@@ -479,3 +479,97 @@ export function toSessionProfile(user: IdentityUser): SessionProfile | null {
     permissions: [],
   };
 }
+
+/* -------------------------------------------------------------------------
+ * Staff invite acceptance (district-admin / school-admin / teacher).
+ *
+ * Invites are created on identity-svc (token-hashed `districtAdminInvites`
+ * rows) and delivered by email with a `/accept-invite?token=…` link. These
+ * two BFF helpers let the web accept-invite page preview the invite and
+ * complete acceptance (which creates the account + auto-logs the user in).
+ * ---------------------------------------------------------------------- */
+
+export type InvitePreview = {
+  email: string;
+  name: string;
+  role: string; // wire format (uppercase)
+  schoolName: string | null;
+  districtName: string | null;
+  expiresAt: string;
+};
+
+export type IdentityInvitePreviewResult =
+  | { ok: true; invite: InvitePreview }
+  | { ok: false; status: number; error: string };
+
+/**
+ * GET /api/auth/invite/:token — public preview. Returns a friendly error
+ * (invalid / expired / already-accepted) the page can render verbatim.
+ */
+export async function identityInvitePreview(
+  token: string,
+): Promise<IdentityInvitePreviewResult> {
+  let res: Response;
+  try {
+    res = await fetch(
+      `${serverEnv.IDENTITY_SVC_URL}/api/auth/invite/${encodeURIComponent(token)}`,
+      { cache: "no-store" },
+    );
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "This invitation could not be found.",
+    };
+  }
+  return { ok: true, invite: json.invite as InvitePreview };
+}
+
+export type IdentityAcceptInviteResult =
+  | { ok: true; user: IdentityUser; accessToken: string; setCookies: string[] }
+  | { ok: false; status: number; error: string; reasons?: string[] };
+
+/**
+ * POST /api/auth/accept-invite — sets the chosen password, which creates
+ * the account and returns an access token + refresh cookie for auto-login.
+ * The caller is responsible for persisting the session on the web-v2 domain
+ * (same as login).
+ */
+export async function identityAcceptInvite(
+  token: string,
+  password: string,
+): Promise<IdentityAcceptInviteResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/accept-invite`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token, password }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    const reasons = Array.isArray(json.reasons)
+      ? (json.reasons.filter((r) => typeof r === "string") as string[])
+      : undefined;
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Could not accept this invitation.",
+      reasons,
+    };
+  }
+  return {
+    ok: true,
+    user: json.user as IdentityUser,
+    accessToken: typeof json.accessToken === "string" ? json.accessToken : "",
+    setCookies: readSetCookies(res.headers),
+  };
+}
