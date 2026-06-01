@@ -79,6 +79,8 @@ const PARITY_MATRIX = {
       mobile: "settings/accessibility",
       status: P,
     },
+    { web: "/messages", mobile: "messages", status: P },
+    { web: "/notifications", mobile: "notifications", status: P },
   ],
 
   Onboarding: [

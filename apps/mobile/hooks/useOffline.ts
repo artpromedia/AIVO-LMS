@@ -1,70 +1,56 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import NetInfo from "@react-native-community/netinfo";
+import { makeItem, enqueue, flushQueue, queueLength } from "@/lib/offline-queue";
 
-interface SyncItem {
-  id: string;
-  action: string;
-  endpoint: string;
-  method: string;
-  body: string;
-  createdAt: number;
-}
-
-const syncQueue: SyncItem[] = [];
-
+/**
+ * Offline-aware action queue. Writes made while offline are persisted
+ * (survives app restart) and replayed — authenticated and idempotent —
+ * when connectivity returns. See `lib/offline-queue.ts`.
+ */
 export function useOffline() {
   const [isOnline, setIsOnline] = useState(true);
   const [pendingActions, setPendingActions] = useState(0);
+  const flushing = useRef(false);
+
+  const flush = useCallback(async () => {
+    if (flushing.current) return;
+    flushing.current = true;
+    try {
+      setPendingActions(await flushQueue());
+    } finally {
+      flushing.current = false;
+    }
+  }, []);
 
   useEffect(() => {
+    let alive = true;
+    queueLength().then((n) => {
+      if (alive) setPendingActions(n);
+    });
     const unsubscribe = NetInfo.addEventListener((state) => {
       const online = state.isConnected === true && state.isInternetReachable !== false;
       setIsOnline(online);
-      if (online && syncQueue.length > 0) {
-        processSyncQueue();
-      }
+      if (online) void flush();
     });
-    return () => unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- processSyncQueue is module-scoped and stable
-  }, []);
+    return () => {
+      alive = false;
+      unsubscribe();
+    };
+  }, [flush]);
 
   const addToSyncQueue = useCallback(
-    (action: string, endpoint: string, method: string, body: unknown) => {
-      const item: SyncItem = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        action,
-        endpoint,
-        method,
-        body: JSON.stringify(body),
-        createdAt: Date.now(),
-      };
-      syncQueue.push(item);
-      setPendingActions(syncQueue.length);
+    async (action: string, baseUrl: string, path: string, method: string, body?: unknown) => {
+      const n = await enqueue(makeItem(action, baseUrl, path, method, body));
+      setPendingActions(n);
+      if (isOnline) void flush();
     },
-    [],
+    [isOnline, flush],
   );
-
-  const processSyncQueue = useCallback(async () => {
-    while (syncQueue.length > 0) {
-      const item = syncQueue[0];
-      try {
-        await fetch(item.endpoint, {
-          method: item.method,
-          headers: { "Content-Type": "application/json" },
-          body: item.body,
-        });
-        syncQueue.shift();
-      } catch {
-        break;
-      }
-    }
-    setPendingActions(syncQueue.length);
-  }, []);
 
   return {
     isOnline,
     pendingActions,
     addToSyncQueue,
-    processSyncQueue,
+    processSyncQueue: flush,
   };
 }

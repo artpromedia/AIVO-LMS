@@ -336,6 +336,23 @@ export const getTherapyGoalsSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const createTherapyGoalSchema = {
+  tags: ["Family"],
+  operationId: "createTherapyGoal",
+  summary: "POST /api/family/therapy-goals",
+  body: {
+    type: "object",
+    required: ["learnerId", "goalText"],
+    additionalProperties: true,
+    properties: {
+      learnerId: { type: "string" },
+      goalText: { type: "string", minLength: 1 },
+      domain: { type: "string" },
+    },
+  },
+  response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 403: errorResponse },
+} as const;
+
 export const familyHealthRootSchema = {
   tags: ["Family"],
   operationId: "familyHealthRoot",
@@ -777,6 +794,43 @@ export const internalSpeechBuddyConsentVerifySchema = {
   summary: "POST /api/family/internal/speech-buddy/consent/verify",
   body: passthroughObject,
   response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 404: errorResponse },
+} as const;
+
+const learnerIdParam = {
+  type: "object",
+  required: ["learnerId"],
+  additionalProperties: true,
+  properties: { learnerId: { type: "string" } },
+} as const;
+
+export const getSpeechBuddyConsentSchema = {
+  tags: ["Family"],
+  operationId: "getSpeechBuddyConsent",
+  summary: "GET /api/family/speech-buddy/consent/:learnerId",
+  params: learnerIdParam,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const grantSpeechBuddyConsentSchema = {
+  tags: ["Family"],
+  operationId: "grantSpeechBuddyConsent",
+  summary: "POST /api/family/speech-buddy/consent/:learnerId",
+  params: learnerIdParam,
+  body: passthroughObject,
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+  },
+} as const;
+
+export const revokeSpeechBuddyConsentSchema = {
+  tags: ["Family"],
+  operationId: "revokeSpeechBuddyConsent",
+  summary: "POST /api/family/speech-buddy/consent/:learnerId/revoke",
+  params: learnerIdParam,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
 } as const;
 
 export const transitionByLearnerIdSchema = {

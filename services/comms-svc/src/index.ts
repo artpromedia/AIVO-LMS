@@ -9,6 +9,7 @@ import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } from "@aivo/scheduling";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerNotificationRoutes } from "./routes/notifications.js";
+import { registerMessageRoutes } from "./routes/messages.js";
 import { registerEmailEventsRoutes } from "./routes/webhook-email-events.js";
 import { runDigestCleanupOnce } from "./lib/digest-cleanup.js";
 import { setEmailOutboxDb } from "./lib/postmark.js";
@@ -45,6 +46,7 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
 
   registerHealthRoutes(app);
   registerNotificationRoutes(app, db);
+  registerMessageRoutes(app, db);
   registerEmailEventsRoutes(app, {
     recordEvent: async (ev) => {
       try {

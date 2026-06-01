@@ -9,6 +9,7 @@ import {
   setMustChangePassword as persistMustChangePassword,
   getMustChangePassword,
 } from "@/lib/api";
+import { setApiActiveRole } from "@/lib/active-role";
 import {
   tryBiometricUnlock,
   disableBiometricUnlock,
@@ -26,6 +27,12 @@ interface User {
   email?: string;
   name: string;
   role: UserRole;
+  /**
+   * Every role the user may act as (ADR 0020 — multi-role). Decoded from the
+   * JWT's `availableRoles` claim; defaults to `[role]`. The unified shell's
+   * RoleProvider sources its switchable roles from this.
+   */
+  availableRoles: UserRole[];
   tenantId: string;
   /**
    * Optional profile-photo URL. Not part of the JWT payload; populated
@@ -108,14 +115,27 @@ export function useAuthState(): AuthContextValue {
   const extractUser = (token: string): User | null => {
     const payload = decodeJWT(token);
     if (!payload) return null;
+    const role = payload.role as UserRole;
+    const claimed = Array.isArray(payload.availableRoles)
+      ? (payload.availableRoles as UserRole[]).filter(Boolean)
+      : [];
+    const availableRoles = claimed.length > 0 ? claimed : [role];
     return {
       id: payload.sub as string,
       email: payload.email as string | undefined,
       name: (payload.name as string) || "",
-      role: payload.role as UserRole,
+      role,
+      availableRoles,
       tenantId: (payload.tenantId as string) || "",
     };
   };
+
+  // Keep the active-role hint (sent on every authenticated request by
+  // lib/api.ts) in sync with the signed-in user. Single-role today; the
+  // unified shell's role switcher updates it on switch. Cleared on logout.
+  useEffect(() => {
+    setApiActiveRole(state.user?.role ?? null);
+  }, [state.user?.role]);
 
   const checkAuth = useCallback(async () => {
     const token = await getToken();

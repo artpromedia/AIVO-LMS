@@ -160,6 +160,81 @@ export function extractRefreshToken(setCookies: string[]): string | null {
   return parseRefreshToken(setCookies);
 }
 
+export type IdentityRegisterSuccess = {
+  kind: "ok";
+  user: IdentityUser;
+  accessToken: string;
+  /** Raw Set-Cookie strings from identity-svc (e.g. refreshToken). */
+  setCookies: string[];
+};
+
+export type IdentityRegisterError = {
+  kind: "error";
+  status: number;
+  error: string;
+  /** Password-policy violation reasons returned on a 400. */
+  reasons?: string[];
+  strengthScore?: number;
+};
+
+export type IdentityRegisterResult = IdentityRegisterSuccess | IdentityRegisterError;
+
+/**
+ * POST /api/auth/register on identity-svc to create a self-service
+ * account. Self-registration is PARENT-only server-side (it provisions a
+ * B2C_FAMILY tenant), so `role` is fixed to "PARENT". The success shape
+ * mirrors /api/auth/login — `{ user, accessToken }` plus a `refreshToken`
+ * Set-Cookie — so the caller can re-use the same cookie-setting path.
+ */
+export async function identityRegister(input: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<IdentityRegisterResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/register`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: input.name,
+        email: input.email,
+        password: input.password,
+        role: "PARENT",
+      }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return {
+      kind: "error",
+      status: 502,
+      error: `identity-svc unreachable: ${(err as Error).message}`,
+    };
+  }
+
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+
+  if (!res.ok) {
+    const reasons = Array.isArray(json.reasons)
+      ? (json.reasons.filter((r) => typeof r === "string") as string[])
+      : undefined;
+    return {
+      kind: "error",
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Registration failed",
+      reasons,
+      strengthScore: typeof json.strengthScore === "number" ? json.strengthScore : undefined,
+    };
+  }
+
+  return {
+    kind: "ok",
+    user: json.user as IdentityUser,
+    accessToken: typeof json.accessToken === "string" ? json.accessToken : "",
+    setCookies: readSetCookies(res.headers),
+  };
+}
+
 /**
  * Shared implementation for the dedicated staff login endpoints. Both
  * `/api/auth/admin-login` and `/api/auth/district-login` accept the same

@@ -197,7 +197,13 @@
       "sub_working": "कार्य जारी...",
       "sub_switch": "इस योजना पर स्विच करें",
       "sub_canceling": "रद्द किया जा रहा है...",
-      "sub_cancel_at_period_end": "अवधि के अंत में रद्द करें"
+      "sub_cancel_at_period_end": "अवधि के अंत में रद्द करें",
+      "checkout": {
+        "success_title": "Payment received",
+        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
+        "cancelled_title": "Checkout cancelled",
+        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
+      }
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "आपके जवाब केवल आपके पास रहते हैं",
@@ -507,7 +513,9 @@
       "accessibility_defaults": "एक्सेसिबिलिटी डिफ़ॉल्ट सेटिंग्स",
       "save_changes": "बदलाव सहेजें",
       "delete_confirm_label": "पुष्टि के लिए DELETE टाइप करें",
-      "remove_learner": "सीखने वाले को हटाएँ"
+      "remove_learner": "सीखने वाले को हटाएँ",
+      "speech_buddy_section_title": "Speech Buddy",
+      "speech_buddy_section_desc": "Optional voice companion for social-emotional practice. Requires your consent."
     },
     "learner_snapshot": {
       "open_full_profile": "पूरी प्रोफ़ाइल खोलें",
@@ -617,6 +625,23 @@
       "messages_count": "{count} संदेश",
       "status_done": "पूर्ण",
       "status_open": "खुला"
+    },
+    "speech_buddy": {
+      "intro": "Speech Buddy is an optional voice companion that helps {name} practise social-emotional skills through short spoken role-plays. It is off until you turn it on, every session is safety-filtered, and you can withdraw consent at any time.",
+      "loading": "Loading…",
+      "enabled": "Speech Buddy is enabled.",
+      "enabled_band": "Speech Buddy is enabled for {band}.",
+      "withdraw": "Withdraw consent",
+      "working": "Working…",
+      "age_band_label": "Age band",
+      "age_band_help": "We tune the language and pacing of Speech Buddy to this band.",
+      "enable": "Enable Speech Buddy",
+      "load_error": "Couldn't load consent status.",
+      "save_error": "Couldn't save consent.",
+      "revoke_error": "Couldn't revoke consent.",
+      "age_6_9": "Ages 6–9",
+      "age_10_12": "Ages 10–12",
+      "age_13_15": "Ages 13–15"
     }
   },
   "brain_clone": {
@@ -1171,7 +1196,15 @@
       "email_label": "ईमेल",
       "password_label": "पासवर्ड",
       "password_helper": "एक संख्या और एक प्रतीक के साथ कम से कम 8 अक्षर।",
-      "name_placeholder": "Riley Parent"
+      "name_placeholder": "Riley Parent",
+      "errors": {
+        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
+        "email_taken": "That email is already registered. Try signing in instead.",
+        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
+        "unsupported_role": "This account type can't be created here.",
+        "signup_failed": "We couldn't create your account. Please try again."
+      }
     },
     "forgot": {
       "heading": "अपना पासवर्ड रीसेट करें",
@@ -1297,7 +1330,14 @@
       "reassure_link": "गोपनीयता सूचना पढ़ें",
       "submit": "साइन इन करें",
       "forgot": "पासवर्ड भूल गए?",
-      "create_account": "खाता बनाएँ"
+      "create_account": "खाता बनाएँ",
+      "errors": {
+        "missing_credentials": "Enter your email and password to sign in.",
+        "invalid_credentials": "That email or password didn't match. Please try again.",
+        "wrong_surface": "This account signs in from a different portal.",
+        "unsupported_role": "This account type can't sign in here.",
+        "login_failed": "We couldn't sign you in. Please try again in a moment."
+      }
     },
     "signup": {
       "eyebrow": "अपना खाता बनाएँ",
@@ -1314,7 +1354,15 @@
       "name_label": "आपका नाम",
       "password_helper": "कम से कम 12 अक्षर। सहेजने से पहले हम जाँचेंगे कि यह किसी ज्ञात लीक में नहीं है।",
       "code_placeholder": "जैसे SCHOOL-7Q4M-2025",
-      "name_placeholder": "पहला और अंतिम नाम"
+      "name_placeholder": "पहला और अंतिम नाम",
+      "errors": {
+        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
+        "email_taken": "That email is already registered. Try signing in instead.",
+        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
+        "unsupported_role": "This account type can't be created here.",
+        "signup_failed": "We couldn't create your account. Please try again."
+      }
     },
     "role": {
       "eyebrow": "अपनी भूमिका चुनें",
@@ -1362,7 +1410,8 @@
       "iep_help": "आप इसे अगले चरणों में अपलोड कर सकते हैं—केवल आपकी स्पष्ट सहमति से। यदि आप बाद में तय करना चाहें तो छोड़ दें।",
       "iep_yes": "हाँ",
       "iep_no": "नहीं",
-      "iep_unsure": "अभी पक्का नहीं"
+      "iep_unsure": "अभी पक्का नहीं",
+      "error_first_name": "Please enter your learner's first name to continue."
     },
     "consent": {
       "eyebrow": "आपकी सहमति — आपका नियंत्रण",

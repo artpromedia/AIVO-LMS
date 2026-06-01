@@ -197,7 +197,13 @@
       "sub_working": "Traitement...",
       "sub_switch": "Passer à ce forfait",
       "sub_canceling": "Annulation...",
-      "sub_cancel_at_period_end": "Annuler à la fin de la période"
+      "sub_cancel_at_period_end": "Annuler à la fin de la période",
+      "checkout": {
+        "success_title": "Payment received",
+        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
+        "cancelled_title": "Checkout cancelled",
+        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
+      }
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Vos réponses vous appartiennent",
@@ -507,7 +513,9 @@
       "accessibility_defaults": "Paramètres d'accessibilité",
       "save_changes": "Enregistrer les modifications",
       "delete_confirm_label": "Saisissez SUPPRIMER pour confirmer",
-      "remove_learner": "Retirer l'apprenant"
+      "remove_learner": "Retirer l'apprenant",
+      "speech_buddy_section_title": "Speech Buddy",
+      "speech_buddy_section_desc": "Optional voice companion for social-emotional practice. Requires your consent."
     },
     "learner_snapshot": {
       "open_full_profile": "Ouvrir le profil complet",
@@ -617,6 +625,23 @@
       "messages_count": "{count} messages",
       "status_done": "Terminé",
       "status_open": "Ouvert"
+    },
+    "speech_buddy": {
+      "intro": "Speech Buddy is an optional voice companion that helps {name} practise social-emotional skills through short spoken role-plays. It is off until you turn it on, every session is safety-filtered, and you can withdraw consent at any time.",
+      "loading": "Loading…",
+      "enabled": "Speech Buddy is enabled.",
+      "enabled_band": "Speech Buddy is enabled for {band}.",
+      "withdraw": "Withdraw consent",
+      "working": "Working…",
+      "age_band_label": "Age band",
+      "age_band_help": "We tune the language and pacing of Speech Buddy to this band.",
+      "enable": "Enable Speech Buddy",
+      "load_error": "Couldn't load consent status.",
+      "save_error": "Couldn't save consent.",
+      "revoke_error": "Couldn't revoke consent.",
+      "age_6_9": "Ages 6–9",
+      "age_10_12": "Ages 10–12",
+      "age_13_15": "Ages 13–15"
     }
   },
   "brain_clone": {
@@ -1171,7 +1196,15 @@
       "email_label": "E-mail",
       "password_label": "Mot de passe",
       "password_helper": "Au moins 8 caractères avec un chiffre et un symbole.",
-      "name_placeholder": "Riley Parent"
+      "name_placeholder": "Riley Parent",
+      "errors": {
+        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
+        "email_taken": "That email is already registered. Try signing in instead.",
+        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
+        "unsupported_role": "This account type can't be created here.",
+        "signup_failed": "We couldn't create your account. Please try again."
+      }
     },
     "forgot": {
       "heading": "Réinitialisez votre mot de passe",
@@ -1297,7 +1330,14 @@
       "reassure_link": "Lire l'avis de confidentialité",
       "submit": "Se connecter",
       "forgot": "Mot de passe oublié ?",
-      "create_account": "Créer un compte"
+      "create_account": "Créer un compte",
+      "errors": {
+        "missing_credentials": "Enter your email and password to sign in.",
+        "invalid_credentials": "That email or password didn't match. Please try again.",
+        "wrong_surface": "This account signs in from a different portal.",
+        "unsupported_role": "This account type can't sign in here.",
+        "login_failed": "We couldn't sign you in. Please try again in a moment."
+      }
     },
     "signup": {
       "eyebrow": "Créez votre compte",
@@ -1314,7 +1354,15 @@
       "name_label": "Votre nom",
       "password_helper": "Au moins 12 caractères. Nous vérifierons qu'il ne figure dans aucune fuite connue avant de l'enregistrer.",
       "code_placeholder": "p. ex. SCHOOL-7Q4M-2025",
-      "name_placeholder": "Prénom et nom"
+      "name_placeholder": "Prénom et nom",
+      "errors": {
+        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
+        "email_taken": "That email is already registered. Try signing in instead.",
+        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
+        "unsupported_role": "This account type can't be created here.",
+        "signup_failed": "We couldn't create your account. Please try again."
+      }
     },
     "role": {
       "eyebrow": "Choisissez votre rôle",
@@ -1362,7 +1410,8 @@
       "iep_help": "Vous pourrez le téléverser aux étapes suivantes — uniquement avec votre consentement explicite. Ignorez si vous préférez décider plus tard.",
       "iep_yes": "Oui",
       "iep_no": "Non",
-      "iep_unsure": "Pas encore sûr"
+      "iep_unsure": "Pas encore sûr",
+      "error_first_name": "Please enter your learner's first name to continue."
     },
     "consent": {
       "eyebrow": "Votre consentement, votre contrôle",

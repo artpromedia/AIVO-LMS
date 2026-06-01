@@ -42,6 +42,14 @@ export function SubscribeForm({
         setError(json?.error?.message ?? "Could not change plan.");
         return;
       }
+      // Real billing path: billing-svc returns a hosted Stripe Checkout
+      // URL — hand off to it. The store path returns no URL, so we just
+      // refresh to reflect the simulated change.
+      const checkoutUrl = json?.data?.checkoutUrl;
+      if (typeof checkoutUrl === "string" && checkoutUrl.length > 0) {
+        window.location.assign(checkoutUrl);
+        return;
+      }
       router.refresh();
     });
   }

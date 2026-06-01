@@ -26,7 +26,11 @@ import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 
 WebBrowser.maybeCompleteAuthSession();
 
-const GOOGLE_CLIENT_ID = "373030578076-ftkmofvss349u7qecvsjmiqavq4mt3hs.apps.googleusercontent.com";
+// Env-driven (EAS / .env), with the dev client id as a fallback so local
+// Google sign-in keeps working without extra setup.
+const GOOGLE_CLIENT_ID =
+  process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ??
+  "373030578076-ftkmofvss349u7qecvsjmiqavq4mt3hs.apps.googleusercontent.com";
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();

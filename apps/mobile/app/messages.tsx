@@ -24,6 +24,7 @@
  */
 import React, { useMemo } from "react";
 import {
+  View,
   Text,
   ScrollView,
   StyleSheet,
@@ -34,6 +35,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { EmptyState } from "@aivo/mobile-ui";
 import { useAuth } from "@/hooks/useAuth";
 import { colors, spacing } from "@/constants/colors";
+import { MessagesInbox } from "@/components/messages/MessagesInbox";
 import {
   buildMobileRoleSession,
   getMobileNavAccess,
@@ -130,27 +132,18 @@ export default function MessagesScreen() {
     );
   }
 
-  // `allow` — render the role-agnostic empty-state shell. The real
-  // inbox lands alongside the unified-inbox port in a follow-up; for
-  // now this matches the web `/messages` UX so behavioural parity is
-  // preserved across shells.
+  // `allow` — render the real threaded inbox (mirrors web `/messages`).
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
+    <View
+      style={[
+        styles.container,
+        { flex: 1, paddingTop: insets.top + 16, paddingBottom: 16 },
+      ]}
     >
       <Text style={styles.title}>Messages</Text>
-      <Text style={styles.subtitle}>
-        Conversations with your AIVO team.
-      </Text>
-      <EmptyState
-        icon={
-          <Ionicons name="chatbubbles-outline" size={48} color={colors.textSecondary} />
-        }
-        title="No messages yet"
-        message="When someone on your AIVO team sends you a message it will land here."
-      />
-    </ScrollView>
+      <Text style={styles.subtitle}>Conversations with your AIVO team.</Text>
+      <MessagesInbox />
+    </View>
   );
 }
 

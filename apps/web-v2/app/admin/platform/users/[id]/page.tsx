@@ -16,6 +16,7 @@ import {
 } from "@/lib/db/repos";
 import type { Role } from "@/lib/auth/types";
 import { ArrowLeft } from "lucide-react";
+import { UserRolesCard } from "./user-roles-card";
 
 const ROLE_LABEL: Record<Role, string> = {
   parent: "Parent",
@@ -106,6 +107,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           </p>
         </Card>
       </div>
+
+      <Card className="mt-6 p-[var(--aivo-density-card-pad)]">
+        <p className="mb-3 font-display text-lg font-semibold">Additional roles</p>
+        <UserRolesCard userId={user.id} />
+      </Card>
 
       <Card className="mt-6 overflow-hidden">
         <div className="border-b border-aivo-border px-4 py-3">

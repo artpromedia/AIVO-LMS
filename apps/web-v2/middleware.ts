@@ -6,7 +6,24 @@ import { NextResponse, type NextRequest } from "next/server";
  * happens inside route handlers via the guards in lib/bff/guards.ts so the
  * middleware stays runtime-cheap.
  */
+// Dev-only surfaces (component gallery, render harnesses, lesson-player
+// fixtures) that ship in the route tree but must never be reachable in
+// production. Blocked with a 404 there; available in dev.
+const DEV_ONLY_PREFIXES = [
+  "/design-system",
+  "/surface-preview",
+  "/learner/lesson-player-fixture",
+  "/learner/lesson-player-smoke",
+];
+
 export function middleware(req: NextRequest) {
+  if (process.env.NODE_ENV === "production") {
+    const { pathname } = req.nextUrl;
+    if (DEV_ONLY_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+      return new NextResponse(null, { status: 404 });
+    }
+  }
+
   const requestId =
     req.headers.get("x-request-id") ??
     (typeof crypto !== "undefined" && "randomUUID" in crypto

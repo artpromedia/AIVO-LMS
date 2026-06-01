@@ -9,7 +9,11 @@ import {
   learnerTherapists,
 } from "@aivo/db";
 import { authenticateRequest } from "../auth.js";
-import { getIepGoalsSchema, getTherapyGoalsSchema } from "./schemas.js";
+import {
+  getIepGoalsSchema,
+  getTherapyGoalsSchema,
+  createTherapyGoalSchema,
+} from "./schemas.js";
 
 /**
  * Top-level "across all my learners" read endpoints used by the web
@@ -163,6 +167,49 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
       });
 
       return { goals };
+    },
+  );
+
+  app.post(
+    "/api/family/therapy-goals",
+    { schema: createTherapyGoalSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+
+      const { learnerId, goalText, domain } = (request.body as any) || {};
+      const text = typeof goalText === "string" ? goalText.trim() : "";
+      if (!learnerId || !text) {
+        return reply.code(400).send({ error: "learnerId and goalText are required" });
+      }
+
+      const learnerIds = await getAccessibleLearnerIds(claims.sub, claims.role, claims.tenantId);
+      if (!learnerIds.includes(learnerId)) {
+        return reply.code(403).send({ error: "Forbidden" });
+      }
+
+      const [row] = await db
+        .insert(therapyGoals)
+        .values({
+          tenantId: claims.tenantId,
+          learnerId,
+          goalText: text,
+          domain: typeof domain === "string" && domain ? domain : null,
+          currentProgress: "0%",
+          status: "active",
+        })
+        .returning();
+
+      return reply.send({
+        goal: {
+          id: row.id,
+          learnerId: row.learnerId,
+          title: row.goalText,
+          category: row.domain ?? "general",
+          progressPct: 0,
+          status: row.status ?? "active",
+        },
+      });
     },
   );
 }

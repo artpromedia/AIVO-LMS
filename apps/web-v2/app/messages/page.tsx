@@ -19,12 +19,9 @@
  * is to anchor the canonical route + RBAC, not to ship the full
  * messaging product.
  */
-import {
-  EmptyState as UiEmptyState,
-  GlassCard,
-  ReassuranceCard,
-} from "@aivo/ui";
+import { ReassuranceCard } from "@aivo/ui";
 import { requirePageRole } from "@/lib/auth/server";
+import { MessagesInbox } from "./messages-inbox";
 import { buildRoleSession } from "@/lib/auth/role-session";
 import { ROLE_LABEL, type Role } from "@/lib/auth/types";
 import { AppShell } from "@/components/layout/app-shell";
@@ -79,30 +76,18 @@ export default async function Page() {
           title="Messages"
           description="Conversations with your AIVO team — teachers, caregivers, and support."
         />
-        <section className="mt-6 grid gap-4 lg:grid-cols-[1fr,320px]">
-          <GlassCard
-            elevation="raised"
-            density="comfortable"
-            title="Inbox"
-            description="Threaded conversations will appear here."
-          >
-            <UiEmptyState
-              title="No messages yet"
-              body="When someone on your AIVO team sends you a message it will land here."
-            />
-          </GlassCard>
-          <aside className="flex flex-col gap-3">
-            <ReassuranceCard
-              tone="privacy"
-              title="Private to your account"
-              body="Only people you've added to your AIVO team can message you here."
-            />
-            <ReassuranceCard
-              tone="safety"
-              title="Safety stays on"
-              body="Safety filtering applies to every message, including those from staff."
-            />
-          </aside>
+        <MessagesInbox />
+        <section className="mt-4 grid gap-3 sm:grid-cols-2">
+          <ReassuranceCard
+            tone="privacy"
+            title="Private to your account"
+            body="Only people you've added to your AIVO team can message you here."
+          />
+          <ReassuranceCard
+            tone="safety"
+            title="Safety stays on"
+            body="Safety filtering applies to every message, including those from staff."
+          />
         </section>
       </RoleGate>
     </AppShell>

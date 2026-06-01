@@ -17,12 +17,9 @@ import {
   ReassuranceCard,
 } from "@aivo/ui";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import {
-  getActiveSubscriptionForTenant,
-  getTenantById,
-  listInvoicesForTenant,
-  listPlans,
-} from "@/lib/db/repos";
+import { getTenantById } from "@/lib/db/repos";
+import { loadParentBillingOverview } from "@/lib/bff/billing-svc";
+import { Banner } from "@/components/ui/banner";
 import { SubscribeForm, CancelButton } from "./subscribe-form";
 
 const STATUS_TONE: Record<string, "success" | "warning" | "error" | "neutral"> = {
@@ -40,13 +37,16 @@ const INV_TONE: Record<string, "success" | "warning" | "error" | "neutral"> = {
   uncollectible: "error",
 };
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.billing");
   const tenant = getTenantById(session.tenantId);
-  const sub = getActiveSubscriptionForTenant(session.tenantId);
-  const plans = listPlans("family");
-  const invoices = listInvoicesForTenant(session.tenantId);
+  const { checkout } = await searchParams;
+  const { plans, subscription: sub, invoices } = await loadParentBillingOverview(session);
   const plansById = new Map(plans.map((p) => [p.plan.id, p.plan]));
   const activePlan = sub ? plansById.get(sub.planId) : null;
   const totalPaidCents = invoices
@@ -69,6 +69,24 @@ export default async function Page() {
           {t("description", { name: tenant?.name ?? t("family_fallback") })}
         </p>
       </header>
+
+      {checkout === "success" ? (
+        <div className="mb-6">
+          <Banner
+            tone="success"
+            title={t("checkout.success_title")}
+            description={t("checkout.success_body")}
+          />
+        </div>
+      ) : checkout === "cancelled" ? (
+        <div className="mb-6">
+          <Banner
+            tone="info"
+            title={t("checkout.cancelled_title")}
+            description={t("checkout.cancelled_body")}
+          />
+        </div>
+      ) : null}
 
       <section className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <FloatingMetricCard

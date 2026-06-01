@@ -38,6 +38,7 @@ import crypto from "crypto";
 import argon2 from "argon2";
 import QRCode from "qrcode";
 import { setSurfaceCookie, clearSurfaceCookie } from "../lib/surface-cookie.js";
+import { loadAvailableRoles } from "../lib/available-roles.js";
 import {
   isInternalRole,
   refreshTtlMs,
@@ -601,10 +602,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         })
         .where(eq(users.id, user.id));
 
+      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
       const accessToken = await signJWT({
         sub: user.id,
         tenantId: user.tenantId,
         role: user.role,
+        availableRoles,
         email: user.email!,
         name: user.name,
         ...(user.schoolId ? { schoolId: user.schoolId } : {}),
@@ -745,10 +748,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         })
         .where(eq(users.id, user.id));
 
+      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
       const accessToken = await signJWT({
         sub: user.id,
         tenantId: user.tenantId,
         role: user.role,
+        availableRoles,
         email: user.email!,
         name: user.name,
         ...(user.schoolId ? { schoolId: user.schoolId } : {}),
@@ -861,10 +866,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         })
         .where(eq(users.id, user.id));
 
+      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
       const accessToken = await signJWT({
         sub: user.id,
         tenantId: user.tenantId,
         role: user.role,
+        availableRoles,
         email: user.email!,
         name: user.name,
         ...(user.schoolId ? { schoolId: user.schoolId } : {}),
@@ -1008,10 +1015,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         }
       }
 
+      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
       const accessToken = await signJWT({
         sub: user.id,
         tenantId: user.tenantId,
         role: user.role,
+        availableRoles,
         email: user.email!,
         name: user.name,
         ...(user.schoolId ? { schoolId: user.schoolId } : {}),
@@ -1121,6 +1130,25 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         },
         "2h",
       );
+
+      // Establish a refresh session so the learner's PIN sign-in survives the
+      // 2h access-token expiry. It previously had no sessions row / refresh
+      // cookie, so the session hard-died at 2h with no silent refresh.
+      const rawRefreshToken = crypto.randomUUID();
+      const ttlMs = refreshTtlMs("LEARNER");
+      await db.insert(sessions).values({
+        userId: matchedLearner.id,
+        refreshToken: hashRefreshToken(rawRefreshToken),
+        expiresAt: new Date(Date.now() + ttlMs),
+      });
+      reply.setCookie("refreshToken", rawRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: Math.floor(ttlMs / 1000),
+      });
+      await setSurfaceCookie(reply, "LEARNER");
 
       return {
         user: {
@@ -1633,10 +1661,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
       }
 
       // Auto-login: mint access token + refresh session like registration.
+      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
       const accessToken = await signJWT({
         sub: user.id,
         tenantId: user.tenantId,
         role: user.role,
+        availableRoles,
         email: user.email!,
         name: user.name,
         ...(user.schoolId ? { schoolId: user.schoolId } : {}),
@@ -2055,10 +2085,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         .set({ lastLoginAt: new Date(), lastLoginIp: clientIp })
         .where(eq(users.id, user.id));
 
+      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
       const accessToken = await signJWT({
         sub: user.id,
         tenantId: user.tenantId,
         role: user.role,
+        availableRoles,
         email: user.email!,
         name: user.name,
         ...(user.schoolId ? { schoolId: user.schoolId } : {}),
@@ -2900,10 +2932,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         .update(users)
         .set({ lastLoginAt: new Date(), lastLoginIp: clientIp })
         .where(eq(users.id, user.id));
+      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
       const accessToken = await signJWT({
         sub: user.id,
         tenantId: user.tenantId,
         role: user.role,
+        availableRoles,
         email: user.email!,
         name: user.name,
         ...(user.schoolId ? { schoolId: user.schoolId } : {}),

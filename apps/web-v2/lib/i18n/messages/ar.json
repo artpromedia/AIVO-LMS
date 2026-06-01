@@ -197,7 +197,13 @@
       "sub_working": "جارٍ المعالجة...",
       "sub_switch": "التبديل إلى هذه الخطة",
       "sub_canceling": "جارٍ الإلغاء...",
-      "sub_cancel_at_period_end": "الإلغاء في نهاية الفترة"
+      "sub_cancel_at_period_end": "الإلغاء في نهاية الفترة",
+      "checkout": {
+        "success_title": "Payment received",
+        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
+        "cancelled_title": "Checkout cancelled",
+        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
+      }
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "إجاباتك تخصك وحدك",
@@ -507,7 +513,9 @@
       "accessibility_defaults": "إعدادات إمكانية الوصول الافتراضية",
       "save_changes": "حفظ التغييرات",
       "delete_confirm_label": "اكتب DELETE للتأكيد",
-      "remove_learner": "إزالة المتعلّم"
+      "remove_learner": "إزالة المتعلّم",
+      "speech_buddy_section_title": "Speech Buddy",
+      "speech_buddy_section_desc": "Optional voice companion for social-emotional practice. Requires your consent."
     },
     "learner_snapshot": {
       "open_full_profile": "فتح الملف الكامل",
@@ -617,6 +625,23 @@
       "messages_count": "{count} رسالة",
       "status_done": "مكتمل",
       "status_open": "مفتوح"
+    },
+    "speech_buddy": {
+      "intro": "Speech Buddy is an optional voice companion that helps {name} practise social-emotional skills through short spoken role-plays. It is off until you turn it on, every session is safety-filtered, and you can withdraw consent at any time.",
+      "loading": "Loading…",
+      "enabled": "Speech Buddy is enabled.",
+      "enabled_band": "Speech Buddy is enabled for {band}.",
+      "withdraw": "Withdraw consent",
+      "working": "Working…",
+      "age_band_label": "Age band",
+      "age_band_help": "We tune the language and pacing of Speech Buddy to this band.",
+      "enable": "Enable Speech Buddy",
+      "load_error": "Couldn't load consent status.",
+      "save_error": "Couldn't save consent.",
+      "revoke_error": "Couldn't revoke consent.",
+      "age_6_9": "Ages 6–9",
+      "age_10_12": "Ages 10–12",
+      "age_13_15": "Ages 13–15"
     }
   },
   "brain_clone": {
@@ -1171,7 +1196,15 @@
       "email_label": "البريد الإلكتروني",
       "password_label": "كلمة المرور",
       "password_helper": "‏8 أحرف على الأقل مع رقم ورمز.",
-      "name_placeholder": "Riley Parent"
+      "name_placeholder": "Riley Parent",
+      "errors": {
+        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
+        "email_taken": "That email is already registered. Try signing in instead.",
+        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
+        "unsupported_role": "This account type can't be created here.",
+        "signup_failed": "We couldn't create your account. Please try again."
+      }
     },
     "forgot": {
       "heading": "أعد تعيين كلمة المرور",
@@ -1297,7 +1330,14 @@
       "reassure_link": "اقرأ إشعار الخصوصية",
       "submit": "تسجيل الدخول",
       "forgot": "هل نسيت كلمة المرور؟",
-      "create_account": "إنشاء حساب"
+      "create_account": "إنشاء حساب",
+      "errors": {
+        "missing_credentials": "Enter your email and password to sign in.",
+        "invalid_credentials": "That email or password didn't match. Please try again.",
+        "wrong_surface": "This account signs in from a different portal.",
+        "unsupported_role": "This account type can't sign in here.",
+        "login_failed": "We couldn't sign you in. Please try again in a moment."
+      }
     },
     "signup": {
       "eyebrow": "أنشئ حسابك",
@@ -1314,7 +1354,15 @@
       "name_label": "اسمك",
       "password_helper": "‏12 حرفًا على الأقل. سنتحقّق من أنها ليست ضمن أي تسريب معروف قبل حفظها.",
       "code_placeholder": "مثال: SCHOOL-7Q4M-2025",
-      "name_placeholder": "الاسم الأول واسم العائلة"
+      "name_placeholder": "الاسم الأول واسم العائلة",
+      "errors": {
+        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
+        "email_taken": "That email is already registered. Try signing in instead.",
+        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
+        "unsupported_role": "This account type can't be created here.",
+        "signup_failed": "We couldn't create your account. Please try again."
+      }
     },
     "role": {
       "eyebrow": "اختر دورك",
@@ -1362,7 +1410,8 @@
       "iep_help": "يمكنك رفعها في الخطوات التالية — فقط بموافقتك الصريحة. تخطَّ إذا كنت تفضّل أن تقرّر لاحقًا.",
       "iep_yes": "نعم",
       "iep_no": "لا",
-      "iep_unsure": "لست متأكدًا بعد"
+      "iep_unsure": "لست متأكدًا بعد",
+      "error_first_name": "Please enter your learner's first name to continue."
     },
     "consent": {
       "eyebrow": "موافقتك — تحكّمك",

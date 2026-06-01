@@ -14,6 +14,7 @@ import { deleteLearner, getLearner, parentCanAccessLearner, updateLearner } from
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { patchLearnerSchema } from "@/lib/validators/learner";
+import { SpeechBuddyConsentCard } from "../speech-buddy-consent-card";
 
 function asStringArray(raw: string): string[] {
   return raw
@@ -216,6 +217,17 @@ export default async function LearnerSettingsPage({
             <Button type="submit">{t("save_changes")}</Button>
           </div>
         </form>
+      </Card>
+
+      <SectionHeader
+        title={t("speech_buddy_section_title")}
+        description={t("speech_buddy_section_desc")}
+      />
+      <Card className="max-w-2xl p-6">
+        <SpeechBuddyConsentCard
+          learnerId={learner.id}
+          learnerName={learner.preferredName || learner.firstName}
+        />
       </Card>
 
       <SectionHeader
