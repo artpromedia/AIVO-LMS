@@ -9,7 +9,7 @@
 -- DETACH/DROP per old partition. Hot-path indexes: BRIN on occurred_at (the
 -- table is naturally time-clustered), btree on tenant_id and action.
 
-CREATE TABLE IF NOT EXISTS audit_events (
+CREATE TABLE IF NOT EXISTS audit_events_v2 (
   id            uuid NOT NULL,                 -- uuidv7 (time-ordered)
   occurred_at   timestamptz NOT NULL,
   tenant_id     uuid,                           -- null = platform-global
@@ -38,29 +38,29 @@ DECLARE
   m2 date := (date_trunc('month', now()) + interval '2 months')::date;
 BEGIN
   EXECUTE format(
-    'CREATE TABLE IF NOT EXISTS audit_events_%s PARTITION OF audit_events FOR VALUES FROM (%L) TO (%L)',
+    'CREATE TABLE IF NOT EXISTS audit_events_v2_%s PARTITION OF audit_events_v2 FOR VALUES FROM (%L) TO (%L)',
     to_char(m0, 'YYYYMM'), m0, m1);
   EXECUTE format(
-    'CREATE TABLE IF NOT EXISTS audit_events_%s PARTITION OF audit_events FOR VALUES FROM (%L) TO (%L)',
+    'CREATE TABLE IF NOT EXISTS audit_events_v2_%s PARTITION OF audit_events_v2 FOR VALUES FROM (%L) TO (%L)',
     to_char(m1, 'YYYYMM'), m1, m2);
 END $$;
 
-CREATE INDEX IF NOT EXISTS audit_events_occurred_brin ON audit_events USING brin (occurred_at);
-CREATE INDEX IF NOT EXISTS audit_events_tenant_idx ON audit_events (tenant_id, occurred_at DESC);
-CREATE INDEX IF NOT EXISTS audit_events_action_idx ON audit_events (action, occurred_at DESC);
-CREATE INDEX IF NOT EXISTS audit_events_actor_idx ON audit_events (actor_id, occurred_at DESC);
-CREATE INDEX IF NOT EXISTS audit_events_entity_idx ON audit_events (entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS audit_events_v2_occurred_brin ON audit_events_v2 USING brin (occurred_at);
+CREATE INDEX IF NOT EXISTS audit_events_v2_tenant_idx ON audit_events_v2 (tenant_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS audit_events_v2_action_idx ON audit_events_v2 (action, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS audit_events_v2_actor_idx ON audit_events_v2 (actor_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS audit_events_v2_entity_idx ON audit_events_v2 (entity_type, entity_id);
 
 -- Append-only guard: block UPDATE/DELETE on the hot table (archival happens
 -- via partition DETACH, not row deletes). Verification jobs read only.
-CREATE OR REPLACE FUNCTION audit_events_block_mutation() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION audit_events_v2_block_mutation() RETURNS trigger AS $$
 BEGIN
-  RAISE EXCEPTION 'audit_events is append-only (no % allowed)', TG_OP;
+  RAISE EXCEPTION 'audit_events_v2 is append-only (no % allowed)', TG_OP;
 END $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS audit_events_no_update ON audit_events;
-CREATE TRIGGER audit_events_no_update BEFORE UPDATE OR DELETE ON audit_events
-  FOR EACH ROW EXECUTE FUNCTION audit_events_block_mutation();
+DROP TRIGGER IF EXISTS audit_events_v2_no_update ON audit_events_v2;
+CREATE TRIGGER audit_events_v2_no_update BEFORE UPDATE OR DELETE ON audit_events_v2
+  FOR EACH ROW EXECUTE FUNCTION audit_events_v2_block_mutation();
 
 -- Daily tamper-evidence anchor: the chain head hash + count for a window,
 -- mirrored to object-lock storage. A rewrite that fixes intra-table hashes
