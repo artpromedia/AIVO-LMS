@@ -2069,6 +2069,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ai/generate-baseline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        parent_assessment: Record<string, never>;
+                        functioning_level?: string;
+                        iep?: Record<string, never> | null;
+                        district?: Record<string, never> | null;
+                        interest_profile?: Record<string, never> | null;
+                        caregiver_perspectives?: unknown[] | null;
+                        teacher_assessment?: Record<string, never> | null;
+                        zip_code?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/assessments/learner-profile/{learnerId}": {
         parameters: {
             query?: never;

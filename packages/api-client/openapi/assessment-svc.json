@@ -3495,6 +3495,68 @@
         }
       }
     },
+    "/api/ai/generate-baseline": {
+      "post": {
+        "tags": [
+          "Baseline LLM"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "parent_assessment"
+                ],
+                "properties": {
+                  "parent_assessment": {
+                    "type": "object"
+                  },
+                  "functioning_level": {
+                    "type": "string"
+                  },
+                  "iep": {
+                    "type": "object",
+                    "nullable": true
+                  },
+                  "district": {
+                    "type": "object",
+                    "nullable": true
+                  },
+                  "interest_profile": {
+                    "type": "object",
+                    "nullable": true
+                  },
+                  "caregiver_perspectives": {
+                    "type": "array",
+                    "nullable": true
+                  },
+                  "teacher_assessment": {
+                    "type": "object",
+                    "nullable": true
+                  },
+                  "zip_code": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
     "/api/assessments/learner-profile/{learnerId}": {
       "get": {
         "tags": [

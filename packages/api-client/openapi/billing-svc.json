@@ -17,78 +17,27 @@
   "paths": {
     "/health": {
       "get": {
-        "operationId": "billingHealthRoot",
-        "summary": "Service health probe (root)",
-        "tags": [
-          "Health"
-        ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "service",
-                    "timestamp"
-                  ],
-                  "additionalProperties": true,
-                  "properties": {
-                    "status": {
-                      "type": "string"
-                    },
-                    "service": {
-                      "type": "string"
-                    },
-                    "timestamp": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Default Response"
           }
         }
       }
     },
     "/api/billing/health": {
       "get": {
-        "operationId": "billingHealth",
-        "summary": "Service health probe",
-        "tags": [
-          "Health"
-        ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "service",
-                    "timestamp"
-                  ],
-                  "additionalProperties": true,
-                  "properties": {
-                    "status": {
-                      "type": "string"
-                    },
-                    "service": {
-                      "type": "string"
-                    },
-                    "timestamp": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Default Response"
           }
         }
       }

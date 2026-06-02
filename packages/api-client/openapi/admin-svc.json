@@ -1618,6 +1618,36 @@
             "description": "Default Response"
           }
         }
+      },
+      "post": {
+        "tags": [
+          "content-cms"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pack": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
       }
     },
     "/api/admin/content-cms/packs/{id}": {
