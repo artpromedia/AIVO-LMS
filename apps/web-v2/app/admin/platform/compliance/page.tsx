@@ -14,7 +14,8 @@ import {
   listAllDataDeletionRequests,
   listPolicyVersions,
 } from "@/lib/db/repos";
-import { Database, ScrollText, Clock, ShieldCheck } from "lucide-react";
+import { listDsars, computeKpis } from "@/lib/compliance/governance-store";
+import { Database, ScrollText, Clock, ShieldCheck, AlertTriangle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,9 @@ export default async function Page() {
   const exports = listAllDataExportRequests();
   const deletes = listAllDataDeletionRequests();
   const policies = await listPolicyVersions();
+
+  const dsars = listDsars();
+  const kpis = computeKpis(dsars);
 
   const tiles: { href: string; label: string; v: number | string; icon: React.ReactNode }[] = [
     {
@@ -50,7 +54,7 @@ export default async function Page() {
     {
       href: "/admin/platform/compliance/dsar",
       label: "DSARs (open + closed)",
-      v: exports.length + deletes.length,
+      v: exports.length + deletes.length + dsars.length,
       icon: <ShieldCheck className="h-4 w-4" />,
     },
   ];
@@ -72,15 +76,54 @@ export default async function Page() {
         description="Data inventory, disclosure log, retention, and parent DSAR queue."
       />
 
+      {/* DSAR KPI cards */}
+      <div className="grid gap-3 sm:grid-cols-3 mb-4">
+        <Card className="p-[var(--aivo-density-card-pad)]">
+          <p className="text-xs font-semibold uppercase text-aivo-muted">Open DSARs</p>
+          <p className="mt-1 font-display text-3xl font-bold">{kpis.open}</p>
+        </Card>
+        <Card className="p-[var(--aivo-density-card-pad)]">
+          <p className="text-xs font-semibold uppercase text-aivo-muted">Overdue</p>
+          <p
+            className={`mt-1 font-display text-3xl font-bold ${kpis.overdue > 0 ? "text-aivo-danger" : ""}`}
+          >
+            {kpis.overdue}
+          </p>
+        </Card>
+        <Card className="p-[var(--aivo-density-card-pad)]">
+          <p className="text-xs font-semibold uppercase text-aivo-muted">Avg fulfillment</p>
+          <p className="mt-1 font-display text-3xl font-bold">
+            {kpis.avgFulfillmentHours !== null
+              ? `${Math.round(kpis.avgFulfillmentHours / 24)}d`
+              : "—"}
+          </p>
+        </Card>
+      </div>
+
+      {kpis.overdue > 0 && (
+        <Card className="mb-4 p-[var(--aivo-density-card-pad)] border-l-4 border-l-aivo-danger bg-aivo-danger/5">
+          <p className="text-sm flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-aivo-danger" />
+            <strong>
+              {kpis.overdue} overdue DSAR{kpis.overdue === 1 ? "" : "s"}
+            </strong>{" "}
+            — fulfillment deadline has passed.{" "}
+            <Link className="underline font-semibold" href="/admin/platform/compliance/dsar">
+              Review now
+            </Link>
+          </p>
+        </Card>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {tiles.map((t) => (
-          <Link key={t.href} href={t.href} className="block">
+        {tiles.map((tile) => (
+          <Link key={tile.href} href={tile.href} className="block">
             <Card className="p-[var(--aivo-density-card-pad)] hover:bg-aivo-surface-2 transition">
               <div className="flex items-center gap-2 text-aivo-muted text-xs font-semibold uppercase">
-                {t.icon}
-                {t.label}
+                {tile.icon}
+                {tile.label}
               </div>
-              <p className="mt-1 font-display text-3xl font-bold">{t.v.toLocaleString()}</p>
+              <p className="mt-1 font-display text-3xl font-bold">{tile.v.toLocaleString()}</p>
             </Card>
           </Link>
         ))}
