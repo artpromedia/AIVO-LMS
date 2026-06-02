@@ -20,12 +20,12 @@ export default async function SsoStartPage({
   searchParams,
 }: {
   params: Promise<{ tenantId: string }>;
-  searchParams: Promise<{ return?: string }>;
+  searchParams: Promise<{ return?: string; noredirect?: string }>;
 }) {
   // Anonymous surface — a signed-in user shouldn't re-enter the SSO dance.
   await requireAnonymous();
   const { tenantId } = await params;
-  const { return: ret } = await searchParams;
+  const { return: ret, noredirect } = await searchParams;
   const t = await getTranslations("auth.sso_start");
 
   const config = getIdpConfigByTenant(tenantId);
@@ -34,12 +34,15 @@ export default async function SsoStartPage({
   const returnTo = safeReturn(ret);
   // Mirrors the URL shape returned by /api/auth/discover (identity-svc).
   const ssoUrl = `/api/sso/${protocol}/${encodeURIComponent(tenantId)}/login?returnTo=${encodeURIComponent(returnTo)}`;
+  // Auto-redirect is the default; `?noredirect=1` lets a user who navigated
+  // back to this page (or an automated a11y check) land without bouncing.
+  const autoRedirect = noredirect !== "1" && noredirect !== "true";
 
   return (
     <>
       <SiteHeader />
       <main id="main" className="mx-auto flex w-full max-w-md flex-col gap-4 px-6 py-12 sm:py-16">
-        <SsoAutoRedirect url={ssoUrl} />
+        {autoRedirect ? <SsoAutoRedirect url={ssoUrl} /> : null}
         <AuthCard
           icon={
             <span
