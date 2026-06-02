@@ -301,13 +301,11 @@ export function registerContentCmsRoutes(app: FastifyInstance, db?: Db): void {
       }
       const issues = validateContentPack(candidate as ContentPack);
       if (issues.length > 0) {
-        return reply
-          .status(400)
-          .send({
-            error: "Pack failed validation; not stored.",
-            issueCount: issues.length,
-            issues,
-          });
+        return reply.status(400).send({
+          error: "Pack failed validation; not stored.",
+          issueCount: issues.length,
+          issues,
+        });
       }
       const ranAt = new Date().toISOString();
       const rec = await store.upsert(candidate as ContentPack);
