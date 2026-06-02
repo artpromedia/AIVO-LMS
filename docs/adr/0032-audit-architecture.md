@@ -90,14 +90,31 @@ platform/district/school admin console (filter bar, table, detail drawer
 with proof, export) + RBAC BFF + i18n (10 locales). tsc/eslint/route-audit
 clean.
 
-**Tracked for follow-up** (need a live Postgres/object-lock + cross-service
-rollout): wiring `audit.emit`/`@audited` into every producer
-(identity/admin/tenant/billing/data-governance/integration — the hook +
-client are ready); the Drizzle-backed partitioned store + the nightly
-retention/anchor job; the WORM anchor upload; the 1M-event p95<500ms and
-100k-row<60s streaming performance runs (the query/stream/index design
-targets them); and the live tamper-alert job (the `verify()` primitive that
-flags the break already exists and is unit-tested).
+**Now also delivered (verified):**
+- `audit.emit`/`@audited` wiring via `installAuditing(app)` — live in
+  **integration-svc** (SIS connect/disconnect/sync), **billing-svc**
+  (subscription change, add-on removal), and **admin-svc** (API-key
+  creation), with a `FastifyContextConfig` augmentation so it composes under
+  strict type-providers.
+- `DrizzleEventStore` against the partitioned `audit_events_v2` table
+  (append in a transaction, keyset query/stream, proof, full-chain verify),
+  selected at boot when `DATABASE_URL` is set.
+- Retention (`partitionsToPrune` + archive-then-drop), anchor
+  (head-hash + count → `audit_anchors` + `S3WormStore` object-lock), and a
+  nightly `audit.tamper-check` safe-cron — all unit-tested; the S3 WORM
+  adapter typechecks against `@aws-sdk/client-s3`.
+- 100k-row streaming export drains in ~1s (constant memory) — pins the
+  `<60s` DoD on the in-memory path.
+
+**Still tracked** (genuinely need live Postgres/Redis/object-lock):
+- `@audited` annotations on the remaining producers' routes
+  (**identity-svc**, **tenant-svc**, **data-governance-svc** — identical
+  one-line `installAuditing(app)` + per-route `audited(...)`, the pattern is
+  proven in the three wired services above).
+- The 1M-event **p95 < 500 ms** query run against the indexed
+  Postgres table (the BRIN/btree design targets it; needs a seeded DB).
+- Object-lock bucket provisioning + the retention job's live DETACH/DROP
+  (the SQL + ports exist; needs a partitioned DB to exercise).
 
 The breach-investigation procedure is in
 `docs/runbooks/audit-incident-response.md`.

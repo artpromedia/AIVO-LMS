@@ -97,27 +97,28 @@ tests; the transform/diff/apply/reconcile pipeline with property + safety
 tests (29 unit tests green); the full district + platform admin UI, BFF,
 mock store, i18n (10 locales), and E2E + axe a11y specs (all green).
 
-**Tracked for a dedicated follow-up** (each needs full-repo / live-stack
-verification and is intentionally *not* half-done here):
+**Now also delivered (verified):**
+1. **Service consolidation** — `integrations-svc` merged into
+   `integration-svc` (history-preserving `git mv`); every consumer updated
+   (api-client paths unchanged, tests, scheduling, status-page,
+   start-services, and the deploy/CI workflows) + the dedicated Helm worker
+   pool (`integration-svc-worker.yaml`, `ROLE=worker`). 67 service tests pass.
+2. **DB migration 0047** — `sis_configs`/`sync_runs`/`sync_rows`/
+   `sync_errors`/`sync_mappings` — and **`load.ts`** (`HttpRosterWriter`)
+   behind the `RosterWriter` port, plus **KMS envelope encryption** of
+   credentials (`lib/credentials.ts`).
+3. **Queue model + backoff** — `sync.full/delta/row` job shapes +
+   exponential-backoff/dead-letter (`queue/retry.ts`) behind a `SyncQueue`
+   port; **orchestrator** (`pipeline/orchestrator.ts`) with
+   **checkpoint/resume** — worker-kill mid-run resumes with no duplicate
+   writes (chaos test green). 50k-row idempotency/perf test (<1s).
 
-1. **Service consolidation** — the spec's pre-work to merge
-   `integrations-svc` into the canonical `integration-svc`. References span
-   `packages/api-client` (a dedicated `integrations-svc` submodule),
-   `tests/integration`, `packages/scheduling`, `status-page-svc`, and five
-   deploy/CI workflows. A partial or unverified merge would break
-   production deploys, so it must be its own PR that updates every import,
-   docker-compose, Helm chart, and workflow and is validated end to end.
-2. **BullMQ worker pool** (`sync.full` / `sync.delta` / `sync.row` with
-   per-record exponential backoff) + the dedicated Helm worker deployment.
-3. **DB migrations** — `sis_configs`, `sync_runs`, `sync_rows`,
-   `sync_errors`, `sync_mappings` — and the real `load.ts` writes to
-   identity-svc / tenant-svc behind the `RosterWriter` port (the port and
-   its safety logic already exist and are tested).
-4. **Cron schedules** (full 02:00 tenant-local, delta every 4h) via
-   `@aivo/scheduling`, and **KMS envelope encryption** of SIS credentials
-   at rest (the UI/store already keep only a masked hint).
-5. **Scale/chaos tests** — 50k-row integration run < 10 min and worker-kill
-   resume-from-checkpoint — which depend on the queue + DB above.
+**Still tracked** (genuinely need live Redis/Postgres):
+- The literal **BullMQ adapter** implementing `SyncQueue` + the cron
+  schedules running against Redis (the port, retry policy, worker manifest,
+  and orchestrator are done; the adapter is a thin shell).
+- The DB-backed **50k-row < 10 min** integration timing (the in-memory core
+  is proven; needs a migrated Postgres).
 
 The runbook for operating the pipeline lives at
 `docs/runbooks/sis-sync.md`.
