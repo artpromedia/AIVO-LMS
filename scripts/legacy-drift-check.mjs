@@ -41,7 +41,6 @@ const EXPECTED_SERVICES = new Set([
   "i18n-svc",
   "identity-svc",
   "integration-svc",
-  "integrations-svc",
   "learning-svc",
   "math-recognizer-svc",
   "problem-session-svc",
@@ -103,7 +102,7 @@ const REFERENCED_FILES = [
   "packages/ops-alerts/src/index.ts",
   "services/integration-svc/src/services/sis-provider-interface.ts",
   "services/integration-svc/src/services/lti13-launch-validator.ts",
-  "services/integrations-svc/src/routes/connectors.ts",
+  "services/integration-svc/src/routes/connectors.ts",
 ];
 
 function listDirNames(rel) {

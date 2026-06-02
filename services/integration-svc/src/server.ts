@@ -5,6 +5,8 @@ import { registerObservabilityPlugin } from "@aivo/observability";
 import { createDb, type Database } from "@aivo/db";
 import { registerSisRoutes } from "./routes/sis.js";
 import { registerLtiRoutes } from "./routes/lti.js";
+import { registerConnectorRoutes } from "./routes/connectors.js";
+import { registerHealthRoutes as registerConnectorHealthRoutes } from "./routes/connectors-health.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
@@ -38,10 +40,24 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerObservabilityPlugin(app, "integration-svc");
   await app.register(cors, { origin: true, credentials: true });
   app.get("/healthz", async () => ({ status: "ok", service: "integration-svc" }));
-  if (!options.skipAuth) {
-    registerEnterpriseAuthHook(app, { sourceService: "integration-svc" });
-  }
-  registerSisRoutes(app);
-  registerLtiRoutes(app, resolveDb(options.db));
+
+  const db = resolveDb(options.db);
+
+  // SIS + LTI routes live behind the enterprise service-auth hook. The hook
+  // is encapsulated in this child scope so it does NOT apply to the merged
+  // connector routes, which authenticate per-route (and expose a public
+  // waitlist) — preserving the behavior they had as a standalone service.
+  await app.register(async (secured) => {
+    if (!options.skipAuth) {
+      registerEnterpriseAuthHook(secured, { sourceService: "integration-svc" });
+    }
+    registerSisRoutes(secured);
+    registerLtiRoutes(secured, db);
+  });
+
+  // Merged from the former integrations-svc (Sprint 3 consolidation): SIS
+  // connector catalogue + connection management. Self-authenticating.
+  registerConnectorRoutes(app, db);
+  registerConnectorHealthRoutes(app);
   return app;
 }

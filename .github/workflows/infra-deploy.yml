@@ -53,7 +53,7 @@ jobs:
           SERVICES=(
             identity-svc assessment-svc brain-svc ai-svc learning-svc
             tutor-svc family-svc engagement-svc billing-svc comms-svc
-            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            i18n-svc integration-svc admin-svc status-page-svc research-svc
             curriculum-svc
           )
 

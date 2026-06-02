@@ -60,9 +60,9 @@ const DEFAULT_SOURCE_KEYS: Array<{ service: string; envKey: string; devDefault: 
   { service: "comms-svc", envKey: "COMMS_SVC_URL", devDefault: "http://localhost:3010" },
   { service: "i18n-svc", envKey: "I18N_SVC_URL", devDefault: "http://localhost:3011" },
   {
-    service: "integrations-svc",
-    envKey: "INTEGRATIONS_SVC_URL",
-    devDefault: "http://localhost:3012",
+    service: "integration-svc",
+    envKey: "INTEGRATION_SVC_URL",
+    devDefault: "http://localhost:3068",
   },
   { service: "admin-svc", envKey: "ADMIN_SVC_URL", devDefault: "http://localhost:3013" },
   { service: "research-svc", envKey: "RESEARCH_SVC_URL", devDefault: "http://localhost:3015" },

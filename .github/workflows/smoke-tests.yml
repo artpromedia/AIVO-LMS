@@ -108,7 +108,7 @@ jobs:
           echo ""
 
           SERVICES=(
-            identity-svc billing-svc family-svc integrations-svc admin-svc
+            identity-svc billing-svc family-svc integration-svc admin-svc
             learning-svc engagement-svc comms-svc i18n-svc tutor-svc
             status-page-svc research-svc assessment-svc curriculum-svc
             ai-svc brain-svc web marketing

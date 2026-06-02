@@ -17,7 +17,7 @@ import {
   listSyncLogsSchema,
   getSyncStatusSchema,
   listRosterMappingsSchema,
-} from "./schemas.js";
+} from "./connectors-schemas.js";
 
 const IS_PROD = process.env.NODE_ENV === "production";
 function requireUrl(name: string, devDefault: string): string {

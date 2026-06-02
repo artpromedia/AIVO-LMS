@@ -53,9 +53,9 @@ echo "Group 3: tutor-svc, family-svc, engagement-svc"
 sleep "$GROUP_PAUSE"
 
 # ── Group 4: billing + integrations + admin ───────────────────────────────
-echo "Group 4: billing-svc, integrations-svc, admin-svc"
+echo "Group 4: billing-svc, integration-svc, admin-svc"
 ( cd /home/runner/workspace/services/billing-svc && BILLING_SVC_PORT=3009 NODE_ENV=development $TSX_BIN src/index.ts ) &
-( cd /home/runner/workspace/services/integrations-svc && INTEGRATIONS_SVC_PORT=3012 NODE_ENV=development $TSX_BIN src/index.ts ) &
+( cd /home/runner/workspace/services/integration-svc && INTEGRATION_PORT=3068 NODE_ENV=development $TSX_BIN src/index.ts ) &
 ( cd /home/runner/workspace/services/admin-svc && ADMIN_SVC_PORT=3013 NODE_ENV=development $TSX_BIN src/index.ts ) &
 sleep "$GROUP_PAUSE"
 

@@ -61,7 +61,7 @@ jobs:
           - learning-svc # 5
           - assessment-svc # 6
           - comms-svc # 7
-          - integrations-svc # 8
+          - integration-svc # 8
           - web-app # 9
           - marketing-site # 10
           - brain-svc # 11 (python)
@@ -197,7 +197,7 @@ jobs:
           NODE_SERVICES=(
             identity-svc assessment-svc learning-svc tutor-svc
             family-svc engagement-svc billing-svc comms-svc
-            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            i18n-svc integration-svc admin-svc status-page-svc research-svc
           )
           GIT_COMMIT="${GITHUB_SHA}"
           for svc in "${NODE_SERVICES[@]}"; do
@@ -294,7 +294,7 @@ jobs:
           SERVICES=(
             identity-svc assessment-svc brain-svc ai-svc learning-svc
             tutor-svc family-svc engagement-svc billing-svc comms-svc
-            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            i18n-svc integration-svc admin-svc status-page-svc research-svc
             curriculum-svc
           )
           adopt() {
@@ -363,7 +363,7 @@ jobs:
                 EXTRA_SETS=(--set env.COMMS_SVC_PORT=3000)
                 ;;
               i18n-svc)         EXTRA_SETS=(--set env.I18N_SVC_PORT=3000) ;;
-              integrations-svc) EXTRA_SETS=(--set env.INTEGRATIONS_SVC_PORT=3000) ;;
+              integration-svc) EXTRA_SETS=(--set env.INTEGRATION_SVC_PORT=3000) ;;
               research-svc)     EXTRA_SETS=(--set env.RESEARCH_SVC_PORT=3000) ;;
               curriculum-svc)   EXTRA_SETS=(--set env.CURRICULUM_SVC_PORT=3000) ;;
               status-page-svc)
@@ -379,7 +379,7 @@ jobs:
                   --set "env.ENGAGEMENT_SVC_URL=http://engagement-svc.${NS}.svc.cluster.local:3000"
                   --set "env.BILLING_SVC_URL=http://billing-svc.${NS}.svc.cluster.local:3000"
                   --set "env.I18N_SVC_URL=http://i18n-svc.${NS}.svc.cluster.local:3000"
-                  --set "env.INTEGRATIONS_SVC_URL=http://integrations-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.INTEGRATION_SVC_URL=http://integration-svc.${NS}.svc.cluster.local:3000"
                   --set "env.ADMIN_SVC_URL=http://admin-svc.${NS}.svc.cluster.local:3000"
                   --set "env.STATUS_PAGE_SVC_URL=http://status-page-svc.${NS}.svc.cluster.local:3000"
                   --set "env.RESEARCH_SVC_URL=http://research-svc.${NS}.svc.cluster.local:3000"
@@ -657,7 +657,7 @@ jobs:
           SERVICES=(
             identity-svc assessment-svc brain-svc ai-svc learning-svc
             tutor-svc family-svc engagement-svc billing-svc comms-svc
-            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            i18n-svc integration-svc admin-svc status-page-svc research-svc
             curriculum-svc
           )
           PYTHON_SERVICES=(brain-svc ai-svc curriculum-svc)
@@ -715,7 +715,7 @@ jobs:
               billing-svc)      EXTRA_SETS=(--set env.BILLING_SVC_PORT=3000) ;;
               comms-svc)        EXTRA_SETS=(--set env.COMMS_SVC_PORT=3000) ;;
               i18n-svc)         EXTRA_SETS=(--set env.I18N_SVC_PORT=3000) ;;
-              integrations-svc) EXTRA_SETS=(--set env.INTEGRATIONS_SVC_PORT=3000) ;;
+              integration-svc) EXTRA_SETS=(--set env.INTEGRATION_SVC_PORT=3000) ;;
               research-svc)     EXTRA_SETS=(--set env.RESEARCH_SVC_PORT=3000) ;;
               curriculum-svc)   EXTRA_SETS=(--set env.CURRICULUM_SVC_PORT=3000) ;;
               status-page-svc)
@@ -733,7 +733,7 @@ jobs:
                   --set "env.ENGAGEMENT_SVC_URL=http://engagement-svc.aivo.svc.cluster.local:3000"
                   --set "env.BILLING_SVC_URL=http://billing-svc.aivo.svc.cluster.local:3000"
                   --set "env.I18N_SVC_URL=http://i18n-svc.aivo.svc.cluster.local:3000"
-                  --set "env.INTEGRATIONS_SVC_URL=http://integrations-svc.aivo.svc.cluster.local:3000"
+                  --set "env.INTEGRATION_SVC_URL=http://integration-svc.aivo.svc.cluster.local:3000"
                   --set "env.ADMIN_SVC_URL=http://admin-svc.aivo.svc.cluster.local:3000"
                   --set "env.STATUS_PAGE_SVC_URL=http://status-page-svc.aivo.svc.cluster.local:3000"
                   --set "env.RESEARCH_SVC_URL=http://research-svc.aivo.svc.cluster.local:3000"

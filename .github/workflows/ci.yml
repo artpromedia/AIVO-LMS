@@ -268,13 +268,11 @@ jobs:
       - name: Run research-svc tests (analytics auth gate)
         run: pnpm --filter @aivo/research-svc test
 
-      - name: Run integration-svc tests (LTI 1.3 launch + validator)
+      - name: Run integration-svc tests (LTI 1.3 + SIS connectors + roster pipeline)
         # No DATABASE_URL: the LTI persistence test is opt-in (skips without a
-        # migrated DB); the launch + validator suites run statelessly here.
+        # migrated DB); the launch, validator, connector-catalogue, and roster
+        # pipeline suites run statelessly here. (integrations-svc was merged in.)
         run: pnpm --filter @aivo/integration-svc test
-
-      - name: Run integrations-svc tests (connector catalogue)
-        run: pnpm --filter @aivo/integrations-svc test
 
       - name: Build packages + services for in-process integration tests
         run: pnpm --filter "./packages/**" --filter "./services/**" build

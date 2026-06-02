@@ -111,7 +111,7 @@ jobs:
           NODE_SERVICES=(
             identity-svc assessment-svc learning-svc tutor-svc
             family-svc engagement-svc billing-svc comms-svc
-            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            i18n-svc integration-svc admin-svc status-page-svc research-svc
           )
           GIT_COMMIT="${GITHUB_SHA}"
           for svc in "${NODE_SERVICES[@]}"; do
@@ -183,7 +183,7 @@ jobs:
           SERVICES=(
             identity-svc assessment-svc brain-svc ai-svc learning-svc
             tutor-svc family-svc engagement-svc billing-svc comms-svc
-            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            i18n-svc integration-svc admin-svc status-page-svc research-svc
             curriculum-svc
             alerts-proxy-svc
           )

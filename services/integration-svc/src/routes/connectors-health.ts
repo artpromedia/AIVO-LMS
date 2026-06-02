@@ -1,10 +1,10 @@
 import { FastifyInstance } from "fastify";
-import { healthSchema } from "./schemas.js";
+import { healthSchema } from "./connectors-schemas.js";
 
 export function registerHealthRoutes(app: FastifyInstance) {
   const handler = async () => ({
     status: "ok",
-    service: "integrations-svc",
+    service: "integration-svc",
     timestamp: new Date().toISOString(),
   });
   app.get("/api/integrations/health", { schema: healthSchema }, handler);
