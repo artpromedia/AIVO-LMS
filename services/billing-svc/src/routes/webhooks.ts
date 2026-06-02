@@ -5,6 +5,7 @@ import {
   subscriptions,
   tutorSubscriptions,
   invoices as invoicesTable,
+  invoicesCache,
   stripeWebhookEvents,
 } from "@aivo/db";
 import { isPlanId, isTutorSku, type PlanId, type TutorSku } from "@aivo/billing-entitlements";
@@ -630,6 +631,12 @@ async function handleInvoiceUpsert(
       .where(eq(invoicesTable.id, existing[0].id));
   }
 
+  // Keep the district-rollup cache (`invoices_cache`) in step with the
+  // per-tenant mirror so cross-school invoice listing stays fast. The PDF
+  // is re-hosted lazily (the .pdf route streams from Stripe on demand and
+  // backfills the object key), so `pdfObjectKey` starts null here.
+  await upsertInvoiceCache(db, invoice, tenantId);
+
   await emitBillingAudit(db, log, {
     eventType: paymentStatus === "paid" ? "billing.invoice.paid" : "billing.invoice.failed",
     tenantId,
@@ -651,6 +658,37 @@ async function handleInvoiceUpsert(
         updatedAt: new Date(),
       })
       .where(eq(subscriptions.stripeSubscriptionId, stripeSubscriptionId));
+  }
+}
+
+/**
+ * Idempotent upsert into the district-rollup invoice cache. Keyed by
+ * `stripe_invoice_id`; safe to call on every invoice webhook.
+ */
+async function upsertInvoiceCache(db: any, invoice: Stripe.Invoice, tenantId: string) {
+  const values = {
+    tenantId,
+    stripeInvoiceId: invoice.id,
+    number: invoice.number ?? null,
+    status: invoice.status ?? "open",
+    amountDue: invoice.amount_due ?? 0,
+    amountPaid: invoice.amount_paid ?? 0,
+    currency: invoice.currency ?? "usd",
+    hostedInvoiceUrl: invoice.hosted_invoice_url ?? null,
+    periodStart: unixToDate(invoice.period_start),
+    periodEnd: unixToDate(invoice.period_end),
+    issuedAt: unixToDate(invoice.created) ?? new Date(),
+    updatedAt: new Date(),
+  };
+  const existing = await db
+    .select({ id: invoicesCache.id })
+    .from(invoicesCache)
+    .where(eq(invoicesCache.stripeInvoiceId, invoice.id))
+    .limit(1);
+  if (existing.length === 0) {
+    await db.insert(invoicesCache).values(values);
+  } else {
+    await db.update(invoicesCache).set(values).where(eq(invoicesCache.id, existing[0].id));
   }
 }
 

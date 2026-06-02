@@ -288,6 +288,13 @@
       "when": 1780632000000,
       "tag": "0057_content_packs",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1780718400000,
+      "tag": "0058_seat_pooling",
+      "breakpoints": true
     }
   ]
 }

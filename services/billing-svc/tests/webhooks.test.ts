@@ -279,8 +279,9 @@ test("invoice.payment_succeeded routes through the paid handler", async () => {
     } as unknown as Stripe.Event,
     silentLog,
   );
-  // Insert into invoices, update subscription payment_status.
-  assert.equal(calls.filter((c) => c.op === "insert").length, 1);
+  // Insert into invoices + the district-rollup invoices_cache (Sprint 4),
+  // and update subscription payment_status.
+  assert.equal(calls.filter((c) => c.op === "insert").length, 2);
   assert.equal(calls.filter((c) => c.op === "update").length, 1);
 });
 

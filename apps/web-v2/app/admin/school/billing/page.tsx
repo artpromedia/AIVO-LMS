@@ -13,7 +13,9 @@ import {
   listSeatAssignments,
   listSeatLicensesForTenant,
 } from "@/lib/db/repos";
+import { getSchoolSeatView, listSeatRequestsForSchool } from "@/lib/billing/district-pool";
 import { AssignSeatRow, RevokeSeatButton } from "./seat-actions";
+import { DistrictSeatSection } from "./district-seat-section";
 
 const STATUS_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> = {
   trialing: "warning",
@@ -30,6 +32,8 @@ export default async function Page() {
   const sub = getActiveSubscriptionForTenant(session.tenantId);
   const licenses = listSeatLicensesForTenant(session.tenantId);
   const invoices = listInvoicesForTenant(session.tenantId);
+  const seatView = getSchoolSeatView(session.tenantId);
+  const seatRequests = listSeatRequestsForSchool(session.tenantId);
 
   return (
     <AppShell
@@ -160,6 +164,20 @@ export default async function Page() {
           </table>
         </Card>
       )}
+
+      {/* District seat allocation section */}
+      <DistrictSeatSection
+        districtId={seatView.districtId}
+        allocated={seatView.allocated}
+        used={seatView.used}
+        requests={seatRequests.map((r) => ({
+          id: r.id,
+          requestedSeats: r.requestedSeats,
+          justification: r.justification,
+          status: r.status,
+          createdAt: r.createdAt,
+        }))}
+      />
     </AppShell>
   );
 }

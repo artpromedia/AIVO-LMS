@@ -33,7 +33,10 @@ export type BillingAuditEventType =
   | "billing.invoice.failed"
   | "billing.entitlement.granted"
   | "billing.entitlement.revoked"
-  | "billing.reconciliation.drift";
+  | "billing.reconciliation.drift"
+  | "billing.seats.allocated"
+  | "billing.seats.allocation_superseded"
+  | "billing.overage";
 
 export interface EmitArgs {
   eventType: BillingAuditEventType;
