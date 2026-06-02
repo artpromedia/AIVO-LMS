@@ -122,3 +122,69 @@ test("POST /packs/:id/publish 404s for unknown id", async () => {
     await app.close();
   }
 });
+
+test("POST /packs creates a pack that is then listable + publishable", async () => {
+  const app = await bootstrap();
+  try {
+    const pack = {
+      id: "g1-reading-spring-2026",
+      title: "G1 Reading Spring 2026",
+      version: "1.0.0",
+      schemaVersion: 1,
+      subject: "reading",
+      gradeBand: "1",
+      skillGraphRefs: ["ccss.ela.1.rf"],
+      publisher: { name: "AIVO" },
+      license: "Proprietary",
+      publishedAt: "2026-03-01T00:00:00Z",
+      assets: [],
+      activities: [
+        {
+          id: "a-letter-a",
+          title: "Letter A",
+          skillId: "ccss.ela.1.rf.1",
+          type: "tap",
+          prompt: "Tap A.",
+          difficulty: "intro",
+          choices: [{ id: "ok", label: "A", correct: true }],
+        },
+      ],
+    };
+    const create = await app.inject({
+      method: "POST",
+      url: "/api/admin/content-cms/packs",
+      payload: { pack },
+    });
+    assert.equal(create.statusCode, 201);
+
+    const detail = await app.inject({
+      method: "GET",
+      url: "/api/admin/content-cms/packs/g1-reading-spring-2026",
+    });
+    assert.equal(detail.statusCode, 200);
+    assert.equal((detail.json() as any).lastValidation.ok, true);
+
+    const publish = await app.inject({
+      method: "POST",
+      url: "/api/admin/content-cms/packs/g1-reading-spring-2026/publish",
+    });
+    assert.equal(publish.statusCode, 200);
+    assert.equal((publish.json() as any).status, "published");
+  } finally {
+    await app.close();
+  }
+});
+
+test("POST /packs rejects an invalid pack", async () => {
+  const app = await bootstrap();
+  try {
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/admin/content-cms/packs",
+      payload: { pack: { id: "", title: "" } },
+    });
+    assert.equal(res.statusCode, 400);
+  } finally {
+    await app.close();
+  }
+});

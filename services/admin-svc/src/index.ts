@@ -76,7 +76,7 @@ export async function buildApp(
   registerScimTokenRoutes(app, db);
   registerEvidenceRoutes(app, db);
   registerJobsRoutes(app, db);
-  registerContentCmsRoutes(app);
+  registerContentCmsRoutes(app, db);
   // Wire the internal-jobs route up with a handle map that is mutated
   // by `start()` once the schedulers are running. The dump path leaves
   // it empty, which is safe because the route reads `handles[jobName]`
