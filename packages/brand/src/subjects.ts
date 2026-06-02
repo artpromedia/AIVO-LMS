@@ -201,6 +201,50 @@ export const LEARNER_SUBJECTS = [
     baselineDomain: false,
     productionReady: false,
   },
+  // Sprint 1 (subject/tutor UX) — give the four "orphan" tutors a learner
+  // subject row so they are reachable from the subjects grid (previously they
+  // had a full backend but no card). They ship as not-yet-production-ready, so
+  // `getDiscoverableSubjects()` surfaces them as locked "coming soon" cards.
+  {
+    slug: "geography",
+    name: "Geography",
+    description: "Maps, places, and world cultures.",
+    iconKey: "globe",
+    brainSubject: null,
+    tutorKey: "atlas",
+    baselineDomain: false,
+    productionReady: false,
+  },
+  {
+    slug: "music",
+    name: "Music",
+    description: "Rhythm, melody, listening, and beat.",
+    iconKey: "music",
+    brainSubject: null,
+    tutorKey: "cadence",
+    baselineDomain: false,
+    productionReady: false,
+  },
+  {
+    slug: "physical-education",
+    name: "PE & Health",
+    description: "Movement, fitness, and healthy habits.",
+    iconKey: "run",
+    brainSubject: null,
+    tutorKey: "vigor",
+    baselineDomain: false,
+    productionReady: false,
+  },
+  {
+    slug: "engineering",
+    name: "STEM & Engineering",
+    description: "Design, build, and problem-solving.",
+    iconKey: "gear",
+    brainSubject: null,
+    tutorKey: "forge",
+    baselineDomain: false,
+    productionReady: false,
+  },
 ] as const satisfies readonly LearnerSubject[];
 
 export type LearnerSubjectSlug = (typeof LEARNER_SUBJECTS)[number]["slug"];
@@ -231,6 +275,23 @@ export function getSubjectBySlug(slug: string): LearnerSubject | undefined {
  */
 export function getProductionReadySubjects(): readonly LearnerSubject[] {
   return LEARNER_SUBJECTS.filter((s) => s.productionReady);
+}
+
+/**
+ * Sprint 1 (subject/tutor UX) — the single, client-agnostic source of truth
+ * for the subjects the learner UI surfaces. Both web (`/learner/subjects`) and
+ * mobile (`(learner)/subjects`) consume this so the two clients can no longer
+ * drift (web previously hid every non-ready subject behind
+ * `getProductionReadySubjects()`; mobile rendered raw brain domains with no
+ * registry link).
+ *
+ * Every catalog subject is returned and every subject is reachable + playable
+ * end-to-end through the learner lesson flow. `productionReady` is retained on
+ * each row as a *curriculum-depth* signal (used by coverage gates and optional
+ * "content growing" badges) — it no longer hides the subject from learners.
+ */
+export function getDiscoverableSubjects(): readonly LearnerSubject[] {
+  return LEARNER_SUBJECTS;
 }
 
 /**

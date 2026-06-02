@@ -16,7 +16,8 @@ export type LearnerSurfaceType =
   | "voice_response"
   | "multi_step_workspace"
   | "coding_sandbox"
-  | "art_canvas";
+  | "art_canvas"
+  | "music_sequencer";
 
 export type FeedbackMode =
   | "immediate_supportive"
@@ -54,6 +55,184 @@ export interface LearnerSurfaceSpec {
   numberLine?: NumberLineSpec;
   /** Sprint — set when type === "video" | "audio" | "media". */
   media?: MediaSurfaceSpec;
+  /** Sprint 4 — set when type === "reading_annotation". */
+  readingAnnotation?: ReadingAnnotationSpec;
+  /** Sprint 5 — set when type === "graph". */
+  graph?: GraphSpec;
+  /** Sprint 5 — set when type === "drag_manipulative". */
+  dragManipulative?: DragManipulativeSpec;
+  /** Sprint 5 — set when type === "multi_step_workspace". */
+  multiStep?: MultiStepSpec;
+  /** Sprint 6 — set when type === "science_diagram". */
+  scienceDiagram?: ScienceDiagramSpec;
+  /** Sprint 8 — set when type === "music_sequencer". */
+  musicSequencer?: MusicSequencerSpec;
+}
+
+/**
+ * Sprint 8 — Music/rhythm step sequencer (cadence). A grid of instrument tracks
+ * × beats; the learner toggles cells to build a rhythm pattern. Optional audio
+ * playback ticks the beats. Captures the pattern as the response.
+ */
+export interface MusicSequencerSpec {
+  /** Instrument row labels (e.g. ["Clap", "Drum", "Shaker"]). */
+  tracks: string[];
+  /** Number of beats (columns). Default 8. */
+  steps?: number;
+  /** Playback tempo in beats per minute. Default 90. */
+  tempo?: number;
+  /** Expected active step indices per track, for scoring. */
+  expectedPattern?: number[][];
+}
+
+export interface MusicSequencerResponse {
+  /** pattern[trackIndex] = sorted active step indices. */
+  pattern: number[][];
+}
+
+/**
+ * Sprint 4 — Reading annotation surface (sage / ELA).
+ *
+ * The passage is pre-tokenized into addressable spans (sentence or phrase
+ * level). The learner highlights/underlines the spans that answer a
+ * comprehension prompt; the response captures the selected span ids as cited
+ * evidence. Rendering is by index only — no raw HTML — so AI-authored passages
+ * can never inject markup.
+ */
+export interface ReadingAnnotationSpan {
+  /** Stable id used for selection + scoring. */
+  id: string;
+  /** Plain text of this span. */
+  text: string;
+  /** When false, the span is shown but cannot be selected. Defaults to true. */
+  selectable?: boolean;
+  /** When true, a paragraph break is rendered after this span. */
+  breakAfter?: boolean;
+}
+
+export type ReadingAnnotationTool = "highlight" | "underline";
+
+export interface ReadingAnnotationSpec {
+  passage: ReadingAnnotationSpan[];
+  /** Annotation tools available to the learner. Defaults to ["highlight"]. */
+  tools?: ReadingAnnotationTool[];
+  /** Span ids that constitute the correct textual evidence (for scoring). */
+  expectedEvidenceIds?: string[];
+  /** Optional comprehension question shown above the passage. */
+  question?: string;
+}
+
+export interface ReadingAnnotationResponse {
+  selectedSpanIds: string[];
+  tool: ReadingAnnotationTool;
+}
+
+/**
+ * Sprint 5 — Coordinate-plane graphing surface (nova / spark). The learner
+ * plots points (and optionally connects them) on a deterministic grid.
+ */
+export interface GraphSpec {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  step?: number;
+  /** "points" lets the learner place discrete points; "line" connects them. */
+  mode?: "points" | "line";
+  /** Expected points for scoring (order-independent for "points"). */
+  expectedPoints?: Point[];
+  /** Tolerance (in grid units) when matching a plotted point. Default 0. */
+  tolerance?: number;
+}
+
+export interface GraphResponse {
+  points: Point[];
+}
+
+/**
+ * Sprint 5 — Drag-and-place manipulative (nova early math / compass exec-fn):
+ * the learner drags tokens into labelled targets (bins, slots, a number frame).
+ */
+export interface DragManipulativeItem {
+  id: string;
+  label: string;
+  emoji?: string;
+}
+
+export interface DragManipulativeTarget {
+  id: string;
+  label: string;
+  /** Max tokens this target accepts (omit for unlimited). */
+  capacity?: number;
+}
+
+export interface DragManipulativeSpec {
+  items: DragManipulativeItem[];
+  targets: DragManipulativeTarget[];
+  /** Correct itemId -> targetId mapping for scoring. */
+  correctPlacement?: Record<string, string>;
+}
+
+export interface DragManipulativeResponse {
+  /** itemId -> targetId for every placed token. */
+  placement: Record<string, string>;
+}
+
+/**
+ * Sprint 5 — Multi-step workspace (nova / spark): a structured solver where
+ * each step is entered and validated independently so process telemetry is
+ * captured (not just a single final answer).
+ */
+export interface MultiStepStep {
+  id: string;
+  prompt: string;
+  /** Expected answer for this step (string-compared after normalization). */
+  expectedAnswer?: string;
+  hint?: string;
+}
+
+export interface MultiStepSpec {
+  steps: MultiStepStep[];
+}
+
+export interface MultiStepResponse {
+  /** stepId -> learner entry. */
+  entries: Record<string, string>;
+}
+
+/**
+ * Sprint 6 — Science diagram labelling (spark). A safe, deterministic diagram
+ * (reusing `GeometryDiagramSpec` primitives) with positioned drop-targets the
+ * learner labels from a bank (e.g. label the cell, the water cycle, circuit
+ * parts). Optionally captures observation rows for an experiment.
+ */
+export interface ScienceDiagramTarget {
+  id: string;
+  /** Position in the diagram's coordinate space (matches diagram width/height). */
+  x: number;
+  y: number;
+  /** Correct label id for scoring (omit for ungraded/observational targets). */
+  correctLabelId?: string;
+}
+
+export interface ScienceDiagramLabel {
+  id: string;
+  text: string;
+}
+
+export interface ScienceDiagramSpec {
+  /** Safe background visual rendered via `renderGeometrySvg`. */
+  diagram?: GeometryDiagramSpec;
+  /** Coordinate space for target positions (defaults to the diagram size). */
+  width?: number;
+  height?: number;
+  targets: ScienceDiagramTarget[];
+  labels: ScienceDiagramLabel[];
+}
+
+export interface ScienceDiagramResponse {
+  /** targetId -> labelId placed by the learner. */
+  placement: Record<string, string>;
 }
 
 export interface SurfaceCaptureSpec {
@@ -318,6 +497,18 @@ export interface SurfaceResponse {
   durationMs?: number;
   /** Sprint 10 — set when type === "voice_response". */
   voiceResponse?: VoiceResponsePayload;
+  /** Sprint 4 — set when type === "reading_annotation". */
+  readingAnnotation?: ReadingAnnotationResponse;
+  /** Sprint 5 — set when type === "graph". */
+  graph?: GraphResponse;
+  /** Sprint 5 — set when type === "drag_manipulative". */
+  dragManipulative?: DragManipulativeResponse;
+  /** Sprint 5 — set when type === "multi_step_workspace". */
+  multiStep?: MultiStepResponse;
+  /** Sprint 6 — set when type === "science_diagram". */
+  scienceDiagram?: ScienceDiagramResponse;
+  /** Sprint 8 — set when type === "music_sequencer". */
+  musicSequencer?: MusicSequencerResponse;
 }
 
 /**

@@ -87,6 +87,39 @@ export function scaleFont(size: number, scale: TextScale): number {
   return Math.round(size * TEXT_SCALE_FACTOR[scale] * 100) / 100;
 }
 
+/**
+ * Sprint 9 — the lesson-runtime accommodation set, resolved from the learner's
+ * accessibility + audio preferences plus any IEP-driven extended-time flag.
+ * Both the stage runtime and surface renderers consume this to decide which
+ * affordances/indicators to surface (read-aloud control, captions, extended
+ * time, reduced motion, text scale) — a single source so web and mobile agree.
+ */
+export interface LessonAccommodations {
+  /** Show a read-aloud (TTS) control. Requires both the a11y default and the
+   *  master TTS switch to be on. */
+  readAloud: boolean;
+  /** Force captions on media surfaces. */
+  captionsAlwaysOn: boolean;
+  /** Surface an "extra time — no rush" indicator and relax any timers. */
+  extendedTime: boolean;
+  reducedMotion: boolean;
+  textScale: TextScale;
+}
+
+export function resolveLessonAccommodations(
+  a11y: A11yPreferences,
+  audio: AudioPreferences,
+  opts?: { extendedTime?: boolean },
+): LessonAccommodations {
+  return {
+    readAloud: a11y.readAloudDefault && audio.ttsEnabled,
+    captionsAlwaysOn: a11y.captionsDefault,
+    extendedTime: opts?.extendedTime ?? false,
+    reducedMotion: a11y.reduceMotion,
+    textScale: a11y.textScale,
+  };
+}
+
 function isTextScale(v: unknown): v is TextScale {
   return v === "small" || v === "medium" || v === "large";
 }

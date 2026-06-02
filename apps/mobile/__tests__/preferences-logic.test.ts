@@ -9,7 +9,45 @@ import {
   DEFAULT_AUDIO,
   MIN_SPEED,
   MAX_SPEED,
+  resolveLessonAccommodations,
 } from "../lib/preferences-logic";
+
+describe("resolveLessonAccommodations", () => {
+  it("enables read-aloud only when both the a11y default and TTS master are on", () => {
+    const on = resolveLessonAccommodations(
+      { ...DEFAULT_A11Y, readAloudDefault: true },
+      { ...DEFAULT_AUDIO, ttsEnabled: true },
+    );
+    expect(on.readAloud).toBe(true);
+    const ttsOff = resolveLessonAccommodations(
+      { ...DEFAULT_A11Y, readAloudDefault: true },
+      { ...DEFAULT_AUDIO, ttsEnabled: false },
+    );
+    expect(ttsOff.readAloud).toBe(false);
+    const prefOff = resolveLessonAccommodations(
+      { ...DEFAULT_A11Y, readAloudDefault: false },
+      { ...DEFAULT_AUDIO, ttsEnabled: true },
+    );
+    expect(prefOff.readAloud).toBe(false);
+  });
+
+  it("passes through captions, reduced motion, and text scale", () => {
+    const r = resolveLessonAccommodations(
+      { reduceMotion: true, textScale: "large", readAloudDefault: false, captionsDefault: true },
+      DEFAULT_AUDIO,
+    );
+    expect(r.captionsAlwaysOn).toBe(true);
+    expect(r.reducedMotion).toBe(true);
+    expect(r.textScale).toBe("large");
+  });
+
+  it("surfaces extended time only when the IEP flag is set", () => {
+    expect(resolveLessonAccommodations(DEFAULT_A11Y, DEFAULT_AUDIO).extendedTime).toBe(false);
+    expect(
+      resolveLessonAccommodations(DEFAULT_A11Y, DEFAULT_AUDIO, { extendedTime: true }).extendedTime,
+    ).toBe(true);
+  });
+});
 
 describe("preferences-logic", () => {
   it("coerceA11y fills defaults and rejects bad values", () => {

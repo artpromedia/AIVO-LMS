@@ -25,43 +25,141 @@ interface Case {
 
 const CASES: Case[] = [
   // Authored item-bank surface types (Sprint 1 expansion).
-  { surfaceType: "multiple_choice", expectedMarker: "choice-grid-surface", extra: { choices: ["A", "B"] } },
+  {
+    surfaceType: "multiple_choice",
+    expectedMarker: "choice-grid-surface",
+    extra: { choices: ["A", "B"] },
+  },
   { surfaceType: "short_response", expectedMarker: "math-expression-surface" },
   { surfaceType: "fill_in_blank", expectedMarker: "math-expression-surface" },
-  { surfaceType: "drag_drop", expectedMarker: "choice-grid-surface", extra: { choices: ["A", "B"] } },
-  { surfaceType: "geometry", expectedMarker: "geometry-surface", extra: {
+  {
+    surfaceType: "drag_drop",
+    expectedMarker: "choice-grid-surface",
+    extra: { choices: ["A", "B"] },
+  },
+  {
+    surfaceType: "geometry",
+    expectedMarker: "geometry-surface",
+    extra: {
       diagram: {
         canvasMode: "svg",
         shapes: [{ id: "r", kind: "rectangle", x: 10, y: 10, width: 40, height: 40 }],
       },
-    } },
+    },
+  },
   { surfaceType: "math_expression", expectedMarker: "math-expression-surface" },
-  { surfaceType: "coding_sandbox", expectedMarker: "coding-sandbox-surface", extra: {
+  {
+    surfaceType: "coding_sandbox",
+    expectedMarker: "coding-sandbox-surface",
+    extra: {
       codingSandbox: { language: "javascript", starterCode: "// solve\n" },
-    } },
-  { surfaceType: "art_canvas", expectedMarker: "art-canvas-surface", extra: {
+    },
+  },
+  {
+    surfaceType: "art_canvas",
+    expectedMarker: "art-canvas-surface",
+    extra: {
       artCanvas: { showGuides: true },
-    } },
-  { surfaceType: "voice_response", expectedMarker: "voice-response-surface", extra: {
+    },
+  },
+  {
+    surfaceType: "voice_response",
+    expectedMarker: "voice-response-surface",
+    extra: {
       voiceResponse: { language: "en-US" },
-    } },
-  { surfaceType: "ink_canvas", expectedMarker: "scratchpad-surface", extra: {
+    },
+  },
+  {
+    surfaceType: "ink_canvas",
+    expectedMarker: "scratchpad-surface",
+    extra: {
       scratchpad: { enabled: true },
-    } },
-  { surfaceType: "scratchpad", expectedMarker: "scratchpad-surface", extra: {
+    },
+  },
+  {
+    surfaceType: "scratchpad",
+    expectedMarker: "scratchpad-surface",
+    extra: {
       scratchpad: { enabled: true },
-    } },
+    },
+  },
   // Runtime-internal aliases the lesson player emits.
-  { surfaceType: "choice_grid", expectedMarker: "choice-grid-surface", extra: { choices: ["A", "B"] } },
-  { surfaceType: "geometry_workspace", expectedMarker: "geometry-surface", extra: {
+  {
+    surfaceType: "choice_grid",
+    expectedMarker: "choice-grid-surface",
+    extra: { choices: ["A", "B"] },
+  },
+  {
+    surfaceType: "geometry_workspace",
+    expectedMarker: "geometry-surface",
+    extra: {
       diagram: {
         canvasMode: "svg",
         shapes: [{ id: "r", kind: "rectangle", x: 10, y: 10, width: 40, height: 40 }],
       },
-    } },
-  { surfaceType: "number_line", expectedMarker: "number-line-surface", extra: {
+    },
+  },
+  {
+    surfaceType: "number_line",
+    expectedMarker: "number-line-surface",
+    extra: {
       numberLine: { min: 0, max: 5, step: 1 },
-    } },
+    },
+  },
+  // Sprint 4–8 surfaces emitted directly by the lesson player.
+  {
+    surfaceType: "reading_annotation",
+    expectedMarker: "reading-annotation-surface",
+    extra: {
+      readingAnnotation: {
+        passage: [{ id: "s1", text: "A sentence." }],
+        expectedEvidenceIds: ["s1"],
+      },
+    },
+  },
+  {
+    surfaceType: "graph",
+    expectedMarker: "graph-surface",
+    extra: {
+      graph: { xMin: 0, xMax: 5, yMin: 0, yMax: 5, step: 1 },
+    },
+  },
+  {
+    surfaceType: "drag_manipulative",
+    expectedMarker: "drag-manipulative-surface",
+    extra: {
+      dragManipulative: {
+        items: [{ id: "i1", label: "1" }],
+        targets: [{ id: "t1", label: "Box" }],
+      },
+    },
+  },
+  {
+    surfaceType: "multi_step_workspace",
+    expectedMarker: "multi-step-workspace-surface",
+    extra: {
+      multiStep: { steps: [{ id: "a", prompt: "Step 1" }] },
+    },
+  },
+  {
+    surfaceType: "science_diagram",
+    expectedMarker: "science-diagram-surface",
+    extra: {
+      scienceDiagram: {
+        width: 100,
+        height: 100,
+        targets: [{ id: "t1", x: 10, y: 10, correctLabelId: "l1" }],
+        labels: [{ id: "l1", text: "Part" }],
+      },
+    },
+  },
+  {
+    surfaceType: "music_sequencer",
+    expectedMarker: "music-sequencer-surface",
+    extra: {
+      musicSequencer: { tracks: ["Clap"], steps: 8 },
+    },
+  },
 ];
 
 describe("SurfaceRouter routing coverage", () => {

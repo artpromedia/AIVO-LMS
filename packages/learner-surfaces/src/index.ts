@@ -39,6 +39,42 @@ export {
   type MathExpressionSurfaceProps,
 } from "./surfaces/MathExpressionSurface.js";
 export {
+  ReadingAnnotationSurface,
+  type ReadingAnnotationSurfaceProps,
+} from "./surfaces/ReadingAnnotationSurface.js";
+export { GraphSurface, type GraphSurfaceProps } from "./surfaces/GraphSurface.js";
+export {
+  DragManipulativeSurface,
+  type DragManipulativeSurfaceProps,
+} from "./surfaces/DragManipulativeSurface.js";
+export {
+  MultiStepWorkspaceSurface,
+  type MultiStepWorkspaceSurfaceProps,
+} from "./surfaces/MultiStepWorkspaceSurface.js";
+export {
+  ScienceDiagramSurface,
+  type ScienceDiagramSurfaceProps,
+} from "./surfaces/ScienceDiagramSurface.js";
+export {
+  MusicSequencerSurface,
+  type MusicSequencerSurfaceProps,
+} from "./surfaces/MusicSequencerSurface.js";
+export {
+  toggleSpanSelection,
+  scoreReadingAnnotation,
+  defaultReadingTool,
+  pointsMatch,
+  snapToGrid,
+  scoreGraph,
+  scoreDragManipulative,
+  targetIsFull,
+  normalizeAnswer,
+  scoreMultiStep,
+  scoreScienceDiagram,
+  toggleStep,
+  scoreMusicSequencer,
+} from "./scoring/activity-scoring.js";
+export {
   SurfaceRouter,
   SUPPORTED_RUNTIME_TYPES,
   ITEM_TYPE_TO_RUNTIME,
@@ -65,10 +101,7 @@ export {
   CODING_FIXTURE_ITEMS,
   type CodingFixtureItem,
 } from "./CodingSandbox/index.js";
-export {
-  ArtCanvasSurface,
-  type ArtCanvasSurfaceProps,
-} from "./surfaces/ArtCanvasSurface.js";
+export { ArtCanvasSurface, type ArtCanvasSurfaceProps } from "./surfaces/ArtCanvasSurface.js";
 export {
   VoiceResponseSurface,
   type VoiceResponseSurfaceProps,
@@ -80,8 +113,18 @@ export {
   isSurfaceEntitled,
   isPremiumSurface,
   requiredTutorForSurface,
+  requiredTutorsForSurface,
   type SurfaceTutorKey,
 } from "./entitlement/required-tutor.js";
+
+export {
+  SURFACE_CAPABILITY_REGISTRY,
+  ALL_SURFACE_TYPES,
+  surfaceSupport,
+  isSurfaceFallback,
+  type SurfaceCapability,
+  type SurfaceSupportLevel,
+} from "./SurfaceRouter/surface-capability.js";
 
 export { InkCanvas, type InkCanvasProps } from "./ink/InkCanvas.js";
 export {

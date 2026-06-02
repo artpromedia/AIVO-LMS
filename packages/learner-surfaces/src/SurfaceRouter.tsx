@@ -7,6 +7,12 @@ import { GeometrySurface } from "./surfaces/GeometrySurface.js";
 import { MathExpressionSurface } from "./surfaces/MathExpressionSurface.js";
 import { ScratchpadSurface } from "./surfaces/ScratchpadSurface.js";
 import { VoiceResponseSurface } from "./surfaces/VoiceResponseSurface.js";
+import { ReadingAnnotationSurface } from "./surfaces/ReadingAnnotationSurface.js";
+import { GraphSurface } from "./surfaces/GraphSurface.js";
+import { DragManipulativeSurface } from "./surfaces/DragManipulativeSurface.js";
+import { MultiStepWorkspaceSurface } from "./surfaces/MultiStepWorkspaceSurface.js";
+import { ScienceDiagramSurface } from "./surfaces/ScienceDiagramSurface.js";
+import { MusicSequencerSurface } from "./surfaces/MusicSequencerSurface.js";
 import type { SurfaceTelemetryEvent } from "./telemetry/surface-events.js";
 import type {
   LearnerSurfaceSpec,
@@ -111,6 +117,55 @@ export function SurfaceRouter({
           onSubmit={onSubmit}
           onEvent={onEvent}
           accessibilityPreferences={accessibilityPreferences}
+        />
+      );
+    case "reading_annotation":
+      return (
+        <ReadingAnnotationSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
+    case "graph":
+      return (
+        <GraphSurface surface={surface} disabled={disabled} onSubmit={onSubmit} onEvent={onEvent} />
+      );
+    case "drag_manipulative":
+      return (
+        <DragManipulativeSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
+    case "multi_step_workspace":
+      return (
+        <MultiStepWorkspaceSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
+    case "science_diagram":
+      return (
+        <ScienceDiagramSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
+    case "music_sequencer":
+      return (
+        <MusicSequencerSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
         />
       );
     default:

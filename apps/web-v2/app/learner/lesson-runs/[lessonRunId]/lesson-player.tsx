@@ -119,8 +119,8 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       key: `gp-${i}`,
       gpId: g.id,
       surfaceType:
-        ((g as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
-          (g.choices?.length ? "choice_grid" : "math_expression")),
+        (g as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+        (g.choices?.length ? "choice_grid" : "math_expression"),
       prompt: g.prompt,
       expectedAnswer: g.expectedAnswer,
       choices: g.choices,
@@ -135,8 +135,8 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       key: `chk-${i}`,
       checkId: c.id,
       surfaceType:
-        ((c as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
-          (c.choices?.length ? "choice_grid" : "math_expression")),
+        (c as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+        (c.choices?.length ? "choice_grid" : "math_expression"),
       prompt: c.prompt,
       expectedAnswer: c.expectedAnswer,
       choices: c.choices,
@@ -175,9 +175,7 @@ type Props = {
 };
 
 type LessonMediaProps = {
-  media: NonNullable<
-    Extract<Beat, { kind: "guided" | "check" }>["media"]
-  >;
+  media: NonNullable<Extract<Beat, { kind: "guided" | "check" }>["media"]>;
   onTelemetry: (event: string) => void;
 };
 
@@ -321,8 +319,7 @@ export function LessonPlayer({
                           : "next_step";
       postStep({
         stepKind,
-        stepRefId:
-          beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
+        stepRefId: beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
       });
     }
   }, [stepIdx, beat, learnerId, lessonRunId, onBreak]);
@@ -330,8 +327,7 @@ export function LessonPlayer({
   function emitMediaTelemetry(surfaceType: "video" | "audio", event: string) {
     postStep({
       stepKind: "answer_submitted",
-      stepRefId:
-        beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
+      stepRefId: beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
       response: `media:${surfaceType}:${event}`,
       isCorrect: null,
     });
@@ -381,7 +377,9 @@ export function LessonPlayer({
     }).catch(() => {});
   }
 
-  function toSurfaceItem(currentBeat: Extract<Beat, { kind: "guided" | "check" }>): SurfaceRouterItem {
+  function toSurfaceItem(
+    currentBeat: Extract<Beat, { kind: "guided" | "check" }>,
+  ): SurfaceRouterItem {
     return {
       id: currentBeat.kind === "guided" ? currentBeat.gpId : currentBeat.checkId,
       surfaceType: currentBeat.surfaceType,
@@ -389,9 +387,7 @@ export function LessonPlayer({
       choices: currentBeat.choices,
       expectedAnswer: currentBeat.expectedAnswer,
       instructions:
-        currentBeat.kind === "guided"
-          ? t("instructions_guided")
-          : t("instructions_check"),
+        currentBeat.kind === "guided" ? t("instructions_guided") : t("instructions_check"),
       answerInput: { type: "text", label: t("answer_label"), placeholder: t("answer_placeholder") },
       scratchpad:
         currentBeat.surfaceType === "scratchpad" || currentBeat.surfaceType === "ink_canvas"
@@ -403,7 +399,9 @@ export function LessonPlayer({
               canvasMode: "svg",
               width: 480,
               height: 320,
-              shapes: [{ id: "fixture-rect", kind: "rectangle", x: 110, y: 70, width: 220, height: 150 }],
+              shapes: [
+                { id: "fixture-rect", kind: "rectangle", x: 110, y: 70, width: 220, height: 150 },
+              ],
             }
           : undefined,
       numberLine:
@@ -421,6 +419,91 @@ export function LessonPlayer({
       artCanvas: currentBeat.surfaceType === "art_canvas" ? { showGuides: true } : undefined,
       voiceResponse:
         currentBeat.surfaceType === "voice_response" ? { language: "en-US" } : undefined,
+      // Sprint 4–8 surfaces. Authored specs ride on the beat when the
+      // curriculum/item-bank provides them; otherwise a coherent default
+      // fixture keeps the activity playable (and serves as the authoring
+      // template) instead of rendering blank.
+      readingAnnotation:
+        currentBeat.surfaceType === "reading_annotation"
+          ? ((currentBeat as { readingAnnotation?: SurfaceRouterItem["readingAnnotation"] })
+              .readingAnnotation ?? {
+              question: currentBeat.prompt,
+              tools: ["highlight"],
+              passage: [
+                { id: "s1", text: "The little fox was thirsty." },
+                { id: "s2", text: "It ran all the way to the cool stream." },
+                { id: "s3", text: "Then it took a long, happy drink." },
+              ],
+              expectedEvidenceIds: ["s2"],
+            })
+          : undefined,
+      graph:
+        currentBeat.surfaceType === "graph"
+          ? ((currentBeat as { graph?: SurfaceRouterItem["graph"] }).graph ?? {
+              xMin: 0,
+              xMax: 10,
+              yMin: 0,
+              yMax: 10,
+              step: 1,
+              mode: "points",
+            })
+          : undefined,
+      dragManipulative:
+        currentBeat.surfaceType === "drag_manipulative"
+          ? ((currentBeat as { dragManipulative?: SurfaceRouterItem["dragManipulative"] })
+              .dragManipulative ?? {
+              items: [
+                { id: "i1", label: "3" },
+                { id: "i2", label: "8" },
+              ],
+              targets: [
+                { id: "odd", label: "Odd" },
+                { id: "even", label: "Even" },
+              ],
+              correctPlacement: { i1: "odd", i2: "even" },
+            })
+          : undefined,
+      multiStep:
+        currentBeat.surfaceType === "multi_step_workspace"
+          ? ((currentBeat as { multiStep?: SurfaceRouterItem["multiStep"] }).multiStep ?? {
+              steps: [
+                { id: "a", prompt: "Show your first step." },
+                { id: "b", prompt: "Show your next step." },
+                { id: "c", prompt: "Write your final answer." },
+              ],
+            })
+          : undefined,
+      scienceDiagram:
+        currentBeat.surfaceType === "science_diagram"
+          ? ((currentBeat as { scienceDiagram?: SurfaceRouterItem["scienceDiagram"] })
+              .scienceDiagram ?? {
+              width: 480,
+              height: 320,
+              diagram: {
+                canvasMode: "svg",
+                width: 480,
+                height: 320,
+                shapes: [{ id: "cell", kind: "circle", cx: 240, cy: 160, r: 110 }],
+              },
+              targets: [
+                { id: "t1", x: 240, y: 160, correctLabelId: "nucleus" },
+                { id: "t2", x: 240, y: 60, correctLabelId: "membrane" },
+              ],
+              labels: [
+                { id: "nucleus", text: "Nucleus" },
+                { id: "membrane", text: "Membrane" },
+              ],
+            })
+          : undefined,
+      musicSequencer:
+        currentBeat.surfaceType === "music_sequencer"
+          ? ((currentBeat as { musicSequencer?: SurfaceRouterItem["musicSequencer"] })
+              .musicSequencer ?? {
+              tracks: ["Clap", "Drum"],
+              steps: 8,
+              tempo: 90,
+            })
+          : undefined,
     };
   }
 
@@ -432,9 +515,8 @@ export function LessonPlayer({
     const candidate =
       typeof result.response.answer === "string"
         ? result.response.answer
-        : result.response.selectedChoiceId ?? "";
-    const correct =
-      result.isCorrect === null ? isCorrect(expected, candidate) : result.isCorrect;
+        : (result.response.selectedChoiceId ?? "");
+    const correct = result.isCorrect === null ? isCorrect(expected, candidate) : result.isCorrect;
 
     setFeedback(correct ? "correct" : "incorrect");
     if (beat.kind === "check") {
@@ -558,128 +640,130 @@ export function LessonPlayer({
       </div>
 
       <FocusMode title={beat.kind === "check" ? t("focus_check") : t("focus_lesson")}>
-      <Card className={`p-6 ${transitionClass}`}>
-        {/* Each beat sets aria-live so read-aloud announces it. */}
-        <div aria-live="polite" className="space-y-4">
-          {beat.kind === "welcome" ||
-          beat.kind === "goal" ||
-          beat.kind === "story" ||
-          beat.kind === "micro" ||
-          beat.kind === "celebrate" ||
-          beat.kind === "progress" ||
-          beat.kind === "next" ? (
-            <p className="font-display text-2xl">
-              <MathText>{beat.body}</MathText>
+        <Card className={`p-6 ${transitionClass}`}>
+          {/* Each beat sets aria-live so read-aloud announces it. */}
+          <div aria-live="polite" className="space-y-4">
+            {beat.kind === "welcome" ||
+            beat.kind === "goal" ||
+            beat.kind === "story" ||
+            beat.kind === "micro" ||
+            beat.kind === "celebrate" ||
+            beat.kind === "progress" ||
+            beat.kind === "next" ? (
+              <p className="font-display text-2xl">
+                <MathText>{beat.body}</MathText>
+              </p>
+            ) : null}
+
+            {beat.kind === "example" && (
+              <>
+                <p className="font-display text-2xl">
+                  <MathText>{beat.prompt}</MathText>
+                </p>
+                <p className="text-aivo-ink-soft">
+                  <MathText>{beat.explanation}</MathText>
+                </p>
+              </>
+            )}
+
+            {beat.kind === "guided" && (
+              <>
+                <p className="font-display text-2xl">
+                  <MathText>{beat.prompt}</MathText>
+                </p>
+                {beat.media ? (
+                  <LessonMedia
+                    media={beat.media}
+                    onTelemetry={(event) => emitMediaTelemetry(beat.media!.surfaceType, event)}
+                  />
+                ) : null}
+                <SurfaceRouter
+                  item={toSurfaceItem(beat)}
+                  accessibilitySettings={accessibility}
+                  onSubmitAndAdvance={submitSurface}
+                  onEvent={emitSurfaceTelemetry}
+                />
+                {showHint && (
+                  <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
+                    {t("hint_prefix")} <MathText>{beat.hint}</MathText>
+                  </p>
+                )}
+                {feedback === "correct" && (
+                  <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
+                    {t("nice_work")}
+                  </p>
+                )}
+                {feedback === "incorrect" && (
+                  <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
+                    {t("not_quite")} <MathText>{beat.scaffold}</MathText>
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="soft" onClick={requestHint} disabled={showHint}>
+                    {t("hint_btn")}
+                  </Button>
+                  <Button variant="ghost" onClick={useScaffold}>
+                    {t("show_me_how")}
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {beat.kind === "check" && (
+              <>
+                <p className="font-display text-2xl">
+                  <MathText>{beat.prompt}</MathText>
+                </p>
+                {beat.media ? (
+                  <LessonMedia
+                    media={beat.media}
+                    onTelemetry={(event) => emitMediaTelemetry(beat.media!.surfaceType, event)}
+                  />
+                ) : null}
+                <SurfaceRouter
+                  item={toSurfaceItem(beat)}
+                  accessibilitySettings={accessibility}
+                  onSubmitAndAdvance={submitSurface}
+                  onEvent={emitSurfaceTelemetry}
+                />
+                {feedback === "correct" && (
+                  <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
+                    {t("check_correct")}
+                  </p>
+                )}
+                {feedback === "incorrect" && (
+                  <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
+                    {t("check_close")} <MathText>{beat.supportIfWrong}</MathText>
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+
+          <div className="mt-6 flex justify-between gap-2">
+            <Button
+              variant="soft"
+              onClick={() => setStepIdx(Math.max(0, stepIdx - 1))}
+              disabled={stepIdx === 0}
+            >
+              {t("back")}
+            </Button>
+            {!isLastBeat ? (
+              <Button onClick={advance} disabled={isInteractive && feedback === null}>
+                {t("next")}
+              </Button>
+            ) : (
+              <Button onClick={() => complete(false)} disabled={completing}>
+                {completing ? t("saving") : t("done")}
+              </Button>
+            )}
+          </div>
+          {completeError ? (
+            <p role="alert" className="mt-3 text-sm text-red-600">
+              {completeError}
             </p>
           ) : null}
-
-          {beat.kind === "example" && (
-            <>
-              <p className="font-display text-2xl">
-                <MathText>{beat.prompt}</MathText>
-              </p>
-              <p className="text-aivo-ink-soft">
-                <MathText>{beat.explanation}</MathText>
-              </p>
-            </>
-          )}
-
-          {beat.kind === "guided" && (
-            <>
-              <p className="font-display text-2xl">
-                <MathText>{beat.prompt}</MathText>
-              </p>
-              {beat.media ? (
-                <LessonMedia
-                  media={beat.media}
-                  onTelemetry={(event) => emitMediaTelemetry(beat.media!.surfaceType, event)}
-                />
-              ) : null}
-              <SurfaceRouter
-                item={toSurfaceItem(beat)}
-                accessibilitySettings={accessibility}
-                onSubmitAndAdvance={submitSurface}
-                onEvent={emitSurfaceTelemetry}
-              />
-              {showHint && (
-                <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
-                  {t("hint_prefix")} <MathText>{beat.hint}</MathText>
-                </p>
-              )}
-              {feedback === "correct" && (
-                <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">{t("nice_work")}</p>
-              )}
-              {feedback === "incorrect" && (
-                <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
-                  {t("not_quite")} <MathText>{beat.scaffold}</MathText>
-                </p>
-              )}
-              <div className="flex flex-wrap gap-2">
-                <Button variant="soft" onClick={requestHint} disabled={showHint}>
-                  {t("hint_btn")}
-                </Button>
-                <Button variant="ghost" onClick={useScaffold}>
-                  {t("show_me_how")}
-                </Button>
-              </div>
-            </>
-          )}
-
-          {beat.kind === "check" && (
-            <>
-              <p className="font-display text-2xl">
-                <MathText>{beat.prompt}</MathText>
-              </p>
-              {beat.media ? (
-                <LessonMedia
-                  media={beat.media}
-                  onTelemetry={(event) => emitMediaTelemetry(beat.media!.surfaceType, event)}
-                />
-              ) : null}
-              <SurfaceRouter
-                item={toSurfaceItem(beat)}
-                accessibilitySettings={accessibility}
-                onSubmitAndAdvance={submitSurface}
-                onEvent={emitSurfaceTelemetry}
-              />
-              {feedback === "correct" && (
-                <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
-                  {t("check_correct")}
-                </p>
-              )}
-              {feedback === "incorrect" && (
-                <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
-                  {t("check_close")} <MathText>{beat.supportIfWrong}</MathText>
-                </p>
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="mt-6 flex justify-between gap-2">
-          <Button
-            variant="soft"
-            onClick={() => setStepIdx(Math.max(0, stepIdx - 1))}
-            disabled={stepIdx === 0}
-          >
-            {t("back")}
-          </Button>
-          {!isLastBeat ? (
-            <Button onClick={advance} disabled={isInteractive && feedback === null}>
-              {t("next")}
-            </Button>
-          ) : (
-            <Button onClick={() => complete(false)} disabled={completing}>
-              {completing ? t("saving") : t("done")}
-            </Button>
-          )}
-        </div>
-        {completeError ? (
-          <p role="alert" className="mt-3 text-sm text-red-600">
-            {completeError}
-          </p>
-        ) : null}
-      </Card>
+        </Card>
       </FocusMode>
     </div>
   );
@@ -694,9 +778,7 @@ export function LessonPlayer({
         // Mirror AAC activations into the existing surface-telemetry
         // sink so analytics can correlate them with lesson outcomes.
         emitSurfaceTelemetry({
-          id:
-            globalThis.crypto?.randomUUID?.() ??
-            `aac-${evt.targetId}-${Date.now()}`,
+          id: globalThis.crypto?.randomUUID?.() ?? `aac-${evt.targetId}-${Date.now()}`,
           surfaceId: "aac",
           type: "answer_changed",
           occurredAt: new Date().toISOString(),

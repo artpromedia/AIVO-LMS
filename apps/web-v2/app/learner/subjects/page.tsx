@@ -1,10 +1,10 @@
 /**
  * Subjects-all page.
  *
- * Renders only production-ready subjects (`productionReady === true` in
- * `@aivo/brand`'s LEARNER_SUBJECTS). Non-ready subjects are hidden from
- * the learner grid until their curriculum + item bank lands; we no
- * longer ship a "Coming soon" placeholder card (route-audit gate).
+ * Sprint 1 (subject/tutor UX): renders the canonical discoverable set from
+ * `@aivo/brand` (`getDiscoverableSubjects`) so web and mobile show the same
+ * subjects. Every subject is reachable and playable end-to-end through the
+ * lesson flow (no hidden subjects, no "coming soon" placeholders).
  *
  * Empty state (no baseline yet) routes the learner to /learner/baseline
  * so they don't see hollow cards.
@@ -16,13 +16,9 @@ import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { SubjectCard, EmptyState } from "@aivo/ui";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import {
-  getIEPForLearner,
-  getMasteryMap,
-  listSubjects,
-} from "@/lib/db/repos";
+import { getIEPForLearner, getMasteryMap, listSubjects } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
-import { getProductionReadySubjects } from "@aivo/brand";
+import { getDiscoverableSubjects } from "@aivo/brand";
 
 function masteryLabel(score: number, t: (key: string) => string): string {
   if (score >= 0.85) return t("mastery_strong");
@@ -40,11 +36,11 @@ export default async function LearnerSubjectsPage() {
   if (!learnerId) redirect("/learner/home");
 
   const { map, skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
-  // Intersect BFF-seeded subjects with the brand registry's production-
-  // ready set so non-ready slugs (currently world-languages, coding,
-  // and the other content-team-WIP rows) never reach the learner UI.
-  const productionReadySlugs = new Set(getProductionReadySubjects().map((s) => s.slug));
-  const subjects = (await listSubjects()).filter((s) => productionReadySlugs.has(s.slug));
+  // Render the canonical discoverable set from the brand registry, merged with
+  // the BFF-seeded subjects (which carry the DB id + mastery). Every subject is
+  // navigable into its detail/lesson flow.
+  const discoverable = getDiscoverableSubjects();
+  const bffBySlug = new Map((await listSubjects()).map((s) => [s.slug, s]));
   const iep = await getIEPForLearner(learnerId, session.tenantId);
   const baselineNeeded = !map;
 
@@ -84,7 +80,16 @@ export default async function LearnerSubjectsPage() {
                 className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
               >
                 {tSubjects("baseline_needed_cta")}
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
                   <path d="M5 12h14" />
                   <path d="m13 5 7 7-7 7" />
                 </svg>
@@ -94,14 +99,15 @@ export default async function LearnerSubjectsPage() {
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {subjects.map((s) => {
-            const entry = subjectScore.get(s.id);
+          {discoverable.map((s) => {
+            const bff = bffBySlug.get(s.slug);
+            const entry = bff ? subjectScore.get(bff.id) : undefined;
             const avg = entry ? entry.score / entry.count : 0;
             const tutor = tutorForSubjectSlug(s.slug);
             return (
               <SubjectCard
-                key={s.id}
-                href={`/learner/subjects/${s.id}`}
+                key={s.slug}
+                href={bff ? `/learner/subjects/${bff.id}` : `/learner/subjects/${s.slug}`}
                 name={s.name}
                 eyebrow={tutor ? `${tutor.name} · ${tutor.landmark}` : undefined}
                 masteryLabel={masteryLabel(avg, tProgress)}

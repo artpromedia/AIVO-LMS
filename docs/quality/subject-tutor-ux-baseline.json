@@ -1,0 +1,174 @@
+{
+  "_comment": "Baseline snapshot of the subject×tutor×platform experience matrix. Regression (a subject status dropping, e.g. P→H, or a tutor going linked→orphan) is a hard fail. Improvements require updating this file in the same PR. Source of truth: scripts/subject-tutor-ux-check.mjs (`pnpm ux:matrix`). See docs/SUBJECT_TUTOR_UX_GAP_ANALYSIS_AND_SPRINTS.md.",
+  "snapshotDate": "2026-06-01",
+  "subjects": {
+    "reading": {
+      "tutor": "sage",
+      "web": "P",
+      "mobile": "P"
+    },
+    "math": {
+      "tutor": "nova",
+      "web": "P",
+      "mobile": "P"
+    },
+    "science": {
+      "tutor": "spark",
+      "web": "P",
+      "mobile": "P"
+    },
+    "social": {
+      "tutor": "harmony",
+      "web": "P",
+      "mobile": "P"
+    },
+    "speech": {
+      "tutor": "echo",
+      "web": "P",
+      "mobile": "P"
+    },
+    "executive-function": {
+      "tutor": "compass",
+      "web": "P",
+      "mobile": "P"
+    },
+    "writing": {
+      "tutor": "sage",
+      "web": "P",
+      "mobile": "P"
+    },
+    "life": {
+      "tutor": "compass",
+      "web": "P",
+      "mobile": "P"
+    },
+    "art": {
+      "tutor": "muse",
+      "web": "P",
+      "mobile": "P"
+    },
+    "social-studies": {
+      "tutor": "chrono",
+      "web": "P",
+      "mobile": "P"
+    },
+    "world-languages": {
+      "tutor": "lingua",
+      "web": "P",
+      "mobile": "P"
+    },
+    "coding": {
+      "tutor": "pixel",
+      "web": "P",
+      "mobile": "P"
+    },
+    "geography": {
+      "tutor": "atlas",
+      "web": "P",
+      "mobile": "P"
+    },
+    "music": {
+      "tutor": "cadence",
+      "web": "P",
+      "mobile": "P"
+    },
+    "physical-education": {
+      "tutor": "vigor",
+      "web": "P",
+      "mobile": "P"
+    },
+    "engineering": {
+      "tutor": "forge",
+      "web": "P",
+      "mobile": "P"
+    }
+  },
+  "tutors": {
+    "atlas": {
+      "status": "linked",
+      "subjects": [
+        "geography"
+      ]
+    },
+    "cadence": {
+      "status": "linked",
+      "subjects": [
+        "music"
+      ]
+    },
+    "chrono": {
+      "status": "linked",
+      "subjects": [
+        "social-studies"
+      ]
+    },
+    "compass": {
+      "status": "linked",
+      "subjects": [
+        "executive-function",
+        "life"
+      ]
+    },
+    "echo": {
+      "status": "linked",
+      "subjects": [
+        "speech"
+      ]
+    },
+    "forge": {
+      "status": "linked",
+      "subjects": [
+        "engineering"
+      ]
+    },
+    "harmony": {
+      "status": "linked",
+      "subjects": [
+        "social"
+      ]
+    },
+    "lingua": {
+      "status": "linked",
+      "subjects": [
+        "world-languages"
+      ]
+    },
+    "muse": {
+      "status": "linked",
+      "subjects": [
+        "art"
+      ]
+    },
+    "nova": {
+      "status": "linked",
+      "subjects": [
+        "math"
+      ]
+    },
+    "pixel": {
+      "status": "linked",
+      "subjects": [
+        "coding"
+      ]
+    },
+    "sage": {
+      "status": "linked",
+      "subjects": [
+        "reading",
+        "writing"
+      ]
+    },
+    "spark": {
+      "status": "linked",
+      "subjects": [
+        "science"
+      ]
+    },
+    "vigor": {
+      "status": "linked",
+      "subjects": [
+        "physical-education"
+      ]
+    }
+  }
+}
