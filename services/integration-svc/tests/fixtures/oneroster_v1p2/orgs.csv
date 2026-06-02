@@ -1,0 +1,4 @@
+sourcedId,status,dateLastModified,name,type,identifier,parentSourcedId
+dist-1,active,2026-01-01T00:00:00Z,Springfield USD,district,NCES-001,
+sch-1,active,2026-01-01T00:00:00Z,Springfield Elementary,school,NCES-101,dist-1
+sch-2,active,2026-01-01T00:00:00Z,Springfield High,school,NCES-102,dist-1

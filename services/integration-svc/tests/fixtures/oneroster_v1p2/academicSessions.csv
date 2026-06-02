@@ -1,0 +1,3 @@
+sourcedId,status,dateLastModified,title,type,startDate,endDate,parentSourcedId,schoolYear
+sy-2026,active,2026-01-01T00:00:00Z,2025-2026,schoolYear,2025-08-15,2026-06-10,,2026
+term-fall,active,2026-01-01T00:00:00Z,Fall 2025,semester,2025-08-15,2025-12-20,sy-2026,2026
