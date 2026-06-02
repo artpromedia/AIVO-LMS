@@ -5,6 +5,7 @@ import { getOutboxCounts } from "../lib/email-outbox.js";
 import { renderTemplate, AVAILABLE_TEMPLATES } from "../lib/templates.js";
 import { createLogger } from "@aivo/observability";
 import { emitCommsAudit } from "../lib/audit.js";
+import { sendSms, isSmsConfigured } from "../providers/sms-router.js";
 import {
   registerDeviceToken,
   listDeviceTargets,
@@ -117,6 +118,35 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
           });
           return reply.code(500).send({ error: "Failed to send email", details: err.message });
         }
+      }
+
+      if (channel === "sms") {
+        if (!isSmsConfigured()) {
+          return reply.code(503).send({ error: "SMS channel not configured" });
+        }
+        const rendered = renderTemplate(template, data || {});
+        // SMS is text-only: prefer the template's text body, fall back to subject.
+        const body = (rendered.text || rendered.subject || "").trim();
+        const result = await sendSms({ to: recipient, body });
+        if (result.status === "failed") {
+          await emitCommsAudit({
+            db,
+            request,
+            eventType: "NOTIFICATION_FAILED",
+            tenantId: (request as any).auth?.tenantId ?? null,
+            details: { channel, template, error: result.error },
+          });
+          return reply.code(500).send({ error: "Failed to send SMS", details: result.error });
+        }
+        await emitCommsAudit({
+          db,
+          request,
+          eventType: "NOTIFICATION_SENT",
+          tenantId: (request as any).auth?.tenantId ?? null,
+          resourceId: result.messageId ?? null,
+          details: { channel, template, status: result.status },
+        });
+        return { status: result.status, messageId: result.messageId, channel, template };
       }
 
       const queuedId = crypto.randomUUID();
@@ -288,7 +318,8 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
         userId,
         email: { enabled: true, digest: "daily", marketing: false },
         push: { enabled: true, sessionReminders: true, progressUpdates: true },
-        sms: { enabled: false },
+        // SMS is opt-in and only available when a provider is configured.
+        sms: { enabled: false, available: isSmsConfigured() },
       };
     },
   );
@@ -1075,15 +1106,12 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
       process.env.APNS_KEY_ID && process.env.APNS_TEAM_ID && process.env.APNS_PRIVATE_KEY
         ? "connected"
         : "not_configured";
-    const push =
-      fcm === "connected" || apns === "connected"
-        ? "connected"
-        : "not_configured";
+    const push = fcm === "connected" || apns === "connected" ? "connected" : "not_configured";
     return {
       postmark: isConfigured() ? "connected" : "not_configured",
       push,
       pushDetail: { fcm, apns },
-      sms: "not_available",
+      sms: isSmsConfigured() ? "connected" : "not_configured",
     };
   });
 
@@ -1249,17 +1277,13 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
 
   // Outbox health snapshot. Used by the admin console + readiness probes
   // to surface a growing dead_letter or pending backlog.
-  app.get(
-    "/api/comms/outbox/stats",
-    { preHandler: requireAdmin },
-    async (_req, reply) => {
-      try {
-        const counts = await getOutboxCounts(db);
-        return { counts };
-      } catch (err: any) {
-        logger.error({ err }, "failed to read email outbox counts");
-        return reply.code(500).send({ error: "outbox_stats_failed" });
-      }
-    },
-  );
+  app.get("/api/comms/outbox/stats", { preHandler: requireAdmin }, async (_req, reply) => {
+    try {
+      const counts = await getOutboxCounts(db);
+      return { counts };
+    } catch (err: any) {
+      logger.error({ err }, "failed to read email outbox counts");
+      return reply.code(500).send({ error: "outbox_stats_failed" });
+    }
+  });
 }
