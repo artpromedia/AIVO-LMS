@@ -1175,6 +1175,9 @@ importers:
 
   services/audit-svc:
     dependencies:
+      '@aivo/audit-client':
+        specifier: workspace:*
+        version: link:../../packages/audit-client
       '@aivo/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -1187,6 +1190,9 @@ importers:
       '@aivo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@aivo/security':
+        specifier: workspace:*
+        version: link:../../packages/security
       '@fastify/cors':
         specifier: ^11.0.0
         version: 11.2.0
