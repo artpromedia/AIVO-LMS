@@ -7,13 +7,25 @@ import { MathExpressionSurface } from "../surfaces/MathExpressionSurface.js";
 import { NumberLineSurface } from "../surfaces/NumberLineSurface.js";
 import { ScratchpadSurface } from "../surfaces/ScratchpadSurface.js";
 import { VoiceResponseSurface } from "../surfaces/VoiceResponseSurface.js";
+import { ReadingAnnotationSurface } from "../surfaces/ReadingAnnotationSurface.js";
+import { GraphSurface } from "../surfaces/GraphSurface.js";
+import { DragManipulativeSurface } from "../surfaces/DragManipulativeSurface.js";
+import { MultiStepWorkspaceSurface } from "../surfaces/MultiStepWorkspaceSurface.js";
+import { ScienceDiagramSurface } from "../surfaces/ScienceDiagramSurface.js";
+import { MusicSequencerSurface } from "../surfaces/MusicSequencerSurface.js";
 import { createSurfaceEvent, type SurfaceTelemetryEvent } from "../telemetry/surface-events.js";
 import type {
   AnswerInputSpec,
   ArtCanvasSpec,
   CodingSandboxSpec,
+  DragManipulativeSpec,
   GeometryDiagramSpec,
+  GraphSpec,
   LearnerSurfaceSpec,
+  MultiStepSpec,
+  MusicSequencerSpec,
+  ReadingAnnotationSpec,
+  ScienceDiagramSpec,
   ScratchpadSpec,
   SurfaceAccessibilitySpec,
   SurfaceResponse,
@@ -46,6 +58,13 @@ export type SurfaceRouterItem = {
   codingSandbox?: CodingSandboxSpec;
   artCanvas?: ArtCanvasSpec;
   voiceResponse?: VoiceResponseSpec;
+  // Sprint 4–8 surfaces.
+  readingAnnotation?: ReadingAnnotationSpec;
+  graph?: GraphSpec;
+  dragManipulative?: DragManipulativeSpec;
+  multiStep?: MultiStepSpec;
+  scienceDiagram?: ScienceDiagramSpec;
+  musicSequencer?: MusicSequencerSpec;
   accessibility?: Partial<SurfaceAccessibilitySpec>;
 };
 
@@ -108,6 +127,12 @@ function buildSurfaceSpec(item: SurfaceRouterItem): LearnerSurfaceSpec {
     codingSandbox: item.codingSandbox,
     artCanvas: item.artCanvas,
     voiceResponse: item.voiceResponse,
+    readingAnnotation: item.readingAnnotation,
+    graph: item.graph,
+    dragManipulative: item.dragManipulative,
+    multiStep: item.multiStep,
+    scienceDiagram: item.scienceDiagram,
+    musicSequencer: item.musicSequencer,
     capture: {
       finalAnswer: true,
       inkStrokes:
@@ -165,7 +190,9 @@ export function SurfaceRouter({
 
     const expected = item.expectedAnswer;
     const isCorrect =
-      expected && candidate.length > 0 ? normalizeAnswer(expected) === normalizeAnswer(candidate) : null;
+      expected && candidate.length > 0
+        ? normalizeAnswer(expected) === normalizeAnswer(candidate)
+        : null;
 
     onSubmitAndAdvance({ response, isCorrect });
   };
@@ -187,6 +214,14 @@ export function SurfaceRouter({
       {surface.type === "coding_sandbox" ? <CodingSandboxSurface {...sharedProps} /> : null}
       {surface.type === "art_canvas" ? <ArtCanvasSurface {...sharedProps} /> : null}
       {surface.type === "voice_response" ? <VoiceResponseSurface {...sharedProps} /> : null}
+      {surface.type === "reading_annotation" ? <ReadingAnnotationSurface {...sharedProps} /> : null}
+      {surface.type === "graph" ? <GraphSurface {...sharedProps} /> : null}
+      {surface.type === "drag_manipulative" ? <DragManipulativeSurface {...sharedProps} /> : null}
+      {surface.type === "multi_step_workspace" ? (
+        <MultiStepWorkspaceSurface {...sharedProps} />
+      ) : null}
+      {surface.type === "science_diagram" ? <ScienceDiagramSurface {...sharedProps} /> : null}
+      {surface.type === "music_sequencer" ? <MusicSequencerSurface {...sharedProps} /> : null}
     </div>
   );
 }

@@ -40,7 +40,14 @@ export type RouterSurfaceType =
   | "geometry_workspace"
   | "number_line"
   | "video"
-  | "audio";
+  | "audio"
+  // Sprint 4–8 runtime surfaces the lesson player emits directly.
+  | "reading_annotation"
+  | "graph"
+  | "drag_manipulative"
+  | "multi_step_workspace"
+  | "science_diagram"
+  | "music_sequencer";
 
 /**
  * Maps authored item-bank surface types onto the runtime

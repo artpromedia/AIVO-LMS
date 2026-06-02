@@ -500,5 +500,17 @@ honestly.
 - `apps/mobile/src/components/learning/MobileSurfaceRenderer.tsx` — no `voice_response` case.
 - `apps/mobile/hooks/useSpeechInput.ts` — implemented; consumed only by `app/(learner)/homework/[sessionId].tsx`.
 - `docs/mobile-parity.md` — route-level "100% parity" claim (no surface-type axis).
-  </content>
-  </invoke>
+
+---
+
+## 5. Post-sprint follow-ups
+
+| Follow-up                                                                                                                                                                                                | Status                                                                                                                                                               |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wire all 16 surfaces into the **item-based** `SurfaceRouter` the app actually uses (the spec-based router + `SurfaceHost` were wired during the sprints; the item router rendered only the original set) | ✅ done — `SurfaceRouterItem` carries every spec, `buildSurfaceSpec` passes them through, render branches + `RouterSurfaceType` extended; routing test covers all 16 |
+| Lesson player **emits** the new surfaces e2e                                                                                                                                                             | ✅ done — `toSurfaceItem` passes authored specs through and supplies coherent default fixtures so a beat declaring any surface type renders (never blank)            |
+| Mobile **voice entitlement** multi-tutor parity (echo + lingua)                                                                                                                                          | ✅ done — mobile `REQUIRED_TUTOR` now supports multiple owners, matching the web map                                                                                 |
+| Per-subject **content authoring** (real passages / diagrams / item banks per grade band) so lessons routinely surface these activities                                                                   | ⏳ content track — runtime is ready; authoring is curriculum/SME work (see `docs/quality/tutor-k12-coverage-gap-plan.md`)                                            |
+| Mobile **TTS read-aloud** control                                                                                                                                                                        | ⏳ needs the `expo-speech` dependency (not installed); the shared `resolveLessonAccommodations` resolver is in place to drive it                                     |
+| **Accommodation indicator** UI in the stage runtime (extended-time / captions chips)                                                                                                                     | ⏳ needs a runtime learner a11y-prefs hook (only sensory mode is exposed today); resolver + types are ready                                                          |
+| In-lesson **tutor chat panel** (web)                                                                                                                                                                     | ⏳ deferred — tutor identity is wired into the lesson; the live chat panel needs a BFF reply route change                                                            |

@@ -76,14 +76,26 @@ export type SurfaceTutorKey =
  * so the mobile bundle doesn't have to import the web learner-surfaces
  * package (which depends on `react-dom`). Keep these two in sync.
  */
-const REQUIRED_TUTOR: Partial<Record<LearnerSurfaceKind, SurfaceTutorKey>> = {
+const REQUIRED_TUTOR: Partial<
+  Record<LearnerSurfaceKind, SurfaceTutorKey | readonly SurfaceTutorKey[]>
+> = {
   coding_sandbox: "pixel",
   // Sprint 1 fix (kept in sync with the web entitlement map): the art canvas
   // belongs to the art tutor (muse), not the music tutor (cadence).
   art_canvas: "muse",
   // Sprint 8: the music/rhythm sequencer belongs to the music tutor (cadence).
   music_sequencer: "cadence",
+  // Follow-up: spoken responses serve speech (echo) and world languages
+  // (lingua) — full parity with the web entitlement map.
+  voice_response: ["echo", "lingua"],
 };
+
+/** Every tutor that unlocks a surface (empty when free). */
+function requiredTutorsFor(kind: LearnerSurfaceKind): readonly SurfaceTutorKey[] {
+  const v = REQUIRED_TUTOR[kind];
+  if (!v) return [];
+  return Array.isArray(v) ? v : [v as SurfaceTutorKey];
+}
 
 export type SurfaceCommand =
   | { kind: "text_response"; text: string }
@@ -138,11 +150,13 @@ function isEntitled(
   kind: LearnerSurfaceKind,
   entitled?: ReadonlySet<SurfaceTutorKey> | readonly SurfaceTutorKey[],
 ): boolean {
-  const required = REQUIRED_TUTOR[kind];
-  if (!required) return true;
+  const required = requiredTutorsFor(kind);
+  if (required.length === 0) return true;
   if (entitled === undefined) return true;
-  if (Array.isArray(entitled)) return entitled.includes(required);
-  return (entitled as ReadonlySet<SurfaceTutorKey>).has(required);
+  const has = Array.isArray(entitled)
+    ? (k: SurfaceTutorKey) => entitled.includes(k)
+    : (k: SurfaceTutorKey) => (entitled as ReadonlySet<SurfaceTutorKey>).has(k);
+  return required.some(has);
 }
 
 export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitledTutors }: Props) {
@@ -164,12 +178,12 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitle
   }, [kind, isFallback]);
 
   if (!isEntitled(kind, entitledTutors)) {
-    const required = REQUIRED_TUTOR[kind];
+    const required = requiredTutorsFor(kind);
     return (
       <View style={styles.wrap}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.body}>
-          {`This activity needs the ${required ?? "premium"} tutor add-on.`}
+          {`This activity needs the ${required.join(" or ") || "premium"} tutor add-on.`}
         </Text>
         <Text style={styles.note}>Ask a grown-up to unlock it from the billing screen.</Text>
       </View>
