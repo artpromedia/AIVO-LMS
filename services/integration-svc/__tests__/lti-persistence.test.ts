@@ -131,3 +131,62 @@ describe.skipIf(SKIP)("LTI 1.3 runtime persistence", () => {
     expect(rows[0].scoreMaximum).toBe(50); // refreshed
   });
 });
+
+describe.skipIf(SKIP)("LTI platform registration (Sprint 6C)", () => {
+  let db: any;
+  let mod: typeof import("../src/lti/persistence.js");
+  let schema: any;
+  const tenantId = "00000000-0000-0000-0000-0000000000bb";
+  const issuer = `https://reg.test/${Date.now()}`;
+  const clientId = "reg-client";
+
+  beforeAll(async () => {
+    const { createDb } = await import("@aivo/db");
+    schema = await import("@aivo/db");
+    mod = await import("../src/lti/persistence.js");
+    db = createDb(process.env.DATABASE_URL!);
+  });
+
+  afterAll(async () => {
+    if (!db) return;
+    await db
+      .delete(schema.ltiPlatforms)
+      .where(
+        and(eq(schema.ltiPlatforms.issuer, issuer), eq(schema.ltiPlatforms.clientId, clientId)),
+      );
+    try {
+      await db.$client?.end?.({ timeout: 2 });
+    } catch {
+      /* ignore */
+    }
+  });
+
+  it("registers a platform + deployments, is idempotent, and lists by tenant", async () => {
+    const input = {
+      tenantId,
+      issuer,
+      clientId,
+      jwksUrl: `${issuer}/jwks`,
+      authTokenUrl: `${issuer}/token`,
+      authLoginUrl: `${issuer}/login`,
+      label: "Canvas Prod",
+      deployments: [{ deploymentId: "d-1", label: "Main" }],
+    };
+
+    const first = await mod.registerPlatform(db, input);
+    expect(first.platformId).toBeTruthy();
+    expect(first.deploymentIds).toHaveLength(1);
+
+    // Re-registering the same (issuer, clientId) reuses rows (no duplicates).
+    const second = await mod.registerPlatform(db, { ...input, label: "Canvas Prod v2" });
+    expect(second.platformId).toBe(first.platformId);
+    expect(second.deploymentIds[0]).toBe(first.deploymentIds[0]);
+
+    const platforms = await mod.listPlatforms(db, tenantId);
+    const found = platforms.find((p) => p.issuer === issuer && p.clientId === clientId);
+    expect(found).toBeTruthy();
+    expect(found!.label).toBe("Canvas Prod v2");
+    expect(found!.deployments).toHaveLength(1);
+    expect(found!.deployments[0].deploymentId).toBe("d-1");
+  });
+});

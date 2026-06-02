@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 import {
   ltiPlatforms,
   ltiDeployments,
@@ -45,6 +45,123 @@ export interface LaunchPersistResult {
   deploymentRowId: string;
   contextRowId: string | null;
   resourceLinkRowId: string | null;
+}
+
+// ─────────────────────── Admin platform registration ───────────────────────
+//
+// Sprint 6 (closeout): onboarding an LMS no longer needs a manual DB insert.
+// A tenant admin registers the platform (issuer, client_id, JWKS + OAuth URLs)
+// and its deployment ids; launches for an unregistered (issuer, client_id) are
+// still rejected by persistLaunch above.
+
+export interface PlatformDeploymentInput {
+  deploymentId: string;
+  label?: string;
+}
+
+export interface RegisterPlatformInput {
+  tenantId: string;
+  issuer: string;
+  clientId: string;
+  jwksUrl: string;
+  authTokenUrl: string;
+  authLoginUrl: string;
+  label?: string;
+  deployments?: PlatformDeploymentInput[];
+}
+
+export interface PlatformView {
+  id: string;
+  tenantId: string;
+  issuer: string;
+  clientId: string;
+  jwksUrl: string;
+  authTokenUrl: string;
+  authLoginUrl: string;
+  label: string | null;
+  createdAt: string;
+  deployments: Array<{ id: string; deploymentId: string; label: string | null }>;
+}
+
+/**
+ * Register (or update) an LTI platform and its deployments, keyed on the
+ * natural (issuer, client_id) identity so re-registration is idempotent.
+ */
+export async function registerPlatform(
+  db: LtiDb,
+  input: RegisterPlatformInput,
+): Promise<{ platformId: string; deploymentIds: string[] }> {
+  const [platform] = await db
+    .insert(ltiPlatforms)
+    .values({
+      tenantId: input.tenantId,
+      issuer: input.issuer,
+      clientId: input.clientId,
+      jwksUrl: input.jwksUrl,
+      authTokenUrl: input.authTokenUrl,
+      authLoginUrl: input.authLoginUrl,
+      label: input.label ?? null,
+    })
+    .onConflictDoUpdate({
+      target: [ltiPlatforms.issuer, ltiPlatforms.clientId],
+      set: {
+        tenantId: input.tenantId,
+        jwksUrl: input.jwksUrl,
+        authTokenUrl: input.authTokenUrl,
+        authLoginUrl: input.authLoginUrl,
+        label: input.label ?? null,
+      },
+    })
+    .returning({ id: ltiPlatforms.id });
+
+  const deploymentIds: string[] = [];
+  for (const d of input.deployments ?? []) {
+    const [row] = await db
+      .insert(ltiDeployments)
+      .values({ platformId: platform.id, deploymentId: d.deploymentId, label: d.label ?? null })
+      .onConflictDoUpdate({
+        target: [ltiDeployments.platformId, ltiDeployments.deploymentId],
+        set: { label: d.label ?? null },
+      })
+      .returning({ id: ltiDeployments.id });
+    deploymentIds.push(row.id);
+  }
+
+  return { platformId: platform.id, deploymentIds };
+}
+
+/** List a tenant's registered platforms with their deployments. */
+export async function listPlatforms(db: LtiDb, tenantId: string): Promise<PlatformView[]> {
+  const platforms = await db
+    .select()
+    .from(ltiPlatforms)
+    .where(eq(ltiPlatforms.tenantId, tenantId))
+    .orderBy(desc(ltiPlatforms.createdAt));
+
+  const views: PlatformView[] = [];
+  for (const p of platforms) {
+    const deployments = await db
+      .select({
+        id: ltiDeployments.id,
+        deploymentId: ltiDeployments.deploymentId,
+        label: ltiDeployments.label,
+      })
+      .from(ltiDeployments)
+      .where(eq(ltiDeployments.platformId, p.id));
+    views.push({
+      id: p.id,
+      tenantId: p.tenantId,
+      issuer: p.issuer,
+      clientId: p.clientId,
+      jwksUrl: p.jwksUrl,
+      authTokenUrl: p.authTokenUrl,
+      authLoginUrl: p.authLoginUrl,
+      label: p.label,
+      createdAt: p.createdAt instanceof Date ? p.createdAt.toISOString() : String(p.createdAt),
+      deployments,
+    });
+  }
+  return views;
 }
 
 /**

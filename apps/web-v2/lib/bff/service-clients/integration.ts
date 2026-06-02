@@ -24,6 +24,75 @@ type Result<T> = { ok: true; data: T } | { ok: false; reason: string };
 
 const TIMEOUT_MS = 5000;
 
+export interface LtiPlatformView {
+  id: string;
+  tenantId: string;
+  issuer: string;
+  clientId: string;
+  jwksUrl: string;
+  authTokenUrl: string;
+  authLoginUrl: string;
+  label: string | null;
+  createdAt: string;
+  deployments: Array<{ id: string; deploymentId: string; label: string | null }>;
+}
+
+export interface RegisterLtiPlatformInput {
+  issuer: string;
+  clientId: string;
+  jwksUrl: string;
+  authTokenUrl: string;
+  authLoginUrl: string;
+  label?: string;
+  deployments?: Array<{ deploymentId: string; label?: string }>;
+}
+
+/** List the caller tenant's registered LTI platforms via integration-svc. */
+export async function listLtiPlatforms(
+  authToken: string,
+): Promise<Result<{ platforms: LtiPlatformView[]; count: number }>> {
+  try {
+    const res = await fetch(`${serverEnv.INTEGRATION_SVC_URL}/api/lti/platforms`, {
+      method: "GET",
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      headers: { authorization: `Bearer ${authToken}` },
+      cache: "no-store",
+    });
+    if (!res.ok) return { ok: false, reason: `http_${res.status}` };
+    return {
+      ok: true,
+      data: (await res.json()) as { platforms: LtiPlatformView[]; count: number },
+    };
+  } catch (err) {
+    return { ok: false, reason: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/** Register (or update) an LTI platform via integration-svc. */
+export async function registerLtiPlatform(
+  authToken: string,
+  input: RegisterLtiPlatformInput,
+): Promise<Result<{ platformId: string; deploymentIds: string[] }>> {
+  try {
+    const res = await fetch(`${serverEnv.INTEGRATION_SVC_URL}/api/lti/platforms`, {
+      method: "POST",
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      headers: { "content-type": "application/json", authorization: `Bearer ${authToken}` },
+      body: JSON.stringify(input),
+    });
+    if (!res.ok) {
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      return { ok: false, reason: body.error ?? `http_${res.status}` };
+    }
+    return {
+      ok: true,
+      data: (await res.json()) as { platformId: string; deploymentIds: string[] },
+    };
+  } catch (err) {
+    return { ok: false, reason: err instanceof Error ? err.message : String(err) };
+  }
+}
+
 export async function importSisExport(input: {
   vendor: "clever" | "classlink";
   export: unknown;
