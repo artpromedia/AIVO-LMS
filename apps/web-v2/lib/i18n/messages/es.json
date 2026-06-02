@@ -1278,6 +1278,56 @@
       "notices": {
         "resent": "Se ha enviado un nuevo código a tu correo."
       }
+    },
+    "sso_start": {
+      "eyebrow": "Inicio de sesión único",
+      "title": "Continuar con {idp}",
+      "subtitle": "Le redirigiremos al proveedor de identidad de su organización para completar el inicio de sesión.",
+      "continue": "Continuar con {idp}",
+      "redirect_note": "Se le está redirigiendo automáticamente. Si no ocurre nada, use el botón de abajo.",
+      "back_to_login": "Volver al inicio de sesión",
+      "default_idp": "su proveedor de identidad"
+    },
+    "mfa_enroll": {
+      "eyebrow": "Seguridad de la cuenta",
+      "title": "Configurar la autenticación en dos pasos",
+      "subtitle": "Añada una aplicación de autenticación para proteger las acciones privilegiadas.",
+      "intro": "Use una aplicación de autenticación como Google Authenticator, 1Password o Authy.",
+      "start": "Configurar autenticador",
+      "starting": "Configurando…",
+      "scan_instructions": "Escanee el código QR en su aplicación de autenticación o abra el enlace de abajo.",
+      "open_in_app": "Abrir en la aplicación de autenticación",
+      "manual_key": "O introduzca esta clave manualmente:",
+      "code_label": "Código de 6 dígitos",
+      "confirm": "Confirmar",
+      "confirming": "Confirmando…",
+      "enrolled": "La autenticación en dos pasos está activada.",
+      "error_generic": "Algo salió mal. Inténtelo de nuevo.",
+      "error_network": "Error de red: vuelva a intentarlo.",
+      "error_invalid_code": "Ese código es incorrecto o ha caducado."
+    },
+    "mfa_verify": {
+      "eyebrow": "Verificación",
+      "title": "Verifique su identidad",
+      "subtitle": "Introduzca el código actual de su aplicación de autenticación.",
+      "code_label": "Código de 6 dígitos",
+      "verify": "Verificar",
+      "verifying": "Verificando…",
+      "error_invalid_code": "Ese código es incorrecto o ha caducado.",
+      "error_network": "Error de red: vuelva a intentarlo."
+    },
+    "mfa_step_up": {
+      "eyebrow": "Verificación adicional",
+      "title": "Confirme su identidad",
+      "subtitle": "Esta acción requiere una verificación en dos pasos reciente.",
+      "checking": "Comprobando…",
+      "code_label": "Código de 6 dígitos",
+      "verify": "Verificar",
+      "verifying": "Verificando…",
+      "no_factor": "Aún no tiene un autenticador configurado. Configure uno para continuar.",
+      "enroll_cta": "Configurar autenticador",
+      "error_invalid_code": "Ese código es incorrecto o ha caducado.",
+      "error_network": "Error de red: vuelva a intentarlo."
     }
   },
   "onboarding": {

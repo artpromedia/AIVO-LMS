@@ -1278,6 +1278,56 @@
       "notices": {
         "resent": "Ein neuer Code wurde an deine E-Mail gesendet."
       }
+    },
+    "sso_start": {
+      "eyebrow": "Single sign-on",
+      "title": "Continue with {idp}",
+      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
+      "continue": "Continue with {idp}",
+      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
+      "back_to_login": "Back to sign-in",
+      "default_idp": "your identity provider"
+    },
+    "mfa_enroll": {
+      "eyebrow": "Account security",
+      "title": "Set up two-factor authentication",
+      "subtitle": "Add an authenticator app to protect privileged actions.",
+      "intro": "Use an authenticator app such as Google Authenticator, 1Password, or Authy.",
+      "start": "Set up authenticator",
+      "starting": "Setting up…",
+      "scan_instructions": "Scan the QR code in your authenticator app, or open the link below.",
+      "open_in_app": "Open in authenticator app",
+      "manual_key": "Or enter this key manually:",
+      "code_label": "6-digit code",
+      "confirm": "Confirm",
+      "confirming": "Confirming…",
+      "enrolled": "Two-factor authentication is enabled.",
+      "error_generic": "Something went wrong. Please try again.",
+      "error_network": "Network error — please try again.",
+      "error_invalid_code": "That code is incorrect or expired."
+    },
+    "mfa_verify": {
+      "eyebrow": "Verification",
+      "title": "Verify it's you",
+      "subtitle": "Enter the current code from your authenticator app.",
+      "code_label": "6-digit code",
+      "verify": "Verify",
+      "verifying": "Verifying…",
+      "error_invalid_code": "That code is incorrect or expired.",
+      "error_network": "Network error — please try again."
+    },
+    "mfa_step_up": {
+      "eyebrow": "Extra verification",
+      "title": "Confirm it's you",
+      "subtitle": "This action requires recent two-factor verification.",
+      "checking": "Checking…",
+      "code_label": "6-digit code",
+      "verify": "Verify",
+      "verifying": "Verifying…",
+      "no_factor": "You don't have an authenticator set up yet. Enroll one to continue.",
+      "enroll_cta": "Set up authenticator",
+      "error_invalid_code": "That code is incorrect or expired.",
+      "error_network": "Network error — please try again."
     }
   },
   "onboarding": {

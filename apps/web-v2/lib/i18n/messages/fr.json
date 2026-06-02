@@ -1278,6 +1278,56 @@
       "notices": {
         "resent": "Un nouveau code a été envoyé à votre e-mail."
       }
+    },
+    "sso_start": {
+      "eyebrow": "Authentification unique",
+      "title": "Continuer avec {idp}",
+      "subtitle": "Nous vous redirigeons vers le fournisseur d'identité de votre organisation pour terminer la connexion.",
+      "continue": "Continuer avec {idp}",
+      "redirect_note": "Vous êtes redirigé automatiquement. Si rien ne se passe, utilisez le bouton ci-dessous.",
+      "back_to_login": "Retour à la connexion",
+      "default_idp": "votre fournisseur d'identité"
+    },
+    "mfa_enroll": {
+      "eyebrow": "Sécurité du compte",
+      "title": "Configurer l'authentification à deux facteurs",
+      "subtitle": "Ajoutez une application d'authentification pour protéger les actions sensibles.",
+      "intro": "Utilisez une application d'authentification telle que Google Authenticator, 1Password ou Authy.",
+      "start": "Configurer l'authentificateur",
+      "starting": "Configuration…",
+      "scan_instructions": "Scannez le code QR dans votre application d'authentification, ou ouvrez le lien ci-dessous.",
+      "open_in_app": "Ouvrir dans l'application d'authentification",
+      "manual_key": "Ou saisissez cette clé manuellement :",
+      "code_label": "Code à 6 chiffres",
+      "confirm": "Confirmer",
+      "confirming": "Confirmation…",
+      "enrolled": "L'authentification à deux facteurs est activée.",
+      "error_generic": "Une erreur s'est produite. Veuillez réessayer.",
+      "error_network": "Erreur réseau — veuillez réessayer.",
+      "error_invalid_code": "Ce code est incorrect ou expiré."
+    },
+    "mfa_verify": {
+      "eyebrow": "Vérification",
+      "title": "Confirmez votre identité",
+      "subtitle": "Saisissez le code actuel de votre application d'authentification.",
+      "code_label": "Code à 6 chiffres",
+      "verify": "Vérifier",
+      "verifying": "Vérification…",
+      "error_invalid_code": "Ce code est incorrect ou expiré.",
+      "error_network": "Erreur réseau — veuillez réessayer."
+    },
+    "mfa_step_up": {
+      "eyebrow": "Vérification supplémentaire",
+      "title": "Confirmez votre identité",
+      "subtitle": "Cette action nécessite une vérification à deux facteurs récente.",
+      "checking": "Vérification…",
+      "code_label": "Code à 6 chiffres",
+      "verify": "Vérifier",
+      "verifying": "Vérification…",
+      "no_factor": "Vous n'avez pas encore configuré d'authentificateur. Configurez-en un pour continuer.",
+      "enroll_cta": "Configurer l'authentificateur",
+      "error_invalid_code": "Ce code est incorrect ou expiré.",
+      "error_network": "Erreur réseau — veuillez réessayer."
     }
   },
   "onboarding": {
