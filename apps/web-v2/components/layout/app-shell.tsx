@@ -134,6 +134,7 @@ export function AppShell({
   children,
   variant = "standard",
   topBarSlot,
+  jobTray,
 }: {
   role: string;
   roleLabel: string;
@@ -152,6 +153,13 @@ export function AppShell({
    * persistent "living brain" indicator.
    */
   topBarSlot?: React.ReactNode;
+  /**
+   * Optional fixed overlay element rendered after the page body.
+   * Used by school_admin pages to show the import job-tray component.
+   * Kept fully additive — all non-school-admin pages omit this prop
+   * and are unaffected.
+   */
+  jobTray?: React.ReactNode;
 }) {
   const theme = roleToTheme(role);
   const chrome = THEME_CHROME[theme];
@@ -289,6 +297,11 @@ export function AppShell({
           <span>COPPA · FERPA · SOC 2</span>
         </div>
       </footer>
+
+      {/* Job-tray overlay — rendered outside the layout flow so it floats
+          over content regardless of scroll position. Only present when the
+          page opts in via the `jobTray` prop (school_admin pages only). */}
+      {jobTray}
     </div>
   );
 }

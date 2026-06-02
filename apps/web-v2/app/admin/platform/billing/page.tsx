@@ -7,6 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listBillingForTenants, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
+import { listPlatformRollup } from "@/lib/billing/district-pool";
+import { PlatformRollupTable } from "@/components/admin/billing/platform-rollup-table";
+
+function formatMoney(cents: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(cents / 100);
+}
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
@@ -17,6 +28,14 @@ export default async function Page() {
     acc[a.status] = (acc[a.status] ?? 0) + 1;
     return acc;
   }, {});
+
+  // District rollup data
+  const districtTenants = tenants.filter((t) => t.type === "district");
+  const rollupRows = listPlatformRollup(districtTenants.map((t) => t.id));
+
+  // Aggregate MRR/ARR across all districts
+  const totalMrr = rollupRows.reduce((sum, r) => sum + r.mrrCents, 0);
+  const totalArr = rollupRows.reduce((sum, r) => sum + r.arrCents, 0);
 
   return (
     <AppShell
@@ -30,6 +49,8 @@ export default async function Page() {
         title={t("title")}
         description="Every billing account on the platform."
       />
+
+      {/* Status summary cards (existing) */}
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
         {["trialing", "active", "past_due", "canceled"].map((k) => (
           <Card key={k} className="p-[var(--aivo-density-card-pad)]">
@@ -38,6 +59,39 @@ export default async function Page() {
           </Card>
         ))}
       </div>
+
+      {/* MRR / ARR summary cards */}
+      {districtTenants.length > 0 && (
+        <div className="mb-6 grid gap-4 sm:grid-cols-3">
+          <Card className="p-[var(--aivo-density-card-pad)]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+              Total MRR (districts)
+            </p>
+            <p className="mt-1 font-display text-3xl font-bold">{formatMoney(totalMrr)}</p>
+          </Card>
+          <Card className="p-[var(--aivo-density-card-pad)]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+              Total ARR (districts)
+            </p>
+            <p className="mt-1 font-display text-3xl font-bold">{formatMoney(totalArr)}</p>
+          </Card>
+          <Card className="p-[var(--aivo-density-card-pad)]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+              District tenants
+            </p>
+            <p className="mt-1 font-display text-3xl font-bold">{districtTenants.length}</p>
+          </Card>
+        </div>
+      )}
+
+      {/* Cross-district rollup table */}
+      {districtTenants.length > 0 && (
+        <div className="mb-6">
+          <PlatformRollupTable rows={rollupRows} />
+        </div>
+      )}
+
+      {/* All accounts table (existing) */}
       {accounts.length === 0 ? (
         <EmptyState title={t("empty_title")} />
       ) : (
@@ -54,11 +108,11 @@ export default async function Page() {
             </thead>
             <tbody>
               {accounts.map((a) => {
-                const t = getTenantById(a.tenantId);
+                const tenant = getTenantById(a.tenantId);
                 return (
                   <tr key={a.id} className="border-t border-aivo-border">
-                    <td className="p-3 font-medium">{t?.name ?? a.tenantId}</td>
-                    <td className="p-3 text-aivo-ink-soft">{t?.type ?? "?"}</td>
+                    <td className="p-3 font-medium">{tenant?.name ?? a.tenantId}</td>
+                    <td className="p-3 text-aivo-ink-soft">{tenant?.type ?? "?"}</td>
                     <td className="p-3 text-aivo-ink-soft">{a.plan}</td>
                     <td className="p-3">
                       <Badge

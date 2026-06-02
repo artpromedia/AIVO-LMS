@@ -204,3 +204,100 @@ export async function cancelStripeSubscriptionAtPeriodEnd(
     { idempotencyKey: `sub:cancelAtPeriodEnd:${stripeSubscriptionId}:${cancel ? "1" : "0"}` },
   );
 }
+
+/** Change the plan on an existing subscription (used by the plan-change route). */
+export async function changeSubscriptionPlan(args: {
+  stripeSubscriptionId: string;
+  newPriceId: string;
+  /** Stripe spreads or charges the proration immediately by default. */
+  prorationBehavior?: Stripe.SubscriptionUpdateParams.ProrationBehavior;
+}): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+  const sub = await stripe.subscriptions.retrieve(args.stripeSubscriptionId);
+  const firstItem = sub.items.data[0];
+  if (!firstItem) throw new Error("subscription has no items to change");
+  return stripe.subscriptions.update(
+    args.stripeSubscriptionId,
+    {
+      items: [{ id: firstItem.id, price: args.newPriceId }],
+      proration_behavior: args.prorationBehavior ?? "create_prorations",
+    },
+    { idempotencyKey: `sub:planChange:${args.stripeSubscriptionId}:${args.newPriceId}` },
+  );
+}
+
+// ── Invoice retrieval ────────────────────────────────────────────────────────
+
+/** Retrieve a single Stripe invoice (for cache refresh / PDF backfill). */
+export async function retrieveInvoice(stripeInvoiceId: string): Promise<Stripe.Invoice> {
+  return getStripe().invoices.retrieve(stripeInvoiceId);
+}
+
+export interface ListInvoicesArgs {
+  customerId: string;
+  /** Unix-seconds bounds, inclusive. */
+  createdGte?: number;
+  createdLte?: number;
+  limit?: number;
+}
+
+/** List a customer's invoices within an optional created-date window. */
+export async function listStripeInvoices(args: ListInvoicesArgs): Promise<Stripe.Invoice[]> {
+  const stripe = getStripe();
+  const created: { gte?: number; lte?: number } | undefined =
+    args.createdGte || args.createdLte
+      ? {
+          ...(args.createdGte ? { gte: args.createdGte } : {}),
+          ...(args.createdLte ? { lte: args.createdLte } : {}),
+        }
+      : undefined;
+  const page = await stripe.invoices.list({
+    customer: args.customerId,
+    limit: Math.min(100, Math.max(1, args.limit ?? 50)),
+    ...(created ? { created } : {}),
+  });
+  return page.data;
+}
+
+/**
+ * Fetch the raw PDF bytes for an invoice so they can be re-hosted in our
+ * own object storage and served via short-lived signed URLs (we never
+ * hand customers Stripe's hosted URL directly — see ADR 0033). Stripe's
+ * `invoice_pdf` is an authenticated URL; the secret key authorizes it.
+ */
+export async function downloadInvoicePdf(stripeInvoiceId: string): Promise<Buffer> {
+  const stripe = getStripe();
+  const invoice = await stripe.invoices.retrieve(stripeInvoiceId);
+  if (!invoice.invoice_pdf) {
+    throw new Error(`invoice ${stripeInvoiceId} has no PDF available yet`);
+  }
+  const res = await fetch(invoice.invoice_pdf, {
+    headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY ?? ""}` },
+  });
+  if (!res.ok) throw new Error(`failed to fetch invoice PDF: ${res.status}`);
+  return Buffer.from(await res.arrayBuffer());
+}
+
+// ── Metered usage reporting ──────────────────────────────────────────────────
+
+/**
+ * Report metered seat usage to Stripe for a subscription item. Used by
+ * the nightly utilization job for usage-based district contracts. The
+ * idempotency key is bucketed by the usage timestamp's day so a re-run
+ * of the same night does not double-report.
+ */
+export async function reportMeteredUsage(args: {
+  subscriptionItemId: string;
+  quantity: number;
+  timestamp?: number; // unix seconds; defaults to now
+  action?: "increment" | "set";
+}): Promise<Stripe.UsageRecord> {
+  const stripe = getStripe();
+  const ts = args.timestamp ?? Math.floor(Date.now() / 1000);
+  const dayBucket = Math.floor(ts / 86_400);
+  return (stripe as any).subscriptionItems.createUsageRecord(
+    args.subscriptionItemId,
+    { quantity: args.quantity, timestamp: ts, action: args.action ?? "set" },
+    { idempotencyKey: `usage:${args.subscriptionItemId}:${dayBucket}:${args.action ?? "set"}` },
+  );
+}

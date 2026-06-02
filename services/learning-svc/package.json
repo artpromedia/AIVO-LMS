@@ -12,6 +12,7 @@
   "dependencies": {
     "@aivo/billing-entitlements": "workspace:*",
     "@aivo/db": "workspace:*",
+    "@aivo/enterprise-core": "workspace:*",
     "@aivo/brand": "workspace:*",
     "@aivo/events": "workspace:*",
     "@aivo/observability": "workspace:*",

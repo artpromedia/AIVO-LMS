@@ -21,8 +21,11 @@ import { registerDailyJobsRoutes } from "./routes/daily-jobs.js";
 import { registerCouponRoutes } from "./routes/coupons.js";
 import { registerInternalJobRoutes } from "./routes/internal-jobs.js";
 import { registerBillingTestHelperRoutes } from "./routes/test-helpers.js";
+import { registerSeatRoutes } from "./routes/seats.js";
+import { registerGovernanceRoutes } from "./routes/governance.js";
 import { runExpiryBatchForScheduler } from "./lib/expiryReminderService.js";
 import { runReconciliationForScheduler } from "./lib/reconciliationService.js";
+import { runUtilizationForScheduler } from "./jobs/utilization.js";
 
 const logger = createLogger("billing-svc");
 const PORT = parseInt(process.env.BILLING_SVC_PORT || "3009", 10);
@@ -73,8 +76,10 @@ export async function buildApp(
   registerWebhookRoutes(app, db);
   registerDailyJobsRoutes(app, db);
   registerCouponRoutes(app, db);
+  registerSeatRoutes(app, db);
   registerInternalJobRoutes(app, handles);
   registerBillingTestHelperRoutes(app, db);
+  registerGovernanceRoutes(app, db);
 
   return app;
 }
@@ -109,6 +114,19 @@ async function start() {
     run: () => runReconciliationForScheduler(db),
   });
   handles["billing.daily-stripe-reconciliation"] = reconciliationHandle;
+
+  // Nightly seat-utilization rollup: promotes matured future-dated
+  // allocations, refreshes per-pool `used` from identity-svc active users,
+  // and raises `billing.overage` events. No-ops cleanly when there are no
+  // pools or identity-svc is unreachable.
+  const utilizationHandle = startSafeCron({
+    jobName: "billing.nightly-seat-utilization",
+    ledger,
+    lock,
+    log: logger,
+    run: () => runUtilizationForScheduler(db),
+  });
+  handles["billing.nightly-seat-utilization"] = utilizationHandle;
 
   let sharedSql: ReturnType<typeof postgres> | null = null;
   const opsAlerts = await bootstrapOpsAlerts({

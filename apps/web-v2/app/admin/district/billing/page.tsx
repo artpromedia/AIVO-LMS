@@ -1,18 +1,31 @@
+import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
-import { listBillingForTenants, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
+import {
+  getDistrictSummary,
+  getDistrictPool,
+  listDistrictInvoices,
+  getUtilizationSeries,
+} from "@/lib/billing/district-pool";
+import { SeatPoolCard } from "@/components/admin/billing/seat-pool-card";
+import { AllocationMatrix } from "@/components/admin/billing/allocation-matrix";
+import { UtilizationChart } from "@/components/admin/billing/utilization-chart";
+import { InvoiceTable } from "@/components/admin/billing/invoice-table";
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
   const t = await getTranslations("admin.district_billing");
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const accounts = listBillingForTenants(tenants.map((t) => t.id));
+  const districtId = session.tenantId;
+
+  const summary = getDistrictSummary(districtId);
+  const pool = getDistrictPool(districtId);
+  const usageSeries = getUtilizationSeries(districtId, "month");
+  const invoices = listDistrictInvoices(districtId).slice(0, 5);
 
   return (
     <AppShell
@@ -24,49 +37,61 @@ export default async function Page() {
       <PageHeader
         eyebrow="District admin"
         title={t("title")}
-        description="Plan and payment status across schools and families in the district."
+        description="Plan, seat pool, and payment status for your district."
+        actions={
+          <div className="flex gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/admin/district/billing/invoices">View all invoices</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/admin/district/billing/allocate">Manage seat allocations</Link>
+            </Button>
+          </div>
+        }
       />
-      {accounts.length === 0 ? (
-        <EmptyState title={t("empty_title")} />
-      ) : (
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-aivo-surface-2 text-left">
-              <tr>
-                <th className="p-3">{t("col_tenant")}</th>
-                <th className="p-3">Type</th>
-                <th className="p-3">Plan</th>
-                <th className="p-3">{t("col_status")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {accounts.map((a) => {
-                const t = getTenantById(a.tenantId);
-                return (
-                  <tr key={a.id} className="border-t border-aivo-border">
-                    <td className="p-3 font-medium">{t?.name ?? a.tenantId}</td>
-                    <td className="p-3 text-aivo-ink-soft">{t?.type ?? "?"}</td>
-                    <td className="p-3 text-aivo-ink-soft">{a.plan}</td>
-                    <td className="p-3">
-                      <Badge
-                        tone={
-                          a.status === "active"
-                            ? "success"
-                            : a.status === "past_due"
-                              ? "danger"
-                              : "warning"
-                        }
-                      >
-                        {a.status}
-                      </Badge>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </Card>
-      )}
+
+      {/* Seat pool summary */}
+      <div className="mb-6">
+        <SeatPoolCard
+          total={summary.seats.total}
+          allocated={summary.seats.allocated}
+          used={summary.seats.used}
+          unallocated={pool.unallocated}
+          status={summary.status}
+          renewalDate={summary.renewalDate}
+          plan={summary.plan}
+          mrrCents={summary.mrrCents}
+          arrCents={summary.arrCents}
+          currency={summary.currency}
+        />
+      </div>
+
+      {/* Utilization chart */}
+      <Card className="mb-6 p-[var(--aivo-density-card-pad)]">
+        <h2 className="mb-4 font-display text-lg font-semibold">Seat utilization (6 months)</h2>
+        <UtilizationChart
+          series={usageSeries.series}
+          granularity={usageSeries.granularity}
+          overage={usageSeries.overage}
+          hardCap={usageSeries.hardCap}
+        />
+      </Card>
+
+      {/* Allocation matrix */}
+      <div className="mb-6">
+        <AllocationMatrix
+          allocations={pool.allocations}
+          unallocated={pool.unallocated}
+          total={pool.pool.total}
+        />
+      </div>
+
+      {/* Recent invoices */}
+      <InvoiceTable
+        invoices={invoices}
+        districtId={districtId}
+        viewAllHref="/admin/district/billing/invoices"
+      />
     </AppShell>
   );
 }

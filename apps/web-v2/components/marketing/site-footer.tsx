@@ -69,6 +69,7 @@ export function SiteFooter() {
         { label: "Cookie Policy", href: marketingHref("/cookie-policy"), external: true },
         { label: "COPPA Compliance", href: marketingHref("/coppa-compliance"), external: true },
         { label: "FERPA Compliance", href: marketingHref("/ferpa-compliance"), external: true },
+        { label: "Submit a privacy/data request", href: "/privacy/request" },
         { label: "Accessibility", href: marketingHref("/accessibility"), external: true },
         { label: "Security", href: marketingHref("/security"), external: true },
         { label: "Trust", href: marketingHref("/trust"), external: true },

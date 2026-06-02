@@ -739,3 +739,106 @@ export const healthSchema = {
   summary: "Service health probe",
   response: { 200: healthResponseSchema },
 } as const;
+
+// ── Sprint 4: district seat pooling / rollups ────────────────────────────────
+
+const tenantIdParam = {
+  type: "object",
+  required: ["tenantId"],
+  properties: { tenantId: { type: "string" } },
+} as const;
+
+export const seatSummarySchema = {
+  tags: ["Billing", "Seats"],
+  operationId: "getBillingSummary",
+  summary: "District/tenant billing summary — totals, MRR/ARR, plan, renewal",
+  params: tenantIdParam,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const seatPoolSchema = {
+  tags: ["Billing", "Seats"],
+  operationId: "getSeatPool",
+  summary: "Seat pool plus per-child-tenant allocations",
+  params: tenantIdParam,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const allocateSeatsSchema = {
+  tags: ["Billing", "Seats"],
+  operationId: "allocateSeats",
+  summary: "Reassign seats between child tenants (or grant from the pool)",
+  params: tenantIdParam,
+  body: {
+    type: "object",
+    required: ["to_tenant_id", "count"],
+    properties: {
+      from_tenant_id: { type: ["string", "null"] },
+      to_tenant_id: { type: "string" },
+      count: { type: "integer", minimum: 1 },
+      effective_at: { type: "string", format: "date-time" },
+    },
+  },
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+    409: errorResponse,
+    500: errorResponse,
+  },
+} as const;
+
+export const listInvoicesCacheSchema = {
+  tags: ["Billing", "Invoices"],
+  operationId: "listCachedInvoices",
+  summary: "List cached invoices for a tenant within a date window",
+  params: tenantIdParam,
+  querystring: {
+    type: "object",
+    properties: { from: { type: "string" }, to: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const getInvoicePdfSchema = {
+  tags: ["Billing", "Invoices"],
+  operationId: "getInvoicePdf",
+  summary: "Stream (or sign a URL for) a cached invoice PDF",
+  params: {
+    type: "object",
+    required: ["tenantId", "id"],
+    properties: { tenantId: { type: "string" }, id: { type: "string" } },
+  },
+  response: { 401: errorResponse, 403: errorResponse, 404: errorResponse, 503: errorResponse },
+} as const;
+
+export const usageSeriesSchema = {
+  tags: ["Billing", "Usage"],
+  operationId: "getSeatUsageSeries",
+  summary: "Seat utilization time series (day|month granularity)",
+  params: tenantIdParam,
+  querystring: {
+    type: "object",
+    properties: { granularity: { type: "string", enum: ["day", "month"] } },
+  },
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const changePlanSchema = {
+  tags: ["Billing", "Plans"],
+  operationId: "changeBillingPlan",
+  summary: "Change a tenant's plan (platform admin only; step-up MFA required)",
+  params: tenantIdParam,
+  body: {
+    type: "object",
+    required: ["planId"],
+    properties: { planId: { type: "string" } },
+  },
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+  },
+} as const;

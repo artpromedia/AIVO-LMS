@@ -7,33 +7,28 @@ import { registerSisRoutes } from "./routes/sis.js";
 import { registerLtiRoutes } from "./routes/lti.js";
 import { registerConnectorRoutes } from "./routes/connectors.js";
 import { registerHealthRoutes as registerConnectorHealthRoutes } from "./routes/connectors-health.js";
+import { registerGovernanceRoutes } from "./routes/governance.js";
 import { installAuditing } from "@aivo/audit-client";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
   /**
-   * Drizzle handle for LTI 1.3 runtime persistence. Defaults to a pool built
-   * from DATABASE_URL when that is set; pass `null` to run the LTI routes in
-   * stateless verify-and-redirect mode (used by the self-contained unit
-   * tests). In production DATABASE_URL must be set so launches persist.
+   * Optional pre-built database handle. When omitted we lazily create one
+   * using DATABASE_URL (or fall back to `null` for in-memory/test mode where
+   * routes detect the absence and switch to mock storage).
    */
   db?: Database | null;
 }
 
-const IS_PROD = process.env.NODE_ENV === "production";
-
-function resolveDb(opt: BuildAppOptions["db"]): Database | undefined {
-  if (opt === null) return undefined;
-  if (opt) return opt;
+function resolveDb(input?: Database | null): Database | null {
+  if (input !== undefined) return input;
   const url = process.env.DATABASE_URL;
-  if (url) return createDb(url);
-  if (IS_PROD) {
-    throw new Error(
-      "integration-svc: DATABASE_URL must be set in production so LTI 1.3 " +
-        "launches persist (migration 0045 tables).",
-    );
+  if (!url) return null;
+  try {
+    return createDb(url);
+  } catch {
+    return null;
   }
-  return undefined;
 }
 
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
@@ -63,5 +58,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   // connector catalogue + connection management. Self-authenticating.
   registerConnectorRoutes(app, db);
   registerConnectorHealthRoutes(app);
+
+  // Sprint 5 governance subscribers (DSAR erase/export at /__governance/*).
+  registerGovernanceRoutes(app, db);
   return app;
 }

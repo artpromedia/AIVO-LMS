@@ -27,6 +27,11 @@ import { registerEvidenceRoutes } from "./routes/evidence.js";
 import { registerJobsRoutes } from "./routes/jobs.js";
 import { registerAdminInternalJobRoutes } from "./routes/internal-jobs.js";
 import { registerContentCmsRoutes } from "./routes/content-cms.js";
+import { registerGovernanceRoutes } from "./routes/governance.js";
+import { registerLearnerImportRoutes } from "./routes/learner-import.js";
+import { registerClassroomRoutes } from "./routes/classrooms.js";
+import { registerReportRoutes } from "./routes/reports.js";
+import { registerNotificationRoutes } from "./routes/notifications.js";
 import { startEvidenceCron } from "./lib/soc2-evidence.js";
 import { startWatchdog, configureWatchdogAlerts } from "./lib/watchdog.js";
 import { runJanitorOnce } from "./lib/janitor.js";
@@ -79,6 +84,11 @@ export async function buildApp(
   registerEvidenceRoutes(app, db);
   registerJobsRoutes(app, db);
   registerContentCmsRoutes(app, db);
+  registerGovernanceRoutes(app, db);
+  registerLearnerImportRoutes(app, db);
+  registerClassroomRoutes(app, db);
+  registerReportRoutes(app, db);
+  registerNotificationRoutes(app, db);
   // Wire the internal-jobs route up with a handle map that is mutated
   // by `start()` once the schedulers are running. The dump path leaves
   // it empty, which is safe because the route reads `handles[jobName]`

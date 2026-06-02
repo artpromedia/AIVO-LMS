@@ -4,8 +4,8 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { listRetentionPolicies } from "@/lib/db/repos";
-import { RetentionRow } from "./row";
+import { listRetentionPolicies, previewRetention } from "@/lib/compliance/governance-store";
+import { RetentionPolicyEditor } from "@/components/admin/compliance/retention-policy-editor";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +24,7 @@ export default async function Page() {
       <PageHeader
         eyebrow="Platform · Compliance"
         title={t("title")}
-        description="Retention and archive windows per data classification."
+        description="Retention windows, disposition, and legal hold settings per data classification. The preview column shows how many synthetic records would be eligible for action."
       />
 
       <Card className="overflow-hidden">
@@ -33,14 +33,20 @@ export default async function Page() {
             <tr>
               <th className="p-3">{t("col_classification")}</th>
               <th className="p-3">{t("col_retention_days")}</th>
-              <th className="p-3">{t("col_archive_days")}</th>
-              <th className="p-3">{t("col_description")}</th>
+              <th className="p-3">Disposition</th>
+              <th className="p-3">Legal hold</th>
+              <th className="p-3">Eligible / Total</th>
               <th className="p-3"></th>
             </tr>
           </thead>
           <tbody>
             {policies.map((p) => (
-              <RetentionRow key={p.id} policy={p} />
+              <RetentionPolicyEditor
+                key={p.dataClass}
+                dataClass={p}
+                retention={p.retention}
+                preview={previewRetention(p.dataClass)}
+              />
             ))}
           </tbody>
         </table>

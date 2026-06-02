@@ -8,6 +8,7 @@ import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerSessionRoutes } from "./routes/sessions.js";
 import { registerAuthHook } from "./lib/tenant.js";
+import { registerGovernanceRoutes } from "./routes/governance.js";
 
 const logger = createLogger("learning-svc");
 const PORT = parseInt(process.env.LEARNING_PORT || "3005", 10);
@@ -44,6 +45,7 @@ export async function buildApp() {
   registerHealthRoutes(app);
   registerAuthHook(app);
   registerSessionRoutes(app, db);
+  registerGovernanceRoutes(app, db);
 
   return app;
 }
