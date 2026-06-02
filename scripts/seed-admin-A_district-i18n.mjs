@@ -24,7 +24,8 @@ const ADMIN = {
   en: {
     district_overview: {
       eyebrow: "District admin",
-      description: "Cross-school oversight, rostering, and reporting. Drill into a card to manage a school.",
+      description:
+        "Cross-school oversight, rostering, and reporting. Drill into a card to manage a school.",
       fl_distribution_title: "Functioning level distribution",
       no_learners: "No learners assigned yet.",
       platform_health_title: "Platform health",
@@ -100,7 +101,8 @@ const ADMIN = {
       idp_name_placeholder: "e.g. District Okta",
       scim_provisioning: "SCIM provisioning",
       enable_scim: "Enable SCIM",
-      scim_rotate_warning: "Rotating the SCIM token invalidates any IdP integration using the old credential.",
+      scim_rotate_warning:
+        "Rotating the SCIM token invalidates any IdP integration using the old credential.",
       rotate_scim_token: "Rotate SCIM token",
     },
     district_staff: {
@@ -176,7 +178,8 @@ const ADMIN = {
   es: {
     district_overview: {
       eyebrow: "Administrador de distrito",
-      description: "Supervisión entre escuelas, configuración de listas y reportes. Haz clic en una tarjeta para gestionar una escuela.",
+      description:
+        "Supervisión entre escuelas, configuración de listas y reportes. Haz clic en una tarjeta para gestionar una escuela.",
       fl_distribution_title: "Distribución de nivel de funcionamiento",
       no_learners: "Aún no hay estudiantes asignados.",
       platform_health_title: "Estado de la plataforma",
@@ -215,13 +218,15 @@ const ADMIN = {
     district_settings_admins: {
       title: "Administradores",
       empty_title: "Aún no hay administradores",
-      invite_note: "La invitación de administradores está a cargo del contacto de incorporación de tu distrito en AIVO.",
+      invite_note:
+        "La invitación de administradores está a cargo del contacto de incorporación de tu distrito en AIVO.",
       col_joined: "Se unió",
     },
     district_settings_branding: {
       title: "Marca",
       display_name: "Nombre para mostrar",
-      display_name_hint: "Se muestra en el encabezado del producto, correos electrónicos y portal para padres.",
+      display_name_hint:
+        "Se muestra en el encabezado del producto, correos electrónicos y portal para padres.",
       support_email: "Correo de soporte",
       support_email_hint: "Familias y personal de este distrito lo ven en cada página de ayuda.",
       primary_colour: "Color principal de marca",
@@ -252,7 +257,8 @@ const ADMIN = {
       idp_name_placeholder: "p. ej. Okta del distrito",
       scim_provisioning: "Aprovisionamiento SCIM",
       enable_scim: "Habilitar SCIM",
-      scim_rotate_warning: "Rotar el token SCIM invalida cualquier integración de IdP que use la credencial anterior.",
+      scim_rotate_warning:
+        "Rotar el token SCIM invalida cualquier integración de IdP que use la credencial anterior.",
       rotate_scim_token: "Rotar token SCIM",
     },
     district_staff: {
@@ -328,7 +334,8 @@ const ADMIN = {
   fr: {
     district_overview: {
       eyebrow: "Administrateur de district",
-      description: "Supervision inter-écoles, listes et rapports. Cliquez sur une carte pour gérer une école.",
+      description:
+        "Supervision inter-écoles, listes et rapports. Cliquez sur une carte pour gérer une école.",
       fl_distribution_title: "Distribution des niveaux de fonctionnement",
       no_learners: "Aucun apprenant assigné pour l'instant.",
       platform_health_title: "État de la plateforme",
@@ -367,7 +374,8 @@ const ADMIN = {
     district_settings_admins: {
       title: "Administrateurs",
       empty_title: "Aucun administrateur pour l'instant",
-      invite_note: "L’invitation des administrateurs est gérée par le contact d’intégration de votre district chez AIVO.",
+      invite_note:
+        "L’invitation des administrateurs est gérée par le contact d’intégration de votre district chez AIVO.",
       col_joined: "A rejoint",
     },
     district_settings_branding: {
@@ -375,7 +383,8 @@ const ADMIN = {
       display_name: "Nom d’affichage",
       display_name_hint: "Affiché dans l’en-tête du produit, les e-mails et le portail parents.",
       support_email: "E-mail de support",
-      support_email_hint: "Les familles et le personnel de ce district le voient sur chaque page d’aide.",
+      support_email_hint:
+        "Les familles et le personnel de ce district le voient sur chaque page d’aide.",
       primary_colour: "Couleur principale de la marque",
       primary_colour_aria: "Couleur principale de la marque",
       sample: "Exemple",
@@ -404,7 +413,8 @@ const ADMIN = {
       idp_name_placeholder: "ex. Okta du district",
       scim_provisioning: "Provisionnement SCIM",
       enable_scim: "Activer SCIM",
-      scim_rotate_warning: "La rotation du jeton SCIM invalide toute intégration IdP utilisant l’ancienne accréditation.",
+      scim_rotate_warning:
+        "La rotation du jeton SCIM invalide toute intégration IdP utilisant l’ancienne accréditation.",
       rotate_scim_token: "Faire pivoter le jeton SCIM",
     },
     district_staff: {
@@ -480,7 +490,8 @@ const ADMIN = {
   de: {
     district_overview: {
       eyebrow: "Bezirksadministrator",
-      description: "Schulübergreifende Aufsicht, Rostering und Berichte. Klicke auf eine Karte, um eine Schule zu verwalten.",
+      description:
+        "Schulübergreifende Aufsicht, Rostering und Berichte. Klicke auf eine Karte, um eine Schule zu verwalten.",
       fl_distribution_title: "Verteilung der Funktionsniveaus",
       no_learners: "Noch keine Lernenden zugewiesen.",
       platform_health_title: "Plattformzustand",
@@ -519,7 +530,8 @@ const ADMIN = {
     district_settings_admins: {
       title: "Administratoren",
       empty_title: "Noch keine Administratoren",
-      invite_note: "Die Einladung von Administratoren erfolgt durch den Onboarding-Kontakt Ihres Bezirks bei AIVO.",
+      invite_note:
+        "Die Einladung von Administratoren erfolgt durch den Onboarding-Kontakt Ihres Bezirks bei AIVO.",
       col_joined: "Beigetreten",
     },
     district_settings_branding: {
@@ -545,7 +557,8 @@ const ADMIN = {
       notifications_heading: "Benachrichtigungseinstellungen",
       notifications_desc: "Worüber Bezirksadministratoren per E-Mail informiert werden.",
       features_heading: "Funktionsüberschreibungen",
-      features_desc: "Einstellungen auf Bezirksebene, die auf alle Schulen des Bezirks angewendet werden.",
+      features_desc:
+        "Einstellungen auf Bezirksebene, die auf alle Schulen des Bezirks angewendet werden.",
     },
     district_settings_sso: {
       title: "SSO & SCIM",
@@ -556,7 +569,8 @@ const ADMIN = {
       idp_name_placeholder: "z. B. Bezirks-Okta",
       scim_provisioning: "SCIM-Bereitstellung",
       enable_scim: "SCIM aktivieren",
-      scim_rotate_warning: "Das Rotieren des SCIM-Tokens macht jede IdP-Integration ungültig, die die alte Anmeldedaten verwendet.",
+      scim_rotate_warning:
+        "Das Rotieren des SCIM-Tokens macht jede IdP-Integration ungültig, die die alte Anmeldedaten verwendet.",
       rotate_scim_token: "SCIM-Token rotieren",
     },
     district_staff: {
@@ -632,7 +646,8 @@ const ADMIN = {
   pt: {
     district_overview: {
       eyebrow: "Administrador de distrito",
-      description: "Supervisão entre escolas, gerenciamento de listas e relatórios. Clique em um card para gerenciar uma escola.",
+      description:
+        "Supervisão entre escolas, gerenciamento de listas e relatórios. Clique em um card para gerenciar uma escola.",
       fl_distribution_title: "Distribuição de nível de funcionamento",
       no_learners: "Nenhum aluno atribuído ainda.",
       platform_health_title: "Saúde da plataforma",
@@ -671,7 +686,8 @@ const ADMIN = {
     district_settings_admins: {
       title: "Administradores",
       empty_title: "Nenhum administrador ainda",
-      invite_note: "O convite de administradores é gerenciado pelo contato de integração do seu distrito na AIVO.",
+      invite_note:
+        "O convite de administradores é gerenciado pelo contato de integração do seu distrito na AIVO.",
       col_joined: "Entrou",
     },
     district_settings_branding: {
@@ -679,7 +695,8 @@ const ADMIN = {
       display_name: "Nome de exibição",
       display_name_hint: "Exibido no cabeçalho do produto, e-mails e portal dos responsáveis.",
       support_email: "E-mail de suporte",
-      support_email_hint: "Famílias e equipe deste distrito veem isso em todas as páginas de ajuda.",
+      support_email_hint:
+        "Famílias e equipe deste distrito veem isso em todas as páginas de ajuda.",
       primary_colour: "Cor principal da marca",
       primary_colour_aria: "Cor principal da marca",
       sample: "Amostra",
@@ -708,7 +725,8 @@ const ADMIN = {
       idp_name_placeholder: "ex.: Okta do distrito",
       scim_provisioning: "Provisionamento SCIM",
       enable_scim: "Habilitar SCIM",
-      scim_rotate_warning: "Rodar o token SCIM invalida qualquer integração IdP que use a credencial antiga.",
+      scim_rotate_warning:
+        "Rodar o token SCIM invalida qualquer integração IdP que use a credencial antiga.",
       rotate_scim_token: "Rodar token SCIM",
     },
     district_staff: {
@@ -1012,7 +1030,8 @@ const ADMIN = {
       idp_name_placeholder: "例: 地区 Okta",
       scim_provisioning: "SCIM プロビジョニング",
       enable_scim: "SCIM を有効にする",
-      scim_rotate_warning: "SCIM トークンをローテーションすると、古い資格情報を使用している IdP 統合が無効になります。",
+      scim_rotate_warning:
+        "SCIM トークンをローテーションすると、古い資格情報を使用している IdP 統合が無効になります。",
       rotate_scim_token: "SCIM トークンをローテーション",
     },
     district_staff: {
@@ -1164,7 +1183,8 @@ const ADMIN = {
       idp_name_placeholder: "예: 학구 Okta",
       scim_provisioning: "SCIM 프로비저닝",
       enable_scim: "SCIM 활성화",
-      scim_rotate_warning: "SCIM 토큰을 교체하면 이전 자격 증명을 사용하는 모든 IdP 통합이 무효화됩니다.",
+      scim_rotate_warning:
+        "SCIM 토큰을 교체하면 이전 자격 증명을 사용하는 모든 IdP 통합이 무효화됩니다.",
       rotate_scim_token: "SCIM 토큰 교체",
     },
     district_staff: {
@@ -1240,7 +1260,8 @@ const ADMIN = {
   ar: {
     district_overview: {
       eyebrow: "مدير المنطقة",
-      description: "الإشراف عبر المدارس وإدارة القوائم وإعداد التقارير. انقر على بطاقة لإدارة مدرسة.",
+      description:
+        "الإشراف عبر المدارس وإدارة القوائم وإعداد التقارير. انقر على بطاقة لإدارة مدرسة.",
       fl_distribution_title: "توزيع مستوى الأداء الوظيفي",
       no_learners: "لم يُعيَّن أي متعلّم بعد.",
       platform_health_title: "صحة المنصة",
@@ -1392,7 +1413,8 @@ const ADMIN = {
   hi: {
     district_overview: {
       eyebrow: "जिला प्रशासक",
-      description: "स्कूलों के बीच निगरानी, रोस्टरिंग और रिपोर्टिंग। किसी स्कूल को प्रबंधित करने के लिए कार्ड पर क्लिक करें।",
+      description:
+        "स्कूलों के बीच निगरानी, रोस्टरिंग और रिपोर्टिंग। किसी स्कूल को प्रबंधित करने के लिए कार्ड पर क्लिक करें।",
       fl_distribution_title: "कार्यात्मक स्तर वितरण",
       no_learners: "अभी तक कोई शिक्षार्थी नियुक्त नहीं किया गया।",
       platform_health_title: "प्लेटफ़ॉर्म स्वास्थ्य",
@@ -1431,7 +1453,8 @@ const ADMIN = {
     district_settings_admins: {
       title: "प्रशासक",
       empty_title: "अभी कोई प्रशासक नहीं",
-      invite_note: "प्रशासकों को आमंत्रित करना आपके जिले के AIVO ऑनबोर्डिंग संपर्क द्वारा संभाला जाता है।",
+      invite_note:
+        "प्रशासकों को आमंत्रित करना आपके जिले के AIVO ऑनबोर्डिंग संपर्क द्वारा संभाला जाता है।",
       col_joined: "जुड़े",
     },
     district_settings_branding: {
@@ -1468,7 +1491,8 @@ const ADMIN = {
       idp_name_placeholder: "जैसे: जिला Okta",
       scim_provisioning: "SCIM प्रोविजनिंग",
       enable_scim: "SCIM सक्षम करें",
-      scim_rotate_warning: "SCIM टोकन बदलने से पुराने क्रेडेंशियल का उपयोग करने वाले सभी IdP एकीकरण अमान्य हो जाते हैं।",
+      scim_rotate_warning:
+        "SCIM टोकन बदलने से पुराने क्रेडेंशियल का उपयोग करने वाले सभी IdP एकीकरण अमान्य हो जाते हैं।",
       rotate_scim_token: "SCIM टोकन रोटेट करें",
     },
     district_staff: {
@@ -1549,6 +1573,8 @@ for (const [locale, admin] of Object.entries(ADMIN)) {
   json.admin = { ...(json.admin ?? {}), ...admin };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-admin-A_district-i18n: merged admin A_district namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-admin-A_district-i18n: merged admin A_district namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-admin-A_district-i18n: done — ${written} locale catalogs updated.`);

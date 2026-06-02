@@ -3,12 +3,47 @@ import * as jose from "jose";
 import { validateLtiLaunch, type LtiLaunchPayload } from "../services/lti13-launch-validator.js";
 import { getRemoteJwks } from "../lti/jwks-cache.js";
 import { mapLisRolesToAivoRole, type AivoRole } from "../lti/role-mapping.js";
+import { verifyJWT } from "@aivo/security";
 import {
   persistLaunch,
   upsertAgsLineitem,
+  registerPlatform,
+  listPlatforms,
   UnregisteredPlatformError,
   type LtiDb,
 } from "../lti/persistence.js";
+
+const PLATFORM_REGISTRATION_ROLES = new Set(["PLATFORM_ADMIN", "DISTRICT_ADMIN", "SCHOOL_ADMIN"]);
+
+/**
+ * Authenticate an admin caller for platform-registration endpoints. Returns the
+ * verified claims, or null after sending a 401/403 (caller should return).
+ */
+async function requirePlatformAdmin(
+  req: { headers: Record<string, unknown> },
+  reply: { code: (n: number) => { send: (b: unknown) => unknown } },
+): Promise<{ sub: string; role: string; tenantId: string } | null> {
+  const auth = req.headers["authorization"];
+  if (typeof auth !== "string" || !auth.startsWith("Bearer ")) {
+    reply.code(401).send({ error: "Missing authorization header" });
+    return null;
+  }
+  try {
+    const payload = (await verifyJWT(auth.slice(7))) as {
+      sub: string;
+      role: string;
+      tenantId?: string;
+    };
+    if (!PLATFORM_REGISTRATION_ROLES.has(payload.role)) {
+      reply.code(403).send({ error: "Admin access required" });
+      return null;
+    }
+    return { sub: payload.sub, role: payload.role, tenantId: payload.tenantId ?? "" };
+  } catch {
+    reply.code(401).send({ error: "Invalid token" });
+    return null;
+  }
+}
 
 /**
  * Sprint 12.7 — LTI 1.3 launch + deep linking + AGS routes.
@@ -77,6 +112,69 @@ export function registerLtiRoutes(app: FastifyInstance, db?: LtiDb): void {
   });
 
   /**
+   * GET /api/lti/platforms — list the caller tenant's registered LTI platforms.
+   * POST /api/lti/platforms — register/update a platform (+ deployments).
+   *
+   * Admin-only; tenant comes from the verified JWT. These close the
+   * "register an LMS without a manual DB insert" gap. Available only when a db
+   * handle is wired (production); stateless dev returns 503.
+   */
+  app.get("/api/lti/platforms", async (request, reply) => {
+    const claims = await requirePlatformAdmin(request, reply);
+    if (!claims) return;
+    if (!db) return reply.code(503).send({ error: "LTI registry not available (no database)" });
+    if (!claims.tenantId) return reply.code(400).send({ error: "Token is missing a tenant" });
+    const platforms = await listPlatforms(db, claims.tenantId);
+    return { platforms, count: platforms.length };
+  });
+
+  app.post<{
+    Body: {
+      issuer?: string;
+      clientId?: string;
+      jwksUrl?: string;
+      authTokenUrl?: string;
+      authLoginUrl?: string;
+      label?: string;
+      deployments?: Array<{ deploymentId: string; label?: string }>;
+    };
+  }>("/api/lti/platforms", async (request, reply) => {
+    const claims = await requirePlatformAdmin(request, reply);
+    if (!claims) return;
+    if (!db) return reply.code(503).send({ error: "LTI registry not available (no database)" });
+    if (!claims.tenantId) return reply.code(400).send({ error: "Token is missing a tenant" });
+
+    const b = request.body ?? {};
+    const required = {
+      issuer: b.issuer,
+      clientId: b.clientId,
+      jwksUrl: b.jwksUrl,
+      authTokenUrl: b.authTokenUrl,
+      authLoginUrl: b.authLoginUrl,
+    };
+    for (const [k, v] of Object.entries(required)) {
+      if (typeof v !== "string" || !v.trim()) {
+        return reply.code(400).send({ error: `${k} is required` });
+      }
+    }
+    const result = await registerPlatform(db, {
+      tenantId: claims.tenantId,
+      issuer: b.issuer!,
+      clientId: b.clientId!,
+      jwksUrl: b.jwksUrl!,
+      authTokenUrl: b.authTokenUrl!,
+      authLoginUrl: b.authLoginUrl!,
+      label: typeof b.label === "string" ? b.label : undefined,
+      deployments: Array.isArray(b.deployments)
+        ? b.deployments.filter(
+            (d) => d && typeof d.deploymentId === "string" && d.deploymentId.trim(),
+          )
+        : undefined,
+    });
+    return reply.code(201).send(result);
+  });
+
+  /**
    * POST /api/lti/launch
    *
    * Body:
@@ -109,8 +207,7 @@ export function registerLtiRoutes(app: FastifyInstance, db?: LtiDb): void {
       request.log?.warn({ err: err.message }, "LTI launch JWT verify failed");
       return reply.code(401).send({ error: "invalid_id_token", detail: err.message });
     }
-    const deploymentId =
-      claims["https://purl.imsglobal.org/spec/lti/claim/deployment_id"];
+    const deploymentId = claims["https://purl.imsglobal.org/spec/lti/claim/deployment_id"];
     if (!deploymentId) return reply.code(400).send({ error: "missing_deployment_id" });
     if (!claims.nonce) return reply.code(400).send({ error: "missing_nonce" });
 

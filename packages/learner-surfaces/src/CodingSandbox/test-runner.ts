@@ -33,7 +33,10 @@ function toComparableStdout(v: unknown): string {
     .trim();
 }
 
-function pickFunctionName(test: CodingRubricTest, exportsMap: Record<string, unknown>): string | null {
+function pickFunctionName(
+  test: CodingRubricTest,
+  exportsMap: Record<string, unknown>,
+): string | null {
   if (typeof exportsMap[test.name] === "function") return test.name;
   const fallback = test.name.split(/\s+/)[0]?.trim();
   if (fallback && typeof exportsMap[fallback] === "function") return fallback;
@@ -100,4 +103,3 @@ export async function runJavascriptRubricTests(params: {
     failed: results.length - passed,
   };
 }
-

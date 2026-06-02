@@ -17,13 +17,14 @@ export function canonicalize(value: unknown): string {
   return JSON.stringify(sort(value));
 }
 
-function sort(v: any): any {
+function sort(v: unknown): unknown {
   if (Array.isArray(v)) return v.map(sort);
   if (v && typeof v === "object" && !(v instanceof Date)) {
-    const out: Record<string, any> = {};
-    for (const k of Object.keys(v).sort()) {
-      if (v[k] === undefined) continue;
-      out[k] = sort(v[k]);
+    const obj = v as Record<string, unknown>;
+    const out: Record<string, unknown> = {};
+    for (const k of Object.keys(obj).sort()) {
+      if (obj[k] === undefined) continue;
+      out[k] = sort(obj[k]);
     }
     return out;
   }
@@ -47,11 +48,11 @@ export function computeAuditHash(prevHash: string | null | undefined, payload: u
  * Returns `true` when the row is intact.
  */
 export function verifyAuditRow(
-  row: { prevHash: string | null; hash: string | null; [k: string]: any },
+  row: { prevHash: string | null; hash: string | null; [k: string]: unknown },
   payloadKeys: readonly string[],
 ): boolean {
   if (!row.hash) return false;
-  const payload: Record<string, any> = {};
+  const payload: Record<string, unknown> = {};
   for (const k of payloadKeys) payload[k] = row[k];
   return computeAuditHash(row.prevHash, payload) === row.hash;
 }

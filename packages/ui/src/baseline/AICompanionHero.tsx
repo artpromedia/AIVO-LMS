@@ -72,23 +72,15 @@ export function AICompanionHero({
     >
       <div className="grid gap-6 md:grid-cols-[1fr,auto] items-center">
         <div className="flex flex-col gap-4 max-w-2xl">
-          {eyebrow ? (
-            <p className="iw-label text-iw-text-muted">{eyebrow}</p>
-          ) : null}
+          {eyebrow ? <p className="iw-label text-iw-text-muted">{eyebrow}</p> : null}
           <h1 className="text-3xl md:text-4xl leading-snug font-semibold text-iw-text-strong">
             {title}
           </h1>
           {body ? (
-            <p className="text-base md:text-lg text-iw-text-muted leading-relaxed">
-              {body}
-            </p>
+            <p className="text-base md:text-lg text-iw-text-muted leading-relaxed">{body}</p>
           ) : null}
-          {chips ? (
-            <div className="flex flex-wrap gap-2 mt-1">{chips}</div>
-          ) : null}
-          {actions ? (
-            <div className="flex flex-wrap gap-3 mt-2">{actions}</div>
-          ) : null}
+          {chips ? <div className="flex flex-wrap gap-2 mt-1">{chips}</div> : null}
+          {actions ? <div className="flex flex-wrap gap-3 mt-2">{actions}</div> : null}
         </div>
         <div className="relative flex items-center justify-center">
           {companion ?? <DefaultOrb />}

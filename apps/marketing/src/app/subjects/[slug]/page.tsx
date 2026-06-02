@@ -78,7 +78,9 @@ export default async function SubjectPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("topics_covered")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+          {t("topics_covered")}
+        </h2>
         <div className="flex flex-wrap gap-2">
           {subject.topics.map((topic) => (
             <span
@@ -92,7 +94,9 @@ export default async function SubjectPage({ params }: Props) {
       </section>
 
       <section className="mt-14 pt-8 border-t border-slate-100">
-        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">{t("other_subjects")}</h2>
+        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">
+          {t("other_subjects")}
+        </h2>
         <div className="flex flex-wrap gap-3">
           {SUBJECTS.filter((s) => s.slug !== subject.slug).map((other) => (
             <Link

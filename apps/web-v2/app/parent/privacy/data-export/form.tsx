@@ -78,9 +78,7 @@ export function ExportRequestForm({ learners }: { learners: LearnerOpt[] }) {
       <Button type="submit" disabled={busy}>
         {busy ? t("form_submitting") : t("form_submit")}
       </Button>
-      <p className="text-xs text-aivo-muted">
-        {t("form_email_when_ready")}
-      </p>
+      <p className="text-xs text-aivo-muted">{t("form_email_when_ready")}</p>
     </form>
   );
 }

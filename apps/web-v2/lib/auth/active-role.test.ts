@@ -82,10 +82,7 @@ describe("decideActiveRoleSwitch", () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.payload.activeRole).toBe("learner");
-    expect(r.cookies.map((c) => c.name).sort()).toEqual([
-      "aivo_active_role",
-      "aivo_session_role",
-    ]);
+    expect(r.cookies.map((c) => c.name).sort()).toEqual(["aivo_active_role", "aivo_session_role"]);
     const active = r.cookies.find((c) => c.name === "aivo_active_role")!;
     expect(active.value).toBe("learner");
     expect(active.httpOnly).toBe(true);

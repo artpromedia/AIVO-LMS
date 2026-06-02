@@ -36,7 +36,9 @@ export const ClassOverviewCard = forwardRef<HTMLDivElement, ClassOverviewCardPro
       <GlassCard ref={ref} density="base" radius="card-lg" className={cn(className_)}>
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="min-w-0">
-            <h3 className="text-base font-semibold text-iw-text-strong truncate">{classDisplayName}</h3>
+            <h3 className="text-base font-semibold text-iw-text-strong truncate">
+              {classDisplayName}
+            </h3>
             <p className="text-xs text-iw-text-muted inline-flex items-center gap-1.5 mt-0.5">
               <Users className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="iw-tabular">{studentCount}</span>

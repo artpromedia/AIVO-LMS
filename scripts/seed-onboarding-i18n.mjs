@@ -128,8 +128,7 @@ const ONBOARDING = {
       continue: "Continue — add a learner",
       household_label: "Household name (optional)",
       household_placeholder: "e.g. The Okafor family",
-      household_helper:
-        "Shown to teachers when they message you. You can change it later.",
+      household_helper: "Shown to teachers when they message you. You can change it later.",
       coparent_label: "Invite a co-parent or caregiver (optional)",
       coparent_helper:
         "They'll get an email with their own sign-in. You can both approve consents and view progress.",
@@ -204,8 +203,7 @@ const ONBOARDING = {
       mic_desc:
         "Used only for speak-to-read lessons and AI tutor voice mode. Off by default — turn on if your child wants to read aloud.",
       cam_title: "Camera",
-      cam_desc:
-        "Used only when scanning a homework page or document. AIVO never records video.",
+      cam_desc: "Used only when scanning a homework page or document. AIVO never records video.",
       notifs_title: "Notifications",
       notifs_desc:
         "Approval requests, weekly progress digests, and safety messages. Lesson reminders are off by default — you can enable them later.",
@@ -306,8 +304,7 @@ const ONBOARDING = {
       reassure_body:
         "Until you press Approve, this profile is in a holding state. Your child cannot sign in or start lessons.",
       approve: "Approve and finish",
-      footer_note:
-        "You'll arrive on the parent home with your child set up and ready.",
+      footer_note: "You'll arrive on the parent home with your child set up and ready.",
       comm_title: "Messages with teachers",
       comm_desc:
         "Your child can read messages from teachers and reply with adult-moderated quick responses.",
@@ -344,8 +341,7 @@ const ONBOARDING = {
       legal_never_body:
         "medical diagnoses, psychological evaluations, parent statements, signatures.",
       legal_teachers_label: "Visible to teachers:",
-      legal_teachers_body:
-        "only the accommodations list, only at schools you've opted in to.",
+      legal_teachers_body: "only the accommodations list, only at schools you've opted in to.",
     },
     invite_school: {
       eyebrow: "School invite",
@@ -398,8 +394,7 @@ const ONBOARDING = {
       blocked_body:
         "You'll get an email at the address on file once the review finishes, usually within one business day.",
       blocked_reassure_title: "Your child's data is safe.",
-      blocked_reassure_body:
-        "We don't delete anything during a review — pause and resume only.",
+      blocked_reassure_body: "We don't delete anything during a review — pause and resume only.",
       blocked_primary: "Back to welcome",
       generic_eyebrow: "Something went wrong",
       generic_title: "We hit a snag.",
@@ -514,8 +509,7 @@ const ONBOARDING = {
       continue: "Continuar — añadir un estudiante",
       household_label: "Nombre del hogar (opcional)",
       household_placeholder: "p. ej. La familia Okafor",
-      household_helper:
-        "Se muestra a los docentes cuando te escriben. Puedes cambiarlo después.",
+      household_helper: "Se muestra a los docentes cuando te escriben. Puedes cambiarlo después.",
       coparent_label: "Invitar a un co-padre o cuidador (opcional)",
       coparent_helper:
         "Recibirán un correo con su propio inicio de sesión. Ambos pueden aprobar consentimientos y ver el progreso.",
@@ -534,7 +528,8 @@ const ONBOARDING = {
       first_name_placeholder: "p. ej. Emma",
       grade_band_label: "Nivel escolar",
       grade_band_placeholder: "Elige un nivel",
-      grade_band_help: "Usamos un nivel, no una fecha de nacimiento. Puedes cambiarlo cuando quieras.",
+      grade_band_help:
+        "Usamos un nivel, no una fecha de nacimiento. Puedes cambiarlo cuando quieras.",
       iep_legend: "¿Tu hijo tiene un plan IEP o 504?",
       iep_help:
         "Puedes subirlo en los siguientes pasos, solo con tu consentimiento explícito. Omítelo si prefieres decidir más tarde.",
@@ -692,8 +687,7 @@ const ONBOARDING = {
       reassure_body:
         "Hasta que pulses Aprobar, este perfil está en espera. Tu hijo no puede iniciar sesión ni empezar las lecciones.",
       approve: "Aprobar y finalizar",
-      footer_note:
-        "Llegarás a la página de inicio de padres con tu hijo configurado y listo.",
+      footer_note: "Llegarás a la página de inicio de padres con tu hijo configurado y listo.",
       comm_title: "Mensajes con los docentes",
       comm_desc:
         "Tu hijo puede leer los mensajes de los docentes y responder con respuestas rápidas moderadas por un adulto.",
@@ -739,7 +733,8 @@ const ONBOARDING = {
       subtitle:
         "Pega el código que te envió tu escuela. Si no tienes uno, pídeselo a tu administrador escolar: solo el personal invitado puede unirse.",
       reassure_title: "El personal escolar no puede inscribirse por su cuenta.",
-      reassure_body: "Un administrador debe invitarte. Esto protege las listas y los datos de los estudiantes.",
+      reassure_body:
+        "Un administrador debe invitarte. Esto protege las listas y los datos de los estudiantes.",
       join: "Unirse a la escuela",
       code_label: "Código de invitación",
       email_label: "Tu correo escolar",
@@ -784,8 +779,7 @@ const ONBOARDING = {
       blocked_body:
         "Recibirás un correo en la dirección registrada cuando termine la revisión, normalmente en un día hábil.",
       blocked_reassure_title: "Los datos de tu hijo están seguros.",
-      blocked_reassure_body:
-        "No eliminamos nada durante una revisión: solo se pausa y se reanuda.",
+      blocked_reassure_body: "No eliminamos nada durante una revisión: solo se pausa y se reanuda.",
       blocked_primary: "Volver a bienvenida",
       generic_eyebrow: "Algo salió mal",
       generic_title: "Tuvimos un problema.",
@@ -920,7 +914,8 @@ const ONBOARDING = {
       first_name_placeholder: "p. ex. Emma",
       grade_band_label: "Niveau scolaire",
       grade_band_placeholder: "Choisissez un niveau",
-      grade_band_help: "Nous utilisons un niveau, pas une date de naissance. Vous pouvez le changer à tout moment.",
+      grade_band_help:
+        "Nous utilisons un niveau, pas une date de naissance. Vous pouvez le changer à tout moment.",
       iep_legend: "Votre enfant a-t-il un plan IEP ou 504 ?",
       iep_help:
         "Vous pourrez le téléverser aux étapes suivantes — uniquement avec votre consentement explicite. Ignorez si vous préférez décider plus tard.",
@@ -1010,7 +1005,8 @@ const ONBOARDING = {
       verify_continue: "Vérifier et continuer",
       use_diff_phone: "Utiliser un autre numéro de téléphone",
       phone_label: "Téléphone mobile",
-      phone_helper: "Nous l'utilisons uniquement pour la vérification et la récupération du compte.",
+      phone_helper:
+        "Nous l'utilisons uniquement pour la vérification et la récupération du compte.",
       code_label: "Code à 6 chiffres",
     },
     privacy: {
@@ -1025,7 +1021,8 @@ const ONBOARDING = {
       collect_account: "Compte : nom du parent / du personnel, e-mail.",
       collect_learner:
         "Apprenant : prénom ou surnom, niveau scolaire, aménagements facultatifs (IEP / 504), réponses aux leçons.",
-      collect_device: "Appareil : navigateur, système d'exploitation, version de l'app — pour le débogage uniquement.",
+      collect_device:
+        "Appareil : navigateur, système d'exploitation, version de l'app — pour le débogage uniquement.",
       ai_summary: "Comment l'IA est utilisée.",
       ai_body:
         "Quand la personnalisation par IA est activée, les réponses de votre enfant ajustent sa prochaine leçon — rythme, exemples, indices. Nous n'utilisons pas ces réponses pour identifier votre enfant. Nous n'entraînons pas de modèles de fondation sur des travaux d'élèves identifiables. Les fournisseurs de modèles sont contractuellement tenus de supprimer les données de prompts et de réponses sous 30 jours.",
@@ -1078,8 +1075,7 @@ const ONBOARDING = {
       reassure_body:
         "Tant que vous n'appuyez pas sur Approuver, ce profil est en attente. Votre enfant ne peut pas se connecter ni commencer les leçons.",
       approve: "Approuver et terminer",
-      footer_note:
-        "Vous arriverez sur l'accueil parent avec votre enfant configuré et prêt.",
+      footer_note: "Vous arriverez sur l'accueil parent avec votre enfant configuré et prêt.",
       comm_title: "Messages avec les enseignants",
       comm_desc:
         "Votre enfant peut lire les messages des enseignants et répondre par des réponses rapides modérées par un adulte.",
@@ -1125,7 +1121,8 @@ const ONBOARDING = {
       subtitle:
         "Collez le code envoyé par votre école. Si vous n'en avez pas, demandez à votre administrateur d'école — seul le personnel invité peut rejoindre.",
       reassure_title: "Le personnel scolaire ne peut pas s'inscrire seul.",
-      reassure_body: "Un administrateur doit vous inviter. Cela protège les listes et les données des élèves.",
+      reassure_body:
+        "Un administrateur doit vous inviter. Cela protège les listes et les données des élèves.",
       join: "Rejoindre l'école",
       code_label: "Code d'invitation",
       email_label: "Votre e-mail scolaire",
@@ -1229,7 +1226,8 @@ const ONBOARDING = {
       trouble: "Probleme beim Anmelden?",
       eyebrow: "Willkommen zurück",
       title: "Anmelden",
-      subtitle: "Verwende die E-Mail, mit der du dich für Familie, Schule oder Bezirk angemeldet hast.",
+      subtitle:
+        "Verwende die E-Mail, mit der du dich für Familie, Schule oder Bezirk angemeldet hast.",
       reassure_title: "Wir verkaufen deine Daten niemals.",
       reassure_body:
         "Deine E-Mail dient nur zur Identifizierung deines Kontos. Mehr dazu im Datenschutzhinweis.",
@@ -1244,8 +1242,7 @@ const ONBOARDING = {
       title_default: "Erzähl uns ein wenig über dich",
       subtitle_invite:
         "Füge den Code aus der Einladung deiner Schule oder deines Bezirks ein. Deine Rolle kannst du anschließend einrichten.",
-      subtitle_default:
-        "Wir passen die nächsten Schritte daran an, für wen du AIVO einrichtest.",
+      subtitle_default: "Wir passen die nächsten Schritte daran an, für wen du AIVO einrichtest.",
       reassure_title: "Erwachsene richten Konten ein, nicht Kinder.",
       reassure_body:
         "Wenn du ein Konto für ein Kind erstellst, fügst du es im nächsten Schritt hinzu. AIVO bittet niemals ein Kind, ein eigenes Konto zu erstellen.",
@@ -1306,7 +1303,8 @@ const ONBOARDING = {
       first_name_placeholder: "z. B. Emma",
       grade_band_label: "Klassenstufe",
       grade_band_placeholder: "Stufe wählen",
-      grade_band_help: "Wir verwenden eine Stufe, kein Geburtsdatum. Du kannst sie jederzeit ändern.",
+      grade_band_help:
+        "Wir verwenden eine Stufe, kein Geburtsdatum. Du kannst sie jederzeit ändern.",
       iep_legend: "Hat dein Kind einen IEP- oder 504-Plan?",
       iep_help:
         "Du kannst ihn in den nächsten Schritten hochladen – nur mit deiner ausdrücklichen Einwilligung. Überspringe, wenn du später entscheiden möchtest.",
@@ -1464,8 +1462,7 @@ const ONBOARDING = {
       reassure_body:
         "Bis du auf Genehmigen drückst, befindet sich dieses Profil im Wartezustand. Dein Kind kann sich nicht anmelden und keine Lektionen starten.",
       approve: "Genehmigen und abschließen",
-      footer_note:
-        "Du gelangst zur Eltern-Startseite, mit eingerichtetem und startbereitem Kind.",
+      footer_note: "Du gelangst zur Eltern-Startseite, mit eingerichtetem und startbereitem Kind.",
       comm_title: "Nachrichten mit Lehrkräften",
       comm_desc:
         "Dein Kind kann Nachrichten von Lehrkräften lesen und mit von Erwachsenen moderierten Schnellantworten antworten.",
@@ -1511,18 +1508,21 @@ const ONBOARDING = {
       subtitle:
         "Füge den Code ein, den deine Schule dir gesendet hat. Wenn du keinen hast, frage deine Schuladministration – nur eingeladenes Personal kann beitreten.",
       reassure_title: "Schulpersonal kann sich nicht selbst eintragen.",
-      reassure_body: "Eine Administration muss dich einladen. Das schützt Klassenlisten und Schülerdaten.",
+      reassure_body:
+        "Eine Administration muss dich einladen. Das schützt Klassenlisten und Schülerdaten.",
       join: "Schule beitreten",
       code_label: "Einladungscode",
       email_label: "Deine Schul-E-Mail",
-      email_helper: "Muss mit der E-Mail übereinstimmen, zu der die Administration dich eingeladen hat.",
+      email_helper:
+        "Muss mit der E-Mail übereinstimmen, zu der die Administration dich eingeladen hat.",
     },
     invite_district: {
       eyebrow: "Bezirkseinladung",
       title: "Tritt deinem Bezirk auf AIVO bei.",
       subtitle:
         "Einladungen für Bezirksadministratoren werden von AIVO während des Onboardings ausgestellt. Dein Customer-Success-Manager des Bezirks sendet dir einen Einmalcode.",
-      reassure_title: "Die verstärkte Authentifizierung für Bezirksadministratoren ist verpflichtend.",
+      reassure_title:
+        "Die verstärkte Authentifizierung für Bezirksadministratoren ist verpflichtend.",
       reassure_body:
         "Jede Anmeldung für diese Rolle erfordert eine erneute biometrische oder PIN-Prüfung. AIVO lässt niemals zu, dass ein einzelnes Passwort Bezirksdaten entsperrt.",
       code_label: "Bezirks-Einladungscode",
@@ -1603,8 +1603,7 @@ const ONBOARDING = {
         "A AIVO é uma plataforma de aprendizado calma e acessível, criada com famílias, professores e alunos — incluindo crianças que aprendem de forma diferente.",
       eyebrow: "Bem-vindo",
       title: "Vamos começar.",
-      subtitle:
-        "Entre para continuar ou crie uma nova conta para sua família, escola ou distrito.",
+      subtitle: "Entre para continuar ou crie uma nova conta para sua família, escola ou distrito.",
       sign_in: "Entrar",
       create_account: "Criar uma conta",
       invite_lead: "Tem um código de convite de uma escola ou distrito?",
@@ -1850,8 +1849,7 @@ const ONBOARDING = {
       reassure_body:
         "Até você tocar em Aprovar, este perfil fica em espera. Seu filho não pode entrar nem começar as lições.",
       approve: "Aprovar e concluir",
-      footer_note:
-        "Você chegará à página inicial dos pais com seu filho configurado e pronto.",
+      footer_note: "Você chegará à página inicial dos pais com seu filho configurado e pronto.",
       comm_title: "Mensagens com os professores",
       comm_desc:
         "Seu filho pode ler mensagens dos professores e responder com respostas rápidas moderadas por adultos.",
@@ -1897,7 +1895,8 @@ const ONBOARDING = {
       subtitle:
         "Cole o código que sua escola enviou. Se você não tiver um, peça ao administrador da escola — apenas a equipe convidada pode entrar.",
       reassure_title: "A equipe escolar não pode se inscrever sozinha.",
-      reassure_body: "Um administrador deve convidá-lo. Isso protege as listas e os dados dos alunos.",
+      reassure_body:
+        "Um administrador deve convidá-lo. Isso protege as listas e os dados dos alunos.",
       join: "Entrar na escola",
       code_label: "Código de convite",
       email_label: "Seu e-mail escolar",
@@ -1942,8 +1941,7 @@ const ONBOARDING = {
       blocked_body:
         "Você receberá um e-mail no endereço cadastrado quando a revisão terminar, normalmente em um dia útil.",
       blocked_reassure_title: "Os dados do seu filho estão seguros.",
-      blocked_reassure_body:
-        "Não excluímos nada durante uma revisão — apenas pausar e retomar.",
+      blocked_reassure_body: "Não excluímos nada durante uma revisão — apenas pausar e retomar.",
       blocked_primary: "Voltar às boas-vindas",
       generic_eyebrow: "Algo deu errado",
       generic_title: "Tivemos um problema.",
@@ -2027,8 +2025,7 @@ const ONBOARDING = {
     role: {
       eyebrow: "选择你的角色",
       title: "你在为谁设置 AIVO？",
-      subtitle:
-        "我们将定制后续步骤。你可以稍后添加其他角色——许多成年人既是家长也是教师。",
+      subtitle: "我们将定制后续步骤。你可以稍后添加其他角色——许多成年人既是家长也是教师。",
       reassure_title: "孩子不选择角色。",
       reassure_body:
         "由家长或教师添加学习者。学习者看到的是带有他们功课的儿童友好视图——绝不会是此页面。",
@@ -2044,8 +2041,7 @@ const ONBOARDING = {
     parent_setup: {
       eyebrow: "家庭设置",
       title: "告诉我们你的家庭情况。",
-      subtitle:
-        "你将在下一步添加孩子。这些信息帮助我们转发邀请，并与合适的大人共享进度。",
+      subtitle: "你将在下一步添加孩子。这些信息帮助我们转发邀请，并与合适的大人共享进度。",
       reassure_title: "家庭信息保持私密。",
       reassure_body: "我们绝不出售家庭信息。共同家长只能看到他们被添加到的学习者。",
       reassure_link: "我们收集什么",
@@ -2054,17 +2050,14 @@ const ONBOARDING = {
       household_placeholder: "例如：Okafor 一家",
       household_helper: "当教师给你发消息时会显示。你可以稍后更改。",
       coparent_label: "邀请共同家长或照护者（可选）",
-      coparent_helper:
-        "他们将收到一封带有自己登录方式的邮件。你们都可以批准同意并查看进度。",
+      coparent_helper: "他们将收到一封带有自己登录方式的邮件。你们都可以批准同意并查看进度。",
     },
     learner_new: {
       eyebrow: "添加学习者",
       title: "告诉我们你孩子的情况。",
-      subtitle:
-        "只用你会大声说出来的内容——名字就够了。你可以稍后从主屏幕添加更多学习者。",
+      subtitle: "只用你会大声说出来的内容——名字就够了。你可以稍后从主屏幕添加更多学习者。",
       reassure_title: "我们只收集最少的必要信息。",
-      reassure_body:
-        "这里不需要姓氏、出生日期或地址。你将在同意步骤看到教师和 AI 究竟使用什么。",
+      reassure_body: "这里不需要姓氏、出生日期或地址。你将在同意步骤看到教师和 AI 究竟使用什么。",
       reassure_link: "我们使用什么",
       continue: "继续到同意",
       first_name_label: "学习者名字（或昵称）",
@@ -2073,8 +2066,7 @@ const ONBOARDING = {
       grade_band_placeholder: "选择一个年级段",
       grade_band_help: "我们使用年级段，而不是生日。你可以随时更改。",
       iep_legend: "你的孩子有 IEP 或 504 计划吗？",
-      iep_help:
-        "你可以在后续步骤上传它——仅在你明确同意的情况下。如果你想稍后再决定，可以跳过。",
+      iep_help: "你可以在后续步骤上传它——仅在你明确同意的情况下。如果你想稍后再决定，可以跳过。",
       iep_yes: "是",
       iep_no: "否",
       iep_unsure: "还不确定",
@@ -2088,11 +2080,9 @@ const ONBOARDING = {
       reassure_link: "阅读完整的隐私声明",
       footer_note: "我们稍后会请你重新确认任何影响孩子的选择——绝不会悄悄更改。",
       row_parent_title: "家长／监护人同意",
-      row_parent_desc:
-        "我确认我是本账户中学习者的家长或法定监护人，并同意 AIVO 的条款。",
+      row_parent_desc: "我确认我是本账户中学习者的家长或法定监护人，并同意 AIVO 的条款。",
       row_school_title: "与孩子的学校共享进度",
-      row_school_desc:
-        "让孩子的教师看到掌握情况、课程和 IEP 支持。与下面任何 AI 选择相互独立。",
+      row_school_desc: "让孩子的教师看到掌握情况、课程和 IEP 支持。与下面任何 AI 选择相互独立。",
       row_ai_title: "使用 AI 个性化学习",
       row_ai_desc:
         "AIVO 使用孩子的回答来调整节奏、示例和提示。我们绝不出售这些数据。关闭此项会让孩子停留在非个性化课程中。",
@@ -2112,20 +2102,17 @@ const ONBOARDING = {
     permissions: {
       eyebrow: "设备权限",
       title: "AIVO 可以在此设备上使用什么？",
-      subtitle:
-        "这些是 AIVO 唯一会请求的设备功能。我们绝不请求位置、通讯录或相册访问权限。",
+      subtitle: "这些是 AIVO 唯一会请求的设备功能。我们绝不请求位置、通讯录或相册访问权限。",
       reassure_title: "你的浏览器也会请求这些。",
       reassure_body:
         "当 AIVO 确实需要麦克风或摄像头时，你的浏览器会弹出它自己的权限提示——即使你在这里说了是，你也可以拒绝。",
       continue: "继续 — 设置 PIN",
       mic_title: "麦克风",
-      mic_desc:
-        "仅用于朗读式课程和 AI 导师语音模式。默认关闭——如果孩子想朗读，请开启。",
+      mic_desc: "仅用于朗读式课程和 AI 导师语音模式。默认关闭——如果孩子想朗读，请开启。",
       cam_title: "摄像头",
       cam_desc: "仅在扫描作业页面或文档时使用。AIVO 绝不录制视频。",
       notifs_title: "通知",
-      notifs_desc:
-        "批准请求、每周进度摘要和安全消息。课程提醒默认关闭——你可以稍后启用。",
+      notifs_desc: "批准请求、每周进度摘要和安全消息。课程提醒默认关闭——你可以稍后启用。",
     },
     pin: {
       eyebrow: "学习者 PIN",
@@ -2147,8 +2134,7 @@ const ONBOARDING = {
         "我们将通过短信发送一次性代码，以确认你是此账户的成年人。我们绝不将此号码用于营销。",
       subtitle_code: "我们已向你的手机发送了一个代码。它将在 10 分钟后失效。",
       reassure_title: "孩子无法跳过此步骤。",
-      reassure_body:
-        "孩子的个人资料只有在家长验证后才会激活。AIVO 正是以此方式落实家长批准。",
+      reassure_body: "孩子的个人资料只有在家长验证后才会激活。AIVO 正是以此方式落实家长批准。",
       send_code: "发送代码",
       verify_continue: "验证并继续",
       use_diff_phone: "使用其他电话号码",
@@ -2159,22 +2145,19 @@ const ONBOARDING = {
     privacy: {
       eyebrow: "隐私",
       title: "AIVO 做什么——通俗易懂。",
-      subtitle:
-        "下面是简短版本。每个部分都可展开完整的法律文本。你可以随时在设置中重新阅读此页。",
+      subtitle: "下面是简短版本。每个部分都可展开完整的法律文本。你可以随时在设置中重新阅读此页。",
       reassure_title: "高于一切的一个承诺。",
       reassure_body: "我们绝不出售学生数据。不卖给广告商、不卖给供应商、也不卖给 AI 训练伙伴。",
       collect_summary: "我们收集什么——只收集教学所需的内容。",
       collect_account: "账户：家长／教职员姓名、电子邮箱。",
-      collect_learner:
-        "学习者：名字或昵称、年级段、可选的适应性支持（IEP / 504）、对课程的回答。",
+      collect_learner: "学习者：名字或昵称、年级段、可选的适应性支持（IEP / 504）、对课程的回答。",
       collect_device: "设备：浏览器、操作系统、应用版本——仅用于调试。",
       ai_summary: "如何使用 AI。",
       ai_body:
         "开启 AI 个性化后，孩子的回答会调整其下一节课——节奏、示例、提示。我们不会使用这些回答来识别你的孩子。我们不会用可识别的学生作业训练基础模型。模型提供商按合同约定须在 30 天内删除提示与回复数据。",
       who_summary: "谁能看到什么。",
       who_you: "你和你添加的任何共同家长：完整进度。",
-      who_teachers:
-        "你已同意的学校的教师：仅他们班级的课程掌握情况和 IEP 支持。",
+      who_teachers: "你已同意的学校的教师：仅他们班级的课程掌握情况和 IEP 支持。",
       who_staff:
         "AIVO 员工：为提供支持而进行的加密访问，并带有审计日志。我们绝不随意浏览学生作业。",
       who_advertisers: "广告商：绝不。",
@@ -2215,8 +2198,7 @@ const ONBOARDING = {
       subtitle:
         "这些是你的孩子可以在 AIVO 上使用的体验。你可以稍后在其个人资料中更改其中任何一项。",
       reassure_title: "你的孩子在等你。",
-      reassure_body:
-        "在你按下批准之前，此个人资料处于等待状态。你的孩子无法登录或开始课程。",
+      reassure_body: "在你按下批准之前，此个人资料处于等待状态。你的孩子无法登录或开始课程。",
       approve: "批准并完成",
       footer_note: "你将到达家长主页，孩子已设置好并准备就绪。",
       comm_title: "与教师的消息",
@@ -2239,8 +2221,7 @@ const ONBOARDING = {
       skip: "暂时跳过",
       footer_note: "你可以稍后从学习者的个人资料上传。",
       consent_title: "我明确同意上传 IEP / 504 计划",
-      consent_desc:
-        "AIVO 将存储该文件，提取列出的适应性支持，并将其应用于课程。你可以随时删除它。",
+      consent_desc: "AIVO 将存储该文件，提取列出的适应性支持，并将其应用于课程。你可以随时删除它。",
       choose_file: "选择 PDF 或 Word 文件",
       file_help: "文件最大 20 MB。在应用任何内容之前，我们会展示所提取内容的预览。",
       legal_summary: "提取什么，不提取什么。",
@@ -2266,8 +2247,7 @@ const ONBOARDING = {
     invite_district: {
       eyebrow: "学区邀请",
       title: "在 AIVO 上加入你的学区。",
-      subtitle:
-        "学区管理员邀请由 AIVO 在引导期间发出。你的学区成功经理将向你发送一次性代码。",
+      subtitle: "学区管理员邀请由 AIVO 在引导期间发出。你的学区成功经理将向你发送一次性代码。",
       reassure_title: "学区管理员的强化验证为强制要求。",
       reassure_body:
         "此角色的每次登录都需要一次全新的生物识别或 PIN 检查。AIVO 绝不允许单个密码解锁学区数据。",
@@ -2410,8 +2390,7 @@ const ONBOARDING = {
       continue: "続行 — 学習者を追加",
       household_label: "世帯名（任意）",
       household_placeholder: "例：オカフォー家",
-      household_helper:
-        "教師があなたにメッセージを送るときに表示されます。後で変更できます。",
+      household_helper: "教師があなたにメッセージを送るときに表示されます。後で変更できます。",
       coparent_label: "共同保護者またはケア提供者を招待（任意）",
       coparent_helper:
         "本人専用のサインイン情報付きのメールが届きます。お二人とも同意を承認し、進捗を確認できます。",
@@ -2441,8 +2420,7 @@ const ONBOARDING = {
     consent: {
       eyebrow: "あなたの同意 — あなたの管理",
       title: "AIVO にできることを選んでください。",
-      subtitle:
-        "各行は個別の選択です。後から 設定 → プライバシー でいつでも変更できます。",
+      subtitle: "各行は個別の選択です。後から 設定 → プライバシー でいつでも変更できます。",
       reassure_title: "抱き合わせなし。ダークパターンなし。",
       reassure_body:
         "学校とのデータ共有と AI のパーソナライズは独立しています。一方に「はい」、もう一方に「いいえ」と言えます。",
@@ -2588,17 +2566,14 @@ const ONBOARDING = {
       reassure_body:
         "あなたが「承認」を押すまで、このプロフィールは保留状態です。お子さまはサインインもレッスン開始もできません。",
       approve: "承認して完了",
-      footer_note:
-        "お子さまの設定が完了し準備が整った状態で、保護者ホームに移動します。",
+      footer_note: "お子さまの設定が完了し準備が整った状態で、保護者ホームに移動します。",
       comm_title: "教師とのメッセージ",
-      comm_desc:
-        "お子さまは教師からのメッセージを読み、大人が確認したクイック返信で返信できます。",
+      comm_desc: "お子さまは教師からのメッセージを読み、大人が確認したクイック返信で返信できます。",
       ai_title: "AI チューター",
       ai_desc:
         "概念を説明し、最終的な答えは決して出さず、安全に関する話題は大人に引き継ぐ対話型チューターです。",
       voice_title: "音声モード",
-      voice_desc:
-        "お子さまがチューターと話し、聞き返せます。既定はオフ — マイクを使用します。",
+      voice_desc: "お子さまがチューターと話し、聞き返せます。既定はオフ — マイクを使用します。",
     },
     iep_upload: {
       eyebrow: "IEP / 504 サポート",
@@ -2616,8 +2591,7 @@ const ONBOARDING = {
       consent_desc:
         "AIVO は文書を保存し、記載された配慮を抽出してレッスンに適用します。いつでも削除できます。",
       choose_file: "PDF または Word ファイルを選択",
-      file_help:
-        "最大 20 MB のファイル。適用する前に、抽出した内容のプレビューを表示します。",
+      file_help: "最大 20 MB のファイル。適用する前に、抽出した内容のプレビューを表示します。",
       legal_summary: "抽出されるもの、されないもの。",
       legal_extracted_label: "抽出：",
       legal_extracted_body:
@@ -2625,8 +2599,7 @@ const ONBOARDING = {
       legal_never_label: "抽出しない：",
       legal_never_body: "医学的診断、心理評価、保護者の陳述、署名。",
       legal_teachers_label: "教師に表示：",
-      legal_teachers_body:
-        "配慮の一覧のみ、あなたが同意した学校でのみ。",
+      legal_teachers_body: "配慮の一覧のみ、あなたが同意した学校でのみ。",
     },
     invite_school: {
       eyebrow: "学校への招待",
@@ -2634,7 +2607,8 @@ const ONBOARDING = {
       subtitle:
         "学校から送られたコードを貼り付けてください。お持ちでない場合は学校管理者に依頼してください。招待された職員のみ参加できます。",
       reassure_title: "学校職員は自己登録できません。",
-      reassure_body: "管理者があなたを招待する必要があります。これにより名簿と生徒データを保護します。",
+      reassure_body:
+        "管理者があなたを招待する必要があります。これにより名簿と生徒データを保護します。",
       join: "学校に参加",
       code_label: "招待コード",
       email_label: "学校のメールアドレス",
@@ -2669,8 +2643,7 @@ const ONBOARDING = {
       offline_body:
         "レッスンが読み込まれた後は、一部の学習者向けアクティビティはオフラインでも動作しますが、セットアップにはオンライン接続が必要です。",
       offline_reassure_title: "失われたものはありません。",
-      offline_reassure_body:
-        "オンラインに戻り次第、中断したところから正確に再開します。",
+      offline_reassure_body: "オンラインに戻り次第、中断したところから正確に再開します。",
       offline_primary: "再試行",
       blocked_eyebrow: "アカウントがブロックされています",
       blocked_title: "このアカウントは一時停止中です。",
@@ -2679,8 +2652,7 @@ const ONBOARDING = {
       blocked_body:
         "確認が完了すると、登録のアドレス宛にメールが届きます。通常は 1 営業日以内です。",
       blocked_reassure_title: "お子さまのデータは安全です。",
-      blocked_reassure_body:
-        "確認中に何かを削除することはありません。一時停止と再開のみです。",
+      blocked_reassure_body: "確認中に何かを削除することはありません。一時停止と再開のみです。",
       blocked_primary: "ようこそ画面に戻る",
       generic_eyebrow: "問題が発生しました",
       generic_title: "問題が発生しました。",
@@ -2726,8 +2698,7 @@ const ONBOARDING = {
         "AIVO는 가족, 교사, 학습자와 함께 만든 차분하고 접근성 높은 학습 플랫폼입니다. 다르게 배우는 아이들도 포함합니다.",
       eyebrow: "환영합니다",
       title: "시작해 볼까요.",
-      subtitle:
-        "로그인하여 계속하거나, 가족·학교·교육구를 위한 새 계정을 만드세요.",
+      subtitle: "로그인하여 계속하거나, 가족·학교·교육구를 위한 새 계정을 만드세요.",
       sign_in: "로그인",
       create_account: "계정 만들기",
       invite_lead: "학교나 교육구에서 받은 초대 코드가 있나요?",
@@ -2753,8 +2724,7 @@ const ONBOARDING = {
       title_default: "당신에 대해 조금 알려 주세요",
       subtitle_invite:
         "학교나 교육구 초대의 코드를 붙여 넣으세요. 역할 설정은 다음에 마칠 수 있습니다.",
-      subtitle_default:
-        "누구를 위해 AIVO를 설정하는지에 맞춰 다음 단계를 맞춤화합니다.",
+      subtitle_default: "누구를 위해 AIVO를 설정하는지에 맞춰 다음 단계를 맞춤화합니다.",
       reassure_title: "계정은 아이가 아니라 어른이 만듭니다.",
       reassure_body:
         "아이를 위한 계정을 만드는 경우 다음 단계에서 추가합니다. AIVO는 아이에게 직접 계정을 만들라고 요구하지 않습니다.",
@@ -2763,8 +2733,7 @@ const ONBOARDING = {
       invite_label: "초대 코드",
       invite_helper: "학교나 교육구가 환영 이메일로 보냈습니다.",
       name_label: "이름",
-      password_helper:
-        "12자 이상. 저장하기 전에 알려진 유출에 포함되어 있지 않은지 확인합니다.",
+      password_helper: "12자 이상. 저장하기 전에 알려진 유출에 포함되어 있지 않은지 확인합니다.",
     },
     role: {
       eyebrow: "역할 선택",
@@ -2795,8 +2764,7 @@ const ONBOARDING = {
       continue: "계속 — 학습자 추가",
       household_label: "가정 이름(선택)",
       household_placeholder: "예: 오카포르 가족",
-      household_helper:
-        "교사가 메시지를 보낼 때 표시됩니다. 나중에 변경할 수 있습니다.",
+      household_helper: "교사가 메시지를 보낼 때 표시됩니다. 나중에 변경할 수 있습니다.",
       coparent_label: "공동 학부모 또는 보호자 초대(선택)",
       coparent_helper:
         "그들은 자신의 로그인 정보가 담긴 이메일을 받습니다. 두 분 모두 동의를 승인하고 진행 상황을 볼 수 있습니다.",
@@ -2826,8 +2794,7 @@ const ONBOARDING = {
     consent: {
       eyebrow: "당신의 동의 — 당신의 통제",
       title: "AIVO가 할 수 있는 일을 선택하세요.",
-      subtitle:
-        "각 줄은 별개의 선택입니다. 나중에 설정 → 개인정보에서 언제든 변경할 수 있습니다.",
+      subtitle: "각 줄은 별개의 선택입니다. 나중에 설정 → 개인정보에서 언제든 변경할 수 있습니다.",
       reassure_title: "묶음 없음. 다크 패턴 없음.",
       reassure_body:
         "학교 데이터 공유와 AI 개인화는 독립적입니다. 하나에는 예, 다른 하나에는 아니요라고 할 수 있습니다.",
@@ -2918,16 +2885,14 @@ const ONBOARDING = {
         "저희는 학생 데이터를 절대 판매하지 않습니다. 광고주에게도, 공급업체에게도, AI 학습 파트너에게도.",
       collect_summary: "수집 항목 — 가르치는 데 필요한 것만.",
       collect_account: "계정: 학부모 / 교직원 이름, 이메일.",
-      collect_learner:
-        "학습자: 이름 또는 별명, 학년대, 선택적 편의(IEP / 504), 수업 응답.",
+      collect_learner: "학습자: 이름 또는 별명, 학년대, 선택적 편의(IEP / 504), 수업 응답.",
       collect_device: "기기: 브라우저, OS, 앱 버전 — 디버깅용으로만.",
       ai_summary: "AI 사용 방식.",
       ai_body:
         "AI 개인화가 켜져 있으면 아이의 응답이 다음 수업의 속도, 예시, 힌트를 조정합니다. 이 응답을 아이를 식별하는 데 사용하지 않습니다. 식별 가능한 학생 작업으로 파운데이션 모델을 학습시키지 않습니다. 모델 제공업체는 계약상 프롬프트 및 응답 데이터를 30일 이내에 삭제할 의무가 있습니다.",
       who_summary: "누가 무엇을 보나.",
       who_you: "귀하와 추가한 모든 공동 학부모: 전체 진행 상황.",
-      who_teachers:
-        "동의한 학교의 교사: 자신의 학급에 한해 수업 숙달도와 IEP 지원만.",
+      who_teachers: "동의한 학교의 교사: 자신의 학급에 한해 수업 숙달도와 IEP 지원만.",
       who_staff:
         "AIVO 직원: 감사 로그가 있는 지원용 암호화 접근. 학생 작업을 함부로 들여다보지 않습니다.",
       who_advertisers: "광고주: 절대.",
@@ -2973,17 +2938,14 @@ const ONBOARDING = {
       reassure_body:
         "승인을 누르기 전까지 이 프로필은 대기 상태입니다. 아이는 로그인하거나 수업을 시작할 수 없습니다.",
       approve: "승인하고 완료",
-      footer_note:
-        "아이가 설정되어 준비된 상태로 학부모 홈에 도착합니다.",
+      footer_note: "아이가 설정되어 준비된 상태로 학부모 홈에 도착합니다.",
       comm_title: "교사와의 메시지",
-      comm_desc:
-        "아이는 교사의 메시지를 읽고 어른이 검토한 빠른 답장으로 응답할 수 있습니다.",
+      comm_desc: "아이는 교사의 메시지를 읽고 어른이 검토한 빠른 답장으로 응답할 수 있습니다.",
       ai_title: "AI 튜터",
       ai_desc:
         "개념을 설명하고, 최종 답을 절대 제공하지 않으며, 안전 주제는 어른에게 연결하는 대화형 튜터입니다.",
       voice_title: "음성 모드",
-      voice_desc:
-        "아이가 튜터와 말하고 들을 수 있게 합니다. 기본값은 꺼짐 — 마이크를 사용합니다.",
+      voice_desc: "아이가 튜터와 말하고 들을 수 있게 합니다. 기본값은 꺼짐 — 마이크를 사용합니다.",
     },
     iep_upload: {
       eyebrow: "IEP / 504 지원",
@@ -3001,8 +2963,7 @@ const ONBOARDING = {
       consent_desc:
         "AIVO는 문서를 저장하고, 나열된 편의를 추출하여 수업에 적용합니다. 언제든 삭제할 수 있습니다.",
       choose_file: "PDF 또는 Word 파일 선택",
-      file_help:
-        "최대 20MB 파일. 무언가를 적용하기 전에 추출한 내용의 미리보기를 보여드립니다.",
+      file_help: "최대 20MB 파일. 무언가를 적용하기 전에 추출한 내용의 미리보기를 보여드립니다.",
       legal_summary: "무엇이 추출되고 무엇이 추출되지 않는지.",
       legal_extracted_label: "추출:",
       legal_extracted_body:
@@ -3010,8 +2971,7 @@ const ONBOARDING = {
       legal_never_label: "절대 추출하지 않음:",
       legal_never_body: "의학적 진단, 심리 평가, 학부모 진술, 서명.",
       legal_teachers_label: "교사에게 표시:",
-      legal_teachers_body:
-        "편의 목록만, 동의한 학교에서만.",
+      legal_teachers_body: "편의 목록만, 동의한 학교에서만.",
     },
     invite_school: {
       eyebrow: "학교 초대",
@@ -3054,8 +3014,7 @@ const ONBOARDING = {
       offline_body:
         "수업이 로드된 후에는 일부 학습자 활동이 오프라인에서 작동하지만, 설정에는 실시간 연결이 필요합니다.",
       offline_reassure_title: "잃어버린 것은 없습니다.",
-      offline_reassure_body:
-        "다시 온라인이 되는 즉시 중단한 지점에서 정확히 이어집니다.",
+      offline_reassure_body: "다시 온라인이 되는 즉시 중단한 지점에서 정확히 이어집니다.",
       offline_primary: "다시 시도",
       blocked_eyebrow: "계정 차단됨",
       blocked_title: "이 계정은 일시 중지되었습니다.",
@@ -3064,14 +3023,12 @@ const ONBOARDING = {
       blocked_body:
         "검토가 끝나면 등록된 주소로 이메일을 받게 됩니다. 보통 영업일 기준 하루 이내입니다.",
       blocked_reassure_title: "아이의 데이터는 안전합니다.",
-      blocked_reassure_body:
-        "검토 중에는 아무것도 삭제하지 않습니다 — 일시 중지와 재개만 합니다.",
+      blocked_reassure_body: "검토 중에는 아무것도 삭제하지 않습니다 — 일시 중지와 재개만 합니다.",
       blocked_primary: "환영 화면으로 돌아가기",
       generic_eyebrow: "문제가 발생했습니다",
       generic_title: "문제가 생겼습니다.",
       generic_subtitle: "아마 일시적인 문제입니다 — 잠시 후 다시 시도하세요.",
-      generic_body:
-        "이 문제가 계속되면 AIVO 지원팀에 연락하여 무엇을 하려고 했는지 알려 주세요.",
+      generic_body: "이 문제가 계속되면 AIVO 지원팀에 연락하여 무엇을 하려고 했는지 알려 주세요.",
       generic_reassure_title: "잘못 청구되거나 저장된 것은 없습니다.",
       generic_reassure_body: "AIVO는 완료되지 않은 설정 데이터를 절대 보관하지 않습니다.",
       generic_primary: "처음부터 다시 시작",
@@ -3138,8 +3095,7 @@ const ONBOARDING = {
       title_default: "أخبرنا قليلًا عن نفسك",
       subtitle_invite:
         "الصق الرمز من دعوة مدرستك أو منطقتك التعليمية. يمكنك إكمال إعداد دورك بعد ذلك.",
-      subtitle_default:
-        "سنخصّص الخطوات التالية بناءً على مَن تُعدّ AIVO من أجله.",
+      subtitle_default: "سنخصّص الخطوات التالية بناءً على مَن تُعدّ AIVO من أجله.",
       reassure_title: "البالغون من يُنشئون الحسابات، وليس الأطفال.",
       reassure_body:
         "إذا كنت تُنشئ حسابًا لطفل، فستضيفه في الخطوة التالية. لا تطلب AIVO أبدًا من طفل أن يُنشئ حسابه الخاص.",
@@ -3148,8 +3104,7 @@ const ONBOARDING = {
       invite_label: "رمز الدعوة",
       invite_helper: "أرسلته مدرستك أو منطقتك التعليمية في رسالة الترحيب.",
       name_label: "اسمك",
-      password_helper:
-        "‏12 حرفًا على الأقل. سنتحقّق من أنها ليست ضمن أي تسريب معروف قبل حفظها.",
+      password_helper: "‏12 حرفًا على الأقل. سنتحقّق من أنها ليست ضمن أي تسريب معروف قبل حفظها.",
     },
     role: {
       eyebrow: "اختر دورك",
@@ -3180,8 +3135,7 @@ const ONBOARDING = {
       continue: "متابعة — إضافة متعلّم",
       household_label: "اسم الأسرة (اختياري)",
       household_placeholder: "مثال: عائلة أوكافور",
-      household_helper:
-        "يظهر للمعلّمين عند مراسلتك. يمكنك تغييره لاحقًا.",
+      household_helper: "يظهر للمعلّمين عند مراسلتك. يمكنك تغييره لاحقًا.",
       coparent_label: "دعوة والد مشارك أو مقدّم رعاية (اختياري)",
       coparent_helper:
         "سيتلقّون رسالة بريد إلكتروني بتسجيل دخول خاص بهم. يمكنكما الموافقة على الأذونات وعرض التقدّم معًا.",
@@ -3211,14 +3165,12 @@ const ONBOARDING = {
     consent: {
       eyebrow: "موافقتك — تحكّمك",
       title: "اختر ما يمكن لـ AIVO فعله.",
-      subtitle:
-        "كل صف خيار منفصل. يمكنك تغيير أيٍّ منها لاحقًا من الإعدادات ← الخصوصية.",
+      subtitle: "كل صف خيار منفصل. يمكنك تغيير أيٍّ منها لاحقًا من الإعدادات ← الخصوصية.",
       reassure_title: "لا حِزَم. لا أنماط خادعة.",
       reassure_body:
         "مشاركة بيانات المدرسة والتخصيص بالذكاء الاصطناعي مستقلّان. يمكنك الموافقة على أحدهما ورفض الآخر.",
       reassure_link: "اقرأ إشعار الخصوصية الكامل",
-      footer_note:
-        "سنطلب منك إعادة تأكيد أي خيار يؤثّر على طفلك لاحقًا — ولا يُغيَّر بصمت أبدًا.",
+      footer_note: "سنطلب منك إعادة تأكيد أي خيار يؤثّر على طفلك لاحقًا — ولا يُغيَّر بصمت أبدًا.",
       row_parent_title: "موافقة الوالد / الوصي",
       row_parent_desc:
         "أؤكّد أنني الوالد أو الوصي القانوني للمتعلّمين في هذا الحساب، وأوافق على شروط AIVO.",
@@ -3232,8 +3184,7 @@ const ONBOARDING = {
       row_mkt_desc: "رسالة شهرية قصيرة. لا تُرسل أبدًا إلى المتعلّمين.",
       legal_summary: "ما الذي يُغيّره كل خيار فعليًا (بلغة واضحة).",
       legal_parent_label: "الوالد / الوصي:",
-      legal_parent_body:
-        "مطلوب لإنشاء حسابات لأي شخص دون 18 عامًا. يتحقّق من أنك الوصي القانوني.",
+      legal_parent_body: "مطلوب لإنشاء حسابات لأي شخص دون 18 عامًا. يتحقّق من أنك الوصي القانوني.",
       legal_school_label: "المشاركة مع المدرسة:",
       legal_school_body:
         "يرى المعلّمون الإتقان والدروس و(إن رُفعت) دعم الـ IEP. لا تسويق ولا مشاركة مع أطراف ثالثة.",
@@ -3256,8 +3207,7 @@ const ONBOARDING = {
       mic_desc:
         "يُستخدم فقط لدروس القراءة بصوت عالٍ ووضع الصوت لمعلّم الذكاء الاصطناعي. مُعطّل افتراضيًا — فعّله إذا أراد طفلك القراءة بصوت عالٍ.",
       cam_title: "الكاميرا",
-      cam_desc:
-        "تُستخدم فقط عند مسح صفحة واجب أو مستند ضوئيًا. لا يسجّل AIVO الفيديو أبدًا.",
+      cam_desc: "تُستخدم فقط عند مسح صفحة واجب أو مستند ضوئيًا. لا يسجّل AIVO الفيديو أبدًا.",
       notifs_title: "الإشعارات",
       notifs_desc:
         "طلبات الموافقة، وملخّصات التقدّم الأسبوعية، ورسائل الأمان. تذكيرات الدروس مُعطّلة افتراضيًا — يمكنك تفعيلها لاحقًا.",
@@ -3311,8 +3261,7 @@ const ONBOARDING = {
         "عند تفعيل التخصيص بالذكاء الاصطناعي، تضبط إجابات طفلك درسه التالي — الإيقاع والأمثلة والتلميحات. لا نستخدم هذه الإجابات لتحديد هوية طفلك. ولا ندرّب النماذج الأساسية على أعمال طلابية قابلة للتعريف. ومزوّدو النماذج ملزمون بموجب عقد بحذف بيانات الطلب والاستجابة خلال 30 يومًا.",
       who_summary: "مَن يرى ماذا.",
       who_you: "أنت وأي والد مشارك أضفته: التقدّم الكامل.",
-      who_teachers:
-        "معلّمو المدرسة التي وافقت عليها: إتقان الدروس ودعم الـ IEP لصفوفهم فقط.",
+      who_teachers: "معلّمو المدرسة التي وافقت عليها: إتقان الدروس ودعم الـ IEP لصفوفهم فقط.",
       who_staff:
         "موظفو AIVO: وصول مشفّر للدعم، مع سجلّات تدقيق. لا نتصفّح أعمال الطلاب عشوائيًا أبدًا.",
       who_advertisers: "المعلنون: أبدًا.",
@@ -3358,11 +3307,9 @@ const ONBOARDING = {
       reassure_body:
         "حتى تضغط على موافقة، يبقى هذا الملف في حالة انتظار. لا يستطيع طفلك تسجيل الدخول أو بدء الدروس.",
       approve: "الموافقة والإنهاء",
-      footer_note:
-        "ستصل إلى الصفحة الرئيسية للوالد وطفلك مُعدّ وجاهز.",
+      footer_note: "ستصل إلى الصفحة الرئيسية للوالد وطفلك مُعدّ وجاهز.",
       comm_title: "الرسائل مع المعلّمين",
-      comm_desc:
-        "يمكن لطفلك قراءة رسائل المعلّمين والردّ بردود سريعة يراجعها بالغ.",
+      comm_desc: "يمكن لطفلك قراءة رسائل المعلّمين والردّ بردود سريعة يراجعها بالغ.",
       ai_title: "معلّم الذكاء الاصطناعي",
       ai_desc:
         "معلّم حواري يشرح المفاهيم، ولا يقدّم الإجابات النهائية أبدًا، ويحوّل مواضيع الأمان إلى بالغ.",
@@ -3386,8 +3333,7 @@ const ONBOARDING = {
       consent_desc:
         "ستخزّن AIVO المستند، وتستخرج التيسيرات المذكورة، وتطبّقها على الدروس. يمكنك حذفه في أي وقت.",
       choose_file: "اختر ملف PDF أو Word",
-      file_help:
-        "ملفات حتى 20 ميغابايت. سنعرض معاينة لما استخرجناه قبل تطبيق أي شيء.",
+      file_help: "ملفات حتى 20 ميغابايت. سنعرض معاينة لما استخرجناه قبل تطبيق أي شيء.",
       legal_summary: "ما الذي يُستخرج وما الذي لا يُستخرج.",
       legal_extracted_label: "يُستخرج:",
       legal_extracted_body:
@@ -3395,8 +3341,7 @@ const ONBOARDING = {
       legal_never_label: "لا يُستخرج أبدًا:",
       legal_never_body: "التشخيصات الطبية، التقييمات النفسية، إفادات الوالدين، التوقيعات.",
       legal_teachers_label: "مرئي للمعلّمين:",
-      legal_teachers_body:
-        "قائمة التيسيرات فقط، وفي المدارس التي وافقت عليها فقط.",
+      legal_teachers_body: "قائمة التيسيرات فقط، وفي المدارس التي وافقت عليها فقط.",
     },
     invite_school: {
       eyebrow: "دعوة المدرسة",
@@ -3439,8 +3384,7 @@ const ONBOARDING = {
       offline_body:
         "تعمل بعض أنشطة المتعلّم دون اتصال بعد تحميل الدرس — لكن الإعداد يحتاج إلى اتصال نشط.",
       offline_reassure_title: "لم يُفقد شيء.",
-      offline_reassure_body:
-        "سنُكمل من حيث توقّفت بالضبط بمجرد عودتك للاتصال.",
+      offline_reassure_body: "سنُكمل من حيث توقّفت بالضبط بمجرد عودتك للاتصال.",
       offline_primary: "إعادة المحاولة",
       blocked_eyebrow: "الحساب محظور",
       blocked_title: "هذا الحساب مُوقَف مؤقتًا.",
@@ -3449,14 +3393,12 @@ const ONBOARDING = {
       blocked_body:
         "ستتلقّى رسالة بريد إلكتروني على العنوان المُسجَّل بمجرد انتهاء المراجعة، عادةً خلال يوم عمل واحد.",
       blocked_reassure_title: "بيانات طفلك آمنة.",
-      blocked_reassure_body:
-        "لا نحذف أي شيء أثناء المراجعة — إيقاف مؤقت واستئناف فقط.",
+      blocked_reassure_body: "لا نحذف أي شيء أثناء المراجعة — إيقاف مؤقت واستئناف فقط.",
       blocked_primary: "العودة إلى الترحيب",
       generic_eyebrow: "حدث خطأ ما",
       generic_title: "واجهتنا مشكلة.",
       generic_subtitle: "غالبًا ما تكون مؤقتة — حاول مرة أخرى بعد قليل.",
-      generic_body:
-        "إذا استمرّ هذا، فيرجى التواصل مع دعم AIVO وذكر ما كنت تحاول فعله.",
+      generic_body: "إذا استمرّ هذا، فيرجى التواصل مع دعم AIVO وذكر ما كنت تحاول فعله.",
       generic_reassure_title: "لم يتم تحصيل أي مبلغ أو حفظ أي شيء بشكل خاطئ.",
       generic_reassure_body: "لا تحتفظ AIVO أبدًا ببيانات إعداد غير مكتملة.",
       generic_primary: "البدء من جديد",
@@ -3523,8 +3465,7 @@ const ONBOARDING = {
       title_default: "हमें अपने बारे में थोड़ा बताएँ",
       subtitle_invite:
         "अपने स्कूल या ज़िले के आमंत्रण का कोड चिपकाएँ। आप आगे अपनी भूमिका सेट करना पूरा कर सकते हैं।",
-      subtitle_default:
-        "आप किसके लिए AIVO सेट कर रहे हैं, उसके अनुसार हम अगले चरण निजीकृत करेंगे।",
+      subtitle_default: "आप किसके लिए AIVO सेट कर रहे हैं, उसके अनुसार हम अगले चरण निजीकृत करेंगे।",
       reassure_title: "खाते वयस्क बनाते हैं, बच्चे नहीं।",
       reassure_body:
         "यदि आप किसी बच्चे के लिए खाता बना रहे हैं, तो आप उसे अगले चरण में जोड़ेंगे। AIVO कभी किसी बच्चे से अपना खाता बनाने को नहीं कहता।",
@@ -3743,8 +3684,7 @@ const ONBOARDING = {
       reassure_body:
         "जब तक आप स्वीकृत नहीं दबाते, यह प्रोफ़ाइल प्रतीक्षा की स्थिति में रहती है। आपका बच्चा साइन इन या पाठ शुरू नहीं कर सकता।",
       approve: "स्वीकृत करें और समाप्त करें",
-      footer_note:
-        "आप अभिभावक होम पर पहुँचेंगे, जहाँ आपका बच्चा सेट और तैयार होगा।",
+      footer_note: "आप अभिभावक होम पर पहुँचेंगे, जहाँ आपका बच्चा सेट और तैयार होगा।",
       comm_title: "शिक्षकों के साथ संदेश",
       comm_desc:
         "आपका बच्चा शिक्षकों के संदेश पढ़ सकता है और वयस्क-नियंत्रित त्वरित उत्तरों से जवाब दे सकता है।",
@@ -3780,8 +3720,7 @@ const ONBOARDING = {
       legal_never_label: "कभी नहीं निकाला:",
       legal_never_body: "चिकित्सा निदान, मनोवैज्ञानिक मूल्यांकन, अभिभावक के कथन, हस्ताक्षर।",
       legal_teachers_label: "शिक्षकों को दृश्य:",
-      legal_teachers_body:
-        "केवल सुविधाओं की सूची, केवल उन स्कूलों में जिनके लिए आपने सहमति दी।",
+      legal_teachers_body: "केवल सुविधाओं की सूची, केवल उन स्कूलों में जिनके लिए आपने सहमति दी।",
     },
     invite_school: {
       eyebrow: "स्कूल आमंत्रण",
@@ -3789,7 +3728,8 @@ const ONBOARDING = {
       subtitle:
         "अपने स्कूल द्वारा भेजा गया कोड चिपकाएँ। यदि आपके पास नहीं है, तो अपने स्कूल प्रशासक से माँगें—केवल आमंत्रित स्टाफ़ ही जुड़ सकता है।",
       reassure_title: "स्कूल स्टाफ़ स्वयं नामांकन नहीं कर सकता।",
-      reassure_body: "एक प्रशासक को आपको आमंत्रित करना होगा। यह नामावली और छात्र डेटा की रक्षा करता है।",
+      reassure_body:
+        "एक प्रशासक को आपको आमंत्रित करना होगा। यह नामावली और छात्र डेटा की रक्षा करता है।",
       join: "स्कूल से जुड़ें",
       code_label: "आमंत्रण कोड",
       email_label: "आपका स्कूल ईमेल",
@@ -3834,8 +3774,7 @@ const ONBOARDING = {
       blocked_body:
         "समीक्षा समाप्त होने पर आपको फ़ाइल में दर्ज पते पर एक ईमेल मिलेगा, आमतौर पर एक कार्यदिवस के भीतर।",
       blocked_reassure_title: "आपके बच्चे का डेटा सुरक्षित है।",
-      blocked_reassure_body:
-        "समीक्षा के दौरान हम कुछ नहीं हटाते—केवल रोकना और फिर से शुरू करना।",
+      blocked_reassure_body: "समीक्षा के दौरान हम कुछ नहीं हटाते—केवल रोकना और फिर से शुरू करना।",
       blocked_primary: "स्वागत पर वापस जाएँ",
       generic_eyebrow: "कुछ गलत हो गया",
       generic_title: "हमें एक अड़चन आई।",

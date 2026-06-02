@@ -51,7 +51,8 @@ export default function TeacherAssignmentsScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={[styles.name, { color: palette.ink }]}>{a.title}</Text>
                 <Text style={[styles.meta, { color: palette.inkMuted }]}>
-                  {a.subject}{a.dueDate ? ` · ${t("teacherAssignments.due", "due")} ${a.dueDate}` : ""}
+                  {a.subject}
+                  {a.dueDate ? ` · ${t("teacherAssignments.due", "due")} ${a.dueDate}` : ""}
                 </Text>
               </View>
               <View style={[styles.badge, { backgroundColor: palette.accentSoft }]}>
@@ -66,7 +67,15 @@ export default function TeacherAssignmentsScreen() {
 }
 
 const styles = StyleSheet.create({
-  newBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: 16, borderWidth: 1.5 },
+  newBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 16,
+    borderWidth: 1.5,
+  },
   newText: { fontSize: 15, fontFamily: fontFamilies.bodyBold },
   row: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   name: { fontSize: 15, fontFamily: fontFamilies.bodyBold },

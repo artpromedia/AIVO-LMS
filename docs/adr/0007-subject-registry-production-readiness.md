@@ -10,6 +10,7 @@
 that the learner UI, admin tools, marketing site, tutor matcher and
 brain profiler all read from. Three of those 12 (`social-studies`,
 `world-languages`, `coding`) had no production item bank as of Sprint 2:
+
 - `social-studies` had skill seeds (CCSS K-2) but zero items;
 - `world-languages` had ACTFL Novice-Low skill seeds but zero items;
 - `coding` had CSTA K-2 skill seeds but zero items.

@@ -47,10 +47,7 @@ export default function ShellShowcase() {
   const previewPath = PREVIEW_PATHS[role];
   const activeArea = activeAreaFromPath(previewPath);
 
-  const roleOptions = React.useMemo(
-    () => ROLES.map((id) => ({ id, available: true })),
-    [],
-  );
+  const roleOptions = React.useMemo(() => ROLES.map((id) => ({ id, available: true })), []);
 
   return (
     <AppShell

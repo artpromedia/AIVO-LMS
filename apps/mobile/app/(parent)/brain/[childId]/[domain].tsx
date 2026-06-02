@@ -38,7 +38,9 @@ export default function DomainDrillDown() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{targetLabel}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {targetLabel}
+      </Text>
       <Text style={styles.subtitle}>Grade Ladder & Skill Breakdown</Text>
 
       <AivoCard style={styles.ladderCard}>

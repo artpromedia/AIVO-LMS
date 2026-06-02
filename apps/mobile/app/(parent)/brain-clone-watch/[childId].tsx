@@ -1,23 +1,34 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, router, type Href } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLearner } from "@/hooks/useLearners";
-import { useBrain } from "@/hooks/useBrain";
+import { useBrain, labelForDomain } from "@/hooks/useBrain";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card, Button } from "@/components/ui";
 import { LoadingState } from "@aivo/mobile-ui";
-import { labelForDomain } from "@/hooks/useBrain";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 const STAGES = [
-  { key: "signals", label: "Reading the signals", desc: "Baseline answers, parent input, IEP, and accessibility needs." },
-  { key: "mastery", label: "Mapping mastery", desc: "Where your child is strong and where to support." },
-  { key: "accommodations", label: "Choosing supports", desc: "Accommodations that make learning accessible." },
+  {
+    key: "signals",
+    label: "Reading the signals",
+    desc: "Baseline answers, parent input, IEP, and accessibility needs.",
+  },
+  {
+    key: "mastery",
+    label: "Mapping mastery",
+    desc: "Where your child is strong and where to support.",
+  },
+  {
+    key: "accommodations",
+    label: "Choosing supports",
+    desc: "Accommodations that make learning accessible.",
+  },
   { key: "tutors", label: "Picking tutors", desc: "Tutor personas matched to your child." },
   { key: "identity", label: "Shaping personality", desc: "A calm, encouraging style." },
   { key: "paths", label: "Drawing the path", desc: "An ordered plan of what's next." },
@@ -68,17 +79,30 @@ export default function ParentBrainCloneWatchScreen() {
                 <View style={[styles.node, { backgroundColor: palette.primary }]}>
                   <Text style={styles.nodeNum}>{i + 1}</Text>
                 </View>
-                {i < STAGES.length - 1 ? <View style={[styles.line, { backgroundColor: palette.border }]} /> : null}
+                {i < STAGES.length - 1 ? (
+                  <View style={[styles.line, { backgroundColor: palette.border }]} />
+                ) : null}
               </View>
               <View style={{ flex: 1, paddingBottom: spacing.md }}>
-                <Text style={[styles.stageLabel, { color: palette.ink }]}>{t(`brainClone.${s.key}`, s.label)}</Text>
-                <Text style={[styles.stageDesc, { color: palette.inkMuted }]}>{t(`brainClone.${s.key}Desc`, s.desc)}</Text>
+                <Text style={[styles.stageLabel, { color: palette.ink }]}>
+                  {t(`brainClone.${s.key}`, s.label)}
+                </Text>
+                <Text style={[styles.stageDesc, { color: palette.inkMuted }]}>
+                  {t(`brainClone.${s.key}Desc`, s.desc)}
+                </Text>
                 {s.key === "mastery" && decisions?.mastery_decisions?.length ? (
                   <View style={styles.chips}>
                     {decisions.mastery_decisions.slice(0, 6).map((d, idx) => (
-                      <View key={idx} style={[styles.chip, { borderColor: palette.border, backgroundColor: palette.bgRaised }]}>
+                      <View
+                        key={idx}
+                        style={[
+                          styles.chip,
+                          { borderColor: palette.border, backgroundColor: palette.bgRaised },
+                        ]}
+                      >
                         <Text style={[styles.chipText, { color: palette.ink }]}>
-                          {labelForDomain(d.domain)} · {Math.round((d.score > 1 ? d.score / 100 : d.score) * 100)}%
+                          {labelForDomain(d.domain)} ·{" "}
+                          {Math.round((d.score > 1 ? d.score / 100 : d.score) * 100)}%
                         </Text>
                       </View>
                     ))}
@@ -87,8 +111,16 @@ export default function ParentBrainCloneWatchScreen() {
                 {s.key === "accommodations" && decisions?.accommodation_decisions?.length ? (
                   <View style={styles.chips}>
                     {decisions.accommodation_decisions.slice(0, 6).map((d, idx) => (
-                      <View key={idx} style={[styles.chip, { borderColor: palette.border, backgroundColor: palette.bgRaised }]}>
-                        <Text style={[styles.chipText, { color: palette.ink }]}>{d.display_label || d.accommodation}</Text>
+                      <View
+                        key={idx}
+                        style={[
+                          styles.chip,
+                          { borderColor: palette.border, backgroundColor: palette.bgRaised },
+                        ]}
+                      >
+                        <Text style={[styles.chipText, { color: palette.ink }]}>
+                          {d.display_label || d.accommodation}
+                        </Text>
                       </View>
                     ))}
                   </View>
@@ -101,7 +133,10 @@ export default function ParentBrainCloneWatchScreen() {
             <Card tone="raised" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               <Ionicons name="checkmark-circle" size={22} color="#22c55e" />
               <Text style={[styles.body, { color: palette.ink, flex: 1 }]}>
-                {t("brainClone.alreadyApproved", "You've approved this profile. AIVO is teaching with it.")}
+                {t(
+                  "brainClone.alreadyApproved",
+                  "You've approved this profile. AIVO is teaching with it.",
+                )}
               </Text>
             </Card>
           ) : (

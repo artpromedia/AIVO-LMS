@@ -64,12 +64,9 @@ test("selects GeocodioFallback when provider and key are both set", async () => 
 });
 
 test("unknown provider value falls back to NullFallback", async () => {
-  await withEnv(
-    { ZIP_LOOKUP_FALLBACK_PROVIDER: "google" },
-    async () => {
-      __resetZipLookupFallback();
-      const fb = getZipLookupFallback();
-      assert.equal(fb.name, "null");
-    },
-  );
+  await withEnv({ ZIP_LOOKUP_FALLBACK_PROVIDER: "google" }, async () => {
+    __resetZipLookupFallback();
+    const fb = getZipLookupFallback();
+    assert.equal(fb.name, "null");
+  });
 });

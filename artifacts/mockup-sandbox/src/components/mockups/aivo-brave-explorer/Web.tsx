@@ -9,12 +9,20 @@ export function Web() {
       <nav className="w-full px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
         <div className="font-display text-3xl font-black text-blue-600 tracking-tight">AIVO</div>
         <div className="hidden md:flex gap-8 font-bold text-sm">
-          <a href="#" className="hover:text-blue-600">For Parents</a>
-          <a href="#" className="hover:text-blue-600">For Schools</a>
-          <a href="#" className="hover:text-blue-600">How it Works</a>
+          <a href="#" className="hover:text-blue-600">
+            For Parents
+          </a>
+          <a href="#" className="hover:text-blue-600">
+            For Schools
+          </a>
+          <a href="#" className="hover:text-blue-600">
+            How it Works
+          </a>
         </div>
         <div className="flex gap-4">
-          <button className="px-6 py-2 font-bold hover:bg-gray-100 rounded-full transition-colors">Log In</button>
+          <button className="px-6 py-2 font-bold hover:bg-gray-100 rounded-full transition-colors">
+            Log In
+          </button>
           <button className="brave-btn-primary px-6 py-2">Start Quest</button>
         </div>
       </nav>
@@ -29,15 +37,14 @@ export function Web() {
             Turn Learning Into An <span className="text-blue-600">Epic Quest</span>.
           </h1>
           <p className="text-xl font-medium opacity-80 mb-8 max-w-lg leading-relaxed">
-            The neurodivergent-friendly learning app that adapts to how your child's brain works. 14 specialized AI tutors, 5 functioning levels, infinite possibilities.
+            The neurodivergent-friendly learning app that adapts to how your child's brain works. 14
+            specialized AI tutors, 5 functioning levels, infinite possibilities.
           </p>
           <div className="flex gap-4">
             <button className="brave-btn-primary text-xl px-8 py-4 flex items-center gap-2">
               Start Free Trial <ArrowRight className="w-6 h-6" />
             </button>
-            <button className="brave-btn-secondary text-xl px-8 py-4">
-              Watch Demo
-            </button>
+            <button className="brave-btn-secondary text-xl px-8 py-4">Watch Demo</button>
           </div>
           <div className="mt-8 flex items-center gap-4 text-sm font-bold opacity-70">
             <div className="flex -space-x-2">
@@ -50,9 +57,16 @@ export function Web() {
         </div>
         <div className="relative">
           <div className="aspect-[4/3] rounded-[2rem] overflow-hidden border-8 border-white shadow-2xl bg-gray-100">
-            <img src="/__mockup/images/brave-hero.png" alt="AIVO World" className="w-full h-full object-cover" />
+            <img
+              src="/__mockup/images/brave-hero.png"
+              alt="AIVO World"
+              className="w-full h-full object-cover"
+            />
           </div>
-          <div className="absolute -bottom-6 -left-6 brave-card p-4 flex items-center gap-4 animate-bounce" style={{animationDuration: '3s'}}>
+          <div
+            className="absolute -bottom-6 -left-6 brave-card p-4 flex items-center gap-4 animate-bounce"
+            style={{ animationDuration: "3s" }}
+          >
             <div className="w-12 h-12 rounded-full bg-yellow-400 flex items-center justify-center text-white">
               <Star className="w-6 h-6 fill-current" />
             </div>
@@ -81,7 +95,8 @@ export function Web() {
               </div>
               <h3 className="font-display text-2xl font-bold mb-3">Adaptive Levels</h3>
               <p className="font-medium opacity-80 leading-relaxed">
-                From pre-symbolic communication to advanced middle school math, AIVO adjusts in real-time.
+                From pre-symbolic communication to advanced middle school math, AIVO adjusts in
+                real-time.
               </p>
             </div>
             <div className="brave-card p-8 bg-red-50/50">
@@ -90,7 +105,8 @@ export function Web() {
               </div>
               <h3 className="font-display text-2xl font-bold mb-3">14 AI Tutors</h3>
               <p className="font-medium opacity-80 leading-relaxed">
-                Meet specialized companions that change their teaching style based on your child's needs.
+                Meet specialized companions that change their teaching style based on your child's
+                needs.
               </p>
             </div>
             <div className="brave-card p-8 bg-yellow-50/50">
@@ -99,7 +115,8 @@ export function Web() {
               </div>
               <h3 className="font-display text-2xl font-bold mb-3">Sensory Safe</h3>
               <p className="font-medium opacity-80 leading-relaxed">
-                No messy noise, flashing lights, or harsh sounds. Just clear, focused, joyful learning.
+                No messy noise, flashing lights, or harsh sounds. Just clear, focused, joyful
+                learning.
               </p>
             </div>
           </div>
@@ -109,21 +126,33 @@ export function Web() {
       {/* Proof / Testimonial */}
       <section className="py-24 bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2 className="font-display text-4xl md:text-5xl font-black mb-12">"Finally, an app that gets it."</h2>
+          <h2 className="font-display text-4xl md:text-5xl font-black mb-12">
+            "Finally, an app that gets it."
+          </h2>
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="brave-card p-8 text-left text-gray-900">
               <div className="flex gap-1 text-yellow-400 mb-4">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-6 h-6 fill-current" />)}
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className="w-6 h-6 fill-current" />
+                ))}
               </div>
-              <p className="font-medium text-lg mb-6">"My autistic son used to cry during math homework. With AIVO's visual quests, he's actually asking to play it. The adaptive pacing is incredible."</p>
+              <p className="font-medium text-lg mb-6">
+                "My autistic son used to cry during math homework. With AIVO's visual quests, he's
+                actually asking to play it. The adaptive pacing is incredible."
+              </p>
               <div className="font-bold">Sarah M.</div>
               <div className="text-sm opacity-60 font-medium">Parent of 2nd Grader</div>
             </div>
             <div className="brave-card p-8 text-left text-gray-900">
               <div className="flex gap-1 text-yellow-400 mb-4">
-                {[1,2,3,4,5].map(i => <Star key={i} className="w-6 h-6 fill-current" />)}
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className="w-6 h-6 fill-current" />
+                ))}
               </div>
-              <p className="font-medium text-lg mb-6">"As a special education teacher, finding tools that work across multiple functioning levels is rare. AIVO is a game-changer for my classroom."</p>
+              <p className="font-medium text-lg mb-6">
+                "As a special education teacher, finding tools that work across multiple functioning
+                levels is rare. AIVO is a game-changer for my classroom."
+              </p>
               <div className="font-bold">David L.</div>
               <div className="text-sm opacity-60 font-medium">Special Ed Teacher</div>
             </div>
@@ -135,10 +164,10 @@ export function Web() {
       <section className="py-32 bg-[#f8fafe] text-center">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="font-display text-5xl font-black mb-6">Ready to start the adventure?</h2>
-          <p className="text-xl font-medium opacity-80 mb-10">Join thousands of learners discovering the joy of tailored education.</p>
-          <button className="brave-btn-primary text-2xl px-12 py-6">
-            Create Free Account
-          </button>
+          <p className="text-xl font-medium opacity-80 mb-10">
+            Join thousands of learners discovering the joy of tailored education.
+          </p>
+          <button className="brave-btn-primary text-2xl px-12 py-6">Create Free Account</button>
         </div>
       </section>
     </div>

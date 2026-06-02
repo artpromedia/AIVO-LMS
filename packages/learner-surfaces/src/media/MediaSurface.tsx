@@ -39,7 +39,10 @@ export function MediaSurface({
   const missingCaptionsEmittedRef = useRef(false);
   const [captionText, setCaptionText] = useState("");
   const captionAssets = useMemo(
-    () => (surface.media?.assets ?? []).filter((asset): asset is CaptionAsset => asset.type === "captions"),
+    () =>
+      (surface.media?.assets ?? []).filter(
+        (asset): asset is CaptionAsset => asset.type === "captions",
+      ),
     [surface.media?.assets],
   );
   const defaultCaption = captionAssets.find((asset) => asset.default) ?? captionAssets[0];
@@ -242,7 +245,9 @@ export function MediaSurface({
           ))}
         </audio>
       )}
-      <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+      <div
+        style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}
+      >
         <button
           type="button"
           onClick={() => setCaptions(!captionsEnabled)}

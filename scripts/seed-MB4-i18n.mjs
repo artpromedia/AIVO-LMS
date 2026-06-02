@@ -54,7 +54,7 @@ const DATA = {
       addonPrice: "+ 4.99$/شهر",
       cancelSubscription: "إلغاء الاشتراك",
       cancelAtPeriodEnd: "يُلغى في نهاية الفترة",
-      addedToBill: "{{count}} إضافة · {{price}}$/شهر"
+      addedToBill: "{{count}} إضافة · {{price}}$/شهر",
     },
     learnerSettings: {
       title: "الإعدادات",
@@ -79,7 +79,7 @@ const DATA = {
       saveChanges: "حفظ التغييرات",
       saved: "تم حفظ الإعدادات!",
       language: "اللغة",
-      languageDesc: "ستستخدم AIVO هذه اللغة للأزرار والقوائم والرسائل المساعدة."
+      languageDesc: "ستستخدم AIVO هذه اللغة للأزرار والقوائم والرسائل المساعدة.",
     },
     parentTutors: {
       title: "متجر المدرسين",
@@ -90,7 +90,7 @@ const DATA = {
       core7Bundle: "حزمة الأساسية 7",
       includedWithSub: "مضمّن مع الاشتراك",
       full14Bundle: "حزمة الكاملة 14",
-      full14Price: "إضافة بـ 9.99$/شهر"
+      full14Price: "إضافة بـ 9.99$/شهر",
     },
     learnerBrain: {
       title: "دماغي",
@@ -100,7 +100,7 @@ const DATA = {
       mySubjects: "موادي",
       gradeLabel: "الصف {{grade}}",
       goalLabel: "الهدف: {{grade}}",
-      mastered: "{{percent}}% مُتقن"
+      mastered: "{{percent}}% مُتقن",
     },
     caregiverChild: {
       overview: "نظرة عامة على {{name}}",
@@ -109,18 +109,18 @@ const DATA = {
       accommodations: "التسهيلات",
       iepGoals: "أهداف IEP",
       gradebook: "سجل الدرجات",
-      observation: "ملاحظة"
+      observation: "ملاحظة",
     },
     caregiverBrain: {
       title: "ملخص الدماغ",
       subtitle: "عرض للقراءة فقط للملف التعليمي",
       enrolled: "مسجّل: {{grade}}",
-      functioning: "يعمل عند: {{grade}}"
+      functioning: "يعمل عند: {{grade}}",
     },
     parentColearn: {
       title: "التعلم المشترك",
-      subtitle: "تعلّم جانباً {{name}}"
-    }
+      subtitle: "تعلّم جانباً {{name}}",
+    },
   },
 
   de: {
@@ -133,21 +133,25 @@ const DATA = {
       paymentMethod: "Zahlungsmethode",
       expires: "Läuft ab {{date}}",
       loading: "Abonnement wird geladen…",
-      loadError: "Abrechnungsdetails konnten nicht geladen werden. Nach unten ziehen zum Wiederholen.",
+      loadError:
+        "Abrechnungsdetails konnten nicht geladen werden. Nach unten ziehen zum Wiederholen.",
       accessDenied: "Du hast keine Berechtigung, dieses Abrechnungskonto einzusehen.",
       networkError: "Netzwerkfehler. Überprüfe deine Verbindung und versuche es erneut.",
       retry: "Wiederholen",
       paymentFailedWarning: "Deine letzte Zahlung konnte nicht verarbeitet werden.",
       updatePaymentMethod: "Zahlungsmethode aktualisieren",
       manageBilling: "Abrechnung verwalten",
-      subscribeToAddTutors: "Abonniere einen kostenpflichtigen Tarif, um weitere Tutoren hinzuzufügen.",
+      subscribeToAddTutors:
+        "Abonniere einen kostenpflichtigen Tarif, um weitere Tutoren hinzuzufügen.",
       resumeSubscription: "Abonnement fortsetzen",
       trialEndsInDays: "Testphase endet in {{days}} Tagen",
       trialEndsToday: "Testphase endet heute — füge eine Karte hinzu, um den Zugang zu behalten.",
-      trialEndsTomorrow: "Testphase endet morgen — füge eine Karte hinzu, um den Zugang zu behalten.",
+      trialEndsTomorrow:
+        "Testphase endet morgen — füge eine Karte hinzu, um den Zugang zu behalten.",
       downgradeToFree: "Auf kostenlos herabstufen",
       downgradeAlertTitle: "Auf kostenlos herabstufen",
-      downgradeAlertMessage: "Aktuelles Abonnement kündigen? Der Zugang bleibt bis zum Ende des Abrechnungszeitraums bestehen.",
+      downgradeAlertMessage:
+        "Aktuelles Abonnement kündigen? Der Zugang bleibt bis zum Ende des Abrechnungszeitraums bestehen.",
       downgradeConfirm: "Abonnement kündigen",
       downgradeScheduled: "Geplant",
       downgradeScheduledMessage: "Dein Abonnement endet am Ende des Zeitraums.",
@@ -171,7 +175,7 @@ const DATA = {
       addonPrice: "+ 4,99 €/Monat",
       cancelSubscription: "Abonnement kündigen",
       cancelAtPeriodEnd: "Kündigung zum Periodenende",
-      addedToBill: "{{count}} Erweiterung(en) · {{price}} €/Monat"
+      addedToBill: "{{count}} Erweiterung(en) · {{price}} €/Monat",
     },
     learnerSettings: {
       title: "Einstellungen",
@@ -196,7 +200,7 @@ const DATA = {
       saveChanges: "Änderungen speichern",
       saved: "Einstellungen gespeichert!",
       language: "Sprache",
-      languageDesc: "AIVO verwendet diese Sprache für Schaltflächen, Menüs und Hilfsnachrichten."
+      languageDesc: "AIVO verwendet diese Sprache für Schaltflächen, Menüs und Hilfsnachrichten.",
     },
     parentTutors: {
       title: "Tutor-Store",
@@ -207,7 +211,7 @@ const DATA = {
       core7Bundle: "Kern-7-Paket",
       includedWithSub: "Im Abonnement enthalten",
       full14Bundle: "Vollständiges 14er-Paket",
-      full14Price: "9,99 €/Monat Erweiterung"
+      full14Price: "9,99 €/Monat Erweiterung",
     },
     learnerBrain: {
       title: "Mein Gehirn",
@@ -217,7 +221,7 @@ const DATA = {
       mySubjects: "Meine Fächer",
       gradeLabel: "Klasse {{grade}}",
       goalLabel: "Ziel: {{grade}}",
-      mastered: "{{percent}}% gemeistert"
+      mastered: "{{percent}}% gemeistert",
     },
     caregiverChild: {
       overview: "{{name}} Übersicht",
@@ -226,18 +230,18 @@ const DATA = {
       accommodations: "Unterstützungsmaßnahmen",
       iepGoals: "IEP-Ziele",
       gradebook: "Notenbuch",
-      observation: "Beobachtung"
+      observation: "Beobachtung",
     },
     caregiverBrain: {
       title: "Gehirn-Zusammenfassung",
       subtitle: "Schreibgeschützte Ansicht des Lernprofils",
       enrolled: "Eingeschrieben: {{grade}}",
-      functioning: "Funktionsniveau: {{grade}}"
+      functioning: "Funktionsniveau: {{grade}}",
     },
     parentColearn: {
       title: "Gemeinsam Lernen",
-      subtitle: "Lerne gemeinsam mit {{name}}"
-    }
+      subtitle: "Lerne gemeinsam mit {{name}}",
+    },
   },
 
   fr: {
@@ -250,21 +254,24 @@ const DATA = {
       paymentMethod: "Moyen de paiement",
       expires: "Expire le {{date}}",
       loading: "Chargement de votre abonnement…",
-      loadError: "Impossible de charger vos détails de facturation. Tirez vers le bas pour réessayer.",
+      loadError:
+        "Impossible de charger vos détails de facturation. Tirez vers le bas pour réessayer.",
       accessDenied: "Vous n'avez pas l'autorisation de consulter ce compte de facturation.",
       networkError: "Erreur réseau. Vérifiez votre connexion et réessayez.",
       retry: "Réessayer",
       paymentFailedWarning: "Votre dernier paiement n'a pas abouti.",
       updatePaymentMethod: "Mettre à jour le moyen de paiement",
       manageBilling: "Gérer la facturation",
-      subscribeToAddTutors: "Abonnez-vous à un forfait payant pour ajouter des tuteurs supplémentaires.",
+      subscribeToAddTutors:
+        "Abonnez-vous à un forfait payant pour ajouter des tuteurs supplémentaires.",
       resumeSubscription: "Reprendre l'abonnement",
       trialEndsInDays: "L'essai se termine dans {{days}} jours",
       trialEndsToday: "L'essai se termine aujourd'hui — ajoutez une carte pour conserver l'accès.",
       trialEndsTomorrow: "L'essai se termine demain — ajoutez une carte pour conserver l'accès.",
       downgradeToFree: "Passer à la version gratuite",
       downgradeAlertTitle: "Passer à la version gratuite",
-      downgradeAlertMessage: "Annuler votre abonnement actuel ? L'accès continue jusqu'à la fin de la période de facturation.",
+      downgradeAlertMessage:
+        "Annuler votre abonnement actuel ? L'accès continue jusqu'à la fin de la période de facturation.",
       downgradeConfirm: "Annuler l'abonnement",
       downgradeScheduled: "Planifié",
       downgradeScheduledMessage: "Votre abonnement prendra fin à la fin de la période.",
@@ -288,7 +295,7 @@ const DATA = {
       addonPrice: "+ 4,99 €/mois",
       cancelSubscription: "Annuler l'abonnement",
       cancelAtPeriodEnd: "Annulation en fin de période",
-      addedToBill: "{{count}} extension(s) · {{price}} €/mois"
+      addedToBill: "{{count}} extension(s) · {{price}} €/mois",
     },
     learnerSettings: {
       title: "Paramètres",
@@ -298,7 +305,8 @@ const DATA = {
       learner: "Apprenant",
       soundAndMotion: "Son et mouvement",
       soundEffects: "Effets sonores",
-      soundEffectsDesc: "Jouer des effets sonores lors des interactions avec les jeux et les leçons.",
+      soundEffectsDesc:
+        "Jouer des effets sonores lors des interactions avec les jeux et les leçons.",
       music: "Musique de fond",
       musicDesc: "Jouer de la musique en arrière-plan pendant l'apprentissage.",
       animations: "Animations",
@@ -313,7 +321,8 @@ const DATA = {
       saveChanges: "Enregistrer les modifications",
       saved: "Paramètres sauvegardés !",
       language: "Langue",
-      languageDesc: "AIVO utilisera cette langue pour les boutons, les menus et les messages d'aide."
+      languageDesc:
+        "AIVO utilisera cette langue pour les boutons, les menus et les messages d'aide.",
     },
     parentTutors: {
       title: "Boutique de tuteurs",
@@ -324,7 +333,7 @@ const DATA = {
       core7Bundle: "Pack Principaux 7",
       includedWithSub: "Inclus avec l'abonnement",
       full14Bundle: "Pack Complet 14",
-      full14Price: "9,99 €/mois en option"
+      full14Price: "9,99 €/mois en option",
     },
     learnerBrain: {
       title: "Mon cerveau",
@@ -334,7 +343,7 @@ const DATA = {
       mySubjects: "Mes matières",
       gradeLabel: "Niveau {{grade}}",
       goalLabel: "Objectif : {{grade}}",
-      mastered: "{{percent}}% maîtrisé"
+      mastered: "{{percent}}% maîtrisé",
     },
     caregiverChild: {
       overview: "Aperçu de {{name}}",
@@ -343,18 +352,18 @@ const DATA = {
       accommodations: "Aménagements",
       iepGoals: "Objectifs IEP",
       gradebook: "Carnet de notes",
-      observation: "Observation"
+      observation: "Observation",
     },
     caregiverBrain: {
       title: "Résumé du cerveau",
       subtitle: "Vue en lecture seule du profil d'apprentissage",
       enrolled: "Inscrit : {{grade}}",
-      functioning: "Fonctionnement : {{grade}}"
+      functioning: "Fonctionnement : {{grade}}",
     },
     parentColearn: {
       title: "Co-apprentissage",
-      subtitle: "Apprenez aux côtés de {{name}}"
-    }
+      subtitle: "Apprenez aux côtés de {{name}}",
+    },
   },
 
   hi: {
@@ -405,7 +414,7 @@ const DATA = {
       addonPrice: "+ ₹4.99/माह",
       cancelSubscription: "सदस्यता रद्द करें",
       cancelAtPeriodEnd: "अवधि के अंत में रद्द",
-      addedToBill: "{{count}} ऐड-ऑन · {{price}}/माह"
+      addedToBill: "{{count}} ऐड-ऑन · {{price}}/माह",
     },
     learnerSettings: {
       title: "सेटिंग्स",
@@ -430,7 +439,7 @@ const DATA = {
       saveChanges: "परिवर्तन सहेजें",
       saved: "सेटिंग्स सहेजी गईं!",
       language: "भाषा",
-      languageDesc: "AIVO बटन, मेनू और सहायक संदेशों के लिए इस भाषा का उपयोग करेगा।"
+      languageDesc: "AIVO बटन, मेनू और सहायक संदेशों के लिए इस भाषा का उपयोग करेगा।",
     },
     parentTutors: {
       title: "ट्यूटर स्टोर",
@@ -441,7 +450,7 @@ const DATA = {
       core7Bundle: "मुख्य 7 बंडल",
       includedWithSub: "सदस्यता के साथ शामिल",
       full14Bundle: "पूर्ण 14 बंडल",
-      full14Price: "₹9.99/माह ऐड-ऑन"
+      full14Price: "₹9.99/माह ऐड-ऑन",
     },
     learnerBrain: {
       title: "मेरा दिमाग",
@@ -451,7 +460,7 @@ const DATA = {
       mySubjects: "मेरे विषय",
       gradeLabel: "कक्षा {{grade}}",
       goalLabel: "लक्ष्य: {{grade}}",
-      mastered: "{{percent}}% में महारत हासिल"
+      mastered: "{{percent}}% में महारत हासिल",
     },
     caregiverChild: {
       overview: "{{name}} का सारांश",
@@ -460,18 +469,18 @@ const DATA = {
       accommodations: "सुविधाएं",
       iepGoals: "IEP लक्ष्य",
       gradebook: "ग्रेडबुक",
-      observation: "अवलोकन"
+      observation: "अवलोकन",
     },
     caregiverBrain: {
       title: "दिमाग सारांश",
       subtitle: "सीखने की प्रोफ़ाइल का केवल-पढ़ने योग्य दृश्य",
       enrolled: "नामांकित: {{grade}}",
-      functioning: "कार्यशील: {{grade}}"
+      functioning: "कार्यशील: {{grade}}",
     },
     parentColearn: {
       title: "सह-शिक्षण",
-      subtitle: "{{name}} के साथ सीखें"
-    }
+      subtitle: "{{name}} के साथ सीखें",
+    },
   },
 
   ja: {
@@ -498,7 +507,8 @@ const DATA = {
       trialEndsTomorrow: "トライアルは明日終了 — 引き続きご利用にはカードを追加してください。",
       downgradeToFree: "無料にダウングレード",
       downgradeAlertTitle: "無料にダウングレード",
-      downgradeAlertMessage: "現在のサブスクリプションをキャンセルしますか？請求期間の終了まで引き続きアクセスできます。",
+      downgradeAlertMessage:
+        "現在のサブスクリプションをキャンセルしますか？請求期間の終了まで引き続きアクセスできます。",
       downgradeConfirm: "サブスクリプションをキャンセル",
       downgradeScheduled: "予定済み",
       downgradeScheduledMessage: "サブスクリプションは期間終了時に終了します。",
@@ -522,7 +532,7 @@ const DATA = {
       addonPrice: "+ ¥4.99/月",
       cancelSubscription: "サブスクリプションをキャンセル",
       cancelAtPeriodEnd: "期間終了時にキャンセル",
-      addedToBill: "{{count}}個の追加オプション · ¥{{price}}/月"
+      addedToBill: "{{count}}個の追加オプション · ¥{{price}}/月",
     },
     learnerSettings: {
       title: "設定",
@@ -547,7 +557,7 @@ const DATA = {
       saveChanges: "変更を保存",
       saved: "設定を保存しました！",
       language: "言語",
-      languageDesc: "AIVOはボタン、メニュー、ヘルプメッセージにこの言語を使用します。"
+      languageDesc: "AIVOはボタン、メニュー、ヘルプメッセージにこの言語を使用します。",
     },
     parentTutors: {
       title: "チューターストア",
@@ -558,7 +568,7 @@ const DATA = {
       core7Bundle: "コア7バンドル",
       includedWithSub: "サブスクリプションに含まれています",
       full14Bundle: "フル14バンドル",
-      full14Price: "¥9.99/月のアドオン"
+      full14Price: "¥9.99/月のアドオン",
     },
     learnerBrain: {
       title: "マイブレイン",
@@ -568,7 +578,7 @@ const DATA = {
       mySubjects: "マイ教科",
       gradeLabel: "{{grade}}年生",
       goalLabel: "目標：{{grade}}",
-      mastered: "{{percent}}%習得済み"
+      mastered: "{{percent}}%習得済み",
     },
     caregiverChild: {
       overview: "{{name}}の概要",
@@ -577,18 +587,18 @@ const DATA = {
       accommodations: "サポート措置",
       iepGoals: "IEP目標",
       gradebook: "成績表",
-      observation: "観察"
+      observation: "観察",
     },
     caregiverBrain: {
       title: "ブレインサマリー",
       subtitle: "学習プロフィールの読み取り専用表示",
       enrolled: "在籍：{{grade}}",
-      functioning: "機能レベル：{{grade}}"
+      functioning: "機能レベル：{{grade}}",
     },
     parentColearn: {
       title: "共同学習",
-      subtitle: "{{name}}と一緒に学ぶ"
-    }
+      subtitle: "{{name}}と一緒に学ぶ",
+    },
   },
 
   ko: {
@@ -615,7 +625,8 @@ const DATA = {
       trialEndsTomorrow: "체험판이 내일 종료됩니다 — 이용을 유지하려면 카드를 추가하세요.",
       downgradeToFree: "무료로 다운그레이드",
       downgradeAlertTitle: "무료로 다운그레이드",
-      downgradeAlertMessage: "현재 구독을 취소하시겠습니까? 청구 기간이 끝날 때까지 접속이 유지됩니다.",
+      downgradeAlertMessage:
+        "현재 구독을 취소하시겠습니까? 청구 기간이 끝날 때까지 접속이 유지됩니다.",
       downgradeConfirm: "구독 취소",
       downgradeScheduled: "예약됨",
       downgradeScheduledMessage: "구독은 기간 종료 시 만료됩니다.",
@@ -639,7 +650,7 @@ const DATA = {
       addonPrice: "+ ₩4.99/월",
       cancelSubscription: "구독 취소",
       cancelAtPeriodEnd: "기간 종료 시 취소",
-      addedToBill: "{{count}}개 부가 기능 · ₩{{price}}/월"
+      addedToBill: "{{count}}개 부가 기능 · ₩{{price}}/월",
     },
     learnerSettings: {
       title: "설정",
@@ -664,7 +675,7 @@ const DATA = {
       saveChanges: "변경사항 저장",
       saved: "설정이 저장되었습니다!",
       language: "언어",
-      languageDesc: "AIVO는 버튼, 메뉴, 도움말 메시지에 이 언어를 사용합니다."
+      languageDesc: "AIVO는 버튼, 메뉴, 도움말 메시지에 이 언어를 사용합니다.",
     },
     parentTutors: {
       title: "튜터 스토어",
@@ -675,7 +686,7 @@ const DATA = {
       core7Bundle: "핵심 7 번들",
       includedWithSub: "구독에 포함됨",
       full14Bundle: "전체 14 번들",
-      full14Price: "월 $9.99 부가 기능"
+      full14Price: "월 $9.99 부가 기능",
     },
     learnerBrain: {
       title: "내 두뇌",
@@ -685,7 +696,7 @@ const DATA = {
       mySubjects: "내 과목",
       gradeLabel: "{{grade}}학년",
       goalLabel: "목표: {{grade}}",
-      mastered: "{{percent}}% 숙달"
+      mastered: "{{percent}}% 숙달",
     },
     caregiverChild: {
       overview: "{{name}} 개요",
@@ -694,18 +705,18 @@ const DATA = {
       accommodations: "지원 사항",
       iepGoals: "IEP 목표",
       gradebook: "성적표",
-      observation: "관찰"
+      observation: "관찰",
     },
     caregiverBrain: {
       title: "두뇌 요약",
       subtitle: "학습 프로필 읽기 전용 보기",
       enrolled: "등록: {{grade}}",
-      functioning: "기능 수준: {{grade}}"
+      functioning: "기능 수준: {{grade}}",
     },
     parentColearn: {
       title: "공동 학습",
-      subtitle: "{{name}}와 함께 배우기"
-    }
+      subtitle: "{{name}}와 함께 배우기",
+    },
   },
 
   pt: {
@@ -718,7 +729,8 @@ const DATA = {
       paymentMethod: "Método de Pagamento",
       expires: "Expira em {{date}}",
       loading: "Carregando sua assinatura…",
-      loadError: "Não foi possível carregar os detalhes de cobrança. Puxe para baixo para tentar novamente.",
+      loadError:
+        "Não foi possível carregar os detalhes de cobrança. Puxe para baixo para tentar novamente.",
       accessDenied: "Você não tem permissão para visualizar esta conta de cobrança.",
       networkError: "Erro de rede. Verifique sua conexão e tente novamente.",
       retry: "Tentar novamente",
@@ -732,7 +744,8 @@ const DATA = {
       trialEndsTomorrow: "Teste termina amanhã — adicione um cartão para manter o acesso.",
       downgradeToFree: "Fazer downgrade para gratuito",
       downgradeAlertTitle: "Fazer downgrade para gratuito",
-      downgradeAlertMessage: "Cancelar sua assinatura atual? O acesso continua até o final do período de cobrança.",
+      downgradeAlertMessage:
+        "Cancelar sua assinatura atual? O acesso continua até o final do período de cobrança.",
       downgradeConfirm: "Cancelar assinatura",
       downgradeScheduled: "Agendado",
       downgradeScheduledMessage: "Sua assinatura terminará ao final do período.",
@@ -756,7 +769,7 @@ const DATA = {
       addonPrice: "+ R$4,99/mês",
       cancelSubscription: "Cancelar assinatura",
       cancelAtPeriodEnd: "Cancela no final do período",
-      addedToBill: "{{count}} complemento(s) · R${{price}}/mês"
+      addedToBill: "{{count}} complemento(s) · R${{price}}/mês",
     },
     learnerSettings: {
       title: "Configurações",
@@ -781,7 +794,7 @@ const DATA = {
       saveChanges: "Salvar Alterações",
       saved: "Configurações salvas!",
       language: "Idioma",
-      languageDesc: "AIVO usará este idioma para botões, menus e mensagens de ajuda."
+      languageDesc: "AIVO usará este idioma para botões, menus e mensagens de ajuda.",
     },
     parentTutors: {
       title: "Loja de Tutores",
@@ -792,7 +805,7 @@ const DATA = {
       core7Bundle: "Pacote Principais 7",
       includedWithSub: "Incluído na assinatura",
       full14Bundle: "Pacote Completo 14",
-      full14Price: "R$9,99/mês complemento"
+      full14Price: "R$9,99/mês complemento",
     },
     learnerBrain: {
       title: "Meu Cérebro",
@@ -802,7 +815,7 @@ const DATA = {
       mySubjects: "Minhas Matérias",
       gradeLabel: "Série {{grade}}",
       goalLabel: "Meta: {{grade}}",
-      mastered: "{{percent}}% dominado"
+      mastered: "{{percent}}% dominado",
     },
     caregiverChild: {
       overview: "Visão geral de {{name}}",
@@ -811,18 +824,18 @@ const DATA = {
       accommodations: "Acomodações",
       iepGoals: "Metas IEP",
       gradebook: "Boletim",
-      observation: "Observação"
+      observation: "Observação",
     },
     caregiverBrain: {
       title: "Resumo do Cérebro",
       subtitle: "Visualização somente leitura do perfil de aprendizado",
       enrolled: "Matriculado: {{grade}}",
-      functioning: "Funcionamento: {{grade}}"
+      functioning: "Funcionamento: {{grade}}",
     },
     parentColearn: {
       title: "Co-aprendizado",
-      subtitle: "Aprenda ao lado de {{name}}"
-    }
+      subtitle: "Aprenda ao lado de {{name}}",
+    },
   },
 
   zh: {
@@ -873,7 +886,7 @@ const DATA = {
       addonPrice: "+ ¥4.99/月",
       cancelSubscription: "取消订阅",
       cancelAtPeriodEnd: "周期结束时取消",
-      addedToBill: "{{count}} 个附加项 · ¥{{price}}/月"
+      addedToBill: "{{count}} 个附加项 · ¥{{price}}/月",
     },
     learnerSettings: {
       title: "设置",
@@ -898,7 +911,7 @@ const DATA = {
       saveChanges: "保存更改",
       saved: "设置已保存！",
       language: "语言",
-      languageDesc: "AIVO 将使用此语言显示按钮、菜单和帮助信息。"
+      languageDesc: "AIVO 将使用此语言显示按钮、菜单和帮助信息。",
     },
     parentTutors: {
       title: "辅导老师商店",
@@ -909,7 +922,7 @@ const DATA = {
       core7Bundle: "核心 7 套餐",
       includedWithSub: "订阅已包含",
       full14Bundle: "完整 14 套餐",
-      full14Price: "¥9.99/月附加项"
+      full14Price: "¥9.99/月附加项",
     },
     learnerBrain: {
       title: "我的大脑",
@@ -919,7 +932,7 @@ const DATA = {
       mySubjects: "我的科目",
       gradeLabel: "{{grade}} 年级",
       goalLabel: "目标：{{grade}}",
-      mastered: "已掌握 {{percent}}%"
+      mastered: "已掌握 {{percent}}%",
     },
     caregiverChild: {
       overview: "{{name}} 概览",
@@ -928,26 +941,32 @@ const DATA = {
       accommodations: "学习支持",
       iepGoals: "IEP 目标",
       gradebook: "成绩册",
-      observation: "观察记录"
+      observation: "观察记录",
     },
     caregiverBrain: {
       title: "大脑摘要",
       subtitle: "学习档案只读视图",
       enrolled: "入学：{{grade}}",
-      functioning: "功能水平：{{grade}}"
+      functioning: "功能水平：{{grade}}",
     },
     parentColearn: {
       title: "共同学习",
-      subtitle: "与 {{name}} 一起学习"
-    }
-  }
+      subtitle: "与 {{name}} 一起学习",
+    },
+  },
 };
 
-function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
-  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
-  else t[k]=v;}return t;}
+function deepMerge(t, s) {
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if (!t[k] || typeof t[k] !== "object") t[k] = {};
+      deepMerge(t[k], v);
+    } else t[k] = v;
+  }
+  return t;
+}
 
-let n=0;
+let n = 0;
 for (const [locale, roots] of Object.entries(DATA)) {
   const file = join(dir, `${locale}.json`);
   const json = JSON.parse(readFileSync(file, "utf8"));

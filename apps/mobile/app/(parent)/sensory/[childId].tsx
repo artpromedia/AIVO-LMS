@@ -76,7 +76,10 @@ export default function ParentSensoryScreen() {
                     {channel.accommodations.map((a) => (
                       <View
                         key={a}
-                        style={[styles.chip, { borderColor: palette.border, backgroundColor: palette.bgPage }]}
+                        style={[
+                          styles.chip,
+                          { borderColor: palette.border, backgroundColor: palette.bgPage },
+                        ]}
                       >
                         <Text style={[styles.chipText, { color: palette.ink }]}>{a}</Text>
                       </View>
@@ -99,7 +102,13 @@ export default function ParentSensoryScreen() {
 const styles = StyleSheet.create({
   card: { gap: spacing.sm },
   cardHead: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  iconWrap: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   channelLabel: { flex: 1, fontSize: 16, fontFamily: fontFamilies.bodyBold },
   badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.full },
   badgeText: { fontSize: 12, fontFamily: fontFamilies.bodyBold, textTransform: "capitalize" },

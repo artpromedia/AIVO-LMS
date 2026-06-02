@@ -48,16 +48,16 @@ export async function GET(req: Request): Promise<NextResponse> {
 
     const env = (process.env ?? {}) as Record<string, string | undefined>;
     const resolved = resolveEnterpriseFlags(env);
-    const enterprise: FlagSnapshot[] = Object.values(ENTERPRISE_FLAG_META).map(
-      (meta) => ({
-        ...meta,
-        active: resolved[meta.key],
-      }),
-    );
+    const enterprise: FlagSnapshot[] = Object.values(ENTERPRISE_FLAG_META).map((meta) => ({
+      ...meta,
+      active: resolved[meta.key],
+    }));
     const sprintPipeline = SPRINT_PIPELINE_FLAGS.map((meta) => ({
       ...meta,
       active: ["1", "true", "yes", "on"].includes(
-        String(env[meta.envVar] ?? "").trim().toLowerCase(),
+        String(env[meta.envVar] ?? "")
+          .trim()
+          .toLowerCase(),
       ),
     }));
     return ok({ flags: { enterprise, sprintPipeline } }, requestId);

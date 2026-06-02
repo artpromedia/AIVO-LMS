@@ -53,16 +53,11 @@ export const LOCALE_STORAGE_KEY = "aivo_locale_v1";
 
 function pickInitialLocale(): SupportedLocale {
   const code = Localization.getLocales()?.[0]?.languageCode ?? "en";
-  return (SUPPORTED_LOCALES as readonly string[]).includes(code)
-    ? (code as SupportedLocale)
-    : "en";
+  return (SUPPORTED_LOCALES as readonly string[]).includes(code) ? (code as SupportedLocale) : "en";
 }
 
 export function isSupportedLocale(value: unknown): value is SupportedLocale {
-  return (
-    typeof value === "string" &&
-    (SUPPORTED_LOCALES as readonly string[]).includes(value)
-  );
+  return typeof value === "string" && (SUPPORTED_LOCALES as readonly string[]).includes(value);
 }
 
 // Right-to-left locales. Only `ar` ships today, but the wider set mirrors

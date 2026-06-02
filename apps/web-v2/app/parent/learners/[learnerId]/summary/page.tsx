@@ -31,7 +31,7 @@ export default async function ParentSummaryPage({
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const t = await getTranslations("parent.learner_summary");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);

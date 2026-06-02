@@ -1,4 +1,8 @@
-import { findSkillsByTopic, getPrerequisitesFor, getStandardsFor } from "../../services/skill-graph-store.js";
+import {
+  findSkillsByTopic,
+  getPrerequisitesFor,
+  getStandardsFor,
+} from "../../services/skill-graph-store.js";
 import { buildProfileAdaptations } from "../../services/profile-adaptations.js";
 import type {
   AdaptDirective,

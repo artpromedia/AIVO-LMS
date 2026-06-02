@@ -63,14 +63,11 @@ const DEFAULT_RAI_COMPLIANCE: BrainRaiCompliance = {
     "Accommodations selected from evidence-based templates, not assumptions",
     "Parent context treated as supplementary—never overrides learner-demonstrated ability",
   ],
-  transparency:
-    "All decisions below include the reasoning and source data that informed them.",
+  transparency: "All decisions below include the reasoning and source data that informed them.",
   humanOversight: "This brain clone requires parent approval before activation.",
 };
 
-export function selectBrainExplainability(
-  state: LearnerBrainProfileState,
-): BrainExplainability {
+export function selectBrainExplainability(state: LearnerBrainProfileState): BrainExplainability {
   const xai = state.xaiExplanation;
 
   const raiComplianceDetail: BrainRaiCompliance = xai.raiComplianceDetail

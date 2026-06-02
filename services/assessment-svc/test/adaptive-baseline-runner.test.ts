@@ -86,8 +86,18 @@ test("a correct answer drives the next item harder than a wrong answer does", ()
   const start = startRun({ bank: BANK, priorTheta: 0 });
   const served = start.session.lastServedItemId!;
 
-  const correct = respondToItem({ session: start.session, itemId: served, correct: true, bank: BANK });
-  const wrong = respondToItem({ session: start.session, itemId: served, correct: false, bank: BANK });
+  const correct = respondToItem({
+    session: start.session,
+    itemId: served,
+    correct: true,
+    bank: BANK,
+  });
+  const wrong = respondToItem({
+    session: start.session,
+    itemId: served,
+    correct: false,
+    bank: BANK,
+  });
   assert.equal(correct.ok, true);
   assert.equal(wrong.ok, true);
   if (!correct.ok || !wrong.ok) return;

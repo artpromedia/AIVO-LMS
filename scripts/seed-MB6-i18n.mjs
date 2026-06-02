@@ -18,45 +18,45 @@ const DATA = {
       badges: {
         first_session: {
           name: "الجلسة الأولى",
-          description: "أكمل أول جلسة تعليمية"
+          description: "أكمل أول جلسة تعليمية",
         },
         on_fire: {
           name: "متقد",
-          description: "سلسلة 7 أيام"
+          description: "سلسلة 7 أيام",
         },
         brain_activated: {
           name: "الدماغ نشط",
-          description: "تمت الموافقة على ملف الدماغ"
+          description: "تمت الموافقة على ملف الدماغ",
         },
         bookworm: {
           name: "قارئ نهم",
-          description: "أُكملت 10 جلسات"
+          description: "أُكملت 10 جلسات",
         },
         mastery_champion: {
           name: "بطل الإتقان",
-          description: "أي مادة أعلى من 75٪"
+          description: "أي مادة أعلى من 75٪",
         },
         goal_getter: {
           name: "محقق الأهداف",
-          description: "تم تحقيق هدف IEP"
+          description: "تم تحقيق هدف IEP",
         },
         team_player: {
           name: "لاعب الفريق",
-          description: "فريق تعليمي كامل"
+          description: "فريق تعليمي كامل",
         },
         multi_subject: {
           name: "متعدد المواد",
-          description: "نشط في 3 مواد أو أكثر"
+          description: "نشط في 3 مواد أو أكثر",
         },
         speed_learner: {
           name: "متعلم سريع",
-          description: "أفضل 25٪ في وقت الجلسة"
+          description: "أفضل 25٪ في وقت الجلسة",
         },
         explorer: {
           name: "مستكشف",
-          description: "تم استكشاف جميع المجالات"
-        }
-      }
+          description: "تم استكشاف جميع المجالات",
+        },
+      },
     },
     parentTeam: {
       title: "فريق الرعاية",
@@ -82,7 +82,7 @@ const DATA = {
       credentials: "المؤهلات",
       credentialsPlaceholder: "مثل: CCC-SLP, M.Ed",
       relationship: "العلاقة",
-      relationshipPlaceholder: "مثل: والد مشارك، جد"
+      relationshipPlaceholder: "مثل: والد مشارك، جد",
     },
     therapistClient: {
       overview: "ملف {{name}}",
@@ -101,7 +101,7 @@ const DATA = {
       reportsSubtitle: "إنشاء وعرض تقارير تقدم العلاج",
       noReportsTitle: "لا توجد تقارير",
       noReportsMessage: "أنشئ تقرير تقدم عند الاستعداد.",
-      generateReport: "إنشاء تقرير"
+      generateReport: "إنشاء تقرير",
     },
     parentInbox: {
       title: "صندوق الوارد",
@@ -109,18 +109,18 @@ const DATA = {
         all: "الكل",
         action: "يتطلب إجراءً",
         celebrations: "الاحتفالات",
-        archived: "الأرشيف"
+        archived: "الأرشيف",
       },
       empty: {
         all: "صندوق الوارد فارغ. سنعلمك عند الحاجة إلى اتخاذ إجراء.",
         action: "لا توجد عناصر تتطلب إجراءً.",
         celebrations: "لا توجد احتفالات.",
-        archived: "لا توجد عناصر مؤرشفة."
+        archived: "لا توجد عناصر مؤرشفة.",
       },
       markRead: "تحديد كمقروء",
       dismiss: "رفض",
       view: "عرض",
-      openOnWeb: "افتح هذا الإشعار على تطبيق الويب لاتخاذ إجراء."
+      openOnWeb: "افتح هذا الإشعار على تطبيق الويب لاتخاذ إجراء.",
     },
     teacherStudent: {
       brain: "دماغ {{name}}",
@@ -129,26 +129,26 @@ const DATA = {
       enrolled: "ملتحق: {{grade}}",
       functioning: "الأداء: {{grade}}",
       submitInsight: "إرسال ملاحظة",
-      uploadIEP: "رفع IEP"
+      uploadIEP: "رفع IEP",
     },
     teacherInsight: {
       title: "إرسال ملاحظة",
       subtitle: "شارك ملاحظة حول تعلم هذا الطالب",
       yourInsight: "ملاحظتك",
       placeholder: "صِف ما لاحظته بشأن هذا الطالب...",
-      submitted: "تم إرسال الملاحظة إلى صندوق وارد ولي الأمر"
+      submitted: "تم إرسال الملاحظة إلى صندوق وارد ولي الأمر",
     },
     learnerQuests: {
       title: "عوالم المهام",
       subtitle: "استكشف مغامرات التعلم مع معلميك",
       world: "عالم {{name}}",
-      chapter: "الفصل {{current}} من {{total}}"
+      chapter: "الفصل {{current}} من {{total}}",
     },
     learnerGradebook: {
       title: "دفتر الدرجات",
       subtitle: "إتقانك للمواد",
-      functioningAt: "الأداء في الصف {{functioning}} (المسجل: {{enrolled}})"
-    }
+      functioningAt: "الأداء في الصف {{functioning}} (المسجل: {{enrolled}})",
+    },
   },
   de: {
     parentMilestones: {
@@ -162,45 +162,45 @@ const DATA = {
       badges: {
         first_session: {
           name: "Erste Sitzung",
-          description: "Erste Tutoringstunde abgeschlossen"
+          description: "Erste Tutoringstunde abgeschlossen",
         },
         on_fire: {
           name: "In Fahrt",
-          description: "7-Tage-Serie"
+          description: "7-Tage-Serie",
         },
         brain_activated: {
           name: "Gehirn aktiviert",
-          description: "Gehirnprofil genehmigt"
+          description: "Gehirnprofil genehmigt",
         },
         bookworm: {
           name: "Bücherwurm",
-          description: "10 Sitzungen abgeschlossen"
+          description: "10 Sitzungen abgeschlossen",
         },
         mastery_champion: {
           name: "Meisterschaftssieger",
-          description: "Jedes Fach über 75 %"
+          description: "Jedes Fach über 75 %",
         },
         goal_getter: {
           name: "Zielerreicher",
-          description: "IEP-Ziel erfüllt"
+          description: "IEP-Ziel erfüllt",
         },
         team_player: {
           name: "Teamplayer",
-          description: "Vollständiges Lernteam"
+          description: "Vollständiges Lernteam",
         },
         multi_subject: {
           name: "Multifach",
-          description: "In 3+ Fächern aktiv"
+          description: "In 3+ Fächern aktiv",
         },
         speed_learner: {
           name: "Schnelllerner",
-          description: "Top 25 % der Sitzungszeit"
+          description: "Top 25 % der Sitzungszeit",
         },
         explorer: {
           name: "Entdecker",
-          description: "Alle Fachbereiche erkundet"
-        }
-      }
+          description: "Alle Fachbereiche erkundet",
+        },
+      },
     },
     parentTeam: {
       title: "Betreuungsteam",
@@ -226,7 +226,7 @@ const DATA = {
       credentials: "Qualifikationen",
       credentialsPlaceholder: "z. B. CCC-SLP, M.Ed",
       relationship: "Beziehung",
-      relationshipPlaceholder: "z. B. Mitsorgeberechtigte/r, Großelternteil"
+      relationshipPlaceholder: "z. B. Mitsorgeberechtigte/r, Großelternteil",
     },
     therapistClient: {
       overview: "{{name}}s Profil",
@@ -245,7 +245,7 @@ const DATA = {
       reportsSubtitle: "Therapiefortschrittsberichte erstellen und ansehen",
       noReportsTitle: "Keine Berichte",
       noReportsMessage: "Erstelle einen Fortschrittsbericht, wenn du bereit bist.",
-      generateReport: "Bericht erstellen"
+      generateReport: "Bericht erstellen",
     },
     parentInbox: {
       title: "Posteingang",
@@ -253,18 +253,18 @@ const DATA = {
         all: "Alle",
         action: "Handlungsbedarf",
         celebrations: "Erfolge",
-        archived: "Archiv"
+        archived: "Archiv",
       },
       empty: {
         all: "Dein Posteingang ist leer. Wir benachrichtigen dich, wenn etwas Aufmerksamkeit erfordert.",
         action: "Keine Aufgaben vorhanden.",
         celebrations: "Keine Erfolge vorhanden.",
-        archived: "Keine archivierten Einträge."
+        archived: "Keine archivierten Einträge.",
       },
       markRead: "Als gelesen markieren",
       dismiss: "Schließen",
       view: "Ansehen",
-      openOnWeb: "Öffne diese Benachrichtigung in der Web-App, um eine Aktion durchzuführen."
+      openOnWeb: "Öffne diese Benachrichtigung in der Web-App, um eine Aktion durchzuführen.",
     },
     teacherStudent: {
       brain: "{{name}}s Gehirn",
@@ -273,26 +273,26 @@ const DATA = {
       enrolled: "Eingeschrieben: {{grade}}",
       functioning: "Funktionsniveau: {{grade}}",
       submitInsight: "Einblick einreichen",
-      uploadIEP: "IEP hochladen"
+      uploadIEP: "IEP hochladen",
     },
     teacherInsight: {
       title: "Einblick einreichen",
       subtitle: "Teile eine Beobachtung über das Lernen dieses Schülers",
       yourInsight: "Dein Einblick",
       placeholder: "Beschreibe, was du bei diesem Schüler beobachtet hast...",
-      submitted: "Einblick an den Posteingang der Eltern gesendet"
+      submitted: "Einblick an den Posteingang der Eltern gesendet",
     },
     learnerQuests: {
       title: "Abenteuerwelten",
       subtitle: "Erkunde Lernabenteuern mit deinen Tutoren",
       world: "{{name}}s Welt",
-      chapter: "Kapitel {{current}} von {{total}}"
+      chapter: "Kapitel {{current}} von {{total}}",
     },
     learnerGradebook: {
       title: "Notenbuch",
       subtitle: "Deine Fachbeherrschung",
-      functioningAt: "Funktionsniveau Klasse {{functioning}} (Eingeschrieben: {{enrolled}})"
-    }
+      functioningAt: "Funktionsniveau Klasse {{functioning}} (Eingeschrieben: {{enrolled}})",
+    },
   },
   fr: {
     parentMilestones: {
@@ -306,45 +306,45 @@ const DATA = {
       badges: {
         first_session: {
           name: "Première séance",
-          description: "Terminer la première séance de tutorat"
+          description: "Terminer la première séance de tutorat",
         },
         on_fire: {
           name: "En feu",
-          description: "Série de 7 jours"
+          description: "Série de 7 jours",
         },
         brain_activated: {
           name: "Cerveau activé",
-          description: "Profil cérébral approuvé"
+          description: "Profil cérébral approuvé",
         },
         bookworm: {
           name: "Rat de bibliothèque",
-          description: "10 séances terminées"
+          description: "10 séances terminées",
         },
         mastery_champion: {
           name: "Champion de la maîtrise",
-          description: "N'importe quelle matière au-dessus de 75 %"
+          description: "N'importe quelle matière au-dessus de 75 %",
         },
         goal_getter: {
           name: "Atteigneur d'objectifs",
-          description: "Objectif IEP atteint"
+          description: "Objectif IEP atteint",
         },
         team_player: {
           name: "Joueur d'équipe",
-          description: "Équipe d'apprentissage complète"
+          description: "Équipe d'apprentissage complète",
         },
         multi_subject: {
           name: "Multidisciplinaire",
-          description: "Actif dans 3+ matières"
+          description: "Actif dans 3+ matières",
         },
         speed_learner: {
           name: "Apprenant rapide",
-          description: "Top 25 % en temps de séance"
+          description: "Top 25 % en temps de séance",
         },
         explorer: {
           name: "Explorateur",
-          description: "Toutes les matières explorées"
-        }
-      }
+          description: "Toutes les matières explorées",
+        },
+      },
     },
     parentTeam: {
       title: "Équipe de soins",
@@ -370,7 +370,7 @@ const DATA = {
       credentials: "Qualifications",
       credentialsPlaceholder: "ex. CCC-SLP, M.Ed",
       relationship: "Relation",
-      relationshipPlaceholder: "ex. Co-parent, Grand-parent"
+      relationshipPlaceholder: "ex. Co-parent, Grand-parent",
     },
     therapistClient: {
       overview: "Profil de {{name}}",
@@ -389,7 +389,7 @@ const DATA = {
       reportsSubtitle: "Générer et consulter les rapports de progression thérapeutique",
       noReportsTitle: "Aucun rapport",
       noReportsMessage: "Générez un rapport de progression quand vous êtes prêt.",
-      generateReport: "Générer un rapport"
+      generateReport: "Générer un rapport",
     },
     parentInbox: {
       title: "Boîte de réception",
@@ -397,18 +397,18 @@ const DATA = {
         all: "Tous",
         action: "Action requise",
         celebrations: "Célébrations",
-        archived: "Archives"
+        archived: "Archives",
       },
       empty: {
         all: "Votre boîte de réception est vide. Nous vous préviendrons quand quelque chose nécessitera votre attention.",
         action: "Aucun élément à traiter.",
         celebrations: "Aucune célébration.",
-        archived: "Aucun élément archivé."
+        archived: "Aucun élément archivé.",
       },
       markRead: "Marquer comme lu",
       dismiss: "Ignorer",
       view: "Voir",
-      openOnWeb: "Ouvrez cette notification sur l'application web pour agir."
+      openOnWeb: "Ouvrez cette notification sur l'application web pour agir.",
     },
     teacherStudent: {
       brain: "Le cerveau de {{name}}",
@@ -417,26 +417,26 @@ const DATA = {
       enrolled: "Inscrit : {{grade}}",
       functioning: "Fonctionnement : {{grade}}",
       submitInsight: "Soumettre une observation",
-      uploadIEP: "Téléverser l'IEP"
+      uploadIEP: "Téléverser l'IEP",
     },
     teacherInsight: {
       title: "Soumettre une observation",
       subtitle: "Partagez une observation sur l'apprentissage de cet élève",
       yourInsight: "Votre observation",
       placeholder: "Décrivez ce que vous avez observé chez cet élève...",
-      submitted: "Observation envoyée dans la boîte de réception des parents"
+      submitted: "Observation envoyée dans la boîte de réception des parents",
     },
     learnerQuests: {
       title: "Mondes de quêtes",
       subtitle: "Explorez des aventures d'apprentissage avec vos tuteurs",
       world: "Le monde de {{name}}",
-      chapter: "Chapitre {{current}} sur {{total}}"
+      chapter: "Chapitre {{current}} sur {{total}}",
     },
     learnerGradebook: {
       title: "Carnet de notes",
       subtitle: "Votre maîtrise des matières",
-      functioningAt: "Fonctionnement au niveau {{functioning}} (Inscrit : {{enrolled}})"
-    }
+      functioningAt: "Fonctionnement au niveau {{functioning}} (Inscrit : {{enrolled}})",
+    },
   },
   hi: {
     parentMilestones: {
@@ -450,45 +450,45 @@ const DATA = {
       badges: {
         first_session: {
           name: "पहला सत्र",
-          description: "पहला ट्यूटरिंग सत्र पूरा करें"
+          description: "पहला ट्यूटरिंग सत्र पूरा करें",
         },
         on_fire: {
           name: "जोशीला",
-          description: "7 दिन की स्ट्रीक"
+          description: "7 दिन की स्ट्रीक",
         },
         brain_activated: {
           name: "दिमाग सक्रिय",
-          description: "ब्रेन प्रोफ़ाइल स्वीकृत"
+          description: "ब्रेन प्रोफ़ाइल स्वीकृत",
         },
         bookworm: {
           name: "किताबी कीड़ा",
-          description: "10 सत्र पूरे किए"
+          description: "10 सत्र पूरे किए",
         },
         mastery_champion: {
           name: "महारत चैंपियन",
-          description: "कोई भी विषय 75% से ऊपर"
+          description: "कोई भी विषय 75% से ऊपर",
         },
         goal_getter: {
           name: "लक्ष्य प्राप्तकर्ता",
-          description: "IEP लक्ष्य पूरा हुआ"
+          description: "IEP लक्ष्य पूरा हुआ",
         },
         team_player: {
           name: "टीम खिलाड़ी",
-          description: "पूरी शिक्षण टीम"
+          description: "पूरी शिक्षण टीम",
         },
         multi_subject: {
           name: "बहु-विषयक",
-          description: "3+ विषयों में सक्रिय"
+          description: "3+ विषयों में सक्रिय",
         },
         speed_learner: {
           name: "तेज़ शिक्षार्थी",
-          description: "सत्र समय में शीर्ष 25%"
+          description: "सत्र समय में शीर्ष 25%",
         },
         explorer: {
           name: "अन्वेषक",
-          description: "सभी विषय क्षेत्रों का अन्वेषण"
-        }
-      }
+          description: "सभी विषय क्षेत्रों का अन्वेषण",
+        },
+      },
     },
     parentTeam: {
       title: "देखभाल टीम",
@@ -514,7 +514,7 @@ const DATA = {
       credentials: "योग्यताएं",
       credentialsPlaceholder: "जैसे: CCC-SLP, M.Ed",
       relationship: "संबंध",
-      relationshipPlaceholder: "जैसे: सह-माता-पिता, दादा-दादी"
+      relationshipPlaceholder: "जैसे: सह-माता-पिता, दादा-दादी",
     },
     therapistClient: {
       overview: "{{name}} की प्रोफ़ाइल",
@@ -533,7 +533,7 @@ const DATA = {
       reportsSubtitle: "थेरेपी प्रगति रिपोर्ट तैयार करें और देखें",
       noReportsTitle: "कोई रिपोर्ट नहीं",
       noReportsMessage: "तैयार होने पर प्रगति रिपोर्ट बनाएं।",
-      generateReport: "रिपोर्ट बनाएं"
+      generateReport: "रिपोर्ट बनाएं",
     },
     parentInbox: {
       title: "इनबॉक्स",
@@ -541,18 +541,18 @@ const DATA = {
         all: "सभी",
         action: "कार्रवाई आवश्यक",
         celebrations: "उपलब्धियां",
-        archived: "संग्रहीत"
+        archived: "संग्रहीत",
       },
       empty: {
         all: "आपका इनबॉक्स खाली है। जब कुछ ध्यान देने की ज़रूरत होगी, हम बताएंगे।",
         action: "कोई कार्य आइटम नहीं।",
         celebrations: "कोई उपलब्धि नहीं।",
-        archived: "कोई संग्रहीत आइटम नहीं।"
+        archived: "कोई संग्रहीत आइटम नहीं।",
       },
       markRead: "पढ़ा हुआ चिह्नित करें",
       dismiss: "हटाएं",
       view: "देखें",
-      openOnWeb: "कार्रवाई के लिए इस सूचना को वेब ऐप पर खोलें।"
+      openOnWeb: "कार्रवाई के लिए इस सूचना को वेब ऐप पर खोलें।",
     },
     teacherStudent: {
       brain: "{{name}} का दिमाग",
@@ -561,26 +561,26 @@ const DATA = {
       enrolled: "नामांकित: {{grade}}",
       functioning: "कार्यक्षमता: {{grade}}",
       submitInsight: "अंतर्दृष्टि सबमिट करें",
-      uploadIEP: "IEP अपलोड करें"
+      uploadIEP: "IEP अपलोड करें",
     },
     teacherInsight: {
       title: "अंतर्दृष्टि सबमिट करें",
       subtitle: "इस छात्र के सीखने के बारे में एक टिप्पणी साझा करें",
       yourInsight: "आपकी अंतर्दृष्टि",
       placeholder: "इस छात्र के बारे में जो आपने देखा है उसे बताएं...",
-      submitted: "अंतर्दृष्टि अभिभावक के इनबॉक्स में भेजी गई"
+      submitted: "अंतर्दृष्टि अभिभावक के इनबॉक्स में भेजी गई",
     },
     learnerQuests: {
       title: "क्वेस्ट वर्ल्ड्स",
       subtitle: "अपने ट्यूटर्स के साथ सीखने के साहसिक कार्य खोजें",
       world: "{{name}} की दुनिया",
-      chapter: "अध्याय {{current}} में से {{total}}"
+      chapter: "अध्याय {{current}} में से {{total}}",
     },
     learnerGradebook: {
       title: "ग्रेड बुक",
       subtitle: "आपकी विषय महारत",
-      functioningAt: "कक्षा {{functioning}} पर कार्यरत (नामांकित: {{enrolled}})"
-    }
+      functioningAt: "कक्षा {{functioning}} पर कार्यरत (नामांकित: {{enrolled}})",
+    },
   },
   ja: {
     parentMilestones: {
@@ -594,45 +594,45 @@ const DATA = {
       badges: {
         first_session: {
           name: "初回セッション",
-          description: "最初の個別指導セッションを完了"
+          description: "最初の個別指導セッションを完了",
         },
         on_fire: {
           name: "燃えている",
-          description: "7日連続ストリーク"
+          description: "7日連続ストリーク",
         },
         brain_activated: {
           name: "ブレイン起動",
-          description: "ブレインプロフィール承認済み"
+          description: "ブレインプロフィール承認済み",
         },
         bookworm: {
           name: "本の虫",
-          description: "セッション10回完了"
+          description: "セッション10回完了",
         },
         mastery_champion: {
           name: "マスタリーチャンピオン",
-          description: "いずれかの科目が75%以上"
+          description: "いずれかの科目が75%以上",
         },
         goal_getter: {
           name: "目標達成者",
-          description: "IEP目標達成"
+          description: "IEP目標達成",
         },
         team_player: {
           name: "チームプレイヤー",
-          description: "学習チームが揃った"
+          description: "学習チームが揃った",
         },
         multi_subject: {
           name: "マルチ科目",
-          description: "3科目以上でアクティブ"
+          description: "3科目以上でアクティブ",
         },
         speed_learner: {
           name: "スピードラーナー",
-          description: "セッション時間上位25%"
+          description: "セッション時間上位25%",
         },
         explorer: {
           name: "エクスプローラー",
-          description: "全教科エリア探索済み"
-        }
-      }
+          description: "全教科エリア探索済み",
+        },
+      },
     },
     parentTeam: {
       title: "ケアチーム",
@@ -658,7 +658,7 @@ const DATA = {
       credentials: "資格",
       credentialsPlaceholder: "例：CCC-SLP, M.Ed",
       relationship: "関係",
-      relationshipPlaceholder: "例：共同親権者、祖父母"
+      relationshipPlaceholder: "例：共同親権者、祖父母",
     },
     therapistClient: {
       overview: "{{name}}のプロフィール",
@@ -677,7 +677,7 @@ const DATA = {
       reportsSubtitle: "セラピー進捗レポートの作成と閲覧",
       noReportsTitle: "レポートなし",
       noReportsMessage: "準備ができたら進捗レポートを作成してください。",
-      generateReport: "レポートを作成"
+      generateReport: "レポートを作成",
     },
     parentInbox: {
       title: "受信トレイ",
@@ -685,18 +685,18 @@ const DATA = {
         all: "すべて",
         action: "対応が必要",
         celebrations: "お祝い",
-        archived: "アーカイブ"
+        archived: "アーカイブ",
       },
       empty: {
         all: "受信トレイは空です。対応が必要になればお知らせします。",
         action: "対応項目なし。",
         celebrations: "お祝いなし。",
-        archived: "アーカイブ済み項目なし。"
+        archived: "アーカイブ済み項目なし。",
       },
       markRead: "既読にする",
       dismiss: "閉じる",
       view: "表示",
-      openOnWeb: "アクションを行うには、このお知らせをウェブアプリで開いてください。"
+      openOnWeb: "アクションを行うには、このお知らせをウェブアプリで開いてください。",
     },
     teacherStudent: {
       brain: "{{name}}のブレイン",
@@ -705,26 +705,26 @@ const DATA = {
       enrolled: "在籍：{{grade}}",
       functioning: "機能レベル：{{grade}}",
       submitInsight: "インサイトを送信",
-      uploadIEP: "IEPをアップロード"
+      uploadIEP: "IEPをアップロード",
     },
     teacherInsight: {
       title: "インサイトを送信",
       subtitle: "この生徒の学習に関する観察を共有する",
       yourInsight: "あなたのインサイト",
       placeholder: "この生徒について観察したことを説明してください...",
-      submitted: "インサイトを保護者の受信トレイに送信しました"
+      submitted: "インサイトを保護者の受信トレイに送信しました",
     },
     learnerQuests: {
       title: "クエストワールド",
       subtitle: "チューターと一緒に学習の冒険を探索しよう",
       world: "{{name}}のワールド",
-      chapter: "チャプター{{current}}／{{total}}"
+      chapter: "チャプター{{current}}／{{total}}",
     },
     learnerGradebook: {
       title: "成績帳",
       subtitle: "教科の習熟度",
-      functioningAt: "{{functioning}}年生レベルで機能中（在籍：{{enrolled}}）"
-    }
+      functioningAt: "{{functioning}}年生レベルで機能中（在籍：{{enrolled}}）",
+    },
   },
   ko: {
     parentMilestones: {
@@ -738,45 +738,45 @@ const DATA = {
       badges: {
         first_session: {
           name: "첫 번째 세션",
-          description: "첫 튜터링 세션 완료"
+          description: "첫 튜터링 세션 완료",
         },
         on_fire: {
           name: "불꽃",
-          description: "7일 연속 기록"
+          description: "7일 연속 기록",
         },
         brain_activated: {
           name: "브레인 활성화",
-          description: "브레인 프로필 승인됨"
+          description: "브레인 프로필 승인됨",
         },
         bookworm: {
           name: "독서광",
-          description: "세션 10회 완료"
+          description: "세션 10회 완료",
         },
         mastery_champion: {
           name: "마스터리 챔피언",
-          description: "어느 과목이든 75% 이상"
+          description: "어느 과목이든 75% 이상",
         },
         goal_getter: {
           name: "목표 달성자",
-          description: "IEP 목표 달성"
+          description: "IEP 목표 달성",
         },
         team_player: {
           name: "팀 플레이어",
-          description: "학습 팀 완성"
+          description: "학습 팀 완성",
         },
         multi_subject: {
           name: "다과목",
-          description: "3개 이상 과목에서 활동 중"
+          description: "3개 이상 과목에서 활동 중",
         },
         speed_learner: {
           name: "빠른 학습자",
-          description: "세션 시간 상위 25%"
+          description: "세션 시간 상위 25%",
         },
         explorer: {
           name: "탐험가",
-          description: "모든 교과 영역 탐색 완료"
-        }
-      }
+          description: "모든 교과 영역 탐색 완료",
+        },
+      },
     },
     parentTeam: {
       title: "돌봄 팀",
@@ -802,7 +802,7 @@ const DATA = {
       credentials: "자격증",
       credentialsPlaceholder: "예: CCC-SLP, M.Ed",
       relationship: "관계",
-      relationshipPlaceholder: "예: 공동 부모, 조부모"
+      relationshipPlaceholder: "예: 공동 부모, 조부모",
     },
     therapistClient: {
       overview: "{{name}}의 프로필",
@@ -821,7 +821,7 @@ const DATA = {
       reportsSubtitle: "치료 진행 보고서 생성 및 조회",
       noReportsTitle: "보고서 없음",
       noReportsMessage: "준비가 되면 진행 보고서를 생성하세요.",
-      generateReport: "보고서 생성"
+      generateReport: "보고서 생성",
     },
     parentInbox: {
       title: "받은 편지함",
@@ -829,18 +829,18 @@ const DATA = {
         all: "전체",
         action: "조치 필요",
         celebrations: "축하",
-        archived: "보관함"
+        archived: "보관함",
       },
       empty: {
         all: "받은 편지함이 비어 있습니다. 주의가 필요할 때 알려드리겠습니다.",
         action: "처리할 항목 없음.",
         celebrations: "축하 항목 없음.",
-        archived: "보관된 항목 없음."
+        archived: "보관된 항목 없음.",
       },
       markRead: "읽음 표시",
       dismiss: "닫기",
       view: "보기",
-      openOnWeb: "조치를 취하려면 웹 앱에서 이 알림을 여세요."
+      openOnWeb: "조치를 취하려면 웹 앱에서 이 알림을 여세요.",
     },
     teacherStudent: {
       brain: "{{name}}의 브레인",
@@ -849,26 +849,26 @@ const DATA = {
       enrolled: "등록: {{grade}}",
       functioning: "기능 수준: {{grade}}",
       submitInsight: "인사이트 제출",
-      uploadIEP: "IEP 업로드"
+      uploadIEP: "IEP 업로드",
     },
     teacherInsight: {
       title: "인사이트 제출",
       subtitle: "이 학생의 학습에 대한 관찰을 공유하세요",
       yourInsight: "인사이트",
       placeholder: "이 학생에 대해 관찰한 내용을 설명해 주세요...",
-      submitted: "인사이트가 학부모 받은 편지함으로 전송되었습니다"
+      submitted: "인사이트가 학부모 받은 편지함으로 전송되었습니다",
     },
     learnerQuests: {
       title: "퀘스트 월드",
       subtitle: "튜터와 함께 학습 모험을 탐험하세요",
       world: "{{name}}의 월드",
-      chapter: "챕터 {{current}} / {{total}}"
+      chapter: "챕터 {{current}} / {{total}}",
     },
     learnerGradebook: {
       title: "성적표",
       subtitle: "교과 숙달도",
-      functioningAt: "{{functioning}}학년 수준으로 기능 중 (등록: {{enrolled}})"
-    }
+      functioningAt: "{{functioning}}학년 수준으로 기능 중 (등록: {{enrolled}})",
+    },
   },
   pt: {
     parentMilestones: {
@@ -882,45 +882,45 @@ const DATA = {
       badges: {
         first_session: {
           name: "Primeira sessão",
-          description: "Completar a primeira sessão de tutoria"
+          description: "Completar a primeira sessão de tutoria",
         },
         on_fire: {
           name: "Em chamas",
-          description: "Sequência de 7 dias"
+          description: "Sequência de 7 dias",
         },
         brain_activated: {
           name: "Cérebro ativado",
-          description: "Perfil cerebral aprovado"
+          description: "Perfil cerebral aprovado",
         },
         bookworm: {
           name: "Rato de biblioteca",
-          description: "10 sessões concluídas"
+          description: "10 sessões concluídas",
         },
         mastery_champion: {
           name: "Campeão de domínio",
-          description: "Qualquer matéria acima de 75%"
+          description: "Qualquer matéria acima de 75%",
         },
         goal_getter: {
           name: "Atingidor de metas",
-          description: "Meta IEP alcançada"
+          description: "Meta IEP alcançada",
         },
         team_player: {
           name: "Jogador de equipe",
-          description: "Equipe de aprendizado completa"
+          description: "Equipe de aprendizado completa",
         },
         multi_subject: {
           name: "Multidisciplinar",
-          description: "Ativo em 3+ matérias"
+          description: "Ativo em 3+ matérias",
         },
         speed_learner: {
           name: "Aprendiz rápido",
-          description: "Top 25% no tempo de sessão"
+          description: "Top 25% no tempo de sessão",
         },
         explorer: {
           name: "Explorador",
-          description: "Todas as áreas de matérias exploradas"
-        }
-      }
+          description: "Todas as áreas de matérias exploradas",
+        },
+      },
     },
     parentTeam: {
       title: "Equipe de cuidados",
@@ -946,7 +946,7 @@ const DATA = {
       credentials: "Credenciais",
       credentialsPlaceholder: "ex.: CCC-SLP, M.Ed",
       relationship: "Relacionamento",
-      relationshipPlaceholder: "ex.: Co-responsável, Avô/Avó"
+      relationshipPlaceholder: "ex.: Co-responsável, Avô/Avó",
     },
     therapistClient: {
       overview: "Perfil de {{name}}",
@@ -965,7 +965,7 @@ const DATA = {
       reportsSubtitle: "Gerar e visualizar relatórios de progresso terapêutico",
       noReportsTitle: "Nenhum relatório",
       noReportsMessage: "Gere um relatório de progresso quando estiver pronto.",
-      generateReport: "Gerar relatório"
+      generateReport: "Gerar relatório",
     },
     parentInbox: {
       title: "Caixa de entrada",
@@ -973,18 +973,18 @@ const DATA = {
         all: "Todos",
         action: "Ação necessária",
         celebrations: "Celebrações",
-        archived: "Arquivados"
+        archived: "Arquivados",
       },
       empty: {
         all: "Sua caixa de entrada está vazia. Avisaremos quando algo precisar de atenção.",
         action: "Nenhum item de ação.",
         celebrations: "Nenhuma celebração.",
-        archived: "Nenhum item arquivado."
+        archived: "Nenhum item arquivado.",
       },
       markRead: "Marcar como lido",
       dismiss: "Dispensar",
       view: "Ver",
-      openOnWeb: "Abra esta notificação no aplicativo web para tomar uma ação."
+      openOnWeb: "Abra esta notificação no aplicativo web para tomar uma ação.",
     },
     teacherStudent: {
       brain: "Cérebro de {{name}}",
@@ -993,26 +993,26 @@ const DATA = {
       enrolled: "Matriculado: {{grade}}",
       functioning: "Funcionamento: {{grade}}",
       submitInsight: "Enviar observação",
-      uploadIEP: "Enviar IEP"
+      uploadIEP: "Enviar IEP",
     },
     teacherInsight: {
       title: "Enviar observação",
       subtitle: "Compartilhe uma observação sobre o aprendizado deste aluno",
       yourInsight: "Sua observação",
       placeholder: "Descreva o que você observou sobre este aluno...",
-      submitted: "Observação enviada para a caixa de entrada dos pais"
+      submitted: "Observação enviada para a caixa de entrada dos pais",
     },
     learnerQuests: {
       title: "Mundos de missões",
       subtitle: "Explore aventuras de aprendizado com seus tutores",
       world: "O mundo de {{name}}",
-      chapter: "Capítulo {{current}} de {{total}}"
+      chapter: "Capítulo {{current}} de {{total}}",
     },
     learnerGradebook: {
       title: "Boletim",
       subtitle: "Seu domínio por matéria",
-      functioningAt: "Funcionando no nível {{functioning}} (Matriculado: {{enrolled}})"
-    }
+      functioningAt: "Funcionando no nível {{functioning}} (Matriculado: {{enrolled}})",
+    },
   },
   zh: {
     parentMilestones: {
@@ -1026,45 +1026,45 @@ const DATA = {
       badges: {
         first_session: {
           name: "首次会话",
-          description: "完成第一次辅导课程"
+          description: "完成第一次辅导课程",
         },
         on_fire: {
           name: "燃烧状态",
-          description: "连续7天记录"
+          description: "连续7天记录",
         },
         brain_activated: {
           name: "大脑激活",
-          description: "脑力档案已审批"
+          description: "脑力档案已审批",
         },
         bookworm: {
           name: "书虫",
-          description: "完成10次会话"
+          description: "完成10次会话",
         },
         mastery_champion: {
           name: "掌握冠军",
-          description: "任何科目超过75%"
+          description: "任何科目超过75%",
         },
         goal_getter: {
           name: "目标达成者",
-          description: "IEP目标已实现"
+          description: "IEP目标已实现",
         },
         team_player: {
           name: "团队合作者",
-          description: "完整学习团队"
+          description: "完整学习团队",
         },
         multi_subject: {
           name: "多科目",
-          description: "活跃于3个以上科目"
+          description: "活跃于3个以上科目",
         },
         speed_learner: {
           name: "快速学习者",
-          description: "会话时间前25%"
+          description: "会话时间前25%",
         },
         explorer: {
           name: "探索者",
-          description: "探索了所有学科领域"
-        }
-      }
+          description: "探索了所有学科领域",
+        },
+      },
     },
     parentTeam: {
       title: "照护团队",
@@ -1090,7 +1090,7 @@ const DATA = {
       credentials: "资质证书",
       credentialsPlaceholder: "例：CCC-SLP, M.Ed",
       relationship: "关系",
-      relationshipPlaceholder: "例：共同监护人、祖父母"
+      relationshipPlaceholder: "例：共同监护人、祖父母",
     },
     therapistClient: {
       overview: "{{name}}的档案",
@@ -1109,7 +1109,7 @@ const DATA = {
       reportsSubtitle: "生成并查看治疗进展报告",
       noReportsTitle: "暂无报告",
       noReportsMessage: "准备好后生成进展报告。",
-      generateReport: "生成报告"
+      generateReport: "生成报告",
     },
     parentInbox: {
       title: "收件箱",
@@ -1117,18 +1117,18 @@ const DATA = {
         all: "全部",
         action: "需要处理",
         celebrations: "庆祝",
-        archived: "已归档"
+        archived: "已归档",
       },
       empty: {
         all: "收件箱为空。当有需要关注的事项时，我们会通知您。",
         action: "没有待处理项目。",
         celebrations: "没有庆祝项目。",
-        archived: "没有已归档项目。"
+        archived: "没有已归档项目。",
       },
       markRead: "标记为已读",
       dismiss: "忽略",
       view: "查看",
-      openOnWeb: "请在网页应用中打开此通知以采取行动。"
+      openOnWeb: "请在网页应用中打开此通知以采取行动。",
     },
     teacherStudent: {
       brain: "{{name}}的大脑",
@@ -1137,34 +1137,40 @@ const DATA = {
       enrolled: "就读：{{grade}}",
       functioning: "能力水平：{{grade}}",
       submitInsight: "提交观察",
-      uploadIEP: "上传IEP"
+      uploadIEP: "上传IEP",
     },
     teacherInsight: {
       title: "提交观察",
       subtitle: "分享对该学生学习情况的观察",
       yourInsight: "您的观察",
       placeholder: "描述您对该学生的观察...",
-      submitted: "观察已发送至家长收件箱"
+      submitted: "观察已发送至家长收件箱",
     },
     learnerQuests: {
       title: "任务世界",
       subtitle: "与导师一起探索学习冒险",
       world: "{{name}}的世界",
-      chapter: "第{{current}}章，共{{total}}章"
+      chapter: "第{{current}}章，共{{total}}章",
     },
     learnerGradebook: {
       title: "成绩册",
       subtitle: "您的科目掌握情况",
-      functioningAt: "在{{functioning}}年级水平运作（就读：{{enrolled}}）"
-    }
+      functioningAt: "在{{functioning}}年级水平运作（就读：{{enrolled}}）",
+    },
   },
 };
 
-function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
-  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
-  else t[k]=v;}return t;}
+function deepMerge(t, s) {
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if (!t[k] || typeof t[k] !== "object") t[k] = {};
+      deepMerge(t[k], v);
+    } else t[k] = v;
+  }
+  return t;
+}
 
-let n=0;
+let n = 0;
 for (const [locale, roots] of Object.entries(DATA)) {
   const file = join(dir, `${locale}.json`);
   const json = JSON.parse(readFileSync(file, "utf8"));

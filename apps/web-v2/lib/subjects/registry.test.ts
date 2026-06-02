@@ -71,10 +71,7 @@ describe("LEARNER_SUBJECTS registry", () => {
   describe("productionReady contract", () => {
     it("every subject declares a productionReady boolean", () => {
       for (const subject of LEARNER_SUBJECTS) {
-        expect(
-          typeof subject.productionReady,
-          `subject ${subject.slug}`,
-        ).toBe("boolean");
+        expect(typeof subject.productionReady, `subject ${subject.slug}`).toBe("boolean");
       }
     });
 

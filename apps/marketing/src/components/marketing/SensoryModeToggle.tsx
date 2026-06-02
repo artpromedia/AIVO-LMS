@@ -69,9 +69,7 @@ export function SensoryModeToggle({
               onClick={() => selectMode(m)}
               aria-pressed={active}
               className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-colors min-h-[28px] whitespace-nowrap ${
-                active
-                  ? "bg-white shadow-sm text-slate-900"
-                  : "text-slate-500 hover:text-slate-800"
+                active ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               {LABELS[m]}

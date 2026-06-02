@@ -3,8 +3,8 @@
 ADR 0020 Phase 4 slice 4.4 requires this directory to hold the marketing
 screenshots used by the App Store Connect and Play Console listings.
 The release manager populates the per-resolution folders below from
-the canonical Figma frames; the file names here pin the *role
-coverage*, not the visual treatment.
+the canonical Figma frames; the file names here pin the _role
+coverage_, not the visual treatment.
 
 Required coverage per resolution (iOS 6.7" / 6.5" / 5.5", Android
 phone / tablet) — one screenshot per row, in this order so the store

@@ -56,9 +56,7 @@ export default async function TherapistReportsPage() {
   const t = await getTranslations("therapist.reports");
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
-  const maybeLearners = await Promise.all(
-    learnerIds.map((id) => getLearner(id, session.tenantId)),
-  );
+  const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
 
   const skillNameById = new Map((await listSkills()).map((s) => [s.id, s.name]));
@@ -67,10 +65,7 @@ export default async function TherapistReportsPage() {
     learners.map(async (l) => {
       const { skillMasteries } = await getMasteryMap(l.id, session.tenantId);
       const tracked = skillMasteries.length;
-      const avg =
-        tracked > 0
-          ? skillMasteries.reduce((sum, m) => sum + m.score, 0) / tracked
-          : 0;
+      const avg = tracked > 0 ? skillMasteries.reduce((sum, m) => sum + m.score, 0) / tracked : 0;
       const focus = skillMasteries.slice().sort((a, b) => a.score - b.score)[0] ?? null;
       return {
         learner: l,

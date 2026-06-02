@@ -7,29 +7,29 @@
 
 **Legend**: A = authored (SME-signed-off production content), S = scaffold (AI-draft or pre-review), — = missing (declared but no content), · = not in catalog scope for this tutor.
 
-| Tutor | PRE_K | K | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | ADULT |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| atlas | · | A | A | A | S | S | S | S | S | S | S | S | S | S | · |
-| cadence | S | A | A | A | S | S | S | S | S | S | · | · | · | · | · |
-| chrono | · | · | · | · | S | S | S | S | S | S | S | S | S | S | · |
-| compass | · | · | · | · | · | · | · | A | A | A | S | S | S | S | S |
-| echo | A | A | A | A | S | S | S | S | S | S | · | · | · | · | · |
-| forge | · | · | · | · | A | A | A | S | S | S | S | S | S | S | · |
-| harmony | S | A | A | A | S | S | S | S | S | S | S | S | S | S | · |
-| lingua | · | · | · | · | · | · | · | A | S | S | S | S | S | S | · |
-| muse | · | A | A | A | S | S | S | S | S | S | S | S | S | S | · |
-| nova | S | A | A | A | A | A | A | A | A | A | S | S | S | S | · |
-| pixel | · | A | A | A | S | S | S | S | S | S | S | S | S | S | · |
-| sage | S | A | A | A | A | A | A | A | A | A | S | S | S | S | · |
-| spark | · | A | A | A | A | A | A | A | A | A | S | S | S | S | · |
-| vigor | S | A | A | A | S | S | S | S | S | S | S | S | S | S | · |
+| Tutor   | PRE_K | K   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | 9   | 10  | 11  | 12  | ADULT |
+| ------- | ----- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ----- |
+| atlas   | ·     | A   | A   | A   | S   | S   | S   | S   | S   | S   | S   | S   | S   | S   | ·     |
+| cadence | S     | A   | A   | A   | S   | S   | S   | S   | S   | S   | ·   | ·   | ·   | ·   | ·     |
+| chrono  | ·     | ·   | ·   | ·   | S   | S   | S   | S   | S   | S   | S   | S   | S   | S   | ·     |
+| compass | ·     | ·   | ·   | ·   | ·   | ·   | ·   | A   | A   | A   | S   | S   | S   | S   | S     |
+| echo    | A     | A   | A   | A   | S   | S   | S   | S   | S   | S   | ·   | ·   | ·   | ·   | ·     |
+| forge   | ·     | ·   | ·   | ·   | A   | A   | A   | S   | S   | S   | S   | S   | S   | S   | ·     |
+| harmony | S     | A   | A   | A   | S   | S   | S   | S   | S   | S   | S   | S   | S   | S   | ·     |
+| lingua  | ·     | ·   | ·   | ·   | ·   | ·   | ·   | A   | S   | S   | S   | S   | S   | S   | ·     |
+| muse    | ·     | A   | A   | A   | S   | S   | S   | S   | S   | S   | S   | S   | S   | S   | ·     |
+| nova    | S     | A   | A   | A   | A   | A   | A   | A   | A   | A   | S   | S   | S   | S   | ·     |
+| pixel   | ·     | A   | A   | A   | S   | S   | S   | S   | S   | S   | S   | S   | S   | S   | ·     |
+| sage    | S     | A   | A   | A   | A   | A   | A   | A   | A   | A   | S   | S   | S   | S   | ·     |
+| spark   | ·     | A   | A   | A   | A   | A   | A   | A   | A   | A   | S   | S   | S   | S   | ·     |
+| vigor   | S     | A   | A   | A   | S   | S   | S   | S   | S   | S   | S   | S   | S   | S   | ·     |
 
 ## Aggregate
 
-| Status | Count |
-| --- | ---: |
-| authored | 56 |
-| scaffold | 107 |
-| missing | 0 |
+| Status   | Count |
+| -------- | ----: |
+| authored |    56 |
+| scaffold |   107 |
+| missing  |     0 |
 
 See `docs/quality/tutor-k12-coverage-gap-plan.md` for the rollout plan and `docs/quality/tutor-content-signoffs.json` for the SME sign-off ledger.

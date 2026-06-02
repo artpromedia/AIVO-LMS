@@ -1,7 +1,10 @@
 export type AivoAgeMode = "sprout" | "spark" | "scholar";
 export type AivoTheme = "light" | "dark" | "high-contrast";
 
-export const AIVO_AGE_MODES: Record<AivoAgeMode, { minTouchTarget: number; fontScale: number; radiusScale: number; motionScale: number }> = {
+export const AIVO_AGE_MODES: Record<
+  AivoAgeMode,
+  { minTouchTarget: number; fontScale: number; radiusScale: number; motionScale: number }
+> = {
   sprout: { minTouchTarget: 56, fontScale: 1.08, radiusScale: 1.2, motionScale: 1.1 },
   spark: { minTouchTarget: 56, fontScale: 1, radiusScale: 1, motionScale: 1 },
   scholar: { minTouchTarget: 48, fontScale: 0.95, radiusScale: 0.85, motionScale: 0.85 },

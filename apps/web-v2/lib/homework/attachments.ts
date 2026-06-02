@@ -27,8 +27,7 @@ export type ParseHomeworkAttachmentResult =
 
 function isAllowedMime(value: unknown): value is HomeworkAttachment["mimeType"] {
   return (
-    typeof value === "string" &&
-    (ALLOWED_HOMEWORK_MIME_TYPES as readonly string[]).includes(value)
+    typeof value === "string" && (ALLOWED_HOMEWORK_MIME_TYPES as readonly string[]).includes(value)
   );
 }
 

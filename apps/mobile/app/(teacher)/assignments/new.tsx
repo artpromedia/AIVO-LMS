@@ -24,10 +24,17 @@ export default function TeacherNewAssignmentScreen() {
 
   const onSubmit = async () => {
     try {
-      await create.mutateAsync({ title: title.trim(), subject: subject.trim(), dueDate: dueDate.trim() || undefined });
+      await create.mutateAsync({
+        title: title.trim(),
+        subject: subject.trim(),
+        dueDate: dueDate.trim() || undefined,
+      });
       router.replace("/(teacher)/assignments" as never);
     } catch {
-      Alert.alert(t("common.error", "Something went wrong"), t("teacherAssignments.createFailed", "Couldn't create the assignment."));
+      Alert.alert(
+        t("common.error", "Something went wrong"),
+        t("teacherAssignments.createFailed", "Couldn't create the assignment."),
+      );
     }
   };
 
@@ -39,7 +46,10 @@ export default function TeacherNewAssignmentScreen() {
         onChangeText={set}
         placeholder={placeholder}
         placeholderTextColor={palette.inkMuted}
-        style={[styles.input, { borderColor: palette.border, color: palette.ink, backgroundColor: palette.bgRaised }]}
+        style={[
+          styles.input,
+          { borderColor: palette.border, color: palette.ink, backgroundColor: palette.bgRaised },
+        ]}
         accessibilityLabel={label}
       />
     </View>
@@ -49,9 +59,19 @@ export default function TeacherNewAssignmentScreen() {
     <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
       <ScreenHeader title={t("teacherAssignments.new", "New assignment")} />
       <Card tone="raised" style={{ gap: spacing.md }}>
-        {field(t("teacherAssignments.titleField", "Title"), title, setTitle, t("teacherAssignments.titlePh", "e.g. Fractions practice"))}
+        {field(
+          t("teacherAssignments.titleField", "Title"),
+          title,
+          setTitle,
+          t("teacherAssignments.titlePh", "e.g. Fractions practice"),
+        )}
         {field(t("teacherAssignments.subject", "Subject"), subject, setSubject, "Math")}
-        {field(t("teacherAssignments.dueField", "Due date (optional)"), dueDate, setDueDate, "2026-02-01")}
+        {field(
+          t("teacherAssignments.dueField", "Due date (optional)"),
+          dueDate,
+          setDueDate,
+          "2026-02-01",
+        )}
         <Button
           title={t("teacherAssignments.create", "Create assignment")}
           onPress={onSubmit}
@@ -67,5 +87,12 @@ export default function TeacherNewAssignmentScreen() {
 
 const styles = StyleSheet.create({
   label: { fontSize: 13, fontFamily: fontFamilies.bodyBold },
-  input: { height: 48, borderWidth: 1.5, borderRadius: radius.lg, paddingHorizontal: spacing.md, fontSize: 16, fontFamily: fontFamilies.bodyRegular },
+  input: {
+    height: 48,
+    borderWidth: 1.5,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md,
+    fontSize: 16,
+    fontFamily: fontFamilies.bodyRegular,
+  },
 });

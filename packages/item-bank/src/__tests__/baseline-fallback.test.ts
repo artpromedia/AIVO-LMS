@@ -29,14 +29,11 @@ describe("baseline fallback bank — coverage", () => {
     }
   });
 
-  it.each(BASELINE_FALLBACK_SUBJECTS)(
-    "%s has ≥ 14 fallback-usable items",
-    (subject) => {
-      const items = BASELINE_FALLBACK_BANK[subject];
-      const usable = items.filter((it) => itemToBaselineQuestion(it, subject) !== null);
-      expect(usable.length).toBeGreaterThanOrEqual(14);
-    },
-  );
+  it.each(BASELINE_FALLBACK_SUBJECTS)("%s has ≥ 14 fallback-usable items", (subject) => {
+    const items = BASELINE_FALLBACK_BANK[subject];
+    const usable = items.filter((it) => itemToBaselineQuestion(it, subject) !== null);
+    expect(usable.length).toBeGreaterThanOrEqual(14);
+  });
 
   it("every variant in every fallback bank validates", () => {
     for (const subject of BASELINE_FALLBACK_SUBJECTS) {
@@ -76,9 +73,7 @@ describe("itemToBaselineQuestion", () => {
     expect(q!.questionText.length).toBeGreaterThan(0);
     expect(q!.options.length).toBeGreaterThanOrEqual(2);
     expect(q!.options.map((o) => o.value)).toEqual(
-      Array.from({ length: q!.options.length }, (_, i) =>
-        ["a", "b", "c", "d", "e", "f"][i],
-      ),
+      Array.from({ length: q!.options.length }, (_, i) => ["a", "b", "c", "d", "e", "f"][i]),
     );
     expect(q!.options.find((o) => o.value === q!.correctAnswer)).toBeDefined();
     expect(q!.skillId).toBe(item.skillId);
@@ -91,17 +86,19 @@ describe("itemToBaselineQuestion", () => {
     const bad = {
       id: "bad.no-choices.text",
       skillId: "test.K.x.1",
-      variants: [{
-        id: "bad.no-choices.text@1.0.0",
-        itemId: "bad.no-choices.text",
-        version: "1.0.0" as const,
-        status: "active" as const,
-        cohortWeight: 1,
-        publishedAt: "2026-05-25T00:00:00Z",
-        body: { stem: "What shape has 3 sides?", correctAnswer: "triangle" },
-        defectCount: 0,
-        surfaceType: "math_expression" as const,
-      }],
+      variants: [
+        {
+          id: "bad.no-choices.text@1.0.0",
+          itemId: "bad.no-choices.text",
+          version: "1.0.0" as const,
+          status: "active" as const,
+          cohortWeight: 1,
+          publishedAt: "2026-05-25T00:00:00Z",
+          body: { stem: "What shape has 3 sides?", correctAnswer: "triangle" },
+          defectCount: 0,
+          surfaceType: "math_expression" as const,
+        },
+      ],
     };
     expect(itemToBaselineQuestion(bad, "math")).toBeNull();
   });
@@ -110,17 +107,19 @@ describe("itemToBaselineQuestion", () => {
     const numeric = {
       id: "numeric.fallback.example",
       skillId: "test.K.x.1",
-      variants: [{
-        id: "numeric.fallback.example@1.0.0",
-        itemId: "numeric.fallback.example",
-        version: "1.0.0" as const,
-        status: "active" as const,
-        cohortWeight: 1,
-        publishedAt: "2026-05-25T00:00:00Z",
-        body: { stem: "8 + 5 = ?", correctAnswer: "13" },
-        defectCount: 0,
-        surfaceType: "math_expression" as const,
-      }],
+      variants: [
+        {
+          id: "numeric.fallback.example@1.0.0",
+          itemId: "numeric.fallback.example",
+          version: "1.0.0" as const,
+          status: "active" as const,
+          cohortWeight: 1,
+          publishedAt: "2026-05-25T00:00:00Z",
+          body: { stem: "8 + 5 = ?", correctAnswer: "13" },
+          defectCount: 0,
+          surfaceType: "math_expression" as const,
+        },
+      ],
     };
     const q = itemToBaselineQuestion(numeric, "math");
     expect(q).not.toBeNull();
@@ -133,17 +132,19 @@ describe("itemToBaselineQuestion", () => {
     const bad = {
       id: "bad.mismatch",
       skillId: "test.K.x.1",
-      variants: [{
-        id: "bad.mismatch@1.0.0",
-        itemId: "bad.mismatch",
-        version: "1.0.0" as const,
-        status: "active" as const,
-        cohortWeight: 1,
-        publishedAt: "2026-05-25T00:00:00Z",
-        body: { stem: "Pick one", choices: ["A", "B"], correctAnswer: "Z" },
-        defectCount: 0,
-        surfaceType: "choice_grid" as const,
-      }],
+      variants: [
+        {
+          id: "bad.mismatch@1.0.0",
+          itemId: "bad.mismatch",
+          version: "1.0.0" as const,
+          status: "active" as const,
+          cohortWeight: 1,
+          publishedAt: "2026-05-25T00:00:00Z",
+          body: { stem: "Pick one", choices: ["A", "B"], correctAnswer: "Z" },
+          defectCount: 0,
+          surfaceType: "choice_grid" as const,
+        },
+      ],
     };
     expect(itemToBaselineQuestion(bad, "math")).toBeNull();
   });

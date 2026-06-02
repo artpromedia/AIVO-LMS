@@ -208,7 +208,9 @@ function uniqueDeltas(seed: number, count: number, step: number): number[] {
   const out = new Set<number>();
   let s = seed | 0 || 1;
   while (out.size < count) {
-    s ^= s << 13; s ^= s >>> 17; s ^= s << 5;
+    s ^= s << 13;
+    s ^= s >>> 17;
+    s ^= s << 5;
     const sign = s & 1 ? 1 : -1;
     const magnitude = Math.max(1, Math.floor((Math.abs(s) % 5) + 1)) * step;
     const candidate = sign * magnitude;
@@ -228,7 +230,9 @@ function shuffleDeterministic<T>(arr: readonly T[], seed: number): T[] {
   const out = [...arr];
   let s = seed | 0 || 1;
   for (let i = out.length - 1; i > 0; i -= 1) {
-    s ^= s << 13; s ^= s >>> 17; s ^= s << 5;
+    s ^= s << 13;
+    s ^= s >>> 17;
+    s ^= s << 5;
     const j = Math.abs(s) % (i + 1);
     [out[i], out[j]] = [out[j], out[i]];
   }

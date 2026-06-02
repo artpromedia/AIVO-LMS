@@ -344,8 +344,7 @@ const DATA = {
         one_moment: "请稍候 — 正在加载最新版本…",
         something_went_wrong: "出了点问题",
         lets_try_again: "让我们再试一次。",
-        unexpected_error:
-          "遇到了意外错误。您可以立即重试，或返回主页稍后再来。",
+        unexpected_error: "遇到了意外错误。您可以立即重试，或返回主页稍后再来。",
         try_again: "重试",
         back_to_home: "返回主页",
       },
@@ -670,6 +669,8 @@ for (const [locale, roots] of Object.entries(DATA)) {
 
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-R_C2-i18n: merged root/settings_accessibility/district_login → messages/${locale}.json`);
+  console.log(
+    `seed-R_C2-i18n: merged root/settings_accessibility/district_login → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-R_C2-i18n: done — ${written} locale catalogs updated.`);

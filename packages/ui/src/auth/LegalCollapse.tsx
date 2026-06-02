@@ -22,12 +22,7 @@ export interface LegalCollapseProps {
   className?: string;
 }
 
-export function LegalCollapse({
-  summary,
-  children,
-  defaultOpen,
-  className,
-}: LegalCollapseProps) {
+export function LegalCollapse({ summary, children, defaultOpen, className }: LegalCollapseProps) {
   return (
     <details
       className={cn(
@@ -59,9 +54,7 @@ export function LegalCollapse({
           Hide
         </span>
       </summary>
-      <div className="px-4 pb-4 pt-1 text-xs leading-relaxed text-iw-text-muted">
-        {children}
-      </div>
+      <div className="px-4 pb-4 pt-1 text-xs leading-relaxed text-iw-text-muted">{children}</div>
     </details>
   );
 }

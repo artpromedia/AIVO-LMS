@@ -32,11 +32,7 @@ import React, {
   useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  INCLUSIVE_WARM_BY_MODE,
-  resolveSensoryMode,
-  type SensoryMode,
-} from "@aivo/brand";
+import { INCLUSIVE_WARM_BY_MODE, resolveSensoryMode, type SensoryMode } from "@aivo/brand";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 
@@ -64,14 +60,9 @@ const defaultValue: SensoryModeContextValue = {
   isHydrated: false,
 };
 
-const SensoryModeContext =
-  createContext<SensoryModeContextValue>(defaultValue);
+const SensoryModeContext = createContext<SensoryModeContextValue>(defaultValue);
 
-const MODE_ORDER: readonly SensoryMode[] = [
-  "standard",
-  "calm",
-  "high-contrast",
-] as const;
+const MODE_ORDER: readonly SensoryMode[] = ["standard", "calm", "high-contrast"] as const;
 
 interface ProviderProps {
   children: React.ReactNode;
@@ -128,12 +119,9 @@ export function SensoryModeProvider({ children, learnerId }: ProviderProps) {
           { method: "GET" },
         );
         if (!res.ok) return;
-        const data = (await res.json()) as
-          | { profile: null }
-          | { mode?: string | null };
+        const data = (await res.json()) as { profile: null } | { mode?: string | null };
         if (cancelled) return;
-        const remote =
-          "mode" in data && data.mode ? resolveSensoryMode(data.mode) : null;
+        const remote = "mode" in data && data.mode ? resolveSensoryMode(data.mode) : null;
         if (remote) {
           setModeState(remote);
           await AsyncStorage.setItem(STORAGE_KEY, remote).catch(() => {});
@@ -201,11 +189,7 @@ export function SensoryModeProvider({ children, learnerId }: ProviderProps) {
     };
   }, [mode, setMode, cycleMode, isHydrated]);
 
-  return (
-    <SensoryModeContext.Provider value={value}>
-      {children}
-    </SensoryModeContext.Provider>
-  );
+  return <SensoryModeContext.Provider value={value}>{children}</SensoryModeContext.Provider>;
 }
 
 /** Full sensory-mode context. */

@@ -155,19 +155,12 @@ export function BrainBuildingClient({
   }
 
   return (
-    <div
-      className="bc-watch-root"
-      style={{ "--bc-primary": primaryHue } as React.CSSProperties}
-    >
+    <div className="bc-watch-root" style={{ "--bc-primary": primaryHue } as React.CSSProperties}>
       <header className="bc-watch-header">
         <p className="bc-watch-eyebrow">For {learnerName}</p>
         <h1 className="bc-watch-title">{title}</h1>
         <p className="bc-watch-description">{description}</p>
-        <button
-          type="button"
-          onClick={() => setShowClone(true)}
-          className="bc-watch-replay-btn"
-        >
+        <button type="button" onClick={() => setShowClone(true)} className="bc-watch-replay-btn">
           {replayCloneLabel}
         </button>
       </header>
@@ -241,10 +234,7 @@ export function BrainBuildingClient({
                 </button>
               </form>
             </div>
-            <Link
-              href={`/parent/learners/${learnerId}`}
-              className="bc-watch-back-link"
-            >
+            <Link href={`/parent/learners/${learnerId}`} className="bc-watch-back-link">
               {backLabel}
             </Link>
           </>

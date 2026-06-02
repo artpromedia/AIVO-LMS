@@ -177,8 +177,7 @@ export const ENTERPRISE_FLAG_META: Record<EnterpriseFlagKey, FlagMeta> = {
     key: "sisSync",
     envVar: ENTERPRISE_FLAG_ENV_VARS.sisSync,
     label: "SIS sync",
-    description:
-      "Two-way roster sync with Clever / Classlink. When off, rostering is CSV-only.",
+    description: "Two-way roster sync with Clever / Classlink. When off, rostering is CSV-only.",
     surface: "integrations",
     riskBand: "high",
     defaultValue: false,
@@ -196,8 +195,7 @@ export const ENTERPRISE_FLAG_META: Record<EnterpriseFlagKey, FlagMeta> = {
     key: "dataGovernanceCenter",
     envVar: ENTERPRISE_FLAG_ENV_VARS.dataGovernanceCenter,
     label: "Data governance center",
-    description:
-      "DSAR / retention / data-inventory tooling under /admin/platform/compliance.",
+    description: "DSAR / retention / data-inventory tooling under /admin/platform/compliance.",
     surface: "enterprise",
     riskBand: "low",
     defaultValue: false,

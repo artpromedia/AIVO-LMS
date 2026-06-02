@@ -56,9 +56,7 @@ describe("<RoleGate>", () => {
     const switchCta = screen.getByTestId("role-gate-switch");
     expect(switchCta.textContent).toContain("schoolAdmin");
     const link = switchCta.querySelector("a")!;
-    expect(link.getAttribute("href")).toBe(
-      "/role-switch?to=schoolAdmin&next=%2Fadmin%2Fschool",
-    );
+    expect(link.getAttribute("href")).toBe("/role-switch?to=schoolAdmin&next=%2Fadmin%2Fschool");
   });
 
   it("renders locked fallback with the matrix lock reason", () => {

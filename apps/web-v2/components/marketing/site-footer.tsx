@@ -95,9 +95,7 @@ export function SiteFooter() {
             </p>
             <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-iw-border bg-iw-accent-soft px-4 py-2 text-iw-primary">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-              <span className="whitespace-nowrap text-sm font-semibold">
-                COPPA · FERPA · SOC 2
-              </span>
+              <span className="whitespace-nowrap text-sm font-semibold">COPPA · FERPA · SOC 2</span>
             </div>
           </div>
 

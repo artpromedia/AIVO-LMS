@@ -92,10 +92,7 @@ export function writeIdempotencyCache(
  * (Next.js normalises to lower, but tests may pass either).
  */
 export function readIdempotencyKey(req: Request): string | null {
-  const raw =
-    req.headers.get("idempotency-key") ??
-    req.headers.get("Idempotency-Key") ??
-    null;
+  const raw = req.headers.get("idempotency-key") ?? req.headers.get("Idempotency-Key") ?? null;
   if (!raw) return null;
   const trimmed = raw.trim();
   if (trimmed.length < 8 || trimmed.length > 128) return null;

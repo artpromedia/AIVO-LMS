@@ -4,15 +4,7 @@ export const defaultLocale: Locale = "en";
 
 // Sprint 8 — RTL helpers, mirrored from apps/web-v2/lib/i18n/config.ts
 // so marketing's <html dir> stays in sync.
-export const RTL_LOCALES: ReadonlySet<string> = new Set([
-  "ar",
-  "he",
-  "fa",
-  "ur",
-  "ps",
-  "sd",
-  "yi",
-]);
+export const RTL_LOCALES: ReadonlySet<string> = new Set(["ar", "he", "fa", "ur", "ps", "sd", "yi"]);
 
 export type Direction = "rtl" | "ltr";
 
@@ -59,9 +51,7 @@ const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 function readLocaleCookie(): Locale | null {
   if (typeof document === "undefined") return null;
   try {
-    const match = document.cookie
-      .split("; ")
-      .find((c) => c.startsWith(`${LOCALE_COOKIE_NAME}=`));
+    const match = document.cookie.split("; ").find((c) => c.startsWith(`${LOCALE_COOKIE_NAME}=`));
     if (!match) return null;
     const value = decodeURIComponent(match.split("=")[1] ?? "");
     if (value && isValidLocale(value)) return value;

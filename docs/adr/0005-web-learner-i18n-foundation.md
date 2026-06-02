@@ -16,7 +16,7 @@ and `accept-invite-form`). The learner UI was effectively English-only
 regardless of the locale a parent picked.
 
 A full extraction of all 254 web .tsx files is multi-sprint work. The
-gap the platform team has to close first is the *foundation*: the
+gap the platform team has to close first is the _foundation_: the
 audit must see the web catalog, a parity test must prevent silent key
 drift, and a couple of high-traffic pages must demonstrate the
 pattern so the curriculum-content team can copy it.

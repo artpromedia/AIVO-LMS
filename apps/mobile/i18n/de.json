@@ -739,7 +739,9 @@
     "subtitle": "Teile eine Beobachtung über das Lernen dieses Schülers",
     "yourInsight": "Dein Einblick",
     "placeholder": "Beschreibe, was du bei diesem Schüler beobachtet hast...",
-    "submitted": "Einblick an den Posteingang der Eltern gesendet"
+    "submitted": "Einblick an den Posteingang der Eltern gesendet",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "IEP hochladen",
@@ -810,7 +812,9 @@
     "prompt": "Wie hat das Kind heute abgeschnitten?",
     "placeholder": "Teile deine Beobachtung…",
     "submitBtn": "Beobachtung einreichen",
-    "submitted": "Beobachtung in Gehirnerkenntnissen gespeichert"
+    "submitted": "Beobachtung in Gehirnerkenntnissen gespeichert",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "Fortschritt",
@@ -846,7 +850,11 @@
     "reportsSubtitle": "Therapiefortschrittsberichte erstellen und ansehen",
     "noReportsTitle": "Keine Berichte",
     "noReportsMessage": "Erstelle einen Fortschrittsbericht, wenn du bereit bist.",
-    "generateReport": "Bericht erstellen"
+    "generateReport": "Bericht erstellen",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected."
   },
   "therapistSessions": {
     "title": "Sitzungsprotokolle",

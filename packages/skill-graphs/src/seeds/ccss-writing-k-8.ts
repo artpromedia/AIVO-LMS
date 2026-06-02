@@ -54,8 +54,7 @@ export const ccssWritingK8: SkillGraph = {
     {
       id: "ccss-writing.1.W.2",
       title: "Informational writing: name a topic",
-      description:
-        "I can write to share facts about a topic and close with one sentence about it.",
+      description: "I can write to share facts about a topic and close with one sentence about it.",
       subject: "writing" as unknown as "ela",
       gradeBand: "1",
       frameworkRefs: [{ framework: "CCSS-ELA", code: "1.W.2" }],
@@ -118,8 +117,7 @@ export const ccssWritingK8: SkillGraph = {
     {
       id: "ccss-writing.4.W.5",
       title: "Plan, revise, and edit",
-      description:
-        "I can plan my writing, revise it based on feedback, and edit it for clarity.",
+      description: "I can plan my writing, revise it based on feedback, and edit it for clarity.",
       subject: "writing" as unknown as "ela",
       gradeBand: "4",
       frameworkRefs: [{ framework: "CCSS-ELA", code: "4.W.5" }],

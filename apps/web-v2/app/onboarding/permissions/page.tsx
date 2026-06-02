@@ -1,13 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import {
-  AuthShell,
-  AuthCard,
-  ReassuranceCard,
-  ConsentRow,
-  StepperHeader,
-} from "@aivo/ui/auth";
+import { AuthShell, AuthCard, ReassuranceCard, ConsentRow, StepperHeader } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { useTranslations } from "next-intl";
 
@@ -29,21 +23,14 @@ export default function DevicePermissionsPage() {
   return (
     <AuthShell>
       <div className="flex flex-col gap-5">
-        <StepperHeader
-          steps={STEPS.map((s) => ({ label: ts(s.label) }))}
-          current={3}
-        />
+        <StepperHeader steps={STEPS.map((s) => ({ label: ts(s.label) }))} current={3} />
         <AuthCard
           icon={<AivoIcon name="safetyOk" size={32} />}
           eyebrow={t("eyebrow")}
           title={t("title")}
           subtitle={t("subtitle")}
           reassurance={
-            <ReassuranceCard
-              tone="safety"
-              title={t("reassure_title")}
-              body={t("reassure_body")}
-            />
+            <ReassuranceCard tone="safety" title={t("reassure_title")} body={t("reassure_body")} />
           }
           actions={
             <Link

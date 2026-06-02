@@ -27,7 +27,8 @@ const PARENT = {
     notifications: {
       eyebrow: "Parent",
       title: "Notifications & approvals",
-      description: "Every notification here has a clear action. Approvals link straight into the workflow they unblock.",
+      description:
+        "Every notification here has a clear action. Approvals link straight into the workflow they unblock.",
       unread_label: "Unread",
       unread_zero: "All caught up",
       unread_some: "Tap to read",
@@ -42,18 +43,22 @@ const PARENT = {
       empty_title: "No notifications yet",
       empty_body: "You'll see updates here when activity occurs.",
       reassure_actionable_title: "Every notification is actionable",
-      reassure_actionable_body: "If a notification can't be acted on, we don't send it. Reduces noise.",
+      reassure_actionable_body:
+        "If a notification can't be acted on, we don't send it. Reduces noise.",
       reassure_learners_title: "Learners see less",
-      reassure_learners_body: "Only age-appropriate messages reach your learner — never approvals, billing, or admin items.",
+      reassure_learners_body:
+        "Only age-appropriate messages reach your learner — never approvals, billing, or admin items.",
       reassure_safety_title: "Safety items always urgent",
-      reassure_safety_body: "If anything safety-related ever appears, it goes to the top of this list and pings you immediately.",
+      reassure_safety_body:
+        "If anything safety-related ever appears, it goes to the top of this list and pings you immediately.",
       prefs_title: "Delivery preferences",
       prefs_desc: "Choose which updates reach you on each channel.",
     },
     privacy: {
       eyebrow: "Privacy",
       title: "Privacy & your data",
-      description: "See what AIVO stores, who processes it, and request export or deletion at any time.",
+      description:
+        "See what AIVO stores, who processes it, and request export or deletion at any time.",
       link_consent_label: "Consent center",
       link_consent_desc: "Review and revoke account- and learner-level consents.",
       link_export_label: "Request a data export",
@@ -71,9 +76,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "Privacy",
       title: "Delete data",
-      description: "Request deletion of your account, a specific learner, or just an uploaded IEP. We preserve a small audit trail required for compliance.",
+      description:
+        "Request deletion of your account, a specific learner, or just an uploaded IEP. We preserve a small audit trail required for compliance.",
       warning_strong: "Deletion is permanent.",
-      warning_body: "Once approved, learner progress, lesson history, and IEP files are removed. We keep the minimum legally required audit records (when the request was made, that consent was withdrawn) so the deletion itself can be proven later.",
+      warning_body:
+        "Once approved, learner progress, lesson history, and IEP files are removed. We keep the minimum legally required audit records (when the request was made, that consent was withdrawn) so the deletion itself can be proven later.",
       past_requests: "Past requests",
       no_requests: "No requests yet.",
       th_requested: "Requested",
@@ -85,7 +92,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "Privacy",
       title: "Request a data export",
-      description: "You can request a portable copy of your family's data at any time. We notify you when it is ready to download.",
+      description:
+        "You can request a portable copy of your family's data at any time. We notify you when it is ready to download.",
       past_requests: "Past requests",
       no_requests: "No requests yet.",
       th_requested: "Requested",
@@ -110,9 +118,11 @@ const PARENT = {
       no_active_plan_title: "No active plan",
       no_active_plan_body: "Pick a plan below to get started.",
       reassure_hidden_title: "Billing stays out of learner view",
-      reassure_hidden_body: "Your learner never sees plan, payment, or invoice surfaces. Even when they switch into your account, billing is hidden.",
+      reassure_hidden_body:
+        "Your learner never sees plan, payment, or invoice surfaces. Even when they switch into your account, billing is hidden.",
       reassure_cancel_title: "Cancel any time, no friction",
-      reassure_cancel_body: "Cancellation keeps your learning history intact and you'll keep access until the period ends.",
+      reassure_cancel_body:
+        "Cancellation keeps your learning history intact and you'll keep access until the period ends.",
       choose_plan: "Choose a plan",
       recent_invoices: "Recent invoices",
       no_invoices_title: "No invoices yet",
@@ -124,7 +134,8 @@ const PARENT = {
     notifications: {
       eyebrow: "Madre/Padre",
       title: "Notificaciones y aprobaciones",
-      description: "Cada notificación aquí tiene una acción clara. Las aprobaciones enlazan directamente con el flujo que desbloquean.",
+      description:
+        "Cada notificación aquí tiene una acción clara. Las aprobaciones enlazan directamente con el flujo que desbloquean.",
       unread_label: "Sin leer",
       unread_zero: "Todo al día",
       unread_some: "Toca para leer",
@@ -135,28 +146,34 @@ const PARENT = {
       urgent_zero: "Nada urgente",
       urgent_some: "Revisa por favor",
       inbox_title: "Bandeja de entrada",
-      inbox_desc: "Toca un elemento para marcarlo como leído. Los no leídos muestran un punto suave.",
+      inbox_desc:
+        "Toca un elemento para marcarlo como leído. Los no leídos muestran un punto suave.",
       empty_title: "Aún no hay notificaciones",
       empty_body: "Verás novedades aquí cuando haya actividad.",
       reassure_actionable_title: "Cada notificación es accionable",
-      reassure_actionable_body: "Si no se puede actuar sobre una notificación, no la enviamos. Reduce el ruido.",
+      reassure_actionable_body:
+        "Si no se puede actuar sobre una notificación, no la enviamos. Reduce el ruido.",
       reassure_learners_title: "Los estudiantes ven menos",
-      reassure_learners_body: "Solo los mensajes apropiados para su edad llegan a tu estudiante, nunca aprobaciones, facturación ni elementos de administración.",
+      reassure_learners_body:
+        "Solo los mensajes apropiados para su edad llegan a tu estudiante, nunca aprobaciones, facturación ni elementos de administración.",
       reassure_safety_title: "Los temas de seguridad siempre son urgentes",
-      reassure_safety_body: "Si alguna vez aparece algo relacionado con la seguridad, va al principio de esta lista y te avisa de inmediato.",
+      reassure_safety_body:
+        "Si alguna vez aparece algo relacionado con la seguridad, va al principio de esta lista y te avisa de inmediato.",
       prefs_title: "Preferencias de entrega",
       prefs_desc: "Elige qué novedades te llegan por cada canal.",
     },
     privacy: {
       eyebrow: "Privacidad",
       title: "Privacidad y tus datos",
-      description: "Mira qué almacena AIVO, quién lo procesa y solicita la exportación o eliminación en cualquier momento.",
+      description:
+        "Mira qué almacena AIVO, quién lo procesa y solicita la exportación o eliminación en cualquier momento.",
       link_consent_label: "Centro de consentimiento",
       link_consent_desc: "Revisa y revoca los consentimientos a nivel de cuenta y de estudiante.",
       link_export_label: "Solicitar una exportación de datos",
       link_export_desc: "Descarga una copia de los datos de tu familia.",
       link_delete_label: "Eliminar datos",
-      link_delete_desc: "Solicita la eliminación de una cuenta, un estudiante o solo los archivos IEP.",
+      link_delete_desc:
+        "Solicita la eliminación de una cuenta, un estudiante o solo los archivos IEP.",
       policies_title: "Políticas actuales",
       subprocessors_title: "Subprocesadores",
       subprocessors_desc: "Terceros que AIVO usa para prestar el servicio.",
@@ -168,9 +185,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "Privacidad",
       title: "Eliminar datos",
-      description: "Solicita la eliminación de tu cuenta, de un estudiante concreto o solo de un IEP subido. Conservamos un pequeño registro de auditoría exigido por cumplimiento.",
+      description:
+        "Solicita la eliminación de tu cuenta, de un estudiante concreto o solo de un IEP subido. Conservamos un pequeño registro de auditoría exigido por cumplimiento.",
       warning_strong: "La eliminación es permanente.",
-      warning_body: "Una vez aprobada, se eliminan el progreso del estudiante, el historial de lecciones y los archivos IEP. Conservamos los registros de auditoría mínimos exigidos por ley (cuándo se hizo la solicitud, que se retiró el consentimiento) para poder probar la eliminación más adelante.",
+      warning_body:
+        "Una vez aprobada, se eliminan el progreso del estudiante, el historial de lecciones y los archivos IEP. Conservamos los registros de auditoría mínimos exigidos por ley (cuándo se hizo la solicitud, que se retiró el consentimiento) para poder probar la eliminación más adelante.",
       past_requests: "Solicitudes anteriores",
       no_requests: "Aún no hay solicitudes.",
       th_requested: "Solicitada",
@@ -182,7 +201,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "Privacidad",
       title: "Solicitar una exportación de datos",
-      description: "Puedes solicitar una copia portable de los datos de tu familia en cualquier momento. Te avisamos cuando esté lista para descargar.",
+      description:
+        "Puedes solicitar una copia portable de los datos de tu familia en cualquier momento. Te avisamos cuando esté lista para descargar.",
       past_requests: "Solicitudes anteriores",
       no_requests: "Aún no hay solicitudes.",
       th_requested: "Solicitada",
@@ -207,13 +227,16 @@ const PARENT = {
       no_active_plan_title: "Sin plan activo",
       no_active_plan_body: "Elige un plan abajo para empezar.",
       reassure_hidden_title: "La facturación queda fuera de la vista del estudiante",
-      reassure_hidden_body: "Tu estudiante nunca ve las pantallas de plan, pago o facturas. Incluso cuando cambia a tu cuenta, la facturación está oculta.",
+      reassure_hidden_body:
+        "Tu estudiante nunca ve las pantallas de plan, pago o facturas. Incluso cuando cambia a tu cuenta, la facturación está oculta.",
       reassure_cancel_title: "Cancela cuando quieras, sin fricción",
-      reassure_cancel_body: "La cancelación mantiene intacto tu historial de aprendizaje y conservas el acceso hasta que termine el periodo.",
+      reassure_cancel_body:
+        "La cancelación mantiene intacto tu historial de aprendizaje y conservas el acceso hasta que termine el periodo.",
       choose_plan: "Elige un plan",
       recent_invoices: "Facturas recientes",
       no_invoices_title: "Aún no hay facturas",
-      no_invoices_body: "Las facturas aparecen aquí después de que cierra cada periodo de facturación.",
+      no_invoices_body:
+        "Las facturas aparecen aquí después de que cierra cada periodo de facturación.",
     },
   },
 
@@ -221,7 +244,8 @@ const PARENT = {
     notifications: {
       eyebrow: "Parent",
       title: "Notifications et approbations",
-      description: "Chaque notification ici a une action claire. Les approbations renvoient directement au flux qu'elles débloquent.",
+      description:
+        "Chaque notification ici a une action claire. Les approbations renvoient directement au flux qu'elles débloquent.",
       unread_label: "Non lues",
       unread_zero: "Tout est à jour",
       unread_some: "Touchez pour lire",
@@ -232,28 +256,35 @@ const PARENT = {
       urgent_zero: "Rien d'urgent",
       urgent_some: "À vérifier",
       inbox_title: "Boîte de réception",
-      inbox_desc: "Touchez un élément pour le marquer comme lu. Les non lus affichent un point discret.",
+      inbox_desc:
+        "Touchez un élément pour le marquer comme lu. Les non lus affichent un point discret.",
       empty_title: "Aucune notification pour l'instant",
       empty_body: "Les mises à jour apparaîtront ici en cas d'activité.",
       reassure_actionable_title: "Chaque notification est actionnable",
-      reassure_actionable_body: "Si une notification n'appelle aucune action, nous ne l'envoyons pas. Cela réduit le bruit.",
+      reassure_actionable_body:
+        "Si une notification n'appelle aucune action, nous ne l'envoyons pas. Cela réduit le bruit.",
       reassure_learners_title: "Les apprenants en voient moins",
-      reassure_learners_body: "Seuls les messages adaptés à leur âge parviennent à votre apprenant — jamais les approbations, la facturation ou les éléments d'administration.",
+      reassure_learners_body:
+        "Seuls les messages adaptés à leur âge parviennent à votre apprenant — jamais les approbations, la facturation ou les éléments d'administration.",
       reassure_safety_title: "Les sujets de sécurité sont toujours urgents",
-      reassure_safety_body: "Si quelque chose lié à la sécurité apparaît, cela passe en haut de cette liste et vous alerte immédiatement.",
+      reassure_safety_body:
+        "Si quelque chose lié à la sécurité apparaît, cela passe en haut de cette liste et vous alerte immédiatement.",
       prefs_title: "Préférences de réception",
       prefs_desc: "Choisissez quelles mises à jour vous parviennent sur chaque canal.",
     },
     privacy: {
       eyebrow: "Confidentialité",
       title: "Confidentialité et vos données",
-      description: "Voyez ce qu'AIVO stocke, qui le traite, et demandez l'export ou la suppression à tout moment.",
+      description:
+        "Voyez ce qu'AIVO stocke, qui le traite, et demandez l'export ou la suppression à tout moment.",
       link_consent_label: "Centre de consentement",
-      link_consent_desc: "Consultez et révoquez les consentements au niveau du compte et de l'apprenant.",
+      link_consent_desc:
+        "Consultez et révoquez les consentements au niveau du compte et de l'apprenant.",
       link_export_label: "Demander un export de données",
       link_export_desc: "Téléchargez une copie des données de votre famille.",
       link_delete_label: "Supprimer des données",
-      link_delete_desc: "Demandez la suppression d'un compte, d'un apprenant, ou seulement des fichiers IEP.",
+      link_delete_desc:
+        "Demandez la suppression d'un compte, d'un apprenant, ou seulement des fichiers IEP.",
       policies_title: "Politiques actuelles",
       subprocessors_title: "Sous-traitants",
       subprocessors_desc: "Tiers auxquels AIVO fait appel pour fournir le service.",
@@ -265,9 +296,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "Confidentialité",
       title: "Supprimer des données",
-      description: "Demandez la suppression de votre compte, d'un apprenant précis ou seulement d'un IEP téléversé. Nous conservons un petit journal d'audit exigé pour la conformité.",
+      description:
+        "Demandez la suppression de votre compte, d'un apprenant précis ou seulement d'un IEP téléversé. Nous conservons un petit journal d'audit exigé pour la conformité.",
       warning_strong: "La suppression est définitive.",
-      warning_body: "Une fois approuvée, la progression de l'apprenant, l'historique des leçons et les fichiers IEP sont supprimés. Nous conservons le minimum d'enregistrements d'audit exigé par la loi (date de la demande, retrait du consentement) afin que la suppression elle-même puisse être prouvée ultérieurement.",
+      warning_body:
+        "Une fois approuvée, la progression de l'apprenant, l'historique des leçons et les fichiers IEP sont supprimés. Nous conservons le minimum d'enregistrements d'audit exigé par la loi (date de la demande, retrait du consentement) afin que la suppression elle-même puisse être prouvée ultérieurement.",
       past_requests: "Demandes passées",
       no_requests: "Aucune demande pour l'instant.",
       th_requested: "Demandée",
@@ -279,7 +312,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "Confidentialité",
       title: "Demander un export de données",
-      description: "Vous pouvez demander une copie portable des données de votre famille à tout moment. Nous vous prévenons lorsqu'elle est prête à télécharger.",
+      description:
+        "Vous pouvez demander une copie portable des données de votre famille à tout moment. Nous vous prévenons lorsqu'elle est prête à télécharger.",
       past_requests: "Demandes passées",
       no_requests: "Aucune demande pour l'instant.",
       th_requested: "Demandée",
@@ -304,13 +338,16 @@ const PARENT = {
       no_active_plan_title: "Aucun forfait actif",
       no_active_plan_body: "Choisissez un forfait ci-dessous pour commencer.",
       reassure_hidden_title: "La facturation reste hors de la vue de l'apprenant",
-      reassure_hidden_body: "Votre apprenant ne voit jamais les écrans de forfait, de paiement ou de factures. Même lorsqu'il bascule sur votre compte, la facturation est masquée.",
+      reassure_hidden_body:
+        "Votre apprenant ne voit jamais les écrans de forfait, de paiement ou de factures. Même lorsqu'il bascule sur votre compte, la facturation est masquée.",
       reassure_cancel_title: "Annulez à tout moment, sans friction",
-      reassure_cancel_body: "L'annulation conserve votre historique d'apprentissage intact et vous gardez l'accès jusqu'à la fin de la période.",
+      reassure_cancel_body:
+        "L'annulation conserve votre historique d'apprentissage intact et vous gardez l'accès jusqu'à la fin de la période.",
       choose_plan: "Choisir un forfait",
       recent_invoices: "Factures récentes",
       no_invoices_title: "Aucune facture pour l'instant",
-      no_invoices_body: "Les factures apparaissent ici après la clôture de chaque période de facturation.",
+      no_invoices_body:
+        "Les factures apparaissent ici après la clôture de chaque période de facturation.",
     },
   },
 
@@ -318,7 +355,8 @@ const PARENT = {
     notifications: {
       eyebrow: "Elternteil",
       title: "Benachrichtigungen & Genehmigungen",
-      description: "Jede Benachrichtigung hier hat eine klare Aktion. Genehmigungen verlinken direkt in den Ablauf, den sie freischalten.",
+      description:
+        "Jede Benachrichtigung hier hat eine klare Aktion. Genehmigungen verlinken direkt in den Ablauf, den sie freischalten.",
       unread_label: "Ungelesen",
       unread_zero: "Alles erledigt",
       unread_some: "Zum Lesen tippen",
@@ -329,28 +367,34 @@ const PARENT = {
       urgent_zero: "Nichts Dringendes",
       urgent_some: "Bitte prüfen",
       inbox_title: "Posteingang",
-      inbox_desc: "Tippe auf ein Element, um es als gelesen zu markieren. Ungelesene zeigen einen sanften Punkt.",
+      inbox_desc:
+        "Tippe auf ein Element, um es als gelesen zu markieren. Ungelesene zeigen einen sanften Punkt.",
       empty_title: "Noch keine Benachrichtigungen",
       empty_body: "Updates erscheinen hier, sobald Aktivität auftritt.",
       reassure_actionable_title: "Jede Benachrichtigung ist umsetzbar",
-      reassure_actionable_body: "Wenn auf eine Benachrichtigung nicht reagiert werden kann, senden wir sie nicht. Das reduziert Rauschen.",
+      reassure_actionable_body:
+        "Wenn auf eine Benachrichtigung nicht reagiert werden kann, senden wir sie nicht. Das reduziert Rauschen.",
       reassure_learners_title: "Lernende sehen weniger",
-      reassure_learners_body: "Nur altersgerechte Nachrichten erreichen deine Lernenden – niemals Genehmigungen, Abrechnung oder Admin-Elemente.",
+      reassure_learners_body:
+        "Nur altersgerechte Nachrichten erreichen deine Lernenden – niemals Genehmigungen, Abrechnung oder Admin-Elemente.",
       reassure_safety_title: "Sicherheitsthemen sind immer dringend",
-      reassure_safety_body: "Falls jemals etwas Sicherheitsrelevantes auftaucht, rückt es an die Spitze dieser Liste und benachrichtigt dich sofort.",
+      reassure_safety_body:
+        "Falls jemals etwas Sicherheitsrelevantes auftaucht, rückt es an die Spitze dieser Liste und benachrichtigt dich sofort.",
       prefs_title: "Zustellungseinstellungen",
       prefs_desc: "Wähle, welche Updates dich über welchen Kanal erreichen.",
     },
     privacy: {
       eyebrow: "Datenschutz",
       title: "Datenschutz & deine Daten",
-      description: "Sieh, was AIVO speichert, wer es verarbeitet, und fordere jederzeit Export oder Löschung an.",
+      description:
+        "Sieh, was AIVO speichert, wer es verarbeitet, und fordere jederzeit Export oder Löschung an.",
       link_consent_label: "Einwilligungscenter",
       link_consent_desc: "Einwilligungen auf Konto- und Lernenden-Ebene prüfen und widerrufen.",
       link_export_label: "Datenexport anfordern",
       link_export_desc: "Lade eine Kopie der Daten deiner Familie herunter.",
       link_delete_label: "Daten löschen",
-      link_delete_desc: "Löschung eines Kontos, eines Lernenden oder nur der IEP-Dateien anfordern.",
+      link_delete_desc:
+        "Löschung eines Kontos, eines Lernenden oder nur der IEP-Dateien anfordern.",
       policies_title: "Aktuelle Richtlinien",
       subprocessors_title: "Unterauftragsverarbeiter",
       subprocessors_desc: "Dritte, die AIVO zur Bereitstellung des Dienstes einsetzt.",
@@ -362,9 +406,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "Datenschutz",
       title: "Daten löschen",
-      description: "Fordere die Löschung deines Kontos, eines bestimmten Lernenden oder nur eines hochgeladenen IEP an. Wir bewahren einen kleinen, für die Compliance erforderlichen Prüfpfad auf.",
+      description:
+        "Fordere die Löschung deines Kontos, eines bestimmten Lernenden oder nur eines hochgeladenen IEP an. Wir bewahren einen kleinen, für die Compliance erforderlichen Prüfpfad auf.",
       warning_strong: "Die Löschung ist dauerhaft.",
-      warning_body: "Nach der Genehmigung werden Lernfortschritt, Lektionsverlauf und IEP-Dateien entfernt. Wir behalten die gesetzlich erforderlichen Mindest-Prüfaufzeichnungen (wann die Anfrage gestellt wurde, dass die Einwilligung widerrufen wurde), damit die Löschung selbst später nachgewiesen werden kann.",
+      warning_body:
+        "Nach der Genehmigung werden Lernfortschritt, Lektionsverlauf und IEP-Dateien entfernt. Wir behalten die gesetzlich erforderlichen Mindest-Prüfaufzeichnungen (wann die Anfrage gestellt wurde, dass die Einwilligung widerrufen wurde), damit die Löschung selbst später nachgewiesen werden kann.",
       past_requests: "Frühere Anfragen",
       no_requests: "Noch keine Anfragen.",
       th_requested: "Angefordert",
@@ -376,7 +422,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "Datenschutz",
       title: "Datenexport anfordern",
-      description: "Du kannst jederzeit eine portable Kopie der Daten deiner Familie anfordern. Wir benachrichtigen dich, sobald sie zum Download bereit ist.",
+      description:
+        "Du kannst jederzeit eine portable Kopie der Daten deiner Familie anfordern. Wir benachrichtigen dich, sobald sie zum Download bereit ist.",
       past_requests: "Frühere Anfragen",
       no_requests: "Noch keine Anfragen.",
       th_requested: "Angefordert",
@@ -401,13 +448,16 @@ const PARENT = {
       no_active_plan_title: "Kein aktiver Tarif",
       no_active_plan_body: "Wähle unten einen Tarif, um zu starten.",
       reassure_hidden_title: "Die Abrechnung bleibt außerhalb der Lernendenansicht",
-      reassure_hidden_body: "Deine Lernenden sehen niemals Tarif-, Zahlungs- oder Rechnungsbereiche. Selbst beim Wechsel in dein Konto bleibt die Abrechnung verborgen.",
+      reassure_hidden_body:
+        "Deine Lernenden sehen niemals Tarif-, Zahlungs- oder Rechnungsbereiche. Selbst beim Wechsel in dein Konto bleibt die Abrechnung verborgen.",
       reassure_cancel_title: "Jederzeit kündbar, ohne Hürden",
-      reassure_cancel_body: "Die Kündigung lässt deinen Lernverlauf unangetastet, und du behältst den Zugang bis zum Periodenende.",
+      reassure_cancel_body:
+        "Die Kündigung lässt deinen Lernverlauf unangetastet, und du behältst den Zugang bis zum Periodenende.",
       choose_plan: "Tarif wählen",
       recent_invoices: "Aktuelle Rechnungen",
       no_invoices_title: "Noch keine Rechnungen",
-      no_invoices_body: "Rechnungen erscheinen hier, nachdem jede Abrechnungsperiode abgeschlossen ist.",
+      no_invoices_body:
+        "Rechnungen erscheinen hier, nachdem jede Abrechnungsperiode abgeschlossen ist.",
     },
   },
 
@@ -415,7 +465,8 @@ const PARENT = {
     notifications: {
       eyebrow: "Responsável",
       title: "Notificações e aprovações",
-      description: "Cada notificação aqui tem uma ação clara. As aprovações levam direto ao fluxo que desbloqueiam.",
+      description:
+        "Cada notificação aqui tem uma ação clara. As aprovações levam direto ao fluxo que desbloqueiam.",
       unread_label: "Não lidas",
       unread_zero: "Tudo em dia",
       unread_some: "Toque para ler",
@@ -430,18 +481,22 @@ const PARENT = {
       empty_title: "Ainda não há notificações",
       empty_body: "Você verá atualizações aqui quando houver atividade.",
       reassure_actionable_title: "Toda notificação é acionável",
-      reassure_actionable_body: "Se não for possível agir sobre uma notificação, não a enviamos. Reduz o ruído.",
+      reassure_actionable_body:
+        "Se não for possível agir sobre uma notificação, não a enviamos. Reduz o ruído.",
       reassure_learners_title: "Os alunos veem menos",
-      reassure_learners_body: "Apenas mensagens apropriadas para a idade chegam ao seu aluno — nunca aprovações, faturamento ou itens de administração.",
+      reassure_learners_body:
+        "Apenas mensagens apropriadas para a idade chegam ao seu aluno — nunca aprovações, faturamento ou itens de administração.",
       reassure_safety_title: "Itens de segurança são sempre urgentes",
-      reassure_safety_body: "Se algo relacionado à segurança aparecer, vai para o topo desta lista e avisa você imediatamente.",
+      reassure_safety_body:
+        "Se algo relacionado à segurança aparecer, vai para o topo desta lista e avisa você imediatamente.",
       prefs_title: "Preferências de entrega",
       prefs_desc: "Escolha quais atualizações chegam a você em cada canal.",
     },
     privacy: {
       eyebrow: "Privacidade",
       title: "Privacidade e seus dados",
-      description: "Veja o que a AIVO armazena, quem processa e solicite exportação ou exclusão a qualquer momento.",
+      description:
+        "Veja o que a AIVO armazena, quem processa e solicite exportação ou exclusão a qualquer momento.",
       link_consent_label: "Central de consentimento",
       link_consent_desc: "Revise e revogue consentimentos no nível da conta e do aluno.",
       link_export_label: "Solicitar exportação de dados",
@@ -459,9 +514,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "Privacidade",
       title: "Excluir dados",
-      description: "Solicite a exclusão da sua conta, de um aluno específico ou apenas de um IEP enviado. Mantemos um pequeno registro de auditoria exigido para conformidade.",
+      description:
+        "Solicite a exclusão da sua conta, de um aluno específico ou apenas de um IEP enviado. Mantemos um pequeno registro de auditoria exigido para conformidade.",
       warning_strong: "A exclusão é permanente.",
-      warning_body: "Após a aprovação, o progresso do aluno, o histórico de lições e os arquivos IEP são removidos. Mantemos os registros de auditoria mínimos exigidos por lei (quando a solicitação foi feita, que o consentimento foi retirado) para que a própria exclusão possa ser comprovada mais tarde.",
+      warning_body:
+        "Após a aprovação, o progresso do aluno, o histórico de lições e os arquivos IEP são removidos. Mantemos os registros de auditoria mínimos exigidos por lei (quando a solicitação foi feita, que o consentimento foi retirado) para que a própria exclusão possa ser comprovada mais tarde.",
       past_requests: "Solicitações anteriores",
       no_requests: "Ainda não há solicitações.",
       th_requested: "Solicitada",
@@ -473,7 +530,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "Privacidade",
       title: "Solicitar exportação de dados",
-      description: "Você pode solicitar uma cópia portátil dos dados da sua família a qualquer momento. Avisamos quando estiver pronta para download.",
+      description:
+        "Você pode solicitar uma cópia portátil dos dados da sua família a qualquer momento. Avisamos quando estiver pronta para download.",
       past_requests: "Solicitações anteriores",
       no_requests: "Ainda não há solicitações.",
       th_requested: "Solicitada",
@@ -498,13 +556,16 @@ const PARENT = {
       no_active_plan_title: "Nenhum plano ativo",
       no_active_plan_body: "Escolha um plano abaixo para começar.",
       reassure_hidden_title: "O faturamento fica fora da visão do aluno",
-      reassure_hidden_body: "Seu aluno nunca vê as telas de plano, pagamento ou faturas. Mesmo quando ele muda para a sua conta, o faturamento fica oculto.",
+      reassure_hidden_body:
+        "Seu aluno nunca vê as telas de plano, pagamento ou faturas. Mesmo quando ele muda para a sua conta, o faturamento fica oculto.",
       reassure_cancel_title: "Cancele quando quiser, sem fricção",
-      reassure_cancel_body: "O cancelamento mantém seu histórico de aprendizado intacto e você mantém o acesso até o fim do período.",
+      reassure_cancel_body:
+        "O cancelamento mantém seu histórico de aprendizado intacto e você mantém o acesso até o fim do período.",
       choose_plan: "Escolher um plano",
       recent_invoices: "Faturas recentes",
       no_invoices_title: "Ainda não há faturas",
-      no_invoices_body: "As faturas aparecem aqui depois que cada período de faturamento é fechado.",
+      no_invoices_body:
+        "As faturas aparecem aqui depois que cada período de faturamento é fechado.",
     },
   },
 
@@ -529,7 +590,8 @@ const PARENT = {
       reassure_actionable_title: "每条通知都可操作",
       reassure_actionable_body: "如果某条通知无法采取行动，我们就不会发送。这能减少干扰。",
       reassure_learners_title: "学习者看到的更少",
-      reassure_learners_body: "只有适合其年龄的消息才会送达你的学习者——绝不包括批准、账单或管理事项。",
+      reassure_learners_body:
+        "只有适合其年龄的消息才会送达你的学习者——绝不包括批准、账单或管理事项。",
       reassure_safety_title: "安全事项始终紧急",
       reassure_safety_body: "如果出现任何与安全相关的内容，它会置于此列表顶部并立即提醒你。",
       prefs_title: "送达偏好",
@@ -556,9 +618,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "隐私",
       title: "删除数据",
-      description: "申请删除你的账户、某个特定学习者，或仅删除已上传的 IEP。我们会保留合规所需的少量审计记录。",
+      description:
+        "申请删除你的账户、某个特定学习者，或仅删除已上传的 IEP。我们会保留合规所需的少量审计记录。",
       warning_strong: "删除是永久性的。",
-      warning_body: "一旦获批，学习者进度、课程历史和 IEP 文件都会被移除。我们会保留法律要求的最少审计记录（申请发出的时间、同意已撤回），以便日后能够证明该删除本身。",
+      warning_body:
+        "一旦获批，学习者进度、课程历史和 IEP 文件都会被移除。我们会保留法律要求的最少审计记录（申请发出的时间、同意已撤回），以便日后能够证明该删除本身。",
       past_requests: "过往申请",
       no_requests: "暂无申请。",
       th_requested: "申请时间",
@@ -595,7 +659,8 @@ const PARENT = {
       no_active_plan_title: "无有效计划",
       no_active_plan_body: "在下方选择一个计划即可开始。",
       reassure_hidden_title: "账单不在学习者视图中",
-      reassure_hidden_body: "你的学习者绝不会看到计划、付款或发票界面。即使切换到你的账户，账单也会被隐藏。",
+      reassure_hidden_body:
+        "你的学习者绝不会看到计划、付款或发票界面。即使切换到你的账户，账单也会被隐藏。",
       reassure_cancel_title: "随时取消，毫无阻碍",
       reassure_cancel_body: "取消会完整保留你的学习历史，并且在本期结束前你仍可使用。",
       choose_plan: "选择计划",
@@ -609,7 +674,8 @@ const PARENT = {
     notifications: {
       eyebrow: "保護者",
       title: "通知と承認",
-      description: "ここの通知にはすべて明確なアクションがあります。承認は、それが解除するフローへ直接リンクします。",
+      description:
+        "ここの通知にはすべて明確なアクションがあります。承認は、それが解除するフローへ直接リンクします。",
       unread_label: "未読",
       unread_zero: "すべて対応済み",
       unread_some: "タップして読む",
@@ -626,16 +692,19 @@ const PARENT = {
       reassure_actionable_title: "すべての通知はアクション可能",
       reassure_actionable_body: "対応できない通知は送りません。ノイズを減らします。",
       reassure_learners_title: "学習者が見る情報は少なめ",
-      reassure_learners_body: "学習者には年齢に適したメッセージのみが届きます。承認・請求・管理項目は届きません。",
+      reassure_learners_body:
+        "学習者には年齢に適したメッセージのみが届きます。承認・請求・管理項目は届きません。",
       reassure_safety_title: "安全に関する項目は常に緊急",
-      reassure_safety_body: "安全に関するものが現れた場合は、このリストの先頭に置かれ、すぐに通知します。",
+      reassure_safety_body:
+        "安全に関するものが現れた場合は、このリストの先頭に置かれ、すぐに通知します。",
       prefs_title: "配信設定",
       prefs_desc: "各チャネルでどの更新を受け取るかを選びます。",
     },
     privacy: {
       eyebrow: "プライバシー",
       title: "プライバシーとあなたのデータ",
-      description: "AIVO が何を保存し、誰が処理するかを確認し、いつでもエクスポートや削除を申請できます。",
+      description:
+        "AIVO が何を保存し、誰が処理するかを確認し、いつでもエクスポートや削除を申請できます。",
       link_consent_label: "同意センター",
       link_consent_desc: "アカウント単位・学習者単位の同意を確認・取り消します。",
       link_export_label: "データのエクスポートを申請",
@@ -653,9 +722,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "プライバシー",
       title: "データを削除",
-      description: "アカウント、特定の学習者、またはアップロード済みの IEP のみの削除を申請します。コンプライアンスに必要な小さな監査証跡は保持します。",
+      description:
+        "アカウント、特定の学習者、またはアップロード済みの IEP のみの削除を申請します。コンプライアンスに必要な小さな監査証跡は保持します。",
       warning_strong: "削除は取り消せません。",
-      warning_body: "承認されると、学習者の進捗・レッスン履歴・IEP ファイルが削除されます。法的に必要な最小限の監査記録（申請日時、同意が撤回されたこと）は保持し、削除自体を後で証明できるようにします。",
+      warning_body:
+        "承認されると、学習者の進捗・レッスン履歴・IEP ファイルが削除されます。法的に必要な最小限の監査記録（申請日時、同意が撤回されたこと）は保持し、削除自体を後で証明できるようにします。",
       past_requests: "過去の申請",
       no_requests: "まだ申請はありません。",
       th_requested: "申請日時",
@@ -667,7 +738,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "プライバシー",
       title: "データのエクスポートを申請",
-      description: "いつでもご家族のデータのポータブルなコピーを申請できます。ダウンロードの準備ができたらお知らせします。",
+      description:
+        "いつでもご家族のデータのポータブルなコピーを申請できます。ダウンロードの準備ができたらお知らせします。",
       past_requests: "過去の申請",
       no_requests: "まだ申請はありません。",
       th_requested: "申請日時",
@@ -692,9 +764,11 @@ const PARENT = {
       no_active_plan_title: "有効なプランがありません",
       no_active_plan_body: "下のプランを選んで開始してください。",
       reassure_hidden_title: "請求は学習者のビューに表示されません",
-      reassure_hidden_body: "学習者にはプラン・支払い・請求の画面は一切表示されません。あなたのアカウントに切り替えても、請求は非表示です。",
+      reassure_hidden_body:
+        "学習者にはプラン・支払い・請求の画面は一切表示されません。あなたのアカウントに切り替えても、請求は非表示です。",
       reassure_cancel_title: "いつでも、面倒なくキャンセル",
-      reassure_cancel_body: "キャンセルしても学習履歴はそのまま残り、期間終了までアクセスを保てます。",
+      reassure_cancel_body:
+        "キャンセルしても学習履歴はそのまま残り、期間終了までアクセスを保てます。",
       choose_plan: "プランを選ぶ",
       recent_invoices: "最近の請求書",
       no_invoices_title: "まだ請求書はありません",
@@ -706,7 +780,8 @@ const PARENT = {
     notifications: {
       eyebrow: "보호자",
       title: "알림 및 승인",
-      description: "여기의 모든 알림에는 명확한 작업이 있습니다. 승인은 그것이 해제하는 흐름으로 바로 연결됩니다.",
+      description:
+        "여기의 모든 알림에는 명확한 작업이 있습니다. 승인은 그것이 해제하는 흐름으로 바로 연결됩니다.",
       unread_label: "읽지 않음",
       unread_zero: "모두 처리됨",
       unread_some: "탭하여 읽기",
@@ -723,7 +798,8 @@ const PARENT = {
       reassure_actionable_title: "모든 알림은 실행 가능합니다",
       reassure_actionable_body: "조치할 수 없는 알림은 보내지 않습니다. 잡음을 줄입니다.",
       reassure_learners_title: "학습자는 더 적게 봅니다",
-      reassure_learners_body: "학습자에게는 연령에 맞는 메시지만 전달됩니다 — 승인, 청구, 관리 항목은 전달되지 않습니다.",
+      reassure_learners_body:
+        "학습자에게는 연령에 맞는 메시지만 전달됩니다 — 승인, 청구, 관리 항목은 전달되지 않습니다.",
       reassure_safety_title: "안전 항목은 항상 긴급합니다",
       reassure_safety_body: "안전 관련 항목이 나타나면 이 목록 맨 위로 올라가고 즉시 알려드립니다.",
       prefs_title: "전달 환경설정",
@@ -732,7 +808,8 @@ const PARENT = {
     privacy: {
       eyebrow: "개인정보",
       title: "개인정보 및 내 데이터",
-      description: "AIVO가 무엇을 저장하고 누가 처리하는지 확인하고, 언제든지 내보내기나 삭제를 요청하세요.",
+      description:
+        "AIVO가 무엇을 저장하고 누가 처리하는지 확인하고, 언제든지 내보내기나 삭제를 요청하세요.",
       link_consent_label: "동의 센터",
       link_consent_desc: "계정 및 학습자 수준의 동의를 검토하고 철회합니다.",
       link_export_label: "데이터 내보내기 요청",
@@ -750,9 +827,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "개인정보",
       title: "데이터 삭제",
-      description: "계정, 특정 학습자 또는 업로드된 IEP만의 삭제를 요청하세요. 규정 준수를 위해 필요한 최소한의 감사 기록은 보존합니다.",
+      description:
+        "계정, 특정 학습자 또는 업로드된 IEP만의 삭제를 요청하세요. 규정 준수를 위해 필요한 최소한의 감사 기록은 보존합니다.",
       warning_strong: "삭제는 영구적입니다.",
-      warning_body: "승인되면 학습자 진행 상황, 수업 기록, IEP 파일이 제거됩니다. 삭제 자체를 나중에 증명할 수 있도록 법적으로 요구되는 최소한의 감사 기록(요청 시점, 동의 철회 사실)은 보관합니다.",
+      warning_body:
+        "승인되면 학습자 진행 상황, 수업 기록, IEP 파일이 제거됩니다. 삭제 자체를 나중에 증명할 수 있도록 법적으로 요구되는 최소한의 감사 기록(요청 시점, 동의 철회 사실)은 보관합니다.",
       past_requests: "이전 요청",
       no_requests: "아직 요청이 없습니다.",
       th_requested: "요청일",
@@ -764,7 +843,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "개인정보",
       title: "데이터 내보내기 요청",
-      description: "언제든지 가족 데이터의 이동 가능한 사본을 요청할 수 있습니다. 다운로드 준비가 되면 알려드립니다.",
+      description:
+        "언제든지 가족 데이터의 이동 가능한 사본을 요청할 수 있습니다. 다운로드 준비가 되면 알려드립니다.",
       past_requests: "이전 요청",
       no_requests: "아직 요청이 없습니다.",
       th_requested: "요청일",
@@ -789,9 +869,11 @@ const PARENT = {
       no_active_plan_title: "활성 요금제 없음",
       no_active_plan_body: "아래에서 요금제를 선택해 시작하세요.",
       reassure_hidden_title: "결제는 학습자 화면에 표시되지 않습니다",
-      reassure_hidden_body: "학습자는 요금제, 결제 또는 청구서 화면을 절대 보지 않습니다. 귀하의 계정으로 전환해도 결제는 숨겨집니다.",
+      reassure_hidden_body:
+        "학습자는 요금제, 결제 또는 청구서 화면을 절대 보지 않습니다. 귀하의 계정으로 전환해도 결제는 숨겨집니다.",
       reassure_cancel_title: "언제든 번거로움 없이 취소",
-      reassure_cancel_body: "취소해도 학습 기록은 그대로 유지되며 기간이 끝날 때까지 액세스를 유지합니다.",
+      reassure_cancel_body:
+        "취소해도 학습 기록은 그대로 유지되며 기간이 끝날 때까지 액세스를 유지합니다.",
       choose_plan: "요금제 선택",
       recent_invoices: "최근 청구서",
       no_invoices_title: "아직 청구서가 없습니다",
@@ -818,11 +900,14 @@ const PARENT = {
       empty_title: "لا توجد إشعارات بعد",
       empty_body: "سترى التحديثات هنا عند حدوث نشاط.",
       reassure_actionable_title: "كل إشعار قابل للتنفيذ",
-      reassure_actionable_body: "إذا تعذّر التصرّف بناءً على إشعار، فإننا لا نرسله. هذا يقلّل التشويش.",
+      reassure_actionable_body:
+        "إذا تعذّر التصرّف بناءً على إشعار، فإننا لا نرسله. هذا يقلّل التشويش.",
       reassure_learners_title: "يرى المتعلّمون أقل",
-      reassure_learners_body: "تصل إلى متعلّمك الرسائل المناسبة لعمره فقط — لا الموافقات ولا الفوترة ولا عناصر الإدارة.",
+      reassure_learners_body:
+        "تصل إلى متعلّمك الرسائل المناسبة لعمره فقط — لا الموافقات ولا الفوترة ولا عناصر الإدارة.",
       reassure_safety_title: "عناصر الأمان عاجلة دائمًا",
-      reassure_safety_body: "إذا ظهر أي شيء متعلّق بالأمان، فإنه يتصدّر هذه القائمة وينبّهك على الفور.",
+      reassure_safety_body:
+        "إذا ظهر أي شيء متعلّق بالأمان، فإنه يتصدّر هذه القائمة وينبّهك على الفور.",
       prefs_title: "تفضيلات التسليم",
       prefs_desc: "اختر التحديثات التي تصلك عبر كل قناة.",
     },
@@ -847,9 +932,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "الخصوصية",
       title: "حذف البيانات",
-      description: "اطلب حذف حسابك أو متعلّم محدّد أو ملف IEP مرفوع فقط. نحتفظ بسجلّ تدقيق صغير مطلوب للامتثال.",
+      description:
+        "اطلب حذف حسابك أو متعلّم محدّد أو ملف IEP مرفوع فقط. نحتفظ بسجلّ تدقيق صغير مطلوب للامتثال.",
       warning_strong: "الحذف نهائي.",
-      warning_body: "بعد الموافقة، تُزال تقدّم المتعلّم وسجلّ الدروس وملفات الـ IEP. نحتفظ بالحدّ الأدنى من سجلّات التدقيق المطلوبة قانونًا (وقت تقديم الطلب، وسحب الموافقة) حتى يمكن إثبات الحذف نفسه لاحقًا.",
+      warning_body:
+        "بعد الموافقة، تُزال تقدّم المتعلّم وسجلّ الدروس وملفات الـ IEP. نحتفظ بالحدّ الأدنى من سجلّات التدقيق المطلوبة قانونًا (وقت تقديم الطلب، وسحب الموافقة) حتى يمكن إثبات الحذف نفسه لاحقًا.",
       past_requests: "الطلبات السابقة",
       no_requests: "لا توجد طلبات بعد.",
       th_requested: "وقت الطلب",
@@ -861,7 +948,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "الخصوصية",
       title: "طلب تصدير البيانات",
-      description: "يمكنك طلب نسخة قابلة للنقل من بيانات عائلتك في أي وقت. سنُعلمك عندما تصبح جاهزة للتنزيل.",
+      description:
+        "يمكنك طلب نسخة قابلة للنقل من بيانات عائلتك في أي وقت. سنُعلمك عندما تصبح جاهزة للتنزيل.",
       past_requests: "الطلبات السابقة",
       no_requests: "لا توجد طلبات بعد.",
       th_requested: "وقت الطلب",
@@ -886,9 +974,11 @@ const PARENT = {
       no_active_plan_title: "لا توجد خطة نشطة",
       no_active_plan_body: "اختر خطة أدناه للبدء.",
       reassure_hidden_title: "تبقى الفوترة بعيدة عن عرض المتعلّم",
-      reassure_hidden_body: "لا يرى متعلّمك أبدًا شاشات الخطة أو الدفع أو الفواتير. وحتى عند التبديل إلى حسابك، تبقى الفوترة مخفية.",
+      reassure_hidden_body:
+        "لا يرى متعلّمك أبدًا شاشات الخطة أو الدفع أو الفواتير. وحتى عند التبديل إلى حسابك، تبقى الفوترة مخفية.",
       reassure_cancel_title: "ألغِ في أي وقت دون عناء",
-      reassure_cancel_body: "يحافظ الإلغاء على سجلّ تعلّمك سليمًا، وتحتفظ بالوصول حتى نهاية الفترة.",
+      reassure_cancel_body:
+        "يحافظ الإلغاء على سجلّ تعلّمك سليمًا، وتحتفظ بالوصول حتى نهاية الفترة.",
       choose_plan: "اختر خطة",
       recent_invoices: "الفواتير الأخيرة",
       no_invoices_title: "لا توجد فواتير بعد",
@@ -900,7 +990,8 @@ const PARENT = {
     notifications: {
       eyebrow: "अभिभावक",
       title: "सूचनाएँ और स्वीकृतियाँ",
-      description: "यहाँ हर सूचना के साथ एक स्पष्ट कार्रवाई जुड़ी है। स्वीकृतियाँ सीधे उस प्रवाह से जुड़ती हैं जिसे वे खोलती हैं।",
+      description:
+        "यहाँ हर सूचना के साथ एक स्पष्ट कार्रवाई जुड़ी है। स्वीकृतियाँ सीधे उस प्रवाह से जुड़ती हैं जिसे वे खोलती हैं।",
       unread_label: "अपठित",
       unread_zero: "सब निपट गया",
       unread_some: "पढ़ने के लिए टैप करें",
@@ -911,22 +1002,27 @@ const PARENT = {
       urgent_zero: "कुछ भी अत्यावश्यक नहीं",
       urgent_some: "कृपया समीक्षा करें",
       inbox_title: "इनबॉक्स",
-      inbox_desc: "किसी आइटम को पढ़ा हुआ चिह्नित करने के लिए टैप करें। अपठित आइटम एक हल्का बिंदु दिखाते हैं।",
+      inbox_desc:
+        "किसी आइटम को पढ़ा हुआ चिह्नित करने के लिए टैप करें। अपठित आइटम एक हल्का बिंदु दिखाते हैं।",
       empty_title: "अभी कोई सूचना नहीं",
       empty_body: "गतिविधि होने पर आपको यहाँ अपडेट दिखेंगे।",
       reassure_actionable_title: "हर सूचना कार्रवाई-योग्य है",
-      reassure_actionable_body: "यदि किसी सूचना पर कार्रवाई संभव नहीं है, तो हम उसे नहीं भेजते। इससे शोर कम होता है।",
+      reassure_actionable_body:
+        "यदि किसी सूचना पर कार्रवाई संभव नहीं है, तो हम उसे नहीं भेजते। इससे शोर कम होता है।",
       reassure_learners_title: "सीखने वाले कम देखते हैं",
-      reassure_learners_body: "आपके सीखने वाले तक केवल आयु-उपयुक्त संदेश पहुँचते हैं — स्वीकृति, बिलिंग या व्यवस्थापन आइटम कभी नहीं।",
+      reassure_learners_body:
+        "आपके सीखने वाले तक केवल आयु-उपयुक्त संदेश पहुँचते हैं — स्वीकृति, बिलिंग या व्यवस्थापन आइटम कभी नहीं।",
       reassure_safety_title: "सुरक्षा आइटम हमेशा अत्यावश्यक",
-      reassure_safety_body: "यदि सुरक्षा से संबंधित कुछ भी दिखे, तो वह इस सूची में सबसे ऊपर आ जाता है और तुरंत आपको सूचित करता है।",
+      reassure_safety_body:
+        "यदि सुरक्षा से संबंधित कुछ भी दिखे, तो वह इस सूची में सबसे ऊपर आ जाता है और तुरंत आपको सूचित करता है।",
       prefs_title: "डिलीवरी प्राथमिकताएँ",
       prefs_desc: "चुनें कि हर चैनल पर आपको कौन-से अपडेट मिलें।",
     },
     privacy: {
       eyebrow: "गोपनीयता",
       title: "गोपनीयता और आपका डेटा",
-      description: "देखें कि AIVO क्या संग्रहीत करता है, कौन इसे प्रोसेस करता है, और किसी भी समय निर्यात या हटाने का अनुरोध करें।",
+      description:
+        "देखें कि AIVO क्या संग्रहीत करता है, कौन इसे प्रोसेस करता है, और किसी भी समय निर्यात या हटाने का अनुरोध करें।",
       link_consent_label: "सहमति केंद्र",
       link_consent_desc: "खाता- और सीखने वाले-स्तर की सहमतियाँ देखें और वापस लें।",
       link_export_label: "डेटा निर्यात का अनुरोध करें",
@@ -944,9 +1040,11 @@ const PARENT = {
     privacy_delete: {
       eyebrow: "गोपनीयता",
       title: "डेटा हटाएँ",
-      description: "अपने खाते, किसी विशिष्ट सीखने वाले, या केवल एक अपलोड किए गए IEP को हटाने का अनुरोध करें। हम अनुपालन के लिए आवश्यक एक छोटा ऑडिट रिकॉर्ड संरक्षित रखते हैं।",
+      description:
+        "अपने खाते, किसी विशिष्ट सीखने वाले, या केवल एक अपलोड किए गए IEP को हटाने का अनुरोध करें। हम अनुपालन के लिए आवश्यक एक छोटा ऑडिट रिकॉर्ड संरक्षित रखते हैं।",
       warning_strong: "हटाना स्थायी है।",
-      warning_body: "स्वीकृत होने पर, सीखने वाले की प्रगति, पाठ इतिहास और IEP फ़ाइलें हटा दी जाती हैं। हम कानूनी रूप से आवश्यक न्यूनतम ऑडिट रिकॉर्ड (अनुरोध कब किया गया, कि सहमति वापस ली गई) रखते हैं ताकि बाद में स्वयं हटाने को सिद्ध किया जा सके।",
+      warning_body:
+        "स्वीकृत होने पर, सीखने वाले की प्रगति, पाठ इतिहास और IEP फ़ाइलें हटा दी जाती हैं। हम कानूनी रूप से आवश्यक न्यूनतम ऑडिट रिकॉर्ड (अनुरोध कब किया गया, कि सहमति वापस ली गई) रखते हैं ताकि बाद में स्वयं हटाने को सिद्ध किया जा सके।",
       past_requests: "पिछले अनुरोध",
       no_requests: "अभी कोई अनुरोध नहीं।",
       th_requested: "अनुरोधित",
@@ -958,7 +1056,8 @@ const PARENT = {
     privacy_export: {
       eyebrow: "गोपनीयता",
       title: "डेटा निर्यात का अनुरोध करें",
-      description: "आप किसी भी समय अपने परिवार के डेटा की एक पोर्टेबल प्रति का अनुरोध कर सकते हैं। डाउनलोड के लिए तैयार होने पर हम आपको सूचित करते हैं।",
+      description:
+        "आप किसी भी समय अपने परिवार के डेटा की एक पोर्टेबल प्रति का अनुरोध कर सकते हैं। डाउनलोड के लिए तैयार होने पर हम आपको सूचित करते हैं।",
       past_requests: "पिछले अनुरोध",
       no_requests: "अभी कोई अनुरोध नहीं।",
       th_requested: "अनुरोधित",
@@ -983,9 +1082,11 @@ const PARENT = {
       no_active_plan_title: "कोई सक्रिय योजना नहीं",
       no_active_plan_body: "शुरू करने के लिए नीचे एक योजना चुनें।",
       reassure_hidden_title: "बिलिंग सीखने वाले के दृश्य से बाहर रहती है",
-      reassure_hidden_body: "आपका सीखने वाला योजना, भुगतान या चालान स्क्रीन कभी नहीं देखता। आपके खाते में स्विच करने पर भी बिलिंग छिपी रहती है।",
+      reassure_hidden_body:
+        "आपका सीखने वाला योजना, भुगतान या चालान स्क्रीन कभी नहीं देखता। आपके खाते में स्विच करने पर भी बिलिंग छिपी रहती है।",
       reassure_cancel_title: "कभी भी रद्द करें, बिना झंझट",
-      reassure_cancel_body: "रद्द करने से आपका सीखने का इतिहास बरकरार रहता है और अवधि समाप्त होने तक आपकी पहुँच बनी रहती है।",
+      reassure_cancel_body:
+        "रद्द करने से आपका सीखने का इतिहास बरकरार रहता है और अवधि समाप्त होने तक आपकी पहुँच बनी रहती है।",
       choose_plan: "एक योजना चुनें",
       recent_invoices: "हाल के चालान",
       no_invoices_title: "अभी कोई चालान नहीं",
@@ -1001,6 +1102,8 @@ for (const [locale, parent] of Object.entries(PARENT)) {
   json.parent = { ...(json.parent ?? {}), ...parent };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-parent-account-i18n: merged parent account namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-parent-account-i18n: merged parent account namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-parent-account-i18n: done — ${written} locale catalogs updated.`);

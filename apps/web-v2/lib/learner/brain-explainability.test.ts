@@ -21,9 +21,7 @@ import {
 import { selectBrainExplainability } from "@/lib/learner/brain-explainability";
 import type { LearnerBrainProfileState } from "@/lib/db/types";
 
-function baseState(
-  overrides: Partial<LearnerBrainProfileState> = {},
-): LearnerBrainProfileState {
+function baseState(overrides: Partial<LearnerBrainProfileState> = {}): LearnerBrainProfileState {
   return {
     learnerProfileSnapshot: {
       learnerId: "lp_test",
@@ -179,9 +177,7 @@ describe("selectBrainExplainability — real clone pipeline output", () => {
     );
     expect(result.masteryDecisionsDetailed).toHaveLength(1);
     expect(result.masteryDecisionsDetailed[0]?.rawScore).toBe("6/10");
-    expect(result.accommodationDecisionsDetailed[0]?.accommodation).toBe(
-      "extended_time",
-    );
+    expect(result.accommodationDecisionsDetailed[0]?.accommodation).toBe("extended_time");
     expect(result.tutorDecisionsDetailed[0]?.tutorKey).toBe("ela-tutor");
   });
 });

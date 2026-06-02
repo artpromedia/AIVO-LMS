@@ -21,9 +21,8 @@ async function bootstrap() {
   const Fastify = (await import("fastify")).default;
   const { createDb } = await import("@aivo/db");
   const { initKeys } = await import("@aivo/security");
-  const { registerCollaborationRoutes, resetInviteRateLimitsForTest } = await import(
-    "../src/routes/collaboration.js"
-  );
+  const { registerCollaborationRoutes, resetInviteRateLimitsForTest } =
+    await import("../src/routes/collaboration.js");
   await initKeys();
   resetInviteRateLimitsForTest();
   const db = createDb(process.env.DATABASE_URL!);
@@ -90,14 +89,8 @@ async function seed(db: any): Promise<Fixture> {
 
 async function cleanup(db: any, f: Fixture) {
   const { eq } = await import("drizzle-orm");
-  const {
-    tenants,
-    users,
-    learners,
-    learnerTeachers,
-    learnerCaregivers,
-    learnerTherapists,
-  } = await import("@aivo/db");
+  const { tenants, users, learners, learnerTeachers, learnerCaregivers, learnerTherapists } =
+    await import("@aivo/db");
   await db.delete(learnerTeachers).where(eq(learnerTeachers.tenantId, f.tenantId));
   await db.delete(learnerCaregivers).where(eq(learnerCaregivers.tenantId, f.tenantId));
   await db.delete(learnerTherapists).where(eq(learnerTherapists.tenantId, f.tenantId));
@@ -204,101 +197,93 @@ test(
   },
 );
 
-test(
-  "invite revoke: sets status to REVOKED, blocks accepted rows",
-  { skip: SKIP },
-  async () => {
-    const { app, db } = await bootstrap();
-    const f = await seed(db);
-    try {
-      const parentToken = await tokenFor({
-        sub: f.parentId,
-        role: "PARENT",
-        tenantId: f.tenantId,
-        email: f.parentEmail,
-      });
+test("invite revoke: sets status to REVOKED, blocks accepted rows", { skip: SKIP }, async () => {
+  const { app, db } = await bootstrap();
+  const f = await seed(db);
+  try {
+    const parentToken = await tokenFor({
+      sub: f.parentId,
+      role: "PARENT",
+      tenantId: f.tenantId,
+      email: f.parentEmail,
+    });
 
-      const create = await app.inject({
-        method: "POST",
-        url: `/api/family/collaboration/${f.learnerId}/invite/caregiver`,
-        headers: { authorization: `Bearer ${parentToken}` },
-        payload: { email: "cg-revoke@test.local", relationship: "Grandparent" },
-      });
-      assert.equal(create.statusCode, 201, create.body);
-      const inviteId = (create.json() as any).id;
+    const create = await app.inject({
+      method: "POST",
+      url: `/api/family/collaboration/${f.learnerId}/invite/caregiver`,
+      headers: { authorization: `Bearer ${parentToken}` },
+      payload: { email: "cg-revoke@test.local", relationship: "Grandparent" },
+    });
+    assert.equal(create.statusCode, 201, create.body);
+    const inviteId = (create.json() as any).id;
 
-      const revoke = await app.inject({
-        method: "DELETE",
-        url: `/api/family/collaboration/invites/caregiver/${inviteId}`,
-        headers: { authorization: `Bearer ${parentToken}` },
-      });
-      assert.equal(revoke.statusCode, 200);
+    const revoke = await app.inject({
+      method: "DELETE",
+      url: `/api/family/collaboration/invites/caregiver/${inviteId}`,
+      headers: { authorization: `Bearer ${parentToken}` },
+    });
+    assert.equal(revoke.statusCode, 200);
 
-      // Status now REVOKED.
-      const { learnerCaregivers } = await import("@aivo/db");
-      const { eq } = await import("drizzle-orm");
-      const [row] = await db
-        .select()
-        .from(learnerCaregivers)
-        .where(eq(learnerCaregivers.id, inviteId));
-      assert.equal(row.status, "REVOKED");
+    // Status now REVOKED.
+    const { learnerCaregivers } = await import("@aivo/db");
+    const { eq } = await import("drizzle-orm");
+    const [row] = await db
+      .select()
+      .from(learnerCaregivers)
+      .where(eq(learnerCaregivers.id, inviteId));
+    assert.equal(row.status, "REVOKED");
 
-      // Revoking again on a non-PENDING row returns success (idempotent)
-      // — the spec only blocks ACCEPTED. Promote it to ACCEPTED and try.
-      await db
-        .update(learnerCaregivers)
-        .set({ status: "ACCEPTED", acceptedAt: new Date() })
-        .where(eq(learnerCaregivers.id, inviteId));
-      const blocked = await app.inject({
-        method: "DELETE",
-        url: `/api/family/collaboration/invites/caregiver/${inviteId}`,
-        headers: { authorization: `Bearer ${parentToken}` },
-      });
-      assert.equal(blocked.statusCode, 400);
-    } finally {
-      await cleanup(db, f);
-      await teardown(app, db);
-    }
-  },
-);
+    // Revoking again on a non-PENDING row returns success (idempotent)
+    // — the spec only blocks ACCEPTED. Promote it to ACCEPTED and try.
+    await db
+      .update(learnerCaregivers)
+      .set({ status: "ACCEPTED", acceptedAt: new Date() })
+      .where(eq(learnerCaregivers.id, inviteId));
+    const blocked = await app.inject({
+      method: "DELETE",
+      url: `/api/family/collaboration/invites/caregiver/${inviteId}`,
+      headers: { authorization: `Bearer ${parentToken}` },
+    });
+    assert.equal(blocked.statusCode, 400);
+  } finally {
+    await cleanup(db, f);
+    await teardown(app, db);
+  }
+});
 
-test(
-  "invite resend: non-parent caller is rejected with 403",
-  { skip: SKIP },
-  async () => {
-    const { app, db } = await bootstrap();
-    const f = await seed(db);
-    try {
-      const parentToken = await tokenFor({
-        sub: f.parentId,
-        role: "PARENT",
-        tenantId: f.tenantId,
-        email: f.parentEmail,
-      });
-      const create = await app.inject({
-        method: "POST",
-        url: `/api/family/collaboration/${f.learnerId}/invite/therapist`,
-        headers: { authorization: `Bearer ${parentToken}` },
-        payload: { email: "ther@test.local", specialty: "OT" },
-      });
-      assert.equal(create.statusCode, 201, create.body);
-      const inviteId = (create.json() as any).id;
+test("invite resend: non-parent caller is rejected with 403", { skip: SKIP }, async () => {
+  const { app, db } = await bootstrap();
+  const f = await seed(db);
+  try {
+    const parentToken = await tokenFor({
+      sub: f.parentId,
+      role: "PARENT",
+      tenantId: f.tenantId,
+      email: f.parentEmail,
+    });
+    const create = await app.inject({
+      method: "POST",
+      url: `/api/family/collaboration/${f.learnerId}/invite/therapist`,
+      headers: { authorization: `Bearer ${parentToken}` },
+      payload: { email: "ther@test.local", specialty: "OT" },
+    });
+    assert.equal(create.statusCode, 201, create.body);
+    const inviteId = (create.json() as any).id;
 
-      const intruderToken = await tokenFor({
-        sub: "11111111-1111-1111-1111-111111111111",
-        role: "PARENT",
-        tenantId: f.tenantId,
-        email: "intruder@test.local",
-      });
-      const r = await app.inject({
-        method: "POST",
-        url: `/api/family/collaboration/invites/therapist/${inviteId}/resend`,
-        headers: { authorization: `Bearer ${intruderToken}` },
-      });
-      assert.equal(r.statusCode, 403);
-    } finally {
-      await cleanup(db, f);
-      await teardown(app, db);
-    }
-  },
-);
+    const intruderToken = await tokenFor({
+      sub: "11111111-1111-1111-1111-111111111111",
+      role: "PARENT",
+      tenantId: f.tenantId,
+      email: "intruder@test.local",
+    });
+    const r = await app.inject({
+      method: "POST",
+      url: `/api/family/collaboration/invites/therapist/${inviteId}/resend`,
+      headers: { authorization: `Bearer ${intruderToken}` },
+    });
+    assert.equal(r.statusCode, 403);
+  } finally {
+    await cleanup(db, f);
+    await teardown(app, db);
+  }
+});

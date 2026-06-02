@@ -280,10 +280,7 @@ export function registerTutorSessionRoutes(app: FastifyInstance): void {
           // production for this learner's grade band. The UI should
           // render an "Authoring in progress" surface rather than
           // treating this as a client bug.
-          if (
-            err.code === "grade_band_not_production" ||
-            err.code === "grade_band_not_in_scope"
-          ) {
+          if (err.code === "grade_band_not_production" || err.code === "grade_band_not_in_scope") {
             return reply.code(409).send({
               error: err.message,
               code: err.code,

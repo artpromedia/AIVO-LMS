@@ -73,7 +73,8 @@ const PARENT = {
       manage_baseline: "Manage baseline",
       baseline_complete: "Baseline complete",
       questions_answered: "Questions answered",
-      skipped_questions_note: "Skipped questions are useful too — they tell AIVO what to ease into slowly.",
+      skipped_questions_note:
+        "Skipped questions are useful too — they tell AIVO what to ease into slowly.",
       subjects_covered: "Subjects covered",
       personalization: "Personalization",
       parent_assessment: "Parent assessment",
@@ -81,7 +82,8 @@ const PARENT = {
       where_lessons_start: "Where lessons start",
       for_you: "For you",
       what_learner_sees: "What your learner sees",
-      learner_only_version_note: "This is the only version your learner sees — no scores, no clinical language.",
+      learner_only_version_note:
+        "This is the only version your learner sees — no scores, no clinical language.",
       iep_supports_in_effect: "IEP supports in effect",
       back_to_learner_home: "Back to learner home",
       run_another_baseline: "Run another baseline",
@@ -146,14 +148,16 @@ const PARENT = {
       try_again: "Intentar de nuevo",
       step1_label: "Paso 1 · Gráfico de habilidades",
       step1_heading: "Eligiendo las habilidades de inicio correctas",
-      step1_body: "Mapeamos la banda de grado y las respuestas de confianza de tu estudiante en el currículo.",
+      step1_body:
+        "Mapeamos la banda de grado y las respuestas de confianza de tu estudiante en el currículo.",
       step2_label: "Paso 2 · Personalización",
       step2_heading: "Aplicando apoyos y ritmo",
       step2_body: "Respetamos cada adaptación que confirmaste más el perfil sensorial.",
       in_progress: "En progreso",
       step3_label: "Paso 3 · Conjunto de preguntas",
       step3_heading: "Redactando las primeras preguntas",
-      step3_body: "Corto, tranquilo, sin presión de tiempo. Tu estudiante puede pausar en cualquier momento.",
+      step3_body:
+        "Corto, tranquilo, sin presión de tiempo. Tu estudiante puede pausar en cualquier momento.",
       up_next: "A continuación",
     },
     learner_baseline_summary: {
@@ -164,7 +168,8 @@ const PARENT = {
       manage_baseline: "Gestionar línea de base",
       baseline_complete: "Línea de base completa",
       questions_answered: "Preguntas respondidas",
-      skipped_questions_note: "Las preguntas omitidas también son útiles: le dicen a AIVO en qué ir avanzando lentamente.",
+      skipped_questions_note:
+        "Las preguntas omitidas también son útiles: le dicen a AIVO en qué ir avanzando lentamente.",
       subjects_covered: "Materias cubiertas",
       personalization: "Personalización",
       parent_assessment: "Evaluación del padre",
@@ -172,7 +177,8 @@ const PARENT = {
       where_lessons_start: "Dónde empiezan las lecciones",
       for_you: "Para ti",
       what_learner_sees: "Lo que ve tu estudiante",
-      learner_only_version_note: "Esta es la única versión que ve tu estudiante: sin calificaciones, sin lenguaje clínico.",
+      learner_only_version_note:
+        "Esta es la única versión que ve tu estudiante: sin calificaciones, sin lenguaje clínico.",
       iep_supports_in_effect: "Apoyos del IEP en efecto",
       back_to_learner_home: "Volver al inicio del estudiante",
       run_another_baseline: "Ejecutar otra línea de base",
@@ -237,14 +243,17 @@ const PARENT = {
       try_again: "Réessayer",
       step1_label: "Étape 1 · Graphe de compétences",
       step1_heading: "Choisir les bonnes compétences de départ",
-      step1_body: "Nous cartographions le niveau scolaire et les réponses de confiance de votre apprenant sur le programme.",
+      step1_body:
+        "Nous cartographions le niveau scolaire et les réponses de confiance de votre apprenant sur le programme.",
       step2_label: "Étape 2 · Personnalisation",
       step2_heading: "Application des supports et du rythme",
-      step2_body: "Nous respectons chaque adaptation que vous avez confirmée ainsi que le profil sensoriel.",
+      step2_body:
+        "Nous respectons chaque adaptation que vous avez confirmée ainsi que le profil sensoriel.",
       in_progress: "En cours",
       step3_label: "Étape 3 · Ensemble de questions",
       step3_heading: "Rédaction des premières questions",
-      step3_body: "Court, calme, sans pression de temps. Votre apprenant peut faire une pause à tout moment.",
+      step3_body:
+        "Court, calme, sans pression de temps. Votre apprenant peut faire une pause à tout moment.",
       up_next: "À suivre",
     },
     learner_baseline_summary: {
@@ -255,7 +264,8 @@ const PARENT = {
       manage_baseline: "Gérer la ligne de base",
       baseline_complete: "Ligne de base terminée",
       questions_answered: "Questions répondues",
-      skipped_questions_note: "Les questions ignorées sont utiles aussi — elles indiquent à AIVO ce dans quoi progresser doucement.",
+      skipped_questions_note:
+        "Les questions ignorées sont utiles aussi — elles indiquent à AIVO ce dans quoi progresser doucement.",
       subjects_covered: "Matières couvertes",
       personalization: "Personnalisation",
       parent_assessment: "Évaluation parentale",
@@ -263,7 +273,8 @@ const PARENT = {
       where_lessons_start: "Où commencent les leçons",
       for_you: "Pour vous",
       what_learner_sees: "Ce que voit votre apprenant",
-      learner_only_version_note: "C'est la seule version que voit votre apprenant — sans notes, sans langage clinique.",
+      learner_only_version_note:
+        "C'est la seule version que voit votre apprenant — sans notes, sans langage clinique.",
       iep_supports_in_effect: "Supports IEP en vigueur",
       back_to_learner_home: "Retour à l'accueil de l'apprenant",
       run_another_baseline: "Lancer une autre ligne de base",
@@ -328,10 +339,12 @@ const PARENT = {
       try_again: "Erneut versuchen",
       step1_label: "Schritt 1 · Kompetenzgraph",
       step1_heading: "Die richtigen Startkompetenzen auswählen",
-      step1_body: "Wir ordnen die Jahrgangsstufe und die Selbsteinschätzungsantworten deines Lernenden dem Lehrplan zu.",
+      step1_body:
+        "Wir ordnen die Jahrgangsstufe und die Selbsteinschätzungsantworten deines Lernenden dem Lehrplan zu.",
       step2_label: "Schritt 2 · Personalisierung",
       step2_heading: "Unterstützungen und Tempo anwenden",
-      step2_body: "Wir berücksichtigen jede von dir bestätigte Anpassung sowie das sensorische Profil.",
+      step2_body:
+        "Wir berücksichtigen jede von dir bestätigte Anpassung sowie das sensorische Profil.",
       in_progress: "In Bearbeitung",
       step3_label: "Schritt 3 · Fragenset",
       step3_heading: "Die ersten Fragen entwerfen",
@@ -346,7 +359,8 @@ const PARENT = {
       manage_baseline: "Basislinie verwalten",
       baseline_complete: "Basislinie abgeschlossen",
       questions_answered: "Beantwortete Fragen",
-      skipped_questions_note: "Übersprungene Fragen sind ebenfalls nützlich — sie zeigen AIVO, womit es langsam anfangen soll.",
+      skipped_questions_note:
+        "Übersprungene Fragen sind ebenfalls nützlich — sie zeigen AIVO, womit es langsam anfangen soll.",
       subjects_covered: "Abgedeckte Fächer",
       personalization: "Personalisierung",
       parent_assessment: "Elternbewertung",
@@ -354,7 +368,8 @@ const PARENT = {
       where_lessons_start: "Wo Lektionen beginnen",
       for_you: "Für Sie",
       what_learner_sees: "Was Ihr Lernender sieht",
-      learner_only_version_note: "Dies ist die einzige Version, die Ihr Lernender sieht — keine Noten, keine klinische Sprache.",
+      learner_only_version_note:
+        "Dies ist die einzige Version, die Ihr Lernender sieht — keine Noten, keine klinische Sprache.",
       iep_supports_in_effect: "IEP-Unterstützungen in Kraft",
       back_to_learner_home: "Zurück zur Startseite des Lernenden",
       run_another_baseline: "Weitere Basislinie durchführen",
@@ -364,7 +379,8 @@ const PARENT = {
       finish_assessment_first_title: "Schließe zuerst die Elternbewertung ab",
       iep_stays_private_title: "Der IEP bleibt privat",
       you_stay_in_control_title: "Sie behalten die Kontrolle",
-      share_document_title: "Teilen Sie ein Dokument, damit wir die richtigen Unterstützungen anwenden",
+      share_document_title:
+        "Teilen Sie ein Dokument, damit wir die richtigen Unterstützungen anwenden",
       back_to_learner: "Zurück zum Lernenden",
       continue_assessment: "Bewertung fortsetzen",
       skip_for_now: "Vorerst überspringen",
@@ -419,7 +435,8 @@ const PARENT = {
       try_again: "Tentar novamente",
       step1_label: "Passo 1 · Gráfico de habilidades",
       step1_heading: "Escolhendo as habilidades iniciais certas",
-      step1_body: "Mapeamos a faixa de série e as respostas de confiança do seu aluno no currículo.",
+      step1_body:
+        "Mapeamos a faixa de série e as respostas de confiança do seu aluno no currículo.",
       step2_label: "Passo 2 · Personalização",
       step2_heading: "Aplicando suportes e ritmo",
       step2_body: "Respeitamos cada adaptação que você confirmou mais o perfil sensorial.",
@@ -437,7 +454,8 @@ const PARENT = {
       manage_baseline: "Gerenciar linha de base",
       baseline_complete: "Linha de base concluída",
       questions_answered: "Questões respondidas",
-      skipped_questions_note: "Questões puladas também são úteis — elas dizem ao AIVO o que introduzir lentamente.",
+      skipped_questions_note:
+        "Questões puladas também são úteis — elas dizem ao AIVO o que introduzir lentamente.",
       subjects_covered: "Matérias cobertas",
       personalization: "Personalização",
       parent_assessment: "Avaliação dos pais",
@@ -445,7 +463,8 @@ const PARENT = {
       where_lessons_start: "Onde as lições começam",
       for_you: "Para você",
       what_learner_sees: "O que seu aluno vê",
-      learner_only_version_note: "Esta é a única versão que seu aluno vê — sem notas, sem linguagem clínica.",
+      learner_only_version_note:
+        "Esta é a única versão que seu aluno vê — sem notas, sem linguagem clínica.",
       iep_supports_in_effect: "Suportes do IEP em vigor",
       back_to_learner_home: "Voltar à página inicial do aluno",
       run_another_baseline: "Executar outra linha de base",
@@ -619,7 +638,8 @@ const PARENT = {
       manage_baseline: "ベースラインを管理",
       baseline_complete: "ベースライン完了",
       questions_answered: "回答済みの質問",
-      skipped_questions_note: "スキップした質問も役立ちます — AIVO がゆっくり導入すべき内容を示します。",
+      skipped_questions_note:
+        "スキップした質問も役立ちます — AIVO がゆっくり導入すべき内容を示します。",
       subjects_covered: "カバーした科目",
       personalization: "個別化",
       parent_assessment: "保護者評価",
@@ -627,7 +647,8 @@ const PARENT = {
       where_lessons_start: "レッスンの開始地点",
       for_you: "保護者向け",
       what_learner_sees: "学習者が見るもの",
-      learner_only_version_note: "これは学習者が見る唯一のバージョンです — スコアも臨床用語もありません。",
+      learner_only_version_note:
+        "これは学習者が見る唯一のバージョンです — スコアも臨床用語もありません。",
       iep_supports_in_effect: "IEP サポート有効中",
       back_to_learner_home: "学習者のホームに戻る",
       run_another_baseline: "別のベースラインを実行",
@@ -699,7 +720,8 @@ const PARENT = {
       in_progress: "진행 중",
       step3_label: "3단계 · 문제 세트",
       step3_heading: "첫 번째 질문 작성 중",
-      step3_body: "짧고, 차분하며, 시간 압박이 없습니다. 학습자는 언제든지 일시 정지할 수 있습니다.",
+      step3_body:
+        "짧고, 차분하며, 시간 압박이 없습니다. 학습자는 언제든지 일시 정지할 수 있습니다.",
       up_next: "다음 차례",
     },
     learner_baseline_summary: {
@@ -718,7 +740,8 @@ const PARENT = {
       where_lessons_start: "수업이 시작되는 곳",
       for_you: "학부모용",
       what_learner_sees: "학습자가 보는 것",
-      learner_only_version_note: "이것은 학습자가 보는 유일한 버전입니다 — 점수도, 임상 언어도 없습니다.",
+      learner_only_version_note:
+        "이것은 학습자가 보는 유일한 버전입니다 — 점수도, 임상 언어도 없습니다.",
       iep_supports_in_effect: "IEP 지원 적용 중",
       back_to_learner_home: "학습자 홈으로 돌아가기",
       run_another_baseline: "다른 기준선 실행",
@@ -809,7 +832,8 @@ const PARENT = {
       where_lessons_start: "من أين تبدأ الدروس",
       for_you: "لك",
       what_learner_sees: "ما يراه متعلّمك",
-      learner_only_version_note: "هذه هي النسخة الوحيدة التي يراها متعلّمك — بدون درجات أو لغة سريرية.",
+      learner_only_version_note:
+        "هذه هي النسخة الوحيدة التي يراها متعلّمك — بدون درجات أو لغة سريرية.",
       iep_supports_in_effect: "دعم IEP ساري المفعول",
       back_to_learner_home: "العودة إلى الصفحة الرئيسية للمتعلّم",
       run_another_baseline: "تشغيل خط أساسي آخر",
@@ -874,10 +898,12 @@ const PARENT = {
       try_again: "पुनः प्रयास करें",
       step1_label: "चरण 1 · कौशल ग्राफ",
       step1_heading: "सही शुरुआती कौशल चुनना",
-      step1_body: "हम आपके शिक्षार्थी के ग्रेड बैंड और आत्मविश्वास के उत्तरों को पाठ्यक्रम पर मैप करते हैं।",
+      step1_body:
+        "हम आपके शिक्षार्थी के ग्रेड बैंड और आत्मविश्वास के उत्तरों को पाठ्यक्रम पर मैप करते हैं।",
       step2_label: "चरण 2 · व्यक्तिगतकरण",
       step2_heading: "समर्थन और गति लागू करना",
-      step2_body: "हम आपके द्वारा पुष्टि की गई प्रत्येक सुविधा और संवेदी प्रोफ़ाइल का सम्मान करते हैं।",
+      step2_body:
+        "हम आपके द्वारा पुष्टि की गई प्रत्येक सुविधा और संवेदी प्रोफ़ाइल का सम्मान करते हैं।",
       in_progress: "प्रगति पर",
       step3_label: "चरण 3 · प्रश्न सेट",
       step3_heading: "पहले प्रश्न तैयार करना",
@@ -892,7 +918,8 @@ const PARENT = {
       manage_baseline: "बेसलाइन प्रबंधित करें",
       baseline_complete: "बेसलाइन पूर्ण",
       questions_answered: "उत्तर दिए गए प्रश्न",
-      skipped_questions_note: "छोड़े गए प्रश्न भी उपयोगी हैं — ये AIVO को बताते हैं कि धीरे-धीरे क्या पेश करना है।",
+      skipped_questions_note:
+        "छोड़े गए प्रश्न भी उपयोगी हैं — ये AIVO को बताते हैं कि धीरे-धीरे क्या पेश करना है।",
       subjects_covered: "कवर किए गए विषय",
       personalization: "व्यक्तिगतकरण",
       parent_assessment: "अभिभावक मूल्यांकन",
@@ -900,7 +927,8 @@ const PARENT = {
       where_lessons_start: "पाठ कहाँ से शुरू होते हैं",
       for_you: "आपके लिए",
       what_learner_sees: "आपका शिक्षार्थी क्या देखता है",
-      learner_only_version_note: "यह एकमात्र संस्करण है जो आपका शिक्षार्थी देखता है — कोई अंक नहीं, कोई नैदानिक भाषा नहीं।",
+      learner_only_version_note:
+        "यह एकमात्र संस्करण है जो आपका शिक्षार्थी देखता है — कोई अंक नहीं, कोई नैदानिक भाषा नहीं।",
       iep_supports_in_effect: "IEP समर्थन प्रभावी",
       back_to_learner_home: "शिक्षार्थी के होम पर वापस",
       run_another_baseline: "एक और बेसलाइन चलाएं",
@@ -945,6 +973,8 @@ for (const [locale, subtree] of Object.entries(PARENT)) {
   json.parent = { ...(json.parent ?? {}), ...subtree };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-parent-P_baseline-i18n: merged parent P_baseline namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-parent-P_baseline-i18n: merged parent P_baseline namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-parent-P_baseline-i18n: done — ${written} locale catalogs updated.`);

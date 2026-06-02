@@ -93,8 +93,7 @@ export default tseslint.config(
       "no-restricted-syntax": [
         "error",
         {
-          selector:
-            "Literal[value=/#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\b/]",
+          selector: "Literal[value=/#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\b/]",
           message:
             "Do not hardcode hex colors. Use Inclusive-Warm Tailwind utilities (bg-iw-*, text-iw-*, border-iw-*) or the @aivo/brand CSS variables instead.",
         },

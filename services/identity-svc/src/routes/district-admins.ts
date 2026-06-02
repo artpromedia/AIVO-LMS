@@ -193,20 +193,18 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
       const schoolRows = await db
         .select({ id: schools.id, name: schools.name })
         .from(schools)
-        .where(
-          and(eq(schools.tenantId, tid), inArray(schools.id, Array.from(schoolIds))),
-        );
+        .where(and(eq(schools.tenantId, tid), inArray(schools.id, Array.from(schoolIds))));
       for (const s of schoolRows) schoolNameById.set(s.id, s.name);
     }
 
     return {
       admins: rows.map((r: any) => ({
         ...r,
-        schoolName: r.schoolId ? schoolNameById.get(r.schoolId) ?? null : null,
+        schoolName: r.schoolId ? (schoolNameById.get(r.schoolId) ?? null) : null,
       })),
       pendingInvites: pendingInvites.map((i: any) => ({
         ...i,
-        schoolName: i.schoolId ? schoolNameById.get(i.schoolId) ?? null : null,
+        schoolName: i.schoolId ? (schoolNameById.get(i.schoolId) ?? null) : null,
       })),
     };
   });
@@ -221,7 +219,12 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
     { schema: districtAdminsSchema, preHandler: stepUp },
     async (req: any, reply: any) => {
       const tid = req.tenantId;
-      const { email, name, role: rawRole, schoolId } = (req.body || {}) as {
+      const {
+        email,
+        name,
+        role: rawRole,
+        schoolId,
+      } = (req.body || {}) as {
         email?: string;
         name?: string;
         role?: string;
@@ -232,18 +235,14 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
       }
       const role = (rawRole || "DISTRICT_ADMIN").toUpperCase();
       if (role !== "DISTRICT_ADMIN" && role !== "SCHOOL_ADMIN") {
-        return reply
-          .status(400)
-          .send({ error: "role must be DISTRICT_ADMIN or SCHOOL_ADMIN" });
+        return reply.status(400).send({ error: "role must be DISTRICT_ADMIN or SCHOOL_ADMIN" });
       }
 
       let resolvedSchoolId: string | null = null;
       let schoolName: string | undefined;
       if (role === "SCHOOL_ADMIN") {
         if (!schoolId) {
-          return reply
-            .status(400)
-            .send({ error: "schoolId is required for SCHOOL_ADMIN invites" });
+          return reply.status(400).send({ error: "schoolId is required for SCHOOL_ADMIN invites" });
         }
         const [school] = await db
           .select({ id: schools.id, name: schools.name })
@@ -251,9 +250,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
           .where(and(eq(schools.id, schoolId), eq(schools.tenantId, tid)))
           .limit(1);
         if (!school) {
-          return reply
-            .status(400)
-            .send({ error: "schoolId does not belong to this tenant" });
+          return reply.status(400).send({ error: "schoolId does not belong to this tenant" });
         }
         resolvedSchoolId = school.id;
         schoolName = school.name;
@@ -319,10 +316,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
 
       await logBoth(db, {
         tenantId: tid,
-        action:
-          role === "SCHOOL_ADMIN"
-            ? "school_admin.invited"
-            : "district_admin.invited",
+        action: role === "SCHOOL_ADMIN" ? "school_admin.invited" : "district_admin.invited",
         actor: req.user,
         resourceType: "district_admin_invite",
         resourceId: invite.id,

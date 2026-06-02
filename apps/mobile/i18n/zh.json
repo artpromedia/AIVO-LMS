@@ -739,7 +739,9 @@
     "subtitle": "分享对该学生学习情况的观察",
     "yourInsight": "您的观察",
     "placeholder": "描述您对该学生的观察...",
-    "submitted": "观察已发送至家长收件箱"
+    "submitted": "观察已发送至家长收件箱",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "上传IEP",
@@ -810,7 +812,9 @@
     "prompt": "今天孩子表现如何？",
     "placeholder": "分享您的观察…",
     "submitBtn": "提交观察",
-    "submitted": "观察已保存至大脑洞察"
+    "submitted": "观察已保存至大脑洞察",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "进度",
@@ -846,7 +850,11 @@
     "reportsSubtitle": "生成并查看治疗进展报告",
     "noReportsTitle": "暂无报告",
     "noReportsMessage": "准备好后生成进展报告。",
-    "generateReport": "生成报告"
+    "generateReport": "生成报告",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected."
   },
   "therapistSessions": {
     "title": "会话日志",

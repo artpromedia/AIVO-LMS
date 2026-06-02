@@ -104,9 +104,7 @@ export default async function Page() {
         mockupTitle="Parent assessment · Section 2 of 5"
         mockup={
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-slate-900">
-              {t("reading_question")}
-            </p>
+            <p className="text-sm font-semibold text-slate-900">{t("reading_question")}</p>
             <div className="grid grid-cols-2 gap-2">
               {["Loves it", "Mixed", "Avoids it", "Not sure"].map((o) => (
                 <div
@@ -135,9 +133,7 @@ export default async function Page() {
               relevant context with AIVO. We use it to adjust pacing, scaffolds, and supports —
               never to label your child or expose raw plan text inside the product.
             </p>
-            <p className="mt-3 text-sm text-slate-600">
-              {t("aivo_disclaimer")}
-            </p>
+            <p className="mt-3 text-sm text-slate-600">{t("aivo_disclaimer")}</p>
           </>
         }
         ctaLabel="Read our special education page"
@@ -195,7 +191,9 @@ export default async function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-4 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">{t("todays_mission")}</p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">
+                {t("todays_mission")}
+              </p>
               <h3 className="mt-1 font-heading text-xl font-bold">{t("multiplying_by_3s")}</h3>
               <p className="mt-1 text-xs text-purple-100">{t("with_atlas")}</p>
             </div>

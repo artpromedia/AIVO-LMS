@@ -19,7 +19,11 @@ const messagesDir = join(repoRoot, "apps/web-v2/lib/i18n/messages");
 
 const DATA = {
   en: {
-    common: { learner_eyebrow: "Learner", no_profile: "No learner profile linked", source: "Source: {source}" },
+    common: {
+      learner_eyebrow: "Learner",
+      no_profile: "No learner profile linked",
+      source: "Source: {source}",
+    },
     missions: {
       title: "Missions",
       description: "Your active assignments and lessons in progress.",
@@ -65,7 +69,11 @@ const DATA = {
   },
 
   es: {
-    common: { learner_eyebrow: "Estudiante", no_profile: "No hay un perfil de estudiante vinculado", source: "Fuente: {source}" },
+    common: {
+      learner_eyebrow: "Estudiante",
+      no_profile: "No hay un perfil de estudiante vinculado",
+      source: "Fuente: {source}",
+    },
     missions: {
       title: "Misiones",
       description: "Tus tareas activas y lecciones en curso.",
@@ -111,7 +119,11 @@ const DATA = {
   },
 
   fr: {
-    common: { learner_eyebrow: "Apprenant", no_profile: "Aucun profil d'apprenant associé", source: "Source : {source}" },
+    common: {
+      learner_eyebrow: "Apprenant",
+      no_profile: "Aucun profil d'apprenant associé",
+      source: "Source : {source}",
+    },
     missions: {
       title: "Missions",
       description: "Tes devoirs en cours et tes leçons en cours.",
@@ -157,7 +169,11 @@ const DATA = {
   },
 
   de: {
-    common: { learner_eyebrow: "Lernende/r", no_profile: "Kein Lernprofil verknüpft", source: "Quelle: {source}" },
+    common: {
+      learner_eyebrow: "Lernende/r",
+      no_profile: "Kein Lernprofil verknüpft",
+      source: "Quelle: {source}",
+    },
     missions: {
       title: "Missionen",
       description: "Deine aktiven Aufgaben und laufenden Lektionen.",
@@ -173,7 +189,8 @@ const DATA = {
       title: "Bibliothek",
       description: "Spiele Lektionen erneut, die du schon abgeschlossen hast.",
       nothing_finished: "Noch nichts abgeschlossen",
-      nothing_finished_desc: "Schließe eine Lektion aus der heutigen Mission ab, dann erscheint sie hier.",
+      nothing_finished_desc:
+        "Schließe eine Lektion aus der heutigen Mission ab, dann erscheint sie hier.",
       lesson: "Lektion",
       completed: "abgeschlossen am {date}",
       replay: "Erneut abspielen →",
@@ -189,7 +206,8 @@ const DATA = {
       description: "Wähle, wessen Lernenden-Erlebnis du ansehen möchtest.",
       forbidden: "Diese/r Lernende ist nicht mit deinem Konto verknüpft.",
       no_learners: "Noch keine Lernenden",
-      no_learners_desc: "Füge deinem Konto ein Kind hinzu, bevor du das Lernenden-Erlebnis ansiehst.",
+      no_learners_desc:
+        "Füge deinem Konto ein Kind hinzu, bevor du das Lernenden-Erlebnis ansiehst.",
       add_learner: "Lernende/n hinzufügen",
       view_as_aria: "Ansehen als {name}",
       age_not_set: "Alter nicht festgelegt",
@@ -203,7 +221,11 @@ const DATA = {
   },
 
   pt: {
-    common: { learner_eyebrow: "Aluno", no_profile: "Nenhum perfil de aluno vinculado", source: "Fonte: {source}" },
+    common: {
+      learner_eyebrow: "Aluno",
+      no_profile: "Nenhum perfil de aluno vinculado",
+      source: "Fonte: {source}",
+    },
     missions: {
       title: "Missões",
       description: "Suas tarefas ativas e lições em andamento.",
@@ -295,7 +317,11 @@ const DATA = {
   },
 
   ja: {
-    common: { learner_eyebrow: "学習者", no_profile: "学習者プロフィールが関連付けられていません", source: "ソース：{source}" },
+    common: {
+      learner_eyebrow: "学習者",
+      no_profile: "学習者プロフィールが関連付けられていません",
+      source: "ソース：{source}",
+    },
     missions: {
       title: "ミッション",
       description: "進行中の課題とレッスン。",
@@ -341,7 +367,11 @@ const DATA = {
   },
 
   ko: {
-    common: { learner_eyebrow: "학습자", no_profile: "연결된 학습자 프로필이 없습니다", source: "출처: {source}" },
+    common: {
+      learner_eyebrow: "학습자",
+      no_profile: "연결된 학습자 프로필이 없습니다",
+      source: "출처: {source}",
+    },
     missions: {
       title: "미션",
       description: "진행 중인 과제와 수업.",
@@ -387,7 +417,11 @@ const DATA = {
   },
 
   ar: {
-    common: { learner_eyebrow: "المتعلّم", no_profile: "لا يوجد ملف متعلّم مرتبط", source: "المصدر: {source}" },
+    common: {
+      learner_eyebrow: "المتعلّم",
+      no_profile: "لا يوجد ملف متعلّم مرتبط",
+      source: "المصدر: {source}",
+    },
     missions: {
       title: "المهام",
       description: "واجباتك النشطة ودروسك الجارية.",
@@ -433,7 +467,11 @@ const DATA = {
   },
 
   hi: {
-    common: { learner_eyebrow: "सीखने वाला", no_profile: "कोई सीखने वाला प्रोफ़ाइल लिंक नहीं है", source: "स्रोत: {source}" },
+    common: {
+      learner_eyebrow: "सीखने वाला",
+      no_profile: "कोई सीखने वाला प्रोफ़ाइल लिंक नहीं है",
+      source: "स्रोत: {source}",
+    },
     missions: {
       title: "मिशन",
       description: "तुम्हारे सक्रिय असाइनमेंट और चल रहे पाठ।",

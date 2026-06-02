@@ -15,8 +15,7 @@ import {
 import { BASELINE_LLM_REQUIRED_SUBJECTS } from "@/lib/validators/baseline-llm";
 
 function makeValidQuestion(idx: number) {
-  const subject =
-    BASELINE_LLM_REQUIRED_SUBJECTS[idx % BASELINE_LLM_REQUIRED_SUBJECTS.length]!;
+  const subject = BASELINE_LLM_REQUIRED_SUBJECTS[idx % BASELINE_LLM_REQUIRED_SUBJECTS.length]!;
   return {
     id: `q_${idx}`,
     subject,
@@ -72,9 +71,7 @@ describe("baselineLlmEndpoint", () => {
   it("joins base + path without producing a double slash", () => {
     expect(baselineLlmEndpoint("http://x")).toBe("http://x/api/ai/generate-baseline");
     expect(baselineLlmEndpoint("http://x/")).toBe("http://x/api/ai/generate-baseline");
-    expect(baselineLlmEndpoint("http://x///")).toBe(
-      "http://x/api/ai/generate-baseline",
-    );
+    expect(baselineLlmEndpoint("http://x///")).toBe("http://x/api/ai/generate-baseline");
   });
 });
 

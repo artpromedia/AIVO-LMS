@@ -8,14 +8,7 @@
 //   - `variant="segmented"` full three-segment pill (used in settings)
 
 import React from "react";
-import {
-  Pressable,
-  View,
-  Text,
-  StyleSheet,
-  type StyleProp,
-  type ViewStyle,
-} from "react-native";
+import { Pressable, View, Text, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SENSORY_MODES, SENSORY_MODE_LABELS, type SensoryMode } from "@aivo/brand";
 import { useSensoryMode, useSensoryPalette } from "@/context/SensoryModeProvider";
@@ -32,10 +25,7 @@ const ICON_BY_MODE: Record<SensoryMode, keyof typeof Ionicons.glyphMap> = {
   "high-contrast": "contrast",
 };
 
-export function SensoryToggle({
-  variant = "icon",
-  style,
-}: SensoryToggleProps) {
+export function SensoryToggle({ variant = "icon", style }: SensoryToggleProps) {
   const { mode, setMode, cycleMode } = useSensoryMode();
   const palette = useSensoryPalette();
 
@@ -85,10 +75,7 @@ export function SensoryToggle({
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
             accessibilityLabel={SENSORY_MODE_LABELS[m].label}
-            style={[
-              styles.segmentItem,
-              active && { backgroundColor: palette.bgPage },
-            ]}
+            style={[styles.segmentItem, active && { backgroundColor: palette.bgPage }]}
           >
             <Text
               style={{

@@ -69,10 +69,7 @@ export default async function LearnerQuestsPage() {
 
       {worlds.length === 0 ? (
         <div className="mt-6 rounded-iw-card-lg bg-white border border-iw-border p-6">
-          <EmptyState
-            title={t("no_quests_title")}
-            body={t("no_quests_body")}
-          />
+          <EmptyState title={t("no_quests_title")} body={t("no_quests_body")} />
         </div>
       ) : (
         <>
@@ -81,12 +78,15 @@ export default async function LearnerQuestsPage() {
               <p className="iw-label text-iw-text-muted">{t("across_all")}</p>
               <p className="text-lg font-semibold text-iw-text-strong">
                 {t("chapters_complete", { count: completedCount })}{" "}
-                <span className="text-iw-text-muted">{t("of_total", { total: totalChapters })}</span>
+                <span className="text-iw-text-muted">
+                  {t("of_total", { total: totalChapters })}
+                </span>
               </p>
             </div>
             <BaselineProgressDots
-              states={Array.from({ length: totalChapters }, (_, i): DotState =>
-                i < completedCount ? "answered" : "pending",
+              states={Array.from(
+                { length: totalChapters },
+                (_, i): DotState => (i < completedCount ? "answered" : "pending"),
               )}
               ariaLabel={t("total_progress_aria")}
             />
@@ -97,51 +97,56 @@ export default async function LearnerQuestsPage() {
               worlds.map(async (w) => {
                 const chapters = await listQuestChapters(w.id);
                 const normal = chapters.filter((c) => !c.isBoss);
-              const boss = chapters.find((c) => c.isBoss);
-              const done = normal.filter((c) => completedChapterIds.has(c.id)).length;
-              const bossDone = boss ? completedChapterIds.has(boss.id) : false;
-              const states: DotState[] = normal.map((c) =>
-                completedChapterIds.has(c.id) ? "answered" : "pending",
-              );
-              return (
-                <GlassCard
-                  key={w.id}
-                  elevation="raised"
-                  density="comfortable"
-                >
-                  <header className="flex items-start justify-between gap-3 mb-3">
-                    <div className="min-w-0">
-                      <h2 className="text-lg font-semibold text-iw-text-strong leading-snug">
-                        {w.name}
-                      </h2>
-                      <p className="text-sm text-iw-text-muted mt-1">{w.description}</p>
-                    </div>
-                    <InsightChip
-                      tone={bossDone ? "success" : "primary"}
-                      size="md"
+                const boss = chapters.find((c) => c.isBoss);
+                const done = normal.filter((c) => completedChapterIds.has(c.id)).length;
+                const bossDone = boss ? completedChapterIds.has(boss.id) : false;
+                const states: DotState[] = normal.map((c) =>
+                  completedChapterIds.has(c.id) ? "answered" : "pending",
+                );
+                return (
+                  <GlassCard key={w.id} elevation="raised" density="comfortable">
+                    <header className="flex items-start justify-between gap-3 mb-3">
+                      <div className="min-w-0">
+                        <h2 className="text-lg font-semibold text-iw-text-strong leading-snug">
+                          {w.name}
+                        </h2>
+                        <p className="text-sm text-iw-text-muted mt-1">{w.description}</p>
+                      </div>
+                      <InsightChip tone={bossDone ? "success" : "primary"} size="md">
+                        {done}/{normal.length}
+                      </InsightChip>
+                    </header>
+                    <BaselineProgressDots
+                      states={states}
+                      ariaLabel={t("world_progress_aria", { name: w.name })}
+                    />
+                    {boss ? (
+                      <p className="mt-3 text-xs text-iw-text-muted">
+                        {bossDone
+                          ? t("boss_complete")
+                          : t("boss_unlocks", { count: boss.prerequisiteChapterIds.length })}
+                      </p>
+                    ) : null}
+                    <Link
+                      href={`/learner/quests/${w.id}`}
+                      className="mt-4 inline-flex items-center gap-2 self-start rounded-iw-control px-4 py-2 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
                     >
-                      {done}/{normal.length}
-                    </InsightChip>
-                  </header>
-                  <BaselineProgressDots states={states} ariaLabel={t("world_progress_aria", { name: w.name })} />
-                  {boss ? (
-                    <p className="mt-3 text-xs text-iw-text-muted">
-                      {bossDone
-                        ? t("boss_complete")
-                        : t("boss_unlocks", { count: boss.prerequisiteChapterIds.length })}
-                    </p>
-                  ) : null}
-                  <Link
-                    href={`/learner/quests/${w.id}`}
-                    className="mt-4 inline-flex items-center gap-2 self-start rounded-iw-control px-4 py-2 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
-                  >
-                    {done > 0 ? t("continue") : t("start_quest")}
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M5 12h14" />
-                      <path d="m13 5 7 7-7 7" />
-                    </svg>
-                  </Link>
-                </GlassCard>
+                      {done > 0 ? t("continue") : t("start_quest")}
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.25"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M5 12h14" />
+                        <path d="m13 5 7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </GlassCard>
                 );
               }),
             )}

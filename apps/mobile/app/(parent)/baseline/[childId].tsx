@@ -12,7 +12,7 @@ import { Card } from "@/components/ui";
 import { MasteryBar, LoadingState } from "@aivo/mobile-ui";
 import { summarizeDomains } from "@/lib/learner-progress";
 import { subjectAccent } from "@/lib/subject-display";
-import { spacing, radius } from "@/constants/colors";
+import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 
@@ -31,7 +31,10 @@ export default function ParentBaselineScreen() {
   const { data: brain, isLoading } = useBrain(id);
   const { domains } = useBrainDomains(id, { enrolledGrade: learner?.gradeLevel ?? null });
   const summary = useMemo(
-    () => summarizeDomains(domains.map((d) => ({ domain: d.domain, masteryPercent: d.masteryPercent }))),
+    () =>
+      summarizeDomains(
+        domains.map((d) => ({ domain: d.domain, masteryPercent: d.masteryPercent })),
+      ),
     [domains],
   );
 
@@ -74,7 +77,12 @@ export default function ParentBaselineScreen() {
               {t("parentBaseline.bySubject", "By subject")}
             </Text>
             {summary.subjects.map((s) => (
-              <MasteryBar key={s.name} label={s.name} value={s.mastery} tone={subjectAccent(s.name)} />
+              <MasteryBar
+                key={s.name}
+                label={s.name}
+                value={s.mastery}
+                tone={subjectAccent(s.name)}
+              />
             ))}
           </Card>
         </View>
@@ -84,8 +92,19 @@ export default function ParentBaselineScreen() {
 }
 
 const styles = StyleSheet.create({
-  iconWrap: { width: 56, height: 56, borderRadius: 28, alignItems: "center", justifyContent: "center" },
+  iconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   heading: { fontSize: 18, fontFamily: fontFamilies.displayBold },
-  eyebrow: { fontSize: 12, fontFamily: fontFamilies.bodyBold, textTransform: "uppercase", letterSpacing: 0.5 },
+  eyebrow: {
+    fontSize: 12,
+    fontFamily: fontFamilies.bodyBold,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
   body: { fontSize: 14, fontFamily: fontFamilies.bodyRegular, lineHeight: 21 },
 });

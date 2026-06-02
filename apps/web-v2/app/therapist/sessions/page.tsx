@@ -64,9 +64,7 @@ export default async function TherapistSessionsPage() {
   const t = await getTranslations("therapist.sessions");
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
-  const maybeLearners = await Promise.all(
-    learnerIds.map((id) => getLearner(id, session.tenantId)),
-  );
+  const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   const learnerById = new Map(learners.map((l) => [l.id, l]));
 
@@ -74,9 +72,7 @@ export default async function TherapistSessionsPage() {
   const skillName = new Map((await listSkills()).map((s) => [s.id, s.name]));
 
   const runBatches = await Promise.all(
-    learners.map((l) =>
-      listLessonRunsForLearner(l.id, session.tenantId, { limit: LOG_LIMIT }),
-    ),
+    learners.map((l) => listLessonRunsForLearner(l.id, session.tenantId, { limit: LOG_LIMIT })),
   );
   const log = runBatches
     .flat()

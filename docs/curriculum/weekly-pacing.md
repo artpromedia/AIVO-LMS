@@ -9,12 +9,12 @@ syllabus.
 
 ## What's in this phase
 
-| Piece | Location |
-| ----- | -------- |
-| Schema (5 tables) | `packages/db/src/schema/pacing.ts` + migration `drizzle/0046_weekly_pacing.sql` |
-| Pure pacing engine | `services/brain-svc/.../services/pacing_engine.py` |
-| Routes | `services/brain-svc/.../routes/pacing.py` (prefix `/api/brain/pacing`) |
-| Tests | `services/brain-svc/tests/test_pacing_engine.py` |
+| Piece              | Location                                                                        |
+| ------------------ | ------------------------------------------------------------------------------- |
+| Schema (5 tables)  | `packages/db/src/schema/pacing.ts` + migration `drizzle/0046_weekly_pacing.sql` |
+| Pure pacing engine | `services/brain-svc/.../services/pacing_engine.py`                              |
+| Routes             | `services/brain-svc/.../routes/pacing.py` (prefix `/api/brain/pacing`)          |
+| Tests              | `services/brain-svc/tests/test_pacing_engine.py`                                |
 
 ## Tables (shared Postgres)
 
@@ -45,11 +45,11 @@ content.
 
 ## Routes (`/api/brain/pacing`, JWT-auth + learner-scope)
 
-| Method | Route | Purpose |
-| ------ | ----- | ------- |
-| `POST` | `/{learner_id}/pacing-plan/generate` | generate scope-&-sequence → explode onto the calendar → persist a new active plan (archiving the prior one). Body: `{ subject, term_count?, plan_start, calendar?: { terms[], breaks[] } }`. |
-| `GET`  | `/{learner_id}/pacing/current?subject=&on=` | the week whose window contains `on` (default today) for the active plan, plus the next week. |
-| `GET`  | `/{learner_id}/pacing/plan?subject=` | the full active plan with all weeks. |
+| Method | Route                                       | Purpose                                                                                                                                                                                      |
+| ------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST` | `/{learner_id}/pacing-plan/generate`        | generate scope-&-sequence → explode onto the calendar → persist a new active plan (archiving the prior one). Body: `{ subject, term_count?, plan_start, calendar?: { terms[], breaks[] } }`. |
+| `GET`  | `/{learner_id}/pacing/current?subject=&on=` | the week whose window contains `on` (default today) for the active plan, plus the next week.                                                                                                 |
+| `GET`  | `/{learner_id}/pacing/plan?subject=`        | the full active plan with all weeks.                                                                                                                                                         |
 
 The plan reuses the existing `generate_scope_sequence` (brain-svc curriculum
 engine), the learner's framework/grade/mastery/accommodations, and persists via
@@ -105,7 +105,7 @@ pacing week live via `getActiveCurriculumFocus` (Phase 2b) — so a started less
 is already pacing-synced and there's nothing stale to pre-warm for correctness.
 Pre-materializing runs would also require a standard→web-v2-`skillId` mapping
 that doesn't exist yet and would create runs that may never be used. The cron's
-job is to keep week *status* current (drives progress display + the upcoming
+job is to keep week _status_ current (drives progress display + the upcoming
 holiday-prep selection). Pre-generation can be revisited as a cache-warm
 optimization once standard→skill mapping lands.
 
@@ -115,8 +115,8 @@ Break weeks are no longer "no-sync" dead time — they become **holiday-prep
 lessons** so the learner stays ready for school resumption:
 
 - **brain-svc** `build_holiday_prep(weeks, break_week_index)` (pure) reviews the
-  nearest instruction weeks *before* the break and previews the next
-  instruction week *after* it, returning combined review/preview topics,
+  nearest instruction weeks _before_ the break and previews the next
+  instruction week _after_ it, returning combined review/preview topics,
   standards and vocabulary + the prior/next unit titles. `/pacing/current`
   includes a `holidayPrep` payload whenever the current week is a break.
 - **web-v2** `holidayPrepToFocus` (`lib/bff/brain-pacing.ts`) maps that payload
@@ -124,17 +124,18 @@ lessons** so the learner stays ready for school resumption:
   then preview). `brainPacingFocus` returns it for a break week; an
   instructional week still returns a normal `mode: "school_sync"` focus.
 - **Generator** (`lib/learner/lesson-plan.ts`) branches on
-  `curriculumFocus.mode`: a holiday-prep lesson is framed as *"School's on a
-  break — let's review and get a head start on what's coming up"* (title, story
+  `curriculumFocus.mode`: a holiday-prep lesson is framed as _"School's on a
+  break — let's review and get a head start on what's coming up"_ (title, story
   hook, micro-lesson, worked example and parent summary all adjust) instead of
-  *"the same thing you're doing in class this week."*
+  _"the same thing you're doing in class this week."_
 
 `CurriculumFocus.mode` defaults to `school_sync` (Phase 1 uploads + Phase 2
 instruction weeks), so existing behavior is unchanged.
 
 Tests: `build_holiday_prep` cases in `test_pacing_engine.py`; `holidayPrepToFocus`
-+ break-week mapping in `brain-pacing.test.ts`; the holiday-prep generator
-framing in `curriculum-sync.test.ts`.
+
+- break-week mapping in `brain-pacing.test.ts`; the holiday-prep generator
+  framing in `curriculum-sync.test.ts`.
 
 ## Not in this phase (next steps)
 

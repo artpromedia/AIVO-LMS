@@ -35,8 +35,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     const state = await refreshLearnerReadiness(learnerId, session!.tenantId);
-    if (!state)
-      return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
+    if (!state) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     const next = nextStepFor({ id: learnerId, readinessState: state });
     return ok(
       {

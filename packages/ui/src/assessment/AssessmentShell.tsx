@@ -50,15 +50,11 @@ export function AssessmentShell({
         {(progress || saveIndicator || eyebrow) && (
           <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-1 min-w-0">
-              {eyebrow ? (
-                <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p>
-              ) : null}
+              {eyebrow ? <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p> : null}
               {progress}
             </div>
             {saveIndicator ? (
-              <div className="shrink-0 text-xs text-iw-text-muted">
-                {saveIndicator}
-              </div>
+              <div className="shrink-0 text-xs text-iw-text-muted">{saveIndicator}</div>
             ) : null}
           </header>
         )}

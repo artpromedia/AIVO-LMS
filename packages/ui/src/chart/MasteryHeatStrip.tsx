@@ -53,14 +53,26 @@ const LEGEND: Array<{ level: MasteryLevel; label: string }> = [
  */
 export const MasteryHeatStrip = forwardRef<HTMLDivElement, MasteryHeatStripProps>(
   function MasteryHeatStrip(
-    { cells, height = 40, showLegend = true, className, ariaLabel = "Mastery overview", loading, error, empty },
+    {
+      cells,
+      height = 40,
+      showLegend = true,
+      className,
+      ariaLabel = "Mastery overview",
+      loading,
+      error,
+      empty,
+    },
     ref,
   ) {
     if (loading) {
       return (
         <div
           ref={ref}
-          className={cn("aivo-motion-baseline-gen rounded-iw-card bg-iw-card border border-iw-border", className)}
+          className={cn(
+            "aivo-motion-baseline-gen rounded-iw-card bg-iw-card border border-iw-border",
+            className,
+          )}
           style={{ height: height + (showLegend ? 28 : 0) }}
           aria-busy="true"
         />
@@ -95,7 +107,12 @@ export const MasteryHeatStrip = forwardRef<HTMLDivElement, MasteryHeatStripProps
     }
 
     return (
-      <div ref={ref} className={cn("flex flex-col gap-2", className)} role="group" aria-label={ariaLabel}>
+      <div
+        ref={ref}
+        className={cn("flex flex-col gap-2", className)}
+        role="group"
+        aria-label={ariaLabel}
+      >
         <div
           className="grid gap-1 aivo-motion-lesson-reveal"
           style={{ gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`, height }}

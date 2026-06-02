@@ -1,7 +1,7 @@
 # Sprint 12 — Production Readiness
 
 This document captures the production-readiness gates added in Sprint 12
-and the e2e / load / security work that ships *next* (the items here
+and the e2e / load / security work that ships _next_ (the items here
 need real browsers, k6, and a manual review pass — they don't belong in
 the unit-test grid).
 
@@ -101,15 +101,16 @@ through Playwright with `baseURL=https://staging.aivolms.com`.
 
 Run k6 with the following ramps against staging:
 
-| Endpoint | Target VUs | Duration | p95 SLO |
-|---|---|---|---|
-| `POST /api/ai/generate-baseline` | 50 | 5 min | < 30 s |
-| `POST /api/ai/iep/draft`         | 25 | 5 min | < 40 s |
-| `GET  /api/bff/admin/school/dashboard` | 200 | 10 min | < 500 ms |
-| `POST /api/bff/therapist/sessions` | 50 | 5 min | < 800 ms |
-| `GET  /api/bff/admin/baseline-metrics` | 100 | 10 min | < 600 ms |
+| Endpoint                               | Target VUs | Duration | p95 SLO  |
+| -------------------------------------- | ---------- | -------- | -------- |
+| `POST /api/ai/generate-baseline`       | 50         | 5 min    | < 30 s   |
+| `POST /api/ai/iep/draft`               | 25         | 5 min    | < 40 s   |
+| `GET  /api/bff/admin/school/dashboard` | 200        | 10 min   | < 500 ms |
+| `POST /api/bff/therapist/sessions`     | 50         | 5 min    | < 800 ms |
+| `GET  /api/bff/admin/baseline-metrics` | 100        | 10 min   | < 600 ms |
 
 Track in Grafana:
+
 - LLM token spend per tenant (sum of `cost_cents` from
   `services/ai-svc/.../llm_gateway.py` log lines).
 - Prompt-cache hit rate per (district, gradeBand, functioningLevel)

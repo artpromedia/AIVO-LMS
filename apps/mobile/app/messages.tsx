@@ -23,24 +23,14 @@
  * be lifted into the catalog alongside the unified inbox port.
  */
 import React, { useMemo } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { EmptyState } from "@aivo/mobile-ui";
 import { useAuth } from "@/hooks/useAuth";
 import { colors, spacing } from "@/constants/colors";
 import { MessagesInbox } from "@/components/messages/MessagesInbox";
-import {
-  buildMobileRoleSession,
-  getMobileNavAccess,
-  toNavRole,
-} from "@/lib/nav-access";
+import { buildMobileRoleSession, getMobileNavAccess, toNavRole } from "@/lib/nav-access";
 
 export default function MessagesScreen() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -76,10 +66,7 @@ export default function MessagesScreen() {
     return (
       <ScrollView
         style={styles.container}
-        contentContainerStyle={[
-          styles.center,
-          { paddingTop: insets.top + 16, paddingBottom: 32 },
-        ]}
+        contentContainerStyle={[styles.center, { paddingTop: insets.top + 16, paddingBottom: 32 }]}
       >
         <ActivityIndicator color={colors.primary} />
       </ScrollView>
@@ -99,9 +86,7 @@ export default function MessagesScreen() {
   if (decision.outcome === "switch-role" && decision.requiredRole) {
     return screen(
       <EmptyState
-        icon={
-          <Ionicons name="swap-horizontal-outline" size={48} color={colors.textSecondary} />
-        }
+        icon={<Ionicons name="swap-horizontal-outline" size={48} color={colors.textSecondary} />}
         title="Switch role to continue"
         message={`Messages for this area are available under your ${decision.requiredRole} role.`}
       />,
@@ -113,9 +98,7 @@ export default function MessagesScreen() {
       <EmptyState
         icon={<Ionicons name="lock-closed-outline" size={48} color={colors.textSecondary} />}
         title="Messages are not available"
-        message={
-          decision.lockReason ?? "Messages are not available for your current role."
-        }
+        message={decision.lockReason ?? "Messages are not available for your current role."}
       />,
     );
   }
@@ -123,9 +106,7 @@ export default function MessagesScreen() {
   if (decision.outcome === "forbidden") {
     return screen(
       <EmptyState
-        icon={
-          <Ionicons name="alert-circle-outline" size={48} color={colors.textSecondary} />
-        }
+        icon={<Ionicons name="alert-circle-outline" size={48} color={colors.textSecondary} />}
         title="You don't have access"
         message="Messages aren't available for your current account."
       />,
@@ -134,12 +115,7 @@ export default function MessagesScreen() {
 
   // `allow` — render the real threaded inbox (mirrors web `/messages`).
   return (
-    <View
-      style={[
-        styles.container,
-        { flex: 1, paddingTop: insets.top + 16, paddingBottom: 16 },
-      ]}
-    >
+    <View style={[styles.container, { flex: 1, paddingTop: insets.top + 16, paddingBottom: 16 }]}>
       <Text style={styles.title}>Messages</Text>
       <Text style={styles.subtitle}>Conversations with your AIVO team.</Text>
       <MessagesInbox />

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { 
-  Menu, 
-  Settings, 
-  Eye, 
-  Battery, 
-  Wifi, 
-  Signal, 
+import {
+  Menu,
+  Settings,
+  Eye,
+  Battery,
+  Wifi,
+  Signal,
   ChevronRight,
   BookOpen,
   Calculator,
@@ -13,7 +13,7 @@ import {
   Star,
   Trophy,
   Brain,
-  Pause
+  Pause,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,11 @@ export function Mobile() {
   const [mode, setMode] = useState<"standard" | "calm">("standard");
 
   return (
-    <div className={`aivo-inclusive-lab relative w-full h-full max-w-[390px] mx-auto bg-background text-foreground overflow-hidden flex flex-col font-sans transition-colors duration-500 border-x ${
-      mode === "calm" ? "sensory-calm" : ""
-    }`}>
-      
+    <div
+      className={`aivo-inclusive-lab relative w-full h-full max-w-[390px] mx-auto bg-background text-foreground overflow-hidden flex flex-col font-sans transition-colors duration-500 border-x ${
+        mode === "calm" ? "sensory-calm" : ""
+      }`}
+    >
       {/* Fake iOS Status Bar */}
       <div className="h-12 px-5 flex items-center justify-between text-foreground text-[15px] font-medium shrink-0 pt-2 z-50 bg-background">
         <span>9:41</span>
@@ -49,13 +50,13 @@ export function Mobile() {
             <p className="text-xs text-muted-foreground">Level 3 Scholar</p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="w-9 h-9 rounded-full bg-muted/50"
-            onClick={() => setMode(m => m === "standard" ? "calm" : "standard")}
+            onClick={() => setMode((m) => (m === "standard" ? "calm" : "standard"))}
           >
             <Eye className={`w-4 h-4 ${mode === "calm" ? "text-primary" : ""}`} />
           </Button>
@@ -64,17 +65,18 @@ export function Mobile() {
 
       {/* Main Scrollable Content */}
       <div className="flex-1 overflow-y-auto px-6 pb-24 scrollbar-hide">
-        
         {/* Companion & Status */}
         <section className="mt-2 mb-8 relative">
-          <div className={`rounded-3xl p-6 flex flex-col items-center text-center transition-all duration-500 ${
-            mode === "calm" ? "bg-muted/30" : "bg-gradient-to-b from-primary/10 to-transparent"
-          }`}>
+          <div
+            className={`rounded-3xl p-6 flex flex-col items-center text-center transition-all duration-500 ${
+              mode === "calm" ? "bg-muted/30" : "bg-gradient-to-b from-primary/10 to-transparent"
+            }`}
+          >
             <div className="relative w-32 h-32 mb-4">
               <div className="absolute inset-0 bg-secondary/20 rounded-full blur-2xl animate-pulse"></div>
-              <img 
-                src="/__mockup/images/aivo-inclusive-lab/companion.png" 
-                alt="Digital Companion" 
+              <img
+                src="/__mockup/images/aivo-inclusive-lab/companion.png"
+                alt="Digital Companion"
                 className="w-full h-full object-contain relative z-10"
               />
             </div>
@@ -82,7 +84,7 @@ export function Mobile() {
             <p className="text-muted-foreground text-sm max-w-[240px]">
               You had great focus yesterday. Ready for today's plan?
             </p>
-            
+
             <div className="w-full mt-6 flex items-center gap-4 bg-background p-3 rounded-2xl border shadow-sm">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 text-amber-700">
                 <Star className="w-5 h-5 fill-amber-500" />
@@ -102,9 +104,11 @@ export function Mobile() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-lg">Today's Plan</h3>
-            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-full">3 Tasks</span>
+            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-full">
+              3 Tasks
+            </span>
           </div>
-          
+
           <div className="space-y-3">
             {/* Active Task */}
             <Card className="border-primary shadow-sm overflow-hidden relative">

@@ -106,9 +106,9 @@ export function SpeechBuddyConsentCard({
     <Card tone="raised" style={{ gap: spacing.sm }}>
       <Text style={[styles.title, { color: palette.ink }]}>Speech Buddy</Text>
       <Text style={[styles.body, { color: palette.inkMuted }]}>
-        Optional voice companion that helps {learnerName} practise social-emotional
-        skills. Off until you turn it on; every session is safety-filtered, and you can
-        withdraw consent any time.
+        Optional voice companion that helps {learnerName} practise social-emotional skills. Off
+        until you turn it on; every session is safety-filtered, and you can withdraw consent any
+        time.
       </Text>
 
       {loading ? (

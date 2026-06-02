@@ -14,7 +14,10 @@ import { fontFamilies } from "@/constants/typography";
 async function pickDoc(): Promise<{ name: string } | null> {
   try {
     const DP: any = await import("expo-document-picker");
-    const res = await DP.getDocumentAsync({ type: ["application/pdf", "image/*"], copyToCacheDirectory: true });
+    const res = await DP.getDocumentAsync({
+      type: ["application/pdf", "image/*"],
+      copyToCacheDirectory: true,
+    });
     if (res?.canceled) return null;
     const asset = res?.assets?.[0];
     return asset ? { name: asset.name ?? "document" } : null;
@@ -39,7 +42,9 @@ export default function TeacherCurriculumScreen() {
     <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
       <ScreenHeader title={t("teacherCurriculum.title", "Curriculum")} />
       <Card tone="raised" style={{ gap: spacing.sm }}>
-        <Text style={[styles.heading, { color: palette.ink }]}>{t("teacherCurriculum.heading", "Add class scope")}</Text>
+        <Text style={[styles.heading, { color: palette.ink }]}>
+          {t("teacherCurriculum.heading", "Add class scope")}
+        </Text>
         <Text style={[styles.body, { color: palette.inkMuted }]}>
           {t("teacherCurriculum.body", {
             name: learner?.firstName ?? t("teacher.student", "this student"),
@@ -49,20 +54,29 @@ export default function TeacherCurriculumScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t("teacherCurriculum.upload", "Upload a document")}
-          onPress={async () => { const d = await pickDoc(); if (d) setPicked((p) => [d.name, ...p]); }}
+          onPress={async () => {
+            const d = await pickDoc();
+            if (d) setPicked((p) => [d.name, ...p]);
+          }}
           style={[styles.uploadBtn, { borderColor: palette.primary }]}
         >
           <Ionicons name="cloud-upload-outline" size={20} color={palette.primary} />
-          <Text style={[styles.uploadText, { color: palette.primary }]}>{t("teacherCurriculum.upload", "Upload a document")}</Text>
+          <Text style={[styles.uploadText, { color: palette.primary }]}>
+            {t("teacherCurriculum.upload", "Upload a document")}
+          </Text>
         </Pressable>
       </Card>
       {picked.length > 0 && (
         <Card tone="raised" style={{ gap: spacing.sm, marginTop: spacing.md }}>
-          <Text style={[styles.heading, { color: palette.ink }]}>{t("teacherCurriculum.uploaded", "Selected files")}</Text>
+          <Text style={[styles.heading, { color: palette.ink }]}>
+            {t("teacherCurriculum.uploaded", "Selected files")}
+          </Text>
           {picked.map((name, i) => (
             <View key={`${name}-${i}`} style={styles.fileRow}>
               <Ionicons name="document-text-outline" size={18} color={palette.primary} />
-              <Text style={[styles.fileName, { color: palette.ink }]} numberOfLines={1}>{name}</Text>
+              <Text style={[styles.fileName, { color: palette.ink }]} numberOfLines={1}>
+                {name}
+              </Text>
             </View>
           ))}
         </Card>
@@ -74,7 +88,16 @@ export default function TeacherCurriculumScreen() {
 const styles = StyleSheet.create({
   heading: { fontSize: 16, fontFamily: fontFamilies.displayBold },
   body: { fontSize: 14, fontFamily: fontFamilies.bodyRegular, lineHeight: 20 },
-  uploadBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: radius.xl, borderWidth: 1.5, marginTop: spacing.sm },
+  uploadBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: radius.xl,
+    borderWidth: 1.5,
+    marginTop: spacing.sm,
+  },
   uploadText: { fontSize: 15, fontFamily: fontFamilies.bodyBold },
   fileRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   fileName: { flex: 1, fontSize: 14, fontFamily: fontFamilies.bodySemiBold },

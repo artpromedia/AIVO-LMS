@@ -29,11 +29,7 @@ export default function ParentVerifyPage() {
         title={stage === "phone" ? t("title_phone") : t("title_code")}
         subtitle={stage === "phone" ? t("subtitle_phone") : t("subtitle_code")}
         reassurance={
-          <ReassuranceCard
-            tone="safety"
-            title={t("reassure_title")}
-            body={t("reassure_body")}
-          />
+          <ReassuranceCard tone="safety" title={t("reassure_title")} body={t("reassure_body")} />
         }
         actions={
           <>
@@ -84,9 +80,7 @@ export default function ParentVerifyPage() {
             label={t("code_label")}
             inputMode="numeric"
             value={code}
-            onChange={(e) =>
-              setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-            }
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
             placeholder="123456"
             autoComplete="one-time-code"
           />

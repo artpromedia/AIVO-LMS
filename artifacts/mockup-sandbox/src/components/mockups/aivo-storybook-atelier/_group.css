@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 
 .storybook-theme {
   --background: 40 33% 96%; /* Cream paper */
@@ -14,14 +14,14 @@
   --card: 40 40% 98%;
   --card-foreground: 24 10% 20%;
   --border: 30 20% 85%;
-  
-  font-family: 'Nunito', sans-serif;
+
+  font-family: "Nunito", sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
 
 .storybook-theme .font-display {
-  font-family: 'Fraunces', serif;
+  font-family: "Fraunces", serif;
 }
 
 .storybook-theme .paper-texture {

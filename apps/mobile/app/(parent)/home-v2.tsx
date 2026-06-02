@@ -34,15 +34,28 @@ interface MetricCardProps {
   onPress: () => void;
 }
 
-function MetricCard({ label, value, description, iconName, tone = "neutral", onPress }: MetricCardProps) {
+function MetricCard({
+  label,
+  value,
+  description,
+  iconName,
+  tone = "neutral",
+  onPress,
+}: MetricCardProps) {
   const palette = useSensoryPalette();
   const toneColor =
-    tone === "success" ? "#16a34a"
-    : tone === "warning" ? "#b45309"
-    : tone === "info" ? "#0284c7"
-    : palette.primary;
+    tone === "success"
+      ? "#16a34a"
+      : tone === "warning"
+        ? "#b45309"
+        : tone === "info"
+          ? "#0284c7"
+          : palette.primary;
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [s.metricCard, pressed && { opacity: 0.85 }]}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [s.metricCard, pressed && { opacity: 0.85 }]}
+    >
       <View style={[s.metricIcon, { backgroundColor: toneColor + "22" }]}>
         <Ionicons name={iconName} size={20} color={toneColor} />
       </View>
@@ -99,10 +112,17 @@ export default function ParentHomeV2() {
       style={[s.canvas, { paddingTop: insets.top }]}
       contentContainerStyle={[s.content, { paddingBottom: insets.bottom + spacing.xl }]}
     >
-      <View style={[s.hero, { backgroundColor: palette.primary + "12", borderColor: palette.primary + "33" }]}>
+      <View
+        style={[
+          s.hero,
+          { backgroundColor: palette.primary + "12", borderColor: palette.primary + "33" },
+        ]}
+      >
         <Text style={s.heroGreeting}>Hi, {parentFirstName}.</Text>
         <Text style={s.heroSubhead}>{learnerFirstName} is ready for today&apos;s learning.</Text>
-        <Text style={s.heroBody}>Calm, personalized, and waiting for one quick check-in from you.</Text>
+        <Text style={s.heroBody}>
+          Calm, personalized, and waiting for one quick check-in from you.
+        </Text>
         <View style={s.heroActions}>
           <Pressable
             onPress={() => router.push("/(parent)/session/emma" as Href)}
@@ -111,7 +131,10 @@ export default function ParentHomeV2() {
             <Ionicons name="play" size={16} color="#fff" />
             <Text style={s.btnPrimaryText}>Start with {learnerFirstName}</Text>
           </Pressable>
-          <Pressable onPress={() => router.push("/(parent)/onboard" as Href)} style={s.btnSecondary}>
+          <Pressable
+            onPress={() => router.push("/(parent)/onboard" as Href)}
+            style={s.btnSecondary}
+          >
             <Ionicons name="person-add" size={16} color={colors.text} />
             <Text style={s.btnSecondaryText}>Add learner</Text>
           </Pressable>
@@ -227,8 +250,17 @@ const s = StyleSheet.create({
     gap: spacing.sm,
   },
   heroGreeting: { fontFamily: fontFamilies.displayBold, fontSize: 26, color: colors.text },
-  heroSubhead: { fontFamily: fontFamilies.displaySemiBold, fontSize: 18, color: colors.textSecondary },
-  heroBody: { fontFamily: fontFamilies.bodyRegular, fontSize: 14, color: colors.textSecondary, marginTop: spacing.xs },
+  heroSubhead: {
+    fontFamily: fontFamilies.displaySemiBold,
+    fontSize: 18,
+    color: colors.textSecondary,
+  },
+  heroBody: {
+    fontFamily: fontFamilies.bodyRegular,
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+  },
   heroActions: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.sm, flexWrap: "wrap" },
   btnPrimary: {
     flexDirection: "row",
@@ -280,7 +312,12 @@ const s = StyleSheet.create({
   },
   metricLabel: { fontFamily: fontFamilies.bodyRegular, fontSize: 12, color: colors.textSecondary },
   metricValue: { fontFamily: fontFamilies.displaySemiBold, fontSize: 18, color: colors.text },
-  metricDesc: { fontFamily: fontFamilies.bodyRegular, fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  metricDesc: {
+    fontFamily: fontFamilies.bodyRegular,
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
   list: { gap: spacing.xs },
   row: {
     flexDirection: "row",
@@ -292,9 +329,20 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  rowIcon: { width: 32, height: 32, borderRadius: 999, alignItems: "center", justifyContent: "center" },
+  rowIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   rowTitle: { fontFamily: fontFamilies.bodyBold, fontSize: 14, color: colors.text },
-  rowSubtitle: { fontFamily: fontFamilies.bodyRegular, fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  rowSubtitle: {
+    fontFamily: fontFamilies.bodyRegular,
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
   rowBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -303,7 +351,11 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  rowBadgeText: { fontFamily: fontFamilies.bodySemiBold, fontSize: 11, color: colors.textSecondary },
+  rowBadgeText: {
+    fontFamily: fontFamilies.bodySemiBold,
+    fontSize: 11,
+    color: colors.textSecondary,
+  },
   footer: {
     textAlign: "center",
     fontFamily: fontFamilies.bodyRegular,

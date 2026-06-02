@@ -18,10 +18,7 @@ import {
 } from "./baseline-adaptive";
 
 let qSeq = 0;
-function q(
-  difficulty: BaselineDifficulty,
-  opts: Partial<BaselineQuestion> = {},
-): BaselineQuestion {
+function q(difficulty: BaselineDifficulty, opts: Partial<BaselineQuestion> = {}): BaselineQuestion {
   qSeq += 1;
   return {
     id: opts.id ?? `q${qSeq}`,
@@ -182,7 +179,9 @@ describe("assessFrustration", () => {
   });
 
   it("escalates to mild then high as the wrong/skip run grows", () => {
-    expect(assessFrustration([ans("a", true), ans("b", false), ans("c", false)]).level).toBe("mild");
+    expect(assessFrustration([ans("a", true), ans("b", false), ans("c", false)]).level).toBe(
+      "mild",
+    );
     const high = assessFrustration([ans("a", false), ans("b", false), ans("c", false)]);
     expect(high.level).toBe("high");
     expect(high.struggleStreak).toBe(3);

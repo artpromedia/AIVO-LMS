@@ -96,10 +96,14 @@ if (!existsSync(typesPath) || !existsSync(readinessPath)) {
       const tpl = m[1];
       // Replace {learnerId} with the [learnerId] folder name.
       const route = tpl.replace(/\{learnerId\}/g, "[learnerId]").replace(/\?.*$/, "");
-      const rel = `apps/web-v2/app${route}/page.tsx`;
-      if (!existsSync(join(repoRoot, rel))) {
+      // A next-step href may be backed by either a rendered page (page.tsx) or a
+      // Route Handler (route.ts) that sets a cookie / redirects — e.g.
+      // /learner/select/auto. Accept either.
+      const pageRel = `apps/web-v2/app${route}/page.tsx`;
+      const routeRel = `apps/web-v2/app${route}/route.ts`;
+      if (!existsSync(join(repoRoot, pageRel)) && !existsSync(join(repoRoot, routeRel))) {
         errors.push(
-          `READINESS_NEXT_STEP hrefTemplate "${tpl}" has no backing page.tsx (expected ${rel}).`,
+          `READINESS_NEXT_STEP hrefTemplate "${tpl}" has no backing page.tsx or route.ts (expected ${pageRel} or ${routeRel}).`,
         );
       }
     }

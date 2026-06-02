@@ -48,9 +48,7 @@ export function ResetPasswordFields({ id }: { readonly id: string }) {
         onChange={(event) => setPassword(event.target.value)}
         required
         minLength={12}
-        helper={
-          tooShort ? t("reset.helper_too_short") : t("reset.helper_default")
-        }
+        helper={tooShort ? t("reset.helper_too_short") : t("reset.helper_default")}
         trailing={trailing}
       />
       <AuthInput

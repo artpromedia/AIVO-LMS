@@ -30,8 +30,7 @@ export function useResponsiveType(): typeof typography {
     const out: Record<string, unknown> = {};
     (Object.keys(typography) as TypeKey[]).forEach((k) => {
       const base = typography[k] as TypeStyle & { fontSize: number; lineHeight: number };
-      const isDisplay =
-        k === "heroDisplay" || k === "h1" || k === "h2" || k === "h3";
+      const isDisplay = k === "heroDisplay" || k === "h1" || k === "h2" || k === "h3";
       out[k] = isDisplay
         ? {
             ...base,

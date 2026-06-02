@@ -232,7 +232,9 @@ describe("aggregateItemPsychometrics", () => {
       const k = 12;
       const c = Math.round(p * k);
       for (let i = 0; i < k; i++) {
-        logs.push(log({ itemKey: "skd|grade_level", skillId: "skd", thetaBefore: t, correct: i < c }));
+        logs.push(
+          log({ itemKey: "skd|grade_level", skillId: "skd", thetaBefore: t, correct: i < c }),
+        );
       }
     }
     const [row] = aggregateItemPsychometrics(logs, { minExposure: 5 });

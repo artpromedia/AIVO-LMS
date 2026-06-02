@@ -229,8 +229,14 @@ export default function PixiBrainSphere(props: PixiBrainSphereProps) {
               uIntensity: { value: intensity, type: "f32" },
               uPrimary: { value: toVec(primaryHue), type: "vec3<f32>" },
               uSec0: { value: toVec(secondaryHues[0] ?? primaryHue), type: "vec3<f32>" },
-              uSec1: { value: toVec(secondaryHues[1] ?? secondaryHues[0] ?? primaryHue), type: "vec3<f32>" },
-              uSec2: { value: toVec(secondaryHues[2] ?? secondaryHues[0] ?? primaryHue), type: "vec3<f32>" },
+              uSec1: {
+                value: toVec(secondaryHues[1] ?? secondaryHues[0] ?? primaryHue),
+                type: "vec3<f32>",
+              },
+              uSec2: {
+                value: toVec(secondaryHues[2] ?? secondaryHues[0] ?? primaryHue),
+                type: "vec3<f32>",
+              },
             },
           },
         });

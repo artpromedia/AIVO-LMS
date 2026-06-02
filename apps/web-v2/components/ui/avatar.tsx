@@ -31,10 +31,8 @@ const avatarVariants = cva(
 );
 
 export interface AvatarProps
-  extends Omit<
-      React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>,
-      "asChild"
-    >,
+  extends
+    Omit<React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>, "asChild">,
     VariantProps<typeof avatarVariants> {
   /** Image URL. Falls back to initials when missing or fails to load. */
   readonly src?: string | null;
@@ -61,37 +59,36 @@ function deriveInitials(name: string | undefined): string {
  * Do not use as a clickable affordance on its own — wrap in `<Button>` or
  * `<Link>` and add accessible text.
  */
-export const Avatar = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Root>,
-  AvatarProps
->(function Avatar({ className, size, ring, src, name, initials, ...props }, ref) {
-  const fallback = initials ?? deriveInitials(name);
-  return (
-    <AvatarPrimitive.Root
-      ref={ref}
-      className={cn(avatarVariants({ size, ring }), className)}
-      {...props}
-    >
-      {src && (
-        <AvatarPrimitive.Image
-          src={src}
-          alt={name ?? ""}
-          className="h-full w-full object-cover"
-        />
-      )}
-      <AvatarPrimitive.Fallback
-        delayMs={src ? 400 : 0}
-        className="flex h-full w-full items-center justify-center bg-iw-accent-soft text-iw-primary"
+export const Avatar = React.forwardRef<React.ElementRef<typeof AvatarPrimitive.Root>, AvatarProps>(
+  function Avatar({ className, size, ring, src, name, initials, ...props }, ref) {
+    const fallback = initials ?? deriveInitials(name);
+    return (
+      <AvatarPrimitive.Root
+        ref={ref}
+        className={cn(avatarVariants({ size, ring }), className)}
+        {...props}
       >
-        {fallback || (
-          <span aria-hidden="true" className="text-iw-ink-muted">
-            •
-          </span>
+        {src && (
+          <AvatarPrimitive.Image
+            src={src}
+            alt={name ?? ""}
+            className="h-full w-full object-cover"
+          />
         )}
-      </AvatarPrimitive.Fallback>
-    </AvatarPrimitive.Root>
-  );
-});
+        <AvatarPrimitive.Fallback
+          delayMs={src ? 400 : 0}
+          className="flex h-full w-full items-center justify-center bg-iw-accent-soft text-iw-primary"
+        >
+          {fallback || (
+            <span aria-hidden="true" className="text-iw-ink-muted">
+              •
+            </span>
+          )}
+        </AvatarPrimitive.Fallback>
+      </AvatarPrimitive.Root>
+    );
+  },
+);
 
 /**
  * AvatarGroup — overlapping cluster of avatars (e.g. "5 family members").
@@ -105,22 +102,14 @@ export interface AvatarGroupProps {
   readonly className?: string;
 }
 
-export function AvatarGroup({
-  children,
-  max = 4,
-  size = "md",
-  className,
-}: AvatarGroupProps) {
+export function AvatarGroup({ children, max = 4, size = "md", className }: AvatarGroupProps) {
   const items = React.Children.toArray(children);
   const visible = items.slice(0, max);
   const overflow = items.length - visible.length;
   return (
     <div className={cn("flex -space-x-2", className)}>
       {visible.map((child, index) => (
-        <span
-          key={index}
-          className="ring-2 ring-iw-bg rounded-full inline-flex"
-        >
+        <span key={index} className="ring-2 ring-iw-bg rounded-full inline-flex">
           {child}
         </span>
       ))}

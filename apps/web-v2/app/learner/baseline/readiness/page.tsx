@@ -2,11 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
-import {
-  LearnerBaselineShell,
-  PersonalizationChip,
-  type PersonalizationVariant,
-} from "@aivo/ui";
+import { LearnerBaselineShell, PersonalizationChip, type PersonalizationVariant } from "@aivo/ui";
 import {
   getActiveBaselineForLearner,
   getBaselineById,
@@ -65,7 +61,16 @@ export default async function BaselineReadinessPage({
           href="/learner/baseline/subjects"
           className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <path d="M19 12H5" />
             <path d="m12 19-7-7 7-7" />
           </svg>
@@ -82,16 +87,25 @@ export default async function BaselineReadinessPage({
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-snug">
           {t("readiness.title")}
         </h1>
-        <p className="text-base text-iw-text-muted max-w-2xl">
-          {t("readiness.body")}
-        </p>
+        <p className="text-base text-iw-text-muted max-w-2xl">{t("readiness.body")}</p>
       </section>
 
       <ul className="grid gap-3 md:grid-cols-2">
         <li className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
           <header className="flex items-center justify-between gap-2">
-            <span className="w-10 h-10 rounded-iw-control bg-[var(--aivo-aivoPurple-50)] text-[var(--aivo-aivoPurple-700)] flex items-center justify-center" aria-hidden="true">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <span
+              className="w-10 h-10 rounded-iw-control bg-[var(--aivo-aivoPurple-50)] text-[var(--aivo-aivoPurple-700)] flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                 <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
               </svg>
@@ -113,8 +127,19 @@ export default async function BaselineReadinessPage({
         </li>
         <li className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
           <header className="flex items-center justify-between gap-2">
-            <span className="w-10 h-10 rounded-iw-control bg-[var(--aivo-aivoTeal-50)] text-[var(--aivo-aivoTeal-700)] flex items-center justify-center" aria-hidden="true">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <span
+              className="w-10 h-10 rounded-iw-control bg-[var(--aivo-aivoTeal-50)] text-[var(--aivo-aivoTeal-700)] flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
             </span>
@@ -129,14 +154,23 @@ export default async function BaselineReadinessPage({
             </span>
           </header>
           <p className="font-semibold text-iw-text-strong">{t("readiness.calm_title")}</p>
-          <p className="text-sm text-iw-text-muted leading-relaxed">
-            {t("readiness.calm_body")}
-          </p>
+          <p className="text-sm text-iw-text-muted leading-relaxed">{t("readiness.calm_body")}</p>
         </li>
         <li className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
           <header className="flex items-center justify-between gap-2">
-            <span className="w-10 h-10 rounded-iw-control bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)] flex items-center justify-center" aria-hidden="true">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <span
+              className="w-10 h-10 rounded-iw-control bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)] flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <rect x="6" y="4" width="4" height="16" />
                 <rect x="14" y="4" width="4" height="16" />
               </svg>
@@ -146,14 +180,23 @@ export default async function BaselineReadinessPage({
             </span>
           </header>
           <p className="font-semibold text-iw-text-strong">{t("readiness.breaks_title")}</p>
-          <p className="text-sm text-iw-text-muted leading-relaxed">
-            {t("readiness.breaks_body")}
-          </p>
+          <p className="text-sm text-iw-text-muted leading-relaxed">{t("readiness.breaks_body")}</p>
         </li>
         <li className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
           <header className="flex items-center justify-between gap-2">
-            <span className="w-10 h-10 rounded-iw-control bg-[var(--aivo-aivoPurple-50)] text-[var(--aivo-aivoPurple-700)] flex items-center justify-center" aria-hidden="true">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <span
+              className="w-10 h-10 rounded-iw-control bg-[var(--aivo-aivoPurple-50)] text-[var(--aivo-aivoPurple-700)] flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
@@ -187,7 +230,16 @@ export default async function BaselineReadinessPage({
           className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
         >
           {t("readiness.im_ready")}
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <path d="M5 12h14" />
             <path d="m13 5 7 7-7 7" />
           </svg>

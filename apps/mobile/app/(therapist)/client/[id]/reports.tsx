@@ -42,7 +42,11 @@ export default function ProgressReports() {
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
-        <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("therapistClient.reportsTitle")}</Text>
+        <Text
+          style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}
+        >
+          {t("therapistClient.reportsTitle")}
+        </Text>
         <Text style={styles.subtitle}>{t("therapistClient.reportsSubtitle")}</Text>
 
         <AivoCard style={styles.genCard}>
@@ -54,10 +58,7 @@ export default function ProgressReports() {
           <AivoButton
             title={t("therapistClient.generateReport")}
             onPress={() =>
-              Alert.alert(
-                t("therapistClient.generateReport"),
-                t("common.featureUnavailable"),
-              )
+              Alert.alert(t("therapistClient.generateReport"), t("common.featureUnavailable"))
             }
             style={{ marginTop: spacing.md }}
           />

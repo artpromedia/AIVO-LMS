@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import {
-  TutorMessage,
-  TutorInsightChip,
-} from "@aivo/ui";
+import { TutorMessage, TutorInsightChip } from "@aivo/ui";
 
 type Turn = { id: string; role: "learner" | "tutor"; text: string; blocked?: boolean };
 

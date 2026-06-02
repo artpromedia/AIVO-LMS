@@ -43,7 +43,10 @@ export const DotChart = forwardRef<SVGSVGElement, DotChartProps>(function DotCha
   if (loading) {
     return (
       <div
-        className={cn("aivo-motion-baseline-gen rounded-iw-card bg-iw-card border border-iw-border", className)}
+        className={cn(
+          "aivo-motion-baseline-gen rounded-iw-card bg-iw-card border border-iw-border",
+          className,
+        )}
         style={{ height }}
         aria-busy="true"
       />
@@ -104,13 +107,7 @@ export const DotChart = forwardRef<SVGSVGElement, DotChartProps>(function DotCha
           />
         ))}
       {coords.map((c, i) => (
-        <circle
-          key={`${c.label}-${i}`}
-          cx={c.x}
-          cy={c.y}
-          r={4}
-          className={cn(DOT_FILL[tone])}
-        >
+        <circle key={`${c.label}-${i}`} cx={c.x} cy={c.y} r={4} className={cn(DOT_FILL[tone])}>
           <title>{`${c.label}: ${c.value}`}</title>
         </circle>
       ))}

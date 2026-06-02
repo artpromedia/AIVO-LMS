@@ -11,7 +11,7 @@ import { Card } from "@/components/ui";
 import { EmptyState, LoadingState } from "@aivo/mobile-ui";
 import { splitLessons } from "@/lib/gradebook-logic";
 import { subjectAccent } from "@/lib/subject-display";
-import { spacing, radius } from "@/constants/colors";
+import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**

@@ -55,46 +55,46 @@ export default async function QuestWorldPage({ params }: Params) {
         {await Promise.all(
           chapters.map(async (c) => {
             const unlocked = await isQuestChapterUnlocked(learnerId!, session.tenantId, c);
-          const isDone = completed.has(c.id);
-          const inner = (
-            <Card
-              className={`p-5 ${unlocked ? "hover:shadow-lg transition-shadow" : "opacity-60"}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                      {t("chapter_label", { order: c.order })}
-                      {c.isBoss ? t("boss_suffix") : ""}
-                    </span>
-                    {isDone ? (
-                      <Badge tone="success">{t("status_done")}</Badge>
-                    ) : !unlocked ? (
-                      <Badge tone="neutral">{t("status_locked")}</Badge>
-                    ) : null}
-                  </div>
-                  <h2 className="text-lg font-semibold mt-1">{c.title}</h2>
-                  <p className="text-sm text-muted-foreground mt-1">{c.description}</p>
-                </div>
-              </div>
-            </Card>
-          );
-          if (!unlocked) {
-            return (
-              <li key={c.id} aria-disabled="true">
-                {inner}
-              </li>
-            );
-          }
-          return (
-            <li key={c.id}>
-              <Link
-                href={`/learner/quests/${worldId}/chapters/${c.id}`}
-                className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+            const isDone = completed.has(c.id);
+            const inner = (
+              <Card
+                className={`p-5 ${unlocked ? "hover:shadow-lg transition-shadow" : "opacity-60"}`}
               >
-                {inner}
-              </Link>
-            </li>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                        {t("chapter_label", { order: c.order })}
+                        {c.isBoss ? t("boss_suffix") : ""}
+                      </span>
+                      {isDone ? (
+                        <Badge tone="success">{t("status_done")}</Badge>
+                      ) : !unlocked ? (
+                        <Badge tone="neutral">{t("status_locked")}</Badge>
+                      ) : null}
+                    </div>
+                    <h2 className="text-lg font-semibold mt-1">{c.title}</h2>
+                    <p className="text-sm text-muted-foreground mt-1">{c.description}</p>
+                  </div>
+                </div>
+              </Card>
+            );
+            if (!unlocked) {
+              return (
+                <li key={c.id} aria-disabled="true">
+                  {inner}
+                </li>
+              );
+            }
+            return (
+              <li key={c.id}>
+                <Link
+                  href={`/learner/quests/${worldId}/chapters/${c.id}`}
+                  className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+                >
+                  {inner}
+                </Link>
+              </li>
             );
           }),
         )}

@@ -2,13 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import {
-  AuthShell,
-  AuthCard,
-  AuthInput,
-  ReassuranceCard,
-  StepperHeader,
-} from "@aivo/ui/auth";
+import { AuthShell, AuthCard, AuthInput, ReassuranceCard, StepperHeader } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 
 export default function SchoolInvitePage() {
@@ -37,11 +31,7 @@ export default function SchoolInvitePage() {
           title={t("title")}
           subtitle={t("subtitle")}
           reassurance={
-            <ReassuranceCard
-              tone="safety"
-              title={t("reassure_title")}
-              body={t("reassure_body")}
-            />
+            <ReassuranceCard tone="safety" title={t("reassure_title")} body={t("reassure_body")} />
           }
           actions={
             <>

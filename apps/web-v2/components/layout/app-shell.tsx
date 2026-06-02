@@ -8,11 +8,7 @@ import { SensoryModePopover } from "@/components/system/sensory-mode-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerTrigger,
-  DrawerContent,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerTrigger, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 
 /**
@@ -77,14 +73,10 @@ function SidebarBody({
         <div className="flex items-center gap-3 px-2">
           <Avatar name={user.displayName} size="md" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold leading-tight">
-              {user.displayName}
-            </p>
+            <p className="truncate text-sm font-semibold leading-tight">{user.displayName}</p>
             <p
               className="truncate text-xs leading-tight"
-              style={
-                isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined
-              }
+              style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
               title={user.email}
             >
               {user.email}
@@ -209,10 +201,7 @@ export function AppShell({
               </DrawerTrigger>
               <DrawerContent
                 side="left"
-                className={cn(
-                  "p-5",
-                  isDarkSidebar ? "" : "bg-iw-card",
-                )}
+                className={cn("p-5", isDarkSidebar ? "" : "bg-iw-card")}
                 style={sidebarStyle}
               >
                 <SidebarBody

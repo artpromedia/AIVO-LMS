@@ -3,16 +3,21 @@ import { eq, and, desc, inArray } from "drizzle-orm";
 import {
   iepGoals,
   therapyGoals,
+  therapySessions,
+  brainInsights,
   learners,
   learnerTeachers,
   learnerCaregivers,
   learnerTherapists,
 } from "@aivo/db";
 import { authenticateRequest } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 import {
   getIepGoalsSchema,
   getTherapyGoalsSchema,
   createTherapyGoalSchema,
+  createTherapySessionSchema,
+  createTeacherInsightSchema,
 } from "./schemas.js";
 
 /**
@@ -210,6 +215,135 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
           status: row.status ?? "active",
         },
       });
+    },
+  );
+
+  /**
+   * Record a therapy session note (SOAP-style). Persists into therapy_sessions
+   * so the note survives — previously the mobile therapist screen faked a save.
+   * Access mirrors therapy-goals: parent ownership or an accepted collaboration
+   * link to the learner (PLATFORM_ADMIN sees the tenant).
+   */
+  app.post(
+    "/api/family/therapy-sessions",
+    { schema: createTherapySessionSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+
+      const body = (request.body as Record<string, unknown>) || {};
+      const learnerId = typeof body.learnerId === "string" ? body.learnerId : "";
+      const outcome = typeof body.outcome === "string" ? body.outcome.trim() : "";
+      if (!learnerId || !outcome) {
+        return reply.code(400).send({ error: "learnerId and outcome are required" });
+      }
+
+      const learnerIds = await getAccessibleLearnerIds(claims.sub, claims.role, claims.tenantId);
+      if (!learnerIds.includes(learnerId)) {
+        return reply.code(403).send({ error: "Forbidden" });
+      }
+
+      // Resolve the caller's therapist link to this learner when they have one
+      // (therapist_id is a nullable FK — parents/admins record with null).
+      const [link] = await db
+        .select({ id: learnerTherapists.id })
+        .from(learnerTherapists)
+        .where(
+          and(
+            eq(learnerTherapists.learnerId, learnerId),
+            eq(learnerTherapists.therapistUserId, claims.sub),
+            eq(learnerTherapists.status, "ACCEPTED"),
+          ),
+        )
+        .limit(1);
+
+      const sessionDate =
+        typeof body.sessionDate === "string" && body.sessionDate
+          ? new Date(body.sessionDate)
+          : new Date();
+      const goalsAddressed = Array.isArray(body.goalIds) ? body.goalIds : [];
+      const duration =
+        typeof body.durationMinutes === "number" ? `${body.durationMinutes} min` : null;
+
+      const [row] = await db
+        .insert(therapySessions)
+        .values({
+          tenantId: claims.tenantId,
+          learnerId,
+          therapistId: link?.id ?? null,
+          sessionDate,
+          notes: outcome,
+          goalsAddressed,
+          // Structured SOAP-ish detail the note form captures.
+          progressUpdates: {
+            skillTargeted: typeof body.skillTargeted === "string" ? body.skillTargeted : "",
+            method: typeof body.method === "string" ? body.method : "",
+            recommendations: typeof body.recommendations === "string" ? body.recommendations : "",
+          },
+          duration,
+        })
+        .returning();
+
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "THERAPY_SESSION_RECORDED",
+        tenantId: claims.tenantId,
+        learnerId,
+        resourceId: row.id,
+        details: { therapistLinked: Boolean(link?.id) },
+      });
+
+      return reply.code(201).send({ session: row });
+    },
+  );
+
+  /**
+   * Record a teacher's qualitative insight about a learner. Persists into
+   * brain_insights (source "teacher") so it feeds the learner's brain profile —
+   * previously the mobile teacher screen faked a save.
+   */
+  app.post(
+    "/api/family/teacher-insights",
+    { schema: createTeacherInsightSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+
+      const body = (request.body as Record<string, unknown>) || {};
+      const learnerId = typeof body.learnerId === "string" ? body.learnerId : "";
+      const insightText = typeof body.insightText === "string" ? body.insightText.trim() : "";
+      if (!learnerId || !insightText) {
+        return reply.code(400).send({ error: "learnerId and insightText are required" });
+      }
+
+      const learnerIds = await getAccessibleLearnerIds(claims.sub, claims.role, claims.tenantId);
+      if (!learnerIds.includes(learnerId)) {
+        return reply.code(403).send({ error: "Forbidden" });
+      }
+
+      const [row] = await db
+        .insert(brainInsights)
+        .values({
+          learnerId,
+          source: "teacher",
+          sourceUserId: claims.sub,
+          insightText,
+          domain: typeof body.domain === "string" && body.domain ? body.domain : null,
+        })
+        .returning();
+
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "TEACHER_INSIGHT_SUBMITTED",
+        tenantId: claims.tenantId,
+        learnerId,
+        resourceId: row.id,
+        details: { domain: row.domain ?? null },
+      });
+
+      return reply.code(201).send({ insight: row });
     },
   );
 }

@@ -68,9 +68,7 @@ export default async function ComparePage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
-          {t("side_by_side")}
-        </h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("side_by_side")}</h2>
         <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
           <table className="w-full text-sm">
             <caption className="sr-only">AIVO vs {comp.competitor} feature comparison</caption>
@@ -115,7 +113,9 @@ export default async function ComparePage({ params }: Props) {
       </section>
 
       <section className="mt-14 pt-8 border-t border-slate-100">
-        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">{t("other_comparisons")}</h2>
+        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">
+          {t("other_comparisons")}
+        </h2>
         <div className="flex flex-wrap gap-3">
           {COMPARISONS.filter((c) => c.slug !== comp.slug).map((other) => (
             <Link

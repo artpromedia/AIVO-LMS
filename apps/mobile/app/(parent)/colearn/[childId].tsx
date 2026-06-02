@@ -21,9 +21,7 @@ export default function CoLearnScreen() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text
-        style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}
-      >
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
         {t("parentColearn.title")}
       </Text>
       <Text style={styles.subtitle}>{t("parentColearn.subtitle", { name: "" })}</Text>

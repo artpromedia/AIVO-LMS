@@ -27,7 +27,8 @@ const LEARNER = {
       title: "Make AIVO yours",
       description: "Pick how AIVO looks, sounds, and speaks to you.",
       language_title: "Language",
-      language_desc: "AIVO will use this language for buttons, menus, and helper messages. Your lessons stay in the subject's language.",
+      language_desc:
+        "AIVO will use this language for buttons, menus, and helper messages. Your lessons stay in the subject's language.",
       a11y_title: "Accessibility",
       a11y_desc: "Larger text, reduced motion, captions, and switch scanning.",
       a11y_link: "Open accessibility settings →",
@@ -42,18 +43,22 @@ const LEARNER = {
       card_title: "Reading & display",
       card_desc: "Big text, dyslexia-friendly font, extra spacing, high contrast.",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "Every AIVO screen meets WCAG 2.2 AA out of the box. These settings let you push further when you need to.",
+      reassure_wcag_body:
+        "Every AIVO screen meets WCAG 2.2 AA out of the box. These settings let you push further when you need to.",
       reassure_labels_title: "Same product, no labels",
-      reassure_labels_body: "Turning on supports never marks your learner as different — the interface stays calm and premium.",
+      reassure_labels_body:
+        "Turning on supports never marks your learner as different — the interface stays calm and premium.",
       reassure_teachers_title: "Teachers honour these",
-      reassure_teachers_body: "Whatever you turn on here is applied during lessons, homework, and the AI tutor — no extra setup.",
+      reassure_teachers_body:
+        "Whatever you turn on here is applied during lessons, homework, and the AI tutor — no extra setup.",
     },
     settings_audio: {
       no_learner_title: "Audio",
       no_learner_body: "Sign in as a learner to view audio settings.",
       eyebrow: "Settings",
       title: "Read-aloud",
-      description: "Pick a voice and playback speed. Your grown-up controls whether read-aloud is turned on.",
+      description:
+        "Pick a voice and playback speed. Your grown-up controls whether read-aloud is turned on.",
       voice_kid_friendly: "Kid-friendly",
       voice_warm_female: "Warm female",
       voice_warm_male: "Warm male",
@@ -83,7 +88,8 @@ const LEARNER = {
       title: "Haz que AIVO sea tuyo",
       description: "Elige cómo AIVO se ve, suena y te habla.",
       language_title: "Idioma",
-      language_desc: "AIVO usará este idioma para botones, menús y mensajes de ayuda. Tus lecciones se mantienen en el idioma de la materia.",
+      language_desc:
+        "AIVO usará este idioma para botones, menús y mensajes de ayuda. Tus lecciones se mantienen en el idioma de la materia.",
       a11y_title: "Accesibilidad",
       a11y_desc: "Texto más grande, menos movimiento, subtítulos y barrido por conmutador.",
       a11y_link: "Abrir ajustes de accesibilidad →",
@@ -98,18 +104,22 @@ const LEARNER = {
       card_title: "Lectura y pantalla",
       card_desc: "Texto grande, fuente amigable para la dislexia, mayor espaciado, alto contraste.",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "Cada pantalla de AIVO cumple WCAG 2.2 AA de fábrica. Estos ajustes te permiten ir más lejos cuando lo necesites.",
+      reassure_wcag_body:
+        "Cada pantalla de AIVO cumple WCAG 2.2 AA de fábrica. Estos ajustes te permiten ir más lejos cuando lo necesites.",
       reassure_labels_title: "El mismo producto, sin etiquetas",
-      reassure_labels_body: "Activar apoyos nunca marca a tu estudiante como diferente: la interfaz sigue siendo tranquila y de calidad.",
+      reassure_labels_body:
+        "Activar apoyos nunca marca a tu estudiante como diferente: la interfaz sigue siendo tranquila y de calidad.",
       reassure_teachers_title: "Los docentes los respetan",
-      reassure_teachers_body: "Lo que actives aquí se aplica durante las lecciones, las tareas y el tutor con IA, sin configuración adicional.",
+      reassure_teachers_body:
+        "Lo que actives aquí se aplica durante las lecciones, las tareas y el tutor con IA, sin configuración adicional.",
     },
     settings_audio: {
       no_learner_title: "Audio",
       no_learner_body: "Inicia sesión como estudiante para ver los ajustes de audio.",
       eyebrow: "Ajustes",
       title: "Lectura en voz alta",
-      description: "Elige una voz y la velocidad de reproducción. Tu adulto controla si la lectura en voz alta está activada.",
+      description:
+        "Elige una voz y la velocidad de reproducción. Tu adulto controla si la lectura en voz alta está activada.",
       voice_kid_friendly: "Para niños",
       voice_warm_female: "Femenina cálida",
       voice_warm_male: "Masculina cálida",
@@ -126,7 +136,8 @@ const LEARNER = {
       preview_aria: "Vista previa de voz",
       no_audio_support: "Tu navegador no admite la reproducción de audio.",
       transcript: "Transcripción",
-      preview_unavailable: "Vista previa de audio no disponible: se muestra arriba la transcripción de reserva.",
+      preview_unavailable:
+        "Vista previa de audio no disponible: se muestra arriba la transcripción de reserva.",
       preview_text: "¡Hola! Esta es la vista previa de tu voz de lectura en voz alta.",
       failed: "Error.",
       preview_failed: "Falló la vista previa.",
@@ -139,12 +150,14 @@ const LEARNER = {
       title: "Faites d'AIVO le vôtre",
       description: "Choisissez l'apparence, le son et la façon dont AIVO vous parle.",
       language_title: "Langue",
-      language_desc: "AIVO utilisera cette langue pour les boutons, les menus et les messages d'aide. Vos leçons restent dans la langue de la matière.",
+      language_desc:
+        "AIVO utilisera cette langue pour les boutons, les menus et les messages d'aide. Vos leçons restent dans la langue de la matière.",
       a11y_title: "Accessibilité",
       a11y_desc: "Texte plus grand, mouvement réduit, sous-titres et balayage par contacteur.",
       a11y_link: "Ouvrir les paramètres d'accessibilité →",
       sound_title: "Son et voix",
-      sound_desc: "Choisissez la voix d'aide qu'AIVO utilise pour lire les questions et les retours.",
+      sound_desc:
+        "Choisissez la voix d'aide qu'AIVO utilise pour lire les questions et les retours.",
       sound_link: "Ouvrir les paramètres de son →",
     },
     settings_a11y: {
@@ -154,18 +167,22 @@ const LEARNER = {
       card_title: "Lecture et affichage",
       card_desc: "Grand texte, police adaptée à la dyslexie, espacement accru, contraste élevé.",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "Chaque écran d'AIVO respecte WCAG 2.2 AA d'emblée. Ces paramètres vous permettent d'aller plus loin au besoin.",
+      reassure_wcag_body:
+        "Chaque écran d'AIVO respecte WCAG 2.2 AA d'emblée. Ces paramètres vous permettent d'aller plus loin au besoin.",
       reassure_labels_title: "Même produit, sans étiquettes",
-      reassure_labels_body: "Activer des aides ne marque jamais votre apprenant comme différent — l'interface reste apaisée et soignée.",
+      reassure_labels_body:
+        "Activer des aides ne marque jamais votre apprenant comme différent — l'interface reste apaisée et soignée.",
       reassure_teachers_title: "Les enseignants les respectent",
-      reassure_teachers_body: "Tout ce que vous activez ici s'applique pendant les leçons, les devoirs et le tuteur IA — sans configuration supplémentaire.",
+      reassure_teachers_body:
+        "Tout ce que vous activez ici s'applique pendant les leçons, les devoirs et le tuteur IA — sans configuration supplémentaire.",
     },
     settings_audio: {
       no_learner_title: "Audio",
       no_learner_body: "Connectez-vous en tant qu'apprenant pour voir les paramètres audio.",
       eyebrow: "Paramètres",
       title: "Lecture à voix haute",
-      description: "Choisissez une voix et une vitesse de lecture. Votre adulte contrôle si la lecture à voix haute est activée.",
+      description:
+        "Choisissez une voix et une vitesse de lecture. Votre adulte contrôle si la lecture à voix haute est activée.",
       voice_kid_friendly: "Pour enfants",
       voice_warm_female: "Voix féminine chaleureuse",
       voice_warm_male: "Voix masculine chaleureuse",
@@ -182,7 +199,8 @@ const LEARNER = {
       preview_aria: "Aperçu de la voix",
       no_audio_support: "Votre navigateur ne prend pas en charge la lecture audio.",
       transcript: "Transcription",
-      preview_unavailable: "Aperçu audio indisponible — la transcription de secours est affichée ci-dessus.",
+      preview_unavailable:
+        "Aperçu audio indisponible — la transcription de secours est affichée ci-dessus.",
       preview_text: "Bonjour ! Voici l'aperçu de votre voix de lecture à voix haute.",
       failed: "Échec.",
       preview_failed: "Échec de l'aperçu.",
@@ -195,7 +213,8 @@ const LEARNER = {
       title: "Mach AIVO zu deinem",
       description: "Wähle, wie AIVO aussieht, klingt und mit dir spricht.",
       language_title: "Sprache",
-      language_desc: "AIVO verwendet diese Sprache für Schaltflächen, Menüs und Hilfetexte. Deine Lektionen bleiben in der Sprache des Fachs.",
+      language_desc:
+        "AIVO verwendet diese Sprache für Schaltflächen, Menüs und Hilfetexte. Deine Lektionen bleiben in der Sprache des Fachs.",
       a11y_title: "Barrierefreiheit",
       a11y_desc: "Größerer Text, weniger Bewegung, Untertitel und Switch-Scanning.",
       a11y_link: "Barrierefreiheits-Einstellungen öffnen →",
@@ -210,18 +229,22 @@ const LEARNER = {
       card_title: "Lesen & Anzeige",
       card_desc: "Großer Text, Legasthenie-freundliche Schrift, größerer Abstand, hoher Kontrast.",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "Jeder AIVO-Bildschirm erfüllt WCAG 2.2 AA von Haus aus. Mit diesen Einstellungen kannst du bei Bedarf weiter gehen.",
+      reassure_wcag_body:
+        "Jeder AIVO-Bildschirm erfüllt WCAG 2.2 AA von Haus aus. Mit diesen Einstellungen kannst du bei Bedarf weiter gehen.",
       reassure_labels_title: "Gleiches Produkt, keine Etiketten",
-      reassure_labels_body: "Das Aktivieren von Hilfen kennzeichnet deine Lernenden niemals als anders — die Oberfläche bleibt ruhig und hochwertig.",
+      reassure_labels_body:
+        "Das Aktivieren von Hilfen kennzeichnet deine Lernenden niemals als anders — die Oberfläche bleibt ruhig und hochwertig.",
       reassure_teachers_title: "Lehrkräfte respektieren diese",
-      reassure_teachers_body: "Was du hier aktivierst, wird in Lektionen, Hausaufgaben und beim KI-Tutor angewendet — ohne zusätzliche Einrichtung.",
+      reassure_teachers_body:
+        "Was du hier aktivierst, wird in Lektionen, Hausaufgaben und beim KI-Tutor angewendet — ohne zusätzliche Einrichtung.",
     },
     settings_audio: {
       no_learner_title: "Audio",
       no_learner_body: "Melde dich als Lernende/r an, um die Audio-Einstellungen zu sehen.",
       eyebrow: "Einstellungen",
       title: "Vorlesen",
-      description: "Wähle eine Stimme und die Wiedergabegeschwindigkeit. Dein Erwachsener steuert, ob das Vorlesen eingeschaltet ist.",
+      description:
+        "Wähle eine Stimme und die Wiedergabegeschwindigkeit. Dein Erwachsener steuert, ob das Vorlesen eingeschaltet ist.",
       voice_kid_friendly: "Kindgerecht",
       voice_warm_female: "Warme weibliche Stimme",
       voice_warm_male: "Warme männliche Stimme",
@@ -238,7 +261,8 @@ const LEARNER = {
       preview_aria: "Stimmvorschau",
       no_audio_support: "Dein Browser unterstützt keine Audiowiedergabe.",
       transcript: "Transkript",
-      preview_unavailable: "Audiovorschau nicht verfügbar — das Transkript wird oben als Ausweichlösung angezeigt.",
+      preview_unavailable:
+        "Audiovorschau nicht verfügbar — das Transkript wird oben als Ausweichlösung angezeigt.",
       preview_text: "Hallo! Dies ist die Vorschau deiner Vorlesestimme.",
       failed: "Fehlgeschlagen.",
       preview_failed: "Vorschau fehlgeschlagen.",
@@ -251,7 +275,8 @@ const LEARNER = {
       title: "Deixe a AIVO com a sua cara",
       description: "Escolha como a AIVO aparece, soa e fala com você.",
       language_title: "Idioma",
-      language_desc: "A AIVO usará este idioma para botões, menus e mensagens de ajuda. Suas lições permanecem no idioma da matéria.",
+      language_desc:
+        "A AIVO usará este idioma para botões, menus e mensagens de ajuda. Suas lições permanecem no idioma da matéria.",
       a11y_title: "Acessibilidade",
       a11y_desc: "Texto maior, menos movimento, legendas e varredura por acionador.",
       a11y_link: "Abrir configurações de acessibilidade →",
@@ -266,18 +291,22 @@ const LEARNER = {
       card_title: "Leitura e exibição",
       card_desc: "Texto grande, fonte amigável para dislexia, mais espaçamento, alto contraste.",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "Cada tela da AIVO atende ao WCAG 2.2 AA de fábrica. Estas configurações permitem ir além quando você precisar.",
+      reassure_wcag_body:
+        "Cada tela da AIVO atende ao WCAG 2.2 AA de fábrica. Estas configurações permitem ir além quando você precisar.",
       reassure_labels_title: "Mesmo produto, sem rótulos",
-      reassure_labels_body: "Ativar apoios nunca marca seu aluno como diferente — a interface continua calma e premium.",
+      reassure_labels_body:
+        "Ativar apoios nunca marca seu aluno como diferente — a interface continua calma e premium.",
       reassure_teachers_title: "Os professores respeitam isto",
-      reassure_teachers_body: "O que você ativar aqui é aplicado durante as lições, as tarefas e o tutor de IA — sem configuração extra.",
+      reassure_teachers_body:
+        "O que você ativar aqui é aplicado durante as lições, as tarefas e o tutor de IA — sem configuração extra.",
     },
     settings_audio: {
       no_learner_title: "Áudio",
       no_learner_body: "Entre como aluno para ver as configurações de áudio.",
       eyebrow: "Configurações",
       title: "Leitura em voz alta",
-      description: "Escolha uma voz e a velocidade de reprodução. Seu adulto controla se a leitura em voz alta está ativada.",
+      description:
+        "Escolha uma voz e a velocidade de reprodução. Seu adulto controla se a leitura em voz alta está ativada.",
       voice_kid_friendly: "Para crianças",
       voice_warm_female: "Feminina acolhedora",
       voice_warm_male: "Masculina acolhedora",
@@ -294,7 +323,8 @@ const LEARNER = {
       preview_aria: "Prévia da voz",
       no_audio_support: "Seu navegador não suporta a reprodução de áudio.",
       transcript: "Transcrição",
-      preview_unavailable: "Prévia de áudio indisponível — a transcrição de reserva é mostrada acima.",
+      preview_unavailable:
+        "Prévia de áudio indisponível — a transcrição de reserva é mostrada acima.",
       preview_text: "Olá! Esta é a prévia da sua voz de leitura em voz alta.",
       failed: "Falhou.",
       preview_failed: "A prévia falhou.",
@@ -363,7 +393,8 @@ const LEARNER = {
       title: "AIVO をあなた仕様に",
       description: "AIVO の見た目・音・話しかけ方を選びましょう。",
       language_title: "言語",
-      language_desc: "AIVO はボタン・メニュー・ヘルプメッセージにこの言語を使います。レッスンは教科の言語のままです。",
+      language_desc:
+        "AIVO はボタン・メニュー・ヘルプメッセージにこの言語を使います。レッスンは教科の言語のままです。",
       a11y_title: "アクセシビリティ",
       a11y_desc: "大きな文字、動きの軽減、字幕、スイッチスキャン。",
       a11y_link: "アクセシビリティ設定を開く →",
@@ -378,18 +409,22 @@ const LEARNER = {
       card_title: "読みやすさと表示",
       card_desc: "大きな文字、ディスレクシアに優しいフォント、広い字間、ハイコントラスト。",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "AIVO のすべての画面は標準で WCAG 2.2 AA を満たします。これらの設定で必要に応じてさらに調整できます。",
+      reassure_wcag_body:
+        "AIVO のすべての画面は標準で WCAG 2.2 AA を満たします。これらの設定で必要に応じてさらに調整できます。",
       reassure_labels_title: "同じ製品、ラベルなし",
-      reassure_labels_body: "サポートを有効にしても、学習者が「違う」と見なされることはありません。画面は穏やかで上質なままです。",
+      reassure_labels_body:
+        "サポートを有効にしても、学習者が「違う」と見なされることはありません。画面は穏やかで上質なままです。",
       reassure_teachers_title: "教師もこれを尊重します",
-      reassure_teachers_body: "ここで有効にしたものは、レッスン・宿題・AI チューターで適用されます — 追加設定は不要です。",
+      reassure_teachers_body:
+        "ここで有効にしたものは、レッスン・宿題・AI チューターで適用されます — 追加設定は不要です。",
     },
     settings_audio: {
       no_learner_title: "オーディオ",
       no_learner_body: "オーディオ設定を見るには、学習者としてサインインしてください。",
       eyebrow: "設定",
       title: "読み上げ",
-      description: "声と再生速度を選びます。読み上げをオンにするかどうかは、あなたの大人が管理します。",
+      description:
+        "声と再生速度を選びます。読み上げをオンにするかどうかは、あなたの大人が管理します。",
       voice_kid_friendly: "子ども向け",
       voice_warm_female: "温かみのある女性",
       voice_warm_male: "温かみのある男性",
@@ -406,7 +441,8 @@ const LEARNER = {
       preview_aria: "声のプレビュー",
       no_audio_support: "お使いのブラウザは音声の再生に対応していません。",
       transcript: "文字起こし",
-      preview_unavailable: "音声プレビューを利用できません — 上に文字起こしをフォールバックとして表示しています。",
+      preview_unavailable:
+        "音声プレビューを利用できません — 上に文字起こしをフォールバックとして表示しています。",
       preview_text: "こんにちは！これはあなたの読み上げ音声のプレビューです。",
       failed: "失敗しました。",
       preview_failed: "プレビューに失敗しました。",
@@ -419,7 +455,8 @@ const LEARNER = {
       title: "AIVO를 내 것으로",
       description: "AIVO의 모습, 소리, 말하는 방식을 선택하세요.",
       language_title: "언어",
-      language_desc: "AIVO는 버튼, 메뉴, 도움말 메시지에 이 언어를 사용합니다. 수업은 과목의 언어 그대로 유지됩니다.",
+      language_desc:
+        "AIVO는 버튼, 메뉴, 도움말 메시지에 이 언어를 사용합니다. 수업은 과목의 언어 그대로 유지됩니다.",
       a11y_title: "접근성",
       a11y_desc: "더 큰 글자, 모션 줄이기, 자막, 스위치 스캐닝.",
       a11y_link: "접근성 설정 열기 →",
@@ -434,11 +471,14 @@ const LEARNER = {
       card_title: "읽기 및 표시",
       card_desc: "큰 글자, 난독증 친화 글꼴, 넓은 간격, 고대비.",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "AIVO의 모든 화면은 기본으로 WCAG 2.2 AA를 충족합니다. 이 설정으로 필요할 때 더 나아갈 수 있습니다.",
+      reassure_wcag_body:
+        "AIVO의 모든 화면은 기본으로 WCAG 2.2 AA를 충족합니다. 이 설정으로 필요할 때 더 나아갈 수 있습니다.",
       reassure_labels_title: "같은 제품, 라벨 없음",
-      reassure_labels_body: "지원을 켠다고 해서 학습자를 다르게 표시하지 않습니다 — 인터페이스는 차분하고 고급스럽게 유지됩니다.",
+      reassure_labels_body:
+        "지원을 켠다고 해서 학습자를 다르게 표시하지 않습니다 — 인터페이스는 차분하고 고급스럽게 유지됩니다.",
       reassure_teachers_title: "교사도 이를 존중합니다",
-      reassure_teachers_body: "여기서 켠 것은 수업, 숙제, AI 튜터에 적용됩니다 — 추가 설정이 필요 없습니다.",
+      reassure_teachers_body:
+        "여기서 켠 것은 수업, 숙제, AI 튜터에 적용됩니다 — 추가 설정이 필요 없습니다.",
     },
     settings_audio: {
       no_learner_title: "오디오",
@@ -475,7 +515,8 @@ const LEARNER = {
       title: "اجعل AIVO خاصًّا بك",
       description: "اختر شكل AIVO وصوته وطريقة حديثه إليك.",
       language_title: "اللغة",
-      language_desc: "سيستخدم AIVO هذه اللغة للأزرار والقوائم ورسائل المساعدة. تبقى دروسك بلغة المادة.",
+      language_desc:
+        "سيستخدم AIVO هذه اللغة للأزرار والقوائم ورسائل المساعدة. تبقى دروسك بلغة المادة.",
       a11y_title: "إمكانية الوصول",
       a11y_desc: "نص أكبر، وحركة أقل، وتسميات توضيحية، ومسح بالمفتاح.",
       a11y_link: "فتح إعدادات إمكانية الوصول →",
@@ -490,11 +531,14 @@ const LEARNER = {
       card_title: "القراءة والعرض",
       card_desc: "نص كبير، وخط ملائم لعسر القراءة، وتباعد إضافي، وتباين عالٍ.",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "كل شاشة في AIVO تستوفي WCAG 2.2 AA افتراضيًا. وتتيح لك هذه الإعدادات الذهاب أبعد عند الحاجة.",
+      reassure_wcag_body:
+        "كل شاشة في AIVO تستوفي WCAG 2.2 AA افتراضيًا. وتتيح لك هذه الإعدادات الذهاب أبعد عند الحاجة.",
       reassure_labels_title: "المنتج نفسه، دون تصنيفات",
-      reassure_labels_body: "تفعيل وسائل الدعم لا يصنّف متعلّمك على أنه مختلف أبدًا — تبقى الواجهة هادئة وراقية.",
+      reassure_labels_body:
+        "تفعيل وسائل الدعم لا يصنّف متعلّمك على أنه مختلف أبدًا — تبقى الواجهة هادئة وراقية.",
       reassure_teachers_title: "المعلّمون يحترمون هذه الإعدادات",
-      reassure_teachers_body: "كل ما تفعّله هنا يُطبَّق أثناء الدروس والواجبات ومعلّم الذكاء الاصطناعي — دون إعداد إضافي.",
+      reassure_teachers_body:
+        "كل ما تفعّله هنا يُطبَّق أثناء الدروس والواجبات ومعلّم الذكاء الاصطناعي — دون إعداد إضافي.",
     },
     settings_audio: {
       no_learner_title: "الصوت",
@@ -531,12 +575,14 @@ const LEARNER = {
       title: "AIVO को अपना बनाएँ",
       description: "चुनें कि AIVO कैसा दिखे, कैसा सुनाई दे और आपसे कैसे बात करे।",
       language_title: "भाषा",
-      language_desc: "AIVO बटन, मेन्यू और सहायक संदेशों के लिए इस भाषा का उपयोग करेगा। आपके पाठ विषय की भाषा में ही रहते हैं।",
+      language_desc:
+        "AIVO बटन, मेन्यू और सहायक संदेशों के लिए इस भाषा का उपयोग करेगा। आपके पाठ विषय की भाषा में ही रहते हैं।",
       a11y_title: "सुलभता",
       a11y_desc: "बड़ा टेक्स्ट, कम मोशन, कैप्शन और स्विच स्कैनिंग।",
       a11y_link: "सुलभता सेटिंग्स खोलें →",
       sound_title: "ध्वनि और आवाज़",
-      sound_desc: "वह सहायक आवाज़ चुनें जिसका उपयोग AIVO प्रश्न और प्रतिक्रिया पढ़ने के लिए करता है।",
+      sound_desc:
+        "वह सहायक आवाज़ चुनें जिसका उपयोग AIVO प्रश्न और प्रतिक्रिया पढ़ने के लिए करता है।",
       sound_link: "ध्वनि सेटिंग्स खोलें →",
     },
     settings_a11y: {
@@ -546,18 +592,22 @@ const LEARNER = {
       card_title: "पठन और प्रदर्शन",
       card_desc: "बड़ा टेक्स्ट, डिस्लेक्सिया-अनुकूल फ़ॉन्ट, अतिरिक्त रिक्ति, उच्च कंट्रास्ट।",
       reassure_wcag_title: "WCAG 2.2 AA",
-      reassure_wcag_body: "AIVO की हर स्क्रीन डिफ़ॉल्ट रूप से WCAG 2.2 AA को पूरा करती है। ये सेटिंग्स ज़रूरत पड़ने पर आपको और आगे ले जाने देती हैं।",
+      reassure_wcag_body:
+        "AIVO की हर स्क्रीन डिफ़ॉल्ट रूप से WCAG 2.2 AA को पूरा करती है। ये सेटिंग्स ज़रूरत पड़ने पर आपको और आगे ले जाने देती हैं।",
       reassure_labels_title: "वही उत्पाद, कोई लेबल नहीं",
-      reassure_labels_body: "सहायताएँ चालू करना आपके सीखने वाले को कभी अलग के रूप में चिह्नित नहीं करता — इंटरफ़ेस शांत और प्रीमियम बना रहता है।",
+      reassure_labels_body:
+        "सहायताएँ चालू करना आपके सीखने वाले को कभी अलग के रूप में चिह्नित नहीं करता — इंटरफ़ेस शांत और प्रीमियम बना रहता है।",
       reassure_teachers_title: "शिक्षक इन्हें मानते हैं",
-      reassure_teachers_body: "आप यहाँ जो भी चालू करते हैं वह पाठों, होमवर्क और AI ट्यूटर के दौरान लागू होता है — कोई अतिरिक्त सेटअप नहीं।",
+      reassure_teachers_body:
+        "आप यहाँ जो भी चालू करते हैं वह पाठों, होमवर्क और AI ट्यूटर के दौरान लागू होता है — कोई अतिरिक्त सेटअप नहीं।",
     },
     settings_audio: {
       no_learner_title: "ऑडियो",
       no_learner_body: "ऑडियो सेटिंग्स देखने के लिए सीखने वाले के रूप में साइन इन करें।",
       eyebrow: "सेटिंग्स",
       title: "ज़ोर से पढ़ना",
-      description: "एक आवाज़ और प्लेबैक गति चुनें। ज़ोर से पढ़ना चालू है या नहीं, यह आपका बड़ा नियंत्रित करता है।",
+      description:
+        "एक आवाज़ और प्लेबैक गति चुनें। ज़ोर से पढ़ना चालू है या नहीं, यह आपका बड़ा नियंत्रित करता है।",
       voice_kid_friendly: "बच्चों के अनुकूल",
       voice_warm_female: "गर्मजोश महिला",
       voice_warm_male: "गर्मजोश पुरुष",
@@ -574,7 +624,8 @@ const LEARNER = {
       preview_aria: "आवाज़ पूर्वावलोकन",
       no_audio_support: "आपका ब्राउज़र ऑडियो प्लेबैक का समर्थन नहीं करता।",
       transcript: "प्रतिलेख",
-      preview_unavailable: "ऑडियो पूर्वावलोकन अनुपलब्ध — ऊपर प्रतिलेख फ़ॉलबैक के रूप में दिखाया गया है।",
+      preview_unavailable:
+        "ऑडियो पूर्वावलोकन अनुपलब्ध — ऊपर प्रतिलेख फ़ॉलबैक के रूप में दिखाया गया है।",
       preview_text: "नमस्ते! यह आपकी ज़ोर-से-पढ़ने वाली आवाज़ का पूर्वावलोकन है।",
       failed: "विफल।",
       preview_failed: "पूर्वावलोकन विफल।",
@@ -589,6 +640,8 @@ for (const [locale, learner] of Object.entries(LEARNER)) {
   json.learner = { ...(json.learner ?? {}), ...learner };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-learner-settings-i18n: merged learner settings namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-learner-settings-i18n: merged learner settings namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-learner-settings-i18n: done — ${written} locale catalogs updated.`);

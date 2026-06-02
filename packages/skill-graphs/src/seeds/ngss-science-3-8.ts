@@ -41,7 +41,8 @@ export const ngssScience3To8: SkillGraph = {
     {
       id: "ngss.3-PS2-1",
       title: "Balanced and unbalanced forces on motion",
-      description: "I can investigate how balanced and unbalanced forces affect an object's motion.",
+      description:
+        "I can investigate how balanced and unbalanced forces affect an object's motion.",
       subject: "science",
       gradeBand: "3",
       frameworkRefs: [{ framework: "NGSS", code: "3-PS2-1" }],
@@ -95,7 +96,8 @@ export const ngssScience3To8: SkillGraph = {
     {
       id: "ngss.MS-PS1-1.g6",
       title: "Molecular models of substances",
-      description: "I can build a model that shows how atoms join to form molecules of a substance.",
+      description:
+        "I can build a model that shows how atoms join to form molecules of a substance.",
       subject: "science",
       gradeBand: "6",
       frameworkRefs: [{ framework: "NGSS", code: "MS-PS1-1" }],

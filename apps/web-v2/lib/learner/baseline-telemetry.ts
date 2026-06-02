@@ -63,9 +63,7 @@ function medianOf(values: number[]): number | null {
   if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 1
-    ? sorted[mid]!
-    : Math.round((sorted[mid - 1]! + sorted[mid]!) / 2);
+  return sorted.length % 2 === 1 ? sorted[mid]! : Math.round((sorted[mid - 1]! + sorted[mid]!) / 2);
 }
 
 export interface BuildRunTelemetryInput {
@@ -279,9 +277,7 @@ export function aggregateItemPsychometrics(
     const defectReasons: string[] = [];
     if (sufficientData) {
       if (Math.abs(thetaDelta) >= MISCALIBRATION_LOGITS) {
-        defectReasons.push(
-          thetaDelta > 0 ? "harder_than_calibrated" : "easier_than_calibrated",
-        );
+        defectReasons.push(thetaDelta > 0 ? "harder_than_calibrated" : "easier_than_calibrated");
       }
       if (pValue <= 0.05) defectReasons.push("near_zero_pvalue");
       if (pValue >= 0.98 && seedTheta > 0) defectReasons.push("trivial_for_band");
@@ -333,9 +329,7 @@ export function recalibrationMap(
     if (!row.sufficientData) continue;
     out[row.itemKey] = {
       difficulty: row.estimatedTheta,
-      ...(row.estimatedDiscrimination !== 1
-        ? { discrimination: row.estimatedDiscrimination }
-        : {}),
+      ...(row.estimatedDiscrimination !== 1 ? { discrimination: row.estimatedDiscrimination } : {}),
     };
   }
   return out;

@@ -40,8 +40,7 @@ export const actflWorldLanguages7To12: SkillGraph = {
     {
       id: "actfl.nm.inters.7",
       title: "Communicate with memorized expressions (Novice-Mid)",
-      description:
-        "I can ask and answer simple questions using memorized words and phrases.",
+      description: "I can ask and answer simple questions using memorized words and phrases.",
       subject: "world_languages",
       gradeBand: "7",
       frameworkRefs: [{ framework: "ACTFL", code: "Interpersonal/Novice-Mid" }],
@@ -50,8 +49,7 @@ export const actflWorldLanguages7To12: SkillGraph = {
     {
       id: "actfl.nm.present.7",
       title: "Present information using memorized phrases",
-      description:
-        "I can introduce myself and describe familiar things using memorized phrases.",
+      description: "I can introduce myself and describe familiar things using memorized phrases.",
       subject: "world_languages",
       gradeBand: "7",
       frameworkRefs: [{ framework: "ACTFL", code: "Presentational/Novice-Mid" }],
@@ -62,8 +60,7 @@ export const actflWorldLanguages7To12: SkillGraph = {
     {
       id: "actfl.nh.interp.8",
       title: "Understand main idea of simple texts (Novice-High)",
-      description:
-        "I can understand the main idea of a short, simple text on a familiar topic.",
+      description: "I can understand the main idea of a short, simple text on a familiar topic.",
       subject: "world_languages",
       gradeBand: "8",
       frameworkRefs: [{ framework: "ACTFL", code: "Interpretive/Novice-High" }],
@@ -136,8 +133,7 @@ export const actflWorldLanguages7To12: SkillGraph = {
     {
       id: "actfl.im.present.12",
       title: "Present on familiar topics with detail",
-      description:
-        "I can present on familiar topics with some detail and connected sentences.",
+      description: "I can present on familiar topics with some detail and connected sentences.",
       subject: "world_languages",
       gradeBand: "12",
       frameworkRefs: [{ framework: "ACTFL", code: "Presentational/Intermediate-Mid" }],

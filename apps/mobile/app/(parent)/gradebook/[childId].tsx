@@ -17,8 +17,6 @@ import {
 } from "@aivo/mobile-ui";
 import { summarizeDomains } from "@/lib/learner-progress";
 import { subjectAccent } from "@/lib/subject-display";
-import { useGradebook } from "@/hooks/useGradebook";
-import { groupBySubject } from "@/lib/gradebook-logic";
 import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 

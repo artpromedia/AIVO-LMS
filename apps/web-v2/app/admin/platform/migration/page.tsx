@@ -37,10 +37,7 @@ export default async function Page() {
 
       <h2 className="mb-3 font-display text-lg font-semibold">{t("recent_jobs")}</h2>
       {jobs.length === 0 ? (
-        <EmptyState
-          title={t("empty")}
-          description="Use the form above to start a dry-run."
-        />
+        <EmptyState title={t("empty")} description="Use the form above to start a dry-run." />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">

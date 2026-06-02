@@ -11,7 +11,10 @@ import { listClassrooms, listEnrollments } from "@/lib/db/repos";
 export default async function Page() {
   const t = await getTranslations("teacher.classes");
   const session = await requirePageRole(["teacher"]);
-  const classrooms = await listClassrooms({ tenantId: session.tenantId, teacherUserId: session.userId });
+  const classrooms = await listClassrooms({
+    tenantId: session.tenantId,
+    teacherUserId: session.userId,
+  });
 
   return (
     <AppShell
@@ -37,21 +40,21 @@ export default async function Page() {
               const enrollments = await listEnrollments(c.id);
               const learners = enrollments.filter((e) => e.role === "learner").length;
               return (
-              <Link
-                key={c.id}
-                href={`/teacher/classes/${c.id}`}
-                className="block rounded-2xl border border-aivo-border bg-aivo-surface p-4 transition hover:border-aivo-primary"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-display text-base font-semibold">{c.name}</p>
-                    <p className="text-xs text-aivo-muted">
-                      {c.gradeBand} · {learners} learners
-                    </p>
+                <Link
+                  key={c.id}
+                  href={`/teacher/classes/${c.id}`}
+                  className="block rounded-2xl border border-aivo-border bg-aivo-surface p-4 transition hover:border-aivo-primary"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-display text-base font-semibold">{c.name}</p>
+                      <p className="text-xs text-aivo-muted">
+                        {c.gradeBand} · {learners} learners
+                      </p>
+                    </div>
+                    <Badge tone="primary">{c.gradeBand}</Badge>
                   </div>
-                  <Badge tone="primary">{c.gradeBand}</Badge>
-                </div>
-              </Link>
+                </Link>
               );
             }),
           )}

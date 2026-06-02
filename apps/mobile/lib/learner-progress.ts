@@ -37,7 +37,7 @@ export interface ProgressSummary {
   subjects: SubjectStat[];
 }
 
-export function summarizeDomains(domains: ReadonlyArray<DomainInput>): ProgressSummary {
+export function summarizeDomains(domains: readonly DomainInput[]): ProgressSummary {
   const subjects: SubjectStat[] = domains.map((d) => ({
     name: d.domain,
     mastery: clampPct(d.masteryPercent),

@@ -63,10 +63,7 @@ export function AISuggestionsToolbar({
 
   // Track the current field value so completion + dedupe stay in sync.
   React.useEffect(() => {
-    const el = document.getElementById(targetId) as
-      | HTMLTextAreaElement
-      | HTMLInputElement
-      | null;
+    const el = document.getElementById(targetId) as HTMLTextAreaElement | HTMLInputElement | null;
     if (!el) return;
     const handler = () => setTextNow(el.value);
     setTextNow(el.value);
@@ -144,10 +141,7 @@ export function AISuggestionsToolbar({
 
   const insertSuggestion = React.useCallback(
     (value: string) => {
-      const el = document.getElementById(targetId) as
-        | HTMLTextAreaElement
-        | HTMLInputElement
-        | null;
+      const el = document.getElementById(targetId) as HTMLTextAreaElement | HTMLInputElement | null;
       if (!el) return;
       const current = el.value;
       const sep = separator === "newline" ? "\n" : ", ";
@@ -170,10 +164,7 @@ export function AISuggestionsToolbar({
 
   const acceptCompletion = React.useCallback(() => {
     if (!completion) return;
-    const el = document.getElementById(targetId) as
-      | HTMLTextAreaElement
-      | HTMLInputElement
-      | null;
+    const el = document.getElementById(targetId) as HTMLTextAreaElement | HTMLInputElement | null;
     if (!el) return;
     el.value = el.value + completion;
     el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -183,10 +174,7 @@ export function AISuggestionsToolbar({
 
   // Bind Tab / → to accept ghost-text completion when present.
   React.useEffect(() => {
-    const el = document.getElementById(targetId) as
-      | HTMLTextAreaElement
-      | HTMLInputElement
-      | null;
+    const el = document.getElementById(targetId) as HTMLTextAreaElement | HTMLInputElement | null;
     if (!el) return;
     const onKey: EventListener = (ev) => {
       if (!completion) return;
@@ -243,7 +231,9 @@ export function AISuggestionsToolbar({
             <span ref={ghostRef} className="font-medium text-iw-ink">
               {completion}
             </span>
-            <kbd className="ml-1 rounded border border-iw-border bg-iw-raised px-1 text-[10px] text-iw-ink-muted">Tab</kbd>
+            <kbd className="ml-1 rounded border border-iw-border bg-iw-raised px-1 text-[10px] text-iw-ink-muted">
+              Tab
+            </kbd>
           </span>
         ) : null}
       </div>
@@ -261,8 +251,7 @@ export function AISuggestionsToolbar({
             <p className="text-xs text-iw-ink-muted">Thinking of ideas…</p>
           ) : suggestions.length === 0 ? (
             <p className="text-xs text-iw-ink-muted">
-              No new suggestions — everything we'd recommend is already in
-              the box.
+              No new suggestions — everything we'd recommend is already in the box.
             </p>
           ) : (
             <>
@@ -281,7 +270,10 @@ export function AISuggestionsToolbar({
                       "hover:border-aivo-accent hover:bg-iw-warm-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring",
                     )}
                   >
-                    <Plus className="h-3 w-3 text-iw-ink-muted group-hover:text-aivo-accent" aria-hidden="true" />
+                    <Plus
+                      className="h-3 w-3 text-iw-ink-muted group-hover:text-aivo-accent"
+                      aria-hidden="true"
+                    />
                     {s}
                   </button>
                 ))}

@@ -12,7 +12,9 @@ type Params = { searchParams: Promise<{ schoolId?: string }> };
 export default async function Page({ searchParams }: Params) {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
   const params = await searchParams;
-  const schools = await listSchools(session.role === "platform_admin" ? undefined : session.tenantId);
+  const schools = await listSchools(
+    session.role === "platform_admin" ? undefined : session.tenantId,
+  );
   if (schools.length === 0) redirect("/admin/school/rostering");
   const selectedSchool = schools.find((s) => s.id === params.schoolId) ?? schools[0]!;
 

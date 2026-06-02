@@ -1,8 +1,11 @@
 import { describe, it, expect } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { createAnthropicTutorProvider, ANTHROPIC_TUTOR_MODEL } from "./anthropic-tutor";
-import { generateLessonPlanWithRetry, type TutorGenerationInputs } from "./tutor";
-import { generateDeterministicLessonPlan } from "@/lib/learner/lesson-plan";
+import {
+  generateLessonPlanWithRetry,
+  MockTutorProvider,
+  type TutorGenerationInputs,
+} from "./tutor";
 import type {
   CurriculumFocus,
   LearnerBrainProfileState,
@@ -81,13 +84,15 @@ describe("AnthropicTutorProvider", () => {
       thinking: unknown;
       system: Array<{ cache_control: unknown }>;
     };
-    const validPlan = generateDeterministicLessonPlan(INPUT);
+    // Source a schema-valid reference plan from the deterministic provider
+    // (the orchestrator supplies it the same way at runtime).
+    const validPlan = (await MockTutorProvider.generate(INPUT)) as { title: string };
     let sent: SentShape | undefined;
     const provider = createAnthropicTutorProvider(
       fakeClient(JSON.stringify(validPlan), { capture: (a) => (sent = a as SentShape) }),
     );
 
-    const raw = await provider.generate(INPUT);
+    const raw = await provider.generate(INPUT, validPlan);
     expect(raw).toMatchObject({ title: validPlan.title });
 
     // Request shape: right model, adaptive thinking, cached system prefix.
@@ -98,7 +103,7 @@ describe("AnthropicTutorProvider", () => {
   });
 
   it("feeds the validate/repair/fallback harness and reports provider=ai", async () => {
-    const validPlan = generateDeterministicLessonPlan(INPUT);
+    const validPlan = (await MockTutorProvider.generate(INPUT)) as { title: string };
     const provider = createAnthropicTutorProvider(fakeClient(JSON.stringify(validPlan)));
     const { plan, telemetry } = await generateLessonPlanWithRetry(provider, INPUT);
     expect(telemetry.provider).toBe("ai");
@@ -106,10 +111,10 @@ describe("AnthropicTutorProvider", () => {
   });
 
   it("tolerates a ```json fenced response", async () => {
-    const validPlan = generateDeterministicLessonPlan(INPUT);
+    const validPlan = (await MockTutorProvider.generate(INPUT)) as { title: string };
     const fenced = "```json\n" + JSON.stringify(validPlan) + "\n```";
     const provider = createAnthropicTutorProvider(fakeClient(fenced));
-    const raw = (await provider.generate(INPUT)) as { title: string };
+    const raw = (await provider.generate(INPUT, validPlan)) as { title: string };
     expect(raw.title).toEqual(validPlan.title);
   });
 

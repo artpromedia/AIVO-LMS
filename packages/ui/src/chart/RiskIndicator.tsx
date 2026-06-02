@@ -29,7 +29,10 @@ const BG: Record<RiskLevel, string> = {
   high: "bg-iw-risk-high-subtle text-iw-risk-high-strong",
 };
 
-const SIZE: Record<NonNullable<RiskIndicatorProps["size"]>, { pad: string; icon: string; label: string }> = {
+const SIZE: Record<
+  NonNullable<RiskIndicatorProps["size"]>,
+  { pad: string; icon: string; label: string }
+> = {
   sm: { pad: "px-2.5 py-1.5 gap-2", icon: "w-4 h-4", label: "text-xs" },
   md: { pad: "px-3 py-2 gap-2.5", icon: "w-5 h-5", label: "text-sm" },
   lg: { pad: "px-4 py-3 gap-3", icon: "w-6 h-6", label: "text-base" },
@@ -61,7 +64,9 @@ export const RiskIndicator = forwardRef<HTMLDivElement, RiskIndicatorProps>(func
       <Icon className={cn(s.icon, "shrink-0 mt-0.5")} aria-hidden="true" />
       <div className="flex flex-col items-start min-w-0">
         <span className={cn(s.label, "leading-tight")}>{label}</span>
-        {detail && <span className="text-xs font-normal opacity-80 leading-tight mt-0.5">{detail}</span>}
+        {detail && (
+          <span className="text-xs font-normal opacity-80 leading-tight mt-0.5">{detail}</span>
+        )}
       </div>
     </div>
   );

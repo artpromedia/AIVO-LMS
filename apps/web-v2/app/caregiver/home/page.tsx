@@ -25,18 +25,13 @@ export default async function CaregiverHomePage() {
   const t = await getTranslations("caregiver.home");
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "caregiver");
-  const maybeLearners = await Promise.all(
-    learnerIds.map((id) => getLearner(id, session.tenantId)),
-  );
+  const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   for (const l of learners) await refreshLearnerReadiness(l.id, session.tenantId);
-  const refreshed = await Promise.all(
-    learners.map((l) => getLearner(l.id, session.tenantId)),
-  );
+  const refreshed = await Promise.all(learners.map((l) => getLearner(l.id, session.tenantId)));
   const fresh = refreshed.filter((l): l is LearnerProfile => Boolean(l));
   const learningNow = fresh.filter(
-    (l) =>
-      l.readinessState === "active_learning" || l.readinessState === "ready_for_today_mission",
+    (l) => l.readinessState === "active_learning" || l.readinessState === "ready_for_today_mission",
   ).length;
 
   return (

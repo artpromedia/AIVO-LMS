@@ -25,10 +25,12 @@ const BASELINE = {
     index: {
       notready_eyebrow: "Almost ready",
       notready_title: "A grown-up is still setting this up",
-      notready_body: "Ask the grown-up who signed you up — they have a couple of questions to finish before AIVO can plan your check-in.",
+      notready_body:
+        "Ask the grown-up who signed you up — they have a couple of questions to finish before AIVO can plan your check-in.",
       ready_eyebrow: "A friendly check-in",
       ready_title: "Hi {name} — ready to show me how you think?",
-      ready_body: "Three calm steps before the first question. Pick what you want to start with, AIVO does the rest.",
+      ready_body:
+        "Three calm steps before the first question. Pick what you want to start with, AIVO does the rest.",
       lets_go: "Let's go",
     },
     why: {
@@ -37,11 +39,13 @@ const BASELINE = {
       body: "A grown-up answered a few questions so I'd know how you like to learn. If they shared an IEP, I read the supports too. Here's what I'm doing right now:",
       cta: "Pick where to start",
       card1_title: "Made fresh for you",
-      card1_body: "Every question is picked just for what your grown-up shared — not from a big shared quiz.",
+      card1_body:
+        "Every question is picked just for what your grown-up shared — not from a big shared quiz.",
       card2_title: "No grades, no points",
       card2_body: "This isn't a test. AIVO uses what you show to plan calm, just-right lessons.",
       card3_title: "Breaks are good",
-      card3_body: "You can pause, take a breath, or stop for today. AIVO will remember where you were.",
+      card3_body:
+        "You can pause, take a breath, or stop for today. AIVO will remember where you were.",
     },
     subjects: {
       step: "Step 1 of 3",
@@ -51,7 +55,7 @@ const BASELINE = {
       legend: "Choose subjects",
       with_tutor: "With {name} · {landmark}",
       picked_by_grownup: "Picked by grown-up",
-      picked_note: "Subjects with a \"Picked by grown-up\" tag come from your parent's setup.",
+      picked_note: 'Subjects with a "Picked by grown-up" tag come from your parent\'s setup.',
       get_ready: "Get ready",
     },
     readiness: {
@@ -64,9 +68,11 @@ const BASELINE = {
       status_always: "Always",
       status_off: "Off",
       readaloud_title: "Read-aloud",
-      readaloud_body: "Tap the speaker on any question to hear the words. No one will know — promise.",
+      readaloud_body:
+        "Tap the speaker on any question to hear the words. No one will know — promise.",
       calm_title: "Calm screen",
-      calm_body: "Soft colors and quiet motion so it's easier to focus. You can change this any time.",
+      calm_body:
+        "Soft colors and quiet motion so it's easier to focus. You can change this any time.",
       breaks_title: "Breaks are good",
       breaks_body: "You can pause whenever. AIVO will remember and pick up where you left off.",
       extratime_title: "Extra time",
@@ -78,7 +84,8 @@ const BASELINE = {
       step: "Step 3 of 3",
       eyebrow: "A friendly check-in · {count} short questions",
       title: "Ready, {name}?",
-      body_with_tutor: "{tutorName} from the {landmark} is here to help you start. We'll go one question at a time. Skip anything you don't want to try.",
+      body_with_tutor:
+        "{tutorName} from the {landmark} is here to help you start. We'll go one question at a time. Skip anything you don't want to try.",
       body_default: "We'll go one question at a time. Skip anything you don't want to try.",
       start: "Start when you're ready",
       subjects_today: "Subjects today",
@@ -96,10 +103,12 @@ const BASELINE = {
     index: {
       notready_eyebrow: "Casi listo",
       notready_title: "Un adulto todavía está configurando esto",
-      notready_body: "Pregúntale al adulto que te registró: tiene un par de preguntas que terminar antes de que AIVO pueda planear tu encuentro.",
+      notready_body:
+        "Pregúntale al adulto que te registró: tiene un par de preguntas que terminar antes de que AIVO pueda planear tu encuentro.",
       ready_eyebrow: "Un encuentro amistoso",
       ready_title: "Hola {name}, ¿listo para mostrarme cómo piensas?",
-      ready_body: "Tres pasos tranquilos antes de la primera pregunta. Elige por dónde empezar y AIVO hace el resto.",
+      ready_body:
+        "Tres pasos tranquilos antes de la primera pregunta. Elige por dónde empezar y AIVO hace el resto.",
       lets_go: "Vamos",
     },
     why: {
@@ -108,9 +117,11 @@ const BASELINE = {
       body: "Un adulto respondió unas preguntas para que yo supiera cómo te gusta aprender. Si compartió un IEP, también leí los apoyos. Esto es lo que estoy haciendo ahora:",
       cta: "Elige por dónde empezar",
       card1_title: "Hecho a tu medida",
-      card1_body: "Cada pregunta se elige según lo que compartió tu adulto, no de un examen genérico.",
+      card1_body:
+        "Cada pregunta se elige según lo que compartió tu adulto, no de un examen genérico.",
       card2_title: "Sin notas ni puntos",
-      card2_body: "Esto no es un examen. AIVO usa lo que muestras para planear lecciones tranquilas y a tu medida.",
+      card2_body:
+        "Esto no es un examen. AIVO usa lo que muestras para planear lecciones tranquilas y a tu medida.",
       card3_title: "Los descansos son buenos",
       card3_body: "Puedes pausar, respirar o parar por hoy. AIVO recordará dónde te quedaste.",
     },
@@ -122,7 +133,8 @@ const BASELINE = {
       legend: "Elegir materias",
       with_tutor: "Con {name} · {landmark}",
       picked_by_grownup: "Elegido por un adulto",
-      picked_note: "Las materias con la etiqueta \"Elegido por un adulto\" vienen de la configuración de tu familia.",
+      picked_note:
+        'Las materias con la etiqueta "Elegido por un adulto" vienen de la configuración de tu familia.',
       get_ready: "Prepárate",
     },
     readiness: {
@@ -135,9 +147,11 @@ const BASELINE = {
       status_always: "Siempre",
       status_off: "Desactivado",
       readaloud_title: "Lectura en voz alta",
-      readaloud_body: "Toca el altavoz en cualquier pregunta para oír las palabras. Nadie lo sabrá, prometido.",
+      readaloud_body:
+        "Toca el altavoz en cualquier pregunta para oír las palabras. Nadie lo sabrá, prometido.",
       calm_title: "Pantalla tranquila",
-      calm_body: "Colores suaves y poco movimiento para concentrarte mejor. Puedes cambiarlo cuando quieras.",
+      calm_body:
+        "Colores suaves y poco movimiento para concentrarte mejor. Puedes cambiarlo cuando quieras.",
       breaks_title: "Los descansos son buenos",
       breaks_body: "Puedes pausar cuando quieras. AIVO recordará y seguirá donde lo dejaste.",
       extratime_title: "Tiempo extra",
@@ -149,7 +163,8 @@ const BASELINE = {
       step: "Paso 3 de 3",
       eyebrow: "Un encuentro amistoso · {count} preguntas cortas",
       title: "¿Listo, {name}?",
-      body_with_tutor: "{tutorName} de {landmark} está aquí para ayudarte a empezar. Iremos pregunta por pregunta. Salta lo que no quieras intentar.",
+      body_with_tutor:
+        "{tutorName} de {landmark} está aquí para ayudarte a empezar. Iremos pregunta por pregunta. Salta lo que no quieras intentar.",
       body_default: "Iremos pregunta por pregunta. Salta lo que no quieras intentar.",
       start: "Empieza cuando estés listo",
       subjects_today: "Materias de hoy",
@@ -167,10 +182,12 @@ const BASELINE = {
     index: {
       notready_eyebrow: "Presque prêt",
       notready_title: "Un adulte est encore en train de tout préparer",
-      notready_body: "Demande à l'adulte qui t'a inscrit — il lui reste deux ou trois questions à finir avant qu'AIVO puisse préparer ton rendez-vous.",
+      notready_body:
+        "Demande à l'adulte qui t'a inscrit — il lui reste deux ou trois questions à finir avant qu'AIVO puisse préparer ton rendez-vous.",
       ready_eyebrow: "Un petit rendez-vous tranquille",
       ready_title: "Salut {name} — prêt à me montrer comment tu réfléchis ?",
-      ready_body: "Trois étapes tranquilles avant la première question. Choisis par quoi commencer, AIVO fait le reste.",
+      ready_body:
+        "Trois étapes tranquilles avant la première question. Choisis par quoi commencer, AIVO fait le reste.",
       lets_go: "C'est parti",
     },
     why: {
@@ -179,11 +196,14 @@ const BASELINE = {
       body: "Un adulte a répondu à quelques questions pour que je sache comment tu aimes apprendre. S'il a partagé un IEP, j'ai lu les aménagements aussi. Voici ce que je fais en ce moment :",
       cta: "Choisis par où commencer",
       card1_title: "Fait sur mesure pour toi",
-      card1_body: "Chaque question est choisie selon ce que ton adulte a partagé — pas un grand quiz tout fait.",
+      card1_body:
+        "Chaque question est choisie selon ce que ton adulte a partagé — pas un grand quiz tout fait.",
       card2_title: "Pas de notes, pas de points",
-      card2_body: "Ce n'est pas un test. AIVO utilise ce que tu montres pour préparer des leçons calmes et bien adaptées.",
+      card2_body:
+        "Ce n'est pas un test. AIVO utilise ce que tu montres pour préparer des leçons calmes et bien adaptées.",
       card3_title: "Les pauses, c'est bien",
-      card3_body: "Tu peux faire une pause, souffler ou t'arrêter pour aujourd'hui. AIVO se souviendra d'où tu en étais.",
+      card3_body:
+        "Tu peux faire une pause, souffler ou t'arrêter pour aujourd'hui. AIVO se souviendra d'où tu en étais.",
     },
     subjects: {
       step: "Étape 1 sur 3",
@@ -193,7 +213,8 @@ const BASELINE = {
       legend: "Choisir des matières",
       with_tutor: "Avec {name} · {landmark}",
       picked_by_grownup: "Choisi par un adulte",
-      picked_note: "Les matières avec l'étiquette « Choisi par un adulte » viennent de la configuration de tes parents.",
+      picked_note:
+        "Les matières avec l'étiquette « Choisi par un adulte » viennent de la configuration de tes parents.",
       get_ready: "Prépare-toi",
     },
     readiness: {
@@ -206,11 +227,14 @@ const BASELINE = {
       status_always: "Toujours",
       status_off: "Désactivé",
       readaloud_title: "Lecture à voix haute",
-      readaloud_body: "Touche le haut-parleur sur n'importe quelle question pour entendre les mots. Personne ne le saura — promis.",
+      readaloud_body:
+        "Touche le haut-parleur sur n'importe quelle question pour entendre les mots. Personne ne le saura — promis.",
       calm_title: "Écran apaisé",
-      calm_body: "Des couleurs douces et peu de mouvement pour mieux te concentrer. Tu peux changer ça à tout moment.",
+      calm_body:
+        "Des couleurs douces et peu de mouvement pour mieux te concentrer. Tu peux changer ça à tout moment.",
       breaks_title: "Les pauses, c'est bien",
-      breaks_body: "Tu peux faire une pause quand tu veux. AIVO se souviendra et reprendra où tu en étais.",
+      breaks_body:
+        "Tu peux faire une pause quand tu veux. AIVO se souviendra et reprendra où tu en étais.",
       extratime_title: "Temps supplémentaire",
       extratime_body: "De toute façon, il n'y a pas d'horloge. Prends tout le temps qu'il te faut.",
       tell_me_more: "Dis-m'en plus",
@@ -220,7 +244,8 @@ const BASELINE = {
       step: "Étape 3 sur 3",
       eyebrow: "Un rendez-vous tranquille · {count} questions courtes",
       title: "Prêt, {name} ?",
-      body_with_tutor: "{tutorName} de {landmark} est là pour t'aider à démarrer. On y va une question à la fois. Saute ce que tu ne veux pas essayer.",
+      body_with_tutor:
+        "{tutorName} de {landmark} est là pour t'aider à démarrer. On y va une question à la fois. Saute ce que tu ne veux pas essayer.",
       body_default: "On y va une question à la fois. Saute ce que tu ne veux pas essayer.",
       start: "Commence quand tu es prêt",
       subjects_today: "Matières du jour",
@@ -238,10 +263,12 @@ const BASELINE = {
     index: {
       notready_eyebrow: "Fast bereit",
       notready_title: "Ein Erwachsener richtet das noch ein",
-      notready_body: "Frag den Erwachsenen, der dich angemeldet hat — er muss noch ein paar Fragen beantworten, bevor AIVO deinen Check-in planen kann.",
+      notready_body:
+        "Frag den Erwachsenen, der dich angemeldet hat — er muss noch ein paar Fragen beantworten, bevor AIVO deinen Check-in planen kann.",
       ready_eyebrow: "Ein freundlicher Check-in",
       ready_title: "Hallo {name} — bereit, mir zu zeigen, wie du denkst?",
-      ready_body: "Drei ruhige Schritte vor der ersten Frage. Wähle, womit du anfangen willst, AIVO macht den Rest.",
+      ready_body:
+        "Drei ruhige Schritte vor der ersten Frage. Wähle, womit du anfangen willst, AIVO macht den Rest.",
       lets_go: "Los geht's",
     },
     why: {
@@ -250,11 +277,14 @@ const BASELINE = {
       body: "Ein Erwachsener hat ein paar Fragen beantwortet, damit ich weiß, wie du gern lernst. Wenn er einen IEP geteilt hat, habe ich auch die Hilfen gelesen. Das mache ich gerade:",
       cta: "Wähle, wo du anfängst",
       card1_title: "Frisch für dich gemacht",
-      card1_body: "Jede Frage wird nach dem ausgewählt, was dein Erwachsener geteilt hat — nicht aus einem großen Standard-Quiz.",
+      card1_body:
+        "Jede Frage wird nach dem ausgewählt, was dein Erwachsener geteilt hat — nicht aus einem großen Standard-Quiz.",
       card2_title: "Keine Noten, keine Punkte",
-      card2_body: "Das ist kein Test. AIVO nutzt, was du zeigst, um ruhige, passende Lektionen zu planen.",
+      card2_body:
+        "Das ist kein Test. AIVO nutzt, was du zeigst, um ruhige, passende Lektionen zu planen.",
       card3_title: "Pausen sind gut",
-      card3_body: "Du kannst pausieren, durchatmen oder für heute aufhören. AIVO merkt sich, wo du warst.",
+      card3_body:
+        "Du kannst pausieren, durchatmen oder für heute aufhören. AIVO merkt sich, wo du warst.",
     },
     subjects: {
       step: "Schritt 1 von 3",
@@ -264,7 +294,8 @@ const BASELINE = {
       legend: "Fächer wählen",
       with_tutor: "Mit {name} · {landmark}",
       picked_by_grownup: "Von Erwachsenem gewählt",
-      picked_note: "Fächer mit dem Etikett „Von Erwachsenem gewählt“ stammen aus der Einrichtung deiner Eltern.",
+      picked_note:
+        "Fächer mit dem Etikett „Von Erwachsenem gewählt“ stammen aus der Einrichtung deiner Eltern.",
       get_ready: "Mach dich bereit",
     },
     readiness: {
@@ -277,11 +308,14 @@ const BASELINE = {
       status_always: "Immer",
       status_off: "Aus",
       readaloud_title: "Vorlesen",
-      readaloud_body: "Tippe bei jeder Frage auf das Lautsprechersymbol, um die Wörter zu hören. Niemand wird es wissen — versprochen.",
+      readaloud_body:
+        "Tippe bei jeder Frage auf das Lautsprechersymbol, um die Wörter zu hören. Niemand wird es wissen — versprochen.",
       calm_title: "Ruhiger Bildschirm",
-      calm_body: "Sanfte Farben und wenig Bewegung, damit du dich leichter konzentrierst. Du kannst das jederzeit ändern.",
+      calm_body:
+        "Sanfte Farben und wenig Bewegung, damit du dich leichter konzentrierst. Du kannst das jederzeit ändern.",
       breaks_title: "Pausen sind gut",
-      breaks_body: "Du kannst jederzeit pausieren. AIVO merkt es sich und macht dort weiter, wo du aufgehört hast.",
+      breaks_body:
+        "Du kannst jederzeit pausieren. AIVO merkt es sich und macht dort weiter, wo du aufgehört hast.",
       extratime_title: "Mehr Zeit",
       extratime_body: "Es gibt sowieso keine Uhr. Nimm dir so viel Zeit, wie du brauchst.",
       tell_me_more: "Erzähl mir mehr",
@@ -291,7 +325,8 @@ const BASELINE = {
       step: "Schritt 3 von 3",
       eyebrow: "Ein freundlicher Check-in · {count} kurze Fragen",
       title: "Bereit, {name}?",
-      body_with_tutor: "{tutorName} von {landmark} hilft dir beim Start. Wir gehen Frage für Frage vor. Überspring, was du nicht ausprobieren willst.",
+      body_with_tutor:
+        "{tutorName} von {landmark} hilft dir beim Start. Wir gehen Frage für Frage vor. Überspring, was du nicht ausprobieren willst.",
       body_default: "Wir gehen Frage für Frage vor. Überspring, was du nicht ausprobieren willst.",
       start: "Starte, wenn du bereit bist",
       subjects_today: "Fächer heute",
@@ -309,10 +344,12 @@ const BASELINE = {
     index: {
       notready_eyebrow: "Quase pronto",
       notready_title: "Um adulto ainda está configurando isto",
-      notready_body: "Pergunte ao adulto que te cadastrou — faltam algumas perguntas para ele terminar antes que a AIVO possa planejar seu encontro.",
+      notready_body:
+        "Pergunte ao adulto que te cadastrou — faltam algumas perguntas para ele terminar antes que a AIVO possa planejar seu encontro.",
       ready_eyebrow: "Um encontro amigável",
       ready_title: "Oi {name} — pronto para me mostrar como você pensa?",
-      ready_body: "Três passos tranquilos antes da primeira pergunta. Escolha por onde começar e a AIVO faz o resto.",
+      ready_body:
+        "Três passos tranquilos antes da primeira pergunta. Escolha por onde começar e a AIVO faz o resto.",
       lets_go: "Vamos",
     },
     why: {
@@ -321,9 +358,11 @@ const BASELINE = {
       body: "Um adulto respondeu algumas perguntas para que eu soubesse como você gosta de aprender. Se ele compartilhou um IEP, também li os apoios. Aqui está o que estou fazendo agora:",
       cta: "Escolha por onde começar",
       card1_title: "Feito sob medida para você",
-      card1_body: "Cada pergunta é escolhida com base no que seu adulto compartilhou — não de um quiz genérico.",
+      card1_body:
+        "Cada pergunta é escolhida com base no que seu adulto compartilhou — não de um quiz genérico.",
       card2_title: "Sem notas, sem pontos",
-      card2_body: "Isto não é uma prova. A AIVO usa o que você mostra para planejar lições calmas e na medida certa.",
+      card2_body:
+        "Isto não é uma prova. A AIVO usa o que você mostra para planejar lições calmas e na medida certa.",
       card3_title: "Pausas são boas",
       card3_body: "Você pode pausar, respirar ou parar por hoje. A AIVO lembrará onde você estava.",
     },
@@ -335,7 +374,8 @@ const BASELINE = {
       legend: "Escolher matérias",
       with_tutor: "Com {name} · {landmark}",
       picked_by_grownup: "Escolhido por um adulto",
-      picked_note: "Matérias com a etiqueta \"Escolhido por um adulto\" vêm da configuração da sua família.",
+      picked_note:
+        'Matérias com a etiqueta "Escolhido por um adulto" vêm da configuração da sua família.',
       get_ready: "Prepare-se",
     },
     readiness: {
@@ -348,11 +388,14 @@ const BASELINE = {
       status_always: "Sempre",
       status_off: "Desativado",
       readaloud_title: "Leitura em voz alta",
-      readaloud_body: "Toque no alto-falante em qualquer pergunta para ouvir as palavras. Ninguém vai saber — prometo.",
+      readaloud_body:
+        "Toque no alto-falante em qualquer pergunta para ouvir as palavras. Ninguém vai saber — prometo.",
       calm_title: "Tela calma",
-      calm_body: "Cores suaves e pouco movimento para você focar melhor. Você pode mudar isso quando quiser.",
+      calm_body:
+        "Cores suaves e pouco movimento para você focar melhor. Você pode mudar isso quando quiser.",
       breaks_title: "Pausas são boas",
-      breaks_body: "Você pode pausar quando quiser. A AIVO lembrará e continuará de onde você parou.",
+      breaks_body:
+        "Você pode pausar quando quiser. A AIVO lembrará e continuará de onde você parou.",
       extratime_title: "Tempo extra",
       extratime_body: "De qualquer forma não há relógio. Use todo o tempo que precisar.",
       tell_me_more: "Conte-me mais",
@@ -362,7 +405,8 @@ const BASELINE = {
       step: "Etapa 3 de 3",
       eyebrow: "Um encontro amigável · {count} perguntas curtas",
       title: "Pronto, {name}?",
-      body_with_tutor: "{tutorName} de {landmark} está aqui para te ajudar a começar. Vamos uma pergunta de cada vez. Pule o que não quiser tentar.",
+      body_with_tutor:
+        "{tutorName} de {landmark} está aqui para te ajudar a começar. Vamos uma pergunta de cada vez. Pule o que não quiser tentar.",
       body_default: "Vamos uma pergunta de cada vez. Pule o que não quiser tentar.",
       start: "Comece quando estiver pronto",
       subjects_today: "Matérias de hoje",
@@ -433,7 +477,8 @@ const BASELINE = {
       step: "第 3 步，共 3 步",
       eyebrow: "一次轻松的见面 · {count} 个简短问题",
       title: "准备好了吗，{name}？",
-      body_with_tutor: "来自{landmark}的 {tutorName} 在这里帮你开始。我们一次一个问题。不想试的可以跳过。",
+      body_with_tutor:
+        "来自{landmark}的 {tutorName} 在这里帮你开始。我们一次一个问题。不想试的可以跳过。",
       body_default: "我们一次一个问题。不想试的可以跳过。",
       start: "准备好就开始",
       subjects_today: "今天的学科",
@@ -451,10 +496,12 @@ const BASELINE = {
     index: {
       notready_eyebrow: "もうすぐ準備完了",
       notready_title: "大人がまだ準備しています",
-      notready_body: "登録してくれた大人に聞いてみてね — AIVO がチェックインを計画する前に、あといくつか質問に答える必要があります。",
+      notready_body:
+        "登録してくれた大人に聞いてみてね — AIVO がチェックインを計画する前に、あといくつか質問に答える必要があります。",
       ready_eyebrow: "やさしいチェックイン",
       ready_title: "こんにちは {name} — どんなふうに考えるか見せてくれる準備はいい？",
-      ready_body: "最初の質問の前に、落ち着いた3つのステップ。どこから始めるか選んでね。あとは AIVO がやります。",
+      ready_body:
+        "最初の質問の前に、落ち着いた3つのステップ。どこから始めるか選んでね。あとは AIVO がやります。",
       lets_go: "はじめよう",
     },
     why: {
@@ -463,11 +510,14 @@ const BASELINE = {
       body: "大人がいくつか質問に答えてくれたので、あなたの学び方がわかりました。IEP を共有してくれたら、そのサポートも読みました。いま私がしていることはこれです：",
       cta: "どこから始めるか選ぶ",
       card1_title: "あなた専用に作りました",
-      card1_body: "どの質問も、あなたの大人が共有した内容に合わせて選ばれています — 大きな共通テストからではありません。",
+      card1_body:
+        "どの質問も、あなたの大人が共有した内容に合わせて選ばれています — 大きな共通テストからではありません。",
       card2_title: "成績も点数もなし",
-      card2_body: "これはテストではありません。AIVO はあなたが見せてくれたものをもとに、落ち着いたちょうどよいレッスンを計画します。",
+      card2_body:
+        "これはテストではありません。AIVO はあなたが見せてくれたものをもとに、落ち着いたちょうどよいレッスンを計画します。",
       card3_title: "休憩はいいこと",
-      card3_body: "一時停止したり、ひと息ついたり、今日はやめたりできます。AIVO はあなたがどこにいたか覚えています。",
+      card3_body:
+        "一時停止したり、ひと息ついたり、今日はやめたりできます。AIVO はあなたがどこにいたか覚えています。",
     },
     subjects: {
       step: "ステップ 1 / 3",
@@ -490,7 +540,8 @@ const BASELINE = {
       status_always: "常に",
       status_off: "オフ",
       readaloud_title: "読み上げ",
-      readaloud_body: "どの質問でもスピーカーをタップすると言葉が聞けます。誰にも知られません — 約束します。",
+      readaloud_body:
+        "どの質問でもスピーカーをタップすると言葉が聞けます。誰にも知られません — 約束します。",
       calm_title: "落ち着いた画面",
       calm_body: "やわらかい色と静かな動きで集中しやすくします。いつでも変えられます。",
       breaks_title: "休憩はいいこと",
@@ -504,7 +555,8 @@ const BASELINE = {
       step: "ステップ 3 / 3",
       eyebrow: "やさしいチェックイン · 短い質問が {count} 問",
       title: "準備はいい、{name}？",
-      body_with_tutor: "{landmark} の {tutorName} がスタートを手伝います。1問ずつ進みます。やりたくないものは飛ばしてね。",
+      body_with_tutor:
+        "{landmark} の {tutorName} がスタートを手伝います。1問ずつ進みます。やりたくないものは飛ばしてね。",
       body_default: "1問ずつ進みます。やりたくないものは飛ばしてね。",
       start: "準備ができたら始める",
       subjects_today: "今日の教科",
@@ -522,10 +574,12 @@ const BASELINE = {
     index: {
       notready_eyebrow: "거의 다 됐어요",
       notready_title: "어른이 아직 설정하고 있어요",
-      notready_body: "너를 등록해 준 어른에게 물어봐 — AIVO가 만남을 계획하기 전에 끝내야 할 질문이 몇 개 남았어.",
+      notready_body:
+        "너를 등록해 준 어른에게 물어봐 — AIVO가 만남을 계획하기 전에 끝내야 할 질문이 몇 개 남았어.",
       ready_eyebrow: "편안한 만남",
       ready_title: "안녕 {name} — 네가 어떻게 생각하는지 보여줄 준비됐니?",
-      ready_body: "첫 질문 전에 차분한 세 단계가 있어. 어디서 시작할지 고르면 나머지는 AIVO가 할게.",
+      ready_body:
+        "첫 질문 전에 차분한 세 단계가 있어. 어디서 시작할지 고르면 나머지는 AIVO가 할게.",
       lets_go: "시작하자",
     },
     why: {
@@ -534,11 +588,13 @@ const BASELINE = {
       body: "어른이 몇 가지 질문에 답해 줘서 네가 어떻게 배우길 좋아하는지 알았어. IEP를 공유했다면 그 지원도 읽었어. 지금 내가 하고 있는 건 이거야:",
       cta: "어디서 시작할지 고르기",
       card1_title: "너에게 딱 맞게 만들었어",
-      card1_body: "모든 질문은 네 어른이 공유한 것에 맞춰 골랐어 — 큰 공용 퀴즈에서 가져온 게 아니야.",
+      card1_body:
+        "모든 질문은 네 어른이 공유한 것에 맞춰 골랐어 — 큰 공용 퀴즈에서 가져온 게 아니야.",
       card2_title: "점수도, 포인트도 없어",
       card2_body: "이건 시험이 아니야. AIVO는 네가 보여주는 것으로 차분하고 딱 맞는 수업을 계획해.",
       card3_title: "쉬는 건 좋은 거야",
-      card3_body: "잠시 멈추거나, 숨을 고르거나, 오늘은 그만둘 수 있어. AIVO가 네가 어디 있었는지 기억할게.",
+      card3_body:
+        "잠시 멈추거나, 숨을 고르거나, 오늘은 그만둘 수 있어. AIVO가 네가 어디 있었는지 기억할게.",
     },
     subjects: {
       step: "1/3 단계",
@@ -548,7 +604,7 @@ const BASELINE = {
       legend: "과목 선택",
       with_tutor: "{name} · {landmark}와 함께",
       picked_by_grownup: "어른이 고름",
-      picked_note: "\"어른이 고름\" 태그가 있는 과목은 부모님의 설정에서 온 거야.",
+      picked_note: '"어른이 고름" 태그가 있는 과목은 부모님의 설정에서 온 거야.',
       get_ready: "준비하기",
     },
     readiness: {
@@ -561,7 +617,8 @@ const BASELINE = {
       status_always: "항상",
       status_off: "꺼짐",
       readaloud_title: "소리 내어 읽기",
-      readaloud_body: "어느 질문에서든 스피커를 누르면 단어를 들을 수 있어. 아무도 모를 거야 — 약속해.",
+      readaloud_body:
+        "어느 질문에서든 스피커를 누르면 단어를 들을 수 있어. 아무도 모를 거야 — 약속해.",
       calm_title: "차분한 화면",
       calm_body: "부드러운 색과 조용한 움직임으로 더 집중하기 쉽게. 언제든 바꿀 수 있어.",
       breaks_title: "쉬는 건 좋은 거야",
@@ -575,7 +632,8 @@ const BASELINE = {
       step: "3/3 단계",
       eyebrow: "편안한 만남 · 짧은 질문 {count}개",
       title: "준비됐어, {name}?",
-      body_with_tutor: "{landmark}의 {tutorName}가 시작을 도와줄 거야. 한 번에 한 질문씩 갈게. 하기 싫은 건 건너뛰어.",
+      body_with_tutor:
+        "{landmark}의 {tutorName}가 시작을 도와줄 거야. 한 번에 한 질문씩 갈게. 하기 싫은 건 건너뛰어.",
       body_default: "한 번에 한 질문씩 갈게. 하기 싫은 건 건너뛰어.",
       start: "준비되면 시작",
       subjects_today: "오늘의 과목",
@@ -593,7 +651,8 @@ const BASELINE = {
     index: {
       notready_eyebrow: "أوشكنا على الجاهزية",
       notready_title: "ما زال أحد البالغين يُعدّ هذا",
-      notready_body: "اسأل البالغ الذي سجّلك — لديه سؤالان أو ثلاثة لإنهائها قبل أن يتمكّن AIVO من التخطيط للقائك.",
+      notready_body:
+        "اسأل البالغ الذي سجّلك — لديه سؤالان أو ثلاثة لإنهائها قبل أن يتمكّن AIVO من التخطيط للقائك.",
       ready_eyebrow: "لقاء ودّي",
       ready_title: "مرحبًا {name} — هل أنت مستعدّ لتُريني كيف تفكّر؟",
       ready_body: "ثلاث خطوات هادئة قبل السؤال الأول. اختر من أين تبدأ، ويتكفّل AIVO بالباقي.",
@@ -646,7 +705,8 @@ const BASELINE = {
       step: "الخطوة 3 من 3",
       eyebrow: "لقاء ودّي · {count} أسئلة قصيرة",
       title: "مستعدّ يا {name}؟",
-      body_with_tutor: "{tutorName} من {landmark} هنا لمساعدتك على البدء. سنمضي سؤالًا تلو الآخر. تجاوز ما لا تريد تجربته.",
+      body_with_tutor:
+        "{tutorName} من {landmark} هنا لمساعدتك على البدء. سنمضي سؤالًا تلو الآخر. تجاوز ما لا تريد تجربته.",
       body_default: "سنمضي سؤالًا تلو الآخر. تجاوز ما لا تريد تجربته.",
       start: "ابدأ عندما تكون مستعدًّا",
       subjects_today: "مواد اليوم",
@@ -664,7 +724,8 @@ const BASELINE = {
     index: {
       notready_eyebrow: "बस तैयार ही है",
       notready_title: "एक बड़ा अब भी इसे सेट कर रहा है",
-      notready_body: "जिस बड़े ने तुम्हें साइन अप किया उससे पूछो — AIVO तुम्हारी मुलाक़ात की योजना बनाने से पहले उनके कुछ सवाल बाक़ी हैं।",
+      notready_body:
+        "जिस बड़े ने तुम्हें साइन अप किया उससे पूछो — AIVO तुम्हारी मुलाक़ात की योजना बनाने से पहले उनके कुछ सवाल बाक़ी हैं।",
       ready_eyebrow: "एक दोस्ताना मुलाक़ात",
       ready_title: "नमस्ते {name} — मुझे यह दिखाने को तैयार हो कि तुम कैसे सोचते हो?",
       ready_body: "पहले सवाल से पहले तीन शांत चरण। चुनो कि कहाँ से शुरू करना है, बाक़ी AIVO करेगा।",
@@ -676,11 +737,14 @@ const BASELINE = {
       body: "एक बड़े ने कुछ सवालों के जवाब दिए ताकि मुझे पता चले कि तुम्हें कैसे सीखना पसंद है। अगर उन्होंने IEP साझा किया, तो मैंने सहायताएँ भी पढ़ीं। अभी मैं यही कर रहा हूँ:",
       cta: "चुनो कि कहाँ से शुरू करना है",
       card1_title: "तुम्हारे लिए ख़ास बनाया",
-      card1_body: "हर सवाल वही चुना गया है जो तुम्हारे बड़े ने साझा किया — किसी बड़े साझा क्विज़ से नहीं।",
+      card1_body:
+        "हर सवाल वही चुना गया है जो तुम्हारे बड़े ने साझा किया — किसी बड़े साझा क्विज़ से नहीं।",
       card2_title: "कोई ग्रेड नहीं, कोई अंक नहीं",
-      card2_body: "यह कोई परीक्षा नहीं है। तुम जो दिखाते हो उससे AIVO शांत, बिल्कुल सही पाठ बनाता है।",
+      card2_body:
+        "यह कोई परीक्षा नहीं है। तुम जो दिखाते हो उससे AIVO शांत, बिल्कुल सही पाठ बनाता है।",
       card3_title: "विराम अच्छे होते हैं",
-      card3_body: "तुम रुक सकते हो, साँस ले सकते हो, या आज के लिए रोक सकते हो। AIVO याद रखेगा कि तुम कहाँ थे।",
+      card3_body:
+        "तुम रुक सकते हो, साँस ले सकते हो, या आज के लिए रोक सकते हो। AIVO याद रखेगा कि तुम कहाँ थे।",
     },
     subjects: {
       step: "चरण 1 / 3",
@@ -690,7 +754,7 @@ const BASELINE = {
       legend: "विषय चुनें",
       with_tutor: "{name} · {landmark} के साथ",
       picked_by_grownup: "बड़े ने चुना",
-      picked_note: "\"बड़े ने चुना\" टैग वाले विषय तुम्हारे माता-पिता के सेटअप से आते हैं।",
+      picked_note: '"बड़े ने चुना" टैग वाले विषय तुम्हारे माता-पिता के सेटअप से आते हैं।',
       get_ready: "तैयार हो जाओ",
     },
     readiness: {
@@ -717,7 +781,8 @@ const BASELINE = {
       step: "चरण 3 / 3",
       eyebrow: "एक दोस्ताना मुलाक़ात · {count} छोटे सवाल",
       title: "तैयार हो, {name}?",
-      body_with_tutor: "{landmark} के {tutorName} तुम्हें शुरू करने में मदद के लिए यहाँ हैं। हम एक बार में एक सवाल लेंगे। जो आज़माना न चाहो उसे छोड़ दो।",
+      body_with_tutor:
+        "{landmark} के {tutorName} तुम्हें शुरू करने में मदद के लिए यहाँ हैं। हम एक बार में एक सवाल लेंगे। जो आज़माना न चाहो उसे छोड़ दो।",
       body_default: "हम एक बार में एक सवाल लेंगे। जो आज़माना न चाहो उसे छोड़ दो।",
       start: "तैयार हो तो शुरू करो",
       subjects_today: "आज के विषय",

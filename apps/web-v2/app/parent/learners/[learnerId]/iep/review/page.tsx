@@ -33,7 +33,7 @@ async function reextractAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -56,7 +56,7 @@ async function confirmAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   const accepted = formData.getAll("accepted").map(String);
@@ -79,7 +79,7 @@ async function deleteAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   const { deleteIEPForLearner } = await import("@/lib/db/repos");
@@ -125,7 +125,7 @@ export default async function IEPReviewPage({
   const t = await getTranslations("parent.learner_iep_review");
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -332,8 +332,8 @@ export default async function IEPReviewPage({
                   {ex.learnerSafeSummary}
                 </p>
                 <p className="text-[11px] text-iw-text-muted mt-2">
-                  This is the only version your learner ever sees. They never see the raw IEP or
-                  any clinical language.
+                  This is the only version your learner ever sees. They never see the raw IEP or any
+                  clinical language.
                 </p>
               </div>
 

@@ -52,14 +52,8 @@ interface Fixture {
 }
 
 async function seed(db: any): Promise<Fixture> {
-  const {
-    tenants,
-    users,
-    learners,
-    schools,
-    classrooms,
-    classroomEnrollments,
-  } = await import("@aivo/db");
+  const { tenants, users, learners, schools, classrooms, classroomEnrollments } =
+    await import("@aivo/db");
   const stamp = Date.now();
 
   const [t] = await db
@@ -136,13 +130,9 @@ async function cleanup(db: any, f: Fixture) {
     learnerTeachers,
     teacherParentInvites,
   } = await import("@aivo/db");
-  await db
-    .delete(teacherParentInvites)
-    .where(eq(teacherParentInvites.tenantId, f.tenantId));
+  await db.delete(teacherParentInvites).where(eq(teacherParentInvites.tenantId, f.tenantId));
   await db.delete(learnerTeachers).where(eq(learnerTeachers.tenantId, f.tenantId));
-  await db
-    .delete(classroomEnrollments)
-    .where(eq(classroomEnrollments.classroomId, f.classroomId));
+  await db.delete(classroomEnrollments).where(eq(classroomEnrollments.classroomId, f.classroomId));
   await db.delete(classrooms).where(eq(classrooms.id, f.classroomId));
   await db.delete(learners).where(eq(learners.id, f.learnerId));
   await db.delete(schools).where(eq(schools.id, f.schoolId));
@@ -319,10 +309,7 @@ test(
       });
       assert.equal(res.statusCode, 200);
       const body = res.json() as any;
-      assert.equal(
-        body.accepted.filter((a: any) => a.role === "teacher_parent").length,
-        0,
-      );
+      assert.equal(body.accepted.filter((a: any) => a.role === "teacher_parent").length, 0);
 
       const { teacherParentInvites } = await import("@aivo/db");
       const rows = await db.select().from(teacherParentInvites);

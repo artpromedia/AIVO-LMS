@@ -94,13 +94,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     const okResponse = ok({ interaction }, requestId);
     // Cache the response body+status for replay-safe idempotency.
     if (idemKey) {
-      writeIdempotencyCache(
-        session!.tenantId,
-        IDEMPOTENCY_ROUTE,
-        idemKey,
-        { interaction },
-        200,
-      );
+      writeIdempotencyCache(session!.tenantId, IDEMPOTENCY_ROUTE, idemKey, { interaction }, 200);
     }
     return okResponse;
   } catch (e) {

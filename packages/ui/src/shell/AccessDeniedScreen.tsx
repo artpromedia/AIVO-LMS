@@ -25,12 +25,7 @@ export function AccessDeniedScreen({
   className,
 }: AccessDeniedScreenProps) {
   return (
-    <div
-      className={clsx(
-        "min-h-[60vh] flex items-center justify-center px-4 py-12",
-        className,
-      )}
-    >
+    <div className={clsx("min-h-[60vh] flex items-center justify-center px-4 py-12", className)}>
       <div className="max-w-md w-full rounded-iw-card-lg bg-white/85 backdrop-blur-md border border-iw-border shadow-iw-soft p-8 text-center flex flex-col items-center gap-4">
         <div className="flex h-16 w-16 items-center justify-center rounded-iw-hero bg-[var(--aivo-color-status-warning-subtle,#fffbeb)]">
           <ShieldAlert
@@ -43,9 +38,9 @@ export function AccessDeniedScreen({
             You don't have access to this page
           </h1>
           <p className="text-sm text-iw-text-muted">
-            Your current role ({ROLE_META[role].label}) doesn't include the
-            requested area. Switch roles from the top bar if you have another
-            account on AIVO, or ask an admin to grant access.
+            Your current role ({ROLE_META[role].label}) doesn't include the requested area. Switch
+            roles from the top bar if you have another account on AIVO, or ask an admin to grant
+            access.
           </p>
           {attemptedPath ? (
             <p className="text-xs text-iw-text-muted">

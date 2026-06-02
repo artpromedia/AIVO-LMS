@@ -11,12 +11,7 @@ import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import {
-  AICompanionHero,
-  PersonalizationChip,
-  GlassCard,
-  ReassuranceCard,
-} from "@aivo/ui";
+import { AICompanionHero, PersonalizationChip, GlassCard, ReassuranceCard } from "@aivo/ui";
 import { getAccessibilityPrefs, getLearner, parentCanAccessLearner } from "@/lib/db/repos";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AccessibilityForm } from "@/components/learner/accessibility-form";
@@ -37,7 +32,7 @@ export default async function LearnerAccessibilitySettingsPage() {
   if (!learner) redirect("/learner/select");
   if (
     session.role !== "learner" &&
-    !await parentCanAccessLearner(session.userId, learnerId, session.tenantId)
+    !(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))
   ) {
     redirect("/learner/select");
   }

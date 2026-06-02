@@ -26,10 +26,7 @@ import {
   buildBaselineFallback,
   type BaselineFallbackReason,
 } from "../services/baseline-fallback.js";
-import {
-  applySafetyGate,
-  persistAudits,
-} from "../services/baseline-safety-gate.js";
+import { applySafetyGate, persistAudits } from "../services/baseline-safety-gate.js";
 
 // ---- Sprint 02 adapter: problem-session ledger ----------------------------
 // Flag-gated, fire-and-forget. Records a baseline-source problem session per
@@ -1103,10 +1100,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
         reply.header("content-type", contentType);
         return reply.send(text);
       } catch (e: any) {
-        app.log.error(
-          { err: e?.message },
-          "[baseline-llm-proxy] ai-svc unreachable",
-        );
+        app.log.error({ err: e?.message }, "[baseline-llm-proxy] ai-svc unreachable");
         return reply.status(502).send({
           error: "ai_unreachable",
           detail: e?.message ?? "unknown",

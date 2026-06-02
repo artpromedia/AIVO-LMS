@@ -14,11 +14,11 @@ App Live** gives a manual, remote-desktop-style session on a real
 device, runs both iOS (`.ipa`) and Android (`.apk`), and covers every
 device in our matrix:
 
-| Matrix entry                      | BrowserStack device label                         |
-| --------------------------------- | ------------------------------------------------- |
-| iPad 10.9" (10th / 11th gen)      | `iPad 10th Gen` / `iPad 11th Gen` — iOS 17/18     |
-| iPad Pro 12.9" / iPad Pro 13" M4  | `iPad Pro 12.9 2022` / `iPad Pro 13 M4` — iOS 18  |
-| Android ~11" tablet               | `Google Pixel Tablet` / `Galaxy Tab S9` — Android 14 |
+| Matrix entry                     | BrowserStack device label                            |
+| -------------------------------- | ---------------------------------------------------- |
+| iPad 10.9" (10th / 11th gen)     | `iPad 10th Gen` / `iPad 11th Gen` — iOS 17/18        |
+| iPad Pro 12.9" / iPad Pro 13" M4 | `iPad Pro 12.9 2022` / `iPad Pro 13 M4` — iOS 18     |
+| Android ~11" tablet              | `Google Pixel Tablet` / `Galaxy Tab S9` — Android 14 |
 
 Plan needed: **App Live** (sufficient — App Automate is not required
 for a manual walk-through).
@@ -27,7 +27,7 @@ for a manual walk-through).
 
 1. **Create / log in to the BrowserStack account** that owns the
    AIVO workspace. Note the **username** and **access key** under
-   *Account → Settings*.
+   _Account → Settings_.
 2. **Add the credentials as GitHub repo secrets** (Settings → Secrets
    and variables → Actions):
    - `BROWSERSTACK_USERNAME`
@@ -99,7 +99,7 @@ curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
 
 Response is JSON with `"app_url": "bs://…"`. Open
 [app-live.browserstack.com](https://app-live.browserstack.com), pick a
-device from the matrix, and paste the `app_url` in the *Uploaded apps*
+device from the matrix, and paste the `app_url` in the _Uploaded apps_
 picker.
 
 ## Running the checklist on a remote device
@@ -114,7 +114,7 @@ For each device + orientation cell in
    assumes default font scaling — don't run with accessibility text
    amplification on for the first pass.
 3. **Rotate via the toolbar**, not by tilting your laptop — App Live's
-   *Rotate* control fires the real OS rotation event so the layout's
+   _Rotate_ control fires the real OS rotation event so the layout's
    `useWindowDimensions` hook fires correctly.
 4. **Sign in fresh as each role**. Test accounts live in 1Password
    under `mobile-qa-roles`:
@@ -128,9 +128,9 @@ For each device + orientation cell in
    finding** into the Drift log table at the bottom of
    `tablet-hardware-qa.md`. One row per (device, orientation, role,
    screen) — or one summary row per (device, orientation, role)
-   marked *"no drift observed"* if everything passed.
+   marked _"no drift observed"_ if everything passed.
 6. **Capture evidence for anything ≥ P1**: App Live's toolbar has a
-   *Screenshot* and *Record session* button — attach the recording URL
+   _Screenshot_ and _Record session_ button — attach the recording URL
    in the Drift log row so the fix PR has something to reference.
 7. **End the session** when done. Sessions are billed by the minute on
    App Live; don't leave one idle.
@@ -152,7 +152,7 @@ When a P0 or P1 fix lands:
 
 1. Update the matrix table in `tablet-hardware-qa.md`.
 2. Confirm the device exists in App Live's device list (Settings →
-   *Device Cloud* → search by model number).
+   _Device Cloud_ → search by model number).
 3. No workflow change is needed — App Live exposes every enabled
    device through the same upload endpoint.
 

@@ -12,7 +12,13 @@ export type ReviewerRole =
   | "assessment_specialist"
   | "district_reviewer";
 
-export type CognitiveLevel = "remember" | "understand" | "apply" | "analyze" | "evaluate" | "create";
+export type CognitiveLevel =
+  | "remember"
+  | "understand"
+  | "apply"
+  | "analyze"
+  | "evaluate"
+  | "create";
 
 export type ItemQuestionType =
   | "multiple-choice"

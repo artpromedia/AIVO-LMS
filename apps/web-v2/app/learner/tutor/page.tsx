@@ -21,11 +21,7 @@ import {
   type PersonalizationVariant,
 } from "@aivo/ui";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import {
-  getIEPForLearner,
-  getLearner,
-  listSubjects,
-} from "@/lib/db/repos";
+import { getIEPForLearner, getLearner, listSubjects } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 import { LearnerTutorChat } from "./chat";
 
@@ -124,9 +120,7 @@ export default async function LearnerTutorHome() {
 
           <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
             <h3 className="text-base font-semibold text-iw-text-strong">{t("safety")}</h3>
-            <p className="text-xs text-iw-text-muted leading-relaxed">
-              {t("safety_body")}
-            </p>
+            <p className="text-xs text-iw-text-muted leading-relaxed">{t("safety_body")}</p>
             <TutorInsightChip kind="safety_active" />
           </article>
         </aside>

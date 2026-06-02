@@ -150,9 +150,9 @@ export function registerMessageRoutes(app: FastifyInstance, db: any): void {
       .returning();
 
     const members = Array.from(new Set([user.sub, ...participants]));
-    await db.insert(messageThreadParticipants).values(
-      members.map((userId) => ({ threadId: thread.id, userId })),
-    );
+    await db
+      .insert(messageThreadParticipants)
+      .values(members.map((userId) => ({ threadId: thread.id, userId })));
 
     let firstMessage = null;
     if (firstBody) {
@@ -258,25 +258,21 @@ export function registerMessageRoutes(app: FastifyInstance, db: any): void {
   );
 
   // --- mark read ---------------------------------------------------------
-  app.post(
-    "/api/comms/threads/:threadId/read",
-    { preHandler: requireAuth },
-    async (req, reply) => {
-      const user = (req as any).user;
-      const { threadId } = req.params as { threadId: string };
-      if (!(await myParticipation(threadId, user.sub))) {
-        return reply.code(403).send({ error: "Forbidden" });
-      }
-      await db
-        .update(messageThreadParticipants)
-        .set({ lastReadAt: new Date() })
-        .where(
-          and(
-            eq(messageThreadParticipants.threadId, threadId),
-            eq(messageThreadParticipants.userId, user.sub),
-          ),
-        );
-      return { ok: true };
-    },
-  );
+  app.post("/api/comms/threads/:threadId/read", { preHandler: requireAuth }, async (req, reply) => {
+    const user = (req as any).user;
+    const { threadId } = req.params as { threadId: string };
+    if (!(await myParticipation(threadId, user.sub))) {
+      return reply.code(403).send({ error: "Forbidden" });
+    }
+    await db
+      .update(messageThreadParticipants)
+      .set({ lastReadAt: new Date() })
+      .where(
+        and(
+          eq(messageThreadParticipants.threadId, threadId),
+          eq(messageThreadParticipants.userId, user.sub),
+        ),
+      );
+    return { ok: true };
+  });
 }

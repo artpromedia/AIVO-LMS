@@ -78,9 +78,10 @@ function heuristicParse(input: ParseInput): ParseResult {
     .map((l) => l.replace(/^[\s\-*\d.)]+/, "").trim())
     .filter((l) => l.length >= 3 && l.length <= 120);
   const topics = Array.from(new Set(lines)).slice(0, 10);
-  const standards = Array.from(
-    new Set(text.match(/\b[A-Z]{2,}[.-][A-Z0-9.-]{2,}\b/g) ?? []),
-  ).slice(0, 20);
+  const standards = Array.from(new Set(text.match(/\b[A-Z]{2,}[.-][A-Z0-9.-]{2,}\b/g) ?? [])).slice(
+    0,
+    20,
+  );
   const subject = normalizeSubject(input.hintedSubject);
   const summary =
     topics.length > 0
@@ -147,7 +148,10 @@ export async function parseCurriculumFocus(input: ParseInput): Promise<ParseResu
     const data = (await res.json()) as Record<string, unknown>;
     return {
       focus: {
-        title: typeof data.title === "string" && data.title.trim() ? data.title.trim() : "This week's lessons",
+        title:
+          typeof data.title === "string" && data.title.trim()
+            ? data.title.trim()
+            : "This week's lessons",
         subject: normalizeSubject(data.subject ?? input.hintedSubject),
         weekStart: isoDateOrNull(data.weekStart ?? input.hintedWeekStart),
         weekEnd: isoDateOrNull(data.weekEnd ?? input.hintedWeekEnd),
@@ -159,7 +163,9 @@ export async function parseCurriculumFocus(input: ParseInput): Promise<ParseResu
         confidence: typeof data.confidence === "number" ? data.confidence : 0.5,
       },
       rawText:
-        typeof data.raw_text === "string" ? data.raw_text : (input.text ?? "").slice(0, MAX_TEXT_LEN),
+        typeof data.raw_text === "string"
+          ? data.raw_text
+          : (input.text ?? "").slice(0, MAX_TEXT_LEN),
       usedFallback: false,
     };
   } catch (err) {

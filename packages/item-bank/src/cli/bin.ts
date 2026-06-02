@@ -55,7 +55,6 @@ function getPersist(kind: string, dryRun: boolean): PersistAdapter {
   if (kind === "prisma") {
     const customPath = process.env.ITEM_BANK_PERSIST_MODULE;
     if (!customPath) {
-      // eslint-disable-next-line no-console
       console.warn(
         "[item-bank-import] --persist=prisma requires ITEM_BANK_PERSIST_MODULE env; falling back to dry-run.",
       );
@@ -71,7 +70,6 @@ function getPersist(kind: string, dryRun: boolean): PersistAdapter {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.inputDir) {
-    // eslint-disable-next-line no-console
     console.error("Usage: item-bank:import <dir> [--dry-run] [--subjects=...] [--persist=...]");
     process.exit(2);
   }
@@ -84,28 +82,24 @@ async function main() {
   });
 
   if (args.jsonReport) {
-    // eslint-disable-next-line no-console
     console.log(JSON.stringify(summary, null, 2));
   } else {
-    // eslint-disable-next-line no-console
-    console.log(`item-bank-import: ${summary.imported.length} items imported, ${summary.failed.length} failed.`);
-    // eslint-disable-next-line no-console
+    console.log(
+      `item-bank-import: ${summary.imported.length} items imported, ${summary.failed.length} failed.`,
+    );
+
     console.log("Coverage by subject:");
     for (const [s, n] of Object.entries(summary.coverage.bySubject)) {
-      // eslint-disable-next-line no-console
       console.log(`  ${s}: ${n} items`);
     }
-    // eslint-disable-next-line no-console
+
     console.log("Coverage by grade band:");
     for (const [g, n] of Object.entries(summary.coverage.byGradeBand)) {
-      // eslint-disable-next-line no-console
       console.log(`  ${g}: ${n} items`);
     }
     if (summary.failed.length > 0) {
-      // eslint-disable-next-line no-console
       console.error("\nFailures:");
       for (const f of summary.failed) {
-        // eslint-disable-next-line no-console
         console.error(`  ${f.file}${f.itemId ? `#${f.itemId}` : ""}: ${f.detail}`);
       }
     }
@@ -114,7 +108,6 @@ async function main() {
 }
 
 void main().catch((err) => {
-  // eslint-disable-next-line no-console
   console.error("item-bank-import: fatal error", err);
   process.exit(1);
 });

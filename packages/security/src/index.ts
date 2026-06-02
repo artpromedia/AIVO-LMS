@@ -125,7 +125,9 @@ export async function initKeys() {
       publicKey = await jose.importSPKI(pubFile, "RS256");
       return;
     }
-  } catch {}
+  } catch {
+    /* ignore — fall through to regenerate keys */
+  }
 
   const { privateKey: priv, publicKey: pub } = await jose.generateKeyPair("RS256", {
     extractable: true,
@@ -139,7 +141,9 @@ export async function initKeys() {
     const pubPemOut = await jose.exportSPKI(pub as jose.CryptoKey);
     fs.writeFileSync(privPath, privPemOut, { mode: 0o600 });
     fs.writeFileSync(pubPath, pubPemOut, { mode: 0o644 });
-  } catch {}
+  } catch {
+    /* ignore — best-effort key persistence */
+  }
 }
 
 export async function signJWT<T extends object = JWTPayload>(
@@ -208,11 +212,7 @@ export {
   type SurfaceCookieClaims,
 } from "./surface-cookie.js";
 
-export {
-  getSecretsClient,
-  _resetSecretsClient,
-  type SecretsClient,
-} from "./secrets-client.js";
+export { getSecretsClient, _resetSecretsClient, type SecretsClient } from "./secrets-client.js";
 
 export {
   ACTIVE_ROLE_HEADER,

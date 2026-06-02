@@ -92,9 +92,7 @@ export function mapIdentityErrorBody(
   if (status === 429) {
     return {
       code: "rate_limited",
-      message:
-        raw ||
-        "Too many attempts. Please wait a moment and try again.",
+      message: raw || "Too many attempts. Please wait a moment and try again.",
       retryAfterSeconds: body?.retryAfter,
       status,
     };
@@ -128,9 +126,7 @@ export function mapIdentityErrorBody(
     if (body?.requiresConsent) {
       return {
         code: "requires_consent",
-        message:
-          raw ||
-          "Please confirm parental consent and terms before continuing.",
+        message: raw || "Please confirm parental consent and terms before continuing.",
         status,
       };
     }
@@ -146,8 +142,7 @@ export function mapIdentityErrorBody(
     if (lower.includes("deactivat")) {
       return {
         code: "account_deactivated",
-        message:
-          raw || "Your account has been deactivated. Contact support.",
+        message: raw || "Your account has been deactivated. Contact support.",
         status,
       };
     }
@@ -162,8 +157,7 @@ export function mapIdentityErrorBody(
     }
     return {
       code: "mfa_required",
-      message:
-        raw || "Additional verification is required to continue.",
+      message: raw || "Additional verification is required to continue.",
       status,
     };
   }
@@ -202,9 +196,7 @@ export function mapIdentityErrorBody(
   if (status >= 500) {
     return {
       code: "server_error",
-      message:
-        raw ||
-        "Something went wrong on our end. Please try again in a moment.",
+      message: raw || "Something went wrong on our end. Please try again in a moment.",
       status,
     };
   }
@@ -225,8 +217,7 @@ export function mapIdentityErrorBody(
 export function mapIdentityNetworkError(_err: unknown): IdentityErrorResult {
   return {
     code: "network_error",
-    message:
-      "Couldn't reach the server. Check your connection and try again.",
+    message: "Couldn't reach the server. Check your connection and try again.",
   };
 }
 

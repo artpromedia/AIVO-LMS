@@ -739,7 +739,9 @@
     "subtitle": "شارك ملاحظة حول تعلم هذا الطالب",
     "yourInsight": "ملاحظتك",
     "placeholder": "صِف ما لاحظته بشأن هذا الطالب...",
-    "submitted": "تم إرسال الملاحظة إلى صندوق وارد ولي الأمر"
+    "submitted": "تم إرسال الملاحظة إلى صندوق وارد ولي الأمر",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "رفع IEP",
@@ -810,7 +812,9 @@
     "prompt": "كيف كان أداء الطفل اليوم؟",
     "placeholder": "شارك ملاحظتك…",
     "submitBtn": "تقديم الملاحظة",
-    "submitted": "تم حفظ الملاحظة في رؤى الدماغ"
+    "submitted": "تم حفظ الملاحظة في رؤى الدماغ",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "التقدم",
@@ -846,7 +850,11 @@
     "reportsSubtitle": "إنشاء وعرض تقارير تقدم العلاج",
     "noReportsTitle": "لا توجد تقارير",
     "noReportsMessage": "أنشئ تقرير تقدم عند الاستعداد.",
-    "generateReport": "إنشاء تقرير"
+    "generateReport": "إنشاء تقرير",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected."
   },
   "therapistSessions": {
     "title": "سجلات الجلسات",

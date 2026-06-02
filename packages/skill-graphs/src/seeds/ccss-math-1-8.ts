@@ -140,7 +140,8 @@ export const ccssMath1To8: SkillGraph = {
     {
       id: "ccss-math.4.NBT.B.4",
       title: "Add and subtract multi-digit numbers",
-      description: "I can add or subtract numbers with several digits using the standard algorithm.",
+      description:
+        "I can add or subtract numbers with several digits using the standard algorithm.",
       subject: "math",
       gradeBand: "4",
       frameworkRefs: [{ framework: "CCSS-Math", code: "4.NBT.B.4" }],
@@ -169,8 +170,7 @@ export const ccssMath1To8: SkillGraph = {
     {
       id: "ccss-math.5.NF.A.1",
       title: "Add and subtract fractions with unlike denominators",
-      description:
-        "I can add or subtract fractions even when their bottom numbers are different.",
+      description: "I can add or subtract fractions even when their bottom numbers are different.",
       subject: "math",
       gradeBand: "5",
       frameworkRefs: [{ framework: "CCSS-Math", code: "5.NF.A.1" }],
@@ -250,8 +250,7 @@ export const ccssMath1To8: SkillGraph = {
     {
       id: "ccss-math.8.EE.B.5",
       title: "Graph proportional relationships",
-      description:
-        "I can graph a proportional relationship and read the unit rate as the slope.",
+      description: "I can graph a proportional relationship and read the unit rate as the slope.",
       subject: "math",
       gradeBand: "8",
       frameworkRefs: [{ framework: "CCSS-Math", code: "8.EE.B.5" }],
@@ -269,8 +268,7 @@ export const ccssMath1To8: SkillGraph = {
     {
       id: "ccss-math.8.G.B.7",
       title: "Apply the Pythagorean theorem",
-      description:
-        "I can use a² + b² = c² to find a missing side length of a right triangle.",
+      description: "I can use a² + b² = c² to find a missing side length of a right triangle.",
       subject: "math",
       gradeBand: "8",
       frameworkRefs: [{ framework: "CCSS-Math", code: "8.G.B.7" }],

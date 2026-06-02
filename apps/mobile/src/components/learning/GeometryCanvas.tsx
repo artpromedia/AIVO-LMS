@@ -1,14 +1,6 @@
 import React, { useMemo } from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
-import Svg, {
-  Circle,
-  G,
-  Line,
-  Polygon,
-  Polyline,
-  Rect,
-  Text as SvgText,
-} from "react-native-svg";
+import Svg, { Circle, G, Line, Polygon, Polyline, Rect, Text as SvgText } from "react-native-svg";
 import { colors, radius, INCLUSIVE_WARM_PALETTE } from "@/constants/colors";
 
 export type GeometryShape =
@@ -95,20 +87,52 @@ export function GeometryCanvas({
     const lines: React.ReactNode[] = [];
     for (let x = 0; x <= width; x += step) {
       lines.push(
-        <Line key={`vx-${x}`} x1={x} y1={0} x2={x} y2={height} stroke={colors.border} strokeWidth={1} />,
+        <Line
+          key={`vx-${x}`}
+          x1={x}
+          y1={0}
+          x2={x}
+          y2={height}
+          stroke={colors.border}
+          strokeWidth={1}
+        />,
       );
     }
     for (let y = 0; y <= height; y += step) {
       lines.push(
-        <Line key={`hy-${y}`} x1={0} y1={y} x2={width} y2={y} stroke={colors.border} strokeWidth={1} />,
+        <Line
+          key={`hy-${y}`}
+          x1={0}
+          y1={y}
+          x2={width}
+          y2={y}
+          stroke={colors.border}
+          strokeWidth={1}
+        />,
       );
     }
     if (axes) {
       const midX = Math.round(width / 2);
       const midY = Math.round(height / 2);
       lines.push(
-        <Line key="ax" x1={0} y1={midY} x2={width} y2={midY} stroke={INCLUSIVE_WARM_PALETTE.borderStrong} strokeWidth={1.5} />,
-        <Line key="ay" x1={midX} y1={0} x2={midX} y2={height} stroke={INCLUSIVE_WARM_PALETTE.borderStrong} strokeWidth={1.5} />,
+        <Line
+          key="ax"
+          x1={0}
+          y1={midY}
+          x2={width}
+          y2={midY}
+          stroke={INCLUSIVE_WARM_PALETTE.borderStrong}
+          strokeWidth={1.5}
+        />,
+        <Line
+          key="ay"
+          x1={midX}
+          y1={0}
+          x2={midX}
+          y2={height}
+          stroke={INCLUSIVE_WARM_PALETTE.borderStrong}
+          strokeWidth={1.5}
+        />,
       );
     }
     return lines;

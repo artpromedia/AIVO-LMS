@@ -34,10 +34,10 @@ Fields:
 
 ## Feature flag
 
-| `SPEECH_EVAL_MODE` | Behaviour |
-|-|-|
+| `SPEECH_EVAL_MODE` | Behaviour                                                                                                                              |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `mock` (default)   | Returns deterministic mock scores with `degraded: true`. No Whisper or cloud ASR required. Use this until real hosting is provisioned. |
-| `live`             | Stub — returns 503 until a real Whisper integration is wired. |
+| `live`             | Stub — returns 503 until a real Whisper integration is wired.                                                                          |
 
 ## Development
 

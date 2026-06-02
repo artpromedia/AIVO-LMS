@@ -28,18 +28,14 @@ const voiceSurface: LearnerSurfaceSpec = {
 
 describe("VoiceResponseSurface", () => {
   it("renders via SurfaceHost without crashing", () => {
-    const markup = renderToStaticMarkup(
-      <SurfaceHost surface={voiceSurface} />,
-    );
+    const markup = renderToStaticMarkup(<SurfaceHost surface={voiceSurface} />);
     expect(markup).toContain("voice-response-surface");
     expect(markup).toContain("Say the days of the week");
     expect(markup).toContain("Record yourself saying all seven days.");
   });
 
   it("renders record and submit buttons in idle state (SSR)", () => {
-    const markup = renderToStaticMarkup(
-      <SurfaceHost surface={voiceSurface} />,
-    );
+    const markup = renderToStaticMarkup(<SurfaceHost surface={voiceSurface} />);
     expect(markup).toContain("record voice answer");
     expect(markup).toContain("submit voice answer");
   });
@@ -58,9 +54,7 @@ describe("VoiceResponseSurface", () => {
   });
 
   it("defaults to entitled when entitledTutors not supplied", () => {
-    const markup = renderToStaticMarkup(
-      <SurfaceHost surface={voiceSurface} />,
-    );
+    const markup = renderToStaticMarkup(<SurfaceHost surface={voiceSurface} />);
     expect(markup).not.toContain("locked learner surface");
     expect(markup).toContain("voice-response-surface");
   });
@@ -70,9 +64,7 @@ describe("VoiceResponseSurface", () => {
       ...voiceSurface,
       accessibility: { ...voiceSurface.accessibility, reduceMotionSafe: true },
     };
-    const markup = renderToStaticMarkup(
-      <SurfaceHost surface={reducedSurface} />,
-    );
+    const markup = renderToStaticMarkup(<SurfaceHost surface={reducedSurface} />);
     // Level meter is not rendered in SSR / idle state
     expect(markup).not.toContain("recording level");
   });
@@ -80,10 +72,7 @@ describe("VoiceResponseSurface", () => {
   it("emits surface_started telemetry on mount", () => {
     const events: Array<{ type: string }> = [];
     renderToStaticMarkup(
-      <SurfaceHost
-        surface={voiceSurface}
-        onEvent={(e) => events.push({ type: e.type })}
-      />,
+      <SurfaceHost surface={voiceSurface} onEvent={(e) => events.push({ type: e.type })} />,
     );
     expect(events.some((e) => e.type === "surface_started")).toBe(true);
   });

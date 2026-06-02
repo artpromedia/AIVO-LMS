@@ -36,11 +36,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const roleErr = requireRole(
-      session!,
-      ["teacher", "school_admin", "district_admin"],
-      requestId,
-    );
+    const roleErr = requireRole(session!, ["teacher", "school_admin", "district_admin"], requestId);
     if (roleErr) return roleErr;
 
     const url = new URL(req.url);
@@ -61,11 +57,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const roleErr = requireRole(
-      session!,
-      ["teacher", "school_admin", "district_admin"],
-      requestId,
-    );
+    const roleErr = requireRole(session!, ["teacher", "school_admin", "district_admin"], requestId);
     if (roleErr) return roleErr;
 
     const url = new URL(req.url);
@@ -99,15 +91,13 @@ export async function POST(req: Request): Promise<NextResponse> {
       return ok({ draft: updated }, requestId);
     }
 
-    const body = (await req.json().catch(() => null)) as
-      | {
-          learnerId?: string;
-          draft?: IepAiDraftBody;
-          model?: string;
-          sourceAttemptId?: string | null;
-          responsibleAi?: Record<string, unknown>;
-        }
-      | null;
+    const body = (await req.json().catch(() => null)) as {
+      learnerId?: string;
+      draft?: IepAiDraftBody;
+      model?: string;
+      sourceAttemptId?: string | null;
+      responsibleAi?: Record<string, unknown>;
+    } | null;
     if (!body?.learnerId || !body.draft) {
       return fail(
         {

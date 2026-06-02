@@ -8,6 +8,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { useColumns } from "@aivo/mobile-ui";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { Card } from "@/components/ui";
+import { WhatsWorkingCard } from "@/components/parent/WhatsWorkingCard";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
@@ -125,6 +126,10 @@ export default function LearnerHubScreen() {
           </Text>
         ) : null}
       </Card>
+
+      {learner ? (
+        <WhatsWorkingCard learnerId={id} learnerName={`${learner.firstName} ${learner.lastName}`} />
+      ) : null}
 
       <View style={styles.grid}>
         {TILES.map((tile) => (

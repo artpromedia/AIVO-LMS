@@ -70,10 +70,9 @@ describe("mobile i18n catalog parity", () => {
     // pin them so they cannot silently fall back to English again.
     for (const key of ["learnerSettings.language", "learnerSettings.languageDesc"]) {
       expect(localeFlat[key], `${locale} missing ${key}`).toBeTruthy();
-      expect(
-        localeFlat[key] === enFlat[key],
-        `${locale} ${key} is identical to English`,
-      ).toBe(false);
+      expect(localeFlat[key] === enFlat[key], `${locale} ${key} is identical to English`).toBe(
+        false,
+      );
     }
   });
 });

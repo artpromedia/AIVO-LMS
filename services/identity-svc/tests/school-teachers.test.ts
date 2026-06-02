@@ -32,7 +32,10 @@ async function seed(db: any) {
   const { tenants, schools, users } = await import("@aivo/db");
   const [tenant] = await db
     .insert(tenants)
-    .values({ name: `School Test ${Date.now()}-${crypto.randomBytes(3).toString("hex")}`, type: "B2B_DISTRICT" } as any)
+    .values({
+      name: `School Test ${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+      type: "B2B_DISTRICT",
+    } as any)
     .returning();
   const [school] = await db
     .insert(schools)
@@ -73,39 +76,43 @@ async function schoolAdminToken(admin: any, schoolId: string, tenantId: string) 
   });
 }
 
-test("school teachers: a school admin can invite a teacher (role=TEACHER, scoped to the school)", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const { tenantId, schoolId, admin } = await seed(db);
-  try {
-    const token = await schoolAdminToken(admin, schoolId, tenantId);
-    const email = `teacher+${crypto.randomBytes(4).toString("hex")}@example.com`;
-    const res = await app.inject({
-      method: "POST",
-      url: "/api/school/teachers",
-      headers: { Authorization: `Bearer ${token}` },
-      payload: { email, name: "Pat Teacher" },
-    });
-    assert.equal(res.statusCode, 200);
-    const body = res.json() as any;
-    assert.equal(body.invite.role, "TEACHER");
-    assert.equal(body.invite.schoolId, schoolId);
+test(
+  "school teachers: a school admin can invite a teacher (role=TEACHER, scoped to the school)",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const { tenantId, schoolId, admin } = await seed(db);
+    try {
+      const token = await schoolAdminToken(admin, schoolId, tenantId);
+      const email = `teacher+${crypto.randomBytes(4).toString("hex")}@example.com`;
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/school/teachers",
+        headers: { Authorization: `Bearer ${token}` },
+        payload: { email, name: "Pat Teacher" },
+      });
+      assert.equal(res.statusCode, 200);
+      const body = res.json() as any;
+      assert.equal(body.invite.role, "TEACHER");
+      assert.equal(body.invite.schoolId, schoolId);
 
-    const { districtAdminInvites } = await import("@aivo/db");
-    const { eq, and } = await import("drizzle-orm");
-    const [row] = await db
-      .select()
-      .from(districtAdminInvites)
-      .where(and(eq(districtAdminInvites.id, body.invite.id)))
-      .limit(1);
-    assert.equal(row.role, "TEACHER");
-    assert.equal(row.schoolId, schoolId);
-    assert.equal(row.email, email);
-    assert.ok(!row.acceptedAt);
-  } finally {
-    await cleanup(db, tenantId);
-    await teardown(app, db);
-  }
-});
+      const { districtAdminInvites } = await import("@aivo/db");
+      const { eq, and } = await import("drizzle-orm");
+      const [row] = await db
+        .select()
+        .from(districtAdminInvites)
+        .where(and(eq(districtAdminInvites.id, body.invite.id)))
+        .limit(1);
+      assert.equal(row.role, "TEACHER");
+      assert.equal(row.schoolId, schoolId);
+      assert.equal(row.email, email);
+      assert.ok(!row.acceptedAt);
+    } finally {
+      await cleanup(db, tenantId);
+      await teardown(app, db);
+    }
+  },
+);
 
 test("school teachers: a TEACHER token is rejected by the guard", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();
@@ -133,28 +140,32 @@ test("school teachers: a TEACHER token is rejected by the guard", { skip: SKIP }
   }
 });
 
-test("school teachers: a second invite for the same email is rejected", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const { tenantId, schoolId, admin } = await seed(db);
-  try {
-    const token = await schoolAdminToken(admin, schoolId, tenantId);
-    const email = `dupe+${crypto.randomBytes(4).toString("hex")}@example.com`;
-    const first = await app.inject({
-      method: "POST",
-      url: "/api/school/teachers",
-      headers: { Authorization: `Bearer ${token}` },
-      payload: { email, name: "First" },
-    });
-    assert.equal(first.statusCode, 200);
-    const second = await app.inject({
-      method: "POST",
-      url: "/api/school/teachers",
-      headers: { Authorization: `Bearer ${token}` },
-      payload: { email, name: "Second" },
-    });
-    assert.equal(second.statusCode, 409);
-  } finally {
-    await cleanup(db, tenantId);
-    await teardown(app, db);
-  }
-});
+test(
+  "school teachers: a second invite for the same email is rejected",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const { tenantId, schoolId, admin } = await seed(db);
+    try {
+      const token = await schoolAdminToken(admin, schoolId, tenantId);
+      const email = `dupe+${crypto.randomBytes(4).toString("hex")}@example.com`;
+      const first = await app.inject({
+        method: "POST",
+        url: "/api/school/teachers",
+        headers: { Authorization: `Bearer ${token}` },
+        payload: { email, name: "First" },
+      });
+      assert.equal(first.statusCode, 200);
+      const second = await app.inject({
+        method: "POST",
+        url: "/api/school/teachers",
+        headers: { Authorization: `Bearer ${token}` },
+        payload: { email, name: "Second" },
+      });
+      assert.equal(second.statusCode, 409);
+    } finally {
+      await cleanup(db, tenantId);
+      await teardown(app, db);
+    }
+  },
+);

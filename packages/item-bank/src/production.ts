@@ -60,9 +60,7 @@ export function getProductionBankForSubject(
 }
 
 /** A single combined production bank across all required subjects. */
-export function getCombinedProductionBank(
-  defectBudget: number = DEFAULT_DEFECT_BUDGET,
-): ItemBank {
+export function getCombinedProductionBank(defectBudget: number = DEFAULT_DEFECT_BUDGET): ItemBank {
   return {
     id: "prod-required-subjects-2026",
     schemaVersion: 1,

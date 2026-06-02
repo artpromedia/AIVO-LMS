@@ -1143,8 +1143,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         }
         if (row.status === "ACCEPTED")
           return reply.code(400).send({ error: "Invite already accepted" });
-        if (row.status === "REVOKED")
-          return reply.code(400).send({ error: "Invite was revoked" });
+        if (row.status === "REVOKED") return reply.code(400).send({ error: "Invite was revoked" });
 
         await db
           .update(table)
@@ -1181,8 +1180,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         }
         if (row.status === "ACCEPTED")
           return reply.code(400).send({ error: "Invite already accepted" });
-        if (row.status === "REVOKED")
-          return reply.code(400).send({ error: "Invite was revoked" });
+        if (row.status === "REVOKED") return reply.code(400).send({ error: "Invite was revoked" });
 
         const rawToken = crypto.randomBytes(32).toString("base64url");
         const tokenHash = hashInviteToken(rawToken);
@@ -1302,12 +1300,9 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const role = claims.role;
-      const isStaff =
-        role === "TEACHER" || role === "SCHOOL_ADMIN" || role === "DISTRICT_ADMIN";
+      const isStaff = role === "TEACHER" || role === "SCHOOL_ADMIN" || role === "DISTRICT_ADMIN";
       if (!isStaff && role !== "PLATFORM_ADMIN") {
-        return reply
-          .code(403)
-          .send({ error: "Only teachers and school staff can invite parents" });
+        return reply.code(403).send({ error: "Only teachers and school staff can invite parents" });
       }
 
       const body = (request.body || {}) as {
@@ -1324,8 +1319,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       // When an admin invites on behalf of a teacher they must pass the
       // teacher's user id; for a teacher caller it's their own sub.
-      const teacherUserId =
-        role === "TEACHER" ? claims.sub : body.teacherUserId || claims.sub;
+      const teacherUserId = role === "TEACHER" ? claims.sub : body.teacherUserId || claims.sub;
       if (!teacherUserId) {
         return reply.code(400).send({ error: "teacherUserId required" });
       }
@@ -1360,9 +1354,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       // PLATFORM_ADMIN is global and bypasses the scope check.
       if (role === "SCHOOL_ADMIN" || role === "DISTRICT_ADMIN") {
         if (!claims.tenantId || learner.tenantId !== claims.tenantId) {
-          return reply
-            .code(403)
-            .send({ error: "Learner is outside your administrative scope" });
+          return reply.code(403).send({ error: "Learner is outside your administrative scope" });
         }
       }
 
@@ -1396,9 +1388,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
             )
             .limit(1);
           if (!link) {
-            return reply
-              .code(403)
-              .send({ error: "Teacher is not assigned to this learner" });
+            return reply.code(403).send({ error: "Teacher is not assigned to this learner" });
           }
         }
       }
@@ -1512,8 +1502,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       }
       if (invite.status === "ACCEPTED")
         return reply.code(400).send({ error: "Invite already accepted" });
-      if (invite.status === "REVOKED")
-        return reply.code(400).send({ error: "Invite was revoked" });
+      if (invite.status === "REVOKED") return reply.code(400).send({ error: "Invite was revoked" });
 
       const rawToken = crypto.randomBytes(32).toString("base64url");
       const tokenHash = hashInviteToken(rawToken);
@@ -1625,123 +1614,114 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
   //   2. learner_teachers ACCEPTED rows (parent invite path)
   // Deduplicated by learnerId. When a learner appears in both, source is
   // "both" and the classroom_name + classroom_id are surfaced.
-  app.get(
-    "/api/teacher/roster",
-    { schema: getTeacherRosterSchema },
-    async (request, reply) => {
-      const claims = await authenticateRequest(request, reply);
-      if (!claims) return;
-      if (claims.role !== "TEACHER" && claims.role !== "PLATFORM_ADMIN") {
-        return reply.code(403).send({ error: "Teacher access required" });
+  app.get("/api/teacher/roster", { schema: getTeacherRosterSchema }, async (request, reply) => {
+    const claims = await authenticateRequest(request, reply);
+    if (!claims) return;
+    if (claims.role !== "TEACHER" && claims.role !== "PLATFORM_ADMIN") {
+      return reply.code(403).send({ error: "Teacher access required" });
+    }
+    const teacherUserId = claims.sub;
+
+    // Classroom path.
+    const classroomRows = await db
+      .select({
+        learnerId: classroomEnrollments.learnerId,
+        classroomId: classrooms.id,
+        classroomName: classrooms.name,
+        gradeLevel: classrooms.gradeLevel,
+        subject: classrooms.subject,
+        schoolId: classrooms.schoolId,
+      })
+      .from(classroomEnrollments)
+      .innerJoin(classrooms, eq(classroomEnrollments.classroomId, classrooms.id))
+      .where(and(eq(classrooms.teacherId, teacherUserId), isNull(classroomEnrollments.removedAt)));
+
+    // Parent-invite path.
+    const inviteRows = await db
+      .select({
+        learnerId: learnerTeachers.learnerId,
+        classroomId: learnerTeachers.classroomId,
+      })
+      .from(learnerTeachers)
+      .where(
+        and(
+          eq(learnerTeachers.teacherUserId, teacherUserId),
+          eq(learnerTeachers.status, "ACCEPTED"),
+        ),
+      );
+
+    const merged = new Map<
+      string,
+      {
+        learnerId: string;
+        source: "classroom" | "parent_invite" | "both";
+        classroomId: string | null;
+        classroomName: string | null;
       }
-      const teacherUserId = claims.sub;
-
-      // Classroom path.
-      const classroomRows = await db
-        .select({
-          learnerId: classroomEnrollments.learnerId,
-          classroomId: classrooms.id,
-          classroomName: classrooms.name,
-          gradeLevel: classrooms.gradeLevel,
-          subject: classrooms.subject,
-          schoolId: classrooms.schoolId,
-        })
-        .from(classroomEnrollments)
-        .innerJoin(classrooms, eq(classroomEnrollments.classroomId, classrooms.id))
-        .where(
-          and(
-            eq(classrooms.teacherId, teacherUserId),
-            isNull(classroomEnrollments.removedAt),
-          ),
-        );
-
-      // Parent-invite path.
-      const inviteRows = await db
-        .select({
-          learnerId: learnerTeachers.learnerId,
-          classroomId: learnerTeachers.classroomId,
-        })
-        .from(learnerTeachers)
-        .where(
-          and(
-            eq(learnerTeachers.teacherUserId, teacherUserId),
-            eq(learnerTeachers.status, "ACCEPTED"),
-          ),
-        );
-
-      const merged = new Map<
-        string,
-        {
-          learnerId: string;
-          source: "classroom" | "parent_invite" | "both";
-          classroomId: string | null;
-          classroomName: string | null;
+    >();
+    for (const r of classroomRows) {
+      merged.set(r.learnerId, {
+        learnerId: r.learnerId,
+        source: "classroom",
+        classroomId: r.classroomId,
+        classroomName: r.classroomName,
+      });
+    }
+    for (const r of inviteRows) {
+      const existing = merged.get(r.learnerId);
+      if (existing) {
+        existing.source = "both";
+        if (!existing.classroomId && r.classroomId) {
+          existing.classroomId = r.classroomId;
         }
-      >();
-      for (const r of classroomRows) {
+      } else {
         merged.set(r.learnerId, {
           learnerId: r.learnerId,
-          source: "classroom",
+          source: "parent_invite",
           classroomId: r.classroomId,
-          classroomName: r.classroomName,
+          classroomName: null,
         });
       }
-      for (const r of inviteRows) {
-        const existing = merged.get(r.learnerId);
-        if (existing) {
-          existing.source = "both";
-          if (!existing.classroomId && r.classroomId) {
-            existing.classroomId = r.classroomId;
-          }
-        } else {
-          merged.set(r.learnerId, {
-            learnerId: r.learnerId,
-            source: "parent_invite",
-            classroomId: r.classroomId,
-            classroomName: null,
-          });
-        }
-      }
+    }
 
-      if (merged.size === 0) return [];
+    if (merged.size === 0) return [];
 
-      // Hydrate learner + parent display info in one query.
-      const learnerIds = Array.from(merged.keys());
-      const learnerRows = await db
-        .select({
-          id: learners.id,
-          name: learners.name,
-          gradeLevel: learners.gradeLevel,
-          functioningLevel: learners.functioningLevel,
-          parentId: learners.parentId,
-        })
-        .from(learners)
-        .where(inArray(learners.id, learnerIds));
-      const parentIds = Array.from(new Set(learnerRows.map((l) => l.parentId).filter(Boolean)));
-      const parentRows =
-        parentIds.length > 0
-          ? await db
-              .select({ id: users.id, name: users.name, email: users.email })
-              .from(users)
-              .where(inArray(users.id, parentIds as string[]))
-          : [];
-      const parentById = new Map(parentRows.map((p) => [p.id, p]));
+    // Hydrate learner + parent display info in one query.
+    const learnerIds = Array.from(merged.keys());
+    const learnerRows = await db
+      .select({
+        id: learners.id,
+        name: learners.name,
+        gradeLevel: learners.gradeLevel,
+        functioningLevel: learners.functioningLevel,
+        parentId: learners.parentId,
+      })
+      .from(learners)
+      .where(inArray(learners.id, learnerIds));
+    const parentIds = Array.from(new Set(learnerRows.map((l) => l.parentId).filter(Boolean)));
+    const parentRows =
+      parentIds.length > 0
+        ? await db
+            .select({ id: users.id, name: users.name, email: users.email })
+            .from(users)
+            .where(inArray(users.id, parentIds as string[]))
+        : [];
+    const parentById = new Map(parentRows.map((p) => [p.id, p]));
 
-      return learnerRows.map((l) => {
-        const m = merged.get(l.id)!;
-        const parent = parentById.get(l.parentId);
-        return {
-          learnerId: l.id,
-          learnerName: l.name,
-          gradeLevel: l.gradeLevel,
-          functioningLevel: l.functioningLevel,
-          source: m.source,
-          classroomId: m.classroomId,
-          classroomName: m.classroomName,
-          parentName: parent?.name ?? null,
-          parentEmail: parent?.email ?? null,
-        };
-      });
-    },
-  );
+    return learnerRows.map((l) => {
+      const m = merged.get(l.id)!;
+      const parent = parentById.get(l.parentId);
+      return {
+        learnerId: l.id,
+        learnerName: l.name,
+        gradeLevel: l.gradeLevel,
+        functioningLevel: l.functioningLevel,
+        source: m.source,
+        classroomId: m.classroomId,
+        classroomName: m.classroomName,
+        parentName: parent?.name ?? null,
+        parentEmail: parent?.email ?? null,
+      };
+    });
+  });
 }

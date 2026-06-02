@@ -66,12 +66,9 @@ export function AssessmentProgress({
               aria-hidden="true"
               className={cn(
                 "h-2 flex-1 rounded-full transition-colors duration-200",
-                state === "done" &&
-                  "bg-[var(--aivo-sensory-primary,#7c3aed)]",
-                state === "active" &&
-                  "bg-[var(--aivo-color-aivoPurple-200,#ddd6fe)]",
-                state === "upcoming" &&
-                  "bg-[var(--aivo-color-surface-muted,#e2e8f0)]",
+                state === "done" && "bg-[var(--aivo-sensory-primary,#7c3aed)]",
+                state === "active" && "bg-[var(--aivo-color-aivoPurple-200,#ddd6fe)]",
+                state === "upcoming" && "bg-[var(--aivo-color-surface-muted,#e2e8f0)]",
               )}
             />
           );

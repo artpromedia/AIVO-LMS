@@ -78,8 +78,7 @@ const DATA = {
         what_happens_next: "What happens next",
         step1_label: "Step 1 · Within 1 business day",
         step2_label: "Step 2 · 30-minute walkthrough",
-        step2_body:
-          "We show learner, parent, and teacher views — and answer your questions live.",
+        step2_body: "We show learner, parent, and teacher views — and answer your questions live.",
         step3_label: "Step 3 · Pilot or proposal",
         step3_body:
           "If it's a fit, we scope a short pilot or send a written proposal — no pressure.",
@@ -88,8 +87,7 @@ const DATA = {
         hero_title: "The personalized learning unit behind every AIVO lesson",
         voice_support_title: "Voice support on every step",
         break_mode_title: "A calm pause — not a rage-quit",
-        count_by_3s_prompt:
-          "Let's count by 3s up to 12. Start at 3. What comes next?",
+        count_by_3s_prompt: "Let's count by 3s up to 12. Start at 3. What comes next?",
         hint_counting_fingers:
           "Try counting on your fingers: 3 · 6 · ? — what number comes three more than 6?",
         need_another_hint: "Need another hint?",
@@ -177,8 +175,7 @@ const DATA = {
         hero_title: "La unidad de aprendizaje personalizado detrás de cada lección de AIVO",
         voice_support_title: "Soporte de voz en cada paso",
         break_mode_title: "Una pausa tranquila — no una rabieta",
-        count_by_3s_prompt:
-          "Contemos de 3 en 3 hasta 12. Empezamos en 3. ¿Qué viene después?",
+        count_by_3s_prompt: "Contemos de 3 en 3 hasta 12. Empezamos en 3. ¿Qué viene después?",
         hint_counting_fingers:
           "Intenta contar con los dedos: 3 · 6 · ? — ¿qué número viene tres más que 6?",
         need_another_hint: "¿Necesitas otra pista?",
@@ -444,8 +441,7 @@ const DATA = {
         hero_title: "A unidade de aprendizado personalizado por trás de cada lição do AIVO",
         voice_support_title: "Suporte de voz em cada etapa",
         break_mode_title: "Uma pausa tranquila — não uma desistência frustrada",
-        count_by_3s_prompt:
-          "Vamos contar de 3 em 3 até 12. Começamos no 3. O que vem a seguir?",
+        count_by_3s_prompt: "Vamos contar de 3 em 3 até 12. Começamos no 3. O que vem a seguir?",
         hint_counting_fingers:
           "Tente contar nos dedos: 3 · 6 · ? — que número vem três a mais que 6?",
         need_another_hint: "Precisa de outra dica?",
@@ -504,8 +500,7 @@ const DATA = {
         iep_title: "IEP 或无障碍支持信息，妥善处理",
         reading_question: "您的孩子对阅读的感受如何？",
         answers_saved: "答案已自动保存。",
-        aivo_disclaimer:
-          "AIVO 不做诊断。AIVO 不能替代治疗师、IEP 团队或专科医生。",
+        aivo_disclaimer: "AIVO 不做诊断。AIVO 不能替代治疗师、IEP 团队或专科医生。",
         take_a_breath: "深呼吸。没有计时器。",
         which_word_means: "哪个词与",
         need_a_break: "需要休息一下？",
@@ -531,8 +526,7 @@ const DATA = {
         voice_support_title: "每个步骤均提供语音支持",
         break_mode_title: "平静的暂停——而非愤怒退出",
         count_by_3s_prompt: "让我们以 3 为单位数到 12。从 3 开始，下一个是什么？",
-        hint_counting_fingers:
-          "试着用手指数数：3 · 6 · ?——比 6 多三的数字是什么？",
+        hint_counting_fingers: "试着用手指数数：3 · 6 · ?——比 6 多三的数字是什么？",
         need_another_hint: "需要再来一个提示吗？",
         maya_strong_week: "Maya 这周表现非常出色！",
       },
@@ -607,8 +601,7 @@ const DATA = {
         what_happens_next: "次に何が起こるか",
         step1_label: "ステップ 1 · 1営業日以内",
         step2_label: "ステップ 2 · 30分間のウォークスルー",
-        step2_body:
-          "学習者、保護者、教師のビューをお見せし、ご質問にライブでお答えします。",
+        step2_body: "学習者、保護者、教師のビューをお見せし、ご質問にライブでお答えします。",
         step3_label: "ステップ 3 · パイロットまたは提案",
         step3_body:
           "適合すれば、短いパイロットを設定するか、書面による提案をお送りします — プレッシャーはありません。",
@@ -617,10 +610,8 @@ const DATA = {
         hero_title: "すべてのAIVOレッスンの背後にある個別化学習ユニット",
         voice_support_title: "すべてのステップでの音声サポート",
         break_mode_title: "穏やかな休憩 — 怒りのやめ方ではなく",
-        count_by_3s_prompt:
-          "3ずつ数えて12まで数えましょう。3から始めます。次は何ですか？",
-        hint_counting_fingers:
-          "指で数えてみて：3 · 6 · ? — 6よりも3多い数は何ですか？",
+        count_by_3s_prompt: "3ずつ数えて12まで数えましょう。3から始めます。次は何ですか？",
+        hint_counting_fingers: "指で数えてみて：3 · 6 · ? — 6よりも3多い数は何ですか？",
         need_another_hint: "別のヒントが必要ですか？",
         maya_strong_week: "マヤは今週、頑張りました！",
       },
@@ -635,8 +626,7 @@ const DATA = {
       page_pricing: {
         hero_title: "誠実な価格設定。サプライズなし。",
         for_families: "ご家庭向け",
-        family_disclaimer:
-          "月額払い。いつでもキャンセル可能。有料プランは30日間返金保証。",
+        family_disclaimer: "月額払い。いつでもキャンセル可能。有料プランは30日間返金保証。",
         for_schools: "学校・学区向け",
         pricing_faq_heading: "料金に関するよくある質問",
       },
@@ -696,18 +686,15 @@ const DATA = {
         what_happens_next: "다음에 일어나는 일",
         step1_label: "단계 1 · 영업일 기준 1일 이내",
         step2_label: "단계 2 · 30분 데모",
-        step2_body:
-          "학습자, 학부모, 교사의 화면을 보여드리고 질문에 실시간으로 답변해 드립니다.",
+        step2_body: "학습자, 학부모, 교사의 화면을 보여드리고 질문에 실시간으로 답변해 드립니다.",
         step3_label: "단계 3 · 파일럿 또는 제안서",
-        step3_body:
-          "적합하다면 짧은 파일럿을 진행하거나 서면 제안서를 보내드립니다 — 부담 없이.",
+        step3_body: "적합하다면 짧은 파일럿을 진행하거나 서면 제안서를 보내드립니다 — 부담 없이.",
       },
       page_features_lessonrun: {
         hero_title: "모든 AIVO 수업 뒤에 있는 개인화 학습 단위",
         voice_support_title: "모든 단계에서 음성 지원",
         break_mode_title: "차분한 휴식 — 분노의 종료가 아닌",
-        count_by_3s_prompt:
-          "3씩 세어 12까지 가 봅시다. 3에서 시작합니다. 다음은 무엇인가요?",
+        count_by_3s_prompt: "3씩 세어 12까지 가 봅시다. 3에서 시작합니다. 다음은 무엇인가요?",
         hint_counting_fingers:
           "손가락으로 세어 보세요: 3 · 6 · ? — 6보다 3 많은 숫자는 무엇인가요?",
         need_another_hint: "힌트가 더 필요한가요?",
@@ -724,8 +711,7 @@ const DATA = {
       page_pricing: {
         hero_title: "솔직한 가격. 숨겨진 비용 없음.",
         for_families: "가족을 위해",
-        family_disclaimer:
-          "월별 결제. 언제든지 취소 가능. 유료 플랜 30일 환불 보장.",
+        family_disclaimer: "월별 결제. 언제든지 취소 가능. 유료 플랜 30일 환불 보장.",
         for_schools: "학교 및 교육구를 위해",
         pricing_faq_heading: "가격 자주 묻는 질문",
       },
@@ -766,8 +752,7 @@ const DATA = {
         iep_title: "سياق IEP أو التسهيلات، يُعالَج باهتمام",
         reading_question: "كيف يشعر طفلك تجاه القراءة؟",
         answers_saved: "يتم حفظ الإجابات تلقائيًا.",
-        aivo_disclaimer:
-          "AIVO لا يشخّص. AIVO لا يحلّ محلّ المعالجين أو فرق IEP أو المتخصصين.",
+        aivo_disclaimer: "AIVO لا يشخّص. AIVO لا يحلّ محلّ المعالجين أو فرق IEP أو المتخصصين.",
         take_a_breath: "خذ نفسًا عميقًا. لا يوجد مؤقت.",
         which_word_means: "أي كلمة تعني نفس معنى",
         need_a_break: "هل تحتاج إلى استراحة؟",
@@ -780,23 +765,19 @@ const DATA = {
       page_demo: {
         hero_title: "شاهد AIVO في العمل.",
         form_heading: "أخبرنا قليلاً عن بيئتك",
-        form_subheading:
-          "كلما عرفنا أكثر، كان العرض أكثر فائدة. الحقول المطلوبة مُعلَّمة.",
+        form_subheading: "كلما عرفنا أكثر، كان العرض أكثر فائدة. الحقول المطلوبة مُعلَّمة.",
         what_happens_next: "ما الذي يحدث بعد ذلك",
         step1_label: "الخطوة 1 · خلال يوم عمل واحد",
         step2_label: "الخطوة 2 · جولة استعراضية لمدة 30 دقيقة",
-        step2_body:
-          "نعرض مشاهد المتعلّم والوالد والمعلم — ونجيب على أسئلتك مباشرةً.",
+        step2_body: "نعرض مشاهد المتعلّم والوالد والمعلم — ونجيب على أسئلتك مباشرةً.",
         step3_label: "الخطوة 3 · تجريبي أو مقترح",
-        step3_body:
-          "إذا كان هناك توافق، نخطط لتجربة قصيرة أو نرسل مقترحًا مكتوبًا — دون ضغط.",
+        step3_body: "إذا كان هناك توافق، نخطط لتجربة قصيرة أو نرسل مقترحًا مكتوبًا — دون ضغط.",
       },
       page_features_lessonrun: {
         hero_title: "وحدة التعلم الشخصية وراء كل درس في AIVO",
         voice_support_title: "دعم صوتي في كل خطوة",
         break_mode_title: "توقف هادئ — لا انسحاب غاضب",
-        count_by_3s_prompt:
-          "لنعدّ من 3 إلى 3 حتى 12. ابدأ من 3. ما الذي يأتي بعده؟",
+        count_by_3s_prompt: "لنعدّ من 3 إلى 3 حتى 12. ابدأ من 3. ما الذي يأتي بعده؟",
         hint_counting_fingers:
           "حاول العدّ على أصابعك: 3 · 6 · ? — ما الرقم الذي يأتي ثلاثة أكثر من 6؟",
         need_another_hint: "هل تحتاج إلى تلميح آخر؟",
@@ -884,8 +865,7 @@ const DATA = {
         hero_title: "AIVO की हर पाठ के पीछे की व्यक्तिगत शिक्षण इकाई",
         voice_support_title: "हर चरण पर वॉयस सपोर्ट",
         break_mode_title: "एक शांत विराम — क्रोध में छोड़ना नहीं",
-        count_by_3s_prompt:
-          "चलो 3-3 करके 12 तक गिनते हैं। 3 से शुरू करें। आगे क्या आता है?",
+        count_by_3s_prompt: "चलो 3-3 करके 12 तक गिनते हैं। 3 से शुरू करें। आगे क्या आता है?",
         hint_counting_fingers:
           "अपनी उंगलियों पर गिनने की कोशिश करें: 3 · 6 · ? — 6 से तीन अधिक कौन-सी संख्या है?",
         need_another_hint: "क्या आपको और संकेत चाहिए?",
@@ -931,7 +911,7 @@ for (const [locale, roots] of Object.entries(DATA)) {
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
   console.log(
-    `seed-M_copy3-i18n: merged page_about/page_for_parents/page_demo/page_features_lessonrun/page_careers/page_pricing/page_features/page_thank_you/page_levels → messages/${locale}.json`
+    `seed-M_copy3-i18n: merged page_about/page_for_parents/page_demo/page_features_lessonrun/page_careers/page_pricing/page_features/page_thank_you/page_levels → messages/${locale}.json`,
   );
 }
 console.log(`\nseed-M_copy3-i18n: done — ${written} locale catalogs updated.`);

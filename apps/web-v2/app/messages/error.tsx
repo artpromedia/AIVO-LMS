@@ -20,9 +20,7 @@ export default function MessagesError({
       id="main"
       className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center"
     >
-      <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">
-        Messages
-      </p>
+      <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">Messages</p>
       <h1 className="mt-2 font-display text-4xl font-bold">
         Something went wrong loading your messages.
       </h1>

@@ -66,10 +66,7 @@ export default function SignInPage() {
               {t("submit")}
             </Button>
             <div className="flex justify-between text-sm">
-              <Link
-                href="/onboarding/recovery"
-                className="text-iw-text-muted hover:underline"
-              >
+              <Link href="/onboarding/recovery" className="text-iw-text-muted hover:underline">
                 {t("forgot")}
               </Link>
               <Link

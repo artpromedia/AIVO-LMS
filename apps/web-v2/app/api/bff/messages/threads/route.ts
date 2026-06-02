@@ -18,7 +18,11 @@ export async function GET(req: Request): Promise<NextResponse> {
       const r = await listThreadsSvc(bearer);
       if (!r.ok) {
         return fail(
-          { ...ERRORS.UPSTREAM_UNAVAILABLE, message: r.error, status: r.status >= 500 ? 502 : r.status },
+          {
+            ...ERRORS.UPSTREAM_UNAVAILABLE,
+            message: r.error,
+            status: r.status >= 500 ? 502 : r.status,
+          },
           requestId,
         );
       }

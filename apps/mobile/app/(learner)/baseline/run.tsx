@@ -221,7 +221,10 @@ export default function LearnerBaselineRunScreen() {
               accessibilityRole="button"
               accessibilityLabel={opt}
               onPress={answer}
-              style={[styles.option, { borderColor: palette.border, backgroundColor: palette.bgPage }]}
+              style={[
+                styles.option,
+                { borderColor: palette.border, backgroundColor: palette.bgPage },
+              ]}
             >
               <Text style={[styles.optionText, { color: palette.ink }]}>{opt}</Text>
             </Pressable>
@@ -246,7 +249,13 @@ const styles = StyleSheet.create({
   dots: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: spacing.md },
   dot: { height: 8, borderRadius: 4 },
   card: { gap: spacing.sm },
-  iconWrap: { width: 60, height: 60, borderRadius: 30, alignItems: "center", justifyContent: "center" },
+  iconWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   h1: { fontSize: 22, fontFamily: fontFamilies.displayBold },
   body: { fontSize: 14, fontFamily: fontFamilies.bodyRegular, lineHeight: 21 },
   count: {
@@ -256,6 +265,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   question: { fontSize: 19, fontFamily: fontFamilies.displayBold, lineHeight: 26 },
-  option: { paddingVertical: 14, paddingHorizontal: spacing.md, borderRadius: radius.lg, borderWidth: 1.5 },
+  option: {
+    paddingVertical: 14,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.lg,
+    borderWidth: 1.5,
+  },
   optionText: { fontSize: 16, fontFamily: fontFamilies.bodyBold },
 });

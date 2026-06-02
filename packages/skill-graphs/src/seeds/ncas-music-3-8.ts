@@ -28,8 +28,7 @@ export const ncasMusic3To8: SkillGraph = {
     {
       id: "ncas.music.cr1.3",
       title: "Improvise rhythmic and melodic patterns",
-      description:
-        "I can make up short rhythm or melody patterns to express an idea.",
+      description: "I can make up short rhythm or melody patterns to express an idea.",
       subject: "music",
       gradeBand: "3",
       frameworkRefs: [{ framework: "NCAS", code: "MU:Cr1.1.E.3a" }],
@@ -48,8 +47,7 @@ export const ncasMusic3To8: SkillGraph = {
     {
       id: "ncas.music.cr3.7",
       title: "Refine compositions with peer feedback",
-      description:
-        "I can revise a piece I composed based on feedback to make it stronger.",
+      description: "I can revise a piece I composed based on feedback to make it stronger.",
       subject: "music",
       gradeBand: "7",
       frameworkRefs: [{ framework: "NCAS", code: "MU:Cr3.1.E.7a" }],
@@ -92,8 +90,7 @@ export const ncasMusic3To8: SkillGraph = {
     {
       id: "ncas.music.re7.4",
       title: "Describe music using elements and vocabulary",
-      description:
-        "I can describe a piece of music using terms like tempo, dynamics, and timbre.",
+      description: "I can describe a piece of music using terms like tempo, dynamics, and timbre.",
       subject: "music",
       gradeBand: "4",
       frameworkRefs: [{ framework: "NCAS", code: "MU:Re7.2.E.4a" }],
@@ -112,8 +109,7 @@ export const ncasMusic3To8: SkillGraph = {
     {
       id: "ncas.music.re9.8",
       title: "Evaluate musical works using criteria",
-      description:
-        "I can evaluate a musical work using personal and established criteria.",
+      description: "I can evaluate a musical work using personal and established criteria.",
       subject: "music",
       gradeBand: "8",
       frameworkRefs: [{ framework: "NCAS", code: "MU:Re9.1.E.8a" }],
@@ -124,8 +120,7 @@ export const ncasMusic3To8: SkillGraph = {
     {
       id: "ncas.music.cn10.5",
       title: "Connect music to personal experience",
-      description:
-        "I can explain how a piece of music connects to my own experiences or feelings.",
+      description: "I can explain how a piece of music connects to my own experiences or feelings.",
       subject: "music",
       gradeBand: "5",
       frameworkRefs: [{ framework: "NCAS", code: "MU:Cn10.0.E.5a" }],
@@ -134,8 +129,7 @@ export const ncasMusic3To8: SkillGraph = {
     {
       id: "ncas.music.cn11.7",
       title: "Connect music to culture and context",
-      description:
-        "I can explain how music reflects the time, place, and culture it comes from.",
+      description: "I can explain how music reflects the time, place, and culture it comes from.",
       subject: "music",
       gradeBand: "7",
       frameworkRefs: [{ framework: "NCAS", code: "MU:Cn11.0.E.7a" }],

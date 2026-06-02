@@ -86,89 +86,59 @@
   "tutors": {
     "atlas": {
       "status": "linked",
-      "subjects": [
-        "geography"
-      ]
+      "subjects": ["geography"]
     },
     "cadence": {
       "status": "linked",
-      "subjects": [
-        "music"
-      ]
+      "subjects": ["music"]
     },
     "chrono": {
       "status": "linked",
-      "subjects": [
-        "social-studies"
-      ]
+      "subjects": ["social-studies"]
     },
     "compass": {
       "status": "linked",
-      "subjects": [
-        "executive-function",
-        "life"
-      ]
+      "subjects": ["executive-function", "life"]
     },
     "echo": {
       "status": "linked",
-      "subjects": [
-        "speech"
-      ]
+      "subjects": ["speech"]
     },
     "forge": {
       "status": "linked",
-      "subjects": [
-        "engineering"
-      ]
+      "subjects": ["engineering"]
     },
     "harmony": {
       "status": "linked",
-      "subjects": [
-        "social"
-      ]
+      "subjects": ["social"]
     },
     "lingua": {
       "status": "linked",
-      "subjects": [
-        "world-languages"
-      ]
+      "subjects": ["world-languages"]
     },
     "muse": {
       "status": "linked",
-      "subjects": [
-        "art"
-      ]
+      "subjects": ["art"]
     },
     "nova": {
       "status": "linked",
-      "subjects": [
-        "math"
-      ]
+      "subjects": ["math"]
     },
     "pixel": {
       "status": "linked",
-      "subjects": [
-        "coding"
-      ]
+      "subjects": ["coding"]
     },
     "sage": {
       "status": "linked",
-      "subjects": [
-        "reading",
-        "writing"
-      ]
+      "subjects": ["reading", "writing"]
     },
     "spark": {
       "status": "linked",
-      "subjects": [
-        "science"
-      ]
+      "subjects": ["science"]
     },
     "vigor": {
       "status": "linked",
-      "subjects": [
-        "physical-education"
-      ]
+      "subjects": ["physical-education"]
     }
   }
 }

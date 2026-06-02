@@ -75,9 +75,7 @@ export default async function TeacherLearnerDetailPage({
       <section className="grid gap-3">
         <SectionHeader title={t("active_assignments")} />
         {assignments.length === 0 ? (
-          <Card className="p-4 text-sm text-muted-foreground">
-            {t("no_active_assignments")}
-          </Card>
+          <Card className="p-4 text-sm text-muted-foreground">{t("no_active_assignments")}</Card>
         ) : (
           <ul className="grid gap-2">
             {assignments.map((a) => (
@@ -132,9 +130,7 @@ export default async function TeacherLearnerDetailPage({
       <section className="grid gap-3 mt-6">
         <SectionHeader title={t("skill_gaps")} />
         {gaps.length === 0 ? (
-          <Card className="p-4 text-sm text-muted-foreground">
-            {t("no_notable_gaps")}
-          </Card>
+          <Card className="p-4 text-sm text-muted-foreground">{t("no_notable_gaps")}</Card>
         ) : (
           <ul className="grid gap-2">
             {gaps.map((m) => {

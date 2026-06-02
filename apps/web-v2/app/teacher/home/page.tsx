@@ -12,13 +12,7 @@ import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
-import {
-  LearningHero,
-  FloatingMetricCard,
-  GlassCard,
-  InsightChip,
-  EmptyState,
-} from "@aivo/ui";
+import { LearningHero, FloatingMetricCard, GlassCard, InsightChip, EmptyState } from "@aivo/ui";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { Home, Users, ClipboardList, BarChart3, Settings } from "lucide-react";
 import {
@@ -51,8 +45,7 @@ type Insight = {
 };
 
 const TONE_TINT: Record<InsightTone, string> = {
-  warning:
-    "bg-iw-warm-soft text-[var(--aivo-status-warning)] border-[var(--aivo-status-warning)]",
+  warning: "bg-iw-warm-soft text-[var(--aivo-status-warning)] border-[var(--aivo-status-warning)]",
   primary:
     "bg-[var(--aivo-aivoPurple-50)] text-[var(--aivo-aivoPurple-700)] border-[var(--aivo-aivoPurple-100)]",
   info: "bg-iw-accent-soft text-[var(--aivo-status-info)] border-[var(--aivo-status-info)]",
@@ -64,7 +57,20 @@ const TONE_TINT: Record<InsightTone, string> = {
 // so "Ms. Vega" becomes "Vega" instead of "Ms.".
 function greetingName(displayName: string): string {
   const parts = displayName.trim().split(/\s+/);
-  const HONORIFICS = new Set(["Ms.", "Ms", "Mr.", "Mr", "Mrs.", "Mrs", "Mx.", "Mx", "Dr.", "Dr", "Prof.", "Prof"]);
+  const HONORIFICS = new Set([
+    "Ms.",
+    "Ms",
+    "Mr.",
+    "Mr",
+    "Mrs.",
+    "Mrs",
+    "Mx.",
+    "Mx",
+    "Dr.",
+    "Dr",
+    "Prof.",
+    "Prof",
+  ]);
   for (const p of parts) {
     if (!HONORIFICS.has(p)) return p;
   }
@@ -108,7 +114,16 @@ export default async function TeacherHome() {
       count: needsSupport,
       tone: "warning",
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="w-5 h-5"
+          aria-hidden="true"
+        >
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
           <polyline points="22 4 12 14.01 9 11.01" />
         </svg>
@@ -121,7 +136,16 @@ export default async function TeacherHome() {
       count: activeAssignments.length,
       tone: "primary",
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="w-5 h-5"
+          aria-hidden="true"
+        >
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
           <polyline points="14 2 14 8 20 8" />
         </svg>
@@ -134,7 +158,16 @@ export default async function TeacherHome() {
       count: dueThisWeek,
       tone: "info",
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="w-5 h-5"
+          aria-hidden="true"
+        >
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
           <line x1="16" y1="2" x2="16" y2="6" />
           <line x1="8" y1="2" x2="8" y2="6" />
@@ -149,7 +182,16 @@ export default async function TeacherHome() {
       count: iepCount,
       tone: "accent",
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="w-5 h-5"
+          aria-hidden="true"
+        >
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
       ),
@@ -177,7 +219,16 @@ export default async function TeacherHome() {
             className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
           >
             {t("open_needs_support_list")}
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M5 12h14" />
               <path d="m13 5 7 7-7 7" />
             </svg>
@@ -295,7 +346,16 @@ export default async function TeacherHome() {
                   className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
                 >
                   Open
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <svg
+                    className="w-3 h-3"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
                     <path d="M5 12h14" />
                     <path d="m13 5 7 7-7 7" />
                   </svg>

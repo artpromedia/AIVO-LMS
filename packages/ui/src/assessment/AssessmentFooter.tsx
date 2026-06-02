@@ -42,36 +42,37 @@ export function AssessmentFooter({
         {saveExit}
       </div>
       <div className="flex items-center gap-2">
-        {primary ?? (primaryLabel ? (
-          <button
-            type="submit"
-            disabled={primaryDisabled}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5",
-              "text-sm font-semibold text-white",
-              "bg-[var(--aivo-sensory-primary,#7c3aed)]",
-              "hover:brightness-110 active:brightness-95",
-              "shadow-[0_2px_6px_rgba(124,58,237,0.18)]",
-              "focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus,#7c3aed)] focus:ring-offset-2 focus:ring-offset-white",
-              "disabled:opacity-50 disabled:pointer-events-none",
-            )}
-          >
-            {primaryLabel}
-            <svg
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.25"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+        {primary ??
+          (primaryLabel ? (
+            <button
+              type="submit"
+              disabled={primaryDisabled}
+              className={cn(
+                "inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5",
+                "text-sm font-semibold text-white",
+                "bg-[var(--aivo-sensory-primary,#7c3aed)]",
+                "hover:brightness-110 active:brightness-95",
+                "shadow-[0_2px_6px_rgba(124,58,237,0.18)]",
+                "focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus,#7c3aed)] focus:ring-offset-2 focus:ring-offset-white",
+                "disabled:opacity-50 disabled:pointer-events-none",
+              )}
             >
-              <path d="M5 12h14" />
-              <path d="m13 5 7 7-7 7" />
-            </svg>
-          </button>
-        ) : null)}
+              {primaryLabel}
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14" />
+                <path d="m13 5 7 7-7 7" />
+              </svg>
+            </button>
+          ) : null)}
       </div>
     </div>
   );

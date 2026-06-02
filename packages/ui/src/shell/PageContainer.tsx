@@ -12,8 +12,7 @@
 import * as React from "react";
 import clsx from "clsx";
 
-export interface PageContainerProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+export interface PageContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /** Small label above the title (e.g. "Reading", "Class · Grade 3"). */
   eyebrow?: React.ReactNode;
   /** Main page title. Rendered as h1. */
@@ -67,21 +66,13 @@ export function PageContainer({
         {(eyebrow || title || subtitle || actions) && (
           <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="flex flex-col gap-1">
-              {eyebrow ? (
-                <p className="iw-label text-iw-text-muted">{eyebrow}</p>
-              ) : null}
+              {eyebrow ? <p className="iw-label text-iw-text-muted">{eyebrow}</p> : null}
               {title ? (
-                <h1 className="text-2xl lg:text-3xl font-semibold text-iw-text-strong">
-                  {title}
-                </h1>
+                <h1 className="text-2xl lg:text-3xl font-semibold text-iw-text-strong">{title}</h1>
               ) : null}
-              {subtitle ? (
-                <p className="text-iw-text-muted max-w-2xl">{subtitle}</p>
-              ) : null}
+              {subtitle ? <p className="text-iw-text-muted max-w-2xl">{subtitle}</p> : null}
             </div>
-            {actions ? (
-              <div className="flex flex-wrap items-center gap-2">{actions}</div>
-            ) : null}
+            {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
           </header>
         )}
         {glass ? (

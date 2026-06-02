@@ -27,11 +27,7 @@ import { ROLE_LABEL, type Role } from "@/lib/auth/types";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { RoleGate } from "@/components/auth/role-gate";
-import {
-  LEARNER_NAV,
-  PARENT_NAV,
-  TEACHER_NAV,
-} from "@/components/layout/role-shells";
+import { LEARNER_NAV, PARENT_NAV, TEACHER_NAV } from "@/components/layout/role-shells";
 
 const ALL_ROLES: Role[] = [
   "parent",

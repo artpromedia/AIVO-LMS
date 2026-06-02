@@ -16,9 +16,7 @@ export default async function ComparePage() {
   return (
     <main id="main" className="mx-auto max-w-4xl px-6 py-16">
       <p className="text-sm font-medium uppercase tracking-wide text-aivo-purple">{t("eyebrow")}</p>
-      <h1 className="mt-2 font-display text-4xl font-bold">
-        {t("heading")}
-      </h1>
+      <h1 className="mt-2 font-display text-4xl font-bold">{t("heading")}</h1>
       <p className="mt-3 text-aivo-ink-soft">
         Every learner is different and every role uses AIVO differently. Pick yours below to see the
         specific benefits, workflows, and outcomes that matter most to you.

@@ -30,27 +30,27 @@ export default async function Page() {
           subjects.map(async (s) => {
             const doms = listDomains(s.id);
             const sks = await listSkills(s.id);
-          return (
-            <Card key={s.id} className="p-[var(--aivo-density-card-pad)]">
-              <div className="flex items-center justify-between">
-                <h2 className="font-display font-semibold">{s.name}</h2>
-                <Badge tone="neutral">{sks.length} skills</Badge>
-              </div>
-              <p className="text-xs text-aivo-muted mt-1">{s.description}</p>
-              <ul className="mt-3 space-y-1 text-sm">
-                {doms.length === 0 ? (
-                  <li className="text-aivo-muted">{t("no_domains_yet")}</li>
-                ) : (
-                  doms.map((d) => (
-                    <li key={d.id} className="flex items-start justify-between gap-2">
-                      <span>{d.name}</span>
-                      <span className="text-xs text-aivo-muted">{d.description}</span>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </Card>
-          );
+            return (
+              <Card key={s.id} className="p-[var(--aivo-density-card-pad)]">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-display font-semibold">{s.name}</h2>
+                  <Badge tone="neutral">{sks.length} skills</Badge>
+                </div>
+                <p className="text-xs text-aivo-muted mt-1">{s.description}</p>
+                <ul className="mt-3 space-y-1 text-sm">
+                  {doms.length === 0 ? (
+                    <li className="text-aivo-muted">{t("no_domains_yet")}</li>
+                  ) : (
+                    doms.map((d) => (
+                      <li key={d.id} className="flex items-start justify-between gap-2">
+                        <span>{d.name}</span>
+                        <span className="text-xs text-aivo-muted">{d.description}</span>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </Card>
+            );
           }),
         )}
       </div>

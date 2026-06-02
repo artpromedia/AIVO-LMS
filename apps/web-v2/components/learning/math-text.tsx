@@ -19,9 +19,7 @@
 import katex from "katex";
 import "katex/dist/katex.min.css";
 
-type Token =
-  | { kind: "text"; value: string }
-  | { kind: "math"; value: string; display: boolean };
+type Token = { kind: "text"; value: string } | { kind: "math"; value: string; display: boolean };
 
 const PATTERN = /\$\$([^$]+?)\$\$|\$([^$\n]+?)\$/g;
 

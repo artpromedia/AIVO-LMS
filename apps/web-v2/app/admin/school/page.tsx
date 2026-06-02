@@ -8,11 +8,7 @@ import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
-import {
-  FloatingMetricCard,
-  GlassCard,
-  InsightChip,
-} from "@aivo/ui";
+import { FloatingMetricCard, GlassCard, InsightChip } from "@aivo/ui";
 import { Building2, Users, FileText, Shield, Settings } from "lucide-react";
 import { getSchoolDashboard, type SchoolDashboardSnapshot } from "@/lib/db/repos";
 
@@ -99,10 +95,7 @@ export default async function SchoolAdminHome() {
         </p>
       </header>
 
-      <section
-        className="grid grid-cols-2 md:grid-cols-4 gap-3"
-        data-testid="school-kpis"
-      >
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3" data-testid="school-kpis">
         <FloatingMetricCard
           label="Active learners"
           value={String(learners)}
@@ -257,12 +250,9 @@ export default async function SchoolAdminHome() {
       </section>
 
       {!snap && (
-        <p
-          className="mt-6 text-sm text-iw-text-muted"
-          data-testid="school-empty-state"
-        >
-          No school is associated with this session yet. Ask your district admin to
-          provision a school record.
+        <p className="mt-6 text-sm text-iw-text-muted" data-testid="school-empty-state">
+          No school is associated with this session yet. Ask your district admin to provision a
+          school record.
         </p>
       )}
     </AppShell>

@@ -36,12 +36,12 @@ later, a lesson starts ──▶ createLessonRun ──▶ getActiveCurriculumFo
 
 ## BFF routes
 
-| Method | Route | Purpose |
-| ------ | ----- | ------- |
-| `GET`    | `/api/bff/{parent,teacher}/learners/:learnerId/curriculum` | list uploads |
+| Method   | Route                                                                    | Purpose              |
+| -------- | ------------------------------------------------------------------------ | -------------------- |
+| `GET`    | `/api/bff/{parent,teacher}/learners/:learnerId/curriculum`               | list uploads         |
 | `POST`   | `/api/bff/{parent,teacher}/learners/:learnerId/curriculum/parse-preview` | parse without saving |
-| `POST`   | `/api/bff/{parent,teacher}/learners/:learnerId/curriculum` | save an active focus |
-| `DELETE` | `/api/bff/{parent,teacher}/learners/:learnerId/curriculum/:uploadId` | remove |
+| `POST`   | `/api/bff/{parent,teacher}/learners/:learnerId/curriculum`               | save an active focus |
+| `DELETE` | `/api/bff/{parent,teacher}/learners/:learnerId/curriculum/:uploadId`     | remove               |
 
 All routes go through `requireSession` + `requireRole` + `requireLearnerScope`.
 The shared handlers live in `lib/bff/curriculum.ts`.

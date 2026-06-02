@@ -133,10 +133,7 @@ const surfaceZone =
   readIfExists("apps/web-v2/components/stage/SurfaceResponseZone.ts") ??
   "";
 if (surfaceZone && !/SurfaceHost\b/.test(surfaceZone)) {
-  fail(
-    "surface-response-zone-host",
-    "SurfaceResponseZone does not render via SurfaceHost",
-  );
+  fail("surface-response-zone-host", "SurfaceResponseZone does not render via SurfaceHost");
 }
 
 // ---------------------------------------------------------------------------

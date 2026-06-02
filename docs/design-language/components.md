@@ -1,6 +1,7 @@
 # Component inventory
 
 ## Primitives
+
 - Button (`primary`, `secondary`, `ghost`, `playful`, `audio`)
 - Card, Input, Select, Checkbox, Radio, Switch
 - Badge / Chip / Tag
@@ -11,6 +12,7 @@
 - Tabs / Accordion / Stepper
 
 ## Patterns
+
 - LessonCard
 - TopicGrid
 - LearningPath

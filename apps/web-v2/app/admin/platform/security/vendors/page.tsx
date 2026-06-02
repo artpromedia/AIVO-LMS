@@ -28,9 +28,7 @@ export default async function Page() {
         description="Anyone processing learner data appears in the public subprocessor list."
       />
       <Card className="mb-6 p-[var(--aivo-density-card-pad)]">
-        <p className="mb-1 font-display text-base font-semibold">
-          {t("subprocessors_heading")}
-        </p>
+        <p className="mb-1 font-display text-base font-semibold">{t("subprocessors_heading")}</p>
         <p className="mb-3 text-xs text-aivo-muted">
           {subprocessors.length} on file · IL SOPPA + NY 2-d compliant disclosure.
         </p>

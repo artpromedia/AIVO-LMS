@@ -65,7 +65,9 @@ export default async function Page() {
           <p className="mt-1 font-display text-3xl font-bold">{warning}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("over_cap")}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            {t("over_cap")}
+          </p>
           <p className="mt-1 font-display text-3xl font-bold">{overBudget}</p>
         </Card>
       </div>

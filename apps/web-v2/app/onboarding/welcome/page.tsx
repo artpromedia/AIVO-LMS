@@ -15,9 +15,7 @@ export default function WelcomePage() {
           <h2 className="text-3xl font-semibold text-iw-text-strong leading-tight">
             {t("brand_title")}
           </h2>
-          <p className="text-sm text-iw-text-muted leading-relaxed">
-            {t("brand_body")}
-          </p>
+          <p className="text-sm text-iw-text-muted leading-relaxed">{t("brand_body")}</p>
         </div>
       }
       footer={

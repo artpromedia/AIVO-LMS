@@ -56,9 +56,7 @@ export default async function GuidesIndexPage() {
           <h1 className="mt-4 font-heading text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
             {t("heading")}
           </h1>
-          <p className="mt-3 max-w-2xl font-body text-lg text-slate-500">
-            {t("subheading")}
-          </p>
+          <p className="mt-3 max-w-2xl font-body text-lg text-slate-500">{t("subheading")}</p>
         </div>
       </section>
 

@@ -45,7 +45,10 @@ export default function ParentHomeworkScreen() {
         <EmptyState
           icon={<Ionicons name="color-wand-outline" size={48} color={palette.inkMuted} />}
           title={t("parentHomework.emptyTitle", "No homework sessions yet")}
-          message={t("parentHomework.emptyBody", "When your child uses the Homework Helper, a summary appears here.")}
+          message={t(
+            "parentHomework.emptyBody",
+            "When your child uses the Homework Helper, a summary appears here.",
+          )}
         />
       </View>
     </ResponsiveScreen>

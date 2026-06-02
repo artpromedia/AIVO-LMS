@@ -4,11 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import {
-  AuthCard,
-  AuthInput,
-  ReassuranceCard,
-} from "@aivo/ui/auth";
+import { AuthCard, AuthInput, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
@@ -49,16 +45,12 @@ export default function SignupPage() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  const canSubmit =
-    name.trim().length > 1 && /.+@.+\..+/.test(email) && password.length >= 8;
+  const canSubmit = name.trim().length > 1 && /.+@.+\..+/.test(email) && password.length >= 8;
 
   return (
     <>
       <SiteHeader />
-      <main
-        id="main"
-        className="mx-auto w-full max-w-6xl px-6 py-12 sm:py-16 lg:py-20"
-      >
+      <main id="main" className="mx-auto w-full max-w-6xl px-6 py-12 sm:py-16 lg:py-20">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-start">
           <aside className="flex flex-col gap-5">
             <AuthCard

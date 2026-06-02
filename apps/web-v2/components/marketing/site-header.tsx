@@ -7,11 +7,7 @@ import { Menu } from "lucide-react";
 import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerTrigger,
-  DrawerContent,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerTrigger, DrawerContent } from "@/components/ui/drawer";
 
 /**
  * Inclusive-Warm marketing-style top chrome for unauthenticated web-v2

@@ -17,10 +17,7 @@
       "supportsTablet": true,
       "requireFullScreen": false,
       "bundleIdentifier": "com.artpromedia.aivo",
-      "associatedDomains": [
-        "applinks:aivo.app",
-        "applinks:staging.aivo.app"
-      ],
+      "associatedDomains": ["applinks:aivo.app", "applinks:staging.aivo.app"],
       "config": {
         "usesNonExemptEncryption": false
       },

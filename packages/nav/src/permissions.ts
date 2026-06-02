@@ -326,7 +326,8 @@ const MATRIX: Matrix = {
     },
     aiTutor: {
       access: "locked",
-      lockReason: "AI Tutor sessions are private to learners. Use Reports for aggregate usage data.",
+      lockReason:
+        "AI Tutor sessions are private to learners. Use Reports for aggregate usage data.",
     },
   },
 
@@ -355,7 +356,8 @@ const MATRIX: Matrix = {
     },
     aiTutor: {
       access: "locked",
-      lockReason: "AI Tutor sessions are private to learners. District-level usage lives in Reports.",
+      lockReason:
+        "AI Tutor sessions are private to learners. District-level usage lives in Reports.",
     },
   },
 
@@ -516,9 +518,7 @@ export function getAreasForRole(role: Role, opts?: { includeLocked?: boolean }):
  * top of the sidebar / as bottom tabs on mobile.
  */
 export function getPrimaryAreas(role: Role): NavArea[] {
-  return (Object.keys(MATRIX[role]) as NavArea[]).filter(
-    (a) => MATRIX[role][a]?.access === "full",
-  );
+  return (Object.keys(MATRIX[role]) as NavArea[]).filter((a) => MATRIX[role][a]?.access === "full");
 }
 
 export { MATRIX as _MATRIX };

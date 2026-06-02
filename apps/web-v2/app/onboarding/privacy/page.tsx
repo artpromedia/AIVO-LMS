@@ -23,11 +23,7 @@ export default function PrivacyExplanationPage() {
         title={t("title")}
         subtitle={t("subtitle")}
         reassurance={
-          <ReassuranceCard
-            tone="privacy"
-            title={t("reassure_title")}
-            body={t("reassure_body")}
-          />
+          <ReassuranceCard tone="privacy" title={t("reassure_title")} body={t("reassure_body")} />
         }
         actions={
           <Link

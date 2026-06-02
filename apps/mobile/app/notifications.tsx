@@ -25,23 +25,14 @@
  * unified inbox port.
  */
 import React, { useMemo } from "react";
-import {
-  Text,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { EmptyState } from "@aivo/mobile-ui";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/hooks/useTranslation";
 import { colors, spacing } from "@/constants/colors";
-import {
-  buildMobileRoleSession,
-  getMobileNavAccess,
-  toNavRole,
-} from "@/lib/nav-access";
+import { buildMobileRoleSession, getMobileNavAccess, toNavRole } from "@/lib/nav-access";
 
 export default function NotificationsScreen() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -78,10 +69,7 @@ export default function NotificationsScreen() {
     return (
       <ScrollView
         style={styles.container}
-        contentContainerStyle={[
-          styles.center,
-          { paddingTop: insets.top + 16, paddingBottom: 32 },
-        ]}
+        contentContainerStyle={[styles.center, { paddingTop: insets.top + 16, paddingBottom: 32 }]}
       >
         <ActivityIndicator color={colors.primary} />
       </ScrollView>
@@ -101,9 +89,7 @@ export default function NotificationsScreen() {
   if (decision.outcome === "switch-role" && decision.requiredRole) {
     return screen(
       <EmptyState
-        icon={
-          <Ionicons name="swap-horizontal-outline" size={48} color={colors.textSecondary} />
-        }
+        icon={<Ionicons name="swap-horizontal-outline" size={48} color={colors.textSecondary} />}
         title="Switch role to continue"
         message={`Notifications for this area are available under your ${decision.requiredRole} role.`}
       />,
@@ -115,9 +101,7 @@ export default function NotificationsScreen() {
       <EmptyState
         icon={<Ionicons name="lock-closed-outline" size={48} color={colors.textSecondary} />}
         title="Notifications are not available"
-        message={
-          decision.lockReason ?? "Notifications are not available for your current role."
-        }
+        message={decision.lockReason ?? "Notifications are not available for your current role."}
       />,
     );
   }
@@ -125,9 +109,7 @@ export default function NotificationsScreen() {
   if (decision.outcome === "forbidden") {
     return screen(
       <EmptyState
-        icon={
-          <Ionicons name="alert-circle-outline" size={48} color={colors.textSecondary} />
-        }
+        icon={<Ionicons name="alert-circle-outline" size={48} color={colors.textSecondary} />}
         title="You don't have access"
         message="Notifications aren't available for your current account."
       />,
@@ -147,9 +129,7 @@ export default function NotificationsScreen() {
       <Text style={styles.title}>{t("caregiverNotifications.title")}</Text>
       <Text style={styles.subtitle}>{t("caregiverNotifications.subtitle")}</Text>
       <EmptyState
-        icon={
-          <Ionicons name="notifications-outline" size={48} color={colors.textSecondary} />
-        }
+        icon={<Ionicons name="notifications-outline" size={48} color={colors.textSecondary} />}
         title={t("caregiverNotifications.noNotificationsTitle")}
         message={t("caregiverNotifications.noNotificationsMessage")}
       />

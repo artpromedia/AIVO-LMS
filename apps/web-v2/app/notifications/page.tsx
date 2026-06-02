@@ -27,15 +27,8 @@ import { ROLE_LABEL, type Role } from "@/lib/auth/types";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { RoleGate } from "@/components/auth/role-gate";
-import {
-  LEARNER_NAV,
-  PARENT_NAV,
-  TEACHER_NAV,
-} from "@/components/layout/role-shells";
-import {
-  getNotificationPreference,
-  listNotifications,
-} from "@/lib/db/repos";
+import { LEARNER_NAV, PARENT_NAV, TEACHER_NAV } from "@/components/layout/role-shells";
+import { getNotificationPreference, listNotifications } from "@/lib/db/repos";
 import { ParentNotificationList } from "./_components/parent-notification-list";
 import { ParentPreferencesForm } from "./_components/parent-preferences-form";
 import { LearnerNotificationsList } from "./_components/learner-notifications-list";
@@ -126,21 +119,15 @@ async function ParentView({
   ).length;
   const urgentCount = notifications.filter(
     (n) =>
-      n.type.includes("safety") ||
-      n.type.includes("payment_failed") ||
-      n.type.includes("urgent"),
+      n.type.includes("safety") || n.type.includes("payment_failed") || n.type.includes("urgent"),
   ).length;
 
   return (
     <>
       <header className="flex flex-col gap-2 mb-6">
         <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
-        <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
-          {t("title")}
-        </h1>
-        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
-          {t("description")}
-        </p>
+        <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">{t("title")}</h1>
+        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">{t("description")}</p>
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-3 gap-3">

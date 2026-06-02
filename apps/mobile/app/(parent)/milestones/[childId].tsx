@@ -88,7 +88,9 @@ export default function MilestonesScreen() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("parentMilestones.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {t("parentMilestones.title")}
+      </Text>
 
       {streak ? (
         <View style={styles.streakRow}>

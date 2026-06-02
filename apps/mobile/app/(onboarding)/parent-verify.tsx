@@ -22,7 +22,10 @@ export default function ParentVerifyScreen() {
     <OnboardingScaffold
       eyebrow={t("onboarding.verify.eyebrow", "Verify it's you")}
       title={t("onboarding.verify.title", "Enter your code")}
-      subtitle={t("onboarding.verify.subtitle", "We sent a 6-digit code to your email. Enter it to continue.")}
+      subtitle={t(
+        "onboarding.verify.subtitle",
+        "We sent a 6-digit code to your email. Enter it to continue.",
+      )}
       onBack={() => router.back()}
       footer={
         <Button
@@ -34,7 +37,9 @@ export default function ParentVerifyScreen() {
         />
       }
     >
-      <View style={[styles.codeBox, { borderColor: palette.border, backgroundColor: palette.bgRaised }]}>
+      <View
+        style={[styles.codeBox, { borderColor: palette.border, backgroundColor: palette.bgRaised }]}
+      >
         <Ionicons name="mail-open-outline" size={22} color={palette.primary} />
         <TextInput
           value={code}
@@ -54,7 +59,20 @@ export default function ParentVerifyScreen() {
 }
 
 const styles = StyleSheet.create({
-  codeBox: { flexDirection: "row", alignItems: "center", gap: spacing.sm, paddingHorizontal: spacing.md, height: 56, borderWidth: 1.5, borderRadius: radius.lg },
+  codeBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    height: 56,
+    borderWidth: 1.5,
+    borderRadius: radius.lg,
+  },
   codeInput: { flex: 1, fontSize: 24, letterSpacing: 8, fontFamily: fontFamilies.displayBold },
-  resend: { fontSize: 14, fontFamily: fontFamilies.bodyBold, textAlign: "center", marginTop: spacing.md },
+  resend: {
+    fontSize: 14,
+    fontFamily: fontFamilies.bodyBold,
+    textAlign: "center",
+    marginTop: spacing.md,
+  },
 });

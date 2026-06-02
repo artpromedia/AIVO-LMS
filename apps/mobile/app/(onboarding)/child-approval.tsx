@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router, type Href } from "expo-router";
+import { router } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { OnboardingScaffold } from "@/src/components/onboarding/OnboardingScaffold";
 import { Card, Button } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -22,7 +22,10 @@ export default function ChildApprovalScreen() {
     <OnboardingScaffold
       eyebrow={t("onboarding.approve.eyebrow", "Almost there")}
       title={t("onboarding.approve.title", "Approve your child's account")}
-      subtitle={t("onboarding.approve.subtitle", "As the parent or guardian, you approve this account and consent on your child's behalf.")}
+      subtitle={t(
+        "onboarding.approve.subtitle",
+        "As the parent or guardian, you approve this account and consent on your child's behalf.",
+      )}
       onBack={() => router.back()}
       footer={
         <>

@@ -56,55 +56,52 @@ const VARIANT: Record<
   },
 };
 
-export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  function Skeleton(
-    { variant = "line", width, height, lines = 1, className, style, ...rest },
-    ref
-  ) {
-    const { className: variantClass, defaultStyle } = VARIANT[variant];
-    const merged: React.CSSProperties = {
-      ...defaultStyle,
-      ...(width != null ? { width } : null),
-      ...(height != null ? { height } : null),
-      ...style,
-    };
+export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(function Skeleton(
+  { variant = "line", width, height, lines = 1, className, style, ...rest },
+  ref,
+) {
+  const { className: variantClass, defaultStyle } = VARIANT[variant];
+  const merged: React.CSSProperties = {
+    ...defaultStyle,
+    ...(width != null ? { width } : null),
+    ...(height != null ? { height } : null),
+    ...style,
+  };
 
-    if (variant === "line" && lines > 1) {
-      return (
-        <div
-          ref={ref}
-          role="status"
-          aria-busy="true"
-          aria-label="Loading"
-          className={cn("flex flex-col gap-2", className)}
-          {...rest}
-        >
-          {Array.from({ length: lines }).map((_, i) => (
-            <span
-              key={i}
-              className={cn(BASE, variantClass)}
-              style={{
-                ...merged,
-                width:
-                  i === lines - 1 ? "60%" : (merged.width as React.CSSProperties["width"]),
-              }}
-            />
-          ))}
-        </div>
-      );
-    }
-
+  if (variant === "line" && lines > 1) {
     return (
       <div
         ref={ref}
         role="status"
         aria-busy="true"
         aria-label="Loading"
+        className={cn("flex flex-col gap-2", className)}
         {...rest}
-        style={merged}
-        className={cn(BASE, variantClass, "block", className)}
-      />
+      >
+        {Array.from({ length: lines }).map((_, i) => (
+          <span
+            key={i}
+            className={cn(BASE, variantClass)}
+            style={{
+              ...merged,
+              width: i === lines - 1 ? "60%" : (merged.width as React.CSSProperties["width"]),
+            }}
+          />
+        ))}
+      </div>
     );
   }
-);
+
+  return (
+    <div
+      ref={ref}
+      role="status"
+      aria-busy="true"
+      aria-label="Loading"
+      {...rest}
+      style={merged}
+      className={cn(BASE, variantClass, "block", className)}
+    />
+  );
+});
 Skeleton.displayName = "States/Skeleton";

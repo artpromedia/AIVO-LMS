@@ -74,19 +74,22 @@ export function PracticeCard({
             ribbon.class,
           )}
         >
-          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            className="w-3 h-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <circle cx="12" cy="12" r="9" />
-            {kind === "graded" ? (
-              <path d="m9 12 2 2 4-4" />
-            ) : (
-              <path d="M12 7v6m0 3v.01" />
-            )}
+            {kind === "graded" ? <path d="m9 12 2 2 4-4" /> : <path d="M12 7v6m0 3v.01" />}
           </svg>
           {ribbon.label}
         </span>
-        {subtitle ? (
-          <p className="text-xs text-iw-text-muted">{subtitle}</p>
-        ) : null}
+        {subtitle ? <p className="text-xs text-iw-text-muted">{subtitle}</p> : null}
       </header>
       <h3 className="text-xl md:text-2xl font-semibold text-iw-text-strong leading-snug">
         {prompt}

@@ -1,4 +1,8 @@
-import { findSkillsByTopic, getPrerequisitesFor, getStandardsFor } from "../../services/skill-graph-store.js";
+import {
+  findSkillsByTopic,
+  getPrerequisitesFor,
+  getStandardsFor,
+} from "../../services/skill-graph-store.js";
 import { buildProfileAdaptations } from "../../services/profile-adaptations.js";
 import type {
   AdaptDirective,
@@ -105,7 +109,9 @@ export class StemEngineeringBrain implements SubjectBrain {
       mastery: correctness,
       confidence: 0.6,
       feedback:
-        correctness >= 0.7 ? "Right — that's the change that helps." : "Look at what changed when it failed and try again.",
+        correctness >= 0.7
+          ? "Right — that's the change that helps."
+          : "Look at what changed when it failed and try again.",
     };
   }
 

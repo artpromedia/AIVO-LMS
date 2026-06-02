@@ -67,10 +67,9 @@ describe("AAC target → SwitchScanController integration", () => {
   });
 
   it("activating a 2-switch session reports method=switch_2", () => {
-    const ctrl = new SwitchScanController(
-      { ...baseConfig, method: "switch_2" },
-      [targetToSymbol("x", "X", 0)],
-    );
+    const ctrl = new SwitchScanController({ ...baseConfig, method: "switch_2" }, [
+      targetToSymbol("x", "X", 0),
+    ]);
     expect(ctrl.activate().method).toBe("switch_2");
   });
 

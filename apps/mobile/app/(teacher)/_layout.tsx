@@ -90,11 +90,11 @@ export default function TeacherLayout() {
         <Tabs.Screen name="student/[id]/iep" options={{ href: null }} />
         <Tabs.Screen name="learners" options={{ href: null }} />
         <Tabs.Screen name="insights" options={{ href: null }} />
-      <Tabs.Screen name="classes/index" options={{ href: null }} />
-      <Tabs.Screen name="classes/[classId]" options={{ href: null }} />
-      <Tabs.Screen name="assignments/index" options={{ href: null }} />
-      <Tabs.Screen name="assignments/new" options={{ href: null }} />
-      <Tabs.Screen name="curriculum/[id]" options={{ href: null }} />
+        <Tabs.Screen name="classes/index" options={{ href: null }} />
+        <Tabs.Screen name="classes/[classId]" options={{ href: null }} />
+        <Tabs.Screen name="assignments/index" options={{ href: null }} />
+        <Tabs.Screen name="assignments/new" options={{ href: null }} />
+        <Tabs.Screen name="curriculum/[id]" options={{ href: null }} />
       </Tabs>
     </RoleTabletShell>
   );

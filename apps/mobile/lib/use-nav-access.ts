@@ -41,12 +41,5 @@ export function useNavAccess(input: UseNavAccessInput): AccessDecision | null {
       capabilities: input.capabilities,
     });
     return getMobileNavAccess(session, input.area);
-  }, [
-    activeRole,
-    availableRoles,
-    input.area,
-    input.userId,
-    input.tenantId,
-    input.capabilities,
-  ]);
+  }, [activeRole, availableRoles, input.area, input.userId, input.tenantId, input.capabilities]);
 }

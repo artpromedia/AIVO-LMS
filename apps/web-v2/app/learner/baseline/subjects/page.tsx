@@ -3,10 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { Button } from "@/components/ui/button";
-import {
-  LearnerBaselineShell,
-  PersonalizationChip,
-} from "@aivo/ui";
+import { LearnerBaselineShell, PersonalizationChip } from "@aivo/ui";
 import {
   createBaseline,
   getActiveBaselineForLearner,
@@ -61,8 +58,10 @@ export default async function BaselineSubjectsPage({
   if (!session.learnerId) redirect("/learner/home");
   const subjects = await listSubjects();
   const focusSubjects =
-    ((await await getOrCreateParentAssessment(session.learnerId, session.tenantId)).answers
-      .grade_subject as { focusSubjects?: string[] } | undefined)?.focusSubjects ?? [];
+    (
+      (await await getOrCreateParentAssessment(session.learnerId, session.tenantId)).answers
+        .grade_subject as { focusSubjects?: string[] } | undefined
+    )?.focusSubjects ?? [];
 
   // Highlight focus subjects from the parent assessment with a tag.
   const focusSet = new Set(focusSubjects.map((s) => s.toLowerCase()));
@@ -74,7 +73,16 @@ export default async function BaselineSubjectsPage({
           href="/learner/baseline/why"
           className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <path d="M19 12H5" />
             <path d="m12 19-7-7 7-7" />
           </svg>
@@ -88,9 +96,7 @@ export default async function BaselineSubjectsPage({
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-snug">
           {t("subjects.title")}
         </h1>
-        <p className="text-base text-iw-text-muted max-w-2xl">
-          {t("subjects.body")}
-        </p>
+        <p className="text-base text-iw-text-muted max-w-2xl">{t("subjects.body")}</p>
       </section>
 
       {sp.error === "pick_one" ? (
@@ -173,12 +179,19 @@ export default async function BaselineSubjectsPage({
         </fieldset>
 
         <div className="flex items-center justify-between gap-3 pt-2 flex-wrap">
-          <p className="text-xs text-iw-text-muted">
-            {t("subjects.picked_note")}
-          </p>
+          <p className="text-xs text-iw-text-muted">{t("subjects.picked_note")}</p>
           <Button type="submit" size="lg">
             {t("subjects.get_ready")}
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M5 12h14" />
               <path d="m13 5 7 7-7 7" />
             </svg>

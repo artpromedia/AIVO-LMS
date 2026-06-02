@@ -36,7 +36,6 @@ function coerceRole(value: unknown): TenantRole | undefined {
 }
 
 declare module "fastify" {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface FastifyRequest {
     enterpriseContext?: RequestContext;
   }

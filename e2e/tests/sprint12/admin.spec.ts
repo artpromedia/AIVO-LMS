@@ -64,7 +64,9 @@ test.describe("admin golden paths", () => {
     test.skip(!admin, "school admin seed failed");
     const ctx = await test.info().attach;
     // bff() helper unwraps json — go direct so we can inspect headers.
-    const apiCtx = await (await import("@playwright/test")).request.newContext({ baseURL: WEB_BASE });
+    const apiCtx = await (
+      await import("@playwright/test")
+    ).request.newContext({ baseURL: WEB_BASE });
     const res = await apiCtx.get(`/api/bff/admin/school/report?format=csv`, {
       headers: { authorization: `Bearer ${admin!.accessToken}` },
       failOnStatusCode: false,

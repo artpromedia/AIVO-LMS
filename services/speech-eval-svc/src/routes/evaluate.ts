@@ -71,130 +71,134 @@ function isMockMode(): boolean {
 }
 
 export function registerEvaluateRoute(app: FastifyInstance) {
-  app.post("/api/speech-eval/evaluate", {
-    schema: {
-      tags: ["SpeechEval"],
-      operationId: "speechEvalEvaluate",
-      summary: "Evaluate a learner voice recording",
-      description:
-        "Accepts multipart audio + target text + language. " +
-        "When SPEECH_EVAL_MODE=mock (default) returns realistic mock scores with degraded:true.",
-      // multipart bodies are parsed by @fastify/multipart; JSON schema only
-      // describes the response so the swagger UI is informative.
-      response: {
-        200: {
-          type: "object",
-          required: ["transcript", "scores", "degraded", "language"],
-          additionalProperties: true,
-          properties: {
-            transcript: { type: "string" },
-            scores: {
-              type: "object",
-              required: ["pronunciation", "fluency"],
-              additionalProperties: true,
-              properties: {
-                pronunciation: { type: "number" },
-                fluency: { type: "number" },
-                perWord: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    required: ["word", "score"],
-                    properties: {
-                      word: { type: "string" },
-                      score: { type: "number" },
+  app.post(
+    "/api/speech-eval/evaluate",
+    {
+      schema: {
+        tags: ["SpeechEval"],
+        operationId: "speechEvalEvaluate",
+        summary: "Evaluate a learner voice recording",
+        description:
+          "Accepts multipart audio + target text + language. " +
+          "When SPEECH_EVAL_MODE=mock (default) returns realistic mock scores with degraded:true.",
+        // multipart bodies are parsed by @fastify/multipart; JSON schema only
+        // describes the response so the swagger UI is informative.
+        response: {
+          200: {
+            type: "object",
+            required: ["transcript", "scores", "degraded", "language"],
+            additionalProperties: true,
+            properties: {
+              transcript: { type: "string" },
+              scores: {
+                type: "object",
+                required: ["pronunciation", "fluency"],
+                additionalProperties: true,
+                properties: {
+                  pronunciation: { type: "number" },
+                  fluency: { type: "number" },
+                  perWord: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      required: ["word", "score"],
+                      properties: {
+                        word: { type: "string" },
+                        score: { type: "number" },
+                      },
                     },
                   },
                 },
               },
+              degraded: { type: "boolean" },
+              language: { type: "string" },
+              durationMs: { type: "number" },
             },
-            degraded: { type: "boolean" },
-            language: { type: "string" },
-            durationMs: { type: "number" },
           },
-        },
-        400: {
-          type: "object",
-          required: ["error"],
-          additionalProperties: true,
-          properties: { error: { type: "string" } },
-        },
-        503: {
-          type: "object",
-          required: ["error"],
-          additionalProperties: true,
-          properties: { error: { type: "string" }, degraded: { type: "boolean" } },
+          400: {
+            type: "object",
+            required: ["error"],
+            additionalProperties: true,
+            properties: { error: { type: "string" } },
+          },
+          503: {
+            type: "object",
+            required: ["error"],
+            additionalProperties: true,
+            properties: { error: { type: "string" }, degraded: { type: "boolean" } },
+          },
         },
       },
     },
-  }, async (request, reply) => {
-    // Parse multipart parts
-    let audioPart: MultipartFile | undefined;
-    let targetText = "";
-    let language = "en-US";
+    async (request, reply) => {
+      // Parse multipart parts
+      let audioPart: MultipartFile | undefined;
+      let targetText = "";
+      let language = "en-US";
 
-    try {
-      const parts = (request as any).parts() as AsyncIterable<
-        MultipartFile | { type: "field"; fieldname: string; value: string }
-      >;
-      for await (const part of parts) {
-        if ("file" in part) {
-          audioPart = part as MultipartFile;
-          // Drain the stream so the upload completes
-          const chunks: Buffer[] = [];
-          for await (const chunk of audioPart.file) {
-            chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      try {
+        const parts = (request as any).parts() as AsyncIterable<
+          MultipartFile | { type: "field"; fieldname: string; value: string }
+        >;
+        for await (const part of parts) {
+          if ("file" in part) {
+            audioPart = part as MultipartFile;
+            // Drain the stream so the upload completes
+            const chunks: Buffer[] = [];
+            for await (const chunk of audioPart.file) {
+              chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+            }
+            // attach buffer so live path can use it later
+            (audioPart as any)._buf = Buffer.concat(chunks);
+          } else {
+            const field = part as { type: "field"; fieldname: string; value: string };
+            if (field.fieldname === "targetText") targetText = String(field.value ?? "");
+            if (field.fieldname === "language") language = String(field.value ?? "en-US");
           }
-          // attach buffer so live path can use it later
-          (audioPart as any)._buf = Buffer.concat(chunks);
-        } else {
-          const field = part as { type: "field"; fieldname: string; value: string };
-          if (field.fieldname === "targetText") targetText = String(field.value ?? "");
-          if (field.fieldname === "language") language = String(field.value ?? "en-US");
         }
+      } catch (err: any) {
+        return reply.code(400).send({ error: `multipart parse error: ${err?.message ?? err}` });
       }
-    } catch (err: any) {
-      return reply.code(400).send({ error: `multipart parse error: ${err?.message ?? err}` });
-    }
 
-    if (!audioPart) {
-      return reply.code(400).send({ error: "Missing required field: audio" });
-    }
-    if (!targetText.trim()) {
-      return reply.code(400).send({ error: "Missing required field: targetText" });
-    }
+      if (!audioPart) {
+        return reply.code(400).send({ error: "Missing required field: audio" });
+      }
+      if (!targetText.trim()) {
+        return reply.code(400).send({ error: "Missing required field: targetText" });
+      }
 
-    if (isMockMode()) {
-      const result = buildMockResult(targetText, language);
-      return reply.send(result);
-    }
+      if (isMockMode()) {
+        const result = buildMockResult(targetText, language);
+        return reply.send(result);
+      }
 
-    // ── Live path (Sprint F — completion plan) ─────────────────────────────
-    // Selects an ASR provider via env (ASR_PROVIDER=openai|azure). When
-    // no provider is configured the route falls back to the mock scorer
-    // rather than 503-ing — lessons advance under network failure.
-    const provider = getAsrProvider();
-    const audioBuf = (audioPart as { _buf?: Buffer })._buf ?? Buffer.alloc(0);
-    const asrResult = await provider.transcribe({
-      audio: audioBuf,
-      mimetype: audioPart.mimetype || "application/octet-stream",
-      filename: audioPart.filename,
-      language,
-    });
+      // ── Live path (Sprint F — completion plan) ─────────────────────────────
+      // Selects an ASR provider via env (ASR_PROVIDER=openai|azure). When
+      // no provider is configured the route falls back to the mock scorer
+      // rather than 503-ing — lessons advance under network failure.
+      const provider = getAsrProvider();
+      const audioBuf = (audioPart as { _buf?: Buffer })._buf ?? Buffer.alloc(0);
+      const asrResult = await provider.transcribe({
+        audio: audioBuf,
+        mimetype: audioPart.mimetype || "application/octet-stream",
+        filename: audioPart.filename,
+        language,
+      });
 
-    if (asrResult.status === "ok") {
-      const result = scoreAgainstTarget(asrResult.transcript, targetText);
-      return reply.send(result);
-    }
+      if (asrResult.status === "ok") {
+        const result = scoreAgainstTarget(asrResult.transcript, targetText);
+        return reply.send(result);
+      }
 
-    // Provider unavailable — log the reason and fall back to mock scores
-    // so learner flow never blocks on infrastructure.
-    request.log.warn(
-      { provider: asrResult.provider, reason: asrResult.reason },
-      "ASR provider unavailable; falling back to mock scorer",
-    );
-    return reply.send(buildMockResult(targetText, language));
-  });
+      // Provider unavailable — log the reason and fall back to mock scores
+      // so learner flow never blocks on infrastructure.
+      request.log.warn(
+        { provider: asrResult.provider, reason: asrResult.reason },
+        "ASR provider unavailable; falling back to mock scorer",
+      );
+      return reply.send(buildMockResult(targetText, language));
+    },
+  );
 }
 
 // ── Live scorer: align ASR transcript against the target text ───────────────

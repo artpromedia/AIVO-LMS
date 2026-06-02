@@ -22,12 +22,10 @@ export function PwaRegister() {
 
     // Register on load to avoid competing with the first paint.
     const onLoad = () => {
-      navigator.serviceWorker
-        .register("/sw.js", { scope: "/" })
-        .catch(() => {
-          // SW registration is a progressive enhancement; failures here
-          // are non-fatal and the app should keep working online.
-        });
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {
+        // SW registration is a progressive enhancement; failures here
+        // are non-fatal and the app should keep working online.
+      });
     };
 
     // Sprint 1.3 — when the SW asks the page to flush queued telemetry

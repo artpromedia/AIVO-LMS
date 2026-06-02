@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  isRoleAwareNotificationPayload,
-  withTargetRole,
-} from "../notifications-contract.js";
+import { isRoleAwareNotificationPayload, withTargetRole } from "../notifications-contract.js";
 import { resolveDeepLink } from "../deep-links.js";
 import type { RoleSession } from "../session.js";
 
@@ -51,9 +48,7 @@ describe("isRoleAwareNotificationPayload", () => {
   });
 
   it("rejects payloads with the wrong type for href", () => {
-    expect(
-      isRoleAwareNotificationPayload({ ...valid, href: 123 }),
-    ).toBe(false);
+    expect(isRoleAwareNotificationPayload({ ...valid, href: 123 })).toBe(false);
   });
 
   it("rejects non-object inputs", () => {
@@ -65,21 +60,14 @@ describe("isRoleAwareNotificationPayload", () => {
 
 describe("withTargetRole", () => {
   it("stamps the target role onto a legacy payload", () => {
-    const stamped = withTargetRole(
-      { href: "/parent/consent", title: "t", body: "b" },
-      "parent",
-    );
+    const stamped = withTargetRole({ href: "/parent/consent", title: "t", body: "b" }, "parent");
     expect(stamped.targetRole).toBe("parent");
     expect(stamped.href).toBe("/parent/consent");
     expect(stamped.targetLearnerId).toBeUndefined();
   });
 
   it("includes targetLearnerId when provided", () => {
-    const stamped = withTargetRole(
-      { href: "/learner/1/goals" },
-      "therapist",
-      "l-1",
-    );
+    const stamped = withTargetRole({ href: "/learner/1/goals" }, "therapist", "l-1");
     expect(stamped.targetRole).toBe("therapist");
     expect(stamped.targetLearnerId).toBe("l-1");
   });
@@ -87,10 +75,7 @@ describe("withTargetRole", () => {
 
 describe("integration: notification → resolveDeepLink", () => {
   it("a teacher who is also a parent gets routed via /role-switch when tapping a parent-targeted push", () => {
-    const payload = withTargetRole(
-      { href: "/parent/consent" },
-      "parent",
-    );
+    const payload = withTargetRole({ href: "/parent/consent" }, "parent");
     const decision = resolveDeepLink(payload.href, session());
     // teacher's approvals is `linked` → allow, so the test sanity-checks
     // that the targetRole differs from activeRole and the resolver

@@ -115,9 +115,8 @@ export async function onboardingSignInAction(formData: FormData): Promise<void> 
   if (result.kind === "mfa") {
     // Hand the challenge to the canonical /login/mfa screen via the same
     // short-lived httpOnly cookie it expects.
-    const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } = await import(
-      "@/lib/auth/mfa-cookies"
-    );
+    const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } =
+      await import("@/lib/auth/mfa-cookies");
     const jar = await cookies();
     jar.set(
       MFA_CHALLENGE_COOKIE,

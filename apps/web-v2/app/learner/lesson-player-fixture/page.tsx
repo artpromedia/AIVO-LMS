@@ -152,9 +152,7 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
   const session = await requirePageRole(["learner", "parent"]);
   const params = await searchParams;
   const requested = params?.surfaceType;
-  const surfaceType: FixtureSurfaceType = FIXTURE_SURFACE_TYPES.has(
-    requested as FixtureSurfaceType,
-  )
+  const surfaceType: FixtureSurfaceType = FIXTURE_SURFACE_TYPES.has(requested as FixtureSurfaceType)
     ? (requested as FixtureSurfaceType)
     : "choice_grid";
 

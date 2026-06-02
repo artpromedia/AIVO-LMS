@@ -99,7 +99,10 @@ export function normalizeFunctioningLevel(raw: string | null | undefined): Tutor
  */
 export function normalizeGradeBand(raw: string | null | undefined): GradeBand | undefined {
   if (!raw) return undefined;
-  const cleaned = raw.trim().toUpperCase().replace(/[-_\s]/g, "_");
+  const cleaned = raw
+    .trim()
+    .toUpperCase()
+    .replace(/[-_\s]/g, "_");
   if ((GRADE_BANDS as readonly string[]).includes(cleaned)) return cleaned as GradeBand;
   if (cleaned === "KINDERGARTEN" || cleaned === "PREK") {
     return cleaned === "PREK" ? "PRE_K" : "K";

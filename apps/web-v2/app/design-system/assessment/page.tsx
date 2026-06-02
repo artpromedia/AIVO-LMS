@@ -49,9 +49,9 @@ export default function AssessmentDesignSystemPage() {
             Assessment & IEP primitives
           </h1>
           <p className="text-iw-text-muted max-w-2xl leading-relaxed">
-            Calm, soft-glass building blocks for the parent assessment and IEP
-            upload flow. Every primitive ships with default / hover / focus /
-            disabled / loading / error / empty states.
+            Calm, soft-glass building blocks for the parent assessment and IEP upload flow. Every
+            primitive ships with default / hover / focus / disabled / loading / error / empty
+            states.
           </p>
           <nav className="flex flex-wrap gap-2 mt-2">
             <Link
@@ -90,12 +90,7 @@ export default function AssessmentDesignSystemPage() {
               />
             </div>
             <div className="rounded-iw-card-lg border border-iw-border bg-white p-4">
-              <AssessmentProgress
-                total={11}
-                current={10}
-                label="Concerns"
-                hint="Almost done."
-              />
+              <AssessmentProgress total={11} current={10} label="Concerns" hint="Almost done." />
             </div>
           </div>
         </section>

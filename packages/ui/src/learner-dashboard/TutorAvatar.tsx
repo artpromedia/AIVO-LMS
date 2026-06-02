@@ -14,13 +14,7 @@ import { cn } from "../utils/cn.js";
  * 3D character asset later). The component centers and scales it.
  */
 export type TutorAvatarSize = "sm" | "md" | "lg" | "xl";
-export type TutorAvatarTone =
-  | "lavender"
-  | "mint"
-  | "peach"
-  | "coral"
-  | "sunshine"
-  | "sky";
+export type TutorAvatarTone = "lavender" | "mint" | "peach" | "coral" | "sunshine" | "sky";
 
 export interface TutorAvatarProps {
   glyph: React.ReactNode;

@@ -27,12 +27,10 @@ export interface SectionCardProps {
 
 const BADGE_TONE: Record<NonNullable<SectionCardProps["badgeTone"]>, string> = {
   neutral: "bg-iw-card text-iw-text-muted border border-iw-border",
-  info:
-    "bg-[var(--aivo-aivoTeal-100)] text-[var(--aivo-aivoTeal-700)]",
+  info: "bg-[var(--aivo-aivoTeal-100)] text-[var(--aivo-aivoTeal-700)]",
   success:
     "bg-[var(--aivo-domain-completion-complete-subtle)] text-[var(--aivo-domain-completion-complete-strong)]",
-  warning:
-    "bg-iw-warm-soft text-[var(--aivo-status-warning)]",
+  warning: "bg-iw-warm-soft text-[var(--aivo-status-warning)]",
 };
 
 export function SectionCard({
@@ -62,9 +60,7 @@ export function SectionCard({
         ) : null}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-base sm:text-lg font-semibold text-iw-text-strong">
-              {title}
-            </h3>
+            <h3 className="text-base sm:text-lg font-semibold text-iw-text-strong">{title}</h3>
             {badge ? (
               <span
                 className={[
@@ -76,9 +72,7 @@ export function SectionCard({
               </span>
             ) : null}
           </div>
-          {subtitle ? (
-            <p className="text-sm text-iw-text-muted mt-1">{subtitle}</p>
-          ) : null}
+          {subtitle ? <p className="text-sm text-iw-text-muted mt-1">{subtitle}</p> : null}
         </div>
       </header>
 

@@ -95,9 +95,7 @@ export function holidayPrepToFocus(
     keywords: [...strList(prep.review_vocabulary), ...strList(prep.preview_vocabulary)],
     standards: [...strList(prep.review_standards), ...strList(prep.preview_standards)],
     skills: previewTopics,
-    summary: summaryParts.length
-      ? `School's on a break — ${summaryParts.join(", and ")}.`
-      : title,
+    summary: summaryParts.length ? `School's on a break — ${summaryParts.join(", and ")}.` : title,
     confidence: 1,
     mode: "holiday_prep",
   };
@@ -122,9 +120,7 @@ export function weekToFocus(week: PacingWeek | null, subject: string): Curriculu
     keywords: strList(week.vocabulary),
     standards: strList(week.standards),
     skills: objectives,
-    summary: topics.length
-      ? `This week's school plan: ${topics.slice(0, 3).join("; ")}.`
-      : title,
+    summary: topics.length ? `This week's school plan: ${topics.slice(0, 3).join("; ")}.` : title,
     // District-aligned pacing is authoritative, not an AI guess.
     confidence: 1,
     mode: "school_sync",

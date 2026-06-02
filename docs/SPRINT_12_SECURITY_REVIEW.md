@@ -22,23 +22,23 @@ Checklist (OWASP top 10 + AIVO-specific concerns):
 Every new BFF route in `apps/web-v2/app/api/bff/*` calls
 `requireSession` followed by `requireRole`. The role sets are:
 
-| Route | Allowed roles |
-|---|---|
-| `/api/bff/admin/school/dashboard` | `ADMIN_ROLES` (platform / district / school) |
-| `/api/bff/admin/school/report` | `ADMIN_ROLES` |
-| `/api/bff/admin/school/classes` | `ADMIN_ROLES` |
-| `/api/bff/admin/school/staff` | `ADMIN_ROLES` |
-| `/api/bff/admin/feature-flags` | `ADMIN_ROLES` |
-| `/api/bff/admin/baseline-metrics` | `ADMIN_ROLES` |
-| `/api/bff/therapist/caseload` | `["therapist"]` (strict) |
-| `/api/bff/therapist/goals` (GET) | `["therapist", "teacher"]` |
-| `/api/bff/therapist/goals` (POST) | `["therapist", "teacher"]` |
-| `/api/bff/therapist/sessions` (GET) | `["therapist", "parent"]` |
-| `/api/bff/therapist/sessions` (POST) | `["therapist"]` (write strict) |
-| `/api/bff/caregiver/observations` (GET) | `["caregiver", "parent", "therapist", "teacher"]` |
-| `/api/bff/caregiver/observations` (POST) | `["caregiver"]` (write strict) |
-| `/api/bff/teacher/iep-drafts` | `["teacher", "school_admin", "district_admin"]` |
-| `/api/bff/teacher/gradebook` | `["teacher", "school_admin", "district_admin"]` + roster check |
+| Route                                    | Allowed roles                                                  |
+| ---------------------------------------- | -------------------------------------------------------------- |
+| `/api/bff/admin/school/dashboard`        | `ADMIN_ROLES` (platform / district / school)                   |
+| `/api/bff/admin/school/report`           | `ADMIN_ROLES`                                                  |
+| `/api/bff/admin/school/classes`          | `ADMIN_ROLES`                                                  |
+| `/api/bff/admin/school/staff`            | `ADMIN_ROLES`                                                  |
+| `/api/bff/admin/feature-flags`           | `ADMIN_ROLES`                                                  |
+| `/api/bff/admin/baseline-metrics`        | `ADMIN_ROLES`                                                  |
+| `/api/bff/therapist/caseload`            | `["therapist"]` (strict)                                       |
+| `/api/bff/therapist/goals` (GET)         | `["therapist", "teacher"]`                                     |
+| `/api/bff/therapist/goals` (POST)        | `["therapist", "teacher"]`                                     |
+| `/api/bff/therapist/sessions` (GET)      | `["therapist", "parent"]`                                      |
+| `/api/bff/therapist/sessions` (POST)     | `["therapist"]` (write strict)                                 |
+| `/api/bff/caregiver/observations` (GET)  | `["caregiver", "parent", "therapist", "teacher"]`              |
+| `/api/bff/caregiver/observations` (POST) | `["caregiver"]` (write strict)                                 |
+| `/api/bff/teacher/iep-drafts`            | `["teacher", "school_admin", "district_admin"]`                |
+| `/api/bff/teacher/gradebook`             | `["teacher", "school_admin", "district_admin"]` + roster check |
 
 Confirmed by grep: zero new route files match the regex
 `export async function (GET|POST|DELETE)` without a matching
@@ -102,7 +102,7 @@ learner or guardian:
    failures trigger one repair retry, then either partial-success
    salvage (baseline) or a 502 (IEP draft).
 2. **Responsible-AI gate** — `services/assessment-svc/src/services/
-   baseline-safety-gate.ts` calls `@aivo/responsible-ai-svc` on every
+baseline-safety-gate.ts` calls `@aivo/responsible-ai-svc` on every
    generated item. Blocked items are SWAPPED with curated fallback
    bank items (Sprint 3), with the verdict persisted to
    `baseline_item_audits`.
@@ -145,7 +145,7 @@ here.
   prompt's strict schema (Sprint 2) is unaffected.
 - No user-provided ZIP code is interpolated into a downstream query
   string without `normalize_zip_code()` first (in `curriculum-svc/
-  catalogue.py`).
+catalogue.py`).
 
 ## 7. CSRF / XSS / SSRF
 
@@ -154,7 +154,7 @@ here.
   protection for App-Router server components covers the form
   surfaces.
 - The caregiver observation form (`apps/web-v2/app/caregiver/
-  observations/observation-form.tsx`) escapes form data into a
+observations/observation-form.tsx`) escapes form data into a
   JSON POST body. No `dangerouslySetInnerHTML` introduced in any
   new page.
 - ai-svc → curriculum-svc HTTP calls use a fixed `_CURRICULUM_SVC_URL`
@@ -183,12 +183,12 @@ added in any Sprint 7-12 component.
 
 ## 10. Findings + remediations
 
-| Finding | Severity | Status |
-|---|---|---|
-| `dev` store does not enforce cross-tenant on therapist session writes (in-memory bypass) | Low | Documented in `therapist.spec.ts` (test 7). Production postgres enforces via FK + RLS. Acceptable. |
-| Feature-flag admin page is read-only (env vars are source of truth) | Info | By design — runbook and runtime cannot diverge. |
-| Baseline metrics aggregator pulls from `moderationEvents` in dev; postgres `baseline_item_audits` is the prod surface | Info | Documented in `repos.ts` comment. |
-| No new file-upload paths introduced; caregiver `attachmentUrl` is opaque string, not file content | Info | When file uploads land in a later sprint, route through the existing sanitiser. |
+| Finding                                                                                                               | Severity | Status                                                                                             |
+| --------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `dev` store does not enforce cross-tenant on therapist session writes (in-memory bypass)                              | Low      | Documented in `therapist.spec.ts` (test 7). Production postgres enforces via FK + RLS. Acceptable. |
+| Feature-flag admin page is read-only (env vars are source of truth)                                                   | Info     | By design — runbook and runtime cannot diverge.                                                    |
+| Baseline metrics aggregator pulls from `moderationEvents` in dev; postgres `baseline_item_audits` is the prod surface | Info     | Documented in `repos.ts` comment.                                                                  |
+| No new file-upload paths introduced; caregiver `attachmentUrl` is opaque string, not file content                     | Info     | When file uploads land in a later sprint, route through the existing sanitiser.                    |
 
 ## Sign-off prerequisites
 

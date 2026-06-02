@@ -215,7 +215,12 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   modalError: { fontSize: 13, color: "#ef4444", fontFamily: "Nunito-Regular" },
-  modalActions: { flexDirection: "row", justifyContent: "flex-end", gap: 10, marginTop: spacing.xs },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+    marginTop: spacing.xs,
+  },
   modalBtn: {
     paddingVertical: 12,
     paddingHorizontal: 20,

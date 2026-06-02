@@ -11,11 +11,7 @@ import { NextResponse } from "next/server";
 import { failFromUnknown, fail, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { ADMIN_ROLES, adminScopeForSession } from "@/lib/bff/admin-scope";
-import {
-  createClassroom,
-  deleteClassroom,
-  listClassrooms,
-} from "@/lib/db/repos";
+import { createClassroom, deleteClassroom, listClassrooms } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -46,19 +42,22 @@ export async function POST(req: Request): Promise<NextResponse> {
     const tenantId = scope.tenantIds[0];
     if (!tenantId)
       return fail(
-        { code: "no_tenant", message: "No tenant in scope", userMessage: "Your session has no school in scope.", status: 403 },
+        {
+          code: "no_tenant",
+          message: "No tenant in scope",
+          userMessage: "Your session has no school in scope.",
+          status: 403,
+        },
         requestId,
       );
 
-    const body = (await req.json().catch(() => null)) as
-      | {
-          schoolId?: string;
-          name?: string;
-          gradeBand?: string;
-          teacherUserId?: string;
-          courseId?: string | null;
-        }
-      | null;
+    const body = (await req.json().catch(() => null)) as {
+      schoolId?: string;
+      name?: string;
+      gradeBand?: string;
+      teacherUserId?: string;
+      courseId?: string | null;
+    } | null;
     if (!body?.schoolId || !body.name || !body.gradeBand || !body.teacherUserId) {
       return fail(
         {
@@ -95,20 +94,35 @@ export async function DELETE(req: Request): Promise<NextResponse> {
     const tenantId = scope.tenantIds[0];
     if (!tenantId)
       return fail(
-        { code: "no_tenant", message: "No tenant in scope", userMessage: "Your session has no school in scope.", status: 403 },
+        {
+          code: "no_tenant",
+          message: "No tenant in scope",
+          userMessage: "Your session has no school in scope.",
+          status: 403,
+        },
         requestId,
       );
 
     const id = new URL(req.url).searchParams.get("id");
     if (!id)
       return fail(
-        { code: "validation_error", message: "id is required", userMessage: "Class id is required.", status: 400 },
+        {
+          code: "validation_error",
+          message: "id is required",
+          userMessage: "Class id is required.",
+          status: 400,
+        },
         requestId,
       );
     const removed = await deleteClassroom(id, tenantId);
     if (!removed)
       return fail(
-        { code: "not_found", message: "Classroom not found", userMessage: "That class is not in this school.", status: 404 },
+        {
+          code: "not_found",
+          message: "Classroom not found",
+          userMessage: "That class is not in this school.",
+          status: 404,
+        },
         requestId,
       );
     return ok({ deleted: true }, requestId);

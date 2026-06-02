@@ -65,8 +65,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
 
     const curriculum = await curriculumRes.json();
-    const districts =
-      districtsRes && districtsRes.ok ? await districtsRes.json() : null;
+    const districts = districtsRes && districtsRes.ok ? await districtsRes.json() : null;
 
     return ok(
       {

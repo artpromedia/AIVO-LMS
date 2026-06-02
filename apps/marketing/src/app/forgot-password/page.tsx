@@ -51,9 +51,7 @@ export default function ForgotPasswordPage() {
             <h1 className="text-3xl font-heading font-bold text-slate-900 text-center leading-tight">
               {t("heading")}
             </h1>
-            <p className="text-slate-500 font-body text-center mt-2">
-              {t("subheading")}
-            </p>
+            <p className="text-slate-500 font-body text-center mt-2">{t("subheading")}</p>
 
             {submitted ? (
               <div className="mt-7 text-center">

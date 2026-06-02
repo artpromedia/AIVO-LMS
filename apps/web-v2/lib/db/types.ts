@@ -2580,12 +2580,7 @@ export type LearnerSensoryProfile = {
 // progressed independently of the source PDF.
 // ---------------------------------------------------------------------------
 
-export type IepGoalStatus =
-  | "draft"
-  | "active"
-  | "met"
-  | "not_met"
-  | "discontinued";
+export type IepGoalStatus = "draft" | "active" | "met" | "not_met" | "discontinued";
 
 export type IepGoalRecord = {
   id: ID;

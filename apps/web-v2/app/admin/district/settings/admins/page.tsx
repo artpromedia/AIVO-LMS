@@ -38,9 +38,7 @@ export default async function Page() {
           <p className="text-sm font-medium">
             {admins.length} {admins.length === 1 ? "administrator" : "administrators"}
           </p>
-          <p className="text-xs text-aivo-ink-soft">
-            {t("invite_note")}
-          </p>
+          <p className="text-xs text-aivo-ink-soft">{t("invite_note")}</p>
         </div>
         {admins.length === 0 ? (
           <EmptyState title={t("empty_title")} />

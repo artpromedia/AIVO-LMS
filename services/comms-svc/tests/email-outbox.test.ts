@@ -20,10 +20,7 @@ import {
   getOutboxCounts,
   type EmailOutboxStatus,
 } from "../src/lib/email-outbox.js";
-import {
-  runEmailOutboxDrainOnce,
-  startEmailOutboxWorker,
-} from "../src/lib/email-worker.js";
+import { runEmailOutboxDrainOnce, startEmailOutboxWorker } from "../src/lib/email-worker.js";
 import { setEmailOutboxDb } from "../src/lib/postmark.js";
 
 // ─── Tiny in-memory drizzle.execute stub ──────────────────────────────────
@@ -174,7 +171,9 @@ function makeFakeDb() {
       if (text.includes("WITH picked AS") && text.includes("FOR UPDATE SKIP LOCKED")) {
         const [limit] = p as [number];
         const due = rows
-          .filter((r) => (r.status === "pending" || r.status === "failed") && r.next_retry_at <= now())
+          .filter(
+            (r) => (r.status === "pending" || r.status === "failed") && r.next_retry_at <= now(),
+          )
           .sort((a, b) => a.next_retry_at.getTime() - b.next_retry_at.getTime())
           .slice(0, limit);
         for (const r of due) {

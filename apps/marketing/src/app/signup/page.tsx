@@ -234,9 +234,7 @@ function SignupInner() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-500 font-body mt-1.5 ml-1">
-                  {t("password_hint")}
-                </p>
+                <p className="text-xs text-slate-500 font-body mt-1.5 ml-1">{t("password_hint")}</p>
               </div>
 
               <button

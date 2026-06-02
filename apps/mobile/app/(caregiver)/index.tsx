@@ -49,106 +49,111 @@ export default function CaregiverDashboard() {
       }
     >
       <View style={{ width: contentWidth }}>
-      <View style={styles.header}>
-        <HeaderUserChip
-          name={user?.name || t("caregiver.title")}
-          subtitle={t("caregiver.assignedChildren")}
-          onPress={() => router.push("/(caregiver)/settings" as Href)}
-        />
-        <View style={styles.headerActions}>
-          <SensoryToggle variant="icon" />
-          <Pressable onPress={logout} accessibilityLabel="Log out" hitSlop={12}>
-            <Ionicons name="log-out-outline" size={22} color={palette.inkMuted} />
-          </Pressable>
+        <View style={styles.header}>
+          <HeaderUserChip
+            name={user?.name || t("caregiver.title")}
+            subtitle={t("caregiver.assignedChildren")}
+            onPress={() => router.push("/(caregiver)/settings" as Href)}
+          />
+          <View style={styles.headerActions}>
+            <SensoryToggle variant="icon" />
+            <Pressable onPress={logout} accessibilityLabel="Log out" hitSlop={12}>
+              <Ionicons name="log-out-outline" size={22} color={palette.inkMuted} />
+            </Pressable>
+          </View>
         </View>
-      </View>
 
-      <Text
-        style={[
-          styles.greeting,
-          { color: palette.ink, fontFamily: fontFamilies.displayBold, fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight },
-        ]}
-      >
-        {t("caregiver.greeting", { name: user?.name })}
-      </Text>
+        <Text
+          style={[
+            styles.greeting,
+            {
+              color: palette.ink,
+              fontFamily: fontFamilies.displayBold,
+              fontSize: type.h1.fontSize,
+              lineHeight: type.h1.lineHeight,
+            },
+          ]}
+        >
+          {t("caregiver.greeting", { name: user?.name })}
+        </Text>
 
-      {!children?.length ? (
-        <EmptyState
-          icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
-          title={t("caregiver.noChildrenTitle")}
-          message={t("caregiver.noChildrenMessage")}
-        />
-      ) : (
-        children.map((child: any) => (
-          <Pressable
-            key={child.id}
-            onPress={() => router.push(`/(caregiver)/child/${child.id}` as Href)}
-            style={{ marginBottom: spacing.md }}
-          >
-            <Card>
-              <View style={styles.childRow}>
-                <View
-                  style={[
-                    styles.childAvatar,
-                    { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
-                  ]}
-                >
-                  <Text
+        {!children?.length ? (
+          <EmptyState
+            icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
+            title={t("caregiver.noChildrenTitle")}
+            message={t("caregiver.noChildrenMessage")}
+          />
+        ) : (
+          children.map((child: any) => (
+            <Pressable
+              key={child.id}
+              onPress={() => router.push(`/(caregiver)/child/${child.id}` as Href)}
+              style={{ marginBottom: spacing.md }}
+            >
+              <Card>
+                <View style={styles.childRow}>
+                  <View
                     style={[
-                      styles.childInitial,
-                      { color: palette.primary, fontFamily: fontFamilies.bodyBold },
+                      styles.childAvatar,
+                      { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
                     ]}
                   >
-                    {child.firstName?.[0] || "C"}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.childInitial,
+                        { color: palette.primary, fontFamily: fontFamilies.bodyBold },
+                      ]}
+                    >
+                      {child.firstName?.[0] || "C"}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={[
+                        styles.childName,
+                        { color: palette.ink, fontFamily: fontFamilies.bodyBold },
+                      ]}
+                    >
+                      {child.firstName} {child.lastName}
+                    </Text>
+                    <Text style={[styles.childGrade, { color: palette.inkMuted }]}>
+                      Grade {child.gradeLevel}
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={[
-                      styles.childName,
-                      { color: palette.ink, fontFamily: fontFamilies.bodyBold },
-                    ]}
-                  >
-                    {child.firstName} {child.lastName}
-                  </Text>
-                  <Text style={[styles.childGrade, { color: palette.inkMuted }]}>
-                    Grade {child.gradeLevel}
-                  </Text>
+                <View style={[styles.quickLinks, { borderTopColor: palette.border }]}>
+                  <QuickLink
+                    icon="bulb-outline"
+                    label={t("caregiver.brain")}
+                    tint={palette.primary}
+                    onPress={() => router.push(`/(caregiver)/child/${child.id}/brain` as Href)}
+                  />
+                  <QuickLink
+                    icon="flag-outline"
+                    label={t("caregiver.iep")}
+                    tint={INCLUSIVE_WARM_PALETTE.info}
+                    onPress={() => router.push(`/(caregiver)/child/${child.id}/iep-goals` as Href)}
+                  />
+                  <QuickLink
+                    icon="time-outline"
+                    label={t("caregiver.sessions")}
+                    tint={palette.warm}
+                    onPress={() => router.push(`/(caregiver)/child/${child.id}/sessions` as Href)}
+                  />
+                  <QuickLink
+                    icon="create-outline"
+                    label={t("caregiver.note")}
+                    tint={palette.accent}
+                    onPress={() =>
+                      router.push(`/(caregiver)/child/${child.id}/observation` as Href)
+                    }
+                  />
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
-              </View>
-              <View style={[styles.quickLinks, { borderTopColor: palette.border }]}>
-                <QuickLink
-                  icon="bulb-outline"
-                  label={t("caregiver.brain")}
-                  tint={palette.primary}
-                  onPress={() => router.push(`/(caregiver)/child/${child.id}/brain` as Href)}
-                />
-                <QuickLink
-                  icon="flag-outline"
-                  label={t("caregiver.iep")}
-                  tint={INCLUSIVE_WARM_PALETTE.info}
-                  onPress={() => router.push(`/(caregiver)/child/${child.id}/iep-goals` as Href)}
-                />
-                <QuickLink
-                  icon="time-outline"
-                  label={t("caregiver.sessions")}
-                  tint={palette.warm}
-                  onPress={() => router.push(`/(caregiver)/child/${child.id}/sessions` as Href)}
-                />
-                <QuickLink
-                  icon="create-outline"
-                  label={t("caregiver.note")}
-                  tint={palette.accent}
-                  onPress={() =>
-                    router.push(`/(caregiver)/child/${child.id}/observation` as Href)
-                  }
-                />
-              </View>
-            </Card>
-          </Pressable>
-        ))
-      )}
+              </Card>
+            </Pressable>
+          ))
+        )}
       </View>
     </ScrollView>
   );
@@ -170,7 +175,10 @@ function QuickLink({
     <Pressable style={styles.linkBtn} onPress={onPress} accessibilityRole="button">
       <Ionicons name={icon} size={16} color={tint} />
       <Text
-        style={[styles.linkText, { color: palette.inkMuted, fontFamily: fontFamilies.bodySemiBold }]}
+        style={[
+          styles.linkText,
+          { color: palette.inkMuted, fontFamily: fontFamilies.bodySemiBold },
+        ]}
       >
         {label}
       </Text>

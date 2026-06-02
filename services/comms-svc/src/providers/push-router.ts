@@ -69,7 +69,9 @@ export class PushRouter {
   async send(targets: PushTarget[], message: PushMessage): Promise<PushResult[]> {
     // Partial-failure fan-out: a bad token must not abort the others.
     const settled = await Promise.allSettled(
-      targets.map((t) => (t.kind === "fcm" ? this.fcm.send(t, message) : this.apns.send(t, message))),
+      targets.map((t) =>
+        t.kind === "fcm" ? this.fcm.send(t, message) : this.apns.send(t, message),
+      ),
     );
     return settled.map((r, i) =>
       r.status === "fulfilled"

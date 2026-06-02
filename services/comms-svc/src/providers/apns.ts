@@ -88,7 +88,7 @@ export async function sendApns(target: PushTarget, message: PushMessage): Promis
       "content-length": Buffer.byteLength(payload),
     });
     let status = 0;
-    let bodyChunks: Buffer[] = [];
+    const bodyChunks: Buffer[] = [];
     req.on("response", (headers) => {
       status = Number(headers[":status"] ?? 0);
     });

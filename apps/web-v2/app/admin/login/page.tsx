@@ -33,15 +33,11 @@ async function signInAction(formData: FormData): Promise<void> {
     redirect("/admin/login?error=missing_credentials");
   }
 
-  const {
-    identityAdminLogin,
-    extractRefreshToken,
-    toSessionProfile,
-  } = await import("@/lib/auth/identity-client");
+  const { identityAdminLogin, extractRefreshToken, toSessionProfile } =
+    await import("@/lib/auth/identity-client");
   const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
-  const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } = await import(
-    "@/lib/auth/mfa-cookies"
-  );
+  const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } =
+    await import("@/lib/auth/mfa-cookies");
 
   const result = await identityAdminLogin(email, password);
 

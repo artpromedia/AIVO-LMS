@@ -92,7 +92,9 @@ export function startRun(input: StartInput): StartResult {
     readingDifficulty: input.readingDifficulty,
   });
   const stop = shouldStop(state);
-  const nextItem = !stop.stop ? pickNextItem(state, input.bank, { applyFrustrationCeiling: true }) : null;
+  const nextItem = !stop.stop
+    ? pickNextItem(state, input.bank, { applyFrustrationCeiling: true })
+    : null;
   return {
     session: { state, lastServedItemId: nextItem?.id ?? null },
     nextItem,

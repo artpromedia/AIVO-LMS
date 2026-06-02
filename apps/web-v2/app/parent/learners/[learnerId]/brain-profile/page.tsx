@@ -42,7 +42,7 @@ async function regenerateAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -80,7 +80,7 @@ export default async function BrainProfilePage({
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.learner_brain_profile");
   const { learnerId } = await params;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -274,7 +274,9 @@ export default async function BrainProfilePage({
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">{t("comfort")}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+            {t("comfort")}
+          </p>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between gap-2">
               <dt className="text-aivo-ink-soft">{t("reading")}</dt>

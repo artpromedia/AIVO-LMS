@@ -7,19 +7,20 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
+import { useCreateTherapySession } from "@/hooks/useFamily";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
 
 export default function SessionNotesScreen() {
   const { t } = useTranslation();
   const type = useResponsiveType();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- route param reserved for future use
-  const { id: _id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const [skillTargeted, setSkillTargeted] = useState("");
   const [method, setMethod] = useState("");
   const [outcome, setOutcome] = useState("");
   const [recommendations, setRecommendations] = useState("");
+  const createSession = useCreateTherapySession();
   const { sizeClass, width: winWidth, isTablet } = useWindowSizeClass();
   const hPad = pickBySizeClass(sizeClass, {
     compact: spacing.md,
@@ -43,70 +44,109 @@ export default function SessionNotesScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <View style={{ width: contentWidth }}>
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
-        <Ionicons name="arrow-back" size={20} color={colors.primary} />
-        <Text style={styles.backText}>{t("common.back")}</Text>
-      </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("therapistClient.notesTitle")}</Text>
-      <Text style={styles.subtitle}>{t("therapistClient.notesSubtitle")}</Text>
+        <Pressable onPress={() => router.back()} style={styles.backRow}>
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
+          <Text style={styles.backText}>{t("common.back")}</Text>
+        </Pressable>
+        <Text
+          style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}
+        >
+          {t("therapistClient.notesTitle")}
+        </Text>
+        <Text style={styles.subtitle}>{t("therapistClient.notesSubtitle")}</Text>
 
-      <AivoCard>
-        <View style={styles.field}>
-          <Text style={styles.label}>Skill Targeted</Text>
-          <TextInput
-            style={styles.input}
-            value={skillTargeted}
-            onChangeText={setSkillTargeted}
-            placeholder="e.g., Receptive language"
-            placeholderTextColor={colors.textSecondary}
+        <AivoCard>
+          <View style={styles.field}>
+            <Text style={styles.label}>Skill Targeted</Text>
+            <TextInput
+              style={styles.input}
+              value={skillTargeted}
+              onChangeText={setSkillTargeted}
+              placeholder="e.g., Receptive language"
+              placeholderTextColor={colors.textSecondary}
+            />
+          </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>Method</Text>
+            <TextInput
+              style={styles.input}
+              value={method}
+              onChangeText={setMethod}
+              placeholder="e.g., Play-based therapy"
+              placeholderTextColor={colors.textSecondary}
+            />
+          </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>Outcome</Text>
+            <TextInput
+              style={styles.textArea}
+              value={outcome}
+              onChangeText={setOutcome}
+              placeholder="Describe the session outcome..."
+              placeholderTextColor={colors.textSecondary}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+          </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>Recommendations</Text>
+            <TextInput
+              style={styles.textArea}
+              value={recommendations}
+              onChangeText={setRecommendations}
+              placeholder="Any follow-up recommendations..."
+              placeholderTextColor={colors.textSecondary}
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+            />
+          </View>
+          <AivoButton
+            title={
+              createSession.isPending
+                ? t("common.saving", "Saving...")
+                : t("therapistClient.saveNotes", "Save Session Notes")
+            }
+            onPress={() => {
+              if (!id) {
+                Alert.alert(
+                  t("common.error", "Error"),
+                  t("therapistClient.noClient", "No client selected."),
+                );
+                return;
+              }
+              createSession.mutate(
+                {
+                  learnerId: id,
+                  outcome: outcome.trim(),
+                  skillTargeted: skillTargeted.trim() || undefined,
+                  method: method.trim() || undefined,
+                  recommendations: recommendations.trim() || undefined,
+                },
+                {
+                  onSuccess: () => {
+                    Alert.alert(
+                      t("common.success", "Success"),
+                      t("therapistClient.notesSaved", "Session notes saved"),
+                    );
+                    router.back();
+                  },
+                  onError: (e) => {
+                    Alert.alert(
+                      t("common.error", "Error"),
+                      e instanceof Error
+                        ? e.message
+                        : t("therapistClient.notesError", "Couldn't save session notes"),
+                    );
+                  },
+                },
+              );
+            }}
+            disabled={!skillTargeted.trim() || !outcome.trim() || createSession.isPending}
+            style={{ marginTop: spacing.md }}
           />
-        </View>
-        <View style={styles.field}>
-          <Text style={styles.label}>Method</Text>
-          <TextInput
-            style={styles.input}
-            value={method}
-            onChangeText={setMethod}
-            placeholder="e.g., Play-based therapy"
-            placeholderTextColor={colors.textSecondary}
-          />
-        </View>
-        <View style={styles.field}>
-          <Text style={styles.label}>Outcome</Text>
-          <TextInput
-            style={styles.textArea}
-            value={outcome}
-            onChangeText={setOutcome}
-            placeholder="Describe the session outcome..."
-            placeholderTextColor={colors.textSecondary}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
-        <View style={styles.field}>
-          <Text style={styles.label}>Recommendations</Text>
-          <TextInput
-            style={styles.textArea}
-            value={recommendations}
-            onChangeText={setRecommendations}
-            placeholder="Any follow-up recommendations..."
-            placeholderTextColor={colors.textSecondary}
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-          />
-        </View>
-        <AivoButton
-          title="Save Session Notes"
-          onPress={() => {
-            Alert.alert("Saved", "Session notes submitted to Brain");
-            router.back();
-          }}
-          disabled={!skillTargeted.trim() || !outcome.trim()}
-          style={{ marginTop: spacing.md }}
-        />
-      </AivoCard>
+        </AivoCard>
       </View>
     </ScrollView>
   );

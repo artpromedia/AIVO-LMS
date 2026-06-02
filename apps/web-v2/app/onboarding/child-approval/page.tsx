@@ -2,12 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import {
-  AuthShell,
-  AuthCard,
-  ReassuranceCard,
-  ConsentRow,
-} from "@aivo/ui/auth";
+import { AuthShell, AuthCard, ReassuranceCard, ConsentRow } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 
 /**
@@ -36,11 +31,7 @@ export default function ChildApprovalPage() {
         title={t("title")}
         subtitle={t("subtitle")}
         reassurance={
-          <ReassuranceCard
-            tone="safety"
-            title={t("reassure_title")}
-            body={t("reassure_body")}
-          />
+          <ReassuranceCard tone="safety" title={t("reassure_title")} body={t("reassure_body")} />
         }
         actions={
           <>
@@ -50,9 +41,7 @@ export default function ChildApprovalPage() {
             >
               {t("approve")}
             </Link>
-            <p className="text-xs text-iw-text-muted text-center">
-              {t("footer_note")}
-            </p>
+            <p className="text-xs text-iw-text-muted text-center">{t("footer_note")}</p>
           </>
         }
       >

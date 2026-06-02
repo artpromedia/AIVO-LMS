@@ -17,20 +17,28 @@ export function registerHealthRoutes(app: FastifyInstance) {
     service: "speech-eval-svc",
     timestamp: new Date().toISOString(),
   });
-  app.get("/health", {
-    schema: {
-      tags: ["Health"],
-      operationId: "speechEvalHealth",
-      summary: "Service health probe (root)",
-      response: { 200: healthResponse },
+  app.get(
+    "/health",
+    {
+      schema: {
+        tags: ["Health"],
+        operationId: "speechEvalHealth",
+        summary: "Service health probe (root)",
+        response: { 200: healthResponse },
+      },
     },
-  }, handler);
-  app.get("/api/speech-eval/health", {
-    schema: {
-      tags: ["Health"],
-      operationId: "speechEvalHealthApi",
-      summary: "Service health probe",
-      response: { 200: healthResponse },
+    handler,
+  );
+  app.get(
+    "/api/speech-eval/health",
+    {
+      schema: {
+        tags: ["Health"],
+        operationId: "speechEvalHealthApi",
+        summary: "Service health probe",
+        response: { 200: healthResponse },
+      },
     },
-  }, handler);
+    handler,
+  );
 }

@@ -5,11 +5,7 @@ import { describe, expect, it, beforeEach } from "vitest";
 import { ensureSeeded } from "@/lib/db/seed";
 import { resetStore, getStore } from "@/lib/db/store";
 import { getBaselinePipelineMetrics } from "@/lib/db/repos";
-import {
-  ENTERPRISE_FLAG_META,
-  listFlagMeta,
-  resolveEnterpriseFlags,
-} from "@aivo/feature-flags";
+import { ENTERPRISE_FLAG_META, listFlagMeta, resolveEnterpriseFlags } from "@aivo/feature-flags";
 
 describe("getBaselinePipelineMetrics", () => {
   beforeEach(() => {

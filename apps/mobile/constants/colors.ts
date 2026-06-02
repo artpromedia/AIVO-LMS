@@ -9,11 +9,7 @@
 // high-contrast modes, components should read from `useSensoryPalette()`
 // in `@/context/SensoryModeProvider` instead of these static tokens.
 
-import {
-  INCLUSIVE_WARM_PALETTE,
-  INCLUSIVE_WARM_BY_MODE,
-  INCLUSIVE_WARM_RADII,
-} from "@aivo/brand";
+import { INCLUSIVE_WARM_PALETTE, INCLUSIVE_WARM_BY_MODE, INCLUSIVE_WARM_RADII } from "@aivo/brand";
 
 const STANDARD = INCLUSIVE_WARM_BY_MODE.standard;
 const P = INCLUSIVE_WARM_PALETTE;

@@ -4,12 +4,12 @@ Tool: Lighthouse 12.8.2 (Chromium 138.0.7204.100, headless, accessibility catego
 
 ## Results
 
-| URL                                                            | When                  | Score | Report                  |
-| -------------------------------------------------------------- | --------------------- | ----- | ----------------------- |
-| https://aivolearning.com/                                      | 2026-05-18T21:00:01Z  | **89**  | `home-a11y-prod.html`   |
-| https://aivolearning.com/ferpa-compliance                      | 2026-05-18T21:00:49Z  | **96**  | `ferpa-a11y-prod.html`  |
-| http://127.0.0.1:4173/  (local `next start` of this branch)    | 2026-05-18T20:56:31Z  | **100** | `home-a11y.html`        |
-| http://127.0.0.1:4173/ferpa-compliance (this branch)           | 2026-05-18T20:56:52Z  | **100** | `ferpa-a11y.html`       |
+| URL                                                        | When                 | Score   | Report                 |
+| ---------------------------------------------------------- | -------------------- | ------- | ---------------------- |
+| https://aivolearning.com/                                  | 2026-05-18T21:00:01Z | **89**  | `home-a11y-prod.html`  |
+| https://aivolearning.com/ferpa-compliance                  | 2026-05-18T21:00:49Z | **96**  | `ferpa-a11y-prod.html` |
+| http://127.0.0.1:4173/ (local `next start` of this branch) | 2026-05-18T20:56:31Z | **100** | `home-a11y.html`       |
+| http://127.0.0.1:4173/ferpa-compliance (this branch)       | 2026-05-18T20:56:52Z | **100** | `ferpa-a11y.html`      |
 
 ## What this shows
 
@@ -22,13 +22,13 @@ Tool: Lighthouse 12.8.2 (Chromium 138.0.7204.100, headless, accessibility catego
 
 ## Failing audits on production / home (before the fixes on this branch)
 
-| Audit                          | Elements | Root cause                                                              |
-| ------------------------------ | -------: | ----------------------------------------------------------------------- |
-| color-contrast                 | 25       | `text-slate-400` (#90a1b9) on white = 2.63:1, and `text-white/80` on `#7c3aed` = 3.64:1 in the CTA card |
-| target-size                    | 17       | Carousel indicator dots (8 × 8 px) and tutor selector dots (12–16 px) — below WCAG 2.5.5's 24 × 24 px floor |
-| aria-prohibited-attr           |  4       | `<div aria-label="…">` 5-star rating with no role                       |
-| label-content-name-mismatch    |  3       | TutorCarousel side buttons (after fixes the i18n label includes the visible text) |
-| heading-order                  |  1       | Footer column titles were `<h4>` with no preceding `<h3>`               |
+| Audit                       | Elements | Root cause                                                                                                  |
+| --------------------------- | -------: | ----------------------------------------------------------------------------------------------------------- |
+| color-contrast              |       25 | `text-slate-400` (#90a1b9) on white = 2.63:1, and `text-white/80` on `#7c3aed` = 3.64:1 in the CTA card     |
+| target-size                 |       17 | Carousel indicator dots (8 × 8 px) and tutor selector dots (12–16 px) — below WCAG 2.5.5's 24 × 24 px floor |
+| aria-prohibited-attr        |        4 | `<div aria-label="…">` 5-star rating with no role                                                           |
+| label-content-name-mismatch |        3 | TutorCarousel side buttons (after fixes the i18n label includes the visible text)                           |
+| heading-order               |        1 | Footer column titles were `<h4>` with no preceding `<h3>`                                                   |
 
 ## Fixes applied on this branch
 

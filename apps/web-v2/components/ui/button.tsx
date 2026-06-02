@@ -26,8 +26,7 @@ const buttonVariants = cva(
         // Primary "pill" CTA — the signature Inclusive-Warm look.
         default: "bg-iw-primary text-iw-primary-fg shadow-md hover:bg-iw-primary-hover",
         // Soft glass card-on-card affordance.
-        outline:
-          "border border-iw-border bg-iw-raised text-iw-ink hover:bg-iw-card",
+        outline: "border border-iw-border bg-iw-raised text-iw-ink hover:bg-iw-card",
         ghost: "text-iw-ink hover:bg-iw-card",
         // Accent (lavender) — used for secondary brand actions.
         accent: "bg-iw-accent text-iw-primary-fg hover:opacity-90",
@@ -36,8 +35,7 @@ const buttonVariants = cva(
         soft: "bg-iw-accent-soft text-iw-ink hover:opacity-90",
         // Destructive — uses the semantic danger token from the base preset
         // (still token-driven, no raw hex).
-        danger:
-          "bg-aivo-danger text-aivo-primary-fg hover:opacity-90",
+        danger: "bg-aivo-danger text-aivo-primary-fg hover:opacity-90",
       },
       size: {
         sm: "h-9 px-4 text-xs",
@@ -53,8 +51,7 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

@@ -86,21 +86,48 @@ export function HomeworkUploadCard({
       <header className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <ModeTab active={mode === "camera"} onClick={() => setMode("camera")}>
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="w-3.5 h-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
               <circle cx="12" cy="13" r="4" />
             </svg>
             Camera
           </ModeTab>
           <ModeTab active={mode === "file"} onClick={() => setMode("file")}>
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="w-3.5 h-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
             File
           </ModeTab>
           <ModeTab active={mode === "text"} onClick={() => setMode("text")}>
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="w-3.5 h-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <line x1="4" y1="6" x2="20" y2="6" />
               <line x1="4" y1="12" x2="20" y2="12" />
               <line x1="4" y1="18" x2="14" y2="18" />
@@ -113,7 +140,16 @@ export function HomeworkUploadCard({
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-iw-chip text-[11px] font-semibold bg-[var(--aivo-color-aivoTeal-50)] text-[var(--aivo-color-aivoTeal-700)] border border-[var(--aivo-color-aivoTeal-100)]"
             role="status"
           >
-            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="w-3 h-3"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <polyline points="20 6 9 17 4 12" />
             </svg>
             Detected: {detectedSubject}
@@ -128,22 +164,49 @@ export function HomeworkUploadCard({
               className="w-16 h-16 rounded-2xl bg-white shadow-[0_4px_16px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] inline-flex items-center justify-center text-[var(--aivo-sensory-primary)]"
               aria-hidden="true"
             >
-              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                className="w-8 h-8"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                 <circle cx="12" cy="13" r="4" />
               </svg>
             </span>
             <div className="flex flex-col gap-1">
-              <p className="text-lg font-semibold text-iw-text-strong">Snap a photo of your homework</p>
-              <p className="text-sm text-iw-text-muted">Hold the page flat. I'll figure out the rest.</p>
+              <p className="text-lg font-semibold text-iw-text-strong">
+                Snap a photo of your homework
+              </p>
+              <p className="text-sm text-iw-text-muted">
+                Hold the page flat. I'll figure out the rest.
+              </p>
             </div>
             <label className="inline-flex items-center gap-1.5 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 cursor-pointer">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                 <circle cx="12" cy="13" r="4" />
               </svg>
               Open camera
-              <input type="file" accept="image/*" capture="environment" name={cameraName} className="sr-only" />
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                name={cameraName}
+                className="sr-only"
+              />
             </label>
           </>
         ) : null}
@@ -154,14 +217,24 @@ export function HomeworkUploadCard({
               className="w-16 h-16 rounded-2xl bg-white shadow-[0_4px_16px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] inline-flex items-center justify-center text-[var(--aivo-sensory-primary)]"
               aria-hidden="true"
             >
-              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                className="w-8 h-8"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </span>
             <div className="flex flex-col gap-1">
-              <p className="text-lg font-semibold text-iw-text-strong">Pick a file from your device</p>
+              <p className="text-lg font-semibold text-iw-text-strong">
+                Pick a file from your device
+              </p>
               <p className="text-sm text-iw-text-muted">PDF, image, or a Word doc.</p>
             </div>
             <label className="inline-flex items-center gap-1.5 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 cursor-pointer">
@@ -178,7 +251,10 @@ export function HomeworkUploadCard({
 
         {mode === "text" ? (
           <div className="w-full flex flex-col gap-2 items-stretch">
-            <label htmlFor={textName} className="text-sm font-semibold text-iw-text-strong text-left">
+            <label
+              htmlFor={textName}
+              className="text-sm font-semibold text-iw-text-strong text-left"
+            >
               Tell me what you're working on
             </label>
             <textarea

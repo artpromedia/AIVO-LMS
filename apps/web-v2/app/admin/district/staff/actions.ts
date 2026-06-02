@@ -10,11 +10,7 @@ import {
   identityRevokeAdminInvite,
   identityInviteTeacher,
 } from "@/lib/auth/identity-client";
-import {
-  createStaffInvite,
-  revokeStaffInvite,
-  type StaffRole,
-} from "@/lib/db/staff-invites";
+import { createStaffInvite, revokeStaffInvite, type StaffRole } from "@/lib/db/staff-invites";
 
 const ROLES: readonly StaffRole[] = ["district_admin", "school_admin", "teacher"];
 

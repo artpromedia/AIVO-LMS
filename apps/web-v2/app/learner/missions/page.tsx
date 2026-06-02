@@ -51,7 +51,9 @@ export default async function Page() {
           <Card key={a.id} className="p-4">
             <p className="font-medium">{a.title}</p>
             <p className="text-sm text-aivo-ink-soft">
-              {t("from_teacher", { subject: subjectMap.get(a.subjectId)?.name ?? t("subject_fallback") })}
+              {t("from_teacher", {
+                subject: subjectMap.get(a.subjectId)?.name ?? t("subject_fallback"),
+              })}
             </p>
           </Card>
         ))}

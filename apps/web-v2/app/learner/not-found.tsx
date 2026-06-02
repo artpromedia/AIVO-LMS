@@ -11,9 +11,7 @@ export default async function LearnerNotFound() {
     >
       <p className="text-sm font-medium uppercase tracking-wide text-aivo-muted">404</p>
       <h1 className="mt-2 font-display text-4xl font-bold">{t("title")}</h1>
-      <p className="mt-3 text-aivo-ink-soft">
-        {t("body")}
-      </p>
+      <p className="mt-3 text-aivo-ink-soft">{t("body")}</p>
       <div className="mt-6">
         <Button asChild>
           <Link href="/learner/home">{t("cta")}</Link>

@@ -12,9 +12,21 @@ import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 const TYPES: { key: string; label: string; desc: string }[] = [
-  { key: "data_processing", label: "Data processing", desc: "Store and process learning data to personalise lessons." },
-  { key: "personalization", label: "Personalisation", desc: "Use mastery + activity to tailor tutoring." },
-  { key: "analytics", label: "Product analytics", desc: "Aggregate, de-identified usage to improve AIVO." },
+  {
+    key: "data_processing",
+    label: "Data processing",
+    desc: "Store and process learning data to personalise lessons.",
+  },
+  {
+    key: "personalization",
+    label: "Personalisation",
+    desc: "Use mastery + activity to tailor tutoring.",
+  },
+  {
+    key: "analytics",
+    label: "Product analytics",
+    desc: "Aggregate, de-identified usage to improve AIVO.",
+  },
   { key: "marketing", label: "Product updates", desc: "Occasional emails about new features." },
 ];
 
@@ -44,7 +56,10 @@ export default function ParentConsentScreen() {
           <View style={styles.reassure}>
             <Ionicons name="shield-checkmark" size={18} color={palette.primary} />
             <Text style={[styles.reassureText, { color: palette.inkMuted }]}>
-              {t("parentConsent.note", "You can change these at any time. Some are required to run AIVO.")}
+              {t(
+                "parentConsent.note",
+                "You can change these at any time. Some are required to run AIVO.",
+              )}
             </Text>
           </View>
           {TYPES.map((ct) => {

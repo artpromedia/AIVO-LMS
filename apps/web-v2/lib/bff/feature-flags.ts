@@ -16,14 +16,12 @@ function readBool(name: string, defaultValue = false): boolean {
 }
 
 export const enterpriseFlags = {
-  responsibleAiGuardrails: () =>
-    readBool("AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS"),
+  responsibleAiGuardrails: () => readBool("AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS"),
   dataGovernanceCenter: () => readBool("AIVO_FEATURE_DATA_GOVERNANCE_CENTER"),
   sisSync: () => readBool("AIVO_FEATURE_SIS_SYNC"),
   lti13: () => readBool("AIVO_FEATURE_LTI_13"),
   // The default for this flag was flipped to true in the
   // ConfigMap (see Sprint C). The reader still defaults to false so a
   // missing env doesn't change behavior elsewhere in BFF land.
-  advancedContentGenerators: () =>
-    readBool("AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS"),
+  advancedContentGenerators: () => readBool("AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS"),
 };

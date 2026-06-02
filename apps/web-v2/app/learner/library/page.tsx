@@ -43,10 +43,7 @@ export default async function Page() {
         description={t("description")}
       />
       {runs.length === 0 ? (
-        <EmptyState
-          title={t("nothing_finished")}
-          description={t("nothing_finished_desc")}
-        />
+        <EmptyState title={t("nothing_finished")} description={t("nothing_finished_desc")} />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {runs.map((r) => (

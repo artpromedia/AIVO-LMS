@@ -105,7 +105,5 @@ export function withTargetRole<T extends { href: string }>(
   targetRole: Role,
   targetLearnerId?: string,
 ): T & { targetRole: Role; targetLearnerId?: string } {
-  return targetLearnerId
-    ? { ...base, targetRole, targetLearnerId }
-    : { ...base, targetRole };
+  return targetLearnerId ? { ...base, targetRole, targetLearnerId } : { ...base, targetRole };
 }

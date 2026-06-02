@@ -128,9 +128,7 @@ if (wantJson) {
 } else {
   process.stderr.write(
     `api-boundary: ${violations.length} violation(s):\n` +
-      violations
-        .map((v) => `  ${v.file}:${v.line} [${v.rule}]\n    ${v.snippet}`)
-        .join("\n") +
+      violations.map((v) => `  ${v.file}:${v.line} [${v.rule}]\n    ${v.snippet}`).join("\n") +
       "\n\nSee apps/web-v2/app/api/bff/README.md + docs/adr/0008 for the rule.\n",
   );
 }

@@ -27,7 +27,7 @@ export default async function Page({ params }: { params: Promise<{ learnerId: st
   const { learnerId } = await params;
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.consent");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -50,9 +50,7 @@ export default async function Page({ params }: { params: Promise<{ learnerId: st
       />
       {ageGate?.requiresParentConsent ? (
         <Card className="p-4 mb-4 bg-amber-50 border-amber-200">
-          <p className="text-sm text-amber-900">
-            {t("coppa_notice")}
-          </p>
+          <p className="text-sm text-amber-900">{t("coppa_notice")}</p>
         </Card>
       ) : null}
       <Card className="p-0 divide-y">

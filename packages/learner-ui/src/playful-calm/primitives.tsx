@@ -34,11 +34,14 @@ export function Button({ variant = "primary", size = "md", style, ...props }: Pl
         minHeight: BUTTON_SIZES[size],
         borderRadius: "var(--aivo-radius-xl, 24px)",
         background: BUTTON_VARIANTS[variant],
-        color: isGhost ? "var(--aivo-semantic-color-text-primary, #111827)" : "var(--aivo-semantic-color-text-onPrimary, #fff)",
+        color: isGhost
+          ? "var(--aivo-semantic-color-text-primary, #111827)"
+          : "var(--aivo-semantic-color-text-onPrimary, #fff)",
         border: isGhost ? "2px solid var(--aivo-semantic-color-border-default, #d1d5db)" : "none",
         padding: "0 20px",
         fontWeight: 700,
-        transition: "transform var(--aivo-motion-duration-fast, 150ms) var(--aivo-motion-easing-spring-bounce, ease)",
+        transition:
+          "transform var(--aivo-motion-duration-fast, 150ms) var(--aivo-motion-easing-spring-bounce, ease)",
         ...style,
       }}
     />
@@ -96,7 +99,10 @@ export const Radio = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
   <input type="radio" {...props} style={{ width: 24, height: 24, ...props.style }} />
 );
 
-export const Switch = ({ checked, ...props }: { checked: boolean } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+export const Switch = ({
+  checked,
+  ...props
+}: { checked: boolean } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     aria-pressed={checked}
     {...props}
@@ -138,27 +144,62 @@ export function Avatar({ label, src, size = 56 }: { label: string; src?: string;
   return src ? (
     <img src={src} alt={label} width={size} height={size} style={{ borderRadius: 9999 }} />
   ) : (
-    <div aria-label={label} style={{ width: size, height: size, borderRadius: 9999, background: "var(--aivo-color-calmSky-200, #bfdbfe)" }} />
+    <div
+      aria-label={label}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 9999,
+        background: "var(--aivo-color-calmSky-200, #bfdbfe)",
+      }}
+    />
   );
 }
 
 export function Modal({ open, children }: { open: boolean; children: React.ReactNode }) {
   if (!open) return null;
-  return <div role="dialog" aria-modal="true">{children}</div>;
+  return (
+    <div role="dialog" aria-modal="true">
+      {children}
+    </div>
+  );
 }
 
 export function Sheet({ open, children }: { open: boolean; children: React.ReactNode }) {
   if (!open) return null;
-  return <div role="dialog" aria-modal="true">{children}</div>;
+  return (
+    <div role="dialog" aria-modal="true">
+      {children}
+    </div>
+  );
 }
 
-export const Toast = ({ children }: { children: React.ReactNode }) => <div role="status">{children}</div>;
+export const Toast = ({ children }: { children: React.ReactNode }) => (
+  <div role="status">{children}</div>
+);
 
-export const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => <span aria-label={label}>{children}</span>;
+export const Tooltip = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <span aria-label={label}>{children}</span>
+);
 
 export const ProgressBar = ({ value }: { value: number }) => (
-  <div aria-label="Progress" style={{ width: "100%", height: 12, borderRadius: 9999, background: "var(--aivo-semantic-color-border-subtle, #e5e7eb)" }}>
-    <div style={{ width: `${Math.max(0, Math.min(100, value))}%`, height: "100%", borderRadius: 9999, background: "var(--aivo-semantic-color-interactive-primary-default, #3b82f6)" }} />
+  <div
+    aria-label="Progress"
+    style={{
+      width: "100%",
+      height: 12,
+      borderRadius: 9999,
+      background: "var(--aivo-semantic-color-border-subtle, #e5e7eb)",
+    }}
+  >
+    <div
+      style={{
+        width: `${Math.max(0, Math.min(100, value))}%`,
+        height: "100%",
+        borderRadius: 9999,
+        background: "var(--aivo-semantic-color-interactive-primary-default, #3b82f6)",
+      }}
+    />
   </div>
 );
 
@@ -168,23 +209,48 @@ export const ProgressRing = ({ value }: { value: number }) => {
   const offset = dash - (dash * pct) / 100;
   return (
     <svg width="88" height="88" viewBox="0 0 88 88" aria-label="Progress ring">
-      <circle cx="44" cy="44" r="36" stroke="var(--aivo-semantic-color-border-subtle, #e5e7eb)" strokeWidth="8" fill="none" />
-      <circle cx="44" cy="44" r="36" stroke="var(--aivo-semantic-color-interactive-primary-default, #3b82f6)" strokeWidth="8" fill="none" strokeDasharray={dash} strokeDashoffset={offset} transform="rotate(-90 44 44)" />
+      <circle
+        cx="44"
+        cy="44"
+        r="36"
+        stroke="var(--aivo-semantic-color-border-subtle, #e5e7eb)"
+        strokeWidth="8"
+        fill="none"
+      />
+      <circle
+        cx="44"
+        cy="44"
+        r="36"
+        stroke="var(--aivo-semantic-color-interactive-primary-default, #3b82f6)"
+        strokeWidth="8"
+        fill="none"
+        strokeDasharray={dash}
+        strokeDashoffset={offset}
+        transform="rotate(-90 44 44)"
+      />
     </svg>
   );
 };
 
-export const XPMeter = ({ xp, goal }: { xp: number; goal: number }) => <ProgressBar value={(xp / Math.max(goal, 1)) * 100} />;
-export const StreakFlame = ({ days }: { days: number }) => <Badge aria-label={`Streak ${days} days`}>🔥 {days} day streak</Badge>;
+export const XPMeter = ({ xp, goal }: { xp: number; goal: number }) => (
+  <ProgressBar value={(xp / Math.max(goal, 1)) * 100} />
+);
+export const StreakFlame = ({ days }: { days: number }) => (
+  <Badge aria-label={`Streak ${days} days`}>🔥 {days} day streak</Badge>
+);
 
-export const Tabs = ({ children }: { children: React.ReactNode }) => <div role="tablist">{children}</div>;
+export const Tabs = ({ children }: { children: React.ReactNode }) => (
+  <div role="tablist">{children}</div>
+);
 
 export const Accordion = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
 
 export const Stepper = ({ steps, currentStep }: { steps: string[]; currentStep: number }) => (
   <ol>
     {steps.map((step, idx) => (
-      <li key={step} aria-current={idx === currentStep ? "step" : undefined}>{step}</li>
+      <li key={step} aria-current={idx === currentStep ? "step" : undefined}>
+        {step}
+      </li>
     ))}
   </ol>
 );

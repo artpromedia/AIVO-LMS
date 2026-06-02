@@ -14,8 +14,7 @@ import type { AivoComponentState } from "../utils/types";
  * gestures are the consumer's responsibility; the primitive remains
  * controlled via `open` / `onClose`).
  */
-export interface BottomSheetProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+export interface BottomSheetProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   open: boolean;
   state?: AivoComponentState;
   title?: React.ReactNode;
@@ -26,64 +25,60 @@ export interface BottomSheetProps
   maxHeightVh?: number;
 }
 
-export const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
-  function BottomSheet(
-    {
-      open,
-      state = "default",
-      title,
-      onClose,
-      withHandle = true,
-      maxHeightVh = 85,
-      className,
-      children,
-      style,
-      ...rest
-    },
-    ref
-  ) {
-    if (!open) return null;
+export const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(function BottomSheet(
+  {
+    open,
+    state = "default",
+    title,
+    onClose,
+    withHandle = true,
+    maxHeightVh = 85,
+    className,
+    children,
+    style,
+    ...rest
+  },
+  ref,
+) {
+  if (!open) return null;
 
-    return (
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center aivo-motion-lesson-reveal"
+      role="dialog"
+      aria-modal="true"
+      aria-busy={state === "loading" || undefined}
+    >
+      <button
+        type="button"
+        aria-label="Close sheet"
+        onClick={onClose}
+        className="absolute inset-0 bg-[rgba(15,23,42,0.4)] backdrop-blur-sm cursor-default"
+        tabIndex={-1}
+      />
       <div
-        className="fixed inset-0 z-50 flex items-end justify-center aivo-motion-lesson-reveal"
-        role="dialog"
-        aria-modal="true"
-        aria-busy={state === "loading" || undefined}
+        ref={ref}
+        {...rest}
+        style={{ maxHeight: `${maxHeightVh}vh`, ...style }}
+        className={cn(
+          "relative w-full max-w-2xl bg-[var(--aivo-color-surface-card,#ffffff)]",
+          "rounded-t-iw-sheet-top shadow-[0_-12px_48px_-12px_rgba(15,23,42,0.24)]",
+          "flex flex-col px-5 pt-3 iw-safe-bottom overflow-hidden",
+          state === "loading" && "aivo-motion-baseline-gen",
+          className,
+        )}
       >
-        <button
-          type="button"
-          aria-label="Close sheet"
-          onClick={onClose}
-          className="absolute inset-0 bg-[rgba(15,23,42,0.4)] backdrop-blur-sm cursor-default"
-          tabIndex={-1}
-        />
-        <div
-          ref={ref}
-          {...rest}
-          style={{ maxHeight: `${maxHeightVh}vh`, ...style }}
-          className={cn(
-            "relative w-full max-w-2xl bg-[var(--aivo-color-surface-card,#ffffff)]",
-            "rounded-t-iw-sheet-top shadow-[0_-12px_48px_-12px_rgba(15,23,42,0.24)]",
-            "flex flex-col px-5 pt-3 iw-safe-bottom overflow-hidden",
-            state === "loading" && "aivo-motion-baseline-gen",
-            className
-          )}
-        >
-          {withHandle && (
-            <div className="self-center mb-3 w-10 h-1.5 rounded-full bg-[var(--aivo-color-border-subtle,rgba(15,23,42,0.18))]" />
-          )}
-          {title && (
-            <header className="pb-3 border-b border-[var(--aivo-color-border-subtle,rgba(15,23,42,0.06))]">
-              <h2 className="iw-label text-[var(--aivo-color-text-default,#0f172a)]">
-                {title}
-              </h2>
-            </header>
-          )}
-          <div className="flex-1 min-h-0 overflow-auto py-4">{children}</div>
-        </div>
+        {withHandle && (
+          <div className="self-center mb-3 w-10 h-1.5 rounded-full bg-[var(--aivo-color-border-subtle,rgba(15,23,42,0.18))]" />
+        )}
+        {title && (
+          <header className="pb-3 border-b border-[var(--aivo-color-border-subtle,rgba(15,23,42,0.06))]">
+            <h2 className="iw-label text-[var(--aivo-color-text-default,#0f172a)]">{title}</h2>
+          </header>
+        )}
+        <div className="flex-1 min-h-0 overflow-auto py-4">{children}</div>
       </div>
-    );
-  }
-);
+    </div>
+  );
+});
 BottomSheet.displayName = "Overlay/BottomSheet";

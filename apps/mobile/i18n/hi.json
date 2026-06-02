@@ -739,7 +739,9 @@
     "subtitle": "इस छात्र के सीखने के बारे में एक टिप्पणी साझा करें",
     "yourInsight": "आपकी अंतर्दृष्टि",
     "placeholder": "इस छात्र के बारे में जो आपने देखा है उसे बताएं...",
-    "submitted": "अंतर्दृष्टि अभिभावक के इनबॉक्स में भेजी गई"
+    "submitted": "अंतर्दृष्टि अभिभावक के इनबॉक्स में भेजी गई",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "IEP अपलोड करें",
@@ -810,7 +812,9 @@
     "prompt": "आज बच्चे ने कैसा प्रदर्शन किया?",
     "placeholder": "अपना अवलोकन साझा करें…",
     "submitBtn": "अवलोकन प्रस्तुत करें",
-    "submitted": "अवलोकन ब्रेन इनसाइट्स में सहेजा गया"
+    "submitted": "अवलोकन ब्रेन इनसाइट्स में सहेजा गया",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "प्रगति",
@@ -846,7 +850,11 @@
     "reportsSubtitle": "थेरेपी प्रगति रिपोर्ट तैयार करें और देखें",
     "noReportsTitle": "कोई रिपोर्ट नहीं",
     "noReportsMessage": "तैयार होने पर प्रगति रिपोर्ट बनाएं।",
-    "generateReport": "रिपोर्ट बनाएं"
+    "generateReport": "रिपोर्ट बनाएं",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected."
   },
   "therapistSessions": {
     "title": "सत्र लॉग",

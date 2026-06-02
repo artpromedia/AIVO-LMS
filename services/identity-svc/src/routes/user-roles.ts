@@ -157,9 +157,7 @@ export async function registerUserRoleRoutes(app: FastifyInstance) {
       if (!user) return reply.code(404).send({ error: "User not found" });
       if (!canManage(admin, user.tenantId)) return reply.code(403).send({ error: "Forbidden" });
 
-      await db
-        .delete(userRoles)
-        .where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
+      await db.delete(userRoles).where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
       await appendAudit(db, "admin_audit_log", adminAuditLog, {
         action: "ROLE_REVOKED",
         actorId: admin.sub,

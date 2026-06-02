@@ -91,5 +91,4 @@ or, for domains that have been migrated, the persistence adapter at
 - ❌ Exposing internal IDs that aren't tenant-scoped. The BFF must
   enforce tenant boundaries; the upstream service may or may not.
 
-The lint script `scripts/check-api-boundary.mjs` (planned — see ADR
-0008) will fail CI on the first two.
+The lint script `scripts/check-api-boundary.mjs` (planned — see ADR 0008) will fail CI on the first two.

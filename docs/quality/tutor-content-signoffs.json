@@ -2,58 +2,148 @@
   "_comment": "SME sign-off ledger for production tutor content. A skill graph can only back an `authored` coverageMatrix cell if (a) its file's version is NOT a -draft, and (b) it has a non-empty signoffs entry below with at least one curriculum-designer review and (where applicable) a special-education reviewer. The promotion guard in scripts/curriculum-coverage-check.mjs enforces this. To promote a `scaffold` band to `authored`: review the seed file → bump its version from 0.1.0-draft to 1.0.0 → add a signoff entry here → flip the tutor's coverageMatrix entry. See docs/quality/tutor-k12-coverage-gap-plan.md.",
   "signoffs": {
     "ccss-math-k": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from GREEN-03 K-8 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from GREEN-03 K-8 production seed."
+      }
     ],
     "ccss-math-1-8": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from GREEN-03 K-8 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from GREEN-03 K-8 production seed."
+      }
     ],
     "ngss-k2-physical-science": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from GREEN-03 K-8 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from GREEN-03 K-8 production seed."
+      }
     ],
     "ngss-science-3-8": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from GREEN-03 K-8 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from GREEN-03 K-8 production seed."
+      }
     ],
     "ccss-ela-k": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from GREEN-03 K-8 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from GREEN-03 K-8 production seed."
+      }
     ],
     "ccss-ela-1-8": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from GREEN-03 K-8 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from GREEN-03 K-8 production seed."
+      }
     ],
     "ccss-writing-k-8": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from GREEN-03 K-8 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from GREEN-03 K-8 production seed."
+      }
     ],
     "c3-social-studies-k2": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 K-2 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 K-2 production seed."
+      }
     ],
     "ncge-geography-k2": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 K-2 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 K-2 production seed."
+      }
     ],
     "csta-coding-k2": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 K-2 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 K-2 production seed."
+      }
     ],
     "asha-speech-early": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 PRE_K-2 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 PRE_K-2 production seed."
+      }
     ],
     "casel-sel-k2": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 K-2 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 K-2 production seed."
+      }
     ],
     "ncas-music-k2": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 K-2 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 K-2 production seed."
+      }
     ],
     "shape-pe-health-k2": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 K-2 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 K-2 production seed."
+      }
     ],
     "actfl-world-languages-novice-low": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 grade-6 Novice-Low production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 grade-6 Novice-Low production seed."
+      }
     ],
     "ngss-engineering-design-3-5": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 3-5 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 3-5 production seed."
+      }
     ],
     "cec-life-skills-6-plus": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 grade-6+ production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 grade-6+ production seed."
+      }
     ],
     "ncas-creative-arts-k2": [
-      { "reviewer": "platform-baseline", "role": "engineering-baseline", "date": "2026-05-18", "notes": "Inherited from Sprint 5 K-2 production seed." }
+      {
+        "reviewer": "platform-baseline",
+        "role": "engineering-baseline",
+        "date": "2026-05-18",
+        "notes": "Inherited from Sprint 5 K-2 production seed."
+      }
     ]
   },
   "_pending_review": "All `0.1.0-draft` graphs require SME sign-off before they can back an `authored` coverageMatrix cell. Add them here once reviewed."

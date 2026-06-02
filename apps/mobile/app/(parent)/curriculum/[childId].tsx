@@ -14,7 +14,10 @@ import { fontFamilies } from "@/constants/typography";
 async function pickDoc(): Promise<{ name: string } | null> {
   try {
     const DP: any = await import("expo-document-picker");
-    const res = await DP.getDocumentAsync({ type: ["application/pdf", "image/*"], copyToCacheDirectory: true });
+    const res = await DP.getDocumentAsync({
+      type: ["application/pdf", "image/*"],
+      copyToCacheDirectory: true,
+    });
     if (res?.canceled) return null;
     const asset = res?.assets?.[0];
     return asset ? { name: asset.name ?? "document" } : null;
@@ -72,7 +75,9 @@ export default function ParentCurriculumScreen() {
           {picked.map((name, i) => (
             <View key={`${name}-${i}`} style={styles.fileRow}>
               <Ionicons name="document-text-outline" size={18} color={palette.primary} />
-              <Text style={[styles.fileName, { color: palette.ink }]} numberOfLines={1}>{name}</Text>
+              <Text style={[styles.fileName, { color: palette.ink }]} numberOfLines={1}>
+                {name}
+              </Text>
             </View>
           ))}
         </Card>
@@ -85,8 +90,14 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 16, fontFamily: fontFamilies.displayBold },
   body: { fontSize: 14, fontFamily: fontFamilies.bodyRegular, lineHeight: 20 },
   uploadBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
-    paddingVertical: 14, borderRadius: radius.xl, borderWidth: 1.5, marginTop: spacing.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: radius.xl,
+    borderWidth: 1.5,
+    marginTop: spacing.sm,
   },
   uploadText: { fontSize: 15, fontFamily: fontFamilies.bodyBold },
   fileRow: { flexDirection: "row", alignItems: "center", gap: 8 },

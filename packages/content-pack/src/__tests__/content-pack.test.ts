@@ -190,7 +190,13 @@ describe("validateContentPack", () => {
     const audioWithCaptions = basePack({
       assets: [
         { id: "aud", kind: "audio", src: "https://x/audio.mp3" },
-        { id: "cap-en", kind: "captions", src: "https://x/audio.en.vtt", lang: "en", default: true },
+        {
+          id: "cap-en",
+          kind: "captions",
+          src: "https://x/audio.en.vtt",
+          lang: "en",
+          default: true,
+        },
       ],
       activities: [
         {
@@ -204,8 +210,8 @@ describe("validateContentPack", () => {
         },
       ],
     });
-    expect(validateContentPack(audioWithCaptions).some((i) => i.code === "missing_captions_asset")).toBe(
-      false,
-    );
+    expect(
+      validateContentPack(audioWithCaptions).some((i) => i.code === "missing_captions_asset"),
+    ).toBe(false);
   });
 });

@@ -1,82 +1,101 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
 .cosmic-friendly {
   --background: 40 33% 98%; /* Cream base */
   --foreground: 230 40% 20%; /* Deep indigo text for readability */
-  
+
   --card: 0 0% 100%;
   --card-foreground: 230 40% 20%;
-  
+
   --popover: 0 0% 100%;
   --popover-foreground: 230 40% 20%;
-  
+
   --primary: 240 60% 65%; /* Periwinkle */
   --primary-foreground: 0 0% 100%;
-  
+
   --secondary: 20 80% 75%; /* Dusty peach */
   --secondary-foreground: 230 40% 20%;
-  
+
   --muted: 230 20% 94%;
   --muted-foreground: 230 20% 45%;
-  
+
   --accent: 270 70% 75%; /* Lavender */
   --accent-foreground: 230 40% 20%;
-  
+
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
   --border: 230 20% 90%;
   --input: 230 20% 90%;
   --ring: 240 60% 65%;
-  
+
   --radius: 1.5rem;
 }
 
 .cosmic-friendly {
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
 
 .font-display {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
 }
 
 /* Gradients and Backgrounds */
 .bg-dawn-sky {
-  background: linear-gradient(180deg, 
-    #4F46E5 0%,    /* Soft Indigo */
-    #818CF8 25%,   /* Periwinkle */
-    #C084FC 55%,   /* Lavender */
-    #FDBA74 85%,   /* Dusty Peach */
-    #FEF3C7 100%   /* Cream */
+  background: linear-gradient(
+    180deg,
+    #4f46e5 0%,
+    /* Soft Indigo */ #818cf8 25%,
+    /* Periwinkle */ #c084fc 55%,
+    /* Lavender */ #fdba74 85%,
+    /* Dusty Peach */ #fef3c7 100% /* Cream */
   );
 }
 
 .bg-dawn-sky-mobile {
-  background: linear-gradient(180deg, 
-    #4F46E5 0%,
-    #818CF8 30%,
-    #C084FC 60%,
-    #FDBA74 85%,
-    #FEF3C7 100%
+  background: linear-gradient(
+    180deg,
+    #4f46e5 0%,
+    #818cf8 30%,
+    #c084fc 60%,
+    #fdba74 85%,
+    #fef3c7 100%
   );
 }
 
 /* Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 @keyframes pulse-soft {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
 }
 
 .animate-float {

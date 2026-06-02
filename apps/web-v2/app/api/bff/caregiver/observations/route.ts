@@ -12,10 +12,7 @@
 import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
-import {
-  createCaregiverObservation,
-  listCaregiverObservations,
-} from "@/lib/db/repos";
+import { createCaregiverObservation, listCaregiverObservations } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -33,13 +30,15 @@ export async function GET(req: Request): Promise<NextResponse> {
     const learnerId = new URL(req.url).searchParams.get("learnerId");
     if (!learnerId)
       return fail(
-        { code: "validation_error", message: "learnerId is required", userMessage: "Pick a learner first.", status: 400 },
+        {
+          code: "validation_error",
+          message: "learnerId is required",
+          userMessage: "Pick a learner first.",
+          status: 400,
+        },
         requestId,
       );
-    return ok(
-      { observations: listCaregiverObservations(learnerId, session!.tenantId) },
-      requestId,
-    );
+    return ok({ observations: listCaregiverObservations(learnerId, session!.tenantId) }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }
@@ -52,18 +51,16 @@ export async function POST(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["caregiver"], requestId);
     if (roleErr) return roleErr;
-    const body = (await req.json().catch(() => null)) as
-      | {
-          learnerId?: string;
-          observedAt?: string;
-          behaviour?: string;
-          antecedent?: string;
-          consequence?: string;
-          durationMinutes?: number | null;
-          location?: string;
-          attachmentUrl?: string | null;
-        }
-      | null;
+    const body = (await req.json().catch(() => null)) as {
+      learnerId?: string;
+      observedAt?: string;
+      behaviour?: string;
+      antecedent?: string;
+      consequence?: string;
+      durationMinutes?: number | null;
+      location?: string;
+      attachmentUrl?: string | null;
+    } | null;
     if (!body?.learnerId || !body.behaviour) {
       return fail(
         {

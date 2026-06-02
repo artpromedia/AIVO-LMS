@@ -7,11 +7,7 @@ import { CopyIcon, Loader2, UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  initialStaffInviteState,
-  inviteStaffAction,
-  revokeStaffInviteAction,
-} from "./actions";
+import { initialStaffInviteState, inviteStaffAction, revokeStaffInviteAction } from "./actions";
 
 type SchoolOption = { id: string; name: string };
 
@@ -31,13 +27,8 @@ export function StaffInviteSection({
 }) {
   const t = useTranslations("admin.district_staff");
   const [open, setOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(
-    inviteStaffAction,
-    initialStaffInviteState,
-  );
-  const [role, setRole] = useState<"district_admin" | "school_admin" | "teacher">(
-    "teacher",
-  );
+  const [state, formAction, pending] = useActionState(inviteStaffAction, initialStaffInviteState);
+  const [role, setRole] = useState<"district_admin" | "school_admin" | "teacher">("teacher");
   const formRef = useRef<HTMLFormElement>(null);
 
   // Reset form whenever a success bounces back.
@@ -69,16 +60,11 @@ export function StaffInviteSection({
       {pendingInvites.length > 0 ? (
         <ul className="divide-y divide-aivo-border">
           {pendingInvites.map((i) => (
-            <li
-              key={i.id}
-              className="flex items-center justify-between py-2 text-sm"
-            >
+            <li key={i.id} className="flex items-center justify-between py-2 text-sm">
               <div>
                 <span className="font-medium">{i.displayName}</span>{" "}
                 <span className="text-aivo-ink-soft">— {i.email}</span>{" "}
-                <span className="text-xs text-aivo-muted">
-                  ({roleLabel(i.role)})
-                </span>
+                <span className="text-xs text-aivo-muted">({roleLabel(i.role)})</span>
               </div>
               <RevokeButton inviteId={i.id} />
             </li>
@@ -156,19 +142,12 @@ export function StaffInviteSection({
                   </label>
                 ) : null}
                 {state.status === "error" ? (
-                  <p
-                    role="alert"
-                    className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700"
-                  >
+                  <p role="alert" className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700">
                     {state.error}
                   </p>
                 ) : null}
                 <div className="flex justify-end gap-2 pt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setOpen(false)}
-                  >
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                     {t("cancel")}
                   </Button>
                   <Button type="submit" disabled={pending}>
@@ -227,8 +206,8 @@ function SuccessPanel({
           </Button>
         </div>
         <p className="mt-2 text-xs text-aivo-ink-soft">
-          Share this with the new staff member out-of-band. They&apos;ll be
-          prompted to change it on first sign-in.
+          Share this with the new staff member out-of-band. They&apos;ll be prompted to change it on
+          first sign-in.
         </p>
       </div>
       <div className="flex justify-end">
@@ -268,16 +247,9 @@ function InvitedPanel({
 function RevokeButton({ inviteId }: { inviteId: string }) {
   const [pending, startTransition] = useTransition();
   return (
-    <form
-      action={(fd) => startTransition(() => revokeStaffInviteAction(fd))}
-    >
+    <form action={(fd) => startTransition(() => revokeStaffInviteAction(fd))}>
       <input type="hidden" name="inviteId" value={inviteId} />
-      <Button
-        type="submit"
-        variant="outline"
-        size="sm"
-        disabled={pending}
-      >
+      <Button type="submit" variant="outline" size="sm" disabled={pending}>
         {pending ? "Revoking…" : "Revoke"}
       </Button>
     </form>

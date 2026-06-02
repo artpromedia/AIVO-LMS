@@ -13,18 +13,18 @@ guardrail (see [`src/lib/downstream.ts`](src/lib/downstream.ts)).
 
 ### Downstream services tracked
 
-| Subsystem              | Env var                      | Severity | Behaviour on failure                                       |
-| ---------------------- | ---------------------------- | -------- | ---------------------------------------------------------- |
-| `brain-svc`            | `BRAIN_SVC_URL`              | critical | Fail-closed by default (HTTP 503 `DegradedResponse`).      |
-| `subject-brain-svc`    | `SUBJECT_BRAIN_SVC_URL`      | soft     | Logged + counted; lesson proceeds with degraded flag.      |
-| `responsible-ai-svc`   | `RESPONSIBLE_AI_SVC_URL`     | soft     | Logged + counted; lesson proceeds with degraded flag.      |
-| `problem-session-svc`  | `PROBLEM_SESSION_SVC_URL`    | soft     | Fire-and-forget; logged + counted, never blocks the flow.  |
+| Subsystem             | Env var                   | Severity | Behaviour on failure                                      |
+| --------------------- | ------------------------- | -------- | --------------------------------------------------------- |
+| `brain-svc`           | `BRAIN_SVC_URL`           | critical | Fail-closed by default (HTTP 503 `DegradedResponse`).     |
+| `subject-brain-svc`   | `SUBJECT_BRAIN_SVC_URL`   | soft     | Logged + counted; lesson proceeds with degraded flag.     |
+| `responsible-ai-svc`  | `RESPONSIBLE_AI_SVC_URL`  | soft     | Logged + counted; lesson proceeds with degraded flag.     |
+| `problem-session-svc` | `PROBLEM_SESSION_SVC_URL` | soft     | Fire-and-forget; logged + counted, never blocks the flow. |
 
 Each failure:
 
 1. Emits a structured `pino` log on the `learning-svc:downstream`
    logger with `{ service, endpoint, statusCode, correlationId,
-   learnerId, err }`.
+learnerId, err }`.
 2. Increments the Prometheus counter
    `learning_svc_downstream_failures_total{service,endpoint}` exposed
    on `/metrics`.
@@ -38,10 +38,7 @@ Each failure:
 interface DegradedResponse {
   degraded: true;
   degradedSubsystems: Array<
-    | "brain-svc"
-    | "subject-brain-svc"
-    | "responsible-ai-svc"
-    | "problem-session-svc"
+    "brain-svc" | "subject-brain-svc" | "responsible-ai-svc" | "problem-session-svc"
   >;
   error: string;
 }
@@ -56,11 +53,11 @@ silently returning fabricated content.
 Controls whether the lesson flow continues with best-effort defaults
 when the **critical** `brain-svc` subsystem is unavailable.
 
-| Value            | Meaning                                                                    |
-| ---------------- | -------------------------------------------------------------------------- |
-| `true`/`1`/`on`  | Fail open. Lesson is generated with empty brain context.                   |
-| `false`/`0`/`off`| Fail closed. Route returns `503` `DegradedResponse`.                       |
-| unset            | Defaults to `true` outside production, `false` in production.              |
+| Value             | Meaning                                                       |
+| ----------------- | ------------------------------------------------------------- |
+| `true`/`1`/`on`   | Fail open. Lesson is generated with empty brain context.      |
+| `false`/`0`/`off` | Fail closed. Route returns `503` `DegradedResponse`.          |
+| unset             | Defaults to `true` outside production, `false` in production. |
 
 Soft subsystems (`subject-brain-svc`, `responsible-ai-svc`,
 `problem-session-svc`) are always logged + counted but never block.
@@ -77,11 +74,11 @@ learning_svc_downstream_failures_total{service="subject-brain-svc",endpoint="POS
 
 ### Feature flags for downstream calls
 
-| Flag                                       | Default | Effect                                                |
-| ------------------------------------------ | ------- | ----------------------------------------------------- |
-| `AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS` | `false` | Enables `subject-brain-svc` enrichment.               |
-| `AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS`   | `false` | Enables `responsible-ai-svc` evaluation (warn mode).  |
-| `AIVO_FEATURE_PROBLEM_SESSION_LEDGER`      | `false` | Enables fire-and-forget `problem-session-svc` write.  |
+| Flag                                       | Default | Effect                                               |
+| ------------------------------------------ | ------- | ---------------------------------------------------- |
+| `AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS` | `false` | Enables `subject-brain-svc` enrichment.              |
+| `AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS`   | `false` | Enables `responsible-ai-svc` evaluation (warn mode). |
+| `AIVO_FEATURE_PROBLEM_SESSION_LEDGER`      | `false` | Enables fire-and-forget `problem-session-svc` write. |
 
 ### Tests
 

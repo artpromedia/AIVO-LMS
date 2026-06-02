@@ -13,11 +13,7 @@
  */
 import * as React from "react";
 import clsx from "clsx";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Lock,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import {
   NAV_AREA_META,
   getAreasForRole,
@@ -62,10 +58,7 @@ export function Sidebar({
     else setUncontrolled(next);
   };
 
-  const areas = React.useMemo(
-    () => getAreasForRole(role, { includeLocked: true }),
-    [role],
-  );
+  const areas = React.useMemo(() => getAreasForRole(role, { includeLocked: true }), [role]);
 
   return (
     <aside
@@ -94,11 +87,7 @@ export function Sidebar({
           className="iw-touch -mr-1.5 inline-flex h-8 w-8 items-center justify-center rounded-iw-control text-iw-text-muted hover:bg-iw-card hover:text-iw-text-strong"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </div>
 
@@ -129,9 +118,7 @@ export function Sidebar({
                   <span
                     className={clsx(
                       "flex h-8 w-8 shrink-0 items-center justify-center rounded-iw-control",
-                      isActive
-                        ? "bg-white shadow-iw-soft"
-                        : "bg-transparent",
+                      isActive ? "bg-white shadow-iw-soft" : "bg-transparent",
                     )}
                   >
                     <AivoIcon
@@ -149,10 +136,7 @@ export function Sidebar({
                     {meta.label}
                   </span>
                   {isLocked && !collapsed ? (
-                    <Lock
-                      className="h-3.5 w-3.5 text-iw-text-muted"
-                      aria-label="Locked"
-                    />
+                    <Lock className="h-3.5 w-3.5 text-iw-text-muted" aria-label="Locked" />
                   ) : null}
                 </LinkComponent>
               </li>
@@ -162,12 +146,7 @@ export function Sidebar({
       </nav>
 
       {footer ? (
-        <div
-          className={clsx(
-            "border-t border-iw-border px-3 py-3",
-            collapsed && "px-1.5",
-          )}
-        >
+        <div className={clsx("border-t border-iw-border px-3 py-3", collapsed && "px-1.5")}>
           {footer}
         </div>
       ) : null}

@@ -23,7 +23,7 @@ export default [
     ignores: ["dist/*", ".expo/*", "node_modules/*", "android/*", "ios/*"],
   },
   {
-    files: ["scripts/**/*.{js,cjs,mjs}"],
+    files: ["scripts/**/*.{js,cjs}"],
     languageOptions: {
       globals: {
         __dirname: "readonly",
@@ -37,6 +37,14 @@ export default [
         exports: "writable",
       },
       sourceType: "commonjs",
+    },
+  },
+  {
+    // ESM script files use `import`/`export` and must be parsed as modules.
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: { process: "readonly", console: "readonly", Buffer: "readonly" },
+      sourceType: "module",
     },
   },
   {

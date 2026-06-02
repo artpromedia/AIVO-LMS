@@ -1,11 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { eq, sql, desc } from "drizzle-orm";
-import {
-  xpEvents,
-  streaks,
-  badges,
-  virtualCurrency,
-} from "@aivo/db";
+import { xpEvents, streaks, badges, virtualCurrency } from "@aivo/db";
 import { authenticateRequest, requireSelfOrRole } from "../auth.js";
 
 /**
@@ -38,11 +33,7 @@ import { authenticateRequest, requireSelfOrRole } from "../auth.js";
  * stored.
  */
 
-type EngagementEventType =
-  | "lesson_completed"
-  | "streak_day"
-  | "quest_finished"
-  | "badge_earned";
+type EngagementEventType = "lesson_completed" | "streak_day" | "quest_finished" | "badge_earned";
 
 interface EventBody {
   learnerId: string;
@@ -111,7 +102,7 @@ async function publishEvent(topic: string, payload: Record<string, unknown>): Pr
   try {
     const url = process.env.NATS_URL;
     if (!url) return;
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const nats: any = await import(/* @vite-ignore */ "nats" as string).catch(() => null);
     if (!nats?.connect) return;
     const nc = await nats.connect({ servers: url });
@@ -258,9 +249,7 @@ export function registerEventRoutes(
       .where(eq(xpEvents.learnerId, learnerId))
       .orderBy(desc(xpEvents.createdAt))
       .limit(1);
-    const lastActiveAt = recent[0]?.createdAt
-      ? new Date(recent[0].createdAt).toISOString()
-      : null;
+    const lastActiveAt = recent[0]?.createdAt ? new Date(recent[0].createdAt).toISOString() : null;
 
     const [currency] = await db
       .select()
@@ -280,9 +269,7 @@ export function registerEventRoutes(
       })),
       achievements: learnerBadges.filter((b) => b.rarity === "epic" || b.rarity === "legendary"),
       lastActiveAt,
-      currency: currency
-        ? { coins: currency.coins, gems: currency.gems }
-        : { coins: 0, gems: 0 },
+      currency: currency ? { coins: currency.coins, gems: currency.gems } : { coins: 0, gems: 0 },
     };
   });
 }

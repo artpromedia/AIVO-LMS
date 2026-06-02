@@ -59,13 +59,13 @@ export function SoftTextField({
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label
-        htmlFor={name}
-        className="text-sm font-semibold text-iw-text-strong"
-      >
+      <label htmlFor={name} className="text-sm font-semibold text-iw-text-strong">
         {label}
         {required ? (
-          <span className="ml-1 text-[var(--aivo-color-status-error-strong,#b91c1c)]" aria-hidden="true">
+          <span
+            className="ml-1 text-[var(--aivo-color-status-error-strong,#b91c1c)]"
+            aria-hidden="true"
+          >
             *
           </span>
         ) : null}
@@ -80,9 +80,7 @@ export function SoftTextField({
           "relative flex items-stretch rounded-iw-control border bg-white",
           "transition-colors duration-150",
           "focus-within:border-[var(--aivo-sensory-primary,#7c3aed)] focus-within:ring-2 focus-within:ring-[var(--aivo-sensory-ringFocus,#7c3aed)]/40",
-          error
-            ? "border-[var(--aivo-color-status-error-default,#fecaca)]"
-            : "border-iw-border",
+          error ? "border-[var(--aivo-color-status-error-default,#fecaca)]" : "border-iw-border",
         )}
       >
         {multiline ? (
@@ -122,9 +120,7 @@ export function SoftTextField({
           />
         )}
         {trailing ? (
-          <span className="flex items-center pr-3 text-xs text-iw-text-muted">
-            {trailing}
-          </span>
+          <span className="flex items-center pr-3 text-xs text-iw-text-muted">{trailing}</span>
         ) : null}
       </div>
       <div className="flex items-baseline justify-between gap-3">
@@ -136,7 +132,9 @@ export function SoftTextField({
           >
             {error}
           </p>
-        ) : <span />}
+        ) : (
+          <span />
+        )}
         {maxLength ? (
           <p className="text-[11px] text-iw-text-muted tabular-nums">
             {count}/{maxLength}

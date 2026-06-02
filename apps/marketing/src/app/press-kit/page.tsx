@@ -25,7 +25,9 @@ export default function PressKitPage() {
       accentColor={MARKETING_ACCENTS.amberDeep}
     >
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">{t("company_overview")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">
+          {t("company_overview")}
+        </h2>
         <div className="bg-white rounded-2xl border border-slate-100 p-8">
           <p className="text-slate-600 font-body leading-relaxed mb-6">
             AIVO Learning is an AI-powered adaptive learning platform designed for students of all
@@ -113,7 +115,9 @@ export default function PressKitPage() {
 
       <section>
         <div className="bg-amber-50 rounded-3xl border border-amber-100 p-8 md:p-12">
-          <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("media_contact")}</h2>
+          <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+            {t("media_contact")}
+          </h2>
           <p className="text-slate-600 font-body mb-6">
             For press inquiries, interview requests, or media resources, please reach out to our
             communications team.

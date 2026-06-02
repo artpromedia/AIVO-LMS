@@ -739,7 +739,9 @@
     "subtitle": "Partagez une observation sur l'apprentissage de cet élève",
     "yourInsight": "Votre observation",
     "placeholder": "Décrivez ce que vous avez observé chez cet élève...",
-    "submitted": "Observation envoyée dans la boîte de réception des parents"
+    "submitted": "Observation envoyée dans la boîte de réception des parents",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "Importer le IEP",
@@ -810,7 +812,9 @@
     "prompt": "Comment s'est passée la journée de l'enfant ?",
     "placeholder": "Partage ton observation…",
     "submitBtn": "Soumettre l'observation",
-    "submitted": "Observation enregistrée dans les insights cérébraux"
+    "submitted": "Observation enregistrée dans les insights cérébraux",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "Progression",
@@ -846,7 +850,11 @@
     "reportsSubtitle": "Générer et consulter les rapports de progression thérapeutique",
     "noReportsTitle": "Aucun rapport",
     "noReportsMessage": "Générez un rapport de progression quand vous êtes prêt.",
-    "generateReport": "Générer un rapport"
+    "generateReport": "Générer un rapport",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected."
   },
   "therapistSessions": {
     "title": "Journaux de séances",

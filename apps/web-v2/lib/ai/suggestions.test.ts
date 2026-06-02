@@ -19,11 +19,9 @@ describe("generateSuggestions", () => {
   });
 
   it("filters out entries listed in existingItems", () => {
-    const { suggestions } = generateSuggestions(
-      "learner_strengths",
-      "",
-      { existingItems: ["Loves animals"] },
-    );
+    const { suggestions } = generateSuggestions("learner_strengths", "", {
+      existingItems: ["Loves animals"],
+    });
     expect(suggestions.map((s) => s.toLowerCase())).not.toContain("loves animals");
   });
 
@@ -45,9 +43,7 @@ describe("generateSuggestions", () => {
     });
     // The pre-K bias list includes "Caring for pets" — should surface early.
     expect(suggestions.length).toBeGreaterThan(0);
-    expect(suggestions.slice(0, 3)).toEqual(
-      expect.arrayContaining(["Caring for pets"]),
-    );
+    expect(suggestions.slice(0, 3)).toEqual(expect.arrayContaining(["Caring for pets"]));
   });
 
   it("respects the limit parameter", () => {
@@ -56,10 +52,7 @@ describe("generateSuggestions", () => {
   });
 
   it("returns an empty result for an unknown field type", () => {
-    const { suggestions } = generateSuggestions(
-      "not_a_field" as never,
-      "",
-    );
+    const { suggestions } = generateSuggestions("not_a_field" as never, "");
     expect(suggestions).toEqual([]);
   });
 });

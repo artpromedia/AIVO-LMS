@@ -28,12 +28,7 @@ import {
   type CalibrationMap,
 } from "./baseline-adaptive";
 
-const BAND_ORDER: BaselineDifficulty[] = [
-  "foundational",
-  "approaching",
-  "grade_level",
-  "stretch",
-];
+const BAND_ORDER: BaselineDifficulty[] = ["foundational", "approaching", "grade_level", "stretch"];
 
 function bandIndex(b: BaselineDifficulty): number {
   return BAND_ORDER.indexOf(b);
@@ -147,9 +142,7 @@ export function evaluateParityGate(
     reasons.push("no_runs");
   } else {
     if (summary.completionRate < thresholds.minCompletionRate) {
-      reasons.push(
-        `completion_rate ${summary.completionRate} < ${thresholds.minCompletionRate}`,
-      );
+      reasons.push(`completion_rate ${summary.completionRate} < ${thresholds.minCompletionRate}`);
     }
     if (summary.placementAgreementRate < thresholds.minAgreementRate) {
       reasons.push(

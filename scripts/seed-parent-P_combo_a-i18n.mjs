@@ -29,7 +29,8 @@ const PARENT = {
     consent: {
       title: "Per-learner consents",
       description: "Per-learner consents apply only to this child.",
-      coppa_notice: "This learner is under 13. Parent consent is required for data collection per COPPA.",
+      coppa_notice:
+        "This learner is under 13. Parent consent is required for data collection per COPPA.",
       accepted: "Accepted",
       not_accepted: "Not accepted",
     },
@@ -65,7 +66,8 @@ const PARENT = {
       title: "Milestones",
       description: "Experience points, streaks, currency, and badges earned across the program.",
       no_engagement_data: "No engagement data yet",
-      no_engagement_desc: "Once your learner completes their first session we will start tracking XP, streaks, and badges.",
+      no_engagement_desc:
+        "Once your learner completes their first session we will start tracking XP, streaks, and badges.",
       back_to_overview: "Back to learner overview",
       total_xp: "Total XP",
       levels_desc: "Levels unlock new avatars, customizations, and quest worlds.",
@@ -131,7 +133,8 @@ const PARENT = {
       account_label: "Account",
       billing_label: "Billing",
       privacy_label: "Privacy",
-      privacy_desc: "COPPA, FERPA, and data export tools live with the platform team — file a support ticket if you need an export.",
+      privacy_desc:
+        "COPPA, FERPA, and data export tools live with the platform team — file a support ticket if you need an export.",
     },
   },
 
@@ -139,7 +142,8 @@ const PARENT = {
     consent: {
       title: "Consentimientos por estudiante",
       description: "Los consentimientos por estudiante aplican solo a este niño.",
-      coppa_notice: "Este estudiante es menor de 13 años. Se requiere el consentimiento de los padres para la recopilación de datos según COPPA.",
+      coppa_notice:
+        "Este estudiante es menor de 13 años. Se requiere el consentimiento de los padres para la recopilación de datos según COPPA.",
       accepted: "Aceptado",
       not_accepted: "No aceptado",
     },
@@ -175,10 +179,12 @@ const PARENT = {
       title: "Hitos",
       description: "Puntos de experiencia, rachas, moneda y medallas obtenidos en el programa.",
       no_engagement_data: "Aún no hay datos de participación",
-      no_engagement_desc: "Una vez que tu estudiante complete su primera sesión, comenzaremos a registrar XP, rachas y medallas.",
+      no_engagement_desc:
+        "Una vez que tu estudiante complete su primera sesión, comenzaremos a registrar XP, rachas y medallas.",
       back_to_overview: "Volver al resumen del estudiante",
       total_xp: "XP total",
-      levels_desc: "Los niveles desbloquean nuevos avatares, personalizaciones y mundos de aventuras.",
+      levels_desc:
+        "Los niveles desbloquean nuevos avatares, personalizaciones y mundos de aventuras.",
       current_streak: "Racha actual",
       wallet: "Billetera",
       wallet_desc: "Monedas ganadas por sesión. Gemas desbloqueadas por grandes logros.",
@@ -216,7 +222,8 @@ const PARENT = {
     },
     learners: {
       title: "Tus estudiantes",
-      description: "Configura a cada hijo una vez y luego observa su crecimiento desde un solo lugar.",
+      description:
+        "Configura a cada hijo una vez y luego observa su crecimiento desde un solo lugar.",
       add_learner: "Agregar estudiante",
       no_learners: "Aún no hay estudiantes",
       no_learners_desc: "Agrega a tu primer hijo para comenzar el flujo de preparación.",
@@ -226,7 +233,8 @@ const PARENT = {
       eyebrow: "Madre/Padre",
       title: "Resumen semanal de aprendizaje",
       no_learners: "Aún no hay estudiantes",
-      no_learners_body: "Agrega un estudiante desde la página de inicio para comenzar a generar informes de progreso.",
+      no_learners_body:
+        "Agrega un estudiante desde la página de inicio para comenzar a generar informes de progreso.",
       open_learner: "Abrir estudiante →",
       recent_lessons: "Lecciones recientes",
     },
@@ -241,7 +249,8 @@ const PARENT = {
       account_label: "Cuenta",
       billing_label: "Facturación",
       privacy_label: "Privacidad",
-      privacy_desc: "Las herramientas de COPPA, FERPA y exportación de datos están con el equipo de la plataforma — crea un ticket de soporte si necesitas una exportación.",
+      privacy_desc:
+        "Las herramientas de COPPA, FERPA y exportación de datos están con el equipo de la plataforma — crea un ticket de soporte si necesitas una exportación.",
     },
   },
 
@@ -249,7 +258,8 @@ const PARENT = {
     consent: {
       title: "Consentements par apprenant",
       description: "Les consentements par apprenant s'appliquent uniquement à cet enfant.",
-      coppa_notice: "Cet apprenant a moins de 13 ans. Le consentement parental est requis pour la collecte de données conformément à COPPA.",
+      coppa_notice:
+        "Cet apprenant a moins de 13 ans. Le consentement parental est requis pour la collecte de données conformément à COPPA.",
       accepted: "Accepté",
       not_accepted: "Non accepté",
     },
@@ -285,10 +295,12 @@ const PARENT = {
       title: "Étapes",
       description: "Points d'expérience, séries, monnaie et badges obtenus dans le programme.",
       no_engagement_data: "Pas encore de données d'engagement",
-      no_engagement_desc: "Dès que votre apprenant aura terminé sa première session, nous commencerons à suivre XP, séries et badges.",
+      no_engagement_desc:
+        "Dès que votre apprenant aura terminé sa première session, nous commencerons à suivre XP, séries et badges.",
       back_to_overview: "Retour à la vue d'ensemble de l'apprenant",
       total_xp: "XP total",
-      levels_desc: "Les niveaux débloquent de nouveaux avatars, personnalisations et mondes de quêtes.",
+      levels_desc:
+        "Les niveaux débloquent de nouveaux avatars, personnalisations et mondes de quêtes.",
       current_streak: "Série actuelle",
       wallet: "Portefeuille",
       wallet_desc: "Pièces gagnées par session. Gemmes débloquées pour les grandes victoires.",
@@ -326,7 +338,8 @@ const PARENT = {
     },
     learners: {
       title: "Vos apprenants",
-      description: "Configurez chaque enfant une seule fois, puis suivez sa croissance depuis un seul endroit.",
+      description:
+        "Configurez chaque enfant une seule fois, puis suivez sa croissance depuis un seul endroit.",
       add_learner: "Ajouter un apprenant",
       no_learners: "Pas encore d'apprenant",
       no_learners_desc: "Ajoutez votre premier enfant pour commencer le flux de préparation.",
@@ -336,7 +349,8 @@ const PARENT = {
       eyebrow: "Parent",
       title: "Résumé hebdomadaire des apprentissages",
       no_learners: "Pas encore d'apprenant",
-      no_learners_body: "Ajoutez un apprenant depuis la page d'accueil pour commencer à générer des rapports de progression.",
+      no_learners_body:
+        "Ajoutez un apprenant depuis la page d'accueil pour commencer à générer des rapports de progression.",
       open_learner: "Ouvrir l'apprenant →",
       recent_lessons: "Leçons récentes",
     },
@@ -351,7 +365,8 @@ const PARENT = {
       account_label: "Compte",
       billing_label: "Facturation",
       privacy_label: "Confidentialité",
-      privacy_desc: "Les outils COPPA, FERPA et d'export de données sont gérés par l'équipe plateforme — déposez un ticket de support si vous avez besoin d'un export.",
+      privacy_desc:
+        "Les outils COPPA, FERPA et d'export de données sont gérés par l'équipe plateforme — déposez un ticket de support si vous avez besoin d'un export.",
     },
   },
 
@@ -359,7 +374,8 @@ const PARENT = {
     consent: {
       title: "Einwilligungen pro Lernenden",
       description: "Einwilligungen pro Lernenden gelten nur für dieses Kind.",
-      coppa_notice: "Dieser Lernende ist unter 13 Jahre alt. Die elterliche Einwilligung ist gemäß COPPA für die Datenerhebung erforderlich.",
+      coppa_notice:
+        "Dieser Lernende ist unter 13 Jahre alt. Die elterliche Einwilligung ist gemäß COPPA für die Datenerhebung erforderlich.",
       accepted: "Akzeptiert",
       not_accepted: "Nicht akzeptiert",
     },
@@ -395,7 +411,8 @@ const PARENT = {
       title: "Meilensteine",
       description: "Erfahrungspunkte, Serien, Währung und im Programm verdiente Abzeichen.",
       no_engagement_data: "Noch keine Engagement-Daten",
-      no_engagement_desc: "Sobald dein Lernender die erste Sitzung abgeschlossen hat, beginnen wir mit der Verfolgung von XP, Serien und Abzeichen.",
+      no_engagement_desc:
+        "Sobald dein Lernender die erste Sitzung abgeschlossen hat, beginnen wir mit der Verfolgung von XP, Serien und Abzeichen.",
       back_to_overview: "Zurück zur Lernenden-Übersicht",
       total_xp: "Gesamt-XP",
       levels_desc: "Levels schalten neue Avatare, Anpassungen und Abenteuerwelten frei.",
@@ -436,7 +453,8 @@ const PARENT = {
     },
     learners: {
       title: "Deine Lernenden",
-      description: "Konfiguriere jedes Kind einmalig und verfolge dann sein Wachstum von einem Ort aus.",
+      description:
+        "Konfiguriere jedes Kind einmalig und verfolge dann sein Wachstum von einem Ort aus.",
       add_learner: "Lernenden hinzufügen",
       no_learners: "Noch keine Lernenden",
       no_learners_desc: "Füge dein erstes Kind hinzu, um den Bereitschaftsablauf zu starten.",
@@ -446,7 +464,8 @@ const PARENT = {
       eyebrow: "Elternteil",
       title: "Wöchentliche Lernzusammenfassung",
       no_learners: "Noch keine Lernenden",
-      no_learners_body: "Füge einen Lernenden von der Startseite hinzu, um Fortschrittsberichte zu erstellen.",
+      no_learners_body:
+        "Füge einen Lernenden von der Startseite hinzu, um Fortschrittsberichte zu erstellen.",
       open_learner: "Lernenden öffnen →",
       recent_lessons: "Letzte Lektionen",
     },
@@ -461,7 +480,8 @@ const PARENT = {
       account_label: "Konto",
       billing_label: "Abrechnung",
       privacy_label: "Datenschutz",
-      privacy_desc: "COPPA-, FERPA- und Datenexport-Tools liegen beim Plattformteam — erstelle ein Support-Ticket, wenn du einen Export benötigst.",
+      privacy_desc:
+        "COPPA-, FERPA- und Datenexport-Tools liegen beim Plattformteam — erstelle ein Support-Ticket, wenn du einen Export benötigst.",
     },
   },
 
@@ -469,7 +489,8 @@ const PARENT = {
     consent: {
       title: "Consentimentos por aluno",
       description: "Os consentimentos por aluno se aplicam apenas a esta criança.",
-      coppa_notice: "Este aluno tem menos de 13 anos. O consentimento dos pais é necessário para a coleta de dados conforme a COPPA.",
+      coppa_notice:
+        "Este aluno tem menos de 13 anos. O consentimento dos pais é necessário para a coleta de dados conforme a COPPA.",
       accepted: "Aceito",
       not_accepted: "Não aceito",
     },
@@ -505,7 +526,8 @@ const PARENT = {
       title: "Marcos",
       description: "Pontos de experiência, sequências, moeda e emblemas conquistados no programa.",
       no_engagement_data: "Ainda sem dados de engajamento",
-      no_engagement_desc: "Assim que seu aluno concluir a primeira sessão, começaremos a rastrear XP, sequências e emblemas.",
+      no_engagement_desc:
+        "Assim que seu aluno concluir a primeira sessão, começaremos a rastrear XP, sequências e emblemas.",
       back_to_overview: "Voltar à visão geral do aluno",
       total_xp: "XP total",
       levels_desc: "Os níveis desbloqueiam novos avatares, personalizações e mundos de aventura.",
@@ -556,7 +578,8 @@ const PARENT = {
       eyebrow: "Responsável",
       title: "Resumo semanal de aprendizado",
       no_learners: "Ainda sem alunos",
-      no_learners_body: "Adicione um aluno na página inicial para começar a gerar relatórios de progresso.",
+      no_learners_body:
+        "Adicione um aluno na página inicial para começar a gerar relatórios de progresso.",
       open_learner: "Abrir aluno →",
       recent_lessons: "Lições recentes",
     },
@@ -571,7 +594,8 @@ const PARENT = {
       account_label: "Conta",
       billing_label: "Faturamento",
       privacy_label: "Privacidade",
-      privacy_desc: "As ferramentas de COPPA, FERPA e exportação de dados ficam com a equipe da plataforma — abra um ticket de suporte se precisar de uma exportação.",
+      privacy_desc:
+        "As ferramentas de COPPA, FERPA e exportação de dados ficam com a equipe da plataforma — abra um ticket de suporte se precisar de uma exportação.",
     },
   },
 
@@ -689,7 +713,8 @@ const PARENT = {
     consent: {
       title: "学習者ごとの同意",
       description: "学習者ごとの同意はこの子どもにのみ適用されます。",
-      coppa_notice: "この学習者は13歳未満です。COPPA に基づき、データ収集には保護者の同意が必要です。",
+      coppa_notice:
+        "この学習者は13歳未満です。COPPA に基づき、データ収集には保護者の同意が必要です。",
       accepted: "承認済み",
       not_accepted: "未承認",
     },
@@ -725,7 +750,8 @@ const PARENT = {
       title: "マイルストーン",
       description: "プログラム全体で獲得した経験値、ストリーク、通貨、バッジ。",
       no_engagement_data: "まだエンゲージメントデータがありません",
-      no_engagement_desc: "学習者が最初のセッションを完了すると、XP・ストリーク・バッジの追跡を開始します。",
+      no_engagement_desc:
+        "学習者が最初のセッションを完了すると、XP・ストリーク・バッジの追跡を開始します。",
       back_to_overview: "学習者の概要に戻る",
       total_xp: "合計 XP",
       levels_desc: "レベルアップで新しいアバター、カスタマイズ、クエストワールドが解放されます。",
@@ -791,7 +817,8 @@ const PARENT = {
       account_label: "アカウント",
       billing_label: "請求",
       privacy_label: "プライバシー",
-      privacy_desc: "COPPA・FERPA・データエクスポートツールはプラットフォームチームが担当しています。エクスポートが必要な場合はサポートチケットをお送りください。",
+      privacy_desc:
+        "COPPA・FERPA・データエクスポートツールはプラットフォームチームが担当しています。エクスポートが必要な場合はサポートチケットをお送りください。",
     },
   },
 
@@ -799,7 +826,8 @@ const PARENT = {
     consent: {
       title: "학습자별 동의",
       description: "학습자별 동의는 이 아이에게만 적용됩니다.",
-      coppa_notice: "이 학습자는 13세 미만입니다. COPPA에 따라 데이터 수집에는 부모 동의가 필요합니다.",
+      coppa_notice:
+        "이 학습자는 13세 미만입니다. COPPA에 따라 데이터 수집에는 부모 동의가 필요합니다.",
       accepted: "수락됨",
       not_accepted: "수락되지 않음",
     },
@@ -901,7 +929,8 @@ const PARENT = {
       account_label: "계정",
       billing_label: "결제",
       privacy_label: "개인정보",
-      privacy_desc: "COPPA, FERPA 및 데이터 내보내기 도구는 플랫폼 팀에서 관리합니다. 내보내기가 필요하면 지원 티켓을 제출하세요.",
+      privacy_desc:
+        "COPPA, FERPA 및 데이터 내보내기 도구는 플랫폼 팀에서 관리합니다. 내보내기가 필요하면 지원 티켓을 제출하세요.",
     },
   },
 
@@ -909,7 +938,8 @@ const PARENT = {
     consent: {
       title: "موافقات خاصة بكل متعلّم",
       description: "تسري موافقات كل متعلّم على هذا الطفل فقط.",
-      coppa_notice: "هذا المتعلّم دون الثالثة عشرة من عمره. يُشترط حصول الوالدين على الموافقة لجمع البيانات وفقًا لـ COPPA.",
+      coppa_notice:
+        "هذا المتعلّم دون الثالثة عشرة من عمره. يُشترط حصول الوالدين على الموافقة لجمع البيانات وفقًا لـ COPPA.",
       accepted: "مقبول",
       not_accepted: "غير مقبول",
     },
@@ -1011,7 +1041,8 @@ const PARENT = {
       account_label: "الحساب",
       billing_label: "الفوترة",
       privacy_label: "الخصوصية",
-      privacy_desc: "تقع أدوات COPPA وFERPA وتصدير البيانات ضمن اختصاص فريق المنصة — أرسل تذكرة دعم إذا كنت بحاجة إلى تصدير.",
+      privacy_desc:
+        "تقع أدوات COPPA وFERPA وتصدير البيانات ضمن اختصاص فريق المنصة — أرسل تذكرة دعم إذا كنت بحاجة إلى تصدير.",
     },
   },
 
@@ -1019,7 +1050,8 @@ const PARENT = {
     consent: {
       title: "प्रति-शिक्षार्थी सहमतियाँ",
       description: "प्रति-शिक्षार्थी सहमतियाँ केवल इस बच्चे पर लागू होती हैं।",
-      coppa_notice: "यह शिक्षार्थी 13 वर्ष से कम उम्र का है। COPPA के तहत डेटा संग्रह के लिए माता-पिता की सहमति आवश्यक है।",
+      coppa_notice:
+        "यह शिक्षार्थी 13 वर्ष से कम उम्र का है। COPPA के तहत डेटा संग्रह के लिए माता-पिता की सहमति आवश्यक है।",
       accepted: "स्वीकृत",
       not_accepted: "अस्वीकृत",
     },
@@ -1055,7 +1087,8 @@ const PARENT = {
       title: "मील के पत्थर",
       description: "पूरे कार्यक्रम में अर्जित अनुभव अंक, धाराएँ, मुद्रा और बैज।",
       no_engagement_data: "अभी कोई सहभागिता डेटा नहीं",
-      no_engagement_desc: "एक बार जब आपका शिक्षार्थी पहला सत्र पूरा कर लेगा, तो हम XP, धाराएँ और बैज ट्रैक करना शुरू करेंगे।",
+      no_engagement_desc:
+        "एक बार जब आपका शिक्षार्थी पहला सत्र पूरा कर लेगा, तो हम XP, धाराएँ और बैज ट्रैक करना शुरू करेंगे।",
       back_to_overview: "शिक्षार्थी अवलोकन पर वापस जाएँ",
       total_xp: "कुल XP",
       levels_desc: "स्तर नए अवतार, अनुकूलन और क्वेस्ट दुनिया अनलॉक करते हैं।",
@@ -1121,7 +1154,8 @@ const PARENT = {
       account_label: "खाता",
       billing_label: "बिलिंग",
       privacy_label: "गोपनीयता",
-      privacy_desc: "COPPA, FERPA और डेटा निर्यात टूल प्लेटफ़ॉर्म टीम के पास हैं — यदि आपको निर्यात की आवश्यकता हो तो सहायता टिकट दर्ज करें।",
+      privacy_desc:
+        "COPPA, FERPA और डेटा निर्यात टूल प्लेटफ़ॉर्म टीम के पास हैं — यदि आपको निर्यात की आवश्यकता हो तो सहायता टिकट दर्ज करें।",
     },
   },
 };
@@ -1133,6 +1167,8 @@ for (const [locale, parent] of Object.entries(PARENT)) {
   json.parent = { ...(json.parent ?? {}), ...parent };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-parent-P_combo_a-i18n: merged parent P_combo_a namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-parent-P_combo_a-i18n: merged parent P_combo_a namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-parent-P_combo_a-i18n: done — ${written} locale catalogs updated.`);

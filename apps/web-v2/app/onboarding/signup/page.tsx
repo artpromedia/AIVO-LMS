@@ -3,13 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import {
-  AuthShell,
-  AuthCard,
-  AuthInput,
-  ReassuranceCard,
-  StepperHeader,
-} from "@aivo/ui/auth";
+import { AuthShell, AuthCard, AuthInput, ReassuranceCard, StepperHeader } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
@@ -67,11 +61,7 @@ export default function SignUpPage() {
           title={viaInvite ? t("title_invite") : t("title_default")}
           subtitle={viaInvite ? t("subtitle_invite") : t("subtitle_default")}
           reassurance={
-            <ReassuranceCard
-              tone="safety"
-              title={t("reassure_title")}
-              body={t("reassure_body")}
-            />
+            <ReassuranceCard tone="safety" title={t("reassure_title")} body={t("reassure_body")} />
           }
           actions={
             <>
@@ -85,12 +75,7 @@ export default function SignUpPage() {
                   {tc("continue")}
                 </Link>
               ) : (
-                <Button
-                  type="submit"
-                  form="onboarding-signup-form"
-                  size="lg"
-                  className="w-full"
-                >
+                <Button type="submit" form="onboarding-signup-form" size="lg" className="w-full">
                   {tc("continue")}
                 </Button>
               )}

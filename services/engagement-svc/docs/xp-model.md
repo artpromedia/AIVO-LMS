@@ -26,7 +26,7 @@ configs). The service never synthesizes XP from mastery.
 ## Completion bonus
 
 `lesson_completed` adds a flat `+5 XP` on top of the authored value.
-Rationale: this nudges learners toward *finishing* a lesson when the
+Rationale: this nudges learners toward _finishing_ a lesson when the
 authored XP is small (e.g. SEL reflections), without distorting the
 ranking between subjects that already pay higher base XP.
 

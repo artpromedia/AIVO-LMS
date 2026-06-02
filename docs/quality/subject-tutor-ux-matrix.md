@@ -10,76 +10,76 @@
 
 ## Subjects
 
-| Subject (slug) | Tutor | Web | Mobile |
-| --- | --- | :---: | :---: |
-| reading | sage | P | P |
-| math | nova | P | P |
-| science | spark | P | P |
-| social | harmony | P | P |
-| speech | echo | P | P |
-| executive-function | compass | P | P |
-| writing | sage | P | P |
-| life | compass | P | P |
-| art | muse | P | P |
-| social-studies | chrono | P | P |
-| world-languages | lingua | P | P |
-| coding | pixel | P | P |
-| geography | atlas | P | P |
-| music | cadence | P | P |
-| physical-education | vigor | P | P |
-| engineering | forge | P | P |
+| Subject (slug)     | Tutor   | Web | Mobile |
+| ------------------ | ------- | :-: | :----: |
+| reading            | sage    |  P  |   P    |
+| math               | nova    |  P  |   P    |
+| science            | spark   |  P  |   P    |
+| social             | harmony |  P  |   P    |
+| speech             | echo    |  P  |   P    |
+| executive-function | compass |  P  |   P    |
+| writing            | sage    |  P  |   P    |
+| life               | compass |  P  |   P    |
+| art                | muse    |  P  |   P    |
+| social-studies     | chrono  |  P  |   P    |
+| world-languages    | lingua  |  P  |   P    |
+| coding             | pixel   |  P  |   P    |
+| geography          | atlas   |  P  |   P    |
+| music              | cadence |  P  |   P    |
+| physical-education | vigor   |  P  |   P    |
+| engineering        | forge   |  P  |   P    |
 
 ## Tutors
 
-| Tutor | Status | Subjects |
-| --- | :---: | --- |
-| atlas | linked | geography |
-| cadence | linked | music |
-| chrono | linked | social-studies |
+| Tutor   | Status | Subjects                 |
+| ------- | :----: | ------------------------ |
+| atlas   | linked | geography                |
+| cadence | linked | music                    |
+| chrono  | linked | social-studies           |
 | compass | linked | executive-function, life |
-| echo | linked | speech |
-| forge | linked | engineering |
-| harmony | linked | social |
-| lingua | linked | world-languages |
-| muse | linked | art |
-| nova | linked | math |
-| pixel | linked | coding |
-| sage | linked | reading, writing |
-| spark | linked | science |
-| vigor | linked | physical-education |
+| echo    | linked | speech                   |
+| forge   | linked | engineering              |
+| harmony | linked | social                   |
+| lingua  | linked | world-languages          |
+| muse    | linked | art                      |
+| nova    | linked | math                     |
+| pixel   | linked | coding                   |
+| sage    | linked | reading, writing         |
+| spark   | linked | science                  |
+| vigor   | linked | physical-education       |
 
 ## Aggregate
 
-| Metric | Count |
-| --- | ---: |
-| subjects total | 16 |
-| subjects reachable on web (P/F) | 16 |
-| subjects hidden on web (H) | 0 |
-| subjects reachable on mobile (P/F) | 16 |
-| tutors total | 14 |
-| orphan tutors (O) | 0 |
+| Metric                             | Count |
+| ---------------------------------- | ----: |
+| subjects total                     |    16 |
+| subjects reachable on web (P/F)    |    16 |
+| subjects hidden on web (H)         |     0 |
+| subjects reachable on mobile (P/F) |    16 |
+| tutors total                       |    14 |
+| orphan tutors (O)                  |     0 |
 
 ## Activity surface capability
 
 > Source of truth: `packages/learner-surfaces` `SURFACE_CAPABILITY_REGISTRY`.
 
-| Surface | Web | Mobile | Primary subject / tutor |
-| --- | :---: | :---: | --- |
-| choice_grid | ✅ full | ✅ full | universal — multiple choice |
-| scratchpad | ✅ full | ✅ full | universal — ink workspace |
-| math_expression | ✅ full | ✅ full | math (nova) |
-| number_line | ✅ full | ✅ full | math (nova) |
-| coding_sandbox | ✅ full | ✅ full | coding (pixel) |
-| art_canvas | ✅ full | ✅ full | art (muse) |
-| voice_response | ✅ full | ✅ full | speech (echo) / languages (lingua) |
-| video | ✅ full | ✅ full | media-rich lessons (all) |
-| audio | ✅ full | ✅ full | media-rich lessons (all) |
-| geometry_workspace | ✅ full | ✅ full | math/geometry (nova) |
-| reading_annotation | ✅ full | ✅ full | reading/ELA (sage) |
-| graph | ✅ full | ✅ full | math/science (nova/spark) |
-| drag_manipulative | ✅ full | ✅ full | math manipulatives (nova) / exec-fn (compass) |
-| multi_step_workspace | ✅ full | ✅ full | math/science (nova/spark) |
-| science_diagram | ✅ full | ✅ full | science (spark) |
-| music_sequencer | ✅ full | ✅ full | music (cadence) |
+| Surface              |   Web   | Mobile  | Primary subject / tutor                       |
+| -------------------- | :-----: | :-----: | --------------------------------------------- |
+| choice_grid          | ✅ full | ✅ full | universal — multiple choice                   |
+| scratchpad           | ✅ full | ✅ full | universal — ink workspace                     |
+| math_expression      | ✅ full | ✅ full | math (nova)                                   |
+| number_line          | ✅ full | ✅ full | math (nova)                                   |
+| coding_sandbox       | ✅ full | ✅ full | coding (pixel)                                |
+| art_canvas           | ✅ full | ✅ full | art (muse)                                    |
+| voice_response       | ✅ full | ✅ full | speech (echo) / languages (lingua)            |
+| video                | ✅ full | ✅ full | media-rich lessons (all)                      |
+| audio                | ✅ full | ✅ full | media-rich lessons (all)                      |
+| geometry_workspace   | ✅ full | ✅ full | math/geometry (nova)                          |
+| reading_annotation   | ✅ full | ✅ full | reading/ELA (sage)                            |
+| graph                | ✅ full | ✅ full | math/science (nova/spark)                     |
+| drag_manipulative    | ✅ full | ✅ full | math manipulatives (nova) / exec-fn (compass) |
+| multi_step_workspace | ✅ full | ✅ full | math/science (nova/spark)                     |
+| science_diagram      | ✅ full | ✅ full | science (spark)                               |
+| music_sequencer      | ✅ full | ✅ full | music (cadence)                               |
 
 Surfaces with a full renderer: **web 16/16**, **mobile 16/16**. Non-full surfaces render a labelled fallback that emits `unsupported_surface`.

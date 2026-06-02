@@ -134,9 +134,7 @@ export default async function LearnerProgressPage() {
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
           {t("title", { name: learner.preferredName || learner.firstName })}
         </h1>
-        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
-          {t("description")}
-        </p>
+        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">{t("description")}</p>
       </header>
 
       {!map ? (
@@ -146,7 +144,9 @@ export default async function LearnerProgressPage() {
             body={t("empty_body")}
             action={
               <Link
-                href={session.role === "parent" ? `/parent/learners/${learnerId}` : "/learner/baseline"}
+                href={
+                  session.role === "parent" ? `/parent/learners/${learnerId}` : "/learner/baseline"
+                }
                 className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
               >
                 {session.role === "parent" ? t("empty_cta_parent") : t("empty_cta_learner")}
@@ -193,9 +193,7 @@ export default async function LearnerProgressPage() {
               {trendPoints.length > 0 ? (
                 <SoftLine data={trendPoints} ariaLabel={t("lessons_aria")} filled />
               ) : (
-                <p className="text-sm text-iw-text-muted">
-                  {t("no_lessons_waiting")}
-                </p>
+                <p className="text-sm text-iw-text-muted">{t("no_lessons_waiting")}</p>
               )}
             </GlassCard>
             <GlassCard
@@ -222,11 +220,7 @@ export default async function LearnerProgressPage() {
                   level: levelToMasteryCell(m.level),
                 }));
                 return (
-                  <GlassCard
-                    key={subj.id}
-                    elevation="raised"
-                    density="comfortable"
-                  >
+                  <GlassCard key={subj.id} elevation="raised" density="comfortable">
                     <header className="flex items-center justify-between gap-2 mb-3">
                       <h3 className="text-base font-semibold text-iw-text-strong">{subj.name}</h3>
                       <InsightChip
@@ -240,7 +234,10 @@ export default async function LearnerProgressPage() {
                       <p className="text-sm text-iw-text-muted">{t("no_mastery_data")}</p>
                     ) : (
                       <>
-                        <MasteryHeatStrip cells={cells} ariaLabel={t("heat_aria", { name: subj.name })} />
+                        <MasteryHeatStrip
+                          cells={cells}
+                          ariaLabel={t("heat_aria", { name: subj.name })}
+                        />
                         <ProgressCurve value={avg} className="mt-3" />
                       </>
                     )}
@@ -268,8 +265,7 @@ export default async function LearnerProgressPage() {
                         {skillNames.get(r.skillId) ?? r.skillId}
                       </p>
                       <p className="text-xs text-iw-text-muted">
-                        {r.source.replace(/_/g, " ")} ·{" "}
-                        {new Date(r.createdAt).toLocaleDateString()}
+                        {r.source.replace(/_/g, " ")} · {new Date(r.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     <InsightChip

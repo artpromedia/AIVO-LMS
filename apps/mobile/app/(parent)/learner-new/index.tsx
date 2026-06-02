@@ -38,11 +38,19 @@ export default function ParentLearnerNewScreen() {
       if (id) router.replace(`/(parent)/learners/${id}` as never);
       else router.back();
     } catch {
-      Alert.alert(t("common.error", "Something went wrong"), t("parentLearnerNew.failed", "Couldn't add the learner. Please try again."));
+      Alert.alert(
+        t("common.error", "Something went wrong"),
+        t("parentLearnerNew.failed", "Couldn't add the learner. Please try again."),
+      );
     }
   };
 
-  const field = (label: string, value: string, set: (v: string) => void, opts: { keyboard?: "default" | "number-pad"; secure?: boolean } = {}) => (
+  const field = (
+    label: string,
+    value: string,
+    set: (v: string) => void,
+    opts: { keyboard?: "default" | "number-pad"; secure?: boolean } = {},
+  ) => (
     <View style={{ gap: 6 }}>
       <Text style={[styles.label, { color: palette.ink }]}>{label}</Text>
       <TextInput
@@ -50,7 +58,10 @@ export default function ParentLearnerNewScreen() {
         onChangeText={set}
         keyboardType={opts.keyboard ?? "default"}
         secureTextEntry={opts.secure}
-        style={[styles.input, { borderColor: palette.border, color: palette.ink, backgroundColor: palette.bgRaised }]}
+        style={[
+          styles.input,
+          { borderColor: palette.border, color: palette.ink, backgroundColor: palette.bgRaised },
+        ]}
         placeholderTextColor={palette.inkMuted}
         accessibilityLabel={label}
       />
@@ -64,7 +75,10 @@ export default function ParentLearnerNewScreen() {
         {field(t("parentLearnerNew.firstName", "First name"), firstName, setFirstName)}
         {field(t("parentLearnerNew.lastName", "Last name"), lastName, setLastName)}
         {field(t("parentLearnerNew.grade", "Grade level"), gradeLevel, setGradeLevel)}
-        {field(t("parentLearnerNew.pin", "Learner PIN (4+ digits)"), pin, setPin, { keyboard: "number-pad", secure: true })}
+        {field(t("parentLearnerNew.pin", "Learner PIN (4+ digits)"), pin, setPin, {
+          keyboard: "number-pad",
+          secure: true,
+        })}
         <Button
           title={t("parentLearnerNew.create", "Add learner")}
           onPress={onSubmit}
@@ -80,5 +94,12 @@ export default function ParentLearnerNewScreen() {
 
 const styles = StyleSheet.create({
   label: { fontSize: 13, fontFamily: fontFamilies.bodyBold },
-  input: { height: 48, borderWidth: 1.5, borderRadius: radius.lg, paddingHorizontal: spacing.md, fontSize: 16, fontFamily: fontFamilies.bodyRegular },
+  input: {
+    height: 48,
+    borderWidth: 1.5,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md,
+    fontSize: 16,
+    fontFamily: fontFamilies.bodyRegular,
+  },
 });

@@ -66,11 +66,7 @@ export function CommandBar({
     >
       {leading}
 
-      <form
-        role="search"
-        onSubmit={submit}
-        className="flex flex-1 items-center gap-2 max-w-xl"
-      >
+      <form role="search" onSubmit={submit} className="flex flex-1 items-center gap-2 max-w-xl">
         <label className="iw-touch relative flex w-full items-center">
           <Search
             className="pointer-events-none absolute left-3 h-4 w-4 text-iw-text-muted"
@@ -88,21 +84,13 @@ export function CommandBar({
       </form>
 
       <div className="flex items-center gap-1.5">
-        <RoleSwitcher
-          current={role}
-          options={roleOptions}
-          onSelect={onRoleSelect}
-        />
+        <RoleSwitcher current={role} options={roleOptions} onSelect={onRoleSelect} />
 
         <button
           type="button"
           onClick={onOpenNotifications}
           className="iw-touch relative inline-flex h-9 w-9 items-center justify-center rounded-iw-control text-iw-text-muted hover:bg-iw-card hover:text-iw-text-strong"
-          aria-label={
-            unreadCount > 0
-              ? `Notifications, ${unreadCount} unread`
-              : "Notifications"
-          }
+          aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
         >
           <Bell className="h-4 w-4" aria-hidden />
           {unreadCount > 0 ? (
@@ -132,19 +120,13 @@ export function CommandBar({
         >
           {account.avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={account.avatarUrl}
-              alt=""
-              className="h-7 w-7 rounded-full object-cover"
-            />
+            <img src={account.avatarUrl} alt="" className="h-7 w-7 rounded-full object-cover" />
           ) : (
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--aivo-color-aivoTeal-100,#ccfbf1)] text-xs font-semibold text-[var(--aivo-color-aivoTeal-700,#0f766e)]">
               {(account.initials ?? account.name.slice(0, 1)).toUpperCase()}
             </span>
           )}
-          <span className="hidden md:inline max-w-[120px] truncate">
-            {account.name}
-          </span>
+          <span className="hidden md:inline max-w-[120px] truncate">{account.name}</span>
         </button>
       </div>
     </header>

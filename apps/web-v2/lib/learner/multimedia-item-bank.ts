@@ -52,13 +52,17 @@ function loadFixtureBank(): GeneratedFixtureBank {
     }
   }
   if (!raw) {
-    throw new Error("multimedia fixture import missing; run pnpm item-bank:import-multimedia-fixtures");
+    throw new Error(
+      "multimedia fixture import missing; run pnpm item-bank:import-multimedia-fixtures",
+    );
   }
   cached = JSON.parse(raw) as GeneratedFixtureBank;
   return cached;
 }
 
-function normalizeSubject(subjectSlug: string): keyof GeneratedFixtureBank["itemsBySubject"] | null {
+function normalizeSubject(
+  subjectSlug: string,
+): keyof GeneratedFixtureBank["itemsBySubject"] | null {
   if (subjectSlug === "math") return "math";
   if (subjectSlug === "science") return "science";
   if (subjectSlug === "reading" || subjectSlug === "writing" || subjectSlug === "ela") return "ela";

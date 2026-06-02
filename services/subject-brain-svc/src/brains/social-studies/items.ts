@@ -14,7 +14,12 @@ export const SOCIAL_STUDIES_ITEMS: Item[] = [
     difficulty: -1.5,
     surface: "choice_grid",
     prompt: "Why do classrooms have rules?",
-    options: ["To keep everyone safe and fair", "To make people sad", "To waste time", "For decoration"],
+    options: [
+      "To keep everyone safe and fair",
+      "To make people sad",
+      "To waste time",
+      "For decoration",
+    ],
   },
   {
     id: "SS.IT.CIV.002",
@@ -38,7 +43,12 @@ export const SOCIAL_STUDIES_ITEMS: Item[] = [
     difficulty: 0.2,
     surface: "choice_grid",
     prompt: "Which is a responsibility of citizens?",
-    options: ["Voting and following the law", "Designing the flag", "Naming the seasons", "Choosing the weather"],
+    options: [
+      "Voting and following the law",
+      "Designing the flag",
+      "Naming the seasons",
+      "Choosing the weather",
+    ],
   },
   {
     id: "SS.IT.CIV.005",
@@ -108,7 +118,12 @@ export const SOCIAL_STUDIES_ITEMS: Item[] = [
     prompt: "Watch the migration clip. What is one common reason people migrate?",
     mediaUrl: "https://media.aivo.dev/ss/migration.mp4",
     captionUrl: "https://media.aivo.dev/ss/migration.vtt",
-    options: ["Looking for better opportunities", "To repaint their homes", "To rename rivers", "For no reason"],
+    options: [
+      "Looking for better opportunities",
+      "To repaint their homes",
+      "To rename rivers",
+      "For no reason",
+    ],
   },
   {
     id: "SS.IT.GEO.005",
@@ -140,7 +155,12 @@ export const SOCIAL_STUDIES_ITEMS: Item[] = [
     difficulty: -0.8,
     surface: "choice_grid",
     prompt: "A map key tells you…",
-    options: ["What the symbols mean", "Who made the map", "When it was printed", "How heavy it is"],
+    options: [
+      "What the symbols mean",
+      "Who made the map",
+      "When it was printed",
+      "How heavy it is",
+    ],
   },
 
   // History (8)
@@ -150,7 +170,12 @@ export const SOCIAL_STUDIES_ITEMS: Item[] = [
     difficulty: -1.5,
     surface: "choice_grid",
     prompt: "Which happened first?",
-    options: ["You were born", "You started school", "You started reading", "You learned your name"],
+    options: [
+      "You were born",
+      "You started school",
+      "You started reading",
+      "You learned your name",
+    ],
   },
   {
     id: "SS.IT.HIST.002",
@@ -184,7 +209,12 @@ export const SOCIAL_STUDIES_ITEMS: Item[] = [
     difficulty: 0.6,
     surface: "choice_grid",
     prompt: "What was one main cause of the U.S. Civil War?",
-    options: ["Disagreement over slavery", "A bad harvest", "A spelling reform", "A scientific discovery"],
+    options: [
+      "Disagreement over slavery",
+      "A bad harvest",
+      "A spelling reform",
+      "A scientific discovery",
+    ],
   },
   {
     id: "SS.IT.HIST.006",
@@ -244,7 +274,12 @@ export const SOCIAL_STUDIES_ITEMS: Item[] = [
     difficulty: 0.3,
     surface: "choice_grid",
     prompt: "Scarcity means…",
-    options: ["Not enough to meet everyone's wants", "Free for everyone", "Too much of something", "Old and broken"],
+    options: [
+      "Not enough to meet everyone's wants",
+      "Free for everyone",
+      "Too much of something",
+      "Old and broken",
+    ],
   },
   {
     id: "SS.IT.ECON.005",

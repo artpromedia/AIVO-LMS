@@ -9,12 +9,7 @@
 import { getStore, newId, nowIso } from "@/lib/db/store";
 import type { TenantMembership, User } from "@/lib/db/types";
 import type { Role } from "@/lib/auth/types";
-import type {
-  IdentityStore,
-  StaffUserRecord,
-  StaffUserRole,
-  UserSummary,
-} from "../types";
+import type { IdentityStore, StaffUserRecord, StaffUserRole, UserSummary } from "../types";
 
 const STAFF_ROLE_MAP: Record<StaffUserRole, Role> = {
   TEACHER: "teacher",

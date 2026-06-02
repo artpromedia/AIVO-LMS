@@ -43,12 +43,7 @@ export interface ServiceCallSuccess<T> {
 export interface ServiceCallFailure {
   ok: false;
   status: number | null;
-  reason:
-    | "non_2xx"
-    | "timeout"
-    | "network_error"
-    | "schema_validation_failed"
-    | "no_url";
+  reason: "non_2xx" | "timeout" | "network_error" | "schema_validation_failed" | "no_url";
   message: string;
   attempts: number;
   latencyMs: number;

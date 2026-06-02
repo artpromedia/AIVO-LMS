@@ -1,15 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { buildDrawingPngDataUrl, buildDrawingSvg, buildDrawingSvgDataUrl } from "../DrawingCanvas/exportDrawing.js";
+import {
+  buildDrawingPngDataUrl,
+  buildDrawingSvg,
+  buildDrawingSvgDataUrl,
+} from "../DrawingCanvas/exportDrawing.js";
 import { createStroke } from "../ink/stroke-model.js";
 
 describe("drawing exports", () => {
-  const stroke = createStroke(
-    "pencil",
-    { x: 10, y: 20, t: Date.now() },
-    3,
-    "stroke-1",
-    "#ff0000",
-  );
+  const stroke = createStroke("pencil", { x: 10, y: 20, t: Date.now() }, 3, "stroke-1", "#ff0000");
 
   it("builds svg output with path data", () => {
     const svg = buildDrawingSvg([stroke], 120, 80);

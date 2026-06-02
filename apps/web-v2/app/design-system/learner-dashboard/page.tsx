@@ -25,18 +25,13 @@ export const metadata: Metadata = {
 
 export default function LearnerDashboardDesignSystemPage() {
   return (
-    <main
-      data-role-theme="learner"
-      className="min-h-screen bg-[var(--color-aivo-page-bg)] py-12"
-    >
+    <main data-role-theme="learner" className="min-h-screen bg-[var(--color-aivo-page-bg)] py-12">
       <div className="max-w-[1280px] mx-auto px-6 flex flex-col gap-12">
         <header className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-iw-text-strong">
-            Learner Dashboard primitives
-          </h1>
+          <h1 className="text-3xl font-bold text-iw-text-strong">Learner Dashboard primitives</h1>
           <p className="text-base text-iw-text-muted">
-            SensoryAdaptive composition — what the live learner home renders
-            once a learner has a resumable lesson or completed baseline.
+            SensoryAdaptive composition — what the live learner home renders once a learner has a
+            resumable lesson or completed baseline.
           </p>
         </header>
 

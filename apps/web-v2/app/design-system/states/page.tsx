@@ -103,7 +103,12 @@ export default function StatesDesignSystemPage() {
             Every dead-end becomes a calm soft-glass card with a clear next action.
           </p>
           <nav className="flex flex-wrap gap-2 mt-2">
-            <Link href="/design-system" className="text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline">← Core primitives</Link>
+            <Link
+              href="/design-system"
+              className="text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
+            >
+              ← Core primitives
+            </Link>
           </nav>
         </header>
 

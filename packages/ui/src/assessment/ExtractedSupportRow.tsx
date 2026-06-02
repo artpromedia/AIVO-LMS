@@ -37,7 +37,8 @@ const CONFIDENCE_LABEL: Record<NonNullable<ExtractedSupportRowProps["confidence"
 };
 const CONFIDENCE_TINT: Record<NonNullable<ExtractedSupportRowProps["confidence"]>, string> = {
   high: "bg-[var(--aivo-color-status-success-subtle,#f0fdf4)] text-[var(--aivo-color-status-success-strong,#15803d)]",
-  medium: "bg-[var(--aivo-color-status-info-subtle,#eff6ff)] text-[var(--aivo-color-status-info-strong,#1d4ed8)]",
+  medium:
+    "bg-[var(--aivo-color-status-info-subtle,#eff6ff)] text-[var(--aivo-color-status-info-strong,#1d4ed8)]",
   low: "bg-[var(--aivo-color-status-warning-subtle,#fffbeb)] text-[var(--aivo-color-status-warning-strong,#b45309)]",
 };
 
@@ -105,9 +106,7 @@ export function ExtractedSupportRow({
       </span>
       <span className="flex-1 min-w-0 flex flex-col gap-1">
         <span className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-semibold text-iw-text-strong">
-            {label}
-          </span>
+          <span className="text-sm font-semibold text-iw-text-strong">{label}</span>
           {confidence ? (
             <span
               className={cn(
@@ -125,14 +124,10 @@ export function ExtractedSupportRow({
           ) : null}
         </span>
         {description ? (
-          <span className="text-xs text-iw-text-muted leading-relaxed">
-            {description}
-          </span>
+          <span className="text-xs text-iw-text-muted leading-relaxed">{description}</span>
         ) : null}
         {provenance ? (
-          <span className="text-[11px] text-iw-text-muted/80 mt-0.5">
-            {provenance}
-          </span>
+          <span className="text-[11px] text-iw-text-muted/80 mt-0.5">{provenance}</span>
         ) : null}
       </span>
     </label>

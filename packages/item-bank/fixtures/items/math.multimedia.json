@@ -8,11 +8,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then solve item 1: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -40,11 +36,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then solve item 2: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -72,11 +64,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then solve item 3: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -104,11 +92,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then solve item 4: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -136,11 +120,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then solve item 5: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -168,11 +148,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then solve item 6: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -200,11 +176,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then solve item 7: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -232,11 +204,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then solve item 8: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -264,11 +232,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then solve item 9: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -296,11 +260,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then solve item 10: what is the best answer?",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [

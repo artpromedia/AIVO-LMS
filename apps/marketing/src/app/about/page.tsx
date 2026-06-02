@@ -194,9 +194,7 @@ export default function AboutPage() {
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
               {t("core_principles")}
             </h2>
-            <p className="text-lg text-slate-500 font-body">
-              {t("core_principles_sub")}
-            </p>
+            <p className="text-lg text-slate-500 font-body">{t("core_principles_sub")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {PRINCIPLES.map((p) => (
@@ -224,9 +222,7 @@ export default function AboutPage() {
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
               {t("our_values")}
             </h2>
-            <p className="text-lg text-slate-500 font-body">
-              {t("our_values_sub")}
-            </p>
+            <p className="text-lg text-slate-500 font-body">{t("our_values_sub")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {VALUES.map((v) => (
@@ -322,7 +318,9 @@ export default function AboutPage() {
       <section className="py-16 md:py-20">
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <div className="bg-gradient-to-r from-primary to-purple-600 rounded-3xl p-10 md:p-16 text-white">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">{t("join_our_mission")}</h2>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
+              {t("join_our_mission")}
+            </h2>
             <p className="text-lg text-white/80 font-body mb-8 max-w-2xl mx-auto">
               Help us build a world where every student gets the personalized education they
               deserve.

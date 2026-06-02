@@ -91,7 +91,7 @@ async function answerAction(formData: FormData) {
   const latencyMs = Number.isFinite(latencyRaw) && latencyRaw >= 0 ? latencyRaw : undefined;
 
   if (session.role === "parent") {
-    if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+    if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
       redirect("/parent/learners");
     }
   } else if (session.role === "learner") {
@@ -136,7 +136,7 @@ async function completeAction(formData: FormData) {
   const asParent = String(formData.get("asParent") || "") === "1";
 
   if (session.role === "parent") {
-    if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+    if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
       redirect("/parent/learners");
     }
   } else if (session.role === "learner") {
@@ -195,7 +195,7 @@ export default async function BaselineRunnerPage({
   if (!baseline) notFound();
 
   if (session.role === "parent") {
-    if (!await parentCanAccessLearner(session.userId, baseline.learnerId, session.tenantId)) {
+    if (!(await parentCanAccessLearner(session.userId, baseline.learnerId, session.tenantId))) {
       notFound();
     }
   } else if (session.role === "learner") {
@@ -303,7 +303,16 @@ export default async function BaselineRunnerPage({
             href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
             className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M19 12H5" />
               <path d="m12 19-7-7 7-7" />
             </svg>
@@ -318,17 +327,32 @@ export default async function BaselineRunnerPage({
           showAnswered={asParent}
           body={baseline.summary?.learnerSafeSummary ?? undefined}
           learned={[
-            ...subjectMastery.map((s) => `${s.subjectName}: starting at ${s.estimate.replaceAll("_", " ")}`),
+            ...subjectMastery.map(
+              (s) => `${s.subjectName}: starting at ${s.estimate.replaceAll("_", " ")}`,
+            ),
             ...(chips.includes("iep") ? ["IEP supports stay on"] : []),
             ...(chips.includes("calm_mode") ? ["Calm pacing locked in"] : []),
           ]}
           primary={
             <Link
-              href={asParent ? `/parent/learners/${baseline.learnerId}/baseline/summary` : "/learner/home"}
+              href={
+                asParent
+                  ? `/parent/learners/${baseline.learnerId}/baseline/summary`
+                  : "/learner/home"
+              }
               className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
             >
               {asParent ? "See the parent summary" : "Take me home"}
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <path d="M5 12h14" />
                 <path d="m13 5 7 7-7 7" />
               </svg>
@@ -354,7 +378,16 @@ export default async function BaselineRunnerPage({
               {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
               <Button type="submit" size="lg">
                 {t("finish_baseline")}
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <svg
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
                   <path d="M5 12h14" />
                   <path d="m13 5 7 7-7 7" />
                 </svg>
@@ -397,7 +430,16 @@ export default async function BaselineRunnerPage({
               className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
             >
               {t("resume")}
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
             </Link>
@@ -475,7 +517,16 @@ export default async function BaselineRunnerPage({
           href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
           className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <rect x="6" y="4" width="4" height="16" />
             <rect x="14" y="4" width="4" height="16" />
           </svg>
@@ -507,9 +558,7 @@ export default async function BaselineRunnerPage({
             <span>{next.prompt}</span>
           </>
         }
-        readAloud={
-          next.readAloudText ? <ReadAloudButton href={`?read=${next.id}`} /> : null
-        }
+        readAloud={next.readAloudText ? <ReadAloudButton href={`?read=${next.id}`} /> : null}
         footer={
           <>
             <div className="flex items-center gap-2">
@@ -520,7 +569,16 @@ export default async function BaselineRunnerPage({
                 <input type="hidden" name="skipped" value="1" />
                 {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
                 <Button type="submit" variant="outline" size="sm" formNoValidate>
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
                     <polygon points="5 4 15 12 5 20 5 4" />
                     <line x1="19" y1="5" x2="19" y2="19" />
                   </svg>
@@ -530,7 +588,16 @@ export default async function BaselineRunnerPage({
             </div>
             <Button type="submit" form={`answer-form-${next.id}`}>
               Next
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <path d="M5 12h14" />
                 <path d="m13 5 7 7-7 7" />
               </svg>
@@ -556,9 +623,7 @@ export default async function BaselineRunnerPage({
                 // option looks like a real cartoon picture (dog, cat,
                 // car). Falls back to the raw emoji glyph if the
                 // codepoint isn't in Twemoji's pack.
-                const choiceImg = emoji
-                  ? resolveBaselineImage({ sceneEmoji: emoji })
-                  : undefined;
+                const choiceImg = emoji ? resolveBaselineImage({ sceneEmoji: emoji }) : undefined;
                 let lead: ReactNode = undefined;
                 if (choiceImg?.imageUrl) {
                   lead = (

@@ -71,7 +71,8 @@ export const caselSel3To12: SkillGraph = {
     {
       id: "casel.sm.stress.10",
       title: "Manage stress and seek support",
-      description: "I can recognize when I'm stressed, use coping strategies, and ask for help when I need it.",
+      description:
+        "I can recognize when I'm stressed, use coping strategies, and ask for help when I need it.",
       subject: "sel",
       gradeBand: "10",
       frameworkRefs: [{ framework: "CASEL", code: "Self-Management" }],
@@ -120,7 +121,8 @@ export const caselSel3To12: SkillGraph = {
     {
       id: "casel.rs.conflict.7",
       title: "Resolve conflicts respectfully",
-      description: "I can resolve a disagreement by listening, sharing, and finding a fair solution.",
+      description:
+        "I can resolve a disagreement by listening, sharing, and finding a fair solution.",
       subject: "sel",
       gradeBand: "7",
       frameworkRefs: [{ framework: "CASEL", code: "Relationship-Skills" }],
@@ -140,7 +142,8 @@ export const caselSel3To12: SkillGraph = {
     {
       id: "casel.rdm.choices.5",
       title: "Make safe and ethical choices",
-      description: "I can think about consequences before I make a choice that affects me and others.",
+      description:
+        "I can think about consequences before I make a choice that affects me and others.",
       subject: "sel",
       gradeBand: "5",
       frameworkRefs: [{ framework: "CASEL", code: "Responsible-Decision-Making" }],
@@ -158,7 +161,8 @@ export const caselSel3To12: SkillGraph = {
     {
       id: "casel.rdm.civic.12",
       title: "Contribute to community well-being",
-      description: "I can apply decision-making to issues that affect my community and act on them.",
+      description:
+        "I can apply decision-making to issues that affect my community and act on them.",
       subject: "sel",
       gradeBand: "12",
       frameworkRefs: [{ framework: "CASEL", code: "Responsible-Decision-Making" }],

@@ -2,42 +2,137 @@
   "semantic": {
     "domain": {
       "mastery": {
-        "emerging":   {"subtle":"#fee2e2","default":"#ef4444","strong":"#b91c1c","on":"#ffffff"},
-        "developing": {"subtle":"#fef3c7","default":"#f59e0b","strong":"#b45309","on":"#0f1011"},
-        "proficient": {"subtle":"#ccfbf1","default":"#14b8a6","strong":"#0f766e","on":"#ffffff"},
-        "mastered":   {"subtle":"#dcfce7","default":"#22c55e","strong":"#15803d","on":"#ffffff"}
+        "emerging": {
+          "subtle": "#fee2e2",
+          "default": "#ef4444",
+          "strong": "#b91c1c",
+          "on": "#ffffff"
+        },
+        "developing": {
+          "subtle": "#fef3c7",
+          "default": "#f59e0b",
+          "strong": "#b45309",
+          "on": "#0f1011"
+        },
+        "proficient": {
+          "subtle": "#ccfbf1",
+          "default": "#14b8a6",
+          "strong": "#0f766e",
+          "on": "#ffffff"
+        },
+        "mastered": {
+          "subtle": "#dcfce7",
+          "default": "#22c55e",
+          "strong": "#15803d",
+          "on": "#ffffff"
+        }
       },
       "risk": {
-        "low":      {"subtle":"#dcfce7","default":"#22c55e","strong":"#15803d","on":"#ffffff"},
-        "watch":    {"subtle":"#fef3c7","default":"#f59e0b","strong":"#b45309","on":"#0f1011"},
-        "elevated": {"subtle":"#ffedd5","default":"#f97316","strong":"#c2410c","on":"#ffffff"},
-        "high":     {"subtle":"#fee2e2","default":"#ef4444","strong":"#b91c1c","on":"#ffffff"}
+        "low": { "subtle": "#dcfce7", "default": "#22c55e", "strong": "#15803d", "on": "#ffffff" },
+        "watch": {
+          "subtle": "#fef3c7",
+          "default": "#f59e0b",
+          "strong": "#b45309",
+          "on": "#0f1011"
+        },
+        "elevated": {
+          "subtle": "#ffedd5",
+          "default": "#f97316",
+          "strong": "#c2410c",
+          "on": "#ffffff"
+        },
+        "high": { "subtle": "#fee2e2", "default": "#ef4444", "strong": "#b91c1c", "on": "#ffffff" }
       },
       "consent": {
-        "pending":  {"subtle":"#fef3c7","default":"#f59e0b","strong":"#b45309","on":"#0f1011"},
-        "granted":  {"subtle":"#ede9fe","default":"#7c3aed","strong":"#5b21b6","on":"#ffffff"},
-        "revoked":  {"subtle":"#fee2e2","default":"#ef4444","strong":"#b91c1c","on":"#ffffff"},
-        "expired":  {"subtle":"#f3f4f6","default":"#6b7280","strong":"#374151","on":"#ffffff"}
+        "pending": {
+          "subtle": "#fef3c7",
+          "default": "#f59e0b",
+          "strong": "#b45309",
+          "on": "#0f1011"
+        },
+        "granted": {
+          "subtle": "#ede9fe",
+          "default": "#7c3aed",
+          "strong": "#5b21b6",
+          "on": "#ffffff"
+        },
+        "revoked": {
+          "subtle": "#fee2e2",
+          "default": "#ef4444",
+          "strong": "#b91c1c",
+          "on": "#ffffff"
+        },
+        "expired": {
+          "subtle": "#f3f4f6",
+          "default": "#6b7280",
+          "strong": "#374151",
+          "on": "#ffffff"
+        }
       },
       "billing": {
-        "paid":     {"subtle":"#dcfce7","default":"#22c55e","strong":"#15803d","on":"#ffffff"},
-        "due":      {"subtle":"#fef3c7","default":"#f59e0b","strong":"#b45309","on":"#0f1011"},
-        "overdue":  {"subtle":"#fee2e2","default":"#ef4444","strong":"#b91c1c","on":"#ffffff"},
-        "trial":    {"subtle":"#ede9fe","default":"#7c3aed","strong":"#5b21b6","on":"#ffffff"},
-        "refunded": {"subtle":"#f3f4f6","default":"#6b7280","strong":"#374151","on":"#ffffff"}
+        "paid": { "subtle": "#dcfce7", "default": "#22c55e", "strong": "#15803d", "on": "#ffffff" },
+        "due": { "subtle": "#fef3c7", "default": "#f59e0b", "strong": "#b45309", "on": "#0f1011" },
+        "overdue": {
+          "subtle": "#fee2e2",
+          "default": "#ef4444",
+          "strong": "#b91c1c",
+          "on": "#ffffff"
+        },
+        "trial": {
+          "subtle": "#ede9fe",
+          "default": "#7c3aed",
+          "strong": "#5b21b6",
+          "on": "#ffffff"
+        },
+        "refunded": {
+          "subtle": "#f3f4f6",
+          "default": "#6b7280",
+          "strong": "#374151",
+          "on": "#ffffff"
+        }
       },
       "safety": {
-        "safe":     {"subtle":"#ccfbf1","default":"#14b8a6","strong":"#0f766e","on":"#ffffff"},
-        "review":   {"subtle":"#fef3c7","default":"#f59e0b","strong":"#b45309","on":"#0f1011"},
-        "flag":     {"subtle":"#ffedd5","default":"#f97316","strong":"#c2410c","on":"#ffffff"},
-        "block":    {"subtle":"#fee2e2","default":"#ef4444","strong":"#b91c1c","on":"#ffffff"}
+        "safe": { "subtle": "#ccfbf1", "default": "#14b8a6", "strong": "#0f766e", "on": "#ffffff" },
+        "review": {
+          "subtle": "#fef3c7",
+          "default": "#f59e0b",
+          "strong": "#b45309",
+          "on": "#0f1011"
+        },
+        "flag": { "subtle": "#ffedd5", "default": "#f97316", "strong": "#c2410c", "on": "#ffffff" },
+        "block": { "subtle": "#fee2e2", "default": "#ef4444", "strong": "#b91c1c", "on": "#ffffff" }
       },
       "completion": {
-        "notStarted": {"subtle":"#f3f4f6","default":"#9ca3af","strong":"#4b5563","on":"#ffffff"},
-        "inProgress": {"subtle":"#ede9fe","default":"#7c3aed","strong":"#5b21b6","on":"#ffffff"},
-        "submitted":  {"subtle":"#ccfbf1","default":"#14b8a6","strong":"#0f766e","on":"#ffffff"},
-        "complete":   {"subtle":"#dcfce7","default":"#22c55e","strong":"#15803d","on":"#ffffff"},
-        "overdue":    {"subtle":"#fee2e2","default":"#ef4444","strong":"#b91c1c","on":"#ffffff"}
+        "notStarted": {
+          "subtle": "#f3f4f6",
+          "default": "#9ca3af",
+          "strong": "#4b5563",
+          "on": "#ffffff"
+        },
+        "inProgress": {
+          "subtle": "#ede9fe",
+          "default": "#7c3aed",
+          "strong": "#5b21b6",
+          "on": "#ffffff"
+        },
+        "submitted": {
+          "subtle": "#ccfbf1",
+          "default": "#14b8a6",
+          "strong": "#0f766e",
+          "on": "#ffffff"
+        },
+        "complete": {
+          "subtle": "#dcfce7",
+          "default": "#22c55e",
+          "strong": "#15803d",
+          "on": "#ffffff"
+        },
+        "overdue": {
+          "subtle": "#fee2e2",
+          "default": "#ef4444",
+          "strong": "#b91c1c",
+          "on": "#ffffff"
+        }
       }
     }
   }

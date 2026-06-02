@@ -99,7 +99,10 @@ export async function handleParsePreview(
       hintedWeekStart: typeof body.weekStart === "string" ? body.weekStart : undefined,
       hintedWeekEnd: typeof body.weekEnd === "string" ? body.weekEnd : undefined,
     });
-    return ok({ parsed: result.focus, rawText: result.rawText, usedFallback: result.usedFallback }, requestId);
+    return ok(
+      { parsed: result.focus, rawText: result.rawText, usedFallback: result.usedFallback },
+      requestId,
+    );
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

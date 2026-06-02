@@ -69,12 +69,14 @@ const DATA = {
       page_waitlist: {
         page_title: "Save your spot.",
         form_heading: "Tell us about your learner",
-        form_subheading: "Two required fields. The rest helps us pick the right onboarding when your spot opens.",
+        form_subheading:
+          "Two required fields. The rest helps us pick the right onboarding when your spot opens.",
         promise_heading: "What we promise",
         promise_no_spam_title: "No spam",
         promise_no_spam_body: "One email when your spot opens. Maybe a second if you don’t reply.",
         promise_no_sharing_title: "No sharing",
-        promise_no_sharing_body: "We don’t sell or share your contact info — ever. See our privacy policy.",
+        promise_no_sharing_body:
+          "We don’t sell or share your contact info — ever. See our privacy policy.",
         promise_easy_out_title: "Easy out",
         promise_easy_out_body: "Reply “remove” to any waitlist email and we delete your record.",
       },
@@ -83,7 +85,8 @@ const DATA = {
         badge: "Resources",
         heading: "Guides, primers, and reading paths",
         guides_heading: "Guides",
-        guides_subheading: "Longer-form practical guides for schools, districts, and procurement teams.",
+        guides_subheading:
+          "Longer-form practical guides for schools, districts, and procurement teams.",
         blog_heading: "From the blog",
         blog_subheading: "Short articles on how the learning loop actually works.",
       },
@@ -139,10 +142,12 @@ const DATA = {
         page_title: "Ayuda guiada, sin revelar respuestas",
         callout_title: "El Asistente de Tareas no dar\xe1 respuestas directas",
         get_help_cta: "Obtener ayuda →",
-        clarifying_question: "Antes de resolverlo, \xbfqu\xe9 significa “en total” para ti en este problema?",
+        clarifying_question:
+          "Antes de resolverlo, \xbfqu\xe9 significa “en total” para ti en este problema?",
         your_answer_label: "Tu respuesta:",
         explanation_text: "Sumaste 3 cuatro veces. Eso es lo mismo que 3 \xd7 4. A eso se le llama",
-        mastery_updated: "Dominio actualizado: Multiplicaci\xf3n como suma repetida \xb7 en progreso.",
+        mastery_updated:
+          "Dominio actualizado: Multiplicaci\xf3n como suma repetida \xb7 en progreso.",
         recommended_next_label: "Recomendado a continuaci\xf3n",
         recommended_lesson_title: "Multiplicando por 3 \xb7 LessonRun",
         recommended_lesson_meta: "Con Atlas \xb7 ~15 minutos",
@@ -151,23 +156,29 @@ const DATA = {
       page_waitlist: {
         page_title: "Reserva tu lugar.",
         form_heading: "Cu\xe9ntanos sobre tu estudiante",
-        form_subheading: "Dos campos obligatorios. El resto nos ayuda a elegir el proceso de incorporaci\xf3n correcto cuando llegue tu turno.",
+        form_subheading:
+          "Dos campos obligatorios. El resto nos ayuda a elegir el proceso de incorporaci\xf3n correcto cuando llegue tu turno.",
         promise_heading: "Lo que prometemos",
         promise_no_spam_title: "Sin spam",
-        promise_no_spam_body: "Un correo cuando llegue tu turno. Tal vez un segundo si no respondes.",
+        promise_no_spam_body:
+          "Un correo cuando llegue tu turno. Tal vez un segundo si no respondes.",
         promise_no_sharing_title: "Sin compartir datos",
-        promise_no_sharing_body: "No vendemos ni compartimos tu informaci\xf3n de contacto — nunca. Consulta nuestra pol\xedtica de privacidad.",
+        promise_no_sharing_body:
+          "No vendemos ni compartimos tu informaci\xf3n de contacto — nunca. Consulta nuestra pol\xedtica de privacidad.",
         promise_easy_out_title: "F\xe1cil de cancelar",
-        promise_easy_out_body: "Responde “eliminar” a cualquier correo de la lista de espera y eliminamos tu registro.",
+        promise_easy_out_body:
+          "Responde “eliminar” a cualquier correo de la lista de espera y eliminamos tu registro.",
       },
       page_resources: {
         cta_get_started: "Comenzar",
         badge: "Recursos",
         heading: "Gu\xedas, introducciones y rutas de lectura",
         guides_heading: "Gu\xedas",
-        guides_subheading: "Gu\xedas pr\xe1cticas detalladas para escuelas, distritos y equipos de adquisici\xf3n.",
+        guides_subheading:
+          "Gu\xedas pr\xe1cticas detalladas para escuelas, distritos y equipos de adquisici\xf3n.",
         blog_heading: "Del blog",
-        blog_subheading: "Art\xedculos breves sobre c\xf3mo funciona realmente el ciclo de aprendizaje.",
+        blog_subheading:
+          "Art\xedculos breves sobre c\xf3mo funciona realmente el ciclo de aprendizaje.",
       },
       page_for_teachers: {
         assignment_title: "Multiplicando por 3 — semana 4",
@@ -189,7 +200,8 @@ const DATA = {
         heading: "Notas del equipo de AIVO",
       },
       page_for_schools: {
-        callout_workflow_title: "El aprendizaje personalizado falla cuando a\xf1ade carga de trabajo al docente",
+        callout_workflow_title:
+          "El aprendizaje personalizado falla cuando a\xf1ade carga de trabajo al docente",
         callout_neurodiverse_title: "Creado pensando en estudiantes neurodivergentes",
         progress_summary: "Maya muestra un progreso constante en lectura.",
       },
@@ -221,10 +233,13 @@ const DATA = {
         page_title: "Une aide guid\xe9e, jamais une r\xe9ponse toute faite",
         callout_title: "L’Assistant devoirs ne donnera pas les r\xe9ponses directement",
         get_help_cta: "Obtenir de l’aide →",
-        clarifying_question: "Avant de r\xe9soudre — que signifie « en tout » pour toi dans ce probl\xe8me ?",
+        clarifying_question:
+          "Avant de r\xe9soudre — que signifie « en tout » pour toi dans ce probl\xe8me ?",
         your_answer_label: "Ta r\xe9ponse :",
-        explanation_text: "Tu as ajout\xe9 3 quatre fois. C’est la m\xeame chose que 3 \xd7 4. \xc7a s’appelle",
-        mastery_updated: "Ma\xeetrise mise \xe0 jour : Multiplication comme addition r\xe9p\xe9t\xe9e \xb7 en cours.",
+        explanation_text:
+          "Tu as ajout\xe9 3 quatre fois. C’est la m\xeame chose que 3 \xd7 4. \xc7a s’appelle",
+        mastery_updated:
+          "Ma\xeetrise mise \xe0 jour : Multiplication comme addition r\xe9p\xe9t\xe9e \xb7 en cours.",
         recommended_next_label: "Recommand\xe9 ensuite",
         recommended_lesson_title: "Multiplier par 3 \xb7 LessonRun",
         recommended_lesson_meta: "Avec Atlas \xb7 ~15 minutes",
@@ -233,36 +248,45 @@ const DATA = {
       page_waitlist: {
         page_title: "R\xe9servez votre place.",
         form_heading: "Parlez-nous de votre apprenant",
-        form_subheading: "Deux champs obligatoires. Le reste nous aide \xe0 choisir la bonne int\xe9gration quand votre place sera disponible.",
+        form_subheading:
+          "Deux champs obligatoires. Le reste nous aide \xe0 choisir la bonne int\xe9gration quand votre place sera disponible.",
         promise_heading: "Ce que nous promettons",
         promise_no_spam_title: "Pas de spam",
-        promise_no_spam_body: "Un e-mail quand votre place s’ouvre. Peut-\xeatre un second si vous ne r\xe9pondez pas.",
+        promise_no_spam_body:
+          "Un e-mail quand votre place s’ouvre. Peut-\xeatre un second si vous ne r\xe9pondez pas.",
         promise_no_sharing_title: "Pas de partage",
-        promise_no_sharing_body: "Nous ne vendons ni ne partageons vos coordonn\xe9es — jamais. Consultez notre politique de confidentialit\xe9.",
+        promise_no_sharing_body:
+          "Nous ne vendons ni ne partageons vos coordonn\xe9es — jamais. Consultez notre politique de confidentialit\xe9.",
         promise_easy_out_title: "Sortie facile",
-        promise_easy_out_body: "R\xe9pondez « supprimer » \xe0 n’importe quel e-mail de liste d’attente et nous supprimons votre enregistrement.",
+        promise_easy_out_body:
+          "R\xe9pondez « supprimer » \xe0 n’importe quel e-mail de liste d’attente et nous supprimons votre enregistrement.",
       },
       page_resources: {
         cta_get_started: "Commencer",
         badge: "Ressources",
         heading: "Guides, introductions et parcours de lecture",
         guides_heading: "Guides",
-        guides_subheading: "Guides pratiques d\xe9taill\xe9s pour les \xe9coles, les districts et les \xe9quipes d’approvisionnement.",
+        guides_subheading:
+          "Guides pratiques d\xe9taill\xe9s pour les \xe9coles, les districts et les \xe9quipes d’approvisionnement.",
         blog_heading: "Du blog",
-        blog_subheading: "Articles courts sur le fonctionnement r\xe9el de la boucle d’apprentissage.",
+        blog_subheading:
+          "Articles courts sur le fonctionnement r\xe9el de la boucle d’apprentissage.",
       },
       page_for_teachers: {
         assignment_title: "Multiplier par 3 — semaine 4",
         roster_label: "Liste de classe",
         roster_value: "Classe 3B \xb7 22 apprenants",
         assign_cta: "Assigner \xe0 la classe",
-        callout_summaries_title: "Des r\xe9sum\xe9s en langage clair que vous enverriez vraiment \xe0 la maison",
-        callout_accommodation_title: "R\xe9sum\xe9s d’am\xe9nagements s\xe9curis\xe9s pour les enseignants",
+        callout_summaries_title:
+          "Des r\xe9sum\xe9s en langage clair que vous enverriez vraiment \xe0 la maison",
+        callout_accommodation_title:
+          "R\xe9sum\xe9s d’am\xe9nagements s\xe9curis\xe9s pour les enseignants",
       },
       page_contact: {
         page_title: "Parlez \xe0 une vraie personne.",
         form_heading: "Envoyez-nous un message",
-        form_subheading: "Dites-nous ce que vous cherchez et nous l’acheminerons vers la bonne \xe9quipe.",
+        form_subheading:
+          "Dites-nous ce que vous cherchez et nous l’acheminerons vers la bonne \xe9quipe.",
         inboxes_heading: "Autres fa\xe7ons de nous joindre",
       },
       page_blog: {
@@ -271,7 +295,8 @@ const DATA = {
         heading: "Notes de l’\xe9quipe AIVO",
       },
       page_for_schools: {
-        callout_workflow_title: "L’apprentissage personnalis\xe9 \xe9choue quand il alourdit le travail des enseignants",
+        callout_workflow_title:
+          "L’apprentissage personnalis\xe9 \xe9choue quand il alourdit le travail des enseignants",
         callout_neurodiverse_title: "Con\xe7u en pensant aux apprenants neurodivergents",
         progress_summary: "Maya montre des progr\xe8s constants en lecture.",
       },
@@ -303,10 +328,12 @@ const DATA = {
         page_title: "Gezielte Hilfe, kein Antwort-Dump",
         callout_title: "Der Hausaufgaben-Helfer gibt keine direkten Antworten",
         get_help_cta: "Hilfe holen →",
-        clarifying_question: "Bevor wir es l\xf6sen — was bedeutet „insgesamt“ f\xfcr dich in diesem Problem?",
+        clarifying_question:
+          "Bevor wir es l\xf6sen — was bedeutet „insgesamt“ f\xfcr dich in diesem Problem?",
         your_answer_label: "Deine Antwort:",
         explanation_text: "Du hast 3 viermal addiert. Das ist dasselbe wie 3 \xd7 4. Das nennt man",
-        mastery_updated: "Kompetenz aktualisiert: Multiplikation als wiederholte Addition \xb7 im Aufbau.",
+        mastery_updated:
+          "Kompetenz aktualisiert: Multiplikation als wiederholte Addition \xb7 im Aufbau.",
         recommended_next_label: "Als N\xe4chstes empfohlen",
         recommended_lesson_title: "Multiplizieren mit 3 \xb7 LessonRun",
         recommended_lesson_meta: "Mit Atlas \xb7 ~15 Minuten",
@@ -315,36 +342,45 @@ const DATA = {
       page_waitlist: {
         page_title: "Sichern Sie sich Ihren Platz.",
         form_heading: "Erz\xe4hlen Sie uns von Ihrem Lernenden",
-        form_subheading: "Zwei Pflichtfelder. Der Rest hilft uns, das richtige Onboarding zu w\xe4hlen, wenn Ihr Platz frei wird.",
+        form_subheading:
+          "Zwei Pflichtfelder. Der Rest hilft uns, das richtige Onboarding zu w\xe4hlen, wenn Ihr Platz frei wird.",
         promise_heading: "Was wir versprechen",
         promise_no_spam_title: "Kein Spam",
-        promise_no_spam_body: "Eine E-Mail, wenn Ihr Platz frei wird. Vielleicht eine zweite, wenn Sie nicht antworten.",
+        promise_no_spam_body:
+          "Eine E-Mail, wenn Ihr Platz frei wird. Vielleicht eine zweite, wenn Sie nicht antworten.",
         promise_no_sharing_title: "Keine Weitergabe",
-        promise_no_sharing_body: "Wir verkaufen oder teilen Ihre Kontaktdaten niemals. Siehe unsere Datenschutzrichtlinie.",
+        promise_no_sharing_body:
+          "Wir verkaufen oder teilen Ihre Kontaktdaten niemals. Siehe unsere Datenschutzrichtlinie.",
         promise_easy_out_title: "Einfach abmelden",
-        promise_easy_out_body: "Antworten Sie auf jede Wartelisten-E-Mail mit „entfernen“ und wir l\xf6schen Ihren Eintrag.",
+        promise_easy_out_body:
+          "Antworten Sie auf jede Wartelisten-E-Mail mit „entfernen“ und wir l\xf6schen Ihren Eintrag.",
       },
       page_resources: {
         cta_get_started: "Jetzt starten",
         badge: "Ressourcen",
         heading: "Leitf\xe4den, Einf\xfchrungen und Lesepfade",
         guides_heading: "Leitf\xe4den",
-        guides_subheading: "Ausf\xfchrliche praktische Leitf\xe4den f\xfcr Schulen, Bezirke und Beschaffungsteams.",
+        guides_subheading:
+          "Ausf\xfchrliche praktische Leitf\xe4den f\xfcr Schulen, Bezirke und Beschaffungsteams.",
         blog_heading: "Aus dem Blog",
-        blog_subheading: "Kurze Artikel dar\xfcber, wie der Lernkreislauf tats\xe4chlich funktioniert.",
+        blog_subheading:
+          "Kurze Artikel dar\xfcber, wie der Lernkreislauf tats\xe4chlich funktioniert.",
       },
       page_for_teachers: {
         assignment_title: "Multiplizieren mit 3 — Woche 4",
         roster_label: "Kursliste",
         roster_value: "Klasse 3B \xb7 22 Lernende",
         assign_cta: "Der Klasse zuweisen",
-        callout_summaries_title: "Klartextliche Zusammenfassungen, die Sie wirklich nach Hause schicken w\xfcrden",
-        callout_accommodation_title: "Lehrergerechte Zusammenfassungen zu Unterst\xfctzungsma\xdfnahmen",
+        callout_summaries_title:
+          "Klartextliche Zusammenfassungen, die Sie wirklich nach Hause schicken w\xfcrden",
+        callout_accommodation_title:
+          "Lehrergerechte Zusammenfassungen zu Unterst\xfctzungsma\xdfnahmen",
       },
       page_contact: {
         page_title: "Sprechen Sie mit einem echten Menschen.",
         form_heading: "Schreiben Sie uns",
-        form_subheading: "Teilen Sie uns mit, wonach Sie suchen, und wir leiten Ihre Anfrage an das richtige Team weiter.",
+        form_subheading:
+          "Teilen Sie uns mit, wonach Sie suchen, und wir leiten Ihre Anfrage an das richtige Team weiter.",
         inboxes_heading: "Andere Kontaktm\xf6glichkeiten",
       },
       page_blog: {
@@ -353,7 +389,8 @@ const DATA = {
         heading: "Notizen vom AIVO-Team",
       },
       page_for_schools: {
-        callout_workflow_title: "Personalisiertes Lernen scheitert, wenn es den Arbeitsaufwand der Lehrkr\xe4fte erh\xf6ht",
+        callout_workflow_title:
+          "Personalisiertes Lernen scheitert, wenn es den Arbeitsaufwand der Lehrkr\xe4fte erh\xf6ht",
         callout_neurodiverse_title: "Entwickelt mit Blick auf neurodivergente Lernende",
         progress_summary: "Maya zeigt stetige Fortschritte beim Lesen.",
       },
@@ -385,10 +422,13 @@ const DATA = {
         page_title: "Ajuda guiada, nunca respostas prontas",
         callout_title: "O Assistente de Li\xe7\xe3o de Casa n\xe3o vai entregar respostas diretas",
         get_help_cta: "Obter ajuda →",
-        clarifying_question: "Antes de resolver — o que “no total” significa para voc\xea neste problema?",
+        clarifying_question:
+          "Antes de resolver — o que “no total” significa para voc\xea neste problema?",
         your_answer_label: "Sua resposta:",
-        explanation_text: "Voc\xea adicionou 3 quatro vezes. Isso \xe9 o mesmo que 3 \xd7 4. Isso se chama",
-        mastery_updated: "Dom\xednio atualizado: Multiplica\xe7\xe3o como adi\xe7\xe3o repetida \xb7 em constru\xe7\xe3o.",
+        explanation_text:
+          "Voc\xea adicionou 3 quatro vezes. Isso \xe9 o mesmo que 3 \xd7 4. Isso se chama",
+        mastery_updated:
+          "Dom\xednio atualizado: Multiplica\xe7\xe3o como adi\xe7\xe3o repetida \xb7 em constru\xe7\xe3o.",
         recommended_next_label: "Recomendado a seguir",
         recommended_lesson_title: "Multiplicando por 3 \xb7 LessonRun",
         recommended_lesson_meta: "Com Atlas \xb7 ~15 minutos",
@@ -397,21 +437,26 @@ const DATA = {
       page_waitlist: {
         page_title: "Reserve seu lugar.",
         form_heading: "Conte-nos sobre seu estudante",
-        form_subheading: "Dois campos obrigat\xf3rios. O restante nos ajuda a escolher o processo correto quando sua vaga abrir.",
+        form_subheading:
+          "Dois campos obrigat\xf3rios. O restante nos ajuda a escolher o processo correto quando sua vaga abrir.",
         promise_heading: "O que prometemos",
         promise_no_spam_title: "Sem spam",
-        promise_no_spam_body: "Um e-mail quando sua vaga abrir. Talvez um segundo se voc\xea n\xe3o responder.",
+        promise_no_spam_body:
+          "Um e-mail quando sua vaga abrir. Talvez um segundo se voc\xea n\xe3o responder.",
         promise_no_sharing_title: "Sem compartilhamento",
-        promise_no_sharing_body: "N\xe3o vendemos nem compartilhamos suas informa\xe7\xf5es de contato — nunca. Veja nossa pol\xedtica de privacidade.",
+        promise_no_sharing_body:
+          "N\xe3o vendemos nem compartilhamos suas informa\xe7\xf5es de contato — nunca. Veja nossa pol\xedtica de privacidade.",
         promise_easy_out_title: "Sa\xedda f\xe1cil",
-        promise_easy_out_body: "Responda “remover” a qualquer e-mail da lista de espera e exclu\xedmos seu registro.",
+        promise_easy_out_body:
+          "Responda “remover” a qualquer e-mail da lista de espera e exclu\xedmos seu registro.",
       },
       page_resources: {
         cta_get_started: "Come\xe7ar",
         badge: "Recursos",
         heading: "Guias, introdu\xe7\xf5es e trilhas de leitura",
         guides_heading: "Guias",
-        guides_subheading: "Guias pr\xe1ticos detalhados para escolas, distritos e equipes de compras.",
+        guides_subheading:
+          "Guias pr\xe1ticos detalhados para escolas, distritos e equipes de compras.",
         blog_heading: "Do blog",
         blog_subheading: "Artigos curtos sobre como o ciclo de aprendizagem realmente funciona.",
       },
@@ -420,13 +465,15 @@ const DATA = {
         roster_label: "Lista de alunos",
         roster_value: "Turma 3B \xb7 22 alunos",
         assign_cta: "Atribuir \xe0 turma",
-        callout_summaries_title: "Resumos em linguagem simples que voc\xea realmente enviaria para casa",
+        callout_summaries_title:
+          "Resumos em linguagem simples que voc\xea realmente enviaria para casa",
         callout_accommodation_title: "Resumos de adapta\xe7\xf5es seguros para professores",
       },
       page_contact: {
         page_title: "Fale com uma pessoa real.",
         form_heading: "Envie-nos uma mensagem",
-        form_subheading: "Diga-nos o que voc\xea est\xe1 procurando e encaminharemos para a equipe certa.",
+        form_subheading:
+          "Diga-nos o que voc\xea est\xe1 procurando e encaminharemos para a equipe certa.",
         inboxes_heading: "Outras formas de nos contatar",
       },
       page_blog: {
@@ -435,7 +482,8 @@ const DATA = {
         heading: "Notas da equipe AIVO",
       },
       page_for_schools: {
-        callout_workflow_title: "O aprendizado personalizado falha quando acrescenta carga de trabalho ao professor",
+        callout_workflow_title:
+          "O aprendizado personalizado falha quando acrescenta carga de trabalho ao professor",
         callout_neurodiverse_title: "Criado pensando em estudantes neurodivergentes",
         progress_summary: "Maya est\xe1 mostrando progresso constante na leitura.",
       },
@@ -561,12 +609,15 @@ const DATA = {
       page_waitlist: {
         page_title: "お席を確保してください。",
         form_heading: "学習者について教えてください",
-        form_subheading: "必須項目は 2 つです。残りは、お席が開いたときに最適なオンボーディングを選ぶために使用します。",
+        form_subheading:
+          "必須項目は 2 つです。残りは、お席が開いたときに最適なオンボーディングを選ぶために使用します。",
         promise_heading: "私たちの約浟",
         promise_no_spam_title: "スパムなし",
-        promise_no_spam_body: "お席が開いたときに 1 通のメール。返信がなければもう 1 通届くことがあります。",
+        promise_no_spam_body:
+          "お席が開いたときに 1 通のメール。返信がなければもう 1 通届くことがあります。",
         promise_no_sharing_title: "情報の共有なし",
-        promise_no_sharing_body: "連絡先情報を販売または共有することは一切ありません。プライバシーポリシーをご確認ください。",
+        promise_no_sharing_body:
+          "連絡先情報を販売または共有することは一切ありません。プライバシーポリシーをご確認ください。",
         promise_easy_out_title: "簡単に退出",
         promise_easy_out_body: "待機リストのメールに「削除」と返信すると登録を削除します。",
       },
@@ -643,12 +694,15 @@ const DATA = {
       page_waitlist: {
         page_title: "자리를 확보하세요.",
         form_heading: "학습자에 대해 알려주세요",
-        form_subheading: "필수 항목 2개. 나머지는 자리가 열렸을 때 올바른 온보딩을 선택하는 데 도움이 됩니다.",
+        form_subheading:
+          "필수 항목 2개. 나머지는 자리가 열렸을 때 올바른 온보딩을 선택하는 데 도움이 됩니다.",
         promise_heading: "저희의 약속",
         promise_no_spam_title: "스팸 없음",
-        promise_no_spam_body: "자리가 열리면 이메일 한 통을 보냅니다. 답장이 없으면 한 통 더 보낼 수 있습니다.",
+        promise_no_spam_body:
+          "자리가 열리면 이메일 한 통을 보냅니다. 답장이 없으면 한 통 더 보낼 수 있습니다.",
         promise_no_sharing_title: "정보 공유 없음",
-        promise_no_sharing_body: "연락정보를 판매하거나 공유하지 않습니다 — 절대로. 개인정보선을 확인하세요.",
+        promise_no_sharing_body:
+          "연락정보를 판매하거나 공유하지 않습니다 — 절대로. 개인정보선을 확인하세요.",
         promise_easy_out_title: "쉽게 탈퇴",
         promise_easy_out_body: "대기자 이메일에 ‘제거’라고 답장하면 레코드를 삭제합니다.",
       },
@@ -725,7 +779,8 @@ const DATA = {
       page_waitlist: {
         page_title: "احجز مكانك.",
         form_heading: "أخبرنا عن متعلّمك",
-        form_subheading: "حقلان مطلوبان. الباقي يساعدنا في اختيار مسار الإعداد المناسب عند فتح مكانك.",
+        form_subheading:
+          "حقلان مطلوبان. الباقي يساعدنا في اختيار مسار الإعداد المناسب عند فتح مكانك.",
         promise_heading: "ما نعد به",
         promise_no_spam_title: "لا بريد مزعج",
         promise_no_spam_body: "رسالة واحدة عند فتح مكانك. ربما ثانية إن لم ترد.",
@@ -795,7 +850,8 @@ const DATA = {
         page_title: "मार्गदर्शित सहायता, कभी सीधा जवाब नहीं",
         callout_title: "होमवर्क हेल्पर सीधे जवाब नहीं देगा",
         get_help_cta: "सहायता पाएं →",
-        clarifying_question: "हल करने से पहले — इस समस्या में “कुल मिलाकर” आपके लिए क्या अर्थ रखता है?",
+        clarifying_question:
+          "हल करने से पहले — इस समस्या में “कुल मिलाकर” आपके लिए क्या अर्थ रखता है?",
         your_answer_label: "आपका जवाब:",
         explanation_text: "आपने 3 चार बार जोड़ा। यह 3 \xd7 4 के समान है। इसे कहते हैं",
         mastery_updated: "दक्षता अपडेट: दोहरावे के रूप में गुणन \xb7 निर्माण हो रहा है।",
@@ -807,14 +863,17 @@ const DATA = {
       page_waitlist: {
         page_title: "अपनी जगह सुरक्षित करें।",
         form_heading: "अपने सीखने वाले के बारे में बताएं",
-        form_subheading: "दो आवश्यक फ़ील्ड। बाकी हमें आपकी जगह खुलने पर सही ओनबोर्डिंग चुनने में मदद करता है।",
+        form_subheading:
+          "दो आवश्यक फ़ील्ड। बाकी हमें आपकी जगह खुलने पर सही ओनबोर्डिंग चुनने में मदद करता है।",
         promise_heading: "हमारा वादा",
         promise_no_spam_title: "कोई स्पैम नहीं",
         promise_no_spam_body: "जब आपकी जगह खुले तो एक ईमेल। यदि आप नहीं जवाब देते तो शायद एक और।",
         promise_no_sharing_title: "कोई साझाकरी नहीं",
-        promise_no_sharing_body: "हम आपकी संपर्क जानकारी कभी नहीं बेचते या साझा करते। हमारी गोपनीयता नीति देखें।",
+        promise_no_sharing_body:
+          "हम आपकी संपर्क जानकारी कभी नहीं बेचते या साझा करते। हमारी गोपनीयता नीति देखें।",
         promise_easy_out_title: "आसान विदायी",
-        promise_easy_out_body: "किसी भी वेटलिस्ट ईमेल पर “हटाएं” की प्रतिक्रिया दें और हम आपका रिकॉर्ड हटा देंगे।",
+        promise_easy_out_body:
+          "किसी भी वेटलिस्ट ईमेल पर “हटाएं” की प्रतिक्रिया दें और हम आपका रिकॉर्ड हटा देंगे।",
       },
       page_resources: {
         cta_get_started: "शुरू करें",

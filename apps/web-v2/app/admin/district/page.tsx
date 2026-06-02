@@ -1,11 +1,7 @@
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
-import {
-  FloatingMetricCard,
-  GlassCard,
-  InsightChip,
-} from "@aivo/ui";
+import { FloatingMetricCard, GlassCard, InsightChip } from "@aivo/ui";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
 import {
   scopeTenantsForSession,
@@ -84,9 +80,7 @@ export default async function DistrictAdminHome() {
       <header className="flex flex-col gap-2 mb-6">
         <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">{districtName}</h1>
-        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
-          {t("description")}
-        </p>
+        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">{t("description")}</p>
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -107,7 +101,11 @@ export default async function DistrictAdminHome() {
           density="comfortable"
           title={t("fl_distribution_title")}
           description={`${flTotal.toLocaleString()} learners across five AIVO levels`}
-          actions={<InsightChip tone="neutral" size="md">{flTotal.toLocaleString()}</InsightChip>}
+          actions={
+            <InsightChip tone="neutral" size="md">
+              {flTotal.toLocaleString()}
+            </InsightChip>
+          }
           className="lg:col-span-2"
         >
           {flTotal === 0 ? (
@@ -120,7 +118,9 @@ export default async function DistrictAdminHome() {
                 return (
                   <li key={row.level}>
                     <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="font-medium text-iw-text-strong">{FL_LABELS[row.level] ?? row.level}</span>
+                      <span className="font-medium text-iw-text-strong">
+                        {FL_LABELS[row.level] ?? row.level}
+                      </span>
                       <span className="text-iw-text-muted tabular-nums">
                         {row.count.toLocaleString()} · {pct.toFixed(0)}%
                       </span>
@@ -158,19 +158,27 @@ export default async function DistrictAdminHome() {
           <dl className="space-y-2.5 text-sm mt-2">
             <div className="flex items-center justify-between">
               <dt className="text-iw-text-muted">{t("lessons_completed")}</dt>
-              <dd className="font-semibold text-iw-text-strong tabular-nums">{health.lessonRunsCompleted.toLocaleString()}</dd>
+              <dd className="font-semibold text-iw-text-strong tabular-nums">
+                {health.lessonRunsCompleted.toLocaleString()}
+              </dd>
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-iw-text-muted">{t("lessons_attempted")}</dt>
-              <dd className="font-semibold text-iw-text-strong tabular-nums">{health.lessonRunsTotal.toLocaleString()}</dd>
+              <dd className="font-semibold text-iw-text-strong tabular-nums">
+                {health.lessonRunsTotal.toLocaleString()}
+              </dd>
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-iw-text-muted">{t("ai_jobs_in_queue")}</dt>
-              <dd className="font-semibold text-iw-text-strong tabular-nums">{health.generationQueuedCount.toLocaleString()}</dd>
+              <dd className="font-semibold text-iw-text-strong tabular-nums">
+                {health.generationQueuedCount.toLocaleString()}
+              </dd>
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-iw-text-muted">{t("ai_failures")}</dt>
-              <dd className="font-semibold text-iw-text-strong tabular-nums">{health.generationFailureCount.toLocaleString()}</dd>
+              <dd className="font-semibold text-iw-text-strong tabular-nums">
+                {health.generationFailureCount.toLocaleString()}
+              </dd>
             </div>
           </dl>
         </GlassCard>

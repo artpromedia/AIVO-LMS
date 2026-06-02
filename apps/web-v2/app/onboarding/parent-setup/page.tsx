@@ -1,13 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import {
-  AuthShell,
-  AuthCard,
-  AuthInput,
-  ReassuranceCard,
-  StepperHeader,
-} from "@aivo/ui/auth";
+import { AuthShell, AuthCard, AuthInput, ReassuranceCard, StepperHeader } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { useTranslations } from "next-intl";
 
@@ -28,10 +22,7 @@ export default function ParentSetupPage() {
   return (
     <AuthShell>
       <div className="flex flex-col gap-5">
-        <StepperHeader
-          steps={STEPS.map((s) => ({ label: ts(s.label) }))}
-          current={2}
-        />
+        <StepperHeader steps={STEPS.map((s) => ({ label: ts(s.label) }))} current={2} />
         <AuthCard
           icon={<AivoIcon name="care" size={32} />}
           eyebrow={t("eyebrow")}

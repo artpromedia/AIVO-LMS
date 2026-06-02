@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Switch,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, Switch, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, spacing, radius } from "@/constants/colors";
@@ -46,10 +39,7 @@ export default function BiometricSetupScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [s, armed] = await Promise.all([
-        getBiometricSupport(),
-        isBiometricUnlockArmed(),
-      ]);
+      const [s, armed] = await Promise.all([getBiometricSupport(), isBiometricUnlockArmed()]);
       if (cancelled) return;
       setSupport(s);
       setEnabled(armed.armed);
@@ -129,8 +119,8 @@ export default function BiometricSetupScreen() {
         <Text style={styles.eyebrow}>One-tap unlock</Text>
         <Text style={styles.title}>Use {biometryLabel} to unlock?</Text>
         <Text style={styles.subtitle}>
-          Adds a faster way back into your account. Your password still
-          works, and any sensitive action still re-prompts.
+          Adds a faster way back into your account. Your password still works, and any sensitive
+          action still re-prompts.
         </Text>
 
         {unavailableReason ? (
@@ -163,8 +153,8 @@ export default function BiometricSetupScreen() {
         <View style={styles.reassure}>
           <Text style={styles.reassureTitle}>It&apos;s a shortcut, not a vault.</Text>
           <Text style={styles.reassureBody}>
-            Approving a child profile, changing consent, or accessing billing
-            still requires your password.
+            Approving a child profile, changing consent, or accessing billing still requires your
+            password.
           </Text>
         </View>
       </View>
@@ -174,11 +164,11 @@ export default function BiometricSetupScreen() {
           onPress={handleContinue}
           style={[styles.cta, { backgroundColor: palette.primary }]}
           accessibilityRole="button"
-          accessibilityLabel={enabled ? `Continue with ${biometryLabel} enabled` : "Skip and continue"}
+          accessibilityLabel={
+            enabled ? `Continue with ${biometryLabel} enabled` : "Skip and continue"
+          }
         >
-          <Text style={styles.ctaLabel}>
-            {enabled ? "Continue" : "Skip for now"}
-          </Text>
+          <Text style={styles.ctaLabel}>{enabled ? "Continue" : "Skip for now"}</Text>
         </Pressable>
       </View>
     </View>

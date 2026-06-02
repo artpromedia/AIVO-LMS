@@ -26,7 +26,10 @@ export default function TutorDesignSystemPage() {
             AI tutor & lesson experience
           </h1>
           <nav className="flex flex-wrap gap-2 mt-2">
-            <Link href="/design-system/learner-home" className="text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline">
+            <Link
+              href="/design-system/learner-home"
+              className="text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
+            >
               ← Learner home
             </Link>
           </nav>
@@ -64,8 +67,15 @@ export default function TutorDesignSystemPage() {
           <TutorMessage author="learner" name="You" avatar="🙂">
             <p>What's the air part called?</p>
           </TutorMessage>
-          <TutorMessage author="tutor" name="AIVO" avatar="✨" insight={<TutorInsightChip kind="difficulty_adjusted" />}>
-            <p>Great question — it's <strong>carbon dioxide</strong>. Plants breathe it in.</p>
+          <TutorMessage
+            author="tutor"
+            name="AIVO"
+            avatar="✨"
+            insight={<TutorInsightChip kind="difficulty_adjusted" />}
+          >
+            <p>
+              Great question — it's <strong>carbon dioxide</strong>. Plants breathe it in.
+            </p>
           </TutorMessage>
           <TutorMessage author="tutor" name="AIVO" avatar="✨" thinking>
             <p className="text-iw-text-muted">…</p>
@@ -77,10 +87,20 @@ export default function TutorDesignSystemPage() {
           <h2 className="text-lg font-semibold text-iw-text-strong border-b border-iw-border pb-2">
             ExplanationCard · 4 kinds
           </h2>
-          <ExplanationCard kind="explanation" step={1} title="What is a fraction?" controls={<ReadAloudButton />}>
+          <ExplanationCard
+            kind="explanation"
+            step={1}
+            title="What is a fraction?"
+            controls={<ReadAloudButton />}
+          >
             A fraction shows part of a whole. The top number is the part, the bottom is the whole.
           </ExplanationCard>
-          <ExplanationCard kind="example" step={2} title="Worked example: 3/4 of a pizza" citation={<span>From your school's grade 3–5 unit</span>}>
+          <ExplanationCard
+            kind="example"
+            step={2}
+            title="Worked example: 3/4 of a pizza"
+            citation={<span>From your school's grade 3–5 unit</span>}
+          >
             If a pizza has 4 slices and you eat 3, you've had 3/4 of it.
           </ExplanationCard>
           <ExplanationCard kind="correction" title="Common mistake to watch for">
@@ -96,19 +116,31 @@ export default function TutorDesignSystemPage() {
           <h2 className="text-lg font-semibold text-iw-text-strong border-b border-iw-border pb-2">
             PracticeCard · 3 kinds
           </h2>
-          <PracticeCard kind="practice" prompt="Which fraction is the same as 1/2?" subtitle="Try it — no grade.">
+          <PracticeCard
+            kind="practice"
+            prompt="Which fraction is the same as 1/2?"
+            subtitle="Try it — no grade."
+          >
             <LearnerChoiceCard name="demo.p1" value="2/4" label="2/4" index={0} />
             <LearnerChoiceCard name="demo.p1" value="1/3" label="1/3" index={1} />
             <LearnerChoiceCard name="demo.p1" value="3/8" label="3/8" index={2} />
           </PracticeCard>
-          <PracticeCard kind="try_it" prompt="Now you try: simplify 6/9." subtitle="Take your time.">
+          <PracticeCard
+            kind="try_it"
+            prompt="Now you try: simplify 6/9."
+            subtitle="Take your time."
+          >
             <input
               type="text"
               placeholder="Type your answer"
               className="rounded-iw-control border border-iw-border bg-white px-4 py-3 text-base text-iw-text-strong placeholder:text-iw-text-muted/70 focus:outline-none focus:border-[var(--aivo-sensory-primary)]"
             />
           </PracticeCard>
-          <PracticeCard kind="graded" prompt="Check: Is 4/8 equal to 1/2?" subtitle="This one counts toward your assignment.">
+          <PracticeCard
+            kind="graded"
+            prompt="Check: Is 4/8 equal to 1/2?"
+            subtitle="This one counts toward your assignment."
+          >
             <LearnerChoiceCard name="demo.p2" value="yes" label="Yes" index={0} />
             <LearnerChoiceCard name="demo.p2" value="no" label="No" index={1} />
           </PracticeCard>

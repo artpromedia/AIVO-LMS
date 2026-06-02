@@ -124,8 +124,7 @@ export const ccssEla1To8: SkillGraph = {
     {
       id: "ccss-ela.5.RL.6",
       title: "Describe point of view in narrative texts",
-      description:
-        "I can tell who is telling the story and how that changes what I learn.",
+      description: "I can tell who is telling the story and how that changes what I learn.",
       subject: "ela",
       gradeBand: "5",
       frameworkRefs: [{ framework: "CCSS-ELA", code: "5.RL.6" }],

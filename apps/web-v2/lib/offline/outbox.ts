@@ -89,7 +89,9 @@ function reqAsPromise<T>(req: IDBRequest<T>): Promise<T> {
 }
 
 /** Add a record. No-op SSR-side. */
-export async function enqueueOutbox(record: Omit<OutboxRecord, "enqueuedAt" | "attempts">): Promise<void> {
+export async function enqueueOutbox(
+  record: Omit<OutboxRecord, "enqueuedAt" | "attempts">,
+): Promise<void> {
   if (!isBrowser()) return;
   const full: OutboxRecord = {
     ...record,

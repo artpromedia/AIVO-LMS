@@ -32,12 +32,7 @@ export interface BufferedTelemetryEvent {
    * etc) plus four high-level player events used to satisfy Sprint 1.3:
    * impression / interaction / completion / abandon.
    */
-  eventType:
-    | SurfaceTelemetryEventType
-    | "impression"
-    | "interaction"
-    | "completion"
-    | "abandon";
+  eventType: SurfaceTelemetryEventType | "impression" | "interaction" | "completion" | "abandon";
   payload?: Record<string, unknown>;
   /** ISO-8601 — set automatically when enqueued. */
   enqueuedAt: string;
@@ -71,7 +66,11 @@ class TelemetryBuffer {
     this.endpoint = opts.endpoint ?? "/api/bff/learning/surface-telemetry";
     this.debounceMs = opts.debounceMs ?? DEFAULT_DEBOUNCE_MS;
     this.maxBatchSize = opts.maxBatchSize ?? 50;
-    this.fetchImpl = opts.fetchImpl ?? (typeof fetch !== "undefined" ? fetch.bind(globalThis) : (async () => new Response(null, { status: 599 })) as typeof fetch);
+    this.fetchImpl =
+      opts.fetchImpl ??
+      (typeof fetch !== "undefined"
+        ? fetch.bind(globalThis)
+        : ((async () => new Response(null, { status: 599 })) as typeof fetch));
     this.hydrate();
     this.attachLifecycleListeners();
   }

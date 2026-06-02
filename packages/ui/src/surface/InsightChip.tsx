@@ -45,19 +45,13 @@ const TONE_SUBTLE: Record<AivoTone, string> = {
 };
 
 const TONE_STRONG: Record<AivoTone, string> = {
-  neutral:
-    "bg-[var(--aivo-color-text-default,#0f172a)] text-white border-transparent",
-  primary:
-    "bg-[var(--aivo-sensory-primary,#7c3aed)] text-white border-transparent",
-  accent:
-    "bg-[var(--aivo-color-aivoTeal-600,#0d9488)] text-white border-transparent",
+  neutral: "bg-[var(--aivo-color-text-default,#0f172a)] text-white border-transparent",
+  primary: "bg-[var(--aivo-sensory-primary,#7c3aed)] text-white border-transparent",
+  accent: "bg-[var(--aivo-color-aivoTeal-600,#0d9488)] text-white border-transparent",
   warm: "bg-[var(--aivo-color-aivoOrange-600,#ea580c)] text-white border-transparent",
-  success:
-    "bg-[var(--aivo-color-status-success-strong,#16a34a)] text-white border-transparent",
-  warning:
-    "bg-[var(--aivo-color-status-warning-strong,#d97706)] text-white border-transparent",
-  error:
-    "bg-[var(--aivo-color-status-error-strong,#dc2626)] text-white border-transparent",
+  success: "bg-[var(--aivo-color-status-success-strong,#16a34a)] text-white border-transparent",
+  warning: "bg-[var(--aivo-color-status-warning-strong,#d97706)] text-white border-transparent",
+  error: "bg-[var(--aivo-color-status-error-strong,#dc2626)] text-white border-transparent",
   info: "bg-[var(--aivo-color-status-info-strong,#2563eb)] text-white border-transparent",
 };
 
@@ -66,49 +60,47 @@ const SIZE_CLASS = {
   md: "px-3 py-1 text-xs gap-1.5 rounded-iw-chip",
 } as const;
 
-export const InsightChip = React.forwardRef<HTMLSpanElement, InsightChipProps>(
-  function InsightChip(
-    {
-      state = "default",
-      tone = "neutral",
-      size = "sm",
-      icon: Icon,
-      trailing,
-      strong = false,
-      interactive = false,
-      className,
-      children,
-      ...rest
-    },
-    ref
-  ) {
-    const palette = strong ? TONE_STRONG[tone] : TONE_SUBTLE[tone];
-    return (
-      <span
-        ref={ref}
-        data-state={state}
-        role={interactive ? "button" : undefined}
-        tabIndex={interactive && state !== "disabled" ? 0 : undefined}
-        aria-disabled={state === "disabled" || undefined}
-        aria-busy={state === "loading" || undefined}
-        {...rest}
-        className={cn(
-          "inline-flex items-center font-semibold border whitespace-nowrap select-none transition-colors",
-          SIZE_CLASS[size],
-          palette,
-          interactive &&
-            "cursor-pointer hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus,#7c3aed)] focus:ring-offset-1",
-          state === "disabled" && "opacity-50 pointer-events-none",
-          state === "loading" && "animate-pulse",
-          state === "empty" && "opacity-60",
-          className
-        )}
-      >
-        {Icon && <Icon className="w-3 h-3" aria-hidden />}
-        <span className="truncate">{children}</span>
-        {trailing}
-      </span>
-    );
-  }
-);
+export const InsightChip = React.forwardRef<HTMLSpanElement, InsightChipProps>(function InsightChip(
+  {
+    state = "default",
+    tone = "neutral",
+    size = "sm",
+    icon: Icon,
+    trailing,
+    strong = false,
+    interactive = false,
+    className,
+    children,
+    ...rest
+  },
+  ref,
+) {
+  const palette = strong ? TONE_STRONG[tone] : TONE_SUBTLE[tone];
+  return (
+    <span
+      ref={ref}
+      data-state={state}
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive && state !== "disabled" ? 0 : undefined}
+      aria-disabled={state === "disabled" || undefined}
+      aria-busy={state === "loading" || undefined}
+      {...rest}
+      className={cn(
+        "inline-flex items-center font-semibold border whitespace-nowrap select-none transition-colors",
+        SIZE_CLASS[size],
+        palette,
+        interactive &&
+          "cursor-pointer hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus,#7c3aed)] focus:ring-offset-1",
+        state === "disabled" && "opacity-50 pointer-events-none",
+        state === "loading" && "animate-pulse",
+        state === "empty" && "opacity-60",
+        className,
+      )}
+    >
+      {Icon && <Icon className="w-3 h-3" aria-hidden />}
+      <span className="truncate">{children}</span>
+      {trailing}
+    </span>
+  );
+});
 InsightChip.displayName = "Surface/InsightChip";

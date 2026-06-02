@@ -29,9 +29,8 @@ async function bootstrap() {
   const Fastify = (await import("fastify")).default;
   const { createDb } = await import("@aivo/db");
   const { initKeys } = await import("@aivo/security");
-  const { registerCollaborationRoutes, resetInviteRateLimitsForTest } = await import(
-    "../src/routes/collaboration.js"
-  );
+  const { registerCollaborationRoutes, resetInviteRateLimitsForTest } =
+    await import("../src/routes/collaboration.js");
   await initKeys();
   resetInviteRateLimitsForTest();
   const db = createDb(process.env.DATABASE_URL!);
@@ -226,9 +225,7 @@ test(
     } finally {
       // Cleanup.
       const { teacherParentInvites } = await import("@aivo/db");
-      await db
-        .delete(teacherParentInvites)
-        .where(eq(teacherParentInvites.tenantId, tenant.id));
+      await db.delete(teacherParentInvites).where(eq(teacherParentInvites.tenantId, tenant.id));
       await db.delete(learnerTeachers).where(eq(learnerTeachers.tenantId, tenant.id));
       await db.delete(learnerCaregivers).where(eq(learnerCaregivers.tenantId, tenant.id));
       await db.delete(learnerTherapists).where(eq(learnerTherapists.tenantId, tenant.id));

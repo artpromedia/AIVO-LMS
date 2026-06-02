@@ -36,10 +36,10 @@ export type DownstreamService =
   | "problem-session-svc"
   | "responsible-ai-svc";
 
-export const downstreamFailures = createCounter(
-  "learning_svc_downstream_failures_total",
-  ["service", "endpoint"],
-);
+export const downstreamFailures = createCounter("learning_svc_downstream_failures_total", [
+  "service",
+  "endpoint",
+]);
 
 /**
  * Resolve `LEARNING_SVC_FAIL_OPEN`. Default behaviour:
@@ -76,8 +76,7 @@ export interface DowntreamFailureInput extends DowntreamCallContext {
 export function reportDownstreamFailure(input: DowntreamFailureInput): void {
   const { service, endpoint, statusCode, correlationId, learnerId, err, tracker } = input;
   downstreamFailures.increment(1, { service, endpoint });
-  const errMessage =
-    err instanceof Error ? err.message : err != null ? String(err) : undefined;
+  const errMessage = err instanceof Error ? err.message : err != null ? String(err) : undefined;
   logger.error(
     {
       service,

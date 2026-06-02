@@ -4,7 +4,7 @@
  * Brand-free (hex literals mirror INCLUSIVE_WARM_PALETTE.visual*).
  */
 
-const ACCENTS: Array<{ match: RegExp; color: string }> = [
+const ACCENTS: { match: RegExp; color: string }[] = [
   { match: /math/i, color: "#7c3aed" }, // visualMath
   { match: /read|ela|english|literac/i, color: "#14b8a6" }, // visualReading
   { match: /sci/i, color: "#22c55e" }, // visualScience

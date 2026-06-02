@@ -75,9 +75,7 @@ export function HintCard({
     <div
       className={cn(
         "rounded-iw-card border bg-white overflow-hidden",
-        open
-          ? "border-[var(--aivo-color-aivoPurple-200)]"
-          : "border-iw-border",
+        open ? "border-[var(--aivo-color-aivoPurple-200)]" : "border-iw-border",
         className,
       )}
     >

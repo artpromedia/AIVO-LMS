@@ -1,26 +1,96 @@
 {
   "_comment": "Smoke fixture for scripts/seed-nces-districts.mjs. Real production seed is the full NCES CCD + zip overlay (~17k districts, ~40k zip mappings). This fixture covers the top-20 districts referenced by the legacy static map so dev environments and E2E tests resolve a non-empty set without network. Sourced from NCES CCD 2022-23 public domain data; nces_id is the federal LEA identifier.",
   "districts": [
-    { "ncesId": "3620580", "name": "New York City Public Schools", "state": "NY", "city": "New York" },
-    { "ncesId": "0622710", "name": "Los Angeles Unified School District", "state": "CA", "city": "Los Angeles" },
+    {
+      "ncesId": "3620580",
+      "name": "New York City Public Schools",
+      "state": "NY",
+      "city": "New York"
+    },
+    {
+      "ncesId": "0622710",
+      "name": "Los Angeles Unified School District",
+      "state": "CA",
+      "city": "Los Angeles"
+    },
     { "ncesId": "1709930", "name": "Chicago Public Schools", "state": "IL", "city": "Chicago" },
-    { "ncesId": "4823640", "name": "Houston Independent School District", "state": "TX", "city": "Houston" },
-    { "ncesId": "4816230", "name": "Dallas Independent School District", "state": "TX", "city": "Dallas" },
-    { "ncesId": "4845570", "name": "San Antonio Independent School District", "state": "TX", "city": "San Antonio" },
-    { "ncesId": "0612330", "name": "Beverly Hills Unified School District", "state": "CA", "city": "Beverly Hills" },
-    { "ncesId": "0691051", "name": "San Diego Unified School District", "state": "CA", "city": "San Diego" },
-    { "ncesId": "1200870", "name": "Miami-Dade County Public Schools", "state": "FL", "city": "Miami" },
+    {
+      "ncesId": "4823640",
+      "name": "Houston Independent School District",
+      "state": "TX",
+      "city": "Houston"
+    },
+    {
+      "ncesId": "4816230",
+      "name": "Dallas Independent School District",
+      "state": "TX",
+      "city": "Dallas"
+    },
+    {
+      "ncesId": "4845570",
+      "name": "San Antonio Independent School District",
+      "state": "TX",
+      "city": "San Antonio"
+    },
+    {
+      "ncesId": "0612330",
+      "name": "Beverly Hills Unified School District",
+      "state": "CA",
+      "city": "Beverly Hills"
+    },
+    {
+      "ncesId": "0691051",
+      "name": "San Diego Unified School District",
+      "state": "CA",
+      "city": "San Diego"
+    },
+    {
+      "ncesId": "1200870",
+      "name": "Miami-Dade County Public Schools",
+      "state": "FL",
+      "city": "Miami"
+    },
     { "ncesId": "0403600", "name": "Mesa Unified District", "state": "AZ", "city": "Mesa" },
-    { "ncesId": "5103930", "name": "Fairfax County Public Schools", "state": "VA", "city": "Fairfax" },
-    { "ncesId": "2400390", "name": "Montgomery County Public Schools", "state": "MD", "city": "Rockville" },
+    {
+      "ncesId": "5103930",
+      "name": "Fairfax County Public Schools",
+      "state": "VA",
+      "city": "Fairfax"
+    },
+    {
+      "ncesId": "2400390",
+      "name": "Montgomery County Public Schools",
+      "state": "MD",
+      "city": "Rockville"
+    },
     { "ncesId": "5305910", "name": "Seattle Public Schools", "state": "WA", "city": "Seattle" },
     { "ncesId": "0802550", "name": "Denver County 1", "state": "CO", "city": "Denver" },
     { "ncesId": "1303300", "name": "Atlanta Public Schools", "state": "GA", "city": "Atlanta" },
     { "ncesId": "2502790", "name": "Boston Public Schools", "state": "MA", "city": "Boston" },
-    { "ncesId": "4218990", "name": "Philadelphia City School District", "state": "PA", "city": "Philadelphia" },
-    { "ncesId": "3904378", "name": "Cleveland Municipal School District", "state": "OH", "city": "Cleveland" },
-    { "ncesId": "3904380", "name": "Columbus City School District", "state": "OH", "city": "Columbus" },
-    { "ncesId": "0509600", "name": "Little Rock School District", "state": "AR", "city": "Little Rock" }
+    {
+      "ncesId": "4218990",
+      "name": "Philadelphia City School District",
+      "state": "PA",
+      "city": "Philadelphia"
+    },
+    {
+      "ncesId": "3904378",
+      "name": "Cleveland Municipal School District",
+      "state": "OH",
+      "city": "Cleveland"
+    },
+    {
+      "ncesId": "3904380",
+      "name": "Columbus City School District",
+      "state": "OH",
+      "city": "Columbus"
+    },
+    {
+      "ncesId": "0509600",
+      "name": "Little Rock School District",
+      "state": "AR",
+      "city": "Little Rock"
+    }
   ],
   "zipDistrict": [
     { "zip": "10001", "ncesId": "3620580", "weight": 1.0, "dominant": true },

@@ -85,7 +85,7 @@ test("requireStepUp rejects when flag is on, no header is present", async () => 
   sec.ADMIN_ENTERPRISE.STEP_UP_AUTH = true;
   try {
     const handler = requireStepUp("user:delete");
-    let captured: { status?: number; body?: any } = {};
+    const captured: { status?: number; body?: any } = {};
     const reply = {
       status(s: number) {
         captured.status = s;
@@ -142,7 +142,7 @@ test("requireStepUp rejects token issued for a different scope", async () => {
   try {
     const stepUpToken = await issueStepUpToken(USER, "user:delete", "totp");
     const handler = requireStepUp("tenant:suspend");
-    let captured: { status?: number; body?: any } = {};
+    const captured: { status?: number; body?: any } = {};
     const reply = {
       status(s: number) {
         captured.status = s;
@@ -172,7 +172,7 @@ test("requireStepUp rejects token issued for a different subject", async () => {
   try {
     const stepUpToken = await issueStepUpToken(USER, "user:delete", "totp");
     const handler = requireStepUp("user:delete");
-    let captured: { status?: number; body?: any } = {};
+    const captured: { status?: number; body?: any } = {};
     const reply = {
       status(s: number) {
         captured.status = s;

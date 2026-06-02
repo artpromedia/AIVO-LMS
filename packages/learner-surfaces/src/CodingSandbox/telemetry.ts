@@ -17,4 +17,3 @@ export function buildSnippetTelemetry(params: {
     source: params.captureSource ? params.source : undefined,
   };
 }
-

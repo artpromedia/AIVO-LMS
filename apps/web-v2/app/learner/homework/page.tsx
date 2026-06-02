@@ -63,35 +63,14 @@ export default async function LearnerHomeworkPage() {
       <section className="mt-8 flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-iw-text-strong">{t("section_how_i_help")}</h2>
         <div className="grid gap-3 md:grid-cols-3">
-          <GuidedStepCard
-            step={1}
-            total={3}
-            stage="try"
-            title={t("card_try")}
-          >
-            <p className="text-sm">
-              {t("card_try_body")}
-            </p>
+          <GuidedStepCard step={1} total={3} stage="try" title={t("card_try")}>
+            <p className="text-sm">{t("card_try_body")}</p>
           </GuidedStepCard>
-          <GuidedStepCard
-            step={2}
-            total={3}
-            stage="hint"
-            title={t("card_hint")}
-          >
-            <p className="text-sm">
-              {t("card_hint_body")}
-            </p>
+          <GuidedStepCard step={2} total={3} stage="hint" title={t("card_hint")}>
+            <p className="text-sm">{t("card_hint_body")}</p>
           </GuidedStepCard>
-          <GuidedStepCard
-            step={3}
-            total={3}
-            stage="walk"
-            title={t("card_walkthrough")}
-          >
-            <p className="text-sm">
-              {t("card_walk_body")}
-            </p>
+          <GuidedStepCard step={3} total={3} stage="walk" title={t("card_walkthrough")}>
+            <p className="text-sm">{t("card_walk_body")}</p>
           </GuidedStepCard>
         </div>
       </section>
@@ -108,7 +87,9 @@ export default async function LearnerHomeworkPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-iw-text-strong truncate">{s.topic}</p>
+                      <p className="text-sm font-semibold text-iw-text-strong truncate">
+                        {s.topic}
+                      </p>
                       <p className="text-xs text-iw-text-muted mt-1">
                         {new Date(s.startedAt).toLocaleString()}
                       </p>

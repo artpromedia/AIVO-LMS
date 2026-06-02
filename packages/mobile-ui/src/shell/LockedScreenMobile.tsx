@@ -1,12 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
-import {
-  NAV_AREA_META,
-  ROLE_META,
-  getPermission,
-  type NavArea,
-  type Role,
-} from "@aivo/nav";
+import { NAV_AREA_META, ROLE_META, getPermission, type NavArea, type Role } from "@aivo/nav";
 import { theme } from "../theme";
 
 /**
@@ -24,12 +18,7 @@ export interface LockedScreenMobileProps {
   onCta?: () => void;
 }
 
-export function LockedScreenMobile({
-  role,
-  area,
-  renderIcon,
-  onCta,
-}: LockedScreenMobileProps) {
+export function LockedScreenMobile({ role, area, renderIcon, onCta }: LockedScreenMobileProps) {
   const areaMeta = NAV_AREA_META[area];
   const roleMeta = ROLE_META[role];
   const permission = getPermission(role, area);

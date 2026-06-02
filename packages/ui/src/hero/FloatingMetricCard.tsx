@@ -52,7 +52,9 @@ export function FloatingMetricCard({
       className={clsx(
         "relative block overflow-hidden rounded-iw-hero bg-white p-6 sm:p-7",
         "shadow-[0_30px_80px_-40px_rgba(15,23,42,0.22)]",
-        href ? "transition-transform hover:-translate-y-0.5 hover:shadow-[0_36px_90px_-40px_rgba(15,23,42,0.28)]" : "",
+        href
+          ? "transition-transform hover:-translate-y-0.5 hover:shadow-[0_36px_90px_-40px_rgba(15,23,42,0.28)]"
+          : "",
         className,
       )}
     >

@@ -16,9 +16,9 @@ const OUT = "screenshots/redesign";
 mkdirSync(OUT, { recursive: true });
 
 const VIEWPORTS = [
-  { name: "mobile", width: 390, height: 844 },      // iPhone 14
-  { name: "tablet", width: 820, height: 1180 },     // iPad portrait-ish
-  { name: "desktop", width: 1440, height: 900 },    // common laptop
+  { name: "mobile", width: 390, height: 844 }, // iPhone 14
+  { name: "tablet", width: 820, height: 1180 }, // iPad portrait-ish
+  { name: "desktop", width: 1440, height: 900 }, // common laptop
 ];
 
 const ROUTES = [
@@ -60,9 +60,7 @@ try {
         await page.screenshot({ path: filename, fullPage: true });
         console.log(`OK  ${route.name} @ ${vp.name}  →  ${filename}`);
       } catch (err) {
-        console.log(
-          `FAIL ${route.name} @ ${vp.name}  ${(err && err.message) || err}`,
-        );
+        console.log(`FAIL ${route.name} @ ${vp.name}  ${(err && err.message) || err}`);
       }
       await context.close();
     }

@@ -91,9 +91,7 @@ const LOANWORD_EXEMPT: Record<string, ReadonlySet<string>> = {
   hi: new Set(),
   ja: new Set(),
   ko: new Set(),
-  pt: new Set([
-    "learner.homework.conversation_aria",
-  ]),
+  pt: new Set(["learner.homework.conversation_aria"]),
   zh: new Set(),
 };
 

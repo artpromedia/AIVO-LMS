@@ -48,60 +48,59 @@ export function SeeBaselineCta({ href }: { href: string }) {
 
   return (
     <div className="flex flex-col gap-2">
-    <button
-      type="button"
-      onClick={() => {
-        startTransition(() => {
-          router.push(href);
-        });
-      }}
-      disabled={isPending}
-      aria-busy={isPending}
-      className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_2px_6px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-white disabled:cursor-progress disabled:opacity-80"
-    >
-      {isPending ? (
-        <>
-          <svg
-            className="w-4 h-4 motion-safe:animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.25"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-          </svg>
-          {t("setting_it_up")}
-        </>
-      ) : (
-        <>
-          {t("see_baseline_cta")}
-          <svg
-            className="w-4 h-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.25"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M5 12h14" />
-            <path d="m13 5 7 7-7 7" />
-          </svg>
-        </>
-      )}
-    </button>
+      <button
+        type="button"
+        onClick={() => {
+          startTransition(() => {
+            router.push(href);
+          });
+        }}
+        disabled={isPending}
+        aria-busy={isPending}
+        className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_2px_6px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-white disabled:cursor-progress disabled:opacity-80"
+      >
+        {isPending ? (
+          <>
+            <svg
+              className="w-4 h-4 motion-safe:animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            {t("setting_it_up")}
+          </>
+        ) : (
+          <>
+            {t("see_baseline_cta")}
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14" />
+              <path d="m13 5 7 7-7 7" />
+            </svg>
+          </>
+        )}
+      </button>
       {stalled ? (
         <p
           role="status"
           aria-live="polite"
           className="text-xs text-iw-text-muted leading-relaxed max-w-md"
         >
-          This is taking longer than usual. Baseline generation can be slow on the first
-          run.{" "}
+          This is taking longer than usual. Baseline generation can be slow on the first run.{" "}
           <a
             href={href}
             className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"

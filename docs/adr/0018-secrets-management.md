@@ -24,15 +24,15 @@ Across Sprints 1-12 the AIVO services have grown to depend on roughly 60 distinc
 
 ## Rotation policy
 
-| Secret class | Rotation cadence | Mechanism |
-| ------------ | ---------------- | --------- |
-| AUTH_SECRET, COOKIE_SECRET, SESSION_SECRET | Quarterly | Vault `pki/issue` + rolling restart |
-| INTERNAL_SERVICE_TOKEN, INTERNAL_AI_TOKEN | Semi-annually | Vault transit + rolling restart |
-| STRIPE_SECRET_KEY (restricted) | Annually or on compromise | Stripe Dashboard + Vault write |
-| FCM_SERVICE_ACCOUNT_JSON | On Apple/Google rotation events | Vault write |
-| APNS_PRIVATE_KEY | Annually | Vault write |
-| OIDC signing keys (`oidc_signing_keys` table) | Quarterly | `POST /oidc/rotate` from the housekeeping cron |
-| POSTMARK_WEBHOOK_SECRET, MAILGUN_WEBHOOK_SIGNING_KEY | On vendor key rotation | Vault write + redeploy |
+| Secret class                                         | Rotation cadence                | Mechanism                                      |
+| ---------------------------------------------------- | ------------------------------- | ---------------------------------------------- |
+| AUTH_SECRET, COOKIE_SECRET, SESSION_SECRET           | Quarterly                       | Vault `pki/issue` + rolling restart            |
+| INTERNAL_SERVICE_TOKEN, INTERNAL_AI_TOKEN            | Semi-annually                   | Vault transit + rolling restart                |
+| STRIPE_SECRET_KEY (restricted)                       | Annually or on compromise       | Stripe Dashboard + Vault write                 |
+| FCM_SERVICE_ACCOUNT_JSON                             | On Apple/Google rotation events | Vault write                                    |
+| APNS_PRIVATE_KEY                                     | Annually                        | Vault write                                    |
+| OIDC signing keys (`oidc_signing_keys` table)        | Quarterly                       | `POST /oidc/rotate` from the housekeeping cron |
+| POSTMARK_WEBHOOK_SECRET, MAILGUN_WEBHOOK_SIGNING_KEY | On vendor key rotation          | Vault write + redeploy                         |
 
 ## Consequences
 

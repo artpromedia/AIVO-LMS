@@ -4,11 +4,7 @@ import { requireSession, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { getLearnerEngagement, listLearnerBadges } from "@/lib/db/repos";
 import type { BadgeKey } from "@/lib/db/types";
-import type {
-  BadgeRarity,
-  EngagementBadge,
-  EngagementProfile,
-} from "@/lib/contracts/engagement";
+import type { BadgeRarity, EngagementBadge, EngagementProfile } from "@/lib/contracts/engagement";
 
 export const dynamic = "force-dynamic";
 
@@ -22,12 +18,15 @@ type Params = { params: Promise<{ learnerId: string }> };
  * icon components into a serializable response. Keep the keys in sync
  * with `BadgeKey` in `lib/db/types.ts`.
  */
-const BADGE_CATALOG: Record<BadgeKey, {
-  name: string;
-  description: string;
-  icon: string;
-  rarity: BadgeRarity;
-}> = {
+const BADGE_CATALOG: Record<
+  BadgeKey,
+  {
+    name: string;
+    description: string;
+    icon: string;
+    rarity: BadgeRarity;
+  }
+> = {
   first_session: {
     name: "First Session",
     description: "Complete the first tutoring session.",

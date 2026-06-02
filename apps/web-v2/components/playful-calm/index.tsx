@@ -27,7 +27,11 @@ export function LearningPath({
         >
           <Badge
             tone={
-              node.state === "complete" ? "success" : node.state === "current" ? "primary" : "neutral"
+              node.state === "complete"
+                ? "success"
+                : node.state === "current"
+                  ? "primary"
+                  : "neutral"
             }
           >
             {node.state}

@@ -15,13 +15,7 @@
  * temporary passwords.
  */
 import { FastifyInstance } from "fastify";
-import {
-  users,
-  schools,
-  districtAdminInvites,
-  appendAudit,
-  adminAuditLog,
-} from "@aivo/db";
+import { users, schools, districtAdminInvites, appendAudit, adminAuditLog } from "@aivo/db";
 import { eq, and, isNull } from "drizzle-orm";
 import crypto from "crypto";
 import { createLogger } from "@aivo/observability";
@@ -86,7 +80,11 @@ export async function registerSchoolRoutes(app: FastifyInstance) {
       req.user?.role === "PLATFORM_ADMIN"
         ? eq(schools.id, sid)
         : and(eq(schools.id, sid), eq(schools.tenantId, req.tenantId));
-    const [school] = await db.select({ id: schools.id, name: schools.name }).from(schools).where(where).limit(1);
+    const [school] = await db
+      .select({ id: schools.id, name: schools.name })
+      .from(schools)
+      .where(where)
+      .limit(1);
     if (!school) {
       reply.status(404).send({ error: "School not found in your scope" });
       return null;
@@ -95,137 +93,152 @@ export async function registerSchoolRoutes(app: FastifyInstance) {
   }
 
   // --- LIST teachers + pending teacher invites for the school -------
-  app.get("/api/school/teachers", { preHandler: requireSchoolAdmin }, async (req: any, reply: any) => {
-    const school = await resolveSchool(req, reply);
-    if (!school) return;
+  app.get(
+    "/api/school/teachers",
+    { preHandler: requireSchoolAdmin },
+    async (req: any, reply: any) => {
+      const school = await resolveSchool(req, reply);
+      if (!school) return;
 
-    const teachers = await db
-      .select({
-        id: users.id,
-        email: users.email,
-        name: users.name,
-        deactivatedAt: users.deactivatedAt,
-        lastLoginAt: users.lastLoginAt,
-        createdAt: users.createdAt,
-      })
-      .from(users)
-      .where(and(eq(users.schoolId, school.id), eq(users.role, "TEACHER")))
-      .orderBy(users.createdAt);
+      const teachers = await db
+        .select({
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          deactivatedAt: users.deactivatedAt,
+          lastLoginAt: users.lastLoginAt,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .where(and(eq(users.schoolId, school.id), eq(users.role, "TEACHER")))
+        .orderBy(users.createdAt);
 
-    const pendingInvites = await db
-      .select({
-        id: districtAdminInvites.id,
-        email: districtAdminInvites.email,
-        name: districtAdminInvites.name,
-        expiresAt: districtAdminInvites.expiresAt,
-        createdAt: districtAdminInvites.createdAt,
-      })
-      .from(districtAdminInvites)
-      .where(
-        and(
-          eq(districtAdminInvites.schoolId, school.id),
-          eq(districtAdminInvites.role, "TEACHER"),
-          isNull(districtAdminInvites.acceptedAt),
-          isNull(districtAdminInvites.revokedAt),
-        ),
-      )
-      .orderBy(districtAdminInvites.createdAt);
+      const pendingInvites = await db
+        .select({
+          id: districtAdminInvites.id,
+          email: districtAdminInvites.email,
+          name: districtAdminInvites.name,
+          expiresAt: districtAdminInvites.expiresAt,
+          createdAt: districtAdminInvites.createdAt,
+        })
+        .from(districtAdminInvites)
+        .where(
+          and(
+            eq(districtAdminInvites.schoolId, school.id),
+            eq(districtAdminInvites.role, "TEACHER"),
+            isNull(districtAdminInvites.acceptedAt),
+            isNull(districtAdminInvites.revokedAt),
+          ),
+        )
+        .orderBy(districtAdminInvites.createdAt);
 
-    return { school: { id: school.id, name: school.name }, teachers, pendingInvites };
-  });
+      return { school: { id: school.id, name: school.name }, teachers, pendingInvites };
+    },
+  );
 
   // --- INVITE a teacher --------------------------------------------
-  app.post("/api/school/teachers", { preHandler: requireSchoolAdmin }, async (req: any, reply: any) => {
-    const school = await resolveSchool(req, reply);
-    if (!school) return;
+  app.post(
+    "/api/school/teachers",
+    { preHandler: requireSchoolAdmin },
+    async (req: any, reply: any) => {
+      const school = await resolveSchool(req, reply);
+      if (!school) return;
 
-    const { email, name } = (req.body || {}) as { email?: string; name?: string };
-    const lowerEmail = (email || "").trim().toLowerCase();
-    const displayName = (name || "").trim();
-    if (!EMAIL_RE.test(lowerEmail)) {
-      return reply.status(400).send({ error: "A valid email is required" });
-    }
-    if (!displayName) {
-      return reply.status(400).send({ error: "name is required" });
-    }
+      const { email, name } = (req.body || {}) as { email?: string; name?: string };
+      const lowerEmail = (email || "").trim().toLowerCase();
+      const displayName = (name || "").trim();
+      if (!EMAIL_RE.test(lowerEmail)) {
+        return reply.status(400).send({ error: "A valid email is required" });
+      }
+      if (!displayName) {
+        return reply.status(400).send({ error: "name is required" });
+      }
 
-    // Reject if a user with this email already exists in the tenant.
-    const [existing] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(and(eq(users.tenantId, req.tenantId), eq(users.email, lowerEmail)))
-      .limit(1);
-    if (existing) {
-      return reply.status(409).send({ error: "A user with this email already exists in your district." });
-    }
+      // Reject if a user with this email already exists in the tenant.
+      const [existing] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(and(eq(users.tenantId, req.tenantId), eq(users.email, lowerEmail)))
+        .limit(1);
+      if (existing) {
+        return reply
+          .status(409)
+          .send({ error: "A user with this email already exists in your district." });
+      }
 
-    // Reject if there's an outstanding invite for this email.
-    const [openInvite] = await db
-      .select({ id: districtAdminInvites.id })
-      .from(districtAdminInvites)
-      .where(
-        and(
-          eq(districtAdminInvites.tenantId, req.tenantId),
-          eq(districtAdminInvites.email, lowerEmail),
-          isNull(districtAdminInvites.acceptedAt),
-          isNull(districtAdminInvites.revokedAt),
-        ),
-      )
-      .limit(1);
-    if (openInvite) {
-      return reply.status(409).send({ error: "An invite is already pending for this email." });
-    }
+      // Reject if there's an outstanding invite for this email.
+      const [openInvite] = await db
+        .select({ id: districtAdminInvites.id })
+        .from(districtAdminInvites)
+        .where(
+          and(
+            eq(districtAdminInvites.tenantId, req.tenantId),
+            eq(districtAdminInvites.email, lowerEmail),
+            isNull(districtAdminInvites.acceptedAt),
+            isNull(districtAdminInvites.revokedAt),
+          ),
+        )
+        .limit(1);
+      if (openInvite) {
+        return reply.status(409).send({ error: "An invite is already pending for this email." });
+      }
 
-    const rawToken = crypto.randomBytes(32).toString("base64url");
-    const tokenHash = hashInviteToken(rawToken);
-    const expiresAt = new Date(Date.now() + INVITE_TTL_HOURS * 3600 * 1000);
+      const rawToken = crypto.randomBytes(32).toString("base64url");
+      const tokenHash = hashInviteToken(rawToken);
+      const expiresAt = new Date(Date.now() + INVITE_TTL_HOURS * 3600 * 1000);
 
-    const [invite] = await db
-      .insert(districtAdminInvites)
-      .values({
-        tenantId: req.tenantId,
-        email: lowerEmail,
+      const [invite] = await db
+        .insert(districtAdminInvites)
+        .values({
+          tenantId: req.tenantId,
+          email: lowerEmail,
+          name: displayName,
+          role: "TEACHER",
+          schoolId: school.id,
+          invitedBy: req.user.sub,
+          tokenHash,
+          expiresAt,
+        })
+        .returning();
+
+      const inviteUrl = `${process.env.WEB_BASE_URL || "https://app.aivolearning.com"}/accept-invite?token=${rawToken}`;
+      await emailTeacherInvite({
+        to: lowerEmail,
         name: displayName,
-        role: "TEACHER",
-        schoolId: school.id,
-        invitedBy: req.user.sub,
-        tokenHash,
-        expiresAt,
-      })
-      .returning();
-
-    const inviteUrl = `${process.env.WEB_BASE_URL || "https://app.aivolearning.com"}/accept-invite?token=${rawToken}`;
-    await emailTeacherInvite({ to: lowerEmail, name: displayName, schoolName: school.name, inviteUrl });
-
-    try {
-      await appendAudit(db, "admin_audit_log", adminAuditLog, {
-        tenantId: req.tenantId,
-        action: "teacher.invited",
-        actorId: req.user.sub,
-        actorEmail: req.user.email,
-        actorRole: req.user.role,
-        onBehalfOfId: null,
-        resourceType: "district_admin_invite",
-        resourceId: invite.id,
-        details: { email: lowerEmail, name: displayName, schoolId: school.id },
-        ipAddress: req.ip ?? null,
-        userAgent: (req.headers["user-agent"] as string) ?? null,
+        schoolName: school.name,
+        inviteUrl,
       });
-    } catch (err) {
-      logger.warn("teacher invite audit append failed", { err: String(err) });
-    }
 
-    return {
-      invite: {
-        id: invite.id,
-        email: lowerEmail,
-        name: displayName,
-        role: "TEACHER",
-        schoolId: school.id,
-        expiresAt,
-      },
-    };
-  });
+      try {
+        await appendAudit(db, "admin_audit_log", adminAuditLog, {
+          tenantId: req.tenantId,
+          action: "teacher.invited",
+          actorId: req.user.sub,
+          actorEmail: req.user.email,
+          actorRole: req.user.role,
+          onBehalfOfId: null,
+          resourceType: "district_admin_invite",
+          resourceId: invite.id,
+          details: { email: lowerEmail, name: displayName, schoolId: school.id },
+          ipAddress: req.ip ?? null,
+          userAgent: (req.headers["user-agent"] as string) ?? null,
+        });
+      } catch (err) {
+        logger.warn("teacher invite audit append failed", { err: String(err) });
+      }
+
+      return {
+        invite: {
+          id: invite.id,
+          email: lowerEmail,
+          name: displayName,
+          role: "TEACHER",
+          schoolId: school.id,
+          expiresAt,
+        },
+      };
+    },
+  );
 
   // --- REVOKE a pending teacher invite -----------------------------
   app.delete(

@@ -21,7 +21,9 @@ interface ThreadMessage {
 
 function timeLabel(iso: string): string {
   const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "" : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
 /**
@@ -55,8 +57,7 @@ export function MessagesInbox() {
     void loadThreads();
   }, [loadThreads]);
 
-  const isVisible = () =>
-    typeof document === "undefined" || document.visibilityState === "visible";
+  const isVisible = () => typeof document === "undefined" || document.visibilityState === "visible";
 
   // Live updates (visibility-aware polling — a robust, dual-path alternative
   // to a push stream). Thread list refreshes every 12s; the open conversation
@@ -82,28 +83,25 @@ export function MessagesInbox() {
     return () => clearInterval(id);
   }, [activeId]);
 
-  const openThread = React.useCallback(
-    async (id: string, subject: string) => {
-      setActiveId(id);
-      setActiveSubject(subject);
-      setMessages(null);
-      setError(null);
-      try {
-        const res = await fetch(`/api/bff/messages/threads/${id}/messages`);
-        const j = await res.json().catch(() => ({}));
-        if (res.ok && j?.data) {
-          setMessages((j.data.messages ?? []) as ThreadMessage[]);
-          void fetch(`/api/bff/messages/threads/${id}/read`, { method: "POST" });
-          setThreads((prev) => prev.map((t) => (t.id === id ? { ...t, unread: 0 } : t)));
-        } else {
-          setError("Couldn't open that conversation.");
-        }
-      } catch {
+  const openThread = React.useCallback(async (id: string, subject: string) => {
+    setActiveId(id);
+    setActiveSubject(subject);
+    setMessages(null);
+    setError(null);
+    try {
+      const res = await fetch(`/api/bff/messages/threads/${id}/messages`);
+      const j = await res.json().catch(() => ({}));
+      if (res.ok && j?.data) {
+        setMessages((j.data.messages ?? []) as ThreadMessage[]);
+        void fetch(`/api/bff/messages/threads/${id}/read`, { method: "POST" });
+        setThreads((prev) => prev.map((t) => (t.id === id ? { ...t, unread: 0 } : t)));
+      } else {
         setError("Couldn't open that conversation.");
       }
-    },
-    [],
-  );
+    } catch {
+      setError("Couldn't open that conversation.");
+    }
+  }, []);
 
   function send() {
     const body = draft.trim();
@@ -162,7 +160,9 @@ export function MessagesInbox() {
                     ) : null}
                   </span>
                   {t.lastMessage ? (
-                    <span className="truncate text-xs text-iw-text-muted">{t.lastMessage.body}</span>
+                    <span className="truncate text-xs text-iw-text-muted">
+                      {t.lastMessage.body}
+                    </span>
                   ) : null}
                 </button>
               </li>
@@ -202,7 +202,9 @@ export function MessagesInbox() {
                     >
                       {m.body}
                     </div>
-                    <span className="mt-1 text-[11px] text-iw-text-muted">{timeLabel(m.createdAt)}</span>
+                    <span className="mt-1 text-[11px] text-iw-text-muted">
+                      {timeLabel(m.createdAt)}
+                    </span>
                   </div>
                 ))
               )}

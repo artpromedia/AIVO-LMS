@@ -24,7 +24,8 @@ export type SetupStep = {
 
 const STATUS_DOT: Record<SetupStep["status"], string> = {
   done: "bg-[var(--aivo-domain-completion-completed-strong,#16a34a)] text-white",
-  active: "bg-[var(--aivo-sensory-primary,#7c3aed)] text-white ring-4 ring-[var(--aivo-sensory-primary,#7c3aed)]/20",
+  active:
+    "bg-[var(--aivo-sensory-primary,#7c3aed)] text-white ring-4 ring-[var(--aivo-sensory-primary,#7c3aed)]/20",
   upcoming: "bg-white text-iw-text-muted ring-1 ring-iw-border",
   blocked: "bg-amber-100 text-amber-800 ring-1 ring-amber-300",
 };
@@ -48,16 +49,11 @@ export function SetupProgressTrack({ steps, className }: SetupProgressTrackProps
 
   return (
     <div
-      className={clsx(
-        "rounded-iw-card-lg bg-white ring-1 ring-iw-border p-5 sm:p-6",
-        className,
-      )}
+      className={clsx("rounded-iw-card-lg bg-white ring-1 ring-iw-border p-5 sm:p-6", className)}
       aria-label="Family setup progress"
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className="iw-label uppercase tracking-wider text-iw-text-muted">
-          Family setup
-        </p>
+        <p className="iw-label uppercase tracking-wider text-iw-text-muted">Family setup</p>
         <p className="text-sm font-semibold text-iw-text-strong tabular-nums">
           {done} of {total} done · {pct}%
         </p>
@@ -85,7 +81,9 @@ export function SetupProgressTrack({ steps, className }: SetupProgressTrackProps
                 {...(s.href ? { href: s.href } : {})}
                 className={clsx(
                   "flex items-center gap-3 rounded-iw-card border border-iw-border bg-white px-3 py-2",
-                  s.href ? "hover:border-[var(--aivo-sensory-primary,#7c3aed)] transition-colors" : "",
+                  s.href
+                    ? "hover:border-[var(--aivo-sensory-primary,#7c3aed)] transition-colors"
+                    : "",
                 )}
                 aria-current={s.status === "active" ? "step" : undefined}
               >

@@ -56,9 +56,7 @@ async function resetPasswordAction(formData: FormData) {
     }
     redirect(
       `/reset-password?token=${encodeURIComponent(token)}&error=${code}` +
-        (result.reasons?.length
-          ? `&detail=${encodeURIComponent(result.reasons.join("|"))}`
-          : ""),
+        (result.reasons?.length ? `&detail=${encodeURIComponent(result.reasons.join("|"))}` : ""),
     );
   }
 
@@ -98,10 +96,7 @@ export default async function ResetPasswordPage({
   return (
     <>
       <SiteHeader />
-      <main
-        id="main"
-        className="mx-auto flex w-full max-w-md flex-col gap-4 px-6 py-12 sm:py-16"
-      >
+      <main id="main" className="mx-auto flex w-full max-w-md flex-col gap-4 px-6 py-12 sm:py-16">
         <div className="flex items-center gap-3">
           <span
             aria-hidden="true"
@@ -159,11 +154,7 @@ export default async function ResetPasswordPage({
               </>
             }
           >
-            <form
-              id="reset-form"
-              action={resetPasswordAction}
-              className="flex flex-col gap-4"
-            >
+            <form id="reset-form" action={resetPasswordAction} className="flex flex-col gap-4">
               <input type="hidden" name="token" value={token} />
               <ResetPasswordFields id="reset" />
             </form>

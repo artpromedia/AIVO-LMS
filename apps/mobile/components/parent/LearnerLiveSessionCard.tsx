@@ -8,7 +8,9 @@ import { colors, spacing, radius } from "@/constants/colors";
 function fmtTime(iso?: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "" : d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
 function fmtDuration(sec?: number | null): string | null {
@@ -53,9 +55,7 @@ export function LearnerLiveSessionCard({ learnerId }: { learnerId: string }) {
       </View>
       <Text style={styles.subject}>{latest.subject}</Text>
       <View style={styles.metaRow}>
-        {latest.xpEarned != null ? (
-          <Text style={styles.meta}>{latest.xpEarned} XP</Text>
-        ) : null}
+        {latest.xpEarned != null ? <Text style={styles.meta}>{latest.xpEarned} XP</Text> : null}
         {meta ? <Text style={styles.meta}>{meta}</Text> : null}
         <Text style={styles.meta}>
           {live
@@ -79,7 +79,12 @@ const styles = StyleSheet.create({
   cardLive: { borderColor: "#22c55e" },
   headerRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   dot: { width: 10, height: 10, borderRadius: 5 },
-  status: { fontSize: 12, fontFamily: "Nunito-Bold", textTransform: "uppercase", letterSpacing: 0.5 },
+  status: {
+    fontSize: 12,
+    fontFamily: "Nunito-Bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
   subject: { fontSize: 20, fontFamily: "Nunito-ExtraBold", color: colors.text, marginTop: 4 },
   metaRow: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 4 },
   meta: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },

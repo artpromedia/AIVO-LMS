@@ -36,7 +36,7 @@ We add a centralised production loader and a validation gate:
     defect budget of 5.
   - `getProductionItemCounts()` — fast threshold sanity check.
   - `RequiredSubjectSlug = "math" | "ela" | "science" | "writing"`.
-  Fixtures are intentionally NOT exposed here.
+    Fixtures are intentionally NOT exposed here.
 
 - **`packages/item-bank/src/validate.ts`** — extended:
   - New `ROUTABLE_SURFACE_TYPES` set listing the six runtime surface

@@ -91,7 +91,9 @@ export default async function TeacherReportsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">{t("col_learners")}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+            {t("col_learners")}
+          </p>
           <p className="mt-1 font-display text-3xl font-semibold">{learners.length}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
@@ -103,7 +105,9 @@ export default async function TeacherReportsPage() {
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">{t("on_track")}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+            {t("on_track")}
+          </p>
           <p className="mt-1 font-display text-3xl font-semibold">{learnersOnTrack}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">{t("avg_mastery_threshold")}</p>
         </Card>
@@ -118,9 +122,7 @@ export default async function TeacherReportsPage() {
       <SectionHeader title={t("mastery_distribution")} />
       {distTotal === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-sm text-aivo-ink-soft">
-            {t("no_mastery_data")}
-          </p>
+          <p className="text-sm text-aivo-ink-soft">{t("no_mastery_data")}</p>
         </Card>
       ) : (
         <Card className="p-[var(--aivo-density-card-pad)]">

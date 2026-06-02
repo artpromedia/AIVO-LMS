@@ -24,8 +24,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "AI tutor · always calm, always patient",
       hero_title: "Hi {name} — ask me anything.",
-      hero_body: "I'll explain, give hints, walk you through examples, or just keep you company while you practice. No grades. Tap a subject to start, or pick up an open lesson.",
-      greeting: "Hi {name}! Ask me anything — I'll guide you with hints and questions instead of just handing over the answer. What are you working on?",
+      hero_body:
+        "I'll explain, give hints, walk you through examples, or just keep you company while you practice. No grades. Tap a subject to start, or pick up an open lesson.",
+      greeting:
+        "Hi {name}! Ask me anything — I'll guide you with hints and questions instead of just handing over the answer. What are you working on?",
       start_lesson: "Start today's lesson",
       quick_asks: "Quick asks",
       help_with: "Help with {name}",
@@ -37,7 +39,8 @@ const DATA = {
       who_nobody: "Nobody else",
       who_nobody_desc: "Tutor chat stays private to you.",
       safety: "Safety",
-      safety_body: "AIVO has safety filters always on. If something feels off, your grown-up will know. You can always pause or close the tutor — no questions asked.",
+      safety_body:
+        "AIVO has safety filters always on. If something feels off, your grown-up will know. You can always pause or close the tutor — no questions asked.",
       ask_label: "Ask the tutor",
       you: "You",
       err_send: "Couldn't send. Try again.",
@@ -47,8 +50,9 @@ const DATA = {
     },
     homework: {
       hero_eyebrow: "Homework Helper · I'll guide, not just give answers",
-      hero_body: "Snap a photo of your work, upload a file, or just type what you're working on. I'll walk you through it one step at a time.",
-      card_try_body: "Even one guess helps. There's no wrong answer in the \"try first\" step.",
+      hero_body:
+        "Snap a photo of your work, upload a file, or just type what you're working on. I'll walk you through it one step at a time.",
+      card_try_body: 'Even one guess helps. There\'s no wrong answer in the "try first" step.',
       card_hint_body: "Just enough to nudge you forward, never the whole answer.",
       card_walk_body: "We solve it together — one step at a time, in plain words.",
       recent_sessions: "Recent sessions",
@@ -85,8 +89,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "Tutor de IA · siempre tranquilo, siempre paciente",
       hero_title: "Hola {name}, pregúntame lo que quieras.",
-      hero_body: "Te explico, te doy pistas, te guío con ejemplos o simplemente te acompaño mientras practicas. Sin notas. Toca una materia para empezar, o retoma una lección abierta.",
-      greeting: "¡Hola {name}! Pregúntame lo que quieras: te guiaré con pistas y preguntas en lugar de darte la respuesta. ¿En qué estás trabajando?",
+      hero_body:
+        "Te explico, te doy pistas, te guío con ejemplos o simplemente te acompaño mientras practicas. Sin notas. Toca una materia para empezar, o retoma una lección abierta.",
+      greeting:
+        "¡Hola {name}! Pregúntame lo que quieras: te guiaré con pistas y preguntas en lugar de darte la respuesta. ¿En qué estás trabajando?",
       start_lesson: "Empezar la lección de hoy",
       quick_asks: "Preguntas rápidas",
       help_with: "Ayuda con {name}",
@@ -98,7 +104,8 @@ const DATA = {
       who_nobody: "Nadie más",
       who_nobody_desc: "El chat del tutor es privado para ti.",
       safety: "Seguridad",
-      safety_body: "AIVO tiene los filtros de seguridad siempre activos. Si algo no va bien, tu adulto lo sabrá. Siempre puedes pausar o cerrar el tutor, sin preguntas.",
+      safety_body:
+        "AIVO tiene los filtros de seguridad siempre activos. Si algo no va bien, tu adulto lo sabrá. Siempre puedes pausar o cerrar el tutor, sin preguntas.",
       ask_label: "Pregúntale al tutor",
       you: "Tú",
       err_send: "No se pudo enviar. Inténtalo de nuevo.",
@@ -108,8 +115,10 @@ const DATA = {
     },
     homework: {
       hero_eyebrow: "Ayudante de tareas · te guío, no solo doy respuestas",
-      hero_body: "Saca una foto de tu trabajo, sube un archivo o solo escribe en qué estás trabajando. Te guiaré paso a paso.",
-      card_try_body: "Hasta una sola idea ayuda. No hay respuesta incorrecta en el paso de \"intenta primero\".",
+      hero_body:
+        "Saca una foto de tu trabajo, sube un archivo o solo escribe en qué estás trabajando. Te guiaré paso a paso.",
+      card_try_body:
+        'Hasta una sola idea ayuda. No hay respuesta incorrecta en el paso de "intenta primero".',
       card_hint_body: "Lo justo para empujarte hacia adelante, nunca toda la respuesta.",
       card_walk_body: "Lo resolvemos juntos: paso a paso, en palabras sencillas.",
       recent_sessions: "Sesiones recientes",
@@ -126,7 +135,8 @@ const DATA = {
       err_file_read: "No se pudo leer ese archivo. Prueba con otro.",
       err_topic_required: "Describe en qué estás trabajando.",
       err_start: "No se pudo iniciar una sesión. Inténtalo de nuevo.",
-      err_start_network: "No se pudo contactar al ayudante. Comprueba tu conexión e inténtalo de nuevo.",
+      err_start_network:
+        "No se pudo contactar al ayudante. Comprueba tu conexión e inténtalo de nuevo.",
       header_eyebrow: "Ayudante de tareas",
       attachment_note: "Compartido cuando empezaste esta sesión.",
       session_summary: "Resumen de la sesión",
@@ -146,8 +156,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "Tuteur IA · toujours calme, toujours patient",
       hero_title: "Salut {name} — demande-moi ce que tu veux.",
-      hero_body: "Je t'explique, je te donne des indices, je te guide avec des exemples, ou je te tiens simplement compagnie pendant que tu t'entraînes. Pas de notes. Touche une matière pour commencer, ou reprends une leçon ouverte.",
-      greeting: "Salut {name} ! Demande-moi ce que tu veux — je te guiderai avec des indices et des questions plutôt que de te donner la réponse. Sur quoi travailles-tu ?",
+      hero_body:
+        "Je t'explique, je te donne des indices, je te guide avec des exemples, ou je te tiens simplement compagnie pendant que tu t'entraînes. Pas de notes. Touche une matière pour commencer, ou reprends une leçon ouverte.",
+      greeting:
+        "Salut {name} ! Demande-moi ce que tu veux — je te guiderai avec des indices et des questions plutôt que de te donner la réponse. Sur quoi travailles-tu ?",
       start_lesson: "Commencer la leçon du jour",
       quick_asks: "Questions rapides",
       help_with: "De l'aide avec {name}",
@@ -159,7 +171,8 @@ const DATA = {
       who_nobody: "Personne d'autre",
       who_nobody_desc: "Le chat du tuteur reste privé.",
       safety: "Sécurité",
-      safety_body: "AIVO a des filtres de sécurité toujours actifs. Si quelque chose ne va pas, ton adulte le saura. Tu peux toujours mettre en pause ou fermer le tuteur — sans avoir à te justifier.",
+      safety_body:
+        "AIVO a des filtres de sécurité toujours actifs. Si quelque chose ne va pas, ton adulte le saura. Tu peux toujours mettre en pause ou fermer le tuteur — sans avoir à te justifier.",
       ask_label: "Pose une question au tuteur",
       you: "Toi",
       err_send: "Échec de l'envoi. Réessaie.",
@@ -169,8 +182,10 @@ const DATA = {
     },
     homework: {
       hero_eyebrow: "Aide aux devoirs · je guide, je ne donne pas juste les réponses",
-      hero_body: "Prends une photo de ton travail, téléverse un fichier, ou écris simplement ce sur quoi tu travailles. Je te guiderai étape par étape.",
-      card_try_body: "Même une seule idée aide. Il n'y a pas de mauvaise réponse à l'étape « essaie d'abord ».",
+      hero_body:
+        "Prends une photo de ton travail, téléverse un fichier, ou écris simplement ce sur quoi tu travailles. Je te guiderai étape par étape.",
+      card_try_body:
+        "Même une seule idée aide. Il n'y a pas de mauvaise réponse à l'étape « essaie d'abord ».",
       card_hint_body: "Juste assez pour t'aider à avancer, jamais toute la réponse.",
       card_walk_body: "On le résout ensemble — une étape à la fois, en mots simples.",
       recent_sessions: "Sessions récentes",
@@ -207,8 +222,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "KI-Tutor · immer ruhig, immer geduldig",
       hero_title: "Hallo {name} — frag mich alles.",
-      hero_body: "Ich erkläre, gebe Hinweise, gehe Beispiele mit dir durch oder leiste dir einfach Gesellschaft beim Üben. Keine Noten. Tippe auf ein Fach, um zu starten, oder mach bei einer offenen Lektion weiter.",
-      greeting: "Hallo {name}! Frag mich alles — ich führe dich mit Hinweisen und Fragen, statt dir einfach die Antwort zu geben. Woran arbeitest du?",
+      hero_body:
+        "Ich erkläre, gebe Hinweise, gehe Beispiele mit dir durch oder leiste dir einfach Gesellschaft beim Üben. Keine Noten. Tippe auf ein Fach, um zu starten, oder mach bei einer offenen Lektion weiter.",
+      greeting:
+        "Hallo {name}! Frag mich alles — ich führe dich mit Hinweisen und Fragen, statt dir einfach die Antwort zu geben. Woran arbeitest du?",
       start_lesson: "Heutige Lektion starten",
       quick_asks: "Schnelle Fragen",
       help_with: "Hilfe bei {name}",
@@ -220,7 +237,8 @@ const DATA = {
       who_nobody: "Sonst niemand",
       who_nobody_desc: "Der Tutor-Chat bleibt privat.",
       safety: "Sicherheit",
-      safety_body: "AIVO hat immer Sicherheitsfilter aktiv. Wenn sich etwas nicht richtig anfühlt, erfährt es dein Erwachsener. Du kannst den Tutor jederzeit pausieren oder schließen — ohne Nachfragen.",
+      safety_body:
+        "AIVO hat immer Sicherheitsfilter aktiv. Wenn sich etwas nicht richtig anfühlt, erfährt es dein Erwachsener. Du kannst den Tutor jederzeit pausieren oder schließen — ohne Nachfragen.",
       ask_label: "Frag den Tutor",
       you: "Du",
       err_send: "Senden fehlgeschlagen. Versuch es erneut.",
@@ -230,8 +248,10 @@ const DATA = {
     },
     homework: {
       hero_eyebrow: "Hausaufgabenhelfer · ich leite an, gebe nicht nur Antworten",
-      hero_body: "Mach ein Foto von deiner Arbeit, lade eine Datei hoch oder schreib einfach, woran du arbeitest. Ich führe dich Schritt für Schritt durch.",
-      card_try_body: "Schon eine Vermutung hilft. Beim Schritt „erst versuchen“ gibt es keine falsche Antwort.",
+      hero_body:
+        "Mach ein Foto von deiner Arbeit, lade eine Datei hoch oder schreib einfach, woran du arbeitest. Ich führe dich Schritt für Schritt durch.",
+      card_try_body:
+        "Schon eine Vermutung hilft. Beim Schritt „erst versuchen“ gibt es keine falsche Antwort.",
       card_hint_body: "Gerade genug, um dich voranzubringen, niemals die ganze Antwort.",
       card_walk_body: "Wir lösen es gemeinsam — Schritt für Schritt, in einfachen Worten.",
       recent_sessions: "Letzte Sitzungen",
@@ -248,7 +268,8 @@ const DATA = {
       err_file_read: "Diese Datei konnte nicht gelesen werden. Versuch eine andere.",
       err_topic_required: "Beschreibe bitte, woran du arbeitest.",
       err_start: "Sitzung konnte nicht gestartet werden. Versuch es erneut.",
-      err_start_network: "Der Helfer ist nicht erreichbar. Prüfe deine Verbindung und versuch es erneut.",
+      err_start_network:
+        "Der Helfer ist nicht erreichbar. Prüfe deine Verbindung und versuch es erneut.",
       header_eyebrow: "Hausaufgabenhelfer",
       attachment_note: "Geteilt, als du diese Sitzung gestartet hast.",
       session_summary: "Sitzungszusammenfassung",
@@ -268,8 +289,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "Tutor de IA · sempre calmo, sempre paciente",
       hero_title: "Oi {name} — pergunte o que quiser.",
-      hero_body: "Eu explico, dou dicas, te guio com exemplos ou só te faço companhia enquanto você pratica. Sem notas. Toque numa matéria para começar, ou retome uma lição aberta.",
-      greeting: "Oi {name}! Pergunte o que quiser — vou te guiar com dicas e perguntas em vez de simplesmente dar a resposta. No que você está trabalhando?",
+      hero_body:
+        "Eu explico, dou dicas, te guio com exemplos ou só te faço companhia enquanto você pratica. Sem notas. Toque numa matéria para começar, ou retome uma lição aberta.",
+      greeting:
+        "Oi {name}! Pergunte o que quiser — vou te guiar com dicas e perguntas em vez de simplesmente dar a resposta. No que você está trabalhando?",
       start_lesson: "Começar a lição de hoje",
       quick_asks: "Perguntas rápidas",
       help_with: "Ajuda com {name}",
@@ -281,7 +304,8 @@ const DATA = {
       who_nobody: "Mais ninguém",
       who_nobody_desc: "O chat do tutor fica privado para você.",
       safety: "Segurança",
-      safety_body: "A AIVO tem filtros de segurança sempre ativos. Se algo parecer errado, seu adulto vai saber. Você sempre pode pausar ou fechar o tutor — sem perguntas.",
+      safety_body:
+        "A AIVO tem filtros de segurança sempre ativos. Se algo parecer errado, seu adulto vai saber. Você sempre pode pausar ou fechar o tutor — sem perguntas.",
       ask_label: "Pergunte ao tutor",
       you: "Você",
       err_send: "Não foi possível enviar. Tente novamente.",
@@ -291,8 +315,9 @@ const DATA = {
     },
     homework: {
       hero_eyebrow: "Ajudante de tarefas · eu guio, não só dou respostas",
-      hero_body: "Tire uma foto do seu trabalho, envie um arquivo ou só digite no que está trabalhando. Vou te guiar passo a passo.",
-      card_try_body: "Até um palpite ajuda. Não há resposta errada na etapa \"tente primeiro\".",
+      hero_body:
+        "Tire uma foto do seu trabalho, envie um arquivo ou só digite no que está trabalhando. Vou te guiar passo a passo.",
+      card_try_body: 'Até um palpite ajuda. Não há resposta errada na etapa "tente primeiro".',
       card_hint_body: "Só o suficiente para te empurrar adiante, nunca a resposta inteira.",
       card_walk_body: "Resolvemos juntos — um passo de cada vez, em palavras simples.",
       recent_sessions: "Sessões recentes",
@@ -309,7 +334,8 @@ const DATA = {
       err_file_read: "Não foi possível ler esse arquivo. Tente outro.",
       err_topic_required: "Descreva no que você está trabalhando.",
       err_start: "Não foi possível iniciar uma sessão. Tente novamente.",
-      err_start_network: "Não foi possível contatar o ajudante. Verifique sua conexão e tente novamente.",
+      err_start_network:
+        "Não foi possível contatar o ajudante. Verifique sua conexão e tente novamente.",
       header_eyebrow: "Ajudante de tarefas",
       attachment_note: "Compartilhado quando você iniciou esta sessão.",
       session_summary: "Resumo da sessão",
@@ -329,7 +355,8 @@ const DATA = {
     tutor: {
       hero_eyebrow: "AI 导师 · 始终平和、始终耐心",
       hero_title: "嗨 {name}——尽管问我。",
-      hero_body: "我会讲解、给提示、带你看例子，或在你练习时陪着你。没有分数。点按一个学科开始，或继续一节未完成的课。",
+      hero_body:
+        "我会讲解、给提示、带你看例子，或在你练习时陪着你。没有分数。点按一个学科开始，或继续一节未完成的课。",
       greeting: "嗨 {name}！尽管问我——我会用提示和问题来引导你，而不是直接给答案。你在做什么呢？",
       start_lesson: "开始今天的课程",
       quick_asks: "快速提问",
@@ -342,7 +369,8 @@ const DATA = {
       who_nobody: "其他人都看不到",
       who_nobody_desc: "导师聊天只对你私密可见。",
       safety: "安全",
-      safety_body: "AIVO 的安全过滤始终开启。如果有什么不对劲，你的大人会知道。你随时可以暂停或关闭导师——无需任何理由。",
+      safety_body:
+        "AIVO 的安全过滤始终开启。如果有什么不对劲，你的大人会知道。你随时可以暂停或关闭导师——无需任何理由。",
       ask_label: "向导师提问",
       you: "你",
       err_send: "发送失败。请重试。",
@@ -390,8 +418,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "AI チューター · いつも穏やか、いつも辛抱強い",
       hero_title: "こんにちは {name} — なんでも聞いてね。",
-      hero_body: "説明したり、ヒントを出したり、例を一緒に見たり、練習中はそばにいたりします。成績はなし。教科をタップして始めるか、開いているレッスンの続きをどうぞ。",
-      greeting: "こんにちは {name}！なんでも聞いてね — 答えをそのまま渡すのではなく、ヒントや質問で導きます。いま何に取り組んでいる？",
+      hero_body:
+        "説明したり、ヒントを出したり、例を一緒に見たり、練習中はそばにいたりします。成績はなし。教科をタップして始めるか、開いているレッスンの続きをどうぞ。",
+      greeting:
+        "こんにちは {name}！なんでも聞いてね — 答えをそのまま渡すのではなく、ヒントや質問で導きます。いま何に取り組んでいる？",
       start_lesson: "今日のレッスンを始める",
       quick_asks: "クイック質問",
       help_with: "{name}を手伝って",
@@ -403,7 +433,8 @@ const DATA = {
       who_nobody: "ほかの誰も",
       who_nobody_desc: "チューターとのチャットはあなただけの非公開です。",
       safety: "安全",
-      safety_body: "AIVO は安全フィルターが常にオンです。何かおかしいと感じたら、あなたの大人に伝わります。チューターはいつでも一時停止したり閉じたりできます — 理由は聞きません。",
+      safety_body:
+        "AIVO は安全フィルターが常にオンです。何かおかしいと感じたら、あなたの大人に伝わります。チューターはいつでも一時停止したり閉じたりできます — 理由は聞きません。",
       ask_label: "チューターに質問",
       you: "あなた",
       err_send: "送信できませんでした。もう一度お試しください。",
@@ -413,7 +444,8 @@ const DATA = {
     },
     homework: {
       hero_eyebrow: "宿題ヘルパー · 答えを渡すだけでなく、導きます",
-      hero_body: "作業の写真を撮る、ファイルをアップロードする、または取り組んでいる内容を入力してね。1ステップずつ一緒に進めます。",
+      hero_body:
+        "作業の写真を撮る、ファイルをアップロードする、または取り組んでいる内容を入力してね。1ステップずつ一緒に進めます。",
       card_try_body: "ひとつの推測でも役立ちます。「まず試す」ステップに不正解はありません。",
       card_hint_body: "前に進めるだけのちょうどよさ。決して答え全部ではありません。",
       card_walk_body: "一緒に解こう — 1ステップずつ、やさしい言葉で。",
@@ -451,8 +483,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "AI 튜터 · 언제나 차분하고, 언제나 인내심 있게",
       hero_title: "안녕 {name} — 뭐든 물어봐.",
-      hero_body: "설명하고, 힌트를 주고, 예시를 함께 보고, 또는 네가 연습하는 동안 곁에 있어 줄게. 점수는 없어. 과목을 눌러 시작하거나, 열려 있는 수업을 이어서 해.",
-      greeting: "안녕 {name}! 뭐든 물어봐 — 답을 그냥 주는 대신 힌트와 질문으로 안내할게. 지금 뭘 하고 있어?",
+      hero_body:
+        "설명하고, 힌트를 주고, 예시를 함께 보고, 또는 네가 연습하는 동안 곁에 있어 줄게. 점수는 없어. 과목을 눌러 시작하거나, 열려 있는 수업을 이어서 해.",
+      greeting:
+        "안녕 {name}! 뭐든 물어봐 — 답을 그냥 주는 대신 힌트와 질문으로 안내할게. 지금 뭘 하고 있어?",
       start_lesson: "오늘의 수업 시작",
       quick_asks: "빠른 질문",
       help_with: "{name} 도와줘",
@@ -464,7 +498,8 @@ const DATA = {
       who_nobody: "그 외에는 아무도",
       who_nobody_desc: "튜터 채팅은 너에게만 비공개야.",
       safety: "안전",
-      safety_body: "AIVO는 안전 필터가 항상 켜져 있어. 뭔가 이상하면 너의 보호자가 알게 돼. 언제든 튜터를 멈추거나 닫을 수 있어 — 이유를 묻지 않아.",
+      safety_body:
+        "AIVO는 안전 필터가 항상 켜져 있어. 뭔가 이상하면 너의 보호자가 알게 돼. 언제든 튜터를 멈추거나 닫을 수 있어 — 이유를 묻지 않아.",
       ask_label: "튜터에게 질문",
       you: "너",
       err_send: "보내지 못했어. 다시 시도해.",
@@ -474,8 +509,9 @@ const DATA = {
     },
     homework: {
       hero_eyebrow: "숙제 도우미 · 답만 주지 않고 안내해 줄게",
-      hero_body: "작업한 걸 사진으로 찍거나, 파일을 올리거나, 그냥 뭘 하고 있는지 입력해. 한 단계씩 안내할게.",
-      card_try_body: "한 번의 추측도 도움이 돼. \"먼저 시도하기\" 단계에는 틀린 답이 없어.",
+      hero_body:
+        "작업한 걸 사진으로 찍거나, 파일을 올리거나, 그냥 뭘 하고 있는지 입력해. 한 단계씩 안내할게.",
+      card_try_body: '한 번의 추측도 도움이 돼. "먼저 시도하기" 단계에는 틀린 답이 없어.',
       card_hint_body: "앞으로 나아가게 할 만큼만, 결코 답 전체는 아니야.",
       card_walk_body: "함께 풀어 보자 — 한 번에 한 단계씩, 쉬운 말로.",
       recent_sessions: "최근 세션",
@@ -512,8 +548,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "معلّم بالذكاء الاصطناعي · هادئ دائمًا، صبور دائمًا",
       hero_title: "مرحبًا {name} — اسألني أي شيء.",
-      hero_body: "أشرح لك، وأعطيك تلميحات، وأمرّ معك على أمثلة، أو ببساطة أرافقك أثناء التدريب. لا درجات. اضغط على مادة لتبدأ، أو تابع درسًا مفتوحًا.",
-      greeting: "مرحبًا {name}! اسألني أي شيء — سأرشدك بالتلميحات والأسئلة بدل أن أعطيك الإجابة مباشرةً. على ماذا تعمل؟",
+      hero_body:
+        "أشرح لك، وأعطيك تلميحات، وأمرّ معك على أمثلة، أو ببساطة أرافقك أثناء التدريب. لا درجات. اضغط على مادة لتبدأ، أو تابع درسًا مفتوحًا.",
+      greeting:
+        "مرحبًا {name}! اسألني أي شيء — سأرشدك بالتلميحات والأسئلة بدل أن أعطيك الإجابة مباشرةً. على ماذا تعمل؟",
       start_lesson: "ابدأ درس اليوم",
       quick_asks: "أسئلة سريعة",
       help_with: "مساعدة في {name}",
@@ -525,7 +563,8 @@ const DATA = {
       who_nobody: "لا أحد غير ذلك",
       who_nobody_desc: "تبقى محادثة المعلّم خاصة بك.",
       safety: "الأمان",
-      safety_body: "لدى AIVO عوامل تصفية أمان مفعّلة دائمًا. إذا بدا شيء غير صحيح، فسيعرف الشخص البالغ لديك. يمكنك دائمًا إيقاف المعلّم مؤقّتًا أو إغلاقه — دون أي أسئلة.",
+      safety_body:
+        "لدى AIVO عوامل تصفية أمان مفعّلة دائمًا. إذا بدا شيء غير صحيح، فسيعرف الشخص البالغ لديك. يمكنك دائمًا إيقاف المعلّم مؤقّتًا أو إغلاقه — دون أي أسئلة.",
       ask_label: "اسأل المعلّم",
       you: "أنت",
       err_send: "تعذّر الإرسال. حاول مرة أخرى.",
@@ -573,8 +612,10 @@ const DATA = {
     tutor: {
       hero_eyebrow: "AI ट्यूटर · हमेशा शांत, हमेशा धैर्यवान",
       hero_title: "नमस्ते {name} — मुझसे कुछ भी पूछो।",
-      hero_body: "मैं समझाऊँगा, संकेत दूँगा, उदाहरणों से तुम्हें ले चलूँगा, या जब तुम अभ्यास करो तब बस तुम्हारे साथ रहूँगा। कोई ग्रेड नहीं। शुरू करने के लिए किसी विषय पर टैप करो, या कोई खुला पाठ जारी रखो।",
-      greeting: "नमस्ते {name}! मुझसे कुछ भी पूछो — मैं सीधे जवाब देने के बजाय संकेतों और सवालों से तुम्हें राह दिखाऊँगा। तुम किस पर काम कर रहे हो?",
+      hero_body:
+        "मैं समझाऊँगा, संकेत दूँगा, उदाहरणों से तुम्हें ले चलूँगा, या जब तुम अभ्यास करो तब बस तुम्हारे साथ रहूँगा। कोई ग्रेड नहीं। शुरू करने के लिए किसी विषय पर टैप करो, या कोई खुला पाठ जारी रखो।",
+      greeting:
+        "नमस्ते {name}! मुझसे कुछ भी पूछो — मैं सीधे जवाब देने के बजाय संकेतों और सवालों से तुम्हें राह दिखाऊँगा। तुम किस पर काम कर रहे हो?",
       start_lesson: "आज का पाठ शुरू करें",
       quick_asks: "त्वरित सवाल",
       help_with: "{name} में मदद",
@@ -586,7 +627,8 @@ const DATA = {
       who_nobody: "और कोई नहीं",
       who_nobody_desc: "ट्यूटर चैट सिर्फ़ तुम्हारे लिए निजी रहती है।",
       safety: "सुरक्षा",
-      safety_body: "AIVO के सुरक्षा फ़िल्टर हमेशा चालू रहते हैं। अगर कुछ ठीक न लगे, तो तुम्हारे बड़े को पता चलेगा। तुम कभी भी ट्यूटर को रोक या बंद कर सकते हो — बिना कोई सवाल।",
+      safety_body:
+        "AIVO के सुरक्षा फ़िल्टर हमेशा चालू रहते हैं। अगर कुछ ठीक न लगे, तो तुम्हारे बड़े को पता चलेगा। तुम कभी भी ट्यूटर को रोक या बंद कर सकते हो — बिना कोई सवाल।",
       ask_label: "ट्यूटर से पूछो",
       you: "तुम",
       err_send: "भेजा नहीं जा सका। फिर से प्रयास करो।",
@@ -596,8 +638,9 @@ const DATA = {
     },
     homework: {
       hero_eyebrow: "होमवर्क हेल्पर · मैं राह दिखाता हूँ, सिर्फ़ जवाब नहीं देता",
-      hero_body: "अपने काम की फ़ोटो लो, कोई फ़ाइल अपलोड करो, या बस लिखो कि तुम किस पर काम कर रहे हो। मैं एक-एक कदम तुम्हें ले चलूँगा।",
-      card_try_body: "एक अनुमान भी मदद करता है। \"पहले कोशिश करो\" चरण में कोई गलत जवाब नहीं होता।",
+      hero_body:
+        "अपने काम की फ़ोटो लो, कोई फ़ाइल अपलोड करो, या बस लिखो कि तुम किस पर काम कर रहे हो। मैं एक-एक कदम तुम्हें ले चलूँगा।",
+      card_try_body: 'एक अनुमान भी मदद करता है। "पहले कोशिश करो" चरण में कोई गलत जवाब नहीं होता।',
       card_hint_body: "बस इतना कि तुम आगे बढ़ो, कभी पूरा जवाब नहीं।",
       card_walk_body: "हम इसे साथ हल करते हैं — एक बार में एक कदम, सरल शब्दों में।",
       recent_sessions: "हाल के सत्र",

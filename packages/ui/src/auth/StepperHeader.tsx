@@ -25,13 +25,9 @@ export interface StepperHeaderProps {
 
 export function StepperHeader({ steps, current, className }: StepperHeaderProps) {
   return (
-    <ol
-      className={cn("flex items-center gap-2 flex-wrap", className)}
-      aria-label="Progress"
-    >
+    <ol className={cn("flex items-center gap-2 flex-wrap", className)} aria-label="Progress">
       {steps.map((s, i) => {
-        const state =
-          i < current ? "done" : i === current ? "active" : "upcoming";
+        const state = i < current ? "done" : i === current ? "active" : "upcoming";
         const cls =
           state === "done"
             ? "bg-[var(--aivo-domain-completion-completed-strong,#047857)] text-white"
@@ -56,18 +52,13 @@ export function StepperHeader({ steps, current, className }: StepperHeaderProps)
             <span
               className={cn(
                 "text-xs font-medium",
-                state === "active"
-                  ? "text-iw-text-strong"
-                  : "text-iw-text-muted",
+                state === "active" ? "text-iw-text-strong" : "text-iw-text-muted",
               )}
             >
               {s.label}
             </span>
             {i < steps.length - 1 ? (
-              <span
-                aria-hidden="true"
-                className="w-6 h-px bg-iw-border mx-1"
-              />
+              <span aria-hidden="true" className="w-6 h-px bg-iw-border mx-1" />
             ) : null}
           </li>
         );

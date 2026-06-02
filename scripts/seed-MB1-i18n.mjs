@@ -75,7 +75,8 @@ const DATA = {
       pleaseEnterEmail: "يرجى إدخال بريدك الإلكتروني",
       somethingWentWrong: "حدث خطأ ما. يرجى المحاولة مجدداً.",
       checkYourEmail: "تحقق من بريدك الإلكتروني",
-      resetEmailSent: "إذا كان هناك حساب مرتبط بـ {{email}}، ستصلك رسالة إعادة تعيين كلمة المرور قريباً.",
+      resetEmailSent:
+        "إذا كان هناك حساب مرتبط بـ {{email}}، ستصلك رسالة إعادة تعيين كلمة المرور قريباً.",
       changePasswordTitle: "تحديث كلمة المرور",
       changePasswordSubtitle: "لأمنك، يجب عليك اختيار كلمة مرور جديدة قبل المتابعة.",
       changePasswordCurrent: "كلمة المرور الحالية",
@@ -91,27 +92,31 @@ const DATA = {
       changePasswordReasonMissingDiversity: "استخدم 3 على الأقل من: أحرف صغيرة، كبيرة، أرقام، رموز",
       resetPasswordTitle: "اختر كلمة مرور جديدة",
       resetPasswordSubtitle: "أدخل كلمة المرور الجديدة وأكّدها لإتمام إعادة التعيين.",
-      resetPasswordMissingToken: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية. يرجى طلب رابط جديد.",
+      resetPasswordMissingToken:
+        "رابط إعادة التعيين غير صالح أو منتهي الصلاحية. يرجى طلب رابط جديد.",
       resetPasswordExpiredLink: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية",
       resetPasswordSuccess: "تم تحديث كلمة المرور. يمكنك الآن تسجيل الدخول.",
       resetPasswordSubmit: "تحديث كلمة المرور",
       acceptInviteTitle: "قبول دعوتك",
-      acceptInviteNeedsLogin: "تمت دعوتك للانضمام إلى فريق تعلم. سجّل الدخول أو أنشئ حسابك للمتابعة.",
+      acceptInviteNeedsLogin:
+        "تمت دعوتك للانضمام إلى فريق تعلم. سجّل الدخول أو أنشئ حسابك للمتابعة.",
       acceptInviteNeedsLoginWithEmail: "تمت دعوتك للانضمام إلى فريق تعلم خاص بـ {{email}}.",
       acceptInviteHaveAccount: "لدي حساب بالفعل",
       acceptInviteCreateAccount: "إنشاء حساب جديد",
-      acceptInviteWrongEmail: "أنت مسجّل الدخول بـ {{current}}، لكن هذه الدعوة مخصصة لـ {{invited}}. يرجى تسجيل الخروج والدخول بالعنوان المدعو.",
+      acceptInviteWrongEmail:
+        "أنت مسجّل الدخول بـ {{current}}، لكن هذه الدعوة مخصصة لـ {{invited}}. يرجى تسجيل الخروج والدخول بالعنوان المدعو.",
       acceptInviteSwitchAccount: "تسجيل الدخول بحساب مختلف",
       acceptInviteAccepting: "جارٍ قبول دعوتك…",
       acceptInviteSuccess: "تمت إضافتك إلى {{count}} فريق (فرق) متعلمين. مرحباً!",
-      acceptInviteNoneFound: "لم يتم العثور على دعوات معلّقة لحسابك. إذا كنت تتوقع واحدة، اطلب من ولي الأمر إعادة إرسال الدعوة إلى {{email}}.",
+      acceptInviteNoneFound:
+        "لم يتم العثور على دعوات معلّقة لحسابك. إذا كنت تتوقع واحدة، اطلب من ولي الأمر إعادة إرسال الدعوة إلى {{email}}.",
       acceptInviteContinue: "المتابعة إلى لوحة التحكم",
-      acceptInviteError: "حدث خطأ: {{message}}"
+      acceptInviteError: "حدث خطأ: {{message}}",
     },
     caregiverGradebook: {
       title: "كشف الدرجات",
-      subtitle: "نظرة عامة على إتقان المواد"
-    }
+      subtitle: "نظرة عامة على إتقان المواد",
+    },
   },
   de: {
     auth: {
@@ -154,7 +159,8 @@ const DATA = {
       confirmPassword: "Passwort bestätigen",
       confirmPasswordPlaceholder: "Passwort bestätigen",
       atLeast8Chars: "Mindestens 8 Zeichen",
-      coppaConsent: "Ich bestätige, dass ich der Elternteil/gesetzliche Vormund bin (COPPA-Konformität)",
+      coppaConsent:
+        "Ich bestätige, dass ich der Elternteil/gesetzliche Vormund bin (COPPA-Konformität)",
       termsConsent: "Ich akzeptiere die Nutzungsbedingungen und Datenschutzrichtlinie",
       createAccountBtn: "Konto erstellen",
       haveAccount: "Bereits ein Konto?",
@@ -162,7 +168,8 @@ const DATA = {
       passwordsMismatch: "Passwörter stimmen nicht überein",
       passwordTooShort: "Passwort muss mindestens 8 Zeichen lang sein",
       acceptTerms: "Bitte Nutzungsbedingungen und COPPA-Einwilligung akzeptieren",
-      acceptCoppaGoogle: "Bitte COPPA-Einwilligung und Nutzungsbedingungen akzeptieren, bevor du dich mit Google registrierst",
+      acceptCoppaGoogle:
+        "Bitte COPPA-Einwilligung und Nutzungsbedingungen akzeptieren, bevor du dich mit Google registrierst",
       registrationFailed: "Registrierung fehlgeschlagen",
       googleSignUpFailed: "Google-Registrierung fehlgeschlagen",
       consentTitle: "Fast geschafft!",
@@ -182,43 +189,54 @@ const DATA = {
       pleaseEnterEmail: "Bitte E-Mail-Adresse eingeben",
       somethingWentWrong: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
       checkYourEmail: "E-Mail prüfen",
-      resetEmailSent: "Falls ein Konto für {{email}} existiert, erhältst du in Kürze einen Link zum Zurücksetzen des Passworts.",
+      resetEmailSent:
+        "Falls ein Konto für {{email}} existiert, erhältst du in Kürze einen Link zum Zurücksetzen des Passworts.",
       changePasswordTitle: "Passwort aktualisieren",
-      changePasswordSubtitle: "Aus Sicherheitsgründen musst du vor dem Fortfahren ein neues Passwort wählen.",
+      changePasswordSubtitle:
+        "Aus Sicherheitsgründen musst du vor dem Fortfahren ein neues Passwort wählen.",
       changePasswordCurrent: "Aktuelles Passwort",
       changePasswordNew: "Neues Passwort",
       changePasswordNewPlaceholder: "Mindestens 12 Zeichen",
       changePasswordSubmit: "Passwort aktualisieren",
       changePasswordFailed: "Passwort konnte nicht aktualisiert werden",
       changePasswordFillAll: "Bitte alle Felder ausfüllen",
-      changePasswordReasonTooShort: "Zu kurz — mindestens 12 Zeichen erforderlich (14 für Mitarbeiter)",
+      changePasswordReasonTooShort:
+        "Zu kurz — mindestens 12 Zeichen erforderlich (14 für Mitarbeiter)",
       changePasswordReasonTooWeak: "Nicht stark genug — mehr Länge oder Vielfalt hinzufügen",
-      changePasswordReasonBreached: "Dieses Passwort ist in einem öffentlichen Datenleck aufgetaucht",
+      changePasswordReasonBreached:
+        "Dieses Passwort ist in einem öffentlichen Datenleck aufgetaucht",
       changePasswordReasonReused: "Du hast dieses Passwort bereits verwendet",
-      changePasswordReasonMissingDiversity: "Mindestens 3 verwenden: Kleinbuchstaben, Großbuchstaben, Ziffern, Sonderzeichen",
+      changePasswordReasonMissingDiversity:
+        "Mindestens 3 verwenden: Kleinbuchstaben, Großbuchstaben, Ziffern, Sonderzeichen",
       resetPasswordTitle: "Neues Passwort wählen",
-      resetPasswordSubtitle: "Neues Passwort eingeben und bestätigen, um den Vorgang abzuschließen.",
-      resetPasswordMissingToken: "Dieser Reset-Link ist ungültig oder abgelaufen. Bitte einen neuen anfordern.",
+      resetPasswordSubtitle:
+        "Neues Passwort eingeben und bestätigen, um den Vorgang abzuschließen.",
+      resetPasswordMissingToken:
+        "Dieser Reset-Link ist ungültig oder abgelaufen. Bitte einen neuen anfordern.",
       resetPasswordExpiredLink: "Ungültiger oder abgelaufener Reset-Link",
       resetPasswordSuccess: "Passwort aktualisiert. Du kannst dich jetzt anmelden.",
       resetPasswordSubmit: "Passwort aktualisieren",
       acceptInviteTitle: "Einladung annehmen",
-      acceptInviteNeedsLogin: "Du wurdest eingeladen, einem Lernteam beizutreten. Melde dich an oder erstelle dein Konto, um fortzufahren.",
-      acceptInviteNeedsLoginWithEmail: "Du wurdest eingeladen, einem Lernteam für {{email}} beizutreten.",
+      acceptInviteNeedsLogin:
+        "Du wurdest eingeladen, einem Lernteam beizutreten. Melde dich an oder erstelle dein Konto, um fortzufahren.",
+      acceptInviteNeedsLoginWithEmail:
+        "Du wurdest eingeladen, einem Lernteam für {{email}} beizutreten.",
       acceptInviteHaveAccount: "Ich habe bereits ein Konto",
       acceptInviteCreateAccount: "Neues Konto erstellen",
-      acceptInviteWrongEmail: "Du bist als {{current}} angemeldet, aber diese Einladung gilt für {{invited}}. Bitte abmelden und mit der eingeladenen Adresse anmelden.",
+      acceptInviteWrongEmail:
+        "Du bist als {{current}} angemeldet, aber diese Einladung gilt für {{invited}}. Bitte abmelden und mit der eingeladenen Adresse anmelden.",
       acceptInviteSwitchAccount: "Mit einem anderen Konto anmelden",
       acceptInviteAccepting: "Einladung wird angenommen…",
       acceptInviteSuccess: "Du wurdest zu {{count}} Lernteam(s) hinzugefügt. Willkommen!",
-      acceptInviteNoneFound: "Für dein Konto wurden keine ausstehenden Einladungen gefunden. Falls du eine erwartest, bitte die Eltern, die Einladung erneut an {{email}} zu senden.",
+      acceptInviteNoneFound:
+        "Für dein Konto wurden keine ausstehenden Einladungen gefunden. Falls du eine erwartest, bitte die Eltern, die Einladung erneut an {{email}} zu senden.",
       acceptInviteContinue: "Zum Dashboard wechseln",
-      acceptInviteError: "Etwas ist schiefgelaufen: {{message}}"
+      acceptInviteError: "Etwas ist schiefgelaufen: {{message}}",
     },
     caregiverGradebook: {
       title: "Notenbuch",
-      subtitle: "Übersicht über die Fachkenntnisse"
-    }
+      subtitle: "Übersicht über die Fachkenntnisse",
+    },
   },
   fr: {
     auth: {
@@ -269,7 +287,8 @@ const DATA = {
       passwordsMismatch: "Les mots de passe ne correspondent pas",
       passwordTooShort: "Le mot de passe doit contenir au moins 8 caractères",
       acceptTerms: "Veuillez accepter les conditions et le consentement COPPA",
-      acceptCoppaGoogle: "Veuillez accepter le consentement COPPA et les Conditions d'utilisation avant de vous inscrire avec Google",
+      acceptCoppaGoogle:
+        "Veuillez accepter le consentement COPPA et les Conditions d'utilisation avant de vous inscrire avec Google",
       registrationFailed: "Échec de l'inscription",
       googleSignUpFailed: "L'inscription Google a échoué",
       consentTitle: "Presque terminé !",
@@ -289,43 +308,53 @@ const DATA = {
       pleaseEnterEmail: "Veuillez saisir votre e-mail",
       somethingWentWrong: "Une erreur s'est produite. Veuillez réessayer.",
       checkYourEmail: "Vérifiez votre e-mail",
-      resetEmailSent: "Si un compte existe pour {{email}}, vous recevrez bientôt un lien de réinitialisation.",
+      resetEmailSent:
+        "Si un compte existe pour {{email}}, vous recevrez bientôt un lien de réinitialisation.",
       changePasswordTitle: "Mettre à jour votre mot de passe",
-      changePasswordSubtitle: "Pour votre sécurité, vous devez choisir un nouveau mot de passe avant de continuer.",
+      changePasswordSubtitle:
+        "Pour votre sécurité, vous devez choisir un nouveau mot de passe avant de continuer.",
       changePasswordCurrent: "Mot de passe actuel",
       changePasswordNew: "Nouveau mot de passe",
       changePasswordNewPlaceholder: "Au moins 12 caractères",
       changePasswordSubmit: "Mettre à jour le mot de passe",
       changePasswordFailed: "Impossible de mettre à jour le mot de passe",
       changePasswordFillAll: "Veuillez remplir tous les champs",
-      changePasswordReasonTooShort: "Trop court — au moins 12 caractères requis (14 pour le personnel)",
+      changePasswordReasonTooShort:
+        "Trop court — au moins 12 caractères requis (14 pour le personnel)",
       changePasswordReasonTooWeak: "Pas assez fort — ajoutez plus de longueur ou de variété",
       changePasswordReasonBreached: "Ce mot de passe est apparu dans une fuite de données publique",
       changePasswordReasonReused: "Vous avez déjà utilisé ce mot de passe",
-      changePasswordReasonMissingDiversity: "Utilisez au moins 3 parmi : minuscules, majuscules, chiffres, symboles",
+      changePasswordReasonMissingDiversity:
+        "Utilisez au moins 3 parmi : minuscules, majuscules, chiffres, symboles",
       resetPasswordTitle: "Choisir un nouveau mot de passe",
-      resetPasswordSubtitle: "Saisissez et confirmez votre nouveau mot de passe pour terminer la réinitialisation.",
-      resetPasswordMissingToken: "Ce lien de réinitialisation est invalide ou expiré. Veuillez en demander un nouveau.",
+      resetPasswordSubtitle:
+        "Saisissez et confirmez votre nouveau mot de passe pour terminer la réinitialisation.",
+      resetPasswordMissingToken:
+        "Ce lien de réinitialisation est invalide ou expiré. Veuillez en demander un nouveau.",
       resetPasswordExpiredLink: "Lien de réinitialisation invalide ou expiré",
       resetPasswordSuccess: "Mot de passe mis à jour. Vous pouvez maintenant vous connecter.",
       resetPasswordSubmit: "Mettre à jour le mot de passe",
       acceptInviteTitle: "Accepter votre invitation",
-      acceptInviteNeedsLogin: "Vous avez été invité à rejoindre une équipe d'apprentissage. Connectez-vous ou créez votre compte pour continuer.",
-      acceptInviteNeedsLoginWithEmail: "Vous avez été invité à rejoindre une équipe d'apprentissage pour {{email}}.",
+      acceptInviteNeedsLogin:
+        "Vous avez été invité à rejoindre une équipe d'apprentissage. Connectez-vous ou créez votre compte pour continuer.",
+      acceptInviteNeedsLoginWithEmail:
+        "Vous avez été invité à rejoindre une équipe d'apprentissage pour {{email}}.",
       acceptInviteHaveAccount: "J'ai déjà un compte",
       acceptInviteCreateAccount: "Créer un nouveau compte",
-      acceptInviteWrongEmail: "Vous êtes connecté en tant que {{current}}, mais cette invitation est pour {{invited}}. Veuillez vous déconnecter et vous connecter avec l'adresse invitée.",
+      acceptInviteWrongEmail:
+        "Vous êtes connecté en tant que {{current}}, mais cette invitation est pour {{invited}}. Veuillez vous déconnecter et vous connecter avec l'adresse invitée.",
       acceptInviteSwitchAccount: "Se connecter avec un autre compte",
       acceptInviteAccepting: "Acceptation de votre invitation…",
       acceptInviteSuccess: "Vous avez été ajouté à {{count}} équipe(s) d'apprenants. Bienvenue !",
-      acceptInviteNoneFound: "Aucune invitation en attente trouvée pour votre compte. Si vous en attendez une, demandez au parent de renvoyer l'invitation à {{email}}.",
+      acceptInviteNoneFound:
+        "Aucune invitation en attente trouvée pour votre compte. Si vous en attendez une, demandez au parent de renvoyer l'invitation à {{email}}.",
       acceptInviteContinue: "Accéder à votre tableau de bord",
-      acceptInviteError: "Une erreur s'est produite : {{message}}"
+      acceptInviteError: "Une erreur s'est produite : {{message}}",
     },
     caregiverGradebook: {
       title: "Carnet de notes",
-      subtitle: "Aperçu de la maîtrise des matières"
-    }
+      subtitle: "Aperçu de la maîtrise des matières",
+    },
   },
   hi: {
     auth: {
@@ -376,7 +405,8 @@ const DATA = {
       passwordsMismatch: "पासवर्ड मेल नहीं खाते",
       passwordTooShort: "पासवर्ड कम से कम 8 अक्षरों का होना चाहिए",
       acceptTerms: "कृपया शर्तें और COPPA सहमति स्वीकार करें",
-      acceptCoppaGoogle: "Google से साइन अप करने से पहले कृपया COPPA सहमति और सेवा की शर्तें स्वीकार करें",
+      acceptCoppaGoogle:
+        "Google से साइन अप करने से पहले कृपया COPPA सहमति और सेवा की शर्तें स्वीकार करें",
       registrationFailed: "पंजीकरण विफल",
       googleSignUpFailed: "Google साइन-अप विफल",
       consentTitle: "लगभग हो गया!",
@@ -396,7 +426,8 @@ const DATA = {
       pleaseEnterEmail: "कृपया अपना ईमेल दर्ज करें",
       somethingWentWrong: "कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
       checkYourEmail: "अपना ईमेल जांचें",
-      resetEmailSent: "यदि {{email}} के लिए कोई खाता मौजूद है, तो आपको जल्द ही पासवर्ड रीसेट लिंक मिलेगा।",
+      resetEmailSent:
+        "यदि {{email}} के लिए कोई खाता मौजूद है, तो आपको जल्द ही पासवर्ड रीसेट लिंक मिलेगा।",
       changePasswordTitle: "अपना पासवर्ड अपडेट करें",
       changePasswordSubtitle: "आपकी सुरक्षा के लिए, जारी रखने से पहले आपको नया पासवर्ड चुनना होगा।",
       changePasswordCurrent: "वर्तमान पासवर्ड",
@@ -409,7 +440,8 @@ const DATA = {
       changePasswordReasonTooWeak: "पर्याप्त मजबूत नहीं — अधिक लंबाई या विविधता जोड़ें",
       changePasswordReasonBreached: "यह पासवर्ड किसी सार्वजनिक उल्लंघन में सामने आया है",
       changePasswordReasonReused: "आपने यह पासवर्ड पहले उपयोग किया है",
-      changePasswordReasonMissingDiversity: "कम से कम 3 का उपयोग करें: लोअरकेस, अपरकेस, अंक, प्रतीक",
+      changePasswordReasonMissingDiversity:
+        "कम से कम 3 का उपयोग करें: लोअरकेस, अपरकेस, अंक, प्रतीक",
       resetPasswordTitle: "नया पासवर्ड चुनें",
       resetPasswordSubtitle: "रीसेट पूरा करने के लिए अपना नया पासवर्ड दर्ज करें और पुष्टि करें।",
       resetPasswordMissingToken: "यह रीसेट लिंक अमान्य या समाप्त हो गया है। कृपया नया अनुरोध करें।",
@@ -417,22 +449,26 @@ const DATA = {
       resetPasswordSuccess: "पासवर्ड अपडेट हो गया। अब आप साइन इन कर सकते हैं।",
       resetPasswordSubmit: "पासवर्ड अपडेट करें",
       acceptInviteTitle: "अपना निमंत्रण स्वीकार करें",
-      acceptInviteNeedsLogin: "आपको एक शिक्षण टीम में शामिल होने के लिए आमंत्रित किया गया है। जारी रखने के लिए साइन इन करें या अपना खाता बनाएं।",
-      acceptInviteNeedsLoginWithEmail: "आपको {{email}} के लिए एक शिक्षण टीम में शामिल होने के लिए आमंत्रित किया गया है।",
+      acceptInviteNeedsLogin:
+        "आपको एक शिक्षण टीम में शामिल होने के लिए आमंत्रित किया गया है। जारी रखने के लिए साइन इन करें या अपना खाता बनाएं।",
+      acceptInviteNeedsLoginWithEmail:
+        "आपको {{email}} के लिए एक शिक्षण टीम में शामिल होने के लिए आमंत्रित किया गया है।",
       acceptInviteHaveAccount: "मेरे पास पहले से खाता है",
       acceptInviteCreateAccount: "नया खाता बनाएं",
-      acceptInviteWrongEmail: "आप {{current}} के रूप में साइन इन हैं, लेकिन यह निमंत्रण {{invited}} के लिए है। कृपया साइन आउट करें और आमंत्रित पते से साइन इन करें।",
+      acceptInviteWrongEmail:
+        "आप {{current}} के रूप में साइन इन हैं, लेकिन यह निमंत्रण {{invited}} के लिए है। कृपया साइन आउट करें और आमंत्रित पते से साइन इन करें।",
       acceptInviteSwitchAccount: "किसी अन्य खाते से साइन इन करें",
       acceptInviteAccepting: "आपका निमंत्रण स्वीकार किया जा रहा है…",
       acceptInviteSuccess: "आपको {{count}} शिक्षार्थी टीम(ओं) में जोड़ा गया है। स्वागत है!",
-      acceptInviteNoneFound: "आपके खाते के लिए कोई लंबित निमंत्रण नहीं मिला। यदि आप एक की उम्मीद कर रहे थे, तो माता-पिता से {{email}} पर निमंत्रण पुनः भेजने के लिए कहें।",
+      acceptInviteNoneFound:
+        "आपके खाते के लिए कोई लंबित निमंत्रण नहीं मिला। यदि आप एक की उम्मीद कर रहे थे, तो माता-पिता से {{email}} पर निमंत्रण पुनः भेजने के लिए कहें।",
       acceptInviteContinue: "अपने डैशबोर्ड पर जाएं",
-      acceptInviteError: "कुछ गलत हो गया: {{message}}"
+      acceptInviteError: "कुछ गलत हो गया: {{message}}",
     },
     caregiverGradebook: {
       title: "ग्रेडबुक",
-      subtitle: "विषय दक्षता अवलोकन"
-    }
+      subtitle: "विषय दक्षता अवलोकन",
+    },
   },
   ja: {
     auth: {
@@ -503,9 +539,11 @@ const DATA = {
       pleaseEnterEmail: "メールアドレスを入力してください",
       somethingWentWrong: "問題が発生しました。もう一度お試しください。",
       checkYourEmail: "メールを確認してください",
-      resetEmailSent: "{{email}}のアカウントが存在する場合、まもなくパスワードリセットリンクが届きます。",
+      resetEmailSent:
+        "{{email}}のアカウントが存在する場合、まもなくパスワードリセットリンクが届きます。",
       changePasswordTitle: "パスワードを更新",
-      changePasswordSubtitle: "セキュリティのため、続行する前に新しいパスワードを設定してください。",
+      changePasswordSubtitle:
+        "セキュリティのため、続行する前に新しいパスワードを設定してください。",
       changePasswordCurrent: "現在のパスワード",
       changePasswordNew: "新しいパスワード",
       changePasswordNewPlaceholder: "12文字以上",
@@ -516,30 +554,35 @@ const DATA = {
       changePasswordReasonTooWeak: "強度が不十分です — 長さや多様性を増やしてください",
       changePasswordReasonBreached: "このパスワードは公開されたデータ漏洩に含まれています",
       changePasswordReasonReused: "このパスワードは以前に使用されています",
-      changePasswordReasonMissingDiversity: "小文字、大文字、数字、記号のうち3種類以上使用してください",
+      changePasswordReasonMissingDiversity:
+        "小文字、大文字、数字、記号のうち3種類以上使用してください",
       resetPasswordTitle: "新しいパスワードを選択",
       resetPasswordSubtitle: "リセットを完了するには、新しいパスワードを入力して確認してください。",
-      resetPasswordMissingToken: "このリセットリンクは無効か期限切れです。新しいリンクをリクエストしてください。",
+      resetPasswordMissingToken:
+        "このリセットリンクは無効か期限切れです。新しいリンクをリクエストしてください。",
       resetPasswordExpiredLink: "無効または期限切れのリセットリンク",
       resetPasswordSuccess: "パスワードが更新されました。サインインできます。",
       resetPasswordSubmit: "パスワードを更新",
       acceptInviteTitle: "招待を承認",
-      acceptInviteNeedsLogin: "学習チームへの参加招待が届いています。続けるにはサインインするか、アカウントを作成してください。",
+      acceptInviteNeedsLogin:
+        "学習チームへの参加招待が届いています。続けるにはサインインするか、アカウントを作成してください。",
       acceptInviteNeedsLoginWithEmail: "{{email}}の学習チームへの参加招待が届いています。",
       acceptInviteHaveAccount: "すでにアカウントを持っています",
       acceptInviteCreateAccount: "新しいアカウントを作成",
-      acceptInviteWrongEmail: "{{current}}でサインインしていますが、この招待は{{invited}}宛です。サインアウトして招待されたアドレスでサインインしてください。",
+      acceptInviteWrongEmail:
+        "{{current}}でサインインしていますが、この招待は{{invited}}宛です。サインアウトして招待されたアドレスでサインインしてください。",
       acceptInviteSwitchAccount: "別のアカウントでサインイン",
       acceptInviteAccepting: "招待を承認しています…",
       acceptInviteSuccess: "{{count}}つの学習チームに追加されました。ようこそ！",
-      acceptInviteNoneFound: "アカウントに保留中の招待が見つかりませんでした。招待を期待していた場合は、保護者に{{email}}へ招待を再送するよう依頼してください。",
+      acceptInviteNoneFound:
+        "アカウントに保留中の招待が見つかりませんでした。招待を期待していた場合は、保護者に{{email}}へ招待を再送するよう依頼してください。",
       acceptInviteContinue: "ダッシュボードへ進む",
-      acceptInviteError: "問題が発生しました：{{message}}"
+      acceptInviteError: "問題が発生しました：{{message}}",
     },
     caregiverGradebook: {
       title: "成績表",
-      subtitle: "科目習熟度の概要"
-    }
+      subtitle: "科目習熟度の概要",
+    },
   },
   ko: {
     auth: {
@@ -610,7 +653,8 @@ const DATA = {
       pleaseEnterEmail: "이메일을 입력해 주세요",
       somethingWentWrong: "문제가 발생했습니다. 다시 시도해 주세요.",
       checkYourEmail: "이메일을 확인하세요",
-      resetEmailSent: "{{email}}에 해당하는 계정이 있으면 곧 비밀번호 재설정 링크를 받으실 수 있습니다.",
+      resetEmailSent:
+        "{{email}}에 해당하는 계정이 있으면 곧 비밀번호 재설정 링크를 받으실 수 있습니다.",
       changePasswordTitle: "비밀번호 업데이트",
       changePasswordSubtitle: "보안을 위해 계속하기 전에 새 비밀번호를 설정해야 합니다.",
       changePasswordCurrent: "현재 비밀번호",
@@ -623,10 +667,12 @@ const DATA = {
       changePasswordReasonTooWeak: "강도가 충분하지 않습니다 — 길이나 다양성을 늘려주세요",
       changePasswordReasonBreached: "이 비밀번호는 공개 데이터 침해에 노출된 적 있습니다",
       changePasswordReasonReused: "이전에 사용한 비밀번호입니다",
-      changePasswordReasonMissingDiversity: "소문자, 대문자, 숫자, 기호 중 3가지 이상 사용해 주세요",
+      changePasswordReasonMissingDiversity:
+        "소문자, 대문자, 숫자, 기호 중 3가지 이상 사용해 주세요",
       resetPasswordTitle: "새 비밀번호 선택",
       resetPasswordSubtitle: "재설정을 완료하려면 새 비밀번호를 입력하고 확인하세요.",
-      resetPasswordMissingToken: "이 재설정 링크는 유효하지 않거나 만료되었습니다. 새 링크를 요청해 주세요.",
+      resetPasswordMissingToken:
+        "이 재설정 링크는 유효하지 않거나 만료되었습니다. 새 링크를 요청해 주세요.",
       resetPasswordExpiredLink: "유효하지 않거나 만료된 재설정 링크",
       resetPasswordSuccess: "비밀번호가 업데이트되었습니다. 이제 로그인할 수 있습니다.",
       resetPasswordSubmit: "비밀번호 업데이트",
@@ -635,18 +681,20 @@ const DATA = {
       acceptInviteNeedsLoginWithEmail: "{{email}}의 학습 팀에 초대되었습니다.",
       acceptInviteHaveAccount: "이미 계정이 있습니다",
       acceptInviteCreateAccount: "새 계정 만들기",
-      acceptInviteWrongEmail: "{{current}}으로 로그인되어 있지만, 이 초대는 {{invited}}를 위한 것입니다. 로그아웃 후 초대된 이메일로 로그인해 주세요.",
+      acceptInviteWrongEmail:
+        "{{current}}으로 로그인되어 있지만, 이 초대는 {{invited}}를 위한 것입니다. 로그아웃 후 초대된 이메일로 로그인해 주세요.",
       acceptInviteSwitchAccount: "다른 계정으로 로그인",
       acceptInviteAccepting: "초대를 수락하는 중…",
       acceptInviteSuccess: "{{count}}개의 학습자 팀에 추가되었습니다. 환영합니다!",
-      acceptInviteNoneFound: "계정에 보류 중인 초대가 없습니다. 초대를 기대하셨다면 부모님께 {{email}}로 초대를 재전송해 달라고 요청하세요.",
+      acceptInviteNoneFound:
+        "계정에 보류 중인 초대가 없습니다. 초대를 기대하셨다면 부모님께 {{email}}로 초대를 재전송해 달라고 요청하세요.",
       acceptInviteContinue: "대시보드로 이동",
-      acceptInviteError: "오류가 발생했습니다: {{message}}"
+      acceptInviteError: "오류가 발생했습니다: {{message}}",
     },
     caregiverGradebook: {
       title: "성적표",
-      subtitle: "과목 숙달도 개요"
-    }
+      subtitle: "과목 숙달도 개요",
+    },
   },
   pt: {
     auth: {
@@ -697,7 +745,8 @@ const DATA = {
       passwordsMismatch: "As senhas não correspondem",
       passwordTooShort: "A senha deve ter pelo menos 8 caracteres",
       acceptTerms: "Por favor, aceite os termos e o consentimento COPPA",
-      acceptCoppaGoogle: "Por favor, aceite o consentimento COPPA e os Termos de Serviço antes de se cadastrar com o Google",
+      acceptCoppaGoogle:
+        "Por favor, aceite o consentimento COPPA e os Termos de Serviço antes de se cadastrar com o Google",
       registrationFailed: "Falha no cadastro",
       googleSignUpFailed: "Falha no cadastro com Google",
       consentTitle: "Quase lá!",
@@ -717,9 +766,11 @@ const DATA = {
       pleaseEnterEmail: "Por favor, insira seu e-mail",
       somethingWentWrong: "Algo deu errado. Por favor, tente novamente.",
       checkYourEmail: "Verifique seu e-mail",
-      resetEmailSent: "Se existir uma conta para {{email}}, você receberá em breve um link para redefinir a senha.",
+      resetEmailSent:
+        "Se existir uma conta para {{email}}, você receberá em breve um link para redefinir a senha.",
       changePasswordTitle: "Atualizar sua senha",
-      changePasswordSubtitle: "Por sua segurança, você deve escolher uma nova senha antes de continuar.",
+      changePasswordSubtitle:
+        "Por sua segurança, você deve escolher uma nova senha antes de continuar.",
       changePasswordCurrent: "Senha atual",
       changePasswordNew: "Nova senha",
       changePasswordNewPlaceholder: "Pelo menos 12 caracteres",
@@ -727,33 +778,40 @@ const DATA = {
       changePasswordFailed: "Não foi possível atualizar a senha",
       changePasswordFillAll: "Por favor, preencha todos os campos",
       changePasswordReasonTooShort: "Muito curta — mínimo de 12 caracteres (14 para funcionários)",
-      changePasswordReasonTooWeak: "Não é forte o suficiente — adicione mais comprimento ou variedade",
+      changePasswordReasonTooWeak:
+        "Não é forte o suficiente — adicione mais comprimento ou variedade",
       changePasswordReasonBreached: "Esta senha apareceu em uma violação pública de dados",
       changePasswordReasonReused: "Você já usou esta senha antes",
-      changePasswordReasonMissingDiversity: "Use pelo menos 3 de: minúsculas, maiúsculas, dígitos, símbolos",
+      changePasswordReasonMissingDiversity:
+        "Use pelo menos 3 de: minúsculas, maiúsculas, dígitos, símbolos",
       resetPasswordTitle: "Escolha uma nova senha",
       resetPasswordSubtitle: "Insira e confirme sua nova senha para concluir a redefinição.",
-      resetPasswordMissingToken: "Este link de redefinição é inválido ou expirou. Por favor, solicite um novo.",
+      resetPasswordMissingToken:
+        "Este link de redefinição é inválido ou expirou. Por favor, solicite um novo.",
       resetPasswordExpiredLink: "Link de redefinição inválido ou expirado",
       resetPasswordSuccess: "Senha atualizada. Você já pode fazer login.",
       resetPasswordSubmit: "Atualizar senha",
       acceptInviteTitle: "Aceitar seu convite",
-      acceptInviteNeedsLogin: "Você foi convidado a entrar em uma equipe de aprendizagem. Faça login ou crie sua conta para continuar.",
-      acceptInviteNeedsLoginWithEmail: "Você foi convidado a entrar em uma equipe de aprendizagem para {{email}}.",
+      acceptInviteNeedsLogin:
+        "Você foi convidado a entrar em uma equipe de aprendizagem. Faça login ou crie sua conta para continuar.",
+      acceptInviteNeedsLoginWithEmail:
+        "Você foi convidado a entrar em uma equipe de aprendizagem para {{email}}.",
       acceptInviteHaveAccount: "Já tenho uma conta",
       acceptInviteCreateAccount: "Criar uma nova conta",
-      acceptInviteWrongEmail: "Você está conectado como {{current}}, mas este convite é para {{invited}}. Saia e entre com o endereço convidado.",
+      acceptInviteWrongEmail:
+        "Você está conectado como {{current}}, mas este convite é para {{invited}}. Saia e entre com o endereço convidado.",
       acceptInviteSwitchAccount: "Entrar com uma conta diferente",
       acceptInviteAccepting: "Aceitando seu convite…",
       acceptInviteSuccess: "Você foi adicionado a {{count}} equipe(s) de aprendizes. Bem-vindo(a)!",
-      acceptInviteNoneFound: "Nenhum convite pendente foi encontrado para sua conta. Se estava esperando um, peça ao responsável para reenviar o convite para {{email}}.",
+      acceptInviteNoneFound:
+        "Nenhum convite pendente foi encontrado para sua conta. Se estava esperando um, peça ao responsável para reenviar o convite para {{email}}.",
       acceptInviteContinue: "Ir para o painel",
-      acceptInviteError: "Algo deu errado: {{message}}"
+      acceptInviteError: "Algo deu errado: {{message}}",
     },
     caregiverGradebook: {
       title: "Boletim",
-      subtitle: "Visão geral do domínio por disciplina"
-    }
+      subtitle: "Visão geral do domínio por disciplina",
+    },
   },
   zh: {
     auth: {
@@ -849,26 +907,34 @@ const DATA = {
       acceptInviteNeedsLoginWithEmail: "您已被邀请加入 {{email}} 的学习团队。",
       acceptInviteHaveAccount: "我已有账户",
       acceptInviteCreateAccount: "创建新账户",
-      acceptInviteWrongEmail: "您以 {{current}} 身份登录，但此邀请是为 {{invited}} 准备的。请退出登录并使用受邀地址登录。",
+      acceptInviteWrongEmail:
+        "您以 {{current}} 身份登录，但此邀请是为 {{invited}} 准备的。请退出登录并使用受邀地址登录。",
       acceptInviteSwitchAccount: "使用其他账户登录",
       acceptInviteAccepting: "正在接受邀请…",
       acceptInviteSuccess: "您已被添加到 {{count}} 个学习团队。欢迎！",
-      acceptInviteNoneFound: "未找到您账户的待处理邀请。如果您期望有邀请，请让家长重新向 {{email}} 发送邀请。",
+      acceptInviteNoneFound:
+        "未找到您账户的待处理邀请。如果您期望有邀请，请让家长重新向 {{email}} 发送邀请。",
       acceptInviteContinue: "前往仪表盘",
-      acceptInviteError: "出了点问题：{{message}}"
+      acceptInviteError: "出了点问题：{{message}}",
     },
     caregiverGradebook: {
       title: "成绩册",
-      subtitle: "科目掌握程度概览"
-    }
+      subtitle: "科目掌握程度概览",
+    },
   },
 };
 
-function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
-  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
-  else t[k]=v;}return t;}
+function deepMerge(t, s) {
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if (!t[k] || typeof t[k] !== "object") t[k] = {};
+      deepMerge(t[k], v);
+    } else t[k] = v;
+  }
+  return t;
+}
 
-let n=0;
+let n = 0;
 for (const [locale, roots] of Object.entries(DATA)) {
   const file = join(dir, `${locale}.json`);
   const json = JSON.parse(readFileSync(file, "utf8"));

@@ -90,9 +90,7 @@ function normalizeEmail(email: string): string {
 
 export function getCareTeam(learnerId: ID): LearnerCareTeam {
   const t = tables();
-  const teachers = t.teachers.filter(
-    (r) => r.learnerId === learnerId && r.status !== "REVOKED",
-  );
+  const teachers = t.teachers.filter((r) => r.learnerId === learnerId && r.status !== "REVOKED");
   const caregivers = t.caregivers.filter(
     (r) => r.learnerId === learnerId && r.status !== "REVOKED",
   );
@@ -223,31 +221,20 @@ export function listPendingInvitesForEmail(userEmail: string): TeamMemberRecord[
   );
 }
 
-export function listLearnersForMember(
-  userId: ID,
-  userEmail: string,
-  role: TeamRole,
-): ID[] {
+export function listLearnersForMember(userId: ID, userEmail: string, role: TeamRole): ID[] {
   const email = normalizeEmail(userEmail);
   const list = tableFor(role);
   return Array.from(
     new Set(
       list
-        .filter(
-          (r) =>
-            r.status === "ACCEPTED" && (r.memberUserId === userId || r.email === email),
-        )
+        .filter((r) => r.status === "ACCEPTED" && (r.memberUserId === userId || r.email === email))
         .map((r) => r.learnerId),
     ),
   );
 }
 
 /** Test/dev helper — seeds a couple of demo invites so the UI has content. */
-export function seedDemoInvites(args: {
-  tenantId: ID;
-  learnerId: ID;
-  invitedBy: ID;
-}): void {
+export function seedDemoInvites(args: { tenantId: ID; learnerId: ID; invitedBy: ID }): void {
   const t = tables();
   if (t.teachers.length || t.caregivers.length || t.therapists.length) return;
   t.caregivers.push({

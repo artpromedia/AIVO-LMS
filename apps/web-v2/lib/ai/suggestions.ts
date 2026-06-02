@@ -248,9 +248,17 @@ const AGE_BIAS: Partial<Record<FieldType, Partial<Record<AgeBand, string[]>>>> =
   learner_loves: {
     preK: ["Trains, planes, and big machines", "Caring for pets", "Dancing to favourite songs"],
     K: ["Drawing comics", "Caring for pets", "Building with LEGO"],
-    early_elementary: ["Minecraft and creative worlds", "Building with LEGO", "Soccer and being outdoors"],
+    early_elementary: [
+      "Minecraft and creative worlds",
+      "Building with LEGO",
+      "Soccer and being outdoors",
+    ],
     upper_elementary: ["Minecraft and creative worlds", "Reading graphic novels", "Playing chess"],
-    middle: ["Making YouTube-style videos", "Music — listening and making", "Crafting and friendship bracelets"],
+    middle: [
+      "Making YouTube-style videos",
+      "Music — listening and making",
+      "Crafting and friendship bracelets",
+    ],
     high: ["Music — listening and making", "Making YouTube-style videos"],
   },
   learner_strengths: {
@@ -264,7 +272,8 @@ function mapAgeToBand(age?: string | null, grade?: string | null): AgeBand | nul
   if (grade) {
     if (grade === "preK") return "preK";
     if (grade === "K") return "K";
-    if (grade === "1-2" || grade === "3-5") return grade === "1-2" ? "early_elementary" : "upper_elementary";
+    if (grade === "1-2" || grade === "3-5")
+      return grade === "1-2" ? "early_elementary" : "upper_elementary";
     if (grade === "6-8") return "middle";
     if (grade === "9-12") return "high";
     if (grade === "post_secondary") return "post_secondary";
@@ -291,10 +300,7 @@ function alreadyMentioned(item: string, currentText: string, existingItems: stri
   for (const entry of existingItems) {
     if (normaliseToken(entry) === needle) return true;
   }
-  const haystack = currentText
-    .split(SEPARATOR_RE)
-    .map(normaliseToken)
-    .filter(Boolean);
+  const haystack = currentText.split(SEPARATOR_RE).map(normaliseToken).filter(Boolean);
   return haystack.includes(needle);
 }
 
@@ -339,7 +345,7 @@ export function generateSuggestions(
   }
 
   const band = mapAgeToBand(context.ageRange ?? null, context.gradeBand ?? null);
-  const biased = band ? AGE_BIAS[fieldType]?.[band] ?? [] : [];
+  const biased = band ? (AGE_BIAS[fieldType]?.[band] ?? []) : [];
   const existing = context.existingItems ?? [];
 
   const accept = (item: string, seen: Set<string>): boolean => {

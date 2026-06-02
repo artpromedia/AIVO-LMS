@@ -22,7 +22,13 @@ export interface ItemVariant {
   /** Defect count — increments via `registerDefect`. */
   defectCount: number;
   /** Optional learner surface type for runtime rendering. */
-  surfaceType?: "choice_grid" | "scratchpad" | "math_expression" | "geometry_workspace" | "video" | "audio";
+  surfaceType?:
+    | "choice_grid"
+    | "scratchpad"
+    | "math_expression"
+    | "geometry_workspace"
+    | "video"
+    | "audio";
   /** Optional variant assets used by surface renderers. */
   assets?: ItemAsset[];
 }

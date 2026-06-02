@@ -21,7 +21,8 @@ export const CREATIVE_ARTS_ITEMS: Item[] = [
     skillCode: "ARTS.WRITE.STORY_PARTS",
     difficulty: -0.5,
     surface: "scratchpad",
-    prompt: "Write three sentences: one for the beginning, one for the middle, one for the end of a story about a lost puppy.",
+    prompt:
+      "Write three sentences: one for the beginning, one for the middle, one for the end of a story about a lost puppy.",
   },
   {
     id: "ARTS.WRITE.DESCRIBE.001",

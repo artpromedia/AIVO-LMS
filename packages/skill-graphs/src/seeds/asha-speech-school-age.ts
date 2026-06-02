@@ -62,8 +62,7 @@ export const ashaSpeechSchoolAge: SkillGraph = {
     {
       id: "asha.school.sem.figurative",
       title: "Understand and use figurative language",
-      description:
-        "I can understand idioms, similes, and metaphors and use them when appropriate.",
+      description: "I can understand idioms, similes, and metaphors and use them when appropriate.",
       subject: "speech",
       gradeBand: "5",
       frameworkRefs: [{ framework: "ASHA", code: "SAL/Semantic" }],
@@ -116,8 +115,7 @@ export const ashaSpeechSchoolAge: SkillGraph = {
     {
       id: "asha.school.prag.persuade",
       title: "Use persuasive and informative discourse",
-      description:
-        "I can structure what I say to inform or persuade a listener.",
+      description: "I can structure what I say to inform or persuade a listener.",
       subject: "speech",
       gradeBand: "7",
       frameworkRefs: [{ framework: "ASHA", code: "SAL/Pragmatic" }],
@@ -182,8 +180,7 @@ export const ashaSpeechSchoolAge: SkillGraph = {
     {
       id: "asha.school.advocacy",
       title: "Self-advocate for communication needs",
-      description:
-        "I can tell teachers and peers what helps me communicate best.",
+      description: "I can tell teachers and peers what helps me communicate best.",
       subject: "speech",
       gradeBand: "8",
       frameworkRefs: [{ framework: "ASHA", code: "Self-Advocacy" }],

@@ -90,7 +90,12 @@ export function GuidedStepCard({
         <span className="iw-label text-iw-text-muted">
           Step {step} of {total}
         </span>
-        <span className={cn("inline-flex items-center px-2.5 py-1 rounded-iw-chip border text-[10px] font-semibold uppercase tracking-wide", tint.ribbon)}>
+        <span
+          className={cn(
+            "inline-flex items-center px-2.5 py-1 rounded-iw-chip border text-[10px] font-semibold uppercase tracking-wide",
+            tint.ribbon,
+          )}
+        >
           {tint.label}
         </span>
       </header>

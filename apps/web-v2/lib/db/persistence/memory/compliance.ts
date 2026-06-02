@@ -45,9 +45,7 @@ export const memoryCompliance: ComplianceStore = {
   async listConsentsForLearner(parentUserId, learnerId, tenantId) {
     return getStore().consentRecords.filter(
       (c) =>
-        c.parentUserId === parentUserId &&
-        c.learnerId === learnerId &&
-        c.tenantId === tenantId,
+        c.parentUserId === parentUserId && c.learnerId === learnerId && c.tenantId === tenantId,
     );
   },
 

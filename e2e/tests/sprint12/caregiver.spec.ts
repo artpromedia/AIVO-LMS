@@ -36,9 +36,7 @@ test.describe("caregiver golden paths", () => {
     await page.goto(`${WEB_BASE}/caregiver/observations`);
     // Either the form OR the "no learners yet" empty state shows.
     const formOrEmpty = page
-      .locator(
-        `[data-testid="${T.observationSubmit}"], text="No learners yet"`,
-      )
+      .locator(`[data-testid="${T.observationSubmit}"], text="No learners yet"`)
       .first();
     await expect(formOrEmpty).toBeVisible({ timeout: 5_000 });
   });

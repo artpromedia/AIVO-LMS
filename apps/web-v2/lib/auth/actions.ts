@@ -22,11 +22,8 @@ export async function logoutAction() {
   jar.set(MOCK_COOKIE_NAME, "", { path: "/", maxAge: 0 });
 
   if (serverEnv.AUTH_MODE !== "mock") {
-    const {
-      identityLogout,
-      IDENTITY_ACCESS_TOKEN_COOKIE,
-      IDENTITY_REFRESH_TOKEN_COOKIE,
-    } = await import("@/lib/auth/identity-client");
+    const { identityLogout, IDENTITY_ACCESS_TOKEN_COOKIE, IDENTITY_REFRESH_TOKEN_COOKIE } =
+      await import("@/lib/auth/identity-client");
     const refresh = jar.get(IDENTITY_REFRESH_TOKEN_COOKIE)?.value ?? null;
     await identityLogout(refresh);
     jar.set(IDENTITY_ACCESS_TOKEN_COOKIE, "", { path: "/", maxAge: 0 });
@@ -36,4 +33,3 @@ export async function logoutAction() {
 
   redirect("/login");
 }
-

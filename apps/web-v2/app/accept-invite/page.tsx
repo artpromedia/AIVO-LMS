@@ -27,11 +27,7 @@ export const dynamic = "force-dynamic";
 
 type SearchParams = Promise<{ email?: string; token?: string }>;
 
-export default async function AcceptInvitePage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function AcceptInvitePage({ searchParams }: { searchParams: SearchParams }) {
   const t = await getTranslations("accept_invite.page");
   const params = await searchParams;
   const inviteToken = (params.token ?? "").trim();
@@ -90,10 +86,7 @@ export default async function AcceptInvitePage({
           )}
         </p>
         <div className="flex flex-col gap-3">
-          <Link
-            href={`/login?redirect=${encodeURIComponent(redirect)}`}
-            className="block w-full"
-          >
+          <Link href={`/login?redirect=${encodeURIComponent(redirect)}`} className="block w-full">
             <Button className="w-full">I already have an account</Button>
           </Link>
           <Link
@@ -117,9 +110,8 @@ export default async function AcceptInvitePage({
       <Shell heading={t("accept_heading")}>
         <Card className="border-rose-200 bg-rose-50 p-4">
           <p className="text-sm text-aivo-ink">
-            {t("signed_in_as")} <strong>{session.email}</strong>, but this
-            invitation is for <strong>{invitedEmail}</strong>. Sign out and sign
-            in with the invited address.
+            {t("signed_in_as")} <strong>{session.email}</strong>, but this invitation is for{" "}
+            <strong>{invitedEmail}</strong>. Sign out and sign in with the invited address.
           </p>
         </Card>
         <Link href="/login" className="block w-full">

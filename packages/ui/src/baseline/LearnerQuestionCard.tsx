@@ -68,9 +68,7 @@ export function LearnerQuestionCard({
             </div>
           ) : null}
           <div className="flex-1 min-w-0">
-            {eyebrow ? (
-              <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p>
-            ) : null}
+            {eyebrow ? <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p> : null}
           </div>
           {readAloud ? <div className="shrink-0">{readAloud}</div> : null}
         </header>
@@ -91,9 +89,7 @@ export function LearnerQuestionCard({
       </div>
 
       {footer ? (
-        <footer className="flex items-center justify-between gap-3 flex-wrap pt-2">
-          {footer}
-        </footer>
+        <footer className="flex items-center justify-between gap-3 flex-wrap pt-2">{footer}</footer>
       ) : null}
     </article>
   );

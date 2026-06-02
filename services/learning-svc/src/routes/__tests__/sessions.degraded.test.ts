@@ -34,7 +34,7 @@ function installFetchStub(
   handler: (url: string, init?: RequestInit) => Response | Promise<Response> | Error,
 ) {
   globalThis.fetch = (async (input: any, init?: any) => {
-    const url = typeof input === "string" ? input : input?.url ?? String(input);
+    const url = typeof input === "string" ? input : (input?.url ?? String(input));
     const out = await handler(url, init);
     if (out instanceof Error) throw out;
     return out;
@@ -152,10 +152,7 @@ describe("learning-svc downstream guardrails (Sprint 0)", () => {
       await app.close();
     }
 
-    assert.ok(
-      metricCount("brain-svc") > before,
-      "expected brain-svc failure counter to increment",
-    );
+    assert.ok(metricCount("brain-svc") > before, "expected brain-svc failure counter to increment");
   });
 
   it("brain-svc outage with fail-open does not return typed degraded 503", async () => {

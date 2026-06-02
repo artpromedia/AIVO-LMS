@@ -126,8 +126,7 @@ FeaturedLessonCard.displayName = "LearnerDashboard/FeaturedLessonCard";
    Secondary action button used in the FeaturedLessonCard footer row
    (Read Aloud, Overview, etc.). Soft outlined pill with an icon.
    ----------------------------------------------------------------- */
-export interface LessonSecondaryActionProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface LessonSecondaryActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode;
   children: React.ReactNode;
 }

@@ -187,12 +187,12 @@ body {
 /* TEACHER — instructional, denser, more grayscale. Smaller radius, more
    data-tabular feel, calmer cool-teal primary. */
 [data-role-theme="teacher"] {
-  --color-aivo-ink: oklch(0.20 0.02 220);
-  --color-aivo-ink-soft: oklch(0.40 0.02 220);
+  --color-aivo-ink: oklch(0.2 0.02 220);
+  --color-aivo-ink-soft: oklch(0.4 0.02 220);
   --color-aivo-surface: oklch(0.99 0.003 220);
   --color-aivo-surface-2: oklch(0.96 0.006 220);
-  --color-aivo-border: oklch(0.90 0.006 220);
-  --color-aivo-primary: oklch(0.52 0.10 210);
+  --color-aivo-border: oklch(0.9 0.006 220);
+  --color-aivo-primary: oklch(0.52 0.1 210);
   --color-aivo-primary-soft: oklch(0.94 0.025 210);
   --color-aivo-page-bg: oklch(0.965 0.005 220);
   --color-aivo-sidebar-bg: oklch(0.99 0.003 220);
@@ -222,18 +222,18 @@ body {
 /* PLATFORM ADMIN — utilitarian, dashboardy, dark sidebar, monospace IDs.
    Internal-facing; density over warmth. */
 [data-role-theme="platform"] {
-  --color-aivo-ink: oklch(0.20 0.02 240);
-  --color-aivo-ink-soft: oklch(0.40 0.02 240);
+  --color-aivo-ink: oklch(0.2 0.02 240);
+  --color-aivo-ink-soft: oklch(0.4 0.02 240);
   --color-aivo-surface: oklch(0.99 0.004 240);
   --color-aivo-surface-2: oklch(0.95 0.008 240);
   --color-aivo-border: oklch(0.88 0.01 240);
-  --color-aivo-primary: oklch(0.50 0.15 220);
+  --color-aivo-primary: oklch(0.5 0.15 220);
   --color-aivo-primary-soft: oklch(0.94 0.03 220);
   --color-aivo-accent: oklch(0.72 0.18 195);
   --color-aivo-page-bg: oklch(0.95 0.008 240);
   --color-aivo-sidebar-bg: oklch(0.22 0.04 250);
   --color-aivo-sidebar-fg: oklch(0.96 0.01 240);
-  --color-aivo-sidebar-muted: oklch(0.70 0.03 240);
+  --color-aivo-sidebar-muted: oklch(0.7 0.03 240);
   --color-aivo-sidebar-border: oklch(0.32 0.04 250);
   --radius-card: 8px;
   --aivo-density-card-pad: 1rem;

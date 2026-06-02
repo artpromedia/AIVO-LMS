@@ -8,14 +8,7 @@
 // preview component in design reviews.
 
 import React from "react";
-import {
-  Pressable,
-  View,
-  Text,
-  StyleSheet,
-  type StyleProp,
-  type ViewStyle,
-} from "react-native";
+import { Pressable, View, Text, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { fontFamilies } from "@/constants/typography";
@@ -59,9 +52,7 @@ export function DarkCapsuleNav({ items, style, hideOnTablet = true }: DarkCapsul
             accessibilityLabel={item.label}
             style={styles.item}
           >
-            {item.active ? (
-              <View style={styles.activePill} />
-            ) : null}
+            {item.active ? <View style={styles.activePill} /> : null}
             <Ionicons
               name={item.icon}
               size={22}

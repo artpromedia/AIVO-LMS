@@ -20,11 +20,7 @@
 import { cookies } from "next/headers";
 import { serverEnv } from "@/lib/env";
 import { IDENTITY_ACCESS_TOKEN_COOKIE } from "@/lib/auth/identity-client";
-import {
-  getActiveSubscriptionForTenant,
-  listInvoicesForTenant,
-  listPlans,
-} from "@/lib/db/repos";
+import { getActiveSubscriptionForTenant, listInvoicesForTenant, listPlans } from "@/lib/db/repos";
 import type { SessionProfile } from "@/lib/auth/types";
 import { logger } from "@/lib/observability/logger";
 
@@ -270,19 +266,16 @@ export async function createParentCheckout(params: {
   origin: string;
   bearer: string;
 }): Promise<ServiceResult<{ checkoutUrl: string; sessionId: string }>> {
-  return billingFetch<{ checkoutUrl: string; sessionId: string }>(
-    "/api/billing/checkout/session",
-    {
-      method: "POST",
-      bearer: params.bearer,
-      body: {
-        tenantId: params.tenantId,
-        planId: params.planId,
-        successUrl: `${params.origin}/parent/settings/billing?checkout=success`,
-        cancelUrl: `${params.origin}/parent/settings/billing?checkout=cancelled`,
-      },
+  return billingFetch<{ checkoutUrl: string; sessionId: string }>("/api/billing/checkout/session", {
+    method: "POST",
+    bearer: params.bearer,
+    body: {
+      tenantId: params.tenantId,
+      planId: params.planId,
+      successUrl: `${params.origin}/parent/settings/billing?checkout=success`,
+      cancelUrl: `${params.origin}/parent/settings/billing?checkout=cancelled`,
     },
-  );
+  });
 }
 
 /** Cancel the tenant's subscription at period end via billing-svc. */
@@ -290,8 +283,8 @@ export async function cancelParentSubscription(params: {
   tenantId: string;
   bearer: string;
 }): Promise<ServiceResult<{ status: string }>> {
-  return billingFetch<{ status: string }>(
-    `/api/billing/subscription/${params.tenantId}/cancel`,
-    { method: "POST", bearer: params.bearer },
-  );
+  return billingFetch<{ status: string }>(`/api/billing/subscription/${params.tenantId}/cancel`, {
+    method: "POST",
+    bearer: params.bearer,
+  });
 }

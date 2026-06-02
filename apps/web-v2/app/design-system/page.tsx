@@ -80,8 +80,7 @@ export default function DesignSystemPage() {
               <code className="px-1.5 py-0.5 rounded-iw-control bg-iw-card border border-iw-border text-xs">
                 @aivo/brand
               </code>{" "}
-              tokens. Use this page as a quick visual diff while iterating on the
-              shared system.
+              tokens. Use this page as a quick visual diff while iterating on the shared system.
             </p>
           </div>
 
@@ -156,12 +155,7 @@ export default function DesignSystemPage() {
           <h2 className="text-xl font-semibold text-iw-text-strong">Metric cards</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricCard label="Lessons this week" value="14" suffix="/ 20" delta={12} />
-            <MetricCard
-              label="Reading mastery"
-              value="67%"
-              delta={14}
-              caption="vs. last week"
-            />
+            <MetricCard label="Reading mastery" value="67%" delta={14} caption="vs. last week" />
             <MetricCard
               label="Active risks"
               value="2"
@@ -171,7 +165,12 @@ export default function DesignSystemPage() {
                 <AivoIcon name="safetyAlert" tone="risk" className={className} aria-hidden={ah} />
               )}
             />
-            <MetricCard label="Pending consents" value="0" delta={null} caption="All families up to date" />
+            <MetricCard
+              label="Pending consents"
+              value="0"
+              delta={null}
+              caption="All families up to date"
+            />
           </div>
         </section>
 
@@ -182,16 +181,31 @@ export default function DesignSystemPage() {
             <GlassCard density="base" radius="card-lg" title="Mastery trend" description="7 weeks">
               <SoftLine data={trend} tone="mastery" />
             </GlassCard>
-            <GlassCard density="base" radius="card-lg" title="Daily lessons" description="This week">
+            <GlassCard
+              density="base"
+              radius="card-lg"
+              title="Daily lessons"
+              description="This week"
+            >
               <DotChart data={dots} tone="brand" />
             </GlassCard>
-            <GlassCard density="base" radius="card-lg" title="Weekly goal" description="Lessons completed">
+            <GlassCard
+              density="base"
+              radius="card-lg"
+              title="Weekly goal"
+              description="Lessons completed"
+            >
               <div className="flex justify-center">
                 <ProgressCurve value={0.7} target={0.85} tone="mastery" helper="14 of 20 lessons" />
               </div>
             </GlassCard>
           </div>
-          <GlassCard density="base" radius="card-lg" title="Standards mastery" description="Grade 3 Reading">
+          <GlassCard
+            density="base"
+            radius="card-lg"
+            title="Standards mastery"
+            description="Grade 3 Reading"
+          >
             <MasteryHeatStrip cells={mastery} />
           </GlassCard>
         </section>

@@ -16,7 +16,11 @@ export const mascotIdle = {
   animate: { y: [0, -3, 0], transition: { duration: 3.6, repeat: Infinity, ease: "easeInOut" } },
 } as const;
 export const mascotCelebrate = {
-  animate: { rotate: [0, -8, 8, 0], scale: [1, 1.04, 1], transition: { duration: 0.9, repeat: Infinity, repeatDelay: 1.2 } },
+  animate: {
+    rotate: [0, -8, 8, 0],
+    scale: [1, 1.04, 1],
+    transition: { duration: 0.9, repeat: Infinity, repeatDelay: 1.2 },
+  },
 } as const;
 
 export const MOTION_VARIANTS = {

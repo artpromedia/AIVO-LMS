@@ -61,10 +61,7 @@ export function SensoryControlGroup<V extends string = string>({
       <div
         role="radiogroup"
         aria-label={label}
-        className={cn(
-          "grid gap-2",
-          resolvedCols === 3 ? "grid-cols-3" : "grid-cols-2",
-        )}
+        className={cn("grid gap-2", resolvedCols === 3 ? "grid-cols-3" : "grid-cols-2")}
       >
         {options.map((opt, idx) => {
           const selected = opt.value === value;
@@ -87,7 +84,10 @@ export function SensoryControlGroup<V extends string = string>({
               )}
             >
               {opt.icon && density === "comfortable" ? (
-                <span aria-hidden="true" className="w-5 h-5 inline-flex items-center justify-center">
+                <span
+                  aria-hidden="true"
+                  className="w-5 h-5 inline-flex items-center justify-center"
+                >
                   {opt.icon}
                 </span>
               ) : null}

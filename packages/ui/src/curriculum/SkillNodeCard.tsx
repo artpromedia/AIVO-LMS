@@ -47,8 +47,10 @@ const STATUS_LABEL: Record<SkillNodeStatus, string> = {
 };
 
 const STATUS_TINT: Record<SkillNodeStatus, string> = {
-  approved: "bg-[var(--aivo-color-status-success-subtle)] text-[var(--aivo-color-status-success-strong)]",
-  review: "bg-[var(--aivo-color-status-warning-subtle)] text-[var(--aivo-color-status-warning-strong)]",
+  approved:
+    "bg-[var(--aivo-color-status-success-subtle)] text-[var(--aivo-color-status-success-strong)]",
+  review:
+    "bg-[var(--aivo-color-status-warning-subtle)] text-[var(--aivo-color-status-warning-strong)]",
   draft: "bg-[var(--aivo-color-surface-muted)] text-iw-text-muted",
   prereq: "bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-color-aivoPurple-700)]",
 };
@@ -79,9 +81,7 @@ export function SkillNodeCard({
         className={cn("absolute left-0 top-0 bottom-0 w-1 rounded-l-iw-card-lg", ACCENT[status])}
       />
       <header className="flex items-center justify-between gap-2">
-        {subject ? (
-          <p className="iw-label text-iw-text-muted">{subject}</p>
-        ) : <span />}
+        {subject ? <p className="iw-label text-iw-text-muted">{subject}</p> : <span />}
         <span
           className={cn(
             "inline-flex items-center px-2 py-0.5 rounded-iw-chip text-[10px] font-semibold uppercase tracking-wide",
@@ -95,10 +95,14 @@ export function SkillNodeCard({
       <footer className="flex items-center justify-between gap-2 text-xs text-iw-text-muted">
         {standardCode ? (
           <span className="font-mono text-[11px] tabular-nums">{standardCode}</span>
-        ) : <span />}
+        ) : (
+          <span />
+        )}
         <span className="flex items-center gap-3">
           {typeof prerequisiteCount === "number" && prerequisiteCount > 0 ? (
-            <span>{prerequisiteCount} prereq{prerequisiteCount === 1 ? "" : "s"}</span>
+            <span>
+              {prerequisiteCount} prereq{prerequisiteCount === 1 ? "" : "s"}
+            </span>
           ) : null}
           {typeof masteryPct === "number" ? (
             <span className="inline-flex items-center gap-1.5">

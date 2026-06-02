@@ -215,8 +215,7 @@ export function validateStagePlan(
       if (skills.length === 0 && standards.length === 0) {
         issues.push({
           code: "empty_subject_brain_evidence",
-          detail:
-            "subjectBrainEvidenceUsed.relevantSkills or .standards must be non-empty",
+          detail: "subjectBrainEvidenceUsed.relevantSkills or .standards must be non-empty",
         });
       }
     }

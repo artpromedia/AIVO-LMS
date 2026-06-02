@@ -26,7 +26,8 @@ const DATA = {
       approve: "موافقة",
       decline: "رفض",
       adjust: "تعديل",
-      featureUnavailable: "هذه الميزة غير متاحة على الجوال بعد. يرجى استخدام تطبيق AIVO على الويب للمتابعة.",
+      featureUnavailable:
+        "هذه الميزة غير متاحة على الجوال بعد. يرجى استخدام تطبيق AIVO على الويب للمتابعة.",
       overview: "نظرة عامة",
       on: "تشغيل",
       off: "إيقاف",
@@ -34,7 +35,7 @@ const DATA = {
       confirm: "تأكيد",
       appVersion: "AIVO Learning v1.0.0",
       unknownError: "خطأ غير معروف",
-      done: "تم"
+      done: "تم",
     },
     learnerHomeworkSession: {
       title: "جلسة الواجب المنزلي",
@@ -53,17 +54,19 @@ const DATA = {
       finish: "إنهاء الجلسة",
       notFound: "تعذّر تحميل جلسة الواجب المنزلي هذه.",
       greetingNoProblems: "مرحبًا! أنا هنا لمساعدتك في واجبك المنزلي. على ماذا تريد العمل؟",
-      greetingWithProblems: "مرحبًا! أرى أن لديك {{count}} مسائل للعمل عليها. لنبدأ بالمسألة {{first}}. ألقِ نظرة وأخبرني ما تعتقد أن الخطوة الأولى هي!",
+      greetingWithProblems:
+        "مرحبًا! أرى أن لديك {{count}} مسائل للعمل عليها. لنبدأ بالمسألة {{first}}. ألقِ نظرة وأخبرني ما تعتقد أن الخطوة الأولى هي!",
       startRecording: "بدء الإدخال الصوتي",
       stopRecording: "إيقاف التسجيل",
       sttError: {
-        permission_denied: "تم رفض الوصول إلى الميكروفون. اسمح بالوصول إلى الميكروفون في الإعدادات لاستخدام الإدخال الصوتي.",
+        permission_denied:
+          "تم رفض الوصول إلى الميكروفون. اسمح بالوصول إلى الميكروفون في الإعدادات لاستخدام الإدخال الصوتي.",
         no_speech: "لم نتمكن من سماع أي شيء. حاول التسجيل مرة أخرى.",
         unsupported: "الإدخال الصوتي غير مدعوم على هذا الجهاز.",
         network: "مشكلة في الشبكة أثناء إرسال الصوت. حاول مرة أخرى.",
         transcription_failed: "تعذّر نسخ ذلك. حاول مرة أخرى أو اكتب ردك.",
-        audio_capture: "تعذّر تسجيل الصوت. حاول مرة أخرى."
-      }
+        audio_capture: "تعذّر تسجيل الصوت. حاول مرة أخرى.",
+      },
     },
     learnerChallenges: {
       title: "التحديات",
@@ -80,7 +83,7 @@ const DATA = {
       inviteFriend: "دعوة صديق",
       inviteText: "شارك رمز دعوتك للعب مع الأصدقاء!",
       copyCode: "نسخ الرمز",
-      codeCopied: "تم نسخ رمز الدعوة إلى الحافظة!"
+      codeCopied: "تم نسخ رمز الدعوة إلى الحافظة!",
     },
     parentSettings: {
       title: "الإعدادات",
@@ -92,10 +95,11 @@ const DATA = {
       pinNoLearners: "لم يتم العثور على ملفات متعلمين لتحديث رقم PIN.",
       pinUpdated: "تم تحديث رقم PIN لـ {{name}}.",
       pinUpdateFailed: "فشل تحديث رقم PIN.",
-      exportSummary: "تمت تجهيز بيانات حسابك.\n\nالاسم: {{name}}\nالبريد الإلكتروني: {{email}}\nالدور: {{role}}\n\nتم إرسال تصدير كامل للبيانات إلى بريدك الإلكتروني.",
+      exportSummary:
+        "تمت تجهيز بيانات حسابك.\n\nالاسم: {{name}}\nالبريد الإلكتروني: {{email}}\nالدور: {{role}}\n\nتم إرسال تصدير كامل للبيانات إلى بريدك الإلكتروني.",
       exportFailed: "فشل تصدير البيانات.",
       pinSelectLearner: "اختر المتعلم",
-      unnamedLearner: "المتعلم"
+      unnamedLearner: "المتعلم",
     },
     caregiver: {
       greeting: "مرحبًا، {{name}}",
@@ -105,27 +109,27 @@ const DATA = {
       brain: "الدماغ",
       iep: "IEP",
       sessions: "الجلسات",
-      note: "ملاحظة"
+      note: "ملاحظة",
     },
     learnerTutor: {
       tutorNotFound: "لم يتم العثور على المعلم",
       sessionDuration: "~15 دقيقة للجلسة",
       adaptiveDifficulty: "صعوبة تكيّفية",
       brainInformed: "مستند إلى الدماغ",
-      startSession: "بدء الجلسة مع {{name}}"
+      startSession: "بدء الجلسة مع {{name}}",
     },
     learnerAdventure: {
       title: "مغامرة الاستكشاف",
       subtitle: "دعنا نكتشف ما تعرفه!",
       start: "ابدأ",
-      beginAdventure: "ابدأ المغامرة"
+      beginAdventure: "ابدأ المغامرة",
     },
     caregiverSessions: {
       title: "سجل الجلسات",
       subtitle: "جلسات التعلم المرتبة زمنيًا",
       noTitle: "لا توجد جلسات بعد",
-      noMessage: "ستظهر سجلات الجلسات عند إكمال المتعلم للأنشطة."
-    }
+      noMessage: "ستظهر سجلات الجلسات عند إكمال المتعلم للأنشطة.",
+    },
   },
 
   de: {
@@ -148,7 +152,8 @@ const DATA = {
       approve: "Genehmigen",
       decline: "Ablehnen",
       adjust: "Anpassen",
-      featureUnavailable: "Diese Funktion ist auf Mobilgeräten noch nicht verfügbar. Bitte verwende die AIVO-Web-App, um fortzufahren.",
+      featureUnavailable:
+        "Diese Funktion ist auf Mobilgeräten noch nicht verfügbar. Bitte verwende die AIVO-Web-App, um fortzufahren.",
       overview: "Übersicht",
       on: "Ein",
       off: "Aus",
@@ -156,7 +161,7 @@ const DATA = {
       confirm: "Bestätigen",
       appVersion: "AIVO Learning v1.0.0",
       unknownError: "Unbekannter Fehler",
-      done: "Fertig"
+      done: "Fertig",
     },
     learnerHomeworkSession: {
       title: "Hausaufgaben-Sitzung",
@@ -170,22 +175,27 @@ const DATA = {
       placeholder: "Deine Antwort oder Frage eingeben…",
       send: "Senden",
       thinking: "Denkt nach…",
-      sendError: "Entschuldigung, ich hatte Schwierigkeiten damit. Könntest du es erneut versuchen?",
+      sendError:
+        "Entschuldigung, ich hatte Schwierigkeiten damit. Könntest du es erneut versuchen?",
       completeError: "Die Sitzung konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       finish: "Sitzung beenden",
       notFound: "Diese Hausaufgaben-Sitzung konnte nicht geladen werden.",
-      greetingNoProblems: "Hallo! Ich bin hier, um dir bei deinen Hausaufgaben zu helfen. Womit möchtest du anfangen?",
-      greetingWithProblems: "Hallo! Ich sehe, du hast {{count}} Aufgaben. Fangen wir mit Aufgabe {{first}} an. Schau sie dir an und sag mir, was du als ersten Schritt tun würdest!",
+      greetingNoProblems:
+        "Hallo! Ich bin hier, um dir bei deinen Hausaufgaben zu helfen. Womit möchtest du anfangen?",
+      greetingWithProblems:
+        "Hallo! Ich sehe, du hast {{count}} Aufgaben. Fangen wir mit Aufgabe {{first}} an. Schau sie dir an und sag mir, was du als ersten Schritt tun würdest!",
       startRecording: "Spracheingabe starten",
       stopRecording: "Aufnahme stoppen",
       sttError: {
-        permission_denied: "Mikrofonzugriff wurde verweigert. Erlaube den Mikrofonzugriff in den Einstellungen, um die Spracheingabe zu nutzen.",
+        permission_denied:
+          "Mikrofonzugriff wurde verweigert. Erlaube den Mikrofonzugriff in den Einstellungen, um die Spracheingabe zu nutzen.",
         no_speech: "Wir konnten nichts hören. Versuche erneut aufzunehmen.",
         unsupported: "Spracheingabe wird auf diesem Gerät nicht unterstützt.",
         network: "Netzwerkproblem beim Senden deines Audios. Versuche es erneut.",
-        transcription_failed: "Konnte nicht transkribiert werden. Versuche es erneut oder tippe deine Antwort.",
-        audio_capture: "Audio konnte nicht aufgezeichnet werden. Versuche es erneut."
-      }
+        transcription_failed:
+          "Konnte nicht transkribiert werden. Versuche es erneut oder tippe deine Antwort.",
+        audio_capture: "Audio konnte nicht aufgezeichnet werden. Versuche es erneut.",
+      },
     },
     learnerChallenges: {
       title: "Herausforderungen",
@@ -202,7 +212,7 @@ const DATA = {
       inviteFriend: "Freund einladen",
       inviteText: "Teile deinen Einladungscode zum Spielen mit Freunden!",
       copyCode: "Code kopieren",
-      codeCopied: "Einladungscode in die Zwischenablage kopiert!"
+      codeCopied: "Einladungscode in die Zwischenablage kopiert!",
     },
     parentSettings: {
       title: "Einstellungen",
@@ -214,10 +224,11 @@ const DATA = {
       pinNoLearners: "Keine Lernprofile zum Aktualisieren der PIN gefunden.",
       pinUpdated: "PIN für {{name}} aktualisiert.",
       pinUpdateFailed: "PIN konnte nicht aktualisiert werden.",
-      exportSummary: "Deine Kontodaten wurden vorbereitet.\n\nName: {{name}}\nE-Mail: {{email}}\nRolle: {{role}}\n\nEin vollständiger Datenexport wurde an deine E-Mail gesendet.",
+      exportSummary:
+        "Deine Kontodaten wurden vorbereitet.\n\nName: {{name}}\nE-Mail: {{email}}\nRolle: {{role}}\n\nEin vollständiger Datenexport wurde an deine E-Mail gesendet.",
       exportFailed: "Daten konnten nicht exportiert werden.",
       pinSelectLearner: "Lernenden auswählen",
-      unnamedLearner: "Lernender"
+      unnamedLearner: "Lernender",
     },
     caregiver: {
       greeting: "Hallo, {{name}}",
@@ -227,27 +238,28 @@ const DATA = {
       brain: "Gehirn",
       iep: "IEP",
       sessions: "Sitzungen",
-      note: "Notiz"
+      note: "Notiz",
     },
     learnerTutor: {
       tutorNotFound: "Tutor nicht gefunden",
       sessionDuration: "~15 Min. Sitzung",
       adaptiveDifficulty: "Adaptiver Schwierigkeitsgrad",
       brainInformed: "Gehirn-informiert",
-      startSession: "Sitzung mit {{name}} starten"
+      startSession: "Sitzung mit {{name}} starten",
     },
     learnerAdventure: {
       title: "Entdeckungsabenteuer",
       subtitle: "Lass uns herausfinden, was du weißt!",
       start: "Starten",
-      beginAdventure: "Abenteuer beginnen"
+      beginAdventure: "Abenteuer beginnen",
     },
     caregiverSessions: {
       title: "Sitzungsprotokoll",
       subtitle: "Lernsitzungen in chronologischer Reihenfolge",
       noTitle: "Noch keine Sitzungen",
-      noMessage: "Der Sitzungsverlauf erscheint, sobald der Lernende Aktivitäten abgeschlossen hat."
-    }
+      noMessage:
+        "Der Sitzungsverlauf erscheint, sobald der Lernende Aktivitäten abgeschlossen hat.",
+    },
   },
 
   fr: {
@@ -270,7 +282,8 @@ const DATA = {
       approve: "Approuver",
       decline: "Refuser",
       adjust: "Ajuster",
-      featureUnavailable: "Cette fonctionnalité n'est pas encore disponible sur mobile. Veuillez utiliser l'application web AIVO pour continuer.",
+      featureUnavailable:
+        "Cette fonctionnalité n'est pas encore disponible sur mobile. Veuillez utiliser l'application web AIVO pour continuer.",
       overview: "Aperçu",
       on: "Activé",
       off: "Désactivé",
@@ -278,7 +291,7 @@ const DATA = {
       confirm: "Confirmer",
       appVersion: "AIVO Learning v1.0.0",
       unknownError: "Erreur inconnue",
-      done: "Terminé"
+      done: "Terminé",
     },
     learnerHomeworkSession: {
       title: "Session de devoirs",
@@ -296,18 +309,21 @@ const DATA = {
       completeError: "Impossible de terminer la session. Veuillez réessayer.",
       finish: "Terminer la session",
       notFound: "Impossible de charger cette session de devoirs.",
-      greetingNoProblems: "Salut ! Je suis là pour t'aider avec tes devoirs. Sur quoi aimerais-tu travailler ?",
-      greetingWithProblems: "Salut ! Je vois que tu as {{count}} problèmes à résoudre. Commençons par le problème {{first}}. Regarde-le et dis-moi ce que tu penses être la première étape !",
+      greetingNoProblems:
+        "Salut ! Je suis là pour t'aider avec tes devoirs. Sur quoi aimerais-tu travailler ?",
+      greetingWithProblems:
+        "Salut ! Je vois que tu as {{count}} problèmes à résoudre. Commençons par le problème {{first}}. Regarde-le et dis-moi ce que tu penses être la première étape !",
       startRecording: "Démarrer la saisie vocale",
       stopRecording: "Arrêter l'enregistrement",
       sttError: {
-        permission_denied: "L'accès au microphone a été refusé. Autorisez l'accès au microphone dans les réglages pour utiliser la saisie vocale.",
+        permission_denied:
+          "L'accès au microphone a été refusé. Autorisez l'accès au microphone dans les réglages pour utiliser la saisie vocale.",
         no_speech: "Nous n'avons rien entendu. Essayez d'enregistrer à nouveau.",
         unsupported: "La saisie vocale n'est pas prise en charge sur cet appareil.",
         network: "Problème réseau lors de l'envoi de votre audio. Réessayez.",
         transcription_failed: "Impossible de transcrire. Réessayez ou tapez votre réponse.",
-        audio_capture: "Impossible d'enregistrer l'audio. Réessayez."
-      }
+        audio_capture: "Impossible d'enregistrer l'audio. Réessayez.",
+      },
     },
     learnerChallenges: {
       title: "Défis",
@@ -324,7 +340,7 @@ const DATA = {
       inviteFriend: "Inviter un ami",
       inviteText: "Partagez votre code d'invitation pour jouer avec des amis !",
       copyCode: "Copier le code",
-      codeCopied: "Code d'invitation copié dans le presse-papiers !"
+      codeCopied: "Code d'invitation copié dans le presse-papiers !",
     },
     parentSettings: {
       title: "Paramètres",
@@ -336,10 +352,11 @@ const DATA = {
       pinNoLearners: "Aucun profil d'apprenant trouvé pour mettre à jour le PIN.",
       pinUpdated: "PIN mis à jour pour {{name}}.",
       pinUpdateFailed: "Échec de la mise à jour du PIN.",
-      exportSummary: "Vos données de compte ont été préparées.\n\nNom : {{name}}\nEmail : {{email}}\nRôle : {{role}}\n\nUn export complet des données a été envoyé à votre email.",
+      exportSummary:
+        "Vos données de compte ont été préparées.\n\nNom : {{name}}\nEmail : {{email}}\nRôle : {{role}}\n\nUn export complet des données a été envoyé à votre email.",
       exportFailed: "Échec de l'exportation des données.",
       pinSelectLearner: "Choisir un apprenant",
-      unnamedLearner: "Apprenant"
+      unnamedLearner: "Apprenant",
     },
     caregiver: {
       greeting: "Bonjour, {{name}}",
@@ -349,27 +366,28 @@ const DATA = {
       brain: "Cerveau",
       iep: "IEP",
       sessions: "Sessions",
-      note: "Note"
+      note: "Note",
     },
     learnerTutor: {
       tutorNotFound: "Tuteur introuvable",
       sessionDuration: "~15 min de session",
       adaptiveDifficulty: "Difficulté adaptative",
       brainInformed: "Basé sur le cerveau",
-      startSession: "Démarrer la session avec {{name}}"
+      startSession: "Démarrer la session avec {{name}}",
     },
     learnerAdventure: {
       title: "Aventure découverte",
       subtitle: "Découvrons ce que tu sais !",
       start: "Commencer",
-      beginAdventure: "Débuter l'aventure"
+      beginAdventure: "Débuter l'aventure",
     },
     caregiverSessions: {
       title: "Journal des sessions",
       subtitle: "Sessions d'apprentissage chronologiques",
       noTitle: "Aucune session pour l'instant",
-      noMessage: "L'historique des sessions apparaîtra au fur et à mesure que l'apprenant complète des activités."
-    }
+      noMessage:
+        "L'historique des sessions apparaîtra au fur et à mesure que l'apprenant complète des activités.",
+    },
   },
 
   hi: {
@@ -392,7 +410,8 @@ const DATA = {
       approve: "स्वीकृत करें",
       decline: "अस्वीकार करें",
       adjust: "समायोजित करें",
-      featureUnavailable: "यह सुविधा अभी मोबाइल पर उपलब्ध नहीं है। कृपया जारी रखने के लिए AIVO वेब ऐप का उपयोग करें।",
+      featureUnavailable:
+        "यह सुविधा अभी मोबाइल पर उपलब्ध नहीं है। कृपया जारी रखने के लिए AIVO वेब ऐप का उपयोग करें।",
       overview: "अवलोकन",
       on: "चालू",
       off: "बंद",
@@ -400,7 +419,7 @@ const DATA = {
       confirm: "पुष्टि करें",
       appVersion: "AIVO Learning v1.0.0",
       unknownError: "अज्ञात त्रुटि",
-      done: "पूर्ण"
+      done: "पूर्ण",
     },
     learnerHomeworkSession: {
       title: "होमवर्क सत्र",
@@ -414,22 +433,26 @@ const DATA = {
       placeholder: "अपना उत्तर या प्रश्न टाइप करें…",
       send: "भेजें",
       thinking: "सोच रहा हूं…",
-      sendError: "माफ करें, मुझे उसके बारे में सोचने में परेशानी हुई। क्या आप फिर से कोशिश कर सकते हैं?",
+      sendError:
+        "माफ करें, मुझे उसके बारे में सोचने में परेशानी हुई। क्या आप फिर से कोशिश कर सकते हैं?",
       completeError: "सत्र समाप्त नहीं हो सका। कृपया पुनः प्रयास करें।",
       finish: "सत्र समाप्त करें",
       notFound: "यह होमवर्क सत्र लोड नहीं हो सका।",
-      greetingNoProblems: "नमस्ते! मैं आपके होमवर्क में मदद करने के लिए यहाँ हूं। आप किस पर काम करना चाहेंगे?",
-      greetingWithProblems: "नमस्ते! मैं देख रहा हूं आपके पास {{count}} समस्याएं हैं। समस्या {{first}} से शुरू करते हैं। इसे देखें और मुझे बताएं कि आपको लगता है पहला कदम क्या है!",
+      greetingNoProblems:
+        "नमस्ते! मैं आपके होमवर्क में मदद करने के लिए यहाँ हूं। आप किस पर काम करना चाहेंगे?",
+      greetingWithProblems:
+        "नमस्ते! मैं देख रहा हूं आपके पास {{count}} समस्याएं हैं। समस्या {{first}} से शुरू करते हैं। इसे देखें और मुझे बताएं कि आपको लगता है पहला कदम क्या है!",
       startRecording: "वॉयस इनपुट शुरू करें",
       stopRecording: "रिकॉर्डिंग रोकें",
       sttError: {
-        permission_denied: "माइक्रोफ़ोन एक्सेस अस्वीकार किया गया। वॉयस इनपुट का उपयोग करने के लिए सेटिंग्स में माइक्रोफ़ोन एक्सेस की अनुमति दें।",
+        permission_denied:
+          "माइक्रोफ़ोन एक्सेस अस्वीकार किया गया। वॉयस इनपुट का उपयोग करने के लिए सेटिंग्स में माइक्रोफ़ोन एक्सेस की अनुमति दें।",
         no_speech: "हमें कुछ सुनाई नहीं दिया। फिर से रिकॉर्ड करने का प्रयास करें।",
         unsupported: "इस डिवाइस पर वॉयस इनपुट समर्थित नहीं है।",
         network: "आपका ऑडियो भेजते समय नेटवर्क समस्या। फिर प्रयास करें।",
         transcription_failed: "ट्रांसक्राइब नहीं हो सका। फिर कोशिश करें या अपना जवाब टाइप करें।",
-        audio_capture: "ऑडियो रिकॉर्ड नहीं हो सका। फिर प्रयास करें।"
-      }
+        audio_capture: "ऑडियो रिकॉर्ड नहीं हो सका। फिर प्रयास करें।",
+      },
     },
     learnerChallenges: {
       title: "चुनौतियां",
@@ -446,7 +469,7 @@ const DATA = {
       inviteFriend: "मित्र को आमंत्रित करें",
       inviteText: "दोस्तों के साथ खेलने के लिए अपना आमंत्रण कोड साझा करें!",
       copyCode: "कोड कॉपी करें",
-      codeCopied: "आमंत्रण कोड क्लिपबोर्ड पर कॉपी किया गया!"
+      codeCopied: "आमंत्रण कोड क्लिपबोर्ड पर कॉपी किया गया!",
     },
     parentSettings: {
       title: "सेटिंग्स",
@@ -458,40 +481,42 @@ const DATA = {
       pinNoLearners: "PIN अपडेट करने के लिए कोई शिक्षार्थी प्रोफ़ाइल नहीं मिली।",
       pinUpdated: "{{name}} के लिए PIN अपडेट किया गया।",
       pinUpdateFailed: "PIN अपडेट करने में विफल।",
-      exportSummary: "आपका खाता डेटा तैयार किया गया है।\n\nनाम: {{name}}\nईमेल: {{email}}\nभूमिका: {{role}}\n\nपूर्ण डेटा निर्यात आपके ईमेल पर भेजा गया है।",
+      exportSummary:
+        "आपका खाता डेटा तैयार किया गया है।\n\nनाम: {{name}}\nईमेल: {{email}}\nभूमिका: {{role}}\n\nपूर्ण डेटा निर्यात आपके ईमेल पर भेजा गया है।",
       exportFailed: "डेटा निर्यात करने में विफल।",
       pinSelectLearner: "शिक्षार्थी चुनें",
-      unnamedLearner: "शिक्षार्थी"
+      unnamedLearner: "शिक्षार्थी",
     },
     caregiver: {
       greeting: "नमस्ते, {{name}}",
       assignedChildren: "आपके नियुक्त बच्चे",
       noChildrenTitle: "कोई बच्चा नियुक्त नहीं",
-      noChildrenMessage: "किसी माता-पिता को अपने बच्चे के लिए आपको देखभालकर्ता के रूप में आमंत्रित करना होगा।",
+      noChildrenMessage:
+        "किसी माता-पिता को अपने बच्चे के लिए आपको देखभालकर्ता के रूप में आमंत्रित करना होगा।",
       brain: "ब्रेन",
       iep: "IEP",
       sessions: "सत्र",
-      note: "नोट"
+      note: "नोट",
     },
     learnerTutor: {
       tutorNotFound: "ट्यूटर नहीं मिला",
       sessionDuration: "~15 मिनट का सत्र",
       adaptiveDifficulty: "अनुकूली कठिनाई",
       brainInformed: "ब्रेन-आधारित",
-      startSession: "{{name}} के साथ सत्र शुरू करें"
+      startSession: "{{name}} के साथ सत्र शुरू करें",
     },
     learnerAdventure: {
       title: "खोज साहसिक यात्रा",
       subtitle: "आइए देखें आप क्या जानते हैं!",
       start: "शुरू करें",
-      beginAdventure: "साहसिक यात्रा शुरू करें"
+      beginAdventure: "साहसिक यात्रा शुरू करें",
     },
     caregiverSessions: {
       title: "सत्र लॉग",
       subtitle: "कालानुक्रमिक शिक्षण सत्र",
       noTitle: "अभी तक कोई सत्र नहीं",
-      noMessage: "सत्र इतिहास तब दिखाई देगा जब शिक्षार्थी गतिविधियां पूरी करेगा।"
-    }
+      noMessage: "सत्र इतिहास तब दिखाई देगा जब शिक्षार्थी गतिविधियां पूरी करेगा।",
+    },
   },
 
   ja: {
@@ -514,7 +539,8 @@ const DATA = {
       approve: "承認",
       decline: "拒否",
       adjust: "調整",
-      featureUnavailable: "この機能はまだモバイルでは利用できません。続けるにはAIVOウェブアプリをご利用ください。",
+      featureUnavailable:
+        "この機能はまだモバイルでは利用できません。続けるにはAIVOウェブアプリをご利用ください。",
       overview: "概要",
       on: "オン",
       off: "オフ",
@@ -522,7 +548,7 @@ const DATA = {
       confirm: "確認",
       appVersion: "AIVO Learning v1.0.0",
       unknownError: "不明なエラー",
-      done: "完了"
+      done: "完了",
     },
     learnerHomeworkSession: {
       title: "宿題セッション",
@@ -541,17 +567,20 @@ const DATA = {
       finish: "セッションを終了",
       notFound: "この宿題セッションを読み込めませんでした。",
       greetingNoProblems: "こんにちは！宿題のお手伝いをします。何に取り組みたいですか？",
-      greetingWithProblems: "こんにちは！{{count}}問の問題があります。問題{{first}}から始めましょう。見てみて、最初のステップは何だと思いますか！",
+      greetingWithProblems:
+        "こんにちは！{{count}}問の問題があります。問題{{first}}から始めましょう。見てみて、最初のステップは何だと思いますか！",
       startRecording: "音声入力を開始",
       stopRecording: "録音を停止",
       sttError: {
-        permission_denied: "マイクのアクセスが拒否されました。音声入力を使用するには、設定でマイクのアクセスを許可してください。",
+        permission_denied:
+          "マイクのアクセスが拒否されました。音声入力を使用するには、設定でマイクのアクセスを許可してください。",
         no_speech: "何も聞こえませんでした。もう一度録音してください。",
         unsupported: "このデバイスでは音声入力はサポートされていません。",
         network: "音声の送信中にネットワーク問題が発生しました。もう一度お試しください。",
-        transcription_failed: "文字起こしできませんでした。もう一度試すか、回答を入力してください。",
-        audio_capture: "音声を録音できませんでした。もう一度お試しください。"
-      }
+        transcription_failed:
+          "文字起こしできませんでした。もう一度試すか、回答を入力してください。",
+        audio_capture: "音声を録音できませんでした。もう一度お試しください。",
+      },
     },
     learnerChallenges: {
       title: "チャレンジ",
@@ -568,7 +597,7 @@ const DATA = {
       inviteFriend: "友達を招待",
       inviteText: "招待コードを共有して友達と遊ぼう！",
       copyCode: "コードをコピー",
-      codeCopied: "招待コードをクリップボードにコピーしました！"
+      codeCopied: "招待コードをクリップボードにコピーしました！",
     },
     parentSettings: {
       title: "設定",
@@ -580,10 +609,11 @@ const DATA = {
       pinNoLearners: "PINを更新する学習者プロフィールが見つかりませんでした。",
       pinUpdated: "{{name}}のPINが更新されました。",
       pinUpdateFailed: "PINの更新に失敗しました。",
-      exportSummary: "アカウントデータが準備できました。\n\n名前: {{name}}\nメール: {{email}}\n役割: {{role}}\n\n完全なデータエクスポートがメールに送信されました。",
+      exportSummary:
+        "アカウントデータが準備できました。\n\n名前: {{name}}\nメール: {{email}}\n役割: {{role}}\n\n完全なデータエクスポートがメールに送信されました。",
       exportFailed: "データのエクスポートに失敗しました。",
       pinSelectLearner: "学習者を選択",
-      unnamedLearner: "学習者"
+      unnamedLearner: "学習者",
     },
     caregiver: {
       greeting: "こんにちは、{{name}}",
@@ -593,27 +623,27 @@ const DATA = {
       brain: "ブレイン",
       iep: "IEP",
       sessions: "セッション",
-      note: "メモ"
+      note: "メモ",
     },
     learnerTutor: {
       tutorNotFound: "チューターが見つかりません",
       sessionDuration: "約15分のセッション",
       adaptiveDifficulty: "適応型難易度",
       brainInformed: "ブレイン対応",
-      startSession: "{{name}}とのセッションを開始"
+      startSession: "{{name}}とのセッションを開始",
     },
     learnerAdventure: {
       title: "発見アドベンチャー",
       subtitle: "あなたが何を知っているか見てみよう！",
       start: "スタート",
-      beginAdventure: "アドベンチャーを始める"
+      beginAdventure: "アドベンチャーを始める",
     },
     caregiverSessions: {
       title: "セッションログ",
       subtitle: "時系列の学習セッション",
       noTitle: "まだセッションがありません",
-      noMessage: "学習者がアクティビティを完了するとセッション履歴が表示されます。"
-    }
+      noMessage: "学習者がアクティビティを完了するとセッション履歴が表示されます。",
+    },
   },
 
   ko: {
@@ -636,7 +666,8 @@ const DATA = {
       approve: "승인",
       decline: "거절",
       adjust: "조정",
-      featureUnavailable: "이 기능은 아직 모바일에서 이용할 수 없습니다. 계속하려면 AIVO 웹 앱을 사용해 주세요.",
+      featureUnavailable:
+        "이 기능은 아직 모바일에서 이용할 수 없습니다. 계속하려면 AIVO 웹 앱을 사용해 주세요.",
       overview: "개요",
       on: "켜짐",
       off: "꺼짐",
@@ -644,7 +675,7 @@ const DATA = {
       confirm: "확인",
       appVersion: "AIVO Learning v1.0.0",
       unknownError: "알 수 없는 오류",
-      done: "완료"
+      done: "완료",
     },
     learnerHomeworkSession: {
       title: "숙제 세션",
@@ -663,17 +694,19 @@ const DATA = {
       finish: "세션 완료",
       notFound: "이 숙제 세션을 불러올 수 없습니다.",
       greetingNoProblems: "안녕하세요! 숙제 도움을 드리러 왔어요. 무엇을 함께 해볼까요?",
-      greetingWithProblems: "안녕하세요! {{count}}개의 문제가 있군요. 문제 {{first}}부터 시작해 볼까요. 문제를 보고 첫 번째 단계가 무엇인지 알려주세요!",
+      greetingWithProblems:
+        "안녕하세요! {{count}}개의 문제가 있군요. 문제 {{first}}부터 시작해 볼까요. 문제를 보고 첫 번째 단계가 무엇인지 알려주세요!",
       startRecording: "음성 입력 시작",
       stopRecording: "녹음 중지",
       sttError: {
-        permission_denied: "마이크 접근이 거부되었습니다. 음성 입력을 사용하려면 설정에서 마이크 접근을 허용해 주세요.",
+        permission_denied:
+          "마이크 접근이 거부되었습니다. 음성 입력을 사용하려면 설정에서 마이크 접근을 허용해 주세요.",
         no_speech: "아무것도 들리지 않았습니다. 다시 녹음해 주세요.",
         unsupported: "이 기기에서는 음성 입력을 지원하지 않습니다.",
         network: "오디오 전송 중 네트워크 문제가 발생했습니다. 다시 시도해 주세요.",
         transcription_failed: "텍스트 변환에 실패했습니다. 다시 시도하거나 직접 입력해 주세요.",
-        audio_capture: "오디오를 녹음할 수 없습니다. 다시 시도해 주세요."
-      }
+        audio_capture: "오디오를 녹음할 수 없습니다. 다시 시도해 주세요.",
+      },
     },
     learnerChallenges: {
       title: "챌린지",
@@ -690,7 +723,7 @@ const DATA = {
       inviteFriend: "친구 초대",
       inviteText: "친구와 함께 플레이하려면 초대 코드를 공유하세요!",
       copyCode: "코드 복사",
-      codeCopied: "초대 코드가 클립보드에 복사되었습니다!"
+      codeCopied: "초대 코드가 클립보드에 복사되었습니다!",
     },
     parentSettings: {
       title: "설정",
@@ -702,10 +735,11 @@ const DATA = {
       pinNoLearners: "PIN을 업데이트할 학습자 프로필을 찾을 수 없습니다.",
       pinUpdated: "{{name}}의 PIN이 업데이트되었습니다.",
       pinUpdateFailed: "PIN 업데이트에 실패했습니다.",
-      exportSummary: "계정 데이터가 준비되었습니다.\n\n이름: {{name}}\n이메일: {{email}}\n역할: {{role}}\n\n전체 데이터 내보내기가 이메일로 전송되었습니다.",
+      exportSummary:
+        "계정 데이터가 준비되었습니다.\n\n이름: {{name}}\n이메일: {{email}}\n역할: {{role}}\n\n전체 데이터 내보내기가 이메일로 전송되었습니다.",
       exportFailed: "데이터 내보내기에 실패했습니다.",
       pinSelectLearner: "학습자 선택",
-      unnamedLearner: "학습자"
+      unnamedLearner: "학습자",
     },
     caregiver: {
       greeting: "안녕하세요, {{name}}",
@@ -715,27 +749,27 @@ const DATA = {
       brain: "브레인",
       iep: "IEP",
       sessions: "세션",
-      note: "메모"
+      note: "메모",
     },
     learnerTutor: {
       tutorNotFound: "튜터를 찾을 수 없습니다",
       sessionDuration: "~15분 세션",
       adaptiveDifficulty: "적응형 난이도",
       brainInformed: "브레인 기반",
-      startSession: "{{name}}와 세션 시작"
+      startSession: "{{name}}와 세션 시작",
     },
     learnerAdventure: {
       title: "발견 모험",
       subtitle: "네가 무엇을 알고 있는지 알아보자!",
       start: "시작",
-      beginAdventure: "모험 시작"
+      beginAdventure: "모험 시작",
     },
     caregiverSessions: {
       title: "세션 기록",
       subtitle: "시간순 학습 세션",
       noTitle: "아직 세션 없음",
-      noMessage: "학습자가 활동을 완료하면 세션 기록이 표시됩니다."
-    }
+      noMessage: "학습자가 활동을 완료하면 세션 기록이 표시됩니다.",
+    },
   },
 
   pt: {
@@ -758,7 +792,8 @@ const DATA = {
       approve: "Aprovar",
       decline: "Recusar",
       adjust: "Ajustar",
-      featureUnavailable: "Este recurso ainda não está disponível no celular. Use o aplicativo web AIVO para continuar.",
+      featureUnavailable:
+        "Este recurso ainda não está disponível no celular. Use o aplicativo web AIVO para continuar.",
       overview: "Visão geral",
       on: "Ativado",
       off: "Desativado",
@@ -766,7 +801,7 @@ const DATA = {
       confirm: "Confirmar",
       appVersion: "AIVO Learning v1.0.0",
       unknownError: "Erro desconhecido",
-      done: "Concluído"
+      done: "Concluído",
     },
     learnerHomeworkSession: {
       title: "Sessão de Lição de Casa",
@@ -784,18 +819,22 @@ const DATA = {
       completeError: "Não foi possível finalizar a sessão. Por favor, tente novamente.",
       finish: "Finalizar sessão",
       notFound: "Não foi possível carregar esta sessão de lição de casa.",
-      greetingNoProblems: "Olá! Estou aqui para ajudar com sua lição de casa. No que você gostaria de trabalhar?",
-      greetingWithProblems: "Olá! Vejo que você tem {{count}} problemas para resolver. Vamos começar com o Problema {{first}}. Dê uma olhada e me diga qual você acha que é o primeiro passo!",
+      greetingNoProblems:
+        "Olá! Estou aqui para ajudar com sua lição de casa. No que você gostaria de trabalhar?",
+      greetingWithProblems:
+        "Olá! Vejo que você tem {{count}} problemas para resolver. Vamos começar com o Problema {{first}}. Dê uma olhada e me diga qual você acha que é o primeiro passo!",
       startRecording: "Iniciar entrada de voz",
       stopRecording: "Parar gravação",
       sttError: {
-        permission_denied: "Acesso ao microfone foi negado. Permita o acesso ao microfone nas configurações para usar a entrada de voz.",
+        permission_denied:
+          "Acesso ao microfone foi negado. Permita o acesso ao microfone nas configurações para usar a entrada de voz.",
         no_speech: "Não conseguimos ouvir nada. Tente gravar novamente.",
         unsupported: "A entrada de voz não é suportada neste dispositivo.",
         network: "Problema de rede ao enviar seu áudio. Tente novamente.",
-        transcription_failed: "Não foi possível transcrever. Tente novamente ou digite sua resposta.",
-        audio_capture: "Não foi possível gravar o áudio. Tente novamente."
-      }
+        transcription_failed:
+          "Não foi possível transcrever. Tente novamente ou digite sua resposta.",
+        audio_capture: "Não foi possível gravar o áudio. Tente novamente.",
+      },
     },
     learnerChallenges: {
       title: "Desafios",
@@ -812,7 +851,7 @@ const DATA = {
       inviteFriend: "Convidar um amigo",
       inviteText: "Compartilhe seu código de convite para jogar com amigos!",
       copyCode: "Copiar código",
-      codeCopied: "Código de convite copiado para a área de transferência!"
+      codeCopied: "Código de convite copiado para a área de transferência!",
     },
     parentSettings: {
       title: "Configurações",
@@ -824,10 +863,11 @@ const DATA = {
       pinNoLearners: "Nenhum perfil de aluno encontrado para atualizar o PIN.",
       pinUpdated: "PIN atualizado para {{name}}.",
       pinUpdateFailed: "Falha ao atualizar o PIN.",
-      exportSummary: "Seus dados de conta foram preparados.\n\nNome: {{name}}\nEmail: {{email}}\nFunção: {{role}}\n\nUma exportação completa dos dados foi enviada para seu email.",
+      exportSummary:
+        "Seus dados de conta foram preparados.\n\nNome: {{name}}\nEmail: {{email}}\nFunção: {{role}}\n\nUma exportação completa dos dados foi enviada para seu email.",
       exportFailed: "Falha ao exportar dados.",
       pinSelectLearner: "Escolher aluno",
-      unnamedLearner: "Aluno"
+      unnamedLearner: "Aluno",
     },
     caregiver: {
       greeting: "Olá, {{name}}",
@@ -837,27 +877,27 @@ const DATA = {
       brain: "Cérebro",
       iep: "IEP",
       sessions: "Sessões",
-      note: "Nota"
+      note: "Nota",
     },
     learnerTutor: {
       tutorNotFound: "Tutor não encontrado",
       sessionDuration: "~15 min de sessão",
       adaptiveDifficulty: "Dificuldade adaptativa",
       brainInformed: "Baseado no cérebro",
-      startSession: "Iniciar sessão com {{name}}"
+      startSession: "Iniciar sessão com {{name}}",
     },
     learnerAdventure: {
       title: "Aventura de Descoberta",
       subtitle: "Vamos descobrir o que você sabe!",
       start: "Começar",
-      beginAdventure: "Iniciar aventura"
+      beginAdventure: "Iniciar aventura",
     },
     caregiverSessions: {
       title: "Registro de Sessões",
       subtitle: "Sessões de aprendizado em ordem cronológica",
       noTitle: "Nenhuma Sessão Ainda",
-      noMessage: "O histórico de sessões aparecerá conforme o aluno conclui atividades."
-    }
+      noMessage: "O histórico de sessões aparecerá conforme o aluno conclui atividades.",
+    },
   },
 
   zh: {
@@ -888,7 +928,7 @@ const DATA = {
       confirm: "确认",
       appVersion: "AIVO Learning v1.0.0",
       unknownError: "未知错误",
-      done: "完成"
+      done: "完成",
     },
     learnerHomeworkSession: {
       title: "作业辅导会话",
@@ -907,7 +947,8 @@ const DATA = {
       finish: "结束会话",
       notFound: "无法加载此作业会话。",
       greetingNoProblems: "你好！我在这里帮你完成作业。你想做哪个题目呢？",
-      greetingWithProblems: "你好！我看到你有 {{count}} 道题需要完成。让我们从第 {{first}} 题开始。看一看，告诉我你认为第一步是什么！",
+      greetingWithProblems:
+        "你好！我看到你有 {{count}} 道题需要完成。让我们从第 {{first}} 题开始。看一看，告诉我你认为第一步是什么！",
       startRecording: "开始语音输入",
       stopRecording: "停止录音",
       sttError: {
@@ -916,8 +957,8 @@ const DATA = {
         unsupported: "此设备不支持语音输入。",
         network: "发送音频时出现网络问题，请重试。",
         transcription_failed: "无法转录，请重试或输入您的回答。",
-        audio_capture: "无法录制音频，请重试。"
-      }
+        audio_capture: "无法录制音频，请重试。",
+      },
     },
     learnerChallenges: {
       title: "挑战",
@@ -934,7 +975,7 @@ const DATA = {
       inviteFriend: "邀请朋友",
       inviteText: "分享邀请码与朋友一起游戏！",
       copyCode: "复制邀请码",
-      codeCopied: "邀请码已复制到剪贴板！"
+      codeCopied: "邀请码已复制到剪贴板！",
     },
     parentSettings: {
       title: "设置",
@@ -946,10 +987,11 @@ const DATA = {
       pinNoLearners: "未找到可更新 PIN 的学习者档案。",
       pinUpdated: "已更新 {{name}} 的 PIN。",
       pinUpdateFailed: "更新 PIN 失败。",
-      exportSummary: "您的账户数据已准备好。\n\n姓名：{{name}}\n邮箱：{{email}}\n角色：{{role}}\n\n完整数据导出已发送至您的邮箱。",
+      exportSummary:
+        "您的账户数据已准备好。\n\n姓名：{{name}}\n邮箱：{{email}}\n角色：{{role}}\n\n完整数据导出已发送至您的邮箱。",
       exportFailed: "导出数据失败。",
       pinSelectLearner: "选择学习者",
-      unnamedLearner: "学习者"
+      unnamedLearner: "学习者",
     },
     caregiver: {
       greeting: "你好，{{name}}",
@@ -959,35 +1001,41 @@ const DATA = {
       brain: "大脑",
       iep: "IEP",
       sessions: "会话",
-      note: "备注"
+      note: "备注",
     },
     learnerTutor: {
       tutorNotFound: "未找到辅导老师",
       sessionDuration: "约15分钟会话",
       adaptiveDifficulty: "自适应难度",
       brainInformed: "脑科学驱动",
-      startSession: "与 {{name}} 开始会话"
+      startSession: "与 {{name}} 开始会话",
     },
     learnerAdventure: {
       title: "探索冒险",
       subtitle: "让我们看看你知道什么！",
       start: "开始",
-      beginAdventure: "开始冒险"
+      beginAdventure: "开始冒险",
     },
     caregiverSessions: {
       title: "会话记录",
       subtitle: "按时间顺序排列的学习会话",
       noTitle: "暂无会话",
-      noMessage: "当学习者完成活动后，会话历史将显示在这里。"
-    }
+      noMessage: "当学习者完成活动后，会话历史将显示在这里。",
+    },
   },
 };
 
-function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
-  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
-  else t[k]=v;}return t;}
+function deepMerge(t, s) {
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if (!t[k] || typeof t[k] !== "object") t[k] = {};
+      deepMerge(t[k], v);
+    } else t[k] = v;
+  }
+  return t;
+}
 
-let n=0;
+let n = 0;
 for (const [locale, roots] of Object.entries(DATA)) {
   const file = join(dir, `${locale}.json`);
   const json = JSON.parse(readFileSync(file, "utf8"));

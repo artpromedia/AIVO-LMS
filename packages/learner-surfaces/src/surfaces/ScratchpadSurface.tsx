@@ -49,13 +49,9 @@ export function ScratchpadSurface({
 
   return (
     <section aria-label="scratchpad-surface" className="flex flex-col gap-4">
-      <p className="text-lg font-semibold text-iw-text-strong leading-snug">
-        {surface.prompt}
-      </p>
+      <p className="text-lg font-semibold text-iw-text-strong leading-snug">{surface.prompt}</p>
       {surface.instructions ? (
-        <p className="text-sm text-iw-text-muted leading-relaxed">
-          {surface.instructions}
-        </p>
+        <p className="text-sm text-iw-text-muted leading-relaxed">{surface.instructions}</p>
       ) : null}
       <div
         className="rounded-iw-card-lg border-2 border-iw-border bg-white p-3 shadow-sm"

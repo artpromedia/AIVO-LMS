@@ -82,7 +82,9 @@ export default function CareersPage() {
       accentColor={MARKETING_ACCENTS.emeraldDeep}
     >
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">{t("why_work_heading")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">
+          {t("why_work_heading")}
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {PERKS.map((perk) => (
             <div
@@ -98,7 +100,9 @@ export default function CareersPage() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">{t("open_positions_heading")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">
+          {t("open_positions_heading")}
+        </h2>
         <div className="space-y-8">
           {DEPARTMENTS.map((dept) => (
             <div key={dept.name}>
@@ -137,7 +141,9 @@ export default function CareersPage() {
       </section>
 
       <div className="mt-16 p-8 rounded-3xl bg-emerald-50 border border-emerald-100 text-center">
-        <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">{t("no_role_heading")}</h3>
+        <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">
+          {t("no_role_heading")}
+        </h3>
         <p className="text-slate-600 font-body mb-6">
           We are always interested in hearing from talented people passionate about education and
           technology.

@@ -77,7 +77,9 @@ export default async function TeacherLessonPlansPage() {
           <p className="mt-1 font-display text-3xl font-semibold">{plans.length}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">{t("ai_jobs")}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+            {t("ai_jobs")}
+          </p>
           <p className="mt-1 font-display text-3xl font-semibold">{completeCount}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
             {runningCount} running · {failedCount} failed

@@ -22,7 +22,8 @@ const DATA = {
     progress: {
       eyebrow: "Progress",
       title: "How {name} is growing",
-      description: "A calm snapshot of mastery across subjects, recent lessons, and where to focus next.",
+      description:
+        "A calm snapshot of mastery across subjects, recent lessons, and where to focus next.",
       empty_title: "No mastery yet",
       empty_body: "Finish a baseline assessment so we can start tracking growth.",
       empty_cta_parent: "Open setup",
@@ -59,7 +60,8 @@ const DATA = {
       kind_stretch: "Stretch goal",
       welcome: "Welcome to {name}",
       baseline_first_title: "Finish the baseline first",
-      baseline_first_body: "Once you've done the baseline check-in, we'll pick the right starting skill for you here.",
+      baseline_first_body:
+        "Once you've done the baseline check-in, we'll pick the right starting skill for you here.",
       start_baseline: "Start baseline",
       with_tutor: "{subject} with {tutor}",
       iep_on: "IEP supports on",
@@ -82,7 +84,8 @@ const DATA = {
     progress: {
       eyebrow: "Progreso",
       title: "Cómo está creciendo {name}",
-      description: "Una vista tranquila del dominio por materias, las lecciones recientes y en qué enfocarse después.",
+      description:
+        "Una vista tranquila del dominio por materias, las lecciones recientes y en qué enfocarse después.",
       empty_title: "Aún no hay dominio",
       empty_body: "Termina una evaluación de nivel para que podamos empezar a seguir el progreso.",
       empty_cta_parent: "Abrir configuración",
@@ -98,7 +101,8 @@ const DATA = {
       lessons_completed: "Lecciones completadas",
       last_14: "Últimos 14 días",
       lessons_aria: "Lecciones completadas por día",
-      no_lessons_waiting: "Aún no hay lecciones. La misión de hoy te espera en tu página de inicio.",
+      no_lessons_waiting:
+        "Aún no hay lecciones. La misión de hoy te espera en tu página de inicio.",
       mastery_by_subject: "Dominio por materia",
       dot_view_desc: "Vista de puntos tranquila: la altura = dominio promedio",
       skill_map: "Mapa de dominio de habilidades",
@@ -119,7 +123,8 @@ const DATA = {
       kind_stretch: "Meta de reto",
       welcome: "Bienvenido a {name}",
       baseline_first_title: "Primero termina el nivel inicial",
-      baseline_first_body: "Cuando hayas hecho el encuentro de nivel inicial, elegiremos aquí la habilidad de inicio adecuada para ti.",
+      baseline_first_body:
+        "Cuando hayas hecho el encuentro de nivel inicial, elegiremos aquí la habilidad de inicio adecuada para ti.",
       start_baseline: "Empezar el nivel inicial",
       with_tutor: "{subject} con {tutor}",
       iep_on: "Apoyos del IEP activados",
@@ -142,9 +147,11 @@ const DATA = {
     progress: {
       eyebrow: "Progression",
       title: "Comment {name} progresse",
-      description: "Un aperçu apaisé de la maîtrise par matière, des leçons récentes et de la prochaine priorité.",
+      description:
+        "Un aperçu apaisé de la maîtrise par matière, des leçons récentes et de la prochaine priorité.",
       empty_title: "Pas encore de maîtrise",
-      empty_body: "Termine une évaluation de départ pour qu'on puisse commencer à suivre la progression.",
+      empty_body:
+        "Termine une évaluation de départ pour qu'on puisse commencer à suivre la progression.",
       empty_cta_parent: "Ouvrir la configuration",
       empty_cta_learner: "Commencer l'évaluation",
       metric_overall: "Maîtrise globale",
@@ -179,7 +186,8 @@ const DATA = {
       kind_stretch: "Objectif de dépassement",
       welcome: "Bienvenue en {name}",
       baseline_first_title: "Termine d'abord l'évaluation de départ",
-      baseline_first_body: "Une fois le rendez-vous d'évaluation fait, on choisira ici la bonne compétence de départ pour toi.",
+      baseline_first_body:
+        "Une fois le rendez-vous d'évaluation fait, on choisira ici la bonne compétence de départ pour toi.",
       start_baseline: "Commencer l'évaluation",
       with_tutor: "{subject} avec {tutor}",
       iep_on: "Aides IEP activées",
@@ -202,7 +210,8 @@ const DATA = {
     progress: {
       eyebrow: "Fortschritt",
       title: "Wie {name} wächst",
-      description: "Ein ruhiger Überblick über die Beherrschung in allen Fächern, jüngste Lektionen und den nächsten Fokus.",
+      description:
+        "Ein ruhiger Überblick über die Beherrschung in allen Fächern, jüngste Lektionen und den nächsten Fokus.",
       empty_title: "Noch keine Beherrschung",
       empty_body: "Schließe eine Einstufung ab, damit wir das Wachstum verfolgen können.",
       empty_cta_parent: "Einrichtung öffnen",
@@ -239,7 +248,8 @@ const DATA = {
       kind_stretch: "Stretch-Ziel",
       welcome: "Willkommen bei {name}",
       baseline_first_title: "Schließe zuerst die Einstufung ab",
-      baseline_first_body: "Sobald du den Einstufungs-Check gemacht hast, wählen wir hier die richtige Startfähigkeit für dich.",
+      baseline_first_body:
+        "Sobald du den Einstufungs-Check gemacht hast, wählen wir hier die richtige Startfähigkeit für dich.",
       start_baseline: "Einstufung starten",
       with_tutor: "{subject} mit {tutor}",
       iep_on: "IEP-Hilfen an",
@@ -262,7 +272,8 @@ const DATA = {
     progress: {
       eyebrow: "Progresso",
       title: "Como {name} está crescendo",
-      description: "Um panorama calmo do domínio nas matérias, das lições recentes e de onde focar a seguir.",
+      description:
+        "Um panorama calmo do domínio nas matérias, das lições recentes e de onde focar a seguir.",
       empty_title: "Ainda sem domínio",
       empty_body: "Conclua uma avaliação de nível para começarmos a acompanhar o crescimento.",
       empty_cta_parent: "Abrir configuração",
@@ -278,7 +289,8 @@ const DATA = {
       lessons_completed: "Lições concluídas",
       last_14: "Últimos 14 dias",
       lessons_aria: "Lições concluídas por dia",
-      no_lessons_waiting: "Ainda sem lições. A missão de hoje espera por você na sua página inicial.",
+      no_lessons_waiting:
+        "Ainda sem lições. A missão de hoje espera por você na sua página inicial.",
       mastery_by_subject: "Domínio por matéria",
       dot_view_desc: "Visão de pontos calma — altura = domínio médio",
       skill_map: "Mapa de domínio de habilidades",
@@ -299,7 +311,8 @@ const DATA = {
       kind_stretch: "Meta de desafio",
       welcome: "Bem-vindo a {name}",
       baseline_first_title: "Primeiro conclua o nível inicial",
-      baseline_first_body: "Depois de fazer o encontro de nível inicial, escolheremos aqui a habilidade inicial certa para você.",
+      baseline_first_body:
+        "Depois de fazer o encontro de nível inicial, escolheremos aqui a habilidade inicial certa para você.",
       start_baseline: "Começar o nível inicial",
       with_tutor: "{subject} com {tutor}",
       iep_on: "Apoios do IEP ativados",
@@ -382,7 +395,8 @@ const DATA = {
     progress: {
       eyebrow: "進捗",
       title: "{name} の成長",
-      description: "教科ごとの習熟度、最近のレッスン、次に集中するポイントの落ち着いたスナップショット。",
+      description:
+        "教科ごとの習熟度、最近のレッスン、次に集中するポイントの落ち着いたスナップショット。",
       empty_title: "まだ習熟度はありません",
       empty_body: "ベースライン評価を終えると、成長を記録し始められます。",
       empty_cta_parent: "セットアップを開く",
@@ -419,7 +433,8 @@ const DATA = {
       kind_stretch: "ストレッチ目標",
       welcome: "{name} へようこそ",
       baseline_first_title: "まずベースラインを終えよう",
-      baseline_first_body: "ベースラインのチェックインを終えたら、ここであなたに合った最初のスキルを選びます。",
+      baseline_first_body:
+        "ベースラインのチェックインを終えたら、ここであなたに合った最初のスキルを選びます。",
       start_baseline: "ベースラインを始める",
       with_tutor: "{tutor} と一緒に {subject}",
       iep_on: "IEP サポートがオン",
@@ -562,7 +577,8 @@ const DATA = {
     progress: {
       eyebrow: "प्रगति",
       title: "{name} कैसे बढ़ रहा है",
-      description: "विषयों में महारत, हाल के पाठ, और आगे कहाँ ध्यान देना है, इसका एक शांत स्नैपशॉट।",
+      description:
+        "विषयों में महारत, हाल के पाठ, और आगे कहाँ ध्यान देना है, इसका एक शांत स्नैपशॉट।",
       empty_title: "अभी कोई महारत नहीं",
       empty_body: "एक आधार मूल्यांकन पूरा करो ताकि हम वृद्धि ट्रैक करना शुरू कर सकें।",
       empty_cta_parent: "सेटअप खोलें",
@@ -599,7 +615,8 @@ const DATA = {
       kind_stretch: "चुनौती लक्ष्य",
       welcome: "{name} में स्वागत है",
       baseline_first_title: "पहले आधार पूरा करो",
-      baseline_first_body: "आधार चेक-इन पूरा करने के बाद, हम यहाँ तुम्हारे लिए सही शुरुआती कौशल चुनेंगे।",
+      baseline_first_body:
+        "आधार चेक-इन पूरा करने के बाद, हम यहाँ तुम्हारे लिए सही शुरुआती कौशल चुनेंगे।",
       start_baseline: "आधार शुरू करें",
       with_tutor: "{tutor} के साथ {subject}",
       iep_on: "IEP सहायताएँ चालू",

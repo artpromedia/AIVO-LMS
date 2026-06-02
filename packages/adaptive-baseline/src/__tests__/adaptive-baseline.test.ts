@@ -111,7 +111,7 @@ describe("adaptive-baseline", () => {
   });
 
   it("moves θ up after a correct answer and down after a wrong one", () => {
-    let s = initBaseline();
+    const s = initBaseline();
     const it = bank.find((b) => b.id === "i3")!;
     const sUp = recordResponse({
       state: s,
@@ -314,8 +314,16 @@ describe("2-PL discrimination", () => {
     let sHi = initBaseline();
     let sLo = initBaseline();
     for (let i = 0; i < 6; i++) {
-      sHi = recordResponse({ state: sHi, item: hi, response: { itemId: "a", correct: i % 2 === 0, responseTimeMs: 1 } });
-      sLo = recordResponse({ state: sLo, item: lo, response: { itemId: "b", correct: i % 2 === 0, responseTimeMs: 1 } });
+      sHi = recordResponse({
+        state: sHi,
+        item: hi,
+        response: { itemId: "a", correct: i % 2 === 0, responseTimeMs: 1 },
+      });
+      sLo = recordResponse({
+        state: sLo,
+        item: lo,
+        response: { itemId: "b", correct: i % 2 === 0, responseTimeMs: 1 },
+      });
     }
     // More info accumulated ⇒ smaller SE.
     expect(shouldStop(sHi).se).toBeLessThan(shouldStop(sLo).se);

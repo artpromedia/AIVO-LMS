@@ -5,11 +5,11 @@ regressing learners. Reversible at every step.
 
 ## Flags
 
-| Flag | Gates | Default |
-|------|-------|---------|
-| `AIVO_FEATURE_BASELINE_ADAPTIVE` | local adaptive selection + the wider BANK pool + telemetry capture | OFF in prod, ON in dev/preview |
-| `AIVO_FEATURE_BASELINE_STREAMING` | drive the assessment-svc session run-loop instead of the local pool | OFF (explicit opt-in) |
-| `CRON_SECRET` | authorizes the scheduled recalibration job (`GET /api/bff/admin/baseline-recalibration/run`) | unset |
+| Flag                              | Gates                                                                                        | Default                        |
+| --------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------ |
+| `AIVO_FEATURE_BASELINE_ADAPTIVE`  | local adaptive selection + the wider BANK pool + telemetry capture                           | OFF in prod, ON in dev/preview |
+| `AIVO_FEATURE_BASELINE_STREAMING` | drive the assessment-svc session run-loop instead of the local pool                          | OFF (explicit opt-in)          |
+| `CRON_SECRET`                     | authorizes the scheduled recalibration job (`GET /api/bff/admin/baseline-recalibration/run`) | unset                          |
 
 The fixed-form BANK path is always retained as the fallback: any failure
 in the adaptive/streaming path degrades to it, so the flags are true kill
@@ -40,12 +40,14 @@ Implemented in `lib/learner/baseline-parity.ts`
 shadow/monitoring job can score a cohort.
 
 Metrics per run:
+
 - **Completion** — did the run finish.
 - **Placement agreement** — the adaptive θ-derived band lands within one
   band of the simple accuracy-derived band (they shouldn't disagree wildly
   on where to start a learner).
 
 Default thresholds (`DEFAULT_PARITY_THRESHOLDS`):
+
 - `minCompletionRate: 0.90`
 - `minAgreementRate: 0.80`
 

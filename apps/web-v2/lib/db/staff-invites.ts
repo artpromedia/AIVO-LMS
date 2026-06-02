@@ -75,7 +75,7 @@ export function createStaffInvite(input: CreateStaffInviteInput): CreateStaffInv
 
   const reg = registry();
   const dupe = reg.invites.find(
-    (i) => i.tenantId === input.tenantId && i.email === email && i.status === "PENDING"
+    (i) => i.tenantId === input.tenantId && i.email === email && i.status === "PENDING",
   );
   if (dupe) return { ok: false, error: "An invitation is already pending for that email." };
 

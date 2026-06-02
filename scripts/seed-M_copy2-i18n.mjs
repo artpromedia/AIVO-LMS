@@ -258,7 +258,8 @@ const DATA = {
         mockup_lesson_title: "Multiplier par 3",
         mockup_lesson_meta: "Avec Atlas · ~15 minutes · Mathématiques",
         mockup_start_mission: "Démarrer la mission →",
-        mockup_accessibility_note: "La lecture à voix haute et le mode pause sont activés pour Maya.",
+        mockup_accessibility_note:
+          "La lecture à voix haute et le mode pause sont activés pour Maya.",
         visibility_title: "Une visibilité en langage clair, pas un déversement de données",
       },
       page_for_districts: {
@@ -401,8 +402,7 @@ const DATA = {
       page_forgot_password: {
         logo_aria_label: "Início do AIVO",
         heading: "Esqueceu a senha?",
-        subheading:
-          "Digite seu e-mail e enviaremos um link para redefinir sua senha.",
+        subheading: "Digite seu e-mail e enviaremos um link para redefinir sua senha.",
         check_inbox: "Verifique sua caixa de entrada",
         if_account_exists: "Se existir uma conta para",
         back_to_sign_in: "Voltar para entrar",
@@ -570,8 +570,7 @@ const DATA = {
       page_forgot_password: {
         logo_aria_label: "AIVO ホーム",
         heading: "パスワードをお忘れですか？",
-        subheading:
-          "メールアドレスを入力してください。パスワード再設定リンクをお送りします。",
+        subheading: "メールアドレスを入力してください。パスワード再設定リンクをお送りします。",
         check_inbox: "受信トレイを確認してください",
         if_account_exists: "このアドレスにアカウントが存在する場合：",
         back_to_sign_in: "サインインに戻る",
@@ -894,7 +893,7 @@ for (const [locale, roots] of Object.entries(DATA)) {
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
   console.log(
-    `seed-M_copy2-i18n: merged page_signup/page_forgot_password/page_press_kit/page_features_todays_mission/page_for_districts/page_guides/page_compare/page_for_special_education/page_tutors → messages/${locale}.json`
+    `seed-M_copy2-i18n: merged page_signup/page_forgot_password/page_press_kit/page_features_todays_mission/page_for_districts/page_guides/page_compare/page_for_special_education/page_tutors → messages/${locale}.json`,
   );
 }
 console.log(`\nseed-M_copy2-i18n: done — ${written} locale catalogs updated.`);

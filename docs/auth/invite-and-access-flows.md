@@ -20,15 +20,15 @@ All flows share a common substrate:
 
 ## Roles at a glance
 
-| Role | Scope | Provisioned by |
-|------|-------|----------------|
-| `PLATFORM_ADMIN` | Global | AIVO ops (seed / manual) |
-| `DISTRICT_ADMIN` | One tenant (district) | Token-based invite from another DISTRICT_ADMIN |
-| `SCHOOL_ADMIN` | One school within a tenant | Token-based invite from a DISTRICT_ADMIN |
-| `TEACHER` | School roster + parent-invited learners | Created by DISTRICT_ADMIN (or SCHOOL_ADMIN) via `POST /api/district/staff` |
-| `THERAPIST` / `CAREGIVER` | Per-learner, parent-initiated | Parent invite (`learner_therapists` / `learner_caregivers`) |
-| `PARENT` | Self-onboarded; controls their `learners` rows | Signup or accept of a teacher-initiated invite |
-| `LEARNER` | Created as a child of a PARENT | Parent onboarding |
+| Role                      | Scope                                          | Provisioned by                                                             |
+| ------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
+| `PLATFORM_ADMIN`          | Global                                         | AIVO ops (seed / manual)                                                   |
+| `DISTRICT_ADMIN`          | One tenant (district)                          | Token-based invite from another DISTRICT_ADMIN                             |
+| `SCHOOL_ADMIN`            | One school within a tenant                     | Token-based invite from a DISTRICT_ADMIN                                   |
+| `TEACHER`                 | School roster + parent-invited learners        | Created by DISTRICT_ADMIN (or SCHOOL_ADMIN) via `POST /api/district/staff` |
+| `THERAPIST` / `CAREGIVER` | Per-learner, parent-initiated                  | Parent invite (`learner_therapists` / `learner_caregivers`)                |
+| `PARENT`                  | Self-onboarded; controls their `learners` rows | Signup or accept of a teacher-initiated invite                             |
+| `LEARNER`                 | Created as a child of a PARENT                 | Parent onboarding                                                          |
 
 ## The seven flows
 
@@ -54,7 +54,7 @@ All flows share a common substrate:
 - **Table**: `learner_caregivers`
 - **Cap**: 2 caregivers per learner.
 
-### 4. Teacher → Parent  *(added in Sprint 3 of the invite-flows series)*
+### 4. Teacher → Parent _(added in Sprint 3 of the invite-flows series)_
 
 The inverse of flow 2. A teacher who runs a classroom containing a
 learner can invite that learner's parent to confirm the connection.
@@ -84,8 +84,8 @@ learner can invite that learner's parent to confirm the connection.
 ### 5. District Admin → School Admin
 
 - **Endpoint**: `POST /api/district/admins` with `{ role: 'SCHOOL_ADMIN', schoolId }`
-  *(role param added in Sprint 1 of invite-flows; `role: 'DISTRICT_ADMIN'`
-  is the legacy default)*
+  _(role param added in Sprint 1 of invite-flows; `role: 'DISTRICT_ADMIN'`
+  is the legacy default)_
 - **Step-up**: required (scope `district:admin-mgmt`).
 - **Table**: `district_admin_invites` (now carries `role` + `school_id`).
 - **Email**: `school_admin_invite` (or `district_admin_invite`) template.
@@ -109,7 +109,7 @@ learner can invite that learner's parent to confirm the connection.
 
 ### 7. Teacher manages multiple children (unified roster)
 
-- **Endpoint**: `GET /api/teacher/roster` *(added in Sprint 4)*
+- **Endpoint**: `GET /api/teacher/roster` _(added in Sprint 4)_
 - **Source**:
   [`services/family-svc/src/routes/collaboration.ts`](../../services/family-svc/src/routes/collaboration.ts)
 - Merges two paths into one deduplicated list:
@@ -120,7 +120,7 @@ learner can invite that learner's parent to confirm the connection.
 - Each entry carries `source: "classroom" | "parent_invite" | "both"`,
   `classroomId`, `classroomName`, `parentName`, and `parentEmail`.
 
-## Invite hygiene  *(Sprint 5)*
+## Invite hygiene _(Sprint 5)_
 
 - **Resend (generic)**:
   `POST /api/family/collaboration/invites/:kind/:id/resend` where

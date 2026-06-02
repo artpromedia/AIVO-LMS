@@ -12,7 +12,12 @@ import { EmptyState, LoadingState } from "@aivo/mobile-ui";
 import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
-interface S { id: string; firstName?: string; lastName?: string; gradeLevel?: string }
+interface S {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  gradeLevel?: string;
+}
 
 /**
  * Caregiver learners (MOB-CGV-001) — mirror of web's
@@ -47,13 +52,20 @@ export default function CaregiverLearnersScreen() {
             >
               <Card tone="raised" style={styles.row}>
                 <View style={[styles.avatar, { backgroundColor: palette.accentSoft }]}>
-                  <Text style={[styles.initial, { color: palette.accent }]}>{l.firstName?.[0] ?? "?"}</Text>
+                  <Text style={[styles.initial, { color: palette.accent }]}>
+                    {l.firstName?.[0] ?? "?"}
+                  </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={[styles.name, { color: palette.ink }]}>{l.firstName} {l.lastName}</Text>
+                  <Text style={[styles.name, { color: palette.ink }]}>
+                    {l.firstName} {l.lastName}
+                  </Text>
                   {l.gradeLevel ? (
                     <Text style={[styles.meta, { color: palette.inkMuted }]}>
-                      {t("common.grade", { grade: l.gradeLevel, defaultValue: `Grade ${l.gradeLevel}` })}
+                      {t("common.grade", {
+                        grade: l.gradeLevel,
+                        defaultValue: `Grade ${l.gradeLevel}`,
+                      })}
                     </Text>
                   ) : null}
                 </View>
@@ -69,7 +81,13 @@ export default function CaregiverLearnersScreen() {
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: spacing.md },
-  avatar: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   initial: { fontSize: 20, fontFamily: fontFamilies.displayBold },
   name: { fontSize: 16, fontFamily: fontFamilies.bodyBold },
   meta: { fontSize: 13, fontFamily: fontFamilies.bodyRegular, marginTop: 2 },

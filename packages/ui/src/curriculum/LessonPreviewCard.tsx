@@ -84,9 +84,7 @@ export function LessonPreviewCard({
     >
       <header className="flex items-start justify-between gap-3 flex-wrap">
         <div className="min-w-0">
-          {subject ? (
-            <p className="iw-label text-iw-text-muted">{subject}</p>
-          ) : null}
+          {subject ? <p className="iw-label text-iw-text-muted">{subject}</p> : null}
           <h3 className="text-xl md:text-2xl font-semibold text-iw-text-strong leading-snug mt-1">
             {skillName}
           </h3>
@@ -110,7 +108,9 @@ export function LessonPreviewCard({
         {typeof estimateMinutes === "number" ? (
           <div>
             <dt className="iw-label text-iw-text-muted">Estimated time</dt>
-            <dd className="font-semibold text-iw-text-strong tabular-nums">{estimateMinutes} min</dd>
+            <dd className="font-semibold text-iw-text-strong tabular-nums">
+              {estimateMinutes} min
+            </dd>
           </div>
         ) : null}
         {prerequisites && prerequisites.length > 0 ? (

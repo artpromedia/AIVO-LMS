@@ -124,8 +124,7 @@ const TOGGLES: Array<{
   {
     key: "aacEnabled",
     label: "AAC support",
-    help:
-      "Turn on switch-scan / eye-gaze input. Space activates; ArrowRight advances the scanner.",
+    help: "Turn on switch-scan / eye-gaze input. Space activates; ArrowRight advances the scanner.",
     group: "aac",
   },
 ];

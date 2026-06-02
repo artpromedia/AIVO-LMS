@@ -50,12 +50,21 @@ type Seed = {
 
 async function seedInvite(
   db: any,
-  opts: { role: string; withSchool?: boolean; expiresAt?: Date; acceptedAt?: Date; revokedAt?: Date },
+  opts: {
+    role: string;
+    withSchool?: boolean;
+    expiresAt?: Date;
+    acceptedAt?: Date;
+    revokedAt?: Date;
+  },
 ): Promise<Seed> {
   const { tenants, schools, users, districtAdminInvites } = await import("@aivo/db");
   const [tenant] = await db
     .insert(tenants)
-    .values({ name: `Invite Test ${Date.now()}-${crypto.randomBytes(3).toString("hex")}`, type: "B2B_DISTRICT" } as any)
+    .values({
+      name: `Invite Test ${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+      type: "B2B_DISTRICT",
+    } as any)
     .returning();
   const [inviter] = await db
     .insert(users)
@@ -91,12 +100,26 @@ async function seedInvite(
       revokedAt: opts.revokedAt ?? null,
     } as any)
     .returning();
-  return { tenantId: tenant.id, inviterId: inviter.id, schoolId, inviteId: invite.id, rawToken, email };
+  return {
+    tenantId: tenant.id,
+    inviterId: inviter.id,
+    schoolId,
+    inviteId: invite.id,
+    rawToken,
+    email,
+  };
 }
 
 async function cleanup(db: any, seed: Seed) {
-  const { tenants, schools, users, districtAdminInvites, sessions, passwordHistory, adminAuditLog } =
-    await import("@aivo/db");
+  const {
+    tenants,
+    schools,
+    users,
+    districtAdminInvites,
+    sessions,
+    passwordHistory,
+    adminAuditLog,
+  } = await import("@aivo/db");
   const { eq } = await import("drizzle-orm");
   // Order matters for FKs: child rows first.
   await db.delete(districtAdminInvites).where(eq(districtAdminInvites.tenantId, seed.tenantId));
@@ -114,93 +137,108 @@ async function cleanup(db: any, seed: Seed) {
   await db.delete(tenants).where(eq(tenants.id, seed.tenantId));
 }
 
-test("invite preview: returns invitee + school for a valid SCHOOL_ADMIN token", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const seed = await seedInvite(db, { role: "SCHOOL_ADMIN", withSchool: true });
-  try {
-    const res = await app.inject({ method: "GET", url: `/api/auth/invite/${seed.rawToken}` });
-    assert.equal(res.statusCode, 200);
-    const body = res.json() as any;
-    assert.equal(body.invite.email, seed.email);
-    assert.equal(body.invite.role, "SCHOOL_ADMIN");
-    assert.equal(body.invite.schoolName, "Lincoln Elementary");
-  } finally {
-    await cleanup(db, seed);
-    await teardown(app, db);
-  }
-});
+test(
+  "invite preview: returns invitee + school for a valid SCHOOL_ADMIN token",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const seed = await seedInvite(db, { role: "SCHOOL_ADMIN", withSchool: true });
+    try {
+      const res = await app.inject({ method: "GET", url: `/api/auth/invite/${seed.rawToken}` });
+      assert.equal(res.statusCode, 200);
+      const body = res.json() as any;
+      assert.equal(body.invite.email, seed.email);
+      assert.equal(body.invite.role, "SCHOOL_ADMIN");
+      assert.equal(body.invite.schoolName, "Lincoln Elementary");
+    } finally {
+      await cleanup(db, seed);
+      await teardown(app, db);
+    }
+  },
+);
 
 test("invite preview: rejects an unknown token", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();
   try {
-    const res = await app.inject({ method: "GET", url: `/api/auth/invite/${crypto.randomBytes(32).toString("base64url")}` });
+    const res = await app.inject({
+      method: "GET",
+      url: `/api/auth/invite/${crypto.randomBytes(32).toString("base64url")}`,
+    });
     assert.equal(res.statusCode, 400);
   } finally {
     await teardown(app, db);
   }
 });
 
-test("accept-invite: creates the account, accepts the invite, and auto-logs in", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const seed = await seedInvite(db, { role: "SCHOOL_ADMIN", withSchool: true });
-  try {
-    const res = await app.inject({
-      method: "POST",
-      url: "/api/auth/accept-invite",
-      payload: { token: seed.rawToken, password: "Str0ng-Passw0rd!42xz" },
-    });
-    assert.equal(res.statusCode, 200);
-    const body = res.json() as any;
-    assert.equal(body.ok, true);
-    assert.ok(typeof body.accessToken === "string" && body.accessToken.length > 0);
-    assert.equal(body.user.email, seed.email);
-    assert.equal(body.user.role, "SCHOOL_ADMIN");
-    assert.equal(body.user.schoolId, seed.schoolId);
-    // Refresh cookie set for the new session.
-    assert.ok(String(res.headers["set-cookie"] ?? "").includes("refreshToken="));
+test(
+  "accept-invite: creates the account, accepts the invite, and auto-logs in",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const seed = await seedInvite(db, { role: "SCHOOL_ADMIN", withSchool: true });
+    try {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/auth/accept-invite",
+        payload: { token: seed.rawToken, password: "Str0ng-Passw0rd!42xz" },
+      });
+      assert.equal(res.statusCode, 200);
+      const body = res.json() as any;
+      assert.equal(body.ok, true);
+      assert.ok(typeof body.accessToken === "string" && body.accessToken.length > 0);
+      assert.equal(body.user.email, seed.email);
+      assert.equal(body.user.role, "SCHOOL_ADMIN");
+      assert.equal(body.user.schoolId, seed.schoolId);
+      // Refresh cookie set for the new session.
+      assert.ok(String(res.headers["set-cookie"] ?? "").includes("refreshToken="));
 
-    // The user row exists and the invite is marked accepted.
-    const { users, districtAdminInvites } = await import("@aivo/db");
-    const { eq } = await import("drizzle-orm");
-    const [created] = await db.select().from(users).where(eq(users.id, body.user.id)).limit(1);
-    assert.ok(created);
-    assert.equal(created.role, "SCHOOL_ADMIN");
-    assert.equal(created.schoolId, seed.schoolId);
-    assert.equal(created.mustChangePassword, false);
-    const [invite] = await db
-      .select()
-      .from(districtAdminInvites)
-      .where(eq(districtAdminInvites.id, seed.inviteId))
-      .limit(1);
-    assert.ok(invite.acceptedAt);
-    assert.equal(invite.acceptedUserId, body.user.id);
-  } finally {
-    await cleanup(db, seed);
-    await teardown(app, db);
-  }
-});
+      // The user row exists and the invite is marked accepted.
+      const { users, districtAdminInvites } = await import("@aivo/db");
+      const { eq } = await import("drizzle-orm");
+      const [created] = await db.select().from(users).where(eq(users.id, body.user.id)).limit(1);
+      assert.ok(created);
+      assert.equal(created.role, "SCHOOL_ADMIN");
+      assert.equal(created.schoolId, seed.schoolId);
+      assert.equal(created.mustChangePassword, false);
+      const [invite] = await db
+        .select()
+        .from(districtAdminInvites)
+        .where(eq(districtAdminInvites.id, seed.inviteId))
+        .limit(1);
+      assert.ok(invite.acceptedAt);
+      assert.equal(invite.acceptedUserId, body.user.id);
+    } finally {
+      await cleanup(db, seed);
+      await teardown(app, db);
+    }
+  },
+);
 
-test("accept-invite: a second acceptance with the same token is rejected", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const seed = await seedInvite(db, { role: "DISTRICT_ADMIN" });
-  try {
-    const first = await app.inject({
-      method: "POST",
-      url: "/api/auth/accept-invite",
-      payload: { token: seed.rawToken, password: "Str0ng-Passw0rd!42xz" },
-    });
-    assert.equal(first.statusCode, 200);
-    const second = await app.inject({
-      method: "POST",
-      url: "/api/auth/accept-invite",
-      payload: { token: seed.rawToken, password: "An0ther-Passw0rd!42xz" },
-    });
-    assert.equal(second.statusCode, 409);
-  } finally {
-    await cleanup(db, seed);
-    await teardown(app, db);
-  }
-});
+test(
+  "accept-invite: a second acceptance with the same token is rejected",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const seed = await seedInvite(db, { role: "DISTRICT_ADMIN" });
+    try {
+      const first = await app.inject({
+        method: "POST",
+        url: "/api/auth/accept-invite",
+        payload: { token: seed.rawToken, password: "Str0ng-Passw0rd!42xz" },
+      });
+      assert.equal(first.statusCode, 200);
+      const second = await app.inject({
+        method: "POST",
+        url: "/api/auth/accept-invite",
+        payload: { token: seed.rawToken, password: "An0ther-Passw0rd!42xz" },
+      });
+      assert.equal(second.statusCode, 409);
+    } finally {
+      await cleanup(db, seed);
+      await teardown(app, db);
+    }
+  },
+);
 
 test("accept-invite: an expired invite is rejected with 410", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();

@@ -8,13 +8,13 @@ Sprint 12.7 ships a minimal OpenID Connect Provider for trusted internal tools a
 
 ## Endpoints
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| GET | `/oidc/jwks.json` | Published JWK set (RS256). |
-| GET | `/oidc/authorize` | Auth-code flow with PKCE (S256). Redirects to `/login?next=` when there is no session cookie. |
-| POST | `/oidc/token` | Exchanges code for `access_token`, `refresh_token`, `id_token`. Supports `refresh_token` grant. |
-| GET | `/oidc/userinfo` | Returns claims for the bearer access token. |
-| POST | `/oidc/rotate` | Operator-only (`x-service-token`) — marks the active key rotated and provisions a fresh one. |
+| Method | Path              | Purpose                                                                                         |
+| ------ | ----------------- | ----------------------------------------------------------------------------------------------- |
+| GET    | `/oidc/jwks.json` | Published JWK set (RS256).                                                                      |
+| GET    | `/oidc/authorize` | Auth-code flow with PKCE (S256). Redirects to `/login?next=` when there is no session cookie.   |
+| POST   | `/oidc/token`     | Exchanges code for `access_token`, `refresh_token`, `id_token`. Supports `refresh_token` grant. |
+| GET    | `/oidc/userinfo`  | Returns claims for the bearer access token.                                                     |
+| POST   | `/oidc/rotate`    | Operator-only (`x-service-token`) — marks the active key rotated and provisions a fresh one.    |
 
 ## Supported
 
@@ -36,7 +36,7 @@ The current implementation keeps authorization codes and access tokens in proces
 
 ## Environment
 
-| Var | Purpose |
-| --- | ------- |
-| `OIDC_ISSUER` | Stable issuer URL exposed in discovery. Defaults to identity-svc public URL. |
-| `INTERNAL_SERVICE_TOKEN` | Authorises `POST /oidc/rotate`. |
+| Var                      | Purpose                                                                      |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| `OIDC_ISSUER`            | Stable issuer URL exposed in discovery. Defaults to identity-svc public URL. |
+| `INTERNAL_SERVICE_TOKEN` | Authorises `POST /oidc/rotate`.                                              |

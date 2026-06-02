@@ -25,7 +25,7 @@ export default function ParentIEPReviewScreen() {
   const id = childId ?? "";
   const { data: learner } = useLearner(id);
   const { data, isLoading } = useIEPGoals(id);
-  const goals = (data as { goals?: any[] } | any[] | undefined);
+  const goals = data as { goals?: any[] } | any[] | undefined;
   const list: any[] = Array.isArray(goals) ? goals : (goals?.goals ?? []);
 
   return (
@@ -37,20 +37,31 @@ export default function ParentIEPReviewScreen() {
         <EmptyState
           icon={<Ionicons name="clipboard-outline" size={48} color={palette.inkMuted} />}
           title={t("parentIepReview.emptyTitle", "No IEP goals yet")}
-          message={t("parentIepReview.emptyBody", "When goals are set, you can review them and their progress here.")}
+          message={t(
+            "parentIepReview.emptyBody",
+            "When goals are set, you can review them and their progress here.",
+          )}
         />
       ) : (
         <View style={{ gap: spacing.md }}>
           {learner ? (
             <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
-              {t("parentIepReview.for", { name: learner.firstName, defaultValue: `Goals for ${learner.firstName}` })}
+              {t("parentIepReview.for", {
+                name: learner.firstName,
+                defaultValue: `Goals for ${learner.firstName}`,
+              })}
             </Text>
           ) : null}
           {list.map((g, i) => (
             <Card key={g.id ?? i} tone="raised" style={{ gap: spacing.sm }}>
-              <Text style={[styles.goalTitle, { color: palette.ink }]}>{g.title ?? g.description ?? t("parentIepReview.goal", "Goal")}</Text>
+              <Text style={[styles.goalTitle, { color: palette.ink }]}>
+                {g.title ?? g.description ?? t("parentIepReview.goal", "Goal")}
+              </Text>
               {typeof g.progress === "number" ? (
-                <MasteryBar value={g.progress} caption={t("parentIepReview.progress", "Progress")} />
+                <MasteryBar
+                  value={g.progress}
+                  caption={t("parentIepReview.progress", "Progress")}
+                />
               ) : null}
               {g.targetDate ? (
                 <Text style={[styles.meta, { color: palette.inkMuted }]}>

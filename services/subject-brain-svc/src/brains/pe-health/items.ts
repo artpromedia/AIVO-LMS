@@ -14,7 +14,8 @@ export const PE_HEALTH_ITEMS: Item[] = [
     skillCode: "PE.MOTOR.MANIPULATIVE",
     difficulty: -0.8,
     surface: "drag_manipulative",
-    prompt: "Order the steps of an underhand throw: face the target, step forward, swing back, release low.",
+    prompt:
+      "Order the steps of an underhand throw: face the target, step forward, swing back, release low.",
     options: ["face the target", "step forward", "swing back", "release low"],
   },
   {

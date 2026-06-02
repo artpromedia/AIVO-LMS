@@ -29,7 +29,6 @@ export interface MobileSurfaceTelemetryEvent {
 export type SurfaceTelemetrySink = (event: MobileSurfaceTelemetryEvent) => void;
 
 const defaultSink: SurfaceTelemetrySink = (event) => {
-  // eslint-disable-next-line no-console
   console.warn(`[surface-telemetry] ${event.type} kind=${event.surfaceKind}`, event.payload ?? {});
 };
 

@@ -76,7 +76,8 @@ export const ncasCreativeArts3To12: SkillGraph = {
     {
       id: "ncas.ca.re8.10",
       title: "Interpret intent and meaning in artwork",
-      description: "I can interpret a work by analyzing artistic choices, context, and personal response.",
+      description:
+        "I can interpret a work by analyzing artistic choices, context, and personal response.",
       subject: "creative_arts",
       gradeBand: "10",
       frameworkRefs: [{ framework: "NCAS", code: "Re8.1" }],

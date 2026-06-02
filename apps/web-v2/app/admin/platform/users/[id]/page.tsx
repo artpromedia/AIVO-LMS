@@ -89,11 +89,15 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("user_id")}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            {t("user_id")}
+          </p>
           <p className="mt-1 font-mono text-sm">{user.id}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("col_created")}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            {t("col_created")}
+          </p>
           <p className="mt-1 text-sm font-medium">
             {new Date(user.createdAt).toLocaleDateString()}
           </p>

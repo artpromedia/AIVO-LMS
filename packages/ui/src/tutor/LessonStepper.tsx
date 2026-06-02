@@ -43,12 +43,10 @@ export function LessonStepper({ beats, current, className }: LessonStepperProps)
               aria-current={state === "active" ? "step" : undefined}
               className={cn(
                 "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-iw-chip text-[11px] font-semibold whitespace-nowrap transition-colors",
-                state === "done" &&
-                  "bg-[var(--aivo-sensory-primary)] text-white",
+                state === "done" && "bg-[var(--aivo-sensory-primary)] text-white",
                 state === "active" &&
                   "bg-white text-[var(--aivo-sensory-primary)] border border-[var(--aivo-sensory-primary)]",
-                state === "upcoming" &&
-                  "bg-[var(--aivo-color-surface-muted)] text-iw-text-muted",
+                state === "upcoming" && "bg-[var(--aivo-color-surface-muted)] text-iw-text-muted",
               )}
             >
               <span aria-hidden="true" className="tabular-nums">
@@ -57,10 +55,7 @@ export function LessonStepper({ beats, current, className }: LessonStepperProps)
               {b.label}
             </span>
             {i < beats.length - 1 ? (
-              <span
-                aria-hidden="true"
-                className="w-3 h-px bg-iw-border"
-              />
+              <span aria-hidden="true" className="w-3 h-px bg-iw-border" />
             ) : null}
           </li>
         );

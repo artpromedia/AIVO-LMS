@@ -39,22 +39,22 @@ This file is the rollout plan to close every `missing` cell.
 Status legend: **A** = authored, **S** = scaffold (declared, no content),
 **—** = missing (planned, not started), **·** = not in this tutor's catalog scope.
 
-| Tutor (key) | Subject | PRE_K | K | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | ADULT |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| nova (math) | Math | S | A | A | A | A | A | A | A | A | A | — | — | — | — | · |
-| sage (ela) | ELA | S | A | A | A | A | A | A | A | A | A | — | — | — | — | · |
-| spark (science) | Science | · | A | A | A | A | A | A | A | A | A | — | — | — | — | · |
-| chrono (history) | Social Studies | · | · | · | · | — | — | — | — | — | — | — | — | — | — | · |
-| pixel (coding) | Coding | · | A | A | A | — | — | — | — | — | — | — | — | — | — | · |
-| echo (speech) | Speech & Language | A | A | A | A | — | — | — | — | — | — | · | · | · | · | · |
-| harmony (sel) | SEL | S | A | A | A | — | — | — | — | — | — | — | — | — | — | · |
-| atlas (geography) | Geography | · | A | A | A | — | — | — | — | — | — | — | — | — | — | · |
-| cadence (music) | Music | S | A | A | A | — | — | — | — | — | — | · | · | · | · | · |
-| vigor (pe_health) | PE / Health | S | A | A | A | — | — | — | — | — | — | — | — | — | — | · |
-| lingua (world_languages) | World Languages | · | · | · | · | · | · | · | A | — | — | — | — | — | — | · |
-| forge (stem_engineering) | STEM / Engineering | · | · | · | · | A | A | A | — | — | — | — | — | — | — | · |
-| compass (life_skills) | Life Skills / Exec Fn | · | · | · | · | · | · | · | A | A | A | — | — | — | — | S |
-| muse (creative_arts) | Creative Arts | · | A | A | A | — | — | — | — | — | — | — | — | — | — | · |
+| Tutor (key)              | Subject               | PRE_K | K   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | 9   | 10  | 11  | 12  | ADULT |
+| ------------------------ | --------------------- | ----- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ----- |
+| nova (math)              | Math                  | S     | A   | A   | A   | A   | A   | A   | A   | A   | A   | —   | —   | —   | —   | ·     |
+| sage (ela)               | ELA                   | S     | A   | A   | A   | A   | A   | A   | A   | A   | A   | —   | —   | —   | —   | ·     |
+| spark (science)          | Science               | ·     | A   | A   | A   | A   | A   | A   | A   | A   | A   | —   | —   | —   | —   | ·     |
+| chrono (history)         | Social Studies        | ·     | ·   | ·   | ·   | —   | —   | —   | —   | —   | —   | —   | —   | —   | —   | ·     |
+| pixel (coding)           | Coding                | ·     | A   | A   | A   | —   | —   | —   | —   | —   | —   | —   | —   | —   | —   | ·     |
+| echo (speech)            | Speech & Language     | A     | A   | A   | A   | —   | —   | —   | —   | —   | —   | ·   | ·   | ·   | ·   | ·     |
+| harmony (sel)            | SEL                   | S     | A   | A   | A   | —   | —   | —   | —   | —   | —   | —   | —   | —   | —   | ·     |
+| atlas (geography)        | Geography             | ·     | A   | A   | A   | —   | —   | —   | —   | —   | —   | —   | —   | —   | —   | ·     |
+| cadence (music)          | Music                 | S     | A   | A   | A   | —   | —   | —   | —   | —   | —   | ·   | ·   | ·   | ·   | ·     |
+| vigor (pe_health)        | PE / Health           | S     | A   | A   | A   | —   | —   | —   | —   | —   | —   | —   | —   | —   | —   | ·     |
+| lingua (world_languages) | World Languages       | ·     | ·   | ·   | ·   | ·   | ·   | ·   | A   | —   | —   | —   | —   | —   | —   | ·     |
+| forge (stem_engineering) | STEM / Engineering    | ·     | ·   | ·   | ·   | A   | A   | A   | —   | —   | —   | —   | —   | —   | —   | ·     |
+| compass (life_skills)    | Life Skills / Exec Fn | ·     | ·   | ·   | ·   | ·   | ·   | ·   | A   | A   | A   | —   | —   | —   | —   | S     |
+| muse (creative_arts)     | Creative Arts         | ·     | A   | A   | A   | —   | —   | —   | —   | —   | —   | —   | —   | —   | —   | ·     |
 
 **Aggregate (current)**: 56 `authored` cells, 107 `scaffold`,
 **0 `missing`** across the 14 tutors' declared catalog scopes. Every
@@ -70,7 +70,7 @@ authoring requires SME review before any cell can be promoted from
 
 Per the existing rule in
 `docs/quality/curriculum-coverage-matrix.md` (lines 19–39): generating
-stub skills that *look* like coverage routes learners through fabricated
+stub skills that _look_ like coverage routes learners through fabricated
 material and breaks baseline generation, LessonRun routing, and mastery
 maps. Every `missing` cell must be closed by a qualified curriculum
 designer working with a special-education specialist, not by code.
@@ -116,23 +116,23 @@ to flag the corresponding bands as `"scaffold"` until SME sign-off.
 
 Files added under `packages/skill-graphs/src/seeds/`:
 
-| File | Tutor(s) | Bands | Framework |
-| --- | --- | --- | --- |
-| `c3-social-studies-3-8.ts` | chrono | 3–8 | C3 / NCSS |
-| `ccss-math-9-12.ts` | nova | 9–12 | CCSS-Math HS |
-| `ccss-ela-9-12.ts` | sage | 9–12 | CCSS-ELA HS |
-| `ngss-science-9-12.ts` | spark | 9–12 | NGSS HS (PS/LS/ESS/ETS) |
-| `c3-social-studies-9-12.ts` | chrono | 9–12 | C3 HS |
-| `asha-speech-school-age.ts` | echo | 3–8 | ASHA School-Age |
-| `ncas-music-3-8.ts` | cadence | 3–8 | NCAS Music |
-| `actfl-world-languages-7-12.ts` | lingua | 7–12 | ACTFL Novice-Mid → Int-Mid |
-| `ngss-engineering-design-6-12.ts` | forge | 6–12 | NGSS ETS1 MS+HS |
-| `cec-life-skills-9-12.ts` | compass | 9–12 + ADULT | CEC/DCDT Transition |
-| `ncge-geography-3-12.ts` | atlas | 3–12 | NCGE |
-| `casel-sel-3-12.ts` | harmony | 3–12 | CASEL |
-| `ncas-creative-arts-3-12.ts` | muse | 3–12 | NCAS Visual/Theater/Dance/Media |
-| `csta-coding-3-12.ts` | pixel | 3–12 | CSTA Levels 1B/2/3A/3B |
-| `shape-pe-health-3-12.ts` | vigor | 3–12 | SHAPE + NHES |
+| File                              | Tutor(s) | Bands        | Framework                       |
+| --------------------------------- | -------- | ------------ | ------------------------------- |
+| `c3-social-studies-3-8.ts`        | chrono   | 3–8          | C3 / NCSS                       |
+| `ccss-math-9-12.ts`               | nova     | 9–12         | CCSS-Math HS                    |
+| `ccss-ela-9-12.ts`                | sage     | 9–12         | CCSS-ELA HS                     |
+| `ngss-science-9-12.ts`            | spark    | 9–12         | NGSS HS (PS/LS/ESS/ETS)         |
+| `c3-social-studies-9-12.ts`       | chrono   | 9–12         | C3 HS                           |
+| `asha-speech-school-age.ts`       | echo     | 3–8          | ASHA School-Age                 |
+| `ncas-music-3-8.ts`               | cadence  | 3–8          | NCAS Music                      |
+| `actfl-world-languages-7-12.ts`   | lingua   | 7–12         | ACTFL Novice-Mid → Int-Mid      |
+| `ngss-engineering-design-6-12.ts` | forge    | 6–12         | NGSS ETS1 MS+HS                 |
+| `cec-life-skills-9-12.ts`         | compass  | 9–12 + ADULT | CEC/DCDT Transition             |
+| `ncge-geography-3-12.ts`          | atlas    | 3–12         | NCGE                            |
+| `casel-sel-3-12.ts`               | harmony  | 3–12         | CASEL                           |
+| `ncas-creative-arts-3-12.ts`      | muse     | 3–12         | NCAS Visual/Theater/Dance/Media |
+| `csta-coding-3-12.ts`             | pixel    | 3–12         | CSTA Levels 1B/2/3A/3B          |
+| `shape-pe-health-3-12.ts`         | vigor    | 3–12         | SHAPE + NHES                    |
 
 ### What still needs human work to flip `scaffold` → `authored`
 
@@ -161,11 +161,11 @@ bank depth called out in `curriculum-coverage-matrix.md` (≥3 items per
 difficulty band per skill, against the Sprint 7.3 cadence of 200
 items / sprint).
 
-| Tutor | Bands | Skill graph (exists) | Item-bank deficit |
-| --- | --- | --- | --- |
-| nova (math) | 3–8 | `ccss-math-1-8` | author ≥600 items |
-| sage (ela) | 6–8 | `ccss-ela-1-8` + `ccss-writing-k-8` | author ≥600 items |
-| spark (science) | 3–8 | `ngss-science-3-8` | author ≥600 items |
+| Tutor            | Bands     | Skill graph (exists)                                    | Item-bank deficit           |
+| ---------------- | --------- | ------------------------------------------------------- | --------------------------- |
+| nova (math)      | 3–8       | `ccss-math-1-8`                                         | author ≥600 items           |
+| sage (ela)       | 6–8       | `ccss-ela-1-8` + `ccss-writing-k-8`                     | author ≥600 items           |
+| spark (science)  | 3–8       | `ngss-science-3-8`                                      | author ≥600 items           |
 | chrono (history) | K–2 + 3–8 | extend `c3-social-studies-k2` → `c3-social-studies-3-8` | new skill graph + 600 items |
 
 **Exit criteria**: every Phase 1 cell flips to `authored`; the
@@ -174,12 +174,12 @@ core-subjects gate in `curriculum-coverage-matrix.md` reaches its
 
 ## Phase 2 — High school, grades 9–12 (2 content sprints)
 
-| Tutor | Scope |
-| --- | --- |
-| nova | CCSS Math HS — Algebra I/II, Geometry, Pre-Calc, Stats |
-| sage | CCSS ELA HS — Literature, Composition, Rhetoric |
-| spark | NGSS HS — Biology, Chemistry, Physics, Earth/Space |
-| chrono | C3 HS — US History, World History, Civics, Economics |
+| Tutor                                       | Scope                                                    |
+| ------------------------------------------- | -------------------------------------------------------- |
+| nova                                        | CCSS Math HS — Algebra I/II, Geometry, Pre-Calc, Stats   |
+| sage                                        | CCSS ELA HS — Literature, Composition, Rhetoric          |
+| spark                                       | NGSS HS — Biology, Chemistry, Physics, Earth/Space       |
+| chrono                                      | C3 HS — US History, World History, Civics, Economics     |
 | harmony, vigor, geography, sel, muse, pixel | 9–12 extension authoring against existing K–2 frameworks |
 
 Each subject needs a new `*-9-12.ts` skill-graph seed exported from
@@ -187,13 +187,13 @@ Each subject needs a new `*-9-12.ts` skill-graph seed exported from
 
 ## Phase 3 — Specialized tutors (1 content sprint)
 
-| Tutor | Gap | Approach |
-| --- | --- | --- |
-| echo (speech) | 3–8 | extend `asha-speech-early` → `asha-speech-school-age` |
-| cadence (music) | 3–8 | author `ncas-music-3-8` |
-| lingua (world languages) | 7–12 | author Novice-Mid → Intermediate-Mid ladder under ACTFL |
-| forge (stem) | 6–12 | extend `ngss-engineering-design-3-5` → `…-6-8` and `…-9-12` |
-| compass (life skills) | 9–12 + ADULT | author transition-planning + post-secondary content |
+| Tutor                    | Gap          | Approach                                                    |
+| ------------------------ | ------------ | ----------------------------------------------------------- |
+| echo (speech)            | 3–8          | extend `asha-speech-early` → `asha-speech-school-age`       |
+| cadence (music)          | 3–8          | author `ncas-music-3-8`                                     |
+| lingua (world languages) | 7–12         | author Novice-Mid → Intermediate-Mid ladder under ACTFL     |
+| forge (stem)             | 6–12         | extend `ngss-engineering-design-3-5` → `…-6-8` and `…-9-12` |
+| compass (life skills)    | 9–12 + ADULT | author transition-planning + post-secondary content         |
 
 ## Phase 4 — Rolling quality gates ✅ (landed)
 
@@ -227,13 +227,13 @@ Four gates now run on every `pnpm curriculum:coverage` invocation:
 
 ### Defense-in-depth recap
 
-| Surface | Defense |
-| --- | --- |
-| Authoring time (PR) | Promotion guard, regression ratchet, SDK validator |
-| Build time | Skill-graph `validateGraph` (cycles, missing prereqs) |
+| Surface                 | Defense                                               |
+| ----------------------- | ----------------------------------------------------- |
+| Authoring time (PR)     | Promotion guard, regression ratchet, SDK validator    |
+| Build time              | Skill-graph `validateGraph` (cycles, missing prereqs) |
 | Runtime (session start) | `planSession` refuses non-`authored` bands by default |
-| Catalog UI | Reads `coverageMatrix`, surfaces "in progress" badge |
-| Documentation | Auto-regenerated `coverage-dashboard.md` |
+| Catalog UI              | Reads `coverageMatrix`, surfaces "in progress" badge  |
+| Documentation           | Auto-regenerated `coverage-dashboard.md`              |
 
 ## Phase 4 — Rolling quality gates [ORIGINAL PLAN]
 

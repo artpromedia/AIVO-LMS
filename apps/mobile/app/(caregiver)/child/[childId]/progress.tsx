@@ -30,7 +30,9 @@ export default function CaregiverProgressScreen() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("caregiverProgress.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {t("caregiverProgress.title")}
+      </Text>
       <Text style={styles.subtitle}>{t("caregiverProgress.subtitle")}</Text>
 
       {domains.map((d) => (

@@ -132,7 +132,7 @@ test.describe("VoiceResponse surface", () => {
 
     // Look for a voice_response surface already on the page; if the learner
     // landing page doesn't show one, navigate to a fixture lesson URL.
-    const hasSurface = await page.locator('[aria-label="voice-response-surface"]').count() > 0;
+    const hasSurface = (await page.locator('[aria-label="voice-response-surface"]').count()) > 0;
     if (!hasSurface) {
       // Skip rather than fail — the surface only appears in voice lessons.
       test.skip();
@@ -142,9 +142,13 @@ test.describe("VoiceResponse surface", () => {
     // ── 4. Click Record and wait for scoring to complete ──────────────────
     await page.getByRole("button", { name: "record voice answer" }).click();
     // The mock recorder fires after 50 ms; wait for the uploading state to resolve
-    await expect(page.getByRole("status").filter({ hasText: /Uploading/ })).toBeVisible({
-      timeout: 3000,
-    }).catch(() => {/* status may resolve before assertion */});
+    await expect(page.getByRole("status").filter({ hasText: /Uploading/ }))
+      .toBeVisible({
+        timeout: 3000,
+      })
+      .catch(() => {
+        /* status may resolve before assertion */
+      });
 
     // Wait for transcript to appear (score received)
     await expect(page.getByLabel("transcript")).toBeVisible({ timeout: 5000 });

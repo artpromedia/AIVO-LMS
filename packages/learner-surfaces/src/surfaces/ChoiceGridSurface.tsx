@@ -39,13 +39,7 @@ interface ChoiceButtonProps {
  * `useAACTarget` is a no-op when the upstream AACTargetProvider is not
  * mounted, so the standard rendering path is unaffected.
  */
-function ChoiceButton({
-  surfaceId,
-  choice,
-  selected,
-  disabled,
-  onSelect,
-}: ChoiceButtonProps) {
+function ChoiceButton({ surfaceId, choice, selected, disabled, onSelect }: ChoiceButtonProps) {
   const { ref, isHighlighted } = useAACTarget(
     `${surfaceId}.choice.${choice.id}`,
     choice.label,
@@ -97,11 +91,7 @@ interface SubmitButtonProps {
 }
 
 function SubmitButton({ surfaceId, disabled, onSubmit }: SubmitButtonProps) {
-  const { ref, isHighlighted } = useAACTarget(
-    `${surfaceId}.submit`,
-    "Submit",
-    onSubmit,
-  );
+  const { ref, isHighlighted } = useAACTarget(`${surfaceId}.submit`, "Submit", onSubmit);
   return (
     <button
       ref={(node) => ref(node)}
@@ -133,19 +123,11 @@ export function ChoiceGridSurface({
 
   return (
     <section aria-label="choice-grid-surface" className="flex flex-col gap-4">
-      <p className="text-lg font-semibold text-iw-text-strong leading-snug">
-        {surface.prompt}
-      </p>
+      <p className="text-lg font-semibold text-iw-text-strong leading-snug">{surface.prompt}</p>
       {surface.instructions ? (
-        <p className="text-sm text-iw-text-muted leading-relaxed">
-          {surface.instructions}
-        </p>
+        <p className="text-sm text-iw-text-muted leading-relaxed">{surface.instructions}</p>
       ) : null}
-      <div
-        role="radiogroup"
-        aria-label="choices"
-        className="grid gap-3 sm:grid-cols-2"
-      >
+      <div role="radiogroup" aria-label="choices" className="grid gap-3 sm:grid-cols-2">
         {(surface.choices ?? []).map((choice) => (
           <ChoiceButton
             key={choice.id}
@@ -163,11 +145,7 @@ export function ChoiceGridSurface({
         ))}
       </div>
       <div className="flex justify-end pt-1">
-        <SubmitButton
-          surfaceId={surface.id}
-          disabled={submitDisabled}
-          onSubmit={handleSubmit}
-        />
+        <SubmitButton surfaceId={surface.id} disabled={submitDisabled} onSubmit={handleSubmit} />
       </div>
     </section>
   );

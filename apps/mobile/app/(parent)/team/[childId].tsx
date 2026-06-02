@@ -102,7 +102,9 @@ export default function TeamScreen() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("parentTeam.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {t("parentTeam.title")}
+      </Text>
       <Text style={styles.subtitle}>{t("parentTeam.subtitle", { name: "" })}</Text>
 
       <View style={styles.seatCards}>

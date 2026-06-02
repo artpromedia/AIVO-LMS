@@ -86,17 +86,13 @@ export function getPersistence(): Persistence {
     // visible on the individual stores at construction time (above).
     // Callers that want to branch on mode should branch per-domain.
     mode: serverEnv.AIVO_PERSISTENCE,
-    notifications:
-      notificationsMode === "postgres" ? drizzleNotifications : memoryNotifications,
+    notifications: notificationsMode === "postgres" ? drizzleNotifications : memoryNotifications,
     audit: auditMode === "postgres" ? drizzleAudit : memoryAudit,
     identity: identityMode === "postgres" ? drizzleIdentity : memoryIdentity,
     learners: learnersMode === "postgres" ? drizzleLearners : memoryLearners,
-    assessments:
-      assessmentsMode === "postgres" ? drizzleAssessments : memoryAssessments,
-    lessonRuns:
-      lessonRunsMode === "postgres" ? drizzleLessonRuns : memoryLessonRuns,
-    brainProfiles:
-      brainProfilesMode === "postgres" ? drizzleBrainProfiles : memoryBrainProfiles,
+    assessments: assessmentsMode === "postgres" ? drizzleAssessments : memoryAssessments,
+    lessonRuns: lessonRunsMode === "postgres" ? drizzleLessonRuns : memoryLessonRuns,
+    brainProfiles: brainProfilesMode === "postgres" ? drizzleBrainProfiles : memoryBrainProfiles,
     curriculum: curriculumMode === "postgres" ? drizzleCurriculum : memoryCurriculum,
     compliance: complianceMode === "postgres" ? drizzleCompliance : memoryCompliance,
     quests: questsMode === "postgres" ? drizzleQuests : memoryQuests,

@@ -81,9 +81,7 @@ export function ZipDistrictField({
   helperText = "We use this to align lessons with your local district's standards.",
 }: ZipDistrictFieldProps) {
   const [zip, setZip] = React.useState(defaultZip);
-  const [status, setStatus] = React.useState<Status>(
-    defaultDistrictId ? "resolved" : "idle",
-  );
+  const [status, setStatus] = React.useState<Status>(defaultDistrictId ? "resolved" : "idle");
   const [districtId, setDistrictId] = React.useState(defaultDistrictId);
   const [districtName, setDistrictName] = React.useState(defaultDistrictName);
   const [districtState, setDistrictState] = React.useState<string>("");
@@ -109,10 +107,9 @@ export function ZipDistrictField({
       setStatus("loading");
 
       try {
-        const res = await fetch(
-          `/api/bff/curriculum/lookup?zipCode=${encodeURIComponent(zip)}`,
-          { signal: ctrl.signal },
-        );
+        const res = await fetch(`/api/bff/curriculum/lookup?zipCode=${encodeURIComponent(zip)}`, {
+          signal: ctrl.signal,
+        });
         const json = (await res.json()) as LookupResponse;
         if (!json.ok) {
           setStatus("error");
@@ -162,10 +159,9 @@ export function ZipDistrictField({
       try {
         const params = new URLSearchParams({ q: searchQuery.trim() });
         if (districtState) params.set("state", districtState);
-        const res = await fetch(
-          `/api/bff/curriculum/districts/search?${params.toString()}`,
-          { signal: ctrl.signal },
-        );
+        const res = await fetch(`/api/bff/curriculum/districts/search?${params.toString()}`, {
+          signal: ctrl.signal,
+        });
         const json = (await res.json()) as SearchResponse;
         if (json.ok) setSearchResults(json.data.matches);
       } catch (err) {
@@ -210,12 +206,7 @@ export function ZipDistrictField({
         {helperText}
       </p>
 
-      <div
-        id="zipCode-status"
-        role="status"
-        aria-live="polite"
-        className="text-sm"
-      >
+      <div id="zipCode-status" role="status" aria-live="polite" className="text-sm">
         {status === "loading" && (
           <span className="text-iw-ink-muted">Looking up your district…</span>
         )}
@@ -232,8 +223,8 @@ export function ZipDistrictField({
         )}
         {status === "error" && (
           <span className="text-iw-warn">
-            District lookup is unavailable right now. You can continue without one
-            or search manually.
+            District lookup is unavailable right now. You can continue without one or search
+            manually.
           </span>
         )}
       </div>
@@ -248,9 +239,16 @@ export function ZipDistrictField({
             className="h-9 rounded-iw-control border border-iw-border bg-iw-raised px-2 text-sm text-iw-ink"
             value={districtId}
             onChange={(e) => {
-              const next = [...alternates, { ncesId: districtId, name: districtName, state: districtState, weight: 1, dominant: true } as ResolvedDistrict].find(
-                (d) => d.ncesId === e.target.value,
-              );
+              const next = [
+                ...alternates,
+                {
+                  ncesId: districtId,
+                  name: districtName,
+                  state: districtState,
+                  weight: 1,
+                  dominant: true,
+                } as ResolvedDistrict,
+              ].find((d) => d.ncesId === e.target.value);
               if (next) pickDistrict(next);
             }}
           >

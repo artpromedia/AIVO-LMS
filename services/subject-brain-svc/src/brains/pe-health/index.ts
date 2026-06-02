@@ -1,4 +1,8 @@
-import { findSkillsByTopic, getPrerequisitesFor, getStandardsFor } from "../../services/skill-graph-store.js";
+import {
+  findSkillsByTopic,
+  getPrerequisitesFor,
+  getStandardsFor,
+} from "../../services/skill-graph-store.js";
 import { buildProfileAdaptations } from "../../services/profile-adaptations.js";
 import type {
   AdaptDirective,
@@ -62,11 +66,7 @@ export class PeHealthBrain implements SubjectBrain {
         ];
 
     const standards: StandardReference[] = getStandardsFor(relevantSkills).map((code) => ({
-      framework: code.startsWith("SHAPE")
-        ? "SHAPE"
-        : code.startsWith("NHES")
-          ? "NHES"
-          : "Custom",
+      framework: code.startsWith("SHAPE") ? "SHAPE" : code.startsWith("NHES") ? "NHES" : "Custom",
       code,
       description: `Aligns to ${code}`,
     }));

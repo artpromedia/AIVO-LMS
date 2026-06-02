@@ -29,13 +29,7 @@
  * false positives are frozen into the baseline and only NEW strings fail
  * a build — which is exactly the regression we want to prevent.
  */
-import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -232,12 +226,12 @@ if (!MODE_BY_AREA) {
   console.log(`\nFirst ${Math.min(MAX, findings.length)} strings:\n`);
   for (const f of findings.slice(0, MAX)) {
     console.log(`  [${f.kind.padEnd(11)}] ${relative(repoRoot, f.file)}:`);
-    console.log(
-      `              "${f.value.length > 100 ? f.value.slice(0, 100) + "…" : f.value}"`,
-    );
+    console.log(`              "${f.value.length > 100 ? f.value.slice(0, 100) + "…" : f.value}"`);
   }
   if (findings.length > MAX) {
-    console.log(`\n…and ${findings.length - MAX} more. Re-run with --max=${findings.length} to see all.`);
+    console.log(
+      `\n…and ${findings.length - MAX} more. Re-run with --max=${findings.length} to see all.`,
+    );
   }
 }
 

@@ -24,7 +24,9 @@ export default function SessionLogScreen() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("caregiverSessions.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {t("caregiverSessions.title")}
+      </Text>
       <Text style={styles.subtitle}>{t("caregiverSessions.subtitle")}</Text>
 
       <EmptyState

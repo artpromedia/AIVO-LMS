@@ -17,12 +17,7 @@
 import { serverEnv } from "@/lib/env";
 import { logger } from "@/lib/observability/logger";
 import { newId } from "@/lib/db/store";
-import type {
-  BaselineDifficulty,
-  BaselineQuestion,
-  Skill,
-  Subject,
-} from "@/lib/db/types";
+import type { BaselineDifficulty, BaselineQuestion, Skill, Subject } from "@/lib/db/types";
 import {
   baselineLlmRequestSchema,
   baselineLlmResponseSchema,
@@ -129,13 +124,13 @@ export async function generateBaselineQuestionsViaLLM(
     clearTimeout(timeoutHandle);
     const aborted =
       (err instanceof Error && err.name === "AbortError") ||
-      (typeof err === "object" && err !== null && "name" in err && (err as { name?: string }).name === "AbortError");
+      (typeof err === "object" &&
+        err !== null &&
+        "name" in err &&
+        (err as { name?: string }).name === "AbortError");
     const reason: BaselineLlmFailureReason = aborted ? "timeout" : "network_error";
     const message = err instanceof Error ? err.message : String(err);
-    logger.warn(
-      { endpoint, reason, message },
-      "baseline-llm: fetch failed",
-    );
+    logger.warn({ endpoint, reason, message }, "baseline-llm: fetch failed");
     return { ok: false, reason, message };
   } finally {
     clearTimeout(timeoutHandle);
@@ -274,10 +269,7 @@ export function mapLlmQuestionsToBaselineQuestions(
   return out;
 }
 
-function labelForValue(
-  options: BaselineLlmQuestion["options"],
-  value: string,
-): string {
+function labelForValue(options: BaselineLlmQuestion["options"], value: string): string {
   return options.find((o) => o.value === value)?.label ?? value;
 }
 

@@ -16,12 +16,7 @@ import { addStaffUser, removeStaffUser } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
-const ALLOWED_ROLES = new Set([
-  "TEACHER",
-  "SCHOOL_ADMIN",
-  "THERAPIST",
-  "CAREGIVER",
-]);
+const ALLOWED_ROLES = new Set(["TEACHER", "SCHOOL_ADMIN", "THERAPIST", "CAREGIVER"]);
 
 export async function POST(req: Request): Promise<NextResponse> {
   const requestId = getRequestId(req);
@@ -34,13 +29,20 @@ export async function POST(req: Request): Promise<NextResponse> {
     const tenantId = scope.tenantIds[0];
     if (!tenantId)
       return fail(
-        { code: "no_tenant", message: "No tenant in scope", userMessage: "Your session has no school in scope.", status: 403 },
+        {
+          code: "no_tenant",
+          message: "No tenant in scope",
+          userMessage: "Your session has no school in scope.",
+          status: 403,
+        },
         requestId,
       );
 
-    const body = (await req.json().catch(() => null)) as
-      | { email?: string; displayName?: string; role?: string }
-      | null;
+    const body = (await req.json().catch(() => null)) as {
+      email?: string;
+      displayName?: string;
+      role?: string;
+    } | null;
     if (!body?.email || !body.displayName || !body.role) {
       return fail(
         {
@@ -86,20 +88,35 @@ export async function DELETE(req: Request): Promise<NextResponse> {
     const tenantId = scope.tenantIds[0];
     if (!tenantId)
       return fail(
-        { code: "no_tenant", message: "No tenant in scope", userMessage: "Your session has no school in scope.", status: 403 },
+        {
+          code: "no_tenant",
+          message: "No tenant in scope",
+          userMessage: "Your session has no school in scope.",
+          status: 403,
+        },
         requestId,
       );
 
     const id = new URL(req.url).searchParams.get("id");
     if (!id)
       return fail(
-        { code: "validation_error", message: "id is required", userMessage: "User id is required.", status: 400 },
+        {
+          code: "validation_error",
+          message: "id is required",
+          userMessage: "User id is required.",
+          status: 400,
+        },
         requestId,
       );
     const removed = await removeStaffUser(id, tenantId);
     if (!removed)
       return fail(
-        { code: "not_found", message: "Staff user not found", userMessage: "That staff member is no longer on the roster.", status: 404 },
+        {
+          code: "not_found",
+          message: "Staff user not found",
+          userMessage: "That staff member is no longer on the roster.",
+          status: 404,
+        },
         requestId,
       );
     return ok({ deleted: true }, requestId);

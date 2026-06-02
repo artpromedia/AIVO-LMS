@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, spacing, radius } from "@/constants/colors";
@@ -37,11 +30,7 @@ import { useLearners } from "@/hooks/useLearners";
  * The screen lives in the auth stack because switching profiles is an
  * auth-equivalent action — the device's effective identity changes.
  */
-type SwitchTarget =
-  | "stay"
-  | "learner"
-  | "new_parent"
-  | "cancel";
+type SwitchTarget = "stay" | "learner" | "new_parent" | "cancel";
 
 export default function SessionSwitchScreen() {
   const insets = useSafeAreaInsets();
@@ -82,8 +71,11 @@ export default function SessionSwitchScreen() {
     return null;
   }
 
-  const initial =
-    (user.name?.trim().charAt(0) || user.email?.trim().charAt(0) || "?").toUpperCase();
+  const initial = (
+    user.name?.trim().charAt(0) ||
+    user.email?.trim().charAt(0) ||
+    "?"
+  ).toUpperCase();
 
   return (
     <View
@@ -96,8 +88,7 @@ export default function SessionSwitchScreen() {
         <Text style={styles.eyebrow}>Who&apos;s using AIVO?</Text>
         <Text style={styles.title}>Switch profile.</Text>
         <Text style={styles.subtitle}>
-          Tap a profile to switch into it. Learner profiles will ask for
-          their PIN.
+          Tap a profile to switch into it. Learner profiles will ask for their PIN.
         </Text>
 
         <Text style={styles.sectionLabel}>Signed in</Text>
@@ -130,13 +121,10 @@ export default function SessionSwitchScreen() {
           </View>
         ) : learnersErrored ? (
           <Text style={styles.errorText}>
-            Couldn&apos;t load your learners. Pull down to retry from the
-            parent dashboard.
+            Couldn&apos;t load your learners. Pull down to retry from the parent dashboard.
           </Text>
         ) : learners.length === 0 ? (
-          <Text style={styles.emptyText}>
-            No learners yet. Add one from the parent dashboard.
-          </Text>
+          <Text style={styles.emptyText}>No learners yet. Add one from the parent dashboard.</Text>
         ) : (
           learners.map((l) => {
             const displayName = `${l.firstName ?? ""} ${l.lastName ?? ""}`.trim() || "Learner";

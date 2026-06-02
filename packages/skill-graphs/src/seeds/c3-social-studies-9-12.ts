@@ -82,8 +82,7 @@ export const c3SocialStudies9To12: SkillGraph = {
     {
       id: "c3.9-12.D2.Civ.8",
       title: "Evaluate social and political systems for liberty and equality",
-      description:
-        "I can evaluate how social and political systems balance liberty and equality.",
+      description: "I can evaluate how social and political systems balance liberty and equality.",
       subject: "social_studies",
       gradeBand: "12",
       frameworkRefs: [{ framework: "C3", code: "D2.Civ.8.9-12" }],
@@ -158,8 +157,7 @@ export const c3SocialStudies9To12: SkillGraph = {
     {
       id: "c3.9-12.D3.Src.2",
       title: "Evaluate credibility of sources",
-      description:
-        "I can evaluate sources by their origins, authority, and intended audience.",
+      description: "I can evaluate sources by their origins, authority, and intended audience.",
       subject: "social_studies",
       gradeBand: "10",
       frameworkRefs: [{ framework: "C3", code: "D3.2.9-12" }],
@@ -190,8 +188,7 @@ export const c3SocialStudies9To12: SkillGraph = {
     {
       id: "c3.9-12.D4.Act.7",
       title: "Take informed civic action",
-      description:
-        "I can identify and plan civic actions to address a problem I have researched.",
+      description: "I can identify and plan civic actions to address a problem I have researched.",
       subject: "social_studies",
       gradeBand: "12",
       frameworkRefs: [{ framework: "C3", code: "D4.7.9-12" }],

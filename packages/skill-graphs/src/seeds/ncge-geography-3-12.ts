@@ -95,7 +95,8 @@ export const ncgeGeography3To12: SkillGraph = {
     {
       id: "ncge.std15.hs",
       title: "Evaluate environmental impacts and sustainability",
-      description: "I can evaluate the environmental consequences of human decisions and propose alternatives.",
+      description:
+        "I can evaluate the environmental consequences of human decisions and propose alternatives.",
       subject: "geography",
       gradeBand: "11",
       frameworkRefs: [{ framework: "NCGE", code: "Standard 15" }],
@@ -104,7 +105,8 @@ export const ncgeGeography3To12: SkillGraph = {
     {
       id: "ncge.std18.hs",
       title: "Apply geography to interpret present and plan for future",
-      description: "I can apply geographic thinking to interpret current events and plan for the future.",
+      description:
+        "I can apply geographic thinking to interpret current events and plan for the future.",
       subject: "geography",
       gradeBand: "12",
       frameworkRefs: [{ framework: "NCGE", code: "Standard 18" }],
