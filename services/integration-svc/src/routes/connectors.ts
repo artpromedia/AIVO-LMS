@@ -626,7 +626,7 @@ export function registerConnectorRoutes(app: FastifyInstance, db: any) {
   );
 }
 
-async function runSyncInBackground(db: any, connection: any, syncLogId: string) {
+export async function runSyncInBackground(db: any, connection: any, syncLogId: string) {
   const startTime = Date.now();
   let recordsSynced = 0;
   let recordsFailed = 0;

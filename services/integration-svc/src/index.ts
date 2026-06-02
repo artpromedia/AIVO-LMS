@@ -1,5 +1,4 @@
 import { buildApp } from "./server.js";
-import type { SyncJob } from "./queue/retry.js";
 
 export { buildApp } from "./server.js";
 export * from "./services/sis-provider-interface.js";
@@ -50,12 +49,10 @@ async function start() {
   let worker: { close: () => Promise<void> } | null = null;
   if (role === "worker" && bullQueue && process.env.REDIS_URL) {
     const IORedis = (await import("ioredis")).default;
+    const { createSyncJobHandler } = await import("./queue/sync-job-handler.js");
     const conn = new IORedis(process.env.REDIS_URL, { maxRetriesPerRequest: null });
-    worker = createSyncWorker(conn, async (job: SyncJob) => {
-      // Stub handler — real sync.row/sync.full/sync.delta dispatch lands with the
-      // queue producer wiring. For now we just log so a smoke `enqueue` is visible.
-      logger.info({ msg: "sync job received", type: job.type, attempt: job.attempt });
-    });
+    const handler = createSyncJobHandler({ db, queue: bullQueue, logger });
+    worker = createSyncWorker(conn, handler);
     logger.info("BullMQ sync worker started (ROLE=worker)");
   }
 
