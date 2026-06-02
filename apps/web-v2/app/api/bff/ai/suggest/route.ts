@@ -1,10 +1,6 @@
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import {
-  generateSuggestions,
-  isFieldType,
-  type SuggestionContext,
-} from "@/lib/ai/suggestions";
+import { generateSuggestions, isFieldType, type SuggestionContext } from "@/lib/ai/suggestions";
 
 export const dynamic = "force-dynamic";
 
@@ -37,10 +33,7 @@ export async function POST(req: Request) {
   try {
     const body = (await req.json().catch(() => ({}))) as Body;
     if (!isFieldType(body.fieldType)) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: "Unknown fieldType" },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: "Unknown fieldType" }, requestId);
     }
 
     const context: SuggestionContext = {
@@ -49,7 +42,8 @@ export async function POST(req: Request) {
       existingItems: asStringArray(body.context?.existingItems),
     };
     const currentText = asString(body.currentText);
-    const limit = typeof body.limit === "number" && body.limit > 0 ? Math.min(12, Math.floor(body.limit)) : 6;
+    const limit =
+      typeof body.limit === "number" && body.limit > 0 ? Math.min(12, Math.floor(body.limit)) : 6;
 
     const result = generateSuggestions(body.fieldType, currentText, context, limit);
     return ok(result, requestId);

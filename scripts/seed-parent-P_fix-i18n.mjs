@@ -291,6 +291,8 @@ for (const [locale, subtrees] of Object.entries(DATA)) {
   }
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-parent-P_fix-i18n: merged error/not_found/homework keys → messages/${locale}.json`);
+  console.log(
+    `seed-parent-P_fix-i18n: merged error/not_found/homework keys → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-parent-P_fix-i18n: done — ${written} locale catalogs updated.`);

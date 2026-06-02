@@ -49,23 +49,17 @@ export function AuthCard({
     >
       <header className="flex flex-col gap-2">
         {icon ? <div className="mb-1">{icon}</div> : null}
-        {eyebrow ? (
-          <p className="iw-label text-iw-text-muted">{eyebrow}</p>
-        ) : null}
+        {eyebrow ? <p className="iw-label text-iw-text-muted">{eyebrow}</p> : null}
         <h1 className="font-iw-display text-3xl md:text-4xl font-semibold tracking-tight text-iw-text-strong">
           {title}
         </h1>
         {subtitle ? (
-          <p className="text-sm md:text-base text-iw-text-muted leading-relaxed">
-            {subtitle}
-          </p>
+          <p className="text-sm md:text-base text-iw-text-muted leading-relaxed">{subtitle}</p>
         ) : null}
       </header>
       <div className="flex flex-col gap-4">{children}</div>
       {reassurance ? <div>{reassurance}</div> : null}
-      {actions ? (
-        <div className="flex flex-col gap-3 pt-2">{actions}</div>
-      ) : null}
+      {actions ? <div className="flex flex-col gap-3 pt-2">{actions}</div> : null}
     </section>
   );
 }

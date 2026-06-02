@@ -17,19 +17,19 @@ const DATA = {
         map: "الخريطة",
         brain: "الدماغ",
         stats: "الإحصاءات",
-        settings: "الإعدادات"
+        settings: "الإعدادات",
       },
       header: {
         closeSession: "إغلاق الجلسة",
         pauseSession: "إيقاف الجلسة مؤقتًا",
         openScratchpad: "فتح لوحة المسودة",
-        closeScratchpad: "إغلاق لوحة المسودة"
+        closeScratchpad: "إغلاق لوحة المسودة",
       },
       error: {
         missingId: "معرّف الجلسة مفقود",
         couldNotLoad: "تعذّر تحميل هذه الجلسة.",
         tryAgain: "حاول مجددًا",
-        backToHome: "العودة إلى الرئيسية"
+        backToHome: "العودة إلى الرئيسية",
       },
       pause: {
         titleSoft: "إيقاف الجلسة مؤقتًا",
@@ -37,20 +37,20 @@ const DATA = {
         message: "سيتم حفظ تقدمك. هل تريد المتابعة لاحقًا؟",
         keepGoingSoft: "استمر!",
         keepGoing: "استمر",
-        exit: "إيقاف والخروج"
+        exit: "إيقاف والخروج",
       },
       saveError: {
         title: "تحذير",
-        message: "تعذّر حفظ إجابتك. قد لا تُسجَّل."
+        message: "تعذّر حفظ إجابتك. قد لا تُسجَّل.",
       },
       offline: {
         title: "حُفظ دون اتصال",
-        message: "ستُزامَن نتائج جلستك عند عودة الاتصال."
+        message: "ستُزامَن نتائج جلستك عند عودة الاتصال.",
       },
       level: "المستوى {{level}}",
       completion: {
         score: "{{correct}} / {{total}} صحيح ({{score}}%)",
-        xpEarned: "+{{xp}} XP مكتسبة"
+        xpEarned: "+{{xp}} XP مكتسبة",
       },
       voice: {
         early: {
@@ -60,7 +60,7 @@ const DATA = {
           nextLabel: "التالي →",
           finishLabel: "رائع! انتهينا",
           homeLabel: "العودة إلى المرج",
-          intro: "لنحلّ هذا معًا!"
+          intro: "لنحلّ هذا معًا!",
         },
         middle: {
           encourage: "جيد. كاي يومئ بالموافقة.",
@@ -69,7 +69,7 @@ const DATA = {
           nextLabel: "السؤال التالي",
           finishLabel: "إنهاء الجلسة",
           homeLabel: "العودة إلى البيت الشجري",
-          intro: "خذ وقتك."
+          intro: "خذ وقتك.",
         },
         high: {
           encourage: "صحيح.",
@@ -78,9 +78,9 @@ const DATA = {
           nextLabel: "التالي",
           finishLabel: "إنهاء",
           homeLabel: "العودة إلى لوحة التحكم",
-          intro: "ابدأ عندما تكون مستعدًا."
-        }
-      }
+          intro: "ابدأ عندما تكون مستعدًا.",
+        },
+      },
     },
     teacherLessonPlan: {
       title: "خطط الدروس",
@@ -100,7 +100,7 @@ const DATA = {
       overview: "نظرة عامة",
       duration: "المدة",
       activities: "الأنشطة",
-      accommodations: "التسهيلات"
+      accommodations: "التسهيلات",
     },
     teacherAnalytics: {
       title: "تحليلات الفصل",
@@ -112,7 +112,7 @@ const DATA = {
       engagementTrends: "اتجاهات التفاعل",
       avgSessionsWeek: "متوسط الجلسات/الأسبوع",
       avgSessionDuration: "متوسط مدة الجلسة",
-      tutorUsageRate: "معدل استخدام المدرس"
+      tutorUsageRate: "معدل استخدام المدرس",
     },
     learnerLeaderboard: {
       title: "لوحة المتصدرين",
@@ -123,7 +123,7 @@ const DATA = {
       empty: "لا توجد إدخالات بعد. اكسب XP للتصاعد في الترتيب!",
       youSuffix: "{{name}} (أنت)",
       learnerName: "المتعلم {{id}}",
-      weeklyXp: "+{{xp}} هذا الأسبوع"
+      weeklyXp: "+{{xp}} هذا الأسبوع",
     },
     caregiverObservation: {
       title: "تقديم ملاحظة",
@@ -131,21 +131,22 @@ const DATA = {
       prompt: "كيف كان أداء الطفل اليوم؟",
       placeholder: "شارك ملاحظتك…",
       submitBtn: "تقديم الملاحظة",
-      submitted: "تم حفظ الملاحظة في رؤى الدماغ"
+      submitted: "تم حفظ الملاحظة في رؤى الدماغ",
     },
     caregiverNotifications: {
       title: "الإشعارات",
       subtitle: "التنبيهات والإنجازات",
       noNotificationsTitle: "لا توجد إشعارات",
-      noNotificationsMessage: "ستصلك تنبيهات حول أهداف IEP والتغييرات في مستوى الأداء وإنجازات الاستمرارية."
+      noNotificationsMessage:
+        "ستصلك تنبيهات حول أهداف IEP والتغييرات في مستوى الأداء وإنجازات الاستمرارية.",
     },
     parentProgress: {
       title: "تقدم {{name}}",
-      subtitle: "تقدم التعلم عبر الزمن"
+      subtitle: "تقدم التعلم عبر الزمن",
     },
     teacherSettings: {
-      title: "الإعدادات"
-    }
+      title: "الإعدادات",
+    },
   },
 
   de: {
@@ -159,19 +160,19 @@ const DATA = {
         map: "Karte",
         brain: "Gehirn",
         stats: "Statistiken",
-        settings: "Einstellungen"
+        settings: "Einstellungen",
       },
       header: {
         closeSession: "Sitzung schließen",
         pauseSession: "Sitzung pausieren",
         openScratchpad: "Notizblock öffnen",
-        closeScratchpad: "Notizblock schließen"
+        closeScratchpad: "Notizblock schließen",
       },
       error: {
         missingId: "Sitzungs-ID fehlt",
         couldNotLoad: "Diese Sitzung konnte nicht geladen werden.",
         tryAgain: "Erneut versuchen",
-        backToHome: "Zurück zur Startseite"
+        backToHome: "Zurück zur Startseite",
       },
       pause: {
         titleSoft: "Sitzung pausieren",
@@ -179,20 +180,21 @@ const DATA = {
         message: "Dein Fortschritt wird gespeichert. Später weitermachen?",
         keepGoingSoft: "Weiter so!",
         keepGoing: "Weitermachen",
-        exit: "Pausieren & beenden"
+        exit: "Pausieren & beenden",
       },
       saveError: {
         title: "Warnung",
-        message: "Deine Antwort konnte nicht gespeichert werden. Sie wird möglicherweise nicht aufgezeichnet."
+        message:
+          "Deine Antwort konnte nicht gespeichert werden. Sie wird möglicherweise nicht aufgezeichnet.",
       },
       offline: {
         title: "Offline gespeichert",
-        message: "Deine Sitzungsergebnisse werden synchronisiert, sobald du wieder online bist."
+        message: "Deine Sitzungsergebnisse werden synchronisiert, sobald du wieder online bist.",
       },
       level: "Stufe {{level}}",
       completion: {
         score: "{{correct}} / {{total}} richtig ({{score}}%)",
-        xpEarned: "+{{xp}} XP verdient"
+        xpEarned: "+{{xp}} XP verdient",
       },
       voice: {
         early: {
@@ -202,7 +204,7 @@ const DATA = {
           nextLabel: "Weiter →",
           finishLabel: "Super! Alles erledigt",
           homeLabel: "Zurück zur Wiese",
-          intro: "Lass uns das gemeinsam lösen!"
+          intro: "Lass uns das gemeinsam lösen!",
         },
         middle: {
           encourage: "Gut. Kai nickt zustimmend.",
@@ -211,7 +213,7 @@ const DATA = {
           nextLabel: "Nächste Frage",
           finishLabel: "Sitzung beenden",
           homeLabel: "Zurück zum Baumhaus",
-          intro: "Lass dir Zeit."
+          intro: "Lass dir Zeit.",
         },
         high: {
           encourage: "Richtig.",
@@ -220,15 +222,16 @@ const DATA = {
           nextLabel: "Weiter",
           finishLabel: "Beenden",
           homeLabel: "Zurück zum Dashboard",
-          intro: "Beginne, wenn du bereit bist."
-        }
-      }
+          intro: "Beginne, wenn du bereit bist.",
+        },
+      },
     },
     teacherLessonPlan: {
       title: "Unterrichtspläne",
       subtitle: "KI-gestützter Unterrichtsplangenerator",
       generateNew: "Neuen Plan erstellen",
-      generateDesc: "Wähle Schüler aus und lass AI einen differenzierten Unterrichtsplan auf Basis ihrer Gehirnprofile erstellen",
+      generateDesc:
+        "Wähle Schüler aus und lass AI einen differenzierten Unterrichtsplan auf Basis ihrer Gehirnprofile erstellen",
       createPlan: "Unterrichtsplan erstellen",
       recentPlans: "Neueste Pläne",
       noPlansTitle: "Noch keine Unterrichtspläne",
@@ -242,7 +245,7 @@ const DATA = {
       overview: "Übersicht",
       duration: "Dauer",
       activities: "Aktivitäten",
-      accommodations: "Anpassungen"
+      accommodations: "Anpassungen",
     },
     teacherAnalytics: {
       title: "Klassenanalyse",
@@ -254,7 +257,7 @@ const DATA = {
       engagementTrends: "Engagementtrends",
       avgSessionsWeek: "Durchschn. Sitzungen/Woche",
       avgSessionDuration: "Durchschn. Sitzungsdauer",
-      tutorUsageRate: "Nachhilfenutzungsrate"
+      tutorUsageRate: "Nachhilfenutzungsrate",
     },
     learnerLeaderboard: {
       title: "Rangliste",
@@ -265,7 +268,7 @@ const DATA = {
       empty: "Noch keine Einträge. Verdiene XP, um aufzusteigen!",
       youSuffix: "{{name}} (Du)",
       learnerName: "Lernender {{id}}",
-      weeklyXp: "+{{xp}} diese Woche"
+      weeklyXp: "+{{xp}} diese Woche",
     },
     caregiverObservation: {
       title: "Beobachtung einreichen",
@@ -273,21 +276,22 @@ const DATA = {
       prompt: "Wie hat das Kind heute abgeschnitten?",
       placeholder: "Teile deine Beobachtung…",
       submitBtn: "Beobachtung einreichen",
-      submitted: "Beobachtung in Gehirnerkenntnissen gespeichert"
+      submitted: "Beobachtung in Gehirnerkenntnissen gespeichert",
     },
     caregiverNotifications: {
       title: "Benachrichtigungen",
       subtitle: "Meldungen und Meilensteine",
       noNotificationsTitle: "Keine Benachrichtigungen",
-      noNotificationsMessage: "Du erhältst Meldungen zu IEP-Zielen, Leistungsänderungen und Streak-Erfolgen."
+      noNotificationsMessage:
+        "Du erhältst Meldungen zu IEP-Zielen, Leistungsänderungen und Streak-Erfolgen.",
     },
     parentProgress: {
       title: "Fortschritt von {{name}}",
-      subtitle: "Lernfortschritt im Zeitverlauf"
+      subtitle: "Lernfortschritt im Zeitverlauf",
     },
     teacherSettings: {
-      title: "Einstellungen"
-    }
+      title: "Einstellungen",
+    },
   },
 
   fr: {
@@ -301,19 +305,19 @@ const DATA = {
         map: "Carte",
         brain: "Cerveau",
         stats: "Statistiques",
-        settings: "Paramètres"
+        settings: "Paramètres",
       },
       header: {
         closeSession: "Fermer la session",
         pauseSession: "Mettre en pause",
         openScratchpad: "Ouvrir le brouillon",
-        closeScratchpad: "Fermer le brouillon"
+        closeScratchpad: "Fermer le brouillon",
       },
       error: {
         missingId: "Identifiant de session manquant",
         couldNotLoad: "Impossible de charger cette session.",
         tryAgain: "Réessayer",
-        backToHome: "Retour à l'accueil"
+        backToHome: "Retour à l'accueil",
       },
       pause: {
         titleSoft: "Pause session",
@@ -321,20 +325,20 @@ const DATA = {
         message: "Votre progression sera sauvegardée. Continuer plus tard ?",
         keepGoingSoft: "Continue !",
         keepGoing: "Continuer",
-        exit: "Pause et quitter"
+        exit: "Pause et quitter",
       },
       saveError: {
         title: "Avertissement",
-        message: "Impossible de sauvegarder votre réponse. Elle pourrait ne pas être enregistrée."
+        message: "Impossible de sauvegarder votre réponse. Elle pourrait ne pas être enregistrée.",
       },
       offline: {
         title: "Sauvegardé hors ligne",
-        message: "Les résultats de votre session seront synchronisés à la reconnexion."
+        message: "Les résultats de votre session seront synchronisés à la reconnexion.",
       },
       level: "Niveau {{level}}",
       completion: {
         score: "{{correct}} / {{total}} correct ({{score}}%)",
-        xpEarned: "+{{xp}} XP gagnés"
+        xpEarned: "+{{xp}} XP gagnés",
       },
       voice: {
         early: {
@@ -344,7 +348,7 @@ const DATA = {
           nextLabel: "Suivant →",
           finishLabel: "Super ! Tout fini",
           homeLabel: "Retour à la prairie",
-          intro: "Résolvons ça ensemble !"
+          intro: "Résolvons ça ensemble !",
         },
         middle: {
           encourage: "Bien joué. Kai approuve d'un signe de tête.",
@@ -353,7 +357,7 @@ const DATA = {
           nextLabel: "Question suivante",
           finishLabel: "Terminer la session",
           homeLabel: "Retour à la cabane",
-          intro: "Prends ton temps."
+          intro: "Prends ton temps.",
         },
         high: {
           encourage: "Correct.",
@@ -362,15 +366,16 @@ const DATA = {
           nextLabel: "Suivant",
           finishLabel: "Terminer",
           homeLabel: "Retour au tableau de bord",
-          intro: "Commence quand tu es prêt."
-        }
-      }
+          intro: "Commence quand tu es prêt.",
+        },
+      },
     },
     teacherLessonPlan: {
       title: "Plans de leçon",
       subtitle: "Générateur de plans de leçon basé sur le profil cérébral",
       generateNew: "Générer un nouveau plan",
-      generateDesc: "Sélectionne des élèves et laisse l'AI créer un plan de leçon différencié basé sur leurs profils cérébraux",
+      generateDesc:
+        "Sélectionne des élèves et laisse l'AI créer un plan de leçon différencié basé sur leurs profils cérébraux",
       createPlan: "Créer un plan de leçon",
       recentPlans: "Plans récents",
       noPlansTitle: "Aucun plan de leçon",
@@ -384,7 +389,7 @@ const DATA = {
       overview: "Aperçu",
       duration: "Durée",
       activities: "Activités",
-      accommodations: "Aménagements"
+      accommodations: "Aménagements",
     },
     teacherAnalytics: {
       title: "Analyses de classe",
@@ -396,7 +401,7 @@ const DATA = {
       engagementTrends: "Tendances d'engagement",
       avgSessionsWeek: "Moy. sessions/semaine",
       avgSessionDuration: "Durée moy. de session",
-      tutorUsageRate: "Taux d'utilisation du tuteur"
+      tutorUsageRate: "Taux d'utilisation du tuteur",
     },
     learnerLeaderboard: {
       title: "Classement",
@@ -407,7 +412,7 @@ const DATA = {
       empty: "Aucune entrée pour l'instant. Gagne des XP pour grimper dans le classement !",
       youSuffix: "{{name}} (Toi)",
       learnerName: "Apprenant {{id}}",
-      weeklyXp: "+{{xp}} cette semaine"
+      weeklyXp: "+{{xp}} cette semaine",
     },
     caregiverObservation: {
       title: "Soumettre une observation",
@@ -415,21 +420,22 @@ const DATA = {
       prompt: "Comment s'est passée la journée de l'enfant ?",
       placeholder: "Partage ton observation…",
       submitBtn: "Soumettre l'observation",
-      submitted: "Observation enregistrée dans les insights cérébraux"
+      submitted: "Observation enregistrée dans les insights cérébraux",
     },
     caregiverNotifications: {
       title: "Notifications",
       subtitle: "Alertes et jalons",
       noNotificationsTitle: "Aucune notification",
-      noNotificationsMessage: "Tu recevras des alertes pour les objectifs IEP, les changements de niveau et les séries de réussite."
+      noNotificationsMessage:
+        "Tu recevras des alertes pour les objectifs IEP, les changements de niveau et les séries de réussite.",
     },
     parentProgress: {
       title: "Progrès de {{name}}",
-      subtitle: "Progression de l'apprentissage dans le temps"
+      subtitle: "Progression de l'apprentissage dans le temps",
     },
     teacherSettings: {
-      title: "Paramètres"
-    }
+      title: "Paramètres",
+    },
   },
 
   hi: {
@@ -443,19 +449,19 @@ const DATA = {
         map: "मानचित्र",
         brain: "ब्रेन",
         stats: "आँकड़े",
-        settings: "सेटिंग्स"
+        settings: "सेटिंग्स",
       },
       header: {
         closeSession: "सत्र बंद करें",
         pauseSession: "सत्र रोकें",
         openScratchpad: "स्क्रैचपैड खोलें",
-        closeScratchpad: "स्क्रैचपैड बंद करें"
+        closeScratchpad: "स्क्रैचपैड बंद करें",
       },
       error: {
         missingId: "सत्र ID अनुपलब्ध है",
         couldNotLoad: "यह सत्र लोड नहीं हो सका।",
         tryAgain: "पुनः प्रयास करें",
-        backToHome: "होम पर वापस जाएँ"
+        backToHome: "होम पर वापस जाएँ",
       },
       pause: {
         titleSoft: "सत्र रोकें",
@@ -463,20 +469,20 @@ const DATA = {
         message: "आपकी प्रगति सहेजी जाएगी। बाद में जारी रखें?",
         keepGoingSoft: "जारी रखो!",
         keepGoing: "जारी रखें",
-        exit: "रोकें और बाहर निकलें"
+        exit: "रोकें और बाहर निकलें",
       },
       saveError: {
         title: "चेतावनी",
-        message: "आपका उत्तर सहेजा नहीं जा सका। यह दर्ज नहीं हो सकता।"
+        message: "आपका उत्तर सहेजा नहीं जा सका। यह दर्ज नहीं हो सकता।",
       },
       offline: {
         title: "ऑफलाइन सहेजा गया",
-        message: "ऑनलाइन होने पर आपके सत्र के परिणाम सिंक हो जाएँगे।"
+        message: "ऑनलाइन होने पर आपके सत्र के परिणाम सिंक हो जाएँगे।",
       },
       level: "स्तर {{level}}",
       completion: {
         score: "{{correct}} / {{total}} सही ({{score}}%)",
-        xpEarned: "+{{xp}} XP अर्जित"
+        xpEarned: "+{{xp}} XP अर्जित",
       },
       voice: {
         early: {
@@ -486,7 +492,7 @@ const DATA = {
           nextLabel: "अगला →",
           finishLabel: "बढ़िया! सब हो गया",
           homeLabel: "मैदान पर वापस जाएँ",
-          intro: "आइए इसे मिलकर हल करें!"
+          intro: "आइए इसे मिलकर हल करें!",
         },
         middle: {
           encourage: "बढ़िया। काई सहमति में सिर हिलाता है।",
@@ -495,7 +501,7 @@ const DATA = {
           nextLabel: "अगला प्रश्न",
           finishLabel: "सत्र समाप्त करें",
           homeLabel: "ट्रीहाउस पर वापस जाएँ",
-          intro: "समय लें।"
+          intro: "समय लें।",
         },
         high: {
           encourage: "सही।",
@@ -504,15 +510,16 @@ const DATA = {
           nextLabel: "अगला",
           finishLabel: "समाप्त",
           homeLabel: "डैशबोर्ड पर वापस जाएँ",
-          intro: "तैयार होने पर शुरू करें।"
-        }
-      }
+          intro: "तैयार होने पर शुरू करें।",
+        },
+      },
     },
     teacherLessonPlan: {
       title: "पाठ योजनाएँ",
       subtitle: "ब्रेन-आधारित पाठ योजना जनरेटर",
       generateNew: "नई योजना बनाएँ",
-      generateDesc: "छात्रों का चयन करें और AI को उनके ब्रेन प्रोफ़ाइल के आधार पर विभेदित पाठ योजना बनाने दें",
+      generateDesc:
+        "छात्रों का चयन करें और AI को उनके ब्रेन प्रोफ़ाइल के आधार पर विभेदित पाठ योजना बनाने दें",
       createPlan: "पाठ योजना बनाएँ",
       recentPlans: "हाल की योजनाएँ",
       noPlansTitle: "अभी तक कोई पाठ योजना नहीं",
@@ -526,7 +533,7 @@ const DATA = {
       overview: "अवलोकन",
       duration: "अवधि",
       activities: "गतिविधियाँ",
-      accommodations: "समायोजन"
+      accommodations: "समायोजन",
     },
     teacherAnalytics: {
       title: "कक्षा विश्लेषण",
@@ -538,7 +545,7 @@ const DATA = {
       engagementTrends: "सहभागिता प्रवृत्तियाँ",
       avgSessionsWeek: "औसत सत्र/सप्ताह",
       avgSessionDuration: "औसत सत्र अवधि",
-      tutorUsageRate: "ट्यूटर उपयोग दर"
+      tutorUsageRate: "ट्यूटर उपयोग दर",
     },
     learnerLeaderboard: {
       title: "लीडरबोर्ड",
@@ -549,7 +556,7 @@ const DATA = {
       empty: "अभी तक कोई प्रविष्टि नहीं। रैंक में ऊपर जाने के लिए XP अर्जित करें!",
       youSuffix: "{{name}} (आप)",
       learnerName: "विद्यार्थी {{id}}",
-      weeklyXp: "+{{xp}} इस सप्ताह"
+      weeklyXp: "+{{xp}} इस सप्ताह",
     },
     caregiverObservation: {
       title: "अवलोकन प्रस्तुत करें",
@@ -557,21 +564,22 @@ const DATA = {
       prompt: "आज बच्चे ने कैसा प्रदर्शन किया?",
       placeholder: "अपना अवलोकन साझा करें…",
       submitBtn: "अवलोकन प्रस्तुत करें",
-      submitted: "अवलोकन ब्रेन इनसाइट्स में सहेजा गया"
+      submitted: "अवलोकन ब्रेन इनसाइट्स में सहेजा गया",
     },
     caregiverNotifications: {
       title: "सूचनाएँ",
       subtitle: "अलर्ट और मील के पत्थर",
       noNotificationsTitle: "कोई सूचना नहीं",
-      noNotificationsMessage: "आपको IEP लक्ष्य मील के पत्थर, कार्य स्तर परिवर्तन और स्ट्रीक उपलब्धियों के लिए अलर्ट मिलेंगे।"
+      noNotificationsMessage:
+        "आपको IEP लक्ष्य मील के पत्थर, कार्य स्तर परिवर्तन और स्ट्रीक उपलब्धियों के लिए अलर्ट मिलेंगे।",
     },
     parentProgress: {
       title: "{{name}} की प्रगति",
-      subtitle: "समय के साथ सीखने की प्रगति"
+      subtitle: "समय के साथ सीखने की प्रगति",
     },
     teacherSettings: {
-      title: "सेटिंग्स"
-    }
+      title: "सेटिंग्स",
+    },
   },
 
   ja: {
@@ -585,19 +593,19 @@ const DATA = {
         map: "マップ",
         brain: "ブレイン",
         stats: "統計",
-        settings: "設定"
+        settings: "設定",
       },
       header: {
         closeSession: "セッションを閉じる",
         pauseSession: "セッションを一時停止",
         openScratchpad: "メモ帳を開く",
-        closeScratchpad: "メモ帳を閉じる"
+        closeScratchpad: "メモ帳を閉じる",
       },
       error: {
         missingId: "セッションIDがありません",
         couldNotLoad: "このセッションを読み込めませんでした。",
         tryAgain: "もう一度試す",
-        backToHome: "ホームに戻る"
+        backToHome: "ホームに戻る",
       },
       pause: {
         titleSoft: "セッションを一時停止",
@@ -605,20 +613,20 @@ const DATA = {
         message: "進捗は保存されます。後で続けますか？",
         keepGoingSoft: "続けよう！",
         keepGoing: "続ける",
-        exit: "一時停止して終了"
+        exit: "一時停止して終了",
       },
       saveError: {
         title: "警告",
-        message: "回答を保存できませんでした。記録されない可能性があります。"
+        message: "回答を保存できませんでした。記録されない可能性があります。",
       },
       offline: {
         title: "オフラインで保存済み",
-        message: "オンラインに戻ったときにセッション結果が同期されます。"
+        message: "オンラインに戻ったときにセッション結果が同期されます。",
       },
       level: "レベル {{level}}",
       completion: {
         score: "{{correct}} / {{total}} 正解 ({{score}}%)",
-        xpEarned: "+{{xp}} XP 獲得"
+        xpEarned: "+{{xp}} XP 獲得",
       },
       voice: {
         early: {
@@ -628,7 +636,7 @@ const DATA = {
           nextLabel: "次へ →",
           finishLabel: "やった！全部完了",
           homeLabel: "草原に戻る",
-          intro: "一緒に解いてみよう！"
+          intro: "一緒に解いてみよう！",
         },
         middle: {
           encourage: "いいね。カイが頷いている。",
@@ -637,7 +645,7 @@ const DATA = {
           nextLabel: "次の問題",
           finishLabel: "セッションを終わる",
           homeLabel: "ツリーハウスに戻る",
-          intro: "ゆっくり考えて。"
+          intro: "ゆっくり考えて。",
         },
         high: {
           encourage: "正解。",
@@ -646,9 +654,9 @@ const DATA = {
           nextLabel: "次へ",
           finishLabel: "終了",
           homeLabel: "ダッシュボードに戻る",
-          intro: "準備ができたら始めてください。"
-        }
-      }
+          intro: "準備ができたら始めてください。",
+        },
+      },
     },
     teacherLessonPlan: {
       title: "授業計画",
@@ -668,7 +676,7 @@ const DATA = {
       overview: "概要",
       duration: "所要時間",
       activities: "活動",
-      accommodations: "配慮事項"
+      accommodations: "配慮事項",
     },
     teacherAnalytics: {
       title: "クラス分析",
@@ -680,7 +688,7 @@ const DATA = {
       engagementTrends: "エンゲージメントの傾向",
       avgSessionsWeek: "平均セッション数/週",
       avgSessionDuration: "平均セッション時間",
-      tutorUsageRate: "チューター利用率"
+      tutorUsageRate: "チューター利用率",
     },
     learnerLeaderboard: {
       title: "ランキング",
@@ -691,7 +699,7 @@ const DATA = {
       empty: "まだランキングがありません。XP を獲得して順位を上げよう！",
       youSuffix: "{{name}}（あなた）",
       learnerName: "学習者 {{id}}",
-      weeklyXp: "+{{xp}} 今週"
+      weeklyXp: "+{{xp}} 今週",
     },
     caregiverObservation: {
       title: "観察を提出",
@@ -699,21 +707,22 @@ const DATA = {
       prompt: "今日の子どもの様子はどうでしたか？",
       placeholder: "観察内容を共有してください…",
       submitBtn: "観察を提出",
-      submitted: "観察をブレインインサイトに保存しました"
+      submitted: "観察をブレインインサイトに保存しました",
     },
     caregiverNotifications: {
       title: "通知",
       subtitle: "アラートとマイルストーン",
       noNotificationsTitle: "通知なし",
-      noNotificationsMessage: "IEP 目標のマイルストーン、機能レベルの変化、ストリーク達成についてのアラートが届きます。"
+      noNotificationsMessage:
+        "IEP 目標のマイルストーン、機能レベルの変化、ストリーク達成についてのアラートが届きます。",
     },
     parentProgress: {
       title: "{{name}} の進捗",
-      subtitle: "学習の進捗の推移"
+      subtitle: "学習の進捗の推移",
     },
     teacherSettings: {
-      title: "設定"
-    }
+      title: "設定",
+    },
   },
 
   ko: {
@@ -727,19 +736,19 @@ const DATA = {
         map: "맵",
         brain: "브레인",
         stats: "통계",
-        settings: "설정"
+        settings: "설정",
       },
       header: {
         closeSession: "세션 닫기",
         pauseSession: "세션 일시정지",
         openScratchpad: "메모장 열기",
-        closeScratchpad: "메모장 닫기"
+        closeScratchpad: "메모장 닫기",
       },
       error: {
         missingId: "세션 ID가 없습니다",
         couldNotLoad: "이 세션을 불러올 수 없습니다.",
         tryAgain: "다시 시도",
-        backToHome: "홈으로 돌아가기"
+        backToHome: "홈으로 돌아가기",
       },
       pause: {
         titleSoft: "세션 일시정지",
@@ -747,20 +756,20 @@ const DATA = {
         message: "진행 상황이 저장됩니다. 나중에 계속하시겠어요?",
         keepGoingSoft: "계속해요!",
         keepGoing: "계속하기",
-        exit: "일시정지 후 종료"
+        exit: "일시정지 후 종료",
       },
       saveError: {
         title: "경고",
-        message: "답변을 저장할 수 없습니다. 기록되지 않을 수 있습니다."
+        message: "답변을 저장할 수 없습니다. 기록되지 않을 수 있습니다.",
       },
       offline: {
         title: "오프라인 저장됨",
-        message: "인터넷에 연결되면 세션 결과가 동기화됩니다."
+        message: "인터넷에 연결되면 세션 결과가 동기화됩니다.",
       },
       level: "레벨 {{level}}",
       completion: {
         score: "{{correct}} / {{total}} 정답 ({{score}}%)",
-        xpEarned: "+{{xp}} XP 획득"
+        xpEarned: "+{{xp}} XP 획득",
       },
       voice: {
         early: {
@@ -770,7 +779,7 @@ const DATA = {
           nextLabel: "다음 →",
           finishLabel: "야호! 모두 완료",
           homeLabel: "초원으로 돌아가기",
-          intro: "함께 풀어봐요!"
+          intro: "함께 풀어봐요!",
         },
         middle: {
           encourage: "잘했어요. 카이가 고개를 끄덕입니다.",
@@ -779,7 +788,7 @@ const DATA = {
           nextLabel: "다음 문제",
           finishLabel: "세션 마치기",
           homeLabel: "나무집으로 돌아가기",
-          intro: "천천히 생각해요."
+          intro: "천천히 생각해요.",
         },
         high: {
           encourage: "정답.",
@@ -788,15 +797,16 @@ const DATA = {
           nextLabel: "다음",
           finishLabel: "완료",
           homeLabel: "대시보드로 돌아가기",
-          intro: "준비되면 시작하세요."
-        }
-      }
+          intro: "준비되면 시작하세요.",
+        },
+      },
     },
     teacherLessonPlan: {
       title: "수업 계획",
       subtitle: "브레인 기반 수업 계획 생성기",
       generateNew: "새 계획 생성",
-      generateDesc: "학생을 선택하면 AI가 브레인 프로파일을 기반으로 차별화된 수업 계획을 생성합니다",
+      generateDesc:
+        "학생을 선택하면 AI가 브레인 프로파일을 기반으로 차별화된 수업 계획을 생성합니다",
       createPlan: "수업 계획 만들기",
       recentPlans: "최근 계획",
       noPlansTitle: "아직 수업 계획이 없습니다",
@@ -810,7 +820,7 @@ const DATA = {
       overview: "개요",
       duration: "수업 시간",
       activities: "활동",
-      accommodations: "지원 사항"
+      accommodations: "지원 사항",
     },
     teacherAnalytics: {
       title: "학급 분석",
@@ -822,7 +832,7 @@ const DATA = {
       engagementTrends: "참여 트렌드",
       avgSessionsWeek: "평균 세션 수/주",
       avgSessionDuration: "평균 세션 시간",
-      tutorUsageRate: "튜터 사용률"
+      tutorUsageRate: "튜터 사용률",
     },
     learnerLeaderboard: {
       title: "리더보드",
@@ -833,7 +843,7 @@ const DATA = {
       empty: "아직 순위가 없습니다. XP를 쌓아 순위를 올리세요!",
       youSuffix: "{{name}} (나)",
       learnerName: "학습자 {{id}}",
-      weeklyXp: "+{{xp}} 이번 주"
+      weeklyXp: "+{{xp}} 이번 주",
     },
     caregiverObservation: {
       title: "관찰 제출",
@@ -841,21 +851,22 @@ const DATA = {
       prompt: "오늘 아이는 어떻게 지냈나요?",
       placeholder: "관찰 내용을 공유하세요…",
       submitBtn: "관찰 제출",
-      submitted: "관찰이 브레인 인사이트에 저장되었습니다"
+      submitted: "관찰이 브레인 인사이트에 저장되었습니다",
     },
     caregiverNotifications: {
       title: "알림",
       subtitle: "알림 및 마일스톤",
       noNotificationsTitle: "알림 없음",
-      noNotificationsMessage: "IEP 목표 마일스톤, 기능 수준 변화, 연속 달성에 대한 알림을 받게 됩니다."
+      noNotificationsMessage:
+        "IEP 목표 마일스톤, 기능 수준 변화, 연속 달성에 대한 알림을 받게 됩니다.",
     },
     parentProgress: {
       title: "{{name}}의 진행 상황",
-      subtitle: "시간에 따른 학습 진행"
+      subtitle: "시간에 따른 학습 진행",
     },
     teacherSettings: {
-      title: "설정"
-    }
+      title: "설정",
+    },
   },
 
   pt: {
@@ -869,19 +880,19 @@ const DATA = {
         map: "Mapa",
         brain: "Cérebro",
         stats: "Estatísticas",
-        settings: "Configurações"
+        settings: "Configurações",
       },
       header: {
         closeSession: "Fechar sessão",
         pauseSession: "Pausar sessão",
         openScratchpad: "Abrir rascunho",
-        closeScratchpad: "Fechar rascunho"
+        closeScratchpad: "Fechar rascunho",
       },
       error: {
         missingId: "ID da sessão ausente",
         couldNotLoad: "Não foi possível carregar esta sessão.",
         tryAgain: "Tentar novamente",
-        backToHome: "Voltar ao início"
+        backToHome: "Voltar ao início",
       },
       pause: {
         titleSoft: "Pausar sessão",
@@ -889,20 +900,20 @@ const DATA = {
         message: "Seu progresso será salvo. Continuar mais tarde?",
         keepGoingSoft: "Continue assim!",
         keepGoing: "Continuar",
-        exit: "Pausar e sair"
+        exit: "Pausar e sair",
       },
       saveError: {
         title: "Aviso",
-        message: "Não foi possível salvar sua resposta. Ela pode não ser registrada."
+        message: "Não foi possível salvar sua resposta. Ela pode não ser registrada.",
       },
       offline: {
         title: "Salvo offline",
-        message: "Os resultados da sua sessão serão sincronizados quando você voltar online."
+        message: "Os resultados da sua sessão serão sincronizados quando você voltar online.",
       },
       level: "Nível {{level}}",
       completion: {
         score: "{{correct}} / {{total}} corretos ({{score}}%)",
-        xpEarned: "+{{xp}} XP ganhos"
+        xpEarned: "+{{xp}} XP ganhos",
       },
       voice: {
         early: {
@@ -912,7 +923,7 @@ const DATA = {
           nextLabel: "Próximo →",
           finishLabel: "Eba! Tudo pronto",
           homeLabel: "Voltar ao prado",
-          intro: "Vamos resolver juntos!"
+          intro: "Vamos resolver juntos!",
         },
         middle: {
           encourage: "Ótimo. Kai acena com aprovação.",
@@ -921,7 +932,7 @@ const DATA = {
           nextLabel: "Próxima pergunta",
           finishLabel: "Encerrar sessão",
           homeLabel: "Voltar à cabana na árvore",
-          intro: "Tome o seu tempo."
+          intro: "Tome o seu tempo.",
         },
         high: {
           encourage: "Correto.",
@@ -930,15 +941,16 @@ const DATA = {
           nextLabel: "Próximo",
           finishLabel: "Concluir",
           homeLabel: "Voltar ao painel",
-          intro: "Comece quando estiver pronto."
-        }
-      }
+          intro: "Comece quando estiver pronto.",
+        },
+      },
     },
     teacherLessonPlan: {
       title: "Planos de Aula",
       subtitle: "Gerador de planos de aula baseado no perfil cerebral",
       generateNew: "Gerar novo plano",
-      generateDesc: "Selecione alunos e deixe a AI criar um plano de aula diferenciado com base em seus perfis cerebrais",
+      generateDesc:
+        "Selecione alunos e deixe a AI criar um plano de aula diferenciado com base em seus perfis cerebrais",
       createPlan: "Criar plano de aula",
       recentPlans: "Planos recentes",
       noPlansTitle: "Nenhum plano de aula ainda",
@@ -952,7 +964,7 @@ const DATA = {
       overview: "Visão geral",
       duration: "Duração",
       activities: "Atividades",
-      accommodations: "Adaptações"
+      accommodations: "Adaptações",
     },
     teacherAnalytics: {
       title: "Análises da Turma",
@@ -964,7 +976,7 @@ const DATA = {
       engagementTrends: "Tendências de engajamento",
       avgSessionsWeek: "Média de sessões/semana",
       avgSessionDuration: "Duração média da sessão",
-      tutorUsageRate: "Taxa de uso do tutor"
+      tutorUsageRate: "Taxa de uso do tutor",
     },
     learnerLeaderboard: {
       title: "Classificação",
@@ -975,7 +987,7 @@ const DATA = {
       empty: "Nenhuma entrada ainda. Ganhe XP para subir no ranking!",
       youSuffix: "{{name}} (Você)",
       learnerName: "Aluno {{id}}",
-      weeklyXp: "+{{xp}} esta semana"
+      weeklyXp: "+{{xp}} esta semana",
     },
     caregiverObservation: {
       title: "Enviar observação",
@@ -983,21 +995,22 @@ const DATA = {
       prompt: "Como a criança foi hoje?",
       placeholder: "Compartilhe sua observação…",
       submitBtn: "Enviar observação",
-      submitted: "Observação salva nos insights do Cérebro"
+      submitted: "Observação salva nos insights do Cérebro",
     },
     caregiverNotifications: {
       title: "Notificações",
       subtitle: "Alertas e marcos",
       noNotificationsTitle: "Nenhuma notificação",
-      noNotificationsMessage: "Você receberá alertas sobre metas IEP, mudanças de nível de funcionamento e conquistas de sequência."
+      noNotificationsMessage:
+        "Você receberá alertas sobre metas IEP, mudanças de nível de funcionamento e conquistas de sequência.",
     },
     parentProgress: {
       title: "Progresso de {{name}}",
-      subtitle: "Progresso de aprendizado ao longo do tempo"
+      subtitle: "Progresso de aprendizado ao longo do tempo",
     },
     teacherSettings: {
-      title: "Configurações"
-    }
+      title: "Configurações",
+    },
   },
 
   zh: {
@@ -1011,19 +1024,19 @@ const DATA = {
         map: "地图",
         brain: "大脑",
         stats: "统计",
-        settings: "设置"
+        settings: "设置",
       },
       header: {
         closeSession: "关闭课程",
         pauseSession: "暂停课程",
         openScratchpad: "打开草稿板",
-        closeScratchpad: "关闭草稿板"
+        closeScratchpad: "关闭草稿板",
       },
       error: {
         missingId: "缺少课程 ID",
         couldNotLoad: "无法加载此课程。",
         tryAgain: "重试",
-        backToHome: "返回首页"
+        backToHome: "返回首页",
       },
       pause: {
         titleSoft: "暂停课程",
@@ -1031,20 +1044,20 @@ const DATA = {
         message: "您的进度将被保存。稍后继续？",
         keepGoingSoft: "继续加油！",
         keepGoing: "继续",
-        exit: "暂停并退出"
+        exit: "暂停并退出",
       },
       saveError: {
         title: "警告",
-        message: "无法保存您的答案，可能不会被记录。"
+        message: "无法保存您的答案，可能不会被记录。",
       },
       offline: {
         title: "已离线保存",
-        message: "恢复网络后，您的课程结果将自动同步。"
+        message: "恢复网络后，您的课程结果将自动同步。",
       },
       level: "等级 {{level}}",
       completion: {
         score: "{{correct}} / {{total}} 正确（{{score}}%）",
-        xpEarned: "+{{xp}} XP 已获得"
+        xpEarned: "+{{xp}} XP 已获得",
       },
       voice: {
         early: {
@@ -1054,7 +1067,7 @@ const DATA = {
           nextLabel: "下一步 →",
           finishLabel: "太好了！全部完成",
           homeLabel: "回到草地",
-          intro: "让我们一起解决吧！"
+          intro: "让我们一起解决吧！",
         },
         middle: {
           encourage: "不错。凯点头表示赞许。",
@@ -1063,7 +1076,7 @@ const DATA = {
           nextLabel: "下一题",
           finishLabel: "结束课程",
           homeLabel: "回到树屋",
-          intro: "慢慢来。"
+          intro: "慢慢来。",
         },
         high: {
           encourage: "正确。",
@@ -1072,9 +1085,9 @@ const DATA = {
           nextLabel: "下一步",
           finishLabel: "完成",
           homeLabel: "返回仪表盘",
-          intro: "准备好后开始。"
-        }
-      }
+          intro: "准备好后开始。",
+        },
+      },
     },
     teacherLessonPlan: {
       title: "课程计划",
@@ -1094,7 +1107,7 @@ const DATA = {
       overview: "概述",
       duration: "时长",
       activities: "活动",
-      accommodations: "调整措施"
+      accommodations: "调整措施",
     },
     teacherAnalytics: {
       title: "班级分析",
@@ -1106,7 +1119,7 @@ const DATA = {
       engagementTrends: "参与趋势",
       avgSessionsWeek: "平均课程次数/周",
       avgSessionDuration: "平均课程时长",
-      tutorUsageRate: "辅导使用率"
+      tutorUsageRate: "辅导使用率",
     },
     learnerLeaderboard: {
       title: "排行榜",
@@ -1117,7 +1130,7 @@ const DATA = {
       empty: "暂无排行榜数据。赚取 XP 提升排名！",
       youSuffix: "{{name}}（你）",
       learnerName: "学习者 {{id}}",
-      weeklyXp: "+{{xp}} 本周"
+      weeklyXp: "+{{xp}} 本周",
     },
     caregiverObservation: {
       title: "提交观察",
@@ -1125,29 +1138,35 @@ const DATA = {
       prompt: "今天孩子表现如何？",
       placeholder: "分享您的观察…",
       submitBtn: "提交观察",
-      submitted: "观察已保存至大脑洞察"
+      submitted: "观察已保存至大脑洞察",
     },
     caregiverNotifications: {
       title: "通知",
       subtitle: "提醒与里程碑",
       noNotificationsTitle: "暂无通知",
-      noNotificationsMessage: "您将收到有关 IEP 目标里程碑、功能水平变化和连续学习成就的提醒。"
+      noNotificationsMessage: "您将收到有关 IEP 目标里程碑、功能水平变化和连续学习成就的提醒。",
     },
     parentProgress: {
       title: "{{name}} 的进度",
-      subtitle: "随时间推移的学习进度"
+      subtitle: "随时间推移的学习进度",
     },
     teacherSettings: {
-      title: "设置"
-    }
-  }
+      title: "设置",
+    },
+  },
 };
 
-function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
-  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
-  else t[k]=v;}return t;}
+function deepMerge(t, s) {
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if (!t[k] || typeof t[k] !== "object") t[k] = {};
+      deepMerge(t[k], v);
+    } else t[k] = v;
+  }
+  return t;
+}
 
-let n=0;
+let n = 0;
 for (const [locale, roots] of Object.entries(DATA)) {
   const file = join(dir, `${locale}.json`);
   const json = JSON.parse(readFileSync(file, "utf8"));

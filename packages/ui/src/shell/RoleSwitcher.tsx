@@ -80,9 +80,7 @@ export function RoleSwitcher({
           className="absolute right-0 z-40 mt-2 w-[280px] rounded-iw-card-lg border border-iw-border bg-white/95 backdrop-blur-md shadow-iw-floating p-1.5"
         >
           {visible.length === 0 ? (
-            <p className="px-3 py-2 text-sm text-iw-text-muted">
-              No other roles available.
-            </p>
+            <p className="px-3 py-2 text-sm text-iw-text-muted">No other roles available.</p>
           ) : (
             <ul className="flex flex-col gap-0.5">
               {visible.map((opt) => {
@@ -120,9 +118,7 @@ export function RoleSwitcher({
                             />
                           ) : null}
                         </span>
-                        <span className="block text-xs text-iw-text-muted">
-                          {meta.description}
-                        </span>
+                        <span className="block text-xs text-iw-text-muted">{meta.description}</span>
                       </span>
                       {isCurrent ? (
                         <Check

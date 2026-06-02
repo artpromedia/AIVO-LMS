@@ -171,12 +171,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
               <Button type="submit" size="sm" disabled={pending}>
                 {pending ? "Sending…" : "Send invite"}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setOpenRole(null)}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={() => setOpenRole(null)}>
                 {t("cancel")}
               </Button>
             </div>

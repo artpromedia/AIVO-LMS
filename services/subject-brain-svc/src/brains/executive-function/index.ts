@@ -1,5 +1,9 @@
 import { breakDownTask, nextStepPrompt } from "@aivo/executive-function";
-import { findSkillsByTopic, getPrerequisitesFor, getStandardsFor } from "../../services/skill-graph-store.js";
+import {
+  findSkillsByTopic,
+  getPrerequisitesFor,
+  getStandardsFor,
+} from "../../services/skill-graph-store.js";
 import { buildProfileAdaptations } from "../../services/profile-adaptations.js";
 import type {
   AdaptDirective,
@@ -37,7 +41,7 @@ export class ExecutiveFunctionBrain implements SubjectBrain {
     const recommendedSurfaces = ["multi_step_workspace", "drag_manipulative", "choice_grid"];
     const recommendedScaffolds = [
       "Externalize working memory: keep the rule visible while solving.",
-      "Pre-announce a switch (\"new rule next!\") to support flexibility.",
+      'Pre-announce a switch ("new rule next!") to support flexibility.',
       "Chunk multi-step tasks; check off each step.",
     ];
 
@@ -120,8 +124,7 @@ export class ExecutiveFunctionBrain implements SubjectBrain {
       return { difficultyModulation: 1.0, rationale: "No history; hold pace." };
     }
     const recent = history.slice(-5);
-    const avgCorrections =
-      recent.reduce((s, r) => s + (r.corrections ?? 0), 0) / recent.length;
+    const avgCorrections = recent.reduce((s, r) => s + (r.corrections ?? 0), 0) / recent.length;
     const avgLatency = recent.reduce((s, r) => s + (r.responseTimeMs ?? 0), 0) / recent.length;
     const avgCorrect = recent.reduce((s, r) => s + (r.correctness ?? 0), 0) / recent.length;
 

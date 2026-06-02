@@ -731,6 +731,8 @@ for (const [locale, roots] of Object.entries(DATA)) {
   }
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-R_T1-i18n: merged teacher.home/lesson_plans/reports/learner_overview/learner_iep_draft keys → messages/${locale}.json`);
+  console.log(
+    `seed-R_T1-i18n: merged teacher.home/lesson_plans/reports/learner_overview/learner_iep_draft keys → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-R_T1-i18n: done — ${written} locale catalogs updated.`);

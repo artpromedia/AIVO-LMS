@@ -42,10 +42,14 @@ const PARENT = {
       placeholder_good_at: "Memorising lyrics, building, drawing, kindness",
       placeholder_motivates: "Beating their own time. Showing dad. Cool space facts.",
       placeholder_frustration_triggers: "Long reading passages.\nTimers.\nLoud rooms.",
-      placeholder_calming_strategies: "A short walk.\nWater + 2 minutes off screen.\nNoise-cancelling headphones.",
-      placeholder_accommodations: "Extended time on tests.\nFrequent movement breaks.\nQuiet testing environment.",
-      placeholder_goals: "Read for 15 minutes without quitting.\nFeel confident with multiplication.\nWrite a short story.",
-      placeholder_concerns: "Worried about confidence with reading. Recently moved schools. Big test in spring.",
+      placeholder_calming_strategies:
+        "A short walk.\nWater + 2 minutes off screen.\nNoise-cancelling headphones.",
+      placeholder_accommodations:
+        "Extended time on tests.\nFrequent movement breaks.\nQuiet testing environment.",
+      placeholder_goals:
+        "Read for 15 minutes without quitting.\nFeel confident with multiplication.\nWrite a short story.",
+      placeholder_concerns:
+        "Worried about confidence with reading. Recently moved schools. Big test in spring.",
       reassurance_private_title: "Private by default",
       reassurance_no_diagnosis_title: "No diagnosis required",
       movement_helps_label: "Movement helps my child focus",
@@ -124,16 +128,23 @@ const PARENT = {
       placeholder_diagnoses_other: "p. ej. APD, pérdida auditiva leve",
       placeholder_loves: "Dinosaurios. Construir con LEGO. Cocinar con la abuela.",
       placeholder_good_at: "Memorizar letras de canciones, construir, dibujar, amabilidad",
-      placeholder_motivates: "Superar su propio tiempo. Mostrarle a papá. Datos curiosos del espacio.",
-      placeholder_frustration_triggers: "Párrafos de lectura largos.\nCronómetros.\nSalones ruidosos.",
-      placeholder_calming_strategies: "Un corto paseo.\nAgua + 2 minutos sin pantalla.\nAudífonos con cancelación de ruido.",
-      placeholder_accommodations: "Tiempo extendido en exámenes.\nDescansos de movimiento frecuentes.\nEntorno tranquilo para evaluar.",
-      placeholder_goals: "Leer 15 minutos sin rendirse.\nSentirse seguro con la multiplicación.\nEscribir un cuento corto.",
-      placeholder_concerns: "Preocupado por la confianza en la lectura. Se cambió de escuela recientemente. Examen importante en primavera.",
+      placeholder_motivates:
+        "Superar su propio tiempo. Mostrarle a papá. Datos curiosos del espacio.",
+      placeholder_frustration_triggers:
+        "Párrafos de lectura largos.\nCronómetros.\nSalones ruidosos.",
+      placeholder_calming_strategies:
+        "Un corto paseo.\nAgua + 2 minutos sin pantalla.\nAudífonos con cancelación de ruido.",
+      placeholder_accommodations:
+        "Tiempo extendido en exámenes.\nDescansos de movimiento frecuentes.\nEntorno tranquilo para evaluar.",
+      placeholder_goals:
+        "Leer 15 minutos sin rendirse.\nSentirse seguro con la multiplicación.\nEscribir un cuento corto.",
+      placeholder_concerns:
+        "Preocupado por la confianza en la lectura. Se cambió de escuela recientemente. Examen importante en primavera.",
       reassurance_private_title: "Privado por defecto",
       reassurance_no_diagnosis_title: "No se requiere diagnóstico",
       movement_helps_label: "El movimiento ayuda a mi hijo/a a concentrarse",
-      movement_helps_body: "AIVO puede sugerir pausas de estiramiento / caminata entre bloques de preguntas.",
+      movement_helps_body:
+        "AIVO puede sugerir pausas de estiramiento / caminata entre bloques de preguntas.",
       aac_label: "Mi hijo/a usa un dispositivo o app de CAA",
       aac_body: "AIVO cambiará a patrones de respuesta amigables con CAA.",
       homework_coaching_label: "Mi hijo/a necesita ayuda para empezar con la tarea",
@@ -208,16 +219,23 @@ const PARENT = {
       placeholder_diagnoses_other: "ex. APD, légère perte auditive",
       placeholder_loves: "Les dinosaures. Construire avec LEGO. Cuisiner avec mamie.",
       placeholder_good_at: "Mémoriser des paroles, construire, dessiner, gentillesse",
-      placeholder_motivates: "Battre son propre record. Montrer à papa. Des faits cool sur l'espace.",
-      placeholder_frustration_triggers: "Longs passages de lecture.\nMinuteries.\nSalles bruyantes.",
-      placeholder_calming_strategies: "Une courte marche.\nEau + 2 minutes sans écran.\nCasque antibruit.",
-      placeholder_accommodations: "Temps supplémentaire aux examens.\nPauses de mouvement fréquentes.\nEnvironnement calme pour les tests.",
-      placeholder_goals: "Lire 15 minutes sans s'arrêter.\nSe sentir à l'aise avec la multiplication.\nÉcrire une courte histoire.",
-      placeholder_concerns: "Inquiet pour la confiance en lecture. Changement d'école récent. Grand examen au printemps.",
+      placeholder_motivates:
+        "Battre son propre record. Montrer à papa. Des faits cool sur l'espace.",
+      placeholder_frustration_triggers:
+        "Longs passages de lecture.\nMinuteries.\nSalles bruyantes.",
+      placeholder_calming_strategies:
+        "Une courte marche.\nEau + 2 minutes sans écran.\nCasque antibruit.",
+      placeholder_accommodations:
+        "Temps supplémentaire aux examens.\nPauses de mouvement fréquentes.\nEnvironnement calme pour les tests.",
+      placeholder_goals:
+        "Lire 15 minutes sans s'arrêter.\nSe sentir à l'aise avec la multiplication.\nÉcrire une courte histoire.",
+      placeholder_concerns:
+        "Inquiet pour la confiance en lecture. Changement d'école récent. Grand examen au printemps.",
       reassurance_private_title: "Privé par défaut",
       reassurance_no_diagnosis_title: "Aucun diagnostic requis",
       movement_helps_label: "Le mouvement aide mon enfant à se concentrer",
-      movement_helps_body: "AIVO peut suggérer des pauses étirement / marche entre les blocs de questions.",
+      movement_helps_body:
+        "AIVO peut suggérer des pauses étirement / marche entre les blocs de questions.",
       aac_label: "Mon enfant utilise un dispositif ou une app de CAA",
       aac_body: "AIVO passera aux schémas de réponse adaptés à la CAA.",
       homework_coaching_label: "Mon enfant a besoin d'aide pour démarrer ses devoirs",
@@ -294,10 +312,14 @@ const PARENT = {
       placeholder_good_at: "Liedtexte auswendig lernen, bauen, zeichnen, Freundlichkeit",
       placeholder_motivates: "Die eigene Zeit unterbieten. Papa zeigen. Coole Weltraumfakten.",
       placeholder_frustration_triggers: "Lange Leseabschnitte.\nTimer.\nLaute Räume.",
-      placeholder_calming_strategies: "Ein kurzer Spaziergang.\nWasser + 2 Minuten ohne Bildschirm.\nGeräuschunterdrückende Kopfhörer.",
-      placeholder_accommodations: "Verlängerte Zeit bei Tests.\nHäufige Bewegungspausen.\nRuhige Testumgebung.",
-      placeholder_goals: "15 Minuten lesen ohne aufzuhören.\nSich sicher bei der Multiplikation fühlen.\nEine kurze Geschichte schreiben.",
-      placeholder_concerns: "Besorgt über das Selbstvertrauen beim Lesen. Kürzlich die Schule gewechselt. Wichtige Prüfung im Frühling.",
+      placeholder_calming_strategies:
+        "Ein kurzer Spaziergang.\nWasser + 2 Minuten ohne Bildschirm.\nGeräuschunterdrückende Kopfhörer.",
+      placeholder_accommodations:
+        "Verlängerte Zeit bei Tests.\nHäufige Bewegungspausen.\nRuhige Testumgebung.",
+      placeholder_goals:
+        "15 Minuten lesen ohne aufzuhören.\nSich sicher bei der Multiplikation fühlen.\nEine kurze Geschichte schreiben.",
+      placeholder_concerns:
+        "Besorgt über das Selbstvertrauen beim Lesen. Kürzlich die Schule gewechselt. Wichtige Prüfung im Frühling.",
       reassurance_private_title: "Standardmäßig privat",
       reassurance_no_diagnosis_title: "Keine Diagnose erforderlich",
       movement_helps_label: "Bewegung hilft meinem Kind, sich zu konzentrieren",
@@ -376,16 +398,23 @@ const PARENT = {
       placeholder_diagnoses_other: "ex.: APD, perda auditiva leve",
       placeholder_loves: "Dinossauros. Construir com LEGO. Cozinhar com a vovó.",
       placeholder_good_at: "Memorizar letras de músicas, construir, desenhar, bondade",
-      placeholder_motivates: "Superar o próprio tempo. Mostrar ao pai. Fatos legais sobre o espaço.",
-      placeholder_frustration_triggers: "Longos trechos de leitura.\nTemporizadores.\nSalas barulhentas.",
-      placeholder_calming_strategies: "Uma caminhada curta.\nÁgua + 2 minutos sem tela.\nFones de ouvido com cancelamento de ruído.",
-      placeholder_accommodations: "Tempo extra em testes.\nPausas de movimento frequentes.\nAmbiente tranquilo para avaliação.",
-      placeholder_goals: "Ler por 15 minutos sem parar.\nSentir-se confiante na multiplicação.\nEscrever uma história curta.",
-      placeholder_concerns: "Preocupado com a confiança na leitura. Mudou de escola recentemente. Prova importante na primavera.",
+      placeholder_motivates:
+        "Superar o próprio tempo. Mostrar ao pai. Fatos legais sobre o espaço.",
+      placeholder_frustration_triggers:
+        "Longos trechos de leitura.\nTemporizadores.\nSalas barulhentas.",
+      placeholder_calming_strategies:
+        "Uma caminhada curta.\nÁgua + 2 minutos sem tela.\nFones de ouvido com cancelamento de ruído.",
+      placeholder_accommodations:
+        "Tempo extra em testes.\nPausas de movimento frequentes.\nAmbiente tranquilo para avaliação.",
+      placeholder_goals:
+        "Ler por 15 minutos sem parar.\nSentir-se confiante na multiplicação.\nEscrever uma história curta.",
+      placeholder_concerns:
+        "Preocupado com a confiança na leitura. Mudou de escola recentemente. Prova importante na primavera.",
       reassurance_private_title: "Privado por padrão",
       reassurance_no_diagnosis_title: "Nenhum diagnóstico necessário",
       movement_helps_label: "O movimento ajuda meu filho/a a se concentrar",
-      movement_helps_body: "AIVO pode sugerir pausas de alongamento / caminhada entre blocos de perguntas.",
+      movement_helps_body:
+        "AIVO pode sugerir pausas de alongamento / caminhada entre blocos de perguntas.",
       aac_label: "Meu filho/a usa um dispositivo ou app de CAA",
       aac_body: "AIVO mudará para padrões de resposta amigáveis com CAA.",
       homework_coaching_label: "Meu filho/a precisa de ajuda para começar a fazer a lição de casa",
@@ -546,7 +575,8 @@ const PARENT = {
       placeholder_good_at: "歌詞を覚える、作ること、絵を描くこと、優しさ",
       placeholder_motivates: "自分の記録を更新する。お父さんに見せる。宇宙のクールな雑学。",
       placeholder_frustration_triggers: "長い読解文章。\nタイマー。\nうるさい部屋。",
-      placeholder_calming_strategies: "短い散歩。\n水を飲む + 2 分の画面離れ。\nノイズキャンセリングヘッドフォン。",
+      placeholder_calming_strategies:
+        "短い散歩。\n水を飲む + 2 分の画面離れ。\nノイズキャンセリングヘッドフォン。",
       placeholder_accommodations: "テストの延長時間。\n頻繁な運動休憩。\n静かなテスト環境。",
       placeholder_goals: "15 分間やめずに読む。\n掛け算に自信を持つ。\n短い話を書く。",
       placeholder_concerns: "読書への自信が心配。最近転校した。春に重要なテストがある。",
@@ -630,10 +660,12 @@ const PARENT = {
       placeholder_good_at: "가사 외우기, 만들기, 그림 그리기, 친절함",
       placeholder_motivates: "자신의 기록 깨기. 아빠에게 보여주기. 멋진 우주 사실.",
       placeholder_frustration_triggers: "긴 독해 지문.\n타이머.\n시끄러운 공간.",
-      placeholder_calming_strategies: "짧은 산책.\n물 마시기 + 2분 화면 쉬기.\n노이즈 캔슬링 헤드폰.",
+      placeholder_calming_strategies:
+        "짧은 산책.\n물 마시기 + 2분 화면 쉬기.\n노이즈 캔슬링 헤드폰.",
       placeholder_accommodations: "시험 시간 연장.\n잦은 움직임 휴식.\n조용한 시험 환경.",
       placeholder_goals: "15분 동안 멈추지 않고 읽기.\n곱셈에 자신감 갖기.\n짧은 이야기 쓰기.",
-      placeholder_concerns: "읽기 자신감이 걱정됩니다. 최근에 전학했어요. 봄에 중요한 시험이 있어요.",
+      placeholder_concerns:
+        "읽기 자신감이 걱정됩니다. 최근에 전학했어요. 봄에 중요한 시험이 있어요.",
       reassurance_private_title: "기본적으로 비공개",
       reassurance_no_diagnosis_title: "진단이 필요하지 않아요",
       movement_helps_label: "움직임이 아이의 집중에 도움이 돼요",
@@ -714,10 +746,14 @@ const PARENT = {
       placeholder_good_at: "حفظ كلمات الأغاني، البناء، الرسم، اللطف",
       placeholder_motivates: "تجاوز رقمه الخاص. إظهاره لأبيه. حقائق رائعة عن الفضاء.",
       placeholder_frustration_triggers: "فقرات القراءة الطويلة.\nالمؤقتات.\nالغرف الصاخبة.",
-      placeholder_calming_strategies: "نزهة قصيرة.\nالماء + دقيقتان بعيداً عن الشاشة.\nسماعات عازلة للصوت.",
-      placeholder_accommodations: "وقت ممتد في الاختبارات.\nفترات راحة للحركة متكررة.\nبيئة هادئة للاختبار.",
-      placeholder_goals: "القراءة لمدة 15 دقيقة دون توقف.\nالشعور بالثقة في الضرب.\nكتابة قصة قصيرة.",
-      placeholder_concerns: "قلق بشأن الثقة في القراءة. انتقل مؤخراً إلى مدرسة جديدة. اختبار مهم في الربيع.",
+      placeholder_calming_strategies:
+        "نزهة قصيرة.\nالماء + دقيقتان بعيداً عن الشاشة.\nسماعات عازلة للصوت.",
+      placeholder_accommodations:
+        "وقت ممتد في الاختبارات.\nفترات راحة للحركة متكررة.\nبيئة هادئة للاختبار.",
+      placeholder_goals:
+        "القراءة لمدة 15 دقيقة دون توقف.\nالشعور بالثقة في الضرب.\nكتابة قصة قصيرة.",
+      placeholder_concerns:
+        "قلق بشأن الثقة في القراءة. انتقل مؤخراً إلى مدرسة جديدة. اختبار مهم في الربيع.",
       reassurance_private_title: "خاص بشكل افتراضي",
       reassurance_no_diagnosis_title: "لا يلزم أي تشخيص",
       movement_helps_label: "الحركة تساعد طفلي على التركيز",
@@ -798,10 +834,14 @@ const PARENT = {
       placeholder_good_at: "गाने के बोल याद करना, बनाना, चित्र बनाना, दयालुता",
       placeholder_motivates: "अपना रिकॉर्ड तोड़ना। पापा को दिखाना। अंतरिक्ष के रोचक तथ्य।",
       placeholder_frustration_triggers: "लंबे पठन अनुच्छेद।\nटाइमर।\nशोरगुल वाले कमरे।",
-      placeholder_calming_strategies: "थोड़ी सैर।\nपानी + 2 मिनट स्क्रीन से दूर।\nनॉइज़-कैंसलिंग हेडफ़ोन।",
-      placeholder_accommodations: "परीक्षाओं में अतिरिक्त समय।\nबार-बार मूवमेंट ब्रेक।\nशांत परीक्षण वातावरण।",
-      placeholder_goals: "15 मिनट बिना रुके पढ़ना।\nगुणा में आत्मविश्वास महसूस करना।\nएक छोटी कहानी लिखना।",
-      placeholder_concerns: "पढ़ने में आत्मविश्वास को लेकर चिंतित। हाल ही में स्कूल बदला। वसंत में बड़ी परीक्षा।",
+      placeholder_calming_strategies:
+        "थोड़ी सैर।\nपानी + 2 मिनट स्क्रीन से दूर।\nनॉइज़-कैंसलिंग हेडफ़ोन।",
+      placeholder_accommodations:
+        "परीक्षाओं में अतिरिक्त समय।\nबार-बार मूवमेंट ब्रेक।\nशांत परीक्षण वातावरण।",
+      placeholder_goals:
+        "15 मिनट बिना रुके पढ़ना।\nगुणा में आत्मविश्वास महसूस करना।\nएक छोटी कहानी लिखना।",
+      placeholder_concerns:
+        "पढ़ने में आत्मविश्वास को लेकर चिंतित। हाल ही में स्कूल बदला। वसंत में बड़ी परीक्षा।",
       reassurance_private_title: "डिफ़ॉल्ट रूप से निजी",
       reassurance_no_diagnosis_title: "किसी निदान की आवश्यकता नहीं",
       movement_helps_label: "हलचल से मेरे बच्चे को ध्यान केंद्रित करने में मदद मिलती है",
@@ -876,6 +916,8 @@ for (const [locale, parent] of Object.entries(PARENT)) {
   json.parent = { ...(json.parent ?? {}), ...parent };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-parent-P_assess-i18n: merged parent P_assess namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-parent-P_assess-i18n: merged parent P_assess namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-parent-P_assess-i18n: done — ${written} locale catalogs updated.`);

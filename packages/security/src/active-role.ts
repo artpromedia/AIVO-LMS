@@ -50,9 +50,7 @@ export function checkActiveRole(
   }
   const requested = normalize(raw);
   const grantedList =
-    opts?.availableRoles && opts.availableRoles.length > 0
-      ? opts.availableRoles
-      : [grantedRole];
+    opts?.availableRoles && opts.availableRoles.length > 0 ? opts.availableRoles : [grantedRole];
   const granted = grantedList.map(normalize);
   if (granted.includes(requested)) {
     return { ok: true, activeRole: requested };

@@ -45,10 +45,7 @@ describe("withRoleContext", () => {
   });
 
   it("payload keys win on collision", () => {
-    const merged = withRoleContext(
-      { event: "lesson.start", activeRole: "parent" },
-      session,
-    );
+    const merged = withRoleContext({ event: "lesson.start", activeRole: "parent" }, session);
     expect(merged.activeRole).toBe("parent");
   });
 

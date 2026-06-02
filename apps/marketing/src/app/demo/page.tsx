@@ -33,9 +33,7 @@ export default async function DemoPage() {
         <h2 id="demo-form-heading" className="font-heading text-2xl font-bold text-slate-900">
           {t("form_heading")}
         </h2>
-        <p className="mt-1 mb-6 font-body text-slate-600">
-          {t("form_subheading")}
-        </p>
+        <p className="mt-1 mb-6 font-body text-slate-600">{t("form_subheading")}</p>
         <DemoRequestForm />
       </section>
 
@@ -62,17 +60,13 @@ export default async function DemoPage() {
             <span className="font-heading text-sm font-bold text-purple-700">
               {t("step2_label")}
             </span>
-            <p className="mt-1 font-body text-slate-700">
-              {t("step2_body")}
-            </p>
+            <p className="mt-1 font-body text-slate-700">{t("step2_body")}</p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
             <span className="font-heading text-sm font-bold text-purple-700">
               {t("step3_label")}
             </span>
-            <p className="mt-1 font-body text-slate-700">
-              {t("step3_body")}
-            </p>
+            <p className="mt-1 font-body text-slate-700">{t("step3_body")}</p>
           </li>
         </ol>
       </section>

@@ -46,7 +46,10 @@ export const ProgressCurve = forwardRef<SVGSVGElement, ProgressCurveProps>(funct
   const headline = label ?? `${pct}%`;
 
   return (
-    <div className={cn("inline-flex flex-col items-center justify-center", className)} aria-label={ariaLabel}>
+    <div
+      className={cn("inline-flex flex-col items-center justify-center", className)}
+      aria-label={ariaLabel}
+    >
       <svg
         ref={ref}
         viewBox={`0 0 ${size} ${size}`}

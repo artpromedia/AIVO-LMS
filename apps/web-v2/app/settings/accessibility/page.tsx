@@ -119,10 +119,7 @@ export default async function AccessibilitySettings() {
               ))}
             </RadioGroup>
           </fieldset>
-          <A11yPreferencesToggles
-            initialTypeface={typeface}
-            initialReducedMotion={reducedMotion}
-          />
+          <A11yPreferencesToggles initialTypeface={typeface} initialReducedMotion={reducedMotion} />
           <fieldset className="grid gap-2 sm:max-w-md">
             <Label>{t("language")}</Label>
             <Select defaultValue="en-US">

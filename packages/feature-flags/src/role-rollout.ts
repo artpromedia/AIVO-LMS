@@ -74,10 +74,7 @@ export const ROLE_ROLLOUT_ENV_VARS: Record<RoleRolloutRoleId, string> = {
  * Production defaults intentionally trail dev/staging so dark
  * launches don't require an emergency env-var push.
  */
-export const ROLE_ROLLOUT_DEFAULTS: Record<
-  RoleRolloutRoleId,
-  Record<RoleRolloutEnv, boolean>
-> = {
+export const ROLE_ROLLOUT_DEFAULTS: Record<RoleRolloutRoleId, Record<RoleRolloutEnv, boolean>> = {
   learner: { development: true, staging: true, production: true },
   parent: { development: true, staging: true, production: true },
   teacher: { development: true, staging: true, production: true },
@@ -99,8 +96,7 @@ export type RoleRolloutFlags = Record<RoleRolloutRoleId, boolean>;
  */
 export function resolveRoleRolloutFlags(
   env: RoleRolloutEnv,
-  source: Record<string, string | undefined> = typeof process !== "undefined" &&
-  process?.env
+  source: Record<string, string | undefined> = typeof process !== "undefined" && process?.env
     ? (process.env as Record<string, string | undefined>)
     : {},
 ): RoleRolloutFlags {

@@ -36,7 +36,9 @@ export default async function Page({ params }: Params) {
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("teachers")}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            {t("teachers")}
+          </p>
           {teachers.length === 0 ? (
             <p className="mt-2 text-sm text-aivo-muted">{t("none_yet")}</p>
           ) : (

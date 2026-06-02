@@ -10,7 +10,9 @@ import { test } from "node:test";
 import assert from "node:assert";
 import { PushRouter, type PushAdapter } from "../src/providers/push-router.js";
 
-function adapterReturning(result: Partial<{ ok: boolean; invalidToken: boolean }> | "throw"): PushAdapter {
+function adapterReturning(
+  result: Partial<{ ok: boolean; invalidToken: boolean }> | "throw",
+): PushAdapter {
   return {
     send: async (target) => {
       if (result === "throw") throw new Error("network down");

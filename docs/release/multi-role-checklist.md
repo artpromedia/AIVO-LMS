@@ -25,7 +25,7 @@
 - [ ] `apps/mobile/store-assets/whats-new.md` reflects the current
       release.
 - [ ] Screenshots in `apps/mobile/store-assets/screenshots/{ios,
-      android}/*` cover the seven canonical frames listed in the
+android}/*` cover the seven canonical frames listed in the
       screenshots README (role switcher → 5 role homes → cross-cutting
       notifications).
 - [ ] App Store Connect / Play Console pulls copy **from this folder**,

@@ -1,10 +1,5 @@
 import * as React from "react";
-import {
-  canAccessArea,
-  getPermission,
-  type NavArea,
-  type RoleSession,
-} from "@aivo/nav";
+import { canAccessArea, getPermission, type NavArea, type RoleSession } from "@aivo/nav";
 
 /**
  * `<RoleGate>` — server-renderable RBAC boundary for web shell routes.
@@ -72,20 +67,14 @@ const DEFAULT_SWITCH = ({
 }) => (
   <div data-testid="role-gate-switch" role="status">
     <p>
-      This area is available under your <strong>{requiredRole}</strong> role. Switch roles
-      to continue.
+      This area is available under your <strong>{requiredRole}</strong> role. Switch roles to
+      continue.
     </p>
     <a href={switchHref}>Switch to {requiredRole}</a>
   </div>
 );
 
-const DEFAULT_LOCKED = ({
-  area,
-  lockReason,
-}: {
-  area: NavArea;
-  lockReason?: string;
-}) => (
+const DEFAULT_LOCKED = ({ area, lockReason }: { area: NavArea; lockReason?: string }) => (
   <div data-testid="role-gate-locked" role="status">
     <p>
       <strong>{area}</strong> is not available for your current role.
@@ -136,8 +125,7 @@ export function RoleGate(props: RoleGateProps): React.ReactElement {
     );
   }
   if (decision.outcome === "locked") {
-    const lockReason =
-      decision.lockReason ?? getPermission(session.activeRole, area).lockReason;
+    const lockReason = decision.lockReason ?? getPermission(session.activeRole, area).lockReason;
     return <>{renderLocked({ area, lockReason })}</>;
   }
   return <>{renderForbidden({ area })}</>;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, type Href } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -34,12 +34,19 @@ export default function IepUploadScreen() {
     <OnboardingScaffold
       eyebrow={t("onboarding.iep.eyebrow", "Optional")}
       title={t("onboarding.iep.title", "Upload an IEP or 504")}
-      subtitle={t("onboarding.iep.subtitle", "If you have one, AIVO can read goals and accommodations to personalise faster. You can do this later.")}
+      subtitle={t(
+        "onboarding.iep.subtitle",
+        "If you have one, AIVO can read goals and accommodations to personalise faster. You can do this later.",
+      )}
       onBack={() => router.back()}
       footer={
         <>
           <Button
-            title={file ? t("onboarding.common.continue", "Continue") : t("onboarding.iep.skip", "Skip for now")}
+            title={
+              file
+                ? t("onboarding.common.continue", "Continue")
+                : t("onboarding.iep.skip", "Skip for now")
+            }
             onPress={() => router.push("/(onboarding)/permissions" as Href)}
             fullWidth
             size="lg"
@@ -50,17 +57,28 @@ export default function IepUploadScreen() {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t("onboarding.iep.pick", "Choose a PDF")}
-        onPress={async () => { const f = await pickPdf(); if (f) setFile(f.name); }}
+        onPress={async () => {
+          const f = await pickPdf();
+          if (f) setFile(f.name);
+        }}
         style={[styles.drop, { borderColor: palette.primary, backgroundColor: palette.bgRaised }]}
       >
-        <Ionicons name={file ? "document-text" : "cloud-upload-outline"} size={32} color={palette.primary} />
+        <Ionicons
+          name={file ? "document-text" : "cloud-upload-outline"}
+          size={32}
+          color={palette.primary}
+        />
         <Text style={[styles.dropText, { color: palette.ink }]}>
           {file ?? t("onboarding.iep.pick", "Choose a PDF")}
         </Text>
         {file ? (
-          <Text style={[styles.dropHint, { color: "#22c55e" }]}>{t("onboarding.iep.ready", "Ready to upload")}</Text>
+          <Text style={[styles.dropHint, { color: "#22c55e" }]}>
+            {t("onboarding.iep.ready", "Ready to upload")}
+          </Text>
         ) : (
-          <Text style={[styles.dropHint, { color: palette.inkMuted }]}>{t("onboarding.iep.hint", "PDF up to 10MB")}</Text>
+          <Text style={[styles.dropHint, { color: palette.inkMuted }]}>
+            {t("onboarding.iep.hint", "PDF up to 10MB")}
+          </Text>
         )}
       </Pressable>
     </OnboardingScaffold>
@@ -68,7 +86,14 @@ export default function IepUploadScreen() {
 }
 
 const styles = StyleSheet.create({
-  drop: { alignItems: "center", gap: 8, paddingVertical: spacing.xl, borderRadius: radius.xl, borderWidth: 2, borderStyle: "dashed" },
+  drop: {
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: spacing.xl,
+    borderRadius: radius.xl,
+    borderWidth: 2,
+    borderStyle: "dashed",
+  },
   dropText: { fontSize: 15, fontFamily: fontFamilies.bodyBold },
   dropHint: { fontSize: 12, fontFamily: fontFamilies.bodyRegular },
 });

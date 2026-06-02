@@ -22,7 +22,10 @@ export default function LearnerNewScreen() {
     <OnboardingScaffold
       eyebrow={t("onboarding.learnerNew.eyebrow", "Welcome!")}
       title={t("onboarding.learnerNew.title", "Let's set up your space")}
-      subtitle={t("onboarding.learnerNew.subtitle", "Type your name and the class code your teacher or grown-up gave you.")}
+      subtitle={t(
+        "onboarding.learnerNew.subtitle",
+        "Type your name and the class code your teacher or grown-up gave you.",
+      )}
       onBack={() => router.back()}
       footer={
         <Button
@@ -36,25 +39,43 @@ export default function LearnerNewScreen() {
     >
       <View style={{ gap: spacing.md }}>
         <View style={{ gap: 6 }}>
-          <Text style={[styles.label, { color: palette.ink }]}>{t("onboarding.learnerNew.name", "Your first name")}</Text>
+          <Text style={[styles.label, { color: palette.ink }]}>
+            {t("onboarding.learnerNew.name", "Your first name")}
+          </Text>
           <TextInput
             value={name}
             onChangeText={setName}
             placeholder={t("onboarding.learnerNew.namePh", "e.g. Sam")}
             placeholderTextColor={palette.inkMuted}
-            style={[styles.input, { borderColor: palette.border, color: palette.ink, backgroundColor: palette.bgRaised }]}
+            style={[
+              styles.input,
+              {
+                borderColor: palette.border,
+                color: palette.ink,
+                backgroundColor: palette.bgRaised,
+              },
+            ]}
             accessibilityLabel={t("onboarding.learnerNew.name", "Your first name")}
           />
         </View>
         <View style={{ gap: 6 }}>
-          <Text style={[styles.label, { color: palette.ink }]}>{t("onboarding.learnerNew.code", "Class code (optional)")}</Text>
+          <Text style={[styles.label, { color: palette.ink }]}>
+            {t("onboarding.learnerNew.code", "Class code (optional)")}
+          </Text>
           <TextInput
             value={code}
             onChangeText={setCode}
             autoCapitalize="characters"
             placeholder="ABC123"
             placeholderTextColor={palette.inkMuted}
-            style={[styles.input, { borderColor: palette.border, color: palette.ink, backgroundColor: palette.bgRaised }]}
+            style={[
+              styles.input,
+              {
+                borderColor: palette.border,
+                color: palette.ink,
+                backgroundColor: palette.bgRaised,
+              },
+            ]}
             accessibilityLabel={t("onboarding.learnerNew.code", "Class code")}
           />
         </View>
@@ -65,5 +86,12 @@ export default function LearnerNewScreen() {
 
 const styles = StyleSheet.create({
   label: { fontSize: 13, fontFamily: fontFamilies.bodyBold },
-  input: { height: 48, borderWidth: 1.5, borderRadius: radius.lg, paddingHorizontal: spacing.md, fontSize: 16, fontFamily: fontFamilies.bodyRegular },
+  input: {
+    height: 48,
+    borderWidth: 1.5,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md,
+    fontSize: 16,
+    fontFamily: fontFamilies.bodyRegular,
+  },
 });

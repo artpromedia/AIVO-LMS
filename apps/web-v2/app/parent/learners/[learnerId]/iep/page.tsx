@@ -35,7 +35,7 @@ async function uploadAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   const file = formData.get("file");
@@ -81,7 +81,7 @@ async function skipAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   await recordIEPSkip(learnerId, session.tenantId);
@@ -96,7 +96,7 @@ async function deleteAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   const { deleteIEPForLearner } = await import("@/lib/db/repos");
@@ -145,7 +145,7 @@ export default async function IEPUploadPage({
   const t = await getTranslations("parent.learner_iep");
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -171,10 +171,7 @@ export default async function IEPUploadPage({
           actions={
             <AssessmentFooter
               back={
-                <Link
-                  href={`/parent/learners/${learner.id}`}
-                  className={ASSESSMENT_BACK_CLASS}
-                >
+                <Link href={`/parent/learners/${learner.id}`} className={ASSESSMENT_BACK_CLASS}>
                   {t("back_to_learner")}
                 </Link>
               }
@@ -190,8 +187,8 @@ export default async function IEPUploadPage({
           }
         >
           <p className="text-sm text-iw-text-muted">
-            Submit your assessment and we'll route you straight here to optionally share an IEP, 504,
-            or accommodations letter.
+            Submit your assessment and we'll route you straight here to optionally share an IEP,
+            504, or accommodations letter.
           </p>
         </QuestionCard>
       </AssessmentShell>
@@ -321,11 +318,7 @@ export default async function IEPUploadPage({
             </p>
           </div>
         ) : (
-          <form
-            action={uploadAction}
-            encType="multipart/form-data"
-            className="flex flex-col gap-3"
-          >
+          <form action={uploadAction} encType="multipart/form-data" className="flex flex-col gap-3">
             <input type="hidden" name="learnerId" value={learner.id} />
             <UploadDropZone
               name="file"

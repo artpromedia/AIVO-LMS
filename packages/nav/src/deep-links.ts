@@ -380,10 +380,7 @@ export function getDeepLinkAreas(): readonly NavArea[] {
  * that want to spot-check that a resolver result is achievable on the
  * current shell.
  */
-export function getSwitchableRoles(
-  session: RoleSession,
-  surface: Surface,
-): Role[] {
+export function getSwitchableRoles(session: RoleSession, surface: Surface): Role[] {
   // Re-use the canonical filter so this helper stays in lockstep with
   // the rest of the package.
   const surfaceRoles = getRolesForSurface(session.roles, surface);

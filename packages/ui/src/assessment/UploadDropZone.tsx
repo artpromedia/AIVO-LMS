@@ -111,10 +111,7 @@ export function UploadDropZone({
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <label
-        htmlFor={name}
-        className="text-sm font-semibold text-iw-text-strong"
-      >
+      <label htmlFor={name} className="text-sm font-semibold text-iw-text-strong">
         {label}
       </label>
       <div

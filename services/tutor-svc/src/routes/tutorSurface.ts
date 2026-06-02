@@ -88,10 +88,7 @@ export function registerTutorSurfaceRoutes(app: FastifyInstance): void {
         return reply.send(response);
       } catch (err) {
         if (err instanceof TutorPolicyError) {
-          if (
-            err.code === "grade_band_not_production" ||
-            err.code === "grade_band_not_in_scope"
-          ) {
+          if (err.code === "grade_band_not_production" || err.code === "grade_band_not_in_scope") {
             return reply.code(409).send({
               error: err.message,
               code: err.code,

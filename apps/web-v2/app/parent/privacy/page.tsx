@@ -52,11 +52,7 @@ export default async function Page() {
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        description={t("description")}
-      />
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
       <div className="grid gap-3 sm:grid-cols-3">
         {links.map((l) => (
@@ -92,9 +88,7 @@ export default async function Page() {
 
       <Card className="mt-4 p-[var(--aivo-density-card-pad)]">
         <h2 className="font-display text-lg font-semibold">{t("subprocessors_title")}</h2>
-        <p className="text-sm text-aivo-ink-soft">
-          {t("subprocessors_desc")}
-        </p>
+        <p className="text-sm text-aivo-ink-soft">{t("subprocessors_desc")}</p>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {subs.map((s) => (
             <li key={s.id} className="rounded border border-aivo-border p-3 text-sm">

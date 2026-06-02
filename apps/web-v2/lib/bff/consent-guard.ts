@@ -41,7 +41,12 @@ export async function requireLearnerConsent(
     );
   }
   for (const type of consentTypes) {
-    const perLearner = await getActiveConsentForUser(parentUserId, type, session.tenantId, learnerId);
+    const perLearner = await getActiveConsentForUser(
+      parentUserId,
+      type,
+      session.tenantId,
+      learnerId,
+    );
     const account = await getActiveConsentForUser(parentUserId, type, session.tenantId, null);
     if (!perLearner && !account) {
       return fail(

@@ -41,7 +41,9 @@ export default async function Page() {
             <div key={type} className="flex items-start justify-between gap-4 bg-iw-card p-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-iw-display text-base font-semibold text-iw-ink">{humanize(type)}</h3>
+                  <h3 className="font-iw-display text-base font-semibold text-iw-ink">
+                    {humanize(type)}
+                  </h3>
                   {active ? (
                     <Badge tone="success">{t("accepted")}</Badge>
                   ) : (

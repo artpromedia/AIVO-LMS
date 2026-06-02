@@ -66,9 +66,7 @@ export function ConsentRow({
             </span>
           ) : null}
         </div>
-        <p className="text-xs text-iw-text-muted mt-0.5 leading-relaxed">
-          {description}
-        </p>
+        <p className="text-xs text-iw-text-muted mt-0.5 leading-relaxed">{description}</p>
       </div>
       <input
         id={id}

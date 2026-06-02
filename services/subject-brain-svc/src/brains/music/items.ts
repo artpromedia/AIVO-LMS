@@ -31,7 +31,6 @@ export const MUSIC_ITEMS: Item[] = [
     skillCode: "MUSIC.COMPOSE.SIMPLE",
     difficulty: 0.2,
     surface: "scratchpad",
-    prompt:
-      "Make your own 4-beat pattern using claps and rests (e.g. clap, rest, clap, clap).",
+    prompt: "Make your own 4-beat pattern using claps and rests (e.g. clap, rest, clap, clap).",
   },
 ];

@@ -234,7 +234,9 @@ export function pickNextItem(
     const within = candidates.filter((it) => it.difficulty <= cap);
     if (within.length === 0) {
       // Everything left is above the kindness ceiling — undershoot.
-      return candidates.reduce((easiest, it) => (it.difficulty < easiest.difficulty ? it : easiest));
+      return candidates.reduce((easiest, it) =>
+        it.difficulty < easiest.difficulty ? it : easiest,
+      );
     }
     return bestByScore(state, within);
   }

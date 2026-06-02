@@ -1,4 +1,8 @@
-import { findSkillsByTopic, getPrerequisitesFor, getStandardsFor } from "../../services/skill-graph-store.js";
+import {
+  findSkillsByTopic,
+  getPrerequisitesFor,
+  getStandardsFor,
+} from "../../services/skill-graph-store.js";
 import { buildProfileAdaptations } from "../../services/profile-adaptations.js";
 import type {
   AdaptDirective,
@@ -86,9 +90,7 @@ export class CodingBrain implements SubjectBrain {
   }
 
   score(response: ItemResponse): ScoreResult {
-    const payload = response.payload as
-      | { bugsFound?: number; totalBugs?: number }
-      | undefined;
+    const payload = response.payload as { bugsFound?: number; totalBugs?: number } | undefined;
     if (payload?.totalBugs && payload.totalBugs > 0) {
       const mastery = (payload.bugsFound ?? 0) / payload.totalBugs;
       return {
@@ -107,7 +109,9 @@ export class CodingBrain implements SubjectBrain {
       mastery: correctness,
       confidence: 0.65,
       feedback:
-        correctness >= 0.7 ? "Nice — that program does what we asked." : "Let's read the program aloud and try again.",
+        correctness >= 0.7
+          ? "Nice — that program does what we asked."
+          : "Let's read the program aloud and try again.",
     };
   }
 
@@ -115,7 +119,8 @@ export class CodingBrain implements SubjectBrain {
     const recent = history.slice(-5);
     if (recent.length === 0) return { difficultyModulation: 1.0, rationale: "No history." };
     const avg = recent.reduce((s, r) => s + (r.correctness ?? 0), 0) / recent.length;
-    if (avg > 0.8) return { difficultyModulation: 1.15, rationale: "Step up — fluent with basics." };
+    if (avg > 0.8)
+      return { difficultyModulation: 1.15, rationale: "Step up — fluent with basics." };
     if (avg < 0.4)
       return {
         difficultyModulation: 0.85,

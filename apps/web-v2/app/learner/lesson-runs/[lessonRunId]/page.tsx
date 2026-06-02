@@ -53,7 +53,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
     // Parent (or other shadowing role): require ownership + active-learner
     // cookie match so a parent can only play under the learner they've
     // explicitly switched to.
-    if (!await parentCanAccessLearner(session.userId, learner.id, session.tenantId)) {
+    if (!(await parentCanAccessLearner(session.userId, learner.id, session.tenantId))) {
       redirect("/learner/select");
     }
     const active = await readActiveLearnerFromCookies(session);

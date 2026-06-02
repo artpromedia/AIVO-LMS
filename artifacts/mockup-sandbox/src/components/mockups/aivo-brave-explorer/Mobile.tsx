@@ -19,7 +19,11 @@ export function Mobile() {
       <header className="px-6 py-4 flex items-center justify-between z-10 relative">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-white border-2 border-[#e2e8f0] overflow-hidden">
-            <img src="/__mockup/images/brave-tutor-1.png" alt="Avatar" className="w-full h-full object-cover" />
+            <img
+              src="/__mockup/images/brave-tutor-1.png"
+              alt="Avatar"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
             <h1 className="font-display text-xl font-bold">Hi, Leo!</h1>
@@ -48,7 +52,7 @@ export function Mobile() {
             </div>
             <h2 className="font-display text-2xl font-bold mb-1">Math Kingdom</h2>
             <p className="opacity-90 font-medium mb-4">Master basic addition</p>
-            
+
             <div className="mb-4">
               <div className="flex justify-between text-sm font-bold mb-1.5">
                 <span>Progress</span>
@@ -68,7 +72,7 @@ export function Mobile() {
         {/* Path / Map */}
         <div className="mt-8 relative">
           <div className="absolute left-8 top-8 bottom-0 w-3 bg-blue-100 rounded-full" />
-          
+
           <div className="flex gap-4 items-center mb-8 relative">
             <div className="w-16 h-16 rounded-full bg-green-500 border-4 border-white shadow-lg flex items-center justify-center z-10 text-white transform scale-110">
               <Star className="w-8 h-8 fill-current" />

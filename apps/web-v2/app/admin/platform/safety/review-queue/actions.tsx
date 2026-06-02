@@ -41,12 +41,7 @@ export function ReviewActions({ caseId }: { caseId: string }) {
         className="w-full rounded border px-2 py-1 text-sm"
       />
       <div className="flex gap-2">
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => resolve("resolved_allow")}
-          disabled={busy}
-        >
+        <Button type="button" size="sm" onClick={() => resolve("resolved_allow")} disabled={busy}>
           Allow
         </Button>
         <Button

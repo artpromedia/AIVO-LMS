@@ -71,9 +71,7 @@ export default async function ResourcesPage() {
           <h2 id="guides-heading" className="font-heading text-2xl font-bold text-slate-900">
             {t("guides_heading")}
           </h2>
-          <p className="mt-1 font-body text-slate-600">
-            {t("guides_subheading")}
-          </p>
+          <p className="mt-1 font-body text-slate-600">{t("guides_subheading")}</p>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             {guides.map((g) => (
               <Link
@@ -101,9 +99,7 @@ export default async function ResourcesPage() {
           <h2 id="blog-heading" className="font-heading text-2xl font-bold text-slate-900">
             {t("blog_heading")}
           </h2>
-          <p className="mt-1 font-body text-slate-600">
-            {t("blog_subheading")}
-          </p>
+          <p className="mt-1 font-body text-slate-600">{t("blog_subheading")}</p>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             {blog.map((p) => (
               <Link

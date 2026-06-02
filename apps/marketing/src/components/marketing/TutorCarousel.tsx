@@ -72,7 +72,8 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
     <section
       className="relative py-24 overflow-hidden"
       style={{
-        background: "linear-gradient(180deg, var(--aivo-meadow-50) 0%, var(--aivo-meadow-50) 30%, var(--aivo-calmSky-50) 70%, var(--aivo-cloud-50) 100%)",
+        background:
+          "linear-gradient(180deg, var(--aivo-meadow-50) 0%, var(--aivo-meadow-50) 30%, var(--aivo-calmSky-50) 70%, var(--aivo-cloud-50) 100%)",
       }}
     >
       <div className="max-w-6xl mx-auto px-6 md:px-8">

@@ -56,9 +56,7 @@ export function QuestionCard({
       <header className="flex flex-col gap-2.5">
         {(eyebrow || tag) && (
           <div className="flex items-center gap-2 flex-wrap">
-            {eyebrow ? (
-              <p className="iw-label text-iw-text-muted">{eyebrow}</p>
-            ) : null}
+            {eyebrow ? <p className="iw-label text-iw-text-muted">{eyebrow}</p> : null}
             {tag ? (
               <span
                 className={cn(

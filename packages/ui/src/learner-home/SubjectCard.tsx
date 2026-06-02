@@ -46,13 +46,7 @@ function Ring({ pct, accent }: { pct: number; accent: string }) {
   const c = 2 * Math.PI * r;
   const offset = c * (1 - clamped / 100);
   return (
-    <svg
-      width="72"
-      height="72"
-      viewBox="0 0 72 72"
-      className="shrink-0"
-      aria-hidden="true"
-    >
+    <svg width="72" height="72" viewBox="0 0 72 72" className="shrink-0" aria-hidden="true">
       <circle
         cx="36"
         cy="36"
@@ -116,9 +110,7 @@ export function SubjectCard({
         <Ring pct={masteryPct} accent={accent} />
       </header>
       <div className="flex flex-col gap-1">
-        {eyebrow ? (
-          <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p>
-        ) : null}
+        {eyebrow ? <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p> : null}
         <h3 className="text-lg font-semibold text-iw-text-strong">{name}</h3>
         <p className="text-sm text-iw-text-muted">
           <span className="font-semibold text-iw-text-strong">{masteryLabel}</span>

@@ -193,8 +193,16 @@ export default function MasterToChildClone({
               <stop offset="100%" stopColor="#06B6D4" stopOpacity="0.4" />
             </radialGradient>
             <radialGradient id={`${reactId}-child`} cx="50%" cy="45%" r="55%">
-              <stop offset="0%" stopColor={childCoreStops.primary} stopOpacity={0.2 + progress * 0.7} />
-              <stop offset="100%" stopColor={childCoreStops.secondary} stopOpacity={0.05 + progress * 0.25} />
+              <stop
+                offset="0%"
+                stopColor={childCoreStops.primary}
+                stopOpacity={0.2 + progress * 0.7}
+              />
+              <stop
+                offset="100%"
+                stopColor={childCoreStops.secondary}
+                stopOpacity={0.05 + progress * 0.25}
+              />
             </radialGradient>
             <filter id={`${reactId}-glow`} x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="3" />
@@ -302,10 +310,7 @@ export default function MasterToChildClone({
             DOMAIN_PARTICLES.map((p, i) => {
               // Stagger each particle's start so the stream feels continuous.
               const startFrac = i / DOMAIN_PARTICLES.length;
-              const localProgress = Math.max(
-                0,
-                Math.min(1, (progress - startFrac * 0.6) / 0.45),
-              );
+              const localProgress = Math.max(0, Math.min(1, (progress - startFrac * 0.6) / 0.45));
               if (localProgress <= 0) return null;
               const x1 = 230;
               const x2 = 370;

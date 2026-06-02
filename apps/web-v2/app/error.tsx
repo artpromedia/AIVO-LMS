@@ -60,9 +60,7 @@ export default function ErrorPage({
         <p className="text-sm font-medium uppercase tracking-wide text-aivo-ink-soft">
           {t("refreshing")}
         </p>
-        <h1 className="mt-2 font-display text-3xl font-bold">
-          {t("one_moment")}
-        </h1>
+        <h1 className="mt-2 font-display text-3xl font-bold">{t("one_moment")}</h1>
       </main>
     );
   }
@@ -76,9 +74,7 @@ export default function ErrorPage({
         {t("something_went_wrong")}
       </p>
       <h1 className="mt-2 font-display text-4xl font-bold">{t("lets_try_again")}</h1>
-      <p className="mt-3 text-aivo-ink-soft">
-        {t("unexpected_error")}
-      </p>
+      <p className="mt-3 text-aivo-ink-soft">{t("unexpected_error")}</p>
       {error.digest ? (
         <p className="mt-2 text-xs text-aivo-muted">Reference: {error.digest}</p>
       ) : null}

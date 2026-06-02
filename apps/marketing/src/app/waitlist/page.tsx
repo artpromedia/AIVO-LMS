@@ -33,9 +33,7 @@ export default async function WaitlistPage() {
         <h2 id="waitlist-form-heading" className="font-heading text-2xl font-bold text-slate-900">
           {t("form_heading")}
         </h2>
-        <p className="mt-1 mb-6 font-body text-slate-600">
-          {t("form_subheading")}
-        </p>
+        <p className="mt-1 mb-6 font-body text-slate-600">{t("form_subheading")}</p>
         <WaitlistForm />
       </section>
 
@@ -48,22 +46,22 @@ export default async function WaitlistPage() {
         </h2>
         <ul className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">{t("promise_no_spam_title")}</span>
-            <p className="mt-1 font-body text-slate-700">
-              {t("promise_no_spam_body")}
-            </p>
+            <span className="font-heading text-sm font-bold text-emerald-700">
+              {t("promise_no_spam_title")}
+            </span>
+            <p className="mt-1 font-body text-slate-700">{t("promise_no_spam_body")}</p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">{t("promise_no_sharing_title")}</span>
-            <p className="mt-1 font-body text-slate-700">
-              {t("promise_no_sharing_body")}
-            </p>
+            <span className="font-heading text-sm font-bold text-emerald-700">
+              {t("promise_no_sharing_title")}
+            </span>
+            <p className="mt-1 font-body text-slate-700">{t("promise_no_sharing_body")}</p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">{t("promise_easy_out_title")}</span>
-            <p className="mt-1 font-body text-slate-700">
-              {t("promise_easy_out_body")}
-            </p>
+            <span className="font-heading text-sm font-bold text-emerald-700">
+              {t("promise_easy_out_title")}
+            </span>
+            <p className="mt-1 font-body text-slate-700">{t("promise_easy_out_body")}</p>
           </li>
         </ul>
       </section>

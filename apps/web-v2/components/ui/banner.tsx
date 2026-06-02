@@ -4,10 +4,7 @@ import { AlertCircle, Info, ShieldCheck, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const bannerVariants = cva(
-  cn(
-    "flex w-full items-start gap-3 rounded-iw-card border px-4 py-3 text-sm",
-    "shadow-soft-1",
-  ),
+  cn("flex w-full items-start gap-3 rounded-iw-card border px-4 py-3 text-sm", "shadow-soft-1"),
   {
     variants: {
       tone: {
@@ -34,8 +31,7 @@ const TONE_ICON: Record<NonNullable<BannerProps["tone"]>, React.ReactNode> = {
 };
 
 export interface BannerProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title">,
-    VariantProps<typeof bannerVariants> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title">, VariantProps<typeof bannerVariants> {
   /** Short, scannable label. */
   readonly title?: React.ReactNode;
   /** Optional secondary text. */
@@ -88,9 +84,7 @@ export function Banner({
       )}
       <div className="flex flex-1 flex-col gap-0.5">
         {title && <div className="font-semibold leading-snug">{title}</div>}
-        {description && (
-          <div className="text-iw-ink-muted leading-snug">{description}</div>
-        )}
+        {description && <div className="text-iw-ink-muted leading-snug">{description}</div>}
         {children}
       </div>
       {action && <div className="ml-2 shrink-0">{action}</div>}

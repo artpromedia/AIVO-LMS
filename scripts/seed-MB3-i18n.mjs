@@ -56,11 +56,12 @@ const DATA = {
       inApp: "داخل التطبيق",
       prefLockedNote: "قناة واحدة على الأقل مطلوبة للتحديثات ذات الأهمية القانونية.",
       prefsSaved: "تم حفظ تفضيلات الإشعارات.",
-      prefsSaveFailed: "تعذّر حفظ التفضيلات. يرجى المحاولة مرة أخرى."
+      prefsSaveFailed: "تعذّر حفظ التفضيلات. يرجى المحاولة مرة أخرى.",
     },
     mfaFactors: {
       totpTitle: "تطبيق المصادقة",
-      totpDesc: "استخدم تطبيق مصادقة (Google Authenticator أو 1Password أو Authy) لإنشاء رموز تسجيل الدخول.",
+      totpDesc:
+        "استخدم تطبيق مصادقة (Google Authenticator أو 1Password أو Authy) لإنشاء رموز تسجيل الدخول.",
       enroll: "إعداد تطبيق المصادقة",
       disable: "إيقاف تشغيل المصادقة",
       disableConfirm: "أكّد كلمة مرورك لإيقاف تشغيل تطبيق المصادقة.",
@@ -80,7 +81,7 @@ const DATA = {
       regenFailed: "تعذّر إنشاء رموز استرداد جديدة.",
       codesWarning: "احفظ هذه الرموز الآن — لن تُعرض مرة أخرى.",
       copyCodes: "نسخ الكل",
-      codesCopied: "تم نسخ رموز الاسترداد إلى الحافظة."
+      codesCopied: "تم نسخ رموز الاسترداد إلى الحافظة.",
     },
     parentBrain: {
       title: "دماغ {{name}}",
@@ -91,7 +92,7 @@ const DATA = {
       mastered: "{{percent}}% مُتقَن",
       viewHistory: "عرض السجل",
       brainHistory: "سجل الدماغ",
-      historySubtitle: "الجدول الزمني للتغييرات والإنجازات"
+      historySubtitle: "الجدول الزمني للتغييرات والإنجازات",
     },
     learnerShop: {
       title: "متجر الأفاتار",
@@ -101,29 +102,29 @@ const DATA = {
       pets: "الحيوانات الأليفة",
       backgrounds: "الخلفيات",
       effects: "التأثيرات",
-      special: "مميز"
+      special: "مميز",
     },
     learnerGamification: {
       title: "ملفي الشخصي",
       streak: "سلسلة الإنجازات",
       activeChallenges: "التحديات النشطة",
       noChallenges: "لا توجد تحديات نشطة. تحقق مرة أخرى قريباً!",
-      gradebook: "سجل الدرجات"
+      gradebook: "سجل الدرجات",
     },
     caregiverIEP: {
       title: "أهداف IEP",
       subtitle: "تتبع التقدم للقراءة فقط",
       noTitle: "لا توجد أهداف IEP",
       noMessage: "لم يتم إعداد أهداف IEP بعد.",
-      progressLabel: "{{percent}}% (الأساس ← الحالي ← الهدف)"
+      progressLabel: "{{percent}}% (الأساس ← الحالي ← الهدف)",
     },
     parentSession: {
       title: "جلسة المشاهدة المشتركة",
-      subtitle: "شاهد تعلم {{name}} معاً"
+      subtitle: "شاهد تعلم {{name}} معاً",
     },
     therapistSettings: {
-      title: "الإعدادات"
-    }
+      title: "الإعدادات",
+    },
   },
   de: {
     parentIEP: {
@@ -134,7 +135,8 @@ const DATA = {
       iepGoals: "IEP-Ziele",
       complete: "abgeschlossen",
       noGoalsTitle: "Keine IEP-Ziele",
-      noGoalsMessage: "Laden Sie ein IEP-Dokument hoch, um analysierte Ziele zu sehen und den Fortschritt zu verfolgen.",
+      noGoalsMessage:
+        "Laden Sie ein IEP-Dokument hoch, um analysierte Ziele zu sehen und den Fortschritt zu verfolgen.",
       uploadDesc: "Foto aufnehmen oder PDF auswählen",
       camera: "Kamera",
       filter_all: "Alle",
@@ -158,8 +160,10 @@ const DATA = {
       object: "Einspruch erheben",
       acknowledgeTitle: "Änderung bestätigen",
       objectTitle: "Einspruch gegen Änderung",
-      acknowledgeDesc: "Die Bestätigung zeichnet Ihre Zustimmung auf und wendet die Änderungen auf das IEP an.",
-      objectDesc: "Ein Einspruch markiert diese Änderung für den Fallmanager. Fügen Sie eine Notiz hinzu, um Ihre Bedenken zu erläutern.",
+      acknowledgeDesc:
+        "Die Bestätigung zeichnet Ihre Zustimmung auf und wendet die Änderungen auf das IEP an.",
+      objectDesc:
+        "Ein Einspruch markiert diese Änderung für den Fallmanager. Fügen Sie eine Notiz hinzu, um Ihre Bedenken zu erläutern.",
       noteOptional: "Notiz hinzufügen (optional)",
       confirmAcknowledge: "Bestätigung bestätigen",
       confirmObject: "Einspruch bestätigen",
@@ -173,18 +177,21 @@ const DATA = {
       prefCat_reminders: "Erinnerungen zur jährlichen Überprüfung",
       email: "E-Mail",
       inApp: "In der App",
-      prefLockedNote: "Mindestens ein Kanal ist für rechtlich bedeutsame Aktualisierungen erforderlich.",
+      prefLockedNote:
+        "Mindestens ein Kanal ist für rechtlich bedeutsame Aktualisierungen erforderlich.",
       prefsSaved: "Benachrichtigungseinstellungen gespeichert.",
-      prefsSaveFailed: "Einstellungen konnten nicht gespeichert werden. Bitte erneut versuchen."
+      prefsSaveFailed: "Einstellungen konnten nicht gespeichert werden. Bitte erneut versuchen.",
     },
     mfaFactors: {
       totpTitle: "Authenticator-App",
-      totpDesc: "Verwenden Sie eine Authenticator-App (Google Authenticator, 1Password, Authy), um Anmeldecodes zu generieren.",
+      totpDesc:
+        "Verwenden Sie eine Authenticator-App (Google Authenticator, 1Password, Authy), um Anmeldecodes zu generieren.",
       enroll: "Authenticator-App einrichten",
       disable: "Authenticator deaktivieren",
       disableConfirm: "Bestätigen Sie Ihr Passwort, um die Authenticator-App zu deaktivieren.",
       disableFailed: "Die Authenticator-App konnte nicht deaktiviert werden.",
-      scanQr: "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App oder geben Sie das Geheimnis manuell ein.",
+      scanQr:
+        "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App oder geben Sie das Geheimnis manuell ein.",
       qrAlt: "QR-Code zum Einrichten Ihrer Authenticator-App",
       manualEntry: "Manueller Eingabe-Schlüssel (Base32):",
       secretCopied: "Geheimnis in die Zwischenablage kopiert.",
@@ -192,14 +199,16 @@ const DATA = {
       enrollFailed: "Authenticator-Einrichtung konnte nicht gestartet werden.",
       confirmFailed: "Code stimmt nicht überein — erneut versuchen.",
       recoveryTitle: "Wiederherstellungscodes",
-      recoveryDesc: "Einmalcodes, die Sie verwenden können, wenn Sie den Zugang zu Ihrer Authenticator-App verlieren.",
+      recoveryDesc:
+        "Einmalcodes, die Sie verwenden können, wenn Sie den Zugang zu Ihrer Authenticator-App verlieren.",
       recoveryRemaining: "{{remaining}} von {{total}} Wiederherstellungscodes verbleibend",
       regen: "Neue Wiederherstellungscodes generieren",
-      regenConfirm: "Bestätigen Sie Ihr Passwort, um neue Wiederherstellungscodes zu generieren. Ihre alten Codes werden ungültig.",
+      regenConfirm:
+        "Bestätigen Sie Ihr Passwort, um neue Wiederherstellungscodes zu generieren. Ihre alten Codes werden ungültig.",
       regenFailed: "Neue Wiederherstellungscodes konnten nicht generiert werden.",
       codesWarning: "Speichern Sie diese Codes jetzt — sie werden nicht erneut angezeigt.",
       copyCodes: "Alle kopieren",
-      codesCopied: "Wiederherstellungscodes in die Zwischenablage kopiert."
+      codesCopied: "Wiederherstellungscodes in die Zwischenablage kopiert.",
     },
     parentBrain: {
       title: "{{name}}s Gehirn",
@@ -210,7 +219,7 @@ const DATA = {
       mastered: "{{percent}}% gemeistert",
       viewHistory: "Verlauf anzeigen",
       brainHistory: "Gehirnverlauf",
-      historySubtitle: "Zeitstrahl der Änderungen und Meilensteine"
+      historySubtitle: "Zeitstrahl der Änderungen und Meilensteine",
     },
     learnerShop: {
       title: "Avatar-Shop",
@@ -220,29 +229,29 @@ const DATA = {
       pets: "Haustiere",
       backgrounds: "Hintergründe",
       effects: "Effekte",
-      special: "Spezial"
+      special: "Spezial",
     },
     learnerGamification: {
       title: "Mein Profil",
       streak: "Serie",
       activeChallenges: "Aktive Herausforderungen",
       noChallenges: "Keine aktiven Herausforderungen. Schau bald wieder vorbei!",
-      gradebook: "Notenbuch"
+      gradebook: "Notenbuch",
     },
     caregiverIEP: {
       title: "IEP-Ziele",
       subtitle: "Nur-Lese-Fortschrittsverfolgung",
       noTitle: "Keine IEP-Ziele",
       noMessage: "Es wurden noch keine IEP-Ziele eingerichtet.",
-      progressLabel: "{{percent}}% (Ausgangswert → Aktuell → Ziel)"
+      progressLabel: "{{percent}}% (Ausgangswert → Aktuell → Ziel)",
     },
     parentSession: {
       title: "Gemeinsame Sitzung",
-      subtitle: "Verfolgen Sie {{name}}s Lernen gemeinsam"
+      subtitle: "Verfolgen Sie {{name}}s Lernen gemeinsam",
     },
     therapistSettings: {
-      title: "Einstellungen"
-    }
+      title: "Einstellungen",
+    },
   },
   fr: {
     parentIEP: {
@@ -253,7 +262,8 @@ const DATA = {
       iepGoals: "Objectifs IEP",
       complete: "terminé",
       noGoalsTitle: "Aucun objectif IEP",
-      noGoalsMessage: "Téléchargez un document IEP pour voir les objectifs analysés et suivre les progrès.",
+      noGoalsMessage:
+        "Téléchargez un document IEP pour voir les objectifs analysés et suivre les progrès.",
       uploadDesc: "Prenez une photo ou sélectionnez un PDF",
       camera: "Appareil photo",
       filter_all: "Tout",
@@ -277,8 +287,10 @@ const DATA = {
       object: "Objecter",
       acknowledgeTitle: "Reconnaître l'amendement",
       objectTitle: "Objecter à l'amendement",
-      acknowledgeDesc: "La reconnaissance enregistre votre consentement et applique les modifications à l'IEP.",
-      objectDesc: "L'objection signale cet amendement au gestionnaire de cas. Ajoutez une note pour expliquer vos préoccupations.",
+      acknowledgeDesc:
+        "La reconnaissance enregistre votre consentement et applique les modifications à l'IEP.",
+      objectDesc:
+        "L'objection signale cet amendement au gestionnaire de cas. Ajoutez une note pour expliquer vos préoccupations.",
       noteOptional: "Ajouter une note (optionnel)",
       confirmAcknowledge: "Confirmer la reconnaissance",
       confirmObject: "Confirmer l'objection",
@@ -294,16 +306,19 @@ const DATA = {
       inApp: "Dans l'application",
       prefLockedNote: "Au moins un canal est requis pour les mises à jour à caractère légal.",
       prefsSaved: "Préférences de notification enregistrées.",
-      prefsSaveFailed: "Impossible d'enregistrer les préférences. Veuillez réessayer."
+      prefsSaveFailed: "Impossible d'enregistrer les préférences. Veuillez réessayer.",
     },
     mfaFactors: {
       totpTitle: "Application d'authentification",
-      totpDesc: "Utilisez une application d'authentification (Google Authenticator, 1Password, Authy) pour générer des codes de connexion.",
+      totpDesc:
+        "Utilisez une application d'authentification (Google Authenticator, 1Password, Authy) pour générer des codes de connexion.",
       enroll: "Configurer l'application d'authentification",
       disable: "Désactiver l'authentificateur",
-      disableConfirm: "Confirmez votre mot de passe pour désactiver l'application d'authentification.",
+      disableConfirm:
+        "Confirmez votre mot de passe pour désactiver l'application d'authentification.",
       disableFailed: "Impossible de désactiver l'application d'authentification.",
-      scanQr: "Scannez ce code QR avec votre application d'authentification, ou saisissez le secret manuellement.",
+      scanQr:
+        "Scannez ce code QR avec votre application d'authentification, ou saisissez le secret manuellement.",
       qrAlt: "Code QR pour configurer votre application d'authentification",
       manualEntry: "Secret de saisie manuelle (Base32) :",
       secretCopied: "Secret copié dans le presse-papiers.",
@@ -311,14 +326,16 @@ const DATA = {
       enrollFailed: "Impossible de démarrer la configuration de l'authentificateur.",
       confirmFailed: "Le code ne correspond pas — réessayez.",
       recoveryTitle: "Codes de récupération",
-      recoveryDesc: "Codes à usage unique que vous pouvez utiliser si vous perdez l'accès à votre application d'authentification.",
+      recoveryDesc:
+        "Codes à usage unique que vous pouvez utiliser si vous perdez l'accès à votre application d'authentification.",
       recoveryRemaining: "{{remaining}} sur {{total}} codes de récupération restants",
       regen: "Générer de nouveaux codes de récupération",
-      regenConfirm: "Confirmez votre mot de passe pour générer de nouveaux codes de récupération. Vos anciens codes cesseront de fonctionner.",
+      regenConfirm:
+        "Confirmez votre mot de passe pour générer de nouveaux codes de récupération. Vos anciens codes cesseront de fonctionner.",
       regenFailed: "Impossible de générer de nouveaux codes de récupération.",
       codesWarning: "Sauvegardez ces codes maintenant — ils ne seront plus affichés.",
       copyCodes: "Tout copier",
-      codesCopied: "Codes de récupération copiés dans le presse-papiers."
+      codesCopied: "Codes de récupération copiés dans le presse-papiers.",
     },
     parentBrain: {
       title: "Le Cerveau de {{name}}",
@@ -329,7 +346,7 @@ const DATA = {
       mastered: "{{percent}}% maîtrisé",
       viewHistory: "Voir l'historique",
       brainHistory: "Historique du Cerveau",
-      historySubtitle: "Chronologie des changements et des jalons"
+      historySubtitle: "Chronologie des changements et des jalons",
     },
     learnerShop: {
       title: "Boutique d'avatars",
@@ -339,29 +356,29 @@ const DATA = {
       pets: "Animaux",
       backgrounds: "Arrière-plans",
       effects: "Effets",
-      special: "Spécial"
+      special: "Spécial",
     },
     learnerGamification: {
       title: "Mon profil",
       streak: "Série",
       activeChallenges: "Défis actifs",
       noChallenges: "Aucun défi actif. Revenez bientôt !",
-      gradebook: "Carnet de notes"
+      gradebook: "Carnet de notes",
     },
     caregiverIEP: {
       title: "Objectifs IEP",
       subtitle: "Suivi des progrès en lecture seule",
       noTitle: "Aucun objectif IEP",
       noMessage: "Aucun objectif IEP n'a encore été défini.",
-      progressLabel: "{{percent}}% (Référence → Actuel → Cible)"
+      progressLabel: "{{percent}}% (Référence → Actuel → Cible)",
     },
     parentSession: {
       title: "Session co-visionnage",
-      subtitle: "Regardez l'apprentissage de {{name}} ensemble"
+      subtitle: "Regardez l'apprentissage de {{name}} ensemble",
     },
     therapistSettings: {
-      title: "Paramètres"
-    }
+      title: "Paramètres",
+    },
   },
   hi: {
     parentIEP: {
@@ -372,7 +389,8 @@ const DATA = {
       iepGoals: "IEP लक्ष्य",
       complete: "पूर्ण",
       noGoalsTitle: "कोई IEP लक्ष्य नहीं",
-      noGoalsMessage: "विश्लेषित लक्ष्य देखने और प्रगति ट्रैक करने के लिए IEP दस्तावेज़ अपलोड करें।",
+      noGoalsMessage:
+        "विश्लेषित लक्ष्य देखने और प्रगति ट्रैक करने के लिए IEP दस्तावेज़ अपलोड करें।",
       uploadDesc: "फ़ोटो लें या PDF चुनें",
       camera: "कैमरा",
       filter_all: "सभी",
@@ -397,7 +415,8 @@ const DATA = {
       acknowledgeTitle: "संशोधन स्वीकार करें",
       objectTitle: "संशोधन पर आपत्ति",
       acknowledgeDesc: "स्वीकृति आपकी सहमति दर्ज करती है और IEP में बदलाव लागू करती है।",
-      objectDesc: "आपत्ति इस संशोधन को केस मैनेजर को चिह्नित करती है। अपनी चिंताएं बताने के लिए एक नोट जोड़ें।",
+      objectDesc:
+        "आपत्ति इस संशोधन को केस मैनेजर को चिह्नित करती है। अपनी चिंताएं बताने के लिए एक नोट जोड़ें।",
       noteOptional: "नोट जोड़ें (वैकल्पिक)",
       confirmAcknowledge: "स्वीकृति की पुष्टि करें",
       confirmObject: "आपत्ति की पुष्टि करें",
@@ -413,11 +432,12 @@ const DATA = {
       inApp: "ऐप में",
       prefLockedNote: "कानूनी रूप से महत्वपूर्ण अपडेट के लिए कम से कम एक चैनल आवश्यक है।",
       prefsSaved: "अधिसूचना प्राथमिकताएं सहेजी गईं।",
-      prefsSaveFailed: "प्राथमिकताएं सहेजी नहीं जा सकीं। कृपया पुनः प्रयास करें।"
+      prefsSaveFailed: "प्राथमिकताएं सहेजी नहीं जा सकीं। कृपया पुनः प्रयास करें।",
     },
     mfaFactors: {
       totpTitle: "प्रमाणक ऐप",
-      totpDesc: "साइन-इन कोड जनरेट करने के लिए प्रमाणक ऐप (Google Authenticator, 1Password, Authy) का उपयोग करें।",
+      totpDesc:
+        "साइन-इन कोड जनरेट करने के लिए प्रमाणक ऐप (Google Authenticator, 1Password, Authy) का उपयोग करें।",
       enroll: "प्रमाणक ऐप सेट करें",
       disable: "प्रमाणक बंद करें",
       disableConfirm: "प्रमाणक ऐप बंद करने के लिए अपना पासवर्ड की पुष्टि करें।",
@@ -433,11 +453,12 @@ const DATA = {
       recoveryDesc: "एकबारगी कोड जो आप अपने प्रमाणक ऐप तक पहुंच खोने पर उपयोग कर सकते हैं।",
       recoveryRemaining: "{{total}} में से {{remaining}} रिकवरी कोड शेष",
       regen: "नए रिकवरी कोड जनरेट करें",
-      regenConfirm: "नए रिकवरी कोड जनरेट करने के लिए अपना पासवर्ड की पुष्टि करें। आपके पुराने कोड काम करना बंद कर देंगे।",
+      regenConfirm:
+        "नए रिकवरी कोड जनरेट करने के लिए अपना पासवर्ड की पुष्टि करें। आपके पुराने कोड काम करना बंद कर देंगे।",
       regenFailed: "नए रिकवरी कोड जनरेट नहीं हो सके।",
       codesWarning: "इन कोड को अभी सहेजें — ये दोबारा नहीं दिखाए जाएंगे।",
       copyCodes: "सभी कॉपी करें",
-      codesCopied: "रिकवरी कोड क्लिपबोर्ड पर कॉपी हो गए।"
+      codesCopied: "रिकवरी कोड क्लिपबोर्ड पर कॉपी हो गए।",
     },
     parentBrain: {
       title: "{{name}} का ब्रेन",
@@ -448,7 +469,7 @@ const DATA = {
       mastered: "{{percent}}% में महारत",
       viewHistory: "इतिहास देखें",
       brainHistory: "ब्रेन इतिहास",
-      historySubtitle: "परिवर्तनों और मील के पत्थर की समयरेखा"
+      historySubtitle: "परिवर्तनों और मील के पत्थर की समयरेखा",
     },
     learnerShop: {
       title: "अवतार शॉप",
@@ -458,29 +479,29 @@ const DATA = {
       pets: "पालतू जानवर",
       backgrounds: "पृष्ठभूमि",
       effects: "प्रभाव",
-      special: "विशेष"
+      special: "विशेष",
     },
     learnerGamification: {
       title: "मेरी प्रोफ़ाइल",
       streak: "लगातार प्रदर्शन",
       activeChallenges: "सक्रिय चुनौतियाँ",
       noChallenges: "कोई सक्रिय चुनौती नहीं। जल्द वापस जाँचें!",
-      gradebook: "ग्रेडबुक"
+      gradebook: "ग्रेडबुक",
     },
     caregiverIEP: {
       title: "IEP लक्ष्य",
       subtitle: "केवल पढ़ने के लिए प्रगति ट्रैकिंग",
       noTitle: "कोई IEP लक्ष्य नहीं",
       noMessage: "अभी तक कोई IEP लक्ष्य निर्धारित नहीं किया गया है।",
-      progressLabel: "{{percent}}% (आधार रेखा → वर्तमान → लक्ष्य)"
+      progressLabel: "{{percent}}% (आधार रेखा → वर्तमान → लक्ष्य)",
     },
     parentSession: {
       title: "सह-दर्शन सत्र",
-      subtitle: "{{name}} की सीखाई एक साथ देखें"
+      subtitle: "{{name}} की सीखाई एक साथ देखें",
     },
     therapistSettings: {
-      title: "सेटिंग्स"
-    }
+      title: "सेटिंग्स",
+    },
   },
   ja: {
     parentIEP: {
@@ -516,7 +537,8 @@ const DATA = {
       acknowledgeTitle: "修正を確認する",
       objectTitle: "修正に異議を唱える",
       acknowledgeDesc: "確認することで同意が記録され、IEPに変更が適用されます。",
-      objectDesc: "異議を唱えるとこの修正がケースマネージャーに通知されます。懸念を説明するメモを追加してください。",
+      objectDesc:
+        "異議を唱えるとこの修正がケースマネージャーに通知されます。懸念を説明するメモを追加してください。",
       noteOptional: "メモを追加（任意）",
       confirmAcknowledge: "確認を決定する",
       confirmObject: "異議を確定する",
@@ -532,11 +554,12 @@ const DATA = {
       inApp: "アプリ内",
       prefLockedNote: "法的に重要な更新には少なくとも1つのチャンネルが必要です。",
       prefsSaved: "通知設定が保存されました。",
-      prefsSaveFailed: "設定を保存できませんでした。もう一度お試しください。"
+      prefsSaveFailed: "設定を保存できませんでした。もう一度お試しください。",
     },
     mfaFactors: {
       totpTitle: "認証アプリ",
-      totpDesc: "認証アプリ（Google Authenticator、1Password、Authy）を使ってサインインコードを生成します。",
+      totpDesc:
+        "認証アプリ（Google Authenticator、1Password、Authy）を使ってサインインコードを生成します。",
       enroll: "認証アプリを設定する",
       disable: "認証アプリを無効にする",
       disableConfirm: "認証アプリを無効にするためにパスワードを確認してください。",
@@ -552,11 +575,12 @@ const DATA = {
       recoveryDesc: "認証アプリへのアクセスを失った場合に使用できるワンタイムコードです。",
       recoveryRemaining: "{{total}}件中{{remaining}}件の回復コードが残っています",
       regen: "新しい回復コードを生成する",
-      regenConfirm: "新しい回復コードを生成するためにパスワードを確認してください。古いコードは使用できなくなります。",
+      regenConfirm:
+        "新しい回復コードを生成するためにパスワードを確認してください。古いコードは使用できなくなります。",
       regenFailed: "新しい回復コードを生成できませんでした。",
       codesWarning: "今すぐこれらのコードを保存してください — 再表示されません。",
       copyCodes: "すべてコピー",
-      codesCopied: "回復コードがクリップボードにコピーされました。"
+      codesCopied: "回復コードがクリップボードにコピーされました。",
     },
     parentBrain: {
       title: "{{name}}のブレイン",
@@ -567,7 +591,7 @@ const DATA = {
       mastered: "{{percent}}%習得済み",
       viewHistory: "履歴を見る",
       brainHistory: "ブレイン履歴",
-      historySubtitle: "変更とマイルストーンのタイムライン"
+      historySubtitle: "変更とマイルストーンのタイムライン",
     },
     learnerShop: {
       title: "アバターショップ",
@@ -577,29 +601,29 @@ const DATA = {
       pets: "ペット",
       backgrounds: "背景",
       effects: "エフェクト",
-      special: "スペシャル"
+      special: "スペシャル",
     },
     learnerGamification: {
       title: "マイプロフィール",
       streak: "連続記録",
       activeChallenges: "アクティブなチャレンジ",
       noChallenges: "アクティブなチャレンジはありません。後でまた確認してください！",
-      gradebook: "成績簿"
+      gradebook: "成績簿",
     },
     caregiverIEP: {
       title: "IEP目標",
       subtitle: "読み取り専用の進捗追跡",
       noTitle: "IEP目標なし",
       noMessage: "IEP目標はまだ設定されていません。",
-      progressLabel: "{{percent}}%（ベースライン → 現在 → 目標）"
+      progressLabel: "{{percent}}%（ベースライン → 現在 → 目標）",
     },
     parentSession: {
       title: "共同視聴セッション",
-      subtitle: "{{name}}の学習を一緒に見守る"
+      subtitle: "{{name}}の学習を一緒に見守る",
     },
     therapistSettings: {
-      title: "設定"
-    }
+      title: "設定",
+    },
   },
   ko: {
     parentIEP: {
@@ -635,7 +659,8 @@ const DATA = {
       acknowledgeTitle: "수정 확인",
       objectTitle: "수정에 이의 제기",
       acknowledgeDesc: "확인하면 동의가 기록되고 IEP에 변경 사항이 적용됩니다.",
-      objectDesc: "이의 제기는 케이스 매니저에게 이 수정을 표시합니다. 우려 사항을 설명하는 메모를 추가하세요.",
+      objectDesc:
+        "이의 제기는 케이스 매니저에게 이 수정을 표시합니다. 우려 사항을 설명하는 메모를 추가하세요.",
       noteOptional: "메모 추가 (선택 사항)",
       confirmAcknowledge: "확인 확정",
       confirmObject: "이의 제기 확정",
@@ -651,11 +676,12 @@ const DATA = {
       inApp: "앱 내",
       prefLockedNote: "법적으로 중요한 업데이트에는 최소 하나의 채널이 필요합니다.",
       prefsSaved: "알림 기본 설정이 저장되었습니다.",
-      prefsSaveFailed: "기본 설정을 저장할 수 없습니다. 다시 시도해 주세요."
+      prefsSaveFailed: "기본 설정을 저장할 수 없습니다. 다시 시도해 주세요.",
     },
     mfaFactors: {
       totpTitle: "인증 앱",
-      totpDesc: "인증 앱(Google Authenticator, 1Password, Authy)을 사용하여 로그인 코드를 생성하세요.",
+      totpDesc:
+        "인증 앱(Google Authenticator, 1Password, Authy)을 사용하여 로그인 코드를 생성하세요.",
       enroll: "인증 앱 설정",
       disable: "인증 앱 해제",
       disableConfirm: "인증 앱을 해제하려면 비밀번호를 확인하세요.",
@@ -671,11 +697,12 @@ const DATA = {
       recoveryDesc: "인증 앱에 대한 접근을 잃었을 때 사용할 수 있는 일회용 코드입니다.",
       recoveryRemaining: "{{total}}개 중 {{remaining}}개의 복구 코드 남음",
       regen: "새 복구 코드 생성",
-      regenConfirm: "새 복구 코드를 생성하려면 비밀번호를 확인하세요. 기존 코드는 더 이상 작동하지 않습니다.",
+      regenConfirm:
+        "새 복구 코드를 생성하려면 비밀번호를 확인하세요. 기존 코드는 더 이상 작동하지 않습니다.",
       regenFailed: "새 복구 코드를 생성할 수 없습니다.",
       codesWarning: "지금 이 코드를 저장하세요 — 다시 표시되지 않습니다.",
       copyCodes: "모두 복사",
-      codesCopied: "복구 코드가 클립보드에 복사되었습니다."
+      codesCopied: "복구 코드가 클립보드에 복사되었습니다.",
     },
     parentBrain: {
       title: "{{name}}의 브레인",
@@ -686,7 +713,7 @@ const DATA = {
       mastered: "{{percent}}% 숙달",
       viewHistory: "기록 보기",
       brainHistory: "브레인 기록",
-      historySubtitle: "변경 사항 및 마일스톤 타임라인"
+      historySubtitle: "변경 사항 및 마일스톤 타임라인",
     },
     learnerShop: {
       title: "아바타 상점",
@@ -696,29 +723,29 @@ const DATA = {
       pets: "펫",
       backgrounds: "배경",
       effects: "효과",
-      special: "스페셜"
+      special: "스페셜",
     },
     learnerGamification: {
       title: "내 프로필",
       streak: "연속 달성",
       activeChallenges: "활성 챌린지",
       noChallenges: "활성 챌린지가 없습니다. 곧 다시 확인하세요!",
-      gradebook: "성적부"
+      gradebook: "성적부",
     },
     caregiverIEP: {
       title: "IEP 목표",
       subtitle: "읽기 전용 진행 상황 추적",
       noTitle: "IEP 목표 없음",
       noMessage: "아직 IEP 목표가 설정되지 않았습니다.",
-      progressLabel: "{{percent}}% (기준선 → 현재 → 목표)"
+      progressLabel: "{{percent}}% (기준선 → 현재 → 목표)",
     },
     parentSession: {
       title: "공동 시청 세션",
-      subtitle: "{{name}}의 학습을 함께 시청하세요"
+      subtitle: "{{name}}의 학습을 함께 시청하세요",
     },
     therapistSettings: {
-      title: "설정"
-    }
+      title: "설정",
+    },
   },
   pt: {
     parentIEP: {
@@ -729,7 +756,8 @@ const DATA = {
       iepGoals: "Metas IEP",
       complete: "concluído",
       noGoalsTitle: "Nenhuma meta IEP",
-      noGoalsMessage: "Faça upload de um documento IEP para ver as metas analisadas e acompanhar o progresso.",
+      noGoalsMessage:
+        "Faça upload de um documento IEP para ver as metas analisadas e acompanhar o progresso.",
       uploadDesc: "Tire uma foto ou selecione um PDF",
       camera: "Câmera",
       filter_all: "Todos",
@@ -754,7 +782,8 @@ const DATA = {
       acknowledgeTitle: "Reconhecer emenda",
       objectTitle: "Objetar à emenda",
       acknowledgeDesc: "Reconhecer registra seu consentimento e aplica as alterações ao IEP.",
-      objectDesc: "Objetar sinaliza esta emenda ao gerente de caso. Adicione uma nota para explicar suas preocupações.",
+      objectDesc:
+        "Objetar sinaliza esta emenda ao gerente de caso. Adicione uma nota para explicar suas preocupações.",
       noteOptional: "Adicionar nota (opcional)",
       confirmAcknowledge: "Confirmar reconhecimento",
       confirmObject: "Confirmar objeção",
@@ -768,18 +797,21 @@ const DATA = {
       prefCat_reminders: "Lembretes de revisão anual",
       email: "E-mail",
       inApp: "No aplicativo",
-      prefLockedNote: "Pelo menos um canal é necessário para atualizações legalmente significativas.",
+      prefLockedNote:
+        "Pelo menos um canal é necessário para atualizações legalmente significativas.",
       prefsSaved: "Preferências de notificação salvas.",
-      prefsSaveFailed: "Não foi possível salvar as preferências. Por favor, tente novamente."
+      prefsSaveFailed: "Não foi possível salvar as preferências. Por favor, tente novamente.",
     },
     mfaFactors: {
       totpTitle: "Aplicativo autenticador",
-      totpDesc: "Use um aplicativo autenticador (Google Authenticator, 1Password, Authy) para gerar códigos de login.",
+      totpDesc:
+        "Use um aplicativo autenticador (Google Authenticator, 1Password, Authy) para gerar códigos de login.",
       enroll: "Configurar aplicativo autenticador",
       disable: "Desativar autenticador",
       disableConfirm: "Confirme sua senha para desativar o aplicativo autenticador.",
       disableFailed: "Não foi possível desativar o aplicativo autenticador.",
-      scanQr: "Escaneie este código QR com seu aplicativo autenticador ou insira o segredo manualmente.",
+      scanQr:
+        "Escaneie este código QR com seu aplicativo autenticador ou insira o segredo manualmente.",
       qrAlt: "Código QR para configurar seu aplicativo autenticador",
       manualEntry: "Segredo de entrada manual (Base32):",
       secretCopied: "Segredo copiado para a área de transferência.",
@@ -787,14 +819,16 @@ const DATA = {
       enrollFailed: "Não foi possível iniciar a configuração do autenticador.",
       confirmFailed: "Código não correspondeu — tente novamente.",
       recoveryTitle: "Códigos de recuperação",
-      recoveryDesc: "Códigos de uso único que você pode usar se perder acesso ao seu aplicativo autenticador.",
+      recoveryDesc:
+        "Códigos de uso único que você pode usar se perder acesso ao seu aplicativo autenticador.",
       recoveryRemaining: "{{remaining}} de {{total}} códigos de recuperação restantes",
       regen: "Gerar novos códigos de recuperação",
-      regenConfirm: "Confirme sua senha para gerar novos códigos de recuperação. Seus códigos antigos deixarão de funcionar.",
+      regenConfirm:
+        "Confirme sua senha para gerar novos códigos de recuperação. Seus códigos antigos deixarão de funcionar.",
       regenFailed: "Não foi possível gerar novos códigos de recuperação.",
       codesWarning: "Salve estes códigos agora — eles não serão mostrados novamente.",
       copyCodes: "Copiar todos",
-      codesCopied: "Códigos de recuperação copiados para a área de transferência."
+      codesCopied: "Códigos de recuperação copiados para a área de transferência.",
     },
     parentBrain: {
       title: "Cérebro de {{name}}",
@@ -805,7 +839,7 @@ const DATA = {
       mastered: "{{percent}}% dominado",
       viewHistory: "Ver histórico",
       brainHistory: "Histórico do Cérebro",
-      historySubtitle: "Linha do tempo de mudanças e marcos"
+      historySubtitle: "Linha do tempo de mudanças e marcos",
     },
     learnerShop: {
       title: "Loja de Avatares",
@@ -815,29 +849,29 @@ const DATA = {
       pets: "Animais de estimação",
       backgrounds: "Fundos",
       effects: "Efeitos",
-      special: "Especial"
+      special: "Especial",
     },
     learnerGamification: {
       title: "Meu Perfil",
       streak: "Sequência",
       activeChallenges: "Desafios ativos",
       noChallenges: "Nenhum desafio ativo. Volte em breve!",
-      gradebook: "Boletim"
+      gradebook: "Boletim",
     },
     caregiverIEP: {
       title: "Metas IEP",
       subtitle: "Rastreamento de progresso somente leitura",
       noTitle: "Nenhuma meta IEP",
       noMessage: "Nenhuma meta IEP foi configurada ainda.",
-      progressLabel: "{{percent}}% (Linha de base → Atual → Meta)"
+      progressLabel: "{{percent}}% (Linha de base → Atual → Meta)",
     },
     parentSession: {
       title: "Sessão de Co-Visualização",
-      subtitle: "Acompanhe o aprendizado de {{name}} juntos"
+      subtitle: "Acompanhe o aprendizado de {{name}} juntos",
     },
     therapistSettings: {
-      title: "Configurações"
-    }
+      title: "Configurações",
+    },
   },
   zh: {
     parentIEP: {
@@ -889,7 +923,7 @@ const DATA = {
       inApp: "应用内",
       prefLockedNote: "法律上重要的更新至少需要一个渠道。",
       prefsSaved: "通知偏好已保存。",
-      prefsSaveFailed: "无法保存偏好设置。请重试。"
+      prefsSaveFailed: "无法保存偏好设置。请重试。",
     },
     mfaFactors: {
       totpTitle: "身份验证应用",
@@ -913,7 +947,7 @@ const DATA = {
       regenFailed: "无法生成新的恢复代码。",
       codesWarning: "立即保存这些代码 — 它们不会再次显示。",
       copyCodes: "全部复制",
-      codesCopied: "恢复代码已复制到剪贴板。"
+      codesCopied: "恢复代码已复制到剪贴板。",
     },
     parentBrain: {
       title: "{{name}}的大脑",
@@ -924,7 +958,7 @@ const DATA = {
       mastered: "{{percent}}%已掌握",
       viewHistory: "查看历史",
       brainHistory: "大脑历史",
-      historySubtitle: "变化和里程碑的时间线"
+      historySubtitle: "变化和里程碑的时间线",
     },
     learnerShop: {
       title: "化身商店",
@@ -934,37 +968,43 @@ const DATA = {
       pets: "宠物",
       backgrounds: "背景",
       effects: "特效",
-      special: "特别"
+      special: "特别",
     },
     learnerGamification: {
       title: "我的档案",
       streak: "连续记录",
       activeChallenges: "活跃挑战",
       noChallenges: "没有活跃挑战。请稍后再来！",
-      gradebook: "成绩册"
+      gradebook: "成绩册",
     },
     caregiverIEP: {
       title: "IEP目标",
       subtitle: "只读进度跟踪",
       noTitle: "没有IEP目标",
       noMessage: "尚未设置IEP目标。",
-      progressLabel: "{{percent}}%（基线 → 当前 → 目标）"
+      progressLabel: "{{percent}}%（基线 → 当前 → 目标）",
     },
     parentSession: {
       title: "共同观看课程",
-      subtitle: "一起观看{{name}}的学习"
+      subtitle: "一起观看{{name}}的学习",
     },
     therapistSettings: {
-      title: "设置"
-    }
-  }
+      title: "设置",
+    },
+  },
 };
 
-function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
-  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
-  else t[k]=v;}return t;}
+function deepMerge(t, s) {
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if (!t[k] || typeof t[k] !== "object") t[k] = {};
+      deepMerge(t[k], v);
+    } else t[k] = v;
+  }
+  return t;
+}
 
-let n=0;
+let n = 0;
 for (const [locale, roots] of Object.entries(DATA)) {
   const file = join(dir, `${locale}.json`);
   const json = JSON.parse(readFileSync(file, "utf8"));

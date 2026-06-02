@@ -68,10 +68,30 @@ export default function LearnerHomeDesignSystemPage() {
             }
           />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <FloatingMetricCard label="Today's focus" value="Reading" description="15 min" tone="info" />
-            <FloatingMetricCard label="Streak" value="7 days" description="Keep going!" tone="success" />
-            <FloatingMetricCard label="Support mode" value="4 on" description="IEP supports" tone="info" />
-            <FloatingMetricCard label="Tutor" value="Ready" description="Ask for a hint" tone="neutral" />
+            <FloatingMetricCard
+              label="Today's focus"
+              value="Reading"
+              description="15 min"
+              tone="info"
+            />
+            <FloatingMetricCard
+              label="Streak"
+              value="7 days"
+              description="Keep going!"
+              tone="success"
+            />
+            <FloatingMetricCard
+              label="Support mode"
+              value="4 on"
+              description="IEP supports"
+              tone="info"
+            />
+            <FloatingMetricCard
+              label="Tutor"
+              value="Ready"
+              description="Ask for a hint"
+              tone="neutral"
+            />
           </div>
         </section>
 
@@ -84,15 +104,24 @@ export default function LearnerHomeDesignSystemPage() {
             title="Identifying main idea"
             body="A short story and a couple of friendly questions. About 12 minutes."
             companion={
-              <span className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)]" aria-hidden="true">
+              <span
+                className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)]"
+                aria-hidden="true"
+              >
                 📚
               </span>
             }
             meta={
               <>
-                <InsightChip tone="primary" size="md">12 min</InsightChip>
-                <InsightChip tone="accent" size="md">IEP supports on</InsightChip>
-                <InsightChip tone="info" size="md">Read-aloud available</InsightChip>
+                <InsightChip tone="primary" size="md">
+                  12 min
+                </InsightChip>
+                <InsightChip tone="accent" size="md">
+                  IEP supports on
+                </InsightChip>
+                <InsightChip tone="info" size="md">
+                  Read-aloud available
+                </InsightChip>
               </>
             }
             action={
@@ -206,8 +235,8 @@ export default function LearnerHomeDesignSystemPage() {
             LearnerBottomNav (mobile only — view this page in a narrow viewport)
           </h2>
           <p className="text-sm text-iw-text-muted">
-            Renders at the bottom of the page on small screens. Active state and unread dot are shown
-            in the live preview below the design system content.
+            Renders at the bottom of the page on small screens. Active state and unread dot are
+            shown in the live preview below the design system content.
           </p>
         </section>
       </div>

@@ -4,20 +4,13 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Globe } from "lucide-react";
 import { useTranslations } from "next-intl";
-import {
-  locales,
-  localeNames,
-  LOCALE_COOKIE_NAME,
-  type Locale,
-} from "@/lib/i18n/config";
+import { locales, localeNames, LOCALE_COOKIE_NAME, type Locale } from "@/lib/i18n/config";
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 function readCurrentLocale(): Locale {
   if (typeof document === "undefined") return "en";
-  const match = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(`${LOCALE_COOKIE_NAME}=`));
+  const match = document.cookie.split("; ").find((row) => row.startsWith(`${LOCALE_COOKIE_NAME}=`));
   const raw = match?.split("=")[1];
   if (raw && (locales as readonly string[]).includes(raw)) {
     return raw as Locale;

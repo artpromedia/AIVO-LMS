@@ -9,10 +9,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  normalizeZip,
-  resolveZipToDistricts,
-} from "../src/services/zip-district-resolver.js";
+import { normalizeZip, resolveZipToDistricts } from "../src/services/zip-district-resolver.js";
 
 test("normalizeZip strips non-digits and clamps to 5", () => {
   assert.equal(normalizeZip("90210"), "90210");

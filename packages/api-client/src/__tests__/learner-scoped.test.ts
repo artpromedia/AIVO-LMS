@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  isLearnerScopedKey,
-  learnerScopedQueryKey,
-} from "../react/learner-scoped.js";
+import { isLearnerScopedKey, learnerScopedQueryKey } from "../react/learner-scoped.js";
 
 describe("learnerScopedQueryKey", () => {
   it("namespaces by (learner, learnerId, viewerRole, resource)", () => {
@@ -15,9 +12,14 @@ describe("learnerScopedQueryKey", () => {
   });
 
   it("appends extra positional disambiguators", () => {
-    expect(
-      learnerScopedQueryKey("l-1", "teacher", "sessions", { from: "2026-01-01" }, 1),
-    ).toEqual(["learner", "l-1", "teacher", "sessions", { from: "2026-01-01" }, 1]);
+    expect(learnerScopedQueryKey("l-1", "teacher", "sessions", { from: "2026-01-01" }, 1)).toEqual([
+      "learner",
+      "l-1",
+      "teacher",
+      "sessions",
+      { from: "2026-01-01" },
+      1,
+    ]);
   });
 
   it("separates parent and teacher slices of the same learner", () => {
@@ -67,11 +69,7 @@ describe("isLearnerScopedKey", () => {
   });
 
   it("can scope predicate to a specific learnerId", () => {
-    expect(
-      isLearnerScopedKey(["learner", "l-1", "parent", "profile"], "l-1"),
-    ).toBe(true);
-    expect(
-      isLearnerScopedKey(["learner", "l-1", "parent", "profile"], "l-2"),
-    ).toBe(false);
+    expect(isLearnerScopedKey(["learner", "l-1", "parent", "profile"], "l-1")).toBe(true);
+    expect(isLearnerScopedKey(["learner", "l-1", "parent", "profile"], "l-2")).toBe(false);
   });
 });

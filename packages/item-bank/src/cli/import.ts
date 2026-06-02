@@ -107,10 +107,7 @@ function parseTinyYaml(input: string): unknown {
     if (v === "null" || v === "~") return null;
     if (/^-?\d+$/.test(v)) return parseInt(v, 10);
     if (/^-?\d+\.\d+$/.test(v)) return parseFloat(v);
-    if (
-      (v.startsWith('"') && v.endsWith('"')) ||
-      (v.startsWith("'") && v.endsWith("'"))
-    ) {
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
       return v.slice(1, -1);
     }
     return v;
@@ -173,11 +170,7 @@ function parseTinyYaml(input: string): unknown {
 function isBank(v: unknown): v is { schemaVersion: number; id: string; items: unknown[] } {
   if (!v || typeof v !== "object") return false;
   const o = v as Record<string, unknown>;
-  return (
-    typeof o.id === "string" &&
-    typeof o.schemaVersion === "number" &&
-    Array.isArray(o.items)
-  );
+  return typeof o.id === "string" && typeof o.schemaVersion === "number" && Array.isArray(o.items);
 }
 
 export interface ImportOptions {

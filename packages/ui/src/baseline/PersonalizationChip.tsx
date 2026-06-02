@@ -43,7 +43,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "Personalized from parent assessment",
     tone: "primary",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
         <path d="m22 11-3 3-1.5-1.5" />
@@ -54,7 +63,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "IEP supports applied",
     tone: "accent",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
     ),
@@ -63,7 +81,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "Pacing adjusted",
     tone: "info",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <circle cx="12" cy="12" r="9" />
         <path d="M12 7v5l3 2" />
       </svg>
@@ -73,7 +100,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "No grades — this helps AIVO learn",
     tone: "neutral",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <circle cx="12" cy="12" r="10" />
         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
         <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -84,7 +120,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "Read-aloud on",
     tone: "info",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
         <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
       </svg>
@@ -94,7 +139,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "Calm mode",
     tone: "accent",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
       </svg>
     ),
@@ -103,7 +157,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "Extra time",
     tone: "info",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
       </svg>
@@ -113,7 +176,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "Paused",
     tone: "warm",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <rect x="6" y="4" width="4" height="16" />
         <rect x="14" y="4" width="4" height="16" />
       </svg>
@@ -123,7 +195,16 @@ const SPECS: Record<PersonalizationVariant, VariantSpec> = {
     label: "AIVO is with you",
     tone: "primary",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <circle cx="12" cy="12" r="9" />
         <circle cx="12" cy="12" r="3" />
       </svg>

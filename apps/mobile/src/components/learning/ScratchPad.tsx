@@ -149,12 +149,22 @@ export function ScratchPad({
     const lines: React.ReactNode[] = [];
     for (let x = step; x < size.w; x += step) {
       lines.push(
-        <Path key={`vx-${x}`} d={`M ${x} 0 L ${x} ${size.h}`} stroke={colors.border} strokeWidth={1} />,
+        <Path
+          key={`vx-${x}`}
+          d={`M ${x} 0 L ${x} ${size.h}`}
+          stroke={colors.border}
+          strokeWidth={1}
+        />,
       );
     }
     for (let y = step; y < size.h; y += step) {
       lines.push(
-        <Path key={`hy-${y}`} d={`M 0 ${y} L ${size.w} ${y}`} stroke={colors.border} strokeWidth={1} />,
+        <Path
+          key={`hy-${y}`}
+          d={`M 0 ${y} L ${size.w} ${y}`}
+          stroke={colors.border}
+          strokeWidth={1}
+        />,
       );
     }
     return lines;

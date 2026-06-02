@@ -33,10 +33,4 @@ export type AivoDensity = "compact" | "base" | "comfortable";
 export type AivoElevation = "flat" | "raised" | "floating" | "overlay";
 
 /** Radius preset — maps to the iw-* radius tokens. */
-export type AivoRadius =
-  | "control"
-  | "card"
-  | "card-lg"
-  | "hero"
-  | "chip"
-  | "sheet-top";
+export type AivoRadius = "control" | "card" | "card-lg" | "hero" | "chip" | "sheet-top";

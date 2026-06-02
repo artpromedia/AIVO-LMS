@@ -36,7 +36,10 @@ export async function runBaselineRecalibrationJob(input: {
   const tenants: TenantRecalibrationSummary[] = [];
   for (const tenantId of input.tenantIds) {
     const items = await getBaselineRecalibration({ tenantId, minExposure: input.minExposure });
-    const calibration = await getBaselineCalibrationMap({ tenantId, minExposure: input.minExposure });
+    const calibration = await getBaselineCalibrationMap({
+      tenantId,
+      minExposure: input.minExposure,
+    });
     const summary: TenantRecalibrationSummary = {
       tenantId,
       itemsObserved: items.length,

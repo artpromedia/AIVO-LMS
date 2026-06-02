@@ -141,9 +141,7 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
           </label>
         </div>
         <div className="mt-3 flex items-center justify-between">
-          <p className="text-xs text-aivo-ink-soft">
-            {t("scim_rotate_warning")}
-          </p>
+          <p className="text-xs text-aivo-ink-soft">{t("scim_rotate_warning")}</p>
           <Button
             type="button"
             variant="outline"

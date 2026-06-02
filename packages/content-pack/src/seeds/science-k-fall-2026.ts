@@ -24,8 +24,18 @@ export const scienceKFall2026: ContentPack = {
   license: "CC-BY-4.0",
   publishedAt: "2026-09-01T00:00:00Z",
   assets: [
-    { id: "img-push", kind: "inline_svg", src: PUSH_SVG, alt: "A hand pushing a box from the left." },
-    { id: "img-pull", kind: "inline_svg", src: PULL_SVG, alt: "A hand pulling a box from the right." },
+    {
+      id: "img-push",
+      kind: "inline_svg",
+      src: PUSH_SVG,
+      alt: "A hand pushing a box from the left.",
+    },
+    {
+      id: "img-pull",
+      kind: "inline_svg",
+      src: PULL_SVG,
+      alt: "A hand pulling a box from the right.",
+    },
     { id: "img-sun", kind: "inline_svg", src: SUN_SVG, alt: "A bright yellow sun." },
   ],
   activities: [
@@ -73,7 +83,8 @@ export const scienceKFall2026: ContentPack = {
       title: "Stronger push",
       skillId: "ngss.K-PS2-2",
       type: "multiple_choice",
-      prompt: "If a small ball and a big rock are next to you, which one needs a stronger push to move?",
+      prompt:
+        "If a small ball and a big rock are next to you, which one needs a stronger push to move?",
       difficulty: "core",
       choices: [
         { id: "br", label: "Big rock", correct: true },

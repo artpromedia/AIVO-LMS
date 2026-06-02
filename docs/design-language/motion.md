@@ -1,6 +1,7 @@
 # Motion and sound
 
 Motion variants are in `packages/learner-ui/src/motion/variants.ts`:
+
 - `springGentle`
 - `springBounce`
 - `pop`

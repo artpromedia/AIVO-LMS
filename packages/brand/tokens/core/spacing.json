@@ -16,12 +16,17 @@
     "24": "96px"
   },
   "grid": {
-    "gutter":      {"mobile": "16px", "tablet": "24px", "desktop": "32px"},
-    "section":     {"mobile": "40px", "tablet": "64px", "desktop": "96px"},
-    "cardPad":     {"compact": "16px", "base": "24px", "comfortable": "32px"},
-    "container":   {"mobile": "100%", "tablet": "720px", "desktop": "1200px", "wide": "1440px"},
-    "columns":     {"mobile": "4", "tablet": "8", "desktop": "12"},
-    "safeArea":    {"top": "env(safe-area-inset-top)", "bottom": "env(safe-area-inset-bottom)", "left": "env(safe-area-inset-left)", "right": "env(safe-area-inset-right)"},
+    "gutter": { "mobile": "16px", "tablet": "24px", "desktop": "32px" },
+    "section": { "mobile": "40px", "tablet": "64px", "desktop": "96px" },
+    "cardPad": { "compact": "16px", "base": "24px", "comfortable": "32px" },
+    "container": { "mobile": "100%", "tablet": "720px", "desktop": "1200px", "wide": "1440px" },
+    "columns": { "mobile": "4", "tablet": "8", "desktop": "12" },
+    "safeArea": {
+      "top": "env(safe-area-inset-top)",
+      "bottom": "env(safe-area-inset-bottom)",
+      "left": "env(safe-area-inset-left)",
+      "right": "env(safe-area-inset-right)"
+    },
     "touchTarget": "44px"
   }
 }

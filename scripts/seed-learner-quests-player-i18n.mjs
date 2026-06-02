@@ -22,7 +22,8 @@ const DATA = {
     quests: {
       hero_eyebrow: "Quests · curriculum-aligned, never points-for-points",
       hero_title: "Pick a quest",
-      hero_body: "Every chapter is a real lesson AIVO picked for you. No badges to collect — just one calm step at a time, with a tutor by your side.",
+      hero_body:
+        "Every chapter is a real lesson AIVO picked for you. No badges to collect — just one calm step at a time, with a tutor by your side.",
       no_quests_title: "No quests yet",
       no_quests_body: "Quests will appear here once your learning path is ready. Check back soon!",
       across_all: "Across all quests",
@@ -31,7 +32,8 @@ const DATA = {
       total_progress_aria: "Total quest progress",
       world_progress_aria: "{name} progress",
       boss_complete: "Boss chapter complete",
-      boss_unlocks: "{count, plural, one {Boss chapter unlocks after # chapter} other {Boss chapter unlocks after # chapters}}",
+      boss_unlocks:
+        "{count, plural, one {Boss chapter unlocks after # chapter} other {Boss chapter unlocks after # chapters}}",
       continue: "Continue",
       start_quest: "Start quest",
       worlds_aria: "Quest worlds",
@@ -80,16 +82,20 @@ const DATA = {
     quests: {
       hero_eyebrow: "Aventuras · alineadas al currículo, nunca puntos por puntos",
       hero_title: "Elige una aventura",
-      hero_body: "Cada capítulo es una lección real que AIVO eligió para ti. No hay insignias que coleccionar: solo un paso tranquilo a la vez, con un tutor a tu lado.",
+      hero_body:
+        "Cada capítulo es una lección real que AIVO eligió para ti. No hay insignias que coleccionar: solo un paso tranquilo a la vez, con un tutor a tu lado.",
       no_quests_title: "Aún no hay aventuras",
-      no_quests_body: "Las aventuras aparecerán aquí cuando tu ruta de aprendizaje esté lista. ¡Vuelve pronto!",
+      no_quests_body:
+        "Las aventuras aparecerán aquí cuando tu ruta de aprendizaje esté lista. ¡Vuelve pronto!",
       across_all: "En todas las aventuras",
-      chapters_complete: "{count, plural, one {# capítulo completado} other {# capítulos completados}}",
+      chapters_complete:
+        "{count, plural, one {# capítulo completado} other {# capítulos completados}}",
       of_total: "de {total}",
       total_progress_aria: "Progreso total de aventuras",
       world_progress_aria: "Progreso de {name}",
       boss_complete: "Capítulo final completado",
-      boss_unlocks: "{count, plural, one {El capítulo final se desbloquea tras # capítulo} other {El capítulo final se desbloquea tras # capítulos}}",
+      boss_unlocks:
+        "{count, plural, one {El capítulo final se desbloquea tras # capítulo} other {El capítulo final se desbloquea tras # capítulos}}",
       continue: "Continuar",
       start_quest: "Empezar aventura",
       worlds_aria: "Mundos de aventura",
@@ -138,16 +144,19 @@ const DATA = {
     quests: {
       hero_eyebrow: "Quêtes · alignées au programme, jamais des points pour des points",
       hero_title: "Choisis une quête",
-      hero_body: "Chaque chapitre est une vraie leçon qu'AIVO a choisie pour toi. Pas de badges à collectionner — juste une étape calme à la fois, avec un tuteur à tes côtés.",
+      hero_body:
+        "Chaque chapitre est une vraie leçon qu'AIVO a choisie pour toi. Pas de badges à collectionner — juste une étape calme à la fois, avec un tuteur à tes côtés.",
       no_quests_title: "Pas encore de quêtes",
-      no_quests_body: "Les quêtes apparaîtront ici dès que ton parcours sera prêt. Reviens bientôt !",
+      no_quests_body:
+        "Les quêtes apparaîtront ici dès que ton parcours sera prêt. Reviens bientôt !",
       across_all: "Toutes quêtes confondues",
       chapters_complete: "{count, plural, one {# chapitre terminé} other {# chapitres terminés}}",
       of_total: "sur {total}",
       total_progress_aria: "Progression totale des quêtes",
       world_progress_aria: "Progression de {name}",
       boss_complete: "Chapitre boss terminé",
-      boss_unlocks: "{count, plural, one {Le chapitre boss se débloque après # chapitre} other {Le chapitre boss se débloque après # chapitres}}",
+      boss_unlocks:
+        "{count, plural, one {Le chapitre boss se débloque après # chapitre} other {Le chapitre boss se débloque après # chapitres}}",
       continue: "Continuer",
       start_quest: "Commencer la quête",
       worlds_aria: "Mondes de quête",
@@ -188,7 +197,8 @@ const DATA = {
       next: "Suivant",
       saving: "Enregistrement…",
       done: "J'ai fini",
-      complete_error: "Nous n'avons pas pu enregistrer cette leçon. Réessaie avec le bouton « J'ai fini ».",
+      complete_error:
+        "Nous n'avons pas pu enregistrer cette leçon. Réessaie avec le bouton « J'ai fini ».",
     },
   },
 
@@ -196,16 +206,20 @@ const DATA = {
     quests: {
       hero_eyebrow: "Quests · lehrplan-orientiert, nie Punkte um der Punkte willen",
       hero_title: "Wähle eine Quest",
-      hero_body: "Jedes Kapitel ist eine echte Lektion, die AIVO für dich ausgewählt hat. Keine Abzeichen zum Sammeln — nur ein ruhiger Schritt nach dem anderen, mit einem Tutor an deiner Seite.",
+      hero_body:
+        "Jedes Kapitel ist eine echte Lektion, die AIVO für dich ausgewählt hat. Keine Abzeichen zum Sammeln — nur ein ruhiger Schritt nach dem anderen, mit einem Tutor an deiner Seite.",
       no_quests_title: "Noch keine Quests",
-      no_quests_body: "Quests erscheinen hier, sobald dein Lernpfad bereit ist. Schau bald wieder vorbei!",
+      no_quests_body:
+        "Quests erscheinen hier, sobald dein Lernpfad bereit ist. Schau bald wieder vorbei!",
       across_all: "Über alle Quests",
-      chapters_complete: "{count, plural, one {# Kapitel abgeschlossen} other {# Kapitel abgeschlossen}}",
+      chapters_complete:
+        "{count, plural, one {# Kapitel abgeschlossen} other {# Kapitel abgeschlossen}}",
       of_total: "von {total}",
       total_progress_aria: "Gesamter Quest-Fortschritt",
       world_progress_aria: "Fortschritt von {name}",
       boss_complete: "Boss-Kapitel abgeschlossen",
-      boss_unlocks: "{count, plural, one {Boss-Kapitel schaltet sich nach # Kapitel frei} other {Boss-Kapitel schaltet sich nach # Kapiteln frei}}",
+      boss_unlocks:
+        "{count, plural, one {Boss-Kapitel schaltet sich nach # Kapitel frei} other {Boss-Kapitel schaltet sich nach # Kapiteln frei}}",
       continue: "Fortfahren",
       start_quest: "Quest starten",
       worlds_aria: "Quest-Welten",
@@ -246,7 +260,8 @@ const DATA = {
       next: "Weiter",
       saving: "Wird gespeichert…",
       done: "Ich bin fertig",
-      complete_error: "Wir konnten diese Lektion nicht speichern. Bitte versuch die Schaltfläche „Ich bin fertig“ erneut.",
+      complete_error:
+        "Wir konnten diese Lektion nicht speichern. Bitte versuch die Schaltfläche „Ich bin fertig“ erneut.",
     },
   },
 
@@ -254,16 +269,20 @@ const DATA = {
     quests: {
       hero_eyebrow: "Missões · alinhadas ao currículo, nunca pontos por pontos",
       hero_title: "Escolha uma missão",
-      hero_body: "Cada capítulo é uma lição real que a AIVO escolheu para você. Sem medalhas para colecionar — só um passo calmo de cada vez, com um tutor ao seu lado.",
+      hero_body:
+        "Cada capítulo é uma lição real que a AIVO escolheu para você. Sem medalhas para colecionar — só um passo calmo de cada vez, com um tutor ao seu lado.",
       no_quests_title: "Ainda não há missões",
-      no_quests_body: "As missões aparecerão aqui quando seu caminho de aprendizado estiver pronto. Volte em breve!",
+      no_quests_body:
+        "As missões aparecerão aqui quando seu caminho de aprendizado estiver pronto. Volte em breve!",
       across_all: "Em todas as missões",
-      chapters_complete: "{count, plural, one {# capítulo concluído} other {# capítulos concluídos}}",
+      chapters_complete:
+        "{count, plural, one {# capítulo concluído} other {# capítulos concluídos}}",
       of_total: "de {total}",
       total_progress_aria: "Progresso total das missões",
       world_progress_aria: "Progresso de {name}",
       boss_complete: "Capítulo chefe concluído",
-      boss_unlocks: "{count, plural, one {O capítulo chefe é desbloqueado após # capítulo} other {O capítulo chefe é desbloqueado após # capítulos}}",
+      boss_unlocks:
+        "{count, plural, one {O capítulo chefe é desbloqueado após # capítulo} other {O capítulo chefe é desbloqueado após # capítulos}}",
       continue: "Continuar",
       start_quest: "Começar missão",
       worlds_aria: "Mundos das missões",
@@ -304,7 +323,7 @@ const DATA = {
       next: "Avançar",
       saving: "Salvando…",
       done: "Terminei",
-      complete_error: "Não conseguimos salvar esta lição. Tente o botão \"Terminei\" novamente.",
+      complete_error: 'Não conseguimos salvar esta lição. Tente o botão "Terminei" novamente.',
     },
   },
 
@@ -312,7 +331,8 @@ const DATA = {
     quests: {
       hero_eyebrow: "任务 · 与课程对齐，绝非为积分而积分",
       hero_title: "选择一个任务",
-      hero_body: "每一章都是 AIVO 为你挑选的真实课程。没有徽章可收集——只是一次一个平和的步骤，有导师陪在你身边。",
+      hero_body:
+        "每一章都是 AIVO 为你挑选的真实课程。没有徽章可收集——只是一次一个平和的步骤，有导师陪在你身边。",
       no_quests_title: "还没有任务",
       no_quests_body: "当你的学习路径准备好后，任务会出现在这里。请稍后再来！",
       across_all: "所有任务总计",
@@ -370,7 +390,8 @@ const DATA = {
     quests: {
       hero_eyebrow: "クエスト · カリキュラム準拠、ポイントのためのポイントは決してなし",
       hero_title: "クエストを選ぶ",
-      hero_body: "どの章も AIVO があなたのために選んだ本物のレッスンです。集めるバッジはありません — チューターがそばにいて、落ち着いて一歩ずつ進むだけ。",
+      hero_body:
+        "どの章も AIVO があなたのために選んだ本物のレッスンです。集めるバッジはありません — チューターがそばにいて、落ち着いて一歩ずつ進むだけ。",
       no_quests_title: "まだクエストがありません",
       no_quests_body: "学習の道のりが整うと、ここにクエストが表示されます。また見に来てね！",
       across_all: "すべてのクエスト合計",
@@ -420,7 +441,8 @@ const DATA = {
       next: "次へ",
       saving: "保存中…",
       done: "できた",
-      complete_error: "このレッスンを保存できませんでした。「できた」ボタンをもう一度試してください。",
+      complete_error:
+        "このレッスンを保存できませんでした。「できた」ボタンをもう一度試してください。",
     },
   },
 
@@ -428,7 +450,8 @@ const DATA = {
     quests: {
       hero_eyebrow: "퀘스트 · 교육과정에 맞춰, 점수를 위한 점수는 결코 아니야",
       hero_title: "퀘스트를 골라",
-      hero_body: "모든 챕터는 AIVO가 너를 위해 고른 진짜 수업이야. 모을 배지는 없어 — 튜터가 곁에서 함께, 차분히 한 걸음씩 갈 뿐이야.",
+      hero_body:
+        "모든 챕터는 AIVO가 너를 위해 고른 진짜 수업이야. 모을 배지는 없어 — 튜터가 곁에서 함께, 차분히 한 걸음씩 갈 뿐이야.",
       no_quests_title: "아직 퀘스트가 없어",
       no_quests_body: "학습 경로가 준비되면 여기에 퀘스트가 나타나. 곧 다시 와 줘!",
       across_all: "모든 퀘스트 합계",
@@ -486,7 +509,8 @@ const DATA = {
     quests: {
       hero_eyebrow: "المهام · متوائمة مع المنهج، وليست نقاطًا مقابل نقاط أبدًا",
       hero_title: "اختر مهمة",
-      hero_body: "كل فصل درس حقيقي اختاره AIVO من أجلك. لا أوسمة لتجمعها — مجرّد خطوة هادئة في كل مرة، ومعلّم إلى جانبك.",
+      hero_body:
+        "كل فصل درس حقيقي اختاره AIVO من أجلك. لا أوسمة لتجمعها — مجرّد خطوة هادئة في كل مرة، ومعلّم إلى جانبك.",
       no_quests_title: "لا مهام بعد",
       no_quests_body: "ستظهر المهام هنا بمجرد أن يصبح مسار تعلّمك جاهزًا. عُد قريبًا!",
       across_all: "عبر كل المهام",
@@ -544,7 +568,8 @@ const DATA = {
     quests: {
       hero_eyebrow: "क्वेस्ट · पाठ्यक्रम से जुड़े, कभी अंक के लिए अंक नहीं",
       hero_title: "एक क्वेस्ट चुनो",
-      hero_body: "हर अध्याय एक असली पाठ है जो AIVO ने तुम्हारे लिए चुना। जमा करने के लिए कोई बैज नहीं — बस एक बार में एक शांत कदम, तुम्हारे साथ एक ट्यूटर।",
+      hero_body:
+        "हर अध्याय एक असली पाठ है जो AIVO ने तुम्हारे लिए चुना। जमा करने के लिए कोई बैज नहीं — बस एक बार में एक शांत कदम, तुम्हारे साथ एक ट्यूटर।",
       no_quests_title: "अभी कोई क्वेस्ट नहीं",
       no_quests_body: "तुम्हारी सीखने की राह तैयार होते ही क्वेस्ट यहाँ दिखेंगे। जल्द फिर आना!",
       across_all: "सभी क्वेस्ट में कुल",
@@ -553,7 +578,8 @@ const DATA = {
       total_progress_aria: "कुल क्वेस्ट प्रगति",
       world_progress_aria: "{name} की प्रगति",
       boss_complete: "बॉस अध्याय पूरा",
-      boss_unlocks: "{count, plural, one {बॉस अध्याय # अध्याय के बाद खुलता है} other {बॉस अध्याय # अध्यायों के बाद खुलता है}}",
+      boss_unlocks:
+        "{count, plural, one {बॉस अध्याय # अध्याय के बाद खुलता है} other {बॉस अध्याय # अध्यायों के बाद खुलता है}}",
       continue: "जारी रखें",
       start_quest: "क्वेस्ट शुरू करें",
       worlds_aria: "क्वेस्ट दुनियाएँ",

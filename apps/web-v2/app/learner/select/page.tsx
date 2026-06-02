@@ -64,11 +64,7 @@ export default async function LearnerSelectPage({
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        description={t("description")}
-      />
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
       {params.error === "forbidden" && (
         <Card className="mb-4 border-red-200 bg-red-50 p-4 text-sm text-red-900">
           {t("forbidden")}
@@ -103,7 +99,9 @@ export default async function LearnerSelectPage({
                       {l.gradeBand ? ` · ${l.gradeBand}` : ""}
                     </p>
                     <div className="mt-2">
-                      <Badge tone="neutral">{t("readiness", { state: l.readinessState.replace(/_/g, " ") })}</Badge>
+                      <Badge tone="neutral">
+                        {t("readiness", { state: l.readinessState.replace(/_/g, " ") })}
+                      </Badge>
                     </div>
                   </div>
                 </Card>

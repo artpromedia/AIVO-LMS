@@ -206,12 +206,7 @@ export default function SignupScreen() {
           <AivoLogo width={160} variant="purple" />
         </View>
 
-        <Text
-          style={[
-            styles.title,
-            { color: palette.ink, fontFamily: fontFamilies.displayBold },
-          ]}
-        >
+        <Text style={[styles.title, { color: palette.ink, fontFamily: fontFamilies.displayBold }]}>
           {t("auth.createAccount")}
         </Text>
         <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
@@ -238,10 +233,7 @@ export default function SignupScreen() {
         </View>
 
         <View
-          style={[
-            styles.card,
-            { backgroundColor: palette.bgRaised, borderColor: palette.border },
-          ]}
+          style={[styles.card, { backgroundColor: palette.bgRaised, borderColor: palette.border }]}
         >
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.fullName")}</Text>

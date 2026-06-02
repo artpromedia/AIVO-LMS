@@ -15,8 +15,8 @@
   --input: 0 0% 88%;
   --ring: 164 36% 26%;
   --radius: 0.5rem;
-  
-  font-family: 'Space Grotesk', sans-serif;
+
+  font-family: "Space Grotesk", sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
@@ -37,11 +37,11 @@
 }
 
 .aivo-qa-theme .font-inter {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .aivo-qa-theme .font-sans {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: "Space Grotesk", sans-serif;
 }
 
 /* Subtle grain overlay */

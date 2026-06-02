@@ -22,7 +22,12 @@ export async function GET(req: Request): Promise<NextResponse> {
     const learnerId = new URL(req.url).searchParams.get("learnerId");
     if (!learnerId)
       return fail(
-        { code: "validation_error", message: "learnerId is required", userMessage: "Pick a learner first.", status: 400 },
+        {
+          code: "validation_error",
+          message: "learnerId is required",
+          userMessage: "Pick a learner first.",
+          status: 400,
+        },
         requestId,
       );
     return ok({ goals: listIepGoals(learnerId, session!.tenantId) }, requestId);
@@ -38,16 +43,14 @@ export async function POST(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["therapist", "teacher"], requestId);
     if (roleErr) return roleErr;
-    const body = (await req.json().catch(() => null)) as
-      | {
-          learnerId?: string;
-          domain?: string;
-          goalText?: string;
-          baseline?: string;
-          targetCriteria?: string;
-          measurableCriteria?: string;
-        }
-      | null;
+    const body = (await req.json().catch(() => null)) as {
+      learnerId?: string;
+      domain?: string;
+      goalText?: string;
+      baseline?: string;
+      targetCriteria?: string;
+      measurableCriteria?: string;
+    } | null;
     if (!body?.learnerId || !body.domain || !body.goalText) {
       return fail(
         {

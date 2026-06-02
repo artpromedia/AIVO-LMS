@@ -142,9 +142,7 @@ export default async function PricingPage() {
         <h2 id="family-pricing-heading" className="font-heading text-2xl font-bold text-slate-900">
           {t("for_families")}
         </h2>
-        <p className="mt-1 font-body text-slate-600">
-          {t("family_disclaimer")}
-        </p>
+        <p className="mt-1 font-body text-slate-600">{t("family_disclaimer")}</p>
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-3">
           {FAMILY_PLANS.map((p) => (
             <article

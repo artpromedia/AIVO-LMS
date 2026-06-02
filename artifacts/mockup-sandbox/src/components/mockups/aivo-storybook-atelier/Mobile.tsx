@@ -25,7 +25,9 @@ export function Mobile() {
               <User className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Explorer</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                Explorer
+              </p>
               <h1 className="font-display text-xl font-bold">Leo</h1>
             </div>
           </div>
@@ -37,12 +39,12 @@ export function Mobile() {
         {/* Map Area */}
         <div className="flex-1 relative overflow-hidden bg-[#e9e1d3]">
           {/* We use the generated map image as a rich background */}
-          <img 
-            src="/__mockup/images/storybook-map.png" 
-            alt="World Map" 
+          <img
+            src="/__mockup/images/storybook-map.png"
+            alt="World Map"
             className="absolute inset-0 w-full h-full object-cover object-bottom"
           />
-          
+
           {/* Map Overlay Elements - Nodes on the journey */}
           <div className="absolute inset-0 z-10">
             {/* Completed Node */}
@@ -54,8 +56,18 @@ export function Mobile() {
             </div>
 
             {/* Path visualization (SVG placeholder for the dotted line) */}
-            <svg className="absolute top-[25%] left-[30%] w-32 h-32" style={{ pointerEvents: 'none' }}>
-              <path d="M 0 0 Q 50 50 100 10" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="4" strokeDasharray="8 8" strokeLinecap="round" />
+            <svg
+              className="absolute top-[25%] left-[30%] w-32 h-32"
+              style={{ pointerEvents: "none" }}
+            >
+              <path
+                d="M 0 0 Q 50 50 100 10"
+                fill="none"
+                stroke="rgba(255,255,255,0.6)"
+                strokeWidth="4"
+                strokeDasharray="8 8"
+                strokeLinecap="round"
+              />
             </svg>
 
             {/* Current Node */}
@@ -79,10 +91,12 @@ export function Mobile() {
         {/* Bottom Card - Current Activity */}
         <div className="relative z-20 bg-background rounded-t-[2.5rem] p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border-t border-border/50 pb-8">
           <div className="w-12 h-1.5 bg-border rounded-full mx-auto mb-6"></div>
-          
+
           <h2 className="font-display text-2xl mb-2 text-foreground">Today's Story</h2>
-          <p className="text-muted-foreground mb-6 text-sm">Professor Badger is waiting in the Reading Tree with a new adventure.</p>
-          
+          <p className="text-muted-foreground mb-6 text-sm">
+            Professor Badger is waiting in the Reading Tree with a new adventure.
+          </p>
+
           <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg py-4 rounded-full organic-border shadow-lg shadow-primary/20 flex items-center justify-center gap-3 active:scale-95 transition-transform">
             <Play className="w-5 h-5" fill="currentColor" />
             Let's Go!

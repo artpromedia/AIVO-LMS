@@ -56,7 +56,7 @@ function normTrend(t?: string | null): "up" | "down" | "stable" {
 }
 
 /** Group gradebook entries by subject with per-skill rows + a subject average. */
-export function groupBySubject(entries: ReadonlyArray<GradebookEntry>): SubjectGrades[] {
+export function groupBySubject(entries: readonly GradebookEntry[]): SubjectGrades[] {
   const bySubject = new Map<string, SkillRow[]>();
   for (const e of entries) {
     const score = normalizeScore(e.masteryScore ?? 0);
@@ -84,10 +84,7 @@ export function groupBySubject(entries: ReadonlyArray<GradebookEntry>): SubjectG
 }
 
 /** Per-skill rows for a single subject (case-insensitive match). */
-export function skillsForSubject(
-  entries: ReadonlyArray<GradebookEntry>,
-  subject: string,
-): SkillRow[] {
+export function skillsForSubject(entries: readonly GradebookEntry[], subject: string): SkillRow[] {
   return (
     groupBySubject(entries).find((g) => g.subject.toLowerCase() === subject.toLowerCase())
       ?.skills ?? []
@@ -102,7 +99,7 @@ const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
  * newest), labelled by weekday. `now` is injectable for tests.
  */
 export function lessonsByDay(
-  sessions: ReadonlyArray<LessonSession>,
+  sessions: readonly LessonSession[],
   days = 7,
   now: number = Date.now(),
 ): { label: string; value: number }[] {
@@ -132,7 +129,7 @@ export function isCompleted(s: LessonSession): boolean {
 }
 
 /** Split lessons into completed (library) and in-progress (missions). */
-export function splitLessons(sessions: ReadonlyArray<LessonSession>): {
+export function splitLessons(sessions: readonly LessonSession[]): {
   completed: LessonSession[];
   inProgress: LessonSession[];
 } {

@@ -30,12 +30,10 @@ export default function ParentHomeV2Error({
         <div className="self-center inline-flex items-center justify-center h-14 w-14 rounded-full bg-iw-warm-soft text-[var(--aivo-status-warning)]">
           <AivoIcon name="safetyFlag" size={28} />
         </div>
-        <h1 className="text-xl font-semibold text-iw-text-strong">
-          {t("error_heading")}
-        </h1>
+        <h1 className="text-xl font-semibold text-iw-text-strong">{t("error_heading")}</h1>
         <p className="text-sm text-iw-text-muted">
-          Nothing has changed for your learner. Try again — and if it
-          keeps happening, the legacy home is still available.
+          Nothing has changed for your learner. Try again — and if it keeps happening, the legacy
+          home is still available.
         </p>
         {error.digest ? (
           <p className="text-xs text-iw-text-muted">

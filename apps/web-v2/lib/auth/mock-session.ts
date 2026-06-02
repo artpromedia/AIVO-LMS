@@ -236,4 +236,3 @@ function applyMultiRoleOverlay(
     capabilities: base.capabilities ?? [...base.permissions],
   };
 }
-

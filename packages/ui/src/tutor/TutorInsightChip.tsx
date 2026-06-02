@@ -33,7 +33,16 @@ const SPECS: Record<TutorInsightKind, Spec> = {
     label: "Hint used",
     tint: "bg-[var(--aivo-color-aivoOrange-50)] text-[var(--aivo-color-aivoOrange-700)] border-[var(--aivo-color-aivoOrange-100)]",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <path d="M9 18h6" />
         <path d="M10 22h4" />
         <path d="M2 12a10 10 0 0 1 20 0c0 4.5-3.5 6-5 8h-10c-1.5-2-5-3.5-5-8z" />
@@ -44,7 +53,16 @@ const SPECS: Record<TutorInsightKind, Spec> = {
     label: "Adapting",
     tint: "bg-[var(--aivo-color-aivoTeal-50)] text-[var(--aivo-color-aivoTeal-700)] border-[var(--aivo-color-aivoTeal-100)]",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <path d="m9 18 6-6-6-6" />
       </svg>
     ),
@@ -53,7 +71,16 @@ const SPECS: Record<TutorInsightKind, Spec> = {
     label: "Safety on",
     tint: "bg-[var(--aivo-color-status-success-subtle)] text-[var(--aivo-color-status-success-strong)] border-[var(--aivo-color-status-success-default)]",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
     ),
@@ -62,14 +89,26 @@ const SPECS: Record<TutorInsightKind, Spec> = {
     label: "Thinking",
     tint: "bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-color-aivoPurple-700)] border-[var(--aivo-color-aivoPurple-100)]",
     icon: (
-      <span className="aivo-motion-ai-thinking w-3 h-3 rounded-full bg-[var(--aivo-sensory-primary)]" aria-hidden="true" />
+      <span
+        className="aivo-motion-ai-thinking w-3 h-3 rounded-full bg-[var(--aivo-sensory-primary)]"
+        aria-hidden="true"
+      />
     ),
   },
   cited: {
     label: "From your school",
     tint: "bg-[var(--aivo-color-status-info-subtle)] text-[var(--aivo-color-status-info-strong)] border-[var(--aivo-color-status-info-default)]",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
       </svg>
@@ -79,7 +118,16 @@ const SPECS: Record<TutorInsightKind, Spec> = {
     label: "Step by step",
     tint: "bg-[var(--aivo-color-surface-muted)] text-iw-text-strong border-iw-border",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-3 h-3">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="w-3 h-3"
+      >
         <line x1="8" y1="6" x2="21" y2="6" />
         <line x1="8" y1="12" x2="21" y2="12" />
         <line x1="8" y1="18" x2="21" y2="18" />

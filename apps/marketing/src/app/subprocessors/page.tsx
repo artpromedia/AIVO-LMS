@@ -249,7 +249,9 @@ export default async function SubprocessorsPage() {
         </section>
 
         <div className="mt-12 rounded-3xl border border-purple-100 bg-purple-50/40 p-8">
-          <h3 className="font-heading text-xl font-bold text-slate-900">{t("questions_heading")}</h3>
+          <h3 className="font-heading text-xl font-bold text-slate-900">
+            {t("questions_heading")}
+          </h3>
           <p className="mt-2 font-body text-slate-600">
             Contact our compliance team for a signed DPA, subprocessor exhibits, or procurement
             review.

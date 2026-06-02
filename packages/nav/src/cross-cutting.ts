@@ -37,11 +37,7 @@ import type { Role } from "./roles.js";
  * conflating it with `messages` (a nav area whose UX the surface
  * subsumes).
  */
-export type CrossCuttingSurface =
-  | "notifications"
-  | "messages"
-  | "settings"
-  | "billing";
+export type CrossCuttingSurface = "notifications" | "messages" | "settings" | "billing";
 
 export const CROSS_CUTTING_SURFACES: readonly CrossCuttingSurface[] = [
   "notifications",
@@ -155,10 +151,6 @@ export function getCrossCuttingSurfacesInMigrationOrder(): CrossCuttingSurfaceMe
  * so callers can fall back without throwing — useful when this list
  * grows in future ADRs.
  */
-export function getCrossCuttingSurface(
-  id: string,
-): CrossCuttingSurfaceMeta | undefined {
-  return (CROSS_CUTTING_REGISTRY as Record<string, CrossCuttingSurfaceMeta | undefined>)[
-    id
-  ];
+export function getCrossCuttingSurface(id: string): CrossCuttingSurfaceMeta | undefined {
+  return (CROSS_CUTTING_REGISTRY as Record<string, CrossCuttingSurfaceMeta | undefined>)[id];
 }

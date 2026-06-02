@@ -72,9 +72,7 @@ function pillClass(checked: boolean, disabled?: boolean) {
 function indicatorClass(checked: boolean, isRadio: boolean) {
   return cn(
     "shrink-0 mt-0.5 flex items-center justify-center transition-colors",
-    isRadio
-      ? "w-5 h-5 rounded-full border-2"
-      : "w-5 h-5 rounded-[6px] border-2",
+    isRadio ? "w-5 h-5 rounded-full border-2" : "w-5 h-5 rounded-[6px] border-2",
     checked
       ? "border-[var(--aivo-sensory-primary,#7c3aed)] bg-[var(--aivo-sensory-primary,#7c3aed)]"
       : "border-iw-border bg-white",
@@ -92,17 +90,7 @@ function ColumnsClass(columns: 1 | 2 | 3 | undefined, count: number): string {
 }
 
 export function PillCardGroup(props: PillCardGroupProps) {
-  const {
-    name,
-    legend,
-    helper,
-    columns,
-    compact,
-    required,
-    error,
-    options,
-    className,
-  } = props;
+  const { name, legend, helper, columns, compact, required, error, options, className } = props;
   const isSingle = props.mode === "single";
   const initial: Set<string> = isSingle
     ? new Set(props.defaultValue ? [props.defaultValue] : [])
@@ -138,7 +126,10 @@ export function PillCardGroup(props: PillCardGroupProps) {
       <legend className="text-sm font-semibold text-iw-text-strong">
         {legend}
         {required ? (
-          <span className="ml-1 text-[var(--aivo-color-status-error-strong,#b91c1c)]" aria-hidden="true">
+          <span
+            className="ml-1 text-[var(--aivo-color-status-error-strong,#b91c1c)]"
+            aria-hidden="true"
+          >
             *
           </span>
         ) : null}

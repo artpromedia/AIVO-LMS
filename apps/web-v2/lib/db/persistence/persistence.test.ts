@@ -219,12 +219,9 @@ describe("persistence adapter — notifications (memory)", () => {
   });
 
   it("parent assessment: patchSection accumulates completed sections", async () => {
-    const updated = await patchParentAssessmentSection(
-      "lrn_demo_sky",
-      "t_demo",
-      "goals",
-      { sample: "ok" },
-    );
+    const updated = await patchParentAssessmentSection("lrn_demo_sky", "t_demo", "goals", {
+      sample: "ok",
+    });
     expect(updated.completedSections).toContain("goals");
     const refetched = await findParentAssessment("lrn_demo_sky", "t_demo");
     expect(refetched?.id).toBe(updated.id);
@@ -434,15 +431,9 @@ describe("persistence adapter — notifications (memory)", () => {
       createdAt: now,
       updatedAt: now,
     });
-    const fetched = await admin.getTeacherAssignmentById(
-      "ta-test-1",
-      "u_demo_teacher",
-      "t_demo",
-    );
+    const fetched = await admin.getTeacherAssignmentById("ta-test-1", "u_demo_teacher", "t_demo");
     expect(fetched?.title).toBe("Adapter Test Assignment");
-    expect(
-      await admin.deleteTeacherAssignment("ta-test-1", "u_demo_teacher", "t_demo"),
-    ).toBe(true);
+    expect(await admin.deleteTeacherAssignment("ta-test-1", "u_demo_teacher", "t_demo")).toBe(true);
     expect(
       await admin.getTeacherAssignmentById("ta-test-1", "u_demo_teacher", "t_demo"),
     ).toBeNull();
@@ -458,11 +449,9 @@ describe("persistence adapter — notifications (memory)", () => {
       href: null,
       learnerId: null,
     });
-    const otherTenant = await markNotificationsRead(
-      "u_demo_parent",
-      "t_some_other_tenant",
-      [notification.id],
-    );
+    const otherTenant = await markNotificationsRead("u_demo_parent", "t_some_other_tenant", [
+      notification.id,
+    ]);
     expect(otherTenant).toBe(0);
   });
 });

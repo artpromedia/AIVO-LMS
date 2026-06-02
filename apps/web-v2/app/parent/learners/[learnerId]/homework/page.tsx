@@ -23,7 +23,7 @@ export default async function ParentHomeworkHistoryPage({
   const t = await getTranslations("parent.learner_homework");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -37,11 +37,7 @@ export default async function ParentHomeworkHistoryPage({
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow={learner.displayName}
-        title={t("title")}
-        description={t("description")}
-      />
+      <PageHeader eyebrow={learner.displayName} title={t("title")} description={t("description")} />
       {sessions.length === 0 ? (
         <Card className="p-6 text-sm text-muted-foreground">{t("empty")}</Card>
       ) : (

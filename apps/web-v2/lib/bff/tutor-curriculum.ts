@@ -61,10 +61,7 @@ function normStatus(v: unknown): CurriculumUpload["status"] {
 }
 function normRole(v: unknown): CurriculumUpload["uploaderRole"] {
   const s = String(v ?? "parent").toLowerCase();
-  return s === "teacher" ||
-    s === "caregiver" ||
-    s === "school_admin" ||
-    s === "district_admin"
+  return s === "teacher" || s === "caregiver" || s === "school_admin" || s === "district_admin"
     ? (s as CurriculumUpload["uploaderRole"])
     : "parent";
 }
@@ -203,7 +200,11 @@ export async function tutorActiveFocusSafe(
     return await tutorActiveFocus(learnerId, subject);
   } catch (err) {
     logger.warn(
-      { feature: "weekly-curriculum", learnerId, err: err instanceof Error ? err.message : String(err) },
+      {
+        feature: "weekly-curriculum",
+        learnerId,
+        err: err instanceof Error ? err.message : String(err),
+      },
       "[tutor-curriculum] active focus read failed — generating without school sync",
     );
     return null;

@@ -14,10 +14,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  buildBaselineFallback,
-  normaliseGradeBand,
-} from "../src/services/baseline-fallback.js";
+import { buildBaselineFallback, normaliseGradeBand } from "../src/services/baseline-fallback.js";
 
 test("buildBaselineFallback returns 42 questions with correct shape", () => {
   const out = buildBaselineFallback({
@@ -52,7 +49,13 @@ test("buildBaselineFallback covers all 7 subjects with 6 items each", () => {
     counts.set(q.subject, (counts.get(q.subject) ?? 0) + 1);
   }
   for (const subject of [
-    "math", "ela", "science", "speech", "sel", "life_skills", "executive_function",
+    "math",
+    "ela",
+    "science",
+    "speech",
+    "sel",
+    "life_skills",
+    "executive_function",
   ]) {
     assert.equal(counts.get(subject), 6, `${subject} missing items`);
   }
@@ -64,10 +67,15 @@ test("buildBaselineFallback subjects taxonomy includes the 7 required keys", () 
     reason: "ai_invalid_json",
   });
   const keys = out.subjects.map((s) => s.key);
-  assert.deepEqual(
-    keys,
-    ["math", "ela", "science", "speech", "sel", "life_skills", "executive_function"],
-  );
+  assert.deepEqual(keys, [
+    "math",
+    "ela",
+    "science",
+    "speech",
+    "sel",
+    "life_skills",
+    "executive_function",
+  ]);
 });
 
 test("buildBaselineFallback is deterministic per learnerId", () => {

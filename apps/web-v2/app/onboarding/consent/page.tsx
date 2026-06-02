@@ -43,10 +43,7 @@ export default function ConsentReviewPage() {
   return (
     <AuthShell>
       <div className="flex flex-col gap-5">
-        <StepperHeader
-          steps={STEPS.map((s) => ({ label: ts(s.label) }))}
-          current={3}
-        />
+        <StepperHeader steps={STEPS.map((s) => ({ label: ts(s.label) }))} current={3} />
         <AuthCard
           icon={<AivoIcon name="consentCheck" size={32} />}
           eyebrow={t("eyebrow")}
@@ -73,9 +70,7 @@ export default function ConsentReviewPage() {
               >
                 {tc("continue")}
               </Link>
-              <p className="text-xs text-iw-text-muted text-center">
-                {t("footer_note")}
-              </p>
+              <p className="text-xs text-iw-text-muted text-center">{t("footer_note")}</p>
             </>
           }
         >

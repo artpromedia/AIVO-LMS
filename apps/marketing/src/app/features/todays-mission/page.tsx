@@ -94,7 +94,9 @@ export default async function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-4 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">{t("mockup_todays_mission")}</p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">
+                {t("mockup_todays_mission")}
+              </p>
               <h3 className="mt-1 font-heading text-xl font-bold">{t("mockup_lesson_title")}</h3>
               <p className="mt-1 text-xs text-purple-100">{t("mockup_lesson_meta")}</p>
             </div>

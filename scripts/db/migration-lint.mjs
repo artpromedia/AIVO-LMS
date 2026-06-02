@@ -39,11 +39,15 @@ const UNSAFE_PATTERNS = [
   { pattern: /\bDROP\s+COLUMN\b/i, message: "DROP COLUMN" },
   { pattern: /\bDROP\s+DATABASE\b/i, message: "DROP DATABASE" },
   { pattern: /\bDROP\s+INDEX\b(?!\s+CONCURRENTLY)/i, message: "DROP INDEX (non-CONCURRENTLY)" },
-  { pattern: /\bALTER\s+COLUMN\s+\w+\s+TYPE\b/i, message: "ALTER COLUMN TYPE (potentially blocking)" },
+  {
+    pattern: /\bALTER\s+COLUMN\s+\w+\s+TYPE\b/i,
+    message: "ALTER COLUMN TYPE (potentially blocking)",
+  },
   { pattern: /\bTRUNCATE\b/i, message: "TRUNCATE" },
   { pattern: /\bREINDEX\b(?!\s+CONCURRENTLY)/i, message: "REINDEX (non-CONCURRENTLY)" },
   {
-    pattern: /\bCREATE\s+INDEX\b(?!\s+CONCURRENTLY)(?!\s+IF\s+NOT\s+EXISTS\s+\w+\s+ON\s+\w+\s*\([^)]*\)\s*WHERE\s)/i,
+    pattern:
+      /\bCREATE\s+INDEX\b(?!\s+CONCURRENTLY)(?!\s+IF\s+NOT\s+EXISTS\s+\w+\s+ON\s+\w+\s*\([^)]*\)\s*WHERE\s)/i,
     message: "CREATE INDEX without CONCURRENTLY",
   },
 ];

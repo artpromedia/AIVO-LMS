@@ -178,8 +178,7 @@ export const ccssMath9To12: SkillGraph = {
     {
       id: "ccss-math.HSG.GMD.A.3",
       title: "Use volume formulas for cylinders, pyramids, cones, and spheres",
-      description:
-        "I can use volume formulas to solve real-world and mathematical problems.",
+      description: "I can use volume formulas to solve real-world and mathematical problems.",
       subject: "math",
       gradeBand: "10",
       frameworkRefs: [{ framework: "CCSS-Math", code: "HSG-GMD.A.3" }],
@@ -190,8 +189,7 @@ export const ccssMath9To12: SkillGraph = {
     {
       id: "ccss-math.HSS.ID.A.2",
       title: "Compare distributions of two data sets",
-      description:
-        "I can compare center, spread, and shape of two data sets to draw conclusions.",
+      description: "I can compare center, spread, and shape of two data sets to draw conclusions.",
       subject: "math",
       gradeBand: "11",
       frameworkRefs: [{ framework: "CCSS-Math", code: "HSS-ID.A.2" }],
@@ -232,8 +230,7 @@ export const ccssMath9To12: SkillGraph = {
     {
       id: "ccss-math.HSF.BF.B.4",
       title: "Find and verify inverse functions",
-      description:
-        "I can find the inverse of a function and verify that one undoes the other.",
+      description: "I can find the inverse of a function and verify that one undoes the other.",
       subject: "math",
       gradeBand: "12",
       frameworkRefs: [{ framework: "CCSS-Math", code: "HSF-BF.B.4" }],

@@ -71,21 +71,16 @@ describe("isRoleEnabled", () => {
 describe("filterEnabledRoles", () => {
   it("removes dark-launched roles in production", () => {
     expect(
-      filterEnabledRoles(
-        ["parent", "therapist", "caregiver", "teacher"],
-        "production",
-        {},
-      ),
+      filterEnabledRoles(["parent", "therapist", "caregiver", "teacher"], "production", {}),
     ).toEqual(["parent", "teacher"]);
   });
 
   it("keeps every role enabled by an env override", () => {
     expect(
-      filterEnabledRoles(
-        ["therapist", "caregiver"],
-        "production",
-        { AIVO_ROLE_THERAPIST_ENABLED: "true", AIVO_ROLE_CAREGIVER_ENABLED: "1" },
-      ),
+      filterEnabledRoles(["therapist", "caregiver"], "production", {
+        AIVO_ROLE_THERAPIST_ENABLED: "true",
+        AIVO_ROLE_CAREGIVER_ENABLED: "1",
+      }),
     ).toEqual(["therapist", "caregiver"]);
   });
 });

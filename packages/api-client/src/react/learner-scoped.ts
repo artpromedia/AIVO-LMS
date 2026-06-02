@@ -24,11 +24,7 @@
  * threads `viewerRole` into the hook so application code doesn't
  * juggle it manually.
  */
-import {
-  type UseQueryOptions,
-  type UseQueryResult,
-  useQuery,
-} from "@tanstack/react-query";
+import { type UseQueryOptions, type UseQueryResult, useQuery } from "@tanstack/react-query";
 
 /**
  * The role identifier strings any learner-scoped hook accepts. We
@@ -61,7 +57,7 @@ export type LearnerScopedQueryKey = readonly [
   string,
   LearnerViewerRole,
   string,
-  ...readonly unknown[],
+  ...(readonly unknown[]),
 ];
 
 /**

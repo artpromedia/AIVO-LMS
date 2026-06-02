@@ -1,12 +1,7 @@
 "use client";
 import * as React from "react";
 import { cn } from "../utils/cn";
-import type {
-  AivoComponentState,
-  AivoDensity,
-  AivoElevation,
-  AivoRadius,
-} from "../utils/types";
+import type { AivoComponentState, AivoDensity, AivoElevation, AivoRadius } from "../utils/types";
 
 /**
  * Surface/GlassCard
@@ -27,8 +22,7 @@ import type {
  *  - error    → red-tinted left rim, role="alert" wrapper
  *  - empty    → muted text colour, dashed iw-border outline
  */
-export interface GlassCardProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+export interface GlassCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   state?: AivoComponentState;
   density?: AivoDensity;
   elevation?: AivoElevation;
@@ -68,78 +62,73 @@ const ELEVATION_CLASS: Record<AivoElevation, string> = {
     "shadow-[0_24px_64px_-12px_rgba(15,23,42,0.24)] border border-[var(--aivo-color-border-subtle,rgba(15,23,42,0.08))]",
 };
 
-export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
-  function GlassCard(
-    {
-      state = "default",
-      density = "base",
-      elevation = "raised",
-      radius = "card-lg",
-      glass = false,
-      title,
-      description,
-      actions,
-      className,
-      children,
-      ...rest
-    },
-    ref
-  ) {
-    const isDisabled = state === "disabled";
-    const isError = state === "error";
-    const isEmpty = state === "empty";
-    const isLoading = state === "loading";
+export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(function GlassCard(
+  {
+    state = "default",
+    density = "base",
+    elevation = "raised",
+    radius = "card-lg",
+    glass = false,
+    title,
+    description,
+    actions,
+    className,
+    children,
+    ...rest
+  },
+  ref,
+) {
+  const isDisabled = state === "disabled";
+  const isError = state === "error";
+  const isEmpty = state === "empty";
+  const isLoading = state === "loading";
 
-    const wrapperRole = isError ? "alert" : rest.role;
+  const wrapperRole = isError ? "alert" : rest.role;
 
-    return (
-      <div
-        ref={ref}
-        data-state={state}
-        aria-disabled={isDisabled || undefined}
-        aria-busy={isLoading || undefined}
-        role={wrapperRole}
-        {...rest}
-        className={cn(
-          "relative isolate flex flex-col gap-3 transition-[transform,box-shadow,opacity] duration-200 ease-out",
-          RADIUS_CLASS[radius],
-          PAD_CLASS[density],
-          ELEVATION_CLASS[elevation],
-          glass
-            ? "bg-white/70 backdrop-blur-xl"
-            : "bg-[var(--aivo-color-surface-card,#ffffff)]",
-          state === "hover" && "-translate-y-px shadow-lg",
-          state === "focus" &&
-            "outline-none ring-2 ring-offset-2 ring-[var(--aivo-sensory-ringFocus,#7c3aed)] ring-offset-[var(--aivo-color-surface-canvas,#f4f6f5)]",
-          isDisabled && "opacity-50 pointer-events-none select-none",
-          isLoading && "aivo-motion-baseline-gen",
-          isError &&
-            "border-l-4 border-l-[var(--aivo-color-status-error-strong,#dc2626)] bg-[var(--aivo-color-status-error-subtle,#fef2f2)]",
-          isEmpty &&
-            "border-dashed text-[var(--aivo-color-text-muted,#64748b)]",
-          className
-        )}
-      >
-        {(title || description || actions) && (
-          <header className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex flex-col gap-1">
-              {title && (
-                <h3 className="iw-label text-[var(--aivo-color-text-default,#0f172a)] truncate">
-                  {title}
-                </h3>
-              )}
-              {description && (
-                <p className="text-sm text-[var(--aivo-color-text-muted,#64748b)] truncate">
-                  {description}
-                </p>
-              )}
-            </div>
-            {actions && <div className="shrink-0">{actions}</div>}
-          </header>
-        )}
-        {children}
-      </div>
-    );
-  }
-);
+  return (
+    <div
+      ref={ref}
+      data-state={state}
+      aria-disabled={isDisabled || undefined}
+      aria-busy={isLoading || undefined}
+      role={wrapperRole}
+      {...rest}
+      className={cn(
+        "relative isolate flex flex-col gap-3 transition-[transform,box-shadow,opacity] duration-200 ease-out",
+        RADIUS_CLASS[radius],
+        PAD_CLASS[density],
+        ELEVATION_CLASS[elevation],
+        glass ? "bg-white/70 backdrop-blur-xl" : "bg-[var(--aivo-color-surface-card,#ffffff)]",
+        state === "hover" && "-translate-y-px shadow-lg",
+        state === "focus" &&
+          "outline-none ring-2 ring-offset-2 ring-[var(--aivo-sensory-ringFocus,#7c3aed)] ring-offset-[var(--aivo-color-surface-canvas,#f4f6f5)]",
+        isDisabled && "opacity-50 pointer-events-none select-none",
+        isLoading && "aivo-motion-baseline-gen",
+        isError &&
+          "border-l-4 border-l-[var(--aivo-color-status-error-strong,#dc2626)] bg-[var(--aivo-color-status-error-subtle,#fef2f2)]",
+        isEmpty && "border-dashed text-[var(--aivo-color-text-muted,#64748b)]",
+        className,
+      )}
+    >
+      {(title || description || actions) && (
+        <header className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex flex-col gap-1">
+            {title && (
+              <h3 className="iw-label text-[var(--aivo-color-text-default,#0f172a)] truncate">
+                {title}
+              </h3>
+            )}
+            {description && (
+              <p className="text-sm text-[var(--aivo-color-text-muted,#64748b)] truncate">
+                {description}
+              </p>
+            )}
+          </div>
+          {actions && <div className="shrink-0">{actions}</div>}
+        </header>
+      )}
+      {children}
+    </div>
+  );
+});
 GlassCard.displayName = "Surface/GlassCard";

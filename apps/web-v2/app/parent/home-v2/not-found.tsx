@@ -16,13 +16,10 @@ export default async function ParentHomeV2NotFound() {
         <div className="self-center inline-flex items-center justify-center h-14 w-14 rounded-full bg-[var(--aivo-aivoTeal-100)] text-[var(--aivo-aivoTeal-700)]">
           <AivoIcon name="aiBrain" size={28} />
         </div>
-        <h1 className="text-xl font-semibold text-iw-text-strong">
-          {t("not_found_heading")}
-        </h1>
+        <h1 className="text-xl font-semibold text-iw-text-strong">{t("not_found_heading")}</h1>
         <p className="text-sm text-iw-text-muted">
-          The redesigned parent home is still rolling out. The page
-          you were looking for either hasn't shipped yet or has a
-          different address.
+          The redesigned parent home is still rolling out. The page you were looking for either
+          hasn't shipped yet or has a different address.
         </p>
         <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
           <Link

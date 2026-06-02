@@ -186,9 +186,7 @@ export default async function PlatformAdminHome() {
           <div className="mb-4 flex items-center justify-between">
             <div>
               <p className="font-display text-lg font-semibold">{t("tenant_footprint")}</p>
-              <p className="text-xs text-aivo-ink-soft">
-                {t("tenant_footprint_desc")}
-              </p>
+              <p className="text-xs text-aivo-ink-soft">{t("tenant_footprint_desc")}</p>
             </div>
             <Badge tone="neutral">{tenants.length.toLocaleString()} tenants</Badge>
           </div>

@@ -19,11 +19,7 @@ export default function RecoveryPage() {
         title={t("title")}
         subtitle={t("subtitle")}
         reassurance={
-          <ReassuranceCard
-            tone="info"
-            title={t("reassure_title")}
-            body={t("reassure_body")}
-          />
+          <ReassuranceCard tone="info" title={t("reassure_title")} body={t("reassure_body")} />
         }
         actions={
           <>

@@ -148,7 +148,9 @@ export const CODING_FIXTURE_ITEMS: CodingFixtureItem[] = [
       type: "coding",
       language: "python",
       starterCode: "def reverse_word(word):\n    return word[::-1]",
-      tests: [{ name: "reverse_word", kind: "returns", input: ["code"], expected: "edoc", hidden: true }],
+      tests: [
+        { name: "reverse_word", kind: "returns", input: ["code"], expected: "edoc", hidden: true },
+      ],
     },
   },
   {
@@ -174,4 +176,3 @@ export const CODING_FIXTURE_ITEMS: CodingFixtureItem[] = [
     },
   },
 ];
-

@@ -4,13 +4,13 @@ Sprint 12.7. Procedure for rolling a bad production deploy back to the prior kno
 
 ## When to roll back
 
-| Signal | Action |
-| ------ | ------ |
-| `/health` returns 503 across >25% of replicas of any service | Page on-call, then roll back |
-| Error rate >5% sustained for 5 minutes on identity, billing, or learning | Page on-call, then roll back |
-| Stripe webhook signature failures spike after a comms-svc deploy | Roll back comms-svc only |
+| Signal                                                                   | Action                         |
+| ------------------------------------------------------------------------ | ------------------------------ |
+| `/health` returns 503 across >25% of replicas of any service             | Page on-call, then roll back   |
+| Error rate >5% sustained for 5 minutes on identity, billing, or learning | Page on-call, then roll back   |
+| Stripe webhook signature failures spike after a comms-svc deploy         | Roll back comms-svc only       |
 | LTI launch failures across all platforms after an integration-svc deploy | Roll back integration-svc only |
-| Migration applied unsafe schema change (failed `migration-lint`) | See "Schema rollback" below |
+| Migration applied unsafe schema change (failed `migration-lint`)         | See "Schema rollback" below    |
 
 ## Standard image rollback
 

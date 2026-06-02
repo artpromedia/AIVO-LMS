@@ -49,9 +49,18 @@ export function normaliseGradeBand(raw: unknown): string | null {
     if (n >= 1 && n <= 12) return String(n);
   }
   const words: Record<string, string> = {
-    first: "1", second: "2", third: "3", fourth: "4", fifth: "5",
-    sixth: "6", seventh: "7", eighth: "8", ninth: "9", tenth: "10",
-    eleventh: "11", twelfth: "12",
+    first: "1",
+    second: "2",
+    third: "3",
+    fourth: "4",
+    fifth: "5",
+    sixth: "6",
+    seventh: "7",
+    eighth: "8",
+    ninth: "9",
+    tenth: "10",
+    eleventh: "11",
+    twelfth: "12",
   };
   for (const [word, n] of Object.entries(words)) {
     if (s.includes(word)) return n;
@@ -92,9 +101,7 @@ export interface BaselineFallbackResponse {
  * any network and is therefore safe to call from within a route's
  * error path.
  */
-export function buildBaselineFallback(
-  input: BuildBaselineFallbackInput,
-): BaselineFallbackResponse {
+export function buildBaselineFallback(input: BuildBaselineFallbackInput): BaselineFallbackResponse {
   const gradeBand = normaliseGradeBand(input.gradeLevel);
   const picked = pickFallbackBaseline({
     learnerId: input.learnerId,

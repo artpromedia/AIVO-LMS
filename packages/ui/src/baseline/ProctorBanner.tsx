@@ -37,11 +37,7 @@ export function ProctorBanner({
       ? "bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-color-aivoPurple-700)] border-[var(--aivo-color-aivoPurple-100)]"
       : "bg-[var(--aivo-color-aivoTeal-50)] text-[var(--aivo-color-aivoTeal-700)] border-[var(--aivo-color-aivoTeal-100)]";
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      className={cn("border-b", tint, className)}
-    >
+    <div role="status" aria-live="polite" className={cn("border-b", tint, className)}>
       <div className="mx-auto w-full max-w-4xl px-4 py-2 flex items-center gap-3 justify-between flex-wrap">
         <p className="text-xs font-semibold flex items-center gap-2">
           <svg

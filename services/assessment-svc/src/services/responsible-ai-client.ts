@@ -117,9 +117,7 @@ export async function evaluateBaselineBatch(
   ctx: Omit<EvaluateBaselineItemInput, "question">,
 ): Promise<(ResponsibleAiVerdict | null)[]> {
   if (!responsibleAiEnabled()) return questions.map(() => null);
-  return Promise.all(
-    questions.map((q) => evaluateBaselineItem({ ...ctx, question: q })),
-  );
+  return Promise.all(questions.map((q) => evaluateBaselineItem({ ...ctx, question: q })));
 }
 
 /**

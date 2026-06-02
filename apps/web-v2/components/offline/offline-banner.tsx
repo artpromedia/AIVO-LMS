@@ -96,7 +96,9 @@ export function OfflineBanner({ copy = DEFAULT_COPY }: OfflineBannerProps) {
       ) : (
         <span>
           {copy.offlineMessage}
-          {queueSize > 0 ? <span className="ml-2 font-semibold">· {copy.queuedLabel(queueSize)}</span> : null}
+          {queueSize > 0 ? (
+            <span className="ml-2 font-semibold">· {copy.queuedLabel(queueSize)}</span>
+          ) : null}
         </span>
       )}
     </div>

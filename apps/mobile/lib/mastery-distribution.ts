@@ -49,7 +49,7 @@ function pct(v: number): number {
   return Math.max(0, Math.min(1, Number.isFinite(n) ? n : 0)) * 100;
 }
 
-export function distribution(learners: ReadonlyArray<LearnerMastery>): Distribution {
+export function distribution(learners: readonly LearnerMastery[]): Distribution {
   const bands: Record<Band, number> = { stretching: 0, onGrade: 0, approaching: 0, emerging: 0 };
   let sum = 0;
   for (const l of learners) {

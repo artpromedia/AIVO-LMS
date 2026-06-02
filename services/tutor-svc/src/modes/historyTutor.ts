@@ -22,11 +22,7 @@ export const historyTutor: TutorDefinition = defineTutor({
   subjects: ["social_studies"],
   gradeBands: ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL"],
-  skillGraphRefs: [
-    "c3-social-studies-k2",
-    "c3-social-studies-3-8",
-    "c3-social-studies-9-12",
-  ],
+  skillGraphRefs: ["c3-social-studies-k2", "c3-social-studies-3-8", "c3-social-studies-9-12"],
   defaultContentPackRefs: ["history-3-5-fall-2026"],
   coverageMatrix: {
     "3": "scaffold",

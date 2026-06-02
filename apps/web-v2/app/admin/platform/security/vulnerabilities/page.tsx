@@ -33,9 +33,7 @@ export default async function Page() {
         description="Dependency, container, IaC, and pen-test findings — triaged centrally."
       />
       {vulns.length === 0 ? (
-        <Card className="p-6 text-sm text-aivo-ink-soft">
-          {t("empty_body")}
-        </Card>
+        <Card className="p-6 text-sm text-aivo-ink-soft">{t("empty_body")}</Card>
       ) : (
         <div className="space-y-3">
           {vulns.map((v) => (

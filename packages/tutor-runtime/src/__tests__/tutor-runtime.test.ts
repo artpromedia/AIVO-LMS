@@ -181,12 +181,10 @@ describe("planSession", () => {
       ...tutor,
       coverageMatrix: { K: "authored", "1": "scaffold", "2": "missing" },
     });
-    const plan = planSession(
-      tutorWithMatrix,
-      { ...baseCtx, gradeBand: "K" },
-      pack,
-      { maxActivities: 2, rng: () => 0 },
-    );
+    const plan = planSession(tutorWithMatrix, { ...baseCtx, gradeBand: "K" }, pack, {
+      maxActivities: 2,
+      rng: () => 0,
+    });
     expect(plan.activities.length).toBeGreaterThan(0);
   });
 
@@ -195,12 +193,11 @@ describe("planSession", () => {
       ...tutor,
       coverageMatrix: { K: "authored", "1": "scaffold", "2": "missing" },
     });
-    const plan = planSession(
-      tutorWithMatrix,
-      { ...baseCtx, gradeBand: "1" },
-      pack,
-      { maxActivities: 2, rng: () => 0, allowScaffold: true },
-    );
+    const plan = planSession(tutorWithMatrix, { ...baseCtx, gradeBand: "1" }, pack, {
+      maxActivities: 2,
+      rng: () => 0,
+      allowScaffold: true,
+    });
     expect(plan.activities.length).toBeGreaterThan(0);
   });
 

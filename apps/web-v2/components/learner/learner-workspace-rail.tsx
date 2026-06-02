@@ -2,10 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {
-  LearnerProfileCard,
-  SensoryControlGroup,
-} from "@aivo/ui/learner-dashboard";
+import { LearnerProfileCard, SensoryControlGroup } from "@aivo/ui/learner-dashboard";
 import { useSensoryMode } from "@/components/system/sensory-mode-provider";
 import { setTypefaceCookie } from "@/lib/a11y/actions";
 import { Moon, Sun, Zap, VolumeX, Volume1, Volume2 } from "lucide-react";
@@ -61,12 +58,10 @@ export function LearnerWorkspaceRail({
   initialTypeface = "standard",
 }: LearnerWorkspaceRailProps) {
   const { mode, setMode } = useSensoryMode();
-  const [spacing, setSpacing] = React.useState<(typeof spacingOptions)[number]["value"]>(
-    "comfortable",
-  );
-  const [fontStyle, setFontStyle] = React.useState<(typeof fontStyleOptions)[number]["value"]>(
-    initialTypeface,
-  );
+  const [spacing, setSpacing] =
+    React.useState<(typeof spacingOptions)[number]["value"]>("comfortable");
+  const [fontStyle, setFontStyle] =
+    React.useState<(typeof fontStyleOptions)[number]["value"]>(initialTypeface);
   const [sound, setSound] = React.useState<(typeof soundOptions)[number]["value"]>("soft");
 
   React.useEffect(() => {
@@ -118,7 +113,9 @@ export function LearnerWorkspaceRail({
           label="Mood"
           value={mode}
           onChange={(v) => setMode(v as typeof mode)}
-          options={moodOptions as unknown as { value: string; label: string; icon: React.ReactNode }[]}
+          options={
+            moodOptions as unknown as { value: string; label: string; icon: React.ReactNode }[]
+          }
         />
         <SensoryControlGroup
           label="Spacing"
@@ -137,7 +134,9 @@ export function LearnerWorkspaceRail({
           label="Sound"
           value={sound}
           onChange={(v) => setSound(v as typeof sound)}
-          options={soundOptions as unknown as { value: string; label: string; icon: React.ReactNode }[]}
+          options={
+            soundOptions as unknown as { value: string; label: string; icon: React.ReactNode }[]
+          }
         />
 
         <Link

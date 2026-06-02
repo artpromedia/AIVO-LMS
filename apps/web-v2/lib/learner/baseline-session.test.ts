@@ -7,11 +7,7 @@ import {
   type BaselineItem,
   type BaselineState,
 } from "@aivo/adaptive-baseline";
-import type {
-  BaselineAssessment,
-  BaselineAttempt,
-  BaselineQuestion,
-} from "@/lib/db/types";
+import type { BaselineAssessment, BaselineAttempt, BaselineQuestion } from "@/lib/db/types";
 import { questionsToBank } from "./baseline-stream";
 import { streamNextQuestion, type StreamClient } from "./baseline-session";
 
@@ -78,10 +74,16 @@ function makeFakeServer(bank: BaselineItem[]) {
       const s = sessions.get(sessionId);
       if (!s) return { ok: false, reason: "non_2xx", status: 404, message: "no session" };
       if (s.lastServedItemId !== null && response.itemId !== s.lastServedItemId) {
-        return { ok: false, reason: "response_rejected", rejection: "unexpected_item", message: "x" };
+        return {
+          ok: false,
+          reason: "response_rejected",
+          rejection: "unexpected_item",
+          message: "x",
+        };
       }
       const item = bank.find((b) => b.id === response.itemId);
-      if (!item) return { ok: false, reason: "response_rejected", rejection: "unknown_item", message: "x" };
+      if (!item)
+        return { ok: false, reason: "response_rejected", rejection: "unknown_item", message: "x" };
       const state = recordResponse({ state: s.state, item, response });
       const stop = shouldStop(state);
       const nextItem = stop.stop ? null : pickNextItem(state, bank);

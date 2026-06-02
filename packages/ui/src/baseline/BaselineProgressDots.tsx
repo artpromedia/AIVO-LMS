@@ -30,8 +30,7 @@ export interface BaselineProgressDotsProps {
 
 const DOT_CLASS: Record<DotState, string> = {
   answered: "bg-[var(--aivo-sensory-primary)]",
-  skipped:
-    "bg-white border-2 border-[var(--aivo-sensory-primary)]",
+  skipped: "bg-white border-2 border-[var(--aivo-sensory-primary)]",
   current:
     "bg-white ring-2 ring-[var(--aivo-sensory-primary)] ring-offset-2 ring-offset-[var(--aivo-color-surface-canvas)] scale-110",
   pending: "bg-[var(--aivo-color-surface-muted)]",
@@ -59,10 +58,7 @@ export function BaselineProgressDots({
           <span
             key={i}
             aria-hidden="true"
-            className={cn(
-              "w-2.5 h-2.5 rounded-full transition-all duration-200",
-              DOT_CLASS[s],
-            )}
+            className={cn("w-2.5 h-2.5 rounded-full transition-all duration-200", DOT_CLASS[s])}
           />
         ))}
       </div>

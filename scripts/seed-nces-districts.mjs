@@ -135,8 +135,7 @@ async function seedFromCsvs() {
       ncesId: pick(r, ["LEAID", "leaid", "lea_id", "LEA_ID"]),
       weight: Number(pick(r, ["WEIGHT", "weight", "OVERLAP", "overlap"]) ?? 1),
       dominant:
-        String(pick(r, ["DOMINANT", "dominant", "PRIMARY"]) ?? "").toLowerCase() ===
-          "true" ||
+        String(pick(r, ["DOMINANT", "dominant", "PRIMARY"]) ?? "").toLowerCase() === "true" ||
         Number(pick(r, ["WEIGHT", "weight", "OVERLAP", "overlap"]) ?? 1) >= 0.5,
     }))
     .filter((z) => z.zip && /^\d{5}$/.test(z.zip) && z.ncesId);
@@ -147,13 +146,9 @@ async function seedFromCsvs() {
 async function main() {
   console.log(`[seed-nces] mode=${useFixture ? "fixture" : "csv"}`);
 
-  const { districts, zips } = useFixture
-    ? await seedFromFixture()
-    : await seedFromCsvs();
+  const { districts, zips } = useFixture ? await seedFromFixture() : await seedFromCsvs();
 
-  console.log(
-    `[seed-nces] loaded ${districts.length} districts, ${zips.length} zip mappings`,
-  );
+  console.log(`[seed-nces] loaded ${districts.length} districts, ${zips.length} zip mappings`);
 
   const BATCH = 1000;
   let inserted = 0;
@@ -188,9 +183,7 @@ async function main() {
     const chunk = zips.slice(i, i + BATCH);
     await sql`
       INSERT INTO zip_nces_district (zip, nces_id, weight, dominant)
-      SELECT * FROM ${sql(
-        chunk.map((z) => [z.zip, z.ncesId, z.weight, z.dominant]),
-      )}
+      SELECT * FROM ${sql(chunk.map((z) => [z.zip, z.ncesId, z.weight, z.dominant]))}
       ON CONFLICT (zip, nces_id) DO UPDATE SET
         weight = EXCLUDED.weight,
         dominant = EXCLUDED.dominant

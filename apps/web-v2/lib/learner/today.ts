@@ -129,7 +129,7 @@ export async function pickTodaysMission(
         if (ch.skillIds.length === 0) continue;
         const prog = await getQuestProgress(learnerId, tenantId, ch.id);
         if (prog && prog.progress >= 1) continue;
-        if (!await isQuestChapterUnlocked(learnerId, tenantId, ch)) continue;
+        if (!(await isQuestChapterUnlocked(learnerId, tenantId, ch))) continue;
         const subj = store.subjects.get(ch.subjectId);
         const skill = store.skills.get(ch.skillIds[0]);
         if (!subj || !skill) continue;

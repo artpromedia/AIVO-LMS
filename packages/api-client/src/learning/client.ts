@@ -44,10 +44,7 @@ export class LearningClientError extends Error {
   }
 }
 
-async function parseResponse<S extends ZodTypeAny>(
-  res: Response,
-  schema: S,
-): Promise<z.infer<S>> {
+async function parseResponse<S extends ZodTypeAny>(res: Response, schema: S): Promise<z.infer<S>> {
   if (!res.ok) {
     let body: unknown = null;
     try {
@@ -165,12 +162,7 @@ export function createLearningClient(opts: LearningClientOptions = {}) {
     /** POST /api/learning/gradebook/update */
     updateGradebook(input: UpdateGradebookRequest) {
       const parsed = UpdateGradebookRequest.parse(input);
-      return call(
-        "POST",
-        "/api/learning/gradebook/update",
-        UpdateGradebookResponse,
-        parsed,
-      );
+      return call("POST", "/api/learning/gradebook/update", UpdateGradebookResponse, parsed);
     },
     /** GET /api/learning/gradebook/:learnerId */
     getGradebook(learnerId: string) {

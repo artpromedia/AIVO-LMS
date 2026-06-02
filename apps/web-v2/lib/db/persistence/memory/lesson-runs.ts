@@ -8,11 +8,7 @@
  *   - Optional status filter is applied before the limit.
  */
 import { getStore } from "@/lib/db/store";
-import type {
-  GeneratedLessonPlan,
-  LessonInteraction,
-  ParentLessonSummary,
-} from "@/lib/db/types";
+import type { GeneratedLessonPlan, LessonInteraction, ParentLessonSummary } from "@/lib/db/types";
 import type { LessonRunStore } from "../types";
 
 export const memoryLessonRuns: LessonRunStore = {
@@ -35,9 +31,7 @@ export const memoryLessonRuns: LessonRunStore = {
         r.tenantId === tenantId &&
         (!opts?.status || r.status === opts.status),
     );
-    return all
-      .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
-      .slice(0, limit);
+    return all.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)).slice(0, limit);
   },
 
   async countForLearner(learnerId, tenantId) {

@@ -47,7 +47,9 @@ export default async function Page() {
                 <dd className="font-medium">{p.ruleset.reviewThreshold}</dd>
               </div>
               <div className="col-span-2">
-                <dt className="text-aivo-muted text-xs uppercase">{t("label_auto_review_categories")}</dt>
+                <dt className="text-aivo-muted text-xs uppercase">
+                  {t("label_auto_review_categories")}
+                </dt>
                 <dd className="flex flex-wrap gap-1 mt-1">
                   {p.ruleset.autoReviewCategories.map((c) => (
                     <Badge key={c} tone="warning">
@@ -57,7 +59,9 @@ export default async function Page() {
                 </dd>
               </div>
               <div className="col-span-2">
-                <dt className="text-aivo-muted text-xs uppercase">{t("label_auto_block_categories")}</dt>
+                <dt className="text-aivo-muted text-xs uppercase">
+                  {t("label_auto_block_categories")}
+                </dt>
                 <dd className="flex flex-wrap gap-1 mt-1">
                   {p.ruleset.autoBlockCategories.map((c) => (
                     <Badge key={c} tone="danger">

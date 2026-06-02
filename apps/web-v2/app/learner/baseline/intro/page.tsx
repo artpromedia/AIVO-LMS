@@ -64,25 +64,33 @@ export default async function BaselineIntroPage({
           href={`/learner/baseline/readiness?b=${baseline.id}`}
           className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <path d="M19 12H5" />
             <path d="m12 19-7-7 7-7" />
           </svg>
           {t("back")}
         </Link>
       }
-      headerRight={
-        <p className="text-xs text-iw-text-muted">
-          {t("intro.step")}
-        </p>
-      }
+      headerRight={<p className="text-xs text-iw-text-muted">{t("intro.step")}</p>}
     >
       <AICompanionHero
         eyebrow={t("intro.eyebrow", { count: questions.length })}
         title={t("intro.title", { name: learner.preferredName || learner.firstName })}
         body={
           firstTutor
-            ? t("intro.body_with_tutor", { tutorName: firstTutor.name, landmark: firstTutor.landmark })
+            ? t("intro.body_with_tutor", {
+                tutorName: firstTutor.name,
+                landmark: firstTutor.landmark,
+              })
             : t("intro.body_default")
         }
         tutorAvatar={firstTutor?.emoji}
@@ -95,7 +103,16 @@ export default async function BaselineIntroPage({
             className="inline-flex items-center gap-2 rounded-iw-control px-6 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
           >
             {t("intro.start")}
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <polygon points="5 3 19 12 5 21 5 3" />
             </svg>
           </Link>
@@ -117,16 +134,12 @@ export default async function BaselineIntroPage({
           <p className="text-2xl font-semibold text-iw-text-strong tabular-nums">
             {questions.length}
           </p>
-          <p className="text-xs text-iw-text-muted leading-relaxed">
-            {t("intro.questions_note")}
-          </p>
+          <p className="text-xs text-iw-text-muted leading-relaxed">{t("intro.questions_note")}</p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
           <p className="iw-label text-iw-text-muted">{t("intro.time_label")}</p>
           <p className="text-2xl font-semibold text-iw-text-strong">{t("intro.no_clock")}</p>
-          <p className="text-xs text-iw-text-muted leading-relaxed">
-            {t("intro.time_note")}
-          </p>
+          <p className="text-xs text-iw-text-muted leading-relaxed">{t("intro.time_note")}</p>
         </article>
       </section>
     </LearnerBaselineShell>

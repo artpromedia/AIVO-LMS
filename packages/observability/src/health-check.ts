@@ -111,9 +111,9 @@ export async function pingHttp(
  * exposes `execute(rawSqlString)`. The plain-string fallback is used if
  * drizzle-orm is not resolvable from the caller's module graph.
  */
-export async function pingDb(
-  db: { execute: (q: any) => Promise<any> },
-): Promise<HealthCheckOutcome> {
+export async function pingDb(db: {
+  execute: (q: any) => Promise<any>;
+}): Promise<HealthCheckOutcome> {
   const started = Date.now();
   try {
     let query: any = "SELECT 1";

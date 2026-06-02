@@ -91,9 +91,7 @@ function summariseQuestion(q: BaselineQuestionLike): string {
   return `${subj}: ${stem}`.slice(0, 200);
 }
 
-export async function applySafetyGate(
-  input: ApplySafetyGateInput,
-): Promise<ApplySafetyGateResult> {
+export async function applySafetyGate(input: ApplySafetyGateInput): Promise<ApplySafetyGateResult> {
   const {
     learnerId,
     questions,
@@ -112,18 +110,15 @@ export async function applySafetyGate(
     return { questions, audits: [], hadReplacements: false, evaluatorSilent: true };
   }
 
-  const verdicts = await evaluateBaselineBatch(
-    questions as Record<string, unknown>[],
-    {
-      learnerId,
-      inputSummary: "baseline-batch",
-      learnerProfileSummary: {
-        functioningLevel: functioningLevel ?? undefined,
-        accommodations: accommodations ?? [],
-      },
-      policyMode,
+  const verdicts = await evaluateBaselineBatch(questions as Record<string, unknown>[], {
+    learnerId,
+    inputSummary: "baseline-batch",
+    learnerProfileSummary: {
+      functioningLevel: functioningLevel ?? undefined,
+      accommodations: accommodations ?? [],
     },
-  );
+    policyMode,
+  });
 
   // Did every verdict come back null? That means the evaluator is
   // disabled or unreachable across the batch — treat as silent: ship
@@ -171,8 +166,7 @@ export async function applySafetyGate(
 
     // Allow when the evaluator didn't speak, allowed it, or only asked
     // for a non-block action (revise / escalate — logged, not swapped).
-    const shouldBlock =
-      policyMode === "block" && verdict?.recommendedAction === "block";
+    const shouldBlock = policyMode === "block" && verdict?.recommendedAction === "block";
 
     if (!shouldBlock) {
       out.push(q);

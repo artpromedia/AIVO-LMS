@@ -61,7 +61,8 @@ export const codingK2Fall2026: ContentPack = {
       title: "Order the steps",
       skillId: "csta.1A.AP.10",
       type: "drag_drop",
-      prompt: "Put the steps in order so the robot reaches the flag: move up, move up, move right, move right.",
+      prompt:
+        "Put the steps in order so the robot reaches the flag: move up, move up, move right, move right.",
       difficulty: "core",
       choices: [
         { id: "u1", label: "move up", value: "step-1" },

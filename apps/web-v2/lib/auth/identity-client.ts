@@ -69,10 +69,7 @@ export type IdentityLoginError = {
   wrongSurface?: string;
 };
 
-export type IdentityLoginResult =
-  | IdentityLoginSuccess
-  | IdentityLoginMfa
-  | IdentityLoginError;
+export type IdentityLoginResult = IdentityLoginSuccess | IdentityLoginMfa | IdentityLoginError;
 
 /**
  * Extract Set-Cookie headers across runtimes. Node 18+ exposes
@@ -106,10 +103,7 @@ function parseRefreshToken(setCookies: string[]): string | null {
  * POST /api/auth/login on identity-svc with the user's credentials.
  * Returns a discriminated union for the three legitimate outcomes.
  */
-export async function identityLogin(
-  email: string,
-  password: string,
-): Promise<IdentityLoginResult> {
+export async function identityLogin(email: string, password: string): Promise<IdentityLoginResult> {
   let res: Response;
   try {
     res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/login`, {
@@ -581,9 +575,7 @@ export type IdentityInvitePreviewResult =
  * GET /api/auth/invite/:token — public preview. Returns a friendly error
  * (invalid / expired / already-accepted) the page can render verbatim.
  */
-export async function identityInvitePreview(
-  token: string,
-): Promise<IdentityInvitePreviewResult> {
+export async function identityInvitePreview(token: string): Promise<IdentityInvitePreviewResult> {
   let res: Response;
   try {
     res = await fetch(
@@ -760,8 +752,7 @@ export async function identityListDistrictSchools(
 export async function identityListDistrictAdmins(
   accessToken: string,
 ): Promise<
-  | { ok: true; pendingInvites: DistrictAdminInvite[] }
-  | { ok: false; status: number; error: string }
+  { ok: true; pendingInvites: DistrictAdminInvite[] } | { ok: false; status: number; error: string }
 > {
   const res = await districtGet<{ pendingInvites: DistrictAdminInvite[] }>(
     accessToken,
@@ -778,7 +769,12 @@ export type IdentityCreateAdminInviteResult =
 /** POST /api/district/admins — invite a DISTRICT_ADMIN or SCHOOL_ADMIN. */
 export async function identityCreateAdminInvite(
   accessToken: string,
-  input: { email: string; name: string; role: "DISTRICT_ADMIN" | "SCHOOL_ADMIN"; schoolId?: string },
+  input: {
+    email: string;
+    name: string;
+    role: "DISTRICT_ADMIN" | "SCHOOL_ADMIN";
+    schoolId?: string;
+  },
 ): Promise<IdentityCreateAdminInviteResult> {
   let res: Response;
   try {

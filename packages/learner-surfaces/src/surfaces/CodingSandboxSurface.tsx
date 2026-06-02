@@ -11,12 +11,19 @@ export interface CodingSandboxSurfaceProps {
   onEvent?: (event: SurfaceTelemetryEvent) => void;
 }
 
-async function executeJsInIframe(input: {
-  code: string;
-  stdin: string;
-}): Promise<{ stdout: string; stderr: string; runtimeMs: number; exportsMap: Record<string, unknown> }> {
+async function executeJsInIframe(input: { code: string; stdin: string }): Promise<{
+  stdout: string;
+  stderr: string;
+  runtimeMs: number;
+  exportsMap: Record<string, unknown>;
+}> {
   if (typeof window === "undefined" || typeof document === "undefined") {
-    return { stdout: "", stderr: "Execution unavailable outside browser.", runtimeMs: 0, exportsMap: {} };
+    return {
+      stdout: "",
+      stderr: "Execution unavailable outside browser.",
+      runtimeMs: 0,
+      exportsMap: {},
+    };
   }
   const frame = document.createElement("iframe");
   frame.setAttribute("sandbox", "allow-scripts");
@@ -72,7 +79,14 @@ window.addEventListener("message", async (evt) => {
   return await new Promise((resolve) => {
     const onMessage = (evt: MessageEvent) => {
       const data = evt.data as
-        | { type?: string; token?: string; stdout?: string; stderr?: string; runtimeMs?: number; exportsMap?: Record<string, unknown> }
+        | {
+            type?: string;
+            token?: string;
+            stdout?: string;
+            stderr?: string;
+            runtimeMs?: number;
+            exportsMap?: Record<string, unknown>;
+          }
         | undefined;
       if (!data || data.type !== "execute-result" || data.token !== token) return;
       window.removeEventListener("message", onMessage);
@@ -86,7 +100,10 @@ window.addEventListener("message", async (evt) => {
     };
     window.addEventListener("message", onMessage);
     const submit = () =>
-      frame.contentWindow?.postMessage({ type: "execute", token, code: input.code, stdin: input.stdin }, "*");
+      frame.contentWindow?.postMessage(
+        { type: "execute", token, code: input.code, stdin: input.stdin },
+        "*",
+      );
     if (frame.contentWindow) {
       submit();
     } else {
@@ -108,7 +125,11 @@ async function runPythonWithWorker(input: {
 }): Promise<CodingRunResult> {
   if (typeof Worker === "undefined") {
     return {
-      output: { stdout: "", stderr: "Python execution unavailable in this environment.", runtimeMs: 0 },
+      output: {
+        stdout: "",
+        stderr: "Python execution unavailable in this environment.",
+        runtimeMs: 0,
+      },
       tests: [],
       passed: 0,
       failed: input.tests.length,
@@ -204,7 +225,9 @@ self.onmessage = async (event) => {
     });
   }
 };`;
-  const worker = new Worker(URL.createObjectURL(new Blob([workerScript], { type: "text/javascript" })));
+  const worker = new Worker(
+    URL.createObjectURL(new Blob([workerScript], { type: "text/javascript" })),
+  );
   return await new Promise((resolve) => {
     worker.onmessage = (event) => {
       const data = event.data as { ok?: boolean; error?: string; result?: CodingRunResult };
@@ -380,7 +403,12 @@ export function CodingSandboxSurface({
       </div>
       {cfg?.hint ? <p>{cfg.hint}</p> : null}
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-        <button type="button" aria-label="run code tests" disabled={disabled || running} onClick={runTests}>
+        <button
+          type="button"
+          aria-label="run code tests"
+          disabled={disabled || running}
+          onClick={runTests}
+        >
           {running ? "Running…" : "Run tests"}
         </button>
         <button
@@ -403,7 +431,11 @@ export function CodingSandboxSurface({
                 length: code.length,
               }),
             );
-            onSubmit?.({ surfaceId: surface.id, answer: code, durationMs: result?.output.runtimeMs });
+            onSubmit?.({
+              surfaceId: surface.id,
+              answer: code,
+              durationMs: result?.output.runtimeMs,
+            });
           }}
         >
           Submit code
@@ -433,4 +465,3 @@ export function CodingSandboxSurface({
     </section>
   );
 }
-

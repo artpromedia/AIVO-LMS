@@ -15,7 +15,9 @@ import { fontFamilies } from "@/constants/typography";
 function fmtWhen(iso?: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 /**
@@ -51,13 +53,20 @@ export default function LearnerNotificationsScreen() {
             >
               <Card
                 tone="raised"
-                style={[styles.row, !n.readAt && { borderLeftWidth: 3, borderLeftColor: palette.primary }]}
+                style={[
+                  styles.row,
+                  !n.readAt && { borderLeftWidth: 3, borderLeftColor: palette.primary },
+                ]}
               >
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.itemTitle, { color: palette.ink }]}>{n.title}</Text>
-                  {n.body ? <Text style={[styles.body, { color: palette.inkMuted }]}>{n.body}</Text> : null}
+                  {n.body ? (
+                    <Text style={[styles.body, { color: palette.inkMuted }]}>{n.body}</Text>
+                  ) : null}
                 </View>
-                <Text style={[styles.when, { color: palette.inkMuted }]}>{fmtWhen(n.createdAt)}</Text>
+                <Text style={[styles.when, { color: palette.inkMuted }]}>
+                  {fmtWhen(n.createdAt)}
+                </Text>
               </Card>
             </Pressable>
           ))}

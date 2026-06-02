@@ -34,7 +34,9 @@ export default function AccommodationsScreen() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("caregiverAccommodations.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {t("caregiverAccommodations.title")}
+      </Text>
       <Text style={styles.subtitle}>{t("caregiverAccommodations.subtitle")}</Text>
 
       {allAccommodations.length === 0 ? (

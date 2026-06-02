@@ -8,12 +8,7 @@
  *   - teacher assignments: newest-first by createdAt.
  */
 import { getStore } from "@/lib/db/store";
-import type {
-  Classroom,
-  Enrollment,
-  School,
-  TeacherAssignment,
-} from "@/lib/db/types";
+import type { Classroom, Enrollment, School, TeacherAssignment } from "@/lib/db/types";
 import type { AdminStore } from "../types";
 
 export const memoryAdmin: AdminStore = {

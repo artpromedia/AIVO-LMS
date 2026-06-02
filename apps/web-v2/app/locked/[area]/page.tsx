@@ -43,15 +43,10 @@ export default async function LockedRoute({ params, searchParams }: Params) {
     notFound();
   }
 
-  const role: Role = VALID_ROLES.has(rawRole as Role)
-    ? (rawRole as Role)
-    : "parent";
+  const role: Role = VALID_ROLES.has(rawRole as Role) ? (rawRole as Role) : "parent";
 
   return (
-    <main
-      id="main"
-      className="min-h-screen bg-[var(--aivo-color-surface-canvas)]"
-    >
+    <main id="main" className="min-h-screen bg-[var(--aivo-color-surface-canvas)]">
       <LockedScreen role={role} area={area} linkAs={Link} />
     </main>
   );

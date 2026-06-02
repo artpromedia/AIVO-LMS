@@ -63,13 +63,7 @@ export interface BrainBuildingSequenceProps {
   onSequenceComplete: () => void;
 }
 
-type BuildStage =
-  | "template"
-  | "domains"
-  | "accommodations"
-  | "activation"
-  | "tutors"
-  | "complete";
+type BuildStage = "template" | "domains" | "accommodations" | "activation" | "tutors" | "complete";
 
 const STAGE_ORDER: BuildStage[] = [
   "template",
@@ -137,7 +131,10 @@ export default function BrainBuildingSequence({
   }, []);
 
   // Reduced-motion shortens every dwell so the sequence still completes.
-  const ms = useCallback((normal: number) => (reducedMotion ? Math.min(700, normal) : normal), [reducedMotion]);
+  const ms = useCallback(
+    (normal: number) => (reducedMotion ? Math.min(700, normal) : normal),
+    [reducedMotion],
+  );
 
   const advanceStage = useCallback(() => {
     const idx = STAGE_ORDER.indexOf(currentStage);
@@ -217,10 +214,7 @@ export default function BrainBuildingSequence({
   const sphereLabel = t("clone_child_label", { name: learnerName });
 
   return (
-    <div
-      className="bbs-root"
-      style={{ "--bbs-primary": primaryHue } as React.CSSProperties}
-    >
+    <div className="bbs-root" style={{ "--bbs-primary": primaryHue } as React.CSSProperties}>
       <header className="bbs-header">
         <div className="bbs-badge" aria-hidden="true">
           <Brain className="w-5 h-5" strokeWidth={2.5} />
@@ -293,7 +287,9 @@ export default function BrainBuildingSequence({
                     <div className="bbs-card-meta">
                       <span>{t("building_level", { grade })}</span>
                       <span>{t("building_enrolled", { grade: enrolled })}</span>
-                      {gap > 0 && <span className="bbs-gap">{t("building_gap", { years: gap })}</span>}
+                      {gap > 0 && (
+                        <span className="bbs-gap">{t("building_gap", { years: gap })}</span>
+                      )}
                     </div>
                   </div>
                 );
@@ -344,13 +340,16 @@ export default function BrainBuildingSequence({
             <p className="bbs-muted">{t("building_activation_caption", { name: learnerName })}</p>
             <div className="bbs-chips">
               <span className="bbs-chip">
-                <Lock className="w-3.5 h-3.5" aria-hidden="true" /> {t("building_activation_encrypted")}
+                <Lock className="w-3.5 h-3.5" aria-hidden="true" />{" "}
+                {t("building_activation_encrypted")}
               </span>
               <span className="bbs-chip">
-                <ClipboardList className="w-3.5 h-3.5" aria-hidden="true" /> {t("building_activation_version")}
+                <ClipboardList className="w-3.5 h-3.5" aria-hidden="true" />{" "}
+                {t("building_activation_version")}
               </span>
               <span className="bbs-chip">
-                <Undo2 className="w-3.5 h-3.5" aria-hidden="true" /> {t("building_activation_rollback")}
+                <Undo2 className="w-3.5 h-3.5" aria-hidden="true" />{" "}
+                {t("building_activation_rollback")}
               </span>
             </div>
           </div>
@@ -371,10 +370,7 @@ export default function BrainBuildingSequence({
                     key={td.tutorKey}
                     className={`bbs-card bbs-tutor ${i < tutorsRevealed ? "is-in" : ""}`}
                   >
-                    <span
-                      className="bbs-tutor-avatar"
-                      style={{ borderColor: tutor.color }}
-                    >
+                    <span className="bbs-tutor-avatar" style={{ borderColor: tutor.color }}>
                       <Image src={tutor.avatar} alt="" width={44} height={44} />
                     </span>
                     <div className="bbs-tutor-body">
@@ -400,7 +396,9 @@ export default function BrainBuildingSequence({
               ariaLabel={sphereLabel}
               className="bbs-sphere"
             />
-            <h2 className="bbs-h2 bbs-h2-lg">{t("building_complete_title", { name: learnerName })}</h2>
+            <h2 className="bbs-h2 bbs-h2-lg">
+              {t("building_complete_title", { name: learnerName })}
+            </h2>
             <p className="bbs-muted">{t("building_complete_caption", { name: learnerName })}</p>
             <button type="button" onClick={onSequenceComplete} className="bbs-cta">
               {t("building_complete_cta")}

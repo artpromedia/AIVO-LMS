@@ -10,10 +10,7 @@ import {
   getMustChangePassword,
 } from "@/lib/api";
 import { setApiActiveRole } from "@/lib/active-role";
-import {
-  tryBiometricUnlock,
-  disableBiometricUnlock,
-} from "@/lib/biometric";
+import { tryBiometricUnlock, disableBiometricUnlock } from "@/lib/biometric";
 import {
   mapIdentityErrorResponse,
   mapIdentityErrorBody,

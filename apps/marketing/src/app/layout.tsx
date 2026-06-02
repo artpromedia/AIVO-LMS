@@ -7,12 +7,7 @@ import { I18nProvider } from "@/providers/i18n-provider";
 import enMessages from "@/i18n/messages/en.json";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
-import {
-  LOCALE_COOKIE_NAME,
-  defaultLocale,
-  dirForLocale,
-  isValidLocale,
-} from "@/i18n/config";
+import { LOCALE_COOKIE_NAME, defaultLocale, dirForLocale, isValidLocale } from "@/i18n/config";
 
 const inter = Inter({
   subsets: ["latin"],

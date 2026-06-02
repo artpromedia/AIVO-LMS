@@ -50,7 +50,10 @@ async function userToken(sub: string) {
 }
 async function adminToken() {
   const { signJWT } = await import("@aivo/security");
-  return signJWT({ sub: crypto.randomUUID(), role: "PLATFORM_ADMIN", tenantId: crypto.randomUUID() }, "5m");
+  return signJWT(
+    { sub: crypto.randomUUID(), role: "PLATFORM_ADMIN", tenantId: crypto.randomUUID() },
+    "5m",
+  );
 }
 
 test("device tokens: register → resolve+fan-out → unregister", { skip: SKIP }, async () => {
@@ -117,32 +120,36 @@ test("device tokens: register → resolve+fan-out → unregister", { skip: SKIP 
   }
 });
 
-test("device tokens: cannot delete another user's token (owner-scoped)", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const ownerId = crypto.randomUUID();
-  const token = `fcm_${crypto.randomBytes(12).toString("hex")}`;
-  try {
-    const ownerTok = await userToken(ownerId);
-    const otherTok = await userToken(crypto.randomUUID());
+test(
+  "device tokens: cannot delete another user's token (owner-scoped)",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const ownerId = crypto.randomUUID();
+    const token = `fcm_${crypto.randomBytes(12).toString("hex")}`;
+    try {
+      const ownerTok = await userToken(ownerId);
+      const otherTok = await userToken(crypto.randomUUID());
 
-    await app.inject({
-      method: "POST",
-      url: "/api/comms/devices",
-      headers: { authorization: `Bearer ${ownerTok}`, "content-type": "application/json" },
-      payload: { token, kind: "fcm" },
-    });
+      await app.inject({
+        method: "POST",
+        url: "/api/comms/devices",
+        headers: { authorization: `Bearer ${ownerTok}`, "content-type": "application/json" },
+        payload: { token, kind: "fcm" },
+      });
 
-    // A different user trying to delete the owner's token gets 404 (no match).
-    const del = await app.inject({
-      method: "DELETE",
-      url: `/api/comms/devices/${encodeURIComponent(token)}`,
-      headers: { authorization: `Bearer ${otherTok}` },
-    });
-    assert.equal(del.statusCode, 404);
-  } finally {
-    await teardown(app, db, ownerId);
-  }
-});
+      // A different user trying to delete the owner's token gets 404 (no match).
+      const del = await app.inject({
+        method: "DELETE",
+        url: `/api/comms/devices/${encodeURIComponent(token)}`,
+        headers: { authorization: `Bearer ${otherTok}` },
+      });
+      assert.equal(del.statusCode, 404);
+    } finally {
+      await teardown(app, db, ownerId);
+    }
+  },
+);
 
 test("push: unknown user with no devices returns no_devices", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();

@@ -116,7 +116,8 @@ const PARENT = {
       school_data_sharing: "Compartir datos con la escuela",
       optional_not_set: "Opcional — no configurado",
       approve_voice_mode: "Aprobar modo de voz",
-      approve_voice_mode_desc: "Permite que Emma hable con el tutor AI en voz alta durante las lecciones.",
+      approve_voice_mode_desc:
+        "Permite que Emma hable con el tutor AI en voz alta durante las lecciones.",
       upload_iep_optional: "Subir IEP (opcional)",
       upload_iep_desc: "Añade adaptaciones para que AIVO las aplique desde el primer día.",
       new_milestone: "Nuevo hito:",
@@ -169,7 +170,8 @@ const PARENT = {
       school_data_sharing: "Partage des données avec l'école",
       optional_not_set: "Optionnel — non défini",
       approve_voice_mode: "Approuver le mode vocal",
-      approve_voice_mode_desc: "Permet à Emma de parler à voix haute avec le tuteur AI pendant les cours.",
+      approve_voice_mode_desc:
+        "Permet à Emma de parler à voix haute avec le tuteur AI pendant les cours.",
       upload_iep_optional: "Charger IEP (optionnel)",
       upload_iep_desc: "Ajoutez des aménagements pour qu'AIVO les applique dès le premier jour.",
       new_milestone: "Nouveau jalon :",
@@ -222,7 +224,8 @@ const PARENT = {
       school_data_sharing: "Schuldatenweitergabe",
       optional_not_set: "Optional — nicht festgelegt",
       approve_voice_mode: "Sprachmodus genehmigen",
-      approve_voice_mode_desc: "Ermöglicht Emma, während der Lektionen laut mit dem AI-Tutor zu sprechen.",
+      approve_voice_mode_desc:
+        "Ermöglicht Emma, während der Lektionen laut mit dem AI-Tutor zu sprechen.",
       upload_iep_optional: "IEP hochladen (optional)",
       upload_iep_desc: "Füge Anpassungen hinzu, damit AIVO sie vom ersten Tag an anwendet.",
       new_milestone: "Neuer Meilenstein:",
@@ -540,7 +543,8 @@ const PARENT = {
       school_data_sharing: "विद्यालय डेटा साझाकरण",
       optional_not_set: "वैकल्पिक — सेट नहीं किया",
       approve_voice_mode: "वॉइस मोड स्वीकृत करें",
-      approve_voice_mode_desc: "Emma को पाठों के दौरान AI ट्यूटर से ज़ोर से बात करने की अनुमति देता है।",
+      approve_voice_mode_desc:
+        "Emma को पाठों के दौरान AI ट्यूटर से ज़ोर से बात करने की अनुमति देता है।",
       upload_iep_optional: "IEP अपलोड करें (वैकल्पिक)",
       upload_iep_desc: "AIVO को पहले दिन से लागू करने के लिए समायोजन जोड़ें।",
       new_milestone: "नई उपलब्धि:",

@@ -27,7 +27,9 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
   if (process.env.NODE_ENV === "production") notFound();
   const session = await requirePageRole(["learner", "parent"]);
   const learnerId =
-    session.role === "learner" ? (session.learnerId ?? "lrn_demo_sky") : await readActiveLearnerFromCookies(session);
+    session.role === "learner"
+      ? (session.learnerId ?? "lrn_demo_sky")
+      : await readActiveLearnerFromCookies(session);
   if (!learnerId) {
     return <div data-testid="smoke-error">Missing learner context.</div>;
   }
@@ -63,7 +65,7 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
     const fixture = pickMultimediaFixtureForSubject(mapped, `smoke:${mapped}`);
     if (!fixture) return <div data-testid="smoke-error">Fixture missing for smoke route.</div>;
     const now = nowIso();
-    lessonRun = ({
+    lessonRun = {
       id: newId("lr"),
       tenantId: session.tenantId,
       learnerId,
@@ -141,7 +143,7 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
       completedAt: null,
       createdAt: now,
       updatedAt: now,
-    } as unknown) as LessonRun;
+    } as unknown as LessonRun;
     plan = {
       id: newId("plan"),
       lessonRunId: lessonRun.id,

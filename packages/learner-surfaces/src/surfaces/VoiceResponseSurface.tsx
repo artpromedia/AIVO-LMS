@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type {
-  LearnerSurfaceSpec,
-  SurfaceResponse,
-  VoiceResponsePayload,
-} from "../types.js";
+import type { LearnerSurfaceSpec, SurfaceResponse, VoiceResponsePayload } from "../types.js";
 import { createSurfaceEvent, type SurfaceTelemetryEvent } from "../telemetry/surface-events.js";
 
 export interface VoiceResponseSurfaceProps {
@@ -13,13 +9,7 @@ export interface VoiceResponseSurfaceProps {
   onEvent?: (event: SurfaceTelemetryEvent) => void;
 }
 
-type RecorderState =
-  | "idle"
-  | "recording"
-  | "uploading"
-  | "recorded"
-  | "denied"
-  | "unsupported";
+type RecorderState = "idle" | "recording" | "uploading" | "recorded" | "denied" | "unsupported";
 
 const DEFAULT_MAX_DURATION_MS = 60_000;
 const MAX_RECORDED_BYTES = 5 * 1024 * 1024;
@@ -140,7 +130,11 @@ export function VoiceResponseSurface({
       analyserRef.current = null;
     }
     if (audioCtxRef.current) {
-      try { audioCtxRef.current.close(); } catch { /* already closed */ }
+      try {
+        audioCtxRef.current.close();
+      } catch {
+        /* already closed */
+      }
       audioCtxRef.current = null;
     }
     if (recorderRef.current && recorderRef.current.state !== "inactive") {
@@ -159,30 +153,33 @@ export function VoiceResponseSurface({
 
   useEffect(() => () => cleanup(), [cleanup]);
 
-  const startMeter = useCallback((stream: MediaStream) => {
-    if (reducedMotion) return; // skip animation when reduced-motion is on
-    try {
-      const ctx = new AudioContext();
-      audioCtxRef.current = ctx;
-      const source = ctx.createMediaStreamSource(stream);
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      analyserRef.current = analyser;
+  const startMeter = useCallback(
+    (stream: MediaStream) => {
+      if (reducedMotion) return; // skip animation when reduced-motion is on
+      try {
+        const ctx = new AudioContext();
+        audioCtxRef.current = ctx;
+        const source = ctx.createMediaStreamSource(stream);
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        analyserRef.current = analyser;
 
-      const buf = new Uint8Array(analyser.frequencyBinCount);
-      const tick = () => {
-        if (!analyserRef.current) return;
-        analyserRef.current.getByteFrequencyData(buf);
-        const avg = buf.reduce((s, v) => s + v, 0) / buf.length;
-        setMeterLevel(avg / 255);
+        const buf = new Uint8Array(analyser.frequencyBinCount);
+        const tick = () => {
+          if (!analyserRef.current) return;
+          analyserRef.current.getByteFrequencyData(buf);
+          const avg = buf.reduce((s, v) => s + v, 0) / buf.length;
+          setMeterLevel(avg / 255);
+          meterRafRef.current = requestAnimationFrame(tick);
+        };
         meterRafRef.current = requestAnimationFrame(tick);
-      };
-      meterRafRef.current = requestAnimationFrame(tick);
-    } catch {
-      // AudioContext not available (SSR / test env)
-    }
-  }, [reducedMotion]);
+      } catch {
+        // AudioContext not available (SSR / test env)
+      }
+    },
+    [reducedMotion],
+  );
 
   const start = useCallback(async () => {
     if (disabled || state === "recording") return;
@@ -199,9 +196,7 @@ export function VoiceResponseSurface({
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
       const name = (err as { name?: string })?.name ?? "";
-      setState(
-        name === "NotAllowedError" || name === "SecurityError" ? "denied" : "unsupported",
-      );
+      setState(name === "NotAllowedError" || name === "SecurityError" ? "denied" : "unsupported");
       return;
     }
     streamRef.current = stream;
@@ -220,7 +215,11 @@ export function VoiceResponseSurface({
     recorder.ondataavailable = (event) => {
       if (!event.data || event.data.size === 0) return;
       if (bytesRef.current + event.data.size > MAX_RECORDED_BYTES) {
-        try { recorder.stop(); } catch { /* already stopping */ }
+        try {
+          recorder.stop();
+        } catch {
+          /* already stopping */
+        }
         return;
       }
       bytesRef.current += event.data.size;
@@ -235,15 +234,25 @@ export function VoiceResponseSurface({
         return;
       }
 
-      onEvent?.(createSurfaceEvent(surface.id, "tool_changed", { tool: "voice_record_stop", durationMs }));
+      onEvent?.(
+        createSurfaceEvent(surface.id, "tool_changed", { tool: "voice_record_stop", durationMs }),
+      );
 
       setState("uploading");
       setUploadError(null);
-      onEvent?.(createSurfaceEvent(surface.id, "tool_changed", { tool: "voice_upload", bytes: blob.size }));
+      onEvent?.(
+        createSurfaceEvent(surface.id, "tool_changed", { tool: "voice_upload", bytes: blob.size }),
+      );
 
       let scoreResult: ScoreResult | null = null;
       try {
-        scoreResult = await uploadAndScore(blob, mimeRef.current, targetText, language, scoreServiceUrl);
+        scoreResult = await uploadAndScore(
+          blob,
+          mimeRef.current,
+          targetText,
+          language,
+          scoreServiceUrl,
+        );
         onEvent?.(
           createSurfaceEvent(surface.id, "answer_changed", {
             kind: "voice_score_received",
@@ -290,14 +299,36 @@ export function VoiceResponseSurface({
     tickRef.current = setInterval(() => {
       setElapsed(Date.now() - startedAtRef.current);
     }, 250);
-    timeoutRef.current = setTimeout(() => {
-      try { recorder.stop(); } catch { /* already stopped */ }
-    }, Math.min(maxDurationMs, DEFAULT_MAX_DURATION_MS));
-  }, [cleanup, disabled, language, maxDurationMs, onEvent, scoreServiceUrl, startMeter, state, surface.id, targetText]);
+    timeoutRef.current = setTimeout(
+      () => {
+        try {
+          recorder.stop();
+        } catch {
+          /* already stopped */
+        }
+      },
+      Math.min(maxDurationMs, DEFAULT_MAX_DURATION_MS),
+    );
+  }, [
+    cleanup,
+    disabled,
+    language,
+    maxDurationMs,
+    onEvent,
+    scoreServiceUrl,
+    startMeter,
+    state,
+    surface.id,
+    targetText,
+  ]);
 
   const stop = useCallback(() => {
     if (recorderRef.current && recorderRef.current.state === "recording") {
-      try { recorderRef.current.stop(); } catch { /* already stopped */ }
+      try {
+        recorderRef.current.stop();
+      } catch {
+        /* already stopped */
+      }
     }
   }, []);
 
@@ -374,12 +405,16 @@ export function VoiceResponseSurface({
             </button>
           </>
         ) : state === "uploading" ? (
-          <p aria-live="polite" aria-atomic="true">Uploading and scoring…</p>
+          <p aria-live="polite" aria-atomic="true">
+            Uploading and scoring…
+          </p>
         ) : (
           <button
             type="button"
             aria-label="record voice answer"
-            onClick={() => { void start(); }}
+            onClick={() => {
+              void start();
+            }}
             disabled={disabled || state === "denied" || state === "unsupported"}
           >
             {recording ? "● Re-record" : "● Record"}
@@ -456,4 +491,3 @@ export function VoiceResponseSurface({
     </section>
   );
 }
-

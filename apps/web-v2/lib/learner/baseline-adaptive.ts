@@ -252,7 +252,8 @@ export function assessFrustration(attempts: BaselineAttempt[]): FrustrationAsses
     if (a.skipped || !a.isCorrect) streak += 1;
     else break;
   }
-  let level: FrustrationLevel = streak >= STREAK_HIGH ? "high" : streak >= STREAK_MILD ? "mild" : "none";
+  let level: FrustrationLevel =
+    streak >= STREAK_HIGH ? "high" : streak >= STREAK_MILD ? "mild" : "none";
 
   const last = ordered[ordered.length - 1];
   if (last && typeof last.latencyMs === "number" && last.latencyMs >= LONG_LATENCY_MS) {

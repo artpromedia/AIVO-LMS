@@ -21,12 +21,7 @@ import { z } from "zod";
 import { serverEnv } from "@/lib/env";
 import { logger } from "@/lib/observability/logger";
 import { newId } from "@/lib/db/store";
-import type {
-  BaselineDifficulty,
-  BaselineQuestion,
-  Skill,
-  Subject,
-} from "@/lib/db/types";
+import type { BaselineDifficulty, BaselineQuestion, Skill, Subject } from "@/lib/db/types";
 
 export const DEFAULT_DISCOVERY_CHAPTER_TIMEOUT_MS = 180_000;
 
@@ -254,14 +249,10 @@ export async function generateDiscoveryChapter(
     });
   } catch (err) {
     clearTimeout(timeoutHandle);
-    const aborted =
-      err instanceof Error && err.name === "AbortError";
+    const aborted = err instanceof Error && err.name === "AbortError";
     const reason: DiscoveryChapterFailureReason = aborted ? "timeout" : "network_error";
     const message = err instanceof Error ? err.message : String(err);
-    logger.warn(
-      { endpoint, reason, message },
-      "baseline-discovery: fetch failed",
-    );
+    logger.warn({ endpoint, reason, message }, "baseline-discovery: fetch failed");
     return { ok: false, reason, message };
   } finally {
     clearTimeout(timeoutHandle);
@@ -339,9 +330,10 @@ export type MapDiscoveryActivitiesInput = {
  * Returns the produced questions plus the next `order` index so a
  * subsequent chapter can continue numbering without collisions.
  */
-export function mapDiscoveryActivitiesToBaselineQuestions(
-  input: MapDiscoveryActivitiesInput,
-): { questions: BaselineQuestion[]; nextOrder: number } {
+export function mapDiscoveryActivitiesToBaselineQuestions(input: MapDiscoveryActivitiesInput): {
+  questions: BaselineQuestion[];
+  nextOrder: number;
+} {
   const { baselineId, chapter, activities, subjects, skills, accommodationTags } = input;
 
   const subject = subjects.find((s) => s.slug === chapter.webV2SubjectSlug);

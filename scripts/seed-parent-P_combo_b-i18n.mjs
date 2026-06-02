@@ -70,7 +70,8 @@ const PARENT = {
       how_collab_works: "How collaboration works",
       collab_parents: "Parents and guardians have full access to all learner data.",
       collab_teachers: "Teachers see classroom-scoped progress and may draft IEP goals.",
-      collab_therapists: "Therapists and caregivers see read-only summaries unless explicitly elevated.",
+      collab_therapists:
+        "Therapists and caregivers see read-only summaries unless explicitly elevated.",
       cancel_invite: "Cancel invite",
       email_address: "Email address",
       relationship_optional: "Relationship (optional)",
@@ -141,9 +142,11 @@ const PARENT = {
       no_members_title: "Aún no hay miembros del equipo",
       primary: "Principal",
       how_collab_works: "Cómo funciona la colaboración",
-      collab_parents: "Los padres y tutores tienen acceso completo a todos los datos del estudiante.",
+      collab_parents:
+        "Los padres y tutores tienen acceso completo a todos los datos del estudiante.",
       collab_teachers: "Los maestros ven el progreso del aula y pueden redactar objetivos IEP.",
-      collab_therapists: "Los terapeutas y cuidadores ven resúmenes de solo lectura a menos que se les eleve explícitamente.",
+      collab_therapists:
+        "Los terapeutas y cuidadores ven resúmenes de solo lectura a menos que se les eleve explícitamente.",
       cancel_invite: "Cancelar invitación",
       email_address: "Dirección de correo electrónico",
       relationship_optional: "Relación (opcional)",
@@ -214,9 +217,12 @@ const PARENT = {
       no_members_title: "Aucun membre de l'équipe pour l'instant",
       primary: "Principal(e)",
       how_collab_works: "Comment fonctionne la collaboration",
-      collab_parents: "Les parents et tuteurs ont un accès complet à toutes les données de l'apprenant.",
-      collab_teachers: "Les enseignants voient les progrès dans la classe et peuvent rédiger des objectifs IEP.",
-      collab_therapists: "Les thérapeutes et accompagnants voient des résumés en lecture seule, sauf élévation explicite.",
+      collab_parents:
+        "Les parents et tuteurs ont un accès complet à toutes les données de l'apprenant.",
+      collab_teachers:
+        "Les enseignants voient les progrès dans la classe et peuvent rédiger des objectifs IEP.",
+      collab_therapists:
+        "Les thérapeutes et accompagnants voient des résumés en lecture seule, sauf élévation explicite.",
       cancel_invite: "Annuler l'invitation",
       email_address: "Adresse e-mail",
       relationship_optional: "Relation (facultatif)",
@@ -287,9 +293,11 @@ const PARENT = {
       no_members_title: "Noch keine Teammitglieder",
       primary: "Primär",
       how_collab_works: "Wie die Zusammenarbeit funktioniert",
-      collab_parents: "Eltern und Erziehungsberechtigte haben vollen Zugriff auf alle Lernendendaten.",
+      collab_parents:
+        "Eltern und Erziehungsberechtigte haben vollen Zugriff auf alle Lernendendaten.",
       collab_teachers: "Lehrkräfte sehen klassenweite Fortschritte und können IEP-Ziele entwerfen.",
-      collab_therapists: "Therapeuten und Betreuungspersonen sehen schreibgeschützte Zusammenfassungen, sofern sie nicht ausdrücklich erweitert wurden.",
+      collab_therapists:
+        "Therapeuten und Betreuungspersonen sehen schreibgeschützte Zusammenfassungen, sofern sie nicht ausdrücklich erweitert wurden.",
       cancel_invite: "Einladung abbrechen",
       email_address: "E-Mail-Adresse",
       relationship_optional: "Beziehung (optional)",
@@ -362,7 +370,8 @@ const PARENT = {
       how_collab_works: "Como funciona a colaboração",
       collab_parents: "Pais e responsáveis têm acesso completo a todos os dados do aluno.",
       collab_teachers: "Professores veem o progresso da turma e podem redigir objetivos de IEP.",
-      collab_therapists: "Terapeutas e cuidadores veem resumos somente leitura, salvo elevação explícita.",
+      collab_therapists:
+        "Terapeutas e cuidadores veem resumos somente leitura, salvo elevação explícita.",
       cancel_invite: "Cancelar convite",
       email_address: "Endereço de e-mail",
       relationship_optional: "Relacionamento (opcional)",
@@ -508,7 +517,8 @@ const PARENT = {
       how_collab_works: "コラボレーションの仕組み",
       collab_parents: "保護者は学習者のすべてのデータにフルアクセスできます。",
       collab_teachers: "教師はクラス単位の進捗を確認でき、IEP 目標を作成できます。",
-      collab_therapists: "セラピストとケアギバーは明示的に権限昇格されない限り、読み取り専用の要約のみ閲覧できます。",
+      collab_therapists:
+        "セラピストとケアギバーは明示的に権限昇格されない限り、読み取り専用の要約のみ閲覧できます。",
       cancel_invite: "招待をキャンセル",
       email_address: "メールアドレス",
       relationship_optional: "続柄（任意）",
@@ -581,7 +591,8 @@ const PARENT = {
       how_collab_works: "협력 방식 안내",
       collab_parents: "부모와 보호자는 학습자의 모든 데이터에 완전히 접근할 수 있습니다.",
       collab_teachers: "교사는 학급 범위의 진도를 확인하고 IEP 목표를 작성할 수 있습니다.",
-      collab_therapists: "치료사와 돌봄 제공자는 명시적으로 권한이 부여되지 않는 한 읽기 전용 요약만 볼 수 있습니다.",
+      collab_therapists:
+        "치료사와 돌봄 제공자는 명시적으로 권한이 부여되지 않는 한 읽기 전용 요약만 볼 수 있습니다.",
       cancel_invite: "초대 취소",
       email_address: "이메일 주소",
       relationship_optional: "관계 (선택 사항)",
@@ -654,7 +665,8 @@ const PARENT = {
       how_collab_works: "كيف تعمل التعاون",
       collab_parents: "للآباء والأوصياء وصول كامل إلى جميع بيانات المتعلّم.",
       collab_teachers: "يرى المعلمون التقدّم على مستوى الفصل ويمكنهم صياغة أهداف IEP.",
-      collab_therapists: "يرى المعالجون ومقدّمو الرعاية ملخّصات للقراءة فقط ما لم يُمنحوا صلاحيات صريحة.",
+      collab_therapists:
+        "يرى المعالجون ومقدّمو الرعاية ملخّصات للقراءة فقط ما لم يُمنحوا صلاحيات صريحة.",
       cancel_invite: "إلغاء الدعوة",
       email_address: "عنوان البريد الإلكتروني",
       relationship_optional: "العلاقة (اختياري)",
@@ -727,7 +739,8 @@ const PARENT = {
       how_collab_works: "सहयोग कैसे काम करता है",
       collab_parents: "माता-पिता और अभिभावकों के पास सभी सीखने वाले डेटा तक पूर्ण पहुँच है।",
       collab_teachers: "शिक्षक कक्षा-स्तरीय प्रगति देख सकते हैं और IEP लक्ष्य तैयार कर सकते हैं।",
-      collab_therapists: "चिकित्सक और देखभालकर्ता केवल-पढ़ने-योग्य सारांश देखते हैं, जब तक उन्हें स्पष्ट रूप से उन्नत न किया जाए।",
+      collab_therapists:
+        "चिकित्सक और देखभालकर्ता केवल-पढ़ने-योग्य सारांश देखते हैं, जब तक उन्हें स्पष्ट रूप से उन्नत न किया जाए।",
       cancel_invite: "आमंत्रण रद्द करें",
       email_address: "ईमेल पता",
       relationship_optional: "संबंध (वैकल्पिक)",

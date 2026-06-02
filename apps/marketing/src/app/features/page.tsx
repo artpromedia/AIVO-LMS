@@ -36,9 +36,7 @@ export default async function FeaturesPage() {
   return (
     <main id="main" className="mx-auto max-w-4xl px-6 py-16">
       <p className="text-sm font-medium uppercase tracking-wide text-aivo-purple">{t("eyebrow")}</p>
-      <h1 className="mt-2 font-display text-4xl font-bold">
-        {t("heading")}
-      </h1>
+      <h1 className="mt-2 font-display text-4xl font-bold">{t("heading")}</h1>
       <p className="mt-3 text-aivo-ink-soft">
         AIVO is built around three flows learners use every day. Each one is adaptive, accessible,
         and grounded in the learner's IEP and brain profile.

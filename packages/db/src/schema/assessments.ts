@@ -243,7 +243,9 @@ export const baselineItemResponseLogs = pgTable(
 export const iepDrafts = pgTable("iep_drafts", {
   id: uuid("id").defaultRandom().primaryKey(),
   tenantId: uuid("tenant_id").references(() => tenants.id),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   /** Source attempt that fed the draft. Nullable when generated from
    *  parent assessment only (no completed baseline yet). */
   sourceAttemptId: uuid("source_attempt_id").references(() => assessmentAttempts.id),
@@ -275,7 +277,9 @@ export const iepDrafts = pgTable("iep_drafts", {
 export const baselineItemAudits = pgTable("baseline_item_audits", {
   id: uuid("id").defaultRandom().primaryKey(),
   tenantId: uuid("tenant_id").references(() => tenants.id),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   /** Stable id of the question evaluated (e.g. `m3`). */
   questionId: varchar("question_id", { length: 200 }).notNull(),
   /** One of math / ela / science / speech / sel / life_skills / executive_function. */

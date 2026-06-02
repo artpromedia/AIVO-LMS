@@ -25,8 +25,7 @@
  * generated at most once across the fleet.
  */
 
-const TWEMOJI_CDN_BASE =
-  "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg";
+const TWEMOJI_CDN_BASE = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg";
 
 /**
  * Read the ai-svc baseline-image endpoint base URL from the environment.
@@ -266,9 +265,7 @@ export interface ResolveBaselineImageInput {
  * function — safe to call on the server during baseline creation OR on
  * the client while rendering.
  */
-export function resolveBaselineImage(
-  input: ResolveBaselineImageInput,
-): ResolvedBaselineImage {
+export function resolveBaselineImage(input: ResolveBaselineImageInput): ResolvedBaselineImage {
   if (input.imageUrl) {
     return {
       imageUrl: input.imageUrl,
@@ -279,8 +276,7 @@ export function resolveBaselineImage(
   if (input.sceneEmoji) {
     // Prefer the ai-svc endpoint when configured — it either generates a
     // real cartoon picture for the concept or 302s back to Twemoji.
-    const url =
-      aiSvcImageUrl(input.sceneEmoji) ?? emojiToImageUrl(input.sceneEmoji);
+    const url = aiSvcImageUrl(input.sceneEmoji) ?? emojiToImageUrl(input.sceneEmoji);
     if (url) {
       return {
         imageUrl: url,

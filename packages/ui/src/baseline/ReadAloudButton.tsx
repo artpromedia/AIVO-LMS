@@ -87,7 +87,12 @@ export function ReadAloudButton({
 
   if (href) {
     return (
-      <a href={href} aria-label={ariaLabel} aria-pressed={playing || undefined} className={baseClass}>
+      <a
+        href={href}
+        aria-label={ariaLabel}
+        aria-pressed={playing || undefined}
+        className={baseClass}
+      >
         {content}
       </a>
     );

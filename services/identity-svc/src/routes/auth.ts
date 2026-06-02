@@ -1482,9 +1482,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
     return crypto.createHash("sha256").update(raw).digest("hex");
   }
 
-  type InviteLookup =
-    | { ok: true; invite: any }
-    | { ok: false; status: number; error: string };
+  type InviteLookup = { ok: true; invite: any } | { ok: false; status: number; error: string };
 
   async function lookupValidInvite(db: any, token: string): Promise<InviteLookup> {
     const tokenHash = hashInviteToken(token);

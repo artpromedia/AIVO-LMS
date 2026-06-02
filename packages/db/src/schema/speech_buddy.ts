@@ -28,10 +28,7 @@ export const speechBuddyConsents = pgTable(
     revokedAt: timestamp("revoked_at", { withTimezone: true }),
   },
   (t) => ({
-    tenantLearnerIdx: index("speech_buddy_consents_tenant_learner_idx").on(
-      t.tenantId,
-      t.learnerId,
-    ),
+    tenantLearnerIdx: index("speech_buddy_consents_tenant_learner_idx").on(t.tenantId, t.learnerId),
     learnerIdx: index("speech_buddy_consents_learner_idx").on(t.learnerId),
   }),
 );

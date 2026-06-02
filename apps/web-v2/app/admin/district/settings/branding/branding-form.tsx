@@ -95,9 +95,7 @@ export function BrandingForm({
           maxLength={120}
           className="mt-1"
         />
-        <p className="mt-1 text-xs text-aivo-ink-soft">
-          {t("display_name_hint")}
-        </p>
+        <p className="mt-1 text-xs text-aivo-ink-soft">{t("display_name_hint")}</p>
       </div>
 
       <div>
@@ -111,9 +109,7 @@ export function BrandingForm({
           placeholder="support@district.org"
           className="mt-1"
         />
-        <p className="mt-1 text-xs text-aivo-ink-soft">
-          {t("support_email_hint")}
-        </p>
+        <p className="mt-1 text-xs text-aivo-ink-soft">{t("support_email_hint")}</p>
       </div>
 
       <div>

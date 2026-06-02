@@ -42,9 +42,7 @@ export function DrawingCanvas({
   const [useHighContrastPalette, setUseHighContrastPalette] = useState(false);
   const colors = useMemo(
     () =>
-      useHighContrastPalette
-        ? (highContrastPalette ?? DEFAULT_HIGH_CONTRAST_PALETTE)
-        : palette,
+      useHighContrastPalette ? (highContrastPalette ?? DEFAULT_HIGH_CONTRAST_PALETTE) : palette,
     [highContrastPalette, palette, useHighContrastPalette],
   );
 
@@ -93,7 +91,9 @@ export function DrawingCanvas({
         y: clamp(current.y + dy, 0, height),
       };
       if (activeKeyboardStroke) {
-        setActiveKeyboardStroke(appendStrokePoint(activeKeyboardStroke, { ...next, t: Date.now() }));
+        setActiveKeyboardStroke(
+          appendStrokePoint(activeKeyboardStroke, { ...next, t: Date.now() }),
+        );
       }
       return next;
     });
@@ -163,13 +163,7 @@ export function DrawingCanvas({
             finishKeyboardStroke();
           } else if (tool !== "eraser") {
             setActiveKeyboardStroke(
-              createStroke(
-                "pencil",
-                { ...cursor, t: Date.now() },
-                3,
-                undefined,
-                selectedColor,
-              ),
+              createStroke("pencil", { ...cursor, t: Date.now() }, 3, undefined, selectedColor),
             );
           }
         }
@@ -182,7 +176,11 @@ export function DrawingCanvas({
       <p id={`${surfaceId}-drawing-help`} style={{ fontSize: "0.875em" }}>
         {keyboardHelp}
       </p>
-      <div role="toolbar" aria-label="drawing tools" style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+      <div
+        role="toolbar"
+        aria-label="drawing tools"
+        style={{ display: "flex", gap: 8, marginBottom: 8 }}
+      >
         <button
           type="button"
           aria-label="pen"
@@ -239,7 +237,10 @@ export function DrawingCanvas({
         })}
       </div>
 
-      <div style={{ position: "relative", width, height, ...guidesStyle }} data-testid="drawing-canvas-frame">
+      <div
+        style={{ position: "relative", width, height, ...guidesStyle }}
+        data-testid="drawing-canvas-frame"
+      >
         <InkCanvas
           surfaceId={surfaceId}
           width={width}
@@ -257,23 +258,34 @@ export function DrawingCanvas({
           style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
           aria-hidden="true"
         >
-          {[...keyboardStrokes, ...(activeKeyboardStroke ? [activeKeyboardStroke] : [])].map((stroke) => {
-            if (stroke.points.length === 0) return null;
-            const [first, ...rest] = stroke.points;
-            const d = [`M ${first.x} ${first.y}`, ...rest.map((p) => `L ${p.x} ${p.y}`)].join(" ");
-            return (
-              <path
-                key={stroke.id}
-                d={d}
-                fill="none"
-                stroke={stroke.color ?? "#1f2937"}
-                strokeWidth={stroke.width}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            );
-          })}
-          <circle cx={cursor.x} cy={cursor.y} r={4} fill="none" stroke="#111827" strokeWidth={1.5} />
+          {[...keyboardStrokes, ...(activeKeyboardStroke ? [activeKeyboardStroke] : [])].map(
+            (stroke) => {
+              if (stroke.points.length === 0) return null;
+              const [first, ...rest] = stroke.points;
+              const d = [`M ${first.x} ${first.y}`, ...rest.map((p) => `L ${p.x} ${p.y}`)].join(
+                " ",
+              );
+              return (
+                <path
+                  key={stroke.id}
+                  d={d}
+                  fill="none"
+                  stroke={stroke.color ?? "#1f2937"}
+                  strokeWidth={stroke.width}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              );
+            },
+          )}
+          <circle
+            cx={cursor.x}
+            cy={cursor.y}
+            r={4}
+            fill="none"
+            stroke="#111827"
+            strokeWidth={1.5}
+          />
         </svg>
       </div>
     </section>

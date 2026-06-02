@@ -39,12 +39,12 @@ compatible) and `aivo-platform` (best-of-breed admin UI).
 
 There are effectively **two parallel implementations** of most flows:
 
-| | "Demo track" (what ships by default) | "Real track" (exists, mostly unwired) |
-|---|---|---|
-| Persistence | `globalThis` Maps / `AIVO_PERSISTENCE=memory` | Drizzle + Postgres adapters, real migrations |
-| Auth | `AUTH_MODE=mock`, `MOCK_USERS` | `identity-svc` login + MFA + step-up |
-| Staff invites | in-memory registry, plaintext temp password, no email | `districtAdminInvites` (token-hashed) + Postmark via `comms-svc` |
-| AI tutor / TTS / speech | `provider=mock` fake output | provider adapters (some still stubbed) |
+|                         | "Demo track" (what ships by default)                  | "Real track" (exists, mostly unwired)                            |
+| ----------------------- | ----------------------------------------------------- | ---------------------------------------------------------------- |
+| Persistence             | `globalThis` Maps / `AIVO_PERSISTENCE=memory`         | Drizzle + Postgres adapters, real migrations                     |
+| Auth                    | `AUTH_MODE=mock`, `MOCK_USERS`                        | `identity-svc` login + MFA + step-up                             |
+| Staff invites           | in-memory registry, plaintext temp password, no email | `districtAdminInvites` (token-hashed) + Postmark via `comms-svc` |
+| AI tutor / TTS / speech | `provider=mock` fake output                           | provider adapters (some still stubbed)                           |
 
 `apps/web-v2/lib/env.ts` defaults: `AUTH_MODE=mock`, `AI_PROVIDER=mock`, `AIVO_PERSISTENCE=memory`,
 `TTS_PROVIDER` → mock, `NEXT_PUBLIC_APP_URL=http://localhost:5000`. Production guards exist (the env
@@ -97,6 +97,7 @@ real Postmark + durable outbox), behind real JWT + step-up. **web-v2's identity-
 ### What to port (fastest path to enterprise grade)
 
 From **`aivo-ai-learning`** (drop-in — shares our `enterprise-core`, drizzle, admin shell):
+
 - `apps/web/src/app/dashboard/district/settings/admins/page.tsx` — peer-admin invite / deactivate /
   resend / revoke / temp-password reset, every mutation via `fetchWithStepUp`. Direct upgrade for our
   `admin/district/staff`.
@@ -104,6 +105,7 @@ From **`aivo-ai-learning`** (drop-in — shares our `enterprise-core`, drizzle, 
   CRUD.
 
 From **`aivo-platform`** (best-of-breed UI, light adaptation):
+
 - `apps/web-district/app/onboarding/setup/steps/InviteAdminsStep.tsx` — the clean
   `role: 'DISTRICT_ADMIN' | 'SCHOOL_ADMIN' | 'TEACHER'` cascade primitive.
 - `apps/web-district/app/users/import/page.tsx` — **bulk CSV admin/roster import** (we lack this).
@@ -119,6 +121,7 @@ teacher-create UI. Mostly porting, not greenfield.
 ## 3. Platform-wide critical blockers (beyond the admin flow)
 
 ### Tier 1 — data-loss / scalability (CRITICAL)
+
 1. `services/identity-svc/src/routes/oidc-provider.ts` — OIDC auth codes in-memory, **single-replica
    only** (`TODO: move to Redis`). **Breaks horizontal scaling / rolling deploys outright.**
 2. `services/recommendation-svc` — entire recommendation + profile store is `new Map()`.
@@ -130,6 +133,7 @@ teacher-create UI. Mostly porting, not greenfield.
 6. `apps/web-v2` `AIVO_PERSISTENCE=memory` default — most domains process-local unless flags flipped.
 
 ### Tier 2 — fake output served as real (HIGH)
+
 - `AUTH_MODE` default `mock`; AI tutor default `mock`; TTS default `mock` (prod adapter **throws**);
   `speech-eval-svc` default `SPEECH_EVAL_MODE=mock` (random scores with `degraded:true`); push
   notifications in `comms-svc` are a **stub** (not delivered).
@@ -137,6 +141,7 @@ teacher-create UI. Mostly porting, not greenfield.
 - `apps/marketing` contact route — leads `console.log`'d, not delivered, when `ADMIN_SVC_URL` unset.
 
 ### Tier 3 — enterprise features off by default (MEDIUM)
+
 `packages/feature-flags/src/enterprise-flags.ts` ships 10 flags `false`: `sisSync`, `lti13`,
 `dataGovernanceCenter`, `districtEnterpriseMode`, `responsibleAiGuardrails`, `problemSessionLedger`,
 `tutorSurfaceProtocol`, `profileRecommendationsV2`, `advancedContentGenerators`, `selfRegulationHub`.
@@ -152,6 +157,7 @@ real auth wired to `identity-svc`, error/not-found/global-error + per-role loadi
 request-id middleware, `no-demo-prod-scan.mjs` gate.
 
 **Blockers (ranked):**
+
 1. **`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` not in env template** — only a code comment warns. Without a
    stable key, login Server Actions 404 (`UnrecognizedActionError`) across replicas / redeploys.
 2. **Production env wiring** — must set `DATABASE_URL`, `REDIS_URL`, real `SESSION_SECRET` (≥32, non-
@@ -173,6 +179,7 @@ versioning + autoIncrement, 1024² icon + splash, `scheme: "aivo"`, iOS `associa
 **Blockers (ranked):**
 
 _Apple App Store_
+
 1. **AASA `TEAMID` placeholder** — `apps/web-v2/public/.well-known/apple-app-site-association` still has
    `TEAMID.com.artpromedia.aivo`. Universal links won't verify until the real Apple Team ID is inserted.
 2. **Missing `PrivacyInfo.xcprivacy`** — Apple rejects data-collecting apps (we use SecureStore /
@@ -182,6 +189,7 @@ _Apple App Store_
 5. **Empty `submit.production` in `eas.json`** — no Team ID / ASC app id / App Store Connect API key.
 
 _Google Play_
+
 1. **`assetlinks.json` placeholder fingerprint** (`AA:BB:CC:…`) — App Links won't verify until the real
    Play signing SHA-256 is inserted.
 2. **Zero screenshots** — `store-assets/screenshots/android/**` empty.
@@ -198,8 +206,8 @@ pen-test items, plus developer-account artifacts.
 
 1. **`aivo-ai-learning`** — confirmed upstream; **highest copy-compatibility**. Port: full
    district/admin pages, **SCIM 2.0 + SAML SSO** (`identity-svc/src/routes/scim.ts` + `0007_sso_scim.sql`
-   + district SSO page), `packages/security/src/flags.ts` (typed flags incl. `AUDIT_IMMUTABLE`,
-   `STEP_UP_AUTH`), hardened `admin-session.ts`, hash-chained `admin_audit_log` (+ impersonation column).
+   - district SSO page), `packages/security/src/flags.ts` (typed flags incl. `AUDIT_IMMUTABLE`,
+     `STEP_UP_AUTH`), hardened `admin-session.ts`, hash-chained `admin_audit_log` (+ impersonation column).
 2. **`aivo-platform`** — best **admin UI**: `libs/ts-rbac` permission matrix (TS+Python), bulk CSV
    import, tenant-management + feature-flag platform console, impersonation console, billing/contracts,
    `InviteAdminsStep.tsx` cascade primitive.
@@ -207,13 +215,14 @@ pen-test items, plus developer-account artifacts.
    enum if we want finance/IT/legal sub-admins. Reference only.
 4. **`aivo`** — polished but mock-driven RBAC-delegation + provisioning-wizard UI. Design reference only.
 
-_(Empty/irrelevant: `aivo-learning`, `aivolearning_`, `aivo-learning-saas`.)_
+_(Empty/irrelevant: `aivo-learning`, `aivolearning_`, `aivo-learning-saas`.)\_
 
 ---
 
 ## 7. Prioritized remediation roadmap
 
 ### Phase 0 — Make "real mode" the default & safe (1–2 days)
+
 - Add to `.env.example` + deploy docs: `AIVO_PERSISTENCE=postgres`, `AUTH_MODE`, `DATABASE_URL`,
   `REDIS_URL`, `SESSION_SECRET`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`, `NEXT_PUBLIC_APP_URL`,
   `EXPO_PUBLIC_API_URL`, provider keys.
@@ -221,6 +230,7 @@ _(Empty/irrelevant: `aivo-learning`, `aivolearning_`, `aivo-learning-saas`.)_
   stubbed push in production (fail fast, don't degrade silently).
 
 ### Phase 1 — Make the admin creation flows real (the headline ask) (3–6 days)
+
 - Wire `admin/district/staff` actions to `identity-svc POST /api/district/admins` + `comms-svc` email;
   delete the `globalThis` invite store + on-screen temp-password panel.
 - Build the **invite-acceptance route** (token → create `users` row → set password → mark `acceptedAt`)
@@ -230,16 +240,19 @@ _(Empty/irrelevant: `aivo-learning`, `aivolearning_`, `aivo-learning-saas`.)_
 - Adopt the `aivo-platform` `InviteAdminsStep` cascade UI + central permission matrix.
 
 ### Phase 2 — Persistence & scale hardening (3–5 days)
+
 - Move identity-svc OIDC codes to **Redis** (multi-replica blocker). Remove in-memory fallbacks in
   `audit-svc`, `problem-session-svc`, `homework-svc`, `recommendation-svc`, `admin-svc` content packs —
   or refuse prod boot when `DATABASE_URL` is unset.
 
 ### Phase 3 — Providers & enterprise features (parallel, scope to pilot)
+
 - Wire real AI/TTS/speech providers (or explicitly disable those surfaces for the pilot).
 - Enable the enterprise flags the pilot actually needs (`districtEnterpriseMode`, `sisSync`, etc.).
 - Optional: port SCIM/SSO + immutable audit from `aivo-ai-learning` for enterprise pilots.
 
 ### Phase 4 — Store submission artifacts (2–3 days, partly non-engineering)
+
 - Insert real Apple Team ID (AASA) + Play signing SHA-256 (assetlinks); run the well-known smoke gate.
 - Add `PrivacyInfo.xcprivacy`; produce screenshots; fill ASC Nutrition Labels + Play Data Safety from a
   data-collection inventory; publish privacy-policy + support URLs; complete `eas.json submit.production`.
@@ -266,12 +279,13 @@ Worked on branch `claude/gifted-heisenberg-V9YJm`. Approach chosen: **real-auth 
 (dual-mode), teachers onboarded via **email invite + set-password** (no out-of-band temp passwords).
 
 **DONE**
+
 - **Invite-acceptance keystone (the universally-missing piece).** `identity-svc`
   `GET /api/auth/invite/:token` + `POST /api/auth/accept-invite`: validates the hashed token, enforces
   password policy, creates the `users` row (role + school from the invite), marks the invite accepted
-  (`acceptedAt` + `acceptedUserId`), audit-logs, and auto-logs the user in. Works for DISTRICT_ADMIN,
-  SCHOOL_ADMIN, and TEACHER. DB-backed tests added. _Previously even the real backend had no production
-  route to consume an invite token — this unblocks every staff invite._
+  (`acceptedAt` + `acceptedUserId`), audit-logs, and auto-logs the user in. Works for DISTRICT*ADMIN,
+  SCHOOL_ADMIN, and TEACHER. DB-backed tests added. \_Previously even the real backend had no production
+  route to consume an invite token — this unblocks every staff invite.*
 - **Web acceptance flow.** `/accept-invite?token=…` now previews the invite and shows a real "set your
   password" form (BFF helpers `identityInvitePreview` / `identityAcceptInvite`), persists the session
   (auto-login), and redirects to the role home. Learner care-team flow unchanged.
@@ -293,7 +307,8 @@ Worked on branch `claude/gifted-heisenberg-V9YJm`. Approach chosen: **real-auth 
   `identityCreateAdminInvite`, `identityRevokeAdminInvite`.
 
 **REMAINING (smaller follow-ups)**
-- The district page's **stats cards + active-staff table** are still demo read models (the *creation*
+
+- The district page's **stats cards + active-staff table** are still demo read models (the _creation_
   flow is real; these read surfaces are display-only and not yet sourced from the backend).
 - **Step-up:** `POST /api/district/admins` is behind `requireStepUp`, which is flag-gated **off** by
   default — not a blocker for the default pilot, but when `STEP_UP_AUTH` is enabled the district console
@@ -406,7 +421,7 @@ ever worked on test-seeded data, and any record vanished on restart. A complete 
 existed but was unwired (its own header said production should "use it as the source of truth").
 
 - New `recommendation-store.ts` — `RecommendationStore` interface + `InMemoryRecommendationStore` (dev/tests)
-  + `ProfileStore` for the scratch BrainProfile. `DrizzleRecommendationStore` satisfies the interface.
+  - `ProfileStore` for the scratch BrainProfile. `DrizzleRecommendationStore` satisfies the interface.
 - `server.ts` selects the store: **Postgres when `DATABASE_URL` is set, refused in production when unset**
   (consistent with audit/problem-session/homework). Both route modules share one store instance.
 - The candidates endpoint now **persists** generated recommendations (the create point), so they are

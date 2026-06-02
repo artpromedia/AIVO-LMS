@@ -49,7 +49,7 @@ export type VoiceId =
   | "narrator_low"
   | "narrator_high";
 
-export const VOICES: ReadonlyArray<{ id: VoiceId; label: string }> = [
+export const VOICES: readonly { id: VoiceId; label: string }[] = [
   { id: "kid_friendly", label: "Kid-friendly" },
   { id: "warm_female", label: "Warm (female)" },
   { id: "warm_male", label: "Warm (male)" },

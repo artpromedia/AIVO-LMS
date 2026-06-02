@@ -108,14 +108,13 @@ function assertProductionEnv(): void {
   if (!problems.length) return;
 
   if (isProd) {
-    /* eslint-disable no-console */
     console.error("[identity-svc] FATAL: production environment validation failed:");
     for (const p of problems) console.error(`  - ${p}`);
     console.error(
       "Fix the deployment secrets and redeploy. See docs/auth/scim-provisioning.md and " +
         "docs/deploy/rollback-runbook.md for guidance.",
     );
-    /* eslint-enable no-console */
+
     process.exit(1);
   }
   for (const p of problems) logger.warn(`[env] ${p}`);

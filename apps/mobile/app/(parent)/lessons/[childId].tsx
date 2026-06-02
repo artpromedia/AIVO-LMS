@@ -11,7 +11,7 @@ import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card } from "@/components/ui";
 import { LoadingState, EmptyState } from "@aivo/mobile-ui";
 import { subjectAccent } from "@/lib/subject-display";
-import { spacing, radius } from "@/constants/colors";
+import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 function fmtDate(iso?: string | null): string {

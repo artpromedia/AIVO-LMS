@@ -2,11 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
-import {
-  AssessmentShell,
-  ReassuranceCard,
-  InsightChip,
-} from "@aivo/ui";
+import { AssessmentShell, ReassuranceCard, InsightChip } from "@aivo/ui";
 import {
   getActiveBaselineForLearner,
   getIEPForLearner,
@@ -30,7 +26,7 @@ export default async function BaselineSummaryPage({
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.learner_baseline_summary");
   const { learnerId } = await params;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -40,9 +36,7 @@ export default async function BaselineSummaryPage({
     return (
       <AssessmentShell eyebrow={`Baseline summary for ${learner.displayName}`}>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-6 md:p-8 flex flex-col gap-4">
-          <h1 className="text-2xl font-semibold text-iw-text-strong">
-            {t("no_baseline_yet")}
-          </h1>
+          <h1 className="text-2xl font-semibold text-iw-text-strong">{t("no_baseline_yet")}</h1>
           <p className="text-sm text-iw-text-muted leading-relaxed">
             Once your learner finishes the baseline, you'll see a calm summary here — including
             which skills lessons will start with and the personalization signals that stay applied.
@@ -155,7 +149,8 @@ export default async function BaselineSummaryPage({
                 </InsightChip>
               </header>
               <p className="text-xs text-iw-text-muted">
-                Answered {s.answered}{s.correct > 0 ? <> · {s.correct} on the first try</> : null}
+                Answered {s.answered}
+                {s.correct > 0 ? <> · {s.correct} on the first try</> : null}
               </p>
               <div
                 className="relative h-1.5 rounded-full bg-[var(--aivo-color-surface-sunken)] overflow-hidden"
@@ -182,9 +177,7 @@ export default async function BaselineSummaryPage({
           <p className="text-sm leading-relaxed text-iw-text-strong">
             {summary.learnerSafeSummary}
           </p>
-          <p className="text-xs text-iw-text-muted mt-1">
-            {t("learner_only_version_note")}
-          </p>
+          <p className="text-xs text-iw-text-muted mt-1">{t("learner_only_version_note")}</p>
         </article>
       </section>
 

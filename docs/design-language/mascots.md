@@ -9,6 +9,7 @@ Each mascot has six expressions: `idle`, `happy`, `thinking`, `celebrating`, `en
 Asset path: `packages/brand/assets/mascots/`
 
 Voice guidance:
+
 - short, encouraging phrases
 - never shaming language
 - clear, confidence-building prompts

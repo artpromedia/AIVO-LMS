@@ -35,13 +35,7 @@ import PixiBrainSphere from "@/components/brain/pixi-brain-sphere";
 
 type PulseRate = "calm" | "steady" | "energetic";
 
-type Phase =
-  | "gathering"
-  | "convergence"
-  | "formation"
-  | "memories"
-  | "reveal"
-  | "settling";
+type Phase = "gathering" | "convergence" | "formation" | "memories" | "reveal" | "settling";
 
 // Phase durations in ms. Total ~22s, paced so the parent watch view can
 // keep up without feeling rushed. Reduced-motion users see one

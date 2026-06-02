@@ -106,20 +106,17 @@ const baseVarsLegacy = flatten({
 const baseVars = [...baseVarsNamespaced, ...baseVarsLegacy];
 
 const themeVars = Object.entries(tokens.modes.theme).map(([name, values]) =>
-  cssBlock(`[data-theme=\"${name}\"]`,
-    flatten({ theme: values }),
-  ));
+  cssBlock(`[data-theme=\"${name}\"]`, flatten({ theme: values })),
+);
 
 const ageVars = Object.entries(tokens.modes.age).map(([name, values]) =>
-  cssBlock(`[data-age-mode=\"${name}\"]`,
-    flatten({ age: values }),
-  ));
+  cssBlock(`[data-age-mode=\"${name}\"]`, flatten({ age: values })),
+);
 
 const sensoryVars = tokens.modes.sensory
   ? Object.entries(tokens.modes.sensory).map(([name, values]) =>
-      cssBlock(`[data-sensory-mode=\"${name}\"]`,
-        flatten({ sensory: values }),
-      ))
+      cssBlock(`[data-sensory-mode=\"${name}\"]`, flatten({ sensory: values })),
+    )
   : [];
 
 // Emit the "standard" sensory mode defaults under :root so apps that
@@ -156,7 +153,9 @@ const css = [
   `.aivo-motion-indeterminate { animation: aivo-indeterminate 1600ms cubic-bezier(0.65, 0, 0.35, 1) infinite; }`,
   // Reduced-motion: collapse durations + skip transforms, keep opacity finals.
   "@media (prefers-reduced-motion: reduce) { :root { --aivo-motion-duration-fast: 0ms; --aivo-motion-duration-base: 0ms; --aivo-motion-duration-slow: 0ms; --aivo-motion-duration-playful: 0ms; --aivo-motion-duration-aiThinking: 0ms; --aivo-motion-duration-lessonReveal: 0ms; --aivo-motion-duration-masteryUp: 0ms; --aivo-motion-duration-approve: 0ms; --aivo-motion-duration-baselineGen: 0ms; --aivo-sensory-motionScale: 0; } .aivo-motion-ai-thinking, .aivo-motion-lesson-reveal, .aivo-motion-mastery-up, .aivo-motion-approve, .aivo-motion-baseline-gen, .aivo-motion-indeterminate { animation: none !important; transform: none !important; } }",
-].filter(Boolean).join("\n\n");
+]
+  .filter(Boolean)
+  .join("\n\n");
 
 const ts = `export const playfulCalmTokens = ${JSON.stringify(tokens, null, 2)} as const;\nexport type PlayfulCalmTokens = typeof playfulCalmTokens;\n`;
 

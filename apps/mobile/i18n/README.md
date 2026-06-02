@@ -6,18 +6,18 @@ and the repo-level `pnpm i18n:audit` gate.
 
 ## Locale inventory
 
-| Locale | File | Direction | Native name | Status |
-|---|---|---|---|---|
-| `en` | `en.json` | LTR | English | Source of truth — 804 keys |
-| `es` | `es.json` | LTR | Español | Largely translated (~42 strings still match en) |
-| `fr` | `fr.json` | LTR | Français | Skeleton — ~615 strings still match en |
-| `de` | `de.json` | LTR | Deutsch | Skeleton — ~611 strings still match en |
-| `pt` | `pt.json` | LTR | Português | Skeleton — ~613 strings still match en |
-| `ar` | `ar.json` | **RTL** | العربية | Skeleton — ~613 strings still match en |
-| `hi` | `hi.json` | LTR | हिन्दी | Skeleton — ~613 strings still match en |
-| `ja` | `ja.json` | LTR | 日本語 | Skeleton — ~613 strings still match en |
-| `ko` | `ko.json` | LTR | 한국어 | Skeleton — ~613 strings still match en |
-| `zh` | `zh.json` | LTR | 中文 | Skeleton — ~613 strings still match en |
+| Locale | File      | Direction | Native name | Status                                          |
+| ------ | --------- | --------- | ----------- | ----------------------------------------------- |
+| `en`   | `en.json` | LTR       | English     | Source of truth — 804 keys                      |
+| `es`   | `es.json` | LTR       | Español     | Largely translated (~42 strings still match en) |
+| `fr`   | `fr.json` | LTR       | Français    | Skeleton — ~615 strings still match en          |
+| `de`   | `de.json` | LTR       | Deutsch     | Skeleton — ~611 strings still match en          |
+| `pt`   | `pt.json` | LTR       | Português   | Skeleton — ~613 strings still match en          |
+| `ar`   | `ar.json` | **RTL**   | العربية     | Skeleton — ~613 strings still match en          |
+| `hi`   | `hi.json` | LTR       | हिन्दी      | Skeleton — ~613 strings still match en          |
+| `ja`   | `ja.json` | LTR       | 日本語      | Skeleton — ~613 strings still match en          |
+| `ko`   | `ko.json` | LTR       | 한국어      | Skeleton — ~613 strings still match en          |
+| `zh`   | `zh.json` | LTR       | 中文        | Skeleton — ~613 strings still match en          |
 
 ## Workflow
 

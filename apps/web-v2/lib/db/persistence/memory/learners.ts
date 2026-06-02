@@ -9,11 +9,7 @@
  * assessments).
  */
 import { getStore, newId, nowIso } from "@/lib/db/store";
-import type {
-  LearnerProfile,
-  ParentLearnerRelationship,
-  ReadinessState,
-} from "@/lib/db/types";
+import type { LearnerProfile, ParentLearnerRelationship, ReadinessState } from "@/lib/db/types";
 import type { LearnerStore } from "../types";
 import type { CreateLearnerInput, PatchLearnerInput } from "@/lib/validators/learner";
 
@@ -130,9 +126,7 @@ export const memoryLearners: LearnerStore = {
       learnerId: id,
       tenantId,
       relation: "parent",
-      isPrimary: store.parentLearnerRelationships.every(
-        (r) => r.parentUserId !== parentUserId,
-      ),
+      isPrimary: store.parentLearnerRelationships.every((r) => r.parentUserId !== parentUserId),
     };
     store.parentLearnerRelationships.push(rel);
     return learner;
@@ -155,13 +149,10 @@ export const memoryLearners: LearnerStore = {
       schoolContext:
         p.schoolContext === undefined ? existing.schoolContext : (p.schoolContext ?? null),
       primaryLanguage:
-        p.primaryLanguage === undefined
-          ? existing.primaryLanguage
-          : (p.primaryLanguage ?? null),
+        p.primaryLanguage === undefined ? existing.primaryLanguage : (p.primaryLanguage ?? null),
       readingComfort:
         p.readingComfort === undefined ? existing.readingComfort : (p.readingComfort ?? null),
-      mathComfort:
-        p.mathComfort === undefined ? existing.mathComfort : (p.mathComfort ?? null),
+      mathComfort: p.mathComfort === undefined ? existing.mathComfort : (p.mathComfort ?? null),
       knownStrengths: p.knownStrengths ?? existing.knownStrengths,
       knownChallenges: p.knownChallenges ?? existing.knownChallenges,
       accessibilityDefaults: p.accessibilityDefaults
@@ -169,8 +160,7 @@ export const memoryLearners: LearnerStore = {
         : existing.accessibilityDefaults,
       zipCode: p.zipCode === undefined ? existing.zipCode : (p.zipCode ?? null),
       districtId: p.districtId === undefined ? existing.districtId : (p.districtId ?? null),
-      districtName:
-        p.districtName === undefined ? existing.districtName : (p.districtName ?? null),
+      districtName: p.districtName === undefined ? existing.districtName : (p.districtName ?? null),
     };
     next.displayName = next.preferredName?.trim() || next.firstName.trim();
     store.learnerProfiles.set(id, next);

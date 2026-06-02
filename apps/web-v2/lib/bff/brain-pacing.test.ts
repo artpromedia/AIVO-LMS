@@ -139,7 +139,10 @@ describe("brainPacingFocusSafe", () => {
   });
 
   it("degrades to null when brain-svc errors", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => new Response("boom", { status: 500 })));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("boom", { status: 500 })),
+    );
     const mod = await load();
     expect(await mod.brainPacingFocusSafe("lrn_1", "math")).toBeNull();
   });

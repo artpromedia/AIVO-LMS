@@ -16,7 +16,7 @@ import * as schema from "./schema/index.js";
  *   pg_pool_size  — total connections opened
  */
 
-let _activeClients = 0;
+const _activeClients = 0;
 let _totalOpened = 0;
 
 function intFromEnv(name: string, fallback: number): number {

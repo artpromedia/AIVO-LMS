@@ -7,10 +7,7 @@ import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
-import {
-  MFA_CHALLENGE_COOKIE,
-  parseMfaChallengeCookie,
-} from "@/lib/auth/mfa-cookies";
+import { MFA_CHALLENGE_COOKIE, parseMfaChallengeCookie } from "@/lib/auth/mfa-cookies";
 
 /**
  * MFA challenge surface. Reached when /api/auth/login returns
@@ -34,9 +31,8 @@ async function verifyMfaAction(formData: FormData) {
     redirect("/login?error=mfa_session_expired");
   }
 
-  const { identityVerifyMfa, extractRefreshToken, toSessionProfile } = await import(
-    "@/lib/auth/identity-client"
-  );
+  const { identityVerifyMfa, extractRefreshToken, toSessionProfile } =
+    await import("@/lib/auth/identity-client");
   const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
   const { ROLE_HOME } = await import("@/lib/auth/types");
 
@@ -119,10 +115,8 @@ export default async function MfaChallengePage({
 }) {
   const { error, notice } = await searchParams;
   const t = await getTranslations("auth.mfa");
-  const errorMessage =
-    error && ERROR_CODES.has(error) ? t(`errors.${error}` as never) : null;
-  const noticeMessage =
-    notice && NOTICE_CODES.has(notice) ? t(`notices.${notice}` as never) : null;
+  const errorMessage = error && ERROR_CODES.has(error) ? t(`errors.${error}` as never) : null;
+  const noticeMessage = notice && NOTICE_CODES.has(notice) ? t(`notices.${notice}` as never) : null;
 
   const jar = await cookies();
   const challenge = parseMfaChallengeCookie(jar.get(MFA_CHALLENGE_COOKIE)?.value);
@@ -145,10 +139,7 @@ export default async function MfaChallengePage({
   return (
     <>
       <SiteHeader />
-      <main
-        id="main"
-        className="mx-auto flex w-full max-w-md flex-col gap-4 px-6 py-12 sm:py-16"
-      >
+      <main id="main" className="mx-auto flex w-full max-w-md flex-col gap-4 px-6 py-12 sm:py-16">
         <div className="flex items-center gap-3">
           <span
             aria-hidden="true"
@@ -167,13 +158,7 @@ export default async function MfaChallengePage({
           subtitle={subtitle}
           actions={
             <>
-              <Button
-                type="submit"
-                form="mfa-form"
-                variant="default"
-                size="lg"
-                className="w-full"
-              >
+              <Button type="submit" form="mfa-form" variant="default" size="lg" className="w-full">
                 {cta}
               </Button>
               {canResend ? (

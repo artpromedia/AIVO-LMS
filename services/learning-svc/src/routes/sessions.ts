@@ -360,9 +360,9 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
     // surface a typed degraded response instead of fabricating a lesson
     // off an empty brain snapshot.
     if (tracker.has("brain-svc") && !failOpen()) {
-      return reply.code(503).send(
-        buildDegradedResponse(tracker, "Critical downstream subsystem unavailable"),
-      );
+      return reply
+        .code(503)
+        .send(buildDegradedResponse(tracker, "Critical downstream subsystem unavailable"));
     }
 
     const functioningLevel = (brainContext as any).functioning_level_profile?.level || "STANDARD";

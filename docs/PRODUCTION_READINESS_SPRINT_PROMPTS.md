@@ -17,12 +17,12 @@ _Date: 2026-06-01 · Scope: monorepo `apps/`, `services/`, `packages/`, `scripts
 
 The repo already ships an extensive set of production-readiness guards, and **they all pass today**:
 
-| Gate | Command | Result |
-| --- | --- | --- |
-| Demo/stub scanner | `pnpm prod:no-demo` | ✅ 0 findings |
-| Production readiness | `pnpm prod:check` | ✅ passed |
-| Persistence stubs | `pnpm persistence:stubs` | ✅ 12/12 adapters implemented, no growth |
-| Backend parity | `pnpm backend:parity` | ✅ 26 green, 2 yellow, 0 red |
+| Gate                 | Command                  | Result                                   |
+| -------------------- | ------------------------ | ---------------------------------------- |
+| Demo/stub scanner    | `pnpm prod:no-demo`      | ✅ 0 findings                            |
+| Production readiness | `pnpm prod:check`        | ✅ passed                                |
+| Persistence stubs    | `pnpm persistence:stubs` | ✅ 12/12 adapters implemented, no growth |
+| Backend parity       | `pnpm backend:parity`    | ✅ 26 green, 2 yellow, 0 red             |
 
 So this is **not** a "the platform is full of stubs" report. The blocking architectural risk
 (mock-by-default) is already cataloged in `PLATFORM_GAP_ANALYSIS.md` with a phased fix. What remains
@@ -33,15 +33,15 @@ debt**. Those are the seven sprints below.
 
 ## 1. Surfaced gaps (evidence)
 
-| # | Gap | Severity | Evidence |
-| --- | --- | --- | --- |
-| 1 | **LTI 1.3 runtime tables not wired.** Migration `0045_lti_13_runtime.sql` creates `lti_platforms`, `lti_deployments`, `lti_contexts`, `lti_resource_links`, `lti_ags_lineitems`, but the launch route never persists to them — context membership and AGS line items are not stored, so score write-back and resource-link reuse cannot work across launches. | HIGH (enterprise LMS interop) | `services/integration-svc/src/routes/lti.ts:15-19` ("A future sprint will wire the … tables (migration 0045) directly"); no `insert`/`update` against those tables in the route. |
-| 2 | **Speech Buddy learning telemetry is log-only.** `session_started`, `session_ended`, `turn_recorded`, `skill_evidence`, `quest_assigned` are emitted only as structured log lines, not published to the event bus / outbox other services use, so skill-evidence never reaches the mastery/scoring pipeline. (Note: the **hard safety-flag** path _does_ dispatch to comms-svc with a durable local-queue fallback — that part is production-grade.) | MEDIUM | `services/ai-svc/src/ai_svc/speech_buddy/events.py:75-78` ("In production this would publish to the event bus; for now the structured log line is the bus"). |
-| 3 | **AAC vocabulary sync ships an empty board.** CoughDrop sync builds a placeholder board with `items: []` and `grid: {rows:0, cols:0}` instead of querying brain-svc for the learner's actual vocabulary, so a "sync" pushes nothing. | MEDIUM (accessibility / AAC users) | `services/family-svc/src/routes/language-profile.ts:131-138` ("Minimal board from learner ID; in production this queries brain-svc for vocabulary"). |
-| 4 | **AssistiveWare reverse-highlight is a no-op.** `highlight()` is an empty `TODO` body; learners on AssistiveWare/Proloquo2Go get no visual prompt highlighting. | LOW–MEDIUM | `packages/aac-bridge/src/adapters/AssistiveWareAdapter.ts:57-60` (`// TODO: Implement via AssistiveWare x-callback-url …`). |
-| 5 | **SIS connectors incomplete.** Two connectors are `status: "coming_soon"` and rejected at connect time; the others are wired. | MEDIUM (depends on pilot district stack) | `services/integrations-svc/src/routes/connectors.ts:79,90` (`schoology`, `powerschool` → `coming_soon`); gate at `:368`. |
-| 6 | **Admin scope accepted at face value in collaboration grants.** Non-teacher (admin) roles bypass the classroom/learner-link authorization check when granting collaboration access. | MEDIUM (authz / least-privilege) | `services/family-svc/src/routes/collaboration.ts:1357-1360` ("for now we accept them at face value here"). |
-| 7 | **Test-coverage debt.** 4 services have **no tests** (`i18n-svc`, `integrations-svc`, `research-svc`, `status-page-svc`); backend-parity reports 2 yellow (`integrations-svc`, `research-svc`) and 8 warnings for missing integration-test references (`curriculum-svc`, `engagement-svc`, `integration-svc`, `integrations-svc`, `research-svc`, `subject-brain-svc`, `tenant-svc`). | MEDIUM | `pnpm backend:parity` summary; directory scan for `*.test.ts` / `test_*.py`. |
+| #   | Gap                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Severity                                 | Evidence                                                                                                                                                                         |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **LTI 1.3 runtime tables not wired.** Migration `0045_lti_13_runtime.sql` creates `lti_platforms`, `lti_deployments`, `lti_contexts`, `lti_resource_links`, `lti_ags_lineitems`, but the launch route never persists to them — context membership and AGS line items are not stored, so score write-back and resource-link reuse cannot work across launches.                                                                                        | HIGH (enterprise LMS interop)            | `services/integration-svc/src/routes/lti.ts:15-19` ("A future sprint will wire the … tables (migration 0045) directly"); no `insert`/`update` against those tables in the route. |
+| 2   | **Speech Buddy learning telemetry is log-only.** `session_started`, `session_ended`, `turn_recorded`, `skill_evidence`, `quest_assigned` are emitted only as structured log lines, not published to the event bus / outbox other services use, so skill-evidence never reaches the mastery/scoring pipeline. (Note: the **hard safety-flag** path _does_ dispatch to comms-svc with a durable local-queue fallback — that part is production-grade.) | MEDIUM                                   | `services/ai-svc/src/ai_svc/speech_buddy/events.py:75-78` ("In production this would publish to the event bus; for now the structured log line is the bus").                     |
+| 3   | **AAC vocabulary sync ships an empty board.** CoughDrop sync builds a placeholder board with `items: []` and `grid: {rows:0, cols:0}` instead of querying brain-svc for the learner's actual vocabulary, so a "sync" pushes nothing.                                                                                                                                                                                                                 | MEDIUM (accessibility / AAC users)       | `services/family-svc/src/routes/language-profile.ts:131-138` ("Minimal board from learner ID; in production this queries brain-svc for vocabulary").                             |
+| 4   | **AssistiveWare reverse-highlight is a no-op.** `highlight()` is an empty `TODO` body; learners on AssistiveWare/Proloquo2Go get no visual prompt highlighting.                                                                                                                                                                                                                                                                                      | LOW–MEDIUM                               | `packages/aac-bridge/src/adapters/AssistiveWareAdapter.ts:57-60` (`// TODO: Implement via AssistiveWare x-callback-url …`).                                                      |
+| 5   | **SIS connectors incomplete.** Two connectors are `status: "coming_soon"` and rejected at connect time; the others are wired.                                                                                                                                                                                                                                                                                                                        | MEDIUM (depends on pilot district stack) | `services/integrations-svc/src/routes/connectors.ts:79,90` (`schoology`, `powerschool` → `coming_soon`); gate at `:368`.                                                         |
+| 6   | **Admin scope accepted at face value in collaboration grants.** Non-teacher (admin) roles bypass the classroom/learner-link authorization check when granting collaboration access.                                                                                                                                                                                                                                                                  | MEDIUM (authz / least-privilege)         | `services/family-svc/src/routes/collaboration.ts:1357-1360` ("for now we accept them at face value here").                                                                       |
+| 7   | **Test-coverage debt.** 4 services have **no tests** (`i18n-svc`, `integrations-svc`, `research-svc`, `status-page-svc`); backend-parity reports 2 yellow (`integrations-svc`, `research-svc`) and 8 warnings for missing integration-test references (`curriculum-svc`, `engagement-svc`, `integration-svc`, `integrations-svc`, `research-svc`, `subject-brain-svc`, `tenant-svc`).                                                                | MEDIUM                                   | `pnpm backend:parity` summary; directory scan for `*.test.ts` / `test_*.py`.                                                                                                     |
 
 Out of scope here (already owned by `PLATFORM_GAP_ANALYSIS.md`): mock-by-default defaults in
 `apps/web-v2/lib/env.ts`, admin user-creation flow wiring, and mobile store-submission artifacts.
@@ -202,15 +202,15 @@ clear message naming the offending variable.
 
 ## 3. Suggested ordering & sizing
 
-| Sprint | Theme | Risk if skipped | Rough size |
-| --- | --- | --- | --- |
-| 7 | Lock real-mode defaults | Demo data/auth ships to a real customer | S (1–2 d) |
-| 1 | LTI 1.3 persistence | LMS score write-back / interop broken | M (3–5 d) |
-| 5 | Collaboration admin scope | Cross-tenant authz leak | S (1–2 d) |
-| 2 | Speech Buddy telemetry | Mastery signal lost for AAC learners | M (2–4 d) |
-| 3 | AAC vocabulary sync | AAC "sync" is a no-op | M (2–3 d) |
-| 6 | Test-coverage backfill | Regressions ship undetected | M (3–5 d) |
-| 4 | AssistiveWare + SIS connectors | Feature completeness for specific districts | M–L (4–6 d) |
+| Sprint | Theme                          | Risk if skipped                             | Rough size  |
+| ------ | ------------------------------ | ------------------------------------------- | ----------- |
+| 7      | Lock real-mode defaults        | Demo data/auth ships to a real customer     | S (1–2 d)   |
+| 1      | LTI 1.3 persistence            | LMS score write-back / interop broken       | M (3–5 d)   |
+| 5      | Collaboration admin scope      | Cross-tenant authz leak                     | S (1–2 d)   |
+| 2      | Speech Buddy telemetry         | Mastery signal lost for AAC learners        | M (2–4 d)   |
+| 3      | AAC vocabulary sync            | AAC "sync" is a no-op                       | M (2–3 d)   |
+| 6      | Test-coverage backfill         | Regressions ship undetected                 | M (3–5 d)   |
+| 4      | AssistiveWare + SIS connectors | Feature completeness for specific districts | M–L (4–6 d) |
 
 Recommended sequence: **7 → 5 → 1 → 2 → 3 → 6 → 4** (security/guardrails first, then interop, then
 feature completeness, with test backfill folded into each PR where practical).
@@ -219,15 +219,15 @@ feature completeness, with test backfill folded into each PR where practical).
 
 All seven sprints implemented, tested, and committed on `claude/jolly-pasteur-z3eWA`:
 
-| Sprint | Status | What landed |
-| --- | --- | --- |
-| 7 — lock real-mode defaults | ✅ Done | Regression tests asserting the env validator fails closed in production for every demo selector (auth/AI/persistence + overrides, dev SESSION_SECRET, missing DATABASE_URL). |
-| 5 — collaboration admin scope | ✅ Done | SCHOOL_ADMIN/DISTRICT_ADMIN parent-invites now tenant-scoped (no cross-tenant); PLATFORM_ADMIN stays global. Cross-tenant rejection test added. |
-| 1 — LTI 1.3 persistence | ✅ Done | New `lti/persistence.ts`: idempotent platform→deployment→context→resource-link upserts + AGS lineitem; unregistered platforms rejected; resource-link db id threaded into the session token. DB-backed tests verified against Postgres. Orphaned `__tests__/` suite un-orphaned. |
-| 2 — Speech Buddy telemetry | ✅ Done | EventEmitter writes a durable outbox; `flush_events()` drains to NATS (best-effort, order-preserving, survives outage). Orchestrator flushes at session/turn boundaries. `nats-py` added; 4 outbox tests. |
-| 3 — AAC vocabulary sync | ✅ Done | New `aac_vocabulary` table + curated core-word catalog in `@aivo/aac-bridge`; `buildSymbolBoard()` seeds core vocab, is locale-aware, fails loudly (422) instead of syncing empty. DB-backed tests verified against Postgres. |
-| 6 — test backfill | ✅ Done | Unit suites for status-page-svc, i18n-svc, research-svc, integrations-svc; wired into CI. `backend:parity` now 28 green / 0 yellow (was 26 green / 2 yellow). |
-| 4 — AssistiveWare + SIS | ✅ Done | AssistiveWare reverse-highlight (native bridge → x-callback-url fallback) + `supportsReverseHighlight()`. Schoology + PowerSchool roster-sync handlers implemented, wired, flipped to `available`, unit-tested. |
+| Sprint                        | Status  | What landed                                                                                                                                                                                                                                                                      |
+| ----------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 7 — lock real-mode defaults   | ✅ Done | Regression tests asserting the env validator fails closed in production for every demo selector (auth/AI/persistence + overrides, dev SESSION_SECRET, missing DATABASE_URL).                                                                                                     |
+| 5 — collaboration admin scope | ✅ Done | SCHOOL_ADMIN/DISTRICT_ADMIN parent-invites now tenant-scoped (no cross-tenant); PLATFORM_ADMIN stays global. Cross-tenant rejection test added.                                                                                                                                  |
+| 1 — LTI 1.3 persistence       | ✅ Done | New `lti/persistence.ts`: idempotent platform→deployment→context→resource-link upserts + AGS lineitem; unregistered platforms rejected; resource-link db id threaded into the session token. DB-backed tests verified against Postgres. Orphaned `__tests__/` suite un-orphaned. |
+| 2 — Speech Buddy telemetry    | ✅ Done | EventEmitter writes a durable outbox; `flush_events()` drains to NATS (best-effort, order-preserving, survives outage). Orchestrator flushes at session/turn boundaries. `nats-py` added; 4 outbox tests.                                                                        |
+| 3 — AAC vocabulary sync       | ✅ Done | New `aac_vocabulary` table + curated core-word catalog in `@aivo/aac-bridge`; `buildSymbolBoard()` seeds core vocab, is locale-aware, fails loudly (422) instead of syncing empty. DB-backed tests verified against Postgres.                                                    |
+| 6 — test backfill             | ✅ Done | Unit suites for status-page-svc, i18n-svc, research-svc, integrations-svc; wired into CI. `backend:parity` now 28 green / 0 yellow (was 26 green / 2 yellow).                                                                                                                    |
+| 4 — AssistiveWare + SIS       | ✅ Done | AssistiveWare reverse-highlight (native bridge → x-callback-url fallback) + `supportsReverseHighlight()`. Schoology + PowerSchool roster-sync handlers implemented, wired, flipped to `available`, unit-tested.                                                                  |
 
 Residual items — now **closed**:
 

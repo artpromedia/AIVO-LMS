@@ -23,11 +23,7 @@ export default async function Page() {
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        description={t("description")}
-      />
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
       <Card className="p-[var(--aivo-density-card-pad)]">
         <ExportRequestForm

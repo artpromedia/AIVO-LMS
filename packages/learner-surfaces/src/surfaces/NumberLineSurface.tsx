@@ -18,7 +18,8 @@ export function NumberLineSurface({
   const [selected, setSelected] = useState<number | null>(null);
   const min = surface.numberLine?.min ?? 0;
   const max = surface.numberLine?.max ?? 10;
-  const step = surface.numberLine?.step && surface.numberLine.step > 0 ? surface.numberLine.step : 1;
+  const step =
+    surface.numberLine?.step && surface.numberLine.step > 0 ? surface.numberLine.step : 1;
 
   const ticks = useMemo(() => {
     if (max <= min) return [min];
@@ -39,7 +40,11 @@ export function NumberLineSurface({
       <div
         role="listbox"
         aria-label="number line values"
-        style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(56px, 1fr))" }}
+        style={{
+          display: "grid",
+          gap: 8,
+          gridTemplateColumns: "repeat(auto-fit, minmax(56px, 1fr))",
+        }}
       >
         {ticks.map((value) => (
           <button

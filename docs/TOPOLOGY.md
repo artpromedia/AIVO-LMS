@@ -24,16 +24,16 @@ All of the role-scoped UIs live inside the single Next.js app at
 `apps/web-v2`. Role separation is enforced by `requirePageRole(...)`
 and the route prefix:
 
-| Role         | Route prefix          | Source                              |
-| ------------ | --------------------- | ----------------------------------- |
-| Parent       | `/parent/*`           | `apps/web-v2/app/parent/`           |
-| Learner      | `/learner/*`          | `apps/web-v2/app/learner/`          |
-| Teacher      | `/teacher/*`          | `apps/web-v2/app/teacher/`          |
-| Caregiver    | `/caregiver/*`        | `apps/web-v2/app/caregiver/`        |
-| Therapist    | `/therapist/*`        | `apps/web-v2/app/therapist/`        |
-| School admin | `/admin/school/*`     | `apps/web-v2/app/admin/school/`     |
-| District     | `/admin/district/*`   | `apps/web-v2/app/admin/district/`   |
-| Platform     | `/admin/platform/*`   | `apps/web-v2/app/admin/platform/`   |
+| Role         | Route prefix        | Source                            |
+| ------------ | ------------------- | --------------------------------- |
+| Parent       | `/parent/*`         | `apps/web-v2/app/parent/`         |
+| Learner      | `/learner/*`        | `apps/web-v2/app/learner/`        |
+| Teacher      | `/teacher/*`        | `apps/web-v2/app/teacher/`        |
+| Caregiver    | `/caregiver/*`      | `apps/web-v2/app/caregiver/`      |
+| Therapist    | `/therapist/*`      | `apps/web-v2/app/therapist/`      |
+| School admin | `/admin/school/*`   | `apps/web-v2/app/admin/school/`   |
+| District     | `/admin/district/*` | `apps/web-v2/app/admin/district/` |
+| Platform     | `/admin/platform/*` | `apps/web-v2/app/admin/platform/` |
 
 **There is no `apps/parent-portal` or `apps/learner-app`.** If you
 see those names in an older doc, treat them as aliases for the
@@ -53,11 +53,11 @@ external contract.
 
 ## Apps directory
 
-| Path             | Description                                   |
-| ---------------- | --------------------------------------------- |
-| `apps/web-v2`    | The Next.js application (all web UI + BFF).   |
+| Path             | Description                                      |
+| ---------------- | ------------------------------------------------ |
+| `apps/web-v2`    | The Next.js application (all web UI + BFF).      |
 | `apps/mobile`    | Expo / React Native mobile app. **Not Flutter.** |
-| `apps/marketing` | Static marketing site.                        |
+| `apps/marketing` | Static marketing site.                           |
 
 If you need a mobile feature, it lives in `apps/mobile/` (TypeScript +
 React Native + Expo). There is no Dart code in this repository.
@@ -66,22 +66,22 @@ React Native + Expo). There is no Dart code in this repository.
 
 Shared libraries used by both `apps/*` and `services/*`. Highlights:
 
-| Path                     | Description                                           |
-| ------------------------ | ----------------------------------------------------- |
-| `packages/db`            | Drizzle ORM schemas, migrations, seed.                |
-| `packages/api-client`    | Generated TypeScript client for services + BFF.       |
-| `packages/ui`            | Design-system primitives (cards, buttons, layouts).   |
-| `packages/brand`         | Tokens, logos, subject registry.                      |
-| `packages/feature-flags` | Runtime feature flag evaluation.                      |
-| `packages/observability` | Logging, tracing, metrics helpers.                    |
-| `packages/security`      | Auth helpers, password hashing, CSRF.                 |
-| `packages/sso`           | SAML / OIDC integration helpers.                      |
-| `packages/scheduling`    | Recurrence math + calendar primitives.                |
-| `packages/scoring`       | Mastery + spaced-review algorithms.                   |
-| `packages/skill-graphs`  | Curriculum graph types + traversal.                   |
-| `packages/item-bank`     | Curriculum item bank loader + validation.             |
-| `packages/learner-ui`    | Story-book of learner-specific UI surfaces.           |
-| `packages/stage-runtime` | Lesson "stage" runtime (lesson player engine).        |
+| Path                     | Description                                         |
+| ------------------------ | --------------------------------------------------- |
+| `packages/db`            | Drizzle ORM schemas, migrations, seed.              |
+| `packages/api-client`    | Generated TypeScript client for services + BFF.     |
+| `packages/ui`            | Design-system primitives (cards, buttons, layouts). |
+| `packages/brand`         | Tokens, logos, subject registry.                    |
+| `packages/feature-flags` | Runtime feature flag evaluation.                    |
+| `packages/observability` | Logging, tracing, metrics helpers.                  |
+| `packages/security`      | Auth helpers, password hashing, CSRF.               |
+| `packages/sso`           | SAML / OIDC integration helpers.                    |
+| `packages/scheduling`    | Recurrence math + calendar primitives.              |
+| `packages/scoring`       | Mastery + spaced-review algorithms.                 |
+| `packages/skill-graphs`  | Curriculum graph types + traversal.                 |
+| `packages/item-bank`     | Curriculum item bank loader + validation.           |
+| `packages/learner-ui`    | Story-book of learner-specific UI surfaces.         |
+| `packages/stage-runtime` | Lesson "stage" runtime (lesson player engine).      |
 
 Run `ls packages/` for the full list (34 packages as of this writing).
 
@@ -90,37 +90,37 @@ Run `ls packages/` for the full list (34 packages as of this writing).
 29 microservices, each in its own folder. The convention is one
 service per business capability:
 
-| Service                      | Owns                                           |
-| ---------------------------- | ---------------------------------------------- |
-| `services/identity-svc`      | Users, sessions, SSO callbacks, SCIM.          |
-| `services/tenant-svc`        | Tenants, memberships, role permissions.        |
-| `services/assessment-svc`    | Baselines, item bank, discovery adventure.     |
-| `services/brain-svc`         | Brain profile / clone / approval.              |
-| `services/ai-svc`            | Multi-model LLM gateway, prompt builder.       |
-| `services/tutor-svc`         | Real-time tutor chat + safety.                 |
-| `services/homework-svc`      | Homework help sessions.                        |
-| `services/curriculum-svc`    | Curriculum graph + standards alignment.        |
-| `services/learning-svc`      | Lesson generation, mastery updates, paths.     |
-| `services/comms-svc`         | Notifications, email, push.                    |
-| `services/family-svc`        | Care-team invites, consent flows.              |
-| `services/billing-svc`       | Stripe, entitlements, seat assignment.         |
-| `services/engagement-svc`    | Streaks, XP, milestones, gamification.         |
-| `services/admin-svc`         | District + school admin operations.            |
-| `services/recommendation-svc`| What-to-do-next personalisation.               |
-| `services/data-governance-svc`| Data export, deletion, retention.             |
-| `services/audit-svc`         | Append-only audit log.                         |
-| `services/responsible-ai-svc`| AI safety, moderation, refusal logging.        |
-| `services/integrations-svc`  | Roster sync (Clever, Classlink, Google).       |
-| `services/i18n-svc`          | Translation + locale fallback.                 |
-| `services/speech-eval-svc`   | Pronunciation scoring.                         |
-| `services/math-recognizer-svc`| Handwritten-math OCR.                         |
-| `services/science-solver-svc`| Science problem grading.                       |
-| `services/subject-brain-svc` | Per-subject brain config.                      |
-| `services/problem-session-svc`| Long-running problem sessions.                |
-| `services/research-svc`      | Internal research instrumentation.             |
-| `services/status-page-svc`   | Public status page.                            |
-| `services/alerts-proxy-svc`  | PagerDuty / Opsgenie webhooks.                 |
-| `services/integration-svc`   | (Legacy — see `integrations-svc`.)             |
+| Service                        | Owns                                       |
+| ------------------------------ | ------------------------------------------ |
+| `services/identity-svc`        | Users, sessions, SSO callbacks, SCIM.      |
+| `services/tenant-svc`          | Tenants, memberships, role permissions.    |
+| `services/assessment-svc`      | Baselines, item bank, discovery adventure. |
+| `services/brain-svc`           | Brain profile / clone / approval.          |
+| `services/ai-svc`              | Multi-model LLM gateway, prompt builder.   |
+| `services/tutor-svc`           | Real-time tutor chat + safety.             |
+| `services/homework-svc`        | Homework help sessions.                    |
+| `services/curriculum-svc`      | Curriculum graph + standards alignment.    |
+| `services/learning-svc`        | Lesson generation, mastery updates, paths. |
+| `services/comms-svc`           | Notifications, email, push.                |
+| `services/family-svc`          | Care-team invites, consent flows.          |
+| `services/billing-svc`         | Stripe, entitlements, seat assignment.     |
+| `services/engagement-svc`      | Streaks, XP, milestones, gamification.     |
+| `services/admin-svc`           | District + school admin operations.        |
+| `services/recommendation-svc`  | What-to-do-next personalisation.           |
+| `services/data-governance-svc` | Data export, deletion, retention.          |
+| `services/audit-svc`           | Append-only audit log.                     |
+| `services/responsible-ai-svc`  | AI safety, moderation, refusal logging.    |
+| `services/integrations-svc`    | Roster sync (Clever, Classlink, Google).   |
+| `services/i18n-svc`            | Translation + locale fallback.             |
+| `services/speech-eval-svc`     | Pronunciation scoring.                     |
+| `services/math-recognizer-svc` | Handwritten-math OCR.                      |
+| `services/science-solver-svc`  | Science problem grading.                   |
+| `services/subject-brain-svc`   | Per-subject brain config.                  |
+| `services/problem-session-svc` | Long-running problem sessions.             |
+| `services/research-svc`        | Internal research instrumentation.         |
+| `services/status-page-svc`     | Public status page.                        |
+| `services/alerts-proxy-svc`    | PagerDuty / Opsgenie webhooks.             |
+| `services/integration-svc`     | (Legacy — see `integrations-svc`.)         |
 
 If you're adding a new domain, prefer **extending an existing
 service** over creating a new one. A new service is justified when

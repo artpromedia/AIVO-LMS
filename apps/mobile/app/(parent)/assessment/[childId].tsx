@@ -21,13 +21,48 @@ interface Step {
 }
 
 const STEPS: Step[] = [
-  { key: "goals", title: "Goals", prompt: "What do you hope AIVO helps with?", placeholder: "e.g. confidence in reading" },
-  { key: "strengths", title: "Strengths", prompt: "What is your child great at?", placeholder: "e.g. curious, loves stories" },
-  { key: "challenges", title: "Challenges", prompt: "Where do they need support?", placeholder: "e.g. focus, math facts" },
-  { key: "communication", title: "Communication", prompt: "How do they communicate best?", placeholder: "e.g. visuals, short steps" },
-  { key: "sensory", title: "Sensory", prompt: "Any sensory needs to know about?", placeholder: "e.g. quiet spaces" },
-  { key: "motivation", title: "Motivation", prompt: "What motivates them?", placeholder: "e.g. earning badges" },
-  { key: "concerns", title: "Concerns", prompt: "Anything else we should know?", placeholder: "Optional" },
+  {
+    key: "goals",
+    title: "Goals",
+    prompt: "What do you hope AIVO helps with?",
+    placeholder: "e.g. confidence in reading",
+  },
+  {
+    key: "strengths",
+    title: "Strengths",
+    prompt: "What is your child great at?",
+    placeholder: "e.g. curious, loves stories",
+  },
+  {
+    key: "challenges",
+    title: "Challenges",
+    prompt: "Where do they need support?",
+    placeholder: "e.g. focus, math facts",
+  },
+  {
+    key: "communication",
+    title: "Communication",
+    prompt: "How do they communicate best?",
+    placeholder: "e.g. visuals, short steps",
+  },
+  {
+    key: "sensory",
+    title: "Sensory",
+    prompt: "Any sensory needs to know about?",
+    placeholder: "e.g. quiet spaces",
+  },
+  {
+    key: "motivation",
+    title: "Motivation",
+    prompt: "What motivates them?",
+    placeholder: "e.g. earning badges",
+  },
+  {
+    key: "concerns",
+    title: "Concerns",
+    prompt: "Anything else we should know?",
+    placeholder: "Optional",
+  },
 ];
 
 /**
@@ -62,10 +97,19 @@ export default function ParentAssessmentScreen() {
             {t("assessment.introTitle", { name, defaultValue: `Tell us about ${name}` })}
           </Text>
           <Text style={[styles.body, { color: palette.inkMuted }]}>
-            {t("assessment.introBody", "A few short questions help AIVO personalise from day one. There are no wrong answers, and you can edit later.")}
+            {t(
+              "assessment.introBody",
+              "A few short questions help AIVO personalise from day one. There are no wrong answers, and you can edit later.",
+            )}
           </Text>
         </Card>
-        <Button title={t("assessment.begin", "Begin")} onPress={() => setPhase("steps")} fullWidth size="lg" style={{ marginTop: spacing.md }} />
+        <Button
+          title={t("assessment.begin", "Begin")}
+          onPress={() => setPhase("steps")}
+          fullWidth
+          size="lg"
+          style={{ marginTop: spacing.md }}
+        />
       </ResponsiveScreen>
     );
   }
@@ -82,10 +126,19 @@ export default function ParentAssessmentScreen() {
             {t("assessment.submitted", "Thank you!")}
           </Text>
           <Text style={[styles.body, { color: palette.inkMuted, textAlign: "center" }]}>
-            {t("assessment.submittedBody", { name, defaultValue: `We'll use this to tailor ${name}'s experience.` })}
+            {t("assessment.submittedBody", {
+              name,
+              defaultValue: `We'll use this to tailor ${name}'s experience.`,
+            })}
           </Text>
         </Card>
-        <Button title={t("assessment.backToProfile", "Back to profile")} onPress={() => router.replace(`/(parent)/learners/${id}` as never)} fullWidth size="lg" style={{ marginTop: spacing.md }} />
+        <Button
+          title={t("assessment.backToProfile", "Back to profile")}
+          onPress={() => router.replace(`/(parent)/learners/${id}` as never)}
+          fullWidth
+          size="lg"
+          style={{ marginTop: spacing.md }}
+        />
       </ResponsiveScreen>
     );
   }
@@ -97,16 +150,32 @@ export default function ParentAssessmentScreen() {
         <View style={{ gap: spacing.sm }}>
           {STEPS.map((s) => (
             <Card key={s.key} tone="raised" style={{ gap: 4 }}>
-              <Text style={[styles.reviewLabel, { color: palette.inkMuted }]}>{t(`assessment.${s.key}`, s.title)}</Text>
+              <Text style={[styles.reviewLabel, { color: palette.inkMuted }]}>
+                {t(`assessment.${s.key}`, s.title)}
+              </Text>
               <Text style={[styles.reviewVal, { color: palette.ink }]}>
                 {answers[s.key]?.trim() || t("assessment.skipped", "—")}
               </Text>
             </Card>
           ))}
         </View>
-        <Button title={t("assessment.submit", "Submit")} onPress={() => setPhase("done")} fullWidth size="lg" style={{ marginTop: spacing.md }} />
-        <Pressable onPress={() => { setPhase("steps"); setStep(0); }} style={{ paddingVertical: spacing.md, alignItems: "center" }}>
-          <Text style={[styles.editLink, { color: palette.primary }]}>{t("assessment.edit", "Edit answers")}</Text>
+        <Button
+          title={t("assessment.submit", "Submit")}
+          onPress={() => setPhase("done")}
+          fullWidth
+          size="lg"
+          style={{ marginTop: spacing.md }}
+        />
+        <Pressable
+          onPress={() => {
+            setPhase("steps");
+            setStep(0);
+          }}
+          style={{ paddingVertical: spacing.md, alignItems: "center" }}
+        >
+          <Text style={[styles.editLink, { color: palette.primary }]}>
+            {t("assessment.edit", "Edit answers")}
+          </Text>
         </Pressable>
       </ResponsiveScreen>
     );
@@ -120,22 +189,34 @@ export default function ParentAssessmentScreen() {
       <ScreenHeader title={t("assessment.title", "About your learner")} />
       <OnboardingStepper steps={STEPS.length} current={step} />
       <Card tone="raised" style={{ gap: spacing.sm }}>
-        <Text style={[styles.stepTitle, { color: palette.ink }]}>{t(`assessment.${current.key}`, current.title)}</Text>
-        <Text style={[styles.prompt, { color: palette.inkMuted }]}>{t(`assessment.${current.key}Prompt`, current.prompt)}</Text>
+        <Text style={[styles.stepTitle, { color: palette.ink }]}>
+          {t(`assessment.${current.key}`, current.title)}
+        </Text>
+        <Text style={[styles.prompt, { color: palette.inkMuted }]}>
+          {t(`assessment.${current.key}Prompt`, current.prompt)}
+        </Text>
         <TextInput
           value={answers[current.key] ?? ""}
           onChangeText={(v) => set(current.key, v)}
           placeholder={current.placeholder}
           placeholderTextColor={palette.inkMuted}
           multiline
-          style={[styles.input, { borderColor: palette.border, color: palette.ink, backgroundColor: palette.bgPage }]}
+          style={[
+            styles.input,
+            { borderColor: palette.border, color: palette.ink, backgroundColor: palette.bgPage },
+          ]}
           accessibilityLabel={current.prompt}
         />
       </Card>
       <View style={{ flexDirection: "row", gap: spacing.sm, marginTop: spacing.md }}>
         {step > 0 ? (
           <View style={{ flex: 1 }}>
-            <Button title={t("common.back", "Back")} onPress={() => setStep((n) => n - 1)} variant="outline" fullWidth />
+            <Button
+              title={t("common.back", "Back")}
+              onPress={() => setStep((n) => n - 1)}
+              variant="outline"
+              fullWidth
+            />
           </View>
         ) : null}
         <View style={{ flex: 1 }}>
@@ -151,13 +232,32 @@ export default function ParentAssessmentScreen() {
 }
 
 const styles = StyleSheet.create({
-  iconWrap: { width: 52, height: 52, borderRadius: 26, alignItems: "center", justifyContent: "center" },
+  iconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   h1: { fontSize: 20, fontFamily: fontFamilies.displayBold },
   body: { fontSize: 14, fontFamily: fontFamilies.bodyRegular, lineHeight: 21 },
   stepTitle: { fontSize: 18, fontFamily: fontFamilies.displayBold },
   prompt: { fontSize: 14, fontFamily: fontFamilies.bodyRegular },
-  input: { minHeight: 96, borderWidth: 1.5, borderRadius: radius.lg, padding: spacing.md, fontSize: 16, fontFamily: fontFamilies.bodyRegular, textAlignVertical: "top" },
-  reviewLabel: { fontSize: 12, fontFamily: fontFamilies.bodyBold, textTransform: "uppercase", letterSpacing: 0.5 },
+  input: {
+    minHeight: 96,
+    borderWidth: 1.5,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    fontSize: 16,
+    fontFamily: fontFamilies.bodyRegular,
+    textAlignVertical: "top",
+  },
+  reviewLabel: {
+    fontSize: 12,
+    fontFamily: fontFamilies.bodyBold,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
   reviewVal: { fontSize: 15, fontFamily: fontFamilies.bodyRegular },
   editLink: { fontSize: 14, fontFamily: fontFamilies.bodyBold },
   stepCount: { fontSize: 12 },

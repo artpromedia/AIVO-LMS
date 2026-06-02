@@ -33,12 +33,7 @@ export function AppShell({
         className,
       )}
     >
-      <div
-        className={clsx(
-          "shrink-0",
-          showSidebarOnMobile ? "block" : "hidden lg:block",
-        )}
-      >
+      <div className={clsx("shrink-0", showSidebarOnMobile ? "block" : "hidden lg:block")}>
         <Sidebar {...sidebar} className="sticky top-0 h-screen" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">

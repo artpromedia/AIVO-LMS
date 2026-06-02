@@ -24,7 +24,8 @@ export const SEL_ITEMS: Item[] = [
     skillCode: "SEL.SELF_AWARE",
     difficulty: -0.5,
     surface: "voice_response",
-    prompt: "Tell me about a time today when your body felt one of those feelings. Where did you feel it?",
+    prompt:
+      "Tell me about a time today when your body felt one of those feelings. Where did you feel it?",
     metadata: { competency: "self-awareness", expectedReflectionDepth: 2, safetyChecked: true },
   },
   {
@@ -120,7 +121,8 @@ export const SEL_ITEMS: Item[] = [
     skillCode: "SEL.SOCIAL_AWARE",
     difficulty: 0.5,
     surface: "voice_response",
-    prompt: "Think of someone whose life is different from yours. What might a normal Tuesday look like for them?",
+    prompt:
+      "Think of someone whose life is different from yours. What might a normal Tuesday look like for them?",
     metadata: { competency: "social-awareness", expectedReflectionDepth: 3, safetyChecked: true },
   },
   {
@@ -162,7 +164,11 @@ export const SEL_ITEMS: Item[] = [
     difficulty: 0.0,
     surface: "voice_response",
     prompt: "Tell about a time you and a friend solved a disagreement.",
-    metadata: { competency: "relationship-skills", expectedReflectionDepth: 2, safetyChecked: true },
+    metadata: {
+      competency: "relationship-skills",
+      expectedReflectionDepth: 2,
+      safetyChecked: true,
+    },
   },
   {
     id: "SEL.REL.003",
@@ -170,7 +176,11 @@ export const SEL_ITEMS: Item[] = [
     difficulty: 0.5,
     surface: "voice_response",
     prompt: "What words help when someone is upset with you?",
-    metadata: { competency: "relationship-skills", expectedReflectionDepth: 3, safetyChecked: true },
+    metadata: {
+      competency: "relationship-skills",
+      expectedReflectionDepth: 3,
+      safetyChecked: true,
+    },
   },
   {
     id: "SEL.REL.004",

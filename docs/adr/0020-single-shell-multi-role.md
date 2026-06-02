@@ -58,7 +58,7 @@ All role-specific UX lives under role-segmented routes inside the two
 existing shells:
 
 - Web: `apps/web-v2/app/{learner,parent,teacher,therapist,caregiver,
-  district,admin}/...`
+district,admin}/...`
 - Mobile: `apps/mobile/app/(learner|parent|teacher|therapist|caregiver|...)/...`
 
 Role-segmented routes own **content** only. Cross-cutting chrome
@@ -150,12 +150,12 @@ typed registry that pins the sequence and canonical destinations
 lives in `packages/nav/src/cross-cutting.ts` (`CROSS_CUTTING_REGISTRY`).
 Migrations happen in phase order; each phase is its own PR.
 
-| Phase | Surface         | Web route        | Mobile route     | Anchored NavArea | Why this order                                                                 |
-| ----- | --------------- | ---------------- | ---------------- | ---------------- | ------------------------------------------------------------------------------ |
-| 1     | `notifications` | `/notifications` | `/notifications` | `messages`       | Lowest risk; mobile already has a partial unified inbox to lift from.          |
-| 2     | `messages`      | `/messages`      | `/messages`      | `messages`       | Shares unread counters with notifications; ships once Phase 1 is stable.       |
+| Phase | Surface         | Web route        | Mobile route     | Anchored NavArea | Why this order                                                                |
+| ----- | --------------- | ---------------- | ---------------- | ---------------- | ----------------------------------------------------------------------------- |
+| 1     | `notifications` | `/notifications` | `/notifications` | `messages`       | Lowest risk; mobile already has a partial unified inbox to lift from.         |
+| 2     | `messages`      | `/messages`      | `/messages`      | `messages`       | Shares unread counters with notifications; ships once Phase 1 is stable.      |
 | 3     | `settings`      | `/settings`      | `/settings`      | `settings`       | Needs `activeRole`-aware section visibility; every shell ships a bespoke one. |
-| 4     | `billing`       | `/billing`       | `/billing`       | `billing`        | Highest risk: Stripe surfaces + copy varies most by role (self-pay vs PO).     |
+| 4     | `billing`       | `/billing`       | `/billing`       | `billing`        | Highest risk: Stripe surfaces + copy varies most by role (self-pay vs PO).    |
 
 Rules each migration PR must follow:
 
@@ -181,7 +181,7 @@ exercised end-to-end without a real identity-svc:
 
 - **`GET /api/bff/me`** (`apps/web-v2/app/api/bff/me/route.ts`)
   returns the canonical `{ id, tenantId, roles[], activeRole,
-  capabilities[] }` payload via `buildRoleSession()`
+capabilities[] }` payload via `buildRoleSession()`
   (`apps/web-v2/lib/auth/role-session.ts`).
 - **`POST /api/bff/me/active-role`**
   (`apps/web-v2/app/api/bff/me/active-role/route.ts`) flips the
@@ -224,7 +224,6 @@ The real-mode `identity-svc` refresh-token flow (issuing a JWT whose
 `role` claim follows `activeRole` on rotation) is the remaining
 slice — tracked separately; the BFF contract above is the gate that
 unblocks the client refactor in Phase 1's "Client" bullet.
-
 
 ## Phase 3 — Cross-role data & navigation
 
@@ -349,7 +348,7 @@ merge. The deliverables are CI-enforced contracts, not docs:
 - **Data isolation review** — `apps/web-v2/lib/auth/data-isolation.test.ts`
   pins `requireRole` and `requireLearnerScope` against the
   active-role contract: the server keys off `session.role` (the
-  *active* role), not `session.roles` (the held set). The client
+  _active_ role), not `session.roles` (the held set). The client
   switcher must never be the only gate (defense in depth) — this test
   ensures a session whose active role is `learner` cannot reach a
   parent-only BFF endpoint even when it also holds the parent role.

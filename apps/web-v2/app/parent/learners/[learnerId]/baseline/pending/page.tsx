@@ -2,12 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
-import {
-  AssessmentShell,
-  BaselinePendingCard,
-  ReassuranceCard,
-  InsightChip,
-} from "@aivo/ui";
+import { AssessmentShell, BaselinePendingCard, ReassuranceCard, InsightChip } from "@aivo/ui";
 import {
   createBaseline,
   getActiveBaselineForLearner,
@@ -36,7 +31,7 @@ export default async function BaselinePendingPage({
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.learner_baseline_pending");
   const { learnerId } = await params;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -157,36 +152,24 @@ export default async function BaselinePendingPage({
         <section className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-iw-card border border-iw-border bg-white p-4 flex flex-col gap-1">
             <p className="iw-label text-iw-text-muted">{t("step1_label")}</p>
-            <p className="text-sm font-semibold text-iw-text-strong">
-              {t("step1_heading")}
-            </p>
-            <p className="text-xs text-iw-text-muted leading-relaxed">
-              {t("step1_body")}
-            </p>
+            <p className="text-sm font-semibold text-iw-text-strong">{t("step1_heading")}</p>
+            <p className="text-xs text-iw-text-muted leading-relaxed">{t("step1_body")}</p>
             <InsightChip tone="success" size="sm" className="self-start mt-1">
               Done
             </InsightChip>
           </div>
           <div className="rounded-iw-card border border-iw-border bg-white p-4 flex flex-col gap-1">
             <p className="iw-label text-iw-text-muted">{t("step2_label")}</p>
-            <p className="text-sm font-semibold text-iw-text-strong">
-              {t("step2_heading")}
-            </p>
-            <p className="text-xs text-iw-text-muted leading-relaxed">
-              {t("step2_body")}
-            </p>
+            <p className="text-sm font-semibold text-iw-text-strong">{t("step2_heading")}</p>
+            <p className="text-xs text-iw-text-muted leading-relaxed">{t("step2_body")}</p>
             <InsightChip tone="primary" size="sm" className="self-start mt-1">
               {t("in_progress")}
             </InsightChip>
           </div>
           <div className="rounded-iw-card border border-iw-border bg-white p-4 flex flex-col gap-1">
             <p className="iw-label text-iw-text-muted">{t("step3_label")}</p>
-            <p className="text-sm font-semibold text-iw-text-strong">
-              {t("step3_heading")}
-            </p>
-            <p className="text-xs text-iw-text-muted leading-relaxed">
-              {t("step3_body")}
-            </p>
+            <p className="text-sm font-semibold text-iw-text-strong">{t("step3_heading")}</p>
+            <p className="text-xs text-iw-text-muted leading-relaxed">{t("step3_body")}</p>
             <InsightChip tone="neutral" size="sm" className="self-start mt-1">
               {t("up_next")}
             </InsightChip>

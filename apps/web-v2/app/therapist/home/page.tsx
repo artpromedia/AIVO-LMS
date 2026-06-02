@@ -25,14 +25,10 @@ export default async function TherapistHomePage() {
   const t = await getTranslations("therapist.home");
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
-  const maybeLearners = await Promise.all(
-    learnerIds.map((id) => getLearner(id, session.tenantId)),
-  );
+  const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   for (const l of learners) await refreshLearnerReadiness(l.id, session.tenantId);
-  const refreshed = await Promise.all(
-    learners.map((l) => getLearner(l.id, session.tenantId)),
-  );
+  const refreshed = await Promise.all(learners.map((l) => getLearner(l.id, session.tenantId)));
   const freshLearners = refreshed.filter((l): l is LearnerProfile => Boolean(l));
   const fresh = await Promise.all(
     freshLearners.map(async (l) => ({

@@ -19,17 +19,10 @@
 
 export type SensoryMode = "standard" | "calm" | "high-contrast";
 
-export const SENSORY_MODES: readonly SensoryMode[] = [
-  "standard",
-  "calm",
-  "high-contrast",
-] as const;
+export const SENSORY_MODES: readonly SensoryMode[] = ["standard", "calm", "high-contrast"] as const;
 
 /** Lookup label and helper text for the in-product sensory mode toggle. */
-export const SENSORY_MODE_LABELS: Record<
-  SensoryMode,
-  { label: string; description: string }
-> = {
+export const SENSORY_MODE_LABELS: Record<SensoryMode, { label: string; description: string }> = {
   standard: {
     label: "Standard",
     description: "Full brand palette and motion.",
@@ -49,9 +42,7 @@ export const SENSORY_MODE_LABELS: Record<
  * Mirrors the pattern of `resolveTheme()` / `resolveAgeMode()` in
  * `./playful-calm.ts`.
  */
-export function resolveSensoryMode(
-  mode: string | null | undefined,
-): SensoryMode {
+export function resolveSensoryMode(mode: string | null | undefined): SensoryMode {
   if (mode === "standard" || mode === "calm" || mode === "high-contrast") {
     return mode;
   }
@@ -209,8 +200,7 @@ export const INCLUSIVE_WARM_RADII = {
 } as const;
 
 export const INCLUSIVE_WARM_FONTS = {
-  display:
-    "'Satoshi Variable', 'Satoshi', 'Inter', ui-sans-serif, system-ui, sans-serif",
+  display: "'Satoshi Variable', 'Satoshi', 'Inter', ui-sans-serif, system-ui, sans-serif",
   body: "'Inter', ui-sans-serif, system-ui, sans-serif",
   mono: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace",
   dyslexia:
@@ -242,12 +232,10 @@ export const INCLUSIVE_WARM_RECIPES = {
     "px-3 h-8 inline-flex items-center rounded-full text-xs font-semibold text-[var(--aivo-sensory-inkMuted)] hover:text-[var(--aivo-sensory-ink)] transition-colors",
   sensoryToggleItemActive:
     "bg-[var(--aivo-sensory-bgRaised)] text-[var(--aivo-sensory-ink)] shadow-sm",
-  navCapsuleDark:
-    "flex items-center justify-around bg-[#1a1c23] rounded-full h-16 px-2 shadow-2xl",
+  navCapsuleDark: "flex items-center justify-around bg-[#1a1c23] rounded-full h-16 px-2 shadow-2xl",
   navCapsuleItem:
     "flex-1 inline-flex flex-col items-center gap-1 h-full justify-center text-white/55 hover:text-white text-[10px] font-bold transition-colors",
-  navCapsuleItemActive:
-    "text-[var(--aivo-sensory-warm)] [&_svg]:fill-current/10",
+  navCapsuleItemActive: "text-[var(--aivo-sensory-warm)] [&_svg]:fill-current/10",
   headlineDisplay:
     "font-display font-bold tracking-tight leading-[1.05] text-[var(--aivo-sensory-ink)]",
   // Uses sensory-mode CSS vars so high-contrast mode collapses the
@@ -258,8 +246,7 @@ export const INCLUSIVE_WARM_RECIPES = {
   bodyText: "font-body text-[var(--aivo-sensory-inkMuted)] leading-relaxed",
   badgeSoft:
     "inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold bg-[var(--aivo-sensory-accentSoft)] text-[var(--aivo-sensory-accentDeep,var(--aivo-sensory-accent))]",
-  surfacePage:
-    "bg-[var(--aivo-sensory-bgPage)] text-[var(--aivo-sensory-ink)] font-body",
+  surfacePage: "bg-[var(--aivo-sensory-bgPage)] text-[var(--aivo-sensory-ink)] font-body",
 } as const;
 
 /**

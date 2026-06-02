@@ -54,10 +54,7 @@ export default async function ForgotPasswordPage({
   return (
     <>
       <SiteHeader />
-      <main
-        id="main"
-        className="mx-auto flex w-full max-w-md flex-col gap-4 px-6 py-12 sm:py-16"
-      >
+      <main id="main" className="mx-auto flex w-full max-w-md flex-col gap-4 px-6 py-12 sm:py-16">
         <div className="flex items-center gap-3">
           <span
             aria-hidden="true"
@@ -127,11 +124,7 @@ export default async function ForgotPasswordPage({
               </>
             }
           >
-            <form
-              id="forgot-form"
-              action={forgotPasswordAction}
-              className="flex flex-col gap-4"
-            >
+            <form id="forgot-form" action={forgotPasswordAction} className="flex flex-col gap-4">
               <AuthInput
                 id="email"
                 name="email"

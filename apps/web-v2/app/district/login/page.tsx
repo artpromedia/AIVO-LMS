@@ -31,15 +31,11 @@ async function signInAction(formData: FormData): Promise<void> {
     redirect("/district/login?error=missing_credentials");
   }
 
-  const {
-    identityDistrictLogin,
-    extractRefreshToken,
-    toSessionProfile,
-  } = await import("@/lib/auth/identity-client");
+  const { identityDistrictLogin, extractRefreshToken, toSessionProfile } =
+    await import("@/lib/auth/identity-client");
   const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
-  const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } = await import(
-    "@/lib/auth/mfa-cookies"
-  );
+  const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } =
+    await import("@/lib/auth/mfa-cookies");
 
   const result = await identityDistrictLogin(email, password);
 

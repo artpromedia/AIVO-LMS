@@ -36,7 +36,7 @@ extend the learner accessibility-prefs surface with the toggle.
     `scanDelayMs` from props.
   - `useAACTarget(id, label, onActivate)` — register a focusable UI
     control as a scannable target. Returns `{ ref, isHighlighted,
-    aacActive }`. Safe to call when no provider is mounted (returns
+aacActive }`. Safe to call when no provider is mounted (returns
     a no-op ref and `aacActive=false`), so every focusable element can
     use it unconditionally.
   - `AACScanRoot` — wraps a subtree and listens for the activation key
@@ -62,7 +62,7 @@ extend the learner accessibility-prefs surface with the toggle.
 - **`apps/web-v2/lib/db/types.ts`** — `AccessibilityPreferences`
   extended with `aacEnabled: boolean`, `aacInputMethod` (touch /
   switch_1 / switch_2 / eye_gaze / head_pointer), `aacScanDelayMs:
-  number`. `ACCESSIBILITY_DEFAULTS` ships sensible defaults
+number`. `ACCESSIBILITY_DEFAULTS` ships sensible defaults
   (aacEnabled=false, touch, 1000 ms).
 
 - **`apps/web-v2/app/learner/lesson-runs/[lessonRunId]/lesson-player.tsx`** —

@@ -13,16 +13,16 @@ file tracks compliance across the existing item bank.
 
 ## Per-subject status
 
-| Subject              | Items w/ media | Captioned | Auto | Status   |
-| -------------------- | -------------- | --------- | ---- | -------- |
-| Math                 | 0              | 0         | 0    | n/a      |
-| ELA / Reading        | 14             | 14        | 0    | Ready    |
-| Science              | 6              | 6         | 0    | Ready    |
-| World Languages      | 22             | 22        | 0    | Ready    |
-| Social Studies       | 4              | 4         | 0    | Ready    |
-| Social-Emotional     | 0              | 0         | 0    | n/a      |
-| Executive Function   | 0              | 0         | 0    | n/a      |
-| Life Skills          | 0              | 0         | 0    | n/a      |
+| Subject            | Items w/ media | Captioned | Auto | Status |
+| ------------------ | -------------- | --------- | ---- | ------ |
+| Math               | 0              | 0         | 0    | n/a    |
+| ELA / Reading      | 14             | 14        | 0    | Ready  |
+| Science            | 6              | 6         | 0    | Ready  |
+| World Languages    | 22             | 22        | 0    | Ready  |
+| Social Studies     | 4              | 4         | 0    | Ready  |
+| Social-Emotional   | 0              | 0         | 0    | n/a    |
+| Executive Function | 0              | 0         | 0    | n/a    |
+| Life Skills        | 0              | 0         | 0    | n/a    |
 
 > Sprint 5 social-studies items ship with captions inline (every video
 > item in `services/subject-brain-svc/src/brains/social-studies/items.ts`

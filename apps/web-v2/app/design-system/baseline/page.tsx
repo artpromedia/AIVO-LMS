@@ -66,9 +66,8 @@ export default function BaselineDesignSystemPage() {
             Custom baseline experience
           </h1>
           <p className="text-iw-text-muted max-w-2xl leading-relaxed">
-            Calm, child-friendly primitives for the personalized baseline
-            assessment. Big touch targets, no grades, no timers, always
-            reduced-motion friendly.
+            Calm, child-friendly primitives for the personalized baseline assessment. Big touch
+            targets, no grades, no timers, always reduced-motion friendly.
           </p>
           <nav className="flex flex-wrap gap-2 mt-2">
             <Link
@@ -126,9 +125,21 @@ export default function BaselineDesignSystemPage() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <LearnerChoiceCard name="demo.choice" value="a" label="The lion roared." index={0} />
-              <LearnerChoiceCard name="demo.choice" value="b" label="The tiger leapt." index={1} defaultChecked />
+              <LearnerChoiceCard
+                name="demo.choice"
+                value="b"
+                label="The tiger leapt."
+                index={1}
+                defaultChecked
+              />
               <LearnerChoiceCard name="demo.choice" value="c" label="The bear waited." index={2} />
-              <LearnerChoiceCard name="demo.choice" value="d" label="The fox ran fast." index={3} disabled />
+              <LearnerChoiceCard
+                name="demo.choice"
+                value="d"
+                label="The fox ran fast."
+                index={3}
+                disabled
+              />
             </div>
             <HintCard hint="Look at the action word — it tells you who's moving." />
             <HintCard hint="(hidden)" policy="locked" />
@@ -151,7 +162,13 @@ export default function BaselineDesignSystemPage() {
             readAloud={<ReadAloudButton />}
           >
             <LearnerChoiceCard name="demo.q1" value="happy" label="happy" index={0} />
-            <LearnerChoiceCard name="demo.q1" value="tired" label="tired" index={1} defaultChecked />
+            <LearnerChoiceCard
+              name="demo.q1"
+              value="tired"
+              label="tired"
+              index={1}
+              defaultChecked
+            />
             <LearnerChoiceCard name="demo.q1" value="loud" label="loud" index={2} />
             <LearnerChoiceCard name="demo.q1" value="cold" label="cold" index={3} />
             <HintCard hint="Think about how someone might feel after walking a long way." />
@@ -208,7 +225,11 @@ export default function BaselineDesignSystemPage() {
           <SectionLabel>CompletionHero · learner view (no scores)</SectionLabel>
           <CompletionHero
             learnerName="Emma"
-            learned={["Reading: starting at on grade", "Math: starting at building", "IEP supports stay on"]}
+            learned={[
+              "Reading: starting at on grade",
+              "Math: starting at building",
+              "IEP supports stay on",
+            ]}
             primary={
               <button
                 type="button"
@@ -273,7 +294,13 @@ export default function BaselineDesignSystemPage() {
                 readAloud={<ReadAloudButton />}
               >
                 <LearnerChoiceCard name="demo.q2" value="tall" label="tall" index={0} />
-                <LearnerChoiceCard name="demo.q2" value="small" label="small" index={1} defaultChecked />
+                <LearnerChoiceCard
+                  name="demo.q2"
+                  value="small"
+                  label="small"
+                  index={1}
+                  defaultChecked
+                />
                 <LearnerChoiceCard name="demo.q2" value="happy" label="happy" index={2} />
               </LearnerQuestionCard>
             </LearnerBaselineShell>

@@ -58,8 +58,10 @@ describe("Phase 5 RBAC — single-role session × every area × every surface", 
             expect(decision.outcome).toBe("locked");
             // The matrix is required to ship a human-readable lock
             // reason for every locked cell so the LockedScreen has copy.
-            expect(perm.lockReason, `Role ${role} / area ${area} is locked but lacks lockReason`)
-              .toBeTruthy();
+            expect(
+              perm.lockReason,
+              `Role ${role} / area ${area} is locked but lacks lockReason`,
+            ).toBeTruthy();
           } else {
             // Hidden + no other role to switch into → forbidden.
             expect(decision.outcome).toBe("forbidden");

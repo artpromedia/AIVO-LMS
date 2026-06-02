@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { 
-  Settings, 
-  Eye, 
-  Battery, 
-  Wifi, 
-  Signal, 
+import {
+  Settings,
+  Eye,
+  Battery,
+  Wifi,
+  Signal,
   ChevronRight,
   BookOpen,
   Calculator,
@@ -13,7 +13,7 @@ import {
   Trophy,
   Brain,
   Pause,
-  Map
+  Map,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,11 @@ export function Mobile() {
   const [mode, setMode] = useState<"standard" | "calm">("standard");
 
   return (
-    <div className={`aivo-inclusive-warm relative w-full h-full max-w-[390px] mx-auto bg-background text-foreground overflow-hidden flex flex-col font-sans transition-colors duration-500 border-x shadow-2xl ${
-      mode === "calm" ? "sensory-calm" : ""
-    }`}>
-      
+    <div
+      className={`aivo-inclusive-warm relative w-full h-full max-w-[390px] mx-auto bg-background text-foreground overflow-hidden flex flex-col font-sans transition-colors duration-500 border-x shadow-2xl ${
+        mode === "calm" ? "sensory-calm" : ""
+      }`}
+    >
       {/* Fake iOS Status Bar */}
       <div className="h-12 px-6 flex items-center justify-between text-foreground text-[15px] font-semibold shrink-0 pt-2 z-50 bg-transparent">
         <span>9:41</span>
@@ -49,35 +50,40 @@ export function Mobile() {
             <p className="text-[11px] font-semibold text-muted-foreground">Level 3 Explorer</p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="w-12 h-12 rounded-full bg-white/60 backdrop-blur-md shadow-sm"
-            onClick={() => setMode(m => m === "standard" ? "calm" : "standard")}
+            onClick={() => setMode((m) => (m === "standard" ? "calm" : "standard"))}
           >
-            <Eye className={`w-5 h-5 ${mode === "calm" ? "text-primary" : "text-muted-foreground"}`} />
+            <Eye
+              className={`w-5 h-5 ${mode === "calm" ? "text-primary" : "text-muted-foreground"}`}
+            />
           </Button>
         </div>
       </header>
 
       {/* Main Scrollable Content */}
       <div className="flex-1 overflow-y-auto px-6 pb-32 scrollbar-hide">
-        
         {/* Companion & Status */}
         <section className="mt-4 mb-8 relative">
-          <div className={`rounded-[2.5rem] p-6 flex flex-col items-center text-center transition-all duration-500 relative overflow-hidden ${
-            mode === "calm" ? "bg-card border-border/50 border" : "bg-card shadow-lg border border-white/50"
-          }`}>
+          <div
+            className={`rounded-[2.5rem] p-6 flex flex-col items-center text-center transition-all duration-500 relative overflow-hidden ${
+              mode === "calm"
+                ? "bg-card border-border/50 border"
+                : "bg-card shadow-lg border border-white/50"
+            }`}
+          >
             {mode !== "calm" && (
-               <div className="absolute top-0 right-0 w-48 h-48 bg-secondary/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4"></div>
+              <div className="absolute top-0 right-0 w-48 h-48 bg-secondary/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4"></div>
             )}
-            
+
             <div className="relative w-40 h-40 mb-2">
-              <img 
-                src="/__mockup/images/aivo-inclusive-warm/companion-3d.png" 
-                alt="Digital Companion" 
+              <img
+                src="/__mockup/images/aivo-inclusive-warm/companion-3d.png"
+                alt="Digital Companion"
                 className="w-full h-full object-contain relative z-10 drop-shadow-xl"
               />
             </div>
@@ -85,7 +91,7 @@ export function Mobile() {
             <p className="text-muted-foreground text-sm font-medium max-w-[240px]">
               You had great focus yesterday. Ready for today's plan?
             </p>
-            
+
             <div className="w-full mt-8 flex items-center gap-4 bg-white/80 backdrop-blur p-4 rounded-[2rem] border shadow-sm">
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 text-amber-700 shrink-0">
                 <Star className="w-6 h-6 fill-amber-500" />
@@ -95,7 +101,10 @@ export function Mobile() {
                   <span className="text-foreground">Daily Goal</span>
                   <span className="text-amber-600">120 / 200 XP</span>
                 </div>
-                <Progress value={60} className="h-3 bg-amber-100 rounded-full [&>div]:bg-amber-500" />
+                <Progress
+                  value={60}
+                  className="h-3 bg-amber-100 rounded-full [&>div]:bg-amber-500"
+                />
               </div>
             </div>
           </div>
@@ -105,9 +114,11 @@ export function Mobile() {
         <section>
           <div className="flex items-center justify-between mb-5">
             <h3 className="font-bold text-xl">Today's Plan</h3>
-            <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full">3 Tasks</span>
+            <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full">
+              3 Tasks
+            </span>
           </div>
-          
+
           <div className="space-y-4">
             {/* Active Task */}
             <Card className="border-0 shadow-lg rounded-[2rem] overflow-hidden relative bg-white">
@@ -118,7 +129,9 @@ export function Mobile() {
                     <Calculator className="w-4 h-4" />
                     <span>Math with Nova</span>
                   </div>
-                  <span className="text-xs font-bold text-muted-foreground bg-muted px-2 py-1 rounded-md">15 mins</span>
+                  <span className="text-xs font-bold text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                    15 mins
+                  </span>
                 </div>
                 <h4 className="font-extrabold text-lg mb-1">Fractions with Trains</h4>
                 <p className="text-sm font-medium text-muted-foreground mb-5">
@@ -139,7 +152,9 @@ export function Mobile() {
                   </div>
                   <div>
                     <h4 className="font-bold text-[15px] mb-0.5">Reading Logic</h4>
-                    <p className="text-xs font-semibold text-muted-foreground">Word patterns with Atlas</p>
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Word patterns with Atlas
+                    </p>
                   </div>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
@@ -156,8 +171,12 @@ export function Mobile() {
                     <Pause className="w-6 h-6 text-muted-foreground" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-[15px] mb-0.5 text-muted-foreground">Brain Break</h4>
-                    <p className="text-xs font-semibold text-muted-foreground/60">Scheduled for 10:15</p>
+                    <h4 className="font-bold text-[15px] mb-0.5 text-muted-foreground">
+                      Brain Break
+                    </h4>
+                    <p className="text-xs font-semibold text-muted-foreground/60">
+                      Scheduled for 10:15
+                    </p>
                   </div>
                 </div>
               </CardContent>

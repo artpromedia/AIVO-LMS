@@ -146,7 +146,9 @@ export function CurriculumManager({
         error?: { userMessage?: string; message?: string };
       };
       if (!res.ok || !body.ok || !body.data) {
-        setError(body.error?.userMessage ?? body.error?.message ?? "Couldn't analyze that. Try again.");
+        setError(
+          body.error?.userMessage ?? body.error?.message ?? "Couldn't analyze that. Try again.",
+        );
         setBusy("idle");
         return;
       }
@@ -240,8 +242,7 @@ export function CurriculumManager({
     }
   }
 
-  const subjectName = (slug: string) =>
-    subjectOptions.find((s) => s.slug === slug)?.name ?? slug;
+  const subjectName = (slug: string) => subjectOptions.find((s) => s.slug === slug)?.name ?? slug;
 
   return (
     <div className="grid gap-6">
@@ -250,8 +251,8 @@ export function CurriculumManager({
         <div>
           <h2 className="text-base font-semibold">Add this week&apos;s lessons</h2>
           <p className="text-sm text-muted-foreground">
-            Paste or upload what {learnerName} is covering in class this week. AIVO&apos;s tutor will
-            teach the same topics, fitted to {learnerName}&apos;s learning profile.
+            Paste or upload what {learnerName} is covering in class this week. AIVO&apos;s tutor
+            will teach the same topics, fitted to {learnerName}&apos;s learning profile.
           </p>
         </div>
 
@@ -425,7 +426,12 @@ export function CurriculumManager({
             <Button type="button" onClick={onSave} disabled={busy !== "idle"}>
               {busy === "saving" ? "Saving…" : "Save this week's focus"}
             </Button>
-            <Button type="button" variant="outline" onClick={() => setDraft(null)} disabled={busy !== "idle"}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDraft(null)}
+              disabled={busy !== "idle"}
+            >
               Back
             </Button>
           </div>
@@ -452,7 +458,9 @@ export function CurriculumManager({
                   <div>
                     <p className="font-medium">
                       {u.title}{" "}
-                      <span className="text-xs text-muted-foreground">· {subjectName(u.subject)}</span>
+                      <span className="text-xs text-muted-foreground">
+                        · {subjectName(u.subject)}
+                      </span>
                       {u.status === "active" ? (
                         <span className="ml-2 rounded bg-primary/10 px-2 py-0.5 text-xs text-primary">
                           Active

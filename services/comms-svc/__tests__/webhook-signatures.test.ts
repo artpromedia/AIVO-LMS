@@ -28,7 +28,9 @@ test("Mailgun signature: bad signature rejected", () => {
   const secret = "mailgun-key";
   const ts = "1690000000";
   const tok = "abc";
-  const good = createHmac("sha256", secret).update(ts + tok).digest("hex");
+  const good = createHmac("sha256", secret)
+    .update(ts + tok)
+    .digest("hex");
   assert.strictEqual(
     verifyMailgunSignature({ timestamp: ts, token: tok, signature: good }, secret),
     true,

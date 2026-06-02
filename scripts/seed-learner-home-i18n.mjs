@@ -40,7 +40,8 @@ const HOME = {
     resume_lesson: "Resume Lesson",
     start_lesson: "Start Lesson",
     setup_title: "Let's get you set up",
-    setup_body_baseline: "We need a quick baseline check so we can build a lesson plan just for you.",
+    setup_body_baseline:
+      "We need a quick baseline check so we can build a lesson plan just for you.",
     setup_body_wait: "Just a moment — we're picking something special.",
     setup_cta_baseline: "Finish the baseline",
     setup_cta_refresh: "Refresh",
@@ -52,9 +53,11 @@ const HOME = {
     supports_on: "Supports on",
     messages_title: "For You Today",
     msg_hint_title: "Need a hint? I'm here.",
-    msg_hint_body: "Tap the read-aloud speaker on any question to hear it. No grades — just exploring together.",
+    msg_hint_body:
+      "Tap the read-aloud speaker on any question to hear it. No grades — just exploring together.",
     msg_supports_title: "Your supports are on",
-    msg_supports_body: "Read-aloud, calm pacing, and {count, plural, one {# other support} other {# other supports}} from your IEP are active.",
+    msg_supports_body:
+      "Read-aloud, calm pacing, and {count, plural, one {# other support} other {# other supports}} from your IEP are active.",
     msg_break_title: "Breaks are good",
     msg_break_body: "Stretch, sip water, look out the window. AIVO will save your place.",
   },
@@ -81,7 +84,8 @@ const HOME = {
     resume_lesson: "Reanudar lección",
     start_lesson: "Empezar lección",
     setup_title: "Vamos a prepararte",
-    setup_body_baseline: "Necesitamos una comprobación rápida de nivel para crear un plan de lecciones solo para ti.",
+    setup_body_baseline:
+      "Necesitamos una comprobación rápida de nivel para crear un plan de lecciones solo para ti.",
     setup_body_wait: "Un momento: estamos eligiendo algo especial.",
     setup_cta_baseline: "Terminar el nivel inicial",
     setup_cta_refresh: "Actualizar",
@@ -93,9 +97,11 @@ const HOME = {
     supports_on: "Apoyos activados",
     messages_title: "Para ti hoy",
     msg_hint_title: "¿Necesitas una pista? Aquí estoy.",
-    msg_hint_body: "Toca el altavoz de lectura en voz alta en cualquier pregunta para oírla. Sin notas, solo explorando juntos.",
+    msg_hint_body:
+      "Toca el altavoz de lectura en voz alta en cualquier pregunta para oírla. Sin notas, solo explorando juntos.",
     msg_supports_title: "Tus apoyos están activados",
-    msg_supports_body: "La lectura en voz alta, el ritmo tranquilo y {count, plural, one {# apoyo más} other {# apoyos más}} de tu IEP están activos.",
+    msg_supports_body:
+      "La lectura en voz alta, el ritmo tranquilo y {count, plural, one {# apoyo más} other {# apoyos más}} de tu IEP están activos.",
     msg_break_title: "Los descansos son buenos",
     msg_break_body: "Estírate, bebe agua, mira por la ventana. AIVO guardará tu lugar.",
   },
@@ -122,7 +128,8 @@ const HOME = {
     resume_lesson: "Reprendre la leçon",
     start_lesson: "Commencer la leçon",
     setup_title: "On va te préparer",
-    setup_body_baseline: "Il nous faut une petite évaluation de départ pour créer un plan de leçons rien que pour toi.",
+    setup_body_baseline:
+      "Il nous faut une petite évaluation de départ pour créer un plan de leçons rien que pour toi.",
     setup_body_wait: "Un instant — on choisit quelque chose de spécial.",
     setup_cta_baseline: "Terminer l'évaluation de départ",
     setup_cta_refresh: "Actualiser",
@@ -134,9 +141,11 @@ const HOME = {
     supports_on: "Aides activées",
     messages_title: "Pour toi aujourd'hui",
     msg_hint_title: "Besoin d'un indice ? Je suis là.",
-    msg_hint_body: "Touche le haut-parleur de lecture sur n'importe quelle question pour l'entendre. Pas de notes — on explore ensemble.",
+    msg_hint_body:
+      "Touche le haut-parleur de lecture sur n'importe quelle question pour l'entendre. Pas de notes — on explore ensemble.",
     msg_supports_title: "Tes aides sont activées",
-    msg_supports_body: "La lecture à voix haute, le rythme apaisé et {count, plural, one {# autre aide} other {# autres aides}} de ton IEP sont actifs.",
+    msg_supports_body:
+      "La lecture à voix haute, le rythme apaisé et {count, plural, one {# autre aide} other {# autres aides}} de ton IEP sont actifs.",
     msg_break_title: "Les pauses, c'est bien",
     msg_break_body: "Étire-toi, bois de l'eau, regarde par la fenêtre. AIVO gardera ta place.",
   },
@@ -163,7 +172,8 @@ const HOME = {
     resume_lesson: "Lektion fortsetzen",
     start_lesson: "Lektion starten",
     setup_title: "Lass uns dich einrichten",
-    setup_body_baseline: "Wir brauchen einen kurzen Einstufungs-Check, damit wir einen Lernplan nur für dich erstellen können.",
+    setup_body_baseline:
+      "Wir brauchen einen kurzen Einstufungs-Check, damit wir einen Lernplan nur für dich erstellen können.",
     setup_body_wait: "Einen Moment — wir suchen etwas Besonderes aus.",
     setup_cta_baseline: "Einstufung abschließen",
     setup_cta_refresh: "Aktualisieren",
@@ -175,11 +185,14 @@ const HOME = {
     supports_on: "Hilfen an",
     messages_title: "Für dich heute",
     msg_hint_title: "Brauchst du einen Tipp? Ich bin da.",
-    msg_hint_body: "Tippe bei jeder Frage auf das Vorlese-Symbol, um sie zu hören. Keine Noten — wir entdecken einfach gemeinsam.",
+    msg_hint_body:
+      "Tippe bei jeder Frage auf das Vorlese-Symbol, um sie zu hören. Keine Noten — wir entdecken einfach gemeinsam.",
     msg_supports_title: "Deine Hilfen sind an",
-    msg_supports_body: "Vorlesen, ruhiges Tempo und {count, plural, one {# weitere Hilfe} other {# weitere Hilfen}} aus deinem IEP sind aktiv.",
+    msg_supports_body:
+      "Vorlesen, ruhiges Tempo und {count, plural, one {# weitere Hilfe} other {# weitere Hilfen}} aus deinem IEP sind aktiv.",
     msg_break_title: "Pausen sind gut",
-    msg_break_body: "Streck dich, trink Wasser, schau aus dem Fenster. AIVO merkt sich deinen Platz.",
+    msg_break_body:
+      "Streck dich, trink Wasser, schau aus dem Fenster. AIVO merkt sich deinen Platz.",
   },
 
   pt: {
@@ -204,7 +217,8 @@ const HOME = {
     resume_lesson: "Retomar lição",
     start_lesson: "Começar lição",
     setup_title: "Vamos te preparar",
-    setup_body_baseline: "Precisamos de uma verificação rápida de nível para criar um plano de lições só para você.",
+    setup_body_baseline:
+      "Precisamos de uma verificação rápida de nível para criar um plano de lições só para você.",
     setup_body_wait: "Só um momento — estamos escolhendo algo especial.",
     setup_cta_baseline: "Concluir o nível inicial",
     setup_cta_refresh: "Atualizar",
@@ -216,9 +230,11 @@ const HOME = {
     supports_on: "Apoios ativados",
     messages_title: "Para você hoje",
     msg_hint_title: "Precisa de uma dica? Estou aqui.",
-    msg_hint_body: "Toque no alto-falante de leitura em qualquer pergunta para ouvi-la. Sem notas — só explorando juntos.",
+    msg_hint_body:
+      "Toque no alto-falante de leitura em qualquer pergunta para ouvi-la. Sem notas — só explorando juntos.",
     msg_supports_title: "Seus apoios estão ativados",
-    msg_supports_body: "Leitura em voz alta, ritmo calmo e {count, plural, one {# outro apoio} other {# outros apoios}} do seu IEP estão ativos.",
+    msg_supports_body:
+      "Leitura em voz alta, ritmo calmo e {count, plural, one {# outro apoio} other {# outros apoios}} do seu IEP estão ativos.",
     msg_break_title: "Pausas são boas",
     msg_break_body: "Alongue-se, beba água, olhe pela janela. A AIVO guardará seu lugar.",
   },
@@ -259,7 +275,8 @@ const HOME = {
     msg_hint_title: "需要提示吗？我在这儿。",
     msg_hint_body: "在任意问题上点按朗读扬声器即可听到它。没有分数——只是一起探索。",
     msg_supports_title: "你的支持已开启",
-    msg_supports_body: "朗读、平和的节奏，以及来自你 IEP 的{count, plural, other {另外 # 项支持}}都已启用。",
+    msg_supports_body:
+      "朗读、平和的节奏，以及来自你 IEP 的{count, plural, other {另外 # 项支持}}都已启用。",
     msg_break_title: "休息是好事",
     msg_break_body: "伸个懒腰、喝点水、看看窗外。AIVO 会保存你的位置。",
   },
@@ -298,9 +315,11 @@ const HOME = {
     supports_on: "サポートがオン",
     messages_title: "今日のあなたへ",
     msg_hint_title: "ヒントがいる？ここにいるよ。",
-    msg_hint_body: "どの質問でも読み上げスピーカーをタップすると聞けます。成績はなし — 一緒に探検するだけ。",
+    msg_hint_body:
+      "どの質問でも読み上げスピーカーをタップすると聞けます。成績はなし — 一緒に探検するだけ。",
     msg_supports_title: "あなたのサポートはオンです",
-    msg_supports_body: "読み上げ、落ち着いたペース、そして IEP からの{count, plural, other {他 # 件のサポート}}が有効です。",
+    msg_supports_body:
+      "読み上げ、落ち着いたペース、そして IEP からの{count, plural, other {他 # 件のサポート}}が有効です。",
     msg_break_title: "休憩はいいこと",
     msg_break_body: "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。",
   },
@@ -339,9 +358,11 @@ const HOME = {
     supports_on: "지원 켜짐",
     messages_title: "오늘 너에게",
     msg_hint_title: "힌트가 필요해? 내가 여기 있어.",
-    msg_hint_body: "어느 질문에서든 소리 내어 읽기 스피커를 누르면 들을 수 있어. 점수는 없어 — 그냥 함께 탐험하는 거야.",
+    msg_hint_body:
+      "어느 질문에서든 소리 내어 읽기 스피커를 누르면 들을 수 있어. 점수는 없어 — 그냥 함께 탐험하는 거야.",
     msg_supports_title: "너의 지원이 켜져 있어",
-    msg_supports_body: "소리 내어 읽기, 차분한 속도, 그리고 IEP의 {count, plural, other {다른 지원 #개}}가 활성화되어 있어.",
+    msg_supports_body:
+      "소리 내어 읽기, 차분한 속도, 그리고 IEP의 {count, plural, other {다른 지원 #개}}가 활성화되어 있어.",
     msg_break_title: "쉬는 건 좋은 거야",
     msg_break_body: "기지개를 켜고, 물을 마시고, 창밖을 봐. AIVO가 네 자리를 저장해 둘게.",
   },
@@ -380,9 +401,11 @@ const HOME = {
     supports_on: "وسائل الدعم مفعّلة",
     messages_title: "لك اليوم",
     msg_hint_title: "تحتاج إلى تلميح؟ أنا هنا.",
-    msg_hint_body: "اضغط على سمّاعة القراءة الجهرية في أي سؤال لتسمعه. لا درجات — مجرّد استكشاف معًا.",
+    msg_hint_body:
+      "اضغط على سمّاعة القراءة الجهرية في أي سؤال لتسمعه. لا درجات — مجرّد استكشاف معًا.",
     msg_supports_title: "وسائل دعمك مفعّلة",
-    msg_supports_body: "القراءة الجهرية والإيقاع الهادئ و{count, plural, other {# وسيلة دعم أخرى}} من خطة الـ IEP الخاصة بك مفعّلة.",
+    msg_supports_body:
+      "القراءة الجهرية والإيقاع الهادئ و{count, plural, other {# وسيلة دعم أخرى}} من خطة الـ IEP الخاصة بك مفعّلة.",
     msg_break_title: "الاستراحات جيّدة",
     msg_break_body: "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك.",
   },
@@ -421,9 +444,11 @@ const HOME = {
     supports_on: "सहायताएँ चालू",
     messages_title: "आज तुम्हारे लिए",
     msg_hint_title: "संकेत चाहिए? मैं यहाँ हूँ।",
-    msg_hint_body: "किसी भी सवाल पर ज़ोर-से-पढ़ने वाला स्पीकर दबाकर उसे सुनो। कोई ग्रेड नहीं — बस साथ मिलकर खोज।",
+    msg_hint_body:
+      "किसी भी सवाल पर ज़ोर-से-पढ़ने वाला स्पीकर दबाकर उसे सुनो। कोई ग्रेड नहीं — बस साथ मिलकर खोज।",
     msg_supports_title: "तुम्हारी सहायताएँ चालू हैं",
-    msg_supports_body: "ज़ोर से पढ़ना, शांत गति, और तुम्हारे IEP से {count, plural, one {# और सहायता} other {# और सहायताएँ}} सक्रिय हैं।",
+    msg_supports_body:
+      "ज़ोर से पढ़ना, शांत गति, और तुम्हारे IEP से {count, plural, one {# और सहायता} other {# और सहायताएँ}} सक्रिय हैं।",
     msg_break_title: "विराम अच्छे होते हैं",
     msg_break_body: "अंगड़ाई लो, पानी पियो, खिड़की से बाहर देखो। AIVO तुम्हारी जगह सहेज लेगा।",
   },

@@ -81,10 +81,7 @@ export function BaselinePendingCard({
         <div className="flex flex-col gap-1.5 min-w-0">
           <h1 className="text-2xl md:text-[28px] font-semibold text-iw-text-strong leading-snug">
             {title ?? (
-              <>
-                Building {learnerName ? <span>{learnerName}'s</span> : null} custom
-                baseline
-              </>
+              <>Building {learnerName ? <span>{learnerName}'s</span> : null} custom baseline</>
             )}
           </h1>
           <p className="text-sm md:text-base text-iw-text-muted leading-relaxed max-w-2xl">
@@ -116,9 +113,7 @@ export function BaselinePendingCard({
             />
           )}
         </div>
-        {estimate ? (
-          <p className="text-xs text-iw-text-muted">{estimate}</p>
-        ) : null}
+        {estimate ? <p className="text-xs text-iw-text-muted">{estimate}</p> : null}
       </div>
 
       {inputs && inputs.length ? (

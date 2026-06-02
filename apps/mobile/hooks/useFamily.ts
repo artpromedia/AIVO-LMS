@@ -230,8 +230,8 @@ export interface WhatsWorkingInsights {
   windowDays: number;
   totalSessions: number;
   bestWindow: { timeOfDay: string; meanAccuracy: number } | null;
-  modalityFit: Array<{ subject: string; modality: string; meanAccuracy: number }>;
-  frustrationHotspots: Array<{ subject: string; modality: string; meanFrustration: number }>;
+  modalityFit: { subject: string; modality: string; meanAccuracy: number }[];
+  frustrationHotspots: { subject: string; modality: string; meanFrustration: number }[];
 }
 
 /**

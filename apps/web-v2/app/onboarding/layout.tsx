@@ -9,10 +9,6 @@ export const metadata = {
   title: "Welcome to AIVO",
 };
 
-export default function OnboardingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

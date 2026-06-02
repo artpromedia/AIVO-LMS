@@ -6,20 +6,20 @@ Sprint 12.7 closes out the SCIM 2.0 surface that ships with `identity-svc`. AIVO
 
 All endpoints are mounted under `/scim/v2/*` on `identity-svc`.
 
-| Method | Path | Notes |
-| ------ | ---- | ----- |
-| GET | `/ServiceProviderConfig` | Public per RFC 7644 §4. |
-| GET | `/Schemas` | Public. |
-| GET | `/ResourceTypes` | Public. |
-| GET | `/Users` | Filter (eq + and/or), `startIndex`, `count` per RFC 7644 §3.4.2. |
-| POST | `/Users` | JIT into the tenant bound to the bearer token. |
-| GET | `/Users/:id` | Tenant-scoped. |
-| PUT | `/Users/:id` | Full replace. |
-| PATCH | `/Users/:id` | Path-based ops per RFC 7644 §3.5.2. |
-| DELETE | `/Users/:id` | Soft-delete (sets `deactivatedAt`); emits audit event. |
-| GET | `/Groups` | Lists virtual role-derived groups. |
-| GET | `/Groups/:id` | Returns active members. |
-| POST/PUT/PATCH/DELETE | `/Groups*` | Refused with SCIM `mutability` (400). Groups are role-derived; mutate `aivoRole` on the user instead. |
+| Method                | Path                     | Notes                                                                                                 |
+| --------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| GET                   | `/ServiceProviderConfig` | Public per RFC 7644 §4.                                                                               |
+| GET                   | `/Schemas`               | Public.                                                                                               |
+| GET                   | `/ResourceTypes`         | Public.                                                                                               |
+| GET                   | `/Users`                 | Filter (eq + and/or), `startIndex`, `count` per RFC 7644 §3.4.2.                                      |
+| POST                  | `/Users`                 | JIT into the tenant bound to the bearer token.                                                        |
+| GET                   | `/Users/:id`             | Tenant-scoped.                                                                                        |
+| PUT                   | `/Users/:id`             | Full replace.                                                                                         |
+| PATCH                 | `/Users/:id`             | Path-based ops per RFC 7644 §3.5.2.                                                                   |
+| DELETE                | `/Users/:id`             | Soft-delete (sets `deactivatedAt`); emits audit event.                                                |
+| GET                   | `/Groups`                | Lists virtual role-derived groups.                                                                    |
+| GET                   | `/Groups/:id`            | Returns active members.                                                                               |
+| POST/PUT/PATCH/DELETE | `/Groups*`               | Refused with SCIM `mutability` (400). Groups are role-derived; mutate `aivoRole` on the user instead. |
 
 ## Authentication
 

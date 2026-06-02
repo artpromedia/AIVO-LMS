@@ -153,9 +153,7 @@ export function Footer() {
             </p>
             <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-100 px-4 py-2 rounded-full text-[var(--aivo-sensory-primary)]">
               <ShieldCheck className="w-4 h-4" aria-hidden="true" />
-              <span className="text-sm font-semibold whitespace-nowrap">
-                COPPA · FERPA · SOC 2
-              </span>
+              <span className="text-sm font-semibold whitespace-nowrap">COPPA · FERPA · SOC 2</span>
             </div>
             <NewsletterSignup />
           </div>

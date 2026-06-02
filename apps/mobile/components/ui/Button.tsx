@@ -59,15 +59,9 @@ export function Button({
   const isPrimary = variant === "primary";
   const isOutline = variant === "outline";
 
-  const bg = isPrimary
-    ? palette.primary
-    : isOutline
-      ? "transparent"
-      : palette.bgRaised;
+  const bg = isPrimary ? palette.primary : isOutline ? "transparent" : palette.bgRaised;
 
-  const fg = isPrimary
-    ? palette.primaryFg
-    : palette.primary;
+  const fg = isPrimary ? palette.primaryFg : palette.primary;
 
   const borderColor = isOutline ? palette.border : "transparent";
   const borderWidth = isOutline ? 1.5 : 0;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { Text, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
@@ -28,13 +28,22 @@ export default function ParentDataExportScreen() {
       if (res.ok) {
         Alert.alert(
           t("parentPrivacy.exportTitle", "Export ready"),
-          t("parentPrivacy.exportDone", "We've prepared your account data. You'll receive it by email shortly."),
+          t(
+            "parentPrivacy.exportDone",
+            "We've prepared your account data. You'll receive it by email shortly.",
+          ),
         );
       } else {
-        Alert.alert(t("common.error", "Something went wrong"), t("parentPrivacy.exportFailed", "Couldn't start the export. Please try again."));
+        Alert.alert(
+          t("common.error", "Something went wrong"),
+          t("parentPrivacy.exportFailed", "Couldn't start the export. Please try again."),
+        );
       }
     } catch {
-      Alert.alert(t("common.error", "Something went wrong"), t("parentPrivacy.exportFailed", "Couldn't start the export. Please try again."));
+      Alert.alert(
+        t("common.error", "Something went wrong"),
+        t("parentPrivacy.exportFailed", "Couldn't start the export. Please try again."),
+      );
     } finally {
       setBusy(false);
     }
@@ -46,7 +55,10 @@ export default function ParentDataExportScreen() {
       <Card tone="raised" style={{ gap: spacing.sm }}>
         <Ionicons name="download-outline" size={28} color={palette.primary} />
         <Text style={[styles.body, { color: palette.inkMuted }]}>
-          {t("parentPrivacy.exportBody", "Request a machine-readable copy of your account and your children's learning data. We'll email it to you.")}
+          {t(
+            "parentPrivacy.exportBody",
+            "Request a machine-readable copy of your account and your children's learning data. We'll email it to you.",
+          )}
         </Text>
         <Button
           title={t("parentPrivacy.exportCta", "Request export")}

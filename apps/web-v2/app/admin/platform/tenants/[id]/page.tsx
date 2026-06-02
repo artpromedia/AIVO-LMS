@@ -117,7 +117,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <p className="mt-1 text-xs text-aivo-ink-soft">across this scope</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("stat_learners")}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            {t("stat_learners")}
+          </p>
           <p className="mt-1 font-display text-3xl font-bold">{learners.length.toLocaleString()}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">enrolled profiles</p>
         </Card>
@@ -131,7 +133,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <p className="mt-1 text-xs text-aivo-ink-soft">schools / families nested</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("stat_created")}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            {t("stat_created")}
+          </p>
           <p className="mt-1 font-display text-xl font-semibold">
             {new Date(tenant.createdAt).toLocaleDateString()}
           </p>
@@ -165,9 +169,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             ) : null}
           </div>
           {directChildren.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">
-              {t("no_nested_tenants")}
-            </p>
+            <p className="mt-2 text-sm text-aivo-ink-soft">{t("no_nested_tenants")}</p>
           ) : (
             <ul className="mt-3 divide-y divide-aivo-border">
               {directChildren.slice(0, 10).map((t) => (

@@ -45,8 +45,18 @@ export default async function ParentHomeV2() {
   const setupSteps: SetupStep[] = [
     { id: "verify", label: "Verify parent", status: "done", href: "/onboarding/parent-verify" },
     { id: "consent", label: "Review consent", status: "done", href: "/onboarding/consent" },
-    { id: "iep", label: "Upload IEP / 504 (optional)", status: "active", href: "/parent/learners/new/iep" },
-    { id: "approve", label: "Approve learner access", status: "upcoming", href: "/onboarding/child-approval" },
+    {
+      id: "iep",
+      label: "Upload IEP / 504 (optional)",
+      status: "active",
+      href: "/parent/learners/new/iep",
+    },
+    {
+      id: "approve",
+      label: "Approve learner access",
+      status: "upcoming",
+      href: "/onboarding/child-approval",
+    },
   ];
 
   return (
@@ -181,8 +191,8 @@ export default async function ParentHomeV2() {
             cta={{ href: `${learnerHref}/assessment`, label: "Resume assessment" }}
           >
             <p className="text-iw-text-muted">
-              No score is shown to Emma. You'll see the brain-profile
-              summary as soon as she finishes the last 4 activities.
+              No score is shown to Emma. You'll see the brain-profile summary as soon as she
+              finishes the last 4 activities.
             </p>
           </SectionCard>
 
@@ -212,11 +222,15 @@ export default async function ParentHomeV2() {
             <ul className="space-y-2">
               <li className="flex justify-between gap-3">
                 <span>{t("parent_guardian_consent")}</span>
-                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">{t("approved")}</span>
+                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">
+                  {t("approved")}
+                </span>
               </li>
               <li className="flex justify-between gap-3">
                 <span>{t("ai_personalization")}</span>
-                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">{t("approved")}</span>
+                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">
+                  {t("approved")}
+                </span>
               </li>
               <li className="flex justify-between gap-3">
                 <span>{t("school_data_sharing")}</span>
@@ -235,20 +249,14 @@ export default async function ParentHomeV2() {
           >
             <ul className="space-y-3">
               <li>
-                <span className="font-semibold text-iw-text-strong">
-                  {t("approve_voice_mode")}
-                </span>
-                <p className="text-iw-text-muted text-sm">
-                  {t("approve_voice_mode_desc")}
-                </p>
+                <span className="font-semibold text-iw-text-strong">{t("approve_voice_mode")}</span>
+                <p className="text-iw-text-muted text-sm">{t("approve_voice_mode_desc")}</p>
               </li>
               <li>
                 <span className="font-semibold text-iw-text-strong">
                   {t("upload_iep_optional")}
                 </span>
-                <p className="text-iw-text-muted text-sm">
-                  {t("upload_iep_desc")}
-                </p>
+                <p className="text-iw-text-muted text-sm">{t("upload_iep_desc")}</p>
               </li>
             </ul>
           </SectionCard>
@@ -264,15 +272,11 @@ export default async function ParentHomeV2() {
             <ul className="space-y-2">
               <li>
                 <span className="text-iw-text-strong font-semibold">{t("new_milestone")}</span>{" "}
-                <span className="text-iw-text-muted">
-                  {t("new_milestone_desc")}
-                </span>
+                <span className="text-iw-text-muted">{t("new_milestone_desc")}</span>
               </li>
               <li>
                 <span className="text-iw-text-strong font-semibold">{t("tutor_note")}</span>{" "}
-                <span className="text-iw-text-muted">
-                  {t("tutor_note_desc")}
-                </span>
+                <span className="text-iw-text-muted">{t("tutor_note_desc")}</span>
               </li>
             </ul>
           </SectionCard>
@@ -310,9 +314,8 @@ export default async function ParentHomeV2() {
             cta={{ href: "/onboarding/invite/school", label: "Connect a school" }}
           >
             <p className="text-iw-text-muted">
-              Linking a school lets teachers see the same learning
-              profile you do — and lets the AI tutor coordinate with
-              classroom work. You stay in control of what's shared.
+              Linking a school lets teachers see the same learning profile you do — and lets the AI
+              tutor coordinate with classroom work. You stay in control of what's shared.
             </p>
           </SectionCard>
         </section>

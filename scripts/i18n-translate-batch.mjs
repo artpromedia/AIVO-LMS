@@ -276,7 +276,10 @@ async function translateNamespace({ app, locale, namespace, provider, glossary }
   }
 
   const masked = targets.map((k) => protect(enFlat[k], glossary));
-  const translatedMasked = await provider(masked.map((m) => m.masked), locale);
+  const translatedMasked = await provider(
+    masked.map((m) => m.masked),
+    locale,
+  );
   const edits = targets.map((k, i) => ({
     key: k,
     en: enFlat[k],
@@ -297,7 +300,9 @@ async function main() {
   }
   const providerFactory = PROVIDERS[args.provider];
   if (!providerFactory) {
-    console.error(`Unknown --provider ${args.provider}; expected one of: ${Object.keys(PROVIDERS).join(", ")}`);
+    console.error(
+      `Unknown --provider ${args.provider}; expected one of: ${Object.keys(PROVIDERS).join(", ")}`,
+    );
     process.exit(2);
   }
   const provider = providerFactory();
@@ -333,7 +338,9 @@ async function main() {
         .map((e) => `${e.key}\n  EN: ${e.en}\n  ${locale.toUpperCase()}: ${e.translated}\n`)
         .join("\n");
       writeFileSync(out, body, "utf8");
-      console.log(`${args.app}/${locale}/${args.namespace}: wrote ${edits.length} candidates to ${out}`);
+      console.log(
+        `${args.app}/${locale}/${args.namespace}: wrote ${edits.length} candidates to ${out}`,
+      );
     }
 
     if (args.apply) {

@@ -46,14 +46,16 @@ export function StickyHeader({
   return (
     <header
       className={`sticky top-0 z-50 w-full bg-[var(--aivo-color-surface-canvas)]/85 backdrop-blur-xl border-b transition-shadow duration-300 ${
-        isScrolled
-          ? "shadow-sm border-slate-200/70"
-          : "border-slate-200/40"
+        isScrolled ? "shadow-sm border-slate-200/70" : "border-slate-200/40"
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 md:px-8 h-20 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6 lg:gap-8 min-w-0">
-          <Link href="/" className="flex items-center relative w-[140px] h-[40px]" aria-label="AIVO Learning home">
+          <Link
+            href="/"
+            className="flex items-center relative w-[140px] h-[40px]"
+            aria-label="AIVO Learning home"
+          >
             <Image
               src="/images/aivo-logo-purple.png"
               alt=""

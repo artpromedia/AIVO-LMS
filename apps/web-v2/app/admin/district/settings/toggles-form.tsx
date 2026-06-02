@@ -153,9 +153,7 @@ export function SettingsTogglesForm({ initial }: { initial: Initial }) {
 
       <Card className="p-[var(--aivo-density-card-pad)]">
         <p className="font-display text-lg font-semibold">{t("features_heading")}</p>
-        <p className="text-sm text-aivo-ink-soft">
-          {t("features_desc")}
-        </p>
+        <p className="text-sm text-aivo-ink-soft">{t("features_desc")}</p>
         <ul className="mt-4 divide-y divide-aivo-border">
           {FEATURE_ROWS.map((row) => (
             <li key={row.key} className="flex items-start justify-between gap-4 py-3">

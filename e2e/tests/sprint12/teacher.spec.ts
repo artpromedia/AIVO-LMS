@@ -78,7 +78,8 @@ test.describe("teacher golden paths", () => {
     });
     expect([201, 401, 403]).toContain(created.status);
     if (created.status === 201) {
-      const draftId = ((created.json as { data?: { draft?: { id?: string } } })?.data?.draft?.id) ?? null;
+      const draftId =
+        (created.json as { data?: { draft?: { id?: string } } })?.data?.draft?.id ?? null;
       if (draftId) {
         const moved = await bff(
           `/api/bff/teacher/iep-drafts?action=progress&id=${draftId}&to=teacher_review`,

@@ -114,23 +114,17 @@ describe.each([
 describe("LIS role mapping", () => {
   it("administrator role maps to DISTRICT_ADMIN", () => {
     expect(
-      mapLisRolesToAivoRole([
-        "http://purl.imsglobal.org/vocab/lis/v2/system/person#SysAdmin",
-      ]),
+      mapLisRolesToAivoRole(["http://purl.imsglobal.org/vocab/lis/v2/system/person#SysAdmin"]),
     ).toBe("DISTRICT_ADMIN");
   });
   it("instructor role maps to TEACHER", () => {
     expect(
-      mapLisRolesToAivoRole([
-        "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
-      ]),
+      mapLisRolesToAivoRole(["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"]),
     ).toBe("TEACHER");
   });
   it("learner role maps to LEARNER", () => {
     expect(
-      mapLisRolesToAivoRole([
-        "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
-      ]),
+      mapLisRolesToAivoRole(["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]),
     ).toBe("LEARNER");
   });
   it("unknown role defaults to LEARNER (least privilege)", () => {

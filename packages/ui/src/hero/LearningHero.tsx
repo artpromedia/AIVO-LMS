@@ -93,7 +93,8 @@ LearningHero.displayName = "Hero/LearningHero";
 
 const TONE_MAP = {
   teal: "from-[var(--aivo-color-aivoTeal-100,#ccfbf1)] to-[var(--aivo-color-aivoTeal-700,#0f766e)] text-[var(--aivo-color-aivoTeal-700,#0f766e)]",
-  purple: "from-[var(--aivo-color-aivoPurple-100,#ede9fe)] to-[var(--aivo-sensory-primary,#7c3aed)] text-[var(--aivo-sensory-primary,#7c3aed)]",
+  purple:
+    "from-[var(--aivo-color-aivoPurple-100,#ede9fe)] to-[var(--aivo-sensory-primary,#7c3aed)] text-[var(--aivo-sensory-primary,#7c3aed)]",
   amber: "from-amber-100 to-amber-500 text-amber-800",
   rose: "from-rose-100 to-rose-500 text-rose-800",
 } as const;
@@ -135,7 +136,15 @@ function Notebook({ className }: { className?: string }) {
           <stop offset="100%" stopColor="#e2e8f0" />
         </linearGradient>
       </defs>
-      <rect x="10" y="10" width="100" height="80" rx="8" fill="url(#aivo-hero-nb)" stroke="#cbd5e1" />
+      <rect
+        x="10"
+        y="10"
+        width="100"
+        height="80"
+        rx="8"
+        fill="url(#aivo-hero-nb)"
+        stroke="#cbd5e1"
+      />
       <line x1="22" y1="30" x2="98" y2="30" stroke="#94a3b8" strokeWidth="2" />
       <line x1="22" y1="46" x2="98" y2="46" stroke="#cbd5e1" strokeWidth="2" />
       <line x1="22" y1="62" x2="98" y2="62" stroke="#cbd5e1" strokeWidth="2" />
@@ -196,11 +205,11 @@ function BrainOrb({ className }: { className?: string }) {
 
 function AISparkle() {
   return (
-    <svg viewBox="0 0 32 32" className="h-7 w-7 text-[var(--aivo-sensory-primary,#7c3aed)] drop-shadow">
-      <path
-        d="M16 2 L19 13 L30 16 L19 19 L16 30 L13 19 L2 16 L13 13 Z"
-        fill="currentColor"
-      />
+    <svg
+      viewBox="0 0 32 32"
+      className="h-7 w-7 text-[var(--aivo-sensory-primary,#7c3aed)] drop-shadow"
+    >
+      <path d="M16 2 L19 13 L30 16 L19 19 L16 30 L13 19 L2 16 L13 13 Z" fill="currentColor" />
     </svg>
   );
 }

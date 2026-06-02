@@ -70,10 +70,10 @@ async function startMissionAction(formData: FormData) {
     if (active !== learnerId) redirect("/learner/select");
   }
   if (
-    !await hasLearnerConsent(session.tenantId, learnerId, [
+    !(await hasLearnerConsent(session.tenantId, learnerId, [
       "child_data_collection",
       "ai_personalization",
-    ])
+    ]))
   ) {
     redirect("/learner/home?blocker=consent");
   }
@@ -137,7 +137,10 @@ function greetingSlot(): "morning" | "afternoon" | "evening" {
 // pastel hex around the page.
 const SUBJECT_LESSON_TONE: Record<
   string,
-  { lessonTone: "math" | "reading" | "science" | "social" | "art" | "neutral"; tutorTone: TutorAvatarTone }
+  {
+    lessonTone: "math" | "reading" | "science" | "social" | "art" | "neutral";
+    tutorTone: TutorAvatarTone;
+  }
 > = {
   math: { lessonTone: "math", tutorTone: "lavender" },
   reading: { lessonTone: "reading", tutorTone: "sky" },
@@ -220,14 +223,14 @@ export default async function LearnerHome({
     .toUpperCase();
 
   const featuredSubjectSlug = today.ready
-    ? allSubjects.find((s) => s.id === today.mission.subjectId)?.slug ?? ""
+    ? (allSubjects.find((s) => s.id === today.mission.subjectId)?.slug ?? "")
     : "";
   const featuredTutor = today.ready ? tutorForSubjectSlug(featuredSubjectSlug) : null;
   const featuredTones = today.ready
-    ? SUBJECT_LESSON_TONE[featuredSubjectSlug] ?? {
+    ? (SUBJECT_LESSON_TONE[featuredSubjectSlug] ?? {
         lessonTone: "neutral" as const,
         tutorTone: "lavender" as const,
-      }
+      })
     : { lessonTone: "neutral" as const, tutorTone: "lavender" as const };
 
   // Up to 4 AI tutors shown beneath the featured lesson — drawn from the
@@ -377,13 +380,7 @@ export default async function LearnerHome({
                 <form action={startMissionAction}>
                   <input type="hidden" name="learnerId" value={learnerId} />
                   <Button type="submit" size="lg" data-primary-cta="todays-mission">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      aria-hidden
-                    >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                       <path d="M8 5v14l11-7L8 5Z" />
                     </svg>
                     {today.mission.existingRunId ? t("resume_lesson") : t("start_lesson")}
@@ -395,9 +392,7 @@ export default async function LearnerHome({
             <div className="rounded-[28px] bg-white border border-iw-border/60 p-8 flex flex-col gap-4">
               <h2 className="text-2xl font-bold text-iw-text-strong">{t("setup_title")}</h2>
               <p className="text-base text-iw-text-muted">
-                {blocker === "no_baseline"
-                  ? t("setup_body_baseline")
-                  : t("setup_body_wait")}
+                {blocker === "no_baseline" ? t("setup_body_baseline") : t("setup_body_wait")}
               </p>
               <Link
                 href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}
@@ -455,7 +450,11 @@ export default async function LearnerHome({
                     key={s.id}
                     href={`/learner/subjects/${s.id}`}
                     name={s.name}
-                    eyebrow={tutor ? t("subject_eyebrow", { name: tutor.name, landmark: tutor.landmark }) : undefined}
+                    eyebrow={
+                      tutor
+                        ? t("subject_eyebrow", { name: tutor.name, landmark: tutor.landmark })
+                        : undefined
+                    }
                     masteryLabel={tp(masteryKey(avg))}
                     masteryPct={Math.round(avg * 100)}
                     accent={tutor?.color}

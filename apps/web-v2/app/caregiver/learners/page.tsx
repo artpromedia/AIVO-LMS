@@ -41,9 +41,7 @@ export default async function CaregiverLearnersPage() {
   const t = await getTranslations("caregiver.learners");
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "caregiver");
-  const maybeLearners = await Promise.all(
-    learnerIds.map((id) => getLearner(id, session.tenantId)),
-  );
+  const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
 
   return (

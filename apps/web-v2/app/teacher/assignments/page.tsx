@@ -38,9 +38,7 @@ export default async function TeacherAssignmentsPage() {
         </Button>
       </div>
       {assignments.length === 0 ? (
-        <Card className="p-6 text-sm text-muted-foreground">
-          {t("empty")}
-        </Card>
+        <Card className="p-6 text-sm text-muted-foreground">{t("empty")}</Card>
       ) : (
         <ul className="grid gap-3">
           {assignments.map((a) => (

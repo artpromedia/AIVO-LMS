@@ -24,13 +24,10 @@ const REQUIRED_SUBJECTS: RequiredSubjectSlug[] = ["math", "ela", "science", "wri
 const MIN_ITEMS_PER_SUBJECT = 20;
 
 describe("production item bank — coverage", () => {
-  it.each(REQUIRED_SUBJECTS)(
-    "%s has at least %d items",
-    (subject) => {
-      const items = getProductionItemsForSubject(subject);
-      expect(items.length).toBeGreaterThanOrEqual(MIN_ITEMS_PER_SUBJECT);
-    },
-  );
+  it.each(REQUIRED_SUBJECTS)("%s has at least %d items", (subject) => {
+    const items = getProductionItemsForSubject(subject);
+    expect(items.length).toBeGreaterThanOrEqual(MIN_ITEMS_PER_SUBJECT);
+  });
 
   it("getProductionItemCounts returns ≥20 per subject", () => {
     const counts = getProductionItemCounts();

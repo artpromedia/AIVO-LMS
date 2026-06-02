@@ -14,9 +14,7 @@ import type { QuestStore } from "../types";
 
 export const memoryQuests: QuestStore = {
   async listWorlds(): Promise<QuestWorld[]> {
-    return Array.from(getStore().questWorlds.values()).sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
+    return Array.from(getStore().questWorlds.values()).sort((a, b) => a.name.localeCompare(b.name));
   },
 
   async getWorldById(worldId) {

@@ -103,7 +103,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         notes: parsed.data.addPrerequisite.notes ?? null,
       });
       prereqResult = added ? "ok" : "cycle";
-      if (added) updated = await getSkill(skillId) ?? updated;
+      if (added) updated = (await getSkill(skillId)) ?? updated;
       else {
         return fail(
           {

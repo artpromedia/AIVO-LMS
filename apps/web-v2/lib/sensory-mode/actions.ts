@@ -1,11 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import {
-  SENSORY_MODE_COOKIE,
-  resolveSensoryMode,
-  type SensoryMode,
-} from "./constants";
+import { SENSORY_MODE_COOKIE, resolveSensoryMode, type SensoryMode } from "./constants";
 
 /**
  * Persist the user's chosen sensory mode in a long-lived cookie so the

@@ -17,7 +17,8 @@ const DATA = {
       accountUpdateFailed: "فشل تحديث الحساب.",
       deletePasswordRequired: "يرجى إدخال كلمة المرور للتأكيد.",
       deleteFailed: "فشل حذف الحساب.",
-      deleteWarning: "سيؤدي هذا إلى حذف حسابك وجميع البيانات المرتبطة به نهائيًا. لا يمكن التراجع عن هذا الإجراء. أدخل كلمة المرور للتأكيد.",
+      deleteWarning:
+        "سيؤدي هذا إلى حذف حسابك وجميع البيانات المرتبطة به نهائيًا. لا يمكن التراجع عن هذا الإجراء. أدخل كلمة المرور للتأكيد.",
       confirmDelete: "حذف الحساب",
       twoFactorAuth: "المصادقة الثنائية",
       mfaDesc: "أضف حماية إضافية بواسطة رموز التحقق عبر البريد الإلكتروني.",
@@ -34,7 +35,7 @@ const DATA = {
       avatarUploadFailed: "تعذر رفع الصورة. حاول مجددًا.",
       avatarPermissionDenied: "مطلوب إذن الوصول إلى الصور.",
       avatarInvalidType: "اختر صورة JPEG أو PNG أو WebP.",
-      avatarTooLarge: "حجم الصورة أكبر من 5 ميغابايت."
+      avatarTooLarge: "حجم الصورة أكبر من 5 ميغابايت.",
     },
     therapistSessions: {
       title: "سجلات الجلسات",
@@ -60,7 +61,7 @@ const DATA = {
       notesPlaceholder: "وثّق ملاحظات الجلسة والأهداف المعمول عليها وملاحظات التقدم...",
       logSubmit: "تسجيل الجلسة",
       logSuccess: "تم تسجيل الجلسة بنجاح",
-      logError: "فشل تسجيل الجلسة. يرجى المحاولة مجددًا."
+      logError: "فشل تسجيل الجلسة. يرجى المحاولة مجددًا.",
     },
     parent: {
       greeting: "مرحبًا، {{name}}",
@@ -77,7 +78,7 @@ const DATA = {
       iep: "IEP",
       team: "الفريق",
       tutorStore: "متجر المدرسين",
-      billing: "الفواتير"
+      billing: "الفواتير",
     },
     tabs: {
       home: "الرئيسية",
@@ -93,7 +94,7 @@ const DATA = {
       lessonPlans: "خطط الدروس",
       alerts: "التنبيهات",
       clients: "العملاء",
-      sessions: "الجلسات"
+      sessions: "الجلسات",
     },
     parentRecommendations: {
       title: "التوصيات",
@@ -102,7 +103,7 @@ const DATA = {
       noPending: "لا توجد توصيات معلقة في الوقت الحالي.",
       adjust: "تعديل",
       adjustValueLabel: "تعديل القيمة المقترحة",
-      amendValueRequired: "يرجى إدخال قيمة قبل التعديل."
+      amendValueRequired: "يرجى إدخال قيمة قبل التعديل.",
     },
     therapist: {
       greeting: "مرحبًا، {{name}}",
@@ -111,18 +112,18 @@ const DATA = {
       noClientsMessage: "يحتاج أحد الوالدين إلى دعوتك كمعالج لطفله.",
       goals: "الأهداف",
       notes: "الملاحظات",
-      reports: "التقارير"
+      reports: "التقارير",
     },
     caregiverAccommodations: {
       title: "التسهيلات",
       subtitle: "التسهيلات النشطة والتفسيرات",
       noTitle: "لا توجد تسهيلات",
-      noMessage: "لا توجد تسهيلات نشطة في الوقت الحالي."
+      noMessage: "لا توجد تسهيلات نشطة في الوقت الحالي.",
     },
     caregiverProgress: {
       title: "التقدم",
-      subtitle: "التقدم في التعلم عبر الزمن"
-    }
+      subtitle: "التقدم في التعلم عبر الزمن",
+    },
   },
   de: {
     accountSettings: {
@@ -135,7 +136,8 @@ const DATA = {
       accountUpdateFailed: "Konto konnte nicht aktualisiert werden.",
       deletePasswordRequired: "Bitte gib dein Passwort zur Bestätigung ein.",
       deleteFailed: "Konto konnte nicht gelöscht werden.",
-      deleteWarning: "Damit wird dein Konto und alle zugehörigen Daten dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden. Gib dein Passwort zur Bestätigung ein.",
+      deleteWarning:
+        "Damit wird dein Konto und alle zugehörigen Daten dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden. Gib dein Passwort zur Bestätigung ein.",
       confirmDelete: "Konto löschen",
       twoFactorAuth: "Zwei-Faktor-Authentifizierung",
       mfaDesc: "Erhöhe die Sicherheit mit E-Mail-Verifizierungscodes.",
@@ -152,7 +154,7 @@ const DATA = {
       avatarUploadFailed: "Foto konnte nicht hochgeladen werden. Erneut versuchen.",
       avatarPermissionDenied: "Fotozugriffsberechtigung erforderlich.",
       avatarInvalidType: "Wähle ein JPEG-, PNG- oder WebP-Bild.",
-      avatarTooLarge: "Bild ist größer als 5 MB."
+      avatarTooLarge: "Bild ist größer als 5 MB.",
     },
     therapistSessions: {
       title: "Sitzungsprotokolle",
@@ -178,7 +180,7 @@ const DATA = {
       notesPlaceholder: "Beobachtungen, bearbeitete Ziele, Fortschrittsnotizen dokumentieren...",
       logSubmit: "Sitzung erfassen",
       logSuccess: "Sitzung erfolgreich protokolliert",
-      logError: "Sitzung konnte nicht protokolliert werden. Bitte erneut versuchen."
+      logError: "Sitzung konnte nicht protokolliert werden. Bitte erneut versuchen.",
     },
     parent: {
       greeting: "Hallo, {{name}}",
@@ -188,14 +190,15 @@ const DATA = {
       sessions: "Sitzungen",
       yourChildren: "Deine Kinder",
       noChildrenTitle: "Keine Kinder hinzugefügt",
-      noChildrenMessage: "Füge dein erstes Kind hinzu, um die personalisierte Lernreise zu beginnen.",
+      noChildrenMessage:
+        "Füge dein erstes Kind hinzu, um die personalisierte Lernreise zu beginnen.",
       addChild: "Kind hinzufügen",
       brain: "Gehirn",
       progress: "Fortschritt",
       iep: "IEP",
       team: "Team",
       tutorStore: "Tutoren-Store",
-      billing: "Abrechnung"
+      billing: "Abrechnung",
     },
     tabs: {
       home: "Startseite",
@@ -211,7 +214,7 @@ const DATA = {
       lessonPlans: "Unterrichtspläne",
       alerts: "Benachrichtigungen",
       clients: "Klienten",
-      sessions: "Sitzungen"
+      sessions: "Sitzungen",
     },
     parentRecommendations: {
       title: "Empfehlungen",
@@ -220,7 +223,7 @@ const DATA = {
       noPending: "Derzeit keine ausstehenden Empfehlungen.",
       adjust: "Anpassen",
       adjustValueLabel: "Vorgeschlagenen Wert bearbeiten",
-      amendValueRequired: "Bitte gib vor dem Anpassen einen Wert ein."
+      amendValueRequired: "Bitte gib vor dem Anpassen einen Wert ein.",
     },
     therapist: {
       greeting: "Hallo, {{name}}",
@@ -229,18 +232,18 @@ const DATA = {
       noClientsMessage: "Ein Elternteil muss dich als Therapeuten für sein Kind einladen.",
       goals: "Ziele",
       notes: "Notizen",
-      reports: "Berichte"
+      reports: "Berichte",
     },
     caregiverAccommodations: {
       title: "Anpassungen",
       subtitle: "Aktive Anpassungen und Erklärungen",
       noTitle: "Keine Anpassungen",
-      noMessage: "Derzeit keine aktiven Anpassungen."
+      noMessage: "Derzeit keine aktiven Anpassungen.",
     },
     caregiverProgress: {
       title: "Fortschritt",
-      subtitle: "Lernfortschritt über die Zeit"
-    }
+      subtitle: "Lernfortschritt über die Zeit",
+    },
   },
   fr: {
     accountSettings: {
@@ -253,7 +256,8 @@ const DATA = {
       accountUpdateFailed: "Échec de la mise à jour du compte.",
       deletePasswordRequired: "Veuillez saisir votre mot de passe pour confirmer.",
       deleteFailed: "Échec de la suppression du compte.",
-      deleteWarning: "Cela supprime définitivement votre compte et toutes les données associées. Cette action est irréversible. Saisissez votre mot de passe pour confirmer.",
+      deleteWarning:
+        "Cela supprime définitivement votre compte et toutes les données associées. Cette action est irréversible. Saisissez votre mot de passe pour confirmer.",
       confirmDelete: "Supprimer le compte",
       twoFactorAuth: "Authentification à deux facteurs",
       mfaDesc: "Renforcez la sécurité avec des codes de vérification par e-mail.",
@@ -270,7 +274,7 @@ const DATA = {
       avatarUploadFailed: "Impossible de télécharger la photo. Réessayez.",
       avatarPermissionDenied: "L'autorisation d'accès aux photos est requise.",
       avatarInvalidType: "Choisissez une image JPEG, PNG ou WebP.",
-      avatarTooLarge: "L'image dépasse 5 Mo."
+      avatarTooLarge: "L'image dépasse 5 Mo.",
     },
     therapistSessions: {
       title: "Journaux de séances",
@@ -278,7 +282,8 @@ const DATA = {
       historyTab: "Historique",
       logTab: "Enregistrer une séance",
       noClientsTitle: "Aucun client connecté pour l'instant",
-      noClientsMessage: "Connectez-vous avec des apprenants pour commencer à enregistrer des séances.",
+      noClientsMessage:
+        "Connectez-vous avec des apprenants pour commencer à enregistrer des séances.",
       loadError: "Impossible de charger les données",
       emptyHistoryTitle: "Aucune séance pour l'instant",
       emptyHistoryMessage: "Aucune séance enregistrée pour {{name}}.",
@@ -293,10 +298,11 @@ const DATA = {
       date: "Date",
       durationMin: "Durée (min)",
       notes: "Notes de séance",
-      notesPlaceholder: "Documenter les observations, les objectifs travaillés, les notes de progression...",
+      notesPlaceholder:
+        "Documenter les observations, les objectifs travaillés, les notes de progression...",
       logSubmit: "Enregistrer la séance",
       logSuccess: "Séance enregistrée avec succès",
-      logError: "Échec de l'enregistrement de la séance. Veuillez réessayer."
+      logError: "Échec de l'enregistrement de la séance. Veuillez réessayer.",
     },
     parent: {
       greeting: "Bonjour, {{name}}",
@@ -306,14 +312,15 @@ const DATA = {
       sessions: "Séances",
       yourChildren: "Vos enfants",
       noChildrenTitle: "Aucun enfant ajouté",
-      noChildrenMessage: "Ajoutez votre premier enfant pour commencer son parcours d'apprentissage personnalisé.",
+      noChildrenMessage:
+        "Ajoutez votre premier enfant pour commencer son parcours d'apprentissage personnalisé.",
       addChild: "Ajouter un enfant",
       brain: "Cerveau",
       progress: "Progression",
       iep: "IEP",
       team: "Équipe",
       tutorStore: "Boutique de tuteurs",
-      billing: "Facturation"
+      billing: "Facturation",
     },
     tabs: {
       home: "Accueil",
@@ -329,7 +336,7 @@ const DATA = {
       lessonPlans: "Plans de cours",
       alerts: "Alertes",
       clients: "Clients",
-      sessions: "Séances"
+      sessions: "Séances",
     },
     parentRecommendations: {
       title: "Recommandations",
@@ -338,7 +345,7 @@ const DATA = {
       noPending: "Aucune recommandation en attente pour l'instant.",
       adjust: "Ajuster",
       adjustValueLabel: "Modifier la valeur proposée",
-      amendValueRequired: "Veuillez saisir une valeur avant d'ajuster."
+      amendValueRequired: "Veuillez saisir une valeur avant d'ajuster.",
     },
     therapist: {
       greeting: "Bonjour, {{name}}",
@@ -347,18 +354,18 @@ const DATA = {
       noClientsMessage: "Un parent doit vous inviter en tant que thérapeute pour son enfant.",
       goals: "Objectifs",
       notes: "Notes",
-      reports: "Rapports"
+      reports: "Rapports",
     },
     caregiverAccommodations: {
       title: "Aménagements",
       subtitle: "Aménagements actifs et explications",
       noTitle: "Aucun aménagement",
-      noMessage: "Aucun aménagement actif pour l'instant."
+      noMessage: "Aucun aménagement actif pour l'instant.",
     },
     caregiverProgress: {
       title: "Progression",
-      subtitle: "Progression de l'apprentissage dans le temps"
-    }
+      subtitle: "Progression de l'apprentissage dans le temps",
+    },
   },
   hi: {
     accountSettings: {
@@ -371,7 +378,8 @@ const DATA = {
       accountUpdateFailed: "खाता अपडेट करने में विफल।",
       deletePasswordRequired: "पुष्टि करने के लिए कृपया अपना पासवर्ड दर्ज करें।",
       deleteFailed: "खाता हटाने में विफल।",
-      deleteWarning: "यह आपके खाते और सभी संबंधित डेटा को स्थायी रूप से हटा देता है। यह क्रिया पूर्ववत नहीं की जा सकती। पुष्टि के लिए अपना पासवर्ड दर्ज करें।",
+      deleteWarning:
+        "यह आपके खाते और सभी संबंधित डेटा को स्थायी रूप से हटा देता है। यह क्रिया पूर्ववत नहीं की जा सकती। पुष्टि के लिए अपना पासवर्ड दर्ज करें।",
       confirmDelete: "खाता हटाएं",
       twoFactorAuth: "दो-कारक प्रमाणीकरण",
       mfaDesc: "ईमेल सत्यापन कोड के साथ अतिरिक्त सुरक्षा जोड़ें।",
@@ -388,7 +396,7 @@ const DATA = {
       avatarUploadFailed: "फ़ोटो अपलोड नहीं हो सकी। पुनः प्रयास करें।",
       avatarPermissionDenied: "फ़ोटो एक्सेस अनुमति आवश्यक है।",
       avatarInvalidType: "JPEG, PNG या WebP छवि चुनें।",
-      avatarTooLarge: "छवि 5 MB से बड़ी है।"
+      avatarTooLarge: "छवि 5 MB से बड़ी है।",
     },
     therapistSessions: {
       title: "सत्र लॉग",
@@ -414,7 +422,7 @@ const DATA = {
       notesPlaceholder: "सत्र अवलोकन, काम किए गए लक्ष्य, प्रगति नोट्स दर्ज करें...",
       logSubmit: "सत्र लॉग करें",
       logSuccess: "सत्र सफलतापूर्वक लॉग किया गया",
-      logError: "सत्र लॉग करने में विफल। कृपया पुनः प्रयास करें।"
+      logError: "सत्र लॉग करने में विफल। कृपया पुनः प्रयास करें।",
     },
     parent: {
       greeting: "नमस्ते, {{name}}",
@@ -431,7 +439,7 @@ const DATA = {
       iep: "IEP",
       team: "टीम",
       tutorStore: "ट्यूटर स्टोर",
-      billing: "बिलिंग"
+      billing: "बिलिंग",
     },
     tabs: {
       home: "होम",
@@ -447,7 +455,7 @@ const DATA = {
       lessonPlans: "पाठ योजनाएं",
       alerts: "अलर्ट",
       clients: "क्लाइंट",
-      sessions: "सत्र"
+      sessions: "सत्र",
     },
     parentRecommendations: {
       title: "सिफारिशें",
@@ -456,27 +464,28 @@ const DATA = {
       noPending: "इस समय कोई लंबित सिफारिश नहीं है।",
       adjust: "समायोजित करें",
       adjustValueLabel: "प्रस्तावित मूल्य संपादित करें",
-      amendValueRequired: "समायोजित करने से पहले कृपया एक मूल्य दर्ज करें।"
+      amendValueRequired: "समायोजित करने से पहले कृपया एक मूल्य दर्ज करें।",
     },
     therapist: {
       greeting: "नमस्ते, {{name}}",
       caseload: "आपके क्लाइंट की सूची",
       noClientsTitle: "कोई क्लाइंट नहीं",
-      noClientsMessage: "किसी बच्चे के लिए थेरेपिस्ट के रूप में आपको आमंत्रित करने के लिए माता-पिता की आवश्यकता है।",
+      noClientsMessage:
+        "किसी बच्चे के लिए थेरेपिस्ट के रूप में आपको आमंत्रित करने के लिए माता-पिता की आवश्यकता है।",
       goals: "लक्ष्य",
       notes: "नोट्स",
-      reports: "रिपोर्ट"
+      reports: "रिपोर्ट",
     },
     caregiverAccommodations: {
       title: "आवास",
       subtitle: "सक्रिय आवास और स्पष्टीकरण",
       noTitle: "कोई आवास नहीं",
-      noMessage: "इस समय कोई सक्रिय आवास नहीं है।"
+      noMessage: "इस समय कोई सक्रिय आवास नहीं है।",
     },
     caregiverProgress: {
       title: "प्रगति",
-      subtitle: "समय के साथ सीखने की प्रगति"
-    }
+      subtitle: "समय के साथ सीखने की प्रगति",
+    },
   },
   ja: {
     accountSettings: {
@@ -489,7 +498,8 @@ const DATA = {
       accountUpdateFailed: "アカウントの更新に失敗しました。",
       deletePasswordRequired: "確認のためパスワードを入力してください。",
       deleteFailed: "アカウントの削除に失敗しました。",
-      deleteWarning: "これによりアカウントと関連するすべてのデータが完全に削除されます。この操作は取り消せません。確認のためパスワードを入力してください。",
+      deleteWarning:
+        "これによりアカウントと関連するすべてのデータが完全に削除されます。この操作は取り消せません。確認のためパスワードを入力してください。",
       confirmDelete: "アカウントを削除",
       twoFactorAuth: "二要素認証",
       mfaDesc: "メール確認コードで追加のセキュリティを設定します。",
@@ -506,7 +516,7 @@ const DATA = {
       avatarUploadFailed: "写真をアップロードできませんでした。もう一度お試しください。",
       avatarPermissionDenied: "写真へのアクセス許可が必要です。",
       avatarInvalidType: "JPEG、PNG、またはWebP画像を選択してください。",
-      avatarTooLarge: "画像が5MBを超えています。"
+      avatarTooLarge: "画像が5MBを超えています。",
     },
     therapistSessions: {
       title: "セッションログ",
@@ -532,7 +542,7 @@ const DATA = {
       notesPlaceholder: "セッションの観察、取り組んだ目標、進捗メモを記録...",
       logSubmit: "セッションを記録",
       logSuccess: "セッションが正常に記録されました",
-      logError: "セッションの記録に失敗しました。もう一度お試しください。"
+      logError: "セッションの記録に失敗しました。もう一度お試しください。",
     },
     parent: {
       greeting: "こんにちは、{{name}}",
@@ -549,7 +559,7 @@ const DATA = {
       iep: "IEP",
       team: "チーム",
       tutorStore: "チューターストア",
-      billing: "請求"
+      billing: "請求",
     },
     tabs: {
       home: "ホーム",
@@ -565,7 +575,7 @@ const DATA = {
       lessonPlans: "レッスンプラン",
       alerts: "アラート",
       clients: "クライアント",
-      sessions: "セッション"
+      sessions: "セッション",
     },
     parentRecommendations: {
       title: "おすすめ",
@@ -574,7 +584,7 @@ const DATA = {
       noPending: "現在、保留中のレコメンデーションはありません。",
       adjust: "調整",
       adjustValueLabel: "提案された値を編集",
-      amendValueRequired: "調整する前に値を入力してください。"
+      amendValueRequired: "調整する前に値を入力してください。",
     },
     therapist: {
       greeting: "こんにちは、{{name}}",
@@ -583,18 +593,18 @@ const DATA = {
       noClientsMessage: "保護者がお子様のセラピストとしてあなたを招待する必要があります。",
       goals: "目標",
       notes: "メモ",
-      reports: "レポート"
+      reports: "レポート",
     },
     caregiverAccommodations: {
       title: "配慮事項",
       subtitle: "有効な配慮事項と説明",
       noTitle: "配慮事項なし",
-      noMessage: "現在、有効な配慮事項はありません。"
+      noMessage: "現在、有効な配慮事項はありません。",
     },
     caregiverProgress: {
       title: "進捗",
-      subtitle: "時系列の学習進捗"
-    }
+      subtitle: "時系列の学習進捗",
+    },
   },
   ko: {
     accountSettings: {
@@ -607,7 +617,8 @@ const DATA = {
       accountUpdateFailed: "계정 업데이트에 실패했습니다.",
       deletePasswordRequired: "확인을 위해 비밀번호를 입력해 주세요.",
       deleteFailed: "계정 삭제에 실패했습니다.",
-      deleteWarning: "이 작업은 계정과 관련된 모든 데이터를 영구적으로 삭제합니다. 이 작업은 취소할 수 없습니다. 확인을 위해 비밀번호를 입력해 주세요.",
+      deleteWarning:
+        "이 작업은 계정과 관련된 모든 데이터를 영구적으로 삭제합니다. 이 작업은 취소할 수 없습니다. 확인을 위해 비밀번호를 입력해 주세요.",
       confirmDelete: "계정 삭제",
       twoFactorAuth: "이중 인증",
       mfaDesc: "이메일 인증 코드로 추가 보안을 설정하세요.",
@@ -624,7 +635,7 @@ const DATA = {
       avatarUploadFailed: "사진을 업로드할 수 없습니다. 다시 시도해 주세요.",
       avatarPermissionDenied: "사진 접근 권한이 필요합니다.",
       avatarInvalidType: "JPEG, PNG 또는 WebP 이미지를 선택하세요.",
-      avatarTooLarge: "이미지가 5MB를 초과합니다."
+      avatarTooLarge: "이미지가 5MB를 초과합니다.",
     },
     therapistSessions: {
       title: "세션 로그",
@@ -650,7 +661,7 @@ const DATA = {
       notesPlaceholder: "세션 관찰, 작업한 목표, 진행 메모를 기록하세요...",
       logSubmit: "세션 기록",
       logSuccess: "세션이 성공적으로 기록되었습니다",
-      logError: "세션 기록에 실패했습니다. 다시 시도해 주세요."
+      logError: "세션 기록에 실패했습니다. 다시 시도해 주세요.",
     },
     parent: {
       greeting: "안녕하세요, {{name}}",
@@ -667,7 +678,7 @@ const DATA = {
       iep: "IEP",
       team: "팀",
       tutorStore: "튜터 스토어",
-      billing: "결제"
+      billing: "결제",
     },
     tabs: {
       home: "홈",
@@ -683,7 +694,7 @@ const DATA = {
       lessonPlans: "수업 계획",
       alerts: "알림",
       clients: "클라이언트",
-      sessions: "세션"
+      sessions: "세션",
     },
     parentRecommendations: {
       title: "추천",
@@ -692,7 +703,7 @@ const DATA = {
       noPending: "현재 대기 중인 추천이 없습니다.",
       adjust: "조정",
       adjustValueLabel: "제안된 값 수정",
-      amendValueRequired: "조정하기 전에 값을 입력해 주세요."
+      amendValueRequired: "조정하기 전에 값을 입력해 주세요.",
     },
     therapist: {
       greeting: "안녕하세요, {{name}}",
@@ -701,18 +712,18 @@ const DATA = {
       noClientsMessage: "부모가 자녀의 치료사로 초대해야 합니다.",
       goals: "목표",
       notes: "메모",
-      reports: "보고서"
+      reports: "보고서",
     },
     caregiverAccommodations: {
       title: "지원 조치",
       subtitle: "활성 지원 조치 및 설명",
       noTitle: "지원 조치 없음",
-      noMessage: "현재 활성 지원 조치가 없습니다."
+      noMessage: "현재 활성 지원 조치가 없습니다.",
     },
     caregiverProgress: {
       title: "진행",
-      subtitle: "시간에 따른 학습 진행"
-    }
+      subtitle: "시간에 따른 학습 진행",
+    },
   },
   pt: {
     accountSettings: {
@@ -725,7 +736,8 @@ const DATA = {
       accountUpdateFailed: "Falha ao atualizar a conta.",
       deletePasswordRequired: "Por favor, insira sua senha para confirmar.",
       deleteFailed: "Falha ao excluir a conta.",
-      deleteWarning: "Isso exclui permanentemente sua conta e todos os dados associados. Esta ação não pode ser desfeita. Insira sua senha para confirmar.",
+      deleteWarning:
+        "Isso exclui permanentemente sua conta e todos os dados associados. Esta ação não pode ser desfeita. Insira sua senha para confirmar.",
       confirmDelete: "Excluir conta",
       twoFactorAuth: "Autenticação de dois fatores",
       mfaDesc: "Adicione segurança extra com códigos de verificação por e-mail.",
@@ -742,7 +754,7 @@ const DATA = {
       avatarUploadFailed: "Não foi possível fazer o upload da foto. Tente novamente.",
       avatarPermissionDenied: "Permissão de acesso às fotos é necessária.",
       avatarInvalidType: "Escolha uma imagem JPEG, PNG ou WebP.",
-      avatarTooLarge: "A imagem é maior que 5 MB."
+      avatarTooLarge: "A imagem é maior que 5 MB.",
     },
     therapistSessions: {
       title: "Registros de sessões",
@@ -768,7 +780,7 @@ const DATA = {
       notesPlaceholder: "Documente observações da sessão, metas trabalhadas, notas de progresso...",
       logSubmit: "Registrar sessão",
       logSuccess: "Sessão registrada com sucesso",
-      logError: "Falha ao registrar a sessão. Por favor, tente novamente."
+      logError: "Falha ao registrar a sessão. Por favor, tente novamente.",
     },
     parent: {
       greeting: "Olá, {{name}}",
@@ -778,14 +790,15 @@ const DATA = {
       sessions: "Sessões",
       yourChildren: "Seus filhos",
       noChildrenTitle: "Nenhum filho adicionado",
-      noChildrenMessage: "Adicione seu primeiro filho para iniciar a jornada de aprendizado personalizado.",
+      noChildrenMessage:
+        "Adicione seu primeiro filho para iniciar a jornada de aprendizado personalizado.",
       addChild: "Adicionar filho",
       brain: "Cérebro",
       progress: "Progresso",
       iep: "IEP",
       team: "Equipe",
       tutorStore: "Loja de tutores",
-      billing: "Faturamento"
+      billing: "Faturamento",
     },
     tabs: {
       home: "Início",
@@ -801,7 +814,7 @@ const DATA = {
       lessonPlans: "Planos de aula",
       alerts: "Alertas",
       clients: "Clientes",
-      sessions: "Sessões"
+      sessions: "Sessões",
     },
     parentRecommendations: {
       title: "Recomendações",
@@ -810,7 +823,7 @@ const DATA = {
       noPending: "Nenhuma recomendação pendente no momento.",
       adjust: "Ajustar",
       adjustValueLabel: "Editar valor proposto",
-      amendValueRequired: "Por favor, insira um valor antes de ajustar."
+      amendValueRequired: "Por favor, insira um valor antes de ajustar.",
     },
     therapist: {
       greeting: "Olá, {{name}}",
@@ -819,18 +832,18 @@ const DATA = {
       noClientsMessage: "Um pai precisa convidá-lo como terapeuta do filho.",
       goals: "Metas",
       notes: "Notas",
-      reports: "Relatórios"
+      reports: "Relatórios",
     },
     caregiverAccommodations: {
       title: "Adaptações",
       subtitle: "Adaptações ativas e explicações",
       noTitle: "Sem adaptações",
-      noMessage: "Nenhuma adaptação ativa no momento."
+      noMessage: "Nenhuma adaptação ativa no momento.",
     },
     caregiverProgress: {
       title: "Progresso",
-      subtitle: "Progresso de aprendizado ao longo do tempo"
-    }
+      subtitle: "Progresso de aprendizado ao longo do tempo",
+    },
   },
   zh: {
     accountSettings: {
@@ -860,7 +873,7 @@ const DATA = {
       avatarUploadFailed: "无法上传照片。请重试。",
       avatarPermissionDenied: "需要照片访问权限。",
       avatarInvalidType: "请选择 JPEG、PNG 或 WebP 图片。",
-      avatarTooLarge: "图片大于 5 MB。"
+      avatarTooLarge: "图片大于 5 MB。",
     },
     therapistSessions: {
       title: "会话日志",
@@ -886,7 +899,7 @@ const DATA = {
       notesPlaceholder: "记录会话观察、已处理目标、进度备注...",
       logSubmit: "记录会话",
       logSuccess: "会话记录成功",
-      logError: "记录会话失败。请重试。"
+      logError: "记录会话失败。请重试。",
     },
     parent: {
       greeting: "你好，{{name}}",
@@ -903,7 +916,7 @@ const DATA = {
       iep: "IEP",
       team: "团队",
       tutorStore: "导师商店",
-      billing: "账单"
+      billing: "账单",
     },
     tabs: {
       home: "主页",
@@ -919,7 +932,7 @@ const DATA = {
       lessonPlans: "课程计划",
       alerts: "提醒",
       clients: "客户",
-      sessions: "会话"
+      sessions: "会话",
     },
     parentRecommendations: {
       title: "推荐",
@@ -928,7 +941,7 @@ const DATA = {
       noPending: "目前没有待处理的推荐。",
       adjust: "调整",
       adjustValueLabel: "编辑建议值",
-      amendValueRequired: "请在调整前输入一个值。"
+      amendValueRequired: "请在调整前输入一个值。",
     },
     therapist: {
       greeting: "你好，{{name}}",
@@ -937,26 +950,32 @@ const DATA = {
       noClientsMessage: "家长需要邀请您作为其孩子的治疗师。",
       goals: "目标",
       notes: "备注",
-      reports: "报告"
+      reports: "报告",
     },
     caregiverAccommodations: {
       title: "调整措施",
       subtitle: "有效的调整措施及说明",
       noTitle: "无调整措施",
-      noMessage: "目前没有有效的调整措施。"
+      noMessage: "目前没有有效的调整措施。",
     },
     caregiverProgress: {
       title: "进度",
-      subtitle: "随时间的学习进度"
-    }
-  }
+      subtitle: "随时间的学习进度",
+    },
+  },
 };
 
-function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
-  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
-  else t[k]=v;}return t;}
+function deepMerge(t, s) {
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if (!t[k] || typeof t[k] !== "object") t[k] = {};
+      deepMerge(t[k], v);
+    } else t[k] = v;
+  }
+  return t;
+}
 
-let n=0;
+let n = 0;
 for (const [locale, roots] of Object.entries(DATA)) {
   const file = join(dir, `${locale}.json`);
   const json = JSON.parse(readFileSync(file, "utf8"));

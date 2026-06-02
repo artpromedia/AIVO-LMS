@@ -168,9 +168,7 @@ export default async function Page() {
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="font-display text-lg font-semibold">{t("lesson_runs")}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">
-            {t("lesson_runs_desc")}
-          </p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">{t("lesson_runs_desc")}</p>
           <p className="mt-3 font-display text-3xl font-bold">
             {h.lessonRunsCompleted.toLocaleString()}
           </p>

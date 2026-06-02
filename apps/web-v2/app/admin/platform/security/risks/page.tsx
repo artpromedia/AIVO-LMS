@@ -49,8 +49,9 @@ export default async function Page() {
               </div>
               <p className="mb-2 text-sm text-aivo-ink-soft">{r.description}</p>
               <p className="text-xs text-aivo-muted">
-                {t("label_treatment")} <span className="text-aivo-ink">{TREATMENT_LABEL[r.treatment]}</span> ·
-                Owner: <span className="text-aivo-ink">{r.owner}</span> · Updated{" "}
+                {t("label_treatment")}{" "}
+                <span className="text-aivo-ink">{TREATMENT_LABEL[r.treatment]}</span> · Owner:{" "}
+                <span className="text-aivo-ink">{r.owner}</span> · Updated{" "}
                 {new Date(r.updatedAt).toLocaleDateString()}
               </p>
             </Card>

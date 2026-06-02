@@ -11,11 +11,7 @@
 import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
-import {
-  createSessionNote,
-  listSessionNotes,
-  signSessionNote,
-} from "@/lib/db/repos";
+import { createSessionNote, listSessionNotes, signSessionNote } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +25,12 @@ export async function GET(req: Request): Promise<NextResponse> {
     const learnerId = new URL(req.url).searchParams.get("learnerId");
     if (!learnerId)
       return fail(
-        { code: "validation_error", message: "learnerId is required", userMessage: "Pick a learner first.", status: 400 },
+        {
+          code: "validation_error",
+          message: "learnerId is required",
+          userMessage: "Pick a learner first.",
+          status: 400,
+        },
         requestId,
       );
     return ok({ notes: listSessionNotes(learnerId, session!.tenantId) }, requestId);
@@ -52,30 +53,38 @@ export async function POST(req: Request): Promise<NextResponse> {
       const id = url.searchParams.get("id");
       if (!id)
         return fail(
-          { code: "validation_error", message: "id is required", userMessage: "Session id is required.", status: 400 },
+          {
+            code: "validation_error",
+            message: "id is required",
+            userMessage: "Session id is required.",
+            status: 400,
+          },
           requestId,
         );
       const note = signSessionNote(id, session!.tenantId);
       if (!note)
         return fail(
-          { code: "not_found", message: "Session note not found", userMessage: "That session is not on your caseload.", status: 404 },
+          {
+            code: "not_found",
+            message: "Session note not found",
+            userMessage: "That session is not on your caseload.",
+            status: 404,
+          },
           requestId,
         );
       return ok({ note }, requestId);
     }
 
-    const body = (await req.json().catch(() => null)) as
-      | {
-          learnerId?: string;
-          sessionDate?: string;
-          durationMinutes?: number;
-          subjective?: string;
-          objective?: string;
-          assessment?: string;
-          plan?: string;
-          goalIds?: string[];
-        }
-      | null;
+    const body = (await req.json().catch(() => null)) as {
+      learnerId?: string;
+      sessionDate?: string;
+      durationMinutes?: number;
+      subjective?: string;
+      objective?: string;
+      assessment?: string;
+      plan?: string;
+      goalIds?: string[];
+    } | null;
     if (!body?.learnerId || typeof body.durationMinutes !== "number") {
       return fail(
         {

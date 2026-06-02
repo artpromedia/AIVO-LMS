@@ -24,26 +24,26 @@ export function useSfx(initialMuted = false) {
     return audioContextRef.current;
   }, []);
 
-  const play = useCallback((event: SfxEvent) => {
-    if (muted) return;
-    const ctx = ensureContext();
-    if (!ctx) return;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.frequency.value = DEFAULT_FREQ[event];
-    osc.type = event === "error-soft" ? "sawtooth" : "sine";
-    gain.gain.value = volume;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    const now = ctx.currentTime;
-    gain.gain.setValueAtTime(volume, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-    osc.start(now);
-    osc.stop(now + 0.2);
-  }, [ensureContext, muted, volume]);
-
-  return useMemo(
-    () => ({ muted, setMuted, volume, setVolume, play }),
-    [muted, play, volume],
+  const play = useCallback(
+    (event: SfxEvent) => {
+      if (muted) return;
+      const ctx = ensureContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.value = DEFAULT_FREQ[event];
+      osc.type = event === "error-soft" ? "sawtooth" : "sine";
+      gain.gain.value = volume;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const now = ctx.currentTime;
+      gain.gain.setValueAtTime(volume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    },
+    [ensureContext, muted, volume],
   );
+
+  return useMemo(() => ({ muted, setMuted, volume, setVolume, play }), [muted, play, volume]);
 }

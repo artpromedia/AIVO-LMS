@@ -83,13 +83,9 @@ export function MessageCard({
           </p>
           <p className="text-sm font-semibold text-iw-text-strong truncate">{title}</p>
         </div>
-        {when ? (
-          <span className="text-[11px] text-iw-text-muted shrink-0">{when}</span>
-        ) : null}
+        {when ? <span className="text-[11px] text-iw-text-muted shrink-0">{when}</span> : null}
       </header>
-      {body ? (
-        <p className="text-sm text-iw-text-muted leading-relaxed">{body}</p>
-      ) : null}
+      {body ? <p className="text-sm text-iw-text-muted leading-relaxed">{body}</p> : null}
       {action ? <div className="flex">{action}</div> : null}
     </article>
   );

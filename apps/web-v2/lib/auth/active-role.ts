@@ -23,12 +23,7 @@
  *         ADR 0020 §4)
  *     and the updated `RoleSessionPayload` to return as the body.
  */
-import {
-  ROLE_META,
-  ROLES,
-  type Role as NavRole,
-  type RoleSession,
-} from "@aivo/nav";
+import { ROLE_META, ROLES, type Role as NavRole, type RoleSession } from "@aivo/nav";
 import { signSurfaceCookieValue, SURFACE_COOKIE_NAME } from "@aivo/security";
 import type { SessionProfile } from "@/lib/auth/types";
 import {
@@ -57,10 +52,7 @@ export type ActiveRoleOutcome =
   | {
       ok: false;
       status: number;
-      code:
-        | "VALIDATION_FAILED"
-        | "FORBIDDEN_ROLE"
-        | "STEP_UP_REQUIRED";
+      code: "VALIDATION_FAILED" | "FORBIDDEN_ROLE" | "STEP_UP_REQUIRED";
       message: string;
       /** Populated for STEP_UP_REQUIRED so the client can launch the right challenge. */
       stepUp?: { scope: "role:change"; reason: string };
@@ -80,9 +72,7 @@ function isNavRole(value: unknown): value is NavRole {
   return typeof value === "string" && (ROLES as readonly string[]).includes(value);
 }
 
-export async function decideActiveRoleSwitch(
-  inputs: ActiveRoleInputs,
-): Promise<ActiveRoleOutcome> {
+export async function decideActiveRoleSwitch(inputs: ActiveRoleInputs): Promise<ActiveRoleOutcome> {
   const body = inputs.body as { role?: unknown } | null | undefined;
   const target = body && typeof body === "object" ? body.role : undefined;
   if (!isNavRole(target)) {

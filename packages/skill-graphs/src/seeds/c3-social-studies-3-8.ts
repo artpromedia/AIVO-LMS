@@ -30,8 +30,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.3.D1.Q1",
       title: "Ask focused questions about a community",
-      description:
-        "I can ask a focused question about how people live and work in my community.",
+      description: "I can ask a focused question about how people live and work in my community.",
       subject: "social_studies",
       gradeBand: "3",
       frameworkRefs: [{ framework: "C3", code: "D1.1.3-5" }],
@@ -40,8 +39,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.3.D2.His.1",
       title: "Identify change and continuity over time",
-      description:
-        "I can describe how my community has changed and what has stayed the same.",
+      description: "I can describe how my community has changed and what has stayed the same.",
       subject: "social_studies",
       gradeBand: "3",
       frameworkRefs: [{ framework: "C3", code: "D2.His.1.3-5" }],
@@ -50,8 +48,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.3.D2.Geo.2",
       title: "Read a map of a region",
-      description:
-        "I can use a map's key, scale, and directions to describe a place near me.",
+      description: "I can use a map's key, scale, and directions to describe a place near me.",
       subject: "social_studies",
       gradeBand: "3",
       frameworkRefs: [{ framework: "C3", code: "D2.Geo.2.3-5" }],
@@ -60,8 +57,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.3.D2.Civ.6",
       title: "Explain roles of community workers and leaders",
-      description:
-        "I can name jobs in my community and explain how leaders are chosen.",
+      description: "I can name jobs in my community and explain how leaders are chosen.",
       subject: "social_studies",
       gradeBand: "3",
       frameworkRefs: [{ framework: "C3", code: "D2.Civ.6.3-5" }],
@@ -72,8 +68,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.4.D2.His.2",
       title: "Compare perspectives on a historical event",
-      description:
-        "I can compare how different people remembered or experienced the same event.",
+      description: "I can compare how different people remembered or experienced the same event.",
       subject: "social_studies",
       gradeBand: "4",
       frameworkRefs: [{ framework: "C3", code: "D2.His.4.3-5" }],
@@ -82,8 +77,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.4.D2.Geo.6",
       title: "Explain how geography shapes settlement",
-      description:
-        "I can explain why people settle near rivers, mountains, or coasts.",
+      description: "I can explain why people settle near rivers, mountains, or coasts.",
       subject: "social_studies",
       gradeBand: "4",
       frameworkRefs: [{ framework: "C3", code: "D2.Geo.6.3-5" }],
@@ -92,8 +86,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.4.D2.Eco.1",
       title: "Describe scarcity and choice",
-      description:
-        "I can explain why people can't have everything they want and how they decide.",
+      description: "I can explain why people can't have everything they want and how they decide.",
       subject: "social_studies",
       gradeBand: "4",
       frameworkRefs: [{ framework: "C3", code: "D2.Eco.1.3-5" }],
@@ -124,8 +117,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.5.D3.Src.1",
       title: "Evaluate sources for relevance and accuracy",
-      description:
-        "I can decide which sources help answer my question and which might be biased.",
+      description: "I can decide which sources help answer my question and which might be biased.",
       subject: "social_studies",
       gradeBand: "5",
       frameworkRefs: [{ framework: "C3", code: "D3.1.3-5" }],
@@ -178,8 +170,7 @@ export const c3SocialStudies3To8: SkillGraph = {
     {
       id: "c3.7.D2.Geo.9",
       title: "Explain global interconnections",
-      description:
-        "I can explain how migration, trade, and conflict link distant places.",
+      description: "I can explain how migration, trade, and conflict link distant places.",
       subject: "social_studies",
       gradeBand: "7",
       frameworkRefs: [{ framework: "C3", code: "D2.Geo.9.6-8" }],

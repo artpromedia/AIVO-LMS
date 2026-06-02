@@ -51,21 +51,17 @@ const AUTH = {
       errors: {
         invalid_credentials: "El correo o la contraseña son incorrectos.",
         invalid_role: "Ese rol no está disponible para esta cuenta.",
-        missing_credentials:
-          "Introduce tu correo y contraseña para iniciar sesión.",
+        missing_credentials: "Introduce tu correo y contraseña para iniciar sesión.",
         mfa_required:
           "Necesitamos un código de verificación para completar tu inicio de sesión. Introdúcelo en la siguiente pantalla.",
-        mfa_session_expired:
-          "Tu sesión de verificación expiró. Inicia sesión de nuevo.",
+        mfa_session_expired: "Tu sesión de verificación expiró. Inicia sesión de nuevo.",
         wrong_surface:
           "Esta cuenta inicia sesión en otro entorno (distrito o administración). Usa el portal correcto.",
-        unsupported_role:
-          "El rol de tu cuenta aún no es compatible con este entorno.",
+        unsupported_role: "El rol de tu cuenta aún no es compatible con este entorno.",
         login_failed: "No pudimos iniciar tu sesión. Inténtalo de nuevo.",
       },
       notices: {
-        password_reset:
-          "Tu contraseña se ha restablecido. Inicia sesión con tu nueva contraseña.",
+        password_reset: "Tu contraseña se ha restablecido. Inicia sesión con tu nueva contraseña.",
         logged_out: "Has cerrado sesión.",
       },
     },
@@ -74,10 +70,8 @@ const AUTH = {
       promo_title: "Una forma más cálida de aprender, para cada niño de la familia.",
       promo_subtitle:
         "Configura estudiantes en minutos. Tutores de IA adaptativos, modos sensorialmente amables y progreso que todo padre puede ver.",
-      benefit_tutors:
-        "Tutores de IA adaptativos que acompañan a cada estudiante donde está.",
-      benefit_sensory:
-        "Modos sensorialmente amables: Estándar, Calma, Alto contraste.",
+      benefit_tutors: "Tutores de IA adaptativos que acompañan a cada estudiante donde está.",
+      benefit_sensory: "Modos sensorialmente amables: Estándar, Calma, Alto contraste.",
       benefit_progress:
         "Progreso que todo padre puede ver, consciente del IEP y honesto con discreción.",
       reassurance_title: "Los adultos crean las cuentas, no los niños.",
@@ -96,8 +90,7 @@ const AUTH = {
     },
     forgot: {
       heading: "Restablece tu contraseña",
-      error_invalid_email:
-        "Introduce un correo válido para que podamos encontrar tu cuenta.",
+      error_invalid_email: "Introduce un correo válido para que podamos encontrar tu cuenta.",
       sent_eyebrow: "Revisa tu bandeja de entrada",
       sent_title: "Si ese correo está registrado, el enlace de restablecimiento está en camino.",
       sent_subtitle:
@@ -109,8 +102,7 @@ const AUTH = {
       try_different_email: "Prueba con otro correo",
       form_eyebrow: "Olvidé mi contraseña",
       form_title: "Introduce el correo de tu cuenta",
-      form_subtitle:
-        "Te enviaremos un enlace seguro por correo para crear una nueva contraseña.",
+      form_subtitle: "Te enviaremos un enlace seguro por correo para crear una nueva contraseña.",
       submit: "Enviar enlace de restablecimiento",
       remembered: "¿La recordaste?",
       sign_in: "Iniciar sesión",
@@ -121,16 +113,13 @@ const AUTH = {
       errors: {
         missing_token:
           "A este enlace de restablecimiento le falta su token de seguridad. Solicita uno nuevo en la página de contraseña olvidada.",
-        weak_password:
-          "Tu nueva contraseña debe tener al menos 12 caracteres.",
-        mismatch:
-          "Las dos contraseñas aún no coinciden. Intenta introducirlas de nuevo.",
+        weak_password: "Tu nueva contraseña debe tener al menos 12 caracteres.",
+        mismatch: "Las dos contraseñas aún no coinciden. Intenta introducirlas de nuevo.",
         invalid_token:
           "Este enlace de restablecimiento ha caducado o ya se ha usado. Solicita uno nuevo para continuar.",
         policy_violation:
           "Esa contraseña no cumple nuestra política. Mira los detalles abajo y prueba con una más segura.",
-        reset_failed:
-          "No pudimos restablecer tu contraseña. Inténtalo de nuevo en un momento.",
+        reset_failed: "No pudimos restablecer tu contraseña. Inténtalo de nuevo en un momento.",
         mock_mode:
           "El restablecimiento de contraseña está deshabilitado en modo de prueba. Ejecuta con AUTH_MODE=custom y el servicio de identidad para probar este flujo.",
       },
@@ -150,8 +139,7 @@ const AUTH = {
       start_over: "Empezar de nuevo",
       new_password_label: "Nueva contraseña",
       confirm_password_label: "Confirmar nueva contraseña",
-      helper_too_short:
-        "Usa al menos 12 caracteres con una mezcla de letras, números y símbolos.",
+      helper_too_short: "Usa al menos 12 caracteres con una mezcla de letras, números y símbolos.",
       helper_default:
         "Usa al menos 12 caracteres. Rechazaremos contraseñas reutilizadas o débiles.",
       mismatch_helper: "Las contraseñas aún no coinciden.",
@@ -168,8 +156,7 @@ const AUTH = {
         "Tu cuenta está protegida con una llave de acceso. El inicio con llave de acceso aún no es compatible con este entorno; usa un código de recuperación abajo.",
       webauthn_cta: "Verificar código de recuperación",
       email_title: "Introduce tu código de verificación",
-      email_subtitle:
-        "Enviamos un código de 6 dígitos al correo registrado. Caduca en 10 minutos.",
+      email_subtitle: "Enviamos un código de 6 dígitos al correo registrado. Caduca en 10 minutos.",
       email_cta: "Verificar código",
       resend_code: "Reenviar código",
       cancel: "Cancelar e iniciar sesión de nuevo",
@@ -219,16 +206,13 @@ const AUTH = {
       errors: {
         invalid_credentials: "L'e-mail ou le mot de passe est incorrect.",
         invalid_role: "Ce rôle n'est pas disponible pour ce compte.",
-        missing_credentials:
-          "Saisissez votre e-mail et votre mot de passe pour vous connecter.",
+        missing_credentials: "Saisissez votre e-mail et votre mot de passe pour vous connecter.",
         mfa_required:
           "Nous avons besoin d'un code de vérification pour finaliser votre connexion. Saisissez-le sur l'écran suivant.",
-        mfa_session_expired:
-          "Votre session de vérification a expiré. Veuillez vous reconnecter.",
+        mfa_session_expired: "Votre session de vérification a expiré. Veuillez vous reconnecter.",
         wrong_surface:
           "Ce compte se connecte sur un autre espace (district ou administration). Utilisez le bon portail.",
-        unsupported_role:
-          "Le rôle de votre compte n'est pas encore pris en charge sur cet espace.",
+        unsupported_role: "Le rôle de votre compte n'est pas encore pris en charge sur cet espace.",
         login_failed: "Nous n'avons pas pu vous connecter. Veuillez réessayer.",
       },
       notices: {
@@ -242,10 +226,8 @@ const AUTH = {
       promo_title: "Une façon plus chaleureuse d'apprendre, pour chaque enfant de la famille.",
       promo_subtitle:
         "Configurez des apprenants en quelques minutes. Des tuteurs IA adaptatifs, des modes adaptés à la sensibilité et des progrès que chaque parent peut voir.",
-      benefit_tutors:
-        "Des tuteurs IA adaptatifs qui rejoignent chaque apprenant là où il en est.",
-      benefit_sensory:
-        "Modes adaptés à la sensibilité : Standard, Calme, Contraste élevé.",
+      benefit_tutors: "Des tuteurs IA adaptatifs qui rejoignent chaque apprenant là où il en est.",
+      benefit_sensory: "Modes adaptés à la sensibilité : Standard, Calme, Contraste élevé.",
       benefit_progress:
         "Des progrès que chaque parent peut voir, sensibles au PEI et honnêtes en toute discrétion.",
       reassurance_title: "Ce sont les adultes qui créent les comptes, pas les enfants.",
@@ -289,10 +271,8 @@ const AUTH = {
       errors: {
         missing_token:
           "Ce lien de réinitialisation n'a pas son jeton de sécurité. Demandez-en un nouveau depuis la page de mot de passe oublié.",
-        weak_password:
-          "Votre nouveau mot de passe doit comporter au moins 12 caractères.",
-        mismatch:
-          "Les deux mots de passe ne correspondent pas encore. Réessayez de les saisir.",
+        weak_password: "Votre nouveau mot de passe doit comporter au moins 12 caractères.",
+        mismatch: "Les deux mots de passe ne correspondent pas encore. Réessayez de les saisir.",
         invalid_token:
           "Ce lien de réinitialisation a expiré ou a déjà été utilisé. Demandez-en un nouveau pour continuer.",
         policy_violation:
@@ -387,16 +367,14 @@ const AUTH = {
       errors: {
         invalid_credentials: "E-Mail oder Passwort ist falsch.",
         invalid_role: "Diese Rolle ist für dieses Konto nicht verfügbar.",
-        missing_credentials:
-          "Gib deine E-Mail und dein Passwort ein, um dich anzumelden.",
+        missing_credentials: "Gib deine E-Mail und dein Passwort ein, um dich anzumelden.",
         mfa_required:
           "Wir benötigen einen Bestätigungscode, um deine Anmeldung abzuschließen. Gib ihn auf dem nächsten Bildschirm ein.",
         mfa_session_expired:
           "Deine Bestätigungssitzung ist abgelaufen. Bitte melde dich erneut an.",
         wrong_surface:
           "Dieses Konto meldet sich in einem anderen Bereich an (Bezirk oder Verwaltung). Verwende das richtige Portal.",
-        unsupported_role:
-          "Die Rolle deines Kontos wird in diesem Bereich noch nicht unterstützt.",
+        unsupported_role: "Die Rolle deines Kontos wird in diesem Bereich noch nicht unterstützt.",
         login_failed: "Wir konnten dich nicht anmelden. Bitte versuche es erneut.",
       },
       notices: {
@@ -410,10 +388,8 @@ const AUTH = {
       promo_title: "Eine wärmere Art zu lernen – für jedes Kind in der Familie.",
       promo_subtitle:
         "Richte Lernende in Minuten ein. Adaptive KI-Tutoren, sensorisch freundliche Modi und Fortschritte, die jedes Elternteil sehen kann.",
-      benefit_tutors:
-        "Adaptive KI-Tutoren, die jeden Lernenden dort abholen, wo er steht.",
-      benefit_sensory:
-        "Sensorisch freundliche Modi: Standard, Ruhe, Hoher Kontrast.",
+      benefit_tutors: "Adaptive KI-Tutoren, die jeden Lernenden dort abholen, wo er steht.",
+      benefit_sensory: "Sensorisch freundliche Modi: Standard, Ruhe, Hoher Kontrast.",
       benefit_progress:
         "Fortschritte, die jedes Elternteil sehen kann – IEP-bewusst und ruhig ehrlich.",
       reassurance_title: "Erwachsene richten Konten ein, nicht Kinder.",
@@ -457,10 +433,8 @@ const AUTH = {
       errors: {
         missing_token:
           "Diesem Link zum Zurücksetzen fehlt sein Sicherheitstoken. Fordere auf der Seite „Passwort vergessen“ einen neuen an.",
-        weak_password:
-          "Dein neues Passwort muss mindestens 12 Zeichen lang sein.",
-        mismatch:
-          "Die beiden Passwörter stimmen noch nicht überein. Gib sie erneut ein.",
+        weak_password: "Dein neues Passwort muss mindestens 12 Zeichen lang sein.",
+        mismatch: "Die beiden Passwörter stimmen noch nicht überein. Gib sie erneut ein.",
         invalid_token:
           "Dieser Link zum Zurücksetzen ist abgelaufen oder wurde bereits verwendet. Fordere einen neuen an, um fortzufahren.",
         policy_violation:
@@ -558,17 +532,14 @@ const AUTH = {
         missing_credentials: "Digite seu e-mail e senha para entrar.",
         mfa_required:
           "Precisamos de um código de verificação para concluir seu acesso. Digite-o na próxima tela.",
-        mfa_session_expired:
-          "Sua sessão de verificação expirou. Entre novamente.",
+        mfa_session_expired: "Sua sessão de verificação expirou. Entre novamente.",
         wrong_surface:
           "Esta conta entra em outro ambiente (distrito ou administração). Use o portal correto.",
-        unsupported_role:
-          "O perfil da sua conta ainda não é compatível com este ambiente.",
+        unsupported_role: "O perfil da sua conta ainda não é compatível com este ambiente.",
         login_failed: "Não conseguimos fazer seu acesso. Tente novamente.",
       },
       notices: {
-        password_reset:
-          "Sua senha foi redefinida. Entre com sua nova senha.",
+        password_reset: "Sua senha foi redefinida. Entre com sua nova senha.",
         logged_out: "Você saiu da conta.",
       },
     },
@@ -577,10 +548,8 @@ const AUTH = {
       promo_title: "Um jeito mais acolhedor de aprender, para cada criança da família.",
       promo_subtitle:
         "Configure alunos em minutos. Tutores de IA adaptativos, modos sensorialmente amigáveis e progresso que todo pai e mãe podem ver.",
-      benefit_tutors:
-        "Tutores de IA adaptativos que encontram cada aluno onde ele está.",
-      benefit_sensory:
-        "Modos sensorialmente amigáveis: Padrão, Calmo, Alto contraste.",
+      benefit_tutors: "Tutores de IA adaptativos que encontram cada aluno onde ele está.",
+      benefit_sensory: "Modos sensorialmente amigáveis: Padrão, Calmo, Alto contraste.",
       benefit_progress:
         "Progresso que todo pai e mãe podem ver — consciente do IEP e honesto com discrição.",
       reassurance_title: "Adultos criam as contas, não as crianças.",
@@ -599,8 +568,7 @@ const AUTH = {
     },
     forgot: {
       heading: "Redefina sua senha",
-      error_invalid_email:
-        "Digite um e-mail válido para que possamos encontrar sua conta.",
+      error_invalid_email: "Digite um e-mail válido para que possamos encontrar sua conta.",
       sent_eyebrow: "Verifique sua caixa de entrada",
       sent_title: "Se esse e-mail estiver registrado, um link de redefinição está a caminho.",
       sent_subtitle:
@@ -612,8 +580,7 @@ const AUTH = {
       try_different_email: "Tente outro e-mail",
       form_eyebrow: "Esqueci a senha",
       form_title: "Digite o e-mail da sua conta",
-      form_subtitle:
-        "Enviaremos por e-mail um link seguro para definir uma nova senha.",
+      form_subtitle: "Enviaremos por e-mail um link seguro para definir uma nova senha.",
       submit: "Enviar link de redefinição",
       remembered: "Lembrou?",
       sign_in: "Entrar",
@@ -625,14 +592,12 @@ const AUTH = {
         missing_token:
           "Falta o token de segurança neste link de redefinição. Solicite um novo na página de esqueci a senha.",
         weak_password: "Sua nova senha deve ter pelo menos 12 caracteres.",
-        mismatch:
-          "As duas senhas ainda não coincidem. Tente digitá-las novamente.",
+        mismatch: "As duas senhas ainda não coincidem. Tente digitá-las novamente.",
         invalid_token:
           "Este link de redefinição expirou ou já foi usado. Solicite um novo para continuar.",
         policy_violation:
           "Essa senha não atende à nossa política. Veja os detalhes abaixo e tente uma mais forte.",
-        reset_failed:
-          "Não conseguimos redefinir sua senha. Tente novamente em um instante.",
+        reset_failed: "Não conseguimos redefinir sua senha. Tente novamente em um instante.",
         mock_mode:
           "A redefinição de senha está desativada no modo de teste. Execute com AUTH_MODE=custom e o serviço de identidade para testar este fluxo.",
       },
@@ -654,8 +619,7 @@ const AUTH = {
       confirm_password_label: "Confirmar nova senha",
       helper_too_short:
         "Use pelo menos 12 caracteres com uma mistura de letras, números e símbolos.",
-      helper_default:
-        "Use pelo menos 12 caracteres. Recusaremos senhas reutilizadas ou fracas.",
+      helper_default: "Use pelo menos 12 caracteres. Recusaremos senhas reutilizadas ou fracas.",
       mismatch_helper: "As senhas ainda não coincidem.",
     },
     mfa: {
@@ -734,7 +698,8 @@ const AUTH = {
     signup: {
       promo_eyebrow: "开始你的家庭试用",
       promo_title: "一种更温暖的学习方式——为家庭中的每个孩子。",
-      promo_subtitle: "几分钟即可设置学习者。自适应 AI 导师、感官友好模式，以及每位家长都能看到的进步。",
+      promo_subtitle:
+        "几分钟即可设置学习者。自适应 AI 导师、感官友好模式，以及每位家长都能看到的进步。",
       benefit_tutors: "自适应 AI 导师，在每位学习者所处的水平上陪伴他们。",
       benefit_sensory: "感官友好模式：标准、舒缓、高对比度。",
       benefit_progress: "每位家长都能看到的进步——了解 IEP，并安静而真诚。",
@@ -758,7 +723,8 @@ const AUTH = {
       sent_eyebrow: "查看你的收件箱",
       sent_title: "如果该邮箱已注册，重置链接即将送达。",
       sent_subtitle: "为了你的安全，我们不会透露账户是否存在。该链接将在 1 小时后失效。",
-      sent_body: "如果一分钟后仍未看到，请查看垃圾邮件或促销邮件。该链接仅可使用一次，随后失效——如需重新开始，请申请新的链接。",
+      sent_body:
+        "如果一分钟后仍未看到，请查看垃圾邮件或促销邮件。该链接仅可使用一次，随后失效——如需重新开始，请申请新的链接。",
       back_to_sign_in: "返回登录",
       didnt_get_it: "没有收到？",
       try_different_email: "尝试其他邮箱",
@@ -857,16 +823,17 @@ const AUTH = {
         invalid_credentials: "メールアドレスまたはパスワードが正しくありません。",
         invalid_role: "そのロールはこのアカウントでは利用できません。",
         missing_credentials: "サインインするにはメールアドレスとパスワードを入力してください。",
-        mfa_required:
-          "サインインを完了するには確認コードが必要です。次の画面で入力してください。",
-        mfa_session_expired: "確認セッションの有効期限が切れました。もう一度サインインしてください。",
+        mfa_required: "サインインを完了するには確認コードが必要です。次の画面で入力してください。",
+        mfa_session_expired:
+          "確認セッションの有効期限が切れました。もう一度サインインしてください。",
         wrong_surface:
           "このアカウントは別の画面（学区または管理）でサインインします。正しいポータルをご利用ください。",
         unsupported_role: "お使いのアカウントのロールはこの画面ではまだサポートされていません。",
         login_failed: "サインインできませんでした。もう一度お試しください。",
       },
       notices: {
-        password_reset: "パスワードがリセットされました。新しいパスワードでサインインしてください。",
+        password_reset:
+          "パスワードがリセットされました。新しいパスワードでサインインしてください。",
         logged_out: "サインアウトしました。",
       },
     },
@@ -923,7 +890,8 @@ const AUTH = {
           "このリセットリンクは期限切れか、すでに使用されています。続行するには新しいリンクをリクエストしてください。",
         policy_violation:
           "そのパスワードはポリシーを満たしていません。下記の詳細を確認し、より強力なものをお試しください。",
-        reset_failed: "パスワードをリセットできませんでした。しばらくしてからもう一度お試しください。",
+        reset_failed:
+          "パスワードをリセットできませんでした。しばらくしてからもう一度お試しください。",
         mock_mode:
           "モックモードではパスワードのリセットは無効です。このフローをテストするには AUTH_MODE=custom と ID サービスで実行してください。",
       },
@@ -951,7 +919,8 @@ const AUTH = {
       heading: "ご本人確認",
       card_eyebrow: "多要素サインイン",
       totp_title: "認証アプリのコードを入力",
-      totp_subtitle: "認証アプリを開き、AIVO Learning に表示されている 6 桁のコードを入力してください。",
+      totp_subtitle:
+        "認証アプリを開き、AIVO Learning に表示されている 6 桁のコードを入力してください。",
       totp_cta: "コードを確認",
       webauthn_title: "パスキーを使って続行",
       webauthn_subtitle:
@@ -971,7 +940,8 @@ const AUTH = {
         locked:
           "失敗回数が多すぎます。アカウントは一時的にロックされています。数分後にもう一度お試しください。",
         resend_failed: "新しいコードを送信できませんでした。もう一度お試しください。",
-        resend_exhausted: "再送の上限に達しました。新しいコードを取得するには、もう一度サインインしてください。",
+        resend_exhausted:
+          "再送の上限に達しました。新しいコードを取得するには、もう一度サインインしてください。",
       },
       notices: {
         resent: "新しいコードをメールに送信しました。",
@@ -1047,7 +1017,8 @@ const AUTH = {
       error_invalid_email: "계정을 찾을 수 있도록 유효한 이메일을 입력하세요.",
       sent_eyebrow: "받은편지함을 확인하세요",
       sent_title: "해당 이메일이 등록되어 있다면 재설정 링크가 곧 전송됩니다.",
-      sent_subtitle: "보안을 위해 계정 존재 여부는 알려드리지 않습니다. 링크는 1시간 후 만료됩니다.",
+      sent_subtitle:
+        "보안을 위해 계정 존재 여부는 알려드리지 않습니다. 링크는 1시간 후 만료됩니다.",
       sent_body:
         "1분 후에도 보이지 않으면 스팸 또는 프로모션을 확인하세요. 링크는 한 번만 작동한 후 만료됩니다. 다시 시작해야 한다면 새 링크를 요청하세요.",
       back_to_sign_in: "로그인으로 돌아가기",
@@ -1068,8 +1039,10 @@ const AUTH = {
           "이 재설정 링크에 보안 토큰이 없습니다. 비밀번호 찾기 페이지에서 새 링크를 요청하세요.",
         weak_password: "새 비밀번호는 12자 이상이어야 합니다.",
         mismatch: "두 비밀번호가 아직 일치하지 않습니다. 다시 입력해 보세요.",
-        invalid_token: "이 재설정 링크는 만료되었거나 이미 사용되었습니다. 계속하려면 새 링크를 요청하세요.",
-        policy_violation: "해당 비밀번호는 정책에 맞지 않습니다. 아래 세부 정보를 확인하고 더 강력한 것을 시도하세요.",
+        invalid_token:
+          "이 재설정 링크는 만료되었거나 이미 사용되었습니다. 계속하려면 새 링크를 요청하세요.",
+        policy_violation:
+          "해당 비밀번호는 정책에 맞지 않습니다. 아래 세부 정보를 확인하고 더 강력한 것을 시도하세요.",
         reset_failed: "비밀번호를 재설정할 수 없습니다. 잠시 후 다시 시도하세요.",
         mock_mode:
           "모의 모드에서는 비밀번호 재설정이 비활성화됩니다. 이 흐름을 테스트하려면 AUTH_MODE=custom과 ID 서비스로 실행하세요.",
@@ -1215,8 +1188,7 @@ const AUTH = {
         mismatch: "كلمتا المرور غير متطابقتين بعد. حاول إدخالهما مرة أخرى.",
         invalid_token:
           "انتهت صلاحية رابط إعادة التعيين هذا أو سبق استخدامه. اطلب رابطًا جديدًا للمتابعة.",
-        policy_violation:
-          "لا تستوفي كلمة المرور هذه سياستنا. راجع التفاصيل أدناه وجرّب كلمة أقوى.",
+        policy_violation: "لا تستوفي كلمة المرور هذه سياستنا. راجع التفاصيل أدناه وجرّب كلمة أقوى.",
         reset_failed: "تعذّر إعادة تعيين كلمة مرورك. يرجى المحاولة بعد قليل.",
         mock_mode:
           "إعادة تعيين كلمة المرور معطّلة في الوضع التجريبي. شغّل باستخدام AUTH_MODE=custom وخدمة الهوية لاختبار هذا المسار.",
@@ -1301,7 +1273,8 @@ const AUTH = {
         invalid_credentials: "ईमेल या पासवर्ड गलत है।",
         invalid_role: "यह भूमिका इस खाते के लिए उपलब्ध नहीं है।",
         missing_credentials: "साइन इन करने के लिए अपना ईमेल और पासवर्ड दर्ज करें।",
-        mfa_required: "आपका साइन इन पूरा करने के लिए हमें एक सत्यापन कोड चाहिए। इसे अगली स्क्रीन पर दर्ज करें।",
+        mfa_required:
+          "आपका साइन इन पूरा करने के लिए हमें एक सत्यापन कोड चाहिए। इसे अगली स्क्रीन पर दर्ज करें।",
         mfa_session_expired: "आपका सत्यापन सत्र समाप्त हो गया। कृपया फिर से साइन इन करें।",
         wrong_surface:
           "यह खाता किसी अन्य सतह (ज़िला या व्यवस्थापक) पर साइन इन करता है। सही पोर्टल का उपयोग करें।",
@@ -1340,7 +1313,8 @@ const AUTH = {
       error_invalid_email: "एक मान्य ईमेल दर्ज करें ताकि हम आपका खाता ढूँढ सकें।",
       sent_eyebrow: "अपना इनबॉक्स देखें",
       sent_title: "यदि वह ईमेल पंजीकृत है, तो एक रीसेट लिंक रास्ते में है।",
-      sent_subtitle: "आपकी सुरक्षा के लिए, हम यह नहीं बताते कि कोई खाता मौजूद है या नहीं। लिंक 1 घंटे में समाप्त हो जाता है।",
+      sent_subtitle:
+        "आपकी सुरक्षा के लिए, हम यह नहीं बताते कि कोई खाता मौजूद है या नहीं। लिंक 1 घंटे में समाप्त हो जाता है।",
       sent_body:
         "यदि एक मिनट बाद भी न दिखे तो स्पैम या प्रचार देखें। लिंक एक बार काम करता है और फिर समाप्त हो जाता है—यदि आपको फिर से शुरू करना हो तो नया अनुरोध करें।",
       back_to_sign_in: "साइन इन पर वापस जाएँ",
@@ -1371,9 +1345,11 @@ const AUTH = {
       },
       no_token_eyebrow: "पासवर्ड रीसेट करें",
       no_token_title: "यह रीसेट लिंक अधूरा है",
-      no_token_subtitle: "आपके ईमेल के लिंक में इसका सुरक्षा टोकन गायब है। जारी रखने के लिए नया अनुरोध करें।",
+      no_token_subtitle:
+        "आपके ईमेल के लिंक में इसका सुरक्षा टोकन गायब है। जारी रखने के लिए नया अनुरोध करें।",
       no_token_cta: "नया लिंक अनुरोध करें",
-      no_token_body: "आपकी सुरक्षा के लिए, रीसेट लिंक 1 घंटे बाद समाप्त हो जाते हैं और केवल एक बार उपयोग किए जा सकते हैं।",
+      no_token_body:
+        "आपकी सुरक्षा के लिए, रीसेट लिंक 1 घंटे बाद समाप्त हो जाते हैं और केवल एक बार उपयोग किए जा सकते हैं।",
       form_eyebrow: "पासवर्ड रीसेट करें",
       form_title: "अपना नया पासवर्ड सेट करें",
       form_subtitle:
@@ -1383,15 +1359,18 @@ const AUTH = {
       start_over: "फिर से शुरू करें",
       new_password_label: "नया पासवर्ड",
       confirm_password_label: "नए पासवर्ड की पुष्टि करें",
-      helper_too_short: "अक्षरों, संख्याओं और प्रतीकों के मिश्रण के साथ कम से कम 12 अक्षर उपयोग करें।",
-      helper_default: "कम से कम 12 अक्षर उपयोग करें। हम दोबारा उपयोग किए गए या कमज़ोर पासवर्ड अस्वीकार करेंगे।",
+      helper_too_short:
+        "अक्षरों, संख्याओं और प्रतीकों के मिश्रण के साथ कम से कम 12 अक्षर उपयोग करें।",
+      helper_default:
+        "कम से कम 12 अक्षर उपयोग करें। हम दोबारा उपयोग किए गए या कमज़ोर पासवर्ड अस्वीकार करेंगे।",
       mismatch_helper: "पासवर्ड अभी मेल नहीं खाते।",
     },
     mfa: {
       heading: "पुष्टि करें कि यह आप हैं",
       card_eyebrow: "बहु-कारक साइन-इन",
       totp_title: "अपना प्रमाणक कोड दर्ज करें",
-      totp_subtitle: "अपना प्रमाणक ऐप खोलें और AIVO Learning के लिए दिखाया गया 6-अंकीय कोड दर्ज करें।",
+      totp_subtitle:
+        "अपना प्रमाणक ऐप खोलें और AIVO Learning के लिए दिखाया गया 6-अंकीय कोड दर्ज करें।",
       totp_cta: "कोड सत्यापित करें",
       webauthn_title: "जारी रखने के लिए अपनी पासकी का उपयोग करें",
       webauthn_subtitle:
@@ -1408,9 +1387,11 @@ const AUTH = {
       errors: {
         missing_code: "जारी रखने के लिए हमारे भेजे गए सत्यापन कोड को दर्ज करें।",
         invalid_code: "वह कोड मेल नहीं खाता। दोबारा जाँचें और फिर से प्रयास करें।",
-        locked: "बहुत अधिक असफल प्रयास। आपका खाता अस्थायी रूप से लॉक है—कृपया कुछ मिनटों में फिर से प्रयास करें।",
+        locked:
+          "बहुत अधिक असफल प्रयास। आपका खाता अस्थायी रूप से लॉक है—कृपया कुछ मिनटों में फिर से प्रयास करें।",
         resend_failed: "हम नया कोड नहीं भेज सके। कृपया फिर से प्रयास करें।",
-        resend_exhausted: "आप फिर से भेजने की सीमा तक पहुँच गए हैं। नया कोड पाने के लिए कृपया फिर से साइन इन करें।",
+        resend_exhausted:
+          "आप फिर से भेजने की सीमा तक पहुँच गए हैं। नया कोड पाने के लिए कृपया फिर से साइन इन करें।",
       },
       notices: {
         resent: "आपके ईमेल पर एक नया कोड भेजा गया है।",

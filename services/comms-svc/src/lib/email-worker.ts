@@ -212,7 +212,8 @@ export function startEmailOutboxWorker(
   const tickIntervalMs = opts.tickIntervalMs ?? 15_000;
   const batchSize = opts.batchSize ?? 50;
   const stuckSendingThresholdMs = opts.stuckSendingThresholdMs ?? 5 * 60_000;
-  const drainOnce = opts.drainOnce ?? ((d) => runEmailOutboxDrainOnce(d, { batchSize, stuckSendingThresholdMs }));
+  const drainOnce =
+    opts.drainOnce ?? ((d) => runEmailOutboxDrainOnce(d, { batchSize, stuckSendingThresholdMs }));
 
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
@@ -256,12 +257,15 @@ export function startEmailOutboxWorker(
 
   // Kick off the first tick a few seconds after boot so dev iterations see
   // queued mail flow quickly.
-  timer = setTimeout(() => {
-    inflight = tick().finally(() => {
-      inflight = null;
-      scheduleNext();
-    });
-  }, Math.min(2_000, tickIntervalMs));
+  timer = setTimeout(
+    () => {
+      inflight = tick().finally(() => {
+        inflight = null;
+        scheduleNext();
+      });
+    },
+    Math.min(2_000, tickIntervalMs),
+  );
   if (typeof (timer as { unref?: () => void }).unref === "function") {
     (timer as unknown as { unref: () => void }).unref();
   }

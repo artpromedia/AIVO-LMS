@@ -1,11 +1,7 @@
 "use client";
 import { forwardRef } from "react";
 import { cn } from "../utils/cn";
-import {
-  pointsToCoords,
-  smoothPath,
-  type ChartPoint,
-} from "./helpers";
+import { pointsToCoords, smoothPath, type ChartPoint } from "./helpers";
 
 export type SoftLineProps = {
   data: ReadonlyArray<ChartPoint>;

@@ -48,7 +48,10 @@ const DATA = {
     onboarding: {
       invite_district: { code_placeholder: "e.g. DISTRICT-9F2L-2025" },
       invite_school: { code_placeholder: "e.g. SCHOOL-7Q4M-2025" },
-      signup: { code_placeholder: "e.g. SCHOOL-7Q4M-2025", name_placeholder: "First and last name" },
+      signup: {
+        code_placeholder: "e.g. SCHOOL-7Q4M-2025",
+        name_placeholder: "First and last name",
+      },
     },
     auth: { signup: { name_placeholder: "Riley Parent" } },
   },
@@ -71,7 +74,10 @@ const DATA = {
     onboarding: {
       invite_district: { code_placeholder: "p. ej. DISTRICT-9F2L-2025" },
       invite_school: { code_placeholder: "p. ej. SCHOOL-7Q4M-2025" },
-      signup: { code_placeholder: "p. ej. SCHOOL-7Q4M-2025", name_placeholder: "Nombre y apellidos" },
+      signup: {
+        code_placeholder: "p. ej. SCHOOL-7Q4M-2025",
+        name_placeholder: "Nombre y apellidos",
+      },
     },
     auth: { signup: { name_placeholder: "Riley Parent" } },
   },
@@ -80,7 +86,8 @@ const DATA = {
       baseline_runner: {
         exit_proctor_view: "Quitter la vue surveillant",
         ready_title: "Un dernier appui",
-        ready_body: "Vous avez répondu à toutes les questions. Envoyez vos réponses quand vous êtes prêt.",
+        ready_body:
+          "Vous avez répondu à toutes les questions. Envoyez vos réponses quand vous êtes prêt.",
         finish_baseline: "Terminer l'évaluation initiale",
         resume: "Reprendre",
         stop_for_today: "Arrêter pour aujourd'hui",
@@ -103,7 +110,8 @@ const DATA = {
       baseline_runner: {
         exit_proctor_view: "Aufsichtsansicht verlassen",
         ready_title: "Ein letzter Tipp",
-        ready_body: "Sie haben alle Fragen beantwortet. Senden Sie Ihre Antworten, wenn Sie bereit sind.",
+        ready_body:
+          "Sie haben alle Fragen beantwortet. Senden Sie Ihre Antworten, wenn Sie bereit sind.",
         finish_baseline: "Einstufung abschließen",
         resume: "Fortsetzen",
         stop_for_today: "Für heute beenden",
@@ -126,7 +134,8 @@ const DATA = {
       baseline_runner: {
         exit_proctor_view: "Sair da visão de supervisor",
         ready_title: "Um último toque",
-        ready_body: "Você respondeu todas as perguntas. Envie suas respostas quando estiver pronto.",
+        ready_body:
+          "Você respondeu todas as perguntas. Envie suas respostas quando estiver pronto.",
         finish_baseline: "Concluir avaliação inicial",
         resume: "Continuar",
         stop_for_today: "Parar por hoje",
@@ -232,7 +241,10 @@ const DATA = {
     onboarding: {
       invite_district: { code_placeholder: "مثال: DISTRICT-9F2L-2025" },
       invite_school: { code_placeholder: "مثال: SCHOOL-7Q4M-2025" },
-      signup: { code_placeholder: "مثال: SCHOOL-7Q4M-2025", name_placeholder: "الاسم الأول واسم العائلة" },
+      signup: {
+        code_placeholder: "مثال: SCHOOL-7Q4M-2025",
+        name_placeholder: "الاسم الأول واسم العائلة",
+      },
     },
     auth: { signup: { name_placeholder: "Riley Parent" } },
   },
@@ -283,6 +295,8 @@ for (const [locale, roots] of Object.entries(DATA)) {
   deepMerge(json, roots);
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-R_mine-i18n: merged remaining existing-namespace keys → messages/${locale}.json`);
+  console.log(
+    `seed-R_mine-i18n: merged remaining existing-namespace keys → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-R_mine-i18n: done — ${written} locale catalogs updated.`);

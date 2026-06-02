@@ -41,49 +41,51 @@ export default function TherapistClientProfile() {
       }}
     >
       <View style={{ width: contentWidth }}>
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
-        <Ionicons name="arrow-back" size={20} color={colors.primary} />
-        <Text style={styles.backText}>{t("common.back")}</Text>
-      </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
-        {t("therapistClient.overview", { name: learner?.firstName || "Client" })}
-      </Text>
-      <Text style={styles.subtitle}>{t("therapistClient.brainProfile")}</Text>
+        <Pressable onPress={() => router.back()} style={styles.backRow}>
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
+          <Text style={styles.backText}>{t("common.back")}</Text>
+        </Pressable>
+        <Text
+          style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}
+        >
+          {t("therapistClient.overview", { name: learner?.firstName || "Client" })}
+        </Text>
+        <Text style={styles.subtitle}>{t("therapistClient.brainProfile")}</Text>
 
-      <AivoCard style={styles.overviewCard}>
-        <Ionicons name="shield-checkmark" size={24} color={colors.success} />
-        <Text style={styles.hipaaLabel}>HIPAA-Scoped Access</Text>
-        <Text style={styles.levelText}>{learner?.functioningLevel || "Standard"}</Text>
-      </AivoCard>
+        <AivoCard style={styles.overviewCard}>
+          <Ionicons name="shield-checkmark" size={24} color={colors.success} />
+          <Text style={styles.hipaaLabel}>HIPAA-Scoped Access</Text>
+          <Text style={styles.levelText}>{learner?.functioningLevel || "Standard"}</Text>
+        </AivoCard>
 
-      <View style={styles.brainWrap}>
-        <BrainCloneCard
-          learnerId={id}
-          learnerName={learnerName}
-          enrolledGrade={learner?.gradeLevel ?? null}
-          variant="full"
-        />
-      </View>
+        <View style={styles.brainWrap}>
+          <BrainCloneCard
+            learnerId={id}
+            learnerName={learnerName}
+            enrolledGrade={learner?.gradeLevel ?? null}
+            variant="full"
+          />
+        </View>
 
-      <View style={styles.actions}>
+        <View style={styles.actions}>
+          <AivoButton
+            title={t("therapistClient.goalsTitle")}
+            onPress={() => router.push(`/(therapist)/client/${id}/goals` as any)}
+            style={{ flex: 1, marginRight: 8 }}
+          />
+          <AivoButton
+            title={t("therapistClient.notesTitle")}
+            onPress={() => router.push(`/(therapist)/client/${id}/notes` as any)}
+            variant="outline"
+            style={{ flex: 1 }}
+          />
+        </View>
         <AivoButton
-          title={t("therapistClient.goalsTitle")}
-          onPress={() => router.push(`/(therapist)/client/${id}/goals` as any)}
-          style={{ flex: 1, marginRight: 8 }}
+          title={t("therapistClient.generateReport")}
+          onPress={() => router.push(`/(therapist)/client/${id}/reports` as any)}
+          variant="secondary"
+          style={{ marginTop: spacing.sm }}
         />
-        <AivoButton
-          title={t("therapistClient.notesTitle")}
-          onPress={() => router.push(`/(therapist)/client/${id}/notes` as any)}
-          variant="outline"
-          style={{ flex: 1 }}
-        />
-      </View>
-      <AivoButton
-        title={t("therapistClient.generateReport")}
-        onPress={() => router.push(`/(therapist)/client/${id}/reports` as any)}
-        variant="secondary"
-        style={{ marginTop: spacing.sm }}
-      />
       </View>
     </ScrollView>
   );

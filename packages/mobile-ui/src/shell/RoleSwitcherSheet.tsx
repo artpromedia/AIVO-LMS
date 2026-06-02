@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Modal,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { ROLES, ROLE_META, type Role } from "@aivo/nav";
 import { theme } from "../theme";
 import type { MobileRoleOption } from "./types";
@@ -56,12 +49,7 @@ export function RoleSwitcherSheet({
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close" />
       <View style={styles.sheet} accessibilityViewIsModal>
         <View style={styles.grabber} />

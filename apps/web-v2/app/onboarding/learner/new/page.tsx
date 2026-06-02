@@ -2,13 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  AuthShell,
-  AuthCard,
-  AuthInput,
-  ReassuranceCard,
-  StepperHeader,
-} from "@aivo/ui/auth";
+import { AuthShell, AuthCard, AuthInput, ReassuranceCard, StepperHeader } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
@@ -22,13 +16,7 @@ const STEPS = [
   { label: "consent" },
 ] as const;
 
-const GRADE_BANDS = [
-  "Pre-K (3-4)",
-  "K-2 (5-7)",
-  "3-5 (8-10)",
-  "6-8 (11-13)",
-  "9-12 (14-18)",
-];
+const GRADE_BANDS = ["Pre-K (3-4)", "K-2 (5-7)", "3-5 (8-10)", "6-8 (11-13)", "9-12 (14-18)"];
 
 export default function NewLearnerPage() {
   const t = useTranslations("onboarding.learner_new");
@@ -45,10 +33,7 @@ export default function NewLearnerPage() {
   return (
     <AuthShell>
       <div className="flex flex-col gap-5">
-        <StepperHeader
-          steps={STEPS.map((s) => ({ label: ts(s.label) }))}
-          current={2}
-        />
+        <StepperHeader steps={STEPS.map((s) => ({ label: ts(s.label) }))} current={2} />
         <AuthCard
           icon={<AivoIcon name="care" size={32} />}
           eyebrow={t("eyebrow")}
@@ -100,10 +85,7 @@ export default function NewLearnerPage() {
                 required
               />
               <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="grade"
-                  className="text-sm font-medium text-iw-text-strong"
-                >
+                <label htmlFor="grade" className="text-sm font-medium text-iw-text-strong">
                   {t("grade_band_label")}
                 </label>
                 <select
@@ -122,18 +104,14 @@ export default function NewLearnerPage() {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-iw-text-muted">
-                  {t("grade_band_help")}
-                </p>
+                <p className="text-xs text-iw-text-muted">{t("grade_band_help")}</p>
               </div>
 
               <fieldset className="flex flex-col gap-2">
                 <legend className="text-sm font-medium text-iw-text-strong">
                   {t("iep_legend")}
                 </legend>
-                <p className="text-xs text-iw-text-muted">
-                  {t("iep_help")}
-                </p>
+                <p className="text-xs text-iw-text-muted">{t("iep_help")}</p>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {(["yes", "no", "unsure"] as const).map((v) => (
                     <Button

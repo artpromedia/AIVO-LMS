@@ -23,9 +23,7 @@ export default function LearnerError({
       id="main"
       className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center"
     >
-      <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">
-        {t("title")}
-      </p>
+      <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">{t("title")}</p>
       <h1 className="mt-2 font-display text-4xl font-bold">{t("body")}</h1>
       <p className="mt-3 text-aivo-ink-soft">
         Your progress is saved. Tap "Try again" to come right back, or visit home for your next

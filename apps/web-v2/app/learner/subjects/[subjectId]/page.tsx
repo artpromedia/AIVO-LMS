@@ -10,18 +10,9 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
-import {
-  TodayFocusCard,
-  GlassCard,
-  InsightChip,
-  EmptyState,
-} from "@aivo/ui";
+import { TodayFocusCard, GlassCard, InsightChip, EmptyState } from "@aivo/ui";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import {
-  getIEPForLearner,
-  getMasteryMap,
-  getSubjectDetail,
-} from "@/lib/db/repos";
+import { getIEPForLearner, getMasteryMap, getSubjectDetail } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 
 // Maps backend enums to their learner.subject_detail.* catalog keys.
@@ -114,14 +105,18 @@ export default async function LearnerSubjectDetailPage({
           <div>
             <p className="iw-label text-iw-text-muted">{detail.subject.name}</p>
             <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-tight">
-              {tutor ? t("with_tutor", { subject: detail.subject.name, tutor: tutor.name }) : detail.subject.name}
+              {tutor
+                ? t("with_tutor", { subject: detail.subject.name, tutor: tutor.name })
+                : detail.subject.name}
             </h1>
           </div>
         </div>
         <p className="text-sm text-iw-text-muted max-w-2xl">{detail.subject.description}</p>
         <div className="flex items-center gap-2 flex-wrap">
           <InsightChip tone="primary" size="md">
-            {LEVEL_KEY[detail.currentLevel] ? t(LEVEL_KEY[detail.currentLevel]) : detail.currentLevel.replaceAll("_", " ")}
+            {LEVEL_KEY[detail.currentLevel]
+              ? t(LEVEL_KEY[detail.currentLevel])
+              : detail.currentLevel.replaceAll("_", " ")}
           </InsightChip>
           {iep?.confirmedAt ? (
             <InsightChip tone="accent" size="md">
@@ -172,7 +167,16 @@ export default async function LearnerSubjectDetailPage({
               style={{ backgroundColor: accent }}
             >
               {t("start_lesson")}
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
             </Link>
@@ -216,7 +220,9 @@ export default async function LearnerSubjectDetailPage({
                   <div className="flex-1 min-w-0 flex flex-col gap-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <InsightChip tone="primary" size="sm">
-                        {KIND_KEY[node.kind] ? t(KIND_KEY[node.kind]) : node.kind.replaceAll("_", " ")}
+                        {KIND_KEY[node.kind]
+                          ? t(KIND_KEY[node.kind])
+                          : node.kind.replaceAll("_", " ")}
                       </InsightChip>
                       <span className="text-xs text-iw-text-muted">
                         {t("min", { n: node.estimatedMinutes })}

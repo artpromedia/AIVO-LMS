@@ -8,10 +8,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  __resetAsrProvider,
-  getAsrProvider,
-} from "../src/services/asr-provider.js";
+import { __resetAsrProvider, getAsrProvider } from "../src/services/asr-provider.js";
 
 function withEnv(vars: Record<string, string | undefined>, fn: () => Promise<void> | void) {
   const original: Record<string, string | undefined> = {};
@@ -46,25 +43,19 @@ test("defaults to NullProvider when ASR_PROVIDER is unset", async () => {
 });
 
 test("falls back to NullProvider when openai is selected without a key", async () => {
-  await withEnv(
-    { ASR_PROVIDER: "openai", OPENAI_API_KEY: undefined },
-    () => {
-      __resetAsrProvider();
-      const p = getAsrProvider();
-      assert.equal(p.name, "null");
-    },
-  );
+  await withEnv({ ASR_PROVIDER: "openai", OPENAI_API_KEY: undefined }, () => {
+    __resetAsrProvider();
+    const p = getAsrProvider();
+    assert.equal(p.name, "null");
+  });
 });
 
 test("selects OpenAiWhisperProvider when openai + key set", async () => {
-  await withEnv(
-    { ASR_PROVIDER: "openai", OPENAI_API_KEY: "test-key" },
-    () => {
-      __resetAsrProvider();
-      const p = getAsrProvider();
-      assert.equal(p.name, "openai-whisper");
-    },
-  );
+  await withEnv({ ASR_PROVIDER: "openai", OPENAI_API_KEY: "test-key" }, () => {
+    __resetAsrProvider();
+    const p = getAsrProvider();
+    assert.equal(p.name, "openai-whisper");
+  });
 });
 
 test("falls back to NullProvider when azure is selected without key+region", async () => {

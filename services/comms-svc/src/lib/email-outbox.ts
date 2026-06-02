@@ -112,8 +112,7 @@ export async function enqueueEmail(
     input.kind === "template" ? JSON.stringify(input.templateModel ?? {}) : null;
   const tag = input.tag ?? null;
   const replyTo = input.kind === "raw" ? (input.replyTo ?? null) : null;
-  const metadata =
-    input.kind === "raw" && input.metadata ? JSON.stringify(input.metadata) : null;
+  const metadata = input.kind === "raw" && input.metadata ? JSON.stringify(input.metadata) : null;
 
   // ON CONFLICT on the partial unique index over dedupe_key. Returns the
   // existing row's id if there was a duplicate so callers can still surface
@@ -254,11 +253,7 @@ export async function recordProviderEvent(
 ): Promise<number> {
   if (!event.messageId) return 0;
   const status =
-    event.type === "bounced"
-      ? "bounced"
-      : event.type === "complained"
-        ? "complained"
-        : null;
+    event.type === "bounced" ? "bounced" : event.type === "complained" ? "complained" : null;
   if (!status) return 0; // delivered/opened/clicked don't change durability state
 
   const result = await db.execute(sql`

@@ -29,7 +29,9 @@ test.describe("Lesson player multimedia captions smoke", () => {
       await page.goto(`/learner/lesson-player-smoke?subject=${subjectSlug}&step=5`, {
         waitUntil: "domcontentloaded",
       });
-      const media = page.locator('[data-testid="lesson-media-video"], [data-testid="lesson-media-audio"]').first();
+      const media = page
+        .locator('[data-testid="lesson-media-video"], [data-testid="lesson-media-audio"]')
+        .first();
       await expect(media).toBeVisible();
       const runId = await page.locator('[data-testid="smoke-run-id"]').getAttribute("data-run-id");
       expect(runId).toBeTruthy();

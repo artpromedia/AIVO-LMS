@@ -40,11 +40,15 @@ const PASSWORD = process.env.E2E_LEARNER_PARENT_PASSWORD || "E2eLesson!Pass1";
 // from the entitlements API rather than hard-coding it here.
 const FALLBACK_TUTOR_SKU = "tutor_pixel";
 
-async function probe(baseURL: string, path: string, init?: {
-  method?: string;
-  data?: unknown;
-  token?: string;
-}) {
+async function probe(
+  baseURL: string,
+  path: string,
+  init?: {
+    method?: string;
+    data?: unknown;
+    token?: string;
+  },
+) {
   const ctx = await pwRequest.newContext({ baseURL });
   const headers: Record<string, string> = {};
   if (init?.data !== undefined) headers["content-type"] = "application/json";
@@ -190,9 +194,7 @@ test.describe("learner lesson loop", () => {
     expect(ent.status).toBe(200);
     const effective: string[] = ent.json?.effectiveTutorSkus ?? [];
     expect(effective.length).toBeGreaterThan(0);
-    entitledTutorSku = effective.includes(FALLBACK_TUTOR_SKU)
-      ? FALLBACK_TUTOR_SKU
-      : effective[0]!;
+    entitledTutorSku = effective.includes(FALLBACK_TUTOR_SKU) ? FALLBACK_TUTOR_SKU : effective[0]!;
 
     // 1. Start the session.
     const start = await probe(TUTOR_BASE, "/api/tutor/session/start", {

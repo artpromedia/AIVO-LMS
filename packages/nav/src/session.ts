@@ -69,9 +69,7 @@ export function isRoleSession(value: unknown): value is RoleSession {
  * call this to render only relevant rows on each surface.
  */
 export function getRolesForSurface(roles: readonly Role[], surface: Surface): Role[] {
-  return roles.filter((r) =>
-    surface === "web" ? ROLE_META[r].onWeb : ROLE_META[r].onMobile,
-  );
+  return roles.filter((r) => (surface === "web" ? ROLE_META[r].onWeb : ROLE_META[r].onMobile));
 }
 
 /**
@@ -170,7 +168,5 @@ export function canAccessArea(
  * server hasn't told us which roles the user holds yet.
  */
 export function allRolesForSurface(surface: Surface): Role[] {
-  return ROLES.filter((r) =>
-    surface === "web" ? ROLE_META[r].onWeb : ROLE_META[r].onMobile,
-  );
+  return ROLES.filter((r) => (surface === "web" ? ROLE_META[r].onWeb : ROLE_META[r].onMobile));
 }

@@ -127,10 +127,7 @@ export default async function NewLearnerPage({
       user={{ displayName: session.displayName, email: session.email }}
     >
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-        <PageHeader
-          title={t("title")}
-          description={t("description")}
-        />
+        <PageHeader title={t("title")} description={t("description")} />
 
         {params.error === "invalid" && (
           <Banner
@@ -145,22 +142,14 @@ export default async function NewLearnerPage({
           <Card className="flex flex-col gap-5 p-6">
             <header className="flex flex-col gap-1">
               <h2 className="text-base font-semibold text-iw-ink">{t("section_about_title")}</h2>
-              <p className="text-sm text-iw-ink-muted">
-                {t("section_about_description")}
-              </p>
+              <p className="text-sm text-iw-ink-muted">{t("section_about_description")}</p>
             </header>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="firstName" required>
                   {t("first_name")}
                 </Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  required
-                  maxLength={80}
-                  autoComplete="off"
-                />
+                <Input id="firstName" name="firstName" required maxLength={80} autoComplete="off" />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="preferredName" optional>
@@ -192,7 +181,12 @@ export default async function NewLearnerPage({
                 <Label htmlFor="pronouns" optional>
                   {t("pronouns")}
                 </Label>
-                <Input id="pronouns" name="pronouns" maxLength={40} placeholder={t("pronouns_placeholder")} />
+                <Input
+                  id="pronouns"
+                  name="pronouns"
+                  maxLength={40}
+                  placeholder={t("pronouns_placeholder")}
+                />
               </div>
             </div>
           </Card>
@@ -201,9 +195,7 @@ export default async function NewLearnerPage({
           <Card className="flex flex-col gap-5 p-6">
             <header className="flex flex-col gap-1">
               <h2 className="text-base font-semibold text-iw-ink">{t("section_school_title")}</h2>
-              <p className="text-sm text-iw-ink-muted">
-                {t("section_school_description")}
-              </p>
+              <p className="text-sm text-iw-ink-muted">{t("section_school_description")}</p>
             </header>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
@@ -280,10 +272,10 @@ export default async function NewLearnerPage({
           {/* Section 3 — Strengths & support. */}
           <Card className="flex flex-col gap-5 p-6">
             <header className="flex flex-col gap-1">
-              <h2 className="text-base font-semibold text-iw-ink">{t("section_strengths_title")}</h2>
-              <p className="text-sm text-iw-ink-muted">
-                {t("section_strengths_description")}
-              </p>
+              <h2 className="text-base font-semibold text-iw-ink">
+                {t("section_strengths_title")}
+              </h2>
+              <p className="text-sm text-iw-ink-muted">{t("section_strengths_description")}</p>
             </header>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
@@ -332,13 +324,8 @@ export default async function NewLearnerPage({
                   rows={3}
                   placeholder={t("known_strengths_placeholder")}
                 />
-                <AISuggestionsToolbar
-                  targetId="knownStrengths"
-                  fieldType="learner_strengths"
-                />
-                <p className="text-xs text-iw-ink-muted">
-                  {t("known_strengths_help")}
-                </p>
+                <AISuggestionsToolbar targetId="knownStrengths" fieldType="learner_strengths" />
+                <p className="text-xs text-iw-ink-muted">{t("known_strengths_help")}</p>
               </div>
               <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="knownChallenges" optional>
@@ -350,10 +337,7 @@ export default async function NewLearnerPage({
                   rows={3}
                   placeholder={t("known_challenges_placeholder")}
                 />
-                <AISuggestionsToolbar
-                  targetId="knownChallenges"
-                  fieldType="learner_challenges"
-                />
+                <AISuggestionsToolbar targetId="knownChallenges" fieldType="learner_challenges" />
               </div>
             </div>
           </Card>

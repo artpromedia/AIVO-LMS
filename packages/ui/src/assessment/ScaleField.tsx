@@ -64,7 +64,10 @@ export function ScaleField({
       <legend className="text-sm font-semibold text-iw-text-strong">
         {legend}
         {required ? (
-          <span className="ml-1 text-[var(--aivo-color-status-error-strong,#b91c1c)]" aria-hidden="true">
+          <span
+            className="ml-1 text-[var(--aivo-color-status-error-strong,#b91c1c)]"
+            aria-hidden="true"
+          >
             *
           </span>
         ) : null}
@@ -100,15 +103,11 @@ export function ScaleField({
                 className="sr-only"
               />
               <span className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-iw-text-strong">
-                  {opt.label}
-                </span>
+                <span className="text-sm font-semibold text-iw-text-strong">{opt.label}</span>
                 <span
                   className={cn(
                     "w-7 h-2.5 rounded-full",
-                    checked
-                      ? "bg-[var(--aivo-sensory-primary,#7c3aed)]"
-                      : tint,
+                    checked ? "bg-[var(--aivo-sensory-primary,#7c3aed)]" : tint,
                   )}
                   aria-hidden="true"
                 />

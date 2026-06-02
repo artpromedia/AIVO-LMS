@@ -18,8 +18,7 @@ import { GlassCard } from "./GlassCard";
  * `font-variant-numeric: tabular-nums` so digits sit on a grid even as
  * the value animates.
  */
-export interface MetricCardProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+export interface MetricCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   state?: AivoComponentState;
   label: React.ReactNode;
   value: React.ReactNode;
@@ -53,103 +52,87 @@ function deriveDeltaTone(delta: number | null | undefined): AivoTone {
   return delta > 0 ? "success" : "error";
 }
 
-export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
-  function MetricCard(
-    {
-      state = "default",
-      label,
-      value,
-      suffix,
-      delta,
-      deltaTone,
-      icon: Icon,
-      trail,
-      caption,
-      className,
-      ...rest
-    },
-    ref
-  ) {
-    const tone = deltaTone ?? deriveDeltaTone(delta);
-    const TrendIcon =
-      delta == null || delta === 0
-        ? Minus
-        : delta > 0
-          ? TrendingUp
-          : TrendingDown;
-    const isLoading = state === "loading";
-    const isEmpty = state === "empty";
+export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(function MetricCard(
+  {
+    state = "default",
+    label,
+    value,
+    suffix,
+    delta,
+    deltaTone,
+    icon: Icon,
+    trail,
+    caption,
+    className,
+    ...rest
+  },
+  ref,
+) {
+  const tone = deltaTone ?? deriveDeltaTone(delta);
+  const TrendIcon = delta == null || delta === 0 ? Minus : delta > 0 ? TrendingUp : TrendingDown;
+  const isLoading = state === "loading";
+  const isEmpty = state === "empty";
 
-    return (
-      <GlassCard
-        ref={ref}
-        state={state}
-        density="base"
-        radius="card"
-        elevation="raised"
-        className={cn("min-h-[140px]", className)}
-        {...rest}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <span className="iw-label-sm text-[var(--aivo-color-text-muted,#64748b)] uppercase tracking-wide">
-            {label}
+  return (
+    <GlassCard
+      ref={ref}
+      state={state}
+      density="base"
+      radius="card"
+      elevation="raised"
+      className={cn("min-h-[140px]", className)}
+      {...rest}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span className="iw-label-sm text-[var(--aivo-color-text-muted,#64748b)] uppercase tracking-wide">
+          {label}
+        </span>
+        {Icon && (
+          <Icon className="w-4 h-4 text-[var(--aivo-color-text-muted,#94a3b8)]" aria-hidden />
+        )}
+      </div>
+
+      <div className="flex items-baseline gap-2 iw-tabular">
+        {isLoading ? (
+          <span
+            aria-hidden
+            className="inline-block h-9 w-24 rounded-iw-control bg-[var(--aivo-color-surface-muted,#e2e8f0)]"
+          />
+        ) : isEmpty ? (
+          <span className="iw-metric-lg text-[var(--aivo-color-text-muted,#94a3b8)]">—</span>
+        ) : (
+          <span className="iw-metric-lg text-[var(--aivo-color-text-default,#0f172a)]">
+            {value}
           </span>
-          {Icon && (
-            <Icon
-              className="w-4 h-4 text-[var(--aivo-color-text-muted,#94a3b8)]"
-              aria-hidden
-            />
-          )}
-        </div>
-
-        <div className="flex items-baseline gap-2 iw-tabular">
-          {isLoading ? (
-            <span
-              aria-hidden
-              className="inline-block h-9 w-24 rounded-iw-control bg-[var(--aivo-color-surface-muted,#e2e8f0)]"
-            />
-          ) : isEmpty ? (
-            <span className="iw-metric-lg text-[var(--aivo-color-text-muted,#94a3b8)]">
-              —
-            </span>
-          ) : (
-            <span className="iw-metric-lg text-[var(--aivo-color-text-default,#0f172a)]">
-              {value}
-            </span>
-          )}
-          {suffix && !isLoading && !isEmpty && (
-            <span className="text-sm text-[var(--aivo-color-text-muted,#64748b)]">
-              {suffix}
-            </span>
-          )}
-        </div>
-
-        {delta !== undefined && (
-          <div
-            className={cn(
-              "inline-flex items-center gap-1 text-xs font-semibold iw-tabular",
-              TONE_CLASS[tone]
-            )}
-            aria-label={
-              delta == null
-                ? "No change data"
-                : `${delta > 0 ? "Up" : delta < 0 ? "Down" : "No change"} ${Math.abs(delta)} percent`
-            }
-          >
-            <TrendIcon className="w-3.5 h-3.5" aria-hidden />
-            {delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta}%`}
-          </div>
         )}
-
-        {trail && <div className="mt-2">{trail}</div>}
-
-        {caption && (
-          <p className="iw-caption text-[var(--aivo-color-text-muted,#94a3b8)]">
-            {caption}
-          </p>
+        {suffix && !isLoading && !isEmpty && (
+          <span className="text-sm text-[var(--aivo-color-text-muted,#64748b)]">{suffix}</span>
         )}
-      </GlassCard>
-    );
-  }
-);
+      </div>
+
+      {delta !== undefined && (
+        <div
+          className={cn(
+            "inline-flex items-center gap-1 text-xs font-semibold iw-tabular",
+            TONE_CLASS[tone],
+          )}
+          aria-label={
+            delta == null
+              ? "No change data"
+              : `${delta > 0 ? "Up" : delta < 0 ? "Down" : "No change"} ${Math.abs(delta)} percent`
+          }
+        >
+          <TrendIcon className="w-3.5 h-3.5" aria-hidden />
+          {delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta}%`}
+        </div>
+      )}
+
+      {trail && <div className="mt-2">{trail}</div>}
+
+      {caption && (
+        <p className="iw-caption text-[var(--aivo-color-text-muted,#94a3b8)]">{caption}</p>
+      )}
+    </GlassCard>
+  );
+});
 MetricCard.displayName = "Surface/MetricCard";

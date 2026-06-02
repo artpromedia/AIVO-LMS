@@ -32,7 +32,7 @@ const DATA = {
       pin: "PIN",
       missingInfo: "معلومات ناقصة",
       fillRequired: "يرجى ملء جميع الحقول المطلوبة",
-      addChildFailed: "فشل إضافة الطفل. يرجى المحاولة مجدداً."
+      addChildFailed: "فشل إضافة الطفل. يرجى المحاولة مجدداً.",
     },
     learnerHomework: {
       title: "مساعد الواجب",
@@ -47,21 +47,23 @@ const DATA = {
       noAssignments: "لا يوجد واجب حتى الآن. التقط صورة أو ارفع PDF للبدء!",
       problems: "{{count}} مسألة",
       openOnWeb: "تابع هذا الواجب على تطبيق الويب للدردشة مع مدرسك الذكي.",
-      cameraOnWeb: "التقاط الصور للواجب يعمل على تطبيق AIVO على الويب. يرجى فتح هذه الصفحة على الويب لالتقاط صورة.",
+      cameraOnWeb:
+        "التقاط الصور للواجب يعمل على تطبيق AIVO على الويب. يرجى فتح هذه الصفحة على الويب لالتقاط صورة.",
       status: {
         PROCESSING: "جارٍ المعالجة…",
         READY: "جاهز",
         IN_PROGRESS: "قيد التنفيذ",
         COMPLETED: "تم!",
-        FAILED: "فشل"
+        FAILED: "فشل",
       },
       uploading: "جارٍ الرفع…",
       uploadFailed: "تعذّر رفع الصورة. يرجى المحاولة مجدداً.",
       cameraPermissionDenied: "يلزم منح إذن الكاميرا لالتقاط صورة للواجب.",
       galleryPermissionDenied: "يلزم منح إذن مكتبة الصور لاختيار صورة للواجب.",
       subscriptionRequiredTitle: "يلزم اشتراك",
-      subscriptionRequiredBody: "يبدو أن هذا الواجب في مادة {{subject}} — تحتاج إلى اشتراك في مدرس {{subject}} للحصول على المساعدة.",
-      pdfTooLarge: "حجم PDF كبير جداً. يرجى اختيار ملف أقل من 10 ميغابايت."
+      subscriptionRequiredBody:
+        "يبدو أن هذا الواجب في مادة {{subject}} — تحتاج إلى اشتراك في مدرس {{subject}} للحصول على المساعدة.",
+      pdfTooLarge: "حجم PDF كبير جداً. يرجى اختيار ملف أقل من 10 ميغابايت.",
     },
     teacherReports: {
       title: "التقارير",
@@ -69,7 +71,8 @@ const DATA = {
       weeklyMasteryTitle: "تقرير الإتقان الأسبوعي",
       weeklyMasteryDesc: "تتبع تقدم الإتقان لدى جميع متعلميك حسب المادة والمهارة.",
       atRiskTitle: "تنبيهات المخاطر",
-      atRiskDesc: "تحديد المتعلمين الذين قد يحتاجون إلى دعم إضافي بناءً على أنماط المشاركة والأداء.",
+      atRiskDesc:
+        "تحديد المتعلمين الذين قد يحتاجون إلى دعم إضافي بناءً على أنماط المشاركة والأداء.",
       engagementTitle: "مشاركة الجلسات",
       engagementDesc: "مراقبة تكرار جلسات المدرسين ومدتها ومقاييس المشاركة لدى متعلميك.",
       iepProgressTitle: "تقدم IEP",
@@ -81,7 +84,7 @@ const DATA = {
       noLearnersTitle: "لا يوجد متعلمون متصلون",
       noLearnersMessage: "ستظهر التقارير بعد دعوة أولياء الأمور إليك في فرق متعلميهم.",
       pending: "قيد الانتظار",
-      gradeLabel: "الصف"
+      gradeLabel: "الصف",
     },
     learner: {
       greeting: "مرحباً، {{name}}!",
@@ -95,7 +98,7 @@ const DATA = {
       homework: "الواجب",
       quests: "المهام",
       badgesLabel: "شارات",
-      grades: "الدرجات"
+      grades: "الدرجات",
     },
     teacher: {
       greeting: "مرحباً، {{name}}",
@@ -104,7 +107,7 @@ const DATA = {
       atRisk: "في خطر",
       avgProgress: "متوسط التقدم",
       noStudentsTitle: "لا يوجد طلاب متصلون",
-      noStudentsMessage: "يحتاج أولياء الأمور إلى دعوتك للانضمام إلى فريق رعاية طفلهم."
+      noStudentsMessage: "يحتاج أولياء الأمور إلى دعوتك للانضمام إلى فريق رعاية طفلهم.",
     },
     teacherIEP: {
       title: "رفع IEP",
@@ -112,19 +115,19 @@ const DATA = {
       uploadDocument: "رفع وثيقة IEP",
       uploadDesc: "التقط صورة أو اختر ملف PDF",
       camera: "الكاميرا",
-      pdf: "PDF"
+      pdf: "PDF",
     },
     learnerBadges: {
       title: "خزانة الشارات",
       earned: "{{count}} شارة مكتسبة",
       noBadgesTitle: "لا توجد شارات بعد",
-      noBadgesMessage: "أكمل الدروس والتحديات لكسب الشارات!"
+      noBadgesMessage: "أكمل الدروس والتحديات لكسب الشارات!",
     },
     caregiverSettings: {
       title: "الإعدادات",
       notificationPreferences: "تفضيلات الإشعارات",
-      accountDetails: "تفاصيل الحساب"
-    }
+      accountDetails: "تفاصيل الحساب",
+    },
   },
 
   de: {
@@ -153,7 +156,7 @@ const DATA = {
       pin: "PIN",
       missingInfo: "Fehlende Angaben",
       fillRequired: "Bitte alle Pflichtfelder ausfüllen",
-      addChildFailed: "Kind konnte nicht hinzugefügt werden. Bitte erneut versuchen."
+      addChildFailed: "Kind konnte nicht hinzugefügt werden. Bitte erneut versuchen.",
     },
     learnerHomework: {
       title: "Hausaufgaben-Helfer",
@@ -165,44 +168,54 @@ const DATA = {
       uploadPDFDesc: "Hausaufgaben-PDF für Hilfe hochladen",
       chooseFile: "Datei auswählen",
       yourHomework: "Deine Hausaufgaben",
-      noAssignments: "Noch keine Hausaufgaben. Mach ein Foto oder lade ein PDF hoch, um loszulegen!",
+      noAssignments:
+        "Noch keine Hausaufgaben. Mach ein Foto oder lade ein PDF hoch, um loszulegen!",
       problems: "{{count}} Aufgaben",
       openOnWeb: "Setze diese Hausaufgabe in der Web-App fort, um mit deinem KI-Tutor zu chatten.",
-      cameraOnWeb: "Kameraaufnahmen für Hausaufgaben laufen in der AIVO-Web-App. Bitte öffne diese Seite im Web, um ein Foto aufzunehmen.",
+      cameraOnWeb:
+        "Kameraaufnahmen für Hausaufgaben laufen in der AIVO-Web-App. Bitte öffne diese Seite im Web, um ein Foto aufzunehmen.",
       status: {
         PROCESSING: "Wird verarbeitet…",
         READY: "Bereit",
         IN_PROGRESS: "In Bearbeitung",
         COMPLETED: "Fertig!",
-        FAILED: "Fehlgeschlagen"
+        FAILED: "Fehlgeschlagen",
       },
       uploading: "Wird hochgeladen…",
       uploadFailed: "Das Foto konnte nicht hochgeladen werden. Bitte erneut versuchen.",
-      cameraPermissionDenied: "Kamerazugriff ist erforderlich, um ein Hausaufgabenfoto aufzunehmen.",
-      galleryPermissionDenied: "Fotobibliothekszugriff ist erforderlich, um ein Hausaufgabenbild auszuwählen.",
+      cameraPermissionDenied:
+        "Kamerazugriff ist erforderlich, um ein Hausaufgabenfoto aufzunehmen.",
+      galleryPermissionDenied:
+        "Fotobibliothekszugriff ist erforderlich, um ein Hausaufgabenbild auszuwählen.",
       subscriptionRequiredTitle: "Abonnement erforderlich",
-      subscriptionRequiredBody: "Diese Hausaufgabe sieht nach {{subject}} aus – du benötigst ein {{subject}}-Tutor-Abonnement für Hilfe.",
-      pdfTooLarge: "Dieses PDF ist zu groß. Bitte wähle eine Datei unter 10 MB."
+      subscriptionRequiredBody:
+        "Diese Hausaufgabe sieht nach {{subject}} aus – du benötigst ein {{subject}}-Tutor-Abonnement für Hilfe.",
+      pdfTooLarge: "Dieses PDF ist zu groß. Bitte wähle eine Datei unter 10 MB.",
     },
     teacherReports: {
       title: "Berichte",
       subtitle: "Brain-basierte Einblicke zu Beherrschung, Engagement und Risikosignalen",
       weeklyMasteryTitle: "Wöchentlicher Beherrschungsbericht",
-      weeklyMasteryDesc: "Verfolge den Beherrschungsfortschritt aller Lernenden nach Fach und Kompetenzbereich.",
+      weeklyMasteryDesc:
+        "Verfolge den Beherrschungsfortschritt aller Lernenden nach Fach und Kompetenzbereich.",
       atRiskTitle: "Risikowarnungen",
-      atRiskDesc: "Identifiziere Lernende, die möglicherweise zusätzliche Unterstützung benötigen, basierend auf Engagement- und Leistungsmustern.",
+      atRiskDesc:
+        "Identifiziere Lernende, die möglicherweise zusätzliche Unterstützung benötigen, basierend auf Engagement- und Leistungsmustern.",
       engagementTitle: "Sitzungsengagement",
-      engagementDesc: "Überwache Häufigkeit, Dauer und Engagement-Metriken der Tutorsitzungen bei deinen Lernenden.",
+      engagementDesc:
+        "Überwache Häufigkeit, Dauer und Engagement-Metriken der Tutorsitzungen bei deinen Lernenden.",
       iepProgressTitle: "IEP-Fortschritt",
-      iepProgressDesc: "Verfolge den IEP-Zielfortschritt für Lernende mit individuellen Bildungsplänen.",
+      iepProgressDesc:
+        "Verfolge den IEP-Zielfortschritt für Lernende mit individuellen Bildungsplänen.",
       cadenceWeekly: "Wöchentlich erstellt",
       cadenceDaily: "Täglich aktualisiert",
       cadenceMonthly: "Monatlich erstellt",
       studentOverview: "Schülerübersicht",
       noLearnersTitle: "Keine Lernenden verbunden",
-      noLearnersMessage: "Berichte erscheinen, sobald Eltern dich zu ihren Lernenden-Teams einladen.",
+      noLearnersMessage:
+        "Berichte erscheinen, sobald Eltern dich zu ihren Lernenden-Teams einladen.",
       pending: "Ausstehend",
-      gradeLabel: "Klasse"
+      gradeLabel: "Klasse",
     },
     learner: {
       greeting: "Hallo, {{name}}!",
@@ -216,7 +229,7 @@ const DATA = {
       homework: "Hausaufgaben",
       quests: "Quests",
       badgesLabel: "Abzeichen",
-      grades: "Noten"
+      grades: "Noten",
     },
     teacher: {
       greeting: "Hallo, {{name}}",
@@ -225,7 +238,7 @@ const DATA = {
       atRisk: "Gefährdet",
       avgProgress: "Durchschn. Fortschritt",
       noStudentsTitle: "Keine Schüler verbunden",
-      noStudentsMessage: "Eltern müssen dich in das Betreuungsteam ihres Kindes einladen."
+      noStudentsMessage: "Eltern müssen dich in das Betreuungsteam ihres Kindes einladen.",
     },
     teacherIEP: {
       title: "IEP hochladen",
@@ -233,19 +246,19 @@ const DATA = {
       uploadDocument: "IEP-Dokument hochladen",
       uploadDesc: "Foto aufnehmen oder PDF-Datei auswählen",
       camera: "Kamera",
-      pdf: "PDF"
+      pdf: "PDF",
     },
     learnerBadges: {
       title: "Abzeichen-Schrank",
       earned: "{{count}} Abzeichen verdient",
       noBadgesTitle: "Noch keine Abzeichen",
-      noBadgesMessage: "Schließe Lektionen und Aufgaben ab, um Abzeichen zu verdienen!"
+      noBadgesMessage: "Schließe Lektionen und Aufgaben ab, um Abzeichen zu verdienen!",
     },
     caregiverSettings: {
       title: "Einstellungen",
       notificationPreferences: "Benachrichtigungseinstellungen",
-      accountDetails: "Kontodetails"
-    }
+      accountDetails: "Kontodetails",
+    },
   },
 
   fr: {
@@ -274,7 +287,7 @@ const DATA = {
       pin: "PIN",
       missingInfo: "Informations manquantes",
       fillRequired: "Veuillez remplir tous les champs obligatoires",
-      addChildFailed: "Échec de l'ajout de l'enfant. Veuillez réessayer."
+      addChildFailed: "Échec de l'ajout de l'enfant. Veuillez réessayer.",
     },
     learnerHomework: {
       title: "Assistant devoirs",
@@ -286,44 +299,53 @@ const DATA = {
       uploadPDFDesc: "Importez un PDF de devoirs pour obtenir de l'aide",
       chooseFile: "Choisir un fichier",
       yourHomework: "Vos devoirs",
-      noAssignments: "Aucun devoir pour l'instant. Prenez une photo ou importez un PDF pour commencer !",
+      noAssignments:
+        "Aucun devoir pour l'instant. Prenez une photo ou importez un PDF pour commencer !",
       problems: "{{count}} exercices",
       openOnWeb: "Continuez ces devoirs sur l'application web pour chatter avec votre tuteur IA.",
-      cameraOnWeb: "La capture par caméra pour les devoirs fonctionne sur l'application web AIVO. Veuillez ouvrir cette page sur le web pour prendre une photo.",
+      cameraOnWeb:
+        "La capture par caméra pour les devoirs fonctionne sur l'application web AIVO. Veuillez ouvrir cette page sur le web pour prendre une photo.",
       status: {
         PROCESSING: "Traitement en cours…",
         READY: "Prêt",
         IN_PROGRESS: "En cours",
         COMPLETED: "Terminé !",
-        FAILED: "Échec"
+        FAILED: "Échec",
       },
       uploading: "Importation…",
       uploadFailed: "Impossible d'importer cette photo. Veuillez réessayer.",
       cameraPermissionDenied: "L'accès à la caméra est requis pour prendre une photo des devoirs.",
-      galleryPermissionDenied: "L'accès à la photothèque est requis pour sélectionner une image des devoirs.",
+      galleryPermissionDenied:
+        "L'accès à la photothèque est requis pour sélectionner une image des devoirs.",
       subscriptionRequiredTitle: "Abonnement requis",
-      subscriptionRequiredBody: "Ces devoirs semblent être en {{subject}} — vous avez besoin d'un abonnement tuteur {{subject}} pour obtenir de l'aide.",
-      pdfTooLarge: "Ce PDF est trop volumineux. Veuillez choisir un fichier de moins de 10 Mo."
+      subscriptionRequiredBody:
+        "Ces devoirs semblent être en {{subject}} — vous avez besoin d'un abonnement tuteur {{subject}} pour obtenir de l'aide.",
+      pdfTooLarge: "Ce PDF est trop volumineux. Veuillez choisir un fichier de moins de 10 Mo.",
     },
     teacherReports: {
       title: "Rapports",
       subtitle: "Aperçus de maîtrise, d'engagement et de risques basés sur Brain",
       weeklyMasteryTitle: "Rapport de maîtrise hebdomadaire",
-      weeklyMasteryDesc: "Suivez la progression de la maîtrise de tous vos apprenants par matière et domaine de compétence.",
+      weeklyMasteryDesc:
+        "Suivez la progression de la maîtrise de tous vos apprenants par matière et domaine de compétence.",
       atRiskTitle: "Alertes à risque",
-      atRiskDesc: "Identifiez les apprenants qui pourraient avoir besoin de soutien supplémentaire selon les schémas d'engagement et de performance.",
+      atRiskDesc:
+        "Identifiez les apprenants qui pourraient avoir besoin de soutien supplémentaire selon les schémas d'engagement et de performance.",
       engagementTitle: "Engagement des sessions",
-      engagementDesc: "Suivez la fréquence, la durée et les métriques d'engagement des sessions de tutorat chez vos apprenants.",
+      engagementDesc:
+        "Suivez la fréquence, la durée et les métriques d'engagement des sessions de tutorat chez vos apprenants.",
       iepProgressTitle: "Progression IEP",
-      iepProgressDesc: "Suivez la progression des objectifs IEP pour les apprenants ayant des plans d'éducation individualisés.",
+      iepProgressDesc:
+        "Suivez la progression des objectifs IEP pour les apprenants ayant des plans d'éducation individualisés.",
       cadenceWeekly: "Généré chaque semaine",
       cadenceDaily: "Mis à jour quotidiennement",
       cadenceMonthly: "Généré chaque mois",
       studentOverview: "Vue d'ensemble des élèves",
       noLearnersTitle: "Aucun apprenant connecté",
-      noLearnersMessage: "Les rapports apparaîtront une fois que les parents vous auront invité à leurs équipes d'apprenants.",
+      noLearnersMessage:
+        "Les rapports apparaîtront une fois que les parents vous auront invité à leurs équipes d'apprenants.",
       pending: "En attente",
-      gradeLabel: "Classe"
+      gradeLabel: "Classe",
     },
     learner: {
       greeting: "Salut, {{name}} !",
@@ -337,7 +359,7 @@ const DATA = {
       homework: "Devoirs",
       quests: "Quêtes",
       badgesLabel: "Badges",
-      grades: "Notes"
+      grades: "Notes",
     },
     teacher: {
       greeting: "Bonjour, {{name}}",
@@ -346,7 +368,7 @@ const DATA = {
       atRisk: "À risque",
       avgProgress: "Prog. moy.",
       noStudentsTitle: "Aucun élève connecté",
-      noStudentsMessage: "Les parents doivent vous inviter dans l'équipe de soins de leur enfant."
+      noStudentsMessage: "Les parents doivent vous inviter dans l'équipe de soins de leur enfant.",
     },
     teacherIEP: {
       title: "Importer le IEP",
@@ -354,19 +376,19 @@ const DATA = {
       uploadDocument: "Importer le document IEP",
       uploadDesc: "Prenez une photo ou sélectionnez un fichier PDF",
       camera: "Caméra",
-      pdf: "PDF"
+      pdf: "PDF",
     },
     learnerBadges: {
       title: "Armoire à badges",
       earned: "{{count}} badges obtenus",
       noBadgesTitle: "Pas encore de badges",
-      noBadgesMessage: "Terminez des leçons et des défis pour gagner des badges !"
+      noBadgesMessage: "Terminez des leçons et des défis pour gagner des badges !",
     },
     caregiverSettings: {
       title: "Paramètres",
       notificationPreferences: "Préférences de notification",
-      accountDetails: "Détails du compte"
-    }
+      accountDetails: "Détails du compte",
+    },
   },
 
   hi: {
@@ -395,7 +417,7 @@ const DATA = {
       pin: "PIN",
       missingInfo: "जानकारी अधूरी है",
       fillRequired: "कृपया सभी आवश्यक फ़ील्ड भरें",
-      addChildFailed: "बच्चा जोड़ने में विफल। कृपया पुनः प्रयास करें।"
+      addChildFailed: "बच्चा जोड़ने में विफल। कृपया पुनः प्रयास करें।",
     },
     learnerHomework: {
       title: "होमवर्क सहायक",
@@ -410,41 +432,48 @@ const DATA = {
       noAssignments: "अभी तक कोई होमवर्क नहीं। शुरू करने के लिए फ़ोटो लें या PDF अपलोड करें!",
       problems: "{{count}} सवाल",
       openOnWeb: "अपने AI ट्यूटर से चैट करने के लिए यह होमवर्क वेब ऐप पर जारी रखें।",
-      cameraOnWeb: "होमवर्क के लिए कैमरा कैप्चर AIVO वेब ऐप पर काम करता है। फ़ोटो लेने के लिए कृपया यह पेज वेब पर खोलें।",
+      cameraOnWeb:
+        "होमवर्क के लिए कैमरा कैप्चर AIVO वेब ऐप पर काम करता है। फ़ोटो लेने के लिए कृपया यह पेज वेब पर खोलें।",
       status: {
         PROCESSING: "प्रक्रिया जारी है…",
         READY: "तैयार",
         IN_PROGRESS: "जारी है",
         COMPLETED: "पूरा हुआ!",
-        FAILED: "विफल"
+        FAILED: "विफल",
       },
       uploading: "अपलोड हो रहा है…",
       uploadFailed: "वह फ़ोटो अपलोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
       cameraPermissionDenied: "होमवर्क फ़ोटो लेने के लिए कैमरा अनुमति आवश्यक है।",
       galleryPermissionDenied: "होमवर्क की छवि चुनने के लिए फ़ोटो लाइब्रेरी अनुमति आवश्यक है।",
       subscriptionRequiredTitle: "सदस्यता आवश्यक है",
-      subscriptionRequiredBody: "यह होमवर्क {{subject}} जैसा लगता है — मदद के लिए आपको {{subject}} ट्यूटर सदस्यता चाहिए।",
-      pdfTooLarge: "वह PDF बहुत बड़ा है। कृपया 10 MB से कम का फ़ाइल चुनें।"
+      subscriptionRequiredBody:
+        "यह होमवर्क {{subject}} जैसा लगता है — मदद के लिए आपको {{subject}} ट्यूटर सदस्यता चाहिए।",
+      pdfTooLarge: "वह PDF बहुत बड़ा है। कृपया 10 MB से कम का फ़ाइल चुनें।",
     },
     teacherReports: {
       title: "रिपोर्ट",
       subtitle: "Brain-आधारित महारत, सहभागिता और जोखिम अंतर्दृष्टि",
       weeklyMasteryTitle: "साप्ताहिक महारत रिपोर्ट",
-      weeklyMasteryDesc: "विषय और कौशल क्षेत्र के अनुसार अपने सभी शिक्षार्थियों की महारत प्रगति ट्रैक करें।",
+      weeklyMasteryDesc:
+        "विषय और कौशल क्षेत्र के अनुसार अपने सभी शिक्षार्थियों की महारत प्रगति ट्रैक करें।",
       atRiskTitle: "जोखिम अलर्ट",
-      atRiskDesc: "सहभागिता और प्रदर्शन पैटर्न के आधार पर उन शिक्षार्थियों की पहचान करें जिन्हें अतिरिक्त सहायता की आवश्यकता हो सकती है।",
+      atRiskDesc:
+        "सहभागिता और प्रदर्शन पैटर्न के आधार पर उन शिक्षार्थियों की पहचान करें जिन्हें अतिरिक्त सहायता की आवश्यकता हो सकती है।",
       engagementTitle: "सत्र सहभागिता",
-      engagementDesc: "अपने शिक्षार्थियों में ट्यूटर सत्र की आवृत्ति, अवधि और सहभागिता मेट्रिक्स की निगरानी करें।",
+      engagementDesc:
+        "अपने शिक्षार्थियों में ट्यूटर सत्र की आवृत्ति, अवधि और सहभागिता मेट्रिक्स की निगरानी करें।",
       iepProgressTitle: "IEP प्रगति",
-      iepProgressDesc: "व्यक्तिगत शिक्षा योजनाओं वाले शिक्षार्थियों के IEP लक्ष्य प्रगति को ट्रैक करें।",
+      iepProgressDesc:
+        "व्यक्तिगत शिक्षा योजनाओं वाले शिक्षार्थियों के IEP लक्ष्य प्रगति को ट्रैक करें।",
       cadenceWeekly: "साप्ताहिक उत्पन्न",
       cadenceDaily: "दैनिक अपडेट",
       cadenceMonthly: "मासिक उत्पन्न",
       studentOverview: "छात्र अवलोकन",
       noLearnersTitle: "कोई शिक्षार्थी कनेक्ट नहीं",
-      noLearnersMessage: "जब माता-पिता आपको अपने शिक्षार्थी टीमों में आमंत्रित करेंगे तो रिपोर्ट दिखाई देगी।",
+      noLearnersMessage:
+        "जब माता-पिता आपको अपने शिक्षार्थी टीमों में आमंत्रित करेंगे तो रिपोर्ट दिखाई देगी।",
       pending: "लंबित",
-      gradeLabel: "कक्षा"
+      gradeLabel: "कक्षा",
     },
     learner: {
       greeting: "नमस्ते, {{name}}!",
@@ -458,7 +487,7 @@ const DATA = {
       homework: "होमवर्क",
       quests: "क्वेस्ट",
       badgesLabel: "बैज",
-      grades: "ग्रेड"
+      grades: "ग्रेड",
     },
     teacher: {
       greeting: "नमस्ते, {{name}}",
@@ -467,7 +496,7 @@ const DATA = {
       atRisk: "जोखिम में",
       avgProgress: "औसत प्रगति",
       noStudentsTitle: "कोई छात्र कनेक्ट नहीं",
-      noStudentsMessage: "माता-पिता को आपको अपने बच्चे की देखभाल टीम में आमंत्रित करना होगा।"
+      noStudentsMessage: "माता-पिता को आपको अपने बच्चे की देखभाल टीम में आमंत्रित करना होगा।",
     },
     teacherIEP: {
       title: "IEP अपलोड करें",
@@ -475,19 +504,19 @@ const DATA = {
       uploadDocument: "IEP दस्तावेज़ अपलोड करें",
       uploadDesc: "फ़ोटो लें या PDF फ़ाइल चुनें",
       camera: "कैमरा",
-      pdf: "PDF"
+      pdf: "PDF",
     },
     learnerBadges: {
       title: "बैज कैबिनेट",
       earned: "{{count}} बैज अर्जित",
       noBadgesTitle: "अभी तक कोई बैज नहीं",
-      noBadgesMessage: "बैज अर्जित करने के लिए पाठ और चुनौतियाँ पूरी करें!"
+      noBadgesMessage: "बैज अर्जित करने के लिए पाठ और चुनौतियाँ पूरी करें!",
     },
     caregiverSettings: {
       title: "सेटिंग्स",
       notificationPreferences: "सूचना प्राथमिकताएं",
-      accountDetails: "खाता विवरण"
-    }
+      accountDetails: "खाता विवरण",
+    },
   },
 
   ja: {
@@ -516,7 +545,7 @@ const DATA = {
       pin: "PIN",
       missingInfo: "情報が不足しています",
       fillRequired: "すべての必須項目を入力してください",
-      addChildFailed: "子どもの追加に失敗しました。もう一度お試しください。"
+      addChildFailed: "子どもの追加に失敗しました。もう一度お試しください。",
     },
     learnerHomework: {
       title: "宿題ヘルパー",
@@ -531,21 +560,23 @@ const DATA = {
       noAssignments: "まだ宿題がありません。写真を撮るかPDFをアップロードして始めましょう！",
       problems: "{{count}}問",
       openOnWeb: "AIチューターとチャットするには、ウェブアプリでこの宿題を続けてください。",
-      cameraOnWeb: "宿題のカメラキャプチャはAIVOウェブアプリで動作します。写真を撮るにはウェブでこのページを開いてください。",
+      cameraOnWeb:
+        "宿題のカメラキャプチャはAIVOウェブアプリで動作します。写真を撮るにはウェブでこのページを開いてください。",
       status: {
         PROCESSING: "処理中…",
         READY: "準備完了",
         IN_PROGRESS: "進行中",
         COMPLETED: "完了！",
-        FAILED: "失敗"
+        FAILED: "失敗",
       },
       uploading: "アップロード中…",
       uploadFailed: "写真をアップロードできませんでした。もう一度お試しください。",
       cameraPermissionDenied: "宿題の写真を撮るにはカメラのアクセス許可が必要です。",
       galleryPermissionDenied: "宿題の画像を選択するにはフォトライブラリのアクセス許可が必要です。",
       subscriptionRequiredTitle: "サブスクリプションが必要です",
-      subscriptionRequiredBody: "この宿題は{{subject}}のようです — サポートを受けるには{{subject}}チューターのサブスクリプションが必要です。",
-      pdfTooLarge: "そのPDFは大きすぎます。10MB未満のファイルを選択してください。"
+      subscriptionRequiredBody:
+        "この宿題は{{subject}}のようです — サポートを受けるには{{subject}}チューターのサブスクリプションが必要です。",
+      pdfTooLarge: "そのPDFは大きすぎます。10MB未満のファイルを選択してください。",
     },
     teacherReports: {
       title: "レポート",
@@ -553,9 +584,11 @@ const DATA = {
       weeklyMasteryTitle: "週次習熟度レポート",
       weeklyMasteryDesc: "科目とスキル領域ごとに全学習者の習熟度の進捗を追跡します。",
       atRiskTitle: "リスクアラート",
-      atRiskDesc: "エンゲージメントとパフォーマンスのパターンに基づいて、追加サポートが必要な学習者を特定します。",
+      atRiskDesc:
+        "エンゲージメントとパフォーマンスのパターンに基づいて、追加サポートが必要な学習者を特定します。",
       engagementTitle: "セッションエンゲージメント",
-      engagementDesc: "学習者のチューターセッションの頻度、時間、エンゲージメント指標を監視します。",
+      engagementDesc:
+        "学習者のチューターセッションの頻度、時間、エンゲージメント指標を監視します。",
       iepProgressTitle: "IEP進捗",
       iepProgressDesc: "個別教育計画を持つ学習者のIEP目標の進捗を追跡します。",
       cadenceWeekly: "週次生成",
@@ -565,7 +598,7 @@ const DATA = {
       noLearnersTitle: "学習者が接続されていません",
       noLearnersMessage: "保護者があなたを学習者チームに招待すると、レポートが表示されます。",
       pending: "保留中",
-      gradeLabel: "学年"
+      gradeLabel: "学年",
     },
     learner: {
       greeting: "こんにちは、{{name}}！",
@@ -579,7 +612,7 @@ const DATA = {
       homework: "宿題",
       quests: "クエスト",
       badgesLabel: "バッジ",
-      grades: "成績"
+      grades: "成績",
     },
     teacher: {
       greeting: "こんにちは、{{name}}",
@@ -588,7 +621,7 @@ const DATA = {
       atRisk: "要注意",
       avgProgress: "平均進捗",
       noStudentsTitle: "生徒が接続されていません",
-      noStudentsMessage: "保護者があなたをお子様のケアチームに招待する必要があります。"
+      noStudentsMessage: "保護者があなたをお子様のケアチームに招待する必要があります。",
     },
     teacherIEP: {
       title: "IEPをアップロード",
@@ -596,19 +629,19 @@ const DATA = {
       uploadDocument: "IEP文書をアップロード",
       uploadDesc: "写真を撮るかPDFファイルを選択してください",
       camera: "カメラ",
-      pdf: "PDF"
+      pdf: "PDF",
     },
     learnerBadges: {
       title: "バッジキャビネット",
       earned: "{{count}}個のバッジ獲得",
       noBadgesTitle: "まだバッジがありません",
-      noBadgesMessage: "バッジを獲得するためにレッスンやチャレンジを完了しよう！"
+      noBadgesMessage: "バッジを獲得するためにレッスンやチャレンジを完了しよう！",
     },
     caregiverSettings: {
       title: "設定",
       notificationPreferences: "通知設定",
-      accountDetails: "アカウント詳細"
-    }
+      accountDetails: "アカウント詳細",
+    },
   },
 
   ko: {
@@ -637,7 +670,7 @@ const DATA = {
       pin: "PIN",
       missingInfo: "정보 누락",
       fillRequired: "필수 항목을 모두 입력해주세요",
-      addChildFailed: "아이 추가에 실패했습니다. 다시 시도해주세요."
+      addChildFailed: "아이 추가에 실패했습니다. 다시 시도해주세요.",
     },
     learnerHomework: {
       title: "숙제 도우미",
@@ -652,21 +685,23 @@ const DATA = {
       noAssignments: "아직 숙제가 없습니다. 사진을 찍거나 PDF를 업로드해서 시작하세요!",
       problems: "{{count}}문제",
       openOnWeb: "AI 튜터와 채팅하려면 웹 앱에서 이 숙제를 계속 진행하세요.",
-      cameraOnWeb: "숙제 카메라 캡처는 AIVO 웹 앱에서 실행됩니다. 사진을 찍으려면 웹에서 이 페이지를 열어주세요.",
+      cameraOnWeb:
+        "숙제 카메라 캡처는 AIVO 웹 앱에서 실행됩니다. 사진을 찍으려면 웹에서 이 페이지를 열어주세요.",
       status: {
         PROCESSING: "처리 중…",
         READY: "준비됨",
         IN_PROGRESS: "진행 중",
         COMPLETED: "완료!",
-        FAILED: "실패"
+        FAILED: "실패",
       },
       uploading: "업로드 중…",
       uploadFailed: "사진을 업로드할 수 없습니다. 다시 시도해주세요.",
       cameraPermissionDenied: "숙제 사진을 찍으려면 카메라 권한이 필요합니다.",
       galleryPermissionDenied: "숙제 이미지를 선택하려면 사진 라이브러리 권한이 필요합니다.",
       subscriptionRequiredTitle: "구독이 필요합니다",
-      subscriptionRequiredBody: "이 숙제는 {{subject}} 과목인 것 같습니다 — 도움을 받으려면 {{subject}} 튜터 구독이 필요합니다.",
-      pdfTooLarge: "PDF 파일이 너무 큽니다. 10MB 미만의 파일을 선택해주세요."
+      subscriptionRequiredBody:
+        "이 숙제는 {{subject}} 과목인 것 같습니다 — 도움을 받으려면 {{subject}} 튜터 구독이 필요합니다.",
+      pdfTooLarge: "PDF 파일이 너무 큽니다. 10MB 미만의 파일을 선택해주세요.",
     },
     teacherReports: {
       title: "보고서",
@@ -686,7 +721,7 @@ const DATA = {
       noLearnersTitle: "연결된 학습자 없음",
       noLearnersMessage: "학부모가 학습자 팀에 초대하면 보고서가 표시됩니다.",
       pending: "대기 중",
-      gradeLabel: "학년"
+      gradeLabel: "학년",
     },
     learner: {
       greeting: "안녕, {{name}}!",
@@ -700,7 +735,7 @@ const DATA = {
       homework: "숙제",
       quests: "퀘스트",
       badgesLabel: "배지",
-      grades: "성적"
+      grades: "성적",
     },
     teacher: {
       greeting: "안녕하세요, {{name}}",
@@ -709,7 +744,7 @@ const DATA = {
       atRisk: "위험군",
       avgProgress: "평균 진도",
       noStudentsTitle: "연결된 학생 없음",
-      noStudentsMessage: "학부모가 자녀의 케어 팀에 초대해야 합니다."
+      noStudentsMessage: "학부모가 자녀의 케어 팀에 초대해야 합니다.",
     },
     teacherIEP: {
       title: "IEP 업로드",
@@ -717,19 +752,19 @@ const DATA = {
       uploadDocument: "IEP 문서 업로드",
       uploadDesc: "사진을 찍거나 PDF 파일을 선택하세요",
       camera: "카메라",
-      pdf: "PDF"
+      pdf: "PDF",
     },
     learnerBadges: {
       title: "배지 캐비닛",
       earned: "{{count}}개 배지 획득",
       noBadgesTitle: "아직 배지 없음",
-      noBadgesMessage: "배지를 획득하려면 수업과 도전을 완료하세요!"
+      noBadgesMessage: "배지를 획득하려면 수업과 도전을 완료하세요!",
     },
     caregiverSettings: {
       title: "설정",
       notificationPreferences: "알림 설정",
-      accountDetails: "계정 정보"
-    }
+      accountDetails: "계정 정보",
+    },
   },
 
   pt: {
@@ -758,7 +793,7 @@ const DATA = {
       pin: "PIN",
       missingInfo: "Informação ausente",
       fillRequired: "Por favor, preencha todos os campos obrigatórios",
-      addChildFailed: "Falha ao adicionar criança. Por favor, tente novamente."
+      addChildFailed: "Falha ao adicionar criança. Por favor, tente novamente.",
     },
     learnerHomework: {
       title: "Assistente de tarefas",
@@ -773,41 +808,49 @@ const DATA = {
       noAssignments: "Nenhuma tarefa ainda. Tire uma foto ou envie um PDF para começar!",
       problems: "{{count}} exercícios",
       openOnWeb: "Continue esta tarefa no aplicativo web para conversar com seu tutor de IA.",
-      cameraOnWeb: "A captura por câmera para tarefas funciona no aplicativo web AIVO. Por favor, abra esta página no web para tirar uma foto.",
+      cameraOnWeb:
+        "A captura por câmera para tarefas funciona no aplicativo web AIVO. Por favor, abra esta página no web para tirar uma foto.",
       status: {
         PROCESSING: "Processando…",
         READY: "Pronto",
         IN_PROGRESS: "Em andamento",
         COMPLETED: "Concluído!",
-        FAILED: "Falhou"
+        FAILED: "Falhou",
       },
       uploading: "Enviando…",
       uploadFailed: "Não foi possível enviar a foto. Por favor, tente novamente.",
       cameraPermissionDenied: "A permissão da câmera é necessária para tirar uma foto da tarefa.",
-      galleryPermissionDenied: "A permissão da biblioteca de fotos é necessária para selecionar uma imagem da tarefa.",
+      galleryPermissionDenied:
+        "A permissão da biblioteca de fotos é necessária para selecionar uma imagem da tarefa.",
       subscriptionRequiredTitle: "Assinatura necessária",
-      subscriptionRequiredBody: "Esta tarefa parece ser de {{subject}} — você precisa de uma assinatura de tutor de {{subject}} para receber ajuda.",
-      pdfTooLarge: "Este PDF é muito grande. Por favor, escolha um arquivo com menos de 10 MB."
+      subscriptionRequiredBody:
+        "Esta tarefa parece ser de {{subject}} — você precisa de uma assinatura de tutor de {{subject}} para receber ajuda.",
+      pdfTooLarge: "Este PDF é muito grande. Por favor, escolha um arquivo com menos de 10 MB.",
     },
     teacherReports: {
       title: "Relatórios",
       subtitle: "Insights de domínio, engajamento e risco baseados no Brain",
       weeklyMasteryTitle: "Relatório semanal de domínio",
-      weeklyMasteryDesc: "Acompanhe o progresso de domínio de todos os seus alunos por matéria e área de habilidade.",
+      weeklyMasteryDesc:
+        "Acompanhe o progresso de domínio de todos os seus alunos por matéria e área de habilidade.",
       atRiskTitle: "Alertas de risco",
-      atRiskDesc: "Identifique alunos que podem precisar de suporte adicional com base em padrões de engajamento e desempenho.",
+      atRiskDesc:
+        "Identifique alunos que podem precisar de suporte adicional com base em padrões de engajamento e desempenho.",
       engagementTitle: "Engajamento nas sessões",
-      engagementDesc: "Monitore a frequência, duração e métricas de engajamento das sessões de tutoria dos seus alunos.",
+      engagementDesc:
+        "Monitore a frequência, duração e métricas de engajamento das sessões de tutoria dos seus alunos.",
       iepProgressTitle: "Progresso do IEP",
-      iepProgressDesc: "Acompanhe o progresso das metas do IEP para alunos com planos de educação individualizados.",
+      iepProgressDesc:
+        "Acompanhe o progresso das metas do IEP para alunos com planos de educação individualizados.",
       cadenceWeekly: "Gerado semanalmente",
       cadenceDaily: "Atualizado diariamente",
       cadenceMonthly: "Gerado mensalmente",
       studentOverview: "Visão geral dos alunos",
       noLearnersTitle: "Nenhum aluno conectado",
-      noLearnersMessage: "Os relatórios aparecerão assim que os pais convidarem você para as equipes de seus alunos.",
+      noLearnersMessage:
+        "Os relatórios aparecerão assim que os pais convidarem você para as equipes de seus alunos.",
       pending: "Pendente",
-      gradeLabel: "Série"
+      gradeLabel: "Série",
     },
     learner: {
       greeting: "Olá, {{name}}!",
@@ -821,7 +864,7 @@ const DATA = {
       homework: "Tarefa",
       quests: "Missões",
       badgesLabel: "Conquistas",
-      grades: "Notas"
+      grades: "Notas",
     },
     teacher: {
       greeting: "Olá, {{name}}",
@@ -830,7 +873,7 @@ const DATA = {
       atRisk: "Em risco",
       avgProgress: "Prog. média",
       noStudentsTitle: "Nenhum aluno conectado",
-      noStudentsMessage: "Os pais precisam convidá-lo para a equipe de cuidados do filho deles."
+      noStudentsMessage: "Os pais precisam convidá-lo para a equipe de cuidados do filho deles.",
     },
     teacherIEP: {
       title: "Enviar IEP",
@@ -838,19 +881,19 @@ const DATA = {
       uploadDocument: "Enviar documento IEP",
       uploadDesc: "Tire uma foto ou selecione um arquivo PDF",
       camera: "Câmera",
-      pdf: "PDF"
+      pdf: "PDF",
     },
     learnerBadges: {
       title: "Armário de conquistas",
       earned: "{{count}} conquistas obtidas",
       noBadgesTitle: "Nenhuma conquista ainda",
-      noBadgesMessage: "Complete lições e desafios para ganhar conquistas!"
+      noBadgesMessage: "Complete lições e desafios para ganhar conquistas!",
     },
     caregiverSettings: {
       title: "Configurações",
       notificationPreferences: "Preferências de notificação",
-      accountDetails: "Detalhes da conta"
-    }
+      accountDetails: "Detalhes da conta",
+    },
   },
 
   zh: {
@@ -879,7 +922,7 @@ const DATA = {
       pin: "PIN",
       missingInfo: "信息缺失",
       fillRequired: "请填写所有必填项",
-      addChildFailed: "添加孩子失败，请重试。"
+      addChildFailed: "添加孩子失败，请重试。",
     },
     learnerHomework: {
       title: "作业助手",
@@ -900,15 +943,16 @@ const DATA = {
         READY: "就绪",
         IN_PROGRESS: "进行中",
         COMPLETED: "已完成！",
-        FAILED: "失败"
+        FAILED: "失败",
       },
       uploading: "上传中…",
       uploadFailed: "无法上传该照片，请重试。",
       cameraPermissionDenied: "拍摄作业照片需要相机权限。",
       galleryPermissionDenied: "选择作业图片需要照片库权限。",
       subscriptionRequiredTitle: "需要订阅",
-      subscriptionRequiredBody: "此作业看起来是{{subject}}科目——获取帮助需要{{subject}}辅导老师订阅。",
-      pdfTooLarge: "该PDF文件过大，请选择10MB以下的文件。"
+      subscriptionRequiredBody:
+        "此作业看起来是{{subject}}科目——获取帮助需要{{subject}}辅导老师订阅。",
+      pdfTooLarge: "该PDF文件过大，请选择10MB以下的文件。",
     },
     teacherReports: {
       title: "报告",
@@ -928,7 +972,7 @@ const DATA = {
       noLearnersTitle: "暂无学习者连接",
       noLearnersMessage: "家长邀请您加入学习者团队后，报告将显示在这里。",
       pending: "待处理",
-      gradeLabel: "年级"
+      gradeLabel: "年级",
     },
     learner: {
       greeting: "你好，{{name}}！",
@@ -942,7 +986,7 @@ const DATA = {
       homework: "作业",
       quests: "任务",
       badgesLabel: "徽章",
-      grades: "成绩"
+      grades: "成绩",
     },
     teacher: {
       greeting: "你好，{{name}}",
@@ -951,7 +995,7 @@ const DATA = {
       atRisk: "高风险",
       avgProgress: "平均进度",
       noStudentsTitle: "暂无学生连接",
-      noStudentsMessage: "家长需要邀请您加入其孩子的关怀团队。"
+      noStudentsMessage: "家长需要邀请您加入其孩子的关怀团队。",
     },
     teacherIEP: {
       title: "上传IEP",
@@ -959,27 +1003,33 @@ const DATA = {
       uploadDocument: "上传IEP文件",
       uploadDesc: "拍照或选择PDF文件",
       camera: "相机",
-      pdf: "PDF"
+      pdf: "PDF",
     },
     learnerBadges: {
       title: "徽章柜",
       earned: "已获得{{count}}枚徽章",
       noBadgesTitle: "暂无徽章",
-      noBadgesMessage: "完成课程和挑战以获得徽章！"
+      noBadgesMessage: "完成课程和挑战以获得徽章！",
     },
     caregiverSettings: {
       title: "设置",
       notificationPreferences: "通知偏好",
-      accountDetails: "账户详情"
-    }
+      accountDetails: "账户详情",
+    },
   },
 };
 
-function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
-  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
-  else t[k]=v;}return t;}
+function deepMerge(t, s) {
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if (!t[k] || typeof t[k] !== "object") t[k] = {};
+      deepMerge(t[k], v);
+    } else t[k] = v;
+  }
+  return t;
+}
 
-let n=0;
+let n = 0;
 for (const [locale, roots] of Object.entries(DATA)) {
   const file = join(dir, `${locale}.json`);
   const json = JSON.parse(readFileSync(file, "utf8"));

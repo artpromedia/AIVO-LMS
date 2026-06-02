@@ -31,9 +31,7 @@ export default async function TeacherLearnersPage() {
         description="Open a learner to see recent lessons, skill progress, and accommodations."
       />
       {learners.length === 0 ? (
-        <Card className="p-6 text-sm text-muted-foreground">
-          {t("empty")}
-        </Card>
+        <Card className="p-6 text-sm text-muted-foreground">{t("empty")}</Card>
       ) : (
         <ul className="grid gap-3">
           {learners.map((l) => (

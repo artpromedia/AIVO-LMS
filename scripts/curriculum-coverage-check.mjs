@@ -239,9 +239,7 @@ for (const file of tutorFiles) {
   // tutor's full id stem ("math-coach"), then the filename stem.
   const personaId = (src.match(/persona:\s*\{[\s\S]*?id:\s*"([^"]+)"/) || [])[1];
   const id =
-    personaId ??
-    (src.match(/id:\s*"([^"@]+)@/) || [])[1] ??
-    file.replace(/Tutor\.ts$/, "");
+    personaId ?? (src.match(/id:\s*"([^"@]+)@/) || [])[1] ?? file.replace(/Tutor\.ts$/, "");
   const bands = parseArrayLiteral(src, "gradeBands") ?? [];
   const matrix = parseCoverageMatrix(src);
   if (bands.length === 0) continue;
@@ -350,7 +348,7 @@ if (existsSync(baselinePath)) {
 
 const signoffsPath = join(repoRoot, "docs/quality/tutor-content-signoffs.json");
 const signoffs = existsSync(signoffsPath)
-  ? JSON.parse(readFileSync(signoffsPath, "utf8")).signoffs ?? {}
+  ? (JSON.parse(readFileSync(signoffsPath, "utf8")).signoffs ?? {})
   : null;
 
 const graphVersionById = new Map();
@@ -427,9 +425,7 @@ for (const id of graphVersionById.keys()) {
 }
 
 if (signoffs === null) {
-  errors.push(
-    "docs/quality/tutor-content-signoffs.json missing — promotion guard cannot run.",
-  );
+  errors.push("docs/quality/tutor-content-signoffs.json missing — promotion guard cannot run.");
 } else {
   // For every `authored` cell, at least one referenced graph that covers
   // the cell's band must be production-ready: non-draft version AND have
@@ -510,7 +506,9 @@ if (tutorRows.length) {
     "| Tutor | " + ALL_BANDS.join(" | ") + " |",
     "| --- | " + ALL_BANDS.map(() => "---").join(" | ") + " |",
   ];
-  let totA = 0, totS = 0, totM = 0;
+  let totA = 0,
+    totS = 0,
+    totM = 0;
   for (const row of [...tutorRows].sort((a, b) => a.id.localeCompare(b.id))) {
     const declared = new Set(row.bands);
     const cells = ALL_BANDS.map((band) => {

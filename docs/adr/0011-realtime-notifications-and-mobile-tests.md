@@ -48,9 +48,9 @@ Close all three with the smallest credible changes:
   1. SSE when an `sseUrl` is supplied — auto-takeover from polling,
      auto-fallback to polling on SSE error.
   2. Polling fallback (default 30 s) when no SSE endpoint is given.
-  Exposes `{ notifications, lastUpdatedAt, unreadCount, markRead,
-  refresh, lastError }`. Mark-read is optimistic; the server
-  reconciles on the next refresh.
+     Exposes `{ notifications, lastUpdatedAt, unreadCount, markRead,
+refresh, lastError }`. Mark-read is optimistic; the server
+     reconciles on the next refresh.
 - **`apps/web-v2/app/learner/notifications/notifications-list.tsx`** —
   client component that hydrates from the server-rendered initial
   list and subscribes via the hook. Card tap fires `markRead`.

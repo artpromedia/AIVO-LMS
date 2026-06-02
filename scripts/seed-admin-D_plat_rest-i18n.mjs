@@ -48,7 +48,8 @@ const ADMIN = {
     platform_ai_playground: {
       title: "AI playground",
       how_it_works: "How it works",
-      responses_moderated: "Responses are passed back through output moderation before being returned here.",
+      responses_moderated:
+        "Responses are passed back through output moderation before being returned here.",
       playground_responses_are: "Playground responses are",
       presets: "Presets",
       model_claude: "Claude Opus 4.7 (primary)",
@@ -197,7 +198,8 @@ const ADMIN = {
     platform_overview: {
       title: "Estado del sistema",
       tenant_footprint: "Presencia de inquilinos",
-      tenant_footprint_desc: "Distribución de inquilinos actualmente aprovisionados en este entorno.",
+      tenant_footprint_desc:
+        "Distribución de inquilinos actualmente aprovisionados en este entorno.",
       billing_status: "Estado de facturación",
       recent_ai_jobs: "Trabajos de AI recientes",
       no_ai_activity_yet: "Aún no hay actividad de generación de AI.",
@@ -220,7 +222,8 @@ const ADMIN = {
     platform_ai_playground: {
       title: "Área de pruebas de AI",
       how_it_works: "Cómo funciona",
-      responses_moderated: "Las respuestas pasan por la moderación de salida antes de mostrarse aquí.",
+      responses_moderated:
+        "Las respuestas pasan por la moderación de salida antes de mostrarse aquí.",
       playground_responses_are: "Las respuestas del área de pruebas",
       presets: "Preajustes",
       model_claude: "Claude Opus 4.7 (principal)",
@@ -369,7 +372,8 @@ const ADMIN = {
     platform_overview: {
       title: "État du système",
       tenant_footprint: "Empreinte des locataires",
-      tenant_footprint_desc: "Distribution des locataires actuellement provisionnés dans cet environnement.",
+      tenant_footprint_desc:
+        "Distribution des locataires actuellement provisionnés dans cet environnement.",
       billing_status: "État de la facturation",
       recent_ai_jobs: "Tâches AI récentes",
       no_ai_activity_yet: "Aucune activité de génération AI pour l'instant.",
@@ -392,7 +396,8 @@ const ADMIN = {
     platform_ai_playground: {
       title: "Bac à sable AI",
       how_it_works: "Comment ça fonctionne",
-      responses_moderated: "Les réponses passent par la modération de sortie avant d'être renvoyées ici.",
+      responses_moderated:
+        "Les réponses passent par la modération de sortie avant d'être renvoyées ici.",
       playground_responses_are: "Les réponses du bac à sable sont",
       presets: "Préréglages",
       model_claude: "Claude Opus 4.7 (principal)",
@@ -541,7 +546,8 @@ const ADMIN = {
     platform_overview: {
       title: "Systemzustand",
       tenant_footprint: "Mandanten-Übersicht",
-      tenant_footprint_desc: "Verteilung der derzeit in dieser Umgebung bereitgestellten Mandanten.",
+      tenant_footprint_desc:
+        "Verteilung der derzeit in dieser Umgebung bereitgestellten Mandanten.",
       billing_status: "Abrechnungsstatus",
       recent_ai_jobs: "Aktuelle AI-Aufträge",
       no_ai_activity_yet: "Noch keine AI-Generierungsaktivität.",
@@ -564,7 +570,8 @@ const ADMIN = {
     platform_ai_playground: {
       title: "AI-Spielwiese",
       how_it_works: "So funktioniert es",
-      responses_moderated: "Antworten durchlaufen die Ausgabe-Moderation, bevor sie hier angezeigt werden.",
+      responses_moderated:
+        "Antworten durchlaufen die Ausgabe-Moderation, bevor sie hier angezeigt werden.",
       playground_responses_are: "Spielwiesen-Antworten werden",
       presets: "Voreinstellungen",
       model_claude: "Claude Opus 4.7 (primär)",
@@ -736,7 +743,8 @@ const ADMIN = {
     platform_ai_playground: {
       title: "Ambiente de testes de AI",
       how_it_works: "Como funciona",
-      responses_moderated: "As respostas passam pela moderação de saída antes de serem retornadas aqui.",
+      responses_moderated:
+        "As respostas passam pela moderação de saída antes de serem retornadas aqui.",
       playground_responses_are: "As respostas do ambiente de testes são",
       presets: "Predefinições",
       model_claude: "Claude Opus 4.7 (principal)",
@@ -1749,6 +1757,8 @@ for (const [locale, adminSubtree] of Object.entries(ADMIN)) {
   json.admin = { ...(json.admin ?? {}), ...adminSubtree };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-admin-D_plat_rest-i18n: merged admin platform namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-admin-D_plat_rest-i18n: merged admin platform namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-admin-D_plat_rest-i18n: done — ${written} locale catalogs updated.`);

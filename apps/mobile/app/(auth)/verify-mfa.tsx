@@ -111,10 +111,7 @@ export default function VerifyMfaScreen() {
   if (!mfaToken) {
     return (
       <View
-        style={[
-          styles.container,
-          { paddingTop: insets.top + 40, backgroundColor: palette.bgPage },
-        ]}
+        style={[styles.container, { paddingTop: insets.top + 40, backgroundColor: palette.bgPage }]}
       >
         <Card>
           <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
@@ -157,10 +154,7 @@ export default function VerifyMfaScreen() {
             <Text style={styles.icon}>✉️</Text>
           </View>
           <Text
-            style={[
-              styles.title,
-              { color: palette.ink, fontFamily: fontFamilies.displayBold },
-            ]}
+            style={[styles.title, { color: palette.ink, fontFamily: fontFamilies.displayBold }]}
           >
             {t("auth.checkEmail")}
           </Text>

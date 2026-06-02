@@ -4,15 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const BASE = require("./web-v2-i18n-base.json");
-const OUT_DIR = path.join(
-  __dirname,
-  "..",
-  "apps",
-  "web-v2",
-  "lib",
-  "i18n",
-  "messages",
-);
+const OUT_DIR = path.join(__dirname, "..", "apps", "web-v2", "lib", "i18n", "messages");
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 

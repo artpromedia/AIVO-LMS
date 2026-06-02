@@ -74,9 +74,7 @@ export function buildMobileRoleSession(args: {
   activeRole: UserRole;
   capabilities?: readonly string[];
 }): RoleSession {
-  const roles = args.availableRoles
-    .map(toNavRole)
-    .filter((r): r is Role => r !== null);
+  const roles = args.availableRoles.map(toNavRole).filter((r): r is Role => r !== null);
   const activeRole = toNavRole(args.activeRole);
   if (!activeRole) {
     throw new Error(
@@ -101,9 +99,6 @@ export function buildMobileRoleSession(args: {
  * Expo Router guards (which want a synchronous decision before
  * rendering a route).
  */
-export function getMobileNavAccess(
-  session: RoleSession,
-  area: NavArea,
-): AccessDecision {
+export function getMobileNavAccess(session: RoleSession, area: NavArea): AccessDecision {
   return canAccessArea(session, area, "mobile");
 }

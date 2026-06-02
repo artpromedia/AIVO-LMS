@@ -101,8 +101,5 @@ export {
 } from "./playful-calm/patterns";
 export { MOTION_VARIANTS } from "./motion/variants";
 export { useSfx } from "./sound/useSfx";
-export {
-  PLAYFUL_CALM_AGE_MODES,
-  resolvePlayfulCalmAgeMode,
-} from "./tokens/playful-calm-modes";
+export { PLAYFUL_CALM_AGE_MODES, resolvePlayfulCalmAgeMode } from "./tokens/playful-calm-modes";
 export type { PlayfulCalmAgeMode } from "./tokens/playful-calm-modes";

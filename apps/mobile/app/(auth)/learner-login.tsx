@@ -95,7 +95,10 @@ export default function LearnerLoginScreen() {
           hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel={t("common.back", "Back")}
-          style={[styles.backBtn, { backgroundColor: palette.bgRaised, borderColor: palette.border }]}
+          style={[
+            styles.backBtn,
+            { backgroundColor: palette.bgRaised, borderColor: palette.border },
+          ]}
         >
           <Ionicons name="chevron-back" size={22} color={palette.ink} />
         </Pressable>
@@ -123,7 +126,8 @@ export default function LearnerLoginScreen() {
       ) : profiles.length > 0 && parentId ? (
         <View style={styles.grid}>
           {profiles.map((l) => {
-            const name = `${l.firstName ?? ""} ${l.lastName ?? ""}`.trim() || t("auth.learner", "Learner");
+            const name =
+              `${l.firstName ?? ""} ${l.lastName ?? ""}`.trim() || t("auth.learner", "Learner");
             const initial = (l.firstName?.trim().charAt(0) || "?").toUpperCase();
             return (
               <Pressable
@@ -151,7 +155,10 @@ export default function LearnerLoginScreen() {
                 </Text>
                 {l.gradeLevel ? (
                   <Text style={[styles.profileMeta, { color: palette.inkMuted }]} numberOfLines={1}>
-                    {t("common.grade", { grade: l.gradeLevel, defaultValue: `Grade ${l.gradeLevel}` })}
+                    {t("common.grade", {
+                      grade: l.gradeLevel,
+                      defaultValue: `Grade ${l.gradeLevel}`,
+                    })}
                   </Text>
                 ) : null}
               </Pressable>
@@ -159,7 +166,12 @@ export default function LearnerLoginScreen() {
           })}
         </View>
       ) : (
-        <View style={[styles.emptyCard, { backgroundColor: palette.bgRaised, borderColor: palette.border }]}>
+        <View
+          style={[
+            styles.emptyCard,
+            { backgroundColor: palette.bgRaised, borderColor: palette.border },
+          ]}
+        >
           <Ionicons name="people-outline" size={40} color={palette.inkMuted} />
           <Text style={[styles.emptyText, { color: palette.inkMuted }]}>
             {t(

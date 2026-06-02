@@ -83,12 +83,14 @@ class AwsSmSecretsClient implements SecretsClient {
     // the SDK is not on the runtime path, fall through to env so dev
     // boots without AWS creds.
     try {
-      const mod = await import("@aws-sdk/client-secrets-manager").catch(() => null as any);
+      const mod = await import("@aws-sdk/client-secrets-manager").catch(
+        () => null as typeof import("@aws-sdk/client-secrets-manager") | null,
+      );
       if (!mod) return process.env[name] ?? null;
       const client = new mod.SecretsManagerClient({ region: this.region });
       const cmd = new mod.GetSecretValueCommand({ SecretId: name });
       const res = await client.send(cmd);
-      return (res as any).SecretString ?? null;
+      return (res as { SecretString?: string }).SecretString ?? null;
     } catch {
       return null;
     }

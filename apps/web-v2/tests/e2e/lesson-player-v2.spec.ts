@@ -151,10 +151,14 @@ test.describe("Lesson Player v2 (LEARNER_LESSON_PLAYER_V2)", () => {
     await page.waitForURL("**/learner/home", { timeout: 15_000 });
 
     // 4. v2 endpoints were hit at least once (advance + complete).
-    expect.soft(
-      learningCalls.some((u) => u.includes("/api/bff/learning/sessions/") && u.includes("/advance")),
-      "v2 advance was called",
-    ).toBeTruthy();
+    expect
+      .soft(
+        learningCalls.some(
+          (u) => u.includes("/api/bff/learning/sessions/") && u.includes("/advance"),
+        ),
+        "v2 advance was called",
+      )
+      .toBeTruthy();
     expect(
       learningCalls.some(
         (u) => u.includes("/api/bff/learning/sessions/") && u.includes("/complete"),

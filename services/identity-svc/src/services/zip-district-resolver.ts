@@ -59,9 +59,7 @@ export function normalizeZip(input: string | undefined | null): string | null {
  * caller can fall back to the static major-district map. The
  * function never throws.
  */
-export async function resolveZipToDistricts(
-  rawZip: string,
-): Promise<ZipDistrictResolution> {
+export async function resolveZipToDistricts(rawZip: string): Promise<ZipDistrictResolution> {
   const zip = normalizeZip(rawZip);
   if (!zip) {
     return { zip: rawZip, dominant: null, alternates: [], source: "miss" };
@@ -115,10 +113,7 @@ export async function resolveZipToDistricts(
  * Matches by case-insensitive substring on `name` and limits results
  * to 25. Empty / too-short queries return [].
  */
-export async function searchDistricts(
-  query: string,
-  state?: string,
-): Promise<ResolvedDistrict[]> {
+export async function searchDistricts(query: string, state?: string): Promise<ResolvedDistrict[]> {
   const q = (query ?? "").trim();
   if (q.length < 2) return [];
 

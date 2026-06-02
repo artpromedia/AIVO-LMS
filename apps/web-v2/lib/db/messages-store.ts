@@ -144,7 +144,12 @@ export function markRead(threadId: string, tenantId: string, userId: string) {
 export function createThread(
   tenantId: string,
   userId: string,
-  input: { subject: string; participantUserIds: string[]; learnerId?: string | null; body?: string },
+  input: {
+    subject: string;
+    participantUserIds: string[];
+    learnerId?: string | null;
+    body?: string;
+  },
 ) {
   const tId = id("thr");
   const members = Array.from(new Set([userId, ...input.participantUserIds]));

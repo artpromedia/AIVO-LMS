@@ -45,15 +45,11 @@ async function signInAction(formData: FormData) {
     redirect("/login?error=missing_credentials");
   }
 
-  const {
-    identityLogin,
-    extractRefreshToken,
-    toSessionProfile,
-  } = await import("@/lib/auth/identity-client");
+  const { identityLogin, extractRefreshToken, toSessionProfile } =
+    await import("@/lib/auth/identity-client");
   const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
-  const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } = await import(
-    "@/lib/auth/mfa-cookies"
-  );
+  const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } =
+    await import("@/lib/auth/mfa-cookies");
 
   const result = await identityLogin(email, password);
 
@@ -158,15 +154,11 @@ export default async function LoginPage({
   const errorMessage = error
     ? t(`errors.${ERROR_CODES.has(error) ? error : "login_failed"}` as never)
     : null;
-  const noticeMessage =
-    notice && NOTICE_CODES.has(notice) ? t(`notices.${notice}` as never) : null;
+  const noticeMessage = notice && NOTICE_CODES.has(notice) ? t(`notices.${notice}` as never) : null;
   return (
     <>
       <SiteHeader />
-      <main
-        id="main"
-        className="mx-auto w-full max-w-5xl px-6 py-10 sm:py-12 lg:py-14"
-      >
+      <main id="main" className="mx-auto w-full max-w-5xl px-6 py-10 sm:py-12 lg:py-14">
         <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16">
           {/* Brand-presence strip — desktop only. Intentionally quiet
               but with enough body to balance the form card's height
@@ -182,9 +174,7 @@ export default async function LoginPage({
             <h2 className="font-iw-display text-3xl font-bold leading-[1.1] text-iw-ink">
               {t("brand_heading")}
             </h2>
-            <p className="text-base leading-relaxed text-iw-ink-muted">
-              {t("brand_body")}
-            </p>
+            <p className="text-base leading-relaxed text-iw-ink-muted">{t("brand_body")}</p>
             {/* Quiet trust block. Mirrors the chrome strip in the marketing
                 footer (COPPA · FERPA · SOC 2) so the brand side has the same
                 weight as the form card without re-selling the product to a

@@ -29,13 +29,7 @@ const REQUIRED_IOS_BUNDLE = "com.artpromedia.aivo";
 const REQUIRED_ANDROID_PACKAGE = "com.artpromedia.aivo";
 
 // Per-role bundle/package suffixes that must never appear.
-const PROHIBITED_ID_SUFFIXES = [
-  ".parent",
-  ".teacher",
-  ".learner",
-  ".therapist",
-  ".caregiver",
-];
+const PROHIBITED_ID_SUFFIXES = [".parent", ".teacher", ".learner", ".therapist", ".caregiver"];
 
 const failures = [];
 
@@ -63,10 +57,14 @@ if (expo.android?.package !== REQUIRED_ANDROID_PACKAGE) {
 
 for (const suffix of PROHIBITED_ID_SUFFIXES) {
   if (expo.ios?.bundleIdentifier?.endsWith(suffix)) {
-    fail(`app.json iOS bundle id "${expo.ios.bundleIdentifier}" carries the prohibited per-role suffix "${suffix}".`);
+    fail(
+      `app.json iOS bundle id "${expo.ios.bundleIdentifier}" carries the prohibited per-role suffix "${suffix}".`,
+    );
   }
   if (expo.android?.package?.endsWith(suffix)) {
-    fail(`app.json Android package "${expo.android.package}" carries the prohibited per-role suffix "${suffix}".`);
+    fail(
+      `app.json Android package "${expo.android.package}" carries the prohibited per-role suffix "${suffix}".`,
+    );
   }
 }
 
@@ -114,9 +112,7 @@ for (const required of ALLOWED_PROFILES) {
 if (failures.length > 0) {
   console.error("\n❌ Mobile single-listing audit failed:\n");
   for (const f of failures) console.error("  • " + f);
-  console.error(
-    "\nSee docs/adr/0020-single-shell-multi-role.md §Phase 4 for the rationale.\n",
-  );
+  console.error("\nSee docs/adr/0020-single-shell-multi-role.md §Phase 4 for the rationale.\n");
   process.exit(1);
 }
 

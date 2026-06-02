@@ -3,10 +3,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { requirePageRole } from "@/lib/auth/server";
-import {
-  IDENTITY_ACCESS_TOKEN_COOKIE,
-  identityInviteTeacher,
-} from "@/lib/auth/identity-client";
+import { IDENTITY_ACCESS_TOKEN_COOKIE, identityInviteTeacher } from "@/lib/auth/identity-client";
 import { createStaffInvite } from "@/lib/db/staff-invites";
 
 /**

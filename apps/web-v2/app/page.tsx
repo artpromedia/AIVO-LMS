@@ -36,8 +36,8 @@ export default async function Home() {
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-iw-ink-muted sm:text-xl">
               AIVO is the first AI learning platform engineered explicitly for neurodiverse
-              cognitive profiles. We build a personalised &ldquo;brain-clone&rdquo; that models
-              how your K&ndash;8 child learns best.
+              cognitive profiles. We build a personalised &ldquo;brain-clone&rdquo; that models how
+              your K&ndash;8 child learns best.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               {session ? (
@@ -78,9 +78,7 @@ export default async function Home() {
             {/* Quiet social-proof line. The previous decorative monogram
                 cluster (S / M / J pills) competed with the CTAs for
                 attention without conveying meaningful information. */}
-            <p className="mt-8 text-sm text-iw-ink-muted">
-              {t("trusted_by")}
-            </p>
+            <p className="mt-8 text-sm text-iw-ink-muted">{t("trusted_by")}</p>
           </div>
 
           <div className="hidden lg:block">

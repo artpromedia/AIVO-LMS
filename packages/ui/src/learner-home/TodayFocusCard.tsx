@@ -56,22 +56,16 @@ export function TodayFocusCard({
       <header className="flex items-start gap-4">
         {companion ? <div aria-hidden="true">{companion}</div> : null}
         <div className="flex-1 min-w-0">
-          {eyebrow ? (
-            <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p>
-          ) : null}
+          {eyebrow ? <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p> : null}
           <h2 className="text-xl md:text-2xl font-semibold text-iw-text-strong leading-snug">
             {title}
           </h2>
           {body ? (
-            <p className="text-sm md:text-base text-iw-text-muted leading-relaxed mt-1">
-              {body}
-            </p>
+            <p className="text-sm md:text-base text-iw-text-muted leading-relaxed mt-1">{body}</p>
           ) : null}
         </div>
       </header>
-      {meta ? (
-        <div className="flex items-center gap-2 flex-wrap">{meta}</div>
-      ) : null}
+      {meta ? <div className="flex items-center gap-2 flex-wrap">{meta}</div> : null}
       <footer className="flex">{action}</footer>
     </article>
   );

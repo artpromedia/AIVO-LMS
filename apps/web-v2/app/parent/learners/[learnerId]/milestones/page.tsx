@@ -92,7 +92,7 @@ export default async function ParentMilestonesPage({
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const t = await getTranslations("parent.learner_milestones");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -113,11 +113,7 @@ export default async function ParentMilestonesPage({
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow={learner.displayName}
-        title={t("title")}
-        description={t("description")}
-      />
+      <PageHeader eyebrow={learner.displayName} title={t("title")} description={t("description")} />
 
       {!eng ? (
         <EmptyState
@@ -155,9 +151,7 @@ export default async function ParentMilestonesPage({
                 Level
               </p>
               <p className="mt-1 font-display text-3xl font-semibold">{eng.level}</p>
-              <p className="mt-3 text-xs text-aivo-ink-soft">
-                {t("levels_desc")}
-              </p>
+              <p className="mt-3 text-xs text-aivo-ink-soft">{t("levels_desc")}</p>
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
               <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
@@ -181,9 +175,7 @@ export default async function ParentMilestonesPage({
                   {eng.gems} ◆
                 </span>
               </div>
-              <p className="mt-3 text-xs text-aivo-ink-soft">
-                {t("wallet_desc")}
-              </p>
+              <p className="mt-3 text-xs text-aivo-ink-soft">{t("wallet_desc")}</p>
             </Card>
           </div>
 

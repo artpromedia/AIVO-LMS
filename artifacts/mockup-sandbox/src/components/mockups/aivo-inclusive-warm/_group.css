@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap");
 
 .aivo-inclusive-warm {
   --background: 250 60% 97%;
@@ -53,11 +53,11 @@
 
   --aivo-gradient: linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%);
 
-  font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
 }
 
 .aivo-inclusive-warm .aivo-display {
-  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-family: "Fredoka", "Nunito", sans-serif;
 }
 
 .aivo-inclusive-warm.sensory-calm {

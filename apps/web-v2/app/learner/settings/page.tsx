@@ -29,20 +29,14 @@ export default async function LearnerSettingsPage() {
       navItems={LEARNER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        description={t("description")}
-      />
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
       <div className="mt-6 grid gap-4">
         <Card className="p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-prose">
               <h2 className="text-base font-semibold text-iw-ink">{t("language_title")}</h2>
-              <p className="mt-1 text-sm text-iw-ink-muted">
-                {t("language_desc")}
-              </p>
+              <p className="mt-1 text-sm text-iw-ink-muted">{t("language_desc")}</p>
             </div>
             <LanguageSwitcher />
           </div>
@@ -50,9 +44,7 @@ export default async function LearnerSettingsPage() {
 
         <Card className="p-5">
           <h2 className="text-base font-semibold text-iw-ink">{t("a11y_title")}</h2>
-          <p className="mt-1 text-sm text-iw-ink-muted">
-            {t("a11y_desc")}
-          </p>
+          <p className="mt-1 text-sm text-iw-ink-muted">{t("a11y_desc")}</p>
           <Link
             href="/learner/settings/accessibility"
             className="mt-3 inline-flex items-center text-sm font-semibold text-iw-primary hover:underline"
@@ -63,9 +55,7 @@ export default async function LearnerSettingsPage() {
 
         <Card className="p-5">
           <h2 className="text-base font-semibold text-iw-ink">{t("sound_title")}</h2>
-          <p className="mt-1 text-sm text-iw-ink-muted">
-            {t("sound_desc")}
-          </p>
+          <p className="mt-1 text-sm text-iw-ink-muted">{t("sound_desc")}</p>
           <Link
             href="/learner/settings/audio"
             className="mt-3 inline-flex items-center text-sm font-semibold text-iw-primary hover:underline"

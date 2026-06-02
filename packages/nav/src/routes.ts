@@ -11,17 +11,13 @@ export type Surface = "web" | "mobile";
  * For `locked` areas the caller should route to `/locked/[area]` on
  * the web shell or push a `LockedScreen` modal on mobile.
  */
-export function resolveRoute(
-  role: Role,
-  area: NavArea,
-  surface: Surface,
-): string | null {
+export function resolveRoute(role: Role, area: NavArea, surface: Surface): string | null {
   const p = getPermission(role, area);
   if (p.access === "hidden") return null;
   if (p.access === "locked") {
     return surface === "web" ? `/locked/${area}` : `/locked/${area}`;
   }
-  return surface === "web" ? p.webRoute ?? null : p.mobileRoute ?? null;
+  return surface === "web" ? (p.webRoute ?? null) : (p.mobileRoute ?? null);
 }
 
 /**

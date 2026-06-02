@@ -355,10 +355,10 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
 
       if (learnerIds.length === 0) return { activities: [], learners: [] };
 
-      let milestones: any[] = [];
+      const milestones: any[] = [];
       try {
         for (const lid of learnerIds) {
-          let conditions: any[] = [eq(learnerMilestones.learnerId, lid)];
+          const conditions: any[] = [eq(learnerMilestones.learnerId, lid)];
           if (sinceDate) conditions.push(sql`${learnerMilestones.createdAt} > ${sinceDate}`);
           const m = await db
             .select()

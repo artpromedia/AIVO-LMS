@@ -28,11 +28,7 @@ export function Card({
   const { shadowStrength } = useSensoryMode();
 
   const bg =
-    tone === "hero"
-      ? palette.bgRaised
-      : tone === "raised"
-        ? palette.bgRaised
-        : palette.bgCard;
+    tone === "hero" ? palette.bgRaised : tone === "raised" ? palette.bgRaised : palette.bgCard;
 
   const radius = tone === "hero" ? 40 : 24;
   const borderWidth = tone === "hero" ? 0 : 1;

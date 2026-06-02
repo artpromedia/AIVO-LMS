@@ -152,9 +152,7 @@ export function AudioPrefForm({
         </p>
       )}
       {previewError && !previewSrc && (
-        <p className="text-xs text-aivo-muted">
-          {t("preview_unavailable")}
-        </p>
+        <p className="text-xs text-aivo-muted">{t("preview_unavailable")}</p>
       )}
     </div>
   );

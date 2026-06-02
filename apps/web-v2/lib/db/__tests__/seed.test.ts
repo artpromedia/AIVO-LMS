@@ -40,9 +40,7 @@ describe("web-v2 seed", () => {
       expect(subject, `subject "${slug}" not seeded`).toBeDefined();
       const subjectSkills = skills.filter((sk) => sk.subjectId === subject!.id);
       expect(subjectSkills.length, `subject "${slug}" has no skills`).toBeGreaterThan(0);
-      const hasKindergarten = subjectSkills.some((sk) =>
-        /K(\b|-)/.test(sk.gradeBand),
-      );
+      const hasKindergarten = subjectSkills.some((sk) => /K(\b|-)/.test(sk.gradeBand));
       expect(hasKindergarten, `subject "${slug}" missing a K skill`).toBe(true);
     }
   });

@@ -8,11 +8,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then choose the best science explanation for item 1.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -40,11 +36,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then choose the best science explanation for item 2.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -72,11 +64,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then choose the best science explanation for item 3.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -104,11 +92,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then choose the best science explanation for item 4.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -136,11 +120,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then choose the best science explanation for item 5.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -168,11 +148,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then choose the best science explanation for item 6.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -200,11 +176,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then choose the best science explanation for item 7.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -232,11 +204,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then choose the best science explanation for item 8.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -264,11 +232,7 @@
       "surfaceType": "video",
       "prompt": "Watch or listen, then choose the best science explanation for item 9.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [
@@ -296,11 +260,7 @@
       "surfaceType": "audio",
       "prompt": "Watch or listen, then choose the best science explanation for item 10.",
       "expectedAnswer": "B",
-      "choices": [
-        "A",
-        "B",
-        "C"
-      ],
+      "choices": ["A", "B", "C"],
       "hint": "Re-play the media and focus on key words in the captions.",
       "scaffold": "Use the captions to find the strongest evidence before choosing.",
       "assets": [

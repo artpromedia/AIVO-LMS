@@ -1,15 +1,24 @@
-import React from 'react';
-import { Compass, Star, Map as MapIcon, ChevronRight, Play, Pause, Activity, BrainCircuit } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import './_group.css';
+import React from "react";
+import {
+  Compass,
+  Star,
+  Map as MapIcon,
+  ChevronRight,
+  Play,
+  Pause,
+  Activity,
+  BrainCircuit,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import "./_group.css";
 
 export function Mobile() {
   return (
     <div className="aivo-qa-theme min-h-[100dvh] w-full bg-background flex flex-col font-sans relative overflow-hidden">
       {/* Background soft gradients */}
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
-      
+
       {/* Status Bar Header Area */}
       <header className="px-6 pt-12 pb-6 relative z-10 flex justify-between items-end">
         <div>
@@ -23,10 +32,11 @@ export function Mobile() {
       </header>
 
       <main className="flex-1 px-6 pb-24 overflow-y-auto z-10 space-y-8">
-        
         {/* Current Path */}
         <section>
-          <h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground mb-4">Today's Focus</h2>
+          <h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground mb-4">
+            Today's Focus
+          </h2>
           <Card className="border-border/60 shadow-sm bg-card rounded-2xl overflow-hidden p-1">
             <div className="bg-secondary/30 rounded-xl p-5 border border-border/40">
               <div className="flex items-center gap-3 mb-4">
@@ -38,7 +48,7 @@ export function Mobile() {
                   <p className="text-sm text-muted-foreground font-inter">Math • Level 3</p>
                 </div>
               </div>
-              
+
               <div className="mb-6">
                 <div className="flex justify-between text-xs font-inter mb-2">
                   <span className="text-muted-foreground">Progress</span>
@@ -59,9 +69,10 @@ export function Mobile() {
 
         {/* AI Tutors */}
         <section>
-          <h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground mb-4">Your Team</h2>
+          <h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground mb-4">
+            Your Team
+          </h2>
           <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 snap-x hide-scrollbar">
-            
             {/* Tutor 1 */}
             <Card className="min-w-[140px] border-border/60 shadow-sm bg-card rounded-2xl p-4 snap-start shrink-0 cursor-pointer hover:border-primary/30 transition-colors">
               <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
@@ -88,10 +99,8 @@ export function Mobile() {
               <h4 className="font-semibold text-muted-foreground">Locked</h4>
               <p className="text-xs text-muted-foreground font-inter mt-1">Level 5 req.</p>
             </Card>
-
           </div>
         </section>
-
       </main>
 
       {/* Bottom Nav */}
@@ -111,7 +120,6 @@ export function Mobile() {
           </button>
         </div>
       </nav>
-
     </div>
   );
 }

@@ -2,13 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import {
-  AuthShell,
-  AuthCard,
-  ReassuranceCard,
-  ConsentRow,
-  LegalCollapse,
-} from "@aivo/ui/auth";
+import { AuthShell, AuthCard, ReassuranceCard, ConsentRow, LegalCollapse } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 
 /**
@@ -50,9 +44,7 @@ export default function IepUploadPage() {
             >
               {file ? t("upload_continue") : t("skip")}
             </Link>
-            <p className="text-xs text-iw-text-muted text-center">
-              {t("footer_note")}
-            </p>
+            <p className="text-xs text-iw-text-muted text-center">{t("footer_note")}</p>
           </>
         }
       >
@@ -94,15 +86,13 @@ export default function IepUploadPage() {
         <LegalCollapse summary={t("legal_summary")}>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              <strong>{t("legal_extracted_label")}</strong>{" "}
-              {t("legal_extracted_body")}
+              <strong>{t("legal_extracted_label")}</strong> {t("legal_extracted_body")}
             </li>
             <li>
               <strong>{t("legal_never_label")}</strong> {t("legal_never_body")}
             </li>
             <li>
-              <strong>{t("legal_teachers_label")}</strong>{" "}
-              {t("legal_teachers_body")}
+              <strong>{t("legal_teachers_label")}</strong> {t("legal_teachers_body")}
             </li>
           </ul>
         </LegalCollapse>

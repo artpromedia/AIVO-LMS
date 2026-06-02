@@ -37,8 +37,8 @@ export function AcceptInviteActions({ pendingCount, continueHref, email }: Props
       return (
         <div className="space-y-3">
           <p className="text-center text-sm text-aivo-ink-soft">
-            {t("no_pending_for")} <strong>{email}</strong>. If you were
-            expecting one, ask the parent to re-send it to that address.
+            {t("no_pending_for")} <strong>{email}</strong>. If you were expecting one, ask the
+            parent to re-send it to that address.
           </p>
           <Button className="w-full" onClick={() => router.push(continueHref)}>
             {t("continue")}

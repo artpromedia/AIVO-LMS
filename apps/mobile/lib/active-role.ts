@@ -26,9 +26,7 @@ export function getApiActiveRole(): string | null {
 }
 
 /** Append the active-role header to a header bag when a role is set. */
-export function applyActiveRoleHeader(
-  headers: Record<string, string>,
-): Record<string, string> {
+export function applyActiveRoleHeader(headers: Record<string, string>): Record<string, string> {
   if (activeRole) headers[ACTIVE_ROLE_HEADER] = activeRole;
   return headers;
 }

@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLearner } from "@/hooks/useLearners";
@@ -9,7 +8,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card } from "@/components/ui";
-import { TrendChart, LoadingState, EmptyState } from "@aivo/mobile-ui";
+import { TrendChart, LoadingState } from "@aivo/mobile-ui";
 import { lessonsByDay, splitLessons } from "@/lib/gradebook-logic";
 import { subjectAccent } from "@/lib/subject-display";
 import { spacing } from "@/constants/colors";
@@ -24,7 +23,8 @@ export default function ParentScheduleScreen() {
   const { t } = useTranslation();
   const palette = useSensoryPalette();
   const { childId } = useLocalSearchParams<{ childId: string }>();
-  const { data: learner } = useLearner(childId ?? "");
+  // Warm the learner cache for child-scoped screens; value not rendered here.
+  useLearner(childId ?? "");
   const { data: sessions, isLoading } = useLessonSessions(childId ?? "");
   const trend = useMemo(() => lessonsByDay(sessions ?? []), [sessions]);
   const active = useMemo(() => splitLessons(sessions ?? []).inProgress, [sessions]);

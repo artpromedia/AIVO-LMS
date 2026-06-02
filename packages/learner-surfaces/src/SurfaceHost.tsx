@@ -107,9 +107,7 @@ export function SurfaceHost({
       aria-label="unsupported learner surface"
       className="flex flex-col items-center gap-2 rounded-iw-card-lg border border-dashed border-iw-border bg-white p-6 text-center"
     >
-      <p className="text-base font-semibold text-iw-text-strong">
-        This activity isn’t ready yet.
-      </p>
+      <p className="text-base font-semibold text-iw-text-strong">This activity isn’t ready yet.</p>
       <p className="text-sm text-iw-text-muted">
         Surface type: <code className="font-mono text-xs">{surface.type}</code>
       </p>

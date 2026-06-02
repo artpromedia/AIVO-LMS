@@ -97,7 +97,7 @@ async function saveStepAction(formData: FormData) {
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
   const stepNum = Number.parseInt(String(formData.get("step") || "1"), 10);
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   const step = WIZARD_STEPS.find((s) => s.id === stepNum);
@@ -212,10 +212,7 @@ async function saveStepAction(formData: FormData) {
         if (rm) sectionData.responseMethod = rm;
         const asb = String(formData.get("learning_profile.attentionSpanBucket") || "");
         if (asb) sectionData.attentionSpanBucket = asb;
-        const bestModes = formData
-          .getAll("learning_profile.bestModes")
-          .map(String)
-          .filter(Boolean);
+        const bestModes = formData.getAll("learning_profile.bestModes").map(String).filter(Boolean);
         if (bestModes.length > 0) sectionData.bestModes = bestModes;
         break;
       }
@@ -293,9 +290,17 @@ const COMFORT_SCALE = [
 ];
 
 const BREAK_STYLE = [
-  { value: "frequent_short", label: "Frequent short breaks", description: "Every 5–10 minutes works best." },
+  {
+    value: "frequent_short",
+    label: "Frequent short breaks",
+    description: "Every 5–10 minutes works best.",
+  },
   { value: "occasional", label: "Occasional breaks", description: "Every 15–25 minutes." },
-  { value: "long_uninterrupted", label: "Long stretches", description: "Can focus 30+ minutes once warmed up." },
+  {
+    value: "long_uninterrupted",
+    label: "Long stretches",
+    description: "Can focus 30+ minutes once warmed up.",
+  },
 ];
 
 const COMMUNICATION_STYLE = [
@@ -713,9 +718,7 @@ function renderSection(
               <span className="block text-sm font-semibold text-iw-text-strong">
                 {t("aac_label")}
               </span>
-              <span className="block text-xs text-iw-text-muted mt-0.5">
-                {t("aac_body")}
-              </span>
+              <span className="block text-xs text-iw-text-muted mt-0.5">{t("aac_body")}</span>
             </span>
           </label>
           <div className="flex flex-col gap-2">
@@ -1006,7 +1009,7 @@ export default async function AssessmentWizard({
   const t = await getTranslations("parent.learner_assessment");
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -1113,10 +1116,7 @@ export default async function AssessmentWizard({
                 )
               }
               saveExit={
-                <Link
-                  href={`/parent/learners/${learner.id}`}
-                  className={ASSESSMENT_GHOST_CLASS}
-                >
+                <Link href={`/parent/learners/${learner.id}`} className={ASSESSMENT_GHOST_CLASS}>
                   {t("save_exit")}
                 </Link>
               }
@@ -1126,10 +1126,15 @@ export default async function AssessmentWizard({
         >
           <div className="flex flex-col gap-6">
             {step.sections.map((s) =>
-              renderSection(s, assessment, {
-                ageRange: learner.ageRange,
-                gradeBand: learner.gradeBand,
-              }, t),
+              renderSection(
+                s,
+                assessment,
+                {
+                  ageRange: learner.ageRange,
+                  gradeBand: learner.gradeBand,
+                },
+                t,
+              ),
             )}
           </div>
         </QuestionCard>

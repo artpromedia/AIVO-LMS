@@ -19,11 +19,15 @@ function exists(...parts: string[]): boolean {
 }
 
 function isFile(...parts: string[]): boolean {
-  return existsSync(join(LEARNER_ROOT, ...parts)) && statSync(join(LEARNER_ROOT, ...parts)).isFile();
+  return (
+    existsSync(join(LEARNER_ROOT, ...parts)) && statSync(join(LEARNER_ROOT, ...parts)).isFile()
+  );
 }
 
 function isDir(...parts: string[]): boolean {
-  return existsSync(join(LEARNER_ROOT, ...parts)) && statSync(join(LEARNER_ROOT, ...parts)).isDirectory();
+  return (
+    existsSync(join(LEARNER_ROOT, ...parts)) && statSync(join(LEARNER_ROOT, ...parts)).isDirectory()
+  );
 }
 
 describe("mobile (learner) route group", () => {

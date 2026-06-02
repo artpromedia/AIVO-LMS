@@ -67,9 +67,7 @@ export function SubmittedHero({
           </svg>
         </span>
         <div className="flex flex-col gap-1.5 min-w-0">
-          {eyebrow ? (
-            <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p>
-          ) : null}
+          {eyebrow ? <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p> : null}
           <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-snug">
             {title}
           </h1>

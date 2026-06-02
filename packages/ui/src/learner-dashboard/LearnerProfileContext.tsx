@@ -40,8 +40,7 @@ export interface LearnerProfileContextValue {
   initials?: string;
 }
 
-const LearnerProfileContext =
-  React.createContext<LearnerProfileContextValue | null>(null);
+const LearnerProfileContext = React.createContext<LearnerProfileContextValue | null>(null);
 
 export interface LearnerProfileProviderProps extends LearnerProfileContextValue {
   children: React.ReactNode;
@@ -64,11 +63,7 @@ export function LearnerProfileProvider({
     () => ({ learnerId, viewerRole, displayName, initials }),
     [learnerId, viewerRole, displayName, initials],
   );
-  return (
-    <LearnerProfileContext.Provider value={value}>
-      {children}
-    </LearnerProfileContext.Provider>
-  );
+  return <LearnerProfileContext.Provider value={value}>{children}</LearnerProfileContext.Provider>;
 }
 
 /**

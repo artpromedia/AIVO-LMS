@@ -33,9 +33,7 @@ export async function GET(req: Request): Promise<Response> {
     start(controller) {
       const encoder = new TextEncoder();
       const send = (event: string, data: unknown) => {
-        controller.enqueue(
-          encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`),
-        );
+        controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
       };
 
       // Initial hello so the client knows the channel is live.

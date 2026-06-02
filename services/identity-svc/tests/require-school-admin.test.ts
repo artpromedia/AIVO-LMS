@@ -106,10 +106,7 @@ test("requireSchoolAdmin accepts DISTRICT_ADMIN and reads schoolId from query", 
     tenantId: "t1",
     email: "da@aivo.test",
   });
-  const req = makeReq(
-    { authorization: `Bearer ${token}` },
-    { query: { schoolId: "s2" } },
-  );
+  const req = makeReq({ authorization: `Bearer ${token}` }, { query: { schoolId: "s2" } });
   const reply = makeReply();
   await requireSchoolAdmin(req, reply);
   assert.equal(reply._status, null);
@@ -123,10 +120,7 @@ test("requireSchoolAdmin accepts PLATFORM_ADMIN and reads schoolId from query", 
     role: "PLATFORM_ADMIN",
     email: "pa@aivo.test",
   });
-  const req = makeReq(
-    { authorization: `Bearer ${token}` },
-    { query: { schoolId: "s3" } },
-  );
+  const req = makeReq({ authorization: `Bearer ${token}` }, { query: { schoolId: "s3" } });
   const reply = makeReply();
   await requireSchoolAdmin(req, reply);
   assert.equal(reply._status, null);

@@ -46,7 +46,8 @@ export const shapePeHealth3To12: SkillGraph = {
     {
       id: "shape.pe.s2.12",
       title: "Analyze and apply tactics across activities",
-      description: "I can analyze movement and apply tactics across a range of activities and lifetime sports.",
+      description:
+        "I can analyze movement and apply tactics across a range of activities and lifetime sports.",
       subject: "pe_health",
       gradeBand: "12",
       frameworkRefs: [{ framework: "SHAPE", code: "PE S2.H1-3" }],
@@ -57,7 +58,8 @@ export const shapePeHealth3To12: SkillGraph = {
     {
       id: "shape.pe.s3.4",
       title: "Participate in fitness-related activity",
-      description: "I can participate in activities that build my fitness and explain why each matters.",
+      description:
+        "I can participate in activities that build my fitness and explain why each matters.",
       subject: "pe_health",
       gradeBand: "4",
       frameworkRefs: [{ framework: "SHAPE", code: "PE S3.E1-6" }],
@@ -66,7 +68,8 @@ export const shapePeHealth3To12: SkillGraph = {
     {
       id: "shape.pe.s3.9",
       title: "Design a personal fitness plan",
-      description: "I can design a personal fitness plan with goals, activities, and a way to track progress.",
+      description:
+        "I can design a personal fitness plan with goals, activities, and a way to track progress.",
       subject: "pe_health",
       gradeBand: "9",
       frameworkRefs: [{ framework: "SHAPE", code: "PE S3.H1-14" }],
@@ -75,7 +78,8 @@ export const shapePeHealth3To12: SkillGraph = {
     {
       id: "shape.pe.s3.11",
       title: "Apply training principles to fitness",
-      description: "I can apply training principles (FITT, overload, specificity) to my fitness plan.",
+      description:
+        "I can apply training principles (FITT, overload, specificity) to my fitness plan.",
       subject: "pe_health",
       gradeBand: "11",
       frameworkRefs: [{ framework: "SHAPE", code: "PE S3.H7-9" }],
@@ -86,7 +90,8 @@ export const shapePeHealth3To12: SkillGraph = {
     {
       id: "shape.pe.s4.6",
       title: "Demonstrate responsibility in physical activity",
-      description: "I can take responsibility for my own behavior and follow safety procedures in activity.",
+      description:
+        "I can take responsibility for my own behavior and follow safety procedures in activity.",
       subject: "pe_health",
       gradeBand: "6",
       frameworkRefs: [{ framework: "SHAPE", code: "PE S4.M1-7" }],
@@ -115,7 +120,8 @@ export const shapePeHealth3To12: SkillGraph = {
     {
       id: "nhes.s2.8",
       title: "Analyze influences on health",
-      description: "I can analyze how family, peers, culture, media, and technology influence health.",
+      description:
+        "I can analyze how family, peers, culture, media, and technology influence health.",
       subject: "pe_health",
       gradeBand: "8",
       frameworkRefs: [{ framework: "SHAPE", code: "NHES Std 2" }],

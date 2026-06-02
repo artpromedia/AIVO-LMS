@@ -1,14 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import {
-  ArrowRight,
-  Building2,
-  CheckCircle2,
-  LineChart,
-  ShieldCheck,
-  Star,
-} from "lucide-react";
+import { ArrowRight, Building2, CheckCircle2, LineChart, ShieldCheck, Star } from "lucide-react";
 import { StickyHeader } from "@/components/marketing/StickyHeader";
 import { Footer } from "@/components/marketing/Footer";
 import { WEB_APP_URL } from "@/lib/constants";
@@ -68,7 +61,10 @@ export default async function Home() {
           <div className="max-w-6xl mx-auto px-6 md:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="max-w-2xl relative z-10">
               <span className="inline-flex items-center gap-2 mb-7 py-1.5 px-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-semibold text-xs tracking-wide uppercase">
-                <ShieldCheck className="w-3.5 h-3.5 text-[var(--aivo-sensory-primary)]" aria-hidden="true" />
+                <ShieldCheck
+                  className="w-3.5 h-3.5 text-[var(--aivo-sensory-primary)]"
+                  aria-hidden="true"
+                />
                 {t("hero_badge")}
               </span>
               <h1 className="font-heading text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-7 text-slate-900">
@@ -77,7 +73,8 @@ export default async function Home() {
                   <span
                     className="relative z-10 bg-clip-text text-transparent"
                     style={{
-                      backgroundImage: "linear-gradient(135deg, var(--aivo-calmSky-500) 0%, var(--aivo-aivoPurple-400) 100%)",
+                      backgroundImage:
+                        "linear-gradient(135deg, var(--aivo-calmSky-500) 0%, var(--aivo-aivoPurple-400) 100%)",
                     }}
                   >
                     {t("hero_headline_emph")}
@@ -156,10 +153,7 @@ export default async function Home() {
         </section>
 
         {/* Research banner */}
-        <section
-          className="py-14 border-y border-slate-200/70"
-          aria-labelledby="research-heading"
-        >
+        <section className="py-14 border-y border-slate-200/70" aria-labelledby="research-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <h2
               id="research-heading"
@@ -233,7 +227,10 @@ export default async function Home() {
         </section>
 
         {/* Testimonials */}
-        <section className="py-24 md:py-32 bg-slate-50/60 border-y border-slate-200/70" aria-labelledby="testimonials-heading">
+        <section
+          className="py-24 md:py-32 bg-slate-50/60 border-y border-slate-200/70"
+          aria-labelledby="testimonials-heading"
+        >
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <div className="flex flex-col items-center text-center mb-14 md:mb-16">
               <span className="mb-5 py-1 px-3 rounded-full bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wide uppercase">
@@ -291,9 +288,7 @@ export default async function Home() {
                   </div>
                   <div>
                     <p className="font-bold text-slate-900">{t("testimonial_2_name")}</p>
-                    <p className="text-sm font-medium text-slate-500">
-                      {t("testimonial_2_role")}
-                    </p>
+                    <p className="text-sm font-medium text-slate-500">{t("testimonial_2_role")}</p>
                   </div>
                 </div>
               </article>
@@ -304,9 +299,7 @@ export default async function Home() {
         {/* CTA */}
         <section className="py-24 md:py-32" aria-labelledby="cta-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8">
-            <div
-              className="text-white shadow-[0_30px_80px_-30px_rgba(76,29,149,0.45)] rounded-3xl md:rounded-[2rem] overflow-hidden border-0 relative bg-gradient-to-br from-[var(--aivo-sensory-primary)] to-indigo-800"
-            >
+            <div className="text-white shadow-[0_30px_80px_-30px_rgba(76,29,149,0.45)] rounded-3xl md:rounded-[2rem] overflow-hidden border-0 relative bg-gradient-to-br from-[var(--aivo-sensory-primary)] to-indigo-800">
               <div
                 className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.10)" }}

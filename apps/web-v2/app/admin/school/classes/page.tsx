@@ -14,8 +14,13 @@ export default async function Page({ searchParams }: Params) {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
   const t = await getTranslations("admin.school_classes");
   const params = await searchParams;
-  const schools = await listSchools(session.role === "platform_admin" ? undefined : session.tenantId);
-  const classrooms = await listClassrooms({ tenantId: session.tenantId, schoolId: params.schoolId });
+  const schools = await listSchools(
+    session.role === "platform_admin" ? undefined : session.tenantId,
+  );
+  const classrooms = await listClassrooms({
+    tenantId: session.tenantId,
+    schoolId: params.schoolId,
+  });
 
   return (
     <AppShell
@@ -63,24 +68,24 @@ export default async function Page({ searchParams }: Params) {
                 (e) => e.role === "learner",
               ).length;
               return (
-              <Link
-                key={c.id}
-                href={`/admin/school/classes/${c.id}`}
-                className="block rounded-2xl border border-aivo-border bg-aivo-surface p-4 transition hover:border-aivo-primary"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-display text-base font-semibold">{c.name}</p>
-                    <p className="text-xs text-aivo-muted">
-                      School {c.schoolId} · teacher {c.teacherUserId}
-                    </p>
+                <Link
+                  key={c.id}
+                  href={`/admin/school/classes/${c.id}`}
+                  className="block rounded-2xl border border-aivo-border bg-aivo-surface p-4 transition hover:border-aivo-primary"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-display text-base font-semibold">{c.name}</p>
+                      <p className="text-xs text-aivo-muted">
+                        School {c.schoolId} · teacher {c.teacherUserId}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <Badge tone="neutral">{c.gradeBand}</Badge>
+                      <span className="text-xs text-aivo-muted">{learners} learners</span>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <Badge tone="neutral">{c.gradeBand}</Badge>
-                    <span className="text-xs text-aivo-muted">{learners} learners</span>
-                  </div>
-                </div>
-              </Link>
+                </Link>
               );
             }),
           )}

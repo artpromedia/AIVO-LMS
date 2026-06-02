@@ -16,12 +16,7 @@ import { cn } from "../utils/cn";
  *   parsed      — supports extracted; ready for review
  *   error       — upload or extraction failed; show retry
  */
-export type UploadFileStatus =
-  | "queued"
-  | "uploading"
-  | "extracting"
-  | "parsed"
-  | "error";
+export type UploadFileStatus = "queued" | "uploading" | "extracting" | "parsed" | "error";
 
 export interface UploadFileCardProps {
   fileName: string;
@@ -125,9 +120,7 @@ export function UploadFileCard({
               <span aria-hidden="true"> · </span>
             ) : null}
             {typeof bytes === "number" ? <span>{formatBytes(bytes)}</span> : null}
-            {typeof bytes === "number" && uploadedAt ? (
-              <span aria-hidden="true"> · </span>
-            ) : null}
+            {typeof bytes === "number" && uploadedAt ? <span aria-hidden="true"> · </span> : null}
             {uploadedAt ? <span>uploaded {uploadedAt}</span> : null}
           </p>
           <span
@@ -137,9 +130,7 @@ export function UploadFileCard({
             )}
           >
             {STATUS_LABEL[status]}
-            {status === "uploading" ? (
-              <span className="ml-1 tabular-nums">{pct}%</span>
-            ) : null}
+            {status === "uploading" ? <span className="ml-1 tabular-nums">{pct}%</span> : null}
           </span>
         </div>
         {actions ? <div className="shrink-0">{actions}</div> : null}

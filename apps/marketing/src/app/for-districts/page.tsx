@@ -128,9 +128,7 @@ export default async function Page() {
               learner, parent, and teacher surfaces, with built-in read-aloud, reduced-motion,
               high-contrast, and large-text modes.
             </p>
-            <p className="mt-3 text-sm text-slate-600">
-              {t("accessibility_gaps_note")}
-            </p>
+            <p className="mt-3 text-sm text-slate-600">{t("accessibility_gaps_note")}</p>
           </>
         }
         ctaLabel="Read the accessibility statement"

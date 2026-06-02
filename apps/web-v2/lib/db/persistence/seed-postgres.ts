@@ -12,6 +12,7 @@
  *     exec tsx lib/db/persistence/seed-postgres.ts   (see db:seed:postgres)
  */
 import type { Database } from "@aivo/db";
+import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import {
   webNotifications,
   webNotificationDeliveries,
@@ -58,9 +59,9 @@ function vals<T>(c: Map<string, T> | T[]): T[] {
 /** Insert in chunks; skip duplicates on a natural-key target. */
 async function bulk<R extends Record<string, unknown>>(
   db: Database,
-  table: any,
+  table: PgTable,
   rows: R[],
-  conflictTarget?: any,
+  conflictTarget?: PgColumn | PgColumn[],
 ): Promise<number> {
   if (rows.length === 0) return 0;
   const CHUNK = 500;
@@ -93,7 +94,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webNotifications,
-      vals(s.notifications).map((n: any) => ({
+      vals(s.notifications).map((n) => ({
         id: n.id,
         tenantId: n.tenantId,
         userId: n.userId,
@@ -109,7 +110,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webNotificationDeliveries,
-      vals(s.notificationDeliveries).map((d: any) => ({
+      vals(s.notificationDeliveries).map((d) => ({
         id: d.id,
         notificationId: d.notificationId,
         data: d,
@@ -122,7 +123,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webAuditLogs,
-      vals(s.auditLogs).map((l: any) => ({ tenantId: l.tenantId ?? null, data: l })),
+      vals(s.auditLogs).map((l) => ({ tenantId: l.tenantId ?? null, data: l })),
     ),
   );
   await log(
@@ -130,7 +131,11 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webUsers,
-      vals(s.users).map((u: any) => ({ id: u.id, tenantId: u.tenantId ?? null, data: u })),
+      vals(s.users).map((u) => ({
+        id: u.id,
+        tenantId: (u as { tenantId?: string | null }).tenantId ?? null,
+        data: u,
+      })),
       webUsers.id,
     ),
   );
@@ -139,7 +144,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webMemberships,
-      vals(s.memberships).map((m: any) => ({
+      vals(s.memberships).map((m) => ({
         userId: m.userId,
         tenantId: m.tenantId,
         createdAt: m.createdAt,
@@ -152,7 +157,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webLearnerProfiles,
-      vals(s.learnerProfiles).map((l: any) => ({ id: l.id, tenantId: l.tenantId, data: l })),
+      vals(s.learnerProfiles).map((l) => ({ id: l.id, tenantId: l.tenantId, data: l })),
       webLearnerProfiles.id,
     ),
   );
@@ -161,7 +166,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webParentLearnerRelationships,
-      vals(s.parentLearnerRelationships).map((r: any) => ({
+      vals(s.parentLearnerRelationships).map((r) => ({
         id: r.id,
         parentUserId: r.parentUserId,
         learnerId: r.learnerId,
@@ -176,7 +181,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webParentAssessments,
-      vals(s.parentAssessments).map((a: any) => ({
+      vals(s.parentAssessments).map((a) => ({
         id: a.id,
         learnerId: a.learnerId,
         tenantId: a.tenantId,
@@ -190,7 +195,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webBaselineAssessments,
-      vals(s.baselineAssessments).map((b: any) => ({
+      vals(s.baselineAssessments).map((b) => ({
         id: b.id,
         learnerId: b.learnerId,
         tenantId: b.tenantId,
@@ -204,7 +209,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webBaselineQuestions,
-      vals(s.baselineQuestions).map((q: any) => ({ id: q.id, baselineId: q.baselineId, data: q })),
+      vals(s.baselineQuestions).map((q) => ({ id: q.id, baselineId: q.baselineId, data: q })),
       webBaselineQuestions.id,
     ),
   );
@@ -213,7 +218,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webBaselineAttempts,
-      vals(s.baselineAttempts).map((a: any) => ({
+      vals(s.baselineAttempts).map((a) => ({
         id: a.id,
         baselineId: a.baselineId,
         tenantId: a.tenantId,
@@ -229,7 +234,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webBaselineTelemetry,
-      vals(s.baselineItemResponseLogs).map((l: any) => ({
+      vals(s.baselineItemResponseLogs).map((l) => ({
         tenantId: l.tenantId,
         learnerId: l.learnerId ?? null,
         data: l,
@@ -241,7 +246,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webSubjects,
-      vals(s.subjects).map((x: any) => ({ id: x.id, data: x })),
+      vals(s.subjects).map((x) => ({ id: x.id, data: x })),
       webSubjects.id,
     ),
   );
@@ -250,7 +255,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webSkills,
-      vals(s.skills).map((x: any) => ({ id: x.id, subjectId: x.subjectId ?? null, data: x })),
+      vals(s.skills).map((x) => ({ id: x.id, subjectId: x.subjectId ?? null, data: x })),
       webSkills.id,
     ),
   );
@@ -259,7 +264,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webMasteryMaps,
-      vals(s.masteryMaps).map((m: any) => ({
+      vals(s.masteryMaps).map((m) => ({
         id: m.id,
         learnerId: m.learnerId,
         tenantId: m.tenantId,
@@ -273,8 +278,8 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webSkillMasteries,
-      vals(s.skillMasteries).map((m: any) => ({
-        id: m.id,
+      vals(s.skillMasteries).map((m) => ({
+        id: (m as { id?: string }).id,
         learnerId: m.learnerId,
         tenantId: m.tenantId,
         data: m,
@@ -287,7 +292,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webLearningPaths,
-      vals(s.learningPaths).map((p: any) => ({
+      vals(s.learningPaths).map((p) => ({
         id: p.id,
         learnerId: p.learnerId,
         tenantId: p.tenantId,
@@ -301,7 +306,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webConsentRecords,
-      vals(s.consentRecords).map((c: any) => ({
+      vals(s.consentRecords).map((c) => ({
         id: c.id,
         parentUserId: c.parentUserId,
         learnerId: c.learnerId ?? null,
@@ -316,7 +321,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webIepDocuments,
-      vals(s.iepDocuments).map((d: any) => ({
+      vals(s.iepDocuments).map((d) => ({
         id: d.id,
         learnerId: d.learnerId,
         tenantId: d.tenantId,
@@ -330,7 +335,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webAgeGateRecords,
-      vals(s.ageGateRecords).map((r: any) => ({
+      vals(s.ageGateRecords).map((r) => ({
         learnerId: r.learnerId,
         tenantId: r.tenantId,
         data: r,
@@ -343,7 +348,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webPolicyVersions,
-      vals(s.policyVersions).map((p: any) => ({ id: p.id, data: p })),
+      vals(s.policyVersions).map((p) => ({ id: p.id, data: p })),
       webPolicyVersions.id,
     ),
   );
@@ -352,7 +357,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webSubprocessors,
-      vals(s.subprocessors).map((x: any) => ({ id: x.id, data: x })),
+      vals(s.subprocessors).map((x) => ({ id: x.id, data: x })),
       webSubprocessors.id,
     ),
   );
@@ -361,7 +366,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webQuestWorlds,
-      vals(s.questWorlds).map((w: any) => ({ id: w.id, data: w })),
+      vals(s.questWorlds).map((w) => ({ id: w.id, data: w })),
       webQuestWorlds.id,
     ),
   );
@@ -370,7 +375,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webQuestChapters,
-      vals(s.questChapters).map((c: any) => ({ id: c.id, worldId: c.questWorldId, data: c })),
+      vals(s.questChapters).map((c) => ({ id: c.id, worldId: c.questWorldId, data: c })),
       webQuestChapters.id,
     ),
   );
@@ -379,7 +384,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webQuestProgress,
-      vals(s.questProgress).map((p: any) => ({
+      vals(s.questProgress).map((p) => ({
         id: p.id,
         learnerId: p.learnerId,
         tenantId: p.tenantId,
@@ -393,7 +398,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       webTeacherAssignments,
-      vals(s.teacherAssignments).map((a: any) => ({
+      vals(s.teacherAssignments).map((a) => ({
         id: a.id,
         teacherId: a.teacherId,
         tenantId: a.tenantId,
@@ -403,14 +408,20 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     ),
   );
   // schools / classrooms / enrollments — present in some seed profiles.
-  const anyStore = s as any;
+  type SchoolRow = { id: string; tenantId: string };
+  type EnrollmentRow = { id: string; classroomId: string; tenantId: string };
+  const anyStore = s as typeof s & {
+    schools?: Map<string, SchoolRow> | SchoolRow[];
+    classrooms?: Map<string, SchoolRow> | SchoolRow[];
+    enrollments?: Map<string, EnrollmentRow> | EnrollmentRow[];
+  };
   if (anyStore.schools) {
     await log(
       "schools",
       await bulk(
         db,
         webSchools,
-        vals(anyStore.schools).map((x: any) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+        vals(anyStore.schools).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
         webSchools.id,
       ),
     );
@@ -421,7 +432,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
       await bulk(
         db,
         webClassrooms,
-        vals(anyStore.classrooms).map((x: any) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+        vals(anyStore.classrooms).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
         webClassrooms.id,
       ),
     );
@@ -432,7 +443,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
       await bulk(
         db,
         webEnrollments,
-        vals(anyStore.enrollments).map((x: any) => ({
+        vals(anyStore.enrollments).map((x) => ({
           id: x.id,
           classroomId: x.classroomId,
           tenantId: x.tenantId,
@@ -447,7 +458,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       learnerBrainProfiles,
-      vals(s.brainProfiles).map((p: any) => ({
+      vals(s.brainProfiles).map((p) => ({
         id: p.id,
         learnerId: p.learnerId,
         tenantId: p.tenantId,
@@ -467,7 +478,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       lessonRuns,
-      vals(s.lessonRuns).map((r: any) => ({
+      vals(s.lessonRuns).map((r) => ({
         id: r.id,
         tenantId: r.tenantId,
         learnerId: r.learnerId,
@@ -499,7 +510,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       generatedLessonPlans,
-      vals(s.generatedLessonPlans).map((p: any) => ({
+      vals(s.generatedLessonPlans).map((p) => ({
         id: p.id,
         tenantId: p.tenantId,
         lessonRunId: p.lessonRunId,
@@ -513,7 +524,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       lessonInteractions,
-      vals(s.lessonInteractions).map((i: any) => ({
+      vals(s.lessonInteractions).map((i) => ({
         id: i.id,
         lessonRunId: i.lessonRunId,
         learnerId: i.learnerId,
@@ -533,7 +544,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
     await bulk(
       db,
       lessonParentSummaries,
-      vals(s.parentLessonSummaries).map((x: any) => ({
+      vals(s.parentLessonSummaries).map((x) => ({
         id: x.id,
         lessonRunId: x.lessonRunId,
         tenantId: x.tenantId,

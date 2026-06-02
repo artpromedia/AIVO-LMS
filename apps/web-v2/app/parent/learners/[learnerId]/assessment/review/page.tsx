@@ -34,7 +34,7 @@ async function submitAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
   const current = await getOrCreateParentAssessment(learnerId, session.tenantId);
@@ -86,7 +86,7 @@ export default async function AssessmentReviewPage({
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.learner_assessment_review");
   const { learnerId } = await params;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -149,10 +149,7 @@ export default async function AssessmentReviewPage({
                 </Link>
               }
               saveExit={
-                <Link
-                  href={`/parent/learners/${learner.id}`}
-                  className={ASSESSMENT_GHOST_CLASS}
-                >
+                <Link href={`/parent/learners/${learner.id}`} className={ASSESSMENT_GHOST_CLASS}>
                   {t("save_exit")}
                 </Link>
               }
@@ -174,15 +171,11 @@ export default async function AssessmentReviewPage({
                 <li
                   key={step.id}
                   className={`flex flex-col gap-2 rounded-iw-card border bg-white p-4 ${
-                    step.ok
-                      ? "border-iw-border"
-                      : "border-[var(--aivo-status-warning)]"
+                    step.ok ? "border-iw-border" : "border-[var(--aivo-status-warning)]"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-iw-text-strong">
-                      {step.longLabel}
-                    </p>
+                    <p className="text-sm font-semibold text-iw-text-strong">{step.longLabel}</p>
                     <InsightChip tone={step.ok ? "success" : "warning"} size="sm">
                       {step.ok ? "Complete" : "Needs info"}
                     </InsightChip>
@@ -196,11 +189,7 @@ export default async function AssessmentReviewPage({
                   )}
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {step.sections.map((sec) => (
-                      <InsightChip
-                        key={sec.id}
-                        tone={sec.ok ? "neutral" : "warning"}
-                        size="sm"
-                      >
+                      <InsightChip key={sec.id} tone={sec.ok ? "neutral" : "warning"} size="sm">
                         {ASSESSMENT_SECTION_LABEL[sec.id]}
                       </InsightChip>
                     ))}

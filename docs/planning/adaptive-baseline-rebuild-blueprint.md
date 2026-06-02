@@ -24,8 +24,8 @@
 
 The baseline assessment a learner actually sees today is a **fixed-form
 quiz**. The full question set is generated up front and the difficulty
-of what comes next never reacts to how the child is doing. We *already
-own* a working adaptive engine — it is just not plugged into the product.
+of what comes next never reacts to how the child is doing. We _already
+own_ a working adaptive engine — it is just not plugged into the product.
 We do not have a missing-technology problem; we have a **wiring,
 calibration, and content problem**. That is good news: the rebuild is an
 integration effort, not a research project.
@@ -37,24 +37,24 @@ baseline/diagnostic assessment. Every team independently reached the same
 conclusion — adaptivity via Item Response Theory (IRT) — but each got
 partway and stopped. We should harvest, not reinvent.
 
-| Repo | Stack | What they built for adaptive difficulty | Reusable for us? |
-|------|-------|------------------------------------------|------------------|
-| **aivo-learning-saas** | Fastify + TS | `assessment-svc` with a **2PL IRT** engine: MLE θ estimation, Fisher-information item selection, SE-based termination, item banks (MATH/ELA/SCIENCE, 50+ items, difficulty −2.5…+2.5), 5 functioning-level formats, **67 passing tests** | **★ Best reference.** Closest to our stack. Port the MLE + Fisher selection + test suite. |
-| **aivo-pro** | Python | `baseline-assessment-svc/src/core/irt_engine.py` — **3PL** engine (D=1.7), difficulty clamped to a **grade-level scale (0.5–12.0)**, full item-bank DB schema, BKT in the learning service | Port the **θ → grade-level placement** mapping and the item-bank SQL schema. |
-| **aivo-platform** | TS + Python | `baseline-svc/src/lib/adaptiveDifficulty.ts` (IRT-inspired) **plus** `ml-recommendation-svc/src/models/irt/` (real **3PL `ThreePLModel`**, Fisher-info selection, item-bank stats) | Port the Python 3PL as the **offline calibration** reference. |
-| **aivo-ai-learning** | TS (Next/Fastify) | **Discovery Adventure**: Bayesian ability estimator (IRT-based CAT) with a **per-domain posterior** and an explicit **frustration threshold** ("never more than 1 SD above ability"); pre-generated, quarterly-refreshed content per grade band | Port the **frustration-aware item selection** and pre-generation/caching strategy. This is the most learner-kind design. |
-| **aivo-agentic-ai-learning-app** | TS + Python | AI-generated items tagged with **3PL params (difficulty, discrimination, guessing)**; `baseline_sessions.ability_estimates_json`; `adaptiveSelection.ts` (Fisher info); **item recalibration endpoints** | Port the **item-recalibration loop** (turn live response data back into calibrated `b` params). |
-| **aivolearning** | TS + Flutter | `learning-svc/.../adaptiveDifficulty.ts`, `synthesizeBaseline()` over domain scores, NATS events, Flutter parity screen | Reference for **event schema** + multi-domain score synthesis. |
-| **aivo (v1)** | Python | `assessment-svc/app/assessment_engine.py` `QuestionBank`, `BaselineAnswerRequest` schema | Historical; superseded. |
-| **aivo-v2** | TS | `BaselineAssessmentAgent` (LLM agent), mock questions, *planned* difficulty adjustment | Confirms the "LLM-only, never finished adaptivity" trap to avoid. |
-| **aivo-v5** | TS | LLM baseline + `AssessmentDataProcessor` (baseline → model-personalization training data) | Reference for **feeding baseline output downstream** into the brain clone. |
+| Repo                             | Stack             | What they built for adaptive difficulty                                                                                                                                                                                                         | Reusable for us?                                                                                                         |
+| -------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **aivo-learning-saas**           | Fastify + TS      | `assessment-svc` with a **2PL IRT** engine: MLE θ estimation, Fisher-information item selection, SE-based termination, item banks (MATH/ELA/SCIENCE, 50+ items, difficulty −2.5…+2.5), 5 functioning-level formats, **67 passing tests**        | **★ Best reference.** Closest to our stack. Port the MLE + Fisher selection + test suite.                                |
+| **aivo-pro**                     | Python            | `baseline-assessment-svc/src/core/irt_engine.py` — **3PL** engine (D=1.7), difficulty clamped to a **grade-level scale (0.5–12.0)**, full item-bank DB schema, BKT in the learning service                                                      | Port the **θ → grade-level placement** mapping and the item-bank SQL schema.                                             |
+| **aivo-platform**                | TS + Python       | `baseline-svc/src/lib/adaptiveDifficulty.ts` (IRT-inspired) **plus** `ml-recommendation-svc/src/models/irt/` (real **3PL `ThreePLModel`**, Fisher-info selection, item-bank stats)                                                              | Port the Python 3PL as the **offline calibration** reference.                                                            |
+| **aivo-ai-learning**             | TS (Next/Fastify) | **Discovery Adventure**: Bayesian ability estimator (IRT-based CAT) with a **per-domain posterior** and an explicit **frustration threshold** ("never more than 1 SD above ability"); pre-generated, quarterly-refreshed content per grade band | Port the **frustration-aware item selection** and pre-generation/caching strategy. This is the most learner-kind design. |
+| **aivo-agentic-ai-learning-app** | TS + Python       | AI-generated items tagged with **3PL params (difficulty, discrimination, guessing)**; `baseline_sessions.ability_estimates_json`; `adaptiveSelection.ts` (Fisher info); **item recalibration endpoints**                                        | Port the **item-recalibration loop** (turn live response data back into calibrated `b` params).                          |
+| **aivolearning**                 | TS + Flutter      | `learning-svc/.../adaptiveDifficulty.ts`, `synthesizeBaseline()` over domain scores, NATS events, Flutter parity screen                                                                                                                         | Reference for **event schema** + multi-domain score synthesis.                                                           |
+| **aivo (v1)**                    | Python            | `assessment-svc/app/assessment_engine.py` `QuestionBank`, `BaselineAnswerRequest` schema                                                                                                                                                        | Historical; superseded.                                                                                                  |
+| **aivo-v2**                      | TS                | `BaselineAssessmentAgent` (LLM agent), mock questions, _planned_ difficulty adjustment                                                                                                                                                          | Confirms the "LLM-only, never finished adaptivity" trap to avoid.                                                        |
+| **aivo-v5**                      | TS                | LLM baseline + `AssessmentDataProcessor` (baseline → model-personalization training data)                                                                                                                                                       | Reference for **feeding baseline output downstream** into the brain clone.                                               |
 
-**Portfolio takeaway**: at least four sibling teams built a *real* IRT
+**Portfolio takeaway**: at least four sibling teams built a _real_ IRT
 selector. The strongest single reference is **aivo-learning-saas**
 (same stack as us, 2PL + Fisher + tests). We do not need to design an
 algorithm — we need to pick the best existing one and wire it in.
 
-## 3. What *this* repo (AIVO-LMS) already has — and the actual gap
+## 3. What _this_ repo (AIVO-LMS) already has — and the actual gap
 
 Three things exist here, and they are not connected to each other:
 
@@ -72,7 +72,7 @@ Three things exist here, and they are not connected to each other:
    question set up front via a ladder: Discovery-Adventure LLM → flat LLM
    → **hardcoded BANK fallback** (`apps/web-v2/lib/learner/baseline.ts`,
    ~27 MCQs). Difficulty is a **4-value enum**
-   (`foundational | approaching | grade_level | stretch`) chosen *once*
+   (`foundational | approaching | grade_level | stretch`) chosen _once_
    from a static comfort "bias" (`pickDifficulties`). Nothing re-selects
    based on answers. The adaptive engine is imported **only** by
    `services/assessment-svc/src/routes/learner-profile.ts` — which the
@@ -80,13 +80,13 @@ Three things exist here, and they are not connected to each other:
 
 3. **The item banks are not calibrated for the engine.**
    The engine needs each item's `difficulty` on a **θ logit scale**.
-   `packages/item-bank` items carry an *optional* `IrtParams {a,b}` that
+   `packages/item-bank` items carry an _optional_ `IrtParams {a,b}` that
    is largely unpopulated; the live BANK uses the 4-value enum instead.
    So even if we wired the engine in tomorrow, item selection would be
    flying blind.
 
-**Net gap statement**: *Orphaned engine + uncalibrated bank + fixed-form
-live flow.* Fix those three and the baseline becomes dynamic.
+**Net gap statement**: _Orphaned engine + uncalibrated bank + fixed-form
+live flow._ Fix those three and the baseline becomes dynamic.
 
 ## 4. End-to-end, market-ready gaps (beyond "difficulty")
 
@@ -109,7 +109,7 @@ bird's-eye list of what else has to be true before we sell this:
   and break cadence. Prior art: aivo-ai-learning frustration threshold.
 - **G6 — Output contract downstream**: the `LearningProfile` + θ must
   feed the brain-clone/personalization (see `commitBrainClone`,
-  aivo-v5 `AssessmentDataProcessor`) so the baseline *means* something.
+  aivo-v5 `AssessmentDataProcessor`) so the baseline _means_ something.
 - **G7 — Accessibility parity**: adaptive path must preserve read-aloud,
   light-reading item preference, picture/switch-scan modes already in
   `@aivo/ui` baseline components.
@@ -161,20 +161,20 @@ engine we already own, and emits a `LearningProfile` that downstream
 personalization consumes.
 
 **Non-goals (this initiative)**: rewriting the engine math from scratch;
-removing the Discovery-Adventure *content* style (we keep the warm
-emoji-rich UX — we change *how items are selected*, not the look); a full
+removing the Discovery-Adventure _content_ style (we keep the warm
+emoji-rich UX — we change _how items are selected_, not the look); a full
 psychometric research program (we ship a pragmatic calibration loop).
 
 ## 1. Success metrics
 
-| Metric | Today | Target |
-|--------|-------|--------|
-| Baseline that adapts item-by-item to answers | 0% (fixed form) | 100% of runs (flagged → default) |
-| Median items to reach SE(θ)≤0.35 | n/a | ≤ 12 items |
-| Calibrated items per (subject × grade band) | ~0 (enum only) | ≥ 25 |
-| Runs that start from an informed prior θ (not 0) | 0% | ≥ 80% (those with parent assessment/IEP) |
-| Learners pushed >1 SD above ability ("frustration over-reach") | unbounded | < 5% of items |
-| Baseline → brain-clone profile populated | partial | 100% |
+| Metric                                                         | Today           | Target                                   |
+| -------------------------------------------------------------- | --------------- | ---------------------------------------- |
+| Baseline that adapts item-by-item to answers                   | 0% (fixed form) | 100% of runs (flagged → default)         |
+| Median items to reach SE(θ)≤0.35                               | n/a             | ≤ 12 items                               |
+| Calibrated items per (subject × grade band)                    | ~0 (enum only)  | ≥ 25                                     |
+| Runs that start from an informed prior θ (not 0)               | 0%              | ≥ 80% (those with parent assessment/IEP) |
+| Learners pushed >1 SD above ability ("frustration over-reach") | unbounded       | < 5% of items                            |
+| Baseline → brain-clone profile populated                       | partial         | 100%                                     |
 
 ## 2. Target architecture (A1)
 
@@ -198,7 +198,7 @@ assessment-svc  /api/assessments/adaptive-baseline/:learnerId/{start,respond,fin
 as the v1 runtime** (it is tested, dependency-free, already wired to
 `assessment-svc`), and **port aivo-learning-saas's 2PL MLE + Fisher
 item-selection as a v1.1 upgrade behind the same interface.** Rationale:
-1-PL gets us *dynamic difficulty in production fastest*; 2PL adds
+1-PL gets us _dynamic difficulty in production fastest_; 2PL adds
 discrimination weighting once items are calibrated. Both satisfy the same
 `pickNextItem/recordResponse` contract, so the swap is internal.
 
@@ -213,6 +213,7 @@ per-run question generator.
 ## 3. Workstreams (epics)
 
 ### EPIC 1 — Wire the engine into the live flow (G1) `[P0]`
+
 **Files**: `apps/web-v2/lib/db/repos.ts` (`createBaseline`,
 `recordBaselineAttempt`, `completeBaseline`),
 `apps/web-v2/app/learner/baseline/[baselineId]/page.tsx`
@@ -231,11 +232,12 @@ per-run question generator.
   and hand to `commitBrainClone`.
 - **Port from**: aivo-learning-saas `assessment-svc` start/answer/complete
   route shape.
-- **Acceptance**: a learner can complete a baseline where item *N+1*
-  difficulty demonstrably depends on the correctness of item *N*; no
+- **Acceptance**: a learner can complete a baseline where item _N+1_
+  difficulty demonstrably depends on the correctness of item _N_; no
   pre-baked full set exists in the response.
 
 ### EPIC 2 — Calibrate the item bank (G2/G3) `[P0]`
+
 **Files**: `packages/item-bank/src/schema.ts` (already has
 `IrtParams {a,b}`), `packages/item-bank/src/seed-*.ts`,
 `packages/item-bank/src/seed-baseline-fallback.ts`,
@@ -244,10 +246,10 @@ per-run question generator.
 - Make `IrtParams.b` (θ-space difficulty) **required** for any item that
   can be served in an adaptive baseline; map the legacy 4-value enum to
   seed `b` values (`foundational≈−1.0, approaching≈−0.3, grade_level≈+0.4,
-  stretch≈+1.2`) as a starting calibration.
+stretch≈+1.2`) as a starting calibration.
 - Raise coverage bar to **≥25 calibrated items per (subject × grade
   band)**; extend `validate.ts` coverage report to **fail CI** below the
-  bar. Use Discovery/LLM generation (existing) as an *authoring* feeder to
+  bar. Use Discovery/LLM generation (existing) as an _authoring_ feeder to
   reach volume, then calibrate.
 - Add an **item-recalibration job** that consumes live response telemetry
   (EPIC 5) to refine `b` (and `a` for 2PL).
@@ -258,6 +260,7 @@ per-run question generator.
   unseen candidates within ±0.5 logits of θ for each served domain.
 
 ### EPIC 3 — Cold-start priors from parent/IEP (G4) `[P1]`
+
 **Files**: `createBaseline` (already loads `getBrainProfile` +
 `findParentAssessment`), `@aivo/adaptive-baseline` `InitBaselineOptions`
 (already accepts `priorTheta` + `readingDifficulty`).
@@ -271,6 +274,7 @@ per-run question generator.
   θ≠0; median items-to-converge drops vs. cold start (track in metrics).
 
 ### EPIC 4 — Kindness guardrails + accessibility parity (G5/G7) `[P1]`
+
 **Files**: `@aivo/adaptive-baseline` (`pickNextItem`, `shouldStop`,
 frustration fields already present), `apps/.../baseline/[baselineId]`
 (break cadence every 5 items already implemented), `@aivo/ui/baseline/*`.
@@ -286,6 +290,7 @@ frustration fields already present), `apps/.../baseline/[baselineId]`
   modes work in an adaptive run; break cards still fire.
 
 ### EPIC 5 — Telemetry, persistence & psychometric QA (G6/G9) `[P1]`
+
 **Files**: `packages/db/src/schema/assessments.ts`
 (`adaptiveBaselineSessions`, `learnerProfiles` already exist),
 `packages/item-bank` defect tracking, `apps/web-v2/app/api/bff/admin/baseline-metrics`.
@@ -299,6 +304,7 @@ frustration fields already present), `apps/.../baseline/[baselineId]`
   `learnerProfiles` row; recalibration job can read it.
 
 ### EPIC 6 — Rollout, parity gate, downstream contract (G6/G8/G10) `[P0 gate]`
+
 **Files**: `apps/web-v2/lib/feature-flags.ts` (baseline flags already
 exist), `createBaseline` (keep BANK path as fallback), parent summary
 pages, `commitBrainClone`.
@@ -365,13 +371,13 @@ unchanged.
 
 ## 7. Risks & mitigations
 
-| Risk | Mitigation |
-|------|-----------|
-| Thin calibrated bank starves the selector | EPIC 2 coverage gate fails CI < 25 items/(subj×grade); LLM authoring feeder |
-| Mis-seeded `b` makes early adaptivity wrong | Seed from enum + grade band, refine via EPIC 5 live recalibration |
-| Adaptive run feels colder than Discovery Adventure | Keep emoji/warm UX; change selection, not presentation; UX-07 tone gate |
-| Service error mid-run | Fixed-form BANK fallback retained (EPIC 6), reversible flag |
-| Accessibility regressions on streamed items | EPIC 4 parity tests for read-aloud/picture/switch-scan |
+| Risk                                               | Mitigation                                                                  |
+| -------------------------------------------------- | --------------------------------------------------------------------------- |
+| Thin calibrated bank starves the selector          | EPIC 2 coverage gate fails CI < 25 items/(subj×grade); LLM authoring feeder |
+| Mis-seeded `b` makes early adaptivity wrong        | Seed from enum + grade band, refine via EPIC 5 live recalibration           |
+| Adaptive run feels colder than Discovery Adventure | Keep emoji/warm UX; change selection, not presentation; UX-07 tone gate     |
+| Service error mid-run                              | Fixed-form BANK fallback retained (EPIC 6), reversible flag                 |
+| Accessibility regressions on streamed items        | EPIC 4 parity tests for read-aloud/picture/switch-scan                      |
 
 ## 8. Definition of Done — market-ready (maps to G1–G10)
 
@@ -388,19 +394,19 @@ unchanged.
 
 ## 9. Reuse ledger (what to port, from where)
 
-| Need | Port from | Asset |
-|------|-----------|-------|
-| 2PL MLE + Fisher selection (v1.1) | aivo-learning-saas | `assessment-svc` IRT engine + 67 tests |
-| θ → grade-level placement | aivo-pro | `irt_engine.py` grade scale (0.5–12.0) |
-| Offline 3PL calibration reference | aivo-platform | `ml-recommendation-svc/models/irt` |
-| Frustration-threshold CAT + per-domain prior | aivo-ai-learning | Discovery Adventure adaptive algorithm |
-| Item recalibration loop | aivo-agentic-ai-learning-app | `/baseline/recalibrate` endpoints |
-| Multi-domain score synthesis + events | aivolearning | `synthesizeBaseline`, NATS subjects |
-| Baseline → personalization handoff | aivo-v5 | `AssessmentDataProcessor` |
+| Need                                         | Port from                    | Asset                                  |
+| -------------------------------------------- | ---------------------------- | -------------------------------------- |
+| 2PL MLE + Fisher selection (v1.1)            | aivo-learning-saas           | `assessment-svc` IRT engine + 67 tests |
+| θ → grade-level placement                    | aivo-pro                     | `irt_engine.py` grade scale (0.5–12.0) |
+| Offline 3PL calibration reference            | aivo-platform                | `ml-recommendation-svc/models/irt`     |
+| Frustration-threshold CAT + per-domain prior | aivo-ai-learning             | Discovery Adventure adaptive algorithm |
+| Item recalibration loop                      | aivo-agentic-ai-learning-app | `/baseline/recalibrate` endpoints      |
+| Multi-domain score synthesis + events        | aivolearning                 | `synthesizeBaseline`, NATS subjects    |
+| Baseline → personalization handoff           | aivo-v5                      | `AssessmentDataProcessor`              |
 
 ---
 
-*Prepared from a direct review of `packages/adaptive-baseline`,
-`packages/item-bank`, `apps/web-v2/lib/learner/baseline*.ts`,
+_Prepared from a direct review of `packages/adaptive-baseline`,
+`packages/item-bank`, `apps/web-v2/lib/learner/baseline_.ts`,
 `apps/web-v2/lib/db/repos.ts`, `services/assessment-svc`, and a code-search
-review of the sibling AIVO repos in the `artpromedia` org.*
+review of the sibling AIVO repos in the `artpromedia` org.\*

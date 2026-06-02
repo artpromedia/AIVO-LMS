@@ -296,8 +296,7 @@ const DATA = {
       form_notes_placeholder: "有什么需要我们知道的吗？",
       form_submitting: "正在提交…",
       form_submit: "请求导出",
-      form_email_when_ready:
-        "导出准备就绪后，我们会通过电子邮件通知您。导出通常需要不到 24 小时。",
+      form_email_when_ready: "导出准备就绪后，我们会通过电子邮件通知您。导出通常需要不到 24 小时。",
     },
     privacy_delete: {
       form_confirm_error: "输入 DELETE 以确认。",

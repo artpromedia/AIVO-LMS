@@ -59,9 +59,7 @@ export function ReassuranceCard({
       ) : null}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-iw-text-strong">{title}</p>
-        <p className="text-xs text-iw-text-muted leading-relaxed mt-0.5">
-          {body}
-        </p>
+        <p className="text-xs text-iw-text-muted leading-relaxed mt-0.5">{body}</p>
         {link ? (
           <a
             href={link.href}

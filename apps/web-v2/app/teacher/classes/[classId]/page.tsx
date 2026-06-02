@@ -32,11 +32,11 @@ export default async function Page({ params }: Params) {
         description={`${learners.length} learner${learners.length === 1 ? "" : "s"} enrolled.`}
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("roster")}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+          {t("roster")}
+        </p>
         {learners.length === 0 ? (
-          <p className="mt-2 text-sm text-aivo-muted">
-            {t("no_learners")}
-          </p>
+          <p className="mt-2 text-sm text-aivo-muted">{t("no_learners")}</p>
         ) : (
           <ul className="mt-2 space-y-1 text-sm">
             {learners.map((e) => (

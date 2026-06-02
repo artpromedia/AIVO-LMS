@@ -1,6 +1,16 @@
 import React from "react";
 import "./_group.css";
-import { Sparkles, Map, Star, BookOpen, Settings, Battery, Zap, ChevronRight, Trophy } from "lucide-react";
+import {
+  Sparkles,
+  Map,
+  Star,
+  BookOpen,
+  Settings,
+  Battery,
+  Zap,
+  ChevronRight,
+  Trophy,
+} from "lucide-react";
 
 export function Mobile() {
   return (
@@ -16,7 +26,7 @@ export function Mobile() {
       {/* Floating Background Elements */}
       <div className="absolute top-[-5%] right-[-10%] w-[80%] h-[40%] rounded-full bg-[#E0E7FF] blur-[80px] opacity-60 pointer-events-none" />
       <div className="absolute bottom-[20%] left-[-10%] w-[60%] h-[30%] rounded-full bg-[#FFEDD5] blur-[80px] opacity-60 pointer-events-none" />
-      
+
       {/* Header */}
       <header className="px-6 pt-4 pb-6 z-10 flex justify-between items-start">
         <div>
@@ -32,8 +42,12 @@ export function Mobile() {
       <div className="px-6 z-10 flex-1 flex flex-col items-center justify-center mb-8">
         <div className="relative w-full max-w-[280px] aspect-square animate-float">
           <div className="absolute inset-0 bg-[#818CF8]/10 rounded-full blur-2xl" />
-          <img src="/__mockup/images/aivo-friendly/mascot.png" alt="AIVO Companion" className="relative z-10 w-full h-full object-contain" />
-          
+          <img
+            src="/__mockup/images/aivo-friendly/mascot.png"
+            alt="AIVO Companion"
+            className="relative z-10 w-full h-full object-contain"
+          />
+
           {/* Chat Bubble */}
           <div className="absolute top-4 -right-4 bg-white px-5 py-3 rounded-2xl rounded-bl-none friendly-soft-shadow-md border border-[#E2E8F0] animate-float-delayed z-20">
             <p className="font-semibold text-sm text-[#334155]">Let's read a story about trains!</p>
@@ -79,7 +93,7 @@ export function Mobile() {
             </div>
             <ChevronRight className="w-6 h-6 text-[#94A3B8]" />
           </div>
-          
+
           {/* Gentle Progress Bar */}
           <div className="w-full h-3 bg-[#F8FAFC] rounded-full overflow-hidden border border-[#E2E8F0]">
             <div className="h-full bg-gradient-to-r from-[#818CF8] to-[#C084FC] w-[30%] rounded-full relative">

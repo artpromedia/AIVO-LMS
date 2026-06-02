@@ -31,11 +31,7 @@ export function Breadcrumbs({
 }: BreadcrumbsProps) {
   if (items.length === 0) return null;
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className={clsx("text-sm", className)}
-      {...rest}
-    >
+    <nav aria-label="Breadcrumb" className={clsx("text-sm", className)} {...rest}>
       <ol className="flex flex-wrap items-center gap-1.5 text-iw-text-muted">
         {items.map((crumb, i) => {
           const last = i === items.length - 1;
@@ -59,9 +55,7 @@ export function Breadcrumbs({
                   {crumb.label}
                 </LinkComponent>
               )}
-              {!last ? (
-                <ChevronRight aria-hidden className="w-3.5 h-3.5 opacity-60" />
-              ) : null}
+              {!last ? <ChevronRight aria-hidden className="w-3.5 h-3.5 opacity-60" /> : null}
             </li>
           );
         })}

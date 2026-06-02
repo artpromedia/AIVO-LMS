@@ -63,9 +63,7 @@ export default async function ContactPage() {
           <h2 id="contact-form-heading" className="font-heading text-2xl font-bold text-slate-900">
             {t("form_heading")}
           </h2>
-          <p className="mt-1 mb-6 font-body text-slate-600">
-            {t("form_subheading")}
-          </p>
+          <p className="mt-1 mb-6 font-body text-slate-600">{t("form_subheading")}</p>
           <ContactForm />
         </section>
 

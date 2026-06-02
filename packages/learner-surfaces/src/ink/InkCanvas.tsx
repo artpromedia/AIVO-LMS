@@ -129,9 +129,7 @@ export function InkCanvas({
               key={stroke.id}
               d={strokeToPath(stroke)}
               fill="none"
-              stroke={
-                stroke.color ?? (stroke.tool === "highlighter" ? "#f59e0b" : "#1f2937")
-              }
+              stroke={stroke.color ?? (stroke.tool === "highlighter" ? "#f59e0b" : "#1f2937")}
               strokeOpacity={stroke.tool === "highlighter" ? 0.4 : 1}
               strokeWidth={stroke.width}
               strokeLinecap="round"

@@ -31,8 +31,7 @@ function makeValidLlmResponse(count = 14) {
     id: `q_${i}`,
     // Cycle through subjects so we hit "math" + "ela" (mapped to
     // "math" + "reading" in web-v2 slugs).
-    subject:
-      BASELINE_LLM_REQUIRED_SUBJECTS[i % BASELINE_LLM_REQUIRED_SUBJECTS.length]!,
+    subject: BASELINE_LLM_REQUIRED_SUBJECTS[i % BASELINE_LLM_REQUIRED_SUBJECTS.length]!,
     questionText: `Question ${i}?`,
     options: [
       { value: "a", label: "Option A" },

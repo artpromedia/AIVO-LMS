@@ -69,10 +69,7 @@ if (roles && areas) {
   // Slice each role block out of the MATRIX object literal. We anchor
   // on lines like "  learner: {" and read until the matching "  },".
   for (const role of roles) {
-    const blockRe = new RegExp(
-      String.raw`^\s{2}${role}:\s*\{([\s\S]*?)^\s{2}\},`,
-      "m",
-    );
+    const blockRe = new RegExp(String.raw`^\s{2}${role}:\s*\{([\s\S]*?)^\s{2}\},`, "m");
     const m = permsSrc.match(blockRe);
     if (!m) {
       errors.push(
@@ -106,9 +103,7 @@ if (roles && areas) {
 
       const accessMatch = body.match(/access:\s*["']([^"']+)["']/);
       if (!accessMatch) {
-        errors.push(
-          `Role "${role}" area "${areaKey}" is missing an "access" value.`,
-        );
+        errors.push(`Role "${role}" area "${areaKey}" is missing an "access" value.`);
         continue;
       }
       const access = accessMatch[1];
@@ -192,6 +187,4 @@ if (errors.length > 0) {
 
 const roleCount = roles ? roles.length : 0;
 const areaCount = areas ? areas.length : 0;
-console.log(
-  `✓ rbac:audit passed — MATRIX classified for ${roleCount} roles × ${areaCount} areas.`,
-);
+console.log(`✓ rbac:audit passed — MATRIX classified for ${roleCount} roles × ${areaCount} areas.`);

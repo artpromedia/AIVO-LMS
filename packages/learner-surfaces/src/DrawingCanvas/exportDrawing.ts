@@ -18,9 +18,8 @@ function pathForStroke(stroke: InkStroke): string {
 }
 
 function encodeBase64(input: string): string {
-  const utf8 = encodeURIComponent(input).replace(
-    /%([0-9A-F]{2})/g,
-    (_match, p1: string) => String.fromCharCode(Number.parseInt(p1, 16)),
+  const utf8 = encodeURIComponent(input).replace(/%([0-9A-F]{2})/g, (_match, p1: string) =>
+    String.fromCharCode(Number.parseInt(p1, 16)),
   );
   if (typeof globalThis.btoa === "function") {
     return globalThis.btoa(utf8);
@@ -76,7 +75,11 @@ export async function buildDrawingPngDataUrl(
   return canvas.toDataURL("image/png");
 }
 
-export function buildDrawingSvgDataUrl(strokes: InkStroke[], width: number, height: number): string {
+export function buildDrawingSvgDataUrl(
+  strokes: InkStroke[],
+  width: number,
+  height: number,
+): string {
   const svg = buildDrawingSvg(strokes, width, height);
   return `data:image/svg+xml;base64,${encodeBase64(svg)}`;
 }

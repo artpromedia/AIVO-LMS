@@ -12,7 +12,7 @@ Drives the `executive_function` subject (learner slug `executive-function`).
 
 ## Model
 
-**IRT-lite 3PL** on a *latency-weighted* correctness signal — not raw
+**IRT-lite 3PL** on a _latency-weighted_ correctness signal — not raw
 correctness. The reasoning: in EF tasks, a correct answer that took 30
 seconds and required four corrections reveals more cognitive load than
 it does mastery, and a "wrong" answer that came back instantly may just
@@ -29,7 +29,7 @@ and `correctionPenalty` scales linearly with revert count.
 
 `adapt()` increases difficulty only when the learner is fast, accurate,
 and not flailing. When latency spikes or corrections climb, it drops
-difficulty *and* recommends a lower-load surface (`choice_grid` instead
+difficulty _and_ recommends a lower-load surface (`choice_grid` instead
 of `multi_step_workspace`).
 
 ## Items

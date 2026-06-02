@@ -20,12 +20,12 @@ plus several **config-default** behaviors that production already flips.
 
 ## What's already solid
 
-| Area | Verdict |
-| --- | --- |
+| Area                             | Verdict                                                                                                                                                                                                                                                                                                                                    |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Mobile tablet + phone formatting | Strong. Material-3 / iPadOS size classes (`apps/mobile/src/design/responsive.ts`), documented split-view multitasking matrix (`useWindowSizeClass.ts`), adaptive nav (phone bottom-tabs → tablet rail → drawer), content max-widths, used in ~60 files, regression-tested. `app.json`: `supportsTablet: true`, `resizeableActivity: true`. |
-| Unified login — backend | One Postgres `users`/`sessions` store, RS256 JWT, Argon2. Mobile and web (real mode) hit the same `identity-svc /api/auth/login`. |
-| Cross-device source of truth | Single Postgres + JSONB brain state; prod enforces `postgres` persistence. |
-| Stub/TODO hygiene | 1 genuine TODO in app code; the 108 STUB / 312 PLACEHOLDER raw hits are false positives (form `placeholder=`, scanner regex literals). `prod:check` passes. |
+| Unified login — backend          | One Postgres `users`/`sessions` store, RS256 JWT, Argon2. Mobile and web (real mode) hit the same `identity-svc /api/auth/login`.                                                                                                                                                                                                          |
+| Cross-device source of truth     | Single Postgres + JSONB brain state; prod enforces `postgres` persistence.                                                                                                                                                                                                                                                                 |
+| Stub/TODO hygiene                | 1 genuine TODO in app code; the 108 STUB / 312 PLACEHOLDER raw hits are false positives (form `placeholder=`, scanner regex literals). `prod:check` passes.                                                                                                                                                                                |
 
 ## Gap inventory
 
@@ -128,14 +128,14 @@ flips the default; "Code gap" = a flag won't fix it.
     Changelog); other services should adopt the helper.**
 20. **[Minor] Unified mobile shell migration stalled.**
     `MOBILE_UNIFIED_APP=false`, no `(app)` shell; legacy per-role shells
-    remain (role switch ⇒ re-login). → **Progressed: the contract's
+    remain (role switch ⇒ re-login). → \*\*Progressed: the contract's
     `lib/api.ts` active-role propagation now ships — mobile sends
     `x-aivo-active-role` on every authenticated request (sourced from the
     signed-in user via `lib/active-role.ts`, kept in sync by `useAuth`),
     completing the loop with the #19 server-side validation. The remaining
     work (the `(app)` shell, role chooser/switcher, screen migration,
     flag flip) is blocked on multi-role tokens (today's JWT is single-role)
-    + on-device nav testing — see note below.**
+    - on-device nav testing — see note below.\*\*
 
     **Multi-role foundation (this pass):** the data model now exists — a
     `user_roles` table (migration `0056`), `availableRoles` in the JWT
@@ -159,6 +159,7 @@ flips the default; "Code gap" = a flag won't fix it.
     enabled + a real admin token, else an in-memory store), with web↔wire
     role mapping. So the only remaining piece for #20 is the `(app)` shell
     UI itself (which needs on-device navigation testing).
+
 21. **[Minor] Parity matrix drift.** Strict `mobile:parity` fails:
     `/messages`, `/notifications` untracked. The "100% parity" doc only checks
     file existence, not functionality. → **Fixed: both routes tracked;
@@ -194,9 +195,10 @@ later).
   read those keys via `t()` instead of inline English.
 
 Verified: i18n coverage + direction tests pass (27 tests); web-v2 typecheck
-+ eslint clean; `next build` green. The mobile strings already use the
-`t(key, defaultValue)` pattern, so they render translated-or-English without
-catalog churn.
+
+- eslint clean; `next build` green. The mobile strings already use the
+  `t(key, defaultValue)` pattern, so they render translated-or-English without
+  catalog churn.
 
 ## Changelog — unified inbox / messaging (#9)
 
@@ -222,7 +224,7 @@ in dev/mock).
   strict `mobile:parity` passes (115 routes); `docs/mobile-parity.md`
   regenerated.
 
-Scope note: starting a *new* thread needs a team-member recipient picker
+Scope note: starting a _new_ thread needs a team-member recipient picker
 (cross-service directory), so the first slice covers list → open → reply and
 seeds a demo thread in dev; thread creation is a follow-up.
 
@@ -392,7 +394,7 @@ request, but no service validated it — the documented spoof protection
 ("Sprint 09 follow-up") never landed.
 
 - `packages/security/src/active-role.ts` (new) — `checkActiveRole(grantedRole,
-  header, { availableRoles? })` plus `ACTIVE_ROLE_HEADER`, `FORBIDDEN_ROLE_CODE`,
+header, { availableRoles? })` plus `ACTIVE_ROLE_HEADER`, `FORBIDDEN_ROLE_CODE`,
   and `ACTIVE_ROLE_SPOOFING_EVENT` constants. Header absent → no-op; header
   matching a granted role → ok; otherwise a `FORBIDDEN_ROLE` spoof result.
   Tokens carry a single `role` today, so the granted set defaults to

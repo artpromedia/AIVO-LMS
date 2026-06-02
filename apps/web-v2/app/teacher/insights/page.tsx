@@ -43,43 +43,43 @@ export default async function Page() {
             learners.map(async (l) => {
               const runs = await listLessonRunsForLearner(l.id, session.tenantId);
               const completed = runs.filter((r) => r.status === "completed").length;
-            const masteries = getStore()
-              .skillMasteries.filter((m) => m.learnerId === l.id)
-              .sort((a, b) => b.score - a.score)
-              .slice(0, 5);
-            return (
-              <Card key={l.id} className="p-[var(--aivo-density-card-pad)]">
-                <div className="flex items-center justify-between">
-                  <p className="font-display text-lg font-semibold">{l.displayName}</p>
-                  <p className="text-sm text-aivo-ink-soft">
-                    {completed} of {runs.length} lessons complete
-                  </p>
-                </div>
-                {masteries.length === 0 ? (
-                  <p className="mt-3 text-sm text-aivo-ink-soft">
-                    No mastery scores recorded yet — encourage {l.displayName} to start a lesson.
-                  </p>
-                ) : (
-                  <ul className="mt-3 space-y-1 text-sm">
-                    {masteries.map((m) => {
-                      const skill = skillMap.get(m.skillId);
-                      const subject = skill ? subjectMap.get(skill.subjectId) : null;
-                      return (
-                        <li key={m.skillId} className="flex items-center justify-between">
-                          <span>
-                            {skill?.name ?? m.skillId}
-                            {subject ? (
-                              <span className="ml-2 text-xs text-aivo-muted">{subject.name}</span>
-                            ) : null}
-                          </span>
-                          <span className="font-medium">{Math.round(m.score * 100)}%</span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </Card>
-            );
+              const masteries = getStore()
+                .skillMasteries.filter((m) => m.learnerId === l.id)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 5);
+              return (
+                <Card key={l.id} className="p-[var(--aivo-density-card-pad)]">
+                  <div className="flex items-center justify-between">
+                    <p className="font-display text-lg font-semibold">{l.displayName}</p>
+                    <p className="text-sm text-aivo-ink-soft">
+                      {completed} of {runs.length} lessons complete
+                    </p>
+                  </div>
+                  {masteries.length === 0 ? (
+                    <p className="mt-3 text-sm text-aivo-ink-soft">
+                      No mastery scores recorded yet — encourage {l.displayName} to start a lesson.
+                    </p>
+                  ) : (
+                    <ul className="mt-3 space-y-1 text-sm">
+                      {masteries.map((m) => {
+                        const skill = skillMap.get(m.skillId);
+                        const subject = skill ? subjectMap.get(skill.subjectId) : null;
+                        return (
+                          <li key={m.skillId} className="flex items-center justify-between">
+                            <span>
+                              {skill?.name ?? m.skillId}
+                              {subject ? (
+                                <span className="ml-2 text-xs text-aivo-muted">{subject.name}</span>
+                              ) : null}
+                            </span>
+                            <span className="font-medium">{Math.round(m.score * 100)}%</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </Card>
+              );
             }),
           )}
         </div>

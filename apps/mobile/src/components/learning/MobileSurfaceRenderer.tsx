@@ -108,7 +108,7 @@ export type SurfaceCommand =
   | { kind: "art_canvas"; strokes: ScratchStroke[]; color: string }
   | { kind: "reading_annotation"; selectedSpanIds: string[]; tool: string }
   | { kind: "voice_response"; transcript: string }
-  | { kind: "graph"; points: Array<{ x: number; y: number }> }
+  | { kind: "graph"; points: { x: number; y: number }[] }
   | { kind: "drag_manipulative"; placement: Record<string, string> }
   | { kind: "multi_step_workspace"; entries: Record<string, string> }
   | { kind: "science_diagram"; placement: Record<string, string> }
@@ -677,7 +677,9 @@ function VoiceResponseSurface({
             : "Speaking isn't available on this device — type your answer instead."}
         </Text>
       )}
-      {speech.error ? <Text style={styles.note}>We couldn't hear that. Try again.</Text> : null}
+      {speech.error ? (
+        <Text style={styles.note}>We couldn&apos;t hear that. Try again.</Text>
+      ) : null}
 
       <View style={{ flexDirection: "row", gap: 12 }}>
         <Pressable
@@ -762,7 +764,7 @@ function GraphSurface({
   const yMax = readNumber(cfg, "yMax", 10);
   const step = Math.max(1, readNumber(cfg, "step", 1));
   const mode = readString(cfg, "mode", "points");
-  const [points, setPoints] = useState<Array<{ x: number; y: number }>>([]);
+  const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
 
   const SIZE = 280;
   const PAD = 24;

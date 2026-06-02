@@ -49,98 +49,103 @@ export default function TherapistDashboard() {
       }
     >
       <View style={{ width: contentWidth }}>
-      <View style={styles.header}>
-        <HeaderUserChip
-          name={user?.name || t("therapist.title")}
-          subtitle={t("therapist.caseload")}
-          onPress={() => router.push("/(therapist)/settings" as Href)}
-        />
-        <View style={styles.headerActions}>
-          <SensoryToggle variant="icon" />
-          <Pressable onPress={logout} accessibilityLabel="Log out" hitSlop={12}>
-            <Ionicons name="log-out-outline" size={22} color={palette.inkMuted} />
-          </Pressable>
+        <View style={styles.header}>
+          <HeaderUserChip
+            name={user?.name || t("therapist.title")}
+            subtitle={t("therapist.caseload")}
+            onPress={() => router.push("/(therapist)/settings" as Href)}
+          />
+          <View style={styles.headerActions}>
+            <SensoryToggle variant="icon" />
+            <Pressable onPress={logout} accessibilityLabel="Log out" hitSlop={12}>
+              <Ionicons name="log-out-outline" size={22} color={palette.inkMuted} />
+            </Pressable>
+          </View>
         </View>
-      </View>
 
-      <Text
-        style={[
-          styles.greeting,
-          { color: palette.ink, fontFamily: fontFamilies.displayBold, fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight },
-        ]}
-      >
-        {t("therapist.greeting", { name: user?.name })}
-      </Text>
+        <Text
+          style={[
+            styles.greeting,
+            {
+              color: palette.ink,
+              fontFamily: fontFamilies.displayBold,
+              fontSize: type.h1.fontSize,
+              lineHeight: type.h1.lineHeight,
+            },
+          ]}
+        >
+          {t("therapist.greeting", { name: user?.name })}
+        </Text>
 
-      {!clients?.length ? (
-        <EmptyState
-          icon={<Ionicons name="medkit-outline" size={48} color={palette.inkMuted} />}
-          title={t("therapist.noClientsTitle")}
-          message={t("therapist.noClientsMessage")}
-        />
-      ) : (
-        clients.map((client: any) => (
-          <Pressable
-            key={client.id}
-            onPress={() => router.push(`/(therapist)/client/${client.id}` as Href)}
-            style={{ marginBottom: spacing.md }}
-          >
-            <Card>
-              <View style={styles.clientRow}>
-                <View
-                  style={[
-                    styles.clientAvatar,
-                    { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
-                  ]}
-                >
-                  <Text
+        {!clients?.length ? (
+          <EmptyState
+            icon={<Ionicons name="medkit-outline" size={48} color={palette.inkMuted} />}
+            title={t("therapist.noClientsTitle")}
+            message={t("therapist.noClientsMessage")}
+          />
+        ) : (
+          clients.map((client: any) => (
+            <Pressable
+              key={client.id}
+              onPress={() => router.push(`/(therapist)/client/${client.id}` as Href)}
+              style={{ marginBottom: spacing.md }}
+            >
+              <Card>
+                <View style={styles.clientRow}>
+                  <View
                     style={[
-                      styles.clientInitial,
-                      { color: palette.primary, fontFamily: fontFamilies.bodyBold },
+                      styles.clientAvatar,
+                      { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
                     ]}
                   >
-                    {client.firstName?.[0] || "C"}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.clientInitial,
+                        { color: palette.primary, fontFamily: fontFamilies.bodyBold },
+                      ]}
+                    >
+                      {client.firstName?.[0] || "C"}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={[
+                        styles.clientName,
+                        { color: palette.ink, fontFamily: fontFamilies.bodyBold },
+                      ]}
+                    >
+                      {client.firstName} {client.lastName}
+                    </Text>
+                    <Text style={[styles.clientInfo, { color: palette.inkMuted }]}>
+                      Grade {client.gradeLevel} | {client.functioningLevel}
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={[
-                      styles.clientName,
-                      { color: palette.ink, fontFamily: fontFamilies.bodyBold },
-                    ]}
-                  >
-                    {client.firstName} {client.lastName}
-                  </Text>
-                  <Text style={[styles.clientInfo, { color: palette.inkMuted }]}>
-                    Grade {client.gradeLevel} | {client.functioningLevel}
-                  </Text>
+                <View style={[styles.quickActions, { borderTopColor: palette.border }]}>
+                  <ActionLink
+                    icon="flag-outline"
+                    label={t("therapist.goals")}
+                    tint={palette.primary}
+                    onPress={() => router.push(`/(therapist)/client/${client.id}/goals` as Href)}
+                  />
+                  <ActionLink
+                    icon="create-outline"
+                    label={t("therapist.notes")}
+                    tint={INCLUSIVE_WARM_PALETTE.info}
+                    onPress={() => router.push(`/(therapist)/client/${client.id}/notes` as Href)}
+                  />
+                  <ActionLink
+                    icon="document-text-outline"
+                    label={t("therapist.reports")}
+                    tint={INCLUSIVE_WARM_PALETTE.success}
+                    onPress={() => router.push(`/(therapist)/client/${client.id}/reports` as Href)}
+                  />
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
-              </View>
-              <View style={[styles.quickActions, { borderTopColor: palette.border }]}>
-                <ActionLink
-                  icon="flag-outline"
-                  label={t("therapist.goals")}
-                  tint={palette.primary}
-                  onPress={() => router.push(`/(therapist)/client/${client.id}/goals` as Href)}
-                />
-                <ActionLink
-                  icon="create-outline"
-                  label={t("therapist.notes")}
-                  tint={INCLUSIVE_WARM_PALETTE.info}
-                  onPress={() => router.push(`/(therapist)/client/${client.id}/notes` as Href)}
-                />
-                <ActionLink
-                  icon="document-text-outline"
-                  label={t("therapist.reports")}
-                  tint={INCLUSIVE_WARM_PALETTE.success}
-                  onPress={() => router.push(`/(therapist)/client/${client.id}/reports` as Href)}
-                />
-              </View>
-            </Card>
-          </Pressable>
-        ))
-      )}
+              </Card>
+            </Pressable>
+          ))
+        )}
       </View>
     </ScrollView>
   );
@@ -162,7 +167,10 @@ function ActionLink({
     <Pressable style={styles.actionBtn} onPress={onPress} accessibilityRole="button">
       <Ionicons name={icon} size={16} color={tint} />
       <Text
-        style={[styles.actionText, { color: palette.inkMuted, fontFamily: fontFamilies.bodySemiBold }]}
+        style={[
+          styles.actionText,
+          { color: palette.inkMuted, fontFamily: fontFamilies.bodySemiBold },
+        ]}
       >
         {label}
       </Text>

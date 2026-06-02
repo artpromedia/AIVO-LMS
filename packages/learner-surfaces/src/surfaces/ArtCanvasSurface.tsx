@@ -48,8 +48,7 @@ export function ArtCanvasSurface({
   }, [cfg?.palette]);
   const [strokes, setStrokes] = useState<InkStroke[]>([]);
 
-  const submitDisabled =
-    disabled || (surface.capture.finalAnswer && strokes.length === 0);
+  const submitDisabled = disabled || (surface.capture.finalAnswer && strokes.length === 0);
 
   return (
     <section aria-label="art-canvas-surface">

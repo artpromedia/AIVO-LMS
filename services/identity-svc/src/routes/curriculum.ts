@@ -1,9 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { lookupCurriculumAsync } from "../services/curriculum-lookup.js";
-import {
-  resolveZipToDistricts,
-  searchDistricts,
-} from "../services/zip-district-resolver.js";
+import { resolveZipToDistricts, searchDistricts } from "../services/zip-district-resolver.js";
 
 export async function registerCurriculumRoutes(app: FastifyInstance) {
   app.get(

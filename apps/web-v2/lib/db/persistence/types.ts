@@ -60,17 +60,9 @@ export type PersistenceMode = "memory" | "postgres";
  */
 export interface NotificationStore {
   /** List notifications for a (userId, tenantId), most recent first. */
-  list(opts: {
-    tenantId: string;
-    userId: string;
-    unreadOnly?: boolean;
-  }): Promise<Notification[]>;
+  list(opts: { tenantId: string; userId: string; unreadOnly?: boolean }): Promise<Notification[]>;
   /** Mark up to N notifications read. Returns the count that flipped. */
-  markRead(opts: {
-    tenantId: string;
-    userId: string;
-    ids: string[];
-  }): Promise<number>;
+  markRead(opts: { tenantId: string; userId: string; ids: string[] }): Promise<number>;
   /** Persist a new notification + the per-channel delivery rows. */
   create(input: {
     notification: Notification;

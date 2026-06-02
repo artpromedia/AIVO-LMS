@@ -29,7 +29,12 @@ export const mathKFall2026: ContentPack = {
   license: "CC-BY-4.0",
   publishedAt: "2026-09-01T00:00:00Z",
   assets: [
-    { id: "img-three-apples", kind: "inline_svg", src: APPLES_SVG, alt: "Three red apples in a row." },
+    {
+      id: "img-three-apples",
+      kind: "inline_svg",
+      src: APPLES_SVG,
+      alt: "Three red apples in a row.",
+    },
     { id: "img-square", kind: "inline_svg", src: SQUARE_SVG, alt: "A blue square." },
     { id: "img-triangle", kind: "inline_svg", src: TRIANGLE_SVG, alt: "An orange triangle." },
     { id: "img-circle", kind: "inline_svg", src: CIRCLE_SVG, alt: "A green circle." },

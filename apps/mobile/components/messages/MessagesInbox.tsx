@@ -152,7 +152,10 @@ export function MessagesInbox() {
           <Text style={[styles.backText, { color: palette.primary }]}>Inbox</Text>
         </Pressable>
         <Text style={[styles.subject, { color: palette.ink }]}>{activeSubject}</Text>
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.sm }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.sm }}
+        >
           {messages === null ? (
             <ActivityIndicator color={palette.primary} />
           ) : (
@@ -216,14 +219,20 @@ export function MessagesInbox() {
               accessibilityRole="button"
               accessibilityLabel={t.subject}
               onPress={() => void openThread(t.id, t.subject)}
-              style={[styles.threadRow, { backgroundColor: palette.bgRaised, borderColor: palette.border }]}
+              style={[
+                styles.threadRow,
+                { backgroundColor: palette.bgRaised, borderColor: palette.border },
+              ]}
             >
               <View style={{ flex: 1 }}>
                 <Text style={[styles.threadSubject, { color: palette.ink }]} numberOfLines={1}>
                   {t.subject}
                 </Text>
                 {t.lastMessage ? (
-                  <Text style={[styles.threadPreview, { color: palette.inkMuted }]} numberOfLines={1}>
+                  <Text
+                    style={[styles.threadPreview, { color: palette.inkMuted }]}
+                    numberOfLines={1}
+                  >
                     {t.lastMessage.body}
                   </Text>
                 ) : null}
@@ -247,7 +256,13 @@ const styles = StyleSheet.create({
   backText: { fontSize: 15, fontFamily: fontFamilies.bodyBold },
   subject: { fontSize: 18, fontFamily: fontFamilies.displayBold, marginBottom: spacing.xs },
   bubble: { maxWidth: "82%", paddingVertical: 10, paddingHorizontal: 14, borderRadius: radius.lg },
-  composer: { flexDirection: "row", alignItems: "flex-end", gap: 8, paddingTop: spacing.sm, borderTopWidth: 1 },
+  composer: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 8,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+  },
   input: {
     flex: 1,
     minHeight: 44,
@@ -258,7 +273,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 14,
   },
-  sendBtn: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  sendBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   threadRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -269,8 +290,20 @@ const styles = StyleSheet.create({
   },
   threadSubject: { fontSize: 15, fontFamily: fontFamilies.bodyBold },
   threadPreview: { fontSize: 13, fontFamily: fontFamilies.bodyRegular, marginTop: 2 },
-  badge: { minWidth: 22, height: 22, borderRadius: 11, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
+  badge: {
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 6,
+  },
   badgeText: { color: "#ffffff", fontSize: 12, fontFamily: fontFamilies.bodyBold },
-  empty: { fontSize: 14, fontFamily: fontFamilies.bodyRegular, marginTop: spacing.lg, lineHeight: 21 },
+  empty: {
+    fontSize: 14,
+    fontFamily: fontFamilies.bodyRegular,
+    marginTop: spacing.lg,
+    lineHeight: 21,
+  },
   error: { fontSize: 13, color: "#ef4444", marginTop: spacing.sm },
 });

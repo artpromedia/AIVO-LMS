@@ -131,7 +131,6 @@ export async function bootstrapOpsAlerts(
   // misconfigured); an explicit boot log line + the metric are the safe
   // visibility lever.
   if (pgRequestedButUnwired) {
-    // eslint-disable-next-line no-console -- explicit boot-time stderr
     console.error(
       `[ops-alerts] CRITICAL: service=${opts.service} OPS_ALERTS_OUTBOX_PG_TABLE is set but pgOutboxClient was not provided. ` +
         `The service is running with a non-durable outbox; queued pages will be lost on restart. ` +

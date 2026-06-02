@@ -31,31 +31,32 @@ describe("tutor-curriculum live proxy", () => {
   });
 
   it("normalizes tutor-svc uppercase status/role on list", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(
-        JSON.stringify({
-          uploads: [
-            {
-              id: "cu_1",
-              tenantId: "t_1",
-              learnerId: "lrn_1",
-              uploadedBy: "u_1",
-              uploaderRole: "TEACHER",
-              subject: "math",
-              title: "Fractions",
-              sourceType: "text",
-              rawText: "",
-              parsedFocus: { topics: ["Fractions"], keywords: ["numerator"] },
-              weekStart: "2026-06-01T00:00:00.000Z",
-              weekEnd: null,
-              status: "ACTIVE",
-              createdAt: "2026-06-01T00:00:00.000Z",
-              updatedAt: "2026-06-01T00:00:00.000Z",
-            },
-          ],
-        }),
-        { status: 200 },
-      ),
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            uploads: [
+              {
+                id: "cu_1",
+                tenantId: "t_1",
+                learnerId: "lrn_1",
+                uploadedBy: "u_1",
+                uploaderRole: "TEACHER",
+                subject: "math",
+                title: "Fractions",
+                sourceType: "text",
+                rawText: "",
+                parsedFocus: { topics: ["Fractions"], keywords: ["numerator"] },
+                weekStart: "2026-06-01T00:00:00.000Z",
+                weekEnd: null,
+                status: "ACTIVE",
+                createdAt: "2026-06-01T00:00:00.000Z",
+                updatedAt: "2026-06-01T00:00:00.000Z",
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
     );
     vi.stubGlobal("fetch", fetchMock);
     const mod = await load();

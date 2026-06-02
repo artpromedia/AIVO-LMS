@@ -21,7 +21,11 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       const r = await markThreadReadSvc(bearer, threadId);
       if (!r.ok) {
         return fail(
-          { ...ERRORS.UPSTREAM_UNAVAILABLE, message: r.error, status: r.status >= 500 ? 502 : r.status },
+          {
+            ...ERRORS.UPSTREAM_UNAVAILABLE,
+            message: r.error,
+            status: r.status >= 500 ? 502 : r.status,
+          },
           requestId,
         );
       }

@@ -18,16 +18,17 @@ export async function GET(req: Request): Promise<NextResponse> {
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const roleErr = requireRole(
-      session!,
-      ["teacher", "school_admin", "district_admin"],
-      requestId,
-    );
+    const roleErr = requireRole(session!, ["teacher", "school_admin", "district_admin"], requestId);
     if (roleErr) return roleErr;
     const learnerId = new URL(req.url).searchParams.get("learnerId");
     if (!learnerId) {
       return fail(
-        { code: "validation_error", message: "learnerId is required", userMessage: "Pick a learner first.", status: 400 },
+        {
+          code: "validation_error",
+          message: "learnerId is required",
+          userMessage: "Pick a learner first.",
+          status: 400,
+        },
         requestId,
       );
     }
@@ -37,7 +38,12 @@ export async function GET(req: Request): Promise<NextResponse> {
       !teacherCanAccessLearner(session!.userId, learnerId, session!.tenantId)
     ) {
       return fail(
-        { code: "forbidden", message: "Learner not on teacher roster", userMessage: "That learner is not on your roster.", status: 403 },
+        {
+          code: "forbidden",
+          message: "Learner not on teacher roster",
+          userMessage: "That learner is not on your roster.",
+          status: 403,
+        },
         requestId,
       );
     }

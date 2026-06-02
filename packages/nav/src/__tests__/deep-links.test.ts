@@ -73,10 +73,7 @@ describe("classifyDeepLinkPath", () => {
 
 describe("resolveDeepLink — same role can render", () => {
   it("returns allow when the active role can reach the area", () => {
-    const d = resolveDeepLink(
-      "aivo://learner/123/goals",
-      session(["parent"], "parent"),
-    );
+    const d = resolveDeepLink("aivo://learner/123/goals", session(["parent"], "parent"));
     expect(d.outcome).toBe("allow");
     expect(d.area).toBe("iep");
     expect(d.params.learnerId).toBe("123");
@@ -86,10 +83,7 @@ describe("resolveDeepLink — same role can render", () => {
 describe("resolveDeepLink — switchable role", () => {
   it("recommends a switch when another held role can reach the area", () => {
     // learner cannot reach /billing (locked), but parent (held) can.
-    const d = resolveDeepLink(
-      "/billing",
-      session(["learner", "parent"], "learner"),
-    );
+    const d = resolveDeepLink("/billing", session(["learner", "parent"], "learner"));
     // For learner, billing is `locked` not `hidden`, so canAccessArea
     // returns `locked` — the resolver should propagate that.
     expect(["locked", "switch-role"]).toContain(d.outcome);
@@ -98,20 +92,14 @@ describe("resolveDeepLink — switchable role", () => {
   it("switches role when the active role has no access but a held one does", () => {
     // therapist has no access to billing — caregiver also lacks it.
     // teacher → /billing is locked; parent → linked (full/linked).
-    const d = resolveDeepLink(
-      "/billing",
-      session(["teacher", "parent"], "teacher"),
-    );
+    const d = resolveDeepLink("/billing", session(["teacher", "parent"], "teacher"));
     // teacher billing is `locked`. parent billing is `linked` → allow.
     // The resolver prefers the active role's `locked` outcome first.
     expect(d.outcome).toBe("locked");
   });
 
   it("sends caregiver→parent when entering /parent/consent as a caregiver who also parents", () => {
-    const d = resolveDeepLink(
-      "/parent/consent",
-      session(["caregiver", "parent"], "caregiver"),
-    );
+    const d = resolveDeepLink("/parent/consent", session(["caregiver", "parent"], "caregiver"));
     expect(d.outcome).toBe("switch-role");
     expect(d.requiredRole).toBe("parent");
     expect(d.requiresStepUp).toBe(true);
@@ -120,10 +108,7 @@ describe("resolveDeepLink — switchable role", () => {
   it("never 404s when at least one held role can reach the area", () => {
     const allRoles = [...ROLES];
     for (const active of allRoles) {
-      const d = resolveDeepLink(
-        "/learner/1/goals",
-        session(allRoles, active),
-      );
+      const d = resolveDeepLink("/learner/1/goals", session(allRoles, active));
       expect(d.outcome).not.toBe("unmatched");
     }
   });
@@ -141,28 +126,19 @@ describe("resolveDeepLink — locked & forbidden", () => {
 
   it("returns forbidden when no held role can reach the area", () => {
     // caregiver has nothing for /admin/school
-    const d = resolveDeepLink(
-      "/admin/school/billing",
-      session(["caregiver"], "caregiver"),
-    );
+    const d = resolveDeepLink("/admin/school/billing", session(["caregiver"], "caregiver"));
     expect(d.outcome).toBe("forbidden");
   });
 });
 
 describe("resolveDeepLink — unmatched", () => {
   it("returns unmatched for unknown route shapes", () => {
-    const d = resolveDeepLink(
-      "/totally/made-up/route",
-      session(["parent"], "parent"),
-    );
+    const d = resolveDeepLink("/totally/made-up/route", session(["parent"], "parent"));
     expect(d.outcome).toBe("unmatched");
   });
 
   it("preserves search and hash on the decision", () => {
-    const d = resolveDeepLink(
-      "/notifications?focus=urgent#row-5",
-      session(["parent"], "parent"),
-    );
+    const d = resolveDeepLink("/notifications?focus=urgent#row-5", session(["parent"], "parent"));
     expect(d.search).toBe("?focus=urgent");
     expect(d.hash).toBe("#row-5");
   });

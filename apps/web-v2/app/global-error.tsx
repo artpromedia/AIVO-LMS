@@ -18,9 +18,7 @@ export default function GlobalError({
         style={{ fontFamily: "system-ui, sans-serif", padding: "4rem 1.5rem", textAlign: "center" }}
       >
         <h1 style={{ fontSize: "1.75rem", fontWeight: 700 }}>{t("heading")}</h1>
-        <p style={{ marginTop: "0.75rem", color: "#555" }}>
-          {t("body")}
-        </p>
+        <p style={{ marginTop: "0.75rem", color: "#555" }}>{t("body")}</p>
         {error.digest ? (
           <p style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "#888" }}>
             Reference: {error.digest}

@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-} from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, Switch } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, spacing, radius } from "@/constants/colors";
@@ -39,14 +32,17 @@ export default function ConsentSheetScreen() {
     <View style={[styles.root, { paddingTop: insets.top + spacing.lg }]}>
       <View style={styles.grabber} />
       <ScrollView
-        contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xl * 2 }}
+        contentContainerStyle={{
+          padding: spacing.lg,
+          paddingBottom: insets.bottom + spacing.xl * 2,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.eyebrow}>Your consent — your control</Text>
         <Text style={styles.title}>Choose what AIVO can do.</Text>
         <Text style={styles.subtitle}>
-          Each row is a separate choice. Tap any row to read what it changes.
-          You can change any of these later from Settings → Privacy.
+          Each row is a separate choice. Tap any row to read what it changes. You can change any of
+          these later from Settings → Privacy.
         </Text>
 
         <Row
@@ -86,8 +82,8 @@ export default function ConsentSheetScreen() {
         <View style={styles.reassure}>
           <Text style={styles.reassureTitle}>No bundles. No dark patterns.</Text>
           <Text style={styles.reassureBody}>
-            School data sharing and AI personalization are independent. You
-            can say yes to one and no to the other.
+            School data sharing and AI personalization are independent. You can say yes to one and
+            no to the other.
           </Text>
         </View>
 

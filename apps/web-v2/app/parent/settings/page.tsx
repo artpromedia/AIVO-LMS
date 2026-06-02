@@ -22,11 +22,7 @@ export default async function Page() {
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        description={t("description")}
-      />
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Link href="/parent/settings/account" className="block">
           <Card className="p-[var(--aivo-density-card-pad)] hover:bg-aivo-surface-2">
@@ -57,11 +53,7 @@ export default async function Page() {
           </Card>
         </Link>
       </div>
-      <SectionHeader
-        className="mt-10"
-        title={t("privacy_label")}
-        description={t("privacy_desc")}
-      />
+      <SectionHeader className="mt-10" title={t("privacy_label")} description={t("privacy_desc")} />
     </AppShell>
   );
 }

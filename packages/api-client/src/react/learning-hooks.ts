@@ -66,12 +66,9 @@ function getClient(override?: LearningClient): LearningClient {
 export const learningKeys = {
   all: ["learning"] as const,
   sessions: () => [...learningKeys.all, "sessions"] as const,
-  sessionList: (learnerId: string) =>
-    [...learningKeys.sessions(), "list", learnerId] as const,
-  session: (sessionId: string) =>
-    [...learningKeys.sessions(), "byId", sessionId] as const,
-  gradebook: (learnerId: string) =>
-    [...learningKeys.all, "gradebook", learnerId] as const,
+  sessionList: (learnerId: string) => [...learningKeys.sessions(), "list", learnerId] as const,
+  session: (sessionId: string) => [...learningKeys.sessions(), "byId", sessionId] as const,
+  gradebook: (learnerId: string) => [...learningKeys.all, "gradebook", learnerId] as const,
   path: (learnerId: string, subject: string) =>
     [...learningKeys.all, "path", learnerId, subject] as const,
 };
@@ -249,17 +246,10 @@ export function useInitLearningPath(opts?: {
 }) {
   const client = getClient(opts?.client);
   const qc = useQueryClient();
-  return useMutation<
-    InitLearningPathResponse,
-    Error,
-    { learnerId: string; subject: string }
-  >({
+  return useMutation<InitLearningPathResponse, Error, { learnerId: string; subject: string }>({
     mutationFn: ({ learnerId, subject }: { learnerId: string; subject: string }) =>
       client.initLearningPath(learnerId, subject),
-    onSuccess: (
-      _data: InitLearningPathResponse,
-      vars: { learnerId: string; subject: string },
-    ) => {
+    onSuccess: (_data: InitLearningPathResponse, vars: { learnerId: string; subject: string }) => {
       qc.invalidateQueries({ queryKey: learningKeys.path(vars.learnerId, vars.subject) });
     },
     ...opts?.mutationOptions,
@@ -276,11 +266,7 @@ export function useAdvanceLearningPath(opts?: {
 }) {
   const client = getClient(opts?.client);
   const qc = useQueryClient();
-  return useMutation<
-    AdvanceLearningPathResponse,
-    Error,
-    { learnerId: string; subject: string }
-  >({
+  return useMutation<AdvanceLearningPathResponse, Error, { learnerId: string; subject: string }>({
     mutationFn: ({ learnerId, subject }: { learnerId: string; subject: string }) =>
       client.advanceLearningPath(learnerId, subject),
     onSuccess: (

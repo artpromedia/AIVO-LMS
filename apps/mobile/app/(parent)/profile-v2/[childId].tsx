@@ -34,18 +34,51 @@ export default function ParentProfileV2Screen() {
   const { data: learner } = useLearner(id);
   const { domains } = useBrainDomains(id, { enrolledGrade: learner?.gradeLevel ?? null });
   const summary = useMemo(
-    () => summarizeDomains(domains.map((d) => ({ domain: d.domain, masteryPercent: d.masteryPercent }))),
+    () =>
+      summarizeDomains(
+        domains.map((d) => ({ domain: d.domain, masteryPercent: d.masteryPercent })),
+      ),
     [domains],
   );
   const columns = useColumns({ compact: 2, medium: 3, expanded: 3 });
 
   const METRICS: Metric[] = [
-    { key: "baseline", icon: "flag", label: t("profileV2.baseline", "Baseline"), route: (i) => `/(parent)/progress/${i}` },
-    { key: "brain", icon: "bulb", label: t("profileV2.brain", "Brain profile"), route: (i) => `/(parent)/brain/${i}` },
-    { key: "iep", icon: "clipboard", label: t("profileV2.iep", "IEP"), route: (i) => `/(parent)/iep/${i}` },
-    { key: "sensory", icon: "color-palette", label: t("profileV2.sensory", "Sensory"), route: (i) => `/(parent)/sensory/${i}` },
-    { key: "a11y", icon: "accessibility", label: t("profileV2.a11y", "Accessibility"), route: (i) => `/(parent)/accessibility/${i}` },
-    { key: "gradebook", icon: "bar-chart", label: t("profileV2.gradebook", "Gradebook"), route: (i) => `/(parent)/gradebook/${i}` },
+    {
+      key: "baseline",
+      icon: "flag",
+      label: t("profileV2.baseline", "Baseline"),
+      route: (i) => `/(parent)/progress/${i}`,
+    },
+    {
+      key: "brain",
+      icon: "bulb",
+      label: t("profileV2.brain", "Brain profile"),
+      route: (i) => `/(parent)/brain/${i}`,
+    },
+    {
+      key: "iep",
+      icon: "clipboard",
+      label: t("profileV2.iep", "IEP"),
+      route: (i) => `/(parent)/iep/${i}`,
+    },
+    {
+      key: "sensory",
+      icon: "color-palette",
+      label: t("profileV2.sensory", "Sensory"),
+      route: (i) => `/(parent)/sensory/${i}`,
+    },
+    {
+      key: "a11y",
+      icon: "accessibility",
+      label: t("profileV2.a11y", "Accessibility"),
+      route: (i) => `/(parent)/accessibility/${i}`,
+    },
+    {
+      key: "gradebook",
+      icon: "bar-chart",
+      label: t("profileV2.gradebook", "Gradebook"),
+      route: (i) => `/(parent)/gradebook/${i}`,
+    },
   ];
 
   return (
@@ -69,7 +102,10 @@ export default function ParentProfileV2Screen() {
               accessibilityRole="button"
               accessibilityLabel={m.label}
               onPress={() => router.push(m.route(id) as Href)}
-              style={[styles.tile, { backgroundColor: palette.bgRaised, borderColor: palette.border }]}
+              style={[
+                styles.tile,
+                { backgroundColor: palette.bgRaised, borderColor: palette.border },
+              ]}
             >
               <View style={[styles.tileIcon, { backgroundColor: palette.bgPage }]}>
                 <Ionicons name={m.icon} size={22} color={palette.primary} />
@@ -86,10 +122,27 @@ export default function ParentProfileV2Screen() {
 const styles = StyleSheet.create({
   hero: { gap: spacing.sm, marginBottom: spacing.md },
   name: { fontSize: 20, fontFamily: fontFamilies.displayBold },
-  eyebrow: { fontSize: 12, fontFamily: fontFamilies.bodyBold, textTransform: "uppercase", letterSpacing: 0.5 },
+  eyebrow: {
+    fontSize: 12,
+    fontFamily: fontFamilies.bodyBold,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
   grid: { flexDirection: "row", flexWrap: "wrap", marginHorizontal: -spacing.xs },
   cell: { padding: spacing.xs },
-  tile: { alignItems: "center", gap: 8, paddingVertical: spacing.md, borderRadius: radius.xl, borderWidth: 1 },
-  tileIcon: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  tile: {
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: spacing.md,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+  },
+  tileIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   tileLabel: { fontSize: 12, fontFamily: fontFamilies.bodyBold, textAlign: "center" },
 });

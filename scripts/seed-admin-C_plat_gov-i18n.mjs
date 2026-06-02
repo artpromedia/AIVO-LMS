@@ -1395,6 +1395,8 @@ for (const [locale, subtree] of Object.entries(ADMIN)) {
   json.admin = { ...(json.admin ?? {}), ...subtree };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-admin-C_plat_gov-i18n: merged platform governance namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-admin-C_plat_gov-i18n: merged platform governance namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-admin-C_plat_gov-i18n: done — ${written} locale catalogs updated.`);

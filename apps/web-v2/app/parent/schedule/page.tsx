@@ -45,52 +45,52 @@ export default async function Page() {
             const activeRuns = allActive.filter(
               (r) => r.status === "ready" || r.status === "in_progress",
             );
-          return (
-            <section key={l.id} className="mb-10">
-              <SectionHeader
-                title={l.displayName}
-                description={`${assignments.length} teacher assignment${assignments.length === 1 ? "" : "s"} · ${activeRuns.length} active lesson${activeRuns.length === 1 ? "" : "s"}`}
-              />
-              <div className="grid gap-3">
-                {assignments.map((a) => (
-                  <Card key={a.id} className="p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="font-medium">{a.title}</p>
-                        <p className="text-sm text-aivo-ink-soft">
-                          {subjectMap.get(a.subjectId)?.name ?? "Subject"}
-                          {a.dueAt ? ` · due ${new Date(a.dueAt).toLocaleDateString()}` : ""}
-                        </p>
+            return (
+              <section key={l.id} className="mb-10">
+                <SectionHeader
+                  title={l.displayName}
+                  description={`${assignments.length} teacher assignment${assignments.length === 1 ? "" : "s"} · ${activeRuns.length} active lesson${activeRuns.length === 1 ? "" : "s"}`}
+                />
+                <div className="grid gap-3">
+                  {assignments.map((a) => (
+                    <Card key={a.id} className="p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="font-medium">{a.title}</p>
+                          <p className="text-sm text-aivo-ink-soft">
+                            {subjectMap.get(a.subjectId)?.name ?? "Subject"}
+                            {a.dueAt ? ` · due ${new Date(a.dueAt).toLocaleDateString()}` : ""}
+                          </p>
+                        </div>
+                        <Badge tone="primary">{t("teacher")}</Badge>
                       </div>
-                      <Badge tone="primary">{t("teacher")}</Badge>
-                    </div>
-                  </Card>
-                ))}
-                {activeRuns.map((r) => (
-                  <Card key={r.id} className="p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="font-medium">{t("in_progress_lesson")}</p>
-                        <p className="text-sm text-aivo-ink-soft">Source: {r.source}</p>
+                    </Card>
+                  ))}
+                  {activeRuns.map((r) => (
+                    <Card key={r.id} className="p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="font-medium">{t("in_progress_lesson")}</p>
+                          <p className="text-sm text-aivo-ink-soft">Source: {r.source}</p>
+                        </div>
+                        <Link
+                          href={`/learner/lesson-runs/${r.id}`}
+                          className="text-xs font-medium text-aivo-primary hover:underline"
+                        >
+                          {t("open_arrow")}
+                        </Link>
                       </div>
-                      <Link
-                        href={`/learner/lesson-runs/${r.id}`}
-                        className="text-xs font-medium text-aivo-primary hover:underline"
-                      >
-                        {t("open_arrow")}
-                      </Link>
-                    </div>
-                  </Card>
-                ))}
-                {assignments.length === 0 && activeRuns.length === 0 ? (
-                  <Card className="p-4 text-sm text-aivo-ink-soft">
-                    Nothing scheduled — {l.displayName} will pick from Today's Mission next time
-                    they sign in.
-                  </Card>
-                ) : null}
-              </div>
-            </section>
-          );
+                    </Card>
+                  ))}
+                  {assignments.length === 0 && activeRuns.length === 0 ? (
+                    <Card className="p-4 text-sm text-aivo-ink-soft">
+                      Nothing scheduled — {l.displayName} will pick from Today's Mission next time
+                      they sign in.
+                    </Card>
+                  ) : null}
+                </div>
+              </section>
+            );
           }),
         )
       )}

@@ -81,8 +81,8 @@ export function UserRolesCard({ userId }: { userId: string }) {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-aivo-ink-soft">
-        Additional roles let this user act as more than their primary role and switch between
-        them in the app without signing out. Changes take effect on their next sign-in.
+        Additional roles let this user act as more than their primary role and switch between them
+        in the app without signing out. Changes take effect on their next sign-in.
       </p>
 
       {loading ? (

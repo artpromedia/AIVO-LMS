@@ -59,9 +59,7 @@ export const ANONYMOUS_ROLE = "anonymous";
  * `redactForLogging` — the enricher already strips any string that
  * looks like an email/JWT/etc. via the parent logger's redactor.
  */
-export function roleContextBase(
-  session?: RoleContextSession | null,
-): RoleContextFields {
+export function roleContextBase(session?: RoleContextSession | null): RoleContextFields {
   if (!session) {
     return { activeRole: ANONYMOUS_ROLE, availableRoles: [] };
   }
@@ -99,9 +97,7 @@ export function withRoleContext<T extends Record<string, unknown>>(
  * flat `Record<string, string>`; this helper produces the right
  * shape from a session.
  */
-export function roleContextAttributes(
-  session?: RoleContextSession | null,
-): Record<string, string> {
+export function roleContextAttributes(session?: RoleContextSession | null): Record<string, string> {
   const base = roleContextBase(session);
   const out: Record<string, string> = {
     "aivo.active_role": base.activeRole,

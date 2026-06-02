@@ -60,7 +60,9 @@ export default function ParentLearnerAudioScreen() {
       </Card>
 
       <Card tone="raised" style={[styles.card, !prefs.ttsEnabled && { opacity: 0.5 }]}>
-        <Text style={[styles.sectionTitle, { color: palette.ink }]}>{t("audio.voice", "Voice")}</Text>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+          {t("audio.voice", "Voice")}
+        </Text>
         <View style={styles.voiceGrid}>
           {VOICES.map((v) => {
             const active = prefs.voiceId === v.id;
@@ -80,7 +82,9 @@ export default function ParentLearnerAudioScreen() {
                   },
                 ]}
               >
-                <Text style={[styles.voiceChipText, { color: active ? palette.bgRaised : palette.ink }]}>
+                <Text
+                  style={[styles.voiceChipText, { color: active ? palette.bgRaised : palette.ink }]}
+                >
                   {v.label}
                 </Text>
               </Pressable>
@@ -90,14 +94,19 @@ export default function ParentLearnerAudioScreen() {
       </Card>
 
       <Card tone="raised" style={[styles.card, !prefs.ttsEnabled && { opacity: 0.5 }]}>
-        <Text style={[styles.sectionTitle, { color: palette.ink }]}>{t("audio.speed", "Speed")}</Text>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+          {t("audio.speed", "Speed")}
+        </Text>
         <View style={styles.speedRow}>
           <Pressable
             disabled={!prefs.ttsEnabled || prefs.speed <= MIN_SPEED}
             accessibilityRole="button"
             accessibilityLabel={t("audio.slower", "Slower")}
             onPress={() => setPref({ speed: clampSpeed(+(prefs.speed - SPEED_STEP).toFixed(2)) })}
-            style={[styles.speedBtn, { borderColor: palette.border, backgroundColor: palette.bgRaised }]}
+            style={[
+              styles.speedBtn,
+              { borderColor: palette.border, backgroundColor: palette.bgRaised },
+            ]}
           >
             <Ionicons name="remove" size={22} color={palette.ink} />
           </Pressable>
@@ -107,7 +116,10 @@ export default function ParentLearnerAudioScreen() {
             accessibilityRole="button"
             accessibilityLabel={t("audio.faster", "Faster")}
             onPress={() => setPref({ speed: clampSpeed(+(prefs.speed + SPEED_STEP).toFixed(2)) })}
-            style={[styles.speedBtn, { borderColor: palette.border, backgroundColor: palette.bgRaised }]}
+            style={[
+              styles.speedBtn,
+              { borderColor: palette.border, backgroundColor: palette.bgRaised },
+            ]}
           >
             <Ionicons name="add" size={22} color={palette.ink} />
           </Pressable>
@@ -124,9 +136,21 @@ const styles = StyleSheet.create({
   desc: { fontSize: 12, fontFamily: fontFamilies.bodyRegular },
   toggleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   voiceGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: spacing.sm },
-  voiceChip: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.lg, borderWidth: 1 },
+  voiceChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+  },
   voiceChipText: { fontSize: 13, fontFamily: fontFamilies.bodyBold },
   speedRow: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginTop: spacing.sm },
-  speedBtn: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  speedBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   speedValue: { flex: 1, textAlign: "center", fontSize: 22, fontFamily: fontFamilies.displayBold },
 });

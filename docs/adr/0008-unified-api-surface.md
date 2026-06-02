@@ -39,12 +39,12 @@ Specifically:
 
 - All app-facing API traffic (web, mobile, partner integrations) goes
   through `apps/web-v2/app/api/bff/**`. There is no `apps/api`; the
-  BFF *is* the API.
+  BFF _is_ the API.
 - BFF route handlers may call into:
   - the in-memory store / Drizzle adapter (ADR 0007), or
   - services in `services/*` via an HTTP client (ADR 0009).
-  Which one is selected by the per-domain persistence + service
-  flags.
+    Which one is selected by the per-domain persistence + service
+    flags.
 - **Every BFF route gets an OpenAPI fragment** under
   `apps/web-v2/app/api/bff/<route>/openapi.ts` exporting a typed
   schema for request/response. A new

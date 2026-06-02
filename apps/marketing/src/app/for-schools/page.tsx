@@ -156,9 +156,7 @@ export default async function Page() {
         mockupTitle="Maya · This quarter"
         mockup={
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-slate-900">
-              {t("progress_summary")}
-            </p>
+            <p className="text-sm font-semibold text-slate-900">{t("progress_summary")}</p>
             <div className="space-y-1.5">
               {[
                 "Reading · steady progress",

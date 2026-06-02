@@ -2,11 +2,7 @@ import React, { useMemo, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  RoleAwareTabBar,
-  RoleSwitcherSheet,
-  LockedScreenMobile,
-} from "@aivo/mobile-ui";
+import { RoleAwareTabBar, RoleSwitcherSheet, LockedScreenMobile } from "@aivo/mobile-ui";
 import {
   NAV_AREA_META,
   ROLES,
@@ -67,9 +63,7 @@ export default function ShellDemoScreen() {
         <LockedScreenMobile
           role={role}
           area={lockedArea}
-          renderIcon={(a) => (
-            <Ionicons name={ICONS[a]} size={40} color="#6D28D9" />
-          )}
+          renderIcon={(a) => <Ionicons name={ICONS[a]} size={40} color="#6D28D9" />}
         />
       </SafeAreaView>
     );
@@ -81,8 +75,8 @@ export default function ShellDemoScreen() {
         <Text style={styles.eyebrow}>Shell demo</Text>
         <Text style={styles.title}>AIVO mobile shell</Text>
         <Text style={styles.subtitle}>
-          The tab bar below is rendered by @aivo/mobile-ui/shell from the @aivo/nav
-          registry — change the role to see how the bar adapts.
+          The tab bar below is rendered by @aivo/mobile-ui/shell from the @aivo/nav registry —
+          change the role to see how the bar adapts.
         </Text>
 
         <View style={styles.card}>
@@ -112,10 +106,7 @@ export default function ShellDemoScreen() {
               {lockedAreas.map((a) => (
                 <Pressable
                   key={a}
-                  style={({ pressed }) => [
-                    styles.lockedRow,
-                    pressed && styles.lockedRowPressed,
-                  ]}
+                  style={({ pressed }) => [styles.lockedRow, pressed && styles.lockedRowPressed]}
                   onPress={() => setLockedArea(a)}
                   accessibilityRole="button"
                   accessibilityLabel={`Preview locked screen for ${NAV_AREA_META[a].label}`}
@@ -133,8 +124,8 @@ export default function ShellDemoScreen() {
           <View style={styles.stepUpBanner}>
             <Ionicons name="shield-checkmark" size={18} color="#FFFFFF" />
             <Text style={styles.stepUpText}>
-              Step-up required to enter {ROLE_META[stepUpRole].label}. In the real
-              app a biometric / PIN prompt would appear here.
+              Step-up required to enter {ROLE_META[stepUpRole].label}. In the real app a biometric /
+              PIN prompt would appear here.
             </Text>
             <Pressable onPress={() => setStepUpRole(null)}>
               <Text style={styles.stepUpDismiss}>OK</Text>
@@ -148,11 +139,7 @@ export default function ShellDemoScreen() {
         activeArea={activeArea}
         onSelect={(area) => setActiveArea(area)}
         renderIcon={(area, active) => (
-          <Ionicons
-            name={ICONS[area]}
-            size={22}
-            color={active ? "#6D28D9" : "#6B7280"}
-          />
+          <Ionicons name={ICONS[area]} size={22} color={active ? "#6D28D9" : "#6B7280"} />
         )}
       />
 

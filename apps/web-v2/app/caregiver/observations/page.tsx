@@ -60,9 +60,7 @@ export default async function CaregiverObservationsPage() {
   const t = await getTranslations("caregiver.observations");
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "caregiver");
-  const maybeLearners = await Promise.all(
-    learnerIds.map((id) => getLearner(id, session.tenantId)),
-  );
+  const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   const learnerById = new Map(learners.map((l) => [l.id, l]));
 
@@ -79,9 +77,7 @@ export default async function CaregiverObservationsPage() {
     .slice(0, 20);
 
   const runBatches = await Promise.all(
-    learners.map((l) =>
-      listLessonRunsForLearner(l.id, session.tenantId, { limit: FEED_LIMIT }),
-    ),
+    learners.map((l) => listLessonRunsForLearner(l.id, session.tenantId, { limit: FEED_LIMIT })),
   );
   const feed = runBatches
     .flat()
@@ -117,9 +113,7 @@ export default async function CaregiverObservationsPage() {
 
       <SectionHeader title={`Your observations (${authored.length})`} />
       {authored.length === 0 ? (
-        <p className="text-sm text-aivo-ink-soft">
-          {t("no_observations_yet")}
-        </p>
+        <p className="text-sm text-aivo-ink-soft">{t("no_observations_yet")}</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {authored.map((obs) => {
@@ -133,9 +127,7 @@ export default async function CaregiverObservationsPage() {
                   </p>
                   <p className="text-xs text-aivo-ink-soft">
                     {formatWhen(obs.observedAt)}
-                    {obs.durationMinutes !== null
-                      ? ` · ${obs.durationMinutes} min`
-                      : ""}
+                    {obs.durationMinutes !== null ? ` · ${obs.durationMinutes} min` : ""}
                   </p>
                   <dl className="mt-2 grid grid-cols-1 gap-1 text-sm md:grid-cols-3">
                     <div>
@@ -182,9 +174,7 @@ export default async function CaregiverObservationsPage() {
                       {skillName.get(run.skillId) ?? "Skill"} · {formatWhen(run.createdAt)}
                     </p>
                   </div>
-                  <Badge tone={statusTone(run.status)}>
-                    {run.status.replaceAll("_", " ")}
-                  </Badge>
+                  <Badge tone={statusTone(run.status)}>{run.status.replaceAll("_", " ")}</Badge>
                 </Card>
               </li>
             );

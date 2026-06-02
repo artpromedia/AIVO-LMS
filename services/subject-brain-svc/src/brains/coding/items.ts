@@ -36,8 +36,7 @@ export const CODING_ITEMS: Item[] = [
     skillCode: "CODE.FOUND.CONDITIONALS",
     difficulty: -0.5,
     surface: "choice_grid",
-    prompt:
-      "We want the robot to honk only when it sees a sign. Which block fits?",
+    prompt: "We want the robot to honk only when it sees a sign. Which block fits?",
     options: ["if sees-sign then honk", "always honk", "never honk", "repeat honk"],
   },
   {

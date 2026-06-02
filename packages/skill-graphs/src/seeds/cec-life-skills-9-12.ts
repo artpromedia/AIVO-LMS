@@ -30,8 +30,7 @@ export const cecLifeSkills9To12: SkillGraph = {
     {
       id: "cec.ls.sd.goals.9",
       title: "Set and track personal transition goals",
-      description:
-        "I can set goals for after high school and track my progress toward them.",
+      description: "I can set goals for after high school and track my progress toward them.",
       subject: "life_skills",
       gradeBand: "9",
       frameworkRefs: [{ framework: "CEC-LS", code: "DCDT/Self-Determination" }],
@@ -62,8 +61,7 @@ export const cecLifeSkills9To12: SkillGraph = {
     {
       id: "cec.ls.emp.resume.10",
       title: "Build a résumé and complete a job application",
-      description:
-        "I can write a résumé and complete a job application accurately.",
+      description: "I can write a résumé and complete a job application accurately.",
       subject: "life_skills",
       gradeBand: "10",
       frameworkRefs: [{ framework: "CEC-LS", code: "DCDT/Employment-Skills" }],
@@ -126,8 +124,7 @@ export const cecLifeSkills9To12: SkillGraph = {
     {
       id: "cec.ls.il.budget.10",
       title: "Manage a personal budget",
-      description:
-        "I can build and follow a basic personal budget, tracking income and expenses.",
+      description: "I can build and follow a basic personal budget, tracking income and expenses.",
       subject: "life_skills",
       gradeBand: "10",
       frameworkRefs: [{ framework: "CEC-LS", code: "DCDT/Financial-Literacy" }],
@@ -136,8 +133,7 @@ export const cecLifeSkills9To12: SkillGraph = {
     {
       id: "cec.ls.il.banking.11",
       title: "Use a bank account safely",
-      description:
-        "I can open and use a checking account, track balance, and avoid common scams.",
+      description: "I can open and use a checking account, track balance, and avoid common scams.",
       subject: "life_skills",
       gradeBand: "11",
       frameworkRefs: [{ framework: "CEC-LS", code: "DCDT/Financial-Literacy" }],
@@ -146,8 +142,7 @@ export const cecLifeSkills9To12: SkillGraph = {
     {
       id: "cec.ls.il.housing.12",
       title: "Navigate housing and household management",
-      description:
-        "I can read a lease, plan utilities and chores, and manage a household routine.",
+      description: "I can read a lease, plan utilities and chores, and manage a household routine.",
       subject: "life_skills",
       gradeBand: "12",
       frameworkRefs: [{ framework: "CEC-LS", code: "DCDT/Independent-Living" }],

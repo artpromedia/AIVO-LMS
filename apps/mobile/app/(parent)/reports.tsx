@@ -12,7 +12,7 @@ import { Card } from "@/components/ui";
 import { MasteryBar, EmptyState, LoadingState } from "@aivo/mobile-ui";
 import { summarizeDomains } from "@/lib/learner-progress";
 import { lessonsByDay } from "@/lib/gradebook-logic";
-import { spacing, radius } from "@/constants/colors";
+import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 interface LearnerLite {

@@ -114,7 +114,7 @@ async function callAdaptive<T>(
   action: "start" | "respond" | "finalize",
   body: Record<string, unknown>,
   opts: CallOptions,
-): Promise<({ ok: true; data: T }) | Fail> {
+): Promise<{ ok: true; data: T } | Fail> {
   const {
     authToken,
     timeoutMs = DEFAULT_STREAM_TIMEOUT_MS,
@@ -138,7 +138,9 @@ async function callAdaptive<T>(
     });
   } catch (err) {
     const aborted =
-      typeof err === "object" && err !== null && "name" in err &&
+      typeof err === "object" &&
+      err !== null &&
+      "name" in err &&
       (err as { name?: string }).name === "AbortError";
     const reason: StreamFailureReason = aborted ? "timeout" : "network_error";
     const message = err instanceof Error ? err.message : String(err);
@@ -249,9 +251,7 @@ export interface ActiveRunInput extends CallOptions {
 }
 
 /** Fetch the learner's in-progress session, if any (resume support). */
-export async function activeAdaptiveBaselineRun(
-  input: ActiveRunInput,
-): Promise<ActiveRunResult> {
+export async function activeAdaptiveBaselineRun(input: ActiveRunInput): Promise<ActiveRunResult> {
   const {
     authToken,
     timeoutMs = DEFAULT_STREAM_TIMEOUT_MS,
@@ -272,7 +272,9 @@ export async function activeAdaptiveBaselineRun(
     });
   } catch (err) {
     const aborted =
-      typeof err === "object" && err !== null && "name" in err &&
+      typeof err === "object" &&
+      err !== null &&
+      "name" in err &&
       (err as { name?: string }).name === "AbortError";
     const reason: StreamFailureReason = aborted ? "timeout" : "network_error";
     const message = err instanceof Error ? err.message : String(err);
@@ -282,11 +284,20 @@ export async function activeAdaptiveBaselineRun(
   }
 
   if (!res.ok) {
-    return { ok: false, reason: "non_2xx", status: res.status, message: `assessment-svc returned ${res.status}` };
+    return {
+      ok: false,
+      reason: "non_2xx",
+      status: res.status,
+      message: `assessment-svc returned ${res.status}`,
+    };
   }
   try {
     return { ok: true, ...((await res.json()) as ActiveRunResponse) };
   } catch (err) {
-    return { ok: false, reason: "invalid_json", message: err instanceof Error ? err.message : "invalid JSON" };
+    return {
+      ok: false,
+      reason: "invalid_json",
+      message: err instanceof Error ? err.message : "invalid JSON",
+    };
   }
 }

@@ -189,13 +189,10 @@ export function AACTargetProvider({
     };
   }, []);
 
-  const attachElement = useCallback<AACProviderContextValue["attachElement"]>(
-    (id, element) => {
-      const t = targetsRef.current.get(id);
-      if (t) t.element = element;
-    },
-    [],
-  );
+  const attachElement = useCallback<AACProviderContextValue["attachElement"]>((id, element) => {
+    const t = targetsRef.current.get(id);
+    if (t) t.element = element;
+  }, []);
 
   const advance = useCallback(() => {
     controllerRef.current?.advance();

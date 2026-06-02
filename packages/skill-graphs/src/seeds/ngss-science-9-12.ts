@@ -49,8 +49,7 @@ export const ngssScience9To12: SkillGraph = {
     {
       id: "ngss.HS-PS2-1",
       title: "Analyze motion using Newton's second law",
-      description:
-        "I can use F = ma to analyze the motion of an object under different forces.",
+      description: "I can use F = ma to analyze the motion of an object under different forces.",
       subject: "science",
       gradeBand: "9",
       frameworkRefs: [{ framework: "NGSS", code: "HS-PS2-1" }],
@@ -91,8 +90,7 @@ export const ngssScience9To12: SkillGraph = {
     {
       id: "ngss.HS-LS1-5",
       title: "Model photosynthesis as energy capture",
-      description:
-        "I can model how plants capture light energy and store it in chemical bonds.",
+      description: "I can model how plants capture light energy and store it in chemical bonds.",
       subject: "science",
       gradeBand: "9",
       frameworkRefs: [{ framework: "NGSS", code: "HS-LS1-5" }],

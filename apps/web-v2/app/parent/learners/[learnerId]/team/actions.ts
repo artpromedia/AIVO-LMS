@@ -3,11 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requirePageRole } from "@/lib/auth/server";
 import { parentCanAccessLearner } from "@/lib/db/repos";
-import {
-  createInvite,
-  revokeInvite,
-  type TeamRole,
-} from "@/lib/db/team-invites";
+import { createInvite, revokeInvite, type TeamRole } from "@/lib/db/team-invites";
 
 export type InviteFormState = { error: string | null; ok: boolean };
 

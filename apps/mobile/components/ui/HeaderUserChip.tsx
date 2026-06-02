@@ -4,14 +4,7 @@
 // high-contrast modes without restyling.
 
 import React from "react";
-import {
-  Pressable,
-  View,
-  Text,
-  StyleSheet,
-  type StyleProp,
-  type ViewStyle,
-} from "react-native";
+import { Pressable, View, Text, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { useSensoryPalette, useSensoryMode } from "@/context/SensoryModeProvider";
 import { fontFamilies } from "@/constants/typography";
 
@@ -23,13 +16,7 @@ interface HeaderUserChipProps {
   style?: StyleProp<ViewStyle>;
 }
 
-export function HeaderUserChip({
-  name,
-  subtitle,
-  initial,
-  onPress,
-  style,
-}: HeaderUserChipProps) {
+export function HeaderUserChip({ name, subtitle, initial, onPress, style }: HeaderUserChipProps) {
   const palette = useSensoryPalette();
   const { shadowStrength } = useSensoryMode();
   const letter = (initial ?? name.trim().charAt(0) ?? "?").toUpperCase();

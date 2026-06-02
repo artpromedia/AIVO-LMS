@@ -49,14 +49,10 @@ export default function () {
     plan: "Continue current intervention.",
     goalIds: [],
   };
-  const res = http.post(
-    `${BASE_URL}/api/bff/therapist/sessions`,
-    JSON.stringify(body),
-    {
-      headers: authHeaders(),
-      tags: { endpoint: "therapist-sessions" },
-    },
-  );
+  const res = http.post(`${BASE_URL}/api/bff/therapist/sessions`, JSON.stringify(body), {
+    headers: authHeaders(),
+    tags: { endpoint: "therapist-sessions" },
+  });
   expectOk(res, "therapist-sessions");
   sleep(sleepWithJitter(1, 0.5));
 }

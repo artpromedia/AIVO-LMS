@@ -124,9 +124,7 @@ export async function sendTemplateEmail(options: TemplateEmailOptions): Promise<
 // worker, (b) callers that explicitly bypass the queue (none right now),
 // and (c) tests that want to assert against the raw Postmark response.
 
-export async function _sendEmailDirect(
-  options: EmailOptions,
-): Promise<SendResult> {
+export async function _sendEmailDirect(options: EmailOptions): Promise<SendResult> {
   const pm = getClient();
 
   const result = await pm.sendEmail({
@@ -151,9 +149,7 @@ export async function _sendEmailDirect(
   };
 }
 
-export async function _sendTemplateEmailDirect(
-  options: TemplateEmailOptions,
-): Promise<SendResult> {
+export async function _sendTemplateEmailDirect(options: TemplateEmailOptions): Promise<SendResult> {
   const pm = getClient();
 
   const result = await pm.sendEmailWithTemplate({

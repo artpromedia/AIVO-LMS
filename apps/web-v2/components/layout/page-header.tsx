@@ -38,9 +38,7 @@ export function PageHeader({
         <h1 className="mt-1 font-iw-display text-3xl font-bold tracking-tight text-iw-ink">
           {title}
         </h1>
-        {description ? (
-          <p className="mt-1 max-w-2xl text-iw-ink-muted">{description}</p>
-        ) : null}
+        {description ? <p className="mt-1 max-w-2xl text-iw-ink-muted">{description}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
     </header>

@@ -9,10 +9,13 @@ import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card } from "@/components/ui";
 import { EmptyState, LoadingState } from "@aivo/mobile-ui";
-import { spacing, radius } from "@/constants/colors";
+import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
-interface S { id: string; gradeLevel?: string }
+interface S {
+  id: string;
+  gradeLevel?: string;
+}
 
 /**
  * Teacher classes (MOB-TCH-004) — mirror of web's /teacher/classes.
@@ -22,7 +25,7 @@ export default function TeacherClassesScreen() {
   const { t } = useTranslation();
   const palette = useSensoryPalette();
   const { data, isLoading } = useConnectedLearners();
-  const students = (data as S[] | undefined) ?? [];
+  const students = useMemo(() => (data as S[] | undefined) ?? [], [data]);
   const classes = useMemo(() => {
     const m = new Map<string, number>();
     for (const s of students) {
@@ -41,7 +44,10 @@ export default function TeacherClassesScreen() {
         <EmptyState
           icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
           title={t("teacherClasses.emptyTitle", "No classes yet")}
-          message={t("teacherClasses.emptyBody", "Students you teach will be grouped into classes here.")}
+          message={t(
+            "teacherClasses.emptyBody",
+            "Students you teach will be grouped into classes here.",
+          )}
         />
       ) : (
         <View style={{ gap: spacing.md }}>
@@ -49,7 +55,10 @@ export default function TeacherClassesScreen() {
             <Pressable
               key={grade}
               accessibilityRole="button"
-              accessibilityLabel={t("teacherClasses.grade", { grade, defaultValue: `Grade ${grade}` })}
+              accessibilityLabel={t("teacherClasses.grade", {
+                grade,
+                defaultValue: `Grade ${grade}`,
+              })}
               onPress={() => router.push(`/(teacher)/classes/${encodeURIComponent(grade)}` as Href)}
             >
               <Card tone="raised" style={styles.row}>
@@ -76,7 +85,13 @@ export default function TeacherClassesScreen() {
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: spacing.md },
-  iconWrap: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  iconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   name: { fontSize: 16, fontFamily: fontFamilies.bodyBold },
   meta: { fontSize: 13, fontFamily: fontFamilies.bodyRegular, marginTop: 2 },
 });

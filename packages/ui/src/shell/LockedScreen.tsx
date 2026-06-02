@@ -9,13 +9,7 @@
 import * as React from "react";
 import clsx from "clsx";
 import { Lock } from "lucide-react";
-import {
-  NAV_AREA_META,
-  ROLE_META,
-  getPermission,
-  type NavArea,
-  type Role,
-} from "@aivo/nav";
+import { NAV_AREA_META, ROLE_META, getPermission, type NavArea, type Role } from "@aivo/nav";
 import { AivoIcon } from "../icon/AivoIcon.js";
 import { NAV_ICON_TO_AIVO_ICON } from "./icon-map.js";
 
@@ -43,12 +37,7 @@ export function LockedScreen({
   const cta = perm.lockCta;
 
   return (
-    <div
-      className={clsx(
-        "min-h-[60vh] flex items-center justify-center px-4 py-12",
-        className,
-      )}
-    >
+    <div className={clsx("min-h-[60vh] flex items-center justify-center px-4 py-12", className)}>
       <div className="max-w-md w-full rounded-iw-card-lg bg-white/85 backdrop-blur-md border border-iw-border shadow-iw-soft p-8 text-center flex flex-col items-center gap-4">
         <div className="relative flex h-16 w-16 items-center justify-center rounded-iw-hero bg-[var(--aivo-color-aivoPurple-50,#f5f3ff)]">
           <AivoIcon

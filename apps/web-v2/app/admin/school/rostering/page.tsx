@@ -13,7 +13,9 @@ import { listRosterImportJobs, listSISConnections, listSchools } from "@/lib/db/
 export default async function Page() {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
   const t = await getTranslations("admin.school_rostering");
-  const schools = await listSchools(session.role === "platform_admin" ? undefined : session.tenantId);
+  const schools = await listSchools(
+    session.role === "platform_admin" ? undefined : session.tenantId,
+  );
   const connections = listSISConnections(session.tenantId);
   const jobs = listRosterImportJobs(session.tenantId).slice(0, 25);
 

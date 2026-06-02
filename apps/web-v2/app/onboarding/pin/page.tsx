@@ -29,11 +29,7 @@ export default function PinSetupPage() {
         title={t("title")}
         subtitle={t("subtitle")}
         reassurance={
-          <ReassuranceCard
-            tone="safety"
-            title={t("reassure_title")}
-            body={t("reassure_body")}
-          />
+          <ReassuranceCard tone="safety" title={t("reassure_title")} body={t("reassure_body")} />
         }
         actions={
           <>
@@ -102,10 +98,7 @@ function PinRing({
         }`}
       />
       {error ? (
-        <p
-          role="alert"
-          className="text-xs text-[var(--aivo-status-error)]"
-        >
+        <p role="alert" className="text-xs text-[var(--aivo-status-error)]">
           {error}
         </p>
       ) : null}

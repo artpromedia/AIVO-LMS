@@ -201,195 +201,197 @@ export default function TherapistSessionsScreen() {
       }}
     >
       <View style={{ width: contentWidth }}>
-      <Text style={styles.title}>{t("therapistSessions.title")}</Text>
+        <Text style={styles.title}>{t("therapistSessions.title")}</Text>
 
-      {clientsError ? (
-        <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{t("therapistSessions.loadError")}</Text>
-          <AivoButton
-            title={t("common.retry")}
-            onPress={() => refetch()}
-            variant="outline"
-            style={{ marginTop: spacing.sm }}
-          />
-        </View>
-      ) : clients.length === 0 ? (
-        <EmptyState
-          icon={<Ionicons name="calendar-outline" size={48} color={colors.textSecondary} />}
-          title={t("therapistSessions.noClientsTitle")}
-          message={t("therapistSessions.noClientsMessage")}
-        />
-      ) : (
-        <>
-          {/* Learner picker — chip row, since RN has no native <select>. */}
-          <Text style={styles.sectionLabel}>{t("therapistSessions.selectClient")}</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.chipRow}
-          >
-            {clients.map((c) => {
-              const active = c.id === selectedLearner;
-              return (
-                <Pressable
-                  key={c.id}
-                  onPress={() => setSelectedLearner(c.id)}
-                  style={[styles.chip, active && styles.chipActive]}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}
-                >
-                  <Text style={[styles.chipText, active && styles.chipTextActive]}>{c.name}</Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          {/* Tabs */}
-          <View style={styles.tabsRow} accessibilityRole="tablist">
-            {(["history", "log"] as const).map((value) => {
-              const active = tab === value;
-              return (
-                <Pressable
-                  key={value}
-                  onPress={() => setTab(value)}
-                  style={[styles.tabBtn, active && styles.tabBtnActive]}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: active }}
-                >
-                  <Text style={[styles.tabText, active && styles.tabTextActive]}>
-                    {value === "history"
-                      ? t("therapistSessions.historyTab")
-                      : t("therapistSessions.logTab")}
-                  </Text>
-                </Pressable>
-              );
-            })}
+        {clientsError ? (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorText}>{t("therapistSessions.loadError")}</Text>
+            <AivoButton
+              title={t("common.retry")}
+              onPress={() => refetch()}
+              variant="outline"
+              style={{ marginTop: spacing.sm }}
+            />
           </View>
-
-          {tab === "history" ? (
-            sessionsLoading ? (
-              <View style={{ paddingVertical: spacing.xl }}>
-                <ActivityIndicator color={colors.primary} />
-              </View>
-            ) : sessions.length === 0 ? (
-              <EmptyState
-                icon={<Ionicons name="time-outline" size={40} color={colors.textSecondary} />}
-                title={t("therapistSessions.emptyHistoryTitle")}
-                message={t("therapistSessions.emptyHistoryMessage", { name: selectedLearnerName })}
-              />
-            ) : (
-              sessions.map((s) => {
-                const tone = statusTone(s.status);
+        ) : clients.length === 0 ? (
+          <EmptyState
+            icon={<Ionicons name="calendar-outline" size={48} color={colors.textSecondary} />}
+            title={t("therapistSessions.noClientsTitle")}
+            message={t("therapistSessions.noClientsMessage")}
+          />
+        ) : (
+          <>
+            {/* Learner picker — chip row, since RN has no native <select>. */}
+            <Text style={styles.sectionLabel}>{t("therapistSessions.selectClient")}</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.chipRow}
+            >
+              {clients.map((c) => {
+                const active = c.id === selectedLearner;
                 return (
-                  <AivoCard key={s.id} style={styles.sessionCard}>
-                    <View style={styles.sessionHeader}>
-                      <Text style={styles.sessionSubject}>{s.subject}</Text>
-                      <View style={[styles.badge, { backgroundColor: tone.bg }]}>
-                        <Text style={[styles.badgeText, { color: tone.fg }]}>
-                          {s.status.replace(/_/g, " ")}
-                        </Text>
-                      </View>
-                    </View>
-                    <Text style={styles.sessionMeta}>
-                      {new Date(s.startedAt).toLocaleDateString()}
-                      {" • "}
-                      {s.contentType}
-                      {" • "}
-                      {formatDuration(s.durationSeconds, t)}
-                    </Text>
-                  </AivoCard>
+                  <Pressable
+                    key={c.id}
+                    onPress={() => setSelectedLearner(c.id)}
+                    style={[styles.chip, active && styles.chipActive]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                  >
+                    <Text style={[styles.chipText, active && styles.chipTextActive]}>{c.name}</Text>
+                  </Pressable>
                 );
-              })
-            )
-          ) : (
-            <AivoCard style={styles.formCard}>
-              <Text style={styles.formTitle}>{t("therapistSessions.logFormTitle")}</Text>
+              })}
+            </ScrollView>
 
-              <Text style={styles.label}>{t("therapistSessions.category")}</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.chipRow}
-              >
-                {CATEGORIES.map((c) => {
-                  const active = logCategory === c;
+            {/* Tabs */}
+            <View style={styles.tabsRow} accessibilityRole="tablist">
+              {(["history", "log"] as const).map((value) => {
+                const active = tab === value;
+                return (
+                  <Pressable
+                    key={value}
+                    onPress={() => setTab(value)}
+                    style={[styles.tabBtn, active && styles.tabBtnActive]}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected: active }}
+                  >
+                    <Text style={[styles.tabText, active && styles.tabTextActive]}>
+                      {value === "history"
+                        ? t("therapistSessions.historyTab")
+                        : t("therapistSessions.logTab")}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {tab === "history" ? (
+              sessionsLoading ? (
+                <View style={{ paddingVertical: spacing.xl }}>
+                  <ActivityIndicator color={colors.primary} />
+                </View>
+              ) : sessions.length === 0 ? (
+                <EmptyState
+                  icon={<Ionicons name="time-outline" size={40} color={colors.textSecondary} />}
+                  title={t("therapistSessions.emptyHistoryTitle")}
+                  message={t("therapistSessions.emptyHistoryMessage", {
+                    name: selectedLearnerName,
+                  })}
+                />
+              ) : (
+                sessions.map((s) => {
+                  const tone = statusTone(s.status);
                   return (
-                    <Pressable
-                      key={c}
-                      onPress={() => setLogCategory(c)}
-                      style={[styles.chip, active && styles.chipActive]}
-                    >
-                      <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                        {t(`therapistSessions.category_${c}`)}
+                    <AivoCard key={s.id} style={styles.sessionCard}>
+                      <View style={styles.sessionHeader}>
+                        <Text style={styles.sessionSubject}>{s.subject}</Text>
+                        <View style={[styles.badge, { backgroundColor: tone.bg }]}>
+                          <Text style={[styles.badgeText, { color: tone.fg }]}>
+                            {s.status.replace(/_/g, " ")}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text style={styles.sessionMeta}>
+                        {new Date(s.startedAt).toLocaleDateString()}
+                        {" • "}
+                        {s.contentType}
+                        {" • "}
+                        {formatDuration(s.durationSeconds, t)}
                       </Text>
-                    </Pressable>
+                    </AivoCard>
                   );
-                })}
-              </ScrollView>
+                })
+              )
+            ) : (
+              <AivoCard style={styles.formCard}>
+                <Text style={styles.formTitle}>{t("therapistSessions.logFormTitle")}</Text>
 
-              <View style={styles.row}>
-                <View style={{ flex: 1, marginRight: spacing.sm }}>
-                  <Text style={styles.label}>{t("therapistSessions.date")}</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={logDate}
-                    onChangeText={setLogDate}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor={colors.textSecondary}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
-                <View style={{ width: 110 }}>
-                  <Text style={styles.label}>{t("therapistSessions.durationMin")}</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={logDuration}
-                    onChangeText={setLogDuration}
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
-
-              <Text style={styles.label}>{t("therapistSessions.notes")}</Text>
-              <TextInput
-                style={[styles.input, styles.textarea]}
-                value={logNotes}
-                onChangeText={setLogNotes}
-                placeholder={t("therapistSessions.notesPlaceholder")}
-                placeholderTextColor={colors.textSecondary}
-                multiline
-                numberOfLines={4}
-              />
-
-              {submitMsg && (
-                <Text
-                  style={[
-                    styles.submitMsg,
-                    {
-                      color: submitMsg.type === "success" ? colors.success : colors.error,
-                      backgroundColor:
-                        (submitMsg.type === "success" ? colors.success : colors.error) + "12",
-                    },
-                  ]}
-                  accessibilityRole="alert"
+                <Text style={styles.label}>{t("therapistSessions.category")}</Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.chipRow}
                 >
-                  {submitMsg.text}
-                </Text>
-              )}
+                  {CATEGORIES.map((c) => {
+                    const active = logCategory === c;
+                    return (
+                      <Pressable
+                        key={c}
+                        onPress={() => setLogCategory(c)}
+                        style={[styles.chip, active && styles.chipActive]}
+                      >
+                        <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                          {t(`therapistSessions.category_${c}`)}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
 
-              <AivoButton
-                title={submitting ? t("common.saving") : t("therapistSessions.logSubmit")}
-                onPress={handleLogSession}
-                loading={submitting}
-                disabled={submitting || !selectedLearner}
-                size="lg"
-                style={{ marginTop: spacing.md }}
-              />
-            </AivoCard>
-          )}
-        </>
-      )}
+                <View style={styles.row}>
+                  <View style={{ flex: 1, marginRight: spacing.sm }}>
+                    <Text style={styles.label}>{t("therapistSessions.date")}</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={logDate}
+                      onChangeText={setLogDate}
+                      placeholder="YYYY-MM-DD"
+                      placeholderTextColor={colors.textSecondary}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  </View>
+                  <View style={{ width: 110 }}>
+                    <Text style={styles.label}>{t("therapistSessions.durationMin")}</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={logDuration}
+                      onChangeText={setLogDuration}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                </View>
+
+                <Text style={styles.label}>{t("therapistSessions.notes")}</Text>
+                <TextInput
+                  style={[styles.input, styles.textarea]}
+                  value={logNotes}
+                  onChangeText={setLogNotes}
+                  placeholder={t("therapistSessions.notesPlaceholder")}
+                  placeholderTextColor={colors.textSecondary}
+                  multiline
+                  numberOfLines={4}
+                />
+
+                {submitMsg && (
+                  <Text
+                    style={[
+                      styles.submitMsg,
+                      {
+                        color: submitMsg.type === "success" ? colors.success : colors.error,
+                        backgroundColor:
+                          (submitMsg.type === "success" ? colors.success : colors.error) + "12",
+                      },
+                    ]}
+                    accessibilityRole="alert"
+                  >
+                    {submitMsg.text}
+                  </Text>
+                )}
+
+                <AivoButton
+                  title={submitting ? t("common.saving") : t("therapistSessions.logSubmit")}
+                  onPress={handleLogSession}
+                  loading={submitting}
+                  disabled={submitting || !selectedLearner}
+                  size="lg"
+                  style={{ marginTop: spacing.md }}
+                />
+              </AivoCard>
+            )}
+          </>
+        )}
       </View>
     </ScrollView>
   );

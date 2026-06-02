@@ -9,13 +9,7 @@
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
-import {
-  FloatingMetricCard,
-  GlassCard,
-  InsightChip,
-  EmptyState,
-  ReassuranceCard,
-} from "@aivo/ui";
+import { FloatingMetricCard, GlassCard, InsightChip, EmptyState, ReassuranceCard } from "@aivo/ui";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { getTenantById } from "@/lib/db/repos";
 import { loadParentBillingOverview } from "@/lib/bff/billing-svc";
@@ -62,9 +56,7 @@ export default async function Page({
     >
       <header className="flex flex-col gap-2 mb-6">
         <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
-        <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
-          {t("title")}
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">{t("title")}</h1>
         <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
           {t("description", { name: tenant?.name ?? t("family_fallback") })}
         </p>
@@ -123,9 +115,7 @@ export default async function Page({
             density="comfortable"
             title={activePlan?.name ?? sub.planId}
             description={`Billing period ${new Date(sub.currentPeriodStartAt).toLocaleDateString()} – ${new Date(sub.currentPeriodEndAt).toLocaleDateString()}${
-              sub.trialEndAt
-                ? ` · trial ends ${new Date(sub.trialEndAt).toLocaleDateString()}`
-                : ""
+              sub.trialEndAt ? ` · trial ends ${new Date(sub.trialEndAt).toLocaleDateString()}` : ""
             }`}
             actions={
               <InsightChip tone={STATUS_TONE[sub.status] ?? "neutral"} size="md">
@@ -166,19 +156,13 @@ export default async function Page({
         <h2 className="text-xl font-semibold text-iw-text-strong">{t("recent_invoices")}</h2>
         {invoices.length === 0 ? (
           <GlassCard elevation="raised" density="comfortable">
-            <EmptyState
-              title={t("no_invoices_title")}
-              body={t("no_invoices_body")}
-            />
+            <EmptyState title={t("no_invoices_title")} body={t("no_invoices_body")} />
           </GlassCard>
         ) : (
           <GlassCard elevation="raised" density="comfortable" className="overflow-hidden">
             <ul className="divide-y divide-iw-border -mx-1">
               {invoices.map((i) => (
-                <li
-                  key={i.id}
-                  className="px-1 py-3 grid grid-cols-[1fr,auto] gap-2 items-center"
-                >
+                <li key={i.id} className="px-1 py-3 grid grid-cols-[1fr,auto] gap-2 items-center">
                   <div className="min-w-0">
                     <p className="font-semibold text-iw-text-strong tabular-nums">{i.number}</p>
                     <p className="text-xs text-iw-text-muted">

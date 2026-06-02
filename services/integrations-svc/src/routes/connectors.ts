@@ -1200,7 +1200,8 @@ export async function syncSchoology(
     }
     const usersData = (await usersRes.json()) as any;
     for (const u of usersData.user || []) {
-      const isTeacher = u.role_id != null && String(u.role_id) === String(usersData.teacher_role_id);
+      const isTeacher =
+        u.role_id != null && String(u.role_id) === String(usersData.teacher_role_id);
       const type = isTeacher ? "teacher" : "student";
       await upsert(String(u.uid ?? u.id), type, type === "student" ? "learner" : "teacher", {
         name: u.name_display || `${u.name_first || ""} ${u.name_last || ""}`.trim(),

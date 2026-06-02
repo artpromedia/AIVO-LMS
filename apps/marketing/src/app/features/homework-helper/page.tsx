@@ -141,9 +141,7 @@ export default async function Page() {
               {t("explanation_text")}
               <span className="font-semibold"> multiplication as repeated addition.</span>
             </div>
-            <p className="text-xs text-slate-500">
-              {t("mastery_updated")}
-            </p>
+            <p className="text-xs text-slate-500">{t("mastery_updated")}</p>
           </div>
         }
       />
@@ -162,7 +160,9 @@ export default async function Page() {
         mockup={
           <div className="space-y-2">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-3 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">{t("recommended_next_label")}</p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">
+                {t("recommended_next_label")}
+              </p>
               <h3 className="mt-1 font-heading text-base font-bold">
                 {t("recommended_lesson_title")}
               </h3>

@@ -1696,6 +1696,8 @@ for (const [locale, subtree] of Object.entries(ADMIN)) {
   json.admin = { ...(json.admin ?? {}), ...subtree };
   writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
   written += 1;
-  console.log(`seed-admin-B_school_core-i18n: merged admin B_school_core namespaces → messages/${locale}.json`);
+  console.log(
+    `seed-admin-B_school_core-i18n: merged admin B_school_core namespaces → messages/${locale}.json`,
+  );
 }
 console.log(`\nseed-admin-B_school_core-i18n: done — ${written} locale catalogs updated.`);

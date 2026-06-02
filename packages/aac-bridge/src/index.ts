@@ -44,11 +44,7 @@ export { CoughDropSync } from "./coughdrop/CoughDropSync.js";
 export type { SyncStatus, SyncState } from "./coughdrop/CoughDropSync.js";
 
 // Core-word vocabulary (board anchoring)
-export {
-  coreWordsForLocale,
-  resolveSymbolUrl,
-  CORE_GRID_COLS,
-} from "./vocabulary/coreWords.js";
+export { coreWordsForLocale, resolveSymbolUrl, CORE_GRID_COLS } from "./vocabulary/coreWords.js";
 export type { CoreWord } from "./vocabulary/coreWords.js";
 
 // Eye-gaze pipeline (§9.3)

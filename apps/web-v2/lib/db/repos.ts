@@ -366,10 +366,7 @@ export async function uploadIEPDocument(input: {
   return doc;
 }
 
-export async function deleteIEPForLearner(
-  learnerId: string,
-  tenantId: string,
-): Promise<boolean> {
+export async function deleteIEPForLearner(learnerId: string, tenantId: string): Promise<boolean> {
   const removed = await getPersistence().compliance.deleteIEP(learnerId, tenantId);
   if (!removed) return false;
   const learner = await getLearner(learnerId, tenantId);
@@ -576,8 +573,7 @@ export async function cloneBrainFromBaseline(
     learnerId,
     tenantId,
   );
-  const latest =
-    active && active.status === "complete" && active.summary ? active : null;
+  const latest = active && active.status === "complete" && active.summary ? active : null;
   if (!latest || !latest.summary) return null;
   const prepared = await prepareBrainCloneFromSummary(learnerId, tenantId, latest.summary);
   if (!prepared) return null;
@@ -599,9 +595,7 @@ export async function approveBrainClone(
   const existing = await getBrainProfile(learnerId, tenantId);
   if (!existing) return null;
   if (existing.cloneStage === "pre_clone") return null;
-  const status: LearnerBrainProfile["approvalStatus"] = options.amended
-    ? "amended"
-    : "approved";
+  const status: LearnerBrainProfile["approvalStatus"] = options.amended ? "amended" : "approved";
   const next: LearnerBrainProfile = {
     ...existing,
     approvedByParent: true,
@@ -707,7 +701,7 @@ export async function createBaseline(input: {
   const canCallLlm = llmFlag && parentAssessment != null && parentAssessment.submittedAt != null;
   const discoveryFlag = baselineDiscoveryEnabled();
   const canCallDiscovery = discoveryFlag && canCallLlm;
-  // eslint-disable-next-line no-console
+
   console.error(
     `[BASELINE_DIAG] start baselineId=${baseline.id} learnerId=${input.learnerId} llmFlag=${llmFlag} discoveryFlag=${discoveryFlag} canCallLlm=${canCallLlm} canCallDiscovery=${canCallDiscovery} hasParentAssessment=${parentAssessment != null} submittedAt=${parentAssessment?.submittedAt ?? "null"} hasBrainProfile=${brainProfile != null} subjects=${subjects.map((s) => s.slug).join(",")} skillsCount=${skills.length}`,
   );
@@ -741,16 +735,15 @@ export async function createBaseline(input: {
       const chapter = ADVENTURE_CHAPTERS[i]!;
       const r = settled[i]!;
       if (r.status === "fulfilled" && r.value.ok) {
-        const { questions: mapped, nextOrder } =
-          mapDiscoveryActivitiesToBaselineQuestions({
-            baselineId: baseline.id,
-            chapter,
-            activities: r.value.response.activities,
-            subjects,
-            skills,
-            accommodationTags,
-            startOrder,
-          });
+        const { questions: mapped, nextOrder } = mapDiscoveryActivitiesToBaselineQuestions({
+          baselineId: baseline.id,
+          chapter,
+          activities: r.value.response.activities,
+          subjects,
+          skills,
+          accommodationTags,
+          startOrder,
+        });
         if (mapped.length > 0) {
           modelUsed ??= r.value.response.model;
           collected.push(...mapped);
@@ -792,7 +785,6 @@ export async function createBaseline(input: {
         );
       }
     } else {
-      // eslint-disable-next-line no-console
       console.error(
         `[BASELINE_DIAG] discovery_total_failure baselineId=${baseline.id} failures=${JSON.stringify(chapterFailures)}`,
       );
@@ -808,7 +800,6 @@ export async function createBaseline(input: {
       );
     }
     if (discoverySucceeded) {
-      // eslint-disable-next-line no-console
       console.error(
         `[BASELINE_DIAG] discovery_succeeded baselineId=${baseline.id} questions=${questions.length} chapters=${chaptersUsed.join(",")}`,
       );
@@ -820,7 +811,7 @@ export async function createBaseline(input: {
       parent_assessment: parentAssessment!.answers as unknown as Record<string, unknown>,
       functioning_level: brainProfile?.state.functioningLevel ?? "STANDARD",
     });
-    // eslint-disable-next-line no-console
+
     console.error(
       `[BASELINE_DIAG] llm_call_result baselineId=${baseline.id} ok=${llmResult.ok} ${llmResult.ok ? `questions=${llmResult.response.questions.length} model=${llmResult.response.model}` : `reason=${llmResult.reason} message=${(llmResult as { message?: string }).message ?? ""}`}`,
     );
@@ -832,7 +823,7 @@ export async function createBaseline(input: {
         skills,
         accommodationTags,
       });
-      // eslint-disable-next-line no-console
+
       console.error(
         `[BASELINE_DIAG] llm_mapped baselineId=${baseline.id} mappedCount=${mapped.length} llmSubjects=${[...new Set(llmResult.response.questions.map((q) => q.subject))].join(",")} subjectSlugs=${subjects.map((s) => s.slug).join(",")}`,
       );
@@ -969,9 +960,7 @@ export async function createBaseline(input: {
  * same accommodation hints as the fallback questions, keeping the
  * downstream player render identical.
  */
-function accommodationTagsForBaseline(
-  brainProfile: LearnerBrainProfile | null,
-): string[] {
+function accommodationTagsForBaseline(brainProfile: LearnerBrainProfile | null): string[] {
   if (!brainProfile) return [];
   const s = brainProfile.state;
   const tags = new Set<string>();
@@ -1193,11 +1182,7 @@ export async function completeBaseline(
   // missing pre-clone profile) we bail out atomically — no skill-mastery,
   // mastery-map, learning-path, review-schedule, or status mutations land in
   // the store, so the parent can simply retry without observable partial state.
-  const preparedClone = await prepareBrainCloneFromSummary(
-    baseline.learnerId,
-    tenantId,
-    summary,
-  );
+  const preparedClone = await prepareBrainCloneFromSummary(baseline.learnerId, tenantId, summary);
   if (!preparedClone) return null;
 
   // --- Commit (atomic from this point: validation has already passed) ---
@@ -2288,9 +2273,7 @@ export async function retryLessonRun(
   }
   if (run.status !== "failed" && run.status !== "generating") {
     // Not retryable from this state — surface a precondition error to caller.
-    const plan = run.lessonPlanId
-      ? await runStore.getPlanById(run.lessonPlanId, tenantId)
-      : null;
+    const plan = run.lessonPlanId ? await runStore.getPlanById(run.lessonPlanId, tenantId) : null;
     return { ok: false, code: "not_retryable", lessonRun: run, plan };
   }
   const subject = store.subjects.get(run.subjectId);
@@ -2724,10 +2707,7 @@ export async function createCurriculumUpload(input: {
 }
 
 /** Delete an upload by id, tenant-scoped. Returns true if removed. */
-export async function deleteCurriculumUpload(
-  uploadId: string,
-  tenantId: string,
-): Promise<boolean> {
+export async function deleteCurriculumUpload(uploadId: string, tenantId: string): Promise<boolean> {
   assertLiveConfigured();
   if (isLiveCurriculum()) {
     return tutorDeleteCurriculum(uploadId);
@@ -3088,11 +3068,7 @@ export async function listConsentsForLearner(
   learnerId: string,
   tenantId: string,
 ): Promise<ConsentRecord[]> {
-  return getPersistence().compliance.listConsentsForLearner(
-    parentUserId,
-    learnerId,
-    tenantId,
-  );
+  return getPersistence().compliance.listConsentsForLearner(parentUserId, learnerId, tenantId);
 }
 
 export async function getActiveConsentForUser(
@@ -4824,9 +4800,7 @@ export async function markNotificationsRead(
   return getPersistence().notifications.markRead({ userId, tenantId, ids });
 }
 
-export async function listDeliveriesFor(
-  notificationId: string,
-): Promise<NotificationDelivery[]> {
+export async function listDeliveriesFor(notificationId: string): Promise<NotificationDelivery[]> {
   return getPersistence().notifications.listDeliveries(notificationId);
 }
 
@@ -5742,9 +5716,7 @@ export type DistrictLearnerRow = {
   hasIep: boolean;
 };
 
-export async function listDistrictLearners(
-  tenantIds: string[],
-): Promise<DistrictLearnerRow[]> {
+export async function listDistrictLearners(tenantIds: string[]): Promise<DistrictLearnerRow[]> {
   const learners = await listLearnersForTenants(tenantIds);
   const iepLearnerIds = new Set(Array.from(db().iepDocuments.values()).map((d) => d.learnerId));
   return learners.map((l) => {
@@ -5982,8 +5954,7 @@ export async function getSchoolDashboard(
   const store = db();
   const tenant = getTenantById(tenantId);
   const schools = await listSchools(tenantId);
-  const school =
-    schools.find((s) => (schoolId ? s.id === schoolId : true)) ?? schools[0] ?? null;
+  const school = schools.find((s) => (schoolId ? s.id === schoolId : true)) ?? schools[0] ?? null;
 
   const learners = Array.from(store.learnerProfiles.values()).filter(
     (l) => l.tenantId === tenantId,
@@ -6010,8 +5981,7 @@ export async function getSchoolDashboard(
 
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const moderationFlagged7d = Array.from(store.moderationEvents.values()).filter(
-    (m) =>
-      m.tenantId === tenantId && new Date(m.createdAt).getTime() >= sevenDaysAgo,
+    (m) => m.tenantId === tenantId && new Date(m.createdAt).getTime() >= sevenDaysAgo,
   ).length;
 
   // Count UNIQUE learners with at least one consent record on file —
@@ -6027,21 +5997,19 @@ export async function getSchoolDashboard(
   const consentCompletePct =
     learners.length === 0
       ? 100
-      : Math.min(
-          100,
-          Math.round((consentedLearners.size / learners.length) * 100),
-        );
+      : Math.min(100, Math.round((consentedLearners.size / learners.length) * 100));
 
   // License pool — use tenant.seatLimit when present, fall back to learner+staff.
   const totalSeats =
     (tenant as { seatLimit?: number } | null)?.seatLimit ?? learners.length + staff.length;
   const usedSeats = learners.length + staff.length;
-  const utilizationPct =
-    totalSeats === 0 ? 0 : Math.round((usedSeats / totalSeats) * 100);
+  const utilizationPct = totalSeats === 0 ? 0 : Math.round((usedSeats / totalSeats) * 100);
 
   // Rostering — last successful job if any, else "unknown".
   const rosteringJobs = Array.from(store.aiGenerationJobs?.values?.() ?? []).filter(
-    (j) => (j as { tenantId?: string }).tenantId === tenantId && (j as { kind?: string }).kind === "rostering_import",
+    (j) =>
+      (j as { tenantId?: string }).tenantId === tenantId &&
+      (j as { kind?: string }).kind === "rostering_import",
   );
   rosteringJobs.sort((a, b) => {
     const ta = new Date((a as { updatedAt?: string }).updatedAt ?? 0).getTime();
@@ -6125,8 +6093,7 @@ export async function getSchoolReport(
 ): Promise<SchoolReportPayload> {
   const store = db();
   const endIso = opts.endIso ?? new Date().toISOString();
-  const startIso =
-    opts.startIso ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const startIso = opts.startIso ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const startMs = new Date(startIso).getTime();
   const endMs = new Date(endIso).getTime();
 
@@ -6147,15 +6114,18 @@ export async function getSchoolReport(
       .filter((c) => c.tenantId === tenantId && c.learnerId)
       .map((c) => c.learnerId as string),
   );
-  const iepByLearner = new Set(
-    Array.from(store.iepDocuments.values()).map((d) => d.learnerId),
-  );
+  const iepByLearner = new Set(Array.from(store.iepDocuments.values()).map((d) => d.learnerId));
 
   const lessonRunsByLearner = new Map<string, number>();
   const lessonRunsInWindowByLearner = new Map<string, number>();
   const lastActiveByLearner = new Map<string, string>();
   for (const lr of Array.from(store.lessonRuns?.values?.() ?? [])) {
-    const t = lr as { learnerId?: string; createdAt?: string; completedAt?: string | null; tenantId?: string };
+    const t = lr as {
+      learnerId?: string;
+      createdAt?: string;
+      completedAt?: string | null;
+      tenantId?: string;
+    };
     if (t.tenantId !== tenantId || !t.learnerId) continue;
     lessonRunsByLearner.set(t.learnerId, (lessonRunsByLearner.get(t.learnerId) ?? 0) + 1);
     const tMs = new Date(t.createdAt ?? 0).getTime();
@@ -6173,7 +6143,7 @@ export async function getSchoolReport(
 
   const rows: SchoolReportRow[] = learners.map((l) => {
     const cls = enrollmentByLearner.get(l.id);
-    const classroom = cls ? classroomById.get(cls) ?? null : null;
+    const classroom = cls ? (classroomById.get(cls) ?? null) : null;
     return {
       learnerId: l.id,
       learnerName: l.displayName ?? l.id,
@@ -6350,9 +6320,7 @@ export function listTherapistCaseload(
     if (!l || l.tenantId !== tenantId) continue;
     out.push({
       learner: l,
-      goals: (goalsByLearner.get(id) ?? []).sort((a, b) =>
-        a.updatedAt < b.updatedAt ? 1 : -1,
-      ),
+      goals: (goalsByLearner.get(id) ?? []).sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
       lastSession: lastSessionByLearner.get(id) ?? null,
       nextSessionIso: null,
     });
@@ -6410,10 +6378,7 @@ export function updateIepGoalProgress(
   if (!g || g.tenantId !== tenantId) return null;
   const clamped = Math.max(0, Math.min(100, value));
   g.progressPct = clamped;
-  g.dataPoints = [
-    ...g.dataPoints,
-    { date: nowIso(), value: clamped, note },
-  ].slice(-50);
+  g.dataPoints = [...g.dataPoints, { date: nowIso(), value: clamped, note }].slice(-50);
   g.updatedAt = nowIso();
   if (clamped >= 100 && g.status === "active") g.status = "met";
   return g;
@@ -6604,16 +6569,14 @@ export function progressIepAiDraft(
 ): import("./types").IepAiDraftRecord | null {
   const d = db().iepAiDrafts.get(id);
   if (!d || d.tenantId !== tenantId) return null;
-  const allowed: Record<
-    import("./types").IepAiDraftStatus,
-    import("./types").IepAiDraftStatus[]
-  > = {
-    ai_draft: ["teacher_review", "archived"],
-    teacher_review: ["admin_approved", "ai_draft", "archived"],
-    admin_approved: ["active", "archived"],
-    active: ["archived"],
-    archived: [],
-  };
+  const allowed: Record<import("./types").IepAiDraftStatus, import("./types").IepAiDraftStatus[]> =
+    {
+      ai_draft: ["teacher_review", "archived"],
+      teacher_review: ["admin_approved", "ai_draft", "archived"],
+      admin_approved: ["active", "archived"],
+      active: ["archived"],
+      archived: [],
+    };
   if (!allowed[d.status].includes(next)) return null;
   d.status = next;
   d.updatedAt = nowIso();
@@ -6690,8 +6653,9 @@ export async function getGradebookDetail(
   }
   rows.sort((a, b) => {
     const order = { mastered: 0, secure: 1, developing: 2, introduced: 3, unattempted: 4 };
-    return (order[a.level] ?? 5) - (order[b.level] ?? 5) ||
-      a.subjectName.localeCompare(b.subjectName);
+    return (
+      (order[a.level] ?? 5) - (order[b.level] ?? 5) || a.subjectName.localeCompare(b.subjectName)
+    );
   });
   const summary = {
     mastered: rows.filter((r) => r.level === "mastered").length,
@@ -6738,8 +6702,7 @@ export function getBaselinePipelineMetrics(
   opts: { startIso?: string; endIso?: string } = {},
 ): BaselinePipelineMetrics {
   const endIso = opts.endIso ?? new Date().toISOString();
-  const startIso =
-    opts.startIso ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const startIso = opts.startIso ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const startMs = new Date(startIso).getTime();
   const endMs = new Date(endIso).getTime();
 
@@ -6747,9 +6710,7 @@ export function getBaselinePipelineMetrics(
   // dedicated baseline_item_audits map yet (the postgres table from
   // Sprint 4 is the production surface); for now we aggregate from
   // moderationEvents which captures the same shape during local dev.
-  const rows: BaselineAuditLike[] = Array.from(
-    db().moderationEvents.values(),
-  ).filter((m) => {
+  const rows: BaselineAuditLike[] = Array.from(db().moderationEvents.values()).filter((m) => {
     const t = m as { createdAt?: string };
     const ms = new Date(t.createdAt ?? 0).getTime();
     return ms >= startMs && ms <= endMs;

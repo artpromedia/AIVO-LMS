@@ -12,7 +12,12 @@ import { EmptyState, LoadingState } from "@aivo/mobile-ui";
 import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
-interface S { id: string; firstName?: string; lastName?: string; gradeLevel?: string }
+interface S {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  gradeLevel?: string;
+}
 
 /**
  * Teacher class detail (MOB-TCH-005) — mirror of web's
@@ -51,9 +56,13 @@ export default function TeacherClassDetailScreen() {
             >
               <Card tone="raised" style={styles.row}>
                 <View style={[styles.avatar, { backgroundColor: palette.accentSoft }]}>
-                  <Text style={[styles.initial, { color: palette.accent }]}>{s.firstName?.[0] ?? "S"}</Text>
+                  <Text style={[styles.initial, { color: palette.accent }]}>
+                    {s.firstName?.[0] ?? "S"}
+                  </Text>
                 </View>
-                <Text style={[styles.name, { color: palette.ink }]}>{s.firstName} {s.lastName}</Text>
+                <Text style={[styles.name, { color: palette.ink }]}>
+                  {s.firstName} {s.lastName}
+                </Text>
                 <Ionicons name="chevron-forward" size={18} color={palette.inkMuted} />
               </Card>
             </Pressable>
@@ -66,7 +75,13 @@ export default function TeacherClassDetailScreen() {
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: spacing.md },
-  avatar: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   initial: { fontSize: 16, fontFamily: fontFamilies.displayBold },
   name: { flex: 1, fontSize: 15, fontFamily: fontFamilies.bodyBold },
 });

@@ -2,12 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
-import {
-  AssessmentShell,
-  SubmittedHero,
-  ReassuranceCard,
-  InsightChip,
-} from "@aivo/ui";
+import { AssessmentShell, SubmittedHero, ReassuranceCard, InsightChip } from "@aivo/ui";
 import {
   getIEPForLearner,
   getLearner,
@@ -27,7 +22,7 @@ export default async function AssessmentSubmittedPage({
   const t = await getTranslations("parent.learner_assessment_submitted");
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   const learner = await getLearner(learnerId, session.tenantId);
@@ -66,10 +61,9 @@ export default async function AssessmentSubmittedPage({
       }
     >
       <SubmittedHero
-        eyebrow={`Parent assessment submitted on ${new Date(assessment.submittedAt ?? Date.now()).toLocaleDateString(
-          undefined,
-          { year: "numeric", month: "short", day: "numeric" },
-        )}`}
+        eyebrow={`Parent assessment submitted on ${new Date(
+          assessment.submittedAt ?? Date.now(),
+        ).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}`}
         title={`Thanks — AIVO is set up for ${learner.preferredName || learner.firstName}`}
         body={
           iepSkipped
@@ -81,7 +75,16 @@ export default async function AssessmentSubmittedPage({
         next={[
           {
             icon: (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+                aria-hidden="true"
+              >
                 <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
               </svg>
             ),
@@ -89,18 +92,35 @@ export default async function AssessmentSubmittedPage({
           },
           {
             icon: (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+                aria-hidden="true"
+              >
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
             ),
-            label:
-              iepConfirmed
-                ? `We'll apply ${supportsCount} support${supportsCount === 1 ? "" : "s"} from the IEP to every lesson.`
-                : "We'll apply sensory + pacing supports based on your assessment.",
+            label: iepConfirmed
+              ? `We'll apply ${supportsCount} support${supportsCount === 1 ? "" : "s"} from the IEP to every lesson.`
+              : "We'll apply sensory + pacing supports based on your assessment.",
           },
           {
             icon: (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+                aria-hidden="true"
+              >
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
@@ -108,9 +128,7 @@ export default async function AssessmentSubmittedPage({
             label: "You'll see a calm progress report as your learner moves through.",
           },
         ]}
-        primary={
-          <SeeBaselineCta href={`/parent/learners/${learner.id}/baseline/pending`} />
-        }
+        primary={<SeeBaselineCta href={`/parent/learners/${learner.id}/baseline/pending`} />}
         secondary={
           <Link
             href={`/parent/learners/${learner.id}`}

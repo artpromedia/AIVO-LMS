@@ -24,9 +24,21 @@ export const dynamic = "force-dynamic";
 
 const NAV = [
   { href: "/admin/platform", label: "Overview", icon: <Building2 className="h-4 w-4" /> },
-  { href: "/admin/platform/feature-flags", label: "Feature flags", icon: <Flag className="h-4 w-4" /> },
-  { href: "/admin/platform/audit-logs", label: "Audit logs", icon: <FileText className="h-4 w-4" /> },
-  { href: "/admin/platform/settings", label: "Settings", icon: <SettingsIcon className="h-4 w-4" /> },
+  {
+    href: "/admin/platform/feature-flags",
+    label: "Feature flags",
+    icon: <Flag className="h-4 w-4" />,
+  },
+  {
+    href: "/admin/platform/audit-logs",
+    label: "Audit logs",
+    icon: <FileText className="h-4 w-4" />,
+  },
+  {
+    href: "/admin/platform/settings",
+    label: "Settings",
+    icon: <SettingsIcon className="h-4 w-4" />,
+  },
 ];
 
 function riskTone(band: FlagMeta["riskBand"]): "success" | "warning" | "danger" {
@@ -77,9 +89,9 @@ export default async function PlatformFeatureFlagsPage() {
 
   const env = (process.env ?? {}) as Record<string, string | undefined>;
   const resolved = resolveEnterpriseFlags(env);
-  const all: Array<FlagMeta & { active: boolean }> = Object.values(
-    ENTERPRISE_FLAG_META,
-  ).map((m) => ({ ...m, active: resolved[m.key as EnterpriseFlagKey] }));
+  const all: Array<FlagMeta & { active: boolean }> = Object.values(ENTERPRISE_FLAG_META).map(
+    (m) => ({ ...m, active: resolved[m.key as EnterpriseFlagKey] }),
+  );
   const grouped = {
     ai: all.filter((m) => m.surface === "ai"),
     enterprise: all.filter((m) => m.surface === "enterprise"),

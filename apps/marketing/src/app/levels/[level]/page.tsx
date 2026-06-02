@@ -56,7 +56,9 @@ export default async function LevelPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("whats_included")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+          {t("whats_included")}
+        </h2>
         <ul className="space-y-2">
           {lvl.features.map((f) => (
             <li key={f} className="flex items-start gap-3 text-slate-700 font-body">
@@ -88,7 +90,9 @@ export default async function LevelPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("sample_activities")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+          {t("sample_activities")}
+        </h2>
         <ul className="space-y-2">
           {lvl.sample.map((s) => (
             <li key={s} className="flex items-start gap-3 text-slate-700 font-body">

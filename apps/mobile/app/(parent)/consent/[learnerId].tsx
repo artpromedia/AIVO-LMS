@@ -44,7 +44,12 @@ export default function ParentLearnerConsentScreen() {
         <LoadingState />
       ) : (
         <View style={{ gap: spacing.md }}>
-          <View style={[styles.coppa, { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft, borderColor: palette.border }]}>
+          <View
+            style={[
+              styles.coppa,
+              { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft, borderColor: palette.border },
+            ]}
+          >
             <Ionicons name="information-circle" size={18} color={palette.primary} />
             <Text style={[styles.coppaText, { color: palette.ink }]}>
               {t("parentConsent.coppa", {
@@ -56,13 +61,19 @@ export default function ParentLearnerConsentScreen() {
           {TYPES.map((ct) => (
             <Card key={ct.key} tone="raised" style={styles.row}>
               <View style={{ flex: 1, paddingRight: spacing.sm }}>
-                <Text style={[styles.label, { color: palette.ink }]}>{t(`parentConsent.${ct.key}`, ct.label)}</Text>
-                <Text style={[styles.desc, { color: palette.inkMuted }]}>{t(`parentConsent.${ct.key}Desc`, ct.desc)}</Text>
+                <Text style={[styles.label, { color: palette.ink }]}>
+                  {t(`parentConsent.${ct.key}`, ct.label)}
+                </Text>
+                <Text style={[styles.desc, { color: palette.inkMuted }]}>
+                  {t(`parentConsent.${ct.key}Desc`, ct.desc)}
+                </Text>
               </View>
               <Switch
                 value={granted(ct.key)}
                 disabled={setConsent.isPending}
-                onValueChange={(v) => setConsent.mutate({ consentType: ct.key, learnerId: id, granted: v })}
+                onValueChange={(v) =>
+                  setConsent.mutate({ consentType: ct.key, learnerId: id, granted: v })
+                }
                 trackColor={{ false: palette.border, true: palette.primary }}
                 thumbColor={palette.bgRaised}
                 accessibilityLabel={t(`parentConsent.${ct.key}`, ct.label)}
@@ -76,7 +87,14 @@ export default function ParentLearnerConsentScreen() {
 }
 
 const styles = StyleSheet.create({
-  coppa: { flexDirection: "row", alignItems: "flex-start", gap: 8, padding: spacing.md, borderRadius: radius.lg, borderWidth: 1 },
+  coppa: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+  },
   coppaText: { flex: 1, fontSize: 13, fontFamily: fontFamilies.bodySemiBold, lineHeight: 19 },
   row: { flexDirection: "row", alignItems: "center" },
   label: { fontSize: 15, fontFamily: fontFamilies.bodyBold },

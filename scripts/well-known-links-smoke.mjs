@@ -83,9 +83,7 @@ if (aasa) {
   } else {
     ok(`AASA carries the production bundle id`);
   }
-  const allComponents = details.flatMap((d) =>
-    (d.components ?? []).map((c) => c["/"]),
-  );
+  const allComponents = details.flatMap((d) => (d.components ?? []).map((c) => c["/"]));
   for (const required of REQUIRED_AASA_PATHS) {
     if (!allComponents.includes(required)) {
       fail(`AASA missing required path "${required}"`);
@@ -103,9 +101,7 @@ if (assetlinks) {
       (entry) => entry?.target?.package_name === REQUIRED_ANDROID_PACKAGE,
     );
     if (!found) {
-      fail(
-        `assetlinks.json missing package_name "${REQUIRED_ANDROID_PACKAGE}"`,
-      );
+      fail(`assetlinks.json missing package_name "${REQUIRED_ANDROID_PACKAGE}"`);
     } else {
       ok(`assetlinks.json carries the production package name`);
       const fps = found.target?.sha256_cert_fingerprints ?? [];

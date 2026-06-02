@@ -140,7 +140,9 @@ export default async function Page() {
                         {row.scored > 0 ? row.pValue.toFixed(2) : "—"}
                       </td>
                       <td className="p-3 text-right text-aivo-ink-soft">
-                        {row.medianLatencyMs !== null ? `${(row.medianLatencyMs / 1000).toFixed(1)}s` : "—"}
+                        {row.medianLatencyMs !== null
+                          ? `${(row.medianLatencyMs / 1000).toFixed(1)}s`
+                          : "—"}
                       </td>
                       <td className="p-3 text-right text-aivo-ink-soft">
                         {row.seedTheta.toFixed(2)}
@@ -172,7 +174,9 @@ export default async function Page() {
                           )
                         ) : (
                           <div className="flex flex-col gap-1">
-                            {row.recommendRetire ? <Badge tone="danger">{t("status_retire")}</Badge> : null}
+                            {row.recommendRetire ? (
+                              <Badge tone="danger">{t("status_retire")}</Badge>
+                            ) : null}
                             {row.defectReasons.map((d) => (
                               <Badge key={d} tone="warning">
                                 {DEFECT_LABELS[d] ?? d}
