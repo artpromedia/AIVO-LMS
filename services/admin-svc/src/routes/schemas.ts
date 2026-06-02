@@ -453,3 +453,183 @@ export const getAdminSvcSearchSchema = {
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject },
 } as const;
+
+// ---------------------------------------------------------------------------
+// Sprint 6: Learner Import schemas
+// ---------------------------------------------------------------------------
+
+const schoolIdParam = {
+  type: "object",
+  required: ["schoolId"],
+  additionalProperties: true,
+  properties: { schoolId: { type: "string" } },
+} as const;
+
+export const postAdminSchoolsLearnerImportValidateSchema = {
+  tags: ["LearnerImport"],
+  operationId: "postAdminSchoolsLearnerImportValidate",
+  summary: "POST /admin/schools/:schoolId/learners/import/validate",
+  params: schoolIdParam,
+  body: passthroughObject,
+  response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const postAdminSchoolsLearnerImportRunSchema = {
+  tags: ["LearnerImport"],
+  operationId: "postAdminSchoolsLearnerImportRun",
+  summary: "POST /admin/schools/:schoolId/learners/import/run",
+  params: schoolIdParam,
+  body: passthroughObject,
+  response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const getAdminSchoolsLearnerImportJobSchema = {
+  tags: ["LearnerImport"],
+  operationId: "getAdminSchoolsLearnerImportJob",
+  summary: "GET /admin/schools/:schoolId/learners/import/:jobId",
+  params: {
+    type: "object",
+    required: ["schoolId", "jobId"],
+    additionalProperties: true,
+    properties: { schoolId: { type: "string" }, jobId: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse, 404: errorResponse },
+} as const;
+
+export const getAdminSchoolsLearnerImportTemplateSchema = {
+  tags: ["LearnerImport"],
+  operationId: "getAdminSchoolsLearnerImportTemplate",
+  summary: "GET /admin/schools/:schoolId/learners/import/template",
+  params: schoolIdParam,
+  response: { 200: { type: "string" }, 401: errorResponse, 403: errorResponse },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Sprint 6: Classroom schemas
+// ---------------------------------------------------------------------------
+
+export const getAdminSchoolsClassroomsSchema = {
+  tags: ["Classrooms"],
+  operationId: "getAdminSchoolsClassrooms",
+  summary: "GET /admin/schools/:schoolId/classrooms",
+  params: schoolIdParam,
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const postAdminSchoolsClassroomsSchema = {
+  tags: ["Classrooms"],
+  operationId: "postAdminSchoolsClassrooms",
+  summary: "POST /admin/schools/:schoolId/classrooms",
+  params: schoolIdParam,
+  body: passthroughObject,
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+  },
+} as const;
+
+export const getAdminSchoolsClassroomByIdSchema = {
+  tags: ["Classrooms"],
+  operationId: "getAdminSchoolsClassroomById",
+  summary: "GET /admin/schools/:schoolId/classrooms/:id",
+  params: {
+    type: "object",
+    required: ["schoolId", "id"],
+    additionalProperties: true,
+    properties: { schoolId: { type: "string" }, id: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse, 404: errorResponse },
+} as const;
+
+export const patchAdminSchoolsClassroomByIdSchema = {
+  tags: ["Classrooms"],
+  operationId: "patchAdminSchoolsClassroomById",
+  summary: "PATCH /admin/schools/:schoolId/classrooms/:id",
+  params: {
+    type: "object",
+    required: ["schoolId", "id"],
+    additionalProperties: true,
+    properties: { schoolId: { type: "string" }, id: { type: "string" } },
+  },
+  body: passthroughObject,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse, 404: errorResponse },
+} as const;
+
+export const deleteAdminSchoolsClassroomByIdSchema = {
+  tags: ["Classrooms"],
+  operationId: "deleteAdminSchoolsClassroomById",
+  summary: "DELETE /admin/schools/:schoolId/classrooms/:id",
+  params: {
+    type: "object",
+    required: ["schoolId", "id"],
+    additionalProperties: true,
+    properties: { schoolId: { type: "string" }, id: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse, 404: errorResponse },
+} as const;
+
+export const postAdminSchoolsClassroomRosterSchema = {
+  tags: ["Classrooms"],
+  operationId: "postAdminSchoolsClassroomRoster",
+  summary: "POST /admin/schools/:schoolId/classrooms/:id/roster",
+  params: {
+    type: "object",
+    required: ["schoolId", "id"],
+    additionalProperties: true,
+    properties: { schoolId: { type: "string" }, id: { type: "string" } },
+  },
+  body: passthroughObject,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse, 404: errorResponse },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Sprint 6: Reports schemas
+// ---------------------------------------------------------------------------
+
+export const getAdminSchoolsReportsSchema = {
+  tags: ["Reports"],
+  operationId: "getAdminSchoolsReports",
+  summary: "GET /admin/schools/:schoolId/reports",
+  params: schoolIdParam,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const postAdminSchoolsReportRunSchema = {
+  tags: ["Reports"],
+  operationId: "postAdminSchoolsReportRun",
+  summary: "POST /admin/schools/:schoolId/reports/:reportId/run",
+  params: {
+    type: "object",
+    required: ["schoolId", "reportId"],
+    additionalProperties: true,
+    properties: { schoolId: { type: "string" }, reportId: { type: "string" } },
+  },
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  body: passthroughObject,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse, 404: errorResponse },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Sprint 6: Notifications schemas
+// ---------------------------------------------------------------------------
+
+export const getAdminSchoolsNotificationsSchema = {
+  tags: ["Notifications"],
+  operationId: "getAdminSchoolsNotifications",
+  summary: "GET /admin/schools/:schoolId/notifications",
+  params: schoolIdParam,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const putAdminSchoolsNotificationsSchema = {
+  tags: ["Notifications"],
+  operationId: "putAdminSchoolsNotifications",
+  summary: "PUT /admin/schools/:schoolId/notifications",
+  params: schoolIdParam,
+  body: passthroughObject,
+  response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 403: errorResponse },
+} as const;
