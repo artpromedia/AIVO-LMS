@@ -5,6 +5,7 @@ import swaggerUI from "@fastify/swagger-ui";
 import rawBody from "fastify-raw-body";
 import postgres from "postgres";
 import { createLogger } from "@aivo/observability";
+import { installAuditing } from "@aivo/audit-client";
 import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts, postgresJsOutboxClient } from "@aivo/ops-alerts";
 import {
@@ -42,6 +43,7 @@ export async function buildApp(
   const app = Fastify({ logger: false });
 
   await app.register(cors, { origin: true, credentials: true });
+  installAuditing(app, { defaultAllowlist: ["plan", "tenantId"] });
   // Stripe signature verification requires the byte-for-byte body the
   // signer hashed. fastify-raw-body opts in per-route via
   // `config: { rawBody: true }`.

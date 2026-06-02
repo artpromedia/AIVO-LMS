@@ -15,6 +15,7 @@
  * Every operation is hash-chained into admin_audit_log via appendAudit.
  */
 
+import { audited } from "@aivo/audit-client";
 import { FastifyInstance } from "fastify";
 import { eq, and, isNull, or, sql, desc } from "drizzle-orm";
 import argon2 from "argon2";
@@ -107,7 +108,11 @@ export function registerApiKeyRoutes(app: FastifyInstance, db: any) {
 
   app.post(
     "/api/admin-svc/api-keys",
-    { schema: adminSvcApiKeysSchema, preHandler: requirePlatformAdmin },
+    {
+      schema: adminSvcApiKeysSchema,
+      preHandler: requirePlatformAdmin,
+      ...audited("admin.api_key.created", { entityType: "api_key", detailsAllowlist: ["name", "scopes", "tenantId"] }),
+    },
     async (req: any, reply) => {
       const { name, scopes, expiresInDays, tenantId } = (req.body || {}) as {
         name?: string;
