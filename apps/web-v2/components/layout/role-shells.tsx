@@ -78,6 +78,11 @@ export const SCHOOL_NAV: RoleNavItem[] = [
   },
   { href: "/admin/school/classes", label: "Classes", icon: <ClipboardList className="h-4 w-4" /> },
   {
+    href: "/admin/school/classrooms",
+    label: "Classrooms",
+    icon: <ClipboardList className="h-4 w-4" />,
+  },
+  {
     href: "/admin/school/rostering",
     label: "Rostering",
     icon: <UploadCloud className="h-4 w-4" />,
@@ -85,6 +90,12 @@ export const SCHOOL_NAV: RoleNavItem[] = [
   { href: "/admin/school/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
   { href: "/admin/school/billing", label: "Billing", icon: <CreditCard className="h-4 w-4" /> },
   { href: "/admin/school/compliance", label: "Compliance", icon: <Shield className="h-4 w-4" /> },
+  {
+    href: "/admin/school/notifications",
+    label: "Notifications",
+    icon: <Bell className="h-4 w-4" />,
+  },
+  { href: "/admin/school/audit", label: "Audit log", icon: <ScrollText className="h-4 w-4" /> },
   { href: "/admin/school/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
