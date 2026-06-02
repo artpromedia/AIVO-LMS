@@ -21,6 +21,7 @@ import { registerCouponRoutes } from "./routes/coupons.js";
 import { registerInternalJobRoutes } from "./routes/internal-jobs.js";
 import { registerBillingTestHelperRoutes } from "./routes/test-helpers.js";
 import { registerSeatRoutes } from "./routes/seats.js";
+import { registerGovernanceRoutes } from "./routes/governance.js";
 import { runExpiryBatchForScheduler } from "./lib/expiryReminderService.js";
 import { runReconciliationForScheduler } from "./lib/reconciliationService.js";
 import { runUtilizationForScheduler } from "./jobs/utilization.js";
@@ -76,6 +77,7 @@ export async function buildApp(
   registerSeatRoutes(app, db);
   registerInternalJobRoutes(app, handles);
   registerBillingTestHelperRoutes(app, db);
+  registerGovernanceRoutes(app, db);
 
   return app;
 }

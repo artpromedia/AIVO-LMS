@@ -1033,6 +1033,9 @@ importers:
       '@aivo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@aivo/enterprise-core':
+        specifier: workspace:*
+        version: link:../../packages/enterprise-core
       '@aivo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -1202,6 +1205,9 @@ importers:
       '@aivo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@aivo/enterprise-core':
+        specifier: workspace:*
+        version: link:../../packages/enterprise-core
       '@aivo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -1527,6 +1533,9 @@ importers:
       '@aivo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@aivo/enterprise-core':
+        specifier: workspace:*
+        version: link:../../packages/enterprise-core
       '@aivo/events':
         specifier: workspace:*
         version: link:../../packages/events
@@ -1704,6 +1713,9 @@ importers:
       '@aivo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@aivo/enterprise-core':
+        specifier: workspace:*
+        version: link:../../packages/enterprise-core
       '@aivo/events':
         specifier: workspace:*
         version: link:../../packages/events

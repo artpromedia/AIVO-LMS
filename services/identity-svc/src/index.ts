@@ -33,6 +33,7 @@ import { registerSsoRoutes } from "./routes/sso.js";
 import { registerScimRoutes } from "./routes/scim.js";
 import { registerOidcProviderRoutes } from "./routes/oidc-provider.js";
 import { registerAvatarRoutes } from "./routes/avatars.js";
+import { registerGovernanceRoutes } from "./routes/governance.js";
 import {
   AVATAR_MAX_BYTES,
   AVATAR_STORAGE_ROOT,
@@ -304,6 +305,7 @@ export async function buildApp() {
   await registerScimRoutes(app);
   await registerOidcProviderRoutes(app);
   await registerAvatarRoutes(app);
+  registerGovernanceRoutes(app, db);
   registerTestHelperRoutes(app);
 
   void REQUIRE_DISTRICT_ADMIN_FLAG;

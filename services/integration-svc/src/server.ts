@@ -5,6 +5,7 @@ import { registerObservabilityPlugin } from "@aivo/observability";
 import { createDb, type Database } from "@aivo/db";
 import { registerSisRoutes } from "./routes/sis.js";
 import { registerLtiRoutes } from "./routes/lti.js";
+import { registerGovernanceRoutes } from "./routes/governance.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
@@ -43,5 +44,6 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   }
   registerSisRoutes(app);
   registerLtiRoutes(app, resolveDb(options.db));
+  registerGovernanceRoutes(app, resolveDb(options.db));
   return app;
 }

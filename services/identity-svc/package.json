@@ -12,6 +12,7 @@
   "dependencies": {
     "@aivo/brand": "workspace:*",
     "@aivo/db": "workspace:*",
+    "@aivo/enterprise-core": "workspace:*",
     "@aivo/events": "workspace:*",
     "@aivo/observability": "workspace:*",
     "@aivo/ops-alerts": "workspace:*",

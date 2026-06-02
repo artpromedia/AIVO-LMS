@@ -6,6 +6,7 @@ import { registerDistrictRoutes } from "./routes/districts.js";
 import { registerSchoolRoutes } from "./routes/schools.js";
 import { registerClassRoutes } from "./routes/classes.js";
 import { registerRosterRoutes } from "./routes/rosters.js";
+import { registerGovernanceRoutes } from "./routes/governance.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
@@ -23,5 +24,6 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerSchoolRoutes(app);
   registerClassRoutes(app);
   registerRosterRoutes(app);
+  registerGovernanceRoutes(app);
   return app;
 }
