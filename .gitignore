@@ -67,3 +67,8 @@ aivo-src.tar.gz
 
 # Claude Code agent worktrees (created by Agent tool isolation: worktree)
 .claude/
+
+# Local deploy artifacts
+*.tar
+.deploy-tag
+.deploy-tag-pending

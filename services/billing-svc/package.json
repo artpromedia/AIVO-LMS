@@ -10,6 +10,7 @@
     "test": "pnpm --filter @aivo/db run build && pnpm --filter @aivo/db run db:migrate && node --test --import tsx tests/*.test.ts"
   },
   "dependencies": {
+    "@aivo/audit-client": "workspace:*",
     "@aivo/billing-entitlements": "workspace:*",
     "@aivo/db": "workspace:*",
     "@aivo/observability": "workspace:*",

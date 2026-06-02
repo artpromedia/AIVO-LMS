@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mig-0045-apply
+  namespace: aivo
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: psql
+          image: postgres:16-alpine
+          command: ["/bin/sh", "-c"]
+          args:
+            - 'psql "$PGURL" -v ON_ERROR_STOP=1 -f /migs/0045.sql && echo DONE'
+          env:
+            - name: PGURL
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: database-url
+          volumeMounts:
+            - { name: migs, mountPath: /migs }
+      volumes:
+        - name: migs
+          configMap:
+            name: mig-0045

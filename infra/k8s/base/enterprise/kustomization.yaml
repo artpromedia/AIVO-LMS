@@ -19,6 +19,7 @@ resources:
   - recommendation-svc.yaml
   - tenant-svc.yaml
   - integration-svc.yaml
+  - integration-svc-worker.yaml
   - audit-svc.yaml
   - data-governance-svc.yaml
   - responsible-ai-svc.yaml

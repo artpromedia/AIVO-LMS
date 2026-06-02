@@ -96,12 +96,6 @@ const SERVICES = [
     exportName: "buildApp",
   },
   {
-    name: "integrations-svc",
-    out: "integrations-svc.json",
-    entry: "services/integrations-svc/src/index.ts",
-    exportName: "buildApp",
-  },
-  {
     name: "research-svc",
     out: "research-svc.json",
     entry: "services/research-svc/src/index.ts",

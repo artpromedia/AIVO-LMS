@@ -20,7 +20,7 @@
  *   - This script itself and other CI tooling that needs to mention the
  *     forbidden phrase.
  *   - Backend `status: "coming_soon"` enum *values* in
- *     services/integrations-svc/src/routes/connectors.ts. These are
+ *     services/integration-svc/src/routes/connectors.ts. These are
  *     machine identifiers, not user-facing prose; the descriptions
  *     served to UIs have been rewritten to remove the prose. Sprint 8
  *     replaces these enum values with `available` once the OAuth flows
@@ -48,7 +48,7 @@ const ALLOW_LIST = new Set([
   // Backend status enum — value "coming_soon" is a machine identifier
   // tracked in the Sprint 8 plan. User-facing descriptions on these
   // connector rows have been rewritten to remove the prose.
-  "services/integrations-svc/src/routes/connectors.ts",
+  "services/integration-svc/src/routes/connectors.ts",
   // Engagement service test explicitly asserts a gate behavior named
   // "coming-soon-gate"; not user-facing.
   "services/engagement-svc/tests/quest-content-gate.test.ts",

@@ -1,0 +1,4 @@
+sourcedId,status,dateLastModified,classSourcedId,schoolSourcedId,userSourcedId,role,primary,beginDate,endDate
+enr-1,active,2026-01-01T00:00:00Z,cls-1,sch-1,usr-t1,teacher,true,2025-08-15,
+enr-2,active,2026-01-01T00:00:00Z,cls-1,sch-1,usr-s1,student,false,2025-08-15,
+enr-3,active,2026-01-01T00:00:00Z,cls-1,sch-1,usr-s2,student,false,2025-08-15,

@@ -93,10 +93,10 @@ const SERVICE_DEFS: Array<{
     devDefault: "http://localhost:3011",
   },
   {
-    name: "integrations-svc",
-    envKey: "INTEGRATIONS_SVC_URL",
+    name: "integration-svc",
+    envKey: "INTEGRATION_SVC_URL",
     healthPath: "/health",
-    devDefault: "http://localhost:3012",
+    devDefault: "http://localhost:3068",
   },
   {
     name: "admin-svc",

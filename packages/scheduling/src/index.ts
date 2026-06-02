@@ -309,8 +309,8 @@ export const JOB_REGISTRY: JobRegistryEntry[] = [
     periodMs: 7 * DEFAULT_PERIOD_MS,
   },
   {
-    jobName: "integrations.connector-sync-watchdog",
-    service: "integrations-svc",
+    jobName: "integration.connector-sync-watchdog",
+    service: "integration-svc",
     description: "Flag integration_connections rows whose external sync has gone stale.",
     periodMs: DEFAULT_PERIOD_MS,
   },

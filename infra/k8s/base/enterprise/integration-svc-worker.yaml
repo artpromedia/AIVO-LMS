@@ -1,0 +1,42 @@
+# Sprint 2 (SIS Roster Sync) — dedicated worker pool.
+#
+# Runs the same integration-svc image with ROLE=worker so it processes the
+# sync.full / sync.delta / sync.row jobs (and the nightly/delta cron) off the
+# request-serving API replicas. Scaled independently of the API tier so a
+# large nightly roster import never starves request latency.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: integration-svc-worker
+  labels:
+    app: integration-svc-worker
+    app.kubernetes.io/part-of: aivo-enterprise
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: integration-svc-worker }
+  template:
+    metadata:
+      labels: { app: integration-svc-worker }
+    spec:
+      containers:
+        - name: worker
+          image: aivo/integration-svc:${IMAGE_TAG:-latest}
+          # The worker boots the queue consumers + cron rather than the HTTP
+          # listener; ROLE switches the entrypoint behavior.
+          env:
+            - { name: NODE_ENV, value: production }
+            - { name: ROLE, value: worker }
+            - { name: INTEGRATION_PORT, value: "3068" }
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef: { name: aivo-redis, key: url, optional: true }
+            - name: AIVO_FEATURE_SIS_SYNC
+              valueFrom:
+                configMapKeyRef:
+                  { name: aivo-enterprise-flags, key: AIVO_FEATURE_SIS_SYNC, optional: true }
+          # No HTTP probes — liveness is a lightweight self-check the worker
+          # writes; readiness is not applicable to a queue consumer.
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: "1", memory: 1Gi }

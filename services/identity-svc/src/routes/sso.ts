@@ -21,7 +21,7 @@ import { FastifyInstance } from "fastify";
 import { eq, and, sql } from "drizzle-orm";
 import crypto from "crypto";
 import { tenants, districtSettings, users, sessions } from "@aivo/db";
-import { signJWT } from "@aivo/security";
+import { signAccessToken } from "../lib/jwt.js";
 import {
   decryptSsoConfig,
   buildSaml,
@@ -298,7 +298,10 @@ export async function registerSsoRoutes(app: FastifyInstance) {
         .where(eq(users.id, user.id));
     }
 
-    const accessToken = await signJWT({
+    // SAML federated login is single-factor from AIVO's perspective; attach
+    // the assurance-context claims (amr=["pwd"], acr="aal1") via the shared
+    // helper. A subsequent step-up lifts the session to AAL2.
+    const accessToken = await signAccessToken({
       sub: user.id,
       tenantId: user.tenantId,
       role: user.role,

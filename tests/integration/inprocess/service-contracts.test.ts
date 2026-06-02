@@ -1,6 +1,6 @@
 /**
  * In-process integration coverage for services the Docker harness does not
- * start: engagement-svc, integration-svc, integrations-svc, subject-brain-svc,
+ * start: engagement-svc, integration-svc, subject-brain-svc,
  * tenant-svc. Each is booted via its real `buildApp` and driven with Fastify
  * `inject` — exercising health, auth enforcement, schema validation, and a
  * representative endpoint without Postgres or a live network.
@@ -10,7 +10,6 @@ import type { FastifyInstance } from "fastify";
 
 import { buildApp as buildEngagement } from "../../../services/engagement-svc/src/index.js";
 import { buildApp as buildIntegration } from "../../../services/integration-svc/src/index.js";
-import { buildApp as buildIntegrations } from "../../../services/integrations-svc/src/index.js";
 import { buildApp as buildSubjectBrain } from "../../../services/subject-brain-svc/src/server.js";
 import { buildApp as buildTenant } from "../../../services/tenant-svc/src/server.js";
 
@@ -88,9 +87,9 @@ describe("integration-svc (LTI 1.3)", () => {
   });
 });
 
-describe("integrations-svc (connector catalogue)", () => {
+describe("integration-svc (connector catalogue, merged from integrations-svc)", () => {
   it("serves the public connector catalogue", async () => {
-    const app = await track(await buildIntegrations({} as any));
+    const app = await track(await buildIntegration({ skipAuth: true, db: null }));
     const res = await app.inject({ method: "GET", url: "/api/integrations/connectors" });
     expect(res.statusCode).toBe(200);
     const body = res.json();

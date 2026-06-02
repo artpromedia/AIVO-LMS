@@ -111,7 +111,12 @@ export async function issueStepUpToken(
   // 5-minute TTL still bounds the worst case if the cache is wiped (process
   // restart) but in steady state every token is consumed at most once.
   const jti = crypto.randomBytes(16).toString("base64url");
-  const claims: StepUpJWT = {
+  // Completing a step-up challenge always involves a second factor on top of
+  // the existing session, so the resulting token asserts AAL2. The `amr`/
+  // `acr` claims let `requireRecentMfa` (and downstream consumers) reason
+  // about assurance without re-deriving it. Cast keeps these additive claims
+  // local to identity-svc without widening the shared StepUpJWT type.
+  const claims = {
     sub: user.sub,
     tenantId: user.tenantId,
     role: user.role,
@@ -119,7 +124,9 @@ export async function issueStepUpToken(
     scope,
     factor,
     jti,
-  };
+    amr: ["pwd", "mfa"],
+    acr: "aal2",
+  } as StepUpJWT;
   return signJWT<StepUpJWT>(claims, STEP_UP_TOKEN_TTL);
 }
 

@@ -1,0 +1,5 @@
+sourcedId,status,dateLastModified,enabledUser,orgSourcedIds,role,username,givenName,familyName,middleName,identifier,email,grades
+usr-t1,active,2026-01-01T00:00:00Z,true,sch-1,teacher,jteacher,Jane,Teacher,,T-1,Jane.Teacher@springfield.k12,
+usr-s1,active,2026-01-01T00:00:00Z,true,sch-1,student,sstudent,Sam,Student,,S-1,sam.student@springfield.k12,06
+usr-s2,active,2026-01-01T00:00:00Z,true,"sch-1,sch-2",student,bstudent,Bob,Student,Q,S-2,bob.student@springfield.k12,06
+usr-s3,tobedeleted,2026-01-01T00:00:00Z,false,sch-1,student,gstudent,Gone,Student,,S-3,gone@springfield.k12,06

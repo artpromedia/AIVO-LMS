@@ -30,6 +30,7 @@ import { registerPublicBrandingRoutes } from "./routes/branding-public.js";
 import { registerDistrictAdminRoutes } from "./routes/district-admins.js";
 import { registerSchoolRoutes } from "./routes/school.js";
 import { registerSsoRoutes } from "./routes/sso.js";
+import { registerOidcRpRoutes } from "./routes/oidc-rp.js";
 import { registerScimRoutes } from "./routes/scim.js";
 import { registerOidcProviderRoutes } from "./routes/oidc-provider.js";
 import { registerAvatarRoutes } from "./routes/avatars.js";
@@ -301,6 +302,7 @@ export async function buildApp() {
   await registerDistrictAdminRoutes(app);
   await registerSchoolRoutes(app);
   await registerSsoRoutes(app);
+  await registerOidcRpRoutes(app);
   await registerScimRoutes(app);
   await registerOidcProviderRoutes(app);
   await registerAvatarRoutes(app);

@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { createLogger, registerObservabilityPlugin } from "@aivo/observability";
+import { installAuditing } from "@aivo/audit-client";
 import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import { logAdminEnterpriseFlags, registerAdminIpAllowlist } from "@aivo/security";
@@ -48,6 +49,7 @@ export async function buildApp(
   registerObservabilityPlugin(app, "admin-svc");
 
   await app.register(cors, { origin: true, credentials: true });
+  installAuditing(app, { defaultAllowlist: ["name", "scopes", "tenantId"] });
   await app.register(swagger, {
     openapi: {
       info: { title: "AIVO Admin Service", version: "1.0.0" },

@@ -28,7 +28,7 @@ concurrency:
 env:
   IMAGE_PREFIX: ghcr.io/artpromedia
   ALL_SERVICES: >-
-    identity-svc,billing-svc,family-svc,integrations-svc,admin-svc,
+    identity-svc,billing-svc,family-svc,integration-svc,admin-svc,
     learning-svc,engagement-svc,comms-svc,i18n-svc,tutor-svc,
     status-page-svc,research-svc,assessment-svc,ai-svc,brain-svc,curriculum-svc,web,marketing
 
@@ -106,7 +106,7 @@ jobs:
           echo "Verifying images with tag: $SOURCE_TAG"
           echo ""
 
-          SERVICES="identity-svc billing-svc family-svc integrations-svc admin-svc \
+          SERVICES="identity-svc billing-svc family-svc integration-svc admin-svc \
             learning-svc engagement-svc comms-svc i18n-svc tutor-svc \
             status-page-svc research-svc assessment-svc ai-svc brain-svc curriculum-svc web marketing"
 
@@ -144,7 +144,7 @@ jobs:
           - identity-svc
           - billing-svc
           - family-svc
-          - integrations-svc
+          - integration-svc
           - admin-svc
           - learning-svc
           - engagement-svc
@@ -241,7 +241,7 @@ jobs:
           | identity-svc | \`${{ env.IMAGE_PREFIX }}/identity-svc:${VERSION}\` |
           | billing-svc | \`${{ env.IMAGE_PREFIX }}/billing-svc:${VERSION}\` |
           | family-svc | \`${{ env.IMAGE_PREFIX }}/family-svc:${VERSION}\` |
-          | integrations-svc | \`${{ env.IMAGE_PREFIX }}/integrations-svc:${VERSION}\` |
+          | integration-svc | \`${{ env.IMAGE_PREFIX }}/integration-svc:${VERSION}\` |
           | admin-svc | \`${{ env.IMAGE_PREFIX }}/admin-svc:${VERSION}\` |
           | learning-svc | \`${{ env.IMAGE_PREFIX }}/learning-svc:${VERSION}\` |
           | engagement-svc | \`${{ env.IMAGE_PREFIX }}/engagement-svc:${VERSION}\` |

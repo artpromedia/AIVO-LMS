@@ -1,3 +1,4 @@
+import { audited } from "@aivo/audit-client";
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { and, desc, eq } from "drizzle-orm";
 import {
@@ -321,7 +322,11 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
    */
   app.post(
     "/api/billing/subscription",
-    { schema: createSubscriptionSchema, preHandler: requireAuth },
+    {
+      schema: createSubscriptionSchema,
+      preHandler: requireAuth,
+      ...audited("billing.subscription.changed", { entityType: "subscription", detailsAllowlist: ["plan", "tenantId"] }),
+    },
     async (request, reply) => {
       const body = (request.body ?? {}) as any;
       if (body.paymentMethodId) {
@@ -645,7 +650,11 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
 
   app.delete(
     "/api/billing/addons/:tenantId/:tutorId",
-    { schema: removeAddonSchema, preHandler: requireAuth },
+    {
+      schema: removeAddonSchema,
+      preHandler: requireAuth,
+      ...audited("billing.addon.removed", { entityType: "addon", entityId: (r) => (r.params as { tutorId?: string })?.tutorId ?? "" }),
+    },
     async (request, reply) => {
       const { tenantId, tutorId } = request.params as { tenantId: string; tutorId: string };
       const user = (request as any).user as JWTPayload;
