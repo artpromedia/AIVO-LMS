@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { verifyJWT } from "@aivo/security";
+import { audited } from "@aivo/audit-client";
 import { eq, and, desc } from "drizzle-orm";
 import { integrationConnections, integrationSyncLogs, integrationRosterMappings } from "@aivo/db";
 import {
@@ -350,7 +351,15 @@ export function registerConnectorRoutes(app: FastifyInstance, db: any) {
 
   app.post(
     "/api/integrations/connect",
-    { schema: connectIntegrationSchema, preHandler: requireAdmin },
+    {
+      schema: connectIntegrationSchema,
+      preHandler: requireAdmin,
+      ...audited("integration.connector.connected", {
+        entityType: "connection",
+        entityId: (r) => (r.body as { provider?: string })?.provider ?? "",
+        detailsAllowlist: ["provider"],
+      }),
+    },
     async (request, reply) => {
       const { tenantId, connectorId, credentials, config: connConfig } = request.body as any;
       if (!tenantId || !connectorId)
@@ -463,7 +472,14 @@ export function registerConnectorRoutes(app: FastifyInstance, db: any) {
 
   app.delete(
     "/api/integrations/disconnect/:connectionId",
-    { schema: disconnectIntegrationSchema, preHandler: requireAdmin },
+    {
+      schema: disconnectIntegrationSchema,
+      preHandler: requireAdmin,
+      ...audited("integration.connector.disconnected", {
+        entityType: "connection",
+        entityId: (r) => (r.params as { connectionId?: string })?.connectionId ?? "",
+      }),
+    },
     async (request, reply) => {
       const { connectionId } = request.params as any;
       const user = (request as any).user;
@@ -488,7 +504,14 @@ export function registerConnectorRoutes(app: FastifyInstance, db: any) {
 
   app.post(
     "/api/integrations/sync/:connectionId",
-    { schema: triggerSyncSchema, preHandler: requireAdmin },
+    {
+      schema: triggerSyncSchema,
+      preHandler: requireAdmin,
+      ...audited("integration.sync.triggered", {
+        entityType: "connection",
+        entityId: (r) => (r.params as { connectionId?: string })?.connectionId ?? "",
+      }),
+    },
     async (request, reply) => {
       const { connectionId } = request.params as any;
       const { syncType = "full" } = (request.body as any) || {};

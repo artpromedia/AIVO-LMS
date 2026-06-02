@@ -7,6 +7,7 @@ import { registerSisRoutes } from "./routes/sis.js";
 import { registerLtiRoutes } from "./routes/lti.js";
 import { registerConnectorRoutes } from "./routes/connectors.js";
 import { registerHealthRoutes as registerConnectorHealthRoutes } from "./routes/connectors-health.js";
+import { installAuditing } from "@aivo/audit-client";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
@@ -39,6 +40,9 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   const app = Fastify({ logger: false });
   registerObservabilityPlugin(app, "integration-svc");
   await app.register(cors, { origin: true, credentials: true });
+  // Auto-emit audit events for routes annotated with `audited(...)`
+  // (SIS connect/disconnect/sync). No-ops when AUDIT_SVC_URL is unset.
+  installAuditing(app, { defaultAllowlist: ["provider"] });
   app.get("/healthz", async () => ({ status: "ok", service: "integration-svc" }));
 
   const db = resolveDb(options.db);

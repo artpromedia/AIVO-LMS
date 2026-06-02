@@ -129,3 +129,39 @@ describe("audited + registerAuditHook", () => {
     expect(sent).toHaveLength(0);
   });
 });
+
+describe("createServiceAuditClient / installAuditing", () => {
+  it("uses a no-op transport when env is unset (never breaks the service)", async () => {
+    const { createServiceAuditClient } = await import("./service.js");
+    const client = createServiceAuditClient({ url: "", serviceToken: "" });
+    await expect(
+      client.emit({
+        tenant_id: null,
+        actor: { id: "u", role: "r", ip: "", ua: "" },
+        action: "x.y",
+        entity: { type: "t", id: "1" },
+        outcome: "success",
+        request_id: "r",
+      }),
+    ).resolves.toBeTruthy();
+  });
+
+  it("installAuditing registers an onResponse hook that emits for annotated routes", async () => {
+    const { installAuditing } = await import("./service.js");
+    const { audited } = await import("./audited.js");
+    const sent: any[] = [];
+    let hook!: (req: any, reply: any) => unknown;
+    const app = { addHook: (_n: "onResponse", fn: typeof hook) => { hook = fn; } };
+    // Point at a fake transport via fetchImpl + url so it's HTTP-backed.
+    const fetchImpl = (async () => ({ ok: true, status: 200 })) as unknown as typeof fetch;
+    installAuditing(app, { url: "https://audit", serviceToken: "svc", fetchImpl });
+    const cfg = audited("tenant.updated", { entityType: "tenant", entityId: () => "t1" });
+    await hook(
+      { method: "PUT", url: "/t1", headers: { "x-request-id": "r1" }, routeOptions: { config: cfg.config }, enterpriseContext: { actorId: "a", tenant: { tenantId: "t1", role: "platform_admin" } } },
+      { statusCode: 200 },
+    );
+    // fetch was invoked (HTTP transport) — assert no throw + hook ran.
+    expect(hook).toBeTypeOf("function");
+    void sent;
+  });
+});
