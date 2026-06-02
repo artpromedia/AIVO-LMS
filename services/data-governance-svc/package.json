@@ -19,6 +19,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aivo/audit-client": "workspace:*",
     "@aivo/audit-svc": "workspace:*",
     "@aivo/db": "workspace:*",
     "@aivo/enterprise-core": "workspace:*",

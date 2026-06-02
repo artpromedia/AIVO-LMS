@@ -37,6 +37,7 @@ import { eq, and, sql, lt, isNull } from "drizzle-orm";
 import crypto from "crypto";
 import argon2 from "argon2";
 import QRCode from "qrcode";
+import { audited } from "@aivo/audit-client";
 import { setSurfaceCookie, clearSurfaceCookie } from "../lib/surface-cookie.js";
 import { loadAvailableRoles } from "../lib/available-roles.js";
 import {
@@ -2448,7 +2449,18 @@ export async function registerAuthRoutes(app: FastifyInstance) {
 
   // ── TOTP enrollment ────────────────────────────────────────────────────────
 
-  app.post("/api/auth/mfa/totp/enroll", { schema: { tags: ["MFA"] } }, async (req, reply) => {
+  app.post(
+    "/api/auth/mfa/totp/enroll",
+    {
+      schema: { tags: ["MFA"] },
+      ...audited("identity.mfa.totp.enroll.initiated", {
+        entityType: "user",
+        entityId: (req) => ((req as any).user?.id as string | undefined) ?? "",
+        detailsAllowlist: ["method"],
+        details: () => ({ method: "totp" }),
+      }),
+    },
+    async (req, reply) => {
     const ctx = await requireUser(app, req, reply);
     if (!ctx) return;
     const { user } = ctx;

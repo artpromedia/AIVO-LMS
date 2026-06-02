@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { FastifyInstance } from "fastify";
+import { audited } from "@aivo/audit-client";
 
 interface DistrictRecord {
   id: string;
@@ -16,6 +17,17 @@ export function clearDistrictsForTest(): void {
 export function registerDistrictRoutes(app: FastifyInstance): void {
   app.post<{ Body: { name: string; externalId?: string } }>(
     "/api/districts",
+    {
+      ...audited("tenant.district.created", {
+        entityType: "district",
+        entityId: (req) => ((req.body as { name?: string })?.name ?? ""),
+        detailsAllowlist: ["name", "externalId"],
+        details: (req) => ({
+          name: (req.body as { name?: string })?.name,
+          externalId: (req.body as { externalId?: string })?.externalId,
+        }),
+      }),
+    },
     async (request, reply) => {
       if (!request.body?.name) {
         return reply.code(400).send({ error: "name is required" });

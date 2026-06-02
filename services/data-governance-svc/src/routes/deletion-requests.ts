@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { emitAuditEvent } from "@aivo/audit-svc";
+import { audited } from "@aivo/audit-client";
 import {
   approveDeletion,
   createDeletionRequest,
@@ -16,7 +17,24 @@ export function clearDeletionStoreForTest(): void {
 }
 
 export function registerDeletionRoutes(app: FastifyInstance): void {
-  app.post<{ Body: DeletionWorkflowInput }>("/api/deletion-requests", async (request, reply) => {
+  app.post<{ Body: DeletionWorkflowInput }>(
+    "/api/deletion-requests",
+    {
+      ...audited("governance.deletion.requested", {
+        entityType: "deletion_request",
+        entityId: (req) => ((req.body as DeletionWorkflowInput)?.learnerId ?? ""),
+        detailsAllowlist: ["learnerId", "requesterRole", "exportBeforeDelete"],
+        details: (req) => {
+          const b = req.body as DeletionWorkflowInput;
+          return {
+            learnerId: b?.learnerId,
+            requesterRole: b?.requesterRole,
+            exportBeforeDelete: b?.exportBeforeDelete,
+          };
+        },
+      }),
+    },
+    async (request, reply) => {
     if (!request.body?.learnerId || !request.body?.requesterId) {
       return reply.code(400).send({ error: "learnerId and requesterId are required" });
     }

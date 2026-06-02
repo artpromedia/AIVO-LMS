@@ -8,6 +8,7 @@ import multipart from "@fastify/multipart";
 import fastifyStatic from "@fastify/static";
 import { promises as fsp } from "node:fs";
 import { createLogger, registerObservabilityPlugin } from "@aivo/observability";
+import { installAuditing } from "@aivo/audit-client";
 import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import {
@@ -163,6 +164,13 @@ export async function buildApp() {
 
   // Structured request logging + /metrics for Prometheus scrape (Supp A).
   registerObservabilityPlugin(app, "identity-svc");
+
+  // Sprint 3 — wire the audit-client onResponse hook. NoopTransport is
+  // used unless AUDIT_SVC_URL + INTERNAL_SERVICE_TOKEN are both set, so
+  // dev/tests stay quiet while prod ships events to audit-svc.
+  installAuditing(app, {
+    defaultAllowlist: ["tenantId", "method", "protocol", "role", "reason"],
+  });
 
   const isDev = process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
   let corsOrigin: boolean | string[];

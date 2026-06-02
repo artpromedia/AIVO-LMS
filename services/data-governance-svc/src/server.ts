@@ -1,6 +1,7 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import { createDb } from "@aivo/db";
+import { installAuditing } from "@aivo/audit-client";
 import { registerEnterpriseAuthHook } from "@aivo/enterprise-core";
 import { registerObservabilityPlugin } from "@aivo/observability";
 import { registerExportRoutes } from "./routes/exports.js";
@@ -20,6 +21,9 @@ export interface BuildAppOptions {
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
   registerObservabilityPlugin(app, "data-governance-svc");
+  installAuditing(app, {
+    defaultAllowlist: ["tenantId", "learnerId", "requesterRole", "exportBeforeDelete"],
+  });
   await app.register(cors, { origin: true, credentials: true });
   app.get("/healthz", async () => ({ status: "ok", service: "data-governance-svc" }));
   if (!options.skipAuth) {
