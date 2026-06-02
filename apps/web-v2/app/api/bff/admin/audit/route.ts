@@ -32,7 +32,7 @@ export async function GET(req: Request) {
     {
       events,
       nextCursor,
-      actions: listAuditActions(scope.tenantId ? { tenantId: scope.tenantId } : undefined),
+      actions: listAuditActions({ tenantId: scope.tenantId, schoolId: scope.schoolId }),
       canViewProof: scope.canViewProof,
     },
     requestId,

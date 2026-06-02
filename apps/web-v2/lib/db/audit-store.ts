@@ -84,11 +84,12 @@ export function getAuditEvent(id: string): { event: AuditEventView; proof: { pre
   return { event, proof: { prev_hash: event.prev_hash, hash: event.hash, next_hash: all[idx + 1]?.hash ?? null } };
 }
 
-/** Distinct actions present, for the filter-bar multi-select. */
-export function listAuditActions(scope?: { tenantId?: string }): string[] {
+/** Distinct actions within scope, for the filter-bar multi-select. */
+export function listAuditActions(scope?: { tenantId?: string; schoolId?: string }): string[] {
   const set = new Set<string>();
   for (const e of db()) {
     if (scope?.tenantId && e.tenant_id !== scope.tenantId) continue;
+    if (scope?.schoolId && e.school_id !== scope.schoolId) continue;
     set.add(e.action);
   }
   return [...set].sort();
