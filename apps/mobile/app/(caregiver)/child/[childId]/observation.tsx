@@ -5,16 +5,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
+import { useCreateObservation } from "@/hooks/useFamily";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
 
 export default function ObservationScreen() {
   const { t } = useTranslation();
   const type = useResponsiveType();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- route param reserved for future use
-  const { childId: _childId } = useLocalSearchParams<{ childId: string }>();
+  const { childId } = useLocalSearchParams<{ childId: string }>();
   const insets = useSafeAreaInsets();
   const [note, setNote] = useState("");
+  const createObservation = useCreateObservation();
 
   return (
     <ScrollView
@@ -26,7 +27,9 @@ export default function ObservationScreen() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("caregiverObservation.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {t("caregiverObservation.title")}
+      </Text>
       <Text style={styles.subtitle}>{t("caregiverObservation.subtitle")}</Text>
 
       <AivoCard>
@@ -42,12 +45,38 @@ export default function ObservationScreen() {
           textAlignVertical="top"
         />
         <AivoButton
-          title={t("caregiverObservation.submitBtn")}
+          title={
+            createObservation.isPending
+              ? t("common.saving", "Saving...")
+              : t("caregiverObservation.submitBtn")
+          }
           onPress={() => {
-            Alert.alert(t("common.success"), t("caregiverObservation.submitted"));
-            router.back();
+            if (!childId) {
+              Alert.alert(
+                t("common.error", "Error"),
+                t("caregiverObservation.noChild", "No child selected."),
+              );
+              return;
+            }
+            createObservation.mutate(
+              { learnerId: childId, notes: note.trim() },
+              {
+                onSuccess: () => {
+                  Alert.alert(t("common.success"), t("caregiverObservation.submitted"));
+                  router.back();
+                },
+                onError: (e) => {
+                  Alert.alert(
+                    t("common.error", "Error"),
+                    e instanceof Error
+                      ? e.message
+                      : t("caregiverObservation.error", "Couldn't submit observation"),
+                  );
+                },
+              },
+            );
           }}
-          disabled={!note.trim()}
+          disabled={!note.trim() || createObservation.isPending}
           style={{ marginTop: spacing.md }}
         />
       </AivoCard>

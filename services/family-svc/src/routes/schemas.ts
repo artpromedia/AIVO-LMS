@@ -353,6 +353,58 @@ export const createTherapyGoalSchema = {
   response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 403: errorResponse },
 } as const;
 
+export const createTherapySessionSchema = {
+  tags: ["Family"],
+  operationId: "createTherapySession",
+  summary: "POST /api/family/therapy-sessions",
+  body: {
+    type: "object",
+    required: ["learnerId", "outcome"],
+    additionalProperties: true,
+    properties: {
+      learnerId: { type: "string" },
+      // SOAP-ish capture from the mobile/web therapist note form.
+      outcome: { type: "string", minLength: 1 },
+      skillTargeted: { type: "string" },
+      method: { type: "string" },
+      recommendations: { type: "string" },
+      durationMinutes: { type: "number" },
+      sessionDate: { type: "string" },
+      goalIds: { type: "array", items: { type: "string" } },
+    },
+  },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+  },
+} as const;
+
+export const createTeacherInsightSchema = {
+  tags: ["Family"],
+  operationId: "createTeacherInsight",
+  summary: "POST /api/family/teacher-insights",
+  body: {
+    type: "object",
+    required: ["learnerId", "insightText"],
+    additionalProperties: true,
+    properties: {
+      learnerId: { type: "string" },
+      insightText: { type: "string", minLength: 1 },
+      domain: { type: "string" },
+    },
+  },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+  },
+} as const;
+
 export const familyHealthRootSchema = {
   tags: ["Family"],
   operationId: "familyHealthRoot",

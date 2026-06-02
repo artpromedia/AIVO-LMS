@@ -141,6 +141,89 @@ export function useCreateTherapyGoal() {
   });
 }
 
+/**
+ * Record a therapy session note for a learner (therapist/parent with access).
+ * Persists into therapy_sessions via family-svc — replaces the mobile screen's
+ * former fake "Saved" alert.
+ */
+export function useCreateTherapySession() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      learnerId: string;
+      outcome: string;
+      skillTargeted?: string;
+      method?: string;
+      recommendations?: string;
+      durationMinutes?: number;
+      goalIds?: string[];
+    }) => {
+      const res = await apiFetch(API.FAMILY, "/api/family/therapy-sessions", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to save session notes");
+      }
+      return (await res.json()) as { session: unknown };
+    },
+    onSuccess: (_, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ["therapy-sessions", variables.learnerId] });
+    },
+  });
+}
+
+/**
+ * Submit a teacher insight for a learner (teacher/parent with access).
+ * Persists into brain_insights via family-svc — replaces the mobile screen's
+ * former fake "Saved" alert.
+ */
+export function useCreateTeacherInsight() {
+  return useMutation({
+    mutationFn: async (input: { learnerId: string; insightText: string; domain?: string }) => {
+      const res = await apiFetch(API.FAMILY, "/api/family/teacher-insights", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to submit insight");
+      }
+      return (await res.json()) as { insight: unknown };
+    },
+  });
+}
+
+/**
+ * Submit a caregiver/parent observation for a learner. Wires the mobile screen
+ * to the existing family-svc POST /api/family/observations endpoint.
+ */
+export function useCreateObservation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      learnerId: string;
+      notes: string;
+      category?: string;
+      mood?: string;
+    }) => {
+      const res = await apiFetch(API.FAMILY, "/api/family/observations", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to submit observation");
+      }
+      return res.json();
+    },
+    onSuccess: (_, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ["observations", variables.learnerId] });
+    },
+  });
+}
+
 // ─────────────── IEP Updates: Timeline / Amendments / Preferences ───────────────
 
 export interface IEPTimelineItem {

@@ -739,7 +739,9 @@
     "subtitle": "Share an observation about this student's learning",
     "yourInsight": "Your Insight",
     "placeholder": "Describe what you've observed about this student...",
-    "submitted": "Insight submitted to parent inbox"
+    "submitted": "Insight submitted to parent inbox",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "Upload IEP",
@@ -810,7 +812,9 @@
     "prompt": "How did the child do today?",
     "placeholder": "Share your observation...",
     "submitBtn": "Submit Observation",
-    "submitted": "Observation saved to Brain insights"
+    "submitted": "Observation saved to Brain insights",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "Progress",
@@ -842,6 +846,10 @@
     "noNotesTitle": "No Notes Yet",
     "noNotesMessage": "Add session notes after each therapy session.",
     "addNote": "Add Note",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected.",
     "reportsTitle": "Progress Reports",
     "reportsSubtitle": "Generate and view therapy progress reports",
     "noReportsTitle": "No Reports",

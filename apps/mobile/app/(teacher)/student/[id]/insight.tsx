@@ -5,16 +5,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
+import { useCreateTeacherInsight } from "@/hooks/useFamily";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
 
 export default function SubmitInsightScreen() {
   const { t } = useTranslation();
   const type = useResponsiveType();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- route param reserved for future use
-  const { id: _id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const [insightText, setInsightText] = useState("");
+  const createInsight = useCreateTeacherInsight();
 
   return (
     <ScrollView
@@ -26,7 +27,9 @@ export default function SubmitInsightScreen() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("teacherInsight.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {t("teacherInsight.title")}
+      </Text>
       <Text style={styles.subtitle}>{t("teacherInsight.subtitle")}</Text>
 
       <AivoCard>
@@ -42,12 +45,36 @@ export default function SubmitInsightScreen() {
           textAlignVertical="top"
         />
         <AivoButton
-          title={t("teacherInsight.title")}
+          title={
+            createInsight.isPending ? t("common.saving", "Saving...") : t("teacherInsight.title")
+          }
           onPress={() => {
-            Alert.alert(t("common.success"), t("teacherInsight.submitted"));
-            router.back();
+            if (!id) {
+              Alert.alert(
+                t("common.error", "Error"),
+                t("teacherInsight.noStudent", "No student selected."),
+              );
+              return;
+            }
+            createInsight.mutate(
+              { learnerId: id, insightText: insightText.trim() },
+              {
+                onSuccess: () => {
+                  Alert.alert(t("common.success"), t("teacherInsight.submitted"));
+                  router.back();
+                },
+                onError: (e) => {
+                  Alert.alert(
+                    t("common.error", "Error"),
+                    e instanceof Error
+                      ? e.message
+                      : t("teacherInsight.error", "Couldn't submit insight"),
+                  );
+                },
+              },
+            );
           }}
-          disabled={!insightText.trim()}
+          disabled={!insightText.trim() || createInsight.isPending}
           style={{ marginTop: spacing.md }}
         />
       </AivoCard>
