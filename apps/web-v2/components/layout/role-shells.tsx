@@ -96,6 +96,7 @@ export const DISTRICT_NAV: RoleNavItem[] = [
   { href: "/admin/district/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
   { href: "/admin/district/billing", label: "Billing", icon: <CreditCard className="h-4 w-4" /> },
   { href: "/admin/district/compliance", label: "Compliance", icon: <Shield className="h-4 w-4" /> },
+  { href: "/admin/district/identity", label: "Identity", icon: <ShieldCheck className="h-4 w-4" /> },
   { href: "/admin/district/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -118,6 +119,7 @@ export const DISTRICT_SETTINGS_NAV: RoleNavItem[] = [
 export const PLATFORM_NAV: RoleNavItem[] = [
   { href: "/admin/platform", label: "System health", icon: <Activity className="h-4 w-4" /> },
   { href: "/admin/platform/tenants", label: "Tenants", icon: <Users className="h-4 w-4" /> },
+  { href: "/admin/platform/identity", label: "Identity", icon: <Shield className="h-4 w-4" /> },
   { href: "/admin/platform/users", label: "Users", icon: <Users className="h-4 w-4" /> },
   {
     href: "/admin/platform/learners",

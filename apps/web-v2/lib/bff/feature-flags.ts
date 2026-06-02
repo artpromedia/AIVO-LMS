@@ -26,4 +26,7 @@ export const enterpriseFlags = {
   // missing env doesn't change behavior elsewhere in BFF land.
   advancedContentGenerators: () =>
     readBool("AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS"),
+  // Sprint 1 (Enterprise Identity) — gates the SSO/SCIM/MFA admin UI and the
+  // district-facing identity surfaces. Defaults false per the sprint spec.
+  enterpriseIdentity: () => readBool("AIVO_FEATURE_ENTERPRISE_IDENTITY"),
 };
