@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Atkinson_Hyperlegible } from "next/font/google";
+import localFont from "next/font/local";
 import "@aivo/brand/tokens.css";
 import "./globals.css";
 import { cookies } from "next/headers";
@@ -9,18 +9,35 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
 import { LOCALE_COOKIE_NAME, defaultLocale, dirForLocale, isValidLocale } from "@/i18n/config";
 
-const inter = Inter({
-  subsets: ["latin"],
+// Self-hosted via next/font/local so the build never touches the network.
+// Files live under src/fonts and are vendored in-repo (see scripts/refresh-fonts.md).
+const inter = localFont({
+  src: [
+    {
+      path: "../fonts/InterVariable.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+  ],
   variable: "--font-inter",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
 });
 
-const atkinson = Atkinson_Hyperlegible({
-  subsets: ["latin"],
+const atkinson = localFont({
+  src: [
+    {
+      path: "../fonts/AtkinsonHyperlegible-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/AtkinsonHyperlegible-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-atkinson",
   display: "swap",
-  weight: ["400", "700"],
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aivolearning.com";
