@@ -21,9 +21,10 @@
  * `packages/api-client/README.md`.
  */
 import { spawn } from "node:child_process";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { tmpdir } from "node:os";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = resolve(ROOT, "packages/api-client/openapi");
@@ -140,9 +141,13 @@ const STUB_ENV = {
  * `tsx` so we get TS source loading + ESM resolution.
  */
 function buildShim(absoluteEntry, exportName, outFileAbs) {
+  // ESM imports of absolute paths must be `file://` URLs on Windows;
+  // otherwise tsx/node rejects the bare `c:\...` specifier with
+  // ERR_UNSUPPORTED_ESM_URL_SCHEME.
+  const entryUrl = pathToFileURL(absoluteEntry).href;
   return `
 import { writeFileSync } from "node:fs";
-import { ${exportName} } from ${JSON.stringify(absoluteEntry)};
+import { ${exportName} } from ${JSON.stringify(entryUrl)};
 (async () => {
   const app = await ${exportName}();
   await app.ready();
@@ -164,17 +169,44 @@ function dumpOne(svc) {
     mkdirSync(dirname(outPath), { recursive: true });
     const shim = buildShim(absEntry, svc.exportName, outPath);
 
+    // Write the shim to a temp .mjs file so we don't have to pass a
+    // multi-line script through `-e` (cross-shell escaping nightmare on
+    // Windows). Cleaned up after the child exits.
+    const shimPath = resolve(
+      tmpdir(),
+      `aivo-openapi-${svc.name}-${process.pid}-${Date.now()}.mjs`,
+    );
+    writeFileSync(shimPath, shim);
+
     // Invoke tsx directly (not via `pnpm exec`) so pnpm's "Unsupported
-    // engine" warning doesn't end up in our log stream.
-    const tsxBin = resolve(ROOT, "node_modules/.bin/tsx");
-    const child = spawn(tsxBin, ["-e", shim], {
+    // engine" warning doesn't end up in our log stream. On Windows the
+    // `.bin/tsx` shim is a shell script with no .exe sibling; Node's
+    // `spawn` cannot exec it. Pick the platform-specific entrypoint
+    // (`tsx.cmd` on Windows, `tsx` elsewhere) and enable `shell` on
+    // Windows so cmd.exe can launch the .cmd wrapper.
+    const isWin = process.platform === "win32";
+    const tsxBin = resolve(ROOT, isWin ? "node_modules/.bin/tsx.cmd" : "node_modules/.bin/tsx");
+    const child = spawn(tsxBin, [shimPath], {
       cwd: ROOT,
       env: { ...process.env, ...STUB_ENV },
       stdio: ["ignore", "inherit", "inherit"],
+      shell: isWin,
     });
 
-    child.on("error", reject);
+    const cleanup = () => {
+      try {
+        rmSync(shimPath, { force: true });
+      } catch {
+        /* ignore */
+      }
+    };
+
+    child.on("error", (err) => {
+      cleanup();
+      reject(err);
+    });
     child.on("close", (code) => {
+      cleanup();
       if (code !== 0) {
         reject(new Error(`[${svc.name}] dump failed (exit ${code})`));
         return;

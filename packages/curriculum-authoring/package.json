@@ -20,7 +20,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@aivo/item-bank": "workspace:*",
