@@ -7,12 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listBillingForTenants, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
-import {
-  listPlatformRollup,
-  mrrCents,
-  arrCents,
-  getDistrictSummary,
-} from "@/lib/billing/district-pool";
+import { listPlatformRollup } from "@/lib/billing/district-pool";
 import { PlatformRollupTable } from "@/components/admin/billing/platform-rollup-table";
 
 function formatMoney(cents: number): string {
