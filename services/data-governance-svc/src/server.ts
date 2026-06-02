@@ -7,6 +7,10 @@ import { registerExportRoutes } from "./routes/exports.js";
 import { registerDeletionRoutes } from "./routes/deletion-requests.js";
 import { initDpaStoreFromDb, registerDpaRoutes } from "./routes/dpa.js";
 import { registerRetentionRoutes } from "./routes/retention.js";
+import { registerDsarRoutes } from "./routes/dsar/index.js";
+import { registerConsentRoutes } from "./routes/consent/index.js";
+import { registerCatalogRoutes } from "./routes/catalog/index.js";
+import { registerRetentionPolicyRoutes } from "./routes/retention/index.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
@@ -36,5 +40,10 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerDeletionRoutes(app);
   registerDpaRoutes(app);
   registerRetentionRoutes(app);
+  // Sprint 5 — Compliance Console.
+  registerDsarRoutes(app);
+  registerConsentRoutes(app);
+  registerCatalogRoutes(app);
+  registerRetentionPolicyRoutes(app);
   return app;
 }

@@ -14,6 +14,14 @@ export { buildAuditContext } from "./audit-context.js";
 export { registerEnterpriseAuthHook } from "./fastify-auth.js";
 export type { EnterpriseAuthOptions } from "./fastify-auth.js";
 
+export { registerGovernanceSubscriber } from "./governance-subscriber.js";
+export type {
+  GovernanceHandlers,
+  GovernanceSubjectRequest,
+  EraseResult,
+  ExportResult,
+} from "./governance-subscriber.js";
+
 export {
   canReadLearnerProfile,
   canMutateLearnerProfile,
