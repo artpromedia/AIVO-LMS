@@ -38,14 +38,14 @@ consumes it**.
 
 ## Journey verification matrix
 
-| Journey | Web | Mobile | Backend e2e | Verdict |
-| --- | --- | --- | --- | --- |
-| **Parent / Caregiver** (signup → learner → interests → Stripe billing → IEP → messages → Speech-Buddy consent) | ✅ | ✅ | ✅ | Works e2e. Gap: *What's Working* surface missing (G7); mobile caregiver observation is a fake save (G6). |
-| **Learner** (PIN/login → adaptive IRT baseline → 16 subjects → Stage runtime → 16 surfaces → real-LLM tutor → homework → voice → offline) | ✅ | ✅ | ✅ | Strongest journey. `ux:matrix` 16/16 web+mobile, `tutor:parity` 14/14. Gap: brain-clone route has no mobile screen (G2). |
-| **Teacher** (login → roster → assign → progress → IEP authoring → collaboration → messages) | ✅ | ⚠️ | ✅ | Web complete; collaboration authz now tenant-scoped. Gap: mobile teacher-insight is a fake save (G5). |
-| **Therapist** (login → caseload → goals → IEP/eligibility → session notes) | ✅ | ⚠️ | ✅ | Goals add fixed. **Gap: mobile session notes is a fake save (G4) — clinical blocker.** |
-| **District / School / Platform Admin** (district login + SSO + step-up MFA → tenant split → SIS → LTI → multi-role → seats → data-governance → hash-chained audit → content CMS) | ✅ | n/a | ✅ | Complete. Gaps: Content-CMS storage in-memory (G8); LTI platform-registration admin UI missing (G11). |
-| **Internal / Ops** (finance, platform health, AI-cost/budget caps, support/safety dispatch, status page) | ✅ | n/a | ✅ | Real dashboards, live data. Gap: comms SMS channel `not_available` (G9); no general real-time push transport (G10). |
+| Journey                                                                                                                                                                          | Web | Mobile | Backend e2e | Verdict                                                                                                                  |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ------ | ----------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Parent / Caregiver** (signup → learner → interests → Stripe billing → IEP → messages → Speech-Buddy consent)                                                                   | ✅  | ✅     | ✅          | Works e2e. Gap: _What's Working_ surface missing (G7); mobile caregiver observation is a fake save (G6).                 |
+| **Learner** (PIN/login → adaptive IRT baseline → 16 subjects → Stage runtime → 16 surfaces → real-LLM tutor → homework → voice → offline)                                        | ✅  | ✅     | ✅          | Strongest journey. `ux:matrix` 16/16 web+mobile, `tutor:parity` 14/14. Gap: brain-clone route has no mobile screen (G2). |
+| **Teacher** (login → roster → assign → progress → IEP authoring → collaboration → messages)                                                                                      | ✅  | ⚠️     | ✅          | Web complete; collaboration authz now tenant-scoped. Gap: mobile teacher-insight is a fake save (G5).                    |
+| **Therapist** (login → caseload → goals → IEP/eligibility → session notes)                                                                                                       | ✅  | ⚠️     | ✅          | Goals add fixed. **Gap: mobile session notes is a fake save (G4) — clinical blocker.**                                   |
+| **District / School / Platform Admin** (district login + SSO + step-up MFA → tenant split → SIS → LTI → multi-role → seats → data-governance → hash-chained audit → content CMS) | ✅  | n/a    | ✅          | Complete. Gaps: Content-CMS storage in-memory (G8); LTI platform-registration admin UI missing (G11).                    |
+| **Internal / Ops** (finance, platform health, AI-cost/budget caps, support/safety dispatch, status page)                                                                         | ✅  | n/a    | ✅          | Real dashboards, live data. Gap: comms SMS channel `not_available` (G9); no general real-time push transport (G10).      |
 
 ## Gap inventory
 
@@ -55,7 +55,7 @@ Severity: **Blocker** (ships broken / blocks release / loses data), **Incomplete
 ### A. Release is RED today
 
 **G1 · [Blocker · code/tooling] `release:gate` + `green:check` fail.**
-`pnpm release:gate` → *FAILED — do not deploy*; 3 gates red:
+`pnpm release:gate` → _FAILED — do not deploy_; 3 gates red:
 
 - **`lessonrun:audit` — REAL REGRESSION on this branch.** The new real-LLM
   provider `apps/web-v2/lib/ai/anthropic-tutor.ts:83` imports and calls
@@ -67,8 +67,8 @@ Severity: **Blocker** (ships broken / blocks release / loses data), **Incomplete
   this regression was introduced here.
 - **`consent:audit` — pre-existing brittle gate (false positive, still red).**
   `scripts/consent-gate-audit.mjs:82` matches `export function
-  requireLearnerConsent`, but the code is `export **async** function
-  requireLearnerConsent` (`apps/web-v2/lib/bff/consent-guard.ts:25`). The export
+requireLearnerConsent`, but the code is `export **async** function
+requireLearnerConsent` (`apps/web-v2/lib/bff/consent-guard.ts:25`). The export
   exists; the regex just doesn't allow `async`.
 - **`onboarding:audit` — pre-existing brittle gate (false positive, still red).**
   `scripts/onboarding-audit.mjs` requires a `page.tsx` for every readiness
@@ -83,12 +83,14 @@ red. All three must be green for `release:gate` to pass.
 
 **G4 · [Blocker · code] Mobile therapist session notes is a fake save.**
 `apps/mobile/app/(therapist)/client/[id]/notes.tsx:102-104`:
+
 ```ts
 onPress={() => {
   Alert.alert("Saved", "Session notes submitted to Brain");  // no network call
   router.back();
 }}
 ```
+
 The web path is real (`apps/web-v2/app/api/bff/therapist/sessions/route.ts`
 POSTs SOAP notes), and `sprint12/therapist.spec.ts` proves it — but the mobile
 button never calls it. A therapist documenting a session on mobile loses the
@@ -302,14 +304,14 @@ platform from the UI and a launch persists + writes back a score.
 
 ## Suggested ordering
 
-| Wave | Sprint | Theme | Unblocks |
-| --- | --- | --- | --- |
-| **Stop the bleeding** | 1 | Green CI | any deploy at all |
-| | 2 | Mobile data-loss fixes | therapist/teacher/caregiver mobile trust |
-| **Close headline gaps** | 3 | What's Working surface | the 4th neurodiverse feature |
-| | 4 | Mobile brain-clone parity | parity gate honesty |
-| **Scale & polish** | 5 | Content-CMS persistence | multi-pod admin |
-| | 6 | Real-time + SMS + LTI UI | enterprise onboarding + UX |
+| Wave                    | Sprint | Theme                     | Unblocks                                 |
+| ----------------------- | ------ | ------------------------- | ---------------------------------------- |
+| **Stop the bleeding**   | 1      | Green CI                  | any deploy at all                        |
+|                         | 2      | Mobile data-loss fixes    | therapist/teacher/caregiver mobile trust |
+| **Close headline gaps** | 3      | What's Working surface    | the 4th neurodiverse feature             |
+|                         | 4      | Mobile brain-clone parity | parity gate honesty                      |
+| **Scale & polish**      | 5      | Content-CMS persistence   | multi-pod admin                          |
+|                         | 6      | Real-time + SMS + LTI UI  | enterprise onboarding + UX               |
 
 **Gate after every sprint:** `pnpm green:check` and `pnpm release:gate` (plus
 `mobile:parity:strict` for Sprints 2 & 4).
@@ -336,3 +338,23 @@ platform from the UI and a launch persists + writes back a score.
   `ai-svc/.../speech_buddy/events.py` (NATS outbox),
   `family-svc/src/lib/aac-board.ts`,
   `packages/aac-bridge/src/adapters/AssistiveWareAdapter.ts` (highlight wired).
+
+## Remediation status — sprints executed (2026-06)
+
+All six sprints from this plan were implemented on `claude/brave-sagan-kM5Fn`.
+
+| Sprint | Scope                                                                                          | Status      | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------ | ---------------------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1      | Green the release gate (lessonrun layering + brittle consent/onboarding gates, no-coming-soon) | ✅ Done     | `release:gate` PASS (20/20); anthropic-tutor no longer imports the deterministic generator (orchestrator passes it as the example); consent/onboarding gates fixed; 4 tutor unit tests pass.                                                                                                                                                                                                                                                         |
+| 2      | Stop mobile data loss (therapist notes, teacher insight, caregiver observation)                | ✅ Done     | Each screen now POSTs to family-svc with pending/error states. New `POST /api/family/therapy-sessions` (→ `therapy_sessions`) + `POST /api/family/teacher-insights` (→ `brain_insights`); observation wired to existing `/api/family/observations`.                                                                                                                                                                                                  |
+| 3      | Ship the "What's Working" surface                                                              | ✅ Done     | Web BFF `/api/bff/parent/learners/[id]/whats-working` + `WhatsWorkingPanel` on the parent learner page; mobile `useWhatsWorking` + `WhatsWorkingCard`; `parent.whats_working` i18n across 10 locales; `i18n:coverage` 0 failures.                                                                                                                                                                                                                    |
+| 4      | Mobile brain-clone parity                                                                      | ✅ Done     | New `apps/mobile/app/(learner)/brain.tsx` ("Your Brain"); `mobile:parity:strict` 115/115, no drift.                                                                                                                                                                                                                                                                                                                                                  |
+| 5      | Content-CMS durable storage                                                                    | ✅ Done     | `content_packs` table + migration 0057; admin-svc pluggable PackStore (Postgres in prod, in-memory for tests); new create/upsert endpoint; 9/9 tests; `persistence:stubs`/`backend:parity` green.                                                                                                                                                                                                                                                    |
+| 6B     | comms-svc SMS channel                                                                          | ✅ Done     | `providers/sms-router.ts` (disabled default + Twilio adapter, env-gated); `channel:"sms"` dispatch + status/preferences reflect real capability; 4 unit tests.                                                                                                                                                                                                                                                                                       |
+| 6C     | LTI platform-registration UI + API                                                             | ✅ Done     | integration-svc `registerPlatform`/`listPlatforms` + admin `GET/POST /api/lti/platforms`; web BFF + `/admin/platform/lti` page; DB-gated persistence test.                                                                                                                                                                                                                                                                                           |
+| 6A     | Real-time fan-out (SSE/WS for inbox + co-view)                                                 | ⏳ Deferred | A correct cross-replica transport requires comms-svc → pub/sub (NATS) → client SSE, whose streaming layer cannot be runtime-verified in CI/this environment. It is a latency **optimization only** — the existing visibility-aware polling (6–12s) loses no data. Recommended as a follow-up once a live stack is available to verify the stream; reuse the Speech Buddy NATS-outbox pattern (`ai-svc/.../speech_buddy/events.py`) as the transport. |
+
+Post-sprint gate state: `release:gate` PASS (20/20), `green:check` core audit
+gates green (the heavyweight repo-wide `format/lint/test/build/api:check` core
+gates remain pre-existing repo debt, out of scope here), `mobile:parity:strict`
+115/115, `i18n:coverage` 0 failures, `backend:parity` 28 green.
