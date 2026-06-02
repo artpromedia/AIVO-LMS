@@ -94,14 +94,17 @@ describe("SurfaceHost", () => {
         surface={{
           ...baseSurface,
           id: "s5",
-          type: "graph",
+          // Use a synthetic surface type that no renderer recognises so we
+          // exercise the unsupported-surface fallback path. All declared
+          // LearnerSurfaceType values are now implemented (Sprints 4-9).
+          type: "__not_a_real_surface__" as unknown as LearnerSurfaceSpec["type"],
           prompt: "Unsupported",
         }}
         onEvent={(event) => events.push({ type: event.type })}
       />,
     );
 
-    expect(unsupportedMarkup).toContain("Activity type unavailable");
+    expect(unsupportedMarkup).toContain("This activity isn’t ready yet.");
     expect(events.some((event) => event.type === "unsupported_surface")).toBe(true);
   });
 
