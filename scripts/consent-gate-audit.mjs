@@ -79,7 +79,7 @@ if (files.length === 0) {
 }
 
 const guardSrc = readFileSync(join(repoRoot, "apps/web-v2/lib/bff/consent-guard.ts"), "utf8");
-if (!/export function requireLearnerConsent/.test(guardSrc)) {
+if (!/export (?:async )?function requireLearnerConsent/.test(guardSrc)) {
   console.error("error: apps/web-v2/lib/bff/consent-guard.ts must export requireLearnerConsent.");
   process.exit(1);
 }

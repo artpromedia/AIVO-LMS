@@ -19,7 +19,6 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { serverEnv } from "@/lib/env";
-import { generateDeterministicLessonPlan } from "@/lib/learner/lesson-plan";
 import { MockTutorProvider, type TutorProvider, type TutorGenerationInputs } from "./tutor";
 
 // Default to the most capable model; adaptive thinking lets Claude scale
@@ -79,8 +78,10 @@ export function createAnthropicTutorProvider(client: Anthropic): TutorProvider {
   return {
     name: "ai",
     model: ANTHROPIC_TUTOR_MODEL,
-    async generate(input) {
-      const example = generateDeterministicLessonPlan(input);
+    // `example` is the schema-valid reference plan supplied by the orchestrator
+    // (`generateLessonPlanWithRetry`); the provider anchors Claude's output to
+    // it without importing the deterministic generator directly.
+    async generate(input, example) {
       const message = await client.messages.create({
         model: ANTHROPIC_TUTOR_MODEL,
         max_tokens: 16000,

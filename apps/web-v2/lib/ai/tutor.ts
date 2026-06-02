@@ -57,8 +57,15 @@ export type TutorGenerationInputs = {
 export type TutorProvider = {
   name: "mock" | "ai";
   model: string;
-  /** May throw or return malformed JSON — the caller validates. */
-  generate(input: TutorGenerationInputs): Promise<unknown>;
+  /**
+   * May throw or return malformed JSON — the caller validates.
+   *
+   * `example` is a schema-valid reference plan the orchestrator supplies so a
+   * real provider can anchor the model output to the exact shape WITHOUT
+   * importing the deterministic generator itself. Keeping that import contained
+   * to this orchestrator is enforced by `scripts/lessonrun-audit.mjs`.
+   */
+  generate(input: TutorGenerationInputs, example?: unknown): Promise<unknown>;
 };
 
 export const MockTutorProvider: TutorProvider = {
@@ -91,9 +98,14 @@ export async function generateLessonPlanWithRetry(
 ): Promise<TutorGenerationResult> {
   const start = Date.now();
   let lastError: unknown = null;
+  // Compute the deterministic plan once: it both anchors the provider's output
+  // shape (passed in as the `example`) and is the validated safety-net
+  // `fallback` below. This is the single place that reaches the deterministic
+  // generator, so real providers never import it.
+  const fallback = generateDeterministicLessonPlan(input);
   for (let attempt = 1; attempt <= LESSON_PLAN_MAX_ATTEMPTS; attempt++) {
     try {
-      const raw = await provider.generate(input);
+      const raw = await provider.generate(input, fallback);
       const parsed = GeneratedLessonPlanSchema.safeParse(raw);
       if (parsed.success) {
         return {
@@ -127,7 +139,6 @@ export async function generateLessonPlanWithRetry(
     { provider: provider.name, lastError: String(lastError) },
     "[ai/tutor] provider exhausted retries — using deterministic fallback",
   );
-  const fallback = generateDeterministicLessonPlan(input);
   const validated = GeneratedLessonPlanSchema.parse(fallback);
   return {
     plan: validated,

@@ -204,7 +204,8 @@ export const LEARNER_SUBJECTS = [
   // Sprint 1 (subject/tutor UX) — give the four "orphan" tutors a learner
   // subject row so they are reachable from the subjects grid (previously they
   // had a full backend but no card). They ship as not-yet-production-ready, so
-  // `getDiscoverableSubjects()` surfaces them as locked "coming soon" cards.
+  // `getDiscoverableSubjects()` surfaces them as locked, preview-only cards
+  // (content in progress) rather than fully playable subjects.
   {
     slug: "geography",
     name: "Geography",
