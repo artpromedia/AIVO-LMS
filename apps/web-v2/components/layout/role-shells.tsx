@@ -85,6 +85,7 @@ export const SCHOOL_NAV: RoleNavItem[] = [
   { href: "/admin/school/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
   { href: "/admin/school/billing", label: "Billing", icon: <CreditCard className="h-4 w-4" /> },
   { href: "/admin/school/compliance", label: "Compliance", icon: <Shield className="h-4 w-4" /> },
+  { href: "/admin/school/audit", label: "Audit", icon: <ScrollText className="h-4 w-4" /> },
   { href: "/admin/school/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -98,6 +99,7 @@ export const DISTRICT_NAV: RoleNavItem[] = [
   { href: "/admin/district/compliance", label: "Compliance", icon: <Shield className="h-4 w-4" /> },
   { href: "/admin/district/identity", label: "Identity", icon: <ShieldCheck className="h-4 w-4" /> },
   { href: "/admin/district/sis", label: "SIS Sync", icon: <UploadCloud className="h-4 w-4" /> },
+  { href: "/admin/district/audit", label: "Audit", icon: <ScrollText className="h-4 w-4" /> },
   { href: "/admin/district/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -122,6 +124,7 @@ export const PLATFORM_NAV: RoleNavItem[] = [
   { href: "/admin/platform/tenants", label: "Tenants", icon: <Users className="h-4 w-4" /> },
   { href: "/admin/platform/identity", label: "Identity", icon: <Shield className="h-4 w-4" /> },
   { href: "/admin/platform/sis", label: "SIS Sync", icon: <UploadCloud className="h-4 w-4" /> },
+  { href: "/admin/platform/audit", label: "Audit", icon: <ScrollText className="h-4 w-4" /> },
   { href: "/admin/platform/users", label: "Users", icon: <Users className="h-4 w-4" /> },
   {
     href: "/admin/platform/learners",
