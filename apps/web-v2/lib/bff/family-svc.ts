@@ -19,6 +19,52 @@ export interface SpeechBuddyConsentView {
   consent: { id: string; ageBand: string; scope: string } | null;
 }
 
+/** Mirrors family-svc `WhatsWorkingInsights` (services/whats-working.ts). */
+export interface WhatsWorkingView {
+  windowDays: number;
+  totalSessions: number;
+  timeOfDay: Array<{
+    timeOfDay: string;
+    sessions: number;
+    meanAccuracy: number;
+    meanFrustration: number;
+    meanAttentionMinutes: number;
+    score: number;
+  }>;
+  bestWindow: {
+    timeOfDay: string;
+    sessions: number;
+    meanAccuracy: number;
+    meanFrustration: number;
+    meanAttentionMinutes: number;
+    score: number;
+  } | null;
+  frustrationHotspots: Array<{
+    subject: string;
+    modality: string;
+    sessions: number;
+    meanFrustration: number;
+  }>;
+  modalityFit: Array<{
+    subject: string;
+    modality: string;
+    sessions: number;
+    meanAccuracy: number;
+  }>;
+}
+
+/** Empty insights — the dev/mock fallback and a safe default for the UI. */
+export function emptyWhatsWorking(windowDays: number): WhatsWorkingView {
+  return {
+    windowDays,
+    totalSessions: 0,
+    timeOfDay: [],
+    bestWindow: null,
+    frustrationHotspots: [],
+    modalityFit: [],
+  };
+}
+
 type ServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; error: string };
 
 /** Resolve the family-svc flag: per-service override, else the stack flag. */
@@ -99,8 +145,23 @@ export function revokeSpeechBuddyConsent(
   bearer: string,
   learnerId: string,
 ): Promise<ServiceResult<{ revoked: boolean }>> {
-  return familyFetch(
-    `/api/family/speech-buddy/consent/${encodeURIComponent(learnerId)}/revoke`,
-    { method: "POST", bearer },
+  return familyFetch(`/api/family/speech-buddy/consent/${encodeURIComponent(learnerId)}/revoke`, {
+    method: "POST",
+    bearer,
+  });
+}
+
+/**
+ * Fetch the "What's Working" analytics for one learner from family-svc
+ * (`GET /api/family/whats-working/:learnerId?windowDays=N`).
+ */
+export function getWhatsWorking(
+  bearer: string,
+  learnerId: string,
+  windowDays: number,
+): Promise<ServiceResult<WhatsWorkingView>> {
+  return familyFetch<WhatsWorkingView>(
+    `/api/family/whats-working/${encodeURIComponent(learnerId)}?windowDays=${windowDays}`,
+    { bearer },
   );
 }

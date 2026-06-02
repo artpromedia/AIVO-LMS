@@ -739,7 +739,9 @@
     "subtitle": "이 학생의 학습에 대한 관찰을 공유하세요",
     "yourInsight": "인사이트",
     "placeholder": "이 학생에 대해 관찰한 내용을 설명해 주세요...",
-    "submitted": "인사이트가 학부모 받은 편지함으로 전송되었습니다"
+    "submitted": "인사이트가 학부모 받은 편지함으로 전송되었습니다",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "IEP 업로드",
@@ -810,7 +812,9 @@
     "prompt": "오늘 아이는 어떻게 지냈나요?",
     "placeholder": "관찰 내용을 공유하세요…",
     "submitBtn": "관찰 제출",
-    "submitted": "관찰이 브레인 인사이트에 저장되었습니다"
+    "submitted": "관찰이 브레인 인사이트에 저장되었습니다",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "진행",
@@ -846,7 +850,11 @@
     "reportsSubtitle": "치료 진행 보고서 생성 및 조회",
     "noReportsTitle": "보고서 없음",
     "noReportsMessage": "준비가 되면 진행 보고서를 생성하세요.",
-    "generateReport": "보고서 생성"
+    "generateReport": "보고서 생성",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected."
   },
   "therapistSessions": {
     "title": "세션 로그",

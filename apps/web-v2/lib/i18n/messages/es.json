@@ -491,7 +491,8 @@
       "strengths": "Fortalezas",
       "none_recorded": "Ninguno registrado aún.",
       "challenges": "Desafíos",
-      "accessibility_defaults": "Configuración de accesibilidad"
+      "accessibility_defaults": "Configuración de accesibilidad",
+      "whats_working": "What's working"
     },
     "learner_sensory": {
       "title": "Perfil sensorial",
@@ -642,6 +643,33 @@
       "age_6_9": "Ages 6–9",
       "age_10_12": "Ages 10–12",
       "age_13_15": "Ages 13–15"
+    },
+    "whats_working": {
+      "title": "What's working",
+      "intro": "Patterns from {name}'s recent sessions — bring these to your next IEP meeting.",
+      "loading": "Loading insights…",
+      "load_error": "Couldn't load insights right now.",
+      "empty": "Not enough sessions yet. Insights appear once {name} has completed a few sessions.",
+      "window_label": "Window",
+      "window_30": "30 days",
+      "window_90": "90 days",
+      "best_window": "Best learning window",
+      "modality_fit": "Modality that clicks",
+      "frustration": "Where frustration spikes",
+      "none_yet": "Not enough data yet",
+      "sessions": "{count} sessions",
+      "accuracy": "{pct}% accuracy",
+      "in_subject": "in {subject}",
+      "tod_early-morning": "Early morning",
+      "tod_morning": "Morning",
+      "tod_midday": "Midday",
+      "tod_afternoon": "Afternoon",
+      "tod_evening": "Evening",
+      "modality_visual": "Visual",
+      "modality_auditory": "Auditory",
+      "modality_kinesthetic": "Hands-on",
+      "modality_reading": "Reading",
+      "modality_unknown": "Mixed"
     }
   },
   "brain_clone": {

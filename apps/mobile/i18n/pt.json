@@ -739,7 +739,9 @@
     "subtitle": "Compartilhe uma observação sobre o aprendizado deste aluno",
     "yourInsight": "Sua observação",
     "placeholder": "Descreva o que você observou sobre este aluno...",
-    "submitted": "Observação enviada para a caixa de entrada dos pais"
+    "submitted": "Observação enviada para a caixa de entrada dos pais",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "Enviar IEP",
@@ -810,7 +812,9 @@
     "prompt": "Como a criança foi hoje?",
     "placeholder": "Compartilhe sua observação…",
     "submitBtn": "Enviar observação",
-    "submitted": "Observação salva nos insights do Cérebro"
+    "submitted": "Observação salva nos insights do Cérebro",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "Progresso",
@@ -846,7 +850,11 @@
     "reportsSubtitle": "Gerar e visualizar relatórios de progresso terapêutico",
     "noReportsTitle": "Nenhum relatório",
     "noReportsMessage": "Gere um relatório de progresso quando estiver pronto.",
-    "generateReport": "Gerar relatório"
+    "generateReport": "Gerar relatório",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected."
   },
   "therapistSessions": {
     "title": "Registros de sessões",

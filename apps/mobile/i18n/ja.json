@@ -739,7 +739,9 @@
     "subtitle": "この生徒の学習に関する観察を共有する",
     "yourInsight": "あなたのインサイト",
     "placeholder": "この生徒について観察したことを説明してください...",
-    "submitted": "インサイトを保護者の受信トレイに送信しました"
+    "submitted": "インサイトを保護者の受信トレイに送信しました",
+    "noStudent": "No student selected.",
+    "error": "Couldn't submit insight"
   },
   "teacherIEP": {
     "title": "IEPをアップロード",
@@ -810,7 +812,9 @@
     "prompt": "今日の子どもの様子はどうでしたか？",
     "placeholder": "観察内容を共有してください…",
     "submitBtn": "観察を提出",
-    "submitted": "観察をブレインインサイトに保存しました"
+    "submitted": "観察をブレインインサイトに保存しました",
+    "noChild": "No child selected.",
+    "error": "Couldn't submit observation"
   },
   "caregiverProgress": {
     "title": "進捗",
@@ -846,7 +850,11 @@
     "reportsSubtitle": "セラピー進捗レポートの作成と閲覧",
     "noReportsTitle": "レポートなし",
     "noReportsMessage": "準備ができたら進捗レポートを作成してください。",
-    "generateReport": "レポートを作成"
+    "generateReport": "レポートを作成",
+    "saveNotes": "Save Session Notes",
+    "notesSaved": "Session notes saved",
+    "notesError": "Couldn't save session notes",
+    "noClient": "No client selected."
   },
   "therapistSessions": {
     "title": "セッションログ",

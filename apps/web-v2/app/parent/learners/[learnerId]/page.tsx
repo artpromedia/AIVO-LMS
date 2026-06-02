@@ -20,6 +20,7 @@ import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { getLearner, parentCanAccessLearner, refreshLearnerReadiness } from "@/lib/db/repos";
 import { READINESS_LABEL, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
+import { WhatsWorkingPanel } from "./whats-working-panel";
 
 export default async function LearnerDetailPage({
   params,
@@ -29,7 +30,7 @@ export default async function LearnerDetailPage({
   const t = await getTranslations("parent.learner_overview");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
   await refreshLearnerReadiness(learnerId, session.tenantId);
@@ -82,6 +83,11 @@ export default async function LearnerDetailPage({
             {next.label} <ArrowRight className="ml-1 h-4 w-4" />
           </Link>
         </Button>
+      </Card>
+
+      <SectionHeader title={t("whats_working")} />
+      <Card className="p-[var(--aivo-density-card-pad)]">
+        <WhatsWorkingPanel learnerId={learner.id} learnerName={learner.displayName} />
       </Card>
 
       <SectionHeader title={t("explore")} />
