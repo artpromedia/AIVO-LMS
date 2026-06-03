@@ -124,8 +124,10 @@ flips the default; "Code gap" = a flag won't fix it.
 19. **[Minor] `x-aivo-active-role` never enforced server-side.** Mobile sends
     it; no service validates it (documented Sprint-09 follow-up never landed).
     Hint-only, so low risk — but the documented spoof protection is absent.
-    → **Fixed in this pass — shared helper + family-svc enforcement (see
-    Changelog); other services should adopt the helper.**
+    → **Fixed — shared helper + family-svc enforcement, then adopted across
+    every JWT service. The remaining JWT services (assessment-svc, comms-svc,
+    admin-svc) now register the shared `registerActiveRoleHook` global hook
+    (see Changelog), so the header is enforced platform-wide.**
 20. **[Minor] Unified mobile shell migration stalled.**
     `MOBILE_UNIFIED_APP=false`, no `(app)` shell; legacy per-role shells
     remain (role switch ⇒ re-login). → \*\*Progressed: the contract's
@@ -247,7 +249,7 @@ mobile build if `EXPO_PUBLIC_API_URL` / Google client ID are unset. Addresses
 
 **Phase 1 — Blockers.** Web signup (#1 ✅), onboarding wizard (#7 ✅ partial),
 billing→billing-svc Checkout (#8), Speech Buddy safety judge (#17) + consent
-store (#18), active-role enforcement (#19).
+store (#18), active-role enforcement (#19 ✅).
 
 **Phase 2 — Parity & continuity.** Mobile baseline → assessment-svc IRT (#11),
 persistent authed offline queue (#15), PIN refresh session (#3), mobile
@@ -448,3 +450,34 @@ Verified: web-v2 `typecheck` + `eslint --max-warnings=0` clean on changed
 files; mobile `tsc` (0 errors) + `eslint` clean. With #18's backend, this
 fully closes the Speech Buddy consent blocker. Consent copy is English-only
 pending an i18n pass.
+
+## Changelog — Phase 1: `x-aivo-active-role` enforcement everywhere (#19)
+
+Closed the remaining JWT services so the active-role spoof protection is now
+enforced platform-wide (previously only `family-svc`, `engagement-svc`,
+`billing-svc`, `learning-svc`, and `tutor-svc` validated the header).
+
+- `packages/security/src/active-role.ts` — added `registerActiveRoleHook(app)`,
+  a framework-light Fastify `onRequest` hook that enforces the existing
+  `checkActiveRole` contract globally. It only does work when the
+  `x-aivo-active-role` header is present (the unified mobile app sends it on
+  every authenticated request; web + internal service-token callers do not),
+  reads the bearer token from the `Authorization` header or `access_token`
+  cookie, and on a spoofed header audit-logs `auth.active_role.spoofing` and
+  returns `403 FORBIDDEN_ROLE`. Header absent, no user token, or an invalid
+  token ⇒ no-op (the route's own auth still applies — the hook never adds a
+  new authentication requirement, it only rejects spoofed role hints).
+  Exported from `@aivo/security`.
+- `services/assessment-svc/src/index.ts`, `services/comms-svc/src/index.ts`,
+  `services/admin-svc/src/index.ts` — each registers the hook once at
+  bootstrap, so all of their JWT routes are covered without touching the
+  individual route files.
+- `packages/security/tests/active-role-hook.test.ts` (new) — 8 tests covering
+  the no-op paths, pass, spoof-reject + audit, multi-role widening, cookie
+  token source, and health/docs skip.
+
+Safe by construction: a real single-role caller sends its own role and always
+passes; only a client claiming a role its token doesn't grant is rejected.
+
+Verified: `@aivo/security` builds + 61 tests pass; `assessment-svc`,
+`comms-svc`, `admin-svc` build clean (`tsc`); changed files `eslint` clean.

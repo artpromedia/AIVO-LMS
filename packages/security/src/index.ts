@@ -235,5 +235,6 @@ export {
   FORBIDDEN_ROLE_CODE,
   ACTIVE_ROLE_SPOOFING_EVENT,
   checkActiveRole,
+  registerActiveRoleHook,
   type ActiveRoleResult,
 } from "./active-role.js";

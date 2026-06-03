@@ -6,6 +6,7 @@ import swaggerUI from "@fastify/swagger-ui";
 import { createLogger } from "@aivo/observability";
 import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
+import { registerActiveRoleHook } from "@aivo/security";
 import { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } from "@aivo/scheduling";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerNotificationRoutes } from "./routes/notifications.js";
@@ -43,6 +44,10 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
   // only thing that talks to the provider. Tests that build the app with a
   // mock db keep using the direct-send path automatically.
   setEmailOutboxDb(db);
+
+  // ADR 0020 — enforce the `x-aivo-active-role` header (hint, never a grant)
+  // against the caller's token. No-op when the header is absent.
+  registerActiveRoleHook(app);
 
   registerHealthRoutes(app);
   registerNotificationRoutes(app, db);

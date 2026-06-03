@@ -5,6 +5,7 @@ import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { createLogger, registerObservabilityPlugin } from "@aivo/observability";
 import { createDb } from "@aivo/db";
+import { registerActiveRoleHook } from "@aivo/security";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerParentAssessmentRoutes } from "./routes/parent-assessment.js";
@@ -82,6 +83,10 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
   await app.register(swaggerUI, { routePrefix: "/docs" });
 
   app.decorate("db", db);
+
+  // ADR 0020 — enforce the `x-aivo-active-role` header (hint, never a grant)
+  // against the caller's token. No-op when the header is absent.
+  registerActiveRoleHook(app);
 
   await registerHealthRoutes(app);
   await registerParentAssessmentRoutes(app);
