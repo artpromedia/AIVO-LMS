@@ -163,8 +163,8 @@ export function registerImpersonationRoutes(app: FastifyInstance, deps: Imperson
       userId: actorClaims.sub,
       role: actorRole as AdminRole,
       tenantId: actorClaims.tenantId,
-      districtId: (actorClaims as Record<string, unknown>).districtId as string | undefined,
-      schoolId: (actorClaims as Record<string, unknown>).schoolId as string | undefined,
+      districtId: (actorClaims as unknown as Record<string, unknown>).districtId as string | undefined,
+      schoolId: (actorClaims as unknown as Record<string, unknown>).schoolId as string | undefined,
     };
 
     // 1) RBAC matrix.
@@ -227,7 +227,7 @@ export function registerImpersonationRoutes(app: FastifyInstance, deps: Imperson
       ttlSeconds: ttl,
       allowWrites: !!body.allow_writes,
       sessionId: session.id,
-      subjectEmail: (subject as Record<string, unknown>).email as string | undefined,
+      subjectEmail: (subject as unknown as Record<string, unknown>).email as string | undefined,
       subjectAvailableRoles: subject.role ? [subject.role] : undefined,
       now: now(),
     });
