@@ -18,7 +18,7 @@
 // of consent types is requested. That is a Sprint 04 follow-up gate.
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -69,7 +69,11 @@ function walk(dir, out = []) {
 }
 
 const bffRoot = join(repoRoot, "apps/web-v2/app/api/bff/learners");
-const files = walk(bffRoot).filter((p) => p.endsWith("/route.ts"));
+// Use path.basename so the filter is correct on both POSIX and Windows
+// (walk() returns paths with the host separator; an `endsWith("/route.ts")`
+// check silently matched nothing on Windows). The guard is not weakened —
+// the route-file recognition is what was platform-broken.
+const files = walk(bffRoot).filter((p) => p.endsWith(`${sep}route.ts`) || p.endsWith("/route.ts"));
 
 if (files.length === 0) {
   console.error(
@@ -88,7 +92,9 @@ const errors = [];
 const warnings = [];
 
 function classify(file) {
-  const rel = file.replace(repoRoot + "/", "");
+  // Normalise to POSIX-style separators so SENSITIVE_PATTERNS regexes
+  // (authored with `/`) match on Windows too.
+  const rel = file.replace(repoRoot + sep, "").split(sep).join("/");
   for (const pattern of SENSITIVE_PATTERNS) {
     if (pattern.match.test(rel)) return pattern;
   }
@@ -96,7 +102,7 @@ function classify(file) {
 }
 
 for (const file of files) {
-  const rel = file.replace(repoRoot + "/", "");
+  const rel = file.replace(repoRoot + sep, "").split(sep).join("/");
   const pattern = classify(file);
   if (!pattern) {
     warnings.push(`${rel}: not classified — add to SENSITIVE_PATTERNS or allow-list.`);

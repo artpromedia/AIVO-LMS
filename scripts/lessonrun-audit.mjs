@@ -113,11 +113,17 @@ if (!existsSync(tutorPath)) {
       "lib/ai/tutor.ts: deterministic fallback must be re-validated with .parse() — a regression must throw, not silently ship a malformed plan.",
     );
   }
-  // No other file may import generateDeterministicLessonPlan.
+  // No other production file may import generateDeterministicLessonPlan.
+  // Test files under __tests__/ that ASSERT this layering are exempt —
+  // they reference the identifier in string assertions, not as a real
+  // import, and excluding them is scoping the guard to production code,
+  // not weakening it. (The layering test itself fails loudly if the
+  // production file ever re-imports the deterministic generator.)
   const root = join(repoRoot, "apps/web-v2");
   for (const f of walk(root)) {
     if (!f.endsWith(".ts") && !f.endsWith(".tsx")) continue;
     if (f === tutorPath) continue;
+    if (/[\\/]__tests__[\\/]/.test(f) || /\.test\.(ts|tsx)$/.test(f)) continue;
     const fsrc = readFileSync(f, "utf8");
     if (
       /generateDeterministicLessonPlan/.test(fsrc) &&
