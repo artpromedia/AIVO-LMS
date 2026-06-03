@@ -1531,7 +1531,9 @@
       "cam_title": "摄像头",
       "cam_desc": "仅在扫描作业页面或文档时使用。AIVO 绝不录制视频。",
       "notifs_title": "通知",
-      "notifs_desc": "批准请求、每周进度摘要和安全消息。课程提醒默认关闭——你可以稍后启用。"
+      "notifs_desc": "批准请求、每周进度摘要和安全消息。课程提醒默认关闭——你可以稍后启用。",
+      "saving": "正在保存…",
+      "save_error": "无法保存您的通知偏好设置，请重试。"
     },
     "pin": {
       "eyebrow": "学习者 PIN",
@@ -1637,7 +1639,15 @@
       "legal_never_label": "绝不提取：",
       "legal_never_body": "医疗诊断、心理评估、家长陈述、签名。",
       "legal_teachers_label": "教师可见：",
-      "legal_teachers_body": "仅适应性支持清单，且仅限你已同意的学校。"
+      "legal_teachers_body": "仅适应性支持清单，且仅限你已同意的学校。",
+      "saving": "正在保存…",
+      "save_error": "无法保存 IEP 步骤，请重试。",
+      "consent_required": "请在上传文件前明确表示同意。",
+      "select_learner_label": "此 IEP 适用于哪个孩子？",
+      "select_learner_placeholder": "选择一个孩子",
+      "no_learner_title": "请先添加一个孩子",
+      "no_learner_body": "IEP 会保存到特定孩子名下。请先添加孩子，然后即可上传其计划。",
+      "no_learner_cta": "添加孩子"
     },
     "invite_school": {
       "eyebrow": "学校邀请",

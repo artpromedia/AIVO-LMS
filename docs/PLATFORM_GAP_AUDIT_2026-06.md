@@ -319,6 +319,51 @@ Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean,
 `eslint --max-warnings=0` clean on the changed file, and
 `corepack pnpm --filter @aivo/web-v2 build` succeeds.
 
+## Changelog — Phase 1: onboarding permissions + IEP persistence (#7, slices 2–3)
+
+Continued closing gap #7 by making the two remaining input-bearing onboarding
+steps persist instead of discarding their state. No new backends — both reuse
+existing, tested BFF endpoints.
+
+Slice 2 — permissions step:
+
+- `apps/web-v2/app/onboarding/permissions/page.tsx` — replaced the Continue
+  `<Link>` with a submit that persists the Notifications toggle via
+  `PATCH /api/bff/notification-preferences`, flipping the email channel for the
+  parent-facing `parent_progress_summary` and `safety_review_required` types
+  (the "weekly digests + safety/approval messages" the row describes). The mic
+  and camera toggles are documented in-code as browser-level device-capability
+  prompts (the real grant is the browser's own permission dialog at point of
+  use) and are intentionally not persisted, so the step is honest rather than
+  silently dropping server state it never had.
+- Adds `onboarding.permissions.saving` / `save_error` in all 10 locales.
+
+Slice 3 — IEP-upload step (depends on a `learnerId`):
+
+- `apps/web-v2/app/onboarding/iep-upload/page.tsx` — the step now persists.
+  IEP documents are learner-scoped, so the page resolves a `learnerId` from
+  the `?learnerId=` query string and, when absent, gates behind learner
+  selection by fetching `GET /api/bff/learners` (auto-selecting a sole learner,
+  offering a picker for several, and pointing the parent at
+  `/onboarding/learner/new` when none exist). On submit with a file it records
+  explicit `iep_document_storage` consent via
+  `POST /api/bff/learners/[learnerId]/consent` and then POSTs the multipart
+  file to `POST /api/bff/learners/[learnerId]/iep-upload`; the skip path calls
+  `POST …/iep-upload/skip` so a deliberate "no IEP" is also recorded. Errors
+  surface inline without navigating.
+- Adds `onboarding.iep_upload.{saving,save_error,consent_required,
+  select_learner_label,select_learner_placeholder,no_learner_title,
+  no_learner_body,no_learner_cta}` in all 10 locales.
+
+Slice 4 (learner PIN-set, household / co-parent invites, real phone/SMS
+verification — overlapping SMS gap #22, and child-approval persistence) remains
+separate feature work needing new backends, and is out of scope here.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
+`eslint --max-warnings=0` clean on the changed files. (`pnpm --filter
+@aivo/web-v2 build` only fails in the sandbox because Google Fonts is
+unreachable — unrelated to these changes.)
+
 ## Changelog — Phase 1: billing → billing-svc (#8)
 
 Wired the web parent billing surface to the real, Stripe-backed

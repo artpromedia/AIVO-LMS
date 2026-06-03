@@ -1531,7 +1531,9 @@
       "cam_title": "Kamera",
       "cam_desc": "Wird nur beim Scannen einer Hausaufgabenseite oder eines Dokuments verwendet. AIVO nimmt niemals Videos auf.",
       "notifs_title": "Benachrichtigungen",
-      "notifs_desc": "Genehmigungsanfragen, wöchentliche Fortschrittsübersichten und Sicherheitsmeldungen. Lektionserinnerungen sind standardmäßig aus – du kannst sie später aktivieren."
+      "notifs_desc": "Genehmigungsanfragen, wöchentliche Fortschrittsübersichten und Sicherheitsmeldungen. Lektionserinnerungen sind standardmäßig aus – du kannst sie später aktivieren.",
+      "saving": "Wird gespeichert…",
+      "save_error": "Ihre Benachrichtigungseinstellung konnte nicht gespeichert werden. Bitte erneut versuchen."
     },
     "pin": {
       "eyebrow": "Lernenden-PIN",
@@ -1637,7 +1639,15 @@
       "legal_never_label": "Niemals extrahiert:",
       "legal_never_body": "medizinische Diagnosen, psychologische Gutachten, Elternaussagen, Unterschriften.",
       "legal_teachers_label": "Für Lehrkräfte sichtbar:",
-      "legal_teachers_body": "nur die Liste der Anpassungen, nur an Schulen, denen du zugestimmt hast."
+      "legal_teachers_body": "nur die Liste der Anpassungen, nur an Schulen, denen du zugestimmt hast.",
+      "saving": "Wird gespeichert…",
+      "save_error": "Der IEP-Schritt konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "consent_required": "Bitte erteilen Sie eine ausdrückliche Einwilligung, bevor Sie ein Dokument hochladen.",
+      "select_learner_label": "Für welches Kind ist dieser IEP?",
+      "select_learner_placeholder": "Kind auswählen",
+      "no_learner_title": "Fügen Sie zuerst ein Kind hinzu",
+      "no_learner_body": "Ein IEP wird für ein bestimmtes Kind gespeichert. Fügen Sie ein Kind hinzu, dann können Sie seinen Plan hochladen.",
+      "no_learner_cta": "Kind hinzufügen"
     },
     "invite_school": {
       "eyebrow": "Schuleinladung",

@@ -1531,7 +1531,9 @@
       "cam_title": "카메라",
       "cam_desc": "숙제 페이지나 문서를 스캔할 때만 사용됩니다. AIVO는 절대 영상을 녹화하지 않습니다.",
       "notifs_title": "알림",
-      "notifs_desc": "승인 요청, 주간 진행 요약, 안전 메시지. 수업 알림은 기본적으로 꺼져 있으며 나중에 켤 수 있습니다."
+      "notifs_desc": "승인 요청, 주간 진행 요약, 안전 메시지. 수업 알림은 기본적으로 꺼져 있으며 나중에 켤 수 있습니다.",
+      "saving": "저장 중…",
+      "save_error": "알림 설정을 저장하지 못했습니다. 다시 시도해 주세요."
     },
     "pin": {
       "eyebrow": "학습자 PIN",
@@ -1637,7 +1639,15 @@
       "legal_never_label": "절대 추출하지 않음:",
       "legal_never_body": "의학적 진단, 심리 평가, 학부모 진술, 서명.",
       "legal_teachers_label": "교사에게 표시:",
-      "legal_teachers_body": "편의 목록만, 동의한 학교에서만."
+      "legal_teachers_body": "편의 목록만, 동의한 학교에서만.",
+      "saving": "저장 중…",
+      "save_error": "IEP 단계를 저장하지 못했습니다. 다시 시도해 주세요.",
+      "consent_required": "문서를 업로드하기 전에 명시적으로 동의해 주세요.",
+      "select_learner_label": "이 IEP는 어떤 자녀를 위한 것인가요?",
+      "select_learner_placeholder": "자녀 선택",
+      "no_learner_title": "먼저 자녀를 추가하세요",
+      "no_learner_body": "IEP는 특정 자녀에 연결되어 저장됩니다. 자녀를 추가하면 해당 계획을 업로드할 수 있습니다.",
+      "no_learner_cta": "자녀 추가"
     },
     "invite_school": {
       "eyebrow": "학교 초대",

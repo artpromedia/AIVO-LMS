@@ -1531,7 +1531,9 @@
       "cam_title": "Câmera",
       "cam_desc": "Usada apenas ao digitalizar uma página de tarefa ou documento. A AIVO nunca grava vídeo.",
       "notifs_title": "Notificações",
-      "notifs_desc": "Pedidos de aprovação, resumos semanais de progresso e mensagens de segurança. Lembretes de lições estão desativados por padrão — você pode ativá-los depois."
+      "notifs_desc": "Pedidos de aprovação, resumos semanais de progresso e mensagens de segurança. Lembretes de lições estão desativados por padrão — você pode ativá-los depois.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar a sua preferência de notificação. Tente novamente."
     },
     "pin": {
       "eyebrow": "PIN do aluno",
@@ -1637,7 +1639,15 @@
       "legal_never_label": "Nunca extraído:",
       "legal_never_body": "diagnósticos médicos, avaliações psicológicas, declarações dos pais, assinaturas.",
       "legal_teachers_label": "Visível para os professores:",
-      "legal_teachers_body": "apenas a lista de adaptações, apenas nas escolas para as quais você consentiu."
+      "legal_teachers_body": "apenas a lista de adaptações, apenas nas escolas para as quais você consentiu.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar a etapa do IEP. Tente novamente.",
+      "consent_required": "Forneça o consentimento explícito antes de enviar um documento.",
+      "select_learner_label": "Para qual filho é este IEP?",
+      "select_learner_placeholder": "Selecione um filho",
+      "no_learner_title": "Adicione um filho primeiro",
+      "no_learner_body": "Um IEP é armazenado para um filho específico. Adicione um filho e depois você poderá enviar o plano dele.",
+      "no_learner_cta": "Adicionar um filho"
     },
     "invite_school": {
       "eyebrow": "Convite da escola",

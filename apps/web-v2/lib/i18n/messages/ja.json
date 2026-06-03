@@ -1531,7 +1531,9 @@
       "cam_title": "カメラ",
       "cam_desc": "宿題のページや文書をスキャンするときのみ使用します。AIVO が動画を録画することはありません。",
       "notifs_title": "通知",
-      "notifs_desc": "承認リクエスト、週次の進捗ダイジェスト、安全に関するメッセージ。レッスンのリマインダーは既定でオフです。後で有効にできます。"
+      "notifs_desc": "承認リクエスト、週次の進捗ダイジェスト、安全に関するメッセージ。レッスンのリマインダーは既定でオフです。後で有効にできます。",
+      "saving": "保存中…",
+      "save_error": "通知設定を保存できませんでした。もう一度お試しください。"
     },
     "pin": {
       "eyebrow": "学習者 PIN",
@@ -1637,7 +1639,15 @@
       "legal_never_label": "抽出しない：",
       "legal_never_body": "医学的診断、心理評価、保護者の陳述、署名。",
       "legal_teachers_label": "教師に表示：",
-      "legal_teachers_body": "配慮の一覧のみ、あなたが同意した学校でのみ。"
+      "legal_teachers_body": "配慮の一覧のみ、あなたが同意した学校でのみ。",
+      "saving": "保存中…",
+      "save_error": "IEP のステップを保存できませんでした。もう一度お試しください。",
+      "consent_required": "書類をアップロードする前に、明示的な同意を行ってください。",
+      "select_learner_label": "この IEP はどのお子さま向けですか？",
+      "select_learner_placeholder": "お子さまを選択",
+      "no_learner_title": "まずお子さまを追加してください",
+      "no_learner_body": "IEP は特定のお子さまに紐づけて保存されます。お子さまを追加すると、その計画をアップロードできます。",
+      "no_learner_cta": "お子さまを追加"
     },
     "invite_school": {
       "eyebrow": "学校への招待",

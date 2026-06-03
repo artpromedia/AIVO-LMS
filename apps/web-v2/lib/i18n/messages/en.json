@@ -1531,7 +1531,9 @@
       "cam_title": "Camera",
       "cam_desc": "Used only when scanning a homework page or document. AIVO never records video.",
       "notifs_title": "Notifications",
-      "notifs_desc": "Approval requests, weekly progress digests, and safety messages. Lesson reminders are off by default — you can enable them later."
+      "notifs_desc": "Approval requests, weekly progress digests, and safety messages. Lesson reminders are off by default — you can enable them later.",
+      "saving": "Saving…",
+      "save_error": "Couldn't save your notification preference. Please try again."
     },
     "pin": {
       "eyebrow": "Learner PIN",
@@ -1637,7 +1639,15 @@
       "legal_never_label": "Never extracted:",
       "legal_never_body": "medical diagnoses, psychological evaluations, parent statements, signatures.",
       "legal_teachers_label": "Visible to teachers:",
-      "legal_teachers_body": "only the accommodations list, only at schools you've opted in to."
+      "legal_teachers_body": "only the accommodations list, only at schools you've opted in to.",
+      "saving": "Saving…",
+      "save_error": "Couldn't save the IEP step. Please try again.",
+      "consent_required": "Please give explicit consent before uploading a document.",
+      "select_learner_label": "Which child is this IEP for?",
+      "select_learner_placeholder": "Select a child",
+      "no_learner_title": "Add a child first",
+      "no_learner_body": "An IEP is stored against a specific child. Add a child, then you can upload their plan.",
+      "no_learner_cta": "Add a child"
     },
     "invite_school": {
       "eyebrow": "School invite",
