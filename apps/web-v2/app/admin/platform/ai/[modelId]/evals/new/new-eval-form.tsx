@@ -14,7 +14,9 @@ export function NewEvalForm({ modelId }: NewEvalFormProps) {
   const [harness, setHarness] = React.useState(HARNESSES[0]);
   const [status, setStatus] = React.useState<"idle" | "running" | "done" | "error">("idle");
   const [message, setMessage] = React.useState<string>("");
-  const [run, setRun] = React.useState<any>(null);
+  const [run, setRun] = React.useState<{ id?: string; status?: string; harness?: string } | null>(
+    null,
+  );
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

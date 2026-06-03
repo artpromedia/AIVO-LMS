@@ -3,11 +3,11 @@
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { RaiModel } from "@/lib/services/responsible-ai-svc";
+import type { RaiModel, RaiOptOut } from "@/lib/services/responsible-ai-svc";
 
 interface OptOutMatrixProps {
   models: RaiModel[];
-  optOuts: any[];
+  optOuts: RaiOptOut[];
   tenantId: string;
 }
 

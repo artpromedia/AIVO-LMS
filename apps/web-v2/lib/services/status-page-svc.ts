@@ -13,9 +13,49 @@ const ALERTS = "alerts-proxy-svc";
 const statusBase = () => serverEnv.STATUS_PAGE_SVC_URL;
 const alertsBase = () => serverEnv.ALERTS_PROXY_SVC_URL;
 
+export interface StatusComponent {
+  id: string;
+  name: string;
+  group: string;
+  status: string;
+}
+
+export interface StatusIncident {
+  id: string;
+  title: string;
+  lifecycle?: string;
+  impact?: string;
+  affectedComponentIds?: string[];
+  updatedAt?: string;
+  resolvedAt?: string | null;
+  postmortemUrl?: string;
+}
+
+export interface IncidentUpdate {
+  lifecycle: string;
+  body: string;
+  author: string;
+  createdAt: string;
+}
+
+export interface StatusMaintenance {
+  id: string;
+  title: string;
+  state: string;
+  scheduledStart: string;
+  scheduledEnd: string;
+}
+
+export interface HealthSignal {
+  service?: string;
+  observedSli?: number;
+  target?: number;
+  status?: string;
+}
+
 export interface PublicSummary {
   overall: string;
-  components: Array<{ id: string; name: string; group: string; status: string }>;
+  components: StatusComponent[];
   activeIncidents: Array<{
     id: string;
     title: string;
@@ -71,8 +111,10 @@ export async function getPublicSummary(
   return res.ok ? res.data : SAMPLE_SUMMARY;
 }
 
-export async function listComponents(opts: { requestId?: string } = {}): Promise<any[]> {
-  const res = await callService<{ components: any[] }>({
+export async function listComponents(
+  opts: { requestId?: string } = {},
+): Promise<StatusComponent[]> {
+  const res = await callService<{ components: StatusComponent[] }>({
     service: STATUS,
     baseUrl: statusBase(),
     url: "/api/statuspage/components",
@@ -83,9 +125,9 @@ export async function listComponents(opts: { requestId?: string } = {}): Promise
 
 export async function listIncidents(
   opts: { active?: boolean; requestId?: string } = {},
-): Promise<any[]> {
+): Promise<StatusIncident[]> {
   const qs = opts.active ? "?active=true" : "";
-  const res = await callService<{ incidents: any[] }>({
+  const res = await callService<{ incidents: StatusIncident[] }>({
     service: STATUS,
     baseUrl: statusBase(),
     url: `/api/statuspage/incidents${qs}`,
@@ -97,8 +139,8 @@ export async function listIncidents(
 export async function getIncident(
   id: string,
   opts: { requestId?: string } = {},
-): Promise<{ incident: any; updates: any[] } | null> {
-  const res = await callService<{ incident: any; updates: any[] }>({
+): Promise<{ incident: StatusIncident; updates: IncidentUpdate[] } | null> {
+  const res = await callService<{ incident: StatusIncident; updates: IncidentUpdate[] }>({
     service: STATUS,
     baseUrl: statusBase(),
     url: `/api/statuspage/incidents/${encodeURIComponent(id)}`,
@@ -107,8 +149,10 @@ export async function getIncident(
   return res.ok ? res.data : null;
 }
 
-export async function listMaintenances(opts: { requestId?: string } = {}): Promise<any[]> {
-  const res = await callService<{ maintenances: any[] }>({
+export async function listMaintenances(
+  opts: { requestId?: string } = {},
+): Promise<StatusMaintenance[]> {
+  const res = await callService<{ maintenances: StatusMaintenance[] }>({
     service: STATUS,
     baseUrl: statusBase(),
     url: "/api/statuspage/maintenances",
@@ -149,8 +193,10 @@ const SAMPLE_BUDGETS: SloBudget[] = [
   },
 ];
 
-export async function listSlos(opts: { requestId?: string } = {}): Promise<any[]> {
-  const res = await callService<{ slos: any[] }>({
+export async function listSlos(
+  opts: { requestId?: string } = {},
+): Promise<Record<string, unknown>[]> {
+  const res = await callService<{ slos: Record<string, unknown>[] }>({
     service: ALERTS,
     baseUrl: alertsBase(),
     url: "/api/alerts/slos",
@@ -179,8 +225,8 @@ export async function getBudgets(
 export async function getTenantHealth(
   tenantId: string,
   opts: { requestId?: string } = {},
-): Promise<{ overall: string; signals: any[] }> {
-  const res = await callService<{ overall: string; signals: any[] }>({
+): Promise<{ overall: string; signals: HealthSignal[] }> {
+  const res = await callService<{ overall: string; signals: HealthSignal[] }>({
     service: ALERTS,
     baseUrl: alertsBase(),
     url: `/api/alerts/health-tenant?tenantId=${encodeURIComponent(tenantId)}`,

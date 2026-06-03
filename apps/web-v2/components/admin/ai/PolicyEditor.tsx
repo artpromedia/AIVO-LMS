@@ -3,9 +3,10 @@
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import type { RaiPolicy } from "@/lib/services/responsible-ai-svc";
 
 interface PolicyEditorProps {
-  policy: any;
+  policy: RaiPolicy;
 }
 
 function joinCsv(value: unknown): string {

@@ -1469,7 +1469,11 @@
       "household_placeholder": "p. ex. La famille Okafor",
       "household_helper": "Affiché aux enseignants quand ils vous écrivent. Vous pourrez le modifier plus tard.",
       "coparent_label": "Inviter un coparent ou un proche aidant (facultatif)",
-      "coparent_helper": "Ils recevront un e-mail avec leur propre connexion. Vous pourrez tous deux approuver les consentements et consulter la progression."
+      "coparent_helper": "Ils recevront un e-mail avec leur propre connexion. Vous pourrez tous deux approuver les consentements et consulter la progression.",
+      "saving": "Enregistrement…",
+      "save_error": "Nous n'avons pas pu enregistrer. Veuillez réessayer.",
+      "coparent_invite_error": "Nous n'avons pas pu envoyer l'invitation. Vérifiez l'e-mail et réessayez.",
+      "coparent_invited": "Invitation envoyée."
     },
     "learner_new": {
       "eyebrow": "Ajouter un apprenant",
@@ -1515,7 +1519,9 @@
       "legal_ai_label": "Personnalisation par IA :",
       "legal_ai_body": "AIVO adapte le rythme et les indices à votre enfant. Les données d'entraînement ne servent jamais à identifier un apprenant.",
       "legal_mkt_label": "Actualités produit :",
-      "legal_mkt_body": "une liste e-mail à faible volume. Désabonnement en un clic."
+      "legal_mkt_body": "une liste e-mail à faible volume. Désabonnement en un clic.",
+      "saving": "Enregistrement…",
+      "save_error": "Impossible d'enregistrer votre consentement. Veuillez réessayer."
     },
     "permissions": {
       "eyebrow": "Autorisations de l'appareil",
@@ -1529,7 +1535,9 @@
       "cam_title": "Caméra",
       "cam_desc": "Utilisée uniquement pour scanner une page de devoir ou un document. AIVO n'enregistre jamais de vidéo.",
       "notifs_title": "Notifications",
-      "notifs_desc": "Demandes d'approbation, résumés hebdomadaires de progression et messages de sécurité. Les rappels de leçons sont désactivés par défaut — vous pourrez les activer plus tard."
+      "notifs_desc": "Demandes d'approbation, résumés hebdomadaires de progression et messages de sécurité. Les rappels de leçons sont désactivés par défaut — vous pourrez les activer plus tard.",
+      "saving": "Enregistrement…",
+      "save_error": "Impossible d'enregistrer votre préférence de notification. Veuillez réessayer."
     },
     "pin": {
       "eyebrow": "Code PIN de l'apprenant",
@@ -1541,7 +1549,14 @@
       "skip": "Ignorer — définir un code PIN plus tard dans Paramètres",
       "choose_pin": "Choisir le code PIN",
       "confirm_pin": "Confirmer le code PIN",
-      "mismatch": "Ils ne correspondent pas. Réessayez."
+      "mismatch": "Ils ne correspondent pas. Réessayez.",
+      "saving": "Enregistrement…",
+      "save_error": "Impossible d'enregistrer le code PIN. Veuillez réessayer.",
+      "select_learner_label": "À quel enfant ce code PIN est-il destiné ?",
+      "select_learner_placeholder": "Sélectionnez un enfant",
+      "no_learner_title": "Ajoutez d'abord un enfant",
+      "no_learner_body": "Un code PIN appartient à un enfant précis. Ajoutez un enfant, puis vous pourrez définir son code PIN.",
+      "no_learner_cta": "Ajouter un enfant"
     },
     "parent_verify": {
       "eyebrow": "Vérification du parent",
@@ -1556,7 +1571,11 @@
       "use_diff_phone": "Utiliser un autre numéro de téléphone",
       "phone_label": "Téléphone mobile",
       "phone_helper": "Nous l'utilisons uniquement pour la vérification et la récupération du compte.",
-      "code_label": "Code à 6 chiffres"
+      "code_label": "Code à 6 chiffres",
+      "sending": "Envoi…",
+      "verifying": "Vérification…",
+      "send_error": "Nous n'avons pas pu envoyer le code. Vérifiez le numéro et réessayez.",
+      "verify_error": "Ce code ne correspond pas. Vérifiez-le et réessayez."
     },
     "privacy": {
       "eyebrow": "Confidentialité",
@@ -1613,7 +1632,14 @@
       "ai_title": "Tuteur IA",
       "ai_desc": "Un tuteur conversationnel qui explique les concepts, ne donne jamais les réponses finales et oriente les sujets de sécurité vers un adulte.",
       "voice_title": "Mode voix",
-      "voice_desc": "Permet à votre enfant de parler au tuteur et de l'écouter. Désactivé par défaut — utilise le microphone."
+      "voice_desc": "Permet à votre enfant de parler au tuteur et de l'écouter. Désactivé par défaut — utilise le microphone.",
+      "saving": "Enregistrement…",
+      "save_error": "Impossible d'enregistrer l'approbation. Veuillez réessayer.",
+      "select_learner_label": "Quel enfant approuvez-vous ?",
+      "select_learner_placeholder": "Sélectionnez un enfant",
+      "no_learner_title": "Ajoutez d'abord un enfant",
+      "no_learner_body": "L'approbation est enregistrée pour un enfant précis. Ajoutez un enfant, puis vous pourrez approuver son accès.",
+      "no_learner_cta": "Ajouter un enfant"
     },
     "iep_upload": {
       "eyebrow": "Aménagements IEP / 504",
@@ -1635,7 +1661,15 @@
       "legal_never_label": "Jamais extrait :",
       "legal_never_body": "diagnostics médicaux, évaluations psychologiques, déclarations des parents, signatures.",
       "legal_teachers_label": "Visible par les enseignants :",
-      "legal_teachers_body": "uniquement la liste des aménagements, uniquement dans les écoles pour lesquelles vous avez consenti."
+      "legal_teachers_body": "uniquement la liste des aménagements, uniquement dans les écoles pour lesquelles vous avez consenti.",
+      "saving": "Enregistrement…",
+      "save_error": "Impossible d'enregistrer l'étape du PEI. Veuillez réessayer.",
+      "consent_required": "Veuillez donner votre consentement explicite avant de téléverser un document.",
+      "select_learner_label": "Pour quel enfant est ce PEI ?",
+      "select_learner_placeholder": "Sélectionnez un enfant",
+      "no_learner_title": "Ajoutez d'abord un enfant",
+      "no_learner_body": "Un PEI est enregistré pour un enfant précis. Ajoutez un enfant, puis vous pourrez téléverser son plan.",
+      "no_learner_cta": "Ajouter un enfant"
     },
     "invite_school": {
       "eyebrow": "Invitation de l'école",

@@ -1469,7 +1469,11 @@
       "household_placeholder": "例如：Okafor 一家",
       "household_helper": "当教师给你发消息时会显示。你可以稍后更改。",
       "coparent_label": "邀请共同家长或照护者（可选）",
-      "coparent_helper": "他们将收到一封带有自己登录方式的邮件。你们都可以批准同意并查看进度。"
+      "coparent_helper": "他们将收到一封带有自己登录方式的邮件。你们都可以批准同意并查看进度。",
+      "saving": "保存中…",
+      "save_error": "无法保存。请重试。",
+      "coparent_invite_error": "无法发送邀请。请检查邮箱后重试。",
+      "coparent_invited": "邀请已发送。"
     },
     "learner_new": {
       "eyebrow": "添加学习者",
@@ -1515,7 +1519,9 @@
       "legal_ai_label": "AI 个性化：",
       "legal_ai_body": "AIVO 为你的孩子调整节奏与提示。训练数据绝不会用于识别某个学习者。",
       "legal_mkt_label": "产品资讯：",
-      "legal_mkt_body": "一个低频邮件列表。一键取消订阅。"
+      "legal_mkt_body": "一个低频邮件列表。一键取消订阅。",
+      "saving": "正在保存…",
+      "save_error": "无法保存您的同意，请重试。"
     },
     "permissions": {
       "eyebrow": "设备权限",
@@ -1529,7 +1535,9 @@
       "cam_title": "摄像头",
       "cam_desc": "仅在扫描作业页面或文档时使用。AIVO 绝不录制视频。",
       "notifs_title": "通知",
-      "notifs_desc": "批准请求、每周进度摘要和安全消息。课程提醒默认关闭——你可以稍后启用。"
+      "notifs_desc": "批准请求、每周进度摘要和安全消息。课程提醒默认关闭——你可以稍后启用。",
+      "saving": "正在保存…",
+      "save_error": "无法保存您的通知偏好设置，请重试。"
     },
     "pin": {
       "eyebrow": "学习者 PIN",
@@ -1541,7 +1549,14 @@
       "skip": "跳过 — 稍后在设置中设置 PIN",
       "choose_pin": "选择 PIN",
       "confirm_pin": "确认 PIN",
-      "mismatch": "两者不一致。请重试。"
+      "mismatch": "两者不一致。请重试。",
+      "saving": "保存中…",
+      "save_error": "无法保存 PIN。请重试。",
+      "select_learner_label": "此 PIN 用于哪个孩子？",
+      "select_learner_placeholder": "选择一个孩子",
+      "no_learner_title": "请先添加孩子",
+      "no_learner_body": "PIN 属于特定的孩子。请先添加孩子，然后即可设置其 PIN。",
+      "no_learner_cta": "添加孩子"
     },
     "parent_verify": {
       "eyebrow": "家长验证",
@@ -1556,7 +1571,11 @@
       "use_diff_phone": "使用其他电话号码",
       "phone_label": "手机",
       "phone_helper": "我们仅将其用于验证和账户恢复。",
-      "code_label": "6 位代码"
+      "code_label": "6 位代码",
+      "sending": "发送中…",
+      "verifying": "验证中…",
+      "send_error": "无法发送验证码。请检查号码后重试。",
+      "verify_error": "验证码不匹配。请检查后重试。"
     },
     "privacy": {
       "eyebrow": "隐私",
@@ -1613,7 +1632,14 @@
       "ai_title": "AI 导师",
       "ai_desc": "一个对话式导师，讲解概念、绝不给出最终答案，并将安全话题转交给成年人。",
       "voice_title": "语音模式",
-      "voice_desc": "让你的孩子与导师对话并收听。默认关闭——使用麦克风。"
+      "voice_desc": "让你的孩子与导师对话并收听。默认关闭——使用麦克风。",
+      "saving": "正在保存…",
+      "save_error": "无法保存批准，请重试。",
+      "select_learner_label": "您要批准哪个孩子？",
+      "select_learner_placeholder": "选择一个孩子",
+      "no_learner_title": "请先添加一个孩子",
+      "no_learner_body": "批准会保存到特定孩子名下。请先添加孩子，然后即可批准其访问权限。",
+      "no_learner_cta": "添加孩子"
     },
     "iep_upload": {
       "eyebrow": "IEP / 504 支持",
@@ -1635,7 +1661,15 @@
       "legal_never_label": "绝不提取：",
       "legal_never_body": "医疗诊断、心理评估、家长陈述、签名。",
       "legal_teachers_label": "教师可见：",
-      "legal_teachers_body": "仅适应性支持清单，且仅限你已同意的学校。"
+      "legal_teachers_body": "仅适应性支持清单，且仅限你已同意的学校。",
+      "saving": "正在保存…",
+      "save_error": "无法保存 IEP 步骤，请重试。",
+      "consent_required": "请在上传文件前明确表示同意。",
+      "select_learner_label": "此 IEP 适用于哪个孩子？",
+      "select_learner_placeholder": "选择一个孩子",
+      "no_learner_title": "请先添加一个孩子",
+      "no_learner_body": "IEP 会保存到特定孩子名下。请先添加孩子，然后即可上传其计划。",
+      "no_learner_cta": "添加孩子"
     },
     "invite_school": {
       "eyebrow": "学校邀请",

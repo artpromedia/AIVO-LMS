@@ -18,7 +18,7 @@ function impactTone(impact: string): "warning" | "danger" | "neutral" {
   return "neutral";
 }
 
-function lifecycleTone(lc: string): "primary" | "warning" | "success" | "neutral" {
+function lifecycleTone(lc?: string): "primary" | "warning" | "success" | "neutral" {
   switch (lc) {
     case "resolved":
       return "success";
@@ -110,7 +110,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 </p>
                 <IncidentLifecycleControls
                   incidentId={id}
-                  current={data.incident.lifecycle}
+                  current={data.incident.lifecycle ?? ""}
                 />
               </Card>
             </div>

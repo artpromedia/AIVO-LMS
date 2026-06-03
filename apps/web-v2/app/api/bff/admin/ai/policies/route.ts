@@ -57,7 +57,7 @@ export async function PUT(req: Request): Promise<NextResponse> {
       );
     }
 
-    return ok({ policy: (res.data as any).policy ?? res.data }, requestId);
+    return ok({ policy: (res.data as Record<string, unknown>).policy ?? res.data }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

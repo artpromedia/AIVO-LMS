@@ -55,7 +55,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       );
     }
 
-    return ok({ incident: (res.data as any).incident ?? res.data }, requestId);
+    return ok({ incident: (res.data as Record<string, unknown>).incident ?? res.data }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

@@ -115,14 +115,14 @@ export function UtilizationChart({ series, granularity, hardCap }: UtilizationCh
         <span className="flex items-center gap-1.5">
           <span
             className="inline-block h-2 w-6 rounded-full"
-            style={{ background: "var(--color-aivo-primary, #6366f1)", opacity: 0.35 }}
+            style={{ background: "var(--color-aivo-primary)", opacity: 0.35 }}
           />
           Allocated
         </span>
         <span className="flex items-center gap-1.5">
           <span
             className="inline-block h-2 w-6 rounded-full"
-            style={{ background: "var(--color-aivo-primary, #6366f1)" }}
+            style={{ background: "var(--color-aivo-primary)" }}
           />
           Used
         </span>
@@ -158,14 +158,14 @@ export function UtilizationChart({ series, granularity, hardCap }: UtilizationCh
         {/* Allocated area (filled, semi-transparent) */}
         <path
           d={pointsToClosedArea(allocPts)}
-          fill="var(--color-aivo-primary, #6366f1)"
+          fill="var(--color-aivo-primary)"
           fillOpacity={0.1}
         />
         {/* Allocated line */}
         <polyline
           points={pointsToPolyline(allocPts)}
           fill="none"
-          stroke="var(--color-aivo-primary, #6366f1)"
+          stroke="var(--color-aivo-primary)"
           strokeOpacity={0.5}
           strokeWidth={1.5}
           strokeDasharray="4 2"
@@ -174,14 +174,14 @@ export function UtilizationChart({ series, granularity, hardCap }: UtilizationCh
         {/* Used area */}
         <path
           d={pointsToClosedArea(usedPts)}
-          fill="var(--color-aivo-primary, #6366f1)"
+          fill="var(--color-aivo-primary)"
           fillOpacity={0.25}
         />
         {/* Used line */}
         <polyline
           points={pointsToPolyline(usedPts)}
           fill="none"
-          stroke="var(--color-aivo-primary, #6366f1)"
+          stroke="var(--color-aivo-primary)"
           strokeWidth={2}
         />
 
@@ -192,7 +192,7 @@ export function UtilizationChart({ series, granularity, hardCap }: UtilizationCh
             y1={hardCapY}
             x2={PAD_LEFT + INNER_W}
             y2={hardCapY}
-            stroke="var(--color-aivo-danger, #ef4444)"
+            stroke="var(--color-aivo-danger)"
             strokeWidth={1.5}
             strokeDasharray="6 3"
           />

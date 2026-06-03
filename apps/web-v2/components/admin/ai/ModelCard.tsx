@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { RaiModel } from "@/lib/services/responsible-ai-svc";
+import type { RaiModel, ModelCardDoc, ModelCardMetadata } from "@/lib/services/responsible-ai-svc";
 
 interface ModelCardProps {
   model: RaiModel;
-  card: any;
+  card: ModelCardDoc | null;
 }
 
 function Field({ label, value }: { label: string; value?: string | null }) {
@@ -23,7 +23,7 @@ function Field({ label, value }: { label: string; value?: string | null }) {
  * intended/out-of-scope use when no card document is present.
  */
 export function ModelCard({ model, card }: ModelCardProps) {
-  const meta = (card?.metadata ?? {}) as Record<string, any>;
+  const meta = (card?.metadata ?? {}) as ModelCardMetadata;
   const stakeholders: string[] | undefined = Array.isArray(meta.stakeholders)
     ? meta.stakeholders
     : undefined;

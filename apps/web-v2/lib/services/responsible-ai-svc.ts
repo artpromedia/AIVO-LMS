@@ -57,6 +57,65 @@ export interface RaiIncident {
   updatedAt: string;
 }
 
+export interface ModelCardMetadata {
+  riskTier?: string;
+  accountableOwner?: string;
+  euAiActClassification?: string;
+  intendedUse?: string;
+  outOfScopeUse?: string;
+  humanOversight?: string;
+  incidentEscalation?: string;
+  provenance?: string;
+  trainingDataSummary?: string;
+  knownLimitations?: string;
+  lastReviewedAt?: string;
+  stakeholders?: string[];
+}
+
+export interface ModelCardDoc {
+  metadata?: ModelCardMetadata;
+  body?: string;
+}
+
+export interface RaiModelVersion {
+  id?: string;
+  label?: string;
+}
+
+export interface RaiPolicy {
+  id: string;
+  name?: string;
+  scopeLevel?: string;
+  scopeId?: string;
+  enabled?: boolean;
+  updatedAt?: string;
+  blockedCategories?: string[];
+  maxSeverity?: string;
+  ageGating?: { minAge?: number | null; requireGuardianConsent?: boolean };
+  allowedRegions?: string[];
+  blockedRegions?: string[];
+}
+
+export interface RaiOptOut {
+  id?: string;
+  modelId?: string;
+  tenantId?: string;
+  reason?: string;
+}
+
+export interface RaiUsagePoint {
+  date: string;
+  calls: number;
+  tokens: number;
+  costUsd: number;
+}
+
+export interface RaiUsageTotals {
+  calls: number;
+  tokens: number;
+  costUsd: number;
+}
+
 const SAMPLE_MODELS: RaiModel[] = [
   {
     id: "model-tutor-pro",
@@ -99,8 +158,12 @@ export async function listModels(opts: { requestId?: string } = {}): Promise<Rai
 export async function getModelCard(
   modelId: string,
   opts: { requestId?: string } = {},
-): Promise<{ model: RaiModel | null; card: any; versions: any[] }> {
-  const res = await callService<{ model: RaiModel; card: any; versions: any[] }>({
+): Promise<{ model: RaiModel | null; card: ModelCardDoc | null; versions: RaiModelVersion[] }> {
+  const res = await callService<{
+    model: RaiModel;
+    card: ModelCardDoc | null;
+    versions: RaiModelVersion[];
+  }>({
     service: SERVICE,
     baseUrl: base(),
     url: `/api/responsible-ai/models/${encodeURIComponent(modelId)}/card`,
@@ -135,8 +198,8 @@ export async function listIncidents(opts: { requestId?: string } = {}): Promise<
   return res.ok ? res.data.incidents : [];
 }
 
-export async function listPolicies(opts: { requestId?: string } = {}): Promise<any[]> {
-  const res = await callService<{ policies: any[] }>({
+export async function listPolicies(opts: { requestId?: string } = {}): Promise<RaiPolicy[]> {
+  const res = await callService<{ policies: RaiPolicy[] }>({
     service: SERVICE,
     baseUrl: base(),
     url: "/api/responsible-ai/policies",
@@ -148,9 +211,9 @@ export async function listPolicies(opts: { requestId?: string } = {}): Promise<a
 export async function listOptOuts(
   tenantId?: string,
   opts: { requestId?: string } = {},
-): Promise<any[]> {
+): Promise<RaiOptOut[]> {
   const qs = tenantId ? `?tenantId=${encodeURIComponent(tenantId)}` : "";
-  const res = await callService<{ optOuts: any[] }>({
+  const res = await callService<{ optOuts: RaiOptOut[] }>({
     service: SERVICE,
     baseUrl: base(),
     url: `/api/responsible-ai/optouts${qs}`,
@@ -164,11 +227,11 @@ export async function getUsage(
   tenantId?: string,
   range = "7d",
   opts: { requestId?: string } = {},
-): Promise<{ totals: any; series: any[] }> {
+): Promise<{ totals: RaiUsageTotals; series: RaiUsagePoint[] }> {
   const params = new URLSearchParams({ range });
   if (modelId) params.set("modelId", modelId);
   if (tenantId) params.set("tenantId", tenantId);
-  const res = await callService<{ totals: any; series: any[] }>({
+  const res = await callService<{ totals: RaiUsageTotals; series: RaiUsagePoint[] }>({
     service: SERVICE,
     baseUrl: base(),
     url: `/api/responsible-ai/usage?${params.toString()}`,

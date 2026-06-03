@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function Page({ params }: { params: { id: string } }) {
   const session = await requirePageRole(["platform_admin"]);
   const policies = await listPolicies();
-  const policy = policies.find((p: any) => p.id === params.id) ?? null;
+  const policy = policies.find((p) => p.id === params.id) ?? null;
 
   return (
     <AppShell

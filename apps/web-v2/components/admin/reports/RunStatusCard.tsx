@@ -61,7 +61,6 @@ export function RunStatusCard({
       active = false;
       clearInterval(interval);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runId, run?.status]);
 
   const status = run?.status ?? "pending";

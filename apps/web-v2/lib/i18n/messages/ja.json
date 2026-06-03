@@ -1469,7 +1469,11 @@
       "household_placeholder": "例：オカフォー家",
       "household_helper": "教師があなたにメッセージを送るときに表示されます。後で変更できます。",
       "coparent_label": "共同保護者またはケア提供者を招待（任意）",
-      "coparent_helper": "本人専用のサインイン情報付きのメールが届きます。お二人とも同意を承認し、進捗を確認できます。"
+      "coparent_helper": "本人専用のサインイン情報付きのメールが届きます。お二人とも同意を承認し、進捗を確認できます。",
+      "saving": "保存中…",
+      "save_error": "保存できませんでした。もう一度お試しください。",
+      "coparent_invite_error": "招待を送信できませんでした。メールアドレスを確認してもう一度お試しください。",
+      "coparent_invited": "招待を送信しました。"
     },
     "learner_new": {
       "eyebrow": "学習者を追加",
@@ -1515,7 +1519,9 @@
       "legal_ai_label": "AI のパーソナライズ：",
       "legal_ai_body": "AIVO はお子さまに合わせてペースとヒントを調整します。学習データが学習者個人の特定に使われることはありません。",
       "legal_mkt_label": "製品ニュース：",
-      "legal_mkt_body": "配信頻度の低いメールリストです。ワンクリックで配信停止できます。"
+      "legal_mkt_body": "配信頻度の低いメールリストです。ワンクリックで配信停止できます。",
+      "saving": "保存中…",
+      "save_error": "同意内容を保存できませんでした。もう一度お試しください。"
     },
     "permissions": {
       "eyebrow": "デバイスの権限",
@@ -1529,7 +1535,9 @@
       "cam_title": "カメラ",
       "cam_desc": "宿題のページや文書をスキャンするときのみ使用します。AIVO が動画を録画することはありません。",
       "notifs_title": "通知",
-      "notifs_desc": "承認リクエスト、週次の進捗ダイジェスト、安全に関するメッセージ。レッスンのリマインダーは既定でオフです。後で有効にできます。"
+      "notifs_desc": "承認リクエスト、週次の進捗ダイジェスト、安全に関するメッセージ。レッスンのリマインダーは既定でオフです。後で有効にできます。",
+      "saving": "保存中…",
+      "save_error": "通知設定を保存できませんでした。もう一度お試しください。"
     },
     "pin": {
       "eyebrow": "学習者 PIN",
@@ -1541,7 +1549,14 @@
       "skip": "スキップ — あとで設定から PIN を設定",
       "choose_pin": "PIN を選択",
       "confirm_pin": "PIN を確認",
-      "mismatch": "一致しません。もう一度お試しください。"
+      "mismatch": "一致しません。もう一度お試しください。",
+      "saving": "保存中…",
+      "save_error": "PIN を保存できませんでした。もう一度お試しください。",
+      "select_learner_label": "この PIN はどのお子さま用ですか？",
+      "select_learner_placeholder": "お子さまを選択",
+      "no_learner_title": "まずお子さまを追加してください",
+      "no_learner_body": "PIN は特定のお子さまに紐づきます。お子さまを追加すると、PIN を設定できます。",
+      "no_learner_cta": "お子さまを追加"
     },
     "parent_verify": {
       "eyebrow": "保護者の確認",
@@ -1556,7 +1571,11 @@
       "use_diff_phone": "別の電話番号を使う",
       "phone_label": "携帯電話",
       "phone_helper": "確認とアカウント復旧のためにのみ使用します。",
-      "code_label": "6 桁のコード"
+      "code_label": "6 桁のコード",
+      "sending": "送信中…",
+      "verifying": "確認中…",
+      "send_error": "コードを送信できませんでした。番号を確認してもう一度お試しください。",
+      "verify_error": "コードが一致しませんでした。確認してもう一度お試しください。"
     },
     "privacy": {
       "eyebrow": "プライバシー",
@@ -1613,7 +1632,14 @@
       "ai_title": "AI チューター",
       "ai_desc": "概念を説明し、最終的な答えは決して出さず、安全に関する話題は大人に引き継ぐ対話型チューターです。",
       "voice_title": "音声モード",
-      "voice_desc": "お子さまがチューターと話し、聞き返せます。既定はオフ — マイクを使用します。"
+      "voice_desc": "お子さまがチューターと話し、聞き返せます。既定はオフ — マイクを使用します。",
+      "saving": "保存中…",
+      "save_error": "承認を保存できませんでした。もう一度お試しください。",
+      "select_learner_label": "どのお子さまを承認しますか？",
+      "select_learner_placeholder": "お子さまを選択",
+      "no_learner_title": "まずお子さまを追加してください",
+      "no_learner_body": "承認は特定のお子さまに紐づけて保存されます。お子さまを追加すると、そのアクセスを承認できます。",
+      "no_learner_cta": "お子さまを追加"
     },
     "iep_upload": {
       "eyebrow": "IEP / 504 サポート",
@@ -1635,7 +1661,15 @@
       "legal_never_label": "抽出しない：",
       "legal_never_body": "医学的診断、心理評価、保護者の陳述、署名。",
       "legal_teachers_label": "教師に表示：",
-      "legal_teachers_body": "配慮の一覧のみ、あなたが同意した学校でのみ。"
+      "legal_teachers_body": "配慮の一覧のみ、あなたが同意した学校でのみ。",
+      "saving": "保存中…",
+      "save_error": "IEP のステップを保存できませんでした。もう一度お試しください。",
+      "consent_required": "書類をアップロードする前に、明示的な同意を行ってください。",
+      "select_learner_label": "この IEP はどのお子さま向けですか？",
+      "select_learner_placeholder": "お子さまを選択",
+      "no_learner_title": "まずお子さまを追加してください",
+      "no_learner_body": "IEP は特定のお子さまに紐づけて保存されます。お子さまを追加すると、その計画をアップロードできます。",
+      "no_learner_cta": "お子さまを追加"
     },
     "invite_school": {
       "eyebrow": "学校への招待",

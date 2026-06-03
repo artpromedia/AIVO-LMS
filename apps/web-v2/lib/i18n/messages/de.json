@@ -1469,7 +1469,11 @@
       "household_placeholder": "z. B. Familie Okafor",
       "household_helper": "Wird Lehrkräften angezeigt, wenn sie dir schreiben. Du kannst ihn später ändern.",
       "coparent_label": "Ein Co-Elternteil oder eine Betreuungsperson einladen (optional)",
-      "coparent_helper": "Sie erhalten eine E-Mail mit eigener Anmeldung. Ihr könnt beide Einwilligungen genehmigen und den Fortschritt einsehen."
+      "coparent_helper": "Sie erhalten eine E-Mail mit eigener Anmeldung. Ihr könnt beide Einwilligungen genehmigen und den Fortschritt einsehen.",
+      "saving": "Speichern…",
+      "save_error": "Speichern nicht möglich. Bitte versuche es erneut.",
+      "coparent_invite_error": "Die Einladung konnte nicht gesendet werden. Prüfe die E-Mail und versuche es erneut.",
+      "coparent_invited": "Einladung gesendet."
     },
     "learner_new": {
       "eyebrow": "Einen Lernenden hinzufügen",
@@ -1515,7 +1519,9 @@
       "legal_ai_label": "KI-Personalisierung:",
       "legal_ai_body": "AIVO passt Tempo und Hinweise an dein Kind an. Trainingsdaten werden niemals zur Identifizierung eines Lernenden verwendet.",
       "legal_mkt_label": "Produktneuigkeiten:",
-      "legal_mkt_body": "eine E-Mail-Liste mit geringem Volumen. Abmeldung mit einem Klick."
+      "legal_mkt_body": "eine E-Mail-Liste mit geringem Volumen. Abmeldung mit einem Klick.",
+      "saving": "Wird gespeichert…",
+      "save_error": "Ihre Einwilligung konnte nicht gespeichert werden. Bitte erneut versuchen."
     },
     "permissions": {
       "eyebrow": "Geräteberechtigungen",
@@ -1529,7 +1535,9 @@
       "cam_title": "Kamera",
       "cam_desc": "Wird nur beim Scannen einer Hausaufgabenseite oder eines Dokuments verwendet. AIVO nimmt niemals Videos auf.",
       "notifs_title": "Benachrichtigungen",
-      "notifs_desc": "Genehmigungsanfragen, wöchentliche Fortschrittsübersichten und Sicherheitsmeldungen. Lektionserinnerungen sind standardmäßig aus – du kannst sie später aktivieren."
+      "notifs_desc": "Genehmigungsanfragen, wöchentliche Fortschrittsübersichten und Sicherheitsmeldungen. Lektionserinnerungen sind standardmäßig aus – du kannst sie später aktivieren.",
+      "saving": "Wird gespeichert…",
+      "save_error": "Ihre Benachrichtigungseinstellung konnte nicht gespeichert werden. Bitte erneut versuchen."
     },
     "pin": {
       "eyebrow": "Lernenden-PIN",
@@ -1541,7 +1549,14 @@
       "skip": "Überspringen – PIN später in den Einstellungen festlegen",
       "choose_pin": "PIN wählen",
       "confirm_pin": "PIN bestätigen",
-      "mismatch": "Die stimmen nicht überein. Versuche es erneut."
+      "mismatch": "Die stimmen nicht überein. Versuche es erneut.",
+      "saving": "Wird gespeichert…",
+      "save_error": "PIN konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+      "select_learner_label": "Für welches Kind ist diese PIN?",
+      "select_learner_placeholder": "Kind auswählen",
+      "no_learner_title": "Fügen Sie zuerst ein Kind hinzu",
+      "no_learner_body": "Eine PIN gehört zu einem bestimmten Kind. Fügen Sie ein Kind hinzu, dann können Sie dessen PIN festlegen.",
+      "no_learner_cta": "Kind hinzufügen"
     },
     "parent_verify": {
       "eyebrow": "Eltern-Verifizierung",
@@ -1556,7 +1571,11 @@
       "use_diff_phone": "Eine andere Telefonnummer verwenden",
       "phone_label": "Mobiltelefon",
       "phone_helper": "Wir verwenden dies nur zur Verifizierung und Kontowiederherstellung.",
-      "code_label": "6-stelliger Code"
+      "code_label": "6-stelliger Code",
+      "sending": "Senden…",
+      "verifying": "Überprüfung…",
+      "send_error": "Der Code konnte nicht gesendet werden. Prüfe die Nummer und versuche es erneut.",
+      "verify_error": "Dieser Code stimmt nicht. Prüfe ihn und versuche es erneut."
     },
     "privacy": {
       "eyebrow": "Datenschutz",
@@ -1613,7 +1632,14 @@
       "ai_title": "KI-Tutor",
       "ai_desc": "Ein dialogorientierter Tutor, der Konzepte erklärt, niemals fertige Antworten liefert und Sicherheitsthemen an einen Erwachsenen weiterleitet.",
       "voice_title": "Sprachmodus",
-      "voice_desc": "Ermöglicht deinem Kind, mit dem Tutor zu sprechen und zuzuhören. Standardmäßig aus – nutzt das Mikrofon."
+      "voice_desc": "Ermöglicht deinem Kind, mit dem Tutor zu sprechen und zuzuhören. Standardmäßig aus – nutzt das Mikrofon.",
+      "saving": "Wird gespeichert…",
+      "save_error": "Die Freigabe konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "select_learner_label": "Welches Kind geben Sie frei?",
+      "select_learner_placeholder": "Kind auswählen",
+      "no_learner_title": "Fügen Sie zuerst ein Kind hinzu",
+      "no_learner_body": "Die Freigabe wird für ein bestimmtes Kind gespeichert. Fügen Sie ein Kind hinzu, dann können Sie seinen Zugang freigeben.",
+      "no_learner_cta": "Kind hinzufügen"
     },
     "iep_upload": {
       "eyebrow": "IEP- / 504-Hilfen",
@@ -1635,7 +1661,15 @@
       "legal_never_label": "Niemals extrahiert:",
       "legal_never_body": "medizinische Diagnosen, psychologische Gutachten, Elternaussagen, Unterschriften.",
       "legal_teachers_label": "Für Lehrkräfte sichtbar:",
-      "legal_teachers_body": "nur die Liste der Anpassungen, nur an Schulen, denen du zugestimmt hast."
+      "legal_teachers_body": "nur die Liste der Anpassungen, nur an Schulen, denen du zugestimmt hast.",
+      "saving": "Wird gespeichert…",
+      "save_error": "Der IEP-Schritt konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "consent_required": "Bitte erteilen Sie eine ausdrückliche Einwilligung, bevor Sie ein Dokument hochladen.",
+      "select_learner_label": "Für welches Kind ist dieser IEP?",
+      "select_learner_placeholder": "Kind auswählen",
+      "no_learner_title": "Fügen Sie zuerst ein Kind hinzu",
+      "no_learner_body": "Ein IEP wird für ein bestimmtes Kind gespeichert. Fügen Sie ein Kind hinzu, dann können Sie seinen Plan hochladen.",
+      "no_learner_cta": "Kind hinzufügen"
     },
     "invite_school": {
       "eyebrow": "Schuleinladung",

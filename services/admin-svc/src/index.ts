@@ -6,7 +6,7 @@ import { createLogger, registerObservabilityPlugin } from "@aivo/observability";
 import { installAuditing } from "@aivo/audit-client";
 import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
-import { logAdminEnterpriseFlags, registerAdminIpAllowlist } from "@aivo/security";
+import { logAdminEnterpriseFlags, registerAdminIpAllowlist, registerActiveRoleHook } from "@aivo/security";
 import {
   startSafeCron,
   createDrizzleAdvisoryLock,
@@ -73,6 +73,9 @@ export async function buildApp(
   registerHealthRoutes(app);
   registerPlatformRoutes(app, db);
   registerAdminIpAllowlist(app);
+  // ADR 0020 — enforce the `x-aivo-active-role` header (hint, never a grant)
+  // against the caller's token. No-op when the header is absent.
+  registerActiveRoleHook(app);
   registerAuditRoutes(app, db);
   registerAuditVerifyRoutes(app, db);
   registerSearchRoutes(app, db);

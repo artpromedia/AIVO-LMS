@@ -46,9 +46,12 @@ flips the default; "Code gap" = a flag won't fix it.
    pin-login now inserts a `sessions` row + sets the `refreshToken` cookie
    (role-based TTL) + surface cookie, mirroring login, so the learner
    session refreshes silently past 2h.**
-4. **[Incomplete] Staff/district roles cannot log in on mobile.**
-   `/api/auth/login` 403s `DISTRICT_ADMIN`/staff; mobile only wires
-   consumer + google + pin flows.
+4. **[By design — not a mobile gap] District admins & platform staff are
+   web-only.** `/api/auth/login` 403s `DISTRICT_ADMIN`/staff and the mobile
+   landing router (`apps/mobile/app/index.tsx`) has no home for them. The only
+   district-side roles on mobile are **teacher** and **therapist**, which sign
+   in through the normal consumer login (they are not bounced). District-admin
+   and internal-staff consoles live on the web admin/district surfaces.
 
 ### B. Cross-device session continuity
 
@@ -124,8 +127,10 @@ flips the default; "Code gap" = a flag won't fix it.
 19. **[Minor] `x-aivo-active-role` never enforced server-side.** Mobile sends
     it; no service validates it (documented Sprint-09 follow-up never landed).
     Hint-only, so low risk — but the documented spoof protection is absent.
-    → **Fixed in this pass — shared helper + family-svc enforcement (see
-    Changelog); other services should adopt the helper.**
+    → **Fixed — shared helper + family-svc enforcement, then adopted across
+    every JWT service. The remaining JWT services (assessment-svc, comms-svc,
+    admin-svc) now register the shared `registerActiveRoleHook` global hook
+    (see Changelog), so the header is enforced platform-wide.**
 20. **[Minor] Unified mobile shell migration stalled.**
     `MOBILE_UNIFIED_APP=false`, no `(app)` shell; legacy per-role shells
     remain (role switch ⇒ re-login). → \*\*Progressed: the contract's
@@ -247,12 +252,13 @@ mobile build if `EXPO_PUBLIC_API_URL` / Google client ID are unset. Addresses
 
 **Phase 1 — Blockers.** Web signup (#1 ✅), onboarding wizard (#7 ✅ partial),
 billing→billing-svc Checkout (#8), Speech Buddy safety judge (#17) + consent
-store (#18), active-role enforcement (#19).
+store (#18), active-role enforcement (#19 ✅).
 
 **Phase 2 — Parity & continuity.** Mobile baseline → assessment-svc IRT (#11),
-persistent authed offline queue (#15), PIN refresh session (#3), mobile
-staff/district scoping (#4), messages/inbox (#9), refresh parity matrix (#21),
-lightweight real-time sync for active learner state (#6).
+persistent authed offline queue (#15), PIN refresh session (#3), messages/inbox
+(#9), refresh parity matrix (#21), lightweight real-time sync for active learner
+state (#6). (#4 is by design — district admins/staff are web-only; mobile's
+district-side roles are teacher + therapist, which already log in.)
 
 **Phase 3 — Incomplete features.** Tutor LLM (#10), co-learn (#12), live
 session viewing (#13), therapist add-goal (#14), comms SMS (#22), AAC
@@ -289,6 +295,209 @@ changed files, `prod:check` passes. No unit/e2e tests target these surfaces.
 Remaining in onboarding (follow-ups): intermediate informational steps
 (role/terms/privacy/consent) are still pure navigation; the field-level error
 copy is English-only pending an i18n pass.
+
+## Changelog — Phase 1: onboarding consent persistence (#7, slice 1)
+
+Closed the consent-step half of gap #7 ("onboarding wizard") by making the
+review step actually persist what the parent selects, instead of discarding
+all four toggles on `<Link>` navigation. No new backend — the route reuses the
+existing `POST /api/bff/consent` and its `consent.accept` audit emission.
+
+- `apps/web-v2/app/onboarding/consent/page.tsx` — replaced the `next/link`
+  Continue with a submit handler that POSTs `/api/bff/consent` per accepted
+  bucket, mapping the four UI toggles onto the canonical `CONSENT_TYPES`:
+  parent → `parent_account_terms` + `child_data_collection`, school →
+  `school_roster_import`, AI → `ai_personalization`, marketing →
+  `marketing_opt_in`. Preserves the parent-required gate, surfaces an
+  i18n'd inline error on failure (no navigation), and only navigates to
+  `/onboarding/permissions` after every record is persisted.
+- `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` —
+  added `onboarding.consent.saving` and `onboarding.consent.save_error` in
+  all 10 supported locales (matching the prior onboarding i18n pass).
+
+Slices 2–3 of the plan (permissions notification preference; learner-scoped
+IEP-upload persistence) and Slice 4 (PIN / parent-setup / parent-verify /
+child-approval — all needing new backends) are out of scope for this PR.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean,
+`eslint --max-warnings=0` clean on the changed file, and
+`corepack pnpm --filter @aivo/web-v2 build` succeeds.
+
+## Changelog — Phase 1: onboarding permissions + IEP persistence (#7, slices 2–3)
+
+Continued closing gap #7 by making the two remaining input-bearing onboarding
+steps persist instead of discarding their state. No new backends — both reuse
+existing, tested BFF endpoints.
+
+Slice 2 — permissions step:
+
+- `apps/web-v2/app/onboarding/permissions/page.tsx` — replaced the Continue
+  `<Link>` with a submit that persists the Notifications toggle via
+  `PATCH /api/bff/notification-preferences`, flipping the email channel for the
+  parent-facing `parent_progress_summary` and `safety_review_required` types
+  (the "weekly digests + safety/approval messages" the row describes). The mic
+  and camera toggles are documented in-code as browser-level device-capability
+  prompts (the real grant is the browser's own permission dialog at point of
+  use) and are intentionally not persisted, so the step is honest rather than
+  silently dropping server state it never had.
+- Adds `onboarding.permissions.saving` / `save_error` in all 10 locales.
+
+Slice 3 — IEP-upload step (depends on a `learnerId`):
+
+- `apps/web-v2/app/onboarding/iep-upload/page.tsx` — the step now persists.
+  IEP documents are learner-scoped, so the page resolves a `learnerId` from
+  the `?learnerId=` query string and, when absent, gates behind learner
+  selection by fetching `GET /api/bff/learners` (auto-selecting a sole learner,
+  offering a picker for several, and pointing the parent at
+  `/onboarding/learner/new` when none exist). On submit with a file it records
+  explicit `iep_document_storage` consent via
+  `POST /api/bff/learners/[learnerId]/consent` and then POSTs the multipart
+  file to `POST /api/bff/learners/[learnerId]/iep-upload`; the skip path calls
+  `POST …/iep-upload/skip` so a deliberate "no IEP" is also recorded. Errors
+  surface inline without navigating.
+- Adds `onboarding.iep_upload.{saving,save_error,consent_required,
+  select_learner_label,select_learner_placeholder,no_learner_title,
+  no_learner_body,no_learner_cta}` in all 10 locales.
+
+Slice 4 (learner PIN-set, household / co-parent invites, real phone/SMS
+verification — overlapping SMS gap #22, and child-approval persistence) remains
+separate feature work needing new backends, and is out of scope here.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
+`eslint --max-warnings=0` clean on the changed files. (`pnpm --filter
+@aivo/web-v2 build` only fails in the sandbox because Google Fonts is
+unreachable — unrelated to these changes.)
+
+## Changelog — Phase 1: onboarding child-approval persistence (#7, slice 4)
+
+Closed the child-approval half of slice 4 of gap #7 by making the final
+parent-approval gate actually persist instead of discarding its toggles on
+`<Link>` navigation. No new backend — the step reuses the existing, tested
+per-learner consent endpoint (the same `POST /api/bff/learners/[learnerId]/consent`
+slice 3 used for IEP storage).
+
+- `apps/web-v2/app/onboarding/child-approval/page.tsx` — the "Approve and
+  finish" gate now persists. Approval is learner-scoped, so the page resolves a
+  `learnerId` from the `?learnerId=` query string and, when absent, gates behind
+  learner selection by fetching `GET /api/bff/learners` (auto-selecting a sole
+  learner, offering a picker for several, and pointing the parent at
+  `/onboarding/learner/new` when none exist) — the same resolution pattern as the
+  slice 3 IEP step. On Approve it records `child_data_collection` (always — the
+  core consent that lifts the profile out of its holding state so the child can
+  sign in), plus `teacher_access` when "Messages with teachers" is on and
+  `ai_personalization` when "AI tutor" is on. Records are written in sequence so a
+  mid-way failure surfaces an inline error without navigating. Voice mode stays an
+  honest browser-level device-capability (the mic grant is the browser's own
+  prompt at point of use) and is intentionally not persisted as a server consent,
+  matching the slice 2 mic/camera treatment.
+- `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
+  `onboarding.child_approval.{saving,save_error,select_learner_label,
+  select_learner_placeholder,no_learner_title,no_learner_body,no_learner_cta}`
+  in all 10 supported locales.
+
+The remaining slice 4 sub-parts — learner PIN-set, household / co-parent invites,
+and real phone/SMS verification (overlapping SMS gap #22) — still need new
+backends and remain separate follow-up work, out of scope for this change.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
+`eslint --max-warnings=0` clean on the changed file. (`pnpm --filter
+@aivo/web-v2 build` only fails in the sandbox because Google Fonts is
+unreachable — unrelated to these changes.)
+
+## Changelog — Phase 1: onboarding learner PIN-set persistence (#7, slice 4)
+
+Closed the learner-PIN half of slice 4 of gap #7 by making the `/onboarding/pin`
+step actually set the learner's PIN instead of discarding the entered digits on
+`<Link>` navigation. The PIN is the value the mobile learner `pin-login` flow
+verifies (`apps/mobile/hooks/useAuth.ts` → identity-svc `POST /api/auth/pin-login`
+against `users.pin`), so the step now writes through to that same field.
+
+- `apps/web-v2/app/api/bff/learners/[learnerId]/pin/route.ts` (new) — dual-path
+  (ADR 0009) BFF route. `POST` validates a 4–6 digit PIN, enforces a parent
+  session + learner-ownership scope, then: when identity-svc is enabled and a
+  real access token is present, sets the PIN via
+  `PUT /api/users/learners/:learnerId` on identity-svc (which re-checks parent
+  ownership); otherwise persists to an in-memory dev store. `GET` returns only
+  `{ hasPin, pinSetAt }` — never the secret. Both verbs audit `learner.pin.set`.
+- `apps/web-v2/lib/bff/identity-learners.ts` (new) — server-only client for the
+  identity-svc learner-PIN mutation, with the standard service flag/bearer/timeout
+  handling.
+- `apps/web-v2/lib/db/learner-pin-store.ts` (new) — the dev/mock fallback store.
+  Even in this throwaway store the PIN is salted + scrypt-hashed and only
+  `hasPin`/`pinSetAt` are ever exposed; a constant-time `verifyStoredLearnerPin`
+  is provided for a future learner-unlock surface and tests.
+- `apps/web-v2/app/onboarding/pin/page.tsx` — the PIN step now persists. A PIN is
+  learner-scoped, so the page resolves a `learnerId` from `?learnerId=` and, when
+  absent, gates behind learner selection via `GET /api/bff/learners` (auto-select
+  sole learner, picker for several, `/onboarding/learner/new` CTA when none) — the
+  same resolution pattern as the slice 3 IEP step. On Save it `POST`s the PIN and
+  advances on success, surfacing an inline error without navigating on failure.
+  Skip still advances without setting a PIN.
+- `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
+  `onboarding.pin.{saving,save_error,select_learner_label,
+  select_learner_placeholder,no_learner_title,no_learner_body,no_learner_cta}`
+  in all 10 supported locales.
+
+The remaining slice 4 sub-parts — household / co-parent invites and real
+phone/SMS verification (overlapping SMS gap #22) — still need IA/backends work
+and remain separate follow-up, out of scope for this change.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
+`eslint --max-warnings=0` clean on the changed files. (`pnpm --filter
+@aivo/web-v2 build` only fails in the sandbox because Google Fonts is
+unreachable — unrelated to these changes.)
+
+## Changelog — Phase 1: onboarding household + phone-verify persistence (#7, slice 4)
+
+Closed the final two slice 4 sub-parts of gap #7 — household / co-parent
+invites and real phone/SMS verification (overlapping SMS gap #22). Both
+onboarding steps used to discard their input on `<Link>` navigation; they now
+persist through new dual-path (ADR 0009) BFF routes.
+
+- `apps/web-v2/app/api/bff/onboarding/parent-verify/route.ts` (new) — issues +
+  verifies a one-time phone code. `POST` validates the number, mints a hashed
+  6-digit code in the new `parent-phone-store`, and delivers it over SMS via
+  comms-svc (`providers/sms-router` → Twilio when configured) when comms-svc is
+  enabled + a real token is present, else the dev path issues the code without a
+  real text. `PUT` verifies the typed code (constant-time, single-use, 10-min
+  expiry, 5-attempt cap). `GET` returns `{ phoneVerified, pendingPhone }` — the
+  code and full number are never returned. Audits `parent.phone.verify.requested`
+  / `parent.phone.verified` / `parent.phone.verify.failed`.
+- `apps/web-v2/lib/db/parent-phone-store.ts` (new) — the dev/mock OTP backend.
+  The code is salted + scrypt-hashed at rest and only handed once to the BFF for
+  delivery; status output masks all but the last 4 digits.
+- `apps/web-v2/app/onboarding/parent-verify/page.tsx` — "Send code" now POSTs the
+  phone and "Verify and continue" PUTs the code; only a server-confirmed match
+  advances to `/onboarding/consent`. Inline errors, no silent navigation.
+- `apps/web-v2/app/api/bff/onboarding/household/route.ts` (new) — `POST` saves the
+  household display name and, when a co-parent email is supplied, records a
+  household-scoped invite, emailing it via comms-svc (`collaboration_invite`
+  template) when wired, else recording it in the dev store. `GET` returns the
+  saved name + pending invites. Audits `household.updated` /
+  `household.coparent.invited`.
+- `apps/web-v2/lib/db/household-store.ts` (new) — the dev/mock household +
+  co-parent-invite backend (household-scoped, since no learner exists yet at
+  parent-setup), with email validation and pending-invite de-duplication.
+- `apps/web-v2/lib/bff/comms-svc.ts` — added `sendSmsCodeSvc` (SMS, `mfa_code`)
+  and `sendCoParentInviteSvc` (email, `collaboration_invite`) helpers fronting
+  comms-svc `POST /api/comms/send`.
+- `apps/web-v2/app/onboarding/parent-setup/page.tsx` — Continue now POSTs the
+  household name + co-parent email before advancing to `/onboarding/learner/new`.
+- `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
+  `onboarding.parent_verify.{sending,verifying,send_error,verify_error}` and
+  `onboarding.parent_setup.{saving,save_error,coparent_invite_error,
+  coparent_invited}` in all 10 locales.
+- `apps/web-v2/lib/db/__tests__/{parent-phone-store,household-store}.test.ts`
+  (new) — cover the challenge lifecycle (issue/verify/expiry/attempt-cap/
+  never-echo) and the household name + invite lifecycle.
+
+With this, every input-bearing onboarding step in gap #7 persists; the slice 4
+follow-up list is now empty.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean,
+`eslint --max-warnings=0` clean on the changed files, and the new store tests
+pass (`vitest run`). (`pnpm --filter @aivo/web-v2 build` only fails in the
+sandbox because Google Fonts is unreachable — unrelated to these changes.)
 
 ## Changelog — Phase 1: billing → billing-svc (#8)
 
@@ -448,3 +657,57 @@ Verified: web-v2 `typecheck` + `eslint --max-warnings=0` clean on changed
 files; mobile `tsc` (0 errors) + `eslint` clean. With #18's backend, this
 fully closes the Speech Buddy consent blocker. Consent copy is English-only
 pending an i18n pass.
+
+## Changelog — Phase 1: `x-aivo-active-role` enforcement everywhere (#19)
+
+Closed the remaining JWT services so the active-role spoof protection is now
+enforced platform-wide (previously only `family-svc`, `engagement-svc`,
+`billing-svc`, `learning-svc`, and `tutor-svc` validated the header).
+
+- `packages/security/src/active-role.ts` — added `registerActiveRoleHook(app)`,
+  a framework-light Fastify `onRequest` hook that enforces the existing
+  `checkActiveRole` contract globally. It only does work when the
+  `x-aivo-active-role` header is present (the unified mobile app sends it on
+  every authenticated request; web + internal service-token callers do not),
+  reads the bearer token from the `Authorization` header or `access_token`
+  cookie, and on a spoofed header audit-logs `auth.active_role.spoofing` and
+  returns `403 FORBIDDEN_ROLE`. Header absent, no user token, or an invalid
+  token ⇒ no-op (the route's own auth still applies — the hook never adds a
+  new authentication requirement, it only rejects spoofed role hints).
+  Exported from `@aivo/security`.
+- `services/assessment-svc/src/index.ts`, `services/comms-svc/src/index.ts`,
+  `services/admin-svc/src/index.ts` — each registers the hook once at
+  bootstrap, so all of their JWT routes are covered without touching the
+  individual route files.
+- `packages/security/tests/active-role-hook.test.ts` (new) — 8 tests covering
+  the no-op paths, pass, spoof-reject + audit, multi-role widening, cookie
+  token source, and health/docs skip.
+
+Safe by construction: a real single-role caller sends its own role and always
+passes; only a client claiming a role its token doesn't grant is rejected.
+
+Verified: `@aivo/security` builds + 61 tests pass; `assessment-svc`,
+`comms-svc`, `admin-svc` build clean (`tsc`); changed files `eslint` clean.
+
+## Changelog — Phase 2: mobile district-role scope clarified (#4)
+
+Reframed #4 from an "incomplete" gap to **by design**. The mobile app's only
+district-side users are **teacher** and **therapist**; both sign in through the
+normal consumer `/api/auth/login` (they are never bounced) and have first-class
+`(teacher)` / `(therapist)` route groups. `DISTRICT_ADMIN` and the internal
+staff roles (`PLATFORM_ADMIN`, `SALES`, `MARKETING`, `CUSTOMER_CARE`,
+`SUPPORT`, `FINANCE`, `DEVOPS`) are web-only: the consumer login `403`s them to
+the admin/district web surfaces, and `apps/mobile/app/index.tsx` has no landing
+for those roles (they fall through to the login screen). Letting them
+authenticate on mobile would only dead-end them, so no mobile sign-in is wired
+for them.
+
+An earlier draft of this slice added a `wrongSurface` retry in
+`useAuth.login()` (plus a `staff-surface` helper and tests) to log those roles
+in on mobile; it was reverted because they are not mobile users. The
+identity-svc surface separation (consumer vs. admin vs. district login
+endpoints) is unchanged and remains correct for the web shells.
+
+Verified: `@aivo/mobile` `eslint` clean; `tsc --noEmit` introduces no new
+errors (one pre-existing unrelated `age-tiers` test import remains); existing
+`vitest run` suites green.

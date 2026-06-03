@@ -1469,7 +1469,11 @@
       "household_placeholder": "ex.: Família Okafor",
       "household_helper": "Mostrado aos professores quando eles enviam mensagens. Você pode mudar depois.",
       "coparent_label": "Convidar um co-responsável ou cuidador (opcional)",
-      "coparent_helper": "Eles receberão um e-mail com o próprio acesso. Ambos podem aprovar consentimentos e ver o progresso."
+      "coparent_helper": "Eles receberão um e-mail com o próprio acesso. Ambos podem aprovar consentimentos e ver o progresso.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar. Tente novamente.",
+      "coparent_invite_error": "Não foi possível enviar o convite. Verifique o e-mail e tente novamente.",
+      "coparent_invited": "Convite enviado."
     },
     "learner_new": {
       "eyebrow": "Adicionar um aluno",
@@ -1515,7 +1519,9 @@
       "legal_ai_label": "Personalização por IA:",
       "legal_ai_body": "a AIVO adapta o ritmo e as dicas ao seu filho. Os dados de treinamento nunca são usados para identificar um aluno.",
       "legal_mkt_label": "Novidades do produto:",
-      "legal_mkt_body": "uma lista de e-mail de baixo volume. Cancele a inscrição com um clique."
+      "legal_mkt_body": "uma lista de e-mail de baixo volume. Cancele a inscrição com um clique.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar o seu consentimento. Tente novamente."
     },
     "permissions": {
       "eyebrow": "Permissões do dispositivo",
@@ -1529,7 +1535,9 @@
       "cam_title": "Câmera",
       "cam_desc": "Usada apenas ao digitalizar uma página de tarefa ou documento. A AIVO nunca grava vídeo.",
       "notifs_title": "Notificações",
-      "notifs_desc": "Pedidos de aprovação, resumos semanais de progresso e mensagens de segurança. Lembretes de lições estão desativados por padrão — você pode ativá-los depois."
+      "notifs_desc": "Pedidos de aprovação, resumos semanais de progresso e mensagens de segurança. Lembretes de lições estão desativados por padrão — você pode ativá-los depois.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar a sua preferência de notificação. Tente novamente."
     },
     "pin": {
       "eyebrow": "PIN do aluno",
@@ -1541,7 +1549,14 @@
       "skip": "Pular — definir um PIN depois nas Configurações",
       "choose_pin": "Escolher PIN",
       "confirm_pin": "Confirmar PIN",
-      "mismatch": "Não conferem. Tente de novo."
+      "mismatch": "Não conferem. Tente de novo.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar o PIN. Tente novamente.",
+      "select_learner_label": "Para qual criança é este PIN?",
+      "select_learner_placeholder": "Selecione uma criança",
+      "no_learner_title": "Adicione uma criança primeiro",
+      "no_learner_body": "Um PIN pertence a uma criança específica. Adicione uma criança e então você poderá definir o PIN dela.",
+      "no_learner_cta": "Adicionar uma criança"
     },
     "parent_verify": {
       "eyebrow": "Verificação do responsável",
@@ -1556,7 +1571,11 @@
       "use_diff_phone": "Usar outro número de telefone",
       "phone_label": "Telefone celular",
       "phone_helper": "Usamos isto apenas para verificação e recuperação de conta.",
-      "code_label": "Código de 6 dígitos"
+      "code_label": "Código de 6 dígitos",
+      "sending": "Enviando…",
+      "verifying": "Verificando…",
+      "send_error": "Não foi possível enviar o código. Verifique o número e tente novamente.",
+      "verify_error": "Esse código não confere. Verifique e tente novamente."
     },
     "privacy": {
       "eyebrow": "Privacidade",
@@ -1613,7 +1632,14 @@
       "ai_title": "Tutor de IA",
       "ai_desc": "Um tutor conversacional que explica conceitos, nunca dá as respostas finais e encaminha temas de segurança a um adulto.",
       "voice_title": "Modo de voz",
-      "voice_desc": "Permite que seu filho fale com o tutor e ouça as respostas. Desativado por padrão — usa o microfone."
+      "voice_desc": "Permite que seu filho fale com o tutor e ouça as respostas. Desativado por padrão — usa o microfone.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar a aprovação. Tente novamente.",
+      "select_learner_label": "Qual filho você está aprovando?",
+      "select_learner_placeholder": "Selecione um filho",
+      "no_learner_title": "Adicione um filho primeiro",
+      "no_learner_body": "A aprovação é armazenada para um filho específico. Adicione um filho e depois você poderá aprovar o acesso dele.",
+      "no_learner_cta": "Adicionar um filho"
     },
     "iep_upload": {
       "eyebrow": "Apoios IEP / 504",
@@ -1635,7 +1661,15 @@
       "legal_never_label": "Nunca extraído:",
       "legal_never_body": "diagnósticos médicos, avaliações psicológicas, declarações dos pais, assinaturas.",
       "legal_teachers_label": "Visível para os professores:",
-      "legal_teachers_body": "apenas a lista de adaptações, apenas nas escolas para as quais você consentiu."
+      "legal_teachers_body": "apenas a lista de adaptações, apenas nas escolas para as quais você consentiu.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar a etapa do IEP. Tente novamente.",
+      "consent_required": "Forneça o consentimento explícito antes de enviar um documento.",
+      "select_learner_label": "Para qual filho é este IEP?",
+      "select_learner_placeholder": "Selecione um filho",
+      "no_learner_title": "Adicione um filho primeiro",
+      "no_learner_body": "Um IEP é armazenado para um filho específico. Adicione um filho e depois você poderá enviar o plano dele.",
+      "no_learner_cta": "Adicionar um filho"
     },
     "invite_school": {
       "eyebrow": "Convite da escola",
