@@ -1545,7 +1545,14 @@
       "skip": "تخطٍّ — عيّن رمز PIN لاحقًا من الإعدادات",
       "choose_pin": "اختر رمز PIN",
       "confirm_pin": "أكّد رمز PIN",
-      "mismatch": "غير متطابقين. حاول مرة أخرى."
+      "mismatch": "غير متطابقين. حاول مرة أخرى.",
+      "saving": "جارٍ الحفظ…",
+      "save_error": "تعذّر حفظ رمز PIN. يرجى المحاولة مرة أخرى.",
+      "select_learner_label": "لأي طفل هذا الرمز؟",
+      "select_learner_placeholder": "اختر طفلاً",
+      "no_learner_title": "أضف طفلاً أولاً",
+      "no_learner_body": "يخص رمز PIN طفلاً محدداً. أضف طفلاً، ثم يمكنك تعيين رمزه.",
+      "no_learner_cta": "إضافة طفل"
     },
     "parent_verify": {
       "eyebrow": "التحقّق من الوالد",

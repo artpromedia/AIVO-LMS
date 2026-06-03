@@ -1545,7 +1545,14 @@
       "skip": "Ignorer — définir un code PIN plus tard dans Paramètres",
       "choose_pin": "Choisir le code PIN",
       "confirm_pin": "Confirmer le code PIN",
-      "mismatch": "Ils ne correspondent pas. Réessayez."
+      "mismatch": "Ils ne correspondent pas. Réessayez.",
+      "saving": "Enregistrement…",
+      "save_error": "Impossible d'enregistrer le code PIN. Veuillez réessayer.",
+      "select_learner_label": "À quel enfant ce code PIN est-il destiné ?",
+      "select_learner_placeholder": "Sélectionnez un enfant",
+      "no_learner_title": "Ajoutez d'abord un enfant",
+      "no_learner_body": "Un code PIN appartient à un enfant précis. Ajoutez un enfant, puis vous pourrez définir son code PIN.",
+      "no_learner_cta": "Ajouter un enfant"
     },
     "parent_verify": {
       "eyebrow": "Vérification du parent",

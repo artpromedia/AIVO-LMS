@@ -1545,7 +1545,14 @@
       "skip": "Omitir — configurar un PIN más tarde desde Ajustes",
       "choose_pin": "Elegir PIN",
       "confirm_pin": "Confirmar PIN",
-      "mismatch": "No coinciden. Inténtalo de nuevo."
+      "mismatch": "No coinciden. Inténtalo de nuevo.",
+      "saving": "Guardando…",
+      "save_error": "No se pudo guardar el PIN. Inténtalo de nuevo.",
+      "select_learner_label": "¿Para qué niño es este PIN?",
+      "select_learner_placeholder": "Selecciona un niño",
+      "no_learner_title": "Primero agrega un niño",
+      "no_learner_body": "Un PIN pertenece a un niño específico. Agrega un niño y luego podrás establecer su PIN.",
+      "no_learner_cta": "Agregar un niño"
     },
     "parent_verify": {
       "eyebrow": "Verificación del padre",

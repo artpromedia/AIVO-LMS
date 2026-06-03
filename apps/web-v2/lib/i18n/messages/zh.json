@@ -1545,7 +1545,14 @@
       "skip": "跳过 — 稍后在设置中设置 PIN",
       "choose_pin": "选择 PIN",
       "confirm_pin": "确认 PIN",
-      "mismatch": "两者不一致。请重试。"
+      "mismatch": "两者不一致。请重试。",
+      "saving": "保存中…",
+      "save_error": "无法保存 PIN。请重试。",
+      "select_learner_label": "此 PIN 用于哪个孩子？",
+      "select_learner_placeholder": "选择一个孩子",
+      "no_learner_title": "请先添加孩子",
+      "no_learner_body": "PIN 属于特定的孩子。请先添加孩子，然后即可设置其 PIN。",
+      "no_learner_cta": "添加孩子"
     },
     "parent_verify": {
       "eyebrow": "家长验证",

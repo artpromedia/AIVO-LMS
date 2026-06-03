@@ -1545,7 +1545,14 @@
       "skip": "건너뛰기 — 나중에 설정에서 PIN 설정",
       "choose_pin": "PIN 선택",
       "confirm_pin": "PIN 확인",
-      "mismatch": "일치하지 않습니다. 다시 시도하세요."
+      "mismatch": "일치하지 않습니다. 다시 시도하세요.",
+      "saving": "저장 중…",
+      "save_error": "PIN을 저장할 수 없습니다. 다시 시도해 주세요.",
+      "select_learner_label": "이 PIN은 어떤 자녀를 위한 것인가요?",
+      "select_learner_placeholder": "자녀 선택",
+      "no_learner_title": "먼저 자녀를 추가하세요",
+      "no_learner_body": "PIN은 특정 자녀에 속합니다. 자녀를 추가하면 PIN을 설정할 수 있습니다.",
+      "no_learner_cta": "자녀 추가"
     },
     "parent_verify": {
       "eyebrow": "학부모 확인",

@@ -400,6 +400,49 @@ Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
 @aivo/web-v2 build` only fails in the sandbox because Google Fonts is
 unreachable — unrelated to these changes.)
 
+## Changelog — Phase 1: onboarding learner PIN-set persistence (#7, slice 4)
+
+Closed the learner-PIN half of slice 4 of gap #7 by making the `/onboarding/pin`
+step actually set the learner's PIN instead of discarding the entered digits on
+`<Link>` navigation. The PIN is the value the mobile learner `pin-login` flow
+verifies (`apps/mobile/hooks/useAuth.ts` → identity-svc `POST /api/auth/pin-login`
+against `users.pin`), so the step now writes through to that same field.
+
+- `apps/web-v2/app/api/bff/learners/[learnerId]/pin/route.ts` (new) — dual-path
+  (ADR 0009) BFF route. `POST` validates a 4–6 digit PIN, enforces a parent
+  session + learner-ownership scope, then: when identity-svc is enabled and a
+  real access token is present, sets the PIN via
+  `PUT /api/users/learners/:learnerId` on identity-svc (which re-checks parent
+  ownership); otherwise persists to an in-memory dev store. `GET` returns only
+  `{ hasPin, pinSetAt }` — never the secret. Both verbs audit `learner.pin.set`.
+- `apps/web-v2/lib/bff/identity-learners.ts` (new) — server-only client for the
+  identity-svc learner-PIN mutation, with the standard service flag/bearer/timeout
+  handling.
+- `apps/web-v2/lib/db/learner-pin-store.ts` (new) — the dev/mock fallback store.
+  Even in this throwaway store the PIN is salted + scrypt-hashed and only
+  `hasPin`/`pinSetAt` are ever exposed; a constant-time `verifyStoredLearnerPin`
+  is provided for a future learner-unlock surface and tests.
+- `apps/web-v2/app/onboarding/pin/page.tsx` — the PIN step now persists. A PIN is
+  learner-scoped, so the page resolves a `learnerId` from `?learnerId=` and, when
+  absent, gates behind learner selection via `GET /api/bff/learners` (auto-select
+  sole learner, picker for several, `/onboarding/learner/new` CTA when none) — the
+  same resolution pattern as the slice 3 IEP step. On Save it `POST`s the PIN and
+  advances on success, surfacing an inline error without navigating on failure.
+  Skip still advances without setting a PIN.
+- `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
+  `onboarding.pin.{saving,save_error,select_learner_label,
+  select_learner_placeholder,no_learner_title,no_learner_body,no_learner_cta}`
+  in all 10 supported locales.
+
+The remaining slice 4 sub-parts — household / co-parent invites and real
+phone/SMS verification (overlapping SMS gap #22) — still need IA/backends work
+and remain separate follow-up, out of scope for this change.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
+`eslint --max-warnings=0` clean on the changed files. (`pnpm --filter
+@aivo/web-v2 build` only fails in the sandbox because Google Fonts is
+unreachable — unrelated to these changes.)
+
 ## Changelog — Phase 1: billing → billing-svc (#8)
 
 Wired the web parent billing surface to the real, Stripe-backed

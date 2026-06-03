@@ -1545,7 +1545,14 @@
       "skip": "Skip — set a PIN later from Settings",
       "choose_pin": "Choose PIN",
       "confirm_pin": "Confirm PIN",
-      "mismatch": "Those don't match. Try again."
+      "mismatch": "Those don't match. Try again.",
+      "saving": "Saving…",
+      "save_error": "Couldn't save the PIN. Please try again.",
+      "select_learner_label": "Which child is this PIN for?",
+      "select_learner_placeholder": "Select a child",
+      "no_learner_title": "Add a child first",
+      "no_learner_body": "A PIN belongs to a specific child. Add a child, then you can set their PIN.",
+      "no_learner_cta": "Add a child"
     },
     "parent_verify": {
       "eyebrow": "Parent verification",

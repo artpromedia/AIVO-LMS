@@ -1545,7 +1545,14 @@
       "skip": "Überspringen – PIN später in den Einstellungen festlegen",
       "choose_pin": "PIN wählen",
       "confirm_pin": "PIN bestätigen",
-      "mismatch": "Die stimmen nicht überein. Versuche es erneut."
+      "mismatch": "Die stimmen nicht überein. Versuche es erneut.",
+      "saving": "Wird gespeichert…",
+      "save_error": "PIN konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+      "select_learner_label": "Für welches Kind ist diese PIN?",
+      "select_learner_placeholder": "Kind auswählen",
+      "no_learner_title": "Fügen Sie zuerst ein Kind hinzu",
+      "no_learner_body": "Eine PIN gehört zu einem bestimmten Kind. Fügen Sie ein Kind hinzu, dann können Sie dessen PIN festlegen.",
+      "no_learner_cta": "Kind hinzufügen"
     },
     "parent_verify": {
       "eyebrow": "Eltern-Verifizierung",

@@ -1545,7 +1545,14 @@
       "skip": "Pular — definir um PIN depois nas Configurações",
       "choose_pin": "Escolher PIN",
       "confirm_pin": "Confirmar PIN",
-      "mismatch": "Não conferem. Tente de novo."
+      "mismatch": "Não conferem. Tente de novo.",
+      "saving": "Salvando…",
+      "save_error": "Não foi possível salvar o PIN. Tente novamente.",
+      "select_learner_label": "Para qual criança é este PIN?",
+      "select_learner_placeholder": "Selecione uma criança",
+      "no_learner_title": "Adicione uma criança primeiro",
+      "no_learner_body": "Um PIN pertence a uma criança específica. Adicione uma criança e então você poderá definir o PIN dela.",
+      "no_learner_cta": "Adicionar uma criança"
     },
     "parent_verify": {
       "eyebrow": "Verificação do responsável",
