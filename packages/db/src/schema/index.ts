@@ -38,3 +38,4 @@ export * from "./messaging.js";
 export * from "./user-roles.js";
 export * from "./content.js";
 export * from "./audit-events-v2.js";
+export * from "./impersonation.js";
