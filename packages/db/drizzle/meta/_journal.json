@@ -302,6 +302,13 @@
       "when": 1780804800000,
       "tag": "0059_data_governance_dsar",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1780891200000,
+      "tag": "0060_school_admin_persistence",
+      "breakpoints": true
     }
   ]
 }

@@ -46,18 +46,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
-    if (process.env.NODE_ENV !== "production" && !process.env.ADMIN_SVC_URL) {
-      console.log("[marketing/lead-stub]", {
+    // Local-only convenience: short-circuit lead ingestion without a running
+    // admin-svc. This is an EXPLICIT opt-in (MARKETING_LEAD_STUB=1) so that
+    // staging / preview deployments — which may not set NODE_ENV=production —
+    // can never silently drop real leads. Production additionally refuses to
+    // honor the flag as defense in depth.
+    if (
+      process.env.MARKETING_LEAD_STUB === "1" &&
+      process.env.NODE_ENV !== "production" &&
+      !process.env.ADMIN_SVC_URL
+    ) {
+      console.warn("[marketing/lead-stub] dropping lead (MARKETING_LEAD_STUB enabled)", {
         type: type || "contact",
-        name,
-        email,
-        company,
-        role,
-        message,
-        schoolSize,
-        gradeBand,
-        interestArea,
-        consent,
+        emailDomain: typeof email === "string" ? email.split("@")[1] : undefined,
       });
       return NextResponse.json({ ok: true, stubbed: true });
     }

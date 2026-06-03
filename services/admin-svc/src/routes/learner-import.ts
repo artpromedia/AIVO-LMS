@@ -2,11 +2,11 @@
  * Sprint 6 — Learner bulk-import routes (admin-svc).
  *
  * Backed by @aivo/learner-import for CSV parsing, validation, and the
- * resumable chunked engine. The in-memory job/learner stores mirror the
- * deletion-requests.ts Map precedent.
- *
- * // TODO(sprint6): Persist import jobs + learner rows in Postgres,
- * //   following the existing dpa-store pattern in data-governance-svc.
+ * resumable chunked engine. Job state and imported learner rows are
+ * persisted via a LearnerImportStore (Postgres in production, in-memory for
+ * tests / local dev) following the dpa-store precedent in data-governance-svc.
+ * Jobs survive restart and learner rows upsert idempotently on
+ * (schoolId, external_id).
  *
  * RBAC: allowed for PLATFORM_ADMIN, DISTRICT_ADMIN, SCHOOL_ADMIN.
  * Note: finer school-ownership scoping is enforced at the BFF/identity layer.
@@ -20,9 +20,14 @@ import {
   dryRunDiff,
   initialProgress,
   type NormalizedLearner,
-  type ImportProgress,
 } from "@aivo/learner-import";
 import { logAuditEvent } from "./audit.js";
+import {
+  type ImportJobRecord,
+  type LearnerImportStore,
+  InMemoryLearnerImportStore,
+  selectLearnerImportStore,
+} from "../stores/learner-import-store.js";
 import {
   postAdminSchoolsLearnerImportValidateSchema,
   postAdminSchoolsLearnerImportRunSchema,
@@ -62,58 +67,42 @@ async function requireSchoolAdmin(
   }
 }
 
-// ---------------------------------------------------------------------------
-// In-memory stores (per school learner set keyed by external_id)
-// ---------------------------------------------------------------------------
-// TODO(sprint6): Replace with Postgres persistence (dpa-store pattern).
-
-type JobStatus = "pending" | "running" | "done" | "failed";
-
-interface ImportJob {
-  jobId: string;
-  schoolId: string;
-  status: JobStatus;
-  progress: ImportProgress;
-  csvText: string;
-  validRows: NormalizedLearner[];
-  errors?: string[];
+function generateJobId(): string {
+  return `job_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-const JOBS = new Map<string, ImportJob>();
-
-// Per-school in-memory learner store: schoolId -> Map<external_id, NormalizedLearner>
-const LEARNER_STORE = new Map<string, Map<string, NormalizedLearner>>();
-
-function getSchoolLearners(schoolId: string): Map<string, NormalizedLearner> {
-  let store = LEARNER_STORE.get(schoolId);
-  if (!store) {
-    store = new Map();
-    LEARNER_STORE.set(schoolId, store);
-  }
-  return store;
-}
-
-/** Idempotent apply stub keyed by external_id — real DB upsert follows in Sprint 7. */
-function makeApply(schoolId: string) {
-  const learners = getSchoolLearners(schoolId);
+/**
+ * Build a synchronous `apply` for the chunked engine. The engine's apply
+ * must be sync, so we classify each row against the pre-loaded set of
+ * existing external_ids and stage the row for a single bulk upsert once the
+ * run completes. Idempotent: a row reprocessed after a resume maps to the
+ * same external_id and upserts in place.
+ */
+function makeStagingApply(existingIds: Set<string>, staged: Map<string, NormalizedLearner>) {
   return (row: NormalizedLearner): "created" | "updated" | "skipped" => {
-    if (learners.has(row.external_id)) {
-      learners.set(row.external_id, row);
-      return "updated";
-    }
-    learners.set(row.external_id, row);
-    return "created";
+    const outcome = existingIds.has(row.external_id) ? "updated" : "created";
+    existingIds.add(row.external_id);
+    staged.set(row.external_id, row);
+    return outcome;
   };
 }
 
-function generateJobId(): string {
-  return `job_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+// Test-only handle to the in-memory store, set when registerLearnerImportRoutes
+// selects it (non-production, no DATABASE_URL).
+let testStore: InMemoryLearnerImportStore | null = null;
+export function clearLearnerImportStoresForTest(): void {
+  testStore?.clear();
 }
 
 // ---------------------------------------------------------------------------
 // Route registration
 // ---------------------------------------------------------------------------
-export function registerLearnerImportRoutes(app: FastifyInstance, db: any): void {
+export function registerLearnerImportRoutes(
+  app: FastifyInstance,
+  db: any,
+  store: LearnerImportStore = selectLearnerImportStore(db),
+): void {
+  if (store instanceof InMemoryLearnerImportStore) testStore = store;
   // ------------------------------------------------------------------
   // POST /admin/schools/:schoolId/learners/import/validate
   // ------------------------------------------------------------------
@@ -168,9 +157,12 @@ export function registerLearnerImportRoutes(app: FastifyInstance, db: any): void
       const validation = validateCsv(csvText, mapping as any);
       const validRows = validation.valid;
 
+      // Existing external_ids for this school — used for dry-run diff and
+      // for created/updated classification during the real run.
+      const existingIds = await store.existingExternalIds(schoolId);
+
       // Dry-run: return diff counts without persisting anything.
       if (dryRun) {
-        const existingIds = new Set(getSchoolLearners(schoolId).keys());
         const diff = dryRunDiff(validRows, existingIds);
         return {
           dryRun: true,
@@ -182,67 +174,83 @@ export function registerLearnerImportRoutes(app: FastifyInstance, db: any): void
       }
 
       // Check for an existing resumable job with the same jobId.
-      let job: ImportJob;
-      if (providedJobId && JOBS.has(providedJobId)) {
-        job = JOBS.get(providedJobId)!;
-        if (job.schoolId !== schoolId) {
-          return reply.code(404).send({ error: "job_not_found" });
+      let job: ImportJobRecord;
+      if (providedJobId) {
+        const existing = await store.getJob(providedJobId);
+        if (existing) {
+          if (existing.schoolId !== schoolId) {
+            return reply.code(404).send({ error: "job_not_found" });
+          }
+          // Resume from the stored cursor.
+          job = { ...existing, status: "running" };
+        } else {
+          job = {
+            jobId: providedJobId,
+            schoolId,
+            status: "running",
+            progress: initialProgress(validRows.length),
+          };
         }
-        // Resume from the stored cursor.
-        job.status = "running";
-        job.csvText = csvText;
-        job.validRows = validRows;
       } else {
-        const jobId = providedJobId ?? generateJobId();
         job = {
-          jobId,
+          jobId: generateJobId(),
           schoolId,
           status: "running",
           progress: initialProgress(validRows.length),
-          csvText,
-          validRows,
         };
-        JOBS.set(jobId, job);
       }
+      await store.saveJob(job);
 
-      const apply = makeApply(schoolId);
+      // Stage processed rows for a single idempotent bulk upsert once the
+      // chunked run finishes.
+      const staged = new Map<string, NormalizedLearner>();
+      const apply = makeStagingApply(existingIds, staged);
 
       // Run the import asynchronously in a setImmediate so we return jobId
       // quickly, while the engine processes chunks in the background.
       setImmediate(() => {
-        try {
-          const finalProgress = runImport(validRows, apply, {
-            chunkSize: 500,
-            resumeFrom: job.progress,
-            onProgress: (p) => {
-              job.progress = p;
-            },
-          });
-          job.progress = finalProgress;
-          job.status = "done";
+        void (async () => {
+          try {
+            const finalProgress = runImport(validRows, apply, {
+              chunkSize: 500,
+              resumeFrom: job.progress,
+              onProgress: (p) => {
+                job.progress = p;
+              },
+            });
 
-          // Emit audit event upon completion.
-          void logAuditEvent(db, {
-            action: "learner_import_completed",
-            actorId: actor.sub,
-            actorEmail: actor.email ?? "unknown",
-            actorRole: actor.role,
-            resourceType: "learner_import",
-            resourceId: job.jobId,
-            details: {
-              schoolId,
-              ...finalProgress,
-              totalRows: validation.summary.totalRows,
-              errorRows: validation.summary.errorRows,
-              warningRows: validation.summary.warningRows,
-            },
-          }).catch(() => {
-            // Fire-and-forget; audit failure must not fail the import.
-          });
-        } catch (err) {
-          job.status = "failed";
-          job.errors = [(err as Error).message];
-        }
+            // Persist the imported learner rows, then mark the job done.
+            await store.upsertLearners(schoolId, [...staged.values()]);
+            job.progress = finalProgress;
+            job.status = "done";
+            await store.saveJob(job);
+
+            // Emit audit event upon completion.
+            void logAuditEvent(db, {
+              action: "learner_import_completed",
+              actorId: actor.sub,
+              actorEmail: actor.email ?? "unknown",
+              actorRole: actor.role,
+              resourceType: "learner_import",
+              resourceId: job.jobId,
+              details: {
+                schoolId,
+                ...finalProgress,
+                totalRows: validation.summary.totalRows,
+                errorRows: validation.summary.errorRows,
+                warningRows: validation.summary.warningRows,
+              },
+            }).catch(() => {
+              // Fire-and-forget; audit failure must not fail the import.
+            });
+          } catch (err) {
+            job.status = "failed";
+            job.errors = [(err as Error).message];
+            await store.saveJob(job).catch(() => {
+              // Best-effort; the in-flight error is already surfaced above.
+            });
+          }
+        })();
       });
 
       return {
@@ -282,7 +290,7 @@ export function registerLearnerImportRoutes(app: FastifyInstance, db: any): void
       if (!actor) return;
 
       const { schoolId, jobId } = req.params;
-      const job = JOBS.get(jobId);
+      const job = await store.getJob(jobId);
       if (!job || job.schoolId !== schoolId) {
         return reply.code(404).send({ error: "job_not_found", jobId });
       }
@@ -302,10 +310,4 @@ export function registerLearnerImportRoutes(app: FastifyInstance, db: any): void
       };
     },
   );
-}
-
-// Exported for tests.
-export function clearLearnerImportStoresForTest(): void {
-  JOBS.clear();
-  LEARNER_STORE.clear();
 }

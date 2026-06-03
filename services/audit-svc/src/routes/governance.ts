@@ -21,28 +21,29 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
       if (!db) return { counts: {}, anonymizedCounts: {} };
       const uid = req.subjectId;
 
-      // Count rows where this subject appears as actor (userId or
-      // onBehalfOfId). We return this count as anonymizedCounts rather
-      // than counts because we do NOT delete — the chain must be kept.
-      //
-      // TODO(sprint5): Uncomment the UPDATE block once the chain
-      // re-verification story is resolved (ADR 0034 §5). The UPDATE sets
-      // userId / onBehalfOfId to NULL without touching prevHash / hash, so
-      // chain integrity is preserved for forward-verification. Backward
-      // verification of pre-anonymization rows will show NULL actors, which
-      // is expected and documented in the DSAR runbook.
-      //
-      // await db
-      //   .update(auditEvents)
-      //   .set({ userId: null, onBehalfOfId: null, ipAddress: null, userAgent: null })
-      //   .where(or(eq(auditEvents.userId, uid), eq(auditEvents.onBehalfOfId, uid)));
-
+      // Rows where this subject appears as actor (userId or onBehalfOfId).
+      // We report the affected rows as anonymizedCounts rather than counts
+      // because we do NOT delete — the append-only hash chain must be kept.
       const rows = await db
         .select({ count: sql<number>`count(*)::int` })
         .from(auditEvents)
         .where(or(eq(auditEvents.userId, uid), eq(auditEvents.onBehalfOfId, uid)));
-
       const n = rows[0]?.count ?? 0;
+
+      // ADR 0034 §5: anonymize actor PII in place. The UPDATE nulls the
+      // actor identity / network columns WITHOUT touching prevHash / hash,
+      // so the forward chain (each row's prevHash still equals the prior
+      // row's hash) remains intact and verifiable. Backward content
+      // re-verification of these specific rows will now show NULL actors —
+      // this is the expected, documented DSAR outcome (see the DSAR
+      // runbook), not chain corruption.
+      if (n > 0) {
+        await db
+          .update(auditEvents)
+          .set({ userId: null, onBehalfOfId: null, ipAddress: null, userAgent: null })
+          .where(or(eq(auditEvents.userId, uid), eq(auditEvents.onBehalfOfId, uid)));
+      }
+
       return { counts: {}, anonymizedCounts: { audit_events: n } };
     },
 
