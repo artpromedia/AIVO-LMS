@@ -1515,7 +1515,9 @@
       "legal_ai_label": "KI-Personalisierung:",
       "legal_ai_body": "AIVO passt Tempo und Hinweise an dein Kind an. Trainingsdaten werden niemals zur Identifizierung eines Lernenden verwendet.",
       "legal_mkt_label": "Produktneuigkeiten:",
-      "legal_mkt_body": "eine E-Mail-Liste mit geringem Volumen. Abmeldung mit einem Klick."
+      "legal_mkt_body": "eine E-Mail-Liste mit geringem Volumen. Abmeldung mit einem Klick.",
+      "saving": "Wird gespeichert…",
+      "save_error": "Ihre Einwilligung konnte nicht gespeichert werden. Bitte erneut versuchen."
     },
     "permissions": {
       "eyebrow": "Geräteberechtigungen",

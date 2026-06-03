@@ -1515,7 +1515,9 @@
       "legal_ai_label": "Personalización con IA:",
       "legal_ai_body": "AIVO adapta el ritmo y las pistas a tu hijo. Los datos de entrenamiento nunca se usan para identificar a un estudiante.",
       "legal_mkt_label": "Novedades del producto:",
-      "legal_mkt_body": "una lista de correo de bajo volumen. Cancela la suscripción con un clic."
+      "legal_mkt_body": "una lista de correo de bajo volumen. Cancela la suscripción con un clic.",
+      "saving": "Guardando…",
+      "save_error": "No se pudo guardar su consentimiento. Inténtelo de nuevo."
     },
     "permissions": {
       "eyebrow": "Permisos del dispositivo",

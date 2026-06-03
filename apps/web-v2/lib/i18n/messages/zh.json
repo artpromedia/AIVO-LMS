@@ -1515,7 +1515,9 @@
       "legal_ai_label": "AI 个性化：",
       "legal_ai_body": "AIVO 为你的孩子调整节奏与提示。训练数据绝不会用于识别某个学习者。",
       "legal_mkt_label": "产品资讯：",
-      "legal_mkt_body": "一个低频邮件列表。一键取消订阅。"
+      "legal_mkt_body": "一个低频邮件列表。一键取消订阅。",
+      "saving": "正在保存…",
+      "save_error": "无法保存您的同意，请重试。"
     },
     "permissions": {
       "eyebrow": "设备权限",

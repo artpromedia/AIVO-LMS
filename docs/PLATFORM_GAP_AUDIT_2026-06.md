@@ -292,6 +292,33 @@ Remaining in onboarding (follow-ups): intermediate informational steps
 (role/terms/privacy/consent) are still pure navigation; the field-level error
 copy is English-only pending an i18n pass.
 
+## Changelog — Phase 1: onboarding consent persistence (#7, slice 1)
+
+Closed the consent-step half of gap #7 ("onboarding wizard") by making the
+review step actually persist what the parent selects, instead of discarding
+all four toggles on `<Link>` navigation. No new backend — the route reuses the
+existing `POST /api/bff/consent` and its `consent.accept` audit emission.
+
+- `apps/web-v2/app/onboarding/consent/page.tsx` — replaced the `next/link`
+  Continue with a submit handler that POSTs `/api/bff/consent` per accepted
+  bucket, mapping the four UI toggles onto the canonical `CONSENT_TYPES`:
+  parent → `parent_account_terms` + `child_data_collection`, school →
+  `school_roster_import`, AI → `ai_personalization`, marketing →
+  `marketing_opt_in`. Preserves the parent-required gate, surfaces an
+  i18n'd inline error on failure (no navigation), and only navigates to
+  `/onboarding/permissions` after every record is persisted.
+- `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` —
+  added `onboarding.consent.saving` and `onboarding.consent.save_error` in
+  all 10 supported locales (matching the prior onboarding i18n pass).
+
+Slices 2–3 of the plan (permissions notification preference; learner-scoped
+IEP-upload persistence) and Slice 4 (PIN / parent-setup / parent-verify /
+child-approval — all needing new backends) are out of scope for this PR.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean,
+`eslint --max-warnings=0` clean on the changed file, and
+`corepack pnpm --filter @aivo/web-v2 build` succeeds.
+
 ## Changelog — Phase 1: billing → billing-svc (#8)
 
 Wired the web parent billing surface to the real, Stripe-backed

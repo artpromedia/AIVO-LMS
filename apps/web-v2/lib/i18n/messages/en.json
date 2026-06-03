@@ -1515,7 +1515,9 @@
       "legal_ai_label": "AI personalization:",
       "legal_ai_body": "AIVO adapts pacing and hints to your child. Training data is never used to identify an individual learner.",
       "legal_mkt_label": "Product news:",
-      "legal_mkt_body": "a low-volume email list. Unsubscribe in one click."
+      "legal_mkt_body": "a low-volume email list. Unsubscribe in one click.",
+      "saving": "Saving…",
+      "save_error": "Couldn't save your consent. Please try again."
     },
     "permissions": {
       "eyebrow": "Device permissions",

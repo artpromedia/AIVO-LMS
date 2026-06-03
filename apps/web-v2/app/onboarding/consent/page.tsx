@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   AuthShell,
   AuthCard,
@@ -20,6 +20,37 @@ const STEPS = [
 ] as const;
 
 /**
+ * The page's four toggles map onto the canonical `CONSENT_TYPES` enum used
+ * by `POST /api/bff/consent`. The parent bucket records both the parent
+ * account terms acceptance and the (required) child data-collection
+ * acknowledgement so a single Continue persists everything the funnel
+ * implies.
+ */
+const PARENT_CONSENT_TYPES = ["parent_account_terms", "child_data_collection"] as const;
+const SCHOOL_CONSENT_TYPE = "school_roster_import";
+const AI_CONSENT_TYPE = "ai_personalization";
+const MARKETING_CONSENT_TYPE = "marketing_opt_in";
+
+async function postConsent(consentType: string): Promise<void> {
+  const res = await fetch("/api/bff/consent", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ consentType }),
+  });
+  // Treat both transport errors and BFF envelope errors as a single failure
+  // so the page can surface one i18n'd message instead of leaking server text.
+  let json: { ok?: boolean } = {};
+  try {
+    json = (await res.json()) as { ok?: boolean };
+  } catch {
+    /* ignore — !res.ok branch handles it */
+  }
+  if (!res.ok || json.ok !== true) {
+    throw new Error("consent_persist_failed");
+  }
+}
+
+/**
  * /onboarding/consent
  *
  * Sprint-3 verbatim acceptance criterion enforced here:
@@ -35,10 +66,41 @@ export default function ConsentReviewPage() {
   const t = useTranslations("onboarding.consent");
   const tc = useTranslations("onboarding.common");
   const ts = useTranslations("onboarding.steps");
+  const router = useRouter();
   const [parentConsent, setParentConsent] = React.useState(true);
   const [schoolShare, setSchoolShare] = React.useState(false);
   const [aiPersonalize, setAiPersonalize] = React.useState(false);
   const [marketing, setMarketing] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const canContinue = parentConsent && !submitting;
+
+  async function handleContinue(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!canContinue) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      // Parent bucket = account terms + child data collection acknowledgement.
+      // School / AI / marketing are independent opt-ins; only persist the
+      // ones the parent actually accepted so revocations stay meaningful.
+      const types: string[] = [...PARENT_CONSENT_TYPES];
+      if (schoolShare) types.push(SCHOOL_CONSENT_TYPE);
+      if (aiPersonalize) types.push(AI_CONSENT_TYPE);
+      if (marketing) types.push(MARKETING_CONSENT_TYPE);
+      // Sequential rather than parallel so the audit log records a stable,
+      // predictable per-bucket order and a mid-flight failure doesn't leave
+      // half the decisions silently dropped on retry.
+      for (const ct of types) {
+        await postConsent(ct);
+      }
+      router.push("/onboarding/permissions");
+    } catch {
+      setError(t("save_error"));
+      setSubmitting(false);
+    }
+  }
 
   return (
     <AuthShell>
@@ -58,20 +120,26 @@ export default function ConsentReviewPage() {
             />
           }
           actions={
-            <>
-              <Link
-                href="/onboarding/permissions"
-                aria-disabled={!parentConsent}
+            <form onSubmit={handleContinue} className="contents">
+              <button
+                type="submit"
+                disabled={!canContinue}
+                aria-disabled={!canContinue}
                 className={`w-full h-12 rounded-iw-control text-white font-semibold flex items-center justify-center ${
-                  parentConsent
+                  canContinue
                     ? "bg-[var(--aivo-sensory-primary)] hover:opacity-95"
-                    : "bg-[var(--aivo-sensory-primary)]/50 pointer-events-none"
+                    : "bg-[var(--aivo-sensory-primary)]/50 cursor-not-allowed"
                 }`}
               >
-                {tc("continue")}
-              </Link>
+                {submitting ? t("saving") : tc("continue")}
+              </button>
+              {error ? (
+                <p role="alert" className="text-xs text-aivo-danger text-center">
+                  {error}
+                </p>
+              ) : null}
               <p className="text-xs text-iw-text-muted text-center">{t("footer_note")}</p>
-            </>
+            </form>
           }
         >
           <ConsentRow
