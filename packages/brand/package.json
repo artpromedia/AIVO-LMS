@@ -22,7 +22,8 @@
     "./tailwind-preset": "./dist/tailwind/preset.cjs"
   },
   "scripts": {
-    "build": "node ./scripts/build-tokens.mjs && tsc"
+    "build": "node ./scripts/build-tokens.mjs && tsc",
+    "prepare": "node ./scripts/build-tokens.mjs && tsc"
   },
   "devDependencies": {
     "typescript": "^5.7.3"
