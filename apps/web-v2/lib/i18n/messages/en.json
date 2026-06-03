@@ -1469,7 +1469,11 @@
       "household_placeholder": "e.g. The Okafor family",
       "household_helper": "Shown to teachers when they message you. You can change it later.",
       "coparent_label": "Invite a co-parent or caregiver (optional)",
-      "coparent_helper": "They'll get an email with their own sign-in. You can both approve consents and view progress."
+      "coparent_helper": "They'll get an email with their own sign-in. You can both approve consents and view progress.",
+      "saving": "Saving…",
+      "save_error": "We couldn't save that. Please try again.",
+      "coparent_invite_error": "We couldn't send that invite. Check the email and try again.",
+      "coparent_invited": "Invitation sent."
     },
     "learner_new": {
       "eyebrow": "Add a learner",
@@ -1567,7 +1571,11 @@
       "use_diff_phone": "Use a different phone number",
       "phone_label": "Mobile phone",
       "phone_helper": "We use this only for verification and account recovery.",
-      "code_label": "6-digit code"
+      "code_label": "6-digit code",
+      "sending": "Sending…",
+      "verifying": "Verifying…",
+      "send_error": "We couldn't send the code. Check the number and try again.",
+      "verify_error": "That code didn't match. Check it and try again."
     },
     "privacy": {
       "eyebrow": "Privacy",

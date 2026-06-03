@@ -90,3 +90,45 @@ export function markThreadReadSvc(
     bearer,
   });
 }
+
+/**
+ * Deliver a one-time verification code over SMS via comms-svc
+ * (`POST /api/comms/send`, channel `sms`, `mfa_code` template). comms-svc only
+ * transmits — the code/expiry/verification logic stays in the BFF
+ * (`parent-phone-store`). Returns the delivery status; `disabled` means no SMS
+ * provider is configured upstream (the BFF then falls back to the dev path).
+ */
+export function sendSmsCodeSvc(
+  bearer: string,
+  phone: string,
+  code: string,
+): Promise<ServiceResult<{ status: string; messageId?: string }>> {
+  return commsFetch("/api/comms/send", {
+    method: "POST",
+    bearer,
+    body: { channel: "sms", recipient: phone, template: "mfa_code", data: { code } },
+  });
+}
+
+/**
+ * Email a co-parent / caregiver invitation via comms-svc
+ * (`POST /api/comms/send`, channel `email`, `collaboration_invite` template).
+ * Used by the onboarding household step; comms-svc owns delivery, the BFF owns
+ * the household-invite record.
+ */
+export function sendCoParentInviteSvc(
+  bearer: string,
+  email: string,
+  data: { inviterName?: string; acceptUrl?: string },
+): Promise<ServiceResult<{ status: string; messageId?: string }>> {
+  return commsFetch("/api/comms/send", {
+    method: "POST",
+    bearer,
+    body: {
+      channel: "email",
+      recipient: email,
+      template: "collaboration_invite",
+      data: { role: "co-parent", inviterName: data.inviterName, acceptUrl: data.acceptUrl },
+    },
+  });
+}

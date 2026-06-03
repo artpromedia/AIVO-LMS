@@ -1469,7 +1469,11 @@
       "household_placeholder": "p. ex. La famille Okafor",
       "household_helper": "Affiché aux enseignants quand ils vous écrivent. Vous pourrez le modifier plus tard.",
       "coparent_label": "Inviter un coparent ou un proche aidant (facultatif)",
-      "coparent_helper": "Ils recevront un e-mail avec leur propre connexion. Vous pourrez tous deux approuver les consentements et consulter la progression."
+      "coparent_helper": "Ils recevront un e-mail avec leur propre connexion. Vous pourrez tous deux approuver les consentements et consulter la progression.",
+      "saving": "Enregistrement…",
+      "save_error": "Nous n'avons pas pu enregistrer. Veuillez réessayer.",
+      "coparent_invite_error": "Nous n'avons pas pu envoyer l'invitation. Vérifiez l'e-mail et réessayez.",
+      "coparent_invited": "Invitation envoyée."
     },
     "learner_new": {
       "eyebrow": "Ajouter un apprenant",
@@ -1567,7 +1571,11 @@
       "use_diff_phone": "Utiliser un autre numéro de téléphone",
       "phone_label": "Téléphone mobile",
       "phone_helper": "Nous l'utilisons uniquement pour la vérification et la récupération du compte.",
-      "code_label": "Code à 6 chiffres"
+      "code_label": "Code à 6 chiffres",
+      "sending": "Envoi…",
+      "verifying": "Vérification…",
+      "send_error": "Nous n'avons pas pu envoyer le code. Vérifiez le numéro et réessayez.",
+      "verify_error": "Ce code ne correspond pas. Vérifiez-le et réessayez."
     },
     "privacy": {
       "eyebrow": "Confidentialité",

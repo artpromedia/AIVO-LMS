@@ -1469,7 +1469,11 @@
       "household_placeholder": "例如：Okafor 一家",
       "household_helper": "当教师给你发消息时会显示。你可以稍后更改。",
       "coparent_label": "邀请共同家长或照护者（可选）",
-      "coparent_helper": "他们将收到一封带有自己登录方式的邮件。你们都可以批准同意并查看进度。"
+      "coparent_helper": "他们将收到一封带有自己登录方式的邮件。你们都可以批准同意并查看进度。",
+      "saving": "保存中…",
+      "save_error": "无法保存。请重试。",
+      "coparent_invite_error": "无法发送邀请。请检查邮箱后重试。",
+      "coparent_invited": "邀请已发送。"
     },
     "learner_new": {
       "eyebrow": "添加学习者",
@@ -1567,7 +1571,11 @@
       "use_diff_phone": "使用其他电话号码",
       "phone_label": "手机",
       "phone_helper": "我们仅将其用于验证和账户恢复。",
-      "code_label": "6 位代码"
+      "code_label": "6 位代码",
+      "sending": "发送中…",
+      "verifying": "验证中…",
+      "send_error": "无法发送验证码。请检查号码后重试。",
+      "verify_error": "验证码不匹配。请检查后重试。"
     },
     "privacy": {
       "eyebrow": "隐私",

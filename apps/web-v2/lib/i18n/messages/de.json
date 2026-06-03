@@ -1469,7 +1469,11 @@
       "household_placeholder": "z. B. Familie Okafor",
       "household_helper": "Wird Lehrkräften angezeigt, wenn sie dir schreiben. Du kannst ihn später ändern.",
       "coparent_label": "Ein Co-Elternteil oder eine Betreuungsperson einladen (optional)",
-      "coparent_helper": "Sie erhalten eine E-Mail mit eigener Anmeldung. Ihr könnt beide Einwilligungen genehmigen und den Fortschritt einsehen."
+      "coparent_helper": "Sie erhalten eine E-Mail mit eigener Anmeldung. Ihr könnt beide Einwilligungen genehmigen und den Fortschritt einsehen.",
+      "saving": "Speichern…",
+      "save_error": "Speichern nicht möglich. Bitte versuche es erneut.",
+      "coparent_invite_error": "Die Einladung konnte nicht gesendet werden. Prüfe die E-Mail und versuche es erneut.",
+      "coparent_invited": "Einladung gesendet."
     },
     "learner_new": {
       "eyebrow": "Einen Lernenden hinzufügen",
@@ -1567,7 +1571,11 @@
       "use_diff_phone": "Eine andere Telefonnummer verwenden",
       "phone_label": "Mobiltelefon",
       "phone_helper": "Wir verwenden dies nur zur Verifizierung und Kontowiederherstellung.",
-      "code_label": "6-stelliger Code"
+      "code_label": "6-stelliger Code",
+      "sending": "Senden…",
+      "verifying": "Überprüfung…",
+      "send_error": "Der Code konnte nicht gesendet werden. Prüfe die Nummer und versuche es erneut.",
+      "verify_error": "Dieser Code stimmt nicht. Prüfe ihn und versuche es erneut."
     },
     "privacy": {
       "eyebrow": "Datenschutz",

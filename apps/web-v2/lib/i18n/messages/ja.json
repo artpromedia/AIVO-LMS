@@ -1469,7 +1469,11 @@
       "household_placeholder": "例：オカフォー家",
       "household_helper": "教師があなたにメッセージを送るときに表示されます。後で変更できます。",
       "coparent_label": "共同保護者またはケア提供者を招待（任意）",
-      "coparent_helper": "本人専用のサインイン情報付きのメールが届きます。お二人とも同意を承認し、進捗を確認できます。"
+      "coparent_helper": "本人専用のサインイン情報付きのメールが届きます。お二人とも同意を承認し、進捗を確認できます。",
+      "saving": "保存中…",
+      "save_error": "保存できませんでした。もう一度お試しください。",
+      "coparent_invite_error": "招待を送信できませんでした。メールアドレスを確認してもう一度お試しください。",
+      "coparent_invited": "招待を送信しました。"
     },
     "learner_new": {
       "eyebrow": "学習者を追加",
@@ -1567,7 +1571,11 @@
       "use_diff_phone": "別の電話番号を使う",
       "phone_label": "携帯電話",
       "phone_helper": "確認とアカウント復旧のためにのみ使用します。",
-      "code_label": "6 桁のコード"
+      "code_label": "6 桁のコード",
+      "sending": "送信中…",
+      "verifying": "確認中…",
+      "send_error": "コードを送信できませんでした。番号を確認してもう一度お試しください。",
+      "verify_error": "コードが一致しませんでした。確認してもう一度お試しください。"
     },
     "privacy": {
       "eyebrow": "プライバシー",

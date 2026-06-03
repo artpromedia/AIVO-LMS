@@ -443,6 +443,58 @@ Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
 @aivo/web-v2 build` only fails in the sandbox because Google Fonts is
 unreachable — unrelated to these changes.)
 
+## Changelog — Phase 1: onboarding household + phone-verify persistence (#7, slice 4)
+
+Closed the final two slice 4 sub-parts of gap #7 — household / co-parent
+invites and real phone/SMS verification (overlapping SMS gap #22). Both
+onboarding steps used to discard their input on `<Link>` navigation; they now
+persist through new dual-path (ADR 0009) BFF routes.
+
+- `apps/web-v2/app/api/bff/onboarding/parent-verify/route.ts` (new) — issues +
+  verifies a one-time phone code. `POST` validates the number, mints a hashed
+  6-digit code in the new `parent-phone-store`, and delivers it over SMS via
+  comms-svc (`providers/sms-router` → Twilio when configured) when comms-svc is
+  enabled + a real token is present, else the dev path issues the code without a
+  real text. `PUT` verifies the typed code (constant-time, single-use, 10-min
+  expiry, 5-attempt cap). `GET` returns `{ phoneVerified, pendingPhone }` — the
+  code and full number are never returned. Audits `parent.phone.verify.requested`
+  / `parent.phone.verified` / `parent.phone.verify.failed`.
+- `apps/web-v2/lib/db/parent-phone-store.ts` (new) — the dev/mock OTP backend.
+  The code is salted + scrypt-hashed at rest and only handed once to the BFF for
+  delivery; status output masks all but the last 4 digits.
+- `apps/web-v2/app/onboarding/parent-verify/page.tsx` — "Send code" now POSTs the
+  phone and "Verify and continue" PUTs the code; only a server-confirmed match
+  advances to `/onboarding/consent`. Inline errors, no silent navigation.
+- `apps/web-v2/app/api/bff/onboarding/household/route.ts` (new) — `POST` saves the
+  household display name and, when a co-parent email is supplied, records a
+  household-scoped invite, emailing it via comms-svc (`collaboration_invite`
+  template) when wired, else recording it in the dev store. `GET` returns the
+  saved name + pending invites. Audits `household.updated` /
+  `household.coparent.invited`.
+- `apps/web-v2/lib/db/household-store.ts` (new) — the dev/mock household +
+  co-parent-invite backend (household-scoped, since no learner exists yet at
+  parent-setup), with email validation and pending-invite de-duplication.
+- `apps/web-v2/lib/bff/comms-svc.ts` — added `sendSmsCodeSvc` (SMS, `mfa_code`)
+  and `sendCoParentInviteSvc` (email, `collaboration_invite`) helpers fronting
+  comms-svc `POST /api/comms/send`.
+- `apps/web-v2/app/onboarding/parent-setup/page.tsx` — Continue now POSTs the
+  household name + co-parent email before advancing to `/onboarding/learner/new`.
+- `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
+  `onboarding.parent_verify.{sending,verifying,send_error,verify_error}` and
+  `onboarding.parent_setup.{saving,save_error,coparent_invite_error,
+  coparent_invited}` in all 10 locales.
+- `apps/web-v2/lib/db/__tests__/{parent-phone-store,household-store}.test.ts`
+  (new) — cover the challenge lifecycle (issue/verify/expiry/attempt-cap/
+  never-echo) and the household name + invite lifecycle.
+
+With this, every input-bearing onboarding step in gap #7 persists; the slice 4
+follow-up list is now empty.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean,
+`eslint --max-warnings=0` clean on the changed files, and the new store tests
+pass (`vitest run`). (`pnpm --filter @aivo/web-v2 build` only fails in the
+sandbox because Google Fonts is unreachable — unrelated to these changes.)
+
 ## Changelog — Phase 1: billing → billing-svc (#8)
 
 Wired the web parent billing surface to the real, Stripe-backed

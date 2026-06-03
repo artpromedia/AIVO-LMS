@@ -1469,7 +1469,11 @@
       "household_placeholder": "예: 오카포르 가족",
       "household_helper": "교사가 메시지를 보낼 때 표시됩니다. 나중에 변경할 수 있습니다.",
       "coparent_label": "공동 학부모 또는 보호자 초대(선택)",
-      "coparent_helper": "그들은 자신의 로그인 정보가 담긴 이메일을 받습니다. 두 분 모두 동의를 승인하고 진행 상황을 볼 수 있습니다."
+      "coparent_helper": "그들은 자신의 로그인 정보가 담긴 이메일을 받습니다. 두 분 모두 동의를 승인하고 진행 상황을 볼 수 있습니다.",
+      "saving": "저장 중…",
+      "save_error": "저장하지 못했습니다. 다시 시도하세요.",
+      "coparent_invite_error": "초대를 보내지 못했습니다. 이메일을 확인하고 다시 시도하세요.",
+      "coparent_invited": "초대를 보냈습니다."
     },
     "learner_new": {
       "eyebrow": "학습자 추가",
@@ -1567,7 +1571,11 @@
       "use_diff_phone": "다른 전화번호 사용",
       "phone_label": "휴대전화",
       "phone_helper": "확인과 계정 복구에만 사용합니다.",
-      "code_label": "6자리 코드"
+      "code_label": "6자리 코드",
+      "sending": "전송 중…",
+      "verifying": "확인 중…",
+      "send_error": "코드를 보내지 못했습니다. 번호를 확인하고 다시 시도하세요.",
+      "verify_error": "코드가 일치하지 않습니다. 확인 후 다시 시도하세요."
     },
     "privacy": {
       "eyebrow": "개인정보",
