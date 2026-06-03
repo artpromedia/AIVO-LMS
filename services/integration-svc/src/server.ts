@@ -51,15 +51,15 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
       registerEnterpriseAuthHook(secured, { sourceService: "integration-svc" });
     }
     registerSisRoutes(secured);
-    registerLtiRoutes(secured, db);
+    registerLtiRoutes(secured, db ?? undefined);
   });
 
   // Merged from the former integrations-svc (Sprint 3 consolidation): SIS
   // connector catalogue + connection management. Self-authenticating.
-  registerConnectorRoutes(app, db);
+  registerConnectorRoutes(app, db ?? undefined);
   registerConnectorHealthRoutes(app);
 
   // Sprint 5 governance subscribers (DSAR erase/export at /__governance/*).
-  registerGovernanceRoutes(app, db);
+  registerGovernanceRoutes(app, db ?? undefined);
   return app;
 }

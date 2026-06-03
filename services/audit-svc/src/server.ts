@@ -26,7 +26,10 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(cors, { origin: true, credentials: true });
   app.get("/healthz", async () => ({ status: "ok", service: "audit-svc" }));
   if (!options.skipAuth) {
-    registerEnterpriseAuthHook(app, { skipPaths: ["/healthz", "/health", "/metrics"] });
+    registerEnterpriseAuthHook(app, {
+      sourceService: "audit-svc",
+      skipPaths: ["/healthz", "/health", "/metrics"],
+    });
   }
   registerAuditEventRoutes(app, store);
   registerAuditReportRoutes(app, store);

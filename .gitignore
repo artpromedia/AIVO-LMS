@@ -62,8 +62,7 @@ infra/helm/aivo-ingress.yaml
 infra/helm/values/image-overrides.yaml
 .data/
 
-aivo-slim.tar.gz
-aivo-src.tar.gz
+*.tar.gz
 
 # Claude Code agent worktrees (created by Agent tool isolation: worktree)
 .claude/
