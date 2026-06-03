@@ -71,6 +71,8 @@ export const TEACHER_NAV: RoleNavItem[] = [
 export const SCHOOL_NAV: RoleNavItem[] = [
   { href: "/admin/school", label: "Overview", icon: <Building2 className="h-4 w-4" /> },
   { href: "/admin/school/staff", label: "Staff", icon: <Users className="h-4 w-4" /> },
+  { href: "/admin/school/ai", label: "AI", icon: <Cpu className="h-4 w-4" /> },
+  { href: "/admin/school/status", label: "Status", icon: <Activity className="h-4 w-4" /> },
   {
     href: "/admin/school/learners",
     label: "Learners",
@@ -92,6 +94,8 @@ export const SCHOOL_NAV: RoleNavItem[] = [
 export const DISTRICT_NAV: RoleNavItem[] = [
   { href: "/admin/district", label: "Overview", icon: <Network className="h-4 w-4" /> },
   { href: "/admin/district/schools", label: "Schools", icon: <Building2 className="h-4 w-4" /> },
+  { href: "/admin/district/ai", label: "AI controls", icon: <Cpu className="h-4 w-4" /> },
+  { href: "/admin/district/status", label: "Status", icon: <Activity className="h-4 w-4" /> },
   { href: "/admin/district/staff", label: "Staff", icon: <Users className="h-4 w-4" /> },
   { href: "/admin/district/iep", label: "IEPs", icon: <ClipboardList className="h-4 w-4" /> },
   { href: "/admin/district/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
@@ -121,6 +125,8 @@ export const DISTRICT_SETTINGS_NAV: RoleNavItem[] = [
 
 export const PLATFORM_NAV: RoleNavItem[] = [
   { href: "/admin/platform", label: "System health", icon: <Activity className="h-4 w-4" /> },
+  { href: "/admin/platform/status", label: "Status & SLOs", icon: <Activity className="h-4 w-4" /> },
+  { href: "/admin/platform/ai", label: "Responsible AI", icon: <Cpu className="h-4 w-4" /> },
   { href: "/admin/platform/tenants", label: "Tenants", icon: <Users className="h-4 w-4" /> },
   { href: "/admin/platform/identity", label: "Identity", icon: <Shield className="h-4 w-4" /> },
   { href: "/admin/platform/sis", label: "SIS Sync", icon: <UploadCloud className="h-4 w-4" /> },
