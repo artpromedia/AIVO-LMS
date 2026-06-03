@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@aivo/brand/tokens.css";
 import "./globals.css";
-import { cookies } from "next/headers";
 import { I18nProvider } from "@/providers/i18n-provider";
-import enMessages from "@/i18n/messages/en.json";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
-import { LOCALE_COOKIE_NAME, defaultLocale, dirForLocale, isValidLocale } from "@/i18n/config";
+import { locales, defaultLocale, dirForLocale } from "@/i18n/config";
+import { resolveServerLocale, loadServerMessages } from "@/i18n/locale.server";
 
 // Self-hosted via next/font/local so the build never touches the network.
 // Files live under src/fonts and are vendored in-repo (see scripts/refresh-fonts.md).
@@ -41,6 +40,17 @@ const atkinson = localFont({
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aivolearning.com";
+
+// hreflang alternates for every supported locale. Each non-default locale
+// points at its crawlable `?lang=` URL, which middleware resolves server-side
+// so crawlers receive fully translated content (not the English shell). The
+// default locale and x-default both map to the canonical root.
+const languageAlternates: Record<string, string> = {
+  "x-default": BASE_URL,
+  ...Object.fromEntries(
+    locales.map((l) => [l, l === defaultLocale ? BASE_URL : `${BASE_URL}/?lang=${l}`]),
+  ),
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -102,10 +112,7 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: BASE_URL,
-    languages: {
-      "x-default": BASE_URL,
-      en: BASE_URL,
-    },
+    languages: languageAlternates,
   },
 };
 
@@ -116,12 +123,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // SensoryModeToggle client component via /api/sensory-mode.
   const sensoryMode = await getSensoryModeFromCookies();
 
-  // Server-render the right language + writing direction from the persisted
-  // locale cookie so RTL locales (e.g. Arabic) paint correctly on first load
-  // instead of flashing LTR until the client provider hydrates. The provider
-  // still refines lang/dir client-side (hence suppressHydrationWarning).
-  const rawLocale = (await cookies()).get(LOCALE_COOKIE_NAME)?.value;
-  const locale = rawLocale && isValidLocale(rawLocale) ? rawLocale : defaultLocale;
+  // Server-resolve the locale (?lang= header → cookie → default) and load its
+  // message bundle so the first paint renders fully translated content with
+  // the correct language + writing direction. RTL locales (e.g. Arabic) paint
+  // correctly on first load instead of flashing LTR/English until the client
+  // provider hydrates. The provider still refines client-side (hence
+  // suppressHydrationWarning).
+  const locale = await resolveServerLocale();
+  const messages = await loadServerMessages(locale);
 
   return (
     <html
@@ -209,7 +218,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="font-body antialiased bg-[var(--aivo-sensory-bgPage)] text-[var(--aivo-sensory-ink)]">
         <GoogleAnalytics />
-        <I18nProvider initialMessages={enMessages}>{children}</I18nProvider>
+        <I18nProvider initialLocale={locale} initialMessages={messages}>
+          {children}
+        </I18nProvider>
       </body>
     </html>
   );

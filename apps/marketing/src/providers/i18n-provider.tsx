@@ -52,14 +52,17 @@ async function loadMessages(locale: Locale): Promise<Messages> {
 export function I18nProvider({
   children,
   initialMessages,
+  initialLocale = defaultLocale,
 }: {
   children: React.ReactNode;
   initialMessages: Messages;
+  /** Server-resolved locale so the first client render matches the SSR output. */
+  initialLocale?: Locale;
 }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
     const stored = getStoredLocale();
     if (stored) return stored;
-    return defaultLocale;
+    return initialLocale;
   });
   const [messages, setMessages] = useState<Messages>(initialMessages);
   const [initialized, setInitialized] = useState(false);
