@@ -985,5 +985,18 @@
     "codesWarning": "지금 이 코드를 저장하세요 — 다시 표시되지 않습니다.",
     "copyCodes": "모두 복사",
     "codesCopied": "복구 코드가 클립보드에 복사되었습니다."
+  },
+  "whatsWorking": {
+    "title": "What's working",
+    "intro": "Patterns to bring to your next IEP meeting.",
+    "loading": "Loading insights�",
+    "error": "Couldn't load insights right now.",
+    "empty": "Not enough sessions yet. Insights appear once {{name}} has completed a few sessions.",
+    "window30": "30 days",
+    "window90": "90 days",
+    "bestWindow": "Best learning window",
+    "modalityFit": "Modality that clicks",
+    "frustration": "Where frustration spikes",
+    "noneYet": "Not enough data yet"
   }
 }

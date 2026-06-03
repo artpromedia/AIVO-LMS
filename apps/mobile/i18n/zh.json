@@ -985,5 +985,18 @@
     "codesWarning": "立即保存这些代码 — 它们不会再次显示。",
     "copyCodes": "全部复制",
     "codesCopied": "恢复代码已复制到剪贴板。"
+  },
+  "whatsWorking": {
+    "title": "What's working",
+    "intro": "Patterns to bring to your next IEP meeting.",
+    "loading": "Loading insights�",
+    "error": "Couldn't load insights right now.",
+    "empty": "Not enough sessions yet. Insights appear once {{name}} has completed a few sessions.",
+    "window30": "30 days",
+    "window90": "90 days",
+    "bestWindow": "Best learning window",
+    "modalityFit": "Modality that clicks",
+    "frustration": "Where frustration spikes",
+    "noneYet": "Not enough data yet"
   }
 }

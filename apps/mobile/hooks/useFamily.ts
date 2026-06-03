@@ -162,34 +162,14 @@ export {
 } from "./useCreateTeacherInsight";
 
 // ─────────────── What's Working (parent dashboard analytics) ───────────────
-
-export interface WhatsWorkingInsights {
-  windowDays: number;
-  totalSessions: number;
-  bestWindow: { timeOfDay: string; meanAccuracy: number } | null;
-  modalityFit: { subject: string; modality: string; meanAccuracy: number }[];
-  frustrationHotspots: { subject: string; modality: string; meanFrustration: number }[];
-}
-
-/**
- * Fetch the "What's Working" analytics for a learner from family-svc
- * (GET /api/family/whats-working/:learnerId?windowDays=N). Parent-only;
- * family-svc enforces ownership.
- */
-export function useWhatsWorking(learnerId: string, windowDays = 30) {
-  return useQuery<WhatsWorkingInsights>({
-    queryKey: ["whats-working", learnerId, windowDays],
-    queryFn: async () => {
-      const res = await apiFetch(
-        API.FAMILY,
-        `/api/family/whats-working/${learnerId}?windowDays=${windowDays}`,
-      );
-      if (!res.ok) throw new Error("Failed to load insights");
-      return res.json();
-    },
-    enabled: !!learnerId,
-  });
-}
+// The hook + types live in their own file so the wire contract can be unit
+// tested without rendering React. Re-exported here for back-compat with
+// existing screens that import from `@/hooks/useFamily`.
+export {
+  useWhatsWorking,
+  fetchWhatsWorking,
+  type WhatsWorkingInsights,
+} from "./useWhatsWorking";
 
 // ─────────────── IEP Updates: Timeline / Amendments / Preferences ───────────────
 

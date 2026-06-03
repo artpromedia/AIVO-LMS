@@ -20,7 +20,7 @@ import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { getLearner, parentCanAccessLearner, refreshLearnerReadiness } from "@/lib/db/repos";
 import { READINESS_LABEL, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
-import { WhatsWorkingPanel } from "./whats-working-panel";
+import { WhatsWorkingPanel } from "@/components/parent/whats-working-panel";
 
 export default async function LearnerDetailPage({
   params,
