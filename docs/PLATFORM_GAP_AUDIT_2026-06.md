@@ -46,13 +46,12 @@ flips the default; "Code gap" = a flag won't fix it.
    pin-login now inserts a `sessions` row + sets the `refreshToken` cookie
    (role-based TTL) + surface cookie, mirroring login, so the learner
    session refreshes silently past 2h.**
-4. **[Incomplete] Staff/district roles cannot log in on mobile.**
-   `/api/auth/login` 403s `DISTRICT_ADMIN`/staff; mobile only wires
-   consumer + google + pin flows. → **Fixed in this pass: mobile `login`
-   now detects the consumer-surface `wrongSurface` bounce and transparently
-   retries against `/api/auth/admin-login` or `/api/auth/district-login`,
-   so staff and district admins sign in on the existing form + MFA flow
-   (see Changelog).**
+4. **[By design — not a mobile gap] District admins & platform staff are
+   web-only.** `/api/auth/login` 403s `DISTRICT_ADMIN`/staff and the mobile
+   landing router (`apps/mobile/app/index.tsx`) has no home for them. The only
+   district-side roles on mobile are **teacher** and **therapist**, which sign
+   in through the normal consumer login (they are not bounced). District-admin
+   and internal-staff consoles live on the web admin/district surfaces.
 
 ### B. Cross-device session continuity
 
@@ -256,9 +255,10 @@ billing→billing-svc Checkout (#8), Speech Buddy safety judge (#17) + consent
 store (#18), active-role enforcement (#19 ✅).
 
 **Phase 2 — Parity & continuity.** Mobile baseline → assessment-svc IRT (#11),
-persistent authed offline queue (#15), PIN refresh session (#3), mobile
-staff/district scoping (#4), messages/inbox (#9), refresh parity matrix (#21),
-lightweight real-time sync for active learner state (#6).
+persistent authed offline queue (#15), PIN refresh session (#3), messages/inbox
+(#9), refresh parity matrix (#21), lightweight real-time sync for active learner
+state (#6). (#4 is by design — district admins/staff are web-only; mobile's
+district-side roles are teacher + therapist, which already log in.)
 
 **Phase 3 — Incomplete features.** Tutor LLM (#10), co-learn (#12), live
 session viewing (#13), therapist add-goal (#14), comms SMS (#22), AAC
@@ -689,36 +689,25 @@ passes; only a client claiming a role its token doesn't grant is rejected.
 Verified: `@aivo/security` builds + 61 tests pass; `assessment-svc`,
 `comms-svc`, `admin-svc` build clean (`tsc`); changed files `eslint` clean.
 
-## Changelog — Phase 2: mobile staff/district login (#4)
+## Changelog — Phase 2: mobile district-role scope clarified (#4)
 
-First Phase 2 (Parity & continuity) slice. The mobile sign-in screen only
-wired the consumer email/password, Google, and PIN flows. Internal staff
-(`PLATFORM_ADMIN`, `SALES`, `MARKETING`, `CUSTOMER_CARE`, `SUPPORT`,
-`FINANCE`, `DEVOPS`) and `DISTRICT_ADMIN` accounts hit `/api/auth/login`,
-which deliberately `403`s them with a `wrongSurface` hint (`"admin"` /
-`"district"`) plus a `redirectTo` host so the web can bounce them to the
-admin / district sign-in surfaces. On mobile there is a single screen, so the
-bounce left those roles unable to sign in at all.
+Reframed #4 from an "incomplete" gap to **by design**. The mobile app's only
+district-side users are **teacher** and **therapist**; both sign in through the
+normal consumer `/api/auth/login` (they are never bounced) and have first-class
+`(teacher)` / `(therapist)` route groups. `DISTRICT_ADMIN` and the internal
+staff roles (`PLATFORM_ADMIN`, `SALES`, `MARKETING`, `CUSTOMER_CARE`,
+`SUPPORT`, `FINANCE`, `DEVOPS`) are web-only: the consumer login `403`s them to
+the admin/district web surfaces, and `apps/mobile/app/index.tsx` has no landing
+for those roles (they fall through to the login screen). Letting them
+authenticate on mobile would only dead-end them, so no mobile sign-in is wired
+for them.
 
-- `apps/mobile/lib/auth/staff-surface.ts` (new) — `staffLoginEndpointFor()`,
-  a pure helper that maps a consumer-login `403` + `wrongSurface` hint to the
-  correct identity-svc endpoint (`/api/auth/admin-login` or
-  `/api/auth/district-login`), and `null` for every other response (including
-  ordinary `401` invalid-credentials and unhinted `403`s).
-- `apps/mobile/hooks/useAuth.ts` — `login()` now performs the consumer POST,
-  and when the helper returns a staff/district endpoint it transparently
-  retries the same email/password there. The admin/district routes return the
-  identical token / `mfaPending` shape, so the existing success + MFA handling
-  (and the `verify-mfa` screen) work unchanged — no new screens needed.
-- `apps/mobile/__tests__/staff-surface.test.ts` (new) — 6 tests covering the
-  admin + district routes, plain `401`, success, unhinted/unknown `403`, and
-  null/non-object bodies.
+An earlier draft of this slice added a `wrongSurface` retry in
+`useAuth.login()` (plus a `staff-surface` helper and tests) to log those roles
+in on mobile; it was reverted because they are not mobile users. The
+identity-svc surface separation (consumer vs. admin vs. district login
+endpoints) is unchanged and remains correct for the web shells.
 
-The consumer login path is unchanged for parents and learners (no extra round
-trip — the retry only fires on a `wrongSurface` `403`). Strict surface
-separation is preserved server-side; mobile simply follows the hint instead of
-redirecting.
-
-Verified: `@aivo/mobile` `eslint` clean on changed files; `tsc --noEmit`
-introduces no new errors (one pre-existing unrelated `age-tiers` test import
-remains); `vitest run` green for the new + existing auth/offline suites.
+Verified: `@aivo/mobile` `eslint` clean; `tsc --noEmit` introduces no new
+errors (one pre-existing unrelated `age-tiers` test import remains); existing
+`vitest run` suites green.

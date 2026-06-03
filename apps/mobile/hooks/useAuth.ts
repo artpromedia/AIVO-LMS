@@ -10,7 +10,6 @@ import {
   getMustChangePassword,
 } from "@/lib/api";
 import { setApiActiveRole } from "@/lib/active-role";
-import { staffLoginEndpointFor } from "@/lib/auth/staff-surface";
 import { tryBiometricUnlock, disableBiometricUnlock } from "@/lib/biometric";
 import {
   mapIdentityErrorResponse,
@@ -173,26 +172,14 @@ export function useAuthState(): AuthContextValue {
   }, [checkAuth]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const attempt = (path: string) =>
-      apiFetch(API.IDENTITY, path, {
+    try {
+      const response = await apiFetch(API.IDENTITY, "/api/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
         skipAuth: true,
       });
-    try {
-      let response = await attempt("/api/auth/login");
-      let data = await response.json().catch(() => ({}));
 
-      // Staff (#4) and district admins are bounced off the consumer surface
-      // with a `wrongSurface` hint. Mobile has one sign-in screen, so retry
-      // transparently against the correct identity-svc endpoint instead of
-      // redirecting; the response shape (token / MFA) is identical.
-      const staffEndpoint = staffLoginEndpointFor(response.status, data);
-      if (staffEndpoint) {
-        response = await attempt(staffEndpoint);
-        data = await response.json().catch(() => ({}));
-      }
-
+      const data = await response.json().catch(() => ({}));
       if (response.ok) {
         if (data.mfaPending) {
           return { success: false, mfaPending: true, mfaToken: data.mfaToken };
