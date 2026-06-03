@@ -102,6 +102,11 @@ const serverSchema = z.object({
   // is on; the local mock store remains for development.
   RESPONSIBLE_AI_SVC_URL: z.string().url().default("http://localhost:3071"),
   DATA_GOVERNANCE_SVC_URL: z.string().url().default("http://localhost:3072"),
+  // Sprint 8: status-page + alerts-proxy (status page, SLO/error-budget).
+  STATUS_PAGE_SVC_URL: z.string().url().default("http://localhost:3014"),
+  ALERTS_PROXY_SVC_URL: z.string().url().default("http://localhost:3016"),
+  // Sprint 10: cross-tier reports & exports framework.
+  REPORTS_SVC_URL: z.string().url().default("http://localhost:3018"),
   // Sprint H: SIS rostering + LTI 1.3.
   INTEGRATION_SVC_URL: z.string().url().default("http://localhost:3060"),
   // Phase 1 (curriculum sync): base URL + internal trust token of `ai-svc`,

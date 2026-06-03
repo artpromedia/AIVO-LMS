@@ -26,6 +26,8 @@ import { registerConsentRoutes } from "./routes/consent.js";
 import { registerCurriculumRoutes } from "./routes/curriculum.js";
 import { registerAdminRoutes } from "./routes/admin.js";
 import { registerStepUpRoutes } from "./routes/step-up.js";
+import { registerImpersonationRoutes } from "./routes/impersonation.js";
+import { buildImpersonationDeps } from "./lib/impersonation-wiring.js";
 import { registerDistrictRoutes } from "./routes/district.js";
 import { registerPublicBrandingRoutes } from "./routes/branding-public.js";
 import { registerDistrictAdminRoutes } from "./routes/district-admins.js";
@@ -300,6 +302,8 @@ export async function buildApp() {
   await registerCurriculumRoutes(app);
   await registerStepUpRoutes(app);
   await registerAdminRoutes(app);
+  // Sprint 9: secure impersonation ("View As") with hardened audit.
+  registerImpersonationRoutes(app, buildImpersonationDeps(db));
   // Sprint 8: install the global tenant-scope hook BEFORE registering
   // district routes. The hook intercepts every /api/district/* request
   // and runs requireDistrictAdmin so no future district route can ship

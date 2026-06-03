@@ -1,43 +1,39 @@
+import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
-import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
-import { computeSystemHealth, scopeTenantsForSession } from "@/lib/db/repos";
+import { listReports } from "@/lib/services/reports-svc";
+import { ReportCatalog } from "@/components/admin/reports/ReportCatalog";
+
+export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
-  const t = await getTranslations("admin.district_reports");
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const health = computeSystemHealth(tenants.map((t) => t.id));
-  const stats = [
-    { k: "Schools", v: tenants.filter((t) => t.type === "school").length },
-    { k: "Families", v: tenants.filter((t) => t.type === "family").length },
-    { k: "Users", v: health.usersTotal },
-    { k: "Lessons completed", v: health.lessonRunsCompleted },
-  ];
+  const scope = { role: session.role, tenantId: session.tenantId, actorId: session.userId };
+  const { reports } = await listReports(scope);
 
   return (
     <AppShell
-      role="district_admin"
+      role={session.role}
       roleLabel="District admin"
       navItems={DISTRICT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="District admin"
-        title={t("title")}
-        description="Roll-up of activity across every school in this district."
+        eyebrow="District admin · Reports"
+        title="Cross-tier reports"
+        description="Run, download, and schedule analytics reports across your district."
+        actions={
+          <Link
+            href="/admin/district/reports/schedules"
+            className="inline-flex h-11 items-center rounded-full border border-iw-border bg-iw-raised px-5 text-sm font-semibold"
+          >
+            Schedules
+          </Link>
+        }
       />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s) => (
-          <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{s.k}</p>
-            <p className="mt-1 font-display text-3xl font-bold">{s.v.toLocaleString()}</p>
-          </Card>
-        ))}
-      </div>
+      <ReportCatalog reports={reports} basePath="/admin/district/reports" />
     </AppShell>
   );
 }

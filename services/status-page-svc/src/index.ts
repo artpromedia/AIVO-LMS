@@ -3,16 +3,26 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { createLogger } from "@aivo/observability";
+import { registerOtelPlugin } from "@aivo/otel-bootstrap";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerStatusRoutes } from "./routes/status.js";
 import { registerOpsAlertsOutboxRoutes } from "./routes/ops-alerts-outbox.js";
+import { registerComponentRoutes } from "./routes/components.js";
+import { registerStatusIncidentRoutes } from "./routes/statuspage-incidents.js";
+import { registerUpdateRoutes } from "./routes/updates.js";
+import { registerMaintenanceRoutes } from "./routes/maintenances.js";
+import { registerSubscriberRoutes } from "./routes/subscribers.js";
+import { registerPublicSummaryRoutes } from "./routes/public-summary.js";
 
 const logger = createLogger("status-page-svc");
 const PORT = parseInt(process.env.STATUS_PAGE_SVC_PORT || "3014", 10);
 
 export async function buildApp() {
   const app = Fastify({ logger: false });
+
+  // W3C trace context + tenant_id baggage + structured logs (Sprint 8).
+  registerOtelPlugin(app, "status-page-svc");
 
   await app.register(cors, { origin: true, credentials: true });
   await app.register(swagger, {
@@ -33,6 +43,13 @@ export async function buildApp() {
   registerHealthRoutes(app);
   registerStatusRoutes(app);
   registerOpsAlertsOutboxRoutes(app);
+  // Status-page management + public summary (Sprint 8).
+  registerComponentRoutes(app);
+  registerStatusIncidentRoutes(app);
+  registerUpdateRoutes(app);
+  registerMaintenanceRoutes(app);
+  registerSubscriberRoutes(app);
+  registerPublicSummaryRoutes(app);
 
   return app;
 }

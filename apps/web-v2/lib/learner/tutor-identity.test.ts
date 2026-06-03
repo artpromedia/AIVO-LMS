@@ -8,7 +8,7 @@ import { tutorForSubjectSlug } from "./baseline-tutors";
  * tutor catalog (Sage, Nova, Spark, …), never the old hardcoded fictional
  * personas (Nimbus, Zara, Penn, …).
  */
-const BRAND_TUTOR_NAMES = new Set(Object.values(TUTORS).map((t) => t.name));
+const BRAND_TUTOR_NAMES = new Set<string>(Object.values(TUTORS).map((t) => t.name));
 const RETIRED_PERSONAS = ["Nimbus", "Zara", "Penn", "Dr. Sprout", "Lumi", "Hue"];
 
 describe("lesson tutor identity", () => {

@@ -7,6 +7,10 @@ export interface RequestContext {
   tenant?: TenantContext;
   sourceService?: string;
   correlationId?: string;
+  /** Set when the request is under impersonation — the real acting admin id. */
+  impersonatorId?: string;
+  /** Impersonation session id (FK to impersonation_sessions). */
+  impersonationSessionId?: string;
 }
 
 export interface CreateRequestContextInput {

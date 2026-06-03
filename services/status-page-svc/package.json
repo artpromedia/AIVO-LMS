@@ -12,6 +12,7 @@
   "dependencies": {
     "@aivo/db": "workspace:*",
     "@aivo/observability": "workspace:*",
+    "@aivo/otel-bootstrap": "workspace:*",
     "@aivo/ops-alerts": "workspace:*",
     "@aivo/security": "workspace:*",
     "@fastify/cors": "^11.0.0",

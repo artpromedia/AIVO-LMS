@@ -10,6 +10,8 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerTrigger, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import { getImpersonationState } from "@/lib/impersonation/state";
+import { ImpersonationBanner } from "@/components/admin/impersonation/ImpersonationBanner";
 
 /**
  * Map a session role to the visual theme it should render under.
@@ -126,7 +128,7 @@ function SidebarBody({
  * (page bg, card surfaces, ring focus, etc.) the moment the user clicks
  * it — no per-page wiring required.
  */
-export function AppShell({
+export async function AppShell({
   role,
   roleLabel,
   navItems,
@@ -175,11 +177,23 @@ export function AppShell({
       }
     : undefined;
 
+  // Secure Impersonation ("View As") — when active, render a persistent banner
+  // above all chrome and flag the shell root so globals.css can paint the
+  // amber accent + diagonal watermark. No impersonation → identical to today.
+  const impersonation = await getImpersonationState();
+
   return (
-    <div data-role-theme={theme} data-role={role} className="min-h-screen bg-iw-bg text-iw-ink">
+    <div
+      data-role-theme={theme}
+      data-role={role}
+      data-impersonating={impersonation ? "true" : undefined}
+      className="min-h-screen bg-iw-bg text-iw-ink"
+    >
       <a href="#main" className="skip-link">
         Skip to main content
       </a>
+
+      {impersonation ? <ImpersonationBanner state={impersonation} /> : null}
 
       {/* Top bar — present on every dashboard. */}
       <header

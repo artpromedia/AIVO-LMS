@@ -1,6 +1,7 @@
 import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import { createLogger } from "@aivo/observability";
+import { registerOtelPlugin } from "@aivo/otel-bootstrap";
 import {
   loadChannels,
   publicView,
@@ -8,6 +9,12 @@ import {
   type ChannelConfig,
 } from "./channels.js";
 import { fanOut, type ForwarderDeps, type OpsAlertEnvelope } from "./forwarders.js";
+import {
+  registerSloRoutes,
+  registerBudgetRoutes,
+  registerAlertIntakeRoutes,
+  registerTenantHealthRoutes,
+} from "./routes.js";
 
 const logger = createLogger("alerts-proxy-svc");
 const PORT = parseInt(process.env.ALERTS_PROXY_SVC_PORT || "3016", 10);
@@ -49,6 +56,8 @@ export async function buildServer(opts: BuildServerOptions | ChannelConfig[] = {
   const forwarderDeps: ForwarderDeps = options.forwarderDeps ?? {};
 
   const app = Fastify({ logger: false });
+  // W3C trace context + tenant_id baggage + structured logs (Sprint 8).
+  registerOtelPlugin(app, "alerts-proxy-svc");
   await app.register(cors, { origin: true, credentials: true });
 
   app.get("/api/alerts/health", async () => {
@@ -133,6 +142,13 @@ export async function buildServer(opts: BuildServerOptions | ChannelConfig[] = {
     }
     return { delivered: deliveredChannels, accepted: results.length, results };
   });
+
+  // SLOs, error budgets, alert intake (dedupe + auto-incident), per-tenant
+  // health aggregation (Sprint 8).
+  registerSloRoutes(app);
+  registerBudgetRoutes(app);
+  registerAlertIntakeRoutes(app);
+  registerTenantHealthRoutes(app);
 
   return app;
 }

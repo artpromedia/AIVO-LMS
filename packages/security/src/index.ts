@@ -15,6 +15,22 @@ export interface JWTPayload {
   email?: string;
   name?: string;
   impersonatedBy?: string;
+  /**
+   * Impersonation claims (Sprint 9 — Secure "View As"). When `imp === true`
+   * this is an impersonation token: `sub` is the impersonated user, `act` is
+   * the acting admin's user id, and authorization for reads uses the
+   * impersonated user's roles. Writes are blocked unless `imp_writes_ok` is
+   * true AND the target route is on the service's write allowlist. `imp_exp`
+   * is the impersonation hard expiry (epoch seconds, ≤ token exp, capped at
+   * 30 min). These travel inside the signed JWT, so they cannot be forged.
+   */
+  act?: string;
+  imp?: boolean;
+  imp_exp?: number;
+  imp_writes_ok?: boolean;
+  imp_reason?: string;
+  /** Impersonation session id (FK to impersonation_sessions). */
+  imp_sid?: string;
 }
 
 /** Short-lived MFA challenge token claims. */

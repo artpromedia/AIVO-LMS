@@ -19,6 +19,12 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { createRequestContext, type RequestContext } from "./request-context.js";
 import type { TenantContext, TenantRole } from "./tenant-context.js";
+import {
+  decideImpersonatedRequest,
+  isImpersonation,
+  type ImpersonationClaimView,
+  type ImpWriteAllowlist,
+} from "./impersonation-guard.js";
 
 const TENANT_ROLES = new Set<TenantRole>([
   "learner",
@@ -56,6 +62,35 @@ export interface EnterpriseAuthOptions {
    * with an unauthenticated RequestContext. Defaults to false (401).
    */
   allowUnauthenticated?: boolean;
+  /**
+   * This service's impersonation write allowlist (Sprint 9). When a request
+   * arrives under an impersonation token (`imp === true`), writes are blocked
+   * unless `imp_writes_ok` is set AND (method, path) is on this allowlist.
+   * Omitted ⇒ no write is ever allowed under impersonation (deny-by-default).
+   */
+  impWriteAllowlist?: ImpWriteAllowlist;
+  /**
+   * Audit sink for impersonated requests. Receives one event per request
+   * under impersonation. Wire this to the service's audit emitter; if omitted
+   * the guard still enforces, it just doesn't emit.
+   */
+  onImpersonatedRequest?: (event: ImpersonatedRequestAuditEvent) => void;
+}
+
+export interface ImpersonatedRequestAuditEvent {
+  action:
+    | "auth.impersonation.request"
+    | "auth.impersonation.write_allowed"
+    | "auth.impersonation.write_blocked"
+    | "auth.impersonation.expired";
+  actorId: string | undefined;
+  subjectId: string | undefined;
+  sessionId: string | undefined;
+  reason: string | undefined;
+  method: string;
+  path: string;
+  ip: string | undefined;
+  userAgent: string | undefined;
 }
 
 function readBearer(request: FastifyRequest): string | undefined {
@@ -153,6 +188,73 @@ export function registerEnterpriseAuthHook(
     const tenantId = typeof claims?.tenantId === "string" ? claims.tenantId : undefined;
     const actorId = typeof claims?.sub === "string" ? claims.sub : undefined;
     const tenant: TenantContext | undefined = tenantId && role ? { tenantId, role } : undefined;
+
+    // ── Impersonation enforcement (Sprint 9) ────────────────────────────────
+    // For impersonation tokens, reads use the impersonated user's roles (the
+    // `sub`/`role` claims above already are the subject's), and writes are
+    // denied unless explicitly permitted + allowlisted. Every impersonated
+    // request is audited.
+    if (claims && isImpersonation(claims as ImpersonationClaimView)) {
+      const impClaims = claims as ImpersonationClaimView;
+      const method = request.method ?? "GET";
+      const path = request.url.split("?")[0];
+      const decision = decideImpersonatedRequest(
+        impClaims,
+        method,
+        path,
+        options.impWriteAllowlist,
+      );
+      const baseEvent = {
+        actorId: impClaims.act,
+        subjectId: impClaims.sub,
+        sessionId: impClaims.imp_sid,
+        reason: impClaims.imp_reason,
+        method,
+        path,
+        ip: request.ip,
+        userAgent:
+          typeof request.headers["user-agent"] === "string"
+            ? (request.headers["user-agent"] as string)
+            : undefined,
+      };
+      // Always record that the request was made under impersonation.
+      options.onImpersonatedRequest?.({ action: "auth.impersonation.request", ...baseEvent });
+
+      if (decision.kind === "expired") {
+        options.onImpersonatedRequest?.({ action: "auth.impersonation.expired", ...baseEvent });
+        return reply.code(401).send({ error: "Impersonation session expired" });
+      }
+      if (decision.kind === "write_blocked") {
+        options.onImpersonatedRequest?.({
+          action: "auth.impersonation.write_blocked",
+          ...baseEvent,
+        });
+        return reply
+          .code(403)
+          .send({ error: "Write blocked under impersonation", reason: decision.reason });
+      }
+      if (decision.kind === "write_allowed") {
+        options.onImpersonatedRequest?.({
+          action: "auth.impersonation.write_allowed",
+          ...baseEvent,
+        });
+      }
+      // Tag the context so downstream handlers/audit know the real actor.
+      request.enterpriseContext = createRequestContext({
+        actorId,
+        actorRole: role,
+        tenant,
+        sourceService: options.sourceService,
+        correlationId:
+          typeof request.headers["x-correlation-id"] === "string"
+            ? (request.headers["x-correlation-id"] as string)
+            : undefined,
+      });
+      request.enterpriseContext.impersonatorId = impClaims.act;
+      request.enterpriseContext.impersonationSessionId = impClaims.imp_sid;
+      return;
+    }
+
     request.enterpriseContext = createRequestContext({
       actorId,
       actorRole: role,
