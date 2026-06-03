@@ -19,6 +19,7 @@ import { registerTutorSurfaceRoutes } from "./routes/tutorSurface.js";
 import { registerTutorSurfaceSubmitRoute } from "./routes/surfaceSubmit.js";
 import { registerTutorRecommendationCandidatesRoute } from "./routes/recommendationCandidates.js";
 import { registerAuthHook } from "./lib/tenant.js";
+import { registerRaiGateway } from "./lib/rai-gateway.js";
 
 const logger = createLogger("tutor-svc");
 const PORT = parseInt(process.env.TUTOR_PORT || "3006", 10);
@@ -63,6 +64,9 @@ export async function buildApp() {
 
   registerHealthRoutes(app);
   registerAuthHook(app);
+  // RAI policy enforcement: consults responsible-ai-svc before inference,
+  // short-circuits opted-out tenants with a graceful fallback (Sprint 7).
+  registerRaiGateway(app);
   registerStoreRoutes(app, db);
   registerChatRoutes(app, db);
   registerHomeworkRoutes(app, db);
