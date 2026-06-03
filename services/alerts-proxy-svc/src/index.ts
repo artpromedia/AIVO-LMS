@@ -8,6 +8,12 @@ import {
   type ChannelConfig,
 } from "./channels.js";
 import { fanOut, type ForwarderDeps, type OpsAlertEnvelope } from "./forwarders.js";
+import {
+  registerSloRoutes,
+  registerBudgetRoutes,
+  registerAlertIntakeRoutes,
+  registerTenantHealthRoutes,
+} from "./routes.js";
 
 const logger = createLogger("alerts-proxy-svc");
 const PORT = parseInt(process.env.ALERTS_PROXY_SVC_PORT || "3016", 10);
@@ -133,6 +139,13 @@ export async function buildServer(opts: BuildServerOptions | ChannelConfig[] = {
     }
     return { delivered: deliveredChannels, accepted: results.length, results };
   });
+
+  // SLOs, error budgets, alert intake (dedupe + auto-incident), per-tenant
+  // health aggregation (Sprint 8).
+  registerSloRoutes(app);
+  registerBudgetRoutes(app);
+  registerAlertIntakeRoutes(app);
+  registerTenantHealthRoutes(app);
 
   return app;
 }
