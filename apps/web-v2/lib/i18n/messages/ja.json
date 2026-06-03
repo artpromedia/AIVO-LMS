@@ -1547,12 +1547,12 @@
       "confirm_pin": "PIN を確認",
       "mismatch": "一致しません。もう一度お試しください。",
       "saving": "保存中…",
-      "save_error": "PINを保存できませんでした。もう一度お試しください。",
-      "select_learner_label": "このPINはどのお子様用ですか？",
-      "select_learner_placeholder": "お子様を選択",
-      "no_learner_title": "まずお子様を追加してください",
-      "no_learner_body": "PINは特定のお子様に紐づきます。お子様を追加すると、PINを設定できます。",
-      "no_learner_cta": "お子様を追加"
+      "save_error": "PIN を保存できませんでした。もう一度お試しください。",
+      "select_learner_label": "この PIN はどのお子さま用ですか？",
+      "select_learner_placeholder": "お子さまを選択",
+      "no_learner_title": "まずお子さまを追加してください",
+      "no_learner_body": "PIN は特定のお子さまに紐づきます。お子さまを追加すると、PIN を設定できます。",
+      "no_learner_cta": "お子さまを追加"
     },
     "parent_verify": {
       "eyebrow": "保護者の確認",
