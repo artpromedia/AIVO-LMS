@@ -1617,7 +1617,14 @@
       "ai_title": "AI tutor",
       "ai_desc": "A conversational tutor that explains concepts, never produces final answers, and routes safety topics to an adult.",
       "voice_title": "Voice mode",
-      "voice_desc": "Lets your child speak to the tutor and listen back. Off by default — uses the microphone."
+      "voice_desc": "Lets your child speak to the tutor and listen back. Off by default — uses the microphone.",
+      "saving": "Saving…",
+      "save_error": "Couldn't save the approval. Please try again.",
+      "select_learner_label": "Which child are you approving?",
+      "select_learner_placeholder": "Select a child",
+      "no_learner_title": "Add a child first",
+      "no_learner_body": "Approval is recorded for a specific child. Add a child, then you can approve their access.",
+      "no_learner_cta": "Add a child"
     },
     "iep_upload": {
       "eyebrow": "IEP / 504 supports",

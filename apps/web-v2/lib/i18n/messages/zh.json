@@ -1617,7 +1617,14 @@
       "ai_title": "AI 导师",
       "ai_desc": "一个对话式导师，讲解概念、绝不给出最终答案，并将安全话题转交给成年人。",
       "voice_title": "语音模式",
-      "voice_desc": "让你的孩子与导师对话并收听。默认关闭——使用麦克风。"
+      "voice_desc": "让你的孩子与导师对话并收听。默认关闭——使用麦克风。",
+      "saving": "正在保存…",
+      "save_error": "无法保存批准，请重试。",
+      "select_learner_label": "您要批准哪个孩子？",
+      "select_learner_placeholder": "选择一个孩子",
+      "no_learner_title": "请先添加一个孩子",
+      "no_learner_body": "批准会保存到特定孩子名下。请先添加孩子，然后即可批准其访问权限。",
+      "no_learner_cta": "添加孩子"
     },
     "iep_upload": {
       "eyebrow": "IEP / 504 支持",

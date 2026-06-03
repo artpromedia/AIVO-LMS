@@ -1617,7 +1617,14 @@
       "ai_title": "KI-Tutor",
       "ai_desc": "Ein dialogorientierter Tutor, der Konzepte erklärt, niemals fertige Antworten liefert und Sicherheitsthemen an einen Erwachsenen weiterleitet.",
       "voice_title": "Sprachmodus",
-      "voice_desc": "Ermöglicht deinem Kind, mit dem Tutor zu sprechen und zuzuhören. Standardmäßig aus – nutzt das Mikrofon."
+      "voice_desc": "Ermöglicht deinem Kind, mit dem Tutor zu sprechen und zuzuhören. Standardmäßig aus – nutzt das Mikrofon.",
+      "saving": "Wird gespeichert…",
+      "save_error": "Die Freigabe konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "select_learner_label": "Welches Kind geben Sie frei?",
+      "select_learner_placeholder": "Kind auswählen",
+      "no_learner_title": "Fügen Sie zuerst ein Kind hinzu",
+      "no_learner_body": "Die Freigabe wird für ein bestimmtes Kind gespeichert. Fügen Sie ein Kind hinzu, dann können Sie seinen Zugang freigeben.",
+      "no_learner_cta": "Kind hinzufügen"
     },
     "iep_upload": {
       "eyebrow": "IEP- / 504-Hilfen",

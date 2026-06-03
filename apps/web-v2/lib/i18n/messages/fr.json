@@ -1617,7 +1617,14 @@
       "ai_title": "Tuteur IA",
       "ai_desc": "Un tuteur conversationnel qui explique les concepts, ne donne jamais les réponses finales et oriente les sujets de sécurité vers un adulte.",
       "voice_title": "Mode voix",
-      "voice_desc": "Permet à votre enfant de parler au tuteur et de l'écouter. Désactivé par défaut — utilise le microphone."
+      "voice_desc": "Permet à votre enfant de parler au tuteur et de l'écouter. Désactivé par défaut — utilise le microphone.",
+      "saving": "Enregistrement…",
+      "save_error": "Impossible d'enregistrer l'approbation. Veuillez réessayer.",
+      "select_learner_label": "Quel enfant approuvez-vous ?",
+      "select_learner_placeholder": "Sélectionnez un enfant",
+      "no_learner_title": "Ajoutez d'abord un enfant",
+      "no_learner_body": "L'approbation est enregistrée pour un enfant précis. Ajoutez un enfant, puis vous pourrez approuver son accès.",
+      "no_learner_cta": "Ajouter un enfant"
     },
     "iep_upload": {
       "eyebrow": "Aménagements IEP / 504",

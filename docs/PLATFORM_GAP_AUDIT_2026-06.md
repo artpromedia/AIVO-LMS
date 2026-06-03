@@ -364,6 +364,42 @@ Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
 @aivo/web-v2 build` only fails in the sandbox because Google Fonts is
 unreachable — unrelated to these changes.)
 
+## Changelog — Phase 1: onboarding child-approval persistence (#7, slice 4)
+
+Closed the child-approval half of slice 4 of gap #7 by making the final
+parent-approval gate actually persist instead of discarding its toggles on
+`<Link>` navigation. No new backend — the step reuses the existing, tested
+per-learner consent endpoint (the same `POST /api/bff/learners/[learnerId]/consent`
+slice 3 used for IEP storage).
+
+- `apps/web-v2/app/onboarding/child-approval/page.tsx` — the "Approve and
+  finish" gate now persists. Approval is learner-scoped, so the page resolves a
+  `learnerId` from the `?learnerId=` query string and, when absent, gates behind
+  learner selection by fetching `GET /api/bff/learners` (auto-selecting a sole
+  learner, offering a picker for several, and pointing the parent at
+  `/onboarding/learner/new` when none exist) — the same resolution pattern as the
+  slice 3 IEP step. On Approve it records `child_data_collection` (always — the
+  core consent that lifts the profile out of its holding state so the child can
+  sign in), plus `teacher_access` when "Messages with teachers" is on and
+  `ai_personalization` when "AI tutor" is on. Records are written in sequence so a
+  mid-way failure surfaces an inline error without navigating. Voice mode stays an
+  honest browser-level device-capability (the mic grant is the browser's own
+  prompt at point of use) and is intentionally not persisted as a server consent,
+  matching the slice 2 mic/camera treatment.
+- `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
+  `onboarding.child_approval.{saving,save_error,select_learner_label,
+  select_learner_placeholder,no_learner_title,no_learner_body,no_learner_cta}`
+  in all 10 supported locales.
+
+The remaining slice 4 sub-parts — learner PIN-set, household / co-parent invites,
+and real phone/SMS verification (overlapping SMS gap #22) — still need new
+backends and remain separate follow-up work, out of scope for this change.
+
+Verified: `corepack pnpm --filter @aivo/web-v2 typecheck` clean and
+`eslint --max-warnings=0` clean on the changed file. (`pnpm --filter
+@aivo/web-v2 build` only fails in the sandbox because Google Fonts is
+unreachable — unrelated to these changes.)
+
 ## Changelog — Phase 1: billing → billing-svc (#8)
 
 Wired the web parent billing surface to the real, Stripe-backed

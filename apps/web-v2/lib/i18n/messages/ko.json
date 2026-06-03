@@ -1617,7 +1617,14 @@
       "ai_title": "AI 튜터",
       "ai_desc": "개념을 설명하고, 최종 답을 절대 제공하지 않으며, 안전 주제는 어른에게 연결하는 대화형 튜터입니다.",
       "voice_title": "음성 모드",
-      "voice_desc": "아이가 튜터와 말하고 들을 수 있게 합니다. 기본값은 꺼짐 — 마이크를 사용합니다."
+      "voice_desc": "아이가 튜터와 말하고 들을 수 있게 합니다. 기본값은 꺼짐 — 마이크를 사용합니다.",
+      "saving": "저장 중…",
+      "save_error": "승인을 저장하지 못했습니다. 다시 시도해 주세요.",
+      "select_learner_label": "어떤 자녀를 승인하시나요?",
+      "select_learner_placeholder": "자녀 선택",
+      "no_learner_title": "먼저 자녀를 추가하세요",
+      "no_learner_body": "승인은 특정 자녀에 연결되어 저장됩니다. 자녀를 추가하면 해당 자녀의 접근을 승인할 수 있습니다.",
+      "no_learner_cta": "자녀 추가"
     },
     "iep_upload": {
       "eyebrow": "IEP / 504 지원",

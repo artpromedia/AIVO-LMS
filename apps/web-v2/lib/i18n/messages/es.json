@@ -1617,7 +1617,14 @@
       "ai_title": "Tutor con IA",
       "ai_desc": "Un tutor conversacional que explica conceptos, nunca da las respuestas finales y deriva los temas de seguridad a un adulto.",
       "voice_title": "Modo de voz",
-      "voice_desc": "Permite que tu hijo hable con el tutor y lo escuche. Desactivado por defecto: usa el micrófono."
+      "voice_desc": "Permite que tu hijo hable con el tutor y lo escuche. Desactivado por defecto: usa el micrófono.",
+      "saving": "Guardando…",
+      "save_error": "No se pudo guardar la aprobación. Inténtelo de nuevo.",
+      "select_learner_label": "¿A qué hijo está aprobando?",
+      "select_learner_placeholder": "Seleccione un hijo",
+      "no_learner_title": "Primero agregue un hijo",
+      "no_learner_body": "La aprobación se guarda para un hijo específico. Agregue un hijo y luego podrá aprobar su acceso.",
+      "no_learner_cta": "Agregar un hijo"
     },
     "iep_upload": {
       "eyebrow": "Apoyos IEP / 504",
