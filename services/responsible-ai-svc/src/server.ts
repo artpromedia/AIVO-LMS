@@ -4,6 +4,12 @@ import { registerEnterpriseAuthHook } from "@aivo/enterprise-core";
 import { registerObservabilityPlugin } from "@aivo/observability";
 import { registerEvaluateRoutes } from "./routes/evaluate.js";
 import { registerPolicyRoutes } from "./routes/policy.js";
+import { registerModelRoutes } from "./routes/models.js";
+import { registerPolicyRegistryRoutes } from "./routes/policies.js";
+import { registerEvalRoutes } from "./routes/evals.js";
+import { registerIncidentRoutes } from "./routes/incidents.js";
+import { registerUsageRoutes } from "./routes/usage.js";
+import { registerOptOutRoutes } from "./routes/optouts.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
@@ -19,5 +25,12 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   }
   registerEvaluateRoutes(app);
   registerPolicyRoutes(app);
+  // Responsible AI Console (Sprint 7).
+  registerModelRoutes(app);
+  registerPolicyRegistryRoutes(app);
+  registerEvalRoutes(app);
+  registerIncidentRoutes(app);
+  registerUsageRoutes(app);
+  registerOptOutRoutes(app);
   return app;
 }
