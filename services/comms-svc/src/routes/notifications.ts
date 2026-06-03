@@ -7,6 +7,13 @@ import { createLogger } from "@aivo/observability";
 import { emitCommsAudit } from "../lib/audit.js";
 import { sendSms, isSmsConfigured } from "../providers/sms-router.js";
 import {
+  CHANNELS,
+  isChannelAllowedForTenant,
+  snapshotChannelStatus,
+  type ChannelDisabledResult,
+  type ChannelSkipReason,
+} from "../lib/channels.js";
+import {
   registerDeviceToken,
   listDeviceTargets,
   deleteDeviceToken,
@@ -121,8 +128,29 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
       }
 
       if (channel === "sms") {
+        const tenantId = ((request as any).auth?.tenantId ?? null) as string | null;
+        // First-class channel registry decides: configured? tenant-allowed?
+        // Either failure mode returns a typed `channel_disabled` body and
+        // emits NOTIFICATION_SKIPPED — never a silent stub success and
+        // never a bare 503.
+        const buildDisabled = async (
+          reason: ChannelSkipReason,
+          detail?: string,
+        ): Promise<ChannelDisabledResult> => {
+          await emitCommsAudit({
+            db,
+            request,
+            eventType: "NOTIFICATION_SKIPPED",
+            tenantId,
+            details: { channel, template, reason, ...(detail ? { detail } : {}) },
+          });
+          return { status: "channel_disabled", channel: CHANNELS.sms.id, reason, ...(detail ? { detail } : {}) };
+        };
         if (!isSmsConfigured()) {
-          return reply.code(503).send({ error: "SMS channel not configured" });
+          return reply.code(200).send(await buildDisabled("provider_not_configured"));
+        }
+        if (!isChannelAllowedForTenant("sms", tenantId)) {
+          return reply.code(200).send(await buildDisabled("tenant_opted_out"));
         }
         const rendered = renderTemplate(template, data || {});
         // SMS is text-only: prefer the template's text body, fall back to subject.
@@ -133,16 +161,22 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
             db,
             request,
             eventType: "NOTIFICATION_FAILED",
-            tenantId: (request as any).auth?.tenantId ?? null,
+            tenantId,
             details: { channel, template, error: result.error },
           });
           return reply.code(500).send({ error: "Failed to send SMS", details: result.error });
+        }
+        // Defense-in-depth: the adapter should never return `disabled`
+        // here (we gated above), but if a misconfiguration races us,
+        // surface it as channel_disabled rather than a fake send.
+        if (result.status === "disabled") {
+          return reply.code(200).send(await buildDisabled("provider_not_configured", "adapter returned disabled"));
         }
         await emitCommsAudit({
           db,
           request,
           eventType: "NOTIFICATION_SENT",
-          tenantId: (request as any).auth?.tenantId ?? null,
+          tenantId,
           resourceId: result.messageId ?? null,
           details: { channel, template, status: result.status },
         });
@@ -1112,6 +1146,9 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
       push,
       pushDetail: { fcm, apns },
       sms: isSmsConfigured() ? "connected" : "not_configured",
+      // Channel registry snapshot — documents every channel as
+      // first-class (real vs descoped) so SMS is never a silent stub.
+      channels: snapshotChannelStatus(),
     };
   });
 
