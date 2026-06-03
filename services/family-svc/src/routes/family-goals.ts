@@ -5,6 +5,7 @@ import {
   therapyGoals,
   therapySessions,
   brainInsights,
+  teacherInsights,
   learners,
   learnerTeachers,
   learnerCaregivers,
@@ -299,9 +300,12 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
   );
 
   /**
-   * Record a teacher's qualitative insight about a learner. Persists into
-   * brain_insights (source "teacher") so it feeds the learner's brain profile —
-   * previously the mobile teacher screen faked a save.
+   * Record a teacher's qualitative insight about a learner. The handler
+   * writes to the dedicated `teacher_insights` table (the canonical record)
+   * AND mirrors the row into `brain_insights` (source = "teacher") so the
+   * existing learner-brain-profile readers (recommendations, etc.) keep
+   * working without a migration sweep. Previously the mobile teacher
+   * screen faked a save.
    */
   app.post(
     "/api/family/teacher-insights",
@@ -322,16 +326,32 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
         return reply.code(403).send({ error: "Forbidden" });
       }
 
+      const domain =
+        typeof body.domain === "string" && body.domain ? body.domain : null;
+
+      // Canonical write: dedicated teacher_insights row, tenant-scoped.
       const [row] = await db
+        .insert(teacherInsights)
+        .values({
+          tenantId: claims.tenantId,
+          learnerId,
+          teacherUserId: claims.sub,
+          insightText,
+          domain,
+        })
+        .returning();
+
+      // Mirror into brain_insights so existing readers (recommendations,
+      // learner brain profile) see it without a separate migration.
+      await db
         .insert(brainInsights)
         .values({
           learnerId,
           source: "teacher",
           sourceUserId: claims.sub,
           insightText,
-          domain: typeof body.domain === "string" && body.domain ? body.domain : null,
-        })
-        .returning();
+          domain,
+        });
 
       await emitFamilyAudit({
         db,
@@ -340,7 +360,7 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
         tenantId: claims.tenantId,
         learnerId,
         resourceId: row.id,
-        details: { domain: row.domain ?? null },
+        details: { domain: row.domain ?? null, mirrored: "brain_insights" },
       });
 
       return reply.code(201).send({ insight: row });

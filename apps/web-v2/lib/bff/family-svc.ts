@@ -165,3 +165,39 @@ export function getWhatsWorking(
     { bearer },
   );
 }
+
+export interface CreateTeacherInsightBody {
+  learnerId: string;
+  insightText: string;
+  domain?: string;
+}
+
+export interface CreateTeacherInsightResponse {
+  insight: {
+    id: string;
+    tenantId: string;
+    learnerId: string;
+    teacherUserId: string;
+    insightText: string;
+    domain: string | null;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+/**
+ * POST a teacher insight to family-svc
+ * (`POST /api/family/teacher-insights`). The handler writes to the
+ * dedicated `teacher_insights` table and mirrors into `brain_insights`.
+ */
+export function createTeacherInsight(
+  bearer: string,
+  body: CreateTeacherInsightBody,
+): Promise<ServiceResult<CreateTeacherInsightResponse>> {
+  return familyFetch<CreateTeacherInsightResponse>("/api/family/teacher-insights", {
+    method: "POST",
+    bearer,
+    body,
+  });
+}

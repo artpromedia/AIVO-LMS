@@ -8,10 +8,14 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: false,
-    include: ["__tests__/**/*.test.ts"],
+    include: ["__tests__/**/*.test.{ts,tsx}"],
   },
   resolve: {
     alias: {
+      // Mirror the `@/*` -> apps/mobile/* path mapping in tsconfig.json
+      // so vitest can resolve `import "@/lib/api"` etc. from test files
+      // and the hooks they exercise.
+      "@/": `${resolve(here)}/`,
       "@aivo/aac-bridge": resolve(here, "../../packages/aac-bridge/src/index.ts"),
       // @aivo/nav is a pure-TS package whose package.json entry points at
       // ./dist/index.js. The mobile vitest job (and CI's mobile-tests) runs

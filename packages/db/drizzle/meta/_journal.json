@@ -309,6 +309,13 @@
       "when": 1780891200000,
       "tag": "0060_school_admin_persistence",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1780977600000,
+      "tag": "0061_teacher_insights",
+      "breakpoints": true
     }
   ]
 }

@@ -60,6 +60,18 @@ const WEB_ONLY_PREFIXES = [
   "/onboarding/invite/school", // school-admin invite
   "/learner/lesson-player-fixture", // dev fixture
   "/learner/lesson-player-smoke", // dev smoke route
+  // Step-up MFA enrolment / challenge surfaces — mobile uses the native
+  // `(auth)/verify-mfa` flow at sign-in time; enrolment + step-up land
+  // in the browser via deep-link return.
+  "/(auth)/mfa",
+  // Enterprise SSO handoff is inherently a browser flow; the mobile
+  // app receives the resulting token via an OS-level redirect.
+  "/(auth)/sso",
+  // Public marketing / compliance pages — opened in a webview from
+  // mobile when needed; no native screen parity required.
+  "/(public)/ai-transparency",
+  "/(public)/privacy",
+  "/(public)/status",
 ];
 
 // The parity matrix. Keyed by web route. `mobile` is the expected mobile
