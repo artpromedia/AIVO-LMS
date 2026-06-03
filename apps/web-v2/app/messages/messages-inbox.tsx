@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
+import { useLiveRefresh } from "@/lib/use-live-refresh";
 
 interface ThreadListItem {
   id: string;
@@ -57,31 +58,24 @@ export function MessagesInbox() {
     void loadThreads();
   }, [loadThreads]);
 
-  const isVisible = () => typeof document === "undefined" || document.visibilityState === "visible";
-
-  // Live updates (visibility-aware polling — a robust, dual-path alternative
-  // to a push stream). Thread list refreshes every 12s; the open conversation
-  // every 6s, so a reply from the other side appears without a manual reload.
-  React.useEffect(() => {
-    const id = setInterval(() => {
-      if (isVisible()) void loadThreads();
-    }, 12000);
-    return () => clearInterval(id);
-  }, [loadThreads]);
-
-  React.useEffect(() => {
+  const loadActiveMessages = React.useCallback(async () => {
     if (!activeId) return;
-    const id = setInterval(() => {
-      if (!isVisible()) return;
-      fetch(`/api/bff/messages/threads/${activeId}/messages`)
-        .then((r) => r.json())
-        .then((j) => {
-          if (j?.data?.messages) setMessages(j.data.messages as ThreadMessage[]);
-        })
-        .catch(() => {});
-    }, 6000);
-    return () => clearInterval(id);
+    try {
+      const r = await fetch(`/api/bff/messages/threads/${activeId}/messages`);
+      const j = await r.json().catch(() => ({}));
+      if (j?.data?.messages) setMessages(j.data.messages as ThreadMessage[]);
+    } catch {
+      // Transient; the next tick retries.
+    }
   }, [activeId]);
+
+  // Live updates over the shared visibility-aware polling transport (the same
+  // cadence/coalescing rules as the notification stream's fallback). Thread
+  // list refreshes every 12s; the open conversation every 6s, so a reply from
+  // the other side appears without a manual reload. A future SSE fan-out
+  // swaps in behind `useLiveRefresh` and upgrades both at once.
+  useLiveRefresh(loadThreads, 12000);
+  useLiveRefresh(loadActiveMessages, 6000, { enabled: activeId !== null });
 
   const openThread = React.useCallback(async (id: string, subject: string) => {
     setActiveId(id);

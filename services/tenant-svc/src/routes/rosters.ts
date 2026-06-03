@@ -9,6 +9,16 @@ import {
 
 const STORES: RosterImporterStores = createRosterImporterStores();
 
+/**
+ * Shared accessor for the in-memory roster stores. Used by the governance
+ * (DSAR) routes for subject-scoped erase/export and by tests. tenant-svc has
+ * no Drizzle handle, so these in-memory stores are the service's only
+ * holder of subject-linked SIS data.
+ */
+export function getRosterStores(): RosterImporterStores {
+  return STORES;
+}
+
 export function getRosterStoresForTest(): RosterImporterStores {
   return STORES;
 }

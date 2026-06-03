@@ -4,8 +4,9 @@
  * Full CRUD for classrooms scoped by school, including a roster management
  * endpoint for adding/removing learners and co-teachers.
  *
- * // TODO(sprint6): Replace in-memory Map with Postgres persistence,
- * //   following the existing dpa-store pattern in data-governance-svc.
+ * Persistence is delegated to a ClassroomStore (Postgres in production,
+ * in-memory for tests / local dev) following the dpa-store precedent in
+ * data-governance-svc. State survives restart and scales horizontally.
  *
  * RBAC: allowed for PLATFORM_ADMIN, DISTRICT_ADMIN, SCHOOL_ADMIN.
  * Note: finer school-ownership scoping is enforced at the BFF/identity layer.
@@ -14,6 +15,12 @@ import type { FastifyInstance } from "fastify";
 import { verifyJWT } from "@aivo/security";
 import { logAuditEvent } from "./audit.js";
 import {
+  type Classroom,
+  type ClassroomStore,
+  InMemoryClassroomStore,
+  selectClassroomStore,
+} from "../stores/classroom-store.js";
+import {
   getAdminSchoolsClassroomsSchema,
   postAdminSchoolsClassroomsSchema,
   getAdminSchoolsClassroomByIdSchema,
@@ -21,6 +28,8 @@ import {
   deleteAdminSchoolsClassroomByIdSchema,
   postAdminSchoolsClassroomRosterSchema,
 } from "./schemas.js";
+
+export type { Classroom };
 
 // ---------------------------------------------------------------------------
 // RBAC helper
@@ -53,38 +62,27 @@ async function requireSchoolAdmin(
   }
 }
 
-// ---------------------------------------------------------------------------
-// In-memory classroom store
-// ---------------------------------------------------------------------------
-// TODO(sprint6): Replace with Postgres persistence (dpa-store pattern).
-
-export interface Classroom {
-  id: string;
-  schoolId: string;
-  name: string;
-  grade: string | null;
-  teacherIds: string[];
-  coTeacherIds: string[];
-  learnerIds: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-const CLASSROOMS = new Map<string, Classroom>();
-
 function generateId(): string {
   return `cls_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-// Exported for tests.
+// Test-only handle to the in-memory store, set when registerClassroomRoutes
+// selects it (non-production, no DATABASE_URL). Lets existing test helpers
+// reset state between cases without reaching into the route internals.
+let testStore: InMemoryClassroomStore | null = null;
 export function clearClassroomStoreForTest(): void {
-  CLASSROOMS.clear();
+  testStore?.clear();
 }
 
 // ---------------------------------------------------------------------------
 // Route registration
 // ---------------------------------------------------------------------------
-export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
+export function registerClassroomRoutes(
+  app: FastifyInstance,
+  db: any,
+  store: ClassroomStore = selectClassroomStore(db),
+): void {
+  if (store instanceof InMemoryClassroomStore) testStore = store;
   // ------------------------------------------------------------------
   // GET /admin/schools/:schoolId/classrooms
   // Optional query: ?grade=&teacherId=
@@ -99,14 +97,7 @@ export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
       const { schoolId } = req.params;
       const { grade, teacherId } = req.query;
 
-      let classrooms = [...CLASSROOMS.values()].filter((c) => c.schoolId === schoolId);
-      if (grade !== undefined) classrooms = classrooms.filter((c) => c.grade === grade);
-      if (teacherId !== undefined) {
-        classrooms = classrooms.filter(
-          (c) => c.teacherIds.includes(teacherId) || c.coTeacherIds.includes(teacherId),
-        );
-      }
-
+      const classrooms = await store.list(schoolId, { grade, teacherId });
       return { classrooms, total: classrooms.length };
     },
   );
@@ -143,7 +134,7 @@ export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
         createdAt: now,
         updatedAt: now,
       };
-      CLASSROOMS.set(classroom.id, classroom);
+      await store.insert(classroom);
 
       void logAuditEvent(db, {
         action: "classroom_created",
@@ -170,7 +161,7 @@ export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
       if (!actor) return;
 
       const { schoolId, id } = req.params;
-      const classroom = CLASSROOMS.get(id);
+      const classroom = await store.get(id);
       if (!classroom || classroom.schoolId !== schoolId) {
         return reply.code(404).send({ error: "classroom_not_found", id });
       }
@@ -192,7 +183,7 @@ export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
       if (!actor) return;
 
       const { schoolId, id } = req.params;
-      const classroom = CLASSROOMS.get(id);
+      const classroom = await store.get(id);
       if (!classroom || classroom.schoolId !== schoolId) {
         return reply.code(404).send({ error: "classroom_not_found", id });
       }
@@ -205,7 +196,7 @@ export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
       if (teacherIds !== undefined) classroom.teacherIds = teacherIds;
       classroom.updatedAt = new Date().toISOString();
 
-      CLASSROOMS.set(id, classroom);
+      await store.replace(classroom);
 
       void logAuditEvent(db, {
         action: "classroom_updated",
@@ -236,11 +227,11 @@ export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
       if (!actor) return;
 
       const { schoolId, id } = req.params;
-      const classroom = CLASSROOMS.get(id);
+      const classroom = await store.get(id);
       if (!classroom || classroom.schoolId !== schoolId) {
         return reply.code(404).send({ error: "classroom_not_found", id });
       }
-      CLASSROOMS.delete(id);
+      await store.remove(id);
 
       void logAuditEvent(db, {
         action: "classroom_deleted",
@@ -276,7 +267,7 @@ export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
       if (!actor) return;
 
       const { schoolId, id } = req.params;
-      const classroom = CLASSROOMS.get(id);
+      const classroom = await store.get(id);
       if (!classroom || classroom.schoolId !== schoolId) {
         return reply.code(404).send({ error: "classroom_not_found", id });
       }
@@ -300,7 +291,7 @@ export function registerClassroomRoutes(app: FastifyInstance, db: any): void {
         ...addCoTeacherIds.filter((cid) => !classroom.coTeacherIds.includes(cid)),
       ];
       classroom.updatedAt = new Date().toISOString();
-      CLASSROOMS.set(id, classroom);
+      await store.replace(classroom);
 
       void logAuditEvent(db, {
         action: "classroom_roster_changed",

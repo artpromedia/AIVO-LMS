@@ -2,10 +2,9 @@
  * Sprint 6 — School notification-preference matrix (admin-svc).
  *
  * Stores a per-school matrix of event type × staff role → email on/off.
- * The in-memory Map mirrors the deletion-requests.ts precedent.
- *
- * // TODO(sprint6): Replace in-memory store with Postgres persistence,
- * //   following the existing dpa-store pattern in data-governance-svc.
+ * Persistence is delegated to a NotificationStore (Postgres in production,
+ * in-memory for tests / local dev) following the dpa-store precedent in
+ * data-governance-svc. The matrix survives restart and is auditable.
  *
  * RBAC: allowed for PLATFORM_ADMIN, DISTRICT_ADMIN, SCHOOL_ADMIN.
  * Note: finer school-ownership scoping is enforced at the BFF/identity layer.
@@ -14,9 +13,18 @@ import type { FastifyInstance } from "fastify";
 import { verifyJWT } from "@aivo/security";
 import { logAuditEvent } from "./audit.js";
 import {
+  type NotificationMatrix,
+  type NotificationStore,
+  DEFAULT_STAFF_ROLES,
+  InMemoryNotificationStore,
+  selectNotificationStore,
+} from "../stores/notification-store.js";
+import {
   getAdminSchoolsNotificationsSchema,
   putAdminSchoolsNotificationsSchema,
 } from "./schemas.js";
+
+export type { NotificationMatrix };
 
 // ---------------------------------------------------------------------------
 // RBAC helper
@@ -49,59 +57,23 @@ async function requireSchoolAdmin(
   }
 }
 
-// ---------------------------------------------------------------------------
-// Notification-preference types and store
-// ---------------------------------------------------------------------------
-
-/** Each cell: event type × staff role → whether email is enabled. */
-export type NotificationMatrix = Record<string, Record<string, boolean>>;
-
-// Default event types and roles for the matrix template.
-const DEFAULT_EVENT_TYPES = [
-  "learner_import_completed",
-  "classroom_created",
-  "classroom_roster_changed",
-  "report_generated",
-  "account_suspended",
-  "intervention_alert",
-];
-
-const DEFAULT_STAFF_ROLES = ["school_admin", "district_admin", "teacher", "co_teacher"];
-
-function buildDefaultMatrix(): NotificationMatrix {
-  const matrix: NotificationMatrix = {};
-  for (const evt of DEFAULT_EVENT_TYPES) {
-    matrix[evt] = {};
-    for (const role of DEFAULT_STAFF_ROLES) {
-      // Admins get email on by default; teachers off by default.
-      matrix[evt][role] = role.includes("admin");
-    }
-  }
-  return matrix;
-}
-
-// In-memory store: schoolId -> NotificationMatrix
-// TODO(sprint6): Replace with Postgres persistence (dpa-store pattern).
-const NOTIFICATION_PREFS = new Map<string, NotificationMatrix>();
-
-function getMatrix(schoolId: string): NotificationMatrix {
-  let matrix = NOTIFICATION_PREFS.get(schoolId);
-  if (!matrix) {
-    matrix = buildDefaultMatrix();
-    NOTIFICATION_PREFS.set(schoolId, matrix);
-  }
-  return matrix;
-}
-
-// Exported for tests.
+// Test-only handle to the in-memory store, set when registerNotificationRoutes
+// selects it (non-production, no DATABASE_URL).
+let testStore: InMemoryNotificationStore | null = null;
 export function clearNotificationStoreForTest(): void {
-  NOTIFICATION_PREFS.clear();
+  testStore?.clear();
 }
 
 // ---------------------------------------------------------------------------
 // Route registration
 // ---------------------------------------------------------------------------
-export function registerNotificationRoutes(app: FastifyInstance, db: any): void {
+export function registerNotificationRoutes(
+  app: FastifyInstance,
+  db: any,
+  store: NotificationStore = selectNotificationStore(db),
+): void {
+  if (store instanceof InMemoryNotificationStore) testStore = store;
+
   // ------------------------------------------------------------------
   // GET /admin/schools/:schoolId/notifications
   // ------------------------------------------------------------------
@@ -113,7 +85,7 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any): void 
       if (!actor) return;
 
       const { schoolId } = req.params;
-      const matrix = getMatrix(schoolId);
+      const matrix = await store.get(schoolId);
       return { schoolId, matrix, eventTypes: Object.keys(matrix), staffRoles: DEFAULT_STAFF_ROLES };
     },
   );
@@ -136,8 +108,8 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any): void 
         return reply.code(400).send({ error: "matrix is required and must be an object" });
       }
 
-      const before = NOTIFICATION_PREFS.get(schoolId) ?? null;
-      NOTIFICATION_PREFS.set(schoolId, matrix);
+      const before = await store.getRaw(schoolId);
+      await store.put(schoolId, matrix, actor.sub);
 
       void logAuditEvent(db, {
         action: "notification_matrix_updated",

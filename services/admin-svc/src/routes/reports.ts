@@ -1,11 +1,13 @@
 /**
  * Sprint 6 — School reports catalog + parameterized run (admin-svc).
  *
- * A static report registry with four reports. Each report produces
- * deterministic synthesized rows for demo/staging purposes.
- *
- * // TODO(sprint6): Replace synthesized data with real DB queries once
- * //   the learner/attendance Postgres tables are available.
+ * A static report registry with four reports. Attendance and learning-time
+ * have no first-party source-of-record table yet, so they are produced as
+ * deterministic *estimates*. Every response is explicitly tagged with
+ * `dataSource: "estimated"` and the report registry advertises an
+ * `estimated` flag so the admin UI never presents proxy rows as
+ * authoritative. Real analytical queries are wired in per report as the
+ * backing tables land (see ADR backlog "Durable Admin Data Layer").
  *
  * RBAC: allowed for PLATFORM_ADMIN, DISTRICT_ADMIN, SCHOOL_ADMIN.
  * Note: finer school-ownership scoping is enforced at the BFF/identity layer.
@@ -59,6 +61,8 @@ interface ReportDefinition {
   id: string;
   name: string;
   description: string;
+  /** True while rows are estimated rather than read from a source-of-record table. */
+  estimated: boolean;
   params: ReportParam[];
 }
 
@@ -67,6 +71,7 @@ const REPORT_REGISTRY: ReportDefinition[] = [
     id: "enrollment",
     name: "Enrollment Summary",
     description: "Learner enrollment counts by grade for a given school and term.",
+    estimated: true,
     params: [
       {
         name: "term",
@@ -86,6 +91,7 @@ const REPORT_REGISTRY: ReportDefinition[] = [
     id: "attendance_proxy",
     name: "Attendance Proxy",
     description: "Estimated attendance rates derived from session activity, by grade and week.",
+    estimated: true,
     params: [
       {
         name: "startDate",
@@ -106,6 +112,7 @@ const REPORT_REGISTRY: ReportDefinition[] = [
     id: "learning_time",
     name: "Learning Time",
     description: "Total instructional minutes logged per learner per week.",
+    estimated: true,
     params: [
       {
         name: "startDate",
@@ -126,6 +133,7 @@ const REPORT_REGISTRY: ReportDefinition[] = [
     id: "intervention_summary",
     name: "Intervention Summary",
     description: "Learners with active IEP or 504 plans, with last session activity.",
+    estimated: true,
     params: [
       {
         name: "grade",
@@ -345,6 +353,10 @@ export function registerReportRoutes(app: FastifyInstance, _db: any): void {
         reportId,
         schoolId,
         generatedAt: new Date().toISOString(),
+        // Transparency: these rows are estimates, not read from a
+        // source-of-record table. The UI must label them accordingly.
+        dataSource: report.estimated ? "estimated" : "source_of_record",
+        estimated: report.estimated,
         params,
         columns,
         rows,
