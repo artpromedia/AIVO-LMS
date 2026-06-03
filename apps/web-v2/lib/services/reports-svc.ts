@@ -38,6 +38,30 @@ export interface ReportSchema {
   allowedTenantIds: string[];
 }
 
+export interface ReportSchedule {
+  id?: string;
+  reportId?: string;
+  report?: string;
+  cron?: string;
+  recipients?: string[];
+  format?: string;
+  createdAt?: string;
+}
+
+export interface ReportRunError {
+  code?: string;
+  message?: string;
+}
+
+export type ReportRun = {
+  status?: string;
+  rowCount?: number;
+  format?: string;
+  cached?: boolean;
+  error?: ReportRunError | string | null;
+  lineage?: { sources?: Array<{ service?: string; query?: string; queryVersion?: string }> };
+} & Record<string, unknown>;
+
 const SAMPLE_CATALOG: ReportCatalogItem[] = [
   {
     id: "enrollment-by-school",
@@ -73,7 +97,10 @@ export async function listReports(
   scope: { role: string; tenantId?: string; actorId?: string },
   opts: { requestId?: string } = {},
 ): Promise<{ reports: ReportCatalogItem[]; quota?: { used: number; limit: number } }> {
-  const res = await callService<{ reports: ReportCatalogItem[]; quota: any }>({
+  const res = await callService<{
+    reports: ReportCatalogItem[];
+    quota: { used: number; limit: number };
+  }>({
     service: SERVICE,
     baseUrl: base(),
     url: "/api/reports",
@@ -101,8 +128,8 @@ export async function getReportSchema(
 export async function listSchedules(
   scope: { role: string; tenantId?: string; actorId?: string },
   opts: { requestId?: string } = {},
-): Promise<any[]> {
-  const res = await callService<{ schedules: any[] }>({
+): Promise<ReportSchedule[]> {
+  const res = await callService<{ schedules: ReportSchedule[] }>({
     service: SERVICE,
     baseUrl: base(),
     url: "/api/reports/schedules",
@@ -116,8 +143,8 @@ export async function getRun(
   runId: string,
   scope: { role: string; tenantId?: string; actorId?: string },
   opts: { requestId?: string } = {},
-): Promise<any | null> {
-  const res = await callService<any>({
+): Promise<ReportRun | null> {
+  const res = await callService<ReportRun>({
     service: SERVICE,
     baseUrl: base(),
     url: `/api/reports/runs/${encodeURIComponent(runId)}`,

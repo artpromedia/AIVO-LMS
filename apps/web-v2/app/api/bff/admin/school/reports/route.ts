@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
+import { failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { REPORT_CATALOG } from "@/lib/admin/school-ops";
 

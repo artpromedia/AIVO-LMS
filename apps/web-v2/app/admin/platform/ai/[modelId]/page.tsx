@@ -140,7 +140,7 @@ export default async function Page({ params }: { params: { modelId: string } }) 
               <p className="mt-3 text-sm text-aivo-ink-soft">No version history.</p>
             ) : (
               <ul className="mt-3 space-y-2 text-sm">
-                {versions.map((v: any, i: number) => (
+                {versions.map((v, i: number) => (
                   <li key={v?.id ?? i} className="flex items-center justify-between">
                     <span>{v?.label ?? v?.id ?? `Version ${i + 1}`}</span>
                     {v?.id === model.currentVersionId ? (

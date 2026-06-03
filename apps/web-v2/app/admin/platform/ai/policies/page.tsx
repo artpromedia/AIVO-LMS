@@ -10,7 +10,7 @@ import { listPolicies } from "@/lib/services/responsible-ai-svc";
 
 export const dynamic = "force-dynamic";
 
-function scopeTone(level: string): "primary" | "accent" | "neutral" {
+function scopeTone(level?: string): "primary" | "accent" | "neutral" {
   if (level === "platform") return "primary";
   if (level === "district") return "accent";
   return "neutral";
@@ -56,7 +56,7 @@ export default async function Page() {
               </tr>
             </thead>
             <tbody className="divide-y divide-aivo-border">
-              {policies.map((p: any) => (
+              {policies.map((p) => (
                 <tr key={p.id} className="hover:bg-aivo-surface-2/40">
                   <td className="px-4 py-3 font-medium">
                     <Link href={`/admin/platform/ai/policies/${p.id}`} className="hover:underline">

@@ -59,7 +59,7 @@ export default async function Page() {
               </tr>
             </thead>
             <tbody className="divide-y divide-iw-border">
-              {schedules.map((s: any, i: number) => (
+              {schedules.map((s, i: number) => (
                 <tr key={s?.id ?? i} className="hover:bg-iw-card-soft/40">
                   <td className="px-4 py-3 font-medium text-iw-ink">
                     {s?.reportId ?? s?.report ?? "—"}

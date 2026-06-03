@@ -66,7 +66,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       return ok({ run }, requestId);
     }
 
-    return ok({ run: (res.data as any).run ?? res.data }, requestId);
+    return ok({ run: (res.data as Record<string, unknown>).run ?? res.data }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

@@ -9,7 +9,6 @@ import {
   type ValidationResult,
   type ColumnMapping,
   REQUIRED_FIELDS,
-  OPTIONAL_FIELDS,
   ALL_FIELDS,
 } from "@aivo/learner-import";
 import { Stepper, type StepperStep } from "@/components/ui/stepper";
@@ -223,7 +222,6 @@ export function CsvImportWizard({ schoolId }: WizardProps) {
     if (step === 3 && !dryRunResult && !isLoading) {
       void handleDryRun();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   const handleDryRunNext = () => {

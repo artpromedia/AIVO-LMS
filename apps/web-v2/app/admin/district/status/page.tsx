@@ -16,7 +16,7 @@ function impactTone(impact: string): "warning" | "danger" | "neutral" {
   return "neutral";
 }
 
-function healthTone(status: string): "success" | "warning" | "danger" | "neutral" {
+function healthTone(status?: string): "success" | "warning" | "danger" | "neutral" {
   switch (status) {
     case "healthy":
     case "operational":
@@ -82,7 +82,7 @@ export default async function Page() {
               </tr>
             </thead>
             <tbody className="divide-y divide-iw-border">
-              {health.signals.map((s: any, i: number) => (
+              {health.signals.map((s, i: number) => (
                 <tr key={s.service ?? i} className="hover:bg-iw-card-soft/40">
                   <td className="px-4 py-3 text-iw-ink">{s.service ?? "—"}</td>
                   <td className="px-4 py-3 tabular-nums">{pct(s.observedSli)}</td>

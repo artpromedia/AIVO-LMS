@@ -26,7 +26,7 @@ export default async function Page() {
       />
       <Card className="max-w-2xl p-[var(--aivo-density-card-pad)]">
         <NewIncidentForm
-          components={components.map((c: any) => ({ id: c.id, name: c.name }))}
+          components={components.map((c) => ({ id: c.id, name: c.name }))}
         />
       </Card>
     </AppShell>

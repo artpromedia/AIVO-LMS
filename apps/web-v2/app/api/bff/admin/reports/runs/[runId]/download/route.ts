@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { failFromUnknown, getRequestId } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { serverEnv } from "@/lib/env";

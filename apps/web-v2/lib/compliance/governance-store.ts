@@ -10,6 +10,7 @@
  * the cross-step e2e relies on.
  */
 import { getTenantById, scopeTenantsForSession } from "@/lib/db/repos";
+import type { Role } from "@/lib/auth/types";
 
 // ── SLA math (mirrors services/data-governance-svc/src/domain/sla.ts) ────────
 
@@ -350,7 +351,7 @@ export interface DsarScope {
 
 export function scopeForSession(role: string, tenantId: string): string[] | undefined {
   if (role === "platform_admin") return undefined;
-  return scopeTenantsForSession(role as any, tenantId).map((t) => t.id);
+  return scopeTenantsForSession(role as Role, tenantId).map((t) => t.id);
 }
 
 export function listDsars(filter: { status?: DsarStatus } & DsarScope = {}): Dsar[] {

@@ -60,7 +60,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       );
     }
 
-    return ok({ optOut: (res.data as any).optOut ?? res.data }, requestId);
+    return ok({ optOut: (res.data as Record<string, unknown>).optOut ?? res.data }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

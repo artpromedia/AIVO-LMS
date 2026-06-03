@@ -69,7 +69,7 @@ export default async function Page() {
               </tr>
             </thead>
             <tbody className="divide-y divide-iw-border">
-              {maintenances.map((m: any) => (
+              {maintenances.map((m) => (
                 <tr key={m.id} className="hover:bg-iw-card-soft/40">
                   <td className="px-4 py-3 text-iw-ink">{m.title}</td>
                   <td className="px-4 py-3">

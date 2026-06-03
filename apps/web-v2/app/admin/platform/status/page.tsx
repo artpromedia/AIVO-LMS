@@ -20,13 +20,13 @@ import { MaintenanceCalendar } from "@/components/admin/status/MaintenanceCalend
 
 export const dynamic = "force-dynamic";
 
-function impactTone(impact: string): "warning" | "danger" | "neutral" {
+function impactTone(impact?: string): "warning" | "danger" | "neutral" {
   if (impact === "critical" || impact === "major") return "danger";
   if (impact === "minor") return "warning";
   return "neutral";
 }
 
-function lifecycleTone(lc: string): "primary" | "warning" | "success" | "neutral" {
+function lifecycleTone(lc?: string): "primary" | "warning" | "success" | "neutral" {
   switch (lc) {
     case "resolved":
       return "success";
@@ -128,7 +128,7 @@ export default async function Page() {
               </tr>
             </thead>
             <tbody className="divide-y divide-iw-border">
-              {incidents.map((inc: any) => (
+              {incidents.map((inc) => (
                 <tr key={inc.id} className="hover:bg-iw-card-soft/40">
                   <td className="px-4 py-3">
                     <Link
