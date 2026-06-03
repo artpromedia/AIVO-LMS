@@ -1,0 +1,133 @@
+{
+  "uid": "aivo-responsible-ai",
+  "title": "AIVO — Responsible AI Console",
+  "tags": ["aivo", "responsible-ai", "rai", "sprint7"],
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "timezone": "",
+  "time": { "from": "now-24h", "to": "now" },
+  "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "tenant_id",
+        "label": "Tenant",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "query": "label_values(ai_calls_total, tenant_id)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "model_id",
+        "label": "Model",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "query": "label_values(ai_calls_total, model_id)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2,
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "AI call volume (calls/s) by model",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (model_id) (rate(ai_calls_total{model_id=~\"$model_id\", tenant_id=~\"$tenant_id\"}[5m]))",
+          "legendFormat": "{{model_id}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Blocked calls (ai.call.blocked) by reason",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (reason) (rate(ai_call_blocked_total{model_id=~\"$model_id\", tenant_id=~\"$tenant_id\"}[5m]))",
+          "legendFormat": "{{reason}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Blocked ratio (% of AI calls denied by the RAI gateway)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 0.05 }, { "color": "red", "value": 0.2 }] } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(ai_call_blocked_total{model_id=~\"$model_id\", tenant_id=~\"$tenant_id\"}[1h])) / sum(rate(ai_calls_total{model_id=~\"$model_id\", tenant_id=~\"$tenant_id\"}[1h]))",
+          "legendFormat": "blocked ratio"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Eval pass rate by harness metric",
+      "type": "bargauge",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "steps": [{ "color": "red", "value": null }, { "color": "orange", "value": 0.8 }, { "color": "green", "value": 0.95 }] } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "avg by (metric) (rai_eval_score{model_id=~\"$model_id\"})",
+          "legendFormat": "{{metric}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Per-model usage (calls / 24h)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, sum by (model_id) (increase(ai_calls_total{model_id=~\"$model_id\", tenant_id=~\"$tenant_id\"}[24h])))",
+          "legendFormat": "{{model_id}}"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Per-model cost (USD / 24h)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "fieldConfig": { "defaults": { "unit": "currencyUSD" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (model_id) (increase(ai_call_cost_usd_total{model_id=~\"$model_id\", tenant_id=~\"$tenant_id\"}[24h]))",
+          "legendFormat": "{{model_id}}"
+        }
+      ]
+    }
+  ]
+}

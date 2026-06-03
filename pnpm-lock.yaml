@@ -1117,6 +1117,9 @@ importers:
       '@aivo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@aivo/otel-bootstrap':
+        specifier: workspace:*
+        version: link:../../packages/otel-bootstrap
       '@fastify/cors':
         specifier: ^11.0.0
         version: 11.2.0
@@ -2034,6 +2037,9 @@ importers:
       '@aivo/ops-alerts':
         specifier: workspace:*
         version: link:../../packages/ops-alerts
+      '@aivo/otel-bootstrap':
+        specifier: workspace:*
+        version: link:../../packages/otel-bootstrap
       '@aivo/security':
         specifier: workspace:*
         version: link:../../packages/security
