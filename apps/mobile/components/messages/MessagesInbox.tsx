@@ -11,10 +11,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { API } from "@/constants/api";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getToken } from "@/lib/api";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
+import { useSse } from "@/hooks/useSse";
 
 interface ThreadListItem {
   id: string;
@@ -62,6 +63,39 @@ export function MessagesInbox() {
     void loadThreads();
   }, [loadThreads]);
 
+  // Cross-replica SSE fan-out: subscribe to the thread the user is
+  // currently viewing. The polling interval below stays in place as the
+  // documented fallback — when SSE is healthy (`sse.state === "open"`)
+  // we skip the per-tick fetch, but the moment the stream errors out the
+  // polling cadence picks the load back up.
+  const [bearer, setBearer] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void getToken().then((t) => {
+      if (alive) setBearer(t);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [activeId]);
+  const sse = useSse(activeId ? `${API.COMMS}/api/comms/threads/${activeId}/stream` : null, {
+    bearer,
+    enabled: !!activeId && !!bearer,
+    onMessage: (data, eventName) => {
+      if (eventName !== "message") return;
+      const payload = data as { type?: string; message?: ThreadMessage } | null;
+      if (payload?.type !== "message.created" || !payload.message) return;
+      setMessages((prev) => {
+        const next = prev ? [...prev] : [];
+        if (next.some((m) => m.id === payload.message!.id)) return next;
+        next.push(payload.message!);
+        return next;
+      });
+      void loadThreads();
+    },
+  });
+  const streamHealthy = sse.state === "open";
+
   // Live updates (foreground-aware polling): thread list every 12s, the open
   // conversation every 6s, so a reply from the other side appears without a
   // manual refresh.
@@ -73,7 +107,7 @@ export function MessagesInbox() {
   }, [loadThreads]);
 
   useEffect(() => {
-    if (!activeId) return;
+    if (!activeId || streamHealthy) return;
     const id = setInterval(() => {
       if (AppState.currentState !== "active") return;
       apiFetch(API.COMMS, `/api/comms/threads/${activeId}/messages`)
@@ -84,7 +118,7 @@ export function MessagesInbox() {
         .catch(() => {});
     }, 6000);
     return () => clearInterval(id);
-  }, [activeId]);
+  }, [activeId, streamHealthy]);
 
   const openThread = useCallback(async (id: string, subject: string) => {
     setActiveId(id);

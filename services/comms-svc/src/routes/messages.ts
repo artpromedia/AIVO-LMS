@@ -21,6 +21,7 @@ import {
   FORBIDDEN_ROLE_CODE,
   ACTIVE_ROLE_SPOOFING_EVENT,
 } from "@aivo/security";
+import { getRealtimeBus, subjects } from "../realtime/bus.js";
 
 async function requireAuth(req: FastifyRequest, reply: FastifyReply): Promise<void> {
   const auth = req.headers.authorization;
@@ -245,6 +246,26 @@ export function registerMessageRoutes(app: FastifyInstance, db: any): void {
             eq(messageThreadParticipants.userId, user.sub),
           ),
         );
+      // Fan-out to every SSE subscriber on this thread (cross-replica via
+      // NATS when configured; in-process EventEmitter otherwise). Polling
+      // remains the documented fallback for clients that can't hold a stream.
+      void (async () => {
+        try {
+          const bus = await getRealtimeBus();
+          await bus.publish(subjects.inboxThread(threadId), {
+            type: "message.created",
+            threadId,
+            message: {
+              id: message.id,
+              senderUserId: message.senderUserId,
+              body: message.body,
+              createdAt: message.createdAt,
+            },
+          });
+        } catch {
+          /* best-effort; subscribers retry via polling fallback */
+        }
+      })();
       return reply.code(201).send({
         message: {
           id: message.id,

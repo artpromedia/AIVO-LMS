@@ -14,6 +14,7 @@ import {
 } from "../services/scoring.js";
 import { resolveTenantId, requireLearnerAccess } from "../lib/tenant.js";
 import { checkLearnerTutorAccess } from "../lib/entitlements.js";
+import { getRealtimeBus, subjects as busSubjects } from "../realtime/bus.js";
 import {
   DegradationTracker,
   buildDegradedResponse,
@@ -249,6 +250,32 @@ async function recordProblemSessionForLesson(
 }
 
 export function registerSessionRoutes(app: FastifyInstance, db: any) {
+  /**
+   * Fan-out a lesson-session row to every parent SSE subscriber on the
+   * `session.coview.<learnerId>` subject. Cross-replica via NATS when
+   * configured; in-process EventEmitter otherwise. Best-effort — polling
+   * remains the documented fallback when the bus drops a message.
+   */
+  function publishCoview(
+    learnerId: string,
+    event: "created" | "updated" | "completed",
+    snapshot: Record<string, unknown>,
+  ): void {
+    void (async () => {
+      try {
+        const bus = await getRealtimeBus();
+        await bus.publish(busSubjects.sessionCoview(learnerId), {
+          type: `session.${event}`,
+          learnerId,
+          session: snapshot,
+          at: new Date().toISOString(),
+        });
+      } catch {
+        /* best-effort */
+      }
+    })();
+  }
+
   app.post("/api/learning/sessions", { schema: createSessionSchema }, async (request, reply) => {
     const body = request.body as {
       learnerId?: string;
@@ -398,6 +425,17 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         ...(durationSeconds > 0 ? { durationSeconds } : {}),
       })
       .returning();
+
+    // Cross-replica fan-out for parent co-view: a new session row exists.
+    // Parents watching `session.coview.<learnerId>` get a push immediately;
+    // polling on /api/learning/sessions remains the documented fallback.
+    publishCoview(learnerId, "created", {
+      id: session.id,
+      status: session.status,
+      subject: session.subject,
+      tutorSku: session.tutorSku,
+      startedAt: session.startedAt,
+    });
 
     // Sprint 02: fire-and-forget problem-session ledger record (flag-gated).
     void recordProblemSessionForLesson(
@@ -553,6 +591,18 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
           },
         })
         .where(eq(lessonSessions.id, sessionId));
+
+      // Parent co-view fan-out: session moved to COMPLETED. Watching
+      // parents get a push so their list flips off the "live" badge
+      // without waiting on the 6s poll.
+      publishCoview(session.learnerId, "completed", {
+        id: session.id,
+        status: "COMPLETED",
+        subject: session.subject,
+        tutorSku: session.tutorSku,
+        xpEarned: finalXp,
+        completedAt: new Date().toISOString(),
+      });
 
       if (masteryUpdates) {
         for (const [skill, score] of Object.entries(masteryUpdates)) {

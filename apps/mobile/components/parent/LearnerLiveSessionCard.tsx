@@ -1,7 +1,11 @@
 import React from "react";
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLearnerLiveSessions, isLiveSession } from "@/hooks/useGradebook";
+import { useSse } from "@/hooks/useSse";
+import { getToken } from "@/lib/api";
+import { API } from "@/constants/api";
 import { EmptyState } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
 
@@ -28,6 +32,32 @@ export function LearnerLiveSessionCard({ learnerId }: { learnerId: string }) {
   const { data, isLoading } = useLearnerLiveSessions(learnerId);
   const latest = data?.[0] ?? null;
   const live = isLiveSession(latest);
+
+  // Cross-replica SSE fan-out on `session.coview.<learnerId>` — push
+  // arrives from whichever learning-svc replica wrote the session row.
+  // We don't merge state locally; we just invalidate react-query so the
+  // existing `useLearnerLiveSessions` hook refetches against the
+  // authoritative GET. The hook's `refetchInterval` polling remains in
+  // place as the documented fallback (it's a no-op when the cache was
+  // freshly invalidated, but takes over if the stream errors).
+  const queryClient = useQueryClient();
+  const [bearer, setBearer] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    let alive = true;
+    void getToken().then((t) => {
+      if (alive) setBearer(t);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [learnerId]);
+  useSse(`${API.LEARNING}/api/learning/sessions/${learnerId}/stream`, {
+    bearer,
+    enabled: !!learnerId && !!bearer,
+    onMessage: () => {
+      void queryClient.invalidateQueries({ queryKey: ["lesson-sessions-live", learnerId] });
+    },
+  });
 
   if (isLoading) {
     return <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.lg }} />;

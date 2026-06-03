@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { useLiveRefresh } from "@/lib/use-live-refresh";
+import { useSse } from "@/lib/realtime/use-sse";
 
 interface ThreadListItem {
   id: string;
@@ -69,13 +70,32 @@ export function MessagesInbox() {
     }
   }, [activeId]);
 
-  // Live updates over the shared visibility-aware polling transport (the same
-  // cadence/coalescing rules as the notification stream's fallback). Thread
-  // list refreshes every 12s; the open conversation every 6s, so a reply from
-  // the other side appears without a manual reload. A future SSE fan-out
-  // swaps in behind `useLiveRefresh` and upgrades both at once.
+  // Live updates: prefer cross-replica SSE fan-out from comms-svc (a NATS
+  // subject keyed by thread id). When the stream is open we skip the
+  // polling fallback; when it errors out (server disabled, network
+  // hiccup, BFF 503) the polling cadence below picks the load back up.
+  // Polling is the documented fallback, not the primary path.
+  const sse = useSse(activeId ? `/api/bff/messages/threads/${activeId}/stream` : null, {
+    enabled: !!activeId,
+    onNamedEvent: (name, data) => {
+      if (name !== "message") return;
+      const payload = data as { type?: string; message?: ThreadMessage } | null;
+      if (payload?.type !== "message.created" || !payload.message) return;
+      setMessages((prev) => {
+        const next = prev ? [...prev] : [];
+        // Dedupe — a poll might have raced us to the same row.
+        if (next.some((m) => m.id === payload.message!.id)) return next;
+        next.push(payload.message!);
+        return next;
+      });
+      // Thread list lastMessage/unread also need to refresh; cheap.
+      void loadThreads();
+    },
+  });
+  const streamHealthy = sse.state === "open";
+
   useLiveRefresh(loadThreads, 12000);
-  useLiveRefresh(loadActiveMessages, 6000, { enabled: activeId !== null });
+  useLiveRefresh(loadActiveMessages, 6000, { enabled: activeId !== null && !streamHealthy });
 
   const openThread = React.useCallback(async (id: string, subject: string) => {
     setActiveId(id);

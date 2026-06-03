@@ -7,6 +7,7 @@ import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerSessionRoutes } from "./routes/sessions.js";
+import { registerSessionCoviewStreamRoutes } from "./routes/session-coview-stream.js";
 import { registerAuthHook } from "./lib/tenant.js";
 import { registerGovernanceRoutes } from "./routes/governance.js";
 
@@ -45,6 +46,7 @@ export async function buildApp() {
   registerHealthRoutes(app);
   registerAuthHook(app);
   registerSessionRoutes(app, db);
+  registerSessionCoviewStreamRoutes(app, db);
   registerGovernanceRoutes(app, db);
 
   return app;
