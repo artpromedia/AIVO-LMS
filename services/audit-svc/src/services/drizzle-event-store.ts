@@ -19,7 +19,7 @@ type Row = typeof auditEventsV2.$inferSelect;
 function rowToEvent(r: Row): AuditEvent {
   return {
     id: r.id,
-    occurred_at: (r.occurredAt instanceof Date ? r.occurredAt.toISOString() : String(r.occurredAt)),
+    occurred_at: r.occurredAt instanceof Date ? r.occurredAt.toISOString() : String(r.occurredAt),
     tenant_id: r.tenantId,
     actor: { id: r.actorId, role: r.actorRole, ip: r.actorIp, ua: r.actorUa },
     action: r.action,
@@ -128,7 +128,9 @@ export class DrizzleEventStore implements EventStore {
     const [next] = await this.db
       .select({ hash: auditEventsV2.hash })
       .from(auditEventsV2)
-      .where(sql`(${auditEventsV2.occurredAt}, ${auditEventsV2.id}) > (${new Date(e.occurred_at)}, ${e.id})`)
+      .where(
+        sql`(${auditEventsV2.occurredAt}, ${auditEventsV2.id}) > (${new Date(e.occurred_at)}, ${e.id})`,
+      )
       .orderBy(asc(auditEventsV2.occurredAt), asc(auditEventsV2.id))
       .limit(1);
     return { prev_hash: e.prev_hash, hash: e.hash, next_hash: next?.hash ?? null };
@@ -142,7 +144,10 @@ export class DrizzleEventStore implements EventStore {
     for (;;) {
       const cond = after
         ? where
-          ? and(where, sql`(${auditEventsV2.occurredAt}, ${auditEventsV2.id}) > (${after.occurredAt}, ${after.id})`)
+          ? and(
+              where,
+              sql`(${auditEventsV2.occurredAt}, ${auditEventsV2.id}) > (${after.occurredAt}, ${after.id})`,
+            )
           : sql`(${auditEventsV2.occurredAt}, ${auditEventsV2.id}) > (${after.occurredAt}, ${after.id})`
         : where;
       const rows: Row[] = await this.db

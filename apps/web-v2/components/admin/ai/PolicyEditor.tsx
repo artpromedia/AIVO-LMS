@@ -80,7 +80,10 @@ export function PolicyEditor({ policy }: PolicyEditorProps) {
     <Card className="p-[var(--aivo-density-card-pad)]">
       <form onSubmit={onSubmit} className="space-y-5">
         <div>
-          <label className="text-xs uppercase tracking-wide text-aivo-ink-soft" htmlFor="blocked-cats">
+          <label
+            className="text-xs uppercase tracking-wide text-aivo-ink-soft"
+            htmlFor="blocked-cats"
+          >
             Blocked categories (comma separated)
           </label>
           <input
@@ -133,7 +136,10 @@ export function PolicyEditor({ policy }: PolicyEditorProps) {
         </div>
 
         <div>
-          <label className="text-xs uppercase tracking-wide text-aivo-ink-soft" htmlFor="allowed-regions">
+          <label
+            className="text-xs uppercase tracking-wide text-aivo-ink-soft"
+            htmlFor="allowed-regions"
+          >
             Allowed regions (comma separated)
           </label>
           <input
@@ -146,7 +152,10 @@ export function PolicyEditor({ policy }: PolicyEditorProps) {
         </div>
 
         <div>
-          <label className="text-xs uppercase tracking-wide text-aivo-ink-soft" htmlFor="blocked-regions">
+          <label
+            className="text-xs uppercase tracking-wide text-aivo-ink-soft"
+            htmlFor="blocked-regions"
+          >
             Blocked regions (comma separated)
           </label>
           <input
@@ -159,11 +168,7 @@ export function PolicyEditor({ policy }: PolicyEditorProps) {
         </div>
 
         <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={enabled}
-            onChange={(e) => setEnabled(e.target.checked)}
-          />
+          <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />
           Policy enabled
         </label>
 

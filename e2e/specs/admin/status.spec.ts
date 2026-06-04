@@ -63,9 +63,12 @@ test.describe("Status page — declare incident, walk lifecycle, public + distri
     // 1) Declare the incident (opens in `investigating`).
     await page.goto("/admin/platform/status/incidents/new");
     await page.getByLabel(/title/i).fill(TITLE);
-    await page.getByLabel(/impact/i).selectOption({ label: "Major" }).catch(async () => {
-      await page.getByText(/major/i).first().click();
-    });
+    await page
+      .getByLabel(/impact/i)
+      .selectOption({ label: "Major" })
+      .catch(async () => {
+        await page.getByText(/major/i).first().click();
+      });
     await page.getByLabel(/message|update|details/i).fill("We are investigating elevated errors.");
     await page.getByRole("button", { name: /create incident|declare|publish/i }).click();
     await expect(page.getByText(TITLE)).toBeVisible();
@@ -93,9 +96,12 @@ test.describe("Status page — declare incident, walk lifecycle, public + distri
       await page.bringToFront();
       await page.getByRole("button", { name: /post update|add update|new update/i }).click();
       // Choose the next lifecycle state.
-      await page.getByLabel(/status|lifecycle|state/i).selectOption({ label: step.name.source }).catch(async () => {
-        await page.getByRole("radio", { name: step.name }).first().click();
-      });
+      await page
+        .getByLabel(/status|lifecycle|state/i)
+        .selectOption({ label: step.name.source })
+        .catch(async () => {
+          await page.getByRole("radio", { name: step.name }).first().click();
+        });
       await page.getByLabel(/message|update|body/i).fill(step.update);
       await page.getByRole("button", { name: /post|publish|save/i }).click();
       await expect(page.getByText(step.name)).toBeVisible();

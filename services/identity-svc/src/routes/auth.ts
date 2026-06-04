@@ -2461,23 +2461,30 @@ export async function registerAuthRoutes(app: FastifyInstance) {
       }),
     },
     async (req, reply) => {
-    const ctx = await requireUser(app, req, reply);
-    if (!ctx) return;
-    const { user } = ctx;
-    if (!user.email) return reply.status(400).send({ error: "Account has no email" });
-    const { base32Secret, otpauthUrl } = generateTotpSecret(user.email);
-    // Carry the unsaved secret in a short-lived JWT so we never persist
-    // an unconfirmed secret.
-    const enrollToken = await signJWT(
-      { sub: user.id, tenantId: "", role: "", purpose: "totp-enroll", secret: base32Secret } as any,
-      "10m",
-    );
-    let qrDataUrl = "";
-    try {
-      qrDataUrl = await QRCode.toDataURL(otpauthUrl, { margin: 1, width: 240 });
-    } catch {}
-    return { enrollToken, otpauthUrl, base32Secret, qrDataUrl };
-  });
+      const ctx = await requireUser(app, req, reply);
+      if (!ctx) return;
+      const { user } = ctx;
+      if (!user.email) return reply.status(400).send({ error: "Account has no email" });
+      const { base32Secret, otpauthUrl } = generateTotpSecret(user.email);
+      // Carry the unsaved secret in a short-lived JWT so we never persist
+      // an unconfirmed secret.
+      const enrollToken = await signJWT(
+        {
+          sub: user.id,
+          tenantId: "",
+          role: "",
+          purpose: "totp-enroll",
+          secret: base32Secret,
+        } as any,
+        "10m",
+      );
+      let qrDataUrl = "";
+      try {
+        qrDataUrl = await QRCode.toDataURL(otpauthUrl, { margin: 1, width: 240 });
+      } catch {}
+      return { enrollToken, otpauthUrl, base32Secret, qrDataUrl };
+    },
+  );
 
   app.post(
     "/api/auth/mfa/totp/confirm",

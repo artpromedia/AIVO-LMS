@@ -12,12 +12,12 @@ tenant-scoped logs/metrics). Admin UI: `/admin/platform/status/*`.
 
 ## Severity matrix
 
-| Sev | Definition | Examples | Response (ack / mitigation start) | Who pages | Comms cadence |
-|-----|------------|----------|-----------------------------------|-----------|---------------|
-| **Sev1** | Full or broad outage; data loss/exposure risk; safety risk to learners | Login down platform-wide; audit chain break; PII exposure; AI emitting unsafe content at scale | **5 min** / immediate | Platform on-call **+** eng lead **+** (security/RAI lead if applicable) | Public update every **30 min**; internal channel live |
-| **Sev2** | Major feature degraded for many tenants; SLO fast-burn (multi-window) | Lessons failing for a district; p95 latency 5x; payment processing erroring | **15 min** / within 30 min | Platform on-call | Public update every **60 min** |
-| **Sev3** | Minor/partial degradation, limited blast radius, workaround exists | One non-critical component degraded; elevated but in-budget errors | **1 business hour** | Owning team (no page) | Status page note if customer-visible |
-| **Sev4** | Cosmetic / no user impact; tracked toil | Dashboard glitch; noisy non-paging alert | Next business day | None | None (ticket only) |
+| Sev      | Definition                                                             | Examples                                                                                       | Response (ack / mitigation start) | Who pages                                                               | Comms cadence                                         |
+| -------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Sev1** | Full or broad outage; data loss/exposure risk; safety risk to learners | Login down platform-wide; audit chain break; PII exposure; AI emitting unsafe content at scale | **5 min** / immediate             | Platform on-call **+** eng lead **+** (security/RAI lead if applicable) | Public update every **30 min**; internal channel live |
+| **Sev2** | Major feature degraded for many tenants; SLO fast-burn (multi-window)  | Lessons failing for a district; p95 latency 5x; payment processing erroring                    | **15 min** / within 30 min        | Platform on-call                                                        | Public update every **60 min**                        |
+| **Sev3** | Minor/partial degradation, limited blast radius, workaround exists     | One non-critical component degraded; elevated but in-budget errors                             | **1 business hour**               | Owning team (no page)                                                   | Status page note if customer-visible                  |
+| **Sev4** | Cosmetic / no user impact; tracked toil                                | Dashboard glitch; noisy non-paging alert                                                       | Next business day                 | None                                                                    | None (ticket only)                                    |
 
 When unsure, **round up** a severity. You can always downgrade after triage.
 
@@ -73,12 +73,12 @@ transition is recorded as an entry in the incident **updates feed**, and
 each update is the unit of public communication. Post a public update on
 **every** transition.
 
-| State | Meaning | Post publicly? |
-|-------|---------|----------------|
-| **investigating** | Impact confirmed, root cause not yet known. | Yes — acknowledge impact + that you are looking. |
-| **identified** | Root cause (or strong hypothesis) found; mitigation in progress. | Yes — what is affected + that a fix is underway. |
-| **monitoring** | Mitigation applied; watching to confirm recovery. | Yes — what changed + that you are verifying. |
-| **resolved** | Recovery confirmed and sustained; sets `resolvedAt`. | Yes — all-clear + brief summary; link `postmortemUrl` when ready. |
+| State             | Meaning                                                          | Post publicly?                                                    |
+| ----------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **investigating** | Impact confirmed, root cause not yet known.                      | Yes — acknowledge impact + that you are looking.                  |
+| **identified**    | Root cause (or strong hypothesis) found; mitigation in progress. | Yes — what is affected + that a fix is underway.                  |
+| **monitoring**    | Mitigation applied; watching to confirm recovery.                | Yes — what changed + that you are verifying.                      |
+| **resolved**      | Recovery confirmed and sustained; sets `resolvedAt`.             | Yes — all-clear + brief summary; link `postmortemUrl` when ready. |
 
 Do not jump straight to `resolved` from `investigating`; pass through
 `monitoring` so subscribers see the recovery being verified.
@@ -136,21 +136,26 @@ Do not jump straight to `resolved` from `investigating`; pass through
 - Customer impact (what users saw):
 
 ## Timeline (UTC)
-- HH:MM  detection (alert / report) ...
-- HH:MM  declared, IC = ...
-- HH:MM  identified: <root cause>
-- HH:MM  mitigation applied: <what>
-- HH:MM  monitoring
-- HH:MM  resolved
+
+- HH:MM detection (alert / report) ...
+- HH:MM declared, IC = ...
+- HH:MM identified: <root cause>
+- HH:MM mitigation applied: <what>
+- HH:MM monitoring
+- HH:MM resolved
 
 ## Root cause
+
 <contributing factors — systems, not people>
 
 ## What went well / what didn't
+
 ## Error-budget impact
+
 <budget consumed; does §8 freeze apply?>
 
 ## Action items (owner, due, tracking link)
+
 - [ ] ...
 ```
 

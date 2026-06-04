@@ -97,13 +97,11 @@ async function seed(db: any): Promise<Fixture> {
     .returning();
 
   // Grant the teacher an accepted collaboration link to learner #1 only.
-  await db
-    .insert(learnerTeachers)
-    .values({
-      learnerId: learner.id,
-      teacherUserId: teacherSub,
-      status: "ACCEPTED",
-    } as any);
+  await db.insert(learnerTeachers).values({
+    learnerId: learner.id,
+    teacherUserId: teacherSub,
+    status: "ACCEPTED",
+  } as any);
 
   return {
     tenantId: t.id,

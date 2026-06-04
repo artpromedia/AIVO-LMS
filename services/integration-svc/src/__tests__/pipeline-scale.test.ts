@@ -9,7 +9,13 @@ import { RecordingRosterWriter } from "../pipeline/load.js";
 function syntheticSnapshot(n: number): RosterSnapshot {
   const snap = emptySnapshot("oneroster");
   for (let i = 0; i < 50; i++) {
-    snap.orgs.push({ provider: "oneroster", sourcedId: `sch-${i}`, status: "active", name: `School ${i}`, type: "school" });
+    snap.orgs.push({
+      provider: "oneroster",
+      sourcedId: `sch-${i}`,
+      status: "active",
+      name: `School ${i}`,
+      type: "school",
+    });
   }
   const users: User[] = new Array(n);
   for (let i = 0; i < n; i++) {

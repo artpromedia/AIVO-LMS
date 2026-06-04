@@ -54,7 +54,9 @@ export function registerIncidentRoutes(app: FastifyInstance): void {
       state: "open",
       reportedBy: actor.actorId ?? "unknown",
       reportedByRole: actor.role ?? "unknown",
-      timeline: [{ at: now, actor: actor.actorId ?? "unknown", state: "open", note: "Incident filed." }],
+      timeline: [
+        { at: now, actor: actor.actorId ?? "unknown", state: "open", note: "Incident filed." },
+      ],
       createdAt: now,
       updatedAt: now,
     };
@@ -74,7 +76,11 @@ export function registerIncidentRoutes(app: FastifyInstance): void {
       const store = getStore();
       const incident = store.incidents.get(request.params.id);
       if (!incident) return reply.code(404).send({ error: "Incident not found" });
-      if (!isPlatform(actor) && incident.tenantId !== actor.tenantId && incident.reportedBy !== actor.actorId) {
+      if (
+        !isPlatform(actor) &&
+        incident.tenantId !== actor.tenantId &&
+        incident.reportedBy !== actor.actorId
+      ) {
         return deny(reply);
       }
       const b = request.body ?? {};

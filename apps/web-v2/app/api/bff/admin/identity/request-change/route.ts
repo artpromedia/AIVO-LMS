@@ -30,7 +30,10 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return fail({ ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." }, requestId);
+    return fail(
+      { ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." },
+      requestId,
+    );
   }
   const parsed = Schema.safeParse(body);
   if (!parsed.success) {

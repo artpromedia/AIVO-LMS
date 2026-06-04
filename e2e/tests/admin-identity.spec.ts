@@ -70,7 +70,10 @@ test.describe("enterprise identity — SSO round-trip + MFA step-up", () => {
     // run them against the real test IdP.
     await page.getByLabel(/username|email/i).fill(OKTA_USER!);
     await page.getByLabel(/password/i).fill(OKTA_PASSWORD!);
-    await page.getByRole("button", { name: /sign in|next|verify/i }).first().click();
+    await page
+      .getByRole("button", { name: /sign in|next|verify/i })
+      .first()
+      .click();
 
     // Back on AIVO, authenticated via SSO.
     await page.waitForURL(/admin\/platform/i, { timeout: 30_000 });

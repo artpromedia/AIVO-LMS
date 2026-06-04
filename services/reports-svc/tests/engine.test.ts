@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  validateParams,
-  prepareRun,
-  executeRun,
-} from "../src/runners/engine.js";
+import { validateParams, prepareRun, executeRun } from "../src/runners/engine.js";
 import { encodeCsv, encodeJson, encodeParquet } from "../src/runners/formats.js";
 import { catalogForScope, getReport, scopeAllows } from "../src/registry/index.js";
 import { reportVersion, captureLineage } from "../src/lineage.js";

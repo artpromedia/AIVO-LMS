@@ -10,7 +10,11 @@ import { FieldMappingEditor, type FieldMappingValue } from "./FieldMappingEditor
 import type { SisProvider } from "@/lib/db/sis-store";
 
 const PROVIDERS: Array<{ value: SisProvider; label: string; desc: string }> = [
-  { value: "oneroster_rest", label: "OneRoster REST", desc: "PowerSchool, Infinite Campus, Skyward (OAuth2)." },
+  {
+    value: "oneroster_rest",
+    label: "OneRoster REST",
+    desc: "PowerSchool, Infinite Campus, Skyward (OAuth2).",
+  },
   { value: "oneroster_csv", label: "OneRoster CSV", desc: "Bulk CSV upload (1.1 / 1.2)." },
   { value: "clever", label: "Clever", desc: "Clever Secure Sync." },
   { value: "classlink", label: "ClassLink", desc: "ClassLink Roster Server." },
@@ -32,7 +36,11 @@ export function ConnectorWizard({ tenantId }: { tenantId: string }) {
     gradeMap: {},
   });
   const [connectorId, setConnectorId] = useState<string | null>(null);
-  const [dryRunCounts, setDryRunCounts] = useState<{ added: number; updated: number; removed: number } | null>(null);
+  const [dryRunCounts, setDryRunCounts] = useState<{
+    added: number;
+    updated: number;
+    removed: number;
+  } | null>(null);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -71,7 +79,10 @@ export function ConnectorWizard({ tenantId }: { tenantId: string }) {
 
   return (
     <div className="space-y-5">
-      <ol className="flex flex-wrap gap-2 text-xs text-aivo-ink-soft" aria-label={t("wizard_steps")}>
+      <ol
+        className="flex flex-wrap gap-2 text-xs text-aivo-ink-soft"
+        aria-label={t("wizard_steps")}
+      >
         {(["provider", "credentials", "mapping", "dryrun"] as Step[]).map((s, i) => (
           <li key={s} className={step === s ? "font-semibold text-aivo-primary" : ""}>
             {i + 1}. {t(`step_${s}`)}
@@ -83,15 +94,26 @@ export function ConnectorWizard({ tenantId }: { tenantId: string }) {
         <div className="space-y-3">
           <div className="grid gap-2 sm:grid-cols-2">
             {PROVIDERS.map((p) => (
-              <label key={p.value} className={`cursor-pointer rounded-md border p-3 text-sm ${provider === p.value ? "border-aivo-primary bg-aivo-primary-soft" : "border-aivo-border hover:bg-aivo-surface-2"}`}>
-                <input type="radio" name="provider" className="sr-only" checked={provider === p.value} onChange={() => setProvider(p.value)} />
+              <label
+                key={p.value}
+                className={`cursor-pointer rounded-md border p-3 text-sm ${provider === p.value ? "border-aivo-primary bg-aivo-primary-soft" : "border-aivo-border hover:bg-aivo-surface-2"}`}
+              >
+                <input
+                  type="radio"
+                  name="provider"
+                  className="sr-only"
+                  checked={provider === p.value}
+                  onChange={() => setProvider(p.value)}
+                />
                 <span className="block font-semibold">{p.label}</span>
                 <span className="mt-1 block text-xs text-aivo-ink-soft">{p.desc}</span>
               </label>
             ))}
           </div>
           <div className="flex justify-end">
-            <Button type="button" onClick={() => setStep("credentials")}>{t("next")}</Button>
+            <Button type="button" onClick={() => setStep("credentials")}>
+              {t("next")}
+            </Button>
           </div>
         </div>
       ) : null}
@@ -100,16 +122,32 @@ export function ConnectorWizard({ tenantId }: { tenantId: string }) {
         <div className="space-y-3">
           <div>
             <Label htmlFor="cw-name">{t("connector_name")}</Label>
-            <Input id="cw-name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="PowerSchool (OneRoster)" className="mt-1" />
+            <Input
+              id="cw-name"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="PowerSchool (OneRoster)"
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="cw-cred">{t("credential_hint")}</Label>
-            <Input id="cw-cred" value={credentialHint} onChange={(e) => setCredentialHint(e.target.value)} placeholder="client_id ····a1b2" className="mt-1" />
+            <Input
+              id="cw-cred"
+              value={credentialHint}
+              onChange={(e) => setCredentialHint(e.target.value)}
+              placeholder="client_id ····a1b2"
+              className="mt-1"
+            />
             <p className="mt-1 text-xs text-aivo-ink-soft">{t("credential_note")}</p>
           </div>
           <div className="flex justify-between">
-            <Button type="button" variant="ghost" onClick={() => setStep("provider")}>{t("back")}</Button>
-            <Button type="button" onClick={() => setStep("mapping")}>{t("next")}</Button>
+            <Button type="button" variant="ghost" onClick={() => setStep("provider")}>
+              {t("back")}
+            </Button>
+            <Button type="button" onClick={() => setStep("mapping")}>
+              {t("next")}
+            </Button>
           </div>
         </div>
       ) : null}
@@ -119,7 +157,9 @@ export function ConnectorWizard({ tenantId }: { tenantId: string }) {
           <FieldMappingEditor value={mapping} onChange={setMapping} />
           {error ? <p className="text-sm text-aivo-danger">{error}</p> : null}
           <div className="flex justify-between">
-            <Button type="button" variant="ghost" onClick={() => setStep("credentials")}>{t("back")}</Button>
+            <Button type="button" variant="ghost" onClick={() => setStep("credentials")}>
+              {t("back")}
+            </Button>
             <Button type="button" onClick={createAndDryRun} disabled={pending}>
               {pending ? t("running_dry_run") : t("run_dry_run")}
             </Button>
@@ -142,7 +182,10 @@ export function ConnectorWizard({ tenantId }: { tenantId: string }) {
             </p>
           </div>
           <div className="flex justify-end">
-            <Button type="button" onClick={() => connectorId && router.push(`/admin/district/sis/${connectorId}`)}>
+            <Button
+              type="button"
+              onClick={() => connectorId && router.push(`/admin/district/sis/${connectorId}`)}
+            >
               {t("finish")}
             </Button>
           </div>

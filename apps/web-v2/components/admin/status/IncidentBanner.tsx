@@ -15,7 +15,8 @@ export function IncidentBanner({
 }) {
   const active = incidents.length > 0;
   const lead = worst(incidents);
-  const critical = lead?.impact === "critical" || lead?.impact === "major" || overall === "major_outage";
+  const critical =
+    lead?.impact === "critical" || lead?.impact === "major" || overall === "major_outage";
 
   if (!active && overall === "operational") {
     return (
@@ -29,7 +30,7 @@ export function IncidentBanner({
   const toneClass = critical ? "bg-aivo-danger/15" : "bg-aivo-warning/15";
   const dotClass = critical ? "bg-aivo-danger" : "bg-aivo-warning";
   const headline = active
-    ? lead?.title ?? "Active incident in progress"
+    ? (lead?.title ?? "Active incident in progress")
     : "Some systems are experiencing issues";
 
   return (

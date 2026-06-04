@@ -65,7 +65,9 @@ export function IdpForm({
     };
     startTransition(async () => {
       try {
-        const url = initial ? `/api/bff/admin/identity/idp/${initial.id}` : "/api/bff/admin/identity/idp";
+        const url = initial
+          ? `/api/bff/admin/identity/idp/${initial.id}`
+          : "/api/bff/admin/identity/idp";
         const res = await fetch(url, {
           method: initial ? "PUT" : "POST",
           headers: { "content-type": "application/json" },
@@ -127,12 +129,16 @@ export function IdpForm({
       </div>
 
       <div>
-        <Label htmlFor="issuer">{protocol === "oidc" ? t("oidc_issuer") : t("saml_entry_point")}</Label>
+        <Label htmlFor="issuer">
+          {protocol === "oidc" ? t("oidc_issuer") : t("saml_entry_point")}
+        </Label>
         <Input
           id="issuer"
           value={issuer}
           onChange={(e) => setIssuer(e.target.value)}
-          placeholder={protocol === "oidc" ? "https://idp.example.com" : "https://idp.example.com/sso"}
+          placeholder={
+            protocol === "oidc" ? "https://idp.example.com" : "https://idp.example.com/sso"
+          }
           className="mt-1"
         />
       </div>

@@ -88,9 +88,7 @@ export const learnerImportRecords = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (t) => [
-    uniqueIndex("idx_learner_import_records_unique").on(t.schoolId, t.externalId),
-  ],
+  (t) => [uniqueIndex("idx_learner_import_records_unique").on(t.schoolId, t.externalId)],
 );
 
 export type AdminClassroomRow = typeof adminClassrooms.$inferSelect;

@@ -13,4 +13,3 @@ describe("useSse", () => {
     expect(typeof useSse).toBe("function");
   });
 });
-

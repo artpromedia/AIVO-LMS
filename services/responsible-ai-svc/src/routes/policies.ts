@@ -45,13 +45,15 @@ export function registerPolicyRegistryRoutes(app: FastifyInstance): void {
         name: b.name ?? existing?.name ?? request.params.id,
         scopeLevel: b.scopeLevel ?? existing?.scopeLevel ?? "platform",
         scopeId: b.scopeId ?? existing?.scopeId ?? null,
-        contentSafety: b.contentSafety ?? existing?.contentSafety ?? {
-          blockedCategories: [],
-          maxSeverity: "low",
-        },
-        ageGating: b.ageGating ?? existing?.ageGating ?? { minAge: null, requireGuardianConsent: false },
-        regionRestrictions:
-          b.regionRestrictions ?? existing?.regionRestrictions ?? { allowedRegions: [], blockedRegions: [] },
+        contentSafety: b.contentSafety ??
+          existing?.contentSafety ?? {
+            blockedCategories: [],
+            maxSeverity: "low",
+          },
+        ageGating: b.ageGating ??
+          existing?.ageGating ?? { minAge: null, requireGuardianConsent: false },
+        regionRestrictions: b.regionRestrictions ??
+          existing?.regionRestrictions ?? { allowedRegions: [], blockedRegions: [] },
         enabled: b.enabled ?? existing?.enabled ?? true,
         updatedAt: now,
         updatedBy: actor.actorId ?? "platform_admin",

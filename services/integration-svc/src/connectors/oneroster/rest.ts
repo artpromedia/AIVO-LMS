@@ -137,7 +137,14 @@ export function mapUser(r: Record<string, any>): User {
   if (Array.isArray(r.roles)) roles = r.roles.map((x: any) => asRole(x.role ?? x.roleType));
   if (roles.length === 0 && r.role) roles = [asRole(r.role)];
   if (roles.length === 0) roles = ["student"];
-  const precedence: RoleType[] = ["administrator", "teacher", "aide", "guardian", "parent", "student"];
+  const precedence: RoleType[] = [
+    "administrator",
+    "teacher",
+    "aide",
+    "guardian",
+    "parent",
+    "student",
+  ];
   const primaryRole = precedence.find((p) => roles.includes(p)) ?? roles[0];
   return {
     provider: "oneroster",

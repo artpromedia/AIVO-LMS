@@ -54,7 +54,7 @@ rests on having verified the requester.
 A DSAR is admissible from anyone with a **verified identity**. Confirm
 the requester's identity is verified in identity-svc and that the
 `subject_id` on the request is the requester's own subject (or one they
-are authorised to act for, below). A request to act on *someone else's*
+are authorised to act for, below). A request to act on _someone else's_
 data without an authorised relationship is a **reject**, with the reason
 recorded.
 
@@ -121,7 +121,7 @@ subscriber runs `POST /__governance/erase` (purge or anonymize by
 Note: **audit-svc anonymizes, it does not delete** (ADR 0034 §4). Its
 `/__governance/erase` strips actor-identifying fields in place while
 preserving the hash chain. "Zero records remaining" does **not** apply to
-audit-svc — for it, the correct end state is *anonymized-only*.
+audit-svc — for it, the correct end state is _anonymized-only_.
 
 ## Diagnose — when the fan-out doesn't reconcile
 
@@ -160,7 +160,7 @@ either never received the event or errored inside `/__governance/erase`.
 
 ### 3. Checksum mismatch
 
-For services that *did* confirm, compare the reported checksum / counts
+For services that _did_ confirm, compare the reported checksum / counts
 against expectation. A `subject.erasure.completed` whose checksum does
 not reconcile means the service ran but **purged/anonymized a different
 record set than the orchestrator expected** — investigate that service's

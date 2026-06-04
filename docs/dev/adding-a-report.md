@@ -35,10 +35,7 @@ step 2 on registration). A complete, self-contained definition:
  * teachers per school. Honours ctx.allowedTenantIds (never reads a tenant
  * outside the caller's scope).
  */
-import type {
-  ReportDefinition,
-  ReportResolverContext,
-} from "./types.js";
+import type { ReportDefinition, ReportResolverContext } from "./types.js";
 import { SEED_TENANTS } from "./seed-data.js";
 
 const OWNER = "School Insights — school-insights@aivo.example";
@@ -90,17 +87,12 @@ export const teacherActivity: ReportDefinition = {
       const activeTeachers = t.teachers ?? 0;
       // Stand-in derivation against seed data; a real resolver would query
       // engagement-svc for the chosen window.
-      const weeklyActive =
-        window === "30d"
-          ? activeTeachers
-          : Math.round(activeTeachers * 0.7);
+      const weeklyActive = window === "30d" ? activeTeachers : Math.round(activeTeachers * 0.7);
       return {
         name: t.name,
         activeTeachers,
         weeklyActive,
-        activeRate: activeTeachers
-          ? Math.round((weeklyActive / activeTeachers) * 100)
-          : 0,
+        activeRate: activeTeachers ? Math.round((weeklyActive / activeTeachers) * 100) : 0,
       };
     });
     return {
@@ -121,9 +113,9 @@ export const teacherActivity: ReportDefinition = {
 
 Notes on the fields you'll most often get wrong:
 
-- **`scopes`** controls who *sees* and *runs* it. `["school"]` means school,
+- **`scopes`** controls who _sees_ and _runs_ it. `["school"]` means school,
   district, and platform admins can run it (caller scope ≥ report scope), but
-  it appears in the school catalog. Set the *lowest* tier that should own it.
+  it appears in the school catalog. Set the _lowest_ tier that should own it.
 - **`params` types** are validated by the engine (`validateParams` in
   `src/runners/engine.ts`): `required`, `enum` `options`, and `default` are
   all enforced before your resolver runs. A `tenantId` param is additionally
@@ -177,12 +169,8 @@ describe("teacher-activity report", () => {
   // 1) Param validation — required tenantId, enum window.
   it("requires tenantId and rejects a bad window", () => {
     expect(validateParams(def, {}).ok).toBe(false);
-    expect(
-      validateParams(def, { tenantId: "t-1", window: "99d" }).ok,
-    ).toBe(false);
-    expect(
-      validateParams(def, { tenantId: "t-1", window: "7d" }).ok,
-    ).toBe(true);
+    expect(validateParams(def, { tenantId: "t-1", window: "99d" }).ok).toBe(false);
+    expect(validateParams(def, { tenantId: "t-1", window: "7d" }).ok).toBe(true);
   });
 
   // 2) Scope/tenant — resolver must not read outside allowedTenantIds.

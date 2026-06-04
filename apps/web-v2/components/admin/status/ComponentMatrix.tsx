@@ -2,7 +2,9 @@ import { Badge } from "@/components/ui/badge";
 
 type ComponentStatus = string;
 
-function statusTone(status: ComponentStatus): "success" | "primary" | "warning" | "danger" | "neutral" {
+function statusTone(
+  status: ComponentStatus,
+): "success" | "primary" | "warning" | "danger" | "neutral" {
   switch (status) {
     case "operational":
       return "success";
@@ -43,7 +45,10 @@ export function ComponentMatrix({
 }: {
   components: Array<{ id: string; name: string; group: string; status: string }>;
 }) {
-  const groups = new Map<string, Array<{ id: string; name: string; group: string; status: string }>>();
+  const groups = new Map<
+    string,
+    Array<{ id: string; name: string; group: string; status: string }>
+  >();
   for (const c of components) {
     const key = c.group || "Other";
     const arr = groups.get(key) ?? [];

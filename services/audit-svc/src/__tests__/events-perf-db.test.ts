@@ -108,7 +108,9 @@ describeFn("audit event store @ DB scale (1M rows)", () => {
       const p95 = samples[Math.floor(samples.length * 0.95)];
       const p99 = samples[Math.floor(samples.length * 0.99)];
       // eslint-disable-next-line no-console
-      console.log(`[perf] query p50=${p50}ms p95=${p95}ms p99=${p99}ms over ${QUERY_SAMPLES} samples`);
+      console.log(
+        `[perf] query p50=${p50}ms p95=${p95}ms p99=${p99}ms over ${QUERY_SAMPLES} samples`,
+      );
       expect(p95).toBeLessThan(P95_BUDGET_MS);
     },
     // Generous timeout — 1M serial appends + 100 queries.

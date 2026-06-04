@@ -28,9 +28,7 @@ export function partitionsToPrune(
   const cutoff = new Date(now.getTime() - minDays * 24 * 60 * 60 * 1000);
   // The partition's month must END before the cutoff to be fully expired.
   const cutoffSuffix = partitionSuffix(cutoff);
-  return existingSuffixes
-    .filter((s) => /^\d{6}$/.test(s) && s < cutoffSuffix)
-    .sort();
+  return existingSuffixes.filter((s) => /^\d{6}$/.test(s) && s < cutoffSuffix).sort();
 }
 
 export interface PartitionArchiver {

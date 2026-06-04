@@ -25,7 +25,9 @@ export function AuditTable({
       <caption className="sr-only">{t("table_caption")}</caption>
       <thead>
         <tr className="text-left text-xs text-aivo-ink-soft">
-          <th scope="col" className="py-1">{t("col_time")}</th>
+          <th scope="col" className="py-1">
+            {t("col_time")}
+          </th>
           <th scope="col">{t("col_actor")}</th>
           <th scope="col">{t("col_action")}</th>
           <th scope="col">{t("col_entity")}</th>
@@ -54,9 +56,15 @@ export function AuditTable({
               <span className="font-medium">{e.actor.id}</span>{" "}
               <span className="text-xs text-aivo-ink-soft">{e.actor.role}</span>
             </td>
-            <td><code className="text-xs">{e.action}</code></td>
-            <td className="text-xs">{e.entity.type}/{e.entity.id}</td>
-            <td><Badge tone={e.outcome === "success" ? "success" : "danger"}>{e.outcome}</Badge></td>
+            <td>
+              <code className="text-xs">{e.action}</code>
+            </td>
+            <td className="text-xs">
+              {e.entity.type}/{e.entity.id}
+            </td>
+            <td>
+              <Badge tone={e.outcome === "success" ? "success" : "danger"}>{e.outcome}</Badge>
+            </td>
             <td className="text-xs">{e.actor.ip}</td>
           </tr>
         ))}

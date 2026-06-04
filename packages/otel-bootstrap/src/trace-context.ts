@@ -63,7 +63,8 @@ export function startSpanContext(): SpanContext {
  * context represents *this* service's span.
  */
 export function contextFromHeaders(headers: Record<string, unknown>): SpanContext {
-  const traceparent = typeof headers["traceparent"] === "string" ? headers["traceparent"] : undefined;
+  const traceparent =
+    typeof headers["traceparent"] === "string" ? headers["traceparent"] : undefined;
   return parseTraceparent(traceparent) ?? startSpanContext();
 }
 

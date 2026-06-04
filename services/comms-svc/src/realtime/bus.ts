@@ -73,7 +73,10 @@ export function _resetInProcessBusForTest(): void {
 
 interface NatsLikeConnection {
   publish(subject: string, data: Uint8Array): void;
-  subscribe(subject: string, opts?: { callback?: (err: unknown, msg: unknown) => void }): {
+  subscribe(
+    subject: string,
+    opts?: { callback?: (err: unknown, msg: unknown) => void },
+  ): {
     unsubscribe(): void;
   };
   drain(): Promise<void>;

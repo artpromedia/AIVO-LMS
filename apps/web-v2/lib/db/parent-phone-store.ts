@@ -161,7 +161,10 @@ export function verifyPhoneChallenge(userId: ID, code: string, now = Date.now())
   if (!match) {
     c.attempts += 1;
     if (c.attempts >= PHONE_MAX_ATTEMPTS) t.challenges.delete(userId);
-    return { ok: false, reason: c.attempts >= PHONE_MAX_ATTEMPTS ? "too_many_attempts" : "mismatch" };
+    return {
+      ok: false,
+      reason: c.attempts >= PHONE_MAX_ATTEMPTS ? "too_many_attempts" : "mismatch",
+    };
   }
   t.challenges.delete(userId);
   t.verified.set(userId, { phone: c.phone, verifiedAt: new Date(now).toISOString() });

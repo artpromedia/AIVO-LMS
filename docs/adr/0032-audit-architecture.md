@@ -66,13 +66,13 @@ entityId, from, to, free-text `q`; cursor paging), `GET /events/:id`
 web admin console (platform/district/school) injects scope **server-side**
 in the BFF so a client cannot widen its view:
 
-| Action | platform | district | school |
-|---|---|---|---|
-| View global | ✅ | ❌ | ❌ |
-| View district | ✅ | ✅ (own) | ❌ |
-| View school | ✅ | ✅ (in district) | ✅ (own) |
-| Export | ✅ | ✅ (own, ≤10k) | ✅ (own, ≤10k) |
-| Hash-chain proof | ✅ | ✅ | ❌ |
+| Action           | platform | district         | school         |
+| ---------------- | -------- | ---------------- | -------------- |
+| View global      | ✅       | ❌               | ❌             |
+| View district    | ✅       | ✅ (own)         | ❌             |
+| View school      | ✅       | ✅ (in district) | ✅ (own)       |
+| Export           | ✅       | ✅ (own, ≤10k)   | ✅ (own, ≤10k) |
+| Hash-chain proof | ✅       | ✅               | ❌             |
 
 ### Retention
 
@@ -91,6 +91,7 @@ with proof, export) + RBAC BFF + i18n (10 locales). tsc/eslint/route-audit
 clean.
 
 **Now also delivered (verified):**
+
 - `audit.emit`/`@audited` wiring via `installAuditing(app)` — live in
   **integration-svc** (SIS connect/disconnect/sync), **billing-svc**
   (subscription change, add-on removal), and **admin-svc** (API-key
@@ -107,6 +108,7 @@ clean.
   `<60s` DoD on the in-memory path.
 
 **Still tracked** (genuinely need live Postgres/Redis/object-lock):
+
 - `@audited` annotations on the remaining producers' routes
   (**identity-svc**, **tenant-svc**, **data-governance-svc** — identical
   one-line `installAuditing(app)` + per-route `audited(...)`, the pattern is

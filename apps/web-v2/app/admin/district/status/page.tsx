@@ -52,9 +52,11 @@ export default async function Page() {
         eyebrow="District · Reliability"
         title="Service status"
         description="Health of the services your district relies on, plus any active incidents that affect you."
-        actions={<Badge tone={healthTone(health.overall)}>
-          <span className="capitalize">{String(health.overall).replace(/_/g, " ")}</span>
-        </Badge>}
+        actions={
+          <Badge tone={healthTone(health.overall)}>
+            <span className="capitalize">{String(health.overall).replace(/_/g, " ")}</span>
+          </Badge>
+        }
       />
 
       <Card className="p-[var(--aivo-density-card-pad)]">
@@ -66,7 +68,7 @@ export default async function Page() {
         <div className="border-b border-iw-border p-[var(--aivo-density-card-pad)]">
           <p className="font-iw-display text-lg font-semibold text-iw-ink">Health signals</p>
         </div>
-        {(!health.signals || health.signals.length === 0) ? (
+        {!health.signals || health.signals.length === 0 ? (
           <EmptyState
             title="No signals"
             description="No tenant-scoped health signals are currently reported."
@@ -89,7 +91,9 @@ export default async function Page() {
                   <td className="px-4 py-3 tabular-nums">{pct(s.target)}</td>
                   <td className="px-4 py-3">
                     <Badge tone={healthTone(s.status)}>
-                      <span className="capitalize">{String(s.status ?? "").replace(/_/g, " ")}</span>
+                      <span className="capitalize">
+                        {String(s.status ?? "").replace(/_/g, " ")}
+                      </span>
                     </Badge>
                   </td>
                 </tr>
@@ -100,9 +104,7 @@ export default async function Page() {
       </Card>
 
       <Card className="mt-6 p-[var(--aivo-density-card-pad)]">
-        <p className="mb-4 font-iw-display text-lg font-semibold text-iw-ink">
-          Active incidents
-        </p>
+        <p className="mb-4 font-iw-display text-lg font-semibold text-iw-ink">Active incidents</p>
         {summary.activeIncidents.length === 0 ? (
           <p className="text-sm text-iw-ink-muted">No active incidents affecting your district.</p>
         ) : (

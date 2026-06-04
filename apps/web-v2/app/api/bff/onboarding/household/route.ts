@@ -4,11 +4,7 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import {
-  isCommsSvcEnabled,
-  getCommsBearer,
-  sendCoParentInviteSvc,
-} from "@/lib/bff/comms-svc";
+import { isCommsSvcEnabled, getCommsBearer, sendCoParentInviteSvc } from "@/lib/bff/comms-svc";
 import {
   addCoParentInvite,
   getHousehold,
@@ -108,7 +104,9 @@ export async function POST(req: Request): Promise<NextResponse> {
       let via: "email" | "dev" = "dev";
       const bearer = await getCommsBearer();
       if (isCommsSvcEnabled() && bearer) {
-        const r = await sendCoParentInviteSvc(bearer, coParentEmail, { inviterName: session.email });
+        const r = await sendCoParentInviteSvc(bearer, coParentEmail, {
+          inviterName: session.email,
+        });
         if (r.ok && r.data.status === "sent") via = "email";
       }
       audit(session, "household.coparent.invited", requestId, { metadata: { via } });

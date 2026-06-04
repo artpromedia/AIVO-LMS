@@ -20,9 +20,18 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: Database | un
       // subjectId is a userId for familySettings; for AAC tables it's a
       // learnerId. We attempt both interpretations.
       const [famSettings, aacSync, aacVocab] = await Promise.all([
-        db.delete(familySettings).where(eq(familySettings.userId, uid)).returning({ id: familySettings.id }),
-        db.delete(aacSyncState).where(eq(aacSyncState.learnerId, uid)).returning({ id: aacSyncState.id }),
-        db.delete(aacVocabulary).where(eq(aacVocabulary.learnerId, uid)).returning({ id: aacVocabulary.id }),
+        db
+          .delete(familySettings)
+          .where(eq(familySettings.userId, uid))
+          .returning({ id: familySettings.id }),
+        db
+          .delete(aacSyncState)
+          .where(eq(aacSyncState.learnerId, uid))
+          .returning({ id: aacSyncState.id }),
+        db
+          .delete(aacVocabulary)
+          .where(eq(aacVocabulary.learnerId, uid))
+          .returning({ id: aacVocabulary.id }),
       ]);
 
       return {

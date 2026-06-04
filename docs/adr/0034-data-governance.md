@@ -98,7 +98,7 @@ unreachable from the public edge:
 The orchestrator never reaches into another service's tables. It
 publishes an event; the owning service acts on its own data and reports
 back. This is a **contract, not a query**: the orchestrator knows the
-*shape* of the response (checksum + counts for erase; a JSON bundle for
+_shape_ of the response (checksum + counts for erase; a JSON bundle for
 export), not the internal schema behind it.
 
 ### 3. Event-driven fan-out with checksum reconciliation
@@ -132,8 +132,8 @@ So audit-svc's `POST /__governance/erase` **anonymizes actor-identifying
 fields** (actor id, ip hash, user-agent hash, any subject-linking
 columns) **in place, while preserving the hash chain**: the row count,
 ordering, `prevHash`/`hash` links, and `action`/`occurredAt` are
-untouched. After erasure, the audit log still proves *that* an action
-occurred and *when*, but no longer ties it to the erased subject. This
+untouched. After erasure, the audit log still proves _that_ an action
+occurred and _when_, but no longer ties it to the erased subject. This
 is the lawful-basis exception we rely on (retention of a tamper-evident
 security/compliance log) and is documented as such in
 `docs/legal/privacy-program.md`.
@@ -208,7 +208,7 @@ step-up policy used in ADR 0033.
   exactly what a regulator or DPA audit asks for.
 - The audit chain survives erasure, so tamper-evidence and SOC 2
   posture are preserved even as subject data is removed.
-- Retention is correct *per data class* — IEPs, chat, audit hashes, and
+- Retention is correct _per data class_ — IEPs, chat, audit hashes, and
   invoices each follow their own lawful window — and the catalog keeps
   the fan-out manifest honest.
 - Enforcing the stricter (30-day) SLA means we never under-comply when
@@ -238,7 +238,7 @@ step-up policy used in ADR 0033.
 **Neutral / follow-ups**
 
 - Cross-regime SLA edge cases (a subject under both GDPR and a state law
-  with a *shorter* statutory window than 30 days) reduce to the same
+  with a _shorter_ statutory window than 30 days) reduce to the same
   "enforce the strictest" rule but should be re-checked as state laws
   evolve; the privacy program doc tracks scope.
 - A reconciliation job that periodically re-asserts erasure (re-issues
@@ -279,7 +279,7 @@ step-up policy used in ADR 0033.
 - **Mutable consent (update-in-place).** Store one consent row per
   subject/type and overwrite on grant/revoke. Rejected for the same
   reason as mutable seat allocations in ADR 0033: it loses the history
-  needed to prove consent *existed at the time data was collected*,
+  needed to prove consent _existed at the time data was collected_,
   which COPPA verifiable-parental-consent audits require. The ledger is
   append-only.
 - **Honour the laxer SLA (45 days) uniformly.** Simpler, but

@@ -12,9 +12,7 @@ import assert from "node:assert/strict";
 import Fastify from "fastify";
 import { signJWT } from "@aivo/security";
 import { templateCsv } from "@aivo/learner-import";
-import {
-  registerClassroomRoutes,
-} from "../src/routes/classrooms.js";
+import { registerClassroomRoutes } from "../src/routes/classrooms.js";
 import { registerNotificationRoutes } from "../src/routes/notifications.js";
 import { registerLearnerImportRoutes } from "../src/routes/learner-import.js";
 import { InMemoryClassroomStore, selectClassroomStore } from "../src/stores/classroom-store.js";

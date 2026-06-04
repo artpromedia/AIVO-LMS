@@ -77,57 +77,55 @@ export function registerReportRoutes(app: FastifyInstance): void {
   });
 
   // ── Run ───────────────────────────────────────────────────────────────
-  app.post<{ Params: { id: string }; Body: { params?: Record<string, unknown>; format?: ReportFormat } }>(
-    "/api/reports/:id/run",
-    async (request, reply) => {
-      const caller = resolveCallerScope(request);
-      if (!caller.scope) return reply.code(403).send({ error: "No reporting scope" });
-      const def = getReport(request.params.id);
-      if (!def) return reply.code(404).send({ error: "Report not found" });
+  app.post<{
+    Params: { id: string };
+    Body: { params?: Record<string, unknown>; format?: ReportFormat };
+  }>("/api/reports/:id/run", async (request, reply) => {
+    const caller = resolveCallerScope(request);
+    if (!caller.scope) return reply.code(403).send({ error: "No reporting scope" });
+    const def = getReport(request.params.id);
+    if (!def) return reply.code(404).send({ error: "Report not found" });
 
-      const body = request.body ?? {};
-      const input = {
-        def,
-        rawParams: body.params ?? {},
-        format: body.format,
-        tenantId: caller.tenantId ?? null,
-        allowedTenantIds: caller.allowedTenantIds,
-        callerScope: caller.scope,
-        requestedBy: caller.actorId ?? "unknown",
-      };
+    const body = request.body ?? {};
+    const input = {
+      def,
+      rawParams: body.params ?? {},
+      format: body.format,
+      tenantId: caller.tenantId ?? null,
+      allowedTenantIds: caller.allowedTenantIds,
+      callerScope: caller.scope,
+      requestedBy: caller.actorId ?? "unknown",
+    };
 
-      const prepared = prepareRun(input);
-      if (!prepared.ok) {
-        return reply
-          .code(prepared.status)
-          .send({ error: prepared.code, errors: prepared.errors });
-      }
+    const prepared = prepareRun(input);
+    if (!prepared.ok) {
+      return reply.code(prepared.status).send({ error: prepared.code, errors: prepared.errors });
+    }
 
-      // Charge quota only for a request that will actually run.
-      const quota = incrementQuota(store, caller.tenantId ?? null);
-      if (!quota.ok) {
-        return reply
-          .code(429)
-          .send({ error: "QUOTA_EXCEEDED", limit: quota.limit, used: quota.count });
-      }
+    // Charge quota only for a request that will actually run.
+    const quota = incrementQuota(store, caller.tenantId ?? null);
+    if (!quota.ok) {
+      return reply
+        .code(429)
+        .send({ error: "QUOTA_EXCEEDED", limit: quota.limit, used: quota.count });
+    }
 
-      const run = await executeRun(input, prepared);
+    const run = await executeRun(input, prepared);
 
-      emitReportAudit({
-        action: "report.run",
-        actorId: caller.actorId,
-        tenantId: caller.tenantId ?? null,
-        reportId: def.id,
-        resourceId: run.id,
-        details: { params: prepared.params, format: prepared.format, cached: run.cached },
-      });
+    emitReportAudit({
+      action: "report.run",
+      actorId: caller.actorId,
+      tenantId: caller.tenantId ?? null,
+      reportId: def.id,
+      resourceId: run.id,
+      details: { params: prepared.params, format: prepared.format, cached: run.cached },
+    });
 
-      if (run.status === "failed") {
-        return reply.code(500).send({ runId: run.id, status: run.status, error: run.error });
-      }
-      return reply.code(202).send({ runId: run.id, status: run.status, cached: run.cached });
-    },
-  );
+    if (run.status === "failed") {
+      return reply.code(500).send({ runId: run.id, status: run.status, error: run.error });
+    }
+    return reply.code(202).send({ runId: run.id, status: run.status, cached: run.cached });
+  });
 
   // ── Run status ──────────────────────────────────────────────────────────
   app.get<{ Params: { runId: string } }>("/api/reports/runs/:runId", async (request, reply) => {
@@ -146,8 +144,7 @@ export function registerReportRoutes(app: FastifyInstance): void {
       lineage: run.lineage,
       createdAt: run.createdAt,
       completedAt: run.completedAt,
-      downloadUrl:
-        run.status === "succeeded" ? `/api/reports/runs/${run.id}/download` : null,
+      downloadUrl: run.status === "succeeded" ? `/api/reports/runs/${run.id}/download` : null,
     };
   });
 
@@ -258,26 +255,23 @@ export function registerReportRoutes(app: FastifyInstance): void {
     return reply.code(201).send({ schedule });
   });
 
-  app.delete<{ Params: { id: string } }>(
-    "/api/reports/schedules/:id",
-    async (request, reply) => {
-      const caller = resolveCallerScope(request);
-      const schedule = store.schedules.get(request.params.id);
-      if (!schedule) return reply.code(404).send({ error: "Schedule not found" });
-      if (caller.scope !== "platform" && schedule.tenantId !== caller.tenantId) {
-        return reply.code(403).send({ error: "Forbidden" });
-      }
-      store.schedules.delete(schedule.id);
-      emitReportAudit({
-        action: "report.schedule.deleted",
-        actorId: caller.actorId,
-        tenantId: caller.tenantId ?? null,
-        reportId: schedule.reportId,
-        resourceId: schedule.id,
-      });
-      return { deleted: true };
-    },
-  );
+  app.delete<{ Params: { id: string } }>("/api/reports/schedules/:id", async (request, reply) => {
+    const caller = resolveCallerScope(request);
+    const schedule = store.schedules.get(request.params.id);
+    if (!schedule) return reply.code(404).send({ error: "Schedule not found" });
+    if (caller.scope !== "platform" && schedule.tenantId !== caller.tenantId) {
+      return reply.code(403).send({ error: "Forbidden" });
+    }
+    store.schedules.delete(schedule.id);
+    emitReportAudit({
+      action: "report.schedule.deleted",
+      actorId: caller.actorId,
+      tenantId: caller.tenantId ?? null,
+      reportId: schedule.reportId,
+      resourceId: schedule.id,
+    });
+    return { deleted: true };
+  });
 }
 
 function canAccessRun(

@@ -143,7 +143,10 @@ export function updateConnector(
 ): SisConnector | null {
   const c = getConnector(id);
   if (!c) return null;
-  Object.assign(c, patch, { mapping: { ...c.mapping, ...(patch.mapping ?? {}) }, updatedAt: nowIso() });
+  Object.assign(c, patch, {
+    mapping: { ...c.mapping, ...(patch.mapping ?? {}) },
+    updatedAt: nowIso(),
+  });
   return c;
 }
 
@@ -205,13 +208,17 @@ export function triggerRun(connectorId: ID, type: SyncType, dryRun: boolean): Sy
   return run;
 }
 
-export function listErrors(connectorId: ID, cursor?: string, pageSize = 20): { errors: SyncError[]; nextCursor: string | null } {
+export function listErrors(
+  connectorId: ID,
+  cursor?: string,
+  pageSize = 20,
+): { errors: SyncError[]; nextCursor: string | null } {
   const all = tables()
     .errors.filter((e) => e.connectorId === connectorId && !e.resolvedAt)
     .sort((a, b) => a.id.localeCompare(b.id));
   const start = cursor ? all.findIndex((e) => e.id === cursor) + 1 : 0;
   const page = all.slice(start, start + pageSize);
-  const nextCursor = start + pageSize < all.length ? page[page.length - 1]?.id ?? null : null;
+  const nextCursor = start + pageSize < all.length ? (page[page.length - 1]?.id ?? null) : null;
   return { errors: page, nextCursor };
 }
 
@@ -267,7 +274,12 @@ function seed(t: Tables): void {
     fullScheduleCron: "0 2 * * *",
     deltaScheduleCron: "0 */4 * * *",
     maxMutationRatio: 0.1,
-    mapping: { emailDomain: "springfield.k12", studentRole: "learner", teacherRole: "teacher", gradeMap: {} },
+    mapping: {
+      emailDomain: "springfield.k12",
+      studentRole: "learner",
+      teacherRole: "teacher",
+      gradeMap: {},
+    },
     createdAt: nowIso(),
     updatedAt: nowIso(),
   };

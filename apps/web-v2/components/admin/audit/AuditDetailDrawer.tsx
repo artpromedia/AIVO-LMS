@@ -43,7 +43,9 @@ export function AuditDetailDrawer({
           <p className="font-display text-lg font-semibold">{t("detail_title")}</p>
           <code className="text-xs text-aivo-ink-soft">{event.id}</code>
         </div>
-        <Button type="button" variant="ghost" size="sm" onClick={onClose} aria-label={t("close")}>✕</Button>
+        <Button type="button" variant="ghost" size="sm" onClick={onClose} aria-label={t("close")}>
+          ✕
+        </Button>
       </div>
 
       <dl className="space-y-2 text-sm">

@@ -15,7 +15,8 @@ export async function GET(req: Request, ctx: Ctx) {
   if ("err" in got) return got.err;
   const { requestId } = got;
   const { connectorId } = await ctx.params;
-  if (!getConnector(connectorId)) return fail({ ...ERRORS.NOT_FOUND, message: "Connector not found" }, requestId);
+  if (!getConnector(connectorId))
+    return fail({ ...ERRORS.NOT_FOUND, message: "Connector not found" }, requestId);
   const cursor = new URL(req.url).searchParams.get("cursor") ?? undefined;
   const { errors, nextCursor } = listErrors(connectorId, cursor);
   return ok({ errors, nextCursor }, requestId);
@@ -41,7 +42,8 @@ export async function POST(req: Request, ctx: Ctx) {
     /* empty body => retry all */
   }
   const parsed = RetrySchema.safeParse(body ?? {});
-  if (!parsed.success) return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
+  if (!parsed.success)
+    return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
 
   const retried = parsed.data.errorId
     ? retryError(connectorId, parsed.data.errorId)

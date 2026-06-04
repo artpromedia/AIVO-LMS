@@ -6,12 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 /** AIVO roles an IdP is permitted to provision via JIT (mirrors identity-svc). */
-export const PROVISIONABLE_ROLES = [
-  "DISTRICT_ADMIN",
-  "TEACHER",
-  "CAREGIVER",
-  "THERAPIST",
-] as const;
+export const PROVISIONABLE_ROLES = ["DISTRICT_ADMIN", "TEACHER", "CAREGIVER", "THERAPIST"] as const;
 
 export type AttributeMappingValue = {
   email: string;

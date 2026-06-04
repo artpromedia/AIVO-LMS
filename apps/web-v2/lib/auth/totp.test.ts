@@ -3,7 +3,14 @@
  * vectors (SHA-1, secret = ASCII "12345678901234567890", 8 digits).
  */
 import { describe, it, expect } from "vitest";
-import { base32Encode, base32Decode, totp, verifyTotp, generateTotpSecret, otpauthUrl } from "./totp";
+import {
+  base32Encode,
+  base32Decode,
+  totp,
+  verifyTotp,
+  generateTotpSecret,
+  otpauthUrl,
+} from "./totp";
 
 const RFC_SECRET = base32Encode(Buffer.from("12345678901234567890"));
 

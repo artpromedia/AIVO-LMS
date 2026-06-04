@@ -12,7 +12,12 @@
  */
 import { test, expect } from "@playwright/test";
 
-const districtCookie = { name: "aivo_mock_session", value: "district_admin", domain: "127.0.0.1", path: "/" };
+const districtCookie = {
+  name: "aivo_mock_session",
+  value: "district_admin",
+  domain: "127.0.0.1",
+  path: "/",
+};
 
 test.describe.configure({ mode: "serial" });
 
@@ -35,7 +40,10 @@ test.describe("SIS roster sync flows", () => {
 
     // The seeded malformed row is shown; retry it and it clears.
     await expect(page.getByText("Missing required field: email")).toBeVisible({ timeout: 15_000 });
-    await page.getByRole("button", { name: /^retry$/i }).first().click();
+    await page
+      .getByRole("button", { name: /^retry$/i })
+      .first()
+      .click();
     await expect(page.getByText(/no errors in the latest run/i)).toBeVisible({ timeout: 15_000 });
   });
 });

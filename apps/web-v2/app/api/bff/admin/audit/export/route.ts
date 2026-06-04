@@ -4,8 +4,18 @@ import { queryAudit, type AuditFilter, type AuditEventView } from "@/lib/db/audi
 export const dynamic = "force-dynamic";
 
 const CSV_COLUMNS = [
-  "id", "occurred_at", "tenant_id", "actor_id", "actor_role", "actor_ip",
-  "action", "entity_type", "entity_id", "outcome", "request_id", "hash",
+  "id",
+  "occurred_at",
+  "tenant_id",
+  "actor_id",
+  "actor_role",
+  "actor_ip",
+  "action",
+  "entity_type",
+  "entity_id",
+  "outcome",
+  "request_id",
+  "hash",
 ] as const;
 
 function cell(v: unknown): string {
@@ -14,9 +24,21 @@ function cell(v: unknown): string {
 }
 function csvRow(e: AuditEventView): string {
   return [
-    e.id, e.occurred_at, e.tenant_id, e.actor.id, e.actor.role, e.actor.ip,
-    e.action, e.entity.type, e.entity.id, e.outcome, e.request_id, e.hash,
-  ].map(cell).join(",");
+    e.id,
+    e.occurred_at,
+    e.tenant_id,
+    e.actor.id,
+    e.actor.role,
+    e.actor.ip,
+    e.action,
+    e.entity.type,
+    e.entity.id,
+    e.outcome,
+    e.request_id,
+    e.hash,
+  ]
+    .map(cell)
+    .join(",");
 }
 
 /**
@@ -35,7 +57,9 @@ export async function GET(req: Request) {
     tenantId: scope.tenantId,
     schoolId: scope.schoolId,
     actorRole: url.searchParams.get("actorRole") ?? undefined,
-    action: url.searchParams.getAll("action").length ? url.searchParams.getAll("action") : undefined,
+    action: url.searchParams.getAll("action").length
+      ? url.searchParams.getAll("action")
+      : undefined,
     from: url.searchParams.get("from") ?? undefined,
     to: url.searchParams.get("to") ?? undefined,
     q: url.searchParams.get("q") ?? undefined,
@@ -53,7 +77,9 @@ export async function GET(req: Request) {
         for (const e of events) controller.enqueue(enc.encode(JSON.stringify(e) + "\n"));
       } else {
         controller.enqueue(enc.encode("["));
-        events.forEach((e, i) => controller.enqueue(enc.encode((i ? "," : "") + JSON.stringify(e))));
+        events.forEach((e, i) =>
+          controller.enqueue(enc.encode((i ? "," : "") + JSON.stringify(e))),
+        );
         controller.enqueue(enc.encode("]"));
       }
       controller.close();

@@ -34,7 +34,7 @@ need:
 
 - **Bulk learner onboarding from a CSV.** An office exports a roster from
   their SIS and needs to create hundreds-to-thousands of learners at
-  once, with the bad rows caught *before* anything is written, not after
+  once, with the bad rows caught _before_ anything is written, not after
   a half-applied import.
 - **Classroom CRUD and roster management.** Sections are the unit
   teachers and learners are assigned to; the school owns them, not the
@@ -80,7 +80,7 @@ for the wizard's dry run. It has three parts:
   - **Warning (non-blocking):** a learner under 13 with no
     `email_parent`. This is a **COPPA** signal (verifiable parental
     consent, ADR 0034) surfaced to the operator, but it is explicitly
-    *not* a hard error — onboarding a learner is not blocked on a parent
+    _not_ a hard error — onboarding a learner is not blocked on a parent
     email being present in the SIS export.
 - **Import engine.** A chunked, **resumable** apply that consumes
   validated rows and creates/updates learners, driven by a persisted
@@ -116,7 +116,7 @@ a progress signal, a status poll) without the infra:
 - **No new infra dependency.** No Redis to provision, secure, or page on.
 - **Resumability via cursor persistence**, not a queue's built-in retry.
   Our durability story is "the cursor is in the database we already run",
-  which is stronger for an *idempotent, restart-safe* import than at-least
+  which is stronger for an _idempotent, restart-safe_ import than at-least
   -once message redelivery would be — redelivery without idempotency is
   exactly the double-apply we must avoid.
 
@@ -169,7 +169,7 @@ of district notification policy, bounded to one tenant.
   4. **Validation report** — the §1 report rendered inline, with a
      **downloadable error CSV** of just the failing rows and their
      reasons, so the office can fix the source and re-upload.
-  5. **Dry-run preview, then confirm** — a preview of what *would* be
+  5. **Dry-run preview, then confirm** — a preview of what _would_ be
      created, then confirm to kick off the **background job**, with
      **progress** and a completion **toast**.
 - **Classroom pages** — classroom CRUD and roster management.
@@ -236,8 +236,7 @@ per-learner noise.
 - **The cursor + idempotent apply is the highest-risk piece.** If apply
   were not truly idempotent on `external_id`, a resume would double-create
   learners. Idempotency is enforced in the apply path and is the
-  invariant to defend in review, the way the pool invariant is in ADR
-  0033.
+  invariant to defend in review, the way the pool invariant is in ADR 0033.
 - **The BullMQ-shaped-but-not-BullMQ contract is a deliberate
   deviation.** It must be documented (this ADR) so a future engineer
   doesn't go looking for a Redis queue that isn't there, and so the swap
@@ -245,7 +244,7 @@ per-learner noise.
 - **The COPPA warning is non-blocking.** Importing a sub-13 learner with
   no parent email succeeds with a warning. That is intentional (it must
   not block onboarding), but it means parent-email completeness is an
-  *operational* follow-up surfaced in the report, not a guarantee the
+  _operational_ follow-up surfaced in the report, not a guarantee the
   import enforces. The verifiable-parental-consent obligation itself lives
   in ADR 0034.
 
@@ -276,7 +275,7 @@ per-learner noise.
   for this sprint: the repo has no Redis, and adding it for one feature
   imports a stateful dependency to provision, secure, and operate. A
   persisted-cursor runner on `@aivo/scheduling` gives resumability that is
-  *stronger* for an idempotent import (database-durable progress) than a
+  _stronger_ for an idempotent import (database-durable progress) than a
   queue's at-least-once redelivery, which without idempotency would cause
   the exact double-apply we must avoid. We kept the **BullMQ-shaped
   contract** so a real queue can be slotted in later without changing

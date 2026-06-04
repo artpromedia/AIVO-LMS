@@ -8,11 +8,7 @@
  * scores from a hash of (modelId, harness, caseId) rather than RNG.
  */
 import { createHash } from "node:crypto";
-import type {
-  EvalHarness,
-  EvalMetricBreakdown,
-  EvalRun,
-} from "./types.js";
+import type { EvalHarness, EvalMetricBreakdown, EvalRun } from "./types.js";
 import { newId } from "./store.js";
 
 const METRICS: Array<keyof EvalMetricBreakdown> = [
@@ -51,7 +47,11 @@ function scoreFor(metric: keyof EvalMetricBreakdown, seed: string): number {
   return Number((0.9 + raw * 0.09).toFixed(4)); // 0.90–0.99
 }
 
-export function runEvalHarness(modelId: string, harness: EvalHarness, triggeredBy: string): EvalRun {
+export function runEvalHarness(
+  modelId: string,
+  harness: EvalHarness,
+  triggeredBy: string,
+): EvalRun {
   const metricsToRun = HARNESS_METRICS[harness];
   const cases: EvalRun["cases"] = [];
   const totals: Record<string, { sum: number; n: number }> = {};

@@ -82,7 +82,9 @@ export function registerComponentRoutes(app: FastifyInstance): void {
       if (!store.components.delete(request.params.id)) {
         return reply.code(404).send({ error: "Component not found" });
       }
-      await emitStatusAudit(request, "STATUS_COMPONENT_CHANGED", request.params.id, { op: "delete" });
+      await emitStatusAudit(request, "STATUS_COMPONENT_CHANGED", request.params.id, {
+        op: "delete",
+      });
       return { removed: true };
     },
   );

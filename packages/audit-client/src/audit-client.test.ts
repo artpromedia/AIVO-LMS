@@ -18,21 +18,31 @@ describe("uuidv7", () => {
 
 describe("redactDetails", () => {
   it("keeps only allowlisted keys", () => {
-    const out = redactDetails({ protocol: "saml", clientSecret: "x", email: "a@b" }, ["protocol", "email"]);
+    const out = redactDetails({ protocol: "saml", clientSecret: "x", email: "a@b" }, [
+      "protocol",
+      "email",
+    ]);
     expect(out).toEqual({ protocol: "saml", email: "a@b" });
   });
   it("masks an allowlisted-but-secret key as defense in depth", () => {
     expect(redactDetails({ token: "abc" }, ["token"])).toEqual({ token: "[REDACTED]" });
   });
   it("maskSecrets recurses", () => {
-    expect(maskSecrets({ a: 1, nested: { password: "p" } })).toEqual({ a: 1, nested: { password: "[REDACTED]" } });
+    expect(maskSecrets({ a: 1, nested: { password: "p" } })).toEqual({
+      a: 1,
+      nested: { password: "[REDACTED]" },
+    });
   });
 });
 
 describe("createAuditClient.emit", () => {
   function fakeTransport() {
     const sent: unknown[] = [];
-    const transport: AuditTransport = { async send(e) { sent.push(e); } };
+    const transport: AuditTransport = {
+      async send(e) {
+        sent.push(e);
+      },
+    };
     return { transport, sent };
   }
 
@@ -57,7 +67,11 @@ describe("createAuditClient.emit", () => {
   it("never throws when the transport fails (best-effort)", async () => {
     const onError = vi.fn();
     const client = createAuditClient({
-      transport: { async send() { throw new Error("down"); } },
+      transport: {
+        async send() {
+          throw new Error("down");
+        },
+      },
       onError,
     });
     await expect(
@@ -77,8 +91,21 @@ describe("createAuditClient.emit", () => {
 describe("HttpAuditTransport", () => {
   it("POSTs to /events with a bearer token", async () => {
     const fetchImpl = vi.fn(async () => ({ ok: true, status: 200 }) as Response);
-    const t = new HttpAuditTransport({ url: "https://audit", serviceToken: "svc", fetchImpl: fetchImpl as unknown as typeof fetch });
-    await t.send({ tenant_id: null, actor: { id: "", role: "", ip: "", ua: "" }, action: "a", entity: { type: "", id: "" }, outcome: "success", details: {}, request_id: "", occurred_at: "now" });
+    const t = new HttpAuditTransport({
+      url: "https://audit",
+      serviceToken: "svc",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await t.send({
+      tenant_id: null,
+      actor: { id: "", role: "", ip: "", ua: "" },
+      action: "a",
+      entity: { type: "", id: "" },
+      outcome: "success",
+      details: {},
+      request_id: "",
+      occurred_at: "now",
+    });
     const [url, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
     expect(url).toBe("https://audit/events");
     expect((init.headers as Record<string, string>).authorization).toBe("Bearer svc");
@@ -88,9 +115,19 @@ describe("HttpAuditTransport", () => {
 describe("audited + registerAuditHook", () => {
   it("emits with success on 2xx and failure on 4xx/5xx, deriving actor/tenant", async () => {
     const sent: any[] = [];
-    const client = createAuditClient({ transport: { async send(e) { sent.push(e); } } });
+    const client = createAuditClient({
+      transport: {
+        async send(e) {
+          sent.push(e);
+        },
+      },
+    });
     let hook!: (req: AuditedRequestLike, reply: { statusCode: number }) => unknown;
-    const app = { addHook: (_n: "onResponse", fn: typeof hook) => { hook = fn; } };
+    const app = {
+      addHook: (_n: "onResponse", fn: typeof hook) => {
+        hook = fn;
+      },
+    };
     registerAuditHook(app, client);
 
     const cfg = audited("identity.user.role.granted", {
@@ -122,9 +159,22 @@ describe("audited + registerAuditHook", () => {
 
   it("ignores routes without an audit config", async () => {
     const sent: any[] = [];
-    const client = createAuditClient({ transport: { async send(e) { sent.push(e); } } });
+    const client = createAuditClient({
+      transport: {
+        async send(e) {
+          sent.push(e);
+        },
+      },
+    });
     let hook!: (req: AuditedRequestLike, reply: { statusCode: number }) => unknown;
-    registerAuditHook({ addHook: (_n, fn) => { hook = fn; } }, client);
+    registerAuditHook(
+      {
+        addHook: (_n, fn) => {
+          hook = fn;
+        },
+      },
+      client,
+    );
     await hook({ method: "GET", url: "/x", headers: {} }, { statusCode: 200 });
     expect(sent).toHaveLength(0);
   });
@@ -151,13 +201,23 @@ describe("createServiceAuditClient / installAuditing", () => {
     const { audited } = await import("./audited.js");
     const sent: any[] = [];
     let hook!: (req: any, reply: any) => unknown;
-    const app = { addHook: (_n: "onResponse", fn: typeof hook) => { hook = fn; } };
+    const app = {
+      addHook: (_n: "onResponse", fn: typeof hook) => {
+        hook = fn;
+      },
+    };
     // Point at a fake transport via fetchImpl + url so it's HTTP-backed.
     const fetchImpl = (async () => ({ ok: true, status: 200 })) as unknown as typeof fetch;
     installAuditing(app, { url: "https://audit", serviceToken: "svc", fetchImpl });
     const cfg = audited("tenant.updated", { entityType: "tenant", entityId: () => "t1" });
     await hook(
-      { method: "PUT", url: "/t1", headers: { "x-request-id": "r1" }, routeOptions: { config: cfg.config }, enterpriseContext: { actorId: "a", tenant: { tenantId: "t1", role: "platform_admin" } } },
+      {
+        method: "PUT",
+        url: "/t1",
+        headers: { "x-request-id": "r1" },
+        routeOptions: { config: cfg.config },
+        enterpriseContext: { actorId: "a", tenant: { tenantId: "t1", role: "platform_admin" } },
+      },
       { statusCode: 200 },
     );
     // fetch was invoked (HTTP transport) — assert no throw + hook ran.

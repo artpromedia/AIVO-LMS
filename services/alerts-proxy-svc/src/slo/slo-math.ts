@@ -53,7 +53,8 @@ export function computeErrorBudget(input: BudgetInput): BudgetResult {
   const errorBudget = totalEvents * (1 - input.target);
   const consumed = input.badEvents;
   const remaining = errorBudget - consumed;
-  const consumedFraction = errorBudget === 0 ? (consumed > 0 ? Infinity : 0) : consumed / errorBudget;
+  const consumedFraction =
+    errorBudget === 0 ? (consumed > 0 ? Infinity : 0) : consumed / errorBudget;
   const observedSli = totalEvents === 0 ? 1 : input.goodEvents / totalEvents;
   return {
     totalEvents,
@@ -81,10 +82,7 @@ export function burnRate(target: number, badRate: number): number {
  * Hours until the error budget is exhausted at the current burn rate.
  * Returns Infinity when not burning.
  */
-export function timeToExhaustionHours(
-  windowDays: number,
-  burn: number,
-): number {
+export function timeToExhaustionHours(windowDays: number, burn: number): number {
   if (burn <= 0) return Infinity;
   const windowHours = windowDays * 24;
   return round(windowHours / burn);

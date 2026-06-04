@@ -43,10 +43,7 @@ export async function PUT(
     const { id } = await ctx.params;
     const parsed = putSchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: "Invalid update payload." },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: "Invalid update payload." }, requestId);
     }
 
     const bearer = await getAdminBearer();

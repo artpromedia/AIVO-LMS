@@ -9,13 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import type { ScimTokenPreview } from "@/lib/db/idp-store";
 
-export function ScimTokenCard({
-  idpId,
-  tokens,
-}: {
-  idpId: string;
-  tokens: ScimTokenPreview[];
-}) {
+export function ScimTokenCard({ idpId, tokens }: { idpId: string; tokens: ScimTokenPreview[] }) {
   const router = useRouter();
   const t = useTranslations("admin.identity");
   const [label, setLabel] = useState("");
@@ -95,7 +89,10 @@ export function ScimTokenCard({
       </div>
 
       {issued ? (
-        <div className="rounded-md border border-aivo-success bg-aivo-success-soft p-3" role="status">
+        <div
+          className="rounded-md border border-aivo-success bg-aivo-success-soft p-3"
+          role="status"
+        >
           <p className="text-sm font-semibold">{t("token_issued_once")}</p>
           <code className="mt-2 block break-all rounded bg-aivo-surface px-2 py-1 text-xs">
             {issued}

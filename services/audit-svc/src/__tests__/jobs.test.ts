@@ -3,7 +3,13 @@ import type { AuditEventInput } from "@aivo/audit-client";
 import { InMemoryEventStore } from "../services/event-store.js";
 import { runAnchorOnce, type WormStore, type AnchorSink } from "../jobs/anchor.js";
 import { runTamperCheckOnce } from "../jobs/tamper.js";
-import { partitionsToPrune, partitionSuffix, runRetentionOnce, FERPA_MIN_DAYS, type PartitionArchiver } from "../jobs/retention.js";
+import {
+  partitionsToPrune,
+  partitionSuffix,
+  runRetentionOnce,
+  FERPA_MIN_DAYS,
+  type PartitionArchiver,
+} from "../jobs/retention.js";
 
 function input(over: Partial<AuditEventInput> = {}): AuditEventInput {
   return {
@@ -28,7 +34,11 @@ describe("anchor job", () => {
 
     const worm: WormStore = { put: vi.fn(async () => ({ ref: "s3://bucket/key#v1" })) };
     const saved: unknown[] = [];
-    const sink: AnchorSink = { save: async (r) => { saved.push(r); } };
+    const sink: AnchorSink = {
+      save: async (r) => {
+        saved.push(r);
+      },
+    };
 
     const rec = await runAnchorOnce(store, worm, sink, {
       windowStart: "2026-01-01T00:00:00.000Z",
@@ -53,7 +63,9 @@ describe("tamper job", () => {
     expect(await runTamperCheckOnce(store, { alert })).toBeNull();
     expect(alert).not.toHaveBeenCalled();
 
-    store._tamper(t.id, (e) => { e.details = { tampered: true }; });
+    store._tamper(t.id, (e) => {
+      e.details = { tampered: true };
+    });
     const brk = await runTamperCheckOnce(store, { alert });
     expect(brk?.id).toBe("victim");
     expect(alert).toHaveBeenCalledOnce();
@@ -78,8 +90,12 @@ describe("retention job", () => {
     const order: string[] = [];
     const archiver: PartitionArchiver = {
       listPartitions: async () => ["201801", "201802"],
-      archive: async (s) => { order.push(`archive:${s}`); },
-      drop: async (s) => { order.push(`drop:${s}`); },
+      archive: async (s) => {
+        order.push(`archive:${s}`);
+      },
+      drop: async (s) => {
+        order.push(`drop:${s}`);
+      },
     };
     const res = await runRetentionOnce(archiver, { now: new Date("2030-01-01T00:00:00Z") });
     expect(res.pruned).toEqual(["201801", "201802"]);

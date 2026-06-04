@@ -37,31 +37,31 @@ The definition is the single source of truth for the catalog, the
 auto-generated param form, the column schema, the resolver, caching, and
 governance metadata:
 
-| Field | Purpose |
-|---|---|
-| `id`, `title`, `description`, `category` | Catalog identity & grouping. |
-| `scopes[]` | Which admin tiers the report belongs to (`platform`/`district`/`school`). |
-| `params[]` | Typed inputs (`string`/`number`/`boolean`/`date`/`enum`/`tenantId`) → drive validation + the UI form. |
-| `columns[]` | Typed output schema (`string`/`number`/`date`/`currency`/`percent`) → encoders + headers. |
-| `resolve(ctx)` | Pure-ish resolver returning `{ rows, sources }`; **must honour `ctx.allowedTenantIds`**. |
-| `defaultFormat` | `csv`/`json`/`parquet`/`pdf`. |
-| `cacheTtl` | Result-cache TTL (seconds) keyed on `reportId+params+tenant+format`. |
-| `owner`, `lastReviewed` | Governance — a named owner and a last-reviewed date (DoD requirement). |
+| Field                                    | Purpose                                                                                               |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `id`, `title`, `description`, `category` | Catalog identity & grouping.                                                                          |
+| `scopes[]`                               | Which admin tiers the report belongs to (`platform`/`district`/`school`).                             |
+| `params[]`                               | Typed inputs (`string`/`number`/`boolean`/`date`/`enum`/`tenantId`) → drive validation + the UI form. |
+| `columns[]`                              | Typed output schema (`string`/`number`/`date`/`currency`/`percent`) → encoders + headers.             |
+| `resolve(ctx)`                           | Pure-ish resolver returning `{ rows, sources }`; **must honour `ctx.allowedTenantIds`**.              |
+| `defaultFormat`                          | `csv`/`json`/`parquet`/`pdf`.                                                                         |
+| `cacheTtl`                               | Result-cache TTL (seconds) keyed on `reportId+params+tenant+format`.                                  |
+| `owner`, `lastReviewed`                  | Governance — a named owner and a last-reviewed date (DoD requirement).                                |
 
 **12 initial reports** ship across the three tiers:
 
-| Scope | Reports |
-|---|---|
-| Platform | `tenant-growth`, `mrr-by-plan`, `dau-wau-mau`, `incident-frequency` |
+| Scope    | Reports                                                                      |
+| -------- | ---------------------------------------------------------------------------- |
+| Platform | `tenant-growth`, `mrr-by-plan`, `dau-wau-mau`, `incident-frequency`          |
 | District | `enrollment-by-school`, `seat-utilization`, `sis-sync-health`, `dsar-status` |
-| School | `enrollment`, `learning-time`, `intervention-summary`, `attendance-proxy` |
+| School   | `enrollment`, `learning-time`, `intervention-summary`, `attendance-proxy`    |
 
 ### 2. Scope model — caller scope ≥ report scope, tenant-param allow-list
 
 Scope is ordered `school < district < platform` (`src/registry/index.ts`,
 `SCOPE_RANK`). A caller may run a report only when **the caller's scope ≥ the
 report's scope** (`scopeAllows`), and the **catalog is filtered** to exactly
-that set (`catalogForScope`) — a school admin never even *sees* a
+that set (`catalogForScope`) — a school admin never even _sees_ a
 district-scope report.
 
 Tenant scoping is independent of the catalog: `resolveCallerScope`
@@ -71,11 +71,11 @@ district → tenants in the district, school → own tenant only). Any
 `ctx.allowedTenantIds` and filter to it, so a forged or out-of-scope tenant
 param cannot widen the result.
 
-| Failure | Code |
-|---|---|
-| Caller scope < report scope (or report not in catalog) | `403 SCOPE_FORBIDDEN` |
-| `tenantId` param outside the caller's allow-list | `403 TENANT_FORBIDDEN` |
-| Daily run quota exceeded | `429` |
+| Failure                                                | Code                   |
+| ------------------------------------------------------ | ---------------------- |
+| Caller scope < report scope (or report not in catalog) | `403 SCOPE_FORBIDDEN`  |
+| `tenantId` param outside the caller's allow-list       | `403 TENANT_FORBIDDEN` |
+| Daily run quota exceeded                               | `429`                  |
 
 ### 3. Run engine — validate → RBAC → cache → resolve → lineage → encode
 
@@ -95,12 +95,12 @@ inline by default and identical to what a worker calls:
 
 ### 4. Format encoders
 
-| Format | Implementation | Notes |
-|---|---|---|
-| `csv` | `encodeCsv` (`src/runners/formats.ts`) | RFC-4180 quoting/escaping. |
-| `json` | `encodeJson` | Rows + column schema. |
-| `parquet` | `encodeParquet` | **Deterministic Parquet container** stand-in (byte-stable for the same rows) until a full columnar writer lands. |
-| `pdf` | `renderReportPdf` (`src/runners/pdf.ts`) | **Branded** PDF via **Playwright** in a separate worker pod; **falls back to HTML** when no browser is available, with per-tenant `Branding`. |
+| Format    | Implementation                           | Notes                                                                                                                                         |
+| --------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `csv`     | `encodeCsv` (`src/runners/formats.ts`)   | RFC-4180 quoting/escaping.                                                                                                                    |
+| `json`    | `encodeJson`                             | Rows + column schema.                                                                                                                         |
+| `parquet` | `encodeParquet`                          | **Deterministic Parquet container** stand-in (byte-stable for the same rows) until a full columnar writer lands.                              |
+| `pdf`     | `renderReportPdf` (`src/runners/pdf.ts`) | **Branded** PDF via **Playwright** in a separate worker pod; **falls back to HTML** when no browser is available, with per-tenant `Branding`. |
 
 ### 5. Quota, scheduling, workers, governance
 

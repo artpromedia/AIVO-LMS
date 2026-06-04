@@ -20,7 +20,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     // we always pass their own userId as the floor.
     const adminId =
       session!.role === "platform_admin"
-        ? url.searchParams.get("adminId") ?? undefined
+        ? (url.searchParams.get("adminId") ?? undefined)
         : session!.userId;
 
     const sessions = await getImpersonationHistory({ adminId, requestId });

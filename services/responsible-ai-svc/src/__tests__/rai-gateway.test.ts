@@ -29,9 +29,7 @@ describe("RAI gateway", () => {
 
   it("short-circuits and fires onBlocked when denied", async () => {
     const onBlocked = vi.fn();
-    const fetchImpl = vi.fn(async () =>
-      policyResponse({ allowed: false, denyReason: "OPT_OUT" }),
-    );
+    const fetchImpl = vi.fn(async () => policyResponse({ allowed: false, denyReason: "OPT_OUT" }));
     const gw = createRaiGateway({ fetchImpl: fetchImpl as unknown as typeof fetch, onBlocked });
     const d = await gw.check({ tenantId: "t", modelId: "m" });
     expect(d.allowed).toBe(false);

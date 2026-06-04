@@ -19,7 +19,10 @@ function cookie(value: string) {
 
 async function scan(page: import("@playwright/test").Page) {
   await page.waitForSelector("main", { timeout: 30_000 });
-  await page.getByText(/Filters/i).first().waitFor({ timeout: 30_000 });
+  await page
+    .getByText(/Filters/i)
+    .first()
+    .waitFor({ timeout: 30_000 });
   await injectAxe(page);
   await checkA11y(page, "main", { detailedReport: true, axeOptions: { rules: AXE_RULES } });
   await expect(page.locator("main")).toBeVisible();

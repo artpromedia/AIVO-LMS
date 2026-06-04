@@ -9,13 +9,7 @@ import { ParamField, initialParamValues } from "./param-fields";
 const selectClass =
   "h-11 w-full rounded-iw-card border border-iw-border bg-iw-raised px-3 text-sm text-iw-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring";
 
-export function ReportParamForm({
-  schema,
-  basePath,
-}: {
-  schema: ReportSchema;
-  basePath: string;
-}) {
+export function ReportParamForm({ schema, basePath }: { schema: ReportSchema; basePath: string }) {
   const router = useRouter();
   const [params, setParams] = React.useState<Record<string, unknown>>(() =>
     initialParamValues(schema),

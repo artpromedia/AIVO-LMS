@@ -36,56 +36,51 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
         .where(eq(lessonRuns.learnerId, uid));
       const runIds = runRows.map((r: { id: string }) => r.id);
 
-      const [
-        interactions,
-        summaries,
-        plans,
-        runs,
-        sessions,
-        paths,
-        gradebook,
-        tutorSess,
-      ] = await Promise.all([
-        runIds.length > 0
-          ? db
-              .delete(lessonInteractions)
-              .where(eq(lessonInteractions.learnerId, uid))
-              .returning({ id: lessonInteractions.id })
-          : Promise.resolve([]),
-        runIds.length > 0
-          ? db
-              .delete(lessonParentSummaries)
-              .where(eq(lessonParentSummaries.learnerId, uid))
-              .returning({ id: lessonParentSummaries.id })
-          : Promise.resolve([]),
-        runIds.length > 0
-          ? Promise.all(
-              runIds.map((rid: string) =>
-                db
-                  .delete(generatedLessonPlans)
-                  .where(eq(generatedLessonPlans.lessonRunId, rid))
-                  .returning({ id: generatedLessonPlans.id }),
-              ),
-            ).then((arrs: unknown[][]) => arrs.flat())
-          : Promise.resolve([]),
-        db.delete(lessonRuns).where(eq(lessonRuns.learnerId, uid)).returning({ id: lessonRuns.id }),
-        db
-          .delete(lessonSessions)
-          .where(eq(lessonSessions.learnerId, uid))
-          .returning({ id: lessonSessions.id }),
-        db
-          .delete(learningPaths)
-          .where(eq(learningPaths.learnerId, uid))
-          .returning({ id: learningPaths.id }),
-        db
-          .delete(gradebookEntries)
-          .where(eq(gradebookEntries.learnerId, uid))
-          .returning({ id: gradebookEntries.id }),
-        db
-          .delete(tutorSessions)
-          .where(eq(tutorSessions.learnerId, uid))
-          .returning({ id: tutorSessions.id }),
-      ]);
+      const [interactions, summaries, plans, runs, sessions, paths, gradebook, tutorSess] =
+        await Promise.all([
+          runIds.length > 0
+            ? db
+                .delete(lessonInteractions)
+                .where(eq(lessonInteractions.learnerId, uid))
+                .returning({ id: lessonInteractions.id })
+            : Promise.resolve([]),
+          runIds.length > 0
+            ? db
+                .delete(lessonParentSummaries)
+                .where(eq(lessonParentSummaries.learnerId, uid))
+                .returning({ id: lessonParentSummaries.id })
+            : Promise.resolve([]),
+          runIds.length > 0
+            ? Promise.all(
+                runIds.map((rid: string) =>
+                  db
+                    .delete(generatedLessonPlans)
+                    .where(eq(generatedLessonPlans.lessonRunId, rid))
+                    .returning({ id: generatedLessonPlans.id }),
+                ),
+              ).then((arrs: unknown[][]) => arrs.flat())
+            : Promise.resolve([]),
+          db
+            .delete(lessonRuns)
+            .where(eq(lessonRuns.learnerId, uid))
+            .returning({ id: lessonRuns.id }),
+          db
+            .delete(lessonSessions)
+            .where(eq(lessonSessions.learnerId, uid))
+            .returning({ id: lessonSessions.id }),
+          db
+            .delete(learningPaths)
+            .where(eq(learningPaths.learnerId, uid))
+            .returning({ id: learningPaths.id }),
+          db
+            .delete(gradebookEntries)
+            .where(eq(gradebookEntries.learnerId, uid))
+            .returning({ id: gradebookEntries.id }),
+          db
+            .delete(tutorSessions)
+            .where(eq(tutorSessions.learnerId, uid))
+            .returning({ id: tutorSessions.id }),
+        ]);
 
       return {
         counts: {

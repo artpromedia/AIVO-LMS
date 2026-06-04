@@ -50,9 +50,8 @@ if (isMain) {
       // Nightly integrity + anchor + retention via the shared safe-cron.
       // Best-effort: a scheduler import failure must not take the API down.
       try {
-        const { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } = await import(
-          "@aivo/scheduling"
-        );
+        const { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } =
+          await import("@aivo/scheduling");
         const { runTamperCheckOnce } = await import("./jobs/tamper.js");
         if (db) {
           const lock = createDrizzleAdvisoryLock(db as never);

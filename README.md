@@ -326,9 +326,9 @@ Ten locales are supported via `next-intl`, including RTL Arabic. Translation fil
 
 The repo distinguishes **key coverage** from **real translation** with two separate scripts:
 
-| Script | Asks | Mode |
-|---|---|---|
-| `pnpm i18n:audit` | "Does every locale carry the same flat key set as English?" | Blocking — runtime UIs crash if not |
+| Script                                      | Asks                                                               | Mode                                                         |
+| ------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| `pnpm i18n:audit`                           | "Does every locale carry the same flat key set as English?"        | Blocking — runtime UIs crash if not                          |
 | `node scripts/i18n-untranslated-report.mjs` | "How many non-English values are still byte-identical to English?" | Two ratchets, both blocking, neither requires a global green |
 
 ### Untranslated ratchet (`i18n-untranslated-report.mjs`)

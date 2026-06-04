@@ -21,7 +21,8 @@ type Err = { err: ReturnType<typeof fail> };
 export async function requireSisViewer(req: Request): Promise<Ok | Err> {
   const requestId = getRequestId(req);
   const session = await readMockSessionFromCookies();
-  if (!session) return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
+  if (!session)
+    return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
   if (!["platform_admin", "district_admin", "school_admin"].includes(session.role)) {
     return { err: fail({ ...ERRORS.FORBIDDEN_ROLE, message: "admin role required" }, requestId) };
   }
@@ -31,10 +32,14 @@ export async function requireSisViewer(req: Request): Promise<Ok | Err> {
 export async function requireSisManager(req: Request): Promise<Ok | Err> {
   const requestId = getRequestId(req);
   const session = await readMockSessionFromCookies();
-  if (!session) return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
+  if (!session)
+    return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
   if (session.role !== "platform_admin" && session.role !== "district_admin") {
     return {
-      err: fail({ ...ERRORS.FORBIDDEN_ROLE, message: "platform_admin or district_admin required" }, requestId),
+      err: fail(
+        { ...ERRORS.FORBIDDEN_ROLE, message: "platform_admin or district_admin required" },
+        requestId,
+      ),
     };
   }
   return { session, requestId };
@@ -48,5 +53,8 @@ export function authorizeManageTenant(
 ): ReturnType<typeof fail> | null {
   if (session.role === "platform_admin") return null;
   if (session.role === "district_admin" && session.tenantId === tenantId) return null;
-  return fail({ ...ERRORS.FORBIDDEN_TENANT, message: "Not permitted to manage this district's SIS" }, requestId);
+  return fail(
+    { ...ERRORS.FORBIDDEN_TENANT, message: "Not permitted to manage this district's SIS" },
+    requestId,
+  );
 }

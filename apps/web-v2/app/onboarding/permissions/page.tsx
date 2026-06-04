@@ -19,10 +19,7 @@ const STEPS = [
  * `NotificationPreference` state via `PATCH /api/bff/notification-preferences`
  * rather than being silently discarded.
  */
-const NOTIF_EMAIL_KEYS = [
-  "parent_progress_summary:email",
-  "safety_review_required:email",
-] as const;
+const NOTIF_EMAIL_KEYS = ["parent_progress_summary:email", "safety_review_required:email"] as const;
 
 async function persistNotificationPreference(enabled: boolean): Promise<void> {
   const preferences: Record<string, boolean> = {};

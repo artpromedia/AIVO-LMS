@@ -20,7 +20,7 @@ export function registerDistrictRoutes(app: FastifyInstance): void {
     {
       ...audited("tenant.district.created", {
         entityType: "district",
-        entityId: (req) => ((req.body as { name?: string })?.name ?? ""),
+        entityId: (req) => (req.body as { name?: string })?.name ?? "",
         detailsAllowlist: ["name", "externalId"],
         details: (req) => ({
           name: (req.body as { name?: string })?.name,

@@ -82,7 +82,12 @@ function defaultTenant(req: AuditedRequestLike): string | null {
  * `addHook("onResponse", fn)`. Routes without an `audit` config are ignored.
  */
 export function registerAuditHook(
-  app: { addHook: (name: "onResponse", fn: (req: AuditedRequestLike, reply: AuditedReplyLike) => unknown) => void },
+  app: {
+    addHook: (
+      name: "onResponse",
+      fn: (req: AuditedRequestLike, reply: AuditedReplyLike) => unknown,
+    ) => void;
+  },
   client: AuditClient,
   options: AuditHookOptions = {},
 ): void {

@@ -44,9 +44,14 @@ export function ErrorDrillDown({
     const header = "id,runId,entity,sourcedId,message,retryable\n";
     const rows = errors
       .map((e) =>
-        [e.id, e.runId, e.entity, e.sourcedId, `"${e.message.replace(/"/g, '""')}"`, e.retryable].join(
-          ",",
-        ),
+        [
+          e.id,
+          e.runId,
+          e.entity,
+          e.sourcedId,
+          `"${e.message.replace(/"/g, '""')}"`,
+          e.retryable,
+        ].join(","),
       )
       .join("\n");
     const blob = new Blob([header + rows], { type: "text/csv" });

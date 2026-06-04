@@ -94,7 +94,10 @@ const warnings = [];
 function classify(file) {
   // Normalise to POSIX-style separators so SENSITIVE_PATTERNS regexes
   // (authored with `/`) match on Windows too.
-  const rel = file.replace(repoRoot + sep, "").split(sep).join("/");
+  const rel = file
+    .replace(repoRoot + sep, "")
+    .split(sep)
+    .join("/");
   for (const pattern of SENSITIVE_PATTERNS) {
     if (pattern.match.test(rel)) return pattern;
   }
@@ -102,7 +105,10 @@ function classify(file) {
 }
 
 for (const file of files) {
-  const rel = file.replace(repoRoot + sep, "").split(sep).join("/");
+  const rel = file
+    .replace(repoRoot + sep, "")
+    .split(sep)
+    .join("/");
   const pattern = classify(file);
   if (!pattern) {
     warnings.push(`${rel}: not classified — add to SENSITIVE_PATTERNS or allow-list.`);

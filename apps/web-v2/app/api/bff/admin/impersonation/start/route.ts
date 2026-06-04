@@ -72,8 +72,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     // upstream is unreachable in the demo env, synthesize it from the request
     // body so the View-As UI is still demoable.
     const upstream = res.ok ? res.data.session : undefined;
-    const endsAt =
-      upstream?.endsAt ?? new Date(Date.now() + ttlSeconds * 1000).toISOString();
+    const endsAt = upstream?.endsAt ?? new Date(Date.now() + ttlSeconds * 1000).toISOString();
     const cookieValue = JSON.stringify({
       sessionId: upstream?.id ?? `imp-local-${Date.now()}`,
       subjectId: upstream?.subjectId ?? body.subject_user_id,

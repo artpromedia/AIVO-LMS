@@ -11,11 +11,7 @@
  */
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
-import {
-  getRealtimeBus,
-  subjects,
-  _resetRealtimeBusForTest,
-} from "../src/realtime/bus.js";
+import { getRealtimeBus, subjects, _resetRealtimeBusForTest } from "../src/realtime/bus.js";
 
 describe("realtime bus (in-process)", () => {
   before(async () => {

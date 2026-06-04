@@ -28,9 +28,7 @@ export default async function PublicStatusPage() {
     <main className="mx-auto max-w-4xl px-6 py-12">
       <header className="mb-8">
         <h1 className="font-iw-display text-3xl font-semibold text-iw-ink">System Status</h1>
-        <p className="mt-1 text-sm text-iw-ink-muted">
-          Live status of the AIVO learning platform.
-        </p>
+        <p className="mt-1 text-sm text-iw-ink-muted">Live status of the AIVO learning platform.</p>
       </header>
 
       <IncidentBanner overall={summary.overall} incidents={summary.activeIncidents} />

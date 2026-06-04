@@ -18,13 +18,23 @@ export function RunHistoryTable({ runs }: { runs: SyncRun[] }) {
       <caption className="sr-only">Sync run history</caption>
       <thead>
         <tr className="text-left text-xs text-aivo-ink-soft">
-          <th scope="col" className="py-1">Started</th>
+          <th scope="col" className="py-1">
+            Started
+          </th>
           <th scope="col">Type</th>
           <th scope="col">Status</th>
-          <th scope="col" className="text-right">Add</th>
-          <th scope="col" className="text-right">Upd</th>
-          <th scope="col" className="text-right">Del</th>
-          <th scope="col" className="text-right">Errors</th>
+          <th scope="col" className="text-right">
+            Add
+          </th>
+          <th scope="col" className="text-right">
+            Upd
+          </th>
+          <th scope="col" className="text-right">
+            Del
+          </th>
+          <th scope="col" className="text-right">
+            Errors
+          </th>
         </tr>
       </thead>
       <tbody>

@@ -15,7 +15,7 @@ requires four things we did not previously have in one place:
 
 - a **public status page** (and per-tenant/district status views) that
   communicates incidents and maintenance honestly and quickly;
-- **per-tenant health** aggregation so a district can see *its own*
+- **per-tenant health** aggregation so a district can see _its own_
   availability, not just a global green/red;
 - **SLOs with error budgets and burn-rate alerting** so paging is driven
   by user-visible budget burn rather than raw symptom noise; and
@@ -67,7 +67,7 @@ timeToExhaustion  = (windowDays * 24) / burnRate  # hours, ∞ when not burning
 A **burn rate of 1** exhausts the whole-window budget exactly at the end
 of the window; `> 1` exhausts it early. Paging uses the **Google SRE
 multi-window, multi-burn-rate** rule: page only when a **fast window
-(1h)** *and* a **slow window (6h)** both exceed the threshold, so a brief
+(1h)** _and_ a **slow window (6h)** both exceed the threshold, so a brief
 spike does not page but a sustained burn does
 (`shouldPageOnBurn({ fastWindowBurn, slowWindowBurn, threshold })`).
 
@@ -106,22 +106,23 @@ One import per service brings:
 
 **Why a self-contained tracer instead of the full OTel SDK:** our build
 environment is offline/restricted, and pulling the full OpenTelemetry SDK
-+ exporters is undesirable there. The implementation is intentionally
-**spec-compliant on the wire** (`00-<32hex>-<16hex>-<flags>` traceparent;
-`key=value,...` baggage), so swapping in the real OTel SDK once collectors
-are deployed is a **drop-in** change — the propagation format other systems
-see does not change.
+
+- exporters is undesirable there. The implementation is intentionally
+  **spec-compliant on the wire** (`00-<32hex>-<16hex>-<flags>` traceparent;
+  `key=value,...` baggage), so swapping in the real OTel SDK once collectors
+  are deployed is a **drop-in** change — the propagation format other systems
+  see does not change.
 
 ### 5. RBAC
 
-| Capability | platform_admin | district_admin | school_admin | other admins |
-|---|:--:|:--:|:--:|:--:|
-| Declare / edit incidents | ✅ | ❌ | ❌ | ❌ |
-| Post incident updates | ✅ | ❌ | ❌ | ❌ |
-| Schedule maintenance | ✅ | ❌ | ❌ | ❌ |
-| Define / edit SLOs | ✅ | ❌ | ❌ | ❌ |
-| View status (own scope) | ✅ | ✅ | ✅ | ✅ |
-| Subscribe (email/webhook/RSS) | ✅ | ✅ | ✅ | ✅ |
+| Capability                    | platform_admin | district_admin | school_admin | other admins |
+| ----------------------------- | :------------: | :------------: | :----------: | :----------: |
+| Declare / edit incidents      |       ✅       |       ❌       |      ❌      |      ❌      |
+| Post incident updates         |       ✅       |       ❌       |      ❌      |      ❌      |
+| Schedule maintenance          |       ✅       |       ❌       |      ❌      |      ❌      |
+| Define / edit SLOs            |       ✅       |       ❌       |      ❌      |      ❌      |
+| View status (own scope)       |       ✅       |       ✅       |      ✅      |      ✅      |
+| Subscribe (email/webhook/RSS) |       ✅       |       ✅       |      ✅      |      ✅      |
 
 Declaring incidents and scheduling maintenance are **platform-only**;
 viewing and subscribing are available to all admins (and, for the public

@@ -85,7 +85,10 @@ export class InMemoryEventStore implements EventStore {
 
   private filtered(filter: EventFilter): AuditEvent[] {
     // Newest first for queries; the chain itself is stored oldest→newest.
-    return this.events.filter((e) => matches(e, filter)).slice().reverse();
+    return this.events
+      .filter((e) => matches(e, filter))
+      .slice()
+      .reverse();
   }
 
   async query(filter: EventFilter): Promise<EventPage> {

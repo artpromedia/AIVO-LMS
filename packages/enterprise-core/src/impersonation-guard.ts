@@ -34,10 +34,7 @@ export function isWriteMethod(method: string | undefined): boolean {
   return WRITE_METHODS.has((method ?? "GET").toUpperCase());
 }
 
-export function isImpersonationExpired(
-  claims: ImpersonationClaimView,
-  now = Date.now(),
-): boolean {
+export function isImpersonationExpired(claims: ImpersonationClaimView, now = Date.now()): boolean {
   if (typeof claims.imp_exp !== "number") return true;
   return Math.floor(now / 1000) >= claims.imp_exp;
 }

@@ -12,8 +12,9 @@ import type { Subscriber, SubscriberChannel } from "../statuspage/types.js";
 const CHANNELS: SubscriberChannel[] = ["email", "webhook", "rss"];
 
 function escapeXml(s: string): string {
-  return s.replace(/[<>&'"]/g, (c) =>
-    ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[c]!,
+  return s.replace(
+    /[<>&'"]/g,
+    (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[c]!,
   );
 }
 

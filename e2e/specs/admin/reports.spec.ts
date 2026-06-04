@@ -59,13 +59,10 @@ test.describe("Cross-Tier Reports — catalog, run, CSV download, schedule, scop
     await skipUnlessIdentityTestMode();
 
     // ── District admin session ────────────────────────────────────────────
-    const seedDistrictAdmin =
-      (fixtures as Record<string, unknown>).seedDistrictAdmin as
-        | (() => Promise<unknown>)
-        | undefined;
-    const district = seedDistrictAdmin
-      ? await seedDistrictAdmin()
-      : await seedSchoolAdmin(); // fallback fixture; real run uses a district admin
+    const seedDistrictAdmin = (fixtures as Record<string, unknown>).seedDistrictAdmin as
+      | (() => Promise<unknown>)
+      | undefined;
+    const district = seedDistrictAdmin ? await seedDistrictAdmin() : await seedSchoolAdmin(); // fallback fixture; real run uses a district admin
     test.skip(!district, "could not seed district admin");
     await authenticateBrowser(page, district as never);
 
@@ -78,16 +75,23 @@ test.describe("Cross-Tier Reports — catalog, run, CSV download, schedule, scop
 
     // 2) Run it. Fill required params (a tenant in the caller's allow-list)
     //    and run; wait for the run to reach "succeeded".
-    await page.getByLabel(/tenant/i).selectOption({ index: 1 }).catch(async () => {
-      await page.getByRole("combobox", { name: /tenant/i }).click();
-      await page.getByRole("option").nth(1).click();
-    });
+    await page
+      .getByLabel(/tenant/i)
+      .selectOption({ index: 1 })
+      .catch(async () => {
+        await page.getByRole("combobox", { name: /tenant/i }).click();
+        await page.getByRole("option").nth(1).click();
+      });
     await page.getByRole("button", { name: /run report|run|generate/i }).click();
     await expect(page.getByText(/succeeded|complete|ready/i)).toBeVisible({ timeout: 30_000 });
 
     // 3) Download CSV. Capture the browser download and assert it is a CSV
     //    with the expected header row.
-    await page.getByRole("button", { name: /format|csv/i }).first().click().catch(() => undefined);
+    await page
+      .getByRole("button", { name: /format|csv/i })
+      .first()
+      .click()
+      .catch(() => undefined);
     const [download] = await Promise.all([
       page.waitForEvent("download", { timeout: 15_000 }),
       page.getByRole("button", { name: /download/i }).click(),
@@ -96,9 +100,12 @@ test.describe("Cross-Tier Reports — catalog, run, CSV download, schedule, scop
 
     // 4) Schedule a weekly delivery to a verified, in-scope recipient.
     await page.getByRole("button", { name: /schedule/i }).click();
-    await page.getByLabel(/frequency|cadence/i).selectOption({ label: "Weekly" }).catch(async () => {
-      await page.getByRole("radio", { name: /weekly/i }).click();
-    });
+    await page
+      .getByLabel(/frequency|cadence/i)
+      .selectOption({ label: "Weekly" })
+      .catch(async () => {
+        await page.getByRole("radio", { name: /weekly/i }).click();
+      });
     await page.getByLabel(/recipient|email/i).fill(VERIFIED_RECIPIENT);
     await page.getByRole("button", { name: /save schedule|schedule|create/i }).click();
     await expect(page.getByText(new RegExp(VERIFIED_RECIPIENT, "i"))).toBeVisible();
@@ -115,9 +122,7 @@ test.describe("Cross-Tier Reports — catalog, run, CSV download, schedule, scop
     //     (catalogForScope filters reportScope > callerScope).
     await schoolPage.goto("/admin/school/reports");
     await expect(schoolPage.getByRole("heading", { name: /reports/i })).toBeVisible();
-    await expect(
-      schoolPage.getByRole("link", { name: /enrollment by school/i }),
-    ).toHaveCount(0);
+    await expect(schoolPage.getByRole("link", { name: /enrollment by school/i })).toHaveCount(0);
 
     // 5b) Directly running the district report by id is refused with 403
     //     SCOPE_FORBIDDEN (caller scope < report scope).

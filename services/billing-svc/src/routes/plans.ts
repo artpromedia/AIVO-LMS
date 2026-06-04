@@ -325,7 +325,10 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
     {
       schema: createSubscriptionSchema,
       preHandler: requireAuth,
-      ...audited("billing.subscription.changed", { entityType: "subscription", detailsAllowlist: ["plan", "tenantId"] }),
+      ...audited("billing.subscription.changed", {
+        entityType: "subscription",
+        detailsAllowlist: ["plan", "tenantId"],
+      }),
     },
     async (request, reply) => {
       const body = (request.body ?? {}) as any;
@@ -653,7 +656,10 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
     {
       schema: removeAddonSchema,
       preHandler: requireAuth,
-      ...audited("billing.addon.removed", { entityType: "addon", entityId: (r) => (r.params as { tutorId?: string })?.tutorId ?? "" }),
+      ...audited("billing.addon.removed", {
+        entityType: "addon",
+        entityId: (r) => (r.params as { tutorId?: string })?.tutorId ?? "",
+      }),
     },
     async (request, reply) => {
       const { tenantId, tutorId } = request.params as { tenantId: string; tutorId: string };

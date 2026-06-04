@@ -5,11 +5,7 @@
  *   GET /api/statuspage/public/summary
  */
 import type { FastifyInstance } from "fastify";
-import {
-  getStatusStore,
-  effectiveComponentStatus,
-  overallStatus,
-} from "../statuspage/store.js";
+import { getStatusStore, effectiveComponentStatus, overallStatus } from "../statuspage/store.js";
 
 export function registerPublicSummaryRoutes(app: FastifyInstance): void {
   app.get<{ Querystring: { tenantId?: string } }>(

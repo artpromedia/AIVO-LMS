@@ -65,11 +65,11 @@ the pipeline and all downstream events speak only this vocabulary.
 
 ### RBAC
 
-| Action | platform_admin | district_admin | school_admin |
-|---|---|---|---|
-| Configure connector | ✅ | ✅ (own) | ❌ |
-| Trigger manual sync | ✅ | ✅ (own) | ❌ |
-| View status / errors | ✅ | ✅ (own) | ✅ (read-only) |
+| Action               | platform_admin | district_admin | school_admin   |
+| -------------------- | -------------- | -------------- | -------------- |
+| Configure connector  | ✅             | ✅ (own)       | ❌             |
+| Trigger manual sync  | ✅             | ✅ (own)       | ❌             |
+| View status / errors | ✅             | ✅ (own)       | ✅ (read-only) |
 
 Enforced in the BFF via `lib/bff/sis-guard.ts` (`requireSisManager` for
 mutations, `requireSisViewer` for reads, `authorizeManageTenant` for tenant
@@ -98,6 +98,7 @@ tests (29 unit tests green); the full district + platform admin UI, BFF,
 mock store, i18n (10 locales), and E2E + axe a11y specs (all green).
 
 **Now also delivered (verified):**
+
 1. **Service consolidation** — `integrations-svc` merged into
    `integration-svc` (history-preserving `git mv`); every consumer updated
    (api-client paths unchanged, tests, scheduling, status-page,
@@ -114,6 +115,7 @@ mock store, i18n (10 locales), and E2E + axe a11y specs (all green).
    writes (chaos test green). 50k-row idempotency/perf test (<1s).
 
 **Still tracked** (genuinely need live Redis/Postgres):
+
 - The literal **BullMQ adapter** implementing `SyncQueue` + the cron
   schedules running against Redis (the port, retry policy, worker manifest,
   and orchestrator are done; the adapter is a thin shell).

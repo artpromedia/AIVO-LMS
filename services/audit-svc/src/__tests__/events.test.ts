@@ -62,9 +62,25 @@ describe("hash chain continuity", () => {
 describe("query filters + paging", () => {
   it("filters by tenant, actor, action, entity, time, and free-text", async () => {
     const store = new InMemoryEventStore();
-    await store.append(input({ tenant_id: "t1", action: "identity.login", actor: { id: "u1", role: "teacher", ip: "", ua: "" }, details: { method: "password" } }));
-    await store.append(input({ tenant_id: "t2", action: "billing.seat.assigned", entity: { type: "seat", id: "s1" }, details: { plan: "pro" } }));
-    await store.append(input({ tenant_id: "t1", action: "sis.sync.trigger", details: { provider: "clever" } }));
+    await store.append(
+      input({
+        tenant_id: "t1",
+        action: "identity.login",
+        actor: { id: "u1", role: "teacher", ip: "", ua: "" },
+        details: { method: "password" },
+      }),
+    );
+    await store.append(
+      input({
+        tenant_id: "t2",
+        action: "billing.seat.assigned",
+        entity: { type: "seat", id: "s1" },
+        details: { plan: "pro" },
+      }),
+    );
+    await store.append(
+      input({ tenant_id: "t1", action: "sis.sync.trigger", details: { provider: "clever" } }),
+    );
 
     expect((await store.query({ tenantId: "t1" })).events).toHaveLength(2);
     expect((await store.query({ action: "billing.seat.assigned" })).events).toHaveLength(1);

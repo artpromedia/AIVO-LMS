@@ -14,9 +14,7 @@ export const tenantGrowth: ReportDefinition = {
   description: "New tenants and cumulative count over time.",
   category: "Growth",
   scopes: ["platform"],
-  params: [
-    { name: "sinceDays", label: "Window (days)", type: "number", default: 365 },
-  ],
+  params: [{ name: "sinceDays", label: "Window (days)", type: "number", default: 365 }],
   columns: [
     { key: "tenantId", label: "Tenant", type: "string" },
     { key: "name", label: "Name", type: "string" },

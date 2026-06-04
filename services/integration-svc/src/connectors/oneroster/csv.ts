@@ -121,7 +121,14 @@ function mapUserRoles(rec: Record<string, string>): { roles: RoleType[]; primary
   if (roles.length === 0 && rec.role) roles = [mapRole(rec.role)];
   if (roles.length === 0) roles = ["student"];
   // Precedence for the AIVO provisioning role.
-  const precedence: RoleType[] = ["administrator", "teacher", "aide", "guardian", "parent", "student"];
+  const precedence: RoleType[] = [
+    "administrator",
+    "teacher",
+    "aide",
+    "guardian",
+    "parent",
+    "student",
+  ];
   const primaryRole = precedence.find((p) => roles.includes(p)) ?? roles[0];
   return { roles, primaryRole };
 }
@@ -236,13 +243,29 @@ export interface OneRosterCsvFiles {
 /** Parse a OneRoster CSV file set into a canonical snapshot. */
 export function parseOneRosterCsv(files: OneRosterCsvFiles): RosterSnapshot {
   const snap = emptySnapshot("oneroster");
-  if (files.orgs) snap.orgs = parseCsv(files.orgs).filter((r) => r.sourcedId).map(orgFromRow);
+  if (files.orgs)
+    snap.orgs = parseCsv(files.orgs)
+      .filter((r) => r.sourcedId)
+      .map(orgFromRow);
   if (files.academicSessions)
-    snap.terms = parseCsv(files.academicSessions).filter((r) => r.sourcedId).map(termFromRow);
-  if (files.courses) snap.courses = parseCsv(files.courses).filter((r) => r.sourcedId).map(courseFromRow);
-  if (files.classes) snap.classes = parseCsv(files.classes).filter((r) => r.sourcedId).map(classFromRow);
-  if (files.users) snap.users = parseCsv(files.users).filter((r) => r.sourcedId).map(userFromRow);
+    snap.terms = parseCsv(files.academicSessions)
+      .filter((r) => r.sourcedId)
+      .map(termFromRow);
+  if (files.courses)
+    snap.courses = parseCsv(files.courses)
+      .filter((r) => r.sourcedId)
+      .map(courseFromRow);
+  if (files.classes)
+    snap.classes = parseCsv(files.classes)
+      .filter((r) => r.sourcedId)
+      .map(classFromRow);
+  if (files.users)
+    snap.users = parseCsv(files.users)
+      .filter((r) => r.sourcedId)
+      .map(userFromRow);
   if (files.enrollments)
-    snap.enrollments = parseCsv(files.enrollments).filter((r) => r.sourcedId).map(enrollmentFromRow);
+    snap.enrollments = parseCsv(files.enrollments)
+      .filter((r) => r.sourcedId)
+      .map(enrollmentFromRow);
   return snap;
 }

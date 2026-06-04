@@ -35,12 +35,7 @@ import {
 } from "../services/oidc-rp.js";
 
 /** OIDC JIT provisioning is restricted to non-platform district roles. */
-const OIDC_PROVISIONABLE_ROLES = new Set([
-  "DISTRICT_ADMIN",
-  "TEACHER",
-  "CAREGIVER",
-  "THERAPIST",
-]);
+const OIDC_PROVISIONABLE_ROLES = new Set(["DISTRICT_ADMIN", "TEACHER", "CAREGIVER", "THERAPIST"]);
 
 const TX_COOKIE = "oidc_rp_tx";
 const TX_TTL = "10m";

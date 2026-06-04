@@ -87,11 +87,16 @@ export async function runSync(opts: RunSyncOptions): Promise<RunSyncResult> {
 
   for (const kind of ENTITY_KINDS) {
     if (done.has(kind)) continue; // resume: skip already-completed kinds
-    const d = (diff as unknown as Record<EntityKind, {
-      added: Array<{ sourcedId: string }>;
-      updated: Array<{ sourcedId: string }>;
-      removed: Array<{ sourcedId: string }>;
-    }>)[kind];
+    const d = (
+      diff as unknown as Record<
+        EntityKind,
+        {
+          added: Array<{ sourcedId: string }>;
+          updated: Array<{ sourcedId: string }>;
+          removed: Array<{ sourcedId: string }>;
+        }
+      >
+    )[kind];
     for (const rec of d.added) await opts.writer.upsert(kind, rec);
     for (const rec of d.updated) await opts.writer.upsert(kind, rec);
     for (const rec of d.removed) await opts.writer.softDelete(kind, rec, effectiveDate);

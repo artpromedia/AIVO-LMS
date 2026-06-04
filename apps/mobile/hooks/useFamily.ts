@@ -165,11 +165,7 @@ export {
 // The hook + types live in their own file so the wire contract can be unit
 // tested without rendering React. Re-exported here for back-compat with
 // existing screens that import from `@/hooks/useFamily`.
-export {
-  useWhatsWorking,
-  fetchWhatsWorking,
-  type WhatsWorkingInsights,
-} from "./useWhatsWorking";
+export { useWhatsWorking, fetchWhatsWorking, type WhatsWorkingInsights } from "./useWhatsWorking";
 
 // ─────────────── IEP Updates: Timeline / Amendments / Preferences ───────────────
 

@@ -16,12 +16,12 @@ sharing credentials, resetting passwords, or querying the database directly
 is unauditable and over-privileged. The industry pattern is **Privileged
 Access Management (PAM) style just-in-time impersonation** ("View As"):
 a time-boxed, narrowly-scoped, fully-audited session in which an authorized
-admin acts *as* another user.
+admin acts _as_ another user.
 
 Impersonation is dangerous to get wrong. Two failure classes dominate:
 
 - **Confused deputy** — the impersonating admin (or a compromised path)
-  performs privileged writes that the *subject* could never authorize, or
+  performs privileged writes that the _subject_ could never authorize, or
   escalates by impersonating a higher-privileged user.
 - **Audit evasion** — actions taken under impersonation are attributed only
   to the subject, so the real actor disappears from the record, or the
@@ -45,15 +45,15 @@ requires **step-up MFA**, and mints a brand-new signed JWT for the session.
 The authorization-relevant facts live **inside the signed token**, so they
 cannot be forged client-side:
 
-| Claim | Meaning |
-|---|---|
-| `sub` | The impersonated user — the authorization subject for **reads**. |
-| `act` | The acting admin's user id (RFC 8693 "actor"). Never lost. |
-| `imp` | `true` — marks the token as an impersonation token. |
-| `imp_exp` | Hard expiry (unix seconds) of the impersonation window (≤ TTL). |
-| `imp_writes_ok` | Whether writes are permitted at all in this session. |
-| `imp_reason` | The documented reason for the session (audited). |
-| `imp_sid` | The `impersonation_sessions` row id, for correlation/revocation. |
+| Claim           | Meaning                                                          |
+| --------------- | ---------------------------------------------------------------- |
+| `sub`           | The impersonated user — the authorization subject for **reads**. |
+| `act`           | The acting admin's user id (RFC 8693 "actor"). Never lost.       |
+| `imp`           | `true` — marks the token as an impersonation token.              |
+| `imp_exp`       | Hard expiry (unix seconds) of the impersonation window (≤ TTL).  |
+| `imp_writes_ok` | Whether writes are permitted at all in this session.             |
+| `imp_reason`    | The documented reason for the session (audited).                 |
+| `imp_sid`       | The `impersonation_sessions` row id, for correlation/revocation. |
 
 Because `act`/`imp`/`imp_exp`/`imp_writes_ok` are signed, a client cannot
 flip `imp_writes_ok`, extend `imp_exp`, or strip `act` without invalidating
@@ -72,12 +72,12 @@ outlive its window even if the JWT `exp` were mis-set longer.
 
 `evaluateRbac(actor, subject)` enforces:
 
-| Actor role | May impersonate | Constraints |
-|---|---|---|
-| `platform_admin` | Anyone | Admin targets require a documented **break-glass** code (`requiresBreakGlass`). |
-| `district_admin` | Users **in their district** | EXCEPT other district admins or platform admins (`ADMIN_TARGET_FORBIDDEN`); cross-district denied (`CROSS_DISTRICT`). |
-| `school_admin` | Learners / teachers / parents **in their school** only | Other roles denied (`OUT_OF_SCOPE`); cross-school denied (`CROSS_SCHOOL`). |
-| any | — | Self-impersonation denied (`SELF_IMPERSONATION`). No transitive impersonation (see §6). |
+| Actor role       | May impersonate                                        | Constraints                                                                                                           |
+| ---------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `platform_admin` | Anyone                                                 | Admin targets require a documented **break-glass** code (`requiresBreakGlass`).                                       |
+| `district_admin` | Users **in their district**                            | EXCEPT other district admins or platform admins (`ADMIN_TARGET_FORBIDDEN`); cross-district denied (`CROSS_DISTRICT`). |
+| `school_admin`   | Learners / teachers / parents **in their school** only | Other roles denied (`OUT_OF_SCOPE`); cross-school denied (`CROSS_SCHOOL`).                                            |
+| any              | —                                                      | Self-impersonation denied (`SELF_IMPERSONATION`). No transitive impersonation (see §6).                               |
 
 Only `platform_admin` may ever target another admin, and only with a
 break-glass code. The actor identity is taken from the caller's own verified
@@ -89,10 +89,10 @@ break-glass code. The actor identity is taken from the caller's own verified
 audited **basis** per allowed path, so the log records exactly which legal /
 operational basis was used:
 
-| Subject | Allowed bases (any one) | Notes |
-|---|---|---|
-| **Adult (≥18)** | `SUBJECT_CONSENT` (consent_ledger) · `JUSTIFICATION_TICKET` (documented ticket) · `PLATFORM_OVERRIDE` (platform-admin explicit) · `BREAK_GLASS` (admin target) | Three independent, separately-audited bases. |
-| **Minor (<18)** | `GUARDIAN_CONSENT` (consent_ledger) · `OPEN_INCIDENT` (open compliance/safety incident) | **Tickets and platform overrides do NOT bypass guardian consent.** |
+| Subject         | Allowed bases (any one)                                                                                                                                        | Notes                                                              |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **Adult (≥18)** | `SUBJECT_CONSENT` (consent_ledger) · `JUSTIFICATION_TICKET` (documented ticket) · `PLATFORM_OVERRIDE` (platform-admin explicit) · `BREAK_GLASS` (admin target) | Three independent, separately-audited bases.                       |
+| **Minor (<18)** | `GUARDIAN_CONSENT` (consent_ledger) · `OPEN_INCIDENT` (open compliance/safety incident)                                                                        | **Tickets and platform overrides do NOT bypass guardian consent.** |
 
 Tenants can **globally disable** impersonation (`enabled: false` →
 `TENANT_DISABLED`), which short-circuits regardless of any other basis. A
@@ -132,17 +132,17 @@ the subject.
 
 ## Threat model
 
-| # | Threat | Mitigation implemented |
-|---|---|---|
-| T1 | **Privilege escalation via impersonation** (act as a higher-privileged user to gain their rights) | RBAC matrix (§3): only `platform_admin` may target an admin, and only with break-glass; district/school actors are scope-bounded; admin targets otherwise `ADMIN_TARGET_FORBIDDEN`. |
-| T2 | **Forging `imp_writes_ok`** to perform writes the subject can't authorize | `imp_writes_ok` lives in the **signed JWT** — tampering breaks the signature. Even when true, writes require an explicit per-service allowlist match (§5), so a forged-or-flipped flag still can't reach a non-allowlisted route. |
-| T3 | **Transitive chaining** (use a session to start another, climbing privilege) | `start` refuses to mint from an impersonation token — no transitive impersonation (§6). |
-| T4 | **Stale / long-lived tokens** (a leaked token used long after the support task) | TTL clamp (default 15 / cap 30 / floor 5 min, §2); `imp_exp` baked into the signed token and enforced on **every** request in every service (§5); session is revocable via `imp_sid`. |
-| T5 | **Impersonating admins** without authority | Only `platform_admin` + documented break-glass code (`BREAK_GLASS` basis); all other actors `ADMIN_TARGET_FORBIDDEN`. |
-| T6 | **Minor-data access without consent** | Minors require `GUARDIAN_CONSENT` or an `OPEN_INCIDENT`; justification tickets and platform overrides explicitly **cannot** bypass guardian consent (§4); tenant-disable short-circuits. |
-| T7 | **Audit gaps / attribution loss** | `act` (acting admin) is always carried and never dropped; per-request `auth.impersonation.*` events; start/stop record the RBAC + consent basis; events land in the tamper-evident audit chain (ADR 0032). |
-| T8 | **Forged claims** (client invents `imp`, `sub`, or `act`) | All impersonation claims live in the server-signed JWT; a client cannot mint or alter them without the signing key. |
-| T9 | **Confused-deputy writes** (admin tricked into a damaging write as subject) | Deny-by-default write guard: the only writes possible are the narrow, explicitly-allowlisted ones, and only when the session was opened writes-on. |
+| #   | Threat                                                                                            | Mitigation implemented                                                                                                                                                                                                            |
+| --- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T1  | **Privilege escalation via impersonation** (act as a higher-privileged user to gain their rights) | RBAC matrix (§3): only `platform_admin` may target an admin, and only with break-glass; district/school actors are scope-bounded; admin targets otherwise `ADMIN_TARGET_FORBIDDEN`.                                               |
+| T2  | **Forging `imp_writes_ok`** to perform writes the subject can't authorize                         | `imp_writes_ok` lives in the **signed JWT** — tampering breaks the signature. Even when true, writes require an explicit per-service allowlist match (§5), so a forged-or-flipped flag still can't reach a non-allowlisted route. |
+| T3  | **Transitive chaining** (use a session to start another, climbing privilege)                      | `start` refuses to mint from an impersonation token — no transitive impersonation (§6).                                                                                                                                           |
+| T4  | **Stale / long-lived tokens** (a leaked token used long after the support task)                   | TTL clamp (default 15 / cap 30 / floor 5 min, §2); `imp_exp` baked into the signed token and enforced on **every** request in every service (§5); session is revocable via `imp_sid`.                                             |
+| T5  | **Impersonating admins** without authority                                                        | Only `platform_admin` + documented break-glass code (`BREAK_GLASS` basis); all other actors `ADMIN_TARGET_FORBIDDEN`.                                                                                                             |
+| T6  | **Minor-data access without consent**                                                             | Minors require `GUARDIAN_CONSENT` or an `OPEN_INCIDENT`; justification tickets and platform overrides explicitly **cannot** bypass guardian consent (§4); tenant-disable short-circuits.                                          |
+| T7  | **Audit gaps / attribution loss**                                                                 | `act` (acting admin) is always carried and never dropped; per-request `auth.impersonation.*` events; start/stop record the RBAC + consent basis; events land in the tamper-evident audit chain (ADR 0032).                        |
+| T8  | **Forged claims** (client invents `imp`, `sub`, or `act`)                                         | All impersonation claims live in the server-signed JWT; a client cannot mint or alter them without the signing key.                                                                                                               |
+| T9  | **Confused-deputy writes** (admin tricked into a damaging write as subject)                       | Deny-by-default write guard: the only writes possible are the narrow, explicitly-allowlisted ones, and only when the session was opened writes-on.                                                                                |
 
 ## Alternatives considered
 

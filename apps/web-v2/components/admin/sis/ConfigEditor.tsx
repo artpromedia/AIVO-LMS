@@ -37,7 +37,8 @@ export function ConfigEditor({ connector }: { connector: SisConnector }) {
           }),
         });
         const json = await res.json();
-        if (!json.ok) return setStatus({ kind: "err", text: json.error?.userMessage ?? t("error_generic") });
+        if (!json.ok)
+          return setStatus({ kind: "err", text: json.error?.userMessage ?? t("error_generic") });
         setStatus({ kind: "ok", text: t("config_saved") });
         router.refresh();
       } catch {
@@ -51,15 +52,33 @@ export function ConfigEditor({ connector }: { connector: SisConnector }) {
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
           <Label htmlFor="cfg-full">{t("full_schedule")}</Label>
-          <Input id="cfg-full" value={fullCron} onChange={(e) => setFullCron(e.target.value)} className="mt-1" />
+          <Input
+            id="cfg-full"
+            value={fullCron}
+            onChange={(e) => setFullCron(e.target.value)}
+            className="mt-1"
+          />
         </div>
         <div>
           <Label htmlFor="cfg-delta">{t("delta_schedule")}</Label>
-          <Input id="cfg-delta" value={deltaCron} onChange={(e) => setDeltaCron(e.target.value)} className="mt-1" />
+          <Input
+            id="cfg-delta"
+            value={deltaCron}
+            onChange={(e) => setDeltaCron(e.target.value)}
+            className="mt-1"
+          />
         </div>
         <div>
           <Label htmlFor="cfg-cap">{t("mutation_cap")}</Label>
-          <Input id="cfg-cap" type="number" min={1} max={100} value={capPct} onChange={(e) => setCapPct(e.target.value)} className="mt-1" />
+          <Input
+            id="cfg-cap"
+            type="number"
+            min={1}
+            max={100}
+            value={capPct}
+            onChange={(e) => setCapPct(e.target.value)}
+            className="mt-1"
+          />
           <p className="mt-1 text-xs text-aivo-ink-soft">{t("mutation_cap_help")}</p>
         </div>
       </div>
@@ -67,7 +86,9 @@ export function ConfigEditor({ connector }: { connector: SisConnector }) {
       <div className="flex items-center justify-end gap-3">
         {status?.kind === "ok" ? <p className="text-sm text-aivo-success">{status.text}</p> : null}
         {status?.kind === "err" ? <p className="text-sm text-aivo-danger">{status.text}</p> : null}
-        <Button type="submit" disabled={pending}>{pending ? t("saving") : t("save_config")}</Button>
+        <Button type="submit" disabled={pending}>
+          {pending ? t("saving") : t("save_config")}
+        </Button>
       </div>
     </form>
   );

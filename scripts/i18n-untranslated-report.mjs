@@ -324,9 +324,7 @@ function parseArgs(argv) {
 
 const args = parseArgs(process.argv.slice(2));
 
-const reports = APPS.map((app) =>
-  auditApp(app, { namespaceFilter: args.namespaces }),
-);
+const reports = APPS.map((app) => auditApp(app, { namespaceFilter: args.namespaces }));
 
 // Threshold ratchet: each (app, locale) cell records its accepted ceiling.
 // Build fails when actual > ceiling. Use --update-threshold whenever
@@ -429,17 +427,14 @@ if (args.json) {
       grandTargeted += info.targeted;
       const cap = baseline?.apps?.[r.app]?.[locale];
       const capStr = typeof cap === "number" ? ` cap=${cap}` : "";
-      const targetedStr = args.namespaces
-        ? ` targeted=${String(info.targeted).padStart(3)}`
-        : "";
+      const targetedStr = args.namespaces ? ` targeted=${String(info.targeted).padStart(3)}` : "";
       lines.push(
         `  ${locale.padEnd(3)}  untranslated=${String(info.total).padStart(4)}${targetedStr}${capStr}`,
       );
       if (args.verbose && info.keys.length > 0) {
         const sample = args.namespaces ? info.targetedKeys : info.keys;
         for (const k of sample.slice(0, 15)) lines.push(`        - ${k}`);
-        if (sample.length > 15)
-          lines.push(`        ... and ${sample.length - 15} more`);
+        if (sample.length > 15) lines.push(`        ... and ${sample.length - 15} more`);
       }
     }
   }

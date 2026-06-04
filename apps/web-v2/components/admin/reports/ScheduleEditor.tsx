@@ -9,13 +9,7 @@ import { RecipientPicker } from "./RecipientPicker";
 const inputClass =
   "h-11 w-full rounded-iw-card border border-iw-border bg-iw-raised px-3 text-sm text-iw-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring";
 
-export function ScheduleEditor({
-  reportId,
-  schema,
-}: {
-  reportId: string;
-  schema: ReportSchema;
-}) {
+export function ScheduleEditor({ reportId, schema }: { reportId: string; schema: ReportSchema }) {
   const [params, setParams] = React.useState<Record<string, unknown>>(() =>
     initialParamValues(schema),
   );

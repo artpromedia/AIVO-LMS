@@ -41,13 +41,9 @@ export async function GET(req: Request) {
 
   // district_admin is always constrained to its own tenant regardless of the
   // query param; platform_admin sees the requested tenant or all of them.
-  const scopeTenant =
-    session.role === "district_admin" ? session.tenantId : tenantId;
+  const scopeTenant = session.role === "district_admin" ? session.tenantId : tenantId;
   if (session.role === "district_admin" && tenantId && tenantId !== session.tenantId) {
-    return fail(
-      { ...ERRORS.FORBIDDEN_TENANT, message: "Cannot list other tenants" },
-      requestId,
-    );
+    return fail({ ...ERRORS.FORBIDDEN_TENANT, message: "Cannot list other tenants" }, requestId);
   }
   return ok({ configs: listIdpConfigs(scopeTenant) }, requestId);
 }
@@ -62,7 +58,10 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return fail({ ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." }, requestId);
+    return fail(
+      { ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." },
+      requestId,
+    );
   }
   const parsed = UpsertSchema.safeParse(body);
   if (!parsed.success) {

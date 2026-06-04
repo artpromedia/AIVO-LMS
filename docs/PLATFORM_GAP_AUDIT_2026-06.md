@@ -356,8 +356,8 @@ Slice 3 — IEP-upload step (depends on a `learnerId`):
   `POST …/iep-upload/skip` so a deliberate "no IEP" is also recorded. Errors
   surface inline without navigating.
 - Adds `onboarding.iep_upload.{saving,save_error,consent_required,
-  select_learner_label,select_learner_placeholder,no_learner_title,
-  no_learner_body,no_learner_cta}` in all 10 locales.
+select_learner_label,select_learner_placeholder,no_learner_title,
+no_learner_body,no_learner_cta}` in all 10 locales.
 
 Slice 4 (learner PIN-set, household / co-parent invites, real phone/SMS
 verification — overlapping SMS gap #22, and child-approval persistence) remains
@@ -392,7 +392,7 @@ slice 3 used for IEP storage).
   matching the slice 2 mic/camera treatment.
 - `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
   `onboarding.child_approval.{saving,save_error,select_learner_label,
-  select_learner_placeholder,no_learner_title,no_learner_body,no_learner_cta}`
+select_learner_placeholder,no_learner_title,no_learner_body,no_learner_cta}`
   in all 10 supported locales.
 
 The remaining slice 4 sub-parts — learner PIN-set, household / co-parent invites,
@@ -435,7 +435,7 @@ against `users.pin`), so the step now writes through to that same field.
   Skip still advances without setting a PIN.
 - `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
   `onboarding.pin.{saving,save_error,select_learner_label,
-  select_learner_placeholder,no_learner_title,no_learner_body,no_learner_cta}`
+select_learner_placeholder,no_learner_title,no_learner_body,no_learner_cta}`
   in all 10 supported locales.
 
 The remaining slice 4 sub-parts — household / co-parent invites and real
@@ -486,7 +486,7 @@ persist through new dual-path (ADR 0009) BFF routes.
 - `apps/web-v2/lib/i18n/messages/{ar,de,en,es,fr,hi,ja,ko,pt,zh}.json` — added
   `onboarding.parent_verify.{sending,verifying,send_error,verify_error}` and
   `onboarding.parent_setup.{saving,save_error,coparent_invite_error,
-  coparent_invited}` in all 10 locales.
+coparent_invited}` in all 10 locales.
 - `apps/web-v2/lib/db/__tests__/{parent-phone-store,household-store}.test.ts`
   (new) — cover the challenge lifecycle (issue/verify/expiry/attempt-cap/
   never-echo) and the household name + invite lifecycle.

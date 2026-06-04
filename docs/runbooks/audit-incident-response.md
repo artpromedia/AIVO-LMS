@@ -48,10 +48,11 @@ GET /export?format=ndjson&from=...&to=...
 ## 3. Identify the actor & method
 
 For each suspect event use the detail/proof view (`GET /events/:id`):
+
 - `actor.id`, `actor.role`, `actor.ip`, `actor.ua`, `request_id` — pivot on
   `request_id` to correlate with service logs and the reverse proxy.
 - `outcome: "failure"` clusters often precede a successful breach (probing).
-- Compare the recomputed hash to the stored hash to confirm whether *this*
+- Compare the recomputed hash to the stored hash to confirm whether _this_
   row was the tampered one or a downstream victim of a reorder.
 
 ## 4. Contain

@@ -9,10 +9,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 // identity fn that echoes the key (good enough to assert structure
 // without coupling to copy).
 vi.mock("next-intl", () => ({
-  useTranslations:
-    (_ns?: string) =>
-    (key: string, _vars?: Record<string, unknown>) =>
-      key,
+  useTranslations: (_ns?: string) => (key: string, _vars?: Record<string, unknown>) => key,
 }));
 
 import { WhatsWorkingPanel } from "./whats-working-panel";
@@ -44,9 +41,7 @@ describe("<WhatsWorkingPanel>", () => {
           { subject: "Reading", modality: "visual", meanAccuracy: 0.91 },
           { subject: "Math", modality: "kinesthetic", meanAccuracy: 0.74 },
         ],
-        frustrationHotspots: [
-          { subject: "Math", modality: "reading", meanFrustration: 0.45 },
-        ],
+        frustrationHotspots: [{ subject: "Math", modality: "reading", meanFrustration: 0.45 }],
       },
     });
 

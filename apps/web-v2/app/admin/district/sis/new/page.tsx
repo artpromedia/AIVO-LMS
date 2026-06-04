@@ -17,7 +17,11 @@ export default async function Page() {
       navItems={DISTRICT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader eyebrow="Rostering" title={t("wizard_title")} description={t("wizard_description")} />
+      <PageHeader
+        eyebrow="Rostering"
+        title={t("wizard_title")}
+        description={t("wizard_description")}
+      />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <ConnectorWizard tenantId={session.tenantId} />
       </Card>

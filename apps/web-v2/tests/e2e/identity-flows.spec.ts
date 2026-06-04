@@ -17,8 +17,18 @@
 import { test, expect } from "@playwright/test";
 import { totp } from "../../lib/auth/totp";
 
-const platformCookie = { name: "aivo_mock_session", value: "platform_admin", domain: "127.0.0.1", path: "/" };
-const districtCookie = { name: "aivo_mock_session", value: "district_admin", domain: "127.0.0.1", path: "/" };
+const platformCookie = {
+  name: "aivo_mock_session",
+  value: "platform_admin",
+  domain: "127.0.0.1",
+  path: "/",
+};
+const districtCookie = {
+  name: "aivo_mock_session",
+  value: "district_admin",
+  domain: "127.0.0.1",
+  path: "/",
+};
 
 test.describe.configure({ mode: "serial" });
 
@@ -39,7 +49,9 @@ test.describe("enterprise identity flows", () => {
     await page.locator('label:has-text("OIDC")').first().click();
     await page.getByLabel("Identity provider name").fill("Okta Test");
     await page.getByLabel("OIDC issuer").fill("https://idp.example.com");
-    await page.getByLabel("OIDC discovery URL").fill("https://idp.example.com/.well-known/openid-configuration");
+    await page
+      .getByLabel("OIDC discovery URL")
+      .fill("https://idp.example.com/.well-known/openid-configuration");
     await page.getByLabel("OIDC client ID").fill("aivo-test-client");
 
     await page.getByRole("button", { name: /create identity provider|save changes/i }).click();
@@ -54,7 +66,10 @@ test.describe("enterprise identity flows", () => {
     await expect(tokenCode).toBeVisible({ timeout: 15_000 });
 
     // Revoke it; the active list empties.
-    await page.getByRole("button", { name: /^revoke$/i }).first().click();
+    await page
+      .getByRole("button", { name: /^revoke$/i })
+      .first()
+      .click();
     await expect(page.getByText(/no active scim tokens/i)).toBeVisible({ timeout: 15_000 });
   });
 

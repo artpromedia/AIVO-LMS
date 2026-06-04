@@ -17,8 +17,14 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
       const uid = req.subjectId;
 
       const [subs, tutorSubs] = await Promise.all([
-        db.delete(subscriptions).where(eq(subscriptions.userId, uid)).returning({ id: subscriptions.id }),
-        db.delete(tutorSubscriptions).where(eq(tutorSubscriptions.userId, uid)).returning({ id: tutorSubscriptions.id }),
+        db
+          .delete(subscriptions)
+          .where(eq(subscriptions.userId, uid))
+          .returning({ id: subscriptions.id }),
+        db
+          .delete(tutorSubscriptions)
+          .where(eq(tutorSubscriptions.userId, uid))
+          .returning({ id: tutorSubscriptions.id }),
       ]);
 
       // invoices are keyed by tenantId only (no userId FK); export-only for billing records.

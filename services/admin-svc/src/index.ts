@@ -6,7 +6,11 @@ import { createLogger, registerObservabilityPlugin } from "@aivo/observability";
 import { installAuditing } from "@aivo/audit-client";
 import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
-import { logAdminEnterpriseFlags, registerAdminIpAllowlist, registerActiveRoleHook } from "@aivo/security";
+import {
+  logAdminEnterpriseFlags,
+  registerAdminIpAllowlist,
+  registerActiveRoleHook,
+} from "@aivo/security";
 import {
   startSafeCron,
   createDrizzleAdvisoryLock,

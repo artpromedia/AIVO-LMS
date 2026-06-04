@@ -16,6 +16,7 @@
     "**/artifacts/**": true,
     "**/.venv/**": true,
     "**/__pycache__/**": true,
+    "**/vendor/**": true,
     "**/*.log": true,
     "**/tsconfig.tsbuildinfo": true
   },
@@ -50,5 +51,6 @@
     "fallbackPolling": "dynamicPriority"
   },
   "typescript.disableAutomaticTypeAcquisition": true,
-  "search.followSymlinks": false
+  "search.followSymlinks": false,
+  "files.useExperimentalFileWatcher": false
 }

@@ -77,10 +77,7 @@ test("claim extraction is case-folded for email and falls back for name", () => 
 
 test("mapOidcRole resolves the first matching group, else the default", () => {
   assert.equal(mapOidcRole({ groups: ["other", "okta-teachers"] } as any, CFG), "TEACHER");
-  assert.equal(
-    mapOidcRole({ groups: "okta-district-admins" } as any, CFG),
-    "DISTRICT_ADMIN",
-  );
+  assert.equal(mapOidcRole({ groups: "okta-district-admins" } as any, CFG), "DISTRICT_ADMIN");
   assert.equal(mapOidcRole({ groups: ["unknown"] } as any, CFG), "TEACHER");
   assert.equal(mapOidcRole({} as any, CFG), "TEACHER");
 });

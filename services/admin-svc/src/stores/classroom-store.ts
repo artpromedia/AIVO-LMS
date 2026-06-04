@@ -40,7 +40,8 @@ function applyFilters(rows: Classroom[], filters?: ClassroomFilters): Classroom[
   if (filters?.grade !== undefined) out = out.filter((c) => c.grade === filters.grade);
   if (filters?.teacherId !== undefined) {
     out = out.filter(
-      (c) => c.teacherIds.includes(filters.teacherId!) || c.coTeacherIds.includes(filters.teacherId!),
+      (c) =>
+        c.teacherIds.includes(filters.teacherId!) || c.coTeacherIds.includes(filters.teacherId!),
     );
   }
   return out;
@@ -135,7 +136,9 @@ export class PostgresClassroomStore implements ClassroomStore {
         learnerIds: classroom.learnerIds,
         updatedAt: new Date(classroom.updatedAt),
       })
-      .where(and(eq(adminClassrooms.id, classroom.id), eq(adminClassrooms.schoolId, classroom.schoolId)));
+      .where(
+        and(eq(adminClassrooms.id, classroom.id), eq(adminClassrooms.schoolId, classroom.schoolId)),
+      );
   }
 
   async remove(id: string): Promise<void> {

@@ -166,10 +166,7 @@ function dumpOne(svc) {
     // Write the shim to a temp .mjs file so we don't have to pass a
     // multi-line script through `-e` (cross-shell escaping nightmare on
     // Windows). Cleaned up after the child exits.
-    const shimPath = resolve(
-      tmpdir(),
-      `aivo-openapi-${svc.name}-${process.pid}-${Date.now()}.mjs`,
-    );
+    const shimPath = resolve(tmpdir(), `aivo-openapi-${svc.name}-${process.pid}-${Date.now()}.mjs`);
     writeFileSync(shimPath, shim);
 
     // Invoke tsx directly (not via `pnpm exec`) so pnpm's "Unsupported

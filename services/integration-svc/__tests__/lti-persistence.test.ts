@@ -240,10 +240,7 @@ describe.skipIf(SKIP)("LTI platform registration CRUD + AGS write-back round-tri
       tenantId,
       label: "Canvas Prod",
       jwksUrl: `${issuer}/jwks/v2`,
-      deployments: [
-        { deploymentId: "dep-B", label: "Period 2" },
-        { deploymentId: "dep-C" },
-      ],
+      deployments: [{ deploymentId: "dep-B", label: "Period 2" }, { deploymentId: "dep-C" }],
     });
     expect(updated.label).toBe("Canvas Prod");
     expect(updated.jwksUrl).toBe(`${issuer}/jwks/v2`);

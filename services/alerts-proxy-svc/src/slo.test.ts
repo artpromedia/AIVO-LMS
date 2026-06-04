@@ -75,7 +75,10 @@ describe("alert dedupe", () => {
     const d = new AlertDeduper(60_000);
     assert.equal(d.accept(firing(), 0), true);
     assert.equal(
-      d.accept({ status: "resolved", labels: { alertname: "HighLatency", severity: "critical" } }, 1_000),
+      d.accept(
+        { status: "resolved", labels: { alertname: "HighLatency", severity: "critical" } },
+        1_000,
+      ),
       true,
     );
   });

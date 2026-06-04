@@ -50,10 +50,14 @@ async function mutate(req: Request, ctx: Ctx) {
   try {
     body = await req.json();
   } catch {
-    return fail({ ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." }, requestId);
+    return fail(
+      { ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." },
+      requestId,
+    );
   }
   const parsed = UpdateSchema.safeParse(body);
-  if (!parsed.success) return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
+  if (!parsed.success)
+    return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
 
   const updated = updateConnector(connectorId, parsed.data);
   await recordAudit({

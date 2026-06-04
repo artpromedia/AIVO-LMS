@@ -11,18 +11,15 @@ import { appendUpdate } from "./statuspage-incidents.js";
 import { emitStatusAudit } from "../statuspage/audit.js";
 
 export function registerUpdateRoutes(app: FastifyInstance): void {
-  app.get<{ Querystring: { incidentId?: string } }>(
-    "/api/statuspage/updates",
-    async (request) => {
-      const store = getStatusStore();
-      let updates = [...store.updates.values()];
-      if (request.query.incidentId) {
-        updates = updates.filter((u) => u.incidentId === request.query.incidentId);
-      }
-      updates.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-      return { updates };
-    },
-  );
+  app.get<{ Querystring: { incidentId?: string } }>("/api/statuspage/updates", async (request) => {
+    const store = getStatusStore();
+    let updates = [...store.updates.values()];
+    if (request.query.incidentId) {
+      updates = updates.filter((u) => u.incidentId === request.query.incidentId);
+    }
+    updates.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return { updates };
+  });
 
   app.post<{ Params: { id: string }; Body: { body?: string; lifecycle?: IncidentLifecycle } }>(
     "/api/statuspage/incidents/:id/updates",

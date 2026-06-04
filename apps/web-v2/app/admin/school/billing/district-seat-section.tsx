@@ -88,9 +88,7 @@ export function DistrictSeatSection({
                         {new Date(r.createdAt).toLocaleDateString()}
                       </td>
                       <td className="p-2">
-                        <Badge tone={REQUEST_STATUS_TONE[r.status] ?? "neutral"}>
-                          {r.status}
-                        </Badge>
+                        <Badge tone={REQUEST_STATUS_TONE[r.status] ?? "neutral"}>{r.status}</Badge>
                       </td>
                     </tr>
                   ))}
@@ -102,17 +100,13 @@ export function DistrictSeatSection({
       ) : (
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-sm text-aivo-ink-soft">
-            This school is not linked to a district. Contact platform support to configure
-            district billing.
+            This school is not linked to a district. Contact platform support to configure district
+            billing.
           </p>
         </Card>
       )}
 
-      <RequestSeatsModal
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-        currentSeats={allocated}
-      />
+      <RequestSeatsModal open={modalOpen} onOpenChange={setModalOpen} currentSeats={allocated} />
     </section>
   );
 }

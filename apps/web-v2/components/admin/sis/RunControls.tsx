@@ -22,16 +22,13 @@ export function RunControls({ connectorId }: { connectorId: string }) {
           body: JSON.stringify({ type, dryRun }),
         });
         const json = await res.json();
-        if (!json.ok) return setMsg({ kind: "err", text: json.error?.userMessage ?? t("error_generic") });
+        if (!json.ok)
+          return setMsg({ kind: "err", text: json.error?.userMessage ?? t("error_generic") });
         const run = json.data.run;
         setMsg({
           kind: "ok",
           text:
-            run.status === "paused"
-              ? t("run_paused")
-              : dryRun
-                ? t("dry_run_done")
-                : t("run_done"),
+            run.status === "paused" ? t("run_paused") : dryRun ? t("dry_run_done") : t("run_done"),
         });
         router.refresh();
       } catch {
@@ -46,7 +43,12 @@ export function RunControls({ connectorId }: { connectorId: string }) {
         <Button type="button" onClick={() => run("full", false)} disabled={pending}>
           {t("run_full")}
         </Button>
-        <Button type="button" variant="outline" onClick={() => run("delta", false)} disabled={pending}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => run("delta", false)}
+          disabled={pending}
+        >
           {t("run_delta")}
         </Button>
         <Button type="button" variant="ghost" onClick={() => run("full", true)} disabled={pending}>
@@ -54,7 +56,9 @@ export function RunControls({ connectorId }: { connectorId: string }) {
         </Button>
       </div>
       {msg ? (
-        <p className={`text-sm ${msg.kind === "ok" ? "text-aivo-success" : "text-aivo-danger"}`}>{msg.text}</p>
+        <p className={`text-sm ${msg.kind === "ok" ? "text-aivo-success" : "text-aivo-danger"}`}>
+          {msg.text}
+        </p>
       ) : null}
     </div>
   );

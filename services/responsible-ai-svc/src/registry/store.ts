@@ -189,7 +189,10 @@ export function createSeededStore(): RegistryStore {
       name: "Springfield District Policy",
       scopeLevel: "district",
       scopeId: "district-springfield",
-      contentSafety: { blockedCategories: ["violence", "self-harm", "sexual", "weapons"], maxSeverity: "low" },
+      contentSafety: {
+        blockedCategories: ["violence", "self-harm", "sexual", "weapons"],
+        maxSeverity: "low",
+      },
       ageGating: { minAge: 6, requireGuardianConsent: true },
       regionRestrictions: { allowedRegions: ["US"], blockedRegions: [] },
       enabled: true,

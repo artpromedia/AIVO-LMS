@@ -15,7 +15,11 @@ export default async function Page() {
       navItems={SCHOOL_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader eyebrow="Security" title={t("school_title")} description={t("school_description")} />
+      <PageHeader
+        eyebrow="Security"
+        title={t("school_title")}
+        description={t("school_description")}
+      />
       <AuditConsole scopeKey="school" />
     </AppShell>
   );

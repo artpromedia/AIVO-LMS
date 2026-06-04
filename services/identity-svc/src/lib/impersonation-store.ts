@@ -55,10 +55,7 @@ export function createInMemoryImpersonationStore(): ImpersonationStore {
     activeForActor(actorId, now = Date.now()) {
       const nowMs = now;
       return [...byId.values()].find(
-        (s) =>
-          s.actorId === actorId &&
-          s.endedAt === null &&
-          new Date(s.endsAt).getTime() > nowMs,
+        (s) => s.actorId === actorId && s.endedAt === null && new Date(s.endsAt).getTime() > nowMs,
       );
     },
     historyForActor(actorId) {

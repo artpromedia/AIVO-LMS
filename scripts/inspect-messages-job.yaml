@@ -9,23 +9,23 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-      - name: psql
-        image: postgres:15-alpine
-        command:
-        - /bin/sh
-        - -c
-        - |
-          psql "$DATABASE_URL" <<'SQL'
-          \echo === messages ===
-          \d messages
-          \echo === message_threads ===
-          \d message_threads
-          \echo === message_thread_participants ===
-          \d message_thread_participants
-          SQL
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: db-secrets
-              key: database-url
+        - name: psql
+          image: postgres:15-alpine
+          command:
+            - /bin/sh
+            - -c
+            - |
+              psql "$DATABASE_URL" <<'SQL'
+              \echo === messages ===
+              \d messages
+              \echo === message_threads ===
+              \d message_threads
+              \echo === message_thread_participants ===
+              \d message_thread_participants
+              SQL
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: database-url

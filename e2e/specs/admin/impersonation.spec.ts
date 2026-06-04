@@ -75,7 +75,10 @@ test.describe("Secure Impersonation — View As a learner, write-blocked, banner
     await page.getByLabel(/reason/i).fill("Support: diagnosing broken learner dashboard.");
     // Leave "allow writes" off — this session is read-only.
     // Step-up MFA challenge (deterministic OTP in identity test-mode).
-    await page.getByLabel(/code|otp|mfa/i).fill("000000").catch(() => undefined);
+    await page
+      .getByLabel(/code|otp|mfa/i)
+      .fill("000000")
+      .catch(() => undefined);
     await page.getByRole("button", { name: /start|confirm|view as/i }).click();
 
     // We are now impersonating: the learner dashboard renders...
@@ -100,7 +103,10 @@ test.describe("Secure Impersonation — View As a learner, write-blocked, banner
         page
           .waitForResponse((r) => /\/api\/.*(comment|message)/i.test(r.url()), { timeout: 10_000 })
           .catch(() => null),
-        page.getByRole("button", { name: /post|send|submit/i }).first().click(),
+        page
+          .getByRole("button", { name: /post|send|submit/i })
+          .first()
+          .click(),
       ]);
       // The guard returns 403 for a non-allowlisted write under impersonation.
       if (resp) expect(resp.status()).toBe(403);
@@ -116,7 +122,10 @@ test.describe("Secure Impersonation — View As a learner, write-blocked, banner
     await expect(page.getByTestId("impersonation-watermark")).toBeVisible();
 
     // 4) "Exit View-As" returns to the original admin session in one click.
-    await page.getByTestId("impersonation-banner").getByRole("button", { name: /exit|stop/i }).click();
+    await page
+      .getByTestId("impersonation-banner")
+      .getByRole("button", { name: /exit|stop/i })
+      .click();
     await expect(page.getByTestId("impersonation-banner")).toHaveCount(0);
     // Back in the platform admin context (the impersonation token is gone).
     await page.goto("/admin/platform/users");

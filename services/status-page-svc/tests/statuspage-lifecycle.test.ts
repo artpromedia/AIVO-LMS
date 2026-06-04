@@ -78,7 +78,9 @@ describe("status-page incident lifecycle + public summary", () => {
     ]);
 
     // Resolved → component restored, no longer in active incidents.
-    const summary = (await app.inject({ method: "GET", url: "/api/statuspage/public/summary" })).json();
+    const summary = (
+      await app.inject({ method: "GET", url: "/api/statuspage/public/summary" })
+    ).json();
     expect(summary.activeIncidents.some((i: any) => i.id === id)).toBe(false);
     const tutor = summary.components.find((c: any) => c.id === "comp-tutor");
     expect(tutor.status).toBe("operational");
@@ -87,7 +89,10 @@ describe("status-page incident lifecycle + public summary", () => {
   it("scopes the public summary by tenant", async () => {
     // comp-assessment is only visible/affecting tenant-springfield.
     const scoped = (
-      await app.inject({ method: "GET", url: "/api/statuspage/public/summary?tenantId=tenant-other" })
+      await app.inject({
+        method: "GET",
+        url: "/api/statuspage/public/summary?tenantId=tenant-other",
+      })
     ).json();
     expect(scoped.components.some((c: any) => c.id === "comp-assessment")).toBe(false);
 
@@ -121,7 +126,9 @@ describe("status-page incident lifecycle + public summary", () => {
       payload: { state: "in_progress" },
       headers: ADMIN,
     });
-    const components = (await app.inject({ method: "GET", url: "/api/statuspage/components" })).json();
+    const components = (
+      await app.inject({ method: "GET", url: "/api/statuspage/components" })
+    ).json();
     const identity = components.components.find((c: any) => c.id === "comp-identity");
     expect(identity.status).toBe("under_maintenance");
   });

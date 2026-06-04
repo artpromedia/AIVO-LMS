@@ -23,7 +23,8 @@ export function registerModelRoutes(app: FastifyInstance): void {
       let models = [...store.models.values()];
       if (status) models = models.filter((m) => m.status === status);
       if (modality) models = models.filter((m) => m.modality === modality);
-      if (owner) models = models.filter((m) => m.owner.team.toLowerCase().includes(owner.toLowerCase()));
+      if (owner)
+        models = models.filter((m) => m.owner.team.toLowerCase().includes(owner.toLowerCase()));
       return {
         models: models.map((m) => ({
           ...m,

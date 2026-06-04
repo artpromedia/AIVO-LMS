@@ -82,7 +82,14 @@ export function mapCleverUser(r: Record<string, any>): User {
   const roles: RoleType[] = roleKeys.map((k) => CLEVER_ROLE[k] ?? "student");
   const fallback: RoleType = r.type ? (CLEVER_ROLE[r.type] ?? "student") : "student";
   const allRoles = roles.length ? Array.from(new Set(roles)) : [fallback];
-  const precedence: RoleType[] = ["administrator", "teacher", "aide", "guardian", "parent", "student"];
+  const precedence: RoleType[] = [
+    "administrator",
+    "teacher",
+    "aide",
+    "guardian",
+    "parent",
+    "student",
+  ];
   const primaryRole = precedence.find((p) => allRoles.includes(p)) ?? allRoles[0];
   const name = r.name ?? {};
   // School association: a teacher/student has `school`; staff may have `schools`.

@@ -102,7 +102,8 @@ describe("decideImpersonatedRequest — the full policy", () => {
 
   it("allows a write only when imp_writes_ok AND allowlisted", () => {
     expect(
-      decideImpersonatedRequest(impClaims({ imp_writes_ok: true }), "POST", "/api/safe", allow).kind,
+      decideImpersonatedRequest(impClaims({ imp_writes_ok: true }), "POST", "/api/safe", allow)
+        .kind,
     ).toBe("write_allowed");
   });
 

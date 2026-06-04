@@ -61,7 +61,10 @@ export async function PUT(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return fail({ ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." }, requestId);
+    return fail(
+      { ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." },
+      requestId,
+    );
   }
   const parsed = VerifySchema.safeParse(body);
   if (!parsed.success) {
@@ -85,7 +88,10 @@ export async function PUT(req: Request) {
     requestId,
   });
   if (!verified) {
-    return fail({ ...ERRORS.VALIDATION_FAILED, message: "That code is incorrect or expired." }, requestId);
+    return fail(
+      { ...ERRORS.VALIDATION_FAILED, message: "That code is incorrect or expired." },
+      requestId,
+    );
   }
 
   grantStepUp(session.userId);

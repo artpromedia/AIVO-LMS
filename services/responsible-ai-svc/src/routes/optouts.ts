@@ -71,7 +71,9 @@ export function registerOptOutRoutes(app: FastifyInstance): void {
     if (!optOut) return reply.code(404).send({ error: "Opt-out not found" });
     if (!canConfigureOptOut(actor, optOut.tenantId)) return deny(reply);
     store.optOuts.delete(optOut.id);
-    await emitRegistryAudit(request, "RAI_OPTOUT_REMOVED", optOut.id, { tenantId: optOut.tenantId });
+    await emitRegistryAudit(request, "RAI_OPTOUT_REMOVED", optOut.id, {
+      tenantId: optOut.tenantId,
+    });
     return { removed: true };
   });
 }

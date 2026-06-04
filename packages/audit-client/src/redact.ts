@@ -6,7 +6,8 @@
  * defense-in-depth backstop, any retained key whose name matches a secret
  * pattern is masked even if allowlisted by mistake.
  */
-const SECRET_KEY = /(secret|password|token|authorization|cookie|ssn|client_secret|private_key|api[_-]?key)/i;
+const SECRET_KEY =
+  /(secret|password|token|authorization|cookie|ssn|client_secret|private_key|api[_-]?key)/i;
 
 export function redactDetails(
   details: Record<string, unknown> | undefined,

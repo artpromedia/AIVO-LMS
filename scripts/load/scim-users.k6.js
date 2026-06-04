@@ -68,7 +68,8 @@ export default function () {
 }
 
 export function handleSummary(data) {
-  const m = data.metrics["http_req_duration{endpoint:scim-users}"] || data.metrics.http_req_duration;
+  const m =
+    data.metrics["http_req_duration{endpoint:scim-users}"] || data.metrics.http_req_duration;
   const p95 = m ? (m.values["p(95)"] || 0).toFixed(0) : "n/a";
   return {
     "scripts/load/results/scim-users-summary.json": JSON.stringify(data, null, 2),

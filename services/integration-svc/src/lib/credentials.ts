@@ -64,7 +64,9 @@ export function decryptSisCredentials(stored: StoredSisCredentials): SisCredenti
 /** Redact secrets from any object before logging. */
 export function redactCredentials<T extends Record<string, unknown>>(obj: T): T {
   const SECRET_KEYS = /secret|token|password|client_secret|clientsecret/i;
-  const clone: Record<string, unknown> = Array.isArray(obj) ? [...(obj as unknown[])] as never : { ...obj };
+  const clone: Record<string, unknown> = Array.isArray(obj)
+    ? ([...(obj as unknown[])] as never)
+    : { ...obj };
   for (const k of Object.keys(clone)) {
     if (SECRET_KEYS.test(k)) clone[k] = "[REDACTED]";
     else if (clone[k] && typeof clone[k] === "object") {

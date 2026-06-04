@@ -47,7 +47,9 @@ describe("synthetic outage → alert → auto-incident", () => {
     let createCount = 0;
     const fetchImpl = (async () => {
       createCount += 1;
-      return new Response(JSON.stringify({ incident: { id: `inc-${createCount}` } }), { status: 201 });
+      return new Response(JSON.stringify({ incident: { id: `inc-${createCount}` } }), {
+        status: 201,
+      });
     }) as unknown as typeof fetch;
 
     const app = Fastify();
@@ -58,7 +60,11 @@ describe("synthetic outage → alert → auto-incident", () => {
     });
 
     const fire = () =>
-      app.inject({ method: "POST", url: "/api/alerts/webhook", payload: { alerts: [criticalAlert()] } });
+      app.inject({
+        method: "POST",
+        url: "/api/alerts/webhook",
+        payload: { alerts: [criticalAlert()] },
+      });
 
     const first = (await fire()).json();
     const second = (await fire()).json();

@@ -43,8 +43,8 @@ non-blocking `billing.overage` event rather than blocking learners.
 
 ## Diagnose
 
-Work top-down: establish *what we billed*, then *what we measured*, then
-*why they differ*.
+Work top-down: establish _what we billed_, then _what we measured_, then
+_why they differ_.
 
 ### 1. What we billed — `invoices_cache` + Stripe
 
@@ -116,13 +116,13 @@ Cross-check `used` against the **nightly utilization job** output, which
 aggregates active users from `identity-svc` and rolls them up to the pool.
 If the district claims `used` never exceeded `allocated`, confirm whether
 the job counted users it should not have (deactivated accounts, duplicate
-identities) — a job-side miscount is a *we were wrong* path, a genuine
-over-utilization is a *defend the charge* path.
+identities) — a job-side miscount is a _we were wrong_ path, a genuine
+over-utilization is a _defend the charge_ path.
 
 ### 4. Hard-cap check
 
 If the district is on an opt-in **hard-cap** (ADR 0033 §4), confirm whether
-the cap was hit during the period — a hard-cap refuses *new* seat
+the cap was hit during the period — a hard-cap refuses _new_ seat
 acquisition but never evicts existing learners, so a district on a hard-cap
 should generally **not** see an overage charge. An overage on a
 hard-capped tenant is itself a bug to investigate, not just a dispute.
@@ -141,8 +141,8 @@ pnpm --filter @aivo/billing-svc exec node scripts/resync-invoice.mjs \
 ```
 
 Confirm `invoices_cache` now matches Stripe, hand the district the
-refreshed signed-URL PDF, and close the dispute as *display error, charge
-correct*.
+refreshed signed-URL PDF, and close the dispute as _display error, charge
+correct_.
 
 ### B. We over-billed (seat count or overage wrong)
 

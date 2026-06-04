@@ -14,9 +14,14 @@ test.describe("audit console scope + export + persistence", () => {
   // Target table rows by their aria-label so we don't also match the
   // action's filter-bar chip with the same text.
   const row = (page: import("@playwright/test").Page, action: string) =>
-    page.getByRole("button", { name: new RegExp(`Open details for ${action.replace(/\./g, "\\.")}`) });
+    page.getByRole("button", {
+      name: new RegExp(`Open details for ${action.replace(/\./g, "\\.")}`),
+    });
 
-  test("platform sees a platform-global (null-tenant) event that district does not", async ({ context, page }) => {
+  test("platform sees a platform-global (null-tenant) event that district does not", async ({
+    context,
+    page,
+  }) => {
     await context.addCookies([cookie("platform_admin")]);
     await page.goto("/admin/platform/audit");
     // mfa.step_up.verify was seeded with tenant_id=null (platform-global).

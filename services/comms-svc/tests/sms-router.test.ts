@@ -7,11 +7,7 @@ import {
   _resetSmsAdapterForTest,
   type SmsAdapter,
 } from "../src/providers/sms-router.js";
-import {
-  CHANNELS,
-  isChannelAllowedForTenant,
-  snapshotChannelStatus,
-} from "../src/lib/channels.js";
+import { CHANNELS, isChannelAllowedForTenant, snapshotChannelStatus } from "../src/lib/channels.js";
 
 test("defaults to the disabled adapter when no provider is configured", () => {
   delete process.env.SMS_PROVIDER;

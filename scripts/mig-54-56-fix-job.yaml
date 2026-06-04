@@ -9,42 +9,42 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-      - name: psql
-        image: postgres:15-alpine
-        command:
-        - /bin/sh
-        - -c
-        - |
-          set -e
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
-          -- Drop empty pre-existing conversation-based messaging tables that
-          -- conflict with the peaceful-meitner thread-based schema (0055).
-          -- All 5 tables verified empty (0 rows).
-          BEGIN;
-          DROP TABLE IF EXISTS conversation_reads CASCADE;
-          DROP TABLE IF EXISTS messages CASCADE;
-          DROP TABLE IF EXISTS thread_participants CASCADE;
-          DROP TABLE IF EXISTS conversations CASCADE;
-          DROP TABLE IF EXISTS message_threads CASCADE;
-          -- message_thread_participants already matches new schema; keep it.
-          COMMIT;
-          SQL
+        - name: psql
+          image: postgres:15-alpine
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+              -- Drop empty pre-existing conversation-based messaging tables that
+              -- conflict with the peaceful-meitner thread-based schema (0055).
+              -- All 5 tables verified empty (0 rows).
+              BEGIN;
+              DROP TABLE IF EXISTS conversation_reads CASCADE;
+              DROP TABLE IF EXISTS messages CASCADE;
+              DROP TABLE IF EXISTS thread_participants CASCADE;
+              DROP TABLE IF EXISTS conversations CASCADE;
+              DROP TABLE IF EXISTS message_threads CASCADE;
+              -- message_thread_participants already matches new schema; keep it.
+              COMMIT;
+              SQL
 
-          echo "=== 0055_messaging.sql (re-apply) ==="
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f /sql/0055_messaging.sql
-          echo "=== 0056_user_roles.sql ==="
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f /sql/0056_user_roles.sql
-          echo "=== DONE ==="
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: db-secrets
-              key: database-url
-        volumeMounts:
-        - name: sql
-          mountPath: /sql
+              echo "=== 0055_messaging.sql (re-apply) ==="
+              psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f /sql/0055_messaging.sql
+              echo "=== 0056_user_roles.sql ==="
+              psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f /sql/0056_user_roles.sql
+              echo "=== DONE ==="
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: database-url
+          volumeMounts:
+            - name: sql
+              mountPath: /sql
       volumes:
-      - name: sql
-        configMap:
-          name: mig-54-56-fix-sql
+        - name: sql
+          configMap:
+            name: mig-54-56-fix-sql

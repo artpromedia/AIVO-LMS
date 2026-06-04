@@ -26,7 +26,7 @@ ADR:
 - **SCIM 2.0** — `services/identity-svc/src/routes/scim.ts`: Users and
   Groups CRUD, filter parsing, bearer tokens hashed at rest.
 - **OIDC Provider** — `services/identity-svc/src/routes/oidc-provider.ts`:
-  AIVO acting *as* an IdP (auth-code + PKCE, JWKS, discovery) for internal
+  AIVO acting _as_ an IdP (auth-code + PKCE, JWKS, discovery) for internal
   tools and trusted partners.
 - **MFA** — TOTP (`services/mfa-totp.ts`), WebAuthn
   (`services/mfa-webauthn.ts`), email OTP, lockout, recovery codes, and
@@ -38,14 +38,14 @@ ADR:
   `apps/web-v2/app/admin/district/settings/sso`.
 
 This ADR records the architecture and the **incremental additions** made
-under Sprint 1 to close the genuine gaps, deliberately *reusing* the
+under Sprint 1 to close the genuine gaps, deliberately _reusing_ the
 existing surfaces rather than duplicating them.
 
 ## Decision
 
 ### 1. OIDC Relying-Party (consume external IdPs)
 
-The repository previously only implemented OIDC as a *provider*. We add
+The repository previously only implemented OIDC as a _provider_. We add
 the **relying-party** side so a tenant can federate to an external OIDC
 IdP, complementing SAML:
 

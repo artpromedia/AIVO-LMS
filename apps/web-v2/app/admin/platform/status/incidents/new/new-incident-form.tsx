@@ -17,9 +17,7 @@ export function NewIncidentForm({ components }: { components: ComponentOption[] 
   const [errorMsg, setErrorMsg] = useState<string>("");
 
   function toggle(id: string) {
-    setAffected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
+    setAffected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
   async function submit(e: React.FormEvent) {
@@ -148,9 +146,7 @@ export function NewIncidentForm({ components }: { components: ComponentOption[] 
         />
       </div>
 
-      {state === "error" ? (
-        <p className="text-sm text-aivo-danger">{errorMsg}</p>
-      ) : null}
+      {state === "error" ? <p className="text-sm text-aivo-danger">{errorMsg}</p> : null}
 
       <button
         type="submit"

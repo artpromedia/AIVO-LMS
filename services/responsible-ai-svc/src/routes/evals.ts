@@ -11,7 +11,12 @@ import { runEvalHarness } from "../registry/eval-harness.js";
 import { actorOf, canRunEvals, deny } from "../registry/rbac.js";
 import { emitRegistryAudit } from "../lib/registry-audit.js";
 
-const VALID_HARNESSES: EvalHarness[] = ["safety-suite", "accuracy-suite", "bias-suite", "full-suite"];
+const VALID_HARNESSES: EvalHarness[] = [
+  "safety-suite",
+  "accuracy-suite",
+  "bias-suite",
+  "full-suite",
+];
 
 export function registerEvalRoutes(app: FastifyInstance): void {
   const base = "/api/responsible-ai/evals";
@@ -35,7 +40,9 @@ export function registerEvalRoutes(app: FastifyInstance): void {
       if (!model) return reply.code(404).send({ error: "Model not found" });
       const harness = request.body?.harness ?? "full-suite";
       if (!VALID_HARNESSES.includes(harness)) {
-        return reply.code(400).send({ error: `harness must be one of ${VALID_HARNESSES.join(", ")}` });
+        return reply
+          .code(400)
+          .send({ error: `harness must be one of ${VALID_HARNESSES.join(", ")}` });
       }
       const run = runEvalHarness(model.id, harness, actor.actorId ?? "platform_admin");
       store.evalRuns.set(run.id, run);

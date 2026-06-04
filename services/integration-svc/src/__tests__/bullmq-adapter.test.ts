@@ -57,10 +57,7 @@ describe("BullMqSyncQueue adapter", () => {
   it("floors negative delays to 0", async () => {
     const { BullMqSyncQueue } = await import("../queue/bullmq-adapter.js");
     const q = new BullMqSyncQueue({} as any);
-    await q.enqueue(
-      { type: "sync.full", tenantId: "t1", connectorId: "c1", attempt: 1 },
-      -100,
-    );
+    await q.enqueue({ type: "sync.full", tenantId: "t1", connectorId: "c1", attempt: 1 }, -100);
     const [, , opts] = addMock.mock.calls[0] as any;
     expect(opts.delay).toBe(0);
   });

@@ -20,7 +20,8 @@ export async function GET(req: Request, ctx: Ctx) {
   if ("err" in got) return got.err;
   const { requestId } = got;
   const { connectorId } = await ctx.params;
-  if (!getConnector(connectorId)) return fail({ ...ERRORS.NOT_FOUND, message: "Connector not found" }, requestId);
+  if (!getConnector(connectorId))
+    return fail({ ...ERRORS.NOT_FOUND, message: "Connector not found" }, requestId);
   return ok({ runs: listRuns(connectorId, 10) }, requestId);
 }
 
@@ -42,7 +43,8 @@ export async function POST(req: Request, ctx: Ctx) {
     /* empty body is allowed — defaults to a full sync */
   }
   const parsed = RunSchema.safeParse(body ?? {});
-  if (!parsed.success) return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
+  if (!parsed.success)
+    return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
 
   const run = triggerRun(connectorId, parsed.data.type, parsed.data.dryRun ?? false);
   await recordAudit({

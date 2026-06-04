@@ -111,7 +111,10 @@ export function registerApiKeyRoutes(app: FastifyInstance, db: any) {
     {
       schema: adminSvcApiKeysSchema,
       preHandler: requirePlatformAdmin,
-      ...audited("admin.api_key.created", { entityType: "api_key", detailsAllowlist: ["name", "scopes", "tenantId"] }),
+      ...audited("admin.api_key.created", {
+        entityType: "api_key",
+        detailsAllowlist: ["name", "scopes", "tenantId"],
+      }),
     },
     async (req: any, reply) => {
       const { name, scopes, expiresInDays, tenantId } = (req.body || {}) as {

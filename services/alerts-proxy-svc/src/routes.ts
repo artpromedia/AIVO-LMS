@@ -169,17 +169,17 @@ export function registerAlertIntakeRoutes(app: FastifyInstance, deps: AlertRoute
       // Critical firing alerts auto-open a status-page incident so the
       // public page reflects the outage within seconds.
       if (severity === "critical" && alert.status === "firing") {
-        decision.autoIncident = await openAutoIncident(
-          doFetch,
-          statusPageUrl,
-          alert,
-          tenantId,
-        );
+        decision.autoIncident = await openAutoIncident(doFetch, statusPageUrl, alert, tenantId);
       }
       routed.push(decision);
     }
 
-    return { received: alerts.length, routed: routed.length, suppressed: suppressed.length, decisions: routed };
+    return {
+      received: alerts.length,
+      routed: routed.length,
+      suppressed: suppressed.length,
+      decisions: routed,
+    };
   });
 }
 
@@ -216,34 +216,31 @@ async function openAutoIncident(
 
 export function registerTenantHealthRoutes(app: FastifyInstance): void {
   // GET /api/alerts/health-tenant?tenantId=... aggregates per-tenant signals.
-  app.get<{ Querystring: { tenantId?: string } }>(
-    "/api/alerts/health-tenant",
-    async (request) => {
-      const store = getSloStore();
-      const tenantId = request.query.tenantId ?? null;
-      const signals = [...store.slos.values()].map((slo) => {
-        const obs = observedFor(store, slo.service, tenantId);
-        const budget = computeErrorBudget({
-          target: slo.target,
-          goodEvents: obs.goodEvents,
-          badEvents: obs.badEvents,
-        });
-        const meeting = budget.observedSli >= slo.target;
-        return {
-          service: slo.service,
-          slo: slo.name,
-          observedSli: budget.observedSli,
-          target: slo.target,
-          budgetRemaining: budget.remaining,
-          status: meeting ? "healthy" : budget.remaining > 0 ? "at_risk" : "breaching",
-        };
+  app.get<{ Querystring: { tenantId?: string } }>("/api/alerts/health-tenant", async (request) => {
+    const store = getSloStore();
+    const tenantId = request.query.tenantId ?? null;
+    const signals = [...store.slos.values()].map((slo) => {
+      const obs = observedFor(store, slo.service, tenantId);
+      const budget = computeErrorBudget({
+        target: slo.target,
+        goodEvents: obs.goodEvents,
+        badEvents: obs.badEvents,
       });
-      const worst = signals.some((s) => s.status === "breaching")
-        ? "breaching"
-        : signals.some((s) => s.status === "at_risk")
-          ? "at_risk"
-          : "healthy";
-      return { tenantId, overall: worst, signals, checkedAt: new Date().toISOString() };
-    },
-  );
+      const meeting = budget.observedSli >= slo.target;
+      return {
+        service: slo.service,
+        slo: slo.name,
+        observedSli: budget.observedSli,
+        target: slo.target,
+        budgetRemaining: budget.remaining,
+        status: meeting ? "healthy" : budget.remaining > 0 ? "at_risk" : "breaching",
+      };
+    });
+    const worst = signals.some((s) => s.status === "breaching")
+      ? "breaching"
+      : signals.some((s) => s.status === "at_risk")
+        ? "at_risk"
+        : "healthy";
+    return { tenantId, overall: worst, signals, checkedAt: new Date().toISOString() };
+  });
 }

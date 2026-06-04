@@ -23,13 +23,7 @@ function statusTone(status?: string): "success" | "danger" | "primary" | "neutra
 
 const TERMINAL = new Set(["succeeded", "failed"]);
 
-export function RunStatusCard({
-  runId,
-  initialRun,
-}: {
-  runId: string;
-  initialRun?: Run;
-}) {
+export function RunStatusCard({ runId, initialRun }: { runId: string; initialRun?: Run }) {
   const [run, setRun] = React.useState<Run | null>(initialRun ?? null);
   const [polling, setPolling] = React.useState(
     !initialRun || !TERMINAL.has(String(initialRun.status)),
@@ -65,8 +59,7 @@ export function RunStatusCard({
 
   const status = run?.status ?? "pending";
   const sources = run?.lineage?.sources ?? [];
-  const error =
-    typeof run?.error === "string" ? { message: run.error } : run?.error ?? null;
+  const error = typeof run?.error === "string" ? { message: run.error } : (run?.error ?? null);
   const succeeded = status === "succeeded";
 
   return (

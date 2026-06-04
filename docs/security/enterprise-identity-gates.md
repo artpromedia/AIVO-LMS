@@ -58,9 +58,9 @@ non-secret `last4` preview is retained
 
 ## Status
 
-| Gate | Mechanism | State |
-|---|---|---|
-| SCIM list p95 < 300ms @ 100 rps | `scripts/load/scim-users.k6.js` | Ready to run in `load-test.yml` |
-| ZAP baseline on new endpoints | `zap-identity` job | Wired (needs `ZAP_IDENTITY_*` secrets) |
-| No XXE on SAML | node-saml v5 + signed assertions | Verified by design |
-| SCIM tokens hashed at rest | sha256 in `scim_tokens` | Verified in code |
+| Gate                            | Mechanism                        | State                                  |
+| ------------------------------- | -------------------------------- | -------------------------------------- |
+| SCIM list p95 < 300ms @ 100 rps | `scripts/load/scim-users.k6.js`  | Ready to run in `load-test.yml`        |
+| ZAP baseline on new endpoints   | `zap-identity` job               | Wired (needs `ZAP_IDENTITY_*` secrets) |
+| No XXE on SAML                  | node-saml v5 + signed assertions | Verified by design                     |
+| SCIM tokens hashed at rest      | sha256 in `scim_tokens`          | Verified in code                       |

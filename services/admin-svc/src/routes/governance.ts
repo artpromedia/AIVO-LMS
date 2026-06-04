@@ -66,21 +66,11 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
         db
           .select()
           .from(adminAuditLog)
-          .where(
-            or(
-              eq(adminAuditLog.actorId, uid),
-              eq(adminAuditLog.onBehalfOfId, uid),
-            ),
-          ),
+          .where(or(eq(adminAuditLog.actorId, uid), eq(adminAuditLog.onBehalfOfId, uid))),
         db
           .select()
           .from(dataRequests)
-          .where(
-            or(
-              eq(dataRequests.subjectId, uid),
-              eq(dataRequests.requesterId, uid),
-            ),
-          ),
+          .where(or(eq(dataRequests.subjectId, uid), eq(dataRequests.requesterId, uid))),
       ]);
 
       return {

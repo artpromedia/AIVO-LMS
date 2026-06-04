@@ -63,7 +63,10 @@ function matches(e: AuditEventView, f: AuditFilter): boolean {
   return true;
 }
 
-export function queryAudit(f: AuditFilter): { events: AuditEventView[]; nextCursor: string | null } {
+export function queryAudit(f: AuditFilter): {
+  events: AuditEventView[];
+  nextCursor: string | null;
+} {
   const limit = Math.min(f.limit ?? 50, 1000);
   const all = db()
     .filter((e) => matches(e, f))
@@ -74,14 +77,22 @@ export function queryAudit(f: AuditFilter): { events: AuditEventView[]; nextCurs
   return { events: page, nextCursor };
 }
 
-export function getAuditEvent(id: string): { event: AuditEventView; proof: { prev_hash: string; hash: string; next_hash: string | null } } | null {
+export function getAuditEvent(
+  id: string,
+): {
+  event: AuditEventView;
+  proof: { prev_hash: string; hash: string; next_hash: string | null };
+} | null {
   const all = db()
     .slice()
     .sort((a, b) => (a.occurred_at < b.occurred_at ? -1 : 1)); // chain order
   const idx = all.findIndex((e) => e.id === id);
   if (idx === -1) return null;
   const event = all[idx];
-  return { event, proof: { prev_hash: event.prev_hash, hash: event.hash, next_hash: all[idx + 1]?.hash ?? null } };
+  return {
+    event,
+    proof: { prev_hash: event.prev_hash, hash: event.hash, next_hash: all[idx + 1]?.hash ?? null },
+  };
 }
 
 /** Distinct actions within scope, for the filter-bar multi-select. */
@@ -116,23 +127,88 @@ function ev(
 }
 
 function seed(): AuditEventView[] {
-  const platform = { id: "u_platform", role: "platform_admin", ip: "203.0.113.7", ua: "Mozilla/5.0" };
-  const district = { id: "u_district", role: "district_admin", ip: "198.51.100.4", ua: "Mozilla/5.0" };
+  const platform = {
+    id: "u_platform",
+    role: "platform_admin",
+    ip: "203.0.113.7",
+    ua: "Mozilla/5.0",
+  };
+  const district = {
+    id: "u_district",
+    role: "district_admin",
+    ip: "198.51.100.4",
+    ua: "Mozilla/5.0",
+  };
   const school = { id: "u_school", role: "school_admin", ip: "198.51.100.9", ua: "Mozilla/5.0" };
   return [
     // Sprint 1 — identity / MFA / SCIM
-    ev(1, { action: "identity.idp.create", actor: platform, entity: { type: "idp", id: "idp_okta" }, details: { protocol: "saml" }, tenant_id: "t_district_demo" }),
-    ev(2, { action: "identity.scim_token.issue", actor: district, entity: { type: "scim_token", id: "tok_1" }, details: {} }),
-    ev(3, { action: "mfa.totp.enrolled", actor: district, entity: { type: "user", id: "u_district" }, details: {} }),
-    ev(4, { action: "mfa.step_up.verify", actor: platform, entity: { type: "user", id: "u_platform" }, outcome: "failure", details: { result: "failure" }, tenant_id: null }),
-    ev(5, { action: "identity.idp.update", actor: platform, entity: { type: "idp", id: "idp_okta" }, details: { enabled: true } }),
+    ev(1, {
+      action: "identity.idp.create",
+      actor: platform,
+      entity: { type: "idp", id: "idp_okta" },
+      details: { protocol: "saml" },
+      tenant_id: "t_district_demo",
+    }),
+    ev(2, {
+      action: "identity.scim_token.issue",
+      actor: district,
+      entity: { type: "scim_token", id: "tok_1" },
+      details: {},
+    }),
+    ev(3, {
+      action: "mfa.totp.enrolled",
+      actor: district,
+      entity: { type: "user", id: "u_district" },
+      details: {},
+    }),
+    ev(4, {
+      action: "mfa.step_up.verify",
+      actor: platform,
+      entity: { type: "user", id: "u_platform" },
+      outcome: "failure",
+      details: { result: "failure" },
+      tenant_id: null,
+    }),
+    ev(5, {
+      action: "identity.idp.update",
+      actor: platform,
+      entity: { type: "idp", id: "idp_okta" },
+      details: { enabled: true },
+    }),
     // Sprint 2 — SIS
-    ev(6, { action: "sis.connector.create", actor: district, entity: { type: "sis_connector", id: "sis_demo" }, details: { provider: "oneroster_rest" } }),
-    ev(7, { action: "sis.sync.trigger", actor: district, entity: { type: "sis_connector", id: "sis_demo" }, details: { type: "full", status: "success" } }),
-    ev(8, { action: "sis.errors.retry", actor: district, entity: { type: "sis_connector", id: "sis_demo" }, details: { retried: 1 } }),
+    ev(6, {
+      action: "sis.connector.create",
+      actor: district,
+      entity: { type: "sis_connector", id: "sis_demo" },
+      details: { provider: "oneroster_rest" },
+    }),
+    ev(7, {
+      action: "sis.sync.trigger",
+      actor: district,
+      entity: { type: "sis_connector", id: "sis_demo" },
+      details: { type: "full", status: "success" },
+    }),
+    ev(8, {
+      action: "sis.errors.retry",
+      actor: district,
+      entity: { type: "sis_connector", id: "sis_demo" },
+      details: { retried: 1 },
+    }),
     // School-scoped
-    ev(9, { action: "identity.user.role.granted", actor: school, entity: { type: "user", id: "u_teacher_1" }, school_id: "t_school_demo", details: { role: "teacher" } }),
-    ev(10, { action: "sis.sync.trigger", actor: district, entity: { type: "sis_connector", id: "sis_demo" }, outcome: "failure", details: { type: "delta", status: "paused" } }),
+    ev(9, {
+      action: "identity.user.role.granted",
+      actor: school,
+      entity: { type: "user", id: "u_teacher_1" },
+      school_id: "t_school_demo",
+      details: { role: "teacher" },
+    }),
+    ev(10, {
+      action: "sis.sync.trigger",
+      actor: district,
+      entity: { type: "sis_connector", id: "sis_demo" },
+      outcome: "failure",
+      details: { type: "delta", status: "paused" },
+    }),
   ];
 }
 

@@ -12,7 +12,13 @@
 import { and, eq } from "drizzle-orm";
 import { integrationConnections, integrationSyncLogs } from "@aivo/db";
 import { runSyncInBackground } from "../routes/connectors.js";
-import { retryRowJob, DEFAULT_BACKOFF, type BackoffPolicy, type SyncJob, type SyncQueue } from "./retry.js";
+import {
+  retryRowJob,
+  DEFAULT_BACKOFF,
+  type BackoffPolicy,
+  type SyncJob,
+  type SyncQueue,
+} from "./retry.js";
 
 export interface SyncJobHandlerOptions {
   db: any;

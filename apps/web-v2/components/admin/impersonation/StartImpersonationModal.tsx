@@ -77,9 +77,10 @@ export function StartImpersonationModal({ trigger }: { trigger?: React.ReactNode
           subject_consent: true,
         }),
       });
-      const json = (await res.json().catch(() => null)) as
-        | { ok: boolean; error?: { userMessage?: string; message?: string } }
-        | null;
+      const json = (await res.json().catch(() => null)) as {
+        ok: boolean;
+        error?: { userMessage?: string; message?: string };
+      } | null;
       if (!res.ok || !json?.ok) {
         setError(
           json?.error?.userMessage ||
@@ -109,8 +110,7 @@ export function StartImpersonationModal({ trigger }: { trigger?: React.ReactNode
           Start a View-As session
         </DialogTitle>
         <DialogDescription className="mt-1 text-sm text-iw-ink-muted">
-          Impersonation is fully audited. You will be asked to verify MFA before the
-          session starts.
+          Impersonation is fully audited. You will be asked to verify MFA before the session starts.
         </DialogDescription>
 
         <form onSubmit={onSubmit} className="mt-4 flex flex-col gap-4">

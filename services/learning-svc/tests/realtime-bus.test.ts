@@ -6,11 +6,7 @@
  */
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
-import {
-  getRealtimeBus,
-  subjects,
-  _resetRealtimeBusForTest,
-} from "../src/realtime/bus.js";
+import { getRealtimeBus, subjects, _resetRealtimeBusForTest } from "../src/realtime/bus.js";
 
 describe("learning-svc realtime bus (in-process)", () => {
   before(async () => {
@@ -28,9 +24,8 @@ describe("learning-svc realtime bus (in-process)", () => {
     assert.equal(publisher.backend, "in-process");
 
     const seen: unknown[] = [];
-    const off = await subscriber.subscribe(
-      subjects.sessionCoview("learner-1"),
-      (p) => seen.push(p),
+    const off = await subscriber.subscribe(subjects.sessionCoview("learner-1"), (p) =>
+      seen.push(p),
     );
 
     await publisher.publish(subjects.sessionCoview("learner-1"), {

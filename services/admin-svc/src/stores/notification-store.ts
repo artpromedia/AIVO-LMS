@@ -83,10 +83,7 @@ export class PostgresNotificationStore implements NotificationStore {
     if (existing) return existing;
     const matrix = buildDefaultMatrix();
     // Seed the default so subsequent reads are stable and auditable.
-    await this.db
-      .insert(adminNotificationPrefs)
-      .values({ schoolId, matrix })
-      .onConflictDoNothing();
+    await this.db.insert(adminNotificationPrefs).values({ schoolId, matrix }).onConflictDoNothing();
     return matrix;
   }
 

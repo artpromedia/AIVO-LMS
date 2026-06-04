@@ -109,11 +109,19 @@ export function AuditConsole({ scopeKey }: { scopeKey: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <AuditFilterBarWrap value={filter} actions={actions} onChange={setFilter} onApply={apply} onReset={reset} />
+        <AuditFilterBarWrap
+          value={filter}
+          actions={actions}
+          onChange={setFilter}
+          onApply={apply}
+          onReset={reset}
+        />
       </div>
       <Card className="p-[var(--aivo-density-card-pad)]">
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-sm text-aivo-ink-soft">{loading ? t("loading") : t("result_count", { count: events.length })}</p>
+          <p className="text-sm text-aivo-ink-soft">
+            {loading ? t("loading") : t("result_count", { count: events.length })}
+          </p>
           <ExportButton filter={applied} />
         </div>
         <div className="overflow-x-auto">
@@ -121,7 +129,13 @@ export function AuditConsole({ scopeKey }: { scopeKey: string }) {
         </div>
         {nextCursor ? (
           <div className="mt-3 flex justify-center">
-            <Button type="button" variant="outline" size="sm" onClick={() => load(applied, nextCursor)} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => load(applied, nextCursor)}
+              disabled={loading}
+            >
               {t("load_more")}
             </Button>
           </div>

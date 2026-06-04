@@ -72,10 +72,7 @@ function strictestSeverity(
   return SEVERITY_RANK[a] <= SEVERITY_RANK[b] ? a : b;
 }
 
-export function resolveEffectivePolicy(
-  store: RegistryStore,
-  input: ResolveInput,
-): EffectivePolicy {
+export function resolveEffectivePolicy(store: RegistryStore, input: ResolveInput): EffectivePolicy {
   const { tenantId, modelId, feature } = input;
   const districtId = store.tenantDistrict.get(tenantId) ?? null;
 
@@ -104,19 +101,18 @@ export function resolveEffectivePolicy(
   }
 
   // Fallback to a deny-by-default empty policy if nothing is configured.
-  const effective: PolicyRecord =
-    merged ?? {
-      id: "synthetic-empty",
-      name: "synthetic",
-      scopeLevel: "platform",
-      scopeId: null,
-      contentSafety: { blockedCategories: [], maxSeverity: "low" },
-      ageGating: { minAge: null, requireGuardianConsent: false },
-      regionRestrictions: { allowedRegions: [], blockedRegions: [] },
-      enabled: true,
-      updatedAt: new Date().toISOString(),
-      updatedBy: "system",
-    };
+  const effective: PolicyRecord = merged ?? {
+    id: "synthetic-empty",
+    name: "synthetic",
+    scopeLevel: "platform",
+    scopeId: null,
+    contentSafety: { blockedCategories: [], maxSeverity: "low" },
+    ageGating: { minAge: null, requireGuardianConsent: false },
+    regionRestrictions: { allowedRegions: [], blockedRegions: [] },
+    enabled: true,
+    updatedAt: new Date().toISOString(),
+    updatedBy: "system",
+  };
 
   // ── Opt-out precedence (highest priority deny) ───────────────────────
   // District-level opt-out cascades to all of its tenants; a tenant
@@ -146,8 +142,7 @@ function computeDenyReason(
 
   for (const o of store.optOuts.values()) {
     const scopeMatch =
-      o.tenantId === args.tenantId ||
-      (args.districtId !== null && o.tenantId === args.districtId);
+      o.tenantId === args.tenantId || (args.districtId !== null && o.tenantId === args.districtId);
     if (!scopeMatch) continue;
     if (o.modelId && o.modelId === args.modelId) return "OPT_OUT";
     if (o.feature && args.feature && o.feature === args.feature) return "OPT_OUT";

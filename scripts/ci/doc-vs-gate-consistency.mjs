@@ -74,9 +74,7 @@ if (!existsSync(manifestPath)) {
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 const gateById = new Map(manifest.gates.map((g) => [g.id, g]));
 const claimWords = (manifest.policy?.claimWords ?? []).map((w) => w.toLowerCase());
-const failureWords = (manifest.policy?.failureWords ?? []).map((w) =>
-  w.toLowerCase(),
-);
+const failureWords = (manifest.policy?.failureWords ?? []).map((w) => w.toLowerCase());
 const scanGlobs = manifest.policy?.scanGlobs ?? [];
 
 // Allowlist of pre-existing doc claims tolerated as historical/aspirational
@@ -119,12 +117,8 @@ function scanFile({ rel, abs }) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const lower = line.toLowerCase();
-    const hasGreenClaim = claimWords.some((w) =>
-      new RegExp(`\\b${w}\\b`).test(lower),
-    );
-    const hasRedClaim = failureWords.some((w) =>
-      new RegExp(`\\b${w}\\b`).test(lower),
-    );
+    const hasGreenClaim = claimWords.some((w) => new RegExp(`\\b${w}\\b`).test(lower));
+    const hasRedClaim = failureWords.some((w) => new RegExp(`\\b${w}\\b`).test(lower));
     if (!hasGreenClaim && !hasRedClaim) continue;
     for (const g of manifest.gates) {
       // Single-word generic IDs ("test", "build", "lint") cause too many
@@ -135,9 +129,7 @@ function scanFile({ rel, abs }) {
       const isCompound = /[.:]/.test(g.id);
       const escaped = g.id.replace(/[.:*+?^${}()|[\]\\]/g, "\\$&");
       const re = isCompound
-        ? new RegExp(
-            `(?:^|[^A-Za-z0-9_])\`?${escaped}\`?(?![A-Za-z0-9_])`,
-          )
+        ? new RegExp(`(?:^|[^A-Za-z0-9_])\`?${escaped}\`?(?![A-Za-z0-9_])`)
         : new RegExp("`" + escaped + "`");
       if (!re.test(line)) continue;
       findings.push({
@@ -189,11 +181,7 @@ if (args.updateAllowlist) {
     generatedAt: new Date().toISOString(),
     description:
       "Pre-existing (file, gateId) pairs where a doc makes a claim that doesn't match the gate manifest. New violations beyond this list fail CI. Ratchet down by fixing docs and re-running with --update-allowlist.",
-    entries: [
-      ...new Set(
-        [...violations, ...allowedHistorical].map((v) => v.allowlistKey),
-      ),
-    ].sort(),
+    entries: [...new Set([...violations, ...allowedHistorical].map((v) => v.allowlistKey))].sort(),
   };
   writeFileSync(allowlistPath, JSON.stringify(next, null, 2) + "\n");
   console.error(`updated doc allowlist → ${allowlistPath}`);
@@ -284,9 +272,7 @@ if (args.json) {
   process.stdout.write(lines.join("\n") + "\n");
 }
 
-const verifyFailures = verifyResults.filter(
-  (r) => !r.ok && r.previousClaim === "green",
-);
+const verifyFailures = verifyResults.filter((r) => !r.ok && r.previousClaim === "green");
 
 if (violations.length > 0) process.exit(1);
 if (args.verify && verifyFailures.length > 0) process.exit(2);

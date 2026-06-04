@@ -18,27 +18,14 @@ function fmt(iso: string | null | undefined): string {
 }
 
 /** Filterable View-As audit log. Filters client-side across all text columns. */
-export function ImpersonationHistoryTable({
-  sessions,
-}: {
-  sessions: ImpersonationSession[];
-}) {
+export function ImpersonationHistoryTable({ sessions }: { sessions: ImpersonationSession[] }) {
   const [filter, setFilter] = React.useState("");
 
   const rows = React.useMemo(() => {
     const q = filter.trim().toLowerCase();
     if (!q) return sessions;
     return sessions.filter((s) =>
-      [
-        s.actorName,
-        s.actorId,
-        s.subjectName,
-        s.subjectId,
-        s.subjectRole,
-        s.reason,
-        s.basis,
-        s.ip,
-      ]
+      [s.actorName, s.actorId, s.subjectName, s.subjectId, s.subjectRole, s.reason, s.basis, s.ip]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(q)),
     );
@@ -89,9 +76,7 @@ export function ImpersonationHistoryTable({
                     ) : null}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="font-medium text-iw-ink">
-                      {s.subjectName ?? s.subjectId}
-                    </span>
+                    <span className="font-medium text-iw-ink">{s.subjectName ?? s.subjectId}</span>
                     {s.subjectRole ? (
                       <span className="block text-xs text-iw-ink-muted">{s.subjectRole}</span>
                     ) : null}

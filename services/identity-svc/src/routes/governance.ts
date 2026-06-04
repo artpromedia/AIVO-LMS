@@ -26,45 +26,36 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
       if (!db) return { counts: {} };
       const uid = req.subjectId;
 
-      const [
-        sess,
-        mfa,
-        mfaRec,
-        webauthn,
-        pwHistory,
-        pwReset,
-        adminSess,
-        consent,
-        user,
-      ] = await Promise.all([
-        db.delete(sessions).where(eq(sessions.userId, uid)).returning({ id: sessions.id }),
-        db.delete(mfaCodes).where(eq(mfaCodes.userId, uid)).returning({ id: mfaCodes.id }),
-        db
-          .delete(mfaRecoveryCodes)
-          .where(eq(mfaRecoveryCodes.userId, uid))
-          .returning({ id: mfaRecoveryCodes.id }),
-        db
-          .delete(webauthnCredentials)
-          .where(eq(webauthnCredentials.userId, uid))
-          .returning({ id: webauthnCredentials.id }),
-        db
-          .delete(passwordHistory)
-          .where(eq(passwordHistory.userId, uid))
-          .returning({ id: passwordHistory.id }),
-        db
-          .delete(passwordResetTokens)
-          .where(eq(passwordResetTokens.userId, uid))
-          .returning({ id: passwordResetTokens.id }),
-        db
-          .delete(adminSessions)
-          .where(eq(adminSessions.userId, uid))
-          .returning({ id: adminSessions.id }),
-        db
-          .delete(consentRecords)
-          .where(or(eq(consentRecords.parentId, uid), eq(consentRecords.childId, uid)))
-          .returning({ id: consentRecords.id }),
-        db.delete(users).where(eq(users.id, uid)).returning({ id: users.id }),
-      ]);
+      const [sess, mfa, mfaRec, webauthn, pwHistory, pwReset, adminSess, consent, user] =
+        await Promise.all([
+          db.delete(sessions).where(eq(sessions.userId, uid)).returning({ id: sessions.id }),
+          db.delete(mfaCodes).where(eq(mfaCodes.userId, uid)).returning({ id: mfaCodes.id }),
+          db
+            .delete(mfaRecoveryCodes)
+            .where(eq(mfaRecoveryCodes.userId, uid))
+            .returning({ id: mfaRecoveryCodes.id }),
+          db
+            .delete(webauthnCredentials)
+            .where(eq(webauthnCredentials.userId, uid))
+            .returning({ id: webauthnCredentials.id }),
+          db
+            .delete(passwordHistory)
+            .where(eq(passwordHistory.userId, uid))
+            .returning({ id: passwordHistory.id }),
+          db
+            .delete(passwordResetTokens)
+            .where(eq(passwordResetTokens.userId, uid))
+            .returning({ id: passwordResetTokens.id }),
+          db
+            .delete(adminSessions)
+            .where(eq(adminSessions.userId, uid))
+            .returning({ id: adminSessions.id }),
+          db
+            .delete(consentRecords)
+            .where(or(eq(consentRecords.parentId, uid), eq(consentRecords.childId, uid)))
+            .returning({ id: consentRecords.id }),
+          db.delete(users).where(eq(users.id, uid)).returning({ id: users.id }),
+        ]);
 
       return {
         counts: {

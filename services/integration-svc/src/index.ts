@@ -19,14 +19,11 @@ const isMain = (() => {
 async function start() {
   const { createDb } = await import("@aivo/db");
   const { bootstrapOpsAlerts } = await import("@aivo/ops-alerts");
-  const { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } = await import(
-    "@aivo/scheduling"
-  );
+  const { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } =
+    await import("@aivo/scheduling");
   const { createLogger } = await import("@aivo/observability");
   const { runConnectorSyncWatchdogOnce } = await import("./lib/connector-sync-watchdog.js");
-  const { createBullMqQueueFromEnv, createSyncWorker } = await import(
-    "./queue/bullmq-adapter.js"
-  );
+  const { createBullMqQueueFromEnv, createSyncWorker } = await import("./queue/bullmq-adapter.js");
   const { InMemorySyncQueue } = await import("./queue/retry.js");
 
   const logger = createLogger("integration-svc");

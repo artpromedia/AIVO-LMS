@@ -62,7 +62,12 @@ export interface TotpOptions {
 }
 
 /** RFC 4226 HOTP for an explicit counter. */
-export function hotp(secret: string, counter: number, digits = 6, algorithm: "sha1" | "sha256" | "sha512" = "sha1"): string {
+export function hotp(
+  secret: string,
+  counter: number,
+  digits = 6,
+  algorithm: "sha1" | "sha256" | "sha512" = "sha1",
+): string {
   const key = base32Decode(secret);
   const buf = Buffer.alloc(8);
   // Write the 64-bit counter big-endian (JS bitwise is 32-bit, so split).

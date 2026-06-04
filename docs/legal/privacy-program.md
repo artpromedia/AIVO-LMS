@@ -52,14 +52,14 @@ through an explicit lifecycle — intake → assigned → approved/rejected →
 fulfilled — and every step is recorded with evidence
 (`docs/adr/0034-data-governance.md`, `docs/runbooks/dsar.md`).
 
-| Right | Statutory basis | DSAR request type | How we fulfill it |
-| ----- | --------------- | ----------------- | ----------------- |
-| Access / right to know | GDPR Art. 15; FERPA inspection; CCPA right to know | **access** | Export fan-out: each owning service returns its records for the subject, reassembled into one bundle. |
-| Data portability | GDPR Art. 20 | **portability** | The same export, delivered as machine-readable, structured JSON with a manifest. |
-| Rectification / amendment | GDPR Art. 16; FERPA amendment; CPRA correction | **rectification** | Routed to the owning service's correction surface; the change is audit-logged. |
-| Erasure / right to delete | GDPR Art. 17; COPPA parental deletion; CCPA delete | **erasure** | Erasure fan-out: each owning service purges or anonymizes by subject id and confirms with a checksum. |
-| Restriction of processing | GDPR Art. 18 | **restriction** | Processing for the subject is suspended pending resolution; recorded on the DSAR. |
-| Objection | GDPR Art. 21 | **objection** | Processing based on the objected-to ground is stopped; consent-gated processing is revoked via the consent ledger. |
+| Right                     | Statutory basis                                    | DSAR request type | How we fulfill it                                                                                                  |
+| ------------------------- | -------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Access / right to know    | GDPR Art. 15; FERPA inspection; CCPA right to know | **access**        | Export fan-out: each owning service returns its records for the subject, reassembled into one bundle.              |
+| Data portability          | GDPR Art. 20                                       | **portability**   | The same export, delivered as machine-readable, structured JSON with a manifest.                                   |
+| Rectification / amendment | GDPR Art. 16; FERPA amendment; CPRA correction     | **rectification** | Routed to the owning service's correction surface; the change is audit-logged.                                     |
+| Erasure / right to delete | GDPR Art. 17; COPPA parental deletion; CCPA delete | **erasure**       | Erasure fan-out: each owning service purges or anonymizes by subject id and confirms with a checksum.              |
+| Restriction of processing | GDPR Art. 18                                       | **restriction**   | Processing for the subject is suspended pending resolution; recorded on the DSAR.                                  |
+| Objection                 | GDPR Art. 21                                       | **objection**     | Processing based on the objected-to ground is stopped; consent-gated processing is revoked via the consent ledger. |
 
 A DSAR is admissible from **anyone with a verified identity**, or from a
 **parent acting on behalf of a learner under 13** (COPPA). Intake
@@ -87,7 +87,7 @@ deletion until it lifts, per `docs/deletion-workflow.md`.
 
 Consent is recorded in an **append-only consent ledger** (`consents`):
 grants and revocations are both appended; the effective state is the most
-recent entry. This gives us a provable history of *when consent existed*,
+recent entry. This gives us a provable history of _when consent existed_,
 which is exactly what COPPA verifiable-parental-consent and lawful-basis
 audits require — we can show consent was in force at the moment a given
 piece of data was collected.
@@ -107,12 +107,12 @@ processing going forward.
 
 The `data_catalog` is the authoritative inventory of what we hold:
 
-| Field | Meaning |
-| ----- | ------- |
-| `class` | The data class (e.g. learner profile, assessment responses, lesson history, IEP, audit record, billing identifier). |
-| owning service | The single service that is the authority for that class. |
-| sensitivity | The sensitivity tier driving handling and access controls. |
-| retention rule | The `retention_policies` rule that governs its lifecycle. |
+| Field          | Meaning                                                                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `class`        | The data class (e.g. learner profile, assessment responses, lesson history, IEP, audit record, billing identifier). |
+| owning service | The single service that is the authority for that class.                                                            |
+| sensitivity    | The sensitivity tier driving handling and access controls.                                                          |
+| retention rule | The `retention_policies` rule that governs its lifecycle.                                                           |
 
 The catalog is also the **subscriber manifest** for DSAR fan-out: a
 service participates in export and erasure because it owns a data class
@@ -141,7 +141,7 @@ Hard-deleting a subject's audit rows would break the hash chain and
 destroy the integrity guarantee the entire compliance and security
 posture depends on. Instead, audit-svc **anonymizes the actor-identifying
 fields in place while preserving the chain**: after erasure the log still
-proves *that* an action occurred and *when*, but no longer ties it to the
+proves _that_ an action occurred and _when_, but no longer ties it to the
 erased subject. We rely on a lawful basis for retaining a tamper-evident
 security and compliance log, and we disclose this approach to subjects so
 that "anonymized" is not mistaken for "incomplete erasure". Every other

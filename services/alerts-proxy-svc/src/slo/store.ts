@@ -38,7 +38,8 @@ export function createSeededSloStore(): SloStore {
       name: "API availability",
       target: 0.999,
       windowDays: 30,
-      indicatorQuery: 'sum(rate(http_requests_total{status!~"5.."}[5m])) / sum(rate(http_requests_total[5m]))',
+      indicatorQuery:
+        'sum(rate(http_requests_total{status!~"5.."}[5m])) / sum(rate(http_requests_total[5m]))',
       createdAt: now,
       updatedAt: now,
     },
@@ -49,7 +50,8 @@ export function createSeededSloStore(): SloStore {
       name: "Tutor latency < 2s",
       target: 0.99,
       windowDays: 30,
-      indicatorQuery: 'sum(rate(http_request_duration_seconds_bucket{le="2"}[5m])) / sum(rate(http_request_duration_seconds_count[5m]))',
+      indicatorQuery:
+        'sum(rate(http_request_duration_seconds_bucket{le="2"}[5m])) / sum(rate(http_request_duration_seconds_count[5m]))',
       createdAt: now,
       updatedAt: now,
     },

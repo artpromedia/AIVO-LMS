@@ -59,15 +59,15 @@ describe("createObservation (caregiver submit)", () => {
       jsonResponse({ error: "learnerId and notes required" }, 400),
     );
 
-    await expect(
-      createObservation({ learnerId: "learner-7", notes: "" }),
-    ).rejects.toThrow("learnerId and notes required");
+    await expect(createObservation({ learnerId: "learner-7", notes: "" })).rejects.toThrow(
+      "learnerId and notes required",
+    );
   });
 
   it("rethrows network failures rather than silently succeeding", async () => {
     apiFetchMock.mockRejectedValueOnce(new Error("ECONNREFUSED"));
-    await expect(
-      createObservation({ learnerId: "learner-7", notes: "note" }),
-    ).rejects.toThrow("ECONNREFUSED");
+    await expect(createObservation({ learnerId: "learner-7", notes: "note" })).rejects.toThrow(
+      "ECONNREFUSED",
+    );
   });
 });

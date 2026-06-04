@@ -43,18 +43,18 @@ cards**. A model card carries the NIST AI RMF **GOVERN** fields so a
 reviewer can answer "who is accountable, what is this for, what are its
 limits, and what evidence backs it":
 
-| GOVERN field | Meaning |
-|---|---|
-| `intendedUse` | The instructional/assessment task the version is approved for. |
-| `outOfScopeUses` | Explicitly prohibited uses (e.g. high-stakes grading without human review). |
-| `accountableOwner` | Named platform owner accountable for the model's risk posture. |
-| `provenance` | Base model, provider, training/fine-tune lineage, license. |
-| `dataGovernance` | Data sources, PII handling, retention, and consent basis. |
-| `knownLimitations` | Documented failure modes (bias, hallucination, age-appropriateness). |
-| `riskTier` | `low` \| `medium` \| `high`; `high` drives fail-closed enforcement. |
-| `humanOversight` | Required human-in-the-loop controls for this version. |
-| `evalEvidence` | Link to the latest eval-harness run that gated promotion. |
-| `reviewCadence` | How often the card must be re-attested (e.g. quarterly). |
+| GOVERN field       | Meaning                                                                     |
+| ------------------ | --------------------------------------------------------------------------- |
+| `intendedUse`      | The instructional/assessment task the version is approved for.              |
+| `outOfScopeUses`   | Explicitly prohibited uses (e.g. high-stakes grading without human review). |
+| `accountableOwner` | Named platform owner accountable for the model's risk posture.              |
+| `provenance`       | Base model, provider, training/fine-tune lineage, license.                  |
+| `dataGovernance`   | Data sources, PII handling, retention, and consent basis.                   |
+| `knownLimitations` | Documented failure modes (bias, hallucination, age-appropriateness).        |
+| `riskTier`         | `low` \| `medium` \| `high`; `high` drives fail-closed enforcement.         |
+| `humanOversight`   | Required human-in-the-loop controls for this version.                       |
+| `evalEvidence`     | Link to the latest eval-harness run that gated promotion.                   |
+| `reviewCadence`    | How often the card must be re-attested (e.g. quarterly).                    |
 
 Model cards are versioned with the model version; promoting a version
 requires a current card and a passing eval run.
@@ -63,7 +63,7 @@ requires a current card and a passing eval run.
 
 A **safety policy** is resolved per request by layering the platform
 baseline, the district policy, and the tenant policy. **The most specific
-layer wins** for scalar settings, but the resolution is *strictness-only*:
+layer wins** for scalar settings, but the resolution is _strictness-only_:
 
 - **Allow/feature toggles:** tenant > district > platform (most specific
   wins), but a school is constrained to a **subset of its district's
@@ -77,7 +77,7 @@ layer wins** for scalar settings, but the resolution is *strictness-only*:
   only raise the floor.
 
 This guarantees a monotonic safety property: descending the hierarchy can
-only make the effective policy *tighter*, which is the behavior auditors
+only make the effective policy _tighter_, which is the behavior auditors
 and districts expect.
 
 ### 3. Opt-out precedence & district cascade
@@ -85,7 +85,7 @@ and districts expect.
 Per-tenant **opt-outs** disable AI features for a tenant's learners. A
 **district opt-out cascades to all child tenants** (schools/classrooms);
 a child cannot re-enable a feature its district has opted out of. A school
-may opt out independently of its district. Opt-out is evaluated *before*
+may opt out independently of its district. Opt-out is evaluated _before_
 policy resolution — an opted-out tenant short-circuits to a graceful
 non-AI fallback regardless of the resolved policy.
 
@@ -95,13 +95,13 @@ The eval harness runs a fixed, **seeded** prompt suite against a model
 version and reports five metrics so results are comparable across versions
 and reproducible across runs:
 
-| Metric | What it measures |
-|---|---|
-| `safety` | Rate of safe responses on the adversarial/safety suite. |
-| `accuracy` | Correctness against the labeled answer key. |
-| `bias` | Disparity across demographic-counterfactual prompt pairs. |
-| `refusalRate` | Rate of appropriate refusals on out-of-scope/unsafe prompts. |
-| `hallucination` | Rate of unsupported/fabricated claims on grounded prompts. |
+| Metric          | What it measures                                             |
+| --------------- | ------------------------------------------------------------ |
+| `safety`        | Rate of safe responses on the adversarial/safety suite.      |
+| `accuracy`      | Correctness against the labeled answer key.                  |
+| `bias`          | Disparity across demographic-counterfactual prompt pairs.    |
+| `refusalRate`   | Rate of appropriate refusals on out-of-scope/unsafe prompts. |
+| `hallucination` | Rate of unsupported/fabricated claims on grounded prompts.   |
 
 Determinism (fixed seed + fixed suite + pinned decoding params) means a
 re-run reproduces the numbers, which is what makes an eval admissible as
@@ -125,14 +125,14 @@ Every AI-calling service imports `createRaiGateway()` and calls
 
 ### 6. RBAC
 
-| Capability | platform_admin | district_admin | school_admin | other admins |
-|---|:--:|:--:|:--:|:--:|
-| Manage model registry / versions / cards | ✅ | ❌ | ❌ | ❌ |
-| Author / promote safety policies | ✅ | ❌ | ❌ | ❌ |
-| Run eval harness / promote versions | ✅ | ❌ | ❌ | ❌ |
-| File RAI incidents | ✅ | ✅ | ✅ | ✅ |
-| Configure opt-outs (own tenant) | ✅ | ✅ (district + cascade) | ✅ (subset of district) | ❌ |
-| View transparency / usage (own scope) | ✅ | ✅ | ✅ | ✅ |
+| Capability                               | platform_admin |     district_admin      |      school_admin       | other admins |
+| ---------------------------------------- | :------------: | :---------------------: | :---------------------: | :----------: |
+| Manage model registry / versions / cards |       ✅       |           ❌            |           ❌            |      ❌      |
+| Author / promote safety policies         |       ✅       |           ❌            |           ❌            |      ❌      |
+| Run eval harness / promote versions      |       ✅       |           ❌            |           ❌            |      ❌      |
+| File RAI incidents                       |       ✅       |           ✅            |           ✅            |      ✅      |
+| Configure opt-outs (own tenant)          |       ✅       | ✅ (district + cascade) | ✅ (subset of district) |      ❌      |
+| View transparency / usage (own scope)    |       ✅       |           ✅            |           ✅            |      ✅      |
 
 A school admin's opt-out scope is a **subset** of its district's
 allow-list (consistent with §2). District/school admins act only within

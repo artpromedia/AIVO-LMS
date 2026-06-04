@@ -326,8 +326,7 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
         return reply.code(403).send({ error: "Forbidden" });
       }
 
-      const domain =
-        typeof body.domain === "string" && body.domain ? body.domain : null;
+      const domain = typeof body.domain === "string" && body.domain ? body.domain : null;
 
       // Canonical write: dedicated teacher_insights row, tenant-scoped.
       const [row] = await db
@@ -343,15 +342,13 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
 
       // Mirror into brain_insights so existing readers (recommendations,
       // learner brain profile) see it without a separate migration.
-      await db
-        .insert(brainInsights)
-        .values({
-          learnerId,
-          source: "teacher",
-          sourceUserId: claims.sub,
-          insightText,
-          domain,
-        });
+      await db.insert(brainInsights).values({
+        learnerId,
+        source: "teacher",
+        sourceUserId: claims.sub,
+        insightText,
+        domain,
+      });
 
       await emitFamilyAudit({
         db,

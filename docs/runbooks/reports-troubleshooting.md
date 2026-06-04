@@ -10,8 +10,8 @@ For any report problem, gather these three before diagnosing:
 
 - **The run record** — `GET /api/reports/runs/{runId}` gives status, format,
   params (scrubbed), error, and **lineage** (`report_run_lineage`: each
-  source `service` / `query` / `queryVersion`). Lineage tells you *which
-  upstream* produced — or failed to produce — the rows.
+  source `service` / `query` / `queryVersion`). Lineage tells you _which
+  upstream_ produced — or failed to produce — the rows.
 - **Audit events** (ADR 0032 / Sprint 3 audit UI) — every run, download, and
   schedule create/delete is audited. `GET /events?q=<runId>` or
   `?action=reports.run` reconstructs who ran what, over which tenants, when.
@@ -46,7 +46,7 @@ exceeding it returns `429`.
 - Inspect usage: the UI shows the tenant's daily usage; the count lives in
   `report_quota_daily` keyed by tenant + day. The audit log
   (`action=reports.run`, filtered by tenant) corroborates the volume and
-  shows *who/what* is consuming it.
+  shows _who/what_ is consuming it.
 - Common cause: a misconfigured schedule or a client loop re-running the same
   report instead of reading the **cache** (see "Cache staleness") or reusing
   a `runId`.
@@ -88,15 +88,16 @@ pod** (`src/runners/pdf.ts`).
 
 Encoders are deterministic — **CSV is RFC-4180**, the **Parquet container is
 a deterministic stand-in** (byte-stable for the same rows), JSON carries rows
-+ schema.
 
-- A snapshot test drifting, or two formats disagreeing on values, means the
+- schema.
+
+* A snapshot test drifting, or two formats disagreeing on values, means the
   **rows or the column schema changed**, not the encoder. Diff the resolver
   output and the definition's `columns[]`.
-- Use **lineage** on the run to see if an upstream `queryVersion` changed
+* Use **lineage** on the run to see if an upstream `queryVersion` changed
   (e.g. `v1`->`v2`) — that's the legitimate reason a number moved; bump the
   snapshot deliberately after review.
-- Remember Parquet here is a **stand-in writer**; if you're validating
+* Remember Parquet here is a **stand-in writer**; if you're validating
   against an external Parquet reader, expect the swap-to-real-writer caveat
   (ADR 0039 Consequences).
 
@@ -143,14 +144,14 @@ A run that completes but takes too long.
 
 ## Quick reference
 
-| Symptom | Likely cause | First check |
-|---|---|---|
-| Run stuck `running` | Worker/Redis down (worker mode) or hung resolver | queue depth in `/metrics`, worker pod, lineage |
-| `429` | Per-tenant daily quota (1000/day) | `report_quota_daily`, `reports.run` audit volume |
-| `403 SCOPE_FORBIDDEN` | Caller scope < report scope | role vs report `scopes[]` |
-| `403 TENANT_FORBIDDEN` | `tenantId` outside allow-list | `resolveCallerScope` / `allowedTenantIds` |
-| Got HTML not PDF | Playwright pod/browser unavailable | PDF worker pod, `reports:pdf` queue |
-| Snapshot/format mismatch | Rows or column schema changed | resolver output, `columns[]`, lineage `queryVersion` |
-| Schedule silent | Unverified/out-of-scope recipient, or cron down | recipient verification, scheduler, `reports.schedule` audit |
-| Stale numbers | Cache hit within `cacheTtl` | report `cacheTtl`, cache key |
-| Slow run | Upstream service slow | lineage source, that service's `/metrics` |
+| Symptom                  | Likely cause                                     | First check                                                 |
+| ------------------------ | ------------------------------------------------ | ----------------------------------------------------------- |
+| Run stuck `running`      | Worker/Redis down (worker mode) or hung resolver | queue depth in `/metrics`, worker pod, lineage              |
+| `429`                    | Per-tenant daily quota (1000/day)                | `report_quota_daily`, `reports.run` audit volume            |
+| `403 SCOPE_FORBIDDEN`    | Caller scope < report scope                      | role vs report `scopes[]`                                   |
+| `403 TENANT_FORBIDDEN`   | `tenantId` outside allow-list                    | `resolveCallerScope` / `allowedTenantIds`                   |
+| Got HTML not PDF         | Playwright pod/browser unavailable               | PDF worker pod, `reports:pdf` queue                         |
+| Snapshot/format mismatch | Rows or column schema changed                    | resolver output, `columns[]`, lineage `queryVersion`        |
+| Schedule silent          | Unverified/out-of-scope recipient, or cron down  | recipient verification, scheduler, `reports.schedule` audit |
+| Stale numbers            | Cache hit within `cacheTtl`                      | report `cacheTtl`, cache key                                |
+| Slow run                 | Upstream service slow                            | lineage source, that service's `/metrics`                   |

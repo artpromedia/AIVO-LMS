@@ -23,11 +23,20 @@ export function ExportButton({ filter }: { filter: AuditFilterValue }) {
 
   return (
     <div className="relative inline-block">
-      <Button type="button" variant="outline" size="sm" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
         {t("export")}
       </Button>
       {open ? (
-        <div className="absolute right-0 z-10 mt-1 w-36 rounded-md border border-aivo-border bg-aivo-surface p-1 shadow-md" role="menu">
+        <div
+          className="absolute right-0 z-10 mt-1 w-36 rounded-md border border-aivo-border bg-aivo-surface p-1 shadow-md"
+          role="menu"
+        >
           {(["csv", "json", "ndjson"] as const).map((fmt) => (
             <a
               key={fmt}

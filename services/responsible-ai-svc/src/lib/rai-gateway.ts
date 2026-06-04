@@ -21,7 +21,12 @@ export interface RaiGatewayOptions {
   /** Injectable fetch for tests. */
   fetchImpl?: typeof fetch;
   /** Called on deny; wire this to your audit emitter. */
-  onBlocked?: (info: { tenantId: string; modelId: string; feature?: string; reason: string }) => void;
+  onBlocked?: (info: {
+    tenantId: string;
+    modelId: string;
+    feature?: string;
+    reason: string;
+  }) => void;
   /**
    * Fail-open or fail-closed when responsible-ai-svc is unreachable.
    * Education deployments default to fail-open for availability but log
@@ -55,10 +60,11 @@ export interface RaiGateway {
 }
 
 export function createRaiGateway(options: RaiGatewayOptions = {}): RaiGateway {
-  const baseUrl = (options.baseUrl ?? process.env.RESPONSIBLE_AI_SVC_URL ?? "http://localhost:3071").replace(
-    /\/+$/,
-    "",
-  );
+  const baseUrl = (
+    options.baseUrl ??
+    process.env.RESPONSIBLE_AI_SVC_URL ??
+    "http://localhost:3071"
+  ).replace(/\/+$/, "");
   const ttlMs = options.ttlMs ?? 60_000;
   const doFetch = options.fetchImpl ?? fetch;
   const cache = new Map<string, CacheEntry>();
@@ -82,7 +88,9 @@ export function createRaiGateway(options: RaiGatewayOptions = {}): RaiGateway {
       url.searchParams.set("modelId", input.modelId);
       if (input.feature) url.searchParams.set("feature", input.feature);
       const res = await doFetch(url.toString(), {
-        headers: { "x-service-token": process.env.INTERNAL_SERVICE_TOKEN ?? "aivo-internal-dev-token" },
+        headers: {
+          "x-service-token": process.env.INTERNAL_SERVICE_TOKEN ?? "aivo-internal-dev-token",
+        },
       });
       if (!res.ok) throw new Error(`policy lookup ${res.status}`);
       const policy = (await res.json()) as EffectivePolicy;

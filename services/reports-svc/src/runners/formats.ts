@@ -26,17 +26,12 @@ function csvCell(value: unknown): string {
 
 export function encodeCsv(columns: ReportColumn[], rows: Array<Record<string, unknown>>): Buffer {
   const header = columns.map((c) => csvCell(c.label)).join(",");
-  const body = rows
-    .map((row) => columns.map((c) => csvCell(row[c.key])).join(","))
-    .join("\n");
+  const body = rows.map((row) => columns.map((c) => csvCell(row[c.key])).join(",")).join("\n");
   const text = body ? `${header}\n${body}\n` : `${header}\n`;
   return Buffer.from(text, "utf8");
 }
 
-export function encodeJson(
-  columns: ReportColumn[],
-  rows: Array<Record<string, unknown>>,
-): Buffer {
+export function encodeJson(columns: ReportColumn[], rows: Array<Record<string, unknown>>): Buffer {
   // Project to declared columns only, preserving column order, so the JSON is
   // stable regardless of resolver row key ordering.
   const projected = rows.map((row) => {

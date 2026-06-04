@@ -25,9 +25,7 @@ export default async function Page() {
         description="Open a new incident. Affected components will be flagged on the public status page."
       />
       <Card className="max-w-2xl p-[var(--aivo-density-card-pad)]">
-        <NewIncidentForm
-          components={components.map((c) => ({ id: c.id, name: c.name }))}
-        />
+        <NewIncidentForm components={components.map((c) => ({ id: c.id, name: c.name }))} />
       </Card>
     </AppShell>
   );

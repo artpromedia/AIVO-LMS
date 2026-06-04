@@ -144,7 +144,12 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
             tenantId,
             details: { channel, template, reason, ...(detail ? { detail } : {}) },
           });
-          return { status: "channel_disabled", channel: CHANNELS.sms.id, reason, ...(detail ? { detail } : {}) };
+          return {
+            status: "channel_disabled",
+            channel: CHANNELS.sms.id,
+            reason,
+            ...(detail ? { detail } : {}),
+          };
         };
         if (!isSmsConfigured()) {
           return reply.code(200).send(await buildDisabled("provider_not_configured"));
@@ -170,7 +175,9 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
         // here (we gated above), but if a misconfiguration races us,
         // surface it as channel_disabled rather than a fake send.
         if (result.status === "disabled") {
-          return reply.code(200).send(await buildDisabled("provider_not_configured", "adapter returned disabled"));
+          return reply
+            .code(200)
+            .send(await buildDisabled("provider_not_configured", "adapter returned disabled"));
         }
         await emitCommsAudit({
           db,

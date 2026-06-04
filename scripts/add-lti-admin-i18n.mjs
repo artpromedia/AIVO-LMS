@@ -14,8 +14,7 @@ const en = {
   page: {
     eyebrow: "Integrations",
     title: "LTI 1.3 platforms",
-    description:
-      "Register an LMS so its launches are accepted and grades can be written back.",
+    description: "Register an LMS so its launches are accepted and grades can be written back.",
   },
   fields: {
     label: "Label (optional)",
@@ -327,8 +326,7 @@ const catalogs = {
     page: {
       eyebrow: "連携",
       title: "LTI 1.3 プラットフォーム",
-      description:
-        "LMS を登録して、その起動が受け入れられ、成績を書き戻せるようにします。",
+      description: "LMS を登録して、その起動が受け入れられ、成績を書き戻せるようにします。",
     },
     fields: { label: "ラベル（任意）", deployment_id: "デプロイメント ID（任意）" },
     actions: {
@@ -368,8 +366,7 @@ const catalogs = {
     page: {
       eyebrow: "통합",
       title: "LTI 1.3 플랫폼",
-      description:
-        "LMS를 등록하여 해당 실행이 수락되고 성적을 다시 기록할 수 있도록 합니다.",
+      description: "LMS를 등록하여 해당 실행이 수락되고 성적을 다시 기록할 수 있도록 합니다.",
     },
     fields: { label: "라벨(선택사항)", deployment_id: "배포 ID(선택사항)" },
     actions: {

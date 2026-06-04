@@ -33,7 +33,7 @@ poorly onto the district sales motion:
   unused capacity locked to the wrong school.
 - **Allocations change over time and in the future.** Districts plan the
   next term in advance: "as of the first day of the fall semester, move 300
-  seats from School A to School C." The model must record *when* an
+  seats from School A to School C." The model must record _when_ an
   allocation takes effect, keep prior allocations for audit, and let
   finance answer "how many seats did School A hold on date D?".
 - **Over-utilization must not break learning.** If a school's active-user
@@ -93,12 +93,12 @@ reserve); the invariant only forbids over-allocation.
 
 Allocations are **never updated in place**. Every change appends a row to
 `seat_allocation_history` with the new `count` and its `effective_at`. The
-*effective* allocation for a tenant at any instant is the most recent
+_effective_ allocation for a tenant at any instant is the most recent
 history row whose `effective_at <= now`. This gives us:
 
 - **Future-dating.** `effective_at` may be in the future; the row is
   written now but does not count toward the live invariant until its
-  effective instant. The invariant in §2 is evaluated *per instant*, so a
+  effective instant. The invariant in §2 is evaluated _per instant_, so a
   future-dated move is validated against the pool state at the moment it
   will take effect.
 - **Point-in-time answers.** "How many seats did School A hold on date D?"
@@ -120,7 +120,7 @@ The nightly utilization job (§6) measures `used` per child tenant from
 
 A **configurable per-tenant hard-cap** is available as an opt-in for
 districts that contractually require enforcement. When a hard-cap is set
-and `used` would exceed it, seat acquisition for *new* learners is refused
+and `used` would exceed it, seat acquisition for _new_ learners is refused
 at that tenant; existing learners are never evicted. The hard-cap defaults
 to **unset** (non-blocking) so the safe-for-learners behaviour is the
 default.

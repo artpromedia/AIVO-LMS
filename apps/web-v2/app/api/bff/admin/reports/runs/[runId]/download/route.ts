@@ -20,16 +20,13 @@ export async function GET(
     // Stream raw bytes: callService parses JSON, so fetch directly here to
     // preserve content-type / content-disposition for the file download.
     const base = serverEnv.REPORTS_SVC_URL.replace(/\/$/, "");
-    const upstream = await fetch(
-      `${base}/api/reports/runs/${encodeURIComponent(runId)}/download`,
-      {
-        headers: {
-          accept: "application/octet-stream",
-          ...reportsAuthHeaders(session!),
-          "x-request-id": requestId,
-        },
+    const upstream = await fetch(`${base}/api/reports/runs/${encodeURIComponent(runId)}/download`, {
+      headers: {
+        accept: "application/octet-stream",
+        ...reportsAuthHeaders(session!),
+        "x-request-id": requestId,
       },
-    );
+    });
     return new Response(await upstream.arrayBuffer(), {
       status: upstream.status,
       headers: {

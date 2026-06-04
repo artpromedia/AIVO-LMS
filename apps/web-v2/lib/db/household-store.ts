@@ -95,11 +95,7 @@ export type AddCoParentResult =
  * Record a co-parent invite for the household. Idempotent per email: a pending
  * invite for the same address is returned as a conflict rather than duplicated.
  */
-export function addCoParentInvite(
-  ownerUserId: ID,
-  tenantId: ID,
-  email: string,
-): AddCoParentResult {
+export function addCoParentInvite(ownerUserId: ID, tenantId: ID, email: string): AddCoParentResult {
   const h = ensure(ownerUserId, tenantId);
   const existing = h.invites.find((i) => i.email === email && i.status === "PENDING");
   if (existing) {

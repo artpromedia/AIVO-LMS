@@ -25,8 +25,5 @@ export async function GET(req: Request, ctx: Ctx) {
     return fail({ ...ERRORS.FORBIDDEN_TENANT, message: "Out of scope" }, requestId);
   }
 
-  return ok(
-    { event: found.event, proof: scope.canViewProof ? found.proof : null },
-    requestId,
-  );
+  return ok({ event: found.event, proof: scope.canViewProof ? found.proof : null }, requestId);
 }

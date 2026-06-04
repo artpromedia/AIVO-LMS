@@ -11,7 +11,12 @@
  * uses a no-op transport so wiring never breaks a service that runs without
  * audit-svc.
  */
-import { createAuditClient, HttpAuditTransport, type AuditClient, type AuditTransport } from "./emit.js";
+import {
+  createAuditClient,
+  HttpAuditTransport,
+  type AuditClient,
+  type AuditTransport,
+} from "./emit.js";
 import { registerAuditHook, type AuditHookOptions } from "./audited.js";
 
 class NoopTransport implements AuditTransport {

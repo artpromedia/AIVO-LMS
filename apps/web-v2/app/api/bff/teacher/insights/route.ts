@@ -18,11 +18,7 @@ import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole } from "@/lib/bff/guards";
-import {
-  isFamilySvcEnabled,
-  getFamilyBearer,
-  createTeacherInsight,
-} from "@/lib/bff/family-svc";
+import { isFamilySvcEnabled, getFamilyBearer, createTeacherInsight } from "@/lib/bff/family-svc";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +37,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     } | null;
 
     const learnerId = typeof body?.learnerId === "string" ? body.learnerId.trim() : "";
-    const insightText =
-      typeof body?.insightText === "string" ? body.insightText.trim() : "";
+    const insightText = typeof body?.insightText === "string" ? body.insightText.trim() : "";
     if (!learnerId || !insightText) {
       return fail(
         {

@@ -49,11 +49,16 @@ describe("transform.normalizeSnapshot — idempotent + order-independent", () =>
       classes: shuffle(snap.classes),
       enrollments: shuffle(snap.enrollments),
     };
-    expect(JSON.stringify(normalizeSnapshot(shuffled))).toBe(JSON.stringify(normalizeSnapshot(snap)));
+    expect(JSON.stringify(normalizeSnapshot(shuffled))).toBe(
+      JSON.stringify(normalizeSnapshot(snap)),
+    );
   });
 
   it("collapses duplicate sourcedIds (last-write-wins)", () => {
-    const dup: RosterSnapshot = { ...snap, orgs: [...snap.orgs, { ...snap.orgs[0], name: "Renamed" }] };
+    const dup: RosterSnapshot = {
+      ...snap,
+      orgs: [...snap.orgs, { ...snap.orgs[0], name: "Renamed" }],
+    };
     const norm = normalizeSnapshot(dup);
     const same = norm.orgs.filter((o) => o.sourcedId === snap.orgs[0].sourcedId);
     expect(same).toHaveLength(1);
@@ -96,12 +101,16 @@ describe("diff.computeDiff", () => {
     const goneId = "usr-s3";
     const next: RosterSnapshot = {
       ...base,
-      users: base.users.map((u) => (u.sourcedId === goneId ? { ...u, status: "tobedeleted" as const } : u)),
+      users: base.users.map((u) =>
+        u.sourcedId === goneId ? { ...u, status: "tobedeleted" as const } : u,
+      ),
     };
     // Put the tobedeleted user into prev as active so it's a real removal.
     const prev: RosterSnapshot = {
       ...base,
-      users: base.users.map((u) => (u.sourcedId === goneId ? { ...u, status: "active" as const } : u)),
+      users: base.users.map((u) =>
+        u.sourcedId === goneId ? { ...u, status: "active" as const } : u,
+      ),
     };
     const diff = computeDiff(normalizeSnapshot(prev), normalizeSnapshot(next));
     expect(diff.users.removed.some((u) => u.sourcedId === goneId)).toBe(true);
@@ -173,7 +182,14 @@ describe("reconcile — orphan detection with outage floor", () => {
     const incoming = emptySnapshot("oneroster");
     incoming.users = [{ ...loadSnapshot().users[0] }];
     const res = reconcile({
-      known: { orgs: [], terms: [], courses: [], classes: [], users: [incoming.users[0].sourcedId, "orphan-1"], enrollments: [] },
+      known: {
+        orgs: [],
+        terms: [],
+        courses: [],
+        classes: [],
+        users: [incoming.users[0].sourcedId, "orphan-1"],
+        enrollments: [],
+      },
       incoming,
     });
     expect(res.orphans.users).toEqual(["orphan-1"]);
@@ -183,7 +199,14 @@ describe("reconcile — orphan detection with outage floor", () => {
   it("refuses to orphan a whole population on an empty payload (suspected outage)", () => {
     const incoming = emptySnapshot("oneroster"); // users empty
     const res = reconcile({
-      known: { orgs: [], terms: [], courses: [], classes: [], users: ["a", "b", "c"], enrollments: [] },
+      known: {
+        orgs: [],
+        terms: [],
+        courses: [],
+        classes: [],
+        users: ["a", "b", "c"],
+        enrollments: [],
+      },
       incoming,
     });
     expect(res.suspectedOutage).toContain("users");

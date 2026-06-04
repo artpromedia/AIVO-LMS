@@ -116,11 +116,21 @@ describe("retry / backoff", () => {
 
   it("retryRowJob re-enqueues with backoff, then dead-letters", async () => {
     const q = new InMemorySyncQueue();
-    const job: SyncJob = { type: "sync.row", tenantId: "t", connectorId: "c", attempt: 1, row: { kind: "users", sourcedId: "u1" } };
+    const job: SyncJob = {
+      type: "sync.row",
+      tenantId: "t",
+      connectorId: "c",
+      attempt: 1,
+      row: { kind: "users", sourcedId: "u1" },
+    };
     const delay = await retryRowJob(q, job, DEFAULT_BACKOFF, () => 0.5);
     expect(delay).toBe(2000);
     expect(q.jobs[0].job.attempt).toBe(2);
-    const dead = await retryRowJob(q, { ...job, attempt: DEFAULT_BACKOFF.maxAttempts }, DEFAULT_BACKOFF);
+    const dead = await retryRowJob(
+      q,
+      { ...job, attempt: DEFAULT_BACKOFF.maxAttempts },
+      DEFAULT_BACKOFF,
+    );
     expect(dead).toBeNull();
   });
 });

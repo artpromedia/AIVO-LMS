@@ -8,11 +8,11 @@ AI-specific series listed below — all carrying per-tenant labels.
 
 ## Dashboards
 
-| File | UID | Purpose |
-|------|-----|---------|
-| `service-health.json` | `aivo-service-health` | RED method across services: request **rate**, **errors** (5xx %), **duration** p50/p95/p99, plus top tenants by traffic. |
+| File                    | UID                     | Purpose                                                                                                                                      |
+| ----------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `service-health.json`   | `aivo-service-health`   | RED method across services: request **rate**, **errors** (5xx %), **duration** p50/p95/p99, plus top tenants by traffic.                     |
 | `slo-error-budget.json` | `aivo-slo-error-budget` | SLO compliance (observed SLI vs target), **error-budget remaining**, multi-window **burn-rate** (1h fast / 6h slow), and the page condition. |
-| `responsible-ai.json` | `aivo-responsible-ai` | AI **call volume**, **blocked calls** (`ai.call.blocked`) by reason, eval **pass rates** by metric, and per-model **usage / cost**. |
+| `responsible-ai.json`   | `aivo-responsible-ai`   | AI **call volume**, **blocked calls** (`ai.call.blocked`) by reason, eval **pass rates** by metric, and per-model **usage / cost**.          |
 
 ## The `tenant_id` template variable
 

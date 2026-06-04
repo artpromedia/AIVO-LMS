@@ -22,7 +22,7 @@ export function registerDeletionRoutes(app: FastifyInstance): void {
     {
       ...audited("governance.deletion.requested", {
         entityType: "deletion_request",
-        entityId: (req) => ((req.body as DeletionWorkflowInput)?.learnerId ?? ""),
+        entityId: (req) => (req.body as DeletionWorkflowInput)?.learnerId ?? "",
         detailsAllowlist: ["learnerId", "requesterRole", "exportBeforeDelete"],
         details: (req) => {
           const b = req.body as DeletionWorkflowInput;
@@ -35,28 +35,29 @@ export function registerDeletionRoutes(app: FastifyInstance): void {
       }),
     },
     async (request, reply) => {
-    if (!request.body?.learnerId || !request.body?.requesterId) {
-      return reply.code(400).send({ error: "learnerId and requesterId are required" });
-    }
-    const record = createDeletionRequest({
-      learnerId: request.body.learnerId,
-      requesterId: request.body.requesterId,
-      requesterRole: request.body.requesterRole,
-      exportBeforeDelete: request.body.exportBeforeDelete,
-      retentionHolds: request.body.retentionHolds ?? [],
-    });
-    STORE.set(record.id, record);
-    void emitAuditEvent({
-      actorId: request.body.requesterId,
-      actorRole: request.body.requesterRole,
-      action: "deletion_requested",
-      resourceType: "deletion_request",
-      resourceId: record.id,
-      learnerId: record.learnerId,
-      metadata: { status: record.status },
-    });
-    return reply.code(201).send(record);
-  });
+      if (!request.body?.learnerId || !request.body?.requesterId) {
+        return reply.code(400).send({ error: "learnerId and requesterId are required" });
+      }
+      const record = createDeletionRequest({
+        learnerId: request.body.learnerId,
+        requesterId: request.body.requesterId,
+        requesterRole: request.body.requesterRole,
+        exportBeforeDelete: request.body.exportBeforeDelete,
+        retentionHolds: request.body.retentionHolds ?? [],
+      });
+      STORE.set(record.id, record);
+      void emitAuditEvent({
+        actorId: request.body.requesterId,
+        actorRole: request.body.requesterRole,
+        action: "deletion_requested",
+        resourceType: "deletion_request",
+        resourceId: record.id,
+        learnerId: record.learnerId,
+        metadata: { status: record.status },
+      });
+      return reply.code(201).send(record);
+    },
+  );
 
   app.post<{ Params: { id: string } }>(
     "/api/deletion-requests/:id/approve",

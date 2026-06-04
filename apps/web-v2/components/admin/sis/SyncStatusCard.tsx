@@ -39,9 +39,7 @@ export function SyncStatusCard({
             {PROVIDER_LABEL[connector.provider] ?? connector.provider}
           </p>
         </div>
-        <Badge tone={tone}>
-          {latestRun ? latestRun.status.toUpperCase() : "NEVER RUN"}
-        </Badge>
+        <Badge tone={tone}>{latestRun ? latestRun.status.toUpperCase() : "NEVER RUN"}</Badge>
       </div>
       <dl className="mt-3 space-y-1 text-sm">
         <div className="flex justify-between">
@@ -50,9 +48,7 @@ export function SyncStatusCard({
         </div>
         <div className="flex justify-between">
           <dt className="text-aivo-ink-soft">Rows (add / upd / del)</dt>
-          <dd>
-            {counts ? `${counts.added} / ${counts.updated} / ${counts.removed}` : "—"}
-          </dd>
+          <dd>{counts ? `${counts.added} / ${counts.updated} / ${counts.removed}` : "—"}</dd>
         </div>
         <div className="flex justify-between">
           <dt className="text-aivo-ink-soft">Errors</dt>

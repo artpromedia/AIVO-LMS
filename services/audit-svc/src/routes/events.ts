@@ -88,8 +88,18 @@ export function registerEventRoutes(app: FastifyInstance, store: EventStore): vo
       reply.raw.write(CSV_COLUMNS.join(",") + "\n");
       for await (const e of store.stream(filter)) {
         const row = [
-          e.id, e.occurred_at, e.tenant_id, e.actor.id, e.actor.role, e.actor.ip,
-          e.action, e.entity.type, e.entity.id, e.outcome, e.request_id, e.hash,
+          e.id,
+          e.occurred_at,
+          e.tenant_id,
+          e.actor.id,
+          e.actor.role,
+          e.actor.ip,
+          e.action,
+          e.entity.type,
+          e.entity.id,
+          e.outcome,
+          e.request_id,
+          e.hash,
         ];
         reply.raw.write(row.map(csvCell).join(",") + "\n");
       }

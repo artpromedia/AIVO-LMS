@@ -59,7 +59,10 @@ export async function emitRegistryAudit(
       request.log.warn({ action, resourceId, status: res.status }, "rai registry audit non-2xx");
     }
   } catch (err) {
-    request.log.warn({ action, resourceId, err: (err as Error).message }, "rai registry audit failed");
+    request.log.warn(
+      { action, resourceId, err: (err as Error).message },
+      "rai registry audit failed",
+    );
   } finally {
     clearTimeout(timer);
   }

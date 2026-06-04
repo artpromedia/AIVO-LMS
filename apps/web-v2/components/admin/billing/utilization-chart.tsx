@@ -156,11 +156,7 @@ export function UtilizationChart({ series, granularity, hardCap }: UtilizationCh
         ))}
 
         {/* Allocated area (filled, semi-transparent) */}
-        <path
-          d={pointsToClosedArea(allocPts)}
-          fill="var(--color-aivo-primary)"
-          fillOpacity={0.1}
-        />
+        <path d={pointsToClosedArea(allocPts)} fill="var(--color-aivo-primary)" fillOpacity={0.1} />
         {/* Allocated line */}
         <polyline
           points={pointsToPolyline(allocPts)}
@@ -172,11 +168,7 @@ export function UtilizationChart({ series, granularity, hardCap }: UtilizationCh
         />
 
         {/* Used area */}
-        <path
-          d={pointsToClosedArea(usedPts)}
-          fill="var(--color-aivo-primary)"
-          fillOpacity={0.25}
-        />
+        <path d={pointsToClosedArea(usedPts)} fill="var(--color-aivo-primary)" fillOpacity={0.25} />
         {/* Used line */}
         <polyline
           points={pointsToPolyline(usedPts)}

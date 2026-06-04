@@ -58,7 +58,10 @@ async function update(req: Request, ctx: Ctx) {
   try {
     body = await req.json();
   } catch {
-    return fail({ ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." }, requestId);
+    return fail(
+      { ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." },
+      requestId,
+    );
   }
   const parsed = PatchSchema.safeParse(body);
   if (!parsed.success) {

@@ -45,10 +45,14 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return fail({ ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." }, requestId);
+    return fail(
+      { ...ERRORS.VALIDATION_FAILED, message: "Could not read request body." },
+      requestId,
+    );
   }
   const parsed = CreateSchema.safeParse(body);
-  if (!parsed.success) return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
+  if (!parsed.success)
+    return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
 
   const denied = authorizeManageTenant(session, parsed.data.tenantId, requestId);
   if (denied) return denied;

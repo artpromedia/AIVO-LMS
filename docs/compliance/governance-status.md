@@ -16,16 +16,16 @@ picture from a dozen scattered files.
 
 ## 1. Framework coverage
 
-| Framework | Status | Source of truth |
-| --- | --- | --- |
-| COPPA (verifiable parental consent, child data) | 🟢 Implemented | [`docs/legal/privacy-program.md`](../legal/privacy-program.md), `identity-svc` consent records |
-| FERPA (school official, directory data, parent access) | 🟢 Implemented | [`docs/legal/privacy-program.md`](../legal/privacy-program.md), [`docs/data-governance-center.md`](../data-governance-center.md) |
-| GDPR / UK-GDPR (DSAR access, erasure, portability) | 🟢 Implemented | [`docs/runbooks/dsar.md`](../runbooks/dsar.md), [`docs/adr/0034-data-governance.md`](../adr/0034-data-governance.md) |
-| US state privacy (CCPA/CPRA et al.) | 🟢 Implemented | [`docs/compliance/state-privacy-matrix.md`](./state-privacy-matrix.md) |
-| Consent management | 🟢 Implemented | [`docs/compliance/consent-matrix.md`](./consent-matrix.md) |
-| SOC 2 (evidence automation, access review) | 🟡 In progress | [`docs/security/soc2-readiness.md`](../security/soc2-readiness.md), `admin-svc` nightly evidence bundles |
-| Audit immutability (hash chain, tamper evidence) | 🟢 Implemented | [`docs/adr/0032-audit-architecture.md`](../adr/0032-audit-architecture.md), [`docs/runbooks/audit-restore.md`](../runbooks/audit-restore.md) |
-| DPA lifecycle (district agreements) | 🟢 Implemented | [`docs/dpa-management.md`](../dpa-management.md) |
+| Framework                                              | Status         | Source of truth                                                                                                                              |
+| ------------------------------------------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| COPPA (verifiable parental consent, child data)        | 🟢 Implemented | [`docs/legal/privacy-program.md`](../legal/privacy-program.md), `identity-svc` consent records                                               |
+| FERPA (school official, directory data, parent access) | 🟢 Implemented | [`docs/legal/privacy-program.md`](../legal/privacy-program.md), [`docs/data-governance-center.md`](../data-governance-center.md)             |
+| GDPR / UK-GDPR (DSAR access, erasure, portability)     | 🟢 Implemented | [`docs/runbooks/dsar.md`](../runbooks/dsar.md), [`docs/adr/0034-data-governance.md`](../adr/0034-data-governance.md)                         |
+| US state privacy (CCPA/CPRA et al.)                    | 🟢 Implemented | [`docs/compliance/state-privacy-matrix.md`](./state-privacy-matrix.md)                                                                       |
+| Consent management                                     | 🟢 Implemented | [`docs/compliance/consent-matrix.md`](./consent-matrix.md)                                                                                   |
+| SOC 2 (evidence automation, access review)             | 🟡 In progress | [`docs/security/soc2-readiness.md`](../security/soc2-readiness.md), `admin-svc` nightly evidence bundles                                     |
+| Audit immutability (hash chain, tamper evidence)       | 🟢 Implemented | [`docs/adr/0032-audit-architecture.md`](../adr/0032-audit-architecture.md), [`docs/runbooks/audit-restore.md`](../runbooks/audit-restore.md) |
+| DPA lifecycle (district agreements)                    | 🟢 Implemented | [`docs/dpa-management.md`](../dpa-management.md)                                                                                             |
 
 Legend: 🟢 Implemented · 🟡 In progress · 🔴 Not started.
 
@@ -39,15 +39,15 @@ fans `erase` / `export` out to each data-owning service's internal
 checksums (see [ADR 0034](../adr/0034-data-governance.md) and the
 [DSAR runbook](../runbooks/dsar.md)).
 
-| Service | Erase | Export | Notes |
-| --- | --- | --- | --- |
-| `identity-svc` | 🟢 delete | 🟢 | User row + sessions, MFA, WebAuthn, password history/resets, admin sessions, consent records. |
-| `learning-svc` | 🟢 delete | 🟢 | Lesson runs/sessions, learning paths, gradebook, tutor sessions, generated plans, parent summaries. |
-| `integration-svc` | 🟢 delete | 🟢 | Family settings, AAC sync state + vocabulary. |
-| `billing-svc` | 🟢 delete | 🟢 | Subscriptions + tutor subscriptions (delete); tenant-scoped invoices (export). |
-| `tenant-svc` | 🟢 delete | 🟢 | In-memory SIS roster: student record + class enrollments, subject-scoped by external id. |
-| `audit-svc` | 🟢 anonymize | 🟢 | Hash-chained — actor/network PII nulled in place; hashes untouched (forward chain stays verifiable). |
-| `admin-svc` | 🟢 delete + anonymize | 🟢 | `data_requests` deleted; hash-chained `admin_audit_log` actor PII anonymized in place. |
+| Service           | Erase                 | Export | Notes                                                                                                |
+| ----------------- | --------------------- | ------ | ---------------------------------------------------------------------------------------------------- |
+| `identity-svc`    | 🟢 delete             | 🟢     | User row + sessions, MFA, WebAuthn, password history/resets, admin sessions, consent records.        |
+| `learning-svc`    | 🟢 delete             | 🟢     | Lesson runs/sessions, learning paths, gradebook, tutor sessions, generated plans, parent summaries.  |
+| `integration-svc` | 🟢 delete             | 🟢     | Family settings, AAC sync state + vocabulary.                                                        |
+| `billing-svc`     | 🟢 delete             | 🟢     | Subscriptions + tutor subscriptions (delete); tenant-scoped invoices (export).                       |
+| `tenant-svc`      | 🟢 delete             | 🟢     | In-memory SIS roster: student record + class enrollments, subject-scoped by external id.             |
+| `audit-svc`       | 🟢 anonymize          | 🟢     | Hash-chained — actor/network PII nulled in place; hashes untouched (forward chain stays verifiable). |
+| `admin-svc`       | 🟢 delete + anonymize | 🟢     | `data_requests` deleted; hash-chained `admin_audit_log` actor PII anonymized in place.               |
 
 **Anonymize vs delete:** append-only, hash-chained tables (`audit_events`,
 `admin_audit_log`) are **never** hard-deleted — actor identity / network
@@ -64,13 +64,13 @@ corruption.
 DSAR and admin-governance correctness depends on durable storage; in-memory
 stores would lose subject data on restart and break reconciliation.
 
-| Area | Status | Backing |
-| --- | --- | --- |
-| DPA acceptances | 🟢 Postgres | `dpa_acceptances` (`data-governance-svc` dpa-store) |
-| DSAR requests / events / retention | 🟢 Postgres | `data-governance-svc` schema (migration `0059`) |
-| Admin classrooms / notification prefs | 🟢 Postgres | `admin_classrooms`, `admin_notification_prefs` (migration `0060`) |
-| Learner import jobs + rows | 🟢 Postgres | `learner_import_jobs`, `learner_import_records` (migration `0060`) |
-| Admin / audit logs | 🟢 Postgres | `admin_audit_log`, `audit_events`, `audit_events_v2` |
+| Area                                  | Status      | Backing                                                            |
+| ------------------------------------- | ----------- | ------------------------------------------------------------------ |
+| DPA acceptances                       | 🟢 Postgres | `dpa_acceptances` (`data-governance-svc` dpa-store)                |
+| DSAR requests / events / retention    | 🟢 Postgres | `data-governance-svc` schema (migration `0059`)                    |
+| Admin classrooms / notification prefs | 🟢 Postgres | `admin_classrooms`, `admin_notification_prefs` (migration `0060`)  |
+| Learner import jobs + rows            | 🟢 Postgres | `learner_import_jobs`, `learner_import_records` (migration `0060`) |
+| Admin / audit logs                    | 🟢 Postgres | `admin_audit_log`, `audit_events`, `audit_events_v2`               |
 
 All admin-svc stores follow the dpa-store precedent: an in-memory
 implementation for tests / local dev and a Postgres implementation for

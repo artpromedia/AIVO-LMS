@@ -57,9 +57,7 @@ export async function POST(req: Request): Promise<NextResponse> {
               ? body.scheduledStart
               : new Date().toISOString(),
           scheduledEnd:
-            typeof body.scheduledEnd === "string"
-              ? body.scheduledEnd
-              : new Date().toISOString(),
+            typeof body.scheduledEnd === "string" ? body.scheduledEnd : new Date().toISOString(),
         },
         stub: true,
       },

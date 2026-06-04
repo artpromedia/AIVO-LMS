@@ -35,7 +35,9 @@ describe("catalog scope filtering", () => {
       headers: hdr("platform_admin"),
     });
     const ids = res.json().reports.map((r: any) => r.id);
-    expect(ids).toEqual(expect.arrayContaining(["mrr-by-plan", "enrollment-by-school", "enrollment"]));
+    expect(ids).toEqual(
+      expect.arrayContaining(["mrr-by-plan", "enrollment-by-school", "enrollment"]),
+    );
   });
 });
 

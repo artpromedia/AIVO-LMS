@@ -48,7 +48,12 @@ describe("clampTtlSeconds", () => {
 
 describe("evaluateRbac matrix", () => {
   const platform: Actor = { userId: "p1", role: "platform_admin", tenantId: "t1" };
-  const district: Actor = { userId: "d1", role: "district_admin", tenantId: "t1", districtId: "dist1" };
+  const district: Actor = {
+    userId: "d1",
+    role: "district_admin",
+    tenantId: "t1",
+    districtId: "dist1",
+  };
   const school: Actor = { userId: "s1", role: "school_admin", tenantId: "t1", schoolId: "sch1" };
 
   const learnerInSchool: Subject = {
@@ -60,7 +65,10 @@ describe("evaluateRbac matrix", () => {
   };
 
   it("rejects self-impersonation", () => {
-    assert.equal(evaluateRbac(platform, { ...learnerInSchool, userId: "p1" }).reason, "SELF_IMPERSONATION");
+    assert.equal(
+      evaluateRbac(platform, { ...learnerInSchool, userId: "p1" }).reason,
+      "SELF_IMPERSONATION",
+    );
   });
   it("platform admin may impersonate a learner with no break-glass", () => {
     const r = evaluateRbac(platform, learnerInSchool);
@@ -86,7 +94,10 @@ describe("evaluateRbac matrix", () => {
   });
   it("school admin limited to their school and to learner/teacher/parent", () => {
     assert.equal(evaluateRbac(school, learnerInSchool).allowed, true);
-    assert.equal(evaluateRbac(school, { ...learnerInSchool, schoolId: "other" }).reason, "CROSS_SCHOOL");
+    assert.equal(
+      evaluateRbac(school, { ...learnerInSchool, schoolId: "other" }).reason,
+      "CROSS_SCHOOL",
+    );
     assert.equal(
       evaluateRbac(school, { ...learnerInSchool, role: "district_admin" }).reason,
       "ADMIN_TARGET_FORBIDDEN",
@@ -107,21 +118,38 @@ describe("evaluateConsent", () => {
     );
   });
   it("adult: subject consent / justification ticket / platform override each work", () => {
-    assert.equal(evaluateConsent(adult, { hasSubjectConsent: true }, tenantOn, rbacOk).basis, "SUBJECT_CONSENT");
+    assert.equal(
+      evaluateConsent(adult, { hasSubjectConsent: true }, tenantOn, rbacOk).basis,
+      "SUBJECT_CONSENT",
+    );
     assert.equal(
       evaluateConsent(adult, { justificationTicketId: "TICK-1" }, tenantOn, rbacOk).basis,
       "JUSTIFICATION_TICKET",
     );
-    assert.equal(evaluateConsent(adult, { platformOverride: true }, tenantOn, rbacOk).basis, "PLATFORM_OVERRIDE");
+    assert.equal(
+      evaluateConsent(adult, { platformOverride: true }, tenantOn, rbacOk).basis,
+      "PLATFORM_OVERRIDE",
+    );
   });
   it("adult with no basis is denied", () => {
     assert.equal(evaluateConsent(adult, {}, tenantOn, rbacOk).reason, "ADULT_NO_BASIS");
   });
   it("minor requires guardian consent or open incident (ticket/override do NOT bypass)", () => {
-    assert.equal(evaluateConsent(minor, { hasGuardianConsent: true }, tenantOn, rbacOk).basis, "GUARDIAN_CONSENT");
-    assert.equal(evaluateConsent(minor, { hasOpenIncident: true }, tenantOn, rbacOk).basis, "OPEN_INCIDENT");
     assert.equal(
-      evaluateConsent(minor, { justificationTicketId: "T", platformOverride: true }, tenantOn, rbacOk).reason,
+      evaluateConsent(minor, { hasGuardianConsent: true }, tenantOn, rbacOk).basis,
+      "GUARDIAN_CONSENT",
+    );
+    assert.equal(
+      evaluateConsent(minor, { hasOpenIncident: true }, tenantOn, rbacOk).basis,
+      "OPEN_INCIDENT",
+    );
+    assert.equal(
+      evaluateConsent(
+        minor,
+        { justificationTicketId: "T", platformOverride: true },
+        tenantOn,
+        rbacOk,
+      ).reason,
       "MINOR_NO_GUARDIAN_CONSENT",
     );
   });
@@ -169,7 +197,14 @@ function makeDeps(overrides: Partial<ImpersonationDeps> = {}): ImpersonationDeps
     store,
     resolveSubject: async (id) =>
       id === "learner-1"
-        ? { userId: "learner-1", role: "learner", tenantId: "t1", districtId: "dist1", schoolId: "sch1", ageYears: 9 }
+        ? {
+            userId: "learner-1",
+            role: "learner",
+            tenantId: "t1",
+            districtId: "dist1",
+            schoolId: "sch1",
+            ageYears: 9,
+          }
         : id === "admin-x"
           ? { userId: "admin-x", role: "platform_admin", tenantId: "t1" }
           : null,
@@ -204,7 +239,12 @@ describe("POST /impersonation/start (route)", () => {
       method: "POST",
       url: "/api/impersonation/start",
       headers: { authorization: `Bearer ${token}`, "x-step-up-token": "ok" },
-      payload: { subject_user_id: "learner-1", reason: "help with login", ttl_seconds: 600, guardian_consent: true },
+      payload: {
+        subject_user_id: "learner-1",
+        reason: "help with login",
+        ttl_seconds: 600,
+        guardian_consent: true,
+      },
     });
     assert.equal(res.statusCode, 201);
     const body = res.json();
@@ -251,7 +291,15 @@ describe("POST /impersonation/start (route)", () => {
     registerImpersonationRoutes(app, makeDeps());
     // Build an impersonation token directly and try to use it to start.
     const impToken = await signJWT(
-      { sub: "learner-1", tenantId: "t1", role: "learner", act: "admin-1", imp: true, imp_exp: Math.floor(Date.now() / 1000) + 600, imp_sid: "s1" } as unknown as JWTPayload,
+      {
+        sub: "learner-1",
+        tenantId: "t1",
+        role: "learner",
+        act: "admin-1",
+        imp: true,
+        imp_exp: Math.floor(Date.now() / 1000) + 600,
+        imp_sid: "s1",
+      } as unknown as JWTPayload,
       "10m",
     );
     const res = await app.inject({
@@ -289,7 +337,12 @@ describe("security: forged imp_writes_ok is rejected by signature", () => {
       method: "POST",
       url: "/api/impersonation/start",
       headers: { authorization: `Bearer ${token}`, "x-step-up-token": "ok" },
-      payload: { subject_user_id: "learner-1", reason: "x", guardian_consent: true, allow_writes: false },
+      payload: {
+        subject_user_id: "learner-1",
+        reason: "x",
+        guardian_consent: true,
+        allow_writes: false,
+      },
     });
     const { token: impToken } = res.json();
     // Forge: flip imp_writes_ok in the payload segment.

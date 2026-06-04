@@ -18,7 +18,10 @@ export interface EntityDiff<T> {
 
 export type SyncDiff = {
   [K in EntityKind]: EntityDiff<RosterSnapshot[K][number]>;
-} & { counts: Record<EntityKind, { added: number; updated: number; removed: number }>; total: number };
+} & {
+  counts: Record<EntityKind, { added: number; updated: number; removed: number }>;
+  total: number;
+};
 
 function diffKind<T extends { sourcedId: string; status: string }>(
   prev: T[],
@@ -57,7 +60,11 @@ export function computeDiff(prev: RosterSnapshot, next: RosterSnapshot): SyncDif
   for (const kind of ENTITY_KINDS) {
     const d = diffKind(prev[kind] as any[], next[kind] as any[]);
     (out as any)[kind] = d;
-    out.counts[kind] = { added: d.added.length, updated: d.updated.length, removed: d.removed.length };
+    out.counts[kind] = {
+      added: d.added.length,
+      updated: d.updated.length,
+      removed: d.removed.length,
+    };
     total += d.added.length + d.updated.length + d.removed.length;
   }
   out.total = total;

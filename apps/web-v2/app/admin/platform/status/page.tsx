@@ -113,10 +113,7 @@ export default async function Page() {
           <p className="font-iw-display text-lg font-semibold text-iw-ink">Incidents</p>
         </div>
         {incidents.length === 0 ? (
-          <EmptyState
-            title="No incidents"
-            description="No incidents have been reported."
-          />
+          <EmptyState title="No incidents" description="No incidents have been reported." />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-iw-card-soft text-xs uppercase tracking-wide text-iw-ink-muted">

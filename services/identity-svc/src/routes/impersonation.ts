@@ -163,7 +163,9 @@ export function registerImpersonationRoutes(app: FastifyInstance, deps: Imperson
       userId: actorClaims.sub,
       role: actorRole as AdminRole,
       tenantId: actorClaims.tenantId,
-      districtId: (actorClaims as unknown as Record<string, unknown>).districtId as string | undefined,
+      districtId: (actorClaims as unknown as Record<string, unknown>).districtId as
+        | string
+        | undefined,
       schoolId: (actorClaims as unknown as Record<string, unknown>).schoolId as string | undefined,
     };
 
@@ -197,7 +199,9 @@ export function registerImpersonationRoutes(app: FastifyInstance, deps: Imperson
         ua: userAgent(req),
         details: { code: consentResult.reason },
       });
-      return reply.code(403).send({ error: "Consent requirements not met", code: consentResult.reason });
+      return reply
+        .code(403)
+        .send({ error: "Consent requirements not met", code: consentResult.reason });
     }
 
     // 3) Clamp TTL and mint the impersonation token.

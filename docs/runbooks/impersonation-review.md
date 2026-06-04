@@ -82,7 +82,7 @@ Work the month's sessions. **Every** session must satisfy **every** item.
 - [ ] **TTLs within policy.** Clamped TTL ∈ [tenant floor (≥ 5 min), 30 min];
       default 15 min when unspecified. No session ran past its `imp_exp`
       (any `expired` event means the guard correctly cut it off — fine; a
-      session that somehow *acted* after `imp_exp` is a red flag).
+      session that somehow _acted_ after `imp_exp` is a red flag).
 - [ ] **No anomalous frequency per actor.** Compare each acting admin's
       session count and total impersonated time to their baseline and to
       peers. Spikes, off-hours bursts, or one admin impersonating an unusual
@@ -131,20 +131,22 @@ implicated, trigger the privacy/DPO breach process.
 ```markdown
 # Impersonation Compliance Review — <YYYY-MM>
 
-- Period:                 <month start> → <month end> (UTC)
-- Reviewer:               <name, role>
-- Data pull by:           <name> on <date>
-- Sources:                impersonation/history + auth.impersonation.* audit
-- Audit chain verified:   yes / no  (/events/verify result)
+- Period: <month start> → <month end> (UTC)
+- Reviewer: <name, role>
+- Data pull by: <name> on <date>
+- Sources: impersonation/history + auth.impersonation.\* audit
+- Audit chain verified: yes / no (/events/verify result)
 
 ## Summary
-- Total sessions:         <n>
+
+- Total sessions: <n>
 - Distinct acting admins: <n>
-- Writes-on sessions:     <n>
-- Minor-subject sessions: <n>   (all guardian-consent / open-incident? yes/no)
-- Admin-target sessions:  <n>   (all break-glass? yes/no)
+- Writes-on sessions: <n>
+- Minor-subject sessions: <n> (all guardian-consent / open-incident? yes/no)
+- Admin-target sessions: <n> (all break-glass? yes/no)
 
 ## Checklist outcome
+
 - [ ] Reason + valid basis on every session
 - [ ] Minors only with guardian consent / open incident
 - [ ] No admin target without break-glass
@@ -155,10 +157,12 @@ implicated, trigger the privacy/DPO breach process.
 - [ ] Tenant-disable honoured
 
 ## Findings / red flags
+
 - <none | description + escalation ticket link>
 
 ## Disposition
-- Result:   PASS / PASS WITH FINDINGS / FAIL (escalated)
+
+- Result: PASS / PASS WITH FINDINGS / FAIL (escalated)
 - Sign-off: <name> <signature/SSO> <date>
 ```
 

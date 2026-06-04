@@ -41,7 +41,10 @@ export function IncidentTimeline({ updates }: { updates: Update[] }) {
     <ol className="relative space-y-6 border-l border-iw-border pl-6">
       {ordered.map((u, i) => (
         <li key={`${u.createdAt}-${i}`} className="relative">
-          <span className="absolute -left-[1.625rem] top-1 h-3 w-3 rounded-full bg-iw-primary ring-4 ring-iw-card" aria-hidden />
+          <span
+            className="absolute -left-[1.625rem] top-1 h-3 w-3 rounded-full bg-iw-primary ring-4 ring-iw-card"
+            aria-hidden
+          />
           <div className="flex items-center gap-2">
             <Badge tone={lifecycleTone(u.lifecycle)}>
               <span className="capitalize">{u.lifecycle.replace(/_/g, " ")}</span>

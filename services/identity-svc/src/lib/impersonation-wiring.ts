@@ -7,7 +7,11 @@
  */
 import { eq } from "drizzle-orm";
 import { users, learners, tenants, auditEvents, appendAudit } from "@aivo/db";
-import type { ImpersonationAuditEvent, ImpersonationDeps, StartBody } from "../routes/impersonation.js";
+import type {
+  ImpersonationAuditEvent,
+  ImpersonationDeps,
+  StartBody,
+} from "../routes/impersonation.js";
 import type { Actor, Subject, TenantImpersonationSettings } from "./impersonation.js";
 
 function ageFromDob(dob: Date | string | null | undefined): number | undefined {
@@ -84,22 +88,27 @@ export function buildImpersonationDeps(db: any): Omit<ImpersonationDeps, "verify
 
     audit(event: ImpersonationAuditEvent) {
       // Best-effort hash-chained audit write.
-      void appendAudit(db, "audit_events", auditEvents as any, {
-        action: event.action,
-        resourceType: "impersonation",
-        resourceId: event.details?.sessionId ?? event.subjectId ?? null,
-        actorUserId: event.actorId,
-        actorRole: "admin",
-        details: {
-          subjectId: event.subjectId,
-          reason: event.reason,
-          basis: event.basis,
-          justificationTicketId: event.justificationTicketId,
-          ip: event.ip,
-          ua: event.ua,
-          ...event.details,
-        },
-      } as any).catch(() => {
+      void appendAudit(
+        db,
+        "audit_events",
+        auditEvents as any,
+        {
+          action: event.action,
+          resourceType: "impersonation",
+          resourceId: event.details?.sessionId ?? event.subjectId ?? null,
+          actorUserId: event.actorId,
+          actorRole: "admin",
+          details: {
+            subjectId: event.subjectId,
+            reason: event.reason,
+            basis: event.basis,
+            justificationTicketId: event.justificationTicketId,
+            ip: event.ip,
+            ua: event.ua,
+            ...event.details,
+          },
+        } as any,
+      ).catch(() => {
         /* audit best-effort */
       });
     },

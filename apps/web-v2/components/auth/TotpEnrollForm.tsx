@@ -53,7 +53,10 @@ export function TotpEnrollForm({ alreadyEnrolled }: { alreadyEnrolled: boolean }
 
   if (done) {
     return (
-      <div role="status" className="rounded-iw-card border border-iw-success/40 bg-iw-success/10 px-4 py-3 text-sm text-iw-success">
+      <div
+        role="status"
+        className="rounded-iw-card border border-iw-success/40 bg-iw-success/10 px-4 py-3 text-sm text-iw-success"
+      >
         {t("enrolled")}
       </div>
     );

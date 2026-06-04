@@ -60,8 +60,7 @@ export function registerMaintenanceRoutes(app: FastifyInstance): void {
       const existing = store.maintenances.get(request.params.id);
       if (!existing) return reply.code(404).send({ error: "Maintenance not found" });
       const b = request.body ?? {};
-      const nextState =
-        b.state && STATES.includes(b.state) ? b.state : existing.state;
+      const nextState = b.state && STATES.includes(b.state) ? b.state : existing.state;
       const updated: Maintenance = {
         ...existing,
         title: b.title ?? existing.title,
@@ -91,7 +90,9 @@ export function registerMaintenanceRoutes(app: FastifyInstance): void {
         }
       }
       store.maintenances.set(updated.id, updated);
-      await emitStatusAudit(request, "STATUS_MAINTENANCE_UPDATED", updated.id, { state: nextState });
+      await emitStatusAudit(request, "STATUS_MAINTENANCE_UPDATED", updated.id, {
+        state: nextState,
+      });
       return { maintenance: updated };
     },
   );
