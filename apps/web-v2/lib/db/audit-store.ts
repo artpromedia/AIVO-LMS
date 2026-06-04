@@ -77,9 +77,7 @@ export function queryAudit(f: AuditFilter): {
   return { events: page, nextCursor };
 }
 
-export function getAuditEvent(
-  id: string,
-): {
+export function getAuditEvent(id: string): {
   event: AuditEventView;
   proof: { prev_hash: string; hash: string; next_hash: string | null };
 } | null {
