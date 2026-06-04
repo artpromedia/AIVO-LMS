@@ -53,6 +53,7 @@
     "rbac:audit": "node scripts/rbac-matrix-audit.mjs",
     "mobile:audit": "node scripts/mobile-unified-audit.mjs",
     "mobile:role-audit": "node scripts/mobile-role-audit.mjs",
+    "ux:parity": "node scripts/ux-parity-check.mjs",
     "persistence:stubs": "node scripts/check-persistence-stubs.mjs",
     "mobile:parity": "node scripts/web-mobile-parity-check.mjs",
     "mobile:parity:strict": "node scripts/web-mobile-parity-check.mjs --strict",

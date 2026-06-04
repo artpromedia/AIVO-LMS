@@ -145,6 +145,13 @@
       "claimed_status": "green",
       "owner": "mobile",
       "notes": "GREEN-07 role lens: active-role helpers, RoleContext shape, apiFetch wiring, MOBILE_UNIFIED_APP/legacy-group consistency, and 6 BFF consumers. Verified 2026-06-04."
+    },
+    {
+      "id": "ux:parity",
+      "command": "pnpm ux:parity",
+      "claimed_status": "green",
+      "owner": "ux",
+      "notes": "GREEN-08 UX-state lens: canonical primitives (EmptyState/OfflineBanner/app shell), per-role EmptyState usage (learner/parent/teacher/admin-school/admin-district), and web⇄mobile parity matrix clean. Verified 2026-06-04."
     }
   ]
 }

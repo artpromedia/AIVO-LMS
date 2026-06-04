@@ -101,9 +101,8 @@ const gates = [
   },
   {
     name: "ux:parity",
-    status: "not-implemented",
-    reason: "Owned by Sprint GREEN-08. scripts/ux-parity-check.mjs not yet created.",
-    required: false,
+    script: "ux:parity",
+    required: true,
     category: "ux",
   },
   {

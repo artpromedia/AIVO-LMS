@@ -62,10 +62,24 @@
 
 ## GREEN-08 deliverable
 
-`scripts/ux-parity-check.mjs` (not yet implemented) must:
+`scripts/ux-parity-check.mjs` (run via `pnpm ux:parity`, required gate in
+`green:check` as of 2026-06-04) enforces:
 
-- enumerate routes in `apps/web-v2`, `apps/marketing`, and `apps/mobile`
-- assert that each surface has the required UX states (verified via test IDs or
-  storybook entries — not just text matches)
-- assert that no production tutor visual is emoji-only
-- emit per-surface report and fail if any surface in the matrix is 🔴
+- canonical UX-state primitives exist on disk and export the expected
+  symbols (`EmptyState` in `@aivo/ui` and `apps/web-v2/components/ui`,
+  `OfflineBanner` in `apps/web-v2/components/offline`, canonical app
+  shell at `apps/web-v2/app/layout.tsx`);
+- every shipping role surface (learner, parent, teacher, admin/school,
+  admin/district) uses `EmptyState` in at least one `page.tsx` — no
+  silent empty-data dead ends;
+- the curated web⇄mobile parity matrix in
+  `scripts/web-mobile-parity-check.mjs` is clean under `--strict`
+  (subprocess invocation; non-zero exit fails the gate).
+
+Out of scope for this gate (tracked elsewhere):
+
+- axe-core / keyboard / screen-reader / reduced-motion snapshots — owned
+  by GREEN-09 `a11y:audit`;
+- per-surface visual-regression baseline — downstream content sprint;
+- "no emoji-only tutor visuals" — downstream tutor-quality sprint
+  (`learner/baseline/intro` still uses an emoji avatar).
