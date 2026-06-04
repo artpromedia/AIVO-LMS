@@ -6,8 +6,15 @@
 //
 //   DATABASE_URL=… node scripts/ci/verify-postgres-rows.mjs
 //   AIVO_VERIFY_SEEDED=1 DATABASE_URL=… node scripts/ci/verify-postgres-rows.mjs
-import { createDb } from "@aivo/db";
-import { sql } from "drizzle-orm";
+//
+// Uses the bare `postgres` driver rather than `@aivo/db` so it can run
+// from any directory (incl. the repo root via `node scripts/...`)
+// without depending on the workspace package being hoisted to root
+// node_modules — pnpm doesn't hoist workspace packages by default.
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const postgres = require("postgres");
 
 const url = process.env.DATABASE_URL;
 if (!url) {
@@ -62,20 +69,24 @@ const REFERENCE = [
   "web_subprocessors",
 ];
 
-const db = createDb(url);
+const db = postgres(url, { max: 1, prepare: false, onnotice: () => {} });
 const errors = [];
 
-for (const t of ALL_TABLES) {
-  const rows = await db.execute(sql.raw(`SELECT to_regclass('public."${t}"') AS reg`));
-  if (!rows?.[0]?.reg) errors.push(`missing table: ${t}`);
-}
-
-if (process.env.AIVO_VERIFY_SEEDED === "1") {
-  for (const t of REFERENCE) {
-    const rows = await db.execute(sql.raw(`SELECT count(*)::int AS n FROM "${t}"`));
-    const n = Number(rows?.[0]?.n ?? 0);
-    if (n === 0) errors.push(`reference table empty after seed/restore: ${t}`);
+try {
+  for (const t of ALL_TABLES) {
+    const rows = await db.unsafe(`SELECT to_regclass('public."${t}"') AS reg`);
+    if (!rows?.[0]?.reg) errors.push(`missing table: ${t}`);
   }
+
+  if (process.env.AIVO_VERIFY_SEEDED === "1") {
+    for (const t of REFERENCE) {
+      const rows = await db.unsafe(`SELECT count(*)::int AS n FROM "${t}"`);
+      const n = Number(rows?.[0]?.n ?? 0);
+      if (n === 0) errors.push(`reference table empty after seed/restore: ${t}`);
+    }
+  }
+} finally {
+  await db.end({ timeout: 5 });
 }
 
 if (errors.length) {

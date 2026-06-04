@@ -644,9 +644,9 @@ jobs:
       - name: Verify persistence schema (web_* tables present)
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
-        # Script imports '@aivo/db'; pnpm doesn't hoist workspace pkgs to root
-        # node_modules. Run from inside @aivo/db where the import resolves.
-        run: pnpm --filter @aivo/db exec node ${{ github.workspace }}/scripts/ci/verify-postgres-rows.mjs
+        # Script lives inside packages/db so it can resolve `postgres`
+        # without root-level hoisting (pnpm doesn't hoist workspace deps).
+        run: node packages/db/scripts/verify-postgres-rows.mjs
 
   # ADR 0020 Phase 5 — Hardening & policy. Runs the pure-logic RBAC,
   # step-up, data-isolation, and learner-under-parent privacy gates so
