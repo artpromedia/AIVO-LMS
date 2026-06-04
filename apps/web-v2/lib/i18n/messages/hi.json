@@ -1364,7 +1364,7 @@
       "continue": "जारी रखें",
       "terms": "शर्तें",
       "privacy": "गोपनीयता",
-      "copyright": "© AIVO Learning",
+      "copyright": "© AIVO Learning. सर्वाधिकार सुरक्षित।",
       "email": "ईमेल",
       "password": "पासवर्ड",
       "show": "दिखाएँ",
@@ -1410,11 +1410,11 @@
       "forgot": "पासवर्ड भूल गए?",
       "create_account": "खाता बनाएँ",
       "errors": {
-        "missing_credentials": "Enter your email and password to sign in.",
-        "invalid_credentials": "That email or password didn't match. Please try again.",
-        "wrong_surface": "This account signs in from a different portal.",
-        "unsupported_role": "This account type can't sign in here.",
-        "login_failed": "We couldn't sign you in. Please try again in a moment."
+        "missing_credentials": "साइन इन के लिए अपना ईमेल और पासवर्ड दर्ज करें।",
+        "invalid_credentials": "वह ईमेल या पासवर्ड मेल नहीं खाता। कृपया दोबारा प्रयास करें।",
+        "wrong_surface": "यह खाता किसी अन्य पोर्टल से साइन इन करता है।",
+        "unsupported_role": "इस प्रकार का खाता यहाँ साइन इन नहीं कर सकता।",
+        "login_failed": "हम आपको साइन इन नहीं कर सके। कृपया कुछ देर में पुनः प्रयास करें।"
       }
     },
     "signup": {
@@ -1434,12 +1434,12 @@
       "code_placeholder": "जैसे SCHOOL-7Q4M-2025",
       "name_placeholder": "पहला और अंतिम नाम",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "कृपया अपना नाम, एक मान्य ईमेल और कम से कम 8 अक्षरों का पासवर्ड दर्ज करें।",
+        "email_taken": "यह ईमेल पहले से पंजीकृत है। इसके बजाय साइन इन करने का प्रयास करें।",
+        "weak_password": "यह पासवर्ड हमारी सुरक्षा नीति को पूरा नहीं करता। कम से कम 8 अक्षर एक अंक और एक प्रतीक के साथ उपयोग करें।",
+        "service_unavailable": "हम साइन-अप सेवा तक नहीं पहुँच सके। कृपया कुछ देर में पुनः प्रयास करें।",
+        "unsupported_role": "इस प्रकार का खाता यहाँ नहीं बनाया जा सकता।",
+        "signup_failed": "हम आपका खाता नहीं बना सके। कृपया पुनः प्रयास करें।"
       }
     },
     "role": {
@@ -1493,7 +1493,7 @@
       "iep_yes": "हाँ",
       "iep_no": "नहीं",
       "iep_unsure": "अभी पक्का नहीं",
-      "error_first_name": "Please enter your learner's first name to continue."
+      "error_first_name": "जारी रखने के लिए कृपया शिक्षार्थी का पहला नाम दर्ज करें।"
     },
     "consent": {
       "eyebrow": "आपकी सहमति — आपका नियंत्रण",
@@ -2832,11 +2832,11 @@
     },
     "fields": {
       "label": "लेबल (वैकल्पिक)",
-      "issuer": "Issuer",
-      "client_id": "Client ID",
+      "issuer": "जारीकर्ता (Issuer)",
+      "client_id": "क्लाइंट आईडी",
       "jwks_url": "JWKS URL",
-      "auth_token_url": "Auth token URL",
-      "auth_login_url": "Auth login URL",
+      "auth_token_url": "ऑथ टोकन URL",
+      "auth_login_url": "ऑथ लॉगिन URL",
       "deployment_id": "परिनियोजन ID (वैकल्पिक)"
     },
     "placeholders": {

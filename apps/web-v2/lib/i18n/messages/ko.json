@@ -1364,7 +1364,7 @@
       "continue": "계속",
       "terms": "약관",
       "privacy": "개인정보",
-      "copyright": "© AIVO Learning",
+      "copyright": "© AIVO Learning. 모든 권리 보유.",
       "email": "이메일",
       "password": "비밀번호",
       "show": "표시",
@@ -1410,11 +1410,11 @@
       "forgot": "비밀번호를 잊으셨나요?",
       "create_account": "계정 만들기",
       "errors": {
-        "missing_credentials": "Enter your email and password to sign in.",
-        "invalid_credentials": "That email or password didn't match. Please try again.",
-        "wrong_surface": "This account signs in from a different portal.",
-        "unsupported_role": "This account type can't sign in here.",
-        "login_failed": "We couldn't sign you in. Please try again in a moment."
+        "missing_credentials": "로그인하려면 이메일과 비밀번호를 입력하세요.",
+        "invalid_credentials": "이메일 또는 비밀번호가 일치하지 않습니다. 다시 시도해 주세요.",
+        "wrong_surface": "이 계정은 다른 포털에서 로그인합니다.",
+        "unsupported_role": "이 계정 유형은 여기에서 로그인할 수 없습니다.",
+        "login_failed": "로그인할 수 없습니다. 잠시 후 다시 시도해 주세요."
       }
     },
     "signup": {
@@ -1434,12 +1434,12 @@
       "code_placeholder": "예: SCHOOL-7Q4M-2025",
       "name_placeholder": "이름과 성",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "이름, 유효한 이메일, 8자 이상의 비밀번호를 입력하세요.",
+        "email_taken": "이미 등록된 이메일입니다. 로그인을 시도해 보세요.",
+        "weak_password": "이 비밀번호는 보안 정책을 충족하지 않습니다. 숫자와 기호를 포함해 8자 이상을 사용하세요.",
+        "service_unavailable": "가입 서비스에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+        "unsupported_role": "이 계정 유형은 여기에서 만들 수 없습니다.",
+        "signup_failed": "계정을 만들 수 없습니다. 다시 시도해 주세요."
       }
     },
     "role": {
@@ -1493,7 +1493,7 @@
       "iep_yes": "예",
       "iep_no": "아니요",
       "iep_unsure": "아직 잘 모르겠어요",
-      "error_first_name": "Please enter your learner's first name to continue."
+      "error_first_name": "계속하려면 학습자의 이름을 입력해 주세요."
     },
     "consent": {
       "eyebrow": "당신의 동의 — 당신의 통제",
@@ -2832,11 +2832,11 @@
     },
     "fields": {
       "label": "라벨(선택사항)",
-      "issuer": "Issuer",
-      "client_id": "Client ID",
+      "issuer": "발급자 (Issuer)",
+      "client_id": "클라이언트 ID",
       "jwks_url": "JWKS URL",
-      "auth_token_url": "Auth token URL",
-      "auth_login_url": "Auth login URL",
+      "auth_token_url": "인증 토큰 URL",
+      "auth_login_url": "인증 로그인 URL",
       "deployment_id": "배포 ID(선택사항)"
     },
     "placeholders": {

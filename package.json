@@ -13,6 +13,9 @@
     "legacy:drift": "node scripts/legacy-drift-check.mjs",
     "i18n:audit": "node scripts/i18n-audit.mjs",
     "i18n:audit:verbose": "node scripts/i18n-audit.mjs --verbose",
+    "i18n:untranslated": "node scripts/i18n-untranslated-report.mjs",
+    "i18n:untranslated:targeted": "node scripts/i18n-untranslated-report.mjs --namespace=billing,speech_buddy,onboarding,whats_working,lti_admin --max-targeted=0",
+    "i18n:untranslated:ratchet": "node scripts/i18n-untranslated-report.mjs --threshold=scripts/i18n-untranslated.baseline.json",
     "i18n:coverage": "node scripts/ci/check-i18n-coverage.mjs",
     "i18n:extract": "node scripts/i18n-extract.mjs",
     "i18n:extract:gate": "node scripts/i18n-extract.mjs --gate",
@@ -64,7 +67,9 @@
     "tutor:parity": "node scripts/tutor-parity-check.mjs",
     "curriculum:coverage": "node scripts/curriculum-coverage-check.mjs",
     "ux:matrix": "node scripts/subject-tutor-ux-check.mjs",
-    "green:check": "node scripts/green-check.mjs"
+    "green:check": "node scripts/green-check.mjs",
+    "ci:doc-vs-gate": "node scripts/ci/doc-vs-gate-consistency.mjs",
+    "ci:doc-vs-gate:verify": "node scripts/ci/doc-vs-gate-consistency.mjs --verify"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",

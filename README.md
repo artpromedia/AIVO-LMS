@@ -322,6 +322,27 @@ The i18n auditor fails on missing/orphan keys and warns on untranslated copy. CI
 
 Ten locales are supported via `next-intl`, including RTL Arabic. Translation files live alongside each app under `messages/<locale>.json`. Use `pnpm i18n:audit:verbose` to inspect coverage.
 
+### Two gates, two questions
+
+The repo distinguishes **key coverage** from **real translation** with two separate scripts:
+
+| Script | Asks | Mode |
+|---|---|---|
+| `pnpm i18n:audit` | "Does every locale carry the same flat key set as English?" | Blocking — runtime UIs crash if not |
+| `node scripts/i18n-untranslated-report.mjs` | "How many non-English values are still byte-identical to English?" | Two ratchets, both blocking, neither requires a global green |
+
+### Untranslated ratchet (`i18n-untranslated-report.mjs`)
+
+Runs in `.github/workflows/i18n-file-audit.yml`. Two enforcement modes:
+
+1. **Targeted-namespace gate** — for recently-shipped features (`billing`, `speech_buddy`, `onboarding`, `whats_working`, `lti_admin`) the untranslated count must stay at **0** across all 9 non-English locales. Regressions exit with code 3. New namespaces are added here when the feature ships translated.
+
+2. **Global ratchet** — `scripts/i18n-untranslated.baseline.json` records the accepted per-locale count for each app. Counts may go **down** (re-run with `--update-threshold` to lock in the win) but never **up**. Regressions exit with code 2. This makes "we'll translate it later" impossible to ship without an explicit, reviewed bump of the baseline file.
+
+Legitimate identical-to-English values (brand acronyms like `AIVO`/`LTI`/`OAuth`, the product name `AIVO Learning`, true cognates like French `Microphone`, universal placeholders like `Canvas — District`) are allowlisted in the report rather than fake-translated. This is QA, not green-checkmark theater.
+
+To translate more strings: do the translation work, then run `node scripts/i18n-untranslated-report.mjs --threshold=scripts/i18n-untranslated.baseline.json --update-threshold` to ratchet the baseline down. The verbose report (`--verbose`) is uploaded as a CI artifact on every run for localization triage.
+
 ## Backend Boot Ordering
 
 `scripts/start-services.sh` launches the ~14 Node and Python backend services in **five small groups with a brief pause between groups**, not in parallel. Fanning out all services at once exhausts the container's process / thread budget on a fresh boot (`EAGAIN` fork errors, `ERR_WORKER_INIT_FAILED` from tsx) and starves the Next.js workflows of CPU long enough to fail port-readiness checks.

@@ -1364,7 +1364,7 @@
       "continue": "続行",
       "terms": "利用規約",
       "privacy": "プライバシー",
-      "copyright": "© AIVO Learning",
+      "copyright": "© AIVO Learning. 無断複写・転載を禁じます。",
       "email": "メールアドレス",
       "password": "パスワード",
       "show": "表示",
@@ -1410,11 +1410,11 @@
       "forgot": "パスワードをお忘れですか？",
       "create_account": "アカウントを作成",
       "errors": {
-        "missing_credentials": "Enter your email and password to sign in.",
-        "invalid_credentials": "That email or password didn't match. Please try again.",
-        "wrong_surface": "This account signs in from a different portal.",
-        "unsupported_role": "This account type can't sign in here.",
-        "login_failed": "We couldn't sign you in. Please try again in a moment."
+        "missing_credentials": "メールアドレスとパスワードを入力してサインインしてください。",
+        "invalid_credentials": "メールアドレスまたはパスワードが一致しません。もう一度お試しください。",
+        "wrong_surface": "このアカウントは別のポータルからサインインします。",
+        "unsupported_role": "この種類のアカウントはここからサインインできません。",
+        "login_failed": "サインインできませんでした。少し時間をおいて再度お試しください。"
       }
     },
     "signup": {
@@ -1434,12 +1434,12 @@
       "code_placeholder": "例: SCHOOL-7Q4M-2025",
       "name_placeholder": "姓名",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "氏名、有効なメールアドレス、8 文字以上のパスワードを入力してください。",
+        "email_taken": "このメールアドレスはすでに登録されています。代わりにサインインをお試しください。",
+        "weak_password": "このパスワードはセキュリティ要件を満たしません。数字と記号を含む 8 文字以上を使用してください。",
+        "service_unavailable": "登録サービスに接続できませんでした。少し時間をおいて再度お試しください。",
+        "unsupported_role": "この種類のアカウントはここでは作成できません。",
+        "signup_failed": "アカウントを作成できませんでした。もう一度お試しください。"
       }
     },
     "role": {
@@ -1493,7 +1493,7 @@
       "iep_yes": "はい",
       "iep_no": "いいえ",
       "iep_unsure": "まだわからない",
-      "error_first_name": "Please enter your learner's first name to continue."
+      "error_first_name": "続行するには学習者の名（ファーストネーム）を入力してください。"
     },
     "consent": {
       "eyebrow": "あなたの同意 — あなたの管理",
@@ -2832,11 +2832,11 @@
     },
     "fields": {
       "label": "ラベル（任意）",
-      "issuer": "Issuer",
-      "client_id": "Client ID",
+      "issuer": "発行者 (Issuer)",
+      "client_id": "クライアント ID",
       "jwks_url": "JWKS URL",
-      "auth_token_url": "Auth token URL",
-      "auth_login_url": "Auth login URL",
+      "auth_token_url": "認証トークン URL",
+      "auth_login_url": "認証ログイン URL",
       "deployment_id": "デプロイメント ID（任意）"
     },
     "placeholders": {

@@ -1364,7 +1364,7 @@
       "continue": "متابعة",
       "terms": "الشروط",
       "privacy": "الخصوصية",
-      "copyright": "© AIVO Learning",
+      "copyright": "© AIVO Learning. جميع الحقوق محفوظة.",
       "email": "البريد الإلكتروني",
       "password": "كلمة المرور",
       "show": "إظهار",
@@ -1410,11 +1410,11 @@
       "forgot": "هل نسيت كلمة المرور؟",
       "create_account": "إنشاء حساب",
       "errors": {
-        "missing_credentials": "Enter your email and password to sign in.",
-        "invalid_credentials": "That email or password didn't match. Please try again.",
-        "wrong_surface": "This account signs in from a different portal.",
-        "unsupported_role": "This account type can't sign in here.",
-        "login_failed": "We couldn't sign you in. Please try again in a moment."
+        "missing_credentials": "أدخل بريدك الإلكتروني وكلمة المرور لتسجيل الدخول.",
+        "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.",
+        "wrong_surface": "يسجّل هذا الحساب الدخول من بوابة مختلفة.",
+        "unsupported_role": "لا يمكن لهذا النوع من الحسابات تسجيل الدخول هنا.",
+        "login_failed": "تعذّر تسجيل دخولك. يرجى المحاولة بعد قليل."
       }
     },
     "signup": {
@@ -1434,12 +1434,12 @@
       "code_placeholder": "مثال: SCHOOL-7Q4M-2025",
       "name_placeholder": "الاسم الأول واسم العائلة",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "يرجى إدخال اسمك وبريد إلكتروني صالح وكلمة مرور لا تقل عن 8 أحرف.",
+        "email_taken": "هذا البريد الإلكتروني مسجّل بالفعل. جرّب تسجيل الدخول بدلاً من ذلك.",
+        "weak_password": "كلمة المرور هذه لا تلبّي سياسة الأمان. استخدم 8 أحرف على الأقل مع رقم ورمز.",
+        "service_unavailable": "تعذّر الوصول إلى خدمة إنشاء الحساب. يرجى المحاولة بعد قليل.",
+        "unsupported_role": "لا يمكن إنشاء هذا النوع من الحسابات هنا.",
+        "signup_failed": "تعذّر إنشاء حسابك. يرجى المحاولة مرة أخرى."
       }
     },
     "role": {
@@ -1493,7 +1493,7 @@
       "iep_yes": "نعم",
       "iep_no": "لا",
       "iep_unsure": "لست متأكدًا بعد",
-      "error_first_name": "Please enter your learner's first name to continue."
+      "error_first_name": "يرجى إدخال الاسم الأول للمتعلّم للمتابعة."
     },
     "consent": {
       "eyebrow": "موافقتك — تحكّمك",
@@ -2832,11 +2832,11 @@
     },
     "fields": {
       "label": "تسمية (اختياري)",
-      "issuer": "Issuer",
-      "client_id": "Client ID",
+      "issuer": "جهة الإصدار (Issuer)",
+      "client_id": "معرّف العميل (Client ID)",
       "jwks_url": "JWKS URL",
-      "auth_token_url": "Auth token URL",
-      "auth_login_url": "Auth login URL",
+      "auth_token_url": "رابط رمز المصادقة (Auth token URL)",
+      "auth_login_url": "رابط تسجيل الدخول (Auth login URL)",
       "deployment_id": "معرّف النشر (اختياري)"
     },
     "placeholders": {

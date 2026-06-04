@@ -1,0 +1,85 @@
+name: i18n File Audit
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: i18n-file-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  i18n-file-audit:
+    name: i18n catalogs — parity (blocking) + untranslated ratchet (informational)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      # Blocking: every locale must have the same flat key set as English.
+      # This is the bedrock contract — if it breaks, runtime UIs will throw
+      # MISSING_TRANSLATION errors for real users.
+      - name: i18n parity gate (blocking)
+        run: pnpm i18n:audit
+
+      # Informational: surfaces keys whose non-English value is byte-identical
+      # to the English source. Per README §"Internationalization" → "Untranslated
+      # ratchet": this is intentionally not a build-blocker for global counts
+      # because translating ~3k strings is a discrete vendor work-stream, but:
+      #
+      #   1. targeted recently-added namespaces (billing, speech_buddy,
+      #      onboarding, whats_working, lti_admin) MUST stay at 0 — those
+      #      shipped with full translations and any regression is a bug
+      #      (`--max-targeted=0`, exit 3 if violated);
+      #
+      #   2. the global per-locale count is ratcheted via
+      #      scripts/i18n-untranslated.baseline.json — counts may go DOWN
+      #      (re-run with --update-threshold to lock in the win) but never UP
+      #      (exit 2 if any (app, locale) exceeds its cap).
+      #
+      # Both gates run as blocking here. The threshold ratchet is the only
+      # legitimate way to grow translations: it makes regressions impossible
+      # without an explicit, reviewed bump of the baseline file.
+      - name: i18n untranslated — targeted namespaces must be 0
+        run: |
+          node scripts/i18n-untranslated-report.mjs \
+            --namespace=billing,speech_buddy,onboarding,whats_working,lti_admin \
+            --max-targeted=0
+
+      - name: i18n untranslated — global ratchet (no regressions vs baseline)
+        run: |
+          node scripts/i18n-untranslated-report.mjs \
+            --threshold=scripts/i18n-untranslated.baseline.json
+
+      # Informational summary — visible in the Actions log + step summary for
+      # localization triage, but the step is `continue-on-error` so a verbose
+      # report can't accidentally fail the build on its own.
+      - name: i18n untranslated — verbose report (informational)
+        if: always()
+        continue-on-error: true
+        run: |
+          node scripts/i18n-untranslated-report.mjs --verbose \
+            | tee untranslated-report.txt
+          {
+            echo '## i18n untranslated report';
+            echo '```';
+            cat untranslated-report.txt;
+            echo '```';
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload untranslated report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: i18n-untranslated-report
+          path: untranslated-report.txt
+          if-no-files-found: ignore

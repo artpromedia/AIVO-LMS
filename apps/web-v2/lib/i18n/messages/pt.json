@@ -1364,7 +1364,7 @@
       "continue": "Continuar",
       "terms": "Termos",
       "privacy": "Privacidade",
-      "copyright": "© AIVO Learning",
+      "copyright": "© AIVO Learning. Todos os direitos reservados.",
       "email": "E-mail",
       "password": "Senha",
       "show": "Mostrar",
@@ -1410,11 +1410,11 @@
       "forgot": "Esqueceu a senha?",
       "create_account": "Criar uma conta",
       "errors": {
-        "missing_credentials": "Enter your email and password to sign in.",
-        "invalid_credentials": "That email or password didn't match. Please try again.",
-        "wrong_surface": "This account signs in from a different portal.",
-        "unsupported_role": "This account type can't sign in here.",
-        "login_failed": "We couldn't sign you in. Please try again in a moment."
+        "missing_credentials": "Insira seu e-mail e sua senha para entrar.",
+        "invalid_credentials": "Esse e-mail ou senha não confere. Tente novamente.",
+        "wrong_surface": "Esta conta entra a partir de outro portal.",
+        "unsupported_role": "Este tipo de conta não pode entrar aqui.",
+        "login_failed": "Não foi possível entrar. Tente de novo em instantes."
       }
     },
     "signup": {
@@ -1434,12 +1434,12 @@
       "code_placeholder": "ex.: SCHOOL-7Q4M-2025",
       "name_placeholder": "Nome e sobrenome",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "Insira seu nome, um e-mail válido e uma senha de pelo menos 8 caracteres.",
+        "email_taken": "Este e-mail já está cadastrado. Tente entrar.",
+        "weak_password": "Essa senha não atende à nossa política de segurança. Use pelo menos 8 caracteres com um número e um símbolo.",
+        "service_unavailable": "Não foi possível acessar o serviço de cadastro. Tente de novo em instantes.",
+        "unsupported_role": "Este tipo de conta não pode ser criado aqui.",
+        "signup_failed": "Não foi possível criar sua conta. Tente novamente."
       }
     },
     "role": {
@@ -1493,7 +1493,7 @@
       "iep_yes": "Sim",
       "iep_no": "Não",
       "iep_unsure": "Ainda não tenho certeza",
-      "error_first_name": "Please enter your learner's first name to continue."
+      "error_first_name": "Informe o primeiro nome do estudante para continuar."
     },
     "consent": {
       "eyebrow": "Seu consentimento — seu controle",
@@ -2832,11 +2832,11 @@
     },
     "fields": {
       "label": "Rótulo (opcional)",
-      "issuer": "Issuer",
-      "client_id": "Client ID",
+      "issuer": "Emissor (Issuer)",
+      "client_id": "ID do cliente",
       "jwks_url": "JWKS URL",
-      "auth_token_url": "Auth token URL",
-      "auth_login_url": "Auth login URL",
+      "auth_token_url": "URL do token de autenticação",
+      "auth_login_url": "URL de login de autenticação",
       "deployment_id": "ID de implantação (opcional)"
     },
     "placeholders": {

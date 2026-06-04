@@ -1,0 +1,58 @@
+name: Doc vs Gate Consistency
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: doc-vs-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  doc-vs-gate:
+    name: Docs cannot lie about gate status
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      # Blocking: scan markdown docs (README, docs/**, CHANGELOG*) for claims
+      # like "release:gate green" and compare against the manifest at
+      # scripts/ci/gate-manifest.json. Pre-existing claims are accepted via
+      # scripts/ci/gate-doc-allowlist.json (ratchet pattern). NEW claims that
+      # don't match the manifest fail the build.
+      #
+      # See: scripts/ci/doc-vs-gate-consistency.mjs and the manifest
+      # itself for the full policy.
+      - name: Doc-vs-gate consistency (scan only)
+        run: pnpm ci:doc-vs-gate
+
+      # Informational summary in step output for release captains.
+      - name: Doc-vs-gate report (informational)
+        if: always()
+        continue-on-error: true
+        run: |
+          pnpm ci:doc-vs-gate | tee doc-vs-gate-report.txt
+          {
+            echo '## Doc-vs-gate consistency';
+            echo '```';
+            cat doc-vs-gate-report.txt;
+            echo '```';
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-vs-gate-report
+          path: doc-vs-gate-report.txt
+          if-no-files-found: ignore

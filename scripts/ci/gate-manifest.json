@@ -1,0 +1,139 @@
+{
+  "$schema": "manifest-v1",
+  "description": "Single source of truth for enterprise release gates. Each entry pins the npm script that executes the gate and the last-observed status. The doc-vs-gate consistency script (scripts/ci/doc-vs-gate-consistency.mjs) reads this file and fails the build if any markdown doc claims a gate is green/passing/done when the manifest says otherwise, or if a gate marked green here actually exits non-zero when re-run.",
+  "policy": {
+    "claimWords": ["green", "passing", "done", "complete"],
+    "failureWords": ["red", "failing", "broken", "blocked"],
+    "scanGlobs": [
+      "README.md",
+      "docs/**/*.md",
+      "CHANGELOG*.md",
+      "docs/ENTERPRISE_READINESS_SIGNOFF_*.md"
+    ]
+  },
+  "gates": [
+    {
+      "id": "lint",
+      "command": "pnpm lint",
+      "claimed_status": "unverified",
+      "owner": "platform",
+      "notes": "ESLint workspace-wide"
+    },
+    {
+      "id": "i18n:audit",
+      "command": "pnpm i18n:audit",
+      "claimed_status": "green",
+      "owner": "i18n",
+      "notes": "Locale-file parity (web, marketing, mobile). Verified 2026-06."
+    },
+    {
+      "id": "i18n:untranslated:targeted",
+      "command": "node scripts/i18n-untranslated-report.mjs --namespace=billing,speech_buddy,onboarding,whats_working,lti_admin --max-targeted=0",
+      "claimed_status": "green",
+      "owner": "i18n",
+      "notes": "Targeted namespaces must be fully translated. Verified 2026-06."
+    },
+    {
+      "id": "i18n:untranslated:ratchet",
+      "command": "node scripts/i18n-untranslated-report.mjs --threshold=scripts/i18n-untranslated.baseline.json",
+      "claimed_status": "green",
+      "owner": "i18n",
+      "notes": "Global ratchet against baseline. Verified 2026-06."
+    },
+    {
+      "id": "backend:parity",
+      "command": "pnpm backend:parity",
+      "claimed_status": "green",
+      "owner": "backend",
+      "notes": "24 green / 3 yellow / 0 red. Verified 2026-06-03."
+    },
+    {
+      "id": "integration-svc:test",
+      "command": "pnpm --filter @aivo/integration-svc test",
+      "claimed_status": "green",
+      "owner": "integrations",
+      "notes": "75 pass / 7 DB-gated skip. Verified 2026-06-03."
+    },
+    {
+      "id": "web-v2:typecheck",
+      "command": "pnpm --filter @aivo/web-v2 typecheck",
+      "claimed_status": "green",
+      "owner": "web",
+      "notes": "tsc --noEmit clean. Verified 2026-06-03."
+    },
+    {
+      "id": "integration-svc:build",
+      "command": "pnpm --filter @aivo/integration-svc build",
+      "claimed_status": "green",
+      "owner": "integrations",
+      "notes": "tsc clean. Verified 2026-06-03."
+    },
+    {
+      "id": "test",
+      "command": "pnpm test",
+      "claimed_status": "unverified",
+      "owner": "platform",
+      "notes": "Full workspace test run — long; verified per-package above"
+    },
+    {
+      "id": "build",
+      "command": "pnpm build",
+      "claimed_status": "unverified",
+      "owner": "platform"
+    },
+    {
+      "id": "api:check",
+      "command": "pnpm api:check",
+      "claimed_status": "unverified",
+      "owner": "platform"
+    },
+    {
+      "id": "prod:check",
+      "command": "pnpm prod:check",
+      "claimed_status": "unverified",
+      "owner": "platform"
+    },
+    {
+      "id": "test:production-readiness",
+      "command": "pnpm test:production-readiness",
+      "claimed_status": "unverified",
+      "owner": "platform"
+    },
+    {
+      "id": "test:enterprise",
+      "command": "pnpm test:enterprise",
+      "claimed_status": "unverified",
+      "owner": "platform"
+    },
+    {
+      "id": "repo:health",
+      "command": "pnpm repo:health",
+      "claimed_status": "unverified",
+      "owner": "platform"
+    },
+    {
+      "id": "brand:check",
+      "command": "pnpm brand:check",
+      "claimed_status": "unverified",
+      "owner": "design"
+    },
+    {
+      "id": "release:gate",
+      "command": "pnpm release:gate",
+      "claimed_status": "unverified",
+      "owner": "release"
+    },
+    {
+      "id": "green:check",
+      "command": "pnpm green:check",
+      "claimed_status": "unverified",
+      "owner": "release"
+    },
+    {
+      "id": "mobile:parity:strict",
+      "command": "pnpm mobile:parity:strict",
+      "claimed_status": "unverified",
+      "owner": "mobile"
+    }
+  ]
+}
