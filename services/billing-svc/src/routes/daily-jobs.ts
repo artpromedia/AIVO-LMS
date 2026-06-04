@@ -102,8 +102,15 @@ export function registerDailyJobsRoutes(app: FastifyInstance, db: any) {
       const latest = latestRows[0] ?? null;
 
       const conds = [sql`job_name = 'billing.daily-expiry-reminders'`];
-      if (filters.statuses) {
-        conds.push(sql`status = ANY(${filters.statuses})`);
+      if (filters.statuses && filters.statuses.length > 0) {
+        // Use IN(...) with sql.join rather than ANY(${array}); drizzle's sql
+        // template can't reliably tag a JS array as a PG text[] parameter,
+        // which made `status = ANY($1)` fail at runtime with a 500.
+        const list = sql.join(
+          filters.statuses.map((s) => sql`${s}`),
+          sql`, `,
+        );
+        conds.push(sql`status IN (${list})`);
       }
       if (filters.since) conds.push(sql`run_at >= ${filters.since}`);
       if (filters.until) conds.push(sql`run_at <= ${filters.until}`);
@@ -166,7 +173,13 @@ export function registerDailyJobsRoutes(app: FastifyInstance, db: any) {
 
       const filters = parseHistoryFilters(req.query as Record<string, unknown>);
       const conds = [sql`job_name = 'billing.daily-expiry-reminders'`];
-      if (filters.statuses) conds.push(sql`status = ANY(${filters.statuses})`);
+      if (filters.statuses && filters.statuses.length > 0) {
+        const list = sql.join(
+          filters.statuses.map((s) => sql`${s}`),
+          sql`, `,
+        );
+        conds.push(sql`status IN (${list})`);
+      }
       if (filters.since) conds.push(sql`run_at >= ${filters.since}`);
       if (filters.until) conds.push(sql`run_at <= ${filters.until}`);
       let where = conds[0]!;

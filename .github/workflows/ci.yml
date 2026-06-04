@@ -569,6 +569,17 @@ jobs:
       - name: Install dependencies
         if: steps.filter.outputs.sp12 == 'true'
         run: pnpm install --frozen-lockfile
+      - name: Bring up postgres + redis (so we can migrate before services boot)
+        if: steps.filter.outputs.sp12 == 'true'
+        run: docker compose -f docker-compose.e2e.yml up -d postgres redis --wait
+      - name: Apply migrations to e2e database
+        if: steps.filter.outputs.sp12 == 'true'
+        env:
+          DATABASE_URL: postgresql://aivo:aivo@localhost:55433/aivo_e2e
+        # daily_job_runs and other tables must exist before identity-svc /
+        # integration-svc / comms-svc tick their schedulers, otherwise the
+        # first tick crashes and the harness fails to come up healthy.
+        run: pnpm --filter @aivo/db run db:migrate
       - name: Bring up compose harness
         if: steps.filter.outputs.sp12 == 'true'
         run: docker compose -f docker-compose.e2e.yml up -d --build --wait || (docker compose -f docker-compose.e2e.yml logs && exit 1)
@@ -633,7 +644,9 @@ jobs:
       - name: Verify persistence schema (web_* tables present)
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
-        run: node scripts/ci/verify-postgres-rows.mjs
+        # Script imports '@aivo/db'; pnpm doesn't hoist workspace pkgs to root
+        # node_modules. Run from inside @aivo/db where the import resolves.
+        run: pnpm --filter @aivo/db exec node ${{ github.workspace }}/scripts/ci/verify-postgres-rows.mjs
 
   # ADR 0020 Phase 5 — Hardening & policy. Runs the pure-logic RBAC,
   # step-up, data-isolation, and learner-under-parent privacy gates so
