@@ -46,6 +46,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # setup-node@v5 auto-detects the `packageManager` field in
+      # package.json (pnpm@x.y.z) and tries to invoke pnpm for
+      # corepack-style version pinning. Without pnpm on PATH the step
+      # fails with "Unable to locate executable file: pnpm". Install
+      # pnpm first; these scripts are pure node and do not need a
+      # full `pnpm install`.
+      - uses: pnpm/action-setup@v5
+
       - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}

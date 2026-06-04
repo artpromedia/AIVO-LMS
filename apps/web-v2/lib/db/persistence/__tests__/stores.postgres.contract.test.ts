@@ -85,6 +85,14 @@ const TABLES = [
 let db: Database;
 
 async function applyMigrations(): Promise<void> {
+  // The CI postgres service is shared across every *.postgres.test.ts
+  // file in this suite. `rls.postgres.test.ts` runs first and creates
+  // the same web_* tables; a second pass of `CREATE TABLE IF NOT EXISTS`
+  // then trips PG's pg_type uniqueness check (the IF NOT EXISTS guard
+  // only consults pg_class, not pg_type). Start from a clean schema so
+  // each contract suite owns its own DDL state.
+  await db.execute(sql.raw("DROP SCHEMA IF EXISTS public CASCADE"));
+  await db.execute(sql.raw("CREATE SCHEMA public"));
   for (const name of MIGRATIONS) {
     const file = readFileSync(resolve(migrationsDir, `${name}.sql`), "utf8");
     for (const stmt of file.split("--> statement-breakpoint")) {
