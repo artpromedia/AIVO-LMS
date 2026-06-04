@@ -22,7 +22,7 @@ export type RoleNavItem = {
  * contrast on the primary-soft pill.
  */
 export function RoleNav({ items, ariaLabel }: { items: RoleNavItem[]; ariaLabel: string }) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   return (
     <nav aria-label={ariaLabel} className="flex flex-col gap-1">
       {items.map((item) => {

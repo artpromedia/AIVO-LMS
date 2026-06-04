@@ -83,7 +83,7 @@ export default function IepUploadPage() {
   const tc = useTranslations("onboarding.common");
   const router = useRouter();
   const search = useSearchParams();
-  const queryLearnerId = search.get("learnerId");
+  const queryLearnerId = search?.get("learnerId");
 
   const [explicitConsent, setExplicitConsent] = React.useState(false);
   const [file, setFile] = React.useState<File | null>(null);
@@ -283,3 +283,4 @@ export default function IepUploadPage() {
     </AuthShell>
   );
 }
+

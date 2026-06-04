@@ -36,7 +36,7 @@ const SIGNUP_ERROR_CODES = new Set([
 export default function SignupPage() {
   const t = useTranslations("auth.signup");
   const search = useSearchParams();
-  const errorCode = search.get("error");
+  const errorCode = search?.get("error");
   const errorMessage = errorCode
     ? t(`errors.${SIGNUP_ERROR_CODES.has(errorCode) ? errorCode : "signup_failed"}`)
     : null;
@@ -178,3 +178,4 @@ export default function SignupPage() {
     </>
   );
 }
+

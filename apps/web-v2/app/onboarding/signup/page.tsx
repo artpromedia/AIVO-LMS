@@ -30,8 +30,8 @@ export default function SignUpPage() {
     { label: ts("consent") },
   ] as const;
   const search = useSearchParams();
-  const viaInvite = search.get("via") === "invite";
-  const errorCode = search.get("error");
+  const viaInvite = search?.get("via") === "invite";
+  const errorCode = search?.get("error");
   const errorMessage = errorCode
     ? t(`errors.${SIGNUP_ERROR_CODES.has(errorCode) ? errorCode : "signup_failed"}`)
     : null;
@@ -152,3 +152,4 @@ export default function SignUpPage() {
     </AuthShell>
   );
 }
+

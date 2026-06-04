@@ -23,7 +23,7 @@ export default function SignInPage() {
   const t = useTranslations("onboarding.signin");
   const tc = useTranslations("onboarding.common");
   const search = useSearchParams();
-  const errorCode = search.get("error");
+  const errorCode = search?.get("error");
   const errorMessage = errorCode
     ? t(`errors.${SIGNIN_ERROR_CODES.has(errorCode) ? errorCode : "login_failed"}`)
     : null;
@@ -125,3 +125,4 @@ export default function SignInPage() {
     </AuthShell>
   );
 }
+

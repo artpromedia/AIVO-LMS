@@ -23,7 +23,7 @@ export default function NewLearnerPage() {
   const tc = useTranslations("onboarding.common");
   const ts = useTranslations("onboarding.steps");
   const search = useSearchParams();
-  const hasError = search.get("error") === "invalid";
+  const hasError = search?.get("error") === "invalid";
   const [firstName, setFirstName] = React.useState("");
   const [grade, setGrade] = React.useState("");
   const [hasIep, setHasIep] = React.useState<"yes" | "no" | "unsure" | null>(null);
@@ -134,3 +134,4 @@ export default function NewLearnerPage() {
     </AuthShell>
   );
 }
+

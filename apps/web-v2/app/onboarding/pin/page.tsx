@@ -50,7 +50,7 @@ export default function PinSetupPage() {
   const t = useTranslations("onboarding.pin");
   const router = useRouter();
   const search = useSearchParams();
-  const queryLearnerId = search.get("learnerId");
+  const queryLearnerId = search?.get("learnerId");
 
   const [pin, setPin] = React.useState("");
   const [confirm, setConfirm] = React.useState("");
@@ -241,3 +241,4 @@ function PinRing({
     </div>
   );
 }
+

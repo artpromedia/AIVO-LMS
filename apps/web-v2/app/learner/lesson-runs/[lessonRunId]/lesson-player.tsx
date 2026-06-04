@@ -254,7 +254,7 @@ export function LessonPlayer({
     [plan, accessibility.shorterSteps],
   );
   const startStep = (() => {
-    const raw = Number(searchParams.get("step") ?? 0);
+    const raw = Number(searchParams?.get("step") ?? 0);
     if (!Number.isFinite(raw) || raw < 0) return 0;
     return Math.min(raw, beats.length - 1);
   })();

@@ -61,7 +61,7 @@ export default function ChildApprovalPage() {
   const tc = useTranslations("onboarding.common");
   const router = useRouter();
   const search = useSearchParams();
-  const queryLearnerId = search.get("learnerId");
+  const queryLearnerId = search?.get("learnerId");
 
   const [communication, setCommunication] = React.useState(true);
   const [aiTutor, setAiTutor] = React.useState(true);
@@ -226,3 +226,4 @@ export default function ChildApprovalPage() {
     </AuthShell>
   );
 }
+

@@ -62,6 +62,15 @@ export const metadata: Metadata = {
   },
 };
 
+// AIVO is a logged-in SaaS — every surface reads cookies for auth,
+// locale, sensory mode, typeface, and reduced-motion in the root layout.
+// Trying to statically prerender these pages fails with misleading
+// "<Html> outside pages/_document" / "Cannot read properties of undefined"
+// errors because the cookie-bound calls return null during SSG. Pin the
+// whole app to dynamic rendering so `next build` only compiles routes
+// and defers all rendering to request time.
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // SSR the user's sensory mode onto <html> so the very first paint already
   // shows the right palette (no FOUC when calm / high-contrast users load
