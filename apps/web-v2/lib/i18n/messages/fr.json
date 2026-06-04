@@ -2823,5 +2823,61 @@
     "card_title": "Connectez-vous à la console du district",
     "sign_in_btn": "Se connecter",
     "standard_sign_in": "Utiliser la connexion standard"
+  },
+  "lti_admin": {
+    "page": {
+      "eyebrow": "Intégrations",
+      "title": "Plateformes LTI 1.3",
+      "description": "Enregistrez un LMS pour accepter ses lancements et renvoyer les notes."
+    },
+    "fields": {
+      "label": "Libellé (optionnel)",
+      "issuer": "Issuer",
+      "client_id": "Client ID",
+      "jwks_url": "JWKS URL",
+      "auth_token_url": "Auth token URL",
+      "auth_login_url": "Auth login URL",
+      "deployment_id": "ID de déploiement (optionnel)"
+    },
+    "placeholders": {
+      "label": "Canvas — District",
+      "issuer": "https://canvas.instructure.com",
+      "client_id": "10000000000001",
+      "jwks_url": "https://…/api/lti/security/jwks",
+      "auth_token_url": "https://…/login/oauth2/token",
+      "auth_login_url": "https://…/api/lti/authorize_redirect",
+      "deployment_id": "1:abcdef…"
+    },
+    "actions": {
+      "register": "Enregistrer la plateforme",
+      "registering": "Enregistrement…",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "deleting": "Suppression…",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler"
+    },
+    "confirm": {
+      "delete": "Supprimer la plateforme LTI {issuer} ? Cela supprime ses déploiements, contextes, liens de ressources et lignes AGS."
+    },
+    "errors": {
+      "load_failed": "Impossible de charger les plateformes enregistrées.",
+      "register_failed": "Échec de l'enregistrement.",
+      "update_failed": "Échec de la mise à jour.",
+      "delete_failed": "Échec de la suppression."
+    },
+    "ok": {
+      "registered": "Plateforme enregistrée.",
+      "updated": "Plateforme mise à jour.",
+      "deleted": "Plateforme supprimée."
+    },
+    "registered": {
+      "heading": "Plateformes enregistrées",
+      "loading": "Chargement…",
+      "empty": "Aucune plateforme enregistrée pour le moment.",
+      "client_id_label": "client",
+      "deployments_label": "Déploiements"
+    }
   }
 }

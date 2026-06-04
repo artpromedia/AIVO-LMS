@@ -9,7 +9,10 @@ import {
   upsertAgsLineitem,
   registerPlatform,
   listPlatforms,
+  updatePlatform,
+  deletePlatform,
   UnregisteredPlatformError,
+  PlatformNotFoundError,
   type LtiDb,
 } from "../lti/persistence.js";
 
@@ -171,7 +174,100 @@ export function registerLtiRoutes(app: FastifyInstance, db?: LtiDb): void {
           )
         : undefined,
     });
+    request.log?.info(
+      {
+        event: "lti.platform.registered",
+        actor: claims.sub,
+        tenantId: claims.tenantId,
+        platformId: result.platformId,
+        issuer: b.issuer,
+        clientId: b.clientId,
+        deploymentCount: result.deploymentIds.length,
+      },
+      "LTI platform registered/updated",
+    );
     return reply.code(201).send(result);
+  });
+
+  /**
+   * PUT /api/lti/platforms/:id — update a registered platform's JWKS/OAuth
+   * URLs, label, and (optionally) replace its deployment set. Issuer + client
+   * id are immutable. Tenant-scoped via the platform tenant guard.
+   */
+  app.put<{
+    Params: { id: string };
+    Body: {
+      jwksUrl?: string;
+      authTokenUrl?: string;
+      authLoginUrl?: string;
+      label?: string | null;
+      deployments?: Array<{ deploymentId: string; label?: string }>;
+    };
+  }>("/api/lti/platforms/:id", async (request, reply) => {
+    const claims = await requirePlatformAdmin(request, reply);
+    if (!claims) return;
+    if (!db) return reply.code(503).send({ error: "LTI registry not available (no database)" });
+    if (!claims.tenantId) return reply.code(400).send({ error: "Token is missing a tenant" });
+
+    const b = request.body ?? {};
+    let labelPatch: string | null | undefined;
+    if (b.label === null) labelPatch = null;
+    else if (typeof b.label === "string") labelPatch = b.label;
+    try {
+      const view = await updatePlatform(db, request.params.id, {
+        tenantId: claims.tenantId,
+        jwksUrl: typeof b.jwksUrl === "string" ? b.jwksUrl : undefined,
+        authTokenUrl: typeof b.authTokenUrl === "string" ? b.authTokenUrl : undefined,
+        authLoginUrl: typeof b.authLoginUrl === "string" ? b.authLoginUrl : undefined,
+        label: labelPatch,
+        deployments: Array.isArray(b.deployments)
+          ? b.deployments.filter(
+              (d) => d && typeof d.deploymentId === "string" && d.deploymentId.trim(),
+            )
+          : undefined,
+      });
+      request.log?.info(
+        {
+          event: "lti.platform.updated",
+          actor: claims.sub,
+          tenantId: claims.tenantId,
+          platformId: view.id,
+          fields: Object.keys(b),
+        },
+        "LTI platform updated",
+      );
+      return reply.send(view);
+    } catch (err) {
+      if (err instanceof PlatformNotFoundError) {
+        return reply.code(404).send({ error: err.message });
+      }
+      throw err;
+    }
+  });
+
+  /**
+   * DELETE /api/lti/platforms/:id — delete a registered platform. Cascades
+   * to deployments/contexts/resource-links/AGS line items per migration-0045.
+   * Tenant-scoped: returns 404 if the row is not owned by the caller's tenant.
+   */
+  app.delete<{ Params: { id: string } }>("/api/lti/platforms/:id", async (request, reply) => {
+    const claims = await requirePlatformAdmin(request, reply);
+    if (!claims) return;
+    if (!db) return reply.code(503).send({ error: "LTI registry not available (no database)" });
+    if (!claims.tenantId) return reply.code(400).send({ error: "Token is missing a tenant" });
+
+    const ok = await deletePlatform(db, request.params.id, claims.tenantId);
+    if (!ok) return reply.code(404).send({ error: "Platform not found" });
+    request.log?.info(
+      {
+        event: "lti.platform.deleted",
+        actor: claims.sub,
+        tenantId: claims.tenantId,
+        platformId: request.params.id,
+      },
+      "LTI platform deleted",
+    );
+    return reply.code(204).send();
   });
 
   /**

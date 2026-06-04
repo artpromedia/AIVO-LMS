@@ -190,3 +190,116 @@ describe.skipIf(SKIP)("LTI platform registration (Sprint 6C)", () => {
     expect(found!.deployments[0].deploymentId).toBe("d-1");
   });
 });
+
+describe.skipIf(SKIP)("LTI platform registration CRUD + AGS write-back round-trip", () => {
+  let db: any;
+  let mod: typeof import("../src/lti/persistence.js");
+  let schema: any;
+  const tenantId = "00000000-0000-0000-0000-0000000000cc";
+  const otherTenant = "00000000-0000-0000-0000-0000000000dd";
+  const issuer = `https://crud.test/${Date.now()}`;
+  const clientId = "crud-client";
+
+  beforeAll(async () => {
+    const { createDb } = await import("@aivo/db");
+    schema = await import("@aivo/db");
+    mod = await import("../src/lti/persistence.js");
+    db = createDb(process.env.DATABASE_URL!);
+  });
+
+  afterAll(async () => {
+    if (!db) return;
+    await db
+      .delete(schema.ltiPlatforms)
+      .where(
+        and(eq(schema.ltiPlatforms.issuer, issuer), eq(schema.ltiPlatforms.clientId, clientId)),
+      );
+    try {
+      await db.$client?.end?.({ timeout: 2 });
+    } catch {
+      /* ignore */
+    }
+  });
+
+  it("updates platform fields, replaces deployments, deletes (tenant-scoped), and supports the full register → launch → AGS write-back flow", async () => {
+    // 1. Register via the public admin API (no manual insert).
+    const reg = await mod.registerPlatform(db, {
+      tenantId,
+      issuer,
+      clientId,
+      jwksUrl: `${issuer}/jwks`,
+      authTokenUrl: `${issuer}/token`,
+      authLoginUrl: `${issuer}/login`,
+      label: "Canvas",
+      deployments: [{ deploymentId: "dep-A", label: "Period 1" }],
+    });
+    expect(reg.deploymentIds).toHaveLength(1);
+
+    // 2. Update mutable fields + replace deployments.
+    const updated = await mod.updatePlatform(db, reg.platformId, {
+      tenantId,
+      label: "Canvas Prod",
+      jwksUrl: `${issuer}/jwks/v2`,
+      deployments: [
+        { deploymentId: "dep-B", label: "Period 2" },
+        { deploymentId: "dep-C" },
+      ],
+    });
+    expect(updated.label).toBe("Canvas Prod");
+    expect(updated.jwksUrl).toBe(`${issuer}/jwks/v2`);
+    expect(updated.deployments.map((d) => d.deploymentId).sort()).toEqual(["dep-B", "dep-C"]);
+
+    // 3. Cross-tenant update is rejected.
+    await expect(
+      mod.updatePlatform(db, reg.platformId, { tenantId: otherTenant, label: "hijack" }),
+    ).rejects.toBeInstanceOf(mod.PlatformNotFoundError);
+
+    // 4. A launch persists against the registered platform.
+    const launch = await mod.persistLaunch(db, {
+      issuer,
+      clientId,
+      deploymentId: "dep-B",
+      context: { id: "ctx-crud-1", title: "Algebra I" },
+      resourceLink: { id: "rl-crud-1", title: "Quiz" },
+      targetLinkUri: "/learn/algebra/quiz",
+    });
+    expect(launch.platformId).toBe(reg.platformId);
+    expect(launch.resourceLinkRowId).toBeTruthy();
+
+    // 5. AGS score write-back records a line item under that resource link.
+    const lineitemUrl = `${issuer}/lineitems/crud-1`;
+    const lineId = await mod.upsertAgsLineitem(db, {
+      resourceLinkRowId: launch.resourceLinkRowId!,
+      lineitemUrl,
+      scoreMaximum: 25,
+      label: "Crud quiz",
+    });
+    const rows = await db
+      .select()
+      .from(schema.ltiAgsLineitems)
+      .where(eq(schema.ltiAgsLineitems.id, lineId));
+    expect(rows).toHaveLength(1);
+    expect(rows[0].scoreMaximum).toBe(25);
+
+    // 6. Cross-tenant delete is a no-op.
+    const stranger = await mod.deletePlatform(db, reg.platformId, otherTenant);
+    expect(stranger).toBe(false);
+
+    // 7. Owning-tenant delete cascades (platform + deployments + contexts +
+    //    resource links + AGS line items all go via ON DELETE CASCADE).
+    const ok = await mod.deletePlatform(db, reg.platformId, tenantId);
+    expect(ok).toBe(true);
+
+    const after = await db
+      .select()
+      .from(schema.ltiPlatforms)
+      .where(eq(schema.ltiPlatforms.id, reg.platformId));
+    expect(after).toHaveLength(0);
+
+    const orphans = await db
+      .select()
+      .from(schema.ltiAgsLineitems)
+      .where(eq(schema.ltiAgsLineitems.id, lineId));
+    expect(orphans).toHaveLength(0);
+  });
+});

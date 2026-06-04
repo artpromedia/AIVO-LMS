@@ -2823,5 +2823,61 @@
     "card_title": "Sign in to the district console",
     "sign_in_btn": "Sign in",
     "standard_sign_in": "Use the standard sign-in"
+  },
+  "lti_admin": {
+    "page": {
+      "eyebrow": "Integrations",
+      "title": "LTI 1.3 platforms",
+      "description": "Register an LMS so its launches are accepted and grades can be written back."
+    },
+    "fields": {
+      "label": "Label (optional)",
+      "issuer": "Issuer",
+      "client_id": "Client ID",
+      "jwks_url": "JWKS URL",
+      "auth_token_url": "Auth token URL",
+      "auth_login_url": "Auth login URL",
+      "deployment_id": "Deployment ID (optional)"
+    },
+    "placeholders": {
+      "label": "Canvas — District",
+      "issuer": "https://canvas.instructure.com",
+      "client_id": "10000000000001",
+      "jwks_url": "https://…/api/lti/security/jwks",
+      "auth_token_url": "https://…/login/oauth2/token",
+      "auth_login_url": "https://…/api/lti/authorize_redirect",
+      "deployment_id": "1:abcdef…"
+    },
+    "actions": {
+      "register": "Register platform",
+      "registering": "Registering…",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleting": "Deleting…",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "confirm": {
+      "delete": "Delete LTI platform {issuer}? This removes its deployments, contexts, resource links, and AGS line items."
+    },
+    "errors": {
+      "load_failed": "Couldn't load registered platforms.",
+      "register_failed": "Registration failed.",
+      "update_failed": "Update failed.",
+      "delete_failed": "Delete failed."
+    },
+    "ok": {
+      "registered": "Platform registered.",
+      "updated": "Platform updated.",
+      "deleted": "Platform deleted."
+    },
+    "registered": {
+      "heading": "Registered platforms",
+      "loading": "Loading…",
+      "empty": "No platforms registered yet.",
+      "client_id_label": "client",
+      "deployments_label": "Deployments"
+    }
   }
 }

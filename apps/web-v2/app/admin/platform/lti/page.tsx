@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -13,6 +14,7 @@ import { LtiPlatformsCard } from "./lti-platforms-card";
  */
 export default async function LtiPlatformsPage() {
   const session = await requirePageRole(["platform_admin", "district_admin", "school_admin"]);
+  const t = await getTranslations("lti_admin");
 
   return (
     <AppShell
@@ -22,9 +24,9 @@ export default async function LtiPlatformsPage() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Integrations"
-        title="LTI 1.3 platforms"
-        description="Register an LMS so its launches are accepted and grades can be written back."
+        eyebrow={t("page.eyebrow")}
+        title={t("page.title")}
+        description={t("page.description")}
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <LtiPlatformsCard />

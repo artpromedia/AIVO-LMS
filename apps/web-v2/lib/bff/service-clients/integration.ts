@@ -93,6 +93,65 @@ export async function registerLtiPlatform(
   }
 }
 
+export interface UpdateLtiPlatformInput {
+  jwksUrl?: string;
+  authTokenUrl?: string;
+  authLoginUrl?: string;
+  label?: string | null;
+  deployments?: Array<{ deploymentId: string; label?: string }>;
+}
+
+/** Update a registered LTI platform's mutable fields and (optional) deployments. */
+export async function updateLtiPlatform(
+  authToken: string,
+  platformId: string,
+  input: UpdateLtiPlatformInput,
+): Promise<Result<LtiPlatformView>> {
+  try {
+    const res = await fetch(
+      `${serverEnv.INTEGRATION_SVC_URL}/api/lti/platforms/${encodeURIComponent(platformId)}`,
+      {
+        method: "PUT",
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+        headers: { "content-type": "application/json", authorization: `Bearer ${authToken}` },
+        body: JSON.stringify(input),
+      },
+    );
+    if (!res.ok) {
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      return { ok: false, reason: body.error ?? `http_${res.status}` };
+    }
+    return { ok: true, data: (await res.json()) as LtiPlatformView };
+  } catch (err) {
+    return { ok: false, reason: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/** Delete a registered LTI platform (cascades per migration-0045). */
+export async function deleteLtiPlatform(
+  authToken: string,
+  platformId: string,
+): Promise<Result<{ deleted: true }>> {
+  try {
+    const res = await fetch(
+      `${serverEnv.INTEGRATION_SVC_URL}/api/lti/platforms/${encodeURIComponent(platformId)}`,
+      {
+        method: "DELETE",
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+        headers: { authorization: `Bearer ${authToken}` },
+      },
+    );
+    if (res.status === 204) return { ok: true, data: { deleted: true } };
+    if (!res.ok) {
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      return { ok: false, reason: body.error ?? `http_${res.status}` };
+    }
+    return { ok: true, data: { deleted: true } };
+  } catch (err) {
+    return { ok: false, reason: err instanceof Error ? err.message : String(err) };
+  }
+}
+
 export async function importSisExport(input: {
   vendor: "clever" | "classlink";
   export: unknown;

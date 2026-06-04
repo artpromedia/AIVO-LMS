@@ -2823,5 +2823,61 @@
     "card_title": "登录学区控制台",
     "sign_in_btn": "登录",
     "standard_sign_in": "使用标准登录"
+  },
+  "lti_admin": {
+    "page": {
+      "eyebrow": "集成",
+      "title": "LTI 1.3 平台",
+      "description": "注册 LMS 以接受其启动并可以回写成绩。"
+    },
+    "fields": {
+      "label": "标签（可选）",
+      "issuer": "Issuer",
+      "client_id": "Client ID",
+      "jwks_url": "JWKS URL",
+      "auth_token_url": "Auth token URL",
+      "auth_login_url": "Auth login URL",
+      "deployment_id": "部署 ID（可选）"
+    },
+    "placeholders": {
+      "label": "Canvas — District",
+      "issuer": "https://canvas.instructure.com",
+      "client_id": "10000000000001",
+      "jwks_url": "https://…/api/lti/security/jwks",
+      "auth_token_url": "https://…/login/oauth2/token",
+      "auth_login_url": "https://…/api/lti/authorize_redirect",
+      "deployment_id": "1:abcdef…"
+    },
+    "actions": {
+      "register": "注册平台",
+      "registering": "注册中…",
+      "edit": "编辑",
+      "delete": "删除",
+      "deleting": "删除中…",
+      "save": "保存",
+      "saving": "保存中…",
+      "cancel": "取消"
+    },
+    "confirm": {
+      "delete": "删除 LTI 平台 {issuer}？这将删除其部署、上下文、资源链接和 AGS 行项目。"
+    },
+    "errors": {
+      "load_failed": "无法加载已注册的平台。",
+      "register_failed": "注册失败。",
+      "update_failed": "更新失败。",
+      "delete_failed": "删除失败。"
+    },
+    "ok": {
+      "registered": "平台已注册。",
+      "updated": "平台已更新。",
+      "deleted": "平台已删除。"
+    },
+    "registered": {
+      "heading": "已注册的平台",
+      "loading": "加载中…",
+      "empty": "尚未注册任何平台。",
+      "client_id_label": "客户端",
+      "deployments_label": "部署"
+    }
   }
 }

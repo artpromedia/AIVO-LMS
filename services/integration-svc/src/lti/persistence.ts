@@ -130,6 +130,130 @@ export async function registerPlatform(
   return { platformId: platform.id, deploymentIds };
 }
 
+export interface UpdatePlatformInput {
+  /** Caller's tenant — used as a guard so cross-tenant ids cannot be edited. */
+  tenantId: string;
+  jwksUrl?: string;
+  authTokenUrl?: string;
+  authLoginUrl?: string;
+  label?: string | null;
+  /**
+   * If provided, replaces the deployment set for the platform. Pass `[]` to
+   * remove all deployments. Pass `undefined` to leave deployments untouched.
+   */
+  deployments?: PlatformDeploymentInput[];
+}
+
+/** Raised when the caller tries to mutate a platform that isn't in their tenant. */
+export class PlatformNotFoundError extends Error {
+  constructor(platformId: string) {
+    super(`LTI platform not found in tenant: ${platformId}`);
+    this.name = "PlatformNotFoundError";
+  }
+}
+
+/**
+ * Update a platform's mutable fields (JWKS/OAuth URLs, label) and optionally
+ * replace its deployment set. Tenant-scoped: throws {@link PlatformNotFoundError}
+ * if the row isn't owned by the caller's tenant. Issuer + client_id are
+ * immutable — re-register if they change.
+ */
+export async function updatePlatform(
+  db: LtiDb,
+  platformId: string,
+  input: UpdatePlatformInput,
+): Promise<PlatformView> {
+  const [existing] = await db
+    .select({ id: ltiPlatforms.id, tenantId: ltiPlatforms.tenantId })
+    .from(ltiPlatforms)
+    .where(eq(ltiPlatforms.id, platformId))
+    .limit(1);
+  if (existing?.tenantId !== input.tenantId) {
+    throw new PlatformNotFoundError(platformId);
+  }
+
+  const patch: Record<string, unknown> = {};
+  if (typeof input.jwksUrl === "string") patch.jwksUrl = input.jwksUrl;
+  if (typeof input.authTokenUrl === "string") patch.authTokenUrl = input.authTokenUrl;
+  if (typeof input.authLoginUrl === "string") patch.authLoginUrl = input.authLoginUrl;
+  if (input.label !== undefined) patch.label = input.label;
+  if (Object.keys(patch).length > 0) {
+    await db.update(ltiPlatforms).set(patch).where(eq(ltiPlatforms.id, platformId));
+  }
+
+  if (input.deployments) {
+    await db.delete(ltiDeployments).where(eq(ltiDeployments.platformId, platformId));
+    for (const d of input.deployments) {
+      if (!d.deploymentId.trim()) continue;
+      await db.insert(ltiDeployments).values({
+        platformId,
+        deploymentId: d.deploymentId,
+        label: d.label ?? null,
+      });
+    }
+  }
+
+  const [view] = await listPlatformsById(db, input.tenantId, platformId);
+  if (!view) throw new PlatformNotFoundError(platformId);
+  return view;
+}
+
+/**
+ * Delete a platform (cascades to deployments / contexts / resource links /
+ * AGS line items per migration-0045 ON DELETE CASCADE). Tenant-scoped:
+ * returns `false` if the row isn't owned by the caller's tenant.
+ */
+export async function deletePlatform(
+  db: LtiDb,
+  platformId: string,
+  tenantId: string,
+): Promise<boolean> {
+  const [existing] = await db
+    .select({ id: ltiPlatforms.id, tenantId: ltiPlatforms.tenantId })
+    .from(ltiPlatforms)
+    .where(eq(ltiPlatforms.id, platformId))
+    .limit(1);
+  if (existing?.tenantId !== tenantId) return false;
+  await db.delete(ltiPlatforms).where(eq(ltiPlatforms.id, platformId));
+  return true;
+}
+
+/** Internal helper — list a single platform as a `PlatformView`. */
+async function listPlatformsById(
+  db: LtiDb,
+  tenantId: string,
+  platformId: string,
+): Promise<PlatformView[]> {
+  const platforms = await db
+    .select()
+    .from(ltiPlatforms)
+    .where(and(eq(ltiPlatforms.tenantId, tenantId), eq(ltiPlatforms.id, platformId)));
+  const out: PlatformView[] = [];
+  for (const p of platforms) {
+    const deployments = await db
+      .select({
+        id: ltiDeployments.id,
+        deploymentId: ltiDeployments.deploymentId,
+        label: ltiDeployments.label,
+      })
+      .from(ltiDeployments)
+      .where(eq(ltiDeployments.platformId, p.id));
+    out.push({
+      id: p.id,
+      tenantId: p.tenantId,
+      issuer: p.issuer,
+      clientId: p.clientId,
+      jwksUrl: p.jwksUrl,
+      authTokenUrl: p.authTokenUrl,
+      authLoginUrl: p.authLoginUrl,
+      label: p.label,
+      createdAt: p.createdAt instanceof Date ? p.createdAt.toISOString() : String(p.createdAt),
+      deployments,
+    });
+  }
+  return out;
+}
+
 /** List a tenant's registered platforms with their deployments. */
 export async function listPlatforms(db: LtiDb, tenantId: string): Promise<PlatformView[]> {
   const platforms = await db
