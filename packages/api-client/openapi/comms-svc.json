@@ -3091,6 +3091,25 @@
         }
       }
     },
+    "/api/comms/threads/{threadId}/stream": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "threadId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
     "/api/comms/webhook/email-events": {
       "post": {
         "operationId": "receiveEmailProviderWebhook",
