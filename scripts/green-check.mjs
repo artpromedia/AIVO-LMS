@@ -95,10 +95,8 @@ const gates = [
   // creates the underlying script lands.
   {
     name: "mobile:role-audit",
-    status: "not-implemented",
-    reason:
-      "Owned by Sprint GREEN-07. scripts/mobile-role-audit.mjs not yet created. (mobile:audit exists but is a different lens.)",
-    required: false,
+    script: "mobile:role-audit",
+    required: true,
     category: "mobile",
   },
   {

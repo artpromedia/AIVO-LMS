@@ -138,6 +138,13 @@
       "command": "pnpm mobile:parity:strict",
       "claimed_status": "unverified",
       "owner": "mobile"
+    },
+    {
+      "id": "mobile:role-audit",
+      "command": "pnpm mobile:role-audit",
+      "claimed_status": "green",
+      "owner": "mobile",
+      "notes": "GREEN-07 role lens: active-role helpers, RoleContext shape, apiFetch wiring, MOBILE_UNIFIED_APP/legacy-group consistency, and 6 BFF consumers. Verified 2026-06-04."
     }
   ]
 }
