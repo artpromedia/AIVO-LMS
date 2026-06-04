@@ -152,6 +152,13 @@
       "claimed_status": "green",
       "owner": "ux",
       "notes": "GREEN-08 UX-state lens: canonical primitives (EmptyState/OfflineBanner/app shell), per-role EmptyState usage (learner/parent/teacher/admin-school/admin-district), and web⇄mobile parity matrix clean. Verified 2026-06-04."
+    },
+    {
+      "id": "a11y:audit",
+      "command": "pnpm a11y:audit",
+      "claimed_status": "green",
+      "owner": "a11y",
+      "notes": "GREEN-09 runtime a11y lens: reduced-motion contract wired through typeface.ts/server.ts/actions.ts/layout.tsx/globals.css, focus-visible + skip-link styled, ≥4 axe-tagged Playwright specs in apps/web-v2/e2e, test:a11y wired, VPAT doc present, and accessibility:audit subprocess passes. Live axe runs (Playwright + browser) remain a CI job. Verified 2026-06-04."
     }
   ]
 }

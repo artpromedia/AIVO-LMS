@@ -107,10 +107,8 @@ const gates = [
   },
   {
     name: "a11y:audit",
-    status: "not-implemented",
-    reason:
-      "Owned by Sprint GREEN-09. accessibility:audit script exists but the GREEN-09 a11y:audit lens (axe + keyboard + reduced-motion snapshots) is not yet implemented.",
-    required: false,
+    script: "a11y:audit",
+    required: true,
     category: "a11y",
   },
   {
