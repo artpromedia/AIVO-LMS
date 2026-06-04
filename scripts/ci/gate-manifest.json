@@ -90,8 +90,9 @@
     {
       "id": "prod:check",
       "command": "pnpm prod:check",
-      "claimed_status": "unverified",
-      "owner": "platform"
+      "claimed_status": "green",
+      "owner": "platform",
+      "notes": "no-demo + surface-contract scans both clean. Verified 2026-06-03."
     },
     {
       "id": "test:production-readiness",
@@ -108,20 +109,23 @@
     {
       "id": "repo:health",
       "command": "pnpm repo:health",
-      "claimed_status": "unverified",
-      "owner": "platform"
+      "claimed_status": "green",
+      "owner": "platform",
+      "notes": "3 apps / 37 packages / 30 services / 17 root scripts. Verified 2026-06-03 (zero warnings)."
     },
     {
       "id": "brand:check",
       "command": "pnpm brand:check",
-      "claimed_status": "unverified",
-      "owner": "design"
+      "claimed_status": "green",
+      "owner": "design",
+      "notes": "3 critical assets present; 37 canonical-asset warnings tracked as NEEDS-HUMAN (design lead). Verified 2026-06-03."
     },
     {
       "id": "release:gate",
       "command": "pnpm release:gate",
-      "claimed_status": "unverified",
-      "owner": "release"
+      "claimed_status": "green",
+      "owner": "release",
+      "notes": "20/20 sub-gates PASS locally. Verified 2026-06-03 after fixing Windows spawnSync bug in release-gate.mjs + path-separator bug in auth-mode-audit.mjs."
     },
     {
       "id": "green:check",

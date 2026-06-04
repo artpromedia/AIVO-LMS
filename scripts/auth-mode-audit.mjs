@@ -81,7 +81,9 @@ function walk(dir, out = []) {
 }
 
 const bffAuthRoot = join(repoRoot, "apps/web-v2/app/api/bff/auth");
-const routeFiles = walk(bffAuthRoot).filter((p) => /mock-[^/\\]+\/route\.ts$/.test(p));
+const routeFiles = walk(bffAuthRoot).filter((p) =>
+  /mock-[^/\\]+[/\\]route\.ts$/.test(p),
+);
 if (routeFiles.length === 0) {
   errors.push(
     "apps/web-v2/app/api/bff/auth/mock-*/route.ts: no mock auth routes found (expected at least mock-login).",

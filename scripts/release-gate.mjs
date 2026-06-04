@@ -45,13 +45,20 @@ const GATES = [
 const results = [];
 let failures = 0;
 
+// On Windows, `pnpm` resolves to `pnpm.cmd`, which Node's spawnSync cannot
+// execute without `shell: true`. Using shell: true on every platform keeps
+// behavior consistent and was previously the cause of a 20/20 false-fail
+// when running release:gate from a Windows PowerShell session.
+const SPAWN_OPTS = {
+  cwd: repoRoot,
+  stdio: "inherit",
+  shell: true,
+};
+
 for (const gate of GATES) {
   process.stdout.write(`\n── ${gate.name} ───────────────────────────────\n`);
   const t0 = Date.now();
-  const result = spawnSync(gate.cmd[0], gate.cmd.slice(1), {
-    cwd: repoRoot,
-    stdio: "inherit",
-  });
+  const result = spawnSync(gate.cmd[0], gate.cmd.slice(1), SPAWN_OPTS);
   const ms = Date.now() - t0;
   const ok = result.status === 0;
   results.push({ name: gate.name, ok, ms });

@@ -139,7 +139,8 @@ for (const gate of gates) {
   const child = spawnSync("pnpm", ["run", "-s", gate.script], {
     cwd: repoRoot,
     stdio: "inherit",
-    shell: false,
+    // shell:true so Windows can resolve pnpm.cmd; harmless on Linux/macOS.
+    shell: true,
   });
   const ok = child.status === 0;
   results.push({ ...gate, ok, exitCode: child.status });
