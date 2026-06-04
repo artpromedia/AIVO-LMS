@@ -358,56 +358,56 @@ CREATE TABLE IF NOT EXISTS "impersonation_sessions" (
 --> statement-breakpoint
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'aac_vocabulary_learner_id_learners_id_fk') THEN
-    ALTER TABLE "aac_vocabulary" ADD CONSTRAINT "aac_vocabulary_learner_id_learners_id_fk" FOREIGN KEY ("learner_id") REFERENCES "public"."learners"("id") ON DELETE cascade ON UPDATE no action;;
+    ALTER TABLE "aac_vocabulary" ADD CONSTRAINT "aac_vocabulary_learner_id_learners_id_fk" FOREIGN KEY ("learner_id") REFERENCES "public"."learners"("id") ON DELETE cascade ON UPDATE no action;
   END IF;
 END $$;
 
 --> statement-breakpoint
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'lti_ags_lineitems_resource_link_id_lti_resource_links_id_fk') THEN
-    ALTER TABLE "lti_ags_lineitems" ADD CONSTRAINT "lti_ags_lineitems_resource_link_id_lti_resource_links_id_fk" FOREIGN KEY ("resource_link_id") REFERENCES "public"."lti_resource_links"("id") ON DELETE cascade ON UPDATE no action;;
+    ALTER TABLE "lti_ags_lineitems" ADD CONSTRAINT "lti_ags_lineitems_resource_link_id_lti_resource_links_id_fk" FOREIGN KEY ("resource_link_id") REFERENCES "public"."lti_resource_links"("id") ON DELETE cascade ON UPDATE no action;
   END IF;
 END $$;
 
 --> statement-breakpoint
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'lti_contexts_deployment_id_lti_deployments_id_fk') THEN
-    ALTER TABLE "lti_contexts" ADD CONSTRAINT "lti_contexts_deployment_id_lti_deployments_id_fk" FOREIGN KEY ("deployment_id") REFERENCES "public"."lti_deployments"("id") ON DELETE cascade ON UPDATE no action;;
+    ALTER TABLE "lti_contexts" ADD CONSTRAINT "lti_contexts_deployment_id_lti_deployments_id_fk" FOREIGN KEY ("deployment_id") REFERENCES "public"."lti_deployments"("id") ON DELETE cascade ON UPDATE no action;
   END IF;
 END $$;
 
 --> statement-breakpoint
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'lti_deployments_platform_id_lti_platforms_id_fk') THEN
-    ALTER TABLE "lti_deployments" ADD CONSTRAINT "lti_deployments_platform_id_lti_platforms_id_fk" FOREIGN KEY ("platform_id") REFERENCES "public"."lti_platforms"("id") ON DELETE cascade ON UPDATE no action;;
+    ALTER TABLE "lti_deployments" ADD CONSTRAINT "lti_deployments_platform_id_lti_platforms_id_fk" FOREIGN KEY ("platform_id") REFERENCES "public"."lti_platforms"("id") ON DELETE cascade ON UPDATE no action;
   END IF;
 END $$;
 
 --> statement-breakpoint
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'lti_resource_links_context_id_lti_contexts_id_fk') THEN
-    ALTER TABLE "lti_resource_links" ADD CONSTRAINT "lti_resource_links_context_id_lti_contexts_id_fk" FOREIGN KEY ("context_id") REFERENCES "public"."lti_contexts"("id") ON DELETE cascade ON UPDATE no action;;
+    ALTER TABLE "lti_resource_links" ADD CONSTRAINT "lti_resource_links_context_id_lti_contexts_id_fk" FOREIGN KEY ("context_id") REFERENCES "public"."lti_contexts"("id") ON DELETE cascade ON UPDATE no action;
   END IF;
 END $$;
 
 --> statement-breakpoint
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'impersonation_sessions_actor_id_users_id_fk') THEN
-    ALTER TABLE "impersonation_sessions" ADD CONSTRAINT "impersonation_sessions_actor_id_users_id_fk" FOREIGN KEY ("actor_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;;
+    ALTER TABLE "impersonation_sessions" ADD CONSTRAINT "impersonation_sessions_actor_id_users_id_fk" FOREIGN KEY ("actor_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
   END IF;
 END $$;
 
 --> statement-breakpoint
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'impersonation_sessions_subject_id_users_id_fk') THEN
-    ALTER TABLE "impersonation_sessions" ADD CONSTRAINT "impersonation_sessions_subject_id_users_id_fk" FOREIGN KEY ("subject_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;;
+    ALTER TABLE "impersonation_sessions" ADD CONSTRAINT "impersonation_sessions_subject_id_users_id_fk" FOREIGN KEY ("subject_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
   END IF;
 END $$;
 
 --> statement-breakpoint
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'impersonation_sessions_tenant_id_tenants_id_fk') THEN
-    ALTER TABLE "impersonation_sessions" ADD CONSTRAINT "impersonation_sessions_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE no action ON UPDATE no action;;
+    ALTER TABLE "impersonation_sessions" ADD CONSTRAINT "impersonation_sessions_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE no action ON UPDATE no action;
   END IF;
 END $$;
 

@@ -29,7 +29,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Run pnpm audit (fail on high+)
-        run: pnpm audit --audit-level=high
+        # GHSA-5xrq-8626-4rwp: vitest --ui server vuln. We never run vitest --ui in CI
+        # or production; vitest is a devDependency only. Tracked in issue #69 (vitest 2->4 upgrade).
+        run: pnpm audit --audit-level=high --ignore GHSA-5xrq-8626-4rwp
 
   pip-audit:
     name: pip audit (Python services)

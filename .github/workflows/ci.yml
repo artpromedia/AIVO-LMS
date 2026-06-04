@@ -492,7 +492,8 @@ jobs:
         run: |
           corepack enable
           pnpm install --frozen-lockfile
-          pnpm audit --audit-level=high
+          # GHSA-5xrq-8626-4rwp: vitest --ui server vuln. Not exploitable in CI/prod (vitest devDep, never --ui).
+          pnpm audit --audit-level=high --ignore GHSA-5xrq-8626-4rwp
         continue-on-error: true
 
       - name: Upload security artifacts
