@@ -74,7 +74,6 @@ const REQUIRED_SERVICES = [
   "i18n-svc",
   "identity-svc",
   "integration-svc",
-  "integrations-svc",
   "learning-svc",
   "math-recognizer-svc",
   "problem-session-svc",

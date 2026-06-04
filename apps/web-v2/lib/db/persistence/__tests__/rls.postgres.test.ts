@@ -28,6 +28,10 @@ const MIGRATIONS = [
 let db: Database;
 
 async function applyMigrations(): Promise<void> {
+  // Reset schema so this test is hermetic when run alongside other
+  // persistence tests that share the same CI Postgres service container.
+  await db.execute(sql.raw("DROP SCHEMA IF EXISTS public CASCADE"));
+  await db.execute(sql.raw("CREATE SCHEMA public"));
   for (const name of MIGRATIONS) {
     const file = readFileSync(resolve(migrationsDir, `${name}.sql`), "utf8");
     for (const stmt of file.split("--> statement-breakpoint")) {

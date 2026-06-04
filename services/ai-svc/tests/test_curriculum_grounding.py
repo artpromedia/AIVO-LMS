@@ -13,7 +13,6 @@ Run with:  pytest services/ai-svc/tests/test_curriculum_grounding.py -v
 """
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import httpx

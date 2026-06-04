@@ -327,13 +327,6 @@
     {
       "idx": 46,
       "version": "7",
-      "when": 1780586291412,
-      "tag": "0046_backfill_pgtable_drift",
-      "breakpoints": true
-    },
-    {
-      "idx": 46,
-      "version": "7",
       "when": 1780617600000,
       "tag": "0062_backfill_pgtable_drift",
       "breakpoints": true

@@ -125,7 +125,6 @@ class EventEmitter:
         publish failure (or when NATS is not configured/available) the file is
         left in place for the next flush or an ops sweep. Never raises.
         """
-        import json as _json
         import pathlib as _pl
 
         if not self._nats_url:

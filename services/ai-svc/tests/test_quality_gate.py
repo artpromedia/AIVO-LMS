@@ -2,7 +2,6 @@
 
 Run with: pytest services/ai-svc/tests/test_quality_gate.py
 """
-import os
 import sys
 from pathlib import Path
 

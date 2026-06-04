@@ -622,7 +622,7 @@ jobs:
       - name: Store contracts (memory reference + postgres adapters)
         env:
           AIVO_TEST_DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
-        run: pnpm --filter @aivo/web-v2 exec vitest run lib/db/persistence
+        run: pnpm --filter @aivo/web-v2 exec vitest run lib/db/persistence --no-file-parallelism
 
       - name: Apply migrations to the service database
         env:

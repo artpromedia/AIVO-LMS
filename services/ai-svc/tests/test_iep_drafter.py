@@ -11,10 +11,8 @@ Pin down the contract for the baseline → IEP draft pipeline:
 
 from __future__ import annotations
 
-import pytest
 
 from ai_svc.services.iep_drafter import (
-    IepDraftPayload,
     build_iep_draft_prompt,
     validate_iep_draft,
 )
