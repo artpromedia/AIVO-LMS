@@ -113,9 +113,8 @@ const gates = [
   },
   {
     name: "security:audit",
-    status: "not-implemented",
-    reason: "Owned by Sprint GREEN-12. scripts/security-audit.mjs not yet created.",
-    required: false,
+    script: "security:audit",
+    required: true,
     category: "security",
   },
 ];

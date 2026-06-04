@@ -55,6 +55,7 @@
     "mobile:role-audit": "node scripts/mobile-role-audit.mjs",
     "ux:parity": "node scripts/ux-parity-check.mjs",
     "a11y:audit": "node scripts/a11y-audit.mjs",
+    "security:audit": "node scripts/security-audit.mjs",
     "persistence:stubs": "node scripts/check-persistence-stubs.mjs",
     "mobile:parity": "node scripts/web-mobile-parity-check.mjs",
     "mobile:parity:strict": "node scripts/web-mobile-parity-check.mjs --strict",

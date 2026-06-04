@@ -159,6 +159,13 @@
       "claimed_status": "green",
       "owner": "a11y",
       "notes": "GREEN-09 runtime a11y lens: reduced-motion contract wired through typeface.ts/server.ts/actions.ts/layout.tsx/globals.css, focus-visible + skip-link styled, ≥4 axe-tagged Playwright specs in apps/web-v2/e2e, test:a11y wired, VPAT doc present, and accessibility:audit subprocess passes. Live axe runs (Playwright + browser) remain a CI job. Verified 2026-06-04."
+    },
+    {
+      "id": "security:audit",
+      "command": "pnpm security:audit",
+      "claimed_status": "green",
+      "owner": "security",
+      "notes": "GREEN-12 Tier A application-security lens: gitleaks config + secret-scan workflow, pnpm-audit --audit-level=high enforced in security-scan.yml and ci.yml, browser security headers in apps/web-v2/next.config.ts (X-Frame-Options/XCTO/Referrer-Policy/Permissions-Policy/HSTS), surface-role cookie helpers in packages/security, and security docs + runbooks (threat-model, soc2-readiness, incident-response, pentest, secret-history-rotation). Live gitleaks + pnpm-audit + semgrep runs live in their dedicated CI workflows. Tier B (encryption-at-rest, key rotation, restore drill) tracked as follow-up. Verified 2026-06-04."
     }
   ]
 }
