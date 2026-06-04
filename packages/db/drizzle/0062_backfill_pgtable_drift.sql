@@ -6,6 +6,13 @@
 --
 -- Tracks: scripts/check-schema-drift.ts CI gate (Task #182).
 
+DO $$ BEGIN
+	CREATE TYPE "aac_word_kind" AS ENUM ('core', 'fringe');
+EXCEPTION
+	WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+
 CREATE TABLE IF NOT EXISTS "aac_vocabulary" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"learner_id" uuid NOT NULL,
