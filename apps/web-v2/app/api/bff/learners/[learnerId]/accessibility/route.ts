@@ -47,7 +47,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (!getLearner(learnerId, session!.tenantId)) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
-    const prefs = getAccessibilityPrefs(learnerId, session!.tenantId);
+    const prefs = await getAccessibilityPrefs(learnerId, session!.tenantId);
     return ok({ accessibility: prefs }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -85,7 +85,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         requestId,
       );
     }
-    const next = updateAccessibilityPrefs(learnerId, session!.tenantId, parsed.data);
+    const next = await updateAccessibilityPrefs(learnerId, session!.tenantId, parsed.data);
     audit(session!, "accessibility.update", requestId, {
       learnerId,
       metadata: { changedKeys: Object.keys(parsed.data) },

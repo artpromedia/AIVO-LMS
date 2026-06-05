@@ -26,7 +26,7 @@ export default async function ParentAccessibilityPage({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const prefs = getAccessibilityPrefs(learnerId, session.tenantId);
+  const prefs = await getAccessibilityPrefs(learnerId, session.tenantId);
 
   return (
     <AppShell

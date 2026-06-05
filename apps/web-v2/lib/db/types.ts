@@ -85,6 +85,14 @@ export type LearnerProfile = {
   knownStrengths: string[];
   knownChallenges: string[];
   accessibilityDefaults: LearnerAccessibilityDefaults;
+  /**
+   * Per-learner runtime accessibility preferences (the 16-field
+   * AccessibilityProfile + envelope). Stored on the learner document so it
+   * persists durably through the same JSON-backed persistence adapter as the
+   * rest of the profile — no separate table. Undefined until first set; the
+   * repo returns ACCESSIBILITY_DEFAULTS in that case.
+   */
+  accessibilityPreferences?: AccessibilityPreferences;
   /** Sprint A: parent-supplied US zip; null if not provided. */
   zipCode: string | null;
   /** Sprint A: NCES district ID resolved from the zip (or null). */

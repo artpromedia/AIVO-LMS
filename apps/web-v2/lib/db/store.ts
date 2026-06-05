@@ -137,7 +137,6 @@ export type Store = {
   iepDocuments: Map<string, IEPDocument>;
   accommodationSummaries: Map<string, AccommodationSummary>;
   brainProfiles: Map<string, LearnerBrainProfile>;
-  accessibilityPrefs: Map<string, AccessibilityPreferences>;
 
   subjects: Map<string, Subject>;
   skills: Map<string, Skill>;
@@ -305,7 +304,6 @@ function createStore(): Store {
     iepDocuments: new Map(),
     accommodationSummaries: new Map(),
     brainProfiles: new Map(),
-    accessibilityPrefs: new Map(),
     subjects: new Map(),
     skills: new Map(),
     masteryMaps: new Map(),

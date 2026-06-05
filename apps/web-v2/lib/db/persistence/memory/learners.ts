@@ -190,4 +190,19 @@ export const memoryLearners: LearnerStore = {
     store.learnerProfiles.set(id, next);
     return next;
   },
+
+  async getAccessibility(id, tenantId) {
+    const existing = getStore().learnerProfiles.get(id);
+    if (!existing || existing.tenantId !== tenantId) return null;
+    return existing.accessibilityPreferences ?? null;
+  },
+
+  async setAccessibility(id, tenantId, prefs) {
+    const store = getStore();
+    const existing = store.learnerProfiles.get(id);
+    if (!existing || existing.tenantId !== tenantId) return null;
+    const next: LearnerProfile = { ...existing, accessibilityPreferences: prefs ?? undefined };
+    store.learnerProfiles.set(id, next);
+    return next.accessibilityPreferences ?? null;
+  },
 };

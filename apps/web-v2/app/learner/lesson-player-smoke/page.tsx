@@ -201,7 +201,7 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
     store.generatedLessonPlans.set(plan.id, plan);
   }
 
-  const accessibility = getAccessibilityPrefs(learnerId, session.tenantId);
+  const accessibility = await getAccessibilityPrefs(learnerId, session.tenantId);
 
   return (
     <AppShell

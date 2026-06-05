@@ -184,6 +184,44 @@ export function learnerStoreContract(label: string, make: () => LearnerStore, re
       expect(await s.getById(l.id, T)).toBeNull();
       expect(await s.parentCanAccess("p_1", l.id, T)).toBe(false);
     });
+
+    it("persists, reads back, and clears accessibility preferences (tenant-scoped)", async () => {
+      const l = await s.create({ tenantId: T, parentUserId: "p_1", data: input("Sam") });
+      // Unset until first write.
+      expect(await s.getAccessibility(l.id, T)).toBeNull();
+
+      const prefs = {
+        learnerId: l.id,
+        tenantId: T,
+        reducedMotion: true,
+        highContrast: false,
+        largeText: true,
+        dyslexiaFriendlyFont: true,
+        visualSupports: false,
+        audioFirst: false,
+        captionsAlwaysOn: true,
+        readAloud: false,
+        hapticsEnabled: false,
+        shorterSteps: false,
+        extraHints: true,
+        breakReminders: false,
+        keyboardOptimized: false,
+        aacEnabled: false,
+        aacInputMethod: "touch",
+        aacScanDelayMs: 1200,
+        updatedAt: new Date().toISOString(),
+      } as never;
+
+      await s.setAccessibility(l.id, T, prefs);
+      const read = await s.getAccessibility(l.id, T);
+      expect(read?.reducedMotion).toBe(true);
+      expect(read?.dyslexiaFriendlyFont).toBe(true);
+      // Tenant isolation: another tenant sees nothing.
+      expect(await s.getAccessibility(l.id, "other")).toBeNull();
+      // Clearing restores the unset state (repo applies defaults).
+      await s.setAccessibility(l.id, T, null);
+      expect(await s.getAccessibility(l.id, T)).toBeNull();
+    });
   });
 }
 
