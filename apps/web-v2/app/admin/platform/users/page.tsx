@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
 import { listUsersForTenants, scopeTenantsForSession } from "@/lib/db/repos";
-import { ROLE_LABEL, type Role } from "@/lib/auth/types";
+import { type Role } from "@/lib/auth/types";
 
 const ROLE_LABEL: Record<Role, string> = {
   parent: "Parent",

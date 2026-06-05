@@ -15,7 +15,7 @@ import {
   listMembershipsForUser,
   listLearnersForParent,
 } from "@/lib/db/repos";
-import { ROLE_LABEL, type Role } from "@/lib/auth/types";
+import { type Role } from "@/lib/auth/types";
 import { ArrowLeft } from "lucide-react";
 import { sessionHasPermission } from "@/lib/auth/permissions";
 import { UserRolesCard } from "./user-roles-card";
