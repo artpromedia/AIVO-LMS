@@ -1,0 +1,92 @@
+name: Accessibility Gates
+
+# Pre-merge guardrails for the neurodiverse learner experience.
+#
+# Three contract gates, fail-fast, no app boot required (pure static checks):
+#   1. accessibility:audit   — every preference is DECLARED (type + default + BFF).
+#   2. a11y:audit            — the runtime a11y contract (reduced motion, focus,
+#                              skip link) is wired end-to-end.
+#   3. a11y:no-inert-prefs   — every preference is APPLIED (has a real consumer in
+#                              a render path), not just persisted. This is the
+#                              guard that catches "collected-but-inert" toggles —
+#                              a pref saved to the schema/form that changes nothing
+#                              on screen. Adding a pref without wiring a consumer
+#                              fails the build.
+#
+# Scoped to the files that can introduce an accessibility regression so it runs
+# cheaply on the PRs that matter.
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/web-v2/lib/db/types.ts"
+      - "apps/web-v2/app/learner/**"
+      - "apps/web-v2/app/api/bff/learners/**/accessibility/**"
+      - "apps/web-v2/components/learner/**"
+      - "apps/web-v2/app/*.css"
+      - "apps/mobile/lib/preferences-logic.ts"
+      - "apps/mobile/lib/preferences.tsx"
+      - "apps/mobile/lib/a11y-style.tsx"
+      - "apps/mobile/hooks/useLessonAccommodations.ts"
+      - "apps/mobile/src/components/learning/**"
+      - "apps/mobile/src/components/settings/**"
+      - "packages/learner-surfaces/**"
+      - "scripts/a11y/**"
+      - "scripts/a11y-audit.mjs"
+      - "scripts/accessibility-audit.mjs"
+      - ".github/workflows/accessibility.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: accessibility-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  a11y-contract-gates:
+    name: Accessibility contract gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Preference declaration gate (accessibility:audit)
+        run: pnpm run accessibility:audit
+
+      - name: Runtime a11y contract gate (a11y:audit)
+        run: pnpm run a11y:audit
+
+      - name: No-inert-prefs gate (every preference is applied)
+        run: pnpm run a11y:no-inert-prefs
+
+  a11y-unit-tests:
+    name: Accessibility unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Mobile preference logic tests
+        run: pnpm --filter @aivo/mobile exec vitest run __tests__/preferences-logic.test.ts
