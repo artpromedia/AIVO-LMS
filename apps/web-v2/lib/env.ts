@@ -18,7 +18,14 @@ import { z } from "zod";
 // misconfigured deployments at first request.
 const NEXT_PHASE = process.env.NEXT_PHASE ?? "";
 const isBuildPhase = NEXT_PHASE === "phase-production-build";
-const isProd = process.env.NODE_ENV === "production" && !isBuildPhase;
+// CI integration / e2e harness escape hatch. `next start` forces
+// NODE_ENV=production at runtime regardless of what the workflow sets,
+// which would otherwise reject AUTH_MODE=mock / AIVO_PERSISTENCE=memory
+// in the BFF Integration job that intentionally runs against the
+// in-memory store with a mock identity provider. Setting AIVO_TEST_MODE=1
+// in the workflow is the explicit "I know this is non-prod" signal.
+const isTestMode = process.env.AIVO_TEST_MODE === "1";
+const isProd = process.env.NODE_ENV === "production" && !isBuildPhase && !isTestMode;
 
 // Sprint 03: AUTH_MODE=mock is a developer affordance only. In production
 // it MUST be set to a real provider, or the app fails to boot. The

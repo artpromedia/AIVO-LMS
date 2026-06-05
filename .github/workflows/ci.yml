@@ -158,6 +158,7 @@ jobs:
         env:
           NODE_ENV: development
           AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
         run: pnpm --filter @aivo/web-v2 build
 
       - name: Start web-v2 (background, AUTH_MODE=mock)
@@ -165,6 +166,7 @@ jobs:
         env:
           NODE_ENV: development
           AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
           PORT: "5000"
         run: |
           nohup pnpm --filter @aivo/web-v2 start > web-v2.log 2>&1 &

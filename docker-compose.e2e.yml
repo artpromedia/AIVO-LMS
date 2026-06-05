@@ -77,10 +77,15 @@ services:
     ports:
       - "3068:3068"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3068/health"]
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3068/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
       interval: 5s
       timeout: 3s
-      retries: 20
+      retries: 30
+      start_period: 10s
 
   comms-svc:
     build:
@@ -100,7 +105,12 @@ services:
     ports:
       - "3010:3010"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3010/health"]
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3010/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
       interval: 5s
       timeout: 3s
-      retries: 20
+      retries: 30
+      start_period: 10s
