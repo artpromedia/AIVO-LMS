@@ -58,8 +58,8 @@ describe("Phase 5 data isolation — requireRole keys off active role", () => {
 });
 
 describe("Phase 5 data isolation — requireLearnerScope enforces self/parent-link", () => {
-  it("blocks a learner from accessing a learnerId that is not their own", () => {
-    const err = requireLearnerScope(
+  it("blocks a learner from accessing a learnerId that is not their own", async () => {
+    const err = await requireLearnerScope(
       session({ role: "learner", learnerId: "lrn_phase5" }),
       "lrn_someone_else",
       "req_4",
@@ -68,8 +68,8 @@ describe("Phase 5 data isolation — requireLearnerScope enforces self/parent-li
     expect(err!.status).toBe(403);
   });
 
-  it("allows a learner to access their own learnerId", () => {
-    const err = requireLearnerScope(
+  it("allows a learner to access their own learnerId", async () => {
+    const err = await requireLearnerScope(
       session({ role: "learner", learnerId: "lrn_phase5" }),
       "lrn_phase5",
       "req_5",

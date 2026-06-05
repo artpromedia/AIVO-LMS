@@ -47,10 +47,13 @@ export async function POST(req: Request): Promise<NextResponse> {
     // Enforce per-event learner scope. Drop any event referencing a
     // learner the caller can't see rather than letting the upstream
     // service do the filtering — defense in depth.
-    const allowed = events.filter((e) => {
-      const scoped = requireLearnerScope(session!, e.learnerId, requestId);
-      return scoped === null;
-    });
+    const scopeChecks = await Promise.all(
+      events.map(async (e) => ({
+        event: e,
+        allowed: (await requireLearnerScope(session!, e.learnerId, requestId)) === null,
+      })),
+    );
+    const allowed = scopeChecks.filter((c) => c.allowed).map((c) => c.event);
     if (allowed.length === 0) {
       return new NextResponse(null, { status: 204 });
     }

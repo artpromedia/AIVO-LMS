@@ -27,7 +27,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const roleErr = requireRole(session!, ["parent", "learner", "teacher"], requestId);
     if (roleErr) return roleErr;
-    const scope = requireLearnerScope(session!, learnerId, requestId);
+    const scope = await requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
     const sessions = listHomeworkSessionsForLearner(learnerId, session!.tenantId, {
       limit: 50,
@@ -60,7 +60,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (response) return response;
     const roleErr = requireRole(session!, ["learner", "parent"], requestId);
     if (roleErr) return roleErr;
-    const scope = requireLearnerScope(session!, learnerId, requestId);
+    const scope = await requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
     const limited = checkRateLimit(
       session!.userId,

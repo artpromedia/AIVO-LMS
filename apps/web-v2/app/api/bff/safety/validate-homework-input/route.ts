@@ -44,7 +44,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     // Authorization: the learnerId in the body must be one this session is
     // allowed to act on. Without this, an authenticated parent could write
     // homework-input audit + moderation rows against an unrelated learner.
-    const scopeErr = requireLearnerScope(session!, parsed.data.learnerId, requestId);
+    const scopeErr = await requireLearnerScope(session!, parsed.data.learnerId, requestId);
     if (scopeErr) return scopeErr;
     const sanitized = SAFETY_SANITIZE(parsed.data.text);
     const result = SAFETY_CLASSIFY(sanitized.cleaned, {

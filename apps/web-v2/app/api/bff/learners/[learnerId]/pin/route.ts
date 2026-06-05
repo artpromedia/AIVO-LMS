@@ -25,7 +25,7 @@ async function authorize(req: Request, requestId: string, learnerId: string) {
   if (response) return { error: response };
   const roleErr = requireRole(session!, ["parent"], requestId);
   if (roleErr) return { error: roleErr };
-  const scope = requireLearnerScope(session!, learnerId, requestId);
+  const scope = await requireLearnerScope(session!, learnerId, requestId);
   if (scope) return { error: scope };
   return { session: session! };
 }

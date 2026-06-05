@@ -23,7 +23,7 @@ export async function POST(req: Request, ctx: Params): Promise<NextResponse> {
     const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
     const { learnerId } = await ctx.params;
-    const scope = requireLearnerScope(session!, learnerId, requestId);
+    const scope = await requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
     const consentErr = await requireLearnerConsent(
       session!,

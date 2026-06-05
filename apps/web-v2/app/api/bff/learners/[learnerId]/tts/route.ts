@@ -35,7 +35,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const scopeErr = requireLearnerScope(session!, learnerId, requestId);
+    const scopeErr = await requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
     const consentErr = await requireLearnerConsent(
       session!,

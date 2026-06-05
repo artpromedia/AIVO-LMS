@@ -109,7 +109,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const scope = requireLearnerScope(session!, learnerId, requestId);
+    const scope = await requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
     // Sprint 10 — engagement exposes personalised gamification data
     // (XP, streaks, earned badges). consent:audit now classifies this

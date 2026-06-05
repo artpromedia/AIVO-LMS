@@ -47,7 +47,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     // prevents one authenticated user from poisoning another learner's
     // moderation audit log inside the same tenant.
     if (parsed.data.learnerId) {
-      const scopeErr = requireLearnerScope(session!, parsed.data.learnerId, requestId);
+      const scopeErr = await requireLearnerScope(session!, parsed.data.learnerId, requestId);
       if (scopeErr) return scopeErr;
     }
     const result = SAFETY_CLASSIFY(parsed.data.text, {

@@ -15,7 +15,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const scopeErr = requireLearnerScope(session!, learnerId, requestId);
+    const scopeErr = await requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
     const consentErr = await requireLearnerConsent(
       session!,

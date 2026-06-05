@@ -51,7 +51,7 @@ export async function handleListCurriculum(
   session: SessionProfile,
   learnerId: string,
 ): Promise<NextResponse> {
-  const scopeErr = requireLearnerScope(session, learnerId, requestId);
+  const scopeErr = await requireLearnerScope(session, learnerId, requestId);
   if (scopeErr) return scopeErr;
   try {
     const url = new URL(req.url);
@@ -72,7 +72,7 @@ export async function handleParsePreview(
   session: SessionProfile,
   learnerId: string,
 ): Promise<NextResponse> {
-  const scopeErr = requireLearnerScope(session, learnerId, requestId);
+  const scopeErr = await requireLearnerScope(session, learnerId, requestId);
   if (scopeErr) return scopeErr;
   try {
     const body = (await req.json().catch(() => ({}))) as {
@@ -115,7 +115,7 @@ export async function handleUpload(
   session: SessionProfile,
   learnerId: string,
 ): Promise<NextResponse> {
-  const scopeErr = requireLearnerScope(session, learnerId, requestId);
+  const scopeErr = await requireLearnerScope(session, learnerId, requestId);
   if (scopeErr) return scopeErr;
   try {
     const body = (await req.json().catch(() => ({}))) as {
@@ -188,7 +188,7 @@ export async function handleDeleteCurriculum(
   learnerId: string,
   uploadId: string,
 ): Promise<NextResponse> {
-  const scopeErr = requireLearnerScope(session, learnerId, requestId);
+  const scopeErr = await requireLearnerScope(session, learnerId, requestId);
   if (scopeErr) return scopeErr;
   try {
     const removed = await deleteCurriculumUpload(uploadId, session.tenantId);

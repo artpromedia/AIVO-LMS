@@ -55,7 +55,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     }
     const learnerId = parsed.data.learnerId ?? null;
     if (learnerId) {
-      const scope = requireLearnerScope(session!, learnerId, requestId);
+      const scope = await requireLearnerScope(session!, learnerId, requestId);
       if (scope) return scope;
     }
     const rec = createDataExportRequest({

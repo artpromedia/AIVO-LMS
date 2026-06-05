@@ -31,7 +31,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     // Enforce learner scoping on read regardless of role: a parent for
     // learner A must not be able to read learner B's run even within the
     // same tenant. requireLearnerScope() handles role-aware checks.
-    const scopeErr = requireLearnerScope(session!, state.learnerId, requestId);
+    const scopeErr = await requireLearnerScope(session!, state.learnerId, requestId);
     if (scopeErr) return scopeErr;
     return ok({ state, version: state.version }, requestId);
   } catch (e) {
@@ -61,7 +61,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
-    const scopeErr = requireLearnerScope(session!, parsed.data.learnerId, requestId);
+    const scopeErr = await requireLearnerScope(session!, parsed.data.learnerId, requestId);
     if (scopeErr) return scopeErr;
     const result = putLessonSyncState({
       lessonRunId,

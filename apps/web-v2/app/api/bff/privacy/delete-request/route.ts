@@ -71,7 +71,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       );
     }
     if (learnerId) {
-      const scope = requireLearnerScope(session!, learnerId, requestId);
+      const scope = await requireLearnerScope(session!, learnerId, requestId);
       if (scope) return scope;
     }
     const rec = createDataDeletionRequest({

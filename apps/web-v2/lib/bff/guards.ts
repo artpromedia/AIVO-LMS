@@ -42,9 +42,13 @@ export function requireTenant(session: SessionProfile, tenantId: string, request
  * - teacher/admins: must share tenantId (cross-tenant blocked here; finer
  *   classroom-level scoping comes in Sprint 18)
  */
-export function requireLearnerScope(session: SessionProfile, learnerId: string, requestId: string) {
+export async function requireLearnerScope(
+  session: SessionProfile,
+  learnerId: string,
+  requestId: string,
+) {
   if (session.role === "parent") {
-    if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+    if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
       return fail(
         { ...ERRORS.FORBIDDEN_LEARNER, message: "Parent not linked to learner" },
         requestId,
@@ -61,7 +65,7 @@ export function requireLearnerScope(session: SessionProfile, learnerId: string, 
     }
     return null;
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) {
     return fail({ ...ERRORS.FORBIDDEN_LEARNER, message: "Learner not found in tenant" }, requestId);
   }
