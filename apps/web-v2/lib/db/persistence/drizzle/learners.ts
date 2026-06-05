@@ -279,4 +279,28 @@ export const drizzleLearners: LearnerStore = {
     await db.update(webLearnerProfiles).set({ data: next }).where(eq(webLearnerProfiles.id, id));
     return next;
   },
+
+  async getAccessibility(id, tenantId) {
+    const [row] = await getDb()
+      .select()
+      .from(webLearnerProfiles)
+      .where(and(eq(webLearnerProfiles.id, id), eq(webLearnerProfiles.tenantId, tenantId)))
+      .limit(1);
+    if (!row) return null;
+    return (row.data as LearnerProfile).accessibilityPreferences ?? null;
+  },
+
+  async setAccessibility(id, tenantId, prefs) {
+    const db = getDb();
+    const [row] = await db
+      .select()
+      .from(webLearnerProfiles)
+      .where(and(eq(webLearnerProfiles.id, id), eq(webLearnerProfiles.tenantId, tenantId)))
+      .limit(1);
+    if (!row) return null;
+    const existing = row.data as LearnerProfile;
+    const next: LearnerProfile = { ...existing, accessibilityPreferences: prefs ?? undefined };
+    await db.update(webLearnerProfiles).set({ data: next }).where(eq(webLearnerProfiles.id, id));
+    return next.accessibilityPreferences ?? null;
+  },
 };

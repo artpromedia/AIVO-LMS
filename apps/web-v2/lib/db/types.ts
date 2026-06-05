@@ -4,6 +4,10 @@
  * Every entity carries tenantId for multi-tenant scoping.
  */
 import type { Role } from "@/lib/auth/types";
+import {
+  ACCESSIBILITY_DEFAULTS as CONTRACT_ACCESSIBILITY_DEFAULTS,
+  type AccessibilityProfile,
+} from "@aivo/accessibility-contract";
 
 export type ID = string;
 export type ISODate = string;
@@ -81,6 +85,14 @@ export type LearnerProfile = {
   knownStrengths: string[];
   knownChallenges: string[];
   accessibilityDefaults: LearnerAccessibilityDefaults;
+  /**
+   * Per-learner runtime accessibility preferences (the 16-field
+   * AccessibilityProfile + envelope). Stored on the learner document so it
+   * persists durably through the same JSON-backed persistence adapter as the
+   * rest of the profile — no separate table. Undefined until first set; the
+   * repo returns ACCESSIBILITY_DEFAULTS in that case.
+   */
+  accessibilityPreferences?: AccessibilityPreferences;
   /** Sprint A: parent-supplied US zip; null if not provided. */
   zipCode: string | null;
   /** Sprint A: NCES district ID resolved from the zip (or null). */
@@ -408,54 +420,20 @@ export type LearnerBrainProfile = {
   updatedAt: ISODate;
 };
 
-export type AccessibilityPreferences = {
+/**
+ * Per-learner accessibility preferences. The preference fields are the
+ * canonical `AccessibilityProfile` from @aivo/accessibility-contract (the same
+ * model the mobile client and the BFF Zod schema derive from); this type only
+ * adds the persistence envelope. Add new preferences in the contract, not here.
+ */
+export type AccessibilityPreferences = AccessibilityProfile & {
   learnerId: ID;
   tenantId: ID;
-  reducedMotion: boolean;
-  highContrast: boolean;
-  largeText: boolean;
-  audioFirst: boolean;
-  captionsAlwaysOn: boolean;
-  hapticsEnabled: boolean;
-  // Sprint 15 additions — full preference surface drives lesson UI + generation.
-  readAloud: boolean;
-  dyslexiaFriendlyFont: boolean;
-  shorterSteps: boolean;
-  extraHints: boolean;
-  visualSupports: boolean;
-  breakReminders: boolean;
-  keyboardOptimized: boolean;
-  // Sprint 7 — AAC bridge integration. When `aacEnabled` is true the
-  // lesson player and tutor chat mount the AACTargetProvider and route
-  // focus/selection through the configured input method.
-  aacEnabled: boolean;
-  aacInputMethod: "touch" | "switch_1" | "switch_2" | "eye_gaze" | "head_pointer";
-  aacScanDelayMs: number;
   updatedAt: ISODate;
 };
 
 /** Defaults applied when no preferences are stored for a learner. */
-export const ACCESSIBILITY_DEFAULTS: Omit<
-  AccessibilityPreferences,
-  "learnerId" | "tenantId" | "updatedAt"
-> = {
-  reducedMotion: false,
-  highContrast: false,
-  largeText: false,
-  audioFirst: false,
-  captionsAlwaysOn: false,
-  hapticsEnabled: false,
-  readAloud: false,
-  dyslexiaFriendlyFont: false,
-  shorterSteps: false,
-  extraHints: false,
-  visualSupports: false,
-  breakReminders: false,
-  keyboardOptimized: false,
-  aacEnabled: false,
-  aacInputMethod: "touch",
-  aacScanDelayMs: 1000,
-};
+export const ACCESSIBILITY_DEFAULTS: AccessibilityProfile = CONTRACT_ACCESSIBILITY_DEFAULTS;
 
 // ===== Curriculum =====
 export type Subject = {

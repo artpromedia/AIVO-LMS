@@ -23,6 +23,7 @@ import type {
   Enrollment,
   GeneratedLessonPlan,
   IEPDocument,
+  AccessibilityPreferences,
   LearnerBrainProfile,
   LearnerProfile,
   LessonInteraction,
@@ -168,6 +169,21 @@ export interface LearnerStore {
     tenantId: string,
     state: ReadinessState,
   ): Promise<LearnerProfile | null>;
+  /**
+   * Read the learner's stored accessibility preferences, or null if none have
+   * been set (caller applies ACCESSIBILITY_DEFAULTS). Persisted on the learner
+   * document so it is durable across restarts and shared across devices.
+   */
+  getAccessibility(id: string, tenantId: string): Promise<AccessibilityPreferences | null>;
+  /**
+   * Upsert the learner's accessibility preferences (pass null to clear back to
+   * defaults). Returns the stored value (or null on clear / unknown learner).
+   */
+  setAccessibility(
+    id: string,
+    tenantId: string,
+    prefs: AccessibilityPreferences | null,
+  ): Promise<AccessibilityPreferences | null>;
 }
 
 /**

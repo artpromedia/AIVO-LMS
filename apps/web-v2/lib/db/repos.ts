@@ -2336,14 +2336,18 @@ export async function retryLessonRun(
 }
 
 // ===== Sprint 15: Accessibility preferences =====
-
-function accessibilityKey(learnerId: ID, tenantId: ID) {
-  return `${tenantId}:${learnerId}`;
-}
+//
+// Routed through the persistence adapter (ADR 0007). Preferences live on the
+// learner document, so they persist durably (Postgres jsonb in production,
+// in-memory in dev/test) and are shared across every device a learner signs in
+// from — replacing the previous per-process in-memory Map.
 
 /** Returns the stored preferences or a defaults object when none persisted. */
-export function getAccessibilityPrefs(learnerId: ID, tenantId: ID): AccessibilityPreferences {
-  const stored = db().accessibilityPrefs.get(accessibilityKey(learnerId, tenantId));
+export async function getAccessibilityPrefs(
+  learnerId: ID,
+  tenantId: ID,
+): Promise<AccessibilityPreferences> {
+  const stored = await getPersistence().learners.getAccessibility(learnerId, tenantId);
   if (stored) return stored;
   return {
     learnerId,
@@ -2357,12 +2361,12 @@ export function getAccessibilityPrefs(learnerId: ID, tenantId: ID): Accessibilit
  * Partial update — fields not present in `patch` are preserved. Returns the
  * persisted record. Creates the record on first write.
  */
-export function updateAccessibilityPrefs(
+export async function updateAccessibilityPrefs(
   learnerId: ID,
   tenantId: ID,
   patch: Partial<Omit<AccessibilityPreferences, "learnerId" | "tenantId" | "updatedAt">>,
-): AccessibilityPreferences {
-  const current = getAccessibilityPrefs(learnerId, tenantId);
+): Promise<AccessibilityPreferences> {
+  const current = await getAccessibilityPrefs(learnerId, tenantId);
   const next: AccessibilityPreferences = {
     ...current,
     ...patch,
@@ -2370,13 +2374,16 @@ export function updateAccessibilityPrefs(
     tenantId,
     updatedAt: nowIso(),
   };
-  db().accessibilityPrefs.set(accessibilityKey(learnerId, tenantId), next);
+  await getPersistence().learners.setAccessibility(learnerId, tenantId, next);
   return next;
 }
 
-/** Restore defaults, deleting any stored row. Returns the defaults record. */
-export function resetAccessibilityPrefs(learnerId: ID, tenantId: ID): AccessibilityPreferences {
-  db().accessibilityPrefs.delete(accessibilityKey(learnerId, tenantId));
+/** Restore defaults, clearing any stored row. Returns the defaults record. */
+export async function resetAccessibilityPrefs(
+  learnerId: ID,
+  tenantId: ID,
+): Promise<AccessibilityPreferences> {
+  await getPersistence().learners.setAccessibility(learnerId, tenantId, null);
   return getAccessibilityPrefs(learnerId, tenantId);
 }
 

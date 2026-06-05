@@ -152,8 +152,24 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
     setStatus(null);
   }
 
+  function setAac<K extends "aacInputMethod" | "aacScanDelayMs">(
+    key: K,
+    value: AccessibilityPreferences[K],
+  ) {
+    setPrefs((p) => ({ ...p, [key]: value }));
+    setStatus(null);
+  }
+
   function save() {
-    const patch = Object.fromEntries(TOGGLES.map((t) => [t.key, prefs[t.key]]));
+    const patch: Record<string, unknown> = Object.fromEntries(
+      TOGGLES.map((t) => [t.key, prefs[t.key]]),
+    );
+    // When AAC is on, persist the input method + scan delay alongside the
+    // on/off flag so the lesson player can configure the scanner correctly.
+    if (prefs.aacEnabled) {
+      patch.aacInputMethod = prefs.aacInputMethod;
+      patch.aacScanDelayMs = prefs.aacScanDelayMs;
+    }
     startSaving(async () => {
       const res = await fetch(`/api/bff/learners/${learnerId}/accessibility`, {
         method: "PATCH",
@@ -187,7 +203,20 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
     });
   }
 
-  const groups: Array<"reading" | "motion" | "support"> = ["reading", "motion", "support"];
+  const groups: Array<"reading" | "motion" | "support" | "aac"> = [
+    "reading",
+    "motion",
+    "support",
+    "aac",
+  ];
+
+  const AAC_INPUT_METHODS: Array<{ value: AccessibilityPreferences["aacInputMethod"]; label: string }> = [
+    { value: "touch", label: "Touch / direct select" },
+    { value: "switch_1", label: "Single switch (auto-scan)" },
+    { value: "switch_2", label: "Two switches (step scan)" },
+    { value: "eye_gaze", label: "Eye gaze" },
+    { value: "head_pointer", label: "Head pointer" },
+  ];
 
   return (
     <div className="grid gap-4">
@@ -214,6 +243,54 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
               </li>
             ))}
           </ul>
+
+          {g === "aac" && prefs.aacEnabled && (
+            <div className="mt-4 grid gap-4 rounded-md border border-aivo-line p-3 sm:grid-cols-2">
+              <div className="flex flex-col gap-1">
+                <Label htmlFor="aacInputMethod" className="font-medium">
+                  Input method
+                </Label>
+                <select
+                  id="aacInputMethod"
+                  value={prefs.aacInputMethod}
+                  onChange={(e) =>
+                    setAac(
+                      "aacInputMethod",
+                      e.target.value as AccessibilityPreferences["aacInputMethod"],
+                    )
+                  }
+                  className="rounded-md border border-aivo-line bg-transparent px-2 py-2 text-sm"
+                >
+                  {AAC_INPUT_METHODS.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label htmlFor="aacScanDelayMs" className="font-medium">
+                  Scan / dwell time (ms)
+                </Label>
+                <input
+                  id="aacScanDelayMs"
+                  type="number"
+                  min={300}
+                  max={5000}
+                  step={100}
+                  value={prefs.aacScanDelayMs}
+                  onChange={(e) => {
+                    const n = Math.min(5000, Math.max(300, Number(e.target.value) || 1200));
+                    setAac("aacScanDelayMs", n);
+                  }}
+                  className="rounded-md border border-aivo-line bg-transparent px-2 py-2 text-sm"
+                />
+                <p className="text-xs text-aivo-ink-soft">
+                  How long the scanner waits on each option (300–5000 ms).
+                </p>
+              </div>
+            </div>
+          )}
         </Card>
       ))}
 

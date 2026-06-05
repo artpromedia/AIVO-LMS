@@ -1,0 +1,39 @@
+{
+  "name": "@aivo/accessibility-contract",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Canonical, single-source accessibility preference contract shared by the web (apps/web-v2) and mobile (apps/mobile) learner interfaces. Eliminates schema drift: field names, value bounds, AAC input methods, and TTS voices are declared once. The zero-dependency `index` entry is safe for React Native; the `./schema` entry adds Zod validation for the web BFF.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js",
+      "default": "./dist/schema.js"
+    }
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

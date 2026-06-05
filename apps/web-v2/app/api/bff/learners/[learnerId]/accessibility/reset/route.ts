@@ -36,7 +36,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!getLearner(learnerId, session!.tenantId)) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
-    const next = resetAccessibilityPrefs(learnerId, session!.tenantId);
+    const next = await resetAccessibilityPrefs(learnerId, session!.tenantId);
     audit(session!, "accessibility.reset", requestId, { learnerId });
     return ok({ accessibility: next }, requestId);
   } catch (e) {

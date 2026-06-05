@@ -36,7 +36,7 @@ export default async function LearnerAccessibilitySettingsPage() {
   ) {
     redirect("/learner/select");
   }
-  const prefs = getAccessibilityPrefs(learnerId, session.tenantId);
+  const prefs = await getAccessibilityPrefs(learnerId, session.tenantId);
   const t = await getTranslations("learner.settings_a11y");
 
   return (

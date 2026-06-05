@@ -59,7 +59,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
     const active = await readActiveLearnerFromCookies(session);
     if (active !== learner.id) redirect("/learner/select");
   }
-  const a11y = getAccessibilityPrefs(learner.id, session.tenantId);
+  const a11y = await getAccessibilityPrefs(learner.id, session.tenantId);
   const lessonSubject = await getSubjectById(lessonRun.subjectId);
   const v2Enabled = lessonPlayerV2Enabled();
 

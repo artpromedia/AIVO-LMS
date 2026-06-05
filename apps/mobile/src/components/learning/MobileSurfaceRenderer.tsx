@@ -28,6 +28,9 @@ import Svg, { Circle, Line, Polyline, Rect } from "react-native-svg";
 import { Audio, Video, ResizeMode } from "expo-av";
 import { emitSurfaceTelemetry } from "@/lib/surface-telemetry";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
+import { useLessonAccommodations } from "@/hooks/useLessonAccommodations";
+import { usePreferences } from "@/lib/preferences";
+import { useA11yStyle } from "@/lib/a11y-style";
 import { ScratchPad, type ScratchStroke } from "./ScratchPad";
 
 /**
@@ -164,8 +167,25 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitle
   const kind = beat.surface.kind;
   const cfg = beat.surface.config;
 
+  // Honor the learner's accessibility accommodations on the lesson surface:
+  // text scaling (`scale`), dyslexia-friendly body face (`bodyFontFamily`),
+  // read-aloud (announce the prompt), and always-on captions for spoken
+  // surfaces. These were previously inert — set in settings, applied nowhere.
+  const accommodations = useLessonAccommodations();
+  const { scale } = usePreferences();
+  const { bodyFontFamily, announce } = useA11yStyle();
+
   const title = kind.replace(/_/g, " ");
   const isFallback = !FULL_MOBILE_KINDS.has(kind);
+  const isSpoken = kind === "audio" || kind === "video" || kind === "voice_response";
+
+  // Read-aloud: when enabled, announce the prompt once so a learner who relies
+  // on audio hears the task without reaching for the speaker control.
+  useEffect(() => {
+    if (accommodations.readAloud && beat.text) announce(beat.text);
+    // Announce only when the prompt or the preference changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [beat.text, accommodations.readAloud]);
 
   // Sprint 3: report which surface the learner actually got. A fallback kind
   // (no dedicated mobile renderer) emits `unsupported_surface` so the gap is
@@ -192,8 +212,23 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitle
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.title}>{title}</Text>
-      {beat.text ? <Text style={styles.body}>{beat.text}</Text> : null}
+      <Text style={[styles.title, { fontSize: scale(18) }]}>{title}</Text>
+      {beat.text ? (
+        <Text style={[styles.body, { fontSize: scale(18), fontFamily: bodyFontFamily }]}>
+          {beat.text}
+        </Text>
+      ) : null}
+
+      {/* Always-on captions: for spoken surfaces, keep the prompt text visible
+          as a caption even when the learner is listening. */}
+      {accommodations.captionsAlwaysOn && isSpoken && beat.text ? (
+        <Text
+          style={[styles.note, { fontSize: scale(14) }]}
+          accessibilityLabel={`Caption: ${beat.text}`}
+        >
+          {beat.text}
+        </Text>
+      ) : null}
 
       {kind === "text_response" ? (
         <TextResponseSurface theme={theme} disabled={disabled} onSubmit={onSubmit} />

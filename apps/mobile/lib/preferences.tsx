@@ -9,8 +9,19 @@
  * Pure types + sanitisation live in `./preferences-logic` so they stay
  * node-testable; this module only adds React state + storage.
  */
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { AccessibilityProfile } from "@aivo/accessibility-contract";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 import {
   type A11yPreferences,
   type AudioPreferences,
@@ -21,6 +32,7 @@ import {
   coerceAudio,
   scaleFont,
 } from "./preferences-logic";
+import { a11yToProfile, profileToA11yPatch } from "./accessibility-sync";
 
 const A11Y_KEY = "@aivo/a11y_prefs_v1";
 const AUDIO_KEY = "@aivo/audio_prefs_v1";
@@ -49,10 +61,26 @@ const defaultValue: PreferencesContextValue = {
 
 const PreferencesContext = createContext<PreferencesContextValue>(defaultValue);
 
-export function PreferencesProvider({ children }: { children: React.ReactNode }) {
+interface PreferencesProviderProps {
+  children: React.ReactNode;
+  /** Optional learner id — when provided, accessibility prefs sync to the
+   *  backend (assessment-svc) so they follow the learner across devices.
+   *  Safe to omit (auth / parent flows with no learner). */
+  learnerId?: string | null;
+}
+
+export function PreferencesProvider({ children, learnerId }: PreferencesProviderProps) {
   const [a11y, setA11yState] = useState<A11yPreferences>(DEFAULT_A11Y);
   const [audio, setAudioState] = useState<AudioPreferences>(DEFAULT_AUDIO);
   const [isHydrated, setIsHydrated] = useState(false);
+  // Mirror of the latest a11y for use inside effects without re-subscribing.
+  const a11yRef = useRef(a11y);
+  useEffect(() => {
+    a11yRef.current = a11y;
+  }, [a11y]);
+  // Tracks the learner we've already reconciled, so the GET fires once per
+  // learner rather than on every render.
+  const reconciledLearnerRef = useRef<string | null>(null);
 
   // Hydrate both preference groups on mount.
   useEffect(() => {
@@ -74,13 +102,76 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
     };
   }, []);
 
-  const setA11y = useCallback((patch: Partial<A11yPreferences>) => {
+  // Apply a patch locally (state + AsyncStorage) WITHOUT a backend round-trip.
+  // Used by the reconcile path so adopting the server's values doesn't echo
+  // straight back to the server.
+  const applyA11yLocal = useCallback((patch: Partial<A11yPreferences>) => {
     setA11yState((prev) => {
       const next = coerceA11y({ ...prev, ...patch });
       void AsyncStorage.setItem(A11Y_KEY, JSON.stringify(next)).catch(() => {});
       return next;
     });
   }, []);
+
+  // Best-effort upload of the canonical profile (mirrors SensoryModeProvider).
+  const syncA11yToBackend = useCallback(
+    async (next: A11yPreferences) => {
+      if (!learnerId) return;
+      try {
+        await apiFetch(API.ASSESSMENT, "/api/assessments/accessibility-preferences", {
+          method: "POST",
+          body: JSON.stringify({ learnerId, ...a11yToProfile(next) }),
+        });
+      } catch {
+        // Offline / 5xx — the local choice is still honored.
+      }
+    },
+    [learnerId],
+  );
+
+  // On sign-in, fetch the server profile and reconcile (server wins for the
+  // shared fields). Keeps the local cache, so the app works offline.
+  useEffect(() => {
+    if (!learnerId) {
+      reconciledLearnerRef.current = null;
+      return;
+    }
+    if (reconciledLearnerRef.current === learnerId) return;
+    reconciledLearnerRef.current = learnerId;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await apiFetch(
+          API.ASSESSMENT,
+          `/api/assessments/accessibility-preferences/${learnerId}`,
+          { method: "GET" },
+        );
+        if (!res.ok) return;
+        const data = (await res.json()) as { prefs: Partial<AccessibilityProfile> | null };
+        if (cancelled || !data?.prefs) return;
+        const patch = profileToA11yPatch(data.prefs, a11yRef.current);
+        if (Object.keys(patch).length > 0) applyA11yLocal(patch);
+      } catch {
+        // Offline / 5xx — keep the local choice.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [learnerId, applyA11yLocal]);
+
+  const setA11y = useCallback(
+    (patch: Partial<A11yPreferences>) => {
+      setA11yState((prev) => {
+        const next = coerceA11y({ ...prev, ...patch });
+        void AsyncStorage.setItem(A11Y_KEY, JSON.stringify(next)).catch(() => {});
+        void syncA11yToBackend(next);
+        return next;
+      });
+    },
+    [syncA11yToBackend],
+  );
 
   const setAudio = useCallback((patch: Partial<AudioPreferences>) => {
     setAudioState((prev) => {

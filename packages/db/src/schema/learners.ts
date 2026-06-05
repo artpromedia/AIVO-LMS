@@ -65,6 +65,22 @@ export const sensoryProfiles = pgTable("sensory_profiles", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Per-learner accessibility preferences, synced across devices.
+//
+// Stores the canonical @aivo/accessibility-contract `AccessibilityProfile`
+// (16 fields) as a JSONB blob keyed by learner, so the field set can evolve in
+// the contract without a migration. The mobile app reads/writes this through
+// assessment-svc (mirroring the sensory-profile sync) so a learner's choices
+// follow them across devices; the web BFF persists the same shape on its
+// learner document.
+export const learnerAccessibilityPrefs = pgTable("learner_accessibility_prefs", {
+  learnerId: uuid("learner_id")
+    .references(() => learners.id, { onDelete: "cascade" })
+    .primaryKey(),
+  prefs: jsonb("prefs").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const iepDocuments = pgTable("iep_documents", {
   id: uuid("id").defaultRandom().primaryKey(),
   learnerId: uuid("learner_id")

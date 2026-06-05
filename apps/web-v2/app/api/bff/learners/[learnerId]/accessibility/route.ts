@@ -5,7 +5,7 @@
  * partial update with strict validation.
  */
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import { AccessibilityPatchSchema } from "@aivo/accessibility-contract/schema";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
@@ -17,23 +17,11 @@ export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ learnerId: string }> };
 
-const PatchSchema = z
-  .object({
-    reducedMotion: z.boolean().optional(),
-    highContrast: z.boolean().optional(),
-    largeText: z.boolean().optional(),
-    audioFirst: z.boolean().optional(),
-    captionsAlwaysOn: z.boolean().optional(),
-    hapticsEnabled: z.boolean().optional(),
-    readAloud: z.boolean().optional(),
-    dyslexiaFriendlyFont: z.boolean().optional(),
-    shorterSteps: z.boolean().optional(),
-    extraHints: z.boolean().optional(),
-    visualSupports: z.boolean().optional(),
-    breakReminders: z.boolean().optional(),
-    keyboardOptimized: z.boolean().optional(),
-  })
-  .strict();
+// Single source of truth: the partial+strict patch schema is derived from the
+// canonical @aivo/accessibility-contract, the same module the mobile client
+// consumes — so the two surfaces can no longer drift. Includes the AAC fields,
+// which the previous hand-rolled schema omitted (breaking every save).
+const PatchSchema = AccessibilityPatchSchema;
 
 export async function GET(req: Request, { params }: Params): Promise<NextResponse> {
   const requestId = getRequestId(req);
@@ -59,7 +47,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (!getLearner(learnerId, session!.tenantId)) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
-    const prefs = getAccessibilityPrefs(learnerId, session!.tenantId);
+    const prefs = await getAccessibilityPrefs(learnerId, session!.tenantId);
     return ok({ accessibility: prefs }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -97,7 +85,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         requestId,
       );
     }
-    const next = updateAccessibilityPrefs(learnerId, session!.tenantId, parsed.data);
+    const next = await updateAccessibilityPrefs(learnerId, session!.tenantId, parsed.data);
     audit(session!, "accessibility.update", requestId, {
       learnerId,
       metadata: { changedKeys: Object.keys(parsed.data) },
