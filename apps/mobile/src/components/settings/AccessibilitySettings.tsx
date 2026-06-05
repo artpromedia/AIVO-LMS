@@ -6,7 +6,7 @@ import { useA11yPreferences } from "@/lib/preferences";
 import { TEXT_SCALES, type TextScale } from "@/lib/preferences-logic";
 import { Card, SensoryToggle } from "@/components/ui";
 import { spacing, radius } from "@/constants/colors";
-import { fontFamilies } from "@/constants/typography";
+import { fontFamilies, DYSLEXIC_BODY_FONT } from "@/constants/typography";
 
 /**
  * Shared accessibility settings body, reused by the global
@@ -94,7 +94,9 @@ export function AccessibilitySettings({ scopeNote }: AccessibilitySettingsProps)
           <Text
             style={{
               color: palette.ink,
-              fontFamily: fontFamilies.bodyRegular,
+              fontFamily: prefs.dyslexiaFriendlyFont
+                ? DYSLEXIC_BODY_FONT
+                : fontFamilies.bodyRegular,
               fontSize: scale(15),
             }}
           >
@@ -127,6 +129,23 @@ export function AccessibilitySettings({ scopeNote }: AccessibilitySettingsProps)
           desc={t("a11y.captionsDesc", "Show captions on spoken audio and video.")}
           value={prefs.captionsDefault}
           onChange={(v) => setPref({ captionsDefault: v })}
+          palette={palette}
+        />
+        <ToggleRow
+          title={t("a11y.dyslexiaFont", "Dyslexia-friendly font")}
+          desc={t(
+            "a11y.dyslexiaFontDesc",
+            "Switch body text to an evenly-spaced, easier-to-read face.",
+          )}
+          value={prefs.dyslexiaFriendlyFont}
+          onChange={(v) => setPref({ dyslexiaFriendlyFont: v })}
+          palette={palette}
+        />
+        <ToggleRow
+          title={t("a11y.breakReminders", "Break reminders")}
+          desc={t("a11y.breakRemindersDesc", "Gentle prompts to pause and rest during a session.")}
+          value={prefs.breakReminders}
+          onChange={(v) => setPref({ breakReminders: v })}
           palette={palette}
           last
         />

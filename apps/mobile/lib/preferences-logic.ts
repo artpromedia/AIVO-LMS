@@ -31,14 +31,31 @@ export interface A11yPreferences {
   readAloudDefault: boolean;
   /** Always show captions on audio/video. */
   captionsDefault: boolean;
+  /** Swap body text to the bundled OpenDyslexic face. Web parity. */
+  dyslexiaFriendlyFont: boolean;
+  /** Gentle, periodic "take a break" prompts during a session. */
+  breakReminders: boolean;
+  /** Minutes between break prompts when `breakReminders` is on (2–45). */
+  breakIntervalMinutes: number;
 }
+
+export const MIN_BREAK_INTERVAL = 2;
+export const MAX_BREAK_INTERVAL = 45;
 
 export const DEFAULT_A11Y: A11yPreferences = {
   reduceMotion: false,
   textScale: "medium",
   readAloudDefault: false,
   captionsDefault: false,
+  dyslexiaFriendlyFont: false,
+  breakReminders: false,
+  breakIntervalMinutes: 10,
 };
+
+export function clampBreakInterval(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_A11Y.breakIntervalMinutes;
+  return Math.max(MIN_BREAK_INTERVAL, Math.min(MAX_BREAK_INTERVAL, Math.round(value)));
+}
 
 /** TTS voices — ids mirror web's `lib/tts` voice catalogue. */
 export type VoiceId =
@@ -134,6 +151,17 @@ export function coerceA11y(raw: unknown): A11yPreferences {
       typeof o.readAloudDefault === "boolean" ? o.readAloudDefault : DEFAULT_A11Y.readAloudDefault,
     captionsDefault:
       typeof o.captionsDefault === "boolean" ? o.captionsDefault : DEFAULT_A11Y.captionsDefault,
+    dyslexiaFriendlyFont:
+      typeof o.dyslexiaFriendlyFont === "boolean"
+        ? o.dyslexiaFriendlyFont
+        : DEFAULT_A11Y.dyslexiaFriendlyFont,
+    breakReminders:
+      typeof o.breakReminders === "boolean" ? o.breakReminders : DEFAULT_A11Y.breakReminders,
+    breakIntervalMinutes: clampBreakInterval(
+      typeof o.breakIntervalMinutes === "number"
+        ? o.breakIntervalMinutes
+        : DEFAULT_A11Y.breakIntervalMinutes,
+    ),
   };
 }
 

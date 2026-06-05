@@ -1,0 +1,47 @@
+/*
+ * Self-hosted dyslexia-friendly webfonts.
+ *
+ * Before this file existed, `[data-typeface="dyslexia"]` only swapped a CSS
+ * variable to a *family name* ("Atkinson Hyperlegible, OpenDyslexic") that was
+ * never actually loaded — so on any device without those fonts installed the
+ * dyslexia mode silently did nothing. These @font-face rules bundle the real
+ * binaries from apps/web-v2/public/fonts so the mode works everywhere, offline.
+ *
+ * Fonts ship under the SIL Open Font License (see the OFL-*.txt files next to
+ * the binaries). Atkinson Hyperlegible is the primary face (Braille Institute,
+ * engineered for legibility); OpenDyslexic is offered as an alternative.
+ */
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/AtkinsonHyperlegible-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/AtkinsonHyperlegible-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("/fonts/OpenDyslexic-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Dyslexia mode now also applies the spacing the research calls for
+ * (letter-spacing ~0.03em, line-height 1.7), and pins a concrete fallback
+ * family in case the brand `--aivo-fontFamily-dyslexia` ramp is undefined on a
+ * given surface. The base globals.css block still rewires --font-sans etc.;
+ * this augments it so the binaries above are always the resolved family.
+ */
+[data-typeface="dyslexia"] {
+  --aivo-fontFamily-dyslexia: "Atkinson Hyperlegible", "OpenDyslexic", system-ui, sans-serif;
+  letter-spacing: 0.03em;
+  line-height: 1.7;
+}

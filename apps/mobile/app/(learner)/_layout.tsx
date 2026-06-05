@@ -6,6 +6,7 @@ import { useLearners } from "@/hooks/useLearners";
 import { useAuth } from "@/hooks/useAuth";
 import { TierThemeProvider, useTierTheme } from "@aivo/mobile-ui";
 import { SwitchScanOverlay } from "@/src/components/SwitchScanOverlay";
+import { BreakReminder } from "@/src/components/learning/BreakReminder";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 import { useTabBarStyle, TAB_BAR_LABEL_STYLE } from "@/hooks/useTabBarStyle";
@@ -49,6 +50,8 @@ export default function LearnerLayout() {
       <ThemedLearnerTabs />
       {/* Global switch scanning overlay — only mounted for eligible learners */}
       <SwitchScanOverlay active={switchScanEnabled} items={[]} />
+      {/* Periodic break prompt — active only when the learner enables it. */}
+      <BreakReminder />
     </TierThemeProvider>
   );
 }

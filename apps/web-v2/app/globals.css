@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "@aivo/brand/tokens.css";
 
+/* Self-hosted dyslexia webfonts + accessibility-mode rules that make
+ * per-learner preferences actually render. Kept in dedicated files so the
+ * @font-face binaries and the data-* mode rules are easy to audit. */
+@import "./fonts-dyslexia.css";
+@import "./a11y-modes.css";
+
 /* Pull in the v3-style @aivo/brand Tailwind preset (iw-*, brand-*, sensory-mode
  * aware utility colors). Tailwind v4 ignores `tailwind.config.cjs` unless it is
  * explicitly loaded via this directive, so without it every `bg-iw-bg`,

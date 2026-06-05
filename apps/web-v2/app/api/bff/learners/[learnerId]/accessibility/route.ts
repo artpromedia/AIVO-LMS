@@ -32,6 +32,16 @@ const PatchSchema = z
     visualSupports: z.boolean().optional(),
     breakReminders: z.boolean().optional(),
     keyboardOptimized: z.boolean().optional(),
+    // Sprint 7 — AAC bridge. These fields exist on AccessibilityPreferences
+    // and the form sends `aacEnabled` on every save; without them here the
+    // strict schema rejected the whole PATCH, so saving any preference failed
+    // and AAC could never be turned on. The lesson player already mounts the
+    // AACTargetProvider when `aacEnabled` is true.
+    aacEnabled: z.boolean().optional(),
+    aacInputMethod: z
+      .enum(["touch", "switch_1", "switch_2", "eye_gaze", "head_pointer"])
+      .optional(),
+    aacScanDelayMs: z.number().int().min(300).max(5000).optional(),
   })
   .strict();
 

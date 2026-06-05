@@ -1,0 +1,42 @@
+/*
+ * Accessibility-mode CSS that gives previously-inert learner preferences a
+ * real, visible effect. Each block is keyed off a `data-*` attribute that the
+ * lesson player (and other learner surfaces) stamp from the per-learner
+ * AccessibilityPreferences.
+ */
+
+/* Keyboard-optimized: upscale every interactive target to >=48x48 CSS px
+   (WCAG 2.5.8 Target Size enhanced) and make the focus ring unmistakable. */
+[data-keyboard-optimized="on"] button,
+[data-keyboard-optimized="on"] a[href],
+[data-keyboard-optimized="on"] [role="button"],
+[data-keyboard-optimized="on"] input,
+[data-keyboard-optimized="on"] select,
+[data-keyboard-optimized="on"] textarea {
+  min-height: 48px;
+  min-width: 48px;
+}
+[data-keyboard-optimized="on"] :focus-visible {
+  outline: 4px solid var(--color-aivo-primary, #3b5bdb);
+  outline-offset: 3px;
+}
+
+/* Visual supports: reveal optional iconography / diagram captions that are
+   hidden by default so the standard view stays uncluttered. Authors tag such
+   elements with `data-visual-support`. */
+[data-visual-support] {
+  display: none;
+}
+[data-visual-supports="on"] [data-visual-support] {
+  display: revert;
+}
+
+/* Larger-text scale parity with mobile's textScale ramp. `largeText` already
+   adds Tailwind classes in the player; this lets non-player learner chrome
+   honor the same intent via a single root attribute. */
+[data-text-scale="large"] {
+  font-size: 1.0625rem;
+}
+[data-text-scale="xlarge"] {
+  font-size: 1.1875rem;
+}

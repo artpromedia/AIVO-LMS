@@ -3,12 +3,15 @@ import {
   coerceA11y,
   coerceAudio,
   clampSpeed,
+  clampBreakInterval,
   scaleFont,
   TEXT_SCALE_FACTOR,
   DEFAULT_A11Y,
   DEFAULT_AUDIO,
   MIN_SPEED,
   MAX_SPEED,
+  MIN_BREAK_INTERVAL,
+  MAX_BREAK_INTERVAL,
   resolveLessonAccommodations,
 } from "../lib/preferences-logic";
 
@@ -33,7 +36,7 @@ describe("resolveLessonAccommodations", () => {
 
   it("passes through captions, reduced motion, and text scale", () => {
     const r = resolveLessonAccommodations(
-      { reduceMotion: true, textScale: "large", readAloudDefault: false, captionsDefault: true },
+      { ...DEFAULT_A11Y, reduceMotion: true, textScale: "large", captionsDefault: true },
       DEFAULT_AUDIO,
     );
     expect(r.captionsAlwaysOn).toBe(true);
@@ -60,7 +63,26 @@ describe("preferences-logic", () => {
       textScale: "large",
       readAloudDefault: true,
       captionsDefault: false,
+      dyslexiaFriendlyFont: false,
+      breakReminders: false,
+      breakIntervalMinutes: 10,
     });
+  });
+
+  it("coerceA11y handles dyslexia font + break reminders and clamps the interval", () => {
+    expect(coerceA11y({ dyslexiaFriendlyFont: true }).dyslexiaFriendlyFont).toBe(true);
+    expect(coerceA11y({ dyslexiaFriendlyFont: "yes" }).dyslexiaFriendlyFont).toBe(false);
+    expect(coerceA11y({ breakReminders: true }).breakReminders).toBe(true);
+    expect(coerceA11y({ breakIntervalMinutes: 1 }).breakIntervalMinutes).toBe(MIN_BREAK_INTERVAL);
+    expect(coerceA11y({ breakIntervalMinutes: 999 }).breakIntervalMinutes).toBe(MAX_BREAK_INTERVAL);
+    expect(coerceA11y({ breakIntervalMinutes: 15 }).breakIntervalMinutes).toBe(15);
+  });
+
+  it("clampBreakInterval keeps values in range and tolerates NaN", () => {
+    expect(clampBreakInterval(10)).toBe(10);
+    expect(clampBreakInterval(1)).toBe(MIN_BREAK_INTERVAL);
+    expect(clampBreakInterval(99)).toBe(MAX_BREAK_INTERVAL);
+    expect(clampBreakInterval(Number.NaN)).toBe(DEFAULT_A11Y.breakIntervalMinutes);
   });
 
   it("coerceAudio validates voice + clamps speed", () => {

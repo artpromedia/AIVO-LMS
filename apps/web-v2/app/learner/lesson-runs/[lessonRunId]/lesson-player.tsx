@@ -16,7 +16,15 @@
  * - Honors accessibility prefs (reducedMotion, largeText, dyslexia font,
  *   highContrast) via wrapper classes + animation gating.
  */
-import { useEffect, useMemo, useRef, useState, useTransition, type SyntheticEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+  type SyntheticEvent,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
@@ -239,6 +247,13 @@ function LessonMedia({ media, onTelemetry }: LessonMediaProps) {
   );
 }
 
+/**
+ * How often the "Break reminders" preference nudges the learner. Long, calm
+ * cadence — this is a gentle prompt, not a nag. The break screen already
+ * exists; the reminder just routes the learner into it on a timer.
+ */
+const BREAK_REMINDER_MS = 10 * 60_000;
+
 export function LessonPlayer({
   learnerId,
   lessonRunId,
@@ -288,6 +303,34 @@ export function LessonPlayer({
       }).catch(() => {});
     }
   }, []);
+
+  // `hapticsEnabled` preference — fire a short vibration on answer feedback
+  // (Web Vibration API; a no-op on desktop / unsupported browsers). Honors the
+  // pref so a learner who finds vibration aversive never feels it.
+  const pulse = useCallback(
+    (pattern: number | number[]) => {
+      if (!accessibility.hapticsEnabled) return;
+      if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+        navigator.vibrate(pattern);
+      }
+    },
+    [accessibility.hapticsEnabled],
+  );
+
+  // `breakReminders` preference — gently route the learner into the existing
+  // break screen on a calm cadence. Cleared on unmount or when the pref flips.
+  useEffect(() => {
+    if (!accessibility.breakReminders) return;
+    const id = window.setInterval(() => setOnBreak(true), BREAK_REMINDER_MS);
+    return () => window.clearInterval(id);
+  }, [accessibility.breakReminders]);
+
+  // `extraHints` preference — surface the hint by default on guided beats
+  // instead of requiring the learner to ask. (They can still ignore it.)
+  useEffect(() => {
+    if (accessibility.extraHints && beat.kind === "guided") setShowHint(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIdx, accessibility.extraHints]);
 
   // Persist current step in URL + emit lesson_step_viewed once per beat.
   useEffect(() => {
@@ -519,6 +562,9 @@ export function LessonPlayer({
     const correct = result.isCorrect === null ? isCorrect(expected, candidate) : result.isCorrect;
 
     setFeedback(correct ? "correct" : "incorrect");
+    // Distinct haptic signatures: a single soft tap for correct, a short
+    // double-buzz for "not quite". No-op unless hapticsEnabled.
+    pulse(correct ? 30 : [20, 40, 20]);
     if (beat.kind === "check") {
       setChecksTotal((n) => n + 1);
       if (correct) setChecksCorrect((n) => n + 1);
@@ -574,15 +620,26 @@ export function LessonPlayer({
     });
   }
 
-  // ----- Accessibility-derived classes -----
+  // ----- Accessibility-derived classes + DOM attributes -----
+  // Dyslexia font is applied via `data-typeface="dyslexia"` (see below), which
+  // resolves to the bundled Atkinson Hyperlegible / OpenDyslexic webfonts plus
+  // the spec'd letter-spacing/line-height. The previous `font-mono` mapping was
+  // wrong — monospace is not a dyslexia-friendly face.
   const rootClass = [
     accessibility.largeText ? "text-lg leading-relaxed" : "",
-    accessibility.dyslexiaFriendlyFont ? "font-mono tracking-wide" : "",
     accessibility.highContrast ? "bg-aivo-surface text-black" : "",
   ]
     .filter(Boolean)
     .join(" ");
   const transitionClass = accessibility.reducedMotion ? "" : "transition-all";
+
+  // Data attributes consumed by app/a11y-modes.css + app/fonts-dyslexia.css so
+  // the remaining preferences actually render rather than just persisting.
+  const a11yAttrs = {
+    "data-typeface": accessibility.dyslexiaFriendlyFont ? "dyslexia" : undefined,
+    "data-keyboard-optimized": accessibility.keyboardOptimized ? "on" : undefined,
+    "data-visual-supports": accessibility.visualSupports ? "on" : undefined,
+  } as const;
 
   if (onBreak) {
     return (
@@ -609,7 +666,7 @@ export function LessonPlayer({
   // device mapped to those keys can drive the whole flow.
   const aacEnabled = accessibility.aacEnabled === true;
   const innerTree = (
-    <div className={rootClass}>
+    <div className={rootClass} {...a11yAttrs}>
       {plan.lessonMode === "holiday_prep" ? (
         <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-ink">
           {t("holiday_prep")}

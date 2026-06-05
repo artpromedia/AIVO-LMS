@@ -31,7 +31,15 @@ export const FONT_ASSETS = {
   "Fredoka-Medium": require("@/assets/fonts/Fredoka-Medium.ttf"),
   "Fredoka-SemiBold": require("@/assets/fonts/Fredoka-SemiBold.ttf"),
   "Fredoka-Bold": require("@/assets/fonts/Fredoka-Bold.ttf"),
+  // Dyslexia-friendly faces (SIL OFL). Loaded so the "dyslexia-friendly
+  // font" accessibility preference can swap the body family at runtime —
+  // previously absent on mobile entirely.
+  OpenDyslexic: require("@/assets/fonts/OpenDyslexic-Regular.otf"),
+  "Atkinson-Hyperlegible": require("@/assets/fonts/AtkinsonHyperlegible-Regular.ttf"),
 } as const;
+
+/** Body family used when the dyslexia-friendly font preference is on. */
+export const DYSLEXIC_BODY_FONT = "OpenDyslexic";
 
 /** Canonical font-family names. Use these everywhere instead of
  *  string literals so the Fredoka swap is a one-file change. */
