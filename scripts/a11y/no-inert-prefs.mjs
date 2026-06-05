@@ -105,10 +105,10 @@ const EXCLUDE =
  */
 const PLATFORMS = [
   {
-    name: "web (apps/web-v2 · AccessibilityPreferences)",
-    schema: "apps/web-v2/lib/db/types.ts",
-    block: /export type AccessibilityPreferences = \{/,
-    drop: ["learnerId", "tenantId", "updatedAt"],
+    name: "web (apps/web-v2 · AccessibilityProfile contract)",
+    schema: "packages/accessibility-contract/src/index.ts",
+    block: /export interface AccessibilityProfile \{/,
+    drop: [],
     proofs: {
       reducedMotion: { token: "reducedMotion", scope: ["apps/web-v2/app/learner"] },
       highContrast: { token: "highContrast", scope: ["apps/web-v2/app/learner"] },

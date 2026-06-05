@@ -108,6 +108,9 @@ importers:
       '@aivo/aac-bridge':
         specifier: workspace:*
         version: link:../../packages/aac-bridge
+      '@aivo/accessibility-contract':
+        specifier: workspace:*
+        version: link:../../packages/accessibility-contract
       '@aivo/billing-entitlements':
         specifier: workspace:*
         version: link:../../packages/billing-entitlements
@@ -274,6 +277,9 @@ importers:
       '@aivo/aac-bridge':
         specifier: workspace:*
         version: link:../../packages/aac-bridge
+      '@aivo/accessibility-contract':
+        specifier: workspace:*
+        version: link:../../packages/accessibility-contract
       '@aivo/adaptive-baseline':
         specifier: workspace:*
         version: link:../../packages/adaptive-baseline
@@ -462,6 +468,22 @@ importers:
       '@types/react':
         specifier: 19.1.4
         version: 19.1.4
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.3
+      vitest:
+        specifier: ^2.0.0
+        version: 2.1.9(@types/node@22.19.17)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.46.1)
+
+  packages/accessibility-contract:
+    dependencies:
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
       typescript:
         specifier: ^5.7.3
         version: 5.8.3
@@ -3982,7 +4004,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@54.0.24':
     resolution: {integrity: sha512-5xse1bEgnVUBhOrtttc6xTNJVvjyTRavpzuF0/0nuj+312vfSbk7EiRbG+xJ2pW/iZxnhLPJkFCrPYG0nmheAQ==}

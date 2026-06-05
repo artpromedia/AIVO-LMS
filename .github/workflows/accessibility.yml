@@ -31,6 +31,7 @@ on:
       - "apps/mobile/hooks/useLessonAccommodations.ts"
       - "apps/mobile/src/components/learning/**"
       - "apps/mobile/src/components/settings/**"
+      - "packages/accessibility-contract/**"
       - "packages/learner-surfaces/**"
       - "scripts/a11y/**"
       - "scripts/a11y-audit.mjs"
@@ -65,6 +66,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build + test the shared accessibility contract
+        run: pnpm --filter @aivo/accessibility-contract build && pnpm --filter @aivo/accessibility-contract test
 
       - name: Preference declaration gate (accessibility:audit)
         run: pnpm run accessibility:audit

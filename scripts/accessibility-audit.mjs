@@ -36,26 +36,29 @@ const REQUIRED_PREFS = [
   "keyboardOptimized",
 ];
 
-const typesPath = join(repoRoot, "apps/web-v2/lib/db/types.ts");
-if (!existsSync(typesPath)) {
-  errors.push("apps/web-v2/lib/db/types.ts missing.");
+// The canonical preference model now lives in @aivo/accessibility-contract —
+// the single source both the web BFF and the mobile client derive from. The
+// audit verifies the contract here, then confirms the web app is wired to it.
+const contractPath = join(repoRoot, "packages/accessibility-contract/src/index.ts");
+if (!existsSync(contractPath)) {
+  errors.push("packages/accessibility-contract/src/index.ts missing.");
 } else {
-  const src = readFileSync(typesPath, "utf8");
-  const prefsBlock = src.match(/export type AccessibilityPreferences\s*=\s*\{([\s\S]*?)\};/);
+  const src = readFileSync(contractPath, "utf8");
+  const prefsBlock = src.match(/export interface AccessibilityProfile\s*\{([\s\S]*?)\n\}/);
   if (!prefsBlock) {
-    errors.push("AccessibilityPreferences type not found.");
+    errors.push("AccessibilityProfile interface not found in the contract.");
   } else {
     const body = prefsBlock[1];
     for (const field of REQUIRED_PREFS) {
       const re = new RegExp(`\\b${field}:`);
       if (!re.test(body)) {
-        errors.push(`AccessibilityPreferences missing field "${field}".`);
+        errors.push(`AccessibilityProfile missing field "${field}".`);
       }
     }
   }
   const defaultsBlock = src.match(/export const ACCESSIBILITY_DEFAULTS[^=]*=\s*\{([\s\S]*?)\};/);
   if (!defaultsBlock) {
-    errors.push("ACCESSIBILITY_DEFAULTS constant not found.");
+    errors.push("ACCESSIBILITY_DEFAULTS constant not found in the contract.");
   } else {
     const body = defaultsBlock[1];
     for (const field of REQUIRED_PREFS) {
@@ -65,6 +68,26 @@ if (!existsSync(typesPath)) {
       }
     }
   }
+}
+
+// The web app must consume the contract (no parallel hand-rolled copy).
+const typesPath = join(repoRoot, "apps/web-v2/lib/db/types.ts");
+if (!existsSync(typesPath)) {
+  errors.push("apps/web-v2/lib/db/types.ts missing.");
+} else if (!/@aivo\/accessibility-contract/.test(readFileSync(typesPath, "utf8"))) {
+  errors.push(
+    "apps/web-v2/lib/db/types.ts no longer imports @aivo/accessibility-contract — the web " +
+      "AccessibilityPreferences must derive from the shared contract.",
+  );
+}
+const routePath = join(
+  repoRoot,
+  "apps/web-v2/app/api/bff/learners/[learnerId]/accessibility/route.ts",
+);
+if (existsSync(routePath) && !/@aivo\/accessibility-contract/.test(readFileSync(routePath, "utf8"))) {
+  errors.push(
+    "accessibility BFF route must validate with the contract's AccessibilityPatchSchema.",
+  );
 }
 
 // --- 3. TTS provider exports ----------------------------------------

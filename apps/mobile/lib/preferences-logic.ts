@@ -9,7 +9,19 @@
  * toggles per-browser (cookies / localStorage) and does not yet sync
  * them across devices. Mobile mirrors that with AsyncStorage. Sensory
  * mode itself IS backend-synced for learners via `SensoryModeProvider`.
+ *
+ * Shared primitives (TTS voice catalogue, break-interval bounds) come from
+ * @aivo/accessibility-contract — the same single source the web BFF + lesson
+ * player use — so the two clients can no longer drift on these values.
  */
+import {
+  TTS_VOICES,
+  VOICE_IDS as CONTRACT_VOICE_IDS,
+  MIN_BREAK_INTERVAL_MINUTES,
+  MAX_BREAK_INTERVAL_MINUTES,
+  clampBreakIntervalMinutes,
+  type VoiceId as ContractVoiceId,
+} from "@aivo/accessibility-contract";
 
 export type TextScale = "small" | "medium" | "large";
 
@@ -39,8 +51,8 @@ export interface A11yPreferences {
   breakIntervalMinutes: number;
 }
 
-export const MIN_BREAK_INTERVAL = 2;
-export const MAX_BREAK_INTERVAL = 45;
+export const MIN_BREAK_INTERVAL = MIN_BREAK_INTERVAL_MINUTES;
+export const MAX_BREAK_INTERVAL = MAX_BREAK_INTERVAL_MINUTES;
 
 export const DEFAULT_A11Y: A11yPreferences = {
   reduceMotion: false,
@@ -53,29 +65,15 @@ export const DEFAULT_A11Y: A11yPreferences = {
 };
 
 export function clampBreakInterval(value: number): number {
-  if (!Number.isFinite(value)) return DEFAULT_A11Y.breakIntervalMinutes;
-  return Math.max(MIN_BREAK_INTERVAL, Math.min(MAX_BREAK_INTERVAL, Math.round(value)));
+  return clampBreakIntervalMinutes(value);
 }
 
-/** TTS voices — ids mirror web's `lib/tts` voice catalogue. */
-export type VoiceId =
-  | "kid_friendly"
-  | "warm_female"
-  | "warm_male"
-  | "calm_neutral"
-  | "narrator_low"
-  | "narrator_high";
+/** TTS voices — the canonical catalogue lives in @aivo/accessibility-contract
+ *  so web and mobile pick from the exact same six voices. */
+export type VoiceId = ContractVoiceId;
+export const VOICES = TTS_VOICES;
 
-export const VOICES: readonly { id: VoiceId; label: string }[] = [
-  { id: "kid_friendly", label: "Kid-friendly" },
-  { id: "warm_female", label: "Warm (female)" },
-  { id: "warm_male", label: "Warm (male)" },
-  { id: "calm_neutral", label: "Calm neutral" },
-  { id: "narrator_low", label: "Narrator (low)" },
-  { id: "narrator_high", label: "Narrator (high)" },
-];
-
-const VOICE_IDS = new Set<string>(VOICES.map((v) => v.id));
+const VOICE_ID_SET = new Set<string>(CONTRACT_VOICE_IDS);
 
 export interface AudioPreferences {
   /** Master switch for spoken audio / TTS. */
@@ -171,7 +169,7 @@ export function coerceAudio(raw: unknown): AudioPreferences {
   return {
     ttsEnabled: typeof o.ttsEnabled === "boolean" ? o.ttsEnabled : DEFAULT_AUDIO.ttsEnabled,
     voiceId:
-      typeof o.voiceId === "string" && VOICE_IDS.has(o.voiceId)
+      typeof o.voiceId === "string" && VOICE_ID_SET.has(o.voiceId)
         ? (o.voiceId as VoiceId)
         : DEFAULT_AUDIO.voiceId,
     speed: clampSpeed(typeof o.speed === "number" ? o.speed : DEFAULT_AUDIO.speed),
