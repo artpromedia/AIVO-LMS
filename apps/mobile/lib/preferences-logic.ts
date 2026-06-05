@@ -5,10 +5,10 @@
  * sanitisation/scale logic in the vitest node env. The React provider
  * that persists these lives in `lib/preferences.tsx`.
  *
- * Parity note: the web accessibility page stores sensory mode + a11y
- * toggles per-browser (cookies / localStorage) and does not yet sync
- * them across devices. Mobile mirrors that with AsyncStorage. Sensory
- * mode itself IS backend-synced for learners via `SensoryModeProvider`.
+ * Sync note: AsyncStorage is the per-device cache + offline fallback. When a
+ * learnerId is available the accessibility prefs also sync to the backend
+ * (assessment-svc) through `PreferencesProvider`, so a learner's choices follow
+ * them across devices — mirroring how `SensoryModeProvider` syncs sensory mode.
  *
  * Shared primitives (TTS voice catalogue, break-interval bounds) come from
  * @aivo/accessibility-contract — the same single source the web BFF + lesson

@@ -62,7 +62,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <AuthContext.Provider value={authState}>
             <SensoryModeProvider learnerId={learnerId}>
-              <PreferencesProvider>
+              <PreferencesProvider learnerId={learnerId}>
                 <Stack
                   screenOptions={{
                     headerShown: false,

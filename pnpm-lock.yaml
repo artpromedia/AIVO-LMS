@@ -1191,6 +1191,9 @@ importers:
 
   services/assessment-svc:
     dependencies:
+      '@aivo/accessibility-contract':
+        specifier: workspace:*
+        version: link:../../packages/accessibility-contract
       '@aivo/adaptive-baseline':
         specifier: workspace:*
         version: link:../../packages/adaptive-baseline

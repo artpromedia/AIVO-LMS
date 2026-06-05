@@ -20,6 +20,7 @@ import { registerIepParentShareRoutes } from "./routes/iep-parent-share.js";
 import { registerLearnerBaselineRoutes } from "./routes/learner-baseline.js";
 import { registerLearnerProfileRoutes } from "./routes/learner-profile.js";
 import { registerSensoryProfileRoutes } from "./routes/sensory-profile.js";
+import { registerAccessibilityPreferencesRoutes } from "./routes/accessibility-preferences.js";
 
 const logger = createLogger("assessment-svc");
 const PORT = parseInt(process.env.ASSESSMENT_PORT || "3003", 10);
@@ -101,6 +102,7 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
   await registerLearnerBaselineRoutes(app);
   await registerLearnerProfileRoutes(app);
   await registerSensoryProfileRoutes(app);
+  await registerAccessibilityPreferencesRoutes(app);
 
   return app;
 }
