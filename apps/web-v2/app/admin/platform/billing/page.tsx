@@ -7,37 +7,18 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { listBillingForTenants, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
-import { listPlatformRollup } from "@/lib/billing/district-pool";
-import { PlatformRollupTable } from "@/components/admin/billing/platform-rollup-table";
+import { listBillingAccounts } from "@/lib/admin-api/billing";
 import { ROLE_LABEL } from "@/lib/auth/types";
-
-function formatMoney(cents: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(cents / 100);
-}
+import { billingTone } from "@/lib/admin-api/types";
 
 export default async function Page() {
   const session = await requirePlatformPage(Permission.BillingRead);
   const t = await getTranslations("admin.platform_billing_overview");
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const accounts = listBillingForTenants(tenants.map((t) => t.id));
-  const counts = accounts.reduce<Record<string, number>>((acc, a) => {
-    acc[a.status] = (acc[a.status] ?? 0) + 1;
+  const accounts = await listBillingAccounts(session);
+  const counts = accounts.reduce<Record<string, number>>((acc, account) => {
+    acc[account.status] = (acc[account.status] ?? 0) + 1;
     return acc;
   }, {});
-
-  // District rollup data
-  const districtTenants = tenants.filter((t) => t.type === "district");
-  const rollupRows = listPlatformRollup(districtTenants.map((t) => t.id));
-
-  // Aggregate MRR/ARR across all districts
-  const totalMrr = rollupRows.reduce((sum, r) => sum + r.mrrCents, 0);
-  const totalArr = rollupRows.reduce((sum, r) => sum + r.arrCents, 0);
 
   return (
     <AppShell
@@ -49,51 +30,22 @@ export default async function Page() {
       <PageHeader
         eyebrow="Platform · Billing"
         title={t("title")}
-        description="Every billing account on the platform."
+        description="Latest subscription row per tenant from admin-svc."
       />
 
-      {/* Status summary cards (existing) */}
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
-        {["trialing", "active", "past_due", "canceled"].map((k) => (
-          <Card key={k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{k}</p>
-            <p className="mt-1 font-display text-3xl font-bold">{counts[k] ?? 0}</p>
+        {["trialing", "active", "past_due", "canceled"].map((status) => (
+          <Card key={status} className="p-[var(--aivo-density-card-pad)]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+              {status}
+            </p>
+            <p className="mt-1 font-display text-3xl font-bold">
+              {(counts[status] ?? 0).toLocaleString()}
+            </p>
           </Card>
         ))}
       </div>
 
-      {/* MRR / ARR summary cards */}
-      {districtTenants.length > 0 && (
-        <div className="mb-6 grid gap-4 sm:grid-cols-3">
-          <Card className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              Total MRR (districts)
-            </p>
-            <p className="mt-1 font-display text-3xl font-bold">{formatMoney(totalMrr)}</p>
-          </Card>
-          <Card className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              Total ARR (districts)
-            </p>
-            <p className="mt-1 font-display text-3xl font-bold">{formatMoney(totalArr)}</p>
-          </Card>
-          <Card className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              District tenants
-            </p>
-            <p className="mt-1 font-display text-3xl font-bold">{districtTenants.length}</p>
-          </Card>
-        </div>
-      )}
-
-      {/* Cross-district rollup table */}
-      {districtTenants.length > 0 && (
-        <div className="mb-6">
-          <PlatformRollupTable rows={rollupRows} />
-        </div>
-      )}
-
-      {/* All accounts table (existing) */}
       {accounts.length === 0 ? (
         <EmptyState title={t("empty_title")} />
       ) : (
@@ -105,36 +57,31 @@ export default async function Page() {
                 <th className="p-3">Type</th>
                 <th className="p-3">Plan</th>
                 <th className="p-3">{t("col_status")}</th>
+                <th className="p-3">Current period end</th>
                 <th className="p-3">{t("col_created")}</th>
               </tr>
             </thead>
             <tbody>
-              {accounts.map((a) => {
-                const tenant = getTenantById(a.tenantId);
-                return (
-                  <tr key={a.id} className="border-t border-aivo-border">
-                    <td className="p-3 font-medium">{tenant?.name ?? a.tenantId}</td>
-                    <td className="p-3 text-aivo-ink-soft">{tenant?.type ?? "?"}</td>
-                    <td className="p-3 text-aivo-ink-soft">{a.plan}</td>
-                    <td className="p-3">
-                      <Badge
-                        tone={
-                          a.status === "active"
-                            ? "success"
-                            : a.status === "past_due"
-                              ? "danger"
-                              : "warning"
-                        }
-                      >
-                        {a.status}
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-aivo-ink-soft">
-                      {new Date(a.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                );
-              })}
+              {accounts.map((account) => (
+                <tr key={account.id} className="border-t border-aivo-border">
+                  <td className="p-3 font-medium">{account.tenantName ?? account.tenantId}</td>
+                  <td className="p-3 text-aivo-ink-soft">{account.tenantTypeLabel}</td>
+                  <td className="p-3 text-aivo-ink-soft">{account.plan}</td>
+                  <td className="p-3">
+                    <Badge tone={billingTone(account.status)}>
+                      {account.status.replace("_", " ")}
+                    </Badge>
+                  </td>
+                  <td className="p-3 text-aivo-ink-soft">
+                    {account.currentPeriodEnd
+                      ? new Date(account.currentPeriodEnd).toLocaleDateString()
+                      : "—"}
+                  </td>
+                  <td className="p-3 text-aivo-ink-soft">
+                    {new Date(account.createdAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </Card>

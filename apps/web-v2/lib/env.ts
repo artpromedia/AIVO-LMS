@@ -116,6 +116,9 @@ const serverSchema = z.object({
   REPORTS_SVC_URL: z.string().url().default("http://localhost:3018"),
   // Sprint H: SIS rostering + LTI 1.3.
   INTEGRATION_SVC_URL: z.string().url().default("http://localhost:3060"),
+  // Enterprise admin parity: web-v2 admin pages now source platform reads
+  // from admin-svc instead of the in-process mock repository.
+  ADMIN_SVC_URL: z.string().url().default("http://localhost:3012"),
   // Phase 1 (curriculum sync): base URL + internal trust token of `ai-svc`,
   // used by the weekly-curriculum parser to extract topics/vocabulary/
   // standards from an uploaded syllabus. `INTERNAL_AI_TOKEN` is the same

@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { listPlatformApiKeys, getUserById } from "@/lib/db/repos";
-import type { User } from "@/lib/db/types";
+import { listAdminApiKeys } from "@/lib/admin-api/api-keys";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
@@ -27,18 +26,11 @@ function relativeTime(iso: string | null): string {
 export default async function Page() {
   const t = await getTranslations("admin.platform_settings_api_keys");
   const session = await requirePageRole(["platform_admin"]);
-  const keys = listPlatformApiKeys();
+  const keys = await listAdminApiKeys(session);
 
-  // Precompute creator map: one lookup per distinct creator, not per row.
-  const creatorById = new Map<string, User>();
-  for (const id of new Set(keys.map((k) => k.createdByUserId))) {
-    const u = await getUserById(id);
-    if (u) creatorById.set(id, u);
-  }
-
-  const active = keys.filter((k) => k.status === "active");
+  const active = keys.filter((key) => !key.revokedAt);
   const idle = active.filter(
-    (k) => !k.lastUsedAt || Date.now() - new Date(k.lastUsedAt).getTime() > 30 * 86400_000,
+    (key) => !key.lastUsedAt || Date.now() - new Date(key.lastUsedAt).getTime() > 30 * 86400_000,
   );
 
   const stats = [
@@ -55,16 +47,16 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Platform · Settings"
+        eyebrow="Platform | Settings"
         title={t("title")}
-        description="Long-lived credentials used by internal systems and trusted integrations. Secrets are shown once at creation and are never displayed here again."
+        description="Long-lived credentials from admin-svc. Secrets are shown once at creation and are never displayed here again."
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        {stats.map((s) => (
-          <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{s.k}</p>
-            <p className="mt-2 font-display text-3xl font-semibold">{s.v}</p>
+        {stats.map((stat) => (
+          <Card key={stat.k} className="p-[var(--aivo-density-card-pad)]">
+            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{stat.k}</p>
+            <p className="mt-2 font-display text-3xl font-semibold">{stat.v}</p>
           </Card>
         ))}
       </div>
@@ -89,17 +81,17 @@ export default async function Page() {
               </tr>
             </thead>
             <tbody className="divide-y divide-aivo-border">
-              {keys.map((k) => {
-                const creator = creatorById.get(k.createdByUserId) ?? null;
+              {keys.map((key) => {
+                const revoked = Boolean(key.revokedAt);
                 return (
-                  <tr key={k.id} className="hover:bg-aivo-surface-2/40">
-                    <td className="px-4 py-3 font-medium">{k.label}</td>
+                  <tr key={key.id} className="hover:bg-aivo-surface-2/40">
+                    <td className="px-4 py-3 font-medium">{key.name}</td>
                     <td className="px-4 py-3 font-mono text-xs text-aivo-ink-soft">
-                      {k.prefix}••••
+                      {key.keyPrefix}****
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
-                        {k.scopes.map((scope) => (
+                        {key.scopes.map((scope) => (
                           <span
                             key={scope}
                             className="rounded bg-aivo-surface-2 px-2 py-0.5 font-mono text-xs"
@@ -110,16 +102,18 @@ export default async function Page() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge tone={k.status === "active" ? "success" : "neutral"}>{k.status}</Badge>
+                      <Badge tone={revoked ? "neutral" : "success"}>
+                        {revoked ? "revoked" : "active"}
+                      </Badge>
                     </td>
                     <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                      {creator?.displayName ?? creator?.email ?? "—"}
+                      {key.createdBy ?? "-"}
                     </td>
                     <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                      {relativeTime(k.lastUsedAt)}
+                      {relativeTime(key.lastUsedAt)}
                     </td>
                     <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                      {new Date(k.createdAt).toLocaleDateString()}
+                      {new Date(key.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
                 );

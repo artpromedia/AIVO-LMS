@@ -7,14 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { platformNavForSession } from "@/components/layout/role-shells";
 import { getTranslations } from "next-intl/server";
-import {
-  computeSystemHealth,
-  scopeTenantsForSession,
-  listUsersForTenants,
-  listLearnersForTenants,
-  listBillingForTenants,
-  listAiGenerationJobs,
-} from "@/lib/db/repos";
+import { listBillingAccounts } from "@/lib/admin-api/billing";
+import { getPlatformSystemHealth, listRecentAiActivity } from "@/lib/admin-api/platform";
 import { sessionHasPermission } from "@/lib/auth/permissions";
 import { ROLE_LABEL } from "@/lib/auth/types";
 import {
@@ -38,29 +32,16 @@ type OperationsCard = {
 export default async function PlatformAdminHome() {
   const t = await getTranslations("admin.platform_overview");
   const session = await requirePlatformPage(Permission.PlatformRead);
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const tenantIds = tenants.map((tenant) => tenant.id);
-  const healthSummary = computeSystemHealth(tenantIds);
-  const users = await listUsersForTenants(tenantIds);
-  const learners = await listLearnersForTenants(tenantIds);
-  const billing = listBillingForTenants(tenantIds);
-  const recentJobs = listAiGenerationJobs(tenantIds, 8);
+  const [health, billingAccounts, aiActivity] = await Promise.all([
+    getPlatformSystemHealth(session),
+    listBillingAccounts(session).catch(() => []),
+    listRecentAiActivity(session, 8).catch(() => []),
+  ]);
 
-  const byType = tenants.reduce<Record<string, number>>((acc, tenant) => {
-    acc[tenant.type] = (acc[tenant.type] ?? 0) + 1;
+  const billingByStatus = billingAccounts.reduce<Record<string, number>>((acc, account) => {
+    acc[account.status] = (acc[account.status] ?? 0) + 1;
     return acc;
   }, {});
-  const billingByStatus = billing.reduce<Record<string, number>>((acc, record) => {
-    acc[record.status] = (acc[record.status] ?? 0) + 1;
-    return acc;
-  }, {});
-
-  const health =
-    healthSummary.generationSuccessRate >= 0.9 && healthSummary.lessonRunsTotal > 0
-      ? { tone: "success" as const, label: "All systems green" }
-      : healthSummary.generationSuccessRate >= 0.7
-        ? { tone: "warning" as const, label: "Degraded" }
-        : { tone: "danger" as const, label: "Incident" };
 
   const kpis: Array<{
     k: string;
@@ -68,11 +49,12 @@ export default async function PlatformAdminHome() {
     helper: string;
     Icon: typeof Building2;
     href: string;
+    suffix?: string;
   }> = [
     {
       k: "Tenants",
-      v: tenants.length,
-      helper: `${byType.district ?? 0} districts | ${byType.school ?? 0} schools | ${byType.family ?? 0} families`,
+      v: health.tenantsTotal,
+      helper: `${health.tenantCounts.district} districts | ${health.tenantCounts.school} schools | ${health.tenantCounts.family} families`,
       Icon: Building2,
       href: sessionHasPermission(session, Permission.TenantRead)
         ? "/admin/platform/tenants"
@@ -80,8 +62,8 @@ export default async function PlatformAdminHome() {
     },
     {
       k: "Users",
-      v: users.length,
-      helper: `${learners.length.toLocaleString()} learners enrolled`,
+      v: health.usersTotal,
+      helper: `${health.learnersTotal.toLocaleString()} learners enrolled`,
       Icon: Users,
       href: sessionHasPermission(session, Permission.UserRead)
         ? "/admin/platform/users"
@@ -89,15 +71,15 @@ export default async function PlatformAdminHome() {
     },
     {
       k: "Lessons completed",
-      v: healthSummary.lessonRunsCompleted,
-      helper: `${healthSummary.lessonRunsTotal.toLocaleString()} attempted total`,
+      v: health.lessonRunsCompleted,
+      helper: `${health.lessonRunsTotal.toLocaleString()} attempted total`,
       Icon: GraduationCap,
-      href: "/admin/platform",
+      href: "/admin/platform/system-health",
     },
     {
-      k: "AI success",
-      v: Math.round(healthSummary.generationSuccessRate * 100),
-      helper: `${healthSummary.generationFailureCount} failed | ${healthSummary.generationQueuedCount} queued`,
+      k: "AI requests (24h)",
+      v: health.aiRequests24h,
+      helper: `${health.aiModelsActive24h} models | $${health.aiEstimatedCostUsd24h.toFixed(2)} est.`,
       Icon: Cpu,
       href: sessionHasPermission(session, Permission.AiRead)
         ? "/admin/platform/ai"
@@ -109,7 +91,7 @@ export default async function PlatformAdminHome() {
     {
       href: "/admin/platform/billing",
       title: "Billing",
-      description: "Plans, status, and revenue across every tenant.",
+      description: "Real subscription status across every tenant.",
       badge: `${(billingByStatus.active ?? 0).toLocaleString()} active`,
       permission: Permission.BillingRead,
     },
@@ -164,11 +146,11 @@ export default async function PlatformAdminHome() {
         eyebrow="Platform"
         title={t("title")}
         description="Operations and observability across every tenant on AIVO."
-        actions={<Badge tone={health.tone}>{health.label}</Badge>}
+        actions={<Badge tone="neutral">Live service data</Badge>}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {kpis.map(({ k, v, helper, Icon, href }) => (
+        {kpis.map(({ k, v, helper, Icon, href, suffix }) => (
           <Link
             key={k}
             href={href}
@@ -181,7 +163,8 @@ export default async function PlatformAdminHome() {
                     {k}
                   </p>
                   <p className="mt-1 font-display text-3xl font-bold">
-                    {k === "AI success" ? `${v}%` : v.toLocaleString()}
+                    {v.toLocaleString()}
+                    {suffix ?? ""}
                   </p>
                   <p className="mt-2 text-xs text-aivo-ink-soft">{helper}</p>
                 </div>
@@ -204,14 +187,14 @@ export default async function PlatformAdminHome() {
               <p className="font-display text-lg font-semibold">{t("tenant_footprint")}</p>
               <p className="text-xs text-aivo-ink-soft">{t("tenant_footprint_desc")}</p>
             </div>
-            <Badge tone="neutral">{tenants.length.toLocaleString()} tenants</Badge>
+            <Badge tone="neutral">{health.tenantsTotal.toLocaleString()} tenants</Badge>
           </div>
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              { k: "Districts", v: byType.district ?? 0 },
-              { k: "Schools", v: byType.school ?? 0 },
-              { k: "Families", v: byType.family ?? 0 },
-              { k: "Platform", v: byType.platform ?? 0 },
+              { k: "Districts", v: health.tenantCounts.district },
+              { k: "Schools", v: health.tenantCounts.school },
+              { k: "Families", v: health.tenantCounts.family },
+              { k: "Unknown", v: health.tenantCounts.unknown },
             ].map((row) => (
               <div key={row.k} className="rounded-md bg-aivo-surface-2 p-3">
                 <dt className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
@@ -252,33 +235,23 @@ export default async function PlatformAdminHome() {
         <Card className="p-[var(--aivo-density-card-pad)]">
           <div className="mb-3 flex items-center gap-2">
             <Activity className="h-4 w-4 text-aivo-primary" />
-            <p className="font-display text-lg font-semibold">{t("recent_ai_jobs")}</p>
+            <p className="font-display text-lg font-semibold">Recent AI activity</p>
           </div>
-          {recentJobs.length === 0 ? (
+          {aiActivity.length === 0 ? (
             <p className="text-sm text-aivo-ink-soft">{t("no_ai_activity_yet")}</p>
           ) : (
             <ul className="space-y-2">
-              {recentJobs.map((job) => {
-                const tone: "success" | "danger" | "warning" | "neutral" =
-                  job.status === "complete"
-                    ? "success"
-                    : job.status === "failed"
-                      ? "danger"
-                      : job.status === "running"
-                        ? "warning"
-                        : "neutral";
-                return (
-                  <li key={job.id} className="flex items-center justify-between gap-2 text-sm">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{job.kind.replace("_", " ")}</p>
-                      <p className="text-xs text-aivo-ink-soft">
-                        {new Date(job.startedAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <Badge tone={tone}>{job.status}</Badge>
-                  </li>
-                );
-              })}
+              {aiActivity.map((entry) => (
+                <li key={entry.id} className="flex items-center justify-between gap-2 text-sm">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{entry.model}</p>
+                    <p className="text-xs text-aivo-ink-soft">
+                      {entry.provider} · {entry.latencyMs} ms · {new Date(entry.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <Badge tone="neutral">${entry.estimatedCostUsd.toFixed(2)}</Badge>
+                </li>
+              ))}
             </ul>
           )}
           {sessionHasPermission(session, Permission.AiRead) ? (
@@ -323,10 +296,7 @@ export default async function PlatformAdminHome() {
             {t("signed_in_as")} <strong>{session.email}</strong> | {ROLE_LABEL[session.role]}
           </span>
         </div>
-        <Link
-          href="/admin/platform/settings"
-          className="font-medium text-aivo-primary hover:underline"
-        >
+        <Link href="/admin/platform/settings" className="font-medium text-aivo-primary hover:underline">
           {t("platform_settings")}
         </Link>
       </div>

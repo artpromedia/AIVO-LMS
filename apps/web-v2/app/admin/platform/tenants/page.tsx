@@ -9,69 +9,59 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
 import {
-  scopeTenantsForSession,
-  listUsersForTenants,
-  listLearnersForTenants,
-  listBillingForTenants,
-} from "@/lib/db/repos";
-import { ROLE_LABEL, type Role } from "@/lib/auth/types";
+  listAdminLearners,
+  listAdminTenants,
+  listAdminUsers,
+} from "@/lib/admin-api/platform";
+import { listBillingAccounts } from "@/lib/admin-api/billing";
+import { ROLE_LABEL } from "@/lib/auth/types";
+import { billingTone } from "@/lib/admin-api/types";
 
-const TYPE_TONE: Record<string, "primary" | "success" | "neutral" | "warning"> = {
-  district: "primary",
-  school: "success",
-  family: "neutral",
-  platform: "warning",
-};
-
-const BILLING_TONE: Record<string, "success" | "neutral" | "warning" | "danger"> = {
-  active: "success",
-  trialing: "warning",
-  past_due: "danger",
-  canceled: "neutral",
+const TYPE_ORDER: Record<string, number> = {
+  district: 0,
+  school: 1,
+  family: 2,
+  unknown: 3,
 };
 
 export default async function Page() {
   const session = await requirePlatformPage(Permission.TenantRead);
   const t = await getTranslations("admin.platform_tenants");
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const tenantIds = tenants.map((t) => t.id);
+  const [tenants, users, learners, accounts] = await Promise.all([
+    listAdminTenants(session),
+    listAdminUsers(session).catch(() => []),
+    listAdminLearners(session).catch(() => []),
+    listBillingAccounts(session).catch(() => []),
+  ]);
 
-  // Precompute counts so the table renders without per-row N+1 scans.
-  const users = await listUsersForTenants(tenantIds);
-  const learners = await listLearnersForTenants(tenantIds);
-  const billingRows = listBillingForTenants(tenantIds);
-  const billingByTenant = new Map(billingRows.map((b) => [b.tenantId, b]));
-  const tenantById = new Map(tenants.map((t) => [t.id, t]));
-
+  const billingByTenant = new Map(accounts.map((account) => [account.tenantId, account]));
   const userCountByTenant = new Map<string, number>();
   const adminCountByTenant = new Map<string, number>();
-  const adminRoles: Role[] = ["district_admin", "school_admin", "platform_admin"];
-  for (const u of users) {
-    userCountByTenant.set(u.tenantId, (userCountByTenant.get(u.tenantId) ?? 0) + 1);
-    if (adminRoles.includes(u.role)) {
-      adminCountByTenant.set(u.tenantId, (adminCountByTenant.get(u.tenantId) ?? 0) + 1);
+  for (const user of users) {
+    if (!user.tenantId) continue;
+    userCountByTenant.set(user.tenantId, (userCountByTenant.get(user.tenantId) ?? 0) + 1);
+    if (user.roleKey === "platform_admin" || user.roleKey === "district_admin" || user.roleKey === "school_admin") {
+      adminCountByTenant.set(user.tenantId, (adminCountByTenant.get(user.tenantId) ?? 0) + 1);
     }
   }
+
   const learnerCountByTenant = new Map<string, number>();
-  for (const l of learners) {
-    learnerCountByTenant.set(l.tenantId, (learnerCountByTenant.get(l.tenantId) ?? 0) + 1);
+  for (const learner of learners) {
+    if (!learner.tenantId) continue;
+    learnerCountByTenant.set(
+      learner.tenantId,
+      (learnerCountByTenant.get(learner.tenantId) ?? 0) + 1,
+    );
   }
 
-  const byType = tenants.reduce<Record<string, number>>((acc, t) => {
-    acc[t.type] = (acc[t.type] ?? 0) + 1;
+  const byType = tenants.reduce<Record<string, number>>((acc, tenant) => {
+    acc[tenant.tenantKind] = (acc[tenant.tenantKind] ?? 0) + 1;
     return acc;
   }, {});
 
-  // Sort: districts → schools → families → platform, then alphabetical.
-  const typeOrder: Record<string, number> = {
-    district: 0,
-    school: 1,
-    family: 2,
-    platform: 3,
-  };
   const sorted = [...tenants].sort((a, b) => {
-    const t = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
-    return t !== 0 ? t : a.name.localeCompare(b.name);
+    const kindDelta = (TYPE_ORDER[a.tenantKind] ?? 99) - (TYPE_ORDER[b.tenantKind] ?? 99);
+    return kindDelta !== 0 ? kindDelta : a.name.localeCompare(b.name);
   });
 
   return (
@@ -84,7 +74,7 @@ export default async function Page() {
       <PageHeader
         eyebrow="Platform"
         title={t("title")}
-        description="Every tenant currently provisioned in this environment."
+        description="Every tenant currently visible through admin-svc."
       />
 
       <div className="mb-6 grid gap-3 sm:grid-cols-4">
@@ -92,11 +82,11 @@ export default async function Page() {
           { k: "Districts", v: byType.district ?? 0 },
           { k: "Schools", v: byType.school ?? 0 },
           { k: "Families", v: byType.family ?? 0 },
-          { k: "Platform", v: byType.platform ?? 0 },
-        ].map((s) => (
-          <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{s.k}</p>
-            <p className="mt-1 font-display text-3xl font-bold">{s.v.toLocaleString()}</p>
+          { k: "Unknown", v: byType.unknown ?? 0 },
+        ].map((item) => (
+          <Card key={item.k} className="p-[var(--aivo-density-card-pad)]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{item.k}</p>
+            <p className="mt-1 font-display text-3xl font-bold">{item.v.toLocaleString()}</p>
           </Card>
         ))}
       </div>
@@ -123,40 +113,38 @@ export default async function Page() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
-                {sorted.map((t) => {
-                  const billing = billingByTenant.get(t.id);
+                {sorted.map((tenant) => {
+                  const billing = billingByTenant.get(tenant.id);
                   return (
-                    <tr key={t.id} className="hover:bg-aivo-surface-2/60">
+                    <tr key={tenant.id} className="hover:bg-aivo-surface-2/60">
                       <td className="px-4 py-3">
                         <Link
-                          href={`/admin/platform/tenants/${t.id}`}
+                          href={`/admin/platform/tenants/${tenant.id}`}
                           className="font-medium hover:text-aivo-primary"
                         >
-                          {t.name}
+                          {tenant.name}
                         </Link>
-                        <p className="font-mono text-xs text-aivo-muted">{t.id}</p>
+                        <p className="font-mono text-xs text-aivo-muted">{tenant.id}</p>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge tone={TYPE_TONE[t.type] ?? "neutral"}>{t.type}</Badge>
+                        <Badge tone={tenant.tenantKind === "district" ? "primary" : tenant.tenantKind === "school" ? "success" : "neutral"}>
+                          {tenant.typeLabel}
+                        </Badge>
                       </td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">
-                        {t.parentTenantId
-                          ? (tenantById.get(t.parentTenantId)?.name ?? t.parentTenantId)
-                          : "—"}
+                      <td className="px-4 py-3 text-aivo-ink-soft">—</td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        {(userCountByTenant.get(tenant.id) ?? 0).toLocaleString()}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
-                        {(userCountByTenant.get(t.id) ?? 0).toLocaleString()}
+                        {(adminCountByTenant.get(tenant.id) ?? 0).toLocaleString()}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
-                        {(adminCountByTenant.get(t.id) ?? 0).toLocaleString()}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {(learnerCountByTenant.get(t.id) ?? 0).toLocaleString()}
+                        {(learnerCountByTenant.get(tenant.id) ?? 0).toLocaleString()}
                       </td>
                       <td className="px-4 py-3">
                         {billing ? (
                           <span className="inline-flex items-center gap-2">
-                            <Badge tone={BILLING_TONE[billing.status] ?? "neutral"}>
+                            <Badge tone={billingTone(billing.status)}>
                               {billing.status.replace("_", " ")}
                             </Badge>
                             <span className="text-xs text-aivo-ink-soft">{billing.plan}</span>
@@ -166,7 +154,7 @@ export default async function Page() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {new Date(t.createdAt).toLocaleDateString()}
+                        {new Date(tenant.createdAt).toLocaleDateString()}
                       </td>
                     </tr>
                   );
@@ -178,11 +166,8 @@ export default async function Page() {
       )}
 
       <p className="mt-4 text-xs text-aivo-ink-soft">
-        Looking for billing rollups?{" "}
-        <Link
-          href="/admin/platform/billing"
-          className="font-medium text-aivo-primary hover:underline"
-        >
+        Looking for billing accounts?{" "}
+        <Link href="/admin/platform/billing" className="font-medium text-aivo-primary hover:underline">
           {t("open_billing")}
         </Link>
         .

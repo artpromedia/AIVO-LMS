@@ -1,12 +1,14 @@
-import { requirePageRole } from "@/lib/auth/server";
+import { Permission } from "@aivo/security";
+import { requirePlatformPage } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { scopeTenantsForSession, listLearnersForTenants } from "@/lib/db/repos";
+import { platformNavForSession } from "@/components/layout/role-shells";
+import { listAdminLearners, listAdminTenants } from "@/lib/admin-api/platform";
+import { ROLE_LABEL } from "@/lib/auth/types";
 
 const FL_LABEL: Record<string, string> = {
   standard: "Standard",
@@ -24,73 +26,87 @@ const FL_TONE: Record<string, "primary" | "success" | "neutral" | "warning"> = {
   pre_symbolic: "neutral",
 };
 
+function normalizeFunctioningLevel(value: string | null | undefined): string | null {
+  return value ? value.toLowerCase() : null;
+}
+
+function functioningLevelLabel(value: string | null | undefined): string {
+  const key = normalizeFunctioningLevel(value);
+  if (!key) return "Unassigned";
+  return FL_LABEL[key] ?? key.replace(/_/g, " ");
+}
+
 export default async function Page() {
-  const session = await requirePageRole(["platform_admin"]);
+  const session = await requirePlatformPage(Permission.LearnerRead);
   const t = await getTranslations("admin.platform_learners");
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const learners = await listLearnersForTenants(tenants.map((t) => t.id));
-  const tenantById = new Map(tenants.map((t) => [t.id, t]));
+  const [learners, tenants] = await Promise.all([
+    listAdminLearners(session),
+    listAdminTenants(session).catch(() => []),
+  ]);
 
-  const flCounts = learners.reduce<Record<string, number>>((acc, l) => {
-    const k = l.functioningLevel ?? "unset";
-    acc[k] = (acc[k] ?? 0) + 1;
+  const tenantById = new Map(tenants.map((tenant) => [tenant.id, tenant]));
+  const assignedLevels = learners.filter((learner) => learner.functioningLevel).length;
+  const unassignedLevels = learners.length - assignedLevels;
+  const distinctTenants = new Set(learners.map((learner) => learner.tenantId).filter(Boolean)).size;
+
+  const flCounts = learners.reduce<Record<string, number>>((acc, learner) => {
+    const key = normalizeFunctioningLevel(learner.functioningLevel) ?? "unset";
+    acc[key] = (acc[key] ?? 0) + 1;
     return acc;
   }, {});
 
-  const iepOnFile = learners.filter((l) => l.iepDecision === "uploaded").length;
-  const iepSkipped = learners.filter((l) => l.iepDecision === "skipped").length;
-  const iepPending = learners.filter((l) => l.iepDecision === null).length;
-
-  // Cross-tenant grade-band rollup.
-  const byGrade = learners.reduce<Record<string, number>>((acc, l) => {
-    const k = l.gradeBand ?? "Unassigned";
-    acc[k] = (acc[k] ?? 0) + 1;
+  const byGrade = learners.reduce<Record<string, number>>((acc, learner) => {
+    const key =
+      learner.gradeLevel === null || learner.gradeLevel === undefined
+        ? "Unassigned"
+        : `Grade ${learner.gradeLevel}`;
+    acc[key] = (acc[key] ?? 0) + 1;
     return acc;
   }, {});
 
-  // Newest 100 — full lists at platform scale would be paginated; we cap
-  // visible rows so the page never devolves into a 10k-row dump on cold-boot.
   const recent = [...learners].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 100);
 
   return (
     <AppShell
-      role="platform_admin"
-      roleLabel="Platform admin"
-      navItems={PLATFORM_NAV}
+      role={session.role}
+      roleLabel={ROLE_LABEL[session.role]}
+      navItems={platformNavForSession(session)}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
         eyebrow="Platform"
         title={t("title")}
-        description="Every learner profile across every tenant on the platform."
+        description="Live learner roster from identity-svc across every tenant."
         actions={<Badge tone="neutral">{learners.length.toLocaleString()} learners</Badge>}
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            {t("iep_on_file")}
+            Learners with level
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">{iepOnFile.toLocaleString()}</p>
+          <p className="mt-1 font-display text-3xl font-bold">{assignedLevels.toLocaleString()}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
             {learners.length > 0
-              ? `${Math.round((iepOnFile / learners.length) * 100)}% of learners`
+              ? `${Math.round((assignedLevels / learners.length) * 100)}% assigned`
               : "No learners"}
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            {t("iep_skipped")}
+            Level pending
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">{iepSkipped.toLocaleString()}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">{t("parent_opt_out")}</p>
+          <p className="mt-1 font-display text-3xl font-bold">
+            {unassignedLevels.toLocaleString()}
+          </p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">No functioning level on the learner row</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            {t("iep_pending")}
+            Tenant footprint
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">{iepPending.toLocaleString()}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">{t("no_decision")}</p>
+          <p className="mt-1 font-display text-3xl font-bold">{distinctTenants.toLocaleString()}</p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">Tenants with at least one learner</p>
         </Card>
       </div>
 
@@ -98,31 +114,23 @@ export default async function Page() {
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="font-display text-lg font-semibold">{t("fl_mix")}</p>
           <ul className="mt-3 space-y-2 text-sm">
-            {Object.entries(FL_LABEL).map(([k, label]) => {
-              const n = flCounts[k] ?? 0;
-              const pct = learners.length > 0 ? (n / learners.length) * 100 : 0;
+            {Object.entries({ ...FL_LABEL, unset: "Unassigned" }).map(([key, label]) => {
+              const count = flCounts[key] ?? 0;
+              const pct = learners.length > 0 ? (count / learners.length) * 100 : 0;
               return (
-                <li key={k}>
+                <li key={key}>
                   <div className="flex items-center justify-between">
                     <span>{label}</span>
                     <span className="text-aivo-ink-soft">
-                      {n.toLocaleString()} · {pct.toFixed(0)}%
+                      {count.toLocaleString()} | {pct.toFixed(0)}%
                     </span>
                   </div>
                   <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-aivo-border/60">
-                    <div
-                      className="h-full rounded-full bg-aivo-primary"
-                      style={{ width: `${pct}%` }}
-                    />
+                    <div className="h-full rounded-full bg-aivo-primary" style={{ width: `${pct}%` }} />
                   </div>
                 </li>
               );
             })}
-            {flCounts.unset ? (
-              <li className="text-xs text-aivo-ink-soft">
-                {flCounts.unset.toLocaleString()} learners have no level assigned yet.
-              </li>
-            ) : null}
           </ul>
         </Card>
 
@@ -131,13 +139,13 @@ export default async function Page() {
           <ul className="mt-3 grid grid-cols-2 gap-2 text-sm">
             {Object.entries(byGrade)
               .sort((a, b) => b[1] - a[1])
-              .map(([grade, n]) => (
+              .map(([grade, count]) => (
                 <li
                   key={grade}
                   className="flex items-center justify-between rounded-md border border-aivo-border px-3 py-2"
                 >
                   <span className="font-medium">{grade}</span>
-                  <span className="text-aivo-ink-soft tabular-nums">{n.toLocaleString()}</span>
+                  <span className="text-aivo-ink-soft tabular-nums">{count.toLocaleString()}</span>
                 </li>
               ))}
           </ul>
@@ -161,46 +169,34 @@ export default async function Page() {
                   <th className="px-4 py-2">{t("col_tenant")}</th>
                   <th className="px-4 py-2">Grade</th>
                   <th className="px-4 py-2">{t("col_fl")}</th>
-                  <th className="px-4 py-2">IEP</th>
                   <th className="px-4 py-2">{t("col_created")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
-                {recent.map((l) => {
-                  const tenant = tenantById.get(l.tenantId);
-                  const fl = l.functioningLevel;
-                  const iep = l.iepDecision;
+                {recent.map((learner) => {
+                  const normalizedLevel = normalizeFunctioningLevel(learner.functioningLevel);
                   return (
-                    <tr key={l.id}>
-                      <td className="px-4 py-3 font-medium">{l.displayName}</td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">{tenant?.name ?? l.tenantId}</td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">{l.gradeBand ?? "—"}</td>
+                    <tr key={learner.id}>
+                      <td className="px-4 py-3 font-medium">{learner.name}</td>
+                      <td className="px-4 py-3 text-aivo-ink-soft">
+                        {tenantById.get(learner.tenantId ?? "")?.name ?? learner.tenantId ?? "Unknown"}
+                      </td>
+                      <td className="px-4 py-3 text-aivo-ink-soft">
+                        {learner.gradeLevel === null || learner.gradeLevel === undefined
+                          ? "\u2014"
+                          : learner.gradeLevel}
+                      </td>
                       <td className="px-4 py-3">
-                        {fl ? (
-                          <Badge tone={FL_TONE[fl] ?? "neutral"}>{FL_LABEL[fl]}</Badge>
+                        {normalizedLevel ? (
+                          <Badge tone={FL_TONE[normalizedLevel] ?? "neutral"}>
+                            {functioningLevelLabel(learner.functioningLevel)}
+                          </Badge>
                         ) : (
                           <span className="text-xs text-aivo-ink-soft">{t("unassigned")}</span>
                         )}
                       </td>
-                      <td className="px-4 py-3">
-                        <Badge
-                          tone={
-                            iep === "uploaded"
-                              ? "success"
-                              : iep === "skipped"
-                                ? "neutral"
-                                : "warning"
-                          }
-                        >
-                          {iep === "uploaded"
-                            ? "On file"
-                            : iep === "skipped"
-                              ? "Skipped"
-                              : "Pending"}
-                        </Badge>
-                      </td>
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {new Date(l.createdAt).toLocaleDateString()}
+                        {new Date(learner.createdAt).toLocaleDateString()}
                       </td>
                     </tr>
                   );

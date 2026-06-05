@@ -5,13 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { listModerationEvents, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
+import { getModerationStats, listModerationEvents } from "@/lib/admin-api/moderation";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-function decisionTone(d: "allow" | "review" | "block"): "success" | "warning" | "danger" {
-  return d === "block" ? "danger" : d === "review" ? "warning" : "success";
+function statusTone(status: string): "success" | "warning" | "danger" | "primary" | "neutral" {
+  if (status === "REJECTED") return "danger";
+  if (status === "PENDING" || status === "LOW_CONFIDENCE") return "warning";
+  if (status === "ESCALATED") return "primary";
+  if (status === "APPROVED") return "success";
+  return "neutral";
 }
 
 function relativeTime(iso: string): string {
@@ -27,42 +31,27 @@ function relativeTime(iso: string): string {
 export default async function Page() {
   const t = await getTranslations("admin.platform_ai_moderation");
   const session = await requirePageRole(["platform_admin"]);
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const tenantIds = new Set(tenants.map((t) => t.id));
-  const tenantById = new Map(tenants.map((t) => [t.id, t]));
+  const [events, stats] = await Promise.all([
+    listModerationEvents(session, { perPage: 200 }),
+    getModerationStats(session),
+  ]);
 
-  const all = listModerationEvents({ limit: 500 }).filter((e) => tenantIds.has(e.tenantId));
+  const statusCounts = new Map(stats.byStatus.map((row) => [row.status, row.count]));
+  const last24h = events.filter(
+    (event) => new Date(event.createdAt).getTime() > Date.now() - 24 * 3600_000,
+  ).length;
 
-  const reviewed = all.filter((e) => e.classification.decision === "review");
-  const blocked = all.filter((e) => e.classification.decision === "block");
-  const allowed = all.filter((e) => e.classification.decision === "allow");
-  const injectionFlagged = all.filter((e) => e.injectionSignals.length > 0).length;
-  const crisisFlagged = all.filter((e) => e.crisisSignals.length > 0).length;
-  const cutoff24h = Date.now() - 24 * 3600_000;
-  const last24h = all.filter((e) => new Date(e.createdAt).getTime() > cutoff24h).length;
-
-  // Category mix from blocked/review events (allow events typically lack categories).
-  const categoryCount = new Map<string, number>();
-  for (const e of all) {
-    if (e.classification.decision === "allow") continue;
-    for (const c of e.classification.categories ?? []) {
-      categoryCount.set(c, (categoryCount.get(c) ?? 0) + 1);
-    }
-  }
-  const topCategories = [...categoryCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-  const stats = [
-    { k: "All events", v: all.length.toLocaleString() },
-    { k: "Blocked", v: blocked.length.toLocaleString() },
-    { k: "Review", v: reviewed.length.toLocaleString() },
-    { k: "Allowed", v: allowed.length.toLocaleString() },
+  const statTiles = [
+    { k: "All events", v: events.length.toLocaleString() },
+    { k: "Pending", v: (statusCounts.get("PENDING") ?? 0).toLocaleString() },
+    { k: "Rejected", v: (statusCounts.get("REJECTED") ?? 0).toLocaleString() },
+    { k: "Escalated", v: (statusCounts.get("ESCALATED") ?? 0).toLocaleString() },
+    { k: "Approved", v: (statusCounts.get("APPROVED") ?? 0).toLocaleString() },
     { k: "Last 24h", v: last24h.toLocaleString() },
-    { k: "Injection signals", v: injectionFlagged.toLocaleString() },
-    { k: "Crisis signals", v: crisisFlagged.toLocaleString() },
   ];
 
-  // Show blocked + review first; cap at 100.
-  const focus = [...blocked, ...reviewed]
+  const focus = events
+    .filter((event) => event.status !== "APPROVED")
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     .slice(0, 100);
 
@@ -74,31 +63,31 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Platform · AI"
+        eyebrow="Platform | AI"
         title={t("title")}
-        description="Every classification produced by the safety pipeline. Allow decisions are recorded only at debug volume; the table below focuses on block + review."
+        description="Moderation records from admin-svc, focused on pending, rejected, and escalated content."
       />
 
-      <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-7">
-        {stats.map((s) => (
-          <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{s.k}</p>
-            <p className="mt-2 font-display text-2xl font-semibold">{s.v}</p>
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+        {statTiles.map((tile) => (
+          <Card key={tile.k} className="p-[var(--aivo-density-card-pad)]">
+            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{tile.k}</p>
+            <p className="mt-2 font-display text-2xl font-semibold">{tile.v}</p>
           </Card>
         ))}
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-1">
+        <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="font-display text-lg font-semibold">{t("top_categories")}</p>
-          {topCategories.length === 0 ? (
+          {stats.byReason.length === 0 ? (
             <p className="mt-2 text-sm text-aivo-ink-soft">{t("no_categorised_events")}</p>
           ) : (
             <ul className="mt-3 space-y-2">
-              {topCategories.map(([cat, count]) => (
-                <li key={cat} className="flex items-center justify-between text-sm">
-                  <span className="capitalize">{cat.replace(/_/g, " ")}</span>
-                  <span className="tabular-nums text-aivo-ink-soft">{count.toLocaleString()}</span>
+              {stats.byReason.slice(0, 5).map((row) => (
+                <li key={row.reason} className="flex items-center justify-between text-sm">
+                  <span className="capitalize">{row.reason.replace(/_/g, " ")}</span>
+                  <span className="tabular-nums text-aivo-ink-soft">{row.count.toLocaleString()}</span>
                 </li>
               ))}
             </ul>
@@ -109,7 +98,7 @@ export default async function Page() {
           {focus.length === 0 ? (
             <EmptyState
               title={t("no_block_or_review_events")}
-              description="The safety pipeline allowed every recent classification."
+              description="There are no non-approved moderation records in the current service response."
             />
           ) : (
             <table className="w-full text-sm">
@@ -124,39 +113,24 @@ export default async function Page() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
-                {focus.map((e) => {
-                  const tenant = tenantById.get(e.tenantId) ?? getTenantById(e.tenantId);
-                  return (
-                    <tr key={e.id} className="hover:bg-aivo-surface-2/40">
-                      <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {relativeTime(e.createdAt)}
-                      </td>
-                      <td className="px-4 py-3 text-xs">{tenant?.name ?? e.tenantId}</td>
-                      <td className="px-4 py-3">
-                        <Badge tone={decisionTone(e.classification.decision)}>
-                          {e.classification.decision}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        {e.classification.categories?.join(", ") || "—"}
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        {e.injectionSignals.length > 0 ? (
-                          <Badge tone="warning">injection ×{e.injectionSignals.length}</Badge>
-                        ) : null}{" "}
-                        {e.crisisSignals.length > 0 ? (
-                          <Badge tone="danger">crisis ×{e.crisisSignals.length}</Badge>
-                        ) : null}
-                        {e.injectionSignals.length === 0 && e.crisisSignals.length === 0
-                          ? "—"
-                          : null}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-aivo-ink-soft" title={e.excerpt}>
-                        {e.excerpt.length > 80 ? `${e.excerpt.slice(0, 80)}…` : e.excerpt}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {focus.map((event) => (
+                  <tr key={event.id} className="hover:bg-aivo-surface-2/40">
+                    <td className="px-4 py-3 text-xs text-aivo-ink-soft">
+                      {relativeTime(event.createdAt)}
+                    </td>
+                    <td className="px-4 py-3 text-xs">{event.tenantId ?? "unknown"}</td>
+                    <td className="px-4 py-3">
+                      <Badge tone={statusTone(event.status)}>{event.status.toLowerCase()}</Badge>
+                    </td>
+                    <td className="px-4 py-3 text-xs">{event.flagReason.replace(/_/g, " ")}</td>
+                    <td className="px-4 py-3 text-xs">
+                      {event.tutorSku ? <Badge tone="neutral">{event.tutorSku}</Badge> : "none"}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-aivo-ink-soft" title={event.content}>
+                      {event.content.length > 80 ? `${event.content.slice(0, 80)}...` : event.content}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           )}

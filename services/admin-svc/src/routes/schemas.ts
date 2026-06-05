@@ -322,6 +322,29 @@ export const getAdminSvcStatsSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const getAdminSvcPlatformSystemHealthSchema = {
+  tags: ["Admin"],
+  operationId: "getAdminSvcPlatformSystemHealth",
+  summary: "GET /api/admin-svc/platform/system-health",
+  response: { 200: passthroughObject },
+} as const;
+
+export const getAdminSvcPlatformAiActivitySchema = {
+  tags: ["Admin"],
+  operationId: "getAdminSvcPlatformAiActivity",
+  summary: "GET /api/admin-svc/platform/ai-activity",
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject },
+} as const;
+
+export const getAdminSvcPlatformAiCostsSchema = {
+  tags: ["Admin"],
+  operationId: "getAdminSvcPlatformAiCosts",
+  summary: "GET /api/admin-svc/platform/ai-costs",
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject },
+} as const;
+
 export const getAdminSvcUsersSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcUsers",
@@ -379,6 +402,13 @@ export const getAdminSvcTenantsByIdSchema = {
     additionalProperties: true,
     properties: { id: { type: "string" } },
   },
+  response: { 200: passthroughObject },
+} as const;
+
+export const getAdminSvcBillingAccountsSchema = {
+  tags: ["Admin"],
+  operationId: "getAdminSvcBillingAccounts",
+  summary: "GET /api/admin-svc/billing/accounts",
   response: { 200: passthroughObject },
 } as const;
 

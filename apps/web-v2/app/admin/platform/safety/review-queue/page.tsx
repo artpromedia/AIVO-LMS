@@ -5,22 +5,26 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { getModerationEvent, listHumanReviewCases } from "@/lib/db/repos";
+import { listModerationEvents } from "@/lib/admin-api/moderation";
 import { ReviewActions } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-function statusTone(s: string) {
-  if (s === "open") return "warning" as const;
-  if (s === "in_review") return "primary" as const;
-  if (s === "escalated") return "danger" as const;
+function statusTone(status: string) {
+  if (status === "PENDING" || status === "LOW_CONFIDENCE") return "warning" as const;
+  if (status === "ESCALATED") return "danger" as const;
+  if (status === "REJECTED") return "neutral" as const;
   return "success" as const;
 }
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const t = await getTranslations("admin.platform_safety_review_queue");
-  const cases = listHumanReviewCases({});
+  const cases = await listModerationEvents(session, { perPage: 200 });
+  const reviewCases = cases.filter(
+    (event) => event.status === "PENDING" || event.status === "LOW_CONFIDENCE",
+  );
+
   return (
     <AppShell
       role="platform_admin"
@@ -31,52 +35,43 @@ export default async function Page() {
       <PageHeader
         eyebrow="Safety"
         title={t("title")}
-        description="Moderation events that need a human decision. Resolving a case allows or blocks the original content and is auditable."
+        description="Moderation records that need a human decision."
       />
       <div className="space-y-3">
-        {cases.length === 0 ? (
-          <Card className="p-[var(--aivo-density-card-pad)] text-aivo-muted text-sm">
+        {reviewCases.length === 0 ? (
+          <Card className="p-[var(--aivo-density-card-pad)] text-sm text-aivo-muted">
             {t("empty_body")}
           </Card>
         ) : (
-          cases.map((c) => {
-            const event = getModerationEvent(c.eventId);
-            return (
-              <Card key={c.id} className="p-[var(--aivo-density-card-pad)]">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Badge tone={statusTone(c.status)}>{c.status.replace(/_/g, " ")}</Badge>
-                      {event && (
-                        <span className="text-xs text-aivo-muted">
-                          {event.subjectKind.replace(/_/g, " ")} · {event.classification.severity}
-                        </span>
-                      )}
-                    </div>
-                    {event && <p className="mt-2 text-sm">{event.excerpt}</p>}
-                    {event && event.classification.categories.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {event.classification.categories.map((cat) => (
-                          <Badge key={cat} tone="neutral">
-                            {cat.replace(/_/g, " ")}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    {c.resolution && (
-                      <p className="mt-2 text-xs text-aivo-muted">Resolution: {c.resolution}</p>
-                    )}
+          reviewCases.map((event) => (
+            <Card key={event.id} className="p-[var(--aivo-density-card-pad)]">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Badge tone={statusTone(event.status)}>{event.status.toLowerCase()}</Badge>
+                    <span className="text-xs text-aivo-muted">
+                      {event.contentType.replace(/_/g, " ")} | {event.flagReason.replace(/_/g, " ")}
+                    </span>
                   </div>
-                  <div className="text-[11px] text-aivo-muted whitespace-nowrap">
-                    {new Date(c.createdAt).toLocaleString()}
+                  <p className="mt-2 text-sm">{event.content}</p>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {event.tutorSku ? <Badge tone="neutral">{event.tutorSku}</Badge> : null}
+                    {event.modelUsed ? <Badge tone="neutral">{event.modelUsed}</Badge> : null}
+                    {event.flagConfidence !== null ? (
+                      <Badge tone="neutral">confidence {event.flagConfidence.toFixed(3)}</Badge>
+                    ) : null}
                   </div>
+                  {event.reviewNotes ? (
+                    <p className="mt-2 text-xs text-aivo-muted">Notes: {event.reviewNotes}</p>
+                  ) : null}
                 </div>
-                {c.status === "open" || c.status === "in_review" ? (
-                  <ReviewActions caseId={c.id} />
-                ) : null}
-              </Card>
-            );
-          })
+                <div className="whitespace-nowrap text-[11px] text-aivo-muted">
+                  {new Date(event.createdAt).toLocaleString()}
+                </div>
+              </div>
+              <ReviewActions caseId={event.id} />
+            </Card>
+          ))
         )}
       </div>
     </AppShell>

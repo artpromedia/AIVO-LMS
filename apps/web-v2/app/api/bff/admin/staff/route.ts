@@ -4,8 +4,8 @@ import { Permission } from "@aivo/security";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { enterpriseFlags } from "@/lib/bff/feature-flags";
 import { requirePermission, requireSession, requireRole } from "@/lib/bff/guards";
-import type { Role } from "@/lib/auth/types";
 import { getAdminBearer, isIdentitySvcEnabled } from "@/lib/bff/identity-admin";
+import type { Role } from "@/lib/auth/types";
 import {
   identityCreatePlatformStaff,
   identityListPlatformStaff,

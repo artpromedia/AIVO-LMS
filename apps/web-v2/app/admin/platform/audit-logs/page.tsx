@@ -6,17 +6,13 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { listAuditLogsForTenants, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
+import { listAdminAuditLogs } from "@/lib/admin-api/audit";
 import { ROLE_LABEL } from "@/lib/auth/types";
 
 export default async function Page() {
   const session = await requirePlatformPage(Permission.AuditRead);
   const t = await getTranslations("admin.platform_audit_logs");
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const logs = await listAuditLogsForTenants(
-    tenants.map((t) => t.id),
-    200,
-  );
+  const logs = await listAdminAuditLogs(session, 200);
 
   return (
     <AppShell
@@ -28,7 +24,7 @@ export default async function Page() {
       <PageHeader
         eyebrow="Platform · Observability"
         title={t("title")}
-        description="Every privileged or state-changing BFF call. Newest first."
+        description="Append-only admin audit entries from admin-svc. Newest first."
       />
       {logs.length === 0 ? (
         <EmptyState title={t("empty")} />
@@ -40,22 +36,28 @@ export default async function Page() {
                 <th className="p-3">When</th>
                 <th className="p-3">{t("col_action")}</th>
                 <th className="p-3">Actor</th>
+                <th className="p-3">Resource</th>
                 <th className="p-3">{t("col_tenant")}</th>
-                <th className="p-3">{t("col_request_id")}</th>
               </tr>
             </thead>
             <tbody>
-              {logs.map((l) => (
-                <tr key={l.id} className="border-t border-aivo-border">
+              {logs.map((log) => (
+                <tr key={log.id} className="border-t border-aivo-border">
                   <td className="p-3 text-aivo-ink-soft">
-                    {new Date(l.occurredAt).toLocaleString()}
+                    {new Date(log.createdAt).toLocaleString()}
                   </td>
-                  <td className="p-3 font-medium">{l.action}</td>
-                  <td className="p-3 text-xs text-aivo-muted">{l.userId ?? "—"}</td>
+                  <td className="p-3 font-medium">{log.action}</td>
+                  <td className="p-3 text-xs text-aivo-muted">
+                    <div>{log.actorEmail || log.actorId}</div>
+                    <div>{log.actorRoleLabel}</div>
+                  </td>
                   <td className="p-3 text-aivo-ink-soft">
-                    {l.tenantId ? (getTenantById(l.tenantId)?.name ?? l.tenantId) : "—"}
+                    {log.resourceType}
+                    {log.resourceId ? ` · ${log.resourceId}` : ""}
                   </td>
-                  <td className="p-3 font-mono text-xs text-aivo-muted">{l.requestId}</td>
+                  <td className="p-3 font-mono text-xs text-aivo-muted">
+                    {log.tenantId ?? "—"}
+                  </td>
                 </tr>
               ))}
             </tbody>

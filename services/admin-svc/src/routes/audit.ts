@@ -1,22 +1,9 @@
 import { FastifyInstance } from "fastify";
 import { adminAuditLog, appendAudit } from "@aivo/db";
-import { verifyJWT } from "@aivo/security";
+import { Permission } from "@aivo/security";
 import { eq, desc, sql, and, gte, lte, or, count, ilike } from "drizzle-orm";
 import { getAdminSvcAuditLogSchema, getAdminSvcActivitySchema } from "./schemas.js";
-
-async function requireAdmin(req: any, reply: any) {
-  const auth = req.headers.authorization;
-  if (!auth?.startsWith("Bearer "))
-    return reply.status(401).send({ error: "Missing authorization header" });
-  try {
-    const payload = await verifyJWT(auth.slice(7));
-    if (!["PLATFORM_ADMIN", "DISTRICT_ADMIN"].includes(payload.role as string))
-      return reply.status(403).send({ error: "Admin access required" });
-    req.user = payload;
-  } catch {
-    return reply.status(401).send({ error: "Invalid token" });
-  }
-}
+import { requirePermission } from "../lib/permissions.js";
 
 export async function logAuditEvent(
   db: any,
@@ -55,7 +42,10 @@ export async function logAuditEvent(
 export function registerAuditRoutes(app: FastifyInstance, db: any) {
   app.get(
     "/api/admin-svc/audit-log",
-    { schema: getAdminSvcAuditLogSchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcAuditLogSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.AuditRead),
+    },
     async (request) => {
       const {
         action,
@@ -107,7 +97,10 @@ export function registerAuditRoutes(app: FastifyInstance, db: any) {
 
   app.get(
     "/api/admin-svc/activity",
-    { schema: getAdminSvcActivitySchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcActivitySchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.AuditRead),
+    },
     async () => {
       const entries = await db
         .select()

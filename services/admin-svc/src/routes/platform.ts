@@ -1,5 +1,5 @@
 /**
- * Sprint 10 — admin-svc as the BFF for platform reads.
+ * Sprint 10 - admin-svc as the BFF for platform reads.
  *
  * Each `/api/admin-svc/{stats,users,learners,tenants}*` GET proxies to
  * identity-svc with the caller's Bearer token + query string forwarded.
@@ -12,33 +12,52 @@
  * append-only history row; `GET /config/history` returns the trail.
  */
 import { FastifyInstance, FastifyReply } from "fastify";
-import { platformConfig, users } from "@aivo/db";
-import { verifyJWT } from "@aivo/security";
-import { desc, eq } from "drizzle-orm";
+import {
+  aiUsageLog,
+  learners,
+  lessonRuns,
+  platformConfig,
+  subscriptions,
+  tenants,
+  users,
+} from "@aivo/db";
+import { Permission, verifyJWT } from "@aivo/security";
+import { asc, count, desc, eq, gte, sql } from "drizzle-orm";
+import { requirePermission } from "../lib/permissions.js";
 import { logAuditEvent } from "./audit.js";
 import {
-  getAdminSvcStatsSchema,
-  getAdminSvcUsersSchema,
-  getAdminSvcUsersByIdSchema,
-  getAdminSvcLearnersSchema,
-  getAdminSvcLearnersByIdSchema,
-  getAdminSvcTenantsSchema,
-  getAdminSvcTenantsByIdSchema,
   adminSvcAiPlaygroundSchema,
-  getAdminSvcConfigSchema,
-  updateAdminSvcConfigSchema,
+  getAdminSvcBillingAccountsSchema,
   getAdminSvcConfigHistorySchema,
+  getAdminSvcConfigSchema,
+  getAdminSvcLearnersByIdSchema,
+  getAdminSvcLearnersSchema,
+  getAdminSvcPlatformAiActivitySchema,
+  getAdminSvcPlatformAiCostsSchema,
+  getAdminSvcPlatformSystemHealthSchema,
+  getAdminSvcStatsSchema,
+  getAdminSvcTenantsByIdSchema,
+  getAdminSvcTenantsSchema,
+  getAdminSvcUsersByIdSchema,
+  getAdminSvcUsersSchema,
+  updateAdminSvcConfigSchema,
 } from "./schemas.js";
 
 const IS_PROD = process.env.NODE_ENV === "production";
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 function requireUrl(name: string, devDefault: string): string {
   const v = process.env[name];
   if (v) return v;
   if (IS_PROD) throw new Error(`admin-svc: ${name} must be set in production`);
   return devDefault;
 }
+
 const IDENTITY_URL = requireUrl("IDENTITY_SVC_URL", "http://localhost:3001");
+const AI_URL = requireUrl("AI_SVC_URL", "http://localhost:3004");
 const BRAIN_URL = requireUrl("BRAIN_SVC_URL", "http://localhost:8000");
+const INTERNAL_SERVICE_TOKEN =
+  process.env.INTERNAL_SERVICE_TOKEN || process.env.INTERNAL_SERVICE_KEY || null;
 
 async function requireAdmin(req: any, reply: any) {
   const auth = req.headers.authorization;
@@ -80,64 +99,498 @@ async function proxyToIdentity(req: any, reply: FastifyReply, downstreamPath: st
     req.log?.error({ err: e?.message, downstreamPath }, "identity-svc proxy failed");
     return reply.status(502).send({ error: "Upstream identity-svc unavailable" });
   }
-  // Forward content-type + status + body. Drop the deprecation headers
-  // here — admin-svc is the new canonical surface, so callers should
-  // see a clean response.
+
   reply.status(res.status);
   const ct = res.headers.get("content-type");
   if (ct) reply.header("content-type", ct);
-  const text = await res.text();
-  return reply.send(text);
+  return reply.send(await res.text());
+}
+
+function normalizeBillingStatus(value: string | null | undefined): string {
+  switch ((value ?? "").toLowerCase()) {
+    case "active":
+      return "active";
+    case "trialing":
+      return "trialing";
+    case "past_due":
+    case "past due":
+    case "unpaid":
+    case "incomplete":
+    case "incomplete_expired":
+      return "past_due";
+    case "cancelled":
+    case "canceled":
+      return "canceled";
+    default:
+      return value?.toLowerCase() ?? "unknown";
+  }
+}
+
+type AiBudgetSnapshot = {
+  budgetAvailable: boolean;
+  tenantId: string;
+  day: string | null;
+  spendCents: number | null;
+  spendUsd: number | null;
+  warnCents: number | null;
+  warnUsd: number | null;
+  capCents: number | null;
+  capUsd: number | null;
+  completionCount: number | null;
+  blockedCount: number | null;
+  warned: boolean;
+  exceeded: boolean;
+  error: string | null;
+};
+
+type AiCostUsage = {
+  requestCount: number;
+  estimatedCostUsd: number;
+  inputTokens: number;
+  outputTokens: number;
+  avgLatencyMs: number;
+};
+
+type AiCostRow = {
+  tenantId: string | null;
+  requestCount: number | string | null;
+  estimatedCostUsd: number | string | null;
+  inputTokens: number | string | null;
+  outputTokens: number | string | null;
+  avgLatencyMs: number | string | null;
+};
+
+type AiCostTenantRow = {
+  id: string;
+  name: string | null;
+  type: string | null;
+};
+
+async function fetchAiBudgetSnapshot(tenantId: string): Promise<AiBudgetSnapshot> {
+  if (!INTERNAL_SERVICE_TOKEN) {
+    return {
+      budgetAvailable: false,
+      tenantId,
+      day: null,
+      spendCents: null,
+      spendUsd: null,
+      warnCents: null,
+      warnUsd: null,
+      capCents: null,
+      capUsd: null,
+      completionCount: null,
+      blockedCount: null,
+      warned: false,
+      exceeded: false,
+      error: "INTERNAL_SERVICE_TOKEN not configured",
+    };
+  }
+
+  const url = new URL(`/api/ai/admin/budget/${encodeURIComponent(tenantId)}`, AI_URL);
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "x-internal-service-token": INTERNAL_SERVICE_TOKEN,
+      },
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch (error: any) {
+    return {
+      budgetAvailable: false,
+      tenantId,
+      day: null,
+      spendCents: null,
+      spendUsd: null,
+      warnCents: null,
+      warnUsd: null,
+      capCents: null,
+      capUsd: null,
+      completionCount: null,
+      blockedCount: null,
+      warned: false,
+      exceeded: false,
+      error: error?.message ?? "ai-svc unavailable",
+    };
+  }
+
+  let payload: Record<string, unknown> | null = null;
+  try {
+    payload = (await response.json()) as Record<string, unknown>;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage =
+      typeof payload?.detail === "string"
+        ? payload.detail
+        : typeof payload?.error === "string"
+          ? payload.error
+          : `ai-svc budget request failed (${response.status})`;
+    return {
+      budgetAvailable: false,
+      tenantId,
+      day: null,
+      spendCents: null,
+      spendUsd: null,
+      warnCents: null,
+      warnUsd: null,
+      capCents: null,
+      capUsd: null,
+      completionCount: null,
+      blockedCount: null,
+      warned: false,
+      exceeded: false,
+      error: errorMessage,
+    };
+  }
+
+  return {
+    budgetAvailable: true,
+    tenantId: String(payload?.tenant_id ?? tenantId),
+    day: payload?.day ? String(payload.day) : null,
+    spendCents: Number(payload?.spend_cents ?? 0),
+    spendUsd: Number(payload?.spend_usd ?? 0),
+    warnCents: Number(payload?.warn_cents ?? 0),
+    warnUsd: Number(payload?.warn_usd ?? 0),
+    capCents: Number(payload?.cap_cents ?? 0),
+    capUsd: Number(payload?.cap_usd ?? 0),
+    completionCount: Number(payload?.completion_count ?? 0),
+    blockedCount: Number(payload?.blocked_count ?? 0),
+    warned: Boolean(payload?.warned),
+    exceeded: Boolean(payload?.exceeded),
+    error: null,
+  };
 }
 
 export function registerPlatformRoutes(app: FastifyInstance, db: any) {
-  // ── Read proxies ──────────────────────────────────────────────────
   app.get(
     "/api/admin-svc/stats",
-    { schema: getAdminSvcStatsSchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcStatsSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.PlatformRead),
+    },
     async (req, reply) => proxyToIdentity(req, reply, "/api/admin/stats"),
   );
 
   app.get(
+    "/api/admin-svc/platform/system-health",
+    {
+      schema: getAdminSvcPlatformSystemHealthSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.PlatformRead),
+    },
+    async () => {
+      const tenantTypeRows = await db
+        .select({ type: tenants.type, count: count() })
+        .from(tenants)
+        .groupBy(tenants.type);
+      const [userTotal] = await db.select({ count: count() }).from(users);
+      const [learnerTotal] = await db.select({ count: count() }).from(learners);
+      const [lessonTotal] = await db.select({ count: count() }).from(lessonRuns);
+      const [lessonCompleted] = await db
+        .select({ count: count() })
+        .from(lessonRuns)
+        .where(eq(lessonRuns.status, "completed"));
+
+      const since = new Date(Date.now() - DAY_MS);
+      const [aiSummary] = await db
+        .select({
+          requestCount: count(),
+          modelsActive: sql<number>`count(distinct ${aiUsageLog.model})`,
+          avgLatencyMs: sql<number>`coalesce(round(avg(${aiUsageLog.latencyMs})), 0)`,
+          estimatedCostUsd: sql<string>`coalesce(sum(${aiUsageLog.estimatedCostUsd}), 0)`,
+        })
+        .from(aiUsageLog)
+        .where(gte(aiUsageLog.createdAt, since));
+
+      const tenantCounts = {
+        district: 0,
+        school: 0,
+        family: 0,
+        unknown: 0,
+      };
+      for (const row of tenantTypeRows) {
+        const nextCount = Number(row.count ?? 0);
+        if (row.type === "B2B_DISTRICT") tenantCounts.district += nextCount;
+        else if (row.type === "B2B_SCHOOL") tenantCounts.school += nextCount;
+        else if (row.type === "B2C_FAMILY") tenantCounts.family += nextCount;
+        else tenantCounts.unknown += nextCount;
+      }
+
+      return {
+        tenantCounts,
+        tenantsTotal:
+          tenantCounts.district + tenantCounts.school + tenantCounts.family + tenantCounts.unknown,
+        usersTotal: Number(userTotal?.count ?? 0),
+        learnersTotal: Number(learnerTotal?.count ?? 0),
+        lessonRunsTotal: Number(lessonTotal?.count ?? 0),
+        lessonRunsCompleted: Number(lessonCompleted?.count ?? 0),
+        aiRequests24h: Number(aiSummary?.requestCount ?? 0),
+        aiModelsActive24h: Number(aiSummary?.modelsActive ?? 0),
+        aiAvgLatencyMs24h: Number(aiSummary?.avgLatencyMs ?? 0),
+        aiEstimatedCostUsd24h: Number(aiSummary?.estimatedCostUsd ?? 0),
+      };
+    },
+  );
+
+  app.get(
+    "/api/admin-svc/platform/ai-activity",
+    {
+      schema: getAdminSvcPlatformAiActivitySchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.AiRead),
+    },
+    async (req) => {
+      const { limit: limitStr } = req.query as { limit?: string };
+      const limit = Math.max(1, Math.min(200, Number(limitStr ?? "8") || 8));
+      const entries = await db
+        .select({
+          id: aiUsageLog.id,
+          provider: aiUsageLog.provider,
+          model: aiUsageLog.model,
+          inputTokens: aiUsageLog.inputTokens,
+          outputTokens: aiUsageLog.outputTokens,
+          latencyMs: aiUsageLog.latencyMs,
+          estimatedCostUsd: aiUsageLog.estimatedCostUsd,
+          learnerId: aiUsageLog.learnerId,
+          tenantId: learners.tenantId,
+          tenantName: tenants.name,
+          createdAt: aiUsageLog.createdAt,
+        })
+        .from(aiUsageLog)
+        .leftJoin(learners, eq(aiUsageLog.learnerId, learners.id))
+        .leftJoin(tenants, eq(learners.tenantId, tenants.id))
+        .orderBy(desc(aiUsageLog.createdAt))
+        .limit(limit);
+      return { entries, limit };
+    },
+  );
+
+  app.get(
+    "/api/admin-svc/platform/ai-costs",
+    {
+      schema: getAdminSvcPlatformAiCostsSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.AiRead),
+    },
+    async (req) => {
+      const { limit: limitStr } = req.query as { limit?: string };
+      const limit = Math.max(1, Math.min(100, Number(limitStr ?? "50") || 50));
+      const since = new Date(Date.now() - DAY_MS);
+
+      const tenantRows = await db
+        .select({
+          id: tenants.id,
+          name: tenants.name,
+          type: tenants.type,
+        })
+        .from(tenants)
+        .orderBy(asc(tenants.name));
+
+      const aiCostRows = await db
+        .select({
+          tenantId: learners.tenantId,
+          requestCount: count(),
+          estimatedCostUsd: sql<string>`coalesce(sum(${aiUsageLog.estimatedCostUsd}), 0)`,
+          inputTokens: sql<string>`coalesce(sum(${aiUsageLog.inputTokens}), 0)`,
+          outputTokens: sql<string>`coalesce(sum(${aiUsageLog.outputTokens}), 0)`,
+          avgLatencyMs: sql<number>`coalesce(round(avg(${aiUsageLog.latencyMs})), 0)`,
+        })
+        .from(aiUsageLog)
+        .leftJoin(learners, eq(aiUsageLog.learnerId, learners.id))
+        .where(gte(aiUsageLog.createdAt, since))
+        .groupBy(learners.tenantId);
+
+      const recentEvents = await db
+        .select({
+          id: aiUsageLog.id,
+          provider: aiUsageLog.provider,
+          model: aiUsageLog.model,
+          inputTokens: aiUsageLog.inputTokens,
+          outputTokens: aiUsageLog.outputTokens,
+          latencyMs: aiUsageLog.latencyMs,
+          estimatedCostUsd: aiUsageLog.estimatedCostUsd,
+          learnerId: aiUsageLog.learnerId,
+          tenantId: learners.tenantId,
+          tenantName: tenants.name,
+          createdAt: aiUsageLog.createdAt,
+        })
+        .from(aiUsageLog)
+        .leftJoin(learners, eq(aiUsageLog.learnerId, learners.id))
+        .leftJoin(tenants, eq(learners.tenantId, tenants.id))
+        .orderBy(desc(aiUsageLog.createdAt))
+        .limit(limit);
+
+      const costByTenant = new Map<string, AiCostUsage>(
+        (aiCostRows as AiCostRow[]).map((row): [string, AiCostUsage] => [
+          String(row.tenantId ?? "__unknown__"),
+          {
+            requestCount: Number(row.requestCount ?? 0),
+            estimatedCostUsd: Number(row.estimatedCostUsd ?? 0),
+            inputTokens: Number(row.inputTokens ?? 0),
+            outputTokens: Number(row.outputTokens ?? 0),
+            avgLatencyMs: Number(row.avgLatencyMs ?? 0),
+          },
+        ]),
+      );
+
+      const tenantBudgets = await Promise.all(
+        (tenantRows as AiCostTenantRow[]).map(async (tenant) => ({
+          tenant,
+          budget: await fetchAiBudgetSnapshot(String(tenant.id)),
+        })),
+      );
+
+      const tenantSummaries = tenantBudgets.map(({ tenant, budget }) => {
+        const usage = costByTenant.get(String(tenant.id)) ?? {
+          requestCount: 0,
+          estimatedCostUsd: 0,
+          inputTokens: 0,
+          outputTokens: 0,
+          avgLatencyMs: 0,
+        };
+        return {
+          tenantId: tenant.id,
+          tenantName: tenant.name,
+          tenantType: tenant.type,
+          requestCount24h: usage.requestCount,
+          estimatedCostUsd24h: usage.estimatedCostUsd,
+          inputTokens24h: usage.inputTokens,
+          outputTokens24h: usage.outputTokens,
+          avgLatencyMs24h: usage.avgLatencyMs,
+          budget,
+        };
+      });
+
+      const totalEstimatedCostUsd24h = tenantSummaries.reduce(
+        (sum, tenant) => sum + tenant.estimatedCostUsd24h,
+        0,
+      );
+      const requestCount24h = tenantSummaries.reduce((sum, tenant) => sum + tenant.requestCount24h, 0);
+      const activeTenants24h = tenantSummaries.filter((tenant) => tenant.requestCount24h > 0).length;
+      const warningTenants = tenantSummaries.filter((tenant) => tenant.budget.warned).length;
+      const overCapTenants = tenantSummaries.filter((tenant) => tenant.budget.exceeded).length;
+      const budgetsAvailable = tenantSummaries.filter((tenant) => tenant.budget.budgetAvailable).length;
+
+      return {
+        summary: {
+          totalEstimatedCostUsd24h,
+          requestCount24h,
+          activeTenants24h,
+          warningTenants,
+          overCapTenants,
+          trackedTenants: tenantSummaries.length,
+          budgetsAvailable,
+        },
+        tenants: tenantSummaries,
+        events: recentEvents,
+      };
+    },
+  );
+
+  app.get(
     "/api/admin-svc/users",
-    { schema: getAdminSvcUsersSchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcUsersSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.UserRead),
+    },
     async (req, reply) => proxyToIdentity(req, reply, "/api/admin/users"),
   );
   app.get(
     "/api/admin-svc/users/:id",
-    { schema: getAdminSvcUsersByIdSchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcUsersByIdSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.UserRead),
+    },
     async (req: any, reply) =>
       proxyToIdentity(req, reply, `/api/admin/users/${encodeURIComponent(req.params.id)}`),
   );
 
   app.get(
     "/api/admin-svc/learners",
-    { schema: getAdminSvcLearnersSchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcLearnersSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.LearnerRead),
+    },
     async (req, reply) => proxyToIdentity(req, reply, "/api/admin/learners"),
   );
   app.get(
     "/api/admin-svc/learners/:id",
-    { schema: getAdminSvcLearnersByIdSchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcLearnersByIdSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.LearnerRead),
+    },
     async (req: any, reply) =>
       proxyToIdentity(req, reply, `/api/admin/learners/${encodeURIComponent(req.params.id)}`),
   );
 
   app.get(
     "/api/admin-svc/tenants",
-    { schema: getAdminSvcTenantsSchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcTenantsSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.TenantRead),
+    },
     async (req, reply) => proxyToIdentity(req, reply, "/api/admin/tenants"),
   );
   app.get(
     "/api/admin-svc/tenants/:id",
-    { schema: getAdminSvcTenantsByIdSchema, preHandler: requireAdmin },
+    {
+      schema: getAdminSvcTenantsByIdSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.TenantRead),
+    },
     async (req: any, reply) =>
       proxyToIdentity(req, reply, `/api/admin/tenants/${encodeURIComponent(req.params.id)}`),
   );
 
-  // ── AI Prompt Playground (proxy to brain-svc) ─────────────────────
-  // Admin-only test surface for tutor system prompts. Forwards the
-  // full request body + bearer token to brain-svc which calls the
-  // selected LLM provider via litellm.
+  app.get(
+    "/api/admin-svc/billing/accounts",
+    {
+      schema: getAdminSvcBillingAccountsSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.BillingRead),
+    },
+    async () => {
+      const rows = await db
+        .select({
+          id: subscriptions.id,
+          tenantId: subscriptions.tenantId,
+          plan: subscriptions.plan,
+          status: subscriptions.status,
+          stripeStatus: subscriptions.stripeStatus,
+          paymentStatus: subscriptions.paymentStatus,
+          createdAt: subscriptions.createdAt,
+          updatedAt: subscriptions.updatedAt,
+          currentPeriodEnd: subscriptions.currentPeriodEnd,
+          tenantName: tenants.name,
+          tenantType: tenants.type,
+        })
+        .from(subscriptions)
+        .leftJoin(tenants, eq(subscriptions.tenantId, tenants.id))
+        .orderBy(desc(subscriptions.updatedAt), desc(subscriptions.createdAt));
+
+      const seen = new Set<string>();
+      const accounts: Array<Record<string, unknown>> = [];
+      for (const row of rows) {
+        const tenantId = String(row.tenantId);
+        if (seen.has(tenantId)) continue;
+        seen.add(tenantId);
+        accounts.push({
+          id: row.id,
+          tenantId,
+          tenantName: row.tenantName,
+          tenantType: row.tenantType,
+          plan: row.plan,
+          status: normalizeBillingStatus(row.stripeStatus ?? row.paymentStatus ?? row.status),
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
+          currentPeriodEnd: row.currentPeriodEnd,
+          paymentStatus: row.paymentStatus,
+        });
+      }
+
+      return { accounts };
+    },
+  );
+
   app.post(
     "/api/admin-svc/ai/playground",
     { schema: adminSvcAiPlaygroundSchema, preHandler: requireAdmin },
@@ -165,7 +618,6 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
     },
   );
 
-  // ── Platform config (owned by admin-svc; append-only history) ──────
   app.get(
     "/api/admin-svc/config",
     { schema: getAdminSvcConfigSchema, preHandler: requireAdmin },
@@ -220,9 +672,6 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
     },
   );
 
-  // Sprint 10 — append-only config history. Returns the last 200 rows
-  // with author + timestamp + description so admins can audit when a
-  // setting changed and who flipped it.
   app.get(
     "/api/admin-svc/config/history",
     { schema: getAdminSvcConfigHistorySchema, preHandler: requireAdmin },

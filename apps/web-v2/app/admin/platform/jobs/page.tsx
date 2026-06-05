@@ -1,132 +1,89 @@
-import { requirePageRole } from "@/lib/auth/server";
+import { Permission } from "@aivo/security";
+import { requirePlatformPage } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { scopeTenantsForSession, listAiGenerationJobs, computeSystemHealth } from "@/lib/db/repos";
-import type { AiGenerationJob } from "@/lib/db/types";
-import { Activity, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
+import { platformNavForSession } from "@/components/layout/role-shells";
+import { getPlatformSystemHealth, listRecentAiActivity } from "@/lib/admin-api/platform";
+import { ROLE_LABEL } from "@/lib/auth/types";
+import { Activity, Cpu, DollarSign, TimerReset } from "lucide-react";
 
-const STATUS_TONE: Record<AiGenerationJob["status"], "success" | "danger" | "warning" | "neutral"> =
-  {
-    complete: "success",
-    failed: "danger",
-    running: "warning",
-    queued: "neutral",
-  };
-
-const KIND_LABEL: Record<AiGenerationJob["kind"], string> = {
-  brain_profile: "Brain profile",
-  lesson_plan: "Lesson plan",
-  baseline: "Baseline",
-  summary: "Summary",
-};
-
-function durationMs(j: AiGenerationJob): number | null {
-  if (!j.completedAt) return null;
-  return new Date(j.completedAt).getTime() - new Date(j.startedAt).getTime();
-}
-
-function formatDuration(ms: number | null): string {
-  if (ms === null) return "—";
-  if (ms < 1000) return `${ms}ms`;
-  if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`;
-  return `${(ms / 60_000).toFixed(1)}m`;
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)] ?? null;
 }
 
 export default async function Page() {
-  const session = await requirePageRole(["platform_admin"]);
+  const session = await requirePlatformPage(Permission.AiRead);
   const t = await getTranslations("admin.platform_jobs");
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const tenantIds = tenants.map((t) => t.id);
-  const jobs = listAiGenerationJobs(tenantIds, 200);
-  const h = computeSystemHealth(tenantIds);
-  const tenantById = new Map(tenants.map((t) => [t.id, t]));
+  const [health, entries] = await Promise.all([
+    getPlatformSystemHealth(session),
+    listRecentAiActivity(session, 200),
+  ]);
 
-  const byStatus = jobs.reduce<Record<AiGenerationJob["status"], number>>(
-    (acc, j) => {
-      acc[j.status] = (acc[j.status] ?? 0) + 1;
-      return acc;
-    },
-    { complete: 0, failed: 0, running: 0, queued: 0 },
-  );
-
-  const byKind = jobs.reduce<Record<string, number>>((acc, j) => {
-    acc[j.kind] = (acc[j.kind] ?? 0) + 1;
+  const byProvider = entries.reduce<Record<string, number>>((acc, entry) => {
+    acc[entry.provider] = (acc[entry.provider] ?? 0) + 1;
     return acc;
   }, {});
-
-  // Median run duration across completed jobs.
-  const completedDurations = jobs
-    .filter((j) => j.status === "complete" && j.completedAt)
-    .map((j) => durationMs(j) ?? 0)
-    .sort((a, b) => a - b);
-  const median =
-    completedDurations.length === 0
-      ? null
-      : completedDurations[Math.floor(completedDurations.length / 2)];
+  const medianLatency = median(entries.map((entry) => entry.latencyMs).filter((value) => value > 0));
+  const totalTokens = entries.reduce(
+    (sum, entry) => sum + entry.inputTokens + entry.outputTokens,
+    0,
+  );
 
   return (
     <AppShell
-      role="platform_admin"
-      roleLabel="Platform admin"
-      navItems={PLATFORM_NAV}
+      role={session.role}
+      roleLabel={ROLE_LABEL[session.role]}
+      navItems={platformNavForSession(session)}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
         eyebrow="Platform · Jobs"
         title={t("title")}
-        description="AI generation pipeline — completions, failures, and queue depth across every tenant."
-        actions={
-          <Badge
-            tone={
-              h.generationSuccessRate >= 0.9
-                ? "success"
-                : h.generationSuccessRate >= 0.7
-                  ? "warning"
-                  : "danger"
-            }
-          >
-            {(h.generationSuccessRate * 100).toFixed(0)}% success
-          </Badge>
-        }
+        description="Live AI request ledger from admin-svc and ai_usage_log."
+        actions={<Badge tone="neutral">Live service data</Badge>}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           {
-            k: "Completed",
-            v: byStatus.complete,
-            Icon: CheckCircle2,
-            tone: "success" as const,
-          },
-          {
-            k: "Failed",
-            v: byStatus.failed,
-            Icon: AlertTriangle,
-            tone: "danger" as const,
-          },
-          {
-            k: "Running",
-            v: byStatus.running,
+            label: "Requests (24h)",
+            value: health.aiRequests24h.toLocaleString(),
+            helper: `${health.aiModelsActive24h} active models`,
             Icon: Activity,
-            tone: "warning" as const,
           },
           {
-            k: "Queued",
-            v: byStatus.queued,
-            Icon: Clock,
-            tone: "neutral" as const,
+            label: "Avg latency",
+            value: `${health.aiAvgLatencyMs24h.toLocaleString()} ms`,
+            helper: medianLatency === null ? "No recent samples" : `Median ${medianLatency} ms`,
+            Icon: TimerReset,
           },
-        ].map(({ k, v, Icon, tone }) => (
-          <Card key={k} className="p-[var(--aivo-density-card-pad)]">
+          {
+            label: "Estimated cost (24h)",
+            value: `$${health.aiEstimatedCostUsd24h.toFixed(2)}`,
+            helper: `${entries.length.toLocaleString()} recent requests sampled`,
+            Icon: DollarSign,
+          },
+          {
+            label: "Tokens sampled",
+            value: totalTokens.toLocaleString(),
+            helper: `${health.lessonRunsCompleted.toLocaleString()} lessons completed`,
+            Icon: Cpu,
+          },
+        ].map(({ label, value, helper, Icon }) => (
+          <Card key={label} className="p-[var(--aivo-density-card-pad)]">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{k}</p>
-                <p className="mt-1 font-display text-3xl font-bold">{v.toLocaleString()}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+                  {label}
+                </p>
+                <p className="mt-1 font-display text-3xl font-bold">{value}</p>
+                <p className="mt-2 text-xs text-aivo-ink-soft">{helper}</p>
               </div>
               <span
                 aria-hidden
@@ -135,88 +92,100 @@ export default async function Page() {
                 <Icon className="h-4 w-4" />
               </span>
             </div>
-            <Badge tone={tone} className="mt-3">
-              {k.toLowerCase()}
-            </Badge>
           </Card>
         ))}
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">{t("by_kind")}</p>
+          <p className="font-display text-lg font-semibold">Provider mix</p>
           <ul className="mt-3 space-y-2 text-sm">
-            {Object.entries(KIND_LABEL).map(([k, label]) => (
-              <li key={k} className="flex items-center justify-between">
-                <span className="text-aivo-ink-soft">{label}</span>
-                <span className="font-semibold tabular-nums">
-                  {(byKind[k] ?? 0).toLocaleString()}
-                </span>
-              </li>
-            ))}
+            {Object.entries(byProvider)
+              .sort((a, b) => b[1] - a[1])
+              .map(([provider, count]) => (
+                <li key={provider} className="flex items-center justify-between">
+                  <span className="text-aivo-ink-soft">{provider}</span>
+                  <span className="font-semibold tabular-nums">{count.toLocaleString()}</span>
+                </li>
+              ))}
           </ul>
         </Card>
+
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">{t("latency")}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">
-            Median completed-job duration across the last {jobs.length} jobs.
-          </p>
-          <p className="mt-3 font-display text-3xl font-bold">{formatDuration(median)}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">
-            {completedDurations.length.toLocaleString()} completed jobs sampled
-          </p>
+          <p className="font-display text-lg font-semibold">AI operations</p>
+          <ul className="mt-3 space-y-2 text-sm">
+            <li className="flex items-center justify-between">
+              <span className="text-aivo-ink-soft">Models active</span>
+              <span className="font-semibold">{health.aiModelsActive24h}</span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span className="text-aivo-ink-soft">Requests last 24h</span>
+              <span className="font-semibold">{health.aiRequests24h.toLocaleString()}</span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span className="text-aivo-ink-soft">Lessons completed</span>
+              <span className="font-semibold">{health.lessonRunsCompleted.toLocaleString()}</span>
+            </li>
+          </ul>
         </Card>
+
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">{t("lesson_runs")}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">{t("lesson_runs_desc")}</p>
+          <p className="font-display text-lg font-semibold">Latency</p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">
+            Based on the most recent {entries.length.toLocaleString()} recorded AI requests.
+          </p>
           <p className="mt-3 font-display text-3xl font-bold">
-            {h.lessonRunsCompleted.toLocaleString()}
+            {medianLatency === null ? "\u2014" : `${medianLatency} ms`}
           </p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
-            of {h.lessonRunsTotal.toLocaleString()} attempted
+            Average {health.aiAvgLatencyMs24h.toLocaleString()} ms across the last 24 hours
           </p>
         </Card>
       </div>
 
       <Card className="mt-6 overflow-hidden">
         <div className="border-b border-aivo-border px-4 py-3 text-sm font-medium">
-          {t("recent_jobs")}
+          Recent AI requests
         </div>
-        {jobs.length === 0 ? (
+        {entries.length === 0 ? (
           <EmptyState title={t("empty")} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
                 <tr>
-                  <th className="px-4 py-2">Kind</th>
-                  <th className="px-4 py-2">{t("col_status")}</th>
+                  <th className="px-4 py-2">When</th>
+                  <th className="px-4 py-2">Model</th>
                   <th className="px-4 py-2">{t("col_tenant")}</th>
-                  <th className="px-4 py-2">{t("col_started")}</th>
-                  <th className="px-4 py-2 text-right">{t("col_duration")}</th>
-                  <th className="px-4 py-2">Input</th>
+                  <th className="px-4 py-2">Tokens</th>
+                  <th className="px-4 py-2 text-right">Latency</th>
+                  <th className="px-4 py-2 text-right">Cost</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
-                {jobs.map((j) => {
-                  const tenant = tenantById.get(j.tenantId);
-                  return (
-                    <tr key={j.id}>
-                      <td className="px-4 py-3 font-medium">{KIND_LABEL[j.kind]}</td>
-                      <td className="px-4 py-3">
-                        <Badge tone={STATUS_TONE[j.status]}>{j.status}</Badge>
-                      </td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">{tenant?.name ?? j.tenantId}</td>
-                      <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {new Date(j.startedAt).toLocaleString()}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums text-aivo-ink-soft">
-                        {formatDuration(durationMs(j))}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs text-aivo-muted">{j.inputRef}</td>
-                    </tr>
-                  );
-                })}
+                {entries.map((entry) => (
+                  <tr key={entry.id}>
+                    <td className="px-4 py-3 text-xs text-aivo-ink-soft">
+                      {new Date(entry.createdAt).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 font-medium">
+                      <div>{entry.model}</div>
+                      <div className="text-xs text-aivo-ink-soft">{entry.provider}</div>
+                    </td>
+                    <td className="px-4 py-3 text-aivo-ink-soft">
+                      {entry.tenantName ?? entry.tenantId ?? "Unknown"}
+                    </td>
+                    <td className="px-4 py-3 text-aivo-ink-soft">
+                      {entry.inputTokens.toLocaleString()} in | {entry.outputTokens.toLocaleString()} out
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums text-aivo-ink-soft">
+                      {entry.latencyMs.toLocaleString()} ms
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      ${entry.estimatedCostUsd.toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

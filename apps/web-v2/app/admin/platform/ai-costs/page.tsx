@@ -1,137 +1,132 @@
-import { requirePageRole } from "@/lib/auth/server";
+import { Permission } from "@aivo/security";
+import { requirePlatformPage } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  checkAIBudget,
-  getAIBudget,
-  listAICostEvents,
-  monthToDateSpendCents,
-  scopeTenantsForSession,
-} from "@/lib/db/repos";
-import { BudgetEditor } from "./budget-editor";
+import { platformNavForSession } from "@/components/layout/role-shells";
+import { getPlatformAiCosts } from "@/lib/admin-api/platform";
+import { ROLE_LABEL } from "@/lib/auth/types";
 import { getTranslations } from "next-intl/server";
 
-function fmtCents(c: number): string {
-  return `$${(c / 100).toFixed(2)}`;
+function fmtUsd(value: number): string {
+  return `$${value.toFixed(2)}`;
+}
+
+function fmtBudgetCap(value: number | null): string {
+  return value === null ? "\u2014" : `$${value.toFixed(2)}`;
 }
 
 export default async function Page() {
   const t = await getTranslations("admin.platform_ai_costs");
-  const session = await requirePageRole(["platform_admin"]);
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const rows = tenants.map((t) => ({
-    tenant: t,
-    budget: getAIBudget(t.id),
-    spent: monthToDateSpendCents(t.id),
-    check: checkAIBudget(t.id),
-  }));
-  const events = listAICostEvents({ limit: 50 });
-  const tenantsById = new Map(tenants.map((t) => [t.id, t]));
-
-  const totalSpent = rows.reduce((s, r) => s + r.spent, 0);
-  const overBudget = rows.filter(
-    (r) => r.budget.monthlyCapCents !== null && r.spent >= r.budget.monthlyCapCents,
-  ).length;
-  const warning = rows.filter((r) => r.check.warning && r.check.allow).length;
+  const session = await requirePlatformPage(Permission.AiRead);
+  const snapshot = await getPlatformAiCosts(session, 50);
 
   return (
     <AppShell
-      role="platform_admin"
-      roleLabel="Platform admin"
-      navItems={PLATFORM_NAV}
+      role={session.role}
+      roleLabel={ROLE_LABEL[session.role]}
+      navItems={platformNavForSession(session)}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
         eyebrow="Platform · AI costs"
         title={t("title")}
-        description="Per-tenant LLM and TTS spend, with monthly caps and hard stops."
+        description="Real 24-hour AI usage spend plus live daily budget state from ai-svc."
+        actions={<Badge tone="neutral">Live service data</Badge>}
       />
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid gap-4 sm:grid-cols-4">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            {t("spend_mtd")}
+            Spend (24h)
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">{fmtCents(totalSpent)}</p>
+          <p className="mt-1 font-display text-3xl font-bold">
+            {fmtUsd(snapshot.summary.totalEstimatedCostUsd24h)}
+          </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            {t("approaching_cap")}
+            Active tenants
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">{warning}</p>
+          <p className="mt-1 font-display text-3xl font-bold">
+            {snapshot.summary.activeTenants24h.toLocaleString()}
+          </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            {t("over_cap")}
+            Warned budgets
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">{overBudget}</p>
+          <p className="mt-1 font-display text-3xl font-bold">
+            {snapshot.summary.warningTenants.toLocaleString()}
+          </p>
+        </Card>
+        <Card className="p-[var(--aivo-density-card-pad)]">
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            Over cap
+          </p>
+          <p className="mt-1 font-display text-3xl font-bold">
+            {snapshot.summary.overCapTenants.toLocaleString()}
+          </p>
         </Card>
       </div>
 
-      <h2 className="mb-3 font-display text-lg font-semibold">{t("tenants")}</h2>
+      <h2 className="mb-3 font-display text-lg font-semibold">Tenants</h2>
       <Card className="mb-8 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-aivo-surface-2 text-left">
             <tr>
               <th className="p-3">{t("col_tenant")}</th>
-              <th className="p-3">Spend</th>
+              <th className="p-3">Requests (24h)</th>
+              <th className="p-3">Spend (24h)</th>
               <th className="p-3">{t("col_status")}</th>
-              <th className="p-3">{t("col_budget")}</th>
+              <th className="p-3">Daily cap</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => {
-              const ratio =
-                r.budget.monthlyCapCents === null
-                  ? 0
-                  : r.budget.monthlyCapCents === 0
-                    ? 1
-                    : r.spent / r.budget.monthlyCapCents;
-              const tone: "neutral" | "warning" | "danger" | "success" = !r.check.allow
-                ? "danger"
-                : r.check.warning
-                  ? "warning"
-                  : r.budget.monthlyCapCents === null
-                    ? "neutral"
+            {snapshot.tenants.map((tenant) => {
+              const tone: "neutral" | "warning" | "danger" | "success" = !tenant.budget.budgetAvailable
+                ? "neutral"
+                : tenant.budget.exceeded
+                  ? "danger"
+                  : tenant.budget.warned
+                    ? "warning"
                     : "success";
+              const label = !tenant.budget.budgetAvailable
+                ? "budget unavailable"
+                : tenant.budget.exceeded
+                  ? "over cap"
+                  : tenant.budget.warned
+                    ? "warning"
+                    : "ok";
               return (
-                <tr key={r.tenant.id} className="border-t border-aivo-border">
+                <tr key={tenant.tenantId} className="border-t border-aivo-border">
                   <td className="p-3 font-medium">
-                    {r.tenant.name}
-                    <span className="ml-2 text-xs text-aivo-ink-soft">{r.tenant.type}</span>
+                    {tenant.tenantName ?? tenant.tenantId}
+                    <span className="ml-2 text-xs text-aivo-ink-soft">{tenant.tenantTypeLabel}</span>
+                  </td>
+                  <td className="p-3 text-aivo-ink-soft">{tenant.requestCount24h.toLocaleString()}</td>
+                  <td className="p-3">
+                    {fmtUsd(tenant.estimatedCostUsd24h)}
+                    <span className="ml-1 text-xs text-aivo-ink-soft">
+                      {tenant.inputTokens24h.toLocaleString()} in | {tenant.outputTokens24h.toLocaleString()} out
+                    </span>
                   </td>
                   <td className="p-3">
-                    {fmtCents(r.spent)}
-                    {r.budget.monthlyCapCents !== null ? (
-                      <span className="ml-1 text-xs text-aivo-ink-soft">
-                        / {fmtCents(r.budget.monthlyCapCents)} ({Math.round(ratio * 100)}%)
-                      </span>
-                    ) : (
-                      <span className="ml-1 text-xs text-aivo-ink-soft">/ unlimited</span>
-                    )}
+                    <Badge tone={tone}>{label}</Badge>
+                    {tenant.budget.error ? (
+                      <div className="mt-1 text-xs text-aivo-ink-soft">{tenant.budget.error}</div>
+                    ) : null}
                   </td>
-                  <td className="p-3">
-                    <Badge tone={tone}>
-                      {!r.check.allow
-                        ? "blocked"
-                        : r.check.warning
-                          ? "approaching"
-                          : r.budget.monthlyCapCents === null
-                            ? "unlimited"
-                            : "ok"}
-                    </Badge>
-                  </td>
-                  <td className="p-3">
-                    <BudgetEditor
-                      tenantId={r.tenant.id}
-                      monthlyCapCents={r.budget.monthlyCapCents}
-                      warnAt={r.budget.warnAt}
-                      hardStop={r.budget.hardStop}
-                    />
+                  <td className="p-3 text-aivo-ink-soft">
+                    {fmtBudgetCap(tenant.budget.capUsd)}
+                    {tenant.budget.budgetAvailable ? (
+                      <div className="text-xs">
+                        spend {fmtUsd(tenant.budget.spendUsd ?? 0)} | warn{" "}
+                        {fmtBudgetCap(tenant.budget.warnUsd)}
+                      </div>
+                    ) : null}
                   </td>
                 </tr>
               );
@@ -141,10 +136,10 @@ export default async function Page() {
       </Card>
 
       <h2 className="mb-3 font-display text-lg font-semibold">{t("recent_cost_events")}</h2>
-      {events.length === 0 ? (
+      {snapshot.events.length === 0 ? (
         <EmptyState
           title={t("no_cost_events_yet")}
-          description="AI generations will appear here as they run."
+          description="Recorded AI requests will appear here as they run."
         />
       ) : (
         <Card className="overflow-hidden">
@@ -153,29 +148,29 @@ export default async function Page() {
               <tr>
                 <th className="p-3">Time</th>
                 <th className="p-3">{t("col_tenant")}</th>
-                <th className="p-3">{t("col_feature")}</th>
                 <th className="p-3">{t("col_provider_model")}</th>
                 <th className="p-3">{t("col_tokens")}</th>
+                <th className="p-3">Latency</th>
                 <th className="p-3">Cost</th>
               </tr>
             </thead>
             <tbody>
-              {events.map((e) => (
-                <tr key={e.id} className="border-t border-aivo-border">
+              {snapshot.events.map((event) => (
+                <tr key={event.id} className="border-t border-aivo-border">
                   <td className="p-3 text-aivo-ink-soft">
-                    {new Date(e.occurredAt).toLocaleString()}
+                    {new Date(event.createdAt).toLocaleString()}
                   </td>
                   <td className="p-3 font-medium">
-                    {tenantsById.get(e.tenantId)?.name ?? e.tenantId}
-                  </td>
-                  <td className="p-3 text-aivo-ink-soft">{e.feature}</td>
-                  <td className="p-3 text-aivo-ink-soft">
-                    {e.provider} · {e.model}
+                    {event.tenantName ?? event.tenantId ?? "Unknown"}
                   </td>
                   <td className="p-3 text-aivo-ink-soft">
-                    {e.promptTokens.toLocaleString()} → {e.completionTokens.toLocaleString()}
+                    {event.provider} | {event.model}
                   </td>
-                  <td className="p-3">{fmtCents(e.amountCents)}</td>
+                  <td className="p-3 text-aivo-ink-soft">
+                    {event.inputTokens.toLocaleString()} in | {event.outputTokens.toLocaleString()} out
+                  </td>
+                  <td className="p-3 text-aivo-ink-soft">{event.latencyMs.toLocaleString()} ms</td>
+                  <td className="p-3">{fmtUsd(event.estimatedCostUsd)}</td>
                 </tr>
               ))}
             </tbody>

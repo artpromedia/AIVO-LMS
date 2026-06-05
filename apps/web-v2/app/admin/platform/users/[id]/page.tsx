@@ -7,74 +7,26 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import {
-  scopeTenantsForSession,
-  getUserById,
-  listMembershipsForUser,
-  listLearnersForParent,
-} from "@/lib/db/repos";
-import { type Role } from "@/lib/auth/types";
+import { getAdminUser } from "@/lib/admin-api/platform";
+import { ROLE_LABEL } from "@/lib/auth/types";
 import { ArrowLeft } from "lucide-react";
 import { sessionHasPermission } from "@/lib/auth/permissions";
 import { UserRolesCard } from "./user-roles-card";
-
-const ROLE_LABEL: Record<Role, string> = {
-  parent: "Parent",
-  learner: "Learner",
-  teacher: "Teacher",
-  caregiver: "Caregiver",
-  therapist: "Therapist",
-  school_admin: "School admin",
-  district_admin: "District admin",
-  platform_admin: "Platform admin",
-  support: "Support",
-  marketing: "Marketing",
-  sales: "Sales",
-  devops: "DevOps",
-  engineering: "Engineering",
-};
-
-const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
-  parent: "neutral",
-  learner: "primary",
-  teacher: "success",
-  caregiver: "neutral",
-  therapist: "neutral",
-  school_admin: "success",
-  district_admin: "primary",
-  platform_admin: "warning",
-  support: "warning",
-  marketing: "warning",
-  sales: "warning",
-  devops: "warning",
-  engineering: "warning",
-};
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await requirePlatformPage(Permission.UserRead);
   const t = await getTranslations("admin.platform_users_detail");
   const canGrantRoles = sessionHasPermission(session, Permission.RoleGrant);
-  const user = await getUserById(id);
+
+  let user;
+  try {
+    user = await getAdminUser(session, id);
+  } catch {
+    notFound();
+  }
   if (!user) notFound();
-
-  // Only show memberships inside the caller's visible tenant scope.
-  const visibleTenants = scopeTenantsForSession(session.role, session.tenantId);
-  const visibleIds = new Set(visibleTenants.map((t) => t.id));
-  const allMemberships = await listMembershipsForUser(user.id);
-  const memberships = allMemberships.filter((m) => visibleIds.has(m.tenantId));
-  if (memberships.length === 0) notFound();
-
-  const tenantById = new Map(visibleTenants.map((t) => [t.id, t]));
-
-  // If parent, list the learners they manage (across all their tenants).
-  const parentMemberships = memberships.filter((m) => m.role === "parent");
-  const managedNested = await Promise.all(
-    parentMemberships.map((m) => listLearnersForParent(user.id, m.tenantId)),
-  );
-  const managedLearners = managedNested.flat();
 
   return (
     <AppShell
@@ -91,21 +43,23 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       </Link>
       <PageHeader
         eyebrow="Platform · User"
-        title={user.displayName}
-        description={user.email}
-        actions={
-          <Badge tone="neutral">
-            {memberships.length} {memberships.length === 1 ? "membership" : "memberships"}
-          </Badge>
-        }
+        title={user.name}
+        description={user.email ?? "No email on record"}
+        actions={<Badge tone={user.roleTone}>{user.roleLabel}</Badge>}
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
             {t("user_id")}
           </p>
           <p className="mt-1 font-mono text-sm">{user.id}</p>
+        </Card>
+        <Card className="p-[var(--aivo-density-card-pad)]">
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Tenant</p>
+          <p className="mt-1 text-sm font-medium">
+            {user.tenant ? `${user.tenant.name} · ${user.tenant.typeLabel}` : "—"}
+          </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
@@ -117,11 +71,69 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            {t("managed_learners")}
+            Active sessions
           </p>
           <p className="mt-1 font-display text-2xl font-bold">
-            {managedLearners.length.toLocaleString()}
+            {user.activeSessions?.toLocaleString() ?? "0"}
           </p>
+        </Card>
+      </div>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <Card className="p-[var(--aivo-density-card-pad)]">
+          <p className="font-display text-lg font-semibold">Authentication</p>
+          <dl className="mt-3 space-y-2 text-sm">
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-aivo-ink-soft">Email verified</dt>
+              <dd>{user.emailVerified ? "Yes" : "No"}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-aivo-ink-soft">Google login</dt>
+              <dd>{user.hasGoogle ? "Connected" : "No"}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-aivo-ink-soft">Apple login</dt>
+              <dd>{user.hasApple ? "Connected" : "No"}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-aivo-ink-soft">Last login</dt>
+              <dd>{user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : "Never"}</dd>
+            </div>
+          </dl>
+        </Card>
+
+        <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-2">
+          <p className="font-display text-lg font-semibold">Profile</p>
+          <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+                Email
+              </dt>
+              <dd className="mt-1 text-sm">{user.email ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+                Role
+              </dt>
+              <dd className="mt-1 text-sm">{user.roleLabel}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+                Updated
+              </dt>
+              <dd className="mt-1 text-sm">
+                {user.updatedAt ? new Date(user.updatedAt).toLocaleString() : "—"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+                Deactivated
+              </dt>
+              <dd className="mt-1 text-sm">
+                {user.deactivatedAt ? new Date(user.deactivatedAt).toLocaleString() : "No"}
+              </dd>
+            </div>
+          </dl>
         </Card>
       </div>
 
@@ -132,57 +144,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </Card>
       ) : null}
 
-      <Card className="mt-6 overflow-hidden">
-        <div className="border-b border-aivo-border px-4 py-3">
-          <p className="font-display text-lg font-semibold">{t("memberships")}</p>
-        </div>
-        {memberships.length === 0 ? (
-          <EmptyState title={t("empty")} />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-                <tr>
-                  <th className="px-4 py-2">{t("col_tenant")}</th>
-                  <th className="px-4 py-2">Type</th>
-                  <th className="px-4 py-2">Role</th>
-                  <th className="px-4 py-2">{t("col_permissions")}</th>
-                  <th className="px-4 py-2">{t("col_joined")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-aivo-border">
-                {memberships.map((m) => {
-                  const t = tenantById.get(m.tenantId);
-                  return (
-                    <tr key={`${m.userId}-${m.tenantId}-${m.role}`}>
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/admin/platform/tenants/${m.tenantId}`}
-                          className="font-medium hover:text-aivo-primary"
-                        >
-                          {t?.name ?? m.tenantId}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">{t?.type ?? "—"}</td>
-                      <td className="px-4 py-3">
-                        <Badge tone={ROLE_TONE[m.role]}>{ROLE_LABEL[m.role]}</Badge>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {m.permissions.length === 0 ? "—" : m.permissions.join(", ")}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {new Date(m.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
-
-      {managedLearners.length > 0 ? (
+      {user.learners.length > 0 ? (
         <Card className="mt-6 overflow-hidden">
           <div className="border-b border-aivo-border px-4 py-3">
             <p className="font-display text-lg font-semibold">{t("managed_learners")}</p>
@@ -193,20 +155,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 <tr>
                   <th className="px-4 py-2">{t("col_learner")}</th>
                   <th className="px-4 py-2">Grade</th>
-                  <th className="px-4 py-2">{t("col_tenant")}</th>
                   <th className="px-4 py-2">{t("col_created")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
-                {managedLearners.map((l) => (
-                  <tr key={l.id}>
-                    <td className="px-4 py-3 font-medium">{l.displayName}</td>
-                    <td className="px-4 py-3 text-aivo-ink-soft">{l.gradeBand ?? "—"}</td>
+                {user.learners.map((learner) => (
+                  <tr key={learner.id}>
+                    <td className="px-4 py-3 font-medium">{learner.name}</td>
                     <td className="px-4 py-3 text-aivo-ink-soft">
-                      {tenantById.get(l.tenantId)?.name ?? l.tenantId}
+                      {learner.gradeLevel ?? "—"}
                     </td>
                     <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                      {new Date(l.createdAt).toLocaleDateString()}
+                      {new Date(learner.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}

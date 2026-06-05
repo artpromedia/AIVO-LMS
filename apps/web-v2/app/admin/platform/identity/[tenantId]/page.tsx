@@ -5,21 +5,24 @@ import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { getTenantById } from "@/lib/db/repos";
-import { getIdpConfigByTenant } from "@/lib/db/idp-store";
-import { IdpForm } from "@/components/admin/identity/IdpForm";
-import { ScimTokenCard } from "@/components/admin/identity/ScimTokenCard";
+import { getAdminTenant } from "@/lib/admin-api/platform";
+import { listScimTokens } from "@/lib/admin-api/scim";
 
 export default async function Page({ params }: { params: Promise<{ tenantId: string }> }) {
   const session = await requirePageRole(["platform_admin"]);
   const { tenantId } = await params;
   const t = await getTranslations("admin.identity");
 
-  const tenant = getTenantById(tenantId);
-  if (!tenant) notFound();
-
-  const config = getIdpConfigByTenant(tenantId);
+  let tenant;
+  try {
+    tenant = await getAdminTenant(session, tenantId);
+  } catch {
+    notFound();
+  }
+  const scimTokens = await listScimTokens(session, tenantId).catch(() => []);
 
   return (
     <AppShell
@@ -37,25 +40,56 @@ export default async function Page({ params }: { params: Promise<{ tenantId: str
             href="/admin/platform/identity"
             className="text-sm text-aivo-ink-soft hover:underline"
           >
-            ← {t("catalog_title")}
+            Back to {t("catalog_title")}
           </Link>
         }
       />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-2">
-          <IdpForm tenantId={tenantId} initial={config} />
+          <p className="font-display text-lg font-semibold">{tenant.name}</p>
+          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-aivo-ink-soft">Tenant type</dt>
+              <dd className="mt-1 font-medium">{tenant.typeLabel}</dd>
+            </div>
+            <div>
+              <dt className="text-aivo-ink-soft">Users</dt>
+              <dd className="mt-1 font-medium">{tenant.userCount.toLocaleString()}</dd>
+            </div>
+            <div>
+              <dt className="text-aivo-ink-soft">Learners</dt>
+              <dd className="mt-1 font-medium">{tenant.learnerCount.toLocaleString()}</dd>
+            </div>
+            <div>
+              <dt className="text-aivo-ink-soft">Created</dt>
+              <dd className="mt-1 font-medium">{new Date(tenant.createdAt).toLocaleDateString()}</dd>
+            </div>
+          </dl>
         </Card>
 
         <div className="space-y-4">
           <Card className="p-[var(--aivo-density-card-pad)]">
-            {config ? (
-              <ScimTokenCard idpId={config.id} tokens={config.scimTokens} />
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-display text-lg font-semibold">{t("scim_tokens")}</p>
+              <Badge tone="neutral">{scimTokens.length.toLocaleString()}</Badge>
+            </div>
+            {scimTokens.length === 0 ? (
+              <EmptyState title={t("scim_after_save")} />
             ) : (
-              <div>
-                <p className="font-display text-lg font-semibold">{t("scim_tokens")}</p>
-                <p className="mt-2 text-sm text-aivo-ink-soft">{t("scim_after_save")}</p>
-              </div>
+              <ul className="mt-3 divide-y text-sm">
+                {scimTokens.map((token) => (
+                  <li key={token.id} className="py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{token.name}</span>
+                      <Badge tone={token.revokedAt ? "neutral" : "success"}>
+                        {token.revokedAt ? "revoked" : "active"}
+                      </Badge>
+                    </div>
+                    <p className="mt-1 font-mono text-xs text-aivo-ink-soft">{token.prefix}****</p>
+                  </li>
+                ))}
+              </ul>
             )}
           </Card>
 

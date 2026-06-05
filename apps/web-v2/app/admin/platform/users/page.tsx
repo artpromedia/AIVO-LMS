@@ -8,71 +8,42 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { listUsersForTenants, scopeTenantsForSession } from "@/lib/db/repos";
-import { type Role } from "@/lib/auth/types";
+import { listAdminTenants, listAdminUsers } from "@/lib/admin-api/platform";
+import { ROLE_LABEL } from "@/lib/auth/types";
 
-const ROLE_LABEL: Record<Role, string> = {
-  parent: "Parent",
-  learner: "Learner",
-  teacher: "Teacher",
-  caregiver: "Caregiver",
-  therapist: "Therapist",
-  school_admin: "School admin",
-  district_admin: "District admin",
-  platform_admin: "Platform admin",
-  support: "Support",
-  marketing: "Marketing",
-  sales: "Sales",
-  devops: "DevOps",
-  engineering: "Engineering",
-};
-
-const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
-  parent: "neutral",
-  learner: "primary",
-  teacher: "success",
-  caregiver: "neutral",
-  therapist: "neutral",
-  school_admin: "success",
-  district_admin: "primary",
-  platform_admin: "warning",
-  support: "warning",
-  marketing: "warning",
-  sales: "warning",
-  devops: "warning",
-  engineering: "warning",
-};
-
-// Display order: privileged → educator → end-user.
-const ROLE_ORDER: Role[] = [
+const ROLE_ORDER = [
   "platform_admin",
   "district_admin",
   "school_admin",
   "teacher",
   "support",
-  "marketing",
+  "customer_care",
   "sales",
+  "marketing",
+  "finance",
   "devops",
   "engineering",
+  "sped_lead",
   "parent",
+  "caregiver",
+  "therapist",
   "learner",
-];
+  "unknown",
+] as const;
 
 export default async function Page() {
   const session = await requirePlatformPage(Permission.UserRead);
   const t = await getTranslations("admin.platform_users");
-  const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const users = await listUsersForTenants(tenants.map((t) => t.id));
-  const tenantById = new Map(tenants.map((t) => [t.id, t]));
+  const [users, tenants] = await Promise.all([
+    listAdminUsers(session),
+    listAdminTenants(session).catch(() => []),
+  ]);
+  const tenantById = new Map(tenants.map((tenant) => [tenant.id, tenant]));
 
-  const byRole = users.reduce<Record<string, number>>((acc, u) => {
-    acc[u.role] = (acc[u.role] ?? 0) + 1;
+  const byRole = users.reduce<Record<string, number>>((acc, user) => {
+    acc[user.roleKey] = (acc[user.roleKey] ?? 0) + 1;
     return acc;
   }, {});
-
-  // Distinct underlying user accounts (a single account can appear in many
-  // tenants via different memberships — we want both numbers visible).
-  const uniqueUsers = new Set(users.map((u) => u.user.id)).size;
 
   return (
     <AppShell
@@ -84,22 +55,18 @@ export default async function Page() {
       <PageHeader
         eyebrow="Platform"
         title={t("title")}
-        description="Every user across every tenant on the platform."
-        actions={
-          <Badge tone="neutral">
-            {uniqueUsers.toLocaleString()} unique · {users.length.toLocaleString()} memberships
-          </Badge>
-        }
+        description="Every real user account currently visible through admin-svc."
+        actions={<Badge tone="neutral">{users.length.toLocaleString()} users</Badge>}
       />
 
       <div className="mb-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {ROLE_ORDER.map((r) => (
-          <Card key={r} className="p-[var(--aivo-density-card-pad)]">
+        {ROLE_ORDER.filter((role) => (byRole[role] ?? 0) > 0).map((role) => (
+          <Card key={role} className="p-[var(--aivo-density-card-pad)]">
             <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              {ROLE_LABEL[r]}
+              {role.replaceAll("_", " ")}
             </p>
             <p className="mt-1 font-display text-2xl font-bold">
-              {(byRole[r] ?? 0).toLocaleString()}
+              {(byRole[role] ?? 0).toLocaleString()}
             </p>
           </Card>
         ))}
@@ -110,7 +77,7 @@ export default async function Page() {
       ) : (
         <Card className="overflow-hidden">
           <div className="border-b border-aivo-border px-4 py-3 text-sm font-medium">
-            {users.length.toLocaleString()} memberships
+            {users.length.toLocaleString()} users
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -124,39 +91,36 @@ export default async function Page() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
-                {users.map((u) => {
-                  const tenant = tenantById.get(u.tenantId);
+                {users.map((user) => {
+                  const tenant = user.tenantId ? tenantById.get(user.tenantId) : null;
                   return (
-                    <tr
-                      key={`${u.user.id}-${u.tenantId}-${u.role}`}
-                      className="hover:bg-aivo-surface-2/60"
-                    >
+                    <tr key={user.id} className="hover:bg-aivo-surface-2/60">
                       <td className="px-4 py-3">
                         <Link
-                          href={`/admin/platform/users/${u.user.id}`}
+                          href={`/admin/platform/users/${user.id}`}
                           className="font-medium hover:text-aivo-primary"
                         >
-                          {u.user.displayName}
+                          {user.name}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">{u.user.email}</td>
+                      <td className="px-4 py-3 text-aivo-ink-soft">{user.email ?? "—"}</td>
                       <td className="px-4 py-3">
-                        <Badge tone={ROLE_TONE[u.role]}>{ROLE_LABEL[u.role]}</Badge>
+                        <Badge tone={user.roleTone}>{user.roleLabel}</Badge>
                       </td>
                       <td className="px-4 py-3 text-aivo-ink-soft">
                         {tenant ? (
                           <Link
-                            href={`/admin/platform/tenants/${u.tenantId}`}
+                            href={`/admin/platform/tenants/${tenant.id}`}
                             className="hover:text-aivo-primary"
                           >
-                            {tenant.name} · {tenant.type}
+                            {tenant.name} · {tenant.typeLabel}
                           </Link>
                         ) : (
-                          u.tenantId
+                          user.tenantId ?? "—"
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {new Date(u.joinedAt).toLocaleDateString()}
+                        {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                     </tr>
                   );
