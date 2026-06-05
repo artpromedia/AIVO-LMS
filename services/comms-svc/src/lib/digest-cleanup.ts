@@ -12,6 +12,16 @@ export async function runDigestCleanupOnce(db: any): Promise<JobOutcome> {
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000);
   let deleted = 0;
   try {
+    // Skip cleanly if the table isn't migrated yet — avoids a noisy
+    // "relation does not exist" postgres ERROR in the logs on a fresh
+    // database (e2e harness) where the digest schema hasn't been
+    // installed.
+    const exists = (await db.execute(sql`SELECT to_regclass('public.notifications') AS reg`)) as
+      | { rows?: Array<{ reg: string | null }> }
+      | Array<{ reg: string | null }>;
+    const existsRows = Array.isArray(exists) ? exists : (exists.rows ?? []);
+    if (!existsRows[0]?.reg) return { status: "ok", sent: 0, failed: 0 };
+
     const r = (await db.execute(sql`
       WITH deleted AS (
         DELETE FROM notifications WHERE created_at < ${cutoff} RETURNING 1

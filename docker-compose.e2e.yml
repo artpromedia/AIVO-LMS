@@ -76,6 +76,11 @@ services:
       postgres: { condition: service_healthy }
     ports:
       - "3068:3068"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3068/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   comms-svc:
     build:
@@ -94,3 +99,8 @@ services:
       postgres: { condition: service_healthy }
     ports:
       - "3010:3010"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3010/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
