@@ -3,6 +3,7 @@ packages:
   - "packages/*"
   - "services/*"
   - "tests/integration"
+  - "e2e"
 
 onlyBuiltDependencies:
   - esbuild

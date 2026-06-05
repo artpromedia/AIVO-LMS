@@ -587,10 +587,10 @@ jobs:
         run: docker compose -f docker-compose.e2e.yml up -d --build --wait || (docker compose -f docker-compose.e2e.yml logs && exit 1)
       - name: Install Playwright browsers
         if: steps.filter.outputs.sp12 == 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm --filter @aivo/e2e exec playwright install --with-deps chromium
       - name: Run sprint 12 e2e suite
         if: steps.filter.outputs.sp12 == 'true'
-        run: pnpm exec playwright test e2e/tests/sprint12 --reporter=line
+        run: pnpm --filter @aivo/e2e exec playwright test tests/sprint12 --reporter=line
       - name: Tear down
         if: always() && steps.filter.outputs.sp12 == 'true'
         run: docker compose -f docker-compose.e2e.yml down -v
