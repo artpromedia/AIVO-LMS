@@ -221,6 +221,13 @@ jobs:
     runs-on: [self-hosted, hetzner, production]
     timeout-minutes: 25
     environment: staging
+    env:
+      # k3s installs `kubectl` as a symlink that auto-resolves
+      # /etc/rancher/k3s/k3s.yaml, but standalone `helm` does not — without
+      # KUBECONFIG it defaults to http://localhost:8080 and fails with
+      # "Kubernetes cluster unreachable". The runner user can read this
+      # world-readable kubeconfig.
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     outputs:
       version: ${{ steps.tag.outputs.version }}
     steps:
@@ -472,6 +479,9 @@ jobs:
     env:
       PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
       FALLBACK_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # kubectl (k3s symlink) auto-resolves this, but set it explicitly so the
+      # cluster-secret fallback and in-cluster psql verify are robust.
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
       - name: Clean self-hosted workspace
         run: |
@@ -622,6 +632,10 @@ jobs:
     runs-on: [self-hosted, hetzner, production]
     timeout-minutes: 30
     environment: production
+    env:
+      # See deploy-staging: standalone `helm` needs KUBECONFIG explicitly or
+      # it talks to localhost:8080. kubectl (k3s symlink) works without it.
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
       - name: Clean self-hosted workspace
         run: |
