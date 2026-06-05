@@ -65,7 +65,7 @@ const ALL_ROLES: Role[] = [
 
 export const ROLE_PERMISSIONS = Object.fromEntries(
   ALL_ROLES.map((role) => [role, permissionsForWebRole(role)]),
-) as Record<Role, readonly string[]>;
+) as unknown as Record<Role, readonly string[]>;
 
 export function hasPermission(permissions: readonly string[], required: string): boolean {
   if (permissions.includes("*")) return true;
