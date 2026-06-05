@@ -22,7 +22,16 @@ import { ImpersonationBanner } from "@/components/admin/impersonation/Impersonat
 function roleToTheme(role: string): "parent" | "learner" | "teacher" | "admin" | "platform" {
   if (role === "learner") return "learner";
   if (role === "teacher") return "teacher";
-  if (role === "platform_admin") return "platform";
+  if (
+    role === "platform_admin" ||
+    role === "support" ||
+    role === "marketing" ||
+    role === "sales" ||
+    role === "devops" ||
+    role === "engineering"
+  ) {
+    return "platform";
+  }
   if (role === "school_admin" || role === "district_admin") return "admin";
   return "parent";
 }

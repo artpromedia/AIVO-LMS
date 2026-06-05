@@ -19,12 +19,13 @@ import {
   appendAudit,
   adminAuditLog,
 } from "@aivo/db";
-import { verifyJWT } from "@aivo/security";
+import { Permission, verifyJWT } from "@aivo/security";
 import { eq, and, sql, ilike, or, count, desc, asc, isNull, gte, lte, between } from "drizzle-orm";
 import argon2 from "argon2";
 import crypto from "crypto";
 import { requireDistrictAdmin } from "../hooks/require-district-admin.js";
 import { requireStepUp } from "./step-up.js";
+import { delegatedAdminRbacV2Enabled, requestHasPermission } from "../lib/permissions.js";
 import { parseLogoDataUrl, wcagContrastRatio, WCAG_AA_NORMAL } from "../lib/branding-validation.js";
 import {
   getDistrictStatsSchema,
@@ -110,13 +111,25 @@ async function logActivity(
   });
 }
 
+function hasDistrictPermission(req: any, permission: Permission): boolean {
+  if (!delegatedAdminRbacV2Enabled()) return true;
+  return requestHasPermission(req.user, permission);
+}
+
+function ensureDistrictPermission(req: any, reply: any, permission: Permission): boolean {
+  if (hasDistrictPermission(req, permission)) return true;
+  reply.status(403).send({ error: "Forbidden" });
+  return false;
+}
+
 export async function registerDistrictRoutes(app: FastifyInstance) {
   const db = (app as any).db;
 
   app.get(
     "/api/district/stats",
     { schema: getDistrictStatsSchema, preHandler: requireDistrictAdmin },
-    async (req: any) => {
+    async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.DistrictRead)) return;
       const tid = req.tenantId;
       const [userCount] = await db
         .select({ count: count() })
@@ -188,7 +201,8 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
   app.get(
     "/api/district/tenant",
     { schema: getDistrictTenantSchema, preHandler: requireDistrictAdmin },
-    async (req: any) => {
+    async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.DistrictRead)) return;
       const [tenant] = await db.select().from(tenants).where(eq(tenants.id, req.tenantId)).limit(1);
       if (!tenant) return { error: "Tenant not found" };
 
@@ -204,7 +218,8 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
   app.get(
     "/api/district/schools",
     { schema: getDistrictSchoolsSchema, preHandler: requireDistrictAdmin },
-    async (req: any) => {
+    async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.SchoolRead)) return;
       const tid = req.tenantId;
       const { search } = req.query as any;
 
@@ -246,6 +261,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/schools",
     { schema: districtSchoolsSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.SchoolCreate)) return;
       const tid = req.tenantId;
       const {
         name,
@@ -296,6 +312,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/schools/:id",
     { schema: getDistrictSchoolsByIdSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.SchoolRead)) return;
       const { id } = req.params as { id: string };
       const [school] = await db
         .select()
@@ -360,6 +377,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/schools/:id",
     { schema: updateDistrictSchoolsByIdSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.SchoolWrite)) return;
       const { id } = req.params as { id: string };
       const [existing] = await db
         .select()
@@ -405,7 +423,8 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
   app.get(
     "/api/district/learners",
     { schema: getDistrictLearnersSchema, preHandler: requireDistrictAdmin },
-    async (req: any) => {
+    async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.LearnerRead)) return;
       const tid = req.tenantId;
       const {
         page: pageStr,
@@ -471,6 +490,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/learners/:id",
     { schema: getDistrictLearnersByIdSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.LearnerRead)) return;
       const { id } = req.params as { id: string };
       const [learner] = await db
         .select()
@@ -523,7 +543,8 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
   app.get(
     "/api/district/staff",
     { schema: getDistrictStaffSchema, preHandler: requireDistrictAdmin },
-    async (req: any) => {
+    async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.StaffRead)) return;
       const tid = req.tenantId;
       const {
         page: pageStr,
@@ -600,6 +621,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/staff",
     { schema: districtStaffSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.TeacherCreate)) return;
       const tid = req.tenantId;
       const { name, email, role, schoolId: assignSchoolId } = req.body as any;
       if (!name || !email || !role)
@@ -692,6 +714,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/staff/:id",
     { schema: getDistrictStaffByIdSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.StaffRead)) return;
       const { id } = req.params as { id: string };
       const [user] = await db
         .select({
@@ -734,6 +757,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/staff/:id",
     { schema: updateDistrictStaffByIdSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.UserManage)) return;
       const { id } = req.params as { id: string };
       const [existing] = await db
         .select()
@@ -769,6 +793,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/staff/:id",
     { schema: deleteDistrictStaffByIdSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.UserManage)) return;
       const { id } = req.params as { id: string };
       const [existing] = await db
         .select()

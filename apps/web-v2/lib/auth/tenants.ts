@@ -1,4 +1,5 @@
 import type { Role } from "@/lib/auth/types";
+import { permissionsForWebRole } from "@/lib/auth/permissions";
 
 export type Tenant = {
   id: string;
@@ -46,16 +47,25 @@ export function getTenant(id: string): Tenant | null {
 }
 
 /** Permission constants per role. Mirrors what real RBAC will issue later. */
-export const ROLE_PERMISSIONS: Record<Role, readonly string[]> = {
-  parent: ["learners:read", "learners:write", "reports:read", "billing:read"],
-  learner: ["self:read", "self:write"],
-  teacher: ["class:read", "class:write", "assignments:read", "assignments:write"],
-  caregiver: ["learner:read"],
-  therapist: ["learner:read", "reports:read"],
-  school_admin: ["school:read", "school:write", "staff:read", "staff:write", "reports:read"],
-  district_admin: ["district:read", "district:write", "schools:read", "reports:read"],
-  platform_admin: ["*"],
-};
+const ALL_ROLES: Role[] = [
+  "parent",
+  "learner",
+  "teacher",
+  "caregiver",
+  "therapist",
+  "school_admin",
+  "district_admin",
+  "platform_admin",
+  "support",
+  "marketing",
+  "sales",
+  "devops",
+  "engineering",
+];
+
+export const ROLE_PERMISSIONS = Object.fromEntries(
+  ALL_ROLES.map((role) => [role, permissionsForWebRole(role)]),
+) as Record<Role, readonly string[]>;
 
 export function hasPermission(permissions: readonly string[], required: string): boolean {
   if (permissions.includes("*")) return true;

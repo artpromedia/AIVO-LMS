@@ -1,4 +1,5 @@
 import { scopeTenantsForSession } from "@/lib/db/repos";
+import { isPlatformRole } from "@/lib/auth/permissions";
 import type { SessionProfile } from "@/lib/auth/types";
 
 /**
@@ -14,7 +15,7 @@ export function adminScopeForSession(session: SessionProfile): {
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   return {
     tenantIds: tenants.map((t) => t.id),
-    isPlatform: session.role === "platform_admin",
+    isPlatform: isPlatformRole(session.role),
   };
 }
 

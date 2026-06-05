@@ -40,6 +40,7 @@ import QRCode from "qrcode";
 import { audited } from "@aivo/audit-client";
 import { setSurfaceCookie, clearSurfaceCookie } from "../lib/surface-cookie.js";
 import { loadAvailableRoles } from "../lib/available-roles.js";
+import { permissionsForCurrentRole } from "../lib/permissions.js";
 import {
   isInternalRole,
   refreshTtlMs,
@@ -348,6 +349,7 @@ const MFA_FORCED_ROLES = [
   "SUPPORT",
   "FINANCE",
   "DEVOPS",
+  "ENGINEERING",
 ];
 
 /**
@@ -406,6 +408,36 @@ function computeMustChangePassword(user: {
   return (
     !!user.mustChangePassword || isPasswordRotationDue(toDate(user.passwordChangedAt), user.role)
   );
+}
+
+type AccessTokenUser = {
+  id: string;
+  tenantId: string;
+  role: string;
+  email?: string | null;
+  name?: string | null;
+  schoolId?: string | null;
+};
+
+async function buildAccessTokenClaims(db: any, user: AccessTokenUser) {
+  return {
+    sub: user.id,
+    tenantId: user.tenantId,
+    role: user.role,
+    availableRoles: await loadAvailableRoles(db, user.id, user.role),
+    permissions: permissionsForCurrentRole(user.role),
+    email: user.email || undefined,
+    name: user.name || undefined,
+    ...(user.schoolId ? { schoolId: user.schoolId } : {}),
+  };
+}
+
+async function mintAccessToken(
+  db: any,
+  user: AccessTokenUser,
+  expiresIn: string = "15m",
+): Promise<string> {
+  return signJWT(await buildAccessTokenClaims(db, user), expiresIn);
 }
 
 export async function registerAuthRoutes(app: FastifyInstance) {
@@ -477,14 +509,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         .returning();
       await db.insert(passwordHistory).values({ userId: user.id, passwordHash: newHash });
 
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: tenant.id,
-        role: user.role,
-        email: user.email!,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
 
       const rawRefreshToken = crypto.randomUUID();
       await db.insert(sessions).values({
@@ -564,6 +589,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
           "SUPPORT",
           "FINANCE",
           "DEVOPS",
+          "ENGINEERING",
         ].includes(user.role)
       ) {
         return reply.status(403).send({
@@ -603,16 +629,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         })
         .where(eq(users.id, user.id));
 
-      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: user.tenantId,
-        role: user.role,
-        availableRoles,
-        email: user.email!,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
 
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs(user.role);
@@ -667,6 +684,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
     "SUPPORT",
     "FINANCE",
     "DEVOPS",
+    "ENGINEERING",
   ];
 
   app.post(
@@ -749,16 +767,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         })
         .where(eq(users.id, user.id));
 
-      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: user.tenantId,
-        role: user.role,
-        availableRoles,
-        email: user.email!,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
 
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs(user.role);
@@ -867,16 +876,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         })
         .where(eq(users.id, user.id));
 
-      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: user.tenantId,
-        role: user.role,
-        availableRoles,
-        email: user.email!,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
 
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs(user.role);
@@ -1016,16 +1016,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         }
       }
 
-      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: user.tenantId,
-        role: user.role,
-        availableRoles,
-        email: user.email!,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
 
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs(user.role);
@@ -1122,15 +1113,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         return reply.status(401).send({ error: "Invalid PIN" });
       }
 
-      const accessToken = await signJWT(
-        {
-          sub: matchedLearner.id,
-          tenantId: matchedLearner.tenantId,
-          role: "LEARNER",
-          name: matchedLearner.name,
-        },
-        "2h",
-      );
+      const accessToken = await mintAccessToken(db, matchedLearner, "2h");
 
       // Establish a refresh session so the learner's PIN sign-in survives the
       // 2h access-token expiry. It previously had no sessions row / refresh
@@ -1222,14 +1205,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
       // load the change-password page itself.
       const rotationDue = isPasswordRotationDue(toDate(user.passwordChangedAt), user.role);
 
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: user.tenantId,
-        role: user.role,
-        email: user.email || undefined,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
 
       return {
         accessToken,
@@ -1660,16 +1636,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
       }
 
       // Auto-login: mint access token + refresh session like registration.
-      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: user.tenantId,
-        role: user.role,
-        availableRoles,
-        email: user.email!,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
       const rawRefreshToken = crypto.randomUUID();
       await db.insert(sessions).values({
         userId: user.id,
@@ -2084,16 +2051,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         .set({ lastLoginAt: new Date(), lastLoginIp: clientIp })
         .where(eq(users.id, user.id));
 
-      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: user.tenantId,
-        role: user.role,
-        availableRoles,
-        email: user.email!,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
 
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs(user.role);
@@ -2949,16 +2907,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         .update(users)
         .set({ lastLoginAt: new Date(), lastLoginIp: clientIp })
         .where(eq(users.id, user.id));
-      const availableRoles = await loadAvailableRoles(db, user.id, user.role);
-      const accessToken = await signJWT({
-        sub: user.id,
-        tenantId: user.tenantId,
-        role: user.role,
-        availableRoles,
-        email: user.email!,
-        name: user.name,
-        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
-      });
+      const accessToken = await mintAccessToken(db, user);
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs(user.role);
       const hashedRT = hashRefreshToken(rawRefreshToken);

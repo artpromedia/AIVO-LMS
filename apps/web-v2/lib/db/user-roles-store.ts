@@ -8,7 +8,18 @@
  * Works in the web (lowercase) Role vocabulary; the identity-svc client
  * translates to/from the uppercase wire roles.
  */
-const GRANTABLE = ["parent", "teacher", "caregiver", "therapist", "learner"];
+const GRANTABLE = [
+  "parent",
+  "teacher",
+  "caregiver",
+  "therapist",
+  "learner",
+  "support",
+  "marketing",
+  "sales",
+  "devops",
+  "engineering",
+];
 
 const additional = new Map<string, Set<string>>();
 

@@ -20,6 +20,7 @@ export const enterpriseFlags = {
   dataGovernanceCenter: () => readBool("AIVO_FEATURE_DATA_GOVERNANCE_CENTER"),
   sisSync: () => readBool("AIVO_FEATURE_SIS_SYNC"),
   lti13: () => readBool("AIVO_FEATURE_LTI_13"),
+  delegatedAdminRbacV2: () => readBool("ADMIN_ENTERPRISE_DELEGATED_ADMIN_RBAC_V2"),
   // The default for this flag was flipped to true in the
   // ConfigMap (see Sprint C). The reader still defaults to false so a
   // missing env doesn't change behavior elsewhere in BFF land.

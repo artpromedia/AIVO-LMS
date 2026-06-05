@@ -6,7 +6,12 @@ export type Role =
   | "therapist"
   | "school_admin"
   | "district_admin"
-  | "platform_admin";
+  | "platform_admin"
+  | "support"
+  | "marketing"
+  | "sales"
+  | "devops"
+  | "engineering";
 
 export type SessionProfile = {
   userId: string;
@@ -46,6 +51,11 @@ export const ROLE_HOME: Record<Role, string> = {
   school_admin: "/admin/school",
   district_admin: "/admin/district",
   platform_admin: "/admin/platform",
+  support: "/admin/platform",
+  marketing: "/admin/platform",
+  sales: "/admin/platform",
+  devops: "/admin/platform",
+  engineering: "/admin/platform",
 };
 
 export const ROLE_LABEL: Record<Role, string> = {
@@ -57,4 +67,9 @@ export const ROLE_LABEL: Record<Role, string> = {
   school_admin: "School admin",
   district_admin: "District admin",
   platform_admin: "Platform admin",
+  support: "Support",
+  marketing: "Marketing",
+  sales: "Sales",
+  devops: "DevOps",
+  engineering: "Engineering",
 };

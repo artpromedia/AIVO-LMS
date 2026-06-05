@@ -2834,7 +2834,14 @@ import type { Role } from "@/lib/auth/types";
 export function scopeTenantsForSession(role: Role, tenantId: string): Tenant[] {
   const all = Array.from(db().tenants.values());
   let visible: Tenant[];
-  if (role === "platform_admin") {
+  if (
+    role === "platform_admin" ||
+    role === "support" ||
+    role === "marketing" ||
+    role === "sales" ||
+    role === "devops" ||
+    role === "engineering"
+  ) {
     visible = all;
   } else if (role === "district_admin" || role === "school_admin") {
     const seen = new Set<string>([tenantId]);

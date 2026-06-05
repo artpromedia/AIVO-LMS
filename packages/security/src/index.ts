@@ -6,6 +6,7 @@ export interface JWTPayload {
   sub: string;
   tenantId: string;
   role: string;
+  permissions?: string[];
   /**
    * Every role the user may act as (ADR 0020 — single shell, multi-role):
    * `role` plus any `user_roles` rows. When present, `checkActiveRole`
@@ -72,6 +73,8 @@ export * from "./audit-chain.js";
 export * from "./ip-allowlist.js";
 export * from "./password-policy.js";
 export * from "./flags.js";
+export * from "./roles.js";
+export * from "./permissions.js";
 
 export const STEP_UP_SCOPES: readonly StepUpScope[] = [
   "tenant:delete",

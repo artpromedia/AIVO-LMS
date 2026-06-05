@@ -25,8 +25,11 @@ import {
   UploadCloud,
   Bell,
 } from "lucide-react";
+import { Permission } from "@aivo/security";
 import type { RoleNavItem } from "@/components/layout/role-nav";
 import { LearnerUnreadNotificationsBadge } from "@/components/layout/learner-unread-notifications-badge";
+import type { SessionProfile } from "@/lib/auth/types";
+import { sessionHasPermission } from "@/lib/auth/permissions";
 
 export const PARENT_NAV: RoleNavItem[] = [
   { href: "/parent/home", label: "Home", icon: <Home className="h-4 w-4" /> },
@@ -161,6 +164,7 @@ export const PLATFORM_NAV: RoleNavItem[] = [
   { href: "/admin/platform/sis", label: "SIS Sync", icon: <UploadCloud className="h-4 w-4" /> },
   { href: "/admin/platform/audit", label: "Audit", icon: <ScrollText className="h-4 w-4" /> },
   { href: "/admin/platform/users", label: "Users", icon: <Users className="h-4 w-4" /> },
+  { href: "/admin/platform/staff", label: "Staff", icon: <Users className="h-4 w-4" /> },
   {
     href: "/admin/platform/learners",
     label: "Learners",
@@ -226,6 +230,63 @@ export const PLATFORM_NAV: RoleNavItem[] = [
   { href: "/admin/platform/audio", label: "Audio", icon: <Sparkles className="h-4 w-4" /> },
   { href: "/admin/platform/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
+
+const PLATFORM_NAV_PERMISSIONS: Record<string, Permission> = {
+  "/admin/platform": Permission.PlatformRead,
+  "/admin/platform/status": Permission.PlatformRead,
+  "/admin/platform/ai": Permission.AiRead,
+  "/admin/platform/reports": Permission.ReportsRead,
+  "/admin/platform/impersonation": Permission.UserRead,
+  "/admin/platform/tenants": Permission.TenantRead,
+  "/admin/platform/identity": Permission.UserRead,
+  "/admin/platform/sis": Permission.TenantRead,
+  "/admin/platform/audit": Permission.AuditRead,
+  "/admin/platform/users": Permission.UserRead,
+  "/admin/platform/staff": Permission.UserRead,
+  "/admin/platform/learners": Permission.LearnerRead,
+  "/admin/platform/jobs": Permission.PlatformRead,
+  "/admin/platform/ai-generation": Permission.AiRead,
+  "/admin/platform/baseline-items": Permission.AiRead,
+  "/admin/platform/audit-logs": Permission.AuditRead,
+  "/admin/platform/billing": Permission.BillingRead,
+  "/admin/platform/billing/coupons": Permission.BillingRead,
+  "/admin/platform/billing/daily-batch": Permission.BillingRead,
+  "/admin/platform/ai/moderation": Permission.SecurityRead,
+  "/admin/platform/ai/playground": Permission.AiRead,
+  "/admin/platform/ai-costs": Permission.AiRead,
+  "/admin/platform/migration": Permission.PlatformRead,
+  "/admin/platform/support": Permission.SupportRead,
+  "/admin/platform/data": Permission.PlatformRead,
+  "/admin/platform/security": Permission.SecurityRead,
+  "/admin/platform/compliance": Permission.SecurityRead,
+  "/admin/platform/curriculum": Permission.CurriculumRead,
+  "/admin/platform/safety": Permission.SecurityRead,
+  "/admin/platform/audio": Permission.PlatformRead,
+  "/admin/platform/settings": Permission.PlatformRead,
+};
+
+const NON_ADMIN_PLATFORM_NAV: Record<string, readonly string[]> = {
+  [Permission.PlatformRead]: ["/admin/platform", "/admin/platform/status"],
+  [Permission.ReportsRead]: ["/admin/platform/reports"],
+  [Permission.UserRead]: ["/admin/platform/users", "/admin/platform/staff"],
+  [Permission.TenantRead]: ["/admin/platform/tenants"],
+  [Permission.AuditRead]: ["/admin/platform/audit-logs"],
+  [Permission.BillingRead]: ["/admin/platform/billing"],
+  [Permission.SecurityRead]: ["/admin/platform/security"],
+  [Permission.SupportRead]: ["/admin/platform/support"],
+  [Permission.CurriculumRead]: ["/admin/platform/curriculum"],
+  [Permission.AiRead]: ["/admin/platform/ai"],
+};
+
+export function platformNavForSession(session: SessionProfile): RoleNavItem[] {
+  return PLATFORM_NAV.filter((item) => {
+    const permission = PLATFORM_NAV_PERMISSIONS[item.href];
+    if (!permission || !sessionHasPermission(session, permission)) return false;
+    if (session.role === "platform_admin") return true;
+    const allowedHrefs = NON_ADMIN_PLATFORM_NAV[permission];
+    return !allowedHrefs || allowedHrefs.includes(item.href);
+  });
+}
 
 /** Sub-nav appended to PARENT_NAV when on the /parent/settings/* family. */
 export const PARENT_SETTINGS_NAV: RoleNavItem[] = [

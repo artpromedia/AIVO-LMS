@@ -14,6 +14,7 @@
  */
 import { serverEnv } from "@/lib/env";
 import type { Role, SessionProfile } from "./types";
+import { capabilitiesForRole } from "./permissions";
 
 export const IDENTITY_ACCESS_TOKEN_COOKIE = "aivo_access_token";
 export const IDENTITY_REFRESH_TOKEN_COOKIE = "aivo_refresh_token";
@@ -28,9 +29,16 @@ const WIRE_TO_ROLE: Record<string, Role> = {
   PARENT: "parent",
   LEARNER: "learner",
   TEACHER: "teacher",
+  CAREGIVER: "caregiver",
+  THERAPIST: "therapist",
   SCHOOL_ADMIN: "school_admin",
   DISTRICT_ADMIN: "district_admin",
   PLATFORM_ADMIN: "platform_admin",
+  SUPPORT: "support",
+  MARKETING: "marketing",
+  SALES: "sales",
+  DEVOPS: "devops",
+  ENGINEERING: "engineering",
 };
 
 export function mapWireRoleToRole(wire: string | undefined | null): Role | null {
@@ -531,21 +539,22 @@ export async function identityLogout(refreshToken: string | null): Promise<void>
 }
 
 /**
- * Build a SessionProfile from an identity-svc user payload. Permissions
- * are intentionally empty here — identity-svc doesn't currently emit a
- * permission list, so callers that need fine-grained checks should
- * derive them from `role` until permission claims land in the JWT.
+ * Build a SessionProfile from an identity-svc user payload. The active
+ * role's capabilities are derived from the shared @aivo/security matrix so
+ * the web shell stays coherent even before/after a role switch.
  */
 export function toSessionProfile(user: IdentityUser): SessionProfile | null {
   const role = mapWireRoleToRole(user.role);
   if (!role) return null;
+  const permissions = capabilitiesForRole(role);
   return {
     userId: user.id,
     tenantId: user.tenantId,
     role,
     email: user.email,
     displayName: user.name ?? user.email,
-    permissions: [],
+    permissions,
+    capabilities: permissions,
   };
 }
 
@@ -827,4 +836,189 @@ export async function identityRevokeAdminInvite(
     };
   }
   return { ok: true };
+}
+
+export type PlatformStaffRecord = {
+  id: string;
+  tenantId: string | null;
+  email: string;
+  name: string;
+  role: string;
+  active: boolean;
+  mustChangePassword?: boolean;
+  deactivatedAt?: string | null;
+  lastLoginAt?: string | null;
+  createdAt?: string;
+};
+
+export async function identityListPlatformStaff(
+  accessToken: string,
+): Promise<{ ok: true; staff: PlatformStaffRecord[] } | { ok: false; status: number; error: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/admin/staff`, {
+      headers: { authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Could not load platform staff.",
+    };
+  }
+  return { ok: true, staff: (json.staff ?? []) as PlatformStaffRecord[] };
+}
+
+export async function identityCreatePlatformStaff(
+  accessToken: string,
+  input: { email: string; name: string; role: string },
+): Promise<
+  | { ok: true; user: PlatformStaffRecord; tempPassword?: string }
+  | { ok: false; status: number; error: string }
+> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/admin/staff`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(input),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Could not create the staff account.",
+    };
+  }
+  return {
+    ok: true,
+    user: json.user as PlatformStaffRecord,
+    tempPassword: typeof json.tempPassword === "string" ? json.tempPassword : undefined,
+  };
+}
+
+export async function identityCreateDistrictSchool(
+  accessToken: string,
+  input: { name: string },
+): Promise<{ ok: true; school: { id: string; name: string } } | { ok: false; status: number; error: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/district/schools`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(input),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Could not create the school.",
+    };
+  }
+  return { ok: true, school: json.school as { id: string; name: string } };
+}
+
+export type SchoolLearnerRecord = {
+  id: string;
+  userId?: string;
+  parentId?: string;
+  name: string;
+  gradeLevel?: string | null;
+  functioningLevel?: string | null;
+  schoolId?: string | null;
+  createdAt?: string;
+};
+
+export async function identityListSchoolLearners(
+  accessToken: string,
+  schoolId?: string,
+): Promise<
+  | { ok: true; learners: SchoolLearnerRecord[]; school?: { id: string; name: string } }
+  | { ok: false; status: number; error: string }
+> {
+  const url = new URL(`${serverEnv.IDENTITY_SVC_URL}/api/school/learners`);
+  if (schoolId) url.searchParams.set("schoolId", schoolId);
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Could not load school learners.",
+    };
+  }
+  return {
+    ok: true,
+    learners: (json.learners ?? []) as SchoolLearnerRecord[],
+    school: json.school as { id: string; name: string } | undefined,
+  };
+}
+
+export async function identityCreateSchoolLearner(
+  accessToken: string,
+  input: {
+    name: string;
+    gradeLevel?: string;
+    functioningLevel?: string;
+    schoolId?: string;
+  },
+): Promise<
+  | { ok: true; learner: SchoolLearnerRecord }
+  | { ok: false; status: number; error: string }
+> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/school/learners`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(input),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Could not create the learner.",
+    };
+  }
+  return {
+    ok: true,
+    learner: json.learner as SchoolLearnerRecord,
+  };
 }

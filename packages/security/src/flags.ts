@@ -15,6 +15,8 @@ export interface AdminEnterpriseFlags {
   STRONG_MFA: boolean;
   /** Require fresh re-auth before high-risk admin actions (Sprint 3). */
   STEP_UP_AUTH: boolean;
+  /** Enable delegated-admin permission enforcement for RBAC v2. */
+  DELEGATED_ADMIN_RBAC_V2: boolean;
   /** Enable SAML SSO + SCIM provisioning for districts (Sprint 6). */
   DISTRICT_SSO: boolean;
   /** Make audit log entries append-only / hash-chained (Sprint 4). */
@@ -50,6 +52,7 @@ export function loadAdminEnterpriseFlags(
   return {
     STRONG_MFA: parseBoolFlag(env[`${PREFIX}STRONG_MFA`], false),
     STEP_UP_AUTH: parseBoolFlag(env[`${PREFIX}STEP_UP_AUTH`], false),
+    DELEGATED_ADMIN_RBAC_V2: parseBoolFlag(env[`${PREFIX}DELEGATED_ADMIN_RBAC_V2`], false),
     DISTRICT_SSO: parseBoolFlag(env[`${PREFIX}DISTRICT_SSO`], false),
     AUDIT_IMMUTABLE: parseBoolFlag(env[`${PREFIX}AUDIT_IMMUTABLE`], false),
     ADMIN_SESSION_IDLE: parseIntFlag(env[`${PREFIX}ADMIN_SESSION_IDLE`], 0),

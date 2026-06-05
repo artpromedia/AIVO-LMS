@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { Permission } from "@aivo/security";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
@@ -20,6 +21,7 @@ import {
   identityListDistrictAdmins,
   mapWireRoleToRole,
 } from "@/lib/auth/identity-client";
+import { sessionHasPermission } from "@/lib/auth/permissions";
 import { StaffInviteSection } from "./staff-invite-section";
 
 type PendingInviteRow = {
@@ -48,6 +50,9 @@ export default async function Page() {
   const t = await getTranslations("admin.district_staff");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
+  const canManageStaff =
+    sessionHasPermission(session, Permission.TeacherCreate) ||
+    sessionHasPermission(session, Permission.UserManage);
   const stats = getDistrictStats(tenantIds);
   const staff = await listMembersByRole(tenantIds, ["district_admin", "school_admin", "teacher"]);
 
@@ -115,7 +120,14 @@ export default async function Page() {
       </div>
 
       <SectionHeader title={t("invitations_heading")} />
-      <StaffInviteSection schools={schools} pendingInvites={pendingInvites} />
+      {canManageStaff ? (
+        <StaffInviteSection schools={schools} pendingInvites={pendingInvites} />
+      ) : (
+        <Card className="p-[var(--aivo-density-card-pad)] text-sm text-aivo-ink-soft">
+          Your current role can review staff posture here but cannot create or revoke subordinate
+          accounts.
+        </Card>
+      )}
 
       <SectionHeader title={t("active_staff_heading")} />
       <Card className="overflow-hidden">

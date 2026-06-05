@@ -1,14 +1,16 @@
 import { getTranslations } from "next-intl/server";
-import { requirePageRole } from "@/lib/auth/server";
+import { Permission } from "@aivo/security";
+import { requirePlatformPage } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PLATFORM_NAV } from "@/components/layout/role-shells";
+import { platformNavForSession } from "@/components/layout/role-shells";
 import { listBillingForTenants, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
 import { listPlatformRollup } from "@/lib/billing/district-pool";
 import { PlatformRollupTable } from "@/components/admin/billing/platform-rollup-table";
+import { ROLE_LABEL } from "@/lib/auth/types";
 
 function formatMoney(cents: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -20,7 +22,7 @@ function formatMoney(cents: number): string {
 }
 
 export default async function Page() {
-  const session = await requirePageRole(["platform_admin"]);
+  const session = await requirePlatformPage(Permission.BillingRead);
   const t = await getTranslations("admin.platform_billing_overview");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const accounts = listBillingForTenants(tenants.map((t) => t.id));
@@ -39,9 +41,9 @@ export default async function Page() {
 
   return (
     <AppShell
-      role="platform_admin"
-      roleLabel="Platform admin"
-      navItems={PLATFORM_NAV}
+      role={session.role}
+      roleLabel={ROLE_LABEL[session.role]}
+      navItems={platformNavForSession(session)}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader

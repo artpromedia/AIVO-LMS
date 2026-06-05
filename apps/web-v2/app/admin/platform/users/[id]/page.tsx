@@ -1,21 +1,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requirePageRole } from "@/lib/auth/server";
+import { Permission } from "@aivo/security";
+import { requirePlatformPage } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PLATFORM_NAV } from "@/components/layout/role-shells";
+import { platformNavForSession } from "@/components/layout/role-shells";
 import {
   scopeTenantsForSession,
   getUserById,
   listMembershipsForUser,
   listLearnersForParent,
 } from "@/lib/db/repos";
-import type { Role } from "@/lib/auth/types";
+import { ROLE_LABEL, type Role } from "@/lib/auth/types";
 import { ArrowLeft } from "lucide-react";
+import { sessionHasPermission } from "@/lib/auth/permissions";
 import { UserRolesCard } from "./user-roles-card";
 
 const ROLE_LABEL: Record<Role, string> = {
@@ -27,6 +29,11 @@ const ROLE_LABEL: Record<Role, string> = {
   school_admin: "School admin",
   district_admin: "District admin",
   platform_admin: "Platform admin",
+  support: "Support",
+  marketing: "Marketing",
+  sales: "Sales",
+  devops: "DevOps",
+  engineering: "Engineering",
 };
 
 const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
@@ -38,12 +45,18 @@ const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
   school_admin: "success",
   district_admin: "primary",
   platform_admin: "warning",
+  support: "warning",
+  marketing: "warning",
+  sales: "warning",
+  devops: "warning",
+  engineering: "warning",
 };
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const session = await requirePageRole(["platform_admin"]);
+  const session = await requirePlatformPage(Permission.UserRead);
   const t = await getTranslations("admin.platform_users_detail");
+  const canGrantRoles = sessionHasPermission(session, Permission.RoleGrant);
   const user = await getUserById(id);
   if (!user) notFound();
 
@@ -65,9 +78,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   return (
     <AppShell
-      role="platform_admin"
-      roleLabel="Platform admin"
-      navItems={PLATFORM_NAV}
+      role={session.role}
+      roleLabel={ROLE_LABEL[session.role]}
+      navItems={platformNavForSession(session)}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <Link
@@ -112,10 +125,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </Card>
       </div>
 
-      <Card className="mt-6 p-[var(--aivo-density-card-pad)]">
-        <p className="mb-3 font-display text-lg font-semibold">Additional roles</p>
-        <UserRolesCard userId={user.id} />
-      </Card>
+      {canGrantRoles ? (
+        <Card className="mt-6 p-[var(--aivo-density-card-pad)]">
+          <p className="mb-3 font-display text-lg font-semibold">Additional roles</p>
+          <UserRolesCard userId={user.id} />
+        </Card>
+      ) : null}
 
       <Card className="mt-6 overflow-hidden">
         <div className="border-b border-aivo-border px-4 py-3">

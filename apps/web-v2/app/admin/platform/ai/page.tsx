@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { requirePageRole } from "@/lib/auth/server";
+import { Permission } from "@aivo/security";
+import { requirePlatformPage } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PLATFORM_NAV } from "@/components/layout/role-shells";
+import { platformNavForSession } from "@/components/layout/role-shells";
+import { ROLE_LABEL } from "@/lib/auth/types";
 import { listModels } from "@/lib/services/responsible-ai-svc";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +19,7 @@ function statusTone(status: string): "success" | "warning" | "neutral" {
 }
 
 export default async function Page() {
-  const session = await requirePageRole(["platform_admin"]);
+  const session = await requirePlatformPage(Permission.AiRead);
   const models = await listModels();
 
   const total = models.length;
@@ -33,8 +35,8 @@ export default async function Page() {
   return (
     <AppShell
       role={session.role}
-      roleLabel="Platform admin"
-      navItems={PLATFORM_NAV}
+      roleLabel={ROLE_LABEL[session.role]}
+      navItems={platformNavForSession(session)}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader

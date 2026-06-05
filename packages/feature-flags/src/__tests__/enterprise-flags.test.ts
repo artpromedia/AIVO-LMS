@@ -37,6 +37,7 @@ describe("resolveEnterpriseFlags", () => {
       tutorSurfaceProtocol: false,
       profileRecommendationsV2: false,
       districtEnterpriseMode: false,
+      delegatedAdminRbacV2: false,
       sisSync: false,
       lti13: false,
       dataGovernanceCenter: false,
@@ -64,5 +65,6 @@ describe("resolveEnterpriseFlags", () => {
     expect(flags.problemSessionLedger).toBe(true);
     expect(flags.tutorSurfaceProtocol).toBe(false);
     expect(flags.districtEnterpriseMode).toBe(false);
+    expect(flags.delegatedAdminRbacV2).toBe(false);
   });
 });

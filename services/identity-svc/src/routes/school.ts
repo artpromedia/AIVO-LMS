@@ -15,11 +15,21 @@
  * temporary passwords.
  */
 import { FastifyInstance } from "fastify";
-import { users, schools, districtAdminInvites, appendAudit, adminAuditLog } from "@aivo/db";
+import {
+  users,
+  schools,
+  learners,
+  languageProfiles,
+  districtAdminInvites,
+  appendAudit,
+  adminAuditLog,
+} from "@aivo/db";
 import { eq, and, isNull } from "drizzle-orm";
 import crypto from "crypto";
 import { createLogger } from "@aivo/observability";
+import { Permission } from "@aivo/security";
 import { requireSchoolAdmin } from "../hooks/require-school-admin.js";
+import { delegatedAdminRbacV2Enabled, requestHasPermission } from "../lib/permissions.js";
 
 const logger = createLogger("identity-svc.school");
 
@@ -39,6 +49,17 @@ function hashInviteToken(raw: string): string {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function ensureSchoolPermission(req: any, reply: any, permission: Permission): boolean {
+  if (
+    !delegatedAdminRbacV2Enabled() ||
+    requestHasPermission(req.user, permission)
+  ) {
+    return true;
+  }
+  reply.status(403).send({ error: "Forbidden" });
+  return false;
+}
 
 async function emailTeacherInvite(opts: {
   to: string;
@@ -97,6 +118,7 @@ export async function registerSchoolRoutes(app: FastifyInstance) {
     "/api/school/teachers",
     { preHandler: requireSchoolAdmin },
     async (req: any, reply: any) => {
+      if (!ensureSchoolPermission(req, reply, Permission.StaffRead)) return;
       const school = await resolveSchool(req, reply);
       if (!school) return;
 
@@ -141,6 +163,7 @@ export async function registerSchoolRoutes(app: FastifyInstance) {
     "/api/school/teachers",
     { preHandler: requireSchoolAdmin },
     async (req: any, reply: any) => {
+      if (!ensureSchoolPermission(req, reply, Permission.TeacherCreate)) return;
       const school = await resolveSchool(req, reply);
       if (!school) return;
 
@@ -245,6 +268,7 @@ export async function registerSchoolRoutes(app: FastifyInstance) {
     "/api/school/teachers/invites/:id",
     { preHandler: requireSchoolAdmin },
     async (req: any, reply: any) => {
+      if (!ensureSchoolPermission(req, reply, Permission.UserManage)) return;
       const school = await resolveSchool(req, reply);
       if (!school) return;
       const { id } = req.params as { id: string };
@@ -289,6 +313,180 @@ export async function registerSchoolRoutes(app: FastifyInstance) {
       }
 
       return { success: true };
+    },
+  );
+
+  app.get(
+    "/api/school/learners",
+    { preHandler: requireSchoolAdmin },
+    async (req: any, reply: any) => {
+      if (!ensureSchoolPermission(req, reply, Permission.LearnerRead)) return;
+      const school = await resolveSchool(req, reply);
+      if (!school) return;
+
+      const rows = await db
+        .select({
+          id: learners.id,
+          userId: learners.userId,
+          parentId: learners.parentId,
+          name: learners.name,
+          gradeLevel: learners.gradeLevel,
+          functioningLevel: learners.functioningLevel,
+          schoolId: learners.schoolId,
+          createdAt: learners.createdAt,
+        })
+        .from(learners)
+        .where(and(eq(learners.schoolId, school.id), eq(learners.tenantId, req.tenantId)))
+        .orderBy(learners.createdAt);
+
+      return {
+        school,
+        learners: rows,
+      };
+    },
+  );
+
+  app.get(
+    "/api/school/learners/:learnerId",
+    { preHandler: requireSchoolAdmin },
+    async (req: any, reply: any) => {
+      if (!ensureSchoolPermission(req, reply, Permission.LearnerRead)) return;
+      const school = await resolveSchool(req, reply);
+      if (!school) return;
+      const { learnerId } = req.params as { learnerId: string };
+
+      const [learner] = await db
+        .select()
+        .from(learners)
+        .where(
+          and(
+            eq(learners.id, learnerId),
+            eq(learners.schoolId, school.id),
+            eq(learners.tenantId, req.tenantId),
+          ),
+        )
+        .limit(1);
+      if (!learner) {
+        return reply.status(404).send({ error: "Learner not found in your school" });
+      }
+
+      return { school, learner };
+    },
+  );
+
+  app.post(
+    "/api/school/learners",
+    { preHandler: requireSchoolAdmin },
+    async (req: any, reply: any) => {
+      if (!ensureSchoolPermission(req, reply, Permission.LearnerCreate)) return;
+      const school = await resolveSchool(req, reply);
+      if (!school) return;
+
+      const body = (req.body || {}) as {
+        name?: string;
+        dateOfBirth?: string;
+        gradeLevel?: string;
+        functioningLevel?: string;
+        communicationMode?: string;
+        diagnoses?: string[];
+        zipCode?: string;
+        country?: string;
+        region?: string;
+        preferredLanguage?: string;
+      };
+      const displayName = String(body.name || "").trim();
+      if (!displayName) {
+        return reply.status(400).send({ error: "name is required" });
+      }
+
+      const [placeholderParent] = await db
+        .insert(users)
+        .values({
+          tenantId: req.tenantId,
+          name: `${displayName} Family`,
+          role: "PARENT",
+          schoolId: school.id,
+        } as any)
+        .returning();
+
+      const [learnerUser] = await db
+        .insert(users)
+        .values({
+          tenantId: req.tenantId,
+          name: displayName,
+          role: "LEARNER",
+          schoolId: school.id,
+        } as any)
+        .returning();
+
+      let learner: any;
+      try {
+        [learner] = await db
+          .insert(learners)
+          .values({
+            tenantId: req.tenantId,
+            userId: learnerUser.id,
+            parentId: placeholderParent.id,
+            schoolId: school.id,
+            name: displayName,
+            dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : undefined,
+            gradeLevel: body.gradeLevel,
+            functioningLevel: body.functioningLevel,
+            communicationMode: body.communicationMode,
+            diagnoses: body.diagnoses || [],
+            zipCode: body.zipCode,
+            country: body.country || "US",
+            region: body.region,
+          } as any)
+          .returning();
+      } catch (err) {
+        logger.warn("school learner extended insert failed", { err: String(err) });
+        [learner] = await db
+          .insert(learners)
+          .values({
+            tenantId: req.tenantId,
+            userId: learnerUser.id,
+            parentId: placeholderParent.id,
+            schoolId: school.id,
+            name: displayName,
+          } as any)
+          .returning();
+      }
+
+      if (body.preferredLanguage) {
+        await db
+          .insert(languageProfiles)
+          .values({
+            learnerId: learner.id,
+            primaryLanguage: body.preferredLanguage,
+            preferredInstructionLanguage: body.preferredLanguage,
+          } as any)
+          .catch(() => {});
+      }
+
+      try {
+        await appendAudit(db, "admin_audit_log", adminAuditLog, {
+          tenantId: req.tenantId,
+          action: "learner.created",
+          actorId: req.user.sub,
+          actorEmail: req.user.email,
+          actorRole: req.user.role,
+          onBehalfOfId: null,
+          resourceType: "learner",
+          resourceId: learner.id,
+          details: { name: displayName, schoolId: school.id, userId: learnerUser.id },
+          ipAddress: req.ip ?? null,
+          userAgent: (req.headers["user-agent"] as string) ?? null,
+        });
+      } catch (err) {
+        logger.warn("school learner audit append failed", { err: String(err) });
+      }
+
+      return reply.status(201).send({
+        learner,
+        user: { id: learnerUser.id, name: learnerUser.name, role: learnerUser.role },
+        placeholderParent: { id: placeholderParent.id, name: placeholderParent.name },
+      });
     },
   );
 }

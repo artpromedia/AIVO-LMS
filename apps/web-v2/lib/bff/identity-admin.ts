@@ -18,6 +18,11 @@ const WEB_TO_WIRE: Record<string, string> = {
   caregiver: "CAREGIVER",
   therapist: "THERAPIST",
   learner: "LEARNER",
+  support: "SUPPORT",
+  marketing: "MARKETING",
+  sales: "SALES",
+  devops: "DEVOPS",
+  engineering: "ENGINEERING",
 };
 
 type ServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; error: string };

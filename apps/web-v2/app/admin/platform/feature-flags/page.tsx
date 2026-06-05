@@ -1,45 +1,19 @@
-/**
- * Sprint 12 — feature-flag inventory for platform admins.
- *
- * Read-only listing of every enterprise + sprint-pipeline flag with
- * its env var, description, risk band, and current active state.
- * Editing is gated by ops on purpose — env vars stay the source of
- * truth so the production runbook and the UI never disagree.
- */
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { platformNavForSession } from "@/components/layout/role-shells";
+import { ROLE_LABEL } from "@/lib/auth/types";
 import {
   ENTERPRISE_FLAG_META,
   resolveEnterpriseFlags,
   type EnterpriseFlagKey,
   type FlagMeta,
 } from "@aivo/feature-flags";
-import { Flag, FileText, Building2, Settings as SettingsIcon } from "lucide-react";
 
 export const dynamic = "force-dynamic";
-
-const NAV = [
-  { href: "/admin/platform", label: "Overview", icon: <Building2 className="h-4 w-4" /> },
-  {
-    href: "/admin/platform/feature-flags",
-    label: "Feature flags",
-    icon: <Flag className="h-4 w-4" />,
-  },
-  {
-    href: "/admin/platform/audit-logs",
-    label: "Audit logs",
-    icon: <FileText className="h-4 w-4" />,
-  },
-  {
-    href: "/admin/platform/settings",
-    label: "Settings",
-    icon: <SettingsIcon className="h-4 w-4" />,
-  },
-];
 
 function riskTone(band: FlagMeta["riskBand"]): "success" | "warning" | "danger" {
   if (band === "low") return "success";
@@ -59,21 +33,21 @@ function SurfaceSection({
     <>
       <SectionHeader title={title} />
       <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {flags.map((f) => (
-          <li key={f.key}>
+        {flags.map((flag) => (
+          <li key={flag.key}>
             <Card className="flex flex-col gap-2 p-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold">{f.label}</p>
+                <p className="text-sm font-semibold">{flag.label}</p>
                 <div className="flex gap-2">
-                  <Badge tone={f.active ? "success" : "neutral"}>
-                    {f.active ? "Active" : "Off"}
+                  <Badge tone={flag.active ? "success" : "neutral"}>
+                    {flag.active ? "Active" : "Off"}
                   </Badge>
-                  <Badge tone={riskTone(f.riskBand)}>{f.riskBand} risk</Badge>
+                  <Badge tone={riskTone(flag.riskBand)}>{flag.riskBand} risk</Badge>
                 </div>
               </div>
-              <p className="text-sm text-aivo-ink-soft">{f.description}</p>
+              <p className="text-sm text-aivo-ink-soft">{flag.description}</p>
               <p className="text-xs font-mono text-aivo-ink-soft" data-testid="flag-envvar">
-                {f.envVar}
+                {flag.envVar}
               </p>
             </Card>
           </li>
@@ -90,26 +64,26 @@ export default async function PlatformFeatureFlagsPage() {
   const env = (process.env ?? {}) as Record<string, string | undefined>;
   const resolved = resolveEnterpriseFlags(env);
   const all: Array<FlagMeta & { active: boolean }> = Object.values(ENTERPRISE_FLAG_META).map(
-    (m) => ({ ...m, active: resolved[m.key as EnterpriseFlagKey] }),
+    (meta) => ({ ...meta, active: resolved[meta.key as EnterpriseFlagKey] }),
   );
   const grouped = {
-    ai: all.filter((m) => m.surface === "ai"),
-    enterprise: all.filter((m) => m.surface === "enterprise"),
-    integrations: all.filter((m) => m.surface === "integrations"),
-    ux: all.filter((m) => m.surface === "ux"),
+    ai: all.filter((meta) => meta.surface === "ai"),
+    enterprise: all.filter((meta) => meta.surface === "enterprise"),
+    integrations: all.filter((meta) => meta.surface === "integrations"),
+    ux: all.filter((meta) => meta.surface === "ux"),
   };
 
   return (
     <AppShell
-      role="platform_admin"
-      roleLabel="Platform admin"
-      navItems={NAV}
+      role={session.role}
+      roleLabel={ROLE_LABEL[session.role]}
+      navItems={platformNavForSession(session)}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
         eyebrow="Platform"
         title={t("title")}
-        description="Source of truth is the AIVO_FEATURE_* env vars. This page surfaces what's live so the runbook and the runtime can never drift."
+        description="Source of truth remains env configuration. This inventory now shows both AIVO feature flags and the delegated-admin RBAC rollout toggle."
       />
 
       <SurfaceSection title={t("section_ai")} flags={grouped.ai} />

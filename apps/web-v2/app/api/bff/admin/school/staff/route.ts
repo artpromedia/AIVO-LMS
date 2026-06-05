@@ -1,17 +1,9 @@
-/**
- * Sprint 8 — staff add / remove.
- *
- *   POST   /api/bff/admin/school/staff
- *   DELETE /api/bff/admin/school/staff?id=...
- *
- * Listing already lives at the existing /api/bff/admin/users surface;
- * this route fills in the create + revoke half so the /admin/school
- * /staff page can complete invites and remove access.
- */
 import { NextResponse } from "next/server";
+import { Permission } from "@aivo/security";
 import { failFromUnknown, fail, getRequestId, ok } from "@/lib/bff/response";
-import { requireSession, requireRole } from "@/lib/bff/guards";
+import { requirePermission, requireSession, requireRole } from "@/lib/bff/guards";
 import { ADMIN_ROLES, adminScopeForSession } from "@/lib/bff/admin-scope";
+import { enterpriseFlags } from "@/lib/bff/feature-flags";
 import { addStaffUser, removeStaffUser } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
@@ -25,9 +17,14 @@ export async function POST(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
+    if (enterpriseFlags.delegatedAdminRbacV2()) {
+      const permissionErr = requirePermission(session!, Permission.TeacherCreate, requestId);
+      if (permissionErr) return permissionErr;
+    }
+
     const scope = adminScopeForSession(session!);
     const tenantId = scope.tenantIds[0];
-    if (!tenantId)
+    if (!tenantId) {
       return fail(
         {
           code: "no_tenant",
@@ -37,6 +34,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         },
         requestId,
       );
+    }
 
     const body = (await req.json().catch(() => null)) as {
       email?: string;
@@ -65,6 +63,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
+
     const user = await addStaffUser({
       tenantId,
       email: body.email,
@@ -72,8 +71,8 @@ export async function POST(req: Request): Promise<NextResponse> {
       role: body.role as never,
     });
     return ok({ user }, requestId, { status: 201 });
-  } catch (e) {
-    return failFromUnknown(e, requestId);
+  } catch (error) {
+    return failFromUnknown(error, requestId);
   }
 }
 
@@ -84,9 +83,14 @@ export async function DELETE(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
+    if (enterpriseFlags.delegatedAdminRbacV2()) {
+      const permissionErr = requirePermission(session!, Permission.UserManage, requestId);
+      if (permissionErr) return permissionErr;
+    }
+
     const scope = adminScopeForSession(session!);
     const tenantId = scope.tenantIds[0];
-    if (!tenantId)
+    if (!tenantId) {
       return fail(
         {
           code: "no_tenant",
@@ -96,9 +100,10 @@ export async function DELETE(req: Request): Promise<NextResponse> {
         },
         requestId,
       );
+    }
 
     const id = new URL(req.url).searchParams.get("id");
-    if (!id)
+    if (!id) {
       return fail(
         {
           code: "validation_error",
@@ -108,8 +113,10 @@ export async function DELETE(req: Request): Promise<NextResponse> {
         },
         requestId,
       );
+    }
+
     const removed = await removeStaffUser(id, tenantId);
-    if (!removed)
+    if (!removed) {
       return fail(
         {
           code: "not_found",
@@ -119,8 +126,10 @@ export async function DELETE(req: Request): Promise<NextResponse> {
         },
         requestId,
       );
+    }
+
     return ok({ deleted: true }, requestId);
-  } catch (e) {
-    return failFromUnknown(e, requestId);
+  } catch (error) {
+    return failFromUnknown(error, requestId);
   }
 }

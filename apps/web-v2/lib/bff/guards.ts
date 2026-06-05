@@ -1,7 +1,9 @@
 import { fail } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
+import { Permission } from "@aivo/security";
 import type { Role, SessionProfile } from "@/lib/auth/types";
 import { getMockSession } from "@/lib/auth/mock-session";
+import { sessionHasPermission } from "@/lib/auth/permissions";
 import { parentCanAccessLearner, getLearner } from "@/lib/db/repos";
 
 export async function requireSession(req: Request, requestId: string) {
@@ -21,6 +23,23 @@ export function requireRole(session: SessionProfile, roles: Role[], requestId: s
       {
         ...ERRORS.FORBIDDEN_ROLE,
         message: `Role ${session.role} not in ${roles.join(",")}`,
+      },
+      requestId,
+    );
+  }
+  return null;
+}
+
+export function requirePermission(
+  session: SessionProfile,
+  permission: Permission | string,
+  requestId: string,
+) {
+  if (!sessionHasPermission(session, permission)) {
+    return fail(
+      {
+        ...ERRORS.FORBIDDEN_ROLE,
+        message: `Permission ${permission} denied for role ${session.role}`,
       },
       requestId,
     );

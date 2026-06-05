@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { Permission } from "@aivo/security";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -7,12 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SCHOOL_NAV } from "@/components/layout/role-shells";
 import { listUsersForTenants, scopeTenantsForSession } from "@/lib/db/repos";
+import { sessionHasPermission } from "@/lib/auth/permissions";
 import { TeacherInviteSection } from "./teacher-invite-section";
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin"]);
   const t = await getTranslations("admin.school_staff");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
+  const canInviteTeacher = sessionHasPermission(session, Permission.TeacherCreate);
   const tenantMap = new Map(tenants.map((t) => [t.id, t]));
   const allStaff = await listUsersForTenants(tenants.map((t) => t.id));
   const staff = allStaff.filter((u) => u.role !== "parent" && u.role !== "learner");
@@ -29,9 +32,11 @@ export default async function Page() {
         title={t("title")}
         description="Teachers and admins assigned to this school."
       />
-      <div className="mb-6">
-        <TeacherInviteSection />
-      </div>
+      {canInviteTeacher ? (
+        <div className="mb-6">
+          <TeacherInviteSection />
+        </div>
+      ) : null}
       {staff.length === 0 ? (
         <EmptyState title={t("empty")} />
       ) : (

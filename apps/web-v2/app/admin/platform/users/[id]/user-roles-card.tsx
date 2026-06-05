@@ -3,13 +3,29 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 
-const GRANTABLE = ["parent", "teacher", "caregiver", "therapist", "learner"] as const;
+const GRANTABLE = [
+  "parent",
+  "teacher",
+  "caregiver",
+  "therapist",
+  "learner",
+  "support",
+  "marketing",
+  "sales",
+  "devops",
+  "engineering",
+] as const;
 const LABEL: Record<string, string> = {
   parent: "Parent",
   teacher: "Teacher",
   caregiver: "Caregiver",
   therapist: "Therapist",
   learner: "Learner",
+  support: "Support",
+  marketing: "Marketing",
+  sales: "Sales",
+  devops: "DevOps",
+  engineering: "Engineering",
 };
 
 /**

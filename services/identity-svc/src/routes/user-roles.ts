@@ -1,27 +1,58 @@
 /**
  * Multi-role management (ADR 0020). Lets a privileged admin grant or revoke
  * the *additional* roles a user may act as, beyond their primary `users.role`.
- * These rows populate `availableRoles` in the access-token JWT, which the
- * unified shell's role switcher and the server-side active-role validator
- * consume.
  *
  *   GET    /api/admin/users/:userId/roles            → base + additional roles
  *   POST   /api/admin/users/:userId/roles   { role } → grant a role
  *   DELETE /api/admin/users/:userId/roles/:role      → revoke a role
  *
- * Authz: SCHOOL_ADMIN / DISTRICT_ADMIN (same tenant) or PLATFORM_ADMIN (any).
- * Every grant/revoke writes a hash-chained admin_audit_log row.
+ * The delegated-admin rollout flag preserves the legacy role-based behavior
+ * when OFF and switches to permission-based grant enforcement when ON.
  */
 import type { FastifyInstance } from "fastify";
 import { and, eq } from "drizzle-orm";
 import { users, userRoles, adminAuditLog, appendAudit } from "@aivo/db";
-import { verifyJWT } from "@aivo/security";
+import { Permission, verifyJWT } from "@aivo/security";
+import { delegatedAdminRbacV2Enabled, requestHasPermission } from "../lib/permissions.js";
+import { requireStepUp } from "./step-up.js";
 
-const ADMIN_ROLES = ["PLATFORM_ADMIN", "DISTRICT_ADMIN", "SCHOOL_ADMIN"];
-// Roles that may be granted as a *secondary* role.
-const GRANTABLE_ROLES = ["PARENT", "TEACHER", "CAREGIVER", "THERAPIST", "LEARNER"];
+const SCHOOL_AND_DISTRICT_ADMIN_ROLES = ["DISTRICT_ADMIN", "SCHOOL_ADMIN"] as const;
+const PLATFORM_OPERATOR_ROLES = [
+  "PLATFORM_ADMIN",
+  "SALES",
+  "MARKETING",
+  "CUSTOMER_CARE",
+  "SUPPORT",
+  "FINANCE",
+  "DEVOPS",
+  "ENGINEERING",
+] as const;
+const ROUTE_ROLES = [...SCHOOL_AND_DISTRICT_ADMIN_ROLES, ...PLATFORM_OPERATOR_ROLES] as const;
+const LEGACY_GRANTABLE_ROLES = ["PARENT", "TEACHER", "CAREGIVER", "THERAPIST", "LEARNER"] as const;
+const PLATFORM_STAFF_ROLES = ["SUPPORT", "MARKETING", "SALES", "DEVOPS", "ENGINEERING"] as const;
+const GRANTABLE_ROLES = [...LEGACY_GRANTABLE_ROLES, ...PLATFORM_STAFF_ROLES] as const;
 
-async function requireAdmin(req: any, reply: any) {
+type JwtActor = {
+  sub: string;
+  email?: string;
+  role: string;
+  tenantId?: string;
+  permissions?: string[];
+};
+
+function isPlatformOperatorRole(role: string): boolean {
+  return (PLATFORM_OPERATOR_ROLES as readonly string[]).includes(role);
+}
+
+function isGrantableRole(role: string): role is (typeof GRANTABLE_ROLES)[number] {
+  return (GRANTABLE_ROLES as readonly string[]).includes(role);
+}
+
+function isLegacyGrantableRole(role: string): boolean {
+  return (LEGACY_GRANTABLE_ROLES as readonly string[]).includes(role);
+}
+
+async function requireAdmin(req: any, reply: any): Promise<JwtActor | null> {
   const auth = req.headers.authorization;
   if (!auth?.startsWith("Bearer ")) {
     reply.status(401).send({ error: "Missing authorization" });
@@ -34,15 +65,32 @@ async function requireAdmin(req: any, reply: any) {
     reply.status(401).send({ error: "Invalid token" });
     return null;
   }
-  if (!ADMIN_ROLES.includes(payload.role)) {
+  if (!(ROUTE_ROLES as readonly string[]).includes(payload.role)) {
     reply.status(403).send({ error: "Admin access required" });
     return null;
   }
+  req.user = payload;
   return payload;
 }
 
-function canManage(admin: any, targetTenantId: string): boolean {
-  return admin.role === "PLATFORM_ADMIN" || admin.tenantId === targetTenantId;
+function canManage(admin: JwtActor, targetTenantId: string): boolean {
+  return admin.role === "PLATFORM_ADMIN" || isPlatformOperatorRole(admin.role) || admin.tenantId === targetTenantId;
+}
+
+function actorMayGrantRole(admin: JwtActor, targetRole: string): boolean {
+  if (!delegatedAdminRbacV2Enabled()) {
+    return (
+      ["PLATFORM_ADMIN", "DISTRICT_ADMIN", "SCHOOL_ADMIN"].includes(admin.role) &&
+      isLegacyGrantableRole(targetRole)
+    );
+  }
+
+  if (!requestHasPermission(admin, Permission.RoleGrant)) return false;
+  if (admin.role === "PLATFORM_ADMIN") return isGrantableRole(targetRole);
+  if (isPlatformOperatorRole(admin.role)) {
+    return (PLATFORM_STAFF_ROLES as readonly string[]).includes(targetRole);
+  }
+  return isLegacyGrantableRole(targetRole);
 }
 
 const userIdParam = {
@@ -54,13 +102,13 @@ const userIdParam = {
 
 export async function registerUserRoleRoutes(app: FastifyInstance) {
   const db = (app as any).db;
+  const roleChangeStepUp = requireStepUp("role:change");
 
   app.get(
     "/api/admin/users/:userId/roles",
-    { schema: { tags: ["Admin"], params: userIdParam } },
+    { schema: { tags: ["Admin"], params: userIdParam }, preHandler: requireAdmin as any },
     async (req, reply) => {
-      const admin = await requireAdmin(req, reply);
-      if (!admin) return;
+      const admin = req.user as JwtActor;
       const { userId } = req.params as { userId: string };
       const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
       if (!user) return reply.code(404).send({ error: "User not found" });
@@ -69,12 +117,12 @@ export async function registerUserRoleRoutes(app: FastifyInstance) {
         .select({ role: userRoles.role })
         .from(userRoles)
         .where(eq(userRoles.userId, userId));
-      const additionalRoles = extra.map((r: { role: string }) => r.role);
+      const additionalRoles = extra.map((row: { role: string }) => row.role);
       return {
         userId,
         baseRole: user.role,
         additionalRoles,
-        availableRoles: [user.role, ...additionalRoles.filter((r: string) => r !== user.role)],
+        availableRoles: [user.role, ...additionalRoles.filter((role: string) => role !== user.role)],
       };
     },
   );
@@ -92,20 +140,21 @@ export async function registerUserRoleRoutes(app: FastifyInstance) {
           properties: { role: { type: "string" } },
         },
       },
+      preHandler: [requireAdmin as any, roleChangeStepUp as any],
     },
     async (req, reply) => {
-      const admin = await requireAdmin(req, reply);
-      if (!admin) return;
+      const admin = req.user as JwtActor;
       const { userId } = req.params as { userId: string };
       const role = String((req.body as any)?.role || "").toUpperCase();
-      if (!GRANTABLE_ROLES.includes(role)) {
-        return reply
-          .code(400)
-          .send({ error: "role must be one of PARENT, TEACHER, CAREGIVER, THERAPIST, LEARNER" });
+      if (!isGrantableRole(role)) {
+        return reply.code(400).send({
+          error: `role must be one of ${GRANTABLE_ROLES.join(", ")}`,
+        });
       }
       const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
       if (!user) return reply.code(404).send({ error: "User not found" });
       if (!canManage(admin, user.tenantId)) return reply.code(403).send({ error: "Forbidden" });
+      if (!actorMayGrantRole(admin, role)) return reply.code(403).send({ error: "Forbidden" });
       if (role === user.role) {
         return reply.code(409).send({ error: "That is already the user's primary role" });
       }
@@ -147,15 +196,16 @@ export async function registerUserRoleRoutes(app: FastifyInstance) {
           properties: { userId: { type: "string" }, role: { type: "string" } },
         },
       },
+      preHandler: [requireAdmin as any, roleChangeStepUp as any],
     },
     async (req, reply) => {
-      const admin = await requireAdmin(req, reply);
-      if (!admin) return;
+      const admin = req.user as JwtActor;
       const { userId, role: roleParam } = req.params as { userId: string; role: string };
       const role = String(roleParam || "").toUpperCase();
       const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
       if (!user) return reply.code(404).send({ error: "User not found" });
       if (!canManage(admin, user.tenantId)) return reply.code(403).send({ error: "Forbidden" });
+      if (!actorMayGrantRole(admin, role)) return reply.code(403).send({ error: "Forbidden" });
 
       await db.delete(userRoles).where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
       await appendAudit(db, "admin_audit_log", adminAuditLog, {

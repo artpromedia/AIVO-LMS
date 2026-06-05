@@ -24,11 +24,13 @@ import {
   appendAudit,
   adminAuditLog,
 } from "@aivo/db";
+import { Permission } from "@aivo/security";
 import { eq, and, count, isNull, ne, inArray } from "drizzle-orm";
 import argon2 from "argon2";
 import crypto from "crypto";
 import { createLogger } from "@aivo/observability";
 import { requireStepUp } from "./step-up.js";
+import { delegatedAdminRbacV2Enabled, requestHasPermission } from "../lib/permissions.js";
 import {
   getDistrictAdminsSchema,
   districtAdminsSchema,
@@ -57,6 +59,17 @@ const COMMS_SVC_URL = requireUrl("COMMS_SVC_URL", "http://localhost:3003");
 
 function hashInviteToken(raw: string): string {
   return crypto.createHash("sha256").update(raw).digest("hex");
+}
+
+function ensureDistrictAdminPermission(req: any, reply: any, permission: Permission): boolean {
+  if (
+    !delegatedAdminRbacV2Enabled() ||
+    requestHasPermission(req.user, permission)
+  ) {
+    return true;
+  }
+  reply.status(403).send({ error: "Forbidden" });
+  return false;
 }
 
 async function logBoth(
@@ -140,7 +153,8 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
   // Returns both DISTRICT_ADMIN and SCHOOL_ADMIN users + their pending
   // invites. School admins carry a schoolId/schoolName so the UI can
   // group them under the school they oversee.
-  app.get("/api/district/admins", { schema: getDistrictAdminsSchema }, async (req: any) => {
+  app.get("/api/district/admins", { schema: getDistrictAdminsSchema }, async (req: any, reply: any) => {
+    if (!ensureDistrictAdminPermission(req, reply, Permission.UserRead)) return;
     const tid = req.tenantId;
     const rows = await db
       .select({
@@ -218,6 +232,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
     "/api/district/admins",
     { schema: districtAdminsSchema, preHandler: stepUp },
     async (req: any, reply: any) => {
+      if (!ensureDistrictAdminPermission(req, reply, Permission.UserManage)) return;
       const tid = req.tenantId;
       const {
         email,
@@ -343,6 +358,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
     "/api/district/admins/invites/:id/resend",
     { schema: districtAdminsInvitesByIdResendSchema, preHandler: stepUp },
     async (req: any, reply: any) => {
+      if (!ensureDistrictAdminPermission(req, reply, Permission.UserManage)) return;
       const tid = req.tenantId;
       const { id } = req.params as { id: string };
       const [invite] = await db
@@ -403,6 +419,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
     "/api/district/admins/invites/:id",
     { schema: deleteDistrictAdminsInvitesByIdSchema, preHandler: stepUp },
     async (req: any, reply: any) => {
+      if (!ensureDistrictAdminPermission(req, reply, Permission.UserManage)) return;
       const tid = req.tenantId;
       const { id } = req.params as { id: string };
       const [invite] = await db
@@ -438,6 +455,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
     "/api/district/admins/:id/deactivate",
     { schema: districtAdminsByIdDeactivateSchema, preHandler: stepUp },
     async (req: any, reply: any) => {
+      if (!ensureDistrictAdminPermission(req, reply, Permission.UserManage)) return;
       const tid = req.tenantId;
       const { id } = req.params as { id: string };
       const [target] = await db
@@ -507,6 +525,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
     "/api/district/admins/:id/reactivate",
     { schema: districtAdminsByIdReactivateSchema, preHandler: stepUp },
     async (req: any, reply: any) => {
+      if (!ensureDistrictAdminPermission(req, reply, Permission.UserManage)) return;
       const tid = req.tenantId;
       const { id } = req.params as { id: string };
       const [target] = await db
@@ -557,6 +576,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
     "/api/district/admins/:id/reset-password",
     { schema: districtAdminsByIdResetPasswordSchema, preHandler: stepUp },
     async (req: any, reply: any) => {
+      if (!ensureDistrictAdminPermission(req, reply, Permission.UserManage)) return;
       const tid = req.tenantId;
       const { id } = req.params as { id: string };
       const [target] = await db
@@ -613,7 +633,8 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
   app.get(
     "/api/district/admins/mfa-stats",
     { schema: getDistrictAdminsMfaStatsSchema },
-    async (req: any) => {
+    async (req: any, reply: any) => {
+      if (!ensureDistrictAdminPermission(req, reply, Permission.DistrictRead)) return;
       const tid = req.tenantId;
       const STAFF_ROLES = [
         "DISTRICT_ADMIN",
@@ -687,6 +708,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
     "/api/district/admins/force-mfa",
     { schema: updateDistrictAdminsForceMfaSchema, preHandler: stepUp },
     async (req: any, reply: any) => {
+      if (!ensureDistrictAdminPermission(req, reply, Permission.UserManage)) return;
       const tid = req.tenantId;
       const { enabled } = (req.body || {}) as { enabled?: boolean };
       if (typeof enabled !== "boolean") {

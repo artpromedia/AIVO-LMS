@@ -11,6 +11,7 @@ import {
 test("min length: internal roles need 14, public roles need 12", () => {
   assert.equal(minLengthFor("PLATFORM_ADMIN"), 14);
   assert.equal(minLengthFor("DISTRICT_ADMIN"), 14);
+  assert.equal(minLengthFor("ENGINEERING"), 14);
   assert.equal(minLengthFor("TEACHER"), 12);
   assert.equal(minLengthFor("CAREGIVER"), 12);
   assert.equal(minLengthFor(undefined), 12);
@@ -92,6 +93,7 @@ test("isInternalRoleForPolicy: covers staff roles only", () => {
   assert.equal(isInternalRoleForPolicy("PLATFORM_ADMIN"), true);
   assert.equal(isInternalRoleForPolicy("DISTRICT_ADMIN"), true);
   assert.equal(isInternalRoleForPolicy("SUPPORT"), true);
+  assert.equal(isInternalRoleForPolicy("ENGINEERING"), true);
   assert.equal(isInternalRoleForPolicy("TEACHER"), false);
   assert.equal(isInternalRoleForPolicy("CAREGIVER"), false);
   assert.equal(isInternalRoleForPolicy("LEARNER"), false);

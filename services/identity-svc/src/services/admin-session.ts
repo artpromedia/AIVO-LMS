@@ -21,6 +21,7 @@ export const INTERNAL_ROLES = new Set([
   "SUPPORT",
   "FINANCE",
   "DEVOPS",
+  "ENGINEERING",
 ]);
 
 export const INTERNAL_REFRESH_TTL_MS = 12 * 60 * 60 * 1000;

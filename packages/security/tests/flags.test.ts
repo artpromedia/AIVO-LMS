@@ -65,6 +65,7 @@ describe("loadAdminEnterpriseFlags", () => {
     assert.deepEqual(flags, {
       STRONG_MFA: false,
       STEP_UP_AUTH: false,
+      DELEGATED_ADMIN_RBAC_V2: false,
       DISTRICT_SSO: false,
       AUDIT_IMMUTABLE: false,
       ADMIN_SESSION_IDLE: 0,
@@ -75,6 +76,7 @@ describe("loadAdminEnterpriseFlags", () => {
     const flags = loadAdminEnterpriseFlags({
       ADMIN_ENTERPRISE_STRONG_MFA: "true",
       ADMIN_ENTERPRISE_STEP_UP_AUTH: "1",
+      ADMIN_ENTERPRISE_DELEGATED_ADMIN_RBAC_V2: "enabled",
       ADMIN_ENTERPRISE_DISTRICT_SSO: "yes",
       ADMIN_ENTERPRISE_AUDIT_IMMUTABLE: "on",
       ADMIN_ENTERPRISE_ADMIN_SESSION_IDLE: "900",
@@ -82,6 +84,7 @@ describe("loadAdminEnterpriseFlags", () => {
     assert.deepEqual(flags, {
       STRONG_MFA: true,
       STEP_UP_AUTH: true,
+      DELEGATED_ADMIN_RBAC_V2: true,
       DISTRICT_SSO: true,
       AUDIT_IMMUTABLE: true,
       ADMIN_SESSION_IDLE: 900,

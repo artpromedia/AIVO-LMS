@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { serverEnv } from "@/lib/env";
 import type { Role, SessionProfile } from "@/lib/auth/types";
+import { capabilitiesForRole } from "@/lib/auth/permissions";
 import {
   ACTIVE_ROLE_COOKIE,
   SESSION_ROLES_COOKIE,
@@ -21,72 +22,99 @@ function mockAuthAllowed(): boolean {
 
 // Mock users so role routing can be exercised end-to-end without a real
 // identity provider. Replaced by Clerk/Auth.js/custom auth in a later sprint.
+function mockProfile(
+  role: Role,
+  input: Omit<SessionProfile, "role" | "permissions" | "capabilities">,
+): SessionProfile {
+  const permissions = capabilitiesForRole(role);
+  return {
+    ...input,
+    role,
+    permissions,
+    capabilities: permissions,
+  };
+}
+
 export const MOCK_USERS: Record<Role, SessionProfile> = {
-  parent: {
+  parent: mockProfile("parent", {
     userId: "u_parent_1",
     tenantId: "t_demo",
-    role: "parent",
     email: "parent@demo.aivo",
     displayName: "Riley Parent",
-    permissions: ["learners:read", "learners:write"],
-  },
-  learner: {
+  }),
+  learner: mockProfile("learner", {
     userId: "u_learner_1",
     tenantId: "t_demo",
-    role: "learner",
     email: "learner@demo.aivo",
     displayName: "Sky",
-    permissions: ["self:read"],
     learnerId: "lrn_demo_sky",
-  },
-  teacher: {
+  }),
+  teacher: mockProfile("teacher", {
     userId: "u_teacher_1",
     tenantId: "t_demo",
-    role: "teacher",
     email: "teacher@demo.aivo",
     displayName: "Ms. Vega",
-    permissions: ["class:read", "class:write"],
-  },
-  school_admin: {
+  }),
+  school_admin: mockProfile("school_admin", {
     userId: "u_school_1",
     tenantId: "t_school_demo",
-    role: "school_admin",
     email: "school@demo.aivo",
     displayName: "Pat Principal",
-    permissions: ["school:read", "school:write"],
-  },
-  district_admin: {
+  }),
+  district_admin: mockProfile("district_admin", {
     userId: "u_district_1",
     tenantId: "t_district_demo",
-    role: "district_admin",
     email: "district@demo.aivo",
     displayName: "Dr. Chen",
-    permissions: ["district:read", "district:write"],
-  },
-  platform_admin: {
+  }),
+  platform_admin: mockProfile("platform_admin", {
     userId: "u_platform_1",
     tenantId: "t_platform",
-    role: "platform_admin",
     email: "platform@demo.aivo",
     displayName: "AIVO Admin",
-    permissions: ["*"],
-  },
-  caregiver: {
+  }),
+  support: mockProfile("support", {
+    userId: "u_support_1",
+    tenantId: "t_platform",
+    email: "support@demo.aivo",
+    displayName: "Alex Support",
+  }),
+  marketing: mockProfile("marketing", {
+    userId: "u_marketing_1",
+    tenantId: "t_platform",
+    email: "marketing@demo.aivo",
+    displayName: "Casey Marketing",
+  }),
+  sales: mockProfile("sales", {
+    userId: "u_sales_1",
+    tenantId: "t_platform",
+    email: "sales@demo.aivo",
+    displayName: "Jordan Sales",
+  }),
+  devops: mockProfile("devops", {
+    userId: "u_devops_1",
+    tenantId: "t_platform",
+    email: "devops@demo.aivo",
+    displayName: "Morgan DevOps",
+  }),
+  engineering: mockProfile("engineering", {
+    userId: "u_engineering_1",
+    tenantId: "t_platform",
+    email: "engineering@demo.aivo",
+    displayName: "Taylor Engineering",
+  }),
+  caregiver: mockProfile("caregiver", {
     userId: "u_caregiver_1",
     tenantId: "t_family_1",
-    role: "caregiver",
     email: "caregiver@demo.aivo",
     displayName: "Sam Caregiver",
-    permissions: ["learner:read"],
-  },
-  therapist: {
+  }),
+  therapist: mockProfile("therapist", {
     userId: "u_therapist_1",
     tenantId: "t_family_1",
-    role: "therapist",
     email: "therapist@demo.aivo",
     displayName: "Dr. Park",
-    permissions: ["learner:read"],
-  },
+  }),
 };
 
 function parseRole(value: string | undefined): Role | null {
@@ -213,26 +241,32 @@ function applyMultiRoleOverlay(
   if (requestedActive && requestedActive !== base.role && seen.has(requestedActive)) {
     if (mockAuthAllowed()) {
       const swap = MOCK_USERS[requestedActive];
+      const permissions = capabilitiesForRole(requestedActive);
       return {
         ...swap,
         userId: base.userId,
         tenantId: base.tenantId,
         email: base.email,
         roles: heldRoles,
-        capabilities: [...swap.permissions],
+        permissions,
+        capabilities: permissions,
       };
     }
+    const permissions = capabilitiesForRole(requestedActive);
     return {
       ...base,
       role: requestedActive,
       roles: heldRoles,
-      capabilities: [...base.permissions],
+      permissions,
+      capabilities: permissions,
     };
   }
 
+  const permissions = capabilitiesForRole(base.role);
   return {
     ...base,
+    permissions,
     roles: heldRoles,
-    capabilities: base.capabilities ?? [...base.permissions],
+    capabilities: permissions,
   };
 }

@@ -135,3 +135,16 @@ export function baselineAdaptiveEnabled(): boolean {
 export function baselineStreamingEnabled(): boolean {
   return isTruthy(process.env.AIVO_FEATURE_BASELINE_STREAMING);
 }
+
+/**
+ * Delegated-admin RBAC v2 rollout flag. Mirrors the server-side
+ * `ADMIN_ENTERPRISE_DELEGATED_ADMIN_RBAC_V2` toggle so the admin shell can
+ * dark-launch platform-staff and delegated-admin capabilities without
+ * drifting from identity-svc.
+ */
+export function delegatedAdminRbacV2Enabled(): boolean {
+  const fromServer = process.env.ADMIN_ENTERPRISE_DELEGATED_ADMIN_RBAC_V2;
+  if (isTruthy(fromServer)) return true;
+  if (isExplicitlyFalsy(fromServer)) return false;
+  return false;
+}

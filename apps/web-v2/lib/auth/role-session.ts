@@ -27,6 +27,7 @@
  */
 import type { Role as NavRole } from "@aivo/nav";
 import type { Role as WebRole, SessionProfile } from "./types";
+import { capabilitiesForRole } from "./permissions";
 
 export const ACTIVE_ROLE_COOKIE = "aivo_active_role";
 export const SESSION_ROLES_COOKIE = "aivo_session_roles";
@@ -47,6 +48,11 @@ const WEB_TO_NAV: Record<WebRole, NavRole> = {
   school_admin: "schoolAdmin",
   district_admin: "districtAdmin",
   platform_admin: "internal",
+  support: "internal",
+  marketing: "internal",
+  sales: "internal",
+  devops: "internal",
+  engineering: "internal",
 };
 
 const NAV_TO_WEB: Record<NavRole, WebRole> = {
@@ -125,7 +131,9 @@ export interface RoleSessionPayload {
  *   de-duplicated and the active role is guaranteed to appear first.
  * - `capabilities[]` mirrors the profile's `permissions[]`; the wider
  *   contract calls them capabilities to leave room for permission
- *   strings that aren't tied to a single CRUD verb.
+ *   strings that aren't tied to a single CRUD verb. The value is always
+ *   recomputed from the active role so a role switch cannot leave stale
+ *   permissions behind in the single-role session snapshot.
  *
  * Pure function — easy to unit-test, no cookies or fetches.
  */
@@ -146,6 +154,6 @@ export function buildRoleSession(profile: SessionProfile): RoleSessionPayload {
     tenantId: profile.tenantId,
     roles,
     activeRole: activeNav,
-    capabilities: [...(profile.capabilities ?? profile.permissions ?? [])],
+    capabilities: capabilitiesForRole(activeWeb),
   };
 }

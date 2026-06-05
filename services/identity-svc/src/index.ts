@@ -38,6 +38,7 @@ import { registerScimRoutes } from "./routes/scim.js";
 import { registerOidcProviderRoutes } from "./routes/oidc-provider.js";
 import { registerAvatarRoutes } from "./routes/avatars.js";
 import { registerGovernanceRoutes } from "./routes/governance.js";
+import { registerStaffRoutes } from "./routes/staff.js";
 import {
   AVATAR_MAX_BYTES,
   AVATAR_STORAGE_ROOT,
@@ -314,6 +315,7 @@ export async function buildApp() {
   await registerPublicBrandingRoutes(app);
   await registerDistrictAdminRoutes(app);
   await registerSchoolRoutes(app);
+  await registerStaffRoutes(app);
   await registerSsoRoutes(app);
   await registerOidcRpRoutes(app);
   await registerScimRoutes(app);

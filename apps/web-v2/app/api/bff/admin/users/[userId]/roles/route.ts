@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { Permission } from "@aivo/security";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { requireSession, requireRole } from "@/lib/bff/guards";
+import { requirePermission, requireSession, requireRole } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import {
   isIdentitySvcEnabled,
@@ -38,6 +39,8 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
+    const permissionErr = requirePermission(session!, Permission.RoleGrant, requestId);
+    if (permissionErr) return permissionErr;
 
     const bearer = await getAdminBearer();
     if (isIdentitySvcEnabled() && bearer) {
@@ -52,7 +55,18 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
 }
 
 const postSchema = z.object({
-  role: z.enum(["parent", "teacher", "caregiver", "therapist", "learner"]),
+  role: z.enum([
+    "parent",
+    "teacher",
+    "caregiver",
+    "therapist",
+    "learner",
+    "support",
+    "marketing",
+    "sales",
+    "devops",
+    "engineering",
+  ]),
 });
 
 export async function POST(req: Request, { params }: Params): Promise<NextResponse> {
@@ -63,6 +77,8 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (response) return response;
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
+    const permissionErr = requirePermission(session!, Permission.RoleGrant, requestId);
+    if (permissionErr) return permissionErr;
 
     const parsed = postSchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) {
@@ -97,6 +113,8 @@ export async function DELETE(req: Request, { params }: Params): Promise<NextResp
     if (response) return response;
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
+    const permissionErr = requirePermission(session!, Permission.RoleGrant, requestId);
+    if (permissionErr) return permissionErr;
 
     const url = new URL(req.url);
     const role = url.searchParams.get("role") ?? "";

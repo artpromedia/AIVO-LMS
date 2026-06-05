@@ -32,6 +32,11 @@ describe("toNavRole / toWebRole", () => {
       "school_admin",
       "district_admin",
       "platform_admin",
+      "support",
+      "marketing",
+      "sales",
+      "devops",
+      "engineering",
     ];
     for (const r of webRoles) {
       expect(toWebRole(toNavRole(r))).toBe(r);
@@ -42,6 +47,7 @@ describe("toNavRole / toWebRole", () => {
     expect(toNavRole("school_admin")).toBe("schoolAdmin");
     expect(toNavRole("district_admin")).toBe("districtAdmin");
     expect(toNavRole("platform_admin")).toBe("internal");
+    expect(toNavRole("support")).toBe("internal");
   });
 });
 
@@ -94,13 +100,16 @@ describe("buildRoleSession", () => {
     expect(payload.activeRole).toBe("teacher");
   });
 
-  it("prefers capabilities[] over permissions[] when both are set", () => {
+  it("recomputes capabilities from the active role", () => {
     const payload = buildRoleSession({
       ...baseProfile,
-      permissions: ["class:read"],
-      capabilities: ["class:read", "class:write", "msg:send"],
+      role: "district_admin",
+      permissions: ["stale:permission"],
+      capabilities: ["stale:capability"],
     });
-    expect(payload.capabilities).toEqual(["class:read", "class:write", "msg:send"]);
+    expect(payload.capabilities).toContain("district:read");
+    expect(payload.capabilities).not.toContain("stale:permission");
+    expect(payload.capabilities).not.toContain("stale:capability");
   });
 
   it("dedupes the active role out of additional roles", () => {

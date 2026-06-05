@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { requirePageRole } from "@/lib/auth/server";
+import { Permission } from "@aivo/security";
+import { requirePlatformPage } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PLATFORM_NAV } from "@/components/layout/role-shells";
+import { platformNavForSession } from "@/components/layout/role-shells";
 import { listUsersForTenants, scopeTenantsForSession } from "@/lib/db/repos";
-import type { Role } from "@/lib/auth/types";
+import { ROLE_LABEL, type Role } from "@/lib/auth/types";
 
 const ROLE_LABEL: Record<Role, string> = {
   parent: "Parent",
@@ -19,6 +20,11 @@ const ROLE_LABEL: Record<Role, string> = {
   school_admin: "School admin",
   district_admin: "District admin",
   platform_admin: "Platform admin",
+  support: "Support",
+  marketing: "Marketing",
+  sales: "Sales",
+  devops: "DevOps",
+  engineering: "Engineering",
 };
 
 const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
@@ -30,6 +36,11 @@ const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
   school_admin: "success",
   district_admin: "primary",
   platform_admin: "warning",
+  support: "warning",
+  marketing: "warning",
+  sales: "warning",
+  devops: "warning",
+  engineering: "warning",
 };
 
 // Display order: privileged → educator → end-user.
@@ -38,12 +49,17 @@ const ROLE_ORDER: Role[] = [
   "district_admin",
   "school_admin",
   "teacher",
+  "support",
+  "marketing",
+  "sales",
+  "devops",
+  "engineering",
   "parent",
   "learner",
 ];
 
 export default async function Page() {
-  const session = await requirePageRole(["platform_admin"]);
+  const session = await requirePlatformPage(Permission.UserRead);
   const t = await getTranslations("admin.platform_users");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const users = await listUsersForTenants(tenants.map((t) => t.id));
@@ -60,9 +76,9 @@ export default async function Page() {
 
   return (
     <AppShell
-      role="platform_admin"
-      roleLabel="Platform admin"
-      navItems={PLATFORM_NAV}
+      role={session.role}
+      roleLabel={ROLE_LABEL[session.role]}
+      navItems={platformNavForSession(session)}
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader

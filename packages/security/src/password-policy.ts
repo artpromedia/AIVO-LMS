@@ -24,6 +24,7 @@ const INTERNAL_ROLES = new Set([
   "SUPPORT",
   "FINANCE",
   "DEVOPS",
+  "ENGINEERING",
 ]);
 
 export interface PasswordPolicyResult {

@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
+import { Permission } from "@aivo/security";
+import { delegatedAdminRbacV2Enabled } from "@/lib/feature-flags";
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
 import { ROLE_HOME, type Role, type SessionProfile } from "@/lib/auth/types";
+import { PLATFORM_ROLES, sessionHasPermission } from "@/lib/auth/permissions";
 
 /**
  * Server-component helper: ensures the visitor is signed in with one of the
@@ -16,6 +19,33 @@ export async function requirePageRole(roles: Role[]): Promise<SessionProfile> {
     redirect(ROLE_HOME[session.role]);
   }
   return session;
+}
+
+export async function requirePagePermission(
+  permission: Permission | string,
+  roles?: Role[],
+): Promise<SessionProfile> {
+  const session = await readMockSessionFromCookies();
+  if (!session) {
+    redirect("/login");
+  }
+  if (roles && !roles.includes(session.role)) {
+    redirect(ROLE_HOME[session.role]);
+  }
+  if (!sessionHasPermission(session, permission)) {
+    redirect(ROLE_HOME[session.role]);
+  }
+  return session;
+}
+
+export function platformPageRoles(): Role[] {
+  return delegatedAdminRbacV2Enabled() ? [...PLATFORM_ROLES] : ["platform_admin"];
+}
+
+export async function requirePlatformPage(
+  permission: Permission | string,
+): Promise<SessionProfile> {
+  return requirePagePermission(permission, platformPageRoles());
 }
 
 /**

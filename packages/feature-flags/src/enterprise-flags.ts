@@ -30,6 +30,7 @@ export const ENTERPRISE_FLAG_ENV_VARS = {
   tutorSurfaceProtocol: "AIVO_FEATURE_TUTOR_SURFACE_PROTOCOL",
   profileRecommendationsV2: "AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2",
   districtEnterpriseMode: "AIVO_FEATURE_DISTRICT_ENTERPRISE_MODE",
+  delegatedAdminRbacV2: "ADMIN_ENTERPRISE_DELEGATED_ADMIN_RBAC_V2",
   sisSync: "AIVO_FEATURE_SIS_SYNC",
   lti13: "AIVO_FEATURE_LTI_13",
   dataGovernanceCenter: "AIVO_FEATURE_DATA_GOVERNANCE_CENTER",
@@ -68,6 +69,11 @@ export function resolveEnterpriseFlags(
       ENTERPRISE_FLAG_ENV_VARS.districtEnterpriseMode,
       false,
     ),
+    delegatedAdminRbacV2: readBooleanFromSource(
+      source,
+      ENTERPRISE_FLAG_ENV_VARS.delegatedAdminRbacV2,
+      false,
+    ),
     sisSync: readBooleanFromSource(source, ENTERPRISE_FLAG_ENV_VARS.sisSync, false),
     lti13: readBooleanFromSource(source, ENTERPRISE_FLAG_ENV_VARS.lti13, false),
     dataGovernanceCenter: readBooleanFromSource(
@@ -101,6 +107,7 @@ export const enterpriseFeatureFlags: EnterpriseFeatureFlags = {
     false,
   ),
   districtEnterpriseMode: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.districtEnterpriseMode, false),
+  delegatedAdminRbacV2: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.delegatedAdminRbacV2, false),
   sisSync: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.sisSync, false),
   lti13: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.lti13, false),
   dataGovernanceCenter: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.dataGovernanceCenter, false),
@@ -169,6 +176,16 @@ export const ENTERPRISE_FLAG_META: Record<EnterpriseFlagKey, FlagMeta> = {
     label: "District enterprise mode",
     description:
       "Activates district-scoped tenant routing, SSO / SCIM integration tabs, and the district admin reporting suite.",
+    surface: "enterprise",
+    riskBand: "high",
+    defaultValue: false,
+  },
+  delegatedAdminRbacV2: {
+    key: "delegatedAdminRbacV2",
+    envVar: ENTERPRISE_FLAG_ENV_VARS.delegatedAdminRbacV2,
+    label: "Delegated admin RBAC v2",
+    description:
+      "Turns on capability-based delegated-admin enforcement across identity-svc, BFF guards, and the unified admin shell.",
     surface: "enterprise",
     riskBand: "high",
     defaultValue: false,
