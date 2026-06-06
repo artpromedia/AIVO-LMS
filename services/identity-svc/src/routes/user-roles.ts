@@ -73,6 +73,10 @@ async function requireAdmin(req: any, reply: any): Promise<JwtActor | null> {
   return payload;
 }
 
+function adminFromRequest(req: unknown): JwtActor {
+  return (req as { user: JwtActor }).user;
+}
+
 function canManage(admin: JwtActor, targetTenantId: string): boolean {
   return admin.role === "PLATFORM_ADMIN" || isPlatformOperatorRole(admin.role) || admin.tenantId === targetTenantId;
 }
@@ -108,7 +112,7 @@ export async function registerUserRoleRoutes(app: FastifyInstance) {
     "/api/admin/users/:userId/roles",
     { schema: { tags: ["Admin"], params: userIdParam }, preHandler: requireAdmin as any },
     async (req, reply) => {
-      const admin = req.user as JwtActor;
+      const admin = adminFromRequest(req);
       const { userId } = req.params as { userId: string };
       const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
       if (!user) return reply.code(404).send({ error: "User not found" });
@@ -143,7 +147,7 @@ export async function registerUserRoleRoutes(app: FastifyInstance) {
       preHandler: [requireAdmin as any, roleChangeStepUp as any],
     },
     async (req, reply) => {
-      const admin = req.user as JwtActor;
+      const admin = adminFromRequest(req);
       const { userId } = req.params as { userId: string };
       const role = String((req.body as any)?.role || "").toUpperCase();
       if (!isGrantableRole(role)) {
@@ -199,7 +203,7 @@ export async function registerUserRoleRoutes(app: FastifyInstance) {
       preHandler: [requireAdmin as any, roleChangeStepUp as any],
     },
     async (req, reply) => {
-      const admin = req.user as JwtActor;
+      const admin = adminFromRequest(req);
       const { userId, role: roleParam } = req.params as { userId: string; role: string };
       const role = String(roleParam || "").toUpperCase();
       const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
