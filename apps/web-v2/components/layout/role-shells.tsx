@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   UploadCloud,
   Bell,
+  Wind,
 } from "lucide-react";
 import { Permission } from "@aivo/security";
 import type { RoleNavItem } from "@/components/layout/role-nav";
@@ -46,6 +47,7 @@ export const LEARNER_NAV: RoleNavItem[] = [
   { href: "/learner/progress", label: "Progress", icon: <BarChart3 className="h-4 w-4" /> },
   { href: "/learner/missions", label: "Missions", icon: <Sparkles className="h-4 w-4" /> },
   { href: "/learner/library", label: "Library", icon: <BookOpen className="h-4 w-4" /> },
+  { href: "/learner/calm", label: "Calm", icon: <Wind className="h-4 w-4" /> },
   { href: "/learner/rewards", label: "Rewards", icon: <Trophy className="h-4 w-4" /> },
   {
     href: "/notifications",

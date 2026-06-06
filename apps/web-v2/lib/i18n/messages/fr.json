@@ -742,6 +742,50 @@
       "retry": "Réessayer",
       "back_home": "Retour à l'accueil"
     },
+    "calm": {
+      "eyebrow": "Coin calme",
+      "title": "Prends un moment de calme",
+      "intro": "Choisis quelque chose qui t'aide à te sentir prêt. Aucune pression de temps et rien n'est noté.",
+      "suggested_title": "Suggéré pour toi",
+      "all_title": "Choisis une activité calme",
+      "im_done": "J'ai fini",
+      "go_back": "Retour",
+      "do_another": "En faire une autre",
+      "affirmations": {
+        "calmer": "Bien calme. Tu as réussi.",
+        "refreshed": "Reposé et prêt.",
+        "ready": "Super — continuons quand tu es prêt.",
+        "supported": "Bon choix. Demander de l'aide, c'est courageux."
+      },
+      "activities": {
+        "box_breathing_title": "Respiration carrée",
+        "box_breathing_body": "Respire en carré : inspire, retiens, expire, retiens.",
+        "five_senses_title": "Ancrage des 5 sens",
+        "five_senses_body": "Remarque 5 choses que tu vois, 4 que tu touches, 3 que tu entends, 2 que tu sens, 1 que tu goûtes.",
+        "stretch_title": "Pause étirement",
+        "stretch_body": "Lève-toi et étire-toi bien grand pendant trente secondes.",
+        "smaller_step_title": "Essaie un plus petit pas",
+        "smaller_step_body": "Choisis juste la prochaine petite partie avant le tout.",
+        "switch_drawing_title": "Passe au dessin",
+        "switch_drawing_body": "Va sur le bloc-notes et dessine le problème.",
+        "listen_again_title": "Écoute encore",
+        "listen_again_body": "Réécoute les consignes une fois de plus avant d'essayer.",
+        "ask_grown_up_title": "Demande à un adulte",
+        "ask_grown_up_body": "Touche la cloche pour demander de l'aide à un adulte."
+      },
+      "breathing": {
+        "round": "Tour {round} sur {rounds}",
+        "phase": {
+          "inhale": "Inspire…",
+          "hold_in": "Retiens…",
+          "exhale": "Expire…",
+          "hold_out": "Garde…"
+        },
+        "next": "Respiration suivante",
+        "finish": "Terminer",
+        "done_early": "J'ai fini"
+      }
+    },
     "progress": {
       "mastery_strong": "Solide",
       "mastery_on_grade": "Au niveau",
