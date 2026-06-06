@@ -2700,3 +2700,40 @@ export type IepAiDraftRecord = {
   createdAt: ISODate;
   updatedAt: ISODate;
 };
+
+// ── Whole-term / trimester syllabus (Sprint 6, G7) ──────────────────────
+
+export type TermSyllabusStatus = "PARSING" | "PARSED" | "SAVED" | "FAILED";
+
+export type TermSyllabusUnit = {
+  id: ID;
+  syllabusId: ID;
+  termNumber: number;
+  orderIndex: number;
+  title: string;
+  durationWeeks: number;
+  topics: string[];
+  objectives: string[];
+  standards: string[];
+  vocabulary: string[];
+  createdAt: ISODate;
+};
+
+export type TermSyllabus = {
+  id: ID;
+  tenantId: ID | null;
+  learnerId: ID;
+  uploadedBy: ID;
+  uploaderRole: string;
+  subject: string;
+  title: string | null;
+  termCount: number;
+  sourceType: string;
+  fileName: string | null;
+  rawText: string | null;
+  status: TermSyllabusStatus;
+  notes: string | null;
+  units: TermSyllabusUnit[];
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};
