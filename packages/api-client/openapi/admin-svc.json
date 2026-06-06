@@ -81,6 +81,72 @@
         }
       }
     },
+    "/api/admin-svc/platform/system-health": {
+      "get": {
+        "operationId": "getAdminSvcPlatformSystemHealth",
+        "summary": "GET /api/admin-svc/platform/system-health",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin-svc/platform/ai-activity": {
+      "get": {
+        "operationId": "getAdminSvcPlatformAiActivity",
+        "summary": "GET /api/admin-svc/platform/ai-activity",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin-svc/platform/ai-costs": {
+      "get": {
+        "operationId": "getAdminSvcPlatformAiCosts",
+        "summary": "GET /api/admin-svc/platform/ai-costs",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin-svc/users": {
       "get": {
         "operationId": "getAdminSvcUsers",
@@ -227,6 +293,28 @@
             "name": "id",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin-svc/billing/accounts": {
+      "get": {
+        "operationId": "getAdminSvcBillingAccounts",
+        "summary": "GET /api/admin-svc/billing/accounts",
+        "tags": [
+          "Admin"
         ],
         "responses": {
           "200": {

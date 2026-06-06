@@ -24,15 +24,16 @@ const appsDir = join(repoRoot, "apps");
 /**
  * Top-level applications that are explicitly allowed under /apps.
  *
- * - `web-v2`   — the only authenticated Next.js shell (all role
- *                surfaces live here).
+ * - `web-v2`   — the authenticated learner/parent/teacher Next.js shell.
+ * - `web-admin` — the isolated administrator Next.js shell.
  * - `mobile`   — the only Expo app (all role surfaces live here).
  * - `marketing`— the unauthenticated marketing site; not a role
  *                surface, only drives sign-up into web-v2.
  *
- * Anything else under /apps is a contract violation per ADR 0020.
+ * Anything else under /apps is a contract violation per ADR 0020
+ * unless a successor ADR explicitly approves it.
  */
-const ALLOWED_APPS = new Set(["web-v2", "mobile", "marketing"]);
+const ALLOWED_APPS = new Set(["web-v2", "web-admin", "mobile", "marketing"]);
 
 /**
  * Patterns that strongly suggest someone tried to split a role into

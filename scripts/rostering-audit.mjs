@@ -9,7 +9,9 @@
 //    listClasses, listEnrollments.
 // 2. createCleverAdapterFromExport and createClassLinkAdapterFromExport
 //    are still exported.
-// 3. Admin school rostering pages exist.
+// 3. The standalone admin app foundation exists. Detailed rostering UI
+//    pages are intentionally not required during the admin-host cutover;
+//    the BFF/API contracts remain guarded separately.
 // 4. integration-svc/src/index.ts re-exports the adapters (so a
 //    consumer that imports from "@aivo/integration-svc" still works).
 
@@ -72,13 +74,14 @@ if (integrationIndex) {
   }
 }
 
-const REQUIRED_ADMIN_PAGES = [
-  "apps/web-v2/app/admin/school/rostering/page.tsx",
-  "apps/web-v2/app/admin/school/rostering/import/page.tsx",
+const REQUIRED_ADMIN_APP_FILES = [
+  "apps/web-admin/app/layout.tsx",
+  "apps/web-admin/app/page.tsx",
+  "apps/web-admin/app/platform/page.tsx",
 ];
-for (const rel of REQUIRED_ADMIN_PAGES) {
+for (const rel of REQUIRED_ADMIN_APP_FILES) {
   if (!existsSync(join(repoRoot, rel))) {
-    errors.push(`missing admin rostering page: ${rel}`);
+    errors.push(`missing standalone admin app file: ${rel}`);
   }
 }
 
@@ -89,5 +92,5 @@ if (errors.length) {
 }
 
 console.log(
-  "rostering:audit OK — SisProvider interface, Clever + ClassLink adapter factories, integration-svc index re-exports, admin rostering pages verified.",
+  "rostering:audit OK — SisProvider interface, Clever + ClassLink adapter factories, integration-svc index re-exports, standalone admin app foundation verified.",
 );
