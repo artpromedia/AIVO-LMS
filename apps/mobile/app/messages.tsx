@@ -17,24 +17,31 @@
  * `useNavAccess({ area: "messages", … })` — the outcome contract is
  * identical.
  *
+ * Responsive note: the screen roots through `ResponsiveScreen`
+ * (`maxWidth="reading"`) so the inbox column is capped at the reading
+ * width on tablets instead of stretching edge-to-edge. The `allow`
+ * path renders the threaded `MessagesInbox` inside the non-scrolling
+ * variant (`scroll={false}` + `innerStyle.flex`) because the inbox owns
+ * its own master/detail scrolling; every other state uses the default
+ * scrolling variant.
+ *
  * i18n note: no `messages.*` namespace exists yet, and Phase 2 §rules
  * forbids forking copy across 10 locale catalogs for a placeholder
  * surface. Strings are intentionally inline English for now and will
  * be lifted into the catalog alongside the unified inbox port.
  */
 import React, { useMemo } from "react";
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { EmptyState } from "@aivo/mobile-ui";
 import { useAuth } from "@/hooks/useAuth";
 import { colors, spacing } from "@/constants/colors";
 import { MessagesInbox } from "@/components/messages/MessagesInbox";
+import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { buildMobileRoleSession, getMobileNavAccess, toNavRole } from "@/lib/nav-access";
 
 export default function MessagesScreen() {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const insets = useSafeAreaInsets();
 
   const decision = useMemo(() => {
     if (!user) return null;
@@ -53,23 +60,17 @@ export default function MessagesScreen() {
   }, [user]);
 
   const screen = (body: React.ReactNode) => (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
-    >
+    <ResponsiveScreen maxWidth="reading">
       <Text style={styles.title}>Messages</Text>
       {body}
-    </ScrollView>
+    </ResponsiveScreen>
   );
 
   if (isLoading) {
     return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.center, { paddingTop: insets.top + 16, paddingBottom: 32 }]}
-      >
+      <ResponsiveScreen maxWidth="reading" contentContainerStyle={styles.center}>
         <ActivityIndicator color={colors.primary} />
-      </ScrollView>
+      </ResponsiveScreen>
     );
   }
 
@@ -114,18 +115,20 @@ export default function MessagesScreen() {
   }
 
   // `allow` — render the real threaded inbox (mirrors web `/messages`).
+  // The inbox owns its own scrolling, so use the non-scrolling variant
+  // and let the inner column flex to fill the remaining height.
   return (
-    <View style={[styles.container, { flex: 1, paddingTop: insets.top + 16, paddingBottom: 16 }]}>
+    <ResponsiveScreen maxWidth="reading" scroll={false} innerStyle={styles.inboxInner}>
       <Text style={styles.title}>Messages</Text>
       <Text style={styles.subtitle}>Conversations with your AIVO team.</Text>
       <MessagesInbox />
-    </View>
+    </ResponsiveScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
+  center: { flexGrow: 1, alignItems: "center", justifyContent: "center" },
+  inboxInner: { flex: 1 },
   title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
   subtitle: {
     fontSize: 14,

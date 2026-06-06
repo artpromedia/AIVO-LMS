@@ -23,6 +23,7 @@ import { colors, spacing, radius } from "@/constants/colors";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
 import { SplitPane } from "@/src/components/layout/SplitPane";
+import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 
 const AMEND_FIELD: Record<string, keyof RecommendationAmendedPayload | null> = {
   accommodation_add: "accommodation",
@@ -269,24 +270,22 @@ export default function RecommendationsScreen() {
     );
   }
 
+  // Phone (and compact-width multitasking) path: single column routed
+  // through the shared scaffold. `maxWidth="dashboard"` mirrors the cap
+  // the tablet console uses; on compact widths it never binds, so the
+  // column is full width minus the size-class padding — no hand-rolled
+  // inset/width math.
   return (
-    <ScrollView
-      style={[styles.container, { paddingHorizontal: hPad }]}
-      contentContainerStyle={{
-        paddingTop: insets.top + 16,
-        paddingBottom: 32,
-        alignItems: "center",
-      }}
+    <ResponsiveScreen
+      maxWidth="dashboard"
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={refetch} colors={[colors.primary]} />
       }
     >
-      <View style={{ width: contentWidth }}>
-        <Text style={styles.title}>{t("parentRecommendations.title")}</Text>
-        <Text style={styles.subtitle}>{t("parentRecommendations.subtitle")}</Text>
-        {pending.length === 0 ? emptyState : pending.map((rec) => renderRec(rec, false))}
-      </View>
-    </ScrollView>
+      <Text style={styles.title}>{t("parentRecommendations.title")}</Text>
+      <Text style={styles.subtitle}>{t("parentRecommendations.subtitle")}</Text>
+      {pending.length === 0 ? emptyState : pending.map((rec) => renderRec(rec, false))}
+    </ResponsiveScreen>
   );
 }
 
