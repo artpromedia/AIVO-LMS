@@ -595,6 +595,10 @@ export const createCheckoutSessionSchema = {
       successUrl: { type: "string" },
       cancelUrl: { type: "string" },
       learnerCount: { type: "integer", minimum: 1 },
+      couponCode: { type: "string" },
+      utmSource: { type: "string" },
+      utmMedium: { type: "string" },
+      utmCampaign: { type: "string" },
     },
   },
   response: {
