@@ -17,6 +17,12 @@
  * `useNavAccess({ area: "messages", … })` — the outcome contract is
  * identical.
  *
+ * Responsive note: the screen roots through `ResponsiveScreen`
+ * (`maxWidth="reading"`) so the notifications column is capped at the
+ * reading width on tablets instead of stretching edge-to-edge, and the
+ * hand-rolled inset/padding math is dropped in favour of the shared
+ * scaffold.
+ *
  * i18n note: the primary strings reuse the existing
  * `caregiverNotifications.*` namespace so this slice does not have to
  * land a new key across 10 locales; the rare-path access-decision
@@ -25,19 +31,18 @@
  * unified inbox port.
  */
 import React, { useMemo } from "react";
-import { Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { EmptyState } from "@aivo/mobile-ui";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/hooks/useTranslation";
 import { colors, spacing } from "@/constants/colors";
+import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { buildMobileRoleSession, getMobileNavAccess, toNavRole } from "@/lib/nav-access";
 
 export default function NotificationsScreen() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
 
   const decision = useMemo(() => {
     if (!user) return null;
@@ -56,23 +61,17 @@ export default function NotificationsScreen() {
   }, [user]);
 
   const screen = (body: React.ReactNode) => (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
-    >
+    <ResponsiveScreen maxWidth="reading">
       <Text style={styles.title}>{t("caregiverNotifications.title")}</Text>
       {body}
-    </ScrollView>
+    </ResponsiveScreen>
   );
 
   if (isLoading) {
     return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.center, { paddingTop: insets.top + 16, paddingBottom: 32 }]}
-      >
+      <ResponsiveScreen maxWidth="reading" contentContainerStyle={styles.center}>
         <ActivityIndicator color={colors.primary} />
-      </ScrollView>
+      </ResponsiveScreen>
     );
   }
 
@@ -122,10 +121,7 @@ export default function NotificationsScreen() {
   // `(caregiver)/notifications.tsx` UX so behavioural parity is
   // preserved while the route flips to the canonical location.
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
-    >
+    <ResponsiveScreen maxWidth="reading">
       <Text style={styles.title}>{t("caregiverNotifications.title")}</Text>
       <Text style={styles.subtitle}>{t("caregiverNotifications.subtitle")}</Text>
       <EmptyState
@@ -133,13 +129,12 @@ export default function NotificationsScreen() {
         title={t("caregiverNotifications.noNotificationsTitle")}
         message={t("caregiverNotifications.noNotificationsMessage")}
       />
-    </ScrollView>
+    </ResponsiveScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
+  center: { flexGrow: 1, alignItems: "center", justifyContent: "center" },
   title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
   subtitle: {
     fontSize: 14,

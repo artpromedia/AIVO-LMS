@@ -1,14 +1,5 @@
 import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, ScrollView, Pressable, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -19,6 +10,9 @@ import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { gridColumns } from "@/src/design/responsive";
 
 const categoryKeys = [
   "all",
@@ -105,7 +99,6 @@ const rarityColors: Record<string, string> = {
 };
 
 export default function ShopScreen() {
-  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { data: learners } = useLearners();
   const learnerId = user?.role === "LEARNER" ? user.id : learners?.[0]?.id || "";
@@ -114,6 +107,13 @@ export default function ShopScreen() {
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { sizeClass } = useWindowSizeClass();
+
+  // Cosmetic tiles are a true grid: 2 columns on phones, 3 on small
+  // tablets, 4 on large tablets — driven by the shared size-class ladder
+  // instead of the old hard-coded 2-up tile width.
+  const cols = gridColumns(sizeClass);
+  const cardWidthPct = `${Math.floor(100 / cols) - 2}%` as const;
 
   const filtered =
     selectedCat === "All" ? shopItems : shopItems.filter((i) => i.category === selectedCat);
@@ -173,10 +173,7 @@ export default function ShopScreen() {
   );
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
-    >
+    <ResponsiveScreen maxWidth="dashboard">
       <View style={styles.header}>
         <Text style={styles.title}>{t("learnerShop.title")}</Text>
         <View style={styles.currencyRow}>
@@ -214,7 +211,7 @@ export default function ShopScreen() {
         {filtered.map((item) => {
           const isPurchasing = purchasingId === item.id;
           return (
-            <AivoCard key={item.id} style={styles.itemCard}>
+            <AivoCard key={item.id} style={[styles.itemCard, { width: cardWidthPct }]}>
               <View style={[styles.rarityDot, { backgroundColor: rarityColors[item.rarity] }]} />
               <View style={styles.itemPreview}>
                 <Ionicons name="shirt-outline" size={32} color={colors.textSecondary} />
@@ -238,12 +235,11 @@ export default function ShopScreen() {
           );
         })}
       </View>
-    </ScrollView>
+    </ResponsiveScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -274,7 +270,7 @@ const styles = StyleSheet.create({
   catText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
   catTextActive: { color: "#FFF" },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  itemCard: { width: "47%", alignItems: "center" as const, padding: spacing.sm },
+  itemCard: { alignItems: "center" as const, padding: spacing.sm },
   rarityDot: { width: 8, height: 8, borderRadius: 4, position: "absolute", top: 8, right: 8 },
   itemPreview: {
     width: 64,
