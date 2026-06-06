@@ -742,6 +742,50 @@
       "retry": "Tentar de novo",
       "back_home": "Voltar para o início"
     },
+    "calm": {
+      "eyebrow": "Cantinho da calma",
+      "title": "Reserve um momento de calma",
+      "intro": "Escolha algo que ajude você a se sentir pronto. Não há pressão de tempo e nada é avaliado.",
+      "suggested_title": "Sugerido para você",
+      "all_title": "Escolha uma atividade calma",
+      "im_done": "Terminei",
+      "go_back": "Voltar",
+      "do_another": "Fazer outra",
+      "affirmations": {
+        "calmer": "Bem calmo. Você conseguiu.",
+        "refreshed": "Renovado e pronto.",
+        "ready": "Ótimo — vamos continuar quando você estiver pronto.",
+        "supported": "Boa escolha. Pedir ajuda é corajoso."
+      },
+      "activities": {
+        "box_breathing_title": "Respiração quadrada",
+        "box_breathing_body": "Respire em um quadrado: inspire, segure, expire, segure.",
+        "five_senses_title": "Ancoragem dos 5 sentidos",
+        "five_senses_body": "Note 5 coisas que você vê, 4 que pode tocar, 3 que ouve, 2 que cheira, 1 que prova.",
+        "stretch_title": "Pausa para alongar",
+        "stretch_body": "Levante-se e estique-se bem alto por trinta segundos.",
+        "smaller_step_title": "Tente um passo menor",
+        "smaller_step_body": "Escolha só a próxima parte pequena antes de tudo.",
+        "switch_drawing_title": "Mude para desenhar",
+        "switch_drawing_body": "Vá para o bloco de rascunho e desenhe o problema.",
+        "listen_again_title": "Ouça de novo",
+        "listen_again_body": "Toque as instruções mais uma vez antes de tentar.",
+        "ask_grown_up_title": "Peça a um adulto",
+        "ask_grown_up_body": "Toque no sino para pedir ajuda a um adulto."
+      },
+      "breathing": {
+        "round": "Rodada {round} de {rounds}",
+        "phase": {
+          "inhale": "Inspire…",
+          "hold_in": "Segure…",
+          "exhale": "Expire…",
+          "hold_out": "Aguarde…"
+        },
+        "next": "Próxima respiração",
+        "finish": "Concluir",
+        "done_early": "Terminei"
+      }
+    },
     "progress": {
       "mastery_strong": "Forte",
       "mastery_on_grade": "No nível",

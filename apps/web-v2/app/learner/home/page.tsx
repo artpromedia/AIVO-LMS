@@ -491,12 +491,17 @@ export default async function LearnerHome({
                   avatar="🛡"
                 />
               ) : (
-                <MessageCard
-                  from="break"
-                  title={t("msg_break_title")}
-                  body={t("msg_break_body")}
-                  avatar="🌿"
-                />
+                <Link
+                  href="/learner/calm"
+                  className="block rounded-3xl focus:outline-none focus:ring-2 focus:ring-offset-2"
+                >
+                  <MessageCard
+                    from="break"
+                    title={t("msg_break_title")}
+                    body={t("msg_break_body")}
+                    avatar="🌿"
+                  />
+                </Link>
               )}
             </div>
           </section>

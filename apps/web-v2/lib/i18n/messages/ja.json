@@ -742,6 +742,50 @@
       "retry": "もう一度",
       "back_home": "ホームに戻る"
     },
+    "calm": {
+      "eyebrow": "おちつきコーナー",
+      "title": "おちつく時間をとろう",
+      "intro": "じゅんびがととのうものを選んでね。時間のプレッシャーはなく、点数もつきません。",
+      "suggested_title": "あなたへのおすすめ",
+      "all_title": "おちつく activity を選ぼう",
+      "im_done": "おわったよ",
+      "go_back": "もどる",
+      "do_another": "もう一つする",
+      "affirmations": {
+        "calmer": "とてもおちついたね。よくできました。",
+        "refreshed": "すっきりして、じゅんびOK。",
+        "ready": "いいね — じゅんびができたら続けよう。",
+        "supported": "いい選択。助けをもとめるのは勇気があるね。"
+      },
+      "activities": {
+        "box_breathing_title": "ボックス呼吸",
+        "box_breathing_body": "四角を描くように呼吸しよう：吸って、止めて、吐いて、止めて。",
+        "five_senses_title": "5つの感覚グラウンディング",
+        "five_senses_body": "見えるもの5つ、さわれるもの4つ、聞こえるもの3つ、においを2つ、味を1つ見つけよう。",
+        "stretch_title": "ストレッチ休けい",
+        "stretch_body": "立ち上がって、30秒間せのびをしよう。",
+        "smaller_step_title": "小さな一歩を試そう",
+        "smaller_step_body": "全部の前に、次の小さな部分だけを選ぼう。",
+        "switch_drawing_title": "お絵かきに切りかえ",
+        "switch_drawing_body": "メモ帳に移って、もんだいを絵にかいてみよう。",
+        "listen_again_title": "もう一度聞こう",
+        "listen_again_body": "やる前に、せつめいをもう一度さいせいしよう。",
+        "ask_grown_up_title": "大人にきこう",
+        "ask_grown_up_body": "ベルをタップして、大人に助けをもとめよう。"
+      },
+      "breathing": {
+        "round": "{rounds} 回中 {round} 回目",
+        "phase": {
+          "inhale": "すって…",
+          "hold_in": "止めて…",
+          "exhale": "はいて…",
+          "hold_out": "キープ…"
+        },
+        "next": "次の呼吸",
+        "finish": "おわり",
+        "done_early": "おわったよ"
+      }
+    },
     "progress": {
       "mastery_strong": "得意",
       "mastery_on_grade": "学年通り",

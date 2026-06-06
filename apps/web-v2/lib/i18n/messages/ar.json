@@ -742,6 +742,50 @@
       "retry": "حاول مرة أخرى",
       "back_home": "العودة إلى الرئيسية"
     },
+    "calm": {
+      "eyebrow": "ركن الهدوء",
+      "title": "خذ لحظة من الهدوء",
+      "intro": "اختر شيئًا يساعدك على الشعور بالاستعداد. لا ضغط للوقت ولا شيء يُقيَّم.",
+      "suggested_title": "مقترح لك",
+      "all_title": "اختر نشاطًا هادئًا",
+      "im_done": "انتهيت",
+      "go_back": "رجوع",
+      "do_another": "افعل نشاطًا آخر",
+      "affirmations": {
+        "calmer": "هادئ وجميل. أنت فعلت ذلك.",
+        "refreshed": "منتعش ومستعد.",
+        "ready": "رائع — لنكمل عندما تكون مستعدًا.",
+        "supported": "قرار جيد. طلب المساعدة شجاعة."
+      },
+      "activities": {
+        "box_breathing_title": "تنفّس المربع",
+        "box_breathing_body": "تنفّس على شكل مربع: شهيق، احبس، زفير، احبس.",
+        "five_senses_title": "تأريض الحواس الخمس",
+        "five_senses_body": "لاحظ 5 أشياء تراها، و4 يمكنك لمسها، و3 تسمعها، و2 تشمها، و1 تتذوقها.",
+        "stretch_title": "استراحة تمدد",
+        "stretch_body": "قف وتمدد عاليًا لمدة ثلاثين ثانية.",
+        "smaller_step_title": "جرّب خطوة أصغر",
+        "smaller_step_body": "اختر الجزء الصغير التالي فقط قبل كل شيء.",
+        "switch_drawing_title": "انتقل إلى الرسم",
+        "switch_drawing_body": "انتقل إلى دفتر الرسم وارسم المسألة.",
+        "listen_again_title": "استمع مرة أخرى",
+        "listen_again_body": "شغّل التعليمات مرة أخرى قبل المحاولة.",
+        "ask_grown_up_title": "اسأل شخصًا بالغًا",
+        "ask_grown_up_body": "اضغط على الجرس لتطلب المساعدة من شخص بالغ."
+      },
+      "breathing": {
+        "round": "الجولة {round} من {rounds}",
+        "phase": {
+          "inhale": "شهيق…",
+          "hold_in": "احبس…",
+          "exhale": "زفير…",
+          "hold_out": "ثبّت…"
+        },
+        "next": "النفَس التالي",
+        "finish": "إنهاء",
+        "done_early": "انتهيت"
+      }
+    },
     "progress": {
       "mastery_strong": "قوي",
       "mastery_on_grade": "في المستوى",

@@ -933,6 +933,50 @@
       "retry": "Try again",
       "back_home": "Back home"
     },
+    "calm": {
+      "eyebrow": "Calm Corner",
+      "title": "Take a calm moment",
+      "intro": "Pick something that helps you feel ready. There is no timer pressure and nothing is graded.",
+      "suggested_title": "Suggested for you",
+      "all_title": "Choose a calm activity",
+      "im_done": "I'm done",
+      "go_back": "Go back",
+      "do_another": "Do another",
+      "affirmations": {
+        "calmer": "Nice and calm. You did that.",
+        "refreshed": "Refreshed and ready.",
+        "ready": "Great — let's keep going when you're ready.",
+        "supported": "Good call. Asking for help is brave."
+      },
+      "activities": {
+        "box_breathing_title": "Box breathing",
+        "box_breathing_body": "Breathe in a square: in, hold, out, hold.",
+        "five_senses_title": "5 senses grounding",
+        "five_senses_body": "Notice 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste.",
+        "stretch_title": "Stretch break",
+        "stretch_body": "Stand up and stretch tall for thirty seconds.",
+        "smaller_step_title": "Try a smaller step",
+        "smaller_step_body": "Pick just the next tiny part before the whole thing.",
+        "switch_drawing_title": "Switch to drawing",
+        "switch_drawing_body": "Move to the scratchpad and draw the problem.",
+        "listen_again_title": "Listen again",
+        "listen_again_body": "Play the instructions one more time before trying.",
+        "ask_grown_up_title": "Ask a grown-up",
+        "ask_grown_up_body": "Tap the bell to ask a grown-up for help."
+      },
+      "breathing": {
+        "round": "Round {round} of {rounds}",
+        "phase": {
+          "inhale": "Breathe in…",
+          "hold_in": "Hold…",
+          "exhale": "Breathe out…",
+          "hold_out": "Hold…"
+        },
+        "next": "Next breath",
+        "finish": "Finish",
+        "done_early": "I'm done"
+      }
+    },
     "progress": {
       "mastery_strong": "Strong",
       "mastery_on_grade": "On grade",
