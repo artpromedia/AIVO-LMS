@@ -818,6 +818,13 @@
         "try_again": "Réessaie, sans te presser.",
         "done": "J'ai fini",
         "go_back": "Retour"
+      },
+      "audio": {
+        "label": "Sons apaisants",
+        "on": "Activé",
+        "off": "Désactivé",
+        "mute": "Couper le son",
+        "unmute": "Activer le son"
       }
     },
     "progress": {

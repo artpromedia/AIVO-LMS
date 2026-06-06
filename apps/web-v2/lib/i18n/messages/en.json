@@ -1009,6 +1009,13 @@
         "try_again": "Try again, no rush.",
         "done": "I'm done",
         "go_back": "Go back"
+      },
+      "audio": {
+        "label": "Calm sounds",
+        "on": "On",
+        "off": "Off",
+        "mute": "Mute sounds",
+        "unmute": "Unmute sounds"
       }
     },
     "progress": {

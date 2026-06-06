@@ -818,6 +818,13 @@
         "try_again": "再试一次，不用着急。",
         "done": "我做好了",
         "go_back": "返回"
+      },
+      "audio": {
+        "label": "平静的声音",
+        "on": "开",
+        "off": "关",
+        "mute": "静音",
+        "unmute": "取消静音"
       }
     },
     "progress": {

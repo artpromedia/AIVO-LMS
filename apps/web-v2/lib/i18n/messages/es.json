@@ -818,6 +818,13 @@
         "try_again": "Inténtalo de nuevo, sin prisa.",
         "done": "Ya terminé",
         "go_back": "Volver"
+      },
+      "audio": {
+        "label": "Sonidos tranquilos",
+        "on": "Activado",
+        "off": "Desactivado",
+        "mute": "Silenciar sonidos",
+        "unmute": "Activar sonidos"
       }
     },
     "progress": {

@@ -14,6 +14,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { resolveEnterpriseFlags } from "@aivo/feature-flags";
 import { getCalmCatalog, recommendCalmActivity } from "@/lib/learner/calm";
+import { getAccessibilityPrefs } from "@/lib/db/repos";
 import { CalmCorner } from "./calm-corner";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +39,13 @@ export default async function LearnerCalmPage({
   const recommended =
     flags.selfRegulationHub && action ? recommendCalmActivity(action) : null;
 
+  // Audio cues are an explicit, persisted opt-in (default off). There is no
+  // server-authoritative "quiet" sensory posture today — the sensory mode is
+  // a browser cookie set client-side — so we gate purely on the stored
+  // preference here; the in-runner mute affordance covers a momentary quiet.
+  const prefs = await getAccessibilityPrefs(learnerId, session.tenantId);
+  const audioCuesEnabled = prefs.calmAudioCues === true;
+
   const t = await getTranslations("learner.calm");
 
   return (
@@ -61,6 +69,7 @@ export default async function LearnerCalmPage({
         learnerId={learnerId}
         catalog={getCalmCatalog()}
         recommendedId={recommended}
+        audioCuesEnabled={audioCuesEnabled}
       />
     </AppShell>
   );

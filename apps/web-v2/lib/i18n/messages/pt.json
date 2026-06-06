@@ -818,6 +818,13 @@
         "try_again": "Tente de novo, sem pressa.",
         "done": "Terminei",
         "go_back": "Voltar"
+      },
+      "audio": {
+        "label": "Sons tranquilos",
+        "on": "Ativado",
+        "off": "Desativado",
+        "mute": "Silenciar sons",
+        "unmute": "Ativar sons"
       }
     },
     "progress": {

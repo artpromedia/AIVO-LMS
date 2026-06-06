@@ -90,6 +90,8 @@ export interface AccessibilityProfile {
   audioFirst: boolean;
   captionsAlwaysOn: boolean;
   readAloud: boolean;
+  /** Opt-in, default-off soft audio cues on Calm Corner phase changes. */
+  calmAudioCues: boolean;
   // motion / feedback
   hapticsEnabled: boolean;
   // cognition / pacing
@@ -113,6 +115,7 @@ export const ACCESSIBILITY_FIELDS = [
   "audioFirst",
   "captionsAlwaysOn",
   "readAloud",
+  "calmAudioCues",
   "hapticsEnabled",
   "shorterSteps",
   "extraHints",
@@ -133,6 +136,7 @@ export const ACCESSIBILITY_DEFAULTS: AccessibilityProfile = {
   audioFirst: false,
   captionsAlwaysOn: false,
   readAloud: false,
+  calmAudioCues: false,
   hapticsEnabled: false,
   shorterSteps: false,
   extraHints: false,

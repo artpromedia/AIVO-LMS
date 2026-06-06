@@ -818,6 +818,13 @@
         "try_again": "Versuch es nochmal, ganz in Ruhe.",
         "done": "Ich bin fertig",
         "go_back": "Zurück"
+      },
+      "audio": {
+        "label": "Ruhige Töne",
+        "on": "Ein",
+        "off": "Aus",
+        "mute": "Töne stummschalten",
+        "unmute": "Töne einschalten"
       }
     },
     "progress": {

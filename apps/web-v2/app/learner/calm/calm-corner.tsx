@@ -11,6 +11,7 @@ import {
   BOX_BREATH_PHASE_SECONDS,
   boxBreathRounds,
 } from "@/lib/learner/calm";
+import { createCalmChime, type CalmChime } from "@/lib/learner/calm-audio";
 import { PatternFocus } from "./games/pattern-focus";
 import { SortingCalm } from "./games/sorting-calm";
 
@@ -18,9 +19,15 @@ interface CalmCornerProps {
   learnerId: string;
   catalog: readonly CalmActivity[];
   recommendedId: CalmActivityId | null;
+  audioCuesEnabled?: boolean;
 }
 
-export function CalmCorner({ learnerId, catalog, recommendedId }: CalmCornerProps) {
+export function CalmCorner({
+  learnerId,
+  catalog,
+  recommendedId,
+  audioCuesEnabled = false,
+}: CalmCornerProps) {
   const t = useTranslations("learner.calm");
   const [active, setActive] = useState<CalmActivity | null>(null);
   const [affirmation, setAffirmation] = useState<string | null>(null);
@@ -90,6 +97,7 @@ export function CalmCorner({ learnerId, catalog, recommendedId }: CalmCornerProp
     return (
       <ActivityRunner
         activity={active}
+        audioCuesEnabled={audioCuesEnabled}
         onDone={(secs) => complete(active, secs, true)}
         onCancel={() => complete(active, 0, false)}
       />
@@ -157,15 +165,19 @@ function ActivityCard({
 
 function ActivityRunner({
   activity,
+  audioCuesEnabled,
   onDone,
   onCancel,
 }: {
   activity: CalmActivity;
+  audioCuesEnabled: boolean;
   onDone: (secondsSpent: number) => void;
   onCancel: () => void;
 }) {
   if (activity.kind === "breathing") {
-    return <BoxBreathing onDone={onDone} onCancel={onCancel} />;
+    return (
+      <BoxBreathing audioCuesEnabled={audioCuesEnabled} onDone={onDone} onCancel={onCancel} />
+    );
   }
   if (activity.id === "pattern_focus") {
     return <PatternFocus onDone={onDone} onCancel={onCancel} />;
@@ -179,16 +191,22 @@ function ActivityRunner({
 /** Box breathing: 4-4-4-4. Honors prefers-reduced-motion by replacing the
  *  animated orb with a static cue + manual "Next breath" affordance. */
 function BoxBreathing({
+  audioCuesEnabled,
   onDone,
   onCancel,
 }: {
+  audioCuesEnabled: boolean;
   onDone: (secondsSpent: number) => void;
   onCancel: () => void;
 }) {
   const t = useTranslations("learner.calm.breathing");
+  const ta = useTranslations("learner.calm.audio");
   const totalPhases = BOX_BREATH_PHASES.length * boxBreathRounds();
   const [phaseIdx, setPhaseIdx] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  // Session-local mute — never writes the stored preference.
+  const [muted, setMuted] = useState(false);
+  const chimeRef = useRef<CalmChime | null>(null);
   const startedAt = useRef<number>(Date.now());
 
   useEffect(() => {
@@ -199,6 +217,26 @@ function BoxBreathing({
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
+
+  // Build the chime once (lazy: no AudioContext until the first cue, which
+  // follows the learner's gesture that started the activity). Dispose on
+  // unmount — i.e. on completion, cancel, or navigating away.
+  useEffect(() => {
+    if (!audioCuesEnabled) return;
+    chimeRef.current = createCalmChime();
+    return () => {
+      chimeRef.current?.dispose();
+      chimeRef.current = null;
+    };
+  }, [audioCuesEnabled]);
+
+  // One soft cue per phase transition (and the first phase). No autoplay:
+  // the cue only sounds because the learner entered/advanced the activity.
+  useEffect(() => {
+    if (!audioCuesEnabled || muted) return;
+    if (phaseIdx >= totalPhases) return;
+    chimeRef.current?.phaseCue(BOX_BREATH_PHASES[phaseIdx % BOX_BREATH_PHASES.length]);
+  }, [phaseIdx, audioCuesEnabled, muted, totalPhases]);
 
   // Auto-advance only when motion is allowed; reduced-motion users tap.
   useEffect(() => {
@@ -244,6 +282,15 @@ function BoxBreathing({
           ) : (
             <Button onClick={() => setPhaseIdx((i) => i + 1)}>{t("next")}</Button>
           )
+        ) : null}
+        {audioCuesEnabled ? (
+          <Button
+            variant="ghost"
+            aria-pressed={muted}
+            onClick={() => setMuted((m) => !m)}
+          >
+            {muted ? ta("unmute") : ta("mute")}
+          </Button>
         ) : null}
         <Button variant="outline" onClick={onCancel}>
           {t("done_early")}
