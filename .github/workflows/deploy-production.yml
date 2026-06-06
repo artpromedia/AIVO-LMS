@@ -247,9 +247,15 @@ jobs:
     # URLs are not configured as repo/environment variables. Configure both
     # vars.AI_SVC_URL and vars.ASSESSMENT_SVC_URL to enable the smoke gate.
     if: ${{ vars.AI_SVC_URL != '' && vars.ASSESSMENT_SVC_URL != '' }}
-    uses: ./.github/workflows/iep-integration-smoke.yml
-    with:
-      ai_svc_url: ${{ vars.AI_SVC_URL }}
-      assessment_svc_url: ${{ vars.ASSESSMENT_SVC_URL }}
-    secrets:
-      INTERNAL_AI_TOKEN: ${{ secrets.INTERNAL_AI_TOKEN }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Run IEP integration smoke
+        env:
+          AI_SVC_URL: ${{ vars.AI_SVC_URL }}
+          ASSESSMENT_SVC_URL: ${{ vars.ASSESSMENT_SVC_URL }}
+          INTERNAL_AI_TOKEN: ${{ secrets.INTERNAL_AI_TOKEN }}
+        run: |
+          chmod +x scripts/smoke/iep-integration-smoke.sh
+          ./scripts/smoke/iep-integration-smoke.sh
