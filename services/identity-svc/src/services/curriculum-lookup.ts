@@ -52,6 +52,10 @@ const US_STATE_FRAMEWORKS: Record<string, { framework: string; standards: string
   DC: { framework: "DC Common Core State Standards", standards: "DC-CCSS" },
 };
 
+// Warm-start cache only. curriculum-svc (ADR 0040) is the authoritative
+// registry — see `resolveJurisdictionViaCurriculumSvc`. This map is the
+// fallback used when the service is unavailable (dev/CI/cold start) and is
+// kept in sync with curriculum-svc's `frameworks.py`.
 const INTERNATIONAL_FRAMEWORKS: Record<string, { framework: string; standards: string }> = {
   GB: { framework: "UK National Curriculum", standards: "UK-NC" },
   CA_INT: { framework: "Canadian Provincial Curricula", standards: "CAN" },
@@ -1158,11 +1162,68 @@ export function lookupCurriculumByCountry(countryCode: string): CurriculumResult
   };
 }
 
+const CURRICULUM_SVC_URL = process.env.CURRICULUM_SVC_URL ?? "http://localhost:3013";
+
+/**
+ * Resolve a jurisdiction against curriculum-svc — the single authoritative
+ * curriculum source (ADR 0040). The `INTERNATIONAL_FRAMEWORKS` / US static
+ * maps in this file are now only a warm-start cache, consulted when this
+ * call is unavailable. Returns null on any failure (so callers fall back to
+ * the cache) and never throws.
+ */
+export async function resolveJurisdictionViaCurriculumSvc(opts: {
+  country: string;
+  region?: string;
+  postalCode?: string;
+  districtId?: string;
+}): Promise<CurriculumResult | null> {
+  const params = new URLSearchParams({ country: opts.country.toUpperCase() });
+  if (opts.region) params.set("region", opts.region);
+  if (opts.postalCode) params.set("postalCode", opts.postalCode);
+  if (opts.districtId) params.set("districtId", opts.districtId);
+  const token = process.env.INTERNAL_SERVICE_TOKEN ?? "aivo-internal-dev-token";
+  try {
+    const res = await fetch(
+      `${CURRICULUM_SVC_URL}/api/curriculum/jurisdictions/resolve?${params.toString()}`,
+      { headers: { "X-Service-Token": token } },
+    );
+    if (!res.ok) return null;
+    const body = (await res.json()) as {
+      country: string;
+      region?: string | null;
+      districtId: string;
+      districtName: string;
+      frameworkCode: string;
+      frameworkName: string;
+    };
+    const state = body.country === "US" ? (body.region ?? undefined) : undefined;
+    return {
+      country: body.country,
+      region: body.region ?? undefined,
+      state,
+      districtId: body.districtId,
+      districtName: body.districtName,
+      curriculumFramework: body.frameworkName,
+      standards: body.frameworkCode,
+      curriculumAlignment: {
+        framework: body.frameworkName,
+        standards: body.frameworkCode,
+        state,
+        districtId: body.districtId,
+        districtName: body.districtName,
+        source: "curriculum_svc",
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Synchronous curriculum lookup. Uses the static major-district map
  * only. Retained for legacy callers (sync hot paths and tests); new
- * code should prefer `lookupCurriculumAsync`, which consults the
- * NCES-seeded DB resolver first.
+ * code should prefer `lookupCurriculumAsync`, which consults
+ * curriculum-svc (authoritative) and the NCES-seeded DB resolver first.
  */
 export function lookupCurriculum(opts: { zipCode?: string; country?: string }): CurriculumResult {
   if (opts.zipCode) {
@@ -1202,6 +1263,9 @@ export async function lookupCurriculumAsync(opts: {
     if (result) return result;
   }
   if (opts.country) {
+    // Authoritative source first (ADR 0040); static map is warm-start cache.
+    const svc = await resolveJurisdictionViaCurriculumSvc({ country: opts.country });
+    if (svc) return svc;
     const result = lookupCurriculumByCountry(opts.country);
     if (result) return result;
   }

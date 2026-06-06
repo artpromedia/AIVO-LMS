@@ -1,0 +1,93 @@
+{
+  "country": "AE",
+  "framework": "UAE-MOE",
+  "source": "UAE Ministry of Education national curriculum, Cycle 1 — Grade 1 Mathematics & English",
+  "districts": [
+    {
+      "id": "ae-dubai",
+      "name": "Dubai (KHDA / MOE)",
+      "region": "Dubai",
+      "zipCodes": []
+    },
+    {
+      "id": "ae-abu-dhabi",
+      "name": "Abu Dhabi (ADEK / MOE)",
+      "region": "Abu Dhabi",
+      "zipCodes": []
+    }
+  ],
+  "skills": [
+    {
+      "id": "uae-moe.math.g1.numbers-to-20",
+      "subject": "math",
+      "gradeBand": "Grade-1",
+      "label": "Numbers and counting to 20",
+      "summary": "Count, read, write and order numbers 0–20 and compare quantities using more/less/equal.",
+      "prerequisites": [],
+      "source": "UAE MOE Mathematics Grade 1 — Strand: Number"
+    },
+    {
+      "id": "uae-moe.math.g1.addition-within-20",
+      "subject": "math",
+      "gradeBand": "Grade-1",
+      "label": "Addition and subtraction within 20",
+      "summary": "Add and subtract within 20 using objects, number lines and number bonds.",
+      "prerequisites": ["uae-moe.math.g1.numbers-to-20"],
+      "source": "UAE MOE Mathematics Grade 1 — Strand: Operations"
+    },
+    {
+      "id": "uae-moe.math.g1.2d-shapes",
+      "subject": "math",
+      "gradeBand": "Grade-1",
+      "label": "Recognise 2D shapes",
+      "summary": "Identify and describe circles, squares, triangles and rectangles by their attributes.",
+      "prerequisites": [],
+      "source": "UAE MOE Mathematics Grade 1 — Strand: Geometry"
+    },
+    {
+      "id": "uae-moe.ela.g1.phonics",
+      "subject": "ela",
+      "gradeBand": "Grade-1",
+      "label": "Letter sounds and blending (phonics)",
+      "summary": "Recognise letter–sound correspondences and blend sounds to read simple CVC words.",
+      "prerequisites": [],
+      "source": "UAE MOE English Grade 1 — Domain: Reading Foundations"
+    },
+    {
+      "id": "uae-moe.ela.g1.sight-words",
+      "subject": "ela",
+      "gradeBand": "Grade-1",
+      "label": "High-frequency sight words",
+      "summary": "Read common high-frequency sight words on sight to support fluent reading.",
+      "prerequisites": ["uae-moe.ela.g1.phonics"],
+      "source": "UAE MOE English Grade 1 — Domain: Reading Fluency"
+    }
+  ],
+  "contentPacks": [
+    {
+      "id": "ae-dubai-g1-math-2026",
+      "title": "Dubai Grade 1 Mathematics (UAE MOE)",
+      "subject": "math",
+      "gradeBand": "Grade-1",
+      "districtIds": ["ae-dubai", "ae-abu-dhabi"],
+      "skillIds": [
+        "uae-moe.math.g1.numbers-to-20",
+        "uae-moe.math.g1.addition-within-20",
+        "uae-moe.math.g1.2d-shapes"
+      ],
+      "frameworkCode": "UAE-MOE"
+    },
+    {
+      "id": "ae-dubai-g1-english-2026",
+      "title": "Dubai Grade 1 English (UAE MOE)",
+      "subject": "ela",
+      "gradeBand": "Grade-1",
+      "districtIds": ["ae-dubai", "ae-abu-dhabi"],
+      "skillIds": [
+        "uae-moe.ela.g1.phonics",
+        "uae-moe.ela.g1.sight-words"
+      ],
+      "frameworkCode": "UAE-MOE"
+    }
+  ]
+}

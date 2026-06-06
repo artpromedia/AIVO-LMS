@@ -1,0 +1,117 @@
+{
+  "country": "NG",
+  "framework": "NG-NERDC",
+  "source": "NERDC Nigeria Basic Education Curriculum (revised), Lower Basic — Primary 3 Mathematics & English Studies",
+  "districts": [
+    {
+      "id": "ng-lagos-state",
+      "name": "Lagos State (SUBEB)",
+      "region": "Lagos",
+      "zipCodes": []
+    }
+  ],
+  "skills": [
+    {
+      "id": "ng-nerdc.math.p3.number.whole-numbers",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Whole numbers up to 999",
+      "summary": "Read, write, count and order whole numbers up to 999 and identify place value (hundreds, tens, units).",
+      "prerequisites": [],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Number and Numeration"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.addition",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Addition of 3-digit numbers with regrouping",
+      "summary": "Add two and three 3-digit numbers with and without regrouping, including word problems within 999.",
+      "prerequisites": ["ng-nerdc.math.p3.number.whole-numbers"],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Basic Operations (Addition)"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.subtraction",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Subtraction of 3-digit numbers with regrouping",
+      "summary": "Subtract 3-digit numbers with and without regrouping and solve related word problems.",
+      "prerequisites": ["ng-nerdc.math.p3.number.whole-numbers"],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Basic Operations (Subtraction)"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.multiplication",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Multiplication of whole numbers by 1 to 9",
+      "summary": "Multiply 2-digit numbers by a 1-digit number (1–9) using repeated addition and the multiplication table.",
+      "prerequisites": ["ng-nerdc.math.p3.number.addition"],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Basic Operations (Multiplication)"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.fractions",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Fractions: halves, quarters and thirds",
+      "summary": "Identify, represent and compare simple fractions (1/2, 1/3, 1/4) of objects and sets.",
+      "prerequisites": ["ng-nerdc.math.p3.number.whole-numbers"],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Fractions"
+    },
+    {
+      "id": "ng-nerdc.ela.p3.reading.comprehension",
+      "subject": "ela",
+      "gradeBand": "Primary-3",
+      "label": "Reading comprehension of short passages",
+      "summary": "Read short passages aloud with fluency and answer literal and simple inferential questions.",
+      "prerequisites": [],
+      "source": "NERDC English Studies P3 — Theme: Reading"
+    },
+    {
+      "id": "ng-nerdc.ela.p3.grammar.sentences",
+      "subject": "ela",
+      "gradeBand": "Primary-3",
+      "label": "Construct simple and correct sentences",
+      "summary": "Use nouns, pronouns and verbs to construct grammatically correct simple sentences.",
+      "prerequisites": ["ng-nerdc.ela.p3.reading.comprehension"],
+      "source": "NERDC English Studies P3 — Theme: Grammar"
+    },
+    {
+      "id": "ng-nerdc.ela.p3.writing.guided",
+      "subject": "ela",
+      "gradeBand": "Primary-3",
+      "label": "Guided composition (3–4 sentences)",
+      "summary": "Write a guided composition of 3–4 connected sentences on a familiar topic.",
+      "prerequisites": ["ng-nerdc.ela.p3.grammar.sentences"],
+      "source": "NERDC English Studies P3 — Theme: Writing"
+    }
+  ],
+  "contentPacks": [
+    {
+      "id": "ng-lagos-p3-math-2026",
+      "title": "Lagos State Primary 3 Mathematics (NERDC)",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "districtIds": ["ng-lagos-state"],
+      "skillIds": [
+        "ng-nerdc.math.p3.number.whole-numbers",
+        "ng-nerdc.math.p3.number.addition",
+        "ng-nerdc.math.p3.number.subtraction",
+        "ng-nerdc.math.p3.number.multiplication",
+        "ng-nerdc.math.p3.number.fractions"
+      ],
+      "frameworkCode": "NG-NERDC"
+    },
+    {
+      "id": "ng-lagos-p3-english-2026",
+      "title": "Lagos State Primary 3 English Studies (NERDC)",
+      "subject": "ela",
+      "gradeBand": "Primary-3",
+      "districtIds": ["ng-lagos-state"],
+      "skillIds": [
+        "ng-nerdc.ela.p3.reading.comprehension",
+        "ng-nerdc.ela.p3.grammar.sentences",
+        "ng-nerdc.ela.p3.writing.guided"
+      ],
+      "frameworkCode": "NG-NERDC"
+    }
+  ]
+}

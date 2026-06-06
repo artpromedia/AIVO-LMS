@@ -46,12 +46,12 @@ A learner's curriculum is resolved deterministically, left to right:
 | `curriculum-svc/.../catalogue.py` | In-memory read model loaded from the `skill_graphs.json` snapshot; enforces district/jurisdiction scoping; `resolve_jurisdiction()`. | Generalized to the `Jurisdiction` model (S2). |
 | `curriculum-svc/.../jurisdiction.py` + `frameworks.py` | `{country, region, district, postalCode}` → framework resolution; single framework registry (NERDC/MOE/NC/…). | Done (S2). Intl content seeded S3. |
 | `curriculum-svc/.../auth.py` | Service-token / JWT auth for catalogue access. | Weak bearer check today; real RS256 in S1. |
-| `packages/skill-graphs` | Skill-graph types, traversal, validators — the graph data compiled into the snapshot. | US today; `src/intl/` added S3. |
-| `packages/content-pack` | Curated content-pack manifests per (jurisdiction, subject, grade). | US today; NG/AE/GB seeded S3. |
-| `brain-svc/.../curriculum_engine.py` | **Scaffolding only** — rephrases/sequences validated catalogue nodes for a learner's functioning level. Forbidden from inventing codes. | Generates standards today (to be retired in S3). |
-| `brain-svc/.../curriculum_validator.py` | Enforces ADR 0041: drops any LLM-proposed code absent from the catalogue. | Planned: S3. |
-| `ai-svc/.../curriculum_client.py` | Grounds baseline/LLM output against curriculum-svc. | Grounding off-by-default today; default-on in S3. |
-| `identity-svc/.../curriculum-lookup.ts` | Warm-start cache of framework names; defers to curriculum-svc for resolution. | Standalone static maps today; pointed at curriculum-svc in S3. |
+| `packages/content-pack/data/<jurisdiction>/catalogue.json` | Curated source data per jurisdiction (US-CCSS + NG-NERDC, AE-MOE, GB-NC), each skill citing its source. Compiled into the snapshot. | NG/AE/GB seeded (S3). |
+| `curriculum-svc/scripts/build_snapshot.py` | Deterministic compiler: source catalogues → `skill_graphs.json`. `--check` fails CI on drift. | Done (S3); replaces the hand-maintained snapshot. |
+| `brain-svc/.../curriculum_engine.py` | **Scaffolding only** — rephrases/sequences validated catalogue nodes; prompt forbids inventing codes. | Routed through the validator (S3). |
+| `brain-svc/.../curriculum_validator.py` | Enforces ADR 0041: drops any LLM-proposed code absent from the catalogue; emits nothing if the catalogue is unreachable. | Done (S3). |
+| `ai-svc/.../curriculum_client.py` | Grounds baseline/LLM output against curriculum-svc; jurisdiction-aware (US ZIP + NG/AE/GB). | Grounding **on by default** (S3). |
+| `identity-svc/.../curriculum-lookup.ts` | `resolveJurisdictionViaCurriculumSvc()` calls the authoritative service; static maps are the warm-start cache. | Pointed at curriculum-svc (S3). |
 
 ## Authority model (who decides what)
 

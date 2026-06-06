@@ -10,9 +10,12 @@ study next" questions, and reserve LLM calls for personalization.
 Initial scope (this PR):
 
 - Read-only catalogue served from a JSON snapshot bundled under
-  `src/curriculum_svc/data/skill_graphs.json`. The snapshot is generated
-  from `packages/skill-graphs` and `packages/content-pack` as part of the
-  monorepo build; the service does not synthesize content at runtime.
+  `src/curriculum_svc/data/skill_graphs.json`. The snapshot is **compiled
+  deterministically** from the per-jurisdiction source catalogues under
+  `packages/content-pack/data/<jurisdiction>/catalogue.json` (US-CCSS plus
+  NG-NERDC, AE-MOE, GB-NC) by `scripts/build_snapshot.py`; the service does
+  not synthesize content at runtime. Regenerate with
+  `python scripts/build_snapshot.py`; CI runs `--check` to fail on drift.
 - `GET /api/curriculum/health` — health check.
 - `GET /api/curriculum/jurisdictions/resolve` — resolve a learner's
   jurisdiction to its district scope + framework (see Jurisdictions

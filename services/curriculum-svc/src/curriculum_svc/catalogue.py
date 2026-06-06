@@ -37,6 +37,10 @@ class Skill:
     label: str
     summary: str
     prerequisites: tuple[str, ...]
+    # Provenance: the authoritative standard/document this skill cites
+    # (e.g. "NERDC Primary Mathematics, P3 Number"). Empty for older US
+    # snapshot rows. Surfaced so consumers can audit where a code came from.
+    source: str = ""
 
 
 @dataclass(frozen=True)
@@ -307,6 +311,7 @@ def _parse_snapshot(raw: dict) -> Catalogue:
             label=s.get("label", ""),
             summary=s.get("summary", ""),
             prerequisites=tuple(s.get("prerequisites", [])),
+            source=s.get("source", ""),
         )
         for s in raw.get("skills", [])
     ]

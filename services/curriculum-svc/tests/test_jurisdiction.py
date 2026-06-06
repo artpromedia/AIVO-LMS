@@ -72,28 +72,40 @@ def test_resolve_us_bad_zip_is_malformed():
         cat.resolve_jurisdiction(country="US", postal_code="abc")
 
 
-# ── International: never a silent US fallback ──────────────────────────
+# ── International: resolves to its OWN framework, never US ─────────────
 
 
-def test_resolve_ng_unseeded_raises_not_seeded_not_us():
+def test_resolve_ng_lagos_returns_nerdc_not_us():
+    cat = get_catalogue()
+    r = cat.resolve_jurisdiction(country="NG", region="Lagos")
+    assert r.country == "NG"
+    assert r.district_id == "ng-lagos-state"
+    assert r.framework_code == "NG-NERDC"
+    assert r.grade_band_scheme == "NG-BASIC"
+
+
+def test_resolve_ae_emirates_return_uae_moe():
+    cat = get_catalogue()
+    for region, district in (("Dubai", "ae-dubai"), ("Abu Dhabi", "ae-abu-dhabi")):
+        r = cat.resolve_jurisdiction(country="AE", region=region)
+        assert r.district_id == district
+        assert r.framework_code == "UAE-MOE"
+
+
+def test_resolve_gb_country_only_returns_uk_nc():
+    cat = get_catalogue()
+    r = cat.resolve_jurisdiction(country="GB")
+    assert r.district_id == "gb-england"
+    assert r.framework_code == "UK-NC"
+
+
+def test_resolve_known_but_unseeded_country_is_not_seeded_not_us():
+    # AU has a registered framework (ACARA) but no seeded content yet.
+    # It must raise NotSeeded — never fall back to US/CCSS.
     cat = get_catalogue()
     with pytest.raises(jurisdiction.JurisdictionNotSeededError) as exc:
-        cat.resolve_jurisdiction(country="NG", region="Lagos")
-    # The error must name the jurisdiction, proving it isn't US content.
-    assert "NG" in str(exc.value)
-
-
-def test_resolve_ae_unseeded_raises_not_seeded():
-    cat = get_catalogue()
-    for region in ("Dubai", "Abu Dhabi"):
-        with pytest.raises(jurisdiction.JurisdictionNotSeededError):
-            cat.resolve_jurisdiction(country="AE", region=region)
-
-
-def test_resolve_gb_country_only_unseeded():
-    cat = get_catalogue()
-    with pytest.raises(jurisdiction.JurisdictionNotSeededError):
-        cat.resolve_jurisdiction(country="GB")
+        cat.resolve_jurisdiction(country="AU")
+    assert "AU" in str(exc.value)
 
 
 def test_resolve_unknown_country_is_unknown_not_us():
@@ -175,10 +187,16 @@ def test_route_resolve_us_zip():
     assert body["frameworkCode"] == "US-CCSS"
 
 
-def test_route_resolve_ng_unseeded_404():
+def test_route_resolve_ng_lagos_200():
     r = client.get(_RESOLVE, params={"country": "NG", "region": "Lagos"}, headers=DEV)
+    assert r.status_code == 200
+    assert r.json()["frameworkCode"] == "NG-NERDC"
+
+
+def test_route_resolve_known_but_unseeded_country_404():
+    r = client.get(_RESOLVE, params={"country": "AU"}, headers=DEV)
     assert r.status_code == 404
-    assert "NG" in r.json()["detail"]
+    assert "AU" in r.json()["detail"]
 
 
 def test_route_resolve_unknown_country_404():
@@ -199,15 +217,30 @@ def test_route_resolve_requires_auth():
 # ── Lookup route internationalization ─────────────────────────────────
 
 
-def test_lookup_non_us_country_never_returns_us_content():
+def test_lookup_ng_returns_real_nerdc_not_us_content():
     r = client.get(
         "/api/curriculum/lookup",
         params={"country": "NG", "region": "Lagos", "subject": "math", "gradeBand": "Primary-3"},
         headers=DEV,
     )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["district"]["id"] == "ng-lagos-state"
+    skill_ids = [s["id"] for s in body["skills"]]
+    assert "ng-nerdc.math.p3.number.whole-numbers" in skill_ids
+    # Each skill cites its NERDC source.
+    assert all(s["source"].startswith("NERDC") for s in body["skills"])
+    # Never US content.
+    assert "mn-stpaul" not in r.text and "wa-tacoma" not in r.text and "ccss" not in r.text
+
+
+def test_lookup_known_but_unseeded_country_404():
+    r = client.get(
+        "/api/curriculum/lookup",
+        params={"country": "AU", "subject": "math"},
+        headers=DEV,
+    )
     assert r.status_code == 404
-    # Must not have served a US district.
-    assert "mn-stpaul" not in r.text and "wa-tacoma" not in r.text
 
 
 def test_lookup_unknown_country_404():

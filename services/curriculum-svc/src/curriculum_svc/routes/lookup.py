@@ -31,6 +31,7 @@ class SkillOut(BaseModel):
     label: str
     summary: str
     prerequisites: list[str]
+    source: str = ""
 
     @classmethod
     def from_skill(cls, s: Skill) -> "SkillOut":
@@ -41,6 +42,7 @@ class SkillOut(BaseModel):
             label=s.label,
             summary=s.summary,
             prerequisites=list(s.prerequisites),
+            source=s.source,
         )
 
 

@@ -1,22 +1,46 @@
 import json
 import logging
 from typing import Optional
+
+from brain_svc.services.curriculum_validator import (
+    fetch_valid_codes,
+    validate_nodes,
+)
 from brain_svc.services.llm_gateway import generate_completion
 
 logger = logging.getLogger("brain-svc.curriculum_engine")
 
-CURRICULUM_EXTRACTOR_SYSTEM = """You are AIVO's Curriculum Standards Engine — an expert in educational standards across all US states, international frameworks, and special education standards.
-
-Given a curriculum framework, subject, grade level, and functioning level, generate the specific learning standards, objectives, and scope-and-sequence that should guide this learner's educational path.
+# ADR 0040/0041: curriculum-svc is the authoritative source of standards.
+# This engine is a SCAFFOLDING layer — it rephrases and sequences catalogue
+# standards for a learner; it must never invent standard codes. The prompt
+# below forbids it, and extract_curriculum_standards() additionally drops
+# any code the model emits that is absent from the catalogue.
+CURRICULUM_EXTRACTOR_SYSTEM = """You are AIVO's Curriculum Scaffolding Engine. You do NOT decide what the curriculum is — curriculum-svc is the single authoritative source of standards. Your job is to rephrase, scaffold, and sequence the catalogue standards you are given for a learner's functioning level.
 
 Rules:
-- Use REAL standards codes and descriptions from the specified framework
-- For US state standards, use actual standard identifiers (e.g., CCSS.MATH.3.OA.A.1, TEKS 3.4A)
-- Adapt scope and sequence for the learner's functioning level
-- For modified/functional curricula, include alternate achievement standards
-- Include prerequisite skills and extension opportunities
-- Keep standards relevant to the specific grade band
-- Output valid JSON only"""
+- NEVER invent a standard code. Use ONLY the standard codes listed in the "Authoritative catalogue codes" provided to you. Any code you output that is not in that list will be rejected and dropped.
+- Rephrase descriptions into clear, learner-friendly language and adapt scope/sequence for the functioning level.
+- For modified/functional curricula, describe alternate achievement of the PROVIDED standards — do not introduce new codes.
+- Reference prerequisites only by codes that appear in the provided list.
+- Output valid JSON only."""
+
+
+# Coarse map from engine subject labels to curriculum-svc subject tokens.
+_CATALOGUE_SUBJECT = {
+    "math": "math",
+    "mathematics": "math",
+    "maths": "math",
+    "ela": "ela",
+    "english": "ela",
+    "english language arts": "ela",
+    "language arts": "ela",
+    "reading": "ela",
+}
+
+
+def _catalogue_subject(subject: str) -> str:
+    s = (subject or "").strip().lower()
+    return _CATALOGUE_SUBJECT.get(s, s)
 
 SCOPE_SEQUENCE_SYSTEM = """You are AIVO's Scope & Sequence Generator — an expert in building personalized learning progressions aligned to educational standards.
 
@@ -38,8 +62,28 @@ async def extract_curriculum_standards(
     functioning_level: str = "STANDARD",
     state: Optional[str] = None,
     district_id: Optional[str] = None,
+    country: Optional[str] = None,
+    region: Optional[str] = None,
+    postal_code: Optional[str] = None,
 ) -> dict:
-    user_prompt = f"""Extract the specific curriculum standards for this learner context:
+    # Authoritative codes the model is allowed to scaffold. None means the
+    # catalogue could not be consulted — in that case we refuse to emit any
+    # standards rather than trust unvalidated LLM output (ADR 0041).
+    valid_codes = await fetch_valid_codes(
+        subject=_catalogue_subject(subject),
+        grade_band=grade_level,
+        country=country,
+        region=region,
+        postal_code=postal_code,
+        district_id=district_id,
+    )
+    allowed = sorted(valid_codes) if valid_codes else []
+    allowed_block = (
+        "Authoritative catalogue codes (use ONLY these): "
+        + (", ".join(allowed) if allowed else "(none available)")
+    )
+
+    user_prompt = f"""Scaffold the authoritative curriculum standards for this learner context:
 
 Framework: {framework}
 Standards Code: {standards_code}
@@ -48,6 +92,10 @@ Grade Level: {grade_level}
 Functioning Level: {functioning_level}
 {f'State: {state}' if state else ''}
 {f'District: {district_id}' if district_id else ''}
+{f'Country: {country}' if country else ''}
+{f'Region: {region}' if region else ''}
+
+{allowed_block}
 
 Respond with JSON:
 {{
@@ -91,10 +139,31 @@ Respond with JSON:
             temperature=0.2,
             max_tokens=3000,
         )
-        return _parse_llm_json(result, "standards")
+        data = _parse_llm_json(result, "standards")
     except Exception as e:
         logger.error(f"Curriculum extraction failed: {e}")
         return {"error": str(e), "framework": framework, "subject": subject}
+
+    return _validate_standards(data, valid_codes)
+
+
+def _validate_standards(data: dict, valid_codes: set[str] | None) -> dict:
+    """Drop any LLM-emitted standard whose code is not in the catalogue.
+
+    If the catalogue was unreachable (``valid_codes is None``) we emit NO
+    standards — the engine never serves unvalidated LLM codes (ADR 0041).
+    """
+    if not isinstance(data, dict) or not isinstance(data.get("standards"), list):
+        return data
+    if valid_codes is None:
+        rejected = [{"code": s.get("code"), "reason": "catalogue_unavailable"} for s in data["standards"]]
+        data["standards"] = []
+        data["validation"] = {"catalogue_available": False, "rejected": rejected}
+        return data
+    result = validate_nodes(data["standards"], valid_codes)
+    data["standards"] = result.accepted
+    data["validation"] = {"catalogue_available": True, "rejected": result.rejected}
+    return data
 
 
 async def generate_scope_sequence(

@@ -7,9 +7,10 @@ unknown subject, 4xx/5xx, network timeout) returns an empty grounding
 result so the LLM still gets called and the parent still sees a
 baseline. Curriculum grounding is *enrichment*, not a hard requirement.
 
-Enabled when ``AIVO_FEATURE_CURRICULUM_GROUNDING`` is truthy. Off by
-default to give ops a kill switch if the curriculum-svc snapshot is out
-of date.
+Grounding is **on by default** (ADR 0041 / Sprint 3): personalization is
+always anchored to the authoritative catalogue. ``AIVO_FEATURE_CURRICULUM_
+GROUNDING`` remains only as an ops kill switch — set it to a falsey value
+to disable.
 """
 
 from __future__ import annotations
@@ -28,6 +29,14 @@ _CURRICULUM_SVC_URL = os.environ.get(
     "CURRICULUM_SVC_URL", "http://localhost:3013"
 )
 
+# curriculum-svc requires auth (service token or verified JWT). We send the
+# internal service token; in dev both services share the documented fallback.
+_DEV_SERVICE_TOKEN = "aivo-internal-dev-token"  # noqa: S105 (dev-only fallback)
+
+
+def _service_headers() -> dict[str, str]:
+    return {"X-Service-Token": os.environ.get("INTERNAL_SERVICE_TOKEN") or _DEV_SERVICE_TOKEN}
+
 # ai-svc speaks 7 subjects; curriculum-svc's catalogue currently covers a
 # subset (math, ela). When a subject has no matching catalogue entries we
 # silently skip it so the LLM still receives partial grounding rather
@@ -44,8 +53,12 @@ SUBJECTS_TO_FETCH: tuple[str, ...] = (
 
 
 def curriculum_grounding_enabled() -> bool:
-    raw = os.environ.get("AIVO_FEATURE_CURRICULUM_GROUNDING", "")
-    return raw.strip().lower() in {"1", "true", "yes", "on"}
+    """On by default (Sprint 3). Only an explicit falsey value disables it,
+    so the env var acts purely as an ops kill switch."""
+    raw = os.environ.get("AIVO_FEATURE_CURRICULUM_GROUNDING")
+    if raw is None or raw.strip() == "":
+        return True
+    return raw.strip().lower() not in {"0", "false", "no", "off"}
 
 
 def normalize_grade_band(grade: str | int | None) -> str | None:
@@ -86,15 +99,18 @@ async def _fetch_subject(
     *,
     subject: str,
     grade_band: str,
-    zip_code: str,
+    location_params: dict[str, str],
 ) -> list[dict]:
-    """Return up to ``max_skills`` skill nodes for (subject, grade, district).
-    On any non-200 response or transport error returns an empty list.
+    """Return up to ``max_skills`` skill nodes for (subject, grade, jurisdiction).
+    ``location_params`` carries the jurisdiction locator (``zipCode`` for US
+    or ``country``/``region`` for intl). On any non-200/transport error
+    returns an empty list.
     """
     try:
         r = await client.get(
             f"{_CURRICULUM_SVC_URL}/lookup",
-            params={"subject": subject, "gradeBand": grade_band, "zipCode": zip_code},
+            params={**location_params, "subject": subject, "gradeBand": grade_band},
+            headers=_service_headers(),
         )
     except (httpx.HTTPError, httpx.InvalidURL) as exc:
         logger.warning("curriculum-svc lookup transport error (%s): %s", subject, exc)
@@ -116,26 +132,96 @@ async def _fetch_subject(
     return [s for s in skills if isinstance(s, dict)]
 
 
-async def load_curriculum_grounding(
+async def _resolve_location(
+    client: httpx.AsyncClient,
     *,
     zip_code: str | None,
+    country: str | None,
+    region: str | None,
+) -> tuple[dict | None, dict[str, str] | None]:
+    """Resolve a learner's jurisdiction to ``(district_info, location_params)``.
+
+    US (no country, or country == "US") resolves by ZIP via
+    ``/districts/resolve``; other countries resolve by country(+region) via
+    ``/jurisdictions/resolve``. Returns ``(None, None)`` when the location
+    cannot be resolved — grounding then degrades to empty.
+    """
+    if country and country.strip().upper() != "US":
+        c = country.strip().upper()
+        params = {"country": c}
+        if region:
+            params["region"] = region
+        try:
+            jr = await client.get(
+                f"{_CURRICULUM_SVC_URL}/jurisdictions/resolve",
+                params=params,
+                headers=_service_headers(),
+            )
+        except httpx.HTTPError as exc:
+            logger.warning("curriculum-svc jurisdiction resolve transport error: %s", exc)
+            return None, None
+        if jr.status_code != 200:
+            logger.info("curriculum-svc jurisdiction resolve non-200 status=%s", jr.status_code)
+            return None, None
+        try:
+            body = jr.json() or {}
+        except ValueError:
+            return None, None
+        district = {
+            "id": body.get("districtId"),
+            "name": body.get("districtName"),
+            "state": body.get("region"),
+        }
+        return district, params
+
+    # US path — ZIP required.
+    if not zip_code:
+        return None, None
+    try:
+        dr = await client.get(
+            f"{_CURRICULUM_SVC_URL}/districts/resolve",
+            params={"zipCode": zip_code},
+            headers=_service_headers(),
+        )
+    except httpx.HTTPError as exc:
+        logger.warning("curriculum-svc district resolve transport error: %s", exc)
+        return None, None
+    if dr.status_code != 200:
+        logger.info("curriculum-svc district resolve non-200 zip=%s status=%s", zip_code, dr.status_code)
+        return None, None
+    try:
+        district = (dr.json() or {}).get("district") or {}
+    except ValueError:
+        return None, None
+    return (
+        {"id": district.get("id"), "name": district.get("name"), "state": district.get("state")},
+        {"zipCode": zip_code},
+    )
+
+
+async def load_curriculum_grounding(
+    *,
+    zip_code: str | None = None,
     grade_level: str | int | None,
+    country: str | None = None,
+    region: str | None = None,
     subjects: Iterable[str] = SUBJECTS_TO_FETCH,
     max_skills_per_subject: int = 5,
     timeout_seconds: float = 3.0,
 ) -> dict:
-    """Fetch district-scoped skill anchors for each requested subject and
+    """Fetch jurisdiction-scoped skill anchors for each requested subject and
     bundle them into a single structure for the prompt builder.
+
+    US learners pass ``zip_code``; non-US learners pass ``country`` (and
+    optionally ``region``). A non-US country is resolved against its own
+    framework — never US/CCSS.
 
     Returns a dict with shape::
 
         {
           "district": {"id": "...", "name": "...", "state": "..."} | None,
-          "gradeBand": "3" | "K" | None,
-          "subjects": {
-            "math": [{"id", "label", "summary", "prerequisites"}, ...],
-            "ela":  [...],
-          },
+          "gradeBand": "3" | "K" | "Primary-3" | None,
+          "subjects": {"math": [{"id","label","summary","prerequisites"}, ...]},
         }
 
     Empty subjects keys are omitted so the prompt builder doesn't emit
@@ -144,54 +230,36 @@ async def load_curriculum_grounding(
     empty: dict = {"district": None, "gradeBand": None, "subjects": {}}
     if not curriculum_grounding_enabled():
         return empty
-    if not zip_code:
+    if not zip_code and not country:
         return empty
-    grade_band = normalize_grade_band(grade_level)
-    if not grade_band:
-        # Still useful: caller may want to see the district even without
-        # a usable grade. Resolve the district but skip per-subject anchors.
-        grade_band = None
+
+    # US grade strings are normalised to catalogue tokens; intl grade bands
+    # (e.g. "Primary-3", "Year-1") are framework-native and pass through.
+    if country and country.strip().upper() != "US":
+        grade_band = str(grade_level).strip() if grade_level not in (None, "") else None
+    else:
+        grade_band = normalize_grade_band(grade_level)
 
     out: dict = {"district": None, "gradeBand": grade_band, "subjects": {}}
 
     try:
         async with httpx.AsyncClient(timeout=timeout_seconds) as client:
-            # Resolve district once; if it 404s the learner's ZIP is not
-            # in the catalogue and we cannot ground at all.
-            try:
-                dr = await client.get(
-                    f"{_CURRICULUM_SVC_URL}/districts/resolve",
-                    params={"zipCode": zip_code},
-                )
-            except httpx.HTTPError as exc:
-                logger.warning("curriculum-svc district resolve transport error: %s", exc)
+            district, location_params = await _resolve_location(
+                client, zip_code=zip_code, country=country, region=region
+            )
+            if district is None or location_params is None:
                 return empty
-            if dr.status_code != 200:
-                logger.info(
-                    "curriculum-svc district resolve non-200 zip=%s status=%s",
-                    zip_code, dr.status_code,
-                )
-                return empty
-            try:
-                district = (dr.json() or {}).get("district") or {}
-            except ValueError:
-                return empty
-            out["district"] = {
-                "id": district.get("id"),
-                "name": district.get("name"),
-                "state": district.get("state"),
-            }
+            out["district"] = district
 
             if grade_band is None:
                 return out
 
             for subject in subjects:
                 skills = await _fetch_subject(
-                    client, subject=subject, grade_band=grade_band, zip_code=zip_code
+                    client, subject=subject, grade_band=grade_band, location_params=location_params
                 )
                 if not skills:
                     continue
-                # Trim & keep only the fields the prompt actually surfaces.
                 out["subjects"][subject] = [
                     {
                         "id": s.get("id"),
