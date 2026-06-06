@@ -72,8 +72,17 @@ async def generate_brain_summary(learner_id: str, db: Session = Depends(get_db),
         {"lid": learner_id}
     ).mappings().first()
 
+    # Alias the real iep_goals columns (domain / goal_text / current_progress)
+    # to the keys the prompt builder downstream already expects (goal_area /
+    # description / progress_percent). The legacy column names never existed in
+    # the schema of record (packages/db/src/schema/learners.ts), so the prior
+    # query 500'd the moment a learner had an active IEP goal.
     iep_goals = db.execute(
-        text("SELECT goal_area, description, status, progress_percent FROM iep_goals WHERE learner_id = :lid AND status = 'active'"),
+        text("SELECT domain        AS goal_area, "
+             "       goal_text     AS description, "
+             "       status, "
+             "       current_progress AS progress_percent "
+             "FROM iep_goals WHERE learner_id = :lid AND status = 'active'"),
         {"lid": learner_id}
     ).mappings().all()
 

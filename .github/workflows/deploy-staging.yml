@@ -263,3 +263,17 @@ jobs:
       - name: Verify rollout
         run: |
           kubectl -n ${{ env.NAMESPACE }} get pods --sort-by=.metadata.name -o wide
+
+  # ─────────────────────────────────────────────────────────────────────
+  # IEP integration smoke gate — exercises the ai-svc draft round-trip
+  # after the staging rollout. Requires the AI_SVC_URL / ASSESSMENT_SVC_URL
+  # repo (or environment) variables to point at the staging ingress URLs.
+  # ─────────────────────────────────────────────────────────────────────
+  iep-smoke:
+    needs: [deploy]
+    uses: ./.github/workflows/iep-integration-smoke.yml
+    with:
+      ai_svc_url: ${{ vars.AI_SVC_URL }}
+      assessment_svc_url: ${{ vars.ASSESSMENT_SVC_URL }}
+    secrets:
+      INTERNAL_AI_TOKEN: ${{ secrets.INTERNAL_AI_TOKEN }}

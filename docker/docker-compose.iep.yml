@@ -1,0 +1,124 @@
+# =============================================================================
+# IEP integration — local full-loop compose
+# =============================================================================
+# Brings up the minimal graph to exercise:
+#   teacher "Generate with AI"  -> assessment-svc -> ai-svc -> Postgres
+#   mastery change              -> iep-progress-sync -> Postgres -> brain-svc
+#
+# Usage:
+#   docker compose -f docker/docker-compose.iep.yml up --build --wait
+#   ./scripts/smoke/iep-integration-smoke.sh
+#   docker compose -f docker/docker-compose.iep.yml down -v
+# =============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: aivo
+      POSTGRES_PASSWORD: aivo
+      POSTGRES_DB: aivo_iep
+    ports:
+      - "55434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aivo -d aivo_iep"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+
+  ai-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.python-service
+      args:
+        SERVICE_NAME: ai-svc
+    environment:
+      ENV: development
+      PORT: "3004"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_iep
+      INTERNAL_AI_TOKEN: iep-local-internal-ai-token
+      # No live LLM in local loop: the /api/ai/iep/draft route honours AI_MOCK
+      # to return a deterministic, schema-valid IEPDraftResponse for smoke runs.
+      AI_MOCK: "1"
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports:
+      - "3004:3004"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3004/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  assessment-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: assessment-svc
+    environment:
+      NODE_ENV: development
+      PORT: "3003"
+      ASSESSMENT_PORT: "3003"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_iep
+      AI_SVC_URL: http://ai-svc:3004
+      INTERNAL_AI_TOKEN: iep-local-internal-ai-token
+      AI_IEP_DRAFT_TIMEOUT_MS: "20000"
+      AUTH_SECRET: iep-local-auth-secret-please-do-not-deploy-32-chars
+    depends_on:
+      postgres: { condition: service_healthy }
+      ai-svc:   { condition: service_healthy }
+    ports:
+      - "3003:3003"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3003/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  brain-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.python-service
+      args:
+        SERVICE_NAME: brain-svc
+    environment:
+      ENV: development
+      PORT: "3002"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_iep
+      INTERNAL_AI_TOKEN: iep-local-internal-ai-token
+      AI_SVC_URL: http://ai-svc:3004
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports:
+      - "3002:3002"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3002/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  iep-progress-sync:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.python-service
+      args:
+        SERVICE_NAME: brain-svc           # reuse the brain-svc image
+    entrypoint: ["/app/iep-progress-sync.entrypoint.sh"]
+    volumes:
+      - ./iep-progress-sync.entrypoint.sh:/app/iep-progress-sync.entrypoint.sh:ro
+    environment:
+      ENV: development
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_iep
+      # Run once and exit in local mode (CI smoke invokes it directly).
+      IEP_PROGRESS_SYNC_ONCE: "1"
+      IEP_PROGRESS_SYNC_MIN_DELTA: "0.05"
+    depends_on:
+      postgres: { condition: service_healthy }
