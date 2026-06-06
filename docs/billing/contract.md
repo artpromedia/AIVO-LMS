@@ -71,6 +71,24 @@ enforces this on the web-v2 BFF.
 
 ## Coupons
 
+> **Source of truth.** `billing-svc` and its `billing_coupons` table are the
+> single canonical store for every coupon. Admin surfaces do **not** keep a
+> separate coupon model — they are read-through projections of billing-svc.
+> The web-v2 in-memory `Coupon` type (`apps/web-v2/lib/db/types.ts`) is a
+> deprecated demo-only fixture for the offline/mock UI and is never seeded
+> outside development; production coupon data always comes from billing-svc.
+
+**Admin path (web-admin → admin-svc → billing-svc).** The platform-admin
+coupon UI lives in `apps/web-admin` (`/platform/billing/coupons`). It uses the
+`@aivo/admin-api/billing` client (`listCoupons` / `createCoupon` /
+`disableCoupon`), which calls admin-svc's proxy
+(`/api/admin-svc/billing/coupons[/:code]`, see
+`services/admin-svc/src/routes/billing-coupons.ts`). admin-svc forwards the
+caller's platform-admin Bearer to billing-svc and passes the canonical error
+codes through verbatim; the client maps them to friendly copy
+(`COUPON_ERROR_MESSAGES`). Both hops require `PLATFORM_ADMIN`, so non-platform
+roles get 403 at admin-svc and again at billing-svc.
+
 `services/billing-svc/src/routes/coupons.ts` exposes:
 
 | Method   | Path                               | Audience                               |

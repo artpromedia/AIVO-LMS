@@ -35,12 +35,28 @@ export default async function PlatformPage() {
       <AdminCard className="mt-6 p-6">
         <h2 className="text-xl font-black">Secure district onboarding</h2>
         <p className="mt-2 max-w-3xl text-slate-600">
-          Platform admins can create a district, invite its first administrator without a temporary password,
-          and manage the invitation lifecycle from this standalone console.
+          Platform admins can create a district, invite its first administrator without a temporary
+          password, and manage the invitation lifecycle from this standalone console.
         </p>
         {session.role === "platform_admin" ? (
           <Link className="mt-4 inline-flex font-bold text-blue-700" href="/platform/districts">
             View district invitations
+          </Link>
+        ) : null}
+      </AdminCard>
+
+      <AdminCard className="mt-6 p-6">
+        <h2 className="text-xl font-black">Pilot coupons</h2>
+        <p className="mt-2 max-w-3xl text-slate-600">
+          Mint and disable discount, subscription, and provisioning (district/school pilot) coupons.
+          Backed by billing-svc, the single source of truth for every coupon.
+        </p>
+        {session.role === "platform_admin" ? (
+          <Link
+            className="mt-4 inline-flex font-bold text-blue-700"
+            href="/platform/billing/coupons"
+          >
+            Manage coupons
           </Link>
         ) : null}
       </AdminCard>

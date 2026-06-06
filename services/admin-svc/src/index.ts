@@ -23,6 +23,7 @@ import { registerAuditRoutes } from "./routes/audit.js";
 import { registerAuditVerifyRoutes } from "./routes/audit-verify.js";
 import { registerSearchRoutes } from "./routes/search.js";
 import { registerLeadRoutes } from "./routes/leads.js";
+import { registerBillingCouponRoutes } from "./routes/billing-coupons.js";
 import { registerModerationRoutes } from "./routes/moderation.js";
 import { registerComplianceRoutes } from "./routes/compliance.js";
 import { registerApiKeyRoutes } from "./routes/api-keys.js";
@@ -84,6 +85,7 @@ export async function buildApp(
   registerAuditVerifyRoutes(app, db);
   registerSearchRoutes(app, db);
   registerLeadRoutes(app, db);
+  registerBillingCouponRoutes(app);
   registerModerationRoutes(app, db);
   registerComplianceRoutes(app, db);
   registerApiKeyRoutes(app, db);

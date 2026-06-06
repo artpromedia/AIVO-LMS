@@ -2737,6 +2737,13 @@ export function ensureSeeded(): void {
   // ============================================================
   // Platform-admin operations: coupons + daily billing batches
   // ============================================================
+  // NOTE: billing-svc (`billing_coupons`) is now the single source of truth
+  // for coupons (see docs/billing/contract.md). The platform-admin coupon UI
+  // lives in apps/web-admin and reads/writes billing-svc via admin-svc — it no
+  // longer reads these in-memory rows. The seeds below are DEMO-ONLY fixtures
+  // for the offline/mock UI and are skipped outside development so a non-mock
+  // environment never surfaces fake coupons.
+  const SEED_DEMO_COUPONS = process.env.NODE_ENV !== "production";
   const couponSeeds: Array<Omit<import("@/lib/db/types").Coupon, "id">> = [
     {
       code: "WELCOME25",
@@ -2799,9 +2806,11 @@ export function ensureSeeded(): void {
       createdAt: new Date(Date.now() - 200 * 86400_000).toISOString(),
     },
   ];
-  for (const c of couponSeeds) {
-    const id = newId("cpn");
-    store.coupons.set(id, { ...c, id });
+  if (SEED_DEMO_COUPONS) {
+    for (const c of couponSeeds) {
+      const id = newId("cpn");
+      store.coupons.set(id, { ...c, id });
+    }
   }
 
   // 14 daily billing batches (last 14 days)
