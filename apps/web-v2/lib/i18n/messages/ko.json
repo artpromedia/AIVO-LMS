@@ -926,7 +926,13 @@
       "err_send": "보내지 못했어. 다시 시도해.",
       "err_network": "네트워크 문제야. 잠시 후 다시 시도해.",
       "err_end": "세션을 끝낼 수 없어.",
-      "err_network_short": "네트워크 문제야. 다시 시도해."
+      "err_network_short": "네트워크 문제야. 다시 시도해.",
+      "calm_nudge": {
+        "title": "잠깐 쉬어 볼까요?",
+        "body": "잠깐 멈춰도 괜찮아요. 짧은 차분한 시간이 다시 준비되도록 도와줘요.",
+        "accept": "차분한 휴식 갖기",
+        "dismiss": "지금은 괜찮아요"
+      }
     },
     "subjects": {
       "page_title": "과목 선택",

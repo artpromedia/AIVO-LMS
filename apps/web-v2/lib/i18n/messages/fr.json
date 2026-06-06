@@ -926,7 +926,13 @@
       "err_send": "Échec de l'envoi. Réessaie.",
       "err_network": "Problème de réseau. Réessaie dans un instant.",
       "err_end": "Impossible de terminer la session.",
-      "err_network_short": "Problème de réseau. Réessaie."
+      "err_network_short": "Problème de réseau. Réessaie.",
+      "calm_nudge": {
+        "title": "Envie d'une pause tout calme ?",
+        "body": "C'est bien de faire une pause. Un petit moment de calme peut t'aider à te sentir prêt.",
+        "accept": "Faire une pause calme",
+        "dismiss": "Pas maintenant"
+      }
     },
     "subjects": {
       "page_title": "Choisis une matière",

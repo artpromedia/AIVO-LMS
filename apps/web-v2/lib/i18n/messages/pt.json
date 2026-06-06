@@ -926,7 +926,13 @@
       "err_send": "Não foi possível enviar. Tente novamente.",
       "err_network": "Problema de rede. Tente novamente em um instante.",
       "err_end": "Não foi possível encerrar a sessão.",
-      "err_network_short": "Problema de rede. Tente novamente."
+      "err_network_short": "Problema de rede. Tente novamente.",
+      "calm_nudge": {
+        "title": "Quer uma pausa tranquila?",
+        "body": "Tudo bem fazer uma pausa. Um momento de calma pode ajudar você a se sentir pronto.",
+        "accept": "Fazer uma pausa tranquila",
+        "dismiss": "Agora não"
+      }
     },
     "subjects": {
       "page_title": "Escolha uma matéria",

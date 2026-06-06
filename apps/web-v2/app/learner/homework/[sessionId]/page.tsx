@@ -12,6 +12,7 @@ import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { resolveEnterpriseFlags } from "@aivo/feature-flags";
 import { getHomeworkSession } from "@/lib/db/repos";
 import { describeHomeworkAttachment } from "@/lib/homework/attachments";
 import { HomeworkChat } from "./chat";
@@ -34,6 +35,9 @@ export default async function HomeworkSessionPage({ params }: Params) {
   const hw = getHomeworkSession(sessionId, session.tenantId);
   if (!hw || hw.learnerId !== learnerId) notFound();
   const t = await getTranslations("learner.homework");
+
+  const flags = resolveEnterpriseFlags(process.env as Record<string, string | undefined>);
+  const regulationEnabled = flags.selfRegulationHub;
 
   return (
     <AppShell
@@ -72,7 +76,12 @@ export default async function HomeworkSessionPage({ params }: Params) {
           </div>
         </Card>
       ) : (
-        <HomeworkChat learnerId={learnerId} sessionId={hw.id} initialMessages={hw.messages} />
+        <HomeworkChat
+          learnerId={learnerId}
+          sessionId={hw.id}
+          initialMessages={hw.messages}
+          regulationEnabled={regulationEnabled}
+        />
       )}
     </AppShell>
   );

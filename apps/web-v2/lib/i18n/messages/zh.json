@@ -926,7 +926,13 @@
       "err_send": "发送失败。请重试。",
       "err_network": "网络出问题了。请稍后重试。",
       "err_end": "无法结束会话。",
-      "err_network_short": "网络出问题了。请重试。"
+      "err_network_short": "网络出问题了。请重试。",
+      "calm_nudge": {
+        "title": "想要一个平静的休息吗？",
+        "body": "暂停一下没关系。一个短暂的平静时刻能帮你重新准备好。",
+        "accept": "去平静一下",
+        "dismiss": "现在不用"
+      }
     },
     "subjects": {
       "page_title": "选择一个科目",

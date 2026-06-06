@@ -926,7 +926,13 @@
       "err_send": "Senden fehlgeschlagen. Versuch es erneut.",
       "err_network": "Netzwerkproblem. Versuch es gleich noch einmal.",
       "err_end": "Die Sitzung konnte nicht beendet werden.",
-      "err_network_short": "Netzwerkproblem. Versuch es erneut."
+      "err_network_short": "Netzwerkproblem. Versuch es erneut.",
+      "calm_nudge": {
+        "title": "Magst du eine ruhige Pause?",
+        "body": "Eine Pause ist völlig okay. Ein kurzer ruhiger Moment kann dir helfen, dich bereit zu fühlen.",
+        "accept": "Ruhige Pause machen",
+        "dismiss": "Jetzt nicht"
+      }
     },
     "subjects": {
       "page_title": "Wähle ein Fach",

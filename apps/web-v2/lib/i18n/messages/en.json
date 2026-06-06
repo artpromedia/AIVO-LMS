@@ -1117,7 +1117,13 @@
       "err_send": "Couldn't send. Try again.",
       "err_network": "Network problem. Try again in a moment.",
       "err_end": "Couldn't end the session.",
-      "err_network_short": "Network problem. Try again."
+      "err_network_short": "Network problem. Try again.",
+      "calm_nudge": {
+        "title": "Want a calm break?",
+        "body": "It's okay to pause. A quick calm moment can help you feel ready.",
+        "accept": "Take a calm break",
+        "dismiss": "Not now"
+      }
     },
     "subjects": {
       "page_title": "Pick a subject",

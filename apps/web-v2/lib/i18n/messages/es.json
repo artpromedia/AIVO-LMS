@@ -926,7 +926,13 @@
       "err_send": "No se pudo enviar. Inténtalo de nuevo.",
       "err_network": "Problema de red. Inténtalo de nuevo en un momento.",
       "err_end": "No se pudo terminar la sesión.",
-      "err_network_short": "Problema de red. Inténtalo de nuevo."
+      "err_network_short": "Problema de red. Inténtalo de nuevo.",
+      "calm_nudge": {
+        "title": "¿Quieres una pausa tranquila?",
+        "body": "Está bien hacer una pausa. Un momento de calma puede ayudarte a sentirte listo.",
+        "accept": "Tomar una pausa tranquila",
+        "dismiss": "Ahora no"
+      }
     },
     "subjects": {
       "page_title": "Elige una materia",
