@@ -10,6 +10,7 @@ import {
   toNavRole,
   toWebRole,
 } from "./role-session";
+import { capabilitiesForRole } from "./permissions";
 import type { SessionProfile } from "./types";
 
 const baseProfile: SessionProfile = {
@@ -22,7 +23,9 @@ const baseProfile: SessionProfile = {
 };
 
 describe("toNavRole / toWebRole", () => {
-  it("round-trips every web role", () => {
+  it("round-trips every web role with a distinct nav id", () => {
+    // The platform/staff roles intentionally collapse to nav `internal`
+    // (many-to-one), so only roles with a 1:1 nav mapping round-trip.
     const webRoles: SessionProfile["role"][] = [
       "learner",
       "parent",
@@ -31,6 +34,14 @@ describe("toNavRole / toWebRole", () => {
       "therapist",
       "school_admin",
       "district_admin",
+    ];
+    for (const r of webRoles) {
+      expect(toWebRole(toNavRole(r))).toBe(r);
+    }
+  });
+
+  it("collapses platform + staff roles to nav `internal`", () => {
+    const internalRoles: SessionProfile["role"][] = [
       "platform_admin",
       "support",
       "marketing",
@@ -38,9 +49,11 @@ describe("toNavRole / toWebRole", () => {
       "devops",
       "engineering",
     ];
-    for (const r of webRoles) {
-      expect(toWebRole(toNavRole(r))).toBe(r);
+    for (const r of internalRoles) {
+      expect(toNavRole(r)).toBe("internal");
     }
+    // `internal` resolves back to the canonical platform_admin web role.
+    expect(toWebRole("internal")).toBe("platform_admin");
   });
 
   it("maps snake_case admins to camelCase nav ids", () => {
@@ -90,7 +103,9 @@ describe("buildRoleSession", () => {
       tenantId: "t_1",
       roles: ["teacher", "parent", "caregiver"],
       activeRole: "teacher",
-      capabilities: ["class:read", "class:write"],
+      // Capabilities are always recomputed from the active role, not
+      // mirrored from the profile's stale `permissions[]`.
+      capabilities: capabilitiesForRole("teacher"),
     });
   });
 
