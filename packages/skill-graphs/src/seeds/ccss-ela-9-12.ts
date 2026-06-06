@@ -17,7 +17,7 @@ import type { SkillGraph } from "../types.js";
 export const ccssEla9To12: SkillGraph = {
   id: "ccss-ela-9-12",
   title: "English Language Arts — Grades 9–12 (CCSS HS, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "Common Core State Standards for English Language Arts, Grades 9–12 (2010)",
   framework: "CCSS-ELA",
   subject: "ela",

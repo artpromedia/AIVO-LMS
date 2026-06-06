@@ -20,7 +20,24 @@ import {
 } from "../production.js";
 import { ROUTABLE_SURFACE_TYPES, validateItemVariant } from "../validate.js";
 
-const REQUIRED_SUBJECTS: RequiredSubjectSlug[] = ["math", "ela", "science", "writing"];
+const REQUIRED_SUBJECTS: RequiredSubjectSlug[] = [
+  "math",
+  "ela",
+  "science",
+  "writing",
+  "sel",
+  "speech",
+  "executive_function",
+  "life_skills",
+  "creative_arts",
+  "social_studies",
+  "world_languages",
+  "coding",
+  "geography",
+  "music",
+  "pe_health",
+  "stem_engineering",
+];
 const MIN_ITEMS_PER_SUBJECT = 20;
 
 describe("production item bank — coverage", () => {

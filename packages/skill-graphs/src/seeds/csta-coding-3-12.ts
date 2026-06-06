@@ -14,7 +14,7 @@ import type { SkillGraph } from "../types.js";
 export const cstaCoding3To12: SkillGraph = {
   id: "csta-coding-3-12",
   title: "Coding & Computational Thinking — Grades 3–12 (CSTA, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "CSTA K-12 Computer Science Standards (2017)",
   framework: "CSTA",
   subject: "coding",

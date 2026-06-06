@@ -30,6 +30,7 @@ export interface TutorPersona {
 /** Capability flag a tutor declares it can use. */
 export type TutorCapability =
   | "chat"
+  | "agentic_guidance"
   | "voice_in"
   | "voice_out"
   | "image_in"

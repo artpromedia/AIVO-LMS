@@ -62,6 +62,33 @@ export { cecLifeSkills6Plus } from "./seeds/cec-life-skills-6-plus.js";
 export { cecLifeSkills9To12 } from "./seeds/cec-life-skills-9-12.js";
 export { ncasCreativeArtsK2 } from "./seeds/ncas-creative-arts-k2.js";
 export { ncasCreativeArts3To12 } from "./seeds/ncas-creative-arts-3-12.js";
+export {
+  ccssWriting9To12,
+  ashaSpeech9To12,
+  executiveFunctionK12,
+  cecLifeSkillsK5,
+  actflWorldLanguagesK5,
+  ncasMusic9To12,
+  ngssEngineeringK2,
+} from "./seeds/catalog-k12-completion.js";
+export {
+  preKMathFoundations,
+  preKElaFoundations,
+  preKWritingFoundations,
+  preKScienceFoundations,
+  preKSelFoundations,
+  preKSpeechFoundations,
+  preKExecutiveFunctionFoundations,
+  preKLifeSkillsFoundations,
+  preKCreativeArtsFoundations,
+  preKSocialStudiesFoundations,
+  preKWorldLanguagesFoundations,
+  preKCodingFoundations,
+  preKGeographyFoundations,
+  preKMusicFoundations,
+  preKPeHealthFoundations,
+  preKStemEngineeringFoundations,
+} from "./seeds/catalog-prek-foundations.js";
 
 import { ccssMathKindergarten } from "./seeds/ccss-math-k.js";
 import { ccssMath1To8 } from "./seeds/ccss-math-1-8.js";
@@ -96,10 +123,53 @@ import { cecLifeSkills6Plus } from "./seeds/cec-life-skills-6-plus.js";
 import { cecLifeSkills9To12 } from "./seeds/cec-life-skills-9-12.js";
 import { ncasCreativeArtsK2 } from "./seeds/ncas-creative-arts-k2.js";
 import { ncasCreativeArts3To12 } from "./seeds/ncas-creative-arts-3-12.js";
+import {
+  ccssWriting9To12,
+  ashaSpeech9To12,
+  executiveFunctionK12,
+  cecLifeSkillsK5,
+  actflWorldLanguagesK5,
+  ncasMusic9To12,
+  ngssEngineeringK2,
+} from "./seeds/catalog-k12-completion.js";
+import {
+  preKMathFoundations,
+  preKElaFoundations,
+  preKWritingFoundations,
+  preKScienceFoundations,
+  preKSelFoundations,
+  preKSpeechFoundations,
+  preKExecutiveFunctionFoundations,
+  preKLifeSkillsFoundations,
+  preKCreativeArtsFoundations,
+  preKSocialStudiesFoundations,
+  preKWorldLanguagesFoundations,
+  preKCodingFoundations,
+  preKGeographyFoundations,
+  preKMusicFoundations,
+  preKPeHealthFoundations,
+  preKStemEngineeringFoundations,
+} from "./seeds/catalog-prek-foundations.js";
 import type { SkillGraph } from "./types.js";
 
 /** All seed graphs that ship with this package, in registration order. */
 export const SEED_GRAPHS: readonly SkillGraph[] = [
+  preKMathFoundations,
+  preKElaFoundations,
+  preKWritingFoundations,
+  preKScienceFoundations,
+  preKSelFoundations,
+  preKSpeechFoundations,
+  preKExecutiveFunctionFoundations,
+  preKLifeSkillsFoundations,
+  preKCreativeArtsFoundations,
+  preKSocialStudiesFoundations,
+  preKWorldLanguagesFoundations,
+  preKCodingFoundations,
+  preKGeographyFoundations,
+  preKMusicFoundations,
+  preKPeHealthFoundations,
+  preKStemEngineeringFoundations,
   ccssMathKindergarten,
   ccssMath1To8,
   ccssMath9To12,
@@ -133,6 +203,13 @@ export const SEED_GRAPHS: readonly SkillGraph[] = [
   cecLifeSkills9To12,
   ncasCreativeArtsK2,
   ncasCreativeArts3To12,
+  ccssWriting9To12,
+  ashaSpeech9To12,
+  executiveFunctionK12,
+  cecLifeSkillsK5,
+  actflWorldLanguagesK5,
+  ncasMusic9To12,
+  ngssEngineeringK2,
 ];
 
 /** Look up a seed graph by id. Returns `undefined` if not found. */

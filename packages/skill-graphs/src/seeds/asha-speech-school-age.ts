@@ -20,7 +20,7 @@ import type { SkillGraph } from "../types.js";
 export const ashaSpeechSchoolAge: SkillGraph = {
   id: "asha-speech-school-age",
   title: "Speech & Language — Grades 3–8 (ASHA school-age, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "ASHA Practice Portal — School-Age Language Development & Speech Sound Disorders",
   framework: "ASHA",
   subject: "speech",

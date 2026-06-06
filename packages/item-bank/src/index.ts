@@ -54,6 +54,17 @@ export { MATH_PRODUCTION_ITEMS } from "./seed-math.js";
 export { ELA_PRODUCTION_ITEMS } from "./seed-ela.js";
 export { SCIENCE_PRODUCTION_ITEMS } from "./seed-science.js";
 export { WRITING_PRODUCTION_ITEMS } from "./seed-writing.js";
+export {
+  CODING_PRODUCTION_ITEMS,
+  CREATIVE_ARTS_PRODUCTION_ITEMS,
+  GEOGRAPHY_PRODUCTION_ITEMS,
+  MUSIC_PRODUCTION_ITEMS,
+  PE_HEALTH_PRODUCTION_ITEMS,
+  SOCIAL_STUDIES_PRODUCTION_ITEMS,
+  STEM_ENGINEERING_PRODUCTION_ITEMS,
+  WORLD_LANGUAGES_PRODUCTION_ITEMS,
+} from "./seed-expansion-subjects.js";
+export { PREK_FOUNDATION_ITEMS, type PreKSubject } from "./seed-prek-foundations.js";
 
 // Sprint 3 — production loader. Use these helpers instead of importing
 // the seed-* modules directly so production callers can never accidentally

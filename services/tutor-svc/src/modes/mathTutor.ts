@@ -30,11 +30,11 @@ export const mathTutor: TutorDefinition = defineTutor({
     voiceStyle: "playful",
     locale: "en-US",
   },
-  capabilities: ["chat", "voice_out", "image_in", "manipulatives", "draw"],
+  capabilities: ["chat", "agentic_guidance", "voice_out", "image_in", "manipulatives", "draw"],
   subjects: ["math"],
   gradeBands: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL"],
-  skillGraphRefs: ["ccss-math-k", "ccss-math-1-8", "ccss-math-9-12"],
+  skillGraphRefs: ["prek-math-foundations", "ccss-math-k", "ccss-math-1-8", "ccss-math-9-12"],
   defaultContentPackRefs: ["math-k-fall-2026"],
   coverageMatrix: {
     PRE_K: "scaffold",
@@ -47,10 +47,10 @@ export const mathTutor: TutorDefinition = defineTutor({
     "6": "authored",
     "7": "authored",
     "8": "authored",
-    "9": "scaffold",
-    "10": "scaffold",
-    "11": "scaffold",
-    "12": "scaffold",
+    "9": "authored",
+    "10": "authored",
+    "11": "authored",
+    "12": "authored",
   },
   policy: {
     // `voice_out` is declared, so consent is required per the SDK

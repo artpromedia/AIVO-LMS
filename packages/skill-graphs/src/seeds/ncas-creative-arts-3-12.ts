@@ -13,7 +13,7 @@ import type { SkillGraph } from "../types.js";
 export const ncasCreativeArts3To12: SkillGraph = {
   id: "ncas-creative-arts-3-12",
   title: "Creative Arts & Expression — Grades 3–12 (NCAS, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "National Core Arts Standards (NCCAS 2014) — Visual/Theater/Dance/Media",
   framework: "NCAS",
   subject: "creative_arts",

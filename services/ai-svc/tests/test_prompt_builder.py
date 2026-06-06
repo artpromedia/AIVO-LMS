@@ -169,6 +169,26 @@ class TestCurriculumAlignment:
 
 
 # ---------------------------------------------------------------------------
+# Agentic domain guidance contract
+# ---------------------------------------------------------------------------
+class TestAgenticDomainGuidance:
+    def test_domain_scope_and_review_boundary_appear(self):
+        ctx = {
+            "tutor_domain": {
+                "subjects": ["math"],
+                "gradeBands": ["PRE_K", "K", "1", "12"],
+                "skillGraphRefs": ["prek-math-foundations", "ccss-math-k"],
+                "coverageMatrix": {"PRE_K": "scaffold", "K": "authored"},
+            }
+        }
+        prompt = build_tutor_system_prompt("ADDON_TUTOR_MATH", ctx, "STANDARD")
+        assert "Agentic Domain Guidance Contract" in prompt
+        assert "PRE_K" in prompt
+        assert "prek-math-foundations" in prompt
+        assert "must not be represented as formal mastery evidence" in prompt
+
+
+# ---------------------------------------------------------------------------
 # Mastery injection
 # ---------------------------------------------------------------------------
 class TestMasteryInjection:

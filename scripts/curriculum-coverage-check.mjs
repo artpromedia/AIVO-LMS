@@ -34,10 +34,22 @@ const repoRoot = resolve(__dirname, "..");
 // Grade bands are matched as substring tokens against seed `gradeBand`
 // declarations so a seed that declares `gradeBand: "K-2"` covers K, 1, 2.
 const REQUIRED_COVERAGE = {
-  math: ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
-  ela: ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
-  science: ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
-  writing: ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
+  math: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  ela: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  science: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  writing: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  sel: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  speech: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  executive_function: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  life_skills: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  creative_arts: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  social_studies: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  world_languages: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  coding: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  geography: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  music: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  pe_health: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  stem_engineering: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
 };
 
 const MIN_ITEMS_PER_SUBJECT = 20; // a smoke threshold — full requirement is
@@ -66,6 +78,7 @@ function record(subject, gradeBand) {
 function expandGradeBand(band) {
   if (!band) return [];
   const b = band.trim();
+  if (/^PRE_K$/i.test(b)) return ["PRE_K"];
   if (/^K$/i.test(b)) return ["K"];
   const range = b.match(/^(K|\d+)\s*-\s*(\d+)$/i);
   if (range) {
@@ -79,27 +92,42 @@ function expandGradeBand(band) {
   if (plus) {
     const start = Number(plus[1]);
     const out = [];
-    for (let i = start; i <= 8; i++) out.push(String(i));
+    for (let i = start; i <= 12; i++) out.push(String(i));
     return out;
   }
   if (/^\d+$/.test(b)) return [b];
   return [];
 }
 
+function extractGraphBlocks(src) {
+  const starts = [...src.matchAll(/^export const \w+:\s*SkillGraph\s*=/gm)].map(
+    (match) => match.index,
+  );
+  if (starts.length === 0) return [src];
+  return starts.map((start, index) => src.slice(start, starts[index + 1] ?? src.length));
+}
+
 for (const file of seedFiles) {
   const src = readFileSync(join(seedsDir, file), "utf8");
+  for (const graphSrc of extractGraphBlocks(src)) {
+  const graphId =
+    (graphSrc.match(/^\s*id:\s*"([^"]+)"/m) || [])[1] ?? file.replace(/\.ts$/, "");
   // Per-graph subject + gradeBand
-  const graphSubject = (src.match(/^\s*subject:\s*"([^"]+)"/m) || [])[1];
-  const graphGrade = (src.match(/^\s*gradeBand:\s*"([^"]+)"/m) || [])[1];
+  const graphSubject = (graphSrc.match(/^\s*subject:\s*"([^"]+)"/m) || [])[1];
+  const graphGrade = (graphSrc.match(/^\s*gradeBand:\s*"([^"]+)"/m) || [])[1];
   // Per-skill subject + gradeBand (override)
   const skillRe = /\{\s*id:\s*"([^"]+)"[\s\S]*?subject:\s*"([^"]+)"[\s\S]*?gradeBand:\s*"([^"]+)"/g;
   let any = false;
-  for (const m of src.matchAll(skillRe)) {
+  for (const m of graphSrc.matchAll(skillRe)) {
     record(m[2], m[3]);
     any = true;
   }
   if (!any && graphSubject && graphGrade) {
     record(graphSubject, graphGrade);
+  }
+  if (graphSubject) {
+    for (const grade of inferGraphBands(graphId)) record(graphSubject, grade);
+  }
   }
 }
 
@@ -141,11 +169,38 @@ for (const file of itemFiles) {
     const skillId = m[2];
     // skillId looks like "ccss-math.K.CC.A.1" or "ccss-ela.K..." etc.
     let subject = "unknown";
-    if (/math/i.test(skillId)) subject = "math";
+    if (/stem-engineering|stem_engineering|engineering/i.test(skillId)) subject = "stem_engineering";
+    else if (/executive-function|executive_function/i.test(skillId)) subject = "executive_function";
+    else if (/world-languages|world_languages|actfl/i.test(skillId)) subject = "world_languages";
+    else if (/social-studies|social_studies|c3\./i.test(skillId)) subject = "social_studies";
+    else if (/creative-arts|creative_arts|ncas\.arts/i.test(skillId)) subject = "creative_arts";
+    else if (/life-skills|life_skills/i.test(skillId)) subject = "life_skills";
+    else if (/pe-health|pe_health|shape\./i.test(skillId)) subject = "pe_health";
+    else if (/geography|ncge/i.test(skillId)) subject = "geography";
+    else if (/coding|csta/i.test(skillId)) subject = "coding";
+    else if (/speech|asha/i.test(skillId)) subject = "speech";
+    else if (/music|ncas\.music/i.test(skillId)) subject = "music";
+    else if (/sel|casel/i.test(skillId)) subject = "sel";
+    else if (/math/i.test(skillId)) subject = "math";
     else if (/ela|reading/i.test(skillId)) subject = "ela";
     else if (/science|ngss/i.test(skillId)) subject = "science";
     else if (/writing/i.test(skillId)) subject = "writing";
     itemCountsBySubject.set(subject, (itemCountsBySubject.get(subject) ?? 0) + 1);
+  }
+}
+const productionManifestPath = join(repoRoot, "packages/item-bank/src/production-manifest.json");
+if (existsSync(productionManifestPath)) {
+  const manifest = JSON.parse(readFileSync(productionManifestPath, "utf8"));
+  for (const [subject, count] of Object.entries(manifest)) {
+    if (Number.isInteger(count) && count >= 0) itemCountsBySubject.set(subject, count);
+  }
+}
+const preKItemCountsBySubject = new Map();
+const preKManifestPath = join(repoRoot, "packages/item-bank/src/production-prek-manifest.json");
+if (existsSync(preKManifestPath)) {
+  const manifest = JSON.parse(readFileSync(preKManifestPath, "utf8"));
+  for (const [subject, count] of Object.entries(manifest)) {
+    if (Number.isInteger(count) && count >= 0) preKItemCountsBySubject.set(subject, count);
   }
 }
 
@@ -178,6 +233,9 @@ for (const subj of subjects) {
     errors.push(
       `${subj}: item bank has ${items} items, minimum production threshold is ${MIN_ITEMS_PER_SUBJECT}`,
     );
+  }
+  if ((preKItemCountsBySubject.get(subj) ?? 0) < 1) {
+    errors.push(`${subj}: PRE_K item bank has no production entries`);
   }
 }
 
@@ -354,9 +412,11 @@ const signoffs = existsSync(signoffsPath)
 const graphVersionById = new Map();
 for (const file of seedFiles) {
   const src = readFileSync(join(seedsDir, file), "utf8");
-  const id = (src.match(/^\s*id:\s*"([^"]+)"/m) || [])[1];
-  const version = (src.match(/^\s*version:\s*"([^"]+)"/m) || [])[1];
-  if (id) graphVersionById.set(id, version ?? "unknown");
+  for (const graphSrc of extractGraphBlocks(src)) {
+    const id = (graphSrc.match(/^\s*id:\s*"([^"]+)"/m) || [])[1];
+    const version = (graphSrc.match(/^\s*version:\s*"([^"]+)"/m) || [])[1];
+    if (id) graphVersionById.set(id, version ?? "unknown");
+  }
 }
 
 // Heuristic mapping from graph id → set of grade bands the graph claims
@@ -388,13 +448,22 @@ function inferGraphBands(graphId) {
     bands.add("ADULT");
     return bands;
   }
+  if (/-prek$/.test(graphId) || /^prek-/.test(graphId)) {
+    bands.add("PRE_K");
+    return bands;
+  }
   // Numeric range like "-3-12", "-9-12", "-k-8", "-k2", "-1-8".
-  let m = graphId.match(/-(k|\d+)-?(\d+)$/i);
+  let m = graphId.match(/(?:^|-)(k|\d+)-(\d+)$/i);
   if (m) {
     const lo = m[1].toUpperCase() === "K" ? 0 : Number(m[1]);
     const hi = Number(m[2]);
-    // "-k2" means K-2 (lo=K, hi=2). "-k-8" → K-8. "-1-8" → 1-8.
     range(lo, hi);
+    return bands;
+  }
+  // Compact trailing K ranges such as "-k2".
+  m = graphId.match(/(?:^|-)k(\d+)$/i);
+  if (m) {
+    range(0, Number(m[1]));
     return bands;
   }
   // Single trailing grade like "-k" or "-9".
@@ -477,8 +546,9 @@ if (surplus.length) {
 }
 
 console.log("\nrequired thresholds:");
-console.log(`  - every subject covers grade bands K through 8`);
+console.log(`  - every subject covers grade bands PRE_K through 12`);
 console.log(`  - every subject has ≥ ${MIN_ITEMS_PER_SUBJECT} item bank entries`);
+console.log(`  - every subject has at least one explicit PRE_K production item`);
 
 // ---------------------------------------------------------------------------
 // 4. Regenerate docs/quality/coverage-dashboard.md from the live matrix.
@@ -492,7 +562,7 @@ if (tutorRows.length) {
   const dashboardPath = join(repoRoot, "docs/quality/coverage-dashboard.md");
   const STATUS_CELL = { authored: "A", scaffold: "S", missing: "—" };
   const lines = [
-    "# Per-Tutor K-12 Coverage Dashboard",
+    "# Per-Tutor PRE-K-12 Coverage Dashboard",
     "",
     "> Auto-generated by `pnpm curriculum:coverage`. Do not edit by hand —",
     "> changes here are overwritten on the next run. To update the underlying",

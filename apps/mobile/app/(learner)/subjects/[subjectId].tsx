@@ -129,6 +129,17 @@ export default function SubjectDetailScreen() {
                     {tutor.name} · {tutor.domain}
                   </Text>
                 </View>
+                <View
+                  style={[
+                    styles.chip,
+                    { borderColor: palette.border, backgroundColor: palette.bgPage },
+                  ]}
+                >
+                  <Ionicons name="chatbubbles" size={14} color={accent} />
+                  <Text style={[styles.chipText, { color: palette.ink }]}>
+                    {t("subjects.agenticScope", "Guidance for PRE-K through grade 12")}
+                  </Text>
+                </View>
               </View>
             </Card>
           )}
@@ -157,12 +168,14 @@ export default function SubjectDetailScreen() {
 
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={t("subjects.startLesson", "Start a lesson")}
+            accessibilityLabel={t("subjects.exploreWithTutor", "Explore with your tutor")}
             onPress={() => router.push(`/(learner)/tutor/${subject.tutorKey}` as Href)}
             style={[styles.cta, { backgroundColor: accent }]}
           >
-            <Ionicons name="play" size={18} color="#fff" />
-            <Text style={styles.ctaText}>{t("subjects.startLesson", "Start a lesson")}</Text>
+            <Ionicons name="chatbubbles" size={18} color="#fff" />
+            <Text style={styles.ctaText}>
+              {t("subjects.exploreWithTutor", "Explore with your tutor")}
+            </Text>
           </Pressable>
         </>
       )}

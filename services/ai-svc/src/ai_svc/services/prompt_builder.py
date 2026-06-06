@@ -131,6 +131,34 @@ def build_tutor_system_prompt(
         if framework:
             layer2_parts.append(f"\n## Curriculum Alignment: {framework}")
 
+    tutor_domain = brain_context.get("tutor_domain") or {}
+    if tutor_domain and isinstance(tutor_domain, dict):
+        subjects = tutor_domain.get("subjects") or []
+        grade_bands = tutor_domain.get("gradeBands") or []
+        skill_graph_refs = tutor_domain.get("skillGraphRefs") or []
+        coverage = tutor_domain.get("coverageMatrix") or {}
+        scaffold_bands = [
+            str(band)
+            for band, status in coverage.items()
+            if status == "scaffold"
+        ] if isinstance(coverage, dict) else []
+        domain_lines = [
+            "\n## Agentic Domain Guidance Contract",
+            "- Guide the learner through open-ended questions and topics within this tutor's domain.",
+            f"- Subjects: {', '.join(str(subject) for subject in subjects)}",
+            f"- Supported K-12 grade bands: {', '.join(str(band) for band in grade_bands)}",
+            f"- Grounding skill graphs: {', '.join(str(ref) for ref in skill_graph_refs)}",
+            "- Adapt explanations, examples, questions, and next steps to the learner's grade and functioning level.",
+            "- Keep the learner actively reasoning: diagnose understanding, choose a next step, provide a scaffold, and check understanding.",
+        ]
+        if scaffold_bands:
+            domain_lines.append(
+                "- Scaffold-guidance bands may be used for explanation and exploration, "
+                "but must not be represented as formal mastery evidence or a validated assessment: "
+                + ", ".join(scaffold_bands)
+            )
+        layer2_parts.append("\n".join(domain_lines))
+
     curriculum_focus = brain_context.get("curriculum_focus") or {}
     if curriculum_focus and isinstance(curriculum_focus, dict):
         focus_lines = ["\n## This Week's Focus (from parent/teacher upload)"]

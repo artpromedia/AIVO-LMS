@@ -18,7 +18,7 @@ import type { SkillGraph } from "../types.js";
 export const c3SocialStudies9To12: SkillGraph = {
   id: "c3-social-studies-9-12",
   title: "Social Studies & History — Grades 9–12 (C3 HS, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "NCSS C3 Framework for Social Studies State Standards (2013), grades 9–12 indicators",
   framework: "C3",
   subject: "social_studies",

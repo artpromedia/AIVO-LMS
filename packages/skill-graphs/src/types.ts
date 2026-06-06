@@ -42,6 +42,7 @@ export interface FrameworkRef {
 export type Subject =
   | "math"
   | "ela"
+  | "writing"
   | "science"
   | "social_studies"
   | "geography"

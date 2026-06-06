@@ -20,7 +20,7 @@ import type { SkillGraph } from "../types.js";
 export const c3SocialStudies3To8: SkillGraph = {
   id: "c3-social-studies-3-8",
   title: "Social Studies & History — Grades 3–8 (C3 / NCSS-aligned)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "NCSS C3 Framework for Social Studies State Standards (2013), grades 3–8 indicators",
   framework: "C3",
   subject: "social_studies",

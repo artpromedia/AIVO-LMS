@@ -77,18 +77,11 @@ export const BRAND = {
 export type AgeTier = "EARLY" | "MIDDLE" | "HIGH";
 
 const ALL_TIERS = ["EARLY", "MIDDLE", "HIGH"] as const;
-const SECONDARY_TIERS = ["MIDDLE", "HIGH"] as const;
-
 /**
  * Canonical tutor catalogue.
  *
- * Each tutor declares the age tiers in which it is a curricular fit:
- *   • Nova / Sage / Spark / Pixel / Echo / Harmony /
- *     Atlas / Cadence / Vigor / Muse  → all tiers
- *   • Chrono (formal Social Studies)   → MIDDLE + HIGH only
- *   • Lingua (World Languages)         → MIDDLE + HIGH only
- *   • Forge (STEM & Engineering)       → MIDDLE + HIGH only
- *   • Compass (Life Skills / Exec Fn.) → MIDDLE + HIGH only
+ * Current policy: every domain tutor supports agentic guidance across the
+ * EARLY, MIDDLE, and HIGH tiers, covering PRE-K through grade 12.
  *
  * Use `getTutorsForTier()` (below) to filter the catalogue for a learner's
  * age tier. The full catalogue is still exported as-is for admin / billing
@@ -128,7 +121,7 @@ export const TUTORS = {
     icon: "🏛️",
     color: "#6366F1",
     tier: "core",
-    tiers: SECONDARY_TIERS,
+    tiers: ALL_TIERS,
     avatar: "/images/tutors/chrono.png",
   },
   pixel: {
@@ -193,7 +186,7 @@ export const TUTORS = {
     icon: "🌐",
     color: "#0EA5E9",
     tier: "expansion",
-    tiers: SECONDARY_TIERS,
+    tiers: ALL_TIERS,
     avatar: "/images/tutors/lingua.png",
   },
   forge: {
@@ -202,7 +195,7 @@ export const TUTORS = {
     icon: "⚙️",
     color: "#EF4444",
     tier: "expansion",
-    tiers: SECONDARY_TIERS,
+    tiers: ALL_TIERS,
     avatar: "/images/tutors/forge.png",
   },
   compass: {
@@ -211,7 +204,7 @@ export const TUTORS = {
     icon: "🧭",
     color: "#F97316",
     tier: "expansion",
-    tiers: SECONDARY_TIERS,
+    tiers: ALL_TIERS,
     avatar: "/images/tutors/compass.png",
   },
   muse: {

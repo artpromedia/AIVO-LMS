@@ -83,7 +83,7 @@ describe("tutor-svc generic plan route", () => {
     assert.equal(res.statusCode, 200);
     const def = res.json() as { persona: { id: string }; subjects: string[] };
     assert.equal(def.persona.id, "sage");
-    assert.deepEqual(def.subjects, ["ela"]);
+    assert.deepEqual(def.subjects, ["ela", "writing"]);
   });
 
   it("GET /api/tutors/:key 404s on unknown tutor", async () => {
@@ -186,7 +186,7 @@ describe("tutor-svc generic plan route", () => {
         payload: {
           learnerId: "l1",
           consentRecordId: "c1",
-          gradeBand: "5",
+          gradeBand: "PRE_K",
           contentPack: makePack("c3.5.D2.His.3"),
         },
       });
@@ -194,7 +194,7 @@ describe("tutor-svc generic plan route", () => {
       const body = res.json() as Record<string, unknown>;
       assert.equal(body.code, "grade_band_not_production");
       assert.equal(body.authoringInProgress, true);
-      assert.equal(body.gradeBand, "5");
+      assert.equal(body.gradeBand, "PRE_K");
     } finally {
       if (prev !== undefined) process.env.AIVO_ALLOW_SCAFFOLD_CONTENT = prev;
     }

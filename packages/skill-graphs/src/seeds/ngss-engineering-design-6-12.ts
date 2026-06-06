@@ -16,7 +16,7 @@ import type { SkillGraph } from "../types.js";
 export const ngssEngineeringDesign6To12: SkillGraph = {
   id: "ngss-engineering-design-6-12",
   title: "STEM & Engineering Design — Grades 6–12 (NGSS ETS1, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "Next Generation Science Standards, Engineering Design (ETS1), grades 6–12 (2013)",
   framework: "NGSS-Engineering",
   subject: "stem_engineering",

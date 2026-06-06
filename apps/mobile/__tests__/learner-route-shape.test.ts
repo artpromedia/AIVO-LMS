@@ -9,7 +9,7 @@
  * needing to boot the Expo runtime.
  */
 import { describe, it, expect } from "vitest";
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const LEARNER_ROOT = join(__dirname, "..", "app", "(learner)");
@@ -80,5 +80,26 @@ describe("mobile (learner) route group", () => {
     // learners on a 404 after sign-in. The route-audit catches it on
     // the file-system check above; this assertion explains why.
     expect(exists("index.tsx")).toBe(true);
+  });
+
+  it("ships behavioral tutor parity for agentic guidance and structured lessons", () => {
+    const tutorScreen = readFileSync(join(LEARNER_ROOT, "tutor", "[tutorSlug].tsx"), "utf8");
+    for (const required of [
+      "useStartSession",
+      "useSendMessage",
+      "useEndSession",
+      "useSpeechInput",
+      "Speech.speak",
+      'sessionType: "agentic_guidance"',
+      "sessionClient.startSession",
+    ]) {
+      expect(tutorScreen, `mobile tutor screen missing ${required}`).toContain(required);
+    }
+  });
+
+  it("lists every domain tutor on the learner home screen", () => {
+    const learnerHome = readFileSync(join(LEARNER_ROOT, "index.tsx"), "utf8");
+    expect(learnerHome).toContain("const domainTutors = Object.entries(TUTORS)");
+    expect(learnerHome).not.toContain('t.tier === "core"');
   });
 });

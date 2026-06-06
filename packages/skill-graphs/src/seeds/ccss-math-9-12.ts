@@ -26,7 +26,7 @@ import type { SkillGraph } from "../types.js";
 export const ccssMath9To12: SkillGraph = {
   id: "ccss-math-9-12",
   title: "Mathematics — Grades 9–12 (CCSS HS, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "Common Core State Standards for Mathematics, High School conceptual categories (2010)",
   framework: "CCSS-Math",
   subject: "math",

@@ -9,6 +9,7 @@ import { computeTutorXp, computeTutorQuality, type TutorSignals } from "../servi
 import { emitTutorAudit } from "../lib/audit.js";
 import { getActiveCurriculumFocus } from "./curriculum.js";
 import { loadDapeProfile } from "../lib/dape.js";
+import { getTutorDefinition } from "../modes/registry.js";
 import {
   sessionStartSchema,
   sessionBySessionIdMessageSchema,
@@ -231,8 +232,26 @@ export function registerChatRoutes(app: FastifyInstance, db: any) {
     }
     const learnerId = await resolveLearnerId(rawLearnerId);
 
+    const tutorKey = TUTOR_SKU_TO_KEY[tutorSku];
+    const tutorDefinition = tutorKey ? getTutorDefinition(tutorKey) : undefined;
+    if (!tutorDefinition || !tutorDefinition.capabilities.includes("agentic_guidance")) {
+      return reply.code(400).send({ error: "Tutor does not support agentic domain guidance" });
+    }
+
     const tutorName = TUTOR_NAME_MAP[tutorSku] || "Tutor";
     const brainContext = await fetchBrainContext(learnerId);
+    brainContext.tutor_domain = {
+      tutorKey,
+      subjects: tutorDefinition.subjects,
+      gradeBands: tutorDefinition.gradeBands.filter((band) => band !== "ADULT"),
+      skillGraphRefs: tutorDefinition.skillGraphRefs,
+      coverageMatrix: tutorDefinition.coverageMatrix,
+      guidancePolicy: {
+        allowOpenEndedGuidance: true,
+        allowScaffoldGuidance: true,
+        allowScaffoldAssessment: false,
+      },
+    };
     const functioningLevel = (brainContext as any).functioning_level_profile?.level || "STANDARD";
 
     const subject = TUTOR_SKU_TO_SUBJECT[tutorSku];

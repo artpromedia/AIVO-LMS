@@ -90,6 +90,20 @@ function parseSkillObjects(src) {
       frameworkRefsBlock: m[4],
     });
   }
+  // Catalog files may use a typed graph factory instead of repeating the
+  // entire Skill literal. Preserve structural validation by extracting the
+  // literal framework, subject, grade band, and skill id from each factory
+  // invocation.
+  const factoryRe =
+    /makePreKGraph\(\{[\s\S]*?framework:\s*"([^"]+)"[\s\S]*?subject:\s*"([^"]+)"[\s\S]*?gradeBand:\s*"([^"]+)"[\s\S]*?skillId:\s*"([^"]+)"/g;
+  for (const m of src.matchAll(factoryRe)) {
+    skills.push({
+      id: m[4],
+      subject: m[2],
+      gradeBand: m[3],
+      frameworkRefsBlock: `[{ framework: "${m[1]}" }]`,
+    });
+  }
   return skills;
 }
 

@@ -14,7 +14,7 @@ import type { SkillGraph } from "../types.js";
 export const ncgeGeography3To12: SkillGraph = {
   id: "ncge-geography-3-12",
   title: "Geography & World Cultures — Grades 3–12 (NCGE, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "National Geography Standards (Geography for Life, 2nd ed., 2012)",
   framework: "NCGE",
   subject: "geography",

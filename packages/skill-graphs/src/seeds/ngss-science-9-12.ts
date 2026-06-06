@@ -19,7 +19,7 @@ import type { SkillGraph } from "../types.js";
 export const ngssScience9To12: SkillGraph = {
   id: "ngss-science-9-12",
   title: "Science — Grades 9–12 (NGSS HS, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "Next Generation Science Standards, High School performance expectations (2013)",
   framework: "NGSS",
   subject: "science",

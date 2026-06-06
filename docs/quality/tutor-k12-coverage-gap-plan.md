@@ -1,4 +1,11 @@
-# Tutor K–12 Coverage Gap Plan
+# Tutor PRE-K–12 Coverage Plan
+
+> Current status (2026-06-06): all 14 tutors declare agentic guidance across
+> PRE-K–12. All K–12 bands are authored and backed by the project owner's
+> human-review attestation. Dedicated PRE-K domain foundations now exist for
+> all 16 subjects; they remain scaffolded pending review except Echo's
+> established early-language content. The historical rollout plan below is
+> retained for provenance.
 
 > Snapshot taken: 2026-05-25 (Phases 1–3 AI-draft authoring landed).
 > Source of truth at runtime:

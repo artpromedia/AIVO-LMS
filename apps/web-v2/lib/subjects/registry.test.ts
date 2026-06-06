@@ -83,25 +83,21 @@ describe("LEARNER_SUBJECTS registry", () => {
       }
     });
 
-    it("the four required-coverage subjects are productionReady", () => {
-      // Mirrors REQUIRED_COVERAGE in scripts/curriculum-coverage-check.mjs.
-      const REQUIRED_READY_SLUGS = ["math", "reading", "science", "writing"];
+    it("every K-12 catalog subject is productionReady", () => {
+      const REQUIRED_READY_SLUGS = LEARNER_SUBJECTS.map((subject) => subject.slug);
       const readySlugs = new Set(getProductionReadySubjects().map((s) => s.slug));
       for (const slug of REQUIRED_READY_SLUGS) {
         expect(readySlugs, `subject ${slug} must be productionReady`).toContain(slug);
       }
     });
 
-    it("non-ready subjects keep their registry rows (admin/marketing keep them)", () => {
+    it("world-languages and coding are available to learners", () => {
       const allSlugs = LEARNER_SUBJECTS.map((s) => s.slug);
-      // world-languages and coding stay in the registry but are NOT
-      // production-ready — the brand registry is the canonical inventory
-      // for non-learner surfaces.
       expect(allSlugs).toContain("world-languages");
       expect(allSlugs).toContain("coding");
       const ready = new Set(getProductionReadySubjects().map((s) => s.slug));
-      expect(ready.has("world-languages")).toBe(false);
-      expect(ready.has("coding")).toBe(false);
+      expect(ready.has("world-languages")).toBe(true);
+      expect(ready.has("coding")).toBe(true);
     });
   });
 });

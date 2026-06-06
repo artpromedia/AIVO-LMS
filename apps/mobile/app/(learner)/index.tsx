@@ -26,7 +26,7 @@ export default function LearnerWorldMap() {
   const palette = useSensoryPalette();
   const type = useResponsiveType();
 
-  const coreTutors = Object.entries(TUTORS).filter(([, t]) => t.tier === "core");
+  const domainTutors = Object.entries(TUTORS);
 
   const cols = gridColumns(sizeClass);
   const cardWidthPct = `${Math.floor(100 / cols) - 2}%` as const;
@@ -205,7 +205,7 @@ export default function LearnerWorldMap() {
             {t("learner.questWorlds")}
           </Text>
           <View style={styles.worldGrid}>
-            {coreTutors.map(([key, tutor]) => {
+            {domainTutors.map(([key, tutor]) => {
               const entitled = isTutorEntitled(key);
               return (
                 <Pressable

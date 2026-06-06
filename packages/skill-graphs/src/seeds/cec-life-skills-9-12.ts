@@ -20,7 +20,7 @@ import type { SkillGraph } from "../types.js";
 export const cecLifeSkills9To12: SkillGraph = {
   id: "cec-life-skills-9-12",
   title: "Life Skills & Transition — Grades 9–12 + ADULT (CEC/DCDT, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "CEC DCDT Transition Competencies + Kohler's Taxonomy 2.0 + IDEA §300.43",
   framework: "CEC-LS",
   subject: "life_skills",

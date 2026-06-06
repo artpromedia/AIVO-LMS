@@ -18,7 +18,7 @@ import type { SkillGraph } from "../types.js";
 export const ncasMusic3To8: SkillGraph = {
   id: "ncas-music-3-8",
   title: "Music — Grades 3–8 (NCAS, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "National Core Arts Standards — Music (NAfME 2014), grades 3–8",
   framework: "NCAS",
   subject: "music",

@@ -25,14 +25,33 @@
 //   node scripts/web-mobile-parity-check.mjs --markdown # emit md report
 //   node scripts/web-mobile-parity-check.mjs --strict   # untracked = fail
 
-import { readdirSync, existsSync, statSync } from "node:fs";
+import { readdirSync, existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  compareSurfaceCapabilities,
+  parseSubjectSlugs,
+  parseTutorTierAssignments,
+  parseSurfaceCapabilities,
+  sourceMarkerAxis,
+  subjectVisibilityAxis,
+} from "./lib/web-mobile-parity.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..");
 const WEB_APP = join(repoRoot, "apps/web-v2/app");
 const MOB_APP = join(repoRoot, "apps/mobile/app");
+const SURFACE_CAPABILITIES = join(
+  repoRoot,
+  "packages/learner-surfaces/src/SurfaceRouter/surface-capability.ts",
+);
+const SUBJECT_REGISTRY = join(repoRoot, "packages/brand/src/subjects.ts");
+const WEB_SUBJECTS_PAGE = join(repoRoot, "apps/web-v2/app/learner/subjects/page.tsx");
+const MOBILE_SUBJECTS_PAGE = join(repoRoot, "apps/mobile/app/(learner)/subjects/index.tsx");
+const MOBILE_TUTOR_SCREEN = join(repoRoot, "apps/mobile/app/(learner)/tutor/[tutorSlug].tsx");
+const MOBILE_TUTOR_HOOK = join(repoRoot, "apps/mobile/hooks/useTutor.ts");
+const MOBILE_LEARNER_HOME = join(repoRoot, "apps/mobile/app/(learner)/index.tsx");
+const BRAND_CATALOG = join(repoRoot, "packages/brand/src/index.ts");
 
 const argv = new Set(process.argv.slice(2));
 const MARKDOWN = argv.has("--markdown");
@@ -166,7 +185,6 @@ const PARITY_MATRIX = {
       mobile: "(learner)/badges",
       status: P,
     },
-    { web: "/learner/notifications", mobile: "(learner)/notifications", status: P },
     { web: "/learner/homework", mobile: "(learner)/homework/index", status: P },
     { web: "/learner/homework/[sessionId]", mobile: "(learner)/homework/[sessionId]", status: P },
     { web: "/learner/tutor", mobile: "(learner)/tutor/[tutorSlug]", status: P },
@@ -318,11 +336,6 @@ const PARITY_MATRIX = {
     { web: "/parent/consent", mobile: "(parent)/consent/index", status: P },
     { web: "/parent/consent/[learnerId]", mobile: "(parent)/consent/[learnerId]", status: P },
     {
-      web: "/parent/notifications",
-      mobile: "(parent)/inbox",
-      status: P,
-    },
-    {
       web: "/parent/reports",
       mobile: "(parent)/reports",
       status: P,
@@ -419,12 +432,17 @@ for (const [role, rows] of Object.entries(PARITY_MATRIX)) {
 const errors = [];
 const warnings = [];
 
-// 2. Untracked in-scope web routes (parity drift guard).
+// 2. Untracked and stale in-scope web routes (parity drift guard).
 const untracked = webRoutes.filter((r) => !isWebOnly(r) && !tracked.has(r)).sort();
 for (const r of untracked) {
   const msg = `untracked web route ${r} — add it to PARITY_MATRIX (web grew; re-audit mobile parity).`;
   if (STRICT) errors.push(msg);
   else warnings.push(msg);
+}
+for (const route of tracked.keys()) {
+  if (!webRoutes.includes(route)) {
+    errors.push(`stale parity row ${route} — no matching web page exists on disk.`);
+  }
 }
 
 // 3. Parity/Partial rows must point at a real mobile file.
@@ -444,12 +462,124 @@ for (const { web, mobile, status, role } of tracked.values()) {
   }
 }
 
+// 4. Surface-type parity comes from the typed capability registry used by both
+// renderers. A mismatch is a real UX gap even when route parity is perfect.
+const surfaceAxis = existsSync(SURFACE_CAPABILITIES)
+  ? compareSurfaceCapabilities(parseSurfaceCapabilities(readFileSync(SURFACE_CAPABILITIES, "utf8")))
+  : [];
+if (surfaceAxis.length === 0) {
+  errors.push("surface capability registry missing or unreadable.");
+}
+for (const surface of surfaceAxis) {
+  if (!surface.parity) {
+    errors.push(
+      `surface ${surface.type} support differs: web=${surface.web}, mobile=${surface.mobile}.`,
+    );
+  }
+}
+
+// 5. Subject visibility parity is structural: both learner subject grids must
+// consume the canonical discoverable-subject registry.
+const subjectSlugs = existsSync(SUBJECT_REGISTRY)
+  ? parseSubjectSlugs(readFileSync(SUBJECT_REGISTRY, "utf8"))
+  : [];
+const subjectConsumers = {
+  web:
+    existsSync(WEB_SUBJECTS_PAGE) &&
+    /\bgetDiscoverableSubjects\s*\(/.test(readFileSync(WEB_SUBJECTS_PAGE, "utf8")),
+  mobile:
+    existsSync(MOBILE_SUBJECTS_PAGE) &&
+    /\bgetDiscoverableSubjects\s*\(/.test(readFileSync(MOBILE_SUBJECTS_PAGE, "utf8")),
+};
+const subjectAxis = subjectVisibilityAxis(subjectSlugs, subjectConsumers);
+if (subjectAxis.length === 0) {
+  errors.push("canonical learner subject registry missing or unreadable.");
+}
+for (const subject of subjectAxis) {
+  if (!subject.parity || !subject.web) {
+    errors.push(
+      `subject ${subject.subject} visibility differs: web=${subject.web}, mobile=${subject.mobile}.`,
+    );
+  }
+}
+
+// 6. Tutor behavior parity verifies that mobile implements the same two tutor
+// modes as web/backend: open-ended agentic guidance and structured lessons.
+// Voice input and read-aloud are required for PRE-K accessibility.
+const mobileTutorSource = existsSync(MOBILE_TUTOR_SCREEN)
+  ? readFileSync(MOBILE_TUTOR_SCREEN, "utf8")
+  : "";
+const mobileTutorHookSource = existsSync(MOBILE_TUTOR_HOOK)
+  ? readFileSync(MOBILE_TUTOR_HOOK, "utf8")
+  : "";
+const mobileLearnerHomeSource = existsSync(MOBILE_LEARNER_HOME)
+  ? readFileSync(MOBILE_LEARNER_HOME, "utf8")
+  : "";
+const behaviorAxis = sourceMarkerAxis(
+  `${mobileTutorSource}\n${mobileTutorHookSource}\n${mobileLearnerHomeSource}`,
+  [
+    {
+      feature: "agentic tutor chat",
+      markers: ["useStartSession", "useSendMessage", 'sessionType: "agentic_guidance"'],
+    },
+    {
+      feature: "tutor session completion",
+      markers: ["useEndSession", "endTutor.mutateAsync"],
+    },
+    {
+      feature: "PRE-K voice input",
+      markers: ["useSpeechInput", "speechInput.start", "speechInput.stop"],
+    },
+    {
+      feature: "tutor read-aloud",
+      markers: ["expo-speech", "Speech.speak"],
+    },
+    {
+      feature: "structured lesson launch",
+      markers: ["sessionClient.startSession", "/(learner)/stage/"],
+    },
+    {
+      feature: "tutor SKU API contract",
+      markers: ["tutorSku", "JSON.stringify({ learnerId, tutorSku, sessionType })"],
+    },
+    {
+      feature: "all tutor discovery",
+      markers: ["const domainTutors = Object.entries(TUTORS)", "domainTutors.map"],
+    },
+  ],
+);
+for (const behavior of behaviorAxis) {
+  if (!behavior.present) {
+    errors.push(
+      `mobile tutor behavior missing ${behavior.feature}: ${behavior.missing.join(", ")}.`,
+    );
+  }
+}
+
+// 7. Every tutor must remain discoverable to the EARLY tier, which includes
+// PRE-K. A stale SECONDARY_TIERS assignment would silently hide domains.
+const tutorTierAxis = existsSync(BRAND_CATALOG)
+  ? parseTutorTierAssignments(readFileSync(BRAND_CATALOG, "utf8"))
+  : [];
+if (tutorTierAxis.length === 0) {
+  errors.push("canonical tutor tier assignments missing or unreadable.");
+}
+for (const tutor of tutorTierAxis) {
+  if (tutor.tiers !== "ALL_TIERS") {
+    errors.push(`tutor ${tutor.tutor} is not available to PRE-K/EARLY learners.`);
+  }
+}
+
 // --- Tally ------------------------------------------------------------
 
 const tally = { [P]: 0, [PARTIAL]: 0, [MISSING]: 0 };
 for (const { status } of tracked.values()) tally[status]++;
 const inScope = tally[P] + tally[PARTIAL] + tally[MISSING];
 const parityPct = ((tally[P] / inScope) * 100).toFixed(0);
+const surfaceParityCount = surfaceAxis.filter((surface) => surface.parity).length;
+const subjectParityCount = subjectAxis.filter((subject) => subject.parity && subject.web).length;
+const behaviorParityCount = behaviorAxis.filter((behavior) => behavior.present).length;
+const earlyTutorCount = tutorTierAxis.filter((tutor) => tutor.tiers === "ALL_TIERS").length;
 
 // --- Output -----------------------------------------------------------
 
@@ -470,6 +600,12 @@ for (const [role, rows] of Object.entries(PARITY_MATRIX)) {
 }
 console.log(
   `\n  TOTAL            parity ${tally[P]}  partial ${tally[PARTIAL]}  missing ${tally[MISSING]}  (${parityPct}% full parity, ${inScope} in-scope routes)`,
+);
+console.log(
+  `  Surfaces         parity ${surfaceParityCount}/${surfaceAxis.length}  Subjects visible ${subjectParityCount}/${subjectAxis.length}`,
+);
+console.log(
+  `  Tutor behavior   parity ${behaviorParityCount}/${behaviorAxis.length}  PRE-K tutors ${earlyTutorCount}/${tutorTierAxis.length}`,
 );
 console.log(
   `  Web-only (excluded): ${webRoutes.filter(isWebOnly).length} routes (admin / dev / design-system).\n`,
@@ -512,6 +648,48 @@ function emitMarkdown() {
   L.push(
     `Full parity: **${parityPct}%**. ${webRoutes.filter(isWebOnly).length} web-only routes excluded.`,
   );
+  L.push("");
+  L.push("## Surface-Type Parity");
+  L.push("");
+  L.push("| Surface type | Web support | Mobile support | Parity |");
+  L.push("| ------------ | ----------- | -------------- | ------ |");
+  for (const surface of surfaceAxis) {
+    L.push(
+      `| \`${surface.type}\` | ${surface.web} | ${surface.mobile} | ${surface.parity ? "Yes" : "**No**"} |`,
+    );
+  }
+  L.push("");
+  L.push("## Subject Visibility Parity");
+  L.push("");
+  L.push(
+    "Both learner subject grids consume the canonical `getDiscoverableSubjects()` registry.",
+  );
+  L.push("");
+  L.push("| Subject | Web visible | Mobile visible | Parity |");
+  L.push("| ------- | ----------- | -------------- | ------ |");
+  for (const subject of subjectAxis) {
+    L.push(
+      `| \`${subject.subject}\` | ${subject.web ? "Yes" : "No"} | ${subject.mobile ? "Yes" : "No"} | ${subject.parity && subject.web ? "Yes" : "**No**"} |`,
+    );
+  }
+  L.push("");
+  L.push("## Tutor Behavior Parity");
+  L.push("");
+  L.push("| Capability | Mobile implemented | Missing markers |");
+  L.push("| ---------- | ------------------ | --------------- |");
+  for (const behavior of behaviorAxis) {
+    L.push(
+      `| ${behavior.feature} | ${behavior.present ? "Yes" : "**No**"} | ${behavior.missing.join(", ") || "None"} |`,
+    );
+  }
+  L.push("");
+  L.push("## PRE-K Tutor Discovery");
+  L.push("");
+  L.push("| Tutor | Available to EARLY / PRE-K |");
+  L.push("| ----- | -------------------------- |");
+  for (const tutor of tutorTierAxis) {
+    L.push(`| \`${tutor.tutor}\` | ${tutor.tiers === "ALL_TIERS" ? "Yes" : "**No**"} |`);
+  }
   L.push("");
   for (const [role, rows] of Object.entries(PARITY_MATRIX)) {
     L.push(`## ${role}`);

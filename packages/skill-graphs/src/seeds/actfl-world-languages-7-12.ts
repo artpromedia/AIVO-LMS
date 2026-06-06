@@ -20,7 +20,7 @@ import type { SkillGraph } from "../types.js";
 export const actflWorldLanguages7To12: SkillGraph = {
   id: "actfl-world-languages-7-12",
   title: "World Languages — Grades 7–12 (ACTFL Novice-Mid → Intermediate-Mid, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "ACTFL World-Readiness Standards & Performance Descriptors (2017)",
   framework: "ACTFL",
   subject: "world_languages",

@@ -18,7 +18,7 @@ import type { SkillGraph } from "../types.js";
 export const shapePeHealth3To12: SkillGraph = {
   id: "shape-pe-health-3-12",
   title: "PE & Health — Grades 3–12 (SHAPE/NHES, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "SHAPE America PE National Standards (2014) + NHES (2022)",
   framework: "SHAPE",
   subject: "pe_health",

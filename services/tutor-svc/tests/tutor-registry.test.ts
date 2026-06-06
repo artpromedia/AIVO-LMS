@@ -44,6 +44,19 @@ describe("tutor-svc tutor registry", () => {
     }
   });
 
+  it("each tutor supports agentic guidance across PRE-K-12", () => {
+    const k12 = ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+    for (const [key, def] of listTutorDefinitions()) {
+      assert.ok(
+        def.capabilities.includes("agentic_guidance"),
+        `tutor "${key}" must declare agentic_guidance`,
+      );
+      for (const band of k12) {
+        assert.ok(def.gradeBands.includes(band as any), `tutor "${key}" must include grade ${band}`);
+      }
+    }
+  });
+
   it("each TutorDefinition declares a coverageMatrix covering every gradeBand", () => {
     for (const [key, def] of listTutorDefinitions()) {
       assert.ok(

@@ -144,7 +144,183 @@
         "date": "2026-05-18",
         "notes": "Inherited from Sprint 5 K-2 production seed."
       }
+    ],
+    "ccss-math-9-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "ccss-ela-9-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "ccss-writing-9-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+      }
+    ],
+    "ngss-science-9-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "c3-social-studies-3-8": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "c3-social-studies-9-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "csta-coding-3-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "asha-speech-school-age": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "asha-speech-9-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+      }
+    ],
+    "casel-sel-3-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "ncge-geography-3-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "ncas-music-3-8": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "ncas-music-9-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+      }
+    ],
+    "shape-pe-health-3-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "actfl-world-languages-k-5": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+      }
+    ],
+    "actfl-world-languages-7-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "ngss-engineering-design-k-2": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+      }
+    ],
+    "ngss-engineering-design-6-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "cec-life-skills-k-5": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+      }
+    ],
+    "cec-executive-function-k-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+      }
+    ],
+    "cec-life-skills-9-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
+    ],
+    "ncas-creative-arts-3-12": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-06",
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+      }
     ]
   },
-  "_pending_review": "All `0.1.0-draft` graphs require SME sign-off before they can back an `authored` coverageMatrix cell. Add them here once reviewed."
+  "_pending_review": "PRE_K and ADULT coverage remains separately scoped. All K-12 graph promotions are backed by the project owner's human-review attestation dated 2026-06-06."
 }

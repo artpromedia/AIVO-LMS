@@ -17,14 +17,60 @@ import { MATH_PRODUCTION_ITEMS } from "./seed-math.js";
 import { ELA_PRODUCTION_ITEMS } from "./seed-ela.js";
 import { SCIENCE_PRODUCTION_ITEMS } from "./seed-science.js";
 import { WRITING_PRODUCTION_ITEMS } from "./seed-writing.js";
+import { SEL_PRODUCTION_ITEMS } from "./seed-sel.js";
+import { SPEECH_PRODUCTION_ITEMS } from "./seed-speech.js";
+import { EXECUTIVE_FUNCTION_PRODUCTION_ITEMS } from "./seed-executive-function.js";
+import { LIFE_SKILLS_PRODUCTION_ITEMS } from "./seed-life-skills.js";
+import {
+  CODING_PRODUCTION_ITEMS,
+  CREATIVE_ARTS_PRODUCTION_ITEMS,
+  GEOGRAPHY_PRODUCTION_ITEMS,
+  MUSIC_PRODUCTION_ITEMS,
+  PE_HEALTH_PRODUCTION_ITEMS,
+  SOCIAL_STUDIES_PRODUCTION_ITEMS,
+  STEM_ENGINEERING_PRODUCTION_ITEMS,
+  WORLD_LANGUAGES_PRODUCTION_ITEMS,
+} from "./seed-expansion-subjects.js";
+import { PREK_FOUNDATION_ITEMS } from "./seed-prek-foundations.js";
 
-export type RequiredSubjectSlug = "math" | "ela" | "science" | "writing";
+export type RequiredSubjectSlug =
+  | "math"
+  | "ela"
+  | "science"
+  | "writing"
+  | "sel"
+  | "speech"
+  | "executive_function"
+  | "life_skills"
+  | "creative_arts"
+  | "social_studies"
+  | "world_languages"
+  | "coding"
+  | "geography"
+  | "music"
+  | "pe_health"
+  | "stem_engineering";
 
 const SUBJECT_ITEMS: Record<RequiredSubjectSlug, readonly Item[]> = {
-  math: MATH_PRODUCTION_ITEMS,
-  ela: ELA_PRODUCTION_ITEMS,
-  science: SCIENCE_PRODUCTION_ITEMS,
-  writing: WRITING_PRODUCTION_ITEMS,
+  math: [...PREK_FOUNDATION_ITEMS.math, ...MATH_PRODUCTION_ITEMS],
+  ela: [...PREK_FOUNDATION_ITEMS.ela, ...ELA_PRODUCTION_ITEMS],
+  science: [...PREK_FOUNDATION_ITEMS.science, ...SCIENCE_PRODUCTION_ITEMS],
+  writing: [...PREK_FOUNDATION_ITEMS.writing, ...WRITING_PRODUCTION_ITEMS],
+  sel: [...PREK_FOUNDATION_ITEMS.sel, ...SEL_PRODUCTION_ITEMS],
+  speech: [...PREK_FOUNDATION_ITEMS.speech, ...SPEECH_PRODUCTION_ITEMS],
+  executive_function: [
+    ...PREK_FOUNDATION_ITEMS.executive_function,
+    ...EXECUTIVE_FUNCTION_PRODUCTION_ITEMS,
+  ],
+  life_skills: [...PREK_FOUNDATION_ITEMS.life_skills, ...LIFE_SKILLS_PRODUCTION_ITEMS],
+  creative_arts: [...PREK_FOUNDATION_ITEMS.creative_arts, ...CREATIVE_ARTS_PRODUCTION_ITEMS],
+  social_studies: [...PREK_FOUNDATION_ITEMS.social_studies, ...SOCIAL_STUDIES_PRODUCTION_ITEMS],
+  world_languages: [...PREK_FOUNDATION_ITEMS.world_languages, ...WORLD_LANGUAGES_PRODUCTION_ITEMS],
+  coding: [...PREK_FOUNDATION_ITEMS.coding, ...CODING_PRODUCTION_ITEMS],
+  geography: [...PREK_FOUNDATION_ITEMS.geography, ...GEOGRAPHY_PRODUCTION_ITEMS],
+  music: [...PREK_FOUNDATION_ITEMS.music, ...MUSIC_PRODUCTION_ITEMS],
+  pe_health: [...PREK_FOUNDATION_ITEMS.pe_health, ...PE_HEALTH_PRODUCTION_ITEMS],
+  stem_engineering: [...PREK_FOUNDATION_ITEMS.stem_engineering, ...STEM_ENGINEERING_PRODUCTION_ITEMS],
 };
 
 /** Default defect budget for production banks — auto-retire variants
@@ -33,12 +79,7 @@ const DEFAULT_DEFECT_BUDGET = 5;
 
 /** All production items across the four required subjects. */
 export function getAllProductionItems(): Item[] {
-  return [
-    ...MATH_PRODUCTION_ITEMS,
-    ...ELA_PRODUCTION_ITEMS,
-    ...SCIENCE_PRODUCTION_ITEMS,
-    ...WRITING_PRODUCTION_ITEMS,
-  ];
+  return Object.values(SUBJECT_ITEMS).flatMap((items) => [...items]);
 }
 
 /** Items for one required subject. */
@@ -72,10 +113,7 @@ export function getCombinedProductionBank(defectBudget: number = DEFAULT_DEFECT_
 /** Item counts per required subject — used by the validate script and
  *  the curriculum-coverage gate for fast sanity checks. */
 export function getProductionItemCounts(): Record<RequiredSubjectSlug, number> {
-  return {
-    math: MATH_PRODUCTION_ITEMS.length,
-    ela: ELA_PRODUCTION_ITEMS.length,
-    science: SCIENCE_PRODUCTION_ITEMS.length,
-    writing: WRITING_PRODUCTION_ITEMS.length,
-  };
+  return Object.fromEntries(
+    Object.entries(SUBJECT_ITEMS).map(([subject, items]) => [subject, items.length]),
+  ) as Record<RequiredSubjectSlug, number>;
 }

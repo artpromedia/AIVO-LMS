@@ -14,7 +14,7 @@ import type { SkillGraph } from "../types.js";
 export const caselSel3To12: SkillGraph = {
   id: "casel-sel-3-12",
   title: "Social-Emotional Learning — Grades 3–12 (CASEL, AI-draft)",
-  version: "0.1.0-draft",
+  version: "1.0.0",
   source: "CASEL Framework for Social and Emotional Learning (2020)",
   framework: "CASEL",
   subject: "sel",

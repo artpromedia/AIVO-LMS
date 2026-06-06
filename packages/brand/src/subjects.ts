@@ -69,7 +69,7 @@ export interface LearnerSubject {
    * these out via `getProductionReadySubjects()`; admin / marketing
    * surfaces may still reference them.
    *
-   * A subject flips to `true` once it ships K-8 skill seeds AND ≥20
+   * A subject flips to `true` once it ships PRE-K-12 skill seeds AND ≥20
    * production items per `scripts/curriculum-coverage-check.mjs`.
    */
   productionReady: boolean;
@@ -119,7 +119,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "social_emotional",
     tutorKey: "harmony",
     baselineDomain: true,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "speech",
@@ -129,7 +129,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: null,
     tutorKey: "echo",
     baselineDomain: true,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "executive-function",
@@ -139,7 +139,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "executive_function",
     tutorKey: "compass",
     baselineDomain: true,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "writing",
@@ -159,7 +159,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "life_skills",
     tutorKey: "compass",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "art",
@@ -169,7 +169,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: null,
     tutorKey: "muse",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "social-studies",
@@ -179,7 +179,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "social_studies",
     tutorKey: "chrono",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "world-languages",
@@ -189,7 +189,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "world_language",
     tutorKey: "lingua",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "coding",
@@ -199,13 +199,9 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "coding",
     tutorKey: "pixel",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
-  // Sprint 1 (subject/tutor UX) — give the four "orphan" tutors a learner
-  // subject row so they are reachable from the subjects grid (previously they
-  // had a full backend but no card). They ship as not-yet-production-ready, so
-  // `getDiscoverableSubjects()` surfaces them as locked, preview-only cards
-  // (content in progress) rather than fully playable subjects.
+  // The remaining domain tutors are first-class PRE-K-12 learner subjects.
   {
     slug: "geography",
     name: "Geography",
@@ -214,7 +210,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: null,
     tutorKey: "atlas",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "music",
@@ -224,7 +220,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: null,
     tutorKey: "cadence",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "physical-education",
@@ -234,7 +230,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: null,
     tutorKey: "vigor",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
   {
     slug: "engineering",
@@ -244,7 +240,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: null,
     tutorKey: "forge",
     baselineDomain: false,
-    productionReady: false,
+    productionReady: true,
   },
 ] as const satisfies readonly LearnerSubject[];
 
