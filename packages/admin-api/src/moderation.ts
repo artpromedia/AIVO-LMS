@@ -1,7 +1,7 @@
 import "server-only";
 
 import { adminGet, adminPatch } from "./client";
-import type { SessionProfile } from "@/lib/auth/types";
+import type { SessionProfile } from "@aivo/admin-auth/types";
 
 export type AdminModerationStatus =
   | "PENDING"

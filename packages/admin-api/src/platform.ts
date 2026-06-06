@@ -18,7 +18,7 @@ import {
   normalizeRoleKey,
   normalizeTenantKind,
 } from "./types";
-import type { SessionProfile } from "@/lib/auth/types";
+import type { SessionProfile } from "@aivo/admin-auth/types";
 
 function mapTenant(row: Record<string, unknown>): AdminTenantSummary {
   const type = typeof row.type === "string" ? row.type : null;

@@ -8,8 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { getAdminTenant } from "@/lib/admin-api/platform";
-import { listScimTokens } from "@/lib/admin-api/scim";
+import { getAdminTenant } from "@aivo/admin-api/platform";
+import { listScimTokens } from "@aivo/admin-api/scim";
 
 export default async function Page({ params }: { params: Promise<{ tenantId: string }> }) {
   const session = await requirePageRole(["platform_admin"]);

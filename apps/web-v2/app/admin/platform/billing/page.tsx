@@ -7,9 +7,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { listBillingAccounts } from "@/lib/admin-api/billing";
+import { listBillingAccounts } from "@aivo/admin-api/billing";
 import { ROLE_LABEL } from "@/lib/auth/types";
-import { billingTone } from "@/lib/admin-api/types";
+import { billingTone } from "@aivo/admin-api/types";
 
 export default async function Page() {
   const session = await requirePlatformPage(Permission.BillingRead);

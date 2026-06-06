@@ -7,8 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { platformNavForSession } from "@/components/layout/role-shells";
 import { getTranslations } from "next-intl/server";
-import { listBillingAccounts } from "@/lib/admin-api/billing";
-import { getPlatformSystemHealth, listRecentAiActivity } from "@/lib/admin-api/platform";
+import { listBillingAccounts } from "@aivo/admin-api/billing";
+import { getPlatformSystemHealth, listRecentAiActivity } from "@aivo/admin-api/platform";
 import { sessionHasPermission } from "@/lib/auth/permissions";
 import { ROLE_LABEL } from "@/lib/auth/types";
 import {

@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { listAdminTenants, listAdminUsers } from "@/lib/admin-api/platform";
+import { listAdminTenants, listAdminUsers } from "@aivo/admin-api/platform";
 import { ROLE_LABEL } from "@/lib/auth/types";
 
 const ROLE_ORDER = [

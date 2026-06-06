@@ -5,7 +5,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { getModerationStats, listModerationEvents } from "@/lib/admin-api/moderation";
+import { getModerationStats, listModerationEvents } from "@aivo/admin-api/moderation";
 import { ShieldAlert, Inbox, ScrollText, FlaskConical } from "lucide-react";
 
 export const dynamic = "force-dynamic";

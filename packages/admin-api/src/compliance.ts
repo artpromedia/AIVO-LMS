@@ -1,7 +1,7 @@
 import "server-only";
 
 import { adminGet } from "./client";
-import type { SessionProfile } from "@/lib/auth/types";
+import type { SessionProfile } from "@aivo/admin-auth/types";
 
 export type AdminControlStatus = "pass" | "warn" | "fail" | "unknown";
 

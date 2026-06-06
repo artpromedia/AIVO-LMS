@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Banner } from "@/components/ui/banner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { listAdminTenants } from "@/lib/admin-api/platform";
+import { listAdminTenants } from "@aivo/admin-api/platform";
 import { enterpriseFlags } from "@/lib/bff/feature-flags";
 
 export default async function Page() {

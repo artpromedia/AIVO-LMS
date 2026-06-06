@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { listModerationEvents } from "@/lib/admin-api/moderation";
+import { listModerationEvents } from "@aivo/admin-api/moderation";
 import { ReviewActions } from "./actions";
 
 export const dynamic = "force-dynamic";

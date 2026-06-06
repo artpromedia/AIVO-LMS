@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { getPlatformAiCosts } from "@/lib/admin-api/platform";
+import { getPlatformAiCosts } from "@aivo/admin-api/platform";
 import { ROLE_LABEL } from "@/lib/auth/types";
 import { getTranslations } from "next-intl/server";
 
