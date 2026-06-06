@@ -12,6 +12,23 @@ npx playwright install chromium
 WEB_BASE_URL=http://localhost:5000 npm test
 ```
 
+The repository-level `pnpm test` command intentionally excludes this package.
+It is the deterministic, sequential unit/service test gate and does not start
+the live service mesh required by these Playwright scenarios. Run the full
+browser suite explicitly from the repository root with:
+
+```bash
+pnpm test:e2e
+```
+
+The Sprint 12 compose-backed subset runs sequentially with:
+
+```bash
+docker compose -f docker-compose.e2e.yml up -d --wait
+pnpm test:e2e:sprint12
+docker compose -f docker-compose.e2e.yml down -v
+```
+
 The DISTRICT_ADMIN-rejection test is auto-skipped unless you provide seeded
 credentials:
 

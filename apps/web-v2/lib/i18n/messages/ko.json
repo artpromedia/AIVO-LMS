@@ -672,13 +672,13 @@
       "modality_unknown": "Mixed"
     },
     "calm_summary": {
-      "title": "Calm moments",
-      "none": "{name} hasn't used the Calm Corner yet.",
-      "moments": "{name} took {count} calm moments this week.",
-      "completed": "{count} finished gently.",
-      "last_active_today": "Last active today",
-      "last_active_yesterday": "Last active yesterday",
-      "last_active_days": "Last active {count} days ago"
+      "title": "차분한 순간",
+      "none": "{name}님은 아직 차분한 공간을 사용하지 않았습니다.",
+      "moments": "{name}님은 이번 주에 {count}번 차분한 시간을 가졌습니다.",
+      "completed": "{count}번 편안하게 마쳤습니다.",
+      "last_active_today": "마지막 활동: 오늘",
+      "last_active_yesterday": "마지막 활동: 어제",
+      "last_active_days": "마지막 활동: {count}일 전"
     }
   },
   "brain_clone": {

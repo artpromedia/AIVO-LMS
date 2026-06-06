@@ -672,13 +672,13 @@
       "modality_unknown": "Mixed"
     },
     "calm_summary": {
-      "title": "Calm moments",
-      "none": "{name} hasn't used the Calm Corner yet.",
-      "moments": "{name} took {count} calm moments this week.",
-      "completed": "{count} finished gently.",
-      "last_active_today": "Last active today",
-      "last_active_yesterday": "Last active yesterday",
-      "last_active_days": "Last active {count} days ago"
+      "title": "शांत पल",
+      "none": "{name} ने अभी तक शांत कोने का उपयोग नहीं किया है।",
+      "moments": "{name} ने इस सप्ताह {count} शांत पल लिए।",
+      "completed": "{count} शांति से पूरे हुए।",
+      "last_active_today": "आज आखिरी बार सक्रिय",
+      "last_active_yesterday": "कल आखिरी बार सक्रिय",
+      "last_active_days": "{count} दिन पहले आखिरी बार सक्रिय"
     }
   },
   "brain_clone": {

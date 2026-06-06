@@ -672,13 +672,13 @@
       "modality_unknown": "Mixed"
     },
     "calm_summary": {
-      "title": "Calm moments",
-      "none": "{name} hasn't used the Calm Corner yet.",
-      "moments": "{name} took {count} calm moments this week.",
-      "completed": "{count} finished gently.",
-      "last_active_today": "Last active today",
-      "last_active_yesterday": "Last active yesterday",
-      "last_active_days": "Last active {count} days ago"
+      "title": "Momentos de calma",
+      "none": "{name} ainda não usou o Cantinho da calma.",
+      "moments": "{name} fez {count} momentos de calma esta semana.",
+      "completed": "{count} terminaram com tranquilidade.",
+      "last_active_today": "Última atividade hoje",
+      "last_active_yesterday": "Última atividade ontem",
+      "last_active_days": "Última atividade há {count} dias"
     }
   },
   "brain_clone": {

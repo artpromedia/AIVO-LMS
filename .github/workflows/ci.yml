@@ -38,6 +38,27 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+  repo-tests:
+    name: Sequential Repo Test Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run deterministic workspace tests sequentially
+        run: pnpm test
+
   i18n-and-completeness:
     name: i18n Coverage & No "Coming Soon"
     runs-on: ubuntu-latest
@@ -699,6 +720,7 @@ jobs:
     if: always()
     needs:
       - lint-and-typecheck
+      - repo-tests
       - build-node
       - brain-svc
       - ai-svc
@@ -712,6 +734,7 @@ jobs:
       - name: Report job statuses
         env:
           LINT: ${{ needs.lint-and-typecheck.result }}
+          TESTS: ${{ needs.repo-tests.result }}
           BUILD: ${{ needs.build-node.result }}
           BRAIN: ${{ needs.brain-svc.result }}
           AI: ${{ needs.ai-svc.result }}
@@ -727,6 +750,7 @@ jobs:
           echo "| Job | Result |" >> "$GITHUB_STEP_SUMMARY"
           echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Lint & Type Check | $LINT |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Sequential Repo Test Gate | $TESTS |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Build Node Services | $BUILD |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Brain Service | $BRAIN |" >> "$GITHUB_STEP_SUMMARY"
           echo "| AI Service | $AI |" >> "$GITHUB_STEP_SUMMARY"
@@ -736,7 +760,7 @@ jobs:
           echo "| Security Scan (non-blocking) | $SECURITY |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Persistence Contract | $PERSISTENCE |" >> "$GITHUB_STEP_SUMMARY"
           # Fail summary only if a blocking job failed (security is non-blocking)
-          for r in "$LINT" "$BUILD" "$BRAIN" "$AI" "$MOBILE" "$MOBILE_TESTS" "$PERSISTENCE" "$PHASE5"; do
+          for r in "$LINT" "$TESTS" "$BUILD" "$BRAIN" "$AI" "$MOBILE" "$MOBILE_TESTS" "$PERSISTENCE" "$PHASE5"; do
             if [ "$r" = "failure" ] || [ "$r" = "cancelled" ]; then
               echo ""
               echo "❌ One or more blocking jobs failed."

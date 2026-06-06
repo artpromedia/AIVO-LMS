@@ -149,6 +149,12 @@ const PARITY_MATRIX = {
   Learner: [
     { web: "/learner/home", mobile: "(learner)/index", status: P },
     {
+      web: "/learner/calm",
+      mobile: null,
+      status: MISSING,
+      gap: "Calm Corner activities, persistence, and learner controls are not implemented on mobile.",
+    },
+    {
       web: "/learner/select",
       mobile: "(auth)/session-switch",
       status: P,
@@ -661,9 +667,7 @@ function emitMarkdown() {
   L.push("");
   L.push("## Subject Visibility Parity");
   L.push("");
-  L.push(
-    "Both learner subject grids consume the canonical `getDiscoverableSubjects()` registry.",
-  );
+  L.push("Both learner subject grids consume the canonical `getDiscoverableSubjects()` registry.");
   L.push("");
   L.push("| Subject | Web visible | Mobile visible | Parity |");
   L.push("| ------- | ----------- | -------------- | ------ |");

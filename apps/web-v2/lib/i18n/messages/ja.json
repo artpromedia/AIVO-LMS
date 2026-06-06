@@ -672,13 +672,13 @@
       "modality_unknown": "Mixed"
     },
     "calm_summary": {
-      "title": "Calm moments",
-      "none": "{name} hasn't used the Calm Corner yet.",
-      "moments": "{name} took {count} calm moments this week.",
-      "completed": "{count} finished gently.",
-      "last_active_today": "Last active today",
-      "last_active_yesterday": "Last active yesterday",
-      "last_active_days": "Last active {count} days ago"
+      "title": "落ち着く時間",
+      "none": "{name}はまだ落ち着きコーナーを使っていません。",
+      "moments": "{name}は今週、{count}回落ち着く時間を取りました。",
+      "completed": "{count}回、穏やかに終えました。",
+      "last_active_today": "最終利用は今日",
+      "last_active_yesterday": "最終利用は昨日",
+      "last_active_days": "最終利用は{count}日前"
     }
   },
   "brain_clone": {

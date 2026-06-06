@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
   registerGovernanceSubscriber,
+  type GovernanceHandlers,
   type GovernanceSubjectRequest,
   type EraseResult,
   type ExportResult,
@@ -8,13 +9,25 @@ import {
 import { auditEvents } from "@aivo/db";
 import { eq, or, sql } from "drizzle-orm";
 
-// audit-svc is special: the hash chain MUST be preserved. We must NOT
-// delete rows. Instead we anonymize actor PII columns (userId /
-// onBehalfOfId) in-place while leaving the hashes intact. If mutating
-// in-place turns out to be unsafe (e.g. hash chain re-verification would
-// fail), the TODO below must be resolved before enabling writes.
-export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
-  registerGovernanceSubscriber(app, {
+interface StoredHashLink {
+  prevHash: string | null;
+  hash: string | null;
+}
+
+/**
+ * Verify the stored forward links without recomputing payload hashes. DSAR
+ * anonymization intentionally changes actor PII, but must never rewrite the
+ * immutable link fields that make deletion/reordering detectable.
+ */
+export function verifyStoredHashLinks(rows: readonly StoredHashLink[]): boolean {
+  for (let index = 1; index < rows.length; index += 1) {
+    if ((rows[index]?.prevHash ?? "") !== (rows[index - 1]?.hash ?? "")) return false;
+  }
+  return true;
+}
+
+export function createGovernanceHandlers(db: any): GovernanceHandlers {
+  return {
     service: "audit-svc",
 
     async erase(req: GovernanceSubjectRequest): Promise<EraseResult> {
@@ -61,5 +74,13 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
         bundle: { audit_events: rows },
       };
     },
-  });
+  };
+}
+
+// audit-svc is special: the hash chain MUST be preserved. We must NOT delete
+// rows. Instead we anonymize actor PII columns in place while leaving the
+// stored prevHash/hash links intact. governance-chain.test.ts exercises the
+// real erase handler and proves those links survive the write.
+export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
+  registerGovernanceSubscriber(app, createGovernanceHandlers(db));
 }
