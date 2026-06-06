@@ -156,19 +156,10 @@ jobs:
       - name: Build and push Python service images
         run: |
           set -euo pipefail
-          PYTHON_SERVICES=(brain-svc ai-svc curriculum-svc)
-          GIT_COMMIT="${GITHUB_SHA}"
-          for svc in "${PYTHON_SERVICES[@]}"; do
-            echo "═══ Building $svc ═══"
-            DOCKER_BUILDKIT=0 docker build \
-              -f docker/Dockerfile.python-service \
-              --build-arg SERVICE_NAME="$svc" \
-              --build-arg GIT_COMMIT="$GIT_COMMIT" \
-              -t "${{ env.IMAGE_PREFIX }}/$svc:latest" \
-              . 2>&1 | tail -5
-            echo "═══ Pushing $svc ═══"
-            docker push "${{ env.IMAGE_PREFIX }}/$svc:latest" 2>&1 | tail -3
-          done
+          IMAGE_PREFIX="${{ env.IMAGE_PREFIX }}" GIT_COMMIT="${GITHUB_SHA}" \
+            bash scripts/ci/build-push-service-images.sh \
+              docker/Dockerfile.python-service \
+              brain-svc ai-svc curriculum-svc
 
   # ───────────────────────────────────────────────────────────────────
   # Stage 1c — Build & push Node.js service images.
@@ -180,7 +171,9 @@ jobs:
     name: Build & Push Node Service Images
     runs-on: [self-hosted, hetzner, production]
     timeout-minutes: 60
-    needs: build
+    # Serialize image builds against the self-hosted Docker/containerd daemon.
+    # Concurrent legacy-builder exports can corrupt containerd ingest state.
+    needs: [build, build-push-python-images]
     steps:
       - name: Clean self-hosted workspace
         run: |
@@ -194,23 +187,12 @@ jobs:
       - name: Build and push Node service images
         run: |
           set -euo pipefail
-          NODE_SERVICES=(
-            identity-svc assessment-svc learning-svc tutor-svc
-            family-svc engagement-svc billing-svc comms-svc
-            i18n-svc integration-svc admin-svc status-page-svc research-svc
-          )
-          GIT_COMMIT="${GITHUB_SHA}"
-          for svc in "${NODE_SERVICES[@]}"; do
-            echo "═══ Building $svc ═══"
-            DOCKER_BUILDKIT=0 docker build \
-              -f docker/Dockerfile.service \
-              --build-arg SERVICE_NAME="$svc" \
-              --build-arg GIT_COMMIT="$GIT_COMMIT" \
-              -t "${{ env.IMAGE_PREFIX }}/$svc:latest" \
-              . 2>&1 | tail -10
-            echo "═══ Pushing $svc ═══"
-            docker push "${{ env.IMAGE_PREFIX }}/$svc:latest" 2>&1 | tail -3
-          done
+          IMAGE_PREFIX="${{ env.IMAGE_PREFIX }}" GIT_COMMIT="${GITHUB_SHA}" \
+            bash scripts/ci/build-push-service-images.sh \
+              docker/Dockerfile.service \
+              identity-svc assessment-svc learning-svc tutor-svc \
+              family-svc engagement-svc billing-svc comms-svc \
+              i18n-svc integration-svc admin-svc status-page-svc research-svc
 
   # ───────────────────────────────────────────────────────────────────
   # Stage 2 — Deploy to Staging.
