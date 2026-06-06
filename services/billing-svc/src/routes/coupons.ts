@@ -21,6 +21,7 @@ import { verifyJWT } from "@aivo/security";
 import { createLogger } from "@aivo/observability";
 import { emitBillingAudit } from "../lib/audit.js";
 import { couponsCreated, couponsRedeemed } from "../lib/metrics.js";
+import { pickAttribution } from "../lib/attribution.js";
 import {
   listCouponsSchema,
   createCouponSchema,
@@ -304,6 +305,9 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
     const body = (req.body ?? {}) as Record<string, unknown>;
     const code = typeof body.code === "string" ? body.code.trim() : "";
     const tenantId = typeof body.tenantId === "string" ? body.tenantId.trim() : "";
+    // Campaign attribution from the ?coupon=&utm_… signup link, persisted on
+    // the subscription metadata for pilot conversion reporting.
+    const attribution = pickAttribution(body);
 
     if (!code || !tenantId) {
       return reply.code(400).send({ error: "missing_fields" });
@@ -363,7 +367,7 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
             'subscription_duration',
             'ACTIVE',
             NOW() + make_interval(days => ${grantsDurationDays}),
-            ${JSON.stringify({ couponCode: row.code, type: "subscription_duration", grantedDays: grantsDurationDays })}
+            ${JSON.stringify({ couponCode: row.code, type: "subscription_duration", grantedDays: grantsDurationDays, ...attribution })}
           )
         `);
         await tx.execute(sql`
@@ -424,7 +428,7 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
           ${grantsPlan},
           'ACTIVE',
           NOW() + make_interval(days => ${grantsDurationDays}),
-          ${JSON.stringify({ couponCode: row.code, provisionedBy: "coupon" })}
+          ${JSON.stringify({ couponCode: row.code, provisionedBy: "coupon", ...attribution })}
         )
       `);
       await tx.execute(sql`

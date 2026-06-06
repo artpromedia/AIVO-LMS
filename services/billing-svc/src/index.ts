@@ -24,6 +24,7 @@ import { registerBillingTestHelperRoutes } from "./routes/test-helpers.js";
 import { registerSeatRoutes } from "./routes/seats.js";
 import { registerGovernanceRoutes } from "./routes/governance.js";
 import { runExpiryBatchForScheduler } from "./lib/expiryReminderService.js";
+import { runTrialEndingBatchForScheduler } from "./lib/trialEndingReminderService.js";
 import { runReconciliationForScheduler } from "./lib/reconciliationService.js";
 import { runUtilizationForScheduler } from "./jobs/utilization.js";
 
@@ -102,6 +103,17 @@ async function start() {
     run: () => runExpiryBatchForScheduler(db),
   });
   handles["billing.daily-expiry-reminders"] = expiryHandle;
+
+  // Daily trial-ending reminders: notify subscriptions whose free trial ends
+  // within 3 days, exactly once (latched on trial_ending_reminder_sent_at).
+  const trialEndingHandle = startSafeCron({
+    jobName: "billing.daily-trial-ending-reminders",
+    ledger,
+    lock,
+    log: logger,
+    run: () => runTrialEndingBatchForScheduler(db),
+  });
+  handles["billing.daily-trial-ending-reminders"] = trialEndingHandle;
 
   // Daily Stripe reconciliation. Walks active subscriptions and repairs
   // local drift if a webhook was dropped or arrived out of order.

@@ -82,6 +82,21 @@ export interface CheckoutForPlanArgs {
   successUrl?: string;
   cancelUrl?: string;
   learnerCount?: number;
+  /** Campaign attribution from the ?coupon=&utm_… signup link. */
+  couponCode?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+}
+
+/** Drop null/undefined attribution so Stripe metadata stays a clean string map. */
+function attributionMetadata(args: CheckoutForPlanArgs): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (args.couponCode) out.couponCode = args.couponCode;
+  if (args.utmSource) out.utmSource = args.utmSource;
+  if (args.utmMedium) out.utmMedium = args.utmMedium;
+  if (args.utmCampaign) out.utmCampaign = args.utmCampaign;
+  return out;
 }
 
 export async function createPlanCheckoutSession(
@@ -106,12 +121,14 @@ export async function createPlanCheckoutSession(
         [STRIPE_METADATA_TENANT_KEY]: args.tenantId,
         [STRIPE_METADATA_PLAN_KEY]: args.plan,
         userId: args.userId,
+        ...attributionMetadata(args),
       },
       subscription_data: {
         metadata: {
           [STRIPE_METADATA_TENANT_KEY]: args.tenantId,
           [STRIPE_METADATA_PLAN_KEY]: args.plan,
           userId: args.userId,
+          ...attributionMetadata(args),
         },
       },
       allow_promotion_codes: true,

@@ -52,12 +52,14 @@ export default async function PlatformPage() {
           Backed by billing-svc, the single source of truth for every coupon.
         </p>
         {session.role === "platform_admin" ? (
-          <Link
-            className="mt-4 inline-flex font-bold text-blue-700"
-            href="/platform/billing/coupons"
-          >
-            Manage coupons
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-4">
+            <Link className="inline-flex font-bold text-blue-700" href="/platform/billing/coupons">
+              Manage coupons
+            </Link>
+            <Link className="inline-flex font-bold text-blue-700" href="/platform/billing/trials">
+              Trials & conversion
+            </Link>
+          </div>
         ) : null}
       </AdminCard>
 

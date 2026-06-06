@@ -47,6 +47,40 @@ export async function listBillingAccounts(
   }));
 }
 
+// ── Trials / conversion report ───────────────────────────────────────────────
+
+export type TrialConversionReport = {
+  trialsStartedLast30d: number;
+  trialingNow: number;
+  trialsEndingIn7d: number;
+  convertedLast30d: number;
+  conversionRateLast30d: number;
+  pilotsStarted: number;
+  pilotsConverted: number;
+  pilotConversionRate: number;
+};
+
+/** Platform trial + pilot-coupon conversion metrics (admin-svc computes it). */
+export async function getTrialConversion(
+  session: Pick<SessionProfile, "role">,
+): Promise<TrialConversionReport> {
+  const r = await adminGet<Partial<TrialConversionReport>>(
+    session,
+    "/api/admin-svc/billing/trials/conversion",
+  );
+  const n = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
+  return {
+    trialsStartedLast30d: n(r.trialsStartedLast30d),
+    trialingNow: n(r.trialingNow),
+    trialsEndingIn7d: n(r.trialsEndingIn7d),
+    convertedLast30d: n(r.convertedLast30d),
+    conversionRateLast30d: n(r.conversionRateLast30d),
+    pilotsStarted: n(r.pilotsStarted),
+    pilotsConverted: n(r.pilotsConverted),
+    pilotConversionRate: n(r.pilotConversionRate),
+  };
+}
+
 // ── Coupons ────────────────────────────────────────────────────────────────
 //
 // billing-svc (`billing_coupons`) is the canonical store; admin-svc proxies

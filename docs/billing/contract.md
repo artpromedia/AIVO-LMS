@@ -130,6 +130,29 @@ Prometheus counters (`/metrics`):
 
 `type` is the `coupon_type` (`DISCOUNT` / `SUBSCRIPTION` / `PROVISIONING`).
 
+## Trials
+
+- **Trial-ending reminders.** The scheduled job
+  `billing.daily-trial-ending-reminders`
+  (`services/billing-svc/src/lib/trialEndingReminderService.ts`) finds
+  subscriptions with `status = TRIALING` whose `trial_ends_at` is within 3
+  days and dispatches the comms-svc `trial_ending` template (email + in-app).
+  Exactly-once is guaranteed by the `subscriptions.trial_ending_reminder_sent_at`
+  latch — the row is skipped once notified, and the latch is set only after a
+  successful send (a transient comms failure retries next tick). This is
+  distinct from `trial_will_end_notified_at`, which only records the Stripe
+  `customer.subscription.trial_will_end` event.
+- **Attribution.** Subscriptions created from a coupon (coupon redeem) or a
+  `?plan=…&coupon=…&utm_…` signup link carry `couponCode` + `utm_*` on
+  `subscriptions.metadata` (`lib/attribution.ts` `pickAttribution`; threaded
+  through Stripe checkout metadata and persisted on the webhook subscription
+  insert). This is the basis for pilots-started → pilots-converted reporting.
+- **Conversion report.** `GET /api/admin-svc/billing/trials/conversion`
+  (BillingRead) returns trials started (30d), trialing now, trials ending in 7
+  days, trial→paid conversion rate, and pilot-coupon conversion (computed by
+  `admin-svc/src/lib/trial-conversion.ts`). Surfaced at web-admin
+  `/platform/billing/trials`.
+
 ## Stripe checkout / portal
 
 | Action                | Endpoint                                          |

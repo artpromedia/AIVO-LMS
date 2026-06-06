@@ -35,6 +35,7 @@ import {
   internalTeamInviteSchema,
   internalPasswordResetSchema,
   internalDistrictAdminInviteSchema,
+  internalTrialEndingSchema,
   internalSchoolAdminInviteSchema,
   internalTeacherInviteSchema,
   internalStaffCredentialsSchema,
@@ -708,6 +709,78 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
         logger.error({ err, to }, "Failed to send district admin invite email");
         return reply.code(500).send({ error: "Failed to send invite" });
       }
+    },
+  );
+
+  app.post(
+    "/api/comms/internal/trial-ending",
+    { schema: internalTrialEndingSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, name, trialEndDate, daysLeft, renewalUrl, parentId, learnerId } =
+        (request.body as any) || {};
+      if (!to && !parentId) {
+        return reply.code(400).send({ error: "to or parentId required" });
+      }
+
+      const rendered = renderTemplate("trial_ending", {
+        name: name || "there",
+        trialEndDate: trialEndDate || "soon",
+        daysLeft,
+        renewalUrl: renewalUrl || "#",
+      });
+
+      let emailStatus: string | undefined;
+      let messageId: string | undefined;
+      // Email (best-effort — only when an address is present and email is set up).
+      if (to && isConfigured()) {
+        try {
+          const result = await sendEmail({
+            to,
+            subject: rendered.subject,
+            htmlBody: rendered.html,
+            textBody: rendered.text,
+            tag: "trial_ending",
+          });
+          emailStatus = result.status;
+          messageId = result.messageId;
+        } catch (err: any) {
+          logger.error({ err, to }, "Failed to send trial-ending email");
+        }
+      } else if (to) {
+        emailStatus = "dev_mode";
+      }
+
+      // In-app notification for the parent (best-effort).
+      let inAppId: string | undefined;
+      if (parentId) {
+        try {
+          const { parentInAppNotifications } = await import("@aivo/db");
+          const [row] = await db
+            .insert(parentInAppNotifications)
+            .values({
+              parentId,
+              learnerId: learnerId || null,
+              category: "billing",
+              template: "trial_ending",
+              title: rendered.subject.slice(0, 255),
+              body: `Add a plan to keep your learner's tutors and progress.`,
+              link: (renewalUrl || "#").slice(0, 1024),
+            })
+            .returning();
+          inAppId = row?.id;
+        } catch (err: any) {
+          logger.error({ err, parentId }, "Failed to create trial-ending in-app notification");
+        }
+      }
+
+      return { status: emailStatus ?? "in_app_only", messageId, inAppId };
     },
   );
 

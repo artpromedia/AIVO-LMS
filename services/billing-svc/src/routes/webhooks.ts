@@ -26,6 +26,7 @@ import {
   subscriptionStateTransitions,
 } from "../lib/metrics.js";
 import { emitBillingAudit } from "../lib/audit.js";
+import { pickAttribution } from "../lib/attribution.js";
 import { stripeWebhookSchema } from "./schemas.js";
 
 /**
@@ -261,6 +262,7 @@ async function handleCheckoutCompleted(
     status: "ACTIVE",
     paymentStatus: "paid",
     lastStripeEventAt: eventCreated,
+    metadata: pickAttribution(session.metadata),
   });
   log.info("checkout.completed: subscription row created", {
     tenantId,
@@ -332,6 +334,7 @@ async function handleSubscriptionUpsert(
       trialEndsAt,
       paymentStatus: stripeStatus === "past_due" ? "failed" : "paid",
       lastStripeEventAt: eventCreated,
+      metadata: pickAttribution(sub.metadata),
     });
     subscriptionStateTransitions.increment(1, { from: "none", to: stripeStatus });
     await emitBillingAudit(db, log, {
