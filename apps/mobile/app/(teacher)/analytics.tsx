@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useConnectedLearners } from "@/hooks/useFamily";
-import { AivoCard, EmptyState } from "@aivo/mobile-ui";
+import { AivoCard, AivoButton, EmptyState } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
 import { MasteryDistributionCard } from "@/src/components/MasteryDistributionCard";
 
@@ -73,11 +74,19 @@ export default function TeacherAnalyticsScreen() {
       <Text style={styles.title}>{t("teacherReports.title")}</Text>
       <Text style={styles.subtitle}>{t("teacherReports.subtitle")}</Text>
 
-      <View style={{ marginBottom: spacing.lg }}>
+      <View style={{ marginBottom: spacing.md }}>
         <MasteryDistributionCard
           title={t("teacherReports.distribution", "Classroom mastery distribution")}
         />
       </View>
+
+      <AivoButton
+        title={t("teacherReports.viewDetailed", "View detailed report")}
+        variant="outline"
+        icon={<Ionicons name="document-text-outline" size={18} color={colors.primary} />}
+        onPress={() => router.push("/(teacher)/reports" as Href)}
+        style={{ marginBottom: spacing.lg }}
+      />
 
       <View style={styles.cardsGrid}>
         {REPORT_CARDS.map((card) => (

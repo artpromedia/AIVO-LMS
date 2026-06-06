@@ -3,6 +3,7 @@ import { router, type Href } from "expo-router";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import { useAuth } from "@/hooks/useAuth";
 import { colors } from "@/constants/colors";
+import { AivoLogo } from "@/components/AivoLogo";
 import { getPendingDeepLink, clearPendingDeepLink } from "@/lib/pendingDeepLink";
 
 export default function Index() {
@@ -69,9 +70,14 @@ export default function Index() {
     };
   }, [isAuthenticated, isLoading, user, mustChangePassword]);
 
+  // On-brand auth-routing tick. This view is only visible for the brief
+  // moment between hydration finishing and `router.replace` landing the
+  // user on their role home, so it keeps the AIVO wordmark on screen
+  // rather than dropping to a bare spinner.
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color={colors.primary} />
+      <AivoLogo variant="purple" width={140} />
+      <ActivityIndicator size="small" color={colors.primary} style={styles.spinner} />
     </View>
   );
 }
@@ -82,5 +88,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.background,
+  },
+  spinner: {
+    marginTop: 20,
   },
 });

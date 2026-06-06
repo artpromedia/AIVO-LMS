@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useBrainDomains } from "@/hooks/useBrain";
@@ -19,7 +19,7 @@ import {
   type MasteryCell,
   type ChartPoint,
 } from "@aivo/mobile-ui";
-import { Card } from "@/components/ui";
+import { Card, Button } from "@/components/ui";
 import { summarizeDomains } from "@/lib/learner-progress";
 import { subjectAccent } from "@/lib/subject-display";
 import { useLessonSessions } from "@/hooks/useGradebook";
@@ -208,6 +208,15 @@ export default function LearnerProgressScreen() {
               </View>
             </Card>
           )}
+
+          <Button
+            title={t("progress.viewHistory", "View lesson history")}
+            variant="outline"
+            fullWidth
+            iconLeft={<Ionicons name="time-outline" size={18} color={palette.primary} />}
+            onPress={() => router.push("/(learner)/lesson-runs" as Href)}
+            style={{ marginTop: spacing.sm, marginBottom: spacing.md }}
+          />
         </>
       )}
     </ResponsiveScreen>

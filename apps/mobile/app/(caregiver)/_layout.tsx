@@ -21,6 +21,13 @@ export default function CaregiverLayout() {
       onPress: () => router.push("/(caregiver)" as Href),
     },
     {
+      key: "observations",
+      label: t("tabs.observations", "Observations"),
+      icon: "eye" as const,
+      active: pathname?.includes("/observations"),
+      onPress: () => router.push("/(caregiver)/observations" as Href),
+    },
+    {
       key: "notifications",
       label: t("tabs.alerts"),
       icon: "notifications" as const,
@@ -51,6 +58,13 @@ export default function CaregiverLayout() {
           options={{
             title: t("tabs.home"),
             tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="observations"
+          options={{
+            title: t("tabs.observations", "Observations"),
+            tabBarIcon: ({ color, size }) => <Ionicons name="eye" size={size} color={color} />,
           }}
         />
         <Tabs.Screen

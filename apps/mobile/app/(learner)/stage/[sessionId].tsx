@@ -453,6 +453,12 @@ export default function StageScreen() {
           onPress: () => router.replace("/(learner)/gamification" as Href),
         },
         {
+          key: "history",
+          label: t("learnerStage.nav.history", "History"),
+          icon: "time",
+          onPress: () => router.replace("/(learner)/lesson-runs" as Href),
+        },
+        {
           key: "settings",
           label: t("learnerStage.nav.settings"),
           icon: "settings",
