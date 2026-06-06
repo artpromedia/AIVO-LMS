@@ -7,6 +7,7 @@ from .routes.generate import router as generate_router
 from .routes.homework import router as homework_router
 from .routes.transcribe import router as transcribe_router
 from .routes.curriculum import router as curriculum_router
+from .routes.term_syllabus import router as term_syllabus_router
 from .routes.speech_buddy import router as speech_buddy_router
 from .routes.budget_admin import router as budget_admin_router
 from .routes.baseline_images import router as baseline_images_router
@@ -56,6 +57,7 @@ app.include_router(generate_router)
 app.include_router(homework_router)
 app.include_router(transcribe_router)
 app.include_router(curriculum_router)
+app.include_router(term_syllabus_router)
 app.include_router(speech_buddy_router)
 app.include_router(budget_admin_router)
 app.include_router(baseline_images_router)
