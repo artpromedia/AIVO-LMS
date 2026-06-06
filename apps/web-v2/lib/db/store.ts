@@ -44,6 +44,7 @@ import type {
   User,
   AiGenerationJob,
   HomeworkHelpSession,
+  CalmSessionRecord,
   CurriculumUpload,
   ConsentRecord,
   ConsentVersion,
@@ -165,6 +166,7 @@ export type Store = {
   learnerSensoryProfiles: Map<string, LearnerSensoryProfile>;
 
   homeworkHelpSessions: Map<string, HomeworkHelpSession>;
+  calmSessions: Map<string, CalmSessionRecord>;
   teacherAssignments: Map<string, TeacherAssignment>;
   curriculumUploads: Map<string, CurriculumUpload>;
 
@@ -325,6 +327,7 @@ function createStore(): Store {
     learnerBadges: new Map(),
     learnerSensoryProfiles: new Map(),
     homeworkHelpSessions: new Map(),
+    calmSessions: new Map(),
     teacherAssignments: new Map(),
     curriculumUploads: new Map(),
     auditLogs: [],

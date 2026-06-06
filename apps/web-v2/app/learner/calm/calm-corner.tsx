@@ -22,6 +22,7 @@ export function CalmCorner({ learnerId, catalog, recommendedId }: CalmCornerProp
   const t = useTranslations("learner.calm");
   const [active, setActive] = useState<CalmActivity | null>(null);
   const [affirmation, setAffirmation] = useState<string | null>(null);
+  const [streakDays, setStreakDays] = useState<number>(0);
 
   const recommended = useMemo(
     () => catalog.find((a) => a.id === recommendedId) ?? null,
@@ -42,6 +43,17 @@ export function CalmCorner({ learnerId, catalog, recommendedId }: CalmCornerProp
         };
         // Affirmation is encouragement only — never block the learner on it.
         setAffirmation(json?.data?.affirmationKey ?? "calmer");
+        // Fetch the freshly-updated streak; the affirmation renders with or
+        // without it, so a failed/absent streak never blocks encouragement.
+        try {
+          const sres = await fetch(`/api/bff/learners/${learnerId}/calm`);
+          const sjson = (await sres.json().catch(() => ({}))) as {
+            data?: { streak?: { currentStreakDays?: number } };
+          };
+          setStreakDays(sjson?.data?.streak?.currentStreakDays ?? 0);
+        } catch {
+          /* streak is optional encouragement; ignore failures */
+        }
       } catch {
         setAffirmation("calmer");
       } finally {
@@ -60,6 +72,11 @@ export function CalmCorner({ learnerId, catalog, recommendedId }: CalmCornerProp
         <h2 className="mt-3 font-display text-2xl font-bold">
           {t(`affirmations.${affirmation}`)}
         </h2>
+        {streakDays > 0 ? (
+          <p className="mt-2 text-sm font-medium text-aivo-ink-soft">
+            {t("streak.label", { count: streakDays })}
+          </p>
+        ) : null}
         <div className="mt-5 flex justify-center gap-3">
           <Button onClick={() => setAffirmation(null)}>{t("do_another")}</Button>
         </div>

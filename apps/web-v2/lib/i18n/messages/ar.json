@@ -670,6 +670,15 @@
       "modality_kinesthetic": "Hands-on",
       "modality_reading": "Reading",
       "modality_unknown": "Mixed"
+    },
+    "calm_summary": {
+      "title": "Calm moments",
+      "none": "{name} hasn't used the Calm Corner yet.",
+      "moments": "{name} took {count} calm moments this week.",
+      "completed": "{count} finished gently.",
+      "last_active_today": "Last active today",
+      "last_active_yesterday": "Last active yesterday",
+      "last_active_days": "Last active {count} days ago"
     }
   },
   "brain_clone": {
@@ -784,6 +793,9 @@
         "next": "النفَس التالي",
         "finish": "إنهاء",
         "done_early": "انتهيت"
+      },
+      "streak": {
+        "label": "🔥 سلسلة هدوء لمدة {count} يوم"
       }
     },
     "progress": {
