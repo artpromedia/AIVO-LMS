@@ -1,4 +1,5 @@
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
+import { JsonLd } from "@/components/seo/JsonLd";
 import type { Audience } from "@/lib/landing-content";
 import { SITE_URL } from "@/lib/constants";
 import Link from "next/link";
@@ -26,10 +27,7 @@ export function AudiencePage({ audience }: { audience: Audience }) {
         { name: audience.badge, href: `/${audience.slug}` },
       ]}
     >
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
+      <JsonLd data={faqJsonLd} />
 
       <section className="mb-14" aria-labelledby="benefits-heading">
         <h2

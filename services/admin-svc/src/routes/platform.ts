@@ -24,6 +24,7 @@ import {
 import { Permission, verifyJWT } from "@aivo/security";
 import { asc, count, desc, eq, gte, sql } from "drizzle-orm";
 import { requirePermission } from "../lib/permissions.js";
+import { computeTrialConversion } from "../lib/trial-conversion.js";
 import { logAuditEvent } from "./audit.js";
 import {
   adminSvcAiPlaygroundSchema,
@@ -466,11 +467,18 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
         (sum, tenant) => sum + tenant.estimatedCostUsd24h,
         0,
       );
-      const requestCount24h = tenantSummaries.reduce((sum, tenant) => sum + tenant.requestCount24h, 0);
-      const activeTenants24h = tenantSummaries.filter((tenant) => tenant.requestCount24h > 0).length;
+      const requestCount24h = tenantSummaries.reduce(
+        (sum, tenant) => sum + tenant.requestCount24h,
+        0,
+      );
+      const activeTenants24h = tenantSummaries.filter(
+        (tenant) => tenant.requestCount24h > 0,
+      ).length;
       const warningTenants = tenantSummaries.filter((tenant) => tenant.budget.warned).length;
       const overCapTenants = tenantSummaries.filter((tenant) => tenant.budget.exceeded).length;
-      const budgetsAvailable = tenantSummaries.filter((tenant) => tenant.budget.budgetAvailable).length;
+      const budgetsAvailable = tenantSummaries.filter(
+        (tenant) => tenant.budget.budgetAvailable,
+      ).length;
 
       return {
         summary: {
@@ -588,6 +596,29 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
       }
 
       return { accounts };
+    },
+  );
+
+  app.get(
+    "/api/admin-svc/billing/trials/conversion",
+    { preHandler: (req, reply) => requirePermission(req, reply, Permission.BillingRead) },
+    async () => {
+      const rows = await db
+        .select({
+          status: subscriptions.status,
+          trialEndsAt: subscriptions.trialEndsAt,
+          createdAt: subscriptions.createdAt,
+          metadata: subscriptions.metadata,
+        })
+        .from(subscriptions);
+      return computeTrialConversion(
+        (rows as any[]).map((r) => ({
+          status: r.status as string | null,
+          trialEndsAt: r.trialEndsAt as Date | null,
+          createdAt: r.createdAt as Date,
+          metadata: (r.metadata ?? null) as Record<string, unknown> | null,
+        })),
+      );
     },
   );
 

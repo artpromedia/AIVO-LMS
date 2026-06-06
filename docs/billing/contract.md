@@ -71,6 +71,24 @@ enforces this on the web-v2 BFF.
 
 ## Coupons
 
+> **Source of truth.** `billing-svc` and its `billing_coupons` table are the
+> single canonical store for every coupon. Admin surfaces do **not** keep a
+> separate coupon model — they are read-through projections of billing-svc.
+> The web-v2 in-memory `Coupon` type (`apps/web-v2/lib/db/types.ts`) is a
+> deprecated demo-only fixture for the offline/mock UI and is never seeded
+> outside development; production coupon data always comes from billing-svc.
+
+**Admin path (web-admin → admin-svc → billing-svc).** The platform-admin
+coupon UI lives in `apps/web-admin` (`/platform/billing/coupons`). It uses the
+`@aivo/admin-api/billing` client (`listCoupons` / `createCoupon` /
+`disableCoupon`), which calls admin-svc's proxy
+(`/api/admin-svc/billing/coupons[/:code]`, see
+`services/admin-svc/src/routes/billing-coupons.ts`). admin-svc forwards the
+caller's platform-admin Bearer to billing-svc and passes the canonical error
+codes through verbatim; the client maps them to friendly copy
+(`COUPON_ERROR_MESSAGES`). Both hops require `PLATFORM_ADMIN`, so non-platform
+roles get 403 at admin-svc and again at billing-svc.
+
 `services/billing-svc/src/routes/coupons.ts` exposes:
 
 | Method   | Path                               | Audience                               |
@@ -90,8 +108,50 @@ Coupon kinds:
 - **School pilot access code** — provisions a `district` plan slice
   with seat cap; manual admin activation required for go-live.
 
-Every redemption emits `billing.coupon.redeemed`; rejections emit
-`billing.coupon.rejected` with a reason.
+The admin detail route `GET /api/billing/admin/coupons/:code` returns the
+single coupon row with its live redemption count (for the pilot-uptake view).
+
+### Coupon audit + metrics
+
+Audit events (hash-chained `audit_events`, surfaced in admin audit dashboards):
+
+| Event                     | Emitted when                                              |
+| ------------------------- | --------------------------------------------------------- |
+| `billing.coupon.created`  | admin creates a coupon (actor + type + grants)            |
+| `billing.coupon.disabled` | admin disables a coupon                                   |
+| `billing.coupon.redeemed` | a coupon is redeemed (DISCOUNT/SUBSCRIPTION/PROVISIONING) |
+
+Prometheus counters (`/metrics`):
+
+| Counter                          | Labels | Incremented on        |
+| -------------------------------- | ------ | --------------------- |
+| `billing_coupons_created_total`  | `type` | successful create     |
+| `billing_coupons_redeemed_total` | `type` | successful redemption |
+
+`type` is the `coupon_type` (`DISCOUNT` / `SUBSCRIPTION` / `PROVISIONING`).
+
+## Trials
+
+- **Trial-ending reminders.** The scheduled job
+  `billing.daily-trial-ending-reminders`
+  (`services/billing-svc/src/lib/trialEndingReminderService.ts`) finds
+  subscriptions with `status = TRIALING` whose `trial_ends_at` is within 3
+  days and dispatches the comms-svc `trial_ending` template (email + in-app).
+  Exactly-once is guaranteed by the `subscriptions.trial_ending_reminder_sent_at`
+  latch — the row is skipped once notified, and the latch is set only after a
+  successful send (a transient comms failure retries next tick). This is
+  distinct from `trial_will_end_notified_at`, which only records the Stripe
+  `customer.subscription.trial_will_end` event.
+- **Attribution.** Subscriptions created from a coupon (coupon redeem) or a
+  `?plan=…&coupon=…&utm_…` signup link carry `couponCode` + `utm_*` on
+  `subscriptions.metadata` (`lib/attribution.ts` `pickAttribution`; threaded
+  through Stripe checkout metadata and persisted on the webhook subscription
+  insert). This is the basis for pilots-started → pilots-converted reporting.
+- **Conversion report.** `GET /api/admin-svc/billing/trials/conversion`
+  (BillingRead) returns trials started (30d), trialing now, trials ending in 7
+  days, trial→paid conversion rate, and pilot-coupon conversion (computed by
+  `admin-svc/src/lib/trial-conversion.ts`). Surfaced at web-admin
+  `/platform/billing/trials`.
 
 ## Stripe checkout / portal
 

@@ -11,7 +11,20 @@ export type ContentArticle = {
   excerpt: string;
   readTime: string;
   publishedAt: string;
+  /** ISO date the article was last meaningfully updated. Defaults to publishedAt. */
+  updatedAt?: string;
   author: string;
+  /**
+   * 3-5 short, self-contained claims rendered at the top of the article and
+   * used as the extractive summary LLMs preferentially quote. Required so
+   * every long-form page ships a "Key takeaways" block.
+   */
+  keyTakeaways: string[];
+  /**
+   * Present only on procedural guides. When set, the page emits HowTo JSON-LD
+   * (instead of Article) built from these ordered steps.
+   */
+  howTo?: { name?: string; steps: { name: string; text: string }[] };
   body: Array<
     { type: "p"; text: string } | { type: "h2"; text: string } | { type: "ul"; items: string[] }
   >;
@@ -29,6 +42,12 @@ export const CONTENT: ContentArticle[] = [
     readTime: "5 min read",
     publishedAt: "2026-05-10",
     author: "AIVO Learning",
+    keyTakeaways: [
+      "Personalized learning keeps the same curriculum and standards but adapts the route — pacing, hints, examples, and next steps change per learner.",
+      "AIVO composes each lesson from a parent assessment, optional IEP or accommodation context, a baseline assessment, and a running mastery history.",
+      "Support such as read-aloud and scaffolds is offered automatically when a learner's profile shows it helps, then pulled back as confidence grows.",
+      "Today's Mission gives one clear next action instead of a dashboard of choices.",
+    ],
     body: [
       {
         type: "p",
@@ -67,6 +86,11 @@ export const CONTENT: ContentArticle[] = [
     readTime: "4 min read",
     publishedAt: "2026-05-03",
     author: "AIVO Learning",
+    keyTakeaways: [
+      "AIVO's parent summary explains in plain words what a child worked on, where it clicked, where it slowed down, and what AIVO will try next.",
+      "Teacher terms like mastery score, standards alignment, and scaffold tier are translated for parents, with the underlying data one click away.",
+      "The two most useful questions a parent can ask are 'What did my child enjoy this week?' and 'What got harder this week?'",
+    ],
     body: [
       {
         type: "p",
@@ -105,6 +129,12 @@ export const CONTENT: ContentArticle[] = [
     readTime: "5 min read",
     publishedAt: "2026-04-26",
     author: "AIVO Learning",
+    keyTakeaways: [
+      "A baseline assessment is a short, adaptive starting point — not a test, not a grade, and nothing a learner can fail.",
+      "It runs as six short Discovery Adventure chapters with built-in breaks, and difficulty adapts up and down so no two learners see the same items.",
+      "No score is shown to the learner; the result feeds the lesson plan so the first LessonRun starts at the right level.",
+      "Parents get a plain-language readout of what AIVO learned and what to watch over the first two weeks.",
+    ],
     body: [
       {
         type: "p",
@@ -143,6 +173,12 @@ export const CONTENT: ContentArticle[] = [
     readTime: "6 min read",
     publishedAt: "2026-04-19",
     author: "AIVO Learning",
+    keyTakeaways: [
+      "AIVO offers four support modes: read-aloud, hints, scaffolded examples, and reduced cognitive load.",
+      "Support appears when the system detects struggle and steps back as the learner gains confidence — it is not a shortcut button.",
+      "Read-aloud is a learning aid, not a reading-skill substitute; AIVO keeps building decoding skill in parallel.",
+      "Reduced cognitive load — fewer items, less animation, shorter instructions — can be applied automatically when a parent or IEP context says it helps.",
+    ],
     body: [
       {
         type: "p",
@@ -181,6 +217,33 @@ export const CONTENT: ContentArticle[] = [
     readTime: "8 min read",
     publishedAt: "2026-04-12",
     author: "AIVO Learning",
+    keyTakeaways: [
+      "Before buying an AI learning tool, confirm where learner data is stored, who can access it, and that it is never used to train third-party foundation models.",
+      "Check that the tool reduces teacher load, shows class-level signal rather than raw learner chats, and lets teachers override or pause recommendations.",
+      "Require WCAG 2.2 AA design, read-aloud on every learner surface, full keyboard navigation, and reduced-motion / high-contrast modes.",
+      "Ask the vendor what their product cannot do — a clean, honest answer is itself a trust signal.",
+    ],
+    howTo: {
+      name: "How to evaluate an AI learning tool before buying",
+      steps: [
+        {
+          name: "Review learner data handling",
+          text: "Confirm where learner data is stored and who has access, whether learner content is used to train any third-party foundation model (it should not be), how export and deletion work and how long deletion actually takes, and whether a subprocessor list is published.",
+        },
+        {
+          name: "Check teacher workflow fit",
+          text: "Verify the tool reduces rather than adds to teacher load, surfaces class-level signal instead of raw learner chats, and lets teachers override or pause individual recommendations.",
+        },
+        {
+          name: "Verify accessibility",
+          text: "Require a WCAG 2.2 AA design target, read-aloud on every learner surface, full keyboard navigation across the app, and reduced-motion and high-contrast modes.",
+        },
+        {
+          name: "Probe vendor honesty",
+          text: "Ask the vendor what their product cannot do. A vendor who answers cleanly is more trustworthy than one who claims everything works.",
+        },
+      ],
+    },
     body: [
       {
         type: "p",
@@ -233,6 +296,12 @@ export const CONTENT: ContentArticle[] = [
     readTime: "6 min read",
     publishedAt: "2026-04-05",
     author: "AIVO Learning",
+    keyTakeaways: [
+      "AIVO does not use learner data — chats, Brain-Clone state, or assessment results — to train any third-party foundation model.",
+      "AIVO does not sell or rent learner or family data and shows no third-party advertisements on learner surfaces.",
+      "For learners under 13, parents are the default authority; where a school is the responsible party under FERPA, parents retain inspection rights through their school.",
+      "Families can request a full export at privacy@aivolearning.com, and account deletion is permanent within 30 days of request.",
+    ],
     body: [
       {
         type: "p",

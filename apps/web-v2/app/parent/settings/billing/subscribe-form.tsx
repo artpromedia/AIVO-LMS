@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  captureCheckoutAttribution,
+  readCheckoutAttribution,
+} from "@/lib/bff/checkout-attribution";
 
 type PlanRow = {
   plan: {
@@ -29,13 +33,19 @@ export function SubscribeForm({
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
+  // Persist any utm_*/coupon present when the billing page loads so a campaign
+  // deep-link is still attributed when the parent subscribes.
+  useEffect(() => {
+    captureCheckoutAttribution();
+  }, []);
+
   function subscribe(planId: string, priceId: string) {
     setError(null);
     start(async () => {
       const res = await fetch("/api/bff/parent/subscription", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ planId, priceId }),
+        body: JSON.stringify({ planId, priceId, ...readCheckoutAttribution() }),
       });
       const json = await res.json();
       if (!res.ok) {

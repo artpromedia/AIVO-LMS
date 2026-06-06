@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { WEB_APP_URL, SITE_URL } from "@/lib/constants";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildArticleJsonLd } from "@/lib/article-schema";
+import { WEB_APP_URL } from "@/lib/constants";
 import type { ContentArticle } from "@/lib/content";
 
 interface Props {
@@ -11,45 +13,13 @@ interface Props {
 }
 
 export function ArticleView({ article, backHref, backLabel }: Props) {
-  const routeBase = article.kind === "guide" ? "guides" : "blog";
-  const canonicalUrl = `${SITE_URL}/${routeBase}/${article.slug}`;
-
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.excerpt,
-    datePublished: article.publishedAt,
-    dateModified: article.publishedAt,
-    author: { "@type": "Organization", name: article.author },
-    publisher: {
-      "@type": "Organization",
-      name: "AIVO Learning",
-      logo: { "@type": "ImageObject", url: `${SITE_URL}/images/aivo-logo-purple.png` },
-    },
-    mainEntityOfPage: canonicalUrl,
-  };
-
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: backLabel, item: `${SITE_URL}${backHref}` },
-      { "@type": "ListItem", position: 3, name: article.title, item: canonicalUrl },
-    ],
-  };
+  // BlogPosting / Article / HowTo + BreadcrumbList, built by a pure helper so
+  // the schema shape stays unit-testable and CI-validatable.
+  const articleJsonLd = buildArticleJsonLd(article, { backHref, backLabel });
 
   return (
     <div className="min-h-screen bg-white">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+      <JsonLd data={articleJsonLd} />
 
       <header className="sticky top-0 z-50 border-b border-slate-100 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 md:px-8">
@@ -116,6 +86,28 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
       </section>
 
       <main className="mx-auto max-w-3xl px-6 py-12 md:px-8 md:py-16">
+        {/* Extractive summary: concise, self-contained claims that answer
+            engines preferentially quote. Sits above the article body. */}
+        <section
+          aria-labelledby="key-takeaways-heading"
+          className="mb-12 rounded-2xl border border-purple-100 bg-purple-50/40 p-6 md:p-7"
+        >
+          <h2 id="key-takeaways-heading" className="font-heading text-lg font-bold text-slate-900">
+            Key takeaways
+          </h2>
+          <ul className="mt-3 space-y-2 font-body text-base leading-relaxed text-slate-700">
+            {article.keyTakeaways.map((takeaway, i) => (
+              <li key={i} className="flex gap-2.5">
+                <span
+                  aria-hidden="true"
+                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-purple-500"
+                />
+                <span>{takeaway}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <article className="space-y-6 font-body text-lg leading-relaxed text-slate-700">
           {article.body.map((block, i) => {
             if (block.type === "p") return <p key={i}>{block.text}</p>;

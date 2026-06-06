@@ -5,6 +5,7 @@ import { WEB_APP_URL } from "@/lib/constants";
 import { Breadcrumbs, breadcrumbJsonLd, type Crumb } from "./Breadcrumbs";
 import { StickyHeader } from "./StickyHeader";
 import { Footer } from "./Footer";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
 
 interface LandingFinalCta {
@@ -61,12 +62,7 @@ export async function LandingPageLayout({
 
   return (
     <div className="min-h-screen bg-[var(--aivo-color-surface-canvas)]">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbJsonLd(breadcrumbs)),
-        }}
-      />
+      <JsonLd data={breadcrumbJsonLd(breadcrumbs)} />
 
       <StickyHeader initialSensoryMode={sensoryMode} />
 

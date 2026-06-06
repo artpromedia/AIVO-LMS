@@ -18,6 +18,7 @@ import {
   cancelParentSubscription,
   type BillingPlanId,
 } from "@/lib/bff/billing-svc";
+import { pickCheckoutAttribution } from "@/lib/bff/checkout-attribution";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,11 @@ export async function GET(req: Request): Promise<NextResponse> {
 const postSchema = z.object({
   planId: z.string().min(1),
   priceId: z.string().min(1),
+  // Optional campaign attribution from the ?plan=…&coupon=…&utm_… signup link.
+  couponCode: z.string().optional(),
+  utmSource: z.string().optional(),
+  utmMedium: z.string().optional(),
+  utmCampaign: z.string().optional(),
 });
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -80,11 +86,13 @@ export async function POST(req: Request): Promise<NextResponse> {
         );
       }
       const origin = req.headers.get("origin") ?? new URL(req.url).origin;
+      const attribution = pickCheckoutAttribution(parsed.data);
       const checkout = await createParentCheckout({
         tenantId: session!.tenantId,
         planId: parsed.data.planId as BillingPlanId,
         origin,
         bearer,
+        attribution,
       });
       if (!checkout.ok) {
         return fail(
@@ -97,7 +105,11 @@ export async function POST(req: Request): Promise<NextResponse> {
         );
       }
       audit(session!, "billing.checkout.created", requestId, {
-        metadata: { planId: parsed.data.planId, sessionId: checkout.data.sessionId },
+        metadata: {
+          planId: parsed.data.planId,
+          sessionId: checkout.data.sessionId,
+          ...(attribution.couponCode ? { couponCode: attribution.couponCode } : {}),
+        },
       });
       return ok({ checkoutUrl: checkout.data.checkoutUrl }, requestId);
     }

@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { ArrowRight } from "lucide-react";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export function PageFAQ({
   heading = "Frequently asked questions",
@@ -21,10 +22,7 @@ export function PageFAQ({
 
   return (
     <section className="mb-14" aria-labelledby={headingId}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
+      <JsonLd data={faqJsonLd} />
       <h2
         id={headingId}
         className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-6"

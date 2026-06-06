@@ -36,7 +36,10 @@ export type BillingAuditEventType =
   | "billing.reconciliation.drift"
   | "billing.seats.allocated"
   | "billing.seats.allocation_superseded"
-  | "billing.overage";
+  | "billing.overage"
+  | "billing.coupon.created"
+  | "billing.coupon.disabled"
+  | "billing.coupon.redeemed";
 
 export interface EmitArgs {
   eventType: BillingAuditEventType;

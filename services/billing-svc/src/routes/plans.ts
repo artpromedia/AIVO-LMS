@@ -392,6 +392,10 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
         successUrl?: string;
         cancelUrl?: string;
         learnerCount?: number;
+        couponCode?: string;
+        utmSource?: string;
+        utmMedium?: string;
+        utmCampaign?: string;
       };
       if (!ensureTenantAccess(user, body.tenantId, reply)) return;
       if (body.planId !== "single" && body.planId !== "family") {
@@ -408,6 +412,12 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
           successUrl: body.successUrl,
           cancelUrl: body.cancelUrl,
           learnerCount: body.learnerCount,
+          // Campaign attribution from the ?plan=…&coupon=…&utm_… signup link,
+          // carried onto the subscription metadata for pilot conversion reporting.
+          couponCode: body.couponCode ?? null,
+          utmSource: body.utmSource ?? null,
+          utmMedium: body.utmMedium ?? null,
+          utmCampaign: body.utmCampaign ?? null,
         });
         if (!session.url) {
           return reply.code(503).send({ error: "Stripe did not return a checkout URL" });
@@ -418,7 +428,11 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
           tenantId: body.tenantId,
           userId: user.sub,
           resourceId: session.id,
-          details: { plan: body.planId, learnerCount: body.learnerCount ?? 1 },
+          details: {
+            plan: body.planId,
+            learnerCount: body.learnerCount ?? 1,
+            couponCode: body.couponCode ?? null,
+          },
         });
         return { checkoutUrl: session.url, sessionId: session.id };
       } catch (err) {

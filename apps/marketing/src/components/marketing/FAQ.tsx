@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 const FAQ_KEYS = [
   { q: "q1", a: "a1" },
@@ -17,25 +18,22 @@ export function FAQ() {
   const t = useTranslations("marketing.faq");
   const [open, setOpen] = useState<number | null>(null);
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQ_KEYS.map((faq) => ({
+      "@type": "Question",
+      name: t(faq.q),
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: t(faq.a),
+      },
+    })),
+  };
+
   return (
     <section className="py-24 bg-gradient-to-b from-slate-50/50 to-white" id="faq">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: FAQ_KEYS.map((faq) => ({
-              "@type": "Question",
-              name: t(faq.q),
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: t(faq.a),
-              },
-            })),
-          }),
-        }}
-      />
+      <JsonLd data={faqJsonLd} />
       <div className="max-w-3xl mx-auto px-6 md:px-8">
         <div className="text-center mb-16">
           <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-3">

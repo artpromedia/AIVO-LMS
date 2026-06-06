@@ -65,6 +65,8 @@ export function renderTemplate(
       return renderMfaCode(data);
     case "district_admin_invite":
       return renderDistrictAdminInvite(data);
+    case "trial_ending":
+      return renderTrialEnding(data);
     case "school_admin_invite":
       return renderSchoolAdminInvite(data);
     case "teacher_invite":
@@ -273,6 +275,33 @@ function renderDistrictAdminInvite(data: TemplateData) {
     subject: `You're invited to administer ${districtName} on AIVO Learning`,
     html,
     text: `You've been invited as a district administrator for ${districtName} on AIVO Learning. Accept your invitation here: ${inviteUrl}\n\nThis link expires in 72 hours.`,
+  };
+}
+
+function renderTrialEnding(data: TemplateData) {
+  const name = (data.name as string) || "there";
+  const trialEndDate = (data.trialEndDate as string) || "soon";
+  const daysLeft = data.daysLeft != null ? Number(data.daysLeft) : null;
+  const renewalUrl = (data.renewalUrl as string) || "#";
+  const whenText =
+    daysLeft != null && daysLeft >= 0
+      ? daysLeft === 0
+        ? "today"
+        : daysLeft === 1
+          ? "tomorrow"
+          : `in ${daysLeft} days`
+      : `on ${trialEndDate}`;
+  const html = baseLayout(`
+    <h1 class="title">Your AIVO free trial ends ${whenText}</h1>
+    <p class="body-text">Hi ${name},</p>
+    <p class="body-text">Your AIVO Learning free trial ends <span class="highlight">${whenText}</span> (${trialEndDate}). To keep your learner's personalized tutors, Brain Clone, and progress without interruption, add a plan before it ends.</p>
+    <p style="text-align:center"><a href="${renewalUrl}" class="btn">Choose a plan</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">If you've already added a plan, you can ignore this email. Paid plans include a 30-day money-back guarantee.</p>
+  `);
+  return {
+    subject: `Your AIVO free trial ends ${whenText}`,
+    html,
+    text: `Your AIVO Learning free trial ends ${whenText} (${trialEndDate}). Add a plan to keep your learner's tutors and progress: ${renewalUrl}`,
   };
 }
 
@@ -581,6 +610,7 @@ export const AVAILABLE_TEMPLATES = [
   { id: "iep_update", name: "IEP Goal Update", channels: ["email", "push"] },
   { id: "mfa_code", name: "MFA Verification Code", channels: ["email"] },
   { id: "district_admin_invite", name: "District Admin Invite", channels: ["email"] },
+  { id: "trial_ending", name: "Trial Ending Reminder", channels: ["email", "in_app"] },
   { id: "school_admin_invite", name: "School Admin Invite", channels: ["email"] },
   { id: "teacher_invite", name: "Teacher Invite", channels: ["email"] },
   { id: "staff_credentials", name: "Staff Credentials (Temp Password)", channels: ["email"] },

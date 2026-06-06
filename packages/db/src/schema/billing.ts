@@ -54,6 +54,12 @@ export const subscriptions = pgTable(
      * reminders.
      */
     trialWillEndNotifiedAt: timestamp("trial_will_end_notified_at"),
+    /**
+     * Idempotency latch for the daily trial-ending reminder job
+     * (billing.daily-trial-ending-reminders). Set after a reminder is
+     * successfully dispatched so retries never double-send.
+     */
+    trialEndingReminderSentAt: timestamp("trial_ending_reminder_sent_at"),
     cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false).notNull(),
     currentPeriodStart: timestamp("current_period_start"),
     currentPeriodEnd: timestamp("current_period_end"),

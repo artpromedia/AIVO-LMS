@@ -61,9 +61,24 @@ export async function adminPatch<T>(
   return adminRequest<T>(session, "PATCH", path, body);
 }
 
+export async function adminPost<T>(
+  session: Pick<SessionProfile, "role">,
+  path: string,
+  body?: unknown,
+): Promise<T> {
+  return adminRequest<T>(session, "POST", path, body);
+}
+
+export async function adminDelete<T>(
+  session: Pick<SessionProfile, "role">,
+  path: string,
+): Promise<T> {
+  return adminRequest<T>(session, "DELETE", path);
+}
+
 async function adminRequest<T>(
   session: Pick<SessionProfile, "role">,
-  method: "GET" | "PATCH",
+  method: "GET" | "PATCH" | "POST" | "DELETE",
   path: string,
   body?: unknown,
   query?: Record<string, QueryValue>,
@@ -92,11 +107,14 @@ async function adminRequest<T>(
   const payload = parseResponseBody(bodyText);
   if (!response.ok) {
     const message =
-      payload && typeof payload === "object" && "error" in payload && typeof payload.error === "string"
+      payload &&
+      typeof payload === "object" &&
+      "error" in payload &&
+      typeof payload.error === "string"
         ? payload.error
         : typeof payload === "string" && payload
           ? payload
-        : `admin-svc request failed (${response.status})`;
+          : `admin-svc request failed (${response.status})`;
     throw new AdminApiError(message, response.status, payload);
   }
 

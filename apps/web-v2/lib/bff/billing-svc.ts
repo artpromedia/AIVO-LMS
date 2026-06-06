@@ -22,6 +22,7 @@ import { serverEnv } from "@/lib/env";
 import { IDENTITY_ACCESS_TOKEN_COOKIE } from "@/lib/auth/identity-client";
 import { getActiveSubscriptionForTenant, listInvoicesForTenant, listPlans } from "@/lib/db/repos";
 import type { SessionProfile } from "@/lib/auth/types";
+import type { CheckoutAttribution } from "@/lib/bff/checkout-attribution";
 import { logger } from "@/lib/observability/logger";
 
 /** Canonical purchasable consumer plans, in display order. */
@@ -258,14 +259,18 @@ export async function loadParentBillingOverview(session: SessionProfile): Promis
 
 /**
  * Start a real Stripe Checkout for a paid plan. Returns the hosted
- * checkout URL the client redirects to.
+ * checkout URL the client redirects to. Any campaign attribution is forwarded
+ * to billing-svc, which stamps it onto the subscription metadata so a
+ * coupon/UTM-driven trial can be traced to its campaign.
  */
 export async function createParentCheckout(params: {
   tenantId: string;
   planId: BillingPlanId;
   origin: string;
   bearer: string;
+  attribution?: CheckoutAttribution;
 }): Promise<ServiceResult<{ checkoutUrl: string; sessionId: string }>> {
+  const attribution = params.attribution ?? {};
   return billingFetch<{ checkoutUrl: string; sessionId: string }>("/api/billing/checkout/session", {
     method: "POST",
     bearer: params.bearer,
@@ -274,6 +279,10 @@ export async function createParentCheckout(params: {
       planId: params.planId,
       successUrl: `${params.origin}/parent/settings/billing?checkout=success`,
       cancelUrl: `${params.origin}/parent/settings/billing?checkout=cancelled`,
+      ...(attribution.couponCode ? { couponCode: attribution.couponCode } : {}),
+      ...(attribution.utmSource ? { utmSource: attribution.utmSource } : {}),
+      ...(attribution.utmMedium ? { utmMedium: attribution.utmMedium } : {}),
+      ...(attribution.utmCampaign ? { utmCampaign: attribution.utmCampaign } : {}),
     },
   });
 }
