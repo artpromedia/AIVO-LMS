@@ -1,60 +1,9 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
-import { type AdminCoupon, disableCoupon, listCoupons } from "@aivo/admin-api/billing";
+import { listCoupons } from "@aivo/admin-api/billing";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Coupon action failed.";
-}
-
-function formatDate(value: string | null): string {
-  if (!value) return "—";
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(value));
-}
-
-/** Derived display status: disabled → expired → exhausted → active. */
-function couponStatus(c: AdminCoupon): "active" | "disabled" | "expired" | "exhausted" {
-  if (!c.active) return "disabled";
-  if (c.expiresAt && new Date(c.expiresAt).getTime() < Date.now()) return "expired";
-  if (c.maxRedemptions != null && c.redemptions >= c.maxRedemptions) return "exhausted";
-  return "active";
-}
-
-/** One-line summary of what the coupon grants, per coupon type. */
-function grantsSummary(c: AdminCoupon): string {
-  switch (c.couponType) {
-    case "DISCOUNT":
-      return `${c.discountPct}% off`;
-    case "SUBSCRIPTION":
-      return `${c.grantsDurationDays ?? 0} free days${c.grantsPlan ? ` · ${c.grantsPlan}` : ""}`;
-    case "PROVISIONING":
-      return [
-        c.grantsTier,
-        c.grantsPlan,
-        c.grantsSeatLimit != null ? `${c.grantsSeatLimit} seats` : "unlimited seats",
-        c.grantsDurationDays != null ? `${c.grantsDurationDays}d` : null,
-      ]
-        .filter(Boolean)
-        .join(" · ");
-    default:
-      return "—";
-  }
-}
-
-async function disableCouponAction(formData: FormData) {
-  "use server";
-  const session = await requirePageRole(["platform_admin"]);
-  const code = String(formData.get("code") || "").trim();
-  if (!code) redirect("/platform/billing/coupons?error=Missing%20coupon%20code.");
-  try {
-    await disableCoupon(session, code);
-  } catch (error) {
-    redirect(`/platform/billing/coupons?error=${encodeURIComponent(actionError(error))}`);
-  }
-  redirect(`/platform/billing/coupons?notice=${encodeURIComponent(`Coupon ${code} disabled.`)}`);
-}
+import { couponStatus, formatCouponDate, grantsSummary } from "./coupon-display";
+import { disableCouponAction } from "./actions";
 
 export default async function CouponsPage({
   searchParams,
@@ -99,9 +48,16 @@ export default async function CouponsPage({
                 return (
                   <tr key={coupon.code}>
                     <td className="font-bold">
-                      <span className="block">{coupon.code}</span>
+                      <Link
+                        className="text-blue-700 hover:underline"
+                        href={`/platform/billing/coupons/${encodeURIComponent(coupon.code)}`}
+                      >
+                        {coupon.code}
+                      </Link>
                       {coupon.description ? (
-                        <span className="text-sm text-slate-500">{coupon.description}</span>
+                        <span className="block text-sm font-normal text-slate-500">
+                          {coupon.description}
+                        </span>
                       ) : null}
                     </td>
                     <td>
@@ -115,7 +71,7 @@ export default async function CouponsPage({
                     <td>
                       <span className={`admin-status admin-status-${status}`}>{status}</span>
                     </td>
-                    <td>{formatDate(coupon.expiresAt)}</td>
+                    <td>{formatCouponDate(coupon.expiresAt)}</td>
                     <td>
                       {coupon.active ? (
                         <form action={disableCouponAction}>

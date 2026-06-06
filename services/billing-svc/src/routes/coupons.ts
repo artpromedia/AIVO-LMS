@@ -18,6 +18,9 @@ import type { FastifyInstance } from "fastify";
 import { sql } from "drizzle-orm";
 import { requirePlatformAdmin } from "./daily-jobs.js";
 import { verifyJWT } from "@aivo/security";
+import { createLogger } from "@aivo/observability";
+import { emitBillingAudit } from "../lib/audit.js";
+import { couponsCreated, couponsRedeemed } from "../lib/metrics.js";
 import {
   listCouponsSchema,
   createCouponSchema,
@@ -25,6 +28,8 @@ import {
   validateCouponSchema,
   redeemCouponSchema,
 } from "./schemas.js";
+
+const auditLog = createLogger("billing-svc.coupons");
 
 /**
  * Per-user 10-req/min token bucket on the redeem path to prevent
@@ -193,7 +198,39 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
       reply.code(409).send({ error: "duplicate_code" });
       return;
     }
+
+    couponsCreated.increment(1, { type: couponType });
+    await emitBillingAudit(db, auditLog, {
+      eventType: "billing.coupon.created",
+      userId: me.sub ?? null,
+      resourceId: code,
+      details: {
+        couponType,
+        code,
+        discountPct: couponType === "DISCOUNT" ? discountPct : undefined,
+        grantsTier,
+        grantsPlan,
+        grantsSeatLimit,
+        grantsDurationDays,
+        maxRedemptions,
+        expiresAt: expiresAt ? expiresAt.toISOString() : null,
+      },
+    });
+
     reply.code(201).send({ ok: true, code });
+  });
+
+  // ── Admin: fetch a single coupon (detail + live redemption count) ──────────
+  app.get("/api/billing/admin/coupons/:code", async (req, reply) => {
+    const me = await requirePlatformAdmin(req, reply);
+    if (!me) return;
+    const { code } = req.params as { code: string };
+    const row = await lookupCoupon(db, code);
+    if (!row) {
+      reply.code(404).send({ error: "not_found" });
+      return;
+    }
+    return { coupon: row };
   });
 
   app.delete(
@@ -206,6 +243,12 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
       await db.execute(sql`
       UPDATE billing_coupons SET active = false WHERE code = ${params.code}
     `);
+      await emitBillingAudit(db, auditLog, {
+        eventType: "billing.coupon.disabled",
+        userId: me.sub ?? null,
+        resourceId: params.code,
+        details: { code: params.code },
+      });
       return { ok: true, code: params.code };
     },
   );
@@ -283,6 +326,14 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
       await db.execute(sql`
         UPDATE billing_coupons SET redemptions = redemptions + 1 WHERE code = ${row.code}
       `);
+      couponsRedeemed.increment(1, { type: "DISCOUNT" });
+      await emitBillingAudit(db, auditLog, {
+        eventType: "billing.coupon.redeemed",
+        tenantId,
+        userId: jwtPayload.sub ?? null,
+        resourceId: row.code,
+        details: { couponType: "DISCOUNT", code: row.code, discountPct: row.discount_pct ?? 0 },
+      });
       return {
         ok: true,
         couponType: "DISCOUNT",
@@ -327,6 +378,15 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
       `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
       const expiresRows = Array.isArray(expiresResult) ? expiresResult : (expiresResult.rows ?? []);
       expiresAt = expiresRows[0]?.current_period_end ?? null;
+
+      couponsRedeemed.increment(1, { type: "SUBSCRIPTION" });
+      await emitBillingAudit(db, auditLog, {
+        eventType: "billing.coupon.redeemed",
+        tenantId,
+        userId,
+        resourceId: row.code,
+        details: { couponType: "SUBSCRIPTION", code: row.code, grantsDurationDays },
+      });
 
       return {
         ok: true,
@@ -379,6 +439,21 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
     `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
     const expiresRows = Array.isArray(expiresResult) ? expiresResult : (expiresResult.rows ?? []);
     expiresAt = expiresRows[0]?.current_period_end ?? null;
+
+    couponsRedeemed.increment(1, { type: "PROVISIONING" });
+    await emitBillingAudit(db, auditLog, {
+      eventType: "billing.coupon.redeemed",
+      tenantId,
+      userId,
+      resourceId: row.code,
+      details: {
+        couponType: "PROVISIONING",
+        code: row.code,
+        grantsTier,
+        grantsPlan,
+        grantsSeatLimit,
+      },
+    });
 
     return {
       ok: true,

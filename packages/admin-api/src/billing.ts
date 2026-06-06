@@ -162,6 +162,24 @@ export async function listCoupons(session: Pick<SessionProfile, "role">): Promis
   return rows.map((r) => mapCouponRow(r as Record<string, unknown>));
 }
 
+/** Fetch a single coupon (with its live redemption count), or null if absent. */
+export async function getCoupon(
+  session: Pick<SessionProfile, "role">,
+  code: string,
+): Promise<AdminCoupon | null> {
+  try {
+    const payload = await adminGet<Record<string, unknown>>(
+      session,
+      `/api/admin-svc/billing/coupons/${encodeURIComponent(code)}`,
+    );
+    const row = payload.coupon;
+    return row && typeof row === "object" ? mapCouponRow(row as Record<string, unknown>) : null;
+  } catch (err) {
+    if (err instanceof AdminApiError && err.status === 404) return null;
+    throw err;
+  }
+}
+
 /** Create a coupon via billing-svc; throws AdminApiError with friendly copy. */
 export async function createCoupon(
   session: Pick<SessionProfile, "role">,

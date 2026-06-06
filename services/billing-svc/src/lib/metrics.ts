@@ -46,3 +46,9 @@ export const reconciliationDrift = createCounter(
   "billing_reconciliation_drift_total",
   ["kind"], // status, period_end, payment_method, tutor_item
 );
+
+// Coupon lifecycle. `type` is the coupon_type (DISCOUNT, SUBSCRIPTION,
+// PROVISIONING) — a fixed, low-cardinality set.
+export const couponsCreated = createCounter("billing_coupons_created_total", ["type"]);
+
+export const couponsRedeemed = createCounter("billing_coupons_redeemed_total", ["type"]);

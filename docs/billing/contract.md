@@ -108,8 +108,27 @@ Coupon kinds:
 - **School pilot access code** — provisions a `district` plan slice
   with seat cap; manual admin activation required for go-live.
 
-Every redemption emits `billing.coupon.redeemed`; rejections emit
-`billing.coupon.rejected` with a reason.
+The admin detail route `GET /api/billing/admin/coupons/:code` returns the
+single coupon row with its live redemption count (for the pilot-uptake view).
+
+### Coupon audit + metrics
+
+Audit events (hash-chained `audit_events`, surfaced in admin audit dashboards):
+
+| Event                     | Emitted when                                              |
+| ------------------------- | --------------------------------------------------------- |
+| `billing.coupon.created`  | admin creates a coupon (actor + type + grants)            |
+| `billing.coupon.disabled` | admin disables a coupon                                   |
+| `billing.coupon.redeemed` | a coupon is redeemed (DISCOUNT/SUBSCRIPTION/PROVISIONING) |
+
+Prometheus counters (`/metrics`):
+
+| Counter                          | Labels | Incremented on        |
+| -------------------------------- | ------ | --------------------- |
+| `billing_coupons_created_total`  | `type` | successful create     |
+| `billing_coupons_redeemed_total` | `type` | successful redemption |
+
+`type` is the `coupon_type` (`DISCOUNT` / `SUBSCRIPTION` / `PROVISIONING`).
 
 ## Stripe checkout / portal
 
