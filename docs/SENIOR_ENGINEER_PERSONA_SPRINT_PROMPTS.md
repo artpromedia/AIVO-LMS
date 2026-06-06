@@ -343,7 +343,8 @@ emits — replacing the coherent-but-generic default fixtures.
 Files to EDIT/EXTEND (reuse, do not reinvent):
 - packages/item-bank/src/* — author calibrated items per subject/grade band; the
   CLI import path (packages/item-bank/src/cli/import.ts) already parses authored
-  content — remove the parser "Hack:" shortcut at import.ts:155 with a proper
+  content — replace the parser "Hack:" shortcut (search for the `// Hack:`
+  comment in import.ts, ~line 155 as of 2026-06) with a proper
   parse if you touch it.
 - packages/content-pack/* — add content-pack manifests + validators for each
   newly-authored subject; keep the existing manifest schema.
