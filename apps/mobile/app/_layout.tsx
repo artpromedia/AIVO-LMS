@@ -11,6 +11,7 @@ import { colors } from "@/constants/colors";
 import { FONT_ASSETS } from "@/constants/typography";
 import { SensoryModeProvider } from "@/context/SensoryModeProvider";
 import { PreferencesProvider } from "@/lib/preferences";
+import { SplashGate } from "@/components/SplashGate";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,11 +32,11 @@ export default function RootLayout() {
 
   const authState = useAuthState();
 
-  useEffect(() => {
-    if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, fontError]);
+  // The native splash now stays up until <SplashGate> mounts and hides it
+  // itself (so the animated logo is on-screen first — no white flash). The
+  // gate also owns the fade to the app, holding until both the fonts are
+  // ready and auth has hydrated.
+  const ready = (fontsLoaded || !!fontError) && !authState.isLoading;
 
   // Restore the learner's saved UI locale from a previous launch. Runs
   // exactly once on mount and is intentionally fire-and-forget — the
@@ -43,10 +44,6 @@ export default function RootLayout() {
   useEffect(() => {
     void restoreSavedLocale();
   }, []);
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
 
   // The sensory-mode provider is mounted inside the auth context
   // (as a child of AuthContext.Provider) so it can read learnerId
@@ -63,23 +60,25 @@ export default function RootLayout() {
           <AuthContext.Provider value={authState}>
             <SensoryModeProvider learnerId={learnerId}>
               <PreferencesProvider learnerId={learnerId}>
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    contentStyle: { backgroundColor: colors.background },
-                  }}
-                >
-                  <Stack.Screen name="index" />
-                  <Stack.Screen name="accept-invite" />
-                  <Stack.Screen name="settings/accessibility" />
-                  <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
-                  <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
-                  <Stack.Screen name="(parent)" />
-                  <Stack.Screen name="(learner)" />
-                  <Stack.Screen name="(teacher)" />
-                  <Stack.Screen name="(caregiver)" />
-                  <Stack.Screen name="(therapist)" />
-                </Stack>
+                <SplashGate ready={ready}>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      contentStyle: { backgroundColor: colors.background },
+                    }}
+                  >
+                    <Stack.Screen name="index" />
+                    <Stack.Screen name="accept-invite" />
+                    <Stack.Screen name="settings/accessibility" />
+                    <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
+                    <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
+                    <Stack.Screen name="(parent)" />
+                    <Stack.Screen name="(learner)" />
+                    <Stack.Screen name="(teacher)" />
+                    <Stack.Screen name="(caregiver)" />
+                    <Stack.Screen name="(therapist)" />
+                  </Stack>
+                </SplashGate>
               </PreferencesProvider>
             </SensoryModeProvider>
           </AuthContext.Provider>

@@ -11,8 +11,7 @@ import {
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "@/hooks/useTranslation";
-import { apiFetch } from "@/lib/api";
-import { API } from "@/constants/api";
+import { requestPasswordReset } from "@/src/api/passwordRecovery";
 import { colors, spacing, radius } from "@/constants/colors";
 import { AivoButton } from "@aivo/mobile-ui";
 
@@ -32,11 +31,7 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     setError("");
     try {
-      await apiFetch(API.IDENTITY, "/api/auth/forgot-password", {
-        method: "POST",
-        body: JSON.stringify({ email: email.trim() }),
-        skipAuth: true,
-      });
+      await requestPasswordReset(email);
       setSent(true);
     } catch {
       setError(t("auth.somethingWentWrong"));

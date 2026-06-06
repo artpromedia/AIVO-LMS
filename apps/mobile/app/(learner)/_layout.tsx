@@ -178,6 +178,7 @@ function ThemedLearnerTabs() {
         <Tabs.Screen name="subjects/index" options={{ href: null }} />
         <Tabs.Screen name="subjects/[subjectId]" options={{ href: null }} />
         <Tabs.Screen name="progress" options={{ href: null }} />
+        <Tabs.Screen name="lesson-runs" options={{ href: null }} />
         <Tabs.Screen name="library" options={{ href: null }} />
         <Tabs.Screen name="missions" options={{ href: null }} />
         <Tabs.Screen name="notifications" options={{ href: null }} />
