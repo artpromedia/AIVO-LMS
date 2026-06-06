@@ -400,7 +400,26 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    code: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         put?: never;
         post?: never;
         /** Deactivate a coupon by code */
@@ -863,6 +882,10 @@ export interface operations {
                     successUrl?: string;
                     cancelUrl?: string;
                     learnerCount?: number;
+                    couponCode?: string;
+                    utmSource?: string;
+                    utmMedium?: string;
+                    utmCampaign?: string;
                 } & {
                     [key: string]: unknown;
                 };

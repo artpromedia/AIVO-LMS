@@ -26,6 +26,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
+          package-manager-cache: false
 
       # Blocking: every locale must have the same flat key set as English.
       # This is the bedrock contract — if it breaks, runtime UIs will throw

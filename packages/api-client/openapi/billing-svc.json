@@ -438,6 +438,18 @@
                   "learnerCount": {
                     "type": "integer",
                     "minimum": 1
+                  },
+                  "couponCode": {
+                    "type": "string"
+                  },
+                  "utmSource": {
+                    "type": "string"
+                  },
+                  "utmMedium": {
+                    "type": "string"
+                  },
+                  "utmCampaign": {
+                    "type": "string"
                   }
                 }
               }
@@ -2177,6 +2189,23 @@
       }
     },
     "/api/billing/admin/coupons/{code}": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "code",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
       "delete": {
         "operationId": "deactivateCoupon",
         "summary": "Deactivate a coupon by code",
