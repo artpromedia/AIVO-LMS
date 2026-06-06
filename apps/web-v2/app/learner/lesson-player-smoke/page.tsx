@@ -16,6 +16,13 @@ import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/lesson-pla
 
 export const dynamic = "force-dynamic";
 
+const SMOKE_ERROR_COPY = {
+  missingLearner: "Missing learner context.",
+  missingSubject: "Missing subject for smoke route.",
+  missingSkill: "Missing skill for smoke route.",
+  missingFixture: "Fixture missing for smoke route.",
+} as const;
+
 type Props = {
   searchParams?: Promise<{ subject?: string }>;
 };
@@ -30,9 +37,7 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
     session.role === "learner"
       ? (session.learnerId ?? "lrn_demo_sky")
       : await readActiveLearnerFromCookies(session);
-  if (!learnerId) {
-    return <div data-testid="smoke-error">Missing learner context.</div>;
-  }
+  if (!learnerId) return <div data-testid="smoke-error">{SMOKE_ERROR_COPY.missingLearner}</div>;
   const requested = (await searchParams)?.subject ?? "math";
   const mapped =
     requested === "reading" || requested === "ela"
@@ -41,14 +46,10 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
         ? "science"
         : "math";
   const subject = (await listSubjects()).find((s) => s.slug === mapped) ?? null;
-  if (!subject) {
-    return <div data-testid="smoke-error">Missing subject for smoke route.</div>;
-  }
+  if (!subject) return <div data-testid="smoke-error">{SMOKE_ERROR_COPY.missingSubject}</div>;
   const detail = await getSubjectDetail(learnerId, session.tenantId, subject.id);
   const skillId = detail?.nextSkillId ?? detail?.skills[0]?.id ?? null;
-  if (!skillId) {
-    return <div data-testid="smoke-error">Missing skill for smoke route.</div>;
-  }
+  if (!skillId) return <div data-testid="smoke-error">{SMOKE_ERROR_COPY.missingSkill}</div>;
   const created = await createLessonRun({
     learnerId,
     tenantId: session.tenantId,
@@ -63,7 +64,7 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
     plan = created.plan;
   } else {
     const fixture = pickMultimediaFixtureForSubject(mapped, `smoke:${mapped}`);
-    if (!fixture) return <div data-testid="smoke-error">Fixture missing for smoke route.</div>;
+    if (!fixture) return <div data-testid="smoke-error">{SMOKE_ERROR_COPY.missingFixture}</div>;
     const now = nowIso();
     lessonRun = {
       id: newId("lr"),

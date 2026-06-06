@@ -8,7 +8,6 @@
  * the dev server. Restart `Web App` workflow to reset.
  */
 import type {
-  AccessibilityPreferences,
   AccommodationSummary,
   AuditLog,
   BaselineAssessment,

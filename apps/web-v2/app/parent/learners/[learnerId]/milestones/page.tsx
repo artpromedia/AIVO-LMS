@@ -83,6 +83,7 @@ const BADGES: Record<BadgeKey, BadgeDef> = {
 };
 
 const ALL_KEYS = Object.keys(BADGES) as BadgeKey[];
+const LEVEL_LABEL = "Level";
 
 export default async function ParentMilestonesPage({
   params,
@@ -148,7 +149,7 @@ export default async function ParentMilestonesPage({
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
               <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-                Level
+                {LEVEL_LABEL}
               </p>
               <p className="mt-1 font-display text-3xl font-semibold">{eng.level}</p>
               <p className="mt-3 text-xs text-aivo-ink-soft">{t("levels_desc")}</p>

@@ -329,7 +329,6 @@ export function LessonPlayer({
   // instead of requiring the learner to ask. (They can still ignore it.)
   useEffect(() => {
     if (accessibility.extraHints && beat.kind === "guided") setShowHint(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepIdx, accessibility.extraHints]);
 
   // Persist current step in URL + emit lesson_step_viewed once per beat.

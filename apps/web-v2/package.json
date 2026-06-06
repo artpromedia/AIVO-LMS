@@ -21,7 +21,6 @@
     "@aivo/accessibility-contract": "workspace:*",
     "@aivo/adaptive-baseline": "workspace:*",
     "@aivo/admin-api": "workspace:*",
-    "@aivo/admin-auth": "workspace:*",
     "@aivo/api-client": "workspace:*",
     "@aivo/brand": "workspace:*",
     "@aivo/db": "workspace:*",

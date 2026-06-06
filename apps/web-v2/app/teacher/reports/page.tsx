@@ -17,6 +17,7 @@ import { getStore as db } from "@/lib/db/store";
 import { getIEPForLearner, getMasteryMap, listLearnersForTeacher } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
+const GOALS_LINK_LABEL = "Goals";
 
 export default async function TeacherReportsPage() {
   const session = await requirePageRole(["teacher"]);
@@ -202,7 +203,7 @@ export default async function TeacherReportsPage() {
                             href={`/teacher/learners/${r.learner.id}/iep/draft`}
                             className="text-aivo-accent underline underline-offset-4"
                           >
-                            Goals
+                            {GOALS_LINK_LABEL}
                           </Link>
                         </>
                       ) : null}

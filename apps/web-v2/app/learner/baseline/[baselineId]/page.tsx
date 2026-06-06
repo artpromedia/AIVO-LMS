@@ -530,7 +530,7 @@ export default async function BaselineRunnerPage({
             <rect x="6" y="4" width="4" height="16" />
             <rect x="14" y="4" width="4" height="16" />
           </svg>
-          Pause
+          {t("stop_for_today")}
         </Link>
       }
       status={chips.slice(0, 4).map((v) => (

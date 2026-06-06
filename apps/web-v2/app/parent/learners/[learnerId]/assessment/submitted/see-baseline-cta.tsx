@@ -105,7 +105,7 @@ export function SeeBaselineCta({ href }: { href: string }) {
             href={href}
             className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
           >
-            Open the setup page directly
+            {t("see_baseline_cta")}
           </a>{" "}
           or try again in a minute.
         </p>

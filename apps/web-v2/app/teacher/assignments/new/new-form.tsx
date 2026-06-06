@@ -12,6 +12,8 @@ type SubjectOption = {
 };
 type LearnerOption = { id: string; displayName: string };
 
+const TITLE_LABEL = "Title";
+
 export function NewAssignmentForm({
   subjects,
   learners,
@@ -81,7 +83,7 @@ export function NewAssignmentForm({
       <Card className="p-[var(--aivo-density-card-pad)] grid gap-4">
         <div className="grid gap-2">
           <label htmlFor="a-title" className="text-sm font-medium">
-            Title
+            {TITLE_LABEL}
           </label>
           <input
             id="a-title"

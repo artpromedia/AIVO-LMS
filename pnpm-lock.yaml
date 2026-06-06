@@ -341,9 +341,6 @@ importers:
       '@aivo/admin-api':
         specifier: workspace:*
         version: link:../../packages/admin-api
-      '@aivo/admin-auth':
-        specifier: workspace:*
-        version: link:../../packages/admin-auth
       '@aivo/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
