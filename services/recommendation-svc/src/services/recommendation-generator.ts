@@ -113,6 +113,50 @@ const CANDIDATES: Candidate[] = [
     affectsInstructionalAccess: true,
     reversible: true,
   },
+  // ── Observation-derived candidates (Sprint 5, G1/G2) ──────────────────
+  // Fire on signals produced by observation-signal-transformer from
+  // teacher/caregiver/therapist observations. Each still requires parent
+  // approval and cites the contributing source(s) in its evidence.
+  {
+    type: "sensory_setting_change",
+    title: "Adjust sensory settings",
+    parentSummary:
+      "Members of the care team have reported sensory overload. We recommend calmer sensory settings (reduced motion, quieter audio) during sessions.",
+    currentValue: "default",
+    proposedValue: "calm",
+    matches: (signals) => signals.filter((s) => s.metric.endsWith("_reports_sensory_overload")),
+    reversible: true,
+  },
+  {
+    type: "self_regulation_support_add",
+    title: "Add self-regulation support (care-team reported)",
+    parentSummary:
+      "Care-team observations point to focus or self-regulation difficulty. We recommend turning on self-regulation prompts and short breaks.",
+    currentValue: "off",
+    proposedValue: "on",
+    matches: (signals) =>
+      signals.filter(
+        (s) =>
+          s.metric.endsWith("_reports_focus_drop") ||
+          s.metric.endsWith("_reports_regulation_difficulty"),
+      ),
+    reversible: true,
+  },
+  {
+    type: "tutor_strategy_change",
+    title: "Adjust tutor strategy (care-team reported)",
+    parentSummary:
+      "Care-team observations report lower engagement or academic struggle. We recommend a tutor strategy change (more scaffolding and interest-led framing).",
+    currentValue: "current",
+    proposedValue: "scaffold_and_interest_led",
+    matches: (signals) =>
+      signals.filter(
+        (s) =>
+          s.metric.endsWith("_reports_engagement_drop") ||
+          s.metric.endsWith("_reports_academic_struggle"),
+      ),
+    reversible: true,
+  },
 ];
 
 export function generateRecommendations(input: GenerateCandidatesInput): ProfileRecommendation[] {

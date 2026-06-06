@@ -19,7 +19,12 @@ export type EvidenceSource =
   | "problem_session"
   | "teacher_observation"
   | "parent_observation"
+  | "caregiver_observation"
+  | "therapist_observation"
   | "regression_check";
+
+/** Who contributed an observation-derived piece of evidence. */
+export type ContributorRole = "parent" | "teacher" | "therapist" | "caregiver";
 
 export interface RecommendationEvidence {
   source: EvidenceSource;
@@ -27,6 +32,10 @@ export interface RecommendationEvidence {
   occurredAt?: string;
   metric?: string;
   value?: number | string | boolean;
+  /** Provenance for caregiver/teacher-derived evidence (G1/G2). */
+  contributorRole?: ContributorRole;
+  /** Relative confidence weight of this evidence (0–1). */
+  weight?: number;
 }
 
 export interface RecommendationSafety {
