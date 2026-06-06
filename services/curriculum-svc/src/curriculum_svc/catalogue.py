@@ -344,13 +344,28 @@ def _parse_snapshot(raw: dict) -> Catalogue:
 
 
 @lru_cache(maxsize=1)
-def get_catalogue() -> Catalogue:
-    """Return the (memoized) in-memory catalogue. Reads from the bundled
-    JSON snapshot via `importlib.resources` so it works equally well in a
+def _bundled_catalogue() -> Catalogue:
+    """Return the (memoized) catalogue parsed from the bundled JSON
+    snapshot via `importlib.resources` so it works equally well in a
     source checkout and in an installed wheel."""
     pkg = resources.files("curriculum_svc.data")
     raw = json.loads((pkg / "skill_graphs.json").read_text(encoding="utf-8"))
     return _parse_snapshot(raw)
+
+
+def get_catalogue() -> Catalogue:
+    """Return the current catalogue read model.
+
+    In the default ``snapshot`` persistence mode this is the immutable
+    bundled snapshot. When ``CURRICULUM_PERSISTENCE`` selects a mutable
+    store (``memory``/``postgres``, Sprint 4) the read model comes from
+    that store so authoring writes are reflected after a reload."""
+    # Imported lazily to avoid a circular import (store imports this module).
+    from curriculum_svc.store import get_store, store_enabled
+
+    if store_enabled():
+        return get_store().to_catalogue()
+    return _bundled_catalogue()
 
 
 def load_catalogue_from_dict(raw: dict) -> Catalogue:

@@ -45,6 +45,7 @@ A learner's curriculum is resolved deterministically, left to right:
 | `services/curriculum-svc` | **Authoritative** catalogue: skills, prerequisites, content packs, frameworks, jurisdiction resolution, validation. | US ZIP catalogue today; intl + auth + authoring + validate over Sprints 1–7. |
 | `curriculum-svc/.../catalogue.py` | In-memory read model loaded from the `skill_graphs.json` snapshot; enforces district/jurisdiction scoping; `resolve_jurisdiction()`. | Generalized to the `Jurisdiction` model (S2). |
 | `curriculum-svc/.../jurisdiction.py` + `frameworks.py` | `{country, region, district, postalCode}` → framework resolution; single framework registry (NERDC/MOE/NC/…). | Done (S2). Intl content seeded S3. |
+| `curriculum-svc/.../store.py` + `routes/authoring.py` | Mutable catalogue store (in-memory / Postgres) + admin-gated CRUD + `/admin/reload`. Durable schema in `packages/db` (migration 0067). | Done (S4). |
 | `curriculum-svc/.../auth.py` | Service-token / JWT auth for catalogue access. | Weak bearer check today; real RS256 in S1. |
 | `packages/content-pack/data/<jurisdiction>/catalogue.json` | Curated source data per jurisdiction (US-CCSS + NG-NERDC, AE-MOE, GB-NC), each skill citing its source. Compiled into the snapshot. | NG/AE/GB seeded (S3). |
 | `curriculum-svc/scripts/build_snapshot.py` | Deterministic compiler: source catalogues → `skill_graphs.json`. `--check` fails CI on drift. | Done (S3); replaces the hand-maintained snapshot. |

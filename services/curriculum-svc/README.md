@@ -76,11 +76,33 @@ secret.
 (`NODE_ENV=production`/`ENV=production`). It never silently accepts an
 unverified token.
 
+## Authoring / CMS write path (Sprint 4)
+
+The bundled snapshot is read-only. To maintain the catalogue at scale,
+set `CURRICULUM_PERSISTENCE` to a mutable backend and use the admin API:
+
+- `memory` — in-process mutable store seeded from the snapshot (dev/test).
+- `postgres` — durable store backed by the `curriculum_*` tables
+  (Drizzle schema in `packages/db/src/schema/curriculum.ts`, migration
+  `0067_curriculum_catalogue.sql`); requires `CURRICULUM_DATABASE_URL`.
+
+Admin-gated endpoints (service token or a user JWT carrying an admin role;
+non-admins get 403). Writes are validated against the authoring contract
+(`packages/curriculum-authoring/schema/curriculum-catalogue.schema.json`):
+
+- `POST|PUT|DELETE /api/curriculum/admin/districts[/{id}]`
+- `POST|PUT|DELETE /api/curriculum/admin/skills[/{id}]`
+- `POST|PUT|DELETE /api/curriculum/admin/packs[/{id}]`
+- `POST /api/curriculum/admin/reload` — rebuild the read model.
+
+Malformed records return 422; packs referencing unknown districts/skills
+return 422 with field errors. In the default `snapshot` mode these routes
+return 503 (catalogue is read-only).
+
 Future scope (out of this PR — tracked in INTEGRATION_STATUS.md):
 
 - gRPC mode for low-latency in-cluster reads.
-- Authoring write-path (CMS UI) — separate PR.
-- Live re-load of the snapshot via S3 sidecar.
+- Authoring CMS UI (admin-svc surface).
 
 ## Run
 

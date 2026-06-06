@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from curriculum_svc.auth import verify_auth_config_or_raise
-from curriculum_svc.routes import health, jurisdictions, lookup
+from curriculum_svc.routes import authoring, health, jurisdictions, lookup
 
 # Fail closed at boot: in production the service refuses to start unless a
 # real credential mechanism (INTERNAL_SERVICE_TOKEN or JWT_PUBLIC_KEY) is
@@ -51,3 +51,4 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api/curriculum", tags=["health"])
 app.include_router(lookup.router, prefix="/api/curriculum", tags=["curriculum"])
 app.include_router(jurisdictions.router, prefix="/api/curriculum", tags=["curriculum"])
+app.include_router(authoring.router, prefix="/api/curriculum", tags=["authoring"])
