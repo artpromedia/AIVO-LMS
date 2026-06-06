@@ -26,7 +26,9 @@ type RoleCase = {
   homeRoute: string;
 };
 
-// Mirrors `ROLE_HOME` in `apps/web-v2/lib/auth/types.ts`. Kept inline
+// Mirrors the consumer routes in `ROLE_HOME`. Admin roles leave web-v2 for
+// the standalone web-admin app and are covered by the admin-host E2E suite.
+// Kept inline
 // so the Playwright spec stays free of `@/lib` aliasing (the playwright
 // runner does not honor the Next.js tsconfig paths config).
 const ROLE_HOMES: RoleCase[] = [
@@ -35,9 +37,6 @@ const ROLE_HOMES: RoleCase[] = [
   { mockSession: "teacher", label: "teacher", homeRoute: "/teacher/home" },
   { mockSession: "caregiver", label: "caregiver", homeRoute: "/caregiver/home" },
   { mockSession: "therapist", label: "therapist", homeRoute: "/therapist/home" },
-  { mockSession: "school_admin", label: "school admin", homeRoute: "/admin/school" },
-  { mockSession: "district_admin", label: "district admin", homeRoute: "/admin/district" },
-  { mockSession: "platform_admin", label: "platform admin", homeRoute: "/admin/platform" },
 ];
 
 // Disabled axe rules — these match the existing `visual-a11y` spec so

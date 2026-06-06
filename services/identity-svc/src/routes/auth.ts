@@ -93,7 +93,8 @@ async function hashPassword(password: string): Promise<string> {
  * misrouted user to. Production hosts are pinned to admin.aivolearning.com /
  * district.aivolearning.com (defense-in-depth + middleware host allowlist),
  * so the rejection payload MUST be an absolute URL on the correct host -
- * a relative `/admin/login` would 404 once host pinning is enforced.
+ * a relative `/login` would stay on the consumer host once host pinning is
+ * enforced.
  *
  * In development (replit dev domain, localhost) we fall back to the same-host
  * relative path so the dev preview pane keeps working.
@@ -119,8 +120,8 @@ function adminLoginUrl(req: { headers: Record<string, string | string[] | undefi
   return buildSurfaceLoginUrl(
     req,
     "WEB_ADMIN_LOGIN_URL",
-    "https://admin.aivolearning.com/admin/login",
-    "/admin/login",
+    "https://admin.aivolearning.com/login",
+    "/login",
   );
 }
 
@@ -128,8 +129,8 @@ function districtLoginUrl(req: { headers: Record<string, string | string[] | und
   return buildSurfaceLoginUrl(
     req,
     "WEB_DISTRICT_LOGIN_URL",
-    "https://district.aivolearning.com/district/login",
-    "/district/login",
+    "https://district.aivolearning.com/login",
+    "/login",
   );
 }
 

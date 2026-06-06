@@ -62,17 +62,13 @@ test.describe("admin/district auth-surface split", () => {
     const res = await page.waitForResponse((r) => r.url().endsWith("/api/auth/login"));
     expect(res.status()).toBe(403);
     const body = await res.json();
-    // Dev defaults to relative; production / aivolearning.com hosts default to
-    // an absolute cross-host URL on district.aivolearning.com.
-    expect(body.redirectTo).toMatch(
-      /(^\/district\/login$)|(^https:\/\/district\.aivolearning\.com\/district\/login$)/,
-    );
+    // The standalone web-admin app serves one canonical /login route on both
+    // the admin and district hosts.
+    expect(body.redirectTo).toMatch(/(^\/login$)|(^https:\/\/district\.aivolearning\.com\/login$)/);
 
     await expect(page.getByRole("alert")).toContainText(/district\.aivolearning\.com/i);
     const staffLink = page.getByRole("link", { name: /staff sign-in/i });
     const href = await staffLink.getAttribute("href");
-    expect(href).toMatch(
-      /(^\/district\/login$)|(^https:\/\/district\.aivolearning\.com\/district\/login$)/,
-    );
+    expect(href).toMatch(/(^\/login$)|(^https:\/\/district\.aivolearning\.com\/login$)/);
   });
 });

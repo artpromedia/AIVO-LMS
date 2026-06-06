@@ -362,7 +362,7 @@ export async function registerSsoRoutes(app: FastifyInstance) {
       req.log.warn({ err: err.message, slug }, "SAML SLO validation failed");
     }
     reply.clearCookie("refreshToken", { path: "/" });
-    reply.redirect("/district/login");
+    reply.redirect(process.env.WEB_DISTRICT_LOGIN_URL || "https://district.aivolearning.com/login");
   };
   app.get("/api/sso/saml/:slug/slo", { schema: getSsoSamlBySlugSloSchema }, sloHandler);
   app.post("/api/sso/saml/:slug/slo", { schema: ssoSamlBySlugSloSchema }, sloHandler);

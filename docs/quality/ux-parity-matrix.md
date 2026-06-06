@@ -69,9 +69,10 @@
   symbols (`EmptyState` in `@aivo/ui` and `apps/web-v2/components/ui`,
   `OfflineBanner` in `apps/web-v2/components/offline`, canonical app
   shell at `apps/web-v2/app/layout.tsx`);
-- every shipping role surface (learner, parent, teacher, admin/school,
-  admin/district) uses `EmptyState` in at least one `page.tsx` — no
-  silent empty-data dead ends;
+- every shipping consumer role surface (learner, parent, teacher) uses
+  `EmptyState` in at least one `page.tsx` — no silent empty-data dead ends;
+  standalone admin route coverage is enforced by `route:audit` and
+  `apps/web-admin/role-home.test.ts`;
 - the curated web⇄mobile parity matrix in
   `scripts/web-mobile-parity-check.mjs` is clean under `--strict`
   (subprocess invocation; non-zero exit fails the gate).

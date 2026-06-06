@@ -36,7 +36,7 @@ function requireUrl(name: string, devDefault: string): string {
 }
 
 const COMMS_SVC_URL = requireUrl("COMMS_SVC_URL", "http://localhost:3003");
-const LOGIN_URL = process.env.WEB_ADMIN_LOGIN_URL || "https://admin.aivolearning.com/admin/login";
+const LOGIN_URL = process.env.WEB_ADMIN_LOGIN_URL || "https://admin.aivolearning.com/login";
 
 function isManagedPlatformStaffRole(role: string): role is (typeof MANAGED_PLATFORM_STAFF_ROLES)[number] {
   return (MANAGED_PLATFORM_STAFF_ROLES as readonly string[]).includes(role);

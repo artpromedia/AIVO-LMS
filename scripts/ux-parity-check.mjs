@@ -15,11 +15,10 @@
 //          OfflineBanner
 //        - apps/web-v2/app/layout.tsx exists (canonical app shell)
 //
-//   2. Each shipping role surface (learner, parent, teacher,
-//      admin/school, admin/district) uses the EmptyState primitive
-//      in at least one page.tsx. Empty-data dead ends are the most
-//      common UX regression and the matrix calls them out as
-//      mandatory.
+//   2. Each shipping consumer role surface (learner, parent, teacher)
+//      uses the EmptyState primitive in at least one page.tsx. Admin
+//      routes live in standalone web-admin and are covered by route:audit
+//      plus apps/web-admin/role-home.test.ts.
 //
 //   3. Web ⇄ Mobile parity matrix is clean — invokes
 //      `scripts/web-mobile-parity-check.mjs --strict` as a subprocess
@@ -94,8 +93,6 @@ const ROLE_BUCKETS = [
   { label: "learner", dir: "apps/web-v2/app/learner" },
   { label: "parent", dir: "apps/web-v2/app/parent" },
   { label: "teacher", dir: "apps/web-v2/app/teacher" },
-  { label: "admin/school", dir: "apps/web-v2/app/admin/school" },
-  { label: "admin/district", dir: "apps/web-v2/app/admin/district" },
 ];
 
 function findPageFilesWithEmptyState(absDir) {

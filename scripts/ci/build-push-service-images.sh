@@ -12,6 +12,7 @@ fi
 
 dockerfile="$1"
 shift
+build_arg_name="${BUILD_ARG_NAME:-SERVICE_NAME}"
 
 is_transient_containerd_failure() {
   local log_file="$1"
@@ -35,7 +36,7 @@ build_service() {
 
     if DOCKER_BUILDKIT=0 docker build \
       -f "$dockerfile" \
-      --build-arg SERVICE_NAME="$service" \
+      --build-arg "${build_arg_name}=${service}" \
       --build-arg GIT_COMMIT="$GIT_COMMIT" \
       -t "$image" \
       . 2>&1 | tee "$log_file" | tail -10; then

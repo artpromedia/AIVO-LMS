@@ -45,7 +45,7 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
           <Card className="border-rose-200 bg-rose-50 p-4">
             <p className="text-sm text-aivo-ink">{preview.error}</p>
           </Card>
-          <Link href="/admin/login" className="block w-full">
+          <Link href="https://admin.aivolearning.com/login" className="block w-full">
             <Button className="w-full">Go to sign in</Button>
           </Link>
         </Shell>

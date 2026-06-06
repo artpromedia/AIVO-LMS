@@ -1,3 +1,5 @@
+import { ADMIN_ROLE_HOME, type AdminRole } from "@aivo/admin-auth/types";
+
 export type Role =
   | "parent"
   | "learner"
@@ -42,20 +44,28 @@ export type SessionProfile = {
   capabilities?: string[];
 };
 
+const ADMIN_APP_URL = "https://admin.aivolearning.com";
+const DISTRICT_APP_URL = "https://district.aivolearning.com";
+
+function standaloneAdminHome(role: AdminRole): string {
+  const baseUrl = role === "district_admin" ? DISTRICT_APP_URL : ADMIN_APP_URL;
+  return new URL(ADMIN_ROLE_HOME[role], baseUrl).toString();
+}
+
 export const ROLE_HOME: Record<Role, string> = {
   parent: "/parent/home",
   learner: "/learner/home",
   teacher: "/teacher/home",
   caregiver: "/caregiver/home",
   therapist: "/therapist/home",
-  school_admin: "/admin/school",
-  district_admin: "/admin/district",
-  platform_admin: "/admin/platform",
-  support: "/admin/platform",
-  marketing: "/admin/platform",
-  sales: "/admin/platform",
-  devops: "/admin/platform",
-  engineering: "/admin/platform",
+  school_admin: standaloneAdminHome("school_admin"),
+  district_admin: standaloneAdminHome("district_admin"),
+  platform_admin: standaloneAdminHome("platform_admin"),
+  support: standaloneAdminHome("support"),
+  marketing: standaloneAdminHome("marketing"),
+  sales: standaloneAdminHome("sales"),
+  devops: standaloneAdminHome("devops"),
+  engineering: standaloneAdminHome("engineering"),
 };
 
 export const ROLE_LABEL: Record<Role, string> = {

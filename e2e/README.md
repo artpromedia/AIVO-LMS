@@ -26,4 +26,8 @@ npm test
 - `tests/admin-district-split.spec.ts` — Sprint 1 auth-surface split:
   district login page renders and posts to `/api/auth/district-login`,
   consumer `/login` rejects DISTRICT_ADMIN with a "Go to staff sign-in"
-  link pointing at `/district/login`.
+  link pointing at the standalone district host's `/login`.
+- `tests/admin-host-routing.spec.ts` — verifies the standalone admin host
+  redirects unauthenticated `/platform` requests to `/login` and, when
+  platform-admin credentials are configured, covers login, MFA, and the
+  `/platform` landing page.

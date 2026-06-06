@@ -27,12 +27,7 @@ export type SessionProfile = {
 
 export const CONSUMER_APP_URL = process.env.NEXT_PUBLIC_CONSUMER_APP_URL || "https://app.aivolearning.com";
 
-export const ROLE_HOME: Record<Role, string> = {
-  parent: `${CONSUMER_APP_URL}/parent/home`,
-  learner: `${CONSUMER_APP_URL}/learner/home`,
-  teacher: `${CONSUMER_APP_URL}/teacher/home`,
-  caregiver: `${CONSUMER_APP_URL}/caregiver/home`,
-  therapist: `${CONSUMER_APP_URL}/therapist/home`,
+export const ADMIN_ROLE_HOME = {
   school_admin: "/school",
   district_admin: "/district",
   platform_admin: "/platform",
@@ -41,6 +36,17 @@ export const ROLE_HOME: Record<Role, string> = {
   sales: "/platform",
   devops: "/platform",
   engineering: "/platform",
+} as const satisfies Partial<Record<Role, string>>;
+
+export type AdminRole = keyof typeof ADMIN_ROLE_HOME;
+
+export const ROLE_HOME: Record<Role, string> = {
+  parent: `${CONSUMER_APP_URL}/parent/home`,
+  learner: `${CONSUMER_APP_URL}/learner/home`,
+  teacher: `${CONSUMER_APP_URL}/teacher/home`,
+  caregiver: `${CONSUMER_APP_URL}/caregiver/home`,
+  therapist: `${CONSUMER_APP_URL}/therapist/home`,
+  ...ADMIN_ROLE_HOME,
 };
 
 export const ROLE_LABEL: Record<Role, string> = {

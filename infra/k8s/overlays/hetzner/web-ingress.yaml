@@ -110,7 +110,8 @@ spec:
                 port:
                   number: 3000
 
-    # Platform admin panel
+    # Standalone admin application. Platform and district roles share the
+    # web-admin deployment and land on role-specific routes within that app.
     - host: admin.aivolearning.com
       http:
         paths:
@@ -118,7 +119,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: web-platform-admin
+                name: web-admin
                 port:
                   number: 3000
 
@@ -130,7 +131,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: web-district
+                name: web-admin
                 port:
                   number: 3000
 

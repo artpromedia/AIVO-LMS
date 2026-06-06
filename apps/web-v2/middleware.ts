@@ -20,7 +20,12 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     if (process.env.NODE_ENV === "production") {
-      const adminUrl = new URL(pathname.replace(/^\/admin/, "") || "/platform", process.env.ADMIN_APP_URL || "https://admin.aivolearning.com");
+      const targetPath = pathname.replace(/^\/admin/, "") || "/platform";
+      const targetBase =
+        targetPath === "/district" || targetPath.startsWith("/district/")
+          ? process.env.DISTRICT_APP_URL || "https://district.aivolearning.com"
+          : process.env.ADMIN_APP_URL || "https://admin.aivolearning.com";
+      const adminUrl = new URL(targetPath, targetBase);
       adminUrl.search = req.nextUrl.search;
       return NextResponse.redirect(adminUrl, 308);
     }
