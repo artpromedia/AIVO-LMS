@@ -2412,7 +2412,6 @@
                       "CAREGIVER",
                       "THERAPIST",
                       "PLATFORM_ADMIN",
-                      "DISTRICT_ADMIN",
                       "SALES",
                       "MARKETING",
                       "CUSTOMER_CARE",
@@ -2470,6 +2469,72 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/api/admin/district-invites": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "accepted",
+                "expired",
+                "revoked"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/api/admin/district-invites/{id}/resend": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/api/admin/district-invites/{id}/revoke": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -2553,6 +2618,24 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/district/setup": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/api/district/settings/complete": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Default Response"
           }
         }
       }

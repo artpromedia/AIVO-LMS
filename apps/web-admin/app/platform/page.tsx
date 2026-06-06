@@ -13,9 +13,16 @@ export default async function PlatformPage() {
       title="Platform operations"
       description={`Signed in as ${session.displayName} (${ROLE_LABEL[session.role]}).`}
       action={
-        <Link className="admin-button" href="/login">
-          Switch account
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          {session.role === "platform_admin" ? (
+            <Link className="admin-button" href="/platform/districts/new">
+              Onboard district
+            </Link>
+          ) : null}
+          <Link className="admin-button admin-button-secondary" href="/login">
+            Switch account
+          </Link>
+        </div>
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-4">
@@ -26,11 +33,16 @@ export default async function PlatformPage() {
       </section>
 
       <AdminCard className="mt-6 p-6">
-        <h2 className="text-xl font-black">Standalone admin app cutover</h2>
+        <h2 className="text-xl font-black">Secure district onboarding</h2>
         <p className="mt-2 max-w-3xl text-slate-600">
-          This app is isolated from the learner/parent web host and uses identity-svc cookies plus admin-svc reads.
-          Remaining admin route relocation should only move screens after their mock data dependencies are removed.
+          Platform admins can create a district, invite its first administrator without a temporary password,
+          and manage the invitation lifecycle from this standalone console.
         </p>
+        {session.role === "platform_admin" ? (
+          <Link className="mt-4 inline-flex font-bold text-blue-700" href="/platform/districts">
+            View district invitations
+          </Link>
+        ) : null}
       </AdminCard>
     </AdminPageFrame>
   );

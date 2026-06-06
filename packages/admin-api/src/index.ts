@@ -3,6 +3,7 @@ export * from "./audit.js";
 export * from "./billing.js";
 export * from "./client.js";
 export * from "./compliance.js";
+export * from "./identity.js";
 export * from "./moderation.js";
 export * from "./platform.js";
 export * from "./scim.js";

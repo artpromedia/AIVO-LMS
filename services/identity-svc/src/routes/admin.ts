@@ -8,6 +8,7 @@ import {
   sessions,
   adminAuditLog,
   appendAudit,
+  districtAdminInvites,
 } from "@aivo/db";
 import { signJWT, verifyJWT } from "@aivo/security";
 import {
@@ -29,11 +30,15 @@ import {
 function clientIp(req: any): string | null {
   return req.headers["x-forwarded-for"]?.toString().split(",")[0]?.trim() || req.ip || null;
 }
-import { eq, sql, desc, ilike, or, and, count, asc } from "drizzle-orm";
+import { eq, sql, desc, ilike, or, and, count, asc, isNull, gt } from "drizzle-orm";
 import argon2 from "argon2";
 import crypto from "crypto";
 import { requireStepUp } from "./step-up.js";
 import { deprecateRoute } from "../lib/deprecation.js";
+import {
+  recordDistrictInviteCreated,
+  recordDistrictInviteRevoked,
+} from "../lib/district-onboarding-observability.js";
 
 // Sprint 10: legacy admin reads now live behind admin-svc. Mark them
 // deprecated for one cycle (default 90 days). Mutations remain canonical
@@ -57,6 +62,53 @@ const INTERNAL_ROLES = [
   "FINANCE",
   "DEVOPS",
 ];
+const INVITE_TTL_HOURS = 72;
+const COMMS_SVC_URL = process.env.COMMS_SVC_URL || "http://localhost:3003";
+
+function hashInviteToken(raw: string): string {
+  return crypto.createHash("sha256").update(raw).digest("hex");
+}
+
+async function sendDistrictAdminInvite(input: {
+  to: string;
+  name: string;
+  districtName: string;
+  inviteUrl: string;
+}): Promise<{ inviteUrl?: string }> {
+  const internalKey =
+    process.env.INTERNAL_SERVICE_KEY ||
+    (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+  const response = await fetch(`${COMMS_SVC_URL}/api/comms/internal/district-admin-invite`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-internal-key": internalKey },
+    body: JSON.stringify(input),
+    signal: AbortSignal.timeout(5000),
+  });
+  const payload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!response.ok) {
+    throw new Error(
+      typeof payload.error === "string" ? payload.error : "Failed to send district admin invite",
+    );
+  }
+  if (payload.status === "dev_mode") {
+    if (process.env.NODE_ENV !== "production" && typeof payload.inviteUrl === "string") {
+      return { inviteUrl: payload.inviteUrl };
+    }
+    throw new Error("District invite email service is not configured");
+  }
+  return {};
+}
+
+function platformInviteStatus(invite: {
+  acceptedAt: Date | null;
+  revokedAt: Date | null;
+  expiresAt: Date;
+}): "pending" | "accepted" | "expired" | "revoked" {
+  if (invite.acceptedAt) return "accepted";
+  if (invite.revokedAt) return "revoked";
+  if (invite.expiresAt < new Date()) return "expired";
+  return "pending";
+}
 
 async function requireAdmin(req: any, reply: any) {
   const auth = req.headers.authorization;
@@ -828,7 +880,6 @@ export async function registerAdminRoutes(app: FastifyInstance) {
                 "CAREGIVER",
                 "THERAPIST",
                 "PLATFORM_ADMIN",
-                "DISTRICT_ADMIN",
                 "SALES",
                 "MARKETING",
                 "CUSTOMER_CARE",
@@ -905,7 +956,14 @@ export async function registerAdminRoutes(app: FastifyInstance) {
   app.post(
     "/api/admin/create-district",
     {
-      preHandler: requirePlatformAdmin,
+      preHandler: [requirePlatformAdmin, requireStepUp("district:create")],
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: "1 hour",
+          keyGenerator: (request: any) => request.headers.authorization || request.ip,
+        },
+      },
       schema: {
         tags: ["Admin"],
         body: {
@@ -919,15 +977,34 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         },
       },
     },
-    async (req, reply) => {
-      const { districtName, adminName, adminEmail } = req.body as any;
+    async (req: any, reply) => {
+      const { districtName, adminName, adminEmail } = req.body as {
+        districtName: string;
+        adminName: string;
+        adminEmail: string;
+      };
+      const email = adminEmail.trim().toLowerCase();
 
-      const existing = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
+      const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
       if (existing.length > 0) {
         return reply.status(409).send({ error: "A user with this email already exists" });
       }
 
-      const tempPassword = crypto.randomBytes(6).toString("base64url");
+      const [openInvite] = await db
+        .select({ id: districtAdminInvites.id })
+        .from(districtAdminInvites)
+        .where(
+          and(
+            eq(districtAdminInvites.email, email),
+            isNull(districtAdminInvites.acceptedAt),
+            isNull(districtAdminInvites.revokedAt),
+            gt(districtAdminInvites.expiresAt, new Date()),
+          ),
+        )
+        .limit(1);
+      if (openInvite) {
+        return reply.status(409).send({ error: "An invite is already pending for this email." });
+      }
 
       const [tenant] = await db
         .insert(tenants)
@@ -938,16 +1015,70 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         })
         .returning();
 
-      const [districtAdmin] = await db
-        .insert(users)
+      const rawToken = crypto.randomBytes(32).toString("base64url");
+      const expiresAt = new Date(Date.now() + INVITE_TTL_HOURS * 60 * 60 * 1000);
+      const [invite] = await db
+        .insert(districtAdminInvites)
         .values({
           tenantId: tenant.id,
-          email: adminEmail,
-          passwordHash: await argon2.hash(tempPassword),
+          email,
           name: adminName,
           role: "DISTRICT_ADMIN",
+          invitedBy: req.user.sub,
+          tokenHash: hashInviteToken(rawToken),
+          expiresAt,
         })
         .returning();
+
+      await appendAudit(db, "admin_audit_log", adminAuditLog, {
+        tenantId: tenant.id,
+        action: "district.created",
+        actorId: req.user.sub,
+        actorEmail: req.user.email,
+        actorRole: req.user.role,
+        onBehalfOfId: null,
+        resourceType: "tenant",
+        resourceId: tenant.id,
+        details: { districtName: tenant.name, email },
+        ipAddress: clientIp(req),
+        userAgent: (req.headers["user-agent"] as string) || null,
+      });
+      await appendAudit(db, "admin_audit_log", adminAuditLog, {
+        tenantId: tenant.id,
+        action: "district_admin.invited",
+        actorId: req.user.sub,
+        actorEmail: req.user.email,
+        actorRole: req.user.role,
+        onBehalfOfId: null,
+        resourceType: "district_admin_invite",
+        resourceId: invite.id,
+        details: { districtName: tenant.name, email },
+        ipAddress: clientIp(req),
+        userAgent: (req.headers["user-agent"] as string) || null,
+      });
+      recordDistrictInviteCreated({
+        inviteId: invite.id,
+        tenantId: tenant.id,
+        source: "platform",
+      });
+
+      const inviteUrl = `${process.env.WEB_BASE_URL || "https://app.aivolearning.com"}/accept-invite?token=${rawToken}`;
+      let delivery: { inviteUrl?: string };
+      try {
+        delivery = await sendDistrictAdminInvite({
+          to: email,
+          name: adminName,
+          districtName: tenant.name,
+          inviteUrl,
+        });
+      } catch (err) {
+        req.log.error({ err: String(err), inviteId: invite.id }, "district invite delivery failed");
+        return reply.status(502).send({
+          error: "District created, but the invitation email could not be sent. Resend the invite.",
+          district: { id: tenant.id, name: tenant.name, type: tenant.type },
+          invite: { id: invite.id, email, expiresAt },
+        });
+      }
 
       return {
         district: {
@@ -956,14 +1087,162 @@ export async function registerAdminRoutes(app: FastifyInstance) {
           type: tenant.type,
           createdAt: tenant.createdAt,
         },
-        admin: {
-          id: districtAdmin.id,
-          name: districtAdmin.name,
-          email: districtAdmin.email,
-          role: districtAdmin.role,
+        invite: {
+          id: invite.id,
+          email,
+          expiresAt,
+          ...delivery,
         },
-        temporaryPassword: tempPassword,
       };
+    },
+  );
+
+  app.get(
+    "/api/admin/district-invites",
+    {
+      preHandler: requirePlatformAdmin,
+      schema: {
+        tags: ["Admin"],
+        querystring: {
+          type: "object",
+          properties: {
+            status: { type: "string", enum: ["pending", "accepted", "expired", "revoked"] },
+          },
+        },
+      },
+    },
+    async (req: any) => {
+      const requestedStatus = req.query?.status as string | undefined;
+      const rows = await db
+        .select({
+          id: districtAdminInvites.id,
+          tenantId: districtAdminInvites.tenantId,
+          districtName: tenants.name,
+          email: districtAdminInvites.email,
+          name: districtAdminInvites.name,
+          role: districtAdminInvites.role,
+          invitedBy: districtAdminInvites.invitedBy,
+          expiresAt: districtAdminInvites.expiresAt,
+          acceptedAt: districtAdminInvites.acceptedAt,
+          revokedAt: districtAdminInvites.revokedAt,
+          createdAt: districtAdminInvites.createdAt,
+        })
+        .from(districtAdminInvites)
+        .innerJoin(tenants, eq(tenants.id, districtAdminInvites.tenantId))
+        .where(eq(districtAdminInvites.role, "DISTRICT_ADMIN"))
+        .orderBy(desc(districtAdminInvites.createdAt))
+        .limit(200);
+      const invites = rows.map((row: any) => ({ ...row, status: platformInviteStatus(row) }));
+      return {
+        invites: requestedStatus
+          ? invites.filter((invite: any) => invite.status === requestedStatus)
+          : invites,
+      };
+    },
+  );
+
+  app.post(
+    "/api/admin/district-invites/:id/resend",
+    { preHandler: [requirePlatformAdmin, requireStepUp("district:admin-mgmt")] },
+    async (req: any, reply) => {
+      const { id } = req.params as { id: string };
+      const [invite] = await db
+        .select({
+          id: districtAdminInvites.id,
+          tenantId: districtAdminInvites.tenantId,
+          districtName: tenants.name,
+          email: districtAdminInvites.email,
+          name: districtAdminInvites.name,
+          role: districtAdminInvites.role,
+          expiresAt: districtAdminInvites.expiresAt,
+          acceptedAt: districtAdminInvites.acceptedAt,
+          revokedAt: districtAdminInvites.revokedAt,
+        })
+        .from(districtAdminInvites)
+        .innerJoin(tenants, eq(tenants.id, districtAdminInvites.tenantId))
+        .where(eq(districtAdminInvites.id, id))
+        .limit(1);
+      if (!invite || invite.role !== "DISTRICT_ADMIN") {
+        return reply.status(404).send({ error: "Invite not found" });
+      }
+      if (invite.acceptedAt) return reply.status(409).send({ error: "Invite already accepted" });
+      if (invite.revokedAt) return reply.status(409).send({ error: "Invite was revoked" });
+
+      const rawToken = crypto.randomBytes(32).toString("base64url");
+      const expiresAt = new Date(Date.now() + INVITE_TTL_HOURS * 60 * 60 * 1000);
+      await db
+        .update(districtAdminInvites)
+        .set({ tokenHash: hashInviteToken(rawToken), expiresAt })
+        .where(eq(districtAdminInvites.id, id));
+
+      await appendAudit(db, "admin_audit_log", adminAuditLog, {
+        tenantId: invite.tenantId,
+        action: "district_admin.invite_resent",
+        actorId: req.user.sub,
+        actorEmail: req.user.email,
+        actorRole: req.user.role,
+        onBehalfOfId: null,
+        resourceType: "district_admin_invite",
+        resourceId: id,
+        details: { districtName: invite.districtName, email: invite.email },
+        ipAddress: clientIp(req),
+        userAgent: (req.headers["user-agent"] as string) || null,
+      });
+      req.log.info(
+        { inviteId: id, tenantId: invite.tenantId, action: "district_admin.invite_resent" },
+        "district invite resent",
+      );
+
+      const inviteUrl = `${process.env.WEB_BASE_URL || "https://app.aivolearning.com"}/accept-invite?token=${rawToken}`;
+      const delivery = await sendDistrictAdminInvite({
+        to: invite.email,
+        name: invite.name,
+        districtName: invite.districtName,
+        inviteUrl,
+      });
+      return { success: true, expiresAt, ...delivery };
+    },
+  );
+
+  app.post(
+    "/api/admin/district-invites/:id/revoke",
+    { preHandler: [requirePlatformAdmin, requireStepUp("district:admin-mgmt")] },
+    async (req: any, reply) => {
+      const { id } = req.params as { id: string };
+      const [invite] = await db
+        .select()
+        .from(districtAdminInvites)
+        .where(eq(districtAdminInvites.id, id))
+        .limit(1);
+      if (!invite || invite.role !== "DISTRICT_ADMIN") {
+        return reply.status(404).send({ error: "Invite not found" });
+      }
+      if (invite.acceptedAt) return reply.status(409).send({ error: "Invite already accepted" });
+      if (invite.revokedAt) return reply.status(409).send({ error: "Invite already revoked" });
+
+      await db
+        .update(districtAdminInvites)
+        .set({ revokedAt: new Date() })
+        .where(eq(districtAdminInvites.id, id));
+      await appendAudit(db, "admin_audit_log", adminAuditLog, {
+        tenantId: invite.tenantId,
+        action: "district_admin.invite_revoked",
+        actorId: req.user.sub,
+        actorEmail: req.user.email,
+        actorRole: req.user.role,
+        onBehalfOfId: null,
+        resourceType: "district_admin_invite",
+        resourceId: id,
+        details: { email: invite.email },
+        ipAddress: clientIp(req),
+        userAgent: (req.headers["user-agent"] as string) || null,
+      });
+      recordDistrictInviteRevoked({
+        inviteId: id,
+        tenantId: invite.tenantId,
+        source: "platform",
+      });
+      return { success: true };
     },
   );
 }

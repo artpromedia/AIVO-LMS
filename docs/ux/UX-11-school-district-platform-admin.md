@@ -6,6 +6,17 @@
 >
 > **Status legend:** ✅ shipped · 🟡 partial · ⬜ planned.
 
+## 2026-06-06 Standalone Admin Update
+
+The current admin source of truth for newly relocated surfaces is `apps/web-admin`, not the deleted
+`apps/web-v2/app/admin/**` routes described by the older audit below.
+
+- `/platform` now renders real platform health counts.
+- `/platform/districts/new` securely creates a district and emails its first admin a token invite.
+- `/platform/districts` lists cross-tenant invites and provides audited resend/revoke actions.
+- `/district` renders real school/staff/learner counts and a persisted first-run setup checklist.
+- No onboarding surface creates or displays a plaintext temporary password.
+
 ## 1. Three admin roles, three jobs
 
 | Role             | Scope                       | Primary job                                                  |

@@ -66,7 +66,7 @@ in production.
 ### 1.5 Step-Up Authentication
 
 - Sensitive operations (user delete, password reset, data export, evidence
-  bundle download, district-admin management) require a fresh proof of
+  bundle download, district creation, district-admin management) require a fresh proof of
   presence even when the session is already authenticated.
 - The client calls `requireStepUp(scope)` (in `apps/web/src/lib/step-up.ts`),
   which prompts for the second factor and exchanges the proof for a
@@ -78,6 +78,10 @@ in production.
 - Defined scopes: `user:delete`, `user:reset-password`, `data:export`,
   `district:admin-mgmt`, `evidence:download`. Each scope is a SOC 2
   control reference — do not reuse one scope for an unrelated action.
+
+- District onboarding adds `district:create` for tenant creation and reuses
+  `district:admin-mgmt` for invite resend/revoke.
+- Enforcement is flag-gated by `ADMIN_ENTERPRISE_STEP_UP_AUTH` and defaults off.
 
 ### 1.6 SAML SSO + SCIM provisioning
 

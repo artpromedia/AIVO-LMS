@@ -19,8 +19,10 @@ const BASE = process.env.IDENTITY_SVC_URL || "http://localhost:3001";
 // endpoints here whenever you ship one — that's the whole point.
 const DISTRICT_ROUTES: Array<[string, string]> = [
   ["GET", "/api/district/tenant"],
+  ["GET", "/api/district/setup"],
   ["GET", "/api/district/settings"],
   ["PUT", "/api/district/settings"],
+  ["PATCH", "/api/district/settings/complete"],
   ["GET", "/api/district/sso"],
   ["PUT", "/api/district/sso"],
   ["GET", "/api/district/admins"],
@@ -50,7 +52,7 @@ test("every /api/district/* route rejects unauthenticated requests via the tenan
     const res = await fetch(`${BASE}${path}`, {
       method,
       headers: { "content-type": "application/json" },
-      body: ["POST", "PUT"].includes(method) ? "{}" : undefined,
+      body: ["POST", "PUT", "PATCH"].includes(method) ? "{}" : undefined,
     });
     assert.ok(
       res.status === 401 || res.status === 403,

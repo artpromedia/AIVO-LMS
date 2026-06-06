@@ -23,7 +23,7 @@ All flows share a common substrate:
 | Role                      | Scope                                          | Provisioned by                                                             |
 | ------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
 | `PLATFORM_ADMIN`          | Global                                         | AIVO ops (seed / manual)                                                   |
-| `DISTRICT_ADMIN`          | One tenant (district)                          | Token-based invite from another DISTRICT_ADMIN                             |
+| `DISTRICT_ADMIN`          | One tenant (district)                          | Token-based invite from PLATFORM_ADMIN or another DISTRICT_ADMIN            |
 | `SCHOOL_ADMIN`            | One school within a tenant                     | Token-based invite from a DISTRICT_ADMIN                                   |
 | `TEACHER`                 | School roster + parent-invited learners        | Created by DISTRICT_ADMIN (or SCHOOL_ADMIN) via `POST /api/district/staff` |
 | `THERAPIST` / `CAREGIVER` | Per-learner, parent-initiated                  | Parent invite (`learner_therapists` / `learner_caregivers`)                |
@@ -31,6 +31,17 @@ All flows share a common substrate:
 | `LEARNER`                 | Created as a child of a PARENT                 | Parent onboarding                                                          |
 
 ## The seven flows
+
+### Platform Admin to First District Admin
+
+- **Create**: `POST /api/admin/create-district` creates the district tenant and a
+  token-hashed `DISTRICT_ADMIN` invite. No temporary password is created or returned.
+- **List**: `GET /api/admin/district-invites`.
+- **Resend / revoke**: `POST /api/admin/district-invites/:id/resend` and
+  `POST /api/admin/district-invites/:id/revoke`.
+- **Step-up**: `district:create` for creation and `district:admin-mgmt` for lifecycle mutations.
+- **Operator UI**: standalone admin app at `/platform/districts/new` and `/platform/districts`.
+- **Accept**: shared `POST /api/auth/accept-invite` flow.
 
 ### 1. Parent → Therapist
 

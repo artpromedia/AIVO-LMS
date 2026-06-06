@@ -44,3 +44,142 @@ body {
   font-weight: 700;
   color: white;
 }
+
+.admin-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.admin-button-secondary {
+  border: 1px solid rgba(23, 78, 166, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+  color: #174ea6;
+}
+
+.admin-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+.admin-step {
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #174ea6;
+}
+
+.admin-notice,
+.admin-error {
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  font-weight: 700;
+}
+
+.admin-notice {
+  border: 1px solid #a7f3d0;
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.admin-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.admin-filter,
+.admin-action {
+  border: 1px solid rgba(23, 32, 51, 0.13);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  padding: 0.5rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.admin-filter-active {
+  background: #172033;
+  color: white;
+}
+
+.admin-action-danger {
+  color: #b91c1c;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid rgba(23, 32, 51, 0.08);
+  padding: 1rem;
+}
+
+.admin-table th {
+  background: rgba(238, 246, 255, 0.75);
+  color: #475569;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-status {
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.admin-status-accepted {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.admin-status-expired,
+.admin-status-revoked {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.admin-checklist {
+  border: 1px solid rgba(23, 32, 51, 0.1);
+  border-radius: 18px;
+  padding: 1rem;
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.admin-checklist-complete {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+}
+
+.admin-checkmark {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #dbeafe;
+  padding: 0.25rem 0.55rem;
+  color: #1e40af;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-quick-action {
+  border: 1px dashed rgba(23, 78, 166, 0.28);
+  border-radius: 18px;
+  background: rgba(238, 246, 255, 0.5);
+  padding: 1rem;
+}

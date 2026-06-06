@@ -32,6 +32,10 @@ import { createLogger } from "@aivo/observability";
 import { requireStepUp } from "./step-up.js";
 import { delegatedAdminRbacV2Enabled, requestHasPermission } from "../lib/permissions.js";
 import {
+  recordDistrictInviteCreated,
+  recordDistrictInviteRevoked,
+} from "../lib/district-onboarding-observability.js";
+import {
   getDistrictAdminsSchema,
   districtAdminsSchema,
   districtAdminsInvitesByIdResendSchema,
@@ -339,6 +343,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
         ip: req.ip,
         ua: req.headers["user-agent"],
       });
+      recordDistrictInviteCreated({ inviteId: invite.id, tenantId: tid, source: "district" });
 
       return {
         invite: {
@@ -446,6 +451,7 @@ export async function registerDistrictAdminRoutes(app: FastifyInstance) {
         ip: req.ip,
         ua: req.headers["user-agent"],
       });
+      recordDistrictInviteRevoked({ inviteId: id, tenantId: tid, source: "district" });
       return { success: true };
     },
   );

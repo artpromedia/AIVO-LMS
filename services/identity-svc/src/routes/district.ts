@@ -10,6 +10,7 @@ import {
   classroomEnrollments,
   staffAssignments,
   districtSettings,
+  districtAdminInvites,
   districtActivityLog,
   iepRecords,
   iepEvaluations,
@@ -20,7 +21,7 @@ import {
   adminAuditLog,
 } from "@aivo/db";
 import { Permission, verifyJWT } from "@aivo/security";
-import { eq, and, sql, ilike, or, count, desc, asc, isNull, gte, lte, between } from "drizzle-orm";
+import { eq, and, sql, ilike, or, count, desc, asc, isNull, gte, gt, lte, between } from "drizzle-orm";
 import argon2 from "argon2";
 import crypto from "crypto";
 import { requireDistrictAdmin } from "../hooks/require-district-admin.js";
@@ -212,6 +213,128 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
         .where(eq(districtSettings.tenantId, req.tenantId))
         .limit(1);
       return { ...tenant, districtSettings: settings || null };
+    },
+  );
+
+  app.get(
+    "/api/district/setup",
+    { preHandler: requireDistrictAdmin },
+    async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.DistrictRead)) return;
+      const tid = req.tenantId;
+      const [[tenant], [settings], [schoolCount], [staffCount], [learnerCount], [pendingInvites]] =
+        await Promise.all([
+          db.select().from(tenants).where(eq(tenants.id, tid)).limit(1),
+          db.select().from(districtSettings).where(eq(districtSettings.tenantId, tid)).limit(1),
+          db.select({ count: count() }).from(schools).where(eq(schools.tenantId, tid)),
+          db
+            .select({ count: count() })
+            .from(users)
+            .where(
+              and(
+                eq(users.tenantId, tid),
+                isNull(users.deactivatedAt),
+                sql`${users.role} = ANY(ARRAY['DISTRICT_ADMIN','SCHOOL_ADMIN','TEACHER','THERAPIST','CAREGIVER']::user_role[])`,
+              ),
+            ),
+          db.select({ count: count() }).from(learners).where(eq(learners.tenantId, tid)),
+          db
+            .select({ count: count() })
+            .from(districtAdminInvites)
+            .where(
+              and(
+                eq(districtAdminInvites.tenantId, tid),
+                isNull(districtAdminInvites.acceptedAt),
+                isNull(districtAdminInvites.revokedAt),
+                gt(districtAdminInvites.expiresAt, new Date()),
+              ),
+            ),
+        ]);
+      if (!tenant) return reply.status(404).send({ error: "Tenant not found" });
+
+      const tenantSettings = (tenant.settings || {}) as Record<string, unknown>;
+      const branding = (settings?.branding || {}) as Record<string, unknown>;
+      const ssoConfig = (settings?.ssoConfig || {}) as Record<string, unknown>;
+      const schoolsReady = Number(schoolCount?.count || 0) > 0;
+      const staffReady =
+        Number(staffCount?.count || 0) > 1 || Number(pendingInvites?.count || 0) > 0;
+      const brandingReady = Boolean(
+        branding.displayName || branding.primaryColor || branding.supportEmail || branding.logoUrl,
+      );
+      const ssoReviewed = Boolean(
+        ssoConfig.enabled || ssoConfig.reviewedAt || tenantSettings.ssoReviewedAt,
+      );
+
+      return {
+        district: { id: tenant.id, name: tenant.name },
+        setupComplete: tenantSettings.setupComplete === true,
+        canComplete: schoolsReady,
+        counts: {
+          schools: Number(schoolCount?.count || 0),
+          staff: Number(staffCount?.count || 0),
+          learners: Number(learnerCount?.count || 0),
+          pendingInvites: Number(pendingInvites?.count || 0),
+        },
+        checklist: {
+          schools: schoolsReady,
+          staff: staffReady,
+          branding: brandingReady,
+          sso: ssoReviewed,
+        },
+      };
+    },
+  );
+
+  app.patch(
+    "/api/district/settings/complete",
+    { preHandler: requireDistrictAdmin },
+    async (req: any, reply: any) => {
+      if (!ensureDistrictPermission(req, reply, Permission.SchoolWrite)) return;
+      const tid = req.tenantId;
+      const [[tenant], [schoolCount]] = await Promise.all([
+        db.select().from(tenants).where(eq(tenants.id, tid)).limit(1),
+        db.select({ count: count() }).from(schools).where(eq(schools.tenantId, tid)),
+      ]);
+      if (!tenant) return reply.status(404).send({ error: "Tenant not found" });
+      if (((tenant.settings || {}) as Record<string, unknown>).setupComplete === true) {
+        return { success: true, setupComplete: true };
+      }
+      if (Number(schoolCount?.count || 0) < 1) {
+        return reply
+          .status(409)
+          .send({ error: "Add at least one school before completing district setup." });
+      }
+
+      const settings = { ...((tenant.settings || {}) as Record<string, unknown>), setupComplete: true };
+      await db
+        .update(tenants)
+        .set({ settings, updatedAt: new Date() })
+        .where(eq(tenants.id, tid));
+      await logActivity(
+        db,
+        tid,
+        "district.setup_completed",
+        req.user.sub,
+        req.user.name || req.user.email,
+        "tenant",
+        tid,
+        { schools: Number(schoolCount.count) },
+      );
+      await appendAudit(db, "admin_audit_log", adminAuditLog, {
+        tenantId: tid,
+        action: "district.setup_completed",
+        actorId: req.user.sub,
+        actorEmail: req.user.email,
+        actorRole: req.user.role,
+        onBehalfOfId: null,
+        resourceType: "tenant",
+        resourceId: tid,
+        details: { schools: Number(schoolCount.count) },
+        ipAddress: (req.headers["x-forwarded-for"] as string) || req.ip || null,
+        userAgent: req.headers["user-agent"] || null,
+      });
+      req.log.info({ tenantId: tid, action: "district.setup_completed" }, "district setup completed");
+      return { success: true, setupComplete: true };
     },
   );
 

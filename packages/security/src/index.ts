@@ -67,6 +67,7 @@ export type StepUpScope =
   | "brain:reset"
   | "data:export"
   | "config:update"
+  | "district:create"
   | "district:admin-mgmt";
 
 export * from "./audit-chain.js";
@@ -85,6 +86,7 @@ export const STEP_UP_SCOPES: readonly StepUpScope[] = [
   "brain:reset",
   "data:export",
   "config:update",
+  "district:create",
   "district:admin-mgmt",
 ] as const;
 

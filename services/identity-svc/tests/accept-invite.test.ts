@@ -256,6 +256,22 @@ test("accept-invite: an expired invite is rejected with 410", { skip: SKIP }, as
   }
 });
 
+test("accept-invite: a revoked invite is rejected", { skip: SKIP }, async () => {
+  const { app, db } = await bootstrap();
+  const seed = await seedInvite(db, { role: "DISTRICT_ADMIN", revokedAt: new Date() });
+  try {
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/auth/accept-invite",
+      payload: { token: seed.rawToken, password: "Str0ng-Passw0rd!42xz" },
+    });
+    assert.equal(res.statusCode, 400);
+  } finally {
+    await cleanup(db, seed);
+    await teardown(app, db);
+  }
+});
+
 test("accept-invite: a weak password is rejected by policy", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();
   const seed = await seedInvite(db, { role: "SCHOOL_ADMIN", withSchool: true });

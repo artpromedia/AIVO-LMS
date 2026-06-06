@@ -82,6 +82,7 @@ import {
   verifyWebauthnChallengeToken,
 } from "../services/mfa-webauthn.js";
 import { getAuthPublicKeySchema, updateAuthSessionHeartbeatSchema } from "./schemas.js";
+import { recordDistrictInviteAccepted } from "../lib/district-onboarding-observability.js";
 
 async function hashPassword(password: string): Promise<string> {
   return argon2.hash(password);
@@ -1615,6 +1616,11 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         .update(districtAdminInvites)
         .set({ acceptedAt: new Date(), acceptedUserId: user.id })
         .where(eq(districtAdminInvites.id, invite.id));
+      recordDistrictInviteAccepted({
+        inviteId: invite.id,
+        tenantId: invite.tenantId,
+        role,
+      });
 
       // Audit: the new user is the actor of their own acceptance.
       try {

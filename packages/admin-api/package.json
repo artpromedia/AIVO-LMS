@@ -26,6 +26,10 @@
       "types": "./dist/compliance.d.ts",
       "default": "./dist/compliance.js"
     },
+    "./identity": {
+      "types": "./dist/identity.d.ts",
+      "default": "./dist/identity.js"
+    },
     "./moderation": {
       "types": "./dist/moderation.d.ts",
       "default": "./dist/moderation.js"
