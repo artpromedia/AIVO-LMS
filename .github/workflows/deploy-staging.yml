@@ -271,6 +271,10 @@ jobs:
   # ─────────────────────────────────────────────────────────────────────
   iep-smoke:
     needs: [deploy]
+    # Skip cleanly (rather than failing the rollout) when the staging ingress
+    # URLs are not configured as repo/environment variables. Configure both
+    # vars.AI_SVC_URL and vars.ASSESSMENT_SVC_URL to enable the smoke gate.
+    if: ${{ vars.AI_SVC_URL != '' && vars.ASSESSMENT_SVC_URL != '' }}
     uses: ./.github/workflows/iep-integration-smoke.yml
     with:
       ai_svc_url: ${{ vars.AI_SVC_URL }}
