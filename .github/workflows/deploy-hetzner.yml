@@ -358,9 +358,13 @@ jobs:
             case "$svc" in
               admin-svc)        EXTRA_SETS=(--set env.ADMIN_SVC_PORT=3000) ;;
               assessment-svc)
+                # IEP AI-draft fan-out to ai-svc. INTERNAL_AI_TOKEN is supplied
+                # via the shared aivo-common-env secret (envFrom), so only the
+                # URL + timeout need an explicit per-service override here.
                 EXTRA_SETS=(
                   --set "env.AI_SVC_URL=http://ai-svc.${NS}.svc.cluster.local:3000"
                   --set "env.BRAIN_SVC_URL=http://brain-svc.${NS}.svc.cluster.local:8000"
+                  --set "env.AI_IEP_DRAFT_TIMEOUT_MS=20000"
                 )
                 ;;
               billing-svc)      EXTRA_SETS=(--set env.BILLING_SVC_PORT=3000) ;;
@@ -446,8 +450,59 @@ jobs:
           done
           echo "Staging deploy: $((${#SERVICES[@]}-FAILED))/${#SERVICES[@]} succeeded"
 
+          # ─── IEP progress-sync worker (brain-svc image, cron entrypoint) ───
+          # Reuses the brain-svc image with the worker module entrypoint and
+          # runs once per tick (IEP_PROGRESS_SYNC_ONCE=1). DATABASE_URL +
+          # INTERNAL_AI_TOKEN are inherited via the same secrets the services
+          # use; db-secrets is optional so a namespace that folds DATABASE_URL
+          # into aivo-common-env still works.
+          echo "═══ Staging deploy: iep-progress-sync (CronJob) ═══"
+          cat <<EOF | kubectl apply -n "$NS" -f -
+          apiVersion: batch/v1
+          kind: CronJob
+          metadata:
+            name: iep-progress-sync
+            labels:
+              app.kubernetes.io/name: iep-progress-sync
+              app.kubernetes.io/managed-by: github-actions
+          spec:
+            schedule: "*/15 * * * *"
+            concurrencyPolicy: Forbid
+            startingDeadlineSeconds: 120
+            successfulJobsHistoryLimit: 3
+            failedJobsHistoryLimit: 3
+            jobTemplate:
+              spec:
+                backoffLimit: 1
+                activeDeadlineSeconds: 600
+                template:
+                  spec:
+                    restartPolicy: Never
+                    imagePullSecrets:
+                      - name: ghcr-pull-secret
+                    containers:
+                      - name: iep-progress-sync
+                        image: ${{ env.IMAGE_PREFIX }}/brain-svc:$IMAGE_TAG
+                        command: ["python", "-m", "brain_svc.jobs.iep_progress_sync"]
+                        env:
+                          - name: ENV
+                            value: "production"
+                          - name: IEP_PROGRESS_SYNC_ONCE
+                            value: "1"
+                          - name: IEP_PROGRESS_SYNC_MIN_DELTA
+                            value: "0.05"
+                        envFrom:
+                          - secretRef:
+                              name: aivo-common-env
+                          - secretRef:
+                              name: db-secrets
+                              optional: true
+          EOF
+
       - name: Verify rollout
-        run: kubectl -n ${{ env.STAGING_NAMESPACE }} get pods --sort-by=.metadata.name -o wide
+        run: |
+          kubectl -n ${{ env.STAGING_NAMESPACE }} get pods --sort-by=.metadata.name -o wide
+          kubectl -n ${{ env.STAGING_NAMESPACE }} get cronjob iep-progress-sync -o wide || true
 
   # ─────────────────────────────────────────────────────────────────────
   # Stage 3 — Smoke test staging (reusable workflow).
@@ -716,9 +771,13 @@ jobs:
               brain-svc)       PORT=8000 ;;
               assessment-svc)
                 PORT=3003
+                # IEP AI-draft fan-out to ai-svc. INTERNAL_AI_TOKEN comes from
+                # the shared aivo-common-env secret (envFrom), so only the URL +
+                # timeout need an explicit per-service override here.
                 EXTRA_SETS=(
                   --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:3000"
                   --set "env.BRAIN_SVC_URL=http://brain-svc.aivo.svc.cluster.local:8000"
+                  --set "env.AI_IEP_DRAFT_TIMEOUT_MS=20000"
                 )
                 ;;
               # These services read a port env var whose name matches what
@@ -817,6 +876,54 @@ jobs:
             fi
           done
           echo "Production deploy: $((${#SERVICES[@]}-FAILED))/${#SERVICES[@]} succeeded"
+
+          # ─── IEP progress-sync worker (brain-svc image, cron entrypoint) ───
+          # Reuses the just-deployed brain-svc image with the worker module
+          # entrypoint; runs once per tick (IEP_PROGRESS_SYNC_ONCE=1). It shares
+          # brain-svc's secrets for DATABASE_URL + INTERNAL_AI_TOKEN.
+          echo "═══ Prod deploy: iep-progress-sync (CronJob $VERSION) ═══"
+          cat <<EOF | kubectl apply -n "$NS" -f -
+          apiVersion: batch/v1
+          kind: CronJob
+          metadata:
+            name: iep-progress-sync
+            labels:
+              app.kubernetes.io/name: iep-progress-sync
+              app.kubernetes.io/managed-by: github-actions
+          spec:
+            schedule: "*/15 * * * *"
+            concurrencyPolicy: Forbid
+            startingDeadlineSeconds: 120
+            successfulJobsHistoryLimit: 3
+            failedJobsHistoryLimit: 3
+            jobTemplate:
+              spec:
+                backoffLimit: 1
+                activeDeadlineSeconds: 600
+                template:
+                  spec:
+                    restartPolicy: Never
+                    imagePullSecrets:
+                      - name: ghcr-pull-secret
+                    containers:
+                      - name: iep-progress-sync
+                        image: ${{ env.IMAGE_PREFIX }}/brain-svc:$VERSION
+                        command: ["python", "-m", "brain_svc.jobs.iep_progress_sync"]
+                        env:
+                          - name: ENV
+                            value: "production"
+                          - name: IEP_PROGRESS_SYNC_ONCE
+                            value: "1"
+                          - name: IEP_PROGRESS_SYNC_MIN_DELTA
+                            value: "0.05"
+                        envFrom:
+                          - secretRef:
+                              name: aivo-common-env
+                          - secretRef:
+                              name: db-secrets
+                              optional: true
+          EOF
+
           if [ "$FAILED" -gt 3 ]; then
             echo "::error::Too many failures ($FAILED) — consider rollback"
             exit 1
@@ -826,6 +933,7 @@ jobs:
         run: |
           kubectl -n ${{ env.PROD_NAMESPACE }} get pods --sort-by=.metadata.name -o wide
           kubectl -n ${{ env.PROD_NAMESPACE }} get deployments
+          kubectl -n ${{ env.PROD_NAMESPACE }} get cronjob iep-progress-sync -o wide || true
 
   # ─────────────────────────────────────────────────────────────────────
   # Stage 6 — Production health check.
