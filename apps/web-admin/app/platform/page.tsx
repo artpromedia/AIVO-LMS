@@ -60,6 +60,19 @@ export default async function PlatformPage() {
           </Link>
         ) : null}
       </AdminCard>
+
+      <AdminCard className="mt-6 p-6">
+        <h2 className="text-xl font-black">Sales leads</h2>
+        <p className="mt-2 max-w-3xl text-slate-600">
+          Website demo, waitlist, and contact submissions with campaign attribution (utm + coupon)
+          and a status lifecycle from new through pilot to won/lost.
+        </p>
+        {session.role === "platform_admin" || session.role === "sales" ? (
+          <Link className="mt-4 inline-flex font-bold text-blue-700" href="/platform/sales/leads">
+            View leads
+          </Link>
+        ) : null}
+      </AdminCard>
     </AdminPageFrame>
   );
 }

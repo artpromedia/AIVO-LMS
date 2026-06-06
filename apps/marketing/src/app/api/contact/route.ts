@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
       interestArea,
       consent,
       website,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      couponCode,
     } = body;
 
     if (website) {
@@ -78,6 +82,10 @@ export async function POST(req: NextRequest) {
         interestArea: interestArea || undefined,
         consent: consent === true ? true : undefined,
         source: "website",
+        utmSource: utmSource || undefined,
+        utmMedium: utmMedium || undefined,
+        utmCampaign: utmCampaign || undefined,
+        couponCode: couponCode || undefined,
       }),
     });
 

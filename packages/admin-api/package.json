@@ -30,6 +30,10 @@
       "types": "./dist/identity.d.ts",
       "default": "./dist/identity.js"
     },
+    "./leads": {
+      "types": "./dist/leads.d.ts",
+      "default": "./dist/leads.js"
+    },
     "./moderation": {
       "types": "./dist/moderation.d.ts",
       "default": "./dist/moderation.js"

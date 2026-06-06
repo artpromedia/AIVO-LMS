@@ -154,14 +154,24 @@ export const leadSubmissions = pgTable(
     role: varchar("role", { length: 100 }),
     message: text("message"),
     schoolSize: varchar("school_size", { length: 50 }),
+    gradeBand: varchar("grade_band", { length: 50 }),
+    interestArea: varchar("interest_area", { length: 100 }),
     source: varchar("source", { length: 50 }).default("website"),
+    // Lead lifecycle: new → contacted → qualified → pilot → won/lost.
     status: varchar("status", { length: 50 }).notNull().default("new"),
+    // Campaign attribution so a pilot coupon can be traced to its source.
+    utmSource: varchar("utm_source", { length: 120 }),
+    utmMedium: varchar("utm_medium", { length: 120 }),
+    utmCampaign: varchar("utm_campaign", { length: 120 }),
+    couponCode: varchar("coupon_code", { length: 64 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     index("idx_lead_submissions_type").on(table.type),
     index("idx_lead_submissions_email").on(table.email),
     index("idx_lead_submissions_created").on(table.createdAt),
+    index("idx_lead_submissions_status").on(table.status),
   ],
 );
 
