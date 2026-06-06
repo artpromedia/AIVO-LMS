@@ -14,14 +14,38 @@ Initial scope (this PR):
   from `packages/skill-graphs` and `packages/content-pack` as part of the
   monorepo build; the service does not synthesize content at runtime.
 - `GET /api/curriculum/health` — health check.
-- `GET /api/curriculum/lookup` — lookup endpoint with the following
-  query parameters (all optional but at least one is required):
+- `GET /api/curriculum/jurisdictions/resolve` — resolve a learner's
+  jurisdiction to its district scope + framework (see Jurisdictions
+  below). Params: `country` (required), `region`, `postalCode`,
+  `districtId`.
+- `GET /api/curriculum/lookup` — lookup endpoint. At least one *filter*
+  (`subject` / `gradeBand` / `skillId`) is required, plus a jurisdiction:
+  - jurisdiction: a US `zipCode`/`postalCode`/`districtId`, or a
+    `country` (+ optional `region`) for non-US learners.
   - `subject` — math / ela / science / ...
-  - `gradeBand` — K / 1 / 2 / ...
+  - `gradeBand` — K / 1 / 2 / ... (or a framework's own band, e.g.
+    `Primary-3` for NG).
   - `skillId` — return one specific skill node + immediate prereqs.
 - `GET /api/curriculum/skills/{skill_id}/path` — return the prerequisite
   chain leading up to a skill (longest-first), useful for the brain-svc
   "next-action" endpoint.
+
+## Jurisdictions (internationalization)
+
+A *jurisdiction* is the `{country, region?, district?, postalCode?}`
+tuple that identifies whose approved curriculum a learner receives:
+
+- **US** resolves by ZIP → district (unchanged).
+- **NG / AE / GB / …** resolve by `country` (+ optional `region`). The
+  governing framework comes from the single framework registry in
+  `frameworks.py` (NERDC, UAE MOE, UK National Curriculum, …).
+
+A non-US country is **never** silently mapped to US/CCSS. A recognised
+country with no curriculum seeded yet returns an explicit
+`404 "no curriculum seeded for <country>-<region>"`; an unrecognised
+country returns `404 "no curriculum framework registered…"`. Real NG/AE/GB
+content is seeded in Sprint 3. See
+[docs/curriculum/ARCHITECTURE.md](../../docs/curriculum/ARCHITECTURE.md).
 
 ## Authentication
 

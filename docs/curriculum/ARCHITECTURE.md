@@ -25,8 +25,8 @@ A learner's curriculum is resolved deterministically, left to right:
   postalCode?}       that jurisdiction    subject, grade)      + prerequisites      for the learner
 
  owned by            frameworks.py        packages/            packages/            brain-svc
- jurisdiction.py     (single registry)    content-pack/        skill-graphs/        curriculum_engine.py
- (planned: S2)       (planned: S2/S3)     (planned: S3)        (today, US)          (scaffold-only, S3)
+ jurisdiction.py     (single registry,    content-pack/        skill-graphs/        curriculum_engine.py
+ (S2, done)          S2 done)             (intl: S3)           (US today; intl S3)  (scaffold-only, S3)
         │                                                                                  │
         │                                                                                  ▼
         │                                                                          curriculum_validator.py
@@ -43,7 +43,8 @@ A learner's curriculum is resolved deterministically, left to right:
 | Component | Role | Status |
 | --------- | ---- | ------ |
 | `services/curriculum-svc` | **Authoritative** catalogue: skills, prerequisites, content packs, frameworks, jurisdiction resolution, validation. | US ZIP catalogue today; intl + auth + authoring + validate over Sprints 1–7. |
-| `curriculum-svc/.../catalogue.py` | In-memory read model loaded from the `skill_graphs.json` snapshot; enforces district/jurisdiction scoping. | US-only today; generalized to `Jurisdiction` in S2. |
+| `curriculum-svc/.../catalogue.py` | In-memory read model loaded from the `skill_graphs.json` snapshot; enforces district/jurisdiction scoping; `resolve_jurisdiction()`. | Generalized to the `Jurisdiction` model (S2). |
+| `curriculum-svc/.../jurisdiction.py` + `frameworks.py` | `{country, region, district, postalCode}` → framework resolution; single framework registry (NERDC/MOE/NC/…). | Done (S2). Intl content seeded S3. |
 | `curriculum-svc/.../auth.py` | Service-token / JWT auth for catalogue access. | Weak bearer check today; real RS256 in S1. |
 | `packages/skill-graphs` | Skill-graph types, traversal, validators — the graph data compiled into the snapshot. | US today; `src/intl/` added S3. |
 | `packages/content-pack` | Curated content-pack manifests per (jurisdiction, subject, grade). | US today; NG/AE/GB seeded S3. |

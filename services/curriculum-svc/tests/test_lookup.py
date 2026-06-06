@@ -105,13 +105,17 @@ def test_lookup_requires_at_least_one_filter():
     assert r.status_code == 400
 
 
-def test_lookup_requires_enrollment_zip_code():
+def test_lookup_requires_a_jurisdiction():
+    # Migrated from the ZIP-only era: `zipCode` is now optional at the
+    # framework level (so non-US lookups can pass `country` instead), and
+    # the "you must locate the learner" rule is enforced in-handler as a
+    # 400 rather than FastAPI's structural 422.
     r = client.get(
         "/api/curriculum/lookup",
         params={"subject": "math", "gradeBand": "K"},
         headers=DEV_TOKEN_HEADERS,
     )
-    assert r.status_code == 422
+    assert r.status_code == 400
 
 
 def test_lookup_by_subject_grade_and_zip_serves_only_that_district():

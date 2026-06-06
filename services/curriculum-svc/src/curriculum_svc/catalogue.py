@@ -18,6 +18,13 @@ from functools import lru_cache
 from importlib import resources
 from typing import Iterable
 
+from curriculum_svc.frameworks import get_framework, normalize_country
+from curriculum_svc.jurisdiction import (
+    JurisdictionNotSeededError,
+    MalformedJurisdictionError,
+    ResolvedJurisdiction,
+    UnknownJurisdictionError,
+)
 
 _ZIP5_RE = re.compile(r"^\d{5}$")
 
@@ -38,6 +45,10 @@ class District:
     name: str
     state: str
     zip_codes: tuple[str, ...]
+    # schemaVersion 2: jurisdiction generalisation. US districts default to
+    # country "US" with region == state so existing snapshots load unchanged.
+    country: str = "US"
+    region: str | None = None
 
 
 @dataclass(frozen=True)
@@ -48,6 +59,8 @@ class ContentPack:
     grade_band: str
     skill_ids: tuple[str, ...]
     district_ids: tuple[str, ...]
+    # schemaVersion 2: the framework this pack's standards belong to.
+    framework_code: str = ""
 
 
 class Catalogue:
@@ -86,6 +99,118 @@ class Catalogue:
 
     def get_district(self, district_id: str) -> District | None:
         return self._districts.get(district_id)
+
+    def list_districts(
+        self,
+        country: str | None = None,
+        region: str | None = None,
+    ) -> list[District]:
+        """All districts, optionally filtered by country and/or region
+        (both case-insensitive). Sorted by id for deterministic responses."""
+        out: list[District] = []
+        for d in self._districts.values():
+            if country is not None and d.country.upper() != country.upper():
+                continue
+            if region is not None and (d.region or "").lower() != region.lower():
+                continue
+            out.append(d)
+        return sorted(out, key=lambda d: d.id)
+
+    @staticmethod
+    def validate_postal_code(country: str, postal_code: str | None) -> str | None:
+        """Per-country postal validation, replacing the global ZIP5-only
+        rule. US requires a valid 5-digit ZIP; other countries treat the
+        postal code as optional metadata (resolution is by country/region).
+        Raises :class:`MalformedJurisdictionError` for an invalid US ZIP."""
+        if normalize_country(country) == "US":
+            if not postal_code:
+                return None
+            try:
+                return Catalogue.normalize_zip_code(postal_code)
+            except ValueError as exc:
+                raise MalformedJurisdictionError(str(exc)) from exc
+        return postal_code.strip() if postal_code else None
+
+    def resolve_jurisdiction(
+        self,
+        country: str,
+        region: str | None = None,
+        district_id: str | None = None,
+        postal_code: str | None = None,
+    ) -> ResolvedJurisdiction:
+        """Resolve ``{country, region?, district?, postalCode?}`` to a
+        concrete district scope plus its governing framework.
+
+        US resolves by ZIP/district; other countries by country (+region).
+        A recognised-but-unseeded country raises
+        :class:`JurisdictionNotSeededError` — never a silent US fallback.
+        """
+        normalized_country = normalize_country(country)
+        if not normalized_country:
+            raise MalformedJurisdictionError("country is required")
+
+        framework = get_framework(normalized_country)
+        if framework is None:
+            raise UnknownJurisdictionError(
+                f"no curriculum framework registered for country '{normalized_country}'"
+            )
+
+        if normalized_country == "US":
+            district = self._resolve_us_district(district_id, postal_code)
+            region_out = district.region or district.state
+        else:
+            district = self._resolve_intl_district(normalized_country, region, district_id)
+            region_out = region or district.region
+
+        return ResolvedJurisdiction(
+            country=normalized_country,
+            region=region_out,
+            district_id=district.id,
+            district_name=district.name,
+            framework_code=framework.standards_code,
+            framework_name=framework.framework,
+            grade_band_scheme=framework.grade_band_scheme,
+        )
+
+    def _resolve_us_district(
+        self, district_id: str | None, postal_code: str | None
+    ) -> District:
+        if district_id:
+            district = self.get_district(district_id)
+            if district is None:
+                raise JurisdictionNotSeededError(
+                    f"no curriculum seeded for district '{district_id}'"
+                )
+            return district
+        normalized = self.validate_postal_code("US", postal_code)
+        if not normalized:
+            raise MalformedJurisdictionError(
+                "US jurisdictions require a postalCode (ZIP) or districtId"
+            )
+        district = self.resolve_district_by_zip(normalized)
+        if district is None:
+            raise JurisdictionNotSeededError(
+                f"no district curriculum mapping found for ZIP code {normalized}"
+            )
+        return district
+
+    def _resolve_intl_district(
+        self, country: str, region: str | None, district_id: str | None
+    ) -> District:
+        candidates = self.list_districts(country=country, region=region)
+        if not candidates:
+            scope = country + (f"-{region}" if region else "")
+            raise JurisdictionNotSeededError(
+                f"no curriculum seeded for {scope}"
+            )
+        if district_id:
+            match = next((d for d in candidates if d.id == district_id), None)
+            if match is None:
+                raise JurisdictionNotSeededError(
+                    f"district '{district_id}' is not seeded for {country}"
+                )
+            return match
+        return candidates[0]
 
     # ── Lookups ──────────────────────────────────────────────────────
 
@@ -191,6 +316,10 @@ def _parse_snapshot(raw: dict) -> Catalogue:
             name=d.get("name", d["id"]),
             state=d.get("state", ""),
             zip_codes=tuple(str(z) for z in d.get("zipCodes", [])),
+            # schemaVersion 1 snapshots omit these — default to US, with the
+            # state standing in as the region so US resolution is unchanged.
+            country=normalize_country(d.get("country", "US")) or "US",
+            region=d.get("region") or d.get("state") or None,
         )
         for d in raw.get("districts", [])
     ]
@@ -202,6 +331,7 @@ def _parse_snapshot(raw: dict) -> Catalogue:
             grade_band=p["gradeBand"],
             skill_ids=tuple(p.get("skillIds", [])),
             district_ids=tuple(p.get("districtIds", [])),
+            framework_code=p.get("frameworkCode", ""),
         )
         for p in raw.get("contentPacks", [])
     ]
