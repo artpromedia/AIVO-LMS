@@ -12,10 +12,10 @@ import {
   listAdminLearners,
   listAdminTenants,
   listAdminUsers,
-} from "@/lib/admin-api/platform";
-import { listBillingAccounts } from "@/lib/admin-api/billing";
+} from "@aivo/admin-api/platform";
+import { listBillingAccounts } from "@aivo/admin-api/billing";
 import { ROLE_LABEL } from "@/lib/auth/types";
-import { billingTone } from "@/lib/admin-api/types";
+import { billingTone } from "@aivo/admin-api/types";
 
 const TYPE_ORDER: Record<string, number> = {
   district: 0,

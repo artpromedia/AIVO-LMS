@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { listAdminLearners, listAdminTenants } from "@/lib/admin-api/platform";
+import { listAdminLearners, listAdminTenants } from "@aivo/admin-api/platform";
 import { ROLE_LABEL } from "@/lib/auth/types";
 
 const FL_LABEL: Record<string, string> = {

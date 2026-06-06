@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { getAdminUser } from "@/lib/admin-api/platform";
+import { getAdminUser } from "@aivo/admin-api/platform";
 import { ROLE_LABEL } from "@/lib/auth/types";
 import { ArrowLeft } from "lucide-react";
 import { sessionHasPermission } from "@/lib/auth/permissions";

@@ -272,6 +272,61 @@ importers:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@22.19.17)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.46.1)
 
+  apps/web-admin:
+    dependencies:
+      '@aivo/admin-api':
+        specifier: workspace:*
+        version: link:../../packages/admin-api
+      '@aivo/admin-auth':
+        specifier: workspace:*
+        version: link:../../packages/admin-auth
+      '@aivo/admin-ui':
+        specifier: workspace:*
+        version: link:../../packages/admin-ui
+      '@aivo/brand':
+        specifier: workspace:*
+        version: link:../../packages/brand
+      '@aivo/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      lucide-react:
+        specifier: ^0.513.0
+        version: 0.513.0(react@19.1.0)
+      next:
+        specifier: ^15.5.18
+        version: 15.5.18(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react:
+        specifier: 19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: 19.1.0
+        version: 19.1.0(react@19.1.0)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.1.8
+        version: 4.2.2
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.17
+      '@types/react':
+        specifier: 19.1.4
+        version: 19.1.4
+      '@types/react-dom':
+        specifier: 19.1.5
+        version: 19.1.5(@types/react@19.1.4)
+      tailwindcss:
+        specifier: ^4.1.8
+        version: 4.2.2
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.19.17)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.46.1)
+
   apps/web-v2:
     dependencies:
       '@aivo/aac-bridge':
@@ -283,6 +338,12 @@ importers:
       '@aivo/adaptive-baseline':
         specifier: workspace:*
         version: link:../../packages/adaptive-baseline
+      '@aivo/admin-api':
+        specifier: workspace:*
+        version: link:../../packages/admin-api
+      '@aivo/admin-auth':
+        specifier: workspace:*
+        version: link:../../packages/admin-auth
       '@aivo/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
@@ -502,6 +563,60 @@ importers:
       vitest:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@22.19.17)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.46.1)
+
+  packages/admin-api:
+    dependencies:
+      '@aivo/admin-auth':
+        specifier: workspace:*
+        version: link:../admin-auth
+      next:
+        specifier: ^15.5.18
+        version: 15.5.18(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.1.0))(react@19.1.0)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.17
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.3
+
+  packages/admin-auth:
+    dependencies:
+      jose:
+        specifier: ^6.0.11
+        version: 6.2.2
+      next:
+        specifier: ^15.5.18
+        version: 15.5.18(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.1.0))(react@19.1.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.17
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.3
+
+  packages/admin-ui:
+    dependencies:
+      react:
+        specifier: 19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: 19.1.0
+        version: 19.1.0(react@19.1.0)
+    devDependencies:
+      '@types/react':
+        specifier: 19.1.4
+        version: 19.1.4
+      '@types/react-dom':
+        specifier: 19.1.5
+        version: 19.1.5(@types/react@19.1.4)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.3
 
   packages/api-client:
     dependencies:
@@ -21601,6 +21716,32 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
+  next@15.5.18(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.1.0))(react@19.1.0):
+    dependencies:
+      '@next/env': 15.5.18
+      '@swc/helpers': 0.5.15
+      caniuse-lite: 1.0.30001787
+      postcss: 8.4.31
+      react: 19.1.0
+      react-dom: 19.2.5(react@19.1.0)
+      styled-jsx: 5.1.6(@babel/core@7.29.0)(react@19.1.0)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 15.5.18
+      '@next/swc-darwin-x64': 15.5.18
+      '@next/swc-linux-arm64-gnu': 15.5.18
+      '@next/swc-linux-arm64-musl': 15.5.18
+      '@next/swc-linux-x64-gnu': 15.5.18
+      '@next/swc-linux-x64-musl': 15.5.18
+      '@next/swc-win32-arm64-msvc': 15.5.18
+      '@next/swc-win32-x64-msvc': 15.5.18
+      '@opentelemetry/api': 1.9.1
+      '@playwright/test': 1.60.0
+      babel-plugin-react-compiler: 1.0.0
+      sharp: 0.34.5
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
   node-abort-controller@3.1.1: {}
 
   node-addon-api@7.1.1: {}
@@ -22207,7 +22348,6 @@ snapshots:
     dependencies:
       react: 19.1.0
       scheduler: 0.27.0
-    optional: true
 
   react-fast-compare@3.2.2: {}
 
@@ -22770,8 +22910,7 @@ snapshots:
 
   scheduler@0.26.0: {}
 
-  scheduler@0.27.0:
-    optional: true
+  scheduler@0.27.0: {}
 
   secure-json-parse@2.7.0: {}
 

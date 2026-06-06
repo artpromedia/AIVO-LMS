@@ -7,7 +7,7 @@ import {
   normalizeBillingStatus,
   normalizeTenantKind,
 } from "./types";
-import type { SessionProfile } from "@/lib/auth/types";
+import type { SessionProfile } from "@aivo/admin-auth/types";
 
 export async function listBillingAccounts(
   session: Pick<SessionProfile, "role">,

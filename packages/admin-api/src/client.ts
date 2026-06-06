@@ -1,10 +1,10 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { serverEnv } from "@/lib/env";
-import { IDENTITY_ACCESS_TOKEN_COOKIE } from "@/lib/auth/identity-client";
-import { securityRoleForWebRole } from "@/lib/auth/permissions";
-import type { SessionProfile } from "@/lib/auth/types";
+import { IDENTITY_ACCESS_TOKEN_COOKIE } from "@aivo/admin-auth/identity-client";
+import { securityRoleForWebRole } from "@aivo/admin-auth/permissions";
+import type { SessionProfile } from "@aivo/admin-auth/types";
+import { adminSvcUrl, internalServiceToken } from "./env.js";
 
 type QueryValue = string | number | boolean | null | undefined;
 
@@ -20,7 +20,7 @@ export class AdminApiError extends Error {
 }
 
 function buildUrl(path: string, query?: Record<string, QueryValue>): string {
-  const url = new URL(path, serverEnv.ADMIN_SVC_URL);
+  const url = new URL(path, adminSvcUrl());
   for (const [key, value] of Object.entries(query ?? {})) {
     if (value === undefined || value === null || value === "") continue;
     url.searchParams.set(key, String(value));
@@ -76,8 +76,9 @@ async function adminRequest<T>(
   if (body !== undefined) {
     headers.set("content-type", "application/json");
   }
-  if (serverEnv.INTERNAL_SERVICE_TOKEN) {
-    headers.set("x-service-token", serverEnv.INTERNAL_SERVICE_TOKEN);
+  const serviceToken = internalServiceToken();
+  if (serviceToken) {
+    headers.set("x-service-token", serviceToken);
   }
 
   const response = await fetch(buildUrl(path, query), {

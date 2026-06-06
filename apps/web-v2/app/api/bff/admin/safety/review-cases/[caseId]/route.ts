@@ -3,7 +3,7 @@ import { z } from "zod";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireRole, requireSession } from "@/lib/bff/guards";
-import { updateModerationEventStatus, type AdminModerationStatus } from "@/lib/admin-api/moderation";
+import { updateModerationEventStatus, type AdminModerationStatus } from "@aivo/admin-api/moderation";
 
 export const dynamic = "force-dynamic";
 

@@ -2,7 +2,7 @@ import "server-only";
 
 import { adminGet } from "./client";
 import { type AdminAuditEntry, adminRoleLabel } from "./types";
-import type { SessionProfile } from "@/lib/auth/types";
+import type { SessionProfile } from "@aivo/admin-auth/types";
 
 export async function listAdminAuditLogs(
   session: Pick<SessionProfile, "role">,

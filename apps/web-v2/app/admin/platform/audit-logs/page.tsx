@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { listAdminAuditLogs } from "@/lib/admin-api/audit";
+import { listAdminAuditLogs } from "@aivo/admin-api/audit";
 import { ROLE_LABEL } from "@/lib/auth/types";
 
 export default async function Page() {

@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(25, 106, 212, 0.12), transparent 28rem),
+    linear-gradient(135deg, #f8fafc 0%, #eef6ff 48%, #f8f5ed 100%);
+  color: #172033;
+}
+
+.admin-card {
+  border: 1px solid rgba(23, 32, 51, 0.1);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 24px 70px rgba(23, 32, 51, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.admin-input {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(23, 32, 51, 0.16);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.78rem 0.9rem;
+  color: #172033;
+}
+
+.admin-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #174ea6;
+  padding: 0.78rem 1.1rem;
+  font-weight: 700;
+  color: white;
+}

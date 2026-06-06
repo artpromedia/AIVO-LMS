@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { listComplianceControls, listEvidenceBundles } from "@/lib/admin-api/compliance";
+import { listComplianceControls, listEvidenceBundles } from "@aivo/admin-api/compliance";
 import { Database, ScrollText, Clock, ShieldCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";

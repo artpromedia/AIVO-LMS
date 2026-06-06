@@ -6,7 +6,7 @@ import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { platformNavForSession } from "@/components/layout/role-shells";
-import { getPlatformSystemHealth } from "@/lib/admin-api/platform";
+import { getPlatformSystemHealth } from "@aivo/admin-api/platform";
 import { ROLE_LABEL } from "@/lib/auth/types";
 
 export default async function Page() {

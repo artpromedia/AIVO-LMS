@@ -17,8 +17,17 @@ const DEV_ONLY_PREFIXES = [
 ];
 
 export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    if (process.env.NODE_ENV === "production") {
+      const adminUrl = new URL(pathname.replace(/^\/admin/, "") || "/platform", process.env.ADMIN_APP_URL || "https://admin.aivolearning.com");
+      adminUrl.search = req.nextUrl.search;
+      return NextResponse.redirect(adminUrl, 308);
+    }
+    return new NextResponse(null, { status: 404 });
+  }
+
   if (process.env.NODE_ENV === "production") {
-    const { pathname } = req.nextUrl;
     if (DEV_ONLY_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
       return new NextResponse(null, { status: 404 });
     }

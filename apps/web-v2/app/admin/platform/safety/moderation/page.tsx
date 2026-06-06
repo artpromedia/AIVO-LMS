@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { listModerationEvents } from "@/lib/admin-api/moderation";
+import { listModerationEvents } from "@aivo/admin-api/moderation";
 
 export const dynamic = "force-dynamic";
 

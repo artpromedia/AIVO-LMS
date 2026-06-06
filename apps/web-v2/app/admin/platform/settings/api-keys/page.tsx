@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import { listAdminApiKeys } from "@/lib/admin-api/api-keys";
+import { listAdminApiKeys } from "@aivo/admin-api/api-keys";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
