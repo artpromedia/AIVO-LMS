@@ -23,6 +23,32 @@ Initial scope (this PR):
   chain leading up to a skill (longest-first), useful for the brain-svc
   "next-action" endpoint.
 
+## Authentication
+
+Every route except `GET /api/curriculum/health` requires one of two real
+credential modes:
+
+1. **Service token** — `X-Service-Token: <token>` matching
+   `INTERNAL_SERVICE_TOKEN`, for service-to-service calls (brain-svc,
+   tutor-svc, …). The comparison is constant-time.
+2. **User JWT** — `Authorization: Bearer <jwt>`, a real RS256 access
+   token issued by identity-svc and verified against the shared
+   `JWT_PUBLIC_KEY` (the SPKI PEM public half of the platform keypair).
+   Verification enforces the signature, `exp`, and `iss`
+   (`aivo:identity-svc`), pins `alg=RS256` (rejecting `alg: none` and
+   HS256-confusion), and optionally checks `aud` when `JWT_AUDIENCE` is
+   set. On success the route receives a `Principal`
+   (`mode` / `sub` / `role` / `tenantId`).
+
+In non-production environments the dev token `aivo-internal-dev-token`
+is accepted so local compose and unit tests work without a generated
+secret.
+
+**Production fail-closed:** the service refuses to boot if neither
+`INTERNAL_SERVICE_TOKEN` nor `JWT_PUBLIC_KEY` is configured
+(`NODE_ENV=production`/`ENV=production`). It never silently accepts an
+unverified token.
+
 Future scope (out of this PR — tracked in INTEGRATION_STATUS.md):
 
 - gRPC mode for low-latency in-cluster reads.

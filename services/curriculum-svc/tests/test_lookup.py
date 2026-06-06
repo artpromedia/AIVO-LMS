@@ -232,11 +232,14 @@ def test_lookup_rejects_wrong_service_token():
     assert r.status_code == 401
 
 
-def test_lookup_accepts_bearer_token():
+def test_lookup_accepts_verified_jwt_bearer(jwt_public_key_env, sign_token):
+    # Migrated from the old "any 16+ char bearer" check: the service now
+    # accepts a Bearer only when it is a real RS256 token signed by the
+    # platform key. See test_auth.py for the rejection cases.
     r = client.get(
         "/api/curriculum/lookup",
         params={"subject": "math", "gradeBand": "K", "zipCode": "55104"},
-        headers={"Authorization": "Bearer a-bearer-longer-than-16-chars"},
+        headers={"Authorization": f"Bearer {sign_token()}"},
     )
     assert r.status_code == 200
 

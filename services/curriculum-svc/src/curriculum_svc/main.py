@@ -9,7 +9,13 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from curriculum_svc.auth import verify_auth_config_or_raise
 from curriculum_svc.routes import health, lookup
+
+# Fail closed at boot: in production the service refuses to start unless a
+# real credential mechanism (INTERNAL_SERVICE_TOKEN or JWT_PUBLIC_KEY) is
+# configured. See curriculum_svc.auth for the rationale.
+verify_auth_config_or_raise()
 
 app = FastAPI(
     title="AIVO Curriculum Service",
