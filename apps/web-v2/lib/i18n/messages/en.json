@@ -971,7 +971,11 @@
         "listen_again_title": "Listen again",
         "listen_again_body": "Play the instructions one more time before trying.",
         "ask_grown_up_title": "Ask a grown-up",
-        "ask_grown_up_body": "Tap the bell to ask a grown-up for help."
+        "ask_grown_up_body": "Tap the bell to ask a grown-up for help.",
+        "pattern_focus_title": "Pattern focus",
+        "pattern_focus_body": "Watch a calm pattern, then tap it back.",
+        "sorting_calm_title": "Calm sorting",
+        "sorting_calm_body": "Arrange the dots from small to big."
       },
       "breathing": {
         "round": "Round {round} of {rounds}",
@@ -987,6 +991,24 @@
       },
       "streak": {
         "label": "🔥 {count}-day calm streak"
+      },
+      "games": {
+        "pattern_title": "Pattern focus",
+        "pattern_watch": "Watch the pattern…",
+        "pattern_repeat": "Now tap the pattern.",
+        "pattern_sequence": "Remember this order: {sequence}",
+        "pattern_board_aria": "Pattern tiles",
+        "pattern_tile": "Tile {number}",
+        "watch_again": "Watch again",
+        "sorting_title": "Calm sorting",
+        "sorting_prompt": "Move the dots from smallest to biggest.",
+        "sorting_tray_aria": "Sorting tray",
+        "sorting_move_left": "Move dot {value} left",
+        "sorting_move_right": "Move dot {value} right",
+        "nice": "Lovely focus.",
+        "try_again": "Try again, no rush.",
+        "done": "I'm done",
+        "go_back": "Go back"
       }
     },
     "progress": {

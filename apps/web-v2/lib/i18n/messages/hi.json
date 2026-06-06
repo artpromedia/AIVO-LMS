@@ -780,7 +780,11 @@
         "listen_again_title": "फिर से सुनें",
         "listen_again_body": "कोशिश करने से पहले निर्देश एक बार और चलाएँ।",
         "ask_grown_up_title": "किसी बड़े से पूछें",
-        "ask_grown_up_body": "किसी बड़े से मदद माँगने के लिए घंटी दबाएँ।"
+        "ask_grown_up_body": "किसी बड़े से मदद माँगने के लिए घंटी दबाएँ।",
+        "pattern_focus_title": "पैटर्न पर ध्यान",
+        "pattern_focus_body": "एक शांत पैटर्न देखो, फिर उसे वैसे ही छूओ।",
+        "sorting_calm_title": "शांति से क्रम",
+        "sorting_calm_body": "बिंदुओं को छोटे से बड़े क्रम में लगाओ।"
       },
       "breathing": {
         "round": "{rounds} में से {round} दौर",
@@ -796,6 +800,24 @@
       },
       "streak": {
         "label": "🔥 {count} दिन की शांति की लड़ी"
+      },
+      "games": {
+        "pattern_title": "पैटर्न पर ध्यान",
+        "pattern_watch": "पैटर्न देखो…",
+        "pattern_repeat": "अब पैटर्न को छूओ।",
+        "pattern_sequence": "यह क्रम याद रखो: {sequence}",
+        "pattern_board_aria": "पैटर्न टाइलें",
+        "pattern_tile": "टाइल {number}",
+        "watch_again": "फिर से देखो",
+        "sorting_title": "शांति से क्रम",
+        "sorting_prompt": "बिंदुओं को सबसे छोटे से सबसे बड़े तक ले जाओ।",
+        "sorting_tray_aria": "क्रम ट्रे",
+        "sorting_move_left": "बिंदु {value} को बाईं ओर ले जाओ",
+        "sorting_move_right": "बिंदु {value} को दाईं ओर ले जाओ",
+        "nice": "बहुत अच्छा ध्यान।",
+        "try_again": "कोई जल्दी नहीं, फिर से कोशिश करो।",
+        "done": "हो गया",
+        "go_back": "वापस"
       }
     },
     "progress": {

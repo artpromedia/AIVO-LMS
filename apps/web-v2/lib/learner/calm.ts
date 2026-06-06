@@ -16,7 +16,9 @@ export type CalmActivityId =
   | "smaller_step"
   | "switch_to_drawing"
   | "listen_again"
-  | "ask_grown_up";
+  | "ask_grown_up"
+  | "pattern_focus"
+  | "sorting_calm";
 
 export type CalmActivityKind =
   | "breathing"
@@ -96,6 +98,22 @@ const CALM_CATALOG: readonly CalmActivity[] = [
     titleKey: "ask_grown_up_title",
     bodyKey: "ask_grown_up_body",
   },
+  {
+    id: "pattern_focus",
+    kind: "grounding",
+    durationSeconds: 0,
+    motionSafe: true,
+    titleKey: "pattern_focus_title",
+    bodyKey: "pattern_focus_body",
+  },
+  {
+    id: "sorting_calm",
+    kind: "grounding",
+    durationSeconds: 0,
+    motionSafe: true,
+    titleKey: "sorting_calm_title",
+    bodyKey: "sorting_calm_body",
+  },
 ] as const;
 
 const CALM_IDS: ReadonlySet<string> = new Set(CALM_CATALOG.map((a) => a.id));
@@ -157,6 +175,8 @@ export function affirmationKeyFor(id: CalmActivityId): string {
     case "smaller_step":
     case "switch_to_drawing":
     case "listen_again":
+    case "pattern_focus":
+    case "sorting_calm":
       return "ready";
     case "ask_grown_up":
       return "supported";
@@ -180,4 +200,74 @@ export function boxBreathRounds(): number {
     getCalmActivity("box_breathing").durationSeconds /
     (BOX_BREATH_PHASES.length * BOX_BREATH_PHASE_SECONDS)
   );
+}
+
+/* ===== Calming mini-games — pure logic =====
+ * Kept here (no I/O, no React) so the UI stays thin and the rules are
+ * exhaustively unit-testable. Randomness is injected via `rng` for
+ * deterministic tests; callers default to `Math.random` at the call site.
+ * These are calm focus activities: no scoring, no timers, no "lose" state.
+ */
+
+/** Number of distinct tiles in the Pattern Focus board. */
+export const PATTERN_TILE_COUNT = 4;
+
+/** Default round length for Pattern Focus — short and low-stakes. */
+export const PATTERN_DEFAULT_LENGTH = 4;
+
+/**
+ * A calm "watch then repeat" sequence of tile indices in
+ * [0, PATTERN_TILE_COUNT). Deterministic for a given `rng`.
+ */
+export function generatePatternSequence(rng: () => number, length: number): number[] {
+  const safeLength = Math.max(0, Math.floor(length));
+  const out: number[] = [];
+  for (let i = 0; i < safeLength; i += 1) {
+    out.push(Math.floor(rng() * PATTERN_TILE_COUNT));
+  }
+  return out;
+}
+
+/** True only when the guess matches the sequence exactly (order + values). */
+export function isPatternGuessCorrect(sequence: number[], guess: number[]): boolean {
+  if (sequence.length !== guess.length) return false;
+  return sequence.every((tile, i) => tile === guess[i]);
+}
+
+/** One item in the Sorting Calm tray — a value the learner arranges low→high. */
+export interface SortItem {
+  id: string;
+  /** The sort key (1..count) the learner arranges into ascending order. */
+  value: number;
+}
+
+/** Default number of items in a Sorting Calm tray. */
+export const SORTING_DEFAULT_COUNT = 5;
+
+/**
+ * Items with values 1..count in a shuffled order (Fisher–Yates driven by
+ * `rng`, so it is deterministic for tests). Ids are stable per value so the
+ * UI can key on them across reorders.
+ */
+export function generateSortingItems(rng: () => number, count: number): SortItem[] {
+  const safeCount = Math.max(0, Math.floor(count));
+  const items: SortItem[] = [];
+  for (let v = 1; v <= safeCount; v += 1) {
+    items.push({ id: `sort_${v}`, value: v });
+  }
+  for (let i = items.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = items[i];
+    items[i] = items[j];
+    items[j] = tmp;
+  }
+  return items;
+}
+
+/** True when items are in non-decreasing order by value (the solved tray). */
+export function isSortingSolved(items: readonly SortItem[]): boolean {
+  for (let i = 1; i < items.length; i += 1) {
+    if (items[i - 1].value > items[i].value) return false;
+  }
+  return true;
 }

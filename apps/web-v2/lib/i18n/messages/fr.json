@@ -780,7 +780,11 @@
         "listen_again_title": "Écoute encore",
         "listen_again_body": "Réécoute les consignes une fois de plus avant d'essayer.",
         "ask_grown_up_title": "Demande à un adulte",
-        "ask_grown_up_body": "Touche la cloche pour demander de l'aide à un adulte."
+        "ask_grown_up_body": "Touche la cloche pour demander de l'aide à un adulte.",
+        "pattern_focus_title": "Concentration sur le motif",
+        "pattern_focus_body": "Observe un motif tout calme, puis reproduis-le.",
+        "sorting_calm_title": "Tri tout calme",
+        "sorting_calm_body": "Range les ronds du plus petit au plus grand."
       },
       "breathing": {
         "round": "Tour {round} sur {rounds}",
@@ -796,6 +800,24 @@
       },
       "streak": {
         "label": "🔥 {count} jours de calme d'affilée"
+      },
+      "games": {
+        "pattern_title": "Concentration sur le motif",
+        "pattern_watch": "Observe le motif…",
+        "pattern_repeat": "Maintenant, touche le motif.",
+        "pattern_sequence": "Retiens cet ordre : {sequence}",
+        "pattern_board_aria": "Tuiles du motif",
+        "pattern_tile": "Tuile {number}",
+        "watch_again": "Revoir",
+        "sorting_title": "Tri tout calme",
+        "sorting_prompt": "Déplace les ronds du plus petit au plus grand.",
+        "sorting_tray_aria": "Plateau de tri",
+        "sorting_move_left": "Déplacer le rond {value} vers la gauche",
+        "sorting_move_right": "Déplacer le rond {value} vers la droite",
+        "nice": "Belle concentration.",
+        "try_again": "Réessaie, sans te presser.",
+        "done": "J'ai fini",
+        "go_back": "Retour"
       }
     },
     "progress": {

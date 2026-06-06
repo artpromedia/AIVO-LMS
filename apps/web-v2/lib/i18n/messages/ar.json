@@ -780,7 +780,11 @@
         "listen_again_title": "استمع مرة أخرى",
         "listen_again_body": "شغّل التعليمات مرة أخرى قبل المحاولة.",
         "ask_grown_up_title": "اسأل شخصًا بالغًا",
-        "ask_grown_up_body": "اضغط على الجرس لتطلب المساعدة من شخص بالغ."
+        "ask_grown_up_body": "اضغط على الجرس لتطلب المساعدة من شخص بالغ.",
+        "pattern_focus_title": "التركيز على النمط",
+        "pattern_focus_body": "شاهد نمطًا هادئًا ثم أعد لمسه.",
+        "sorting_calm_title": "ترتيب هادئ",
+        "sorting_calm_body": "رتّب النقاط من الأصغر إلى الأكبر."
       },
       "breathing": {
         "round": "الجولة {round} من {rounds}",
@@ -796,6 +800,24 @@
       },
       "streak": {
         "label": "🔥 سلسلة هدوء لمدة {count} يوم"
+      },
+      "games": {
+        "pattern_title": "التركيز على النمط",
+        "pattern_watch": "شاهد النمط…",
+        "pattern_repeat": "الآن المس النمط.",
+        "pattern_sequence": "تذكّر هذا الترتيب: {sequence}",
+        "pattern_board_aria": "مربعات النمط",
+        "pattern_tile": "مربع {number}",
+        "watch_again": "شاهد مرة أخرى",
+        "sorting_title": "ترتيب هادئ",
+        "sorting_prompt": "حرّك النقاط من الأصغر إلى الأكبر.",
+        "sorting_tray_aria": "صينية الترتيب",
+        "sorting_move_left": "حرّك النقطة {value} إلى اليسار",
+        "sorting_move_right": "حرّك النقطة {value} إلى اليمين",
+        "nice": "تركيز جميل.",
+        "try_again": "حاول مرة أخرى، على مهلك.",
+        "done": "انتهيت",
+        "go_back": "رجوع"
       }
     },
     "progress": {

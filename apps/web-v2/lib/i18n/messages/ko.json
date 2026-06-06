@@ -780,7 +780,11 @@
         "listen_again_title": "다시 듣기",
         "listen_again_body": "해보기 전에 설명을 한 번 더 들어요.",
         "ask_grown_up_title": "어른에게 물어보기",
-        "ask_grown_up_body": "종을 눌러서 어른에게 도움을 청해요."
+        "ask_grown_up_body": "종을 눌러서 어른에게 도움을 청해요.",
+        "pattern_focus_title": "패턴 집중",
+        "pattern_focus_body": "차분한 패턴을 보고 똑같이 눌러 봐요.",
+        "sorting_calm_title": "차분한 정렬",
+        "sorting_calm_body": "점을 작은 것부터 큰 것까지 놓아 봐요."
       },
       "breathing": {
         "round": "{rounds}회 중 {round}회",
@@ -796,6 +800,24 @@
       },
       "streak": {
         "label": "🔥 {count}일 연속 차분함"
+      },
+      "games": {
+        "pattern_title": "패턴 집중",
+        "pattern_watch": "패턴을 보세요…",
+        "pattern_repeat": "이제 패턴을 눌러 보세요.",
+        "pattern_sequence": "이 순서를 기억하세요: {sequence}",
+        "pattern_board_aria": "패턴 타일",
+        "pattern_tile": "타일 {number}",
+        "watch_again": "다시 보기",
+        "sorting_title": "차분한 정렬",
+        "sorting_prompt": "점을 가장 작은 것부터 가장 큰 것까지 옮겨요.",
+        "sorting_tray_aria": "정렬 트레이",
+        "sorting_move_left": "점 {value} 왼쪽으로 옮기기",
+        "sorting_move_right": "점 {value} 오른쪽으로 옮기기",
+        "nice": "집중 잘했어요.",
+        "try_again": "천천히 다시 해 봐요.",
+        "done": "다 했어요",
+        "go_back": "돌아가기"
       }
     },
     "progress": {

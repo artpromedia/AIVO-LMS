@@ -11,6 +11,8 @@ import {
   BOX_BREATH_PHASE_SECONDS,
   boxBreathRounds,
 } from "@/lib/learner/calm";
+import { PatternFocus } from "./games/pattern-focus";
+import { SortingCalm } from "./games/sorting-calm";
 
 interface CalmCornerProps {
   learnerId: string;
@@ -164,6 +166,12 @@ function ActivityRunner({
 }) {
   if (activity.kind === "breathing") {
     return <BoxBreathing onDone={onDone} onCancel={onCancel} />;
+  }
+  if (activity.id === "pattern_focus") {
+    return <PatternFocus onDone={onDone} onCancel={onCancel} />;
+  }
+  if (activity.id === "sorting_calm") {
+    return <SortingCalm onDone={onDone} onCancel={onCancel} />;
   }
   return <StaticActivity activity={activity} onDone={onDone} onCancel={onCancel} />;
 }

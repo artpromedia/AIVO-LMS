@@ -780,7 +780,11 @@
         "listen_again_title": "再听一遍",
         "listen_again_body": "在动手前再把说明听一遍。",
         "ask_grown_up_title": "问问大人",
-        "ask_grown_up_body": "点一下铃铛，向大人寻求帮助。"
+        "ask_grown_up_body": "点一下铃铛，向大人寻求帮助。",
+        "pattern_focus_title": "图案专注",
+        "pattern_focus_body": "看一段平静的图案，然后点出来。",
+        "sorting_calm_title": "平静排序",
+        "sorting_calm_body": "把圆点从小到大排好。"
       },
       "breathing": {
         "round": "第 {round} 轮，共 {rounds} 轮",
@@ -796,6 +800,24 @@
       },
       "streak": {
         "label": "🔥 连续平静 {count} 天"
+      },
+      "games": {
+        "pattern_title": "图案专注",
+        "pattern_watch": "看看这个图案…",
+        "pattern_repeat": "现在点出这个图案。",
+        "pattern_sequence": "记住这个顺序：{sequence}",
+        "pattern_board_aria": "图案方块",
+        "pattern_tile": "方块 {number}",
+        "watch_again": "再看一次",
+        "sorting_title": "平静排序",
+        "sorting_prompt": "把圆点从最小移到最大。",
+        "sorting_tray_aria": "排序托盘",
+        "sorting_move_left": "把圆点 {value} 向左移",
+        "sorting_move_right": "把圆点 {value} 向右移",
+        "nice": "专注得真好。",
+        "try_again": "再试一次，不用着急。",
+        "done": "我做好了",
+        "go_back": "返回"
       }
     },
     "progress": {
