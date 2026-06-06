@@ -1,0 +1,77 @@
+name: Marketing GEO
+
+# Generative-Engine-Optimization gate. Builds the marketing site, runs the
+# GEO unit tests (llms.txt drift guard + article schema), then boots the built
+# server and validates that representative pages emit the required structured
+# data and that /llms.txt is well-formed with reachable links. Blocks merge on
+# any invalid or missing JSON-LD or a broken llms.txt link.
+
+on:
+  pull_request:
+    paths:
+      - "apps/marketing/**"
+      - "packages/brand/**"
+      - "scripts/geo/**"
+      - ".github/workflows/marketing-geo.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketing-geo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  geo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GEO_BASE_URL: http://localhost:4000
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit tests (llms.txt drift guard + article schema)
+        run: pnpm exec turbo run test --filter=@aivo/marketing
+
+      - name: Build marketing site
+        run: pnpm exec turbo run build --filter=@aivo/marketing
+
+      - name: Start marketing server
+        env:
+          PORT: 4000
+        run: |
+          pnpm --filter @aivo/marketing run start &
+          echo "SERVER_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for server
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:4000/robots.txt >/dev/null; then
+              echo "server is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::marketing server did not start within 60s"
+          exit 1
+
+      - name: Validate structured data
+        run: node scripts/geo/validate-structured-data.mjs
+
+      - name: Check llms.txt
+        run: node scripts/geo/check-llms-txt.mjs
+
+      - name: Stop marketing server
+        if: always()
+        run: kill "${SERVER_PID}" 2>/dev/null || true

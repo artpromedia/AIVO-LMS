@@ -1,17 +1,22 @@
 import type { MetadataRoute } from "next";
 import { TUTORS } from "@/components/marketing/data";
 import { AUDIENCES, LEVELS, SUBJECTS, COMPARISONS } from "@/lib/landing-content";
+import { getAllArticles } from "@/lib/content";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aivolearning.com";
+
+type SitemapPage = {
+  path: string;
+  priority: number;
+  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+  /** Real per-page modified date for dated content; falls back to `now`. */
+  lastModified?: Date;
+};
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const staticPages: {
-    path: string;
-    priority: number;
-    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
-  }[] = [
+  const staticPages: SitemapPage[] = [
     { path: "/", priority: 1.0, changeFrequency: "weekly" },
     { path: "/about", priority: 0.8, changeFrequency: "monthly" },
     { path: "/contact", priority: 0.8, changeFrequency: "monthly" },
@@ -38,17 +43,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/features/homework-helper", priority: 0.85, changeFrequency: "monthly" },
     { path: "/resources", priority: 0.7, changeFrequency: "weekly" },
     { path: "/guides", priority: 0.7, changeFrequency: "weekly" },
-    { path: "/blog/what-is-personalized-learning", priority: 0.6, changeFrequency: "monthly" },
-    { path: "/blog/parent-progress-without-jargon", priority: 0.6, changeFrequency: "monthly" },
-    { path: "/blog/what-is-a-baseline-assessment", priority: 0.6, changeFrequency: "monthly" },
-    { path: "/blog/read-aloud-and-scaffolds", priority: 0.6, changeFrequency: "monthly" },
-    {
-      path: "/guides/school-buying-checklist-ai-learning",
-      priority: 0.6,
-      changeFrequency: "monthly",
-    },
-    { path: "/guides/how-aivo-thinks-about-privacy", priority: 0.6, changeFrequency: "monthly" },
   ];
+
+  // Blog posts and guides are dated content: emit their real last-modified
+  // date (updatedAt, else publishedAt) so freshness is an accurate ranking
+  // and citation signal — never a blanket `now()`. Generated from the content
+  // module so new posts flow in automatically and never drift from the page.
+  const contentPages: SitemapPage[] = getAllArticles().map((a) => ({
+    path: `/${a.kind === "guide" ? "guides" : "blog"}/${a.slug}`,
+    priority: 0.6,
+    changeFrequency: "monthly" as const,
+    lastModified: new Date(a.updatedAt ?? a.publishedAt),
+  }));
 
   const audiencePages = AUDIENCES.map((a) => ({
     path: `/${a.slug}`,
@@ -80,16 +86,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as const,
   }));
 
-  return [
+  const allPages: SitemapPage[] = [
     ...staticPages,
+    ...contentPages,
     ...audiencePages,
     ...tutorPages,
     ...levelPages,
     ...subjectPages,
     ...comparePages,
-  ].map((page) => ({
+  ];
+
+  return allPages.map((page) => ({
     url: `${BASE_URL}${page.path}`,
-    lastModified: now,
+    lastModified: page.lastModified ?? now,
     changeFrequency: page.changeFrequency,
     priority: page.priority,
   }));
