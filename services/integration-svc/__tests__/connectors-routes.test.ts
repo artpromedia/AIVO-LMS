@@ -47,4 +47,14 @@ describe("integrations-svc connector catalogue", () => {
     });
     expect([401, 403]).toContain(res.statusCode);
   });
+
+  it("keeps public LTI launch validation outside enterprise bearer auth", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/lti/launch",
+      payload: {},
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json()).toEqual({ error: "missing_launch_parameters" });
+  });
 });

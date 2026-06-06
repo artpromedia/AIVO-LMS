@@ -42,13 +42,17 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
 
   const db = resolveDb(options.db);
 
-  // SIS + LTI routes live behind the enterprise service-auth hook. The hook
-  // is encapsulated in this child scope so it does NOT apply to the merged
-  // connector routes, which authenticate per-route (and expose a public
+  // SIS + most LTI routes live behind the enterprise service-auth hook. LTI
+  // launch entrypoints stay public by protocol and verify their own id_token.
+  // The hook is encapsulated in this child scope so it does NOT apply to the
+  // merged connector routes, which authenticate per-route (and expose a public
   // waitlist) — preserving the behavior they had as a standalone service.
   await app.register(async (secured) => {
     if (!options.skipAuth) {
-      registerEnterpriseAuthHook(secured, { sourceService: "integration-svc" });
+      registerEnterpriseAuthHook(secured, {
+        sourceService: "integration-svc",
+        skipPaths: ["/healthz", "/metrics", "/api/lti/validate", "/api/lti/launch"],
+      });
     }
     registerSisRoutes(secured);
     registerLtiRoutes(secured, db ?? undefined);
