@@ -861,6 +861,15 @@
       "modality_kinesthetic": "Hands-on",
       "modality_reading": "Reading",
       "modality_unknown": "Mixed"
+    },
+    "calm_summary": {
+      "title": "Calm moments",
+      "none": "{name} hasn't used the Calm Corner yet.",
+      "moments": "{name} took {count} calm moments this week.",
+      "completed": "{count} finished gently.",
+      "last_active_today": "Last active today",
+      "last_active_yesterday": "Last active yesterday",
+      "last_active_days": "Last active {count} days ago"
     }
   },
   "brain_clone": {
@@ -962,7 +971,11 @@
         "listen_again_title": "Listen again",
         "listen_again_body": "Play the instructions one more time before trying.",
         "ask_grown_up_title": "Ask a grown-up",
-        "ask_grown_up_body": "Tap the bell to ask a grown-up for help."
+        "ask_grown_up_body": "Tap the bell to ask a grown-up for help.",
+        "pattern_focus_title": "Pattern focus",
+        "pattern_focus_body": "Watch a calm pattern, then tap it back.",
+        "sorting_calm_title": "Calm sorting",
+        "sorting_calm_body": "Arrange the dots from small to big."
       },
       "breathing": {
         "round": "Round {round} of {rounds}",
@@ -975,6 +988,34 @@
         "next": "Next breath",
         "finish": "Finish",
         "done_early": "I'm done"
+      },
+      "streak": {
+        "label": "🔥 {count}-day calm streak"
+      },
+      "games": {
+        "pattern_title": "Pattern focus",
+        "pattern_watch": "Watch the pattern…",
+        "pattern_repeat": "Now tap the pattern.",
+        "pattern_sequence": "Remember this order: {sequence}",
+        "pattern_board_aria": "Pattern tiles",
+        "pattern_tile": "Tile {number}",
+        "watch_again": "Watch again",
+        "sorting_title": "Calm sorting",
+        "sorting_prompt": "Move the dots from smallest to biggest.",
+        "sorting_tray_aria": "Sorting tray",
+        "sorting_move_left": "Move dot {value} left",
+        "sorting_move_right": "Move dot {value} right",
+        "nice": "Lovely focus.",
+        "try_again": "Try again, no rush.",
+        "done": "I'm done",
+        "go_back": "Go back"
+      },
+      "audio": {
+        "label": "Calm sounds",
+        "on": "On",
+        "off": "Off",
+        "mute": "Mute sounds",
+        "unmute": "Unmute sounds"
       }
     },
     "progress": {
@@ -1083,7 +1124,13 @@
       "err_send": "Couldn't send. Try again.",
       "err_network": "Network problem. Try again in a moment.",
       "err_end": "Couldn't end the session.",
-      "err_network_short": "Network problem. Try again."
+      "err_network_short": "Network problem. Try again.",
+      "calm_nudge": {
+        "title": "Want a calm break?",
+        "body": "It's okay to pause. A quick calm moment can help you feel ready.",
+        "accept": "Take a calm break",
+        "dismiss": "Not now"
+      }
     },
     "subjects": {
       "page_title": "Pick a subject",

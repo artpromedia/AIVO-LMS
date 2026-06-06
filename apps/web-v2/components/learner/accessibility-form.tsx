@@ -23,6 +23,7 @@ type ToggleKey = Extract<
   | "captionsAlwaysOn"
   | "reducedMotion"
   | "hapticsEnabled"
+  | "calmAudioCues"
   | "shorterSteps"
   | "extraHints"
   | "visualSupports"
@@ -78,6 +79,12 @@ const TOGGLES: Array<{
     key: "hapticsEnabled",
     label: "Haptic feedback",
     help: "Small vibration on mobile when a choice is selected.",
+    group: "motion",
+  },
+  {
+    key: "calmAudioCues",
+    label: "Calm sounds",
+    help: "Soft audio cue on each breathing phase in the Calm Corner. Off by default.",
     group: "motion",
   },
   {

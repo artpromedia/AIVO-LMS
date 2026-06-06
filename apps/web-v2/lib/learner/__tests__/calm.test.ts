@@ -23,6 +23,17 @@ describe("calm catalog", () => {
     expect(getCalmCatalog()[0].id).toBe("box_breathing");
   });
 
+  it("includes the Pattern and Sorting grounding activities", () => {
+    const byId = new Map(getCalmCatalog().map((a) => [a.id, a]));
+    for (const id of ["pattern_focus", "sorting_calm"] as const) {
+      const activity = byId.get(id);
+      expect(activity).toBeDefined();
+      expect(activity!.kind).toBe("grounding");
+      expect(activity!.durationSeconds).toBe(0);
+      expect(activity!.motionSafe).toBe(true);
+    }
+  });
+
   it("every activity resolves and is total over its fields", () => {
     for (const a of getCalmCatalog()) {
       const got = getCalmActivity(a.id);

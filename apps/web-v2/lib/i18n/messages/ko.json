@@ -670,6 +670,15 @@
       "modality_kinesthetic": "Hands-on",
       "modality_reading": "Reading",
       "modality_unknown": "Mixed"
+    },
+    "calm_summary": {
+      "title": "Calm moments",
+      "none": "{name} hasn't used the Calm Corner yet.",
+      "moments": "{name} took {count} calm moments this week.",
+      "completed": "{count} finished gently.",
+      "last_active_today": "Last active today",
+      "last_active_yesterday": "Last active yesterday",
+      "last_active_days": "Last active {count} days ago"
     }
   },
   "brain_clone": {
@@ -771,7 +780,11 @@
         "listen_again_title": "다시 듣기",
         "listen_again_body": "해보기 전에 설명을 한 번 더 들어요.",
         "ask_grown_up_title": "어른에게 물어보기",
-        "ask_grown_up_body": "종을 눌러서 어른에게 도움을 청해요."
+        "ask_grown_up_body": "종을 눌러서 어른에게 도움을 청해요.",
+        "pattern_focus_title": "패턴 집중",
+        "pattern_focus_body": "차분한 패턴을 보고 똑같이 눌러 봐요.",
+        "sorting_calm_title": "차분한 정렬",
+        "sorting_calm_body": "점을 작은 것부터 큰 것까지 놓아 봐요."
       },
       "breathing": {
         "round": "{rounds}회 중 {round}회",
@@ -784,6 +797,34 @@
         "next": "다음 호흡",
         "finish": "끝내기",
         "done_early": "다 했어요"
+      },
+      "streak": {
+        "label": "🔥 {count}일 연속 차분함"
+      },
+      "games": {
+        "pattern_title": "패턴 집중",
+        "pattern_watch": "패턴을 보세요…",
+        "pattern_repeat": "이제 패턴을 눌러 보세요.",
+        "pattern_sequence": "이 순서를 기억하세요: {sequence}",
+        "pattern_board_aria": "패턴 타일",
+        "pattern_tile": "타일 {number}",
+        "watch_again": "다시 보기",
+        "sorting_title": "차분한 정렬",
+        "sorting_prompt": "점을 가장 작은 것부터 가장 큰 것까지 옮겨요.",
+        "sorting_tray_aria": "정렬 트레이",
+        "sorting_move_left": "점 {value} 왼쪽으로 옮기기",
+        "sorting_move_right": "점 {value} 오른쪽으로 옮기기",
+        "nice": "집중 잘했어요.",
+        "try_again": "천천히 다시 해 봐요.",
+        "done": "다 했어요",
+        "go_back": "돌아가기"
+      },
+      "audio": {
+        "label": "차분한 소리",
+        "on": "켜짐",
+        "off": "꺼짐",
+        "mute": "소리 끄기",
+        "unmute": "소리 켜기"
       }
     },
     "progress": {
@@ -892,7 +933,13 @@
       "err_send": "보내지 못했어. 다시 시도해.",
       "err_network": "네트워크 문제야. 잠시 후 다시 시도해.",
       "err_end": "세션을 끝낼 수 없어.",
-      "err_network_short": "네트워크 문제야. 다시 시도해."
+      "err_network_short": "네트워크 문제야. 다시 시도해.",
+      "calm_nudge": {
+        "title": "잠깐 쉬어 볼까요?",
+        "body": "잠깐 멈춰도 괜찮아요. 짧은 차분한 시간이 다시 준비되도록 도와줘요.",
+        "accept": "차분한 휴식 갖기",
+        "dismiss": "지금은 괜찮아요"
+      }
     },
     "subjects": {
       "page_title": "과목 선택",

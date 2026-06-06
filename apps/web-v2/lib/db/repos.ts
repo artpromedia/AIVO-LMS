@@ -1503,6 +1503,7 @@ import type {
   QuestWorld,
   HomeworkHelpMessage,
   HomeworkHelpSession,
+  CalmSessionRecord,
   TeacherAssignment,
   CurriculumUpload,
   CurriculumFocus,
@@ -2476,6 +2477,145 @@ export function completeHomeworkSession(
   };
   store.homeworkHelpSessions.set(next.id, next);
   return next;
+}
+
+// ===== Calm Corner =====
+// Map-backed, process-local persistence mirroring the Homework Helper
+// convention (createHomeworkSession et al.). A `postgres` adapter is a
+// future follow-up; these records hold counts only — never free-text or
+// PII — and are tenant- and learner-scoped on every read/write.
+
+const CALM_DAY_MS = 24 * 60 * 60 * 1000;
+
+/** UTC midnight (ms) for an ISO timestamp — the basis for calendar-day keys. */
+function calmUtcMidnight(iso: string): number {
+  const d = new Date(iso);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+}
+
+/** Stable YYYY-MM-DD key for a UTC-midnight millisecond value. */
+function calmDayKey(midnightMs: number): string {
+  return new Date(midnightMs).toISOString().slice(0, 10);
+}
+
+export function recordCalmSession(input: {
+  tenantId: string;
+  learnerId: string;
+  activityId: string;
+  activityKind: string;
+  completed: boolean;
+  secondsSpent: number | null;
+}): CalmSessionRecord {
+  const store = db();
+  const record: CalmSessionRecord = {
+    id: newId("calm"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    activityId: input.activityId,
+    activityKind: input.activityKind,
+    completed: input.completed,
+    secondsSpent: input.secondsSpent,
+    occurredAt: nowIso(),
+  };
+  store.calmSessions.set(record.id, record);
+  return record;
+}
+
+/** Most-recent-first, tenant- and learner-scoped. */
+export function listCalmSessionsForLearner(
+  learnerId: string,
+  tenantId: string,
+  opts?: { limit?: number; sinceIso?: string },
+): CalmSessionRecord[] {
+  const since = opts?.sinceIso;
+  const all = Array.from(db().calmSessions.values())
+    .filter(
+      (s) =>
+        s.learnerId === learnerId &&
+        s.tenantId === tenantId &&
+        (since ? s.occurredAt >= since : true),
+    )
+    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
+  return opts?.limit ? all.slice(0, opts.limit) : all;
+}
+
+/**
+ * Count consecutive UTC calendar days — ending today or yesterday — that
+ * each contain at least one *completed* calm session. Learner-local time
+ * is out of scope; `todayIso` is injectable for deterministic tests.
+ */
+export function getCalmStreak(
+  learnerId: string,
+  tenantId: string,
+  opts?: { todayIso?: string },
+): { currentStreakDays: number; lastSessionAt: string | null } {
+  const completed = listCalmSessionsForLearner(learnerId, tenantId).filter(
+    (s) => s.completed,
+  );
+  const lastSessionAt = completed.length > 0 ? completed[0].occurredAt : null;
+  if (completed.length === 0) {
+    return { currentStreakDays: 0, lastSessionAt };
+  }
+
+  const days = new Set(completed.map((s) => calmDayKey(calmUtcMidnight(s.occurredAt))));
+  const todayMidnight = calmUtcMidnight(opts?.todayIso ?? nowIso());
+
+  let anchor: number;
+  if (days.has(calmDayKey(todayMidnight))) {
+    anchor = todayMidnight;
+  } else if (days.has(calmDayKey(todayMidnight - CALM_DAY_MS))) {
+    anchor = todayMidnight - CALM_DAY_MS;
+  } else {
+    return { currentStreakDays: 0, lastSessionAt };
+  }
+
+  let count = 0;
+  for (let cursor = anchor; days.has(calmDayKey(cursor)); cursor -= CALM_DAY_MS) {
+    count += 1;
+  }
+  return { currentStreakDays: count, lastSessionAt };
+}
+
+/**
+ * Calm, non-clinical parent rollup: counts only. Never returns raw
+ * records or any free-text. `topActivityId` is the most-used activity in
+ * the window (ties broken by first appearance in the catalog order the
+ * records were written in).
+ */
+export function summarizeCalmForParent(
+  learnerId: string,
+  tenantId: string,
+  opts?: { sinceIso?: string },
+): {
+  totalMoments: number;
+  completedMoments: number;
+  topActivityId: string | null;
+  lastSessionAt: string | null;
+} {
+  const sessions = listCalmSessionsForLearner(learnerId, tenantId, {
+    sinceIso: opts?.sinceIso,
+  });
+
+  const counts = new Map<string, number>();
+  for (const s of sessions) {
+    counts.set(s.activityId, (counts.get(s.activityId) ?? 0) + 1);
+  }
+
+  let topActivityId: string | null = null;
+  let topCount = 0;
+  for (const [activityId, count] of counts) {
+    if (count > topCount) {
+      topActivityId = activityId;
+      topCount = count;
+    }
+  }
+
+  return {
+    totalMoments: sessions.length,
+    completedMoments: sessions.filter((s) => s.completed).length,
+    topActivityId,
+    lastSessionAt: sessions.length > 0 ? sessions[0].occurredAt : null,
+  };
 }
 
 // ===== Sprint 18: Teacher assignments =====

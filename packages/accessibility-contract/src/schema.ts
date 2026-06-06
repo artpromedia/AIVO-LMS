@@ -27,6 +27,7 @@ const shape = {
   audioFirst: z.boolean(),
   captionsAlwaysOn: z.boolean(),
   readAloud: z.boolean(),
+  calmAudioCues: z.boolean(),
   hapticsEnabled: z.boolean(),
   shorterSteps: z.boolean(),
   extraHints: z.boolean(),

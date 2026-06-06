@@ -15,6 +15,10 @@ export default defineConfig({
     port: 5000,
     reuseExistingServer: true,
     timeout: 120_000,
+    // Enable the self-regulation hub so the homework → Calm nudge e2e can
+    // exercise the gated surface. Benign for other specs: the flag only adds
+    // the homework nudge and the Calm `?action=` recommendation.
+    env: { AIVO_FEATURE_SELF_REGULATION_HUB: "true" },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

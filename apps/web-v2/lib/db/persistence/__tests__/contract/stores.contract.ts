@@ -201,6 +201,7 @@ export function learnerStoreContract(label: string, make: () => LearnerStore, re
         audioFirst: false,
         captionsAlwaysOn: true,
         readAloud: false,
+        calmAudioCues: false,
         hapticsEnabled: false,
         shorterSteps: false,
         extraHints: true,

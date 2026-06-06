@@ -175,6 +175,7 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
           captionsAlwaysOn: false,
           hapticsEnabled: false,
           readAloud: false,
+          calmAudioCues: false,
           dyslexiaFriendlyFont: false,
           shorterSteps: false,
           extraHints: true,

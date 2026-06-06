@@ -1053,6 +1053,25 @@ export type HomeworkHelpSession = {
   endedAt: ISODate | null;
 };
 
+/**
+ * Calm Corner (Phase 2): a queryable record of a learner-initiated
+ * regulation moment. Counts only — never any free-text or PII — so a
+ * learner can see an encouraging streak and a parent gets a calm,
+ * non-clinical "regulation moments" summary. Map-backed in dev/local,
+ * mirroring the Homework Helper convention; a `postgres` persistence
+ * adapter is a future follow-up.
+ */
+export interface CalmSessionRecord {
+  id: string;
+  tenantId: string;
+  learnerId: string;
+  activityId: string; // CalmActivityId from lib/learner/calm
+  activityKind: string; // CalmActivityKind
+  completed: boolean;
+  secondsSpent: number | null;
+  occurredAt: string; // ISO
+}
+
 export type TeacherAssignment = {
   id: ID;
   teacherId: ID;

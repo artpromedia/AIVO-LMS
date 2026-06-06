@@ -670,6 +670,15 @@
       "modality_kinesthetic": "Hands-on",
       "modality_reading": "Reading",
       "modality_unknown": "Mixed"
+    },
+    "calm_summary": {
+      "title": "Calm moments",
+      "none": "{name} hasn't used the Calm Corner yet.",
+      "moments": "{name} took {count} calm moments this week.",
+      "completed": "{count} finished gently.",
+      "last_active_today": "Last active today",
+      "last_active_yesterday": "Last active yesterday",
+      "last_active_days": "Last active {count} days ago"
     }
   },
   "brain_clone": {
@@ -771,7 +780,11 @@
         "listen_again_title": "Escucha otra vez",
         "listen_again_body": "Reproduce las instrucciones una vez más antes de intentarlo.",
         "ask_grown_up_title": "Pide a un adulto",
-        "ask_grown_up_body": "Toca la campana para pedir ayuda a un adulto."
+        "ask_grown_up_body": "Toca la campana para pedir ayuda a un adulto.",
+        "pattern_focus_title": "Concentración de patrones",
+        "pattern_focus_body": "Observa un patrón tranquilo y luego tócalo igual.",
+        "sorting_calm_title": "Ordenar con calma",
+        "sorting_calm_body": "Ordena los puntos de pequeño a grande."
       },
       "breathing": {
         "round": "Ronda {round} de {rounds}",
@@ -784,6 +797,34 @@
         "next": "Siguiente respiración",
         "finish": "Terminar",
         "done_early": "Ya terminé"
+      },
+      "streak": {
+        "label": "🔥 Racha de calma de {count} días"
+      },
+      "games": {
+        "pattern_title": "Concentración de patrones",
+        "pattern_watch": "Observa el patrón…",
+        "pattern_repeat": "Ahora toca el patrón.",
+        "pattern_sequence": "Recuerda este orden: {sequence}",
+        "pattern_board_aria": "Fichas de patrón",
+        "pattern_tile": "Ficha {number}",
+        "watch_again": "Ver de nuevo",
+        "sorting_title": "Ordenar con calma",
+        "sorting_prompt": "Mueve los puntos del más pequeño al más grande.",
+        "sorting_tray_aria": "Bandeja para ordenar",
+        "sorting_move_left": "Mover el punto {value} a la izquierda",
+        "sorting_move_right": "Mover el punto {value} a la derecha",
+        "nice": "Qué buena concentración.",
+        "try_again": "Inténtalo de nuevo, sin prisa.",
+        "done": "Ya terminé",
+        "go_back": "Volver"
+      },
+      "audio": {
+        "label": "Sonidos tranquilos",
+        "on": "Activado",
+        "off": "Desactivado",
+        "mute": "Silenciar sonidos",
+        "unmute": "Activar sonidos"
       }
     },
     "progress": {
@@ -892,7 +933,13 @@
       "err_send": "No se pudo enviar. Inténtalo de nuevo.",
       "err_network": "Problema de red. Inténtalo de nuevo en un momento.",
       "err_end": "No se pudo terminar la sesión.",
-      "err_network_short": "Problema de red. Inténtalo de nuevo."
+      "err_network_short": "Problema de red. Inténtalo de nuevo.",
+      "calm_nudge": {
+        "title": "¿Quieres una pausa tranquila?",
+        "body": "Está bien hacer una pausa. Un momento de calma puede ayudarte a sentirte listo.",
+        "accept": "Tomar una pausa tranquila",
+        "dismiss": "Ahora no"
+      }
     },
     "subjects": {
       "page_title": "Elige una materia",

@@ -670,6 +670,15 @@
       "modality_kinesthetic": "Hands-on",
       "modality_reading": "Reading",
       "modality_unknown": "Mixed"
+    },
+    "calm_summary": {
+      "title": "Calm moments",
+      "none": "{name} hasn't used the Calm Corner yet.",
+      "moments": "{name} took {count} calm moments this week.",
+      "completed": "{count} finished gently.",
+      "last_active_today": "Last active today",
+      "last_active_yesterday": "Last active yesterday",
+      "last_active_days": "Last active {count} days ago"
     }
   },
   "brain_clone": {
@@ -771,7 +780,11 @@
         "listen_again_title": "再听一遍",
         "listen_again_body": "在动手前再把说明听一遍。",
         "ask_grown_up_title": "问问大人",
-        "ask_grown_up_body": "点一下铃铛，向大人寻求帮助。"
+        "ask_grown_up_body": "点一下铃铛，向大人寻求帮助。",
+        "pattern_focus_title": "图案专注",
+        "pattern_focus_body": "看一段平静的图案，然后点出来。",
+        "sorting_calm_title": "平静排序",
+        "sorting_calm_body": "把圆点从小到大排好。"
       },
       "breathing": {
         "round": "第 {round} 轮，共 {rounds} 轮",
@@ -784,6 +797,34 @@
         "next": "下一次呼吸",
         "finish": "完成",
         "done_early": "我做完了"
+      },
+      "streak": {
+        "label": "🔥 连续平静 {count} 天"
+      },
+      "games": {
+        "pattern_title": "图案专注",
+        "pattern_watch": "看看这个图案…",
+        "pattern_repeat": "现在点出这个图案。",
+        "pattern_sequence": "记住这个顺序：{sequence}",
+        "pattern_board_aria": "图案方块",
+        "pattern_tile": "方块 {number}",
+        "watch_again": "再看一次",
+        "sorting_title": "平静排序",
+        "sorting_prompt": "把圆点从最小移到最大。",
+        "sorting_tray_aria": "排序托盘",
+        "sorting_move_left": "把圆点 {value} 向左移",
+        "sorting_move_right": "把圆点 {value} 向右移",
+        "nice": "专注得真好。",
+        "try_again": "再试一次，不用着急。",
+        "done": "我做好了",
+        "go_back": "返回"
+      },
+      "audio": {
+        "label": "平静的声音",
+        "on": "开",
+        "off": "关",
+        "mute": "静音",
+        "unmute": "取消静音"
       }
     },
     "progress": {
@@ -892,7 +933,13 @@
       "err_send": "发送失败。请重试。",
       "err_network": "网络出问题了。请稍后重试。",
       "err_end": "无法结束会话。",
-      "err_network_short": "网络出问题了。请重试。"
+      "err_network_short": "网络出问题了。请重试。",
+      "calm_nudge": {
+        "title": "想要一个平静的休息吗？",
+        "body": "暂停一下没关系。一个短暂的平静时刻能帮你重新准备好。",
+        "accept": "去平静一下",
+        "dismiss": "现在不用"
+      }
     },
     "subjects": {
       "page_title": "选择一个科目",

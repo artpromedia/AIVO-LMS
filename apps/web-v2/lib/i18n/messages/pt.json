@@ -670,6 +670,15 @@
       "modality_kinesthetic": "Hands-on",
       "modality_reading": "Reading",
       "modality_unknown": "Mixed"
+    },
+    "calm_summary": {
+      "title": "Calm moments",
+      "none": "{name} hasn't used the Calm Corner yet.",
+      "moments": "{name} took {count} calm moments this week.",
+      "completed": "{count} finished gently.",
+      "last_active_today": "Last active today",
+      "last_active_yesterday": "Last active yesterday",
+      "last_active_days": "Last active {count} days ago"
     }
   },
   "brain_clone": {
@@ -771,7 +780,11 @@
         "listen_again_title": "Ouça de novo",
         "listen_again_body": "Toque as instruções mais uma vez antes de tentar.",
         "ask_grown_up_title": "Peça a um adulto",
-        "ask_grown_up_body": "Toque no sino para pedir ajuda a um adulto."
+        "ask_grown_up_body": "Toque no sino para pedir ajuda a um adulto.",
+        "pattern_focus_title": "Foco no padrão",
+        "pattern_focus_body": "Observe um padrão calmo e depois toque igual.",
+        "sorting_calm_title": "Organizar com calma",
+        "sorting_calm_body": "Organize os pontos do menor para o maior."
       },
       "breathing": {
         "round": "Rodada {round} de {rounds}",
@@ -784,6 +797,34 @@
         "next": "Próxima respiração",
         "finish": "Concluir",
         "done_early": "Terminei"
+      },
+      "streak": {
+        "label": "🔥 Sequência de calma de {count} dias"
+      },
+      "games": {
+        "pattern_title": "Foco no padrão",
+        "pattern_watch": "Observe o padrão…",
+        "pattern_repeat": "Agora toque no padrão.",
+        "pattern_sequence": "Lembre desta ordem: {sequence}",
+        "pattern_board_aria": "Peças do padrão",
+        "pattern_tile": "Peça {number}",
+        "watch_again": "Ver de novo",
+        "sorting_title": "Organizar com calma",
+        "sorting_prompt": "Mova os pontos do menor para o maior.",
+        "sorting_tray_aria": "Bandeja de organizar",
+        "sorting_move_left": "Mover o ponto {value} para a esquerda",
+        "sorting_move_right": "Mover o ponto {value} para a direita",
+        "nice": "Que foco ótimo.",
+        "try_again": "Tente de novo, sem pressa.",
+        "done": "Terminei",
+        "go_back": "Voltar"
+      },
+      "audio": {
+        "label": "Sons tranquilos",
+        "on": "Ativado",
+        "off": "Desativado",
+        "mute": "Silenciar sons",
+        "unmute": "Ativar sons"
       }
     },
     "progress": {
@@ -892,7 +933,13 @@
       "err_send": "Não foi possível enviar. Tente novamente.",
       "err_network": "Problema de rede. Tente novamente em um instante.",
       "err_end": "Não foi possível encerrar a sessão.",
-      "err_network_short": "Problema de rede. Tente novamente."
+      "err_network_short": "Problema de rede. Tente novamente.",
+      "calm_nudge": {
+        "title": "Quer uma pausa tranquila?",
+        "body": "Tudo bem fazer uma pausa. Um momento de calma pode ajudar você a se sentir pronto.",
+        "accept": "Fazer uma pausa tranquila",
+        "dismiss": "Agora não"
+      }
     },
     "subjects": {
       "page_title": "Escolha uma matéria",
