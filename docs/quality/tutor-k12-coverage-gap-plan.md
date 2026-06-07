@@ -6,6 +6,16 @@
 > all 16 subjects; they remain scaffolded pending review except Echo's
 > established early-language content. The historical rollout plan below is
 > retained for provenance.
+>
+> Correction (2026-06-07): the `coverageMatrix` fields in
+> `services/tutor-svc/src/modes/*Tutor.ts` had drifted to mark every PRE-K
+> band (and compass's ADULT band) `"authored"`, which let the runtime serve
+> scaffold/placeholder content in production. The matrices were corrected to
+> match the attestation above — PRE-K is now `"scaffold"` for all tutors
+> except Echo, and compass ADULT is `"scaffold"` — so the production gate
+> (`packages/tutor-runtime` `planSession`) again refuses those bands unless the
+> caller opts into preview mode (`AIVO_ALLOW_SCAFFOLD_CONTENT=true`). K–12
+> authored bands are unchanged.
 
 > Snapshot taken: 2026-05-25 (Phases 1–3 AI-draft authoring landed).
 > Source of truth at runtime:

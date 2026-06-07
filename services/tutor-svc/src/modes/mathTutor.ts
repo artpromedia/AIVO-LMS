@@ -29,7 +29,7 @@ export const mathTutor: TutorDefinition = defineTutor({
   skillGraphRefs: ["prek-math-foundations", "ccss-math-k", "ccss-math-1-8", "ccss-math-9-12"],
   defaultContentPackRefs: ["math-k-fall-2026"],
   coverageMatrix: {
-    PRE_K: "authored",
+    PRE_K: "scaffold",
     K: "authored",
     "1": "authored",
     "2": "authored",

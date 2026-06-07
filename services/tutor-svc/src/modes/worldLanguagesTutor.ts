@@ -31,7 +31,7 @@ export const worldLanguagesTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["world-languages-novice-low-fall-2026"],
   coverageMatrix: {
-    PRE_K: "authored",
+    PRE_K: "scaffold",
     K: "authored",
     "1": "authored",
     "2": "authored",

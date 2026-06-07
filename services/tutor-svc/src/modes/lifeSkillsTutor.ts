@@ -34,7 +34,7 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["life-skills-6-plus-fall-2026"],
   coverageMatrix: {
-    PRE_K: "authored",
+    PRE_K: "scaffold",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -48,7 +48,7 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     "10": "authored",
     "11": "authored",
     "12": "authored",
-    ADULT: "authored",
+    ADULT: "scaffold",
   },
   policy: {
     requiresConsent: true,

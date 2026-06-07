@@ -25,7 +25,7 @@ export const selTutor: TutorDefinition = defineTutor({
   skillGraphRefs: ["prek-sel-foundations", "casel-sel-k2", "casel-sel-3-12"],
   defaultContentPackRefs: ["sel-k2-fall-2026"],
   coverageMatrix: {
-    PRE_K: "authored",
+    PRE_K: "scaffold",
     K: "authored",
     "1": "authored",
     "2": "authored",

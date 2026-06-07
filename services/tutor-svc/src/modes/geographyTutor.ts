@@ -26,7 +26,7 @@ export const geographyTutor: TutorDefinition = defineTutor({
   skillGraphRefs: ["prek-geography-foundations", "ncge-geography-k2", "ncge-geography-3-12"],
   defaultContentPackRefs: ["geography-k2-fall-2026"],
   coverageMatrix: {
-    PRE_K: "authored",
+    PRE_K: "scaffold",
     K: "authored",
     "1": "authored",
     "2": "authored",
