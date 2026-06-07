@@ -14,7 +14,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { LearningHero, FloatingMetricCard, GlassCard, InsightChip, EmptyState } from "@aivo/ui";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
-import { Home, Users, ClipboardList, BarChart3, Settings } from "lucide-react";
+import { Home, Users, ClipboardList, BarChart3, Settings, Network } from "lucide-react";
 import {
   getIEPForLearner,
   listLearnersForTeacher,
@@ -25,6 +25,7 @@ import {
 const TEACHER_NAV = [
   { href: "/teacher/home", label: "Home", icon: <Home className="h-4 w-4" /> },
   { href: "/teacher/classes", label: "Classes", icon: <Users className="h-4 w-4" /> },
+  { href: "/teacher/rostering", label: "Rostering", icon: <Network className="h-4 w-4" /> },
   {
     href: "/teacher/assignments",
     label: "Assignments",
@@ -312,8 +313,8 @@ export default async function TeacherHome() {
                 title={t("no_learners_yet")}
                 body="When a parent invites you to a learner's care team, they'll appear here."
                 action={
-                  <Button type="button" variant="outline" size="sm" disabled>
-                    {t("connect_roster")}
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/teacher/rostering">{t("connect_roster")}</Link>
                   </Button>
                 }
               />
@@ -387,8 +388,8 @@ export default async function TeacherHome() {
                 title={t("add_another_class")}
                 body="Roster sync from Google Classroom, Clever, or ClassLink lands here."
                 action={
-                  <Button type="button" variant="outline" size="sm" disabled>
-                    {t("connect_roster")}
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/teacher/rostering">{t("connect_roster")}</Link>
                   </Button>
                 }
               />

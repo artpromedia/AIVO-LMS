@@ -10,7 +10,14 @@
  */
 import type { ID, ISODate } from "@/lib/db/types";
 
-export type SisProvider = "oneroster_rest" | "oneroster_csv" | "clever" | "classlink";
+export type SisProvider =
+  | "oneroster_rest"
+  | "oneroster_csv"
+  | "clever"
+  | "classlink"
+  // Google Classroom rosters are owned by the teacher (not the district
+  // SIS), so they are connectable from the teacher rostering surface.
+  | "google_classroom";
 export type SyncType = "full" | "delta";
 export type RunStatus = "running" | "success" | "failed" | "paused";
 
