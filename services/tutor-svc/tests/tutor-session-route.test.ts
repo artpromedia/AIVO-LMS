@@ -175,18 +175,19 @@ describe("tutor-svc generic plan route", () => {
   });
 
   it("POST /api/tutors/:key/plan 409s on a scaffold band by default", async () => {
-    // chrono declares 3-12 with every band as `scaffold` (AI-draft) —
-    // production env should refuse to plan a session.
+    // compass declares its ADULT band as `scaffold` (no authored content yet)
+    // — production env should refuse to plan a session for it. (PRE-K bands are
+    // now attested `authored`, so a still-scaffold band is used here.)
     const prev = process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
     delete process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
     try {
       const res = await app.inject({
         method: "POST",
-        url: "/api/tutors/chrono/plan",
+        url: "/api/tutors/compass/plan",
         payload: {
           learnerId: "l1",
           consentRecordId: "c1",
-          gradeBand: "PRE_K",
+          gradeBand: "ADULT",
           contentPack: makePack("c3.5.D2.His.3"),
         },
       });
@@ -194,7 +195,7 @@ describe("tutor-svc generic plan route", () => {
       const body = res.json() as Record<string, unknown>;
       assert.equal(body.code, "grade_band_not_production");
       assert.equal(body.authoringInProgress, true);
-      assert.equal(body.gradeBand, "PRE_K");
+      assert.equal(body.gradeBand, "ADULT");
     } finally {
       if (prev !== undefined) process.env.AIVO_ALLOW_SCAFFOLD_CONTENT = prev;
     }
@@ -204,13 +205,14 @@ describe("tutor-svc generic plan route", () => {
     const prev = process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
     process.env.AIVO_ALLOW_SCAFFOLD_CONTENT = "true";
     try {
+      // compass ADULT is a scaffold band — the opt-in flag should let it plan.
       const res = await app.inject({
         method: "POST",
-        url: "/api/tutors/chrono/plan",
+        url: "/api/tutors/compass/plan",
         payload: {
           learnerId: "l1",
           consentRecordId: "c1",
-          gradeBand: "5",
+          gradeBand: "ADULT",
           contentPack: makePack("c3.5.D2.His.3"),
         },
       });

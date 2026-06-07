@@ -57,7 +57,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
 
     const submitted = await submitParentAssessment(learnerId, session!.tenantId);
-    refreshLearnerReadiness(learnerId, session!.tenantId);
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "parent_assessment.submit", requestId, { learnerId });
     return ok({ assessment: submitted }, requestId);
   } catch (e) {

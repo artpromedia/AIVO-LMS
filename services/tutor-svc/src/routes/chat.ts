@@ -6,6 +6,7 @@ import { createLogger, recordSubjectBrainCall } from "@aivo/observability";
 import { resolveTenantIdForLearner } from "../lib/tenant.js";
 import { checkTutorAccess } from "../lib/entitlements.js";
 import { computeTutorXp, computeTutorQuality, type TutorSignals } from "../services/scoring.js";
+import { recordEfSessionOutcome } from "../lib/efOutcome.js";
 import { emitTutorAudit } from "../lib/audit.js";
 import { getActiveCurriculumFocus } from "./curriculum.js";
 import { loadDapeProfile } from "../lib/dape.js";
@@ -485,6 +486,59 @@ export function registerChatRoutes(app: FastifyInstance, db: any) {
           completionQuality,
         })
         .where(eq(tutorSessions.id, sessionId));
+
+      // EF ledger: record this completed session into `ef_session_outcomes`
+      // so the best-window query and the parent "what's working" dashboard
+      // have live data. Previously the ledger was only writable via the
+      // standalone POST /api/ef/session-outcome endpoint, which no live
+      // session ever called — so the dashboard had nothing to read. This is
+      // best-effort: a ledger failure must never fail session completion.
+      try {
+        const attempted =
+          typeof body.attemptedAnswers === "number" ? body.attemptedAnswers : 0;
+        const correct = typeof body.correctAnswers === "number" ? body.correctAnswers : 0;
+        // Accuracy from explicit answer counts when available; otherwise fall
+        // back to the computed completion-quality score (both are 0..1).
+        const accuracy =
+          attempted > 0
+            ? correct / attempted
+            : typeof completionQuality === "number"
+              ? completionQuality
+              : 0;
+        // Frustration proxy: how often the learner needed a break relative to
+        // the beats attempted. Only real breaks count — we do not fabricate a
+        // frustration signal when none was reported.
+        const beatsTotal =
+          typeof body.beatsTotal === "number" && body.beatsTotal > 0
+            ? body.beatsTotal
+            : signals.messageCount;
+        const breaksUsed = typeof body.breaksUsed === "number" ? body.breaksUsed : 0;
+        const frustrationRate = beatsTotal > 0 ? breaksUsed / beatsTotal : 0;
+        // Preferred modality from the brain context, if it exposes one in the
+        // EF modality vocabulary; otherwise the caller may pass an explicit
+        // modality, else null.
+        const brainCtx = (session.brainContext as any) || {};
+        const brainModality =
+          brainCtx.preferred_modality ??
+          (Array.isArray(brainCtx.modality_fit) ? brainCtx.modality_fit[0]?.modality : undefined);
+
+        await recordEfSessionOutcome(db, {
+          tenantId: session.tenantId,
+          learnerId: session.learnerId,
+          startedAt: session.startedAt,
+          localHour: typeof body.localHour === "number" ? body.localHour : null,
+          subject: body.subject ?? session.tutorName ?? null,
+          modality: body.modality ?? brainModality ?? null,
+          accuracy,
+          frustrationRate,
+          attentionMinutes: Math.round(durationSeconds / 60),
+        });
+      } catch (err: any) {
+        request.log?.warn?.(
+          { err: String(err?.message ?? err), sessionId, learnerId: session.learnerId },
+          "ef session-outcome ledger write failed (non-fatal)",
+        );
+      }
 
       return {
         status: "completed",

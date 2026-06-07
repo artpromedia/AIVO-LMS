@@ -112,7 +112,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       tenantId: session!.tenantId,
       ...v.data,
     });
-    refreshLearnerReadiness(learnerId, session!.tenantId);
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
     // The upload path is the moment raw IEP bytes pass through the server;
     // log it as view_raw to keep the FERPA access trail complete (extract
     // and view_summary are logged from their own routes).
@@ -155,7 +155,7 @@ export async function DELETE(req: Request, { params }: Params): Promise<NextResp
     if (!removed) {
       return fail({ ...ERRORS.NOT_FOUND, message: "No IEP on file" }, requestId);
     }
-    refreshLearnerReadiness(learnerId, session!.tenantId);
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
     if (existing) {
       logIepAccess({
         tenantId: session!.tenantId,

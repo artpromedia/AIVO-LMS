@@ -1,4 +1,4 @@
-import { getStore } from "@/lib/db/store";
+import { getPersistence } from "@/lib/db/persistence";
 import type { LearnerProfile, ReadinessState } from "@/lib/db/types";
 
 export const READINESS_LABEL: Record<ReadinessState, string> = {
@@ -67,32 +67,38 @@ export function nextStepFor(learner: Pick<LearnerProfile, "id" | "readinessState
  * Compute readiness from the source-of-truth records. The learner's stored
  * `readinessState` is a cache updated whenever progress is made; this function
  * is the canonical re-derivation.
+ *
+ * Reads go through the persistence adapter (ADR 0007) rather than the legacy
+ * in-memory `getStore()` Maps. In `postgres` mode (required in production —
+ * see `lib/env.ts`) those Maps are empty, so reading them directly here made
+ * this function blind to all persisted progress and collapse every learner
+ * back to `profile_created` — bouncing parents to "Start parent assessment"
+ * even after the parent assessment and baseline were saved. Routing through
+ * `getPersistence()` reads whichever backend is active and is correct in both
+ * `memory` and `postgres` modes.
  */
-export function computeReadinessFor(learnerId: string, tenantId: string): ReadinessState {
-  const store = getStore();
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) return "profile_created";
+export async function computeReadinessFor(
+  learnerId: string,
+  tenantId: string,
+): Promise<ReadinessState> {
+  const p = getPersistence();
+  const learner = await p.learners.getById(learnerId, tenantId);
+  if (!learner) return "profile_created";
 
-  const assessment = Array.from(store.parentAssessments.values()).find(
-    (a) => a.learnerId === learnerId && a.tenantId === tenantId,
-  );
-  const hasIep = Array.from(store.iepDocuments.values()).some(
-    (d) => d.learnerId === learnerId && d.tenantId === tenantId,
-  );
+  const [assessment, iep, baseline, lessonRunCount, brainProfile] = await Promise.all([
+    p.assessments.findParentAssessment(learnerId, tenantId),
+    p.compliance.getIEPForLearner(learnerId, tenantId),
+    p.assessments.getActiveBaselineForLearner(learnerId, tenantId),
+    p.lessonRuns.countForLearner(learnerId, tenantId),
+    p.brainProfiles.getForLearner(learnerId, tenantId),
+  ]);
+
   // Sprint 6: parent's explicit decision on the optional IEP step.
-  const iepDecided = hasIep || learner.iepDecision === "skipped";
-  const baseline = Array.from(store.baselineAssessments.values()).find(
-    (b) => b.learnerId === learnerId && b.tenantId === tenantId && b.status === "complete",
-  );
-  const lessonRunCount = Array.from(store.lessonRuns.values()).filter(
-    (l) => l.learnerId === learnerId && l.tenantId === tenantId,
-  ).length;
-  const brainProfile = Array.from(store.brainProfiles.values()).find(
-    (p) => p.learnerId === learnerId && p.tenantId === tenantId,
-  );
+  const iepDecided = Boolean(iep) || learner.iepDecision === "skipped";
+  const baselineComplete = baseline?.status === "complete" ? baseline : null;
 
   if (lessonRunCount > 0) return "active_learning";
-  if (baseline) {
+  if (baselineComplete) {
     // Baseline finished — gate today's mission on the parent reviewing the
     // freshly cloned brain profile. If no clone is on file (legacy data or
     // an unexpected race), don't block the learner; fall through to

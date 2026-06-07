@@ -18,9 +18,13 @@
 import { FastifyInstance } from "fastify";
 import { eq, desc, gte, and } from "drizzle-orm";
 import { efSessionOutcomes } from "@aivo/db";
-import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { authenticateRequest, verifyParentOwnership, verifyTeacherAccess } from "../auth.js";
 import { computeWhatsWorking, type SessionRow } from "../services/whats-working.js";
-import { getWhatsWorkingByLearnerIdSchema, whatsWorkingByLearnerIdSchema } from "./schemas.js";
+import {
+  getTeacherWhatsWorkingByLearnerIdSchema,
+  getWhatsWorkingByLearnerIdSchema,
+  whatsWorkingByLearnerIdSchema,
+} from "./schemas.js";
 
 interface WhatsWorkingBody {
   rows?: SessionRow[];
@@ -93,6 +97,32 @@ export async function registerWhatsWorkingRoutes(app: FastifyInstance) {
       const { learnerId } = req.params as { learnerId: string };
       const owns = await verifyParentOwnership(db, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
+
+      const q = (req.query ?? {}) as { windowDays?: string };
+      const parsed = q.windowDays ? Number(q.windowDays) : NaN;
+      const windowDays =
+        Number.isFinite(parsed) && parsed > 0 && parsed <= 365 ? Math.floor(parsed) : 30;
+      const rows = await loadDbRows(db, learnerId, windowDays);
+      return computeWhatsWorking(rows, { windowDays });
+    },
+  );
+
+  // Teacher-facing surface — same EF-derived insights the parent sees, so a
+  // teacher and parent walk into an IEP / progress meeting with the same
+  // patterns. Access is gated on an ACCEPTED `learner_teachers` link rather
+  // than parent ownership; the analytics + ledger source are identical.
+  app.get(
+    "/api/family/teacher/whats-working/:learnerId",
+    { schema: getTeacherWhatsWorkingByLearnerIdSchema },
+    async (req: any, reply: any) => {
+      const auth = await authenticateRequest(req, reply);
+      if (!auth) return;
+      if (!rateLimit(auth.sub, Date.now())) {
+        return reply.code(429).send({ error: "Too many requests" });
+      }
+      const { learnerId } = req.params as { learnerId: string };
+      const allowed = await verifyTeacherAccess(db, auth.sub, learnerId);
+      if (!allowed) return reply.code(403).send({ error: "Forbidden" });
 
       const q = (req.query ?? {}) as { windowDays?: string };
       const parsed = q.windowDays ? Number(q.windowDays) : NaN;

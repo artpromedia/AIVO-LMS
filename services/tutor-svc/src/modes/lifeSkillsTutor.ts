@@ -48,7 +48,7 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     "10": "authored",
     "11": "authored",
     "12": "authored",
-    ADULT: "authored",
+    ADULT: "scaffold",
   },
   policy: {
     requiresConsent: true,

@@ -926,6 +926,20 @@ export const getWhatsWorkingByLearnerIdSchema = {
   response: { 200: passthroughObject, 403: errorResponse, 429: errorResponse },
 } as const;
 
+export const getTeacherWhatsWorkingByLearnerIdSchema = {
+  tags: ["Family"],
+  operationId: "getTeacherWhatsWorkingByLearnerId",
+  summary: "GET /api/family/teacher/whats-working/:learnerId",
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject, 403: errorResponse, 429: errorResponse },
+} as const;
+
 export const whatsWorkingByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "whatsWorkingByLearnerId",

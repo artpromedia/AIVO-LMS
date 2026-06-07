@@ -33,8 +33,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    refreshLearnerReadiness(learnerId, session!.tenantId);
-    const learner = getLearner(learnerId, session!.tenantId);
+    // Recompute readiness first so the returned learner carries the freshly
+    // derived `readinessState` cache (the parent dashboard renders its
+    // next-step CTA from it). Both calls are async and MUST be awaited —
+    // returning the un-awaited `getLearner` promise serialized an empty object.
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
+    const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
