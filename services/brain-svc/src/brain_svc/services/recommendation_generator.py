@@ -24,11 +24,16 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Iterable
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
+
+def _utcnow() -> datetime:
+    """Naive UTC now — drop-in for the deprecated ``datetime.utcnow()``."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _json(value: Any) -> Any:
@@ -97,7 +102,7 @@ def _insert(
             "evidence": json.dumps(evidence or {}),
             "signals": json.dumps(source_signals or []),
             "conf": confidence,
-            "now": datetime.utcnow(),
+            "now": _utcnow(),
         },
     )
     return rec_id
@@ -244,7 +249,7 @@ def _rebaseline_recommendations(
         return []
     if brain.get("approval_status") != "approved":
         return []
-    age = datetime.utcnow() - baseline["created_at"]
+    age = _utcnow() - baseline["created_at"]
     if age < timedelta(days=180):
         return []
     payload = {

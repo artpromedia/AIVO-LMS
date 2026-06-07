@@ -1,7 +1,7 @@
 import os
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -17,6 +17,11 @@ RECOMMENDATION_SVC_URL = os.environ.get(
 )
 
 router = APIRouter()
+
+
+def _utcnow() -> datetime:
+    """Naive UTC now — drop-in for the deprecated ``datetime.utcnow()``."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _profile_recommendations_v2_enabled() -> bool:
@@ -349,7 +354,7 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
     if current.get("approval_status") not in ("pending_parent_review", None):
         raise HTTPException(status_code=400, detail=f"Brain already {current.get('approval_status')}")
 
-    now = datetime.utcnow()
+    now = _utcnow()
     new_version = (current["version"] or 1) + 1
 
     mastery = current.get("mastery_levels", {})
@@ -513,7 +518,7 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
     if current.get("approval_status") not in ("pending_parent_review", None):
         raise HTTPException(status_code=400, detail=f"Brain already {current.get('approval_status')}")
 
-    now = datetime.utcnow()
+    now = _utcnow()
     new_version = (current["version"] or 1) + 1
 
     episodic = current.get("episodic_memory", [])
@@ -673,7 +678,7 @@ async def rollback_brain(learner_id: str, request: BrainRollbackRequest, db: Ses
             "aa": json.dumps(snapshot_data.get("active_accommodations", [])),
             "at": json.dumps(snapshot_data.get("active_tutors", [])),
             "v": new_version,
-            "now": datetime.utcnow(),
+            "now": _utcnow(),
             "lid": learner_id,
             "bsid": current["id"] if current else None,
         }
@@ -690,7 +695,7 @@ async def rollback_brain(learner_id: str, request: BrainRollbackRequest, db: Ses
             "lid": learner_id,
             "v": new_version,
             "snap": json.dumps(snapshot_data),
-            "now": datetime.utcnow(),
+            "now": _utcnow(),
         }
     )
 
@@ -838,7 +843,7 @@ async def check_regression(learner_id: str, db: Session = Depends(get_db), auth:
                         "factors": json.dumps(factors),
                         "hyp": hypothesis,
                         "conf": 0.6 if factors else 0.3,
-                        "now": datetime.utcnow(),
+                        "now": _utcnow(),
                     }
                 )
 
@@ -891,7 +896,7 @@ async def update_engagement_profile(learner_id: str, request: dict = None, db: S
 
     episodic.append({
         "type": "engagement_sync",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": _utcnow().isoformat(),
         "totalXp": engagement_data.get("totalXp"),
         "level": engagement_data.get("level"),
         "eventType": engagement_data.get("eventType"),
@@ -905,7 +910,7 @@ async def update_engagement_profile(learner_id: str, request: dict = None, db: S
         text("UPDATE brain_states SET episodic_memory = :em, updated_at = :now WHERE id = :id"),
         {
             "em": json_mod.dumps(episodic),
-            "now": datetime.utcnow(),
+            "now": _utcnow(),
             "id": current["id"],
         }
     )

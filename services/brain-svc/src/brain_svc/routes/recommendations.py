@@ -1,6 +1,6 @@
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -10,6 +10,11 @@ from brain_svc.services.recommendation_generator import generate_for_learner
 from brain_svc.auth import AuthClaims, require_auth
 
 router = APIRouter()
+
+
+def _utcnow() -> datetime:
+    """Naive UTC now — drop-in for the deprecated ``datetime.utcnow()``."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 @router.post("/generate/{learner_id}")
@@ -42,7 +47,7 @@ async def create_recommendation(request: RecommendationCreate, db: Session = Dep
             "title": request.title,
             "desc": request.description,
             "payload": json.dumps(request.payload),
-            "now": datetime.utcnow(),
+            "now": _utcnow(),
         }
     )
     db.commit()
@@ -75,7 +80,7 @@ async def resolve_recommendation(recommendation_id: str, request: Recommendation
         {
             "status": request.status,
             "notes": request.parent_notes,
-            "now": datetime.utcnow(),
+            "now": _utcnow(),
             "id": recommendation_id,
         }
     )

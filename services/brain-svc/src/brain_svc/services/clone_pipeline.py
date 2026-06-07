@@ -1,12 +1,18 @@
 import os
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from brain_svc.models.schemas import BrainCloneRequest
 
 LEARNING_SVC_URL = os.environ.get("LEARNING_SVC_URL", "http://localhost:3005")
+
+
+def _utcnow() -> datetime:
+    """Naive UTC now — drop-in for the deprecated ``datetime.utcnow()``."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
 
 SEED_TEMPLATES = {
     "STANDARD": {
@@ -289,7 +295,7 @@ def _compute_visual_identity(mastery_levels: dict, discovery_results=None) -> di
 
 def _build_initial_episodic(discovery_results, parent_data) -> list:
     events = []
-    now = datetime.utcnow().isoformat()
+    now = _utcnow().isoformat()
     if parent_data:
         events.append({
             "type": "parent_assessment_completed",
@@ -343,7 +349,7 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
     template = SEED_TEMPLATES.get(functioning_level, SEED_TEMPLATES["STANDARD"])
 
     brain_state_id = str(uuid.uuid4())
-    now = datetime.utcnow()
+    now = _utcnow()
 
     learner_row = db.execute(
         text("SELECT curriculum_alignment, curriculum_framework, district_name, district_id, zip_code, country FROM learners WHERE id = :lid"),

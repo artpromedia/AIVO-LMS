@@ -131,7 +131,10 @@ export function PatternFocus({
         {statusText}
       </p>
 
-      <div className="grid grid-cols-2 gap-3" role="group" aria-label={t("pattern_board_aria")}>
+      <fieldset
+        className="m-0 grid min-w-0 grid-cols-2 gap-3 border-0 p-0"
+        aria-label={t("pattern_board_aria")}
+      >
         {Array.from({ length: PATTERN_TILE_COUNT }, (_, tile) => {
           const isLit = highlighted === tile;
           return (
@@ -154,7 +157,7 @@ export function PatternFocus({
             </button>
           );
         })}
-      </div>
+      </fieldset>
 
       <div className="flex flex-wrap justify-center gap-3">
         {phase === "input" && feedback !== "correct" ? (
