@@ -998,5 +998,87 @@
     "modalityFit": "Modality that clicks",
     "frustration": "Where frustration spikes",
     "noneYet": "Not enough data yet"
+  },
+  "learnerCalm": {
+    "eyebrow": "Coin calme",
+    "title": "Prends un moment de calme",
+    "intro": "Choisis quelque chose qui t'aide à te sentir prêt. Aucune pression de temps et rien n'est noté.",
+    "suggested_title": "Suggéré pour toi",
+    "all_title": "Choisis une activité calme",
+    "im_done": "J'ai fini",
+    "go_back": "Retour",
+    "do_another": "En faire une autre",
+    "affirmations": {
+      "calmer": "Bien calme. Tu as réussi.",
+      "refreshed": "Reposé et prêt.",
+      "ready": "Super — continuons quand tu es prêt.",
+      "supported": "Bon choix. Demander de l'aide, c'est courageux."
+    },
+    "activities": {
+      "box_breathing_title": "Respiration carrée",
+      "box_breathing_body": "Respire en carré : inspire, retiens, expire, retiens.",
+      "five_senses_title": "Ancrage des 5 sens",
+      "five_senses_body": "Remarque 5 choses que tu vois, 4 que tu touches, 3 que tu entends, 2 que tu sens, 1 que tu goûtes.",
+      "stretch_title": "Pause étirement",
+      "stretch_body": "Lève-toi et étire-toi bien grand pendant trente secondes.",
+      "smaller_step_title": "Essaie un plus petit pas",
+      "smaller_step_body": "Choisis juste la prochaine petite partie avant le tout.",
+      "switch_drawing_title": "Passe au dessin",
+      "switch_drawing_body": "Va sur le bloc-notes et dessine le problème.",
+      "listen_again_title": "Écoute encore",
+      "listen_again_body": "Réécoute les consignes une fois de plus avant d'essayer.",
+      "ask_grown_up_title": "Demande à un adulte",
+      "ask_grown_up_body": "Touche la cloche pour demander de l'aide à un adulte.",
+      "pattern_focus_title": "Concentration sur le motif",
+      "pattern_focus_body": "Observe un motif tout calme, puis reproduis-le.",
+      "sorting_calm_title": "Tri tout calme",
+      "sorting_calm_body": "Range les ronds du plus petit au plus grand."
+    },
+    "breathing": {
+      "round": "Tour {round} sur {rounds}",
+      "phase": {
+        "inhale": "Inspire…",
+        "hold_in": "Retiens…",
+        "exhale": "Expire…",
+        "hold_out": "Garde…"
+      },
+      "next": "Respiration suivante",
+      "finish": "Terminer",
+      "done_early": "J'ai fini"
+    },
+    "streak": {
+      "label": "🔥 {count} jours de calme d'affilée"
+    },
+    "games": {
+      "pattern_title": "Concentration sur le motif",
+      "pattern_watch": "Observe le motif…",
+      "pattern_repeat": "Maintenant, touche le motif.",
+      "pattern_sequence": "Retiens cet ordre : {sequence}",
+      "pattern_board_aria": "Tuiles du motif",
+      "pattern_tile": "Tuile {number}",
+      "watch_again": "Revoir",
+      "sorting_title": "Tri tout calme",
+      "sorting_prompt": "Déplace les ronds du plus petit au plus grand.",
+      "sorting_tray_aria": "Plateau de tri",
+      "sorting_move_left": "Déplacer le rond {value} vers la gauche",
+      "sorting_move_right": "Déplacer le rond {value} vers la droite",
+      "nice": "Belle concentration.",
+      "try_again": "Réessaie, sans te presser.",
+      "done": "J'ai fini",
+      "go_back": "Retour"
+    },
+    "audio": {
+      "label": "Sons apaisants",
+      "on": "Activé",
+      "off": "Désactivé",
+      "mute": "Couper le son",
+      "unmute": "Activer le son"
+    },
+    "nudge": {
+      "title": "Envie d'une pause tout calme ?",
+      "body": "C'est bien de faire une pause. Un petit moment de calme peut t'aider à te sentir prêt.",
+      "accept": "Faire une pause calme",
+      "dismiss": "Pas maintenant"
+    }
   }
 }

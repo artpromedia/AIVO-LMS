@@ -29,6 +29,7 @@ import { colors, spacing, radius } from "@/constants/colors";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { HomeworkWorkspace } from "@/src/components/learning/HomeworkWorkspace";
 import { ScratchPad } from "@/src/components/learning/ScratchPad";
+import { useCalmNudge } from "@/hooks/useCalmNudge";
 
 type DisplayMessage = HomeworkChatMessage & { _localId: string };
 
@@ -67,6 +68,11 @@ export default function HomeworkSessionScreen() {
   const { data, isLoading, error } = useHomeworkSessionState(sessionId);
   const sendMessage = useSendHomeworkMessage(sessionId);
   const complete = useCompleteHomeworkSession(sessionId);
+
+  // Local-only calm nudge: watches inactivity + rapid resends and offers a
+  // gentle, dismissible link into the Calm Corner when the learner seems
+  // stuck. Mirrors the web homework chat's focus monitor.
+  const calm = useCalmNudge();
 
   const [input, setInput] = useState("");
   const [localMessages, setLocalMessages] = useState<DisplayMessage[]>([]);
@@ -126,6 +132,7 @@ export default function HomeworkSessionScreen() {
     const text = input.trim();
     if (!text || sendMessage.isPending) return;
     setInput("");
+    calm.noteSend();
     const now = new Date().toISOString();
     setLocalMessages((prev) => [
       ...prev,
@@ -313,6 +320,33 @@ export default function HomeworkSessionScreen() {
         <View style={styles.thinkingRow}>
           <ActivityIndicator size="small" color={colors.primary} />
           <Text style={styles.thinkingText}>{t("learnerHomeworkSession.thinking")}</Text>
+        </View>
+      ) : null}
+
+      {calm.nudge ? (
+        <View style={styles.nudgeCard} accessibilityLiveRegion="polite">
+          <Text style={styles.nudgeTitle}>{t("learnerCalm.nudge.title")}</Text>
+          <Text style={styles.nudgeBody}>{t("learnerCalm.nudge.body")}</Text>
+          <View style={styles.nudgeActions}>
+            <Pressable
+              onPress={() => {
+                const action = calm.nudge?.recommendedAction ?? "offer_break";
+                calm.dismiss();
+                router.push(`/(learner)/calm?action=${action}` as never);
+              }}
+              accessibilityRole="button"
+              style={styles.nudgeAccept}
+            >
+              <Text style={styles.nudgeAcceptText}>{t("learnerCalm.nudge.accept")}</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => calm.dismiss()}
+              accessibilityRole="button"
+              style={styles.nudgeDismiss}
+            >
+              <Text style={styles.nudgeDismissText}>{t("learnerCalm.nudge.dismiss")}</Text>
+            </Pressable>
+          </View>
         </View>
       ) : null}
 
@@ -582,6 +616,37 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
   },
+  nudgeCard: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    backgroundColor: colors.primary + "0F",
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    gap: 6,
+  },
+  nudgeTitle: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.text },
+  nudgeBody: { fontSize: 13, fontFamily: "Nunito-Regular", color: colors.textSecondary },
+  nudgeActions: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginTop: 4 },
+  nudgeAccept: {
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  nudgeAcceptText: { fontSize: 14, fontFamily: "Nunito-Bold", color: "#FFF" },
+  nudgeDismiss: {
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  nudgeDismissText: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
   composerRow: {
     flexDirection: "row",
     alignItems: "flex-end",

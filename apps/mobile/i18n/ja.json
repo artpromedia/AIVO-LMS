@@ -998,5 +998,87 @@
     "modalityFit": "Modality that clicks",
     "frustration": "Where frustration spikes",
     "noneYet": "Not enough data yet"
+  },
+  "learnerCalm": {
+    "eyebrow": "おちつきコーナー",
+    "title": "おちつく時間をとろう",
+    "intro": "じゅんびがととのうものを選んでね。時間のプレッシャーはなく、点数もつきません。",
+    "suggested_title": "あなたへのおすすめ",
+    "all_title": "おちつく activity を選ぼう",
+    "im_done": "おわったよ",
+    "go_back": "もどる",
+    "do_another": "もう一つする",
+    "affirmations": {
+      "calmer": "とてもおちついたね。よくできました。",
+      "refreshed": "すっきりして、じゅんびOK。",
+      "ready": "いいね — じゅんびができたら続けよう。",
+      "supported": "いい選択。助けをもとめるのは勇気があるね。"
+    },
+    "activities": {
+      "box_breathing_title": "ボックス呼吸",
+      "box_breathing_body": "四角を描くように呼吸しよう：吸って、止めて、吐いて、止めて。",
+      "five_senses_title": "5つの感覚グラウンディング",
+      "five_senses_body": "見えるもの5つ、さわれるもの4つ、聞こえるもの3つ、においを2つ、味を1つ見つけよう。",
+      "stretch_title": "ストレッチ休けい",
+      "stretch_body": "立ち上がって、30秒間せのびをしよう。",
+      "smaller_step_title": "小さな一歩を試そう",
+      "smaller_step_body": "全部の前に、次の小さな部分だけを選ぼう。",
+      "switch_drawing_title": "お絵かきに切りかえ",
+      "switch_drawing_body": "メモ帳に移って、もんだいを絵にかいてみよう。",
+      "listen_again_title": "もう一度聞こう",
+      "listen_again_body": "やる前に、せつめいをもう一度さいせいしよう。",
+      "ask_grown_up_title": "大人にきこう",
+      "ask_grown_up_body": "ベルをタップして、大人に助けをもとめよう。",
+      "pattern_focus_title": "パターン集中",
+      "pattern_focus_body": "おだやかなパターンを見て、同じようにタップしよう。",
+      "sorting_calm_title": "おだやか並べかえ",
+      "sorting_calm_body": "点を小さい順から大きい順に並べよう。"
+    },
+    "breathing": {
+      "round": "{rounds} 回中 {round} 回目",
+      "phase": {
+        "inhale": "すって…",
+        "hold_in": "止めて…",
+        "exhale": "はいて…",
+        "hold_out": "キープ…"
+      },
+      "next": "次の呼吸",
+      "finish": "おわり",
+      "done_early": "おわったよ"
+    },
+    "streak": {
+      "label": "🔥 {count}日連続の落ち着きタイム"
+    },
+    "games": {
+      "pattern_title": "パターン集中",
+      "pattern_watch": "パターンを見てね…",
+      "pattern_repeat": "今度はパターンをタップしてね。",
+      "pattern_sequence": "この順番を覚えてね：{sequence}",
+      "pattern_board_aria": "パターンのタイル",
+      "pattern_tile": "タイル {number}",
+      "watch_again": "もう一度見る",
+      "sorting_title": "おだやか並べかえ",
+      "sorting_prompt": "点を小さい順から大きい順に動かそう。",
+      "sorting_tray_aria": "並べかえトレイ",
+      "sorting_move_left": "点 {value} を左に動かす",
+      "sorting_move_right": "点 {value} を右に動かす",
+      "nice": "よく集中できたね。",
+      "try_again": "あせらず、もう一度やってみよう。",
+      "done": "おわり",
+      "go_back": "もどる"
+    },
+    "audio": {
+      "label": "おだやかな音",
+      "on": "オン",
+      "off": "オフ",
+      "mute": "音を消す",
+      "unmute": "音を出す"
+    },
+    "nudge": {
+      "title": "ちょっと休けいしよう？",
+      "body": "休んでも大丈夫だよ。少し落ち着く時間が、また始める力になるよ。",
+      "accept": "落ち着く休けいをとる",
+      "dismiss": "今はいい"
+    }
   }
 }

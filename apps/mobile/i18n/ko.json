@@ -998,5 +998,87 @@
     "modalityFit": "Modality that clicks",
     "frustration": "Where frustration spikes",
     "noneYet": "Not enough data yet"
+  },
+  "learnerCalm": {
+    "eyebrow": "마음 진정 코너",
+    "title": "잠시 마음을 가라앉혀요",
+    "intro": "준비되도록 도와줄 활동을 골라요. 시간 압박도 없고 점수도 매기지 않아요.",
+    "suggested_title": "추천 활동",
+    "all_title": "진정 활동을 골라요",
+    "im_done": "다 했어요",
+    "go_back": "돌아가기",
+    "do_another": "하나 더 하기",
+    "affirmations": {
+      "calmer": "아주 차분해요. 잘 해냈어요.",
+      "refreshed": "상쾌하고 준비됐어요.",
+      "ready": "좋아요 — 준비되면 계속해요.",
+      "supported": "잘 골랐어요. 도움을 청하는 건 용감한 일이에요."
+    },
+    "activities": {
+      "box_breathing_title": "박스 호흡",
+      "box_breathing_body": "네모를 그리듯 호흡해요: 들이쉬고, 멈추고, 내쉬고, 멈춰요.",
+      "five_senses_title": "오감 그라운딩",
+      "five_senses_body": "보이는 것 5개, 만질 수 있는 것 4개, 들리는 것 3개, 냄새 2개, 맛 1개를 찾아봐요.",
+      "stretch_title": "스트레칭 쉬는 시간",
+      "stretch_body": "일어나서 삼십 초 동안 높이 쭉 펴요.",
+      "smaller_step_title": "더 작은 단계 해보기",
+      "smaller_step_body": "전체 말고 다음의 아주 작은 부분만 골라요.",
+      "switch_drawing_title": "그림 그리기로 바꾸기",
+      "switch_drawing_body": "메모장으로 옮겨서 문제를 그려봐요.",
+      "listen_again_title": "다시 듣기",
+      "listen_again_body": "해보기 전에 설명을 한 번 더 들어요.",
+      "ask_grown_up_title": "어른에게 물어보기",
+      "ask_grown_up_body": "종을 눌러서 어른에게 도움을 청해요.",
+      "pattern_focus_title": "패턴 집중",
+      "pattern_focus_body": "차분한 패턴을 보고 똑같이 눌러 봐요.",
+      "sorting_calm_title": "차분한 정렬",
+      "sorting_calm_body": "점을 작은 것부터 큰 것까지 놓아 봐요."
+    },
+    "breathing": {
+      "round": "{rounds}회 중 {round}회",
+      "phase": {
+        "inhale": "들이쉬어요…",
+        "hold_in": "멈춰요…",
+        "exhale": "내쉬어요…",
+        "hold_out": "유지해요…"
+      },
+      "next": "다음 호흡",
+      "finish": "끝내기",
+      "done_early": "다 했어요"
+    },
+    "streak": {
+      "label": "🔥 {count}일 연속 차분함"
+    },
+    "games": {
+      "pattern_title": "패턴 집중",
+      "pattern_watch": "패턴을 보세요…",
+      "pattern_repeat": "이제 패턴을 눌러 보세요.",
+      "pattern_sequence": "이 순서를 기억하세요: {sequence}",
+      "pattern_board_aria": "패턴 타일",
+      "pattern_tile": "타일 {number}",
+      "watch_again": "다시 보기",
+      "sorting_title": "차분한 정렬",
+      "sorting_prompt": "점을 가장 작은 것부터 가장 큰 것까지 옮겨요.",
+      "sorting_tray_aria": "정렬 트레이",
+      "sorting_move_left": "점 {value} 왼쪽으로 옮기기",
+      "sorting_move_right": "점 {value} 오른쪽으로 옮기기",
+      "nice": "집중 잘했어요.",
+      "try_again": "천천히 다시 해 봐요.",
+      "done": "다 했어요",
+      "go_back": "돌아가기"
+    },
+    "audio": {
+      "label": "차분한 소리",
+      "on": "켜짐",
+      "off": "꺼짐",
+      "mute": "소리 끄기",
+      "unmute": "소리 켜기"
+    },
+    "nudge": {
+      "title": "잠깐 쉬어 볼까요?",
+      "body": "잠깐 멈춰도 괜찮아요. 짧은 차분한 시간이 다시 준비되도록 도와줘요.",
+      "accept": "차분한 휴식 갖기",
+      "dismiss": "지금은 괜찮아요"
+    }
   }
 }

@@ -97,6 +97,16 @@ describe("mobile (learner) route group", () => {
     }
   });
 
+  it("exposes the Calm Corner self-regulation screen", () => {
+    // calm.tsx is the learner's self-regulation surface, deep-linked from the
+    // homework focus nudge (?action=…). Dropping it would dead-end the nudge.
+    expect(isFile("calm.tsx"), "missing learner screen: calm.tsx").toBe(true);
+    const layout = readFileSync(join(LEARNER_ROOT, "_layout.tsx"), "utf8");
+    // Registered as a hidden tab (href: null) so it never shows a tab bar item.
+    expect(layout).toContain('name="calm"');
+    expect(layout).toContain("href: null");
+  });
+
   it("lists every domain tutor on the learner home screen", () => {
     const learnerHome = readFileSync(join(LEARNER_ROOT, "index.tsx"), "utf8");
     expect(learnerHome).toContain("const domainTutors = Object.entries(TUTORS)");

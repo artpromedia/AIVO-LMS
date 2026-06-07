@@ -998,5 +998,87 @@
     "modalityFit": "Modality that clicks",
     "frustration": "Where frustration spikes",
     "noneYet": "Not enough data yet"
+  },
+  "learnerCalm": {
+    "eyebrow": "Ruhe-Ecke",
+    "title": "Nimm dir einen ruhigen Moment",
+    "intro": "Wähle etwas, das dir hilft, dich bereit zu fühlen. Es gibt keinen Zeitdruck und nichts wird benotet.",
+    "suggested_title": "Für dich vorgeschlagen",
+    "all_title": "Wähle eine ruhige Aktivität",
+    "im_done": "Ich bin fertig",
+    "go_back": "Zurück",
+    "do_another": "Noch eine machen",
+    "affirmations": {
+      "calmer": "Schön ruhig. Das hast du geschafft.",
+      "refreshed": "Erfrischt und bereit.",
+      "ready": "Klasse — machen wir weiter, wenn du bereit bist.",
+      "supported": "Gute Entscheidung. Um Hilfe zu bitten ist mutig."
+    },
+    "activities": {
+      "box_breathing_title": "Quadrat-Atmung",
+      "box_breathing_body": "Atme im Quadrat: ein, halten, aus, halten.",
+      "five_senses_title": "5-Sinne-Erdung",
+      "five_senses_body": "Bemerke 5 Dinge, die du siehst, 4 zum Anfassen, 3 zum Hören, 2 zum Riechen, 1 zum Schmecken.",
+      "stretch_title": "Streck-Pause",
+      "stretch_body": "Steh auf und streck dich dreißig Sekunden lang ganz hoch.",
+      "smaller_step_title": "Probier einen kleineren Schritt",
+      "smaller_step_body": "Wähle nur den nächsten kleinen Teil vor dem Ganzen.",
+      "switch_drawing_title": "Wechsle zum Zeichnen",
+      "switch_drawing_body": "Geh zum Notizblock und zeichne die Aufgabe.",
+      "listen_again_title": "Hör noch einmal zu",
+      "listen_again_body": "Spiel die Anleitung noch einmal ab, bevor du es versuchst.",
+      "ask_grown_up_title": "Frag einen Erwachsenen",
+      "ask_grown_up_body": "Tippe auf die Glocke, um einen Erwachsenen um Hilfe zu bitten.",
+      "pattern_focus_title": "Muster-Fokus",
+      "pattern_focus_body": "Schau dir ein ruhiges Muster an und tippe es nach.",
+      "sorting_calm_title": "Ruhiges Sortieren",
+      "sorting_calm_body": "Ordne die Punkte von klein nach groß."
+    },
+    "breathing": {
+      "round": "Runde {round} von {rounds}",
+      "phase": {
+        "inhale": "Einatmen…",
+        "hold_in": "Halten…",
+        "exhale": "Ausatmen…",
+        "hold_out": "Warten…"
+      },
+      "next": "Nächster Atemzug",
+      "finish": "Fertig",
+      "done_early": "Ich bin fertig"
+    },
+    "streak": {
+      "label": "🔥 Ruhe-Serie: {count} Tage"
+    },
+    "games": {
+      "pattern_title": "Muster-Fokus",
+      "pattern_watch": "Schau dir das Muster an…",
+      "pattern_repeat": "Tippe jetzt das Muster.",
+      "pattern_sequence": "Merke dir diese Reihenfolge: {sequence}",
+      "pattern_board_aria": "Muster-Felder",
+      "pattern_tile": "Feld {number}",
+      "watch_again": "Nochmal ansehen",
+      "sorting_title": "Ruhiges Sortieren",
+      "sorting_prompt": "Schiebe die Punkte vom kleinsten zum größten.",
+      "sorting_tray_aria": "Sortier-Ablage",
+      "sorting_move_left": "Punkt {value} nach links schieben",
+      "sorting_move_right": "Punkt {value} nach rechts schieben",
+      "nice": "Schön konzentriert.",
+      "try_again": "Versuch es nochmal, ganz in Ruhe.",
+      "done": "Ich bin fertig",
+      "go_back": "Zurück"
+    },
+    "audio": {
+      "label": "Ruhige Töne",
+      "on": "Ein",
+      "off": "Aus",
+      "mute": "Töne stummschalten",
+      "unmute": "Töne einschalten"
+    },
+    "nudge": {
+      "title": "Magst du eine ruhige Pause?",
+      "body": "Eine Pause ist völlig okay. Ein kurzer ruhiger Moment kann dir helfen, dich bereit zu fühlen.",
+      "accept": "Ruhige Pause machen",
+      "dismiss": "Jetzt nicht"
+    }
   }
 }
