@@ -3,10 +3,12 @@ import cors from "@fastify/cors";
 import { registerEnterpriseAuthHook } from "@aivo/enterprise-core";
 import { registerObservabilityPlugin } from "@aivo/observability";
 import { createDb } from "@aivo/db";
-import { registerRecommendationRoutes } from "./routes/recommendations.js";
+import { registerRecommendationRoutes, defaultStore } from "./routes/recommendations.js";
 import { registerCandidateRoutes } from "./routes/candidates.js";
 import { DrizzleRecommendationStore } from "./services/drizzle-recommendation-store.js";
 import { ProfileStore, type RecommendationStore } from "./services/recommendation-store.js";
+import { createObservationConsumer } from "./services/observation-consumer.js";
+import { getRealtimeBus } from "./realtime/bus.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
@@ -49,5 +51,28 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     registerRecommendationRoutes(app);
     registerCandidateRoutes(app);
   }
+
+  // Caregiver feedback loop (Sprint 5, G1/G2): consume
+  // `caregiver.observation.created` from the realtime bus, derive
+  // parent-approval recommendations, and persist them into the same store
+  // the routes serve. Never applies effects — parent approval is required.
+  const effectiveStore: RecommendationStore = store ?? defaultStore;
+  const consumer = createObservationConsumer({
+    onRecommendations: async (_learnerId, recommendations) => {
+      for (const rec of recommendations) {
+        try {
+          await effectiveStore.create(rec);
+        } catch (err) {
+          app.log.warn({ err }, "failed to persist observation-derived recommendation");
+        }
+      }
+    },
+  });
+  const bus = await getRealtimeBus();
+  const unsubscribe = await consumer.start(bus);
+  app.addHook("onClose", async () => {
+    await unsubscribe();
+  });
+
   return app;
 }

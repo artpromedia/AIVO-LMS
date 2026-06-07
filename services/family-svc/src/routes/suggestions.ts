@@ -5,6 +5,7 @@ import type { ContributorRole, RecommendationSuggestedPayload } from "@aivo/even
 import { EVENTS } from "@aivo/events";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
 import { emitFamilyAudit } from "../lib/audit.js";
+import { getRealtimeBus } from "../realtime/bus.js";
 
 /**
  * Teacher / caregiver "suggested adjustment" route (Sprint 5, G1/G2).
@@ -144,7 +145,12 @@ export async function registerSuggestionRoutes(app: FastifyInstance) {
       title: rec.title,
       rationale: body.rationale,
     };
-    request.log.info({ event: EVENTS.RECOMMENDATION_SUGGESTED, payload: event }, "recommendation suggested");
+    try {
+      const bus = await getRealtimeBus();
+      await bus.publish(EVENTS.RECOMMENDATION_SUGGESTED, event);
+    } catch (err) {
+      request.log.warn({ err }, "failed to publish recommendation.suggested");
+    }
 
     return reply.status(201).send({
       id: rec.id,

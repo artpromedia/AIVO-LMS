@@ -6,6 +6,7 @@ import { EVENTS } from "@aivo/events";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
 import { getObservationsSchema, observationsSchema } from "./schemas.js";
 import { emitFamilyAudit } from "../lib/audit.js";
+import { getRealtimeBus } from "../realtime/bus.js";
 
 function contributorRoleFromClaims(role: string | undefined): ContributorRole {
   switch ((role ?? "").toUpperCase()) {
@@ -134,10 +135,13 @@ export async function registerObservationRoutes(app: FastifyInstance) {
       mood: body.mood ?? null,
       observedAt: (obs.date instanceof Date ? obs.date : new Date()).toISOString(),
     };
-    request.log.info(
-      { event: EVENTS.CAREGIVER_OBSERVATION_CREATED, payload: event },
-      "caregiver observation created",
-    );
+    try {
+      const bus = await getRealtimeBus();
+      await bus.publish(EVENTS.CAREGIVER_OBSERVATION_CREATED, event);
+    } catch (err) {
+      // Best-effort: a bus outage must not fail the observation write.
+      request.log.warn({ err }, "failed to publish caregiver.observation.created");
+    }
 
     return obs;
   });
