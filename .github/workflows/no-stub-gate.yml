@@ -1,0 +1,11 @@
+name: no-stub-gate
+on: [pull_request]
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ripgrep
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+      - name: Run anti-stub gate
+        run: bash .agents/scripts/no-stub-gate.sh
