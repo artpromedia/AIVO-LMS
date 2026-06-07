@@ -36,6 +36,7 @@ vi.mock("@/lib/db/repos", () => ({
 import { GET, POST } from "@/app/api/bff/teacher/rostering/route";
 import { POST as SYNC } from "@/app/api/bff/teacher/rostering/[connectorId]/sync/route";
 import { _resetSisStore } from "@/lib/db/sis-store";
+import { setTeacherRosteringGrant, _resetRosteringGrants } from "@/lib/db/rostering-grants";
 
 function req(method: string, body?: unknown): Request {
   return new Request("http://localhost/api/bff/teacher/rostering", {
@@ -48,6 +49,7 @@ function req(method: string, body?: unknown): Request {
 describe("teacher rostering BFF", () => {
   beforeEach(() => {
     _resetSisStore();
+    _resetRosteringGrants();
     currentSession = null;
   });
 
@@ -80,8 +82,25 @@ describe("teacher rostering BFF", () => {
     expect(json.data.connectors).toHaveLength(0);
   });
 
-  it("lets a teacher connect a Google Classroom roster in their own tenant", async () => {
+  it("reports canConnect=false until the district grants the right", async () => {
     currentSession = asSession({ tenantId: "t_my_school" });
+    const before = (await (await GET(req("GET"))).json()) as { data: { canConnect: boolean } };
+    expect(before.data.canConnect).toBe(false);
+
+    setTeacherRosteringGrant("t_my_school", true);
+    const after = (await (await GET(req("GET"))).json()) as { data: { canConnect: boolean } };
+    expect(after.data.canConnect).toBe(true);
+  });
+
+  it("blocks a teacher from connecting until the district grants the right", async () => {
+    currentSession = asSession({ tenantId: "t_my_school" });
+    const res = await POST(req("POST", { provider: "google_classroom", displayName: "Room 12" }));
+    expect(res.status).toBe(403);
+  });
+
+  it("lets a granted teacher connect a Google Classroom roster in their own tenant", async () => {
+    currentSession = asSession({ tenantId: "t_my_school" });
+    setTeacherRosteringGrant("t_my_school", true);
     const res = await POST(req("POST", { provider: "google_classroom", displayName: "Room 12" }));
     expect(res.status).toBe(200);
     const json = (await res.json()) as {
@@ -89,6 +108,12 @@ describe("teacher rostering BFF", () => {
     };
     expect(json.data.connector.tenantId).toBe("t_my_school");
     expect(json.data.connector.provider).toBe("google_classroom");
+  });
+
+  it("never gates admin roles on the district grant", async () => {
+    currentSession = asSession({ role: "district_admin", tenantId: "t_my_school" });
+    const res = await POST(req("POST", { provider: "clever", displayName: "District Clever" }));
+    expect(res.status).toBe(200);
   });
 
   it("blocks syncing a connector owned by another tenant", async () => {

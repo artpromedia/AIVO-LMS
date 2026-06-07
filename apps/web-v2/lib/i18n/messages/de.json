@@ -2802,7 +2802,9 @@
       "connect": "Connect",
       "connecting": "Connecting…",
       "name_required": "Please give this connection a name.",
-      "connect_failed": "We couldn't connect that roster source. Please try again."
+      "connect_failed": "We couldn't connect that roster source. Please try again.",
+      "locked_title": "Roster connections aren't enabled",
+      "locked_body": "Your district hasn't enabled teacher-managed roster connections. Ask your school or district admin to turn it on."
     }
   },
   "therapist": {

@@ -4,8 +4,10 @@ import { AdminApiError } from "@aivo/admin-api";
 import {
   completeDistrictSetup,
   createDistrictSchool,
+  getDistrictRosteringGrant,
   getDistrictSetupOverview,
   inviteDistrictAdmin,
+  setDistrictRosteringGrant,
   updateDistrictBranding,
 } from "@aivo/admin-api/identity";
 import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
@@ -43,7 +45,9 @@ async function inviteAdmin(formData: FormData) {
   "use server";
   const session = await requirePageRole(["district_admin"]);
   const name = String(formData.get("name") || "").trim();
-  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const email = String(formData.get("email") || "")
+    .trim()
+    .toLowerCase();
   if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     redirect("/district?error=Enter%20an%20admin%20name%20and%20valid%20email.");
   }
@@ -58,7 +62,9 @@ async function inviteAdmin(formData: FormData) {
 async function saveSupportContact(formData: FormData) {
   "use server";
   const session = await requirePageRole(["district_admin"]);
-  const supportEmail = String(formData.get("supportEmail") || "").trim().toLowerCase();
+  const supportEmail = String(formData.get("supportEmail") || "")
+    .trim()
+    .toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(supportEmail)) {
     redirect("/district?error=Enter%20a%20valid%20support%20email.");
   }
@@ -70,10 +76,29 @@ async function saveSupportContact(formData: FormData) {
   redirect("/district?notice=Support%20contact%20saved.");
 }
 
+async function setRosteringGrant(formData: FormData) {
+  "use server";
+  const session = await requirePageRole(["district_admin"]);
+  const enabled = String(formData.get("enabled") || "") === "true";
+  try {
+    await setDistrictRosteringGrant(session, enabled);
+  } catch (error) {
+    redirect(`/district?error=${encodeURIComponent(messageFor(error))}`);
+  }
+  redirect(
+    enabled
+      ? "/district?notice=Teachers%20can%20now%20connect%20rosters."
+      : "/district?notice=Teacher%20roster%20connections%20disabled.",
+  );
+}
+
 const checklistCopy = {
   schools: ["Add at least one school", "Schools establish the district roster boundary."],
   staff: ["Invite school admins or staff", "Delegate setup and day-to-day operations."],
-  branding: ["Set branding and support contact", "Give families a recognizable, supported experience."],
+  branding: [
+    "Set branding and support contact",
+    "Give families a recognizable, supported experience.",
+  ],
   sso: ["Confirm SSO and SCIM approach", "Enable identity automation when your district is ready."],
 } as const;
 
@@ -85,6 +110,7 @@ export default async function DistrictPage({
   const session = await requirePageRole(["district_admin"]);
   const params = await searchParams;
   const setup = await getDistrictSetupOverview(session);
+  const rostering = await getDistrictRosteringGrant(session);
 
   return (
     <AdminPageFrame
@@ -108,7 +134,8 @@ export default async function DistrictPage({
               <p className="admin-step">First-run setup</p>
               <h2 className="mt-3 text-2xl font-black">Prepare your district</h2>
               <p className="mt-2 text-slate-600">
-                Complete the operational checklist. At least one school is required before setup can be closed.
+                Complete the operational checklist. At least one school is required before setup can
+                be closed.
               </p>
             </div>
             <p className="rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800">
@@ -119,7 +146,10 @@ export default async function DistrictPage({
             {Object.entries(checklistCopy).map(([key, copy]) => {
               const complete = setup.checklist[key as keyof typeof setup.checklist];
               return (
-                <article className={`admin-checklist ${complete ? "admin-checklist-complete" : ""}`} key={key}>
+                <article
+                  className={`admin-checklist ${complete ? "admin-checklist-complete" : ""}`}
+                  key={key}
+                >
                   <span className="admin-checkmark">{complete ? "Done" : "Next"}</span>
                   <h3 className="mt-3 font-black">{copy[0]}</h3>
                   <p className="mt-1 text-sm text-slate-600">{copy[1]}</p>
@@ -178,6 +208,38 @@ export default async function DistrictPage({
           </p>
         </AdminCard>
       )}
+
+      <AdminCard className="mt-6 p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="max-w-2xl">
+            <p className="admin-step">Teacher permissions</p>
+            <h2 className="mt-3 text-2xl font-black">Teacher-managed rostering</h2>
+            <p className="mt-2 text-slate-600">
+              When enabled, teachers can connect and sync their own roster sources (Google
+              Classroom, Clever, ClassLink, OneRoster) from the learner app. When disabled, only
+              district and school admins manage rostering.
+            </p>
+            <p className="mt-2 text-sm font-bold">
+              Status:{" "}
+              {rostering.teacherRosteringEnabled ? (
+                <span className="text-emerald-700">Teachers can connect rosters</span>
+              ) : (
+                <span className="text-slate-600">Teachers cannot connect rosters</span>
+              )}
+            </p>
+          </div>
+          <form action={setRosteringGrant}>
+            <input
+              type="hidden"
+              name="enabled"
+              value={rostering.teacherRosteringEnabled ? "false" : "true"}
+            />
+            <button className="admin-button" type="submit">
+              {rostering.teacherRosteringEnabled ? "Disable for teachers" : "Enable for teachers"}
+            </button>
+          </form>
+        </div>
+      </AdminCard>
     </AdminPageFrame>
   );
 }

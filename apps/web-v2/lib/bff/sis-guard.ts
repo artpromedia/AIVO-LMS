@@ -13,6 +13,7 @@
 import { fail, getRequestId } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { isTeacherRosteringGranted } from "@/lib/db/rostering-grants";
 import type { SessionProfile } from "@/lib/auth/types";
 
 type Ok = { session: SessionProfile; requestId: string };
@@ -116,6 +117,38 @@ export function authorizeRosterTenant(
   if (session.tenantId === tenantId) return null;
   return fail(
     { ...ERRORS.FORBIDDEN_TENANT, message: "Not permitted to manage this tenant's roster" },
+    requestId,
+  );
+}
+
+/**
+ * Whether this actor may CONNECT / sync / disconnect roster sources for
+ * the tenant. Admin roles always may (they are the district). Teachers
+ * may only when the district has granted the right (default-deny).
+ */
+export function canConnectRoster(session: SessionProfile, tenantId: string): boolean {
+  if (session.role !== "teacher") return true;
+  return isTeacherRosteringGranted(tenantId);
+}
+
+/**
+ * Gate roster mutations on the district grant. Returns a 403 failure
+ * when a teacher's district has not enabled teacher-managed rostering,
+ * otherwise `null`.
+ */
+export function requireRosterConnectGrant(
+  session: SessionProfile,
+  tenantId: string,
+  requestId: string,
+): ReturnType<typeof fail> | null {
+  if (canConnectRoster(session, tenantId)) return null;
+  return fail(
+    {
+      ...ERRORS.FORBIDDEN_ROLE,
+      message: "Teacher roster connections are not enabled for this district",
+      userMessage:
+        "Your district hasn't enabled teacher-managed roster connections. Ask your school or district admin to turn it on.",
+    },
     requestId,
   );
 }

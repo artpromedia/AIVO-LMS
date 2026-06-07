@@ -1,6 +1,10 @@
 import { fail, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { requireRosteringActor, authorizeRosterTenant } from "@/lib/bff/sis-guard";
+import {
+  requireRosteringActor,
+  authorizeRosterTenant,
+  requireRosterConnectGrant,
+} from "@/lib/bff/sis-guard";
 import { recordAudit } from "@/lib/db/repos";
 import { getConnector, listRuns, deleteConnector } from "@/lib/db/sis-store";
 
@@ -31,6 +35,8 @@ export async function DELETE(req: Request, ctx: Ctx) {
   if (!connector) return fail({ ...ERRORS.NOT_FOUND, message: "Connector not found" }, requestId);
   const denied = authorizeRosterTenant(session, connector.tenantId, requestId);
   if (denied) return denied;
+  const ungranted = requireRosterConnectGrant(session, connector.tenantId, requestId);
+  if (ungranted) return ungranted;
 
   deleteConnector(connectorId);
   await recordAudit({

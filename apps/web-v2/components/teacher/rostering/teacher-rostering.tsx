@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { RefreshCw, Trash2, Plus, CheckCircle2, AlertTriangle, Link2 } from "lucide-react";
+import { RefreshCw, Trash2, Plus, CheckCircle2, AlertTriangle, Link2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +59,7 @@ function providerName(id: string): string {
 export function TeacherRostering() {
   const t = useTranslations("teacher.rostering");
   const [connectors, setConnectors] = React.useState<Connector[]>([]);
+  const [canConnect, setCanConnect] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [loadError, setLoadError] = React.useState(false);
   const [busyId, setBusyId] = React.useState<string | null>(null);
@@ -74,6 +75,7 @@ export function TeacherRostering() {
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error("load failed");
       setConnectors(json.data.connectors as Connector[]);
+      setCanConnect(Boolean(json.data.canConnect));
     } catch {
       setLoadError(true);
     } finally {
@@ -116,11 +118,23 @@ export function TeacherRostering() {
           <h1 className="font-iw-display text-2xl font-semibold text-iw-ink">{t("title")}</h1>
           <p className="mt-1 max-w-xl text-sm text-iw-ink-muted">{t("subtitle")}</p>
         </div>
-        <Button type="button" onClick={() => setDialogOpen(true)}>
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          {t("add_source")}
-        </Button>
+        {canConnect ? (
+          <Button type="button" onClick={() => setDialogOpen(true)}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {t("add_source")}
+          </Button>
+        ) : null}
       </header>
+
+      {!loading && !loadError && !canConnect ? (
+        <div className="flex items-start gap-2 rounded-iw-card-lg border border-iw-border bg-iw-raised p-4">
+          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-iw-ink-muted" aria-hidden="true" />
+          <div>
+            <p className="text-sm font-semibold text-iw-ink">{t("locked_title")}</p>
+            <p className="mt-0.5 text-sm text-iw-ink-muted">{t("locked_body")}</p>
+          </div>
+        </div>
+      ) : null}
 
       <section aria-live="polite" aria-busy={loading} className="flex flex-col gap-3">
         {loading ? (
@@ -144,12 +158,14 @@ export function TeacherRostering() {
           <EmptyState
             icon={<Link2 className="h-6 w-6" aria-hidden="true" />}
             title={t("empty_title")}
-            description={t("empty_body")}
+            description={canConnect ? t("empty_body") : t("locked_body")}
             action={
-              <Button type="button" onClick={() => setDialogOpen(true)}>
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                {t("add_source")}
-              </Button>
+              canConnect ? (
+                <Button type="button" onClick={() => setDialogOpen(true)}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  {t("add_source")}
+                </Button>
+              ) : undefined
             }
           />
         ) : (
@@ -158,6 +174,7 @@ export function TeacherRostering() {
               key={c.id}
               connector={c}
               busy={busyId === c.id}
+              canManage={canConnect}
               onSync={() => handleSync(c.id)}
               onDisconnect={() => handleDisconnect(c.id)}
             />
@@ -183,11 +200,13 @@ export function TeacherRostering() {
 function ConnectorCard({
   connector,
   busy,
+  canManage,
   onSync,
   onDisconnect,
 }: {
   connector: Connector;
   busy: boolean;
+  canManage: boolean;
   onSync: () => void;
   onDisconnect: () => void;
 }) {
@@ -230,22 +249,24 @@ function ConnectorCard({
             </p>
           ) : null}
         </div>
-        <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={onSync} disabled={busy}>
-            <RefreshCw className={`h-4 w-4 ${busy ? "animate-spin" : ""}`} aria-hidden="true" />
-            {busy ? t("syncing") : t("sync_now")}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onDisconnect}
-            disabled={busy}
-            aria-label={t("disconnect")}
-          >
-            <Trash2 className="h-4 w-4" aria-hidden="true" />
-          </Button>
-        </div>
+        {canManage ? (
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={onSync} disabled={busy}>
+              <RefreshCw className={`h-4 w-4 ${busy ? "animate-spin" : ""}`} aria-hidden="true" />
+              {busy ? t("syncing") : t("sync_now")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onDisconnect}
+              disabled={busy}
+              aria-label={t("disconnect")}
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
