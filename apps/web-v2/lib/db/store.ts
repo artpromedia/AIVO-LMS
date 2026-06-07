@@ -124,6 +124,7 @@ import type {
   TherapistSessionNote,
   CaregiverObservation,
   IepAiDraftRecord,
+  TermSyllabus,
 } from "@/lib/db/types";
 
 export type Store = {
@@ -169,6 +170,7 @@ export type Store = {
   calmSessions: Map<string, CalmSessionRecord>;
   teacherAssignments: Map<string, TeacherAssignment>;
   curriculumUploads: Map<string, CurriculumUpload>;
+  termSyllabi: Map<string, TermSyllabus>;
 
   auditLogs: AuditLog[];
   aiGenerationJobs: Map<string, AiGenerationJob>;
@@ -330,6 +332,7 @@ function createStore(): Store {
     calmSessions: new Map(),
     teacherAssignments: new Map(),
     curriculumUploads: new Map(),
+    termSyllabi: new Map(),
     auditLogs: [],
     aiGenerationJobs: new Map(),
     billingAccounts: new Map(),

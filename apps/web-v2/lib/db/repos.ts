@@ -28,6 +28,8 @@ import type {
   ItemPsychometrics,
   AccessibilityPreferences,
   ID,
+  TermSyllabus,
+  TermSyllabusUnit,
 } from "@/lib/db/types";
 import { ACCESSIBILITY_DEFAULTS } from "@/lib/db/types";
 import type {
@@ -2863,6 +2865,92 @@ export async function deleteCurriculumUpload(uploadId: string, tenantId: string)
   const existing = store.curriculumUploads.get(uploadId);
   if (!existing || existing.tenantId !== tenantId) return false;
   return store.curriculumUploads.delete(uploadId);
+}
+
+// ── Whole-term syllabus repos (Sprint 6, G7) ────────────────────────────
+
+/** List a learner's saved term syllabi (newest first), tenant-scoped. */
+export async function listTermSyllabiForLearner(
+  learnerId: string,
+  tenantId: string,
+  opts: { subject?: string } = {},
+): Promise<TermSyllabus[]> {
+  const store = db();
+  return Array.from(store.termSyllabi.values())
+    .filter(
+      (s) =>
+        s.learnerId === learnerId &&
+        s.tenantId === tenantId &&
+        (!opts.subject || s.subject === opts.subject),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/** Get one term syllabus by id, tenant-scoped. */
+export async function getTermSyllabus(
+  syllabusId: string,
+  tenantId: string,
+): Promise<TermSyllabus | null> {
+  const store = db();
+  const row = store.termSyllabi.get(syllabusId);
+  return row && row.tenantId === tenantId ? row : null;
+}
+
+/** Persist a parsed term syllabus + its ordered units. */
+export async function createTermSyllabus(input: {
+  tenantId: ID;
+  learnerId: ID;
+  uploadedBy: ID;
+  uploaderRole: string;
+  subject: string;
+  title?: string | null;
+  termCount: number;
+  sourceType?: string;
+  fileName?: string | null;
+  rawText?: string | null;
+  units: Array<Omit<TermSyllabusUnit, "id" | "syllabusId" | "createdAt">>;
+  notes?: string | null;
+}): Promise<TermSyllabus> {
+  const store = db();
+  const now = nowIso();
+  const id = newId("tsy");
+  const units: TermSyllabusUnit[] = input.units.map((u) => ({
+    id: newId("tsu"),
+    syllabusId: id,
+    createdAt: now,
+    ...u,
+  }));
+  const syllabus: TermSyllabus = {
+    id,
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    uploadedBy: input.uploadedBy,
+    uploaderRole: input.uploaderRole,
+    subject: input.subject,
+    title: input.title ?? null,
+    termCount: input.termCount,
+    sourceType: input.sourceType ?? "text",
+    fileName: input.fileName ?? null,
+    rawText: input.rawText ? input.rawText.slice(0, 200000) : null,
+    status: "SAVED",
+    notes: input.notes ?? null,
+    units,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.termSyllabi.set(id, syllabus);
+  return syllabus;
+}
+
+/** Delete a term syllabus by id, tenant-scoped. Returns true if removed. */
+export async function deleteTermSyllabus(
+  syllabusId: string,
+  tenantId: string,
+): Promise<boolean> {
+  const store = db();
+  const existing = store.termSyllabi.get(syllabusId);
+  if (!existing || existing.tenantId !== tenantId) return false;
+  return store.termSyllabi.delete(syllabusId);
 }
 
 /**
