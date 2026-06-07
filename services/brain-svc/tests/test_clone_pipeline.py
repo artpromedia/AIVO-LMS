@@ -19,6 +19,7 @@ from brain_svc.services.clone_pipeline import (
     _compute_mastery_from_discovery,
     _compute_visual_identity,
     clone_brain,
+    derive_functioning_level,
 )
 
 
@@ -327,3 +328,77 @@ class TestCloneBrain:
         assert result["functioning_level"] == "STANDARD"
         # visual identity should reflect non-zero mastery
         assert result["visual_identity"]["pulseRate"] > 0.8
+
+    def test_clone_derives_level_from_parent_when_requested_is_standard(self):
+        # learner.functioning_level still STANDARD, but the parent assessment
+        # signals a non-verbal learner → the brain must NOT be STANDARD.
+        db = self._make_db(learner_row=(None,))
+        request = BrainCloneRequest(
+            learner_id="11111111-1111-1111-1111-111111111111",
+            tenant_id="22222222-2222-2222-2222-222222222222",
+            functioning_level="STANDARD",
+            parent_assessment_data=ParentAssessmentData(
+                communicationMode="non_verbal",
+                deviceInteraction="eye_gaze",
+                responseMethod="switch_scan",
+            ),
+        )
+        result = clone_brain(db, request)
+        assert result["functioning_level"] == "NON_VERBAL"
+        assert result["active_tutors"] == SEED_TEMPLATES["NON_VERBAL"]["active_tutors"]
+
+    def test_clone_preserves_explicit_non_standard_level(self):
+        # An explicit non-STANDARD level is authoritative even if parent
+        # signals would map elsewhere.
+        db = self._make_db(learner_row=(None,))
+        request = BrainCloneRequest(
+            learner_id="11111111-1111-1111-1111-111111111111",
+            tenant_id="22222222-2222-2222-2222-222222222222",
+            functioning_level="SUPPORTED",
+            parent_assessment_data=ParentAssessmentData(communicationMode="non_verbal"),
+        )
+        result = clone_brain(db, request)
+        assert result["functioning_level"] == "SUPPORTED"
+
+
+class TestDeriveFunctioningLevel:
+    def test_explicit_non_standard_is_trusted(self):
+        level, source = derive_functioning_level(
+            ParentAssessmentData(communicationMode="non_verbal"), "LOW_VERBAL"
+        )
+        assert level == "LOW_VERBAL"
+        assert source == "explicit"
+
+    def test_no_parent_data_defaults_standard(self):
+        level, source = derive_functioning_level(None, "STANDARD")
+        assert level == "STANDARD"
+        assert source == "default"
+
+    @pytest.mark.parametrize(
+        "comm,device,response,expected",
+        [
+            ("pre_symbolic", "independent", "typing", "PRE_SYMBOLIC"),
+            ("verbal", "partner_assisted", "typing", "PRE_SYMBOLIC"),
+            ("non_verbal", "independent", "typing", "NON_VERBAL"),
+            ("verbal", "eye_gaze", "typing", "NON_VERBAL"),
+            ("limited_verbal", "independent", "typing", "LOW_VERBAL"),
+            ("verbal", "switch_access", "typing", "LOW_VERBAL"),
+            ("verbal", "independent", "switch_scan", "LOW_VERBAL"),
+            ("aac_device", "independent", "typing", "SUPPORTED"),
+            ("sign_language", "independent", "typing", "SUPPORTED"),
+            ("verbal", "guided", "typing", "SUPPORTED"),
+            ("verbal", "independent", "typing", "STANDARD"),
+        ],
+    )
+    def test_signal_mapping(self, comm, device, response, expected):
+        level, source = derive_functioning_level(
+            ParentAssessmentData(
+                communicationMode=comm, deviceInteraction=device, responseMethod=response
+            ),
+            "STANDARD",
+        )
+        assert level == expected
+        if expected == "STANDARD":
+            assert source == "default"
+        else:
+            assert source == "parent_assessment_derivation"

@@ -50,6 +50,53 @@ DOMAIN_TO_MASTERY = {
     "executive_function": "coding",
 }
 
+VALID_FUNCTIONING_LEVELS = {
+    "STANDARD",
+    "SUPPORTED",
+    "LOW_VERBAL",
+    "NON_VERBAL",
+    "PRE_SYMBOLIC",
+}
+
+
+def derive_functioning_level(parent_data, requested_level):
+    """Resolve the functioning level used to seed the brain.
+
+    The level is normally determined by assessment-svc when the parent
+    assessment is submitted (services/assessment-svc level-router.ts) and
+    persisted on ``learners.functioning_level`` — and an explicit non-STANDARD
+    value is always trusted here. But the clone can run while that column is
+    still the ``STANDARD`` default (e.g. the parent assessment was recorded
+    through a path that never ran the router). In that case we back-stop by
+    deriving the level from the parent assessment signals using the SAME rules
+    as level-router.ts, so a learner with clear support needs never silently
+    gets a STANDARD brain.
+
+    Returns ``(level, source)`` where ``source`` explains the decision for the
+    XAI/transparency record.
+    """
+    if requested_level and requested_level != "STANDARD":
+        level = requested_level if requested_level in VALID_FUNCTIONING_LEVELS else "STANDARD"
+        return level, "explicit"
+
+    if not parent_data:
+        return (requested_level or "STANDARD"), "default"
+
+    comm = (parent_data.communicationMode or "")
+    device = (parent_data.deviceInteraction or "")
+    response = (parent_data.responseMethod or "")
+
+    if comm == "pre_symbolic" or device == "partner_assisted":
+        return "PRE_SYMBOLIC", "parent_assessment_derivation"
+    if comm == "non_verbal" or device == "eye_gaze":
+        return "NON_VERBAL", "parent_assessment_derivation"
+    if comm == "limited_verbal" or device == "switch_access" or response == "switch_scan":
+        return "LOW_VERBAL", "parent_assessment_derivation"
+    if comm in ("aac_device", "sign_language") or device == "guided":
+        return "SUPPORTED", "parent_assessment_derivation"
+
+    return "STANDARD", "default"
+
 DIFFICULTY_MULTIPLIER = {
     "easy": 0.8,
     "medium": 1.0,
@@ -285,7 +332,15 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
     if existing:
         return {"error": "Brain state already exists", "brain_state_id": existing[0]}
 
-    template = SEED_TEMPLATES.get(request.functioning_level, SEED_TEMPLATES["STANDARD"])
+    # Resolve the functioning level: trust an explicit non-STANDARD value,
+    # otherwise back-stop by deriving from the parent assessment signals so a
+    # learner with clear support needs never gets a STANDARD brain by default.
+    functioning_level, functioning_level_source = derive_functioning_level(
+        request.parent_assessment_data, request.functioning_level
+    )
+    request.functioning_level = functioning_level
+
+    template = SEED_TEMPLATES.get(functioning_level, SEED_TEMPLATES["STANDARD"])
 
     brain_state_id = str(uuid.uuid4())
     now = datetime.utcnow()
@@ -323,7 +378,11 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
     brain_data = {
         "mastery_levels": mastery_levels,
         "disability_signals": disability_signals,
-        "functioning_level_profile": {"level": request.functioning_level, "determined_at": now.isoformat()},
+        "functioning_level_profile": {
+            "level": functioning_level,
+            "determined_at": now.isoformat(),
+            "source": functioning_level_source,
+        },
         "iep_profile": {},
         "sensory_profile": {},
         "active_accommodations": template["active_accommodations"],
