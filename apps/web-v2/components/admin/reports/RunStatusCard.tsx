@@ -80,7 +80,20 @@ export function RunStatusCard({ runId, initialRun }: { runId: string; initialRun
             Download
           </a>
         ) : (
-          <Button variant="outline" disabled>
+          <Button
+            variant="outline"
+            disabled
+            title={
+              status === "failed"
+                ? "This report run failed — re-run it to download."
+                : "Download will be available once the report finishes generating."
+            }
+            aria-label={
+              status === "failed"
+                ? "Download unavailable: this report run failed"
+                : "Download available once the report finishes generating"
+            }
+          >
             Download
           </Button>
         )}

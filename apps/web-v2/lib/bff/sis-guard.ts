@@ -14,6 +14,7 @@ import { fail, getRequestId } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
 import { isTeacherRosteringGranted } from "@/lib/db/rostering-grants";
+import { fetchTeacherRosteringGrant } from "@/lib/bff/service-clients/rostering";
 import type { SessionProfile } from "@/lib/auth/types";
 
 type Ok = { session: SessionProfile; requestId: string };
@@ -125,9 +126,20 @@ export function authorizeRosterTenant(
  * Whether this actor may CONNECT / sync / disconnect roster sources for
  * the tenant. Admin roles always may (they are the district). Teachers
  * may only when the district has granted the right (default-deny).
+ *
+ * In `AIVO_USE_IDENTITY_SVC` mode the grant is read live from
+ * identity-svc (the district setting set by the web-admin app); on any
+ * read failure, and in mock mode, it falls back to the in-memory store.
  */
-export function canConnectRoster(session: SessionProfile, tenantId: string): boolean {
+export async function canConnectRoster(
+  session: SessionProfile,
+  tenantId: string,
+): Promise<boolean> {
   if (session.role !== "teacher") return true;
+  if (process.env.AIVO_USE_IDENTITY_SVC === "true") {
+    const granted = await fetchTeacherRosteringGrant();
+    if (granted !== null) return granted;
+  }
   return isTeacherRosteringGranted(tenantId);
 }
 
@@ -136,12 +148,12 @@ export function canConnectRoster(session: SessionProfile, tenantId: string): boo
  * when a teacher's district has not enabled teacher-managed rostering,
  * otherwise `null`.
  */
-export function requireRosterConnectGrant(
+export async function requireRosterConnectGrant(
   session: SessionProfile,
   tenantId: string,
   requestId: string,
-): ReturnType<typeof fail> | null {
-  if (canConnectRoster(session, tenantId)) return null;
+): Promise<ReturnType<typeof fail> | null> {
+  if (await canConnectRoster(session, tenantId)) return null;
   return fail(
     {
       ...ERRORS.FORBIDDEN_ROLE,

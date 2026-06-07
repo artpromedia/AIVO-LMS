@@ -45,7 +45,10 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const tenantId = resolveRosterTenant(session, url.searchParams.get("tenantId") ?? undefined);
   const connectors = listConnectors(tenantId).map((c) => ({ ...c, latestRun: latestRun(c.id) }));
-  return ok({ tenantId, connectors, canConnect: canConnectRoster(session, tenantId) }, requestId);
+  return ok(
+    { tenantId, connectors, canConnect: await canConnectRoster(session, tenantId) },
+    requestId,
+  );
 }
 
 /** POST — connect (configure) a roster provider for this teacher's tenant. */
@@ -70,7 +73,7 @@ export async function POST(req: Request) {
   const tenantId = resolveRosterTenant(session);
   const denied = authorizeRosterTenant(session, tenantId, requestId);
   if (denied) return denied;
-  const ungranted = requireRosterConnectGrant(session, tenantId, requestId);
+  const ungranted = await requireRosterConnectGrant(session, tenantId, requestId);
   if (ungranted) return ungranted;
 
   const connector = createConnector({
