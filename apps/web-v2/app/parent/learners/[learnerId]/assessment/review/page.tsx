@@ -48,7 +48,24 @@ async function submitAction(formData: FormData) {
       );
     }
   }
-  await submitParentAssessment(learnerId, session.tenantId);
+  let submitted: Awaited<ReturnType<typeof submitParentAssessment>> = null;
+  try {
+    submitted = await submitParentAssessment(learnerId, session.tenantId);
+  } catch {
+    // Swallowed here only to convert into the existing `?error=` redirect
+    // convention — submitParentAssessment already traced the failure.
+    submitted = null;
+  }
+  if (!submitted?.submittedAt) {
+    // No silent success: bounce back to the first section with an error code
+    // so the parent sees the save did not land instead of a phantom advance.
+    const firstSection = ASSESSMENT_SECTION_ORDER[0];
+    redirect(
+      `/parent/learners/${learnerId}/assessment?step=${stepForSection(firstSection)}&error=${encodeURIComponent(
+        "submit_failed",
+      )}`,
+    );
+  }
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "parent_assessment.submit", newRequestId(), {
     learnerId,

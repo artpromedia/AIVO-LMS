@@ -4,7 +4,12 @@
  * Postgres a body-only replacement (signatures stay stable).
  */
 import { getStore, newId, nowIso } from "@/lib/db/store";
-import { getPersistence } from "@/lib/db/persistence";
+import { getPersistence, resolvePersistenceMode } from "@/lib/db/persistence";
+import {
+  traceAssessmentSubmitAttempt,
+  traceAssessmentSubmitPersisted,
+  traceAssessmentSubmitFailed,
+} from "@/lib/observability/assessment-trace";
 import {
   assertLiveConfigured,
   isLiveCurriculum,
@@ -276,7 +281,47 @@ export async function submitParentAssessment(
     submittedAt: nowIso(),
     updatedAt: nowIso(),
   };
-  const result = await getPersistence().assessments.upsertParentAssessment(submitted);
+
+  // The submittedAt upsert is the transaction of record: persist it FIRST,
+  // isolate every later side-effect (Sprint 1). The trace makes the durable
+  // write observable so a silent RLS rejection can't masquerade as success.
+  const assessmentsMode = resolvePersistenceMode("assessments");
+  const startedMs = Date.now();
+  traceAssessmentSubmitAttempt({ learnerId, tenantId, mode: assessmentsMode });
+  let result: ParentAssessment;
+  try {
+    result = await getPersistence().assessments.upsertParentAssessment(submitted);
+  } catch (err) {
+    traceAssessmentSubmitFailed({
+      learnerId,
+      tenantId,
+      mode: assessmentsMode,
+      durationMs: Date.now() - startedMs,
+      reason: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+  if (!result?.submittedAt) {
+    // A write that "succeeds" but does not return a row with submittedAt set
+    // (e.g. an RLS-rejected upsert that silently affects zero rows) is a
+    // failed save, not a success. Surface it instead of returning a phantom.
+    traceAssessmentSubmitFailed({
+      learnerId,
+      tenantId,
+      mode: assessmentsMode,
+      durationMs: Date.now() - startedMs,
+      reason: "submitted_at_not_persisted",
+    });
+    throw new Error(
+      `submitParentAssessment: durable write did not persist submittedAt for learner ${learnerId}`,
+    );
+  }
+  traceAssessmentSubmitPersisted({
+    learnerId,
+    tenantId,
+    mode: assessmentsMode,
+    durationMs: Date.now() - startedMs,
+  });
 
   // Auto-generate the pre-clone brain profile on submit so the parent sees
   // a brain in the UI immediately and `completeBaseline` has a profile to

@@ -57,6 +57,15 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
 
     const submitted = await submitParentAssessment(learnerId, session!.tenantId);
+    // Success guard: never report a false success. A durable write that did
+    // not stamp `submittedAt` (e.g. an RLS-rejected upsert) must surface as a
+    // typed failure so the client retries rather than advancing the flow.
+    if (!submitted?.submittedAt) {
+      return fail(
+        { ...ERRORS.INTERNAL_ERROR, message: "Parent assessment did not persist submittedAt." },
+        requestId,
+      );
+    }
     await refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "parent_assessment.submit", requestId, { learnerId });
     return ok({ assessment: submitted }, requestId);

@@ -17,6 +17,7 @@ import { memoryQuests } from "../memory/quests";
 import { memoryAdmin } from "../memory/admin";
 import { brainProfileStoreContract } from "./contract/brain-profiles.contract";
 import { lessonRunStoreContract } from "./contract/lesson-runs.contract";
+import { assessmentSubmitContract } from "./contract/assessments.contract";
 import {
   notificationStoreContract,
   auditStoreContract,
@@ -37,6 +38,7 @@ auditStoreContract(M, () => memoryAudit, resetStore);
 identityStoreContract(M, () => memoryIdentity, resetStore);
 learnerStoreContract(M, () => memoryLearners, resetStore);
 assessmentStoreContract(M, () => memoryAssessments, resetStore);
+assessmentSubmitContract(M, () => memoryAssessments, resetStore);
 curriculumStoreContract(M, () => memoryCurriculum, resetStore);
 complianceStoreContract(M, () => memoryCompliance, resetStore);
 questStoreContract(M, () => memoryQuests, resetStore);

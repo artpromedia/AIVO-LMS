@@ -12,6 +12,7 @@
  * postgres while the rest stays in-memory is the supported path.
  */
 import { serverEnv } from "@/lib/env";
+import { logger } from "@/lib/observability/logger";
 import type { Persistence, PersistenceMode } from "./types";
 import { memoryNotifications } from "./memory/notifications";
 import { drizzleNotifications } from "./drizzle/notifications";
@@ -66,6 +67,33 @@ function resolveMode(domain: DomainKey): PersistenceMode {
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
 
+/**
+ * Public read of a single domain's resolved persistence mode. Lets callers
+ * (e.g. the assessment submit trace) report whether they ran against
+ * `memory` or `postgres` without reaching into env directly.
+ */
+export function resolvePersistenceMode(domain: DomainKey): PersistenceMode {
+  return resolveMode(domain);
+}
+
+// PERSISTENCE_MODE_PARITY_ANCHOR — assessments and brainProfiles MUST resolve
+// to the same mode in production. A clone written to an empty in-memory map
+// while the assessment lives in postgres (or vice-versa) is the failure that
+// makes the brain build look "broken" downstream. See scripts/
+// check-persistence-mode-parity.mjs and docs/runbooks/persistence-postgres.md.
+function warnOnModeMismatch(assessmentsMode: PersistenceMode, brainProfilesMode: PersistenceMode) {
+  if (assessmentsMode !== brainProfilesMode) {
+    logger.warn({
+      event: "persistence.mode_mismatch",
+      assessments: assessmentsMode,
+      brainProfiles: brainProfilesMode,
+      message:
+        "assessments and brainProfiles resolved to different persistence modes; " +
+        "the brain clone may be written to a store the assessment never reaches.",
+    });
+  }
+}
+
 let cached: Persistence | null = null;
 
 export function getPersistence(): Persistence {
@@ -81,6 +109,7 @@ export function getPersistence(): Persistence {
   const complianceMode = resolveMode("compliance");
   const questsMode = resolveMode("quests");
   const adminMode = resolveMode("admin");
+  warnOnModeMismatch(assessmentsMode, brainProfilesMode);
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).

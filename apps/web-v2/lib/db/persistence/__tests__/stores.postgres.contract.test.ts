@@ -28,6 +28,7 @@ import { drizzleQuests } from "../drizzle/quests";
 import { drizzleAdmin } from "../drizzle/admin";
 import { brainProfileStoreContract } from "./contract/brain-profiles.contract";
 import { lessonRunStoreContract } from "./contract/lesson-runs.contract";
+import { assessmentSubmitContract } from "./contract/assessments.contract";
 import {
   notificationStoreContract,
   auditStoreContract,
@@ -126,6 +127,7 @@ if (TEST_URL) {
   identityStoreContract(P, () => drizzleIdentity, truncateAll);
   learnerStoreContract(P, () => drizzleLearners, truncateAll);
   assessmentStoreContract(P, () => drizzleAssessments, truncateAll);
+  assessmentSubmitContract(P, () => drizzleAssessments, truncateAll);
   curriculumStoreContract(P, () => drizzleCurriculum, truncateAll);
   complianceStoreContract(P, () => drizzleCompliance, truncateAll);
   questStoreContract(P, () => drizzleQuests, truncateAll);
