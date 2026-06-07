@@ -81,32 +81,78 @@ jobs:
     # API surface. Imports the OpenAPI contract so ZAP exercises every
     # documented operation (SAML ACS/metadata, OIDC RP login/callback,
     # SCIM Users/Groups, MFA enroll/verify/step-up).
+    #
+    # Rather than point at a public hostname (which a GitHub-hosted runner
+    # cannot reach for an in-cluster service — that produced a "green" scan
+    # that imported zero endpoints), we boot identity-svc in CI via the e2e
+    # compose harness and scan it on the compose network. identity-svc is
+    # Fastify + @fastify/swagger-ui (routePrefix "/docs"), so the OpenAPI
+    # JSON is served at /docs/json. ZAP's `-O` rewrites the spec's
+    # localhost:3001 server to the compose service so the active scan
+    # actually attacks the running instance.
     name: ZAP baseline — identity API
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      COMPOSE_PROJECT: zapidentity
+      COMPOSE_FILE: docker-compose.e2e.yml
     steps:
       - uses: actions/checkout@v5
+
+      - name: Boot identity-svc (+ postgres, redis)
+        run: |
+          docker compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE" up -d --wait identity-svc
+          # Fail loudly if the spec endpoint isn't actually serving — this is
+          # what turns a silent no-op scan into a visible failure.
+          docker run --rm --network "${COMPOSE_PROJECT}_default" curlimages/curl:8.11.0 \
+            --fail --silent --show-error --retry 10 --retry-delay 3 --retry-connrefused \
+            http://identity-svc:3001/docs/json -o /dev/null
+          echo "identity-svc OpenAPI spec is reachable at http://identity-svc:3001/docs/json"
+
       - name: ZAP API Scan (identity-svc)
-        # The identity API is an external service whose OpenAPI endpoint may
-        # be temporarily unreachable / undeployed. ZAP returns a hard scan
-        # error (docker exit 1) in that case, which `fail_action` does not
-        # cover. Don't let an unreachable external target red the weekly
-        # security workflow — real alerts are still filed as issues and the
-        # report is uploaded as an artifact below.
-        continue-on-error: true
-        uses: zaproxy/action-api-scan@v0.9.0
+        run: |
+          mkdir -p zap-out && chmod 777 zap-out
+          set +e
+          docker run --rm --network "${COMPOSE_PROJECT}_default" \
+            -v "${{ github.workspace }}/zap-out:/zap/wrk:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-api-scan.py \
+              -t http://identity-svc:3001/docs/json \
+              -f openapi \
+              -O identity-svc:3001 \
+              -a -T 60 \
+              -J report_json.json -w report_md.md -r report_html.html \
+              -z "-config replacer.full_list(0).description=auth
+                  -config replacer.full_list(0).enabled=true
+                  -config replacer.full_list(0).matchtype=REQ_HEADER
+                  -config replacer.full_list(0).matchstr=Authorization
+                  -config replacer.full_list(0).regex=false
+                  -config replacer.full_list(0).replacement='Bearer ${{ secrets.ZAP_IDENTITY_BEARER }}'"
+          code=$?
+          set -e
+          # zap-api-scan exit codes: 0 = clean, 1 = at least one FAIL,
+          # 2 = warnings only, 3 = scan/import error. Treat warnings as a
+          # passing baseline (findings are reported in the artifact), but
+          # fail on real FAILs (3) and on scan errors (3) so a broken scan
+          # can never masquerade as green again.
+          echo "zap-api-scan exit code: $code"
+          if [ "$code" -eq 0 ] || [ "$code" -eq 2 ]; then
+            exit 0
+          fi
+          exit "$code"
+
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          target: ${{ secrets.ZAP_IDENTITY_OPENAPI_URL || 'https://identity.aivolearning.com/docs/json' }}
-          format: openapi
-          cmd_options: >-
-            -a
-            -T 60
-            -z "-config replacer.full_list(0).description=auth
-                -config replacer.full_list(0).enabled=true
-                -config replacer.full_list(0).matchtype=REQ_HEADER
-                -config replacer.full_list(0).matchstr=Authorization
-                -config replacer.full_list(0).regex=false
-                -config replacer.full_list(0).replacement='Bearer ${{ secrets.ZAP_IDENTITY_BEARER }}'"
-          fail_action: false
-          allow_issue_writing: true
-          artifact_name: zap-identity-report
+          name: zap-identity-report
+          path: |
+            zap-out/report_html.html
+            zap-out/report_md.md
+            zap-out/report_json.json
+          if-no-files-found: warn
+
+      - name: Tear down identity-svc
+        if: always()
+        run: docker compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE" down -v
+
