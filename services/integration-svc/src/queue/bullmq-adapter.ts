@@ -11,7 +11,7 @@
  * letting callers fall back to the in-memory port (dev/dry-run).
  */
 import { Queue, Worker, type Job, type ConnectionOptions } from "bullmq";
-import IORedis, { type Redis } from "ioredis";
+import IORedis from "ioredis";
 import type { SyncJob, SyncQueue } from "./retry.js";
 
 export interface BullMqQueueOptions {
@@ -62,8 +62,13 @@ export function createBullMqQueueFromEnv(opts: BullMqQueueOptions = {}): BullMqS
   const url = process.env.REDIS_URL;
   if (!url) return null;
   // BullMQ requires `maxRetriesPerRequest: null` on the ioredis client.
-  const conn: Redis = new IORedis(url, { maxRetriesPerRequest: null });
-  return new BullMqSyncQueue(conn, opts);
+  // BullMQ accepts an existing ioredis client as its connection, but its
+  // `ConnectionOptions` type references the `Redis` type from the ioredis
+  // copy bundled with bullmq, which can structurally diverge from this
+  // service's pinned ioredis when either is bumped. The instance is valid
+  // at runtime, so bridge the type gap with a deliberate cast.
+  const conn = new IORedis(url, { maxRetriesPerRequest: null });
+  return new BullMqSyncQueue(conn as unknown as ConnectionOptions, opts);
 }
 
 /**

@@ -49,7 +49,13 @@ async function start() {
     const { createSyncJobHandler } = await import("./queue/sync-job-handler.js");
     const conn = new IORedis(process.env.REDIS_URL, { maxRetriesPerRequest: null });
     const handler = createSyncJobHandler({ db, queue: bullQueue, logger });
-    worker = createSyncWorker(conn, handler);
+    // bullmq accepts an existing ioredis client at runtime; cast to bridge the
+    // structural gap between this service's ioredis and bullmq's bundled copy
+    // (see createBullMqQueueFromEnv for the same boundary).
+    worker = createSyncWorker(
+      conn as unknown as Parameters<typeof createSyncWorker>[0],
+      handler,
+    );
     logger.info("BullMQ sync worker started (ROLE=worker)");
   }
 
