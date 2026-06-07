@@ -380,6 +380,22 @@ jobs:
                   --set "env.AI_IEP_DRAFT_TIMEOUT_MS=20000"
                 )
                 ;;
+              ai-svc)
+                # Speech Buddy boot guards (services/ai-svc/src/ai_svc/speech_buddy/*).
+                # In NODE_ENV=production / ENV=production the module raises
+                # RuntimeError at import time if these are missing. The 5th
+                # required key (SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY) is read
+                # from the aivo-common-env secret (envFrom) — seeded out-of-
+                # band with `openssl rand -base64 32`. TRANSCRIPT_DIR is
+                # currently ephemeral (pod-local /tmp); object-store backend
+                # is tracked separately.
+                EXTRA_SETS=(
+                  --set "env.SPEECH_BUDDY_STT_PROVIDER=whisper"
+                  --set "env.SPEECH_BUDDY_TTS_PROVIDER=openai"
+                  --set "env.SPEECH_BUDDY_JUDGE_PROVIDER=llm"
+                  --set "env.SPEECH_BUDDY_TRANSCRIPT_DIR=/tmp/speech-buddy"
+                )
+                ;;
               billing-svc)      EXTRA_SETS=(--set env.BILLING_SVC_PORT=3000) ;;
               comms-svc)
                 HELM_TIMEOUT=8m
@@ -801,6 +817,22 @@ jobs:
                   --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:3000"
                   --set "env.BRAIN_SVC_URL=http://brain-svc.aivo.svc.cluster.local:8000"
                   --set "env.AI_IEP_DRAFT_TIMEOUT_MS=20000"
+                )
+                ;;
+              ai-svc)
+                # Speech Buddy boot guards (services/ai-svc/src/ai_svc/speech_buddy/*).
+                # In NODE_ENV=production / ENV=production the module raises
+                # RuntimeError at import time if these are missing. The 5th
+                # required key (SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY) is read
+                # from the aivo-common-env secret (envFrom) — seeded out-of-
+                # band with `openssl rand -base64 32`. TRANSCRIPT_DIR is
+                # currently ephemeral (pod-local /tmp); object-store backend
+                # is tracked separately.
+                EXTRA_SETS=(
+                  --set "env.SPEECH_BUDDY_STT_PROVIDER=whisper"
+                  --set "env.SPEECH_BUDDY_TTS_PROVIDER=openai"
+                  --set "env.SPEECH_BUDDY_JUDGE_PROVIDER=llm"
+                  --set "env.SPEECH_BUDDY_TRANSCRIPT_DIR=/tmp/speech-buddy"
                 )
                 ;;
               # These services read a port env var whose name matches what

@@ -25,6 +25,7 @@ import {
 import { BASELINE_TUTORS, tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
+import { ChapterPreviewButton } from "./chapter-preview-button";
 
 async function startBaselineAction(formData: FormData) {
   "use server";
@@ -277,10 +278,11 @@ export default async function ParentBaselinePage({
                   <Badge tone="success" className="capitalize">
                     {summaryRow.estimate.replaceAll("_", " ")}
                   </Badge>
-                ) : covered ? (
-                  <Badge tone="primary">{t("in_set")}</Badge>
                 ) : (
-                  <Badge tone="neutral">{t("preview")}</Badge>
+                  <div className="flex items-center gap-2">
+                    {covered ? <Badge tone="primary">{t("in_set")}</Badge> : null}
+                    <ChapterPreviewButton tutor={tutor} label={t("preview")} />
+                  </div>
                 )}
               </div>
               <p className="mt-2 text-xs text-aivo-ink-soft">{tutor.scene}</p>
