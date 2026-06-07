@@ -96,10 +96,11 @@ service per business capability:
 | `services/tenant-svc`          | Tenants, memberships, role permissions.    |
 | `services/assessment-svc`      | Baselines, item bank, discovery adventure. |
 | `services/brain-svc`           | Brain profile / clone / approval.          |
+| &nbsp;&nbsp;↳ `curriculum_engine.py` | Scaffolding-only: rephrases/sequences curriculum-svc nodes. Forbidden from inventing standard codes; validated against curriculum-svc (see [ADR 0040](./adr/0040-curriculum-source-of-truth.md), [ADR 0041](./adr/0041-agentic-boundaries.md)). |
 | `services/ai-svc`              | Multi-model LLM gateway, prompt builder.   |
 | `services/tutor-svc`           | Real-time tutor chat + safety.             |
 | `services/homework-svc`        | Homework help sessions.                    |
-| `services/curriculum-svc`      | Curriculum graph + standards alignment.    |
+| `services/curriculum-svc`      | **Authoritative** curriculum: jurisdiction → framework → packs → skills; RS256 auth, authoring/CMS write path, syllabus↔jurisdiction `/validate`. See [ADR 0040](./adr/0040-curriculum-source-of-truth.md). |
 | `services/learning-svc`        | Lesson generation, mastery updates, paths. |
 | `services/comms-svc`           | Notifications, email, push.                |
 | `services/family-svc`          | Care-team invites, consent flows.          |

@@ -19,7 +19,13 @@ from brain_svc.auth import AuthClaims, require_auth
 from brain_svc.models.database import get_db
 from brain_svc.services.access_control import safe_json_parse, verify_learner_access
 from brain_svc.services.curriculum_engine import generate_scope_sequence
-from brain_svc.services.pacing_engine import build_holiday_prep, build_pacing_weeks
+from brain_svc.services.pacing_engine import (
+    SCOPE_SOURCE_AI,
+    SCOPE_SOURCE_UPLOADED_TERM,
+    build_holiday_prep,
+    build_pacing_weeks,
+    normalize_uploaded_scope,
+)
 
 logger = logging.getLogger("brain-svc.pacing")
 
@@ -53,6 +59,11 @@ class GeneratePacingRequest(BaseModel):
     term_count: int = Field(default=4, ge=1, le=8)
     plan_start: str  # ISO date (YYYY-MM-DD) — typically the first day of term 1
     calendar: CalendarInput | None = None
+    # Scope source. Default is AI-generated scope-&-sequence; set to
+    # "uploaded_term_syllabus" and provide term_scope_sequence (from
+    # ai-svc /parse-term) to pace an uploaded whole-term syllabus instead.
+    source: str = Field(default=SCOPE_SOURCE_AI, max_length=48)
+    term_scope_sequence: dict | None = None
 
 
 def _require_iso_date(value: str, field: str) -> str:
@@ -83,43 +94,63 @@ async def generate_pacing_plan(
     if not learner:
         raise HTTPException(status_code=404, detail="Learner not found")
 
-    brain = db.execute(
-        text(
-            """SELECT mastery_levels, active_accommodations, functioning_level_profile
-               FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"""
-        ),
-        {"lid": learner_id},
-    ).mappings().first()
-    if not brain:
-        raise HTTPException(status_code=404, detail="Brain state not found — clone brain first")
-
-    mastery_levels = safe_json_parse(brain.get("mastery_levels"))
-    accommodations = safe_json_parse(brain.get("active_accommodations"), [])
-    flp = safe_json_parse(brain.get("functioning_level_profile"))
-    functioning_level = flp.get("level", "STANDARD")
-
+    # Framework + grade are needed for persistence regardless of scope source.
     curriculum_alignment = safe_json_parse(learner.get("curriculum_alignment"))
     framework = learner.get("curriculum_framework") or curriculum_alignment.get(
         "framework", "Common Core State Standards"
     )
     grade_level = learner.get("grade_level") or "3"
 
-    try:
-        scope = await generate_scope_sequence(
-            framework=framework,
-            subject=request.subject,
-            grade_level=grade_level,
-            mastery_levels=mastery_levels,
-            functioning_level=functioning_level,
-            accommodations=accommodations if isinstance(accommodations, list) else [],
-            term_count=request.term_count,
-        )
-    except Exception as e:
-        logger.error(f"Scope & sequence generation failed for {learner_id}: {e}")
-        raise HTTPException(status_code=503, detail="Scope and sequence generation temporarily unavailable")
+    if request.source == SCOPE_SOURCE_UPLOADED_TERM:
+        # Pace an uploaded whole-term syllabus (from ai-svc /parse-term) as
+        # the authoritative scope — no AI guessing, no brain-state required.
+        if request.term_scope_sequence is None:
+            raise HTTPException(
+                status_code=422,
+                detail="term_scope_sequence is required when source=uploaded_term_syllabus",
+            )
+        try:
+            scope = normalize_uploaded_scope(request.term_scope_sequence)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+        scope_source = SCOPE_SOURCE_UPLOADED_TERM
+    else:
+        brain = db.execute(
+            text(
+                """SELECT mastery_levels, active_accommodations, functioning_level_profile
+                   FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"""
+            ),
+            {"lid": learner_id},
+        ).mappings().first()
+        if not brain:
+            raise HTTPException(status_code=404, detail="Brain state not found — clone brain first")
 
-    if isinstance(scope, dict) and ("error" in scope or "parse_error" in scope):
-        raise HTTPException(status_code=502, detail="Failed to generate scope and sequence from AI")
+        mastery_levels = safe_json_parse(brain.get("mastery_levels"))
+        accommodations = safe_json_parse(brain.get("active_accommodations"), [])
+        flp = safe_json_parse(brain.get("functioning_level_profile"))
+        functioning_level = flp.get("level", "STANDARD")
+
+        try:
+            scope = await generate_scope_sequence(
+                framework=framework,
+                subject=request.subject,
+                grade_level=grade_level,
+                mastery_levels=mastery_levels,
+                functioning_level=functioning_level,
+                accommodations=accommodations if isinstance(accommodations, list) else [],
+                term_count=request.term_count,
+            )
+        except Exception as e:
+            logger.error(f"Scope & sequence generation failed for {learner_id}: {e}")
+            raise HTTPException(status_code=503, detail="Scope and sequence generation temporarily unavailable")
+
+        if isinstance(scope, dict) and ("error" in scope or "parse_error" in scope):
+            raise HTTPException(status_code=502, detail="Failed to generate scope and sequence from AI")
+        scope_source = SCOPE_SOURCE_AI
+
+    # Record scope provenance on the persisted scope-&-sequence.
+    if isinstance(scope, dict):
+        scope["source"] = scope_source
 
     breaks = [b.model_dump() for b in (request.calendar.breaks if request.calendar else [])]
     weeks = build_pacing_weeks(scope, breaks, plan_start)

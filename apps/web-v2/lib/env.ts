@@ -135,6 +135,9 @@ const serverSchema = z.object({
   // store). In dev/test, when unset, web-v2 falls back to its in-memory store.
   TUTOR_SVC_URL: z.string().url().default("http://localhost:3006"),
   INTERNAL_SERVICE_TOKEN: z.string().optional(),
+  // Syllabus ↔ jurisdiction validation (Sprint 7): curriculum-svc base URL.
+  // Authenticated with INTERNAL_SERVICE_TOKEN (sent as `X-Service-Token`).
+  CURRICULUM_SVC_URL: z.string().url().default("http://localhost:3013"),
   AI_PROVIDER: aiProviderSchema,
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),

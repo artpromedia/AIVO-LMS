@@ -1,0 +1,18 @@
+name: curriculum-snapshot-drift
+on:
+  pull_request:
+    paths:
+      - "packages/content-pack/data/**"
+      - "services/curriculum-svc/scripts/build_snapshot.py"
+      - "services/curriculum-svc/src/curriculum_svc/data/skill_graphs.json"
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # build_snapshot.py is pure stdlib — no pip install needed.
+      - name: Verify the curriculum snapshot matches its source catalogues
+        run: python3 services/curriculum-svc/scripts/build_snapshot.py --check

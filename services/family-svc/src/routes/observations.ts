@@ -1,9 +1,26 @@
 import { FastifyInstance } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
 import { caregiverObservations, learnerCaregivers } from "@aivo/db";
+import type { CaregiverObservationCreatedPayload, ContributorRole } from "@aivo/events";
+import { EVENTS } from "@aivo/events";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
 import { getObservationsSchema, observationsSchema } from "./schemas.js";
 import { emitFamilyAudit } from "../lib/audit.js";
+import { getRealtimeBus } from "../realtime/bus.js";
+
+function contributorRoleFromClaims(role: string | undefined): ContributorRole {
+  switch ((role ?? "").toUpperCase()) {
+    case "TEACHER":
+      return "teacher";
+    case "THERAPIST":
+      return "therapist";
+    case "PARENT":
+    case "GUARDIAN":
+      return "parent";
+    default:
+      return "caregiver";
+  }
+}
 
 async function verifyLearnerAccess(
   db: ReturnType<typeof import("@aivo/db").createDb>,
@@ -105,6 +122,26 @@ export async function registerObservationRoutes(app: FastifyInstance) {
         mood: body.mood ?? null,
       },
     });
+
+    // Domain event consumed by recommendation-svc to derive learner signals
+    // (observation-signal-transformer) → parent-approval recommendations.
+    const event: CaregiverObservationCreatedPayload = {
+      observationId: obs.id,
+      learnerId: body.learnerId,
+      contributorUserId: claims.sub,
+      contributorRole: contributorRoleFromClaims(claims.role),
+      category: obs.category,
+      notes: body.notes,
+      mood: body.mood ?? null,
+      observedAt: (obs.date instanceof Date ? obs.date : new Date()).toISOString(),
+    };
+    try {
+      const bus = await getRealtimeBus();
+      await bus.publish(EVENTS.CAREGIVER_OBSERVATION_CREATED, event);
+    } catch (err) {
+      // Best-effort: a bus outage must not fail the observation write.
+      request.log.warn({ err }, "failed to publish caregiver.observation.created");
+    }
 
     return obs;
   });

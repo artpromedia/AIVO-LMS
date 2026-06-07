@@ -1,11 +1,37 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-04-29T00:00:00Z",
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-06T00:00:00Z",
   "districts": [
+    {
+      "id": "ae-abu-dhabi",
+      "name": "Abu Dhabi (ADEK / MOE)",
+      "state": "",
+      "country": "AE",
+      "region": "Abu Dhabi",
+      "zipCodes": []
+    },
+    {
+      "id": "ae-dubai",
+      "name": "Dubai (KHDA / MOE)",
+      "state": "",
+      "country": "AE",
+      "region": "Dubai",
+      "zipCodes": []
+    },
+    {
+      "id": "gb-england",
+      "name": "England (National Curriculum)",
+      "state": "",
+      "country": "GB",
+      "region": "England",
+      "zipCodes": []
+    },
     {
       "id": "mn-stpaul-public-schools",
       "name": "Saint Paul Public Schools",
       "state": "MN",
+      "country": "US",
+      "region": "MN",
       "zipCodes": [
         "55101",
         "55102",
@@ -23,9 +49,19 @@
       ]
     },
     {
+      "id": "ng-lagos-state",
+      "name": "Lagos State (SUBEB)",
+      "state": "",
+      "country": "NG",
+      "region": "Lagos",
+      "zipCodes": []
+    },
+    {
       "id": "wa-tacoma-public-schools",
       "name": "Tacoma Public Schools",
       "state": "WA",
+      "country": "US",
+      "region": "WA",
       "zipCodes": [
         "98402",
         "98403",
@@ -45,52 +81,13 @@
   ],
   "skills": [
     {
-      "id": "ccss.math.k.cc.a.1",
-      "subject": "math",
-      "gradeBand": "K",
-      "label": "Count to 100 by ones and tens",
-      "summary": "Rote count from 1 to 100 by ones and by tens.",
-      "prerequisites": []
-    },
-    {
-      "id": "ccss.math.k.cc.a.2",
-      "subject": "math",
-      "gradeBand": "K",
-      "label": "Count forward from a given number",
-      "summary": "Count forward beginning from a given number within the known sequence.",
-      "prerequisites": ["ccss.math.k.cc.a.1"]
-    },
-    {
-      "id": "ccss.math.k.cc.a.3",
-      "subject": "math",
-      "gradeBand": "K",
-      "label": "Write numbers 0–20",
-      "summary": "Write numbers 0 to 20 and represent quantities with a written numeral.",
-      "prerequisites": ["ccss.math.k.cc.a.1"]
-    },
-    {
-      "id": "ccss.math.k.cc.b.4",
-      "subject": "math",
-      "gradeBand": "K",
-      "label": "Counting to tell number of objects",
-      "summary": "Understand the relationship between numbers and quantities.",
-      "prerequisites": ["ccss.math.k.cc.a.1", "ccss.math.k.cc.a.2"]
-    },
-    {
-      "id": "ccss.math.1.oa.a.1",
-      "subject": "math",
-      "gradeBand": "1",
-      "label": "Add and subtract within 20",
-      "summary": "Solve word problems that call for addition and subtraction within 20.",
-      "prerequisites": ["ccss.math.k.cc.b.4"]
-    },
-    {
       "id": "ccss.ela.k.rf.1",
       "subject": "ela",
       "gradeBand": "K",
       "label": "Print concepts",
       "summary": "Demonstrate understanding of the organization and basic features of print.",
-      "prerequisites": []
+      "prerequisites": [],
+      "source": "CCSS ELA K.RF.1"
     },
     {
       "id": "ccss.ela.k.rf.2",
@@ -98,7 +95,10 @@
       "gradeBand": "K",
       "label": "Phonological awareness",
       "summary": "Demonstrate understanding of spoken words, syllables, and sounds.",
-      "prerequisites": ["ccss.ela.k.rf.1"]
+      "prerequisites": [
+        "ccss.ela.k.rf.1"
+      ],
+      "source": "CCSS ELA K.RF.2"
     },
     {
       "id": "ccss.ela.k.rf.3",
@@ -106,7 +106,10 @@
       "gradeBand": "K",
       "label": "Phonics and word recognition",
       "summary": "Know and apply grade-level phonics and word-analysis skills in decoding words.",
-      "prerequisites": ["ccss.ela.k.rf.2"]
+      "prerequisites": [
+        "ccss.ela.k.rf.2"
+      ],
+      "source": "CCSS ELA K.RF.3"
     },
     {
       "id": "ccss.ela.k.rf.4",
@@ -114,46 +117,404 @@
       "gradeBand": "K",
       "label": "Read with sufficient accuracy and fluency",
       "summary": "Read emergent-reader texts with purpose and understanding.",
-      "prerequisites": ["ccss.ela.k.rf.3"]
+      "prerequisites": [
+        "ccss.ela.k.rf.3"
+      ],
+      "source": "CCSS ELA K.RF.4"
+    },
+    {
+      "id": "ccss.math.1.oa.a.1",
+      "subject": "math",
+      "gradeBand": "1",
+      "label": "Add and subtract within 20",
+      "summary": "Solve word problems that call for addition and subtraction within 20.",
+      "prerequisites": [
+        "ccss.math.k.cc.b.4"
+      ],
+      "source": "CCSS MATH 1.OA.A.1"
+    },
+    {
+      "id": "ccss.math.k.cc.a.1",
+      "subject": "math",
+      "gradeBand": "K",
+      "label": "Count to 100 by ones and tens",
+      "summary": "Rote count from 1 to 100 by ones and by tens.",
+      "prerequisites": [],
+      "source": "CCSS MATH K.CC.A.1"
+    },
+    {
+      "id": "ccss.math.k.cc.a.2",
+      "subject": "math",
+      "gradeBand": "K",
+      "label": "Count forward from a given number",
+      "summary": "Count forward beginning from a given number within the known sequence.",
+      "prerequisites": [
+        "ccss.math.k.cc.a.1"
+      ],
+      "source": "CCSS MATH K.CC.A.2"
+    },
+    {
+      "id": "ccss.math.k.cc.a.3",
+      "subject": "math",
+      "gradeBand": "K",
+      "label": "Write numbers 0–20",
+      "summary": "Write numbers 0 to 20 and represent quantities with a written numeral.",
+      "prerequisites": [
+        "ccss.math.k.cc.a.1"
+      ],
+      "source": "CCSS MATH K.CC.A.3"
+    },
+    {
+      "id": "ccss.math.k.cc.b.4",
+      "subject": "math",
+      "gradeBand": "K",
+      "label": "Counting to tell number of objects",
+      "summary": "Understand the relationship between numbers and quantities.",
+      "prerequisites": [
+        "ccss.math.k.cc.a.1",
+        "ccss.math.k.cc.a.2"
+      ],
+      "source": "CCSS MATH K.CC.B.4"
+    },
+    {
+      "id": "ng-nerdc.ela.p3.grammar.sentences",
+      "subject": "ela",
+      "gradeBand": "Primary-3",
+      "label": "Construct simple and correct sentences",
+      "summary": "Use nouns, pronouns and verbs to construct grammatically correct simple sentences.",
+      "prerequisites": [
+        "ng-nerdc.ela.p3.reading.comprehension"
+      ],
+      "source": "NERDC English Studies P3 — Theme: Grammar"
+    },
+    {
+      "id": "ng-nerdc.ela.p3.reading.comprehension",
+      "subject": "ela",
+      "gradeBand": "Primary-3",
+      "label": "Reading comprehension of short passages",
+      "summary": "Read short passages aloud with fluency and answer literal and simple inferential questions.",
+      "prerequisites": [],
+      "source": "NERDC English Studies P3 — Theme: Reading"
+    },
+    {
+      "id": "ng-nerdc.ela.p3.writing.guided",
+      "subject": "ela",
+      "gradeBand": "Primary-3",
+      "label": "Guided composition (3–4 sentences)",
+      "summary": "Write a guided composition of 3–4 connected sentences on a familiar topic.",
+      "prerequisites": [
+        "ng-nerdc.ela.p3.grammar.sentences"
+      ],
+      "source": "NERDC English Studies P3 — Theme: Writing"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.addition",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Addition of 3-digit numbers with regrouping",
+      "summary": "Add two and three 3-digit numbers with and without regrouping, including word problems within 999.",
+      "prerequisites": [
+        "ng-nerdc.math.p3.number.whole-numbers"
+      ],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Basic Operations (Addition)"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.fractions",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Fractions: halves, quarters and thirds",
+      "summary": "Identify, represent and compare simple fractions (1/2, 1/3, 1/4) of objects and sets.",
+      "prerequisites": [
+        "ng-nerdc.math.p3.number.whole-numbers"
+      ],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Fractions"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.multiplication",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Multiplication of whole numbers by 1 to 9",
+      "summary": "Multiply 2-digit numbers by a 1-digit number (1–9) using repeated addition and the multiplication table.",
+      "prerequisites": [
+        "ng-nerdc.math.p3.number.addition"
+      ],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Basic Operations (Multiplication)"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.subtraction",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Subtraction of 3-digit numbers with regrouping",
+      "summary": "Subtract 3-digit numbers with and without regrouping and solve related word problems.",
+      "prerequisites": [
+        "ng-nerdc.math.p3.number.whole-numbers"
+      ],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Basic Operations (Subtraction)"
+    },
+    {
+      "id": "ng-nerdc.math.p3.number.whole-numbers",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "label": "Whole numbers up to 999",
+      "summary": "Read, write, count and order whole numbers up to 999 and identify place value (hundreds, tens, units).",
+      "prerequisites": [],
+      "source": "NERDC Primary Mathematics P3 — Theme 1: Number and Numeration"
+    },
+    {
+      "id": "uae-moe.ela.g1.phonics",
+      "subject": "ela",
+      "gradeBand": "Grade-1",
+      "label": "Letter sounds and blending (phonics)",
+      "summary": "Recognise letter–sound correspondences and blend sounds to read simple CVC words.",
+      "prerequisites": [],
+      "source": "UAE MOE English Grade 1 — Domain: Reading Foundations"
+    },
+    {
+      "id": "uae-moe.ela.g1.sight-words",
+      "subject": "ela",
+      "gradeBand": "Grade-1",
+      "label": "High-frequency sight words",
+      "summary": "Read common high-frequency sight words on sight to support fluent reading.",
+      "prerequisites": [
+        "uae-moe.ela.g1.phonics"
+      ],
+      "source": "UAE MOE English Grade 1 — Domain: Reading Fluency"
+    },
+    {
+      "id": "uae-moe.math.g1.2d-shapes",
+      "subject": "math",
+      "gradeBand": "Grade-1",
+      "label": "Recognise 2D shapes",
+      "summary": "Identify and describe circles, squares, triangles and rectangles by their attributes.",
+      "prerequisites": [],
+      "source": "UAE MOE Mathematics Grade 1 — Strand: Geometry"
+    },
+    {
+      "id": "uae-moe.math.g1.addition-within-20",
+      "subject": "math",
+      "gradeBand": "Grade-1",
+      "label": "Addition and subtraction within 20",
+      "summary": "Add and subtract within 20 using objects, number lines and number bonds.",
+      "prerequisites": [
+        "uae-moe.math.g1.numbers-to-20"
+      ],
+      "source": "UAE MOE Mathematics Grade 1 — Strand: Operations"
+    },
+    {
+      "id": "uae-moe.math.g1.numbers-to-20",
+      "subject": "math",
+      "gradeBand": "Grade-1",
+      "label": "Numbers and counting to 20",
+      "summary": "Count, read, write and order numbers 0–20 and compare quantities using more/less/equal.",
+      "prerequisites": [],
+      "source": "UAE MOE Mathematics Grade 1 — Strand: Number"
+    },
+    {
+      "id": "uk-nc.ela.y1.comprehension",
+      "subject": "ela",
+      "gradeBand": "Year-1",
+      "label": "Reading comprehension and discussion",
+      "summary": "Understand books read independently and aloud by predicting, recalling and discussing events.",
+      "prerequisites": [
+        "uk-nc.ela.y1.phonics-decoding"
+      ],
+      "source": "UK NC English Year 1 — Reading: comprehension"
+    },
+    {
+      "id": "uk-nc.ela.y1.phonics-decoding",
+      "subject": "ela",
+      "gradeBand": "Year-1",
+      "label": "Systematic phonics decoding",
+      "summary": "Apply phonic knowledge to decode words, responding speedily with the correct sound for graphemes.",
+      "prerequisites": [],
+      "source": "UK NC English Year 1 — Reading: word reading"
+    },
+    {
+      "id": "uk-nc.math.y1.addition-subtraction-20",
+      "subject": "math",
+      "gradeBand": "Year-1",
+      "label": "Addition and subtraction within 20",
+      "summary": "Add and subtract one- and two-digit numbers to 20, including zero, and solve one-step problems.",
+      "prerequisites": [
+        "uk-nc.math.y1.number-to-100"
+      ],
+      "source": "UK NC Mathematics Year 1 — Number: addition and subtraction"
+    },
+    {
+      "id": "uk-nc.math.y1.fractions-half-quarter",
+      "subject": "math",
+      "gradeBand": "Year-1",
+      "label": "Recognise a half and a quarter",
+      "summary": "Recognise, find and name a half and a quarter of an object, shape or quantity.",
+      "prerequisites": [
+        "uk-nc.math.y1.number-to-100"
+      ],
+      "source": "UK NC Mathematics Year 1 — Number: fractions"
+    },
+    {
+      "id": "uk-nc.math.y1.number-to-100",
+      "subject": "math",
+      "gradeBand": "Year-1",
+      "label": "Count and represent numbers to 100",
+      "summary": "Count to and across 100, forwards and backwards, and read and write numbers to 100 in numerals.",
+      "prerequisites": [],
+      "source": "UK NC Mathematics Year 1 — Number: number and place value"
     }
   ],
   "contentPacks": [
     {
-      "id": "mn-stpaul-k-math-fall-2026",
-      "title": "Saint Paul K Math Fall 2026",
-      "subject": "math",
-      "gradeBand": "K",
-      "districtIds": ["mn-stpaul-public-schools"],
+      "id": "ae-dubai-g1-english-2026",
+      "title": "Dubai Grade 1 English (UAE MOE)",
+      "subject": "ela",
+      "gradeBand": "Grade-1",
+      "districtIds": [
+        "ae-dubai",
+        "ae-abu-dhabi"
+      ],
       "skillIds": [
-        "ccss.math.k.cc.a.1",
-        "ccss.math.k.cc.a.2",
-        "ccss.math.k.cc.a.3",
-        "ccss.math.k.cc.b.4"
-      ]
+        "uae-moe.ela.g1.phonics",
+        "uae-moe.ela.g1.sight-words"
+      ],
+      "frameworkCode": "UAE-MOE"
+    },
+    {
+      "id": "ae-dubai-g1-math-2026",
+      "title": "Dubai Grade 1 Mathematics (UAE MOE)",
+      "subject": "math",
+      "gradeBand": "Grade-1",
+      "districtIds": [
+        "ae-dubai",
+        "ae-abu-dhabi"
+      ],
+      "skillIds": [
+        "uae-moe.math.g1.numbers-to-20",
+        "uae-moe.math.g1.addition-within-20",
+        "uae-moe.math.g1.2d-shapes"
+      ],
+      "frameworkCode": "UAE-MOE"
+    },
+    {
+      "id": "gb-england-y1-english-2026",
+      "title": "England Year 1 English (National Curriculum)",
+      "subject": "ela",
+      "gradeBand": "Year-1",
+      "districtIds": [
+        "gb-england"
+      ],
+      "skillIds": [
+        "uk-nc.ela.y1.phonics-decoding",
+        "uk-nc.ela.y1.comprehension"
+      ],
+      "frameworkCode": "UK-NC"
+    },
+    {
+      "id": "gb-england-y1-maths-2026",
+      "title": "England Year 1 Mathematics (National Curriculum)",
+      "subject": "math",
+      "gradeBand": "Year-1",
+      "districtIds": [
+        "gb-england"
+      ],
+      "skillIds": [
+        "uk-nc.math.y1.number-to-100",
+        "uk-nc.math.y1.addition-subtraction-20",
+        "uk-nc.math.y1.fractions-half-quarter"
+      ],
+      "frameworkCode": "UK-NC"
     },
     {
       "id": "mn-stpaul-k-ela-fall-2026",
       "title": "Saint Paul K ELA Fall 2026",
       "subject": "ela",
       "gradeBand": "K",
-      "districtIds": ["mn-stpaul-public-schools"],
-      "skillIds": ["ccss.ela.k.rf.1", "ccss.ela.k.rf.2", "ccss.ela.k.rf.3", "ccss.ela.k.rf.4"]
+      "districtIds": [
+        "mn-stpaul-public-schools"
+      ],
+      "skillIds": [
+        "ccss.ela.k.rf.1",
+        "ccss.ela.k.rf.2",
+        "ccss.ela.k.rf.3",
+        "ccss.ela.k.rf.4"
+      ],
+      "frameworkCode": "US-CCSS"
     },
     {
-      "id": "wa-tacoma-k-math-fall-2026",
-      "title": "Tacoma K Math Fall 2026",
+      "id": "mn-stpaul-k-math-fall-2026",
+      "title": "Saint Paul K Math Fall 2026",
       "subject": "math",
       "gradeBand": "K",
-      "districtIds": ["wa-tacoma-public-schools"],
-      "skillIds": ["ccss.math.k.cc.a.1", "ccss.math.k.cc.a.2", "ccss.math.k.cc.b.4"]
+      "districtIds": [
+        "mn-stpaul-public-schools"
+      ],
+      "skillIds": [
+        "ccss.math.k.cc.a.1",
+        "ccss.math.k.cc.a.2",
+        "ccss.math.k.cc.a.3",
+        "ccss.math.k.cc.b.4"
+      ],
+      "frameworkCode": "US-CCSS"
+    },
+    {
+      "id": "ng-lagos-p3-english-2026",
+      "title": "Lagos State Primary 3 English Studies (NERDC)",
+      "subject": "ela",
+      "gradeBand": "Primary-3",
+      "districtIds": [
+        "ng-lagos-state"
+      ],
+      "skillIds": [
+        "ng-nerdc.ela.p3.reading.comprehension",
+        "ng-nerdc.ela.p3.grammar.sentences",
+        "ng-nerdc.ela.p3.writing.guided"
+      ],
+      "frameworkCode": "NG-NERDC"
+    },
+    {
+      "id": "ng-lagos-p3-math-2026",
+      "title": "Lagos State Primary 3 Mathematics (NERDC)",
+      "subject": "math",
+      "gradeBand": "Primary-3",
+      "districtIds": [
+        "ng-lagos-state"
+      ],
+      "skillIds": [
+        "ng-nerdc.math.p3.number.whole-numbers",
+        "ng-nerdc.math.p3.number.addition",
+        "ng-nerdc.math.p3.number.subtraction",
+        "ng-nerdc.math.p3.number.multiplication",
+        "ng-nerdc.math.p3.number.fractions"
+      ],
+      "frameworkCode": "NG-NERDC"
     },
     {
       "id": "wa-tacoma-k-ela-fall-2026",
       "title": "Tacoma K ELA Fall 2026",
       "subject": "ela",
       "gradeBand": "K",
-      "districtIds": ["wa-tacoma-public-schools"],
-      "skillIds": ["ccss.ela.k.rf.1", "ccss.ela.k.rf.2", "ccss.ela.k.rf.3"]
+      "districtIds": [
+        "wa-tacoma-public-schools"
+      ],
+      "skillIds": [
+        "ccss.ela.k.rf.1",
+        "ccss.ela.k.rf.2",
+        "ccss.ela.k.rf.3"
+      ],
+      "frameworkCode": "US-CCSS"
+    },
+    {
+      "id": "wa-tacoma-k-math-fall-2026",
+      "title": "Tacoma K Math Fall 2026",
+      "subject": "math",
+      "gradeBand": "K",
+      "districtIds": [
+        "wa-tacoma-public-schools"
+      ],
+      "skillIds": [
+        "ccss.math.k.cc.a.1",
+        "ccss.math.k.cc.a.2",
+        "ccss.math.k.cc.b.4"
+      ],
+      "frameworkCode": "US-CCSS"
     }
   ]
 }

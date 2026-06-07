@@ -36,6 +36,8 @@ export const EVENTS = {
   SPEECH_BUDDY_SKILL_EVIDENCE: "speech_buddy.skill.evidence",
   SPEECH_BUDDY_SAFETY_FLAG_RAISED: "speech_buddy.safety.flag.raised",
   SPEECH_BUDDY_QUEST_ASSIGNED: "speech_buddy.quest.assigned",
+  CAREGIVER_OBSERVATION_CREATED: "caregiver.observation.created",
+  RECOMMENDATION_SUGGESTED: "recommendation.suggested",
 } as const;
 
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
@@ -118,6 +120,44 @@ export interface MasteryUpdatedPayload {
   previousScore: number;
   newScore: number;
   source: string;
+}
+
+/**
+ * Care-team roles that can contribute observations/insights about a learner.
+ * Parents retain approval authority; teachers/therapists/caregivers propose.
+ */
+export type ContributorRole = "parent" | "teacher" | "therapist" | "caregiver";
+
+/**
+ * Emitted by family-svc when a caregiver/teacher/therapist records an
+ * observation. recommendation-svc consumes it to derive learner signals
+ * (see observation-signal-transformer) that become parent-approval
+ * recommendations citing the contributing source.
+ */
+export interface CaregiverObservationCreatedPayload {
+  observationId: string;
+  learnerId: string;
+  contributorUserId: string;
+  contributorRole: ContributorRole;
+  category: string;
+  notes: string;
+  mood?: string | null;
+  observedAt: string;
+}
+
+/**
+ * Emitted when a teacher/caregiver proposes an adjustment. It becomes a
+ * PENDING recommendation routed to the parent for approval — it never
+ * mutates brain state directly.
+ */
+export interface RecommendationSuggestedPayload {
+  recommendationId: string;
+  learnerId: string;
+  suggestedByUserId: string;
+  suggestedByRole: ContributorRole;
+  recommendationType: string;
+  title: string;
+  rationale: string;
 }
 
 /* ----------------------------------------------------------------------------

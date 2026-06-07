@@ -6,18 +6,20 @@ the canonical replacement for ad-hoc LLM-synthesized curriculum, and any
 caller (brain-svc, tutor-svc, admin UI) should be able to memoize the
 responses indefinitely.
 
-Learner-serving calls must include the ZIP code captured during
-enrollment. The service resolves ZIP → district and filters curriculum
-packs so learners receive only district-authorized curriculum.
+Learner-serving calls must identify the learner's jurisdiction: a US
+``zipCode``/``districtId`` or a ``country`` (+ optional ``region``) for
+non-US learners. The service resolves it to a district and filters
+curriculum packs so learners receive only jurisdiction-authorized
+curriculum. See ``routes/jurisdictions.py`` for the resolver.
 """
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from curriculum_svc.auth import require_service_or_user
+from curriculum_svc.auth import Principal, require_service_or_user
 from curriculum_svc.catalogue import District, Skill, get_catalogue
-
+from curriculum_svc.routes.jurisdictions import resolve_jurisdiction_or_http
 
 router = APIRouter()
 
@@ -29,6 +31,7 @@ class SkillOut(BaseModel):
     label: str
     summary: str
     prerequisites: list[str]
+    source: str = ""
 
     @classmethod
     def from_skill(cls, s: Skill) -> "SkillOut":
@@ -39,6 +42,7 @@ class SkillOut(BaseModel):
             label=s.label,
             summary=s.summary,
             prerequisites=list(s.prerequisites),
+            source=s.source,
         )
 
 
@@ -85,13 +89,49 @@ def _resolve_district_from_zip(zip_code: str) -> tuple[str, District]:
     return normalized, district
 
 
+def _resolve_lookup_district(
+    country: str | None,
+    region: str | None,
+    zip_code: str | None,
+    postal_code: str | None,
+    district_id: str | None,
+) -> District:
+    """Resolve the district a lookup should be scoped to.
+
+    Backward compatible: a bare ``zipCode`` (no ``country``) is treated as
+    a US lookup, preserving the original ZIP→district behaviour. Supplying
+    ``country`` enables NG/AE/GB/… resolution. A recognised-but-unseeded
+    country yields a 404, never US content.
+    """
+    effective_country = country
+    postal = postal_code or zip_code  # zipCode remains the US postal field.
+    if not effective_country:
+        if postal or district_id:
+            effective_country = "US"
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Provide `country` (with optional region/postalCode) or a US `zipCode`.",
+            )
+    resolved = resolve_jurisdiction_or_http(effective_country, region, postal, district_id)
+    district = get_catalogue().get_district(resolved.district_id)
+    if district is None:
+        # Defensive: the resolver only ever returns seeded district ids.
+        raise HTTPException(
+            status_code=404,
+            detail=f"district {resolved.district_id} not found",
+        )
+    return district
+
+
 @router.get("/districts/resolve", response_model=DistrictResolveResponse)
 def resolve_district(
     zipCode: str = Query(..., min_length=5, max_length=10),
-    _auth: str = Depends(require_service_or_user),
+    _auth: Principal = Depends(require_service_or_user),
 ) -> DistrictResolveResponse:
     """Resolve the learner's enrollment ZIP code to the district whose
-    curriculum should be served.
+    curriculum should be served. (US ZIP path — see
+    ``/jurisdictions/resolve`` for the internationalized resolver.)
     """
     normalized, district = _resolve_district_from_zip(zipCode)
     return DistrictResolveResponse(zipCode=normalized, district=DistrictOut.from_district(district))
@@ -100,22 +140,27 @@ def resolve_district(
 @router.get("/lookup", response_model=LookupResponse)
 def lookup(
     subject: str | None = Query(default=None, max_length=64),
-    gradeBand: str | None = Query(default=None, max_length=8),
+    gradeBand: str | None = Query(default=None, max_length=16),
     skillId: str | None = Query(default=None, max_length=128),
-    zipCode: str = Query(..., min_length=5, max_length=10),
-    _auth: str = Depends(require_service_or_user),
+    zipCode: str | None = Query(default=None, max_length=10),
+    country: str | None = Query(default=None, max_length=8),
+    region: str | None = Query(default=None, max_length=64),
+    postalCode: str | None = Query(default=None, max_length=12),
+    districtId: str | None = Query(default=None, max_length=128),
+    _auth: Principal = Depends(require_service_or_user),
 ) -> LookupResponse:
-    """Lookup over the district-scoped catalogue.
+    """Lookup over the jurisdiction-scoped catalogue.
 
-    `zipCode` is required and must come from enrollment. The service
-    resolves it to a district, then returns only curriculum packs and
-    skills available to that district. This prevents the baseline,
-    lesson, and tutor flows from serving generic or wrong-district
-    curriculum to a learner.
+    The learner's jurisdiction must be identifiable: pass either a US
+    `zipCode` (or `postalCode`) / `districtId`, or a `country` (with
+    optional `region`) for non-US learners. The service resolves it to a
+    district and returns only curriculum packs and skills available to
+    that district, so the baseline, lesson, and tutor flows never serve
+    generic or wrong-jurisdiction curriculum.
 
     `skillId` returns one specific skill node plus its immediate
     prerequisites only when that skill is available in the learner's
-    district curriculum.
+    jurisdiction curriculum.
     """
     if not subject and not gradeBand and not skillId:
         raise HTTPException(
@@ -124,7 +169,7 @@ def lookup(
         )
 
     cat = get_catalogue()
-    _, district = _resolve_district_from_zip(zipCode)
+    district = _resolve_lookup_district(country, region, zipCode, postalCode, districtId)
 
     if skillId:
         target = cat.get_skill(skillId)
@@ -170,7 +215,7 @@ class PrereqPathResponse(BaseModel):
 def prereq_path(
     skill_id: str,
     zipCode: str = Query(..., min_length=5, max_length=10),
-    _auth: str = Depends(require_service_or_user),
+    _auth: Principal = Depends(require_service_or_user),
 ) -> PrereqPathResponse:
     """Return the prerequisite chain leading up to a skill, prerequisites
     first, filtered to the learner's district curriculum.

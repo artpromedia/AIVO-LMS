@@ -105,13 +105,17 @@ def test_lookup_requires_at_least_one_filter():
     assert r.status_code == 400
 
 
-def test_lookup_requires_enrollment_zip_code():
+def test_lookup_requires_a_jurisdiction():
+    # Migrated from the ZIP-only era: `zipCode` is now optional at the
+    # framework level (so non-US lookups can pass `country` instead), and
+    # the "you must locate the learner" rule is enforced in-handler as a
+    # 400 rather than FastAPI's structural 422.
     r = client.get(
         "/api/curriculum/lookup",
         params={"subject": "math", "gradeBand": "K"},
         headers=DEV_TOKEN_HEADERS,
     )
-    assert r.status_code == 422
+    assert r.status_code == 400
 
 
 def test_lookup_by_subject_grade_and_zip_serves_only_that_district():
@@ -232,11 +236,14 @@ def test_lookup_rejects_wrong_service_token():
     assert r.status_code == 401
 
 
-def test_lookup_accepts_bearer_token():
+def test_lookup_accepts_verified_jwt_bearer(jwt_public_key_env, sign_token):
+    # Migrated from the old "any 16+ char bearer" check: the service now
+    # accepts a Bearer only when it is a real RS256 token signed by the
+    # platform key. See test_auth.py for the rejection cases.
     r = client.get(
         "/api/curriculum/lookup",
         params={"subject": "math", "gradeBand": "K", "zipCode": "55104"},
-        headers={"Authorization": "Bearer a-bearer-longer-than-16-chars"},
+        headers={"Authorization": f"Bearer {sign_token()}"},
     )
     assert r.status_code == 200
 

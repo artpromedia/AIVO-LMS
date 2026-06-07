@@ -16,6 +16,13 @@ from __future__ import annotations
 from datetime import date, timedelta
 from typing import Any
 
+# Scope-&-sequence provenance. The default scope is AI-generated
+# (curriculum_engine); when a parent/teacher uploads a whole-term syllabus
+# (Sprint 6) the parsed term scope is used verbatim instead of the
+# AI-guessed scope. Pacing stays break-aware regardless of source.
+SCOPE_SOURCE_AI = "ai_scope_sequence"
+SCOPE_SOURCE_UPLOADED_TERM = "uploaded_term_syllabus"
+
 
 def _parse_date(v: Any) -> date | None:
     if isinstance(v, date):
@@ -137,6 +144,23 @@ def build_pacing_weeks(
         week_index += 1
         cursor = we + timedelta(days=1)
     return weeks
+
+
+def normalize_uploaded_scope(scope: Any) -> dict:
+    """Validate/normalise an uploaded term scope-&-sequence (Sprint 6) into
+    the shape the pacing walk consumes. Raises ``ValueError`` if it carries
+    no instructional units, so the route can return a clear error instead of
+    persisting an empty plan. The returned scope is fed to
+    :func:`build_pacing_weeks` exactly like an AI-generated scope, so the
+    plan stays break-aware."""
+    if not isinstance(scope, dict):
+        raise ValueError("term_scope_sequence must be an object")
+    terms = scope.get("terms")
+    if not isinstance(terms, list) or not terms:
+        raise ValueError("term_scope_sequence must contain at least one term")
+    if not flatten_unit_weeks(scope):
+        raise ValueError("term_scope_sequence contains no instructional units")
+    return {"terms": terms, "source": SCOPE_SOURCE_UPLOADED_TERM}
 
 
 def _uniq(xs: list[str]) -> list[str]:

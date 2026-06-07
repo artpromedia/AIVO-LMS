@@ -235,7 +235,13 @@ async def generate_chat_completion(
     if tenant_id:
         await get_ledger().check(tenant_id)
 
-    models_to_try = [preferred_model] + MODEL_PRIORITY if preferred_model else MODEL_PRIORITY
+    # Dedupe the preferred model so it is not double-tried when it is already
+    # in MODEL_PRIORITY (matches generate_completion's chain construction).
+    models_to_try = (
+        [preferred_model] + [m for m in MODEL_PRIORITY if m != preferred_model]
+        if preferred_model
+        else list(MODEL_PRIORITY)
+    )
 
     try:
         from .moderation_client import is_model_disabled

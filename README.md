@@ -66,6 +66,19 @@ The v2.1 release lands a wide sweep of platform fixes — from the four neurodiv
 - **`@aivo/item-bank` + IEP packet generator route.** Calibrated item bank package; IEP packet generator with a module-level `SIGNATURE_ROLES` constant (review nit) and a fastify route for parent/teacher exports.
 - **`curriculum-svc` + `admin-svc` content-cms first cut.** New curriculum microservice plus admin-svc CMS surface; curriculum-svc wired into the CI/CD pipeline.
 
+### Curriculum source of truth
+
+`curriculum-svc` is the **single authoritative source** of curriculum
+truth across the platform. Every standard code a learner is held to must
+exist in its catalogue. LLM-driven services (`brain-svc`, `ai-svc`) may
+only *personalize and scaffold* catalogue nodes — they never invent
+standards, and any code an LLM proposes that is absent from the catalogue
+is rejected. See:
+
+- [ADR 0040 — Curriculum source of truth](docs/adr/0040-curriculum-source-of-truth.md)
+- [ADR 0041 — Agentic boundaries (LLMs never emit authoritative standards)](docs/adr/0041-agentic-boundaries.md)
+- [docs/curriculum/ARCHITECTURE.md](docs/curriculum/ARCHITECTURE.md) — target end-state (jurisdiction → framework → content pack → skill → scaffolded lesson).
+
 ### Stage & learner experience
 
 - **Stage hooks ported into packages.** `useTTS`, `useSpeechInput`, `useSensoryAdapter`, `voiceMatch`, and `StageBreakCloud` extracted from the web app into shared packages so mobile + web share one source of truth.

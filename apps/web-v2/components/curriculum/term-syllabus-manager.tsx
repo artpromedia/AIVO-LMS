@@ -1,0 +1,278 @@
+"use client";
+
+/**
+ * Whole-term / trimester syllabus manager (Sprint 6, G7). Used by both the
+ * parent and teacher learner views. Lets a parent/teacher paste a full-term
+ * syllabus per subject, review the parsed week-by-week scope, and save it so
+ * AIVO's pacing explodes it into dated, break-aware weekly foci.
+ */
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+
+type ParsedUnit = {
+  title: string;
+  duration_weeks: number;
+  topics: string[];
+  learning_objectives: string[];
+  standards_addressed: string[];
+  key_vocabulary: string[];
+};
+
+type ParseResult = {
+  subject: string | null;
+  source: string;
+  total_terms: number;
+  unit_count: number;
+  terms: Array<{ term_number: number; title?: string | null; units: ParsedUnit[] }>;
+};
+
+type ParseSummary = {
+  unitCount: number;
+  totalWeeks: number;
+  termCount: number;
+  standardsCount: number;
+};
+
+type SavedUnit = { title: string; validationStatus?: string };
+
+type SavedSyllabus = {
+  id: string;
+  subject: string;
+  title: string | null;
+  termCount: number;
+  units: SavedUnit[];
+  createdAt: string;
+};
+
+type JurisdictionLocator = {
+  country?: string;
+  region?: string;
+  postalCode?: string;
+  districtId?: string;
+  zipCode?: string;
+};
+
+function offCurriculumCount(units: SavedUnit[]): number {
+  return units.filter((u) => u.validationStatus === "off_curriculum").length;
+}
+
+const SUBJECTS = [
+  { slug: "math", name: "Math" },
+  { slug: "ela", name: "English / Reading" },
+  { slug: "science", name: "Science" },
+  { slug: "social_studies", name: "Social Studies" },
+  { slug: "other", name: "Other" },
+];
+
+function fmtDate(d: string): string {
+  const dt = new Date(d);
+  return isNaN(dt.getTime()) ? d : dt.toLocaleDateString();
+}
+
+export function TermSyllabusManager({
+  learnerId,
+  apiBase,
+  gradeBand,
+  jurisdiction,
+}: {
+  learnerId: string;
+  /** e.g. `/api/bff/parent/learners/${learnerId}/term-syllabus` */
+  apiBase: string;
+  /** Learner grade band — enables syllabus ↔ jurisdiction validation on save. */
+  gradeBand?: string;
+  /** Learner jurisdiction (US zip/district or country+region) for validation. */
+  jurisdiction?: JurisdictionLocator;
+}) {
+  const [text, setText] = useState("");
+  const [subject, setSubject] = useState("math");
+  const [termCount, setTermCount] = useState(1);
+  const [parsed, setParsed] = useState<ParseResult | null>(null);
+  const [summary, setSummary] = useState<ParseSummary | null>(null);
+  const [saved, setSaved] = useState<SavedSyllabus[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    try {
+      const res = await fetch(apiBase, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setSaved(data?.data?.syllabi ?? []);
+      }
+    } catch {
+      /* non-fatal: list refresh is best-effort */
+    }
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiBase]);
+
+  async function onParse() {
+    setBusy(true);
+    setError(null);
+    setParsed(null);
+    setSummary(null);
+    try {
+      const res = await fetch(`${apiBase}/parse-preview`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text, subject, termCount }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.error?.message ?? "Could not parse the syllabus.");
+        return;
+      }
+      setParsed(data.data.parsed as ParseResult);
+      setSummary(data.data.summary as ParseSummary);
+    } catch {
+      setError("Could not reach the parser. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onSave() {
+    if (!parsed) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(apiBase, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ subject, text, parsed, gradeBand, jurisdiction }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.error?.message ?? "Could not save the term syllabus.");
+        return;
+      }
+      setParsed(null);
+      setSummary(null);
+      setText("");
+      await refresh();
+    } catch {
+      setError("Could not save. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onDelete(id: string) {
+    setBusy(true);
+    try {
+      await fetch(`${apiBase}/${encodeURIComponent(id)}`, { method: "DELETE" });
+      await refresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const allUnits = parsed ? parsed.terms.flatMap((t) => t.units) : [];
+
+  return (
+    <div className="space-y-6" data-learner-id={learnerId}>
+      <Card className="p-4 space-y-3">
+        <h3 className="text-lg font-semibold">Upload a full-term syllabus</h3>
+        <p className="text-sm text-muted-foreground">
+          Paste the whole term/trimester syllabus for one subject. We&apos;ll turn it into a
+          week-by-week plan the tutor follows — break-aware, no page limit.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <label className="text-sm">
+            Subject{" "}
+            <select
+              className="border rounded px-2 py-1"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            >
+              {SUBJECTS.map((s) => (
+                <option key={s.slug} value={s.slug}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm">
+            Terms{" "}
+            <input
+              type="number"
+              min={1}
+              max={4}
+              className="border rounded px-2 py-1 w-16"
+              value={termCount}
+              onChange={(e) => setTermCount(Math.min(4, Math.max(1, Number(e.target.value) || 1)))}
+            />
+          </label>
+        </div>
+        <textarea
+          className="w-full border rounded p-2 h-48 font-mono text-sm"
+          placeholder="Week 1: ...&#10;Week 2: ..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <div className="flex gap-2">
+          <Button onClick={onParse} disabled={busy || !text.trim()}>
+            {busy ? "Parsing…" : "Parse term"}
+          </Button>
+          {parsed && (
+            <Button variant="outline" onClick={onSave} disabled={busy}>
+              Save {summary?.unitCount ?? allUnits.length} weeks
+            </Button>
+          )}
+        </div>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+      </Card>
+
+      {parsed && summary && (
+        <Card className="p-4 space-y-3">
+          <h4 className="font-semibold">
+            Review — {summary.unitCount} units · {summary.totalWeeks} weeks ·{" "}
+            {summary.standardsCount} standards
+          </h4>
+          <ol className="space-y-2 list-decimal pl-5">
+            {allUnits.map((u, i) => (
+              <li key={i} className="text-sm">
+                <span className="font-medium">{u.title}</span>
+                {u.standards_addressed.length > 0 && (
+                  <span className="text-muted-foreground"> · {u.standards_addressed.join(", ")}</span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </Card>
+      )}
+
+      {saved.length > 0 && (
+        <Card className="p-4 space-y-2">
+          <h4 className="font-semibold">Saved term syllabi</h4>
+          <ul className="space-y-2">
+            {saved.map((s) => {
+              const off = offCurriculumCount(s.units);
+              return (
+                <li key={s.id} className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2">
+                    {s.title ?? s.subject} · {s.units.length} weeks · {fmtDate(s.createdAt)}
+                    {off > 0 && (
+                      <span className="rounded bg-amber-100 text-amber-800 px-2 py-0.5 text-xs">
+                        {off} off-curriculum — review
+                      </span>
+                    )}
+                  </span>
+                  <Button variant="ghost" onClick={() => onDelete(s.id)} disabled={busy}>
+                    Remove
+                  </Button>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+export default TermSyllabusManager;

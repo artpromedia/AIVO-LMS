@@ -71,7 +71,9 @@ def _enable_flag(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def _disable_flag(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("AIVO_FEATURE_CURRICULUM_GROUNDING", raising=False)
+    # Grounding is on by default now (Sprint 3); disabling requires an
+    # explicit falsey value rather than simply unsetting the flag.
+    monkeypatch.setenv("AIVO_FEATURE_CURRICULUM_GROUNDING", "false")
 
 
 def _mock_transport(handler) -> httpx.MockTransport:

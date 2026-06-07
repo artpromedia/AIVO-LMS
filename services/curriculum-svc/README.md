@@ -10,24 +10,99 @@ study next" questions, and reserve LLM calls for personalization.
 Initial scope (this PR):
 
 - Read-only catalogue served from a JSON snapshot bundled under
-  `src/curriculum_svc/data/skill_graphs.json`. The snapshot is generated
-  from `packages/skill-graphs` and `packages/content-pack` as part of the
-  monorepo build; the service does not synthesize content at runtime.
+  `src/curriculum_svc/data/skill_graphs.json`. The snapshot is **compiled
+  deterministically** from the per-jurisdiction source catalogues under
+  `packages/content-pack/data/<jurisdiction>/catalogue.json` (US-CCSS plus
+  NG-NERDC, AE-MOE, GB-NC) by `scripts/build_snapshot.py`; the service does
+  not synthesize content at runtime. Regenerate with
+  `python scripts/build_snapshot.py`; CI runs `--check` to fail on drift.
 - `GET /api/curriculum/health` — health check.
-- `GET /api/curriculum/lookup` — lookup endpoint with the following
-  query parameters (all optional but at least one is required):
+- `GET /api/curriculum/jurisdictions/resolve` — resolve a learner's
+  jurisdiction to its district scope + framework (see Jurisdictions
+  below). Params: `country` (required), `region`, `postalCode`,
+  `districtId`.
+- `GET /api/curriculum/lookup` — lookup endpoint. At least one *filter*
+  (`subject` / `gradeBand` / `skillId`) is required, plus a jurisdiction:
+  - jurisdiction: a US `zipCode`/`postalCode`/`districtId`, or a
+    `country` (+ optional `region`) for non-US learners.
   - `subject` — math / ela / science / ...
-  - `gradeBand` — K / 1 / 2 / ...
+  - `gradeBand` — K / 1 / 2 / ... (or a framework's own band, e.g.
+    `Primary-3` for NG).
   - `skillId` — return one specific skill node + immediate prereqs.
 - `GET /api/curriculum/skills/{skill_id}/path` — return the prerequisite
   chain leading up to a skill (longest-first), useful for the brain-svc
   "next-action" endpoint.
 
+## Jurisdictions (internationalization)
+
+A *jurisdiction* is the `{country, region?, district?, postalCode?}`
+tuple that identifies whose approved curriculum a learner receives:
+
+- **US** resolves by ZIP → district (unchanged).
+- **NG / AE / GB / …** resolve by `country` (+ optional `region`). The
+  governing framework comes from the single framework registry in
+  `frameworks.py` (NERDC, UAE MOE, UK National Curriculum, …).
+
+A non-US country is **never** silently mapped to US/CCSS. A recognised
+country with no curriculum seeded yet returns an explicit
+`404 "no curriculum seeded for <country>-<region>"`; an unrecognised
+country returns `404 "no curriculum framework registered…"`. Real NG/AE/GB
+content is seeded in Sprint 3. See
+[docs/curriculum/ARCHITECTURE.md](../../docs/curriculum/ARCHITECTURE.md).
+
+## Authentication
+
+Every route except `GET /api/curriculum/health` requires one of two real
+credential modes:
+
+1. **Service token** — `X-Service-Token: <token>` matching
+   `INTERNAL_SERVICE_TOKEN`, for service-to-service calls (brain-svc,
+   tutor-svc, …). The comparison is constant-time.
+2. **User JWT** — `Authorization: Bearer <jwt>`, a real RS256 access
+   token issued by identity-svc and verified against the shared
+   `JWT_PUBLIC_KEY` (the SPKI PEM public half of the platform keypair).
+   Verification enforces the signature, `exp`, and `iss`
+   (`aivo:identity-svc`), pins `alg=RS256` (rejecting `alg: none` and
+   HS256-confusion), and optionally checks `aud` when `JWT_AUDIENCE` is
+   set. On success the route receives a `Principal`
+   (`mode` / `sub` / `role` / `tenantId`).
+
+In non-production environments the dev token `aivo-internal-dev-token`
+is accepted so local compose and unit tests work without a generated
+secret.
+
+**Production fail-closed:** the service refuses to boot if neither
+`INTERNAL_SERVICE_TOKEN` nor `JWT_PUBLIC_KEY` is configured
+(`NODE_ENV=production`/`ENV=production`). It never silently accepts an
+unverified token.
+
+## Authoring / CMS write path (Sprint 4)
+
+The bundled snapshot is read-only. To maintain the catalogue at scale,
+set `CURRICULUM_PERSISTENCE` to a mutable backend and use the admin API:
+
+- `memory` — in-process mutable store seeded from the snapshot (dev/test).
+- `postgres` — durable store backed by the `curriculum_*` tables
+  (Drizzle schema in `packages/db/src/schema/curriculum.ts`, migration
+  `0067_curriculum_catalogue.sql`); requires `CURRICULUM_DATABASE_URL`.
+
+Admin-gated endpoints (service token or a user JWT carrying an admin role;
+non-admins get 403). Writes are validated against the authoring contract
+(`packages/curriculum-authoring/schema/curriculum-catalogue.schema.json`):
+
+- `POST|PUT|DELETE /api/curriculum/admin/districts[/{id}]`
+- `POST|PUT|DELETE /api/curriculum/admin/skills[/{id}]`
+- `POST|PUT|DELETE /api/curriculum/admin/packs[/{id}]`
+- `POST /api/curriculum/admin/reload` — rebuild the read model.
+
+Malformed records return 422; packs referencing unknown districts/skills
+return 422 with field errors. In the default `snapshot` mode these routes
+return 503 (catalogue is read-only).
+
 Future scope (out of this PR — tracked in INTEGRATION_STATUS.md):
 
 - gRPC mode for low-latency in-cluster reads.
-- Authoring write-path (CMS UI) — separate PR.
-- Live re-load of the snapshot via S3 sidecar.
+- Authoring CMS UI (admin-svc surface).
 
 ## Run
 

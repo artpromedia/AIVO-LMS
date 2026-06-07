@@ -1,0 +1,87 @@
+{
+  "country": "GB",
+  "framework": "UK-NC",
+  "source": "UK National Curriculum (England), Key Stage 1 — Year 1 Mathematics & English programmes of study",
+  "districts": [
+    {
+      "id": "gb-england",
+      "name": "England (National Curriculum)",
+      "region": "England",
+      "zipCodes": []
+    }
+  ],
+  "skills": [
+    {
+      "id": "uk-nc.math.y1.number-to-100",
+      "subject": "math",
+      "gradeBand": "Year-1",
+      "label": "Count and represent numbers to 100",
+      "summary": "Count to and across 100, forwards and backwards, and read and write numbers to 100 in numerals.",
+      "prerequisites": [],
+      "source": "UK NC Mathematics Year 1 — Number: number and place value"
+    },
+    {
+      "id": "uk-nc.math.y1.addition-subtraction-20",
+      "subject": "math",
+      "gradeBand": "Year-1",
+      "label": "Addition and subtraction within 20",
+      "summary": "Add and subtract one- and two-digit numbers to 20, including zero, and solve one-step problems.",
+      "prerequisites": ["uk-nc.math.y1.number-to-100"],
+      "source": "UK NC Mathematics Year 1 — Number: addition and subtraction"
+    },
+    {
+      "id": "uk-nc.math.y1.fractions-half-quarter",
+      "subject": "math",
+      "gradeBand": "Year-1",
+      "label": "Recognise a half and a quarter",
+      "summary": "Recognise, find and name a half and a quarter of an object, shape or quantity.",
+      "prerequisites": ["uk-nc.math.y1.number-to-100"],
+      "source": "UK NC Mathematics Year 1 — Number: fractions"
+    },
+    {
+      "id": "uk-nc.ela.y1.phonics-decoding",
+      "subject": "ela",
+      "gradeBand": "Year-1",
+      "label": "Systematic phonics decoding",
+      "summary": "Apply phonic knowledge to decode words, responding speedily with the correct sound for graphemes.",
+      "prerequisites": [],
+      "source": "UK NC English Year 1 — Reading: word reading"
+    },
+    {
+      "id": "uk-nc.ela.y1.comprehension",
+      "subject": "ela",
+      "gradeBand": "Year-1",
+      "label": "Reading comprehension and discussion",
+      "summary": "Understand books read independently and aloud by predicting, recalling and discussing events.",
+      "prerequisites": ["uk-nc.ela.y1.phonics-decoding"],
+      "source": "UK NC English Year 1 — Reading: comprehension"
+    }
+  ],
+  "contentPacks": [
+    {
+      "id": "gb-england-y1-maths-2026",
+      "title": "England Year 1 Mathematics (National Curriculum)",
+      "subject": "math",
+      "gradeBand": "Year-1",
+      "districtIds": ["gb-england"],
+      "skillIds": [
+        "uk-nc.math.y1.number-to-100",
+        "uk-nc.math.y1.addition-subtraction-20",
+        "uk-nc.math.y1.fractions-half-quarter"
+      ],
+      "frameworkCode": "UK-NC"
+    },
+    {
+      "id": "gb-england-y1-english-2026",
+      "title": "England Year 1 English (National Curriculum)",
+      "subject": "ela",
+      "gradeBand": "Year-1",
+      "districtIds": ["gb-england"],
+      "skillIds": [
+        "uk-nc.ela.y1.phonics-decoding",
+        "uk-nc.ela.y1.comprehension"
+      ],
+      "frameworkCode": "UK-NC"
+    }
+  ]
+}

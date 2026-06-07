@@ -16,6 +16,7 @@ import { registerLanguageProfileRoutes } from "./routes/language-profile.js";
 import { registerDataExportRoutes } from "./routes/data-export.js";
 import { registerParentDashboardRoutes } from "./routes/parent-dashboard.js";
 import { registerObservationRoutes } from "./routes/observations.js";
+import { registerSuggestionRoutes } from "./routes/suggestions.js";
 import { registerSpeechBuddyConsentRoutes } from "./routes/speech-buddy-consent.js";
 import { registerWhatsWorkingRoutes } from "./routes/whats-working.js";
 import { registerInterestRoutes } from "./routes/interests.js";
@@ -71,6 +72,7 @@ export async function buildApp() {
   await registerDataExportRoutes(app);
   await registerParentDashboardRoutes(app);
   await registerObservationRoutes(app);
+  await registerSuggestionRoutes(app);
   await registerSpeechBuddyConsentRoutes(app);
   await registerWhatsWorkingRoutes(app);
   await registerInterestRoutes(app);
