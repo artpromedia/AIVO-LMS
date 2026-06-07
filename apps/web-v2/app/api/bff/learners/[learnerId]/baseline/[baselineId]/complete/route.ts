@@ -36,7 +36,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!result) {
       return fail({ ...ERRORS.INTERNAL_ERROR, message: "Could not complete baseline" }, requestId);
     }
-    refreshLearnerReadiness(learnerId, session!.tenantId);
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "baseline.complete", requestId, {
       learnerId,
       metadata: {

@@ -82,8 +82,8 @@ async function applyPatch(
   if (!v.ok) {
     return fail({ ...ERRORS.VALIDATION_FAILED, message: v.message }, requestId);
   }
-  const next = patchParentAssessmentSection(learnerId, session!.tenantId, sectionId, v.data);
-  refreshLearnerReadiness(learnerId, session!.tenantId);
+  const next = await patchParentAssessmentSection(learnerId, session!.tenantId, sectionId, v.data);
+  await refreshLearnerReadiness(learnerId, session!.tenantId);
   audit(session, "parent_assessment.section.patch", requestId, {
     learnerId,
     metadata: { section: sectionId },

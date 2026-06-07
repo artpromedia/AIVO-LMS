@@ -182,7 +182,7 @@ export async function refreshLearnerReadiness(
 ): Promise<ReadinessState | null> {
   const existing = await getPersistence().learners.getById(id, tenantId);
   if (!existing) return null;
-  const state = computeReadinessFor(id, tenantId);
+  const state = await computeReadinessFor(id, tenantId);
   if (state !== existing.readinessState) {
     await getPersistence().learners.setReadinessState(id, tenantId, state);
   }
@@ -1078,7 +1078,12 @@ export async function completeBaseline(
   const store = db();
   const baseline = await getPersistence().assessments.getBaselineById(baselineId, tenantId);
   if (!baseline) return null;
-  const learner = store.learnerProfiles.get(baseline.learnerId);
+  // Read the learner through the persistence adapter, not the in-memory
+  // `getStore()` Map. In postgres mode (production) the Map is empty, so the
+  // legacy `store.learnerProfiles.get()` returned null here and aborted the
+  // whole completion — meaning the brain clone never ran and the baseline was
+  // never finalized. See ADR 0007.
+  const learner = await getLearner(baseline.learnerId, tenantId);
   if (!learner) return null;
 
   // Idempotent short-circuit: a completed baseline returns the existing
@@ -1121,12 +1126,12 @@ export async function completeBaseline(
 
   const questions = await listBaselineQuestions(baselineId);
   const attempts = await listBaselineAttempts(baselineId, tenantId);
-  const subjects = Array.from(store.subjects.values()).filter((s) =>
-    baseline.subjectIds.includes(s.id),
-  );
-  const skills = Array.from(store.skills.values()).filter((sk) =>
-    baseline.subjectIds.includes(sk.subjectId),
-  );
+  // Subjects + skills are reference data; read them through the persistence
+  // adapter so they resolve in postgres mode (the in-memory `store.subjects` /
+  // `store.skills` Maps are empty there).
+  const subjectIdSet = new Set(baseline.subjectIds);
+  const subjects = (await listSubjects()).filter((s) => subjectIdSet.has(s.id));
+  const skills = (await listSkills()).filter((sk) => subjectIdSet.has(sk.subjectId));
 
   const summary = buildBaselineSummary({
     questions,

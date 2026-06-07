@@ -28,11 +28,11 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const learner = recordIEPSkip(learnerId, session!.tenantId);
+    const learner = await recordIEPSkip(learnerId, session!.tenantId);
     if (!learner) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
-    refreshLearnerReadiness(learnerId, session!.tenantId);
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "iep.skip", requestId, { learnerId });
     return ok({ learner }, requestId);
   } catch (e) {
