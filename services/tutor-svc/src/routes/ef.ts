@@ -25,7 +25,6 @@ import { eq, and, desc } from "drizzle-orm";
 import { efTaskBreakdowns, efTaskStepProgress, efSessionOutcomes, learners } from "@aivo/db";
 import {
   breakDownTask,
-  bucketLocalHour,
   TimeOfDayMemory,
   nextStepPrompt,
   type TimeOfDay,
@@ -34,6 +33,7 @@ import {
   type MicroStep,
 } from "@aivo/executive-function";
 import { createLogger } from "@aivo/observability";
+import { recordEfSessionOutcome } from "../lib/efOutcome.js";
 
 const logger = createLogger("tutor-svc.ef");
 
@@ -366,25 +366,19 @@ export function registerEfRoutes(app: FastifyInstance, db: any): void {
       if (Number.isNaN(startedAt.getTime())) {
         return reply.code(400).send({ error: "Invalid startedAt" });
       }
-      const hour =
-        typeof body.outcome.localHour === "number" ? body.outcome.localHour : startedAt.getHours();
-      const tod = bucketLocalHour(hour);
 
-      const [row] = await db
-        .insert(efSessionOutcomes)
-        .values({
-          tenantId: learner.tenantId,
-          learnerId: learner.id,
-          startedAt,
-          timeOfDay: tod,
-          subject: body.outcome.subject ?? null,
-          modality: body.outcome.modality ?? null,
-          accuracy: body.outcome.accuracy,
-          frustrationRate: body.outcome.frustrationRate ?? 0,
-          attentionMinutes: body.outcome.attentionMinutes ?? 0,
-        })
-        .returning();
-      return reply.code(201).send({ id: row.id, timeOfDay: tod });
+      const { id, timeOfDay } = await recordEfSessionOutcome(db, {
+        tenantId: learner.tenantId,
+        learnerId: learner.id,
+        startedAt,
+        localHour: body.outcome.localHour,
+        subject: body.outcome.subject ?? null,
+        modality: body.outcome.modality ?? null,
+        accuracy: body.outcome.accuracy,
+        frustrationRate: body.outcome.frustrationRate ?? 0,
+        attentionMinutes: body.outcome.attentionMinutes ?? 0,
+      });
+      return reply.code(201).send({ id, timeOfDay });
     },
   );
 
