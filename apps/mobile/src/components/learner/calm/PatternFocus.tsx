@@ -10,7 +10,7 @@ import {
   generatePatternSequence,
   isPatternGuessCorrect,
 } from "@/lib/calm";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /** Milliseconds each tile stays highlighted during the watch phase. */
@@ -45,7 +45,10 @@ export function PatternFocus({
   const [feedback, setFeedback] = useState<Feedback>("none");
 
   // Per-tile accent — never the only signal: each tile also carries a number.
-  const tileTones = [palette.primary, palette.accent, palette.success, palette.warning];
+  // The mode-aware palette only exposes primary/accent, so the two extra
+  // hues come from the static brand status colors (stable across all sensory
+  // modes), giving four clearly-distinct, child-friendly tiles.
+  const tileTones = [palette.primary, palette.accent, colors.success, colors.warning];
 
   // Animated reveal only when motion is allowed; reduced-motion learners
   // read the static sequence and start when they're ready.
