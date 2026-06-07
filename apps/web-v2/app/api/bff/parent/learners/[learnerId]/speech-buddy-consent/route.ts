@@ -70,7 +70,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   }
 }
 
-const postSchema = z.object({ ageBand: z.enum(["6-9", "10-12", "13-15"]) });
+const postSchema = z.object({ ageBand: z.enum(["3-5", "6-9", "10-12", "13-15"]) });
 
 export async function POST(req: Request, { params }: Params): Promise<NextResponse> {
   const requestId = getRequestId(req);
@@ -83,7 +83,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     const parsed = postSchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: "ageBand must be 6-9 / 10-12 / 13-15." },
+        { ...ERRORS.VALIDATION_FAILED, message: "ageBand must be 3-5 / 6-9 / 10-12 / 13-15." },
         requestId,
       );
     }

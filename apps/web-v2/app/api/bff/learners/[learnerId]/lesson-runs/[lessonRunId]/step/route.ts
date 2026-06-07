@@ -41,7 +41,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     // response instead of re-recording the step.
     const idemKey = readIdempotencyKey(req);
     if (idemKey) {
-      const cached = readIdempotencyCache(session!.tenantId, IDEMPOTENCY_ROUTE, idemKey);
+      const cached = await readIdempotencyCache(session!.tenantId, IDEMPOTENCY_ROUTE, idemKey);
       if (cached) {
         return NextResponse.json(cached.body, {
           status: cached.status,
@@ -94,7 +94,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     const okResponse = ok({ interaction }, requestId);
     // Cache the response body+status for replay-safe idempotency.
     if (idemKey) {
-      writeIdempotencyCache(session!.tenantId, IDEMPOTENCY_ROUTE, idemKey, { interaction }, 200);
+      await writeIdempotencyCache(
+        session!.tenantId,
+        IDEMPOTENCY_ROUTE,
+        idemKey,
+        { interaction },
+        200,
+      );
     }
     return okResponse;
   } catch (e) {

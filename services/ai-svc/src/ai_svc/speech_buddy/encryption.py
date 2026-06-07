@@ -35,6 +35,10 @@ _MASTER_ENV = "SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY"
 _DEV_MASTER = b"speech-buddy-dev-master-key-do-not-ship\x00\x00"  # 41 bytes
 
 
+def _is_production() -> bool:
+    return os.environ.get("NODE_ENV") == "production" or os.environ.get("ENV") == "production"
+
+
 def _master_key() -> bytes:
     raw = os.environ.get(_MASTER_ENV)
     if raw:
@@ -43,6 +47,8 @@ def _master_key() -> bytes:
         except Exception:
             return raw.encode("utf-8")
     # Dev fallback — log once.
+    if _is_production():
+        raise RuntimeError(f"{_MASTER_ENV} is required in production")
     if not getattr(_master_key, "_warned", False):  # type: ignore[attr-defined]
         logger.warning(
             "%s not set; using dev master key. DO NOT use in production.",
@@ -108,6 +114,8 @@ def encrypt_transcript(tenant_id: str, plaintext: str) -> EncryptedTranscript:
             ciphertext_b64=base64.b64encode(ct).decode("ascii"),
             algorithm="AES-256-GCM",
         )
+    if _is_production():
+        raise RuntimeError("cryptography.AESGCM is required for Speech Buddy transcripts in production")
     # Dev-only fallback: keystream from HMAC + truncated MAC for integrity.
     warnings.warn(
         "cryptography not installed; falling back to XOR-HMAC dev encryption",
@@ -135,6 +143,8 @@ def decrypt_transcript(enc: EncryptedTranscript) -> str:
         pt = AESGCM(key).decrypt(nonce, body, enc.tenant_id.encode("utf-8"))
         return pt.decode("utf-8")
     if enc.algorithm == "XOR-HMAC-DEV":
+        if _is_production():
+            raise RuntimeError("XOR-HMAC-DEV transcripts are forbidden in production")
         body_pt, tag = body[:-16], body[-16:]
         expected = hmac.new(key, nonce + body_pt + enc.tenant_id.encode("utf-8"), hashlib.sha256).digest()[:16]
         if not hmac.compare_digest(tag, expected):

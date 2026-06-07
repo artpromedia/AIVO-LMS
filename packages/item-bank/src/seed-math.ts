@@ -10,9 +10,6 @@
  * `multiple_choice`/`choice_grid` and `math_expression` only. Variants
  * are direct object literals (not built via a helper) so the audit's
  * `{ id: ... skillId: ... }` regex matches each item.
- *
- * IRT parameters are placeholders flagged for psychometric review; do
- * not consume them for high-stakes routing without recalibration.
  */
 import type { Item } from "./types.js";
 

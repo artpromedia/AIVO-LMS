@@ -129,7 +129,7 @@ export async function registerSpeechBuddyRoutes(app: FastifyInstance) {
       const body: StartSessionBody = req.body ?? {};
       const ageBand = body.ageBand ?? user.ageBand;
       if (!isAgeBand(ageBand)) {
-        return reply.code(400).send({ error: "ageBand must be 6-9, 10-12 or 13-15" });
+        return reply.code(400).send({ error: "ageBand must be 3-5, 6-9, 10-12 or 13-15" });
       }
       if (!isSpeechBuddyEnabled(user.tenantId, ageBand)) {
         return reply

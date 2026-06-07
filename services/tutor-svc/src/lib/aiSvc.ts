@@ -61,7 +61,7 @@ async function call<T>(
 
 export interface StartSessionResponse {
   sessionId: string;
-  ageBand: "6-9" | "10-12" | "13-15";
+  ageBand: "3-5" | "6-9" | "10-12" | "13-15";
   locale: string;
   nicknameToken: string;
   state: string;

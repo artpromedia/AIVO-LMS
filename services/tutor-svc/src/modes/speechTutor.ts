@@ -62,7 +62,7 @@ export const speechTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-speech",
-    status: "alpha",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_SPEECH",
     audioDelegate: "speech-buddy",
     subjectBrain: "speech",

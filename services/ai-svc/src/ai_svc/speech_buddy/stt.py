@@ -1,4 +1,4 @@
-"""STT adapter surface + a deterministic mock + a Whisper provider stub.
+"""STT adapter surface with deterministic test and live Whisper providers.
 
 Real production deployments wire ``WhisperSTT`` through litellm (see
 ``routes/transcribe.py``). The default in tests is ``MockSTT`` so the
@@ -96,10 +96,14 @@ class WhisperSTT:
 
 
 def get_default_stt() -> STTAdapter:
-    """Pick STT adapter based on env. Default = MockSTT for offline tests."""
+    """Pick STT adapter based on env; production must use real transcription."""
     provider = (os.environ.get("SPEECH_BUDDY_STT_PROVIDER") or "mock").lower()
     if provider == "whisper":
         return WhisperSTT()
+    if os.environ.get("NODE_ENV") == "production" or os.environ.get("ENV") == "production":
+        raise RuntimeError(
+            "SPEECH_BUDDY_STT_PROVIDER=whisper is required in production; mock STT is forbidden"
+        )
     return MockSTT()
 
 

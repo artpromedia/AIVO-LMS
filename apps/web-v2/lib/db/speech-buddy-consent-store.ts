@@ -18,7 +18,7 @@ export type SpeechBuddyConsentRecord = {
   grantedAt: string;
 };
 
-const AGE_BANDS = ["6-9", "10-12", "13-15"];
+const AGE_BANDS = ["3-5", "6-9", "10-12", "13-15"];
 
 // Keyed by `${tenantId}:${learnerId}` — only the active grant is retained.
 const store = new Map<string, SpeechBuddyConsentRecord>();

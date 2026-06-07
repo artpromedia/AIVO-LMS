@@ -69,14 +69,14 @@ export const ADMIN_ENTERPRISE: AdminEnterpriseFlags = loadAdminEnterpriseFlags()
  *
  * Configuration source (env, parsed at import time):
  *   SPEECH_BUDDY_ENABLED_TENANTS = "tenantA:6-9,10-12;tenantB:13-15"
- *   SPEECH_BUDDY_ENABLED_GLOBAL  = "" | "all" | "6-9,10-12,13-15"
+ *   SPEECH_BUDDY_ENABLED_GLOBAL  = "" | "all" | "3-5,6-9,10-12,13-15"
  *
  * SPEECH_BUDDY_ENABLED_GLOBAL is for staging / canary only; in production it
  * should remain unset. A future flag service may replace this env-based store.
  * ----------------------------------------------------------------------------
  */
 
-export const SPEECH_BUDDY_AGE_BANDS = ["6-9", "10-12", "13-15"] as const;
+export const SPEECH_BUDDY_AGE_BANDS = ["3-5", "6-9", "10-12", "13-15"] as const;
 export type SpeechBuddyAgeBand = (typeof SPEECH_BUDDY_AGE_BANDS)[number];
 
 export interface SpeechBuddyFlags {

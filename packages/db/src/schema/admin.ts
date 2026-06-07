@@ -191,6 +191,8 @@ export const evidenceBundles = pgTable(
     filename: varchar("filename", { length: 255 }).notNull(),
     sizeBytes: integer("size_bytes").notNull(),
     sha256: varchar("sha256", { length: 64 }).notNull(),
+    storageUri: varchar("storage_uri", { length: 2048 }),
+    retentionUntil: timestamp("retention_until", { withTimezone: true }),
     /** Counts of items inside each artifact, for at-a-glance review. */
     summary: jsonb("summary").notNull(),
     generatedAt: timestamp("generated_at").defaultNow().notNull(),

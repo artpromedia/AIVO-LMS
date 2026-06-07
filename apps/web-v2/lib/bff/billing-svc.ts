@@ -70,6 +70,7 @@ type ServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; err
 
 /** Resolve the billing-svc flag: per-service override, else the global stack flag. */
 export function isBillingSvcEnabled(): boolean {
+  if (process.env.NODE_ENV === "production") return true;
   return serverEnv.AIVO_USE_BILLING_SVC ?? serverEnv.AIVO_USE_SERVICE_STACK;
 }
 
@@ -81,6 +82,9 @@ export function isBillingSvcEnabled(): boolean {
 export async function getBillingBearer(): Promise<string | null> {
   const jar = await cookies();
   const token = jar.get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
+  if (!token && process.env.NODE_ENV === "production") {
+    throw new Error("billing-svc access token is required in production");
+  }
   return token ? `Bearer ${token}` : null;
 }
 

@@ -19,7 +19,7 @@ export const speechBuddyConsents = pgTable(
     tenantId: uuid("tenant_id").notNull(),
     learnerId: uuid("learner_id").notNull(),
     parentUserId: uuid("parent_user_id").notNull(),
-    // "6-9" | "10-12" | "13-15"
+    // "3-5" | "6-9" | "10-12" | "13-15"
     ageBand: varchar("age_band", { length: 8 }).notNull(),
     // Reserved for future Speech-Buddy-adjacent scopes; defaults to the
     // only scope today so the verify lookup is stable.

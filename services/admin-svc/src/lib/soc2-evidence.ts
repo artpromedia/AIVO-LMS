@@ -13,23 +13,21 @@
  *      with author + timestamp (CC8.1).
  *   4. `backup-verification.json` — output of the most recent backup
  *      verification run (CC7.5). Pulled from the `backup-verify` GitHub
- *      Action artifact when present, otherwise a stub indicating no run
- *      in the window.
+ *      Action artifact when present, otherwise an explicit unverified result.
  *
  * The bundle is written to `EVIDENCE_DIR` (default `data/evidence/`)
  * and a row is inserted in `evidence_bundles` with the sha256 hash so
  * auditors can verify integrity from the compliance UI.
  *
- * In a fully cloud-hosted deployment this should additionally upload
- * the bundle to an S3 bucket with object-lock (WORM) enabled. The
- * upload step is gated behind the `EVIDENCE_S3_BUCKET` env var so the
- * Replit dev environment runs without it. Search for `S3_SWAP_POINT`
- * to find the hook.
+ * Production additionally uploads the bundle to an S3 bucket with
+ * Object Lock COMPLIANCE retention enabled. Local development may omit
+ * `EVIDENCE_S3_BUCKET`; production fails closed when it is missing.
  */
 import { createHash } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import { gzipSync } from "zlib";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { users, adminAuditLog, platformConfig, evidenceBundles, sessions } from "@aivo/db";
 import { desc, sql, eq, gte } from "drizzle-orm";
 import { createDrizzleAdvisoryLock, createDrizzleLedger, startSafeCron } from "@aivo/scheduling";
@@ -55,6 +53,46 @@ interface BundleSummary {
   auditLatestHash: string | null;
   configChanges: number;
   backupVerified: boolean;
+  wormStorageUri: string | null;
+  retentionUntil: string | null;
+}
+
+async function uploadEvidenceToWorm(
+  body: Buffer,
+  filename: string,
+  sha256: string,
+): Promise<{ storageUri: string; retentionUntil: Date } | null> {
+  const bucket = process.env.EVIDENCE_S3_BUCKET;
+  if (!bucket) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("EVIDENCE_S3_BUCKET is required in production for immutable SOC 2 evidence");
+    }
+    return null;
+  }
+  const region = process.env.EVIDENCE_S3_REGION || process.env.AWS_REGION;
+  if (!region) throw new Error("EVIDENCE_S3_REGION or AWS_REGION is required for evidence upload");
+  const prefix = (process.env.EVIDENCE_S3_PREFIX || "soc2-evidence").replace(/^\/+|\/+$/g, "");
+  const key = `${prefix}/${filename}`;
+  const retentionYears = Number.parseInt(process.env.EVIDENCE_RETENTION_YEARS || "7", 10);
+  const retentionUntil = new Date();
+  retentionUntil.setUTCFullYear(retentionUntil.getUTCFullYear() + retentionYears);
+  const sseKmsKeyId = process.env.EVIDENCE_S3_KMS_KEY_ID;
+
+  await new S3Client({ region }).send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: "application/gzip",
+      ChecksumSHA256: Buffer.from(sha256, "hex").toString("base64"),
+      Metadata: { sha256 },
+      ObjectLockMode: "COMPLIANCE",
+      ObjectLockRetainUntilDate: retentionUntil,
+      ServerSideEncryption: sseKmsKeyId ? "aws:kms" : "AES256",
+      SSEKMSKeyId: sseKmsKeyId,
+    }),
+  );
+  return { storageUri: `s3://${bucket}/${key}`, retentionUntil };
 }
 
 /** Build a single tar entry header (POSIX ustar) — minimal but valid. */
@@ -73,7 +111,7 @@ function tarHeader(name: string, size: number): Buffer {
     11,
     "utf8",
   );
-  buf.write("        ", 148, 8, "utf8"); // checksum placeholder
+  buf.write("        ", 148, 8, "utf8"); // checksum field is spaces while calculating
   buf.write("0", 156, 1, "utf8"); // typeflag = regular file
   buf.write("ustar  ", 257, 8, "utf8");
   // checksum
@@ -256,6 +294,7 @@ export async function generateEvidenceBundle(
   await fs.mkdir(EVIDENCE_DIR, { recursive: true });
   const filepath = path.join(EVIDENCE_DIR, filename);
   await fs.writeFile(filepath, gz, { mode: 0o440 });
+  const worm = await uploadEvidenceToWorm(gz, filename, sha256);
 
   const summary: BundleSummary = {
     accessReviewRows: access.rows,
@@ -264,6 +303,8 @@ export async function generateEvidenceBundle(
     auditLatestHash: auditMerkle.latestHash,
     configChanges: configHistory.count,
     backupVerified: backup.verified,
+    wormStorageUri: worm?.storageUri ?? null,
+    retentionUntil: worm?.retentionUntil.toISOString() ?? null,
   };
 
   // Upsert by bundleDate so a same-day re-run replaces the row instead
@@ -275,17 +316,22 @@ export async function generateEvidenceBundle(
       filename,
       sizeBytes: gz.length,
       sha256,
+      storageUri: worm?.storageUri ?? null,
+      retentionUntil: worm?.retentionUntil ?? null,
       summary,
     })
     .onConflictDoUpdate({
       target: evidenceBundles.bundleDate,
-      set: { filename, sizeBytes: gz.length, sha256, summary, generatedAt: new Date() },
+      set: {
+        filename,
+        sizeBytes: gz.length,
+        sha256,
+        storageUri: worm?.storageUri ?? null,
+        retentionUntil: worm?.retentionUntil ?? null,
+        summary,
+        generatedAt: new Date(),
+      },
     });
-
-  // S3_SWAP_POINT: in production, upload `gz` to a WORM-locked bucket
-  // here using @aws-sdk/client-s3 with ObjectLockMode=COMPLIANCE and
-  // Retain-Until-Date set 7 years out. Skipped when EVIDENCE_S3_BUCKET
-  // is unset (current Replit deployment).
   return { bundleDate, filename, filepath, sizeBytes: gz.length, sha256, summary };
 }
 

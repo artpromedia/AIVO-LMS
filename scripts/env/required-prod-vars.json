@@ -75,7 +75,7 @@
         "AUTH_MODE": { "notOneOf": ["mock"] },
         "AI_PROVIDER": { "notOneOf": ["mock"] },
         "AIVO_PERSISTENCE": { "equals": "postgres" },
-        "TTS_PROVIDER": { "oneOf": ["mock", "openai", "production"] }
+        "TTS_PROVIDER": { "oneOf": ["openai", "production"] }
       },
       "conditional": {
         "ANTHROPIC_API_KEY": "required when AI_PROVIDER=anthropic (lib/ai/anthropic-tutor.ts)",
@@ -84,9 +84,38 @@
       }
     },
     "speech-eval-svc": {
-      "comment": "Speech evaluation must make an explicit live-vs-mock choice in production (services/speech-eval-svc refuses to boot otherwise).",
-      "required": ["SPEECH_EVAL_MODE"],
-      "values": { "SPEECH_EVAL_MODE": { "oneOf": ["live", "mock"] } }
+      "comment": "Speech evaluation must use a configured live ASR provider in production.",
+      "required": ["SPEECH_EVAL_MODE", "ASR_PROVIDER"],
+      "values": {
+        "SPEECH_EVAL_MODE": { "equals": "live" },
+        "ASR_PROVIDER": { "oneOf": ["openai", "openai-whisper", "azure", "azure-speech"] }
+      },
+      "conditional": {
+        "OPENAI_API_KEY": "required when ASR_PROVIDER=openai or openai-whisper",
+        "AZURE_SPEECH_KEY": "required when ASR_PROVIDER=azure or azure-speech",
+        "AZURE_SPEECH_REGION": "required when ASR_PROVIDER=azure or azure-speech"
+      }
+    },
+    "speech-buddy": {
+      "comment": "Speech Buddy must use live STT, TTS, safety judging, encrypted session recovery, and durable shared storage.",
+      "required": [
+        "SPEECH_BUDDY_STT_PROVIDER",
+        "SPEECH_BUDDY_TTS_PROVIDER",
+        "SPEECH_BUDDY_JUDGE_PROVIDER",
+        "SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY",
+        "SPEECH_BUDDY_TRANSCRIPT_DIR",
+        "OPENAI_API_KEY"
+      ],
+      "minLength": { "SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY": 32 },
+      "values": {
+        "SPEECH_BUDDY_STT_PROVIDER": { "equals": "whisper" },
+        "SPEECH_BUDDY_TTS_PROVIDER": { "equals": "openai" },
+        "SPEECH_BUDDY_JUDGE_PROVIDER": { "oneOf": ["llm", "moderation", "gateway"] }
+      }
+    },
+    "soc2-evidence": {
+      "comment": "SOC 2 evidence bundles must be retained in an S3 Object Lock bucket.",
+      "required": ["EVIDENCE_S3_BUCKET", "EVIDENCE_S3_REGION"]
     }
   }
 }

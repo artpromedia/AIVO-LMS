@@ -34,7 +34,7 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["life-skills-6-plus-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -48,7 +48,7 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     "10": "authored",
     "11": "authored",
     "12": "authored",
-    ADULT: "scaffold",
+    ADULT: "authored",
   },
   policy: {
     requiresConsent: true,
@@ -58,7 +58,7 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-life-skills",
-    status: "scaffold",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_LIFE_SKILLS",
     transitionPlanningFromAge: "14",
   },

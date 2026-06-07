@@ -142,11 +142,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       guidedOnly: false,
     });
     const priorTutorTurns = existing.messages.filter((m) => m.role === "tutor").length;
-    const reply = generateGuidedReply({
+    const reply = await generateGuidedReply({
       topic: existing.topic,
       subjectId: existing.subjectId,
       turn: priorTutorTurns,
       latestLearnerMessage: sanitized.cleaned,
+      learnerId,
+      tenantId: session!.tenantId,
     });
 
     // Post-classify tutor output. We always audit the tutor turn; if rule

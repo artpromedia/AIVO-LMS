@@ -7,6 +7,7 @@ import { createLogger, registerObservabilityPlugin } from "@aivo/observability";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerEvaluateRoute } from "./routes/evaluate.js";
+import { getAsrProvider } from "./services/asr-provider.js";
 
 const logger = createLogger("speech-eval-svc");
 const PORT = parseInt(process.env.SPEECH_EVAL_PORT || "3080", 10);
@@ -50,17 +51,16 @@ export async function buildApp() {
 }
 
 async function start() {
-  // The default (and ASR-unavailable) path returns deterministic *mock*
-  // pronunciation/fluency scores. Those must never be served silently in
-  // production as if they were real evaluations — require an explicit
-  // SPEECH_EVAL_MODE so it's a conscious decision (fail fast otherwise).
+  // Local development can opt into deterministic mock scoring. Production
+  // must use live ASR and fails fast before accepting traffic otherwise.
   const mode = (process.env.SPEECH_EVAL_MODE ?? "").trim().toLowerCase();
-  if (process.env.NODE_ENV === "production" && mode !== "live" && mode !== "mock") {
+  if (process.env.NODE_ENV === "production" && mode !== "live") {
     throw new Error(
-      "SPEECH_EVAL_MODE must be set in production. Use 'live' (a real ASR " +
-        "provider must be configured) or explicitly 'mock' to acknowledge that " +
-        "placeholder scores will be returned.",
+      "SPEECH_EVAL_MODE=live is required in production; placeholder scores are forbidden.",
     );
+  }
+  if (process.env.NODE_ENV === "production" && getAsrProvider().name === "null") {
+    throw new Error("A configured ASR_PROVIDER with valid credentials is required in production");
   }
   const app = await buildApp();
   await bootstrapOpsAlerts({ service: "speech-eval-svc", app, beforeExit: () => app.close() });

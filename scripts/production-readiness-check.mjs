@@ -97,6 +97,11 @@ if (!surfaceOk) {
   blocker("surface-contract", "Surface contract scan failed (see above)");
 }
 
+const productionGapOk = runChildScript("scripts/production-gap-gate.mjs", "production-gap-gate");
+if (!productionGapOk) {
+  blocker("production-gaps", "Required durable, fail-closed, or tutor coverage floors regressed");
+}
+
 // ---------------------------------------------------------------------------
 // 2a. Sprint 12.7 — env manifest gate.
 // Flags:

@@ -54,7 +54,7 @@ function devLookup(tenantId: string, learnerId: string, tutorKey?: string): stri
 export async function verifyConsent(args: {
   tenantId: string;
   learnerId: string;
-  ageBand: "6-9" | "10-12" | "13-15";
+  ageBand: "3-5" | "6-9" | "10-12" | "13-15";
 }): Promise<string> {
   const dev = devLookup(args.tenantId, args.learnerId);
   if (dev) return dev;
@@ -99,7 +99,7 @@ export async function verifyTutorConsent(args: {
   tenantId: string;
   learnerId: string;
   tutorKey: string;
-  ageBand?: "6-9" | "10-12" | "13-15";
+  ageBand?: "3-5" | "6-9" | "10-12" | "13-15";
 }): Promise<string> {
   const dev = devLookup(args.tenantId, args.learnerId, args.tutorKey);
   if (dev) return dev;

@@ -1,7 +1,7 @@
-"""Toolset surface used by the orchestrator (interface-only scaffold).
+"""Toolset protocol used by the production Speech Buddy orchestrator.
 
-The agent-core task implements concrete versions of these tools. This module
-just freezes the signatures so the rest of the platform can plan against them.
+Concrete tools live in ``tools_impl.py``; this module freezes the dependency
+contract so alternate implementations remain substitutable and testable.
 """
 from __future__ import annotations
 

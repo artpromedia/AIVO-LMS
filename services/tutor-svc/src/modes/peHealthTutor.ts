@@ -25,7 +25,7 @@ export const peHealthTutor: TutorDefinition = defineTutor({
   skillGraphRefs: ["prek-pe-health-foundations", "shape-pe-health-k2", "shape-pe-health-3-12"],
   defaultContentPackRefs: ["pe-health-k2-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -48,7 +48,7 @@ export const peHealthTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-pe-health",
-    status: "alpha",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_PE_HEALTH",
     subjectBrain: "pe_health",
     tracks: "fitness,health,dape",

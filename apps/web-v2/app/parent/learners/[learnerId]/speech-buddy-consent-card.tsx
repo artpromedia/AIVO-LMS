@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 const AGE_BANDS = [
+  { value: "3-5", key: "age_3_5" },
   { value: "6-9", key: "age_6_9" },
   { value: "10-12", key: "age_10_12" },
   { value: "13-15", key: "age_13_15" },

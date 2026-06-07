@@ -1,22 +1,14 @@
 /**
  * Math tutor — `@aivo/tutor-sdk` `TutorDefinition`.
  *
- * Demonstrates the v2.1 declarative-tutor pattern: per-mode authoring is
+ * Implements the v2.1 declarative-tutor pattern: per-mode authoring is
  * a `TutorDefinition` (data) consumed by `@aivo/tutor-runtime`, NOT a
- * bespoke `*.ts` per mode under `services/tutor-svc/src/modes/`. The
- * existing `speechBuddy.ts` is an interface-only scaffold for the pre-SDK
- * Speech Buddy session lifecycle and is preserved for that path; new
- * tutors should follow the shape below.
+ * bespoke runtime. Speech Buddy keeps its dedicated session lifecycle;
+ * all domain tutors use the shared agentic runtime.
  *
  * Skill graph ref points at the static CCSS K math graph shipped by
  * `@aivo/skill-graphs` (`ccss-math-k`). The default content-pack ref is
- * the placeholder `math-k-fall-2026` pack id; the actual pack is
- * authored separately and validated against `@aivo/content-pack`.
- *
- * NOTE: Authoring the full 14-tutor catalog is curriculum work that
- * lives outside the engineering tree. This file is the engineering
- * proof-of-wiring: it imports `defineTutor`, types check, and the
- * runtime can load the resulting `TutorDefinition` value.
+ * the authored and validated `math-k-fall-2026` content pack.
  */
 import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
 
@@ -37,7 +29,7 @@ export const mathTutor: TutorDefinition = defineTutor({
   skillGraphRefs: ["prek-math-foundations", "ccss-math-k", "ccss-math-1-8", "ccss-math-9-12"],
   defaultContentPackRefs: ["math-k-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -65,7 +57,7 @@ export const mathTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-math",
-    status: "scaffold",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_MATH",
   },
 });

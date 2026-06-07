@@ -17,28 +17,32 @@ describe("idempotency cache", () => {
     __resetIdempotencyCacheForTests();
   });
 
-  it("returns null when no entry has been cached", () => {
-    expect(readIdempotencyCache("t1", "/api/x", "key-1")).toBeNull();
+  it("returns null when no entry has been cached", async () => {
+    await expect(readIdempotencyCache("t1", "/api/x", "key-1")).resolves.toBeNull();
   });
 
-  it("round-trips a (tenant, route, key) entry", () => {
-    writeIdempotencyCache("t1", "/api/lesson-step", "abc-123", { ok: true, ref: 42 }, 200);
-    const cached = readIdempotencyCache("t1", "/api/lesson-step", "abc-123");
+  it("round-trips a (tenant, route, key) entry", async () => {
+    await writeIdempotencyCache("t1", "/api/lesson-step", "abc-123", { ok: true, ref: 42 }, 200);
+    const cached = await readIdempotencyCache("t1", "/api/lesson-step", "abc-123");
     expect(cached).toEqual({ body: { ok: true, ref: 42 }, status: 200 });
   });
 
-  it("scopes by tenant (a hash collision across tenants must not leak)", () => {
-    writeIdempotencyCache("tenant-A", "/api/x", "shared-key", { who: "A" }, 200);
-    writeIdempotencyCache("tenant-B", "/api/x", "shared-key", { who: "B" }, 200);
-    expect(readIdempotencyCache("tenant-A", "/api/x", "shared-key")?.body).toEqual({ who: "A" });
-    expect(readIdempotencyCache("tenant-B", "/api/x", "shared-key")?.body).toEqual({ who: "B" });
+  it("scopes by tenant (a hash collision across tenants must not leak)", async () => {
+    await writeIdempotencyCache("tenant-A", "/api/x", "shared-key", { who: "A" }, 200);
+    await writeIdempotencyCache("tenant-B", "/api/x", "shared-key", { who: "B" }, 200);
+    expect((await readIdempotencyCache("tenant-A", "/api/x", "shared-key"))?.body).toEqual({
+      who: "A",
+    });
+    expect((await readIdempotencyCache("tenant-B", "/api/x", "shared-key"))?.body).toEqual({
+      who: "B",
+    });
   });
 
-  it("scopes by route (same key on different endpoints is distinct)", () => {
-    writeIdempotencyCache("t1", "/api/x", "k", { from: "x" }, 200);
-    writeIdempotencyCache("t1", "/api/y", "k", { from: "y" }, 200);
-    expect(readIdempotencyCache("t1", "/api/x", "k")?.body).toEqual({ from: "x" });
-    expect(readIdempotencyCache("t1", "/api/y", "k")?.body).toEqual({ from: "y" });
+  it("scopes by route (same key on different endpoints is distinct)", async () => {
+    await writeIdempotencyCache("t1", "/api/x", "k", { from: "x" }, 200);
+    await writeIdempotencyCache("t1", "/api/y", "k", { from: "y" }, 200);
+    expect((await readIdempotencyCache("t1", "/api/x", "k"))?.body).toEqual({ from: "x" });
+    expect((await readIdempotencyCache("t1", "/api/y", "k"))?.body).toEqual({ from: "y" });
   });
 });
 

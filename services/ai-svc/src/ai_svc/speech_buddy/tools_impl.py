@@ -26,6 +26,16 @@ logger = logging.getLogger("ai-svc.speech_buddy.tools")
 # ---------------------------------------------------------------------------
 
 _SCENARIOS: dict[tuple[AgeBand, SkillTag], tuple[str, str, tuple[str, ...]]] = {
+    ("3-5", "name_a_feeling"): (
+        "name-feeling-35",
+        "Point to or say a feeling: happy, sad, mad, or worried. Which one fits right now?",
+        ("happy", "sad", "mad", "worried"),
+    ),
+    ("3-5", "ask_open_question"): (
+        "play-join-ask-35",
+        "Someone is playing with blocks. What could you say to ask to play too?",
+        ("can i", "play", "please", "?"),
+    ),
     ("6-9", "ask_open_question"): (
         "recess-join-ask-69",
         "You're at recess. Two kids are building with blocks. You want to play. What do you say?",
@@ -61,6 +71,7 @@ _SCENARIOS: dict[tuple[AgeBand, SkillTag], tuple[str, str, tuple[str, ...]]] = {
 # Fallback for any (band, skill) we haven't authored yet — keeps the agent
 # usable while the author backlog catches up.
 _FALLBACK_BY_BAND: dict[AgeBand, tuple[str, str, tuple[str, ...]]] = {
+    "3-5":   ("fallback-35",   "Show or tell me one thing that made you happy today.",            ("happy", "i", "me")),
     "6-9":   ("fallback-69",   "Tell me about a time you felt proud of yourself.",                ("i", "felt", "because")),
     "10-12": ("fallback-1012", "Tell me about something hard that happened this week.",          ("i", "felt", "because")),
     "13-15": ("fallback-1315", "Tell me about a choice you're trying to figure out right now.",  ("i", "but", "because", "or")),

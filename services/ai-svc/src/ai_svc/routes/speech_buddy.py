@@ -94,7 +94,7 @@ _orchestrator = DefaultOrchestrator(
 class StartSessionBody(BaseModel):
     tenantId: str = Field(..., min_length=1, max_length=128)
     learnerId: str = Field(..., min_length=1, max_length=128)
-    ageBand: str = Field(..., description="One of 6-9 / 10-12 / 13-15")
+    ageBand: str = Field(..., description="One of 3-5 / 6-9 / 10-12 / 13-15")
     locale: str = Field("en", min_length=2, max_length=16)
     consentRecordId: str = Field(..., min_length=1, max_length=128)
     targetedSkills: list[str] = Field(default_factory=lambda: ["ask_open_question"])

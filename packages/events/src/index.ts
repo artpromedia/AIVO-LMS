@@ -171,7 +171,7 @@ export interface RecommendationSuggestedPayload {
  */
 
 /** Age bands for Speech Buddy. Captured at consent time, never inferred. */
-export const AGE_BANDS = ["6-9", "10-12", "13-15"] as const;
+export const AGE_BANDS = ["3-5", "6-9", "10-12", "13-15"] as const;
 export type AgeBand = (typeof AGE_BANDS)[number];
 
 /**

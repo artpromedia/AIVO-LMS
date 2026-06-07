@@ -95,6 +95,13 @@ _default_store: Optional[TranscriptStore] = None
 def get_default_store() -> TranscriptStore:
     global _default_store
     if _default_store is None:
+        if (
+            os.environ.get("NODE_ENV") == "production"
+            or os.environ.get("ENV") == "production"
+        ) and not os.environ.get("SPEECH_BUDDY_TRANSCRIPT_DIR"):
+            raise RuntimeError(
+                "SPEECH_BUDDY_TRANSCRIPT_DIR is required in production and must point to durable storage"
+            )
         _default_store = FileTranscriptStore()
     return _default_store
 

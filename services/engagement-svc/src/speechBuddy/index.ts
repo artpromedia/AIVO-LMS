@@ -43,6 +43,7 @@ export interface DailyCapPolicy {
  * skill-graph task. Values match docs/products/speech-buddy/README.md.
  */
 export const DEFAULT_DAILY_CAPS: Readonly<Record<AgeBand, DailyCapPolicy>> = {
+  "3-5": { cap: 1 },
   "6-9": { cap: 1 },
   "10-12": { cap: 2 },
   "13-15": { cap: 3 },

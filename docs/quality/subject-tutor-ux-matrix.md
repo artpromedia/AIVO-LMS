@@ -4,7 +4,7 @@
 > Do not hand-edit — regenerated every run. See
 > `docs/SUBJECT_TUTOR_UX_GAP_ANALYSIS_AND_SPRINTS.md` for the rollout plan.
 
-> Snapshot: 2026-06-06
+> Snapshot: 2026-06-07
 
 **Legend** — **F** full · **P** partial (reachable, generic/fallback) · **H** hidden/unreachable · **O** orphan (tutor with no subject card).
 

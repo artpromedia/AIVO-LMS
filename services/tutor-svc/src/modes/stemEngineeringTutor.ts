@@ -31,7 +31,7 @@ export const stemEngineeringTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["stem-engineering-3-5-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -54,7 +54,7 @@ export const stemEngineeringTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-stem",
-    status: "alpha",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_STEM_DESIGN",
     subjectBrain: "stem_engineering",
   },

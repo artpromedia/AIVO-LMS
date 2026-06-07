@@ -6,6 +6,7 @@ import {
   type ImportPayload,
   type RosterImporterStores,
 } from "../services/roster-importer.js";
+import { importRosterPersistent } from "../persistence.js";
 
 const STORES: RosterImporterStores = createRosterImporterStores();
 
@@ -23,7 +24,7 @@ export function getRosterStoresForTest(): RosterImporterStores {
   return STORES;
 }
 
-export function registerRosterRoutes(app: FastifyInstance): void {
+export function registerRosterRoutes(app: FastifyInstance, db?: any): void {
   app.post<{ Body: ImportPayload }>("/api/rosters/import", async (request, reply) => {
     if (!request.body?.districtId) {
       return reply.code(400).send({ error: "districtId is required" });
@@ -40,7 +41,9 @@ export function registerRosterRoutes(app: FastifyInstance): void {
         enrollments: request.body.enrollments?.length ?? 0,
       },
     });
-    const result = importRoster(request.body, STORES);
+    const result = db
+      ? await importRosterPersistent(db, request.body)
+      : importRoster(request.body, STORES);
     void emitAuditEvent({
       actorRole: "district_admin",
       action: "sis_import_completed",

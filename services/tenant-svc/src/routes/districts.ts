@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { audited } from "@aivo/audit-client";
+import { tenantServiceDistricts } from "../persistence.js";
 
 interface DistrictRecord {
   id: string;
@@ -14,7 +15,7 @@ export function clearDistrictsForTest(): void {
   DISTRICTS.clear();
 }
 
-export function registerDistrictRoutes(app: FastifyInstance): void {
+export function registerDistrictRoutes(app: FastifyInstance, db?: any): void {
   app.post<{ Body: { name: string; externalId?: string } }>(
     "/api/districts",
     {
@@ -32,6 +33,13 @@ export function registerDistrictRoutes(app: FastifyInstance): void {
       if (!request.body?.name) {
         return reply.code(400).send({ error: "name is required" });
       }
+      if (db) {
+        const [record] = await db
+          .insert(tenantServiceDistricts)
+          .values({ name: request.body.name, externalId: request.body.externalId ?? null })
+          .returning();
+        return reply.code(201).send(record);
+      }
       const record: DistrictRecord = {
         id: randomUUID(),
         name: request.body.name,
@@ -42,5 +50,7 @@ export function registerDistrictRoutes(app: FastifyInstance): void {
     },
   );
 
-  app.get("/api/districts", async () => ({ districts: Array.from(DISTRICTS.values()) }));
+  app.get("/api/districts", async () => ({
+    districts: db ? await db.select().from(tenantServiceDistricts) : Array.from(DISTRICTS.values()),
+  }));
 }

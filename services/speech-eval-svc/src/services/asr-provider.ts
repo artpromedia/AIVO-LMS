@@ -2,18 +2,17 @@
  * ASR provider interface (Sprint F — completion plan).
  *
  * Splits the speech-eval-svc evaluate route from a specific transcription
- * backend. The route picks a provider via env at request time and falls
- * back to the mock scorer when no provider is configured.
+ * backend. The route picks a provider via env at request time and reports
+ * service unavailability when no provider is configured.
  *
  *   ASR_PROVIDER=openai   → OpenAiWhisperProvider (uses OPENAI_API_KEY)
  *   ASR_PROVIDER=azure    → AzureSpeechProvider   (uses AZURE_SPEECH_KEY +
  *                                                   AZURE_SPEECH_REGION)
- *   ASR_PROVIDER unset    → NullProvider (returns `unavailable`, caller
- *                                          falls back to the mock scorer)
+ *   ASR_PROVIDER unset    → NullProvider (returns `unavailable`)
  *
- * Every provider must return either an `ok` transcript or `unavailable` —
- * provider errors never throw out of `transcribe()`. The route stays
- * non-blocking for learners: bad-network → mock scores → lesson advances.
+ * Every provider must return either an `ok` transcript or `unavailable`;
+ * provider errors never throw out of `transcribe()`. The route converts an
+ * unavailable result into a retryable 503 without generating assessment data.
  */
 
 export interface AsrTranscript {

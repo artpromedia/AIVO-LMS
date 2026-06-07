@@ -48,6 +48,7 @@ export const homeworkSessions = pgTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     tutorSku: varchar("tutor_sku", { length: 100 }),
     messages: jsonb("messages").notNull().default([]),
+    runtimeState: jsonb("runtime_state").notNull().default({}),
     completionQuality: numeric("completion_quality", { precision: 3, scale: 2 }),
     problemsAttempted: integer("problems_attempted").default(0),
     problemsCompleted: integer("problems_completed").default(0),

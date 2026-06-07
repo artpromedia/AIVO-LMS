@@ -150,9 +150,8 @@ const PARITY_MATRIX = {
     { web: "/learner/home", mobile: "(learner)/index", status: P },
     {
       web: "/learner/calm",
-      mobile: null,
-      status: MISSING,
-      gap: "Calm Corner activities, persistence, and learner controls are not implemented on mobile.",
+      mobile: "(learner)/calm",
+      status: P,
     },
     {
       web: "/learner/select",

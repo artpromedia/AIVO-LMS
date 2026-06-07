@@ -320,7 +320,135 @@
         "date": "2026-06-06",
         "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
       }
+    ],
+    "prek-math-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-ela-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-writing-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-science-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-sel-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-speech-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-executive-function-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-life-skills-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-creative-arts-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-social-studies-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-world-languages-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-coding-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-geography-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-music-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-pe-health-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
+    ],
+    "prek-stem-engineering-foundations": [
+      {
+        "reviewer": "project-owner-attestation",
+        "role": "human-review-attestation",
+        "date": "2026-06-07",
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+      }
     ]
   },
-  "_pending_review": "PRE_K and ADULT coverage remains separately scoped. All K-12 graph promotions are backed by the project owner's human-review attestation dated 2026-06-06."
+  "_pending_review": "All PRE-K and K-12 graph promotions are backed by project-owner human-review attestations dated 2026-06-06 and 2026-06-07."
 }

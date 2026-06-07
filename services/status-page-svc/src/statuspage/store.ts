@@ -1,8 +1,7 @@
 /**
- * In-memory status-page store with deterministic seed data.
- *
- * The authoritative schema lives in src/db/migrations/*.sql. Seeds give the
- * public page and admin console demoable content without a database.
+ * Runtime status-page model. Production hydrates and persists this state
+ * through the service runtime-state table; deterministic seed data is
+ * restricted to local development and tests.
  */
 import { randomUUID } from "node:crypto";
 import type {
@@ -25,6 +24,16 @@ export function spId(prefix: string): string {
   return `${prefix}_${randomUUID().slice(0, 12)}`;
 }
 
+export function createEmptyStatusStore(): StatusPageStore {
+  return {
+    components: new Map(),
+    incidents: new Map(),
+    updates: new Map(),
+    maintenances: new Map(),
+    subscribers: new Map(),
+  };
+}
+
 function ago(mins: number): string {
   return new Date(Date.now() - mins * 60_000).toISOString();
 }
@@ -33,13 +42,7 @@ function ahead(mins: number): string {
 }
 
 export function createSeededStatusStore(): StatusPageStore {
-  const store: StatusPageStore = {
-    components: new Map(),
-    incidents: new Map(),
-    updates: new Map(),
-    maintenances: new Map(),
-    subscribers: new Map(),
-  };
+  const store = createEmptyStatusStore();
 
   const components: StatusComponent[] = [
     {
@@ -152,12 +155,21 @@ export function createSeededStatusStore(): StatusPageStore {
 }
 
 let singleton: StatusPageStore | null = null;
+function createDefaultStatusStore(): StatusPageStore {
+  return process.env.NODE_ENV === "production" ? createEmptyStatusStore() : createSeededStatusStore();
+}
+
 export function getStatusStore(): StatusPageStore {
-  if (!singleton) singleton = createSeededStatusStore();
+  if (!singleton) singleton = createDefaultStatusStore();
   return singleton;
 }
 export function resetStatusStore(): StatusPageStore {
-  singleton = createSeededStatusStore();
+  singleton = createDefaultStatusStore();
+  return singleton;
+}
+
+export function replaceStatusStore(store: StatusPageStore): StatusPageStore {
+  singleton = store;
   return singleton;
 }
 

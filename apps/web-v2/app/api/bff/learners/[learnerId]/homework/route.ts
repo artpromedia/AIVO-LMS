@@ -113,7 +113,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       attachment,
     });
     // Seed turn-0 tutor reply so the learner sees something to react to.
-    const opener = generateGuidedReply({ topic, subjectId, turn: 0 });
+    const opener = await generateGuidedReply({
+      topic,
+      subjectId,
+      turn: 0,
+      learnerId,
+      tenantId: session!.tenantId,
+    });
     const withOpener = appendHomeworkMessage(created.id, session!.tenantId, {
       role: "tutor",
       text: opener.text,

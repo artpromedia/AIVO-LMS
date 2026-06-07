@@ -29,7 +29,7 @@ import {
   revokeSpeechBuddyConsentSchema,
 } from "./schemas.js";
 
-const AGE_BANDS = ["6-9", "10-12", "13-15"];
+const AGE_BANDS = ["3-5", "6-9", "10-12", "13-15"];
 const SCOPE = "speech_buddy";
 
 function devLookup(tenantId: string, learnerId: string): string | null {
@@ -97,7 +97,7 @@ export async function registerSpeechBuddyConsentRoutes(app: FastifyInstance) {
       const { learnerId } = req.params as { learnerId: string };
       const { ageBand } = (req.body as any) || {};
       if (!ageBand || !AGE_BANDS.includes(ageBand)) {
-        return reply.code(400).send({ error: "ageBand must be 6-9 / 10-12 / 13-15" });
+        return reply.code(400).send({ error: "ageBand must be 3-5 / 6-9 / 10-12 / 13-15" });
       }
       if (!(await verifyParentOwnership(db, auth.sub, learnerId))) {
         return reply.code(403).send({ error: "Forbidden" });
@@ -176,7 +176,7 @@ export async function registerSpeechBuddyConsentRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: "tenantId, learnerId and ageBand required" });
       }
       if (!AGE_BANDS.includes(ageBand)) {
-        return reply.code(400).send({ error: "ageBand must be 6-9 / 10-12 / 13-15" });
+        return reply.code(400).send({ error: "ageBand must be 3-5 / 6-9 / 10-12 / 13-15" });
       }
 
       // Real DB grant takes precedence. Guard against malformed (non-uuid)

@@ -126,6 +126,10 @@ def get_default_async_judge() -> Optional[AsyncJudgeFn]:
             return await llm_judge_classify(t, s)
 
         return _judge
+    if os.environ.get("NODE_ENV") == "production" or os.environ.get("ENV") == "production":
+        raise RuntimeError(
+            "SPEECH_BUDDY_JUDGE_PROVIDER=llm is required in production; stub safety judge is forbidden"
+        )
     return None
 
 

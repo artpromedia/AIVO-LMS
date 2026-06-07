@@ -85,9 +85,16 @@ export default function HomeworkScreen() {
 
   const onAssignmentPress = async (a: HomeworkAssignment) => {
     if (a.status !== "READY" && a.status !== "IN_PROGRESS") {
-      // Other statuses (PROCESSING/COMPLETED/FAILED) aren't actionable from
-      // the chat view; surface a status alert instead of routing to a stub.
-      Alert.alert(t("learnerHomework.title"), t("learnerHomework.openOnWeb"));
+      const statusLabel = t(`learnerHomework.status.${a.status}`, {
+        defaultValue: a.status,
+      });
+      Alert.alert(
+        t("learnerHomework.title"),
+        t("learnerHomework.statusUnavailable", {
+          status: statusLabel,
+          defaultValue: `This homework is currently ${statusLabel}.`,
+        }),
+      );
       return;
     }
     if (!user?.id) return;
@@ -98,7 +105,12 @@ export default function HomeworkScreen() {
       });
       router.push(`/(learner)/homework/${result.sessionId}` as Href);
     } catch {
-      Alert.alert(t("learnerHomework.title"), t("learnerHomework.openOnWeb"));
+      Alert.alert(
+        t("learnerHomework.title"),
+        t("learnerHomework.sessionStartFailed", {
+          defaultValue: "We couldn't start this homework session. Please try again.",
+        }),
+      );
     }
   };
 

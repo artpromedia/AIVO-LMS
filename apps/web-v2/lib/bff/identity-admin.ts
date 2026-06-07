@@ -28,12 +28,16 @@ const WEB_TO_WIRE: Record<string, string> = {
 type ServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; error: string };
 
 export function isIdentitySvcEnabled(): boolean {
+  if (process.env.NODE_ENV === "production") return true;
   return serverEnv.AIVO_USE_IDENTITY_SVC ?? serverEnv.AIVO_USE_SERVICE_STACK;
 }
 
 export async function getAdminBearer(): Promise<string | null> {
   const jar = await cookies();
   const token = jar.get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
+  if (!token && process.env.NODE_ENV === "production") {
+    throw new Error("identity-svc access token is required in production");
+  }
   return token ? `Bearer ${token}` : null;
 }
 

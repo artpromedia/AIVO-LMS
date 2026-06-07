@@ -20,6 +20,7 @@ type ServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; err
 
 /** Resolve the identity-svc flag: per-service override, else the stack flag. */
 export function isIdentitySvcEnabled(): boolean {
+  if (process.env.NODE_ENV === "production") return true;
   return serverEnv.AIVO_USE_IDENTITY_SVC ?? serverEnv.AIVO_USE_SERVICE_STACK;
 }
 
@@ -31,6 +32,9 @@ export function isIdentitySvcEnabled(): boolean {
 export async function getIdentityBearer(): Promise<string | null> {
   const jar = await cookies();
   const token = jar.get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
+  if (!token && process.env.NODE_ENV === "production") {
+    throw new Error("identity-svc access token is required in production");
+  }
   return token ? `Bearer ${token}` : null;
 }
 

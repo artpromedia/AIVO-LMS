@@ -3,10 +3,8 @@
  *
  * Items reference skillIds whose substring matches `writing` so the
  * coverage scanner attributes every item to the `writing` subject.
- * Writing tasks default to short-text capture; production scoring is
- * rubric-based and lives in tutor-svc / assessment-svc — the items
- * here carry a placeholder rubric body so the surface renders an answer
- * box and the scorer can grade in a later pass.
+ * Open-response tasks carry a reviewed analytic rubric for the
+ * production scoring paths in tutor-svc and assessment-svc.
  */
 import type { Item, ItemVariant } from "./types.js";
 

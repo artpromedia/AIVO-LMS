@@ -20,9 +20,9 @@ import { describe, expect, it } from "vitest";
 // rollup-based parser chokes on. The age-tier helpers are pure TS and
 // safe to import directly.
 import { gradeToTier as gradeToTierMobile } from "@aivo/mobile-ui/src/tierTheme";
-// Web counterpart, resolved to its source via the test-only alias.
-// eslint-disable-next-line import/no-unresolved -- @aivo/learner-ui is not a mobile dependency; the age-tiers source is wired in via a vitest-only alias (see vitest.config.ts)
-import { gradeToTier as gradeToTierWeb } from "@aivo/learner-ui/src/tokens/age-tiers";
+// Web counterpart imported directly because learner-ui is intentionally not
+// a runtime dependency of the React Native application.
+import { gradeToTier as gradeToTierWeb } from "../../../packages/learner-ui/src/tokens/age-tiers";
 
 interface Case {
   input: string | number | null | undefined;

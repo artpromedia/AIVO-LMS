@@ -18,6 +18,7 @@
     "@aivo/ops-alerts": "workspace:*",
     "@aivo/scheduling": "workspace:*",
     "@aivo/security": "workspace:*",
+    "@aws-sdk/client-s3": "^3.654.0",
     "@fastify/cors": "^11.0.0",
     "@fastify/swagger": "^9.6.0",
     "@fastify/swagger-ui": "^5.2.2",

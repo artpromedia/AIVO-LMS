@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status | Count |
 | ------ | ----- |
-| Parity | 113 |
+| Parity | 114 |
 | Partial | 0 |
-| Missing | 1 |
+| Missing | 0 |
 | **In-scope total** | **114** |
 
-Full parity: **99%**. 22 web-only routes excluded.
+Full parity: **100%**. 22 web-only routes excluded.
 
 ## Surface-Type Parity
 
@@ -139,7 +139,7 @@ Both learner subject grids consume the canonical `getDiscoverableSubjects()` reg
 | Web route | Mobile screen | Status | Gap / Ticket |
 | --------- | ------------- | ------ | ------------ |
 | `/learner/home` | `(learner)/index` | Parity | — |
-| `/learner/calm` | — | **Missing** | Calm Corner activities, persistence, and learner controls are not implemented on mobile. |
+| `/learner/calm` | `(learner)/calm` | Parity | — |
 | `/learner/select` | `(auth)/session-switch` | Parity | — |
 | `/learner/subjects` | `(learner)/subjects/index` | Parity | — |
 | `/learner/subjects/[subjectId]` | `(learner)/subjects/[subjectId]` | Parity | — |

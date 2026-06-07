@@ -17,7 +17,9 @@ a single instance via tutor-svc's session router (the WS endpoint).
 """
 from __future__ import annotations
 
+import json
 import logging
+import os
 import secrets
 import time
 import uuid
@@ -25,7 +27,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-from .encryption import EncryptedTranscript, encrypt_transcript
+from .encryption import EncryptedTranscript, decrypt_transcript, encrypt_transcript
 from .events import EventEmitter, hash_learner_id
 from .safety import HARD_CATEGORIES, SafetyDecision, SafetyFilter
 from .llm_judge import get_default_async_judge
@@ -105,7 +107,7 @@ class TurnOutcome:
 
 
 class DefaultOrchestrator:
-    """In-memory Speech Buddy orchestrator."""
+    """Speech Buddy orchestrator with encrypted durable session snapshots."""
 
     def __init__(
         self,
@@ -130,11 +132,90 @@ class DefaultOrchestrator:
         self.max_roleplay_turns = max_roleplay_turns
         self._sessions: dict[str, _SessionRecord] = {}
 
+    def _state_storage_id(self, session_id: str) -> str:
+        return f"{session_id}-state"
+
+    def _persist_session(self, rec: _SessionRecord) -> None:
+        state = {
+            "session": asdict(rec.session),
+            "targeted_skill": rec.targeted_skill,
+            "scenario_id": rec.scenario_id,
+            "scenario_text": rec.scenario_text,
+            "turns": [asdict(turn) for turn in rec.turns],
+            "transcript_lines": rec.transcript_lines,
+            "skill_evidence_totals": rec.skill_evidence_totals,
+            "soft_flag_counts": rec.soft_flag_counts,
+            "ended": rec.ended,
+            "ended_reason": rec.ended_reason,
+            "terminal_flag": asdict(rec.terminal_flag) if rec.terminal_flag else None,
+            "last_latency_breakdown": rec.last_latency_breakdown,
+            "quest_assigned": list(rec.quest_assigned) if rec.quest_assigned else None,
+            "roleplay_turns": rec.roleplay_turns,
+            "transcript_storage_uri": rec.transcript_storage_uri,
+        }
+        encrypted = encrypt_transcript(
+            rec.session.tenant_id,
+            json.dumps(state, separators=(",", ":")),
+        )
+        try:
+            self.transcript_store.put(
+                session_id=self._state_storage_id(rec.session.id),
+                transcript=encrypted,
+            )
+        except Exception:
+            if os.environ.get("NODE_ENV") == "production" or os.environ.get("ENV") == "production":
+                raise
+            logger.exception("speech_buddy.session_state_persist_failed")
+
+    def _load_session(self, session_id: str, tenant_id: str) -> Optional[_SessionRecord]:
+        encrypted = self.transcript_store.get(
+            tenant_id=tenant_id,
+            session_id=self._state_storage_id(session_id),
+        )
+        if encrypted is None:
+            return None
+        state = json.loads(decrypt_transcript(encrypted))
+        session_data = state["session"]
+        session_data["targeted_skills"] = tuple(session_data.get("targeted_skills", ()))
+        session = SpeechBuddySession(**session_data)
+        turns = []
+        for raw_turn in state.get("turns", []):
+            raw_turn["skill_evidence"] = tuple(
+                tuple(item) for item in raw_turn.get("skill_evidence", ())
+            )
+            raw_turn["safety_flags"] = tuple(
+                SafetyFlag(**flag) for flag in raw_turn.get("safety_flags", ())
+            )
+            turns.append(TurnEvent(**raw_turn))
+        terminal = state.get("terminal_flag")
+        started = datetime.fromisoformat(session.started_at)
+        elapsed = max(0.0, (datetime.now(timezone.utc) - started).total_seconds())
+        rec = _SessionRecord(
+            session=session,
+            targeted_skill=state["targeted_skill"],
+            scenario_id=state["scenario_id"],
+            scenario_text=state["scenario_text"],
+            turns=turns,
+            transcript_lines=list(state.get("transcript_lines", [])),
+            skill_evidence_totals=dict(state.get("skill_evidence_totals", {})),
+            soft_flag_counts=dict(state.get("soft_flag_counts", {})),
+            started_perf=_now() - elapsed,
+            ended=bool(state.get("ended", False)),
+            ended_reason=state.get("ended_reason", "completed"),
+            terminal_flag=SafetyFlag(**terminal) if terminal else None,
+            last_latency_breakdown=dict(state.get("last_latency_breakdown", {})),
+            quest_assigned=tuple(state["quest_assigned"]) if state.get("quest_assigned") else None,
+            roleplay_turns=int(state.get("roleplay_turns", 0)),
+            transcript_storage_uri=state.get("transcript_storage_uri"),
+        )
+        self._sessions[session_id] = rec
+        return rec
+
     # ---- session ownership check ------------------------------------------
 
     def assert_owner(self, session_id: str, *, tenant_id: str, learner_id: str) -> None:
         """Raise PermissionError if (tenant_id, learner_id) doesn't own the session."""
-        rec = self._sessions.get(session_id)
+        rec = self._sessions.get(session_id) or self._load_session(session_id, tenant_id)
         if rec is None:
             raise KeyError(session_id)
         if rec.session.tenant_id != tenant_id or rec.session.learner_id != learner_id:
@@ -177,6 +258,7 @@ class DefaultOrchestrator:
             scenario_id=scenario_id,
             scenario_text=scenario_text,
         )
+        self._persist_session(self._sessions[session_id])
         self.emitter.session_started(
             session_id=session_id,
             age_band=age_band,
@@ -364,6 +446,7 @@ class DefaultOrchestrator:
             total_ms=total_ms,
         )
         rec.last_latency_breakdown = trace.as_dict()
+        self._persist_session(rec)
         await self.emitter.flush_events()
         return TurnOutcome(
             buddy_text=buddy_text,
@@ -408,6 +491,7 @@ class DefaultOrchestrator:
                 quest_assigned=quest[0] if quest else None,
                 ended_reason=rec.ended_reason,
             )
+            self._persist_session(rec)
         # Reflection prompts (deterministic).
         reflection_prompts = self._reflection_prompts(rec)
         await self.emitter.flush_events()

@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import { installAuditing } from "@aivo/audit-client";
 import { registerEnterpriseAuthHook } from "@aivo/enterprise-core";
 import { registerObservabilityPlugin } from "@aivo/observability";
+import { createDb } from "@aivo/db";
 import { registerDistrictRoutes } from "./routes/districts.js";
 import { registerSchoolRoutes } from "./routes/schools.js";
 import { registerClassRoutes } from "./routes/classes.js";
@@ -11,6 +12,7 @@ import { registerGovernanceRoutes } from "./routes/governance.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
+  db?: any;
 }
 
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
@@ -24,10 +26,14 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   if (!options.skipAuth) {
     registerEnterpriseAuthHook(app, { sourceService: "tenant-svc" });
   }
-  registerDistrictRoutes(app);
-  registerSchoolRoutes(app);
-  registerClassRoutes(app);
-  registerRosterRoutes(app);
-  registerGovernanceRoutes(app);
+  const db = options.db ?? (process.env.DATABASE_URL ? createDb(process.env.DATABASE_URL) : null);
+  if (!db && process.env.NODE_ENV === "production") {
+    throw new Error("tenant-svc: DATABASE_URL is required in production; process-local authority stores are forbidden");
+  }
+  registerDistrictRoutes(app, db);
+  registerSchoolRoutes(app, db);
+  registerClassRoutes(app, db);
+  registerRosterRoutes(app, db);
+  registerGovernanceRoutes(app, db);
   return app;
 }

@@ -1,16 +1,9 @@
-/**
- * Sprint 17: Homework Helper guided tutor (stub).
- *
- * Real LLM wiring lives in Sprint 23. Until then we use a deterministic
- * mock that follows the same contract the LLM will: **guide, don't answer**.
- * For arithmetic / spelling problems the tutor explicitly withholds the
- * final answer and instead nudges the learner toward the next step.
- */
 import type { HomeworkHelpMessage } from "@/lib/db/types";
+import { serverEnv } from "@/lib/env";
+import { callService } from "@/lib/services/client";
 
 export type SubjectSlug = "reading" | "math" | "writing" | "science" | "social" | "life" | "art";
 
-/** Best-effort classifier from the topic text alone. Null when we can't tell. */
 export function classifySubject(topic: string): SubjectSlug | null {
   const t = topic.toLowerCase();
   if (/\b\d+\s*[+\-*/x×÷]\s*\d+|add|subtract|multiply|divide|fraction|times table|equation/.test(t))
@@ -27,64 +20,114 @@ export function classifySubject(topic: string): SubjectSlug | null {
 type GuidedReplyInput = {
   topic: string;
   subjectId: string | null;
-  /** Number of prior tutor messages, so the tutor varies its prompts. */
   turn: number;
-  /** Optional latest learner message — drives clarifying vs guiding tone. */
   latestLearnerMessage?: string;
+  learnerId?: string;
+  tenantId?: string;
+  functioningLevel?: string;
 };
 
-/**
- * Returns a guided reply that never includes the final numeric/spelling
- * answer. The mock is deterministic per (turn, subject) so tests can rely
- * on it; in production this is replaced by a prompted LLM call with the
- * same `guidedOnly` contract.
- */
-export function generateGuidedReply(
+type HomeworkChatResponse = {
+  response: string;
+  model: string;
+};
+
+function deterministicGuidedReply(
   input: GuidedReplyInput,
 ): Pick<HomeworkHelpMessage, "text" | "guidedOnly"> {
   const { topic, turn, latestLearnerMessage } = input;
   const subj = classifySubject(topic);
-  // Turn 0 = first tutor reply right after the session is created.
   if (turn === 0) {
     return {
       guidedOnly: true,
       text:
         subj === "math"
-          ? `Got it — that looks like a math problem. Can you tell me what you've tried so far, even if you're not sure?`
+          ? "That looks like a math problem. What have you tried so far?"
           : subj === "writing"
-            ? `Nice — writing time. Read it out loud once. What part feels tricky?`
+            ? "Read it out loud once. What part feels tricky?"
             : subj === "reading"
-              ? `Cool, a reading question. Can you tell me one thing you already know about it?`
-              : `Thanks for sharing. What part feels hardest right now?`,
+              ? "Tell me one thing you already know about it."
+              : "What part feels hardest right now?",
     };
   }
-  // Mid-session: explain a concept without giving the answer.
   if (turn === 1) {
     return {
       guidedOnly: true,
       text:
         subj === "math"
-          ? `Let's break it into steps. What's the very first number you'd write down? (I won't tell you the final answer — you'll find it!)`
+          ? "Let's break it into steps. What is the first number you would write down?"
           : subj === "writing"
-            ? `Try saying the sentence out loud. Which word doesn't sound right?`
-            : `Tell me the first step you'd try. I'll help you check it.`,
+            ? "Try saying the sentence out loud. Which word does not sound right?"
+            : "Tell me the first step you would try. I will help you check it.",
     };
   }
-  // Later turns: prompt for self-check.
   const learnerHint = latestLearnerMessage?.slice(0, 120) ?? "";
   return {
     guidedOnly: true,
     text:
       subj === "math"
-        ? `Good thinking. Now check your work: does the answer feel about the right size? ${learnerHint ? "You said: " + learnerHint + "." : ""}`
-        : `You're getting closer. Read back what you wrote — does it match what you meant to say?`,
+        ? `Check your work: does the result feel about the right size? ${learnerHint ? `You said: ${learnerHint}.` : ""}`
+        : "Read back what you wrote. Does it match what you meant to say?",
   };
 }
 
-/**
- * Builds the plain-language "insight" we store when the session ends.
- * Shown to the parent (never raw messages).
- */
+function useLiveAgent(): boolean {
+  if (serverEnv.NODE_ENV === "production") return true;
+  return serverEnv.AIVO_USE_AI_SVC ?? serverEnv.AIVO_USE_SERVICE_STACK;
+}
+
+export async function generateGuidedReply(
+  input: GuidedReplyInput,
+): Promise<Pick<HomeworkHelpMessage, "text" | "guidedOnly">> {
+  if (!useLiveAgent()) return deterministicGuidedReply(input);
+  if (serverEnv.NODE_ENV === "production" && !serverEnv.INTERNAL_AI_TOKEN) {
+    throw new Error("INTERNAL_AI_TOKEN is required for production homework tutor calls");
+  }
+
+  const result = await callService<HomeworkChatResponse>({
+    service: "ai-svc",
+    baseUrl: serverEnv.AI_SVC_URL,
+    url: "/api/ai/homework/chat",
+    method: "POST",
+    headers: serverEnv.INTERNAL_AI_TOKEN
+      ? { "X-Internal-Auth": serverEnv.INTERNAL_AI_TOKEN }
+      : undefined,
+    body: {
+      tutor_sku: `ADDON_TUTOR_${(input.subjectId ?? classifySubject(input.topic) ?? "GENERAL").toUpperCase()}`,
+      learner_id: input.learnerId ?? "unknown",
+      functioning_level: input.functioningLevel ?? "STANDARD",
+      brain_context: {
+        learner_id: input.learnerId,
+        tenant_id: input.tenantId,
+      },
+      homework_context: {
+        subject: input.subjectId ?? classifySubject(input.topic) ?? "general",
+        adapted_problems: [{ problem_number: 1, adapted: input.topic }],
+      },
+      messages: [
+        {
+          role: "user",
+          content:
+            input.latestLearnerMessage ??
+            `Help me get started on this topic without giving me the answer: ${input.topic}`,
+        },
+      ],
+      max_tokens: 500,
+    },
+    retries: 1,
+  });
+
+  if (result.ok && result.data.response.trim()) {
+    return { text: result.data.response.trim(), guidedOnly: true };
+  }
+  if (serverEnv.NODE_ENV === "production") {
+    throw new Error(
+      `ai-svc homework tutor unavailable: ${result.ok ? "empty response" : result.message}`,
+    );
+  }
+  return deterministicGuidedReply(input);
+}
+
 export function buildHomeworkInsight(topic: string, messageCount: number): string {
   const subj = classifySubject(topic);
   const base = `Worked through a ${subj ?? "general"} problem about "${topic}".`;
@@ -92,5 +135,5 @@ export function buildHomeworkInsight(topic: string, messageCount: number): strin
     return `${base} The learner worked through several back-and-forth steps with the tutor.`;
   if (messageCount >= 2)
     return `${base} The learner asked for help and worked through a couple of guiding steps.`;
-  return `${base} A short check-in — the learner asked for help and got started.`;
+  return `${base} A short check-in; the learner asked for help and got started.`;
 }

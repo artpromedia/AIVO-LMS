@@ -30,7 +30,7 @@ export const historyTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["history-3-5-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -53,7 +53,7 @@ export const historyTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-social-studies",
-    status: "scaffold",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_HISTORY",
   },
 });

@@ -8,6 +8,7 @@ import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 const AGE_BANDS = [
+  { value: "3-5", label: "3-5" },
   { value: "6-9", label: "6–9" },
   { value: "10-12", label: "10–12" },
   { value: "13-15", label: "13–15" },

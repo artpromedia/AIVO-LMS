@@ -30,7 +30,7 @@ export const creativeArtsTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["creative-arts-k2-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -53,7 +53,7 @@ export const creativeArtsTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-creative-arts",
-    status: "alpha",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_CREATIVE_WRITING",
     subjectBrain: "creative_arts",
   },

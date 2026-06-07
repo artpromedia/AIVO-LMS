@@ -168,7 +168,7 @@ const serverSchema = z.object({
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z
     .union([z.literal("true"), z.literal("false")])
-    .default("false")
+    .default(isProd ? "true" : "false")
     .transform((v) => v === "true"),
   AIVO_USE_BRAIN_SVC: z
     .union([z.literal("true"), z.literal("false")])

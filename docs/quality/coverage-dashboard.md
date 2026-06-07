@@ -9,27 +9,27 @@
 
 | Tutor | PRE_K | K | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | ADULT |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| atlas | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| cadence | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| chrono | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| compass | S | A | A | A | A | A | A | A | A | A | A | A | A | A | S |
+| atlas | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| cadence | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| chrono | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| compass | A | A | A | A | A | A | A | A | A | A | A | A | A | A | A |
 | echo | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| forge | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| harmony | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| lingua | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| muse | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| nova | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| pixel | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| sage | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| spark | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
-| vigor | S | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| forge | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| harmony | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| lingua | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| muse | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| nova | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| pixel | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| sage | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| spark | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
+| vigor | A | A | A | A | A | A | A | A | A | A | A | A | A | A | · |
 
 ## Aggregate
 
 | Status | Count |
 | --- | ---: |
-| authored | 183 |
-| scaffold | 14 |
+| authored | 197 |
+| scaffold | 0 |
 | missing | 0 |
 
 See `docs/quality/tutor-k12-coverage-gap-plan.md` for the rollout plan and `docs/quality/tutor-content-signoffs.json` for the SME sign-off ledger.

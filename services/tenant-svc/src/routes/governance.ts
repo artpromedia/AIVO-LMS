@@ -6,6 +6,7 @@ import {
   type ExportResult,
 } from "@aivo/enterprise-core";
 import { getRosterStores } from "./rosters.js";
+import { eraseRosterSubject, exportRosterSubject } from "../persistence.js";
 
 /**
  * DSAR (erase / export) handlers for tenant-svc.
@@ -20,11 +21,12 @@ import { getRosterStores } from "./rosters.js";
  * durable Drizzle handle these handlers should additionally erase/export the
  * persisted tenant/user rows; the in-memory sweep below remains correct.
  */
-export function registerGovernanceRoutes(app: FastifyInstance): void {
+export function registerGovernanceRoutes(app: FastifyInstance, db?: any): void {
   registerGovernanceSubscriber(app, {
     service: "tenant-svc",
 
     async erase(req: GovernanceSubjectRequest): Promise<EraseResult> {
+      if (db) return { counts: await eraseRosterSubject(db, req.subjectId, req.tenantId) };
       const stores = getRosterStores();
       const subjectId = req.subjectId;
       const counts: Record<string, number> = {};
@@ -48,6 +50,7 @@ export function registerGovernanceRoutes(app: FastifyInstance): void {
     },
 
     async export(req: GovernanceSubjectRequest): Promise<ExportResult> {
+      if (db) return exportRosterSubject(db, req.subjectId, req.tenantId);
       const stores = getRosterStores();
       const subjectId = req.subjectId;
 

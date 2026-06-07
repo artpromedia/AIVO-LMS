@@ -1,0 +1,7 @@
+BEGIN;
+
+ALTER TABLE evidence_bundles
+  ADD COLUMN IF NOT EXISTS storage_uri VARCHAR(2048),
+  ADD COLUMN IF NOT EXISTS retention_until TIMESTAMPTZ;
+
+COMMIT;

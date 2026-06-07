@@ -27,4 +27,5 @@ export {
   elaKFall2026,
   scienceKFall2026,
   codingK2Fall2026,
+  AUTHORED_SUBJECT_PACKS,
 } from "./seeds/index.js";

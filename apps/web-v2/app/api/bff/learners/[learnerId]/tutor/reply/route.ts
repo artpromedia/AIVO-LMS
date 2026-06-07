@@ -124,11 +124,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       return ok({ reply: { role: "tutor", text: fallback }, blocked: true }, requestId);
     }
 
-    const reply = generateGuidedReply({
+    const reply = await generateGuidedReply({
       topic,
       subjectId: null,
       turn: priorTurnCount,
       latestLearnerMessage: sanitized.cleaned,
+      learnerId,
+      tenantId: session!.tenantId,
     });
 
     // Post-classify the tutor output and substitute a safe fallback when

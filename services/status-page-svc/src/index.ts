@@ -5,6 +5,7 @@ import swaggerUI from "@fastify/swagger-ui";
 import { createLogger } from "@aivo/observability";
 import { registerOtelPlugin } from "@aivo/otel-bootstrap";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
+import { createDb } from "@aivo/db";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerStatusRoutes } from "./routes/status.js";
 import { registerOpsAlertsOutboxRoutes } from "./routes/ops-alerts-outbox.js";
@@ -14,11 +15,12 @@ import { registerUpdateRoutes } from "./routes/updates.js";
 import { registerMaintenanceRoutes } from "./routes/maintenances.js";
 import { registerSubscriberRoutes } from "./routes/subscribers.js";
 import { registerPublicSummaryRoutes } from "./routes/public-summary.js";
+import { hydrateStatusStore, persistStatusStore } from "./statuspage/persistence.js";
 
 const logger = createLogger("status-page-svc");
 const PORT = parseInt(process.env.STATUS_PAGE_SVC_PORT || "3014", 10);
 
-export async function buildApp() {
+export async function buildApp(options: { db?: any } = {}) {
   const app = Fastify({ logger: false });
 
   // W3C trace context + tenant_id baggage + structured logs (Sprint 8).
@@ -39,6 +41,23 @@ export async function buildApp() {
     },
   });
   await app.register(swaggerUI, { routePrefix: "/docs" });
+
+  const db = options.db ?? (process.env.DATABASE_URL ? createDb(process.env.DATABASE_URL) : null);
+  if (!db && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "status-page-svc: DATABASE_URL is required in production; process-local status is forbidden",
+    );
+  }
+  if (db) {
+    app.addHook("onRequest", async () => {
+      await hydrateStatusStore(db);
+    });
+    app.addHook("onSend", async (request) => {
+      if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+        await persistStatusStore(db);
+      }
+    });
+  }
 
   registerHealthRoutes(app);
   registerStatusRoutes(app);

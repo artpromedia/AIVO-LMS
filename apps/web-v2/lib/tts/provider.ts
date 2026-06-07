@@ -255,13 +255,10 @@ export function getTTSProvider(): TTSProvider {
     );
   }
 
-  // The mock provider returns deterministic placeholder audio. It must never
-  // be served silently in production as if it were real — require an explicit
-  // opt-in so it's a conscious decision (fail fast otherwise).
-  if (isProd && env !== "mock") {
+  // Placeholder audio is a development/test affordance only.
+  if (isProd) {
     throw new Error(
-      "TTS_PROVIDER must be set in production. Use 'openai' for real audio, or set " +
-        "'mock' to explicitly allow placeholder audio for the pilot.",
+      "TTS_PROVIDER=openai is required in production; placeholder audio is forbidden.",
     );
   }
 

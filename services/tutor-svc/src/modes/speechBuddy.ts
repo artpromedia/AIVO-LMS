@@ -1,9 +1,8 @@
 /**
- * Speech Buddy session lifecycle (interface-only scaffold).
+ * Speech Buddy session lifecycle contract.
  *
- * The agent-core task (Speech Buddy agent core: STT, planner, dialogue, TTS,
- * safety filter) implements the bodies of these functions. This file exists
- * so other tasks can import a stable surface today.
+ * The live STT, dialogue, safety, persistence, and TTS implementation lives
+ * in ai-svc; this contract keeps tutor-svc and downstream callers aligned.
  *
  * See:
  *   - docs/products/speech-buddy/README.md  (session format)
@@ -52,13 +51,13 @@ export interface SessionEndResult {
   terminalSafetyFlag?: SafetyFlag;
 }
 
-/** Start a new Speech Buddy session. Implementation in agent-core task. */
+/** Start a new Speech Buddy session. */
 export type StartSpeechBuddySession = (input: StartSessionInput) => Promise<SpeechBuddySession>;
 
-/** Run one child→buddy turn. Implementation in agent-core task. */
+/** Run one child-to-buddy turn. */
 export type RunSpeechBuddyTurn = (input: TurnInput) => Promise<TurnOutput>;
 
-/** End a session and produce reflection + quest. Implementation in agent-core. */
+/** End a session and produce reflection + quest. */
 export type EndSpeechBuddySession = (
   sessionId: string,
   reason: SessionEndResult["endedReason"],

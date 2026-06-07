@@ -34,7 +34,7 @@ export const elaTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["ela-k-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -57,7 +57,7 @@ export const elaTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-ela",
-    status: "scaffold",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_ELA",
   },
 });

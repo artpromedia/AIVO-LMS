@@ -9,8 +9,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal, Tuple
 
-AGE_BANDS: Tuple[str, ...] = ("6-9", "10-12", "13-15")
-AgeBand = Literal["6-9", "10-12", "13-15"]
+AGE_BANDS: Tuple[str, ...] = ("3-5", "6-9", "10-12", "13-15")
+AgeBand = Literal["3-5", "6-9", "10-12", "13-15"]
 
 SKILL_TAGS: Tuple[str, ...] = (
     "name_a_feeling",

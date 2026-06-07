@@ -16,7 +16,7 @@ from ai_svc.speech_buddy import (
 
 
 def test_age_bands_match_docs():
-    assert AGE_BANDS == ("6-9", "10-12", "13-15")
+    assert AGE_BANDS == ("3-5", "6-9", "10-12", "13-15")
 
 
 def test_skill_tags_are_stable():

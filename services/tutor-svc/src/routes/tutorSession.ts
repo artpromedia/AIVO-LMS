@@ -62,7 +62,7 @@ interface PlanBody {
   functioningLevel?: string;
   learnerAgeYears?: number;
   consentRecordId?: string;
-  consentAgeBand?: "6-9" | "10-12" | "13-15";
+  consentAgeBand?: "3-5" | "6-9" | "10-12" | "13-15";
   contentPack?: ContentPack;
   masteryRecords?: MasteryRecord[];
   recentOutcomes?: AnswerOutcome[];

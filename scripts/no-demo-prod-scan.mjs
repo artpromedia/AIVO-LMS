@@ -34,6 +34,11 @@ const ROOTS = [
   "services/recommendation-svc",
   "services/audit-svc",
   "services/problem-session-svc",
+  "services/admin-svc",
+  "services/homework-svc",
+  "services/speech-eval-svc",
+  "services/status-page-svc",
+  "services/tenant-svc",
 ];
 
 const SKIP_DIR_NAMES = new Set([

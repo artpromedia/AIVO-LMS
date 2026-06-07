@@ -31,7 +31,7 @@ export const scienceTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["science-k2-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -54,7 +54,7 @@ export const scienceTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-science",
-    status: "scaffold",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_SCIENCE",
   },
 });

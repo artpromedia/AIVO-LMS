@@ -19,12 +19,13 @@ implement.
 
 ## Audiences
 
-Speech Buddy is shipped as three age-band profiles. Vocabulary, sentence length,
+Speech Buddy is shipped as four age-band profiles. Vocabulary, sentence length,
 and persona tone differ per band. The same underlying agent and safety layers
 apply to all bands.
 
 | Band | Ages  | Persona tone                                                   | Vocabulary band |
 | ---- | ----- | -------------------------------------------------------------- | --------------- |
+| PRE-K | 3-5  | Gentle, concrete, caregiver-friendly, one short prompt at a time | Pre-A1        |
 | K1   | 6–9   | Warm, playful, lots of praise, very short sentences            | ~CEFR A1        |
 | K2   | 10–12 | Friendly peer-mentor, light humour, concrete examples          | ~CEFR A2–B1     |
 | K3   | 13–15 | Respectful coach, gives reasoning, treats the child as capable | ~CEFR B1–B2     |

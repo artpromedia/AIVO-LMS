@@ -13,6 +13,12 @@ export interface HomeworkAssignment {
   createdAt: string;
 }
 
+export interface ParentHomeworkChildSummary {
+  learnerId: string;
+  learnerName: string;
+  assignments: HomeworkAssignment[];
+}
+
 export function useHomeworkAssignments(learnerId: string) {
   return useQuery<HomeworkAssignment[]>({
     queryKey: ["homework-assignments", learnerId],
@@ -23,6 +29,26 @@ export function useHomeworkAssignments(learnerId: string) {
       return (data.assignments ?? []) as HomeworkAssignment[];
     },
     enabled: !!learnerId,
+    staleTime: 30 * 1000,
+  });
+}
+
+export function useParentHomeworkSummary(parentId: string, learnerId: string) {
+  return useQuery<ParentHomeworkChildSummary>({
+    queryKey: ["parent-homework-summary", parentId, learnerId],
+    queryFn: async () => {
+      const res = await apiFetch(API.TUTOR, `/api/tutors/homework/parent/${parentId}`);
+      if (!res.ok) throw new Error("Failed to load homework summary");
+      const data = (await res.json()) as { children?: ParentHomeworkChildSummary[] };
+      return (
+        data.children?.find((child) => child.learnerId === learnerId) ?? {
+          learnerId,
+          learnerName: "",
+          assignments: [],
+        }
+      );
+    },
+    enabled: !!parentId && !!learnerId,
     staleTime: 30 * 1000,
   });
 }

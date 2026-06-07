@@ -6,13 +6,9 @@
  *   - targetText: the prompt/phrase the learner was asked to say
  *   - language: BCP-47 language code (e.g. "en-US", "es-MX")
  *
- * When SPEECH_EVAL_MODE=mock (default), returns realistic mock scores
- * with degraded:true so the learner-surface flow completes end-to-end
- * without Whisper/hosted ASR being wired up.
- *
- * When SPEECH_EVAL_MODE=live the route would invoke a real Whisper
- * endpoint + a phoneme-alignment scorer. That path is stubbed here and
- * gated behind the flag until hosting is provisioned.
+ * Development may explicitly use SPEECH_EVAL_MODE=mock for deterministic
+ * local fixtures. Production requires live mode and refuses to fabricate
+ * scores when its configured ASR provider is unavailable.
  */
 
 import { FastifyInstance } from "fastify";
@@ -26,7 +22,7 @@ export interface EvaluateResult {
     fluency: number;
     perWord?: Array<{ word: string; score: number }>;
   };
-  /** true when real ASR/scoring was not available and mock data was used */
+  /** true only for explicit non-production mock-mode responses */
   degraded: boolean;
   language: string;
   durationMs?: number;
@@ -173,9 +169,8 @@ export function registerEvaluateRoute(app: FastifyInstance) {
       }
 
       // ── Live path (Sprint F — completion plan) ─────────────────────────────
-      // Selects an ASR provider via env (ASR_PROVIDER=openai|azure). When
-      // no provider is configured the route falls back to the mock scorer
-      // rather than 503-ing — lessons advance under network failure.
+      // Selects an ASR provider via env (ASR_PROVIDER=openai|azure).
+      // Missing or unavailable providers fail closed without fabricated scores.
       const provider = getAsrProvider();
       const audioBuf = (audioPart as { _buf?: Buffer })._buf ?? Buffer.alloc(0);
       const asrResult = await provider.transcribe({
@@ -190,13 +185,16 @@ export function registerEvaluateRoute(app: FastifyInstance) {
         return reply.send(result);
       }
 
-      // Provider unavailable — log the reason and fall back to mock scores
-      // so learner flow never blocks on infrastructure.
+      // Never convert an infrastructure failure into fabricated assessment
+      // scores. The client can retry or offer a non-scored activity.
       request.log.warn(
         { provider: asrResult.provider, reason: asrResult.reason },
-        "ASR provider unavailable; falling back to mock scorer",
+        "ASR provider unavailable; speech evaluation refused",
       );
-      return reply.send(buildMockResult(targetText, language));
+      return reply.code(503).send({
+        error: "Speech evaluation is temporarily unavailable",
+        degraded: true,
+      });
     },
   );
 }

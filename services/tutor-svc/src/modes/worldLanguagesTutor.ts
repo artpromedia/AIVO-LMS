@@ -31,7 +31,7 @@ export const worldLanguagesTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["world-languages-novice-low-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -54,7 +54,7 @@ export const worldLanguagesTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-languages",
-    status: "scaffold",
+    status: "production",
     aiSvcPersonaKey: "ADDON_TUTOR_LANGUAGES",
   },
 });

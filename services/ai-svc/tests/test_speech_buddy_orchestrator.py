@@ -208,6 +208,39 @@ def test_transcript_store_round_trip_decrypts_back_to_plaintext(tmp_path, monkey
     assert store.get(tenant_id="tenant-B", session_id="sess-1") is None
 
 
+def test_transcript_encryption_requires_master_key_in_production(monkeypatch):
+    from ai_svc.speech_buddy import encryption
+
+    monkeypatch.setenv("NODE_ENV", "production")
+    monkeypatch.delenv("SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="MASTER_KEY.*required in production"):
+        encryption.encrypt_transcript("tenant-A", "private transcript")
+
+
+def test_transcript_encryption_requires_aes_gcm_in_production(monkeypatch):
+    from ai_svc.speech_buddy import encryption
+
+    monkeypatch.setenv("NODE_ENV", "production")
+    monkeypatch.setenv("SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY", "production-master-key-at-least-32-bytes")
+    monkeypatch.setattr(encryption, "_HAS_AESGCM", False)
+    with pytest.raises(RuntimeError, match="AESGCM is required"):
+        encryption.encrypt_transcript("tenant-A", "private transcript")
+
+
+def test_dev_ciphertext_is_rejected_in_production(monkeypatch):
+    from ai_svc.speech_buddy import encryption
+
+    monkeypatch.delenv("NODE_ENV", raising=False)
+    monkeypatch.setattr(encryption, "_HAS_AESGCM", False)
+    encrypted = encryption.encrypt_transcript("tenant-A", "private transcript")
+    assert encrypted.algorithm == "XOR-HMAC-DEV"
+
+    monkeypatch.setenv("NODE_ENV", "production")
+    monkeypatch.setenv("SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY", "production-master-key-at-least-32-bytes")
+    with pytest.raises(RuntimeError, match="forbidden in production"):
+        encryption.decrypt_transcript(encrypted)
+
+
 def test_self_harm_input_triggers_crisis_and_ends():
     async def go():
         orchestrator = _orch()

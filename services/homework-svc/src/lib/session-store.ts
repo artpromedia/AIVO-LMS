@@ -1,24 +1,25 @@
-/**
- * homework-svc session persistence.
- *
- * The in-memory SESSIONS Map in routes/homework-sessions.ts holds
- * ephemeral state for an in-flight practice session (current step,
- * collected events, problems). This module ALSO writes the session
- * to the relational store (`homework_assignments` + `homework_sessions`
- * from `@aivo/db`) so:
- *
- *   1. Compliance audits can query who practiced what, when.
- *   2. Sessions survive a service restart (the relational row stays
- *      even if the in-memory replay state is dropped).
- *   3. Sibling services (admin-svc, teacher dashboards) can read the
- *      session record via SQL rather than reaching into homework-svc.
- *
- * Failures NEVER break the learner-facing flow: when the DB write
- * fails or the service is running without a DATABASE_URL, we fall
- * back to the in-memory-only path and log a warn breadcrumb.
- */
 import type { FastifyRequest } from "fastify";
 import { homeworkAssignments, homeworkSessions } from "@aivo/db";
+import { desc, eq } from "drizzle-orm";
+import type { HomeworkStepState } from "../services/homework-step-engine.js";
+import type {
+  HomeworkProfile,
+  adaptHomeworkForProfile,
+} from "../services/homework-profile-adapter.js";
+
+export interface HomeworkSessionRecord {
+  id: string;
+  assignmentId?: string;
+  learnerId: string;
+  tenantId: string;
+  subject: string;
+  topic?: string;
+  profile?: HomeworkProfile;
+  adaptation?: ReturnType<typeof adaptHomeworkForProfile>;
+  stepState: HomeworkStepState;
+  events: Array<{ at: string; eventType: string }>;
+  problems: Array<{ id: string; prompt: string }>;
+}
 
 export interface PersistedSession {
   assignmentId: string;
@@ -33,15 +34,6 @@ export interface PersistSessionInput {
   tutorSku?: string;
 }
 
-/**
- * Best-effort persistence: returns the new assignment + session ids on
- * success, undefined on failure (caller continues with in-memory only).
- *
- * `db` is the drizzle client; pass `null` to disable DB writes (e.g.
- * for unit tests that don't have a database available). The function
- * never throws — DB errors are logged via the request logger and the
- * promise resolves to undefined.
- */
 export async function persistHomeworkSessionStart(
   db: any | null | undefined,
   request: FastifyRequest,
@@ -69,19 +61,95 @@ export async function persistHomeworkSessionStart(
         learnerId: input.learnerId,
         tutorSku: input.tutorSku ?? null,
         messages: [],
+        runtimeState: {},
       })
       .returning();
     if (!session) return undefined;
     return { assignmentId: assignment.id, sessionId: session.id };
   } catch (err) {
+    if (process.env.NODE_ENV === "production") throw err;
     request.log.warn(
-      {
-        learnerId: input.learnerId,
-        subject: input.subject,
-        err: (err as Error).message,
-      },
-      "homework-svc DB persist failed (continuing with in-memory state only)",
+      { learnerId: input.learnerId, subject: input.subject, err: (err as Error).message },
+      "homework-svc DB persist failed; using non-production memory fallback",
     );
     return undefined;
   }
+}
+
+function isSessionRecord(value: unknown): value is HomeworkSessionRecord {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<HomeworkSessionRecord>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.learnerId === "string" &&
+    typeof candidate.tenantId === "string" &&
+    typeof candidate.subject === "string" &&
+    Boolean(candidate.stepState) &&
+    Array.isArray(candidate.events) &&
+    Array.isArray(candidate.problems)
+  );
+}
+
+export async function persistHomeworkSessionState(
+  db: any | null | undefined,
+  session: HomeworkSessionRecord,
+): Promise<void> {
+  if (!db) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("homework-svc cannot persist session state without a database");
+    }
+    return;
+  }
+
+  const [updated] = await db
+    .update(homeworkSessions)
+    .set({
+      runtimeState: session,
+      messages: session.events,
+      problemsAttempted: session.stepState.history.length,
+      problemsCompleted: session.stepState.currentStep === "complete" ? session.problems.length : 0,
+      endedAt: session.stepState.currentStep === "complete" ? new Date() : null,
+    })
+    .where(eq(homeworkSessions.id, session.id))
+    .returning({ id: homeworkSessions.id });
+
+  if (!updated) {
+    throw new Error(`homework-svc session row not found while persisting state: ${session.id}`);
+  }
+
+  if (session.assignmentId && session.stepState.currentStep === "complete") {
+    await db
+      .update(homeworkAssignments)
+      .set({ status: "COMPLETED" })
+      .where(eq(homeworkAssignments.id, session.assignmentId));
+  }
+}
+
+export async function loadHomeworkSessionState(
+  db: any | null | undefined,
+  sessionId: string,
+): Promise<HomeworkSessionRecord | undefined> {
+  if (!db) return undefined;
+  const [row] = await db
+    .select({ runtimeState: homeworkSessions.runtimeState })
+    .from(homeworkSessions)
+    .where(eq(homeworkSessions.id, sessionId))
+    .limit(1);
+  return isSessionRecord(row?.runtimeState) ? row.runtimeState : undefined;
+}
+
+export async function listHomeworkSessionStates(
+  db: any | null | undefined,
+  learnerId: string,
+): Promise<HomeworkSessionRecord[]> {
+  if (!db) return [];
+  const rows = await db
+    .select({ runtimeState: homeworkSessions.runtimeState })
+    .from(homeworkSessions)
+    .where(eq(homeworkSessions.learnerId, learnerId))
+    .orderBy(desc(homeworkSessions.startedAt))
+    .limit(50);
+  return rows
+    .map((row: { runtimeState: unknown }) => row.runtimeState)
+    .filter(isSessionRecord);
 }

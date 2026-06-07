@@ -23,9 +23,10 @@ from .types import AgeBand
 
 logger = logging.getLogger("ai-svc.speech_buddy.tts")
 
-VoicePreset = Literal["buddy-warm", "buddy-friendly", "buddy-steady"]
+VoicePreset = Literal["buddy-gentle", "buddy-warm", "buddy-friendly", "buddy-steady"]
 
 VOICE_PRESETS: dict[AgeBand, VoicePreset] = {
+    "3-5":   "buddy-gentle",
     "6-9":   "buddy-warm",
     "10-12": "buddy-friendly",
     "13-15": "buddy-steady",
@@ -137,6 +138,10 @@ def get_default_tts() -> TTSAdapter:
     provider = (os.environ.get("SPEECH_BUDDY_TTS_PROVIDER") or "mock").lower()
     if provider == "openai":
         return LitellmTTS()
+    if os.environ.get("NODE_ENV") == "production" or os.environ.get("ENV") == "production":
+        raise RuntimeError(
+            "SPEECH_BUDDY_TTS_PROVIDER=openai is required in production; mock TTS is forbidden"
+        )
     return MockTTS()
 
 
