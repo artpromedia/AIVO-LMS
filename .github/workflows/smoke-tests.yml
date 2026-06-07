@@ -133,10 +133,20 @@ jobs:
             if [ "$DESIRED" -eq 0 ]; then
               STATUS="SKIPPED"
             elif [ "$AVAILABLE" -lt 1 ]; then
+              echo "  waiting for $svc rollout (up to 90s)..."
+              kubectl rollout status -n "$NS" "deploy/$svc" --timeout=90s >/dev/null 2>&1 || true
+              UPDATED=$(kubectl get deploy -n "$NS" "$svc" -o jsonpath='{.status.updatedReplicas}' 2>/dev/null || true)
+              AVAILABLE=$(kubectl get deploy -n "$NS" "$svc" -o jsonpath='{.status.availableReplicas}' 2>/dev/null || true)
+              UPDATED=${UPDATED:-0}
+              AVAILABLE=${AVAILABLE:-0}
               # No pod is serving traffic — always a blocker.
-              STATUS="UNAVAILABLE"
-              if [ "$BLOCKING" -eq 1 ]; then
-                FAIL=1
+              if [ "$AVAILABLE" -lt 1 ]; then
+                STATUS="UNAVAILABLE"
+                if [ "$BLOCKING" -eq 1 ]; then
+                  FAIL=1
+                fi
+              else
+                STATUS="RECOVERED"
               fi
             elif [ "$AVAILABLE" -lt "$DESIRED" ] && [ "$UPDATED" -lt "$DESIRED" ]; then
               # Rollout still in progress AND below desired replicas.
