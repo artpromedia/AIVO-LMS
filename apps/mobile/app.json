@@ -107,7 +107,8 @@
           "icon": "./assets/images/icon.png",
           "color": "#7C3AED"
         }
-      ]
+      ],
+      "./plugins/withAndroidNativeBuildFixes.js"
     ],
     "experiments": {
       "typedRoutes": true
