@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { eq, and } from "drizzle-orm";
-import { learners } from "@aivo/db";
+import { learners, learnerTeachers } from "@aivo/db";
 import {
   verifyJWT,
   JWTPayload,
@@ -85,4 +85,36 @@ export async function verifyParentOwnership(
     .from(learners)
     .where(and(eq(learners.id, learnerId), eq(learners.parentId, userSub)));
   return result.length > 0;
+}
+
+/**
+ * True iff `userSub` is a teacher with an ACCEPTED link to `learnerId` in
+ * `learner_teachers`. Mirrors the connected-access check used by
+ * assessment-svc so a teacher can read the same brain/EF-derived insights a
+ * parent sees, gated on the invite they accepted rather than ownership.
+ */
+export async function verifyTeacherAccess(
+  db: ReturnType<typeof import("@aivo/db").createDb>,
+  userSub: string,
+  learnerId: string,
+): Promise<boolean> {
+  if (!isUuid(userSub) || !isUuid(learnerId)) {
+    return false;
+  }
+  try {
+    const [row] = await db
+      .select()
+      .from(learnerTeachers)
+      .where(
+        and(
+          eq(learnerTeachers.learnerId, learnerId),
+          eq(learnerTeachers.teacherUserId, userSub),
+          eq(learnerTeachers.status, "ACCEPTED"),
+        ),
+      )
+      .limit(1);
+    return !!row;
+  } catch {
+    return false;
+  }
 }
