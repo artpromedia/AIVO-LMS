@@ -81,7 +81,10 @@ async function identityRequest<T>(
   }
   if (!response.ok) {
     const message =
-      payload && typeof payload === "object" && "error" in payload && typeof payload.error === "string"
+      payload &&
+      typeof payload === "object" &&
+      "error" in payload &&
+      typeof payload.error === "string"
         ? payload.error
         : `identity-svc request failed (${response.status})`;
     throw new AdminApiError(message, response.status, payload);
@@ -181,4 +184,44 @@ export async function updateDistrictBranding(
   return identityRequest<Record<string, unknown>>(session, "PUT", "/api/district/settings", {
     branding,
   });
+}
+
+export type DistrictRosteringGrant = { teacherRosteringEnabled: boolean };
+
+/**
+ * Whether this district has granted its teachers the right to connect and
+ * manage roster sources themselves. Stored on the district settings
+ * `featureOverrides`. Teachers are default-deny: the learner app
+ * (`/api/bff/teacher/rostering`) refuses connect/sync until this is true.
+ */
+export async function getDistrictRosteringGrant(
+  session: Pick<SessionProfile, "role">,
+): Promise<DistrictRosteringGrant> {
+  const settings = await identityRequest<{ featureOverrides?: Record<string, unknown> }>(
+    session,
+    "GET",
+    "/api/district/settings",
+  );
+  return {
+    teacherRosteringEnabled: Boolean(settings.featureOverrides?.teacherRosteringEnabled),
+  };
+}
+
+/** Grant or revoke teacher roster-connect rights for the admin's district. */
+export async function setDistrictRosteringGrant(
+  session: Pick<SessionProfile, "role">,
+  enabled: boolean,
+): Promise<DistrictRosteringGrant> {
+  // Read-merge so we never clobber sibling feature overrides.
+  const current = await identityRequest<{ featureOverrides?: Record<string, unknown> }>(
+    session,
+    "GET",
+    "/api/district/settings",
+  );
+  const featureOverrides = {
+    ...(current.featureOverrides ?? {}),
+    teacherRosteringEnabled: enabled,
+  };
+  await identityRequest(session, "PUT", "/api/district/settings", { featureOverrides });
+  return { teacherRosteringEnabled: enabled };
 }

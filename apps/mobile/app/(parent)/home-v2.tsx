@@ -107,6 +107,17 @@ export default function ParentHomeV2() {
   const activeLearner = learnersQuery.data?.[0];
   const learnerFirstName = activeLearner?.firstName ?? "Your learner";
 
+  // Route into a learner-scoped surface using the real active learner.
+  // Falls back to the learners list when none is loaded yet so the cards
+  // never navigate to a phantom id.
+  const openLearner = (section: "session" | "progress" | "milestones" | "iep" | "team") => {
+    if (!activeLearner?.id) {
+      router.push("/(parent)/learners" as Href);
+      return;
+    }
+    router.push(`/(parent)/${section}/${activeLearner.id}` as Href);
+  };
+
   return (
     <ScrollView
       style={[s.canvas, { paddingTop: insets.top }]}
@@ -125,7 +136,7 @@ export default function ParentHomeV2() {
         </Text>
         <View style={s.heroActions}>
           <Pressable
-            onPress={() => router.push("/(parent)/session/emma" as Href)}
+            onPress={() => openLearner("session")}
             style={[s.btnPrimary, { backgroundColor: palette.primary }]}
           >
             <Ionicons name="play" size={16} color="#fff" />
@@ -149,7 +160,7 @@ export default function ParentHomeV2() {
           description="60% of discovery adventure complete."
           iconName="sparkles"
           tone="info"
-          onPress={() => router.push("/(parent)/progress/emma" as Href)}
+          onPress={() => openLearner("progress")}
         />
         <MetricCard
           label="Wellbeing"
@@ -157,7 +168,7 @@ export default function ParentHomeV2() {
           description="No stress flags this week."
           iconName="heart"
           tone="success"
-          onPress={() => router.push("/(parent)/progress/emma" as Href)}
+          onPress={() => openLearner("progress")}
         />
         <MetricCard
           label="Mastery"
@@ -165,14 +176,14 @@ export default function ParentHomeV2() {
           description="This week."
           iconName="trending-up"
           tone="success"
-          onPress={() => router.push("/(parent)/milestones/emma" as Href)}
+          onPress={() => openLearner("milestones")}
         />
         <MetricCard
           label="Today's time"
           value="22 min"
           description="Planned: 35 minutes."
           iconName="time"
-          onPress={() => router.push("/(parent)/session/emma" as Href)}
+          onPress={() => openLearner("session")}
         />
         <MetricCard
           label="Needs approval"
@@ -188,7 +199,7 @@ export default function ParentHomeV2() {
           description="3 accommodations applied."
           iconName="document-text"
           tone="info"
-          onPress={() => router.push("/(parent)/iep/emma" as Href)}
+          onPress={() => openLearner("iep")}
         />
       </View>
 
@@ -199,7 +210,7 @@ export default function ParentHomeV2() {
           title="Learning readiness"
           subtitle="Today's plan, pacing, and sensory mode."
           badge="Ready"
-          onPress={() => router.push("/(parent)/session/emma" as Href)}
+          onPress={() => openLearner("session")}
         />
         <SectionRow
           iconName="checkmark-circle"
@@ -212,7 +223,7 @@ export default function ParentHomeV2() {
           iconName="document-text"
           title="IEP / support upload"
           subtitle="3 accommodations extracted."
-          onPress={() => router.push("/(parent)/iep/emma" as Href)}
+          onPress={() => openLearner("iep")}
         />
         <SectionRow
           iconName="notifications"
@@ -231,7 +242,7 @@ export default function ParentHomeV2() {
           iconName="school"
           title="School connection"
           subtitle="Not linked. Tap to connect a school."
-          onPress={() => router.push("/(parent)/team/emma" as Href)}
+          onPress={() => openLearner("team")}
         />
       </View>
 

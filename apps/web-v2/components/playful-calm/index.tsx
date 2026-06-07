@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { ReadAloudButton } from "@/components/playful-calm/read-aloud-button";
 
 /**
  * Shared dashboard primitives. The folder name is `playful-calm/` for
@@ -50,9 +50,7 @@ export function MascotCoach({ name, tip }: { name: string; tip: string }) {
         {name}
       </p>
       <p className="mt-1 font-iw-display text-xl font-semibold text-iw-ink">{tip}</p>
-      <Button className="mt-3" variant="soft">
-        Read aloud
-      </Button>
+      <ReadAloudButton className="mt-3" text={tip} />
     </Card>
   );
 }

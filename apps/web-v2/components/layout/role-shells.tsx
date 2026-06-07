@@ -61,6 +61,7 @@ export const LEARNER_NAV: RoleNavItem[] = [
 export const TEACHER_NAV: RoleNavItem[] = [
   { href: "/teacher/home", label: "Home", icon: <Home className="h-4 w-4" /> },
   { href: "/teacher/classes", label: "Classes", icon: <Users className="h-4 w-4" /> },
+  { href: "/teacher/rostering", label: "Rostering", icon: <Network className="h-4 w-4" /> },
   { href: "/teacher/learners", label: "Learners", icon: <Users className="h-4 w-4" /> },
   {
     href: "/teacher/assignments",
