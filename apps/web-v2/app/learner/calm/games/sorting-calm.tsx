@@ -20,10 +20,10 @@ import {
 export function SortingCalm({
   onDone,
   onCancel,
-}: {
+}: Readonly<{
   onDone: (secondsSpent: number) => void;
   onCancel: () => void;
-}) {
+}>) {
   const t = useTranslations("learner.calm.games");
   const startedAt = useRef<number>(Date.now());
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -33,8 +33,8 @@ export function SortingCalm({
   const [solved, setSolved] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!("window" in globalThis)) return;
+    const mq = globalThis.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
     const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mq.addEventListener("change", onChange);
@@ -54,7 +54,7 @@ export function SortingCalm({
       if (isSortingSolved(next)) {
         setSolved(true);
         const secs = Math.round((Date.now() - startedAt.current) / 1000);
-        window.setTimeout(() => onDone(secs), 900);
+        globalThis.setTimeout(() => onDone(secs), 900);
       }
     },
     [items, solved, onDone],
@@ -65,7 +65,7 @@ export function SortingCalm({
   return (
     <Card className="mt-6 flex flex-col items-center gap-5 p-6 text-center">
       <h2 className="font-display text-2xl font-bold">{t("sorting_title")}</h2>
-      <p role="status" aria-live="polite" className="min-h-[1.5rem] font-medium">
+      <p role="status" aria-live="polite" className="min-h-6 font-medium">
         {solved ? t("nice") : t("sorting_prompt")}
       </p>
 

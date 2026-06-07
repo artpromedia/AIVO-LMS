@@ -120,6 +120,16 @@ const CALM_CATALOG: readonly CalmActivity[] = [
 
 const CALM_IDS: ReadonlySet<string> = new Set(CALM_CATALOG.map((a) => a.id));
 
+/** O(1) id -> activity lookup. Total over the id union, so a caller that
+ *  already holds a CalmActivityId never observes undefined. */
+const CALM_BY_ID = CALM_CATALOG.reduce(
+  (acc, a) => {
+    acc[a.id] = a;
+    return acc;
+  },
+  {} as Record<CalmActivityId, CalmActivity>,
+);
+
 /** The full, ordered catalog. */
 export function getCalmCatalog(): readonly CalmActivity[] {
   return CALM_CATALOG;
@@ -130,8 +140,9 @@ export function isCalmActivityId(value: unknown): value is CalmActivityId {
 }
 
 export function getCalmActivity(id: CalmActivityId): CalmActivity {
-  // Safe: id is constrained by isCalmActivityId at the call sites.
-  return CALM_CATALOG.find((a) => a.id === id) as CalmActivity;
+  // Total over the union: id is constrained by isCalmActivityId at the
+  // call sites, so the lookup always resolves.
+  return CALM_BY_ID[id];
 }
 
 /**

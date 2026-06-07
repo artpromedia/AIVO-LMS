@@ -69,7 +69,7 @@ describe("synthesizeChimeWavBytes", () => {
       const bytes = synthesizeChimeWavBytes(phase);
       const view = new DataView(bytes.buffer);
       const ascii = (off: number, n: number) =>
-        String.fromCharCode(...bytes.subarray(off, off + n));
+        String.fromCodePoint(...bytes.subarray(off, off + n));
 
       expect(ascii(0, 4)).toBe("RIFF");
       expect(ascii(8, 4)).toBe("WAVE");

@@ -11,7 +11,7 @@ async function bootstrap() {
   const { createDb, users } = await import("@aivo/db");
   const { signJWT } = await import("@aivo/security");
   const { registerCouponRoutes } = await import("../src/routes/coupons.js");
-  const db = createDb(process.env.DATABASE_URL!);
+  const db = createDb(process.env.DATABASE_URL);
   const app = Fastify();
   registerCouponRoutes(app, db);
   await app.ready();

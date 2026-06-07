@@ -27,7 +27,7 @@ export function CalmCorner({
   catalog,
   recommendedId,
   audioCuesEnabled = false,
-}: CalmCornerProps) {
+}: Readonly<CalmCornerProps>) {
   const t = useTranslations("learner.calm");
   const [active, setActive] = useState<CalmActivity | null>(null);
   const [affirmation, setAffirmation] = useState<string | null>(null);
@@ -139,18 +139,18 @@ function ActivityCard({
   activity,
   highlighted = false,
   onPick,
-}: {
+}: Readonly<{
   activity: CalmActivity;
   highlighted?: boolean;
   onPick: () => void;
-}) {
+}>) {
   const t = useTranslations("learner.calm.activities");
   return (
     <button
       type="button"
       onClick={onPick}
       className={
-        "w-full min-h-[44px] rounded-iw-card-lg border p-4 text-left transition-shadow " +
+        "w-full min-h-11 rounded-iw-card-lg border p-4 text-left transition-shadow " +
         "focus:outline-none focus:ring-2 focus:ring-offset-2 " +
         (highlighted
           ? "border-aivo-primary bg-aivo-primary/5"
@@ -168,12 +168,12 @@ function ActivityRunner({
   audioCuesEnabled,
   onDone,
   onCancel,
-}: {
+}: Readonly<{
   activity: CalmActivity;
   audioCuesEnabled: boolean;
   onDone: (secondsSpent: number) => void;
   onCancel: () => void;
-}) {
+}>) {
   if (activity.kind === "breathing") {
     return (
       <BoxBreathing audioCuesEnabled={audioCuesEnabled} onDone={onDone} onCancel={onCancel} />
@@ -194,11 +194,11 @@ function BoxBreathing({
   audioCuesEnabled,
   onDone,
   onCancel,
-}: {
+}: Readonly<{
   audioCuesEnabled: boolean;
   onDone: (secondsSpent: number) => void;
   onCancel: () => void;
-}) {
+}>) {
   const t = useTranslations("learner.calm.breathing");
   const ta = useTranslations("learner.calm.audio");
   const totalPhases = BOX_BREATH_PHASES.length * boxBreathRounds();
@@ -210,8 +210,8 @@ function BoxBreathing({
   const startedAt = useRef<number>(Date.now());
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!("window" in globalThis)) return;
+    const mq = globalThis.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
     const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mq.addEventListener("change", onChange);
@@ -253,6 +253,17 @@ function BoxBreathing({
   const round = Math.floor(phaseIdx / BOX_BREATH_PHASES.length) + 1;
   const rounds = boxBreathRounds();
 
+  // Reduced-motion users advance manually; extracted so the JSX below stays
+  // a single (non-nested) conditional.
+  const reducedMotionButton =
+    phaseIdx + 1 >= totalPhases ? (
+      <Button onClick={() => onDone(Math.round((Date.now() - startedAt.current) / 1000))}>
+        {t("finish")}
+      </Button>
+    ) : (
+      <Button onClick={() => setPhaseIdx((i) => i + 1)}>{t("next")}</Button>
+    );
+
   return (
     <Card className="mt-6 flex flex-col items-center gap-5 p-8 text-center">
       <p className="text-sm text-aivo-muted">{t("round", { round, rounds })}</p>
@@ -261,7 +272,7 @@ function BoxBreathing({
         data-phase={phase}
         className={
           "h-40 w-40 rounded-full bg-aivo-primary/20 " +
-          (reducedMotion ? "" : "transition-transform duration-[4000ms] ease-in-out ") +
+          (reducedMotion ? "" : "transition-transform duration-4000 ease-in-out ") +
           (!reducedMotion && (phase === "inhale" || phase === "hold_in")
             ? "scale-110"
             : "scale-90")
@@ -272,17 +283,7 @@ function BoxBreathing({
       </p>
 
       <div className="flex gap-3">
-        {reducedMotion ? (
-          phaseIdx + 1 >= totalPhases ? (
-            <Button
-              onClick={() => onDone(Math.round((Date.now() - startedAt.current) / 1000))}
-            >
-              {t("finish")}
-            </Button>
-          ) : (
-            <Button onClick={() => setPhaseIdx((i) => i + 1)}>{t("next")}</Button>
-          )
-        ) : null}
+        {reducedMotion ? reducedMotionButton : null}
         {audioCuesEnabled ? (
           <Button
             variant="ghost"
@@ -304,11 +305,11 @@ function StaticActivity({
   activity,
   onDone,
   onCancel,
-}: {
+}: Readonly<{
   activity: CalmActivity;
   onDone: (secondsSpent: number) => void;
   onCancel: () => void;
-}) {
+}>) {
   const t = useTranslations("learner.calm.activities");
   const tc = useTranslations("learner.calm");
   const startedAt = useRef<number>(Date.now());

@@ -28,10 +28,10 @@ type Feedback = "none" | "wrong" | "correct";
 export function PatternFocus({
   onDone,
   onCancel,
-}: {
+}: Readonly<{
   onDone: (secondsSpent: number) => void;
   onCancel: () => void;
-}) {
+}>) {
   const { t } = useTranslation();
   const palette = useSensoryPalette();
   const reducedMotion = useReducedMotion();
@@ -97,14 +97,16 @@ export function PatternFocus({
       ? sequence[revealIdx]
       : null;
 
-  const statusText =
-    feedback === "correct"
-      ? t("learnerCalm.games.nice")
-      : feedback === "wrong"
-        ? t("learnerCalm.games.try_again")
-        : phase === "watch"
-          ? t("learnerCalm.games.pattern_watch")
-          : t("learnerCalm.games.pattern_repeat");
+  let statusText: string;
+  if (feedback === "correct") {
+    statusText = t("learnerCalm.games.nice");
+  } else if (feedback === "wrong") {
+    statusText = t("learnerCalm.games.try_again");
+  } else if (phase === "watch") {
+    statusText = t("learnerCalm.games.pattern_watch");
+  } else {
+    statusText = t("learnerCalm.games.pattern_repeat");
+  }
 
   return (
     <Card tone="raised" style={styles.card}>

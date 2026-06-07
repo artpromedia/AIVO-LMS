@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ sessionId: string }> };
 
-export default async function HomeworkSessionPage({ params }: Params) {
+export default async function HomeworkSessionPage({ params }: Readonly<Params>) {
   const { sessionId } = await params;
   const session = await requirePageRole(["learner", "parent"]);
   let learnerId: string | null = null;
@@ -33,10 +33,10 @@ export default async function HomeworkSessionPage({ params }: Params) {
     if (!learnerId) redirect("/learner/select");
   }
   const hw = getHomeworkSession(sessionId, session.tenantId);
-  if (!hw || hw.learnerId !== learnerId) notFound();
+  if (hw?.learnerId !== learnerId) notFound();
   const t = await getTranslations("learner.homework");
 
-  const flags = resolveEnterpriseFlags(process.env as Record<string, string | undefined>);
+  const flags = resolveEnterpriseFlags(process.env);
   const regulationEnabled = flags.selfRegulationHub;
 
   return (
@@ -66,7 +66,7 @@ export default async function HomeworkSessionPage({ params }: Params) {
         </Card>
       ) : null}
       {hw.endedAt ? (
-        <Card className="p-[var(--aivo-density-card-pad)]">
+        <Card className="p-(--aivo-density-card-pad)">
           <h2 className="font-semibold">{t("session_summary")}</h2>
           <p className="mt-2 text-sm">{hw.insight}</p>
           <div className="mt-4">

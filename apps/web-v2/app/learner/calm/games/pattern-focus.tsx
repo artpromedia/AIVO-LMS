@@ -35,10 +35,10 @@ type Feedback = "none" | "wrong" | "correct";
 export function PatternFocus({
   onDone,
   onCancel,
-}: {
+}: Readonly<{
   onDone: (secondsSpent: number) => void;
   onCancel: () => void;
-}) {
+}>) {
   const t = useTranslations("learner.calm.games");
   const startedAt = useRef<number>(Date.now());
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -51,8 +51,8 @@ export function PatternFocus({
   const [feedback, setFeedback] = useState<Feedback>("none");
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!("window" in globalThis)) return;
+    const mq = globalThis.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
     const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mq.addEventListener("change", onChange);
@@ -91,7 +91,7 @@ export function PatternFocus({
         setFeedback("correct");
         const secs = Math.round((Date.now() - startedAt.current) / 1000);
         // Brief, gentle pause on the success message, then complete.
-        window.setTimeout(() => onDone(secs), 900);
+        globalThis.setTimeout(() => onDone(secs), 900);
       } else {
         // No lose state — clear the attempt and invite another calm try.
         setFeedback("wrong");
@@ -106,14 +106,16 @@ export function PatternFocus({
       ? sequence[revealIdx]
       : null;
 
-  const statusText =
-    feedback === "correct"
-      ? t("nice")
-      : feedback === "wrong"
-        ? t("try_again")
-        : phase === "watch"
-          ? t("pattern_watch")
-          : t("pattern_repeat");
+  let statusText: string;
+  if (feedback === "correct") {
+    statusText = t("nice");
+  } else if (feedback === "wrong") {
+    statusText = t("try_again");
+  } else if (phase === "watch") {
+    statusText = t("pattern_watch");
+  } else {
+    statusText = t("pattern_repeat");
+  }
 
   return (
     <Card className="mt-6 flex flex-col items-center gap-5 p-6 text-center">
@@ -125,7 +127,7 @@ export function PatternFocus({
         </p>
       ) : null}
 
-      <p role="status" aria-live="polite" className="min-h-[1.5rem] font-medium">
+      <p role="status" aria-live="polite" className="min-h-6 font-medium">
         {statusText}
       </p>
 

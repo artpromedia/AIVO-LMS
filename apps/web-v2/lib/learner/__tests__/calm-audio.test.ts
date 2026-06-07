@@ -50,7 +50,7 @@ describe("calmEnvelope", () => {
 
 describe("createCalmChime — no-op without an AudioContext", () => {
   it("never throws when window/AudioContext are unavailable", () => {
-    expect(typeof window).toBe("undefined");
+    expect(typeof globalThis.window).toBe("undefined");
     const chime = createCalmChime();
     expect(() => {
       for (const phase of BOX_BREATH_PHASES) chime.phaseCue(phase);

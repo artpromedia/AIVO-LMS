@@ -45,13 +45,10 @@ import {
   AVATAR_S3_ENABLED,
   getAvatarObjectFromS3,
 } from "./lib/avatar-storage.js";
-import {
-  registerDistrictTenantScope,
-  REQUIRE_DISTRICT_ADMIN_FLAG,
-} from "./hooks/require-district-admin.js";
+import { registerDistrictTenantScope } from "./hooks/require-district-admin.js";
 
 const logger = createLogger("identity-svc");
-const PORT = parseInt(process.env.PORT || "3001", 10);
+const PORT = Number.parseInt(process.env.PORT || "3001", 10);
 
 /**
  * Build the configured Fastify app without binding to a port. Exposed
@@ -182,10 +179,10 @@ export async function buildApp() {
     corsOrigin = process.env.CORS_ORIGINS.split(",")
       .map((s) => s.trim())
       .filter(Boolean);
-  } else if (!isDev) {
-    corsOrigin = process.env.APP_URL ? [process.env.APP_URL] : [];
-  } else {
+  } else if (isDev) {
     corsOrigin = true;
+  } else {
+    corsOrigin = process.env.APP_URL ? [process.env.APP_URL] : [];
   }
   logger.info({ origins: corsOrigin }, "CORS origins");
 
@@ -261,6 +258,15 @@ export async function buildApp() {
     });
   }
 
+  let swaggerServers: { url: string }[];
+  if (process.env.SWAGGER_SERVER_URL) {
+    swaggerServers = [{ url: process.env.SWAGGER_SERVER_URL }];
+  } else if (process.env.NODE_ENV === "production") {
+    swaggerServers = [];
+  } else {
+    swaggerServers = [{ url: `http://localhost:${PORT}` }];
+  }
+
   await app.register(swagger, {
     openapi: {
       info: {
@@ -269,11 +275,7 @@ export async function buildApp() {
         description:
           "Authentication, authorization, and user management for AIVO Learning Platform",
       },
-      servers: process.env.SWAGGER_SERVER_URL
-        ? [{ url: process.env.SWAGGER_SERVER_URL }]
-        : process.env.NODE_ENV === "production"
-          ? []
-          : [{ url: `http://localhost:${PORT}` }],
+      servers: swaggerServers,
       components: {
         securitySchemes: {
           bearerAuth: {
@@ -324,7 +326,6 @@ export async function buildApp() {
   registerGovernanceRoutes(app, db);
   registerTestHelperRoutes(app);
 
-  void REQUIRE_DISTRICT_ADMIN_FLAG;
   return app;
 }
 
@@ -376,8 +377,10 @@ const isMain = (() => {
   }
 })();
 if (isMain) {
-  start().catch((err) => {
+  try {
+    await start();
+  } catch (err) {
     logger.error(err, "Failed to start identity-svc");
     process.exit(1);
-  });
+  }
 }

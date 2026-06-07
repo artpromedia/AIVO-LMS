@@ -11,6 +11,19 @@ import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 import { useTabBarStyle, TAB_BAR_LABEL_STYLE } from "@/hooks/useTabBarStyle";
 
+// Tab-bar icons defined at module scope (not inline in the navigator) so
+// they keep a stable component identity across renders.
+type TabIconProps = Readonly<{ color: string; size: number }>;
+const MapTabIcon = ({ color, size }: TabIconProps) => (
+  <Ionicons name="map" size={size} color={color} />
+);
+const CartTabIcon = ({ color, size }: TabIconProps) => (
+  <Ionicons name="cart" size={size} color={color} />
+);
+const TrophyTabIcon = ({ color, size }: TabIconProps) => (
+  <Ionicons name="trophy" size={size} color={color} />
+);
+
 /**
  * Resolve the active learner's gradeLevel.
  *  - If the logged-in user is a LEARNER, use their own record.
@@ -144,21 +157,21 @@ function ThemedLearnerTabs() {
           name="index"
           options={{
             title: t("tabs.worldMap"),
-            tabBarIcon: ({ color, size }) => <Ionicons name="map" size={size} color={color} />,
+            tabBarIcon: MapTabIcon,
           }}
         />
         <Tabs.Screen
           name="shop"
           options={{
             title: t("tabs.shop"),
-            tabBarIcon: ({ color, size }) => <Ionicons name="cart" size={size} color={color} />,
+            tabBarIcon: CartTabIcon,
           }}
         />
         <Tabs.Screen
           name="gamification"
           options={{
             title: t("tabs.profile"),
-            tabBarIcon: ({ color, size }) => <Ionicons name="trophy" size={size} color={color} />,
+            tabBarIcon: TrophyTabIcon,
           }}
         />
         <Tabs.Screen name="stage/[sessionId]" options={{ href: null }} />

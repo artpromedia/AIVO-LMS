@@ -67,7 +67,7 @@ const SUBJECTS = [
 
 function fmtDate(d: string): string {
   const dt = new Date(d);
-  return isNaN(dt.getTime()) ? d : dt.toLocaleDateString();
+  return Number.isNaN(dt.getTime()) ? d : dt.toLocaleDateString();
 }
 
 export function TermSyllabusManager({
@@ -75,7 +75,7 @@ export function TermSyllabusManager({
   apiBase,
   gradeBand,
   jurisdiction,
-}: {
+}: Readonly<{
   learnerId: string;
   /** e.g. `/api/bff/parent/learners/${learnerId}/term-syllabus` */
   apiBase: string;
@@ -83,7 +83,7 @@ export function TermSyllabusManager({
   gradeBand?: string;
   /** Learner jurisdiction (US zip/district or country+region) for validation. */
   jurisdiction?: JurisdictionLocator;
-}) {
+}>) {
   const [text, setText] = useState("");
   const [subject, setSubject] = useState("math");
   const [termCount, setTermCount] = useState(1);
@@ -233,8 +233,11 @@ export function TermSyllabusManager({
             {summary.standardsCount} standards
           </h4>
           <ol className="space-y-2 list-decimal pl-5">
-            {allUnits.map((u, i) => (
-              <li key={i} className="text-sm">
+            {allUnits.map((u) => (
+              <li
+                key={`${u.title}-${u.duration_weeks}-${u.standards_addressed.join("|")}`}
+                className="text-sm"
+              >
                 <span className="font-medium">{u.title}</span>
                 {u.standards_addressed.length > 0 && (
                   <span className="text-muted-foreground"> · {u.standards_addressed.join(", ")}</span>

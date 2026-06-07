@@ -469,7 +469,7 @@ export default function HomeworkSessionScreen() {
     <KeyboardAvoidingView
       style={[styles.container, { paddingTop: insets.top + 8 }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      keyboardVerticalOffset={0}
     >
       {headerNode}
       {problemsNode}
@@ -478,7 +478,7 @@ export default function HomeworkSessionScreen() {
   );
 }
 
-function MessageBubble({ message }: { message: DisplayMessage }) {
+function MessageBubble({ message }: Readonly<{ message: DisplayMessage }>) {
   const isUser = message.role === "user";
   return (
     <View style={[styles.bubbleRow, { justifyContent: isUser ? "flex-end" : "flex-start" }]}>
