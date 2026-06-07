@@ -5,6 +5,8 @@
  */
 import { describe, it, expect } from "vitest";
 import {
+  applyValidationToUnits,
+  collectTopicsAndStandards,
   flattenToUnits,
   summarizeTerm,
   validateTermParse,
@@ -94,5 +96,39 @@ describe("validateTermParse", () => {
 
   it("accepts a real 12-week parse", () => {
     expect(validateTermParse(buildResult(12))).toHaveLength(0);
+  });
+});
+
+describe("collectTopicsAndStandards", () => {
+  it("aggregates and de-duplicates across units", () => {
+    const r = buildResult(2);
+    r.terms[0].units[1].topics = ["topic 1"]; // duplicate of unit 0
+    const { topics, standards } = collectTopicsAndStandards(r);
+    expect(topics).toContain("topic 1");
+    expect(topics.filter((t) => t === "topic 1")).toHaveLength(1);
+    expect(standards).toContain("3.NBT.A.1");
+  });
+});
+
+describe("applyValidationToUnits", () => {
+  it("marks units unvalidated when no validation result", () => {
+    const units = flattenToUnits(buildResult(2));
+    const out = applyValidationToUnits(units, null);
+    expect(out.every((u) => u.validationStatus === "unvalidated")).toBe(true);
+  });
+
+  it("flags only units containing an unmatched topic/standard", () => {
+    const r = buildResult(3);
+    r.terms[0].units[1].standards_addressed = ["FOREIGN.9.9"];
+    const units = flattenToUnits(r);
+    const out = applyValidationToUnits(units, {
+      unmatched: [{ kind: "standard", input: "FOREIGN.9.9", reason: "not_in_jurisdiction_packs" }],
+      suggestions: [{ input: "FOREIGN.9.9", candidates: ["3.NBT.A.2"] }],
+    });
+    expect(out[0].validationStatus).toBe("in_curriculum");
+    expect(out[1].validationStatus).toBe("off_curriculum");
+    expect(out[1].validationNotes.unmatched).toContain("FOREIGN.9.9");
+    expect(out[1].validationNotes.suggestions?.["FOREIGN.9.9"]).toEqual(["3.NBT.A.2"]);
+    expect(out[2].validationStatus).toBe("in_curriculum");
   });
 });

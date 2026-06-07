@@ -106,6 +106,63 @@ export function validateTermParse(result: TermParseResult | null | undefined): s
   return errors;
 }
 
+/** Collect the de-duplicated topics + standards across all units, in the
+ * flat shape the curriculum-svc /validate endpoint consumes. */
+export function collectTopicsAndStandards(result: TermParseResult): {
+  topics: string[];
+  standards: string[];
+} {
+  const topics = new Set<string>();
+  const standards = new Set<string>();
+  for (const u of flattenToUnits(result)) {
+    for (const t of u.topics) if (t.trim()) topics.add(t.trim());
+    for (const s of u.standards) if (s.trim()) standards.add(s.trim());
+  }
+  return { topics: [...topics], standards: [...standards] };
+}
+
+export type ValidationStatus = "unvalidated" | "in_curriculum" | "off_curriculum";
+
+export interface ValidationOutcome {
+  unmatched: Array<{ kind: string; input: string; reason: string }>;
+  suggestions: Array<{ input: string; candidates: string[] }>;
+}
+
+export interface ValidatedUnit extends FlattenedTermUnit {
+  validationStatus: ValidationStatus;
+  validationNotes: { unmatched?: string[]; suggestions?: Record<string, string[]> };
+}
+
+/** Annotate each unit with a validation status: a unit is `off_curriculum`
+ * if any of its topics/standards are in the unmatched set. */
+export function applyValidationToUnits(
+  units: FlattenedTermUnit[],
+  validation: ValidationOutcome | null,
+): ValidatedUnit[] {
+  if (!validation) {
+    return units.map((u) => ({ ...u, validationStatus: "unvalidated", validationNotes: {} }));
+  }
+  const unmatched = new Set(validation.unmatched.map((u) => u.input.trim()));
+  const suggestionsByInput = new Map(validation.suggestions.map((s) => [s.input.trim(), s.candidates]));
+  return units.map((u) => {
+    const items = [...u.topics, ...u.standards].map((x) => x.trim()).filter(Boolean);
+    const flagged = items.filter((x) => unmatched.has(x));
+    if (flagged.length === 0) {
+      return { ...u, validationStatus: "in_curriculum", validationNotes: {} };
+    }
+    const suggestions: Record<string, string[]> = {};
+    for (const f of flagged) {
+      const cands = suggestionsByInput.get(f);
+      if (cands && cands.length) suggestions[f] = cands;
+    }
+    return {
+      ...u,
+      validationStatus: "off_curriculum",
+      validationNotes: { unmatched: flagged, suggestions },
+    };
+  });
+}
+
 /**
  * Request a term parse from ai-svc. Falls back to throwing a typed error if
  * the service is unreachable; the BFF surfaces that to the caller. The

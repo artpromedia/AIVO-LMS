@@ -22,12 +22,18 @@ import {
 } from "@/lib/db/repos";
 import { normalizeSubject } from "@/lib/learner/curriculum-parse";
 import {
+  applyValidationToUnits,
+  collectTopicsAndStandards,
   flattenToUnits,
   requestTermParse,
   summarizeTerm,
   validateTermParse,
   type TermParseResult,
 } from "@/lib/learner/term-syllabus";
+import {
+  validateAgainstJurisdiction,
+  type JurisdictionLocator,
+} from "@/lib/bff/curriculum-validation";
 
 // Term documents are whole-term/trimester (12+ weeks); allow large input.
 // ai-svc chunks it — there is no 16/32 KB cap on the term path.
@@ -125,12 +131,14 @@ export async function handleSaveTermSyllabus(
   try {
     const body = (await req.json().catch(() => ({}))) as {
       subject?: unknown;
+      gradeBand?: unknown;
       title?: unknown;
       text?: unknown;
       fileName?: unknown;
       sourceType?: unknown;
       parsed?: unknown;
       notes?: unknown;
+      jurisdiction?: unknown;
     };
     if (!body.parsed || typeof body.parsed !== "object") {
       return fail(
@@ -143,9 +151,23 @@ export async function handleSaveTermSyllabus(
     if (errors.length > 0) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: errors.join(" ") }, requestId);
     }
-    const units = flattenToUnits(parsed);
     const subject = normalizeSubject(body.subject ?? parsed.subject ?? "other");
     const sourceType = body.sourceType === "file" ? "file" : "text";
+
+    // Validate the syllabus against the learner's jurisdiction-approved packs
+    // (Sprint 7). Off-curriculum topics/standards are flagged per unit; an
+    // unknown jurisdiction or a curriculum-svc outage degrades to unvalidated.
+    const jurisdiction =
+      body.jurisdiction && typeof body.jurisdiction === "object"
+        ? (body.jurisdiction as JurisdictionLocator)
+        : {};
+    const gradeBand = typeof body.gradeBand === "string" ? body.gradeBand : "";
+    const { topics, standards } = collectTopicsAndStandards(parsed);
+    const validation = gradeBand
+      ? await validateAgainstJurisdiction({ jurisdiction, subject, gradeBand, topics, standards })
+      : null;
+    const units = applyValidationToUnits(flattenToUnits(parsed), validation);
+    const offCurriculum = units.filter((u) => u.validationStatus === "off_curriculum").length;
 
     const syllabus = await createTermSyllabus({
       tenantId: session.tenantId,
@@ -167,9 +189,9 @@ export async function handleSaveTermSyllabus(
 
     audit(session, "term_syllabus.save", requestId, {
       learnerId,
-      metadata: { syllabusId: syllabus.id, subject, units: units.length },
+      metadata: { syllabusId: syllabus.id, subject, units: units.length, offCurriculum },
     });
-    return ok({ syllabus }, requestId, { status: 201 });
+    return ok({ syllabus, offCurriculum }, requestId, { status: 201 });
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

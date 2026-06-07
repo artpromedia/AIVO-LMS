@@ -34,14 +34,28 @@ type ParseSummary = {
   standardsCount: number;
 };
 
+type SavedUnit = { title: string; validationStatus?: string };
+
 type SavedSyllabus = {
   id: string;
   subject: string;
   title: string | null;
   termCount: number;
-  units: Array<{ title: string }>;
+  units: SavedUnit[];
   createdAt: string;
 };
+
+type JurisdictionLocator = {
+  country?: string;
+  region?: string;
+  postalCode?: string;
+  districtId?: string;
+  zipCode?: string;
+};
+
+function offCurriculumCount(units: SavedUnit[]): number {
+  return units.filter((u) => u.validationStatus === "off_curriculum").length;
+}
 
 const SUBJECTS = [
   { slug: "math", name: "Math" },
@@ -59,10 +73,16 @@ function fmtDate(d: string): string {
 export function TermSyllabusManager({
   learnerId,
   apiBase,
+  gradeBand,
+  jurisdiction,
 }: {
   learnerId: string;
   /** e.g. `/api/bff/parent/learners/${learnerId}/term-syllabus` */
   apiBase: string;
+  /** Learner grade band — enables syllabus ↔ jurisdiction validation on save. */
+  gradeBand?: string;
+  /** Learner jurisdiction (US zip/district or country+region) for validation. */
+  jurisdiction?: JurisdictionLocator;
 }) {
   const [text, setText] = useState("");
   const [subject, setSubject] = useState("math");
@@ -123,7 +143,7 @@ export function TermSyllabusManager({
       const res = await fetch(apiBase, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ subject, text, parsed }),
+        body: JSON.stringify({ subject, text, parsed, gradeBand, jurisdiction }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -230,16 +250,24 @@ export function TermSyllabusManager({
         <Card className="p-4 space-y-2">
           <h4 className="font-semibold">Saved term syllabi</h4>
           <ul className="space-y-2">
-            {saved.map((s) => (
-              <li key={s.id} className="flex items-center justify-between text-sm">
-                <span>
-                  {s.title ?? s.subject} · {s.units.length} weeks · {fmtDate(s.createdAt)}
-                </span>
-                <Button variant="ghost" onClick={() => onDelete(s.id)} disabled={busy}>
-                  Remove
-                </Button>
-              </li>
-            ))}
+            {saved.map((s) => {
+              const off = offCurriculumCount(s.units);
+              return (
+                <li key={s.id} className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2">
+                    {s.title ?? s.subject} · {s.units.length} weeks · {fmtDate(s.createdAt)}
+                    {off > 0 && (
+                      <span className="rounded bg-amber-100 text-amber-800 px-2 py-0.5 text-xs">
+                        {off} off-curriculum — review
+                      </span>
+                    )}
+                  </span>
+                  <Button variant="ghost" onClick={() => onDelete(s.id)} disabled={busy}>
+                    Remove
+                  </Button>
+                </li>
+              );
+            })}
           </ul>
         </Card>
       )}

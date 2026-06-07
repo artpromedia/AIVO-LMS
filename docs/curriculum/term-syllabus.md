@@ -47,9 +47,20 @@ brain-svc  POST /api/.../pacing-plan/generate  { source: "uploaded_term_syllabus
 | ----- | ---- |
 | Parser + route | `services/ai-svc/.../term_syllabus_parser.py`, `routes/term_syllabus.py` |
 | Pacing | `services/brain-svc/.../pacing_engine.py` (`normalize_uploaded_scope`), `routes/pacing.py` |
-| Persistence | `packages/db/src/schema/term_syllabus.ts`, `packages/db/drizzle/0068_term_syllabus.sql` |
+| Persistence | `packages/db/src/schema/term_syllabus.ts`, `packages/db/drizzle/0068_term_syllabus.sql` (+ `0069_syllabus_validation.sql`) |
 | Client mapping | `apps/web-v2/lib/learner/term-syllabus.ts`, `lib/db/types.ts` |
+| BFF + routes | `apps/web-v2/lib/bff/term-syllabus.ts`, `app/api/bff/{parent,teacher}/learners/[learnerId]/term-syllabus/*` |
+| UI | `apps/web-v2/components/curriculum/term-syllabus-manager.tsx` |
 
-> Follow-up (part 3): the web-v2 BFF route handlers (parse-preview/save/
-> list/delete) and the `term-syllabus-manager` upload UI build on the
-> client mapping + persistence defined here.
+## Jurisdiction validation (Sprint 7, G8)
+
+On save, the BFF validates the syllabus's topics/standards against the
+learner's jurisdiction-approved packs via curriculum-svc
+`POST /api/curriculum/validate` (`matched` / `unmatched` / `suggestions`):
+
+- Each unit is stamped `validation_status` (`in_curriculum` /
+  `off_curriculum` / `unvalidated`) + `validation_notes` (migration 0069).
+- Off-curriculum items are **flagged for review** in the UI — never
+  silently accepted. In-curriculum topics map to real skill ids.
+- A standard matches only on an exact catalogue-id match; topics match by
+  deterministic token overlap (`curriculum_svc/validation.py`).

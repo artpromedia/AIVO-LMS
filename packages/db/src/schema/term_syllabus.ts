@@ -56,6 +56,11 @@ export const termSyllabusUnits = pgTable(
     objectives: jsonb("objectives").notNull().default([]),
     standards: jsonb("standards").notNull().default([]),
     vocabulary: jsonb("vocabulary").notNull().default([]),
+    // Syllabus ↔ jurisdiction validation (Sprint 7, G8).
+    validationStatus: varchar("validation_status", { length: 24 })
+      .notNull()
+      .default("unvalidated"),
+    validationNotes: jsonb("validation_notes").notNull().default({}),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("term_syllabus_units_syllabus_idx").on(t.syllabusId, t.orderIndex)],

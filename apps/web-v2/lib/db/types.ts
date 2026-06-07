@@ -2705,6 +2705,13 @@ export type IepAiDraftRecord = {
 
 export type TermSyllabusStatus = "PARSING" | "PARSED" | "SAVED" | "FAILED";
 
+export type SyllabusValidationStatus = "unvalidated" | "in_curriculum" | "off_curriculum";
+
+export type SyllabusValidationNotes = {
+  unmatched?: string[];
+  suggestions?: Record<string, string[]>;
+};
+
 export type TermSyllabusUnit = {
   id: ID;
   syllabusId: ID;
@@ -2716,6 +2723,8 @@ export type TermSyllabusUnit = {
   objectives: string[];
   standards: string[];
   vocabulary: string[];
+  validationStatus: SyllabusValidationStatus;
+  validationNotes: SyllabusValidationNotes;
   createdAt: ISODate;
 };
 
