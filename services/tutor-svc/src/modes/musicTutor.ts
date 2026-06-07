@@ -25,7 +25,7 @@ export const musicTutor: TutorDefinition = defineTutor({
   skillGraphRefs: ["prek-music-foundations", "ncas-music-k2", "ncas-music-3-8", "ncas-music-9-12"],
   defaultContentPackRefs: ["music-k2-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",

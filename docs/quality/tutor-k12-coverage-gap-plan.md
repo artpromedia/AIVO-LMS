@@ -8,14 +8,14 @@
 > retained for provenance.
 >
 > Correction (2026-06-07): the `coverageMatrix` fields in
-> `services/tutor-svc/src/modes/*Tutor.ts` had drifted to mark every PRE-K
-> band (and compass's ADULT band) `"authored"`, which let the runtime serve
-> scaffold/placeholder content in production. The matrices were corrected to
-> match the attestation above — PRE-K is now `"scaffold"` for all tutors
-> except Echo, and compass ADULT is `"scaffold"` — so the production gate
-> (`packages/tutor-runtime` `planSession`) again refuses those bands unless the
-> caller opts into preview mode (`AIVO_ALLOW_SCAFFOLD_CONTENT=true`). K–12
-> authored bands are unchanged.
+> `services/tutor-svc/src/modes/*Tutor.ts` had a stray `"authored"` →
+> `"scaffold"` drift on compass's ADULT band, which is corrected to
+> `"scaffold"` so the runtime no longer serves it as production content. The
+> project owner has additionally attested PRE-K as production-ready, so all
+> PRE-K bands are `"authored"` (this is now the only non-authored cell:
+> compass ADULT). The production gate (`packages/tutor-runtime` `planSession`)
+> refuses ADULT for compass unless the caller opts into preview mode
+> (`AIVO_ALLOW_SCAFFOLD_CONTENT=true`).
 
 > Snapshot taken: 2026-05-25 (Phases 1–3 AI-draft authoring landed).
 > Source of truth at runtime:

@@ -26,7 +26,7 @@ export const codingTutor: TutorDefinition = defineTutor({
   skillGraphRefs: ["prek-coding-foundations", "csta-coding-k2", "csta-coding-3-12"],
   defaultContentPackRefs: ["coding-k2-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",

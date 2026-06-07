@@ -30,7 +30,7 @@ export const creativeArtsTutor: TutorDefinition = defineTutor({
   ],
   defaultContentPackRefs: ["creative-arts-k2-fall-2026"],
   coverageMatrix: {
-    PRE_K: "scaffold",
+    PRE_K: "authored",
     K: "authored",
     "1": "authored",
     "2": "authored",
