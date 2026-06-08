@@ -79,6 +79,11 @@ const TABLES = [
   "web_teacher_assignments",
   "web_collaborator_insights",
   "web_collaborator_members",
+  "web_billing_accounts",
+  "web_ai_budgets",
+  "web_ai_cost_events",
+  "web_coupons",
+  "web_daily_billing_batches",
 ] as const;
 
 const POSTGRES_ENABLED =

@@ -50,6 +50,7 @@ const WEB_SCHEMA_MIGRATIONS = [
   "0048_learner_brain_profiles",
   "0049_web_domain",
   "0072_web_collaboration",
+  "0081_web_billing",
 ];
 
 /** Reset `public` and apply the web-domain schema (hermetic, idempotent). */

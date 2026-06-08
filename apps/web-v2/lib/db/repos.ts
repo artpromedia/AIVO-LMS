@@ -3333,20 +3333,12 @@ export function computeSystemHealth(tenantIds: string[]): SystemHealth {
 }
 
 /** Billing — one BillingAccount per tenant; latest wins if dupes exist. */
-export function getBillingForTenant(tenantId: string): BillingAccount | null {
-  let latest: BillingAccount | null = null;
-  for (const b of db().billingAccounts.values()) {
-    if (b.tenantId !== tenantId) continue;
-    if (!latest || b.createdAt > latest.createdAt) latest = b;
-  }
-  return latest;
+export async function getBillingForTenant(tenantId: string): Promise<BillingAccount | null> {
+  return await getPersistence().billing.getAccountForTenant(tenantId);
 }
 
-export function listBillingForTenants(tenantIds: string[]): BillingAccount[] {
-  const ids = new Set(tenantIds);
-  return Array.from(db().billingAccounts.values())
-    .filter((b) => ids.has(b.tenantId))
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+export async function listBillingForTenants(tenantIds: string[]): Promise<BillingAccount[]> {
+  return await getPersistence().billing.listAccountsForTenants(tenantIds);
 }
 
 /** Support tickets. */
@@ -5386,8 +5378,9 @@ export function revokeSeat(assignmentId: string, tenantId: string): SeatAssignme
 
 // ----- AI cost controls -----
 
-export function getAIBudget(tenantId: string): AIBudget {
-  const existing = db().aiBudgets.get(tenantId);
+export async function getAIBudget(tenantId: string): Promise<AIBudget> {
+  const billing = getPersistence().billing;
+  const existing = await billing.getAIBudget(tenantId);
   if (existing) return existing;
   // Reasonable default for paid tenants: $50/mo soft warn at 80%, no hard
   // stop. Platform tenant is unbounded. Repos lazily materialize so every
@@ -5399,31 +5392,39 @@ export function getAIBudget(tenantId: string): AIBudget {
     hardStop: false,
     updatedAt: nowIso(),
   };
-  db().aiBudgets.set(tenantId, def);
-  return def;
+  return await billing.upsertAIBudget(def);
 }
 
-export function updateAIBudget(
+export async function updateAIBudget(
   tenantId: string,
   patch: Partial<Pick<AIBudget, "monthlyCapCents" | "warnAt" | "hardStop">>,
-): AIBudget {
-  const b = getAIBudget(tenantId);
+): Promise<AIBudget> {
+  const b = await getAIBudget(tenantId);
   if (patch.monthlyCapCents !== undefined) b.monthlyCapCents = patch.monthlyCapCents;
   if (patch.warnAt !== undefined) b.warnAt = patch.warnAt;
   if (patch.hardStop !== undefined) b.hardStop = patch.hardStop;
   b.updatedAt = nowIso();
-  return b;
+  return await getPersistence().billing.upsertAIBudget(b);
 }
 
 function periodKey(d: Date): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
-export function monthToDateSpendCents(tenantId: string, at: Date = new Date()): number {
+export async function monthToDateSpendCents(
+  tenantId: string,
+  at: Date = new Date(),
+): Promise<number> {
   const key = periodKey(at);
+  // Period maths stays in app code (identical across backends); the store
+  // returns the tenant's full cost ledger (uncapped — month-to-date must sum
+  // every event, not just the default 200-row page).
+  const events = await getPersistence().billing.listAICostEvents({
+    tenantId,
+    limit: Number.MAX_SAFE_INTEGER,
+  });
   let sum = 0;
-  for (const ev of db().aiCostEvents.values()) {
-    if (ev.tenantId !== tenantId) continue;
+  for (const ev of events) {
     if (periodKey(new Date(ev.occurredAt)) !== key) continue;
     sum += ev.amountCents;
   }
@@ -5436,15 +5437,15 @@ export function monthToDateSpendCents(tenantId: string, at: Date = new Date()): 
  * over the soft `warnAt`, sets `warning=true` so observability can surface
  * the approaching cap without blocking the request.
  */
-export function checkAIBudget(tenantId: string): {
+export async function checkAIBudget(tenantId: string): Promise<{
   allow: boolean;
   warning: boolean;
   spentCents: number;
   capCents: number | null;
   reason: string | null;
-} {
-  const budget = getAIBudget(tenantId);
-  const spent = monthToDateSpendCents(tenantId);
+}> {
+  const budget = await getAIBudget(tenantId);
+  const spent = await monthToDateSpendCents(tenantId);
   if (budget.monthlyCapCents === null) {
     return { allow: true, warning: false, spentCents: spent, capCents: null, reason: null };
   }
@@ -5467,23 +5468,22 @@ export function checkAIBudget(tenantId: string): {
   };
 }
 
-export function recordAICostEvent(
+export async function recordAICostEvent(
   input: Omit<AICostEvent, "id" | "occurredAt"> & { occurredAt?: string },
-): AICostEvent {
+): Promise<AICostEvent> {
   const rec: AICostEvent = {
     id: newId("acos"),
     occurredAt: input.occurredAt ?? nowIso(),
     ...input,
   };
-  db().aiCostEvents.set(rec.id, rec);
-  return rec;
+  return await getPersistence().billing.recordAICostEvent(rec);
 }
 
-export function listAICostEvents(opts: { tenantId?: string; limit?: number }): AICostEvent[] {
-  let arr = Array.from(db().aiCostEvents.values());
-  if (opts.tenantId) arr = arr.filter((e) => e.tenantId === opts.tenantId);
-  arr.sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
-  return arr.slice(0, opts.limit ?? 200);
+export async function listAICostEvents(opts: {
+  tenantId?: string;
+  limit?: number;
+}): Promise<AICostEvent[]> {
+  return await getPersistence().billing.listAICostEvents(opts);
 }
 
 // ----- Migration framework -----
@@ -6149,15 +6149,13 @@ import type {
 } from "@/lib/db/types";
 
 /** Every coupon, newest first. */
-export function listCoupons(): Coupon[] {
-  return Array.from(db().coupons.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function listCoupons(): Promise<Coupon[]> {
+  return await getPersistence().billing.listCoupons();
 }
 
 /** Every daily billing batch, newest run-date first. */
-export function listDailyBillingBatches(): DailyBillingBatch[] {
-  return Array.from(db().dailyBillingBatches.values()).sort((a, b) =>
-    b.runDate.localeCompare(a.runDate),
-  );
+export async function listDailyBillingBatches(): Promise<DailyBillingBatch[]> {
+  return await getPersistence().billing.listDailyBillingBatches();
 }
 
 // ============================================================

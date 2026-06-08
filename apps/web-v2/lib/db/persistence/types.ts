@@ -12,12 +12,17 @@
  * decision record + migration order.
  */
 import type {
+  AIBudget,
+  AICostEvent,
   AuditLog,
   BaselineAssessment,
   BaselineAttempt,
   BaselineItemResponseLog,
   BaselineQuestion,
+  BillingAccount,
   Classroom,
+  Coupon,
+  DailyBillingBatch,
   CollaboratorInsight,
   CollaboratorMember,
   ConsentRecord,
@@ -441,6 +446,41 @@ export interface CollaborationStore {
   listMembersForTenant(tenantId: string): Promise<CollaboratorMember[]>;
 }
 
+/**
+ * Billing domain (Sprint 2) — the WEB-OWNED operational/financial rows that
+ * previously lived in the in-memory Map (real money/quota data lost on
+ * restart). Per ADR 0015 the canonical subscription/invoice/seat state stays
+ * in `services/billing-svc` and is read over REST (see
+ * `lib/billing/billing-svc-client.ts`); this store owns only web_* rows:
+ * billing-account snapshots, AI spend budgets + the per-request cost ledger,
+ * the admin coupon catalog, and the nightly batch run log.
+ */
+export interface BillingStore {
+  // Billing-account snapshots (tenant-scoped).
+  getAccountForTenant(tenantId: string): Promise<BillingAccount | null>;
+  listAccountsForTenants(tenantIds: string[]): Promise<BillingAccount[]>;
+  upsertAccount(account: BillingAccount): Promise<BillingAccount>;
+
+  // AI budgets (one row per tenant). `get` returns null when unset — the repo
+  // layer materializes the default (so the store stays a pure row store).
+  getAIBudget(tenantId: string): Promise<AIBudget | null>;
+  upsertAIBudget(budget: AIBudget): Promise<AIBudget>;
+
+  // AI cost ledger (append-only). `list` is newest-first, tenant-filtered,
+  // capped by `limit` (default 200). The repo sums month-to-date in app code
+  // so the period maths is identical across backends.
+  recordAICostEvent(event: AICostEvent): Promise<AICostEvent>;
+  listAICostEvents(opts: { tenantId?: string; limit?: number }): Promise<AICostEvent[]>;
+
+  // Coupons (platform-wide), newest-first.
+  listCoupons(): Promise<Coupon[]>;
+  upsertCoupon(coupon: Coupon): Promise<Coupon>;
+
+  // Daily billing batches (platform-wide), newest run-date first.
+  listDailyBillingBatches(): Promise<DailyBillingBatch[]>;
+  upsertDailyBillingBatch(batch: DailyBillingBatch): Promise<DailyBillingBatch>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -455,6 +495,7 @@ export interface Persistence {
   quests: QuestStore;
   admin: AdminStore;
   collaboration: CollaborationStore;
+  billing: BillingStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

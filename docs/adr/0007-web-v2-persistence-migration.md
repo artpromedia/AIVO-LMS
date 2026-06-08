@@ -29,6 +29,7 @@ production forces it.
 | 10  | quests / gamification                     | ✅ postgres (proven) | worlds/chapters reference + per-learner progress          |
 | 11  | teacher / school / district admin         | ✅ postgres (proven) | schools/classrooms/enrollments/assignments                |
 | 12  | collaboration (insights + members)        | ✅ postgres (proven) | brain-build inputs; newest-first insights                 |
+| 13  | billing — web-owned (Sprint 2)            | ✅ postgres (proven) | `web_billing_accounts` / `web_ai_budgets` / `web_ai_cost_events` / `web_coupons` / `web_daily_billing_batches`; canonical subs/invoices/seats read from billing-svc over REST (ADR 0015, `lib/billing/billing-svc-client.ts`). Migration jobs (cross-domain mock runner) deferred. |
 
 ## Testcontainers parity harness (Sprint 0)
 

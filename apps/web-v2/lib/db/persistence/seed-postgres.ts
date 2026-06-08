@@ -48,6 +48,11 @@ import {
   generatedLessonPlans,
   lessonInteractions,
   lessonParentSummaries,
+  webBillingAccounts,
+  webAiBudgets,
+  webAiCostEvents,
+  webCoupons,
+  webDailyBillingBatches,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -543,6 +548,62 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
         occurredAt: i.occurredAt,
       })),
       lessonInteractions.id,
+    ),
+  );
+  // ── Sprint 2: web-owned billing / AI-cost rows ──────────────────────
+  await log(
+    "billingAccounts",
+    await bulk(
+      db,
+      webBillingAccounts,
+      vals(s.billingAccounts).map((b) => ({
+        id: b.id,
+        tenantId: b.tenantId,
+        createdAt: b.createdAt,
+        data: b,
+      })),
+      webBillingAccounts.id,
+    ),
+  );
+  await log(
+    "aiBudgets",
+    await bulk(
+      db,
+      webAiBudgets,
+      vals(s.aiBudgets).map((b) => ({ tenantId: b.tenantId, updatedAt: b.updatedAt, data: b })),
+      webAiBudgets.tenantId,
+    ),
+  );
+  await log(
+    "aiCostEvents",
+    await bulk(
+      db,
+      webAiCostEvents,
+      vals(s.aiCostEvents).map((e) => ({
+        id: e.id,
+        tenantId: e.tenantId,
+        occurredAt: e.occurredAt,
+        data: e,
+      })),
+      webAiCostEvents.id,
+    ),
+  );
+  await log(
+    "coupons",
+    await bulk(
+      db,
+      webCoupons,
+      vals(s.coupons).map((c) => ({ id: c.id, code: c.code, createdAt: c.createdAt, data: c })),
+      webCoupons.id,
+    ),
+  );
+  await log(
+    "dailyBillingBatches",
+    await bulk(
+      db,
+      webDailyBillingBatches,
+      vals(s.dailyBillingBatches).map((b) => ({ id: b.id, runDate: b.runDate, data: b })),
+      webDailyBillingBatches.id,
     ),
   );
   await log(

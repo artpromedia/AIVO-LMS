@@ -12,7 +12,7 @@ import { getBillingForTenant, getTenantById } from "@/lib/db/repos";
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.settings");
-  const billing = getBillingForTenant(session.tenantId);
+  const billing = await getBillingForTenant(session.tenantId);
   const tenant = getTenantById(session.tenantId);
 
   return (

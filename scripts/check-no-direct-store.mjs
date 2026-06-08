@@ -130,6 +130,26 @@ const MIGRATED_DOMAINS = [
     domain: "collaboration",
     reposFunctions: ["setTeamInviteDecision"],
   },
+  // Sprint 2 — web-owned billing / AI-cost / coupon / batch rows now durable
+  // in web_* tables (canonical subs/invoices/seats stay in billing-svc, ADR
+  // 0015). Migration jobs (the cross-domain mock admin runner) are a later
+  // sprint and intentionally not listed.
+  {
+    domain: "billing",
+    appPaths: ["api/bff/admin/ai-budgets", "api/bff/admin/billing"],
+    reposFunctions: [
+      "getBillingForTenant",
+      "listBillingForTenants",
+      "getAIBudget",
+      "updateAIBudget",
+      "monthToDateSpendCents",
+      "checkAIBudget",
+      "recordAICostEvent",
+      "listAICostEvents",
+      "listCoupons",
+      "listDailyBillingBatches",
+    ],
+  },
 ];
 
 // Forbidden signals. `getStore`/`resetStore` as identifiers; `db()` as a call.
