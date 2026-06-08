@@ -17,5 +17,6 @@ export * from "./reports.js";
 export * from "./retention.js";
 export * from "./rostering.js";
 export * from "./scim.js";
+export * from "./security.js";
 export * from "./sis.js";
 export * from "./types.js";

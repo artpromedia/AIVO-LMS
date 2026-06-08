@@ -26,6 +26,11 @@ const PLATFORM_NAV = [
     description: "Controls and evidence bundles.",
   },
   { href: "/platform/safety", title: "Safety", description: "AI content moderation queue." },
+  {
+    href: "/platform/security",
+    title: "Security",
+    description: "SOC 2 control register and coverage.",
+  },
   { href: "/platform/ai-costs", title: "AI costs", description: "Per-tenant spend and budget caps." },
   {
     href: "/platform/feature-flags",

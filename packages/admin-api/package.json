@@ -82,6 +82,10 @@
       "types": "./dist/scim.d.ts",
       "default": "./dist/scim.js"
     },
+    "./security": {
+      "types": "./dist/security.d.ts",
+      "default": "./dist/security.js"
+    },
     "./sis": {
       "types": "./dist/sis.d.ts",
       "default": "./dist/sis.js"

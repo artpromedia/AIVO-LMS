@@ -106,6 +106,25 @@ typecheck + lint + tests pass.
   already DB-backed, so a straight proxy — no conversion needed. Adds
   `BILLING_SVC_URL` env helper + shared `InvoicesTable`.
 
+## Done — Wave 8 (security posture: new admin-svc-owned Postgres tables)
+
+The keystone "no owning service" pattern. Security data was in-memory in the old
+web-v2 admin; built it from scratch e2e to Postgres:
+
+- `@aivo/db`: new `security_controls` + `security_control_evidence` tables
+  (`src/schema/security.ts`) and additive migration `drizzle/0075_security_controls.sql`
+  (+ journal entry). Hand-written additive migration (drizzle-kit generate was
+  blocked by pre-existing unrelated snapshot drift; the migrator applies SQL via
+  `_journal.json`).
+- `admin-svc`: new DB-backed `routes/security.ts` — list/get/create/update
+  controls, platform-admin gated, every write hash-chained into admin_audit_log.
+  Builds; 34 service tests pass.
+- `@aivo/admin-api/security` module → `platform/security` (coverage overview) +
+  `platform/security/controls` (register: add control, set status).
+
+Incidents / risks / vendors / vulnerabilities follow this same pattern (add
+table + migration + routes + page).
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but
