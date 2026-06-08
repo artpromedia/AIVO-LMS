@@ -8,6 +8,8 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+import { createObservation } from "../hooks/useCreateObservation";
+
 vi.mock("@/constants/api", () => ({
   API: { FAMILY: "https://family.test" },
 }));
@@ -16,8 +18,6 @@ const apiFetchMock = vi.fn();
 vi.mock("@/lib/api", () => ({
   apiFetch: (...args: unknown[]) => apiFetchMock(...args),
 }));
-
-import { createObservation } from "../hooks/useCreateObservation";
 
 function jsonResponse(body: unknown, status = 201): Response {
   return new Response(JSON.stringify(body), {

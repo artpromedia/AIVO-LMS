@@ -7,6 +7,8 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+import { requestPasswordReset } from "../src/api/passwordRecovery";
+
 vi.mock("@/constants/api", () => ({
   API: { IDENTITY: "https://identity.test" },
 }));
@@ -15,8 +17,6 @@ const apiFetchMock = vi.fn();
 vi.mock("@/lib/api", () => ({
   apiFetch: (...args: unknown[]) => apiFetchMock(...args),
 }));
-
-import { requestPasswordReset } from "../src/api/passwordRecovery";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {

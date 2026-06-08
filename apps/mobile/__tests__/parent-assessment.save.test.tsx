@@ -9,6 +9,8 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+import { submitParentAssessment } from "../hooks/useParentAssessment";
+
 vi.mock("@/constants/api", () => ({
   API: { ASSESSMENT: "https://assessment.test" },
 }));
@@ -17,8 +19,6 @@ const apiFetchMock = vi.fn();
 vi.mock("@/lib/api", () => ({
   apiFetch: (...args: unknown[]) => apiFetchMock(...args),
 }));
-
-import { submitParentAssessment } from "../hooks/useParentAssessment";
 
 function jsonResponse(body: unknown, status = 201): Response {
   return new Response(JSON.stringify(body), {

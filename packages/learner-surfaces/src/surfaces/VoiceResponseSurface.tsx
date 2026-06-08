@@ -88,7 +88,11 @@ export function VoiceResponseSurface({
   const maxDurationMs = (spec?.maxDurationSeconds ?? 60) * 1_000;
   const scoreServiceUrl = spec?.scoreServiceUrl ?? DEFAULT_SCORE_URL;
   const reducedMotion = surface.accessibility.reduceMotionSafe;
-  const largeText = (surface.accessibility as any).largeText as boolean | undefined;
+  // `largeText` is an optional per-surface accessibility hint that isn't on the
+  // canonical `SurfaceAccessibilitySpec` interface. Narrow-cast through the
+  // exact extra shape we read instead of falling back to `any` (which loses
+  // safety on every other property access on `accessibility`).
+  const largeText = (surface.accessibility as { largeText?: boolean }).largeText;
 
   const [state, setState] = useState<RecorderState>("idle");
   const [recording, setRecording] = useState<VoiceResponsePayload | null>(null);
@@ -261,8 +265,8 @@ export function VoiceResponseSurface({
             degraded: scoreResult.degraded,
           }),
         );
-      } catch (err: any) {
-        setUploadError(err?.message ?? "Upload failed");
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : "Upload failed");
       }
 
       try {

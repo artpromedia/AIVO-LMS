@@ -11,6 +11,8 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+import { createTeacherInsight } from "../hooks/useCreateTeacherInsight";
+
 vi.mock("@/constants/api", () => ({
   API: { FAMILY: "https://family.test" },
 }));
@@ -19,8 +21,6 @@ const apiFetchMock = vi.fn();
 vi.mock("@/lib/api", () => ({
   apiFetch: (...args: unknown[]) => apiFetchMock(...args),
 }));
-
-import { createTeacherInsight } from "../hooks/useCreateTeacherInsight";
 
 function jsonResponse(body: unknown, status = 201): Response {
   return new Response(JSON.stringify(body), {

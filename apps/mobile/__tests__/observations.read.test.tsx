@@ -6,6 +6,8 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+import { fetchObservations } from "../src/api/observations";
+
 vi.mock("@/constants/api", () => ({
   API: { FAMILY: "https://family.test" },
 }));
@@ -14,8 +16,6 @@ const apiFetchMock = vi.fn();
 vi.mock("@/lib/api", () => ({
   apiFetch: (...args: unknown[]) => apiFetchMock(...args),
 }));
-
-import { fetchObservations } from "../src/api/observations";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
