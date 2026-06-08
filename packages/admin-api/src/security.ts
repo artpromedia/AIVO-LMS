@@ -279,3 +279,320 @@ export async function updateSecurityIncident(
   );
   return mapIncident((payload.incident as Record<string, unknown>) ?? {});
 }
+
+// ── Risks ────────────────────────────────────────────────────────────────────
+
+export type RiskCategory = "security" | "privacy" | "availability" | "operational" | "third_party";
+export type RiskSeverity = "low" | "medium" | "high" | "critical";
+export type RiskTreatment = "accept" | "mitigate" | "transfer" | "avoid";
+
+export const RISK_CATEGORIES: RiskCategory[] = [
+  "security",
+  "privacy",
+  "availability",
+  "operational",
+  "third_party",
+];
+export const RISK_SEVERITIES: RiskSeverity[] = ["low", "medium", "high", "critical"];
+export const RISK_TREATMENTS: RiskTreatment[] = ["accept", "mitigate", "transfer", "avoid"];
+
+export interface AdminSecurityRisk {
+  id: string;
+  title: string;
+  description: string;
+  category: RiskCategory;
+  inherentSeverity: RiskSeverity;
+  residualSeverity: RiskSeverity;
+  treatment: RiskTreatment;
+  owner: string;
+  open: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+function oneOf<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+  const v = String(value ?? "");
+  return (allowed as readonly string[]).includes(v) ? (v as T) : fallback;
+}
+
+function mapRisk(row: Record<string, unknown>): AdminSecurityRisk {
+  return {
+    id: String(row.id),
+    title: String(row.title ?? ""),
+    description: String(row.description ?? ""),
+    category: oneOf(row.category, RISK_CATEGORIES, "security"),
+    inherentSeverity: oneOf(row.inherentSeverity, RISK_SEVERITIES, "medium"),
+    residualSeverity: oneOf(row.residualSeverity, RISK_SEVERITIES, "medium"),
+    treatment: oneOf(row.treatment, RISK_TREATMENTS, "mitigate"),
+    owner: String(row.owner ?? ""),
+    open: Boolean(row.open),
+    createdAt: row.createdAt ? String(row.createdAt) : null,
+    updatedAt: row.updatedAt ? String(row.updatedAt) : null,
+  };
+}
+
+export async function listSecurityRisks(
+  session: Pick<SessionProfile, "role">,
+): Promise<AdminSecurityRisk[]> {
+  const payload = await adminGet<Record<string, unknown>>(session, "/api/admin-svc/security/risks");
+  const rows = Array.isArray(payload.risks) ? payload.risks : [];
+  return rows.map((row) => mapRisk(row as Record<string, unknown>));
+}
+
+export async function createSecurityRisk(
+  session: Pick<SessionProfile, "role">,
+  input: {
+    title: string;
+    description?: string;
+    category: RiskCategory;
+    inherentSeverity: RiskSeverity;
+    residualSeverity: RiskSeverity;
+    treatment: RiskTreatment;
+    owner?: string;
+  },
+): Promise<AdminSecurityRisk> {
+  const payload = await adminPost<Record<string, unknown>>(
+    session,
+    "/api/admin-svc/security/risks",
+    input,
+  );
+  return mapRisk((payload.risk as Record<string, unknown>) ?? {});
+}
+
+export async function updateSecurityRisk(
+  session: Pick<SessionProfile, "role">,
+  id: string,
+  patch: {
+    title?: string;
+    description?: string;
+    category?: RiskCategory;
+    inherentSeverity?: RiskSeverity;
+    residualSeverity?: RiskSeverity;
+    treatment?: RiskTreatment;
+    owner?: string;
+    open?: boolean;
+  },
+): Promise<AdminSecurityRisk> {
+  const payload = await adminPatch<Record<string, unknown>>(
+    session,
+    `/api/admin-svc/security/risks/${encodeURIComponent(id)}`,
+    patch,
+  );
+  return mapRisk((payload.risk as Record<string, unknown>) ?? {});
+}
+
+// ── Vendors ──────────────────────────────────────────────────────────────────
+
+export type VendorCategory =
+  | "llm_provider"
+  | "tts_provider"
+  | "infra"
+  | "analytics"
+  | "support"
+  | "billing"
+  | "other";
+export type VendorRiskTier = "tier1" | "tier2" | "tier3";
+
+export const VENDOR_CATEGORIES: VendorCategory[] = [
+  "llm_provider",
+  "tts_provider",
+  "infra",
+  "analytics",
+  "support",
+  "billing",
+  "other",
+];
+export const VENDOR_RISK_TIERS: VendorRiskTier[] = ["tier1", "tier2", "tier3"];
+
+export interface AdminSecurityVendor {
+  id: string;
+  name: string;
+  category: VendorCategory;
+  dataResidency: string;
+  processesLearnerData: boolean;
+  dpaSigned: boolean;
+  riskTier: VendorRiskTier;
+  approved: boolean;
+  notes: string | null;
+  lastReviewedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+function mapVendor(row: Record<string, unknown>): AdminSecurityVendor {
+  return {
+    id: String(row.id),
+    name: String(row.name ?? ""),
+    category: oneOf(row.category, VENDOR_CATEGORIES, "other"),
+    dataResidency: String(row.dataResidency ?? ""),
+    processesLearnerData: Boolean(row.processesLearnerData),
+    dpaSigned: Boolean(row.dpaSigned),
+    riskTier: oneOf(row.riskTier, VENDOR_RISK_TIERS, "tier3"),
+    approved: Boolean(row.approved),
+    notes: row.notes ? String(row.notes) : null,
+    lastReviewedAt: row.lastReviewedAt ? String(row.lastReviewedAt) : null,
+    createdAt: row.createdAt ? String(row.createdAt) : null,
+    updatedAt: row.updatedAt ? String(row.updatedAt) : null,
+  };
+}
+
+export async function listSecurityVendors(
+  session: Pick<SessionProfile, "role">,
+): Promise<AdminSecurityVendor[]> {
+  const payload = await adminGet<Record<string, unknown>>(
+    session,
+    "/api/admin-svc/security/vendors",
+  );
+  const rows = Array.isArray(payload.vendors) ? payload.vendors : [];
+  return rows.map((row) => mapVendor(row as Record<string, unknown>));
+}
+
+export async function createSecurityVendor(
+  session: Pick<SessionProfile, "role">,
+  input: {
+    name: string;
+    category: VendorCategory;
+    dataResidency?: string;
+    processesLearnerData?: boolean;
+    dpaSigned?: boolean;
+    riskTier: VendorRiskTier;
+    approved?: boolean;
+    notes?: string | null;
+  },
+): Promise<AdminSecurityVendor> {
+  const payload = await adminPost<Record<string, unknown>>(
+    session,
+    "/api/admin-svc/security/vendors",
+    input,
+  );
+  return mapVendor((payload.vendor as Record<string, unknown>) ?? {});
+}
+
+export async function updateSecurityVendor(
+  session: Pick<SessionProfile, "role">,
+  id: string,
+  patch: {
+    name?: string;
+    category?: VendorCategory;
+    dataResidency?: string;
+    processesLearnerData?: boolean;
+    dpaSigned?: boolean;
+    riskTier?: VendorRiskTier;
+    approved?: boolean;
+    notes?: string | null;
+  },
+): Promise<AdminSecurityVendor> {
+  const payload = await adminPatch<Record<string, unknown>>(
+    session,
+    `/api/admin-svc/security/vendors/${encodeURIComponent(id)}`,
+    patch,
+  );
+  return mapVendor((payload.vendor as Record<string, unknown>) ?? {});
+}
+
+// ── Vulnerabilities ──────────────────────────────────────────────────────────
+
+export type VulnSeverity = "low" | "medium" | "high" | "critical";
+export type VulnStatus = "open" | "triaged" | "fixed" | "wontfix";
+export type VulnSource =
+  | "dependency_scan"
+  | "container_scan"
+  | "iac_scan"
+  | "pen_test"
+  | "external_report"
+  | "internal";
+
+export const VULN_SEVERITIES: VulnSeverity[] = ["low", "medium", "high", "critical"];
+export const VULN_STATUSES: VulnStatus[] = ["open", "triaged", "fixed", "wontfix"];
+export const VULN_SOURCES: VulnSource[] = [
+  "dependency_scan",
+  "container_scan",
+  "iac_scan",
+  "pen_test",
+  "external_report",
+  "internal",
+];
+
+export interface AdminSecurityVulnerability {
+  id: string;
+  title: string;
+  cveId: string | null;
+  severity: VulnSeverity;
+  status: VulnStatus;
+  source: VulnSource;
+  affectedComponent: string;
+  fixedIn: string | null;
+  discoveredAt: string | null;
+  resolvedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+function mapVuln(row: Record<string, unknown>): AdminSecurityVulnerability {
+  return {
+    id: String(row.id),
+    title: String(row.title ?? ""),
+    cveId: row.cveId ? String(row.cveId) : null,
+    severity: oneOf(row.severity, VULN_SEVERITIES, "medium"),
+    status: oneOf(row.status, VULN_STATUSES, "open"),
+    source: oneOf(row.source, VULN_SOURCES, "internal"),
+    affectedComponent: String(row.affectedComponent ?? ""),
+    fixedIn: row.fixedIn ? String(row.fixedIn) : null,
+    discoveredAt: row.discoveredAt ? String(row.discoveredAt) : null,
+    resolvedAt: row.resolvedAt ? String(row.resolvedAt) : null,
+    createdAt: row.createdAt ? String(row.createdAt) : null,
+    updatedAt: row.updatedAt ? String(row.updatedAt) : null,
+  };
+}
+
+export async function listSecurityVulnerabilities(
+  session: Pick<SessionProfile, "role">,
+): Promise<AdminSecurityVulnerability[]> {
+  const payload = await adminGet<Record<string, unknown>>(
+    session,
+    "/api/admin-svc/security/vulnerabilities",
+  );
+  const rows = Array.isArray(payload.vulnerabilities) ? payload.vulnerabilities : [];
+  return rows.map((row) => mapVuln(row as Record<string, unknown>));
+}
+
+export async function createSecurityVulnerability(
+  session: Pick<SessionProfile, "role">,
+  input: {
+    title: string;
+    cveId?: string | null;
+    severity: VulnSeverity;
+    status?: VulnStatus;
+    source: VulnSource;
+    affectedComponent?: string;
+    fixedIn?: string | null;
+  },
+): Promise<AdminSecurityVulnerability> {
+  const payload = await adminPost<Record<string, unknown>>(
+    session,
+    "/api/admin-svc/security/vulnerabilities",
+    input,
+  );
+  return mapVuln((payload.vulnerability as Record<string, unknown>) ?? {});
+}
+
+export async function updateSecurityVulnerability(
+  session: Pick<SessionProfile, "role">,
+  id: string,
+  patch: {
+    title?: string;
+    cveId?: string | null;
+    severity?: VulnSeverity;
+    status?: VulnStatus;
+    source?: VulnSource;
+    affectedComponent?: string;
+    fixedIn?: string | null;
+  },
+): Promise<AdminSecurityVulnerability> {
+  const payload = await adminPatch<Record<string, unknown>>(
+    session,
+    `/api/admin-svc/security/vulnerabilities/${encodeURIComponent(id)}`,
+    patch,
+  );
+  return mapVuln((payload.vulnerability as Record<string, unknown>) ?? {});
+}

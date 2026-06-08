@@ -28,6 +28,18 @@ export default async function SecurityPage() {
           <Link className="admin-button admin-button-secondary" href="/platform/security/incidents">
             Incidents
           </Link>
+          <Link className="admin-button admin-button-secondary" href="/platform/security/risks">
+            Risk register
+          </Link>
+          <Link className="admin-button admin-button-secondary" href="/platform/security/vendors">
+            Vendors
+          </Link>
+          <Link
+            className="admin-button admin-button-secondary"
+            href="/platform/security/vulnerabilities"
+          >
+            Vulnerabilities
+          </Link>
         </div>
       }
     >

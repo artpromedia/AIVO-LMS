@@ -128,7 +128,17 @@ Extends Wave 8: new `security_incidents` table + migration `0076`, incident
 endpoints added to admin-svc `routes/security.ts` (list/create/update, terminal
 status stamps `resolvedAt`, writes audited), `@aivo/admin-api/security` incident
 functions, and `platform/security/incidents` (open incident, set status,
-SEV1/open KPIs). Risks / vendors / vulnerabilities follow the same recipe.
+SEV1/open KPIs).
+
+## Done — Wave 10 (security risks + vendors + vulnerabilities)
+
+Completes the security domain. New tables `security_risks`, `security_vendors`,
+`security_vulnerabilities` + migration `0077`; admin-svc list/create/update
+endpoints for each (vuln fixed/wontfix stamps `resolvedAt`; all writes audited);
+`@aivo/admin-api/security` functions; pages `platform/security/{risks,vendors,
+vulnerabilities}` (register + create + key-field updates), all linked from the
+security overview. **Security posture is now fully migrated** (controls,
+incidents, risks, vendors, vulnerabilities — all e2e to Postgres).
 
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 

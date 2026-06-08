@@ -85,3 +85,85 @@ export const securityIncidents = pgTable(
     index("idx_security_incidents_severity").on(table.severity),
   ],
 );
+
+/**
+ * Risk register.
+ *
+ * `category` ∈ security | privacy | availability | operational | third_party.
+ * `inherentSeverity` / `residualSeverity` ∈ low | medium | high | critical.
+ * `treatment` ∈ accept | mitigate | transfer | avoid.
+ */
+export const securityRisks = pgTable(
+  "security_risks",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: varchar("title", { length: 256 }).notNull(),
+    description: text("description").notNull().default(""),
+    category: varchar("category", { length: 24 }).notNull().default("security"),
+    inherentSeverity: varchar("inherent_severity", { length: 16 }).notNull().default("medium"),
+    residualSeverity: varchar("residual_severity", { length: 16 }).notNull().default("medium"),
+    treatment: varchar("treatment", { length: 16 }).notNull().default("mitigate"),
+    /** Free-form owner role label, e.g. "Platform Security". */
+    owner: varchar("owner", { length: 128 }).notNull().default(""),
+    open: boolean("open").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_security_risks_category").on(table.category)],
+);
+
+/**
+ * Third-party vendor register (vendor risk management).
+ *
+ * `category` ∈ llm_provider | tts_provider | infra | analytics | support |
+ *   billing | other.
+ * `riskTier` ∈ tier1 | tier2 | tier3.
+ */
+export const securityVendors = pgTable(
+  "security_vendors",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: varchar("name", { length: 256 }).notNull(),
+    category: varchar("category", { length: 24 }).notNull().default("other"),
+    dataResidency: varchar("data_residency", { length: 64 }).notNull().default(""),
+    processesLearnerData: boolean("processes_learner_data").notNull().default(false),
+    dpaSigned: boolean("dpa_signed").notNull().default(false),
+    riskTier: varchar("risk_tier", { length: 8 }).notNull().default("tier3"),
+    approved: boolean("approved").notNull().default(false),
+    notes: text("notes"),
+    lastReviewedAt: timestamp("last_reviewed_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_security_vendors_risk_tier").on(table.riskTier)],
+);
+
+/**
+ * Vulnerability report register.
+ *
+ * `severity` ∈ low | medium | high | critical.
+ * `status` ∈ open | triaged | fixed | wontfix.
+ * `source` ∈ dependency_scan | container_scan | iac_scan | pen_test |
+ *   external_report | internal.
+ */
+export const securityVulnerabilities = pgTable(
+  "security_vulnerabilities",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: varchar("title", { length: 256 }).notNull(),
+    cveId: varchar("cve_id", { length: 64 }),
+    severity: varchar("severity", { length: 16 }).notNull().default("medium"),
+    status: varchar("status", { length: 16 }).notNull().default("open"),
+    source: varchar("source", { length: 24 }).notNull().default("internal"),
+    affectedComponent: varchar("affected_component", { length: 256 }).notNull().default(""),
+    fixedIn: varchar("fixed_in", { length: 128 }),
+    discoveredAt: timestamp("discovered_at").defaultNow().notNull(),
+    resolvedAt: timestamp("resolved_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_security_vulnerabilities_status").on(table.status),
+    index("idx_security_vulnerabilities_severity").on(table.severity),
+  ],
+);
