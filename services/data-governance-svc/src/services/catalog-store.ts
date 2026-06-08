@@ -7,6 +7,8 @@
  * default, optionally tenant-scoped). In-memory; the Postgres
  * `data_catalog` / `retention_policies` tables back it in production.
  */
+import { retentionPolicies } from "@aivo/db";
+import { and, eq, isNull } from "drizzle-orm";
 import type { Disposition, RetentionPolicy } from "../domain/retention-preview.js";
 
 export type Sensitivity = "low" | "moderate" | "high" | "restricted";
@@ -120,22 +122,17 @@ interface StoredPolicy extends RetentionPolicy {
   updatedAt: string;
 }
 
-const policyKey = (dataClass: string, tenantId: string | null) =>
-  `${dataClass}::${tenantId ?? "*"}`;
-const policies = new Map<string, StoredPolicy>();
-
-export function clearCatalogStoreForTest(): void {
-  policies.clear();
+export interface SetRetentionPolicyInput {
+  dataClass: string;
+  tenantId?: string | null;
+  retentionDays: number | null;
+  disposition: Disposition;
+  legalHold?: boolean;
+  updatedById?: string | null;
 }
 
-/** Effective policy for a class: explicit override → catalog default. */
-export function getRetentionPolicy(
-  dataClass: string,
-  tenantId: string | null = null,
-): StoredPolicy {
-  const override =
-    policies.get(policyKey(dataClass, tenantId)) ?? policies.get(policyKey(dataClass, null));
-  if (override) return override;
+/** Catalog default for a class when no override row exists. */
+function defaultPolicy(dataClass: string, tenantId: string | null): StoredPolicy {
   const cat = getDataClass(dataClass);
   return {
     dataClass,
@@ -148,28 +145,185 @@ export function getRetentionPolicy(
   };
 }
 
-export function listRetentionPolicies(tenantId: string | null = null): StoredPolicy[] {
-  return listCatalog().map((c) => getRetentionPolicy(c.dataClass, tenantId));
+/**
+ * Store for retention-policy overrides only. The data-class catalog itself is
+ * static config (see `listCatalog` / `getDataClass`) and is NOT backed by this
+ * store. Methods may return a value or a Promise (DB-or-fallback pattern,
+ * mirroring `dpa-store.ts`).
+ */
+export interface RetentionPolicyStore {
+  /** Read an override row (dataClass + tenantId, falling back to tenantId=null);
+   *  undefined when none exists. */
+  getOverride(
+    dataClass: string,
+    tenantId: string | null,
+  ): Promise<StoredPolicy | undefined> | StoredPolicy | undefined;
+  /** Upsert an override row (unique on dataClass + tenantId). */
+  upsert(input: SetRetentionPolicyInput): Promise<StoredPolicy> | StoredPolicy;
+  clear(): void;
 }
 
-export function setRetentionPolicy(input: {
-  dataClass: string;
-  tenantId?: string | null;
-  retentionDays: number | null;
-  disposition: Disposition;
-  legalHold?: boolean;
-  updatedById?: string | null;
-}): StoredPolicy {
-  const tenantId = input.tenantId ?? null;
-  const rec: StoredPolicy = {
-    dataClass: input.dataClass,
-    tenantId,
-    retentionDays: input.retentionDays,
-    disposition: input.disposition,
-    legalHold: input.legalHold ?? false,
-    updatedById: input.updatedById ?? null,
-    updatedAt: new Date().toISOString(),
+export class InMemoryRetentionPolicyStore implements RetentionPolicyStore {
+  private policies = new Map<string, StoredPolicy>();
+
+  private key(dataClass: string, tenantId: string | null): string {
+    return `${dataClass}::${tenantId ?? "*"}`;
+  }
+
+  getOverride(dataClass: string, tenantId: string | null): StoredPolicy | undefined {
+    return (
+      this.policies.get(this.key(dataClass, tenantId)) ??
+      this.policies.get(this.key(dataClass, null))
+    );
+  }
+
+  upsert(input: SetRetentionPolicyInput): StoredPolicy {
+    const tenantId = input.tenantId ?? null;
+    const rec: StoredPolicy = {
+      dataClass: input.dataClass,
+      tenantId,
+      retentionDays: input.retentionDays,
+      disposition: input.disposition,
+      legalHold: input.legalHold ?? false,
+      updatedById: input.updatedById ?? null,
+      updatedAt: new Date().toISOString(),
+    };
+    this.policies.set(this.key(input.dataClass, tenantId), rec);
+    return rec;
+  }
+
+  clear(): void {
+    this.policies.clear();
+  }
+}
+
+function rowToStoredPolicy(row: typeof retentionPolicies.$inferSelect): StoredPolicy {
+  return {
+    dataClass: row.dataClass,
+    tenantId: row.tenantId,
+    retentionDays: row.retentionDays,
+    disposition: row.disposition as Disposition,
+    legalHold: row.legalHold,
+    updatedById: row.updatedById,
+    updatedAt: row.updatedAt.toISOString(),
   };
-  policies.set(policyKey(input.dataClass, tenantId), rec);
-  return rec;
+}
+
+export class PostgresRetentionPolicyStore implements RetentionPolicyStore {
+  // `db` is a drizzle client; typed `any` to keep this file dependency-light.
+  constructor(private readonly db: any) {}
+
+  private async readRow(
+    dataClass: string,
+    tenantId: string | null,
+  ): Promise<StoredPolicy | undefined> {
+    const rows = await this.db
+      .select()
+      .from(retentionPolicies)
+      .where(
+        and(
+          eq(retentionPolicies.dataClass, dataClass),
+          tenantId === null
+            ? isNull(retentionPolicies.tenantId)
+            : eq(retentionPolicies.tenantId, tenantId),
+        ),
+      )
+      .limit(1);
+    return rows[0] ? rowToStoredPolicy(rows[0]) : undefined;
+  }
+
+  async getOverride(
+    dataClass: string,
+    tenantId: string | null,
+  ): Promise<StoredPolicy | undefined> {
+    const scoped = tenantId !== null ? await this.readRow(dataClass, tenantId) : undefined;
+    if (scoped) return scoped;
+    return this.readRow(dataClass, null);
+  }
+
+  async upsert(input: SetRetentionPolicyInput): Promise<StoredPolicy> {
+    const tenantId = input.tenantId ?? null;
+    const values = {
+      tenantId,
+      dataClass: input.dataClass,
+      retentionDays: input.retentionDays,
+      disposition: input.disposition,
+      legalHold: input.legalHold ?? false,
+      updatedById: input.updatedById ?? null,
+      updatedAt: new Date(),
+    };
+    const [row] = await this.db
+      .insert(retentionPolicies)
+      .values(values)
+      .onConflictDoUpdate({
+        target: [retentionPolicies.dataClass, retentionPolicies.tenantId],
+        set: {
+          retentionDays: values.retentionDays,
+          disposition: values.disposition,
+          legalHold: values.legalHold,
+          updatedById: values.updatedById,
+          updatedAt: values.updatedAt,
+        },
+      })
+      .returning();
+    return rowToStoredPolicy(row);
+  }
+
+  clear(): void {
+    // No-op: production state is not cleared from process memory.
+  }
+}
+
+/**
+ * Pick the right retention-policy store at boot. Production requires a drizzle
+ * client; non-production tolerates the in-memory store.
+ */
+export function selectRetentionPolicyStore(db: any | null | undefined): RetentionPolicyStore {
+  if (db) return new PostgresRetentionPolicyStore(db);
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "data-governance-svc: DATABASE_URL / drizzle client required in production. " +
+        "InMemoryRetentionPolicyStore must NOT be used in production — retention " +
+        "policy overrides would be lost on restart.",
+    );
+  }
+  return new InMemoryRetentionPolicyStore();
+}
+
+let POLICY_STORE: RetentionPolicyStore = new InMemoryRetentionPolicyStore();
+
+/** Initialize the retention-policy store from a (possibly absent) drizzle
+ *  client. In production with no client, throws. */
+export function initCatalogStoreFromDb(db: any | null | undefined): void {
+  POLICY_STORE = selectRetentionPolicyStore(db);
+}
+
+export function clearCatalogStoreForTest(): void {
+  if (POLICY_STORE instanceof InMemoryRetentionPolicyStore) {
+    POLICY_STORE.clear();
+  } else {
+    POLICY_STORE = new InMemoryRetentionPolicyStore();
+  }
+}
+
+/** Effective policy for a class: explicit override → catalog default. */
+export async function getRetentionPolicy(
+  dataClass: string,
+  tenantId: string | null = null,
+): Promise<StoredPolicy> {
+  const override = await POLICY_STORE.getOverride(dataClass, tenantId);
+  if (override) return override;
+  return defaultPolicy(dataClass, tenantId);
+}
+
+export async function listRetentionPolicies(
+  tenantId: string | null = null,
+): Promise<StoredPolicy[]> {
+  return Promise.all(listCatalog().map((c) => getRetentionPolicy(c.dataClass, tenantId)));
+}
+
+export async function setRetentionPolicy(
+  input: SetRetentionPolicyInput,
+): Promise<StoredPolicy> {
+  return POLICY_STORE.upsert(input);
 }

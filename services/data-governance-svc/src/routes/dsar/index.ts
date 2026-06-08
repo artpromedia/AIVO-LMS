@@ -69,7 +69,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
           .send({ error: "intake requires a verified identity or an on-behalf-of-minor request" });
       }
 
-      const record = createDsar({
+      const record = await createDsar({
         tenantId: body.tenantId ?? actor.tenantId,
         type: body.type as DsarType,
         regulations: body.regulations,
@@ -98,7 +98,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
     const actor = requireDsarProcessor(request, reply);
     if (!actor) return;
     const status = request.query.status as DsarStatus | undefined;
-    const list = listDsars({ status, tenantScope: tenantScopeFor(actor) });
+    const list = await listDsars({ status, tenantScope: tenantScopeFor(actor) });
     const now = new Date();
     return {
       requests: list.map((r) => ({ ...r, sla: slaStatusFor(r, now) })),
@@ -110,10 +110,10 @@ export function registerDsarRoutes(app: FastifyInstance): void {
   app.get<{ Params: { id: string } }>("/dsar/:id", async (request, reply) => {
     const actor = requireDsarProcessor(request, reply);
     if (!actor) return;
-    const record = getDsar(request.params.id);
+    const record = await getDsar(request.params.id);
     if (!record) return reply.code(404).send({ error: "Not found" });
     if (!canAccess(actor, record.tenantId)) return reply.code(403).send({ error: "Out of scope" });
-    return { request: record, timeline: getTimeline(record.id), sla: slaStatusFor(record) };
+    return { request: record, timeline: await getTimeline(record.id), sla: slaStatusFor(record) };
   });
 
   app.post<{ Params: { id: string }; Body: { method?: string } }>(
@@ -121,11 +121,11 @@ export function registerDsarRoutes(app: FastifyInstance): void {
     async (request, reply) => {
       const actor = requireDsarProcessor(request, reply);
       if (!actor) return;
-      const record = getDsar(request.params.id);
+      const record = await getDsar(request.params.id);
       if (!record) return reply.code(404).send({ error: "Not found" });
       if (!canAccess(actor, record.tenantId))
         return reply.code(403).send({ error: "Out of scope" });
-      const updated = verifyIdentity(record.id, request.body?.method ?? "manual", actor);
+      const updated = await verifyIdentity(record.id, request.body?.method ?? "manual", actor);
       void emitAuditEvent({
         actorId: actor.actorId ?? undefined,
         actorRole: actor.actorRole ?? "system",
@@ -142,7 +142,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
     async (request, reply) => {
       const actor = requireDsarProcessor(request, reply);
       if (!actor) return;
-      const record = getDsar(request.params.id);
+      const record = await getDsar(request.params.id);
       if (!record) return reply.code(404).send({ error: "Not found" });
       if (!canAccess(actor, record.tenantId))
         return reply.code(403).send({ error: "Out of scope" });
@@ -154,13 +154,13 @@ export function registerDsarRoutes(app: FastifyInstance): void {
   app.post<{ Params: { id: string } }>("/dsar/:id/approve", async (request, reply) => {
     const actor = requireDsarProcessor(request, reply);
     if (!actor) return;
-    const record = getDsar(request.params.id);
+    const record = await getDsar(request.params.id);
     if (!record) return reply.code(404).send({ error: "Not found" });
     if (!canAccess(actor, record.tenantId)) return reply.code(403).send({ error: "Out of scope" });
     if (!record.identityVerified) {
       return reply.code(409).send({ error: "identity must be verified before approval" });
     }
-    const updated = approveDsar(record.id, actor);
+    const updated = await approveDsar(record.id, actor);
     void emitAuditEvent({
       actorId: actor.actorId ?? undefined,
       actorRole: actor.actorRole ?? "system",
@@ -176,11 +176,11 @@ export function registerDsarRoutes(app: FastifyInstance): void {
     async (request, reply) => {
       const actor = requireDsarProcessor(request, reply);
       if (!actor) return;
-      const record = getDsar(request.params.id);
+      const record = await getDsar(request.params.id);
       if (!record) return reply.code(404).send({ error: "Not found" });
       if (!canAccess(actor, record.tenantId))
         return reply.code(403).send({ error: "Out of scope" });
-      const updated = rejectDsar(record.id, request.body?.reason ?? "not specified", actor);
+      const updated = await rejectDsar(record.id, request.body?.reason ?? "not specified", actor);
       void emitAuditEvent({
         actorId: actor.actorId ?? undefined,
         actorRole: actor.actorRole ?? "system",
@@ -196,7 +196,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
   app.post<{ Params: { id: string } }>("/dsar/:id/fulfill", async (request, reply) => {
     const actor = requireDsarProcessor(request, reply);
     if (!actor) return;
-    const record = getDsar(request.params.id);
+    const record = await getDsar(request.params.id);
     if (!record) return reply.code(404).send({ error: "Not found" });
     if (!canAccess(actor, record.tenantId)) return reply.code(403).send({ error: "Out of scope" });
     if (record.status !== "approved" && record.status !== "fulfilling") {
@@ -215,7 +215,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
         .send({ error: "step-up required for erasure", code: "STEP_UP_REQUIRED" });
     }
 
-    startFulfillment(record.id, actor);
+    await startFulfillment(record.id, actor);
 
     if (record.type === "erasure") {
       const outcome = await runErasureFanout({
@@ -224,7 +224,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
         tenantId: record.tenantId,
         dsarId: record.id,
       });
-      recordServiceResponse(record.id, {
+      await recordServiceResponse(record.id, {
         kind: "erasure",
         checksum: outcome.checksum,
         totalErased: outcome.totalErased,
@@ -238,7 +238,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
           checksum: outcome.checksum,
         });
       }
-      const updated = fulfillDsar(
+      const updated = await fulfillDsar(
         record.id,
         {
           kind: "erasure_receipt",
@@ -269,7 +269,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
       dsarId: record.id,
     });
     const check = validateArt20Bundle(bundle);
-    const updated = fulfillDsar(
+    const updated = await fulfillDsar(
       record.id,
       {
         kind: "export_bundle",
@@ -293,7 +293,7 @@ export function registerDsarRoutes(app: FastifyInstance): void {
   app.get<{ Params: { id: string } }>("/dsar/:id/export", async (request, reply) => {
     const actor = requireDsarProcessor(request, reply);
     if (!actor) return;
-    const record = getDsar(request.params.id);
+    const record = await getDsar(request.params.id);
     if (!record) return reply.code(404).send({ error: "Not found" });
     if (!canAccess(actor, record.tenantId)) return reply.code(403).send({ error: "Out of scope" });
     const bundle = await runExportFanout({

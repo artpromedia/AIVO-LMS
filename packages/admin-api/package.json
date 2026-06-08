@@ -34,6 +34,10 @@
       "types": "./dist/content.d.ts",
       "default": "./dist/content.js"
     },
+    "./dsar": {
+      "types": "./dist/dsar.d.ts",
+      "default": "./dist/dsar.js"
+    },
     "./feature-flags": {
       "types": "./dist/feature-flags.d.ts",
       "default": "./dist/feature-flags.js"
@@ -61,6 +65,10 @@
     "./reports": {
       "types": "./dist/reports.d.ts",
       "default": "./dist/reports.js"
+    },
+    "./retention": {
+      "types": "./dist/retention.d.ts",
+      "default": "./dist/retention.js"
     },
     "./rostering": {
       "types": "./dist/rostering.d.ts",

@@ -24,7 +24,7 @@ export function registerRetentionPolicyRoutes(app: FastifyInstance): void {
       return reply.code(403).send({ error: "admin role required" });
     }
     const tenantId = isPlatformAdmin(actor) ? null : actor.tenantId;
-    return { policies: listRetentionPolicies(tenantId) };
+    return { policies: await listRetentionPolicies(tenantId) };
   });
 
   app.put<{
@@ -43,7 +43,7 @@ export function registerRetentionPolicyRoutes(app: FastifyInstance): void {
       return reply.code(404).send({ error: `unknown data class: ${dataClass}` });
     }
     const body = request.body ?? {};
-    const updated = setRetentionPolicy({
+    const updated = await setRetentionPolicy({
       dataClass,
       tenantId: body.tenantId ?? null,
       retentionDays: body.retentionDays ?? null,
@@ -77,7 +77,7 @@ export function registerRetentionPolicyRoutes(app: FastifyInstance): void {
       }
       const tenantId = isPlatformAdmin(actor) ? (request.body?.tenantId ?? null) : actor.tenantId;
       const records = request.body?.records ?? [];
-      const policies = listRetentionPolicies(tenantId);
+      const policies = await listRetentionPolicies(tenantId);
       const preview = previewRetention({ policies, records });
       return { preview, totalEligible: totalEligible(preview) };
     },

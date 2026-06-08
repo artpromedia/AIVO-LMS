@@ -79,6 +79,24 @@ data.
 > real database — via the owning service (preferred) or, where there is no
 > owner, new admin-svc Drizzle tables + migrations.
 
+## Done — Wave 6 (DSAR + retention, incl. owning-service DB conversion)
+
+The owning service (`data-governance-svc`) stored DSAR requests and retention
+policies in in-memory `Map`s. Converted both to the DB-or-fallback pattern from
+`dpa-store.ts` — **Postgres in production** (tables `dsar_requests`,
+`dsar_events`, `retention_policies`), `selectXStore(db)` throws in production
+without a DB, in-memory only for tests/dev. Then surfaced them:
+
+- **platform/compliance/dsar (+[id])** ← `@aivo/admin-api/dsar` → `data-governance-svc`
+  `/dsar` queue (KPIs, SLA state, approve/reject) + detail (timeline,
+  verify-identity/approve/reject/fulfill actions).
+- **platform/compliance/retention** ← `@aivo/admin-api/retention` →
+  `/retention/policies` list + per-data-class edit (retention window,
+  disposition, legal hold).
+
+Backend: `data-governance-svc` builds; **37 tests pass**. Frontend: web-admin
+typecheck + lint + tests pass.
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but
