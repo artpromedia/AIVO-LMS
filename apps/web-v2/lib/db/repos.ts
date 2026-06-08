@@ -6844,31 +6844,33 @@ export function createCaregiverObservation(input: {
 // One row per learner; regenerations overwrite.
 // ---------------------------------------------------------------------------
 
-export function upsertIepAiDraft(input: {
+export async function upsertIepAiDraft(input: {
   tenantId: string;
   learnerId: string;
   sourceAttemptId?: string | null;
   draft: import("./types").IepAiDraftBody;
   model?: string | null;
   responsibleAi?: Record<string, unknown>;
-}): import("./types").IepAiDraftRecord {
-  const store = db();
+}): Promise<import("./types").IepAiDraftRecord> {
+  const clinical = getPersistence().clinical;
   const now = nowIso();
-  const existing = Array.from(store.iepAiDrafts.values()).find(
-    (d) => d.learnerId === input.learnerId && d.tenantId === input.tenantId,
-  );
+  const existing = await clinical.getDraftForLearner(input.learnerId, input.tenantId);
   if (existing) {
-    existing.draft = input.draft;
-    existing.model = input.model ?? existing.model;
-    existing.responsibleAi = input.responsibleAi ?? existing.responsibleAi;
-    existing.generatedAt = now;
-    existing.updatedAt = now;
-    existing.status = "ai_draft";
-    existing.reviewedByUserId = null;
-    existing.reviewedAt = null;
-    existing.approvedByUserId = null;
-    existing.approvedAt = null;
-    return existing;
+    // Regeneration resets the review lifecycle back to ai_draft.
+    const updated: import("./types").IepAiDraftRecord = {
+      ...existing,
+      draft: input.draft,
+      model: input.model ?? existing.model,
+      responsibleAi: input.responsibleAi ?? existing.responsibleAi,
+      generatedAt: now,
+      updatedAt: now,
+      status: "ai_draft",
+      reviewedByUserId: null,
+      reviewedAt: null,
+      approvedByUserId: null,
+      approvedAt: null,
+    };
+    return await clinical.upsertDraft(updated);
   }
   const rec: import("./types").IepAiDraftRecord = {
     id: newId("iep-draft"),
@@ -6887,19 +6889,14 @@ export function upsertIepAiDraft(input: {
     createdAt: now,
     updatedAt: now,
   };
-  store.iepAiDrafts.set(rec.id, rec);
-  return rec;
+  return await clinical.upsertDraft(rec);
 }
 
-export function getIepAiDraft(
+export async function getIepAiDraft(
   learnerId: string,
   tenantId: string,
-): import("./types").IepAiDraftRecord | null {
-  return (
-    Array.from(db().iepAiDrafts.values()).find(
-      (d) => d.learnerId === learnerId && d.tenantId === tenantId,
-    ) ?? null
-  );
+): Promise<import("./types").IepAiDraftRecord | null> {
+  return await getPersistence().clinical.getDraftForLearner(learnerId, tenantId);
 }
 
 export async function listIepAiDraftsForReviewer(
@@ -6908,20 +6905,19 @@ export async function listIepAiDraftsForReviewer(
 ): Promise<import("./types").IepAiDraftRecord[]> {
   // Sprint 11: a teacher sees drafts for every learner on their roster.
   const reviewerLearners = await listLearnersForTeacher(reviewerUserId, tenantId);
-  const learnerIds = new Set(reviewerLearners.map((l) => l.id));
-  return Array.from(db().iepAiDrafts.values())
-    .filter((d) => d.tenantId === tenantId && learnerIds.has(d.learnerId))
-    .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+  const learnerIds = reviewerLearners.map((l) => l.id);
+  return await getPersistence().clinical.listDraftsForLearners(learnerIds, tenantId);
 }
 
-export function progressIepAiDraft(
+export async function progressIepAiDraft(
   id: string,
   tenantId: string,
   userId: string,
   next: import("./types").IepAiDraftStatus,
-): import("./types").IepAiDraftRecord | null {
-  const d = db().iepAiDrafts.get(id);
-  if (!d || d.tenantId !== tenantId) return null;
+): Promise<import("./types").IepAiDraftRecord | null> {
+  const clinical = getPersistence().clinical;
+  const d = await clinical.getDraftById(id, tenantId);
+  if (!d) return null;
   const allowed: Record<import("./types").IepAiDraftStatus, import("./types").IepAiDraftStatus[]> =
     {
       ai_draft: ["teacher_review", "archived"],
@@ -6931,17 +6927,17 @@ export function progressIepAiDraft(
       archived: [],
     };
   if (!allowed[d.status].includes(next)) return null;
-  d.status = next;
-  d.updatedAt = nowIso();
-  if (next === "teacher_review") {
-    d.reviewedByUserId = userId;
-    d.reviewedAt = nowIso();
-  }
-  if (next === "admin_approved") {
-    d.approvedByUserId = userId;
-    d.approvedAt = nowIso();
-  }
-  return d;
+  const now = nowIso();
+  const updated: import("./types").IepAiDraftRecord = {
+    ...d,
+    status: next,
+    updatedAt: now,
+    reviewedByUserId: next === "teacher_review" ? userId : d.reviewedByUserId,
+    reviewedAt: next === "teacher_review" ? now : d.reviewedAt,
+    approvedByUserId: next === "admin_approved" ? userId : d.approvedByUserId,
+    approvedAt: next === "admin_approved" ? now : d.approvedAt,
+  };
+  return await clinical.upsertDraft(updated);
 }
 
 // ---------------------------------------------------------------------------

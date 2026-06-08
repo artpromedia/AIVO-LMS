@@ -55,7 +55,7 @@ import type {
   TenantMembership,
   User,
 } from "@/lib/db/types";
-import type { AgeGateRecord } from "@/lib/db/types";
+import type { AgeGateRecord, IepAiDraftRecord } from "@/lib/db/types";
 import type { Role } from "@/lib/auth/types";
 import type { CreateLearnerInput, PatchLearnerInput } from "@/lib/validators/learner";
 
@@ -481,6 +481,25 @@ export interface BillingStore {
   upsertDailyBillingBatch(batch: DailyBillingBatch): Promise<DailyBillingBatch>;
 }
 
+/**
+ * Clinical domain (Sprint 3) — the WEB-OWNED IEP AI-draft review inbox.
+ * Per ADR 0015 the canonical clinical records (IEP goals, therapist session
+ * notes, caregiver observations) are owned by `family-svc` and written through
+ * over REST (`lib/clinical/family-svc-client.ts`); this store owns only the
+ * `web_iep_ai_drafts` row per learner (one upserted draft moving through a
+ * review lifecycle). Tenant-scoped on every call.
+ */
+export interface ClinicalStore {
+  /** The current AI draft for a learner, or null. (One row per learner.) */
+  getDraftForLearner(learnerId: string, tenantId: string): Promise<IepAiDraftRecord | null>;
+  /** A draft by id, tenant-scoped. */
+  getDraftById(id: string, tenantId: string): Promise<IepAiDraftRecord | null>;
+  /** Insert or replace the draft row (the repo owns lifecycle/transition logic). */
+  upsertDraft(draft: IepAiDraftRecord): Promise<IepAiDraftRecord>;
+  /** Drafts for a set of learner ids in a tenant, newest-updated first. */
+  listDraftsForLearners(learnerIds: string[], tenantId: string): Promise<IepAiDraftRecord[]>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -496,6 +515,7 @@ export interface Persistence {
   admin: AdminStore;
   collaboration: CollaborationStore;
   billing: BillingStore;
+  clinical: ClinicalStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

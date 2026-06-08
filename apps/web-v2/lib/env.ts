@@ -177,6 +177,9 @@ const serverSchema = z.object({
   // Sprint 2 — web-owned billing/AI-cost rows (web_* tables). Canonical
   // subscription/invoice/seat state stays in billing-svc (ADR 0015).
   AIVO_PERSISTENCE_BILLING: aivoPersistenceOverrideSchema,
+  // Sprint 3 — web-owned IEP AI-draft review inbox. Canonical IEP goals /
+  // therapist notes / caregiver observations stay in family-svc (ADR 0015).
+  AIVO_PERSISTENCE_CLINICAL: aivoPersistenceOverrideSchema,
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z

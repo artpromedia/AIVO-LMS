@@ -435,6 +435,13 @@
       "when": 1782422400000,
       "tag": "0081_web_billing",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1782508800000,
+      "tag": "0082_web_clinical",
+      "breakpoints": true
     }
   ]
 }

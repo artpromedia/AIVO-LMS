@@ -150,6 +150,19 @@ const MIGRATED_DOMAINS = [
       "listDailyBillingBatches",
     ],
   },
+  // Sprint 3 — web-owned IEP AI-draft review inbox (web_iep_ai_drafts).
+  // Canonical IEP goals / therapist notes / caregiver observations stay in
+  // family-svc (ADR 0015, lib/clinical/family-svc-client.ts) and are not
+  // web_* migration targets, so they are intentionally not listed here.
+  {
+    domain: "clinical",
+    reposFunctions: [
+      "upsertIepAiDraft",
+      "getIepAiDraft",
+      "listIepAiDraftsForReviewer",
+      "progressIepAiDraft",
+    ],
+  },
 ];
 
 // Forbidden signals. `getStore`/`resetStore` as identifiers; `db()` as a call.

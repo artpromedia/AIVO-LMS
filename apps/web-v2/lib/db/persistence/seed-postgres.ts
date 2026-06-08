@@ -53,6 +53,7 @@ import {
   webAiCostEvents,
   webCoupons,
   webDailyBillingBatches,
+  webIepAiDrafts,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -604,6 +605,22 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
       webDailyBillingBatches,
       vals(s.dailyBillingBatches).map((b) => ({ id: b.id, runDate: b.runDate, data: b })),
       webDailyBillingBatches.id,
+    ),
+  );
+  // ── Sprint 3: web-owned IEP AI-draft review inbox ───────────────────
+  await log(
+    "iepAiDrafts",
+    await bulk(
+      db,
+      webIepAiDrafts,
+      vals(s.iepAiDrafts).map((d) => ({
+        id: d.id,
+        learnerId: d.learnerId,
+        tenantId: d.tenantId,
+        updatedAt: d.updatedAt,
+        data: d,
+      })),
+      webIepAiDrafts.id,
     ),
   );
   await log(

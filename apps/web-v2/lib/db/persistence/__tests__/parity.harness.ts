@@ -84,6 +84,7 @@ const TABLES = [
   "web_ai_cost_events",
   "web_coupons",
   "web_daily_billing_batches",
+  "web_iep_ai_drafts",
 ] as const;
 
 const POSTGRES_ENABLED =
