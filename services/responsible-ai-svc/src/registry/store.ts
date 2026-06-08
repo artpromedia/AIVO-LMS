@@ -37,6 +37,19 @@ export function newId(prefix: string): string {
   return `${prefix}_${randomUUID().slice(0, 12)}`;
 }
 
+/**
+ * Seed tenant → district mapping used by policy resolution and the opt-out
+ * cascade. The registry tables (0001 / drizzle 0078) do not model this
+ * mapping, so it is kept here as a shared constant and consulted by both the
+ * in-memory and Postgres repositories to preserve identical resolution
+ * behavior. A future migration can replace this with a real table.
+ */
+export const SEED_TENANT_DISTRICT: ReadonlyArray<readonly [string, string]> = [
+  ["tenant-springfield", "district-springfield"],
+  ["tenant-shelbyville", "district-springfield"],
+  ["tenant-riverdale", "district-riverdale"],
+];
+
 function nowMinus(days: number): string {
   return new Date(Date.now() - days * 86_400_000).toISOString();
 }
@@ -51,11 +64,7 @@ export function createSeededStore(): RegistryStore {
     incidents: new Map(),
     optOuts: new Map(),
     usage: [],
-    tenantDistrict: new Map([
-      ["tenant-springfield", "district-springfield"],
-      ["tenant-shelbyville", "district-springfield"],
-      ["tenant-riverdale", "district-riverdale"],
-    ]),
+    tenantDistrict: new Map(SEED_TENANT_DISTRICT.map(([t, d]) => [t, d])),
   };
 
   // ── Models ────────────────────────────────────────────────────────────

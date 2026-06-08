@@ -10,7 +10,8 @@
  * can tighten, never loosen, what the district permits.
  */
 import type { FastifyInstance } from "fastify";
-import { getStore, newId } from "../registry/store.js";
+import { newId } from "../registry/store.js";
+import { getRegistryRepository } from "../registry/repository.js";
 import type { OptOut } from "../registry/types.js";
 import { actorOf, canConfigureOptOut, isPlatform, deny } from "../registry/rbac.js";
 import { emitRegistryAudit } from "../lib/registry-audit.js";
@@ -19,12 +20,12 @@ export function registerOptOutRoutes(app: FastifyInstance): void {
   const base = "/api/responsible-ai/optouts";
 
   app.get<{ Querystring: { tenantId?: string } }>(base, async (request) => {
-    const store = getStore();
+    const repo = getRegistryRepository();
     const actor = actorOf(request);
-    let optOuts = [...store.optOuts.values()];
+    let optOuts = await repo.listOptOuts();
     const tenantFilter = isPlatform(actor) ? request.query.tenantId : actor.tenantId;
     if (tenantFilter) {
-      const districtId = store.tenantDistrict.get(tenantFilter);
+      const districtId = await repo.getDistrictForTenant(tenantFilter);
       optOuts = optOuts.filter((o) => o.tenantId === tenantFilter || o.tenantId === districtId);
     }
     return { optOuts };
@@ -39,7 +40,7 @@ export function registerOptOutRoutes(app: FastifyInstance): void {
     if (!b.modelId && !b.feature) {
       return reply.code(400).send({ error: "modelId or feature is required" });
     }
-    const store = getStore();
+    const repo = getRegistryRepository();
 
     // School-admin subset rule: cannot opt out of something the district
     // has already opted the whole tree out of (that's already enforced),
@@ -55,7 +56,7 @@ export function registerOptOutRoutes(app: FastifyInstance): void {
       createdByRole: actor.role ?? "unknown",
       createdAt: new Date().toISOString(),
     };
-    store.optOuts.set(optOut.id, optOut);
+    await repo.upsertOptOut(optOut);
     await emitRegistryAudit(request, "RAI_OPTOUT_CREATED", optOut.id, {
       tenantId: optOut.tenantId,
       modelId: optOut.modelId,
@@ -66,11 +67,11 @@ export function registerOptOutRoutes(app: FastifyInstance): void {
 
   app.delete<{ Params: { id: string } }>(`${base}/:id`, async (request, reply) => {
     const actor = actorOf(request);
-    const store = getStore();
-    const optOut = store.optOuts.get(request.params.id);
+    const repo = getRegistryRepository();
+    const optOut = await repo.getOptOut(request.params.id);
     if (!optOut) return reply.code(404).send({ error: "Opt-out not found" });
     if (!canConfigureOptOut(actor, optOut.tenantId)) return deny(reply);
-    store.optOuts.delete(optOut.id);
+    await repo.deleteOptOut(optOut.id);
     await emitRegistryAudit(request, "RAI_OPTOUT_REMOVED", optOut.id, {
       tenantId: optOut.tenantId,
     });

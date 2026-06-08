@@ -33,6 +33,31 @@ const PLATFORM_NAV = [
   },
   { href: "/platform/ai-costs", title: "AI costs", description: "Per-tenant spend and budget caps." },
   {
+    href: "/platform/ai/policies",
+    title: "AI policies",
+    description: "Stacked Responsible-AI safety policies.",
+  },
+  {
+    href: "/platform/ai/incidents",
+    title: "AI incidents",
+    description: "Responsible-AI incident register.",
+  },
+  {
+    href: "/platform/ai/optouts",
+    title: "AI opt-outs",
+    description: "Per-tenant model and feature opt-outs.",
+  },
+  {
+    href: "/platform/ai/models",
+    title: "AI models",
+    description: "Model registry, cards, and versions.",
+  },
+  {
+    href: "/platform/ai/evals",
+    title: "AI evals",
+    description: "Safety, accuracy, and bias harness runs.",
+  },
+  {
     href: "/platform/feature-flags",
     title: "Feature flags",
     description: "Enterprise and sprint flag state.",

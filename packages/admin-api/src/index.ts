@@ -1,3 +1,4 @@
+export * from "./ai-governance.js";
 export * from "./api-keys.js";
 export * from "./audit.js";
 export * from "./billing.js";

@@ -407,6 +407,13 @@
       "when": 1782076800000,
       "tag": "0077_security_risk_vendor_vuln",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1782163200000,
+      "tag": "0078_responsible_ai_registry",
+      "breakpoints": true
     }
   ]
 }

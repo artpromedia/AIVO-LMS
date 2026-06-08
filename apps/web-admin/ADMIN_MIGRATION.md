@@ -140,6 +140,25 @@ vulnerabilities}` (register + create + key-field updates), all linked from the
 security overview. **Security posture is now fully migrated** (controls,
 incidents, risks, vendors, vulnerabilities — all e2e to Postgres).
 
+## Done — Wave 11 (AI governance: responsible-ai-svc converted to Postgres)
+
+The largest conversion. `responsible-ai-svc` was intentionally all-in-memory (a
+seeded `getStore()` singleton, 9 entities + eval/policy engine). Converted the
+whole registry to Postgres, DB-or-fallback:
+
+- `@aivo/db`: 9 new `rai_*` tables (`src/schema/responsible-ai.ts`) mirroring the
+  service's documented `0001` schema + additive migration `0078`.
+- `responsible-ai-svc`: new `registry/repository.ts` (RegistryRepository
+  interface, InMemoryRegistryRepository wrapping the seeded fixtures,
+  PostgresRegistryRepository on the `rai_*` tables, `selectRegistryRepository(db)`
+  throwing in production w/o DB). Rewrote all 37 store call-sites across routes +
+  policy-resolution + usage to the async repo; `resolveEffectivePolicy` now takes
+  a `PolicyResolutionInputs` snapshot (kept pure/sync). Wired
+  `initRegistryRepository(db)` in `buildApp`. **35 service tests pass** (incl.
+  policy-resolution + rai-gateway).
+- `@aivo/admin-api/ai-governance` (direct to responsible-ai-svc) + pages
+  `platform/ai/{policies,incidents,optouts,models,models/[id],evals}`.
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but

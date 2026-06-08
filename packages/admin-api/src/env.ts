@@ -18,6 +18,10 @@ export function billingSvcUrl(): string {
   return process.env.BILLING_SVC_URL || "http://localhost:3009";
 }
 
+export function raiSvcUrl(): string {
+  return process.env.RESPONSIBLE_AI_SVC_URL || "http://localhost:3071";
+}
+
 export function internalServiceToken(): string | null {
   return process.env.INTERNAL_SERVICE_TOKEN || process.env.INTERNAL_SERVICE_KEY || null;
 }
