@@ -21,8 +21,14 @@ import type {
   BaselineQuestion,
   BillingAccount,
   Classroom,
+  Course,
   Coupon,
   DailyBillingBatch,
+  ExternalRosterMapping,
+  LessonSyncState,
+  RosterImportError,
+  RosterImportJob,
+  SISConnection,
   CollaboratorInsight,
   CollaboratorMember,
   ConsentRecord,
@@ -594,6 +600,30 @@ export interface SecurityStore {
   upsertVulnerability(report: VulnerabilityReport): Promise<VulnerabilityReport>;
 }
 
+/**
+ * Rostering / SIS / lesson-sync domain (Sprint 6) — web-owned operational
+ * aggregates. Tenant-scoped in app code (no RLS; see web-rostering.ts). The
+ * canonical SIS sync (integrations-svc) + teacher-rostering grant (identity-
+ * svc) are read over REST and are NOT part of this store.
+ */
+export interface RosteringStore {
+  // Courses (per tenant; seeded reference web surfaces).
+  listCoursesForTenant(tenantId: string): Promise<Course[]>;
+  // Roster import jobs + per-row errors.
+  upsertImportJob(job: RosterImportJob): Promise<RosterImportJob>;
+  /** Get a job by id WITHOUT tenant scoping (platform-admin escape hatch). */
+  getImportJobById(jobId: string): Promise<RosterImportJob | null>;
+  listImportJobsForTenant(tenantId: string): Promise<RosterImportJob[]>;
+  appendImportError(error: RosterImportError): Promise<RosterImportError>;
+  listImportErrors(jobId: string): Promise<RosterImportError[]>;
+  // SIS connections + external roster mappings (web aggregates).
+  listSISConnectionsForTenant(tenantId: string): Promise<SISConnection[]>;
+  listExternalMappingsForConnection(connectionId: string): Promise<ExternalRosterMapping[]>;
+  // Multi-device lesson sync state (keyed by lessonRunId; optimistic version).
+  getLessonSyncState(lessonRunId: string): Promise<LessonSyncState | null>;
+  upsertLessonSyncState(state: LessonSyncState): Promise<LessonSyncState>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -611,6 +641,7 @@ export interface Persistence {
   billing: BillingStore;
   clinical: ClinicalStore;
   security: SecurityStore;
+  rostering: RosteringStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

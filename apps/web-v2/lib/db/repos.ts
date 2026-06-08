@@ -4815,7 +4815,8 @@ export async function runRosterImport(input: {
   dryRun: boolean;
   createdByUserId: string;
 }): Promise<RosterImportJob> {
-  const store = db();
+  const rostering = getPersistence().rostering;
+  const admin = getPersistence().admin;
   const school = await getSchool(input.schoolId);
   if (!school || school.tenantId !== input.tenantId) {
     const errId = newId("job");
@@ -4835,8 +4836,7 @@ export async function runRosterImport(input: {
       createdAt: nowIso(),
       completedAt: nowIso(),
     };
-    store.rosterImportJobs.set(failed.id, failed);
-    return failed;
+    return await rostering.upsertImportJob(failed);
   }
   const { rows, errors: parseErrors } = parseRosterCsv(input.csvText);
   const job: RosterImportJob = {
@@ -4855,7 +4855,8 @@ export async function runRosterImport(input: {
     createdAt: nowIso(),
     completedAt: null,
   };
-  store.rosterImportJobs.set(job.id, job);
+  // The job is persisted once at the end with its final counts (in-place
+  // counter mutation below no longer relies on a shared Map reference).
   for (const err of parseErrors) {
     const errRec: RosterImportError = {
       id: newId("rerr"),
@@ -4864,15 +4865,16 @@ export async function runRosterImport(input: {
       row: err.row,
       message: err.message,
     };
-    store.rosterImportErrors.set(errRec.id, errRec);
+    await rostering.appendImportError(errRec);
   }
 
   // Track classrooms we've materialized this run so multiple roster rows
   // pointing at the same "Mrs. Smith 4A" share one classroom record.
   const classroomByName = new Map<string, Classroom>();
-  for (const c of Array.from(store.classrooms.values()).filter(
-    (c) => c.schoolId === input.schoolId,
-  )) {
+  for (const c of await admin.listClassrooms({
+    tenantId: input.tenantId,
+    schoolId: input.schoolId,
+  })) {
     classroomByName.set(c.name, c);
   }
 
@@ -4900,7 +4902,11 @@ export async function runRosterImport(input: {
         });
         classroomByName.set(classroom.name, classroom);
       } else if (!input.dryRun && row.role === "teacher" && classroom.teacherUserId === "pending") {
-        classroom.teacherUserId = row.externalId;
+        classroom = { ...classroom, teacherUserId: row.externalId };
+        classroomByName.set(classroom.name, classroom);
+        // Persist the teacher promotion so a learner-row-created classroom is
+        // no longer orphaned (durable in both backends).
+        await admin.upsertClassroom(classroom);
       }
       if (input.dryRun) {
         job.createdRows += 1;
@@ -4925,7 +4931,7 @@ export async function runRosterImport(input: {
         row: row as unknown as Record<string, string>,
         message: e instanceof Error ? e.message : "Unknown error.",
       };
-      store.rosterImportErrors.set(errRec.id, errRec);
+      await rostering.appendImportError(errRec);
     }
   }
   job.status = input.dryRun
@@ -4934,56 +4940,65 @@ export async function runRosterImport(input: {
       ? "failed"
       : "completed";
   job.completedAt = nowIso();
-  return job;
+  return await rostering.upsertImportJob(job);
 }
 
-export function getRosterImportJob(jobId: string, tenantId: string): RosterImportJob | null {
-  const j = db().rosterImportJobs.get(jobId);
+export async function getRosterImportJob(
+  jobId: string,
+  tenantId: string,
+): Promise<RosterImportJob | null> {
+  const j = await getPersistence().rostering.getImportJobById(jobId);
   return j && j.tenantId === tenantId ? j : null;
 }
 
 /** Platform-admin escape hatch: skip tenant scoping. Caller MUST gate on role. */
-export function getRosterImportJobAny(jobId: string): RosterImportJob | null {
-  return db().rosterImportJobs.get(jobId) ?? null;
+export async function getRosterImportJobAny(jobId: string): Promise<RosterImportJob | null> {
+  return await getPersistence().rostering.getImportJobById(jobId);
 }
 
-export function listRosterImportJobs(tenantId: string, schoolId?: string): RosterImportJob[] {
-  let arr = Array.from(db().rosterImportJobs.values()).filter((j) => j.tenantId === tenantId);
+export async function listRosterImportJobs(
+  tenantId: string,
+  schoolId?: string,
+): Promise<RosterImportJob[]> {
+  let arr = await getPersistence().rostering.listImportJobsForTenant(tenantId);
   if (schoolId) arr = arr.filter((j) => j.schoolId === schoolId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function listRosterImportErrors(jobId: string): RosterImportError[] {
-  return Array.from(db().rosterImportErrors.values())
-    .filter((e) => e.jobId === jobId)
-    .sort((a, b) => a.rowNumber - b.rowNumber);
+export async function listRosterImportErrors(jobId: string): Promise<RosterImportError[]> {
+  return (await getPersistence().rostering.listImportErrors(jobId)).sort(
+    (a, b) => a.rowNumber - b.rowNumber,
+  );
 }
 
-export function listCourses(tenantId: string, schoolId?: string): Course[] {
-  let arr = Array.from(db().courses.values()).filter((c) => c.tenantId === tenantId);
+export async function listCourses(tenantId: string, schoolId?: string): Promise<Course[]> {
+  let arr = await getPersistence().rostering.listCoursesForTenant(tenantId);
   if (schoolId) arr = arr.filter((c) => c.schoolId === schoolId);
   return arr.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function listSISConnections(tenantId: string): SISConnection[] {
-  return Array.from(db().sisConnections.values())
-    .filter((c) => c.tenantId === tenantId)
-    .sort((a, b) => a.label.localeCompare(b.label));
-}
-
-export function listExternalRosterMappings(connectionId: string): ExternalRosterMapping[] {
-  return Array.from(db().externalRosterMappings.values()).filter(
-    (m) => m.connectionId === connectionId,
+export async function listSISConnections(tenantId: string): Promise<SISConnection[]> {
+  return (await getPersistence().rostering.listSISConnectionsForTenant(tenantId)).sort((a, b) =>
+    a.label.localeCompare(b.label),
   );
 }
 
+export async function listExternalRosterMappings(
+  connectionId: string,
+): Promise<ExternalRosterMapping[]> {
+  return await getPersistence().rostering.listExternalMappingsForConnection(connectionId);
+}
+
 /** Multi-device lesson sync — optimistic concurrency on `version`. */
-export function getLessonSyncState(lessonRunId: string, tenantId: string): LessonSyncState | null {
-  const s = db().lessonSyncStates.get(lessonRunId);
+export async function getLessonSyncState(
+  lessonRunId: string,
+  tenantId: string,
+): Promise<LessonSyncState | null> {
+  const s = await getPersistence().rostering.getLessonSyncState(lessonRunId);
   return s && s.tenantId === tenantId ? s : null;
 }
 
-export function putLessonSyncState(input: {
+export async function putLessonSyncState(input: {
   lessonRunId: string;
   tenantId: string;
   learnerId: string;
@@ -4992,8 +5007,11 @@ export function putLessonSyncState(input: {
   baseVersion: number;
   state: Record<string, unknown>;
   deviceId: string;
-}): { ok: true; state: LessonSyncState } | { ok: false; current: LessonSyncState | null } {
-  const existing = db().lessonSyncStates.get(input.lessonRunId) ?? null;
+}): Promise<
+  { ok: true; state: LessonSyncState } | { ok: false; current: LessonSyncState | null }
+> {
+  const rostering = getPersistence().rostering;
+  const existing = await rostering.getLessonSyncState(input.lessonRunId);
   if (existing) {
     if (existing.tenantId !== input.tenantId) return { ok: false, current: null };
     // Lesson runs are bound to a single learner at creation time. A caller
@@ -5001,11 +5019,14 @@ export function putLessonSyncState(input: {
     // they happen to know lessonRunId — guard before the version check.
     if (existing.learnerId !== input.learnerId) return { ok: false, current: null };
     if (existing.version !== input.baseVersion) return { ok: false, current: existing };
-    existing.version += 1;
-    existing.state = input.state;
-    existing.lastWriterDeviceId = input.deviceId;
-    existing.updatedAt = nowIso();
-    return { ok: true, state: existing };
+    const bumped: LessonSyncState = {
+      ...existing,
+      version: existing.version + 1,
+      state: input.state,
+      lastWriterDeviceId: input.deviceId,
+      updatedAt: nowIso(),
+    };
+    return { ok: true, state: await rostering.upsertLessonSyncState(bumped) };
   }
   if (input.baseVersion !== 0) return { ok: false, current: null };
   const next: LessonSyncState = {
@@ -5017,8 +5038,7 @@ export function putLessonSyncState(input: {
     lastWriterDeviceId: input.deviceId,
     updatedAt: nowIso(),
   };
-  db().lessonSyncStates.set(input.lessonRunId, next);
-  return { ok: true, state: next };
+  return { ok: true, state: await rostering.upsertLessonSyncState(next) };
 }
 
 /**

@@ -71,6 +71,12 @@ import {
   webDataExportRequests,
   webDataDeletionRequests,
   webIepDocAccessLogs,
+  webCourses,
+  webRosterImportJobs,
+  webRosterImportErrors,
+  webSisConnections,
+  webExternalRosterMappings,
+  webLessonSyncStates,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -798,6 +804,69 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
         data: x,
       })),
       webIepDocAccessLogs.id,
+    ),
+  );
+  // ── Sprint 6: web-owned rostering / SIS / lesson-sync aggregates ────
+  await log(
+    "courses",
+    await bulk(
+      db,
+      webCourses,
+      vals(s.courses).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+      webCourses.id,
+    ),
+  );
+  await log(
+    "rosterImportJobs",
+    await bulk(
+      db,
+      webRosterImportJobs,
+      vals(s.rosterImportJobs).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+      webRosterImportJobs.id,
+    ),
+  );
+  await log(
+    "rosterImportErrors",
+    await bulk(
+      db,
+      webRosterImportErrors,
+      vals(s.rosterImportErrors).map((x) => ({ id: x.id, jobId: x.jobId, data: x })),
+      webRosterImportErrors.id,
+    ),
+  );
+  await log(
+    "sisConnections",
+    await bulk(
+      db,
+      webSisConnections,
+      vals(s.sisConnections).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+      webSisConnections.id,
+    ),
+  );
+  await log(
+    "externalRosterMappings",
+    await bulk(
+      db,
+      webExternalRosterMappings,
+      vals(s.externalRosterMappings).map((x) => ({
+        id: x.id,
+        connectionId: x.connectionId,
+        data: x,
+      })),
+      webExternalRosterMappings.id,
+    ),
+  );
+  await log(
+    "lessonSyncStates",
+    await bulk(
+      db,
+      webLessonSyncStates,
+      vals(s.lessonSyncStates).map((x) => ({
+        lessonRunId: x.lessonRunId,
+        tenantId: x.tenantId,
+        data: x,
+      })),
+      webLessonSyncStates.lessonRunId,
     ),
   );
   await log(

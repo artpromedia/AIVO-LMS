@@ -219,6 +219,25 @@ const MIGRATED_DOMAINS = [
       "updateVulnerability",
     ],
   },
+  // Sprint 6 — web-owned rostering / SIS / lesson-sync aggregates. Canonical
+  // SIS sync (integrations-svc) + rostering grant (identity-svc) read via REST
+  // (lib/rostering/integrations-svc-client.ts; lib/db/sis-store.ts +
+  // rostering-grants.ts are documented service-mock dev stores, not web_*).
+  {
+    domain: "rostering",
+    reposFunctions: [
+      "runRosterImport",
+      "getRosterImportJob",
+      "getRosterImportJobAny",
+      "listRosterImportJobs",
+      "listRosterImportErrors",
+      "listCourses",
+      "listSISConnections",
+      "listExternalRosterMappings",
+      "getLessonSyncState",
+      "putLessonSyncState",
+    ],
+  },
 ];
 
 // Forbidden signals. `getStore`/`resetStore` as identifiers; `db()` as a call.

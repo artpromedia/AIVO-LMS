@@ -102,6 +102,12 @@ const TABLES = [
   "web_data_export_requests",
   "web_data_deletion_requests",
   "web_iep_doc_access_logs",
+  "web_courses",
+  "web_roster_import_jobs",
+  "web_roster_import_errors",
+  "web_sis_connections",
+  "web_external_roster_mappings",
+  "web_lesson_sync_states",
 ] as const;
 
 const POSTGRES_ENABLED =
