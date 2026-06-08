@@ -284,6 +284,10 @@ export const internalDistrictAdminInviteSchema = internalSchema(
   "internalSendDistrictAdminInvite",
   "Internal: send a district-admin invite email",
 );
+export const internalParentInviteSchema = internalSchema(
+  "internalSendParentInvite",
+  "Internal: send a parent invite email (into a district tenant)",
+);
 export const internalTrialEndingSchema = internalSchema(
   "internalSendTrialEnding",
   "Internal: send a trial-ending reminder (email + in-app)",

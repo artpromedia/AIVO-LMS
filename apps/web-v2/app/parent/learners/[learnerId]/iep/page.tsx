@@ -31,8 +31,8 @@ import { buildIEPExtraction } from "@/lib/learner/iep";
 
 async function uploadAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
   if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
@@ -77,8 +77,8 @@ async function uploadAction(formData: FormData) {
 
 async function skipAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
   if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
@@ -92,8 +92,8 @@ async function skipAction(formData: FormData) {
 
 async function deleteAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
   if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {

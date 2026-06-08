@@ -68,3 +68,103 @@ then retry completion. Inspect `GET /api/district/setup` for the current counts 
 - Prometheus counters: `identity_district_invites_created_total`,
   `identity_district_invites_accepted_total`, `identity_district_invites_revoked_total`.
 - Structured logger: `identity-svc.district-onboarding`.
+
+## District-pilot e2e harness (no mock on the pilot path)
+
+The district-pilot journey — platform admin provisions a pilot → district admin
+adds a school → parents are invited into the district tenant → each parent logs
+in for real, creates a learner under the seat cap, and completes consent — is
+proven end-to-end against a Dockerized stack, never the mock session.
+
+**Harness:** the `pilot` profile of `docker-compose.e2e.yml` brings up
+`postgres` + `identity-svc` (`IDENTITY_TEST_MODE=1`) + `web-v2`
+(`AUTH_MODE=custom`, `AIVO_PERSISTENCE=postgres`), with `billing-svc` and
+`web-admin` defined for the later sprints. Because `AUTH_MODE=custom` is a
+production-grade provider value, `readMockSessionFromCookies()` only honors the
+real `aivo_session` snapshot — the `aivo_mock_session` cookie and the
+`/api/bff/auth/mock-login` endpoint are hard-disabled.
+
+**Run locally:**
+
+```bash
+docker compose -f docker-compose.e2e.yml --profile pilot up -d --build --wait \
+  postgres identity-svc web-v2
+pnpm --filter @aivo/db run db:migrate
+AIVO_SEED_DATABASE_URL=postgresql://aivo:aivo@localhost:55433/aivo_e2e \
+  pnpm --filter @aivo/web-v2 db:seed:postgres
+pnpm e2e -- specs/district-pilot
+docker compose -f docker-compose.e2e.yml --profile pilot down -v
+```
+
+**CI:** `.github/workflows/district-pilot-e2e.yml` runs the same against service
+containers, path-gated to the surfaces the journey touches. The journey spec
+lives at `e2e/specs/district-pilot/district-pilot.spec.ts`; each sprint
+un-`fixme`s its stage of the journey.
+
+## Provision a district pilot (district + entitlement, one step)
+
+`/platform/pilots/new` (platform admin) creates the district **and** provisions
+its pilot entitlement atomically — there is no separate coupon step.
+
+1. Sign in as `PLATFORM_ADMIN`, open `/platform/pilots/new`.
+2. Enter the district name, **seat cap**, **pilot length (days)**, and the first
+   admin's name + work email. Submit.
+3. identity-svc `POST /api/admin/pilots` (step-up scope `pilot:create`,
+   rate-limited) inserts the district tenant, then calls billing-svc
+   `POST /api/billing/internal/pilots/provision` (internal `x-service-token`)
+   which mints + redeems a `PROVISIONING` coupon **for the new tenant** — setting
+   `tenants.licensing_tier` + `seat_limit` and inserting the `ACTIVE`
+   `subscriptions` row. Only after the entitlement exists does identity write the
+   `district.created` audit and email the first-admin invite.
+4. The success screen shows the seat cap, pilot expiry, and the provisioning
+   coupon code (for the uptake view). The invitee accepts as usual.
+
+**Idempotency.** Provisioning is idempotent on `(tenantId, couponCode)`: re-running
+returns the existing entitlement (`provisioned: false`) and never double-counts
+seats or redemptions. The deterministic code is `PILOT-<first 8 of tenantId>`.
+
+**Rollback.** The tenant is inserted _bare_ (no audit) before billing is called.
+If provisioning fails (billing unreachable or errors), identity deletes the bare
+tenant and returns `502` — a district is **never** left without entitlement. If
+provisioning succeeds but the invite email fails, the district stays entitled and
+the operator is told to resend the invite (entitlement is never rolled back).
+
+**Audits / metrics.** `district.created` (identity), plus billing
+`billing.coupon.created`, `billing.coupon.redeemed`, and `billing.pilot.provisioned`;
+counters `billing_coupons_created_total` / `billing_coupons_redeemed_total`
+(`type=PROVISIONING`).
+
+**Env (identity-svc → billing-svc / comms-svc).** `BILLING_SVC_URL`,
+`COMMS_SVC_URL`, and the shared internal secret (`INTERNAL_SERVICE_TOKEN`, or
+`INTERNAL_SERVICE_KEY` for the comms invite) must be set so the orchestration can
+reach both services.
+
+## Invite parents (single + bulk)
+
+`/district/parents` (district admin) invites parents **into the district
+tenant** — they never create a separate B2C account.
+
+1. **Single:** enter a name + email → `POST /api/district/parents`. A hashed,
+   single-use invite (role `PARENT`, this tenant) is created and emailed via
+   comms-svc (`parent_invite` template). Audited `parent.invited`.
+2. **Bulk:** paste `name,email` rows (a header row is ignored) →
+   `POST /api/district/parents/bulk`. Each row returns `invited` / `skipped`
+   (duplicate or over-cap) / `error` (invalid) — partial success is explicit,
+   nothing is silently dropped.
+3. The table shows pending/accepted invites with **Resend** (rotates the token)
+   and **Revoke**. Remaining seats are surfaced at the top.
+
+**Seat cap.** Invites are refused once _active parents + pending parent invites_
+reach `tenants.seat_limit` (the friendly pre-check). The hard per-learner cap is
+still enforced at learner-create in identity-svc.
+
+**Acceptance.** The parent opens the link, sets their own password, and the
+PARENT `users` row is created under the **district** tenant. No temp password.
+
+## Pilot operations view
+
+Platform admins: `/platform/pilots` lists every active pilot with live seats
+used, parents/learners onboarded, coupon redemptions, and expiry;
+`/platform/pilots/<tenantId>` is the per-pilot detail. District admins see a
+"N of M seats used, expires <date>" banner on their console. All numbers come
+from real billing-svc reads (`/api/billing/admin/pilots*`) — no demo read model.

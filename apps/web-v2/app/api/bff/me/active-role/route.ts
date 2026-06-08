@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { ERRORS } from "@/lib/bff/errors";
 import { fail, getRequestId, ok } from "@/lib/bff/response";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { decideActiveRoleSwitch } from "@/lib/auth/active-role";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,7 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(req: Request) {
   const requestId = getRequestId(req);
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) {
     return fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId);
   }

@@ -49,6 +49,16 @@ services:
       INTERNAL_AI_TOKEN: e2e-internal-ai-token
       WEBAUTHN_RP_ID: localhost
       WEBAUTHN_ORIGINS: http://localhost:5000
+      # Enables /api/__test__/* seed helpers (seed-parent, seed-district-admin,
+      # seed-platform-admin, last-mfa-code, …) consumed by e2e/lib/fixtures.ts.
+      # Gated to NODE_ENV != production in the handlers — never set in a deploy.
+      IDENTITY_TEST_MODE: "1"
+      # Sprint 1 pilot orchestration: identity-svc → billing-svc (provision) and
+      # → comms-svc (first-admin invite). Internal keys default to the shared dev
+      # key on both sides; the billing call uses INTERNAL_SERVICE_TOKEN above.
+      BILLING_SVC_URL: http://billing-svc:3009
+      COMMS_SVC_URL: http://comms-svc:3010
+      WEB_BASE_URL: http://localhost:5000
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -119,3 +129,112 @@ services:
       timeout: 3s
       retries: 30
       start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # District-pilot harness (Sprint 0+). These services sit behind the `pilot`
+  # compose profile so the existing bare `docker compose up --wait` used by the
+  # Sprint 12 job never starts the heavy web builds — only the district-pilot
+  # workflow (which passes `--profile pilot`) brings them up.
+  #
+  # Sprint 0 exercises web-v2 real-auth login against identity-svc. billing-svc
+  # and web-admin are defined here so later sprints (pilot provisioning, parent
+  # invite) layer on without re-touching the harness.
+  # ---------------------------------------------------------------------------
+  billing-svc:
+    profiles: ["pilot"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: billing-svc
+    environment:
+      NODE_ENV: test
+      PORT: "3009"
+      BILLING_SVC_PORT: "3009"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_e2e
+      INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
+      # Enables /api/__test__/billing/* helpers; gated to NODE_ENV != production.
+      BILLING_TEST_MODE: "1"
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports:
+      - "3009:3009"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3009/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  web-v2:
+    profiles: ["pilot"]
+    build:
+      context: .
+      dockerfile: apps/web-v2/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: "5000"
+      HOSTNAME: "0.0.0.0"
+      # Real identity-svc session — NO mock on the pilot path. AUTH_MODE=custom
+      # is a production-grade provider value (env.ts refuses "mock" in prod), so
+      # readMockSessionFromCookies() only honors the real aivo_session cookie.
+      AUTH_MODE: custom
+      AIVO_PERSISTENCE: postgres
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_e2e
+      IDENTITY_SVC_URL: http://identity-svc:3001
+      BILLING_SVC_URL: http://billing-svc:3009
+      COMMS_SVC_URL: http://comms-svc:3010
+      SESSION_SECRET: e2e-web-v2-session-secret-32-chars-minimum-len
+      NEXT_PUBLIC_APP_URL: http://localhost:5000
+      # getIdentityBaseSession() verifies the access-token JWT when web-v2 holds
+      # identity-svc's RS256 public key. Set JWT_PUBLIC_KEY (matching the key
+      # identity-svc signs with) to make verification authoritative here;
+      # otherwise the reader falls back to the httpOnly login snapshot (still
+      # server-set / not user-forgeable). Both keep the pilot session real.
+    depends_on:
+      postgres: { condition: service_healthy }
+      identity-svc: { condition: service_healthy }
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:5000/api/bff/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  web-admin:
+    profiles: ["pilot"]
+    build:
+      context: .
+      dockerfile: apps/web-admin/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: "5001"
+      HOSTNAME: "0.0.0.0"
+      IDENTITY_SVC_URL: http://identity-svc:3001
+      BILLING_SVC_URL: http://billing-svc:3009
+      INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
+      SESSION_SECRET: e2e-web-admin-session-secret-32-chars-min-len
+    depends_on:
+      identity-svc: { condition: service_healthy }
+    ports:
+      - "5001:5001"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:5001/api/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s

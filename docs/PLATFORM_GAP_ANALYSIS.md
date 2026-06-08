@@ -462,3 +462,140 @@ the deploy gate (the repo already has `release-gate.mjs` → `prod:check` + `pro
 All production-readiness integration tests pass (5/5). This converts the runtime guards into deploy-time
 guarantees and is the pattern the remaining provider/store-secret work should follow: build the adapter,
 register its secret + value gate, ship a conformance test — never commit fake values or unverified scaffolds.
+
+## 10. District-pilot pack — Sprint 0 (G1: real web-v2 session, no mock on the pilot path)
+
+The district-pilot persona prompt pack makes "create a pilot for a district and some parents" a
+first-class, end-to-end flow, proven by a containerized Playwright journey. **Sprint 0** closes the
+foundational gap **G1 — no real web-v2 session on the pilot path**:
+
+- **One session selector.** `apps/web-v2/lib/auth/session.ts` (`getSession()` / `getRequestSession()`)
+  is the single entry point every page guard (`requirePageRole`), BFF guard (`requireSession`), and
+  pilot-path caller now reads through. It picks the source by `AUTH_MODE`: the dev mock fixture
+  (`mock-session.ts`, now **mock-only** and self-guarded) or the real identity-svc session
+  (`identity-session.ts`). No `readMockSessionFromCookies()` remains on the pilot path.
+- **Real session, verified, never fabricated.** `identity-session.ts` verifies the access-token JWT via
+  `@aivo/security` `verifyJWT` when web-v2 holds identity-svc's RS256 public key, and otherwise falls
+  back to the httpOnly `aivo_session` snapshot web-v2 itself wrote at login (server-set, not
+  user-forgeable) for RSC render continuity — RSCs can't mint a fresh token mid-render. It returns
+  `null` rather than inventing a session.
+- **Real login/logout BFF.** `app/api/bff/auth/login/route.ts` proxies credentials to identity-svc,
+  sets the access/refresh/snapshot cookies, and returns `{ session, redirectTo }` with MFA-pending +
+  `mustChangePassword` passthrough; `app/api/bff/auth/logout/route.ts` invalidates the refresh row and
+  clears cookies. Both hard-NO in mock mode. `real-session-on-pilot-path.test.ts` pins that, with
+  `AUTH_MODE ≠ mock`, `getSession()` ignores the `aivo_mock_session` cookie entirely; `env.ts` now
+  requires `IDENTITY_SVC_URL` in production.
+- **Containerized harness.** `docker-compose.e2e.yml` gains a `pilot` profile bringing up `web-v2`
+  (`AUTH_MODE=custom`, `AIVO_PERSISTENCE=postgres`) + `billing-svc` + `web-admin`, with
+  `IDENTITY_TEST_MODE=1` on identity-svc for the seed helpers. The profile keeps the heavy web builds out
+  of the existing Sprint 12 `up --wait`.
+- **Journey skeleton.** `e2e/specs/district-pilot/district-pilot.spec.ts` runs the Sprint 0 slice (a
+  pilot parent signs in for real and lands on `/parent/home` with a real session, no mock cookie) and
+  declares sprints 1–4 as `test.fixme` stages each later sprint un-`fixme`s.
+- **CI gate.** `.github/workflows/district-pilot-e2e.yml` runs the slice against service containers,
+  path-gated to the journey's surfaces.
+
+Run it: `pnpm e2e -- specs/district-pilot` against the `pilot` profile (see
+`docs/runbooks/district-onboarding.md`).
+
+## 11. District-pilot pack — Sprint 1 (G2: first-class pilot provisioning, no manual coupon)
+
+**Sprint 1** closes **G2 — no first-class pilot provisioning**: a single platform-admin
+action now creates a district **and** provisions its pilot entitlement atomically, so no human
+re-keys a coupon and no district is born without a seat cap.
+
+- **Shared money/seat path.** `services/billing-svc/src/lib/provision-tenant.ts`
+  (`provisionTenantEntitlement`) is the one implementation that sets `tenants.licensing_tier` +
+  `seat_limit` and inserts the `ACTIVE` `subscriptions` row. The parent coupon-redeem branch
+  (`coupons.ts`) was refactored to call it — no drift.
+- **Internal provision route.** `POST /api/billing/internal/pilots/provision`
+  (`pilot-provisioning.ts`) mints + redeems a `PROVISIONING` coupon for a district tenant in one
+  transaction, guarded by the internal `x-service-token`, **idempotent on `(tenantId, couponCode)`**,
+  audited (`billing.coupon.created` / `billing.coupon.redeemed` / `billing.pilot.provisioned`) and
+  metered.
+- **Orchestration.** identity-svc `POST /api/admin/pilots` (`pilots.ts`, `requirePlatformAdmin` +
+  step-up `pilot:create`, rate-limited) reuses the district-onboarding primitives
+  (`lib/district-onboarding.ts`, also now used by `create-district`) then provisions billing. The
+  bare tenant is inserted **before** any audit so a billing failure deletes it cleanly — a district
+  is never left without entitlement.
+- **Surfaces.** `packages/admin-api` `provisionPilot` + web-admin `/platform/pilots/new` (seat cap +
+  pilot length, success shows seats/expiry/coupon) + a "Provision pilot" primary action on the
+  platform home.
+- **Proof.** `services/billing-svc/tests/pilot-provisioning.test.ts` and
+  `services/identity-svc/tests/pilot-create.test.ts` (DB-backed) cover provisioning, idempotency,
+  token-guard, audit, and rollback; `e2e/specs/district-pilot` Stage 1 runs it against containers
+  (`docs/runbooks/district-onboarding.md`).
+
+## 12. District-pilot pack — Sprint 2 (G3: invite parents into the district tenant)
+
+**Sprint 2** closes **G3 — no parent invite into the district tenant**: district/school admins now
+invite parents (single + bulk CSV) as hashed-token invites (role `PARENT`, pinned to the district
+`tenantId`), reusing the `accept-invite` keystone — so a district and its parents are one coherent
+tenant, not a scatter of self-serve B2C accounts.
+
+- identity-svc `routes/parents.ts`: `POST/GET/DELETE /api/district/parents`,
+  `POST /api/district/parents/bulk`, resend, and `POST/GET /api/school/parents` (requireSchoolAdmin).
+  Seat cap enforced at invite time; audited `parent.invited` / `parent.invite_revoked`.
+- `accept-invite` now accepts role `PARENT`, creating the user under the **district** tenant with a
+  self-chosen password (no temp password) — proven by `tests/parent-invite.test.ts`.
+- comms-svc `parent_invite` template + `POST /api/comms/internal/parent-invite` (dev-mode returns
+  `inviteUrl`).
+- `packages/admin-api` parent client methods + web-admin `/district/parents` (single + bulk CSV +
+  resend/revoke + remaining seats; no dead buttons).
+- `e2e/specs/district-pilot` Stage 2 invites parents under the district tenant and asserts the seat
+  cap, against containers.
+
+## 13. District-pilot pack — Sprint 3 (G1/G3: parent joins, creates a learner under the seat cap)
+
+**Sprint 3** completes the parent stage of the journey: an invited parent logs in for real (Sprint 0
+auth), creates a learner **under the district tenant**, and is held to the pilot seat cap.
+
+- **Seat enforcement on the parent surface (the gap).** The canonical B2B cap on `tenants.seat_limit`
+  was only enforced in identity-svc's learner store; the web-v2 parent path (`web_learner_profiles`)
+  created learners with no cap. `apps/web-v2/lib/db/seat-availability.ts` now counts the tenant's web
+  learners against the shared `tenants.seat_limit`, and all three create paths enforce it:
+  `POST /api/bff/learners` (typed `SEAT_LIMIT_REACHED` 409) and the two onboarding/parent server
+  actions (redirect with `error=seat_limit`). The in-memory dev store stays unlimited.
+- **Consent.** Learner creation stamps the age-gate / parent-consent record at creation
+  (`recordAgeGate`), so COPPA/under-13 status is captured on the district path too.
+- **Proof.** `apps/web-v2/lib/db/seat-availability.test.ts` (dev store unlimited) +
+  `e2e/specs/district-pilot` Stage 3: a parent seeded into the district tenant logs in through the real
+  web-v2 UI, creates one learner (201 + consent record), and is refused the second by the 1-seat cap.
+
+With Sprints 0–3, the end-to-end pilot journey — platform admin provisions a district pilot → district
+admin invites parents into the district tenant → each parent logs in for real, creates a learner under
+the seat cap, and completes consent — is wired and proven against containers (Sprint 4 adds the
+ops dashboard).
+
+## 14. District-pilot pack — Sprint 4 (G4 + G5): ops view, hardening, journey gate — PATH CLOSED
+
+**Sprint 4** closes **G4** (no pilot ops view) and finishes **G5** (hardening), and locks the whole
+journey behind a required containerized e2e.
+
+- **Pilot ops read model.** billing-svc `GET /api/billing/admin/pilots[/:tenantId]` (`pilot-status.ts`)
+  joins the ACTIVE pilot subscription + tenant + coupon redemptions + onboarded parents/learners.
+  web-admin `/platform/pilots[/:tenantId]` + a district-console seat/expiry banner; admin-api
+  `getPilotStatus` / `listPilots` / `getDistrictPilotStatus`. Real reads only.
+- **G5 hardening.** `billing_coupons` is now a **canonical migration**
+  (`drizzle/0090_billing_coupons.sql`, schema-drift green); the in-route `CREATE TABLE`/`ALTER`
+  bootstrap is deleted. The redeem rate-limit is a **durable, multi-replica-safe** Postgres token
+  bucket (`billing_rate_limits` + `lib/redeem-rate-limit.ts`), replacing the process-local Map.
+- **Journey gate.** `e2e/specs/district-pilot/district-pilot.spec.ts` runs Stages 0–4 (real auth →
+  provision pilot → invite parents into the district tenant → parent real-login + seat-capped learner
+  create → platform-admin ops view) against Dockerized Postgres + real identity/billing/comms;
+  `.github/workflows/district-pilot-e2e.yml` adds no-stub / no-demo / schema-drift gates.
+
+### District-pilot path status: **G1–G5 CLOSED**
+
+| Gap | What it was                                         | Closed by                                                 |
+| --- | --------------------------------------------------- | --------------------------------------------------------- |
+| G1  | No real web-v2 session on the pilot path            | Sprint 0 — `getSession()` selector + identity-session     |
+| G2  | No first-class pilot provisioning                   | Sprint 1 — atomic district + redeemed PROVISIONING coupon |
+| G3  | No parent invite into the district tenant           | Sprint 2 — parent invites + accept-invite under district  |
+| G3  | Learner seat cap not enforced on the parent surface | Sprint 3 — web-v2 seat-availability enforcement           |
+| G4  | No pilot ops view                                   | Sprint 4 — billing-svc pilot read model + web-admin pages |
+| G5  | In-route coupon DDL + process-local rate-limit      | Sprint 4 — canonical migration + durable limiter          |
+
+**Go/No-Go — Web pilot:** the "create a pilot for a district and some parents" journey is wired
+end-to-end (no stubs / mock / demo on the path) and proven by the required `district-pilot-e2e`
+workflow. This gate is **satisfied**.

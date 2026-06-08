@@ -39,6 +39,12 @@ import {
   recordDistrictInviteCreated,
   recordDistrictInviteRevoked,
 } from "../lib/district-onboarding-observability.js";
+import {
+  ensureFirstAdminAvailable,
+  createDistrictTenant,
+  inviteFirstDistrictAdmin,
+  DistrictInviteDeliveryError,
+} from "../lib/district-onboarding.js";
 
 // Sprint 10: legacy admin reads now live behind admin-svc. Mark them
 // deprecated for one cycle (default 90 days). Mutations remain canonical
@@ -126,7 +132,7 @@ async function requireAdmin(req: any, reply: any) {
   }
 }
 
-async function requirePlatformAdmin(req: any, reply: any) {
+export async function requirePlatformAdmin(req: any, reply: any) {
   const auth = req.headers.authorization;
   if (!auth?.startsWith("Bearer ")) {
     return reply.status(401).send({ error: "Missing authorization header" });
@@ -984,116 +990,55 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         adminEmail: string;
       };
       const email = adminEmail.trim().toLowerCase();
+      const actor = { sub: req.user.sub, email: req.user.email, role: req.user.role };
+      const ip = clientIp(req);
+      const userAgent = (req.headers["user-agent"] as string) || null;
 
-      const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
-      if (existing.length > 0) {
-        return reply.status(409).send({ error: "A user with this email already exists" });
+      const avail = await ensureFirstAdminAvailable(db, email);
+      if (!avail.ok) {
+        return reply.status(409).send({ error: avail.error });
       }
 
-      const [openInvite] = await db
-        .select({ id: districtAdminInvites.id })
-        .from(districtAdminInvites)
-        .where(
-          and(
-            eq(districtAdminInvites.email, email),
-            isNull(districtAdminInvites.acceptedAt),
-            isNull(districtAdminInvites.revokedAt),
-            gt(districtAdminInvites.expiresAt, new Date()),
-          ),
-        )
-        .limit(1);
-      if (openInvite) {
-        return reply.status(409).send({ error: "An invite is already pending for this email." });
-      }
-
-      const [tenant] = await db
-        .insert(tenants)
-        .values({
-          name: districtName,
-          type: "B2B_DISTRICT",
-          settings: { plan: "enterprise", setupComplete: false },
-        })
-        .returning();
-
-      const rawToken = crypto.randomBytes(32).toString("base64url");
-      const expiresAt = new Date(Date.now() + INVITE_TTL_HOURS * 60 * 60 * 1000);
-      const [invite] = await db
-        .insert(districtAdminInvites)
-        .values({
-          tenantId: tenant.id,
-          email,
-          name: adminName,
-          role: "DISTRICT_ADMIN",
-          invitedBy: req.user.sub,
-          tokenHash: hashInviteToken(rawToken),
-          expiresAt,
-        })
-        .returning();
-
-      await appendAudit(db, "admin_audit_log", adminAuditLog, {
-        tenantId: tenant.id,
-        action: "district.created",
-        actorId: req.user.sub,
-        actorEmail: req.user.email,
-        actorRole: req.user.role,
-        onBehalfOfId: null,
-        resourceType: "tenant",
-        resourceId: tenant.id,
-        details: { districtName: tenant.name, email },
-        ipAddress: clientIp(req),
-        userAgent: (req.headers["user-agent"] as string) || null,
-      });
-      await appendAudit(db, "admin_audit_log", adminAuditLog, {
-        tenantId: tenant.id,
-        action: "district_admin.invited",
-        actorId: req.user.sub,
-        actorEmail: req.user.email,
-        actorRole: req.user.role,
-        onBehalfOfId: null,
-        resourceType: "district_admin_invite",
-        resourceId: invite.id,
-        details: { districtName: tenant.name, email },
-        ipAddress: clientIp(req),
-        userAgent: (req.headers["user-agent"] as string) || null,
-      });
-      recordDistrictInviteCreated({
-        inviteId: invite.id,
-        tenantId: tenant.id,
-        source: "platform",
+      const tenant = await createDistrictTenant(db, {
+        districtName,
+        actor,
+        clientIp: ip,
+        userAgent,
       });
 
-      const inviteUrl = `${process.env.WEB_BASE_URL || "https://app.aivolearning.com"}/accept-invite?token=${rawToken}`;
-      let delivery: { inviteUrl?: string };
       try {
-        delivery = await sendDistrictAdminInvite({
-          to: email,
-          name: adminName,
-          districtName: tenant.name,
-          inviteUrl,
+        const { invite, delivery } = await inviteFirstDistrictAdmin(db, {
+          tenant,
+          adminName,
+          adminEmail: email,
+          actor,
+          clientIp: ip,
+          userAgent,
         });
+        return {
+          district: {
+            id: tenant.id,
+            name: tenant.name,
+            type: tenant.type,
+            createdAt: tenant.createdAt,
+          },
+          invite: { id: invite.id, email: invite.email, expiresAt: invite.expiresAt, ...delivery },
+        };
       } catch (err) {
-        req.log.error({ err: String(err), inviteId: invite.id }, "district invite delivery failed");
-        return reply.status(502).send({
-          error: "District created, but the invitation email could not be sent. Resend the invite.",
-          district: { id: tenant.id, name: tenant.name, type: tenant.type },
-          invite: { id: invite.id, email, expiresAt },
-        });
+        if (err instanceof DistrictInviteDeliveryError) {
+          req.log.error(
+            { err: String(err), inviteId: err.invite.id },
+            "district invite delivery failed",
+          );
+          return reply.status(502).send({
+            error:
+              "District created, but the invitation email could not be sent. Resend the invite.",
+            district: { id: tenant.id, name: tenant.name, type: tenant.type },
+            invite: { id: err.invite.id, email: err.invite.email, expiresAt: err.invite.expiresAt },
+          });
+        }
+        throw err;
       }
-
-      return {
-        district: {
-          id: tenant.id,
-          name: tenant.name,
-          type: tenant.type,
-          createdAt: tenant.createdAt,
-        },
-        invite: {
-          id: invite.id,
-          email,
-          expiresAt,
-          ...delivery,
-        },
-      };
     },
   );
 

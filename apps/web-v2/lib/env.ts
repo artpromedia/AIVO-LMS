@@ -82,175 +82,191 @@ const aivoPersistenceOverrideSchema = isProd
   ? persistenceModeProd.optional()
   : z.enum(["memory", "postgres"]).optional();
 
-const serverSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  // Postgres connection backing the persistence adapter (web_* tables).
-  // Required in production (every domain resolves to `postgres` there); in
-  // dev/test it is optional and only needed once a domain is flipped to
-  // postgres. See docs/runbooks/persistence-postgres.md.
-  DATABASE_URL: isProd ? z.string().url() : z.string().url().optional(),
-  REDIS_URL: isProd ? z.string().url() : z.string().url().optional(),
-  AUTH_MODE: authModeSchema,
-  // Sprint 12.7 — also reject the dev placeholder in production, not
-  // just empty / too-short values. A misconfigured deployment that
-  // forwards the dev string is functionally identical to leaving the
-  // secret blank.
-  SESSION_SECRET: isProd
-    ? z
-        .string()
-        .min(32, "SESSION_SECRET must be at least 32 chars in production")
-        .refine(
-          (v) => v !== "dev-session-secret-please-change-me",
-          "SESSION_SECRET must NOT be the dev placeholder in production",
-        )
-    : z.string().min(8).default("dev-session-secret-please-change-me"),
-  // Base URL of the real identity-svc (Fastify) used when
-  // AUTH_MODE !== "mock". Default to localhost for the dev workflow.
-  IDENTITY_SVC_URL: z.string().url().default("http://localhost:3001"),
-  // Base URL of the real `learning-svc` (Fastify). The Sprint 1 lesson
-  // player v2 BFF routes proxy through this — v1 paths ignore it.
-  LEARNING_SVC_URL: z.string().url().default("http://localhost:3041"),
-  LEARNING_SVC_SERVICE_TOKEN: z.string().optional(),
-  // Sprint B1: base URL of the `assessment-svc` (Fastify). Used by the
-  // baseline-llm pipeline to call `/api/ai/generate-baseline`.
-  ASSESSMENT_SVC_URL: z.string().url().default("http://localhost:3071"),
-  ASSESSMENT_SVC_SERVICE_TOKEN: z.string().optional(),
-  // Sprint G: real responsible-AI evaluator + data-governance services.
-  // BFF routes fan out to these only when the corresponding feature flag
-  // is on; the local mock store remains for development.
-  RESPONSIBLE_AI_SVC_URL: z.string().url().default("http://localhost:3071"),
-  DATA_GOVERNANCE_SVC_URL: z.string().url().default("http://localhost:3072"),
-  // Sprint 8: status-page + alerts-proxy (status page, SLO/error-budget).
-  STATUS_PAGE_SVC_URL: z.string().url().default("http://localhost:3014"),
-  ALERTS_PROXY_SVC_URL: z.string().url().default("http://localhost:3016"),
-  // Sprint 10: cross-tier reports & exports framework.
-  REPORTS_SVC_URL: z.string().url().default("http://localhost:3018"),
-  // Sprint H: SIS rostering + LTI 1.3.
-  INTEGRATION_SVC_URL: z.string().url().default("http://localhost:3060"),
-  // Enterprise admin parity: web-v2 admin pages now source platform reads
-  // from admin-svc instead of the in-process mock repository.
-  ADMIN_SVC_URL: z.string().url().default("http://localhost:3012"),
-  // Phase 1 (curriculum sync): base URL + internal trust token of `ai-svc`,
-  // used by the weekly-curriculum parser to extract topics/vocabulary/
-  // standards from an uploaded syllabus. `INTERNAL_AI_TOKEN` is the same
-  // shared secret tutor-svc/ai-svc use (sent as `X-Internal-Auth`). Both are
-  // optional — when the token is absent the parser falls back to a local
-  // heuristic so the upload flow still works.
-  AI_SVC_URL: z.string().url().default("http://localhost:3004"),
-  INTERNAL_AI_TOKEN: z.string().optional(),
-  // Weekly curriculum sync (live): tutor-svc owns the shared
-  // `curriculum_uploads` Postgres table. The web-v2 BFF proxies parent/teacher
-  // uploads and the lesson-generation focus read to tutor-svc using the shared
-  // `INTERNAL_SERVICE_TOKEN` (sent as `x-service-token`). In production both
-  // MUST be set — the curriculum data path then runs fully live (no in-memory
-  // store). In dev/test, when unset, web-v2 falls back to its in-memory store.
-  TUTOR_SVC_URL: z.string().url().default("http://localhost:3006"),
-  INTERNAL_SERVICE_TOKEN: z.string().optional(),
-  // Syllabus ↔ jurisdiction validation (Sprint 7): curriculum-svc base URL.
-  // Authenticated with INTERNAL_SERVICE_TOKEN (sent as `X-Service-Token`).
-  CURRICULUM_SVC_URL: z.string().url().default("http://localhost:3013"),
-  AI_PROVIDER: aiProviderSchema,
-  ANTHROPIC_API_KEY: z.string().optional(),
-  OPENAI_API_KEY: z.string().optional(),
-  GOOGLE_API_KEY: z.string().optional(),
-  OBJECT_STORAGE_BUCKET: z.string().optional(),
-  OBJECT_STORAGE_REGION: z.string().optional(),
-  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
-  // ADR 0007 — persistence adapter selection. `memory` keeps the
-  // process-local Map store; `postgres` routes ported domains through
-  // packages/db (Drizzle). Default to `memory` until the production
-  // database connection is configured.
-  AIVO_PERSISTENCE: aivoPersistenceSchema,
-  // Per-domain overrides for the persistence adapter. Each value, when
-  // set, wins over AIVO_PERSISTENCE for that domain. See
-  // lib/db/persistence/index.ts for the list of known domains.
-  AIVO_PERSISTENCE_NOTIFICATIONS: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_AUDIT: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_IDENTITY: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_LEARNERS: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_ASSESSMENTS: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_LESSON_RUNS: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_BRAIN_PROFILES: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_CURRICULUM: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_COMPLIANCE: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_QUESTS: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_ADMIN: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_COLLABORATION: aivoPersistenceOverrideSchema,
-  // Sprint 2 — web-owned billing/AI-cost rows (web_* tables). Canonical
-  // subscription/invoice/seat state stays in billing-svc (ADR 0015).
-  AIVO_PERSISTENCE_BILLING: aivoPersistenceOverrideSchema,
-  // Sprint 3 — web-owned IEP AI-draft review inbox. Canonical IEP goals /
-  // therapist notes / caregiver observations stay in family-svc (ADR 0015).
-  AIVO_PERSISTENCE_CLINICAL: aivoPersistenceOverrideSchema,
-  // Sprint 4 — platform-global security / SOC 2 / incident / vendor /
-  // privacy-matrix compliance artifacts (web_* tables).
-  AIVO_PERSISTENCE_SECURITY: aivoPersistenceOverrideSchema,
-  // Sprint 6 — web-owned rostering / SIS / lesson-sync aggregates. Canonical
-  // SIS sync (integrations-svc) + rostering grant (identity-svc) read via REST.
-  AIVO_PERSISTENCE_ROSTERING: aivoPersistenceOverrideSchema,
-  // Sprint 7 — web-owned TTS/audio/read-aloud + safety/moderation.
-  AIVO_PERSISTENCE_AUDIO: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_SAFETY: aivoPersistenceOverrideSchema,
-  // Sprint 8 — web-owned support tickets/AI-jobs + tenant/platform settings.
-  AIVO_PERSISTENCE_SUPPORT: aivoPersistenceOverrideSchema,
-  AIVO_PERSISTENCE_SETTINGS: aivoPersistenceOverrideSchema,
-  // Sprint 8 remainder — web-owned engagement / sessions / notification prefs.
-  AIVO_PERSISTENCE_ENGAGEMENT: aivoPersistenceOverrideSchema,
-  // Sprint 8 remainder — platform-global standards / skill-graph reference.
-  AIVO_PERSISTENCE_STANDARDS: aivoPersistenceOverrideSchema,
-  // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
-  // is the global default; per-service flags override it.
-  AIVO_USE_SERVICE_STACK: z
-    .union([z.literal("true"), z.literal("false")])
-    .default(isProd ? "true" : "false")
-    .transform((v) => v === "true"),
-  AIVO_USE_BRAIN_SVC: z
-    .union([z.literal("true"), z.literal("false")])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
-  AIVO_USE_AI_SVC: z
-    .union([z.literal("true"), z.literal("false")])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
-  AIVO_USE_ASSESSMENT_SVC: z
-    .union([z.literal("true"), z.literal("false")])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
-  AIVO_USE_COMMS_SVC: z
-    .union([z.literal("true"), z.literal("false")])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
-  AIVO_USE_IDENTITY_SVC: z
-    .union([z.literal("true"), z.literal("false")])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
-  BRAIN_SVC_URL: z.string().url().default("http://localhost:3081"),
-  BRAIN_SVC_SERVICE_TOKEN: z.string().optional(),
-  COMMS_SVC_URL: z.string().url().default("http://localhost:3091"),
-  COMMS_SVC_SERVICE_TOKEN: z.string().optional(),
-  BILLING_SVC_URL: z.string().url().default("http://localhost:3009"),
-  BILLING_SVC_SERVICE_TOKEN: z.string().optional(),
-  // Per-service override of AIVO_USE_SERVICE_STACK for billing. When
-  // enabled (and a real access token is present), the parent billing
-  // surface talks to the Stripe-backed billing-svc instead of the
-  // in-memory store simulation.
-  AIVO_USE_BILLING_SVC: z
-    .union([z.literal("true"), z.literal("false")])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
-  FAMILY_SVC_URL: z.string().url().default("http://localhost:3007"),
-  FAMILY_SVC_SERVICE_TOKEN: z.string().optional(),
-  // Per-service override of AIVO_USE_SERVICE_STACK for family-svc. When
-  // enabled (and a real access token is present), the parent Speech Buddy
-  // consent surface talks to family-svc instead of the in-memory store.
-  AIVO_USE_FAMILY_SVC: z
-    .union([z.literal("true"), z.literal("false")])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
-  // Shared upstream timeout (ms) for service calls; the client uses
-  // AbortController with this deadline.
-  AIVO_SERVICE_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
-});
+const serverSchema = z
+  .object({
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    // Postgres connection backing the persistence adapter (web_* tables).
+    // Required in production (every domain resolves to `postgres` there); in
+    // dev/test it is optional and only needed once a domain is flipped to
+    // postgres. See docs/runbooks/persistence-postgres.md.
+    DATABASE_URL: isProd ? z.string().url() : z.string().url().optional(),
+    REDIS_URL: isProd ? z.string().url() : z.string().url().optional(),
+    AUTH_MODE: authModeSchema,
+    // Sprint 12.7 — also reject the dev placeholder in production, not
+    // just empty / too-short values. A misconfigured deployment that
+    // forwards the dev string is functionally identical to leaving the
+    // secret blank.
+    SESSION_SECRET: isProd
+      ? z
+          .string()
+          .min(32, "SESSION_SECRET must be at least 32 chars in production")
+          .refine(
+            (v) => v !== "dev-session-secret-please-change-me",
+            "SESSION_SECRET must NOT be the dev placeholder in production",
+          )
+      : z.string().min(8).default("dev-session-secret-please-change-me"),
+    // Base URL of the real identity-svc (Fastify) used when
+    // AUTH_MODE !== "mock". Default to localhost for the dev workflow.
+    IDENTITY_SVC_URL: z.string().url().default("http://localhost:3001"),
+    // Base URL of the real `learning-svc` (Fastify). The Sprint 1 lesson
+    // player v2 BFF routes proxy through this — v1 paths ignore it.
+    LEARNING_SVC_URL: z.string().url().default("http://localhost:3041"),
+    LEARNING_SVC_SERVICE_TOKEN: z.string().optional(),
+    // Sprint B1: base URL of the `assessment-svc` (Fastify). Used by the
+    // baseline-llm pipeline to call `/api/ai/generate-baseline`.
+    ASSESSMENT_SVC_URL: z.string().url().default("http://localhost:3071"),
+    ASSESSMENT_SVC_SERVICE_TOKEN: z.string().optional(),
+    // Sprint G: real responsible-AI evaluator + data-governance services.
+    // BFF routes fan out to these only when the corresponding feature flag
+    // is on; the local mock store remains for development.
+    RESPONSIBLE_AI_SVC_URL: z.string().url().default("http://localhost:3071"),
+    DATA_GOVERNANCE_SVC_URL: z.string().url().default("http://localhost:3072"),
+    // Sprint 8: status-page + alerts-proxy (status page, SLO/error-budget).
+    STATUS_PAGE_SVC_URL: z.string().url().default("http://localhost:3014"),
+    ALERTS_PROXY_SVC_URL: z.string().url().default("http://localhost:3016"),
+    // Sprint 10: cross-tier reports & exports framework.
+    REPORTS_SVC_URL: z.string().url().default("http://localhost:3018"),
+    // Sprint H: SIS rostering + LTI 1.3.
+    INTEGRATION_SVC_URL: z.string().url().default("http://localhost:3060"),
+    // Enterprise admin parity: web-v2 admin pages now source platform reads
+    // from admin-svc instead of the in-process mock repository.
+    ADMIN_SVC_URL: z.string().url().default("http://localhost:3012"),
+    // Phase 1 (curriculum sync): base URL + internal trust token of `ai-svc`,
+    // used by the weekly-curriculum parser to extract topics/vocabulary/
+    // standards from an uploaded syllabus. `INTERNAL_AI_TOKEN` is the same
+    // shared secret tutor-svc/ai-svc use (sent as `X-Internal-Auth`). Both are
+    // optional — when the token is absent the parser falls back to a local
+    // heuristic so the upload flow still works.
+    AI_SVC_URL: z.string().url().default("http://localhost:3004"),
+    INTERNAL_AI_TOKEN: z.string().optional(),
+    // Weekly curriculum sync (live): tutor-svc owns the shared
+    // `curriculum_uploads` Postgres table. The web-v2 BFF proxies parent/teacher
+    // uploads and the lesson-generation focus read to tutor-svc using the shared
+    // `INTERNAL_SERVICE_TOKEN` (sent as `x-service-token`). In production both
+    // MUST be set — the curriculum data path then runs fully live (no in-memory
+    // store). In dev/test, when unset, web-v2 falls back to its in-memory store.
+    TUTOR_SVC_URL: z.string().url().default("http://localhost:3006"),
+    INTERNAL_SERVICE_TOKEN: z.string().optional(),
+    // Syllabus ↔ jurisdiction validation (Sprint 7): curriculum-svc base URL.
+    // Authenticated with INTERNAL_SERVICE_TOKEN (sent as `X-Service-Token`).
+    CURRICULUM_SVC_URL: z.string().url().default("http://localhost:3013"),
+    AI_PROVIDER: aiProviderSchema,
+    ANTHROPIC_API_KEY: z.string().optional(),
+    OPENAI_API_KEY: z.string().optional(),
+    GOOGLE_API_KEY: z.string().optional(),
+    OBJECT_STORAGE_BUCKET: z.string().optional(),
+    OBJECT_STORAGE_REGION: z.string().optional(),
+    LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
+    // ADR 0007 — persistence adapter selection. `memory` keeps the
+    // process-local Map store; `postgres` routes ported domains through
+    // packages/db (Drizzle). Default to `memory` until the production
+    // database connection is configured.
+    AIVO_PERSISTENCE: aivoPersistenceSchema,
+    // Per-domain overrides for the persistence adapter. Each value, when
+    // set, wins over AIVO_PERSISTENCE for that domain. See
+    // lib/db/persistence/index.ts for the list of known domains.
+    AIVO_PERSISTENCE_NOTIFICATIONS: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_AUDIT: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_IDENTITY: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_LEARNERS: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_ASSESSMENTS: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_LESSON_RUNS: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_BRAIN_PROFILES: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_CURRICULUM: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_COMPLIANCE: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_QUESTS: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_ADMIN: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_COLLABORATION: aivoPersistenceOverrideSchema,
+    // Sprint 2 — web-owned billing/AI-cost rows (web_* tables). Canonical
+    // subscription/invoice/seat state stays in billing-svc (ADR 0015).
+    AIVO_PERSISTENCE_BILLING: aivoPersistenceOverrideSchema,
+    // Sprint 3 — web-owned IEP AI-draft review inbox. Canonical IEP goals /
+    // therapist notes / caregiver observations stay in family-svc (ADR 0015).
+    AIVO_PERSISTENCE_CLINICAL: aivoPersistenceOverrideSchema,
+    // Sprint 4 — platform-global security / SOC 2 / incident / vendor /
+    // privacy-matrix compliance artifacts (web_* tables).
+    AIVO_PERSISTENCE_SECURITY: aivoPersistenceOverrideSchema,
+    // Sprint 6 — web-owned rostering / SIS / lesson-sync aggregates. Canonical
+    // SIS sync (integrations-svc) + rostering grant (identity-svc) read via REST.
+    AIVO_PERSISTENCE_ROSTERING: aivoPersistenceOverrideSchema,
+    // Sprint 7 — web-owned TTS/audio/read-aloud + safety/moderation.
+    AIVO_PERSISTENCE_AUDIO: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_SAFETY: aivoPersistenceOverrideSchema,
+    // Sprint 8 — web-owned support tickets/AI-jobs + tenant/platform settings.
+    AIVO_PERSISTENCE_SUPPORT: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_SETTINGS: aivoPersistenceOverrideSchema,
+    // Sprint 8 remainder — web-owned engagement / sessions / notification prefs.
+    AIVO_PERSISTENCE_ENGAGEMENT: aivoPersistenceOverrideSchema,
+    // Sprint 8 remainder — platform-global standards / skill-graph reference.
+    AIVO_PERSISTENCE_STANDARDS: aivoPersistenceOverrideSchema,
+    // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
+    // is the global default; per-service flags override it.
+    AIVO_USE_SERVICE_STACK: z
+      .union([z.literal("true"), z.literal("false")])
+      .default(isProd ? "true" : "false")
+      .transform((v) => v === "true"),
+    AIVO_USE_BRAIN_SVC: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v === "true")),
+    AIVO_USE_AI_SVC: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v === "true")),
+    AIVO_USE_ASSESSMENT_SVC: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v === "true")),
+    AIVO_USE_COMMS_SVC: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v === "true")),
+    AIVO_USE_IDENTITY_SVC: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v === "true")),
+    BRAIN_SVC_URL: z.string().url().default("http://localhost:3081"),
+    BRAIN_SVC_SERVICE_TOKEN: z.string().optional(),
+    COMMS_SVC_URL: z.string().url().default("http://localhost:3091"),
+    COMMS_SVC_SERVICE_TOKEN: z.string().optional(),
+    BILLING_SVC_URL: z.string().url().default("http://localhost:3009"),
+    BILLING_SVC_SERVICE_TOKEN: z.string().optional(),
+    // Per-service override of AIVO_USE_SERVICE_STACK for billing. When
+    // enabled (and a real access token is present), the parent billing
+    // surface talks to the Stripe-backed billing-svc instead of the
+    // in-memory store simulation.
+    AIVO_USE_BILLING_SVC: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v === "true")),
+    FAMILY_SVC_URL: z.string().url().default("http://localhost:3007"),
+    FAMILY_SVC_SERVICE_TOKEN: z.string().optional(),
+    // Per-service override of AIVO_USE_SERVICE_STACK for family-svc. When
+    // enabled (and a real access token is present), the parent Speech Buddy
+    // consent surface talks to family-svc instead of the in-memory store.
+    AIVO_USE_FAMILY_SVC: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v === "true")),
+    // Shared upstream timeout (ms) for service calls; the client uses
+    // AbortController with this deadline.
+    AIVO_SERVICE_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
+  })
+  .superRefine((_val, ctx) => {
+    // G1 — on the real-auth pilot path, web-v2's session + login round-trip to
+    // identity-svc. In production (where AUTH_MODE is already forced to a real
+    // provider) IDENTITY_SVC_URL MUST be explicitly configured — never left to
+    // the localhost dev default, which would point real sign-in at nothing.
+    if (isProd && !process.env.IDENTITY_SVC_URL) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["IDENTITY_SVC_URL"],
+        message:
+          "IDENTITY_SVC_URL must be set in production (AUTH_MODE is a real provider; " +
+          "web-v2 login/session round-trips to identity-svc). The localhost default is dev-only.",
+      });
+    }
+  });
 
 const clientSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:5000"),

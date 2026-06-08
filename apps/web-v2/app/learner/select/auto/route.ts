@@ -8,14 +8,14 @@
  */
 import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { ROLE_HOME } from "@/lib/auth/types";
 import { ACTIVE_LEARNER_COOKIE, verifyActiveLearner } from "@/lib/auth/active-learner";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request): Promise<NextResponse> {
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) {
     redirect("/login");
   }

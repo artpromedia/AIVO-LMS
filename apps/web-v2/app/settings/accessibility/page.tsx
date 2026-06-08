@@ -1,4 +1,4 @@
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
@@ -21,7 +21,7 @@ import { A11yPreferencesToggles } from "@/components/system/a11y-preferences-tog
 import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
 
 export default async function AccessibilitySettings() {
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) redirect("/login");
 
   const t = await getTranslations("settings_accessibility");

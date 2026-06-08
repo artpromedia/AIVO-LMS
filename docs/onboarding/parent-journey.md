@@ -173,3 +173,33 @@ pnpm onboarding:audit
 pnpm consent:audit
 pnpm test --filter @aivo/web-v2 -- learner/readiness
 ```
+
+## Two ways a parent's account is created
+
+A parent can arrive on AIVO through one of two paths, which land them in
+**different tenants**:
+
+1. **Self-serve `/signup`** (B2C). `identity-svc POST /api/auth/register` is
+   PARENT-only and provisions a **B2C_FAMILY** tenant owned by that parent
+   (1-learner cap). This is the consumer path.
+2. **Invited into a district** (B2B, Sprint 2). A district admin
+   (`POST /api/district/parents`, single + bulk CSV) or school admin
+   (`POST /api/school/parents`) creates a hashed-token invite (role `PARENT`,
+   pinned to the **district `tenantId`**, optional `schoolId`). The parent
+   accepts via `POST /api/auth/accept-invite`, which creates the PARENT `users`
+   row **under the district tenant** with a self-chosen password (no temporary
+   password is ever emailed). Seats are capped by `tenants.seat_limit`.
+
+The invite path is what makes "a district + its parents" one coherent tenant:
+the parent, their learners, and the district's schools all live under the same
+`tenantId`, and cross-tenant access stays blocked.
+
+## Seat cap on the parent learner-create path (pilot)
+
+For a parent under a B2B district tenant, learner creation is capped by
+`tenants.seat_limit`. web-v2 enforces this on every create path (the
+`/api/bff/learners` BFF returns a typed `SEAT_LIMIT_REACHED` error; the
+onboarding/parent server actions redirect with `error=seat_limit`) by counting
+the tenant's `web_learner_profiles` against the seat limit. B2C / uncapped
+tenants are unlimited. The age-gate / parent-consent record is stamped at
+learner creation.

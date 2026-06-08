@@ -15,7 +15,7 @@
  * Parents can refine the exact details later from the learner profile.
  */
 import { redirect } from "next/navigation";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { createLearner } from "@/lib/db/repos";
 import { createLearnerSchema } from "@/lib/validators/learner";
 import { audit } from "@/lib/bff/audit";
@@ -35,7 +35,7 @@ const GRADE_MAP: Record<string, { gradeBand: GradeBand; age: number }> = {
 };
 
 export async function createOnboardingLearnerAction(formData: FormData): Promise<void> {
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session || session.role !== "parent") {
     redirect("/login");
   }
@@ -57,6 +57,13 @@ export async function createOnboardingLearnerAction(formData: FormData): Promise
   const parsed = createLearnerSchema.safeParse(raw);
   if (!parsed.success) {
     redirect("/onboarding/learner/new?error=invalid");
+  }
+
+  // District pilot seat cap (Sprint 3): refuse over-cap before creating.
+  const { getTenantSeatAvailability } = await import("@/lib/db/seat-availability");
+  const seats = await getTenantSeatAvailability(session.tenantId);
+  if (!seats.allowed) {
+    redirect("/onboarding/learner/new?error=seat_limit");
   }
 
   const learner = await createLearner({

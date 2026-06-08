@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { fail, ok, getRequestId } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { recordAudit } from "@/lib/db/repos";
 import { getTotpFactor, grantStepUp, hasRecentStepUp, STEP_UP_TTL_SEC } from "@/lib/db/mfa-store";
 import { verifyTotp } from "@/lib/auth/totp";
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 async function requireSession(req: Request) {
   const requestId = getRequestId(req);
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) {
     return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
   }

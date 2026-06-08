@@ -19,6 +19,8 @@ import { registerPlanRoutes } from "./routes/plans.js";
 import { registerWebhookRoutes } from "./routes/webhooks.js";
 import { registerDailyJobsRoutes } from "./routes/daily-jobs.js";
 import { registerCouponRoutes } from "./routes/coupons.js";
+import { registerPilotProvisioningRoutes } from "./routes/pilot-provisioning.js";
+import { registerPilotStatusRoutes } from "./routes/pilot-status.js";
 import { registerInternalJobRoutes } from "./routes/internal-jobs.js";
 import { registerBillingTestHelperRoutes } from "./routes/test-helpers.js";
 import { registerSeatRoutes } from "./routes/seats.js";
@@ -77,6 +79,8 @@ export async function buildApp(
   registerWebhookRoutes(app, db);
   registerDailyJobsRoutes(app, db);
   registerCouponRoutes(app, db);
+  registerPilotProvisioningRoutes(app, db);
+  registerPilotStatusRoutes(app, db);
   registerSeatRoutes(app, db);
   registerInternalJobRoutes(app, handles);
   registerBillingTestHelperRoutes(app, db);

@@ -1,0 +1,286 @@
+/**
+ * District-pilot end-to-end journey.
+ *
+ * Target journey (grown one sprint at a time — see the persona prompt pack):
+ *   platform admin provisions a district pilot
+ *     → district admin adds a school
+ *     → parents are invited into the district tenant
+ *     → each parent logs in for real, creates a learner under the seat cap,
+ *       and completes consent.
+ *
+ * Sprint 0 (this slice, G1): a pilot parent signs in to web-v2 with REAL
+ * identity-svc credentials — no mock cookie, no demo fallback — and lands on
+ * the parent surface with a real session. The later journey stages are
+ * declared with `test.fixme` so the spec file is the living contract each
+ * subsequent sprint fills in.
+ *
+ * Runs against the Dockerized harness (docker-compose.e2e.yml `pilot`
+ * profile): postgres + identity-svc (IDENTITY_TEST_MODE=1) + web-v2
+ * (AUTH_MODE=custom, AIVO_PERSISTENCE=postgres).
+ */
+import { test, expect } from "@playwright/test";
+import {
+  WEB_BASE,
+  IDENTITY_BASE,
+  seedParent,
+  seedParentInTenant,
+  seedPlatformAdmin,
+  seedDistrictAdmin,
+  skipUnlessIdentityTestMode,
+} from "../../lib/fixtures";
+import { assertRealSessionNoMock, loginThroughWebUi, MOCK_SESSION_COOKIE } from "../../lib/pilot";
+
+const BILLING_BASE = process.env.BILLING_BASE_URL || "http://localhost:3009";
+
+test.describe("District pilot — Sprint 0: real web-v2 session (G1)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("a pilot parent signs in with real credentials and gets a real session", async ({
+    page,
+  }) => {
+    const parent = await seedParent(`pilot-parent-${Date.now()}@aivo.test`);
+    expect(parent, "identity-svc seed-parent helper must be reachable").not.toBeNull();
+    if (!parent) return;
+
+    await loginThroughWebUi(page, {
+      email: parent.email,
+      password: parent.password,
+      expectPath: "/parent/home",
+    });
+
+    // Landed on the real parent surface under a real session.
+    expect(page.url()).toContain("/parent/home");
+    await assertRealSessionNoMock(page);
+  });
+
+  test("the mock-login BFF endpoint is refused when AUTH_MODE is not mock", async ({ request }) => {
+    // G1 invariant, asserted at the wire: with a real identity provider
+    // configured, /api/bff/auth/mock-login must hard-NO (404) so no mock
+    // session can be minted on the pilot path.
+    const res = await request.post(`${WEB_BASE}/api/bff/auth/mock-login`, {
+      data: { role: "parent" },
+      failOnStatusCode: false,
+    });
+    expect(res.status()).toBe(404);
+
+    const cookies = await page_context_cookies(request);
+    expect(cookies.includes(MOCK_SESSION_COOKIE)).toBe(false);
+  });
+});
+
+/** Read Set-Cookie names off the APIRequestContext storage state. */
+async function page_context_cookies(
+  request: import("@playwright/test").APIRequestContext,
+): Promise<string[]> {
+  const state = await request.storageState();
+  return state.cookies.map((c) => c.name);
+}
+
+/* -------------------------------------------------------------------------
+ * Later journey stages. Each is implemented (and un-fixme'd) by its sprint:
+ *   Sprint 1 — platform admin provisions the pilot (district + redeemed coupon)
+ *   Sprint 2 — district/school admin invites parents into the district tenant
+ *   Sprint 3 — invited parent logs in, creates a learner under the seat cap,
+ *              and completes consent — all under the one district tenant
+ *   Sprint 4 — pilot ops dashboard surfaces seats / uptake / expiry
+ * ---------------------------------------------------------------------- */
+test.describe("District pilot — Sprint 1: provision pilot (G2)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("platform admin provisions a district pilot with a redeemed coupon", async ({ request }) => {
+    const admin = await seedPlatformAdmin();
+    expect(admin, "identity-svc seed-platform-admin helper must be reachable").not.toBeNull();
+    if (!admin) return;
+
+    const stamp = Date.now();
+    const provision = await request.post(`${IDENTITY_BASE}/api/admin/pilots`, {
+      headers: { authorization: `Bearer ${admin.accessToken}` },
+      data: {
+        districtName: `Pilot E2E ${stamp}`,
+        adminName: "Pat Principal",
+        adminEmail: `pilot-da-${stamp}@district.test`,
+        seatLimit: 5,
+        durationDays: 30,
+      },
+      failOnStatusCode: false,
+    });
+    expect(provision.status(), await provision.text()).toBe(200);
+    const body = await provision.json();
+
+    // The district was born WITH its pilot entitlement, in one action.
+    expect(body.district.id).toBeTruthy();
+    expect(body.pilot.seatLimit).toBe(5);
+    expect(String(body.pilot.couponCode)).toMatch(/^PILOT-/);
+    expect(body.invite.email).toContain("pilot-da-");
+
+    // billing_coupons is the source of truth: the PROVISIONING coupon was
+    // minted and redeemed exactly once for this tenant.
+    const coupon = await request.get(
+      `${BILLING_BASE}/api/billing/admin/coupons/${body.pilot.couponCode}`,
+      { headers: { authorization: `Bearer ${admin.accessToken}` }, failOnStatusCode: false },
+    );
+    expect(coupon.status()).toBe(200);
+    const cj = await coupon.json();
+    expect(cj.coupon.coupon_type).toBe("PROVISIONING");
+    expect(Number(cj.coupon.redemptions)).toBe(1);
+  });
+});
+
+test.describe("District pilot — Sprint 2: invite parents into the district tenant (G3)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("a district admin invites parents who land under the district tenant, seat-capped", async ({
+    request,
+  }) => {
+    const admin = await seedDistrictAdmin({ seatLimit: 2 });
+    expect(admin, "seed-district-admin helper must be reachable").not.toBeNull();
+    if (!admin) return;
+
+    const stamp = Date.now();
+    const headers = { authorization: `Bearer ${admin.accessToken}` };
+
+    // Invite two parents — fills the 2-seat pilot cap.
+    for (const n of [1, 2]) {
+      const res = await request.post(`${IDENTITY_BASE}/api/district/parents`, {
+        headers,
+        data: { name: `Parent ${n}`, email: `pilot-parent-${n}-${stamp}@fam.test` },
+        failOnStatusCode: false,
+      });
+      expect(res.status(), await res.text()).toBe(200);
+      expect((await res.json()).invite.schoolId).toBeNull();
+    }
+
+    // Third invite exceeds the cap → refused with a clear seat error.
+    const over = await request.post(`${IDENTITY_BASE}/api/district/parents`, {
+      headers,
+      data: { name: "Parent 3", email: `pilot-parent-3-${stamp}@fam.test` },
+      failOnStatusCode: false,
+    });
+    expect(over.status()).toBe(409);
+
+    // The list shows the invites as pending under THIS district, with seat usage.
+    const list = await request.get(`${IDENTITY_BASE}/api/district/parents`, {
+      headers,
+      failOnStatusCode: false,
+    });
+    expect(list.status()).toBe(200);
+    const lj = await list.json();
+    expect(lj.parents.length).toBeGreaterThanOrEqual(2);
+    expect(lj.seats.seatLimit).toBe(2);
+    expect(lj.seats.remaining).toBe(0);
+    for (const p of lj.parents) expect(p.status).toBe("pending");
+  });
+});
+
+test.describe("District pilot — Sprint 3: parent creates a learner under the seat cap (G3)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("a district parent logs in for real and is capped at the pilot seat limit", async ({
+    page,
+  }) => {
+    // 1-seat district so the second learner trips the cap.
+    const admin = await seedDistrictAdmin({ seatLimit: 1 });
+    expect(admin, "seed-district-admin helper must be reachable").not.toBeNull();
+    if (!admin) return;
+
+    const parent = await seedParentInTenant(admin.tenantId);
+    expect(parent, "parent seeded into the district tenant").not.toBeNull();
+    if (!parent) return;
+
+    // Real web-v2 login (no mock) — lands under the DISTRICT tenant.
+    await loginThroughWebUi(page, {
+      email: parent.email,
+      password: parent.password,
+      expectPath: "/parent/home",
+    });
+    await assertRealSessionNoMock(page);
+
+    // First learner: created (201) + an age-gate/consent record is stamped.
+    const first = await page.request.post(`${WEB_BASE}/api/bff/learners`, {
+      data: { firstName: "Kid One", birthYear: 2016 },
+      failOnStatusCode: false,
+    });
+    expect(first.status(), await first.text()).toBe(201);
+    const firstBody = await first.json();
+    expect(firstBody.data.learner.id).toBeTruthy();
+    expect(firstBody.data.ageGate).toBeTruthy(); // consent/age-gate recorded
+
+    // Second learner exceeds the 1-seat pilot cap → refused with a typed error.
+    const second = await page.request.post(`${WEB_BASE}/api/bff/learners`, {
+      data: { firstName: "Kid Two", birthYear: 2018 },
+      failOnStatusCode: false,
+    });
+    expect(second.status()).toBe(409);
+    const secondBody = await second.json();
+    expect(secondBody.error.code).toBe("SEAT_LIMIT_REACHED");
+  });
+});
+
+test.describe("District pilot — Sprint 4: pilot ops view (G4)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("a provisioned pilot surfaces seats/uptake/redemptions/expiry from real reads", async ({
+    page,
+    request,
+  }) => {
+    const admin = await seedPlatformAdmin();
+    expect(admin).not.toBeNull();
+    if (!admin) return;
+
+    // Provision a 2-seat pilot.
+    const stamp = Date.now();
+    const provision = await request.post(`${IDENTITY_BASE}/api/admin/pilots`, {
+      headers: { authorization: `Bearer ${admin.accessToken}` },
+      data: {
+        districtName: `Pilot Ops ${stamp}`,
+        adminName: "Ops Admin",
+        adminEmail: `ops-da-${stamp}@district.test`,
+        seatLimit: 2,
+        durationDays: 30,
+      },
+      failOnStatusCode: false,
+    });
+    expect(provision.status(), await provision.text()).toBe(200);
+    const tenantId = (await provision.json()).district.id;
+
+    // A parent in the district logs in and creates a learner (consumes a seat).
+    const parent = await seedParentInTenant(tenantId);
+    expect(parent).not.toBeNull();
+    if (!parent) return;
+    await loginThroughWebUi(page, {
+      email: parent.email,
+      password: parent.password,
+      expectPath: "/parent/home",
+    });
+    const created = await page.request.post(`${WEB_BASE}/api/bff/learners`, {
+      data: { firstName: "Ops Kid", birthYear: 2016 },
+      failOnStatusCode: false,
+    });
+    expect(created.status(), await created.text()).toBe(201);
+
+    // Platform admin sees the live ops view: real seats/uptake/coupon/expiry.
+    const ops = await request.get(`${BILLING_BASE}/api/billing/admin/pilots/${tenantId}`, {
+      headers: { authorization: `Bearer ${admin.accessToken}` },
+      failOnStatusCode: false,
+    });
+    expect(ops.status()).toBe(200);
+    const pilot = (await ops.json()).pilot;
+    expect(pilot.seatLimit).toBe(2);
+    expect(pilot.seatsUsed).toBeGreaterThanOrEqual(1);
+    expect(pilot.learnersCreated).toBeGreaterThanOrEqual(1);
+    expect(pilot.parentsOnboarded).toBeGreaterThanOrEqual(1);
+    expect(pilot.redemptions).toBe(1);
+    expect(pilot.status).toBe("active");
+    expect(pilot.expiresAt).toBeTruthy();
+  });
+});

@@ -25,6 +25,9 @@ declare module "*?prod-session-placeholder" {
 declare module "*?prod-missing-db" {
   export * from "@/lib/env";
 }
+declare module "*?prod-missing-identity" {
+  export * from "@/lib/env";
+}
 declare module "*?prod-all-real" {
   export * from "@/lib/env";
 }

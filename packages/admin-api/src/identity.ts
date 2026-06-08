@@ -8,7 +8,7 @@ import { AdminApiError } from "./client.js";
 import { identitySvcUrl, internalServiceToken } from "./env.js";
 
 type QueryValue = string | number | boolean | null | undefined;
-type IdentityMethod = "GET" | "POST" | "PATCH" | "PUT";
+type IdentityMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
 export type DistrictInviteStatus = "pending" | "accepted" | "expired" | "revoked";
 
@@ -103,6 +103,37 @@ export async function createPlatformDistrict(
   }>(session, "POST", "/api/admin/create-district", input);
 }
 
+export type ProvisionPilotResult = {
+  district: { id: string; name: string; type: string; createdAt: string };
+  invite: { id: string; email: string; expiresAt: string; inviteUrl?: string };
+  pilot: {
+    plan: string;
+    tier?: string;
+    seatLimit: number | null;
+    expiresAt: string | null;
+    couponCode?: string;
+  };
+};
+
+/**
+ * Provision a district pilot in one call: identity-svc creates the district +
+ * first-admin invite AND redeems a PROVISIONING coupon FOR the new tenant
+ * (seat cap + ACTIVE subscription) via billing-svc — no manual coupon step.
+ */
+export async function provisionPilot(
+  session: Pick<SessionProfile, "role">,
+  input: {
+    districtName: string;
+    adminName: string;
+    adminEmail: string;
+    seatLimit: number;
+    durationDays: number;
+  },
+): Promise<ProvisionPilotResult> {
+  assertPlatformAdmin(session);
+  return identityRequest<ProvisionPilotResult>(session, "POST", "/api/admin/pilots", input);
+}
+
 export async function listPlatformDistrictInvites(
   session: Pick<SessionProfile, "role">,
   status?: DistrictInviteStatus,
@@ -175,6 +206,86 @@ export async function inviteDistrictAdmin(
     "/api/district/admins",
     { ...input, role: "DISTRICT_ADMIN" },
   );
+}
+
+export type DistrictParent = {
+  id: string;
+  email: string;
+  name: string;
+  schoolId: string | null;
+  status: "pending" | "accepted" | "revoked" | "expired";
+  expiresAt: string;
+  createdAt: string;
+};
+
+export type ParentSeatInfo = {
+  seatLimit: number | null;
+  committed: number;
+  remaining: number | null;
+};
+
+export type BulkParentResult = {
+  email: string;
+  name: string;
+  status: "invited" | "skipped" | "error";
+  reason?: string;
+};
+
+/** Invite a single parent into the district tenant. */
+export async function inviteDistrictParent(
+  session: Pick<SessionProfile, "role">,
+  input: { name: string; email: string; schoolId?: string },
+) {
+  return identityRequest<{
+    invite: { id: string; email: string; name: string; schoolId: string | null; expiresAt: string };
+  }>(session, "POST", "/api/district/parents", input);
+}
+
+/** List the district's parent invites (pending/accepted/...) + seat usage. */
+export async function listDistrictParents(session: Pick<SessionProfile, "role">) {
+  return identityRequest<{ parents: DistrictParent[]; seats: ParentSeatInfo }>(
+    session,
+    "GET",
+    "/api/district/parents",
+  );
+}
+
+/** Revoke a pending parent invite. */
+export async function revokeDistrictParentInvite(
+  session: Pick<SessionProfile, "role">,
+  inviteId: string,
+) {
+  return identityRequest<{ success: true }>(
+    session,
+    "DELETE",
+    `/api/district/parents/invites/${encodeURIComponent(inviteId)}`,
+  );
+}
+
+/** Resend a pending parent invite (rotates the token). */
+export async function resendDistrictParentInvite(
+  session: Pick<SessionProfile, "role">,
+  inviteId: string,
+) {
+  return identityRequest<{ success: true; expiresAt: string }>(
+    session,
+    "POST",
+    `/api/district/parents/invites/${encodeURIComponent(inviteId)}/resend`,
+    {},
+  );
+}
+
+/** Bulk-invite parents from parsed CSV rows; returns per-row results. */
+export async function bulkInviteDistrictParents(
+  session: Pick<SessionProfile, "role">,
+  parents: Array<{ name: string; email: string }>,
+) {
+  return identityRequest<{
+    invited: number;
+    total: number;
+    results: BulkParentResult[];
+    seats: ParentSeatInfo;
+  }>(session, "POST", "/api/district/parents/bulk", { parents });
 }
 
 export async function updateDistrictBranding(

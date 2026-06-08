@@ -106,7 +106,23 @@ Coupon kinds:
 - **Provisioning** — grants entitlement without payment (e.g. school
   pilot access code); single-use per tenant; auto-expires.
 - **School pilot access code** — provisions a `district` plan slice
-  with seat cap; manual admin activation required for go-live.
+  with seat cap. **No manual activation:** the platform-admin "Provision
+  pilot" flow mints AND redeems this PROVISIONING coupon for the new district
+  tenant automatically (see below), so a district is born with its entitlement.
+
+### Automated pilot provisioning (no manual coupon step)
+
+`POST /api/billing/internal/pilots/provision` (service-to-service, guarded by
+the internal `x-service-token`) is the entitlement half of the platform-admin
+"Provision pilot" flow (identity-svc `POST /api/admin/pilots`). In one
+transaction it mints a single-use `PROVISIONING` coupon (`PILOT-<tenantShort>`
+when no code is supplied) and redeems it **for the new district tenant** —
+setting `tenants.licensing_tier` + `seat_limit` and inserting the `ACTIVE`
+`subscriptions` row via the shared `provisionTenantEntitlement` (the same
+money/seat write the parent coupon-redeem path uses). It is **idempotent on
+`(tenantId, couponCode)`**: a re-run that finds the tenant already entitled by
+this coupon returns the existing entitlement (`provisioned: false`) without
+touching seats or the redemption counter again.
 
 The admin detail route `GET /api/billing/admin/coupons/:code` returns the
 single coupon row with its live redemption count (for the pilot-uptake view).
@@ -115,11 +131,12 @@ single coupon row with its live redemption count (for the pilot-uptake view).
 
 Audit events (hash-chained `audit_events`, surfaced in admin audit dashboards):
 
-| Event                     | Emitted when                                              |
-| ------------------------- | --------------------------------------------------------- |
-| `billing.coupon.created`  | admin creates a coupon (actor + type + grants)            |
-| `billing.coupon.disabled` | admin disables a coupon                                   |
-| `billing.coupon.redeemed` | a coupon is redeemed (DISCOUNT/SUBSCRIPTION/PROVISIONING) |
+| Event                       | Emitted when                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `billing.coupon.created`    | admin creates a coupon (actor + type + grants)                                                                |
+| `billing.coupon.disabled`   | admin disables a coupon                                                                                       |
+| `billing.coupon.redeemed`   | a coupon is redeemed (DISCOUNT/SUBSCRIPTION/PROVISIONING)                                                     |
+| `billing.pilot.provisioned` | a district pilot entitlement is provisioned (seat cap + active subscription) via the internal provision route |
 
 Prometheus counters (`/metrics`):
 
@@ -223,3 +240,27 @@ pnpm --filter @aivo/billing-entitlements test
 pnpm --filter @aivo/billing-svc test
 pnpm test:enterprise   # district seat allocation, coupon redemption
 ```
+
+### Canonical coupon table + durable redeem rate-limit (Sprint 4)
+
+`billing_coupons` is now owned by a **canonical migration**
+(`packages/db/drizzle/0090_billing_coupons.sql`, applied by `db:migrate`) — the
+previous in-route `CREATE TABLE`/`ALTER` bootstrap in `coupons.ts` is gone and
+the schema-drift gate covers it. The same migration adds `billing_rate_limits`.
+
+The coupon-redeem brute-force limiter is now **durable and multi-replica-safe**
+(`services/billing-svc/src/lib/redeem-rate-limit.ts`): a Postgres-backed token
+bucket (atomic `INSERT … ON CONFLICT … RETURNING`) replaces the process-local
+`Map`, so the 10/min limit holds across pods.
+
+### Pilot operations read model
+
+`GET /api/billing/admin/pilots` and `GET /api/billing/admin/pilots/:tenantId`
+(`pilot-status.ts`) return a district pilot's live ops view — `plan`, `tier`,
+`seatLimit`, `seatsUsed`, `seatsRemaining`, `parentsOnboarded`, `learnersCreated`,
+`couponCode`, `redemptions`, `expiresAt`, `status` — joined from `subscriptions`
+
+- `tenants` + the provisioning coupon's redemption count + onboarded
+  parents/learners. The detail route is visible to PLATFORM_ADMIN or the owning
+  DISTRICT_ADMIN. Surfaced in web-admin at `/platform/pilots[/:tenantId]` and as a
+  seat/expiry banner on the district console.

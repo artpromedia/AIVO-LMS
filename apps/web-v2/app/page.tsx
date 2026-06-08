@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Building2, ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { ROLE_HOME, ROLE_LABEL } from "@/lib/auth/types";
 import { MascotCoach } from "@/components/playful-calm";
 import { SiteHeader } from "@/components/marketing/site-header";
@@ -11,7 +11,7 @@ import { HeroVisual } from "@/components/marketing/hero-visual";
 
 export default async function Home() {
   const t = await getTranslations("root.home");
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
 
   return (
     <>

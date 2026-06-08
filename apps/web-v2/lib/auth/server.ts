@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Permission } from "@aivo/security";
 import { delegatedAdminRbacV2Enabled } from "@/lib/feature-flags";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { ROLE_HOME, type Role, type SessionProfile } from "@/lib/auth/types";
 import { PLATFORM_ROLES, sessionHasPermission } from "@/lib/auth/permissions";
 
@@ -11,7 +11,7 @@ import { PLATFORM_ROLES, sessionHasPermission } from "@/lib/auth/permissions";
  * teacher never lands on /parent/home.
  */
 export async function requirePageRole(roles: Role[]): Promise<SessionProfile> {
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) {
     redirect("/login");
   }
@@ -25,7 +25,7 @@ export async function requirePagePermission(
   permission: Permission | string,
   roles?: Role[],
 ): Promise<SessionProfile> {
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) {
     redirect("/login");
   }
@@ -63,7 +63,7 @@ export async function requirePlatformPage(
 export async function requireAnonymous(
   redirectAuthenticatedRoles: readonly Role[] = [],
 ): Promise<SessionProfile | null> {
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) return null;
   if (redirectAuthenticatedRoles.includes(session.role)) {
     redirect(ROLE_HOME[session.role]);

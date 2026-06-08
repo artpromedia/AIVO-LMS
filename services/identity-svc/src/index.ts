@@ -25,6 +25,8 @@ import { registerHealthRoutes } from "./routes/health.js";
 import { registerConsentRoutes } from "./routes/consent.js";
 import { registerCurriculumRoutes } from "./routes/curriculum.js";
 import { registerAdminRoutes } from "./routes/admin.js";
+import { registerPilotRoutes } from "./routes/pilots.js";
+import { registerParentRoutes } from "./routes/parents.js";
 import { registerStepUpRoutes } from "./routes/step-up.js";
 import { registerImpersonationRoutes } from "./routes/impersonation.js";
 import { buildImpersonationDeps } from "./lib/impersonation-wiring.js";
@@ -306,6 +308,8 @@ export async function buildApp() {
   await registerCurriculumRoutes(app);
   await registerStepUpRoutes(app);
   await registerAdminRoutes(app);
+  // Sprint 1 (district pilot): platform-admin "Provision pilot" orchestration.
+  await registerPilotRoutes(app);
   // Sprint 9: secure impersonation ("View As") with hardened audit.
   registerImpersonationRoutes(app, buildImpersonationDeps(db));
   // Sprint 8: install the global tenant-scope hook BEFORE registering
@@ -318,6 +322,10 @@ export async function buildApp() {
   await registerPublicBrandingRoutes(app);
   await registerDistrictAdminRoutes(app);
   await registerSchoolRoutes(app);
+  // Sprint 2 (district pilot): invite parents into the district tenant.
+  // /api/district/parents inherits requireDistrictAdmin from the tenant-scope
+  // hook above; /api/school/parents uses requireSchoolAdmin per-route.
+  await registerParentRoutes(app);
   await registerRosteringRoutes(app);
   await registerStaffRoutes(app);
   await registerSsoRoutes(app);

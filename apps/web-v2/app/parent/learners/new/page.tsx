@@ -27,8 +27,8 @@ function asStringArray(raw: string): string[] {
 
 async function addLearnerAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session || session.role !== "parent") redirect("/login");
 
   const raw = {
@@ -51,6 +51,12 @@ async function addLearnerAction(formData: FormData) {
   const parsed = createLearnerSchema.safeParse(raw);
   if (!parsed.success) {
     redirect("/parent/learners/new?error=invalid");
+  }
+  // District pilot seat cap (Sprint 3): refuse over-cap before creating.
+  const { getTenantSeatAvailability } = await import("@/lib/db/seat-availability");
+  const seats = await getTenantSeatAvailability(session.tenantId);
+  if (!seats.allowed) {
+    redirect("/parent/learners/new?error=seat_limit");
   }
   const learner = await createLearner({
     tenantId: session.tenantId,

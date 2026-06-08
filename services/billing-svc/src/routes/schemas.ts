@@ -579,6 +579,48 @@ export const runInternalJobSchema = {
   },
 } as const;
 
+// ── internal pilot provisioning (service-to-service) ─────────────────────────
+
+export const internalProvisionPilotSchema = {
+  tags: ["Billing"],
+  operationId: "provisionPilotEntitlement",
+  summary: "Internal: mint + redeem a PROVISIONING coupon for a district tenant",
+  body: {
+    type: "object",
+    required: ["tenantId", "plan", "durationDays", "actorUserId"],
+    additionalProperties: true,
+    properties: {
+      tenantId: { type: "string", minLength: 1 },
+      plan: { type: "string", minLength: 1 },
+      tier: { type: "string", minLength: 1 },
+      seatLimit: { type: ["integer", "null"], minimum: 1 },
+      durationDays: { type: "integer", minimum: 1, maximum: 3650 },
+      couponCode: { type: "string" },
+      actorUserId: { type: "string", minLength: 1 },
+    },
+  },
+  response: {
+    200: {
+      type: "object",
+      required: ["ok", "couponCode", "tier", "plan"],
+      additionalProperties: true,
+      properties: {
+        ok: { type: "boolean" },
+        // false when an idempotent re-run reused the existing entitlement.
+        provisioned: { type: "boolean" },
+        couponCode: { type: "string" },
+        tier: { type: "string" },
+        plan: { type: "string" },
+        seatLimit: { type: ["integer", "null"] },
+        expiresAt: { type: ["string", "null"], format: "date-time" },
+      },
+    },
+    400: errorResponse,
+    401: errorResponse,
+    503: errorResponse,
+  },
+} as const;
+
 // ── checkout / portal / entitlements / resume ───────────────────────────────
 
 export const createCheckoutSessionSchema = {

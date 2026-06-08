@@ -22,6 +22,8 @@ import { createLogger } from "@aivo/observability";
 import { emitBillingAudit } from "../lib/audit.js";
 import { couponsCreated, couponsRedeemed } from "../lib/metrics.js";
 import { pickAttribution } from "../lib/attribution.js";
+import { provisionTenantEntitlement } from "../lib/provision-tenant.js";
+import { consumeRateLimit } from "../lib/redeem-rate-limit.js";
 import {
   listCouponsSchema,
   createCouponSchema,
@@ -33,23 +35,12 @@ import {
 const auditLog = createLogger("billing-svc.coupons");
 
 /**
- * Per-user 10-req/min token bucket on the redeem path to prevent
- * brute-force coupon code probing.
+ * Per-user 10-req/min token bucket on the redeem path to prevent brute-force
+ * coupon-code probing. Backed by Postgres (`billing_rate_limits`) so the limit
+ * holds across replicas — see lib/redeem-rate-limit.ts.
  */
 const REDEEM_RATE_BURST = 10;
-const REDEEM_RATE_WINDOW_MS = 60_000;
-const redeemBuckets = new Map<string, { count: number; resetAt: number }>();
-
-function checkRedeemRateLimit(subject: string, now: number): boolean {
-  const b = redeemBuckets.get(subject);
-  if (!b || b.resetAt <= now) {
-    redeemBuckets.set(subject, { count: 1, resetAt: now + REDEEM_RATE_WINDOW_MS });
-    return true;
-  }
-  if (b.count >= REDEEM_RATE_BURST) return false;
-  b.count += 1;
-  return true;
-}
+const REDEEM_RATE_WINDOW_SECONDS = 60;
 
 async function lookupCoupon(db: any, code: string): Promise<Record<string, any> | null> {
   const result = (await db.execute(sql`
@@ -76,55 +67,10 @@ function validateCouponRow(
 }
 
 export function registerCouponRoutes(app: FastifyInstance, db: any) {
-  // Defense-in-depth: ensure the table exists. Drizzle migrations would do this
-  // in a real deploy, but coupons is admin-only and the dev env may not have run
-  // migrations recently.
-  void db
-    .execute(
-      sql`
-      CREATE TABLE IF NOT EXISTS billing_coupons (
-        code            varchar(64) PRIMARY KEY,
-        description     text,
-        discount_pct    integer NOT NULL DEFAULT 0,
-        max_redemptions integer,
-        redemptions     integer NOT NULL DEFAULT 0,
-        active          boolean NOT NULL DEFAULT true,
-        created_at      timestamptz NOT NULL DEFAULT NOW(),
-        expires_at      timestamptz
-      )
-    `,
-    )
-    .catch(() => {})
-    .then(() =>
-      Promise.all([
-        db
-          .execute(
-            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS coupon_type varchar(20) NOT NULL DEFAULT 'DISCOUNT'`,
-          )
-          .catch(() => {}),
-        db
-          .execute(
-            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_tier varchar(30)`,
-          )
-          .catch(() => {}),
-        db
-          .execute(
-            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_plan varchar(50)`,
-          )
-          .catch(() => {}),
-        db
-          .execute(
-            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_seat_limit integer`,
-          )
-          .catch(() => {}),
-        db
-          .execute(
-            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_duration_days integer`,
-          )
-          .catch(() => {}),
-      ]),
-    )
-    .catch(() => {});
+  // The `billing_coupons` table is owned by a canonical migration
+  // (packages/db/drizzle/0090_billing_coupons.sql, applied by `db:migrate`).
+  // The previous in-route `CREATE TABLE`/`ALTER` bootstrap is intentionally
+  // gone — fresh DBs and the schema-drift gate now agree.
 
   app.get("/api/billing/admin/coupons", { schema: listCouponsSchema }, async (req, reply) => {
     const me = await requirePlatformAdmin(req, reply);
@@ -297,8 +243,14 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
       return reply.code(401).send({ error: "invalid_token" });
     }
 
-    // Rate-limit: 10 redemption attempts per user per minute
-    if (!checkRedeemRateLimit(jwtPayload.sub as string, Date.now())) {
+    // Rate-limit: 10 redemption attempts per user per minute (durable bucket).
+    const rl = await consumeRateLimit(db, {
+      scope: "coupon:redeem",
+      subject: String(jwtPayload.sub),
+      burst: REDEEM_RATE_BURST,
+      windowSeconds: REDEEM_RATE_WINDOW_SECONDS,
+    });
+    if (!rl.allowed) {
       return reply.code(429).send({ error: "too_many_requests" });
     }
 
@@ -414,35 +366,27 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
 
     let expiresAt: unknown = null;
 
-    // Run the provisioning in a transaction (including redemption counter)
+    // Run the provisioning in a transaction (including redemption counter).
+    // The tenant-update + subscription-insert is the SHARED money/seat path —
+    // see provisionTenantEntitlement (also used by the internal pilot-provision
+    // route) so the two can never drift.
     await db.transaction(async (tx: any) => {
-      await tx.execute(sql`
-        UPDATE tenants SET licensing_tier = ${grantsTier}, seat_limit = ${grantsSeatLimit}, updated_at = NOW()
-        WHERE id = ${tenantId}
-      `);
-      await tx.execute(sql`
-        INSERT INTO subscriptions (tenant_id, user_id, plan, status, current_period_end, metadata)
-        VALUES (
-          ${tenantId},
-          ${userId},
-          ${grantsPlan},
-          'ACTIVE',
-          NOW() + make_interval(days => ${grantsDurationDays}),
-          ${JSON.stringify({ couponCode: row.code, provisionedBy: "coupon", ...attribution })}
-        )
-      `);
+      const result = await provisionTenantEntitlement(tx, {
+        tenantId,
+        userId,
+        plan: grantsPlan,
+        tier: grantsTier,
+        seatLimit: grantsSeatLimit,
+        durationDays: grantsDurationDays,
+        couponCode: row.code,
+        provisionedBy: "coupon",
+        attribution,
+      });
+      expiresAt = result.expiresAt;
       await tx.execute(sql`
         UPDATE billing_coupons SET redemptions = redemptions + 1 WHERE code = ${row.code}
       `);
     });
-
-    const expiresResult = (await db.execute(sql`
-      SELECT current_period_end FROM subscriptions
-      WHERE tenant_id = ${tenantId} AND user_id = ${userId} AND plan = ${grantsPlan}
-      ORDER BY id DESC LIMIT 1
-    `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
-    const expiresRows = Array.isArray(expiresResult) ? expiresResult : (expiresResult.rows ?? []);
-    expiresAt = expiresRows[0]?.current_period_end ?? null;
 
     couponsRedeemed.increment(1, { type: "PROVISIONING" });
     await emitBillingAudit(db, auditLog, {

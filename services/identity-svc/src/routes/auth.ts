@@ -1455,7 +1455,10 @@ export async function registerAuthRoutes(app: FastifyInstance) {
   // the invite accepted. This is the production token-acceptance step that
   // previously only existed in test-helpers; without it, invited staff had
   // no way to actually get an account.
-  const INVITE_ACCEPT_ROLES = ["DISTRICT_ADMIN", "SCHOOL_ADMIN", "TEACHER"] as const;
+  // PARENT is accepted here (Sprint 2): a district/school admin invites a parent
+  // INTO the district tenant; acceptance creates the PARENT users row under the
+  // invite's tenantId (the district), with a self-chosen password.
+  const INVITE_ACCEPT_ROLES = ["DISTRICT_ADMIN", "SCHOOL_ADMIN", "TEACHER", "PARENT"] as const;
 
   function hashInviteToken(raw: string): string {
     return crypto.createHash("sha256").update(raw).digest("hex");

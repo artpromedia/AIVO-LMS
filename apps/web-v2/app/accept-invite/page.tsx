@@ -14,7 +14,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Mail } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { ROLE_HOME } from "@/lib/auth/types";
 import { identityInvitePreview } from "@/lib/auth/identity-client";
 import { listPendingInvitesForEmail } from "@/lib/db/team-invites";
@@ -66,7 +66,7 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
   }
 
   const invitedEmail = (params.email ?? "").trim().toLowerCase();
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
 
   // Unauthenticated → bounce to login with a return URL.
   if (!session) {

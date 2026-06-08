@@ -57,28 +57,37 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
   // → entitlement and learner lesson-loop e2e specs. Returns a real
   // access token so the caller can drive authenticated requests against
   // billing-svc / tutor-svc.
-  app.post<{ Body: { email: string; password: string; tenantName?: string } }>(
+  app.post<{ Body: { email: string; password: string; tenantName?: string; tenantId?: string } }>(
     "/api/__test__/seed-parent",
     async (req, reply) => {
       if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
       const db = (app as any).db;
-      const { email, password, tenantName } = req.body ?? ({} as any);
+      const { email, password, tenantName, tenantId } = req.body ?? ({} as any);
       if (!email || !password) {
         return reply.status(400).send({ error: "email and password required" });
       }
       const lcEmail = email.toLowerCase();
-      const desiredTenantName = tenantName ?? `E2E Family ${lcEmail}`;
 
-      let [tenant] = await db
-        .select()
-        .from(tenants)
-        .where(eq(tenants.name, desiredTenantName))
-        .limit(1);
-      if (!tenant) {
+      // When tenantId is supplied (district-pilot e2e), seed the parent INTO that
+      // existing tenant — so the parent lives under the district, not a new B2C
+      // tenant. Otherwise create/reuse a B2C_FAMILY tenant by name.
+      let tenant: any;
+      if (tenantId) {
+        [tenant] = await db.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1);
+        if (!tenant) return reply.status(400).send({ error: "tenantId not found" });
+      } else {
+        const desiredTenantName = tenantName ?? `E2E Family ${lcEmail}`;
         [tenant] = await db
-          .insert(tenants)
-          .values({ name: desiredTenantName, type: "B2C_FAMILY" as any })
-          .returning();
+          .select()
+          .from(tenants)
+          .where(eq(tenants.name, desiredTenantName))
+          .limit(1);
+        if (!tenant) {
+          [tenant] = await db
+            .insert(tenants)
+            .values({ name: desiredTenantName, type: "B2C_FAMILY" as any })
+            .returning();
+        }
       }
 
       const passwordHash = await argon2.hash(password);
@@ -217,24 +226,56 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
 
   // Idempotent seeding for a DISTRICT_ADMIN test fixture used by e2e specs.
   app.post<{
-    Body: { email: string; password: string; tenantName?: string; mfaEnabled?: boolean };
+    Body: {
+      email: string;
+      password: string;
+      tenantName?: string;
+      mfaEnabled?: boolean;
+      seatLimit?: number;
+    };
   }>(
     "/api/__test__/seed-district-admin",
     { schema: testSeedDistrictAdminSchema },
     async (req, reply) => {
       if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
       const db = (app as any).db;
-      const { email, password, tenantName = "E2E District Tenant", mfaEnabled = false } = req.body;
+      const {
+        email,
+        password,
+        tenantName = "E2E District Tenant",
+        mfaEnabled = false,
+        seatLimit,
+      } = req.body;
       if (!email || !password) {
         return reply.status(400).send({ error: "email and password required" });
       }
 
-      let [tenant] = await db.select().from(tenants).where(eq(tenants.name, tenantName)).limit(1);
+      // Pilot district carries a seat cap so the Sprint 2 parent-invite e2e can
+      // exercise seat enforcement. A unique tenant name per seatLimit avoids
+      // colliding with the default tenant.
+      const desiredTenantName =
+        typeof seatLimit === "number" ? `${tenantName} (cap ${seatLimit})` : tenantName;
+      let [tenant] = await db
+        .select()
+        .from(tenants)
+        .where(eq(tenants.name, desiredTenantName))
+        .limit(1);
       if (!tenant) {
         [tenant] = await db
           .insert(tenants)
-          .values({ name: tenantName, type: "B2B_DISTRICT" as any })
+          .values({
+            name: desiredTenantName,
+            type: "B2B_DISTRICT" as any,
+            ...(typeof seatLimit === "number"
+              ? { licensingTier: "B2B_SEAT_LICENSED", seatLimit }
+              : {}),
+          } as any)
           .returning();
+      } else if (typeof seatLimit === "number") {
+        await db
+          .update(tenants)
+          .set({ licensingTier: "B2B_SEAT_LICENSED", seatLimit } as any)
+          .where(eq(tenants.id, tenant.id));
       }
 
       const passwordHash = await argon2.hash(password);
@@ -265,7 +306,73 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
           .returning();
       }
 
-      return { id: user.id, email: user.email, role: user.role, tenantId: tenant.id };
+      const accessToken = await signJWT({
+        sub: user.id,
+        tenantId: tenant.id,
+        role: user.role,
+        email: user.email,
+        name: user.name,
+      });
+      return {
+        id: user.id,
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        tenantId: tenant.id,
+        accessToken,
+      };
+    },
+  );
+
+  // Idempotent seed for a PLATFORM_ADMIN. Used by the district-pilot e2e to
+  // drive POST /api/admin/pilots with a real platform-admin bearer token.
+  // Platform admins are tenant-less; the response shape mirrors the other
+  // seed-* helpers (e2e/lib/fixtures.ts seedPlatformAdmin).
+  app.post<{ Body: { email: string; password: string } }>(
+    "/api/__test__/seed-platform-admin",
+    async (req, reply) => {
+      if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+      const db = (app as any).db;
+      const { email, password } = req.body ?? ({} as any);
+      if (!email || !password) {
+        return reply.status(400).send({ error: "email and password required" });
+      }
+      const lcEmail = email.toLowerCase();
+      const passwordHash = await argon2.hash(password);
+      let [user] = await db.select().from(users).where(eq(users.email, lcEmail)).limit(1);
+      if (user) {
+        await db
+          .update(users)
+          .set({
+            passwordHash,
+            role: "PLATFORM_ADMIN",
+            tenantId: null,
+            mfaEnabled: false,
+            deactivatedAt: null,
+          })
+          .where(eq(users.id, user.id));
+        [user] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+      } else {
+        [user] = await db
+          .insert(users)
+          .values({
+            email: lcEmail,
+            name: "E2E Platform Admin",
+            passwordHash,
+            role: "PLATFORM_ADMIN" as any,
+            tenantId: null,
+            mfaEnabled: false,
+          })
+          .returning();
+      }
+      const accessToken = await signJWT({
+        sub: user.id,
+        tenantId: null,
+        role: user.role,
+        email: user.email,
+        name: user.name,
+      });
+      return { userId: user.id, tenantId: "", role: user.role, accessToken };
     },
   );
 
