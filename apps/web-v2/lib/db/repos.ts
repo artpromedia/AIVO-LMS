@@ -3391,16 +3391,17 @@ import type {
   AgeGateRecord,
 } from "@/lib/db/types";
 
-export function listConsentVersions(): ConsentVersion[] {
-  return Array.from(db().consentVersions.values()).sort((a, b) =>
-    a.consentType.localeCompare(b.consentType),
-  );
+export async function listConsentVersions(): Promise<ConsentVersion[]> {
+  const all = await getPersistence().compliance.listConsentVersions();
+  return all.sort((a, b) => a.consentType.localeCompare(b.consentType));
 }
 
-export function getActiveConsentVersion(type: ConsentType): ConsentVersion | null {
-  const all = Array.from(db().consentVersions.values()).filter((v) => v.consentType === type);
+export async function getActiveConsentVersion(type: ConsentType): Promise<ConsentVersion | null> {
+  const all = (await getPersistence().compliance.listConsentVersions()).filter(
+    (v) => v.consentType === type,
+  );
   if (!all.length) return null;
-  return all.sort((a, b) => b.effectiveAt.localeCompare(a.effectiveAt))[0];
+  return all.sort((a, b) => b.effectiveAt.localeCompare(a.effectiveAt))[0]!;
 }
 
 export async function listConsentsForUser(
@@ -3440,7 +3441,7 @@ export async function recordConsent(input: {
   ipHash?: string | null;
   userAgent?: string | null;
 }): Promise<ConsentRecord> {
-  const version = getActiveConsentVersion(input.consentType);
+  const version = await getActiveConsentVersion(input.consentType);
   // Auto-revoke any prior active records in the same scope so revoke is a
   // single-step operation. Without this, duplicate accepts pile up and a
   // single revoke leaves an older active row that nullifies the revocation.
@@ -3496,11 +3497,11 @@ export async function revokeConsent(input: {
   return last;
 }
 
-export function recordTermsAcceptance(input: {
+export async function recordTermsAcceptance(input: {
   tenantId: string;
   userId: string;
   termsVersion: string;
-}): TermsAcceptance {
+}): Promise<TermsAcceptance> {
   const t: TermsAcceptance = {
     id: newId("tac"),
     tenantId: input.tenantId,
@@ -3508,8 +3509,7 @@ export function recordTermsAcceptance(input: {
     termsVersion: input.termsVersion,
     acceptedAt: nowIso(),
   };
-  db().termsAcceptances.push(t);
-  return t;
+  return await getPersistence().compliance.appendTermsAcceptance(t);
 }
 
 export async function getAgeGateForLearner(
@@ -3555,26 +3555,29 @@ import type {
   PrivacyRequestStatus,
 } from "@/lib/db/types";
 
-export function listDataInventory(): DataInventoryItem[] {
-  return Array.from(db().dataInventory.values()).sort((a, b) => a.key.localeCompare(b.key));
+export async function listDataInventory(): Promise<DataInventoryItem[]> {
+  return (await getPersistence().compliance.listDataInventory()).sort((a, b) =>
+    a.key.localeCompare(b.key),
+  );
 }
 
-export function listRetentionPolicies(): DataRetentionPolicy[] {
-  return Array.from(db().dataRetentionPolicies.values()).sort((a, b) =>
+export async function listRetentionPolicies(): Promise<DataRetentionPolicy[]> {
+  return (await getPersistence().compliance.listRetentionPolicies()).sort((a, b) =>
     a.classification.localeCompare(b.classification),
   );
 }
 
-export function getRetentionPolicy(id: string): DataRetentionPolicy | null {
-  return db().dataRetentionPolicies.get(id) ?? null;
+export async function getRetentionPolicy(id: string): Promise<DataRetentionPolicy | null> {
+  return await getPersistence().compliance.getRetentionPolicy(id);
 }
 
-export function updateRetentionPolicy(
+export async function updateRetentionPolicy(
   id: string,
   patch: { retentionDays?: number; archiveDays?: number; description?: string },
   updatedByUserId: string,
-): DataRetentionPolicy | null {
-  const existing = db().dataRetentionPolicies.get(id);
+): Promise<DataRetentionPolicy | null> {
+  const compliance = getPersistence().compliance;
+  const existing = await compliance.getRetentionPolicy(id);
   if (!existing) return null;
   const next: DataRetentionPolicy = {
     ...existing,
@@ -3590,17 +3593,14 @@ export function updateRetentionPolicy(
     updatedAt: nowIso(),
     updatedByUserId,
   };
-  db().dataRetentionPolicies.set(id, next);
-  return next;
+  return await compliance.upsertRetentionPolicy(next);
 }
 
-export function listDisclosures(tenantId: string): DisclosureLog[] {
-  return db()
-    .disclosureLogs.filter((d) => d.tenantId === tenantId)
-    .sort((a, b) => b.disclosedAt.localeCompare(a.disclosedAt));
+export async function listDisclosures(tenantId: string): Promise<DisclosureLog[]> {
+  return await getPersistence().compliance.listDisclosures(tenantId);
 }
 
-export function recordDisclosure(input: {
+export async function recordDisclosure(input: {
   tenantId: string;
   learnerId: string | null;
   recipientType: DisclosureRecipientType;
@@ -3608,7 +3608,7 @@ export function recordDisclosure(input: {
   reason: string;
   ferpaBasis: string;
   disclosedByUserId: string;
-}): DisclosureLog {
+}): Promise<DisclosureLog> {
   const rec: DisclosureLog = {
     id: newId("disc"),
     tenantId: input.tenantId,
@@ -3620,16 +3620,15 @@ export function recordDisclosure(input: {
     disclosedAt: nowIso(),
     disclosedByUserId: input.disclosedByUserId,
   };
-  db().disclosureLogs.push(rec);
-  return rec;
+  return await getPersistence().compliance.appendDisclosure(rec);
 }
 
-export function createDataExportRequest(input: {
+export async function createDataExportRequest(input: {
   tenantId: string;
   parentUserId: string;
   learnerId: string | null;
   notes?: string | null;
-}): DataExportRequest {
+}): Promise<DataExportRequest> {
   const rec: DataExportRequest = {
     id: newId("dxp"),
     tenantId: input.tenantId,
@@ -3641,42 +3640,45 @@ export function createDataExportRequest(input: {
     exportUrl: null,
     notes: input.notes ?? null,
   };
-  db().dataExportRequests.set(rec.id, rec);
-  return rec;
+  return await getPersistence().compliance.upsertExportRequest(rec);
 }
 
-export function getDataExportRequest(id: string, tenantId: string): DataExportRequest | null {
-  const r = db().dataExportRequests.get(id);
+export async function getDataExportRequest(
+  id: string,
+  tenantId: string,
+): Promise<DataExportRequest | null> {
+  const r = await getPersistence().compliance.getExportRequestById(id);
   if (!r || r.tenantId !== tenantId) return null;
   return r;
 }
 
 /** Cross-tenant lookup, intended for platform_admin DSAR queue review only. */
-export function getDataExportRequestById(id: string): DataExportRequest | null {
-  return db().dataExportRequests.get(id) ?? null;
+export async function getDataExportRequestById(id: string): Promise<DataExportRequest | null> {
+  return await getPersistence().compliance.getExportRequestById(id);
 }
 
-export function listDataExportRequestsForUser(
+export async function listDataExportRequestsForUser(
   parentUserId: string,
   tenantId: string,
-): DataExportRequest[] {
-  return Array.from(db().dataExportRequests.values())
+): Promise<DataExportRequest[]> {
+  return (await getPersistence().compliance.listExportRequests())
     .filter((r) => r.tenantId === tenantId && r.parentUserId === parentUserId)
     .sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
 }
 
-export function listAllDataExportRequests(): DataExportRequest[] {
-  return Array.from(db().dataExportRequests.values()).sort((a, b) =>
+export async function listAllDataExportRequests(): Promise<DataExportRequest[]> {
+  return (await getPersistence().compliance.listExportRequests()).sort((a, b) =>
     b.requestedAt.localeCompare(a.requestedAt),
   );
 }
 
-export function updateDataExportRequestStatus(
+export async function updateDataExportRequestStatus(
   id: string,
   status: PrivacyRequestStatus,
   exportUrl: string | null = null,
-): DataExportRequest | null {
-  const r = db().dataExportRequests.get(id);
+): Promise<DataExportRequest | null> {
+  const compliance = getPersistence().compliance;
+  const r = await compliance.getExportRequestById(id);
   if (!r) return null;
   const completed = status === "completed" || status === "denied";
   const next: DataExportRequest = {
@@ -3685,17 +3687,16 @@ export function updateDataExportRequestStatus(
     completedAt: completed ? nowIso() : r.completedAt,
     exportUrl: exportUrl ?? r.exportUrl,
   };
-  db().dataExportRequests.set(id, next);
-  return next;
+  return await compliance.upsertExportRequest(next);
 }
 
-export function createDataDeletionRequest(input: {
+export async function createDataDeletionRequest(input: {
   tenantId: string;
   parentUserId: string;
   learnerId: string | null;
   scope: "account" | "learner" | "iep_only";
   notes?: string | null;
-}): DataDeletionRequest {
+}): Promise<DataDeletionRequest> {
   const rec: DataDeletionRequest = {
     id: newId("ddr"),
     tenantId: input.tenantId,
@@ -3707,43 +3708,45 @@ export function createDataDeletionRequest(input: {
     scope: input.scope,
     notes: input.notes ?? null,
   };
-  db().dataDeletionRequests.set(rec.id, rec);
-  return rec;
+  return await getPersistence().compliance.upsertDeletionRequest(rec);
 }
 
-export function getDataDeletionRequest(id: string, tenantId: string): DataDeletionRequest | null {
-  const r = db().dataDeletionRequests.get(id);
+export async function getDataDeletionRequest(
+  id: string,
+  tenantId: string,
+): Promise<DataDeletionRequest | null> {
+  const r = await getPersistence().compliance.getDeletionRequestById(id);
   if (!r || r.tenantId !== tenantId) return null;
   return r;
 }
 
 /** Cross-tenant lookup, intended for platform_admin DSAR queue review only. */
-export function getDataDeletionRequestById(id: string): DataDeletionRequest | null {
-  return db().dataDeletionRequests.get(id) ?? null;
+export async function getDataDeletionRequestById(id: string): Promise<DataDeletionRequest | null> {
+  return await getPersistence().compliance.getDeletionRequestById(id);
 }
 
-export function listDataDeletionRequestsForUser(
+export async function listDataDeletionRequestsForUser(
   parentUserId: string,
   tenantId: string,
-): DataDeletionRequest[] {
-  return Array.from(db().dataDeletionRequests.values())
+): Promise<DataDeletionRequest[]> {
+  return (await getPersistence().compliance.listDeletionRequests())
     .filter((r) => r.tenantId === tenantId && r.parentUserId === parentUserId)
     .sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
 }
 
-export function listAllDataDeletionRequests(): DataDeletionRequest[] {
-  return Array.from(db().dataDeletionRequests.values()).sort((a, b) =>
+export async function listAllDataDeletionRequests(): Promise<DataDeletionRequest[]> {
+  return (await getPersistence().compliance.listDeletionRequests()).sort((a, b) =>
     b.requestedAt.localeCompare(a.requestedAt),
   );
 }
 
-export function logIepAccess(input: {
+export async function logIepAccess(input: {
   tenantId: string;
   learnerId: string;
   documentId: string;
   accessedByUserId: string;
   purpose: IEPDocumentAccessLog["purpose"];
-}): IEPDocumentAccessLog {
+}): Promise<IEPDocumentAccessLog> {
   const rec: IEPDocumentAccessLog = {
     id: newId("iepacc"),
     tenantId: input.tenantId,
@@ -3753,17 +3756,14 @@ export function logIepAccess(input: {
     accessedAt: nowIso(),
     purpose: input.purpose,
   };
-  db().iepDocumentAccessLogs.push(rec);
-  return rec;
+  return await getPersistence().compliance.appendIepAccessLog(rec);
 }
 
-export function listIepAccessForLearner(
+export async function listIepAccessForLearner(
   learnerId: string,
   tenantId: string,
-): IEPDocumentAccessLog[] {
-  return db()
-    .iepDocumentAccessLogs.filter((r) => r.learnerId === learnerId && r.tenantId === tenantId)
-    .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
+): Promise<IEPDocumentAccessLog[]> {
+  return await getPersistence().compliance.listIepAccessForLearner(learnerId, tenantId);
 }
 
 export async function listPolicyVersions(): Promise<PolicyVersion[]> {

@@ -63,6 +63,14 @@ import {
   webStatePrivacyRequirements,
   webStatePrivacyMappings,
   webVulnerabilityReports,
+  webConsentVersions,
+  webTermsAcceptances,
+  webDataInventory,
+  webDataRetentionPolicies,
+  webDisclosureLogs,
+  webDataExportRequests,
+  webDataDeletionRequests,
+  webIepDocAccessLogs,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -712,6 +720,84 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
       webVulnerabilityReports,
       vals(s.vulnerabilityReports).map((x) => ({ id: x.id, data: x })),
       webVulnerabilityReports.id,
+    ),
+  );
+  // ── Sprint 5: web-owned privacy / DSAR / terms artifacts ────────────
+  await log(
+    "consentVersions",
+    await bulk(
+      db,
+      webConsentVersions,
+      vals(s.consentVersions).map((x) => ({ id: x.id, data: x })),
+      webConsentVersions.id,
+    ),
+  );
+  await log(
+    "termsAcceptances",
+    await bulk(
+      db,
+      webTermsAcceptances,
+      vals(s.termsAcceptances).map((x) => ({ id: x.id, data: x })),
+      webTermsAcceptances.id,
+    ),
+  );
+  await log(
+    "dataInventory",
+    await bulk(
+      db,
+      webDataInventory,
+      vals(s.dataInventory).map((x) => ({ id: x.id, data: x })),
+      webDataInventory.id,
+    ),
+  );
+  await log(
+    "dataRetentionPolicies",
+    await bulk(
+      db,
+      webDataRetentionPolicies,
+      vals(s.dataRetentionPolicies).map((x) => ({ id: x.id, data: x })),
+      webDataRetentionPolicies.id,
+    ),
+  );
+  await log(
+    "disclosureLogs",
+    await bulk(
+      db,
+      webDisclosureLogs,
+      vals(s.disclosureLogs).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+      webDisclosureLogs.id,
+    ),
+  );
+  await log(
+    "dataExportRequests",
+    await bulk(
+      db,
+      webDataExportRequests,
+      vals(s.dataExportRequests).map((x) => ({ id: x.id, data: x })),
+      webDataExportRequests.id,
+    ),
+  );
+  await log(
+    "dataDeletionRequests",
+    await bulk(
+      db,
+      webDataDeletionRequests,
+      vals(s.dataDeletionRequests).map((x) => ({ id: x.id, data: x })),
+      webDataDeletionRequests.id,
+    ),
+  );
+  await log(
+    "iepDocAccessLogs",
+    await bulk(
+      db,
+      webIepDocAccessLogs,
+      vals(s.iepDocumentAccessLogs).map((x) => ({
+        id: x.id,
+        learnerId: x.learnerId,
+        tenantId: x.tenantId,
+        data: x,
+      })),
+      webIepDocAccessLogs.id,
     ),
   );
   await log(

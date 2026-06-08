@@ -94,6 +94,14 @@ const TABLES = [
   "web_state_privacy_requirements",
   "web_state_privacy_mappings",
   "web_vulnerability_reports",
+  "web_consent_versions",
+  "web_terms_acceptances",
+  "web_data_inventory",
+  "web_data_retention_policies",
+  "web_disclosure_logs",
+  "web_data_export_requests",
+  "web_data_deletion_requests",
+  "web_iep_doc_access_logs",
 ] as const;
 
 const POSTGRES_ENABLED =

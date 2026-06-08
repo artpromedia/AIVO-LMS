@@ -27,6 +27,14 @@ import type {
   CollaboratorMember,
   ConsentRecord,
   ConsentType,
+  ConsentVersion,
+  DataDeletionRequest,
+  DataExportRequest,
+  DataInventoryItem,
+  DataRetentionPolicy,
+  DisclosureLog,
+  IEPDocumentAccessLog,
+  TermsAcceptance,
   Enrollment,
   GeneratedLessonPlan,
   IEPDocument,
@@ -362,6 +370,33 @@ export interface ComplianceStore {
   // Policy + subprocessor catalogs (platform-wide reference data)
   listPolicyVersions(): Promise<PolicyVersion[]>;
   listSubprocessors(): Promise<SubprocessorRecord[]>;
+
+  // ── Sprint 5: privacy / DSAR / terms / inventory / retention / disclosure ──
+  // These web_* tables are PLATFORM/ADMIN-accessed (DPO consoles read DSAR +
+  // disclosure across tenants; access/disclosure logs are append-only audit),
+  // so they carry tenant_id but are NOT RLS-protected — the same exclusion
+  // 0050 makes for web_users / web_audit_logs. App code filters by tenant.
+  listConsentVersions(): Promise<ConsentVersion[]>;
+  appendTermsAcceptance(acceptance: TermsAcceptance): Promise<TermsAcceptance>;
+  listDataInventory(): Promise<DataInventoryItem[]>;
+  listRetentionPolicies(): Promise<DataRetentionPolicy[]>;
+  getRetentionPolicy(id: string): Promise<DataRetentionPolicy | null>;
+  upsertRetentionPolicy(policy: DataRetentionPolicy): Promise<DataRetentionPolicy>;
+  /** Append a FERPA disclosure log entry (append-only). */
+  appendDisclosure(entry: DisclosureLog): Promise<DisclosureLog>;
+  /** Disclosures for a tenant, newest-first. */
+  listDisclosures(tenantId: string): Promise<DisclosureLog[]>;
+  // DSAR export requests
+  upsertExportRequest(request: DataExportRequest): Promise<DataExportRequest>;
+  getExportRequestById(id: string): Promise<DataExportRequest | null>;
+  listExportRequests(): Promise<DataExportRequest[]>;
+  // DSAR deletion requests
+  upsertDeletionRequest(request: DataDeletionRequest): Promise<DataDeletionRequest>;
+  getDeletionRequestById(id: string): Promise<DataDeletionRequest | null>;
+  listDeletionRequests(): Promise<DataDeletionRequest[]>;
+  /** Append an IEP-document access log entry (append-only audit integrity). */
+  appendIepAccessLog(entry: IEPDocumentAccessLog): Promise<IEPDocumentAccessLog>;
+  listIepAccessForLearner(learnerId: string, tenantId: string): Promise<IEPDocumentAccessLog[]>;
 }
 
 /**

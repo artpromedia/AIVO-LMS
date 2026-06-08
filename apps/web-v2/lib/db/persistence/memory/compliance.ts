@@ -11,9 +11,17 @@ import { getStore } from "@/lib/db/store";
 import type {
   AgeGateRecord,
   ConsentRecord,
+  ConsentVersion,
+  DataDeletionRequest,
+  DataExportRequest,
+  DataInventoryItem,
+  DataRetentionPolicy,
+  DisclosureLog,
   IEPDocument,
+  IEPDocumentAccessLog,
   PolicyVersion,
   SubprocessorRecord,
+  TermsAcceptance,
 } from "@/lib/db/types";
 import type { ComplianceStore } from "../types";
 
@@ -104,5 +112,65 @@ export const memoryCompliance: ComplianceStore = {
 
   async listSubprocessors(): Promise<SubprocessorRecord[]> {
     return Array.from(getStore().subprocessors.values());
+  },
+
+  // ── Sprint 5: privacy / DSAR / terms ──────────────────────────────
+  async listConsentVersions(): Promise<ConsentVersion[]> {
+    return Array.from(getStore().consentVersions.values());
+  },
+  async appendTermsAcceptance(acceptance): Promise<TermsAcceptance> {
+    getStore().termsAcceptances.push(acceptance);
+    return acceptance;
+  },
+  async listDataInventory(): Promise<DataInventoryItem[]> {
+    return Array.from(getStore().dataInventory.values());
+  },
+  async listRetentionPolicies(): Promise<DataRetentionPolicy[]> {
+    return Array.from(getStore().dataRetentionPolicies.values());
+  },
+  async getRetentionPolicy(id): Promise<DataRetentionPolicy | null> {
+    return getStore().dataRetentionPolicies.get(id) ?? null;
+  },
+  async upsertRetentionPolicy(policy): Promise<DataRetentionPolicy> {
+    getStore().dataRetentionPolicies.set(policy.id, policy);
+    return policy;
+  },
+  async appendDisclosure(entry): Promise<DisclosureLog> {
+    getStore().disclosureLogs.push(entry);
+    return entry;
+  },
+  async listDisclosures(tenantId): Promise<DisclosureLog[]> {
+    return getStore()
+      .disclosureLogs.filter((d) => d.tenantId === tenantId)
+      .sort((a, b) => b.disclosedAt.localeCompare(a.disclosedAt));
+  },
+  async upsertExportRequest(request): Promise<DataExportRequest> {
+    getStore().dataExportRequests.set(request.id, request);
+    return request;
+  },
+  async getExportRequestById(id): Promise<DataExportRequest | null> {
+    return getStore().dataExportRequests.get(id) ?? null;
+  },
+  async listExportRequests(): Promise<DataExportRequest[]> {
+    return Array.from(getStore().dataExportRequests.values());
+  },
+  async upsertDeletionRequest(request): Promise<DataDeletionRequest> {
+    getStore().dataDeletionRequests.set(request.id, request);
+    return request;
+  },
+  async getDeletionRequestById(id): Promise<DataDeletionRequest | null> {
+    return getStore().dataDeletionRequests.get(id) ?? null;
+  },
+  async listDeletionRequests(): Promise<DataDeletionRequest[]> {
+    return Array.from(getStore().dataDeletionRequests.values());
+  },
+  async appendIepAccessLog(entry): Promise<IEPDocumentAccessLog> {
+    getStore().iepDocumentAccessLogs.push(entry);
+    return entry;
+  },
+  async listIepAccessForLearner(learnerId, tenantId): Promise<IEPDocumentAccessLog[]> {
+    return getStore()
+      .iepDocumentAccessLogs.filter((r) => r.learnerId === learnerId && r.tenantId === tenantId)
+      .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
   },
 };

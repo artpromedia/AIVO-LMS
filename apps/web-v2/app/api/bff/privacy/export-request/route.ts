@@ -22,7 +22,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
-    const items = listDataExportRequestsForUser(session!.userId, session!.tenantId);
+    const items = await listDataExportRequestsForUser(session!.userId, session!.tenantId);
     return ok({ requests: items }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -58,7 +58,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       const scope = await requireLearnerScope(session!, learnerId, requestId);
       if (scope) return scope;
     }
-    const rec = createDataExportRequest({
+    const rec = await createDataExportRequest({
       tenantId: session!.tenantId,
       parentUserId: session!.userId,
       learnerId,

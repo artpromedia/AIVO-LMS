@@ -25,7 +25,7 @@ production forces it.
 | 6   | lesson runs + generated lesson plans      | ✅ postgres (proven) | `lesson_runs` + plans + interactions + summaries          |
 | 7   | brain profile / clone                     | ✅ postgres (proven) | `learner_brain_profiles`; same-mode as assessments (hard) |
 | 8   | curriculum (subjects/skills/path/mastery) | ✅ postgres (proven) | reference set + per-learner mastery/path                  |
-| 9   | care team + consent + privacy             | ✅ postgres (proven) | consent/IEP/age-gate + policy/subprocessor catalogs       |
+| 9   | care team + consent + privacy             | ✅ postgres (proven) | consent/IEP/age-gate + policy/subprocessor catalogs. Sprint 5 extended this with DSAR export/deletion, terms acceptances, data inventory/retention, FERPA disclosure logs, IEP-doc access logs (`web_consent_versions` / `web_terms_acceptances` / `web_data_inventory` / `web_data_retention_policies` / `web_disclosure_logs` / `web_data_export_requests` / `web_data_deletion_requests` / `web_iep_doc_access_logs`). Platform/admin-accessed (DPO cross-tenant DSAR review + append-only audit logs) ⇒ no RLS, like web_users/web_audit_logs. |
 | 10  | quests / gamification                     | ✅ postgres (proven) | worlds/chapters reference + per-learner progress          |
 | 11  | teacher / school / district admin         | ✅ postgres (proven) | schools/classrooms/enrollments/assignments                |
 | 12  | collaboration (insights + members)        | ✅ postgres (proven) | brain-build inputs; newest-first insights                 |

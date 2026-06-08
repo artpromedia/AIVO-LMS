@@ -25,7 +25,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (roleErr) return roleErr;
     return ok(
       {
-        requests: listDataDeletionRequestsForUser(session!.userId, session!.tenantId),
+        requests: await listDataDeletionRequestsForUser(session!.userId, session!.tenantId),
       },
       requestId,
     );
@@ -74,7 +74,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       const scope = await requireLearnerScope(session!, learnerId, requestId);
       if (scope) return scope;
     }
-    const rec = createDataDeletionRequest({
+    const rec = await createDataDeletionRequest({
       tenantId: session!.tenantId,
       parentUserId: session!.userId,
       learnerId,

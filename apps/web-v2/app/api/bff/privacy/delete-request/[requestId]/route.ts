@@ -16,10 +16,10 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const roleErr = requireRole(session!, ["parent", "platform_admin"], requestId);
     if (roleErr) return roleErr;
-    const rec =
+    const rec = await (
       session!.role === "platform_admin"
         ? getDataDeletionRequestById(id)
-        : getDataDeletionRequest(id, session!.tenantId);
+        : getDataDeletionRequest(id, session!.tenantId));
     if (!rec) return fail({ ...ERRORS.NOT_FOUND, message: "Request not found." }, requestId);
     if (session!.role === "parent" && rec.parentUserId !== session!.userId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Request not found." }, requestId);

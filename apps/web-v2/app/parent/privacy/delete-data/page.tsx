@@ -14,7 +14,7 @@ export default async function Page() {
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.privacy_delete");
   const learners = await listLearnersForParent(session.userId, session.tenantId);
-  const requests = listDataDeletionRequestsForUser(session.userId, session.tenantId);
+  const requests = await listDataDeletionRequestsForUser(session.userId, session.tenantId);
 
   return (
     <AppShell

@@ -53,6 +53,7 @@ const WEB_SCHEMA_MIGRATIONS = [
   "0081_web_billing",
   "0082_web_clinical",
   "0083_web_security",
+  "0084_web_privacy",
 ];
 
 /** Reset `public` and apply the web-domain schema (hermetic, idempotent). */

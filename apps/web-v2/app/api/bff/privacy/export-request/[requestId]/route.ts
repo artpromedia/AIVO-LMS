@@ -19,10 +19,10 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     // platform_admin reviews DSARs across all tenants; parents are tenant- and
     // user-scoped. The list view for platform_admin is global, so the detail
     // view must match (otherwise queue rows 404 when opened).
-    const rec =
+    const rec = await (
       session!.role === "platform_admin"
         ? getDataExportRequestById(id)
-        : getDataExportRequest(id, session!.tenantId);
+        : getDataExportRequest(id, session!.tenantId));
     if (!rec) return fail({ ...ERRORS.NOT_FOUND, message: "Request not found." }, requestId);
     if (session!.role === "parent" && rec.parentUserId !== session!.userId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Request not found." }, requestId);

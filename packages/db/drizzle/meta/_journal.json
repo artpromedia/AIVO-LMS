@@ -449,6 +449,13 @@
       "when": 1782595200000,
       "tag": "0083_web_security",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1782681600000,
+      "tag": "0084_web_privacy",
+      "breakpoints": true
     }
   ]
 }
