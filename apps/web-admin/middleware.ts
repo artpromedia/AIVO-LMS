@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { IDENTITY_SESSION_COOKIE } from "@aivo/admin-auth/identity-client";
 
-const PUBLIC_PREFIXES = ["/login", "/api/health", "/_next", "/favicon.ico", "/images", "/assets"];
+const PUBLIC_PREFIXES = ["/login", "/logout", "/api/health", "/_next", "/favicon.ico", "/images", "/assets"];
 const ADMIN_ROLES = new Set([
   "school_admin",
   "district_admin",
