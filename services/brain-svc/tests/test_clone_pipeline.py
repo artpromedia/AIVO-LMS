@@ -18,6 +18,7 @@ from brain_svc.services.clone_pipeline import (
     _build_xai_explanation,
     _compute_mastery_from_discovery,
     _compute_visual_identity,
+    _fold_collaborator_insights,
     clone_brain,
     derive_functioning_level,
 )
@@ -236,19 +237,21 @@ class TestComputeVisualIdentity:
 # clone_brain (DB mocked)
 # ---------------------------------------------------------------------------
 class TestCloneBrain:
-    def _make_db(self, learner_row=None, existing=None):
+    def _make_db(self, learner_row=None, existing=None, insights=None):
         db = MagicMock()
-        # Sequence of execute().first() calls inside clone_brain:
-        # 1) check existing brain_states  → existing
-        # 2) load learner row             → learner_row
-        first_results = [existing, learner_row]
-        execute_results = []
-        for r in first_results:
-            res = MagicMock()
-            res.first.return_value = r
-            execute_results.append(res)
-        # All subsequent INSERT executes return a MagicMock
-        execute_results.extend([MagicMock(), MagicMock()])
+        # Sequence of execute() calls inside clone_brain:
+        # 1) check existing brain_states  → .first() = existing
+        # 2) load learner row             → .first() = learner_row
+        # 3) load collaborator insights   → .fetchall() = insights
+        # 4) brain_states INSERT          → MagicMock
+        # 5) brain_state_snapshots INSERT → MagicMock
+        existing_res = MagicMock()
+        existing_res.first.return_value = existing
+        learner_res = MagicMock()
+        learner_res.first.return_value = learner_row
+        insights_res = MagicMock()
+        insights_res.fetchall.return_value = insights or []
+        execute_results = [existing_res, learner_res, insights_res, MagicMock(), MagicMock()]
         db.execute.side_effect = execute_results
         return db
 
@@ -266,8 +269,9 @@ class TestCloneBrain:
         assert result["functioning_level"] == "STANDARD"
         assert result["active_tutors"] == SEED_TEMPLATES["STANDARD"]["active_tutors"]
 
-        # Inspect the brain_states INSERT params
-        insert_brain_call = db.execute.call_args_list[2]
+        # Inspect the brain_states INSERT params (call #4: after existing,
+        # learner-row, and collaborator-insights loads)
+        insert_brain_call = db.execute.call_args_list[3]
         params = insert_brain_call.args[1]
         assert params["lid"] == request.learner_id
         assert params["tid"] == request.tenant_id
@@ -282,8 +286,8 @@ class TestCloneBrain:
         )
         clone_brain(db, request)
 
-        # 4th execute call is the snapshot INSERT
-        snapshot_call = db.execute.call_args_list[3]
+        # 5th execute call is the snapshot INSERT
+        snapshot_call = db.execute.call_args_list[4]
         sql_text = str(snapshot_call.args[0])
         assert "brain_state_snapshots" in sql_text
         # trigger='initial_clone' is a SQL literal in the INSERT
@@ -299,7 +303,7 @@ class TestCloneBrain:
             tenant_id="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
         )
         clone_brain(db, request)
-        insert_sql = str(db.execute.call_args_list[2].args[0])
+        insert_sql = str(db.execute.call_args_list[3].args[0])
         assert "pending_parent_review" in insert_sql
 
     def test_duplicate_learner_returns_error(self):
@@ -359,6 +363,78 @@ class TestCloneBrain:
         )
         result = clone_brain(db, request)
         assert result["functioning_level"] == "SUPPORTED"
+
+
+class TestCollaboratorInsightFold:
+    """Parity with web-v2 buildBrainProfile (Sprint 4): collaborator insights
+    measurably shape the brain."""
+
+    def _xai(self):
+        return {
+            "accommodation_decisions": [],
+            "tutor_decisions": [],
+            "rai_compliance": {"data_sources": []},
+        }
+
+    def test_therapist_communication_insight_raises_aac_non_removable(self):
+        xai = self._xai()
+        accs, tutors = _fold_collaborator_insights(
+            [{"author_role": "therapist", "domain": "communication", "insight_text": "Uses AAC."}],
+            [],
+            ["nova"],
+            xai,
+        )
+        assert "aac_communication_support" in accs
+        assert "echo" in tutors  # coordinating communication tutor kept active
+        decision = next(
+            d for d in xai["accommodation_decisions"] if d["accommodation"] == "aac_communication_support"
+        )
+        assert decision["source"] == "collaborator:therapist"
+        assert decision["removable"] is False
+
+    def test_caregiver_insight_is_removable(self):
+        xai = self._xai()
+        _fold_collaborator_insights(
+            [{"author_role": "caregiver", "domain": "communication", "insight_text": "Signs at home."}],
+            [],
+            [],
+            xai,
+        )
+        decision = xai["accommodation_decisions"][0]
+        assert decision["source"] == "collaborator:caregiver"
+        assert decision["removable"] is True
+
+    def test_no_insights_is_a_noop(self):
+        xai = self._xai()
+        accs, tutors = _fold_collaborator_insights([], ["extended_time"], ["nova"], xai)
+        assert accs == ["extended_time"]
+        assert tutors == ["nova"]
+        assert xai["accommodation_decisions"] == []
+
+    def test_unmapped_domain_does_not_add_accommodation(self):
+        xai = self._xai()
+        accs, _ = _fold_collaborator_insights(
+            [{"author_role": "teacher", "domain": "handwriting_flourish", "insight_text": "x"}],
+            [],
+            [],
+            xai,
+        )
+        assert accs == []
+        assert xai["accommodation_decisions"] == []
+
+    def test_clone_brain_folds_insights_into_active_lists(self):
+        db = TestCloneBrain()._make_db(
+            learner_row=(None,),
+            insights=[("therapist", "communication", "Uses an AAC device for expressive language.")],
+        )
+        request = BrainCloneRequest(
+            learner_id="11111111-1111-1111-1111-111111111111",
+            tenant_id="22222222-2222-2222-2222-222222222222",
+            functioning_level="STANDARD",
+        )
+        result = clone_brain(db, request)
+        assert "aac_communication_support" in result["active_accommodations"]
+        assert "echo" in result["active_tutors"]
 
 
 class TestDeriveFunctioningLevel:

@@ -109,6 +109,108 @@ DIFFICULTY_MULTIPLIER = {
     "hard": 1.2,
 }
 
+# Collaborator-insight folding (parity with web-v2 buildBrainProfile, Sprint 4).
+# A perspective contributed by an accepted teacher / caregiver / therapist
+# (stored in brain_insights, domain-tagged) raises the matching accommodation
+# and keeps a coordinating tutor active. Slugs mirror web-v2 so the two stacks
+# name accommodations consistently.
+INSIGHT_DOMAIN_ACCOMMODATION = {
+    "communication": ("aac_communication_support", "AAC / communication support"),
+    "aac": ("aac_communication_support", "AAC / communication support"),
+    "speech": ("aac_communication_support", "AAC / communication support"),
+    "sensory": ("sensory_breaks", "Sensory breaks"),
+    "attention": ("visual_schedules", "Visual schedules"),
+    "focus": ("visual_schedules", "Visual schedules"),
+    "reading": ("read_aloud", "Read-aloud"),
+    "literacy": ("read_aloud", "Read-aloud"),
+    "writing": ("speech_to_text", "Speech-to-text"),
+    "motor": ("speech_to_text", "Speech-to-text"),
+}
+
+INSIGHT_DOMAIN_TUTOR = {
+    "communication": "echo",
+    "aac": "echo",
+    "speech": "echo",
+    "sensory": "harmony",
+    "attention": "harmony",
+    "focus": "harmony",
+    "reading": "sage",
+    "literacy": "sage",
+    "writing": "sage",
+    "math": "nova",
+}
+
+
+def _load_collaborator_insights(db: Session, learner_id: str) -> list:
+    """Accepted-collaborator insights for the learner (best-effort).
+
+    Reads the brain_insights surface (author_role + domain + text). Returns []
+    on any error so a clone never fails because the table/column is absent in
+    an older database — the fold is supplementary, never load-bearing.
+    """
+    try:
+        rows = db.execute(
+            text(
+                "SELECT author_role, domain, insight_text FROM brain_insights "
+                "WHERE learner_id = :lid ORDER BY created_at"
+            ),
+            {"lid": learner_id},
+        ).fetchall()
+        return [
+            {"author_role": r[0], "domain": r[1], "insight_text": r[2]}
+            for r in rows
+        ]
+    except Exception:
+        return []
+
+
+def _fold_collaborator_insights(insights: list, accommodations: list, tutors: list, xai_explanation: dict):
+    """Fold collaborator insights into accommodations + tutors + the XAI record.
+
+    Mirrors web-v2: a therapist communication insight raises AAC/communication
+    support and pins it non-removable (a clinician flagged it); a teacher /
+    caregiver insight raises the same support but leaves it removable. Returns
+    the (possibly extended) accommodations + tutors; mutates xai in place.
+    """
+    accommodations = list(accommodations)
+    tutors = list(tutors)
+    acc_decisions = xai_explanation.setdefault("accommodation_decisions", [])
+    tutor_decisions = xai_explanation.setdefault("tutor_decisions", [])
+    seen_acc = {d.get("accommodation") for d in acc_decisions}
+    for ins in insights:
+        domain = (ins.get("domain") or "").strip().lower()
+        role = ins.get("author_role") or "collaborator"
+        mapping = INSIGHT_DOMAIN_ACCOMMODATION.get(domain)
+        if not mapping:
+            continue
+        acc, label = mapping
+        removable = role != "therapist"
+        snippet = " ".join((ins.get("insight_text") or "").split())[:140]
+        if acc not in accommodations:
+            accommodations.append(acc)
+        if acc not in seen_acc:
+            seen_acc.add(acc)
+            acc_decisions.append({
+                "accommodation": acc,
+                "display_label": label,
+                "reasoning": f"{role} insight ({domain}): {snippet}",
+                "source": f"collaborator:{role}",
+                "removable": removable,
+            })
+        elif not removable:
+            for d in acc_decisions:
+                if d.get("accommodation") == acc:
+                    d["removable"] = False
+        tutor = INSIGHT_DOMAIN_TUTOR.get(domain)
+        if tutor and tutor not in tutors:
+            tutors.append(tutor)
+            tutor_decisions.append({
+                "tutor_key": tutor,
+                "reasoning": f"Kept active to coordinate with a {role}'s {domain} insight.",
+                "source": f"collaborator:{role}",
+            })
+    return accommodations, tutors
+
 def _compute_mastery_from_discovery(discovery_results, template_mastery: dict) -> dict:
     mastery = dict(template_mastery)
     for ch in discovery_results.chapterResults:
@@ -356,6 +458,10 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
         {"lid": request.learner_id}
     ).first()
 
+    # Accepted-collaborator perspectives (best-effort) — folded below so the
+    # pre-build invite step measurably shapes the brain.
+    collaborator_insights = _load_collaborator_insights(db, request.learner_id)
+
     curriculum_alignment = {}
     if learner_row and learner_row[0]:
         try:
@@ -379,6 +485,20 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
         request.functioning_level
     )
 
+    # Fold accepted-collaborator insights into the template accommodations +
+    # tutors and the XAI record (parity with web-v2 buildBrainProfile).
+    active_accommodations, active_tutors = _fold_collaborator_insights(
+        collaborator_insights,
+        template["active_accommodations"],
+        template["active_tutors"],
+        xai_explanation,
+    )
+    if collaborator_insights:
+        xai_explanation["rai_compliance"]["data_sources"].append("Accepted collaborator insights")
+        xai_explanation["summary"] += (
+            f" Incorporated {len(collaborator_insights)} collaborator insight(s)."
+        )
+
     visual_identity = _compute_visual_identity(mastery_levels, request.discovery_results)
 
     brain_data = {
@@ -391,9 +511,9 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
         },
         "iep_profile": {},
         "sensory_profile": {},
-        "active_accommodations": template["active_accommodations"],
+        "active_accommodations": active_accommodations,
         "curriculum_alignment": curriculum_alignment,
-        "active_tutors": template["active_tutors"],
+        "active_tutors": active_tutors,
         "functional_curriculum": template.get("functional_curriculum", {}),
         "episodic_memory": episodic_memory,
         "visual_identity": visual_identity,

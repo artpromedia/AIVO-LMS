@@ -5,6 +5,7 @@ import { useLocalSearchParams, router, type Href } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLearner } from "@/hooks/useLearners";
 import { useBrain, labelForDomain } from "@/hooks/useBrain";
+import { isFlagOn } from "@/lib/feature-flags";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
@@ -47,16 +48,51 @@ export default function ParentBrainCloneWatchScreen() {
   const { childId } = useLocalSearchParams<{ childId: string }>();
   const id = childId ?? "";
   const { data: learner } = useLearner(id);
-  const { data: brain, isLoading } = useBrain(id);
+  const { data: brain, isLoading, isFetching, refetch } = useBrain(id);
 
   const approved = brain?.approvalStatus === "approved";
   const decisions = brain?.xaiExplanation;
+
+  // Parity with web-v2 Sprint 5: when the clone isn't ready yet, don't render
+  // an empty timeline that looks broken — show an explicit "still building"
+  // state with a refresh, so the visual build is never a dead end. The brain
+  // hook returns {} (not null) when no clone exists, so detect emptiness via
+  // the markers a built brain always carries. Gated by VISUAL_BRAIN_BUILD so
+  // the change is reversible.
+  const cloneReady = Boolean(
+    brain && (brain.version || brain.xaiExplanation || brain.masteryLevels),
+  );
+  const showPending = !isLoading && !cloneReady && isFlagOn("VISUAL_BRAIN_BUILD");
 
   return (
     <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
       <ScreenHeader title={t("brainClone.title", "Brain profile")} />
       {isLoading ? (
         <LoadingState />
+      ) : showPending ? (
+        <Card tone="hero" style={{ gap: spacing.sm, alignItems: "center" }}>
+          <Ionicons name="hourglass-outline" size={30} color={palette.primary} />
+          <Text style={[styles.heading, { color: palette.ink, textAlign: "center" }]}>
+            {t("brainClone.pendingTitle", {
+              name: learner?.firstName ?? t("parentHub.learner", "your learner"),
+              defaultValue: `Building ${learner?.firstName ?? "your learner"}'s brain`,
+            })}
+          </Text>
+          <Text style={[styles.body, { color: palette.inkMuted, textAlign: "center" }]}>
+            {t(
+              "brainClone.pendingBody",
+              "We're assembling the brain from the baseline now. This can take a moment — refresh to check again.",
+            )}
+          </Text>
+          <Button
+            title={t("brainClone.refresh", "Refresh")}
+            onPress={() => refetch()}
+            loading={isFetching}
+            fullWidth
+            size="lg"
+            style={{ marginTop: spacing.sm }}
+          />
+        </Card>
       ) : (
         <View style={{ gap: spacing.md }}>
           <Card tone="hero" style={{ gap: 6 }}>
