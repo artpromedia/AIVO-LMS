@@ -15,6 +15,17 @@
 import type { EffectivePolicy, PolicyRecord } from "./types.js";
 import type { RegistryStore } from "./store.js";
 
+/**
+ * The slice of registry state policy resolution needs. Both the full
+ * in-memory `RegistryStore` and the repository's `PolicyResolutionSnapshot`
+ * satisfy this, so the resolver stays a pure, sync, sub-5ms computation
+ * regardless of whether the data came from Postgres or the seeded store.
+ */
+export type PolicyResolutionInputs = Pick<
+  RegistryStore,
+  "policies" | "models" | "optOuts" | "tenantDistrict"
+>;
+
 export interface ResolveInput {
   tenantId: string;
   modelId: string;
@@ -72,7 +83,10 @@ function strictestSeverity(
   return SEVERITY_RANK[a] <= SEVERITY_RANK[b] ? a : b;
 }
 
-export function resolveEffectivePolicy(store: RegistryStore, input: ResolveInput): EffectivePolicy {
+export function resolveEffectivePolicy(
+  store: PolicyResolutionInputs,
+  input: ResolveInput,
+): EffectivePolicy {
   const { tenantId, modelId, feature } = input;
   const districtId = store.tenantDistrict.get(tenantId) ?? null;
 
@@ -133,7 +147,7 @@ export function resolveEffectivePolicy(store: RegistryStore, input: ResolveInput
 }
 
 function computeDenyReason(
-  store: RegistryStore,
+  store: PolicyResolutionInputs,
   args: { tenantId: string; districtId: string | null; modelId: string; feature?: string },
 ): string | null {
   const model = store.models.get(args.modelId);

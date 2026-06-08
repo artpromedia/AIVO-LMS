@@ -4,7 +4,7 @@
  * Aggregates calls, tokens and cost over the requested range.
  */
 import type { FastifyInstance } from "fastify";
-import { getStore } from "../registry/store.js";
+import { getRegistryRepository } from "../registry/repository.js";
 import { actorOf, isPlatform } from "../registry/rbac.js";
 
 function rangeToDays(range: string | undefined): number {
@@ -16,12 +16,13 @@ export function registerUsageRoutes(app: FastifyInstance): void {
   app.get<{ Querystring: { modelId?: string; tenantId?: string; range?: string } }>(
     "/api/responsible-ai/usage",
     async (request) => {
-      const store = getStore();
+      const repo = getRegistryRepository();
       const actor = actorOf(request);
       const days = rangeToDays(request.query.range);
       const cutoff = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
 
-      let rows = store.usage.filter((u) => u.date >= cutoff);
+      const usage = await repo.listUsage();
+      let rows = usage.filter((u) => u.date >= cutoff);
       if (request.query.modelId) rows = rows.filter((u) => u.modelId === request.query.modelId);
       // Non-platform admins are pinned to their own tenant.
       const tenantFilter = isPlatform(actor) ? request.query.tenantId : actor.tenantId;

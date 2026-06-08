@@ -5,7 +5,7 @@
  *   GET /api/responsible-ai/policies/effective?tenantId&modelId&feature  computed policy
  */
 import type { FastifyInstance } from "fastify";
-import { getStore } from "../registry/store.js";
+import { getRegistryRepository } from "../registry/repository.js";
 import type { PolicyRecord } from "../registry/types.js";
 import { resolveEffectivePolicy } from "../registry/policy-resolution.js";
 import { actorOf, canEditPolicies, deny } from "../registry/rbac.js";
@@ -15,8 +15,8 @@ export function registerPolicyRegistryRoutes(app: FastifyInstance): void {
   const base = "/api/responsible-ai/policies";
 
   app.get(base, async () => {
-    const store = getStore();
-    return { policies: [...store.policies.values()] };
+    const repo = getRegistryRepository();
+    return { policies: await repo.listPolicies() };
   });
 
   app.get<{ Querystring: { tenantId?: string; modelId?: string; feature?: string } }>(
@@ -26,8 +26,9 @@ export function registerPolicyRegistryRoutes(app: FastifyInstance): void {
       if (!tenantId || !modelId) {
         return reply.code(400).send({ error: "tenantId and modelId are required" });
       }
-      const store = getStore();
-      return resolveEffectivePolicy(store, { tenantId, modelId, feature });
+      const repo = getRegistryRepository();
+      const snapshot = await repo.policyResolutionSnapshot();
+      return resolveEffectivePolicy(snapshot, { tenantId, modelId, feature });
     },
   );
 
@@ -36,8 +37,8 @@ export function registerPolicyRegistryRoutes(app: FastifyInstance): void {
     async (request, reply) => {
       const actor = actorOf(request);
       if (!canEditPolicies(actor)) return deny(reply);
-      const store = getStore();
-      const existing = store.policies.get(request.params.id);
+      const repo = getRegistryRepository();
+      const existing = await repo.getPolicy(request.params.id);
       const b = request.body ?? {};
       const now = new Date().toISOString();
       const policy: PolicyRecord = {
@@ -58,7 +59,7 @@ export function registerPolicyRegistryRoutes(app: FastifyInstance): void {
         updatedAt: now,
         updatedBy: actor.actorId ?? "platform_admin",
       };
-      store.policies.set(policy.id, policy);
+      await repo.upsertPolicy(policy);
       await emitRegistryAudit(request, "RAI_POLICY_UPDATED", policy.id, {
         scopeLevel: policy.scopeLevel,
         scopeId: policy.scopeId,

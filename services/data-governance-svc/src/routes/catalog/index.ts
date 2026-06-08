@@ -13,17 +13,19 @@ export function registerCatalogRoutes(app: FastifyInstance): void {
       return reply.code(403).send({ error: "admin role required" });
     }
     const tenantId = isPlatformAdmin(actor) ? null : actor.tenantId;
-    const classes = listCatalog().map((c) => {
-      const policy = getRetentionPolicy(c.dataClass, tenantId);
-      return {
-        ...c,
-        retention: {
-          retentionDays: policy.retentionDays,
-          disposition: policy.disposition,
-          legalHold: policy.legalHold,
-        },
-      };
-    });
+    const classes = await Promise.all(
+      listCatalog().map(async (c) => {
+        const policy = await getRetentionPolicy(c.dataClass, tenantId);
+        return {
+          ...c,
+          retention: {
+            retentionDays: policy.retentionDays,
+            disposition: policy.disposition,
+            legalHold: policy.legalHold,
+          },
+        };
+      }),
+    );
     return { catalog: classes };
   });
 }

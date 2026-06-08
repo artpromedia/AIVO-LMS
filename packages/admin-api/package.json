@@ -10,6 +10,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./ai-governance": {
+      "types": "./dist/ai-governance.d.ts",
+      "default": "./dist/ai-governance.js"
+    },
     "./api-keys": {
       "types": "./dist/api-keys.d.ts",
       "default": "./dist/api-keys.js"
@@ -18,17 +22,49 @@
       "types": "./dist/audit.d.ts",
       "default": "./dist/audit.js"
     },
+    "./baseline": {
+      "types": "./dist/baseline.d.ts",
+      "default": "./dist/baseline.js"
+    },
     "./billing": {
       "types": "./dist/billing.d.ts",
       "default": "./dist/billing.js"
+    },
+    "./classrooms": {
+      "types": "./dist/classrooms.d.ts",
+      "default": "./dist/classrooms.js"
     },
     "./compliance": {
       "types": "./dist/compliance.d.ts",
       "default": "./dist/compliance.js"
     },
+    "./content": {
+      "types": "./dist/content.d.ts",
+      "default": "./dist/content.js"
+    },
+    "./dsar": {
+      "types": "./dist/dsar.d.ts",
+      "default": "./dist/dsar.js"
+    },
+    "./feature-flags": {
+      "types": "./dist/feature-flags.d.ts",
+      "default": "./dist/feature-flags.js"
+    },
+    "./jobs": {
+      "types": "./dist/jobs.d.ts",
+      "default": "./dist/jobs.js"
+    },
     "./identity": {
       "types": "./dist/identity.d.ts",
       "default": "./dist/identity.js"
+    },
+    "./iep": {
+      "types": "./dist/iep.d.ts",
+      "default": "./dist/iep.js"
+    },
+    "./invoices": {
+      "types": "./dist/invoices.d.ts",
+      "default": "./dist/invoices.js"
     },
     "./leads": {
       "types": "./dist/leads.d.ts",
@@ -42,9 +78,41 @@
       "types": "./dist/platform.d.ts",
       "default": "./dist/platform.js"
     },
+    "./platform-settings": {
+      "types": "./dist/platform-settings.d.ts",
+      "default": "./dist/platform-settings.js"
+    },
+    "./pronunciation": {
+      "types": "./dist/pronunciation.d.ts",
+      "default": "./dist/pronunciation.js"
+    },
+    "./reports": {
+      "types": "./dist/reports.d.ts",
+      "default": "./dist/reports.js"
+    },
+    "./retention": {
+      "types": "./dist/retention.d.ts",
+      "default": "./dist/retention.js"
+    },
+    "./rostering": {
+      "types": "./dist/rostering.d.ts",
+      "default": "./dist/rostering.js"
+    },
     "./scim": {
       "types": "./dist/scim.d.ts",
       "default": "./dist/scim.js"
+    },
+    "./security": {
+      "types": "./dist/security.d.ts",
+      "default": "./dist/security.js"
+    },
+    "./support": {
+      "types": "./dist/support.d.ts",
+      "default": "./dist/support.js"
+    },
+    "./sis": {
+      "types": "./dist/sis.d.ts",
+      "default": "./dist/sis.js"
     },
     "./types": {
       "types": "./dist/types.d.ts",

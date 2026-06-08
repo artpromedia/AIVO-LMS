@@ -5,7 +5,8 @@
  *   PATCH /api/responsible-ai/incidents/:id     state transition
  */
 import type { FastifyInstance } from "fastify";
-import { getStore, newId } from "../registry/store.js";
+import { newId } from "../registry/store.js";
+import { getRegistryRepository } from "../registry/repository.js";
 import type { IncidentSeverity, IncidentState, RaiIncident } from "../registry/types.js";
 import { actorOf, canFileIncident, isPlatform, deny } from "../registry/rbac.js";
 import { emitRegistryAudit } from "../lib/registry-audit.js";
@@ -17,9 +18,9 @@ export function registerIncidentRoutes(app: FastifyInstance): void {
   const base = "/api/responsible-ai/incidents";
 
   app.get(base, async (request) => {
-    const store = getStore();
+    const repo = getRegistryRepository();
     const actor = actorOf(request);
-    let incidents = [...store.incidents.values()];
+    let incidents = await repo.listIncidents();
     // Non-platform admins only see incidents for their own tenant (or
     // tenant-agnostic platform incidents they filed).
     if (!isPlatform(actor)) {
@@ -42,7 +43,7 @@ export function registerIncidentRoutes(app: FastifyInstance): void {
       ? (b.severity as IncidentSeverity)
       : "sev3";
     const now = new Date().toISOString();
-    const store = getStore();
+    const repo = getRegistryRepository();
     const incident: RaiIncident = {
       id: newId("rai-inc"),
       modelId: b.modelId ?? null,
@@ -60,7 +61,7 @@ export function registerIncidentRoutes(app: FastifyInstance): void {
       createdAt: now,
       updatedAt: now,
     };
-    store.incidents.set(incident.id, incident);
+    await repo.upsertIncident(incident);
     await emitRegistryAudit(request, "RAI_INCIDENT_CREATED", incident.id, {
       severity,
       modelId: incident.modelId,
@@ -73,8 +74,8 @@ export function registerIncidentRoutes(app: FastifyInstance): void {
     async (request, reply) => {
       const actor = actorOf(request);
       if (!canFileIncident(actor)) return deny(reply);
-      const store = getStore();
-      const incident = store.incidents.get(request.params.id);
+      const repo = getRegistryRepository();
+      const incident = await repo.getIncident(request.params.id);
       if (!incident) return reply.code(404).send({ error: "Incident not found" });
       if (
         !isPlatform(actor) &&
@@ -94,7 +95,7 @@ export function registerIncidentRoutes(app: FastifyInstance): void {
       });
       incident.state = nextState;
       incident.updatedAt = now;
-      store.incidents.set(incident.id, incident);
+      await repo.upsertIncident(incident);
       await emitRegistryAudit(request, "RAI_INCIDENT_UPDATED", incident.id, { state: nextState });
       return { incident };
     },

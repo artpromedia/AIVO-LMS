@@ -7,6 +7,8 @@ import { registerObservabilityPlugin } from "@aivo/observability";
 import { registerExportRoutes } from "./routes/exports.js";
 import { registerDeletionRoutes } from "./routes/deletion-requests.js";
 import { initDpaStoreFromDb, registerDpaRoutes } from "./routes/dpa.js";
+import { initDsarStoreFromDb } from "./services/dsar-store.js";
+import { initCatalogStoreFromDb } from "./services/catalog-store.js";
 import { registerRetentionRoutes } from "./routes/retention.js";
 import { registerDsarRoutes } from "./routes/dsar/index.js";
 import { registerConsentRoutes } from "./routes/consent/index.js";
@@ -39,6 +41,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   // tests and local dev tolerate the in-memory store.
   const db = options.db ?? (process.env.DATABASE_URL ? createDb(process.env.DATABASE_URL) : null);
   initDpaStoreFromDb(db);
+  initDsarStoreFromDb(db);
+  initCatalogStoreFromDb(db);
 
   registerExportRoutes(app);
   registerDeletionRoutes(app);

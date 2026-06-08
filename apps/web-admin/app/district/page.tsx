@@ -11,6 +11,20 @@ import {
   updateDistrictBranding,
 } from "@aivo/admin-api/identity";
 import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminNavGrid } from "@/components/admin-nav";
+
+const DISTRICT_NAV = [
+  { href: "/district/billing", title: "Billing", description: "Accounts and trial conversion." },
+  { href: "/district/sis", title: "SIS connectors", description: "Roster sync (Clever, OneRoster)." },
+  { href: "/district/iep", title: "IEP evaluations", description: "SPED evaluation pipeline." },
+  { href: "/district/reports", title: "Reports", description: "Run and export district reports." },
+  {
+    href: "/district/compliance",
+    title: "Compliance",
+    description: "Data-protection control monitoring.",
+  },
+  { href: "/district/audit", title: "Audit log", description: "Administrative action history." },
+];
 
 async function completeSetup() {
   "use server";
@@ -240,6 +254,8 @@ export default async function DistrictPage({
           </form>
         </div>
       </AdminCard>
+
+      <AdminNavGrid heading="District tools" items={DISTRICT_NAV} />
     </AdminPageFrame>
   );
 }
