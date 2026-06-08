@@ -224,6 +224,63 @@ test.describe("District pilot — Sprint 3: parent creates a learner under the s
   });
 });
 
-test.describe("District pilot — full journey (sprint 4)", () => {
-  test.fixme("pilot ops dashboard shows seats, uptake, and expiry (Sprint 4)", async () => {});
+test.describe("District pilot — Sprint 4: pilot ops view (G4)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("a provisioned pilot surfaces seats/uptake/redemptions/expiry from real reads", async ({
+    page,
+    request,
+  }) => {
+    const admin = await seedPlatformAdmin();
+    expect(admin).not.toBeNull();
+    if (!admin) return;
+
+    // Provision a 2-seat pilot.
+    const stamp = Date.now();
+    const provision = await request.post(`${IDENTITY_BASE}/api/admin/pilots`, {
+      headers: { authorization: `Bearer ${admin.accessToken}` },
+      data: {
+        districtName: `Pilot Ops ${stamp}`,
+        adminName: "Ops Admin",
+        adminEmail: `ops-da-${stamp}@district.test`,
+        seatLimit: 2,
+        durationDays: 30,
+      },
+      failOnStatusCode: false,
+    });
+    expect(provision.status(), await provision.text()).toBe(200);
+    const tenantId = (await provision.json()).district.id;
+
+    // A parent in the district logs in and creates a learner (consumes a seat).
+    const parent = await seedParentInTenant(tenantId);
+    expect(parent).not.toBeNull();
+    if (!parent) return;
+    await loginThroughWebUi(page, {
+      email: parent.email,
+      password: parent.password,
+      expectPath: "/parent/home",
+    });
+    const created = await page.request.post(`${WEB_BASE}/api/bff/learners`, {
+      data: { firstName: "Ops Kid", birthYear: 2016 },
+      failOnStatusCode: false,
+    });
+    expect(created.status(), await created.text()).toBe(201);
+
+    // Platform admin sees the live ops view: real seats/uptake/coupon/expiry.
+    const ops = await request.get(`${BILLING_BASE}/api/billing/admin/pilots/${tenantId}`, {
+      headers: { authorization: `Bearer ${admin.accessToken}` },
+      failOnStatusCode: false,
+    });
+    expect(ops.status()).toBe(200);
+    const pilot = (await ops.json()).pilot;
+    expect(pilot.seatLimit).toBe(2);
+    expect(pilot.seatsUsed).toBeGreaterThanOrEqual(1);
+    expect(pilot.learnersCreated).toBeGreaterThanOrEqual(1);
+    expect(pilot.parentsOnboarded).toBeGreaterThanOrEqual(1);
+    expect(pilot.redemptions).toBe(1);
+    expect(pilot.status).toBe("active");
+    expect(pilot.expiresAt).toBeTruthy();
+  });
 });

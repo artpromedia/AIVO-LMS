@@ -151,6 +151,24 @@ export default async function PlatformPage() {
       </AdminCard>
 
       <AdminCard className="mt-6 p-6">
+        <h2 className="text-xl font-black">District pilots</h2>
+        <p className="mt-2 max-w-3xl text-slate-600">
+          Provision a district pilot (district + entitlement in one step) and track live seat usage,
+          parent/learner onboarding, coupon uptake, and expiry — all from real billing-svc reads.
+        </p>
+        {session.role === "platform_admin" ? (
+          <div className="mt-4 flex flex-wrap gap-4">
+            <Link className="inline-flex font-bold text-blue-700" href="/platform/pilots">
+              Pilot operations
+            </Link>
+            <Link className="inline-flex font-bold text-blue-700" href="/platform/pilots/new">
+              Provision pilot
+            </Link>
+          </div>
+        ) : null}
+      </AdminCard>
+
+      <AdminCard className="mt-6 p-6">
         <h2 className="text-xl font-black">Pilot coupons</h2>
         <p className="mt-2 max-w-3xl text-slate-600">
           Mint and disable discount, subscription, and provisioning (district/school pilot) coupons.

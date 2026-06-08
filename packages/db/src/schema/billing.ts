@@ -286,3 +286,51 @@ export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
   processedAt: timestamp("processed_at"),
   error: text("error"),
 });
+
+/**
+ * Coupon engine source of truth (Sprint 7; canonicalised in Sprint 4 of the
+ * district-pilot pack). Previously bootstrapped by defensive
+ * `CREATE TABLE IF NOT EXISTS` + `ALTER TABLE … ADD COLUMN` DDL inside
+ * `services/billing-svc/src/routes/coupons.ts`; now a real migration
+ * (drizzle/0090_billing_coupons.sql) so fresh DBs and schema-drift agree.
+ *
+ *   - DISCOUNT      → `discount_pct`
+ *   - SUBSCRIPTION  → `grants_duration_days`
+ *   - PROVISIONING  → `grants_tier` + `grants_plan` (+ `grants_seat_limit`,
+ *                     `grants_duration_days`); the district-pilot path mints +
+ *                     redeems these.
+ */
+export const billingCoupons = pgTable("billing_coupons", {
+  code: varchar("code", { length: 64 }).primaryKey(),
+  description: text("description"),
+  discountPct: integer("discount_pct").notNull().default(0),
+  maxRedemptions: integer("max_redemptions"),
+  redemptions: integer("redemptions").notNull().default(0),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  couponType: varchar("coupon_type", { length: 20 }).notNull().default("DISCOUNT"),
+  grantsTier: varchar("grants_tier", { length: 30 }),
+  grantsPlan: varchar("grants_plan", { length: 50 }),
+  grantsSeatLimit: integer("grants_seat_limit"),
+  grantsDurationDays: integer("grants_duration_days"),
+});
+
+/**
+ * Durable, multi-replica-safe token bucket for the coupon-redeem endpoint
+ * (Sprint 4 hardening). Replaces the process-local `Map` so brute-force
+ * protection actually holds across replicas. One row per `(scope, subject)`
+ * window; the redeem limiter resets the row when the window expires.
+ */
+export const billingRateLimits = pgTable(
+  "billing_rate_limits",
+  {
+    scope: varchar("scope", { length: 64 }).notNull(),
+    subject: varchar("subject", { length: 255 }).notNull(),
+    count: integer("count").notNull().default(0),
+    resetAt: timestamp("reset_at", { withTimezone: true }).notNull(),
+  },
+  (t) => ({
+    pk: uniqueIndex("billing_rate_limits_pk").on(t.scope, t.subject),
+  }),
+);

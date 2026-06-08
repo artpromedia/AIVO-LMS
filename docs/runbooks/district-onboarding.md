@@ -160,3 +160,11 @@ still enforced at learner-create in identity-svc.
 
 **Acceptance.** The parent opens the link, sets their own password, and the
 PARENT `users` row is created under the **district** tenant. No temp password.
+
+## Pilot operations view
+
+Platform admins: `/platform/pilots` lists every active pilot with live seats
+used, parents/learners onboarded, coupon redemptions, and expiry;
+`/platform/pilots/<tenantId>` is the per-pilot detail. District admins see a
+"N of M seats used, expires <date>" banner on their console. All numbers come
+from real billing-svc reads (`/api/billing/admin/pilots*`) — no demo read model.

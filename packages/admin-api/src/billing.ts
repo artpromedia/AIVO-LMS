@@ -1,6 +1,9 @@
 import "server-only";
 
+import { cookies } from "next/headers";
+import { IDENTITY_ACCESS_TOKEN_COOKIE } from "@aivo/admin-auth/identity-client";
 import { AdminApiError, adminDelete, adminGet, adminPost } from "./client";
+import { billingSvcUrl } from "./env.js";
 import {
   type AdminBillingAccount,
   adminTenantTypeLabel,
@@ -8,6 +11,123 @@ import {
   normalizeTenantKind,
 } from "./types";
 import type { SessionProfile } from "@aivo/admin-auth/types";
+
+/**
+ * Direct, platform-admin-bearer GET to billing-svc (the pilot ops read model
+ * lives there, not behind the admin-svc proxy). billing-svc re-verifies the
+ * PLATFORM_ADMIN JWT, so this is double-guarded.
+ */
+async function billingAdminGet<T>(session: Pick<SessionProfile, "role">, path: string): Promise<T> {
+  if (session.role !== "platform_admin") {
+    throw new AdminApiError("Platform admin access required", 403);
+  }
+  const token = (await cookies()).get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
+  if (!token) throw new AdminApiError("Missing admin access token", 401);
+  const res = await fetch(new URL(path, billingSvcUrl()), {
+    headers: { authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  const text = await res.text();
+  let payload: unknown = null;
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = text;
+    }
+  }
+  if (!res.ok) {
+    const message =
+      payload &&
+      typeof payload === "object" &&
+      "error" in payload &&
+      typeof payload.error === "string"
+        ? payload.error
+        : `billing-svc request failed (${res.status})`;
+    throw new AdminApiError(message, res.status, payload);
+  }
+  return payload as T;
+}
+
+export type PilotStatus = {
+  tenantId: string;
+  districtName: string | null;
+  plan: string | null;
+  tier: string | null;
+  seatLimit: number | null;
+  seatsUsed: number;
+  seatsRemaining: number | null;
+  parentsOnboarded: number;
+  learnersCreated: number;
+  couponCode: string | null;
+  redemptions: number;
+  expiresAt: string | null;
+  status: "active" | "expired" | "none";
+};
+
+/** One district pilot's live ops view (seats, uptake, coupon, expiry). */
+export async function getPilotStatus(
+  session: Pick<SessionProfile, "role">,
+  tenantId: string,
+): Promise<PilotStatus> {
+  const { pilot } = await billingAdminGet<{ pilot: PilotStatus }>(
+    session,
+    `/api/billing/admin/pilots/${encodeURIComponent(tenantId)}`,
+  );
+  return pilot;
+}
+
+/** List active district pilots. */
+export async function listPilots(session: Pick<SessionProfile, "role">): Promise<PilotStatus[]> {
+  const { pilots } = await billingAdminGet<{ pilots: PilotStatus[] }>(
+    session,
+    "/api/billing/admin/pilots",
+  );
+  return pilots;
+}
+
+/**
+ * A district admin's own pilot status. billing-svc allows the owning
+ * DISTRICT_ADMIN to read its tenant's pilot view, so the district console can
+ * surface "N of M seats used, expires <date>". Returns null when the tenant has
+ * no pilot subscription.
+ */
+export async function getDistrictPilotStatus(
+  session: Pick<SessionProfile, "role">,
+  tenantId: string,
+): Promise<PilotStatus | null> {
+  if (session.role !== "district_admin" && session.role !== "platform_admin") {
+    throw new AdminApiError("District admin access required", 403);
+  }
+  const token = (await cookies()).get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
+  if (!token) throw new AdminApiError("Missing admin access token", 401);
+  const res = await fetch(
+    new URL(`/api/billing/admin/pilots/${encodeURIComponent(tenantId)}`, billingSvcUrl()),
+    { headers: { authorization: `Bearer ${token}` }, cache: "no-store" },
+  );
+  if (res.status === 404) return null;
+  const text = await res.text();
+  let payload: unknown = null;
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = text;
+    }
+  }
+  if (!res.ok) {
+    const message =
+      payload &&
+      typeof payload === "object" &&
+      "error" in payload &&
+      typeof payload.error === "string"
+        ? payload.error
+        : `billing-svc request failed (${res.status})`;
+    throw new AdminApiError(message, res.status, payload);
+  }
+  const pilot = (payload as { pilot?: PilotStatus }).pilot ?? null;
+  return pilot && pilot.status !== "none" ? pilot : null;
+}
 
 export async function listBillingAccounts(
   session: Pick<SessionProfile, "role">,

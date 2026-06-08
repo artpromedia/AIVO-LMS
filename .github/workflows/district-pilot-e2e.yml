@@ -55,6 +55,19 @@ jobs:
         if: steps.filter.outputs.pilot == 'true'
         run: pnpm install --frozen-lockfile
 
+      - name: Install ripgrep (no-stub gate)
+        if: steps.filter.outputs.pilot == 'true'
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
+      # Prod-quality gates for the whole journey — no stubs, no demo-in-prod on
+      # the path, and the canonical billing_coupons migration matches the schema.
+      - name: Prod gates (no-stub / no-demo / schema-drift)
+        if: steps.filter.outputs.pilot == 'true'
+        run: |
+          bash .agents/scripts/no-stub-gate.sh
+          node scripts/no-demo-prod-scan.mjs
+          pnpm --filter @aivo/db exec tsx scripts/check-schema-drift.ts
+
       - name: Bring up postgres (migrate before services boot)
         if: steps.filter.outputs.pilot == 'true'
         run: docker compose -f docker-compose.e2e.yml up -d postgres --wait
@@ -84,11 +97,12 @@ jobs:
         if: steps.filter.outputs.pilot == 'true'
         run: pnpm --filter @aivo/e2e exec playwright install --with-deps chromium
 
-      - name: Run district-pilot e2e slice
+      - name: Run the full district-pilot journey (Stages 0-4, required)
         if: steps.filter.outputs.pilot == 'true'
         env:
           WEB_BASE_URL: http://localhost:5000
           IDENTITY_BASE_URL: http://localhost:3001
+          BILLING_BASE_URL: http://localhost:3009
         run: pnpm --filter @aivo/e2e exec playwright test specs/district-pilot --reporter=line
 
       - name: Dump logs on failure

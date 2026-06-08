@@ -11,6 +11,7 @@ import {
   setDistrictRosteringGrant,
   updateDistrictBranding,
 } from "@aivo/admin-api/identity";
+import { getDistrictPilotStatus } from "@aivo/admin-api/billing";
 import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
 import { AdminNavGrid } from "@/components/admin-nav";
 
@@ -130,6 +131,10 @@ export default async function DistrictPage({
   const params = await searchParams;
   const setup = await getDistrictSetupOverview(session);
   const rostering = await getDistrictRosteringGrant(session);
+  // Pilot ops summary (real read model). Null when this district has no pilot
+  // subscription; a transient billing error is swallowed so the console still
+  // renders its setup/roster view.
+  const pilot = await getDistrictPilotStatus(session, setup.district.id).catch(() => null);
 
   return (
     <AdminPageFrame
@@ -139,6 +144,20 @@ export default async function DistrictPage({
     >
       {params.notice ? <p className="admin-notice mt-8">{params.notice}</p> : null}
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
+
+      {pilot ? (
+        <div className="mt-8 flex flex-wrap items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+            Pilot
+          </span>
+          <p className="font-semibold text-blue-900">
+            {pilot.seatLimit == null
+              ? `${pilot.seatsUsed} learners (uncapped)`
+              : `${pilot.seatsUsed} of ${pilot.seatLimit} seats used`}
+            {pilot.expiresAt ? ` · expires ${new Date(pilot.expiresAt).toLocaleDateString()}` : ""}
+          </p>
+        </div>
+      ) : null}
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
         <AdminMetricCard label="Schools" value={setup.counts.schools} />

@@ -240,3 +240,27 @@ pnpm --filter @aivo/billing-entitlements test
 pnpm --filter @aivo/billing-svc test
 pnpm test:enterprise   # district seat allocation, coupon redemption
 ```
+
+### Canonical coupon table + durable redeem rate-limit (Sprint 4)
+
+`billing_coupons` is now owned by a **canonical migration**
+(`packages/db/drizzle/0090_billing_coupons.sql`, applied by `db:migrate`) — the
+previous in-route `CREATE TABLE`/`ALTER` bootstrap in `coupons.ts` is gone and
+the schema-drift gate covers it. The same migration adds `billing_rate_limits`.
+
+The coupon-redeem brute-force limiter is now **durable and multi-replica-safe**
+(`services/billing-svc/src/lib/redeem-rate-limit.ts`): a Postgres-backed token
+bucket (atomic `INSERT … ON CONFLICT … RETURNING`) replaces the process-local
+`Map`, so the 10/min limit holds across pods.
+
+### Pilot operations read model
+
+`GET /api/billing/admin/pilots` and `GET /api/billing/admin/pilots/:tenantId`
+(`pilot-status.ts`) return a district pilot's live ops view — `plan`, `tier`,
+`seatLimit`, `seatsUsed`, `seatsRemaining`, `parentsOnboarded`, `learnersCreated`,
+`couponCode`, `redemptions`, `expiresAt`, `status` — joined from `subscriptions`
+
+- `tenants` + the provisioning coupon's redemption count + onboarded
+  parents/learners. The detail route is visible to PLATFORM_ADMIN or the owning
+  DISTRICT_ADMIN. Surfaced in web-admin at `/platform/pilots[/:tenantId]` and as a
+  seat/expiry banner on the district console.
