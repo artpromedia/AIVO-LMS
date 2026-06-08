@@ -1242,6 +1242,9 @@ importers:
       '@aivo/enterprise-core':
         specifier: workspace:*
         version: link:../../packages/enterprise-core
+      '@aivo/feature-flags':
+        specifier: workspace:*
+        version: link:../../packages/feature-flags
       '@aivo/learner-import':
         specifier: workspace:*
         version: link:../../packages/learner-import
