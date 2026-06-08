@@ -84,7 +84,7 @@ jobs:
 
       - name: Setup Python
         if: matrix.target == 'brain-svc' || matrix.target == 'ai-svc' || matrix.target == 'curriculum-svc'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -145,15 +145,8 @@ jobs:
     timeout-minutes: 20
     needs: build
     steps:
-      - name: Clean self-hosted workspace
-        run: |
-          set -eu
-          # actions/checkout cannot remove root-owned leftovers written
-          # by previous Docker-based jobs. Use the rootful Docker daemon
-          # to take ownership so the next checkout can clean cleanly.
-          mkdir -p "$GITHUB_WORKSPACE"
-          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
-            sh -c "chown -R $(id -u):$(id -g) /work"
+      - name: Reclaim disk + clean self-hosted workspace
+        uses: ./.github/actions/hetzner-runner-cleanup
 
       - uses: actions/checkout@v5
 
@@ -179,12 +172,8 @@ jobs:
     # Concurrent legacy-builder exports can corrupt containerd ingest state.
     needs: [build, build-push-python-images]
     steps:
-      - name: Clean self-hosted workspace
-        run: |
-          set -eu
-          mkdir -p "$GITHUB_WORKSPACE"
-          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
-            sh -c "chown -R $(id -u):$(id -g) /work"
+      - name: Reclaim disk + clean self-hosted workspace
+        uses: ./.github/actions/hetzner-runner-cleanup
 
       - uses: actions/checkout@v5
 
@@ -204,12 +193,8 @@ jobs:
     timeout-minutes: 30
     needs: [build, build-push-node-services]
     steps:
-      - name: Clean self-hosted workspace
-        run: |
-          set -eu
-          mkdir -p "$GITHUB_WORKSPACE"
-          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
-            sh -c "chown -R $(id -u):$(id -g) /work"
+      - name: Reclaim disk + clean self-hosted workspace
+        uses: ./.github/actions/hetzner-runner-cleanup
 
       - uses: actions/checkout@v5
 
@@ -238,12 +223,8 @@ jobs:
     outputs:
       version: ${{ steps.tag.outputs.version }}
     steps:
-      - name: Clean self-hosted workspace
-        run: |
-          set -eu
-          mkdir -p "$GITHUB_WORKSPACE"
-          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
-            sh -c "chown -R $(id -u):$(id -g) /work"
+      - name: Reclaim disk + clean self-hosted workspace
+        uses: ./.github/actions/hetzner-runner-cleanup
 
       - uses: actions/checkout@v5
 
@@ -576,12 +557,8 @@ jobs:
       # cluster-secret fallback and in-cluster psql verify are robust.
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
-      - name: Clean self-hosted workspace
-        run: |
-          set -eu
-          mkdir -p "$GITHUB_WORKSPACE"
-          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
-            sh -c "chown -R $(id -u):$(id -g) /work"
+      - name: Reclaim disk + clean self-hosted workspace
+        uses: ./.github/actions/hetzner-runner-cleanup
 
       - uses: actions/checkout@v5
 
@@ -730,12 +707,8 @@ jobs:
       # it talks to localhost:8080. kubectl (k3s symlink) works without it.
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
-      - name: Clean self-hosted workspace
-        run: |
-          set -eu
-          mkdir -p "$GITHUB_WORKSPACE"
-          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
-            sh -c "chown -R $(id -u):$(id -g) /work"
+      - name: Reclaim disk + clean self-hosted workspace
+        uses: ./.github/actions/hetzner-runner-cleanup
 
       - uses: actions/checkout@v5
 

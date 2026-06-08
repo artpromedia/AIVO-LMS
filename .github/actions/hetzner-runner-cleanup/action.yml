@@ -1,0 +1,63 @@
+name: "Hetzner self-hosted runner cleanup"
+description: >-
+  Reclaim disk space on the Hetzner self-hosted runner BEFORE checkout so the
+  next image build doesn't ENOSPC. Idempotent and safe to run on every step:
+  prunes dangling Docker images / unused build cache, trims the runner's
+  diagnostic logs, chowns the workspace (Docker-as-root from prior jobs
+  leaves root-owned files that actions/checkout cannot delete), and prints
+  a before/after disk summary so we can spot a runner that's filling up
+  faster than the prune is keeping up with.
+
+runs:
+  using: composite
+  steps:
+    - name: Reclaim disk + clean workspace
+      shell: bash
+      run: |
+        set -eu
+
+        echo "::group::Disk usage (before)"
+        df -h / /var/lib/docker 2>/dev/null || df -h /
+        echo "::endgroup::"
+
+        # Trim the runner's diagnostic log directory. The "No space left on
+        # device" failures we've been hitting show up first as failed
+        # appends to /opt/github-runner-aivo-ai-learning/_diag/Worker_*.log
+        # — the diag dir grows unbounded across runs and is the smallest
+        # thing we can safely truncate. Keeps the last 3 days of logs so
+        # support still has recent traces to inspect.
+        if [ -d /opt/github-runner-aivo-ai-learning/_diag ]; then
+          echo "::group::Trim runner diag logs (>3 days old)"
+          find /opt/github-runner-aivo-ai-learning/_diag \
+            -maxdepth 1 -type f -name '*.log' -mtime +3 -print -delete || true
+          echo "::endgroup::"
+        fi
+
+        # Prune Docker. `system prune -af` removes:
+        #   - stopped containers
+        #   - unused networks
+        #   - dangling AND unreferenced images (no :latest tag pointing at them)
+        #   - the entire build cache
+        # We deliberately do NOT pass --volumes so persistent test-db / k3s
+        # volumes survive.
+        if command -v docker >/dev/null 2>&1; then
+          echo "::group::docker system prune"
+          docker system prune -af --filter "until=24h" 2>&1 | tail -5 || true
+          docker builder prune -af --filter "until=24h" 2>&1 | tail -3 || true
+          echo "::endgroup::"
+        fi
+
+        # actions/checkout cannot remove root-owned leftovers written by
+        # previous Docker-based jobs (DOCKER_BUILDKIT=0 docker build runs
+        # as root and persists root-owned node_modules, .pnpm-store, etc.).
+        # Use the rootful Docker daemon to take ownership so the next
+        # checkout's clean step can actually clean.
+        mkdir -p "$GITHUB_WORKSPACE"
+        if command -v docker >/dev/null 2>&1; then
+          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+            sh -c "chown -R $(id -u):$(id -g) /work" || true
+        fi
+
+        echo "::group::Disk usage (after)"
+        df -h / /var/lib/docker 2>/dev/null || df -h /
+        echo "::endgroup::"

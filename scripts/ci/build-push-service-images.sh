@@ -62,4 +62,18 @@ for service in "$@"; do
   fi
   echo "=== Pushing ${service} ==="
   docker push "${IMAGE_PREFIX}/${service}:latest" 2>&1 | tail -3
+
+  # Reclaim disk between services so a 14-service run doesn't ENOSPC
+  # halfway through. We can safely drop the local :latest tag — the
+  # registry now has it and downstream `helm` deploys pull from there,
+  # not from the local Docker daemon. Dangling intermediate layers from
+  # this build are pruned in the same step.
+  echo "=== Reclaiming disk after ${service} ==="
+  docker image rm "${IMAGE_PREFIX}/${service}:latest" >/dev/null 2>&1 || true
+  docker image prune -f --filter "dangling=true" 2>&1 | tail -1 || true
 done
+
+# Final aggressive cleanup once all services have been pushed: drop the
+# build cache so the next workflow run starts from a known disk state.
+docker builder prune -af --filter "until=1h" 2>&1 | tail -2 || true
+df -h / 2>/dev/null || true
