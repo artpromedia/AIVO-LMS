@@ -22,6 +22,7 @@ const PLATFORM_NAV = [
   { href: "/platform/safety", title: "Safety", description: "AI content moderation queue." },
   { href: "/platform/ai-costs", title: "AI costs", description: "Per-tenant spend and budget caps." },
   { href: "/platform/audit", title: "Audit log", description: "Hash-chained admin action history." },
+  { href: "/platform/jobs", title: "Jobs", description: "Scheduled job freshness and run health." },
   {
     href: "/platform/settings/api-keys",
     title: "API keys",

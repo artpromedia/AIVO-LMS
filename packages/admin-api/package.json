@@ -22,9 +22,17 @@
       "types": "./dist/billing.d.ts",
       "default": "./dist/billing.js"
     },
+    "./classrooms": {
+      "types": "./dist/classrooms.d.ts",
+      "default": "./dist/classrooms.js"
+    },
     "./compliance": {
       "types": "./dist/compliance.d.ts",
       "default": "./dist/compliance.js"
+    },
+    "./jobs": {
+      "types": "./dist/jobs.d.ts",
+      "default": "./dist/jobs.js"
     },
     "./identity": {
       "types": "./dist/identity.d.ts",
@@ -41,6 +49,14 @@
     "./platform": {
       "types": "./dist/platform.d.ts",
       "default": "./dist/platform.js"
+    },
+    "./reports": {
+      "types": "./dist/reports.d.ts",
+      "default": "./dist/reports.js"
+    },
+    "./rostering": {
+      "types": "./dist/rostering.d.ts",
+      "default": "./dist/rostering.js"
     },
     "./scim": {
       "types": "./dist/scim.d.ts",

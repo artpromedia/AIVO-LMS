@@ -30,7 +30,23 @@ Already present before this wave: `login`, `login/mfa`, `district` (setup),
 `platform`, `platform/districts`, `platform/billing/coupons`,
 `platform/billing/trials`, `platform/sales/leads`, `school`.
 
+## Done — Wave 2 (admin-svc backend already existed; added admin-api modules)
+
+- **platform/jobs** ← `@aivo/admin-api/jobs` (`/api/admin-svc/jobs`, `/jobs/freshness`)
+- **school/classes (+[classId])** ← `@aivo/admin-api/classrooms` (`/admin/schools/:schoolId/classrooms[/:id]`)
+- **district/reports**, **school/reports** ← `@aivo/admin-api/reports`
+  (`/admin/schools/:schoolId/reports`, `POST …/reports/:reportId/run`)
+- **school/rostering (+import, +template route)** ← `@aivo/admin-api/rostering`
+  (`/admin/schools/:schoolId/learners/import/{validate,run,template,:jobId}`)
+
+School-scoped routes derive `:schoolId` from `session.tenantId`.
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
+
+Note: `platform/compliance/{data-inventory,retention}` were attempted but
+**dropped** — `admin-svc`'s `governance` route is a DSAR POST subscriber with no
+GET read API, so those pages need a new governance read endpoint built first.
+
 
 Each domain below has reference logic in `apps/web-v2/app/api/bff/admin/*` on
 `main` (port from there to keep contracts current, NOT from the stale

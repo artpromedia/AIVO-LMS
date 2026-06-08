@@ -4,6 +4,13 @@ import { AdminNavGrid } from "@/components/admin-nav";
 
 const SCHOOL_NAV = [
   { href: "/school/learners", title: "Learners", description: "Learners enrolled at your school." },
+  { href: "/school/classes", title: "Classes", description: "Classrooms, teachers, and rosters." },
+  {
+    href: "/school/rostering",
+    title: "Rostering",
+    description: "Import and sync learner rosters from CSV.",
+  },
+  { href: "/school/reports", title: "Reports", description: "Run and export school reports." },
   { href: "/school/billing", title: "Billing", description: "Subscription and seat status." },
   {
     href: "/school/compliance",
