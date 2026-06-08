@@ -54,6 +54,15 @@ import {
   webCoupons,
   webDailyBillingBatches,
   webIepAiDrafts,
+  webSecurityControls,
+  webControlEvidence,
+  webRiskRegister,
+  webIncidents,
+  webIncidentTimeline,
+  webVendors,
+  webStatePrivacyRequirements,
+  webStatePrivacyMappings,
+  webVulnerabilityReports,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -621,6 +630,88 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
         data: d,
       })),
       webIepAiDrafts.id,
+    ),
+  );
+  // ── Sprint 4: web-owned security / SOC 2 / privacy-matrix artifacts ──
+  await log(
+    "securityControls",
+    await bulk(
+      db,
+      webSecurityControls,
+      vals(s.securityControls).map((x) => ({ id: x.id, data: x })),
+      webSecurityControls.id,
+    ),
+  );
+  await log(
+    "controlEvidence",
+    await bulk(
+      db,
+      webControlEvidence,
+      vals(s.securityControlEvidence).map((x) => ({ id: x.id, controlId: x.controlId, data: x })),
+      webControlEvidence.id,
+    ),
+  );
+  await log(
+    "riskRegister",
+    await bulk(
+      db,
+      webRiskRegister,
+      vals(s.riskRegister).map((x) => ({ id: x.id, data: x })),
+      webRiskRegister.id,
+    ),
+  );
+  await log(
+    "incidents",
+    await bulk(
+      db,
+      webIncidents,
+      vals(s.incidents).map((x) => ({ id: x.id, data: x })),
+      webIncidents.id,
+    ),
+  );
+  await log(
+    "incidentTimeline",
+    await bulk(
+      db,
+      webIncidentTimeline,
+      vals(s.incidentTimelineEvents).map((x) => ({ id: x.id, incidentId: x.incidentId, data: x })),
+      webIncidentTimeline.id,
+    ),
+  );
+  await log(
+    "vendors",
+    await bulk(
+      db,
+      webVendors,
+      vals(s.vendors).map((x) => ({ id: x.id, data: x })),
+      webVendors.id,
+    ),
+  );
+  await log(
+    "statePrivacyRequirements",
+    await bulk(
+      db,
+      webStatePrivacyRequirements,
+      vals(s.statePrivacyRequirements).map((x) => ({ id: x.id, data: x })),
+      webStatePrivacyRequirements.id,
+    ),
+  );
+  await log(
+    "statePrivacyMappings",
+    await bulk(
+      db,
+      webStatePrivacyMappings,
+      vals(s.statePrivacyMappings).map((x) => ({ id: x.id, requirementId: x.requirementId, data: x })),
+      webStatePrivacyMappings.id,
+    ),
+  );
+  await log(
+    "vulnerabilityReports",
+    await bulk(
+      db,
+      webVulnerabilityReports,
+      vals(s.vulnerabilityReports).map((x) => ({ id: x.id, data: x })),
+      webVulnerabilityReports.id,
     ),
   );
   await log(

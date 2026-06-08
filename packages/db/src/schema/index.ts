@@ -13,6 +13,7 @@ export * from "./learner-brain-profiles.js";
 export * from "./web-domain.js";
 export * from "./web-billing.js";
 export * from "./web-clinical.js";
+export * from "./web-security.js";
 export * from "./homework.js";
 export * from "./idempotency.js";
 export * from "./collaboration.js";

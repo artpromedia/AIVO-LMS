@@ -55,7 +55,19 @@ import type {
   TenantMembership,
   User,
 } from "@/lib/db/types";
-import type { AgeGateRecord, IepAiDraftRecord } from "@/lib/db/types";
+import type {
+  AgeGateRecord,
+  IepAiDraftRecord,
+  Incident,
+  IncidentTimelineEvent,
+  RiskRegisterEntry,
+  SecurityControl,
+  SecurityControlEvidence,
+  StatePrivacyControlMapping,
+  StatePrivacyRequirement,
+  Vendor,
+  VulnerabilityReport,
+} from "@/lib/db/types";
 import type { Role } from "@/lib/auth/types";
 import type { CreateLearnerInput, PatchLearnerInput } from "@/lib/validators/learner";
 
@@ -500,6 +512,53 @@ export interface ClinicalStore {
   listDraftsForLearners(learnerIds: string[], tenantId: string): Promise<IepAiDraftRecord[]>;
 }
 
+/**
+ * Security / SOC 2 / privacy-matrix domain (Sprint 4) — PLATFORM-GLOBAL
+ * compliance artifacts (no tenant scoping). The store owns raw row-level
+ * reads + writes; id generation, patch-merge, timestamp stamping, and
+ * referential checks stay in repos.ts. Every list is sorted in app code to
+ * match the in-memory store byte-for-byte.
+ */
+export interface SecurityStore {
+  // SOC 2 controls + evidence
+  listControls(): Promise<SecurityControl[]>;
+  getControl(id: string): Promise<SecurityControl | null>;
+  upsertControl(control: SecurityControl): Promise<SecurityControl>;
+  listEvidenceForControl(controlId: string): Promise<SecurityControlEvidence[]>;
+  upsertEvidence(evidence: SecurityControlEvidence): Promise<SecurityControlEvidence>;
+
+  // Risk register
+  listRisks(): Promise<RiskRegisterEntry[]>;
+  getRisk(id: string): Promise<RiskRegisterEntry | null>;
+  upsertRisk(risk: RiskRegisterEntry): Promise<RiskRegisterEntry>;
+
+  // Incidents + timeline
+  listIncidents(): Promise<Incident[]>;
+  getIncident(id: string): Promise<Incident | null>;
+  upsertIncident(incident: Incident): Promise<Incident>;
+  listIncidentTimeline(incidentId: string): Promise<IncidentTimelineEvent[]>;
+  appendIncidentTimeline(event: IncidentTimelineEvent): Promise<IncidentTimelineEvent>;
+
+  // Vendors
+  listVendors(): Promise<Vendor[]>;
+  getVendor(id: string): Promise<Vendor | null>;
+  upsertVendor(vendor: Vendor): Promise<Vendor>;
+
+  // State-privacy-law matrix
+  listStatePrivacyRequirements(): Promise<StatePrivacyRequirement[]>;
+  getStatePrivacyRequirement(id: string): Promise<StatePrivacyRequirement | null>;
+  listStatePrivacyMappingsFor(requirementId: string): Promise<StatePrivacyControlMapping[]>;
+  getStatePrivacyMapping(id: string): Promise<StatePrivacyControlMapping | null>;
+  upsertStatePrivacyMapping(
+    mapping: StatePrivacyControlMapping,
+  ): Promise<StatePrivacyControlMapping>;
+
+  // Vulnerability reports
+  listVulnerabilities(): Promise<VulnerabilityReport[]>;
+  getVulnerability(id: string): Promise<VulnerabilityReport | null>;
+  upsertVulnerability(report: VulnerabilityReport): Promise<VulnerabilityReport>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -516,6 +575,7 @@ export interface Persistence {
   collaboration: CollaborationStore;
   billing: BillingStore;
   clinical: ClinicalStore;
+  security: SecurityStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

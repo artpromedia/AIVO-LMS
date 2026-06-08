@@ -180,6 +180,9 @@ const serverSchema = z.object({
   // Sprint 3 — web-owned IEP AI-draft review inbox. Canonical IEP goals /
   // therapist notes / caregiver observations stay in family-svc (ADR 0015).
   AIVO_PERSISTENCE_CLINICAL: aivoPersistenceOverrideSchema,
+  // Sprint 4 — platform-global security / SOC 2 / incident / vendor /
+  // privacy-matrix compliance artifacts (web_* tables).
+  AIVO_PERSISTENCE_SECURITY: aivoPersistenceOverrideSchema,
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z

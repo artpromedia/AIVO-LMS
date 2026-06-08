@@ -31,6 +31,7 @@ production forces it.
 | 12  | collaboration (insights + members)        | ✅ postgres (proven) | brain-build inputs; newest-first insights                 |
 | 13  | billing — web-owned (Sprint 2)            | ✅ postgres (proven) | `web_billing_accounts` / `web_ai_budgets` / `web_ai_cost_events` / `web_coupons` / `web_daily_billing_batches`; canonical subs/invoices/seats read from billing-svc over REST (ADR 0015, `lib/billing/billing-svc-client.ts`). Migration jobs (cross-domain mock runner) deferred. |
 | 14  | clinical — IEP AI-draft inbox (Sprint 3)  | ✅ postgres (proven) | `web_iep_ai_drafts` (one per learner, review lifecycle) + RLS. Canonical IEP goals / therapist notes / caregiver observations stay in family-svc, written through over REST (ADR 0015, `lib/clinical/family-svc-client.ts` — persist-or-fail-loudly). |
+| 15  | security / SOC 2 / incidents (Sprint 4)   | ✅ postgres (proven) | `web_security_controls` / `web_control_evidence` / `web_risk_register` / `web_incidents` / `web_incident_timeline` / `web_vendors` / `web_state_privacy_requirements` / `web_state_privacy_mappings` / `web_vulnerability_reports`. Platform-global (no tenant) ⇒ no RLS, like policy/subprocessor reference. Status-page incidents/maintenance + Secure Impersonation BFFs de-stubbed: typed upstream errors, no synthetic ids. |
 
 ## Testcontainers parity harness (Sprint 0)
 

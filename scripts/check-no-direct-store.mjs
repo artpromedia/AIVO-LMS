@@ -163,6 +163,39 @@ const MIGRATED_DOMAINS = [
       "progressIepAiDraft",
     ],
   },
+  // Sprint 4 — platform-global security / SOC 2 / incident / vendor /
+  // privacy-matrix / vulnerability artifacts (web_* tables, no RLS).
+  {
+    domain: "security",
+    appPaths: ["api/bff/admin/security"],
+    reposFunctions: [
+      "listSecurityControls",
+      "getSecurityControl",
+      "createSecurityControl",
+      "updateSecurityControl",
+      "listEvidenceForControl",
+      "createControlEvidence",
+      "listRisks",
+      "createRisk",
+      "updateRisk",
+      "listIncidents",
+      "getIncident",
+      "createIncident",
+      "updateIncident",
+      "appendIncidentTimeline",
+      "listIncidentTimeline",
+      "listVendors",
+      "createVendor",
+      "updateVendor",
+      "listStatePrivacyRequirements",
+      "listStatePrivacyMappingsFor",
+      "createStatePrivacyMapping",
+      "updateStatePrivacyMapping",
+      "listVulnerabilities",
+      "createVulnerability",
+      "updateVulnerability",
+    ],
+  },
 ];
 
 // Forbidden signals. `getStore`/`resetStore` as identifiers; `db()` as a call.

@@ -5643,17 +5643,17 @@ import type {
   VulnerabilityStatus,
 } from "@/lib/db/types";
 
-// ---- Security controls + evidence ----
+// ---- Security controls + evidence (Sprint 4: getPersistence().security) ----
 
-export function listSecurityControls(): SecurityControl[] {
-  return Array.from(db().securityControls.values()).sort((a, b) => a.code.localeCompare(b.code));
+export async function listSecurityControls(): Promise<SecurityControl[]> {
+  return await getPersistence().security.listControls();
 }
-export function getSecurityControl(id: string): SecurityControl | null {
-  return db().securityControls.get(id) ?? null;
+export async function getSecurityControl(id: string): Promise<SecurityControl | null> {
+  return await getPersistence().security.getControl(id);
 }
-export function createSecurityControl(
+export async function createSecurityControl(
   input: Omit<SecurityControl, "id" | "createdAt" | "lastReviewedAt"> & { lastReviewedAt?: string },
-): SecurityControl {
+): Promise<SecurityControl> {
   const rec: SecurityControl = {
     id: newId("ctl"),
     createdAt: nowIso(),
@@ -5665,80 +5665,75 @@ export function createSecurityControl(
     owner: input.owner,
     status: input.status,
   };
-  db().securityControls.set(rec.id, rec);
-  return rec;
+  return await getPersistence().security.upsertControl(rec);
 }
-export function updateSecurityControl(
+export async function updateSecurityControl(
   id: string,
   patch: Partial<Omit<SecurityControl, "id" | "code" | "createdAt">>,
-): SecurityControl | null {
-  const c = db().securityControls.get(id);
+): Promise<SecurityControl | null> {
+  const security = getPersistence().security;
+  const c = await security.getControl(id);
   if (!c) return null;
-  Object.assign(c, patch);
-  c.lastReviewedAt = nowIso();
-  return c;
+  return await security.upsertControl({ ...c, ...patch, lastReviewedAt: nowIso() });
 }
 
-export function listEvidenceForControl(controlId: string): SecurityControlEvidence[] {
-  return Array.from(db().securityControlEvidence.values())
-    .filter((e) => e.controlId === controlId)
-    .sort((a, b) => b.collectedAt.localeCompare(a.collectedAt));
+export async function listEvidenceForControl(
+  controlId: string,
+): Promise<SecurityControlEvidence[]> {
+  return await getPersistence().security.listEvidenceForControl(controlId);
 }
-export function createControlEvidence(
+export async function createControlEvidence(
   input: Omit<SecurityControlEvidence, "id" | "collectedAt">,
-): SecurityControlEvidence | null {
-  if (!db().securityControls.has(input.controlId)) return null;
+): Promise<SecurityControlEvidence | null> {
+  const security = getPersistence().security;
+  if (!(await security.getControl(input.controlId))) return null;
   const rec: SecurityControlEvidence = { id: newId("evd"), collectedAt: nowIso(), ...input };
-  db().securityControlEvidence.set(rec.id, rec);
-  return rec;
+  return await security.upsertEvidence(rec);
 }
 
 // ---- Risk register ----
 
-export function listRisks(): RiskRegisterEntry[] {
-  return Array.from(db().riskRegister.values()).sort((a, b) =>
-    b.updatedAt.localeCompare(a.updatedAt),
-  );
+export async function listRisks(): Promise<RiskRegisterEntry[]> {
+  return await getPersistence().security.listRisks();
 }
-export function createRisk(
+export async function createRisk(
   input: Omit<RiskRegisterEntry, "id" | "createdAt" | "updatedAt">,
-): RiskRegisterEntry {
+): Promise<RiskRegisterEntry> {
   const rec: RiskRegisterEntry = {
     id: newId("risk"),
     createdAt: nowIso(),
     updatedAt: nowIso(),
     ...input,
   };
-  db().riskRegister.set(rec.id, rec);
-  return rec;
+  return await getPersistence().security.upsertRisk(rec);
 }
-export function updateRisk(
+export async function updateRisk(
   id: string,
   patch: Partial<Omit<RiskRegisterEntry, "id" | "createdAt">>,
-): RiskRegisterEntry | null {
-  const r = db().riskRegister.get(id);
+): Promise<RiskRegisterEntry | null> {
+  const security = getPersistence().security;
+  const r = await security.getRisk(id);
   if (!r) return null;
-  Object.assign(r, patch);
-  r.updatedAt = nowIso();
-  return r;
+  return await security.upsertRisk({ ...r, ...patch, updatedAt: nowIso() });
 }
 
 // ---- Incidents ----
 
-export function listIncidents(): Incident[] {
-  return Array.from(db().incidents.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function listIncidents(): Promise<Incident[]> {
+  return await getPersistence().security.listIncidents();
 }
-export function getIncident(id: string): Incident | null {
-  return db().incidents.get(id) ?? null;
+export async function getIncident(id: string): Promise<Incident | null> {
+  return await getPersistence().security.getIncident(id);
 }
-export function createIncident(input: {
+export async function createIncident(input: {
   title: string;
   summary: string;
   severity: IncidentSeverity;
   commanderUserId: string;
   customerImpact: boolean;
   regulatorNotificationRequired: boolean;
-}): Incident {
+}): Promise<Incident> {
+  const security = getPersistence().security;
   const now = nowIso();
   const rec: Incident = {
     id: newId("inc"),
@@ -5748,7 +5743,7 @@ export function createIncident(input: {
     createdAt: now,
     ...input,
   };
-  db().incidents.set(rec.id, rec);
+  await security.upsertIncident(rec);
   // Seed an opening timeline entry so post-mortems start with a detection note.
   const tev: IncidentTimelineEvent = {
     id: newId("itl"),
@@ -5758,10 +5753,10 @@ export function createIncident(input: {
     message: `Incident opened at severity ${input.severity}.`,
     occurredAt: now,
   };
-  db().incidentTimelineEvents.set(tev.id, tev);
+  await security.appendIncidentTimeline(tev);
   return rec;
 }
-export function updateIncident(
+export async function updateIncident(
   id: string,
   patch: Partial<
     Pick<
@@ -5774,38 +5769,37 @@ export function updateIncident(
       | "resolvedAt"
     >
   >,
-): Incident | null {
-  const i = db().incidents.get(id);
+): Promise<Incident | null> {
+  const security = getPersistence().security;
+  const i = await security.getIncident(id);
   if (!i) return null;
-  Object.assign(i, patch);
-  if (patch.status === "resolved" && !i.resolvedAt) i.resolvedAt = nowIso();
-  return i;
+  const next: Incident = { ...i, ...patch };
+  if (patch.status === "resolved" && !next.resolvedAt) next.resolvedAt = nowIso();
+  return await security.upsertIncident(next);
 }
-export function appendIncidentTimeline(input: {
+export async function appendIncidentTimeline(input: {
   incidentId: string;
   authorUserId: string;
   kind: IncidentTimelineEvent["kind"];
   message: string;
-}): IncidentTimelineEvent | null {
-  if (!db().incidents.has(input.incidentId)) return null;
+}): Promise<IncidentTimelineEvent | null> {
+  const security = getPersistence().security;
+  if (!(await security.getIncident(input.incidentId))) return null;
   const rec: IncidentTimelineEvent = { id: newId("itl"), occurredAt: nowIso(), ...input };
-  db().incidentTimelineEvents.set(rec.id, rec);
-  return rec;
+  return await security.appendIncidentTimeline(rec);
 }
-export function listIncidentTimeline(incidentId: string): IncidentTimelineEvent[] {
-  return Array.from(db().incidentTimelineEvents.values())
-    .filter((e) => e.incidentId === incidentId)
-    .sort((a, b) => a.occurredAt.localeCompare(b.occurredAt));
+export async function listIncidentTimeline(incidentId: string): Promise<IncidentTimelineEvent[]> {
+  return await getPersistence().security.listIncidentTimeline(incidentId);
 }
 
 // ---- Vendors ----
 
-export function listVendors(): Vendor[] {
-  return Array.from(db().vendors.values()).sort((a, b) => a.name.localeCompare(b.name));
+export async function listVendors(): Promise<Vendor[]> {
+  return await getPersistence().security.listVendors();
 }
-export function createVendor(
+export async function createVendor(
   input: Omit<Vendor, "id" | "createdAt" | "lastReviewedAt"> & { lastReviewedAt?: string },
-): Vendor {
+): Promise<Vendor> {
   const rec: Vendor = {
     id: newId("vnd"),
     createdAt: nowIso(),
@@ -5819,64 +5813,57 @@ export function createVendor(
     approved: input.approved,
     notes: input.notes,
   };
-  db().vendors.set(rec.id, rec);
-  return rec;
+  return await getPersistence().security.upsertVendor(rec);
 }
-export function updateVendor(
+export async function updateVendor(
   id: string,
   patch: Partial<Omit<Vendor, "id" | "createdAt">>,
-): Vendor | null {
-  const v = db().vendors.get(id);
+): Promise<Vendor | null> {
+  const security = getPersistence().security;
+  const v = await security.getVendor(id);
   if (!v) return null;
-  Object.assign(v, patch);
-  v.lastReviewedAt = nowIso();
-  return v;
+  return await security.upsertVendor({ ...v, ...patch, lastReviewedAt: nowIso() });
 }
 
 // ---- State privacy law matrix ----
 
-export function listStatePrivacyRequirements(): StatePrivacyRequirement[] {
-  return Array.from(db().statePrivacyRequirements.values()).sort((a, b) =>
-    a.label.localeCompare(b.label),
-  );
+export async function listStatePrivacyRequirements(): Promise<StatePrivacyRequirement[]> {
+  return await getPersistence().security.listStatePrivacyRequirements();
 }
-export function listStatePrivacyMappingsFor(requirementId: string): StatePrivacyControlMapping[] {
-  return Array.from(db().statePrivacyMappings.values()).filter(
-    (m) => m.requirementId === requirementId,
-  );
+export async function listStatePrivacyMappingsFor(
+  requirementId: string,
+): Promise<StatePrivacyControlMapping[]> {
+  return await getPersistence().security.listStatePrivacyMappingsFor(requirementId);
 }
-export function createStatePrivacyMapping(
+export async function createStatePrivacyMapping(
   input: Omit<StatePrivacyControlMapping, "id" | "reviewedAt">,
-): StatePrivacyControlMapping | null {
-  if (!db().statePrivacyRequirements.has(input.requirementId)) return null;
-  if (!db().securityControls.has(input.controlId)) return null;
+): Promise<StatePrivacyControlMapping | null> {
+  const security = getPersistence().security;
+  if (!(await security.getStatePrivacyRequirement(input.requirementId))) return null;
+  if (!(await security.getControl(input.controlId))) return null;
   const rec: StatePrivacyControlMapping = { id: newId("spm"), reviewedAt: nowIso(), ...input };
-  db().statePrivacyMappings.set(rec.id, rec);
-  return rec;
+  return await security.upsertStatePrivacyMapping(rec);
 }
-export function updateStatePrivacyMapping(
+export async function updateStatePrivacyMapping(
   id: string,
   patch: Partial<Pick<StatePrivacyControlMapping, "status" | "evidence">>,
-): StatePrivacyControlMapping | null {
-  const m = db().statePrivacyMappings.get(id);
+): Promise<StatePrivacyControlMapping | null> {
+  const security = getPersistence().security;
+  const m = await security.getStatePrivacyMapping(id);
   if (!m) return null;
-  Object.assign(m, patch);
-  m.reviewedAt = nowIso();
-  return m;
+  return await security.upsertStatePrivacyMapping({ ...m, ...patch, reviewedAt: nowIso() });
 }
 
 // ---- Vulnerabilities ----
 
-export function listVulnerabilities(): VulnerabilityReport[] {
-  return Array.from(db().vulnerabilityReports.values()).sort((a, b) =>
-    b.discoveredAt.localeCompare(a.discoveredAt),
-  );
+export async function listVulnerabilities(): Promise<VulnerabilityReport[]> {
+  return await getPersistence().security.listVulnerabilities();
 }
-export function createVulnerability(
+export async function createVulnerability(
   input: Omit<VulnerabilityReport, "id" | "discoveredAt" | "resolvedAt"> & {
     discoveredAt?: string;
   },
-): VulnerabilityReport {
+): Promise<VulnerabilityReport> {
   const rec: VulnerabilityReport = {
     id: newId("vuln"),
     discoveredAt: input.discoveredAt ?? nowIso(),
@@ -5889,18 +5876,18 @@ export function createVulnerability(
     affectedComponent: input.affectedComponent,
     fixedIn: input.fixedIn,
   };
-  db().vulnerabilityReports.set(rec.id, rec);
-  return rec;
+  return await getPersistence().security.upsertVulnerability(rec);
 }
-export function updateVulnerability(
+export async function updateVulnerability(
   id: string,
   patch: Partial<Pick<VulnerabilityReport, "status" | "fixedIn" | "severity">>,
-): VulnerabilityReport | null {
-  const v = db().vulnerabilityReports.get(id);
+): Promise<VulnerabilityReport | null> {
+  const security = getPersistence().security;
+  const v = await security.getVulnerability(id);
   if (!v) return null;
-  Object.assign(v, patch);
-  if (patch.status === "fixed" && !v.resolvedAt) v.resolvedAt = nowIso();
-  return v;
+  const next: VulnerabilityReport = { ...v, ...patch };
+  if (patch.status === "fixed" && !next.resolvedAt) next.resolvedAt = nowIso();
+  return await security.upsertVulnerability(next);
 }
 
 // Make types available to BFFs that import from repos.

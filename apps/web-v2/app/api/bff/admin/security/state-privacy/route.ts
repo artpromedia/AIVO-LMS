@@ -16,14 +16,17 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["platform_admin"], requestId);
     if (roleErr) return roleErr;
-    const controls = listSecurityControls();
-    const matrix = listStatePrivacyRequirements().map((req) => ({
-      requirement: req,
-      mappings: listStatePrivacyMappingsFor(req.id).map((m) => ({
-        mapping: m,
-        control: controls.find((c) => c.id === m.controlId) ?? null,
+    const controls = await listSecurityControls();
+    const requirements = await listStatePrivacyRequirements();
+    const matrix = await Promise.all(
+      requirements.map(async (req) => ({
+        requirement: req,
+        mappings: (await listStatePrivacyMappingsFor(req.id)).map((m) => ({
+          mapping: m,
+          control: controls.find((c) => c.id === m.controlId) ?? null,
+        })),
       })),
-    }));
+    );
     return ok({ controls, matrix }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

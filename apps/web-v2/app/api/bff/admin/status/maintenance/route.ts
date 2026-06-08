@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
+import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { ADMIN_ROLES } from "@/lib/bff/admin-scope";
 import { listMaintenances } from "@/lib/services/status-page-svc";
@@ -45,21 +45,15 @@ export async function POST(req: Request): Promise<NextResponse> {
       return ok(res.data, requestId);
     }
 
-    const title = typeof body.title === "string" ? body.title : "Scheduled maintenance";
-    return ok(
+    // No fabricated fallback: a maintenance window that didn't reach
+    // status-page-svc must surface as a typed error, not a synthetic
+    // synthetic local record that was never actually scheduled upstream.
+    return fail(
       {
-        maintenance: {
-          id: `maint-local-${Date.now()}`,
-          title,
-          state: "scheduled",
-          scheduledStart:
-            typeof body.scheduledStart === "string"
-              ? body.scheduledStart
-              : new Date().toISOString(),
-          scheduledEnd:
-            typeof body.scheduledEnd === "string" ? body.scheduledEnd : new Date().toISOString(),
-        },
-        stub: true,
+        code: "upstream_unavailable",
+        message: `status-page-svc rejected maintenance create (status ${res.status}).`,
+        userMessage: "Could not schedule maintenance — the status page service is unavailable.",
+        status: 502,
       },
       requestId,
     );

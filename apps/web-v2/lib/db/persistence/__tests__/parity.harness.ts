@@ -85,6 +85,15 @@ const TABLES = [
   "web_coupons",
   "web_daily_billing_batches",
   "web_iep_ai_drafts",
+  "web_security_controls",
+  "web_control_evidence",
+  "web_risk_register",
+  "web_incidents",
+  "web_incident_timeline",
+  "web_vendors",
+  "web_state_privacy_requirements",
+  "web_state_privacy_mappings",
+  "web_vulnerability_reports",
 ] as const;
 
 const POSTGRES_ENABLED =

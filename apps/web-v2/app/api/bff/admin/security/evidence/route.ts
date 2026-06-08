@@ -33,7 +33,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const rec = createControlEvidence({
+    const rec = await createControlEvidence({
       controlId: parsed.data.controlId,
       kind: parsed.data.kind,
       summary: parsed.data.summary,

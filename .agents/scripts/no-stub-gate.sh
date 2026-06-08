@@ -35,13 +35,12 @@ fi
 # local id (`inc-local-…`, `maint-local-…`, `run-stub-${Date.now()}`).
 BFF_PATTERN='stub:\s*true|\b(inc|maint|run)-local-|-stub-\$\{Date\.now'
 
-# Grandfathered offenders that predate this gate. Each is owned by a later
-# persistence sprint (incidents/maintenance → Sprint 4; ai evals → Sprint 7)
-# and MUST be de-stubbed there. The gate still catches every NEW occurrence.
+# Grandfathered offenders that predate this gate. Sprint 4 de-stubbed the
+# status incidents/maintenance + impersonation BFFs (typed errors, no synthetic
+# ids); the ai evals route is owned by Sprint 7 and MUST be de-stubbed there.
+# The gate catches every NEW occurrence.
 BFF_EXCLUDES=(
   --glob='!**/*test*/**' --glob='!**/*.test.*'
-  --glob='!apps/web-v2/app/api/bff/admin/status/incidents/**'
-  --glob='!apps/web-v2/app/api/bff/admin/status/maintenance/route.ts'
   --glob='!apps/web-v2/app/api/bff/admin/ai/evals/route.ts'
 )
 

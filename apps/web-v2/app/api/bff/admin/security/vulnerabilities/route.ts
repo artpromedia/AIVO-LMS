@@ -55,7 +55,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const rec = createVulnerability({
+    const rec = await createVulnerability({
       title: parsed.data.title,
       cveId: parsed.data.cveId ?? null,
       severity: parsed.data.severity,
@@ -99,7 +99,7 @@ export async function PATCH(req: Request): Promise<NextResponse> {
       );
     }
     const { vulnId, ...patch } = parsed.data;
-    const updated = updateVulnerability(vulnId, { ...patch, fixedIn: patch.fixedIn ?? undefined });
+    const updated = await updateVulnerability(vulnId, { ...patch, fixedIn: patch.fixedIn ?? undefined });
     if (!updated)
       return fail({ ...ERRORS.NOT_FOUND, message: "Vulnerability not found." }, requestId);
     audit(session!, "security.vulnerability.updated", requestId, {
