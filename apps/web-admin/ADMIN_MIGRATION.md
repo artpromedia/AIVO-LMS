@@ -66,6 +66,19 @@ several web-v2 admin stores (e.g. `lib/db/sis-store`) were **in-memory mocks** �
 the real backend is the owning service, so prefer proxying it over copying mock
 data.
 
+## Done — Wave 5 (SIS, proxied to the real owning service)
+
+- **district/sis (+[connectionId])** ← new `@aivo/admin-api/sis` module calling
+  **integration-svc** directly (the owning service, backed by Postgres
+  `integration_connections` / `integration_sync_logs`). Lists a district's
+  roster connectors, shows live sync history, and triggers a sync — **no mock
+  store; every call hits the live service + DB**. Mirrors the direct-service
+  pattern of `identity.ts`. Adds `INTEGRATION_SVC_URL` env helper.
+
+> Policy: **no in-memory mock data** anywhere. Stateful domains connect e2e to a
+> real database — via the owning service (preferred) or, where there is no
+> owner, new admin-svc Drizzle tables + migrations.
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but

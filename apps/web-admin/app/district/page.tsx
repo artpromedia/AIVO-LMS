@@ -15,6 +15,7 @@ import { AdminNavGrid } from "@/components/admin-nav";
 
 const DISTRICT_NAV = [
   { href: "/district/billing", title: "Billing", description: "Accounts and trial conversion." },
+  { href: "/district/sis", title: "SIS connectors", description: "Roster sync (Clever, OneRoster)." },
   { href: "/district/reports", title: "Reports", description: "Run and export district reports." },
   {
     href: "/district/compliance",

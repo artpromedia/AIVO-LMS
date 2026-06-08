@@ -14,4 +14,5 @@ export * from "./platform.js";
 export * from "./reports.js";
 export * from "./rostering.js";
 export * from "./scim.js";
+export * from "./sis.js";
 export * from "./types.js";
