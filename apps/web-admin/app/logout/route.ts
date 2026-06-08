@@ -31,6 +31,7 @@ function safeNext(raw: string | null): string {
 export async function GET(req: Request): Promise<never> {
   const url = new URL(req.url);
   await clearAndRedirect(safeNext(url.searchParams.get("next")));
+  throw new Error("unreachable: clearAndRedirect must redirect");
 }
 
 export async function POST(req: Request): Promise<never> {
@@ -46,4 +47,5 @@ export async function POST(req: Request): Promise<never> {
     }
   }
   await clearAndRedirect(safeNext(next));
+  throw new Error("unreachable: clearAndRedirect must redirect");
 }
