@@ -89,6 +89,12 @@ import {
   webBlockedGenerations,
   webTutorResponseAudits,
   webHomeworkInputAudits,
+  webSupportTickets,
+  webAiGenerationJobs,
+  webTenantSettings,
+  webPlatformApiKeys,
+  webPlatformEmailTemplates,
+  webPlatformWebhookEndpoints,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -894,6 +900,13 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
   await log("blockedGenerations", await bulk(db, webBlockedGenerations, vals(s.blockedGenerations).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webBlockedGenerations.id));
   await log("tutorResponseAudits", await bulk(db, webTutorResponseAudits, vals(s.tutorResponseAudits).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webTutorResponseAudits.id));
   await log("homeworkInputAudits", await bulk(db, webHomeworkInputAudits, vals(s.homeworkInputAudits).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webHomeworkInputAudits.id));
+  // ── Sprint 8: web-owned support + settings ──────────────────────────
+  await log("supportTickets", await bulk(db, webSupportTickets, vals(s.supportTickets).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webSupportTickets.id));
+  await log("aiGenerationJobs", await bulk(db, webAiGenerationJobs, vals(s.aiGenerationJobs).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webAiGenerationJobs.id));
+  await log("tenantSettings", await bulk(db, webTenantSettings, vals(s.tenantSettings).map((x) => ({ tenantId: x.tenantId, data: x })), webTenantSettings.tenantId));
+  await log("platformApiKeys", await bulk(db, webPlatformApiKeys, vals(s.platformApiKeys).map((x) => ({ id: x.id, data: x })), webPlatformApiKeys.id));
+  await log("platformEmailTemplates", await bulk(db, webPlatformEmailTemplates, vals(s.platformEmailTemplates).map((x) => ({ id: x.id, data: x })), webPlatformEmailTemplates.id));
+  await log("platformWebhookEndpoints", await bulk(db, webPlatformWebhookEndpoints, vals(s.platformWebhookEndpoints).map((x) => ({ id: x.id, data: x })), webPlatformWebhookEndpoints.id));
   await log(
     "lessonParentSummaries",
     await bulk(

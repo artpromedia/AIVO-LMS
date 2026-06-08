@@ -50,6 +50,8 @@ import { memoryAudio } from "./memory/audio";
 import { drizzleAudio } from "./drizzle/audio";
 import { memorySafety } from "./memory/safety";
 import { drizzleSafety } from "./drizzle/safety";
+import { memorySupport, memorySettings } from "./memory/support-settings";
+import { drizzleSupport, drizzleSettings } from "./drizzle/support-settings";
 
 type DomainKey =
   | "notifications"
@@ -69,7 +71,9 @@ type DomainKey =
   | "security"
   | "rostering"
   | "audio"
-  | "safety";
+  | "safety"
+  | "support"
+  | "settings";
 
 /**
  * Test-only global mode override. Set by the parity harness
@@ -108,6 +112,8 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     rostering: serverEnv.AIVO_PERSISTENCE_ROSTERING,
     audio: serverEnv.AIVO_PERSISTENCE_AUDIO,
     safety: serverEnv.AIVO_PERSISTENCE_SAFETY,
+    support: serverEnv.AIVO_PERSISTENCE_SUPPORT,
+    settings: serverEnv.AIVO_PERSISTENCE_SETTINGS,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -188,6 +194,8 @@ export function getPersistence(): Persistence {
   const rosteringMode = resolveMode("rostering");
   const audioMode = resolveMode("audio");
   const safetyMode = resolveMode("safety");
+  const supportMode = resolveMode("support");
+  const settingsMode = resolveMode("settings");
   warnOnModeMismatch(assessmentsMode, brainProfilesMode);
   assertAssessmentsBrainSameMode(assessmentsMode, brainProfilesMode);
   cached = {
@@ -214,6 +222,8 @@ export function getPersistence(): Persistence {
     rostering: rosteringMode === "postgres" ? drizzleRostering : memoryRostering,
     audio: audioMode === "postgres" ? drizzleAudio : memoryAudio,
     safety: safetyMode === "postgres" ? drizzleSafety : memorySafety,
+    support: supportMode === "postgres" ? drizzleSupport : memorySupport,
+    settings: settingsMode === "postgres" ? drizzleSettings : memorySettings,
   };
   return cached;
 }

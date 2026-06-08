@@ -31,7 +31,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
       );
     }
     const scope = adminScopeForSession(session!);
-    const updated = updateSupportTicketStatus(ticketId, status, {
+    const updated = await updateSupportTicketStatus(ticketId, status, {
       tenantIds: scope.tenantIds,
     });
     if (!updated) {

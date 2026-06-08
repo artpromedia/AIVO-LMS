@@ -274,7 +274,30 @@ const MIGRATED_DOMAINS = [
       "listHomeworkInputAudits",
       "getBaselinePipelineMetrics",
     ],
-  },];
+  },
+  // Sprint 8 — web-owned support tickets + AI-generation job log, and tenant
+  // + platform settings.
+  {
+    domain: "support",
+    reposFunctions: [
+      "listSupportTickets",
+      "createSupportTicket",
+      "updateSupportTicketStatus",
+      "recordAiGenerationJob",
+      "listAiGenerationJobs",
+    ],
+  },
+  {
+    domain: "settings",
+    reposFunctions: [
+      "getTenantSettings",
+      "updateTenantSettings",
+      "listPlatformApiKeys",
+      "listPlatformEmailTemplates",
+      "listPlatformWebhookEndpoints",
+    ],
+  },
+];
 
 // Forbidden signals. `getStore`/`resetStore` as identifiers; `db()` as a call.
 const IMPORT_RE = /\b(getStore|resetStore)\b/;

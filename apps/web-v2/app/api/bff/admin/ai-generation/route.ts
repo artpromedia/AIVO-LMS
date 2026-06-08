@@ -14,8 +14,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
     const scope = adminScopeForSession(session!);
-    const jobs = listAiGenerationJobs(scope.tenantIds, 200);
-    const health = computeSystemHealth(scope.tenantIds);
+    const jobs = await listAiGenerationJobs(scope.tenantIds, 200);
+    const health = await computeSystemHealth(scope.tenantIds);
     return ok({ jobs, summary: health }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

@@ -18,6 +18,7 @@ export * from "./web-privacy.js";
 export * from "./web-rostering.js";
 export * from "./web-audio.js";
 export * from "./web-safety.js";
+export * from "./web-support-settings.js";
 export * from "./homework.js";
 export * from "./idempotency.js";
 export * from "./collaboration.js";

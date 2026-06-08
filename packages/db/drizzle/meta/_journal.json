@@ -470,6 +470,13 @@
       "when": 1782854400000,
       "tag": "0086_web_audio_safety",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1782940800000,
+      "tag": "0087_web_support_settings",
+      "breakpoints": true
     }
   ]
 }

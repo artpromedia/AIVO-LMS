@@ -43,7 +43,7 @@ export default async function TeacherLessonPlansPage() {
     .sort((a, b) => b.generatedAt.localeCompare(a.generatedAt))
     .slice(0, 30);
 
-  const jobs = listAiGenerationJobs([tenantId], 20).filter((j) => j.kind === "lesson_plan");
+  const jobs = (await listAiGenerationJobs([tenantId], 20)).filter((j) => j.kind === "lesson_plan");
 
   const completeCount = jobs.filter((j) => j.status === "complete").length;
   const failedCount = jobs.filter((j) => j.status === "failed").length;

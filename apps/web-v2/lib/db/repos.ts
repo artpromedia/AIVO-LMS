@@ -3266,23 +3266,26 @@ export async function listAuditLogsForTenants(
 }
 
 /** AI generation jobs scoped to a tenant set, newest first. */
-export function listAiGenerationJobs(tenantIds: string[], limit = 100): AiGenerationJob[] {
+export async function listAiGenerationJobs(
+  tenantIds: string[],
+  limit = 100,
+): Promise<AiGenerationJob[]> {
   const ids = new Set(tenantIds);
-  return Array.from(db().aiGenerationJobs.values())
+  return (await getPersistence().support.listAiGenerationJobs())
     .filter((j) => ids.has(j.tenantId))
     .sort((a, b) => b.startedAt.localeCompare(a.startedAt))
     .slice(0, limit);
 }
 
 /** Append a telemetry record. S20: every AI call gets logged. */
-export function recordAiGenerationJob(input: {
+export async function recordAiGenerationJob(input: {
   tenantId: string;
   kind: AiGenerationJob["kind"];
   status: AiGenerationJob["status"];
   inputRef: string;
   outputRef?: string | null;
   completedAt?: string | null;
-}): AiGenerationJob {
+}): Promise<AiGenerationJob> {
   const id = newId("aij");
   const job: AiGenerationJob = {
     id,
@@ -3294,8 +3297,7 @@ export function recordAiGenerationJob(input: {
     startedAt: nowIso(),
     completedAt: input.completedAt ?? null,
   };
-  db().aiGenerationJobs.set(id, job);
-  return job;
+  return await getPersistence().support.appendAiGenerationJob(job);
 }
 
 /** Aggregate health derived from generation jobs + lesson runs. */
@@ -3308,9 +3310,11 @@ export type SystemHealth = {
   tenantsTotal: number;
   usersTotal: number;
 };
-export function computeSystemHealth(tenantIds: string[]): SystemHealth {
+export async function computeSystemHealth(tenantIds: string[]): Promise<SystemHealth> {
   const ids = new Set(tenantIds);
-  const jobs = Array.from(db().aiGenerationJobs.values()).filter((j) => ids.has(j.tenantId));
+  const jobs = (await getPersistence().support.listAiGenerationJobs()).filter((j) =>
+    ids.has(j.tenantId),
+  );
   const complete = jobs.filter((j) => j.status === "complete").length;
   const failed = jobs.filter((j) => j.status === "failed").length;
   const queued = jobs.filter((j) => j.status === "queued" || j.status === "running").length;
@@ -3342,19 +3346,19 @@ export async function listBillingForTenants(tenantIds: string[]): Promise<Billin
 }
 
 /** Support tickets. */
-export function listSupportTickets(tenantIds: string[]): SupportTicket[] {
+export async function listSupportTickets(tenantIds: string[]): Promise<SupportTicket[]> {
   const ids = new Set(tenantIds);
-  return Array.from(db().supportTickets.values())
+  return (await getPersistence().support.listSupportTickets())
     .filter((t) => ids.has(t.tenantId))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function createSupportTicket(input: {
+export async function createSupportTicket(input: {
   userId: string;
   tenantId: string;
   subject: string;
   body: string;
-}): SupportTicket {
+}): Promise<SupportTicket> {
   const id = newId("tkt");
   const ticket: SupportTicket = {
     id,
@@ -3365,21 +3369,19 @@ export function createSupportTicket(input: {
     status: "open",
     createdAt: nowIso(),
   };
-  db().supportTickets.set(id, ticket);
-  return ticket;
+  return await getPersistence().support.upsertSupportTicket(ticket);
 }
 
-export function updateSupportTicketStatus(
+export async function updateSupportTicketStatus(
   id: string,
   status: SupportTicket["status"],
   scope: { tenantIds: string[] },
-): SupportTicket | null {
-  const t = db().supportTickets.get(id);
+): Promise<SupportTicket | null> {
+  const support = getPersistence().support;
+  const t = await support.getSupportTicket(id);
   if (!t) return null;
   if (!scope.tenantIds.includes(t.tenantId)) return null;
-  const next: SupportTicket = { ...t, status };
-  db().supportTickets.set(id, next);
-  return next;
+  return await support.upsertSupportTicket({ ...t, status });
 }
 
 // ===== Sprint 24: Consent + Terms + Age gate =====
@@ -5960,11 +5962,11 @@ function defaultTenantSettings(tenantId: string): TenantSettings {
  * Read tenant settings, returning sane defaults if the tenant has never
  * been written. Never returns null so callers can safely render forms.
  */
-export function getTenantSettings(tenantId: string): TenantSettings {
-  return db().tenantSettings.get(tenantId) ?? defaultTenantSettings(tenantId);
+export async function getTenantSettings(tenantId: string): Promise<TenantSettings> {
+  return (await getPersistence().settings.getTenantSettings(tenantId)) ?? defaultTenantSettings(tenantId);
 }
 
-export function updateTenantSettings(
+export async function updateTenantSettings(
   tenantId: string,
   patch: {
     branding?: Partial<TenantBranding>;
@@ -5972,8 +5974,8 @@ export function updateTenantSettings(
     features?: Partial<TenantFeatureOverrides>;
     sso?: Partial<TenantSSOConfig>;
   },
-): TenantSettings {
-  const current = getTenantSettings(tenantId);
+): Promise<TenantSettings> {
+  const current = await getTenantSettings(tenantId);
   const next: TenantSettings = {
     ...current,
     branding: { ...current.branding, ...(patch.branding ?? {}) },
@@ -5982,8 +5984,7 @@ export function updateTenantSettings(
     sso: { ...current.sso, ...(patch.sso ?? {}) },
     updatedAt: nowIso(),
   };
-  db().tenantSettings.set(tenantId, next);
-  return next;
+  return await getPersistence().settings.upsertTenantSettings(next);
 }
 
 /** Every learner whose tenant is in `tenantIds`. */
@@ -6175,22 +6176,22 @@ export async function listDailyBillingBatches(): Promise<DailyBillingBatch[]> {
 // ============================================================
 
 /** Every platform API key, newest first. Secrets are never returned. */
-export function listPlatformApiKeys(): PlatformApiKey[] {
-  return Array.from(db().platformApiKeys.values()).sort((a, b) =>
+export async function listPlatformApiKeys(): Promise<PlatformApiKey[]> {
+  return (await getPersistence().settings.listPlatformApiKeys()).sort((a, b) =>
     b.createdAt.localeCompare(a.createdAt),
   );
 }
 
 /** Every platform email template, alphabetised by name. */
-export function listPlatformEmailTemplates(): PlatformEmailTemplate[] {
-  return Array.from(db().platformEmailTemplates.values()).sort((a, b) =>
+export async function listPlatformEmailTemplates(): Promise<PlatformEmailTemplate[]> {
+  return (await getPersistence().settings.listPlatformEmailTemplates()).sort((a, b) =>
     a.name.localeCompare(b.name),
   );
 }
 
 /** Every platform webhook endpoint, newest first. */
-export function listPlatformWebhookEndpoints(): PlatformWebhookEndpoint[] {
-  return Array.from(db().platformWebhookEndpoints.values()).sort((a, b) =>
+export async function listPlatformWebhookEndpoints(): Promise<PlatformWebhookEndpoint[]> {
+  return (await getPersistence().settings.listPlatformWebhookEndpoints()).sort((a, b) =>
     b.createdAt.localeCompare(a.createdAt),
   );
 }

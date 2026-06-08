@@ -120,6 +120,12 @@ const TABLES = [
   "web_blocked_generations",
   "web_tutor_response_audits",
   "web_homework_input_audits",
+  "web_support_tickets",
+  "web_ai_generation_jobs",
+  "web_tenant_settings",
+  "web_platform_api_keys",
+  "web_platform_email_templates",
+  "web_platform_webhook_endpoints",
 ] as const;
 
 const POSTGRES_ENABLED =

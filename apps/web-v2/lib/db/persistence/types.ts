@@ -20,6 +20,12 @@ import type {
   BaselineItemResponseLog,
   BaselineQuestion,
   BillingAccount,
+  AiGenerationJob,
+  PlatformApiKey,
+  PlatformEmailTemplate,
+  PlatformWebhookEndpoint,
+  SupportTicket,
+  TenantSettings,
   AudioAsset,
   AudioCacheEntry,
   BlockedGeneration,
@@ -681,6 +687,32 @@ export interface SafetyStore {
   listHomeworkInputAudits(): Promise<HomeworkInputAudit[]>;
 }
 
+/**
+ * Support domain (Sprint 8) — support tickets + the AI-generation job log.
+ * Filtering/sorting + status-scope checks stay in repos. No RLS (admin
+ * cross-tenant consoles).
+ */
+export interface SupportStore {
+  listSupportTickets(): Promise<SupportTicket[]>;
+  getSupportTicket(id: string): Promise<SupportTicket | null>;
+  upsertSupportTicket(ticket: SupportTicket): Promise<SupportTicket>;
+  listAiGenerationJobs(): Promise<AiGenerationJob[]>;
+  appendAiGenerationJob(job: AiGenerationJob): Promise<AiGenerationJob>;
+}
+
+/**
+ * Settings domain (Sprint 8) — per-tenant settings (keyed by tenantId) + the
+ * platform settings catalogs (API keys, email templates, webhook endpoints).
+ * No RLS (tenant-keyed + platform-global).
+ */
+export interface SettingsStore {
+  getTenantSettings(tenantId: string): Promise<TenantSettings | null>;
+  upsertTenantSettings(settings: TenantSettings): Promise<TenantSettings>;
+  listPlatformApiKeys(): Promise<PlatformApiKey[]>;
+  listPlatformEmailTemplates(): Promise<PlatformEmailTemplate[]>;
+  listPlatformWebhookEndpoints(): Promise<PlatformWebhookEndpoint[]>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -701,6 +733,8 @@ export interface Persistence {
   rostering: RosteringStore;
   audio: AudioStore;
   safety: SafetyStore;
+  support: SupportStore;
+  settings: SettingsStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.
