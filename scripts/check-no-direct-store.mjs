@@ -46,10 +46,90 @@ const REPOS = join(WEB_V2, "lib", "db", "repos.ts");
 
 /** @type {MigratedDomain[]} */
 const MIGRATED_DOMAINS = [
-  // Sprint 1+ appends entries here as each domain is migrated, e.g.:
-  // { domain: "billing",
-  //   appPaths: ["api/bff/parent/billing", "parent/billing"],
-  //   reposFunctions: ["listInvoices", "getSubscription"] },
+  // Sprint 1 — the 12 originally-migrated domains, proven on Postgres via the
+  // parity harness. Their migrated repos.ts entrypoints are locked clean here
+  // so a regression that reaches back into the Map store fails CI. (Page
+  // components that still read the store across several domains are a separate
+  // presentation-layer cleanup tracked for a later sprint; only verified-clean
+  // surfaces are listed.)
+  {
+    domain: "notifications",
+    reposFunctions: [
+      "createNotification",
+      "listNotifications",
+      "markNotificationsRead",
+      "listDeliveriesFor",
+    ],
+  },
+  {
+    domain: "audit",
+    reposFunctions: ["recordAudit", "recentAuditLogs", "listAuditLogsForTenants"],
+  },
+  {
+    domain: "identity",
+    appPaths: ["api/bff/account", "parent/settings/account"],
+    reposFunctions: [
+      "getUserById",
+      "listUsersForTenants",
+      "addStaffUser",
+      "removeStaffUser",
+      "updateUserDisplayName",
+    ],
+  },
+  {
+    domain: "learners",
+    reposFunctions: [
+      "createLearner",
+      "getLearner",
+      "listLearnersForParent",
+      "parentCanAccessLearner",
+      "updateLearner",
+      "deleteLearner",
+      "findPrimaryParentForLearner",
+    ],
+  },
+  {
+    domain: "assessments",
+    reposFunctions: [
+      "getOrCreateParentAssessment",
+      "findParentAssessment",
+      "submitParentAssessment",
+      "patchParentAssessmentSection",
+    ],
+  },
+  {
+    domain: "lessonRuns",
+    reposFunctions: ["getLessonRun", "listLessonRunsForLearner"],
+  },
+  {
+    domain: "brainProfiles",
+    reposFunctions: ["getBrainProfile", "upsertBrainProfile"],
+  },
+  {
+    domain: "curriculum",
+    reposFunctions: ["listSubjects", "getSubjectById", "listSkills", "getSkill"],
+  },
+  {
+    domain: "compliance",
+    reposFunctions: [
+      "getActiveConsentForUser",
+      "listConsentsForUser",
+      "listSubprocessors",
+      "listPolicyVersions",
+    ],
+  },
+  {
+    domain: "quests",
+    reposFunctions: ["listQuestWorlds", "listQuestChapters"],
+  },
+  {
+    domain: "admin",
+    reposFunctions: ["listSchools", "getSchool", "listClassrooms", "getClassroom"],
+  },
+  {
+    domain: "collaboration",
+    reposFunctions: ["setTeamInviteDecision"],
+  },
 ];
 
 // Forbidden signals. `getStore`/`resetStore` as identifiers; `db()` as a call.

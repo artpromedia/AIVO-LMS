@@ -5,26 +5,30 @@
 - **Deciders:** web-v2 platform team
 - **Related:** AIVO-LMS audit gap #4 ("web-v2 core runtime still in-memory/mock-backed")
 
-## Rollout status (as of 2026-05-28)
+## Rollout status (Sprint 1 — 2026-06-08)
 
-All 11 migration steps have routed their repo functions through the
-`Persistence` adapter. The memory adapter is the default in every
-mode; the drizzle adapter is a per-domain stub awaiting the schema
-wiring listed in each `drizzle/*.ts` file's header comment.
+All 12 originally-migrated domains route their repo functions through the
+`Persistence` adapter, and the drizzle adapter for each is **fully
+implemented and parity-proven on Postgres** (Sprint 1). The Testcontainers
+parity harness replays every per-domain suite against memory AND postgres and
+asserts identical results; `scripts/check-no-direct-store.mjs` locks the
+migrated entrypoints clean. Staging defaults to `postgres` for these 12;
+production forces it.
 
-| #   | Domain                                    | Status    | Notes                                                                  |
-| --- | ----------------------------------------- | --------- | ---------------------------------------------------------------------- |
-| 1   | notifications                             | ✅ memory | drizzle stub; awaits notifications schema in packages/db               |
-| 2   | audit log                                 | ✅ memory | drizzle stub; awaits audit_logs schema                                 |
-| 3   | identity (users + memberships)            | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/users)           |
-| 4   | learners + parent/learner relationships   | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/learners)        |
-| 5   | assessments + baseline runs               | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/assessments)     |
-| 6   | lesson runs + generated lesson plans      | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/learning)        |
-| 7   | brain profile / clone                     | ✅ memory | drizzle wiring deferred; bypassed when AIVO_USE_BRAIN_SVC=true         |
-| 8   | curriculum (subjects/skills/path/mastery) | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/curriculum)      |
-| 9   | care team + consent + privacy             | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/data-governance) |
-| 10  | quests / gamification                     | ✅ memory | drizzle stub; awaits quests schema in packages/db                      |
-| 11  | teacher / school / district admin         | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/tenancy)         |
+| #   | Domain                                    | Status         | Notes                                                              |
+| --- | ----------------------------------------- | -------------- | ------------------------------------------------------------------ |
+| 1   | notifications                             | ✅ postgres (proven) | `web_notifications` + deliveries; parity test green        |
+| 2   | audit log                                 | ✅ postgres (proven) | `web_audit_logs`; append-only, tenant-scoped reads        |
+| 3   | identity (users + memberships)            | ✅ postgres (proven) | `web_users` + `web_memberships`                           |
+| 4   | learners + parent/learner relationships   | ✅ postgres (proven) | `web_learner_profiles` + relationships                    |
+| 5   | assessments + baseline runs               | ✅ postgres (proven) | parent + baseline + telemetry; latest-attempt-wins parity |
+| 6   | lesson runs + generated lesson plans      | ✅ postgres (proven) | `lesson_runs` + plans + interactions + summaries          |
+| 7   | brain profile / clone                     | ✅ postgres (proven) | `learner_brain_profiles`; same-mode as assessments (hard) |
+| 8   | curriculum (subjects/skills/path/mastery) | ✅ postgres (proven) | reference set + per-learner mastery/path                  |
+| 9   | care team + consent + privacy             | ✅ postgres (proven) | consent/IEP/age-gate + policy/subprocessor catalogs       |
+| 10  | quests / gamification                     | ✅ postgres (proven) | worlds/chapters reference + per-learner progress          |
+| 11  | teacher / school / district admin         | ✅ postgres (proven) | schools/classrooms/enrollments/assignments                |
+| 12  | collaboration (insights + members)        | ✅ postgres (proven) | brain-build inputs; newest-first insights                 |
 
 ## Testcontainers parity harness (Sprint 0)
 

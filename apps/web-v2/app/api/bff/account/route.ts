@@ -4,7 +4,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import { updateUserDisplayName } from "@/lib/db/repos";
-import { getStore } from "@/lib/db/store";
+import { getPersistence } from "@/lib/db/persistence";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const user = getStore().users.get(session!.userId) ?? null;
+    const user = await getPersistence().identity.getUserById(session!.userId);
     return ok({ user, role: session!.role }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

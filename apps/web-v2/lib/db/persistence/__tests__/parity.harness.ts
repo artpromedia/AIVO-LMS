@@ -189,6 +189,11 @@ export function runInBothModes(name: string, suite: (ctx: ParityContext) => void
 
     beforeEach(async () => {
       if (!handle) return;
+      // seedPostgres copies the in-memory store into postgres, so the memory
+      // store must be pristine first — otherwise rows a prior memory-pass test
+      // created leak into the postgres seed and skew counts.
+      resetStore();
+      ensureSeeded();
       await truncateAll(handle);
       await seedPostgres(handle.db);
       __setPersistenceModeOverride("postgres");

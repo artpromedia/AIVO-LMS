@@ -115,6 +115,33 @@ function warnOnModeMismatch(assessmentsMode: PersistenceMode, brainProfilesMode:
   }
 }
 
+/**
+ * Sprint 1 — a divergent assessments/brainProfiles mode is no longer a soft
+ * warning: it is a fail-fast misconfiguration. The brain clone produced by
+ * `submitParentAssessment` / `completeBaseline` is written through
+ * `brainProfiles` and must land in the SAME backend the assessment lives in,
+ * or the downstream build reads an empty store and "looks broken". This guard
+ * throws so a bad `AIVO_PERSISTENCE_ASSESSMENTS` / `AIVO_PERSISTENCE_BRAIN_PROFILES`
+ * combination is caught at the first `getPersistence()` rather than at a
+ * learner's brain build. `warnOnModeMismatch` is retained for the structured
+ * log line; this is the hard stop.
+ */
+export function assertAssessmentsBrainSameMode(
+  assessmentsMode: PersistenceMode,
+  brainProfilesMode: PersistenceMode,
+): void {
+  if (assessmentsMode !== brainProfilesMode) {
+    throw new Error(
+      `[persistence] assessments (${assessmentsMode}) and brainProfiles ` +
+        `(${brainProfilesMode}) resolved to different modes. They MUST share a ` +
+        `mode — the brain clone is written through brainProfiles and must land ` +
+        `in the same backend the assessment lives in. Set ` +
+        `AIVO_PERSISTENCE_ASSESSMENTS and AIVO_PERSISTENCE_BRAIN_PROFILES to the ` +
+        `same value (or rely on AIVO_PERSISTENCE for both).`,
+    );
+  }
+}
+
 let cached: Persistence | null = null;
 
 export function getPersistence(): Persistence {
@@ -132,6 +159,7 @@ export function getPersistence(): Persistence {
   const adminMode = resolveMode("admin");
   const collaborationMode = resolveMode("collaboration");
   warnOnModeMismatch(assessmentsMode, brainProfilesMode);
+  assertAssessmentsBrainSameMode(assessmentsMode, brainProfilesMode);
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).
