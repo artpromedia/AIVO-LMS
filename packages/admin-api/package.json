@@ -94,6 +94,10 @@
       "types": "./dist/security.d.ts",
       "default": "./dist/security.js"
     },
+    "./support": {
+      "types": "./dist/support.d.ts",
+      "default": "./dist/support.js"
+    },
     "./sis": {
       "types": "./dist/sis.d.ts",
       "default": "./dist/sis.js"

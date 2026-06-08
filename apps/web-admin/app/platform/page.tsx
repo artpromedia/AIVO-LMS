@@ -67,6 +67,7 @@ const PLATFORM_NAV = [
     title: "Pronunciation",
     description: "TTS pronunciation override dictionary.",
   },
+  { href: "/platform/support", title: "Support", description: "Customer support ticket queue." },
   { href: "/platform/audit", title: "Audit log", description: "Hash-chained admin action history." },
   { href: "/platform/jobs", title: "Jobs", description: "Scheduled job freshness and run health." },
   {

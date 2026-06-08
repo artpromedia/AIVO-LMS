@@ -173,6 +173,15 @@ telemetry in web-v2 with no event pipeline — surfacing it would require
 fabricating data (violates no-mock) or building a usage-ingestion pipeline.
 Left for a dedicated telemetry effort rather than mocked.
 
+## Done — Wave 13 (support ticket queue)
+
+No owning service → admin-svc owns a new table:
+- `@aivo/db`: `support_tickets` table + migration `0080`.
+- `admin-svc`: `routes/support.ts` (list w/ status filter, create, update
+  status/assignee; visible to platform_admin + support; writes audited). 34 tests pass.
+- `@aivo/admin-api/support` + `platform/support` page (queue with status filter
+  chips + KPIs + per-ticket status updates).
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but
