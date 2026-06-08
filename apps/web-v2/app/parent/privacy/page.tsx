@@ -21,8 +21,8 @@ export default async function Page() {
   const t = await getTranslations("parent.privacy");
   const policies = await listPolicyVersions();
   const subs = await listSubprocessors();
-  const exportReqs = listDataExportRequestsForUser(session.userId, session.tenantId);
-  const deleteReqs = listDataDeletionRequestsForUser(session.userId, session.tenantId);
+  const exportReqs = await listDataExportRequestsForUser(session.userId, session.tenantId);
+  const deleteReqs = await listDataDeletionRequestsForUser(session.userId, session.tenantId);
 
   const links: { href: string; label: string; description: string; icon: React.ReactNode }[] = [
     {

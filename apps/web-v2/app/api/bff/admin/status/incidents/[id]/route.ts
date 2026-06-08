@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
+import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { ADMIN_ROLES } from "@/lib/bff/admin-scope";
 import { getIncident } from "@/lib/services/status-page-svc";
@@ -49,15 +49,15 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
       return ok(res.data, requestId);
     }
 
-    // Fallback so lifecycle controls reflect the requested change locally.
-    return ok(
+    // No fabricated fallback: a lifecycle change that didn't reach
+    // status-page-svc must surface as a typed error, not a local echo that
+    // pretends the incident was updated.
+    return fail(
       {
-        incident: {
-          id,
-          ...body,
-          updatedAt: new Date().toISOString(),
-        },
-        stub: true,
+        code: "upstream_unavailable",
+        message: `status-page-svc rejected incident update (status ${res.status}).`,
+        userMessage: "Could not update the incident — the status page service is unavailable.",
+        status: 502,
       },
       requestId,
     );

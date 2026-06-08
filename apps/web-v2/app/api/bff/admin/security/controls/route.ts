@@ -19,7 +19,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["platform_admin"], requestId);
     if (roleErr) return roleErr;
-    const controls = listSecurityControls();
+    const controls = await listSecurityControls();
     const withEvidence = controls.map((c) => ({
       control: c,
       evidence: listEvidenceForControl(c.id),
@@ -63,7 +63,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const control = createSecurityControl(parsed.data);
+    const control = await createSecurityControl(parsed.data);
     audit(session!, "security.control.created", requestId, {
       metadata: { controlId: control.id, code: control.code },
     });

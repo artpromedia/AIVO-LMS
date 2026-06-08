@@ -97,12 +97,61 @@ tables).
   app back at the owner `DATABASE_URL` (owner bypasses RLS) while
   investigating. Prefer the latter — it is instant and reversible.
 
+
+## Memory is a test-only fixture (Sprint 9)
+
+`AIVO_PERSISTENCE=memory` (and any `AIVO_PERSISTENCE_*=memory`) is rejected in
+production — both at boot (lib/env.ts schema) and at the first getPersistence()
+(assertNoMemoryAdapterInProduction). The in-memory Map backs only Vitest and the
+`AIVO_TEST_MODE=1` CI/e2e escape hatch. There is no "roll back to memory" lever
+in production: a domain regression is rolled back by reverting code / migrations
+and (if needed) restoring Postgres from backup (see Backups & PITR above), not
+by flipping a domain to memory.
+
+## Verify parity (local container)
+
+Every domain must behave identically on Postgres as in memory. Prove it
+locally against a real, containerized Postgres before flipping anything:
+
+```bash
+# 1. Bring up the containerized Postgres (the DB every sprint validates on).
+docker compose -f docker-compose.web-v2-db.yml up -d --wait
+
+# 2. Point the persistence suite at it and run the parity harness. Either:
+#    a) attach to the container directly:
+export AIVO_TEST_DATABASE_URL=postgres://aivo:aivo@localhost:5432/aivo_web
+pnpm --filter @aivo/web-v2 exec vitest run lib/db/persistence --no-file-parallelism
+#    b) or let the harness self-provision a throwaway container per run:
+AIVO_PARITY_POSTGRES=1 pnpm --filter @aivo/web-v2 test:persistence
+```
+
+`runInBothModes` (in `lib/db/persistence/__tests__/parity.harness.ts`) replays
+each suite against memory and Postgres and asserts identical results;
+`seed-parity.postgres.test.ts` asserts the seeded reference-row counts match
+memory and that re-seeding is idempotent. With no DB reachable the postgres
+passes skip rather than fail. CI runs the same suite in
+`.github/workflows/web-v2-persistence.yml`.
+
+To exercise the full app on Postgres (mixed memory/postgres during the
+migration) bring the container up, then:
+
+```bash
+export DATABASE_URL=postgres://aivo:aivo@localhost:5432/aivo_web
+pnpm --filter @aivo/db run db:migrate
+pnpm --filter @aivo/web-v2 db:seed:postgres
+AIVO_PERSISTENCE=postgres pnpm --filter @aivo/web-v2 e2e
+```
+
 ## Verification checklist before flipping the global default
 
 - [ ] `pnpm persistence:stubs` → 0 stubs.
-- [ ] CI `persistence-contract` green (all 11 store contracts + RLS
-      against real Postgres).
-- [ ] Seed ran; reference reads (subjects, quests, policies) non-empty.
+- [ ] `node scripts/check-no-direct-store.mjs` → no migrated domain reaches
+      `getStore()`/`db()`.
+- [ ] CI `web-v2-persistence` green (`parity`, `no-direct-store`,
+      `e2e-postgres`) plus the store contracts + RLS against real Postgres.
+- [ ] Parity harness green in **both** memory and postgres locally.
+- [ ] Seed ran; reference reads (subjects, quests, policies) non-empty and
+      count-matched to memory (`seed-parity.postgres.test.ts`).
 - [ ] App configured with the `aivo_app` login role + `withTenantContext`
       on hot paths.
 - [ ] Backup + PITR enabled and a restore drill passed.

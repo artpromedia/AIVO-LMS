@@ -58,7 +58,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const vendor = createVendor({ ...parsed.data, notes: parsed.data.notes ?? null });
+    const vendor = await createVendor({ ...parsed.data, notes: parsed.data.notes ?? null });
     audit(session!, "security.vendor.created", requestId, {
       metadata: { vendorId: vendor.id, name: vendor.name },
     });

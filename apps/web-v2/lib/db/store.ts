@@ -1,11 +1,20 @@
 /**
- * In-memory store standing in for Postgres until Sprint 24 wires a real DB.
- * All repository functions read from this module. Designed so swapping in
- * Drizzle + Postgres only requires replacing the body of `lib/db/repos.ts`.
+ * In-memory Map store — now a TEST FIXTURE, not a production datastore
+ * (ADR 0007, Sprints 0–9). Every migrated domain (22 of them) reads/writes
+ * Postgres via `getPersistence()` and is parity-proven; in production the
+ * persistence adapter REFUSES `memory` (lib/env.ts schema +
+ * `assertNoMemoryAdapterInProduction` in persistence/index.ts), so the
+ * memory adapters here are reached only under `NODE_ENV=test` / vitest.
  *
- * Survives within a single Node process. Each route handler imports the same
- * module instance, so writes from one request are visible to the next inside
- * the dev server. Restart `Web App` workflow to reset.
+ * Remaining direct readers: a set of not-yet-migrated repos functions whose
+ * canonical data is owned by a service per ADR 0015 (tutor-svc curriculum
+ * uploads, billing-svc subscriptions/seats, family-svc clinical, identity-svc
+ * tenants) plus a few cross-domain aggregate readers. These still call
+ * `getStore()` for their dev/mock path and are tracked for the final REST
+ * cutover; until then `getStore()` is intentionally NOT hard-gated so those
+ * paths keep working in dev. `resetStore()` is for Vitest fixtures only.
+ *
+ * Survives within a single Node process (dev/test). Restart to reset.
  */
 import type {
   AccommodationSummary,

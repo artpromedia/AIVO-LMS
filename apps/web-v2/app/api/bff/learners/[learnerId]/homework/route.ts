@@ -29,7 +29,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = await requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const sessions = listHomeworkSessionsForLearner(learnerId, session!.tenantId, {
+    const sessions = await listHomeworkSessionsForLearner(learnerId, session!.tenantId, {
       limit: 50,
     });
     // Parents/teachers only see topic + insight + timestamps, not raw messages.
@@ -105,7 +105,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       attachment = parsed.attachment;
     }
     const subjectId = classifySubject(topic);
-    const created = createHomeworkSession({
+    const created = await createHomeworkSession({
       learnerId,
       tenantId: session!.tenantId,
       topic,
@@ -120,7 +120,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       learnerId,
       tenantId: session!.tenantId,
     });
-    const withOpener = appendHomeworkMessage(created.id, session!.tenantId, {
+    const withOpener = await appendHomeworkMessage(created.id, session!.tenantId, {
       role: "tutor",
       text: opener.text,
       guidedOnly: opener.guidedOnly,

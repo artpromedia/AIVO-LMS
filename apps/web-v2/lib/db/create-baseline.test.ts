@@ -75,6 +75,10 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
   it("falls back to BANK when AIVO_FEATURE_BASELINE_LLM is OFF", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "false");
     vi.stubEnv("NODE_ENV", "production"); // also turn off the dev default
+    // Sprint 9: NODE_ENV=production here only exercises the LLM-off branch; the
+    // persistence layer is still the in-memory test fixture, so signal "this is
+    // a test" so assertNoMemoryAdapterInProduction stays a no-op.
+    vi.stubEnv("AIVO_TEST_MODE", "1");
     await primeSubmittedParentAssessment();
 
     const fetchSpy = vi.fn();

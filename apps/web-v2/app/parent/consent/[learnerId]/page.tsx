@@ -32,7 +32,7 @@ export default async function Page({ params }: { params: Promise<{ learnerId: st
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const versions = listConsentVersions();
+  const versions = await listConsentVersions();
   const records = await listConsentsForLearner(session.userId, learnerId, session.tenantId);
   const ageGate = await getAgeGateForLearner(learnerId, session.tenantId);
 

@@ -22,7 +22,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const state = getLessonSyncState(lessonRunId, session!.tenantId);
+    const state = await getLessonSyncState(lessonRunId, session!.tenantId);
     if (!state) {
       // Empty initial state — return version 0 so callers can POST baseVersion=0
       // to create the row on the next write. No learner data is leaked here.
@@ -63,7 +63,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
     const scopeErr = await requireLearnerScope(session!, parsed.data.learnerId, requestId);
     if (scopeErr) return scopeErr;
-    const result = putLessonSyncState({
+    const result = await putLessonSyncState({
       lessonRunId,
       tenantId: session!.tenantId,
       learnerId: parsed.data.learnerId,

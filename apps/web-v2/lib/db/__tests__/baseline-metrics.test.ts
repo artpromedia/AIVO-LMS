@@ -17,15 +17,15 @@ describe("getBaselinePipelineMetrics", () => {
     getStore().moderationEvents.clear();
   });
 
-  it("returns 0 metrics on an empty store", () => {
-    const m = getBaselinePipelineMetrics();
+  it("returns 0 metrics on an empty store", async () => {
+    const m = await getBaselinePipelineMetrics();
     expect(m.totalEvaluatedItems).toBe(0);
     expect(m.blockRatePct).toBe(0);
     expect(m.fallbackShareOfShippedPct).toBe(0);
     expect(m.topViolations).toEqual([]);
   });
 
-  it("aggregates moderation events into block / allow buckets", () => {
+  it("aggregates moderation events into block / allow buckets", async () => {
     const store = getStore();
     const now = new Date().toISOString();
     store.moderationEvents.set("a", {
@@ -65,7 +65,7 @@ describe("getBaselinePipelineMetrics", () => {
       createdAt: now,
     } as never);
 
-    const m = getBaselinePipelineMetrics();
+    const m = await getBaselinePipelineMetrics();
     expect(m.totalEvaluatedItems).toBe(3);
     expect(m.byRecommendedAction.block).toBe(1);
     expect(m.byRecommendedAction.allow).toBe(2);
@@ -74,7 +74,7 @@ describe("getBaselinePipelineMetrics", () => {
     expect(m.topViolations[0]?.code).toBe("AGE_INAPPROPRIATE");
   });
 
-  it("respects an explicit time window", () => {
+  it("respects an explicit time window", async () => {
     const store = getStore();
     const oldIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     store.moderationEvents.set("old", {
@@ -89,7 +89,7 @@ describe("getBaselinePipelineMetrics", () => {
       source: "ai",
       createdAt: oldIso,
     } as never);
-    const m = getBaselinePipelineMetrics({
+    const m = await getBaselinePipelineMetrics({
       startIso: new Date(Date.now() - 60 * 1000).toISOString(),
       endIso: new Date().toISOString(),
     });

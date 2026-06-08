@@ -100,7 +100,7 @@ export default async function ParentSensoryPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const profile = getLearnerSensoryProfile(learnerId, session.tenantId);
+  const profile = await getLearnerSensoryProfile(learnerId, session.tenantId);
 
   return (
     <AppShell

@@ -76,7 +76,7 @@ describe("calm BFF route", () => {
     expect(auditMock.mock.calls[0][1]).toBe("calm.session.complete");
 
     // New: a queryable record was persisted, tenant/learner-scoped.
-    const records = listCalmSessionsForLearner(LEARNER, TENANT);
+    const records = await listCalmSessionsForLearner(LEARNER, TENANT);
     expect(records).toHaveLength(1);
     expect(records[0]).toMatchObject({
       activityId: "box_breathing",
@@ -88,7 +88,7 @@ describe("calm BFF route", () => {
 
   it("POST defaults completed to true and clamps seconds", async () => {
     await POST(postReq({ activityId: "stretch_break", secondsSpent: 99999 }), params);
-    const [record] = listCalmSessionsForLearner(LEARNER, TENANT);
+    const [record] = await listCalmSessionsForLearner(LEARNER, TENANT);
     expect(record.completed).toBe(true);
     expect(record.secondsSpent).toBe(3600);
   });
@@ -97,7 +97,7 @@ describe("calm BFF route", () => {
     const res = await POST(postReq({ activityId: "not_a_real_activity" }), params);
     expect(res.status).toBe(400);
     expect(auditMock).not.toHaveBeenCalled();
-    expect(listCalmSessionsForLearner(LEARNER, TENANT)).toHaveLength(0);
+    expect(await listCalmSessionsForLearner(LEARNER, TENANT)).toHaveLength(0);
   });
 
   it("GET returns the catalog plus the learner's streak", async () => {

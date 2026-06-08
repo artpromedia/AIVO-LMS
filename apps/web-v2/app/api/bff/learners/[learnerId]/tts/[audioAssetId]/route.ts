@@ -24,7 +24,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       requestId,
     );
     if (consentErr) return consentErr;
-    const asset = getAudioAsset(audioAssetId);
+    const asset = await getAudioAsset(audioAssetId);
     if (!asset) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Audio asset not found." }, requestId);
     }

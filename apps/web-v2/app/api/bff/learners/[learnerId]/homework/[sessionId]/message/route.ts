@@ -63,7 +63,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
-    const existing = getHomeworkSession(sessionId, session!.tenantId);
+    const existing = await getHomeworkSession(sessionId, session!.tenantId);
     if (!existing || existing.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Homework session not found." }, requestId);
     }
@@ -80,13 +80,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     // S27 safety pipeline — sanitize + classify learner input BEFORE the
     // tutor sees it. Prompt-injection scaffolding is stripped; PII is
     // redacted; injection-only inputs are blocked with a safe fallback.
-    const policy = getActiveSafetyPolicy();
+    const policy = await getActiveSafetyPolicy();
     const sanitized = SAFETY_SANITIZE(text);
     const inputCls = SAFETY_CLASSIFY(sanitized.cleaned, {
       subjectKind: "homework_input",
       policy,
     });
-    recordHomeworkInputAudit({
+    await recordHomeworkInputAudit({
       tenantId: session!.tenantId,
       learnerId,
       homeworkSessionId: sessionId,
@@ -96,7 +96,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       piiRedacted: sanitized.piiRedacted,
     });
     if (inputCls.classification.decision !== "allow" || sanitized.injectionStripped) {
-      recordModerationEvent({
+      await recordModerationEvent({
         tenantId: session!.tenantId,
         learnerId,
         subjectKind: "homework_input",
@@ -110,7 +110,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
     if (inputCls.classification.decision === "block") {
       const fallback = SAFETY_BLOCKED_FALLBACK("homework_input");
-      recordBlockedGeneration({
+      await recordBlockedGeneration({
         tenantId: session!.tenantId,
         learnerId,
         subjectKind: "homework_input",
@@ -119,12 +119,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       });
       // Persist the original (raw) learner message so the audit trail is
       // complete, then a tutor turn carrying the safety fallback.
-      appendHomeworkMessage(sessionId, session!.tenantId, {
+      await appendHomeworkMessage(sessionId, session!.tenantId, {
         role: "learner",
         text,
         guidedOnly: false,
       });
-      const blocked = appendHomeworkMessage(sessionId, session!.tenantId, {
+      const blocked = await appendHomeworkMessage(sessionId, session!.tenantId, {
         role: "tutor",
         text: fallback,
         guidedOnly: true,
@@ -136,7 +136,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       return ok({ session: blocked, blocked: true }, requestId);
     }
 
-    appendHomeworkMessage(sessionId, session!.tenantId, {
+    await appendHomeworkMessage(sessionId, session!.tenantId, {
       role: "learner",
       text,
       guidedOnly: false,
@@ -158,7 +158,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       subjectKind: "tutor_response",
       policy,
     });
-    recordTutorResponseAudit({
+    await recordTutorResponseAudit({
       tenantId: session!.tenantId,
       learnerId,
       contextKind: "homework_session",
@@ -172,7 +172,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!tutorRule.ok || tutorCls.classification.decision === "block") {
       finalText = SAFETY_BLOCKED_FALLBACK("tutor_response");
       blockedOutput = true;
-      recordBlockedGeneration({
+      await recordBlockedGeneration({
         tenantId: session!.tenantId,
         learnerId,
         subjectKind: "tutor_response",
@@ -181,7 +181,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
           : `Tutor rule: ${tutorRule.violations.map((v) => v.rule).join(",")}`,
         fallbackResponse: finalText,
       });
-      recordModerationEvent({
+      await recordModerationEvent({
         tenantId: session!.tenantId,
         learnerId,
         subjectKind: "tutor_response",
@@ -194,7 +194,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       });
     }
 
-    const after = appendHomeworkMessage(sessionId, session!.tenantId, {
+    const after = await appendHomeworkMessage(sessionId, session!.tenantId, {
       role: "tutor",
       text: finalText,
       guidedOnly: reply.guidedOnly,

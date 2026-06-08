@@ -48,6 +48,70 @@ import {
   generatedLessonPlans,
   lessonInteractions,
   lessonParentSummaries,
+  webBillingAccounts,
+  webAiBudgets,
+  webAiCostEvents,
+  webCoupons,
+  webDailyBillingBatches,
+  webIepAiDrafts,
+  webSecurityControls,
+  webControlEvidence,
+  webRiskRegister,
+  webIncidents,
+  webIncidentTimeline,
+  webVendors,
+  webStatePrivacyRequirements,
+  webStatePrivacyMappings,
+  webVulnerabilityReports,
+  webConsentVersions,
+  webTermsAcceptances,
+  webDataInventory,
+  webDataRetentionPolicies,
+  webDisclosureLogs,
+  webDataExportRequests,
+  webDataDeletionRequests,
+  webIepDocAccessLogs,
+  webCourses,
+  webRosterImportJobs,
+  webRosterImportErrors,
+  webSisConnections,
+  webExternalRosterMappings,
+  webLessonSyncStates,
+  webAudioAssets,
+  webTtsGenerationJobs,
+  webPronunciationOverrides,
+  webLearnerVoicePreferences,
+  webReadAloudUsageEvents,
+  webAudioCacheEntries,
+  webSafetyPolicyVersions,
+  webModerationEvents,
+  webHumanReviewCases,
+  webBlockedGenerations,
+  webTutorResponseAudits,
+  webHomeworkInputAudits,
+  webSupportTickets,
+  webAiGenerationJobs,
+  webTenantSettings,
+  webPlatformApiKeys,
+  webPlatformEmailTemplates,
+  webPlatformWebhookEndpoints,
+  webNotificationPreferences,
+  webDigestSchedules,
+  webHomeworkHelpSessions,
+  webCalmSessions,
+  webLearnerEngagement,
+  webLearnerBadges,
+  webLearnerSensoryProfiles,
+  webStandardsFrameworks,
+  webStandardDocuments,
+  webStandards,
+  webDomains,
+  webSkillPrerequisites,
+  webSkillVersions,
+  webCurriculumMaps,
+  webLessonObjectiveTemplates,
+  webAssessmentBlueprints,
+  webCurriculumImportJobs,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -56,7 +120,13 @@ function vals<T>(c: Map<string, T> | T[]): T[] {
   return Array.isArray(c) ? c : Array.from(c.values());
 }
 
-/** Insert in chunks; skip duplicates on a natural-key target. */
+/**
+ * Insert in chunks; skip duplicates on a natural-key target. Idempotent:
+ * re-running against an already-seeded database is a no-op (every row
+ * conflicts and is dropped). Returns the count of rows that actually
+ * landed (via RETURNING), so a second pass reports `0` and callers /
+ * tests can observe idempotency rather than the attempted count.
+ */
 async function bulk<R extends Record<string, unknown>>(
   db: Database,
   table: PgTable,
@@ -69,10 +139,10 @@ async function bulk<R extends Record<string, unknown>>(
   for (let i = 0; i < rows.length; i += CHUNK) {
     const slice = rows.slice(i, i + CHUNK);
     const q = db.insert(table).values(slice);
-    await (conflictTarget
-      ? q.onConflictDoNothing({ target: conflictTarget })
-      : q.onConflictDoNothing());
-    n += slice.length;
+    const landed = await (conflictTarget
+      ? q.onConflictDoNothing({ target: conflictTarget }).returning()
+      : q.onConflictDoNothing().returning());
+    n += (landed as unknown[]).length;
   }
   return n;
 }
@@ -539,6 +609,340 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
       lessonInteractions.id,
     ),
   );
+  // ── Sprint 2: web-owned billing / AI-cost rows ──────────────────────
+  await log(
+    "billingAccounts",
+    await bulk(
+      db,
+      webBillingAccounts,
+      vals(s.billingAccounts).map((b) => ({
+        id: b.id,
+        tenantId: b.tenantId,
+        createdAt: b.createdAt,
+        data: b,
+      })),
+      webBillingAccounts.id,
+    ),
+  );
+  await log(
+    "aiBudgets",
+    await bulk(
+      db,
+      webAiBudgets,
+      vals(s.aiBudgets).map((b) => ({ tenantId: b.tenantId, updatedAt: b.updatedAt, data: b })),
+      webAiBudgets.tenantId,
+    ),
+  );
+  await log(
+    "aiCostEvents",
+    await bulk(
+      db,
+      webAiCostEvents,
+      vals(s.aiCostEvents).map((e) => ({
+        id: e.id,
+        tenantId: e.tenantId,
+        occurredAt: e.occurredAt,
+        data: e,
+      })),
+      webAiCostEvents.id,
+    ),
+  );
+  await log(
+    "coupons",
+    await bulk(
+      db,
+      webCoupons,
+      vals(s.coupons).map((c) => ({ id: c.id, code: c.code, createdAt: c.createdAt, data: c })),
+      webCoupons.id,
+    ),
+  );
+  await log(
+    "dailyBillingBatches",
+    await bulk(
+      db,
+      webDailyBillingBatches,
+      vals(s.dailyBillingBatches).map((b) => ({ id: b.id, runDate: b.runDate, data: b })),
+      webDailyBillingBatches.id,
+    ),
+  );
+  // ── Sprint 3: web-owned IEP AI-draft review inbox ───────────────────
+  await log(
+    "iepAiDrafts",
+    await bulk(
+      db,
+      webIepAiDrafts,
+      vals(s.iepAiDrafts).map((d) => ({
+        id: d.id,
+        learnerId: d.learnerId,
+        tenantId: d.tenantId,
+        updatedAt: d.updatedAt,
+        data: d,
+      })),
+      webIepAiDrafts.id,
+    ),
+  );
+  // ── Sprint 4: web-owned security / SOC 2 / privacy-matrix artifacts ──
+  await log(
+    "securityControls",
+    await bulk(
+      db,
+      webSecurityControls,
+      vals(s.securityControls).map((x) => ({ id: x.id, data: x })),
+      webSecurityControls.id,
+    ),
+  );
+  await log(
+    "controlEvidence",
+    await bulk(
+      db,
+      webControlEvidence,
+      vals(s.securityControlEvidence).map((x) => ({ id: x.id, controlId: x.controlId, data: x })),
+      webControlEvidence.id,
+    ),
+  );
+  await log(
+    "riskRegister",
+    await bulk(
+      db,
+      webRiskRegister,
+      vals(s.riskRegister).map((x) => ({ id: x.id, data: x })),
+      webRiskRegister.id,
+    ),
+  );
+  await log(
+    "incidents",
+    await bulk(
+      db,
+      webIncidents,
+      vals(s.incidents).map((x) => ({ id: x.id, data: x })),
+      webIncidents.id,
+    ),
+  );
+  await log(
+    "incidentTimeline",
+    await bulk(
+      db,
+      webIncidentTimeline,
+      vals(s.incidentTimelineEvents).map((x) => ({ id: x.id, incidentId: x.incidentId, data: x })),
+      webIncidentTimeline.id,
+    ),
+  );
+  await log(
+    "vendors",
+    await bulk(
+      db,
+      webVendors,
+      vals(s.vendors).map((x) => ({ id: x.id, data: x })),
+      webVendors.id,
+    ),
+  );
+  await log(
+    "statePrivacyRequirements",
+    await bulk(
+      db,
+      webStatePrivacyRequirements,
+      vals(s.statePrivacyRequirements).map((x) => ({ id: x.id, data: x })),
+      webStatePrivacyRequirements.id,
+    ),
+  );
+  await log(
+    "statePrivacyMappings",
+    await bulk(
+      db,
+      webStatePrivacyMappings,
+      vals(s.statePrivacyMappings).map((x) => ({ id: x.id, requirementId: x.requirementId, data: x })),
+      webStatePrivacyMappings.id,
+    ),
+  );
+  await log(
+    "vulnerabilityReports",
+    await bulk(
+      db,
+      webVulnerabilityReports,
+      vals(s.vulnerabilityReports).map((x) => ({ id: x.id, data: x })),
+      webVulnerabilityReports.id,
+    ),
+  );
+  // ── Sprint 5: web-owned privacy / DSAR / terms artifacts ────────────
+  await log(
+    "consentVersions",
+    await bulk(
+      db,
+      webConsentVersions,
+      vals(s.consentVersions).map((x) => ({ id: x.id, data: x })),
+      webConsentVersions.id,
+    ),
+  );
+  await log(
+    "termsAcceptances",
+    await bulk(
+      db,
+      webTermsAcceptances,
+      vals(s.termsAcceptances).map((x) => ({ id: x.id, data: x })),
+      webTermsAcceptances.id,
+    ),
+  );
+  await log(
+    "dataInventory",
+    await bulk(
+      db,
+      webDataInventory,
+      vals(s.dataInventory).map((x) => ({ id: x.id, data: x })),
+      webDataInventory.id,
+    ),
+  );
+  await log(
+    "dataRetentionPolicies",
+    await bulk(
+      db,
+      webDataRetentionPolicies,
+      vals(s.dataRetentionPolicies).map((x) => ({ id: x.id, data: x })),
+      webDataRetentionPolicies.id,
+    ),
+  );
+  await log(
+    "disclosureLogs",
+    await bulk(
+      db,
+      webDisclosureLogs,
+      vals(s.disclosureLogs).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+      webDisclosureLogs.id,
+    ),
+  );
+  await log(
+    "dataExportRequests",
+    await bulk(
+      db,
+      webDataExportRequests,
+      vals(s.dataExportRequests).map((x) => ({ id: x.id, data: x })),
+      webDataExportRequests.id,
+    ),
+  );
+  await log(
+    "dataDeletionRequests",
+    await bulk(
+      db,
+      webDataDeletionRequests,
+      vals(s.dataDeletionRequests).map((x) => ({ id: x.id, data: x })),
+      webDataDeletionRequests.id,
+    ),
+  );
+  await log(
+    "iepDocAccessLogs",
+    await bulk(
+      db,
+      webIepDocAccessLogs,
+      vals(s.iepDocumentAccessLogs).map((x) => ({
+        id: x.id,
+        learnerId: x.learnerId,
+        tenantId: x.tenantId,
+        data: x,
+      })),
+      webIepDocAccessLogs.id,
+    ),
+  );
+  // ── Sprint 6: web-owned rostering / SIS / lesson-sync aggregates ────
+  await log(
+    "courses",
+    await bulk(
+      db,
+      webCourses,
+      vals(s.courses).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+      webCourses.id,
+    ),
+  );
+  await log(
+    "rosterImportJobs",
+    await bulk(
+      db,
+      webRosterImportJobs,
+      vals(s.rosterImportJobs).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+      webRosterImportJobs.id,
+    ),
+  );
+  await log(
+    "rosterImportErrors",
+    await bulk(
+      db,
+      webRosterImportErrors,
+      vals(s.rosterImportErrors).map((x) => ({ id: x.id, jobId: x.jobId, data: x })),
+      webRosterImportErrors.id,
+    ),
+  );
+  await log(
+    "sisConnections",
+    await bulk(
+      db,
+      webSisConnections,
+      vals(s.sisConnections).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })),
+      webSisConnections.id,
+    ),
+  );
+  await log(
+    "externalRosterMappings",
+    await bulk(
+      db,
+      webExternalRosterMappings,
+      vals(s.externalRosterMappings).map((x) => ({
+        id: x.id,
+        connectionId: x.connectionId,
+        data: x,
+      })),
+      webExternalRosterMappings.id,
+    ),
+  );
+  await log(
+    "lessonSyncStates",
+    await bulk(
+      db,
+      webLessonSyncStates,
+      vals(s.lessonSyncStates).map((x) => ({
+        lessonRunId: x.lessonRunId,
+        tenantId: x.tenantId,
+        data: x,
+      })),
+      webLessonSyncStates.lessonRunId,
+    ),
+  );
+  // ── Sprint 7: web-owned audio + safety artifacts ────────────────────
+  await log("audioAssets", await bulk(db, webAudioAssets, vals(s.audioAssets).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webAudioAssets.id));
+  await log("ttsGenerationJobs", await bulk(db, webTtsGenerationJobs, vals(s.ttsGenerationJobs).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webTtsGenerationJobs.id));
+  await log("pronunciationOverrides", await bulk(db, webPronunciationOverrides, vals(s.pronunciationOverrides).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webPronunciationOverrides.id));
+  await log("learnerVoicePreferences", await bulk(db, webLearnerVoicePreferences, vals(s.learnerVoicePreferences).map((x) => ({ learnerId: x.learnerId, tenantId: x.tenantId, data: x })), webLearnerVoicePreferences.learnerId));
+  await log("readAloudUsageEvents", await bulk(db, webReadAloudUsageEvents, vals(s.readAloudUsageEvents).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webReadAloudUsageEvents.id));
+  await log("audioCacheEntries", await bulk(db, webAudioCacheEntries, Array.from(s.audioCacheEntries.entries()).map(([k, x]) => ({ cacheKey: k, tenantId: x.tenantId, data: x })), webAudioCacheEntries.cacheKey));
+  await log("safetyPolicyVersions", await bulk(db, webSafetyPolicyVersions, vals(s.safetyPolicyVersions).map((x) => ({ id: x.id, data: x })), webSafetyPolicyVersions.id));
+  await log("moderationEvents", await bulk(db, webModerationEvents, vals(s.moderationEvents).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webModerationEvents.id));
+  await log("humanReviewCases", await bulk(db, webHumanReviewCases, vals(s.humanReviewCases).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webHumanReviewCases.id));
+  await log("blockedGenerations", await bulk(db, webBlockedGenerations, vals(s.blockedGenerations).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webBlockedGenerations.id));
+  await log("tutorResponseAudits", await bulk(db, webTutorResponseAudits, vals(s.tutorResponseAudits).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webTutorResponseAudits.id));
+  await log("homeworkInputAudits", await bulk(db, webHomeworkInputAudits, vals(s.homeworkInputAudits).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webHomeworkInputAudits.id));
+  // ── Sprint 8: web-owned support + settings ──────────────────────────
+  await log("supportTickets", await bulk(db, webSupportTickets, vals(s.supportTickets).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webSupportTickets.id));
+  await log("aiGenerationJobs", await bulk(db, webAiGenerationJobs, vals(s.aiGenerationJobs).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webAiGenerationJobs.id));
+  await log("tenantSettings", await bulk(db, webTenantSettings, vals(s.tenantSettings).map((x) => ({ tenantId: x.tenantId, data: x })), webTenantSettings.tenantId));
+  await log("platformApiKeys", await bulk(db, webPlatformApiKeys, vals(s.platformApiKeys).map((x) => ({ id: x.id, data: x })), webPlatformApiKeys.id));
+  await log("platformEmailTemplates", await bulk(db, webPlatformEmailTemplates, vals(s.platformEmailTemplates).map((x) => ({ id: x.id, data: x })), webPlatformEmailTemplates.id));
+  await log("platformWebhookEndpoints", await bulk(db, webPlatformWebhookEndpoints, vals(s.platformWebhookEndpoints).map((x) => ({ id: x.id, data: x })), webPlatformWebhookEndpoints.id));
+  // ── Sprint 8 remainder: engagement / sessions / notification prefs ──
+  await log("notificationPreferences", await bulk(db, webNotificationPreferences, vals(s.notificationPreferences).map((x) => ({ userId: x.userId, tenantId: x.tenantId, data: x })), webNotificationPreferences.userId));
+  await log("digestSchedules", await bulk(db, webDigestSchedules, vals(s.digestSchedules).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webDigestSchedules.id));
+  await log("homeworkHelpSessions", await bulk(db, webHomeworkHelpSessions, vals(s.homeworkHelpSessions).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webHomeworkHelpSessions.id));
+  await log("calmSessions", await bulk(db, webCalmSessions, vals(s.calmSessions).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webCalmSessions.id));
+  await log("learnerEngagement", await bulk(db, webLearnerEngagement, vals(s.learnerEngagement).map((x) => ({ learnerId: x.learnerId, tenantId: x.tenantId, data: x })), webLearnerEngagement.learnerId));
+  await log("learnerBadges", await bulk(db, webLearnerBadges, vals(s.learnerBadges).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webLearnerBadges.id));
+  await log("learnerSensoryProfiles", await bulk(db, webLearnerSensoryProfiles, vals(s.learnerSensoryProfiles).map((x) => ({ learnerId: x.learnerId, tenantId: x.tenantId, data: x })), webLearnerSensoryProfiles.learnerId));
+  // ── Sprint 8 remainder: standards / skill-graph reference ───────────
+  await log("standardsFrameworks", await bulk(db, webStandardsFrameworks, vals(s.standardsFrameworks).map((x) => ({ id: x.id, data: x })), webStandardsFrameworks.id));
+  await log("standardDocuments", await bulk(db, webStandardDocuments, vals(s.standardDocuments).map((x) => ({ id: x.id, data: x })), webStandardDocuments.id));
+  await log("standards", await bulk(db, webStandards, vals(s.standards).map((x) => ({ id: x.id, data: x })), webStandards.id));
+  await log("domains", await bulk(db, webDomains, vals(s.domains).map((x) => ({ id: x.id, data: x })), webDomains.id));
+  await log("skillPrerequisites", await bulk(db, webSkillPrerequisites, vals(s.skillPrerequisites).map((x) => ({ id: x.id, data: x })), webSkillPrerequisites.id));
+  await log("skillVersions", await bulk(db, webSkillVersions, vals(s.skillVersions).map((x) => ({ id: x.id, data: x })), webSkillVersions.id));
+  await log("curriculumMaps", await bulk(db, webCurriculumMaps, vals(s.curriculumMaps).map((x) => ({ id: x.id, data: x })), webCurriculumMaps.id));
+  await log("lessonObjectiveTemplates", await bulk(db, webLessonObjectiveTemplates, vals(s.lessonObjectiveTemplates).map((x) => ({ id: x.id, data: x })), webLessonObjectiveTemplates.id));
+  await log("assessmentBlueprints", await bulk(db, webAssessmentBlueprints, vals(s.assessmentBlueprints).map((x) => ({ id: x.id, data: x })), webAssessmentBlueprints.id));
+  await log("curriculumImportJobs", await bulk(db, webCurriculumImportJobs, vals(s.curriculumImportJobs).map((x) => ({ id: x.id, data: x })), webCurriculumImportJobs.id));
   await log(
     "lessonParentSummaries",
     await bulk(

@@ -10,8 +10,11 @@
     "start": "corepack pnpm run build:brand && next start --port 5000 --hostname 0.0.0.0",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
+    "db:up": "docker compose -f ../../docker-compose.web-v2-db.yml up -d --wait",
+    "db:migrate": "pnpm --filter @aivo/db run db:migrate",
     "db:seed:postgres": "tsx scripts/seed-postgres.ts",
     "test": "vitest run",
+    "test:persistence": "vitest run lib/db/persistence",
     "test:watch": "vitest",
     "e2e": "playwright test",
     "test:a11y": "playwright test --grep @a11y"
@@ -64,6 +67,7 @@
   "devDependencies": {
     "@playwright/test": "^1.49.1",
     "@tailwindcss/postcss": "^4.1.8",
+    "@testcontainers/postgresql": "^10.13.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@types/katex": "^0.16.7",
@@ -75,6 +79,7 @@
     "jsdom": "^25.0.1",
     "postcss": "^8.5.9",
     "tailwindcss": "^4.1.8",
+    "testcontainers": "^10.13.0",
     "typescript": "^5.7.3",
     "vitest": "^2.1.8"
   }

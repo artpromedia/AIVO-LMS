@@ -42,7 +42,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const url = new URL(req.url);
     const learnerId = url.searchParams.get("learnerId");
     if (learnerId) {
-      const draft = getIepAiDraft(learnerId, session!.tenantId);
+      const draft = await getIepAiDraft(learnerId, session!.tenantId);
       return ok({ draft }, requestId);
     }
     const drafts = listIepAiDraftsForReviewer(session!.userId, session!.tenantId);
@@ -76,7 +76,7 @@ export async function POST(req: Request): Promise<NextResponse> {
           requestId,
         );
       }
-      const updated = progressIepAiDraft(id, session!.tenantId, session!.userId, to);
+      const updated = await progressIepAiDraft(id, session!.tenantId, session!.userId, to);
       if (!updated) {
         return fail(
           {
@@ -109,7 +109,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const draft = upsertIepAiDraft({
+    const draft = await upsertIepAiDraft({
       tenantId: session!.tenantId,
       learnerId: body.learnerId,
       sourceAttemptId: body.sourceAttemptId ?? null,

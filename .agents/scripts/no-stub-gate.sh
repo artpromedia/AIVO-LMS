@@ -29,4 +29,26 @@ if rg -nU --glob='!**/*test*/**' -e $'def [a-zA-Z0-9_]+\\([^)]*\\):\\n\\s*pass\\
   exit 1
 fi
 
+# Fabricated BFF fallbacks (persistence-migration Global Invariant #2):
+# a BFF route must surface a typed error when its upstream/DB is
+# unreachable — never synthesize data with `stub: true` or a fabricated
+# local id (`inc-local-…`, `maint-local-…`, `run-stub-${Date.now()}`).
+BFF_PATTERN='stub:\s*true|\b(inc|maint|run)-local-|-stub-\$\{Date\.now'
+
+# Grandfathered offenders that predate this gate. Sprint 4 de-stubbed the
+# status incidents/maintenance + impersonation BFFs (typed errors, no synthetic
+# ids); the ai evals route is owned by Sprint 7 and MUST be de-stubbed there.
+# The gate catches every NEW occurrence.
+BFF_EXCLUDES=(
+  --glob='!**/*test*/**' --glob='!**/*.test.*'
+  --glob='!apps/web-v2/app/api/bff/admin/ai/evals/route.ts'
+)
+
+echo "→ Scanning for fabricated BFF fallbacks (stub:true / *-local-* ids)…"
+if rg -n --hidden "${BFF_EXCLUDES[@]}" -e "$BFF_PATTERN" apps/web-v2/app; then
+  echo "✗ Fabricated BFF fallback found above. Return a typed error instead — "
+  echo "  no stub:true, no synthesized ids. (See README Global Invariant #2.)"
+  exit 1
+fi
+
 echo "✓ No stubs or placeholders detected."

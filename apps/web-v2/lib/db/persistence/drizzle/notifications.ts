@@ -6,9 +6,19 @@
  * reconstructed objects always reflect the latest state.
  */
 import { and, desc, eq, inArray, isNull } from "drizzle-orm";
-import { webNotifications, webNotificationDeliveries } from "@aivo/db";
+import {
+  webNotifications,
+  webNotificationDeliveries,
+  webNotificationPreferences,
+  webDigestSchedules,
+} from "@aivo/db";
 import { nowIso } from "@/lib/db/store";
-import type { Notification, NotificationDelivery } from "@/lib/db/types";
+import type {
+  Notification,
+  NotificationDelivery,
+  NotificationPreference,
+  DigestSchedule,
+} from "@/lib/db/types";
 import type { NotificationStore } from "../types";
 import { getDb } from "./client";
 
@@ -84,5 +94,28 @@ export const drizzleNotifications: NotificationStore = {
       .from(webNotificationDeliveries)
       .where(eq(webNotificationDeliveries.notificationId, notificationId));
     return rows.map((r) => r.data as NotificationDelivery);
+  },
+
+  async getPreference(userId): Promise<NotificationPreference | null> {
+    const [row] = await getDb()
+      .select()
+      .from(webNotificationPreferences)
+      .where(eq(webNotificationPreferences.userId, userId))
+      .limit(1);
+    return row ? (row.data as NotificationPreference) : null;
+  },
+  async upsertPreference(pref): Promise<NotificationPreference> {
+    await getDb()
+      .insert(webNotificationPreferences)
+      .values({ userId: pref.userId, tenantId: pref.tenantId, data: pref })
+      .onConflictDoUpdate({
+        target: webNotificationPreferences.userId,
+        set: { tenantId: pref.tenantId, data: pref },
+      });
+    return pref;
+  },
+  async listDigestSchedules(): Promise<DigestSchedule[]> {
+    const rows = await getDb().select().from(webDigestSchedules);
+    return rows.map((r) => r.data as DigestSchedule);
   },
 };

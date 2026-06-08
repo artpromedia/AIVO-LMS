@@ -38,8 +38,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, [...READ_ROLES], requestId);
     if (roleErr) return roleErr;
-    const frameworks = listStandardsFrameworks();
-    const docs = listStandardDocuments();
+    const frameworks = await listStandardsFrameworks();
+    const docs = await listStandardDocuments();
     const docsByFramework = new Map<string, number>();
     for (const d of docs) {
       docsByFramework.set(d.frameworkId, (docsByFramework.get(d.frameworkId) ?? 0) + 1);
@@ -82,13 +82,13 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    if (getStandardsFrameworkBySlug(parsed.data.slug)) {
+    if (await getStandardsFrameworkBySlug(parsed.data.slug)) {
       return fail(
         { ...ERRORS.VALIDATION_FAILED, message: "Framework slug already exists." },
         requestId,
       );
     }
-    const rec = createStandardsFramework({
+    const rec = await createStandardsFramework({
       slug: parsed.data.slug,
       name: parsed.data.name,
       issuer: parsed.data.issuer,

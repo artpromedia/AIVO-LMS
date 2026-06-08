@@ -32,11 +32,13 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
     return ok(
       {
-        subjects: subjects.map((s) => ({
-          ...s,
-          domains: listDomains(s.id),
-          skillCount: skillCounts.get(s.id) ?? 0,
-        })),
+        subjects: await Promise.all(
+          subjects.map(async (s) => ({
+            ...s,
+            domains: await listDomains(s.id),
+            skillCount: skillCounts.get(s.id) ?? 0,
+          })),
+        ),
       },
       requestId,
     );

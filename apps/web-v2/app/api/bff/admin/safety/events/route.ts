@@ -18,7 +18,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const decision = url.searchParams.get("decision") as "allow" | "review" | "block" | null;
     // Platform admins see global events, others scoped to their tenant.
     const tenantId = session!.role === "platform_admin" ? undefined : session!.tenantId;
-    const events = listModerationEvents({
+    const events = await listModerationEvents({
       tenantId,
       decision: decision ?? undefined,
       limit: 200,

@@ -11,13 +11,29 @@ import {
   webAgeGateRecords,
   webPolicyVersions,
   webSubprocessors,
+  webConsentVersions,
+  webTermsAcceptances,
+  webDataInventory,
+  webDataRetentionPolicies,
+  webDisclosureLogs,
+  webDataExportRequests,
+  webDataDeletionRequests,
+  webIepDocAccessLogs,
 } from "@aivo/db";
 import type {
   AgeGateRecord,
   ConsentRecord,
+  ConsentVersion,
+  DataDeletionRequest,
+  DataExportRequest,
+  DataInventoryItem,
+  DataRetentionPolicy,
+  DisclosureLog,
   IEPDocument,
+  IEPDocumentAccessLog,
   PolicyVersion,
   SubprocessorRecord,
+  TermsAcceptance,
 } from "@/lib/db/types";
 import type { ComplianceStore } from "../types";
 import { getDb } from "./client";
@@ -153,5 +169,113 @@ export const drizzleCompliance: ComplianceStore = {
   async listSubprocessors() {
     const rows = await getDb().select().from(webSubprocessors);
     return rows.map((r) => r.data as SubprocessorRecord);
+  },
+
+  // ── Sprint 5: privacy / DSAR / terms (platform/admin, no RLS) ──────
+  async listConsentVersions(): Promise<ConsentVersion[]> {
+    const rows = await getDb().select().from(webConsentVersions);
+    return rows.map((r) => r.data as ConsentVersion);
+  },
+  async appendTermsAcceptance(acceptance): Promise<TermsAcceptance> {
+    await getDb()
+      .insert(webTermsAcceptances)
+      .values({ id: acceptance.id, data: acceptance })
+      .onConflictDoNothing({ target: webTermsAcceptances.id });
+    return acceptance;
+  },
+  async listDataInventory(): Promise<DataInventoryItem[]> {
+    const rows = await getDb().select().from(webDataInventory);
+    return rows.map((r) => r.data as DataInventoryItem);
+  },
+  async listRetentionPolicies(): Promise<DataRetentionPolicy[]> {
+    const rows = await getDb().select().from(webDataRetentionPolicies);
+    return rows.map((r) => r.data as DataRetentionPolicy);
+  },
+  async getRetentionPolicy(id): Promise<DataRetentionPolicy | null> {
+    const [row] = await getDb()
+      .select()
+      .from(webDataRetentionPolicies)
+      .where(eq(webDataRetentionPolicies.id, id))
+      .limit(1);
+    return row ? (row.data as DataRetentionPolicy) : null;
+  },
+  async upsertRetentionPolicy(policy): Promise<DataRetentionPolicy> {
+    await getDb()
+      .insert(webDataRetentionPolicies)
+      .values({ id: policy.id, data: policy })
+      .onConflictDoUpdate({ target: webDataRetentionPolicies.id, set: { data: policy } });
+    return policy;
+  },
+  async appendDisclosure(entry): Promise<DisclosureLog> {
+    await getDb()
+      .insert(webDisclosureLogs)
+      .values({ id: entry.id, tenantId: entry.tenantId, data: entry })
+      .onConflictDoNothing({ target: webDisclosureLogs.id });
+    return entry;
+  },
+  async listDisclosures(tenantId): Promise<DisclosureLog[]> {
+    const rows = await getDb()
+      .select()
+      .from(webDisclosureLogs)
+      .where(eq(webDisclosureLogs.tenantId, tenantId));
+    return rows
+      .map((r) => r.data as DisclosureLog)
+      .sort((a, b) => b.disclosedAt.localeCompare(a.disclosedAt));
+  },
+  async upsertExportRequest(request): Promise<DataExportRequest> {
+    await getDb()
+      .insert(webDataExportRequests)
+      .values({ id: request.id, data: request })
+      .onConflictDoUpdate({ target: webDataExportRequests.id, set: { data: request } });
+    return request;
+  },
+  async getExportRequestById(id): Promise<DataExportRequest | null> {
+    const [row] = await getDb()
+      .select()
+      .from(webDataExportRequests)
+      .where(eq(webDataExportRequests.id, id))
+      .limit(1);
+    return row ? (row.data as DataExportRequest) : null;
+  },
+  async listExportRequests(): Promise<DataExportRequest[]> {
+    const rows = await getDb().select().from(webDataExportRequests);
+    return rows.map((r) => r.data as DataExportRequest);
+  },
+  async upsertDeletionRequest(request): Promise<DataDeletionRequest> {
+    await getDb()
+      .insert(webDataDeletionRequests)
+      .values({ id: request.id, data: request })
+      .onConflictDoUpdate({ target: webDataDeletionRequests.id, set: { data: request } });
+    return request;
+  },
+  async getDeletionRequestById(id): Promise<DataDeletionRequest | null> {
+    const [row] = await getDb()
+      .select()
+      .from(webDataDeletionRequests)
+      .where(eq(webDataDeletionRequests.id, id))
+      .limit(1);
+    return row ? (row.data as DataDeletionRequest) : null;
+  },
+  async listDeletionRequests(): Promise<DataDeletionRequest[]> {
+    const rows = await getDb().select().from(webDataDeletionRequests);
+    return rows.map((r) => r.data as DataDeletionRequest);
+  },
+  async appendIepAccessLog(entry): Promise<IEPDocumentAccessLog> {
+    await getDb()
+      .insert(webIepDocAccessLogs)
+      .values({ id: entry.id, learnerId: entry.learnerId, tenantId: entry.tenantId, data: entry })
+      .onConflictDoNothing({ target: webIepDocAccessLogs.id });
+    return entry;
+  },
+  async listIepAccessForLearner(learnerId, tenantId): Promise<IEPDocumentAccessLog[]> {
+    const rows = await getDb()
+      .select()
+      .from(webIepDocAccessLogs)
+      .where(
+        and(eq(webIepDocAccessLogs.learnerId, learnerId), eq(webIepDocAccessLogs.tenantId, tenantId)),
+      );
+    return rows
+      .map((r) => r.data as IEPDocumentAccessLog)
+      .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
   },
 };

@@ -52,10 +52,10 @@ describe("upsertIepAiDraft", () => {
     ensureSeeded();
   });
 
-  it("creates a new draft with ai_draft status", () => {
+  it("creates a new draft with ai_draft status", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
     const learner = Array.from(getStore().learnerProfiles.values())[0]!;
-    const out = upsertIepAiDraft({
+    const out = await upsertIepAiDraft({
       tenantId: tenant.id,
       learnerId: learner.id,
       draft: SAMPLE_DRAFT,
@@ -65,20 +65,20 @@ describe("upsertIepAiDraft", () => {
     expect(out.draft.goals).toHaveLength(1);
     expect(out.model).toBe("claude-sonnet-4-6");
 
-    expect(getIepAiDraft(learner.id, tenant.id)?.id).toBe(out.id);
+    expect((await getIepAiDraft(learner.id, tenant.id))?.id).toBe(out.id);
   });
 
-  it("upserts and resets the lifecycle on regenerate", () => {
+  it("upserts and resets the lifecycle on regenerate", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
     const learner = Array.from(getStore().learnerProfiles.values())[0]!;
-    const first = upsertIepAiDraft({
+    const first = await upsertIepAiDraft({
       tenantId: tenant.id,
       learnerId: learner.id,
       draft: SAMPLE_DRAFT,
     });
-    progressIepAiDraft(first.id, tenant.id, "teacher-1", "teacher_review");
+    await progressIepAiDraft(first.id, tenant.id, "teacher-1", "teacher_review");
     // Regenerate.
-    const second = upsertIepAiDraft({
+    const second = await upsertIepAiDraft({
       tenantId: tenant.id,
       learnerId: learner.id,
       draft: { ...SAMPLE_DRAFT, summary: "Updated summary." },
@@ -96,42 +96,42 @@ describe("progressIepAiDraft", () => {
     ensureSeeded();
   });
 
-  it("enforces the lifecycle state machine", () => {
+  it("enforces the lifecycle state machine", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
     const learner = Array.from(getStore().learnerProfiles.values())[0]!;
-    const draft = upsertIepAiDraft({
+    const draft = await upsertIepAiDraft({
       tenantId: tenant.id,
       learnerId: learner.id,
       draft: SAMPLE_DRAFT,
     });
 
     // Illegal direct jump from ai_draft → admin_approved.
-    expect(progressIepAiDraft(draft.id, tenant.id, "user-1", "admin_approved")).toBeNull();
+    expect(await progressIepAiDraft(draft.id, tenant.id, "user-1", "admin_approved")).toBeNull();
 
     // Legal path: ai_draft → teacher_review → admin_approved → active.
-    const r1 = progressIepAiDraft(draft.id, tenant.id, "teacher-1", "teacher_review");
+    const r1 = await progressIepAiDraft(draft.id, tenant.id, "teacher-1", "teacher_review");
     expect(r1?.status).toBe("teacher_review");
     expect(r1?.reviewedByUserId).toBe("teacher-1");
-    const r2 = progressIepAiDraft(draft.id, tenant.id, "admin-1", "admin_approved");
+    const r2 = await progressIepAiDraft(draft.id, tenant.id, "admin-1", "admin_approved");
     expect(r2?.status).toBe("admin_approved");
     expect(r2?.approvedByUserId).toBe("admin-1");
-    const r3 = progressIepAiDraft(draft.id, tenant.id, "admin-1", "active");
+    const r3 = await progressIepAiDraft(draft.id, tenant.id, "admin-1", "active");
     expect(r3?.status).toBe("active");
 
     // archived is terminal: nothing can move out of it.
-    progressIepAiDraft(draft.id, tenant.id, "admin-1", "archived");
-    expect(progressIepAiDraft(draft.id, tenant.id, "admin-1", "active")).toBeNull();
+    await progressIepAiDraft(draft.id, tenant.id, "admin-1", "archived");
+    expect(await progressIepAiDraft(draft.id, tenant.id, "admin-1", "active")).toBeNull();
   });
 
-  it("returns null on cross-tenant attempts", () => {
+  it("returns null on cross-tenant attempts", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
     const learner = Array.from(getStore().learnerProfiles.values())[0]!;
-    const draft = upsertIepAiDraft({
+    const draft = await upsertIepAiDraft({
       tenantId: tenant.id,
       learnerId: learner.id,
       draft: SAMPLE_DRAFT,
     });
-    expect(progressIepAiDraft(draft.id, "wrong-tenant", "x", "teacher_review")).toBeNull();
+    expect(await progressIepAiDraft(draft.id, "wrong-tenant", "x", "teacher_review")).toBeNull();
   });
 });
 
@@ -144,7 +144,7 @@ describe("listIepAiDraftsForReviewer", () => {
   it("returns drafts only for learners on the teacher's roster", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
     const learner = Array.from(getStore().learnerProfiles.values())[0]!;
-    upsertIepAiDraft({
+    await upsertIepAiDraft({
       tenantId: tenant.id,
       learnerId: learner.id,
       draft: SAMPLE_DRAFT,

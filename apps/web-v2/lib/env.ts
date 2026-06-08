@@ -55,11 +55,18 @@ const aiProviderSchema = isProd
     })
   : z.enum(["mock", "anthropic", "openai", "google"]).default("mock");
 
-// The in-memory Map store is a development affordance only: data is lost on
-// restart and is not shared across replicas/serverless workers. In production
-// every persistence selector MUST be `postgres`, so a misconfigured deploy
-// fails fast at startup instead of silently losing data (e.g. staff invites,
-// audit trails). Mirrors the AUTH_MODE / AI_PROVIDER guards above.
+// Sprint 9 — the in-memory Map store is now a TEST-ONLY fixture. Data is lost
+// on restart and is not shared across replicas/serverless workers, so in
+// PRODUCTION every persistence selector MUST be `postgres`: a misconfigured
+// deploy fails fast at startup (here) instead of silently losing data. A second
+// independent guard, `assertNoMemoryAdapterInProduction` in
+// persistence/index.ts, re-checks at the first getPersistence(). Mirrors the
+// AUTH_MODE / AI_PROVIDER guards above.
+//
+// `postgres` mode requires DATABASE_URL (validated below) and the web_*
+// schema applied + seeded. Bring-up, cutover, rollback, and the
+// Testcontainers parity harness that proves memory == postgres are
+// documented in docs/runbooks/persistence-postgres.md.
 const persistenceModeProd = z.enum(["postgres"], {
   errorMap: () => ({
     message:
@@ -77,6 +84,10 @@ const aivoPersistenceOverrideSchema = isProd
 
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  // Postgres connection backing the persistence adapter (web_* tables).
+  // Required in production (every domain resolves to `postgres` there); in
+  // dev/test it is optional and only needed once a domain is flipped to
+  // postgres. See docs/runbooks/persistence-postgres.md.
   DATABASE_URL: isProd ? z.string().url() : z.string().url().optional(),
   REDIS_URL: isProd ? z.string().url() : z.string().url().optional(),
   AUTH_MODE: authModeSchema,
@@ -165,6 +176,28 @@ const serverSchema = z.object({
   AIVO_PERSISTENCE_QUESTS: aivoPersistenceOverrideSchema,
   AIVO_PERSISTENCE_ADMIN: aivoPersistenceOverrideSchema,
   AIVO_PERSISTENCE_COLLABORATION: aivoPersistenceOverrideSchema,
+  // Sprint 2 — web-owned billing/AI-cost rows (web_* tables). Canonical
+  // subscription/invoice/seat state stays in billing-svc (ADR 0015).
+  AIVO_PERSISTENCE_BILLING: aivoPersistenceOverrideSchema,
+  // Sprint 3 — web-owned IEP AI-draft review inbox. Canonical IEP goals /
+  // therapist notes / caregiver observations stay in family-svc (ADR 0015).
+  AIVO_PERSISTENCE_CLINICAL: aivoPersistenceOverrideSchema,
+  // Sprint 4 — platform-global security / SOC 2 / incident / vendor /
+  // privacy-matrix compliance artifacts (web_* tables).
+  AIVO_PERSISTENCE_SECURITY: aivoPersistenceOverrideSchema,
+  // Sprint 6 — web-owned rostering / SIS / lesson-sync aggregates. Canonical
+  // SIS sync (integrations-svc) + rostering grant (identity-svc) read via REST.
+  AIVO_PERSISTENCE_ROSTERING: aivoPersistenceOverrideSchema,
+  // Sprint 7 — web-owned TTS/audio/read-aloud + safety/moderation.
+  AIVO_PERSISTENCE_AUDIO: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_SAFETY: aivoPersistenceOverrideSchema,
+  // Sprint 8 — web-owned support tickets/AI-jobs + tenant/platform settings.
+  AIVO_PERSISTENCE_SUPPORT: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_SETTINGS: aivoPersistenceOverrideSchema,
+  // Sprint 8 remainder — web-owned engagement / sessions / notification prefs.
+  AIVO_PERSISTENCE_ENGAGEMENT: aivoPersistenceOverrideSchema,
+  // Sprint 8 remainder — platform-global standards / skill-graph reference.
+  AIVO_PERSISTENCE_STANDARDS: aivoPersistenceOverrideSchema,
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z

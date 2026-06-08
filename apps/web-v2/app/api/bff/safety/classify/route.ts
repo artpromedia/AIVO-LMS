@@ -52,11 +52,11 @@ export async function POST(req: Request): Promise<NextResponse> {
     }
     const result = SAFETY_CLASSIFY(parsed.data.text, {
       subjectKind: parsed.data.subjectKind,
-      policy: getActiveSafetyPolicy(),
+      policy: await getActiveSafetyPolicy(),
     });
     let eventId: string | null = null;
     if (parsed.data.record !== false && result.classification.decision !== "allow") {
-      const rec = recordModerationEvent({
+      const rec = await recordModerationEvent({
         tenantId: session!.tenantId,
         learnerId: parsed.data.learnerId ?? null,
         subjectKind: parsed.data.subjectKind,

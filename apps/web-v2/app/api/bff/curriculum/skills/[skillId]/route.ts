@@ -49,12 +49,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     return ok(
       {
         skill,
-        currentVersion: getCurrentSkillVersion(skillId),
-        versions: listSkillVersions(skillId),
-        prereqEdges: listSkillPrerequisites(skillId),
-        objectiveTemplates: listLessonObjectiveTemplates(skillId),
-        assessmentBlueprints: listAssessmentBlueprints(skillId),
-        curriculumMaps: listCurriculumMaps(skillId),
+        currentVersion: await getCurrentSkillVersion(skillId),
+        versions: await listSkillVersions(skillId),
+        prereqEdges: await listSkillPrerequisites(skillId),
+        objectiveTemplates: await listLessonObjectiveTemplates(skillId),
+        assessmentBlueprints: await listAssessmentBlueprints(skillId),
+        curriculumMaps: await listCurriculumMaps(skillId),
       },
       requestId,
     );
@@ -87,7 +87,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         requestId,
       );
     }
-    let updated = updateSkill(skillId, {
+    let updated = await updateSkill(skillId, {
       name: parsed.data.name,
       gradeBand: parsed.data.gradeBand,
     });
@@ -96,7 +96,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     }
     let prereqResult: "ok" | "cycle" | "missing" | null = null;
     if (parsed.data.addPrerequisite) {
-      const added = addSkillPrerequisite({
+      const added = await addSkillPrerequisite({
         skillId,
         prerequisiteSkillId: parsed.data.addPrerequisite.prerequisiteSkillId,
         strength: parsed.data.addPrerequisite.strength,

@@ -34,7 +34,7 @@ export default async function LearnerHomeworkPage() {
   const learner = getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/select");
 
-  const recent = listHomeworkSessionsForLearner(learnerId, session.tenantId, { limit: 10 });
+  const recent = await listHomeworkSessionsForLearner(learnerId, session.tenantId, { limit: 10 });
   const iep = await getIEPForLearner(learnerId, session.tenantId);
   const t = await getTranslations("learner.homework");
   const chips: PersonalizationVariant[] = ["ai_companion", "no_grades"];

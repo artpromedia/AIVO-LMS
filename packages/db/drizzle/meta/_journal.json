@@ -428,6 +428,69 @@
       "when": 1782336000000,
       "tag": "0080_support_tickets",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1782422400000,
+      "tag": "0081_web_billing",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1782508800000,
+      "tag": "0082_web_clinical",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1782595200000,
+      "tag": "0083_web_security",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1782681600000,
+      "tag": "0084_web_privacy",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1782768000000,
+      "tag": "0085_web_rostering",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1782854400000,
+      "tag": "0086_web_audio_safety",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1782940800000,
+      "tag": "0087_web_support_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1783027200000,
+      "tag": "0088_web_engagement",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1783113600000,
+      "tag": "0089_web_standards",
+      "breakpoints": true
     }
   ]
 }

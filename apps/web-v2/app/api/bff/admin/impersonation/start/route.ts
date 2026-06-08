@@ -68,29 +68,52 @@ export async function POST(req: Request): Promise<NextResponse> {
       requestId,
     });
 
-    // Resolve the cookie state either from the upstream session or, when the
-    // upstream is unreachable in the demo env, synthesize it from the request
-    // body so the View-As UI is still demoable.
-    const upstream = res.ok ? res.data.session : undefined;
-    const endsAt = upstream?.endsAt ?? new Date(Date.now() + ttlSeconds * 1000).toISOString();
-    const cookieValue = JSON.stringify({
-      sessionId: upstream?.id ?? `imp-local-${Date.now()}`,
-      subjectId: upstream?.subjectId ?? body.subject_user_id,
-      subjectName: upstream?.subjectName ?? body.subject_user_id,
-      subjectRole: upstream?.subjectRole ?? "user",
-      endsAt,
-      allowWrites: upstream?.allowWrites ?? allowWrites,
-      reason: upstream?.reason ?? body.reason,
-    });
+    // No fabricated fallback. Impersonation is security-sensitive: a "View-As"
+    // session MUST be minted by identity-svc (which enforces step-up / MFA and
+    // authorization). If the upstream is unreachable or refuses (e.g. 403
+    // STEP_UP_REQUIRED), surface a typed error — never synthesize a local
+    // "imp-local-…" session that bypasses those checks.
+    if (!res.ok) {
+      return fail(
+        {
+          code: res.status === 403 ? "step_up_required" : "upstream_unavailable",
+          message: `identity-svc rejected impersonation start (status ${res.status ?? "n/a"}).`,
+          userMessage:
+            res.status === 403
+              ? "Additional verification is required to start View-As."
+              : "Could not start View-As — the identity service is unavailable.",
+          status: res.status === 403 ? 403 : 502,
+        },
+        requestId,
+      );
+    }
 
-    // Note: if identity-svc returns 403 STEP_UP_REQUIRED, a production build
-    // would surface that to trigger an MFA challenge. For the demo env we fall
-    // through and set the local cookie so the View-As flow stays exercisable.
+    const upstream = res.data.session;
+    if (!upstream?.id) {
+      return fail(
+        {
+          code: "upstream_unavailable",
+          message: "identity-svc accepted the request but returned no impersonation session.",
+          userMessage: "Could not start View-As — the identity service returned an invalid session.",
+          status: 502,
+        },
+        requestId,
+      );
+    }
+    const endsAt = upstream.endsAt ?? new Date(Date.now() + ttlSeconds * 1000).toISOString();
+    const cookieValue = JSON.stringify({
+      sessionId: upstream.id,
+      subjectId: upstream.subjectId ?? body.subject_user_id,
+      subjectName: upstream.subjectName ?? body.subject_user_id,
+      subjectRole: upstream.subjectRole ?? "user",
+      endsAt,
+      allowWrites: upstream.allowWrites ?? allowWrites,
+      reason: upstream.reason ?? body.reason,
+    });
 
     const okRes = ok(
       {
         started: true,
-        stub: !res.ok,
         endsAt,
       },
       requestId,

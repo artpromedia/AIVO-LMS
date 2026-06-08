@@ -27,8 +27,8 @@ export default async function Page({ params }: PageProps) {
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
   const pref =
-    getLearnerVoicePreference(learnerId) ??
-    upsertLearnerVoicePreference({
+    await getLearnerVoicePreference(learnerId) ??
+    await upsertLearnerVoicePreference({
       learnerId,
       tenantId: session.tenantId,
     });

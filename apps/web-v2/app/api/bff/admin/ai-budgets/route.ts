@@ -22,12 +22,14 @@ export async function GET(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, ["platform_admin"], requestId);
     if (roleErr) return roleErr;
     const tenants = scopeTenantsForSession(session!.role, session!.tenantId);
-    const rows = tenants.map((t) => ({
-      tenant: { id: t.id, name: t.name, type: t.type },
-      budget: getAIBudget(t.id),
-      spentCents: monthToDateSpendCents(t.id),
-      check: checkAIBudget(t.id),
-    }));
+    const rows = await Promise.all(
+      tenants.map(async (t) => ({
+        tenant: { id: t.id, name: t.name, type: t.type },
+        budget: await getAIBudget(t.id),
+        spentCents: await monthToDateSpendCents(t.id),
+        check: await checkAIBudget(t.id),
+      })),
+    );
     return ok({ rows }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -65,7 +67,7 @@ export async function PATCH(req: Request): Promise<NextResponse> {
       );
     }
     const { tenantId, ...patch } = parsed.data;
-    const b = updateAIBudget(tenantId, patch);
+    const b = await updateAIBudget(tenantId, patch);
     audit(session!, "billing.ai_budget.updated", requestId, {
       metadata: {
         tenantId,

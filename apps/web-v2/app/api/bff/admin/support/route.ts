@@ -16,7 +16,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
     const scope = adminScopeForSession(session!);
-    const tickets = listSupportTickets(scope.tenantIds);
+    const tickets = await listSupportTickets(scope.tenantIds);
     return ok({ tickets }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -41,7 +41,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const ticket = createSupportTicket({
+    const ticket = await createSupportTicket({
       userId: session!.userId,
       tenantId: session!.tenantId,
       subject,

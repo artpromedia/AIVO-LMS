@@ -76,7 +76,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const rec = recordDisclosure({
+    const rec = await recordDisclosure({
       tenantId: session!.tenantId,
       learnerId,
       recipientType: parsed.data.recipientType,

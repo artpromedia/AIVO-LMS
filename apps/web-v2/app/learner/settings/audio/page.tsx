@@ -30,8 +30,8 @@ export default async function Page() {
   // Ensure a row exists so the form renders deterministic initial values
   // even on a fresh tenant where no parent has saved preferences yet.
   const pref =
-    getLearnerVoicePreference(session.learnerId) ??
-    upsertLearnerVoicePreference({
+    await getLearnerVoicePreference(session.learnerId) ??
+    await upsertLearnerVoicePreference({
       learnerId: session.learnerId,
       tenantId: session.tenantId,
     });

@@ -32,7 +32,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     // Mutations (POST below) remain platform_admin-only.
     const roleErr = requireRole(session!, [...IMPORT_READ_ROLES], requestId);
     if (roleErr) return roleErr;
-    return ok({ jobs: listCurriculumImportJobs() }, requestId);
+    return ok({ jobs: await listCurriculumImportJobs() }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }
@@ -61,7 +61,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const job = startCurriculumImportJob({
+    const job = await startCurriculumImportJob({
       frameworkSlug: parsed.data.frameworkSlug,
       source: parsed.data.source,
       requestedByUserId: session!.userId,

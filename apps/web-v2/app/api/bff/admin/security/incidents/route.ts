@@ -15,7 +15,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["platform_admin"], requestId);
     if (roleErr) return roleErr;
-    const incidents = listIncidents().map((i) => ({
+    const incidents = (await listIncidents()).map((i) => ({
       incident: i,
       timeline: listIncidentTimeline(i.id),
     }));
@@ -51,7 +51,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const inc = createIncident({ ...parsed.data, commanderUserId: session!.userId });
+    const inc = await createIncident({ ...parsed.data, commanderUserId: session!.userId });
     audit(session!, "security.incident.opened", requestId, {
       metadata: { incidentId: inc.id, severity: inc.severity },
     });

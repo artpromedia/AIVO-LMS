@@ -30,7 +30,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const url = new URL(req.url);
     const startIso = url.searchParams.get("startIso") ?? undefined;
     const endIso = url.searchParams.get("endIso") ?? undefined;
-    const metrics = getBaselinePipelineMetrics({ startIso, endIso });
+    const metrics = await getBaselinePipelineMetrics({ startIso, endIso });
     return ok({ metrics }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

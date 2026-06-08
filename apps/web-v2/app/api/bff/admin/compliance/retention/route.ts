@@ -61,7 +61,7 @@ export async function PATCH(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const updated = updateRetentionPolicy(
+    const updated = await updateRetentionPolicy(
       parsed.data.id,
       {
         retentionDays: parsed.data.retentionDays,

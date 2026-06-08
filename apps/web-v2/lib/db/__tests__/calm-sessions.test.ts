@@ -18,7 +18,7 @@ const LEARNER = "learner_1";
 const TENANT = "tenant_1";
 
 /** Record a session whose `occurredAt` is pinned by mocking the clock. */
-function recordAt(
+async function recordAt(
   occurredAt: string,
   opts: {
     learnerId?: string;
@@ -30,7 +30,7 @@ function recordAt(
   } = {},
 ) {
   vi.setSystemTime(new Date(occurredAt));
-  return recordCalmSession({
+  return await recordCalmSession({
     tenantId: opts.tenantId ?? TENANT,
     learnerId: opts.learnerId ?? LEARNER,
     activityId: opts.activityId ?? "box_breathing",
@@ -50,11 +50,11 @@ describe("calm-sessions repo", () => {
   });
 
   describe("recordCalmSession + listCalmSessionsForLearner", () => {
-    it("persists a record and returns it most-recent-first", () => {
-      recordAt("2026-01-01T10:00:00.000Z", { activityId: "stretch_break" });
-      recordAt("2026-01-02T10:00:00.000Z", { activityId: "box_breathing" });
+    it("persists a record and returns it most-recent-first", async () => {
+      await recordAt("2026-01-01T10:00:00.000Z", { activityId: "stretch_break" });
+      await recordAt("2026-01-02T10:00:00.000Z", { activityId: "box_breathing" });
 
-      const list = listCalmSessionsForLearner(LEARNER, TENANT);
+      const list = await listCalmSessionsForLearner(LEARNER, TENANT);
       expect(list).toHaveLength(2);
       expect(list[0].activityId).toBe("box_breathing");
       expect(list[1].activityId).toBe("stretch_break");
@@ -66,25 +66,25 @@ describe("calm-sessions repo", () => {
       });
     });
 
-    it("is tenant- and learner-scoped on read", () => {
-      recordAt("2026-01-01T10:00:00.000Z", { learnerId: LEARNER, tenantId: TENANT });
-      recordAt("2026-01-01T10:00:00.000Z", { learnerId: "other_learner", tenantId: TENANT });
-      recordAt("2026-01-01T10:00:00.000Z", { learnerId: LEARNER, tenantId: "other_tenant" });
+    it("is tenant- and learner-scoped on read", async () => {
+      await recordAt("2026-01-01T10:00:00.000Z", { learnerId: LEARNER, tenantId: TENANT });
+      await recordAt("2026-01-01T10:00:00.000Z", { learnerId: "other_learner", tenantId: TENANT });
+      await recordAt("2026-01-01T10:00:00.000Z", { learnerId: LEARNER, tenantId: "other_tenant" });
 
-      const list = listCalmSessionsForLearner(LEARNER, TENANT);
+      const list = await listCalmSessionsForLearner(LEARNER, TENANT);
       expect(list).toHaveLength(1);
       expect(list[0].learnerId).toBe(LEARNER);
       expect(list[0].tenantId).toBe(TENANT);
     });
 
-    it("honours limit and sinceIso", () => {
-      recordAt("2026-01-01T10:00:00.000Z");
-      recordAt("2026-01-02T10:00:00.000Z");
-      recordAt("2026-01-03T10:00:00.000Z");
+    it("honours limit and sinceIso", async () => {
+      await recordAt("2026-01-01T10:00:00.000Z");
+      await recordAt("2026-01-02T10:00:00.000Z");
+      await recordAt("2026-01-03T10:00:00.000Z");
 
-      expect(listCalmSessionsForLearner(LEARNER, TENANT, { limit: 2 })).toHaveLength(2);
+      expect(await listCalmSessionsForLearner(LEARNER, TENANT, { limit: 2 })).toHaveLength(2);
       expect(
-        listCalmSessionsForLearner(LEARNER, TENANT, { sinceIso: "2026-01-02T00:00:00.000Z" }),
+        await listCalmSessionsForLearner(LEARNER, TENANT, { sinceIso: "2026-01-02T00:00:00.000Z" }),
       ).toHaveLength(2);
     });
   });
@@ -92,81 +92,81 @@ describe("calm-sessions repo", () => {
   describe("getCalmStreak", () => {
     const today = "2026-03-10T12:00:00.000Z";
 
-    it("empty history → 0", () => {
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today })).toEqual({
+    it("empty history → 0", async () => {
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today }))).toEqual({
         currentStreakDays: 0,
         lastSessionAt: null,
       });
     });
 
-    it("a single completed session today → 1", () => {
-      recordAt("2026-03-10T08:00:00.000Z");
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today }).currentStreakDays).toBe(1);
+    it("a single completed session today → 1", async () => {
+      await recordAt("2026-03-10T08:00:00.000Z");
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today })).currentStreakDays).toBe(1);
     });
 
-    it("counts a streak that ends yesterday → 1", () => {
-      recordAt("2026-03-09T08:00:00.000Z");
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today }).currentStreakDays).toBe(1);
+    it("counts a streak that ends yesterday → 1", async () => {
+      await recordAt("2026-03-09T08:00:00.000Z");
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today })).currentStreakDays).toBe(1);
     });
 
-    it("today + yesterday → 2", () => {
-      recordAt("2026-03-09T08:00:00.000Z");
-      recordAt("2026-03-10T08:00:00.000Z");
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today }).currentStreakDays).toBe(2);
+    it("today + yesterday → 2", async () => {
+      await recordAt("2026-03-09T08:00:00.000Z");
+      await recordAt("2026-03-10T08:00:00.000Z");
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today })).currentStreakDays).toBe(2);
     });
 
-    it("multiple sessions on one day count that day once", () => {
-      recordAt("2026-03-10T07:00:00.000Z");
-      recordAt("2026-03-10T08:00:00.000Z");
-      recordAt("2026-03-09T08:00:00.000Z");
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today }).currentStreakDays).toBe(2);
+    it("multiple sessions on one day count that day once", async () => {
+      await recordAt("2026-03-10T07:00:00.000Z");
+      await recordAt("2026-03-10T08:00:00.000Z");
+      await recordAt("2026-03-09T08:00:00.000Z");
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today })).currentStreakDays).toBe(2);
     });
 
-    it("a gap resets the streak", () => {
-      recordAt("2026-03-10T08:00:00.000Z"); // today
-      recordAt("2026-03-09T08:00:00.000Z"); // yesterday
-      recordAt("2026-03-07T08:00:00.000Z"); // gap on the 8th
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today }).currentStreakDays).toBe(2);
+    it("a gap resets the streak", async () => {
+      await recordAt("2026-03-10T08:00:00.000Z"); // today
+      await recordAt("2026-03-09T08:00:00.000Z"); // yesterday
+      await recordAt("2026-03-07T08:00:00.000Z"); // gap on the 8th
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today })).currentStreakDays).toBe(2);
     });
 
-    it("incomplete-only days do not count", () => {
-      recordAt("2026-03-10T08:00:00.000Z", { completed: false });
-      recordAt("2026-03-09T08:00:00.000Z", { completed: false });
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today })).toEqual({
+    it("incomplete-only days do not count", async () => {
+      await recordAt("2026-03-10T08:00:00.000Z", { completed: false });
+      await recordAt("2026-03-09T08:00:00.000Z", { completed: false });
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today }))).toEqual({
         currentStreakDays: 0,
         lastSessionAt: null,
       });
     });
 
-    it("an incomplete day inside a run breaks the streak", () => {
-      recordAt("2026-03-10T08:00:00.000Z", { completed: true }); // today
-      recordAt("2026-03-09T08:00:00.000Z", { completed: false }); // breaks here
-      recordAt("2026-03-08T08:00:00.000Z", { completed: true });
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today }).currentStreakDays).toBe(1);
+    it("an incomplete day inside a run breaks the streak", async () => {
+      await recordAt("2026-03-10T08:00:00.000Z", { completed: true }); // today
+      await recordAt("2026-03-09T08:00:00.000Z", { completed: false }); // breaks here
+      await recordAt("2026-03-08T08:00:00.000Z", { completed: true });
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today })).currentStreakDays).toBe(1);
     });
 
-    it("a streak older than yesterday does not count", () => {
-      recordAt("2026-03-07T08:00:00.000Z");
-      recordAt("2026-03-08T08:00:00.000Z");
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today }).currentStreakDays).toBe(0);
+    it("a streak older than yesterday does not count", async () => {
+      await recordAt("2026-03-07T08:00:00.000Z");
+      await recordAt("2026-03-08T08:00:00.000Z");
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today })).currentStreakDays).toBe(0);
     });
 
-    it("reports lastSessionAt for the most recent completed session", () => {
-      recordAt("2026-03-09T08:00:00.000Z");
-      const last = recordAt("2026-03-10T08:00:00.000Z");
-      expect(getCalmStreak(LEARNER, TENANT, { todayIso: today }).lastSessionAt).toBe(
+    it("reports lastSessionAt for the most recent completed session", async () => {
+      await recordAt("2026-03-09T08:00:00.000Z");
+      const last = await recordAt("2026-03-10T08:00:00.000Z");
+      expect((await getCalmStreak(LEARNER, TENANT, { todayIso: today })).lastSessionAt).toBe(
         last.occurredAt,
       );
     });
   });
 
   describe("summarizeCalmForParent", () => {
-    it("returns counts + topActivityId and never leaks records", () => {
-      recordAt("2026-01-01T10:00:00.000Z", { activityId: "box_breathing", completed: true });
-      recordAt("2026-01-02T10:00:00.000Z", { activityId: "box_breathing", completed: true });
-      recordAt("2026-01-03T10:00:00.000Z", { activityId: "stretch_break", completed: false });
+    it("returns counts + topActivityId and never leaks records", async () => {
+      await recordAt("2026-01-01T10:00:00.000Z", { activityId: "box_breathing", completed: true });
+      await recordAt("2026-01-02T10:00:00.000Z", { activityId: "box_breathing", completed: true });
+      await recordAt("2026-01-03T10:00:00.000Z", { activityId: "stretch_break", completed: false });
 
-      const summary = summarizeCalmForParent(LEARNER, TENANT);
+      const summary = await summarizeCalmForParent(LEARNER, TENANT);
       expect(summary).toEqual({
         totalMoments: 3,
         completedMoments: 2,
@@ -182,8 +182,8 @@ describe("calm-sessions repo", () => {
       ]);
     });
 
-    it("returns an empty rollup when there is no history", () => {
-      expect(summarizeCalmForParent(LEARNER, TENANT)).toEqual({
+    it("returns an empty rollup when there is no history", async () => {
+      expect((await summarizeCalmForParent(LEARNER, TENANT))).toEqual({
         totalMoments: 0,
         completedMoments: 0,
         topActivityId: null,
@@ -191,20 +191,20 @@ describe("calm-sessions repo", () => {
       });
     });
 
-    it("respects sinceIso", () => {
-      recordAt("2026-01-01T10:00:00.000Z");
-      recordAt("2026-01-05T10:00:00.000Z");
-      const summary = summarizeCalmForParent(LEARNER, TENANT, {
+    it("respects sinceIso", async () => {
+      await recordAt("2026-01-01T10:00:00.000Z");
+      await recordAt("2026-01-05T10:00:00.000Z");
+      const summary = await summarizeCalmForParent(LEARNER, TENANT, {
         sinceIso: "2026-01-03T00:00:00.000Z",
       });
       expect(summary.totalMoments).toBe(1);
       expect(summary.lastSessionAt).toBe("2026-01-05T10:00:00.000Z");
     });
 
-    it("is tenant- and learner-scoped", () => {
-      recordAt("2026-01-01T10:00:00.000Z", { learnerId: "other_learner" });
-      recordAt("2026-01-01T10:00:00.000Z", { tenantId: "other_tenant" });
-      expect(summarizeCalmForParent(LEARNER, TENANT).totalMoments).toBe(0);
+    it("is tenant- and learner-scoped", async () => {
+      await recordAt("2026-01-01T10:00:00.000Z", { learnerId: "other_learner" });
+      await recordAt("2026-01-01T10:00:00.000Z", { tenantId: "other_tenant" });
+      expect((await summarizeCalmForParent(LEARNER, TENANT)).totalMoments).toBe(0);
     });
   });
 });

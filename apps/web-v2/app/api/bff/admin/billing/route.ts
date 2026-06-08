@@ -37,7 +37,7 @@ export async function GET(req: Request): Promise<NextResponse> {
 
     // Default: return all billing accounts in scope
     const scope = adminScopeForSession(session!);
-    const accounts = listBillingForTenants(scope.tenantIds).map((a) => ({
+    const accounts = (await listBillingForTenants(scope.tenantIds)).map((a) => ({
       ...a,
       tenantName: getTenantById(a.tenantId)?.name ?? a.tenantId,
     }));

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
+import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { ADMIN_ROLES } from "@/lib/bff/admin-scope";
 import { listIncidents } from "@/lib/services/status-page-svc";
@@ -45,23 +45,16 @@ export async function POST(req: Request): Promise<NextResponse> {
       return ok(res.data, requestId);
     }
 
-    // Resilient fallback so the admin flow still completes in local/demo mode.
-    const title = typeof body.title === "string" ? body.title : "Untitled incident";
-    const impact = typeof body.impact === "string" ? body.impact : "minor";
-    const affectedComponentIds = Array.isArray(body.affectedComponentIds)
-      ? body.affectedComponentIds
-      : [];
-    return ok(
+    // No fabricated fallback (ADR 0015 / persistence-migration Global
+    // Invariant #2): status-page incidents are owned by status-page-svc. If it
+    // is unreachable, surface a typed upstream error so the admin sees the
+    // failure instead of a synthetic local record that never actually persisted.
+    return fail(
       {
-        incident: {
-          id: `inc-local-${Date.now()}`,
-          title,
-          impact,
-          lifecycle: "investigating",
-          affectedComponentIds,
-          updatedAt: new Date().toISOString(),
-        },
-        stub: true,
+        code: "upstream_unavailable",
+        message: `status-page-svc rejected incident create (status ${res.status}).`,
+        userMessage: "Could not create the incident — the status page service is unavailable.",
+        status: 502,
       },
       requestId,
     );

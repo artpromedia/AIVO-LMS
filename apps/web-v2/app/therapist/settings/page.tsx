@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function Page() {
   const t = await getTranslations("therapist.settings");
   const session = await requirePageRole(["therapist", "platform_admin"]);
-  const prefs = getNotificationPreference(session.userId, session.tenantId);
+  const prefs = await getNotificationPreference(session.userId, session.tenantId);
   const channelCount = (channel: "in_app" | "email" | "push") =>
     Object.entries(prefs.preferences).filter(
       ([key, enabled]) => key.endsWith(`:${channel}`) && enabled,

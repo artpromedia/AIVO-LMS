@@ -4,13 +4,13 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import { getStore } from "@/lib/db/store";
+import { getPersistence } from "@/lib/db/persistence";
 import { AccountForm } from "./account-form";
 
 export default async function Page() {
   const t = await getTranslations("parent.settings_account");
   const session = await requirePageRole(["parent"]);
-  const user = getStore().users.get(session.userId);
+  const user = await getPersistence().identity.getUserById(session.userId);
 
   return (
     <AppShell

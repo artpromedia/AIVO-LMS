@@ -28,7 +28,7 @@ export default async function ParentHomeworkHistoryPage({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const sessions = listHomeworkSessionsForLearner(learnerId, session.tenantId);
+  const sessions = await listHomeworkSessionsForLearner(learnerId, session.tenantId);
 
   return (
     <AppShell

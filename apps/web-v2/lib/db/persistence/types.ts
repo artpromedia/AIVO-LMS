@@ -12,16 +12,70 @@
  * decision record + migration order.
  */
 import type {
+  AIBudget,
+  AICostEvent,
   AuditLog,
   BaselineAssessment,
   BaselineAttempt,
   BaselineItemResponseLog,
   BaselineQuestion,
+  BillingAccount,
+  AiGenerationJob,
+  AssessmentBlueprint,
+  CurriculumImportJob,
+  CurriculumMap,
+  Domain,
+  LessonObjectiveTemplate,
+  SkillPrerequisite,
+  SkillVersion,
+  Standard,
+  StandardDocument,
+  StandardsFramework,
+  CalmSessionRecord,
+  DigestSchedule,
+  HomeworkHelpSession,
+  LearnerBadge,
+  LearnerEngagement,
+  LearnerSensoryProfile,
+  NotificationPreference,
+  PlatformApiKey,
+  PlatformEmailTemplate,
+  PlatformWebhookEndpoint,
+  SupportTicket,
+  TenantSettings,
+  AudioAsset,
+  AudioCacheEntry,
+  BlockedGeneration,
+  HomeworkInputAudit,
+  HumanReviewCase,
+  LearnerVoicePreference,
+  ModerationEvent,
+  PronunciationOverride,
+  ReadAloudUsageEvent,
+  SafetyPolicyVersion,
+  TTSGenerationJob,
+  TutorResponseAudit,
   Classroom,
+  Course,
+  Coupon,
+  DailyBillingBatch,
+  ExternalRosterMapping,
+  LessonSyncState,
+  RosterImportError,
+  RosterImportJob,
+  SISConnection,
   CollaboratorInsight,
   CollaboratorMember,
   ConsentRecord,
   ConsentType,
+  ConsentVersion,
+  DataDeletionRequest,
+  DataExportRequest,
+  DataInventoryItem,
+  DataRetentionPolicy,
+  DisclosureLog,
+  IEPDocumentAccessLog,
+  TermsAcceptance,
   Enrollment,
   GeneratedLessonPlan,
   IEPDocument,
@@ -50,7 +104,19 @@ import type {
   TenantMembership,
   User,
 } from "@/lib/db/types";
-import type { AgeGateRecord } from "@/lib/db/types";
+import type {
+  AgeGateRecord,
+  IepAiDraftRecord,
+  Incident,
+  IncidentTimelineEvent,
+  RiskRegisterEntry,
+  SecurityControl,
+  SecurityControlEvidence,
+  StatePrivacyControlMapping,
+  StatePrivacyRequirement,
+  Vendor,
+  VulnerabilityReport,
+} from "@/lib/db/types";
 import type { Role } from "@/lib/auth/types";
 import type { CreateLearnerInput, PatchLearnerInput } from "@/lib/validators/learner";
 
@@ -73,6 +139,31 @@ export interface NotificationStore {
   }): Promise<{ notification: Notification; deliveries: NotificationDelivery[] }>;
   /** Inspect the delivery rows for a notification (debug/observability). */
   listDeliveries(notificationId: string): Promise<NotificationDelivery[]>;
+
+  // ── Sprint 8 remainder: notification preferences + digest schedules ──
+  /** The user's notification preference row, or null (repo materializes a default). */
+  getPreference(userId: string): Promise<NotificationPreference | null>;
+  upsertPreference(pref: NotificationPreference): Promise<NotificationPreference>;
+  /** All digest schedules (repo filters by tenant/user). */
+  listDigestSchedules(): Promise<DigestSchedule[]>;
+}
+
+/**
+ * Engagement domain (Sprint 8 remainder) — homework-help + calm sessions,
+ * per-learner engagement snapshot + badges + sensory profile. Live
+ * gradebook/leaderboard is read from engagement-svc over REST (ADR 0015);
+ * these are the web app's own durable rows. No RLS (per-learner scoping).
+ */
+export interface EngagementStore {
+  upsertHomeworkSession(session: HomeworkHelpSession): Promise<HomeworkHelpSession>;
+  getHomeworkSession(id: string): Promise<HomeworkHelpSession | null>;
+  listHomeworkSessions(): Promise<HomeworkHelpSession[]>;
+  appendCalmSession(session: CalmSessionRecord): Promise<CalmSessionRecord>;
+  listCalmSessions(): Promise<CalmSessionRecord[]>;
+  getEngagement(learnerId: string): Promise<LearnerEngagement | null>;
+  listBadges(): Promise<LearnerBadge[]>;
+  getSensoryProfile(learnerId: string): Promise<LearnerSensoryProfile | null>;
+  upsertSensoryProfile(profile: LearnerSensoryProfile): Promise<LearnerSensoryProfile>;
 }
 
 /**
@@ -295,6 +386,8 @@ export interface CurriculumStore {
   getSubjectById(subjectId: string): Promise<Subject | null>;
   listSkills(subjectId?: string): Promise<Skill[]>;
   getSkillById(skillId: string): Promise<Skill | null>;
+  /** Sprint 8 remainder: insert/replace a skill (skill-graph authoring). */
+  upsertSkill(skill: Skill): Promise<Skill>;
 
   getMasteryMapForLearner(
     learnerId: string,
@@ -345,6 +438,33 @@ export interface ComplianceStore {
   // Policy + subprocessor catalogs (platform-wide reference data)
   listPolicyVersions(): Promise<PolicyVersion[]>;
   listSubprocessors(): Promise<SubprocessorRecord[]>;
+
+  // ── Sprint 5: privacy / DSAR / terms / inventory / retention / disclosure ──
+  // These web_* tables are PLATFORM/ADMIN-accessed (DPO consoles read DSAR +
+  // disclosure across tenants; access/disclosure logs are append-only audit),
+  // so they carry tenant_id but are NOT RLS-protected — the same exclusion
+  // 0050 makes for web_users / web_audit_logs. App code filters by tenant.
+  listConsentVersions(): Promise<ConsentVersion[]>;
+  appendTermsAcceptance(acceptance: TermsAcceptance): Promise<TermsAcceptance>;
+  listDataInventory(): Promise<DataInventoryItem[]>;
+  listRetentionPolicies(): Promise<DataRetentionPolicy[]>;
+  getRetentionPolicy(id: string): Promise<DataRetentionPolicy | null>;
+  upsertRetentionPolicy(policy: DataRetentionPolicy): Promise<DataRetentionPolicy>;
+  /** Append a FERPA disclosure log entry (append-only). */
+  appendDisclosure(entry: DisclosureLog): Promise<DisclosureLog>;
+  /** Disclosures for a tenant, newest-first. */
+  listDisclosures(tenantId: string): Promise<DisclosureLog[]>;
+  // DSAR export requests
+  upsertExportRequest(request: DataExportRequest): Promise<DataExportRequest>;
+  getExportRequestById(id: string): Promise<DataExportRequest | null>;
+  listExportRequests(): Promise<DataExportRequest[]>;
+  // DSAR deletion requests
+  upsertDeletionRequest(request: DataDeletionRequest): Promise<DataDeletionRequest>;
+  getDeletionRequestById(id: string): Promise<DataDeletionRequest | null>;
+  listDeletionRequests(): Promise<DataDeletionRequest[]>;
+  /** Append an IEP-document access log entry (append-only audit integrity). */
+  appendIepAccessLog(entry: IEPDocumentAccessLog): Promise<IEPDocumentAccessLog>;
+  listIepAccessForLearner(learnerId: string, tenantId: string): Promise<IEPDocumentAccessLog[]>;
 }
 
 /**
@@ -441,6 +561,230 @@ export interface CollaborationStore {
   listMembersForTenant(tenantId: string): Promise<CollaboratorMember[]>;
 }
 
+/**
+ * Billing domain (Sprint 2) — the WEB-OWNED operational/financial rows that
+ * previously lived in the in-memory Map (real money/quota data lost on
+ * restart). Per ADR 0015 the canonical subscription/invoice/seat state stays
+ * in `services/billing-svc` and is read over REST (see
+ * `lib/billing/billing-svc-client.ts`); this store owns only web_* rows:
+ * billing-account snapshots, AI spend budgets + the per-request cost ledger,
+ * the admin coupon catalog, and the nightly batch run log.
+ */
+export interface BillingStore {
+  // Billing-account snapshots (tenant-scoped).
+  getAccountForTenant(tenantId: string): Promise<BillingAccount | null>;
+  listAccountsForTenants(tenantIds: string[]): Promise<BillingAccount[]>;
+  upsertAccount(account: BillingAccount): Promise<BillingAccount>;
+
+  // AI budgets (one row per tenant). `get` returns null when unset — the repo
+  // layer materializes the default (so the store stays a pure row store).
+  getAIBudget(tenantId: string): Promise<AIBudget | null>;
+  upsertAIBudget(budget: AIBudget): Promise<AIBudget>;
+
+  // AI cost ledger (append-only). `list` is newest-first, tenant-filtered,
+  // capped by `limit` (default 200). The repo sums month-to-date in app code
+  // so the period maths is identical across backends.
+  recordAICostEvent(event: AICostEvent): Promise<AICostEvent>;
+  listAICostEvents(opts: { tenantId?: string; limit?: number }): Promise<AICostEvent[]>;
+
+  // Coupons (platform-wide), newest-first.
+  listCoupons(): Promise<Coupon[]>;
+  upsertCoupon(coupon: Coupon): Promise<Coupon>;
+
+  // Daily billing batches (platform-wide), newest run-date first.
+  listDailyBillingBatches(): Promise<DailyBillingBatch[]>;
+  upsertDailyBillingBatch(batch: DailyBillingBatch): Promise<DailyBillingBatch>;
+}
+
+/**
+ * Clinical domain (Sprint 3) — the WEB-OWNED IEP AI-draft review inbox.
+ * Per ADR 0015 the canonical clinical records (IEP goals, therapist session
+ * notes, caregiver observations) are owned by `family-svc` and written through
+ * over REST (`lib/clinical/family-svc-client.ts`); this store owns only the
+ * `web_iep_ai_drafts` row per learner (one upserted draft moving through a
+ * review lifecycle). Tenant-scoped on every call.
+ */
+export interface ClinicalStore {
+  /** The current AI draft for a learner, or null. (One row per learner.) */
+  getDraftForLearner(learnerId: string, tenantId: string): Promise<IepAiDraftRecord | null>;
+  /** A draft by id, tenant-scoped. */
+  getDraftById(id: string, tenantId: string): Promise<IepAiDraftRecord | null>;
+  /** Insert or replace the draft row (the repo owns lifecycle/transition logic). */
+  upsertDraft(draft: IepAiDraftRecord): Promise<IepAiDraftRecord>;
+  /** Drafts for a set of learner ids in a tenant, newest-updated first. */
+  listDraftsForLearners(learnerIds: string[], tenantId: string): Promise<IepAiDraftRecord[]>;
+}
+
+/**
+ * Security / SOC 2 / privacy-matrix domain (Sprint 4) — PLATFORM-GLOBAL
+ * compliance artifacts (no tenant scoping). The store owns raw row-level
+ * reads + writes; id generation, patch-merge, timestamp stamping, and
+ * referential checks stay in repos.ts. Every list is sorted in app code to
+ * match the in-memory store byte-for-byte.
+ */
+export interface SecurityStore {
+  // SOC 2 controls + evidence
+  listControls(): Promise<SecurityControl[]>;
+  getControl(id: string): Promise<SecurityControl | null>;
+  upsertControl(control: SecurityControl): Promise<SecurityControl>;
+  listEvidenceForControl(controlId: string): Promise<SecurityControlEvidence[]>;
+  upsertEvidence(evidence: SecurityControlEvidence): Promise<SecurityControlEvidence>;
+
+  // Risk register
+  listRisks(): Promise<RiskRegisterEntry[]>;
+  getRisk(id: string): Promise<RiskRegisterEntry | null>;
+  upsertRisk(risk: RiskRegisterEntry): Promise<RiskRegisterEntry>;
+
+  // Incidents + timeline
+  listIncidents(): Promise<Incident[]>;
+  getIncident(id: string): Promise<Incident | null>;
+  upsertIncident(incident: Incident): Promise<Incident>;
+  listIncidentTimeline(incidentId: string): Promise<IncidentTimelineEvent[]>;
+  appendIncidentTimeline(event: IncidentTimelineEvent): Promise<IncidentTimelineEvent>;
+
+  // Vendors
+  listVendors(): Promise<Vendor[]>;
+  getVendor(id: string): Promise<Vendor | null>;
+  upsertVendor(vendor: Vendor): Promise<Vendor>;
+
+  // State-privacy-law matrix
+  listStatePrivacyRequirements(): Promise<StatePrivacyRequirement[]>;
+  getStatePrivacyRequirement(id: string): Promise<StatePrivacyRequirement | null>;
+  listStatePrivacyMappingsFor(requirementId: string): Promise<StatePrivacyControlMapping[]>;
+  getStatePrivacyMapping(id: string): Promise<StatePrivacyControlMapping | null>;
+  upsertStatePrivacyMapping(
+    mapping: StatePrivacyControlMapping,
+  ): Promise<StatePrivacyControlMapping>;
+
+  // Vulnerability reports
+  listVulnerabilities(): Promise<VulnerabilityReport[]>;
+  getVulnerability(id: string): Promise<VulnerabilityReport | null>;
+  upsertVulnerability(report: VulnerabilityReport): Promise<VulnerabilityReport>;
+}
+
+/**
+ * Rostering / SIS / lesson-sync domain (Sprint 6) — web-owned operational
+ * aggregates. Tenant-scoped in app code (no RLS; see web-rostering.ts). The
+ * canonical SIS sync (integrations-svc) + teacher-rostering grant (identity-
+ * svc) are read over REST and are NOT part of this store.
+ */
+export interface RosteringStore {
+  // Courses (per tenant; seeded reference web surfaces).
+  listCoursesForTenant(tenantId: string): Promise<Course[]>;
+  // Roster import jobs + per-row errors.
+  upsertImportJob(job: RosterImportJob): Promise<RosterImportJob>;
+  /** Get a job by id WITHOUT tenant scoping (platform-admin escape hatch). */
+  getImportJobById(jobId: string): Promise<RosterImportJob | null>;
+  listImportJobsForTenant(tenantId: string): Promise<RosterImportJob[]>;
+  appendImportError(error: RosterImportError): Promise<RosterImportError>;
+  listImportErrors(jobId: string): Promise<RosterImportError[]>;
+  // SIS connections + external roster mappings (web aggregates).
+  listSISConnectionsForTenant(tenantId: string): Promise<SISConnection[]>;
+  listExternalMappingsForConnection(connectionId: string): Promise<ExternalRosterMapping[]>;
+  // Multi-device lesson sync state (keyed by lessonRunId; optimistic version).
+  getLessonSyncState(lessonRunId: string): Promise<LessonSyncState | null>;
+  upsertLessonSyncState(state: LessonSyncState): Promise<LessonSyncState>;
+}
+
+/**
+ * Audio domain (Sprint 7) — TTS jobs, audio assets, the read-aloud cache
+ * (composite key `${tenantId}:${lang}:${hash}`), pronunciation overrides,
+ * per-learner voice prefs, read-aloud usage. Filtering/sorting + the cache
+ * key + TTL/hit logic stay in repos; the store is a row store. No RLS.
+ */
+export interface AudioStore {
+  getAudioAsset(id: string): Promise<AudioAsset | null>;
+  listAudioAssets(): Promise<AudioAsset[]>;
+  upsertAudioAsset(asset: AudioAsset): Promise<AudioAsset>;
+  upsertTtsJob(job: TTSGenerationJob): Promise<TTSGenerationJob>;
+  listPronunciationOverrides(): Promise<PronunciationOverride[]>;
+  getPronunciationOverride(id: string): Promise<PronunciationOverride | null>;
+  upsertPronunciationOverride(o: PronunciationOverride): Promise<PronunciationOverride>;
+  getVoicePreference(learnerId: string): Promise<LearnerVoicePreference | null>;
+  upsertVoicePreference(pref: LearnerVoicePreference): Promise<LearnerVoicePreference>;
+  appendReadAloudUsage(event: ReadAloudUsageEvent): Promise<ReadAloudUsageEvent>;
+  listReadAloudUsage(): Promise<ReadAloudUsageEvent[]>;
+  /** Audio cache by composite key. */
+  getCacheEntry(cacheKey: string): Promise<AudioCacheEntry | null>;
+  upsertCacheEntry(cacheKey: string, entry: AudioCacheEntry): Promise<AudioCacheEntry>;
+}
+
+/**
+ * Safety domain (Sprint 7) — moderation events + human-review cases +
+ * safety-policy catalog + blocked generations + tutor/homework safety audits.
+ * Moderation events + audits are append-only. No RLS (admin cross-tenant
+ * trust console). Canonical responsible-AI evals/models read via REST.
+ */
+export interface SafetyStore {
+  listSafetyPolicyVersions(): Promise<SafetyPolicyVersion[]>;
+  appendModerationEvent(event: ModerationEvent): Promise<ModerationEvent>;
+  getModerationEvent(id: string): Promise<ModerationEvent | null>;
+  listModerationEvents(): Promise<ModerationEvent[]>;
+  upsertHumanReviewCase(c: HumanReviewCase): Promise<HumanReviewCase>;
+  getHumanReviewCase(id: string): Promise<HumanReviewCase | null>;
+  listHumanReviewCases(): Promise<HumanReviewCase[]>;
+  appendBlockedGeneration(b: BlockedGeneration): Promise<BlockedGeneration>;
+  listBlockedGenerations(): Promise<BlockedGeneration[]>;
+  appendTutorResponseAudit(a: TutorResponseAudit): Promise<TutorResponseAudit>;
+  listTutorResponseAudits(): Promise<TutorResponseAudit[]>;
+  appendHomeworkInputAudit(a: HomeworkInputAudit): Promise<HomeworkInputAudit>;
+  listHomeworkInputAudits(): Promise<HomeworkInputAudit[]>;
+}
+
+/**
+ * Support domain (Sprint 8) — support tickets + the AI-generation job log.
+ * Filtering/sorting + status-scope checks stay in repos. No RLS (admin
+ * cross-tenant consoles).
+ */
+export interface SupportStore {
+  listSupportTickets(): Promise<SupportTicket[]>;
+  getSupportTicket(id: string): Promise<SupportTicket | null>;
+  upsertSupportTicket(ticket: SupportTicket): Promise<SupportTicket>;
+  listAiGenerationJobs(): Promise<AiGenerationJob[]>;
+  appendAiGenerationJob(job: AiGenerationJob): Promise<AiGenerationJob>;
+}
+
+/**
+ * Settings domain (Sprint 8) — per-tenant settings (keyed by tenantId) + the
+ * platform settings catalogs (API keys, email templates, webhook endpoints).
+ * No RLS (tenant-keyed + platform-global).
+ */
+export interface SettingsStore {
+  getTenantSettings(tenantId: string): Promise<TenantSettings | null>;
+  upsertTenantSettings(settings: TenantSettings): Promise<TenantSettings>;
+  listPlatformApiKeys(): Promise<PlatformApiKey[]>;
+  listPlatformEmailTemplates(): Promise<PlatformEmailTemplate[]>;
+  listPlatformWebhookEndpoints(): Promise<PlatformWebhookEndpoint[]>;
+}
+
+/**
+ * Standards / skill-graph domain (Sprint 8 remainder) — platform-global
+ * curriculum-standards reference + skill-graph metadata. Filtering/sorting +
+ * active-version/template selection stay in repos; the store is a row store.
+ * No RLS. Per-learner curriculum uploads / term syllabi are tutor-svc-owned
+ * (REST) and not part of this store.
+ */
+export interface StandardsStore {
+  listFrameworks(): Promise<StandardsFramework[]>;
+  getFramework(id: string): Promise<StandardsFramework | null>;
+  upsertFramework(f: StandardsFramework): Promise<StandardsFramework>;
+  listStandardDocuments(): Promise<StandardDocument[]>;
+  listStandards(): Promise<Standard[]>;
+  getStandard(id: string): Promise<Standard | null>;
+  listDomains(): Promise<Domain[]>;
+  listSkillPrerequisites(): Promise<SkillPrerequisite[]>;
+  upsertSkillPrerequisite(p: SkillPrerequisite): Promise<SkillPrerequisite>;
+  listSkillVersions(): Promise<SkillVersion[]>;
+  upsertSkillVersion(v: SkillVersion): Promise<SkillVersion>;
+  listCurriculumMaps(): Promise<CurriculumMap[]>;
+  upsertCurriculumMap(m: CurriculumMap): Promise<CurriculumMap>;
+  listLessonObjectiveTemplates(): Promise<LessonObjectiveTemplate[]>;
+  listAssessmentBlueprints(): Promise<AssessmentBlueprint[]>;
+  listImportJobs(): Promise<CurriculumImportJob[]>;
+  getImportJob(id: string): Promise<CurriculumImportJob | null>;
+  upsertImportJob(j: CurriculumImportJob): Promise<CurriculumImportJob>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -455,6 +799,16 @@ export interface Persistence {
   quests: QuestStore;
   admin: AdminStore;
   collaboration: CollaborationStore;
+  billing: BillingStore;
+  clinical: ClinicalStore;
+  security: SecurityStore;
+  rostering: RosteringStore;
+  audio: AudioStore;
+  safety: SafetyStore;
+  support: SupportStore;
+  settings: SettingsStore;
+  engagement: EngagementStore;
+  standards: StandardsStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

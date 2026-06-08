@@ -64,7 +64,7 @@ async function requireDistrictAdmin(req: Request) {
 export async function GET(req: Request) {
   const got = await requireDistrictAdmin(req);
   if ("err" in got) return got.err;
-  return ok(getTenantSettings(got.session.tenantId), got.requestId);
+  return ok(await getTenantSettings(got.session.tenantId), got.requestId);
 }
 
 export async function PATCH(req: Request) {
@@ -105,7 +105,7 @@ export async function PATCH(req: Request) {
     };
   }
 
-  const next = updateTenantSettings(session.tenantId, {
+  const next = await updateTenantSettings(session.tenantId, {
     branding: parsed.data.branding,
     notifications: parsed.data.notifications,
     features: parsed.data.features,

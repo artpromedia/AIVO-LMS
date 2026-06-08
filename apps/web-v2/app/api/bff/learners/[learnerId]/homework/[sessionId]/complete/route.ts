@@ -32,7 +32,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const existing = getHomeworkSession(sessionId, session!.tenantId);
+    const existing = await getHomeworkSession(sessionId, session!.tenantId);
     if (!existing || existing.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Homework session not found." }, requestId);
     }
@@ -40,7 +40,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       return ok({ session: existing }, requestId);
     }
     const insight = buildHomeworkInsight(existing.topic, existing.messages.length);
-    const ended = completeHomeworkSession(sessionId, session!.tenantId, insight);
+    const ended = await completeHomeworkSession(sessionId, session!.tenantId, insight);
     audit(session!, "homework.complete", requestId, {
       learnerId,
       metadata: { sessionId, messageCount: existing.messages.length },

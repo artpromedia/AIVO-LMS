@@ -26,7 +26,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
     const tenantId = session!.role === "platform_admin" ? undefined : session!.tenantId;
-    const overrides = listPronunciationOverrides(tenantId);
+    const overrides = await listPronunciationOverrides(tenantId);
     return ok({ overrides }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -65,7 +65,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const rec = createPronunciationOverride({
+    const rec = await createPronunciationOverride({
       tenantId: session!.tenantId,
       token: parsed.data.token,
       replacement: parsed.data.replacement,

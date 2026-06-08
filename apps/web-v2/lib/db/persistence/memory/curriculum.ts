@@ -29,6 +29,11 @@ export const memoryCurriculum: CurriculumStore = {
     return getStore().skills.get(skillId) ?? null;
   },
 
+  async upsertSkill(skill) {
+    getStore().skills.set(skill.id, skill);
+    return skill;
+  },
+
   async getMasteryMapForLearner(learnerId, tenantId) {
     const store = getStore();
     let map: MasteryMap | null = null;

@@ -42,7 +42,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       requestId,
     );
     if (consentErr) return consentErr;
-    const pref = getLearnerVoicePreference(learnerId);
+    const pref = await getLearnerVoicePreference(learnerId);
     return ok({ preference: pref }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -88,7 +88,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         requestId,
       );
     }
-    const pref = upsertLearnerVoicePreference({
+    const pref = await upsertLearnerVoicePreference({
       learnerId,
       tenantId: session!.tenantId,
       ...parsed.data,

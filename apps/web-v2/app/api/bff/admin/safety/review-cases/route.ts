@@ -15,7 +15,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
     const tenantId = session!.role === "platform_admin" ? undefined : session!.tenantId;
-    return ok({ cases: listHumanReviewCases({ tenantId }) }, requestId);
+    return ok({ cases: await listHumanReviewCases({ tenantId }) }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

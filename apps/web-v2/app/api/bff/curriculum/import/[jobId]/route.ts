@@ -20,7 +20,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       requestId,
     );
     if (roleErr) return roleErr;
-    const job = getCurriculumImportJob(jobId);
+    const job = await getCurriculumImportJob(jobId);
     if (!job) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Import job not found." }, requestId);
     }

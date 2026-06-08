@@ -61,9 +61,9 @@ export async function PATCH(
       );
     }
     const { note, ...patch } = parsed.data;
-    const updated = updateIncident(incidentId, patch);
+    const updated = await updateIncident(incidentId, patch);
     if (note) {
-      const tev = appendIncidentTimeline({
+      const tev = await appendIncidentTimeline({
         incidentId,
         authorUserId: session!.userId,
         kind: note.kind,

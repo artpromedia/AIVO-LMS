@@ -1,30 +1,109 @@
 # 0007 — Web-v2 persistence migration (in-memory → Drizzle/Postgres)
 
-- **Status:** Accepted — adapter rollout complete (memory mode), drizzle wiring deferred per-domain
+- **Status:** Completed (Sprint 9) — 22 web-owned domains migrated + parity-proven on Postgres; the in-memory adapter is a TEST-ONLY fixture, forbidden in production by two independent guards (env schema + assertNoMemoryAdapterInProduction). Remaining db()-direct surface is service-owned per ADR 0015 (see Sprint 9 note).
 - **Date:** 2026-05-27
 - **Deciders:** web-v2 platform team
 - **Related:** AIVO-LMS audit gap #4 ("web-v2 core runtime still in-memory/mock-backed")
 
-## Rollout status (as of 2026-05-28)
+## Rollout status (Sprint 1 — 2026-06-08)
 
-All 11 migration steps have routed their repo functions through the
-`Persistence` adapter. The memory adapter is the default in every
-mode; the drizzle adapter is a per-domain stub awaiting the schema
-wiring listed in each `drizzle/*.ts` file's header comment.
+All 12 originally-migrated domains route their repo functions through the
+`Persistence` adapter, and the drizzle adapter for each is **fully
+implemented and parity-proven on Postgres** (Sprint 1). The Testcontainers
+parity harness replays every per-domain suite against memory AND postgres and
+asserts identical results; `scripts/check-no-direct-store.mjs` locks the
+migrated entrypoints clean. Staging defaults to `postgres` for these 12;
+production forces it.
 
-| #   | Domain                                    | Status    | Notes                                                                  |
-| --- | ----------------------------------------- | --------- | ---------------------------------------------------------------------- |
-| 1   | notifications                             | ✅ memory | drizzle stub; awaits notifications schema in packages/db               |
-| 2   | audit log                                 | ✅ memory | drizzle stub; awaits audit_logs schema                                 |
-| 3   | identity (users + memberships)            | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/users)           |
-| 4   | learners + parent/learner relationships   | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/learners)        |
-| 5   | assessments + baseline runs               | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/assessments)     |
-| 6   | lesson runs + generated lesson plans      | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/learning)        |
-| 7   | brain profile / clone                     | ✅ memory | drizzle wiring deferred; bypassed when AIVO_USE_BRAIN_SVC=true         |
-| 8   | curriculum (subjects/skills/path/mastery) | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/curriculum)      |
-| 9   | care team + consent + privacy             | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/data-governance) |
-| 10  | quests / gamification                     | ✅ memory | drizzle stub; awaits quests schema in packages/db                      |
-| 11  | teacher / school / district admin         | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/tenancy)         |
+| #   | Domain                                    | Status         | Notes                                                              |
+| --- | ----------------------------------------- | -------------- | ------------------------------------------------------------------ |
+| 1   | notifications                             | ✅ postgres (proven) | `web_notifications` + deliveries; parity test green        |
+| 2   | audit log                                 | ✅ postgres (proven) | `web_audit_logs`; append-only, tenant-scoped reads        |
+| 3   | identity (users + memberships)            | ✅ postgres (proven) | `web_users` + `web_memberships`                           |
+| 4   | learners + parent/learner relationships   | ✅ postgres (proven) | `web_learner_profiles` + relationships                    |
+| 5   | assessments + baseline runs               | ✅ postgres (proven) | parent + baseline + telemetry; latest-attempt-wins parity |
+| 6   | lesson runs + generated lesson plans      | ✅ postgres (proven) | `lesson_runs` + plans + interactions + summaries          |
+| 7   | brain profile / clone                     | ✅ postgres (proven) | `learner_brain_profiles`; same-mode as assessments (hard) |
+| 8   | curriculum (subjects/skills/path/mastery) | ✅ postgres (proven) | reference set + per-learner mastery/path                  |
+| 9   | care team + consent + privacy             | ✅ postgres (proven) | consent/IEP/age-gate + policy/subprocessor catalogs. Sprint 5 extended this with DSAR export/deletion, terms acceptances, data inventory/retention, FERPA disclosure logs, IEP-doc access logs (`web_consent_versions` / `web_terms_acceptances` / `web_data_inventory` / `web_data_retention_policies` / `web_disclosure_logs` / `web_data_export_requests` / `web_data_deletion_requests` / `web_iep_doc_access_logs`). Platform/admin-accessed (DPO cross-tenant DSAR review + append-only audit logs) ⇒ no RLS, like web_users/web_audit_logs. |
+| 10  | quests / gamification                     | ✅ postgres (proven) | worlds/chapters reference + per-learner progress          |
+| 11  | teacher / school / district admin         | ✅ postgres (proven) | schools/classrooms/enrollments/assignments                |
+| 12  | collaboration (insights + members)        | ✅ postgres (proven) | brain-build inputs; newest-first insights                 |
+| 13  | billing — web-owned (Sprint 2)            | ✅ postgres (proven) | `web_billing_accounts` / `web_ai_budgets` / `web_ai_cost_events` / `web_coupons` / `web_daily_billing_batches`; canonical subs/invoices/seats read from billing-svc over REST (ADR 0015, `lib/billing/billing-svc-client.ts`). Migration jobs (cross-domain mock runner) deferred. |
+| 14  | clinical — IEP AI-draft inbox (Sprint 3)  | ✅ postgres (proven) | `web_iep_ai_drafts` (one per learner, review lifecycle) + RLS. Canonical IEP goals / therapist notes / caregiver observations stay in family-svc, written through over REST (ADR 0015, `lib/clinical/family-svc-client.ts` — persist-or-fail-loudly). |
+| 15  | security / SOC 2 / incidents (Sprint 4)   | ✅ postgres (proven) | `web_security_controls` / `web_control_evidence` / `web_risk_register` / `web_incidents` / `web_incident_timeline` / `web_vendors` / `web_state_privacy_requirements` / `web_state_privacy_mappings` / `web_vulnerability_reports`. Platform-global (no tenant) ⇒ no RLS, like policy/subprocessor reference. Status-page incidents/maintenance + Secure Impersonation BFFs de-stubbed: typed upstream errors, no synthetic ids. |
+| 16  | rostering / SIS / lesson-sync (Sprint 6)  | ✅ postgres (proven) | `web_courses` / `web_roster_import_jobs` / `web_roster_import_errors` / `web_sis_connections` / `web_external_roster_mappings` / `web_lesson_sync_states` (durable + re-runnable import; optimistic-concurrency lesson sync keyed by lessonRunId). No RLS (platform-admin cross-tenant escape hatch + app-layer scoping). Canonical SIS sync read from integrations-svc over REST (`lib/rostering/integrations-svc-client.ts`); `lib/db/sis-store.ts` + `rostering-grants.ts` are documented service-mock dev stores. `deviceSessions` (no accessor) omitted. |
+| 17  | audio / TTS / read-aloud (Sprint 7)       | ✅ postgres (proven) | `web_audio_assets` / `web_tts_generation_jobs` / `web_pronunciation_overrides` / `web_learner_voice_preferences` / `web_read_aloud_usage_events` / `web_audio_cache_entries` (composite key + hit counters). No RLS (admin usage/review consoles). |
+| 18  | safety / moderation (Sprint 7)            | ✅ postgres (proven) | `web_safety_policy_versions` / `web_moderation_events` / `web_human_review_cases` / `web_blocked_generations` / `web_tutor_response_audits` / `web_homework_input_audits`. Moderation events + audits append-only; auto-opened review cases. No RLS (trust/safety admin console). Canonical responsible-AI evals/models read from responsible-ai-svc over REST. |
+| 19  | support + AI-jobs (Sprint 8, partial)     | ✅ postgres (proven) | `web_support_tickets` / `web_ai_generation_jobs`. No RLS (admin cross-tenant). |
+| 20  | tenant + platform settings (Sprint 8, partial) | ✅ postgres (proven) | `web_tenant_settings` (tenant-keyed) / `web_platform_api_keys` / `web_platform_email_templates` / `web_platform_webhook_endpoints`. No RLS. |
+| 21  | engagement / sessions / notif-prefs (Sprint 8) | ✅ postgres (proven) | `web_homework_help_sessions` / `web_calm_sessions` / `web_learner_engagement` / `web_learner_badges` / `web_learner_sensory_profiles` + `web_notification_preferences` / `web_digest_schedules` (NotificationStore extension). No RLS (per-learner/user). Live gradebook/leaderboard read from engagement-svc over REST (ADR 0015). |
+| 22  | standards / skill-graph (Sprint 8)         | ✅ postgres (proven) | `web_standards_frameworks` / `web_standard_documents` / `web_standards` / `web_domains` / `web_skill_prerequisites` / `web_skill_versions` / `web_curriculum_maps` / `web_lesson_objective_templates` / `web_assessment_blueprints` / `web_curriculum_import_jobs` (+ `CurriculumStore.upsertSkill`). Platform-global reference ⇒ no RLS. Per-learner curriculum uploads + term syllabi are tutor-svc-owned (REST) and keep their dev mock. |
+
+> **Sprint 8 remaining (not yet migrated):** the standards/skill-graph surface (30 repos fns / 12 store fields — a sprint-sized effort), and the standalone aux stores (`audit-store`, `household-store`, `idp-store`, `learner-pin-store`, `messages-store`, `mfa-store`, `parent-phone-store`, `user-roles-store`, `staff-invites`, `team-invites`). Identity/MFA/IDP belong to identity-svc (REST). These remain `db()`-direct and are tracked for a follow-up.
+
+
+## Sprint 9 — production decommission of the in-memory path
+
+The in-memory Map (`lib/db/store.ts`) is now a **test fixture**, not a
+datastore. Two independent guards make the memory adapter unreachable in
+production:
+
+1. **`lib/env.ts`** — the Zod schema refuses `memory` for `AIVO_PERSISTENCE`
+   (and every `AIVO_PERSISTENCE_*` override) when `NODE_ENV=production` (and not
+   the build phase / `AIVO_TEST_MODE=1`). A misconfigured deploy fails at boot.
+2. **`assertNoMemoryAdapterInProduction`** (persistence/index.ts) — re-checks at
+   the first `getPersistence()`: if any domain would resolve to `memory` in a
+   production process it throws. Proven by `__tests__/no-memory-in-prod.test.ts`.
+
+So in production every one of the 22 migrated domains resolves to the Drizzle
+adapter; the memory adapters are reached only under `NODE_ENV=test` / vitest.
+
+**Remaining `db()`-direct surface (tracked, NOT in-memory-in-prod):** a set of
+not-yet-migrated repos functions whose canonical data is owned by a SERVICE per
+ADR 0015 — tutor-svc curriculum uploads + term syllabi, billing-svc
+subscriptions/seats/invoices, family-svc IEP goals / therapist notes /
+caregiver observations, identity-svc tenants — plus the migration-job mock
+runner and a few cross-domain aggregate readers. These still call `getStore()`
+for their dev/mock path. Because they are reached in production ONLY via their
+service REST path (or are admin-only aggregates), `getStore()` is intentionally
+not hard-gated to throw — that final removal lands with the per-service REST
+cutovers. `scripts/check-no-direct-store.mjs` therefore stays an allowlist gate
+(enforcing the 22 migrated domains stay clean) rather than deny-all until that
+cutover completes.
+
+## Testcontainers parity harness (Sprint 0)
+
+The migration is only safe if "behaves identically on Postgres" is a thing
+CI can _prove_, not a thing we assert. Sprint 0 adds a parity rig so every
+domain — present and future — is exercised against a **real, containerized
+Postgres**, never a mock.
+
+- **`lib/db/persistence/__tests__/pg-testcontainer.ts`** — `startPostgres()` /
+  `withPostgres(fn)`. Boots `postgres:16` via `@testcontainers/postgresql`
+  (or attaches to `AIVO_TEST_DATABASE_URL` when CI provisions a Postgres
+  service), resets + applies the web-domain schema, and installs it as the
+  drizzle client via `__setDbClient`. Returns `null` when no Postgres is
+  reachable so suites skip cleanly on Docker-less machines.
+- **`lib/db/persistence/__tests__/parity.harness.ts`** — `runInBothModes(name,
+  suite)` replays the same suite against the memory adapters (reset + seeded
+  per test) and against Postgres (truncated + reseeded per test), forcing the
+  backend for every domain through the test-only `__setPersistenceModeOverride`
+  seam in `persistence/index.ts`. A `ctx.parity(label, fn, project?)` helper
+  records the memory-pass value and asserts deep-equality on the postgres pass
+  (project to stable fields — the seed assigns random surrogate ids).
+- **`seed-postgres.ts`** is idempotent (every reference insert
+  `onConflictDoNothing` and reports rows that actually landed via `RETURNING`);
+  `__tests__/seed-parity.postgres.test.ts` asserts the postgres reference-row
+  counts equal the memory-seed counts and that re-seeding is a no-op.
+- **`scripts/check-no-direct-store.mjs`** — an allowlist-driven gate
+  (`MIGRATED_DOMAINS`, initially empty) that fails when a migrated domain's
+  app routes or `repos.ts` functions reach `getStore()`/`db()`.
+- All three run in CI via **`.github/workflows/web-v2-persistence.yml`**
+  (`parity`, `no-direct-store`, `e2e-postgres`). The existing 12 adapter
+  domains pass the harness in postgres mode today.
+
+See `docs/runbooks/persistence-postgres.md` for the local container flow.
 
 ## Context
 

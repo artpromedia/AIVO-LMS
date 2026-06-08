@@ -12,7 +12,7 @@ import { ConsentToggle } from "./consent-toggle";
 export default async function Page() {
   const t = await getTranslations("parent.consent");
   const session = await requirePageRole(["parent"]);
-  const versions = listConsentVersions();
+  const versions = await listConsentVersions();
   const records = await listConsentsForUser(session.userId, session.tenantId);
 
   const accountTypes = CONSENT_TYPES.filter(

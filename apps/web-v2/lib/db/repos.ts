@@ -1035,7 +1035,7 @@ export async function createBaseline(input: {
   // seeded).
   const perSkillBudget = new Map<string, number>();
   for (const sk of skills) {
-    const bp = getActiveAssessmentBlueprint(sk.id);
+    const bp = await getActiveAssessmentBlueprint(sk.id);
     if (bp) {
       const total = bp.items.reduce((acc, it) => acc + it.count, 0);
       if (total > 0) perSkillBudget.set(sk.id, total);
@@ -1809,8 +1809,8 @@ export async function createLessonRun(
       skill,
       // S26: pass curriculum constraints (active version + objective template)
       // so the generator scopes the plan to the canonical scope of the skill.
-      skillVersion: getCurrentSkillVersion(skill.id),
-      objectiveTemplate: getActiveLessonObjectiveTemplate(skill.id),
+      skillVersion: await getCurrentSkillVersion(skill.id),
+      objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
       mastery: masterySnapshot,
       accommodations: accommodationSnapshot,
       curriculumFocus,
@@ -2408,8 +2408,8 @@ export async function retryLessonRun(
       // S26: keep retries scoped to the same curriculum constraints the
       // initial generation read. Retry reads the *current* version, not the
       // snapshot — a republished v2 should pull the retry forward.
-      skillVersion: getCurrentSkillVersion(skill.id),
-      objectiveTemplate: getActiveLessonObjectiveTemplate(skill.id),
+      skillVersion: await getCurrentSkillVersion(skill.id),
+      objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
       mastery: run.masterySnapshot,
       accommodations: run.accommodationSnapshot,
       source: run.source,
@@ -2505,14 +2505,13 @@ export async function resetAccessibilityPrefs(
 
 // ===== Sprint 17: Homework Helper =====
 
-export function createHomeworkSession(input: {
+export async function createHomeworkSession(input: {
   learnerId: string;
   tenantId: string;
   topic: string;
   subjectId: string | null;
   attachment?: HomeworkHelpSession["attachment"];
-}): HomeworkHelpSession {
-  const store = db();
+}): Promise<HomeworkHelpSession> {
   const session: HomeworkHelpSession = {
     id: newId("hw"),
     learnerId: input.learnerId,
@@ -2526,37 +2525,36 @@ export function createHomeworkSession(input: {
     startedAt: nowIso(),
     endedAt: null,
   };
-  store.homeworkHelpSessions.set(session.id, session);
-  return session;
+  return await getPersistence().engagement.upsertHomeworkSession(session);
 }
 
-export function getHomeworkSession(
+export async function getHomeworkSession(
   sessionId: string,
   tenantId: string,
-): HomeworkHelpSession | null {
-  const s = db().homeworkHelpSessions.get(sessionId);
+): Promise<HomeworkHelpSession | null> {
+  const s = await getPersistence().engagement.getHomeworkSession(sessionId);
   if (!s || s.tenantId !== tenantId) return null;
   return s;
 }
 
-export function listHomeworkSessionsForLearner(
+export async function listHomeworkSessionsForLearner(
   learnerId: string,
   tenantId: string,
   opts?: { limit?: number },
-): HomeworkHelpSession[] {
-  const all = Array.from(db().homeworkHelpSessions.values())
+): Promise<HomeworkHelpSession[]> {
+  const all = (await getPersistence().engagement.listHomeworkSessions())
     .filter((s) => s.learnerId === learnerId && s.tenantId === tenantId)
     .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
   return opts?.limit ? all.slice(0, opts.limit) : all;
 }
 
-export function appendHomeworkMessage(
+export async function appendHomeworkMessage(
   sessionId: string,
   tenantId: string,
   message: Omit<HomeworkHelpMessage, "id" | "occurredAt">,
-): HomeworkHelpSession | null {
-  const store = db();
-  const existing = store.homeworkHelpSessions.get(sessionId);
+): Promise<HomeworkHelpSession | null> {
+  const engagement = getPersistence().engagement;
+  const existing = await engagement.getHomeworkSession(sessionId);
   if (!existing || existing.tenantId !== tenantId) return null;
   if (existing.endedAt) return existing; // completed sessions are append-only no-ops
   const next: HomeworkHelpSession = {
@@ -2570,18 +2568,17 @@ export function appendHomeworkMessage(
       },
     ],
   };
-  store.homeworkHelpSessions.set(next.id, next);
-  return next;
+  return await engagement.upsertHomeworkSession(next);
 }
 
-export function completeHomeworkSession(
+export async function completeHomeworkSession(
   sessionId: string,
   tenantId: string,
   insight: string,
   followUpRunId: string | null = null,
-): HomeworkHelpSession | null {
-  const store = db();
-  const existing = store.homeworkHelpSessions.get(sessionId);
+): Promise<HomeworkHelpSession | null> {
+  const engagement = getPersistence().engagement;
+  const existing = await engagement.getHomeworkSession(sessionId);
   if (!existing || existing.tenantId !== tenantId) return null;
   if (existing.endedAt) return existing; // idempotent
   const next: HomeworkHelpSession = {
@@ -2590,8 +2587,7 @@ export function completeHomeworkSession(
     followUpRunId,
     endedAt: nowIso(),
   };
-  store.homeworkHelpSessions.set(next.id, next);
-  return next;
+  return await engagement.upsertHomeworkSession(next);
 }
 
 // ===== Calm Corner =====
@@ -2613,15 +2609,14 @@ function calmDayKey(midnightMs: number): string {
   return new Date(midnightMs).toISOString().slice(0, 10);
 }
 
-export function recordCalmSession(input: {
+export async function recordCalmSession(input: {
   tenantId: string;
   learnerId: string;
   activityId: string;
   activityKind: string;
   completed: boolean;
   secondsSpent: number | null;
-}): CalmSessionRecord {
-  const store = db();
+}): Promise<CalmSessionRecord> {
   const record: CalmSessionRecord = {
     id: newId("calm"),
     tenantId: input.tenantId,
@@ -2632,18 +2627,17 @@ export function recordCalmSession(input: {
     secondsSpent: input.secondsSpent,
     occurredAt: nowIso(),
   };
-  store.calmSessions.set(record.id, record);
-  return record;
+  return await getPersistence().engagement.appendCalmSession(record);
 }
 
 /** Most-recent-first, tenant- and learner-scoped. */
-export function listCalmSessionsForLearner(
+export async function listCalmSessionsForLearner(
   learnerId: string,
   tenantId: string,
   opts?: { limit?: number; sinceIso?: string },
-): CalmSessionRecord[] {
+): Promise<CalmSessionRecord[]> {
   const since = opts?.sinceIso;
-  const all = Array.from(db().calmSessions.values())
+  const all = (await getPersistence().engagement.listCalmSessions())
     .filter(
       (s) =>
         s.learnerId === learnerId &&
@@ -2659,12 +2653,12 @@ export function listCalmSessionsForLearner(
  * each contain at least one *completed* calm session. Learner-local time
  * is out of scope; `todayIso` is injectable for deterministic tests.
  */
-export function getCalmStreak(
+export async function getCalmStreak(
   learnerId: string,
   tenantId: string,
   opts?: { todayIso?: string },
-): { currentStreakDays: number; lastSessionAt: string | null } {
-  const completed = listCalmSessionsForLearner(learnerId, tenantId).filter(
+): Promise<{ currentStreakDays: number; lastSessionAt: string | null }> {
+  const completed = (await listCalmSessionsForLearner(learnerId, tenantId)).filter(
     (s) => s.completed,
   );
   const lastSessionAt = completed.length > 0 ? completed[0].occurredAt : null;
@@ -2697,17 +2691,17 @@ export function getCalmStreak(
  * the window (ties broken by first appearance in the catalog order the
  * records were written in).
  */
-export function summarizeCalmForParent(
+export async function summarizeCalmForParent(
   learnerId: string,
   tenantId: string,
   opts?: { sinceIso?: string },
-): {
+): Promise<{
   totalMoments: number;
   completedMoments: number;
   topActivityId: string | null;
   lastSessionAt: string | null;
-} {
-  const sessions = listCalmSessionsForLearner(learnerId, tenantId, {
+}> {
+  const sessions = await listCalmSessionsForLearner(learnerId, tenantId, {
     sinceIso: opts?.sinceIso,
   });
 
@@ -3266,23 +3260,26 @@ export async function listAuditLogsForTenants(
 }
 
 /** AI generation jobs scoped to a tenant set, newest first. */
-export function listAiGenerationJobs(tenantIds: string[], limit = 100): AiGenerationJob[] {
+export async function listAiGenerationJobs(
+  tenantIds: string[],
+  limit = 100,
+): Promise<AiGenerationJob[]> {
   const ids = new Set(tenantIds);
-  return Array.from(db().aiGenerationJobs.values())
+  return (await getPersistence().support.listAiGenerationJobs())
     .filter((j) => ids.has(j.tenantId))
     .sort((a, b) => b.startedAt.localeCompare(a.startedAt))
     .slice(0, limit);
 }
 
 /** Append a telemetry record. S20: every AI call gets logged. */
-export function recordAiGenerationJob(input: {
+export async function recordAiGenerationJob(input: {
   tenantId: string;
   kind: AiGenerationJob["kind"];
   status: AiGenerationJob["status"];
   inputRef: string;
   outputRef?: string | null;
   completedAt?: string | null;
-}): AiGenerationJob {
+}): Promise<AiGenerationJob> {
   const id = newId("aij");
   const job: AiGenerationJob = {
     id,
@@ -3294,8 +3291,7 @@ export function recordAiGenerationJob(input: {
     startedAt: nowIso(),
     completedAt: input.completedAt ?? null,
   };
-  db().aiGenerationJobs.set(id, job);
-  return job;
+  return await getPersistence().support.appendAiGenerationJob(job);
 }
 
 /** Aggregate health derived from generation jobs + lesson runs. */
@@ -3308,9 +3304,11 @@ export type SystemHealth = {
   tenantsTotal: number;
   usersTotal: number;
 };
-export function computeSystemHealth(tenantIds: string[]): SystemHealth {
+export async function computeSystemHealth(tenantIds: string[]): Promise<SystemHealth> {
   const ids = new Set(tenantIds);
-  const jobs = Array.from(db().aiGenerationJobs.values()).filter((j) => ids.has(j.tenantId));
+  const jobs = (await getPersistence().support.listAiGenerationJobs()).filter((j) =>
+    ids.has(j.tenantId),
+  );
   const complete = jobs.filter((j) => j.status === "complete").length;
   const failed = jobs.filter((j) => j.status === "failed").length;
   const queued = jobs.filter((j) => j.status === "queued" || j.status === "running").length;
@@ -3333,36 +3331,28 @@ export function computeSystemHealth(tenantIds: string[]): SystemHealth {
 }
 
 /** Billing — one BillingAccount per tenant; latest wins if dupes exist. */
-export function getBillingForTenant(tenantId: string): BillingAccount | null {
-  let latest: BillingAccount | null = null;
-  for (const b of db().billingAccounts.values()) {
-    if (b.tenantId !== tenantId) continue;
-    if (!latest || b.createdAt > latest.createdAt) latest = b;
-  }
-  return latest;
+export async function getBillingForTenant(tenantId: string): Promise<BillingAccount | null> {
+  return await getPersistence().billing.getAccountForTenant(tenantId);
 }
 
-export function listBillingForTenants(tenantIds: string[]): BillingAccount[] {
-  const ids = new Set(tenantIds);
-  return Array.from(db().billingAccounts.values())
-    .filter((b) => ids.has(b.tenantId))
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+export async function listBillingForTenants(tenantIds: string[]): Promise<BillingAccount[]> {
+  return await getPersistence().billing.listAccountsForTenants(tenantIds);
 }
 
 /** Support tickets. */
-export function listSupportTickets(tenantIds: string[]): SupportTicket[] {
+export async function listSupportTickets(tenantIds: string[]): Promise<SupportTicket[]> {
   const ids = new Set(tenantIds);
-  return Array.from(db().supportTickets.values())
+  return (await getPersistence().support.listSupportTickets())
     .filter((t) => ids.has(t.tenantId))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function createSupportTicket(input: {
+export async function createSupportTicket(input: {
   userId: string;
   tenantId: string;
   subject: string;
   body: string;
-}): SupportTicket {
+}): Promise<SupportTicket> {
   const id = newId("tkt");
   const ticket: SupportTicket = {
     id,
@@ -3373,21 +3363,19 @@ export function createSupportTicket(input: {
     status: "open",
     createdAt: nowIso(),
   };
-  db().supportTickets.set(id, ticket);
-  return ticket;
+  return await getPersistence().support.upsertSupportTicket(ticket);
 }
 
-export function updateSupportTicketStatus(
+export async function updateSupportTicketStatus(
   id: string,
   status: SupportTicket["status"],
   scope: { tenantIds: string[] },
-): SupportTicket | null {
-  const t = db().supportTickets.get(id);
+): Promise<SupportTicket | null> {
+  const support = getPersistence().support;
+  const t = await support.getSupportTicket(id);
   if (!t) return null;
   if (!scope.tenantIds.includes(t.tenantId)) return null;
-  const next: SupportTicket = { ...t, status };
-  db().supportTickets.set(id, next);
-  return next;
+  return await support.upsertSupportTicket({ ...t, status });
 }
 
 // ===== Sprint 24: Consent + Terms + Age gate =====
@@ -3399,16 +3387,17 @@ import type {
   AgeGateRecord,
 } from "@/lib/db/types";
 
-export function listConsentVersions(): ConsentVersion[] {
-  return Array.from(db().consentVersions.values()).sort((a, b) =>
-    a.consentType.localeCompare(b.consentType),
-  );
+export async function listConsentVersions(): Promise<ConsentVersion[]> {
+  const all = await getPersistence().compliance.listConsentVersions();
+  return all.sort((a, b) => a.consentType.localeCompare(b.consentType));
 }
 
-export function getActiveConsentVersion(type: ConsentType): ConsentVersion | null {
-  const all = Array.from(db().consentVersions.values()).filter((v) => v.consentType === type);
+export async function getActiveConsentVersion(type: ConsentType): Promise<ConsentVersion | null> {
+  const all = (await getPersistence().compliance.listConsentVersions()).filter(
+    (v) => v.consentType === type,
+  );
   if (!all.length) return null;
-  return all.sort((a, b) => b.effectiveAt.localeCompare(a.effectiveAt))[0];
+  return all.sort((a, b) => b.effectiveAt.localeCompare(a.effectiveAt))[0]!;
 }
 
 export async function listConsentsForUser(
@@ -3448,7 +3437,7 @@ export async function recordConsent(input: {
   ipHash?: string | null;
   userAgent?: string | null;
 }): Promise<ConsentRecord> {
-  const version = getActiveConsentVersion(input.consentType);
+  const version = await getActiveConsentVersion(input.consentType);
   // Auto-revoke any prior active records in the same scope so revoke is a
   // single-step operation. Without this, duplicate accepts pile up and a
   // single revoke leaves an older active row that nullifies the revocation.
@@ -3504,11 +3493,11 @@ export async function revokeConsent(input: {
   return last;
 }
 
-export function recordTermsAcceptance(input: {
+export async function recordTermsAcceptance(input: {
   tenantId: string;
   userId: string;
   termsVersion: string;
-}): TermsAcceptance {
+}): Promise<TermsAcceptance> {
   const t: TermsAcceptance = {
     id: newId("tac"),
     tenantId: input.tenantId,
@@ -3516,8 +3505,7 @@ export function recordTermsAcceptance(input: {
     termsVersion: input.termsVersion,
     acceptedAt: nowIso(),
   };
-  db().termsAcceptances.push(t);
-  return t;
+  return await getPersistence().compliance.appendTermsAcceptance(t);
 }
 
 export async function getAgeGateForLearner(
@@ -3563,26 +3551,29 @@ import type {
   PrivacyRequestStatus,
 } from "@/lib/db/types";
 
-export function listDataInventory(): DataInventoryItem[] {
-  return Array.from(db().dataInventory.values()).sort((a, b) => a.key.localeCompare(b.key));
+export async function listDataInventory(): Promise<DataInventoryItem[]> {
+  return (await getPersistence().compliance.listDataInventory()).sort((a, b) =>
+    a.key.localeCompare(b.key),
+  );
 }
 
-export function listRetentionPolicies(): DataRetentionPolicy[] {
-  return Array.from(db().dataRetentionPolicies.values()).sort((a, b) =>
+export async function listRetentionPolicies(): Promise<DataRetentionPolicy[]> {
+  return (await getPersistence().compliance.listRetentionPolicies()).sort((a, b) =>
     a.classification.localeCompare(b.classification),
   );
 }
 
-export function getRetentionPolicy(id: string): DataRetentionPolicy | null {
-  return db().dataRetentionPolicies.get(id) ?? null;
+export async function getRetentionPolicy(id: string): Promise<DataRetentionPolicy | null> {
+  return await getPersistence().compliance.getRetentionPolicy(id);
 }
 
-export function updateRetentionPolicy(
+export async function updateRetentionPolicy(
   id: string,
   patch: { retentionDays?: number; archiveDays?: number; description?: string },
   updatedByUserId: string,
-): DataRetentionPolicy | null {
-  const existing = db().dataRetentionPolicies.get(id);
+): Promise<DataRetentionPolicy | null> {
+  const compliance = getPersistence().compliance;
+  const existing = await compliance.getRetentionPolicy(id);
   if (!existing) return null;
   const next: DataRetentionPolicy = {
     ...existing,
@@ -3598,17 +3589,14 @@ export function updateRetentionPolicy(
     updatedAt: nowIso(),
     updatedByUserId,
   };
-  db().dataRetentionPolicies.set(id, next);
-  return next;
+  return await compliance.upsertRetentionPolicy(next);
 }
 
-export function listDisclosures(tenantId: string): DisclosureLog[] {
-  return db()
-    .disclosureLogs.filter((d) => d.tenantId === tenantId)
-    .sort((a, b) => b.disclosedAt.localeCompare(a.disclosedAt));
+export async function listDisclosures(tenantId: string): Promise<DisclosureLog[]> {
+  return await getPersistence().compliance.listDisclosures(tenantId);
 }
 
-export function recordDisclosure(input: {
+export async function recordDisclosure(input: {
   tenantId: string;
   learnerId: string | null;
   recipientType: DisclosureRecipientType;
@@ -3616,7 +3604,7 @@ export function recordDisclosure(input: {
   reason: string;
   ferpaBasis: string;
   disclosedByUserId: string;
-}): DisclosureLog {
+}): Promise<DisclosureLog> {
   const rec: DisclosureLog = {
     id: newId("disc"),
     tenantId: input.tenantId,
@@ -3628,16 +3616,15 @@ export function recordDisclosure(input: {
     disclosedAt: nowIso(),
     disclosedByUserId: input.disclosedByUserId,
   };
-  db().disclosureLogs.push(rec);
-  return rec;
+  return await getPersistence().compliance.appendDisclosure(rec);
 }
 
-export function createDataExportRequest(input: {
+export async function createDataExportRequest(input: {
   tenantId: string;
   parentUserId: string;
   learnerId: string | null;
   notes?: string | null;
-}): DataExportRequest {
+}): Promise<DataExportRequest> {
   const rec: DataExportRequest = {
     id: newId("dxp"),
     tenantId: input.tenantId,
@@ -3649,42 +3636,45 @@ export function createDataExportRequest(input: {
     exportUrl: null,
     notes: input.notes ?? null,
   };
-  db().dataExportRequests.set(rec.id, rec);
-  return rec;
+  return await getPersistence().compliance.upsertExportRequest(rec);
 }
 
-export function getDataExportRequest(id: string, tenantId: string): DataExportRequest | null {
-  const r = db().dataExportRequests.get(id);
+export async function getDataExportRequest(
+  id: string,
+  tenantId: string,
+): Promise<DataExportRequest | null> {
+  const r = await getPersistence().compliance.getExportRequestById(id);
   if (!r || r.tenantId !== tenantId) return null;
   return r;
 }
 
 /** Cross-tenant lookup, intended for platform_admin DSAR queue review only. */
-export function getDataExportRequestById(id: string): DataExportRequest | null {
-  return db().dataExportRequests.get(id) ?? null;
+export async function getDataExportRequestById(id: string): Promise<DataExportRequest | null> {
+  return await getPersistence().compliance.getExportRequestById(id);
 }
 
-export function listDataExportRequestsForUser(
+export async function listDataExportRequestsForUser(
   parentUserId: string,
   tenantId: string,
-): DataExportRequest[] {
-  return Array.from(db().dataExportRequests.values())
+): Promise<DataExportRequest[]> {
+  return (await getPersistence().compliance.listExportRequests())
     .filter((r) => r.tenantId === tenantId && r.parentUserId === parentUserId)
     .sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
 }
 
-export function listAllDataExportRequests(): DataExportRequest[] {
-  return Array.from(db().dataExportRequests.values()).sort((a, b) =>
+export async function listAllDataExportRequests(): Promise<DataExportRequest[]> {
+  return (await getPersistence().compliance.listExportRequests()).sort((a, b) =>
     b.requestedAt.localeCompare(a.requestedAt),
   );
 }
 
-export function updateDataExportRequestStatus(
+export async function updateDataExportRequestStatus(
   id: string,
   status: PrivacyRequestStatus,
   exportUrl: string | null = null,
-): DataExportRequest | null {
-  const r = db().dataExportRequests.get(id);
+): Promise<DataExportRequest | null> {
+  const compliance = getPersistence().compliance;
+  const r = await compliance.getExportRequestById(id);
   if (!r) return null;
   const completed = status === "completed" || status === "denied";
   const next: DataExportRequest = {
@@ -3693,17 +3683,16 @@ export function updateDataExportRequestStatus(
     completedAt: completed ? nowIso() : r.completedAt,
     exportUrl: exportUrl ?? r.exportUrl,
   };
-  db().dataExportRequests.set(id, next);
-  return next;
+  return await compliance.upsertExportRequest(next);
 }
 
-export function createDataDeletionRequest(input: {
+export async function createDataDeletionRequest(input: {
   tenantId: string;
   parentUserId: string;
   learnerId: string | null;
   scope: "account" | "learner" | "iep_only";
   notes?: string | null;
-}): DataDeletionRequest {
+}): Promise<DataDeletionRequest> {
   const rec: DataDeletionRequest = {
     id: newId("ddr"),
     tenantId: input.tenantId,
@@ -3715,43 +3704,45 @@ export function createDataDeletionRequest(input: {
     scope: input.scope,
     notes: input.notes ?? null,
   };
-  db().dataDeletionRequests.set(rec.id, rec);
-  return rec;
+  return await getPersistence().compliance.upsertDeletionRequest(rec);
 }
 
-export function getDataDeletionRequest(id: string, tenantId: string): DataDeletionRequest | null {
-  const r = db().dataDeletionRequests.get(id);
+export async function getDataDeletionRequest(
+  id: string,
+  tenantId: string,
+): Promise<DataDeletionRequest | null> {
+  const r = await getPersistence().compliance.getDeletionRequestById(id);
   if (!r || r.tenantId !== tenantId) return null;
   return r;
 }
 
 /** Cross-tenant lookup, intended for platform_admin DSAR queue review only. */
-export function getDataDeletionRequestById(id: string): DataDeletionRequest | null {
-  return db().dataDeletionRequests.get(id) ?? null;
+export async function getDataDeletionRequestById(id: string): Promise<DataDeletionRequest | null> {
+  return await getPersistence().compliance.getDeletionRequestById(id);
 }
 
-export function listDataDeletionRequestsForUser(
+export async function listDataDeletionRequestsForUser(
   parentUserId: string,
   tenantId: string,
-): DataDeletionRequest[] {
-  return Array.from(db().dataDeletionRequests.values())
+): Promise<DataDeletionRequest[]> {
+  return (await getPersistence().compliance.listDeletionRequests())
     .filter((r) => r.tenantId === tenantId && r.parentUserId === parentUserId)
     .sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
 }
 
-export function listAllDataDeletionRequests(): DataDeletionRequest[] {
-  return Array.from(db().dataDeletionRequests.values()).sort((a, b) =>
+export async function listAllDataDeletionRequests(): Promise<DataDeletionRequest[]> {
+  return (await getPersistence().compliance.listDeletionRequests()).sort((a, b) =>
     b.requestedAt.localeCompare(a.requestedAt),
   );
 }
 
-export function logIepAccess(input: {
+export async function logIepAccess(input: {
   tenantId: string;
   learnerId: string;
   documentId: string;
   accessedByUserId: string;
   purpose: IEPDocumentAccessLog["purpose"];
-}): IEPDocumentAccessLog {
+}): Promise<IEPDocumentAccessLog> {
   const rec: IEPDocumentAccessLog = {
     id: newId("iepacc"),
     tenantId: input.tenantId,
@@ -3761,17 +3752,14 @@ export function logIepAccess(input: {
     accessedAt: nowIso(),
     purpose: input.purpose,
   };
-  db().iepDocumentAccessLogs.push(rec);
-  return rec;
+  return await getPersistence().compliance.appendIepAccessLog(rec);
 }
 
-export function listIepAccessForLearner(
+export async function listIepAccessForLearner(
   learnerId: string,
   tenantId: string,
-): IEPDocumentAccessLog[] {
-  return db()
-    .iepDocumentAccessLogs.filter((r) => r.learnerId === learnerId && r.tenantId === tenantId)
-    .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
+): Promise<IEPDocumentAccessLog[]> {
+  return await getPersistence().compliance.listIepAccessForLearner(learnerId, tenantId);
 }
 
 export async function listPolicyVersions(): Promise<PolicyVersion[]> {
@@ -3790,59 +3778,63 @@ export async function listSubprocessors(): Promise<SubprocessorRecord[]> {
 // per-tenant artifact). Write-side helpers are wrapped in normal create/
 // update functions that mint ids via newId() so BFFs stay thin.
 
-export function listStandardsFrameworks(): StandardsFramework[] {
-  return Array.from(db().standardsFrameworks.values()).sort((a, b) => a.name.localeCompare(b.name));
+export async function listStandardsFrameworks(): Promise<StandardsFramework[]> {
+  return (await getPersistence().standards.listFrameworks()).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 }
 
-export function getStandardsFramework(id: string): StandardsFramework | null {
-  return db().standardsFrameworks.get(id) ?? null;
+export async function getStandardsFramework(id: string): Promise<StandardsFramework | null> {
+  return await getPersistence().standards.getFramework(id);
 }
 
-export function getStandardsFrameworkBySlug(
+export async function getStandardsFrameworkBySlug(
   slug: StandardsFrameworkSlug,
-): StandardsFramework | null {
-  for (const f of db().standardsFrameworks.values()) {
+): Promise<StandardsFramework | null> {
+  for (const f of await getPersistence().standards.listFrameworks()) {
     if (f.slug === slug) return f;
   }
   return null;
 }
 
-export function createStandardsFramework(input: {
+export async function createStandardsFramework(input: {
   slug: StandardsFrameworkSlug;
   name: string;
   issuer: string;
   description: string;
   homepageUrl: string | null;
-}): StandardsFramework {
+}): Promise<StandardsFramework> {
   const rec: StandardsFramework = {
     id: newId("frw"),
     status: "active",
     ...input,
   };
-  db().standardsFrameworks.set(rec.id, rec);
-  return rec;
+  return await getPersistence().standards.upsertFramework(rec);
 }
 
-export function listStandardDocuments(frameworkId?: string): StandardDocument[] {
-  const all = Array.from(db().standardDocuments.values());
+export async function listStandardDocuments(frameworkId?: string): Promise<StandardDocument[]> {
+  const all = await getPersistence().standards.listStandardDocuments();
   return (frameworkId ? all.filter((d) => d.frameworkId === frameworkId) : all).sort((a, b) =>
     a.title.localeCompare(b.title),
   );
 }
 
-export function listStandards(filter?: { frameworkId?: string; documentId?: string }): Standard[] {
-  let all = Array.from(db().standards.values());
+export async function listStandards(filter?: {
+  frameworkId?: string;
+  documentId?: string;
+}): Promise<Standard[]> {
+  let all = await getPersistence().standards.listStandards();
   if (filter?.frameworkId) all = all.filter((s) => s.frameworkId === filter.frameworkId);
   if (filter?.documentId) all = all.filter((s) => s.documentId === filter.documentId);
   return all.sort((a, b) => a.code.localeCompare(b.code));
 }
 
-export function getStandard(id: string): Standard | null {
-  return db().standards.get(id) ?? null;
+export async function getStandard(id: string): Promise<Standard | null> {
+  return await getPersistence().standards.getStandard(id);
 }
 
-export function listDomains(subjectId?: string): Domain[] {
-  const all = Array.from(db().domains.values());
+export async function listDomains(subjectId?: string): Promise<Domain[]> {
+  const all = await getPersistence().standards.listDomains();
   return (subjectId ? all.filter((d) => d.subjectId === subjectId) : all).sort(
     (a, b) => a.orderIndex - b.orderIndex || a.name.localeCompare(b.name),
   );
@@ -3863,14 +3855,15 @@ export async function getSkill(id: string): Promise<Skill | null> {
   return getPersistence().curriculum.getSkillById(id);
 }
 
-export function createSkill(input: {
+export async function createSkill(input: {
   subjectId: string;
   slug: string;
   name: string;
   gradeBand: string;
   prerequisites?: string[];
-}): Skill {
-  if (!db().subjects.get(input.subjectId)) {
+}): Promise<Skill> {
+  const curriculum = getPersistence().curriculum;
+  if (!(await curriculum.getSubjectById(input.subjectId))) {
     throw new Error(`subjectId not found: ${input.subjectId}`);
   }
   const rec: Skill = {
@@ -3881,10 +3874,10 @@ export function createSkill(input: {
     gradeBand: input.gradeBand,
     prerequisites: input.prerequisites ?? [],
   };
-  db().skills.set(rec.id, rec);
+  await curriculum.upsertSkill(rec);
   // Auto-create a v1 SkillVersion so AI gen always finds a current version.
   const svId = newId("skv");
-  db().skillVersions.set(svId, {
+  await getPersistence().standards.upsertSkillVersion({
     id: svId,
     skillId: rec.id,
     version: "1.0",
@@ -3895,34 +3888,42 @@ export function createSkill(input: {
   return rec;
 }
 
-export function updateSkill(
+export async function updateSkill(
   id: string,
   patch: { name?: string; gradeBand?: string; prerequisites?: string[] },
-): Skill | null {
-  const skill = db().skills.get(id);
-  if (!skill) return null;
+): Promise<Skill | null> {
+  const curriculum = getPersistence().curriculum;
+  const existing = await curriculum.getSkillById(id);
+  if (!existing) return null;
+  const skill: Skill = { ...existing };
   if (patch.name !== undefined) skill.name = patch.name;
   if (patch.gradeBand !== undefined) skill.gradeBand = patch.gradeBand;
   if (patch.prerequisites !== undefined) {
-    skill.prerequisites = patch.prerequisites.filter((p) => db().skills.has(p));
+    const checked: string[] = [];
+    for (const p of patch.prerequisites) {
+      if (await curriculum.getSkillById(p)) checked.push(p);
+    }
+    skill.prerequisites = checked;
   }
-  return skill;
+  return await curriculum.upsertSkill(skill);
 }
 
 // ----- Skill prerequisite graph -----
-export function listSkillPrerequisites(skillId?: string): SkillPrerequisite[] {
-  const all = Array.from(db().skillPrerequisites.values());
+export async function listSkillPrerequisites(skillId?: string): Promise<SkillPrerequisite[]> {
+  const all = await getPersistence().standards.listSkillPrerequisites();
   return skillId ? all.filter((p) => p.skillId === skillId) : all;
 }
 
-export function addSkillPrerequisite(input: {
+export async function addSkillPrerequisite(input: {
   skillId: string;
   prerequisiteSkillId: string;
   strength: "hard" | "soft";
   notes?: string | null;
-}): SkillPrerequisite | null {
-  const store = db();
-  if (!store.skills.has(input.skillId) || !store.skills.has(input.prerequisiteSkillId)) {
+}): Promise<SkillPrerequisite | null> {
+  const curriculum = getPersistence().curriculum;
+  const standards = getPersistence().standards;
+  const skillRec = await curriculum.getSkillById(input.skillId);
+  if (!skillRec || !(await curriculum.getSkillById(input.prerequisiteSkillId))) {
     return null;
   }
   if (input.skillId === input.prerequisiteSkillId) return null;
@@ -3932,8 +3933,9 @@ export function addSkillPrerequisite(input: {
   // can drift if an import or backfill writes one but not the other; the
   // SkillPrerequisite table is what addSkillPrerequisite itself owns.)
   // Also refuse duplicate edges so the graph stays a clean DAG.
+  const allEdges = await standards.listSkillPrerequisites();
   const prereqsBySkill = new Map<string, string[]>();
-  for (const edge of store.skillPrerequisites.values()) {
+  for (const edge of allEdges) {
     if (edge.skillId === input.skillId && edge.prerequisiteSkillId === input.prerequisiteSkillId) {
       return null; // duplicate edge
     }
@@ -3959,39 +3961,44 @@ export function addSkillPrerequisite(input: {
     notes: input.notes ?? null,
     createdAt: nowIso(),
   };
-  store.skillPrerequisites.set(rec.id, rec);
-  const skill = store.skills.get(input.skillId)!;
-  if (!skill.prerequisites.includes(input.prerequisiteSkillId)) {
-    skill.prerequisites.push(input.prerequisiteSkillId);
+  await standards.upsertSkillPrerequisite(rec);
+  // Mirror the denormalized fast-read view on the skill.
+  if (!skillRec.prerequisites.includes(input.prerequisiteSkillId)) {
+    await curriculum.upsertSkill({
+      ...skillRec,
+      prerequisites: [...skillRec.prerequisites, input.prerequisiteSkillId],
+    });
   }
   return rec;
 }
 
 // ----- Skill versions -----
-export function listSkillVersions(skillId?: string): SkillVersion[] {
-  const all = Array.from(db().skillVersions.values());
+export async function listSkillVersions(skillId?: string): Promise<SkillVersion[]> {
+  const all = await getPersistence().standards.listSkillVersions();
   return (skillId ? all.filter((v) => v.skillId === skillId) : all).sort((a, b) =>
     b.effectiveAt.localeCompare(a.effectiveAt),
   );
 }
 
-export function getCurrentSkillVersion(skillId: string): SkillVersion | null {
-  for (const v of db().skillVersions.values()) {
+export async function getCurrentSkillVersion(skillId: string): Promise<SkillVersion | null> {
+  for (const v of await getPersistence().standards.listSkillVersions()) {
     if (v.skillId === skillId && v.isCurrent) return v;
   }
   return null;
 }
 
-export function createSkillVersion(input: {
+export async function createSkillVersion(input: {
   skillId: string;
   version: string;
   objectiveSummary: string;
-}): SkillVersion | null {
-  const store = db();
-  if (!store.skills.has(input.skillId)) return null;
-  // Mark prior versions non-current.
-  for (const v of store.skillVersions.values()) {
-    if (v.skillId === input.skillId && v.isCurrent) v.isCurrent = false;
+}): Promise<SkillVersion | null> {
+  const standards = getPersistence().standards;
+  if (!(await getPersistence().curriculum.getSkillById(input.skillId))) return null;
+  // Mark prior versions non-current (persist each flip).
+  for (const v of await standards.listSkillVersions()) {
+    if (v.skillId === input.skillId && v.isCurrent) {
+      await standards.upsertSkillVersion({ ...v, isCurrent: false });
+    }
   }
   const rec: SkillVersion = {
     id: newId("skv"),
@@ -4001,70 +4008,75 @@ export function createSkillVersion(input: {
     objectiveSummary: input.objectiveSummary,
     isCurrent: true,
   };
-  store.skillVersions.set(rec.id, rec);
-  return rec;
+  return await standards.upsertSkillVersion(rec);
 }
 
 // ----- Curriculum maps -----
-export function listCurriculumMaps(skillId?: string): CurriculumMap[] {
-  const all = Array.from(db().curriculumMaps.values());
+export async function listCurriculumMaps(skillId?: string): Promise<CurriculumMap[]> {
+  const all = await getPersistence().standards.listCurriculumMaps();
   return skillId ? all.filter((m) => m.skillId === skillId) : all;
 }
 
-export function addCurriculumMap(input: {
+export async function addCurriculumMap(input: {
   skillId: string;
   domainId: string;
   standardId: string;
   alignment: "primary" | "supports" | "introduces";
-}): CurriculumMap | null {
-  const store = db();
-  if (
-    !store.skills.has(input.skillId) ||
-    !store.domains.get(input.domainId) ||
-    !store.standards.get(input.standardId)
-  ) {
+}): Promise<CurriculumMap | null> {
+  const standards = getPersistence().standards;
+  const [skill, domains, std] = await Promise.all([
+    getPersistence().curriculum.getSkillById(input.skillId),
+    standards.listDomains(),
+    standards.getStandard(input.standardId),
+  ]);
+  if (!skill || !domains.some((d) => d.id === input.domainId) || !std) {
     return null;
   }
   const rec: CurriculumMap = { id: newId("cmp"), ...input };
-  store.curriculumMaps.set(rec.id, rec);
-  return rec;
+  return await standards.upsertCurriculumMap(rec);
 }
 
 // ----- Lesson objective templates -----
-export function listLessonObjectiveTemplates(skillId?: string): LessonObjectiveTemplate[] {
-  const all = Array.from(db().lessonObjectiveTemplates.values());
+export async function listLessonObjectiveTemplates(
+  skillId?: string,
+): Promise<LessonObjectiveTemplate[]> {
+  const all = await getPersistence().standards.listLessonObjectiveTemplates();
   return skillId ? all.filter((t) => t.skillId === skillId) : all;
 }
 
-export function getActiveLessonObjectiveTemplate(skillId: string): LessonObjectiveTemplate | null {
-  for (const t of db().lessonObjectiveTemplates.values()) {
+export async function getActiveLessonObjectiveTemplate(
+  skillId: string,
+): Promise<LessonObjectiveTemplate | null> {
+  for (const t of await getPersistence().standards.listLessonObjectiveTemplates()) {
     if (t.skillId === skillId && t.status === "active") return t;
   }
   return null;
 }
 
 // ----- Assessment blueprints -----
-export function listAssessmentBlueprints(skillId?: string): AssessmentBlueprint[] {
-  const all = Array.from(db().assessmentBlueprints.values());
+export async function listAssessmentBlueprints(skillId?: string): Promise<AssessmentBlueprint[]> {
+  const all = await getPersistence().standards.listAssessmentBlueprints();
   return skillId ? all.filter((b) => b.skillId === skillId) : all;
 }
 
-export function getActiveAssessmentBlueprint(skillId: string): AssessmentBlueprint | null {
-  for (const b of db().assessmentBlueprints.values()) {
+export async function getActiveAssessmentBlueprint(
+  skillId: string,
+): Promise<AssessmentBlueprint | null> {
+  for (const b of await getPersistence().standards.listAssessmentBlueprints()) {
     if (b.skillId === skillId && b.status === "active") return b;
   }
   return null;
 }
 
 // ----- Curriculum import jobs -----
-export function listCurriculumImportJobs(): CurriculumImportJob[] {
-  return Array.from(db().curriculumImportJobs.values()).sort((a, b) =>
+export async function listCurriculumImportJobs(): Promise<CurriculumImportJob[]> {
+  return (await getPersistence().standards.listImportJobs()).sort((a, b) =>
     b.startedAt.localeCompare(a.startedAt),
   );
 }
 
-export function getCurriculumImportJob(id: string): CurriculumImportJob | null {
-  return db().curriculumImportJobs.get(id) ?? null;
+export async function getCurriculumImportJob(id: string): Promise<CurriculumImportJob | null> {
+  return await getPersistence().standards.getImportJob(id);
 }
 
 /**
@@ -4073,20 +4085,19 @@ export function getCurriculumImportJob(id: string): CurriculumImportJob | null {
  * BFF + UI contract stays the same. Counts are based on the framework's
  * current state, so the admin sees a non-zero result.
  */
-export function startCurriculumImportJob(input: {
+export async function startCurriculumImportJob(input: {
   frameworkSlug: StandardsFrameworkSlug;
   source: string;
   requestedByUserId: string;
-}): CurriculumImportJob {
-  const store = db();
-  const framework = getStandardsFrameworkBySlug(input.frameworkSlug);
+}): Promise<CurriculumImportJob> {
+  const standards = getPersistence().standards;
+  const framework = await getStandardsFrameworkBySlug(input.frameworkSlug);
   const frameworkId = framework?.id;
   const docCount = frameworkId
-    ? Array.from(store.standardDocuments.values()).filter((d) => d.frameworkId === frameworkId)
-        .length
+    ? (await standards.listStandardDocuments()).filter((d) => d.frameworkId === frameworkId).length
     : 0;
   const stdCount = frameworkId
-    ? Array.from(store.standards.values()).filter((s) => s.frameworkId === frameworkId).length
+    ? (await standards.listStandards()).filter((s) => s.frameworkId === frameworkId).length
     : 0;
   const rec: CurriculumImportJob = {
     id: newId("cij"),
@@ -4099,8 +4110,7 @@ export function startCurriculumImportJob(input: {
     error: framework ? null : `Unknown framework slug: ${input.frameworkSlug}`,
     requestedByUserId: input.requestedByUserId,
   };
-  store.curriculumImportJobs.set(rec.id, rec);
-  return rec;
+  return await standards.upsertImportJob(rec);
 }
 
 // ===== Sprint 27: AI Safety + Moderation =====
@@ -4132,15 +4142,15 @@ export const SAFETY_VALIDATE_TUTOR = _validateTutor;
 export const SAFETY_BLOCKED_FALLBACK = _blockedFallback;
 
 /** Returns the current active SafetyPolicyVersion (or the default if unseeded). */
-export function getActiveSafetyPolicy(): SafetyPolicyVersion {
-  for (const p of db().safetyPolicyVersions.values()) {
+export async function getActiveSafetyPolicy(): Promise<SafetyPolicyVersion> {
+  for (const p of await getPersistence().safety.listSafetyPolicyVersions()) {
     if (p.status === "active") return p;
   }
   return DEFAULT_SAFETY_POLICY;
 }
 
-export function listSafetyPolicyVersions(): SafetyPolicyVersion[] {
-  return Array.from(db().safetyPolicyVersions.values()).sort((a, b) =>
+export async function listSafetyPolicyVersions(): Promise<SafetyPolicyVersion[]> {
+  return (await getPersistence().safety.listSafetyPolicyVersions()).sort((a, b) =>
     b.effectiveAt.localeCompare(a.effectiveAt),
   );
 }
@@ -4150,7 +4160,7 @@ export function listSafetyPolicyVersions(): SafetyPolicyVersion[] {
  * or "block" with crisis signals, a HumanReviewCase is opened in the same
  * transaction so the admin queue surfaces it.
  */
-export function recordModerationEvent(input: {
+export async function recordModerationEvent(input: {
   tenantId: string;
   learnerId: string | null;
   subjectKind: SafetySubjectKind;
@@ -4160,8 +4170,8 @@ export function recordModerationEvent(input: {
   injectionSignals: ModerationEvent["injectionSignals"];
   crisisSignals: ModerationEvent["crisisSignals"];
   createdByUserId: string | null;
-}): { event: ModerationEvent; reviewCase: HumanReviewCase | null } {
-  const store = db();
+}): Promise<{ event: ModerationEvent; reviewCase: HumanReviewCase | null }> {
+  const safety = getPersistence().safety;
   const eventId = newId("modev");
   // Open a review case automatically when the decision is "review", on any
   // crisis signal, or on a "block" decision involving self_harm /
@@ -4190,7 +4200,7 @@ export function recordModerationEvent(input: {
       escalatedAt: input.crisisSignals.length > 0 ? nowIso() : null,
       createdAt: nowIso(),
     };
-    store.humanReviewCases.set(reviewCaseId, reviewCase);
+    await safety.upsertHumanReviewCase(reviewCase);
   }
 
   const event: ModerationEvent = {
@@ -4209,16 +4219,16 @@ export function recordModerationEvent(input: {
     reviewCaseId,
     createdAt: nowIso(),
   };
-  store.moderationEvents.set(eventId, event);
+  await safety.appendModerationEvent(event);
   return { event, reviewCase };
 }
 
-export function listModerationEvents(filter?: {
+export async function listModerationEvents(filter?: {
   tenantId?: string;
   decision?: "allow" | "review" | "block";
   limit?: number;
-}): ModerationEvent[] {
-  let arr = Array.from(db().moderationEvents.values());
+}): Promise<ModerationEvent[]> {
+  let arr = await getPersistence().safety.listModerationEvents();
   if (filter?.tenantId) arr = arr.filter((e) => e.tenantId === filter.tenantId);
   if (filter?.decision) arr = arr.filter((e) => e.classification.decision === filter.decision);
   arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -4226,25 +4236,25 @@ export function listModerationEvents(filter?: {
   return arr;
 }
 
-export function getModerationEvent(id: string): ModerationEvent | null {
-  return db().moderationEvents.get(id) ?? null;
+export async function getModerationEvent(id: string): Promise<ModerationEvent | null> {
+  return await getPersistence().safety.getModerationEvent(id);
 }
 
-export function listHumanReviewCases(filter?: {
+export async function listHumanReviewCases(filter?: {
   status?: HumanReviewCaseStatus;
   tenantId?: string;
-}): HumanReviewCase[] {
-  let arr = Array.from(db().humanReviewCases.values());
+}): Promise<HumanReviewCase[]> {
+  let arr = await getPersistence().safety.listHumanReviewCases();
   if (filter?.status) arr = arr.filter((c) => c.status === filter.status);
   if (filter?.tenantId) arr = arr.filter((c) => c.tenantId === filter.tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function getHumanReviewCase(id: string): HumanReviewCase | null {
-  return db().humanReviewCases.get(id) ?? null;
+export async function getHumanReviewCase(id: string): Promise<HumanReviewCase | null> {
+  return await getPersistence().safety.getHumanReviewCase(id);
 }
 
-export function updateHumanReviewCase(
+export async function updateHumanReviewCase(
   id: string,
   patch: {
     status?: HumanReviewCaseStatus;
@@ -4252,9 +4262,11 @@ export function updateHumanReviewCase(
     resolution?: string | null;
     resolvedByUserId?: string | null;
   },
-): HumanReviewCase | null {
-  const c = db().humanReviewCases.get(id);
-  if (!c) return null;
+): Promise<HumanReviewCase | null> {
+  const safety = getPersistence().safety;
+  const existing = await safety.getHumanReviewCase(id);
+  if (!existing) return null;
+  const c: HumanReviewCase = { ...existing };
   if (patch.status !== undefined) {
     c.status = patch.status;
     if ((patch.status === "resolved_allow" || patch.status === "resolved_block") && !c.resolvedAt) {
@@ -4265,28 +4277,27 @@ export function updateHumanReviewCase(
   if (patch.assignedToUserId !== undefined) c.assignedToUserId = patch.assignedToUserId;
   if (patch.resolution !== undefined) c.resolution = patch.resolution;
   if (patch.resolvedByUserId !== undefined) c.resolvedByUserId = patch.resolvedByUserId;
-  return c;
+  return await safety.upsertHumanReviewCase(c);
 }
 
-export function recordBlockedGeneration(input: {
+export async function recordBlockedGeneration(input: {
   tenantId: string;
   learnerId: string | null;
   subjectKind: SafetySubjectKind;
   reason: string;
   fallbackResponse: string;
-}): BlockedGeneration {
+}): Promise<BlockedGeneration> {
   const rec: BlockedGeneration = { id: newId("blk"), createdAt: nowIso(), ...input };
-  db().blockedGenerations.set(rec.id, rec);
-  return rec;
+  return await getPersistence().safety.appendBlockedGeneration(rec);
 }
 
-export function listBlockedGenerations(tenantId?: string): BlockedGeneration[] {
-  let arr = Array.from(db().blockedGenerations.values());
+export async function listBlockedGenerations(tenantId?: string): Promise<BlockedGeneration[]> {
+  let arr = await getPersistence().safety.listBlockedGenerations();
   if (tenantId) arr = arr.filter((b) => b.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function recordTutorResponseAudit(input: {
+export async function recordTutorResponseAudit(input: {
   tenantId: string;
   learnerId: string;
   contextKind: "lesson_run" | "homework_session";
@@ -4294,18 +4305,17 @@ export function recordTutorResponseAudit(input: {
   tutorPersona: string;
   excerpt: string;
   classification: SafetyClassification;
-}): TutorResponseAudit {
+}): Promise<TutorResponseAudit> {
   const rec: TutorResponseAudit = {
     id: newId("tra"),
     createdAt: nowIso(),
     ...input,
     excerpt: input.excerpt.slice(0, 500),
   };
-  db().tutorResponseAudits.set(rec.id, rec);
-  return rec;
+  return await getPersistence().safety.appendTutorResponseAudit(rec);
 }
 
-export function recordHomeworkInputAudit(input: {
+export async function recordHomeworkInputAudit(input: {
   tenantId: string;
   learnerId: string;
   homeworkSessionId: string;
@@ -4313,7 +4323,7 @@ export function recordHomeworkInputAudit(input: {
   sanitizedExcerpt: string;
   classification: SafetyClassification;
   piiRedacted: boolean;
-}): HomeworkInputAudit {
+}): Promise<HomeworkInputAudit> {
   const rec: HomeworkInputAudit = {
     id: newId("hia"),
     createdAt: nowIso(),
@@ -4321,18 +4331,17 @@ export function recordHomeworkInputAudit(input: {
     rawExcerpt: input.rawExcerpt.slice(0, 500),
     sanitizedExcerpt: input.sanitizedExcerpt.slice(0, 500),
   };
-  db().homeworkInputAudits.set(rec.id, rec);
-  return rec;
+  return await getPersistence().safety.appendHomeworkInputAudit(rec);
 }
 
-export function listTutorResponseAudits(tenantId?: string): TutorResponseAudit[] {
-  let arr = Array.from(db().tutorResponseAudits.values());
+export async function listTutorResponseAudits(tenantId?: string): Promise<TutorResponseAudit[]> {
+  let arr = await getPersistence().safety.listTutorResponseAudits();
   if (tenantId) arr = arr.filter((a) => a.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function listHomeworkInputAudits(tenantId?: string): HomeworkInputAudit[] {
-  let arr = Array.from(db().homeworkInputAudits.values());
+export async function listHomeworkInputAudits(tenantId?: string): Promise<HomeworkInputAudit[]> {
+  let arr = await getPersistence().safety.listHomeworkInputAudits();
   if (tenantId) arr = arr.filter((a) => a.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
@@ -4362,20 +4371,22 @@ const DEFAULT_VOICE_PREFERENCE: Omit<
 };
 
 /** Resolve override set for a tenant (platform-scope first, then tenant-scope). */
-function resolveOverrides(tenantId: string): PronunciationOverride[] {
-  const all = Array.from(db().pronunciationOverrides.values());
+async function resolveOverrides(tenantId: string): Promise<PronunciationOverride[]> {
+  const all = await getPersistence().audio.listPronunciationOverrides();
   return all
     .filter((o) => o.scope === "platform" || o.tenantId === tenantId)
     .sort((a, b) => a.token.localeCompare(b.token));
 }
 
-export function listPronunciationOverrides(tenantId?: string): PronunciationOverride[] {
-  let arr = Array.from(db().pronunciationOverrides.values());
+export async function listPronunciationOverrides(
+  tenantId?: string,
+): Promise<PronunciationOverride[]> {
+  let arr = await getPersistence().audio.listPronunciationOverrides();
   if (tenantId) arr = arr.filter((o) => o.scope === "platform" || o.tenantId === tenantId);
   return arr.sort((a, b) => a.token.localeCompare(b.token));
 }
 
-export function createPronunciationOverride(input: {
+export async function createPronunciationOverride(input: {
   tenantId: string;
   token: string;
   replacement: string;
@@ -4383,46 +4394,51 @@ export function createPronunciationOverride(input: {
   scope: "platform" | "tenant";
   notes: string | null;
   createdByUserId: string;
-}): PronunciationOverride {
+}): Promise<PronunciationOverride> {
   const rec: PronunciationOverride = {
     id: newId("pron"),
     createdAt: nowIso(),
     ...input,
   };
-  db().pronunciationOverrides.set(rec.id, rec);
-  return rec;
+  return await getPersistence().audio.upsertPronunciationOverride(rec);
 }
 
-export function updatePronunciationOverride(
+export async function updatePronunciationOverride(
   id: string,
   patch: Partial<Pick<PronunciationOverride, "replacement" | "encoding" | "notes" | "scope">>,
-): PronunciationOverride | null {
-  const o = db().pronunciationOverrides.get(id);
-  if (!o) return null;
+): Promise<PronunciationOverride | null> {
+  const audio = getPersistence().audio;
+  const existing = await audio.getPronunciationOverride(id);
+  if (!existing) return null;
+  const o: PronunciationOverride = { ...existing };
   if (patch.replacement !== undefined) o.replacement = patch.replacement;
   if (patch.encoding !== undefined) o.encoding = patch.encoding;
   if (patch.notes !== undefined) o.notes = patch.notes;
   if (patch.scope !== undefined) o.scope = patch.scope;
-  return o;
+  return await audio.upsertPronunciationOverride(o);
 }
 
-export function getPronunciationOverride(id: string): PronunciationOverride | null {
-  return db().pronunciationOverrides.get(id) ?? null;
+export async function getPronunciationOverride(
+  id: string,
+): Promise<PronunciationOverride | null> {
+  return await getPersistence().audio.getPronunciationOverride(id);
 }
 
-export function getLearnerVoicePreference(learnerId: string): LearnerVoicePreference | null {
-  return db().learnerVoicePreferences.get(learnerId) ?? null;
+export async function getLearnerVoicePreference(
+  learnerId: string,
+): Promise<LearnerVoicePreference | null> {
+  return await getPersistence().audio.getVoicePreference(learnerId);
 }
 
-export function upsertLearnerVoicePreference(input: {
+export async function upsertLearnerVoicePreference(input: {
   learnerId: string;
   tenantId: string;
   voiceId?: TTSVoiceId;
   speed?: number;
   enabled?: boolean;
   captionsAlways?: boolean;
-}): LearnerVoicePreference {
-  const existing = db().learnerVoicePreferences.get(input.learnerId);
+}): Promise<LearnerVoicePreference> {
+  const existing = await getPersistence().audio.getVoicePreference(input.learnerId);
   const merged: LearnerVoicePreference = {
     learnerId: input.learnerId,
     tenantId: input.tenantId,
@@ -4437,8 +4453,7 @@ export function upsertLearnerVoicePreference(input: {
       input.captionsAlways ?? existing?.captionsAlways ?? DEFAULT_VOICE_PREFERENCE.captionsAlways,
     updatedAt: nowIso(),
   };
-  db().learnerVoicePreferences.set(merged.learnerId, merged);
-  return merged;
+  return await getPersistence().audio.upsertVoicePreference(merged);
 }
 
 function cacheKey(tenantId: string, languageCode: string, contentHash: string) {
@@ -4462,12 +4477,12 @@ export async function generateTTS(input: {
   languageCode?: string;
   speed?: number;
 }): Promise<{ job: TTSGenerationJob; asset: AudioAsset }> {
-  const store = db();
+  const audio = getPersistence().audio;
   const languageCode = input.languageCode ?? "en-US";
-  const pref = input.learnerId ? getLearnerVoicePreference(input.learnerId) : null;
+  const pref = input.learnerId ? await getLearnerVoicePreference(input.learnerId) : null;
   const voiceId = input.voiceId ?? pref?.voiceId ?? "kid_friendly";
   const speed = Math.min(2, Math.max(0.5, input.speed ?? pref?.speed ?? 1.0));
-  const overrides = resolveOverrides(input.tenantId).map((o) => ({
+  const overrides = (await resolveOverrides(input.tenantId)).map((o) => ({
     token: o.token,
     replacement: o.replacement,
     encoding: o.encoding,
@@ -4481,12 +4496,11 @@ export async function generateTTS(input: {
   });
 
   const key = cacheKey(input.tenantId, languageCode, hash);
-  const cached = store.audioCacheEntries.get(key);
+  const cached = await audio.getCacheEntry(key);
   if (cached) {
-    const existing = store.audioAssets.get(cached.audioAssetId);
+    const existing = await audio.getAudioAsset(cached.audioAssetId);
     if (existing) {
-      cached.hits += 1;
-      cached.lastHitAt = nowIso();
+      await audio.upsertCacheEntry(key, { ...cached, hits: cached.hits + 1, lastHitAt: nowIso() });
       const jobId = newId("tts");
       const job: TTSGenerationJob = {
         id: jobId,
@@ -4501,7 +4515,7 @@ export async function generateTTS(input: {
         createdAt: nowIso(),
         completedAt: nowIso(),
       };
-      store.ttsGenerationJobs.set(jobId, job);
+      await audio.upsertTtsJob(job);
       return { job, asset: existing };
     }
   }
@@ -4520,7 +4534,7 @@ export async function generateTTS(input: {
     createdAt: nowIso(),
     completedAt: null,
   };
-  store.ttsGenerationJobs.set(jobId, job);
+  await audio.upsertTtsJob(job);
 
   try {
     const provider = getTTSProvider();
@@ -4548,7 +4562,7 @@ export async function generateTTS(input: {
       provider: result.provider,
       createdAt: nowIso(),
     };
-    store.audioAssets.set(assetId, asset);
+    await audio.upsertAudioAsset(asset);
     const entry: AudioCacheEntry = {
       contentHash: hash,
       tenantId: input.tenantId,
@@ -4557,30 +4571,32 @@ export async function generateTTS(input: {
       hits: 0,
       lastHitAt: nowIso(),
     };
-    store.audioCacheEntries.set(key, entry);
+    await audio.upsertCacheEntry(key, entry);
     job.status = "completed";
     job.audioAssetId = assetId;
     job.completedAt = nowIso();
+    await audio.upsertTtsJob(job);
     return { job, asset };
   } catch (e) {
     job.status = "failed";
     job.errorMessage = e instanceof Error ? e.message : "TTS failed.";
     job.completedAt = nowIso();
+    await audio.upsertTtsJob(job);
     throw e;
   }
 }
 
-export function getAudioAsset(id: string): AudioAsset | null {
-  return db().audioAssets.get(id) ?? null;
+export async function getAudioAsset(id: string): Promise<AudioAsset | null> {
+  return await getPersistence().audio.getAudioAsset(id);
 }
 
-export function listAudioAssets(tenantId?: string): AudioAsset[] {
-  let arr = Array.from(db().audioAssets.values());
+export async function listAudioAssets(tenantId?: string): Promise<AudioAsset[]> {
+  let arr = await getPersistence().audio.listAudioAssets();
   if (tenantId) arr = arr.filter((a) => a.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function recordReadAloudUsage(input: {
+export async function recordReadAloudUsage(input: {
   tenantId: string;
   learnerId: string | null;
   audioAssetId: string;
@@ -4588,29 +4604,28 @@ export function recordReadAloudUsage(input: {
   contextRefId: string | null;
   cacheHit: boolean;
   costMicroUsd: number;
-}): ReadAloudUsageEvent {
+}): Promise<ReadAloudUsageEvent> {
   const rec: ReadAloudUsageEvent = {
     id: newId("rau"),
     createdAt: nowIso(),
     ...input,
   };
-  db().readAloudUsageEvents.set(rec.id, rec);
-  return rec;
+  return await getPersistence().audio.appendReadAloudUsage(rec);
 }
 
-export function listReadAloudUsage(tenantId?: string): ReadAloudUsageEvent[] {
-  let arr = Array.from(db().readAloudUsageEvents.values());
+export async function listReadAloudUsage(tenantId?: string): Promise<ReadAloudUsageEvent[]> {
+  let arr = await getPersistence().audio.listReadAloudUsage();
   if (tenantId) arr = arr.filter((e) => e.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function summarizeAudioUsage(tenantId?: string): {
+export async function summarizeAudioUsage(tenantId?: string): Promise<{
   totalPlaybacks: number;
   totalCostMicroUsd: number;
   cacheHitRate: number;
   uniqueAssets: number;
-} {
-  const events = listReadAloudUsage(tenantId);
+}> {
+  const events = await listReadAloudUsage(tenantId);
   const total = events.length;
   const hits = events.filter((e) => e.cacheHit).length;
   const cost = events.reduce((a, e) => a + e.costMicroUsd, 0);
@@ -4823,7 +4838,8 @@ export async function runRosterImport(input: {
   dryRun: boolean;
   createdByUserId: string;
 }): Promise<RosterImportJob> {
-  const store = db();
+  const rostering = getPersistence().rostering;
+  const admin = getPersistence().admin;
   const school = await getSchool(input.schoolId);
   if (!school || school.tenantId !== input.tenantId) {
     const errId = newId("job");
@@ -4843,8 +4859,7 @@ export async function runRosterImport(input: {
       createdAt: nowIso(),
       completedAt: nowIso(),
     };
-    store.rosterImportJobs.set(failed.id, failed);
-    return failed;
+    return await rostering.upsertImportJob(failed);
   }
   const { rows, errors: parseErrors } = parseRosterCsv(input.csvText);
   const job: RosterImportJob = {
@@ -4863,7 +4878,8 @@ export async function runRosterImport(input: {
     createdAt: nowIso(),
     completedAt: null,
   };
-  store.rosterImportJobs.set(job.id, job);
+  // The job is persisted once at the end with its final counts (in-place
+  // counter mutation below no longer relies on a shared Map reference).
   for (const err of parseErrors) {
     const errRec: RosterImportError = {
       id: newId("rerr"),
@@ -4872,15 +4888,16 @@ export async function runRosterImport(input: {
       row: err.row,
       message: err.message,
     };
-    store.rosterImportErrors.set(errRec.id, errRec);
+    await rostering.appendImportError(errRec);
   }
 
   // Track classrooms we've materialized this run so multiple roster rows
   // pointing at the same "Mrs. Smith 4A" share one classroom record.
   const classroomByName = new Map<string, Classroom>();
-  for (const c of Array.from(store.classrooms.values()).filter(
-    (c) => c.schoolId === input.schoolId,
-  )) {
+  for (const c of await admin.listClassrooms({
+    tenantId: input.tenantId,
+    schoolId: input.schoolId,
+  })) {
     classroomByName.set(c.name, c);
   }
 
@@ -4908,7 +4925,11 @@ export async function runRosterImport(input: {
         });
         classroomByName.set(classroom.name, classroom);
       } else if (!input.dryRun && row.role === "teacher" && classroom.teacherUserId === "pending") {
-        classroom.teacherUserId = row.externalId;
+        classroom = { ...classroom, teacherUserId: row.externalId };
+        classroomByName.set(classroom.name, classroom);
+        // Persist the teacher promotion so a learner-row-created classroom is
+        // no longer orphaned (durable in both backends).
+        await admin.upsertClassroom(classroom);
       }
       if (input.dryRun) {
         job.createdRows += 1;
@@ -4933,7 +4954,7 @@ export async function runRosterImport(input: {
         row: row as unknown as Record<string, string>,
         message: e instanceof Error ? e.message : "Unknown error.",
       };
-      store.rosterImportErrors.set(errRec.id, errRec);
+      await rostering.appendImportError(errRec);
     }
   }
   job.status = input.dryRun
@@ -4942,56 +4963,65 @@ export async function runRosterImport(input: {
       ? "failed"
       : "completed";
   job.completedAt = nowIso();
-  return job;
+  return await rostering.upsertImportJob(job);
 }
 
-export function getRosterImportJob(jobId: string, tenantId: string): RosterImportJob | null {
-  const j = db().rosterImportJobs.get(jobId);
+export async function getRosterImportJob(
+  jobId: string,
+  tenantId: string,
+): Promise<RosterImportJob | null> {
+  const j = await getPersistence().rostering.getImportJobById(jobId);
   return j && j.tenantId === tenantId ? j : null;
 }
 
 /** Platform-admin escape hatch: skip tenant scoping. Caller MUST gate on role. */
-export function getRosterImportJobAny(jobId: string): RosterImportJob | null {
-  return db().rosterImportJobs.get(jobId) ?? null;
+export async function getRosterImportJobAny(jobId: string): Promise<RosterImportJob | null> {
+  return await getPersistence().rostering.getImportJobById(jobId);
 }
 
-export function listRosterImportJobs(tenantId: string, schoolId?: string): RosterImportJob[] {
-  let arr = Array.from(db().rosterImportJobs.values()).filter((j) => j.tenantId === tenantId);
+export async function listRosterImportJobs(
+  tenantId: string,
+  schoolId?: string,
+): Promise<RosterImportJob[]> {
+  let arr = await getPersistence().rostering.listImportJobsForTenant(tenantId);
   if (schoolId) arr = arr.filter((j) => j.schoolId === schoolId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function listRosterImportErrors(jobId: string): RosterImportError[] {
-  return Array.from(db().rosterImportErrors.values())
-    .filter((e) => e.jobId === jobId)
-    .sort((a, b) => a.rowNumber - b.rowNumber);
+export async function listRosterImportErrors(jobId: string): Promise<RosterImportError[]> {
+  return (await getPersistence().rostering.listImportErrors(jobId)).sort(
+    (a, b) => a.rowNumber - b.rowNumber,
+  );
 }
 
-export function listCourses(tenantId: string, schoolId?: string): Course[] {
-  let arr = Array.from(db().courses.values()).filter((c) => c.tenantId === tenantId);
+export async function listCourses(tenantId: string, schoolId?: string): Promise<Course[]> {
+  let arr = await getPersistence().rostering.listCoursesForTenant(tenantId);
   if (schoolId) arr = arr.filter((c) => c.schoolId === schoolId);
   return arr.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function listSISConnections(tenantId: string): SISConnection[] {
-  return Array.from(db().sisConnections.values())
-    .filter((c) => c.tenantId === tenantId)
-    .sort((a, b) => a.label.localeCompare(b.label));
-}
-
-export function listExternalRosterMappings(connectionId: string): ExternalRosterMapping[] {
-  return Array.from(db().externalRosterMappings.values()).filter(
-    (m) => m.connectionId === connectionId,
+export async function listSISConnections(tenantId: string): Promise<SISConnection[]> {
+  return (await getPersistence().rostering.listSISConnectionsForTenant(tenantId)).sort((a, b) =>
+    a.label.localeCompare(b.label),
   );
 }
 
+export async function listExternalRosterMappings(
+  connectionId: string,
+): Promise<ExternalRosterMapping[]> {
+  return await getPersistence().rostering.listExternalMappingsForConnection(connectionId);
+}
+
 /** Multi-device lesson sync — optimistic concurrency on `version`. */
-export function getLessonSyncState(lessonRunId: string, tenantId: string): LessonSyncState | null {
-  const s = db().lessonSyncStates.get(lessonRunId);
+export async function getLessonSyncState(
+  lessonRunId: string,
+  tenantId: string,
+): Promise<LessonSyncState | null> {
+  const s = await getPersistence().rostering.getLessonSyncState(lessonRunId);
   return s && s.tenantId === tenantId ? s : null;
 }
 
-export function putLessonSyncState(input: {
+export async function putLessonSyncState(input: {
   lessonRunId: string;
   tenantId: string;
   learnerId: string;
@@ -5000,8 +5030,11 @@ export function putLessonSyncState(input: {
   baseVersion: number;
   state: Record<string, unknown>;
   deviceId: string;
-}): { ok: true; state: LessonSyncState } | { ok: false; current: LessonSyncState | null } {
-  const existing = db().lessonSyncStates.get(input.lessonRunId) ?? null;
+}): Promise<
+  { ok: true; state: LessonSyncState } | { ok: false; current: LessonSyncState | null }
+> {
+  const rostering = getPersistence().rostering;
+  const existing = await rostering.getLessonSyncState(input.lessonRunId);
   if (existing) {
     if (existing.tenantId !== input.tenantId) return { ok: false, current: null };
     // Lesson runs are bound to a single learner at creation time. A caller
@@ -5009,11 +5042,14 @@ export function putLessonSyncState(input: {
     // they happen to know lessonRunId — guard before the version check.
     if (existing.learnerId !== input.learnerId) return { ok: false, current: null };
     if (existing.version !== input.baseVersion) return { ok: false, current: existing };
-    existing.version += 1;
-    existing.state = input.state;
-    existing.lastWriterDeviceId = input.deviceId;
-    existing.updatedAt = nowIso();
-    return { ok: true, state: existing };
+    const bumped: LessonSyncState = {
+      ...existing,
+      version: existing.version + 1,
+      state: input.state,
+      lastWriterDeviceId: input.deviceId,
+      updatedAt: nowIso(),
+    };
+    return { ok: true, state: await rostering.upsertLessonSyncState(bumped) };
   }
   if (input.baseVersion !== 0) return { ok: false, current: null };
   const next: LessonSyncState = {
@@ -5025,8 +5061,7 @@ export function putLessonSyncState(input: {
     lastWriterDeviceId: input.deviceId,
     updatedAt: nowIso(),
   };
-  db().lessonSyncStates.set(input.lessonRunId, next);
-  return { ok: true, state: next };
+  return { ok: true, state: await rostering.upsertLessonSyncState(next) };
 }
 
 /**
@@ -5058,11 +5093,11 @@ function defaultPreferenceMap(): Record<string, boolean> {
   return m;
 }
 
-export function getNotificationPreference(
+export async function getNotificationPreference(
   userId: string,
   tenantId: string,
-): NotificationPreference {
-  const existing = db().notificationPreferences.get(userId);
+): Promise<NotificationPreference> {
+  const existing = await getPersistence().notifications.getPreference(userId);
   if (existing) return existing;
   // Create on read so the UI always has a row to render. Saves an explicit
   // "create defaults" call across BFFs.
@@ -5074,21 +5109,21 @@ export function getNotificationPreference(
     digestCadence: "weekly",
     updatedAt: nowIso(),
   };
-  db().notificationPreferences.set(userId, created);
-  return created;
+  return await getPersistence().notifications.upsertPreference(created);
 }
 
-export function updateNotificationPreference(
+export async function updateNotificationPreference(
   userId: string,
   tenantId: string,
   patch: Partial<Pick<NotificationPreference, "preferences" | "quietHours" | "digestCadence">>,
-): NotificationPreference {
-  const pref = getNotificationPreference(userId, tenantId);
-  if (patch.preferences) pref.preferences = { ...pref.preferences, ...patch.preferences };
-  if (patch.quietHours !== undefined) pref.quietHours = patch.quietHours;
-  if (patch.digestCadence !== undefined) pref.digestCadence = patch.digestCadence;
-  pref.updatedAt = nowIso();
-  return pref;
+): Promise<NotificationPreference> {
+  const pref = await getNotificationPreference(userId, tenantId);
+  const next: NotificationPreference = { ...pref };
+  if (patch.preferences) next.preferences = { ...pref.preferences, ...patch.preferences };
+  if (patch.quietHours !== undefined) next.quietHours = patch.quietHours;
+  if (patch.digestCadence !== undefined) next.digestCadence = patch.digestCadence;
+  next.updatedAt = nowIso();
+  return await getPersistence().notifications.upsertPreference(next);
 }
 
 /**
@@ -5122,7 +5157,7 @@ export async function createNotification(input: {
     readAt: null,
     createdAt: nowIso(),
   };
-  const pref = getNotificationPreference(input.userId, input.tenantId);
+  const pref = await getNotificationPreference(input.userId, input.tenantId);
   const channels: NotificationChannel[] = ["in_app", "email", "push"];
   const deliveries: NotificationDelivery[] = channels.map((ch) => {
     const enabled = pref.preferences[`${input.type}:${ch}`] ?? false;
@@ -5159,8 +5194,13 @@ export async function listDeliveriesFor(notificationId: string): Promise<Notific
   return getPersistence().notifications.listDeliveries(notificationId);
 }
 
-export function listDigestSchedules(tenantId: string, userId?: string): DigestSchedule[] {
-  let arr = Array.from(db().digestSchedules.values()).filter((d) => d.tenantId === tenantId);
+export async function listDigestSchedules(
+  tenantId: string,
+  userId?: string,
+): Promise<DigestSchedule[]> {
+  let arr = (await getPersistence().notifications.listDigestSchedules()).filter(
+    (d) => d.tenantId === tenantId,
+  );
   if (userId) arr = arr.filter((d) => d.userId === userId);
   return arr;
 }
@@ -5386,8 +5426,9 @@ export function revokeSeat(assignmentId: string, tenantId: string): SeatAssignme
 
 // ----- AI cost controls -----
 
-export function getAIBudget(tenantId: string): AIBudget {
-  const existing = db().aiBudgets.get(tenantId);
+export async function getAIBudget(tenantId: string): Promise<AIBudget> {
+  const billing = getPersistence().billing;
+  const existing = await billing.getAIBudget(tenantId);
   if (existing) return existing;
   // Reasonable default for paid tenants: $50/mo soft warn at 80%, no hard
   // stop. Platform tenant is unbounded. Repos lazily materialize so every
@@ -5399,31 +5440,39 @@ export function getAIBudget(tenantId: string): AIBudget {
     hardStop: false,
     updatedAt: nowIso(),
   };
-  db().aiBudgets.set(tenantId, def);
-  return def;
+  return await billing.upsertAIBudget(def);
 }
 
-export function updateAIBudget(
+export async function updateAIBudget(
   tenantId: string,
   patch: Partial<Pick<AIBudget, "monthlyCapCents" | "warnAt" | "hardStop">>,
-): AIBudget {
-  const b = getAIBudget(tenantId);
+): Promise<AIBudget> {
+  const b = await getAIBudget(tenantId);
   if (patch.monthlyCapCents !== undefined) b.monthlyCapCents = patch.monthlyCapCents;
   if (patch.warnAt !== undefined) b.warnAt = patch.warnAt;
   if (patch.hardStop !== undefined) b.hardStop = patch.hardStop;
   b.updatedAt = nowIso();
-  return b;
+  return await getPersistence().billing.upsertAIBudget(b);
 }
 
 function periodKey(d: Date): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
-export function monthToDateSpendCents(tenantId: string, at: Date = new Date()): number {
+export async function monthToDateSpendCents(
+  tenantId: string,
+  at: Date = new Date(),
+): Promise<number> {
   const key = periodKey(at);
+  // Period maths stays in app code (identical across backends); the store
+  // returns the tenant's full cost ledger (uncapped — month-to-date must sum
+  // every event, not just the default 200-row page).
+  const events = await getPersistence().billing.listAICostEvents({
+    tenantId,
+    limit: Number.MAX_SAFE_INTEGER,
+  });
   let sum = 0;
-  for (const ev of db().aiCostEvents.values()) {
-    if (ev.tenantId !== tenantId) continue;
+  for (const ev of events) {
     if (periodKey(new Date(ev.occurredAt)) !== key) continue;
     sum += ev.amountCents;
   }
@@ -5436,15 +5485,15 @@ export function monthToDateSpendCents(tenantId: string, at: Date = new Date()): 
  * over the soft `warnAt`, sets `warning=true` so observability can surface
  * the approaching cap without blocking the request.
  */
-export function checkAIBudget(tenantId: string): {
+export async function checkAIBudget(tenantId: string): Promise<{
   allow: boolean;
   warning: boolean;
   spentCents: number;
   capCents: number | null;
   reason: string | null;
-} {
-  const budget = getAIBudget(tenantId);
-  const spent = monthToDateSpendCents(tenantId);
+}> {
+  const budget = await getAIBudget(tenantId);
+  const spent = await monthToDateSpendCents(tenantId);
   if (budget.monthlyCapCents === null) {
     return { allow: true, warning: false, spentCents: spent, capCents: null, reason: null };
   }
@@ -5467,23 +5516,22 @@ export function checkAIBudget(tenantId: string): {
   };
 }
 
-export function recordAICostEvent(
+export async function recordAICostEvent(
   input: Omit<AICostEvent, "id" | "occurredAt"> & { occurredAt?: string },
-): AICostEvent {
+): Promise<AICostEvent> {
   const rec: AICostEvent = {
     id: newId("acos"),
     occurredAt: input.occurredAt ?? nowIso(),
     ...input,
   };
-  db().aiCostEvents.set(rec.id, rec);
-  return rec;
+  return await getPersistence().billing.recordAICostEvent(rec);
 }
 
-export function listAICostEvents(opts: { tenantId?: string; limit?: number }): AICostEvent[] {
-  let arr = Array.from(db().aiCostEvents.values());
-  if (opts.tenantId) arr = arr.filter((e) => e.tenantId === opts.tenantId);
-  arr.sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
-  return arr.slice(0, opts.limit ?? 200);
+export async function listAICostEvents(opts: {
+  tenantId?: string;
+  limit?: number;
+}): Promise<AICostEvent[]> {
+  return await getPersistence().billing.listAICostEvents(opts);
 }
 
 // ----- Migration framework -----
@@ -5643,17 +5691,17 @@ import type {
   VulnerabilityStatus,
 } from "@/lib/db/types";
 
-// ---- Security controls + evidence ----
+// ---- Security controls + evidence (Sprint 4: getPersistence().security) ----
 
-export function listSecurityControls(): SecurityControl[] {
-  return Array.from(db().securityControls.values()).sort((a, b) => a.code.localeCompare(b.code));
+export async function listSecurityControls(): Promise<SecurityControl[]> {
+  return await getPersistence().security.listControls();
 }
-export function getSecurityControl(id: string): SecurityControl | null {
-  return db().securityControls.get(id) ?? null;
+export async function getSecurityControl(id: string): Promise<SecurityControl | null> {
+  return await getPersistence().security.getControl(id);
 }
-export function createSecurityControl(
+export async function createSecurityControl(
   input: Omit<SecurityControl, "id" | "createdAt" | "lastReviewedAt"> & { lastReviewedAt?: string },
-): SecurityControl {
+): Promise<SecurityControl> {
   const rec: SecurityControl = {
     id: newId("ctl"),
     createdAt: nowIso(),
@@ -5665,80 +5713,75 @@ export function createSecurityControl(
     owner: input.owner,
     status: input.status,
   };
-  db().securityControls.set(rec.id, rec);
-  return rec;
+  return await getPersistence().security.upsertControl(rec);
 }
-export function updateSecurityControl(
+export async function updateSecurityControl(
   id: string,
   patch: Partial<Omit<SecurityControl, "id" | "code" | "createdAt">>,
-): SecurityControl | null {
-  const c = db().securityControls.get(id);
+): Promise<SecurityControl | null> {
+  const security = getPersistence().security;
+  const c = await security.getControl(id);
   if (!c) return null;
-  Object.assign(c, patch);
-  c.lastReviewedAt = nowIso();
-  return c;
+  return await security.upsertControl({ ...c, ...patch, lastReviewedAt: nowIso() });
 }
 
-export function listEvidenceForControl(controlId: string): SecurityControlEvidence[] {
-  return Array.from(db().securityControlEvidence.values())
-    .filter((e) => e.controlId === controlId)
-    .sort((a, b) => b.collectedAt.localeCompare(a.collectedAt));
+export async function listEvidenceForControl(
+  controlId: string,
+): Promise<SecurityControlEvidence[]> {
+  return await getPersistence().security.listEvidenceForControl(controlId);
 }
-export function createControlEvidence(
+export async function createControlEvidence(
   input: Omit<SecurityControlEvidence, "id" | "collectedAt">,
-): SecurityControlEvidence | null {
-  if (!db().securityControls.has(input.controlId)) return null;
+): Promise<SecurityControlEvidence | null> {
+  const security = getPersistence().security;
+  if (!(await security.getControl(input.controlId))) return null;
   const rec: SecurityControlEvidence = { id: newId("evd"), collectedAt: nowIso(), ...input };
-  db().securityControlEvidence.set(rec.id, rec);
-  return rec;
+  return await security.upsertEvidence(rec);
 }
 
 // ---- Risk register ----
 
-export function listRisks(): RiskRegisterEntry[] {
-  return Array.from(db().riskRegister.values()).sort((a, b) =>
-    b.updatedAt.localeCompare(a.updatedAt),
-  );
+export async function listRisks(): Promise<RiskRegisterEntry[]> {
+  return await getPersistence().security.listRisks();
 }
-export function createRisk(
+export async function createRisk(
   input: Omit<RiskRegisterEntry, "id" | "createdAt" | "updatedAt">,
-): RiskRegisterEntry {
+): Promise<RiskRegisterEntry> {
   const rec: RiskRegisterEntry = {
     id: newId("risk"),
     createdAt: nowIso(),
     updatedAt: nowIso(),
     ...input,
   };
-  db().riskRegister.set(rec.id, rec);
-  return rec;
+  return await getPersistence().security.upsertRisk(rec);
 }
-export function updateRisk(
+export async function updateRisk(
   id: string,
   patch: Partial<Omit<RiskRegisterEntry, "id" | "createdAt">>,
-): RiskRegisterEntry | null {
-  const r = db().riskRegister.get(id);
+): Promise<RiskRegisterEntry | null> {
+  const security = getPersistence().security;
+  const r = await security.getRisk(id);
   if (!r) return null;
-  Object.assign(r, patch);
-  r.updatedAt = nowIso();
-  return r;
+  return await security.upsertRisk({ ...r, ...patch, updatedAt: nowIso() });
 }
 
 // ---- Incidents ----
 
-export function listIncidents(): Incident[] {
-  return Array.from(db().incidents.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function listIncidents(): Promise<Incident[]> {
+  return await getPersistence().security.listIncidents();
 }
-export function getIncident(id: string): Incident | null {
-  return db().incidents.get(id) ?? null;
+export async function getIncident(id: string): Promise<Incident | null> {
+  return await getPersistence().security.getIncident(id);
 }
-export function createIncident(input: {
+export async function createIncident(input: {
   title: string;
   summary: string;
   severity: IncidentSeverity;
   commanderUserId: string;
   customerImpact: boolean;
   regulatorNotificationRequired: boolean;
-}): Incident {
+}): Promise<Incident> {
+  const security = getPersistence().security;
   const now = nowIso();
   const rec: Incident = {
     id: newId("inc"),
@@ -5748,7 +5791,7 @@ export function createIncident(input: {
     createdAt: now,
     ...input,
   };
-  db().incidents.set(rec.id, rec);
+  await security.upsertIncident(rec);
   // Seed an opening timeline entry so post-mortems start with a detection note.
   const tev: IncidentTimelineEvent = {
     id: newId("itl"),
@@ -5758,10 +5801,10 @@ export function createIncident(input: {
     message: `Incident opened at severity ${input.severity}.`,
     occurredAt: now,
   };
-  db().incidentTimelineEvents.set(tev.id, tev);
+  await security.appendIncidentTimeline(tev);
   return rec;
 }
-export function updateIncident(
+export async function updateIncident(
   id: string,
   patch: Partial<
     Pick<
@@ -5774,38 +5817,37 @@ export function updateIncident(
       | "resolvedAt"
     >
   >,
-): Incident | null {
-  const i = db().incidents.get(id);
+): Promise<Incident | null> {
+  const security = getPersistence().security;
+  const i = await security.getIncident(id);
   if (!i) return null;
-  Object.assign(i, patch);
-  if (patch.status === "resolved" && !i.resolvedAt) i.resolvedAt = nowIso();
-  return i;
+  const next: Incident = { ...i, ...patch };
+  if (patch.status === "resolved" && !next.resolvedAt) next.resolvedAt = nowIso();
+  return await security.upsertIncident(next);
 }
-export function appendIncidentTimeline(input: {
+export async function appendIncidentTimeline(input: {
   incidentId: string;
   authorUserId: string;
   kind: IncidentTimelineEvent["kind"];
   message: string;
-}): IncidentTimelineEvent | null {
-  if (!db().incidents.has(input.incidentId)) return null;
+}): Promise<IncidentTimelineEvent | null> {
+  const security = getPersistence().security;
+  if (!(await security.getIncident(input.incidentId))) return null;
   const rec: IncidentTimelineEvent = { id: newId("itl"), occurredAt: nowIso(), ...input };
-  db().incidentTimelineEvents.set(rec.id, rec);
-  return rec;
+  return await security.appendIncidentTimeline(rec);
 }
-export function listIncidentTimeline(incidentId: string): IncidentTimelineEvent[] {
-  return Array.from(db().incidentTimelineEvents.values())
-    .filter((e) => e.incidentId === incidentId)
-    .sort((a, b) => a.occurredAt.localeCompare(b.occurredAt));
+export async function listIncidentTimeline(incidentId: string): Promise<IncidentTimelineEvent[]> {
+  return await getPersistence().security.listIncidentTimeline(incidentId);
 }
 
 // ---- Vendors ----
 
-export function listVendors(): Vendor[] {
-  return Array.from(db().vendors.values()).sort((a, b) => a.name.localeCompare(b.name));
+export async function listVendors(): Promise<Vendor[]> {
+  return await getPersistence().security.listVendors();
 }
-export function createVendor(
+export async function createVendor(
   input: Omit<Vendor, "id" | "createdAt" | "lastReviewedAt"> & { lastReviewedAt?: string },
-): Vendor {
+): Promise<Vendor> {
   const rec: Vendor = {
     id: newId("vnd"),
     createdAt: nowIso(),
@@ -5819,64 +5861,57 @@ export function createVendor(
     approved: input.approved,
     notes: input.notes,
   };
-  db().vendors.set(rec.id, rec);
-  return rec;
+  return await getPersistence().security.upsertVendor(rec);
 }
-export function updateVendor(
+export async function updateVendor(
   id: string,
   patch: Partial<Omit<Vendor, "id" | "createdAt">>,
-): Vendor | null {
-  const v = db().vendors.get(id);
+): Promise<Vendor | null> {
+  const security = getPersistence().security;
+  const v = await security.getVendor(id);
   if (!v) return null;
-  Object.assign(v, patch);
-  v.lastReviewedAt = nowIso();
-  return v;
+  return await security.upsertVendor({ ...v, ...patch, lastReviewedAt: nowIso() });
 }
 
 // ---- State privacy law matrix ----
 
-export function listStatePrivacyRequirements(): StatePrivacyRequirement[] {
-  return Array.from(db().statePrivacyRequirements.values()).sort((a, b) =>
-    a.label.localeCompare(b.label),
-  );
+export async function listStatePrivacyRequirements(): Promise<StatePrivacyRequirement[]> {
+  return await getPersistence().security.listStatePrivacyRequirements();
 }
-export function listStatePrivacyMappingsFor(requirementId: string): StatePrivacyControlMapping[] {
-  return Array.from(db().statePrivacyMappings.values()).filter(
-    (m) => m.requirementId === requirementId,
-  );
+export async function listStatePrivacyMappingsFor(
+  requirementId: string,
+): Promise<StatePrivacyControlMapping[]> {
+  return await getPersistence().security.listStatePrivacyMappingsFor(requirementId);
 }
-export function createStatePrivacyMapping(
+export async function createStatePrivacyMapping(
   input: Omit<StatePrivacyControlMapping, "id" | "reviewedAt">,
-): StatePrivacyControlMapping | null {
-  if (!db().statePrivacyRequirements.has(input.requirementId)) return null;
-  if (!db().securityControls.has(input.controlId)) return null;
+): Promise<StatePrivacyControlMapping | null> {
+  const security = getPersistence().security;
+  if (!(await security.getStatePrivacyRequirement(input.requirementId))) return null;
+  if (!(await security.getControl(input.controlId))) return null;
   const rec: StatePrivacyControlMapping = { id: newId("spm"), reviewedAt: nowIso(), ...input };
-  db().statePrivacyMappings.set(rec.id, rec);
-  return rec;
+  return await security.upsertStatePrivacyMapping(rec);
 }
-export function updateStatePrivacyMapping(
+export async function updateStatePrivacyMapping(
   id: string,
   patch: Partial<Pick<StatePrivacyControlMapping, "status" | "evidence">>,
-): StatePrivacyControlMapping | null {
-  const m = db().statePrivacyMappings.get(id);
+): Promise<StatePrivacyControlMapping | null> {
+  const security = getPersistence().security;
+  const m = await security.getStatePrivacyMapping(id);
   if (!m) return null;
-  Object.assign(m, patch);
-  m.reviewedAt = nowIso();
-  return m;
+  return await security.upsertStatePrivacyMapping({ ...m, ...patch, reviewedAt: nowIso() });
 }
 
 // ---- Vulnerabilities ----
 
-export function listVulnerabilities(): VulnerabilityReport[] {
-  return Array.from(db().vulnerabilityReports.values()).sort((a, b) =>
-    b.discoveredAt.localeCompare(a.discoveredAt),
-  );
+export async function listVulnerabilities(): Promise<VulnerabilityReport[]> {
+  return await getPersistence().security.listVulnerabilities();
 }
-export function createVulnerability(
+export async function createVulnerability(
   input: Omit<VulnerabilityReport, "id" | "discoveredAt" | "resolvedAt"> & {
     discoveredAt?: string;
   },
-): VulnerabilityReport {
+): Promise<VulnerabilityReport> {
   const rec: VulnerabilityReport = {
     id: newId("vuln"),
     discoveredAt: input.discoveredAt ?? nowIso(),
@@ -5889,18 +5924,18 @@ export function createVulnerability(
     affectedComponent: input.affectedComponent,
     fixedIn: input.fixedIn,
   };
-  db().vulnerabilityReports.set(rec.id, rec);
-  return rec;
+  return await getPersistence().security.upsertVulnerability(rec);
 }
-export function updateVulnerability(
+export async function updateVulnerability(
   id: string,
   patch: Partial<Pick<VulnerabilityReport, "status" | "fixedIn" | "severity">>,
-): VulnerabilityReport | null {
-  const v = db().vulnerabilityReports.get(id);
+): Promise<VulnerabilityReport | null> {
+  const security = getPersistence().security;
+  const v = await security.getVulnerability(id);
   if (!v) return null;
-  Object.assign(v, patch);
-  if (patch.status === "fixed" && !v.resolvedAt) v.resolvedAt = nowIso();
-  return v;
+  const next: VulnerabilityReport = { ...v, ...patch };
+  if (patch.status === "fixed" && !next.resolvedAt) next.resolvedAt = nowIso();
+  return await security.upsertVulnerability(next);
 }
 
 // Make types available to BFFs that import from repos.
@@ -5948,11 +5983,11 @@ function defaultTenantSettings(tenantId: string): TenantSettings {
  * Read tenant settings, returning sane defaults if the tenant has never
  * been written. Never returns null so callers can safely render forms.
  */
-export function getTenantSettings(tenantId: string): TenantSettings {
-  return db().tenantSettings.get(tenantId) ?? defaultTenantSettings(tenantId);
+export async function getTenantSettings(tenantId: string): Promise<TenantSettings> {
+  return (await getPersistence().settings.getTenantSettings(tenantId)) ?? defaultTenantSettings(tenantId);
 }
 
-export function updateTenantSettings(
+export async function updateTenantSettings(
   tenantId: string,
   patch: {
     branding?: Partial<TenantBranding>;
@@ -5960,8 +5995,8 @@ export function updateTenantSettings(
     features?: Partial<TenantFeatureOverrides>;
     sso?: Partial<TenantSSOConfig>;
   },
-): TenantSettings {
-  const current = getTenantSettings(tenantId);
+): Promise<TenantSettings> {
+  const current = await getTenantSettings(tenantId);
   const next: TenantSettings = {
     ...current,
     branding: { ...current.branding, ...(patch.branding ?? {}) },
@@ -5970,8 +6005,7 @@ export function updateTenantSettings(
     sso: { ...current.sso, ...(patch.sso ?? {}) },
     updatedAt: nowIso(),
   };
-  db().tenantSettings.set(tenantId, next);
-  return next;
+  return await getPersistence().settings.upsertTenantSettings(next);
 }
 
 /** Every learner whose tenant is in `tenantIds`. */
@@ -6149,15 +6183,13 @@ import type {
 } from "@/lib/db/types";
 
 /** Every coupon, newest first. */
-export function listCoupons(): Coupon[] {
-  return Array.from(db().coupons.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function listCoupons(): Promise<Coupon[]> {
+  return await getPersistence().billing.listCoupons();
 }
 
 /** Every daily billing batch, newest run-date first. */
-export function listDailyBillingBatches(): DailyBillingBatch[] {
-  return Array.from(db().dailyBillingBatches.values()).sort((a, b) =>
-    b.runDate.localeCompare(a.runDate),
-  );
+export async function listDailyBillingBatches(): Promise<DailyBillingBatch[]> {
+  return await getPersistence().billing.listDailyBillingBatches();
 }
 
 // ============================================================
@@ -6165,22 +6197,22 @@ export function listDailyBillingBatches(): DailyBillingBatch[] {
 // ============================================================
 
 /** Every platform API key, newest first. Secrets are never returned. */
-export function listPlatformApiKeys(): PlatformApiKey[] {
-  return Array.from(db().platformApiKeys.values()).sort((a, b) =>
+export async function listPlatformApiKeys(): Promise<PlatformApiKey[]> {
+  return (await getPersistence().settings.listPlatformApiKeys()).sort((a, b) =>
     b.createdAt.localeCompare(a.createdAt),
   );
 }
 
 /** Every platform email template, alphabetised by name. */
-export function listPlatformEmailTemplates(): PlatformEmailTemplate[] {
-  return Array.from(db().platformEmailTemplates.values()).sort((a, b) =>
+export async function listPlatformEmailTemplates(): Promise<PlatformEmailTemplate[]> {
+  return (await getPersistence().settings.listPlatformEmailTemplates()).sort((a, b) =>
     a.name.localeCompare(b.name),
   );
 }
 
 /** Every platform webhook endpoint, newest first. */
-export function listPlatformWebhookEndpoints(): PlatformWebhookEndpoint[] {
-  return Array.from(db().platformWebhookEndpoints.values()).sort((a, b) =>
+export async function listPlatformWebhookEndpoints(): Promise<PlatformWebhookEndpoint[]> {
+  return (await getPersistence().settings.listPlatformWebhookEndpoints()).sort((a, b) =>
     b.createdAt.localeCompare(a.createdAt),
   );
 }
@@ -6198,28 +6230,31 @@ import type {
 } from "@/lib/db/types";
 
 /** Engagement (XP/streak/currency) for a learner, or null if not seeded. */
-export function getLearnerEngagement(
+export async function getLearnerEngagement(
   learnerId: string,
   tenantId: string,
-): LearnerEngagement | null {
-  const row = db().learnerEngagement.get(learnerId);
+): Promise<LearnerEngagement | null> {
+  const row = await getPersistence().engagement.getEngagement(learnerId);
   if (!row || row.tenantId !== tenantId) return null;
   return row;
 }
 
 /** All badges earned by a learner, newest first. */
-export function listLearnerBadges(learnerId: string, tenantId: string): LearnerBadge[] {
-  return Array.from(db().learnerBadges.values())
+export async function listLearnerBadges(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBadge[]> {
+  return (await getPersistence().engagement.listBadges())
     .filter((b) => b.learnerId === learnerId && b.tenantId === tenantId)
     .sort((a, b) => b.earnedAt.localeCompare(a.earnedAt));
 }
 
 /** Sensory profile (hyper/neutral/hypo per modality) for a learner, or null. */
-export function getLearnerSensoryProfile(
+export async function getLearnerSensoryProfile(
   learnerId: string,
   tenantId: string,
-): LearnerSensoryProfile | null {
-  const row = db().learnerSensoryProfiles.get(learnerId);
+): Promise<LearnerSensoryProfile | null> {
+  const row = await getPersistence().engagement.getSensoryProfile(learnerId);
   if (!row || row.tenantId !== tenantId) return null;
   return row;
 }
@@ -6228,22 +6263,22 @@ export function getLearnerSensoryProfile(
  * Upsert one modality + optional notes. Returns the updated profile.
  * Creates a fresh "neutral" profile first if none existed.
  */
-export function upsertLearnerSensoryModality(
+export async function upsertLearnerSensoryModality(
   learnerId: string,
   tenantId: string,
   modality: SensoryModality,
   response: SensoryResponse,
   notes?: string,
-): LearnerSensoryProfile {
-  const store = db();
+): Promise<LearnerSensoryProfile> {
+  const engagement = getPersistence().engagement;
   // Tenant isolation: refuse to write if the learner doesn't belong to the
   // caller's tenant. Prevents one tenant overwriting another's profile via
   // a shared learnerId key.
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) {
+  const learner = await getPersistence().learners.getById(learnerId, tenantId);
+  if (!learner) {
     throw new Error(`upsertLearnerSensoryModality: learner ${learnerId} not in tenant ${tenantId}`);
   }
-  let prof = store.learnerSensoryProfiles.get(learnerId);
+  let prof = await engagement.getSensoryProfile(learnerId);
   if (!prof || prof.tenantId !== tenantId) {
     prof = {
       learnerId,
@@ -6265,8 +6300,7 @@ export function upsertLearnerSensoryModality(
     notes: typeof notes === "string" ? notes : prof.notes,
     updatedAt: new Date().toISOString(),
   };
-  store.learnerSensoryProfiles.set(learnerId, next);
-  return next;
+  return await engagement.upsertSensoryProfile(next);
 }
 
 // ---------------------------------------------------------------------------
@@ -6846,31 +6880,33 @@ export function createCaregiverObservation(input: {
 // One row per learner; regenerations overwrite.
 // ---------------------------------------------------------------------------
 
-export function upsertIepAiDraft(input: {
+export async function upsertIepAiDraft(input: {
   tenantId: string;
   learnerId: string;
   sourceAttemptId?: string | null;
   draft: import("./types").IepAiDraftBody;
   model?: string | null;
   responsibleAi?: Record<string, unknown>;
-}): import("./types").IepAiDraftRecord {
-  const store = db();
+}): Promise<import("./types").IepAiDraftRecord> {
+  const clinical = getPersistence().clinical;
   const now = nowIso();
-  const existing = Array.from(store.iepAiDrafts.values()).find(
-    (d) => d.learnerId === input.learnerId && d.tenantId === input.tenantId,
-  );
+  const existing = await clinical.getDraftForLearner(input.learnerId, input.tenantId);
   if (existing) {
-    existing.draft = input.draft;
-    existing.model = input.model ?? existing.model;
-    existing.responsibleAi = input.responsibleAi ?? existing.responsibleAi;
-    existing.generatedAt = now;
-    existing.updatedAt = now;
-    existing.status = "ai_draft";
-    existing.reviewedByUserId = null;
-    existing.reviewedAt = null;
-    existing.approvedByUserId = null;
-    existing.approvedAt = null;
-    return existing;
+    // Regeneration resets the review lifecycle back to ai_draft.
+    const updated: import("./types").IepAiDraftRecord = {
+      ...existing,
+      draft: input.draft,
+      model: input.model ?? existing.model,
+      responsibleAi: input.responsibleAi ?? existing.responsibleAi,
+      generatedAt: now,
+      updatedAt: now,
+      status: "ai_draft",
+      reviewedByUserId: null,
+      reviewedAt: null,
+      approvedByUserId: null,
+      approvedAt: null,
+    };
+    return await clinical.upsertDraft(updated);
   }
   const rec: import("./types").IepAiDraftRecord = {
     id: newId("iep-draft"),
@@ -6889,19 +6925,14 @@ export function upsertIepAiDraft(input: {
     createdAt: now,
     updatedAt: now,
   };
-  store.iepAiDrafts.set(rec.id, rec);
-  return rec;
+  return await clinical.upsertDraft(rec);
 }
 
-export function getIepAiDraft(
+export async function getIepAiDraft(
   learnerId: string,
   tenantId: string,
-): import("./types").IepAiDraftRecord | null {
-  return (
-    Array.from(db().iepAiDrafts.values()).find(
-      (d) => d.learnerId === learnerId && d.tenantId === tenantId,
-    ) ?? null
-  );
+): Promise<import("./types").IepAiDraftRecord | null> {
+  return await getPersistence().clinical.getDraftForLearner(learnerId, tenantId);
 }
 
 export async function listIepAiDraftsForReviewer(
@@ -6910,20 +6941,19 @@ export async function listIepAiDraftsForReviewer(
 ): Promise<import("./types").IepAiDraftRecord[]> {
   // Sprint 11: a teacher sees drafts for every learner on their roster.
   const reviewerLearners = await listLearnersForTeacher(reviewerUserId, tenantId);
-  const learnerIds = new Set(reviewerLearners.map((l) => l.id));
-  return Array.from(db().iepAiDrafts.values())
-    .filter((d) => d.tenantId === tenantId && learnerIds.has(d.learnerId))
-    .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+  const learnerIds = reviewerLearners.map((l) => l.id);
+  return await getPersistence().clinical.listDraftsForLearners(learnerIds, tenantId);
 }
 
-export function progressIepAiDraft(
+export async function progressIepAiDraft(
   id: string,
   tenantId: string,
   userId: string,
   next: import("./types").IepAiDraftStatus,
-): import("./types").IepAiDraftRecord | null {
-  const d = db().iepAiDrafts.get(id);
-  if (!d || d.tenantId !== tenantId) return null;
+): Promise<import("./types").IepAiDraftRecord | null> {
+  const clinical = getPersistence().clinical;
+  const d = await clinical.getDraftById(id, tenantId);
+  if (!d) return null;
   const allowed: Record<import("./types").IepAiDraftStatus, import("./types").IepAiDraftStatus[]> =
     {
       ai_draft: ["teacher_review", "archived"],
@@ -6933,17 +6963,17 @@ export function progressIepAiDraft(
       archived: [],
     };
   if (!allowed[d.status].includes(next)) return null;
-  d.status = next;
-  d.updatedAt = nowIso();
-  if (next === "teacher_review") {
-    d.reviewedByUserId = userId;
-    d.reviewedAt = nowIso();
-  }
-  if (next === "admin_approved") {
-    d.approvedByUserId = userId;
-    d.approvedAt = nowIso();
-  }
-  return d;
+  const now = nowIso();
+  const updated: import("./types").IepAiDraftRecord = {
+    ...d,
+    status: next,
+    updatedAt: now,
+    reviewedByUserId: next === "teacher_review" ? userId : d.reviewedByUserId,
+    reviewedAt: next === "teacher_review" ? now : d.reviewedAt,
+    approvedByUserId: next === "admin_approved" ? userId : d.approvedByUserId,
+    approvedAt: next === "admin_approved" ? now : d.approvedAt,
+  };
+  return await clinical.upsertDraft(updated);
 }
 
 // ---------------------------------------------------------------------------
@@ -7053,9 +7083,9 @@ interface BaselineAuditLike {
   createdAt?: string;
 }
 
-export function getBaselinePipelineMetrics(
+export async function getBaselinePipelineMetrics(
   opts: { startIso?: string; endIso?: string } = {},
-): BaselinePipelineMetrics {
+): Promise<BaselinePipelineMetrics> {
   const endIso = opts.endIso ?? new Date().toISOString();
   const startIso = opts.startIso ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const startMs = new Date(startIso).getTime();
@@ -7065,7 +7095,7 @@ export function getBaselinePipelineMetrics(
   // dedicated baseline_item_audits map yet (the postgres table from
   // Sprint 4 is the production surface); for now we aggregate from
   // moderationEvents which captures the same shape during local dev.
-  const rows: BaselineAuditLike[] = Array.from(db().moderationEvents.values()).filter((m) => {
+  const rows: BaselineAuditLike[] = (await getPersistence().safety.listModerationEvents()).filter((m) => {
     const t = m as { createdAt?: string };
     const ms = new Date(t.createdAt ?? 0).getTime();
     return ms >= startMs && ms <= endMs;
