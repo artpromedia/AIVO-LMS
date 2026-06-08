@@ -16,6 +16,7 @@ export * from "./jobs.js";
 export * from "./leads.js";
 export * from "./moderation.js";
 export * from "./platform.js";
+export * from "./platform-settings.js";
 export * from "./pronunciation.js";
 export * from "./reports.js";
 export * from "./retention.js";

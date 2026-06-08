@@ -78,6 +78,10 @@
       "types": "./dist/platform.d.ts",
       "default": "./dist/platform.js"
     },
+    "./platform-settings": {
+      "types": "./dist/platform-settings.d.ts",
+      "default": "./dist/platform-settings.js"
+    },
     "./pronunciation": {
       "types": "./dist/pronunciation.d.ts",
       "default": "./dist/pronunciation.js"

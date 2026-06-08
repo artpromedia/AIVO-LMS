@@ -203,6 +203,33 @@ authoring/evaluation flow). No new schema, no mock, read-only.
 - `@aivo/admin-api/iep` + pages `platform/iep` (pipeline + overdue reviews) and
   `district/iep` (district-scoped pipeline).
 
+## Done — Wave 16 (platform settings: emails + webhooks)
+
+Both surfaces read real, already-DB-backed tables — no new schema, no mock.
+- `admin-svc`: `routes/settings.ts` — `/settings/emails` (email_outbox delivery
+  monitor: status counts + recent + retry a failed email) and `/settings/webhooks`
+  (webhooks + webhook_deliveries: endpoints + recent deliveries + toggle active).
+  Secrets/bodies never returned; writes audited. Platform-admin.
+- `@aivo/admin-api/platform-settings` + pages `platform/settings/emails` (delivery
+  monitor + retry) and `platform/settings/webhooks` (endpoints + deliveries +
+  enable/disable), linked from the settings index.
+
+---
+
+## Migration status: COMPLETE for all domains with a real data source
+
+Every admin domain that has (or can be backed by) a real database is now
+migrated end-to-end to Postgres in web-admin, with **no in-memory mock data**.
+Where an owning service was itself mock-backed it was converted
+(data-governance-svc DSAR/retention; responsible-ai-svc registry). Where no
+owner existed, admin-svc owns a new table (security, pronunciation, support).
+
+Intentionally NOT built (would require fabricating data or net-new pipelines,
+which the no-mock rule forbids): read-aloud audio **usage** telemetry (no event
+source). And district/school **staff·settings** were left as-is because they
+are already covered by shipped surfaces (users + district setup) rather than
+duplicated.
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but

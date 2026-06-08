@@ -8,6 +8,16 @@ const SETTINGS_LINKS = [
     title: "API keys",
     description: "Service and integration credentials with rotation and grace-period status.",
   },
+  {
+    href: "/platform/settings/emails",
+    title: "Email delivery",
+    description: "Transactional email outbox — delivery status, retries, and failures.",
+  },
+  {
+    href: "/platform/settings/webhooks",
+    title: "Webhooks",
+    description: "Registered webhook endpoints and recent delivery attempts.",
+  },
 ];
 
 export default async function PlatformSettingsPage() {
