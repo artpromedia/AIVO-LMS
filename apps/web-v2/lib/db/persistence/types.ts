@@ -21,6 +21,13 @@ import type {
   BaselineQuestion,
   BillingAccount,
   AiGenerationJob,
+  CalmSessionRecord,
+  DigestSchedule,
+  HomeworkHelpSession,
+  LearnerBadge,
+  LearnerEngagement,
+  LearnerSensoryProfile,
+  NotificationPreference,
   PlatformApiKey,
   PlatformEmailTemplate,
   PlatformWebhookEndpoint,
@@ -122,6 +129,31 @@ export interface NotificationStore {
   }): Promise<{ notification: Notification; deliveries: NotificationDelivery[] }>;
   /** Inspect the delivery rows for a notification (debug/observability). */
   listDeliveries(notificationId: string): Promise<NotificationDelivery[]>;
+
+  // ── Sprint 8 remainder: notification preferences + digest schedules ──
+  /** The user's notification preference row, or null (repo materializes a default). */
+  getPreference(userId: string): Promise<NotificationPreference | null>;
+  upsertPreference(pref: NotificationPreference): Promise<NotificationPreference>;
+  /** All digest schedules (repo filters by tenant/user). */
+  listDigestSchedules(): Promise<DigestSchedule[]>;
+}
+
+/**
+ * Engagement domain (Sprint 8 remainder) — homework-help + calm sessions,
+ * per-learner engagement snapshot + badges + sensory profile. Live
+ * gradebook/leaderboard is read from engagement-svc over REST (ADR 0015);
+ * these are the web app's own durable rows. No RLS (per-learner scoping).
+ */
+export interface EngagementStore {
+  upsertHomeworkSession(session: HomeworkHelpSession): Promise<HomeworkHelpSession>;
+  getHomeworkSession(id: string): Promise<HomeworkHelpSession | null>;
+  listHomeworkSessions(): Promise<HomeworkHelpSession[]>;
+  appendCalmSession(session: CalmSessionRecord): Promise<CalmSessionRecord>;
+  listCalmSessions(): Promise<CalmSessionRecord[]>;
+  getEngagement(learnerId: string): Promise<LearnerEngagement | null>;
+  listBadges(): Promise<LearnerBadge[]>;
+  getSensoryProfile(learnerId: string): Promise<LearnerSensoryProfile | null>;
+  upsertSensoryProfile(profile: LearnerSensoryProfile): Promise<LearnerSensoryProfile>;
 }
 
 /**
@@ -735,6 +767,7 @@ export interface Persistence {
   safety: SafetyStore;
   support: SupportStore;
   settings: SettingsStore;
+  engagement: EngagementStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

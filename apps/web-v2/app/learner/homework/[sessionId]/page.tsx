@@ -32,7 +32,7 @@ export default async function HomeworkSessionPage({ params }: Readonly<Params>) 
     learnerId = await readActiveLearnerFromCookies(session);
     if (!learnerId) redirect("/learner/select");
   }
-  const hw = getHomeworkSession(sessionId, session.tenantId);
+  const hw = await getHomeworkSession(sessionId, session.tenantId);
   if (hw?.learnerId !== learnerId) notFound();
   const t = await getTranslations("learner.homework");
 

@@ -46,7 +46,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     const tenantId = session!.tenantId;
     const streak =
       session!.role === "learner" || session!.role === "parent"
-        ? getCalmStreak(learnerId, tenantId)
+        ? await getCalmStreak(learnerId, tenantId)
         : null;
 
     return ok({ catalog: getCalmCatalog(), recommended, streak }, requestId);
@@ -102,7 +102,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
 
     // Persist a queryable record alongside the audit trail so the learner
     // can see a streak and the parent a calm regulation summary.
-    recordCalmSession({
+    await recordCalmSession({
       tenantId: session!.tenantId,
       learnerId,
       activityId: body.activityId,

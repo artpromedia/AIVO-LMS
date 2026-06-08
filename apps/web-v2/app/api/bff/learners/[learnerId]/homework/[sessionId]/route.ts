@@ -28,7 +28,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const hw = getHomeworkSession(sessionId, session!.tenantId);
+    const hw = await getHomeworkSession(sessionId, session!.tenantId);
     if (!hw || hw.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Homework session not found." }, requestId);
     }

@@ -107,7 +107,7 @@ async function ParentView({
   notifications: Awaited<ReturnType<typeof listNotifications>>;
 }) {
   const t = await getTranslations("parent.notifications");
-  const pref = getNotificationPreference(session.userId, session.tenantId);
+  const pref = await getNotificationPreference(session.userId, session.tenantId);
 
   const unreadCount = notifications.filter((n) => !n.readAt).length;
   // Approvals + urgent counters use the NotificationType vocabulary —

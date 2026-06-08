@@ -52,6 +52,8 @@ import { memorySafety } from "./memory/safety";
 import { drizzleSafety } from "./drizzle/safety";
 import { memorySupport, memorySettings } from "./memory/support-settings";
 import { drizzleSupport, drizzleSettings } from "./drizzle/support-settings";
+import { memoryEngagement } from "./memory/engagement";
+import { drizzleEngagement } from "./drizzle/engagement";
 
 type DomainKey =
   | "notifications"
@@ -73,7 +75,8 @@ type DomainKey =
   | "audio"
   | "safety"
   | "support"
-  | "settings";
+  | "settings"
+  | "engagement";
 
 /**
  * Test-only global mode override. Set by the parity harness
@@ -114,6 +117,7 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     safety: serverEnv.AIVO_PERSISTENCE_SAFETY,
     support: serverEnv.AIVO_PERSISTENCE_SUPPORT,
     settings: serverEnv.AIVO_PERSISTENCE_SETTINGS,
+    engagement: serverEnv.AIVO_PERSISTENCE_ENGAGEMENT,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -196,6 +200,7 @@ export function getPersistence(): Persistence {
   const safetyMode = resolveMode("safety");
   const supportMode = resolveMode("support");
   const settingsMode = resolveMode("settings");
+  const engagementMode = resolveMode("engagement");
   warnOnModeMismatch(assessmentsMode, brainProfilesMode);
   assertAssessmentsBrainSameMode(assessmentsMode, brainProfilesMode);
   cached = {
@@ -224,6 +229,7 @@ export function getPersistence(): Persistence {
     safety: safetyMode === "postgres" ? drizzleSafety : memorySafety,
     support: supportMode === "postgres" ? drizzleSupport : memorySupport,
     settings: settingsMode === "postgres" ? drizzleSettings : memorySettings,
+    engagement: engagementMode === "postgres" ? drizzleEngagement : memoryEngagement,
   };
   return cached;
 }

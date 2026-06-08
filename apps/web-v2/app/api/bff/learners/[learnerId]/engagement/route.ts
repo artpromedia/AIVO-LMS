@@ -122,8 +122,8 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const eng = getLearnerEngagement(learnerId, session!.tenantId);
-    const earned = listLearnerBadges(learnerId, session!.tenantId);
+    const eng = await getLearnerEngagement(learnerId, session!.tenantId);
+    const earned = await listLearnerBadges(learnerId, session!.tenantId);
     const badges: EngagementBadge[] = earned.map((b) => {
       const meta = BADGE_CATALOG[b.badgeKey];
       return {

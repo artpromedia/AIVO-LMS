@@ -2505,14 +2505,13 @@ export async function resetAccessibilityPrefs(
 
 // ===== Sprint 17: Homework Helper =====
 
-export function createHomeworkSession(input: {
+export async function createHomeworkSession(input: {
   learnerId: string;
   tenantId: string;
   topic: string;
   subjectId: string | null;
   attachment?: HomeworkHelpSession["attachment"];
-}): HomeworkHelpSession {
-  const store = db();
+}): Promise<HomeworkHelpSession> {
   const session: HomeworkHelpSession = {
     id: newId("hw"),
     learnerId: input.learnerId,
@@ -2526,37 +2525,36 @@ export function createHomeworkSession(input: {
     startedAt: nowIso(),
     endedAt: null,
   };
-  store.homeworkHelpSessions.set(session.id, session);
-  return session;
+  return await getPersistence().engagement.upsertHomeworkSession(session);
 }
 
-export function getHomeworkSession(
+export async function getHomeworkSession(
   sessionId: string,
   tenantId: string,
-): HomeworkHelpSession | null {
-  const s = db().homeworkHelpSessions.get(sessionId);
+): Promise<HomeworkHelpSession | null> {
+  const s = await getPersistence().engagement.getHomeworkSession(sessionId);
   if (!s || s.tenantId !== tenantId) return null;
   return s;
 }
 
-export function listHomeworkSessionsForLearner(
+export async function listHomeworkSessionsForLearner(
   learnerId: string,
   tenantId: string,
   opts?: { limit?: number },
-): HomeworkHelpSession[] {
-  const all = Array.from(db().homeworkHelpSessions.values())
+): Promise<HomeworkHelpSession[]> {
+  const all = (await getPersistence().engagement.listHomeworkSessions())
     .filter((s) => s.learnerId === learnerId && s.tenantId === tenantId)
     .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
   return opts?.limit ? all.slice(0, opts.limit) : all;
 }
 
-export function appendHomeworkMessage(
+export async function appendHomeworkMessage(
   sessionId: string,
   tenantId: string,
   message: Omit<HomeworkHelpMessage, "id" | "occurredAt">,
-): HomeworkHelpSession | null {
-  const store = db();
-  const existing = store.homeworkHelpSessions.get(sessionId);
+): Promise<HomeworkHelpSession | null> {
+  const engagement = getPersistence().engagement;
+  const existing = await engagement.getHomeworkSession(sessionId);
   if (!existing || existing.tenantId !== tenantId) return null;
   if (existing.endedAt) return existing; // completed sessions are append-only no-ops
   const next: HomeworkHelpSession = {
@@ -2570,18 +2568,17 @@ export function appendHomeworkMessage(
       },
     ],
   };
-  store.homeworkHelpSessions.set(next.id, next);
-  return next;
+  return await engagement.upsertHomeworkSession(next);
 }
 
-export function completeHomeworkSession(
+export async function completeHomeworkSession(
   sessionId: string,
   tenantId: string,
   insight: string,
   followUpRunId: string | null = null,
-): HomeworkHelpSession | null {
-  const store = db();
-  const existing = store.homeworkHelpSessions.get(sessionId);
+): Promise<HomeworkHelpSession | null> {
+  const engagement = getPersistence().engagement;
+  const existing = await engagement.getHomeworkSession(sessionId);
   if (!existing || existing.tenantId !== tenantId) return null;
   if (existing.endedAt) return existing; // idempotent
   const next: HomeworkHelpSession = {
@@ -2590,8 +2587,7 @@ export function completeHomeworkSession(
     followUpRunId,
     endedAt: nowIso(),
   };
-  store.homeworkHelpSessions.set(next.id, next);
-  return next;
+  return await engagement.upsertHomeworkSession(next);
 }
 
 // ===== Calm Corner =====
@@ -2613,15 +2609,14 @@ function calmDayKey(midnightMs: number): string {
   return new Date(midnightMs).toISOString().slice(0, 10);
 }
 
-export function recordCalmSession(input: {
+export async function recordCalmSession(input: {
   tenantId: string;
   learnerId: string;
   activityId: string;
   activityKind: string;
   completed: boolean;
   secondsSpent: number | null;
-}): CalmSessionRecord {
-  const store = db();
+}): Promise<CalmSessionRecord> {
   const record: CalmSessionRecord = {
     id: newId("calm"),
     tenantId: input.tenantId,
@@ -2632,18 +2627,17 @@ export function recordCalmSession(input: {
     secondsSpent: input.secondsSpent,
     occurredAt: nowIso(),
   };
-  store.calmSessions.set(record.id, record);
-  return record;
+  return await getPersistence().engagement.appendCalmSession(record);
 }
 
 /** Most-recent-first, tenant- and learner-scoped. */
-export function listCalmSessionsForLearner(
+export async function listCalmSessionsForLearner(
   learnerId: string,
   tenantId: string,
   opts?: { limit?: number; sinceIso?: string },
-): CalmSessionRecord[] {
+): Promise<CalmSessionRecord[]> {
   const since = opts?.sinceIso;
-  const all = Array.from(db().calmSessions.values())
+  const all = (await getPersistence().engagement.listCalmSessions())
     .filter(
       (s) =>
         s.learnerId === learnerId &&
@@ -2659,12 +2653,12 @@ export function listCalmSessionsForLearner(
  * each contain at least one *completed* calm session. Learner-local time
  * is out of scope; `todayIso` is injectable for deterministic tests.
  */
-export function getCalmStreak(
+export async function getCalmStreak(
   learnerId: string,
   tenantId: string,
   opts?: { todayIso?: string },
-): { currentStreakDays: number; lastSessionAt: string | null } {
-  const completed = listCalmSessionsForLearner(learnerId, tenantId).filter(
+): Promise<{ currentStreakDays: number; lastSessionAt: string | null }> {
+  const completed = (await listCalmSessionsForLearner(learnerId, tenantId)).filter(
     (s) => s.completed,
   );
   const lastSessionAt = completed.length > 0 ? completed[0].occurredAt : null;
@@ -2697,17 +2691,17 @@ export function getCalmStreak(
  * the window (ties broken by first appearance in the catalog order the
  * records were written in).
  */
-export function summarizeCalmForParent(
+export async function summarizeCalmForParent(
   learnerId: string,
   tenantId: string,
   opts?: { sinceIso?: string },
-): {
+): Promise<{
   totalMoments: number;
   completedMoments: number;
   topActivityId: string | null;
   lastSessionAt: string | null;
-} {
-  const sessions = listCalmSessionsForLearner(learnerId, tenantId, {
+}> {
+  const sessions = await listCalmSessionsForLearner(learnerId, tenantId, {
     sinceIso: opts?.sinceIso,
   });
 
@@ -5077,11 +5071,11 @@ function defaultPreferenceMap(): Record<string, boolean> {
   return m;
 }
 
-export function getNotificationPreference(
+export async function getNotificationPreference(
   userId: string,
   tenantId: string,
-): NotificationPreference {
-  const existing = db().notificationPreferences.get(userId);
+): Promise<NotificationPreference> {
+  const existing = await getPersistence().notifications.getPreference(userId);
   if (existing) return existing;
   // Create on read so the UI always has a row to render. Saves an explicit
   // "create defaults" call across BFFs.
@@ -5093,21 +5087,21 @@ export function getNotificationPreference(
     digestCadence: "weekly",
     updatedAt: nowIso(),
   };
-  db().notificationPreferences.set(userId, created);
-  return created;
+  return await getPersistence().notifications.upsertPreference(created);
 }
 
-export function updateNotificationPreference(
+export async function updateNotificationPreference(
   userId: string,
   tenantId: string,
   patch: Partial<Pick<NotificationPreference, "preferences" | "quietHours" | "digestCadence">>,
-): NotificationPreference {
-  const pref = getNotificationPreference(userId, tenantId);
-  if (patch.preferences) pref.preferences = { ...pref.preferences, ...patch.preferences };
-  if (patch.quietHours !== undefined) pref.quietHours = patch.quietHours;
-  if (patch.digestCadence !== undefined) pref.digestCadence = patch.digestCadence;
-  pref.updatedAt = nowIso();
-  return pref;
+): Promise<NotificationPreference> {
+  const pref = await getNotificationPreference(userId, tenantId);
+  const next: NotificationPreference = { ...pref };
+  if (patch.preferences) next.preferences = { ...pref.preferences, ...patch.preferences };
+  if (patch.quietHours !== undefined) next.quietHours = patch.quietHours;
+  if (patch.digestCadence !== undefined) next.digestCadence = patch.digestCadence;
+  next.updatedAt = nowIso();
+  return await getPersistence().notifications.upsertPreference(next);
 }
 
 /**
@@ -5141,7 +5135,7 @@ export async function createNotification(input: {
     readAt: null,
     createdAt: nowIso(),
   };
-  const pref = getNotificationPreference(input.userId, input.tenantId);
+  const pref = await getNotificationPreference(input.userId, input.tenantId);
   const channels: NotificationChannel[] = ["in_app", "email", "push"];
   const deliveries: NotificationDelivery[] = channels.map((ch) => {
     const enabled = pref.preferences[`${input.type}:${ch}`] ?? false;
@@ -5178,8 +5172,13 @@ export async function listDeliveriesFor(notificationId: string): Promise<Notific
   return getPersistence().notifications.listDeliveries(notificationId);
 }
 
-export function listDigestSchedules(tenantId: string, userId?: string): DigestSchedule[] {
-  let arr = Array.from(db().digestSchedules.values()).filter((d) => d.tenantId === tenantId);
+export async function listDigestSchedules(
+  tenantId: string,
+  userId?: string,
+): Promise<DigestSchedule[]> {
+  let arr = (await getPersistence().notifications.listDigestSchedules()).filter(
+    (d) => d.tenantId === tenantId,
+  );
   if (userId) arr = arr.filter((d) => d.userId === userId);
   return arr;
 }
@@ -6209,28 +6208,31 @@ import type {
 } from "@/lib/db/types";
 
 /** Engagement (XP/streak/currency) for a learner, or null if not seeded. */
-export function getLearnerEngagement(
+export async function getLearnerEngagement(
   learnerId: string,
   tenantId: string,
-): LearnerEngagement | null {
-  const row = db().learnerEngagement.get(learnerId);
+): Promise<LearnerEngagement | null> {
+  const row = await getPersistence().engagement.getEngagement(learnerId);
   if (!row || row.tenantId !== tenantId) return null;
   return row;
 }
 
 /** All badges earned by a learner, newest first. */
-export function listLearnerBadges(learnerId: string, tenantId: string): LearnerBadge[] {
-  return Array.from(db().learnerBadges.values())
+export async function listLearnerBadges(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBadge[]> {
+  return (await getPersistence().engagement.listBadges())
     .filter((b) => b.learnerId === learnerId && b.tenantId === tenantId)
     .sort((a, b) => b.earnedAt.localeCompare(a.earnedAt));
 }
 
 /** Sensory profile (hyper/neutral/hypo per modality) for a learner, or null. */
-export function getLearnerSensoryProfile(
+export async function getLearnerSensoryProfile(
   learnerId: string,
   tenantId: string,
-): LearnerSensoryProfile | null {
-  const row = db().learnerSensoryProfiles.get(learnerId);
+): Promise<LearnerSensoryProfile | null> {
+  const row = await getPersistence().engagement.getSensoryProfile(learnerId);
   if (!row || row.tenantId !== tenantId) return null;
   return row;
 }
@@ -6239,22 +6241,22 @@ export function getLearnerSensoryProfile(
  * Upsert one modality + optional notes. Returns the updated profile.
  * Creates a fresh "neutral" profile first if none existed.
  */
-export function upsertLearnerSensoryModality(
+export async function upsertLearnerSensoryModality(
   learnerId: string,
   tenantId: string,
   modality: SensoryModality,
   response: SensoryResponse,
   notes?: string,
-): LearnerSensoryProfile {
-  const store = db();
+): Promise<LearnerSensoryProfile> {
+  const engagement = getPersistence().engagement;
   // Tenant isolation: refuse to write if the learner doesn't belong to the
   // caller's tenant. Prevents one tenant overwriting another's profile via
   // a shared learnerId key.
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) {
+  const learner = await getPersistence().learners.getById(learnerId, tenantId);
+  if (!learner) {
     throw new Error(`upsertLearnerSensoryModality: learner ${learnerId} not in tenant ${tenantId}`);
   }
-  let prof = store.learnerSensoryProfiles.get(learnerId);
+  let prof = await engagement.getSensoryProfile(learnerId);
   if (!prof || prof.tenantId !== tenantId) {
     prof = {
       learnerId,
@@ -6276,8 +6278,7 @@ export function upsertLearnerSensoryModality(
     notes: typeof notes === "string" ? notes : prof.notes,
     updatedAt: new Date().toISOString(),
   };
-  store.learnerSensoryProfiles.set(learnerId, next);
-  return next;
+  return await engagement.upsertSensoryProfile(next);
 }
 
 // ---------------------------------------------------------------------------

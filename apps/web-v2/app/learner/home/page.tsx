@@ -209,7 +209,7 @@ export default async function LearnerHome({
   // repo instead of synthesizing from mastery. `getLearnerEngagement`
   // is the same source the BFF `/api/bff/learners/[id]/engagement`
   // endpoint reads, so web + mobile render identical numbers.
-  const engagement = getLearnerEngagement(learnerId, session.tenantId);
+  const engagement = await getLearnerEngagement(learnerId, session.tenantId);
   const streakDays = engagement?.currentStreakDays ?? 0;
   const levelNumber = engagement?.level ?? 1;
   const xp = engagement?.totalXp ?? 0;

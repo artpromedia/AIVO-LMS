@@ -99,8 +99,8 @@ export default async function ParentMilestonesPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const eng = getLearnerEngagement(learnerId, session.tenantId);
-  const earned = listLearnerBadges(learnerId, session.tenantId);
+  const eng = await getLearnerEngagement(learnerId, session.tenantId);
+  const earned = await listLearnerBadges(learnerId, session.tenantId);
   const earnedKeys = new Set(earned.map((b) => b.badgeKey));
 
   const nextLevelXp = eng ? (eng.level + 1) * 250 : 250;

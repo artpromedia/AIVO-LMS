@@ -5,7 +5,11 @@
  * (selected when AIVO_PERSISTENCE_NOTIFICATIONS=memory).
  */
 import { getStore, nowIso } from "@/lib/db/store";
-import type { NotificationDelivery } from "@/lib/db/types";
+import type {
+  NotificationDelivery,
+  NotificationPreference,
+  DigestSchedule,
+} from "@/lib/db/types";
 import type { NotificationStore } from "../types";
 
 export const memoryNotifications: NotificationStore = {
@@ -42,5 +46,16 @@ export const memoryNotifications: NotificationStore = {
       if (d.notificationId === notificationId) out.push(d);
     }
     return out;
+  },
+
+  async getPreference(userId): Promise<NotificationPreference | null> {
+    return getStore().notificationPreferences.get(userId) ?? null;
+  },
+  async upsertPreference(pref): Promise<NotificationPreference> {
+    getStore().notificationPreferences.set(pref.userId, pref);
+    return pref;
+  },
+  async listDigestSchedules(): Promise<DigestSchedule[]> {
+    return Array.from(getStore().digestSchedules.values());
   },
 };

@@ -59,6 +59,9 @@ const MIGRATED_DOMAINS = [
       "listNotifications",
       "markNotificationsRead",
       "listDeliveriesFor",
+      "getNotificationPreference",
+      "updateNotificationPreference",
+      "listDigestSchedules",
     ],
   },
   {
@@ -295,6 +298,22 @@ const MIGRATED_DOMAINS = [
       "listPlatformApiKeys",
       "listPlatformEmailTemplates",
       "listPlatformWebhookEndpoints",
+    ],
+  },
+{
+    domain: "engagement",
+    reposFunctions: [
+      "createHomeworkSession",
+      "getHomeworkSession",
+      "listHomeworkSessionsForLearner",
+      "appendHomeworkMessage",
+      "completeHomeworkSession",
+      "recordCalmSession",
+      "listCalmSessionsForLearner",
+      "getLearnerEngagement",
+      "listLearnerBadges",
+      "getLearnerSensoryProfile",
+      "upsertLearnerSensoryModality",
     ],
   },
 ];

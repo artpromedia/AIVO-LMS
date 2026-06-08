@@ -192,6 +192,8 @@ const serverSchema = z.object({
   // Sprint 8 — web-owned support tickets/AI-jobs + tenant/platform settings.
   AIVO_PERSISTENCE_SUPPORT: aivoPersistenceOverrideSchema,
   AIVO_PERSISTENCE_SETTINGS: aivoPersistenceOverrideSchema,
+  // Sprint 8 remainder — web-owned engagement / sessions / notification prefs.
+  AIVO_PERSISTENCE_ENGAGEMENT: aivoPersistenceOverrideSchema,
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z

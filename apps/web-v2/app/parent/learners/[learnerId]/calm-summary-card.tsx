@@ -22,7 +22,7 @@ export async function CalmSummaryCard({
 }) {
   const t = await getTranslations("parent.calm_summary");
   const sinceIso = new Date(Date.now() - CALM_SUMMARY_WINDOW_MS).toISOString();
-  const summary = summarizeCalmForParent(learnerId, tenantId, { sinceIso });
+  const summary = await summarizeCalmForParent(learnerId, tenantId, { sinceIso });
 
   let lastActive = "";
   if (summary.lastSessionAt) {

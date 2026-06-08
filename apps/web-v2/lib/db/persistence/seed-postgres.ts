@@ -95,6 +95,13 @@ import {
   webPlatformApiKeys,
   webPlatformEmailTemplates,
   webPlatformWebhookEndpoints,
+  webNotificationPreferences,
+  webDigestSchedules,
+  webHomeworkHelpSessions,
+  webCalmSessions,
+  webLearnerEngagement,
+  webLearnerBadges,
+  webLearnerSensoryProfiles,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -907,6 +914,14 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
   await log("platformApiKeys", await bulk(db, webPlatformApiKeys, vals(s.platformApiKeys).map((x) => ({ id: x.id, data: x })), webPlatformApiKeys.id));
   await log("platformEmailTemplates", await bulk(db, webPlatformEmailTemplates, vals(s.platformEmailTemplates).map((x) => ({ id: x.id, data: x })), webPlatformEmailTemplates.id));
   await log("platformWebhookEndpoints", await bulk(db, webPlatformWebhookEndpoints, vals(s.platformWebhookEndpoints).map((x) => ({ id: x.id, data: x })), webPlatformWebhookEndpoints.id));
+  // ── Sprint 8 remainder: engagement / sessions / notification prefs ──
+  await log("notificationPreferences", await bulk(db, webNotificationPreferences, vals(s.notificationPreferences).map((x) => ({ userId: x.userId, tenantId: x.tenantId, data: x })), webNotificationPreferences.userId));
+  await log("digestSchedules", await bulk(db, webDigestSchedules, vals(s.digestSchedules).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webDigestSchedules.id));
+  await log("homeworkHelpSessions", await bulk(db, webHomeworkHelpSessions, vals(s.homeworkHelpSessions).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webHomeworkHelpSessions.id));
+  await log("calmSessions", await bulk(db, webCalmSessions, vals(s.calmSessions).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webCalmSessions.id));
+  await log("learnerEngagement", await bulk(db, webLearnerEngagement, vals(s.learnerEngagement).map((x) => ({ learnerId: x.learnerId, tenantId: x.tenantId, data: x })), webLearnerEngagement.learnerId));
+  await log("learnerBadges", await bulk(db, webLearnerBadges, vals(s.learnerBadges).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webLearnerBadges.id));
+  await log("learnerSensoryProfiles", await bulk(db, webLearnerSensoryProfiles, vals(s.learnerSensoryProfiles).map((x) => ({ learnerId: x.learnerId, tenantId: x.tenantId, data: x })), webLearnerSensoryProfiles.learnerId));
   await log(
     "lessonParentSummaries",
     await bulk(

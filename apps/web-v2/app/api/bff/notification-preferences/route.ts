@@ -23,7 +23,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const pref = getNotificationPreference(session!.userId, session!.tenantId);
+    const pref = await getNotificationPreference(session!.userId, session!.tenantId);
     return ok({ preference: pref }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -51,7 +51,7 @@ export async function PATCH(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const pref = updateNotificationPreference(session!.userId, session!.tenantId, parsed.data);
+    const pref = await updateNotificationPreference(session!.userId, session!.tenantId, parsed.data);
     audit(session!, "notification.prefs.updated", requestId, {
       metadata: { digestCadence: pref.digestCadence },
     });

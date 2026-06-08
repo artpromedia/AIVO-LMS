@@ -126,6 +126,13 @@ const TABLES = [
   "web_platform_api_keys",
   "web_platform_email_templates",
   "web_platform_webhook_endpoints",
+  "web_notification_preferences",
+  "web_digest_schedules",
+  "web_homework_help_sessions",
+  "web_calm_sessions",
+  "web_learner_engagement",
+  "web_learner_badges",
+  "web_learner_sensory_profiles",
 ] as const;
 
 const POSTGRES_ENABLED =
