@@ -11,8 +11,16 @@ const PLATFORM_NAV = [
     description: "Live tenant, learning, and AI-usage signals.",
   },
   { href: "/platform/tenants", title: "Tenants", description: "Districts, schools, and families." },
-  { href: "/platform/users", title: "Users", description: "Admin, educator, and guardian accounts." },
-  { href: "/platform/learners", title: "Learners", description: "Learner profiles across tenants." },
+  {
+    href: "/platform/users",
+    title: "Users",
+    description: "Admin, educator, and guardian accounts.",
+  },
+  {
+    href: "/platform/learners",
+    title: "Learners",
+    description: "Learner profiles across tenants.",
+  },
   {
     href: "/platform/identity",
     title: "Identity",
@@ -31,7 +39,11 @@ const PLATFORM_NAV = [
     title: "Security",
     description: "SOC 2 control register and coverage.",
   },
-  { href: "/platform/ai-costs", title: "AI costs", description: "Per-tenant spend and budget caps." },
+  {
+    href: "/platform/ai-costs",
+    title: "AI costs",
+    description: "Per-tenant spend and budget caps.",
+  },
   {
     href: "/platform/ai/policies",
     title: "AI policies",
@@ -72,9 +84,17 @@ const PLATFORM_NAV = [
     title: "Baseline items",
     description: "Item calibration analytics and recalibration.",
   },
-  { href: "/platform/iep", title: "IEP oversight", description: "SPED evaluations and review compliance." },
+  {
+    href: "/platform/iep",
+    title: "IEP oversight",
+    description: "SPED evaluations and review compliance.",
+  },
   { href: "/platform/support", title: "Support", description: "Customer support ticket queue." },
-  { href: "/platform/audit", title: "Audit log", description: "Hash-chained admin action history." },
+  {
+    href: "/platform/audit",
+    title: "Audit log",
+    description: "Hash-chained admin action history.",
+  },
   { href: "/platform/jobs", title: "Jobs", description: "Scheduled job freshness and run health." },
   {
     href: "/platform/settings/api-keys",
@@ -95,9 +115,14 @@ export default async function PlatformPage() {
       action={
         <div className="flex flex-wrap gap-2">
           {session.role === "platform_admin" ? (
-            <Link className="admin-button" href="/platform/districts/new">
-              Onboard district
-            </Link>
+            <>
+              <Link className="admin-button" href="/platform/pilots/new">
+                Provision pilot
+              </Link>
+              <Link className="admin-button admin-button-secondary" href="/platform/districts/new">
+                Onboard district
+              </Link>
+            </>
           ) : null}
           <Link className="admin-button admin-button-secondary" href="/login">
             Switch account

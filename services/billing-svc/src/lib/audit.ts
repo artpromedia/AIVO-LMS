@@ -39,7 +39,8 @@ export type BillingAuditEventType =
   | "billing.overage"
   | "billing.coupon.created"
   | "billing.coupon.disabled"
-  | "billing.coupon.redeemed";
+  | "billing.coupon.redeemed"
+  | "billing.pilot.provisioned";
 
 export interface EmitArgs {
   eventType: BillingAuditEventType;

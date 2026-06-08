@@ -100,3 +100,41 @@ docker compose -f docker-compose.e2e.yml --profile pilot down -v
 containers, path-gated to the surfaces the journey touches. The journey spec
 lives at `e2e/specs/district-pilot/district-pilot.spec.ts`; each sprint
 un-`fixme`s its stage of the journey.
+
+## Provision a district pilot (district + entitlement, one step)
+
+`/platform/pilots/new` (platform admin) creates the district **and** provisions
+its pilot entitlement atomically — there is no separate coupon step.
+
+1. Sign in as `PLATFORM_ADMIN`, open `/platform/pilots/new`.
+2. Enter the district name, **seat cap**, **pilot length (days)**, and the first
+   admin's name + work email. Submit.
+3. identity-svc `POST /api/admin/pilots` (step-up scope `pilot:create`,
+   rate-limited) inserts the district tenant, then calls billing-svc
+   `POST /api/billing/internal/pilots/provision` (internal `x-service-token`)
+   which mints + redeems a `PROVISIONING` coupon **for the new tenant** — setting
+   `tenants.licensing_tier` + `seat_limit` and inserting the `ACTIVE`
+   `subscriptions` row. Only after the entitlement exists does identity write the
+   `district.created` audit and email the first-admin invite.
+4. The success screen shows the seat cap, pilot expiry, and the provisioning
+   coupon code (for the uptake view). The invitee accepts as usual.
+
+**Idempotency.** Provisioning is idempotent on `(tenantId, couponCode)`: re-running
+returns the existing entitlement (`provisioned: false`) and never double-counts
+seats or redemptions. The deterministic code is `PILOT-<first 8 of tenantId>`.
+
+**Rollback.** The tenant is inserted _bare_ (no audit) before billing is called.
+If provisioning fails (billing unreachable or errors), identity deletes the bare
+tenant and returns `502` — a district is **never** left without entitlement. If
+provisioning succeeds but the invite email fails, the district stays entitled and
+the operator is told to resend the invite (entitlement is never rolled back).
+
+**Audits / metrics.** `district.created` (identity), plus billing
+`billing.coupon.created`, `billing.coupon.redeemed`, and `billing.pilot.provisioned`;
+counters `billing_coupons_created_total` / `billing_coupons_redeemed_total`
+(`type=PROVISIONING`).
+
+**Env (identity-svc → billing-svc / comms-svc).** `BILLING_SVC_URL`,
+`COMMS_SVC_URL`, and the shared internal secret (`INTERNAL_SERVICE_TOKEN`, or
+`INTERNAL_SERVICE_KEY` for the comms invite) must be set so the orchestration can
+reach both services.

@@ -497,3 +497,31 @@ foundational gap **G1 — no real web-v2 session on the pilot path**:
 
 Run it: `pnpm e2e -- specs/district-pilot` against the `pilot` profile (see
 `docs/runbooks/district-onboarding.md`).
+
+## 11. District-pilot pack — Sprint 1 (G2: first-class pilot provisioning, no manual coupon)
+
+**Sprint 1** closes **G2 — no first-class pilot provisioning**: a single platform-admin
+action now creates a district **and** provisions its pilot entitlement atomically, so no human
+re-keys a coupon and no district is born without a seat cap.
+
+- **Shared money/seat path.** `services/billing-svc/src/lib/provision-tenant.ts`
+  (`provisionTenantEntitlement`) is the one implementation that sets `tenants.licensing_tier` +
+  `seat_limit` and inserts the `ACTIVE` `subscriptions` row. The parent coupon-redeem branch
+  (`coupons.ts`) was refactored to call it — no drift.
+- **Internal provision route.** `POST /api/billing/internal/pilots/provision`
+  (`pilot-provisioning.ts`) mints + redeems a `PROVISIONING` coupon for a district tenant in one
+  transaction, guarded by the internal `x-service-token`, **idempotent on `(tenantId, couponCode)`**,
+  audited (`billing.coupon.created` / `billing.coupon.redeemed` / `billing.pilot.provisioned`) and
+  metered.
+- **Orchestration.** identity-svc `POST /api/admin/pilots` (`pilots.ts`, `requirePlatformAdmin` +
+  step-up `pilot:create`, rate-limited) reuses the district-onboarding primitives
+  (`lib/district-onboarding.ts`, also now used by `create-district`) then provisions billing. The
+  bare tenant is inserted **before** any audit so a billing failure deletes it cleanly — a district
+  is never left without entitlement.
+- **Surfaces.** `packages/admin-api` `provisionPilot` + web-admin `/platform/pilots/new` (seat cap +
+  pilot length, success shows seats/expiry/coupon) + a "Provision pilot" primary action on the
+  platform home.
+- **Proof.** `services/billing-svc/tests/pilot-provisioning.test.ts` and
+  `services/identity-svc/tests/pilot-create.test.ts` (DB-backed) cover provisioning, idempotency,
+  token-guard, audit, and rollback; `e2e/specs/district-pilot` Stage 1 runs it against containers
+  (`docs/runbooks/district-onboarding.md`).

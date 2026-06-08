@@ -22,6 +22,7 @@ import { createLogger } from "@aivo/observability";
 import { emitBillingAudit } from "../lib/audit.js";
 import { couponsCreated, couponsRedeemed } from "../lib/metrics.js";
 import { pickAttribution } from "../lib/attribution.js";
+import { provisionTenantEntitlement } from "../lib/provision-tenant.js";
 import {
   listCouponsSchema,
   createCouponSchema,
@@ -414,35 +415,27 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
 
     let expiresAt: unknown = null;
 
-    // Run the provisioning in a transaction (including redemption counter)
+    // Run the provisioning in a transaction (including redemption counter).
+    // The tenant-update + subscription-insert is the SHARED money/seat path —
+    // see provisionTenantEntitlement (also used by the internal pilot-provision
+    // route) so the two can never drift.
     await db.transaction(async (tx: any) => {
-      await tx.execute(sql`
-        UPDATE tenants SET licensing_tier = ${grantsTier}, seat_limit = ${grantsSeatLimit}, updated_at = NOW()
-        WHERE id = ${tenantId}
-      `);
-      await tx.execute(sql`
-        INSERT INTO subscriptions (tenant_id, user_id, plan, status, current_period_end, metadata)
-        VALUES (
-          ${tenantId},
-          ${userId},
-          ${grantsPlan},
-          'ACTIVE',
-          NOW() + make_interval(days => ${grantsDurationDays}),
-          ${JSON.stringify({ couponCode: row.code, provisionedBy: "coupon", ...attribution })}
-        )
-      `);
+      const result = await provisionTenantEntitlement(tx, {
+        tenantId,
+        userId,
+        plan: grantsPlan,
+        tier: grantsTier,
+        seatLimit: grantsSeatLimit,
+        durationDays: grantsDurationDays,
+        couponCode: row.code,
+        provisionedBy: "coupon",
+        attribution,
+      });
+      expiresAt = result.expiresAt;
       await tx.execute(sql`
         UPDATE billing_coupons SET redemptions = redemptions + 1 WHERE code = ${row.code}
       `);
     });
-
-    const expiresResult = (await db.execute(sql`
-      SELECT current_period_end FROM subscriptions
-      WHERE tenant_id = ${tenantId} AND user_id = ${userId} AND plan = ${grantsPlan}
-      ORDER BY id DESC LIMIT 1
-    `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
-    const expiresRows = Array.isArray(expiresResult) ? expiresResult : (expiresResult.rows ?? []);
-    expiresAt = expiresRows[0]?.current_period_end ?? null;
 
     couponsRedeemed.increment(1, { type: "PROVISIONING" });
     await emitBillingAudit(db, auditLog, {

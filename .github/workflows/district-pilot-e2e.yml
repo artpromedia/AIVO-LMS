@@ -71,13 +71,13 @@ jobs:
           AIVO_SEED_DATABASE_URL: postgresql://aivo:aivo@localhost:55433/aivo_e2e
         run: pnpm --filter @aivo/web-v2 db:seed:postgres
 
-      - name: Bring up pilot harness (identity-svc + web-v2)
+      - name: Bring up pilot harness (identity-svc + billing-svc + comms-svc + web-v2)
         if: steps.filter.outputs.pilot == 'true'
-        # Sprint 0 brings up the slice the journey currently exercises. Later
-        # sprints append `billing-svc web-admin` to this line.
+        # Sprint 0 + Sprint 1 slice: identity-svc real auth (web-v2) and the
+        # pilot-provisioning orchestration (identity → billing → comms).
         run: >
           docker compose -f docker-compose.e2e.yml --profile pilot up -d --build --wait
-          postgres identity-svc web-v2
+          postgres identity-svc billing-svc comms-svc web-v2
           || (docker compose -f docker-compose.e2e.yml --profile pilot logs && exit 1)
 
       - name: Install Playwright browsers

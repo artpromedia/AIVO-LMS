@@ -14,9 +14,13 @@ async function onboardDistrict(formData: FormData) {
   const session = await requirePageRole(["platform_admin"]);
   const districtName = String(formData.get("districtName") || "").trim();
   const adminName = String(formData.get("adminName") || "").trim();
-  const adminEmail = String(formData.get("adminEmail") || "").trim().toLowerCase();
+  const adminEmail = String(formData.get("adminEmail") || "")
+    .trim()
+    .toLowerCase();
   if (!districtName || !adminName || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(adminEmail)) {
-    redirect("/platform/districts/new?error=Enter%20a%20district%20name%2C%20admin%20name%2C%20and%20valid%20email.");
+    redirect(
+      "/platform/districts/new?error=Enter%20a%20district%20name%2C%20admin%20name%2C%20and%20valid%20email.",
+    );
   }
 
   let result;
@@ -47,9 +51,14 @@ export default async function NewDistrictPage({
       title="Onboard a district"
       description="Create the district tenant and email a secure, single-use invitation to its first administrator."
       action={
-        <Link className="admin-button admin-button-secondary" href="/platform/districts">
-          Manage invitations
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link className="admin-button" href="/platform/pilots/new">
+            Provision pilot (with entitlement)
+          </Link>
+          <Link className="admin-button admin-button-secondary" href="/platform/districts">
+            Manage invitations
+          </Link>
+        </div>
       }
     >
       {params.created && params.email ? (
@@ -59,7 +68,8 @@ export default async function NewDistrictPage({
           </p>
           <h2 className="mt-3 text-2xl font-black">{params.created} is ready for setup</h2>
           <p className="mt-2 text-slate-600">
-            A secure invitation was emailed to {params.email}. No temporary password was created or shown.
+            A secure invitation was emailed to {params.email}. No temporary password was created or
+            shown.
           </p>
           {params.inviteUrl ? (
             <p className="mt-4 break-all rounded-xl bg-amber-50 p-4 text-sm text-amber-900">

@@ -68,7 +68,8 @@ export type StepUpScope =
   | "data:export"
   | "config:update"
   | "district:create"
-  | "district:admin-mgmt";
+  | "district:admin-mgmt"
+  | "pilot:create";
 
 export * from "./audit-chain.js";
 export * from "./ip-allowlist.js";
@@ -88,6 +89,7 @@ export const STEP_UP_SCOPES: readonly StepUpScope[] = [
   "config:update",
   "district:create",
   "district:admin-mgmt",
+  "pilot:create",
 ] as const;
 
 /**

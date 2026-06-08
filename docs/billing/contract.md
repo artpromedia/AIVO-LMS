@@ -106,7 +106,23 @@ Coupon kinds:
 - **Provisioning** — grants entitlement without payment (e.g. school
   pilot access code); single-use per tenant; auto-expires.
 - **School pilot access code** — provisions a `district` plan slice
-  with seat cap; manual admin activation required for go-live.
+  with seat cap. **No manual activation:** the platform-admin "Provision
+  pilot" flow mints AND redeems this PROVISIONING coupon for the new district
+  tenant automatically (see below), so a district is born with its entitlement.
+
+### Automated pilot provisioning (no manual coupon step)
+
+`POST /api/billing/internal/pilots/provision` (service-to-service, guarded by
+the internal `x-service-token`) is the entitlement half of the platform-admin
+"Provision pilot" flow (identity-svc `POST /api/admin/pilots`). In one
+transaction it mints a single-use `PROVISIONING` coupon (`PILOT-<tenantShort>`
+when no code is supplied) and redeems it **for the new district tenant** —
+setting `tenants.licensing_tier` + `seat_limit` and inserting the `ACTIVE`
+`subscriptions` row via the shared `provisionTenantEntitlement` (the same
+money/seat write the parent coupon-redeem path uses). It is **idempotent on
+`(tenantId, couponCode)`**: a re-run that finds the tenant already entitled by
+this coupon returns the existing entitlement (`provisioned: false`) without
+touching seats or the redemption counter again.
 
 The admin detail route `GET /api/billing/admin/coupons/:code` returns the
 single coupon row with its live redemption count (for the pilot-uptake view).
@@ -115,11 +131,12 @@ single coupon row with its live redemption count (for the pilot-uptake view).
 
 Audit events (hash-chained `audit_events`, surfaced in admin audit dashboards):
 
-| Event                     | Emitted when                                              |
-| ------------------------- | --------------------------------------------------------- |
-| `billing.coupon.created`  | admin creates a coupon (actor + type + grants)            |
-| `billing.coupon.disabled` | admin disables a coupon                                   |
-| `billing.coupon.redeemed` | a coupon is redeemed (DISCOUNT/SUBSCRIPTION/PROVISIONING) |
+| Event                       | Emitted when                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `billing.coupon.created`    | admin creates a coupon (actor + type + grants)                                                                |
+| `billing.coupon.disabled`   | admin disables a coupon                                                                                       |
+| `billing.coupon.redeemed`   | a coupon is redeemed (DISCOUNT/SUBSCRIPTION/PROVISIONING)                                                     |
+| `billing.pilot.provisioned` | a district pilot entitlement is provisioned (seat cap + active subscription) via the internal provision route |
 
 Prometheus counters (`/metrics`):
 

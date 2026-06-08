@@ -269,6 +269,58 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
     },
   );
 
+  // Idempotent seed for a PLATFORM_ADMIN. Used by the district-pilot e2e to
+  // drive POST /api/admin/pilots with a real platform-admin bearer token.
+  // Platform admins are tenant-less; the response shape mirrors the other
+  // seed-* helpers (e2e/lib/fixtures.ts seedPlatformAdmin).
+  app.post<{ Body: { email: string; password: string } }>(
+    "/api/__test__/seed-platform-admin",
+    async (req, reply) => {
+      if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+      const db = (app as any).db;
+      const { email, password } = req.body ?? ({} as any);
+      if (!email || !password) {
+        return reply.status(400).send({ error: "email and password required" });
+      }
+      const lcEmail = email.toLowerCase();
+      const passwordHash = await argon2.hash(password);
+      let [user] = await db.select().from(users).where(eq(users.email, lcEmail)).limit(1);
+      if (user) {
+        await db
+          .update(users)
+          .set({
+            passwordHash,
+            role: "PLATFORM_ADMIN",
+            tenantId: null,
+            mfaEnabled: false,
+            deactivatedAt: null,
+          })
+          .where(eq(users.id, user.id));
+        [user] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+      } else {
+        [user] = await db
+          .insert(users)
+          .values({
+            email: lcEmail,
+            name: "E2E Platform Admin",
+            passwordHash,
+            role: "PLATFORM_ADMIN" as any,
+            tenantId: null,
+            mfaEnabled: false,
+          })
+          .returning();
+      }
+      const accessToken = await signJWT({
+        sub: user.id,
+        tenantId: null,
+        role: user.role,
+        email: user.email,
+        name: user.name,
+      });
+      return { userId: user.id, tenantId: "", role: user.role, accessToken };
+    },
+  );
+
   // Idempotent seeding for the parent IEP "Updates" timeline e2e fixture.
   // Builds two tenants:
   //   - Tenant A (B2C_FAMILY): a PARENT with a LEARNER child + a finalised

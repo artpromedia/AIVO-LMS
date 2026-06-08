@@ -19,8 +19,16 @@
  * (AUTH_MODE=custom, AIVO_PERSISTENCE=postgres).
  */
 import { test, expect } from "@playwright/test";
-import { WEB_BASE, seedParent, skipUnlessIdentityTestMode } from "../../lib/fixtures";
+import {
+  WEB_BASE,
+  IDENTITY_BASE,
+  seedParent,
+  seedPlatformAdmin,
+  skipUnlessIdentityTestMode,
+} from "../../lib/fixtures";
 import { assertRealSessionNoMock, loginThroughWebUi, MOCK_SESSION_COOKIE } from "../../lib/pilot";
+
+const BILLING_BASE = process.env.BILLING_BASE_URL || "http://localhost:3009";
 
 test.describe("District pilot — Sprint 0: real web-v2 session (G1)", () => {
   test.beforeEach(async () => {
@@ -76,8 +84,51 @@ async function page_context_cookies(
  *              and completes consent — all under the one district tenant
  *   Sprint 4 — pilot ops dashboard surfaces seats / uptake / expiry
  * ---------------------------------------------------------------------- */
-test.describe("District pilot — full journey (sprints 1-4)", () => {
-  test.fixme("platform admin provisions a district pilot with a redeemed coupon (Sprint 1)", async () => {});
+test.describe("District pilot — Sprint 1: provision pilot (G2)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("platform admin provisions a district pilot with a redeemed coupon", async ({ request }) => {
+    const admin = await seedPlatformAdmin();
+    expect(admin, "identity-svc seed-platform-admin helper must be reachable").not.toBeNull();
+    if (!admin) return;
+
+    const stamp = Date.now();
+    const provision = await request.post(`${IDENTITY_BASE}/api/admin/pilots`, {
+      headers: { authorization: `Bearer ${admin.accessToken}` },
+      data: {
+        districtName: `Pilot E2E ${stamp}`,
+        adminName: "Pat Principal",
+        adminEmail: `pilot-da-${stamp}@district.test`,
+        seatLimit: 5,
+        durationDays: 30,
+      },
+      failOnStatusCode: false,
+    });
+    expect(provision.status(), await provision.text()).toBe(200);
+    const body = await provision.json();
+
+    // The district was born WITH its pilot entitlement, in one action.
+    expect(body.district.id).toBeTruthy();
+    expect(body.pilot.seatLimit).toBe(5);
+    expect(String(body.pilot.couponCode)).toMatch(/^PILOT-/);
+    expect(body.invite.email).toContain("pilot-da-");
+
+    // billing_coupons is the source of truth: the PROVISIONING coupon was
+    // minted and redeemed exactly once for this tenant.
+    const coupon = await request.get(
+      `${BILLING_BASE}/api/billing/admin/coupons/${body.pilot.couponCode}`,
+      { headers: { authorization: `Bearer ${admin.accessToken}` }, failOnStatusCode: false },
+    );
+    expect(coupon.status()).toBe(200);
+    const cj = await coupon.json();
+    expect(cj.coupon.coupon_type).toBe("PROVISIONING");
+    expect(Number(cj.coupon.redemptions)).toBe(1);
+  });
+});
+
+test.describe("District pilot — full journey (sprints 2-4)", () => {
   test.fixme("district admin adds a school (Sprint 1/2)", async () => {});
   test.fixme("parents are invited into the district tenant (Sprint 2)", async () => {});
   test.fixme("invited parent logs in and creates a learner under the seat cap + consent (Sprint 3)", async () => {});

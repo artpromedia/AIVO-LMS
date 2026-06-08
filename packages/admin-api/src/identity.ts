@@ -103,6 +103,37 @@ export async function createPlatformDistrict(
   }>(session, "POST", "/api/admin/create-district", input);
 }
 
+export type ProvisionPilotResult = {
+  district: { id: string; name: string; type: string; createdAt: string };
+  invite: { id: string; email: string; expiresAt: string; inviteUrl?: string };
+  pilot: {
+    plan: string;
+    tier?: string;
+    seatLimit: number | null;
+    expiresAt: string | null;
+    couponCode?: string;
+  };
+};
+
+/**
+ * Provision a district pilot in one call: identity-svc creates the district +
+ * first-admin invite AND redeems a PROVISIONING coupon FOR the new tenant
+ * (seat cap + ACTIVE subscription) via billing-svc — no manual coupon step.
+ */
+export async function provisionPilot(
+  session: Pick<SessionProfile, "role">,
+  input: {
+    districtName: string;
+    adminName: string;
+    adminEmail: string;
+    seatLimit: number;
+    durationDays: number;
+  },
+): Promise<ProvisionPilotResult> {
+  assertPlatformAdmin(session);
+  return identityRequest<ProvisionPilotResult>(session, "POST", "/api/admin/pilots", input);
+}
+
 export async function listPlatformDistrictInvites(
   session: Pick<SessionProfile, "role">,
   status?: DistrictInviteStatus,

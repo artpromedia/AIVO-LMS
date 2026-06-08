@@ -50,9 +50,15 @@ services:
       WEBAUTHN_RP_ID: localhost
       WEBAUTHN_ORIGINS: http://localhost:5000
       # Enables /api/__test__/* seed helpers (seed-parent, seed-district-admin,
-      # last-mfa-code, …) consumed by e2e/lib/fixtures.ts. Gated to
-      # NODE_ENV != production in the handlers — never set in a real deploy.
+      # seed-platform-admin, last-mfa-code, …) consumed by e2e/lib/fixtures.ts.
+      # Gated to NODE_ENV != production in the handlers — never set in a deploy.
       IDENTITY_TEST_MODE: "1"
+      # Sprint 1 pilot orchestration: identity-svc → billing-svc (provision) and
+      # → comms-svc (first-admin invite). Internal keys default to the shared dev
+      # key on both sides; the billing call uses INTERNAL_SERVICE_TOKEN above.
+      BILLING_SVC_URL: http://billing-svc:3009
+      COMMS_SVC_URL: http://comms-svc:3010
+      WEB_BASE_URL: http://localhost:5000
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
