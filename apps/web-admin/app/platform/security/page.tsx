@@ -21,9 +21,14 @@ export default async function SecurityPage() {
       title="Security posture"
       description="SOC 2 / Trust Services control coverage, backed by admin-svc (Postgres)."
       action={
-        <Link className="admin-button" href="/platform/security/controls">
-          Control register
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link className="admin-button" href="/platform/security/controls">
+            Control register
+          </Link>
+          <Link className="admin-button admin-button-secondary" href="/platform/security/incidents">
+            Incidents
+          </Link>
+        </div>
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-4">

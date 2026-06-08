@@ -168,3 +168,114 @@ export async function updateSecurityControl(
   );
   return mapControl((payload.control as Record<string, unknown>) ?? {});
 }
+
+// ── Incidents ────────────────────────────────────────────────────────────────
+
+export type IncidentSeverity = "sev1" | "sev2" | "sev3" | "sev4";
+export type IncidentStatus =
+  | "open"
+  | "investigating"
+  | "mitigating"
+  | "resolved"
+  | "post_mortem";
+
+export const INCIDENT_SEVERITIES: IncidentSeverity[] = ["sev1", "sev2", "sev3", "sev4"];
+export const INCIDENT_STATUSES: IncidentStatus[] = [
+  "open",
+  "investigating",
+  "mitigating",
+  "resolved",
+  "post_mortem",
+];
+
+export interface AdminSecurityIncident {
+  id: string;
+  title: string;
+  summary: string;
+  severity: IncidentSeverity;
+  status: IncidentStatus;
+  commanderUserId: string | null;
+  customerImpact: boolean;
+  regulatorNotificationRequired: boolean;
+  detectedAt: string | null;
+  resolvedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+function normalizeSeverity(value: unknown): IncidentSeverity {
+  const v = String(value ?? "sev3");
+  return (INCIDENT_SEVERITIES as string[]).includes(v) ? (v as IncidentSeverity) : "sev3";
+}
+
+function normalizeIncidentStatus(value: unknown): IncidentStatus {
+  const v = String(value ?? "open");
+  return (INCIDENT_STATUSES as string[]).includes(v) ? (v as IncidentStatus) : "open";
+}
+
+function mapIncident(row: Record<string, unknown>): AdminSecurityIncident {
+  return {
+    id: String(row.id),
+    title: String(row.title ?? ""),
+    summary: String(row.summary ?? ""),
+    severity: normalizeSeverity(row.severity),
+    status: normalizeIncidentStatus(row.status),
+    commanderUserId: row.commanderUserId ? String(row.commanderUserId) : null,
+    customerImpact: Boolean(row.customerImpact),
+    regulatorNotificationRequired: Boolean(row.regulatorNotificationRequired),
+    detectedAt: row.detectedAt ? String(row.detectedAt) : null,
+    resolvedAt: row.resolvedAt ? String(row.resolvedAt) : null,
+    createdAt: row.createdAt ? String(row.createdAt) : null,
+    updatedAt: row.updatedAt ? String(row.updatedAt) : null,
+  };
+}
+
+export async function listSecurityIncidents(
+  session: Pick<SessionProfile, "role">,
+): Promise<AdminSecurityIncident[]> {
+  const payload = await adminGet<Record<string, unknown>>(
+    session,
+    "/api/admin-svc/security/incidents",
+  );
+  const rows = Array.isArray(payload.incidents) ? payload.incidents : [];
+  return rows.map((row) => mapIncident(row as Record<string, unknown>));
+}
+
+export async function createSecurityIncident(
+  session: Pick<SessionProfile, "role">,
+  input: {
+    title: string;
+    summary?: string;
+    severity: IncidentSeverity;
+    status?: IncidentStatus;
+    customerImpact?: boolean;
+    regulatorNotificationRequired?: boolean;
+  },
+): Promise<AdminSecurityIncident> {
+  const payload = await adminPost<Record<string, unknown>>(
+    session,
+    "/api/admin-svc/security/incidents",
+    input,
+  );
+  return mapIncident((payload.incident as Record<string, unknown>) ?? {});
+}
+
+export async function updateSecurityIncident(
+  session: Pick<SessionProfile, "role">,
+  id: string,
+  patch: {
+    title?: string;
+    summary?: string;
+    severity?: IncidentSeverity;
+    status?: IncidentStatus;
+    customerImpact?: boolean;
+    regulatorNotificationRequired?: boolean;
+  },
+): Promise<AdminSecurityIncident> {
+  const payload = await adminPatch<Record<string, unknown>>(
+    session,
+    `/api/admin-svc/security/incidents/${encodeURIComponent(id)}`,
+    patch,
+  );
+  return mapIncident((payload.incident as Record<string, unknown>) ?? {});
+}

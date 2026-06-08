@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
 
 /**
  * Security posture: SOC 2 / Trust Services control register and the evidence
@@ -51,4 +51,37 @@ export const securityControlEvidence = pgTable(
     collectedAt: timestamp("collected_at").defaultNow().notNull(),
   },
   (table) => [index("idx_security_control_evidence_control").on(table.controlId)],
+);
+
+/**
+ * Security incident register + bridge ownership.
+ *
+ * `severity` ∈ sev1 | sev2 | sev3 | sev4.
+ * `status` ∈ open | investigating | mitigating | resolved | post_mortem.
+ */
+export const securityIncidents = pgTable(
+  "security_incidents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: varchar("title", { length: 256 }).notNull(),
+    summary: text("summary").notNull().default(""),
+    severity: varchar("severity", { length: 8 }).notNull().default("sev3"),
+    status: varchar("status", { length: 24 }).notNull().default("open"),
+    /** Incident commander (owns the bridge). */
+    commanderUserId: uuid("commander_user_id"),
+    /** May have exposed customer / learner data. */
+    customerImpact: boolean("customer_impact").notNull().default(false),
+    /** Regulators must be notified (FERPA / state breach laws). */
+    regulatorNotificationRequired: boolean("regulator_notification_required")
+      .notNull()
+      .default(false),
+    detectedAt: timestamp("detected_at").defaultNow().notNull(),
+    resolvedAt: timestamp("resolved_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_security_incidents_status").on(table.status),
+    index("idx_security_incidents_severity").on(table.severity),
+  ],
 );

@@ -14,7 +14,13 @@
  */
 import { FastifyInstance } from "fastify";
 import { asc, desc, eq } from "drizzle-orm";
-import { securityControls, securityControlEvidence, adminAuditLog, appendAudit } from "@aivo/db";
+import {
+  securityControls,
+  securityControlEvidence,
+  securityIncidents,
+  adminAuditLog,
+  appendAudit,
+} from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 
 const CRITERIA = new Set([
@@ -25,6 +31,14 @@ const CRITERIA = new Set([
   "privacy",
 ]);
 const STATUSES = new Set(["implemented", "partial", "not_started", "not_applicable"]);
+const SEVERITIES = new Set(["sev1", "sev2", "sev3", "sev4"]);
+const INCIDENT_STATUSES = new Set([
+  "open",
+  "investigating",
+  "mitigating",
+  "resolved",
+  "post_mortem",
+]);
 
 async function requirePlatformAdmin(req: any, reply: any): Promise<boolean> {
   const auth = req.headers.authorization;
@@ -73,15 +87,39 @@ function mapEvidence(row: any) {
   };
 }
 
-async function audit(db: any, action: string, actor: any, control: any, details: Record<string, any>) {
+function mapIncident(row: any) {
+  return {
+    id: row.id,
+    title: row.title,
+    summary: row.summary ?? "",
+    severity: row.severity,
+    status: row.status,
+    commanderUserId: row.commanderUserId ?? null,
+    customerImpact: Boolean(row.customerImpact),
+    regulatorNotificationRequired: Boolean(row.regulatorNotificationRequired),
+    detectedAt: row.detectedAt?.toISOString?.() ?? null,
+    resolvedAt: row.resolvedAt?.toISOString?.() ?? null,
+    createdAt: row.createdAt?.toISOString?.() ?? null,
+    updatedAt: row.updatedAt?.toISOString?.() ?? null,
+  };
+}
+
+async function audit(
+  db: any,
+  resourceType: string,
+  action: string,
+  actor: any,
+  resource: any,
+  details: Record<string, any>,
+) {
   await appendAudit(db, "admin_audit_log", adminAuditLog, {
     action,
     actorId: actor.impersonatedBy || actor.sub,
     actorEmail: actor.email || "",
     actorRole: actor.role,
     onBehalfOfId: actor.impersonatedBy ? actor.sub : null,
-    resourceType: "security_control",
-    resourceId: control.id,
+    resourceType,
+    resourceId: resource.id,
     details,
     ipAddress: null,
     userAgent: null,
@@ -154,7 +192,7 @@ export function registerSecurityRoutes(app: FastifyInstance, db: any): void {
           status,
         })
         .returning();
-      await audit(db, "security_control_created", (req as any).user, created, {
+      await audit(db, "security_control", "security_control_created", (req as any).user, created, {
         code,
         criterion,
         status,
@@ -195,11 +233,125 @@ export function registerSecurityRoutes(app: FastifyInstance, db: any): void {
         .where(eq(securityControls.id, id))
         .returning();
       if (!updated) return reply.code(404).send({ error: "control_not_found" });
-      await audit(db, "security_control_updated", (req as any).user, updated, {
+      await audit(db, "security_control", "security_control_updated", (req as any).user, updated, {
         status: updated.status,
         criterion: updated.criterion,
       });
       return { control: mapControl(updated) };
+    },
+  );
+
+  // ── Incidents ────────────────────────────────────────────────────────────
+
+  app.get(
+    "/api/admin-svc/security/incidents",
+    { schema: { tags: ["security"], security: [{ bearerAuth: [] }] } },
+    async (req, reply) => {
+      if (!(await requirePlatformAdmin(req, reply))) return;
+      const rows = await db
+        .select()
+        .from(securityIncidents)
+        .orderBy(desc(securityIncidents.detectedAt));
+      return { incidents: rows.map(mapIncident) };
+    },
+  );
+
+  app.post<{
+    Body: {
+      title?: string;
+      summary?: string;
+      severity?: string;
+      status?: string;
+      commanderUserId?: string;
+      customerImpact?: boolean;
+      regulatorNotificationRequired?: boolean;
+    };
+  }>(
+    "/api/admin-svc/security/incidents",
+    { schema: { tags: ["security"], security: [{ bearerAuth: [] }] } },
+    async (req, reply) => {
+      if (!(await requirePlatformAdmin(req, reply))) return;
+      const body = req.body ?? {};
+      const title = String(body.title ?? "").trim();
+      if (!title) return reply.code(400).send({ error: "title is required" });
+      const severity = SEVERITIES.has(String(body.severity)) ? String(body.severity) : "sev3";
+      const status = INCIDENT_STATUSES.has(String(body.status)) ? String(body.status) : "open";
+      const [created] = await db
+        .insert(securityIncidents)
+        .values({
+          title,
+          summary: String(body.summary ?? ""),
+          severity,
+          status,
+          commanderUserId: body.commanderUserId ? String(body.commanderUserId) : null,
+          customerImpact: Boolean(body.customerImpact),
+          regulatorNotificationRequired: Boolean(body.regulatorNotificationRequired),
+        })
+        .returning();
+      await audit(db, "security_incident", "security_incident_created", (req as any).user, created, {
+        severity,
+        status,
+        customerImpact: Boolean(body.customerImpact),
+      });
+      return reply.code(201).send({ incident: mapIncident(created) });
+    },
+  );
+
+  app.patch<{
+    Params: { id: string };
+    Body: {
+      title?: string;
+      summary?: string;
+      severity?: string;
+      status?: string;
+      commanderUserId?: string | null;
+      customerImpact?: boolean;
+      regulatorNotificationRequired?: boolean;
+    };
+  }>(
+    "/api/admin-svc/security/incidents/:id",
+    { schema: { tags: ["security"], security: [{ bearerAuth: [] }] } },
+    async (req, reply) => {
+      if (!(await requirePlatformAdmin(req, reply))) return;
+      const { id } = req.params;
+      const body = req.body ?? {};
+      const patch: Record<string, unknown> = { updatedAt: new Date() };
+      if (body.title !== undefined) patch.title = String(body.title);
+      if (body.summary !== undefined) patch.summary = String(body.summary);
+      if (body.commanderUserId !== undefined) {
+        patch.commanderUserId = body.commanderUserId ? String(body.commanderUserId) : null;
+      }
+      if (body.customerImpact !== undefined) patch.customerImpact = Boolean(body.customerImpact);
+      if (body.regulatorNotificationRequired !== undefined) {
+        patch.regulatorNotificationRequired = Boolean(body.regulatorNotificationRequired);
+      }
+      if (body.severity !== undefined) {
+        if (!SEVERITIES.has(String(body.severity))) {
+          return reply.code(400).send({ error: "invalid severity" });
+        }
+        patch.severity = String(body.severity);
+      }
+      if (body.status !== undefined) {
+        if (!INCIDENT_STATUSES.has(String(body.status))) {
+          return reply.code(400).send({ error: "invalid status" });
+        }
+        patch.status = String(body.status);
+        // Stamp resolution time when entering a terminal state.
+        if (body.status === "resolved" || body.status === "post_mortem") {
+          patch.resolvedAt = new Date();
+        }
+      }
+      const [updated] = await db
+        .update(securityIncidents)
+        .set(patch)
+        .where(eq(securityIncidents.id, id))
+        .returning();
+      if (!updated) return reply.code(404).send({ error: "incident_not_found" });
+      await audit(db, "security_incident", "security_incident_updated", (req as any).user, updated, {
+        severity: updated.severity,
+        status: updated.status,
+      });
+      return { incident: mapIncident(updated) };
     },
   );
 }

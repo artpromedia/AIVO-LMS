@@ -122,8 +122,13 @@ web-v2 admin; built it from scratch e2e to Postgres:
 - `@aivo/admin-api/security` module → `platform/security` (coverage overview) +
   `platform/security/controls` (register: add control, set status).
 
-Incidents / risks / vendors / vulnerabilities follow this same pattern (add
-table + migration + routes + page).
+## Done — Wave 9 (security incidents)
+
+Extends Wave 8: new `security_incidents` table + migration `0076`, incident
+endpoints added to admin-svc `routes/security.ts` (list/create/update, terminal
+status stamps `resolvedAt`, writes audited), `@aivo/admin-api/security` incident
+functions, and `platform/security/incidents` (open incident, set status,
+SEV1/open KPIs). Risks / vendors / vulnerabilities follow the same recipe.
 
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
