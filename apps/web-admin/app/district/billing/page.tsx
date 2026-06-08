@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requirePageRole } from "@aivo/admin-auth";
 import { getTrialConversion, listBillingAccounts } from "@aivo/admin-api/billing";
 import { AdminPageFrame } from "@aivo/admin-ui";
@@ -15,6 +16,11 @@ export default async function DistrictBillingPage() {
       eyebrow="District"
       title="Billing"
       description="Subscription accounts and trial conversion for your district."
+      action={
+        <Link className="admin-button admin-button-secondary" href="/district/billing/invoices">
+          View invoices
+        </Link>
+      }
     >
       <TrialMetrics report={trials} />
       <BillingAccountsTable accounts={accounts} />

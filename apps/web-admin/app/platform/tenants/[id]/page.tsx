@@ -20,9 +20,14 @@ export default async function TenantDetailPage({
       title={tenant.name}
       description={`${tenant.typeLabel} · created ${formatDate(tenant.createdAt)}`}
       action={
-        <Link className="admin-button admin-button-secondary" href="/platform/tenants">
-          Back to tenants
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link className="admin-button" href={`/platform/billing/invoices?tenantId=${tenant.id}`}>
+            Invoices
+          </Link>
+          <Link className="admin-button admin-button-secondary" href="/platform/tenants">
+            Back to tenants
+          </Link>
+        </div>
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">

@@ -10,6 +10,7 @@ import type {
   AdminControlStatus,
   AdminEvidenceBundle,
 } from "@aivo/admin-api/compliance";
+import type { TenantInvoice } from "@aivo/admin-api/invoices";
 import { AdminCard, AdminMetricCard } from "@aivo/admin-ui";
 import type { TrialConversionReport } from "@aivo/admin-api/billing";
 import { formatBytes, formatDate, formatDateTime, formatPercent } from "@/components/admin-format";
@@ -55,6 +56,65 @@ export function AuditLogTable({ entries }: { entries: AdminAuditEntry[] }) {
               </tr>
             ))}
             {entries.length === 0 ? <EmptyRow colSpan={5} label="No audit activity recorded yet." /> : null}
+          </tbody>
+        </table>
+      </div>
+    </AdminCard>
+  );
+}
+
+function formatMoney(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${currency.toUpperCase()}`;
+  }
+}
+
+export function InvoicesTable({ invoices }: { invoices: TenantInvoice[] }) {
+  return (
+    <AdminCard className="mt-6 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Paid</th>
+              <th>Date</th>
+              <th>Links</th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoices.map((invoice) => (
+              <tr key={invoice.id}>
+                <td className="font-bold">{invoice.number ?? invoice.id}</td>
+                <td>
+                  <span className="admin-status">{invoice.status}</span>
+                </td>
+                <td>{formatMoney(invoice.amount, invoice.currency)}</td>
+                <td className="text-sm">{formatMoney(invoice.amountPaid, invoice.currency)}</td>
+                <td className="text-sm">{formatDateTime(invoice.date)}</td>
+                <td className="text-sm">
+                  {invoice.url ? (
+                    <a className="font-semibold text-blue-700" href={invoice.url}>
+                      View
+                    </a>
+                  ) : null}
+                  {invoice.pdf ? (
+                    <a className="ml-3 font-semibold text-blue-700" href={invoice.pdf}>
+                      PDF
+                    </a>
+                  ) : null}
+                  {!invoice.url && !invoice.pdf ? "—" : null}
+                </td>
+              </tr>
+            ))}
+            {invoices.length === 0 ? <EmptyRow colSpan={6} label="No invoices found." /> : null}
           </tbody>
         </table>
       </div>

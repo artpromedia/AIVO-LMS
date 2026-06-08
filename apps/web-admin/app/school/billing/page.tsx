@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requirePageRole } from "@aivo/admin-auth";
 import { listBillingAccounts } from "@aivo/admin-api/billing";
 import { AdminPageFrame } from "@aivo/admin-ui";
@@ -12,6 +13,11 @@ export default async function SchoolBillingPage() {
       eyebrow="School"
       title="Billing"
       description="Subscription and seat status for your school."
+      action={
+        <Link className="admin-button admin-button-secondary" href="/school/billing/invoices">
+          View invoices
+        </Link>
+      }
     >
       <BillingAccountsTable accounts={accounts} />
     </AdminPageFrame>

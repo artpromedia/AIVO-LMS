@@ -14,6 +14,10 @@ export function dataGovernanceSvcUrl(): string {
   return process.env.DATA_GOVERNANCE_SVC_URL || "http://localhost:3070";
 }
 
+export function billingSvcUrl(): string {
+  return process.env.BILLING_SVC_URL || "http://localhost:3009";
+}
+
 export function internalServiceToken(): string | null {
   return process.env.INTERNAL_SERVICE_TOKEN || process.env.INTERNAL_SERVICE_KEY || null;
 }

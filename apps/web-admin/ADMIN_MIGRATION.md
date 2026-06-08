@@ -97,6 +97,15 @@ without a DB, in-memory only for tests/dev. Then surfaced them:
 Backend: `data-governance-svc` builds; **37 tests pass**. Frontend: web-admin
 typecheck + lint + tests pass.
 
+## Done — Wave 7 (invoices, proxied to billing-svc)
+
+- **district/billing/invoices**, **school/billing/invoices**,
+  **platform/billing/invoices** (tenant-scoped via `?tenantId=`, linked from
+  tenant detail) ← new `@aivo/admin-api/invoices` module calling **billing-svc**
+  directly (Postgres `invoices` table, synced from Stripe). billing-svc was
+  already DB-backed, so a straight proxy — no conversion needed. Adds
+  `BILLING_SVC_URL` env helper + shared `InvoicesTable`.
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but

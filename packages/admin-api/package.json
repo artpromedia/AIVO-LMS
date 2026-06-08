@@ -50,6 +50,10 @@
       "types": "./dist/identity.d.ts",
       "default": "./dist/identity.js"
     },
+    "./invoices": {
+      "types": "./dist/invoices.d.ts",
+      "default": "./dist/invoices.js"
+    },
     "./leads": {
       "types": "./dist/leads.d.ts",
       "default": "./dist/leads.js"
