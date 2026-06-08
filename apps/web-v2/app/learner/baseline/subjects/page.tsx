@@ -17,8 +17,8 @@ import { newRequestId } from "@/lib/observability/logger";
 
 async function startWithSubjectsAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session || session.role !== "learner" || !session.learnerId) redirect("/login");
   const learnerId = session.learnerId;
   const subjectIds = formData.getAll("subjectIds").map(String).filter(Boolean);

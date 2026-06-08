@@ -469,11 +469,22 @@ The district-pilot persona prompt pack makes "create a pilot for a district and 
 first-class, end-to-end flow, proven by a containerized Playwright journey. **Sprint 0** closes the
 foundational gap **G1 — no real web-v2 session on the pilot path**:
 
-- **Real auth, asserted.** `apps/web-v2/lib/auth/real-session-on-pilot-path.test.ts` pins the
-  load-bearing invariant: when `AUTH_MODE ≠ mock`, `readMockSessionFromCookies()` ignores the
-  `aivo_mock_session` cookie entirely and only materializes the real `aivo_session` snapshot written by
-  the identity-svc-backed login action. A stale mock cookie can never win. (The mock-login BFF already
-  hard-NOs with 404 when mock auth is disabled.)
+- **One session selector.** `apps/web-v2/lib/auth/session.ts` (`getSession()` / `getRequestSession()`)
+  is the single entry point every page guard (`requirePageRole`), BFF guard (`requireSession`), and
+  pilot-path caller now reads through. It picks the source by `AUTH_MODE`: the dev mock fixture
+  (`mock-session.ts`, now **mock-only** and self-guarded) or the real identity-svc session
+  (`identity-session.ts`). No `readMockSessionFromCookies()` remains on the pilot path.
+- **Real session, verified, never fabricated.** `identity-session.ts` verifies the access-token JWT via
+  `@aivo/security` `verifyJWT` when web-v2 holds identity-svc's RS256 public key, and otherwise falls
+  back to the httpOnly `aivo_session` snapshot web-v2 itself wrote at login (server-set, not
+  user-forgeable) for RSC render continuity — RSCs can't mint a fresh token mid-render. It returns
+  `null` rather than inventing a session.
+- **Real login/logout BFF.** `app/api/bff/auth/login/route.ts` proxies credentials to identity-svc,
+  sets the access/refresh/snapshot cookies, and returns `{ session, redirectTo }` with MFA-pending +
+  `mustChangePassword` passthrough; `app/api/bff/auth/logout/route.ts` invalidates the refresh row and
+  clears cookies. Both hard-NO in mock mode. `real-session-on-pilot-path.test.ts` pins that, with
+  `AUTH_MODE ≠ mock`, `getSession()` ignores the `aivo_mock_session` cookie entirely; `env.ts` now
+  requires `IDENTITY_SVC_URL` in production.
 - **Containerized harness.** `docker-compose.e2e.yml` gains a `pilot` profile bringing up `web-v2`
   (`AUTH_MODE=custom`, `AIVO_PERSISTENCE=postgres`) + `billing-svc` + `web-admin`, with
   `IDENTITY_TEST_MODE=1` on identity-svc for the seed helpers. The profile keeps the heavy web builds out

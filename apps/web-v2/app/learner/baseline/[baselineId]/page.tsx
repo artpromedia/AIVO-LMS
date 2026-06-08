@@ -78,8 +78,8 @@ async function assertBaselineMatchesLearner(
 
 async function answerAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session) redirect("/login");
   const baselineId = String(formData.get("baselineId") || "");
   const learnerId = String(formData.get("learnerId") || "");
@@ -128,8 +128,8 @@ async function answerAction(formData: FormData) {
 
 async function completeAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session) redirect("/login");
   const baselineId = String(formData.get("baselineId") || "");
   const learnerId = String(formData.get("learnerId") || "");

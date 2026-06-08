@@ -184,6 +184,11 @@ services:
       COMMS_SVC_URL: http://comms-svc:3010
       SESSION_SECRET: e2e-web-v2-session-secret-32-chars-minimum-len
       NEXT_PUBLIC_APP_URL: http://localhost:5000
+      # getIdentityBaseSession() verifies the access-token JWT when web-v2 holds
+      # identity-svc's RS256 public key. Set JWT_PUBLIC_KEY (matching the key
+      # identity-svc signs with) to make verification authoritative here;
+      # otherwise the reader falls back to the httpOnly login snapshot (still
+      # server-set / not user-forgeable). Both keep the pilot session real.
     depends_on:
       postgres: { condition: service_healthy }
       identity-svc: { condition: service_healthy }

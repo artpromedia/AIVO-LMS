@@ -27,8 +27,8 @@ function asStringArray(raw: string): string[] {
 
 async function addLearnerAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session || session.role !== "parent") redirect("/login");
 
   const raw = {

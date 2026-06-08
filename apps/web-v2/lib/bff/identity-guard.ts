@@ -12,7 +12,7 @@
  */
 import { fail, getRequestId } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import type { SessionProfile } from "@/lib/auth/types";
 
 export type IdentityGuardOk = { session: SessionProfile; requestId: string };
@@ -23,7 +23,7 @@ export async function requireIdentityAdmin(
   req: Request,
 ): Promise<IdentityGuardOk | IdentityGuardErr> {
   const requestId = getRequestId(req);
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) {
     return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
   }

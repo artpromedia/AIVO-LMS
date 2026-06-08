@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { fail, ok, getRequestId } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { recordAudit } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,7 @@ const Schema = z.object({
  */
 export async function POST(req: Request) {
   const requestId = getRequestId(req);
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) {
     return fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId);
   }

@@ -26,8 +26,9 @@ function asSession(partial: Partial<SessionProfile>): SessionProfile {
   } as SessionProfile;
 }
 
-vi.mock("@/lib/auth/mock-session", () => ({
-  readMockSessionFromCookies: vi.fn(async () => currentSession),
+vi.mock("@/lib/auth/session", () => ({
+  getRequestSession: vi.fn(async () => currentSession),
+  getSession: vi.fn(async () => currentSession),
 }));
 vi.mock("@/lib/db/repos", () => ({
   recordAudit: vi.fn(async () => undefined),

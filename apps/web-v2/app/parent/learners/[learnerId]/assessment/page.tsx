@@ -92,8 +92,8 @@ function fieldNumber(
 
 async function saveStepAction(formData: FormData) {
   "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const session = await getSession();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
   const stepNum = Number.parseInt(String(formData.get("step") || "1"), 10);

@@ -2,12 +2,12 @@ import { fail } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { Permission } from "@aivo/security";
 import type { Role, SessionProfile } from "@/lib/auth/types";
-import { getMockSession } from "@/lib/auth/mock-session";
+import { getRequestSession } from "@/lib/auth/session";
 import { sessionHasPermission } from "@/lib/auth/permissions";
 import { parentCanAccessLearner, getLearner } from "@/lib/db/repos";
 
 export async function requireSession(req: Request, requestId: string) {
-  const session = await getMockSession(req);
+  const session = await getRequestSession(req);
   if (!session) {
     return {
       session: null,

@@ -22,6 +22,7 @@ const PROD_GUARD_KEYS = [
   "AIVO_PERSISTENCE",
   "AIVO_PERSISTENCE_AUDIT",
   "TTS_PROVIDER",
+  "IDENTITY_SVC_URL",
 ] as const;
 
 describe("lib/env build-phase relaxation", () => {
@@ -119,6 +120,7 @@ describe("lib/env production fail-closed guards", () => {
     env.AUTH_MODE = "authjs";
     env.AI_PROVIDER = "anthropic";
     env.AIVO_PERSISTENCE = "postgres";
+    env.IDENTITY_SVC_URL = "https://identity.internal:3001";
     delete env.AIVO_PERSISTENCE_AUDIT;
   }
 
@@ -158,6 +160,12 @@ describe("lib/env production fail-closed guards", () => {
     setValidProdBaseline();
     delete env.DATABASE_URL;
     await expect(import("./env?prod-missing-db")).rejects.toThrow(/DATABASE_URL/);
+  });
+
+  it("rejects a missing IDENTITY_SVC_URL in production (real-auth pilot path)", async () => {
+    setValidProdBaseline();
+    delete env.IDENTITY_SVC_URL;
+    await expect(import("./env?prod-missing-identity")).rejects.toThrow(/IDENTITY_SVC_URL/);
   });
 
   it("loads cleanly when every production selector is real", async () => {

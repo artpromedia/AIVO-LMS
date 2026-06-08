@@ -12,7 +12,7 @@
  */
 import { fail, getRequestId } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import { isTeacherRosteringGranted } from "@/lib/db/rostering-grants";
 import { fetchTeacherRosteringGrant } from "@/lib/bff/service-clients/rostering";
 import type { SessionProfile } from "@/lib/auth/types";
@@ -22,7 +22,7 @@ type Err = { err: ReturnType<typeof fail> };
 
 export async function requireSisViewer(req: Request): Promise<Ok | Err> {
   const requestId = getRequestId(req);
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session)
     return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
   if (!["platform_admin", "district_admin", "school_admin"].includes(session.role)) {
@@ -33,7 +33,7 @@ export async function requireSisViewer(req: Request): Promise<Ok | Err> {
 
 export async function requireSisManager(req: Request): Promise<Ok | Err> {
   const requestId = getRequestId(req);
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session)
     return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
   if (session.role !== "platform_admin" && session.role !== "district_admin") {
@@ -87,7 +87,7 @@ const ROSTERING_ROLES: ReadonlyArray<SessionProfile["role"]> = [
 
 export async function requireRosteringActor(req: Request): Promise<Ok | Err> {
   const requestId = getRequestId(req);
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session)
     return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
   if (!ROSTERING_ROLES.includes(session.role)) {

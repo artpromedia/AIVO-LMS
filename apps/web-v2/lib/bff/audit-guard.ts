@@ -13,7 +13,7 @@
  */
 import { fail, getRequestId } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
+import { getSession } from "@/lib/auth/session";
 import type { SessionProfile } from "@/lib/auth/types";
 
 export const SCHOOL_EXPORT_CAP = 10_000;
@@ -32,7 +32,7 @@ type Err = { err: ReturnType<typeof fail> };
 
 export async function requireAuditViewer(req: Request): Promise<Ok | Err> {
   const requestId = getRequestId(req);
-  const session = await readMockSessionFromCookies();
+  const session = await getSession();
   if (!session) {
     return { err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId) };
   }
