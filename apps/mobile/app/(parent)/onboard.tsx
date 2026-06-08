@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAddLearner } from "@/hooks/useLearners";
+import { isFlagOn } from "@/lib/feature-flags";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
@@ -256,6 +257,23 @@ export default function OnboardScreen() {
                     "We'll generate a short adaptive baseline so your child's tutors can personalize from day one.",
                 })}
               </Text>
+
+              {/* Parity with web-v2 Sprint 3: an optional "invite your child's
+                  team" step before the baseline, gated by COLLAB_INVITE_STEP.
+                  Collaborators add their perspective before the brain builds. */}
+              {isFlagOn("COLLAB_INVITE_STEP") && createdLearnerId ? (
+                <AivoButton
+                  title={t("parentOnboard.inviteTeam", {
+                    defaultValue: "Invite your child's team (optional)",
+                  })}
+                  onPress={() => router.push(`/(parent)/team/${createdLearnerId}` as any)}
+                  variant="outline"
+                  size="lg"
+                  icon={<Ionicons name="people" size={18} color={colors.primary} />}
+                  style={{ marginBottom: spacing.sm }}
+                />
+              ) : null}
+
               <AivoButton
                 title={t("parentOnboard.launchBaseline", {
                   defaultValue: "Launch baseline assessment",

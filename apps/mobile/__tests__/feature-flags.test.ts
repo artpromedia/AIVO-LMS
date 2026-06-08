@@ -24,4 +24,15 @@ describe("mobile feature flags", () => {
   it("isFlagOn round-trips the flag value", () => {
     expect(isFlagOn("MOBILE_UNIFIED_APP")).toBe(MOBILE_FLAGS.MOBILE_UNIFIED_APP);
   });
+
+  it("collaborator-invite + visual-brain-build flags are booleans, default off", () => {
+    // Parity with web-v2 (AIVO_FLAG_COLLAB_INVITE_STEP / _VISUAL_BRAIN_BUILD):
+    // both default off in prod until QA.
+    expect(typeof MOBILE_FLAGS.COLLAB_INVITE_STEP).toBe("boolean");
+    expect(typeof MOBILE_FLAGS.VISUAL_BRAIN_BUILD).toBe("boolean");
+    expect(MOBILE_FLAGS.COLLAB_INVITE_STEP).toBe(false);
+    expect(MOBILE_FLAGS.VISUAL_BRAIN_BUILD).toBe(false);
+    expect(isFlagOn("COLLAB_INVITE_STEP")).toBe(false);
+    expect(isFlagOn("VISUAL_BRAIN_BUILD")).toBe(false);
+  });
 });

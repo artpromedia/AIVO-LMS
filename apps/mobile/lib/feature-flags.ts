@@ -34,6 +34,23 @@ export const MOBILE_FLAGS = {
    * (therapist) role groups still ship.
    */
   MOBILE_UNIFIED_APP: parseBoolEnv(process.env.EXPO_PUBLIC_MOBILE_UNIFIED_APP, false),
+
+  /**
+   * Parity with web-v2 AIVO_FLAG_COLLAB_INVITE_STEP. When on, the parent
+   * onboarding surfaces the "Invite your child's team" step (teacher /
+   * caregiver / therapist) before the baseline, so collaborators can add
+   * their perspective before the brain is built. Default off until QA, like
+   * web prod.
+   */
+  COLLAB_INVITE_STEP: parseBoolEnv(process.env.EXPO_PUBLIC_COLLAB_INVITE_STEP, false),
+
+  /**
+   * Parity with web-v2 AIVO_FLAG_VISUAL_BRAIN_BUILD. When on, the brain-clone
+   * watch surface shows an explicit "still building" pending state (with a
+   * refresh) when the clone isn't ready yet, instead of an empty timeline —
+   * so the visual build never looks broken / dead-ended. Default off until QA.
+   */
+  VISUAL_BRAIN_BUILD: parseBoolEnv(process.env.EXPO_PUBLIC_VISUAL_BRAIN_BUILD, false),
 } as const;
 
 export type MobileFlag = keyof typeof MOBILE_FLAGS;
