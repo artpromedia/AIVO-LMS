@@ -372,6 +372,20 @@
       "when": 1781644800000,
       "tag": "0072_web_collaboration",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1781731200000,
+      "tag": "0073_teacher_assignments",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1781817600000,
+      "tag": "0074_teacher_lesson_assignments_rls",
+      "breakpoints": true
     }
   ]
 }

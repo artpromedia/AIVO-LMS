@@ -539,6 +539,64 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
     },
   );
 
+  // ── Mobile-shaped aliases ───────────────────────────────────────────
+  // The mobile app fetches a flat list by userId and marks a single item
+  // read by id. Both read/write the same `parent_in_app_notifications`
+  // table as the web in-app routes above; callers may only act on their
+  // own rows (the path userId must equal the token subject).
+
+  app.get(
+    "/api/comms/notifications/:userId",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const user = (request as any).user;
+      const { userId } = request.params as { userId: string };
+      if (user.sub !== userId && !["PLATFORM_ADMIN", "DISTRICT_ADMIN"].includes(user.role)) {
+        return reply.status(403).send({ error: "Forbidden" });
+      }
+      const { parentInAppNotifications } = await import("@aivo/db");
+      const { desc, eq } = await import("drizzle-orm");
+      const rows = await db
+        .select()
+        .from(parentInAppNotifications)
+        .where(eq(parentInAppNotifications.parentId, userId))
+        .orderBy(desc(parentInAppNotifications.createdAt))
+        .limit(100);
+      // Flat shape the mobile useNotifications hook expects.
+      return rows.map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        body: r.body ?? null,
+        readAt: r.readAt instanceof Date ? r.readAt.toISOString() : r.readAt,
+        createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+        link: r.link ?? null,
+      }));
+    },
+  );
+
+  app.post(
+    "/api/comms/notifications/:id/read",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const user = (request as any).user;
+      const { id } = request.params as { id: string };
+      const { parentInAppNotifications } = await import("@aivo/db");
+      const { and, eq, isNull } = await import("drizzle-orm");
+      const updated = await db
+        .update(parentInAppNotifications)
+        .set({ readAt: new Date() })
+        .where(
+          and(
+            eq(parentInAppNotifications.id, id),
+            eq(parentInAppNotifications.parentId, user.sub),
+            isNull(parentInAppNotifications.readAt),
+          ),
+        )
+        .returning({ id: parentInAppNotifications.id });
+      return { status: "ok", updated: updated.length };
+    },
+  );
+
   app.post(
     "/api/comms/internal/iep-notify",
     { schema: internalIepNotifySchema },
