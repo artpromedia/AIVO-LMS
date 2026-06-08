@@ -194,6 +194,8 @@ const serverSchema = z.object({
   AIVO_PERSISTENCE_SETTINGS: aivoPersistenceOverrideSchema,
   // Sprint 8 remainder — web-owned engagement / sessions / notification prefs.
   AIVO_PERSISTENCE_ENGAGEMENT: aivoPersistenceOverrideSchema,
+  // Sprint 8 remainder — platform-global standards / skill-graph reference.
+  AIVO_PERSISTENCE_STANDARDS: aivoPersistenceOverrideSchema,
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z

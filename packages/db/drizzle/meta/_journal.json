@@ -484,6 +484,13 @@
       "when": 1783027200000,
       "tag": "0088_web_engagement",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1783113600000,
+      "tag": "0089_web_standards",
+      "breakpoints": true
     }
   ]
 }

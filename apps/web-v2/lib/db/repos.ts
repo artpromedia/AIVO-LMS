@@ -1035,7 +1035,7 @@ export async function createBaseline(input: {
   // seeded).
   const perSkillBudget = new Map<string, number>();
   for (const sk of skills) {
-    const bp = getActiveAssessmentBlueprint(sk.id);
+    const bp = await getActiveAssessmentBlueprint(sk.id);
     if (bp) {
       const total = bp.items.reduce((acc, it) => acc + it.count, 0);
       if (total > 0) perSkillBudget.set(sk.id, total);
@@ -1809,8 +1809,8 @@ export async function createLessonRun(
       skill,
       // S26: pass curriculum constraints (active version + objective template)
       // so the generator scopes the plan to the canonical scope of the skill.
-      skillVersion: getCurrentSkillVersion(skill.id),
-      objectiveTemplate: getActiveLessonObjectiveTemplate(skill.id),
+      skillVersion: await getCurrentSkillVersion(skill.id),
+      objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
       mastery: masterySnapshot,
       accommodations: accommodationSnapshot,
       curriculumFocus,
@@ -2408,8 +2408,8 @@ export async function retryLessonRun(
       // S26: keep retries scoped to the same curriculum constraints the
       // initial generation read. Retry reads the *current* version, not the
       // snapshot — a republished v2 should pull the retry forward.
-      skillVersion: getCurrentSkillVersion(skill.id),
-      objectiveTemplate: getActiveLessonObjectiveTemplate(skill.id),
+      skillVersion: await getCurrentSkillVersion(skill.id),
+      objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
       mastery: run.masterySnapshot,
       accommodations: run.accommodationSnapshot,
       source: run.source,
@@ -3778,59 +3778,63 @@ export async function listSubprocessors(): Promise<SubprocessorRecord[]> {
 // per-tenant artifact). Write-side helpers are wrapped in normal create/
 // update functions that mint ids via newId() so BFFs stay thin.
 
-export function listStandardsFrameworks(): StandardsFramework[] {
-  return Array.from(db().standardsFrameworks.values()).sort((a, b) => a.name.localeCompare(b.name));
+export async function listStandardsFrameworks(): Promise<StandardsFramework[]> {
+  return (await getPersistence().standards.listFrameworks()).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 }
 
-export function getStandardsFramework(id: string): StandardsFramework | null {
-  return db().standardsFrameworks.get(id) ?? null;
+export async function getStandardsFramework(id: string): Promise<StandardsFramework | null> {
+  return await getPersistence().standards.getFramework(id);
 }
 
-export function getStandardsFrameworkBySlug(
+export async function getStandardsFrameworkBySlug(
   slug: StandardsFrameworkSlug,
-): StandardsFramework | null {
-  for (const f of db().standardsFrameworks.values()) {
+): Promise<StandardsFramework | null> {
+  for (const f of await getPersistence().standards.listFrameworks()) {
     if (f.slug === slug) return f;
   }
   return null;
 }
 
-export function createStandardsFramework(input: {
+export async function createStandardsFramework(input: {
   slug: StandardsFrameworkSlug;
   name: string;
   issuer: string;
   description: string;
   homepageUrl: string | null;
-}): StandardsFramework {
+}): Promise<StandardsFramework> {
   const rec: StandardsFramework = {
     id: newId("frw"),
     status: "active",
     ...input,
   };
-  db().standardsFrameworks.set(rec.id, rec);
-  return rec;
+  return await getPersistence().standards.upsertFramework(rec);
 }
 
-export function listStandardDocuments(frameworkId?: string): StandardDocument[] {
-  const all = Array.from(db().standardDocuments.values());
+export async function listStandardDocuments(frameworkId?: string): Promise<StandardDocument[]> {
+  const all = await getPersistence().standards.listStandardDocuments();
   return (frameworkId ? all.filter((d) => d.frameworkId === frameworkId) : all).sort((a, b) =>
     a.title.localeCompare(b.title),
   );
 }
 
-export function listStandards(filter?: { frameworkId?: string; documentId?: string }): Standard[] {
-  let all = Array.from(db().standards.values());
+export async function listStandards(filter?: {
+  frameworkId?: string;
+  documentId?: string;
+}): Promise<Standard[]> {
+  let all = await getPersistence().standards.listStandards();
   if (filter?.frameworkId) all = all.filter((s) => s.frameworkId === filter.frameworkId);
   if (filter?.documentId) all = all.filter((s) => s.documentId === filter.documentId);
   return all.sort((a, b) => a.code.localeCompare(b.code));
 }
 
-export function getStandard(id: string): Standard | null {
-  return db().standards.get(id) ?? null;
+export async function getStandard(id: string): Promise<Standard | null> {
+  return await getPersistence().standards.getStandard(id);
 }
 
-export function listDomains(subjectId?: string): Domain[] {
-  const all = Array.from(db().domains.values());
+export async function listDomains(subjectId?: string): Promise<Domain[]> {
+  const all = await getPersistence().standards.listDomains();
   return (subjectId ? all.filter((d) => d.subjectId === subjectId) : all).sort(
     (a, b) => a.orderIndex - b.orderIndex || a.name.localeCompare(b.name),
   );
@@ -3851,14 +3855,15 @@ export async function getSkill(id: string): Promise<Skill | null> {
   return getPersistence().curriculum.getSkillById(id);
 }
 
-export function createSkill(input: {
+export async function createSkill(input: {
   subjectId: string;
   slug: string;
   name: string;
   gradeBand: string;
   prerequisites?: string[];
-}): Skill {
-  if (!db().subjects.get(input.subjectId)) {
+}): Promise<Skill> {
+  const curriculum = getPersistence().curriculum;
+  if (!(await curriculum.getSubjectById(input.subjectId))) {
     throw new Error(`subjectId not found: ${input.subjectId}`);
   }
   const rec: Skill = {
@@ -3869,10 +3874,10 @@ export function createSkill(input: {
     gradeBand: input.gradeBand,
     prerequisites: input.prerequisites ?? [],
   };
-  db().skills.set(rec.id, rec);
+  await curriculum.upsertSkill(rec);
   // Auto-create a v1 SkillVersion so AI gen always finds a current version.
   const svId = newId("skv");
-  db().skillVersions.set(svId, {
+  await getPersistence().standards.upsertSkillVersion({
     id: svId,
     skillId: rec.id,
     version: "1.0",
@@ -3883,34 +3888,42 @@ export function createSkill(input: {
   return rec;
 }
 
-export function updateSkill(
+export async function updateSkill(
   id: string,
   patch: { name?: string; gradeBand?: string; prerequisites?: string[] },
-): Skill | null {
-  const skill = db().skills.get(id);
-  if (!skill) return null;
+): Promise<Skill | null> {
+  const curriculum = getPersistence().curriculum;
+  const existing = await curriculum.getSkillById(id);
+  if (!existing) return null;
+  const skill: Skill = { ...existing };
   if (patch.name !== undefined) skill.name = patch.name;
   if (patch.gradeBand !== undefined) skill.gradeBand = patch.gradeBand;
   if (patch.prerequisites !== undefined) {
-    skill.prerequisites = patch.prerequisites.filter((p) => db().skills.has(p));
+    const checked: string[] = [];
+    for (const p of patch.prerequisites) {
+      if (await curriculum.getSkillById(p)) checked.push(p);
+    }
+    skill.prerequisites = checked;
   }
-  return skill;
+  return await curriculum.upsertSkill(skill);
 }
 
 // ----- Skill prerequisite graph -----
-export function listSkillPrerequisites(skillId?: string): SkillPrerequisite[] {
-  const all = Array.from(db().skillPrerequisites.values());
+export async function listSkillPrerequisites(skillId?: string): Promise<SkillPrerequisite[]> {
+  const all = await getPersistence().standards.listSkillPrerequisites();
   return skillId ? all.filter((p) => p.skillId === skillId) : all;
 }
 
-export function addSkillPrerequisite(input: {
+export async function addSkillPrerequisite(input: {
   skillId: string;
   prerequisiteSkillId: string;
   strength: "hard" | "soft";
   notes?: string | null;
-}): SkillPrerequisite | null {
-  const store = db();
-  if (!store.skills.has(input.skillId) || !store.skills.has(input.prerequisiteSkillId)) {
+}): Promise<SkillPrerequisite | null> {
+  const curriculum = getPersistence().curriculum;
+  const standards = getPersistence().standards;
+  const skillRec = await curriculum.getSkillById(input.skillId);
+  if (!skillRec || !(await curriculum.getSkillById(input.prerequisiteSkillId))) {
     return null;
   }
   if (input.skillId === input.prerequisiteSkillId) return null;
@@ -3920,8 +3933,9 @@ export function addSkillPrerequisite(input: {
   // can drift if an import or backfill writes one but not the other; the
   // SkillPrerequisite table is what addSkillPrerequisite itself owns.)
   // Also refuse duplicate edges so the graph stays a clean DAG.
+  const allEdges = await standards.listSkillPrerequisites();
   const prereqsBySkill = new Map<string, string[]>();
-  for (const edge of store.skillPrerequisites.values()) {
+  for (const edge of allEdges) {
     if (edge.skillId === input.skillId && edge.prerequisiteSkillId === input.prerequisiteSkillId) {
       return null; // duplicate edge
     }
@@ -3947,39 +3961,44 @@ export function addSkillPrerequisite(input: {
     notes: input.notes ?? null,
     createdAt: nowIso(),
   };
-  store.skillPrerequisites.set(rec.id, rec);
-  const skill = store.skills.get(input.skillId)!;
-  if (!skill.prerequisites.includes(input.prerequisiteSkillId)) {
-    skill.prerequisites.push(input.prerequisiteSkillId);
+  await standards.upsertSkillPrerequisite(rec);
+  // Mirror the denormalized fast-read view on the skill.
+  if (!skillRec.prerequisites.includes(input.prerequisiteSkillId)) {
+    await curriculum.upsertSkill({
+      ...skillRec,
+      prerequisites: [...skillRec.prerequisites, input.prerequisiteSkillId],
+    });
   }
   return rec;
 }
 
 // ----- Skill versions -----
-export function listSkillVersions(skillId?: string): SkillVersion[] {
-  const all = Array.from(db().skillVersions.values());
+export async function listSkillVersions(skillId?: string): Promise<SkillVersion[]> {
+  const all = await getPersistence().standards.listSkillVersions();
   return (skillId ? all.filter((v) => v.skillId === skillId) : all).sort((a, b) =>
     b.effectiveAt.localeCompare(a.effectiveAt),
   );
 }
 
-export function getCurrentSkillVersion(skillId: string): SkillVersion | null {
-  for (const v of db().skillVersions.values()) {
+export async function getCurrentSkillVersion(skillId: string): Promise<SkillVersion | null> {
+  for (const v of await getPersistence().standards.listSkillVersions()) {
     if (v.skillId === skillId && v.isCurrent) return v;
   }
   return null;
 }
 
-export function createSkillVersion(input: {
+export async function createSkillVersion(input: {
   skillId: string;
   version: string;
   objectiveSummary: string;
-}): SkillVersion | null {
-  const store = db();
-  if (!store.skills.has(input.skillId)) return null;
-  // Mark prior versions non-current.
-  for (const v of store.skillVersions.values()) {
-    if (v.skillId === input.skillId && v.isCurrent) v.isCurrent = false;
+}): Promise<SkillVersion | null> {
+  const standards = getPersistence().standards;
+  if (!(await getPersistence().curriculum.getSkillById(input.skillId))) return null;
+  // Mark prior versions non-current (persist each flip).
+  for (const v of await standards.listSkillVersions()) {
+    if (v.skillId === input.skillId && v.isCurrent) {
+      await standards.upsertSkillVersion({ ...v, isCurrent: false });
+    }
   }
   const rec: SkillVersion = {
     id: newId("skv"),
@@ -3989,70 +4008,75 @@ export function createSkillVersion(input: {
     objectiveSummary: input.objectiveSummary,
     isCurrent: true,
   };
-  store.skillVersions.set(rec.id, rec);
-  return rec;
+  return await standards.upsertSkillVersion(rec);
 }
 
 // ----- Curriculum maps -----
-export function listCurriculumMaps(skillId?: string): CurriculumMap[] {
-  const all = Array.from(db().curriculumMaps.values());
+export async function listCurriculumMaps(skillId?: string): Promise<CurriculumMap[]> {
+  const all = await getPersistence().standards.listCurriculumMaps();
   return skillId ? all.filter((m) => m.skillId === skillId) : all;
 }
 
-export function addCurriculumMap(input: {
+export async function addCurriculumMap(input: {
   skillId: string;
   domainId: string;
   standardId: string;
   alignment: "primary" | "supports" | "introduces";
-}): CurriculumMap | null {
-  const store = db();
-  if (
-    !store.skills.has(input.skillId) ||
-    !store.domains.get(input.domainId) ||
-    !store.standards.get(input.standardId)
-  ) {
+}): Promise<CurriculumMap | null> {
+  const standards = getPersistence().standards;
+  const [skill, domains, std] = await Promise.all([
+    getPersistence().curriculum.getSkillById(input.skillId),
+    standards.listDomains(),
+    standards.getStandard(input.standardId),
+  ]);
+  if (!skill || !domains.some((d) => d.id === input.domainId) || !std) {
     return null;
   }
   const rec: CurriculumMap = { id: newId("cmp"), ...input };
-  store.curriculumMaps.set(rec.id, rec);
-  return rec;
+  return await standards.upsertCurriculumMap(rec);
 }
 
 // ----- Lesson objective templates -----
-export function listLessonObjectiveTemplates(skillId?: string): LessonObjectiveTemplate[] {
-  const all = Array.from(db().lessonObjectiveTemplates.values());
+export async function listLessonObjectiveTemplates(
+  skillId?: string,
+): Promise<LessonObjectiveTemplate[]> {
+  const all = await getPersistence().standards.listLessonObjectiveTemplates();
   return skillId ? all.filter((t) => t.skillId === skillId) : all;
 }
 
-export function getActiveLessonObjectiveTemplate(skillId: string): LessonObjectiveTemplate | null {
-  for (const t of db().lessonObjectiveTemplates.values()) {
+export async function getActiveLessonObjectiveTemplate(
+  skillId: string,
+): Promise<LessonObjectiveTemplate | null> {
+  for (const t of await getPersistence().standards.listLessonObjectiveTemplates()) {
     if (t.skillId === skillId && t.status === "active") return t;
   }
   return null;
 }
 
 // ----- Assessment blueprints -----
-export function listAssessmentBlueprints(skillId?: string): AssessmentBlueprint[] {
-  const all = Array.from(db().assessmentBlueprints.values());
+export async function listAssessmentBlueprints(skillId?: string): Promise<AssessmentBlueprint[]> {
+  const all = await getPersistence().standards.listAssessmentBlueprints();
   return skillId ? all.filter((b) => b.skillId === skillId) : all;
 }
 
-export function getActiveAssessmentBlueprint(skillId: string): AssessmentBlueprint | null {
-  for (const b of db().assessmentBlueprints.values()) {
+export async function getActiveAssessmentBlueprint(
+  skillId: string,
+): Promise<AssessmentBlueprint | null> {
+  for (const b of await getPersistence().standards.listAssessmentBlueprints()) {
     if (b.skillId === skillId && b.status === "active") return b;
   }
   return null;
 }
 
 // ----- Curriculum import jobs -----
-export function listCurriculumImportJobs(): CurriculumImportJob[] {
-  return Array.from(db().curriculumImportJobs.values()).sort((a, b) =>
+export async function listCurriculumImportJobs(): Promise<CurriculumImportJob[]> {
+  return (await getPersistence().standards.listImportJobs()).sort((a, b) =>
     b.startedAt.localeCompare(a.startedAt),
   );
 }
 
-export function getCurriculumImportJob(id: string): CurriculumImportJob | null {
-  return db().curriculumImportJobs.get(id) ?? null;
+export async function getCurriculumImportJob(id: string): Promise<CurriculumImportJob | null> {
+  return await getPersistence().standards.getImportJob(id);
 }
 
 /**
@@ -4061,20 +4085,19 @@ export function getCurriculumImportJob(id: string): CurriculumImportJob | null {
  * BFF + UI contract stays the same. Counts are based on the framework's
  * current state, so the admin sees a non-zero result.
  */
-export function startCurriculumImportJob(input: {
+export async function startCurriculumImportJob(input: {
   frameworkSlug: StandardsFrameworkSlug;
   source: string;
   requestedByUserId: string;
-}): CurriculumImportJob {
-  const store = db();
-  const framework = getStandardsFrameworkBySlug(input.frameworkSlug);
+}): Promise<CurriculumImportJob> {
+  const standards = getPersistence().standards;
+  const framework = await getStandardsFrameworkBySlug(input.frameworkSlug);
   const frameworkId = framework?.id;
   const docCount = frameworkId
-    ? Array.from(store.standardDocuments.values()).filter((d) => d.frameworkId === frameworkId)
-        .length
+    ? (await standards.listStandardDocuments()).filter((d) => d.frameworkId === frameworkId).length
     : 0;
   const stdCount = frameworkId
-    ? Array.from(store.standards.values()).filter((s) => s.frameworkId === frameworkId).length
+    ? (await standards.listStandards()).filter((s) => s.frameworkId === frameworkId).length
     : 0;
   const rec: CurriculumImportJob = {
     id: newId("cij"),
@@ -4087,8 +4110,7 @@ export function startCurriculumImportJob(input: {
     error: framework ? null : `Unknown framework slug: ${input.frameworkSlug}`,
     requestedByUserId: input.requestedByUserId,
   };
-  store.curriculumImportJobs.set(rec.id, rec);
-  return rec;
+  return await standards.upsertImportJob(rec);
 }
 
 // ===== Sprint 27: AI Safety + Moderation =====

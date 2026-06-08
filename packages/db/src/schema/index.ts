@@ -20,6 +20,7 @@ export * from "./web-audio.js";
 export * from "./web-safety.js";
 export * from "./web-support-settings.js";
 export * from "./web-engagement.js";
+export * from "./web-standards.js";
 export * from "./homework.js";
 export * from "./idempotency.js";
 export * from "./collaboration.js";

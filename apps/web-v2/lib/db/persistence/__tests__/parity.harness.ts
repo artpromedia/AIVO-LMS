@@ -133,6 +133,16 @@ const TABLES = [
   "web_learner_engagement",
   "web_learner_badges",
   "web_learner_sensory_profiles",
+  "web_standards_frameworks",
+  "web_standard_documents",
+  "web_standards",
+  "web_domains",
+  "web_skill_prerequisites",
+  "web_skill_versions",
+  "web_curriculum_maps",
+  "web_lesson_objective_templates",
+  "web_assessment_blueprints",
+  "web_curriculum_import_jobs",
 ] as const;
 
 const POSTGRES_ENABLED =

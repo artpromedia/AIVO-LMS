@@ -102,6 +102,16 @@ import {
   webLearnerEngagement,
   webLearnerBadges,
   webLearnerSensoryProfiles,
+  webStandardsFrameworks,
+  webStandardDocuments,
+  webStandards,
+  webDomains,
+  webSkillPrerequisites,
+  webSkillVersions,
+  webCurriculumMaps,
+  webLessonObjectiveTemplates,
+  webAssessmentBlueprints,
+  webCurriculumImportJobs,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -922,6 +932,17 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
   await log("learnerEngagement", await bulk(db, webLearnerEngagement, vals(s.learnerEngagement).map((x) => ({ learnerId: x.learnerId, tenantId: x.tenantId, data: x })), webLearnerEngagement.learnerId));
   await log("learnerBadges", await bulk(db, webLearnerBadges, vals(s.learnerBadges).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webLearnerBadges.id));
   await log("learnerSensoryProfiles", await bulk(db, webLearnerSensoryProfiles, vals(s.learnerSensoryProfiles).map((x) => ({ learnerId: x.learnerId, tenantId: x.tenantId, data: x })), webLearnerSensoryProfiles.learnerId));
+  // ── Sprint 8 remainder: standards / skill-graph reference ───────────
+  await log("standardsFrameworks", await bulk(db, webStandardsFrameworks, vals(s.standardsFrameworks).map((x) => ({ id: x.id, data: x })), webStandardsFrameworks.id));
+  await log("standardDocuments", await bulk(db, webStandardDocuments, vals(s.standardDocuments).map((x) => ({ id: x.id, data: x })), webStandardDocuments.id));
+  await log("standards", await bulk(db, webStandards, vals(s.standards).map((x) => ({ id: x.id, data: x })), webStandards.id));
+  await log("domains", await bulk(db, webDomains, vals(s.domains).map((x) => ({ id: x.id, data: x })), webDomains.id));
+  await log("skillPrerequisites", await bulk(db, webSkillPrerequisites, vals(s.skillPrerequisites).map((x) => ({ id: x.id, data: x })), webSkillPrerequisites.id));
+  await log("skillVersions", await bulk(db, webSkillVersions, vals(s.skillVersions).map((x) => ({ id: x.id, data: x })), webSkillVersions.id));
+  await log("curriculumMaps", await bulk(db, webCurriculumMaps, vals(s.curriculumMaps).map((x) => ({ id: x.id, data: x })), webCurriculumMaps.id));
+  await log("lessonObjectiveTemplates", await bulk(db, webLessonObjectiveTemplates, vals(s.lessonObjectiveTemplates).map((x) => ({ id: x.id, data: x })), webLessonObjectiveTemplates.id));
+  await log("assessmentBlueprints", await bulk(db, webAssessmentBlueprints, vals(s.assessmentBlueprints).map((x) => ({ id: x.id, data: x })), webAssessmentBlueprints.id));
+  await log("curriculumImportJobs", await bulk(db, webCurriculumImportJobs, vals(s.curriculumImportJobs).map((x) => ({ id: x.id, data: x })), webCurriculumImportJobs.id));
   await log(
     "lessonParentSummaries",
     await bulk(

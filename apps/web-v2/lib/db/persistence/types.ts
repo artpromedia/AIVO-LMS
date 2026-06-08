@@ -21,6 +21,16 @@ import type {
   BaselineQuestion,
   BillingAccount,
   AiGenerationJob,
+  AssessmentBlueprint,
+  CurriculumImportJob,
+  CurriculumMap,
+  Domain,
+  LessonObjectiveTemplate,
+  SkillPrerequisite,
+  SkillVersion,
+  Standard,
+  StandardDocument,
+  StandardsFramework,
   CalmSessionRecord,
   DigestSchedule,
   HomeworkHelpSession,
@@ -376,6 +386,8 @@ export interface CurriculumStore {
   getSubjectById(subjectId: string): Promise<Subject | null>;
   listSkills(subjectId?: string): Promise<Skill[]>;
   getSkillById(skillId: string): Promise<Skill | null>;
+  /** Sprint 8 remainder: insert/replace a skill (skill-graph authoring). */
+  upsertSkill(skill: Skill): Promise<Skill>;
 
   getMasteryMapForLearner(
     learnerId: string,
@@ -745,6 +757,34 @@ export interface SettingsStore {
   listPlatformWebhookEndpoints(): Promise<PlatformWebhookEndpoint[]>;
 }
 
+/**
+ * Standards / skill-graph domain (Sprint 8 remainder) — platform-global
+ * curriculum-standards reference + skill-graph metadata. Filtering/sorting +
+ * active-version/template selection stay in repos; the store is a row store.
+ * No RLS. Per-learner curriculum uploads / term syllabi are tutor-svc-owned
+ * (REST) and not part of this store.
+ */
+export interface StandardsStore {
+  listFrameworks(): Promise<StandardsFramework[]>;
+  getFramework(id: string): Promise<StandardsFramework | null>;
+  upsertFramework(f: StandardsFramework): Promise<StandardsFramework>;
+  listStandardDocuments(): Promise<StandardDocument[]>;
+  listStandards(): Promise<Standard[]>;
+  getStandard(id: string): Promise<Standard | null>;
+  listDomains(): Promise<Domain[]>;
+  listSkillPrerequisites(): Promise<SkillPrerequisite[]>;
+  upsertSkillPrerequisite(p: SkillPrerequisite): Promise<SkillPrerequisite>;
+  listSkillVersions(): Promise<SkillVersion[]>;
+  upsertSkillVersion(v: SkillVersion): Promise<SkillVersion>;
+  listCurriculumMaps(): Promise<CurriculumMap[]>;
+  upsertCurriculumMap(m: CurriculumMap): Promise<CurriculumMap>;
+  listLessonObjectiveTemplates(): Promise<LessonObjectiveTemplate[]>;
+  listAssessmentBlueprints(): Promise<AssessmentBlueprint[]>;
+  listImportJobs(): Promise<CurriculumImportJob[]>;
+  getImportJob(id: string): Promise<CurriculumImportJob | null>;
+  upsertImportJob(j: CurriculumImportJob): Promise<CurriculumImportJob>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -768,6 +808,7 @@ export interface Persistence {
   support: SupportStore;
   settings: SettingsStore;
   engagement: EngagementStore;
+  standards: StandardsStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

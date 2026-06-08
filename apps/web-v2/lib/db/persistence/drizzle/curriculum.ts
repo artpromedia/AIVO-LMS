@@ -44,6 +44,17 @@ export const drizzleCurriculum: CurriculumStore = {
     return row ? (row.data as Skill) : null;
   },
 
+  async upsertSkill(skill) {
+    await getDb()
+      .insert(webSkills)
+      .values({ id: skill.id, subjectId: skill.subjectId ?? null, data: skill })
+      .onConflictDoUpdate({
+        target: webSkills.id,
+        set: { subjectId: skill.subjectId ?? null, data: skill },
+      });
+    return skill;
+  },
+
   async getMasteryMapForLearner(learnerId, tenantId) {
     const db = getDb();
     const [mapRow] = await db

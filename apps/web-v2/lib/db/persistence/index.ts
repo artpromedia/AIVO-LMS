@@ -54,6 +54,8 @@ import { memorySupport, memorySettings } from "./memory/support-settings";
 import { drizzleSupport, drizzleSettings } from "./drizzle/support-settings";
 import { memoryEngagement } from "./memory/engagement";
 import { drizzleEngagement } from "./drizzle/engagement";
+import { memoryStandards } from "./memory/standards";
+import { drizzleStandards } from "./drizzle/standards";
 
 type DomainKey =
   | "notifications"
@@ -76,7 +78,8 @@ type DomainKey =
   | "safety"
   | "support"
   | "settings"
-  | "engagement";
+  | "engagement"
+  | "standards";
 
 /**
  * Test-only global mode override. Set by the parity harness
@@ -118,6 +121,7 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     support: serverEnv.AIVO_PERSISTENCE_SUPPORT,
     settings: serverEnv.AIVO_PERSISTENCE_SETTINGS,
     engagement: serverEnv.AIVO_PERSISTENCE_ENGAGEMENT,
+    standards: serverEnv.AIVO_PERSISTENCE_STANDARDS,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -201,6 +205,7 @@ export function getPersistence(): Persistence {
   const supportMode = resolveMode("support");
   const settingsMode = resolveMode("settings");
   const engagementMode = resolveMode("engagement");
+  const standardsMode = resolveMode("standards");
   warnOnModeMismatch(assessmentsMode, brainProfilesMode);
   assertAssessmentsBrainSameMode(assessmentsMode, brainProfilesMode);
   cached = {
@@ -230,6 +235,7 @@ export function getPersistence(): Persistence {
     support: supportMode === "postgres" ? drizzleSupport : memorySupport,
     settings: settingsMode === "postgres" ? drizzleSettings : memorySettings,
     engagement: engagementMode === "postgres" ? drizzleEngagement : memoryEngagement,
+    standards: standardsMode === "postgres" ? drizzleStandards : memoryStandards,
   };
   return cached;
 }

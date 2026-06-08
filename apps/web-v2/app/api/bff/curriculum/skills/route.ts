@@ -38,14 +38,16 @@ export async function GET(req: Request): Promise<NextResponse> {
     const url = new URL(req.url);
     const subjectId = url.searchParams.get("subjectId") ?? undefined;
     const skills = await listSkills(subjectId);
-    const enriched = skills.map((s) => ({
-      ...s,
-      currentVersion: getCurrentSkillVersion(s.id),
-      prereqEdges: listSkillPrerequisites(s.id),
-      hasObjectiveTemplate: listLessonObjectiveTemplates(s.id).length > 0,
-      hasAssessmentBlueprint: listAssessmentBlueprints(s.id).length > 0,
-      mappedStandards: listCurriculumMaps(s.id).length,
-    }));
+    const enriched = await Promise.all(
+      skills.map(async (s) => ({
+        ...s,
+        currentVersion: await getCurrentSkillVersion(s.id),
+        prereqEdges: await listSkillPrerequisites(s.id),
+        hasObjectiveTemplate: (await listLessonObjectiveTemplates(s.id)).length > 0,
+        hasAssessmentBlueprint: (await listAssessmentBlueprints(s.id)).length > 0,
+        mappedStandards: (await listCurriculumMaps(s.id)).length,
+      })),
+    );
     return ok({ skills: enriched }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -86,7 +88,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const rec = createSkill(parsed.data);
+    const rec = await createSkill(parsed.data);
     audit(session!, "curriculum.skill.created", requestId, {
       metadata: { skillId: rec.id, slug: rec.slug },
     });
