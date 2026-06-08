@@ -70,6 +70,11 @@ export const drizzleCollaboration: CollaborationStore = {
   },
 
   async listAcceptedMembers(learnerId, tenantId) {
+    const all = await this.listMembersForLearner(learnerId, tenantId);
+    return all.filter((m) => m.status === "accepted");
+  },
+
+  async listMembersForLearner(learnerId, tenantId) {
     return withTenantContext(tenantId, async () => {
       const rows = await getDb()
         .select()
@@ -81,9 +86,18 @@ export const drizzleCollaboration: CollaborationStore = {
           ),
         )
         .orderBy(desc(webCollaboratorMembers.id));
-      return rows
-        .map((r) => r.data as CollaboratorMember)
-        .filter((m) => m.status === "accepted");
+      return rows.map((r) => r.data as CollaboratorMember);
+    });
+  },
+
+  async listMembersForTenant(tenantId) {
+    return withTenantContext(tenantId, async () => {
+      const rows = await getDb()
+        .select()
+        .from(webCollaboratorMembers)
+        .where(eq(webCollaboratorMembers.tenantId, tenantId))
+        .orderBy(desc(webCollaboratorMembers.id));
+      return rows.map((r) => r.data as CollaboratorMember);
     });
   },
 };

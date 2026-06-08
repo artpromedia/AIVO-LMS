@@ -6644,14 +6644,14 @@ export interface TherapistCaseloadEntry {
   nextSessionIso: string | null;
 }
 
-export function listTherapistCaseload(
+export async function listTherapistCaseload(
   therapistUserId: string,
   therapistEmail: string,
   tenantId: string,
-): TherapistCaseloadEntry[] {
+): Promise<TherapistCaseloadEntry[]> {
   const store = db();
   const learnerIds = new Set<string>(
-    listLearnersForTeamMember(therapistUserId, therapistEmail, "therapist"),
+    await listLearnersForTeamMember(therapistUserId, therapistEmail, "therapist", tenantId),
   );
   const goalsByLearner = new Map<string, import("./types").IepGoalRecord[]>();
   for (const g of Array.from(store.iepGoalRecords.values())) {

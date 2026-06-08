@@ -89,5 +89,18 @@ export function collaborationStoreContract(
       await store.upsertMember(member({ id: "cm_1", status: "accepted" }));
       expect((await store.listAcceptedMembers("lrn_1", T)).map((m) => m.id)).toEqual(["cm_1"]);
     });
+
+    it("listMembersForLearner returns every status; listMembersForTenant spans learners", async () => {
+      await store.upsertMember(member({ id: "cm_a", learnerId: "lrn_1", status: "pending" }));
+      await store.upsertMember(member({ id: "cm_b", learnerId: "lrn_1", status: "revoked" }));
+      await store.upsertMember(member({ id: "cm_c", learnerId: "lrn_2", status: "accepted" }));
+
+      const forLearner = await store.listMembersForLearner("lrn_1", T);
+      expect(forLearner.map((m) => m.id).sort()).toEqual(["cm_a", "cm_b"]);
+
+      const forTenant = await store.listMembersForTenant(T);
+      expect(forTenant.map((m) => m.id).sort()).toEqual(["cm_a", "cm_b", "cm_c"]);
+      expect(await store.listMembersForTenant("t_other")).toEqual([]);
+    });
   });
 }

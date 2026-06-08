@@ -39,4 +39,20 @@ export const memoryCollaboration: CollaborationStore = {
     }
     return out;
   },
+
+  async listMembersForLearner(learnerId, tenantId) {
+    const out: CollaboratorMember[] = [];
+    for (const m of getStore().collaboratorMembers.values()) {
+      if (m.learnerId === learnerId && m.tenantId === tenantId) out.push(m);
+    }
+    return out;
+  },
+
+  async listMembersForTenant(tenantId) {
+    const out: CollaboratorMember[] = [];
+    for (const m of getStore().collaboratorMembers.values()) {
+      if (m.tenantId === tenantId) out.push(m);
+    }
+    return out;
+  },
 };

@@ -121,7 +121,7 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
     );
   }
 
-  const pending = listPendingInvitesForEmail(session.email);
+  const pending = await listPendingInvitesForEmail(session.email, session.tenantId);
   const continueHref = ROLE_HOME[session.role] ?? "/parent/home";
 
   return (

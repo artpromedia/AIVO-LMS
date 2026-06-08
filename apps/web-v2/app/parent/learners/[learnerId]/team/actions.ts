@@ -33,10 +33,10 @@ export async function inviteTeamMemberAction(
   if (!learnerId || !role) {
     return { ok: false, error: "Missing learner or role." };
   }
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     return { ok: false, error: "You do not have access to that learner." };
   }
-  const result = createInvite({
+  const result = await createInvite({
     role,
     tenantId: session.tenantId,
     learnerId,
@@ -67,7 +67,7 @@ export async function completeTeamInviteStepAction(formData: FormData): Promise<
   if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
-  const team = getCareTeam(learnerId);
+  const team = await getCareTeam(learnerId, session.tenantId);
   const inviteCount = team.teachers.length + team.caregivers.length + team.therapists.length;
   const decision: "done" | "skipped" =
     intent === "skip" ? "skipped" : inviteCount > 0 ? "done" : "skipped";
@@ -86,7 +86,7 @@ export async function revokeTeamMemberAction(formData: FormData): Promise<void> 
   const inviteId = String(formData.get("inviteId") ?? "");
   const role = asRole(formData.get("role"));
   if (!learnerId || !inviteId || !role) return;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) return;
-  revokeInvite(role, inviteId, learnerId);
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) return;
+  await revokeInvite(role, inviteId, learnerId, session.tenantId);
   revalidatePath(`/parent/learners/${learnerId}/team`);
 }

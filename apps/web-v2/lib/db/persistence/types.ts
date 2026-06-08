@@ -435,6 +435,10 @@ export interface CollaborationStore {
   upsertMember(member: CollaboratorMember): Promise<CollaboratorMember>;
   /** Accepted members for a learner (pending/declined/revoked excluded). */
   listAcceptedMembers(learnerId: string, tenantId: string): Promise<CollaboratorMember[]>;
+  /** Every member row for a learner, any status (the care-team view). */
+  listMembersForLearner(learnerId: string, tenantId: string): Promise<CollaboratorMember[]>;
+  /** Every member row in a tenant — caller filters by user/email/role. */
+  listMembersForTenant(tenantId: string): Promise<CollaboratorMember[]>;
 }
 
 export interface Persistence {

@@ -169,7 +169,10 @@ export default async function ParentTeamPage({
       ) : null}
 
       <SectionHeader title={t("invite_member")} />
-      <TeamInviteSection learnerId={learner.id} careTeam={getCareTeam(learner.id)} />
+      <TeamInviteSection
+        learnerId={learner.id}
+        careTeam={await getCareTeam(learner.id, session.tenantId)}
+      />
 
       <SectionHeader title={`${list.length} member${list.length === 1 ? "" : "s"}`} />
       {list.length === 0 ? (

@@ -145,9 +145,9 @@ describe("listTherapistCaseload", () => {
     ensureSeeded();
   });
 
-  it("returns an empty list when the therapist has no accepted invites", () => {
+  it("returns an empty list when the therapist has no accepted invites", async () => {
     const tenantId = Array.from(getStore().tenants.values())[0]!.id;
-    const out = listTherapistCaseload("nonexistent-user", "nobody@example.com", tenantId);
+    const out = await listTherapistCaseload("nonexistent-user", "nobody@example.com", tenantId);
     expect(out).toEqual([]);
   });
 });

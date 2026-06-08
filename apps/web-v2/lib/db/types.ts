@@ -215,6 +215,14 @@ export type CollaboratorMember = {
   status: CollaboratorMemberStatus;
   acceptedAt: ISODate | null;
   createdAt: ISODate;
+  /** Sprint 3 fold-in: care-team invite metadata (was lib/db/team-invites). */
+  invitedBy?: ID;
+  /** caregiver-only — free-form ("Co-parent", "Grandparent", …). */
+  relationship?: string | null;
+  /** therapist-only. */
+  specialty?: string | null;
+  /** therapist-only. */
+  credentials?: string | null;
 };
 
 /**
