@@ -14,6 +14,7 @@
     "@aivo/content-pack": "workspace:*",
     "@aivo/db": "workspace:*",
     "@aivo/enterprise-core": "workspace:*",
+    "@aivo/feature-flags": "workspace:*",
     "@aivo/observability": "workspace:*",
     "@aivo/ops-alerts": "workspace:*",
     "@aivo/scheduling": "workspace:*",

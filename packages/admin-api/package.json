@@ -34,6 +34,10 @@
       "types": "./dist/content.d.ts",
       "default": "./dist/content.js"
     },
+    "./feature-flags": {
+      "types": "./dist/feature-flags.d.ts",
+      "default": "./dist/feature-flags.js"
+    },
     "./jobs": {
       "types": "./dist/jobs.d.ts",
       "default": "./dist/jobs.js"

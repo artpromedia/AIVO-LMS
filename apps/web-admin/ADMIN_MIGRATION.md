@@ -47,6 +47,25 @@ School-scoped routes derive `:schoolId` from `session.tenantId`.
   resend/revoke) + `@aivo/admin-api/scim` (per-tenant SCIM tokens). Platform-admin only.
 - **platform/content (+[id])** ← `@aivo/admin-api/content` (`/api/admin/content-cms/packs`).
 
+## Done — Wave 4 (first full-stack slice: new admin-svc endpoint)
+
+Proves the end-to-end backend-migration pattern for domains with no existing
+admin-svc endpoint:
+
+- **platform/feature-flags** — new `admin-svc` route
+  `GET /api/admin-svc/feature-flags` (resolves `@aivo/feature-flags` metadata +
+  sprint flags against env, ported from web-v2's BFF) → new
+  `@aivo/admin-api/feature-flags` module → page. Stateless (env-driven), no DB.
+
+**Pattern for remaining full-stack domains:** (1) add/port the data source into
+`admin-svc` (route, and for stateful domains a Drizzle schema + repo +
+migration — or a proxy to the real owning service, e.g. `integration-svc` for
+SIS), (2) register in `services/admin-svc/src/index.ts`, (3) add an
+`@aivo/admin-api/<domain>` module, (4) build the page(s), (5) wire nav. Note:
+several web-v2 admin stores (e.g. `lib/db/sis-store`) were **in-memory mocks** —
+the real backend is the owning service, so prefer proxying it over copying mock
+data.
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but
