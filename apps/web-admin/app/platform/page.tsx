@@ -2,6 +2,32 @@ import Link from "next/link";
 import { ROLE_LABEL, requirePlatformPage } from "@aivo/admin-auth";
 import { getPlatformSystemHealth } from "@aivo/admin-api/platform";
 import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminNavGrid } from "@/components/admin-nav";
+
+const PLATFORM_NAV = [
+  {
+    href: "/platform/system-health",
+    title: "System health",
+    description: "Live tenant, learning, and AI-usage signals.",
+  },
+  { href: "/platform/tenants", title: "Tenants", description: "Districts, schools, and families." },
+  { href: "/platform/users", title: "Users", description: "Admin, educator, and guardian accounts." },
+  { href: "/platform/learners", title: "Learners", description: "Learner profiles across tenants." },
+  { href: "/platform/billing", title: "Billing", description: "Accounts and trial conversion." },
+  {
+    href: "/platform/compliance",
+    title: "Compliance",
+    description: "Controls and evidence bundles.",
+  },
+  { href: "/platform/safety", title: "Safety", description: "AI content moderation queue." },
+  { href: "/platform/ai-costs", title: "AI costs", description: "Per-tenant spend and budget caps." },
+  { href: "/platform/audit", title: "Audit log", description: "Hash-chained admin action history." },
+  {
+    href: "/platform/settings/api-keys",
+    title: "API keys",
+    description: "Service credentials and rotation.",
+  },
+];
 
 export default async function PlatformPage() {
   const session = await requirePlatformPage("platform:read");
@@ -75,6 +101,8 @@ export default async function PlatformPage() {
           </Link>
         ) : null}
       </AdminCard>
+
+      <AdminNavGrid heading="Operations" items={PLATFORM_NAV} />
     </AdminPageFrame>
   );
 }
