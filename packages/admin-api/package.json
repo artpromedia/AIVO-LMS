@@ -30,6 +30,10 @@
       "types": "./dist/compliance.d.ts",
       "default": "./dist/compliance.js"
     },
+    "./content": {
+      "types": "./dist/content.d.ts",
+      "default": "./dist/content.js"
+    },
     "./jobs": {
       "types": "./dist/jobs.d.ts",
       "default": "./dist/jobs.js"

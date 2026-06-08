@@ -13,6 +13,12 @@ const PLATFORM_NAV = [
   { href: "/platform/tenants", title: "Tenants", description: "Districts, schools, and families." },
   { href: "/platform/users", title: "Users", description: "Admin, educator, and guardian accounts." },
   { href: "/platform/learners", title: "Learners", description: "Learner profiles across tenants." },
+  {
+    href: "/platform/identity",
+    title: "Identity",
+    description: "District invites and SCIM provisioning.",
+  },
+  { href: "/platform/content", title: "Content packs", description: "Versioned activity bundles." },
   { href: "/platform/billing", title: "Billing", description: "Accounts and trial conversion." },
   {
     href: "/platform/compliance",

@@ -4,6 +4,7 @@ export * from "./billing.js";
 export * from "./classrooms.js";
 export * from "./client.js";
 export * from "./compliance.js";
+export * from "./content.js";
 export * from "./identity.js";
 export * from "./jobs.js";
 export * from "./leads.js";

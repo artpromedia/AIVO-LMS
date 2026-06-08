@@ -41,6 +41,12 @@ Already present before this wave: `login`, `login/mfa`, `district` (setup),
 
 School-scoped routes derive `:schoolId` from `session.tenantId`.
 
+## Done — Wave 3 (more existing backends surfaced)
+
+- **platform/identity (+[tenantId])** ← `@aivo/admin-api/identity` (district invites,
+  resend/revoke) + `@aivo/admin-api/scim` (per-tenant SCIM tokens). Platform-admin only.
+- **platform/content (+[id])** ← `@aivo/admin-api/content` (`/api/admin/content-cms/packs`).
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but
