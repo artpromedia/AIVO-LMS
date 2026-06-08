@@ -462,3 +462,27 @@ the deploy gate (the repo already has `release-gate.mjs` → `prod:check` + `pro
 All production-readiness integration tests pass (5/5). This converts the runtime guards into deploy-time
 guarantees and is the pattern the remaining provider/store-secret work should follow: build the adapter,
 register its secret + value gate, ship a conformance test — never commit fake values or unverified scaffolds.
+
+## 10. District-pilot pack — Sprint 0 (G1: real web-v2 session, no mock on the pilot path)
+
+The district-pilot persona prompt pack makes "create a pilot for a district and some parents" a
+first-class, end-to-end flow, proven by a containerized Playwright journey. **Sprint 0** closes the
+foundational gap **G1 — no real web-v2 session on the pilot path**:
+
+- **Real auth, asserted.** `apps/web-v2/lib/auth/real-session-on-pilot-path.test.ts` pins the
+  load-bearing invariant: when `AUTH_MODE ≠ mock`, `readMockSessionFromCookies()` ignores the
+  `aivo_mock_session` cookie entirely and only materializes the real `aivo_session` snapshot written by
+  the identity-svc-backed login action. A stale mock cookie can never win. (The mock-login BFF already
+  hard-NOs with 404 when mock auth is disabled.)
+- **Containerized harness.** `docker-compose.e2e.yml` gains a `pilot` profile bringing up `web-v2`
+  (`AUTH_MODE=custom`, `AIVO_PERSISTENCE=postgres`) + `billing-svc` + `web-admin`, with
+  `IDENTITY_TEST_MODE=1` on identity-svc for the seed helpers. The profile keeps the heavy web builds out
+  of the existing Sprint 12 `up --wait`.
+- **Journey skeleton.** `e2e/specs/district-pilot/district-pilot.spec.ts` runs the Sprint 0 slice (a
+  pilot parent signs in for real and lands on `/parent/home` with a real session, no mock cookie) and
+  declares sprints 1–4 as `test.fixme` stages each later sprint un-`fixme`s.
+- **CI gate.** `.github/workflows/district-pilot-e2e.yml` runs the slice against service containers,
+  path-gated to the journey's surfaces.
+
+Run it: `pnpm e2e -- specs/district-pilot` against the `pilot` profile (see
+`docs/runbooks/district-onboarding.md`).

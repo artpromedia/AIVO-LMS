@@ -1,0 +1,100 @@
+name: district-pilot-e2e
+
+# Containerized proof for the district-pilot journey (persona prompt pack).
+# Brings up the Dockerized harness (postgres + identity-svc + web-v2) from the
+# `pilot` profile of docker-compose.e2e.yml, applies migrations, seeds the
+# web_* reference data, and runs the district-pilot Playwright slice.
+#
+# Sprint 0 (G1): a pilot parent signs in to web-v2 with a real identity-svc
+# session — no mock on the path. Later sprints extend the `up` line below to
+# add billing-svc + web-admin and un-fixme their journey stages.
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  district-pilot:
+    name: District pilot e2e (compose harness)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Detect district-pilot changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            pilot:
+              - 'apps/web-v2/**'
+              - 'apps/web-admin/**'
+              - 'services/identity-svc/**'
+              - 'services/billing-svc/**'
+              - 'services/comms-svc/**'
+              - 'packages/db/**'
+              - 'e2e/lib/pilot.ts'
+              - 'e2e/lib/fixtures.ts'
+              - 'e2e/specs/district-pilot/**'
+              - 'docker-compose.e2e.yml'
+              - 'apps/web-v2/Dockerfile'
+              - '.github/workflows/district-pilot-e2e.yml'
+
+      - name: Skip when no district-pilot changes
+        if: steps.filter.outputs.pilot != 'true'
+        run: echo "No district-pilot-relevant changes — skipping."
+
+      - name: Install dependencies
+        if: steps.filter.outputs.pilot == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Bring up postgres (migrate before services boot)
+        if: steps.filter.outputs.pilot == 'true'
+        run: docker compose -f docker-compose.e2e.yml up -d postgres --wait
+
+      - name: Apply migrations to e2e database
+        if: steps.filter.outputs.pilot == 'true'
+        env:
+          DATABASE_URL: postgresql://aivo:aivo@localhost:55433/aivo_e2e
+        run: pnpm --filter @aivo/db run db:migrate
+
+      - name: Seed web_* reference data (web-v2 postgres persistence)
+        if: steps.filter.outputs.pilot == 'true'
+        env:
+          AIVO_SEED_DATABASE_URL: postgresql://aivo:aivo@localhost:55433/aivo_e2e
+        run: pnpm --filter @aivo/web-v2 db:seed:postgres
+
+      - name: Bring up pilot harness (identity-svc + web-v2)
+        if: steps.filter.outputs.pilot == 'true'
+        # Sprint 0 brings up the slice the journey currently exercises. Later
+        # sprints append `billing-svc web-admin` to this line.
+        run: >
+          docker compose -f docker-compose.e2e.yml --profile pilot up -d --build --wait
+          postgres identity-svc web-v2
+          || (docker compose -f docker-compose.e2e.yml --profile pilot logs && exit 1)
+
+      - name: Install Playwright browsers
+        if: steps.filter.outputs.pilot == 'true'
+        run: pnpm --filter @aivo/e2e exec playwright install --with-deps chromium
+
+      - name: Run district-pilot e2e slice
+        if: steps.filter.outputs.pilot == 'true'
+        env:
+          WEB_BASE_URL: http://localhost:5000
+          IDENTITY_BASE_URL: http://localhost:3001
+        run: pnpm --filter @aivo/e2e exec playwright test specs/district-pilot --reporter=line
+
+      - name: Dump logs on failure
+        if: failure() && steps.filter.outputs.pilot == 'true'
+        run: docker compose -f docker-compose.e2e.yml --profile pilot logs --no-color
+
+      - name: Tear down
+        if: always() && steps.filter.outputs.pilot == 'true'
+        run: docker compose -f docker-compose.e2e.yml --profile pilot down -v

@@ -68,3 +68,35 @@ then retry completion. Inspect `GET /api/district/setup` for the current counts 
 - Prometheus counters: `identity_district_invites_created_total`,
   `identity_district_invites_accepted_total`, `identity_district_invites_revoked_total`.
 - Structured logger: `identity-svc.district-onboarding`.
+
+## District-pilot e2e harness (no mock on the pilot path)
+
+The district-pilot journey — platform admin provisions a pilot → district admin
+adds a school → parents are invited into the district tenant → each parent logs
+in for real, creates a learner under the seat cap, and completes consent — is
+proven end-to-end against a Dockerized stack, never the mock session.
+
+**Harness:** the `pilot` profile of `docker-compose.e2e.yml` brings up
+`postgres` + `identity-svc` (`IDENTITY_TEST_MODE=1`) + `web-v2`
+(`AUTH_MODE=custom`, `AIVO_PERSISTENCE=postgres`), with `billing-svc` and
+`web-admin` defined for the later sprints. Because `AUTH_MODE=custom` is a
+production-grade provider value, `readMockSessionFromCookies()` only honors the
+real `aivo_session` snapshot — the `aivo_mock_session` cookie and the
+`/api/bff/auth/mock-login` endpoint are hard-disabled.
+
+**Run locally:**
+
+```bash
+docker compose -f docker-compose.e2e.yml --profile pilot up -d --build --wait \
+  postgres identity-svc web-v2
+pnpm --filter @aivo/db run db:migrate
+AIVO_SEED_DATABASE_URL=postgresql://aivo:aivo@localhost:55433/aivo_e2e \
+  pnpm --filter @aivo/web-v2 db:seed:postgres
+pnpm e2e -- specs/district-pilot
+docker compose -f docker-compose.e2e.yml --profile pilot down -v
+```
+
+**CI:** `.github/workflows/district-pilot-e2e.yml` runs the same against service
+containers, path-gated to the surfaces the journey touches. The journey spec
+lives at `e2e/specs/district-pilot/district-pilot.spec.ts`; each sprint
+un-`fixme`s its stage of the journey.
