@@ -60,6 +60,11 @@ const aiProviderSchema = isProd
 // every persistence selector MUST be `postgres`, so a misconfigured deploy
 // fails fast at startup instead of silently losing data (e.g. staff invites,
 // audit trails). Mirrors the AUTH_MODE / AI_PROVIDER guards above.
+//
+// `postgres` mode requires DATABASE_URL (validated below) and the web_*
+// schema applied + seeded. Bring-up, cutover, rollback, and the
+// Testcontainers parity harness that proves memory == postgres are
+// documented in docs/runbooks/persistence-postgres.md.
 const persistenceModeProd = z.enum(["postgres"], {
   errorMap: () => ({
     message:
@@ -77,6 +82,10 @@ const aivoPersistenceOverrideSchema = isProd
 
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  // Postgres connection backing the persistence adapter (web_* tables).
+  // Required in production (every domain resolves to `postgres` there); in
+  // dev/test it is optional and only needed once a domain is flipped to
+  // postgres. See docs/runbooks/persistence-postgres.md.
   DATABASE_URL: isProd ? z.string().url() : z.string().url().optional(),
   REDIS_URL: isProd ? z.string().url() : z.string().url().optional(),
   AUTH_MODE: authModeSchema,

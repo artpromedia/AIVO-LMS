@@ -1,16 +1,19 @@
 /**
- * Persistence adapter — smoke tests.
+ * Persistence adapter — parity smoke tests.
  *
- * The notifications domain is the first migrated through the adapter
- * (ADR 0007). These tests pin:
- *   - `getPersistence()` returns the memory adapter by default.
- *   - `notifications` list/markRead/create/listDeliveries go through
- *     the adapter and remain semantically identical to the legacy
- *     repo-direct implementations.
+ * These assertions used to run against the in-memory adapter only. They
+ * now run through `runInBothModes` (Sprint 0), so the very same suite is
+ * replayed against:
+ *   - the in-memory adapters (reset + seeded per test), and
+ *   - a real, migrated Postgres (testcontainer or AIVO_TEST_DATABASE_URL),
+ *     truncated + reseeded per test.
+ *
+ * Anything that diverges between an array/Map and SQL — ordering, tenant
+ * scoping, filters, upsert, cascade, counts — is caught here in postgres
+ * mode. Reference-data reads (subjects, quest worlds) additionally assert
+ * cross-mode value parity via `ctx.parity`. See `__tests__/parity.harness.ts`.
  */
-import { describe, it, expect, beforeEach } from "vitest";
-import { ensureSeeded } from "@/lib/db/seed";
-import { resetStore } from "@/lib/db/store";
+import { describe, it, expect } from "vitest";
 import {
   createLearner,
   createNotification,
@@ -32,18 +35,13 @@ import {
   submitParentAssessment,
   updateLearner,
 } from "@/lib/db/repos";
-import { getPersistence, resetPersistence } from "@/lib/db/persistence";
+import { getPersistence, resolvePersistenceMode } from "@/lib/db/persistence";
+import { runInBothModes } from "./__tests__/parity.harness";
 
-describe("persistence adapter — notifications (memory)", () => {
-  beforeEach(() => {
-    resetStore();
-    ensureSeeded();
-    resetPersistence();
-  });
-
-  it("defaults to memory mode", () => {
-    const p = getPersistence();
-    expect(p.mode).toBe("memory");
+runInBothModes("persistence adapter", (ctx) => {
+  it("resolves every domain to the active mode", () => {
+    expect(resolvePersistenceMode("notifications")).toBe(ctx.mode);
+    expect(resolvePersistenceMode("curriculum")).toBe(ctx.mode);
   });
 
   it("create + list returns the inserted row", async () => {
@@ -293,7 +291,12 @@ describe("persistence adapter — notifications (memory)", () => {
   });
 
   it("curriculum: listSubjects returns the seeded set", async () => {
-    const subjects = await getPersistence().curriculum.listSubjects();
+    const subjects = await ctx.parity(
+      "curriculum.listSubjects",
+      () => getPersistence().curriculum.listSubjects(),
+      // Compare the stable reference identity (slugs), not random surrogate ids.
+      (s) => s.map((x) => x.slug).sort(),
+    );
     expect(subjects.length).toBeGreaterThan(0);
   });
 
@@ -374,7 +377,11 @@ describe("persistence adapter — notifications (memory)", () => {
 
   it("quests: progress upsert + getProgressForChapter round-trip", async () => {
     const quests = getPersistence().quests;
-    const worlds = await quests.listWorlds();
+    const worlds = await ctx.parity(
+      "quests.listWorlds",
+      () => quests.listWorlds(),
+      (w) => w.map((x) => x.slug).sort(),
+    );
     expect(worlds.length).toBeGreaterThan(0);
     const world = worlds[0]!;
     const chapters = await quests.listChaptersForWorld(world.id);
@@ -453,5 +460,14 @@ describe("persistence adapter — notifications (memory)", () => {
       notification.id,
     ]);
     expect(otherTenant).toBe(0);
+  });
+});
+
+// A trivially-passing describe so this file always reports at least one
+// active test even when the postgres pass is skipped (keeps `--reporter`
+// output unambiguous about which mode ran).
+describe("persistence adapter — file marker", () => {
+  it("module loaded", () => {
+    expect(resolvePersistenceMode).toBeTypeOf("function");
   });
 });

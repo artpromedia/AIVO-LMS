@@ -26,6 +26,39 @@ wiring listed in each `drizzle/*.ts` file's header comment.
 | 10  | quests / gamification                     | ✅ memory | drizzle stub; awaits quests schema in packages/db                      |
 | 11  | teacher / school / district admin         | ✅ memory | drizzle wiring deferred (schemas exist in packages/db/tenancy)         |
 
+## Testcontainers parity harness (Sprint 0)
+
+The migration is only safe if "behaves identically on Postgres" is a thing
+CI can _prove_, not a thing we assert. Sprint 0 adds a parity rig so every
+domain — present and future — is exercised against a **real, containerized
+Postgres**, never a mock.
+
+- **`lib/db/persistence/__tests__/pg-testcontainer.ts`** — `startPostgres()` /
+  `withPostgres(fn)`. Boots `postgres:16` via `@testcontainers/postgresql`
+  (or attaches to `AIVO_TEST_DATABASE_URL` when CI provisions a Postgres
+  service), resets + applies the web-domain schema, and installs it as the
+  drizzle client via `__setDbClient`. Returns `null` when no Postgres is
+  reachable so suites skip cleanly on Docker-less machines.
+- **`lib/db/persistence/__tests__/parity.harness.ts`** — `runInBothModes(name,
+  suite)` replays the same suite against the memory adapters (reset + seeded
+  per test) and against Postgres (truncated + reseeded per test), forcing the
+  backend for every domain through the test-only `__setPersistenceModeOverride`
+  seam in `persistence/index.ts`. A `ctx.parity(label, fn, project?)` helper
+  records the memory-pass value and asserts deep-equality on the postgres pass
+  (project to stable fields — the seed assigns random surrogate ids).
+- **`seed-postgres.ts`** is idempotent (every reference insert
+  `onConflictDoNothing` and reports rows that actually landed via `RETURNING`);
+  `__tests__/seed-parity.postgres.test.ts` asserts the postgres reference-row
+  counts equal the memory-seed counts and that re-seeding is a no-op.
+- **`scripts/check-no-direct-store.mjs`** — an allowlist-driven gate
+  (`MIGRATED_DOMAINS`, initially empty) that fails when a migrated domain's
+  app routes or `repos.ts` functions reach `getStore()`/`db()`.
+- All three run in CI via **`.github/workflows/web-v2-persistence.yml`**
+  (`parity`, `no-direct-store`, `e2e-postgres`). The existing 12 adapter
+  domains pass the harness in postgres mode today.
+
+See `docs/runbooks/persistence-postgres.md` for the local container flow.
+
 ## Context
 
 `apps/web-v2/lib/db/store.ts` holds the entire web-v2 dataset as

@@ -1,0 +1,181 @@
+# web-v2 persistence migration gate (Sprint 0 foundation).
+#
+# Proves the apps/web-v2 persistence layer behaves identically on Postgres
+# as in memory, and guards against migrated domains regressing back to the
+# in-memory Map store. See docs/prompts/persistence-migration/README.md and
+# docs/runbooks/persistence-postgres.md.
+#
+#   parity          — the persistence suite (memory reference + postgres
+#                     adapters + the runInBothModes parity harness +
+#                     seed-parity) against a real Postgres.
+#   no-direct-store — fails if a migrated domain reaches getStore()/db().
+#   e2e-postgres    — boots the compose Postgres, migrates, seeds, and runs
+#                     the BFF integration suite against a postgres-backed app.
+name: web-v2-persistence
+
+on:
+  pull_request:
+    paths:
+      - "apps/web-v2/**"
+      - "packages/db/**"
+      - "scripts/check-no-direct-store.mjs"
+      - "docker-compose.web-v2-db.yml"
+      - ".github/workflows/web-v2-persistence.yml"
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  # ── Parity: persistence suite against a real Postgres ───────────────
+  # Locally the parity harness self-provisions a container via
+  # @testcontainers/postgresql (AIVO_PARITY_POSTGRES=1). In CI we attach a
+  # Postgres service and set AIVO_TEST_DATABASE_URL so the whole persistence
+  # suite — including the existing store-contract + RLS files — runs against
+  # Postgres, not just the parity harness.
+  parity:
+    name: Parity (memory == postgres)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: aivo
+          POSTGRES_PASSWORD: aivo
+          POSTGRES_DB: aivo_web
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm --filter @aivo/db --filter @aivo/brand build
+
+      - name: Persistence suite (memory + postgres parity)
+        env:
+          AIVO_TEST_DATABASE_URL: postgresql://aivo:aivo@localhost:5432/aivo_web
+        run: pnpm --filter @aivo/web-v2 exec vitest run lib/db/persistence --no-file-parallelism
+
+  # ── No direct store access in migrated domains ──────────────────────
+  no-direct-store:
+    name: No direct store (migrated domains)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Guard against direct getStore()/db() in migrated domains
+        run: node scripts/check-no-direct-store.mjs
+
+  # ── e2e against a postgres-backed web-v2 ────────────────────────────
+  e2e-postgres:
+    name: e2e (postgres-backed web-v2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: parity
+    env:
+      DATABASE_URL: postgresql://aivo:aivo@localhost:5432/aivo_web
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Bring up Postgres (compose)
+        run: docker compose -f docker-compose.web-v2-db.yml up -d --wait
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm --filter @aivo/db --filter @aivo/brand build
+
+      - name: Apply migrations
+        run: pnpm --filter @aivo/db run db:migrate
+
+      - name: Seed web_* tables
+        run: pnpm --filter @aivo/web-v2 db:seed:postgres
+
+      - name: Install Playwright browser deps
+        run: pnpm --filter @aivo/web-v2 exec playwright install --with-deps chromium
+
+      - name: Build web-v2
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
+          AIVO_PERSISTENCE: postgres
+        run: pnpm --filter @aivo/web-v2 build
+
+      - name: Start web-v2 (postgres-backed, AUTH_MODE=mock)
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
+          AIVO_PERSISTENCE: postgres
+          PORT: "5000"
+        run: |
+          nohup pnpm --filter @aivo/web-v2 start > web-v2.log 2>&1 &
+          echo $! > web-v2.pid
+
+      - name: Wait for web-v2 to accept connections
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS -o /dev/null http://127.0.0.1:5000/; then
+              echo "web-v2 is up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::web-v2 did not become ready within 60s"
+          tail -n 200 web-v2.log || true
+          exit 1
+
+      - name: Run BFF integration suite (postgres-backed)
+        env:
+          WEB_V2_BASE_URL: http://127.0.0.1:5000
+        run: |
+          pnpm --filter @aivo/web-v2 exec playwright test \
+            --config=playwright.bff.config.ts
+
+      - name: Dump web-v2 logs on failure
+        if: failure()
+        run: tail -n 500 web-v2.log || true
+
+      - name: Stop web-v2
+        if: always()
+        run: |
+          if [ -f web-v2.pid ]; then kill "$(cat web-v2.pid)" || true; fi
+
+      - name: Tear down Postgres
+        if: always()
+        run: docker compose -f docker-compose.web-v2-db.yml down -v
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-v2-persistence-playwright-report
+          path: |
+            apps/web-v2/playwright-report
+            apps/web-v2/test-results
+          if-no-files-found: ignore

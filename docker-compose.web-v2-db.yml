@@ -1,0 +1,38 @@
+# Sprint 0 (persistence migration) — a real, containerized Postgres for
+# the apps/web-v2 persistence layer in local development.
+#
+# This is the database every later sprint validates against: bring it up,
+# apply the @aivo/db migrations, seed the web_* tables, then run the
+# persistence + e2e suites in postgres mode. See
+# docs/runbooks/persistence-postgres.md for the full cutover/rollback flow.
+#
+# Usage:
+#   docker compose -f docker-compose.web-v2-db.yml up -d --wait
+#   export DATABASE_URL=postgres://aivo:aivo@localhost:5432/aivo_web
+#   pnpm --filter @aivo/db migrate
+#   pnpm --filter @aivo/web-v2 db:seed:postgres
+#   pnpm --filter @aivo/web-v2 test:persistence
+#   docker compose -f docker-compose.web-v2-db.yml down       # keep data
+#   docker compose -f docker-compose.web-v2-db.yml down -v     # wipe data
+
+services:
+  web-v2-db:
+    image: postgres:16
+    container_name: web-v2-db
+    environment:
+      POSTGRES_USER: aivo
+      POSTGRES_PASSWORD: aivo
+      POSTGRES_DB: aivo_web
+    ports:
+      - "5432:5432"
+    volumes:
+      - web-v2-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aivo -d aivo_web"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+
+volumes:
+  web-v2-db-data:
+    name: web-v2-db-data

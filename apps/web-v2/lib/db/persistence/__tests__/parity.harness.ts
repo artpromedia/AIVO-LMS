@@ -1,0 +1,200 @@
+/**
+ * Parity harness (Sprint 0) — the reusable rig every later sprint imports.
+ *
+ * `runInBothModes(name, suite)` registers the *same* `suite` twice:
+ *   1. against the in-memory adapters (reset + seeded per test), and
+ *   2. against a real, migrated Postgres (testcontainer or
+ *      `AIVO_TEST_DATABASE_URL`), truncated + reseeded per test.
+ *
+ * Every domain is forced to the active mode via the test-only
+ * `__setPersistenceModeOverride` seam, so `getPersistence()` — and any
+ * `repos.ts` function that calls it — resolves to a single backend for the
+ * duration of the suite. That is what lets a suite written once prove that
+ * memory and postgres are byte-for-byte equivalent.
+ *
+ * Cross-mode value parity: a suite can wrap a read in `ctx.parity(label, fn)`.
+ * The memory pass records the (normalised) return value; the postgres pass
+ * re-runs the same read and `expect(...).toEqual(...)` against the recorded
+ * value. Because the two describe blocks run sequentially within the file,
+ * the recorded values are available to the postgres pass. Use this for reads
+ * of seeded reference data (ids/timestamps are stable across modes); for
+ * mutation flows whose ids/timestamps are generated per run, assert the
+ * invariant directly inside the suite (it still runs against both backends).
+ *
+ * Postgres is opt-in at collection time: set `AIVO_TEST_DATABASE_URL` (CI
+ * provisions a Postgres service) or `AIVO_PARITY_POSTGRES=1` (local Docker via
+ * testcontainers). With neither, the postgres pass registers a single skipped
+ * test so the file stays green on Docker-less machines — mirroring the
+ * skip-when-no-DB convention in `stores.postgres.contract.test.ts`.
+ */
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { sql } from "drizzle-orm";
+import { ensureSeeded } from "@/lib/db/seed";
+import { resetStore } from "@/lib/db/store";
+import {
+  getPersistence,
+  resetPersistence,
+  __setPersistenceModeOverride,
+  type Persistence,
+  type PersistenceMode,
+} from "..";
+import { seedPostgres } from "../seed-postgres";
+import { startPostgres, type PostgresHandle } from "./pg-testcontainer";
+
+/** Every table the web-v2 adapters touch — truncated between postgres cases. */
+const TABLES = [
+  "lesson_parent_summaries",
+  "lesson_interactions",
+  "generated_lesson_plans",
+  "lesson_runs",
+  "learner_brain_profiles",
+  "web_notifications",
+  "web_notification_deliveries",
+  "web_audit_logs",
+  "web_users",
+  "web_memberships",
+  "web_learner_profiles",
+  "web_parent_learner_relationships",
+  "web_parent_assessments",
+  "web_baseline_assessments",
+  "web_baseline_questions",
+  "web_baseline_attempts",
+  "web_baseline_telemetry",
+  "web_subjects",
+  "web_skills",
+  "web_mastery_maps",
+  "web_skill_masteries",
+  "web_learning_paths",
+  "web_consent_records",
+  "web_iep_documents",
+  "web_age_gate_records",
+  "web_policy_versions",
+  "web_subprocessors",
+  "web_quest_worlds",
+  "web_quest_chapters",
+  "web_quest_progress",
+  "web_schools",
+  "web_classrooms",
+  "web_enrollments",
+  "web_teacher_assignments",
+  "web_collaborator_insights",
+  "web_collaborator_members",
+] as const;
+
+const POSTGRES_ENABLED =
+  Boolean(process.env.AIVO_TEST_DATABASE_URL) || process.env.AIVO_PARITY_POSTGRES === "1";
+
+/** Drop undefined / normalise ordering so deep-equality is backend-agnostic. */
+function normalise<T>(value: T): unknown {
+  return JSON.parse(JSON.stringify(value ?? null));
+}
+
+/** Context handed to a parity suite. */
+export interface ParityContext {
+  /** The backend the suite is currently running against. */
+  readonly mode: PersistenceMode;
+  /** A fresh, mode-forced persistence handle. */
+  persistence(): Persistence;
+  /**
+   * Record (memory pass) then assert (postgres pass) deep-equality of a
+   * read's return value across both backends. Returns the raw value so it
+   * can be used inline.
+   *
+   * The seed assigns random surrogate ids (`newId()`), so those differ
+   * between the two seed runs and are not a parity signal. Pass `project`
+   * to compare a stable view (e.g. sorted slugs) — that is what actually
+   * proves the same reference set landed in both backends.
+   */
+  parity<T>(label: string, fn: () => Promise<T> | T, project?: (value: T) => unknown): Promise<T>;
+}
+
+/** Recorded memory-pass values, keyed by `${name}::${label}`, read by postgres. */
+const recorded = new Map<string, unknown>();
+
+function makeContext(name: string, mode: PersistenceMode): ParityContext {
+  return {
+    mode,
+    persistence: () => getPersistence(),
+    async parity<T>(
+      label: string,
+      fn: () => Promise<T> | T,
+      project?: (value: T) => unknown,
+    ): Promise<T> {
+      const value = await fn();
+      const comparable = normalise(project ? project(value) : value);
+      const key = `${name}::${label}`;
+      if (mode === "memory") {
+        recorded.set(key, comparable);
+      } else {
+        expect(recorded.has(key), `parity label "${label}" was not recorded in memory mode`).toBe(
+          true,
+        );
+        expect(comparable).toEqual(recorded.get(key));
+      }
+      return value;
+    },
+  };
+}
+
+async function truncateAll(handle: PostgresHandle): Promise<void> {
+  await handle.db.execute(
+    sql.raw(`TRUNCATE ${TABLES.map((t) => `"${t}"`).join(", ")} RESTART IDENTITY CASCADE`),
+  );
+}
+
+/**
+ * Register `suite` against both the memory and postgres adapters.
+ */
+export function runInBothModes(name: string, suite: (ctx: ParityContext) => void): void {
+  // ── memory ────────────────────────────────────────────────────────
+  describe(`${name} — memory`, () => {
+    beforeEach(() => {
+      resetStore();
+      ensureSeeded();
+      __setPersistenceModeOverride("memory");
+      resetPersistence();
+    });
+    afterEach(() => {
+      __setPersistenceModeOverride(null);
+    });
+    suite(makeContext(name, "memory"));
+  });
+
+  // ── postgres ──────────────────────────────────────────────────────
+  if (!POSTGRES_ENABLED) {
+    describe(`${name} — postgres`, () => {
+      it.skip("skipped — set AIVO_TEST_DATABASE_URL or AIVO_PARITY_POSTGRES=1", () => {});
+    });
+    return;
+  }
+
+  describe(`${name} — postgres`, () => {
+    let handle: PostgresHandle | null = null;
+
+    beforeAll(async () => {
+      handle = await startPostgres();
+      if (!handle) {
+        throw new Error(
+          "[parity] postgres mode enabled but no Postgres available — start " +
+            "Docker (testcontainers) or set AIVO_TEST_DATABASE_URL.",
+        );
+      }
+    });
+
+    afterAll(async () => {
+      __setPersistenceModeOverride(null);
+      if (handle) await handle.teardown();
+      handle = null;
+    });
+
+    beforeEach(async () => {
+      if (!handle) return;
+      await truncateAll(handle);
+      await seedPostgres(handle.db);
+      __setPersistenceModeOverride("postgres");
+      resetPersistence();
+    });
+
+    suite(makeContext(name, "postgres"));
+  });
+}

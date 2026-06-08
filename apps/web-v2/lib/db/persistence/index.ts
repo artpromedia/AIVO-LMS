@@ -53,7 +53,24 @@ type DomainKey =
   | "admin"
   | "collaboration";
 
+/**
+ * Test-only global mode override. Set by the parity harness
+ * (`__tests__/parity.harness.ts`) to force every domain to `memory` or
+ * `postgres` so the same suite can be replayed against both backends. It
+ * is `null` in production — `resolveMode` ignores it — so this changes no
+ * production code path. Mirrors the `__setDbClient` test seam in
+ * `drizzle/client.ts`.
+ */
+let modeOverride: PersistenceMode | null = null;
+
+/** Test-only — force (or clear with `null`) the resolved mode for all domains. */
+export function __setPersistenceModeOverride(mode: PersistenceMode | null): void {
+  modeOverride = mode;
+  cached = null;
+}
+
 function resolveMode(domain: DomainKey): PersistenceMode {
+  if (modeOverride) return modeOverride;
   const overrides: Record<DomainKey, PersistenceMode | undefined> = {
     notifications: serverEnv.AIVO_PERSISTENCE_NOTIFICATIONS,
     audit: serverEnv.AIVO_PERSISTENCE_AUDIT,

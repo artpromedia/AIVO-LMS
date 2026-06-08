@@ -56,7 +56,13 @@ function vals<T>(c: Map<string, T> | T[]): T[] {
   return Array.isArray(c) ? c : Array.from(c.values());
 }
 
-/** Insert in chunks; skip duplicates on a natural-key target. */
+/**
+ * Insert in chunks; skip duplicates on a natural-key target. Idempotent:
+ * re-running against an already-seeded database is a no-op (every row
+ * conflicts and is dropped). Returns the count of rows that actually
+ * landed (via RETURNING), so a second pass reports `0` and callers /
+ * tests can observe idempotency rather than the attempted count.
+ */
 async function bulk<R extends Record<string, unknown>>(
   db: Database,
   table: PgTable,
@@ -69,10 +75,10 @@ async function bulk<R extends Record<string, unknown>>(
   for (let i = 0; i < rows.length; i += CHUNK) {
     const slice = rows.slice(i, i + CHUNK);
     const q = db.insert(table).values(slice);
-    await (conflictTarget
-      ? q.onConflictDoNothing({ target: conflictTarget })
-      : q.onConflictDoNothing());
-    n += slice.length;
+    const landed = await (conflictTarget
+      ? q.onConflictDoNothing({ target: conflictTarget }).returning()
+      : q.onConflictDoNothing().returning());
+    n += (landed as unknown[]).length;
   }
   return n;
 }
