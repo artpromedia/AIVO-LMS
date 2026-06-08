@@ -58,7 +58,15 @@ export default async function BaselinePendingPage({
   const active = await getActiveBaselineForLearner(learnerId, session.tenantId);
 
   // If a baseline already exists and is ready, send the parent on.
-  if (active?.status === "in_progress") {
+  // `not_started` is treated the same as `in_progress` here: the runner's
+  // first answer-submission flips the status (see startBaseline in repos.ts).
+  // Without this branch, a baseline that was created but never had its first
+  // answer submitted (e.g. the parent closed the tab between the auto-create
+  // redirect and the runner's first POST) leaves the parent permanently on
+  // the pending screen — `active` is truthy so we skip re-creation, but no
+  // redirect branch fires. That's the "Building Annie's custom baseline"
+  // loading-forever regression.
+  if (active?.status === "in_progress" || active?.status === "not_started") {
     redirect(`/learner/baseline/${active.id}?as=parent`);
   }
   if (active?.status === "complete") {
@@ -87,6 +95,13 @@ export default async function BaselinePendingPage({
         await refreshLearnerReadiness(learnerId, session.tenantId);
         redirect(`/learner/baseline/${created.baseline.id}?as=parent`);
       }
+      // `createBaseline` returns null on missing learner / empty subject
+      // set rather than throwing. Surface that so a stuck pending screen
+      // shows up in logs instead of silently falling through forever.
+      console.error("baseline.pending.auto_create_returned_null", {
+        learnerId,
+        tenantId: session.tenantId,
+      });
     } catch (err) {
       // `redirect()` throws a NEXT_REDIRECT control-flow error — must
       // re-throw or the user gets stuck on the pending screen.
