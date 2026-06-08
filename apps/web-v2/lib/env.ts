@@ -55,11 +55,13 @@ const aiProviderSchema = isProd
     })
   : z.enum(["mock", "anthropic", "openai", "google"]).default("mock");
 
-// The in-memory Map store is a development affordance only: data is lost on
-// restart and is not shared across replicas/serverless workers. In production
-// every persistence selector MUST be `postgres`, so a misconfigured deploy
-// fails fast at startup instead of silently losing data (e.g. staff invites,
-// audit trails). Mirrors the AUTH_MODE / AI_PROVIDER guards above.
+// Sprint 9 — the in-memory Map store is now a TEST-ONLY fixture. Data is lost
+// on restart and is not shared across replicas/serverless workers, so in
+// PRODUCTION every persistence selector MUST be `postgres`: a misconfigured
+// deploy fails fast at startup (here) instead of silently losing data. A second
+// independent guard, `assertNoMemoryAdapterInProduction` in
+// persistence/index.ts, re-checks at the first getPersistence(). Mirrors the
+// AUTH_MODE / AI_PROVIDER guards above.
 //
 // `postgres` mode requires DATABASE_URL (validated below) and the web_*
 // schema applied + seeded. Bring-up, cutover, rollback, and the

@@ -1,6 +1,6 @@
 # 0007 — Web-v2 persistence migration (in-memory → Drizzle/Postgres)
 
-- **Status:** Accepted — adapter rollout complete (memory mode), drizzle wiring deferred per-domain
+- **Status:** Completed (Sprint 9) — 22 web-owned domains migrated + parity-proven on Postgres; the in-memory adapter is a TEST-ONLY fixture, forbidden in production by two independent guards (env schema + assertNoMemoryAdapterInProduction). Remaining db()-direct surface is service-owned per ADR 0015 (see Sprint 9 note).
 - **Date:** 2026-05-27
 - **Deciders:** web-v2 platform team
 - **Related:** AIVO-LMS audit gap #4 ("web-v2 core runtime still in-memory/mock-backed")
@@ -41,6 +41,36 @@ production forces it.
 | 22  | standards / skill-graph (Sprint 8)         | ✅ postgres (proven) | `web_standards_frameworks` / `web_standard_documents` / `web_standards` / `web_domains` / `web_skill_prerequisites` / `web_skill_versions` / `web_curriculum_maps` / `web_lesson_objective_templates` / `web_assessment_blueprints` / `web_curriculum_import_jobs` (+ `CurriculumStore.upsertSkill`). Platform-global reference ⇒ no RLS. Per-learner curriculum uploads + term syllabi are tutor-svc-owned (REST) and keep their dev mock. |
 
 > **Sprint 8 remaining (not yet migrated):** the standards/skill-graph surface (30 repos fns / 12 store fields — a sprint-sized effort), and the standalone aux stores (`audit-store`, `household-store`, `idp-store`, `learner-pin-store`, `messages-store`, `mfa-store`, `parent-phone-store`, `user-roles-store`, `staff-invites`, `team-invites`). Identity/MFA/IDP belong to identity-svc (REST). These remain `db()`-direct and are tracked for a follow-up.
+
+
+## Sprint 9 — production decommission of the in-memory path
+
+The in-memory Map (`lib/db/store.ts`) is now a **test fixture**, not a
+datastore. Two independent guards make the memory adapter unreachable in
+production:
+
+1. **`lib/env.ts`** — the Zod schema refuses `memory` for `AIVO_PERSISTENCE`
+   (and every `AIVO_PERSISTENCE_*` override) when `NODE_ENV=production` (and not
+   the build phase / `AIVO_TEST_MODE=1`). A misconfigured deploy fails at boot.
+2. **`assertNoMemoryAdapterInProduction`** (persistence/index.ts) — re-checks at
+   the first `getPersistence()`: if any domain would resolve to `memory` in a
+   production process it throws. Proven by `__tests__/no-memory-in-prod.test.ts`.
+
+So in production every one of the 22 migrated domains resolves to the Drizzle
+adapter; the memory adapters are reached only under `NODE_ENV=test` / vitest.
+
+**Remaining `db()`-direct surface (tracked, NOT in-memory-in-prod):** a set of
+not-yet-migrated repos functions whose canonical data is owned by a SERVICE per
+ADR 0015 — tutor-svc curriculum uploads + term syllabi, billing-svc
+subscriptions/seats/invoices, family-svc IEP goals / therapist notes /
+caregiver observations, identity-svc tenants — plus the migration-job mock
+runner and a few cross-domain aggregate readers. These still call `getStore()`
+for their dev/mock path. Because they are reached in production ONLY via their
+service REST path (or are admin-only aggregates), `getStore()` is intentionally
+not hard-gated to throw — that final removal lands with the per-service REST
+cutovers. `scripts/check-no-direct-store.mjs` therefore stays an allowlist gate
+(enforcing the 22 migrated domains stay clean) rather than deny-all until that
+cutover completes.
 
 ## Testcontainers parity harness (Sprint 0)
 

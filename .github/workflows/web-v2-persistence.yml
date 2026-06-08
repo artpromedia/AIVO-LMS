@@ -13,6 +13,11 @@
 #                     the BFF integration suite against a postgres-backed app.
 name: web-v2-persistence
 
+# Sprint 9: the `no-direct-store` and `parity` jobs below are intended to be
+# REQUIRED status checks on the default branch (configure in GitHub branch
+# protection) so the in-memory store can never be reintroduced to a migrated
+# domain, and memory==postgres parity must hold, before merge.
+
 on:
   pull_request:
     paths:

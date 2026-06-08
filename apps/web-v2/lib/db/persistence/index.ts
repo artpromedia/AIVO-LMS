@@ -180,6 +180,30 @@ export function assertAssessmentsBrainSameMode(
   }
 }
 
+/**
+ * Sprint 9 — the in-memory Map is a TEST-ONLY fixture. The persistence adapter
+ * must never select a memory store in production: data would be lost on restart
+ * and fragmented across replicas (the original Sev-2 this whole migration
+ * fixed). The env schema (lib/env.ts) already refuses `memory` in production,
+ * so this is defense-in-depth at the adapter layer — a second, independent
+ * line that throws the moment any domain would resolve to `memory` under a
+ * production process. Exported so `no-memory-in-prod.test.ts` can prove it.
+ */
+export function assertNoMemoryAdapterInProduction(modes: PersistenceMode[]): void {
+  const inProduction =
+    process.env.NODE_ENV === "production" &&
+    process.env.NEXT_PHASE !== "phase-production-build" &&
+    process.env.AIVO_TEST_MODE !== "1";
+  if (inProduction && modes.some((m) => m === "memory")) {
+    throw new Error(
+      "[persistence] the in-memory adapter is forbidden in production — every " +
+        "domain MUST resolve to postgres. The Map store is a test-only fixture " +
+        "(ADR 0007, Sprint 9). Set AIVO_PERSISTENCE / AIVO_PERSISTENCE_* to " +
+        "postgres and configure DATABASE_URL.",
+    );
+  }
+}
+
 let cached: Persistence | null = null;
 
 export function getPersistence(): Persistence {
@@ -208,6 +232,30 @@ export function getPersistence(): Persistence {
   const standardsMode = resolveMode("standards");
   warnOnModeMismatch(assessmentsMode, brainProfilesMode);
   assertAssessmentsBrainSameMode(assessmentsMode, brainProfilesMode);
+  assertNoMemoryAdapterInProduction([
+    notificationsMode,
+    auditMode,
+    identityMode,
+    learnersMode,
+    assessmentsMode,
+    lessonRunsMode,
+    brainProfilesMode,
+    curriculumMode,
+    complianceMode,
+    questsMode,
+    adminMode,
+    collaborationMode,
+    billingMode,
+    clinicalMode,
+    securityMode,
+    rosteringMode,
+    audioMode,
+    safetyMode,
+    supportMode,
+    settingsMode,
+    engagementMode,
+    standardsMode,
+  ]);
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).

@@ -97,6 +97,17 @@ tables).
   app back at the owner `DATABASE_URL` (owner bypasses RLS) while
   investigating. Prefer the latter — it is instant and reversible.
 
+
+## Memory is a test-only fixture (Sprint 9)
+
+`AIVO_PERSISTENCE=memory` (and any `AIVO_PERSISTENCE_*=memory`) is rejected in
+production — both at boot (lib/env.ts schema) and at the first getPersistence()
+(assertNoMemoryAdapterInProduction). The in-memory Map backs only Vitest and the
+`AIVO_TEST_MODE=1` CI/e2e escape hatch. There is no "roll back to memory" lever
+in production: a domain regression is rolled back by reverting code / migrations
+and (if needed) restoring Postgres from backup (see Backups & PITR above), not
+by flipping a domain to memory.
+
 ## Verify parity (local container)
 
 Every domain must behave identically on Postgres as in memory. Prove it
