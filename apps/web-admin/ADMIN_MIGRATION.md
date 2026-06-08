@@ -182,6 +182,17 @@ No owning service → admin-svc owns a new table:
 - `@aivo/admin-api/support` + `platform/support` page (queue with status filter
   chips + KPIs + per-ticket status updates).
 
+## Done — Wave 14 (baseline item calibration analytics)
+
+Computed from a real table — no new schema, no mock. web-v2's metric function
+was an in-memory placeholder; the production surface is the append-only
+`baseline_item_response_logs` table.
+- `admin-svc`: `routes/baseline.ts` — read-only SQL aggregations
+  (`/baseline/metrics` headline + by-difficulty; `/baseline/recalibration`
+  per-item p-value vs. band target → make harder/easier flags). Platform-admin.
+- `@aivo/admin-api/baseline` + `platform/baseline-items` page (KPIs, by-band
+  table, recalibration-candidate table).
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but

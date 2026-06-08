@@ -22,6 +22,10 @@
       "types": "./dist/audit.d.ts",
       "default": "./dist/audit.js"
     },
+    "./baseline": {
+      "types": "./dist/baseline.d.ts",
+      "default": "./dist/baseline.js"
+    },
     "./billing": {
       "types": "./dist/billing.d.ts",
       "default": "./dist/billing.js"

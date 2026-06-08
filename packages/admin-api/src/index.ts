@@ -1,6 +1,7 @@
 export * from "./ai-governance.js";
 export * from "./api-keys.js";
 export * from "./audit.js";
+export * from "./baseline.js";
 export * from "./billing.js";
 export * from "./classrooms.js";
 export * from "./client.js";
