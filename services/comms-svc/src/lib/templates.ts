@@ -65,6 +65,8 @@ export function renderTemplate(
       return renderMfaCode(data);
     case "district_admin_invite":
       return renderDistrictAdminInvite(data);
+    case "parent_invite":
+      return renderParentInvite(data);
     case "trial_ending":
       return renderTrialEnding(data);
     case "school_admin_invite":
@@ -275,6 +277,26 @@ function renderDistrictAdminInvite(data: TemplateData) {
     subject: `You're invited to administer ${districtName} on AIVO Learning`,
     html,
     text: `You've been invited as a district administrator for ${districtName} on AIVO Learning. Accept your invitation here: ${inviteUrl}\n\nThis link expires in 72 hours.`,
+  };
+}
+
+function renderParentInvite(data: TemplateData) {
+  const name = (data.name as string) || "there";
+  const districtName = (data.districtName as string) || "your school district";
+  const schoolName = (data.schoolName as string) || "";
+  const inviteUrl = (data.inviteUrl as string) || "#";
+  const where = schoolName ? `${schoolName} (${districtName})` : districtName;
+  const html = baseLayout(`
+    <h1 class="title">You've been invited to ${BRAND_NAME}</h1>
+    <p class="body-text">Hi ${name},</p>
+    <p class="body-text"><span class="highlight">${where}</span> has invited you to join ${BRAND_NAME} as a parent. Once you accept, you can add your learner and get them started with personalized, adaptive learning.</p>
+    <p style="text-align:center"><a href="${inviteUrl}" class="btn">Accept Invitation</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">This invitation expires in 72 hours. After accepting, you'll set your own password — no temporary password is ever emailed. If you weren't expecting this, you can safely ignore this email.</p>
+  `);
+  return {
+    subject: `You're invited to join ${where} on ${BRAND_NAME}`,
+    html,
+    text: `${where} has invited you to join ${BRAND_NAME} as a parent. Accept your invitation here: ${inviteUrl}\n\nThis link expires in 72 hours. You'll set your own password — no temporary password is emailed.`,
   };
 }
 
@@ -610,6 +632,7 @@ export const AVAILABLE_TEMPLATES = [
   { id: "iep_update", name: "IEP Goal Update", channels: ["email", "push"] },
   { id: "mfa_code", name: "MFA Verification Code", channels: ["email"] },
   { id: "district_admin_invite", name: "District Admin Invite", channels: ["email"] },
+  { id: "parent_invite", name: "Parent Invite (into district tenant)", channels: ["email"] },
   { id: "trial_ending", name: "Trial Ending Reminder", channels: ["email", "in_app"] },
   { id: "school_admin_invite", name: "School Admin Invite", channels: ["email"] },
   { id: "teacher_invite", name: "Teacher Invite", channels: ["email"] },

@@ -78,6 +78,34 @@ export const seedCaregiver = (email = `e2e-caregiver-${Date.now()}@aivo.test`) =
   seedUser("caregiver", email, "E2eCaregiver!Pass1");
 export const seedSchoolAdmin = (email = `e2e-school-${Date.now()}@aivo.test`) =>
   seedUser("school-admin", email, "E2eSchool!Pass1");
+
+/** Seed a DISTRICT_ADMIN with a real bearer token and an optional pilot seat
+ *  cap on its tenant. Used by the Sprint 2 parent-invite e2e. */
+export async function seedDistrictAdmin(
+  opts: { email?: string; seatLimit?: number } = {},
+): Promise<(SeededUser & { tenantId: string }) | null> {
+  const email = opts.email ?? `e2e-district-${Date.now()}@aivo.test`;
+  const password = "E2eDistrict!Pass1";
+  try {
+    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
+    const res = await ctx.post(`/api/__test__/seed-district-admin`, {
+      data: { email, password, seatLimit: opts.seatLimit },
+      failOnStatusCode: false,
+    });
+    await ctx.dispose();
+    if (res.status() !== 200) return null;
+    const body = (await res.json()) as { userId: string; tenantId: string; accessToken: string };
+    return {
+      userId: body.userId,
+      tenantId: body.tenantId,
+      accessToken: body.accessToken,
+      email,
+      password,
+    };
+  } catch {
+    return null;
+  }
+}
 export const seedPlatformAdmin = (email = `e2e-platform-${Date.now()}@aivo.test`) =>
   seedUser("platform-admin", email, "E2ePlat!Pass1");
 

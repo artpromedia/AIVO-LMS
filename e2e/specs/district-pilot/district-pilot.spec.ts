@@ -24,6 +24,7 @@ import {
   IDENTITY_BASE,
   seedParent,
   seedPlatformAdmin,
+  seedDistrictAdmin,
   skipUnlessIdentityTestMode,
 } from "../../lib/fixtures";
 import { assertRealSessionNoMock, loginThroughWebUi, MOCK_SESSION_COOKIE } from "../../lib/pilot";
@@ -128,9 +129,55 @@ test.describe("District pilot — Sprint 1: provision pilot (G2)", () => {
   });
 });
 
-test.describe("District pilot — full journey (sprints 2-4)", () => {
-  test.fixme("district admin adds a school (Sprint 1/2)", async () => {});
-  test.fixme("parents are invited into the district tenant (Sprint 2)", async () => {});
+test.describe("District pilot — Sprint 2: invite parents into the district tenant (G3)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("a district admin invites parents who land under the district tenant, seat-capped", async ({
+    request,
+  }) => {
+    const admin = await seedDistrictAdmin({ seatLimit: 2 });
+    expect(admin, "seed-district-admin helper must be reachable").not.toBeNull();
+    if (!admin) return;
+
+    const stamp = Date.now();
+    const headers = { authorization: `Bearer ${admin.accessToken}` };
+
+    // Invite two parents — fills the 2-seat pilot cap.
+    for (const n of [1, 2]) {
+      const res = await request.post(`${IDENTITY_BASE}/api/district/parents`, {
+        headers,
+        data: { name: `Parent ${n}`, email: `pilot-parent-${n}-${stamp}@fam.test` },
+        failOnStatusCode: false,
+      });
+      expect(res.status(), await res.text()).toBe(200);
+      expect((await res.json()).invite.schoolId).toBeNull();
+    }
+
+    // Third invite exceeds the cap → refused with a clear seat error.
+    const over = await request.post(`${IDENTITY_BASE}/api/district/parents`, {
+      headers,
+      data: { name: "Parent 3", email: `pilot-parent-3-${stamp}@fam.test` },
+      failOnStatusCode: false,
+    });
+    expect(over.status()).toBe(409);
+
+    // The list shows the invites as pending under THIS district, with seat usage.
+    const list = await request.get(`${IDENTITY_BASE}/api/district/parents`, {
+      headers,
+      failOnStatusCode: false,
+    });
+    expect(list.status()).toBe(200);
+    const lj = await list.json();
+    expect(lj.parents.length).toBeGreaterThanOrEqual(2);
+    expect(lj.seats.seatLimit).toBe(2);
+    expect(lj.seats.remaining).toBe(0);
+    for (const p of lj.parents) expect(p.status).toBe("pending");
+  });
+});
+
+test.describe("District pilot — full journey (sprints 3-4)", () => {
   test.fixme("invited parent logs in and creates a learner under the seat cap + consent (Sprint 3)", async () => {});
   test.fixme("pilot ops dashboard shows seats, uptake, and expiry (Sprint 4)", async () => {});
 });

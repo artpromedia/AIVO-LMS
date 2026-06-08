@@ -138,3 +138,25 @@ counters `billing_coupons_created_total` / `billing_coupons_redeemed_total`
 `COMMS_SVC_URL`, and the shared internal secret (`INTERNAL_SERVICE_TOKEN`, or
 `INTERNAL_SERVICE_KEY` for the comms invite) must be set so the orchestration can
 reach both services.
+
+## Invite parents (single + bulk)
+
+`/district/parents` (district admin) invites parents **into the district
+tenant** — they never create a separate B2C account.
+
+1. **Single:** enter a name + email → `POST /api/district/parents`. A hashed,
+   single-use invite (role `PARENT`, this tenant) is created and emailed via
+   comms-svc (`parent_invite` template). Audited `parent.invited`.
+2. **Bulk:** paste `name,email` rows (a header row is ignored) →
+   `POST /api/district/parents/bulk`. Each row returns `invited` / `skipped`
+   (duplicate or over-cap) / `error` (invalid) — partial success is explicit,
+   nothing is silently dropped.
+3. The table shows pending/accepted invites with **Resend** (rotates the token)
+   and **Revoke**. Remaining seats are surfaced at the top.
+
+**Seat cap.** Invites are refused once _active parents + pending parent invites_
+reach `tenants.seat_limit` (the friendly pre-check). The hard per-learner cap is
+still enforced at learner-create in identity-svc.
+
+**Acceptance.** The parent opens the link, sets their own password, and the
+PARENT `users` row is created under the **district** tenant. No temp password.

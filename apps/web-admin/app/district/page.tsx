@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
 import { AdminApiError } from "@aivo/admin-api";
@@ -15,7 +16,11 @@ import { AdminNavGrid } from "@/components/admin-nav";
 
 const DISTRICT_NAV = [
   { href: "/district/billing", title: "Billing", description: "Accounts and trial conversion." },
-  { href: "/district/sis", title: "SIS connectors", description: "Roster sync (Clever, OneRoster)." },
+  {
+    href: "/district/sis",
+    title: "SIS connectors",
+    description: "Roster sync (Clever, OneRoster).",
+  },
   { href: "/district/iep", title: "IEP evaluations", description: "SPED evaluation pipeline." },
   { href: "/district/reports", title: "Reports", description: "Run and export district reports." },
   {
@@ -206,6 +211,18 @@ export default async function DistrictPage({
                 Save contact
               </button>
             </form>
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div className="flex-1">
+              <h3 className="font-black">Invite parents into your district</h3>
+              <p className="text-sm text-slate-500">
+                Single or bulk CSV. Parents set their own password; their accounts live under your
+                district (no self-serve B2C tenant).
+              </p>
+            </div>
+            <Link className="admin-button" href="/district/parents">
+              Invite parents
+            </Link>
           </div>
           <form action={completeSetup} className="mt-6">
             <button className="admin-button" disabled={!setup.canComplete} type="submit">

@@ -525,3 +525,22 @@ re-keys a coupon and no district is born without a seat cap.
   `services/identity-svc/tests/pilot-create.test.ts` (DB-backed) cover provisioning, idempotency,
   token-guard, audit, and rollback; `e2e/specs/district-pilot` Stage 1 runs it against containers
   (`docs/runbooks/district-onboarding.md`).
+
+## 12. District-pilot pack — Sprint 2 (G3: invite parents into the district tenant)
+
+**Sprint 2** closes **G3 — no parent invite into the district tenant**: district/school admins now
+invite parents (single + bulk CSV) as hashed-token invites (role `PARENT`, pinned to the district
+`tenantId`), reusing the `accept-invite` keystone — so a district and its parents are one coherent
+tenant, not a scatter of self-serve B2C accounts.
+
+- identity-svc `routes/parents.ts`: `POST/GET/DELETE /api/district/parents`,
+  `POST /api/district/parents/bulk`, resend, and `POST/GET /api/school/parents` (requireSchoolAdmin).
+  Seat cap enforced at invite time; audited `parent.invited` / `parent.invite_revoked`.
+- `accept-invite` now accepts role `PARENT`, creating the user under the **district** tenant with a
+  self-chosen password (no temp password) — proven by `tests/parent-invite.test.ts`.
+- comms-svc `parent_invite` template + `POST /api/comms/internal/parent-invite` (dev-mode returns
+  `inviteUrl`).
+- `packages/admin-api` parent client methods + web-admin `/district/parents` (single + bulk CSV +
+  resend/revoke + remaining seats; no dead buttons).
+- `e2e/specs/district-pilot` Stage 2 invites parents under the district tenant and asserts the seat
+  cap, against containers.

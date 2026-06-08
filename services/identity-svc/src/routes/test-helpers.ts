@@ -217,24 +217,56 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
 
   // Idempotent seeding for a DISTRICT_ADMIN test fixture used by e2e specs.
   app.post<{
-    Body: { email: string; password: string; tenantName?: string; mfaEnabled?: boolean };
+    Body: {
+      email: string;
+      password: string;
+      tenantName?: string;
+      mfaEnabled?: boolean;
+      seatLimit?: number;
+    };
   }>(
     "/api/__test__/seed-district-admin",
     { schema: testSeedDistrictAdminSchema },
     async (req, reply) => {
       if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
       const db = (app as any).db;
-      const { email, password, tenantName = "E2E District Tenant", mfaEnabled = false } = req.body;
+      const {
+        email,
+        password,
+        tenantName = "E2E District Tenant",
+        mfaEnabled = false,
+        seatLimit,
+      } = req.body;
       if (!email || !password) {
         return reply.status(400).send({ error: "email and password required" });
       }
 
-      let [tenant] = await db.select().from(tenants).where(eq(tenants.name, tenantName)).limit(1);
+      // Pilot district carries a seat cap so the Sprint 2 parent-invite e2e can
+      // exercise seat enforcement. A unique tenant name per seatLimit avoids
+      // colliding with the default tenant.
+      const desiredTenantName =
+        typeof seatLimit === "number" ? `${tenantName} (cap ${seatLimit})` : tenantName;
+      let [tenant] = await db
+        .select()
+        .from(tenants)
+        .where(eq(tenants.name, desiredTenantName))
+        .limit(1);
       if (!tenant) {
         [tenant] = await db
           .insert(tenants)
-          .values({ name: tenantName, type: "B2B_DISTRICT" as any })
+          .values({
+            name: desiredTenantName,
+            type: "B2B_DISTRICT" as any,
+            ...(typeof seatLimit === "number"
+              ? { licensingTier: "B2B_SEAT_LICENSED", seatLimit }
+              : {}),
+          } as any)
           .returning();
+      } else if (typeof seatLimit === "number") {
+        await db
+          .update(tenants)
+          .set({ licensingTier: "B2B_SEAT_LICENSED", seatLimit } as any)
+          .where(eq(tenants.id, tenant.id));
       }
 
       const passwordHash = await argon2.hash(password);
@@ -265,7 +297,21 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
           .returning();
       }
 
-      return { id: user.id, email: user.email, role: user.role, tenantId: tenant.id };
+      const accessToken = await signJWT({
+        sub: user.id,
+        tenantId: tenant.id,
+        role: user.role,
+        email: user.email,
+        name: user.name,
+      });
+      return {
+        id: user.id,
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        tenantId: tenant.id,
+        accessToken,
+      };
     },
   );
 
