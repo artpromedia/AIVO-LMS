@@ -42,6 +42,7 @@ import { registerSecurityRoutes } from "./routes/security.js";
 import { registerPronunciationRoutes } from "./routes/pronunciation.js";
 import { registerSupportRoutes } from "./routes/support.js";
 import { registerBaselineRoutes } from "./routes/baseline.js";
+import { registerIepRoutes } from "./routes/iep.js";
 import { startEvidenceCron } from "./lib/soc2-evidence.js";
 import { startWatchdog, configureWatchdogAlerts } from "./lib/watchdog.js";
 import { runJanitorOnce } from "./lib/janitor.js";
@@ -108,6 +109,7 @@ export async function buildApp(
   registerPronunciationRoutes(app, db);
   registerSupportRoutes(app, db);
   registerBaselineRoutes(app, db);
+  registerIepRoutes(app, db);
   // Wire the internal-jobs route up with a handle map that is mutated
   // by `start()` once the schedulers are running. The dump path leaves
   // it empty, which is safe because the route reads `handles[jobName]`

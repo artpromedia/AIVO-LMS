@@ -10,6 +10,7 @@ export * from "./content.js";
 export * from "./dsar.js";
 export * from "./feature-flags.js";
 export * from "./identity.js";
+export * from "./iep.js";
 export * from "./invoices.js";
 export * from "./jobs.js";
 export * from "./leads.js";

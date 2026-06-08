@@ -72,6 +72,7 @@ const PLATFORM_NAV = [
     title: "Baseline items",
     description: "Item calibration analytics and recalibration.",
   },
+  { href: "/platform/iep", title: "IEP oversight", description: "SPED evaluations and review compliance." },
   { href: "/platform/support", title: "Support", description: "Customer support ticket queue." },
   { href: "/platform/audit", title: "Audit log", description: "Hash-chained admin action history." },
   { href: "/platform/jobs", title: "Jobs", description: "Scheduled job freshness and run health." },

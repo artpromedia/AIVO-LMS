@@ -193,6 +193,16 @@ was an in-memory placeholder; the production surface is the append-only
 - `@aivo/admin-api/baseline` + `platform/baseline-items` page (KPIs, by-band
   table, recalibration-candidate table).
 
+## Done — Wave 15 (IEP oversight)
+
+Read over the real, already-DB-backed IEP tables (12 tables owned by the IEP
+authoring/evaluation flow). No new schema, no mock, read-only.
+- `admin-svc`: `routes/iep.ts` — `/iep/evaluations` (SPED pipeline counts +
+  recent, role-scoped: district admins see only their tenant) and `/iep/profiles`
+  (lifecycle counts + annual-reviews-overdue list, platform admins only).
+- `@aivo/admin-api/iep` + pages `platform/iep` (pipeline + overdue reviews) and
+  `district/iep` (district-scoped pipeline).
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but
