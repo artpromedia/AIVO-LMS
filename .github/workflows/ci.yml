@@ -93,6 +93,14 @@ jobs:
       - name: Check no "coming soon" prose in production code
         run: node scripts/ci/check-no-coming-soon.mjs
 
+      # Sprint 6 anti-stub gates for the parent-assessment → collaborator
+      # invites → brain build path. Pure node, no install needed.
+      - name: Gate no stubs on the assessment → brain-build path
+        run: node scripts/check-no-stub-on-assessment-path.mjs
+
+      - name: Gate persistence mode-parity documentation
+        run: node scripts/check-persistence-mode-parity.mjs
+
   build-node:
     name: Build All Node Services
     runs-on: ubuntu-latest
@@ -216,6 +224,19 @@ jobs:
           pnpm --filter @aivo/web-v2 exec playwright test \
             --config=playwright.bff.config.ts
 
+      # Sprint 5/6: the visual brain build e2e. Runs under the main Playwright
+      # config (testMatch includes e2e/**/*.spec.ts) against the already-
+      # running web-v2 (reuseExistingServer). Flags default ON in dev
+      # (NODE_ENV=development), so the brain_build_pending routing is live.
+      - name: Run brain-build visual e2e
+        if: steps.filter.outputs.bff == 'true'
+        env:
+          AIVO_FLAG_VISUAL_BRAIN_BUILD: "true"
+          AIVO_FLAG_COLLAB_INVITE_STEP: "true"
+        run: |
+          pnpm --filter @aivo/web-v2 exec playwright test \
+            e2e/tests/brain-build-visual.spec.ts
+
       - name: Dump web-v2 logs on failure
         if: failure() && steps.filter.outputs.bff == 'true'
         run: tail -n 500 web-v2.log || true
@@ -287,6 +308,11 @@ jobs:
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
         run: pnpm --filter @aivo/billing-svc test
+
+      - name: Run family-svc tests (collaboration invites + insights)
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
+        run: pnpm --filter @aivo/family-svc test
 
       - name: Run comms-svc tests (email-events webhook)
         run: pnpm --filter @aivo/comms-svc test
