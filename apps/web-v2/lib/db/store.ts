@@ -27,6 +27,8 @@ import type {
   LessonRun,
   MasteryMap,
   ReviewSchedule,
+  CollaboratorInsight,
+  CollaboratorMember,
   ParentAssessment,
   ParentLearnerRelationship,
   ParentLessonSummary,
@@ -278,6 +280,10 @@ export type Store = {
   /** Keyed by tenantId. District + school admin settings (branding, prefs, SSO). */
   tenantSettings: Map<string, TenantSettings>;
 
+  // Sprint 4: collaboration domain (web-v2's own store, keyed by record id).
+  collaboratorInsights: Map<string, CollaboratorInsight>;
+  collaboratorMembers: Map<string, CollaboratorMember>;
+
   // Platform-admin: billing operations
   coupons: Map<string, Coupon>;
   dailyBillingBatches: Map<string, DailyBillingBatch>;
@@ -331,6 +337,8 @@ function createStore(): Store {
     homeworkHelpSessions: new Map(),
     calmSessions: new Map(),
     teacherAssignments: new Map(),
+    collaboratorInsights: new Map(),
+    collaboratorMembers: new Map(),
     curriculumUploads: new Map(),
     termSyllabi: new Map(),
     auditLogs: [],

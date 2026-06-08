@@ -179,6 +179,43 @@ export type ParentAssessment = {
   submittedAt: ISODate | null;
 };
 
+// ===== Collaboration (Sprint 4) =====
+export type CollaboratorRole = "teacher" | "caregiver" | "therapist" | "parent";
+
+export type CollaboratorMemberStatus = "pending" | "accepted" | "declined" | "revoked";
+
+/**
+ * A collaborator's contributed perspective on a learner, captured before the
+ * brain is built. Mirrors family-svc's brain_insights / InsightBody so the two
+ * stacks stay shape-compatible. `domain` is a free-form tag (e.g.
+ * "communication", "sensory", "attention") the brain builder reads to weight
+ * accommodations.
+ */
+export type CollaboratorInsight = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  authorUserId: ID | null;
+  authorRole: CollaboratorRole;
+  insightText: string;
+  domain: string | null;
+  source: string | null;
+  createdAt: ISODate;
+};
+
+/** An invited/accepted member of a learner's care team (web-v2's own store). */
+export type CollaboratorMember = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  role: CollaboratorRole;
+  email: string;
+  memberUserId: ID | null;
+  status: CollaboratorMemberStatus;
+  acceptedAt: ISODate | null;
+  createdAt: ISODate;
+};
+
 /**
  * Structured fields extracted from an uploaded IEP. Raw IEP text is NEVER
  * stored here — only the parsed structured fields that the BFF / UI can show.

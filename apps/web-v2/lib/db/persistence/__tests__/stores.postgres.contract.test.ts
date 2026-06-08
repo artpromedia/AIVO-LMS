@@ -26,9 +26,11 @@ import { drizzleCurriculum } from "../drizzle/curriculum";
 import { drizzleCompliance } from "../drizzle/compliance";
 import { drizzleQuests } from "../drizzle/quests";
 import { drizzleAdmin } from "../drizzle/admin";
+import { drizzleCollaboration } from "../drizzle/collaboration";
 import { brainProfileStoreContract } from "./contract/brain-profiles.contract";
 import { lessonRunStoreContract } from "./contract/lesson-runs.contract";
 import { assessmentSubmitContract } from "./contract/assessments.contract";
+import { collaborationStoreContract } from "./contract/collaboration.contract";
 import {
   notificationStoreContract,
   auditStoreContract,
@@ -44,7 +46,12 @@ import {
 const TEST_URL = process.env.AIVO_TEST_DATABASE_URL;
 const here = dirname(fileURLToPath(import.meta.url));
 const migrationsDir = resolve(here, "../../../../../../packages/db/drizzle");
-const MIGRATIONS = ["0047_lesson_runs", "0048_learner_brain_profiles", "0049_web_domain"];
+const MIGRATIONS = [
+  "0047_lesson_runs",
+  "0048_learner_brain_profiles",
+  "0049_web_domain",
+  "0072_web_collaboration",
+];
 
 const TABLES = [
   "lesson_parent_summaries",
@@ -81,6 +88,8 @@ const TABLES = [
   "web_classrooms",
   "web_enrollments",
   "web_teacher_assignments",
+  "web_collaborator_insights",
+  "web_collaborator_members",
 ];
 
 let db: Database;
@@ -132,6 +141,7 @@ if (TEST_URL) {
   complianceStoreContract(P, () => drizzleCompliance, truncateAll);
   questStoreContract(P, () => drizzleQuests, truncateAll);
   adminStoreContract(P, () => drizzleAdmin, truncateAll);
+  collaborationStoreContract(P, () => drizzleCollaboration, truncateAll);
 } else {
   describe("postgres store contracts", () => {
     it.skip("skipped — set AIVO_TEST_DATABASE_URL to run against Postgres", () => {});

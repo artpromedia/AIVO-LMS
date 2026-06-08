@@ -15,9 +15,11 @@ import { memoryCurriculum } from "../memory/curriculum";
 import { memoryCompliance } from "../memory/compliance";
 import { memoryQuests } from "../memory/quests";
 import { memoryAdmin } from "../memory/admin";
+import { memoryCollaboration } from "../memory/collaboration";
 import { brainProfileStoreContract } from "./contract/brain-profiles.contract";
 import { lessonRunStoreContract } from "./contract/lesson-runs.contract";
 import { assessmentSubmitContract } from "./contract/assessments.contract";
+import { collaborationStoreContract } from "./contract/collaboration.contract";
 import {
   notificationStoreContract,
   auditStoreContract,
@@ -43,3 +45,4 @@ curriculumStoreContract(M, () => memoryCurriculum, resetStore);
 complianceStoreContract(M, () => memoryCompliance, resetStore);
 questStoreContract(M, () => memoryQuests, resetStore);
 adminStoreContract(M, () => memoryAdmin, resetStore);
+collaborationStoreContract(M, () => memoryCollaboration, resetStore);

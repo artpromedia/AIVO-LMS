@@ -36,6 +36,8 @@ import { memoryQuests } from "./memory/quests";
 import { drizzleQuests } from "./drizzle/quests";
 import { memoryAdmin } from "./memory/admin";
 import { drizzleAdmin } from "./drizzle/admin";
+import { memoryCollaboration } from "./memory/collaboration";
+import { drizzleCollaboration } from "./drizzle/collaboration";
 
 type DomainKey =
   | "notifications"
@@ -48,7 +50,8 @@ type DomainKey =
   | "curriculum"
   | "compliance"
   | "quests"
-  | "admin";
+  | "admin"
+  | "collaboration";
 
 function resolveMode(domain: DomainKey): PersistenceMode {
   const overrides: Record<DomainKey, PersistenceMode | undefined> = {
@@ -63,6 +66,7 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     compliance: serverEnv.AIVO_PERSISTENCE_COMPLIANCE,
     quests: serverEnv.AIVO_PERSISTENCE_QUESTS,
     admin: serverEnv.AIVO_PERSISTENCE_ADMIN,
+    collaboration: serverEnv.AIVO_PERSISTENCE_COLLABORATION,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -109,6 +113,7 @@ export function getPersistence(): Persistence {
   const complianceMode = resolveMode("compliance");
   const questsMode = resolveMode("quests");
   const adminMode = resolveMode("admin");
+  const collaborationMode = resolveMode("collaboration");
   warnOnModeMismatch(assessmentsMode, brainProfilesMode);
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
@@ -126,6 +131,8 @@ export function getPersistence(): Persistence {
     compliance: complianceMode === "postgres" ? drizzleCompliance : memoryCompliance,
     quests: questsMode === "postgres" ? drizzleQuests : memoryQuests,
     admin: adminMode === "postgres" ? drizzleAdmin : memoryAdmin,
+    collaboration:
+      collaborationMode === "postgres" ? drizzleCollaboration : memoryCollaboration,
   };
   return cached;
 }

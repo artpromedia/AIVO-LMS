@@ -18,6 +18,8 @@ import type {
   BaselineItemResponseLog,
   BaselineQuestion,
   Classroom,
+  CollaboratorInsight,
+  CollaboratorMember,
   ConsentRecord,
   ConsentType,
   Enrollment,
@@ -419,6 +421,22 @@ export interface AdminStore {
   ): Promise<boolean>;
 }
 
+/**
+ * Collaboration (Sprint 4): collaborator perspectives ("insights") + accepted
+ * care-team members for a learner. Insights are read by the brain builder so
+ * the pre-build invite step shapes the clone. Tenant-scoped on every call.
+ */
+export interface CollaborationStore {
+  /** Persist a collaborator insight. */
+  addInsight(insight: CollaboratorInsight): Promise<CollaboratorInsight>;
+  /** Every insight for a learner, newest first. */
+  listInsightsForLearner(learnerId: string, tenantId: string): Promise<CollaboratorInsight[]>;
+  /** Upsert (insert or status-update) a care-team member. */
+  upsertMember(member: CollaboratorMember): Promise<CollaboratorMember>;
+  /** Accepted members for a learner (pending/declined/revoked excluded). */
+  listAcceptedMembers(learnerId: string, tenantId: string): Promise<CollaboratorMember[]>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -432,6 +450,7 @@ export interface Persistence {
   compliance: ComplianceStore;
   quests: QuestStore;
   admin: AdminStore;
+  collaboration: CollaborationStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

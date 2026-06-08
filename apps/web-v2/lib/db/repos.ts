@@ -38,6 +38,7 @@ import type {
 } from "@/lib/db/types";
 import { ACCESSIBILITY_DEFAULTS } from "@/lib/db/types";
 import type {
+  CollaboratorInsight,
   IEPDocument,
   IEPExtraction,
   LearnerBrainProfile,
@@ -215,6 +216,29 @@ export async function setTeamInviteDecision(
   return updated;
 }
 
+/**
+ * Sprint 4: best-effort read of accepted-collaborator insights for the brain
+ * builder. Isolated — any failure returns [] and is logged, so the insight
+ * read can never throw back into submitParentAssessment / completeBaseline
+ * (the durable write must not be masked by an optional input fetch).
+ */
+async function listCollaboratorInsightsSafe(
+  learnerId: string,
+  tenantId: string,
+): Promise<CollaboratorInsight[]> {
+  try {
+    return await getPersistence().collaboration.listInsightsForLearner(learnerId, tenantId);
+  } catch (err) {
+    logger.warn({
+      event: "brain_clone.collaborator_insights_unavailable",
+      learnerId,
+      tenantId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    return [];
+  }
+}
+
 // ===== Parent Assessment =====
 function emptyAnswers(): ParentAssessment["answers"] {
   return {
@@ -355,6 +379,7 @@ export async function submitParentAssessment(
       if (learner) {
         const iep = await getIEPForLearner(learnerId, tenantId);
         const subjects = await listSubjects();
+        const collaboratorInsights = await listCollaboratorInsightsSafe(learnerId, tenantId);
         const candidate = buildBrainProfile({
           learner,
           assessment: result ?? submitted,
@@ -362,6 +387,7 @@ export async function submitParentAssessment(
           iepUploaded: Boolean(iep),
           subjects,
           baselineAttempts: 0,
+          collaboratorInsights,
         });
         const v = brainProfileStateSchema.safeParse(candidate);
         if (v.success) {
@@ -579,6 +605,7 @@ async function prepareBrainCloneFromSummary(
   const assessment = await findParentAssessment(learnerId, tenantId);
   const iep = await getIEPForLearner(learnerId, tenantId);
   const subjects = await listSubjects();
+  const collaboratorInsights = await listCollaboratorInsightsSafe(learnerId, tenantId);
   const candidate = buildBrainProfile({
     learner,
     assessment,
@@ -587,6 +614,7 @@ async function prepareBrainCloneFromSummary(
     subjects,
     baselineAttempts: summary.totalAnswered,
     baselineSummary: summary,
+    collaboratorInsights,
   });
   const parsed = brainProfileStateSchema.safeParse(candidate);
   if (!parsed.success) return null;
