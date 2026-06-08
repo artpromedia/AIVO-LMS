@@ -13,7 +13,7 @@ export async function acceptInvitesAction(): Promise<AcceptResult> {
   if (!session) {
     return { ok: false, error: "Sign in first to accept invitations." };
   }
-  const result = acceptAllInvitesForEmail(session.email, session.userId);
+  const result = await acceptAllInvitesForEmail(session.email, session.userId, session.tenantId);
   revalidatePath("/accept-invite");
   return { ok: true, count: result.count };
 }

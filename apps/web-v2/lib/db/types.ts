@@ -48,7 +48,9 @@ export type ReadinessState =
   | "profile_created"
   | "assessment_needed"
   | "iep_optional"
+  | "team_invite_optional"
   | "baseline_needed"
+  | "brain_build_pending"
   | "brain_clone_review_needed"
   | "ready_for_today_mission"
   | "active_learning";
@@ -109,6 +111,18 @@ export type LearnerProfile = {
    * Used by readiness to advance past `iep_optional`.
    */
   iepDecision: "uploaded" | "skipped" | null;
+  /**
+   * Sprint 3 (collaborator invites): parent's decision on the optional
+   * "invite your child's team" step, which sits between assessment submit
+   * and the baseline branch.
+   *  - "done": parent invited at least one collaborator and continued
+   *  - "skipped": parent explicitly skipped the step
+   *  - "pending" / undefined: not yet decided
+   * Optional so existing learner records (which predate the field) default
+   * to undecided. Read by `computeReadinessFor` to advance past
+   * `team_invite_optional`.
+   */
+  teamInviteDecision?: "pending" | "done" | "skipped";
   createdAt: ISODate;
 };
 
@@ -164,6 +178,51 @@ export type ParentAssessment = {
   startedAt: ISODate;
   updatedAt: ISODate;
   submittedAt: ISODate | null;
+};
+
+// ===== Collaboration (Sprint 4) =====
+export type CollaboratorRole = "teacher" | "caregiver" | "therapist" | "parent";
+
+export type CollaboratorMemberStatus = "pending" | "accepted" | "declined" | "revoked";
+
+/**
+ * A collaborator's contributed perspective on a learner, captured before the
+ * brain is built. Mirrors family-svc's brain_insights / InsightBody so the two
+ * stacks stay shape-compatible. `domain` is a free-form tag (e.g.
+ * "communication", "sensory", "attention") the brain builder reads to weight
+ * accommodations.
+ */
+export type CollaboratorInsight = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  authorUserId: ID | null;
+  authorRole: CollaboratorRole;
+  insightText: string;
+  domain: string | null;
+  source: string | null;
+  createdAt: ISODate;
+};
+
+/** An invited/accepted member of a learner's care team (web-v2's own store). */
+export type CollaboratorMember = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  role: CollaboratorRole;
+  email: string;
+  memberUserId: ID | null;
+  status: CollaboratorMemberStatus;
+  acceptedAt: ISODate | null;
+  createdAt: ISODate;
+  /** Sprint 3 fold-in: care-team invite metadata (was lib/db/team-invites). */
+  invitedBy?: ID;
+  /** caregiver-only — free-form ("Co-parent", "Grandparent", …). */
+  relationship?: string | null;
+  /** therapist-only. */
+  specialty?: string | null;
+  /** therapist-only. */
+  credentials?: string | null;
 };
 
 /**

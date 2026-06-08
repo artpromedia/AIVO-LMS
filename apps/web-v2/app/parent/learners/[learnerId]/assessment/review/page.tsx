@@ -19,6 +19,7 @@ import {
   submitParentAssessment,
 } from "@/lib/db/repos";
 import { audit } from "@/lib/bff/audit";
+import { nextStepFor } from "@/lib/learner/readiness";
 import { newRequestId } from "@/lib/observability/logger";
 import {
   ASSESSMENT_SECTION_LABEL,
@@ -48,13 +49,34 @@ async function submitAction(formData: FormData) {
       );
     }
   }
-  await submitParentAssessment(learnerId, session.tenantId);
+  let submitted: Awaited<ReturnType<typeof submitParentAssessment>> = null;
+  try {
+    submitted = await submitParentAssessment(learnerId, session.tenantId);
+  } catch {
+    // Swallowed here only to convert into the existing `?error=` redirect
+    // convention — submitParentAssessment already traced the failure.
+    submitted = null;
+  }
+  if (!submitted?.submittedAt) {
+    // No silent success: bounce back to the first section with an error code
+    // so the parent sees the save did not land instead of a phantom advance.
+    const firstSection = ASSESSMENT_SECTION_ORDER[0];
+    redirect(
+      `/parent/learners/${learnerId}/assessment?step=${stepForSection(firstSection)}&error=${encodeURIComponent(
+        "submit_failed",
+      )}`,
+    );
+  }
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "parent_assessment.submit", newRequestId(), {
     learnerId,
     metadata: { source: "ui" },
   });
-  redirect(`/parent/learners/${learnerId}/iep`);
+  // Sprint 3: route to the readiness-computed next step instead of hardcoding
+  // /iep. With the collaborator-invite flag ON this is the team step; OFF, it
+  // is the IEP step exactly as before.
+  const learner = await getLearner(learnerId, session.tenantId);
+  redirect(learner ? nextStepFor(learner).href : `/parent/learners/${learnerId}/iep`);
 }
 
 function stepForSection(sec: AssessmentSectionId): number {

@@ -4,7 +4,12 @@
  * Postgres a body-only replacement (signatures stay stable).
  */
 import { getStore, newId, nowIso } from "@/lib/db/store";
-import { getPersistence } from "@/lib/db/persistence";
+import { getPersistence, resolvePersistenceMode } from "@/lib/db/persistence";
+import {
+  traceAssessmentSubmitAttempt,
+  traceAssessmentSubmitPersisted,
+  traceAssessmentSubmitFailed,
+} from "@/lib/observability/assessment-trace";
 import {
   assertLiveConfigured,
   isLiveCurriculum,
@@ -33,6 +38,7 @@ import type {
 } from "@/lib/db/types";
 import { ACCESSIBILITY_DEFAULTS } from "@/lib/db/types";
 import type {
+  CollaboratorInsight,
   IEPDocument,
   IEPExtraction,
   LearnerBrainProfile,
@@ -189,6 +195,50 @@ export async function refreshLearnerReadiness(
   return state;
 }
 
+/**
+ * Sprint 3: persist the parent's decision on the optional collaborator
+ * invite step and recompute readiness so the learner advances out of
+ * `team_invite_optional`. Routed through the persistence adapter so the
+ * decision is durable (survives a restart) in both memory and postgres.
+ */
+export async function setTeamInviteDecision(
+  learnerId: string,
+  tenantId: string,
+  decision: "pending" | "done" | "skipped",
+): Promise<LearnerProfile | null> {
+  const updated = await getPersistence().learners.setTeamInviteDecision(
+    learnerId,
+    tenantId,
+    decision,
+  );
+  if (!updated) return null;
+  await refreshLearnerReadiness(learnerId, tenantId);
+  return updated;
+}
+
+/**
+ * Sprint 4: best-effort read of accepted-collaborator insights for the brain
+ * builder. Isolated — any failure returns [] and is logged, so the insight
+ * read can never throw back into submitParentAssessment / completeBaseline
+ * (the durable write must not be masked by an optional input fetch).
+ */
+async function listCollaboratorInsightsSafe(
+  learnerId: string,
+  tenantId: string,
+): Promise<CollaboratorInsight[]> {
+  try {
+    return await getPersistence().collaboration.listInsightsForLearner(learnerId, tenantId);
+  } catch (err) {
+    logger.warn({
+      event: "brain_clone.collaborator_insights_unavailable",
+      learnerId,
+      tenantId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    return [];
+  }
+}
+
 // ===== Parent Assessment =====
 function emptyAnswers(): ParentAssessment["answers"] {
   return {
@@ -276,7 +326,47 @@ export async function submitParentAssessment(
     submittedAt: nowIso(),
     updatedAt: nowIso(),
   };
-  const result = await getPersistence().assessments.upsertParentAssessment(submitted);
+
+  // The submittedAt upsert is the transaction of record: persist it FIRST,
+  // isolate every later side-effect (Sprint 1). The trace makes the durable
+  // write observable so a silent RLS rejection can't masquerade as success.
+  const assessmentsMode = resolvePersistenceMode("assessments");
+  const startedMs = Date.now();
+  traceAssessmentSubmitAttempt({ learnerId, tenantId, mode: assessmentsMode });
+  let result: ParentAssessment;
+  try {
+    result = await getPersistence().assessments.upsertParentAssessment(submitted);
+  } catch (err) {
+    traceAssessmentSubmitFailed({
+      learnerId,
+      tenantId,
+      mode: assessmentsMode,
+      durationMs: Date.now() - startedMs,
+      reason: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+  if (!result?.submittedAt) {
+    // A write that "succeeds" but does not return a row with submittedAt set
+    // (e.g. an RLS-rejected upsert that silently affects zero rows) is a
+    // failed save, not a success. Surface it instead of returning a phantom.
+    traceAssessmentSubmitFailed({
+      learnerId,
+      tenantId,
+      mode: assessmentsMode,
+      durationMs: Date.now() - startedMs,
+      reason: "submitted_at_not_persisted",
+    });
+    throw new Error(
+      `submitParentAssessment: durable write did not persist submittedAt for learner ${learnerId}`,
+    );
+  }
+  traceAssessmentSubmitPersisted({
+    learnerId,
+    tenantId,
+    mode: assessmentsMode,
+    durationMs: Date.now() - startedMs,
+  });
 
   // Auto-generate the pre-clone brain profile on submit so the parent sees
   // a brain in the UI immediately and `completeBaseline` has a profile to
@@ -289,6 +379,7 @@ export async function submitParentAssessment(
       if (learner) {
         const iep = await getIEPForLearner(learnerId, tenantId);
         const subjects = await listSubjects();
+        const collaboratorInsights = await listCollaboratorInsightsSafe(learnerId, tenantId);
         const candidate = buildBrainProfile({
           learner,
           assessment: result ?? submitted,
@@ -296,6 +387,7 @@ export async function submitParentAssessment(
           iepUploaded: Boolean(iep),
           subjects,
           baselineAttempts: 0,
+          collaboratorInsights,
         });
         const v = brainProfileStateSchema.safeParse(candidate);
         if (v.success) {
@@ -505,14 +597,19 @@ async function prepareBrainCloneFromSummary(
 ): Promise<LearnerBrainProfile | null> {
   const learner = await getLearner(learnerId, tenantId);
   if (!learner) return null;
+  // No early-return on a missing pre-clone profile: when none exists (legacy
+  // learner, or a pre-clone that failed to persist) we build one straight
+  // into the "cloned" stage below, so a completed baseline ALWAYS yields a
+  // clone the parent can review. Returning null here was the bug that let
+  // baseline completion silently produce no clone.
   const existing = await getBrainProfile(learnerId, tenantId);
-  if (!existing) return null;
 
   // Read-only: must not mutate the store on the preflight path, otherwise
   // a clone-prep failure would still leave a draft parent assessment behind.
   const assessment = await findParentAssessment(learnerId, tenantId);
   const iep = await getIEPForLearner(learnerId, tenantId);
   const subjects = await listSubjects();
+  const collaboratorInsights = await listCollaboratorInsightsSafe(learnerId, tenantId);
   const candidate = buildBrainProfile({
     learner,
     assessment,
@@ -521,9 +618,20 @@ async function prepareBrainCloneFromSummary(
     subjects,
     baselineAttempts: summary.totalAnswered,
     baselineSummary: summary,
+    collaboratorInsights,
   });
   const parsed = brainProfileStateSchema.safeParse(candidate);
-  if (!parsed.success) return null;
+  if (!parsed.success) {
+    // Do not silently drop to no-clone: surface the failing paths so a schema
+    // regression is diagnosable instead of presenting as a missing animation.
+    logger.warn({
+      event: "brain_clone.schema_invalid",
+      learnerId,
+      tenantId,
+      issues: parsed.error.issues.map((i) => ({ path: i.path.join("."), message: i.message })),
+    });
+    return null;
+  }
 
   const now = nowIso();
   if (!existing) {
@@ -6536,14 +6644,14 @@ export interface TherapistCaseloadEntry {
   nextSessionIso: string | null;
 }
 
-export function listTherapistCaseload(
+export async function listTherapistCaseload(
   therapistUserId: string,
   therapistEmail: string,
   tenantId: string,
-): TherapistCaseloadEntry[] {
+): Promise<TherapistCaseloadEntry[]> {
   const store = db();
   const learnerIds = new Set<string>(
-    listLearnersForTeamMember(therapistUserId, therapistEmail, "therapist"),
+    await listLearnersForTeamMember(therapistUserId, therapistEmail, "therapist", tenantId),
   );
   const goalsByLearner = new Map<string, import("./types").IepGoalRecord[]>();
   for (const g of Array.from(store.iepGoalRecords.values())) {

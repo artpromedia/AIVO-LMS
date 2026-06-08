@@ -90,8 +90,13 @@ export const brainInsights = pgTable("brain_insights", {
   learnerId: uuid("learner_id")
     .references(() => learners.id)
     .notNull(),
+  // Sprint 2 (collaborator invites): tenant + author role attribution.
+  // Nullable — legacy rows and other writers (family-goals) predate this;
+  // the collaboration insight route stamps them going forward.
+  tenantId: uuid("tenant_id").references(() => tenants.id),
   source: varchar("source", { length: 50 }).notNull(),
   sourceUserId: uuid("source_user_id"),
+  authorRole: varchar("author_role", { length: 50 }),
   insightText: text("insight_text").notNull(),
   domain: varchar("domain", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),

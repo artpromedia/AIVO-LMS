@@ -20,6 +20,7 @@ import { getStore as db } from "@/lib/db/store";
 import { getLearner, getUserById, parentCanAccessLearner } from "@/lib/db/repos";
 import { getCareTeam } from "@/lib/db/team-invites";
 import { TeamInviteSection } from "./team-invite-section";
+import { completeTeamInviteStepAction } from "./actions";
 export const dynamic = "force-dynamic";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -42,12 +43,16 @@ type TeamMember = {
 
 export default async function ParentTeamPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ learnerId: string }>;
+  searchParams: Promise<{ onboarding?: string }>;
 }) {
   const t = await getTranslations("parent.learner_team");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const { onboarding } = await searchParams;
+  const isOnboarding = onboarding === "1";
   if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
@@ -134,8 +139,40 @@ export default async function ParentTeamPage({
         description="Everyone supporting this learner. Parents, teachers, therapists, and caregivers can all see progress."
       />
 
+      {isOnboarding ? (
+        <Card className="mb-2 border-aivo-accent/40 bg-aivo-accent/5 p-[var(--aivo-density-card-pad)]">
+          <p className="text-sm font-semibold text-aivo-ink">{t("onboarding_title")}</p>
+          <p className="mt-1 text-sm text-aivo-ink-soft">{t("onboarding_subtitle")}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <form action={completeTeamInviteStepAction}>
+              <input type="hidden" name="learnerId" value={learner.id} />
+              <input type="hidden" name="intent" value="continue" />
+              <button
+                type="submit"
+                className="rounded-md bg-aivo-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+              >
+                {t("continue_to_baseline")}
+              </button>
+            </form>
+            <form action={completeTeamInviteStepAction}>
+              <input type="hidden" name="learnerId" value={learner.id} />
+              <input type="hidden" name="intent" value="skip" />
+              <button
+                type="submit"
+                className="rounded-md border border-aivo-border px-4 py-2 text-sm font-semibold text-aivo-ink-soft hover:bg-aivo-surface-soft"
+              >
+                {t("skip_for_now")}
+              </button>
+            </form>
+          </div>
+        </Card>
+      ) : null}
+
       <SectionHeader title={t("invite_member")} />
-      <TeamInviteSection learnerId={learner.id} careTeam={getCareTeam(learner.id)} />
+      <TeamInviteSection
+        learnerId={learner.id}
+        careTeam={await getCareTeam(learner.id, session.tenantId)}
+      />
 
       <SectionHeader title={`${list.length} member${list.length === 1 ? "" : "s"}`} />
       {list.length === 0 ? (

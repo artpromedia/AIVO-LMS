@@ -1,10 +1,14 @@
 import { getStore, newId, nowIso } from "@/lib/db/store";
+import { buildBrainProfile } from "@/lib/learner/brain-profile";
+import { brainProfileStateSchema } from "@/lib/validators/brain-profile";
 import { MOCK_USERS } from "@/lib/auth/mock-session";
 import { MOCK_TENANTS, ROLE_PERMISSIONS } from "@/lib/auth/tenants";
 import type {
   Skill,
   Subject,
   LearnerProfile,
+  LearnerBrainProfile,
+  BaselineAssessment,
   ParentLearnerRelationship,
   QuestWorld,
   QuestChapter,
@@ -542,6 +546,72 @@ export function ensureSeeded(): void {
     isPrimary: true,
   };
   store.parentLearnerRelationships.push(rel);
+
+  // ===== Sprint 5 fold-in: a deterministic learner already at the brain-clone
+  // stage, so the visual-build e2e (e2e/tests/brain-build-visual.spec.ts) can
+  // target a known state instead of driving the full baseline UI. Same parent
+  // as Sky. Completed baseline + a `cloned` brain profile → readiness resolves
+  // to brain_clone_review_needed.
+  const cloneLearnerId = "lrn_demo_clone";
+  const cloneLearner: LearnerProfile = {
+    ...learner,
+    id: cloneLearnerId,
+    displayName: "Rio",
+    firstName: "Rio",
+    preferredName: null,
+    readinessState: "brain_clone_review_needed",
+  };
+  store.learnerProfiles.set(cloneLearnerId, cloneLearner);
+  store.parentLearnerRelationships.push({
+    id: newId("plr"),
+    parentUserId: parent.userId,
+    learnerId: cloneLearnerId,
+    tenantId: parent.tenantId,
+    relation: "parent",
+    isPrimary: true,
+  });
+  const cloneBaseline: BaselineAssessment = {
+    id: "bas_demo_clone",
+    learnerId: cloneLearnerId,
+    tenantId: parent.tenantId,
+    subjectIds: [],
+    status: "complete",
+    createdAt: nowIso(),
+    startedAt: nowIso(),
+    completedAt: nowIso(),
+    summary: {
+      learnerName: "Rio",
+      totalAnswered: 8,
+      perSubject: [],
+      recommendedStartSkillId: null,
+      narrative: "Seeded baseline for the brain-clone demo learner.",
+    } as unknown as BaselineAssessment["summary"],
+  } as unknown as BaselineAssessment;
+  store.baselineAssessments.set(cloneBaseline.id, cloneBaseline);
+  const cloneCandidate = buildBrainProfile({
+    learner: cloneLearner,
+    assessment: null,
+    iepExtraction: null,
+    iepUploaded: false,
+    subjects: Array.from(store.subjects.values()),
+    baselineAttempts: 8,
+  });
+  const cloneParsed = brainProfileStateSchema.safeParse(cloneCandidate);
+  if (cloneParsed.success) {
+    const cloneProfile: LearnerBrainProfile = {
+      id: "brp_demo_clone",
+      learnerId: cloneLearnerId,
+      tenantId: parent.tenantId,
+      state: cloneParsed.data,
+      approvedByParent: false,
+      approvalStatus: "pending_parent_review",
+      cloneStage: "cloned",
+      clonedAt: nowIso(),
+      generatedAt: nowIso(),
+      updatedAt: nowIso(),
+    };
+    store.brainProfiles.set(cloneProfile.id, cloneProfile);
+  }
 
   // ===== Sprint 16: Quest worlds + chapters =====
   // Mapped to the canonical seeded skill slugs so chapter start can spawn a

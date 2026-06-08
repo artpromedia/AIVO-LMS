@@ -21,7 +21,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["therapist"], requestId);
     if (roleErr) return roleErr;
-    const caseload = listTherapistCaseload(session!.userId, session!.email, session!.tenantId);
+    const caseload = await listTherapistCaseload(session!.userId, session!.email, session!.tenantId);
     return ok({ caseload }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

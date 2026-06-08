@@ -325,3 +325,30 @@ export const webTeacherAssignments = pgTable(
   },
   (t) => ({ idx: index("web_teacher_assignments_idx").on(t.teacherId, t.tenantId) }),
 );
+
+// ===== Collaboration (Sprint 4) =====
+// web-v2's own durable store for collaborator perspectives + accepted
+// members, used by the pre-build invite step and the brain builder. Mirrors
+// the family-svc backend in shape but lives in web-v2's database (the rest
+// of web-v2 persistence is web_*), keeping the two stacks independent.
+export const webCollaboratorInsights = pgTable(
+  "web_collaborator_insights",
+  {
+    id: text("id").primaryKey(),
+    learnerId: text("learner_id").notNull(),
+    tenantId: text("tenant_id").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({ idx: index("web_collaborator_insights_idx").on(t.learnerId, t.tenantId) }),
+);
+
+export const webCollaboratorMembers = pgTable(
+  "web_collaborator_members",
+  {
+    id: text("id").primaryKey(),
+    learnerId: text("learner_id").notNull(),
+    tenantId: text("tenant_id").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({ idx: index("web_collaborator_members_idx").on(t.learnerId, t.tenantId) }),
+);

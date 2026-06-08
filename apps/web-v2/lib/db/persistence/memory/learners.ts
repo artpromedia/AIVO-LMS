@@ -191,6 +191,16 @@ export const memoryLearners: LearnerStore = {
     return next;
   },
 
+  async setTeamInviteDecision(id, tenantId, decision) {
+    const store = getStore();
+    const existing = store.learnerProfiles.get(id);
+    if (!existing || existing.tenantId !== tenantId) return null;
+    if (decision === existing.teamInviteDecision) return existing;
+    const next: LearnerProfile = { ...existing, teamInviteDecision: decision };
+    store.learnerProfiles.set(id, next);
+    return next;
+  },
+
   async getAccessibility(id, tenantId) {
     const existing = getStore().learnerProfiles.get(id);
     if (!existing || existing.tenantId !== tenantId) return null;

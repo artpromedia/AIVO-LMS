@@ -14,6 +14,7 @@
 import { BRAIN_VISUAL_IDENTITY_PALETTE } from "@aivo/brand";
 import type {
   BaselineSummary,
+  CollaboratorInsight,
   IEPExtraction,
   LearnerBrainProfileState,
   LearnerProfile,
@@ -36,7 +37,138 @@ type GenInput = {
    * the actual baseline results instead of the generic comfort heuristic.
    */
   baselineSummary?: BaselineSummary | null;
+  /**
+   * Sprint 4: perspectives contributed by accepted collaborators (teacher /
+   * caregiver / therapist) before the brain is built. Folded into the
+   * accommodation + tutor reasoning so the pre-build invite step is
+   * meaningful rather than cosmetic.
+   */
+  collaboratorInsights?: CollaboratorInsight[];
 };
+
+/**
+ * Map a collaborator insight `domain` tag to the accommodation it should
+ * raise. Deterministic so the fold is testable. Unknown domains still get
+ * acknowledged in the reasoning (see foldCollaboratorInsights) but do not
+ * force a structural accommodation.
+ */
+const INSIGHT_DOMAIN_ACCOMMODATION: Record<string, { accommodation: string; label: string }> = {
+  communication: { accommodation: "aac_communication_support", label: "AAC / communication support" },
+  aac: { accommodation: "aac_communication_support", label: "AAC / communication support" },
+  speech: { accommodation: "aac_communication_support", label: "AAC / communication support" },
+  sensory: { accommodation: "sensory_breaks", label: "Sensory breaks" },
+  attention: { accommodation: "visual_schedules", label: "Visual schedules" },
+  focus: { accommodation: "visual_schedules", label: "Visual schedules" },
+  reading: { accommodation: "read_aloud", label: "Read-aloud" },
+  literacy: { accommodation: "read_aloud", label: "Read-aloud" },
+  writing: { accommodation: "speech_to_text", label: "Speech-to-text" },
+  motor: { accommodation: "speech_to_text", label: "Speech-to-text" },
+};
+
+/** A collaborator insight maps to a tutor we keep active to coordinate. */
+const INSIGHT_DOMAIN_TUTOR: Record<string, string> = {
+  communication: "echo",
+  aac: "echo",
+  speech: "echo",
+  sensory: "harmony",
+  attention: "harmony",
+  focus: "harmony",
+  reading: "sage",
+  literacy: "sage",
+  writing: "sage",
+  math: "nova",
+};
+
+type CollaboratorFold = {
+  accommodations: string[];
+  accommodationDetailed: Array<{
+    accommodation: string;
+    displayLabel: string;
+    reasoning: string;
+    source: string;
+    removable: boolean;
+  }>;
+  accommodationStrings: string[];
+  tutorDetailed: Array<{ tutorKey: string; reasoning: string; source: string }>;
+  tutorStrings: string[];
+  activeTutorKeys: string[];
+};
+
+function snippet(text: string, max = 140): string {
+  const t = text.trim().replace(/\s+/g, " ");
+  return t.length > max ? `${t.slice(0, max - 1)}…` : t;
+}
+
+/**
+ * Fold accepted-collaborator perspectives into accommodation + tutor
+ * decisions. A therapist communication insight raises AAC/communication
+ * support (and pins it non-removable, because a clinician flagged it); a
+ * caregiver/teacher insight in the same domain raises the same support but
+ * leaves it removable. Every insight is acknowledged in the reasoning so a
+ * contributed perspective is never silently dropped.
+ */
+function foldCollaboratorInsights(insights: CollaboratorInsight[]): CollaboratorFold {
+  const fold: CollaboratorFold = {
+    accommodations: [],
+    accommodationDetailed: [],
+    accommodationStrings: [],
+    tutorDetailed: [],
+    tutorStrings: [],
+    activeTutorKeys: [],
+  };
+  const seenAccommodation = new Set<string>();
+  const seenTutor = new Set<string>();
+  for (const insight of insights) {
+    const domain = (insight.domain ?? "").trim().toLowerCase();
+    const role = insight.authorRole;
+    const map = domain ? INSIGHT_DOMAIN_ACCOMMODATION[domain] : undefined;
+    if (map) {
+      // Therapist-flagged supports carry more weight: pin them on.
+      const removable = role !== "therapist";
+      if (!seenAccommodation.has(map.accommodation)) {
+        seenAccommodation.add(map.accommodation);
+        fold.accommodations.push(map.accommodation);
+        fold.accommodationDetailed.push({
+          accommodation: map.accommodation,
+          displayLabel: map.label,
+          reasoning: `${role} insight (${domain}): ${snippet(insight.insightText)}`,
+          source: `collaborator:${role}`,
+          removable,
+        });
+        fold.accommodationStrings.push(
+          `${map.label} raised from a ${role}'s ${domain} insight.`,
+        );
+      } else if (!removable) {
+        // A later therapist insight on an already-added support pins it.
+        const existing = fold.accommodationDetailed.find(
+          (d) => d.accommodation === map.accommodation,
+        );
+        if (existing) existing.removable = false;
+      }
+      const tutor = INSIGHT_DOMAIN_TUTOR[domain];
+      if (tutor && !seenTutor.has(tutor)) {
+        seenTutor.add(tutor);
+        fold.activeTutorKeys.push(tutor);
+        fold.tutorDetailed.push({
+          tutorKey: tutor,
+          reasoning: `Kept active to coordinate with a ${role}'s ${domain} insight.`,
+          source: `collaborator:${role}`,
+        });
+        fold.tutorStrings.push(`Tutor ${tutor} kept active for a ${role}'s ${domain} insight.`);
+      }
+    } else if (domain) {
+      // Unknown domain — acknowledge the perspective without a structural change.
+      fold.accommodationStrings.push(
+        `${role} insight (${domain}) noted: ${snippet(insight.insightText, 100)}`,
+      );
+    } else {
+      fold.accommodationStrings.push(
+        `${role} insight noted: ${snippet(insight.insightText, 100)}`,
+      );
+    }
+  }
+  return fold;
+}
 
 /** Map our 5-level mastery estimate down to the 4-level brain profile comfort. */
 function masteryLevelToComfort(level: SkillMasteryLevel): ComfortLevel {
@@ -232,7 +364,9 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
     subjects,
     baselineAttempts,
     baselineSummary,
+    collaboratorInsights,
   } = input;
+  const collabFold = foldCollaboratorInsights(collaboratorInsights ?? []);
   const baselineBySubject = new Map<string, BaselineSummary["perSubject"][number]>();
   for (const row of baselineSummary?.perSubject ?? []) {
     baselineBySubject.set(row.subjectId, row);
@@ -389,9 +523,13 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
   if (supportDefaults.speechToText) accommodationSet.add("speech_to_text");
   if (supportDefaults.visualSchedules) accommodationSet.add("visual_schedules");
   if (supportDefaults.sensoryBreaks) accommodationSet.add("sensory_breaks");
+  // Sprint 4: collaborator insights can raise additional accommodations.
+  for (const a of collabFold.accommodations) accommodationSet.add(a);
   const activeAccommodations = Array.from(accommodationSet);
 
-  const activeTutors = pickActiveTutors(masteryLevels);
+  const baseTutors = pickActiveTutors(masteryLevels);
+  // Keep any tutor a collaborator insight asked us to coordinate with.
+  const activeTutors = Array.from(new Set([...baseTutors, ...collabFold.activeTutorKeys]));
   const visualIdentity = buildVisualIdentity(functioningLevel, seekingOrAvoiding);
 
   // ----- Explainable-AI rationale (RAI compliance) -----
@@ -429,6 +567,7 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
       "Visual schedules enabled because the learner prefers short focus bursts or a visual communication style.",
     );
   }
+  for (const s of collabFold.accommodationStrings) accommodationDecisions.push(s);
   if (accommodationDecisions.length === 0) {
     accommodationDecisions.push(
       "No special accommodations recommended yet — parent assessment did not surface needs.",
@@ -444,17 +583,28 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
       `Therapy services on file (${services.slice(0, 3).join(", ")}) — Echo (communication) and Harmony (SEL) kept active to coordinate with them.`,
     );
   }
+  for (const s of collabFold.tutorStrings) tutorDecisions.push(s);
 
+  const collaboratorCount = (collaboratorInsights ?? []).length;
   const xaiExplanation = {
     summary: `Clone built from ${
       assessment?.submittedAt ? "submitted parent assessment" : "in-progress assessment"
-    }${iepUploaded ? " + IEP" : ""}${
-      baselineSummary ? " + completed baseline" : ""
+    }${iepUploaded ? " + IEP" : ""}${baselineSummary ? " + completed baseline" : ""}${
+      collaboratorCount > 0 ? ` + ${collaboratorCount} collaborator insight(s)` : ""
     }. Functioning level ${functioningLevel}; ${activeAccommodations.length} accommodation(s); ${activeTutors.length} tutor(s) active.`,
     masteryDecisions,
     accommodationDecisions,
     tutorDecisions,
     raiCompliance: true,
+    // Structured collaborator-derived reasoning (Sprint 4). Omitted when no
+    // collaborator insight raised a structural change, so the deterministic
+    // path without collaborators validates unchanged.
+    ...(collabFold.accommodationDetailed.length > 0
+      ? { accommodationDecisionsDetailed: collabFold.accommodationDetailed }
+      : {}),
+    ...(collabFold.tutorDetailed.length > 0
+      ? { tutorDecisionsDetailed: collabFold.tutorDetailed }
+      : {}),
   };
 
   return {

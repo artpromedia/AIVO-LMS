@@ -358,6 +358,20 @@
       "when": 1781472000000,
       "tag": "0070_tenant_runtime_and_idempotency",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1781558400000,
+      "tag": "0071_brain_insights_tenant_scope",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1781644800000,
+      "tag": "0072_web_collaboration",
+      "breakpoints": true
     }
   ]
 }

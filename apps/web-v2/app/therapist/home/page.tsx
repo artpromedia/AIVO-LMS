@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 export default async function TherapistHomePage() {
   const t = await getTranslations("therapist.home");
   const session = await requirePageRole(["therapist", "platform_admin"]);
-  const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
+  const learnerIds = await listLearnersForMember(session.userId, session.email, "therapist", session.tenantId);
   const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   for (const l of learners) await refreshLearnerReadiness(l.id, session.tenantId);

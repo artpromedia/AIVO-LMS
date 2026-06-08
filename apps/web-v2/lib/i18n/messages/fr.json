@@ -541,7 +541,11 @@
       "credentials_placeholder": "p. ex. M.S., CCC-SLP",
       "cancel": "Annuler",
       "care_team_invites": "Invitations à l'équipe de soutien",
-      "revoke": "Révoquer"
+      "revoke": "Révoquer",
+      "onboarding_title": "Invite your child’s team (optional)",
+      "onboarding_subtitle": "Invite a teacher, caregiver, or therapist to add their perspective before AIVO builds the brain. You can do this now or skip and add them later.",
+      "continue_to_baseline": "Continue to baseline",
+      "skip_for_now": "Skip for now"
     },
     "schedule": {
       "title": "Emploi du temps",
@@ -743,7 +747,10 @@
     "building_complete_title": "Le cerveau de {name} est prêt",
     "building_complete_caption": "Le cerveau a été construit à partir des données d'évaluation de {name}. Consultez les détails ci-dessous et décidez de la suite.",
     "building_complete_cta": "Examiner et décider",
-    "skip_animation": "Passer l'animation"
+    "skip_animation": "Passer l'animation",
+    "pending_title": "Building {name}’s brain",
+    "pending_description": "The baseline is in — we are assembling the brain now. If it has not finished, you can rebuild it from the latest baseline results.",
+    "pending_rebuild": "Rebuild the brain"
   },
   "learner": {
     "errors": {

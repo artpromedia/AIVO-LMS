@@ -164,6 +164,7 @@ const serverSchema = z.object({
   AIVO_PERSISTENCE_COMPLIANCE: aivoPersistenceOverrideSchema,
   AIVO_PERSISTENCE_QUESTS: aivoPersistenceOverrideSchema,
   AIVO_PERSISTENCE_ADMIN: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_COLLABORATION: aivoPersistenceOverrideSchema,
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z

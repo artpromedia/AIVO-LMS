@@ -541,7 +541,11 @@
       "credentials_placeholder": "مثال: M.S., CCC-SLP",
       "cancel": "إلغاء",
       "care_team_invites": "دعوات فريق الرعاية",
-      "revoke": "إلغاء الصلاحية"
+      "revoke": "إلغاء الصلاحية",
+      "onboarding_title": "Invite your child’s team (optional)",
+      "onboarding_subtitle": "Invite a teacher, caregiver, or therapist to add their perspective before AIVO builds the brain. You can do this now or skip and add them later.",
+      "continue_to_baseline": "Continue to baseline",
+      "skip_for_now": "Skip for now"
     },
     "schedule": {
       "title": "الجدول الزمني",
@@ -743,7 +747,10 @@
     "building_complete_title": "عقل {name} جاهز",
     "building_complete_caption": "تم بناء العقل من بيانات تقييم {name}. راجِع التفاصيل أدناه وقرّر ما يحدث بعد ذلك.",
     "building_complete_cta": "مراجعة واتخاذ القرار",
-    "skip_animation": "تخطّي الرسوم المتحركة"
+    "skip_animation": "تخطّي الرسوم المتحركة",
+    "pending_title": "Building {name}’s brain",
+    "pending_description": "The baseline is in — we are assembling the brain now. If it has not finished, you can rebuild it from the latest baseline results.",
+    "pending_rebuild": "Rebuild the brain"
   },
   "learner": {
     "errors": {

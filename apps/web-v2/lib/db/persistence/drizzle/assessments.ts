@@ -21,38 +21,48 @@ import type {
   ParentAssessment,
 } from "@/lib/db/types";
 import type { AssessmentStore } from "../types";
-import { getDb } from "./client";
+import { getDb, withTenantContext } from "./client";
 
 export const drizzleAssessments: AssessmentStore = {
   async findParentAssessment(learnerId, tenantId) {
-    const [row] = await getDb()
-      .select()
-      .from(webParentAssessments)
-      .where(
-        and(
-          eq(webParentAssessments.learnerId, learnerId),
-          eq(webParentAssessments.tenantId, tenantId),
-        ),
-      )
-      .limit(1);
-    return row ? (row.data as ParentAssessment) : null;
+    // web_parent_assessments has an RLS `tenant_isolation` policy keyed on
+    // the GUC `app.current_tenant` (0050_web_domain_rls.sql). The app
+    // connects as the non-owner `aivo_app` role, for which the policy is
+    // enforced and fail-closed: with no GUC set, the SELECT/INSERT affects
+    // ZERO rows. withTenantContext opens a transaction and sets the GUC so
+    // the write/read is permitted. (Passthrough in memory mode.)
+    return withTenantContext(tenantId, async () => {
+      const [row] = await getDb()
+        .select()
+        .from(webParentAssessments)
+        .where(
+          and(
+            eq(webParentAssessments.learnerId, learnerId),
+            eq(webParentAssessments.tenantId, tenantId),
+          ),
+        )
+        .limit(1);
+      return row ? (row.data as ParentAssessment) : null;
+    });
   },
 
   async upsertParentAssessment(assessment) {
-    const db = getDb();
-    await db
-      .insert(webParentAssessments)
-      .values({
-        id: assessment.id,
-        learnerId: assessment.learnerId,
-        tenantId: assessment.tenantId,
-        data: assessment,
-      })
-      .onConflictDoUpdate({
-        target: webParentAssessments.id,
-        set: { learnerId: assessment.learnerId, tenantId: assessment.tenantId, data: assessment },
-      });
-    return assessment;
+    return withTenantContext(assessment.tenantId, async () => {
+      const db = getDb();
+      await db
+        .insert(webParentAssessments)
+        .values({
+          id: assessment.id,
+          learnerId: assessment.learnerId,
+          tenantId: assessment.tenantId,
+          data: assessment,
+        })
+        .onConflictDoUpdate({
+          target: webParentAssessments.id,
+          set: { learnerId: assessment.learnerId, tenantId: assessment.tenantId, data: assessment },
+        });
+      return assessment;
+    });
   },
 
   async getBaselineById(baselineId, tenantId) {
