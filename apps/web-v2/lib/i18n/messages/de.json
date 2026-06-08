@@ -541,7 +541,11 @@
       "credentials_placeholder": "z. B. M.S., CCC-SLP",
       "cancel": "Abbrechen",
       "care_team_invites": "Einladungen zum Betreuungsteam",
-      "revoke": "Widerrufen"
+      "revoke": "Widerrufen",
+      "onboarding_title": "Invite your child’s team (optional)",
+      "onboarding_subtitle": "Invite a teacher, caregiver, or therapist to add their perspective before AIVO builds the brain. You can do this now or skip and add them later.",
+      "continue_to_baseline": "Continue to baseline",
+      "skip_for_now": "Skip for now"
     },
     "schedule": {
       "title": "Stundenplan",

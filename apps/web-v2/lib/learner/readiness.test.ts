@@ -13,7 +13,7 @@
  * advances accordingly. If `computeReadinessFor` ever regresses to reading a
  * store the writes don't land in, these assertions fail.
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { ensureSeeded } from "@/lib/db/seed";
 import { resetStore } from "@/lib/db/store";
 import {
@@ -42,6 +42,16 @@ describe("computeReadinessFor (reads through the persistence adapter)", () => {
     resetStore();
     ensureSeeded();
     resetPersistence();
+    // These cases assert the legacy assessment→IEP/baseline transitions.
+    // The Sprint 3 collaborator-invite step (default ON in dev/test) inserts
+    // `team_invite_optional` between them; stub the flag OFF here so the
+    // legacy assertions stay deterministic. Flag-ON behaviour is covered by
+    // readiness.collab.test.ts.
+    vi.stubEnv("AIVO_FLAG_COLLAB_INVITE_STEP", "false");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("a brand-new learner is profile_created", async () => {

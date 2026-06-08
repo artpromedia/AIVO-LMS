@@ -170,6 +170,16 @@ export interface LearnerStore {
     state: ReadinessState,
   ): Promise<LearnerProfile | null>;
   /**
+   * Sprint 3: persist the parent's decision on the optional collaborator
+   * invite step. Durable (stored on the learner document) so the onboarding
+   * progression survives a restart. Returns the updated learner or null.
+   */
+  setTeamInviteDecision(
+    id: string,
+    tenantId: string,
+    decision: "pending" | "done" | "skipped",
+  ): Promise<LearnerProfile | null>;
+  /**
    * Read the learner's stored accessibility preferences, or null if none have
    * been set (caller applies ACCESSIBILITY_DEFAULTS). Persisted on the learner
    * document so it is durable across restarts and shared across devices.

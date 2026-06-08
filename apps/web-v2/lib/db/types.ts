@@ -48,6 +48,7 @@ export type ReadinessState =
   | "profile_created"
   | "assessment_needed"
   | "iep_optional"
+  | "team_invite_optional"
   | "baseline_needed"
   | "brain_clone_review_needed"
   | "ready_for_today_mission"
@@ -109,6 +110,18 @@ export type LearnerProfile = {
    * Used by readiness to advance past `iep_optional`.
    */
   iepDecision: "uploaded" | "skipped" | null;
+  /**
+   * Sprint 3 (collaborator invites): parent's decision on the optional
+   * "invite your child's team" step, which sits between assessment submit
+   * and the baseline branch.
+   *  - "done": parent invited at least one collaborator and continued
+   *  - "skipped": parent explicitly skipped the step
+   *  - "pending" / undefined: not yet decided
+   * Optional so existing learner records (which predate the field) default
+   * to undecided. Read by `computeReadinessFor` to advance past
+   * `team_invite_optional`.
+   */
+  teamInviteDecision?: "pending" | "done" | "skipped";
   createdAt: ISODate;
 };
 

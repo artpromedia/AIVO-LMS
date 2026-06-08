@@ -1,10 +1,12 @@
 import { getPersistence } from "@/lib/db/persistence";
+import { collaboratorInviteStepEnabled } from "@/lib/feature-flags";
 import type { LearnerProfile, ReadinessState } from "@/lib/db/types";
 
 export const READINESS_LABEL: Record<ReadinessState, string> = {
   profile_created: "Profile created",
   assessment_needed: "Assessment needed",
   iep_optional: "Add an IEP (optional)",
+  team_invite_optional: "Invite your child's team (optional)",
   baseline_needed: "Baseline assessment ready",
   brain_clone_review_needed: "Brain clone ready for review",
   ready_for_today_mission: "Ready for today's mission",
@@ -16,6 +18,7 @@ export const READINESS_TONE: Record<ReadinessState, "neutral" | "warning" | "pri
     profile_created: "neutral",
     assessment_needed: "warning",
     iep_optional: "primary",
+    team_invite_optional: "primary",
     baseline_needed: "primary",
     brain_clone_review_needed: "primary",
     ready_for_today_mission: "success",
@@ -36,6 +39,10 @@ export const READINESS_NEXT_STEP: Record<ReadinessState, { label: string; hrefTe
     iep_optional: {
       label: "Add an IEP or skip",
       hrefTemplate: "/parent/learners/{learnerId}/iep",
+    },
+    team_invite_optional: {
+      label: "Invite your child's team",
+      hrefTemplate: "/parent/learners/{learnerId}/team?onboarding=1",
     },
     baseline_needed: {
       label: "Start baseline assessment",
@@ -109,6 +116,16 @@ export async function computeReadinessFor(
     return "ready_for_today_mission";
   }
   if (assessment?.submittedAt) {
+    // Sprint 3: after the assessment is submitted, route the parent to the
+    // optional "invite your child's team" step before the IEP/baseline
+    // branch — unless they've explicitly decided (mirrors the iepDecision
+    // pattern). Gated behind a feature flag so it's reversible: flag OFF
+    // reproduces the exact prior behaviour.
+    const teamInviteDecided =
+      learner.teamInviteDecision === "done" || learner.teamInviteDecision === "skipped";
+    if (collaboratorInviteStepEnabled() && !teamInviteDecided) {
+      return "team_invite_optional";
+    }
     return iepDecided ? "baseline_needed" : "iep_optional";
   }
   if (assessment && assessment.completedSections.length > 0) {

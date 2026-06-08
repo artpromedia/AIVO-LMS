@@ -541,7 +541,11 @@
       "credentials_placeholder": "例如：M.S., CCC-SLP",
       "cancel": "取消",
       "care_team_invites": "关爱团队邀请",
-      "revoke": "撤销"
+      "revoke": "撤销",
+      "onboarding_title": "Invite your child’s team (optional)",
+      "onboarding_subtitle": "Invite a teacher, caregiver, or therapist to add their perspective before AIVO builds the brain. You can do this now or skip and add them later.",
+      "continue_to_baseline": "Continue to baseline",
+      "skip_for_now": "Skip for now"
     },
     "schedule": {
       "title": "课程安排",

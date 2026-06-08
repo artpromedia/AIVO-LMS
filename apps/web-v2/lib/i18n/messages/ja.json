@@ -541,7 +541,11 @@
       "credentials_placeholder": "例：M.S., CCC-SLP",
       "cancel": "キャンセル",
       "care_team_invites": "サポートチームへの招待",
-      "revoke": "取り消し"
+      "revoke": "取り消し",
+      "onboarding_title": "Invite your child’s team (optional)",
+      "onboarding_subtitle": "Invite a teacher, caregiver, or therapist to add their perspective before AIVO builds the brain. You can do this now or skip and add them later.",
+      "continue_to_baseline": "Continue to baseline",
+      "skip_for_now": "Skip for now"
     },
     "schedule": {
       "title": "スケジュール",

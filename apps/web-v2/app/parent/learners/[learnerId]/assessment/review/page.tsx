@@ -19,6 +19,7 @@ import {
   submitParentAssessment,
 } from "@/lib/db/repos";
 import { audit } from "@/lib/bff/audit";
+import { nextStepFor } from "@/lib/learner/readiness";
 import { newRequestId } from "@/lib/observability/logger";
 import {
   ASSESSMENT_SECTION_LABEL,
@@ -71,7 +72,11 @@ async function submitAction(formData: FormData) {
     learnerId,
     metadata: { source: "ui" },
   });
-  redirect(`/parent/learners/${learnerId}/iep`);
+  // Sprint 3: route to the readiness-computed next step instead of hardcoding
+  // /iep. With the collaborator-invite flag ON this is the team step; OFF, it
+  // is the IEP step exactly as before.
+  const learner = await getLearner(learnerId, session.tenantId);
+  redirect(learner ? nextStepFor(learner).href : `/parent/learners/${learnerId}/iep`);
 }
 
 function stepForSection(sec: AssessmentSectionId): number {

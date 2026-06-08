@@ -194,6 +194,27 @@ export async function refreshLearnerReadiness(
   return state;
 }
 
+/**
+ * Sprint 3: persist the parent's decision on the optional collaborator
+ * invite step and recompute readiness so the learner advances out of
+ * `team_invite_optional`. Routed through the persistence adapter so the
+ * decision is durable (survives a restart) in both memory and postgres.
+ */
+export async function setTeamInviteDecision(
+  learnerId: string,
+  tenantId: string,
+  decision: "pending" | "done" | "skipped",
+): Promise<LearnerProfile | null> {
+  const updated = await getPersistence().learners.setTeamInviteDecision(
+    learnerId,
+    tenantId,
+    decision,
+  );
+  if (!updated) return null;
+  await refreshLearnerReadiness(learnerId, tenantId);
+  return updated;
+}
+
 // ===== Parent Assessment =====
 function emptyAnswers(): ParentAssessment["answers"] {
   return {
