@@ -57,28 +57,37 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
   // → entitlement and learner lesson-loop e2e specs. Returns a real
   // access token so the caller can drive authenticated requests against
   // billing-svc / tutor-svc.
-  app.post<{ Body: { email: string; password: string; tenantName?: string } }>(
+  app.post<{ Body: { email: string; password: string; tenantName?: string; tenantId?: string } }>(
     "/api/__test__/seed-parent",
     async (req, reply) => {
       if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
       const db = (app as any).db;
-      const { email, password, tenantName } = req.body ?? ({} as any);
+      const { email, password, tenantName, tenantId } = req.body ?? ({} as any);
       if (!email || !password) {
         return reply.status(400).send({ error: "email and password required" });
       }
       const lcEmail = email.toLowerCase();
-      const desiredTenantName = tenantName ?? `E2E Family ${lcEmail}`;
 
-      let [tenant] = await db
-        .select()
-        .from(tenants)
-        .where(eq(tenants.name, desiredTenantName))
-        .limit(1);
-      if (!tenant) {
+      // When tenantId is supplied (district-pilot e2e), seed the parent INTO that
+      // existing tenant — so the parent lives under the district, not a new B2C
+      // tenant. Otherwise create/reuse a B2C_FAMILY tenant by name.
+      let tenant: any;
+      if (tenantId) {
+        [tenant] = await db.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1);
+        if (!tenant) return reply.status(400).send({ error: "tenantId not found" });
+      } else {
+        const desiredTenantName = tenantName ?? `E2E Family ${lcEmail}`;
         [tenant] = await db
-          .insert(tenants)
-          .values({ name: desiredTenantName, type: "B2C_FAMILY" as any })
-          .returning();
+          .select()
+          .from(tenants)
+          .where(eq(tenants.name, desiredTenantName))
+          .limit(1);
+        if (!tenant) {
+          [tenant] = await db
+            .insert(tenants)
+            .values({ name: desiredTenantName, type: "B2C_FAMILY" as any })
+            .returning();
+        }
       }
 
       const passwordHash = await argon2.hash(password);

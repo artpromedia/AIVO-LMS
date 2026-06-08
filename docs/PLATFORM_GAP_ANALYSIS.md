@@ -544,3 +544,25 @@ tenant, not a scatter of self-serve B2C accounts.
   resend/revoke + remaining seats; no dead buttons).
 - `e2e/specs/district-pilot` Stage 2 invites parents under the district tenant and asserts the seat
   cap, against containers.
+
+## 13. District-pilot pack — Sprint 3 (G1/G3: parent joins, creates a learner under the seat cap)
+
+**Sprint 3** completes the parent stage of the journey: an invited parent logs in for real (Sprint 0
+auth), creates a learner **under the district tenant**, and is held to the pilot seat cap.
+
+- **Seat enforcement on the parent surface (the gap).** The canonical B2B cap on `tenants.seat_limit`
+  was only enforced in identity-svc's learner store; the web-v2 parent path (`web_learner_profiles`)
+  created learners with no cap. `apps/web-v2/lib/db/seat-availability.ts` now counts the tenant's web
+  learners against the shared `tenants.seat_limit`, and all three create paths enforce it:
+  `POST /api/bff/learners` (typed `SEAT_LIMIT_REACHED` 409) and the two onboarding/parent server
+  actions (redirect with `error=seat_limit`). The in-memory dev store stays unlimited.
+- **Consent.** Learner creation stamps the age-gate / parent-consent record at creation
+  (`recordAgeGate`), so COPPA/under-13 status is captured on the district path too.
+- **Proof.** `apps/web-v2/lib/db/seat-availability.test.ts` (dev store unlimited) +
+  `e2e/specs/district-pilot` Stage 3: a parent seeded into the district tenant logs in through the real
+  web-v2 UI, creates one learner (201 + consent record), and is refused the second by the 1-seat cap.
+
+With Sprints 0–3, the end-to-end pilot journey — platform admin provisions a district pilot → district
+admin invites parents into the district tenant → each parent logs in for real, creates a learner under
+the seat cap, and completes consent — is wired and proven against containers (Sprint 4 adds the
+ops dashboard).

@@ -23,6 +23,7 @@ import {
   WEB_BASE,
   IDENTITY_BASE,
   seedParent,
+  seedParentInTenant,
   seedPlatformAdmin,
   seedDistrictAdmin,
   skipUnlessIdentityTestMode,
@@ -177,7 +178,52 @@ test.describe("District pilot — Sprint 2: invite parents into the district ten
   });
 });
 
-test.describe("District pilot — full journey (sprints 3-4)", () => {
-  test.fixme("invited parent logs in and creates a learner under the seat cap + consent (Sprint 3)", async () => {});
+test.describe("District pilot — Sprint 3: parent creates a learner under the seat cap (G3)", () => {
+  test.beforeEach(async () => {
+    await skipUnlessIdentityTestMode();
+  });
+
+  test("a district parent logs in for real and is capped at the pilot seat limit", async ({
+    page,
+  }) => {
+    // 1-seat district so the second learner trips the cap.
+    const admin = await seedDistrictAdmin({ seatLimit: 1 });
+    expect(admin, "seed-district-admin helper must be reachable").not.toBeNull();
+    if (!admin) return;
+
+    const parent = await seedParentInTenant(admin.tenantId);
+    expect(parent, "parent seeded into the district tenant").not.toBeNull();
+    if (!parent) return;
+
+    // Real web-v2 login (no mock) — lands under the DISTRICT tenant.
+    await loginThroughWebUi(page, {
+      email: parent.email,
+      password: parent.password,
+      expectPath: "/parent/home",
+    });
+    await assertRealSessionNoMock(page);
+
+    // First learner: created (201) + an age-gate/consent record is stamped.
+    const first = await page.request.post(`${WEB_BASE}/api/bff/learners`, {
+      data: { firstName: "Kid One", birthYear: 2016 },
+      failOnStatusCode: false,
+    });
+    expect(first.status(), await first.text()).toBe(201);
+    const firstBody = await first.json();
+    expect(firstBody.data.learner.id).toBeTruthy();
+    expect(firstBody.data.ageGate).toBeTruthy(); // consent/age-gate recorded
+
+    // Second learner exceeds the 1-seat pilot cap → refused with a typed error.
+    const second = await page.request.post(`${WEB_BASE}/api/bff/learners`, {
+      data: { firstName: "Kid Two", birthYear: 2018 },
+      failOnStatusCode: false,
+    });
+    expect(second.status()).toBe(409);
+    const secondBody = await second.json();
+    expect(secondBody.error.code).toBe("SEAT_LIMIT_REACHED");
+  });
+});
+
+test.describe("District pilot — full journey (sprint 4)", () => {
   test.fixme("pilot ops dashboard shows seats, uptake, and expiry (Sprint 4)", async () => {});
 });

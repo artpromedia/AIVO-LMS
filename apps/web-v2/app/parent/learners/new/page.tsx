@@ -52,6 +52,12 @@ async function addLearnerAction(formData: FormData) {
   if (!parsed.success) {
     redirect("/parent/learners/new?error=invalid");
   }
+  // District pilot seat cap (Sprint 3): refuse over-cap before creating.
+  const { getTenantSeatAvailability } = await import("@/lib/db/seat-availability");
+  const seats = await getTenantSeatAvailability(session.tenantId);
+  if (!seats.allowed) {
+    redirect("/parent/learners/new?error=seat_limit");
+  }
   const learner = await createLearner({
     tenantId: session.tenantId,
     parentUserId: session.userId,

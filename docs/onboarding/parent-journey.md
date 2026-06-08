@@ -193,3 +193,13 @@ A parent can arrive on AIVO through one of two paths, which land them in
 The invite path is what makes "a district + its parents" one coherent tenant:
 the parent, their learners, and the district's schools all live under the same
 `tenantId`, and cross-tenant access stays blocked.
+
+## Seat cap on the parent learner-create path (pilot)
+
+For a parent under a B2B district tenant, learner creation is capped by
+`tenants.seat_limit`. web-v2 enforces this on every create path (the
+`/api/bff/learners` BFF returns a typed `SEAT_LIMIT_REACHED` error; the
+onboarding/parent server actions redirect with `error=seat_limit`) by counting
+the tenant's `web_learner_profiles` against the seat limit. B2C / uncapped
+tenants are unlimited. The age-gate / parent-consent record is stamped at
+learner creation.

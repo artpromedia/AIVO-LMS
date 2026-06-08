@@ -70,6 +70,28 @@ async function seedUser(role: string, email: string, password: string): Promise<
 
 export const seedParent = (email = `e2e-parent-${Date.now()}@aivo.test`) =>
   seedUser("parent", email, "E2eParent!Pass1");
+
+/** Seed a PARENT directly INTO an existing tenant (e.g. a district tenant) so
+ *  the district-pilot e2e can drive web-v2 learner-create under the seat cap. */
+export async function seedParentInTenant(
+  tenantId: string,
+  email = `e2e-dparent-${Date.now()}@aivo.test`,
+): Promise<SeededUser | null> {
+  const password = "E2eParent!Pass1";
+  try {
+    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
+    const res = await ctx.post(`/api/__test__/seed-parent`, {
+      data: { email, password, tenantId },
+      failOnStatusCode: false,
+    });
+    await ctx.dispose();
+    if (res.status() !== 200) return null;
+    const body = (await res.json()) as Omit<SeededUser, "email" | "password">;
+    return { ...body, email, password };
+  } catch {
+    return null;
+  }
+}
 export const seedTeacher = (email = `e2e-teacher-${Date.now()}@aivo.test`) =>
   seedUser("teacher", email, "E2eTeacher!Pass1");
 export const seedTherapist = (email = `e2e-therapist-${Date.now()}@aivo.test`) =>

@@ -9,6 +9,7 @@ import {
   recordAgeGate,
 } from "@/lib/db/repos";
 import { createLearnerSchema } from "@/lib/validators/learner";
+import { getTenantSeatAvailability } from "@/lib/db/seat-availability";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,24 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
+
+    // District pilot seat cap: a parent in a B2B district tenant may only add
+    // learners up to tenants.seat_limit. (B2C / uncapped tenants are unlimited.)
+    const seats = await getTenantSeatAvailability(session!.tenantId);
+    if (!seats.allowed) {
+      return fail(
+        {
+          code: "SEAT_LIMIT_REACHED",
+          status: 409,
+          message: `Seat limit reached (${seats.used}/${seats.seatLimit}) for tenant ${session!.tenantId}.`,
+          userMessage:
+            "Your school's plan has reached its learner seat limit. Ask your district administrator to add seats.",
+          retryable: false,
+        },
+        requestId,
+      );
+    }
+
     const learner = await createLearner({
       tenantId: session!.tenantId,
       parentUserId: session!.userId,
