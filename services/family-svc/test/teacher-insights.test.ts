@@ -97,9 +97,15 @@ async function seed(db: any): Promise<Fixture> {
     .returning();
 
   // Grant the teacher an accepted collaboration link to learner #1 only.
+  // `learner_teachers` requires NOT NULL tenant_id, teacher_email, and
+  // invited_by — provide all of them so the seed inserts cleanly. The
+  // invite is treated as already-accepted (the parent invited the teacher).
   await db.insert(learnerTeachers).values({
+    tenantId: t.id,
     learnerId: learner.id,
+    teacherEmail: `ti-teacher-${stamp}@test.local`,
     teacherUserId: teacherSub,
+    invitedBy: parentSub,
     status: "ACCEPTED",
   } as any);
 

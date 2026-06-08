@@ -17,10 +17,79 @@ async function ctx() {
   return { db, learners, aacVocabulary, buildSymbolBoard, ensureCoreVocabulary };
 }
 
+/**
+ * The `learners` table has NOT NULL foreign keys to `tenants` / `users`
+ * (tenantId, userId, parentId) plus a NOT NULL `name`, so `values({})` is
+ * not a valid bootstrap — Postgres rejects it with a tenant_id null
+ * violation. Seed the minimum graph (tenant + parent user + learner user)
+ * so the AAC board logic can attach to a real learner row.
+ */
+async function seedLearner(db: any) {
+  const { tenants, users, learners } = await import("@aivo/db");
+  const stamp = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+  const [t] = await db
+    .insert(tenants)
+    .values({ name: `aac-${stamp}`, type: "B2C_FAMILY" } as any)
+    .returning();
+  const [parent] = await db
+    .insert(users)
+    .values({
+      tenantId: t.id,
+      name: `aac-parent-${stamp}`,
+      email: `aac-parent-${stamp}@test.local`,
+      role: "PARENT",
+    } as any)
+    .returning();
+  const [luser] = await db
+    .insert(users)
+    .values({
+      tenantId: t.id,
+      name: `aac-learner-${stamp}`,
+      email: `aac-learner-${stamp}@test.local`,
+      role: "LEARNER",
+    } as any)
+    .returning();
+  const [learner] = await db
+    .insert(learners)
+    .values({
+      tenantId: t.id,
+      userId: luser.id,
+      parentId: parent.id,
+      name: `AAC Test Learner ${stamp}`,
+    } as any)
+    .returning();
+  return { learner, tenant: t, parent, luser };
+}
+
+async function cleanupLearner(
+  db: any,
+  ids: { learner: { id: string }; tenant: { id: string }; parent: { id: string }; luser: { id: string } },
+) {
+  const { learners, users, tenants } = await import("@aivo/db");
+  const { eq } = await import("drizzle-orm");
+  try {
+    await db.delete(learners).where(eq(learners.id, ids.learner.id));
+  } catch {
+    /* ignore */
+  }
+  try {
+    await db.delete(users).where(eq(users.id, ids.luser.id));
+    await db.delete(users).where(eq(users.id, ids.parent.id));
+  } catch {
+    /* ignore */
+  }
+  try {
+    await db.delete(tenants).where(eq(tenants.id, ids.tenant.id));
+  } catch {
+    /* ignore */
+  }
+}
+
 test("buildSymbolBoard anchors a board with core vocabulary", { skip: SKIP }, async () => {
   const { db, learners, aacVocabulary, buildSymbolBoard } = await ctx();
   const { eq } = await import("drizzle-orm");
-  const [learner] = await db.insert(learners).values({}).returning({ id: learners.id });
+  const ids = await seedLearner(db);
+  const learner = ids.learner;
   try {
     const board = await buildSymbolBoard(db, learner.id, "en");
     assert.ok(board.items.length >= 16, "core board has at least 16 words");
@@ -39,7 +108,7 @@ test("buildSymbolBoard anchors a board with core vocabulary", { skip: SKIP }, as
       .where(eq(aacVocabulary.learnerId, learner.id));
     assert.equal(rows.length, board.items.length);
   } finally {
-    await db.delete(learners).where(eq(learners.id, learner.id));
+    await cleanupLearner(db, ids);
     try {
       await (db as any).$client?.end?.({ timeout: 2 });
     } catch {
@@ -50,8 +119,8 @@ test("buildSymbolBoard anchors a board with core vocabulary", { skip: SKIP }, as
 
 test("buildSymbolBoard includes fringe words layered on core", { skip: SKIP }, async () => {
   const { db, learners, aacVocabulary, buildSymbolBoard } = await ctx();
-  const { eq } = await import("drizzle-orm");
-  const [learner] = await db.insert(learners).values({}).returning({ id: learners.id });
+  const ids = await seedLearner(db);
+  const learner = ids.learner;
   try {
     // Seed core first, then add a fringe word.
     await buildSymbolBoard(db, learner.id, "en");
@@ -69,7 +138,7 @@ test("buildSymbolBoard includes fringe words layered on core", { skip: SKIP }, a
     assert.ok(fringe, "fringe word present on the board");
     assert.ok(board.grid.rows >= 5, "grid grew to fit the fringe row");
   } finally {
-    await db.delete(learners).where(eq(learners.id, learner.id));
+    await cleanupLearner(db, ids);
     try {
       await (db as any).$client?.end?.({ timeout: 2 });
     } catch {

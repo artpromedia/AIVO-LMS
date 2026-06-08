@@ -208,6 +208,15 @@ export default function BrainBuildingSequence({
     return () => clearTimeout(x);
   }, [currentStage, tutorsRevealed, tutorDecisions.length, advanceStage, ms]);
 
+  // Under reduced motion, auto-advance past the "complete" stage's CTA so the
+  // parent lands on the recap + approval gate without having to dismiss a
+  // celebratory animation. The CTA remains available for everyone else.
+  useEffect(() => {
+    if (currentStage !== "complete" || !reducedMotion) return;
+    const x = setTimeout(() => onSequenceComplete(), ms(900));
+    return () => clearTimeout(x);
+  }, [currentStage, reducedMotion, onSequenceComplete, ms]);
+
   const stageIdx = STAGE_ORDER.indexOf(currentStage);
   const overallProgress = (stageIdx / (STAGE_ORDER.length - 1)) * 100;
 

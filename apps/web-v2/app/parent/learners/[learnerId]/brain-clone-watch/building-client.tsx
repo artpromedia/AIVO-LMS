@@ -88,6 +88,14 @@ export function BrainBuildingClient({
   // and always skipped for an already-approved brain (no first-run moment
   // left to deliver). `null` = undecided until we read localStorage so SSR
   // and first client render agree.
+  //
+  // `prefers-reduced-motion` also suppresses the auto-playing clone intro
+  // entirely — large animated cross-fades are exactly the kind of "calm"
+  // motion that the OS-level reduce-motion preference asks us to avoid.
+  // Skipping it also keeps the persistent brain sphere (rendered inside
+  // `BrainBuildingSequence`) visible from first paint so reduced-motion
+  // users land on the same affordance as everyone else (and our e2e gate
+  // can assert it without driving a 5s intro).
   const [showClone, setShowClone] = useState<boolean | null>(null);
   // The cinematic build sequence plays after the clone intro and before
   // the approval recap. Already-approved brains skip straight to the recap.
@@ -96,7 +104,10 @@ export function BrainBuildingClient({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const seen = hasSeenClone(learnerId);
-    setShowClone(!alreadyApproved && !seen);
+    const reducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setShowClone(!alreadyApproved && !seen && !reducedMotion);
     // If the parent has already lived the moment (or the brain is approved),
     // jump past the cinematic sequence to the recap + approval gate.
     setSequenceDone(alreadyApproved || seen);
