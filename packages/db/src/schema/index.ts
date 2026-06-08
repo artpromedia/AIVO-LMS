@@ -16,6 +16,8 @@ export * from "./web-clinical.js";
 export * from "./web-security.js";
 export * from "./web-privacy.js";
 export * from "./web-rostering.js";
+export * from "./web-audio.js";
+export * from "./web-safety.js";
 export * from "./homework.js";
 export * from "./idempotency.js";
 export * from "./collaboration.js";

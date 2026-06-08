@@ -55,6 +55,7 @@ const WEB_SCHEMA_MIGRATIONS = [
   "0083_web_security",
   "0084_web_privacy",
   "0085_web_rostering",
+  "0086_web_audio_safety",
 ];
 
 /** Reset `public` and apply the web-domain schema (hermetic, idempotent). */

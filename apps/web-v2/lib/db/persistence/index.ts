@@ -46,6 +46,10 @@ import { memorySecurity } from "./memory/security";
 import { drizzleSecurity } from "./drizzle/security";
 import { memoryRostering } from "./memory/rostering";
 import { drizzleRostering } from "./drizzle/rostering";
+import { memoryAudio } from "./memory/audio";
+import { drizzleAudio } from "./drizzle/audio";
+import { memorySafety } from "./memory/safety";
+import { drizzleSafety } from "./drizzle/safety";
 
 type DomainKey =
   | "notifications"
@@ -63,7 +67,9 @@ type DomainKey =
   | "billing"
   | "clinical"
   | "security"
-  | "rostering";
+  | "rostering"
+  | "audio"
+  | "safety";
 
 /**
  * Test-only global mode override. Set by the parity harness
@@ -100,6 +106,8 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     clinical: serverEnv.AIVO_PERSISTENCE_CLINICAL,
     security: serverEnv.AIVO_PERSISTENCE_SECURITY,
     rostering: serverEnv.AIVO_PERSISTENCE_ROSTERING,
+    audio: serverEnv.AIVO_PERSISTENCE_AUDIO,
+    safety: serverEnv.AIVO_PERSISTENCE_SAFETY,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -178,6 +186,8 @@ export function getPersistence(): Persistence {
   const clinicalMode = resolveMode("clinical");
   const securityMode = resolveMode("security");
   const rosteringMode = resolveMode("rostering");
+  const audioMode = resolveMode("audio");
+  const safetyMode = resolveMode("safety");
   warnOnModeMismatch(assessmentsMode, brainProfilesMode);
   assertAssessmentsBrainSameMode(assessmentsMode, brainProfilesMode);
   cached = {
@@ -202,6 +212,8 @@ export function getPersistence(): Persistence {
     clinical: clinicalMode === "postgres" ? drizzleClinical : memoryClinical,
     security: securityMode === "postgres" ? drizzleSecurity : memorySecurity,
     rostering: rosteringMode === "postgres" ? drizzleRostering : memoryRostering,
+    audio: audioMode === "postgres" ? drizzleAudio : memoryAudio,
+    safety: safetyMode === "postgres" ? drizzleSafety : memorySafety,
   };
   return cached;
 }

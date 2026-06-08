@@ -4124,15 +4124,15 @@ export const SAFETY_VALIDATE_TUTOR = _validateTutor;
 export const SAFETY_BLOCKED_FALLBACK = _blockedFallback;
 
 /** Returns the current active SafetyPolicyVersion (or the default if unseeded). */
-export function getActiveSafetyPolicy(): SafetyPolicyVersion {
-  for (const p of db().safetyPolicyVersions.values()) {
+export async function getActiveSafetyPolicy(): Promise<SafetyPolicyVersion> {
+  for (const p of await getPersistence().safety.listSafetyPolicyVersions()) {
     if (p.status === "active") return p;
   }
   return DEFAULT_SAFETY_POLICY;
 }
 
-export function listSafetyPolicyVersions(): SafetyPolicyVersion[] {
-  return Array.from(db().safetyPolicyVersions.values()).sort((a, b) =>
+export async function listSafetyPolicyVersions(): Promise<SafetyPolicyVersion[]> {
+  return (await getPersistence().safety.listSafetyPolicyVersions()).sort((a, b) =>
     b.effectiveAt.localeCompare(a.effectiveAt),
   );
 }
@@ -4142,7 +4142,7 @@ export function listSafetyPolicyVersions(): SafetyPolicyVersion[] {
  * or "block" with crisis signals, a HumanReviewCase is opened in the same
  * transaction so the admin queue surfaces it.
  */
-export function recordModerationEvent(input: {
+export async function recordModerationEvent(input: {
   tenantId: string;
   learnerId: string | null;
   subjectKind: SafetySubjectKind;
@@ -4152,8 +4152,8 @@ export function recordModerationEvent(input: {
   injectionSignals: ModerationEvent["injectionSignals"];
   crisisSignals: ModerationEvent["crisisSignals"];
   createdByUserId: string | null;
-}): { event: ModerationEvent; reviewCase: HumanReviewCase | null } {
-  const store = db();
+}): Promise<{ event: ModerationEvent; reviewCase: HumanReviewCase | null }> {
+  const safety = getPersistence().safety;
   const eventId = newId("modev");
   // Open a review case automatically when the decision is "review", on any
   // crisis signal, or on a "block" decision involving self_harm /
@@ -4182,7 +4182,7 @@ export function recordModerationEvent(input: {
       escalatedAt: input.crisisSignals.length > 0 ? nowIso() : null,
       createdAt: nowIso(),
     };
-    store.humanReviewCases.set(reviewCaseId, reviewCase);
+    await safety.upsertHumanReviewCase(reviewCase);
   }
 
   const event: ModerationEvent = {
@@ -4201,16 +4201,16 @@ export function recordModerationEvent(input: {
     reviewCaseId,
     createdAt: nowIso(),
   };
-  store.moderationEvents.set(eventId, event);
+  await safety.appendModerationEvent(event);
   return { event, reviewCase };
 }
 
-export function listModerationEvents(filter?: {
+export async function listModerationEvents(filter?: {
   tenantId?: string;
   decision?: "allow" | "review" | "block";
   limit?: number;
-}): ModerationEvent[] {
-  let arr = Array.from(db().moderationEvents.values());
+}): Promise<ModerationEvent[]> {
+  let arr = await getPersistence().safety.listModerationEvents();
   if (filter?.tenantId) arr = arr.filter((e) => e.tenantId === filter.tenantId);
   if (filter?.decision) arr = arr.filter((e) => e.classification.decision === filter.decision);
   arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -4218,25 +4218,25 @@ export function listModerationEvents(filter?: {
   return arr;
 }
 
-export function getModerationEvent(id: string): ModerationEvent | null {
-  return db().moderationEvents.get(id) ?? null;
+export async function getModerationEvent(id: string): Promise<ModerationEvent | null> {
+  return await getPersistence().safety.getModerationEvent(id);
 }
 
-export function listHumanReviewCases(filter?: {
+export async function listHumanReviewCases(filter?: {
   status?: HumanReviewCaseStatus;
   tenantId?: string;
-}): HumanReviewCase[] {
-  let arr = Array.from(db().humanReviewCases.values());
+}): Promise<HumanReviewCase[]> {
+  let arr = await getPersistence().safety.listHumanReviewCases();
   if (filter?.status) arr = arr.filter((c) => c.status === filter.status);
   if (filter?.tenantId) arr = arr.filter((c) => c.tenantId === filter.tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function getHumanReviewCase(id: string): HumanReviewCase | null {
-  return db().humanReviewCases.get(id) ?? null;
+export async function getHumanReviewCase(id: string): Promise<HumanReviewCase | null> {
+  return await getPersistence().safety.getHumanReviewCase(id);
 }
 
-export function updateHumanReviewCase(
+export async function updateHumanReviewCase(
   id: string,
   patch: {
     status?: HumanReviewCaseStatus;
@@ -4244,9 +4244,11 @@ export function updateHumanReviewCase(
     resolution?: string | null;
     resolvedByUserId?: string | null;
   },
-): HumanReviewCase | null {
-  const c = db().humanReviewCases.get(id);
-  if (!c) return null;
+): Promise<HumanReviewCase | null> {
+  const safety = getPersistence().safety;
+  const existing = await safety.getHumanReviewCase(id);
+  if (!existing) return null;
+  const c: HumanReviewCase = { ...existing };
   if (patch.status !== undefined) {
     c.status = patch.status;
     if ((patch.status === "resolved_allow" || patch.status === "resolved_block") && !c.resolvedAt) {
@@ -4257,28 +4259,27 @@ export function updateHumanReviewCase(
   if (patch.assignedToUserId !== undefined) c.assignedToUserId = patch.assignedToUserId;
   if (patch.resolution !== undefined) c.resolution = patch.resolution;
   if (patch.resolvedByUserId !== undefined) c.resolvedByUserId = patch.resolvedByUserId;
-  return c;
+  return await safety.upsertHumanReviewCase(c);
 }
 
-export function recordBlockedGeneration(input: {
+export async function recordBlockedGeneration(input: {
   tenantId: string;
   learnerId: string | null;
   subjectKind: SafetySubjectKind;
   reason: string;
   fallbackResponse: string;
-}): BlockedGeneration {
+}): Promise<BlockedGeneration> {
   const rec: BlockedGeneration = { id: newId("blk"), createdAt: nowIso(), ...input };
-  db().blockedGenerations.set(rec.id, rec);
-  return rec;
+  return await getPersistence().safety.appendBlockedGeneration(rec);
 }
 
-export function listBlockedGenerations(tenantId?: string): BlockedGeneration[] {
-  let arr = Array.from(db().blockedGenerations.values());
+export async function listBlockedGenerations(tenantId?: string): Promise<BlockedGeneration[]> {
+  let arr = await getPersistence().safety.listBlockedGenerations();
   if (tenantId) arr = arr.filter((b) => b.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function recordTutorResponseAudit(input: {
+export async function recordTutorResponseAudit(input: {
   tenantId: string;
   learnerId: string;
   contextKind: "lesson_run" | "homework_session";
@@ -4286,18 +4287,17 @@ export function recordTutorResponseAudit(input: {
   tutorPersona: string;
   excerpt: string;
   classification: SafetyClassification;
-}): TutorResponseAudit {
+}): Promise<TutorResponseAudit> {
   const rec: TutorResponseAudit = {
     id: newId("tra"),
     createdAt: nowIso(),
     ...input,
     excerpt: input.excerpt.slice(0, 500),
   };
-  db().tutorResponseAudits.set(rec.id, rec);
-  return rec;
+  return await getPersistence().safety.appendTutorResponseAudit(rec);
 }
 
-export function recordHomeworkInputAudit(input: {
+export async function recordHomeworkInputAudit(input: {
   tenantId: string;
   learnerId: string;
   homeworkSessionId: string;
@@ -4305,7 +4305,7 @@ export function recordHomeworkInputAudit(input: {
   sanitizedExcerpt: string;
   classification: SafetyClassification;
   piiRedacted: boolean;
-}): HomeworkInputAudit {
+}): Promise<HomeworkInputAudit> {
   const rec: HomeworkInputAudit = {
     id: newId("hia"),
     createdAt: nowIso(),
@@ -4313,18 +4313,17 @@ export function recordHomeworkInputAudit(input: {
     rawExcerpt: input.rawExcerpt.slice(0, 500),
     sanitizedExcerpt: input.sanitizedExcerpt.slice(0, 500),
   };
-  db().homeworkInputAudits.set(rec.id, rec);
-  return rec;
+  return await getPersistence().safety.appendHomeworkInputAudit(rec);
 }
 
-export function listTutorResponseAudits(tenantId?: string): TutorResponseAudit[] {
-  let arr = Array.from(db().tutorResponseAudits.values());
+export async function listTutorResponseAudits(tenantId?: string): Promise<TutorResponseAudit[]> {
+  let arr = await getPersistence().safety.listTutorResponseAudits();
   if (tenantId) arr = arr.filter((a) => a.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function listHomeworkInputAudits(tenantId?: string): HomeworkInputAudit[] {
-  let arr = Array.from(db().homeworkInputAudits.values());
+export async function listHomeworkInputAudits(tenantId?: string): Promise<HomeworkInputAudit[]> {
+  let arr = await getPersistence().safety.listHomeworkInputAudits();
   if (tenantId) arr = arr.filter((a) => a.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
@@ -4354,20 +4353,22 @@ const DEFAULT_VOICE_PREFERENCE: Omit<
 };
 
 /** Resolve override set for a tenant (platform-scope first, then tenant-scope). */
-function resolveOverrides(tenantId: string): PronunciationOverride[] {
-  const all = Array.from(db().pronunciationOverrides.values());
+async function resolveOverrides(tenantId: string): Promise<PronunciationOverride[]> {
+  const all = await getPersistence().audio.listPronunciationOverrides();
   return all
     .filter((o) => o.scope === "platform" || o.tenantId === tenantId)
     .sort((a, b) => a.token.localeCompare(b.token));
 }
 
-export function listPronunciationOverrides(tenantId?: string): PronunciationOverride[] {
-  let arr = Array.from(db().pronunciationOverrides.values());
+export async function listPronunciationOverrides(
+  tenantId?: string,
+): Promise<PronunciationOverride[]> {
+  let arr = await getPersistence().audio.listPronunciationOverrides();
   if (tenantId) arr = arr.filter((o) => o.scope === "platform" || o.tenantId === tenantId);
   return arr.sort((a, b) => a.token.localeCompare(b.token));
 }
 
-export function createPronunciationOverride(input: {
+export async function createPronunciationOverride(input: {
   tenantId: string;
   token: string;
   replacement: string;
@@ -4375,46 +4376,51 @@ export function createPronunciationOverride(input: {
   scope: "platform" | "tenant";
   notes: string | null;
   createdByUserId: string;
-}): PronunciationOverride {
+}): Promise<PronunciationOverride> {
   const rec: PronunciationOverride = {
     id: newId("pron"),
     createdAt: nowIso(),
     ...input,
   };
-  db().pronunciationOverrides.set(rec.id, rec);
-  return rec;
+  return await getPersistence().audio.upsertPronunciationOverride(rec);
 }
 
-export function updatePronunciationOverride(
+export async function updatePronunciationOverride(
   id: string,
   patch: Partial<Pick<PronunciationOverride, "replacement" | "encoding" | "notes" | "scope">>,
-): PronunciationOverride | null {
-  const o = db().pronunciationOverrides.get(id);
-  if (!o) return null;
+): Promise<PronunciationOverride | null> {
+  const audio = getPersistence().audio;
+  const existing = await audio.getPronunciationOverride(id);
+  if (!existing) return null;
+  const o: PronunciationOverride = { ...existing };
   if (patch.replacement !== undefined) o.replacement = patch.replacement;
   if (patch.encoding !== undefined) o.encoding = patch.encoding;
   if (patch.notes !== undefined) o.notes = patch.notes;
   if (patch.scope !== undefined) o.scope = patch.scope;
-  return o;
+  return await audio.upsertPronunciationOverride(o);
 }
 
-export function getPronunciationOverride(id: string): PronunciationOverride | null {
-  return db().pronunciationOverrides.get(id) ?? null;
+export async function getPronunciationOverride(
+  id: string,
+): Promise<PronunciationOverride | null> {
+  return await getPersistence().audio.getPronunciationOverride(id);
 }
 
-export function getLearnerVoicePreference(learnerId: string): LearnerVoicePreference | null {
-  return db().learnerVoicePreferences.get(learnerId) ?? null;
+export async function getLearnerVoicePreference(
+  learnerId: string,
+): Promise<LearnerVoicePreference | null> {
+  return await getPersistence().audio.getVoicePreference(learnerId);
 }
 
-export function upsertLearnerVoicePreference(input: {
+export async function upsertLearnerVoicePreference(input: {
   learnerId: string;
   tenantId: string;
   voiceId?: TTSVoiceId;
   speed?: number;
   enabled?: boolean;
   captionsAlways?: boolean;
-}): LearnerVoicePreference {
-  const existing = db().learnerVoicePreferences.get(input.learnerId);
+}): Promise<LearnerVoicePreference> {
+  const existing = await getPersistence().audio.getVoicePreference(input.learnerId);
   const merged: LearnerVoicePreference = {
     learnerId: input.learnerId,
     tenantId: input.tenantId,
@@ -4429,8 +4435,7 @@ export function upsertLearnerVoicePreference(input: {
       input.captionsAlways ?? existing?.captionsAlways ?? DEFAULT_VOICE_PREFERENCE.captionsAlways,
     updatedAt: nowIso(),
   };
-  db().learnerVoicePreferences.set(merged.learnerId, merged);
-  return merged;
+  return await getPersistence().audio.upsertVoicePreference(merged);
 }
 
 function cacheKey(tenantId: string, languageCode: string, contentHash: string) {
@@ -4454,12 +4459,12 @@ export async function generateTTS(input: {
   languageCode?: string;
   speed?: number;
 }): Promise<{ job: TTSGenerationJob; asset: AudioAsset }> {
-  const store = db();
+  const audio = getPersistence().audio;
   const languageCode = input.languageCode ?? "en-US";
-  const pref = input.learnerId ? getLearnerVoicePreference(input.learnerId) : null;
+  const pref = input.learnerId ? await getLearnerVoicePreference(input.learnerId) : null;
   const voiceId = input.voiceId ?? pref?.voiceId ?? "kid_friendly";
   const speed = Math.min(2, Math.max(0.5, input.speed ?? pref?.speed ?? 1.0));
-  const overrides = resolveOverrides(input.tenantId).map((o) => ({
+  const overrides = (await resolveOverrides(input.tenantId)).map((o) => ({
     token: o.token,
     replacement: o.replacement,
     encoding: o.encoding,
@@ -4473,12 +4478,11 @@ export async function generateTTS(input: {
   });
 
   const key = cacheKey(input.tenantId, languageCode, hash);
-  const cached = store.audioCacheEntries.get(key);
+  const cached = await audio.getCacheEntry(key);
   if (cached) {
-    const existing = store.audioAssets.get(cached.audioAssetId);
+    const existing = await audio.getAudioAsset(cached.audioAssetId);
     if (existing) {
-      cached.hits += 1;
-      cached.lastHitAt = nowIso();
+      await audio.upsertCacheEntry(key, { ...cached, hits: cached.hits + 1, lastHitAt: nowIso() });
       const jobId = newId("tts");
       const job: TTSGenerationJob = {
         id: jobId,
@@ -4493,7 +4497,7 @@ export async function generateTTS(input: {
         createdAt: nowIso(),
         completedAt: nowIso(),
       };
-      store.ttsGenerationJobs.set(jobId, job);
+      await audio.upsertTtsJob(job);
       return { job, asset: existing };
     }
   }
@@ -4512,7 +4516,7 @@ export async function generateTTS(input: {
     createdAt: nowIso(),
     completedAt: null,
   };
-  store.ttsGenerationJobs.set(jobId, job);
+  await audio.upsertTtsJob(job);
 
   try {
     const provider = getTTSProvider();
@@ -4540,7 +4544,7 @@ export async function generateTTS(input: {
       provider: result.provider,
       createdAt: nowIso(),
     };
-    store.audioAssets.set(assetId, asset);
+    await audio.upsertAudioAsset(asset);
     const entry: AudioCacheEntry = {
       contentHash: hash,
       tenantId: input.tenantId,
@@ -4549,30 +4553,32 @@ export async function generateTTS(input: {
       hits: 0,
       lastHitAt: nowIso(),
     };
-    store.audioCacheEntries.set(key, entry);
+    await audio.upsertCacheEntry(key, entry);
     job.status = "completed";
     job.audioAssetId = assetId;
     job.completedAt = nowIso();
+    await audio.upsertTtsJob(job);
     return { job, asset };
   } catch (e) {
     job.status = "failed";
     job.errorMessage = e instanceof Error ? e.message : "TTS failed.";
     job.completedAt = nowIso();
+    await audio.upsertTtsJob(job);
     throw e;
   }
 }
 
-export function getAudioAsset(id: string): AudioAsset | null {
-  return db().audioAssets.get(id) ?? null;
+export async function getAudioAsset(id: string): Promise<AudioAsset | null> {
+  return await getPersistence().audio.getAudioAsset(id);
 }
 
-export function listAudioAssets(tenantId?: string): AudioAsset[] {
-  let arr = Array.from(db().audioAssets.values());
+export async function listAudioAssets(tenantId?: string): Promise<AudioAsset[]> {
+  let arr = await getPersistence().audio.listAudioAssets();
   if (tenantId) arr = arr.filter((a) => a.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function recordReadAloudUsage(input: {
+export async function recordReadAloudUsage(input: {
   tenantId: string;
   learnerId: string | null;
   audioAssetId: string;
@@ -4580,29 +4586,28 @@ export function recordReadAloudUsage(input: {
   contextRefId: string | null;
   cacheHit: boolean;
   costMicroUsd: number;
-}): ReadAloudUsageEvent {
+}): Promise<ReadAloudUsageEvent> {
   const rec: ReadAloudUsageEvent = {
     id: newId("rau"),
     createdAt: nowIso(),
     ...input,
   };
-  db().readAloudUsageEvents.set(rec.id, rec);
-  return rec;
+  return await getPersistence().audio.appendReadAloudUsage(rec);
 }
 
-export function listReadAloudUsage(tenantId?: string): ReadAloudUsageEvent[] {
-  let arr = Array.from(db().readAloudUsageEvents.values());
+export async function listReadAloudUsage(tenantId?: string): Promise<ReadAloudUsageEvent[]> {
+  let arr = await getPersistence().audio.listReadAloudUsage();
   if (tenantId) arr = arr.filter((e) => e.tenantId === tenantId);
   return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function summarizeAudioUsage(tenantId?: string): {
+export async function summarizeAudioUsage(tenantId?: string): Promise<{
   totalPlaybacks: number;
   totalCostMicroUsd: number;
   cacheHitRate: number;
   uniqueAssets: number;
-} {
-  const events = listReadAloudUsage(tenantId);
+}> {
+  const events = await listReadAloudUsage(tenantId);
   const total = events.length;
   const hits = events.filter((e) => e.cacheHit).length;
   const cost = events.reduce((a, e) => a + e.costMicroUsd, 0);
@@ -7054,9 +7059,9 @@ interface BaselineAuditLike {
   createdAt?: string;
 }
 
-export function getBaselinePipelineMetrics(
+export async function getBaselinePipelineMetrics(
   opts: { startIso?: string; endIso?: string } = {},
-): BaselinePipelineMetrics {
+): Promise<BaselinePipelineMetrics> {
   const endIso = opts.endIso ?? new Date().toISOString();
   const startIso = opts.startIso ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const startMs = new Date(startIso).getTime();
@@ -7066,7 +7071,7 @@ export function getBaselinePipelineMetrics(
   // dedicated baseline_item_audits map yet (the postgres table from
   // Sprint 4 is the production surface); for now we aggregate from
   // moderationEvents which captures the same shape during local dev.
-  const rows: BaselineAuditLike[] = Array.from(db().moderationEvents.values()).filter((m) => {
+  const rows: BaselineAuditLike[] = (await getPersistence().safety.listModerationEvents()).filter((m) => {
     const t = m as { createdAt?: string };
     const ms = new Date(t.createdAt ?? 0).getTime();
     return ms >= startMs && ms <= endMs;

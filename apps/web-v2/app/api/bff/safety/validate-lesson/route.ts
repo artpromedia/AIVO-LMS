@@ -48,9 +48,9 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const result = SAFETY_VALIDATE_PLAN(parsed.data, getActiveSafetyPolicy());
+    const result = SAFETY_VALIDATE_PLAN(parsed.data, await getActiveSafetyPolicy());
     if (!result.ok) {
-      recordModerationEvent({
+      await recordModerationEvent({
         tenantId: session!.tenantId,
         learnerId: null,
         subjectKind: "lesson_plan",

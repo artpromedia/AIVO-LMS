@@ -47,7 +47,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     // scope, not just the incoming patch. Without this, a school/district
     // admin who knows a platform override id could mutate it via PATCH simply
     // by omitting `scope` from the body.
-    const existing = getPronunciationOverride(id);
+    const existing = await getPronunciationOverride(id);
     if (!existing) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Override not found." }, requestId);
     }
@@ -79,7 +79,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         requestId,
       );
     }
-    const rec = updatePronunciationOverride(id, parsed.data);
+    const rec = await updatePronunciationOverride(id, parsed.data);
     if (!rec) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Override not found." }, requestId);
     }

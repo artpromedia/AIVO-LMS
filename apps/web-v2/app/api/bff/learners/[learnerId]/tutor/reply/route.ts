@@ -89,14 +89,14 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     // homework session route does. We DO NOT persist message audits here
     // (stateless route), but moderation + blocked-generation events are
     // still recorded so the safety dashboard sees the activity.
-    const policy = getActiveSafetyPolicy();
+    const policy = await getActiveSafetyPolicy();
     const sanitized = SAFETY_SANITIZE(text);
     const inputCls = SAFETY_CLASSIFY(sanitized.cleaned, {
       subjectKind: "homework_input",
       policy,
     });
     if (inputCls.classification.decision !== "allow" || sanitized.injectionStripped) {
-      recordModerationEvent({
+      await recordModerationEvent({
         tenantId: session!.tenantId,
         learnerId,
         subjectKind: "homework_input",
@@ -110,7 +110,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
     if (inputCls.classification.decision === "block") {
       const fallback = SAFETY_BLOCKED_FALLBACK("homework_input");
-      recordBlockedGeneration({
+      await recordBlockedGeneration({
         tenantId: session!.tenantId,
         learnerId,
         subjectKind: "homework_input",
@@ -140,7 +140,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       subjectKind: "tutor_response",
       policy,
     });
-    recordTutorResponseAudit({
+    await recordTutorResponseAudit({
       tenantId: session!.tenantId,
       learnerId,
       contextKind: "homework_session",
@@ -154,7 +154,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!tutorRule.ok || tutorCls.classification.decision === "block") {
       finalText = SAFETY_BLOCKED_FALLBACK("tutor_response");
       blockedOutput = true;
-      recordBlockedGeneration({
+      await recordBlockedGeneration({
         tenantId: session!.tenantId,
         learnerId,
         subjectKind: "tutor_response",
@@ -163,7 +163,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
           : `Tutor rule: ${tutorRule.violations.map((v) => v.rule).join(",")}`,
         fallbackResponse: finalText,
       });
-      recordModerationEvent({
+      await recordModerationEvent({
         tenantId: session!.tenantId,
         learnerId,
         subjectKind: "tutor_response",

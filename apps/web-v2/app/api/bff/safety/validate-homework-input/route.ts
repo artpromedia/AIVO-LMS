@@ -49,9 +49,9 @@ export async function POST(req: Request): Promise<NextResponse> {
     const sanitized = SAFETY_SANITIZE(parsed.data.text);
     const result = SAFETY_CLASSIFY(sanitized.cleaned, {
       subjectKind: "homework_input",
-      policy: getActiveSafetyPolicy(),
+      policy: await getActiveSafetyPolicy(),
     });
-    recordHomeworkInputAudit({
+    await recordHomeworkInputAudit({
       tenantId: session!.tenantId,
       learnerId: parsed.data.learnerId,
       homeworkSessionId: parsed.data.homeworkSessionId,
@@ -61,7 +61,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       piiRedacted: sanitized.piiRedacted,
     });
     if (result.classification.decision !== "allow" || sanitized.injectionStripped) {
-      recordModerationEvent({
+      await recordModerationEvent({
         tenantId: session!.tenantId,
         learnerId: parsed.data.learnerId,
         subjectKind: "homework_input",

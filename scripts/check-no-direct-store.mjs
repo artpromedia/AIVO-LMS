@@ -238,7 +238,43 @@ const MIGRATED_DOMAINS = [
       "putLessonSyncState",
     ],
   },
-];
+  {
+    domain: "audio",
+    reposFunctions: [
+      "generateTTS",
+      "getAudioAsset",
+      "listAudioAssets",
+      "recordReadAloudUsage",
+      "listReadAloudUsage",
+      "summarizeAudioUsage",
+      "listPronunciationOverrides",
+      "createPronunciationOverride",
+      "updatePronunciationOverride",
+      "getPronunciationOverride",
+      "getLearnerVoicePreference",
+      "upsertLearnerVoicePreference",
+    ],
+  },
+  {
+    domain: "safety",
+    reposFunctions: [
+      "getActiveSafetyPolicy",
+      "listSafetyPolicyVersions",
+      "recordModerationEvent",
+      "listModerationEvents",
+      "getModerationEvent",
+      "listHumanReviewCases",
+      "getHumanReviewCase",
+      "updateHumanReviewCase",
+      "recordBlockedGeneration",
+      "listBlockedGenerations",
+      "recordTutorResponseAudit",
+      "recordHomeworkInputAudit",
+      "listTutorResponseAudits",
+      "listHomeworkInputAudits",
+      "getBaselinePipelineMetrics",
+    ],
+  },];
 
 // Forbidden signals. `getStore`/`resetStore` as identifiers; `db()` as a call.
 const IMPORT_RE = /\b(getStore|resetStore)\b/;

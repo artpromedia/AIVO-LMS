@@ -463,6 +463,13 @@
       "when": 1782768000000,
       "tag": "0085_web_rostering",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1782854400000,
+      "tag": "0086_web_audio_safety",
+      "breakpoints": true
     }
   ]
 }

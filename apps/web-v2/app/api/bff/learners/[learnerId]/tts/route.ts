@@ -44,7 +44,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       requestId,
     );
     if (consentErr) return consentErr;
-    const pref = getLearnerVoicePreference(learnerId);
+    const pref = await getLearnerVoicePreference(learnerId);
     if (pref && !pref.enabled) {
       return fail(
         { ...ERRORS.PRECONDITION_FAILED, message: "Read-aloud is disabled for this learner." },
@@ -77,7 +77,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         speed: parsed.data.speed,
       });
       const cacheHit = job.status === "cached_hit";
-      recordReadAloudUsage({
+      await recordReadAloudUsage({
         tenantId: session!.tenantId,
         learnerId,
         audioAssetId: asset.id,

@@ -20,6 +20,18 @@ import type {
   BaselineItemResponseLog,
   BaselineQuestion,
   BillingAccount,
+  AudioAsset,
+  AudioCacheEntry,
+  BlockedGeneration,
+  HomeworkInputAudit,
+  HumanReviewCase,
+  LearnerVoicePreference,
+  ModerationEvent,
+  PronunciationOverride,
+  ReadAloudUsageEvent,
+  SafetyPolicyVersion,
+  TTSGenerationJob,
+  TutorResponseAudit,
   Classroom,
   Course,
   Coupon,
@@ -624,6 +636,51 @@ export interface RosteringStore {
   upsertLessonSyncState(state: LessonSyncState): Promise<LessonSyncState>;
 }
 
+/**
+ * Audio domain (Sprint 7) — TTS jobs, audio assets, the read-aloud cache
+ * (composite key `${tenantId}:${lang}:${hash}`), pronunciation overrides,
+ * per-learner voice prefs, read-aloud usage. Filtering/sorting + the cache
+ * key + TTL/hit logic stay in repos; the store is a row store. No RLS.
+ */
+export interface AudioStore {
+  getAudioAsset(id: string): Promise<AudioAsset | null>;
+  listAudioAssets(): Promise<AudioAsset[]>;
+  upsertAudioAsset(asset: AudioAsset): Promise<AudioAsset>;
+  upsertTtsJob(job: TTSGenerationJob): Promise<TTSGenerationJob>;
+  listPronunciationOverrides(): Promise<PronunciationOverride[]>;
+  getPronunciationOverride(id: string): Promise<PronunciationOverride | null>;
+  upsertPronunciationOverride(o: PronunciationOverride): Promise<PronunciationOverride>;
+  getVoicePreference(learnerId: string): Promise<LearnerVoicePreference | null>;
+  upsertVoicePreference(pref: LearnerVoicePreference): Promise<LearnerVoicePreference>;
+  appendReadAloudUsage(event: ReadAloudUsageEvent): Promise<ReadAloudUsageEvent>;
+  listReadAloudUsage(): Promise<ReadAloudUsageEvent[]>;
+  /** Audio cache by composite key. */
+  getCacheEntry(cacheKey: string): Promise<AudioCacheEntry | null>;
+  upsertCacheEntry(cacheKey: string, entry: AudioCacheEntry): Promise<AudioCacheEntry>;
+}
+
+/**
+ * Safety domain (Sprint 7) — moderation events + human-review cases +
+ * safety-policy catalog + blocked generations + tutor/homework safety audits.
+ * Moderation events + audits are append-only. No RLS (admin cross-tenant
+ * trust console). Canonical responsible-AI evals/models read via REST.
+ */
+export interface SafetyStore {
+  listSafetyPolicyVersions(): Promise<SafetyPolicyVersion[]>;
+  appendModerationEvent(event: ModerationEvent): Promise<ModerationEvent>;
+  getModerationEvent(id: string): Promise<ModerationEvent | null>;
+  listModerationEvents(): Promise<ModerationEvent[]>;
+  upsertHumanReviewCase(c: HumanReviewCase): Promise<HumanReviewCase>;
+  getHumanReviewCase(id: string): Promise<HumanReviewCase | null>;
+  listHumanReviewCases(): Promise<HumanReviewCase[]>;
+  appendBlockedGeneration(b: BlockedGeneration): Promise<BlockedGeneration>;
+  listBlockedGenerations(): Promise<BlockedGeneration[]>;
+  appendTutorResponseAudit(a: TutorResponseAudit): Promise<TutorResponseAudit>;
+  listTutorResponseAudits(): Promise<TutorResponseAudit[]>;
+  appendHomeworkInputAudit(a: HomeworkInputAudit): Promise<HomeworkInputAudit>;
+  listHomeworkInputAudits(): Promise<HomeworkInputAudit[]>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -642,6 +699,8 @@ export interface Persistence {
   clinical: ClinicalStore;
   security: SecurityStore;
   rostering: RosteringStore;
+  audio: AudioStore;
+  safety: SafetyStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

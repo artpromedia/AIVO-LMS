@@ -186,6 +186,9 @@ const serverSchema = z.object({
   // Sprint 6 — web-owned rostering / SIS / lesson-sync aggregates. Canonical
   // SIS sync (integrations-svc) + rostering grant (identity-svc) read via REST.
   AIVO_PERSISTENCE_ROSTERING: aivoPersistenceOverrideSchema,
+  // Sprint 7 — web-owned TTS/audio/read-aloud + safety/moderation.
+  AIVO_PERSISTENCE_AUDIO: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_SAFETY: aivoPersistenceOverrideSchema,
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z

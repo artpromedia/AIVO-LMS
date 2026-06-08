@@ -77,6 +77,18 @@ import {
   webSisConnections,
   webExternalRosterMappings,
   webLessonSyncStates,
+  webAudioAssets,
+  webTtsGenerationJobs,
+  webPronunciationOverrides,
+  webLearnerVoicePreferences,
+  webReadAloudUsageEvents,
+  webAudioCacheEntries,
+  webSafetyPolicyVersions,
+  webModerationEvents,
+  webHumanReviewCases,
+  webBlockedGenerations,
+  webTutorResponseAudits,
+  webHomeworkInputAudits,
 } from "@aivo/db";
 import { getStore } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
@@ -869,6 +881,19 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
       webLessonSyncStates.lessonRunId,
     ),
   );
+  // ── Sprint 7: web-owned audio + safety artifacts ────────────────────
+  await log("audioAssets", await bulk(db, webAudioAssets, vals(s.audioAssets).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webAudioAssets.id));
+  await log("ttsGenerationJobs", await bulk(db, webTtsGenerationJobs, vals(s.ttsGenerationJobs).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webTtsGenerationJobs.id));
+  await log("pronunciationOverrides", await bulk(db, webPronunciationOverrides, vals(s.pronunciationOverrides).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webPronunciationOverrides.id));
+  await log("learnerVoicePreferences", await bulk(db, webLearnerVoicePreferences, vals(s.learnerVoicePreferences).map((x) => ({ learnerId: x.learnerId, tenantId: x.tenantId, data: x })), webLearnerVoicePreferences.learnerId));
+  await log("readAloudUsageEvents", await bulk(db, webReadAloudUsageEvents, vals(s.readAloudUsageEvents).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webReadAloudUsageEvents.id));
+  await log("audioCacheEntries", await bulk(db, webAudioCacheEntries, Array.from(s.audioCacheEntries.entries()).map(([k, x]) => ({ cacheKey: k, tenantId: x.tenantId, data: x })), webAudioCacheEntries.cacheKey));
+  await log("safetyPolicyVersions", await bulk(db, webSafetyPolicyVersions, vals(s.safetyPolicyVersions).map((x) => ({ id: x.id, data: x })), webSafetyPolicyVersions.id));
+  await log("moderationEvents", await bulk(db, webModerationEvents, vals(s.moderationEvents).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webModerationEvents.id));
+  await log("humanReviewCases", await bulk(db, webHumanReviewCases, vals(s.humanReviewCases).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webHumanReviewCases.id));
+  await log("blockedGenerations", await bulk(db, webBlockedGenerations, vals(s.blockedGenerations).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webBlockedGenerations.id));
+  await log("tutorResponseAudits", await bulk(db, webTutorResponseAudits, vals(s.tutorResponseAudits).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webTutorResponseAudits.id));
+  await log("homeworkInputAudits", await bulk(db, webHomeworkInputAudits, vals(s.homeworkInputAudits).map((x) => ({ id: x.id, tenantId: x.tenantId, data: x })), webHomeworkInputAudits.id));
   await log(
     "lessonParentSummaries",
     await bulk(

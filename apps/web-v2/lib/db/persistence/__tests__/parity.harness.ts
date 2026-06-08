@@ -108,6 +108,18 @@ const TABLES = [
   "web_sis_connections",
   "web_external_roster_mappings",
   "web_lesson_sync_states",
+  "web_audio_assets",
+  "web_tts_generation_jobs",
+  "web_pronunciation_overrides",
+  "web_learner_voice_preferences",
+  "web_read_aloud_usage_events",
+  "web_audio_cache_entries",
+  "web_safety_policy_versions",
+  "web_moderation_events",
+  "web_human_review_cases",
+  "web_blocked_generations",
+  "web_tutor_response_audits",
+  "web_homework_input_audits",
 ] as const;
 
 const POSTGRES_ENABLED =
