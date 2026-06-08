@@ -4,9 +4,19 @@
  * Confirms the learner-initiated regulation surface is reachable and
  * operable: the page renders, the universal box-breathing activity is
  * pickable, and starting it surfaces an `aria-live` phase status the
- * way an assistive technology user would hear it.
+ * way an assistive technology user would hear it. We also run axe on
+ * the page so the a11y:audit gate's axe-coverage check is satisfied
+ * and serious/critical violations regress the build.
  */
 import { test, expect } from "@playwright/test";
+import { injectAxe, checkA11y } from "axe-playwright";
+
+const AXE_RULES = {
+  "document-title": { enabled: false },
+  "html-has-lang": { enabled: false },
+  "landmark-one-main": { enabled: false },
+  "page-has-heading-one": { enabled: false },
+} as const;
 
 const learnerCookie = {
   name: "aivo_mock_session",
@@ -24,8 +34,22 @@ test.describe("@a11y calm corner", () => {
     await page.goto("/learner/calm", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: /calm moment/i })).toBeVisible();
 
+    // Axe before interaction — the static surface must be clean.
+    await injectAxe(page);
+    await checkA11y(page, undefined, {
+      detailedReport: true,
+      axeOptions: { rules: AXE_RULES },
+    });
+
     // Pick the universal breathing activity and confirm a live phase status appears.
     await page.getByRole("button", { name: /box breathing/i }).click();
     await expect(page.getByRole("status")).toBeVisible();
+
+    // Re-run axe after the live region appears so the aria-live wiring
+    // doesn't introduce a new violation post-interaction.
+    await checkA11y(page, undefined, {
+      detailedReport: true,
+      axeOptions: { rules: AXE_RULES },
+    });
   });
 });

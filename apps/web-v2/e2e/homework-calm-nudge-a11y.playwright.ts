@@ -7,8 +7,19 @@
  * dismissible "calm break" card that deep-links to the right Calm
  * activity. We drive time with Playwright's clock so the 120s inactivity
  * threshold is reached deterministically instead of by real waiting.
+ * We also run axe on the page before and after the nudge appears so the
+ * a11y:audit gate's axe-coverage check is satisfied and serious/critical
+ * violations regress the build.
  */
 import { test, expect } from "@playwright/test";
+import { injectAxe, checkA11y } from "axe-playwright";
+
+const AXE_RULES = {
+  "document-title": { enabled: false },
+  "html-has-lang": { enabled: false },
+  "landmark-one-main": { enabled: false },
+  "page-has-heading-one": { enabled: false },
+} as const;
 
 const LEARNER_ID = "lrn_demo_sky";
 const learnerCookie = {
@@ -39,12 +50,26 @@ test.describe("@a11y homework calm nudge", () => {
     await page.goto(`/learner/homework/${sessionId}`, { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("textbox")).toBeVisible();
 
+    // Axe the baseline homework surface before the nudge fires.
+    await injectAxe(page);
+    await checkA11y(page, undefined, {
+      detailedReport: true,
+      axeOptions: { rules: AXE_RULES },
+    });
+
     await page.clock.fastForward(130_000);
 
     // The nudge appears, is keyboard-reachable, and deep-links into Calm.
     const accept = page.getByRole("link", { name: /calm break/i });
     await expect(accept).toBeVisible();
     await expect(accept).toHaveAttribute("href", "/learner/calm?action=offer_break");
+
+    // Re-run axe with the nudge card present so it can't ship with
+    // a contrast/role regression once it's on screen.
+    await checkA11y(page, undefined, {
+      detailedReport: true,
+      axeOptions: { rules: AXE_RULES },
+    });
 
     // It is dismissible and never blocks the chat.
     await page.getByRole("button", { name: /not now/i }).click();
