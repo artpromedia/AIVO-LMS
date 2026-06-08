@@ -160,6 +160,28 @@ export function collaboratorInviteStepEnabled(): boolean {
 }
 
 /**
+ * Sprint 5 (un-gate the visual brain build).
+ *
+ * When ON, a completed baseline that has not produced a `cloned` brain
+ * profile routes the parent to an actionable `brain_build_pending` surface
+ * (with a rebuild action) instead of silently skipping the visual build and
+ * dropping them at `ready_for_today_mission`. When OFF, the prior
+ * fall-through behaviour is preserved, so the flag is a reversible kill
+ * switch for the routing change.
+ *
+ * Default OFF in production until QA; ON in dev/preview/test.
+ */
+export function visualBrainBuildEnabled(): boolean {
+  const fromServer = process.env.AIVO_FLAG_VISUAL_BRAIN_BUILD;
+  if (isTruthy(fromServer)) return true;
+  if (isExplicitlyFalsy(fromServer)) return false;
+  const env = process.env.VERCEL_ENV ?? process.env.NEXT_PUBLIC_VERCEL_ENV;
+  if (env === "preview") return true;
+  if (process.env.NODE_ENV !== "production") return true;
+  return false;
+}
+
+/**
  * Delegated-admin RBAC v2 rollout flag. Mirrors the server-side
  * `ADMIN_ENTERPRISE_DELEGATED_ADMIN_RBAC_V2` toggle so the admin shell can
  * dark-launch platform-staff and delegated-admin capabilities without

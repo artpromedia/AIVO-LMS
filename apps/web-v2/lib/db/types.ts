@@ -50,6 +50,7 @@ export type ReadinessState =
   | "iep_optional"
   | "team_invite_optional"
   | "baseline_needed"
+  | "brain_build_pending"
   | "brain_clone_review_needed"
   | "ready_for_today_mission"
   | "active_learning";

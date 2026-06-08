@@ -597,8 +597,12 @@ async function prepareBrainCloneFromSummary(
 ): Promise<LearnerBrainProfile | null> {
   const learner = await getLearner(learnerId, tenantId);
   if (!learner) return null;
+  // No early-return on a missing pre-clone profile: when none exists (legacy
+  // learner, or a pre-clone that failed to persist) we build one straight
+  // into the "cloned" stage below, so a completed baseline ALWAYS yields a
+  // clone the parent can review. Returning null here was the bug that let
+  // baseline completion silently produce no clone.
   const existing = await getBrainProfile(learnerId, tenantId);
-  if (!existing) return null;
 
   // Read-only: must not mutate the store on the preflight path, otherwise
   // a clone-prep failure would still leave a draft parent assessment behind.
@@ -617,7 +621,17 @@ async function prepareBrainCloneFromSummary(
     collaboratorInsights,
   });
   const parsed = brainProfileStateSchema.safeParse(candidate);
-  if (!parsed.success) return null;
+  if (!parsed.success) {
+    // Do not silently drop to no-clone: surface the failing paths so a schema
+    // regression is diagnosable instead of presenting as a missing animation.
+    logger.warn({
+      event: "brain_clone.schema_invalid",
+      learnerId,
+      tenantId,
+      issues: parsed.error.issues.map((i) => ({ path: i.path.join("."), message: i.message })),
+    });
+    return null;
+  }
 
   const now = nowIso();
   if (!existing) {

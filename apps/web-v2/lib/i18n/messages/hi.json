@@ -747,7 +747,10 @@
     "building_complete_title": "{name} का ब्रेन तैयार है",
     "building_complete_caption": "{name} के मूल्यांकन डेटा से ब्रेन बनाया गया है। नीचे विवरण देखें और तय करें कि आगे क्या हो।",
     "building_complete_cta": "समीक्षा करें और तय करें",
-    "skip_animation": "एनिमेशन छोड़ें"
+    "skip_animation": "एनिमेशन छोड़ें",
+    "pending_title": "Building {name}’s brain",
+    "pending_description": "The baseline is in — we are assembling the brain now. If it has not finished, you can rebuild it from the latest baseline results.",
+    "pending_rebuild": "Rebuild the brain"
   },
   "learner": {
     "errors": {

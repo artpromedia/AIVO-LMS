@@ -1,5 +1,5 @@
 import { getPersistence } from "@/lib/db/persistence";
-import { collaboratorInviteStepEnabled } from "@/lib/feature-flags";
+import { collaboratorInviteStepEnabled, visualBrainBuildEnabled } from "@/lib/feature-flags";
 import type { LearnerProfile, ReadinessState } from "@/lib/db/types";
 
 export const READINESS_LABEL: Record<ReadinessState, string> = {
@@ -8,6 +8,7 @@ export const READINESS_LABEL: Record<ReadinessState, string> = {
   iep_optional: "Add an IEP (optional)",
   team_invite_optional: "Invite your child's team (optional)",
   baseline_needed: "Baseline assessment ready",
+  brain_build_pending: "Building your child's brain",
   brain_clone_review_needed: "Brain clone ready for review",
   ready_for_today_mission: "Ready for today's mission",
   active_learning: "Active learning",
@@ -20,6 +21,7 @@ export const READINESS_TONE: Record<ReadinessState, "neutral" | "warning" | "pri
     iep_optional: "primary",
     team_invite_optional: "primary",
     baseline_needed: "primary",
+    brain_build_pending: "warning",
     brain_clone_review_needed: "primary",
     ready_for_today_mission: "success",
     active_learning: "success",
@@ -47,6 +49,10 @@ export const READINESS_NEXT_STEP: Record<ReadinessState, { label: string; hrefTe
     baseline_needed: {
       label: "Start baseline assessment",
       hrefTemplate: "/parent/learners/{learnerId}/baseline",
+    },
+    brain_build_pending: {
+      label: "Finish building the brain",
+      hrefTemplate: "/parent/learners/{learnerId}/brain-clone-watch",
     },
     brain_clone_review_needed: {
       label: "Review brain clone",
@@ -107,11 +113,20 @@ export async function computeReadinessFor(
   if (lessonRunCount > 0) return "active_learning";
   if (baselineComplete) {
     // Baseline finished — gate today's mission on the parent reviewing the
-    // freshly cloned brain profile. If no clone is on file (legacy data or
-    // an unexpected race), don't block the learner; fall through to
-    // ready_for_today_mission so the CTA still works.
+    // freshly cloned brain profile.
     if (brainProfile && brainProfile.cloneStage === "cloned") {
       return "brain_clone_review_needed";
+    }
+    // Already approved → proceed to the mission.
+    if (brainProfile && brainProfile.cloneStage === "approved") {
+      return "ready_for_today_mission";
+    }
+    // Sprint 5: baseline done but no cloned/approved profile. Don't silently
+    // skip the visual build — route to an actionable brain_build_pending
+    // surface with a rebuild action. Flag OFF preserves the prior
+    // fall-through to ready_for_today_mission so the change is reversible.
+    if (visualBrainBuildEnabled()) {
+      return "brain_build_pending";
     }
     return "ready_for_today_mission";
   }

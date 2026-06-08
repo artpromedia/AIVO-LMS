@@ -20,13 +20,18 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import {
   approveBrainClone,
+  cloneBrainFromBaseline,
+  getActiveBaselineForLearner,
   getBrainProfile,
   getLearner,
   parentCanAccessLearner,
+  refreshLearnerReadiness,
 } from "@/lib/db/repos";
+import { visualBrainBuildEnabled } from "@/lib/feature-flags";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { BrainBuildingClient } from "./building-client";
+import { BrainBuildPending } from "./build-pending";
 
 async function approveBrainCloneAction(formData: FormData) {
   "use server";
@@ -46,6 +51,27 @@ async function approveBrainCloneAction(formData: FormData) {
   redirect(`/parent/learners/${learnerId}`);
 }
 
+async function rebuildBrainCloneAction(formData: FormData) {
+  "use server";
+  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
+  const session = await readMockSessionFromCookies();
+  if (!session || session.role !== "parent") redirect("/login");
+  const learnerId = String(formData.get("learnerId") ?? "");
+  if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
+    redirect("/parent/learners");
+  }
+  // Re-run the clone from the most recent completed baseline (Sprint 5: an
+  // actionable retry instead of a dead end). Best-effort; refresh readiness
+  // either way so the parent's next step reflects the outcome.
+  const rebuilt = await cloneBrainFromBaseline(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
+  audit(session, "brain_clone.rebuild", newRequestId(), {
+    learnerId,
+    metadata: { ok: Boolean(rebuilt) },
+  });
+  redirect(`/parent/learners/${learnerId}/brain-clone-watch`);
+}
+
 export default async function BrainCloneWatchPage({
   params,
 }: {
@@ -59,10 +85,37 @@ export default async function BrainCloneWatchPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
   const profile = await getBrainProfile(learnerId, session.tenantId);
-  if (!profile || profile.cloneStage === "pre_clone") {
-    redirect(`/parent/learners/${learnerId}/baseline`);
-  }
   const t = await getTranslations("brain_clone");
+  if (!profile || profile.cloneStage === "pre_clone") {
+    // Sprint 5: a clone is expected here but missing. If the baseline isn't
+    // complete yet, the parent genuinely needs to finish it first. If it IS
+    // complete, don't bounce to /baseline (which makes the build look broken)
+    // — render an actionable pending surface with a rebuild action. Flag OFF
+    // preserves the prior bounce so the change is reversible.
+    const baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
+    const baselineComplete = baseline?.status === "complete";
+    if (!baselineComplete || !visualBrainBuildEnabled()) {
+      redirect(`/parent/learners/${learnerId}/baseline`);
+    }
+    return (
+      <AppShell
+        role="parent"
+        roleLabel="Parent"
+        navItems={PARENT_NAV}
+        user={{ displayName: session.displayName, email: session.email }}
+      >
+        <BrainBuildPending
+          learnerId={learner.id}
+          learnerName={learner.displayName}
+          title={t("pending_title", { name: learner.displayName })}
+          description={t("pending_description")}
+          rebuildLabel={t("pending_rebuild")}
+          backLabel={t("watch_back")}
+          rebuildAction={rebuildBrainCloneAction}
+        />
+      </AppShell>
+    );
+  }
 
   const s = profile.state;
   const alreadyApproved = profile.cloneStage === "approved";

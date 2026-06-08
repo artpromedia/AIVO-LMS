@@ -146,6 +146,8 @@ function CssFallbackSphere({
       role="img"
       aria-label={ariaLabel}
       className={className}
+      data-testid="brain-sphere"
+      data-render-mode="css-fallback"
       style={{ width: size, height: size, position: "relative" }}
     >
       <div
@@ -284,6 +286,8 @@ export default function PixiBrainSphere(props: PixiBrainSphereProps) {
       role="img"
       aria-label={props.ariaLabel}
       className={props.className}
+      data-testid="brain-sphere"
+      data-render-mode={usePixi ? "webgl" : "css-fallback"}
       style={{ width: size, height: size, lineHeight: 0 }}
     >
       {!usePixi ? <CssFallbackSphere {...props} animated={!reducedMotion} /> : null}

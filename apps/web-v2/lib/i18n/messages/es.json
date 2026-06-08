@@ -747,7 +747,10 @@
     "building_complete_title": "El cerebro de {name} está listo",
     "building_complete_caption": "El cerebro se ha construido a partir de los datos de evaluación de {name}. Revisa los detalles a continuación y decide qué sigue.",
     "building_complete_cta": "Revisar y decidir",
-    "skip_animation": "Omitir animación"
+    "skip_animation": "Omitir animación",
+    "pending_title": "Building {name}’s brain",
+    "pending_description": "The baseline is in — we are assembling the brain now. If it has not finished, you can rebuild it from the latest baseline results.",
+    "pending_rebuild": "Rebuild the brain"
   },
   "learner": {
     "errors": {
