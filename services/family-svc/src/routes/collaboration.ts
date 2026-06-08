@@ -571,6 +571,9 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       const { learnerId } = request.params as LearnerId;
 
+      // Track which relationship authorized the insight so the brain
+      // builder (Sprint 4) can weight a perspective by its author's role.
+      let authorRole = "parent";
       const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
       if (!isParent) {
         const teacherMatch = await db
@@ -614,17 +617,35 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
             .code(403)
             .send({ error: "You must be a parent or accepted team member to submit insights" });
         }
+        authorRole =
+          teacherMatch.length > 0
+            ? "teacher"
+            : caregiverMatch.length > 0
+              ? "caregiver"
+              : therapistMatch.length > 0
+                ? "therapist"
+                : (claims.role?.toLowerCase() ?? "collaborator");
       }
 
       const body = request.body as InsightBody;
       if (!body.insightText) return reply.code(400).send({ error: "insightText is required" });
 
+      // Stamp the tenant from the learner row so the insight is tenant-scoped
+      // (Sprint 2) — the learner already passed the ownership/member check.
+      const [learnerRow] = await db
+        .select({ tenantId: learners.tenantId })
+        .from(learners)
+        .where(eq(learners.id, learnerId))
+        .limit(1);
+
       const [record] = await db
         .insert(brainInsights)
         .values({
           learnerId,
-          source: body.source || claims.role?.toLowerCase() || "collaborator",
+          tenantId: learnerRow?.tenantId ?? null,
+          source: body.source || authorRole,
           sourceUserId: claims.sub,
+          authorRole,
           insightText: body.insightText,
           domain: body.domain || null,
         })
