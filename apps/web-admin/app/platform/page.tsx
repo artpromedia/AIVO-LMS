@@ -62,6 +62,11 @@ const PLATFORM_NAV = [
     title: "Feature flags",
     description: "Enterprise and sprint flag state.",
   },
+  {
+    href: "/platform/audio/pronunciation",
+    title: "Pronunciation",
+    description: "TTS pronunciation override dictionary.",
+  },
   { href: "/platform/audit", title: "Audit log", description: "Hash-chained admin action history." },
   { href: "/platform/jobs", title: "Jobs", description: "Scheduled job freshness and run health." },
   {

@@ -414,6 +414,13 @@
       "when": 1782163200000,
       "tag": "0078_responsible_ai_registry",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1782249600000,
+      "tag": "0079_pronunciation_overrides",
+      "breakpoints": true
     }
   ]
 }

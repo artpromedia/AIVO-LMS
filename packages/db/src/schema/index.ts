@@ -46,3 +46,4 @@ export * from "./school-admin.js";
 export * from "./teacher_insights.js";
 export * from "./security.js";
 export * from "./responsible-ai.js";
+export * from "./audio.js";

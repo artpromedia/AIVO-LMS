@@ -159,6 +159,20 @@ whole registry to Postgres, DB-or-fallback:
 - `@aivo/admin-api/ai-governance` (direct to responsible-ai-svc) + pages
   `platform/ai/{policies,incidents,optouts,models,models/[id],evals}`.
 
+## Done — Wave 12 (audio: pronunciation overrides)
+
+No owning service, so admin-svc owns a new table (Wave 8 pattern):
+- `@aivo/db`: `pronunciation_overrides` table + migration `0079`.
+- `admin-svc`: `routes/pronunciation.ts` (list/create/delete, platform-admin
+  gated, writes audited). 34 tests pass.
+- `@aivo/admin-api/pronunciation` + `platform/audio/pronunciation` page (token →
+  SSML/phoneme dictionary; add + remove).
+
+Deferred (no real data source): **read-aloud audio usage** was in-memory
+telemetry in web-v2 with no event pipeline — surfacing it would require
+fabricating data (violates no-mock) or building a usage-ingestion pipeline.
+Left for a dedicated telemetry effort rather than mocked.
+
 ## Remaining — needs a NEW `@aivo/admin-api` module first
 
 Note: `platform/compliance/{data-inventory,retention}` were attempted but
