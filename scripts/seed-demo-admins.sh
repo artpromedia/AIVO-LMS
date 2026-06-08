@@ -11,8 +11,10 @@
 #
 # MFA NOTE: Both PLATFORM_ADMIN and DISTRICT_ADMIN are in
 # MFA_FORCED_ROLES (services/identity-svc/src/routes/auth.ts:345), so
-# every sign-in triggers an email OTP. The demo emails use Gmail
-# +aliases so codes land in iamdrofem@gmail.com.
+# every sign-in triggers an email OTP. The platform admin uses a
+# Gmail +alias (iamdrofem+platform@) so codes land in iamdrofem@gmail.com;
+# the district admin uses a separate Gmail inbox so two demo personas
+# can be signed in side-by-side without OTP collisions.
 set -euo pipefail
 
 PYSCRIPT=/tmp/seed-demo-admins.py
@@ -25,7 +27,10 @@ import psycopg2.extras
 
 PLATFORM_EMAIL = "iamdrofem+platform@gmail.com"
 PLATFORM_NAME = "Demo Platform Admin"
-DISTRICT_EMAIL = "iamdrofem+district@gmail.com"
+DISTRICT_EMAIL = "nkechinyerepkanu@gmail.com"
+# Prior district demo emails that should be removed if still present.
+# Add older addresses here whenever the demo email is rotated.
+DISTRICT_EMAIL_LEGACY = ("iamdrofem+district@gmail.com",)
 DISTRICT_NAME = "Demo District Admin"
 DISTRICT_TENANT_NAME = "Demo District"
 
@@ -72,8 +77,8 @@ try:
         )
         tenant_id = cur.fetchone()["id"]
 
-        # 2) Platform admin (no tenant). Replace existing row by email.
-        cur.execute("DELETE FROM users WHERE email = %s;", (PLATFORM_EMAIL,))
+        # 2) Platform admin (no tenant). UPSERT by email so re-runs
+        #    rotate the password without nuking sessions / audit FKs.
         cur.execute(
             """
             INSERT INTO users (
@@ -82,6 +87,15 @@ try:
               password_changed_at
             ) VALUES (%s, %s, %s, 'PLATFORM_ADMIN',
                       true, false, false, now())
+            ON CONFLICT (email) DO UPDATE SET
+              password_hash       = EXCLUDED.password_hash,
+              name                = EXCLUDED.name,
+              role                = EXCLUDED.role,
+              tenant_id           = NULL,
+              email_verified      = true,
+              mfa_enabled         = false,
+              must_change_password = false,
+              password_changed_at = now()
             RETURNING id;
             """,
             (PLATFORM_EMAIL, platform_hash, PLATFORM_NAME),
@@ -89,7 +103,19 @@ try:
         platform_id = cur.fetchone()["id"]
 
         # 3) District admin scoped to the demo district.
-        cur.execute("DELETE FROM users WHERE email = %s;", (DISTRICT_EMAIL,))
+        #    Tombstone legacy demo emails (preserves audit FKs, blocks login).
+        for legacy in DISTRICT_EMAIL_LEGACY:
+            cur.execute(
+                """
+                UPDATE users
+                SET email = 'tombstone+' || id::text || '@deleted.aivolearning.com',
+                    mfa_enabled = false,
+                    must_change_password = true,
+                    password_hash = ''
+                WHERE email = %s;
+                """,
+                (legacy,),
+            )
         cur.execute(
             """
             INSERT INTO users (
@@ -98,6 +124,15 @@ try:
               password_changed_at
             ) VALUES (%s, %s, %s, %s, 'DISTRICT_ADMIN',
                       true, false, false, now())
+            ON CONFLICT (email) DO UPDATE SET
+              tenant_id           = EXCLUDED.tenant_id,
+              password_hash       = EXCLUDED.password_hash,
+              name                = EXCLUDED.name,
+              role                = EXCLUDED.role,
+              email_verified      = true,
+              mfa_enabled         = false,
+              must_change_password = false,
+              password_changed_at = now()
             RETURNING id;
             """,
             (tenant_id, DISTRICT_EMAIL, district_hash, DISTRICT_NAME),
