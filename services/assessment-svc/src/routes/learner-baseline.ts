@@ -1057,13 +1057,20 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
     },
   );
 
-  // Sprint B1 — thin proxy used by the web-v2 BFF
+  // Sprint B1 — proxy used by the web-v2 BFF
   // (`apps/web-v2/lib/learner/baseline-llm.ts`) when the orchestrated
-  // discovery-chapter path is unavailable or disabled. The web BFF
-  // already has the parent assessment in hand and posts it directly;
-  // this route forwards the payload to ai-svc unchanged and returns
-  // the raw BaselineResponse so the BFF's zod validator + BANK
-  // fallback can branch on the result.
+  // discovery-chapter path is unavailable or disabled. The web BFF has
+  // the parent assessment in hand and posts it directly.
+  //
+  // The caregiver perspectives, teacher assessment, IEP, interest
+  // profile, and district context live in THIS service's DB, not in
+  // web-v2's store — so the BFF can't supply them. When the BFF passes
+  // `learner_id`, this route enriches the payload with that context
+  // server-side (best-effort, only filling fields the caller omitted)
+  // before forwarding to ai-svc, so the flat-LLM tier folds in the same
+  // caregiver/teacher signal as the Discovery Adventure path. It returns
+  // the raw BaselineResponse so the BFF's zod validator + BANK fallback
+  // can branch on the result.
   app.post(
     "/api/ai/generate-baseline",
     {
@@ -1076,6 +1083,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
           properties: {
             parent_assessment: { type: "object" },
             functioning_level: { type: "string" },
+            learner_id: { type: "string" },
             iep: { type: "object", nullable: true },
             district: { type: "object", nullable: true },
             interest_profile: { type: "object", nullable: true },
@@ -1089,10 +1097,72 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
     },
     async (req, reply) => {
       try {
+        const db = (app as any).db;
+        // Forwarded payload starts from the caller's body; `learner_id`
+        // is a routing hint for this service and is stripped before the
+        // ai-svc call (ai-svc's BaselineRequest doesn't model it).
+        const { learner_id: learnerIdHint, ...incoming } = (req.body ?? {}) as Record<
+          string,
+          unknown
+        >;
+        const forwardBody: Record<string, unknown> = { ...incoming };
+
+        // Server-side enrichment: when the BFF supplies a learner id and
+        // omits an optional input, load it from this service's DB. Any
+        // failure is swallowed so enrichment can never turn a working
+        // parent-only baseline into a 5xx.
+        if (typeof learnerIdHint === "string" && learnerIdHint.length > 0) {
+          try {
+            let [learner] = await db
+              .select()
+              .from(learners)
+              .where(eq(learners.id, learnerIdHint))
+              .limit(1);
+            if (!learner) {
+              [learner] = await db
+                .select()
+                .from(learners)
+                .where(eq(learners.userId, learnerIdHint))
+                .limit(1);
+            }
+            if (learner) {
+              if (forwardBody.caregiver_perspectives == null) {
+                forwardBody.caregiver_perspectives = await loadCaregiverPerspectives(
+                  db,
+                  learner.id,
+                );
+              }
+              if (forwardBody.teacher_assessment == null) {
+                forwardBody.teacher_assessment = await loadTeacherContext(db, learner.id);
+              }
+              if (forwardBody.iep == null) {
+                forwardBody.iep = await loadIepContext(db, learner.id);
+              }
+              if (forwardBody.interest_profile == null) {
+                forwardBody.interest_profile = await loadInterestProfile(db, learner.id);
+              }
+              if (forwardBody.district == null) {
+                forwardBody.district = buildDistrictContext(learner);
+              }
+              if (forwardBody.zip_code == null) {
+                forwardBody.zip_code = buildZipCode(learner);
+              }
+              if (forwardBody.functioning_level == null) {
+                forwardBody.functioning_level = learner.functioningLevel || "STANDARD";
+              }
+            }
+          } catch (enrichErr: any) {
+            app.log.warn(
+              { err: enrichErr?.message, learnerId: learnerIdHint },
+              "[baseline-llm-proxy] context enrichment failed; forwarding caller payload as-is",
+            );
+          }
+        }
+
         const aiRes = await fetch(`${AI_SVC_URL}/api/ai/generate-baseline`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(req.body ?? {}),
+          body: JSON.stringify(forwardBody),
         });
         const text = await aiRes.text();
         reply.status(aiRes.status);
