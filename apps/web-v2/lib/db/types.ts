@@ -547,6 +547,45 @@ export type SkillMastery = {
 // ===== Baseline (Sprint 8) =====
 export type BaselineDifficulty = "foundational" | "approaching" | "grade_level" | "stretch";
 
+/** ai-svc subject taxonomy key used to tag pre-generated bank questions. */
+export type BaselineBankSubjectKey =
+  | "math"
+  | "ela"
+  | "science"
+  | "speech"
+  | "sel"
+  | "life_skills"
+  | "executive_function";
+
+/** Functioning level as carried on the brain-profile state (uppercase enum). */
+export type BaselineBankFunctioningLevel =
+  | "STANDARD"
+  | "SUPPORTED"
+  | "LOW_VERBAL"
+  | "NON_VERBAL"
+  | "PRE_SYMBOLIC";
+
+/**
+ * One pre-generated baseline question in the bank (web_baseline_bank). Tagged
+ * with the cell it belongs to (subject × gradeBand × functioningLevel ×
+ * difficulty) so the selector can filter without re-deriving anything. Grown
+ * daily by the baseline-bank-generator CronJob; selected from instantly by
+ * `createBaseline` (see lib/learner/baseline-bank.ts).
+ */
+export type BaselineBankItem = {
+  subject: BaselineBankSubjectKey;
+  gradeBand: GradeBand;
+  functioningLevel: BaselineBankFunctioningLevel;
+  difficulty: BaselineDifficulty;
+  prompt: string;
+  choices: string[];
+  expectedAnswer: string;
+  choiceEmojis?: string[];
+  sceneEmoji?: string;
+  hint?: string;
+  readAloudText?: string;
+};
+
 export type BaselineAssessment = {
   id: ID;
   learnerId: ID;

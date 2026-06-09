@@ -66,6 +66,7 @@ import type {
   CurriculumMap,
   LessonObjectiveTemplate,
   AssessmentBlueprint,
+  BaselineBankItem,
   CurriculumImportJob,
 } from "@/lib/db/types";
 import {
@@ -831,6 +832,18 @@ export async function createBaseline(input: {
   if (baselineBankEnabled() && bankHasItems()) {
     const functioningLevel =
       brainProfile?.state.functioningLevel ?? learner.functioningLevel ?? null;
+    // Fold in the daily-grown DB bank (web_baseline_bank) on top of the
+    // committed seed file. Best-effort: a read failure (or memory mode) just
+    // means we select from the seed file alone.
+    let dbBankItems: BaselineBankItem[] = [];
+    try {
+      dbBankItems = await getPersistence().standards.listBaselineBankItems();
+    } catch (err) {
+      console.error(
+        `[BASELINE_DIAG] bank_db_load_failed baselineId=${baseline.id} err=${err instanceof Error ? err.message : String(err)}`,
+      );
+      dbBankItems = [];
+    }
     const bankQuestions = selectBaselineFromBank({
       baselineId: baseline.id,
       gradeBand: learner.gradeBand,
@@ -838,6 +851,7 @@ export async function createBaseline(input: {
       subjects,
       skills,
       accommodationTags,
+      extraBankItems: dbBankItems,
     });
     const coveredSubjects = new Set(bankQuestions.map((q) => q.subjectId));
     if (bankQuestions.length > 0 && coveredSubjects.size >= subjects.length) {
@@ -852,11 +866,11 @@ export async function createBaseline(input: {
       };
       bankSucceeded = true;
       console.error(
-        `[BASELINE_DIAG] bank_hit baselineId=${baseline.id} questions=${bankQuestions.length} subjects=${coveredSubjects.size}/${subjects.length} gradeBand=${learner.gradeBand ?? "?"} level=${functioningLevel ?? "?"}`,
+        `[BASELINE_DIAG] bank_hit baselineId=${baseline.id} questions=${bankQuestions.length} subjects=${coveredSubjects.size}/${subjects.length} gradeBand=${learner.gradeBand ?? "?"} level=${functioningLevel ?? "?"} dbItems=${dbBankItems.length}`,
       );
     } else {
       console.error(
-        `[BASELINE_DIAG] bank_miss baselineId=${baseline.id} got=${bankQuestions.length} covered=${coveredSubjects.size}/${subjects.length}`,
+        `[BASELINE_DIAG] bank_miss baselineId=${baseline.id} got=${bankQuestions.length} covered=${coveredSubjects.size}/${subjects.length} dbItems=${dbBankItems.length}`,
       );
     }
   }

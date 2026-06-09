@@ -20,8 +20,12 @@
  * existing LLM → BANK ladder.
  */
 import type {
+  BaselineBankFunctioningLevel,
+  BaselineBankItem,
+  BaselineBankSubjectKey,
   BaselineDifficulty,
   BaselineQuestion,
+  GradeBand,
   Skill,
   Subject,
 } from "@/lib/db/types";
@@ -29,52 +33,16 @@ import { newId } from "@/lib/db/store";
 import { LLM_TO_WEB_V2_SUBJECT_SLUG } from "@/lib/learner/baseline-llm";
 import bankData from "@/lib/learner/baseline-bank.generated.json";
 
-/** ai-svc subject taxonomy key (matches BaselineLlmSubject). */
-export type BankSubjectKey =
-  | "math"
-  | "ela"
-  | "science"
-  | "speech"
-  | "sel"
-  | "life_skills"
-  | "executive_function";
+/** ai-svc subject taxonomy key (re-exported from db/types for callers). */
+export type BankSubjectKey = BaselineBankSubjectKey;
 
 /** Functioning level as carried on the brain profile state (uppercase enum). */
-export type BankFunctioningLevel =
-  | "STANDARD"
-  | "SUPPORTED"
-  | "LOW_VERBAL"
-  | "NON_VERBAL"
-  | "PRE_SYMBOLIC";
+export type BankFunctioningLevel = BaselineBankFunctioningLevel;
 
 /** Grade band, mirroring `GradeBand` in db/types. */
-export type BankGradeBand =
-  | "preK"
-  | "K"
-  | "1-2"
-  | "3-5"
-  | "6-8"
-  | "9-12"
-  | "post_secondary";
+export type BankGradeBand = GradeBand;
 
-/**
- * One pre-generated question in the bank. Tagged with the cell it belongs to
- * (subject × gradeBand × functioningLevel × difficulty) so the selector can
- * filter without re-deriving anything.
- */
-export type BaselineBankItem = {
-  subject: BankSubjectKey;
-  gradeBand: BankGradeBand;
-  functioningLevel: BankFunctioningLevel;
-  difficulty: BaselineDifficulty;
-  prompt: string;
-  choices: string[];
-  expectedAnswer: string;
-  choiceEmojis?: string[];
-  sceneEmoji?: string;
-  hint?: string;
-  readAloudText?: string;
-};
+export type { BaselineBankItem };
 
 export type BaselineBankFile = {
   /** Schema/version marker so the generator can evolve the shape safely. */
@@ -218,8 +186,14 @@ export type SelectBaselineFromBankInput = {
   perSubject?: number;
   /** Inject a deterministic RNG in tests; defaults to a baselineId-seeded PRNG. */
   rng?: () => number;
-  /** Override the bank items (tests / future callers); defaults to the committed file. */
+  /** Override the bank items entirely (tests); defaults to the committed file. */
   bankItems?: BaselineBankItem[];
+  /**
+   * Additional bank items merged with the committed seed file — this is how
+   * the daily-grown DB bank (web_baseline_bank) is folded in without a
+   * rebuild. Ignored when `bankItems` is provided (full override).
+   */
+  extraBankItems?: BaselineBankItem[];
 };
 
 /** True when the bank has at least one usable item (cheap guard for callers). */
@@ -244,7 +218,11 @@ export function selectBaselineFromBank(
   const gradeBand = normalizeGradeBand(input.gradeBand);
   const level = normalizeFunctioningLevel(input.functioningLevel);
   const rng = input.rng ?? mulberry32(hashString(input.baselineId));
-  const items = input.bankItems ?? BANK_FILE.items;
+  const items =
+    input.bankItems ??
+    (input.extraBankItems && input.extraBankItems.length > 0
+      ? [...BANK_FILE.items, ...input.extraBankItems]
+      : BANK_FILE.items);
 
   const firstSkillBySubjectId = new Map<string, Skill>();
   for (const sk of input.skills) {

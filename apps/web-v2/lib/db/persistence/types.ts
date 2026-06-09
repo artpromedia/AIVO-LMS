@@ -17,6 +17,7 @@ import type {
   AuditLog,
   BaselineAssessment,
   BaselineAttempt,
+  BaselineBankItem,
   BaselineItemResponseLog,
   BaselineQuestion,
   BillingAccount,
@@ -780,6 +781,13 @@ export interface StandardsStore {
   upsertCurriculumMap(m: CurriculumMap): Promise<CurriculumMap>;
   listLessonObjectiveTemplates(): Promise<LessonObjectiveTemplate[]>;
   listAssessmentBlueprints(): Promise<AssessmentBlueprint[]>;
+  /**
+   * Pre-generated baseline question bank (web_baseline_bank), grown daily by
+   * the baseline-bank-generator CronJob and read by createBaseline to serve
+   * baselines instantly. Returns [] in memory mode (the committed seed file is
+   * the dev/test source).
+   */
+  listBaselineBankItems(): Promise<BaselineBankItem[]>;
   listImportJobs(): Promise<CurriculumImportJob[]>;
   getImportJob(id: string): Promise<CurriculumImportJob | null>;
   upsertImportJob(j: CurriculumImportJob): Promise<CurriculumImportJob>;

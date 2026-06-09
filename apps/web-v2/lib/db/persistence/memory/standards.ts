@@ -5,6 +5,7 @@
 import { getStore } from "@/lib/db/store";
 import type {
   AssessmentBlueprint,
+  BaselineBankItem,
   CurriculumImportJob,
   CurriculumMap,
   Domain,
@@ -66,6 +67,11 @@ export const memoryStandards: StandardsStore = {
   },
   async listAssessmentBlueprints(): Promise<AssessmentBlueprint[]> {
     return Array.from(getStore().assessmentBlueprints.values());
+  },
+  async listBaselineBankItems(): Promise<BaselineBankItem[]> {
+    // Memory mode uses the committed seed bank file (loaded in baseline-bank.ts),
+    // so the DB-grown bank is empty here.
+    return [];
   },
   async listImportJobs(): Promise<CurriculumImportJob[]> {
     return Array.from(getStore().curriculumImportJobs.values());

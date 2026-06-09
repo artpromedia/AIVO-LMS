@@ -14,10 +14,12 @@ import {
   webCurriculumMaps,
   webLessonObjectiveTemplates,
   webAssessmentBlueprints,
+  webBaselineBank,
   webCurriculumImportJobs,
 } from "@aivo/db";
 import type {
   AssessmentBlueprint,
+  BaselineBankItem,
   CurriculumImportJob,
   CurriculumMap,
   Domain,
@@ -102,6 +104,9 @@ export const drizzleStandards: StandardsStore = {
     return (await getDb().select().from(webAssessmentBlueprints)).map(
       (r) => r.data as AssessmentBlueprint,
     );
+  },
+  async listBaselineBankItems(): Promise<BaselineBankItem[]> {
+    return (await getDb().select().from(webBaselineBank)).map((r) => r.data as BaselineBankItem);
   },
   async listImportJobs(): Promise<CurriculumImportJob[]> {
     return (await getDb().select().from(webCurriculumImportJobs)).map(

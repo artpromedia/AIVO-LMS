@@ -69,3 +69,17 @@ export const webCurriculumImportJobs = pgTable("web_curriculum_import_jobs", {
   id: text("id").primaryKey(),
   data: jsonb("data").notNull(),
 });
+
+/**
+ * Pre-generated baseline question bank. Each row is ONE bank item (a question
+ * tagged with its subject × grade band × functioning level × difficulty cell),
+ * stored as the full object in `data`. Grown daily by the
+ * `baseline-bank-generator` CronJob (it calls assessment-svc/ai-svc and upserts
+ * new questions here) and read by web-v2 `createBaseline` to serve baselines
+ * instantly without an on-request LLM call. Platform-global reference data ⇒ no
+ * RLS, like the rest of this file.
+ */
+export const webBaselineBank = pgTable("web_baseline_bank", {
+  id: text("id").primaryKey(),
+  data: jsonb("data").notNull(),
+});

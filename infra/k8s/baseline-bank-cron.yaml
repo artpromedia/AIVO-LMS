@@ -1,0 +1,84 @@
+# Daily baseline-bank generator.
+#
+# Grows the pre-generated baseline question bank (web_baseline_bank) so the web
+# app serves baselines instantly without an on-request LLM call. Each run calls
+# assessment-svc for a rotating window of (grade band x functioning level) cells
+# and UPSERTs new, deduped questions into the table (see
+# scripts/generate-baseline-bank-db.mjs).
+#
+# Runs in the assessment-svc image (Node + the `postgres` client) with the
+# script mounted from the `baseline-bank-generator` ConfigMap. Create/refresh
+# that ConfigMap from the canonical script before applying this manifest:
+#
+#   kubectl -n aivo create configmap baseline-bank-generator \
+#     --from-file=generate.mjs=scripts/generate-baseline-bank-db.mjs \
+#     --dry-run=client -o yaml | kubectl apply -f -
+#   kubectl apply -f infra/k8s/baseline-bank-cron.yaml
+#
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: baseline-bank-generator
+  namespace: aivo
+  labels:
+    app.kubernetes.io/name: baseline-bank-generator
+    app.kubernetes.io/part-of: aivo-platform
+spec:
+  # 04:30 UTC daily — off-peak. Each run processes BANK_CELLS_PER_RUN cells
+  # (~130s each), so it stays well inside activeDeadlineSeconds.
+  schedule: "30 4 * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      # 6 cells x ~130s LLM call + overhead; 30 min gives comfortable headroom.
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: baseline-bank-generator
+        spec:
+          restartPolicy: Never
+          imagePullSecrets:
+            - name: ghcr-pull-secret
+          volumes:
+            - name: generator
+              configMap:
+                name: baseline-bank-generator
+          containers:
+            - name: baseline-bank-generator
+              image: ghcr.io/artpromedia/assessment-svc:latest
+              imagePullPolicy: Always
+              workingDir: /app
+              command: ["node", "/opt/bank/generate.mjs"]
+              env:
+                - name: BANK_CELLS_PER_RUN
+                  value: "6"
+                - name: BANK_TARGET_PER_SUBJECT
+                  value: "24"
+                - name: APP_NODE_MODULES
+                  value: /app/
+              # aivo-common-env supplies ASSESSMENT_SVC_URL, DATABASE_URL and
+              # INTERNAL_SERVICE_TOKEN (the x-service-token assessment-svc's
+              # /api/ai/generate-baseline validates against).
+              envFrom:
+                - secretRef:
+                    name: aivo-common-env
+                - secretRef:
+                    name: db-secrets
+                    optional: true
+              volumeMounts:
+                - name: generator
+                  mountPath: /opt/bank
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: "1"
+                  memory: 512Mi
