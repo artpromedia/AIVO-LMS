@@ -466,8 +466,9 @@ jobs:
                 # IEP AI-draft fan-out to ai-svc. INTERNAL_AI_TOKEN is supplied
                 # via the shared aivo-common-env secret (envFrom), so only the
                 # URL + timeout need an explicit per-service override here.
+                # ai-svc is a Python service listening on 8000 (NOT 3000).
                 EXTRA_SETS=(
-                  --set "env.AI_SVC_URL=http://ai-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.AI_SVC_URL=http://ai-svc.${NS}.svc.cluster.local:8000"
                   --set "env.BRAIN_SVC_URL=http://brain-svc.${NS}.svc.cluster.local:8000"
                   --set "env.AI_IEP_DRAFT_TIMEOUT_MS=20000"
                 )
@@ -504,7 +505,7 @@ jobs:
                   --set "env.IDENTITY_SVC_URL=http://identity-svc.${NS}.svc.cluster.local:3000"
                   --set "env.BRAIN_SVC_URL=http://brain-svc.${NS}.svc.cluster.local:8000"
                   --set "env.ASSESSMENT_SVC_URL=http://assessment-svc.${NS}.svc.cluster.local:3000"
-                  --set "env.AI_SVC_URL=http://ai-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.AI_SVC_URL=http://ai-svc.${NS}.svc.cluster.local:8000"
                   --set "env.LEARNING_SVC_URL=http://learning-svc.${NS}.svc.cluster.local:3000"
                   --set "env.TUTOR_SVC_URL=http://tutor-svc.${NS}.svc.cluster.local:3000"
                   --set "env.FAMILY_SVC_URL=http://family-svc.${NS}.svc.cluster.local:3000"
@@ -951,8 +952,9 @@ jobs:
                 # IEP AI-draft fan-out to ai-svc. INTERNAL_AI_TOKEN comes from
                 # the shared aivo-common-env secret (envFrom), so only the URL +
                 # timeout need an explicit per-service override here.
+                # ai-svc is a Python service listening on 8000 (NOT 3000).
                 EXTRA_SETS=(
-                  --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:3000"
+                  --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:8000"
                   --set "env.BRAIN_SVC_URL=http://brain-svc.aivo.svc.cluster.local:8000"
                   --set "env.AI_IEP_DRAFT_TIMEOUT_MS=20000"
                 )
@@ -998,7 +1000,7 @@ jobs:
                   --set "env.IDENTITY_SVC_URL=http://identity-svc.aivo.svc.cluster.local:3000"
                   --set "env.BRAIN_SVC_URL=http://brain-svc.aivo.svc.cluster.local:8000"
                   --set "env.ASSESSMENT_SVC_URL=http://assessment-svc.aivo.svc.cluster.local:3000"
-                  --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:3000"
+                  --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:8000"
                   --set "env.LEARNING_SVC_URL=http://learning-svc.aivo.svc.cluster.local:3000"
                   --set "env.TUTOR_SVC_URL=http://tutor-svc.aivo.svc.cluster.local:3000"
                   --set "env.FAMILY_SVC_URL=http://family-svc.aivo.svc.cluster.local:3000"
