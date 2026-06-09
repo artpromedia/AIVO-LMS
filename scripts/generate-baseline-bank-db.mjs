@@ -36,15 +36,54 @@
 import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
+import { readdirSync, existsSync } from "node:fs";
 
 const APP_BASE = process.env.APP_NODE_MODULES ?? "/app/";
 const require = createRequire(pathToFileURL(APP_BASE).href);
-let postgres;
-try {
-  postgres = require("postgres");
-} catch (e) {
+
+/**
+ * Resolve the `postgres` client. pnpm hoists it under a versioned `.pnpm`
+ * directory, so a bare require from /app often fails — fall back to globbing the
+ * pnpm store (and a couple of conventional paths) before giving up.
+ */
+function loadPostgres() {
+  try {
+    return require("postgres");
+  } catch {
+    /* fall through to explicit paths */
+  }
+  const candidates = [];
+  const pnpmDir = `${APP_BASE}node_modules/.pnpm`;
+  if (existsSync(pnpmDir)) {
+    for (const entry of readdirSync(pnpmDir)) {
+      if (entry.startsWith("postgres@")) {
+        candidates.push(`${pnpmDir}/${entry}/node_modules/postgres/src/index.js`);
+      }
+    }
+  }
+  candidates.push(`${APP_BASE}node_modules/postgres/src/index.js`);
+  for (const c of candidates) {
+    try {
+      if (existsSync(c)) return require(c);
+    } catch {
+      /* try next */
+    }
+  }
+  return null;
+}
+
+const postgresModule = loadPostgres();
+// The pnpm src/index.js entry exports the factory as `.default`; the hoisted
+// package exports it directly. Accept either.
+const postgres =
+  typeof postgresModule === "function"
+    ? postgresModule
+    : postgresModule && typeof postgresModule.default === "function"
+      ? postgresModule.default
+      : null;
+if (!postgres) {
   console.error(
-    `FATAL: could not load 'postgres' from ${APP_BASE} (${e?.message}). ` +
+    `FATAL: could not load 'postgres' from ${APP_BASE} (checked bare require + .pnpm store). ` +
       "Run this in an image that bundles the postgres client (assessment-svc).",
   );
   process.exit(2);
