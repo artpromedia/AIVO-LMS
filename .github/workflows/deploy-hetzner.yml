@@ -194,7 +194,10 @@ jobs:
   build-push-node-services:
     name: Build & Push Node Service Images
     runs-on: [self-hosted, hetzner, production]
-    timeout-minutes: 60
+    # 13 service images build sequentially with a disk reclaim between each
+    # (no layer-cache reuse), so the run lands just over the old 60-min cap —
+    # 12/13 finished before it was cancelled mid-research-svc. 90 gives margin.
+    timeout-minutes: 90
     # Serialize image builds against the self-hosted Docker/containerd daemon.
     # Concurrent legacy-builder exports can corrupt containerd ingest state.
     needs: [build, build-push-python-images]
