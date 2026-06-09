@@ -920,6 +920,12 @@ export async function createBaseline(input: {
     const llmResult = await generateBaselineQuestionsViaLLM({
       parent_assessment: parentAssessment!.answers as unknown as Record<string, unknown>,
       functioning_level: brainProfile?.state.functioningLevel ?? "STANDARD",
+      // Hand the assessment-svc proxy the learner id so it can fold in
+      // the caregiver perspectives, teacher assessment, IEP, interests,
+      // and district context that live in the assessment-svc DB (web-v2's
+      // store doesn't hold them). Without this the flat-LLM tier would
+      // personalize from the parent assessment alone.
+      learner_id: input.learnerId,
     });
 
     console.error(

@@ -112,6 +112,15 @@ export const baselineLlmRequestSchema = z.object({
   functioning_level: z
     .enum(["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"])
     .default("STANDARD"),
+  /**
+   * When supplied, the assessment-svc proxy enriches the request with
+   * the learner's caregiver perspectives, teacher assessment, IEP,
+   * interest profile, district, and ZIP — loaded server-side from the
+   * assessment-svc DB — for any field the caller didn't already provide.
+   * This is how the flat-LLM tier folds in the caregiver/teacher
+   * assessments that web-v2's own store doesn't hold.
+   */
+  learner_id: z.string().min(1).optional(),
   iep: z.record(z.unknown()).nullable().optional(),
   district: z.record(z.unknown()).nullable().optional(),
   interest_profile: z.record(z.unknown()).nullable().optional(),

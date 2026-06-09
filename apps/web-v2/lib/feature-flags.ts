@@ -59,18 +59,19 @@ export function lessonPlayerV2Enabled(): boolean {
  * instead, so the flag is a true kill switch — flipping it OFF cannot
  * break baseline creation.
  *
- * Defaults: ON in dev/preview/test (so contributors exercise the LLM
- * code path), OFF in production until the staging soak in Sprint B6
- * promotes it.
+ * Defaults: ON everywhere, including production. The baseline must be
+ * LLM-personalized from the parent (and, when present, caregiver +
+ * teacher) assessments rather than serving the static BANK. Any failure
+ * — flag explicitly OFF, auth rejection, timeout, too-few questions, or
+ * no subject mapping — still falls open to the deterministic BANK, so
+ * ON-by-default cannot break baseline creation; it only upgrades the
+ * default experience. Set `AIVO_FEATURE_BASELINE_LLM=false` to use the
+ * BANK as a kill switch.
  */
 export function baselineLlmEnabled(): boolean {
   const fromServer = process.env.AIVO_FEATURE_BASELINE_LLM;
-  if (isTruthy(fromServer)) return true;
   if (isExplicitlyFalsy(fromServer)) return false;
-  const env = process.env.VERCEL_ENV ?? process.env.NEXT_PUBLIC_VERCEL_ENV;
-  if (env === "preview") return true;
-  if (process.env.NODE_ENV !== "production") return true;
-  return false;
+  return true;
 }
 
 /**
