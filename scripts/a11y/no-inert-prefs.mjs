@@ -126,6 +126,9 @@ const PLATFORMS = [
       aacEnabled: { token: "aacEnabled", scope: ["apps/web-v2/app/learner"] },
       aacInputMethod: { token: "aacInputMethod", scope: ["apps/web-v2/app/learner"] },
       aacScanDelayMs: { token: "aacScanDelayMs", scope: ["apps/web-v2/app/learner"] },
+      // Calm Corner audio cues: the stored opt-in gates the breathing
+      // soundscape (calm-corner.tsx → BoxBreathing) via the calm page.
+      calmAudioCues: { token: "calmAudioCues", scope: ["apps/web-v2/app/learner"] },
     },
   },
   {
