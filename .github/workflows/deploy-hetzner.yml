@@ -145,8 +145,35 @@ jobs:
     timeout-minutes: 20
     needs: build
     steps:
+      # Reclaim disk + clean workspace BEFORE checkout. Inlined as a run
+      # step rather than the local ./.github/actions/hetzner-runner-cleanup
+      # composite action: a local action can only be loaded from an
+      # already-checked-out tree, so invoking it before actions/checkout
+      # fails with "Can't find action.yml" on a freshly-cleaned self-hosted
+      # workspace — which is exactly what broke every recent deploy.
       - name: Reclaim disk + clean self-hosted workspace
-        uses: ./.github/actions/hetzner-runner-cleanup
+        shell: bash
+        run: |
+          set -eu
+          echo "::group::Disk usage (before)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
+          if [ -d /opt/github-runner-aivo-ai-learning/_diag ]; then
+            find /opt/github-runner-aivo-ai-learning/_diag \
+              -maxdepth 1 -type f -name '*.log' -mtime +3 -print -delete || true
+          fi
+          if command -v docker >/dev/null 2>&1; then
+            docker system prune -af --filter "until=24h" 2>&1 | tail -5 || true
+            docker builder prune -af --filter "until=24h" 2>&1 | tail -3 || true
+          fi
+          mkdir -p "$GITHUB_WORKSPACE"
+          if command -v docker >/dev/null 2>&1; then
+            docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+              sh -c "chown -R $(id -u):$(id -g) /work" || true
+          fi
+          echo "::group::Disk usage (after)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
 
       - uses: actions/checkout@v5
 
@@ -172,8 +199,35 @@ jobs:
     # Concurrent legacy-builder exports can corrupt containerd ingest state.
     needs: [build, build-push-python-images]
     steps:
+      # Reclaim disk + clean workspace BEFORE checkout. Inlined as a run
+      # step rather than the local ./.github/actions/hetzner-runner-cleanup
+      # composite action: a local action can only be loaded from an
+      # already-checked-out tree, so invoking it before actions/checkout
+      # fails with "Can't find action.yml" on a freshly-cleaned self-hosted
+      # workspace — which is exactly what broke every recent deploy.
       - name: Reclaim disk + clean self-hosted workspace
-        uses: ./.github/actions/hetzner-runner-cleanup
+        shell: bash
+        run: |
+          set -eu
+          echo "::group::Disk usage (before)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
+          if [ -d /opt/github-runner-aivo-ai-learning/_diag ]; then
+            find /opt/github-runner-aivo-ai-learning/_diag \
+              -maxdepth 1 -type f -name '*.log' -mtime +3 -print -delete || true
+          fi
+          if command -v docker >/dev/null 2>&1; then
+            docker system prune -af --filter "until=24h" 2>&1 | tail -5 || true
+            docker builder prune -af --filter "until=24h" 2>&1 | tail -3 || true
+          fi
+          mkdir -p "$GITHUB_WORKSPACE"
+          if command -v docker >/dev/null 2>&1; then
+            docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+              sh -c "chown -R $(id -u):$(id -g) /work" || true
+          fi
+          echo "::group::Disk usage (after)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
 
       - uses: actions/checkout@v5
 
@@ -193,8 +247,35 @@ jobs:
     timeout-minutes: 30
     needs: [build, build-push-node-services]
     steps:
+      # Reclaim disk + clean workspace BEFORE checkout. Inlined as a run
+      # step rather than the local ./.github/actions/hetzner-runner-cleanup
+      # composite action: a local action can only be loaded from an
+      # already-checked-out tree, so invoking it before actions/checkout
+      # fails with "Can't find action.yml" on a freshly-cleaned self-hosted
+      # workspace — which is exactly what broke every recent deploy.
       - name: Reclaim disk + clean self-hosted workspace
-        uses: ./.github/actions/hetzner-runner-cleanup
+        shell: bash
+        run: |
+          set -eu
+          echo "::group::Disk usage (before)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
+          if [ -d /opt/github-runner-aivo-ai-learning/_diag ]; then
+            find /opt/github-runner-aivo-ai-learning/_diag \
+              -maxdepth 1 -type f -name '*.log' -mtime +3 -print -delete || true
+          fi
+          if command -v docker >/dev/null 2>&1; then
+            docker system prune -af --filter "until=24h" 2>&1 | tail -5 || true
+            docker builder prune -af --filter "until=24h" 2>&1 | tail -3 || true
+          fi
+          mkdir -p "$GITHUB_WORKSPACE"
+          if command -v docker >/dev/null 2>&1; then
+            docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+              sh -c "chown -R $(id -u):$(id -g) /work" || true
+          fi
+          echo "::group::Disk usage (after)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
 
       - uses: actions/checkout@v5
 
@@ -223,8 +304,35 @@ jobs:
     outputs:
       version: ${{ steps.tag.outputs.version }}
     steps:
+      # Reclaim disk + clean workspace BEFORE checkout. Inlined as a run
+      # step rather than the local ./.github/actions/hetzner-runner-cleanup
+      # composite action: a local action can only be loaded from an
+      # already-checked-out tree, so invoking it before actions/checkout
+      # fails with "Can't find action.yml" on a freshly-cleaned self-hosted
+      # workspace — which is exactly what broke every recent deploy.
       - name: Reclaim disk + clean self-hosted workspace
-        uses: ./.github/actions/hetzner-runner-cleanup
+        shell: bash
+        run: |
+          set -eu
+          echo "::group::Disk usage (before)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
+          if [ -d /opt/github-runner-aivo-ai-learning/_diag ]; then
+            find /opt/github-runner-aivo-ai-learning/_diag \
+              -maxdepth 1 -type f -name '*.log' -mtime +3 -print -delete || true
+          fi
+          if command -v docker >/dev/null 2>&1; then
+            docker system prune -af --filter "until=24h" 2>&1 | tail -5 || true
+            docker builder prune -af --filter "until=24h" 2>&1 | tail -3 || true
+          fi
+          mkdir -p "$GITHUB_WORKSPACE"
+          if command -v docker >/dev/null 2>&1; then
+            docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+              sh -c "chown -R $(id -u):$(id -g) /work" || true
+          fi
+          echo "::group::Disk usage (after)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
 
       - uses: actions/checkout@v5
 
@@ -557,8 +665,35 @@ jobs:
       # cluster-secret fallback and in-cluster psql verify are robust.
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
+      # Reclaim disk + clean workspace BEFORE checkout. Inlined as a run
+      # step rather than the local ./.github/actions/hetzner-runner-cleanup
+      # composite action: a local action can only be loaded from an
+      # already-checked-out tree, so invoking it before actions/checkout
+      # fails with "Can't find action.yml" on a freshly-cleaned self-hosted
+      # workspace — which is exactly what broke every recent deploy.
       - name: Reclaim disk + clean self-hosted workspace
-        uses: ./.github/actions/hetzner-runner-cleanup
+        shell: bash
+        run: |
+          set -eu
+          echo "::group::Disk usage (before)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
+          if [ -d /opt/github-runner-aivo-ai-learning/_diag ]; then
+            find /opt/github-runner-aivo-ai-learning/_diag \
+              -maxdepth 1 -type f -name '*.log' -mtime +3 -print -delete || true
+          fi
+          if command -v docker >/dev/null 2>&1; then
+            docker system prune -af --filter "until=24h" 2>&1 | tail -5 || true
+            docker builder prune -af --filter "until=24h" 2>&1 | tail -3 || true
+          fi
+          mkdir -p "$GITHUB_WORKSPACE"
+          if command -v docker >/dev/null 2>&1; then
+            docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+              sh -c "chown -R $(id -u):$(id -g) /work" || true
+          fi
+          echo "::group::Disk usage (after)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
 
       - uses: actions/checkout@v5
 
@@ -707,8 +842,35 @@ jobs:
       # it talks to localhost:8080. kubectl (k3s symlink) works without it.
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
+      # Reclaim disk + clean workspace BEFORE checkout. Inlined as a run
+      # step rather than the local ./.github/actions/hetzner-runner-cleanup
+      # composite action: a local action can only be loaded from an
+      # already-checked-out tree, so invoking it before actions/checkout
+      # fails with "Can't find action.yml" on a freshly-cleaned self-hosted
+      # workspace — which is exactly what broke every recent deploy.
       - name: Reclaim disk + clean self-hosted workspace
-        uses: ./.github/actions/hetzner-runner-cleanup
+        shell: bash
+        run: |
+          set -eu
+          echo "::group::Disk usage (before)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
+          if [ -d /opt/github-runner-aivo-ai-learning/_diag ]; then
+            find /opt/github-runner-aivo-ai-learning/_diag \
+              -maxdepth 1 -type f -name '*.log' -mtime +3 -print -delete || true
+          fi
+          if command -v docker >/dev/null 2>&1; then
+            docker system prune -af --filter "until=24h" 2>&1 | tail -5 || true
+            docker builder prune -af --filter "until=24h" 2>&1 | tail -3 || true
+          fi
+          mkdir -p "$GITHUB_WORKSPACE"
+          if command -v docker >/dev/null 2>&1; then
+            docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+              sh -c "chown -R $(id -u):$(id -g) /work" || true
+          fi
+          echo "::group::Disk usage (after)"
+          df -h / /var/lib/docker 2>/dev/null || df -h /
+          echo "::endgroup::"
 
       - uses: actions/checkout@v5
 
