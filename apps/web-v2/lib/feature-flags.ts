@@ -95,6 +95,27 @@ export function baselineDiscoveryEnabled(): boolean {
 }
 
 /**
+ * Pre-generated baseline bank — serve a baseline by SELECTING from the
+ * offline-generated question bank (see lib/learner/baseline-bank.ts) instead
+ * of calling the LLM on the request path. This is the instant, non-blocking
+ * top tier of the baseline ladder: it turns a ~130s synchronous LLM render
+ * (which timed out at the ingress and showed parents an error page) into a
+ * sub-millisecond in-memory pick, while keeping LLM-quality questions matched
+ * to the learner's grade band + functioning level.
+ *
+ * Defaults: ON everywhere. It is fail-open — when the bank lacks coverage for
+ * a learner's cell the selector returns nothing and `createBaseline` falls
+ * through to the live LLM / deterministic BANK ladder, so flipping it OFF
+ * (`AIVO_FEATURE_BASELINE_BANK=false`) only changes the source, never breaks
+ * baseline creation.
+ */
+export function baselineBankEnabled(): boolean {
+  const fromServer = process.env.AIVO_FEATURE_BASELINE_BANK;
+  if (isExplicitlyFalsy(fromServer)) return false;
+  return true;
+}
+
+/**
  * Phase 0 — Adaptive baseline. When ON, two things change:
  *
  *   1. `createBaseline` widens the BANK-fallback pool

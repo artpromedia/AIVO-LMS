@@ -88,8 +88,10 @@ import {
   generateDiscoveryChapter,
   mapDiscoveryActivitiesToBaselineQuestions,
 } from "@/lib/learner/baseline-discovery";
+import { selectBaselineFromBank, bankHasItems, bankModel } from "@/lib/learner/baseline-bank";
 import {
   baselineAdaptiveEnabled,
+  baselineBankEnabled,
   baselineDiscoveryEnabled,
   baselineLlmEnabled,
 } from "@/lib/feature-flags";
@@ -816,6 +818,49 @@ export async function createBaseline(input: {
     `[BASELINE_DIAG] start baselineId=${baseline.id} learnerId=${input.learnerId} llmFlag=${llmFlag} discoveryFlag=${discoveryFlag} canCallLlm=${canCallLlm} canCallDiscovery=${canCallDiscovery} hasParentAssessment=${parentAssessment != null} submittedAt=${parentAssessment?.submittedAt ?? "null"} hasBrainProfile=${brainProfile != null} subjects=${subjects.map((s) => s.slug).join(",")} skillsCount=${skills.length}`,
   );
 
+  // ── Instant tier: pre-generated bank ──────────────────────────────────
+  // Select from the offline-generated question bank (lib/learner/baseline-
+  // bank.ts) — NO LLM on the request path — matched to the learner's grade
+  // band + functioning level. Dynamic: the pick is randomised so repeated
+  // baselines vary. Fail-open: when the bank lacks coverage for the learner's
+  // cell the selector returns nothing and we fall through to the
+  // discovery → LLM → BANK ladder below. This is what turns the baseline from
+  // a ~130s blocking LLM render (which timed out at the ingress) into a
+  // sub-millisecond pick.
+  let bankSucceeded = false;
+  if (baselineBankEnabled() && bankHasItems()) {
+    const functioningLevel =
+      brainProfile?.state.functioningLevel ?? learner.functioningLevel ?? null;
+    const bankQuestions = selectBaselineFromBank({
+      baselineId: baseline.id,
+      gradeBand: learner.gradeBand,
+      functioningLevel,
+      subjects,
+      skills,
+      accommodationTags,
+    });
+    const coveredSubjects = new Set(bankQuestions.map((q) => q.subjectId));
+    if (bankQuestions.length > 0 && coveredSubjects.size >= subjects.length) {
+      questions = bankQuestions;
+      // Bank questions are LLM-generated (offline), so the parent's
+      // "Personalized by AI" badge is correct; `model` records the bank
+      // provenance for the audit trail.
+      metadata = {
+        source: "ai",
+        model: bankModel(),
+        generatedAt: nowIso(),
+      };
+      bankSucceeded = true;
+      console.error(
+        `[BASELINE_DIAG] bank_hit baselineId=${baseline.id} questions=${bankQuestions.length} subjects=${coveredSubjects.size}/${subjects.length} gradeBand=${learner.gradeBand ?? "?"} level=${functioningLevel ?? "?"}`,
+      );
+    } else {
+      console.error(
+        `[BASELINE_DIAG] bank_miss baselineId=${baseline.id} got=${bankQuestions.length} covered=${coveredSubjects.size}/${subjects.length}`,
+      );
+    }
+  }
+
   // Phase 0 — when the adaptive baseline is enabled, the BANK fallback uses
   // a wider, difficulty-spread pool so the runner's adaptive selector has
   // room to move (see `generateAdaptiveBaselinePool`). Off → identical
@@ -830,7 +875,7 @@ export async function createBaseline(input: {
   // independent; partial successes are kept and the per-chapter
   // failure reasons surface on `generationMetadata.chapterFailures`.
   let discoverySucceeded = false;
-  if (canCallDiscovery) {
+  if (!bankSucceeded && canCallDiscovery) {
     const settled = await Promise.allSettled(
       ADVENTURE_CHAPTERS.map((chapter) =>
         generateDiscoveryChapter({ learnerId: input.learnerId, chapter }),
@@ -916,7 +961,7 @@ export async function createBaseline(input: {
     }
   }
 
-  if (!discoverySucceeded && canCallLlm) {
+  if (!bankSucceeded && !discoverySucceeded && canCallLlm) {
     const llmResult = await generateBaselineQuestionsViaLLM({
       parent_assessment: parentAssessment!.answers as unknown as Record<string, unknown>,
       functioning_level: brainProfile?.state.functioningLevel ?? "STANDARD",
@@ -1004,7 +1049,7 @@ export async function createBaseline(input: {
         "baseline: LLM generation failed, used BANK fallback",
       );
     }
-  } else if (!discoverySucceeded) {
+  } else if (!bankSucceeded && !discoverySucceeded) {
     questions = bankGenerator({
       baselineId: baseline.id,
       learner,

@@ -65,6 +65,10 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
     // Default the flag OFF; each test that wants the LLM path on
     // toggles it explicitly via vi.stubEnv.
     vi.unstubAllEnvs();
+    // These tests exercise the discovery → LLM → BANK ladder specifically.
+    // The pre-generated bank is a newer instant top-tier that would otherwise
+    // intercept; turn it off so this suite keeps asserting the lower tiers.
+    vi.stubEnv("AIVO_FEATURE_BASELINE_BANK", "false");
   });
 
   afterEach(() => {
