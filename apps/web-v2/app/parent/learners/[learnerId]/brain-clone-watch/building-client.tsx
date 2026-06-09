@@ -22,6 +22,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import MasterToChildClone from "@/components/brain/master-to-child-clone";
+import PixiBrainSphere from "@/components/brain/pixi-brain-sphere";
 import BrainBuildingSequence, {
   type MasteryDecisionDTO,
   type AccommodationDecisionDTO,
@@ -90,12 +91,13 @@ export function BrainBuildingClient({
   // and first client render agree.
   //
   // `prefers-reduced-motion` also suppresses the auto-playing clone intro
-  // entirely — large animated cross-fades are exactly the kind of "calm"
-  // motion that the OS-level reduce-motion preference asks us to avoid.
-  // Skipping it also keeps the persistent brain sphere (rendered inside
-  // `BrainBuildingSequence`) visible from first paint so reduced-motion
-  // users land on the same affordance as everyone else (and our e2e gate
-  // can assert it without driving a 5s intro).
+  // AND the cinematic build sequence entirely — large auto-playing
+  // cross-fades are exactly the kind of "calm" motion the OS-level
+  // reduce-motion preference asks us to avoid. Reduced-motion users land
+  // straight on the recap, which renders the persistent brain sphere from
+  // first paint (see the recap header below), so they get the same living
+  // brain affordance as everyone else and our e2e gate can assert it
+  // without driving a multi-second cinematic intro.
   const [showClone, setShowClone] = useState<boolean | null>(null);
   // The cinematic build sequence plays after the clone intro and before
   // the approval recap. Already-approved brains skip straight to the recap.
@@ -108,9 +110,11 @@ export function BrainBuildingClient({
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setShowClone(!alreadyApproved && !seen && !reducedMotion);
-    // If the parent has already lived the moment (or the brain is approved),
-    // jump past the cinematic sequence to the recap + approval gate.
-    setSequenceDone(alreadyApproved || seen);
+    // Jump past the cinematic sequence straight to the recap + approval gate
+    // when the parent has already lived the moment, the brain is approved, or
+    // reduced motion is requested (the recap shows the same persistent brain
+    // sphere, minus the auto-playing build animation).
+    setSequenceDone(alreadyApproved || seen || reducedMotion);
   }, [alreadyApproved, learnerId]);
 
   // The recap timeline below the cinematic sequence shows the finished
@@ -168,6 +172,16 @@ export function BrainBuildingClient({
   return (
     <div className="bc-watch-root" style={{ "--bc-primary": primaryHue } as React.CSSProperties}>
       <header className="bc-watch-header">
+        <div className="bc-watch-sphere">
+          <PixiBrainSphere
+            primaryHue={primaryHue}
+            secondaryHues={secondaryHues}
+            pulseRate={sequence.pulseRate}
+            intensity={1}
+            size={160}
+            ariaLabel={`${learnerName}'s brain`}
+          />
+        </div>
         <p className="bc-watch-eyebrow">For {learnerName}</p>
         <h1 className="bc-watch-title">{title}</h1>
         <p className="bc-watch-description">{description}</p>
@@ -259,6 +273,11 @@ export function BrainBuildingClient({
           padding: 1rem 0 3rem;
         }
         .bc-watch-header { margin-bottom: 1.5rem; }
+        .bc-watch-sphere {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 0.75rem;
+        }
         .bc-watch-eyebrow {
           font-size: 0.78rem;
           letter-spacing: 0.18em;
