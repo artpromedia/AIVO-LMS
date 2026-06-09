@@ -1213,6 +1213,19 @@ jobs:
                               optional: true
           EOF
 
+          # ─── Baseline-bank generator (grows web_baseline_bank daily) ───
+          # ConfigMap carries the generator script; the CronJob runs it daily
+          # in the assessment-svc image to grow the pre-generated baseline
+          # question bank so web-v2 serves baselines instantly (no on-request
+          # LLM call). Applied from the committed manifest with the image
+          # pinned to $VERSION so a cluster rebuild recreates the cron.
+          echo "═══ Prod deploy: baseline-bank-generator (ConfigMap + CronJob $VERSION) ═══"
+          kubectl -n "$NS" create configmap baseline-bank-generator \
+            --from-file=generate.mjs=scripts/generate-baseline-bank-db.mjs \
+            --dry-run=client -o yaml | kubectl apply -f -
+          sed "s#assessment-svc:latest#assessment-svc:$VERSION#" \
+            infra/k8s/baseline-bank-cron.yaml | kubectl apply -n "$NS" -f -
+
           if [ "$FAILED" -gt 3 ]; then
             echo "::error::Too many failures ($FAILED) — consider rollback"
             exit 1
@@ -1223,6 +1236,7 @@ jobs:
           kubectl -n ${{ env.PROD_NAMESPACE }} get pods --sort-by=.metadata.name -o wide
           kubectl -n ${{ env.PROD_NAMESPACE }} get deployments
           kubectl -n ${{ env.PROD_NAMESPACE }} get cronjob iep-progress-sync -o wide || true
+          kubectl -n ${{ env.PROD_NAMESPACE }} get cronjob baseline-bank-generator -o wide || true
 
       - name: Verify web-admin ready for host cutover
         env:
