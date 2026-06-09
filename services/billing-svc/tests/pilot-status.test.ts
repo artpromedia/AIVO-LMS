@@ -52,6 +52,21 @@ test("returns a district's live pilot status from real reads", async (t) => {
       } as any)
       .returning();
 
+    // One onboarded parent under the district tenant. Created up front so the
+    // ACTIVE subscription below can reference a real user (subscriptions.user_id
+    // is NOT NULL with an FK to users.id).
+    const [parent] = await db
+      .insert(users)
+      .values({
+        email: `pstat-parent-${Date.now()}@fam.test`,
+        name: "Stat Parent",
+        role: "PARENT",
+        tenantId: tenant.id,
+        passwordHash:
+          "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      } as any)
+      .returning();
+
     const code = `PILOT-STAT-${Date.now()}`.toUpperCase().slice(0, 40);
     await db.execute(sql`
       INSERT INTO billing_coupons
@@ -59,19 +74,10 @@ test("returns a district's live pilot status from real reads", async (t) => {
       VALUES (${code}, 'PROVISIONING', 'enterprise', 'district', 5, 90, 1, 1)
     `);
     await db.execute(sql`
-      INSERT INTO subscriptions (tenant_id, plan, status, current_period_end, metadata)
-      VALUES (${tenant.id}, 'district', 'ACTIVE', now() + make_interval(days => 90),
+      INSERT INTO subscriptions (tenant_id, user_id, plan, status, current_period_end, metadata)
+      VALUES (${tenant.id}, ${parent.id}, 'district', 'ACTIVE', now() + make_interval(days => 90),
         ${JSON.stringify({ couponCode: code, provisionedBy: "pilot" })})
     `);
-    // One onboarded parent under the district tenant.
-    await db.insert(users).values({
-      email: `pstat-parent-${Date.now()}@fam.test`,
-      name: "Stat Parent",
-      role: "PARENT",
-      tenantId: tenant.id,
-      passwordHash:
-        "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-    } as any);
 
     const token = await signJWT({
       sub: "00000000-0000-0000-0000-0000000000ad",

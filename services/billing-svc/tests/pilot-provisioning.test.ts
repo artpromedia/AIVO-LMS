@@ -46,14 +46,32 @@ async function seedDistrictTenant(db: any): Promise<string> {
   return tenant.id as string;
 }
 
-function provisionBody(tenantId: string) {
+// The provisioned subscription's `user_id` (the platform actor) is a real FK
+// into users.id, so the actor must exist before we provision. In production
+// this is the authenticated platform-admin; here we seed a stand-in.
+async function seedActorUser(db: any): Promise<string> {
+  const { users } = await import("@aivo/db");
+  const [user] = await db
+    .insert(users)
+    .values({
+      email: `pilot-actor-${Date.now()}-${Math.random().toString(16).slice(2, 8)}@aivo.dev`,
+      name: "Pilot Actor",
+      role: "PLATFORM_ADMIN",
+      passwordHash:
+        "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    } as any)
+    .returning();
+  return user.id as string;
+}
+
+function provisionBody(tenantId: string, actorUserId = "00000000-0000-0000-0000-0000000000aa") {
   return {
     tenantId,
     plan: "district",
     tier: "enterprise",
     seatLimit: 25,
     durationDays: 90,
-    actorUserId: "00000000-0000-0000-0000-0000000000aa",
+    actorUserId,
   };
 }
 
@@ -63,12 +81,13 @@ test("provision sets tier + seat_limit, inserts ACTIVE subscription, redeems cou
   try {
     const { sql } = await import("drizzle-orm");
     const tenantId = await seedDistrictTenant(db);
+    const actorUserId = await seedActorUser(db);
 
     const res = await app.inject({
       method: "POST",
       url: "/api/billing/internal/pilots/provision",
       headers: { "x-service-token": TOKEN },
-      payload: provisionBody(tenantId),
+      payload: provisionBody(tenantId, actorUserId),
     });
     assert.equal(res.statusCode, 200, res.body);
     const body = res.json();
@@ -117,12 +136,13 @@ test("provision is idempotent on (tenantId, couponCode) — no double seats/subs
   try {
     const { sql } = await import("drizzle-orm");
     const tenantId = await seedDistrictTenant(db);
+    const actorUserId = await seedActorUser(db);
 
     const first = await app.inject({
       method: "POST",
       url: "/api/billing/internal/pilots/provision",
       headers: { "x-service-token": TOKEN },
-      payload: provisionBody(tenantId),
+      payload: provisionBody(tenantId, actorUserId),
     });
     assert.equal(first.statusCode, 200);
     assert.equal(first.json().provisioned, true);
@@ -131,7 +151,7 @@ test("provision is idempotent on (tenantId, couponCode) — no double seats/subs
       method: "POST",
       url: "/api/billing/internal/pilots/provision",
       headers: { "x-service-token": TOKEN },
-      payload: provisionBody(tenantId),
+      payload: provisionBody(tenantId, actorUserId),
     });
     assert.equal(second.statusCode, 200);
     assert.equal(second.json().provisioned, false, "re-run reuses existing entitlement");

@@ -1,0 +1,15 @@
+-- 0091_billing_coupon_discount_default.sql
+--
+-- District-pilot follow-up: align billing_coupons.discount_pct with the
+-- canonical schema (packages/db/src/schema/billing.ts declares
+-- `integer("discount_pct").notNull().default(0)`).
+--
+-- The column was first created by 0012_background_jobs.sql as
+-- `discount_pct integer NOT NULL` (no default). 0090_billing_coupons.sql
+-- re-declares the table with `DEFAULT 0`, but its `CREATE TABLE IF NOT EXISTS`
+-- is a no-op once the table already exists, so the default never landed on
+-- pre-existing DBs. PROVISIONING inserts that legitimately omit discount_pct
+-- (the pilot coupon path) then hit a NOT NULL violation.
+--
+-- Idempotent: setting a column default is safe to re-run.
+ALTER TABLE "billing_coupons" ALTER COLUMN "discount_pct" SET DEFAULT 0;
