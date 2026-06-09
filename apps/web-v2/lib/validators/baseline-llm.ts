@@ -48,8 +48,16 @@ export const baselineLlmQuestionSchema = z
     questionText: z.string().min(1).max(2000),
     options: z.array(baselineLlmOptionSchema).min(2).max(10),
     correctAnswer: z.string().min(1).max(200),
-    // Optional metadata the ai-svc may attach (difficulty, explanation, etc.)
-    difficulty: z.string().max(100).optional(),
+    // Optional metadata the ai-svc may attach (difficulty, explanation, etc.).
+    // ai-svc emits `difficulty` as a NUMBER (e.g. 1..5) per its Pydantic model
+    // (str | int), but earlier this schema only accepted a string, so every
+    // LLM-generated baseline failed validation and fell back to the BANK.
+    // Accept either and coerce to string so the downstream mapper (which
+    // treats difficulty as a string band) keeps working.
+    difficulty: z
+      .union([z.string().max(100), z.number()])
+      .transform((v) => String(v))
+      .optional(),
     explanation: z.string().max(2000).optional(),
     /**
      * Optional scene emoji anchoring the prompt (e.g., 🐱 above the
