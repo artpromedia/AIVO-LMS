@@ -9,7 +9,8 @@ import { ROLE_HOME, type Role, type SessionProfile } from "./types.js";
 
 type JwtClaims = {
   sub: string;
-  tenantId: string;
+  /** identity-svc mints tokens with `tenantId: null` for platform staff. */
+  tenantId: string | null;
   role: string;
 };
 
@@ -41,13 +42,15 @@ async function verifyIdentityJwt(token: string): Promise<JwtClaims> {
   return payload as unknown as JwtClaims;
 }
 
-function parseSessionCookie(value: string | undefined): SessionProfile | null {
+export function parseSessionCookie(value: string | undefined): SessionProfile | null {
   if (!value) return null;
   try {
-    const profile = JSON.parse(decodeURIComponent(value)) as Partial<SessionProfile>;
+    const profile = JSON.parse(decodeURIComponent(value)) as Partial<
+      Omit<SessionProfile, "tenantId"> & { tenantId: string | null }
+    >;
     if (
       typeof profile.userId !== "string" ||
-      typeof profile.tenantId !== "string" ||
+      (typeof profile.tenantId !== "string" && profile.tenantId !== null) ||
       typeof profile.role !== "string" ||
       typeof profile.email !== "string" ||
       typeof profile.displayName !== "string"
@@ -56,7 +59,7 @@ function parseSessionCookie(value: string | undefined): SessionProfile | null {
     }
     return {
       userId: profile.userId,
-      tenantId: profile.tenantId,
+      tenantId: profile.tenantId ?? "",
       role: profile.role as Role,
       email: profile.email,
       displayName: profile.displayName,
@@ -70,10 +73,16 @@ function parseSessionCookie(value: string | undefined): SessionProfile | null {
   }
 }
 
-export async function readAdminSessionFromCookies(): Promise<SessionProfile | null> {
-  const jar = await cookies();
-  const accessToken = jar.get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
-  const session = parseSessionCookie(jar.get(IDENTITY_SESSION_COOKIE)?.value);
+type ReadableCookieJar = {
+  get: (name: string) => { value: string } | undefined;
+};
+
+export async function readAdminSessionFromCookies(
+  jar?: ReadableCookieJar,
+): Promise<SessionProfile | null> {
+  const cookieJar = jar ?? (await cookies());
+  const accessToken = cookieJar.get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
+  const session = parseSessionCookie(cookieJar.get(IDENTITY_SESSION_COOKIE)?.value);
   if (!accessToken || !session || !isAdminRole(session.role)) return null;
 
   let claims: JwtClaims;
@@ -83,7 +92,7 @@ export async function readAdminSessionFromCookies(): Promise<SessionProfile | nu
     return null;
   }
 
-  if (claims.sub !== session.userId || claims.tenantId !== session.tenantId) return null;
+  if (claims.sub !== session.userId || (claims.tenantId ?? "") !== session.tenantId) return null;
   const claimRole = String(claims.role ?? "").toLowerCase() as Role;
   if (claimRole !== session.role) return null;
   return session;
