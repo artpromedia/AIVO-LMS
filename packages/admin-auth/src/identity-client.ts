@@ -26,7 +26,8 @@ export type IdentityUser = {
   email: string;
   name: string | null;
   role: string;
-  tenantId: string;
+  /** Platform-scope staff (PLATFORM_ADMIN, SUPPORT, …) have no tenant. */
+  tenantId: string | null;
 };
 
 export type IdentityLoginSuccess = {
@@ -203,7 +204,9 @@ export function toSessionProfile(user: IdentityUser): SessionProfile | null {
   const permissions = capabilitiesForRole(role);
   return {
     userId: user.id,
-    tenantId: user.tenantId,
+    // Tenantless platform staff are stored as "" so the session cookie and
+    // JWT cross-checks treat "no tenant" consistently (see types.ts).
+    tenantId: user.tenantId ?? "",
     role,
     email: user.email,
     displayName: user.name ?? user.email,

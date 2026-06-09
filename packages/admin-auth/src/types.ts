@@ -15,6 +15,11 @@ export type Role =
 
 export type SessionProfile = {
   userId: string;
+  /**
+   * Empty string for tenantless platform-scope staff (platform_admin,
+   * support, devops, …) whose users row has tenant_id = NULL. Tenant-scoped
+   * roles (school_admin, district_admin) always carry a real tenant id.
+   */
   tenantId: string;
   role: Role;
   email: string;
