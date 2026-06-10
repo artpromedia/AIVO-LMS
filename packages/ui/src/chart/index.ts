@@ -5,3 +5,6 @@ export * from "./MasteryHeatStrip";
 export * from "./ProgressCurve";
 export * from "./RiskIndicator";
 export * from "./ClassOverviewCard";
+export * from "./AreaTrend";
+export * from "./Donut";
+export * from "./KpiCard";
