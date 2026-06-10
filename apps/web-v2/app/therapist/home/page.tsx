@@ -4,6 +4,9 @@
  * Therapists are added via the parent care-team invite flow
  * (`/parent/learners/[learnerId]/team`) and route here after accepting an
  * invite.
+ *
+ * Sprint 13: upgraded flat Card numbers to KpiCard with optional deltas
+ * and sparklines.
  */
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
@@ -11,13 +14,19 @@ import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { THERAPIST_NAV } from "@/components/layout/role-shells";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { KpiCard } from "@aivo/ui/chart";
 import { listLearnersForMember } from "@/lib/db/team-invites";
-import { getIEPForLearner, getLearner, refreshLearnerReadiness } from "@/lib/db/repos";
+import {
+  getIEPForLearner,
+  getLearner,
+  listLessonRunsForLearner,
+  refreshLearnerReadiness,
+} from "@/lib/db/repos";
 import type { LearnerProfile } from "@/lib/db/types";
 import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
+import { computeDeltaPct, computeMetricHistory, splitIntoPeriods } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +46,22 @@ export default async function TherapistHomePage() {
     })),
   );
   const iepCount = fresh.filter((l) => l.iep !== null).length;
+  const readyForSession = fresh.filter(
+    (l) =>
+      l.readinessState === "ready_for_today_mission" || l.readinessState === "active_learning",
+  ).length;
+
+  // --- Trend data: completed sessions across caseload (last 7 days vs prior 7) ---
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const allRuns = (
+    await Promise.all(fresh.map((l) => listLessonRunsForLearner(l.id, session.tenantId)))
+  ).flat();
+  const completedRuns = allRuns.filter((r) => r.status === "completed");
+  const { current: thisWeek, prior: lastWeek } = splitIntoPeriods(completedRuns, sevenDaysAgo);
+  const sessionDelta = computeDeltaPct(thisWeek.length, lastWeek.length);
+  const sessionSeries = computeMetricHistory(completedRuns, (b) => b.length, "week", 8);
 
   return (
     <AppShell
@@ -52,27 +77,40 @@ export default async function TherapistHomePage() {
 
       {fresh.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-3">
-          <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("stat_caseload")}</p>
-            <p className="font-display text-2xl font-semibold">{fresh.length}</p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("stat_ieps")}</p>
-            <p className="font-display text-2xl font-semibold">{iepCount}</p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("quick_links")}</p>
-            <div className="mt-1 flex flex-col gap-1 text-sm">
-              <Link href="/therapist/sessions" className="text-aivo-accent hover:underline">
-                {t("link_sessions")}
-              </Link>
-              <Link href="/therapist/reports" className="text-aivo-accent hover:underline">
-                {t("link_reports")}
-              </Link>
-            </div>
-          </Card>
+          <KpiCard
+            label={t("stat_caseload")}
+            value={String(fresh.length)}
+            periodLabel={t("period_label_active")}
+            seriesTone="brand"
+            ariaLabel={`Caseload size: ${fresh.length} active learners`}
+          />
+          <KpiCard
+            label={t("stat_ieps")}
+            value={String(iepCount)}
+            periodLabel={iepCount === 0 ? "None on file" : "Supports applied"}
+            seriesTone="info"
+            ariaLabel={`IEPs on file: ${iepCount}${iepCount === 0 ? ", none" : ""}`}
+          />
+          <KpiCard
+            label={t("stat_ready_for_session")}
+            value={String(readyForSession)}
+            deltaPct={sessionDelta ?? undefined}
+            periodLabel={sessionDelta != null ? t("period_label_vs_last_week") : t("period_label_this_week")}
+            series={sessionSeries.length > 1 ? sessionSeries : undefined}
+            seriesTone={readyForSession > 0 ? "success" : "brand"}
+            ariaLabel={`Ready for session: ${readyForSession}${sessionDelta != null ? `, ${sessionDelta > 0 ? "up" : sessionDelta < 0 ? "down" : "no change"} ${Math.abs(sessionDelta)}% vs last week` : ""}`}
+          />
         </div>
       ) : null}
+
+      <div className="mt-4 flex flex-col gap-1 text-sm">
+        <Link href="/therapist/sessions" className="text-aivo-accent hover:underline">
+          {t("link_sessions")}
+        </Link>
+        <Link href="/therapist/reports" className="text-aivo-accent hover:underline">
+          {t("link_reports")}
+        </Link>
+      </div>
 
       <SectionHeader title={t("section_caseload")} />
       {fresh.length === 0 ? (
@@ -84,7 +122,7 @@ export default async function TherapistHomePage() {
         <ul className="grid gap-3 sm:grid-cols-2">
           {fresh.map((l) => (
             <li key={l.id}>
-              <Card className="p-4">
+              <div className="rounded-iw-card bg-iw-card border border-iw-border p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold">{l.displayName}</p>
@@ -97,7 +135,7 @@ export default async function TherapistHomePage() {
                     {READINESS_LABEL[l.readinessState]}
                   </Badge>
                 </div>
-              </Card>
+              </div>
             </li>
           ))}
         </ul>

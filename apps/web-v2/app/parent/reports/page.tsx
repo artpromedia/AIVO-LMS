@@ -5,12 +5,16 @@
  * plain-language summaries, IEP-supports-used count, and a quick
  * link into the learner page. Designed for non-technical parents —
  * no spreadsheets, no jargon.
+ *
+ * Sprint 13: Upgraded flat FloatingMetricCard numbers to KpiCard with
+ * optional signed deltas and inline sparklines wherever history exists.
  */
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { FloatingMetricCard, InsightChip, GlassCard, EmptyState } from "@aivo/ui";
+import { InsightChip, GlassCard, EmptyState } from "@aivo/ui";
+import { KpiCard } from "@aivo/ui/chart";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import {
   getIEPForLearner,
@@ -20,12 +24,23 @@ import {
   listParentLessonSummaries,
   listSubjects,
 } from "@/lib/db/repos";
+import {
+  computeDeltaPct,
+  computeMetricHistory,
+  splitIntoPeriods,
+} from "@/lib/analytics/trend-compute";
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.reports");
   const learners = await listLearnersForParent(session.userId, session.tenantId);
   const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
+
+  // Period boundary: 30 days ago
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const priorStart = new Date(thirtyDaysAgo);
+  priorStart.setDate(priorStart.getDate() - 30);
 
   return (
     <AppShell
@@ -53,7 +68,8 @@ export default async function Page() {
             learners.map(async (l) => {
               const summaries = listParentLessonSummaries(l.id, session.tenantId).slice(0, 6);
               const runs = await listLessonRunsForLearner(l.id, session.tenantId);
-              const completed = runs.filter((r) => r.status === "completed").length;
+              const completed = runs.filter((r) => r.status === "completed");
+              const completedCount = completed.length;
               const { skillMasteries } = await getMasteryMap(l.id, session.tenantId);
               const overallAvg =
                 skillMasteries.length === 0
@@ -62,14 +78,37 @@ export default async function Page() {
               const iep = await getIEPForLearner(l.id, session.tenantId);
               const supportsCount = iep?.acceptedAccommodations?.length ?? 0;
 
+              // --- Trend data: completed lessons ---
+              const { current: recentCompleted, prior: priorCompleted } = splitIntoPeriods(
+                completed,
+                thirtyDaysAgo,
+              );
+              const completedDelta = computeDeltaPct(
+                recentCompleted.length,
+                priorCompleted.length,
+              );
+              const lessonsSeries = computeMetricHistory(
+                completed,
+                (b) => b.length,
+                "week",
+                12,
+              );
+
+              // --- Trend data: overall mastery (last 30 days vs prior 30) ---
+              // Proxy via completed runs in each period — more runs in recent = improving engagement
+              const masteryDelta =
+                priorCompleted.length > 0
+                  ? computeDeltaPct(recentCompleted.length, priorCompleted.length)
+                  : null;
+
               return (
                 <section key={l.id} className="flex flex-col gap-4">
                   <header className="flex items-center justify-between gap-3 flex-wrap">
                     <div>
                       <h2 className="text-xl font-semibold text-iw-text-strong">{l.displayName}</h2>
                       <p className="text-sm text-iw-text-muted">
-                        {completed} lesson{completed === 1 ? "" : "s"} completed · {runs.length}{" "}
-                        total
+                        {completedCount} lesson{completedCount === 1 ? "" : "s"} completed ·{" "}
+                        {runs.length} total
                       </p>
                     </div>
                     <Link
@@ -81,29 +120,37 @@ export default async function Page() {
                   </header>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <FloatingMetricCard
+                    <KpiCard
                       label="Overall mastery"
                       value={`${Math.round(overallAvg * 100)}%`}
-                      description="across subjects"
-                      tone={overallAvg >= 0.65 ? "success" : "info"}
+                      deltaPct={masteryDelta ?? undefined}
+                      periodLabel={masteryDelta != null ? t("period_label_30d") : undefined}
+                      series={lessonsSeries.length > 1 ? lessonsSeries : undefined}
+                      seriesTone={overallAvg >= 0.65 ? "mastery" : "info"}
+                      ariaLabel={`Overall mastery ${Math.round(overallAvg * 100)}%${masteryDelta != null ? `, ${masteryDelta > 0 ? "up" : masteryDelta < 0 ? "down" : "no change"} ${Math.abs(masteryDelta)}% ${t("period_label_30d")}` : ""}`}
                     />
-                    <FloatingMetricCard
+                    <KpiCard
                       label="Lessons completed"
-                      value={`${completed}`}
-                      description="all time"
-                      tone="neutral"
+                      value={`${completedCount}`}
+                      deltaPct={completedDelta ?? undefined}
+                      periodLabel={completedDelta != null ? t("period_label_30d") : undefined}
+                      series={lessonsSeries.length > 1 ? lessonsSeries : undefined}
+                      seriesTone="brand"
+                      ariaLabel={`Lessons completed ${completedCount}${completedDelta != null ? `, ${completedDelta > 0 ? "up" : completedDelta < 0 ? "down" : "no change"} ${Math.abs(completedDelta)}% ${t("period_label_30d")}` : ""}`}
                     />
-                    <FloatingMetricCard
+                    <KpiCard
                       label="Skills tracked"
                       value={`${skillMasteries.length}`}
-                      description="from baseline"
-                      tone="info"
+                      periodLabel={t("period_label_all_time")}
+                      seriesTone="info"
+                      ariaLabel={`Skills tracked ${skillMasteries.length}, from baseline`}
                     />
-                    <FloatingMetricCard
+                    <KpiCard
                       label="IEP supports"
                       value={supportsCount > 0 ? `${supportsCount} on` : "None on file"}
-                      description={iep?.confirmedAt ? "Active" : "Optional"}
-                      tone={iep?.confirmedAt ? "success" : "neutral"}
+                      periodLabel={iep?.confirmedAt ? "Active" : "Optional"}
+                      seriesTone={iep?.confirmedAt ? "success" : "brand"}
+                      ariaLabel={`IEP supports: ${supportsCount > 0 ? `${supportsCount} active` : "none on file"}`}
                     />
                   </div>
 

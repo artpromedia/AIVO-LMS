@@ -466,7 +466,9 @@
       "no_learners": "아직 학습자 없음",
       "no_learners_body": "홈 페이지에서 학습자를 추가하여 진도 보고서 생성을 시작하세요.",
       "open_learner": "학습자 열기 →",
-      "recent_lessons": "최근 수업"
+      "recent_lessons": "최근 수업",
+      "period_label_30d": "지난 30일 대비",
+      "period_label_all_time": "전체 기간"
     },
     "settings_account_form": {
       "display_name": "표시 이름",
@@ -2669,7 +2671,9 @@
       "no_learners_yet": "아직 학습자가 없습니다",
       "connect_roster": "명단 연결",
       "roster_snapshot": "명단 개요",
-      "add_another_class": "다른 학급 추가"
+      "add_another_class": "다른 학급 추가",
+      "period_label_this_week": "이번 주",
+      "period_label_vs_last_week": "지난 주 대비"
     },
     "lesson_plans": {
       "page_title": "AI 수업 계획",
@@ -2822,7 +2826,11 @@
       "link_sessions": "세션 →",
       "link_reports": "보고서 →",
       "section_caseload": "케이스로드",
-      "empty_title": "아직 학습자가 없습니다"
+      "empty_title": "아직 학습자가 없습니다",
+      "stat_ready_for_session": "세션 준비 완료",
+      "period_label_active": "활성",
+      "period_label_vs_last_week": "지난 주 대비",
+      "period_label_this_week": "이번 주"
     },
     "reports": {
       "title": "보고서",
@@ -2851,7 +2859,10 @@
       "link_observations": "관찰 기록 →",
       "link_roster": "명단 →",
       "your_learners": "담당 학습자",
-      "no_learners_yet": "아직 학습자가 없습니다"
+      "no_learners_yet": "아직 학습자가 없습니다",
+      "period_label_active": "활성",
+      "period_label_vs_last_week": "지난 주 대비",
+      "period_label_this_week": "이번 주"
     },
     "learners": {
       "title": "학습자",

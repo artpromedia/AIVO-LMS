@@ -466,7 +466,9 @@
       "no_learners": "Aún no hay estudiantes",
       "no_learners_body": "Agrega un estudiante desde la página de inicio para comenzar a generar informes de progreso.",
       "open_learner": "Abrir estudiante →",
-      "recent_lessons": "Lecciones recientes"
+      "recent_lessons": "Lecciones recientes",
+      "period_label_30d": "vs últimos 30 días",
+      "period_label_all_time": "desde siempre"
     },
     "settings_account_form": {
       "display_name": "Nombre para mostrar",
@@ -2669,7 +2671,9 @@
       "no_learners_yet": "Aún no hay estudiantes",
       "connect_roster": "Conectar lista",
       "roster_snapshot": "Vista general de la lista",
-      "add_another_class": "Agregar otra clase"
+      "add_another_class": "Agregar otra clase",
+      "period_label_this_week": "esta semana",
+      "period_label_vs_last_week": "vs la semana pasada"
     },
     "lesson_plans": {
       "page_title": "Planes de lección con AI",
@@ -2822,7 +2826,11 @@
       "link_sessions": "Sesiones →",
       "link_reports": "Informes →",
       "section_caseload": "Carga de casos",
-      "empty_title": "Aún no hay estudiantes"
+      "empty_title": "Aún no hay estudiantes",
+      "stat_ready_for_session": "Listos para sesión",
+      "period_label_active": "activo",
+      "period_label_vs_last_week": "vs la semana pasada",
+      "period_label_this_week": "esta semana"
     },
     "reports": {
       "title": "Informes",
@@ -2851,7 +2859,10 @@
       "link_observations": "Observaciones →",
       "link_roster": "Lista →",
       "your_learners": "Tus estudiantes",
-      "no_learners_yet": "Aún no hay estudiantes"
+      "no_learners_yet": "Aún no hay estudiantes",
+      "period_label_active": "activo",
+      "period_label_vs_last_week": "vs la semana pasada",
+      "period_label_this_week": "esta semana"
     },
     "learners": {
       "title": "Estudiantes",

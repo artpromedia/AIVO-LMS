@@ -6,21 +6,27 @@
  * "AI lesson drafts awaiting review", "parent messages", and
  * "IEP accommodations active today" — each one a card that links
  * deep into the actionable surface.
+ *
+ * Sprint 13: Upgraded flat FloatingMetricCard KPIs to KpiCard with
+ * optional signed deltas computed from lesson-run history.
  */
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
-import { LearningHero, FloatingMetricCard, GlassCard, InsightChip, EmptyState } from "@aivo/ui";
+import { LearningHero, GlassCard, InsightChip, EmptyState } from "@aivo/ui";
+import { KpiCard } from "@aivo/ui/chart";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { Home, Users, ClipboardList, BarChart3, Settings, Network } from "lucide-react";
 import {
   getIEPForLearner,
   listLearnersForTeacher,
+  listLessonRunsForLearner,
   listTeacherAssignments,
   refreshLearnerReadiness,
 } from "@/lib/db/repos";
+import { computeDeltaPct, computeMetricHistory, splitIntoPeriods } from "@/lib/analytics";
 
 const TEACHER_NAV = [
   { href: "/teacher/home", label: "Home", icon: <Home className="h-4 w-4" /> },
@@ -106,6 +112,26 @@ export default async function TeacherHome() {
     const now = Date.now();
     return due >= now && due - now <= 7 * 24 * 60 * 60 * 1000;
   }).length;
+
+  // --- Trend data: aggregate completed lessons across all roster learners ---
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const priorWeekStart = new Date(sevenDaysAgo);
+  priorWeekStart.setDate(priorWeekStart.getDate() - 7);
+
+  const allRuns = (
+    await Promise.all(
+      learners.map((l) => listLessonRunsForLearner(l.id, session.tenantId)),
+    )
+  ).flat();
+  const completedRuns = allRuns.filter((r) => r.status === "completed");
+  const { current: thisWeekRuns, prior: lastWeekRuns } = splitIntoPeriods(
+    completedRuns,
+    sevenDaysAgo,
+  );
+  const lessonDelta = computeDeltaPct(thisWeekRuns.length, lastWeekRuns.length);
+  const lessonSeries = computeMetricHistory(completedRuns, (b) => b.length, "week", 8);
+
 
   const insights: Insight[] = [
     {
@@ -238,29 +264,35 @@ export default async function TeacherHome() {
       />
 
       <section className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-        <FloatingMetricCard
+        <KpiCard
           label="Active learners"
           value={String(learners.length)}
-          description={learners.length === 0 ? "No roster yet" : "On your roster"}
-          tone="info"
+          periodLabel={learners.length === 0 ? "No roster yet" : t("period_label_this_week")}
+          seriesTone="info"
+          ariaLabel={`Active learners: ${learners.length}${learners.length === 0 ? ", no roster yet" : ""}`}
         />
-        <FloatingMetricCard
+        <KpiCard
           label="Active IEPs"
           value={String(iepCount)}
-          description={iepCount === 0 ? "None on file" : "Supports applied"}
-          tone="success"
+          periodLabel={iepCount === 0 ? "None on file" : "Supports applied"}
+          seriesTone="success"
+          ariaLabel={`Active IEPs: ${iepCount}${iepCount === 0 ? ", none on file" : ", supports applied"}`}
         />
-        <FloatingMetricCard
-          label="Baseline pending"
-          value={String(baselinePending)}
-          description={baselinePending === 0 ? "All baselines done" : "Learners awaiting baseline"}
-          tone={baselinePending === 0 ? "success" : "warning"}
+        <KpiCard
+          label="Lessons in progress"
+          value={String(thisWeekRuns.length)}
+          deltaPct={lessonDelta ?? undefined}
+          periodLabel={lessonDelta != null ? t("period_label_vs_last_week") : t("period_label_this_week")}
+          series={lessonSeries.length > 1 ? lessonSeries : undefined}
+          seriesTone="brand"
+          ariaLabel={`Lessons in progress this week: ${thisWeekRuns.length}${lessonDelta != null ? `, ${lessonDelta > 0 ? "up" : lessonDelta < 0 ? "down" : "no change"} ${Math.abs(lessonDelta)}% vs last week` : ""}`}
         />
-        <FloatingMetricCard
+        <KpiCard
           label="Needs support"
           value={String(needsSupport)}
-          description={needsSupport === 0 ? "Everyone's on track" : "Review needed"}
-          tone={needsSupport === 0 ? "success" : "warning"}
+          periodLabel={needsSupport === 0 ? "Everyone's on track" : "Review needed"}
+          seriesTone={needsSupport === 0 ? "success" : "risk"}
+          ariaLabel={`Learners needing support: ${needsSupport}${needsSupport === 0 ? ", everyone on track" : ", review needed"}`}
         />
       </section>
 

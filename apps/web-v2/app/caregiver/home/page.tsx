@@ -4,6 +4,8 @@
  * Caregivers are added via the parent care-team invite flow
  * (`/parent/learners/[learnerId]/team`) and route here after accepting an
  * invite.
+ *
+ * Sprint 13: upgraded flat Card numbers to KpiCard with optional deltas.
  */
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
@@ -11,13 +13,14 @@ import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { CAREGIVER_NAV } from "@/components/layout/role-shells";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { KpiCard } from "@aivo/ui/chart";
 import { listLearnersForMember } from "@/lib/db/team-invites";
-import { getLearner, refreshLearnerReadiness } from "@/lib/db/repos";
+import { getLearner, listLessonRunsForLearner, refreshLearnerReadiness } from "@/lib/db/repos";
 import type { LearnerProfile } from "@/lib/db/types";
 import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
+import { computeDeltaPct, computeMetricHistory, splitIntoPeriods } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +37,18 @@ export default async function CaregiverHomePage() {
     (l) => l.readinessState === "active_learning" || l.readinessState === "ready_for_today_mission",
   ).length;
 
+  // --- Trend data: completed lessons across assigned learners ---
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const allRuns = (
+    await Promise.all(fresh.map((l) => listLessonRunsForLearner(l.id, session.tenantId)))
+  ).flat();
+  const completedRuns = allRuns.filter((r) => r.status === "completed");
+  const { current: thisWeek, prior: lastWeek } = splitIntoPeriods(completedRuns, sevenDaysAgo);
+  const activityDelta = computeDeltaPct(thisWeek.length, lastWeek.length);
+  const activitySeries = computeMetricHistory(completedRuns, (b) => b.length, "week", 8);
+
   return (
     <AppShell
       role="caregiver"
@@ -48,15 +63,23 @@ export default async function CaregiverHomePage() {
 
       {fresh.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-3">
-          <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("on_care_team")}</p>
-            <p className="font-display text-2xl font-semibold">{fresh.length}</p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("active_or_ready")}</p>
-            <p className="font-display text-2xl font-semibold">{learningNow}</p>
-          </Card>
-          <Card className="p-4">
+          <KpiCard
+            label={t("on_care_team")}
+            value={String(fresh.length)}
+            periodLabel={t("period_label_active")}
+            seriesTone="brand"
+            ariaLabel={`Learners on your care team: ${fresh.length}`}
+          />
+          <KpiCard
+            label={t("active_or_ready")}
+            value={String(learningNow)}
+            deltaPct={activityDelta ?? undefined}
+            periodLabel={activityDelta != null ? t("period_label_vs_last_week") : t("period_label_this_week")}
+            series={activitySeries.length > 1 ? activitySeries : undefined}
+            seriesTone={learningNow > 0 ? "success" : "brand"}
+            ariaLabel={`Active or ready learners: ${learningNow}${activityDelta != null ? `, ${activityDelta > 0 ? "up" : activityDelta < 0 ? "down" : "no change"} ${Math.abs(activityDelta)}% vs last week` : ""}`}
+          />
+          <div className="rounded-iw-card bg-iw-card border border-iw-border p-4">
             <p className="text-xs text-aivo-ink-soft">{t("quick_links")}</p>
             <div className="mt-1 flex flex-col gap-1 text-sm">
               <Link href="/caregiver/observations" className="text-aivo-accent hover:underline">
@@ -66,7 +89,7 @@ export default async function CaregiverHomePage() {
                 {t("link_roster")}
               </Link>
             </div>
-          </Card>
+          </div>
         </div>
       ) : null}
 
@@ -80,7 +103,7 @@ export default async function CaregiverHomePage() {
         <ul className="grid gap-3 sm:grid-cols-2">
           {fresh.map((l) => (
             <li key={l.id}>
-              <Card className="p-4">
+              <div className="rounded-iw-card bg-iw-card border border-iw-border p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold">{l.displayName}</p>
@@ -92,7 +115,7 @@ export default async function CaregiverHomePage() {
                     {READINESS_LABEL[l.readinessState]}
                   </Badge>
                 </div>
-              </Card>
+              </div>
             </li>
           ))}
         </ul>
