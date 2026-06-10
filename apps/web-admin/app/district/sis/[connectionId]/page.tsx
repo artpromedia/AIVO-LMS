@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
 import { AdminApiError } from "@aivo/admin-api";
 import { getSisConnection, listSisSyncLogs, triggerSisSync } from "@aivo/admin-api/sis";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 const SIS_ROLES = ["district_admin", "platform_admin"] as const;
@@ -61,8 +61,8 @@ export default async function SisConnectionPage({
           <p className="text-sm font-semibold text-slate-500">Last sync</p>
           <p className="mt-2 text-2xl font-black">{formatDateTime(connection.lastSyncAt)}</p>
         </AdminCard>
-        <AdminMetricCard label="Records synced (last run)" value={lastRun?.recordsSynced ?? 0} />
-        <AdminMetricCard label="Records failed (last run)" value={lastRun?.recordsFailed ?? 0} />
+        <AdminKpiCard label="Records synced (last run)" value={lastRun?.recordsSynced ?? 0} />
+        <AdminKpiCard label="Records failed (last run)" value={lastRun?.recordsFailed ?? 0} />
       </section>
 
       <AdminCard className="mt-6 p-6">

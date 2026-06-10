@@ -4,7 +4,7 @@ import {
   type SecurityControlStatus,
   listSecurityControls,
 } from "@aivo/admin-api/security";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 
 export default async function SecurityPage() {
   const session = await requirePlatformPage("platform:read");
@@ -44,10 +44,10 @@ export default async function SecurityPage() {
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-4">
-        <AdminMetricCard label="Controls" value={controls.length} />
-        <AdminMetricCard label="Implemented" value={implemented} />
-        <AdminMetricCard label="Partial" value={count("partial")} />
-        <AdminMetricCard label="Not started" value={count("not_started")} />
+        <AdminKpiCard label="Controls" value={controls.length} />
+        <AdminKpiCard label="Implemented" value={implemented} />
+        <AdminKpiCard label="Partial" value={count("partial")} />
+        <AdminKpiCard label="Not started" value={count("not_started")} />
       </section>
 
       <AdminCard className="mt-6 p-6">

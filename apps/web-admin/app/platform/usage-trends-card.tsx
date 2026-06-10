@@ -49,6 +49,11 @@ export function UsageTrendsCard({
         title="Usage trends"
         subtitle={`New accounts and learners across all tenants, last ${points.length} days.`}
         aspect={21 / 9}
+        srRows={data.map((point) => ({
+          day: point.t,
+          "new users": point.value,
+          "new learners": point.value2 ?? 0,
+        }))}
         legend={
           <dl className="flex gap-6">
             <div>

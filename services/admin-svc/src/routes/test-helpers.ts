@@ -15,7 +15,15 @@
  * re-inserted on each call, so reruns never inflate the metrics.
  */
 import type { FastifyInstance } from "fastify";
-import { aiUsageLog, lessonRuns, subscriptions, tenants, users } from "@aivo/db";
+import {
+  adminClassrooms,
+  aiUsageLog,
+  learners,
+  lessonRuns,
+  subscriptions,
+  tenants,
+  users,
+} from "@aivo/db";
 import { eq } from "drizzle-orm";
 
 const MARKER = "e2e-metrics";
@@ -63,6 +71,126 @@ export function registerAdminTestHelperRoutes(app: FastifyInstance, db: any) {
       return { ok: true, route, enabled: Boolean(enabled), active: [...faults] };
     },
   );
+
+  // Deterministic school roster for the school-overview dashboard e2e:
+  // teachers + classrooms with sized learner rosters + a 3-day lesson-run
+  // activity trail, all under the given (freshly seeded, run-unique) school
+  // tenant. Idempotent per (tenant, class name) — reruns return existing ids.
+  app.post<{
+    Body: {
+      tenantId: string;
+      teachers?: number;
+      classes?: Array<{ name: string; grade: string; size: number }>;
+      lessonRunsPerDay?: number;
+    };
+  }>("/api/__test__/seed-school-roster", async (req, reply) => {
+    const { tenantId, teachers = 2, classes = [], lessonRunsPerDay = 3 } = req.body ?? ({} as any);
+    if (!tenantId) return reply.status(400).send({ error: "tenantId required" });
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1);
+    if (!tenant) return reply.status(404).send({ error: "tenant not found" });
+    const now = new Date();
+
+    const teacherIds: string[] = [];
+    for (let i = 0; i < teachers; i += 1) {
+      const email = `roster-teacher-${i}@${tenantId.slice(0, 8)}.e2e.test`;
+      let [teacher] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      if (!teacher) {
+        [teacher] = await db
+          .insert(users)
+          .values({
+            email,
+            name: `Roster Teacher ${i + 1}`,
+            role: "TEACHER",
+            tenantId,
+            passwordHash: "e2e-roster-no-login",
+          })
+          .returning();
+      }
+      teacherIds.push(teacher.id);
+    }
+
+    const createdClasses: Array<{ id: string; name: string; learners: number }> = [];
+    let learnerOrdinal = 0;
+    for (const cls of classes) {
+      const classId = `cls-e2e-${tenantId.slice(0, 8)}-${cls.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+      const learnerIds: string[] = [];
+      for (let i = 0; i < cls.size; i += 1) {
+        learnerOrdinal += 1;
+        const learnerName = `Roster Learner ${cls.name} ${i + 1}`;
+        let [learner] = await db
+          .select()
+          .from(learners)
+          .where(eq(learners.name, learnerName))
+          .limit(1);
+        if (!learner || learner.tenantId !== tenantId) {
+          const [learnerUser] = await db
+            .insert(users)
+            .values({
+              email: `roster-learner-${learnerOrdinal}-${Date.now()}@${tenantId.slice(0, 8)}.e2e.test`,
+              name: learnerName,
+              role: "LEARNER",
+              tenantId,
+              passwordHash: "e2e-roster-no-login",
+            })
+            .returning();
+          [learner] = await db
+            .insert(learners)
+            .values({
+              tenantId,
+              userId: learnerUser.id,
+              parentId: learnerUser.id,
+              name: learnerName,
+              gradeLevel: cls.grade,
+            })
+            .returning();
+        }
+        learnerIds.push(learner.id);
+      }
+      const existingClass = await db
+        .select()
+        .from(adminClassrooms)
+        .where(eq(adminClassrooms.id, classId))
+        .limit(1);
+      if (existingClass.length === 0) {
+        await db.insert(adminClassrooms).values({
+          id: classId,
+          schoolId: tenantId,
+          name: cls.name,
+          grade: cls.grade,
+          teacherIds: [teacherIds[createdClasses.length % teacherIds.length] ?? teacherIds[0]].filter(
+            Boolean,
+          ),
+          learnerIds,
+        });
+      }
+      createdClasses.push({ id: classId, name: cls.name, learners: learnerIds.length });
+
+      // A short lesson-run trail for the activity series + recent table.
+      for (let day = 0; day < 3; day += 1) {
+        for (let i = 0; i < lessonRunsPerDay; i += 1) {
+          const at = new Date(now.getTime() - day * 24 * 60 * 60 * 1000 - i * 60 * 1000);
+          await db
+            .insert(lessonRuns)
+            .values({
+              id: `run-e2e-${classId}-${day}-${i}`,
+              tenantId,
+              learnerId: learnerIds[i % learnerIds.length] ?? `${classId}-learner`,
+              status: i % 3 === 0 ? "completed" : "in_progress",
+              createdAt: at.toISOString(),
+              updatedAt: at.toISOString(),
+            })
+            .onConflictDoNothing();
+        }
+      }
+    }
+
+    return {
+      ok: true,
+      tenantId,
+      teachers: teacherIds.length,
+      classes: createdClasses,
+    };
+  });
 
   app.post<{ Body: SeedBody }>("/api/__test__/seed-platform-metrics", async (req) => {
     const body = req.body ?? {};

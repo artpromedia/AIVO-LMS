@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-export { ChartCard } from "./charts/ChartCard.js";
+export { ChartCard, SrOnlyTable } from "./charts/ChartCard.js";
+export type { SrTableRow } from "./charts/ChartCard.js";
 export { AreaTrend } from "./charts/AreaTrend.js";
 export type { AreaTrendPoint } from "./charts/AreaTrend.js";
 export { DonutBreakdown } from "./charts/DonutBreakdown.js";
@@ -69,23 +70,3 @@ export function AdminCard({
   );
 }
 
-/**
- * @deprecated Use {@link AdminKpiCard} — it adds tabular-nums figures, a
- * signed delta vs the prior period, and an embedded sparkline. This
- * value-only tile is kept for existing callers and will be deleted in
- * Sprint 6 once they have migrated.
- */
-export function AdminMetricCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: number;
-}) {
-  return (
-    <AdminCard className="p-5">
-      <p className="text-sm font-semibold text-slate-500">{label}</p>
-      <p className="mt-2 text-3xl font-black">{value.toLocaleString()}</p>
-    </AdminCard>
-  );
-}

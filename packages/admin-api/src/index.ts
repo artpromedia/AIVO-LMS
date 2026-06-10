@@ -21,6 +21,7 @@ export * from "./pronunciation.js";
 export * from "./reports.js";
 export * from "./retention.js";
 export * from "./rostering.js";
+export * from "./school.js";
 export * from "./scim.js";
 export * from "./security.js";
 export * from "./support.js";

@@ -152,8 +152,36 @@ export const seedTherapist = (email = `e2e-therapist-${Date.now()}@aivo.test`) =
   seedUser("therapist", email, "E2eTherapist!Pass1");
 export const seedCaregiver = (email = `e2e-caregiver-${Date.now()}@aivo.test`) =>
   seedUser("caregiver", email, "E2eCaregiver!Pass1");
-export const seedSchoolAdmin = (email = `e2e-school-${Date.now()}@aivo.test`) =>
-  seedUser("school-admin", email, "E2eSchool!Pass1");
+export async function seedSchoolAdmin(
+  email = `e2e-school-${Date.now()}@aivo.test`,
+  opts: { tenantName?: string } = {},
+): Promise<(SeededUser & { tenantId: string }) | null> {
+  const password = "E2eSchool!Pass1";
+  try {
+    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
+    try {
+      const res = await ctx.post(`/api/__test__/seed-school-admin`, {
+        // A unique tenantName gives the spec a fresh school with
+        // deterministic counts; omitted = the shared default tenant.
+        data: { email, password, tenantName: opts.tenantName },
+        failOnStatusCode: false,
+      });
+      if (res.status() !== 200) return null;
+      const body = (await res.json()) as { userId: string; tenantId: string; accessToken: string };
+      return {
+        userId: body.userId,
+        tenantId: body.tenantId,
+        accessToken: body.accessToken,
+        email,
+        password,
+      };
+    } finally {
+      await ctx.dispose();
+    }
+  } catch {
+    return null;
+  }
+}
 
 /** Seed a DISTRICT_ADMIN with a real bearer token and an optional pilot seat
  *  cap on its tenant. Used by the Sprint 2 parent-invite e2e. */
@@ -344,6 +372,17 @@ export const T = {
   navGroupBillingGrowth: "nav-group-billing-growth",
   navGroupComplianceTrust: "nav-group-compliance-trust",
   navGroupOperations: "nav-group-operations",
+  // web-admin /school — school dashboard.
+  schoolKpiLearners: "school-kpi-learners",
+  schoolKpiClasses: "school-kpi-classes",
+  schoolKpiTeachers: "school-kpi-teachers",
+  schoolEngagement: "school-engagement",
+  schoolGradeMix: "school-grade-mix",
+  schoolClassSizes: "school-class-sizes",
+  schoolRecentActivity: "school-recent-activity",
+  // Report chart view + the chart primitives' screen-reader fallback.
+  reportChart: "report-chart",
+  chartSrTable: "chart-sr-table",
   // web-admin /district — district control surface.
   districtKpiSchools: "district-kpi-schools",
   districtKpiStaff: "district-kpi-staff",

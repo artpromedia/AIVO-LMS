@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { getContentPack } from "@aivo/admin-api/content";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 export default async function ContentPackDetailPage({
@@ -25,7 +25,7 @@ export default async function ContentPackDetailPage({
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Activities" value={pack.activityCount} />
+        <AdminKpiCard label="Activities" value={pack.activityCount} />
         <AdminCard className="p-5">
           <p className="text-sm font-semibold text-slate-500">Status</p>
           <p className="mt-2 text-2xl font-black">{pack.status}</p>

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { AdminApiError } from "@aivo/admin-api";
 import { getAiModel } from "@aivo/admin-api/ai-governance";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 export default async function AiModelDetailPage({
@@ -35,7 +35,7 @@ export default async function AiModelDetailPage({
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Versions" value={versions.length} />
+        <AdminKpiCard label="Versions" value={versions.length} />
         <AdminCard className="p-5">
           <p className="text-sm font-semibold text-slate-500">Owner</p>
           <p className="mt-2 text-lg font-black">{model.owner.team}</p>

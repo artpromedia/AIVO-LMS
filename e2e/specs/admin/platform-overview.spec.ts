@@ -36,6 +36,7 @@ import {
   skipUnlessIdentityTestMode,
   type SeededUser,
 } from "../../lib/fixtures";
+import { expectNoSeriousA11yViolations } from "../../lib/a11y";
 
 test.describe.configure({ mode: "serial" });
 
@@ -210,6 +211,10 @@ test.describe("Platform overview — operations dashboard (web-admin :5001)", ()
     expect(await pilotsTable.getByTestId(T.pilotRow).count()).toBeGreaterThanOrEqual(
       pilotNames.length,
     );
+
+    // Accessibility gate: no serious/critical axe violations on the
+    // fully-rendered dashboard.
+    await expectNoSeriousA11yViolations(page);
   });
 
   test("a system-health outage degrades per-widget, not the whole page", async ({

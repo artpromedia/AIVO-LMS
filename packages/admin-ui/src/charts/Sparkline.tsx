@@ -1,6 +1,7 @@
 "use client";
 
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
+import { SrOnlyTable } from "./ChartCard.js";
 import { toneColor, type ChartTone } from "./tones.js";
 
 /**
@@ -26,21 +27,24 @@ export function Sparkline({
   const color = toneColor(tone);
   const points = data.map((value, index) => ({ index, value }));
   return (
-    <div className="w-full" style={{ height }} data-testid={testId}>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={points} title={title} desc={description ?? title} margin={{ top: 2, right: 0, bottom: 0, left: 0 }}>
-          <Area
-            type="monotone"
-            dataKey="value"
-            stroke={color}
-            fill={color}
-            fillOpacity={0.15}
-            strokeWidth={1.5}
-            dot={false}
-            isAnimationActive={false}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+    <div className="w-full" data-testid={testId}>
+      <div style={{ height }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={points} title={title} desc={description ?? title} margin={{ top: 2, right: 0, bottom: 0, left: 0 }}>
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke={color}
+              fill={color}
+              fillOpacity={0.15}
+              strokeWidth={1.5}
+              dot={false}
+              isAnimationActive={false}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+      <SrOnlyTable caption={title} rows={points.map(({ index, value }) => ({ point: index + 1, value }))} />
     </div>
   );
 }

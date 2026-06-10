@@ -1,6 +1,6 @@
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { getIepProfilesReview, listIepEvaluations } from "@aivo/admin-api/iep";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDate, formatDateTime } from "@/components/admin-format";
 
 export default async function PlatformIepPage() {
@@ -20,10 +20,10 @@ export default async function PlatformIepPage() {
       description="Special-education evaluation pipeline and IEP annual-review compliance, read from the live IEP tables."
     >
       <section className="mt-8 grid gap-4 md:grid-cols-4">
-        <AdminMetricCard label="Evaluations" value={total} />
-        <AdminMetricCard label="Submitted" value={queue.counts.submitted ?? 0} />
-        <AdminMetricCard label="Decided" value={decided} />
-        <AdminMetricCard label="Reviews overdue" value={review.reviewDue} />
+        <AdminKpiCard label="Evaluations" value={total} />
+        <AdminKpiCard label="Submitted" value={queue.counts.submitted ?? 0} />
+        <AdminKpiCard label="Decided" value={decided} />
+        <AdminKpiCard label="Reviews overdue" value={review.reviewDue} />
       </section>
 
       <h2 className="mt-8 text-xl font-black">Evaluation pipeline</h2>

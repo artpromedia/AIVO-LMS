@@ -91,6 +91,37 @@ export function navGroupsForRole(role: Role): AdminNavGroup[] {
   })).filter((group) => group.items.length > 0);
 }
 
+/** School console IA — single role (school_admin), so no per-item gating. */
+export const SCHOOL_NAV_GROUPS: readonly AdminNavGroup[] = [
+  {
+    id: "school-operations",
+    label: "Operations",
+    items: [
+      { label: "Learners", href: "/school/learners" },
+      { label: "Classes", href: "/school/classes" },
+      { label: "Rostering", href: "/school/rostering" },
+    ],
+  },
+  {
+    id: "school-reports",
+    label: "Reports",
+    items: [{ label: "Reports", href: "/school/reports" }],
+  },
+  {
+    id: "school-compliance",
+    label: "Compliance",
+    items: [
+      { label: "Compliance", href: "/school/compliance" },
+      { label: "Audit log", href: "/school/audit" },
+    ],
+  },
+  {
+    id: "school-billing",
+    label: "Billing",
+    items: [{ label: "Billing", href: "/school/billing" }],
+  },
+];
+
 /** District console IA — single role (district_admin), so no per-item gating. */
 export const DISTRICT_NAV_GROUPS: readonly AdminNavGroup[] = [
   {

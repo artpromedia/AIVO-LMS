@@ -1,7 +1,7 @@
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { getJobsFreshnessSummary, listJobs } from "@aivo/admin-api/jobs";
 import type { AdminFreshnessStatus, AdminJob } from "@aivo/admin-api/jobs";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 const STATUS_TONE: Record<AdminFreshnessStatus, string> = {
@@ -32,11 +32,11 @@ export default async function PlatformJobsPage() {
       description="Background job registry with freshness status derived from the watchdog ledger."
     >
       <section className="mt-8 grid gap-4 md:grid-cols-5">
-        <AdminMetricCard label="Fresh" value={summary.counts.fresh} />
-        <AdminMetricCard label="Warning" value={summary.counts.warning} />
-        <AdminMetricCard label="Stale" value={summary.counts.stale} />
-        <AdminMetricCard label="Never run" value={summary.counts.never_run} />
-        <AdminMetricCard label="Failed" value={summary.counts.failed} />
+        <AdminKpiCard label="Fresh" value={summary.counts.fresh} />
+        <AdminKpiCard label="Warning" value={summary.counts.warning} />
+        <AdminKpiCard label="Stale" value={summary.counts.stale} />
+        <AdminKpiCard label="Never run" value={summary.counts.never_run} />
+        <AdminKpiCard label="Failed" value={summary.counts.failed} />
       </section>
 
       <h2 className="mt-8 text-xl font-black">Registered jobs</h2>

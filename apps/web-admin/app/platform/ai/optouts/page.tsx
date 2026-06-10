@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { requirePageRole, requirePlatformPage } from "@aivo/admin-auth";
 import { AdminApiError } from "@aivo/admin-api";
 import { createAiOptOut, deleteAiOptOut, listAiOptOuts } from "@aivo/admin-api/ai-governance";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 function actionError(error: unknown): string {
@@ -79,9 +79,9 @@ export default async function AiOptOutsPage({
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Opt-outs" value={optOuts.length} />
-        <AdminMetricCard label="Model-scoped" value={modelScoped} />
-        <AdminMetricCard label="Feature-scoped" value={featureScoped} />
+        <AdminKpiCard label="Opt-outs" value={optOuts.length} />
+        <AdminKpiCard label="Model-scoped" value={modelScoped} />
+        <AdminKpiCard label="Feature-scoped" value={featureScoped} />
       </section>
 
       <AdminCard className="mt-6 p-6">

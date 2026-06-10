@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requirePageRole } from "@aivo/admin-auth";
 import { getTrialConversion } from "@aivo/admin-api/billing";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 
 function pct(value: number): string {
   return `${Math.round(value * 100)}%`;
@@ -23,10 +23,10 @@ export default async function TrialsReportPage() {
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-4">
-        <AdminMetricCard label="Trials started (30d)" value={report.trialsStartedLast30d} />
-        <AdminMetricCard label="Trialing now" value={report.trialingNow} />
-        <AdminMetricCard label="Trials ending in 7 days" value={report.trialsEndingIn7d} />
-        <AdminMetricCard label="Converted to paid (30d)" value={report.convertedLast30d} />
+        <AdminKpiCard label="Trials started (30d)" value={report.trialsStartedLast30d} />
+        <AdminKpiCard label="Trialing now" value={report.trialingNow} />
+        <AdminKpiCard label="Trials ending in 7 days" value={report.trialsEndingIn7d} />
+        <AdminKpiCard label="Converted to paid (30d)" value={report.convertedLast30d} />
       </section>
 
       <section className="mt-6 grid gap-4 md:grid-cols-2">

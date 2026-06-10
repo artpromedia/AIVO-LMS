@@ -120,13 +120,15 @@ export default async function DistrictPage({
 }) {
   const session = await requirePageRole(["district_admin"]);
   const params = await searchParams;
-  const setup = await getDistrictSetupOverview(session);
-  const rostering = await getDistrictRosteringGrant(session);
-  // Pilot ops summary (real read model). Null when this district has no pilot
-  // subscription; a transient billing error is swallowed so the console still
-  // renders its setup/roster view. Same tolerance for the learner growth list.
-  const pilot = await getDistrictPilotStatus(session, setup.district.id).catch(() => null);
-  const learnerRows = await listDistrictLearners(session).catch(() => null);
+  // One parallel round trip: the pilot read keys off the session tenant (the
+  // district id), so nothing here depends on another read. Pilot and learner
+  // failures are swallowed — the console still renders its setup/roster view.
+  const [setup, rostering, pilot, learnerRows] = await Promise.all([
+    getDistrictSetupOverview(session),
+    getDistrictRosteringGrant(session),
+    getDistrictPilotStatus(session, session.tenantId).catch(() => null),
+    listDistrictLearners(session).catch(() => null),
+  ]);
 
   const learnersKpi = learnerRows ? growthKpi(learnerRows) : null;
   const checklistDone = Object.values(setup.checklist).filter(Boolean).length;
@@ -178,6 +180,13 @@ export default async function DistrictPage({
               .filter(Boolean)
               .join(" · ")}
             aspect={16 / 10}
+            srRows={[
+              {
+                "seats used": pilot.seatsUsed,
+                "seat limit": pilot.seatLimit ?? "uncapped",
+                "seats remaining": pilot.seatsRemaining ?? "uncapped",
+              },
+            ]}
           >
             <Gauge
               ratio={seatRatio}
@@ -205,6 +214,7 @@ export default async function DistrictPage({
           title="Roster composition"
           subtitle="Staff, learners, and onboarded parents in your district."
           aspect={16 / 10}
+          srRows={donutSlices.map((slice) => ({ group: slice.label, people: slice.value }))}
         >
           <DonutBreakdown
             data={donutSlices}

@@ -8,6 +8,7 @@ import {
   runReport,
 } from "@aivo/admin-api/reports";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { ReportChart } from "@/components/report-chart";
 
 function ReportResultTable({ result }: { result: AdminReportResult }) {
   return (
@@ -146,6 +147,7 @@ export default async function DistrictReportsPage({
       ) : null}
 
       {runError ? <p className="admin-error mt-5">{runError}</p> : null}
+      {result ? <ReportChart result={result} /> : null}
       {result ? <ReportResultTable result={result} /> : null}
     </AdminPageFrame>
   );

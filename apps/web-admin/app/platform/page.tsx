@@ -149,6 +149,11 @@ export default async function PlatformPage() {
               testId="platform-ai-requests"
               title="AI requests (24h)"
               subtitle="Hourly request volume and average latency from the usage log."
+              srRows={aiRequestsByHour(aiActivity.data, now).map((point) => ({
+                hour: point.t,
+                requests: point.value,
+                "avg latency (ms)": point.value2 ?? 0,
+              }))}
             >
               <AreaTrend
                 data={aiRequestsByHour(aiActivity.data, now)}
@@ -167,6 +172,7 @@ export default async function PlatformPage() {
               title="Tenant mix"
               subtitle="Districts, schools, and families across the platform."
               aspect={16 / 10}
+              srRows={donutSlices.map((slice) => ({ kind: slice.label, tenants: slice.value }))}
             >
               <DonutBreakdown
                 data={donutSlices}
@@ -188,6 +194,13 @@ export default async function PlatformPage() {
               title="Lesson completion"
               subtitle={`${health.data.lessonRunsCompleted.toLocaleString("en-US")} of ${health.data.lessonRunsTotal.toLocaleString("en-US")} lesson runs completed.`}
               aspect={16 / 10}
+              srRows={[
+                {
+                  completed: health.data.lessonRunsCompleted,
+                  total: health.data.lessonRunsTotal,
+                  percent: Math.round(completionRatio * 100),
+                },
+              ]}
             >
               <Gauge
                 ratio={completionRatio}
@@ -204,6 +217,11 @@ export default async function PlatformPage() {
               testId="platform-trial-funnel"
               title="Trial → Pilot → Won"
               subtitle="Conversion from trials started to converted pilots."
+              srRows={[
+                { stage: "Trials started (30d)", value: conversion.data.trialsStartedLast30d },
+                { stage: "Converted (30d)", value: conversion.data.convertedLast30d },
+                { stage: "Pilots converted", value: conversion.data.pilotsConverted },
+              ]}
             >
               <Funnel
                 stages={[

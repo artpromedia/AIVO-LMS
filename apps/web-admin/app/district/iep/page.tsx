@@ -1,6 +1,6 @@
 import { requirePageRole } from "@aivo/admin-auth";
 import { listIepEvaluations } from "@aivo/admin-api/iep";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 export default async function DistrictIepPage() {
@@ -16,9 +16,9 @@ export default async function DistrictIepPage() {
       description="Special-education evaluation pipeline for your district, read from the live IEP tables."
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Evaluations" value={total} />
-        <AdminMetricCard label="Submitted" value={queue.counts.submitted ?? 0} />
-        <AdminMetricCard label="Draft" value={queue.counts.draft ?? 0} />
+        <AdminKpiCard label="Evaluations" value={total} />
+        <AdminKpiCard label="Submitted" value={queue.counts.submitted ?? 0} />
+        <AdminKpiCard label="Draft" value={queue.counts.draft ?? 0} />
       </section>
 
       <AdminCard className="mt-6 overflow-hidden">

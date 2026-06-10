@@ -1,6 +1,6 @@
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { type AdminFeatureFlag, getFeatureFlagInventory } from "@aivo/admin-api/feature-flags";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 
 const RISK_TONE: Record<AdminFeatureFlag["riskBand"], string> = {
   low: "text-emerald-700",
@@ -66,9 +66,9 @@ export default async function FeatureFlagsPage() {
       description="Resolved state of enterprise and sprint-pipeline flags. Environment variables remain the source of truth — this surface is read-only."
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Total flags" value={all.length} />
-        <AdminMetricCard label="Active" value={activeCount} />
-        <AdminMetricCard label="Inactive" value={all.length - activeCount} />
+        <AdminKpiCard label="Total flags" value={all.length} />
+        <AdminKpiCard label="Active" value={activeCount} />
+        <AdminKpiCard label="Inactive" value={all.length - activeCount} />
       </section>
 
       <h2 className="mt-8 text-xl font-black">Enterprise</h2>

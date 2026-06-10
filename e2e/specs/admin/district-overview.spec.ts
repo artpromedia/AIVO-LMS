@@ -32,6 +32,7 @@ import {
   seedPlatformAdmin,
   skipUnlessIdentityTestMode,
 } from "../../lib/fixtures";
+import { expectNoSeriousA11yViolations } from "../../lib/a11y";
 
 test.describe("District overview — control surface (web-admin :5001)", () => {
   test.beforeEach(async () => {
@@ -157,7 +158,10 @@ test.describe("District overview — control surface (web-admin :5001)", () => {
     const setupCard = page.getByTestId(T.districtSetup);
     await setupCard.getByPlaceholder("School name").fill(`Overview Elementary ${stamp}`);
     await setupCard.getByRole("button", { name: "Add school" }).click();
-    await expect(page.getByText("School added.")).toBeVisible();
+    await page.waitForURL(/notice=School%20added/);
+    // Full document render after the action streams behind several backend
+    // reads; allow more than the 5s default under load.
+    await expect(page.getByText("School added.")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId(T.districtSetupProgress)).toHaveText(
       `${checklistDone + 1} of 4 ready`,
     );
@@ -165,10 +169,20 @@ test.describe("District overview — control surface (web-admin :5001)", () => {
       page.getByTestId(T.districtKpiSchools).getByTestId(T.kpiValue),
     ).toHaveText(String(setup.counts.schools + 1));
 
+    // The redirect loads a fresh document; clicking before React finishes
+    // hydrating can drop the action. Proving a client interaction works
+    // (sidebar group collapse/expand) is a deterministic hydration signal.
+    const hydrationProbe = page.getByTestId("nav-group-district-billing");
+    await hydrationProbe.click();
+    await expect(hydrationProbe).toHaveAttribute("aria-expanded", "false");
+    await hydrationProbe.click();
+    await expect(hydrationProbe).toHaveAttribute("aria-expanded", "true");
+
     const completeButton = page.getByRole("button", { name: "Mark district setup complete" });
     await expect(completeButton).toBeEnabled();
     await completeButton.click();
-    await expect(page.getByText("District setup completed.")).toBeVisible();
+    await page.waitForURL(/notice=District%20setup%20completed/);
+    await expect(page.getByText("District setup completed.")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId(T.districtSetupComplete)).toBeVisible();
     await expect(page.getByTestId(T.districtSetupProgress)).toHaveCount(0);
 
@@ -177,5 +191,8 @@ test.describe("District overview — control surface (web-admin :5001)", () => {
     await expect(
       page.getByTestId(T.adminShellSidebar).getByRole("link", { name: "Reports" }),
     ).toBeVisible();
+
+    // Accessibility gate: no serious/critical axe violations.
+    await expectNoSeriousA11yViolations(page);
   });
 });

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requirePageRole } from "@aivo/admin-auth";
 import { getAdminClassroom } from "@aivo/admin-api/classrooms";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDate, formatDateTime } from "@/components/admin-format";
 
 function RosterCard({ title, ids, emptyLabel }: { title: string; ids: string[]; emptyLabel: string }) {
@@ -44,8 +44,8 @@ export default async function SchoolClassDetailPage({
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Teachers" value={classroom.teacherCount} />
-        <AdminMetricCard label="Learners" value={classroom.learnerCount} />
+        <AdminKpiCard label="Teachers" value={classroom.teacherCount} />
+        <AdminKpiCard label="Learners" value={classroom.learnerCount} />
         <AdminCard className="p-5">
           <p className="text-sm font-semibold text-slate-500">Last updated</p>
           <p className="mt-2 text-2xl font-black">{formatDateTime(classroom.updatedAt)}</p>

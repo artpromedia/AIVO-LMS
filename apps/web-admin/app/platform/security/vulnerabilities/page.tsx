@@ -13,7 +13,7 @@ import {
   listSecurityVulnerabilities,
   updateSecurityVulnerability,
 } from "@aivo/admin-api/security";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 function actionError(error: unknown): string {
@@ -94,9 +94,9 @@ export default async function SecurityVulnerabilitiesPage({
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Findings" value={findings.length} />
-        <AdminMetricCard label="Open" value={open} />
-        <AdminMetricCard label="Open critical" value={criticalOpen} />
+        <AdminKpiCard label="Findings" value={findings.length} />
+        <AdminKpiCard label="Open" value={open} />
+        <AdminKpiCard label="Open critical" value={criticalOpen} />
       </section>
 
       <AdminCard className="mt-6 p-6">

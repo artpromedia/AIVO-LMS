@@ -11,7 +11,7 @@ import {
   listSecurityIncidents,
   updateSecurityIncident,
 } from "@aivo/admin-api/security";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 function actionError(error: unknown): string {
@@ -91,9 +91,9 @@ export default async function SecurityIncidentsPage({
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Total" value={incidents.length} />
-        <AdminMetricCard label="Open" value={open} />
-        <AdminMetricCard label="Open SEV1" value={sev1} />
+        <AdminKpiCard label="Total" value={incidents.length} />
+        <AdminKpiCard label="Open" value={open} />
+        <AdminKpiCard label="Open SEV1" value={sev1} />
       </section>
 
       <AdminCard className="mt-6 p-6">
