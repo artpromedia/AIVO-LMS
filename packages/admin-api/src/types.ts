@@ -261,6 +261,13 @@ export interface PlatformSystemHealth {
   aiEstimatedCostUsd24h: number;
 }
 
+export interface PlatformUsageTrendPoint {
+  /** UTC day key, `YYYY-MM-DD`. */
+  day: string;
+  newUsers: number;
+  newLearners: number;
+}
+
 export interface RecentAiActivityEntry {
   id: string;
   provider: string;

@@ -13,10 +13,12 @@
 import { request as pwRequest, test, type APIRequestContext } from "@playwright/test";
 
 export const WEB_BASE = process.env.WEB_BASE_URL || "http://localhost:5000";
+/** Standalone admin console (apps/web-admin) — serves on :5001, not :5000. */
+export const ADMIN_WEB_BASE = process.env.ADMIN_WEB_BASE_URL || "http://localhost:5001";
 export const IDENTITY_BASE = process.env.IDENTITY_BASE_URL || "http://localhost:3001";
 export const ASSESSMENT_BASE = process.env.ASSESSMENT_SVC_URL || "http://localhost:3071";
 export const AI_BASE = process.env.AI_SVC_URL || "http://localhost:3004";
-export const ADMIN_BASE = process.env.ADMIN_SVC_URL || "http://localhost:3003";
+export const ADMIN_BASE = process.env.ADMIN_SVC_URL || "http://localhost:3005";
 
 export interface SeededUser {
   userId: string;
@@ -52,17 +54,44 @@ export async function skipUnlessIdentityTestMode(testInfo = test.info()): Promis
   }
 }
 
+/** Probe the web-v2 BFF. False when the web app isn't part of the running
+ *  stack (e.g. the base compose profile, which only boots the services). */
+export async function webReachable(): Promise<boolean> {
+  try {
+    const ctx = await pwRequest.newContext({ baseURL: WEB_BASE });
+    const res = await ctx.get("/api/bff/health", { failOnStatusCode: false });
+    await ctx.dispose();
+    return res.status() === 200;
+  } catch {
+    return false;
+  }
+}
+
+/** Skip the active test when web-v2 isn't up. Browser suites use this so a
+ *  services-only harness (no web build) skips them instead of failing on a
+ *  dead :5000 — seeding alone succeeding no longer implies the app is up. */
+export async function skipUnlessWebReachable(testInfo = test.info()): Promise<void> {
+  if (!(await webReachable())) {
+    testInfo.skip(true, "web-v2 unreachable (services-only harness)");
+  }
+}
+
 async function seedUser(role: string, email: string, password: string): Promise<SeededUser | null> {
   try {
     const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
-    const res = await ctx.post(`/api/__test__/seed-${role}`, {
-      data: { email, password },
-      failOnStatusCode: false,
-    });
-    await ctx.dispose();
-    if (res.status() !== 200) return null;
-    const body = (await res.json()) as Omit<SeededUser, "email" | "password">;
-    return { ...body, email, password };
+    try {
+      const res = await ctx.post(`/api/__test__/seed-${role}`, {
+        data: { email, password },
+        failOnStatusCode: false,
+      });
+      if (res.status() !== 200) return null;
+      // Read the body BEFORE dispose — disposing the context disposes its
+      // responses, and json() then throws (playwright >= 1.5x).
+      const body = (await res.json()) as Omit<SeededUser, "email" | "password">;
+      return { ...body, email, password };
+    } finally {
+      await ctx.dispose();
+    }
   } catch {
     return null;
   }
@@ -80,14 +109,17 @@ export async function seedParentInTenant(
   const password = "E2eParent!Pass1";
   try {
     const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
-    const res = await ctx.post(`/api/__test__/seed-parent`, {
-      data: { email, password, tenantId },
-      failOnStatusCode: false,
-    });
-    await ctx.dispose();
-    if (res.status() !== 200) return null;
-    const body = (await res.json()) as Omit<SeededUser, "email" | "password">;
-    return { ...body, email, password };
+    try {
+      const res = await ctx.post(`/api/__test__/seed-parent`, {
+        data: { email, password, tenantId },
+        failOnStatusCode: false,
+      });
+      if (res.status() !== 200) return null;
+      const body = (await res.json()) as Omit<SeededUser, "email" | "password">;
+      return { ...body, email, password };
+    } finally {
+      await ctx.dispose();
+    }
   } catch {
     return null;
   }
@@ -110,20 +142,23 @@ export async function seedDistrictAdmin(
   const password = "E2eDistrict!Pass1";
   try {
     const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
-    const res = await ctx.post(`/api/__test__/seed-district-admin`, {
-      data: { email, password, seatLimit: opts.seatLimit },
-      failOnStatusCode: false,
-    });
-    await ctx.dispose();
-    if (res.status() !== 200) return null;
-    const body = (await res.json()) as { userId: string; tenantId: string; accessToken: string };
-    return {
-      userId: body.userId,
-      tenantId: body.tenantId,
-      accessToken: body.accessToken,
-      email,
-      password,
-    };
+    try {
+      const res = await ctx.post(`/api/__test__/seed-district-admin`, {
+        data: { email, password, seatLimit: opts.seatLimit },
+        failOnStatusCode: false,
+      });
+      if (res.status() !== 200) return null;
+      const body = (await res.json()) as { userId: string; tenantId: string; accessToken: string };
+      return {
+        userId: body.userId,
+        tenantId: body.tenantId,
+        accessToken: body.accessToken,
+        email,
+        password,
+      };
+    } finally {
+      await ctx.dispose();
+    }
   } catch {
     return null;
   }
@@ -134,13 +169,16 @@ export const seedPlatformAdmin = (email = `e2e-platform-${Date.now()}@aivo.test`
 export async function seedLearnerForParent(parent: SeededUser): Promise<SeededLearner | null> {
   try {
     const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
-    const res = await ctx.post(`/api/__test__/seed-learner`, {
-      data: { parentUserId: parent.userId, tenantId: parent.tenantId },
-      failOnStatusCode: false,
-    });
-    await ctx.dispose();
-    if (res.status() !== 200) return null;
-    return (await res.json()) as SeededLearner;
+    try {
+      const res = await ctx.post(`/api/__test__/seed-learner`, {
+        data: { parentUserId: parent.userId, tenantId: parent.tenantId },
+        failOnStatusCode: false,
+      });
+      if (res.status() !== 200) return null;
+      return (await res.json()) as SeededLearner;
+    } finally {
+      await ctx.dispose();
+    }
   } catch {
     return null;
   }
@@ -158,6 +196,46 @@ export async function authenticateBrowser(
       name: "aivo_session",
       value: user.accessToken,
       url: WEB_BASE,
+      httpOnly: true,
+      sameSite: "Lax",
+    },
+  ]);
+}
+
+/**
+ * Authenticate the browser against the STANDALONE admin console
+ * (apps/web-admin on :5001). web-admin reads two cookies: the identity-svc
+ * RS256 access token (verified against the shared JWT public key) plus the
+ * `aivo_session` profile snapshot whose userId/tenantId/role must match the
+ * token claims — see packages/admin-auth/src/server.ts.
+ */
+export async function authenticateAdminBrowser(
+  page: import("@playwright/test").Page,
+  user: SeededUser,
+  role: "platform_admin" | "district_admin" | "school_admin" = "platform_admin",
+): Promise<void> {
+  const profile = {
+    userId: user.userId,
+    // identity-svc mints platform-staff tokens with tenantId null; the admin
+    // session cookie stores that as "" (claims.tenantId ?? "" must match).
+    tenantId: user.tenantId ?? "",
+    role,
+    email: user.email,
+    displayName: "E2E Admin",
+    permissions: [],
+  };
+  await page.context().addCookies([
+    {
+      name: "aivo_access_token",
+      value: user.accessToken,
+      url: ADMIN_WEB_BASE,
+      httpOnly: true,
+      sameSite: "Lax",
+    },
+    {
+      name: "aivo_session",
+      value: encodeURIComponent(JSON.stringify(profile)),
+      url: ADMIN_WEB_BASE,
       httpOnly: true,
       sameSite: "Lax",
     },
@@ -200,4 +278,20 @@ export const T = {
   observationSubmit: "observation-form-submit",
   observationError: "observation-form-error",
   flagEnvvar: "flag-envvar",
+  // web-admin /platform — usage-trends widget (charting foundation sprint).
+  platformUsageTrends: "platform-usage-trends",
+  platformUsageTrendsNewUsers: "platform-usage-trends-new-users",
+  platformUsageTrendsNewLearners: "platform-usage-trends-new-learners",
+  platformUsageTrendsError: "platform-usage-trends-error",
+  // web-admin /platform/__chart-check — chart primitive self-test harness.
+  chartCheckArea: "chart-check-area",
+  chartCheckDonut: "chart-check-donut",
+  chartCheckBars: "chart-check-bars",
+  chartCheckGauge: "chart-check-gauge",
+  chartCheckFunnel: "chart-check-funnel",
+  chartCheckKpi: "chart-check-kpi",
+  chartCheckSparkline: "chart-check-sparkline",
+  // Inner hooks rendered by the @aivo/admin-ui primitives themselves.
+  donutCenterTotal: "donut-center-total",
+  gaugeCenterLabel: "gauge-center-label",
 } as const;

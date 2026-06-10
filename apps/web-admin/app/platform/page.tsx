@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { ROLE_LABEL, requirePlatformPage } from "@aivo/admin-auth";
-import { getPlatformSystemHealth } from "@aivo/admin-api/platform";
-import type { PlatformSystemHealth } from "@aivo/admin-api";
+import { getPlatformSystemHealth, getPlatformUsageTrends } from "@aivo/admin-api/platform";
+import type { PlatformSystemHealth, PlatformUsageTrendPoint } from "@aivo/admin-api";
 import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
 import { AdminNavGrid } from "@/components/admin-nav";
 import { describeSystemHealthFailure } from "./health-state";
+import { UsageTrendsCard } from "./usage-trends-card";
 
 const PLATFORM_NAV = [
   {
@@ -112,11 +113,23 @@ export default async function PlatformPage() {
   // read must degrade to a callout instead of crashing the whole console.
   let health: PlatformSystemHealth | null = null;
   let healthError: string | null = null;
-  try {
-    health = await getPlatformSystemHealth(session);
-  } catch (error) {
-    console.error("web-admin /platform: system-health read failed", error);
-    healthError = describeSystemHealthFailure(error);
+  let usageTrends: PlatformUsageTrendPoint[] | null = null;
+  let usageTrendsError: string | null = null;
+  const [healthResult, trendsResult] = await Promise.allSettled([
+    getPlatformSystemHealth(session),
+    getPlatformUsageTrends(session),
+  ]);
+  if (healthResult.status === "fulfilled") {
+    health = healthResult.value;
+  } else {
+    console.error("web-admin /platform: system-health read failed", healthResult.reason);
+    healthError = describeSystemHealthFailure(healthResult.reason);
+  }
+  if (trendsResult.status === "fulfilled") {
+    usageTrends = trendsResult.value;
+  } else {
+    console.error("web-admin /platform: usage-trends read failed", trendsResult.reason);
+    usageTrendsError = describeSystemHealthFailure(trendsResult.reason);
   }
 
   return (
@@ -158,6 +171,8 @@ export default async function PlatformPage() {
           </p>
         </div>
       )}
+
+      <UsageTrendsCard points={usageTrends} error={usageTrendsError} />
 
       <AdminCard className="mt-6 p-6">
         <h2 className="text-xl font-black">Secure district onboarding</h2>

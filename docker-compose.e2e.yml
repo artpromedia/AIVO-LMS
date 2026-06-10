@@ -32,6 +32,20 @@ services:
       timeout: 2s
       retries: 20
 
+  # One-shot generator for the stack's shared RS256 keypair. identity-svc
+  # signs access tokens with it; admin-svc and web-admin verify with the
+  # matching public key (JWT_KEY_DIR=/keys on all three). Throwaway e2e keys
+  # on an ephemeral volume — world-readable on purpose so the non-root
+  # service users can read them.
+  jwt-keygen:
+    image: node:22-alpine
+    command:
+      - node
+      - -e
+      - "const fs=require('fs'),c=require('crypto');if(!fs.existsSync('/keys/private.pem')){const k=c.generateKeyPairSync('rsa',{modulusLength:2048});fs.writeFileSync('/keys/private.pem',k.privateKey.export({type:'pkcs8',format:'pem'}),{mode:0o644});fs.writeFileSync('/keys/public.pem',k.publicKey.export({type:'spki',format:'pem'}),{mode:0o644});}"
+    volumes:
+      - jwt-keys:/keys
+
   identity-svc:
     build:
       context: .
@@ -43,6 +57,7 @@ services:
       PORT: "3001"
       DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_e2e
       REDIS_URL: redis://redis:6379
+      JWT_KEY_DIR: /keys
       AUTH_SECRET: e2e-test-secret-please-do-not-deploy-32-chars-min
       COOKIE_SECRET: e2e-cookie-secret-test-only-32-chars-min-length
       INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
@@ -62,6 +77,9 @@ services:
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
+      jwt-keygen: { condition: service_completed_successfully }
+    volumes:
+      - jwt-keys:/keys
     ports:
       - "3001:3001"
     healthcheck:
@@ -211,6 +229,42 @@ services:
       retries: 40
       start_period: 20s
 
+  # Platform BFF for web-admin reads (system health, usage trends, …).
+  # Shares the e2e postgres with identity-svc so seeded users/learners show
+  # up in the platform dashboards, and the /keys public key so it can verify
+  # identity-minted bearer tokens.
+  admin-svc:
+    profiles: ["pilot"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: admin-svc
+    environment:
+      NODE_ENV: test
+      ADMIN_SVC_PORT: "3005"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_e2e
+      IDENTITY_SVC_URL: http://identity-svc:3001
+      INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
+      JWT_KEY_DIR: /keys
+    volumes:
+      - jwt-keys:/keys:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      jwt-keygen: { condition: service_completed_successfully }
+    ports:
+      - "3005:3005"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3005/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
   web-admin:
     profiles: ["pilot"]
     build:
@@ -222,10 +276,16 @@ services:
       HOSTNAME: "0.0.0.0"
       IDENTITY_SVC_URL: http://identity-svc:3001
       BILLING_SVC_URL: http://billing-svc:3009
+      ADMIN_SVC_URL: http://admin-svc:3005
       INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
       SESSION_SECRET: e2e-web-admin-session-secret-32-chars-min-len
+      # Verify identity-minted session JWTs with the stack's shared public key.
+      JWT_KEY_DIR: /keys
+    volumes:
+      - jwt-keys:/keys:ro
     depends_on:
       identity-svc: { condition: service_healthy }
+      admin-svc: { condition: service_healthy }
     ports:
       - "5001:5001"
     healthcheck:
@@ -238,3 +298,7 @@ services:
       timeout: 3s
       retries: 40
       start_period: 20s
+
+volumes:
+  # Shared RS256 keypair for the stack (see jwt-keygen).
+  jwt-keys:

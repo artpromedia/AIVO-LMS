@@ -324,6 +324,77 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
     },
   );
 
+  // Idempotent seed for a SCHOOL_ADMIN under a B2B_SCHOOL tenant. Mirrors
+  // seed-district-admin; consumed by e2e/lib/fixtures.ts seedSchoolAdmin
+  // (admin-console RBAC specs need a real non-platform admin token).
+  app.post<{
+    Body: { email: string; password: string; tenantName?: string; mfaEnabled?: boolean };
+  }>("/api/__test__/seed-school-admin", async (req, reply) => {
+    if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+    const db = (app as any).db;
+    const {
+      email,
+      password,
+      tenantName = "E2E School Tenant",
+      mfaEnabled = false,
+    } = req.body ?? ({} as any);
+    if (!email || !password) {
+      return reply.status(400).send({ error: "email and password required" });
+    }
+
+    let [tenant] = await db.select().from(tenants).where(eq(tenants.name, tenantName)).limit(1);
+    if (!tenant) {
+      [tenant] = await db
+        .insert(tenants)
+        .values({ name: tenantName, type: "B2B_SCHOOL" as any } as any)
+        .returning();
+    }
+
+    const passwordHash = await argon2.hash(password);
+    const lcEmail = email.toLowerCase();
+    let [user] = await db.select().from(users).where(eq(users.email, lcEmail)).limit(1);
+    if (user) {
+      await db
+        .update(users)
+        .set({
+          passwordHash,
+          role: "SCHOOL_ADMIN",
+          tenantId: tenant.id,
+          mfaEnabled,
+          deactivatedAt: null,
+        })
+        .where(eq(users.id, user.id));
+    } else {
+      [user] = await db
+        .insert(users)
+        .values({
+          email: lcEmail,
+          name: "E2E School Admin",
+          passwordHash,
+          role: "SCHOOL_ADMIN",
+          tenantId: tenant.id,
+          mfaEnabled,
+        })
+        .returning();
+    }
+
+    const accessToken = await signJWT({
+      sub: user.id,
+      tenantId: tenant.id,
+      role: user.role,
+      email: user.email,
+      name: user.name,
+    });
+    return {
+      id: user.id,
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      tenantId: tenant.id,
+      accessToken,
+    };
+  });
+
   // Idempotent seed for a PLATFORM_ADMIN. Used by the district-pilot e2e to
   // drive POST /api/admin/pilots with a real platform-admin bearer token.
   // Platform admins are tenant-less; the response shape mirrors the other

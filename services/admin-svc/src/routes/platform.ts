@@ -25,6 +25,12 @@ import { Permission, verifyJWT } from "@aivo/security";
 import { asc, count, desc, eq, gte, sql } from "drizzle-orm";
 import { requirePermission } from "../lib/permissions.js";
 import { computeTrialConversion } from "../lib/trial-conversion.js";
+import {
+  USAGE_TRENDS_DEFAULT_DAYS,
+  buildUsageTrendSeries,
+  clampTrendDays,
+  trendWindowStart,
+} from "../lib/usage-trends.js";
 import { logAuditEvent } from "./audit.js";
 import {
   adminSvcAiPlaygroundSchema,
@@ -36,6 +42,7 @@ import {
   getAdminSvcPlatformAiActivitySchema,
   getAdminSvcPlatformAiCostsSchema,
   getAdminSvcPlatformSystemHealthSchema,
+  getAdminSvcPlatformUsageTrendsSchema,
   getAdminSvcStatsSchema,
   getAdminSvcTenantsByIdSchema,
   getAdminSvcTenantsSchema,
@@ -332,6 +339,40 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
         aiModelsActive24h: Number(aiSummary?.modelsActive ?? 0),
         aiAvgLatencyMs24h: Number(aiSummary?.avgLatencyMs ?? 0),
         aiEstimatedCostUsd24h: Number(aiSummary?.estimatedCostUsd ?? 0),
+      };
+    },
+  );
+
+  app.get(
+    "/api/admin-svc/platform/usage-trends",
+    {
+      schema: getAdminSvcPlatformUsageTrendsSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.PlatformRead),
+    },
+    async (req) => {
+      const { days: daysStr } = req.query as { days?: string };
+      const days = clampTrendDays(daysStr ?? USAGE_TRENDS_DEFAULT_DAYS);
+      const now = new Date();
+      const since = trendWindowStart(days, now);
+
+      const userDay = sql<string>`to_char(date_trunc('day', ${users.createdAt}), 'YYYY-MM-DD')`;
+      const userRows = await db
+        .select({ day: userDay, count: count() })
+        .from(users)
+        .where(gte(users.createdAt, since))
+        .groupBy(userDay);
+
+      const learnerDay = sql<string>`to_char(date_trunc('day', ${learners.createdAt}), 'YYYY-MM-DD')`;
+      const learnerRows = await db
+        .select({ day: learnerDay, count: count() })
+        .from(learners)
+        .where(gte(learners.createdAt, since))
+        .groupBy(learnerDay);
+
+      return {
+        days,
+        generatedAt: now.toISOString(),
+        points: buildUsageTrendSeries({ days, now, users: userRows, learners: learnerRows }),
       };
     },
   );

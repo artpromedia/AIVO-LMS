@@ -15,12 +15,15 @@ import {
   seedPlatformAdmin,
   seedSchoolAdmin,
   skipUnlessIdentityTestMode,
+  skipUnlessWebReachable,
   T,
 } from "../../lib/fixtures";
 
 test.describe("admin golden paths", () => {
   test.beforeEach(async () => {
     await skipUnlessIdentityTestMode();
+    // These journeys drive web-v2 pages; a services-only harness skips them.
+    await skipUnlessWebReachable();
   });
 
   test("1. school admin overview renders LIVE values, not the legacy mocks", async ({ page }) => {
