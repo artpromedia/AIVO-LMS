@@ -6,7 +6,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEngagement } from "@/hooks/useEngagement";
+import { useEngagementTrend } from "@/hooks/useEngagementTrend";
 import { useLearnerEntitlements } from "@/hooks/useLearnerEntitlements";
+import { useLearnerMastery } from "@/hooks/useLearnerMastery";
 import { TUTORS, INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies, typography } from "@/constants/typography";
@@ -15,11 +17,14 @@ import { Card, HeaderUserChip, SensoryToggle, DarkCapsuleNav } from "@/component
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, gridColumns, pickBySizeClass } from "@/src/design/responsive";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
+import { ProgressRing, Sparkline, BarMini } from "@aivo/mobile-ui";
 
 export default function LearnerWorldMap() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { data: engagement, refetch } = useEngagement(user?.id || "");
+  const { data: trend } = useEngagementTrend(user?.id || "");
+  const { subjects: masterySubjects } = useLearnerMastery(user?.id || "", 4);
   const { t } = useTranslation();
   const { sizeClass, width: winWidth, isTablet } = useWindowSizeClass();
   const { isTutorEntitled } = useLearnerEntitlements(user?.tenantId);
@@ -177,7 +182,7 @@ export default function LearnerWorldMap() {
             />
           </View>
 
-          {/* XP progress to next level */}
+          {/* XP progress to next level — ProgressRing replaces the manual bar */}
           <View
             style={[
               styles.xpCard,
@@ -190,15 +195,48 @@ export default function LearnerWorldMap() {
                 Level {engagement?.level || 1}
               </Text>
             </View>
-            <View style={[styles.xpTrack, { backgroundColor: palette.border }]}>
-              <View
-                style={[
-                  styles.xpFill,
-                  { width: `${xpPctOfNextLevel}%`, backgroundColor: palette.primary },
-                ]}
+            <View style={styles.xpRingRow}>
+              <ProgressRing
+                value={Math.min(xpPctOfNextLevel, 100) / 100}
+                size={72}
+                tone={palette.primary}
+                label={`${Math.round(xpPctOfNextLevel)}%`}
+                ariaLabel={t("learner.xp")}
               />
+              {trend && trend.xpTrend.length > 0 ? (
+                <View style={{ flex: 1, marginLeft: spacing.md }}>
+                  <Text style={[styles.xpTrendLabel, { color: palette.inkMuted }]}>
+                    {t("learner.xpTrend")}
+                  </Text>
+                  <Sparkline
+                    series={trend.xpTrend}
+                    tone={palette.primary}
+                    height={36}
+                    label={t("learner.xpTrend")}
+                  />
+                </View>
+              ) : null}
             </View>
           </View>
+
+          {/* Subject mastery breakdown */}
+          {masterySubjects.length > 0 ? (
+            <View
+              style={[
+                styles.masteryCard,
+                { backgroundColor: palette.bgCard, borderColor: palette.border },
+              ]}
+            >
+              <Text style={[styles.masteryTitle, { color: palette.inkMuted }]}>
+                {t("learner.masteryBySubject")}
+              </Text>
+              <BarMini
+                subjects={masterySubjects.map((s) => ({ name: s.name, value: s.value }))}
+                label={t("learner.masteryBySubject")}
+                style={{ marginTop: 6 }}
+              />
+            </View>
+          ) : null}
 
           {/* Tutor world grid */}
           <Text style={[styles.sectionTitle, { color: palette.ink }]}>
@@ -473,8 +511,15 @@ const styles = StyleSheet.create({
   },
   xpHeaderText: { fontFamily: fontFamilies.bodyBold, fontSize: 13 },
   xpHeaderHint: { fontFamily: fontFamilies.bodySemiBold, fontSize: 12 },
-  xpTrack: { height: 8, borderRadius: 4, overflow: "hidden" },
-  xpFill: { height: 8, borderRadius: 4 },
+  xpRingRow: { flexDirection: "row", alignItems: "center" },
+  xpTrendLabel: { fontFamily: fontFamilies.bodySemiBold, fontSize: 11, marginBottom: 4 },
+  masteryCard: {
+    padding: 14,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    marginBottom: spacing.lg,
+  },
+  masteryTitle: { fontFamily: fontFamilies.bodySemiBold, fontSize: 11 },
   sectionTitle: {
     fontFamily: fontFamilies.displayBold,
     fontSize: 20,

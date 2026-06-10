@@ -153,7 +153,11 @@
     "team": "团队",
     "tutorStore": "导师商店",
     "billing": "账单",
-    "loginAsLearner": "以学习者身份登录"
+    "loginAsLearner": "以学习者身份登录",
+    "activeTutorsTrend": "活跃导师趋势",
+    "sessionsTrend": "本周课程趋势",
+    "masteryBySubject": "按科目掌握程度",
+    "reports": "报告"
   },
   "parentSettings": {
     "title": "设置",
@@ -448,7 +452,13 @@
     "homework": "作业",
     "quests": "任务",
     "badgesLabel": "徽章",
-    "grades": "成绩"
+    "grades": "成绩",
+    "xpTrend": "7天经验值",
+    "masteryBySubject": "按科目掌握程度",
+    "progress": "进度",
+    "subjects": "科目",
+    "missions": "任务",
+    "library": "图书馆"
   },
   "learnerBrain": {
     "title": "我的大脑",

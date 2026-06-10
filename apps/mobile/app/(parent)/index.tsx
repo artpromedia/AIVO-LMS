@@ -7,7 +7,9 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useLearners } from "@/hooks/useLearners";
 import { useParentInbox } from "@/hooks/useParentInbox";
-import { EmptyState } from "@aivo/mobile-ui";
+import { useParentSummary } from "@/hooks/useParentSummary";
+import { useLearnerMastery } from "@/hooks/useLearnerMastery";
+import { EmptyState, Sparkline, BarMini } from "@aivo/mobile-ui";
 import { spacing, radius } from "@/constants/colors";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { fontFamilies } from "@/constants/typography";
@@ -22,6 +24,7 @@ export default function ParentDashboard() {
   const { user, logout } = useAuth();
   const { data: learners, refetch } = useLearners();
   const { data: inbox } = useParentInbox(user?.id ?? "");
+  const { data: summary, refetch: refetchSummary } = useParentSummary(user?.id ?? "");
   const unreadCount = inbox?.unreadCount ?? 0;
   const [refreshing, setRefreshing] = React.useState(false);
   const { t } = useTranslation();
@@ -40,9 +43,15 @@ export default function ParentDashboard() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await refetch();
+    await Promise.all([refetch(), refetchSummary()]);
     setRefreshing(false);
   };
+
+  // Derive stat values from real summary data, falling back to 0 while loading
+  const activeTutors = summary?.activeTutors ?? 0;
+  const sessionsThisWeek = summary?.sessionsThisWeek ?? 0;
+  const activeTutorsTrend = summary?.activeTutorsTrend ?? [];
+  const sessionsThisWeekTrend = summary?.sessionsThisWeekTrend ?? [];
 
   return (
     <ScrollView
@@ -122,17 +131,21 @@ export default function ParentDashboard() {
           />
           <StatTile
             label={t("parent.activeTutors")}
-            value={7}
+            value={activeTutors}
             icon="school"
             tint={palette.accent}
             tintSoft={palette.accentSoft}
+            trend={activeTutorsTrend}
+            trendLabel={t("parent.activeTutorsTrend")}
           />
           <StatTile
             label={t("parent.sessions")}
-            value={24}
+            value={sessionsThisWeek}
             icon="book"
             tint={palette.warm}
             tintSoft={palette.warmSoft}
+            trend={sessionsThisWeekTrend}
+            trendLabel={t("parent.sessionsTrend")}
           />
         </View>
 
@@ -195,6 +208,7 @@ export default function ParentDashboard() {
                   </View>
                   <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
                 </View>
+                <ChildMasteryBar learnerId={learner.id} tint={palette.accent} />
                 <View style={[styles.childActions, { borderTopColor: palette.border }]}>
                   <ChildAction
                     icon="bulb-outline"
@@ -284,12 +298,18 @@ function StatTile({
   icon,
   tint,
   tintSoft,
+  trend,
+  trendLabel,
 }: {
   label: string;
   value: number | string;
   icon: keyof typeof Ionicons.glyphMap;
   tint: string;
   tintSoft: string;
+  /** Optional 7-day history for sparkline. Hidden when empty. */
+  trend?: number[];
+  /** Accessible label for the sparkline. */
+  trendLabel?: string;
 }) {
   const palette = useSensoryPalette();
   return (
@@ -309,6 +329,15 @@ function StatTile({
       <Text style={[styles.statTileLabel, { color: palette.inkMuted }]} numberOfLines={1}>
         {label}
       </Text>
+      {trend && trend.length > 0 ? (
+        <Sparkline
+          series={trend}
+          tone={tint}
+          height={24}
+          label={trendLabel ?? label}
+          style={{ marginTop: 4 }}
+        />
+      ) : null}
     </View>
   );
 }
@@ -330,6 +359,26 @@ function ChildAction({
       <Ionicons name={icon} size={18} color={tint} />
       <Text style={[styles.actionText, { color: palette.inkMuted }]}>{label}</Text>
     </Pressable>
+  );
+}
+
+/**
+ * Renders a compact BarMini of per-subject mastery inside a child card.
+ * Hidden while loading or when no brain data is available.
+ */
+function ChildMasteryBar({ learnerId, tint }: { learnerId: string; tint: string }) {
+  const { t } = useTranslation();
+  const { subjects, isLoading } = useLearnerMastery(learnerId, 4);
+  if (isLoading || subjects.length === 0) return null;
+  return (
+    <View style={styles.childMastery}>
+      <BarMini
+        subjects={subjects.map((s) => ({ name: s.name, value: s.value, tone: tint }))}
+        label={t("parent.masteryBySubject")}
+        barHeight={5}
+        style={{ marginTop: 2 }}
+      />
+    </View>
   );
 }
 
@@ -407,6 +456,7 @@ const styles = StyleSheet.create({
   },
   childCard: { marginBottom: spacing.md },
   childRow: { flexDirection: "row", alignItems: "center" },
+  childMastery: { paddingTop: spacing.sm, paddingBottom: 2 },
   childAvatar: {
     width: 48,
     height: 48,

@@ -153,7 +153,11 @@
     "team": "Equipe",
     "tutorStore": "Loja de tutores",
     "billing": "Faturamento",
-    "loginAsLearner": "Entrar como aluno"
+    "loginAsLearner": "Entrar como aluno",
+    "activeTutorsTrend": "Tendência de tutores ativos",
+    "sessionsTrend": "Tendência de sessões desta semana",
+    "masteryBySubject": "Domínio por matéria",
+    "reports": "Relatórios"
   },
   "parentSettings": {
     "title": "Configurações",
@@ -448,7 +452,13 @@
     "homework": "Tarefa",
     "quests": "Missões",
     "badgesLabel": "Conquistas",
-    "grades": "Notas"
+    "grades": "Notas",
+    "xpTrend": "XP em 7 dias",
+    "masteryBySubject": "Domínio por matéria",
+    "progress": "Progresso",
+    "subjects": "Matérias",
+    "missions": "Missões",
+    "library": "Biblioteca"
   },
   "learnerBrain": {
     "title": "Meu Cérebro",

@@ -153,7 +153,11 @@
     "team": "チーム",
     "tutorStore": "チューターストア",
     "billing": "請求",
-    "loginAsLearner": "学習者としてログイン"
+    "loginAsLearner": "学習者としてログイン",
+    "activeTutorsTrend": "アクティブな家庭教師のトレンド",
+    "sessionsTrend": "今週のセッションのトレンド",
+    "masteryBySubject": "科目別習熟度",
+    "reports": "レポート"
   },
   "parentSettings": {
     "title": "設定",
@@ -448,7 +452,13 @@
     "homework": "宿題",
     "quests": "クエスト",
     "badgesLabel": "バッジ",
-    "grades": "成績"
+    "grades": "成績",
+    "xpTrend": "7日間のXP",
+    "masteryBySubject": "科目別習熟度",
+    "progress": "進捗",
+    "subjects": "科目",
+    "missions": "ミッション",
+    "library": "ライブラリ"
   },
   "learnerBrain": {
     "title": "マイブレイン",

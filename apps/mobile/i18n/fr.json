@@ -153,7 +153,11 @@
     "team": "Équipe",
     "tutorStore": "Boutique de tuteurs",
     "billing": "Facturation",
-    "loginAsLearner": "Se connecter en tant qu'apprenant"
+    "loginAsLearner": "Se connecter en tant qu'apprenant",
+    "activeTutorsTrend": "Tendance des tuteurs actifs",
+    "sessionsTrend": "Tendance des séances cette semaine",
+    "masteryBySubject": "Maîtrise par matière",
+    "reports": "Rapports"
   },
   "parentSettings": {
     "title": "Paramètres",
@@ -448,7 +452,13 @@
     "homework": "Devoirs",
     "quests": "Quêtes",
     "badgesLabel": "Badges",
-    "grades": "Notes"
+    "grades": "Notes",
+    "xpTrend": "XP sur 7 jours",
+    "masteryBySubject": "Maîtrise par matière",
+    "progress": "Progrès",
+    "subjects": "Matières",
+    "missions": "Missions",
+    "library": "Bibliothèque"
   },
   "learnerBrain": {
     "title": "Mon cerveau",
