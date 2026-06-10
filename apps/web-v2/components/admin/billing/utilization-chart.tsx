@@ -31,31 +31,33 @@ function periodLabel(period: string, granularity: "day" | "month"): string {
 }
 
 export function UtilizationChart({ series, granularity, hardCap }: UtilizationChartProps) {
-  const areaSeries = useMemo<AreaTrendSeriesEntry[]>(
-    () => [
+  const areaSeries = useMemo<AreaTrendSeriesEntry[]>(() => {
+    const allocPoints: { label: string; value: number }[] = [];
+    const usedPoints: { label: string; value: number }[] = [];
+
+    for (const p of series) {
+      const label = periodLabel(p.period, granularity);
+      allocPoints.push({ label, value: p.allocated });
+      usedPoints.push({ label, value: p.used });
+    }
+
+    return [
       {
         name: "Allocated",
-        points: series.map((p) => ({
-          label: periodLabel(p.period, granularity),
-          value: p.allocated,
-        })),
+        points: allocPoints,
         tone: "brand" as const,
         dashed: true,
         filled: true,
       },
       {
         name: "Used",
-        points: series.map((p) => ({
-          label: periodLabel(p.period, granularity),
-          value: p.used,
-        })),
+        points: usedPoints,
         tone: "brand" as const,
         dashed: false,
         filled: true,
       },
-    ],
-    [series, granularity],
-  );
+    ];
+  }, [series, granularity]);
 
   const refLine = useMemo<AreaTrendRefLine | undefined>(
     () => (hardCap != null ? { value: hardCap, label: "Hard cap" } : undefined),
