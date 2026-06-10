@@ -26,8 +26,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { Grid2x2, Play, Star, Volume2, Zap } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { RoleHomeScaffold } from "@/components/layout/RoleHomeScaffold";
 import { Button } from "@/components/ui/button";
 import {
   StatChip,
@@ -253,6 +255,58 @@ export default async function LearnerHome({
     })
     .filter((t): t is NonNullable<typeof t> => t !== null);
 
+  const greeting = t(`greeting_${greetingSlot()}`, { name: displayName });
+  const featuredLessonCard = today.ready ? (
+    <FeaturedLessonCard
+      subject={today.mission.subjectName}
+      subjectTone={featuredTones.lessonTone}
+      durationLabel={`${today.mission.estimatedMinutes} mins`}
+      difficultyLabel={overallAvg >= 0.65 ? t("diff_steady") : t("diff_easy")}
+      title={today.mission.skillName}
+      description={today.mission.learnerReason}
+      tutorName={featuredTutor?.name ?? t("tutor_fallback")}
+      tutorPersonality={
+        featuredTutor
+          ? t("tutor_personality", { subtitle: featuredTutor.subtitle })
+          : t("tutor_personality_default")
+      }
+      tutorGlyph={featuredTutor?.emoji ?? "🤖"}
+      tutorTone={featuredTones.tutorTone}
+      secondaryActions={
+        <>
+          <LessonSecondaryAction icon={<Volume2 className="h-4 w-4" aria-hidden />}>
+            {t("read_aloud")}
+          </LessonSecondaryAction>
+          <LessonSecondaryAction icon={<Grid2x2 className="h-4 w-4" aria-hidden />}>
+            {t("overview")}
+          </LessonSecondaryAction>
+        </>
+      }
+      primaryAction={
+        <form action={startMissionAction}>
+          <input type="hidden" name="learnerId" value={learnerId} />
+          <Button type="submit" size="lg" data-primary-cta="todays-mission">
+            <Play className="h-4 w-4" aria-hidden />
+            {today.mission.existingRunId ? t("resume_lesson") : t("start_lesson")}
+          </Button>
+        </form>
+      }
+    />
+  ) : (
+    <div className="rounded-[28px] bg-white border border-iw-border/60 p-8 flex flex-col gap-4">
+      <h2 className="text-2xl font-bold text-iw-text-strong">{t("setup_title")}</h2>
+      <p className="text-base text-iw-text-muted">
+        {blocker === "no_baseline" ? t("setup_body_baseline") : t("setup_body_wait")}
+      </p>
+      <Link
+        href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}
+        className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
+      >
+        {blocker === "no_baseline" ? t("setup_cta_baseline") : t("setup_cta_refresh")}
+      </Link>
+    </div>
+  );
+
   return (
     <AppShell
       role={session.role === "learner" ? "learner" : "parent"}
@@ -279,232 +333,129 @@ export default async function LearnerHome({
           initialTypeface={typeface}
         />
 
-        <div className="flex flex-col gap-6 min-w-0">
-          {/* Top stat strip */}
-          <div className="flex items-center gap-3 p-4 rounded-3xl bg-white border border-iw-border/60 flex-wrap">
-            <StatChip
-              tone="warm"
-              label={t("stat_level", { level: levelNumber })}
-              value={t("stat_xp", { xp: xp.toLocaleString() })}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="m12 2 2.6 6.4 6.9.5-5.3 4.4 1.7 6.7L12 16.8 6.1 20l1.7-6.7L2.5 8.9l6.9-.5L12 2Z" />
-                </svg>
-              }
-            />
-            <StatChip
-              tone="primary"
-              label={t("streak_label")}
-              value={t("streak_value", { days: streakDays })}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
-                </svg>
-              }
-            />
-            <span className="ml-auto">
-              <LearnerLevelBadge level={t(adaptiveLevelKey(overallAvg))} />
-            </span>
-          </div>
-
-          {/* Greeting */}
-          <h1 className="text-3xl md:text-4xl font-bold text-iw-text-strong leading-tight">
-            {t(`greeting_${greetingSlot()}`, { name: displayName })}
-          </h1>
-
-          {/* Featured lesson */}
-          {today.ready ? (
-            <FeaturedLessonCard
-              subject={today.mission.subjectName}
-              subjectTone={featuredTones.lessonTone}
-              durationLabel={`${today.mission.estimatedMinutes} mins`}
-              difficultyLabel={overallAvg >= 0.65 ? t("diff_steady") : t("diff_easy")}
-              title={today.mission.skillName}
-              description={today.mission.learnerReason}
-              tutorName={featuredTutor?.name ?? t("tutor_fallback")}
-              tutorPersonality={
-                featuredTutor
-                  ? t("tutor_personality", { subtitle: featuredTutor.subtitle })
-                  : t("tutor_personality_default")
-              }
-              tutorGlyph={featuredTutor?.emoji ?? "🤖"}
-              tutorTone={featuredTones.tutorTone}
-              secondaryActions={
-                <>
-                  <LessonSecondaryAction
-                    icon={
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden
+        <div className="min-w-0">
+          <RoleHomeScaffold
+            hero={{
+              title: greeting,
+              subheading: today.ready ? today.mission.learnerReason : t("setup_body_wait"),
+              tone: "warm",
+            }}
+            kpiStrip={
+              <>
+                <div className="rounded-iw-card-lg border border-iw-border/60 bg-white p-4">
+                  <StatChip
+                    tone="warm"
+                    label={t("stat_level", { level: levelNumber })}
+                    value={t("stat_xp", { xp: xp.toLocaleString() })}
+                    icon={<Star className="h-5 w-5" aria-hidden />}
+                  />
+                </div>
+                <div className="rounded-iw-card-lg border border-iw-border/60 bg-white p-4">
+                  <StatChip
+                    tone="primary"
+                    label={t("streak_label")}
+                    value={t("streak_value", { days: streakDays })}
+                    icon={<Zap className="h-5 w-5" aria-hidden />}
+                  />
+                </div>
+                <div className="rounded-iw-card-lg border border-iw-border/60 bg-white p-4 flex items-center">
+                  <LearnerLevelBadge level={t(adaptiveLevelKey(overallAvg))} />
+                </div>
+              </>
+            }
+            sections={[
+              {
+                title: "Today's lesson",
+                cards: featuredLessonCard,
+              },
+              {
+                title: t("tutors_title"),
+                cards:
+                  tutorTiles.length > 0 ? (
+                    <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                      {tutorTiles.map((tile) => (
+                        <TutorAvatarCard
+                          key={tile.id}
+                          href={tile.href}
+                          name={tile.name}
+                          subject={tile.subject}
+                          glyph={tile.glyph}
+                          tone={tile.tone}
+                        />
+                      ))}
+                    </div>
+                  ) : undefined,
+              },
+              {
+                title: t("subjects_title"),
+                cards: (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {allSubjects.slice(0, 6).map((s) => {
+                      const tutor = tutorForSubjectSlug(s.slug);
+                      const avg = subjectAvg(s.id);
+                      return (
+                        <SubjectCard
+                          key={s.id}
+                          href={`/learner/subjects/${s.id}`}
+                          name={s.name}
+                          eyebrow={
+                            tutor
+                              ? t("subject_eyebrow", { name: tutor.name, landmark: tutor.landmark })
+                              : undefined
+                          }
+                          masteryLabel={tp(masteryKey(avg))}
+                          masteryPct={Math.round(avg * 100)}
+                          accent={tutor?.color}
+                          icon={tutor?.emoji ?? "📘"}
+                          nextAction={
+                            today.ready && today.mission.subjectId === s.id
+                              ? today.mission.skillName
+                              : t("next_default")
+                          }
+                          support={iep?.confirmedAt ? t("supports_on") : undefined}
+                          locked={avg === 0 && !today.ready}
+                        />
+                      );
+                    })}
+                  </div>
+                ),
+              },
+              {
+                title: t("messages_title"),
+                cards: (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <MessageCard
+                      from="tutor"
+                      sender="AIVO"
+                      title={t("msg_hint_title")}
+                      body={t("msg_hint_body")}
+                      avatar="✨"
+                    />
+                    {iep?.confirmedAt ? (
+                      <MessageCard
+                        from="system"
+                        title={t("msg_supports_title")}
+                        body={t("msg_supports_body", { count: supportsCount })}
+                        avatar="🛡"
+                      />
+                    ) : (
+                      <Link
+                        href="/learner/calm"
+                        className="block rounded-3xl focus:outline-none focus:ring-2 focus:ring-offset-2"
                       >
-                        <path d="M3 10v4a1 1 0 0 0 1 1h3l4 4V5l-4 4H4a1 1 0 0 0-1 1Z" />
-                        <path d="M15 9a4 4 0 0 1 0 6" />
-                        <path d="M18 6a8 8 0 0 1 0 12" />
-                      </svg>
-                    }
-                  >
-                    {t("read_aloud")}
-                  </LessonSecondaryAction>
-                  <LessonSecondaryAction
-                    icon={
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden
-                      >
-                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                      </svg>
-                    }
-                  >
-                    {t("overview")}
-                  </LessonSecondaryAction>
-                </>
-              }
-              primaryAction={
-                <form action={startMissionAction}>
-                  <input type="hidden" name="learnerId" value={learnerId} />
-                  <Button type="submit" size="lg" data-primary-cta="todays-mission">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                      <path d="M8 5v14l11-7L8 5Z" />
-                    </svg>
-                    {today.mission.existingRunId ? t("resume_lesson") : t("start_lesson")}
-                  </Button>
-                </form>
-              }
-            />
-          ) : (
-            <div className="rounded-[28px] bg-white border border-iw-border/60 p-8 flex flex-col gap-4">
-              <h2 className="text-2xl font-bold text-iw-text-strong">{t("setup_title")}</h2>
-              <p className="text-base text-iw-text-muted">
-                {blocker === "no_baseline" ? t("setup_body_baseline") : t("setup_body_wait")}
-              </p>
-              <Link
-                href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}
-                className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
-              >
-                {blocker === "no_baseline" ? t("setup_cta_baseline") : t("setup_cta_refresh")}
-              </Link>
-            </div>
-          )}
-
-          {/* AI tutors grid */}
-          {tutorTiles.length > 0 ? (
-            <section className="flex flex-col gap-4">
-              <header className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-iw-text-strong">{t("tutors_title")}</h2>
-                <Link
-                  href="/learner/subjects"
-                  className="text-sm font-bold text-[var(--color-aivo-primary)] hover:underline"
-                >
-                  {t("see_all")}
-                </Link>
-              </header>
-              <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-                {tutorTiles.map((t) => (
-                  <TutorAvatarCard
-                    key={t.id}
-                    href={t.href}
-                    name={t.name}
-                    subject={t.subject}
-                    glyph={t.glyph}
-                    tone={t.tone}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {/* Subjects */}
-          <section className="flex flex-col gap-4">
-            <header className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-iw-text-strong">{t("subjects_title")}</h2>
-              <Link
-                href="/learner/subjects"
-                className="text-sm font-bold text-[var(--color-aivo-primary)] hover:underline"
-              >
-                {t("see_all")}
-              </Link>
-            </header>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {allSubjects.slice(0, 6).map((s) => {
-                const tutor = tutorForSubjectSlug(s.slug);
-                const avg = subjectAvg(s.id);
-                return (
-                  <SubjectCard
-                    key={s.id}
-                    href={`/learner/subjects/${s.id}`}
-                    name={s.name}
-                    eyebrow={
-                      tutor
-                        ? t("subject_eyebrow", { name: tutor.name, landmark: tutor.landmark })
-                        : undefined
-                    }
-                    masteryLabel={tp(masteryKey(avg))}
-                    masteryPct={Math.round(avg * 100)}
-                    accent={tutor?.color}
-                    icon={tutor?.emoji ?? "📘"}
-                    nextAction={
-                      today.ready && today.mission.subjectId === s.id
-                        ? today.mission.skillName
-                        : t("next_default")
-                    }
-                    support={iep?.confirmedAt ? t("supports_on") : undefined}
-                    locked={avg === 0 && !today.ready}
-                  />
-                );
-              })}
-            </div>
-          </section>
-
-          {/* Messages */}
-          <section className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-iw-text-strong">{t("messages_title")}</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              <MessageCard
-                from="tutor"
-                sender="AIVO"
-                title={t("msg_hint_title")}
-                body={t("msg_hint_body")}
-                avatar="✨"
-              />
-              {iep?.confirmedAt ? (
-                <MessageCard
-                  from="system"
-                  title={t("msg_supports_title")}
-                  body={t("msg_supports_body", { count: supportsCount })}
-                  avatar="🛡"
-                />
-              ) : (
-                <Link
-                  href="/learner/calm"
-                  className="block rounded-3xl focus:outline-none focus:ring-2 focus:ring-offset-2"
-                >
-                  <MessageCard
-                    from="break"
-                    title={t("msg_break_title")}
-                    body={t("msg_break_body")}
-                    avatar="🌿"
-                  />
-                </Link>
-              )}
-            </div>
-          </section>
+                        <MessageCard
+                          from="break"
+                          title={t("msg_break_title")}
+                          body={t("msg_break_body")}
+                          avatar="🌿"
+                        />
+                      </Link>
+                    )}
+                  </div>
+                ),
+              },
+            ]}
+          />
         </div>
       </div>
     </AppShell>
