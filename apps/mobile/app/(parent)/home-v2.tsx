@@ -23,58 +23,14 @@ import { useLearners } from "@/hooks/useLearners";
  *   Greeting: "Hi, [name]. [Child] is ready for today's learning."
  */
 
-type Tone = "neutral" | "info" | "success" | "warning";
-
-interface MetricCardProps {
-  label: string;
-  value: string;
-  description?: string;
-  iconName: keyof typeof Ionicons.glyphMap;
-  tone?: Tone;
-  onPress: () => void;
-}
-
-function MetricCard({
-  label,
-  value,
-  description,
-  iconName,
-  tone = "neutral",
-  onPress,
-}: MetricCardProps) {
-  const palette = useSensoryPalette();
-  const toneColor =
-    tone === "success"
-      ? "#16a34a"
-      : tone === "warning"
-        ? "#b45309"
-        : tone === "info"
-          ? "#0284c7"
-          : palette.primary;
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [s.metricCard, pressed && { opacity: 0.85 }]}
-    >
-      <View style={[s.metricIcon, { backgroundColor: toneColor + "22" }]}>
-        <Ionicons name={iconName} size={20} color={toneColor} />
-      </View>
-      <Text style={s.metricLabel}>{label}</Text>
-      <Text style={s.metricValue}>{value}</Text>
-      {description ? <Text style={s.metricDesc}>{description}</Text> : null}
-    </Pressable>
-  );
-}
-
 interface SectionRowProps {
   iconName: keyof typeof Ionicons.glyphMap;
   title: string;
   subtitle: string;
-  badge?: string;
   onPress: () => void;
 }
 
-function SectionRow({ iconName, title, subtitle, badge, onPress }: SectionRowProps) {
+function SectionRow({ iconName, title, subtitle, onPress }: SectionRowProps) {
   const palette = useSensoryPalette();
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [s.row, pressed && { opacity: 0.85 }]}>
@@ -85,11 +41,6 @@ function SectionRow({ iconName, title, subtitle, badge, onPress }: SectionRowPro
         <Text style={s.rowTitle}>{title}</Text>
         <Text style={s.rowSubtitle}>{subtitle}</Text>
       </View>
-      {badge ? (
-        <View style={s.rowBadge}>
-          <Text style={s.rowBadgeText}>{badge}</Text>
-        </View>
-      ) : null}
       <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
     </Pressable>
   );
@@ -152,90 +103,36 @@ export default function ParentHomeV2() {
         </View>
       </View>
 
-      <Text style={s.sectionLabel}>Today at a glance</Text>
-      <View style={s.metricGrid}>
-        <MetricCard
-          label="Baseline status"
-          value="In progress"
-          description="60% of discovery adventure complete."
-          iconName="sparkles"
-          tone="info"
-          onPress={() => openLearner("progress")}
-        />
-        <MetricCard
-          label="Wellbeing"
-          value="Calm"
-          description="No stress flags this week."
-          iconName="heart"
-          tone="success"
-          onPress={() => openLearner("progress")}
-        />
-        <MetricCard
-          label="Mastery"
-          value="+4 skills"
-          description="This week."
-          iconName="trending-up"
-          tone="success"
-          onPress={() => openLearner("milestones")}
-        />
-        <MetricCard
-          label="Today's time"
-          value="22 min"
-          description="Planned: 35 minutes."
-          iconName="time"
-          onPress={() => openLearner("session")}
-        />
-        <MetricCard
-          label="Needs approval"
-          value="1 thing"
-          description="Approve voice mode."
-          iconName="shield-checkmark"
-          tone="warning"
-          onPress={() => router.push("/(parent)/settings" as Href)}
-        />
-        <MetricCard
-          label="IEP support"
-          value="Active"
-          description="3 accommodations applied."
-          iconName="document-text"
-          tone="info"
-          onPress={() => openLearner("iep")}
-        />
-      </View>
-
       <Text style={s.sectionLabel}>Details</Text>
       <View style={s.list}>
         <SectionRow
           iconName="sparkles"
           title="Learning readiness"
           subtitle="Today's plan, pacing, and sensory mode."
-          badge="Ready"
           onPress={() => openLearner("session")}
         />
         <SectionRow
           iconName="checkmark-circle"
           title="Consent checklist"
-          subtitle="What you've approved and what's still optional."
-          badge="2 of 3"
+          subtitle="Review approvals and optional settings."
           onPress={() => router.push("/(parent)/settings" as Href)}
         />
         <SectionRow
           iconName="document-text"
           title="IEP / support upload"
-          subtitle="3 accommodations extracted."
+          subtitle="Upload supports and accommodations."
           onPress={() => openLearner("iep")}
         />
         <SectionRow
           iconName="notifications"
           title="Notifications"
-          subtitle="1 new milestone, tutor note."
-          badge="1"
+          subtitle="Review recent parent updates."
           onPress={() => router.push("/(parent)/inbox" as Href)}
         />
         <SectionRow
           iconName="card"
           title="Billing"
-          subtitle="Family · monthly. Next renewal Apr 14."
+          subtitle="Review your family plan and renewal details."
           onPress={() => router.push("/(parent)/billing" as Href)}
         />
         <SectionRow
@@ -302,33 +199,6 @@ const s = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: spacing.sm,
   },
-  metricGrid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  metricCard: {
-    flexBasis: "48%",
-    flexGrow: 1,
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 4,
-  },
-  metricIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: spacing.xs,
-  },
-  metricLabel: { fontFamily: fontFamilies.bodyRegular, fontSize: 12, color: colors.textSecondary },
-  metricValue: { fontFamily: fontFamilies.displaySemiBold, fontSize: 18, color: colors.text },
-  metricDesc: {
-    fontFamily: fontFamilies.bodyRegular,
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
   list: { gap: spacing.xs },
   row: {
     flexDirection: "row",
@@ -353,19 +223,6 @@ const s = StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
     marginTop: 2,
-  },
-  rowBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    backgroundColor: colors.background,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  rowBadgeText: {
-    fontFamily: fontFamilies.bodySemiBold,
-    fontSize: 11,
-    color: colors.textSecondary,
   },
   footer: {
     textAlign: "center",

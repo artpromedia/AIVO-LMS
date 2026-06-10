@@ -7,7 +7,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useLearner } from "@/hooks/useLearners";
 import { useBrainDomains } from "@/hooks/useBrain";
-import { AivoCard, StatCard, LoadingState } from "@aivo/mobile-ui";
+import { AivoCard, LoadingState } from "@aivo/mobile-ui";
 import { colors, spacing } from "@/constants/colors";
 
 export default function ProgressScreen() {
@@ -37,28 +37,6 @@ export default function ProgressScreen() {
       </Text>
       <Text style={styles.subtitle}>{t("parentProgress.subtitle")}</Text>
 
-      <View style={styles.statsRow}>
-        <StatCard
-          label={t("parent.sessions")}
-          value={24}
-          icon={<Ionicons name="book" size={20} color={colors.primary} />}
-        />
-        <View style={{ width: 8 }} />
-        <StatCard
-          label="Avg. Time"
-          value="18m"
-          icon={<Ionicons name="time" size={20} color={colors.secondary} />}
-          color={colors.secondary}
-        />
-        <View style={{ width: 8 }} />
-        <StatCard
-          label="Streak"
-          value={5}
-          icon={<Ionicons name="flame" size={20} color={colors.accent} />}
-          color={colors.accent}
-        />
-      </View>
-
       <Text style={[styles.sectionTitle, { marginBottom: spacing.md }]}>Domain Mastery</Text>
       {domains.length === 0 ? (
         <AivoCard>
@@ -81,23 +59,6 @@ export default function ProgressScreen() {
         ))
       )}
 
-      <Text style={[styles.sectionTitle, { marginTop: spacing.lg, marginBottom: spacing.md }]}>
-        Engagement Metrics
-      </Text>
-      <AivoCard>
-        <View style={styles.metricRow}>
-          <Text style={styles.metricLabel}>Tutor Usage</Text>
-          <Text style={styles.metricValue}>7 active tutors</Text>
-        </View>
-        <View style={styles.metricRow}>
-          <Text style={styles.metricLabel}>Session Frequency</Text>
-          <Text style={styles.metricValue}>4.2 sessions/week</Text>
-        </View>
-        <View style={styles.metricRow}>
-          <Text style={styles.metricLabel}>Engagement Score</Text>
-          <Text style={styles.metricValue}>87/100</Text>
-        </View>
-      </AivoCard>
     </ScrollView>
   );
 }
@@ -113,22 +74,12 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
-  statsRow: { flexDirection: "row", marginBottom: spacing.lg },
   sectionTitle: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.text },
   domainCard: { marginBottom: spacing.sm },
   domainName: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.text, marginBottom: 8 },
   progressBar: { height: 8, backgroundColor: colors.border, borderRadius: 4, marginBottom: 4 },
   progressFill: { height: 8, borderRadius: 4, backgroundColor: colors.primary },
   masteryText: { fontSize: 12, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  metricRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  metricLabel: { fontSize: 14, fontFamily: "Nunito-Regular", color: colors.textSecondary },
-  metricValue: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
   noData: {
     fontSize: 14,
     fontFamily: "Nunito-Regular",
