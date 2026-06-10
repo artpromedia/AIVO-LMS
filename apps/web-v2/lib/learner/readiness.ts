@@ -148,3 +148,34 @@ export async function computeReadinessFor(
   }
   return "profile_created";
 }
+
+/**
+ * States that indicate a learner needs clinical/educational attention —
+ * used by the therapist and caregiver home KPI strip.
+ */
+export const NEEDS_SUPPORT_STATES = new Set<ReadinessState>([
+  "assessment_needed",
+  "baseline_needed",
+  "brain_clone_review_needed",
+]);
+
+export function needsSupportCount(learners: Pick<LearnerProfile, "readinessState">[]): number {
+  return learners.filter((l) => NEEDS_SUPPORT_STATES.has(l.readinessState)).length;
+}
+
+/**
+ * Maps a READINESS_TONE value to the Tailwind class string for an inline
+ * status pill used in caseload / care-team learner rows.
+ */
+export function readinessBadgeClass(tone: "neutral" | "warning" | "primary" | "success"): string {
+  switch (tone) {
+    case "success":
+      return "bg-[var(--aivo-color-status-success-subtle)] text-[var(--aivo-color-status-success-strong)] border-[var(--aivo-color-status-success-default)]";
+    case "warning":
+      return "bg-[var(--aivo-color-status-warning-subtle)] text-[var(--aivo-color-status-warning-strong)] border-[var(--aivo-color-status-warning-default)]";
+    case "primary":
+      return "bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-color-aivoPurple-700)] border-[var(--aivo-color-aivoPurple-100)]";
+    default:
+      return "bg-[var(--aivo-color-surface-muted)] text-[var(--aivo-color-text-muted)] border-[var(--aivo-color-border-subtle)]";
+  }
+}
