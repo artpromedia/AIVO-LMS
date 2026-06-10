@@ -1,19 +1,15 @@
 /**
  * Therapist home — caseload dashboard for the therapist role.
- *
- * Therapists are added via the parent care-team invite flow
- * (`/parent/learners/[learnerId]/team`) and route here after accepting an
- * invite.
  */
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader, SectionHeader } from "@/components/layout/page-header";
+import { RoleHomeScaffold } from "@/components/layout/RoleHomeScaffold";
 import { THERAPIST_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState, FloatingMetricCard } from "@aivo/ui";
 import { listLearnersForMember } from "@/lib/db/team-invites";
 import { getIEPForLearner, getLearner, refreshLearnerReadiness } from "@/lib/db/repos";
 import type { LearnerProfile } from "@/lib/db/types";
@@ -45,63 +41,67 @@ export default async function TherapistHomePage() {
       navItems={THERAPIST_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        title={`Welcome, ${session.displayName.split(" ")[0]}`}
-        description="Your caseload — every learner you're assigned to support."
-      />
-
-      {fresh.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("stat_caseload")}</p>
-            <p className="font-display text-2xl font-semibold">{fresh.length}</p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("stat_ieps")}</p>
-            <p className="font-display text-2xl font-semibold">{iepCount}</p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("quick_links")}</p>
-            <div className="mt-1 flex flex-col gap-1 text-sm">
-              <Link href="/therapist/sessions" className="text-aivo-accent hover:underline">
-                {t("link_sessions")}
-              </Link>
-              <Link href="/therapist/reports" className="text-aivo-accent hover:underline">
-                {t("link_reports")}
-              </Link>
-            </div>
-          </Card>
-        </div>
-      ) : null}
-
-      <SectionHeader title={t("section_caseload")} />
-      {fresh.length === 0 ? (
-        <EmptyState
-          title={t("empty_title")}
-          description="Once a parent invites you and you accept, your assigned learners will appear here."
-        />
-      ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {fresh.map((l) => (
-            <li key={l.id}>
-              <Card className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold">{l.displayName}</p>
-                    <p className="mt-0.5 text-xs text-aivo-ink-soft">
-                      {l.gradeBand ? `Grade ${l.gradeBand}` : "Therapy caseload"}
-                      {l.iep ? " · IEP on file" : ""}
-                    </p>
-                  </div>
-                  <Badge tone={READINESS_TONE[l.readinessState]}>
-                    {READINESS_LABEL[l.readinessState]}
-                  </Badge>
+      <RoleHomeScaffold
+        hero={{
+          title: `Welcome, ${session.displayName.split(" ")[0]}`,
+          subheading: "Your caseload — every learner you're assigned to support.",
+          tone: "calm",
+        }}
+        kpiStrip={
+          <>
+            <FloatingMetricCard label={t("stat_caseload")} value={String(fresh.length)} tone="info" />
+            <FloatingMetricCard label={t("stat_ieps")} value={String(iepCount)} tone="success" />
+            <FloatingMetricCard
+              label={t("quick_links")}
+              value={
+                <div className="mt-1 flex flex-col gap-1 text-sm text-left">
+                  <Link href="/therapist/sessions" className="text-iw-text-strong hover:underline">
+                    {t("link_sessions")}
+                  </Link>
+                  <Link href="/therapist/reports" className="text-iw-text-strong hover:underline">
+                    {t("link_reports")}
+                  </Link>
                 </div>
-              </Card>
-            </li>
-          ))}
-        </ul>
-      )}
+              }
+              tone="neutral"
+            />
+          </>
+        }
+        sections={[
+          {
+            title: t("section_caseload"),
+            cards:
+              fresh.length === 0 ? undefined : (
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {fresh.map((l) => (
+                    <li key={l.id}>
+                      <Card className="p-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="text-sm font-semibold">{l.displayName}</p>
+                            <p className="mt-0.5 text-xs text-aivo-ink-soft">
+                              {l.gradeBand ? `Grade ${l.gradeBand}` : "Therapy caseload"}
+                              {l.iep ? " · IEP on file" : ""}
+                            </p>
+                          </div>
+                          <Badge tone={READINESS_TONE[l.readinessState]}>
+                            {READINESS_LABEL[l.readinessState]}
+                          </Badge>
+                        </div>
+                      </Card>
+                    </li>
+                  ))}
+                </ul>
+              ),
+            emptyState: (
+              <EmptyState
+                title={t("empty_title")}
+                body="Once a parent invites you and you accept, your assigned learners will appear here."
+              />
+            ),
+          },
+        ]}
+      />
     </AppShell>
   );
 }
