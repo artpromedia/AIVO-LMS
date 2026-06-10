@@ -51,6 +51,7 @@ const MIGRATIONS = [
   "0048_learner_brain_profiles",
   "0049_web_domain",
   "0072_web_collaboration",
+  "0092_web_review_schedules",
 ];
 
 const TABLES = [
@@ -76,6 +77,7 @@ const TABLES = [
   "web_mastery_maps",
   "web_skill_masteries",
   "web_learning_paths",
+  "web_review_schedules",
   "web_consent_records",
   "web_iep_documents",
   "web_age_gate_records",

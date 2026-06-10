@@ -59,6 +59,7 @@ const WEB_SCHEMA_MIGRATIONS = [
   "0087_web_support_settings",
   "0088_web_engagement",
   "0089_web_standards",
+  "0092_web_review_schedules",
 ];
 
 /** Reset `public` and apply the web-domain schema (hermetic, idempotent). */

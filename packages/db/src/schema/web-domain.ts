@@ -212,6 +212,17 @@ export const webLearningPaths = pgTable(
   (t) => ({ idx: index("web_learning_paths_idx").on(t.learnerId, t.tenantId) }),
 );
 
+export const webReviewSchedules = pgTable(
+  "web_review_schedules",
+  {
+    id: text("id").primaryKey(),
+    learnerId: text("learner_id").notNull(),
+    tenantId: text("tenant_id").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({ idx: index("web_review_schedules_idx").on(t.learnerId, t.tenantId) }),
+);
+
 // ── compliance ──────────────────────────────────────────────────────
 export const webConsentRecords = pgTable(
   "web_consent_records",

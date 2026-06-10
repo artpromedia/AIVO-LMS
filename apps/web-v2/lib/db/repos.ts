@@ -1248,7 +1248,10 @@ export async function completeBaseline(
   /** Post-baseline clone of the brain profile; null if no pre-clone existed. */
   clonedBrainProfile: LearnerBrainProfile | null;
 } | null> {
-  const store = db();
+  // Seed the dev/test memory store before any adapter reads (no-op in
+  // postgres mode); the store handle itself is intentionally unused — every
+  // read/write below goes through the persistence adapter (ADR 0007).
+  db();
   const baseline = await getPersistence().assessments.getBaselineById(baselineId, tenantId);
   if (!baseline) return null;
   // Read the learner through the persistence adapter, not the in-memory
@@ -1261,28 +1264,18 @@ export async function completeBaseline(
 
   // Idempotent short-circuit: a completed baseline returns the existing
   // snapshot (same summary, mastery map, learning path, review schedules) so
-  // callers replaying the request get stable IDs and timestamps.
+  // callers replaying the request get stable IDs and timestamps. Read through
+  // the persistence adapter — in postgres mode the in-memory Maps are empty,
+  // so a direct store read here would wrongly rebuild on every replay.
   if (baseline.status === "complete" && baseline.summary) {
-    let existingMap: MasteryMap | null = null;
-    for (const m of store.masteryMaps.values()) {
-      if (m.learnerId === baseline.learnerId && m.tenantId === tenantId) {
-        existingMap = m;
-        break;
-      }
-    }
-    let existingPath: LearningPath | null = null;
-    for (const p of store.learningPaths.values()) {
-      if (p.learnerId === baseline.learnerId && p.tenantId === tenantId) {
-        existingPath = p;
-        break;
-      }
-    }
+    const curriculumStore = getPersistence().curriculum;
+    const { map: existingMap, skillMasteries: existingMasteries } =
+      await curriculumStore.getMasteryMapForLearner(baseline.learnerId, tenantId);
+    const existingPath = await curriculumStore.getLearningPath(baseline.learnerId, tenantId);
     if (existingMap && existingPath) {
-      const existingMasteries = store.skillMasteries.filter(
-        (m) => m.learnerId === baseline.learnerId && m.tenantId === tenantId,
-      );
-      const existingReviews = store.reviewSchedules.filter(
-        (r) => r.learnerId === baseline.learnerId && r.tenantId === tenantId,
+      const existingReviews = await curriculumStore.getReviewSchedules(
+        baseline.learnerId,
+        tenantId,
       );
       return {
         baseline,
@@ -1324,13 +1317,11 @@ export async function completeBaseline(
 
   // Compute the mastery map snapshot (existing row carried over, otherwise a
   // fresh id) without yet writing it.
-  let masteryMap: MasteryMap | null = null;
-  for (const m of store.masteryMaps.values()) {
-    if (m.learnerId === baseline.learnerId && m.tenantId === tenantId) {
-      masteryMap = m;
-      break;
-    }
-  }
+  const { map: priorMasteryMap } = await getPersistence().curriculum.getMasteryMapForLearner(
+    baseline.learnerId,
+    tenantId,
+  );
+  let masteryMap: MasteryMap | null = priorMasteryMap;
   masteryMap = masteryMap
     ? { ...masteryMap, updatedAt: nowIso() }
     : {
@@ -1367,33 +1358,23 @@ export async function completeBaseline(
 
   // --- Commit (atomic from this point: validation has already passed) ---
 
+  // All derived artifacts land through the persistence adapter so they
+  // survive in postgres mode (production) — writing them to the in-memory
+  // Map store would silently lose the learner's mastery/path on restart.
+  const curriculum = getPersistence().curriculum;
+
   // Replace ALL prior mastery rows in the subjects this baseline covered (not
   // just the skills it evaluated), so a sparser re-run cannot leave stale
   // data behind from a previous, denser baseline.
-  const coveredSubjectIds = new Set(baseline.subjectIds);
-  store.skillMasteries = store.skillMasteries.filter(
-    (m) =>
-      !(
-        m.learnerId === baseline.learnerId &&
-        m.tenantId === tenantId &&
-        coveredSubjectIds.has(m.subjectId)
-      ),
+  await curriculum.replaceSkillMasteriesForSubjects(
+    baseline.learnerId,
+    tenantId,
+    baseline.subjectIds,
+    skillMasteries,
   );
-  store.skillMasteries.push(...skillMasteries);
-
-  store.masteryMaps.set(masteryMap.id, masteryMap);
-
-  for (const [id, p] of store.learningPaths) {
-    if (p.learnerId === baseline.learnerId && p.tenantId === tenantId) {
-      store.learningPaths.delete(id);
-    }
-  }
-  store.learningPaths.set(learningPath.id, learningPath);
-
-  store.reviewSchedules = store.reviewSchedules.filter(
-    (r) => !(r.learnerId === baseline.learnerId && r.tenantId === tenantId),
-  );
-  store.reviewSchedules.push(...reviewSchedules);
+  await curriculum.upsertMasteryMap(masteryMap);
+  await curriculum.replaceLearningPath(baseline.learnerId, tenantId, learningPath);
+  await curriculum.replaceReviewSchedules(baseline.learnerId, tenantId, reviewSchedules);
 
   const clonedBrainProfile = await commitBrainClone(preparedClone);
 
@@ -1579,11 +1560,12 @@ export async function getSubjectDetail(
   tenantId: string,
   subjectId: string,
 ): Promise<SubjectDetail | null> {
-  const store = db();
-  const subject = store.subjects.get(subjectId);
+  // Subjects/skills are reference data — read through the persistence adapter
+  // so subject detail (and next-skill selection) works in postgres mode.
+  const subject = await getPersistence().curriculum.getSubjectById(subjectId);
   if (!subject) return null;
 
-  const skills = Array.from(store.skills.values()).filter((s) => s.subjectId === subjectId);
+  const skills = await getPersistence().curriculum.listSkills(subjectId);
   const { skillMasteries } = await getMasteryMap(learnerId, tenantId);
   const masteryBySkillId = new Map(skillMasteries.map((m) => [m.skillId, m]));
   const annotated = skills.map((s) => ({
@@ -1790,16 +1772,17 @@ export async function createLessonRun(
   input: CreateLessonRunInput,
   provider: TutorProvider = getTutorProvider(),
 ): Promise<CreateLessonRunResult> {
-  const store = db();
   const learner = await getLearner(input.learnerId, input.tenantId);
   if (!learner) {
     return { ok: false, code: "learner_not_found", message: "Learner not in tenant" };
   }
-  const subject = store.subjects.get(input.subjectId);
+  // Subjects/skills are reference data — read through the persistence adapter
+  // so lesson creation resolves them in postgres mode (Map store is empty there).
+  const subject = await getPersistence().curriculum.getSubjectById(input.subjectId);
   if (!subject) {
     return { ok: false, code: "subject_not_found", message: "Subject not found" };
   }
-  const skill = store.skills.get(input.skillId);
+  const skill = await getPersistence().curriculum.getSkillById(input.skillId);
   if (!skill || skill.subjectId !== input.subjectId) {
     return { ok: false, code: "skill_not_found", message: "Skill not in subject" };
   }
@@ -2091,20 +2074,27 @@ export function deriveOutcomeFromInteractions(run: LessonRun, abandoned: boolean
  * with a small penalty per hint/scaffold so we don't over-credit scaffolded work.
  * Returns the before/after mastery snapshot for the parent summary.
  */
-function applyOutcomeToMastery(
-  run: LessonRun,
-  outcome: LessonOutcome,
-): {
+type MasteryDelta = {
   before: number;
   after: number;
   levelBefore: SkillMasteryLevel;
   levelAfter: SkillMasteryLevel;
-} {
-  const store = db();
-  const existing = store.skillMasteries.find(
-    (m) =>
-      m.learnerId === run.learnerId && m.tenantId === run.tenantId && m.skillId === run.skillId,
+};
+
+async function applyOutcomeToMastery(run: LessonRun, outcome: LessonOutcome): Promise<MasteryDelta> {
+  // Read + write through the persistence adapter: in postgres mode
+  // (production) the in-memory Map store is empty, so direct store access
+  // here would both miss the baseline-derived row AND lose the update.
+  const curriculum = getPersistence().curriculum;
+  const { map, skillMasteries } = await curriculum.getMasteryMapForLearner(
+    run.learnerId,
+    run.tenantId,
   );
+  const existing =
+    skillMasteries.find(
+      (m) =>
+        m.learnerId === run.learnerId && m.tenantId === run.tenantId && m.skillId === run.skillId,
+    ) ?? null;
   const beforeScore = existing?.score ?? run.masterySnapshot.score;
   const beforeLevel: SkillMasteryLevel = existing?.level ?? run.masterySnapshot.level;
 
@@ -2119,31 +2109,20 @@ function applyOutcomeToMastery(
   const afterLevel = levelFromScore(afterScore);
   const now = nowIso();
 
-  if (existing) {
-    existing.score = afterScore;
-    existing.level = afterLevel;
-    existing.confidence = Math.min(1, existing.confidence + 0.05);
-    existing.needsReview = outcome.abandoned || accuracy < 0.5;
-    existing.lastEvaluatedAt = now;
-  } else {
-    store.skillMasteries.push({
-      learnerId: run.learnerId,
-      tenantId: run.tenantId,
-      skillId: run.skillId,
-      subjectId: run.subjectId,
-      score: afterScore,
-      level: afterLevel,
-      confidence: 0.6,
-      needsReview: outcome.abandoned || accuracy < 0.5,
-      lastEvaluatedAt: now,
-    });
-  }
+  await curriculum.upsertSkillMastery({
+    learnerId: run.learnerId,
+    tenantId: run.tenantId,
+    skillId: run.skillId,
+    subjectId: existing?.subjectId ?? run.subjectId,
+    score: afterScore,
+    level: afterLevel,
+    confidence: existing ? Math.min(1, existing.confidence + 0.05) : 0.6,
+    needsReview: outcome.abandoned || accuracy < 0.5,
+    lastEvaluatedAt: now,
+  });
   // Bump the MasteryMap.updatedAt so the parent dashboard reflects freshness.
-  const map = Array.from(store.masteryMaps.values()).find(
-    (m) => m.learnerId === run.learnerId && m.tenantId === run.tenantId,
-  );
   if (map) {
-    map.updatedAt = now;
+    await curriculum.upsertMasteryMap({ ...map, updatedAt: now });
   }
   return {
     before: beforeScore,
@@ -2153,15 +2132,18 @@ function applyOutcomeToMastery(
   };
 }
 
-function buildParentLessonSummary(
+async function buildParentLessonSummary(
   run: LessonRun,
   outcome: LessonOutcome,
-  delta: ReturnType<typeof applyOutcomeToMastery>,
-): ParentLessonSummary {
-  const store = db();
-  const subject = store.subjects.get(run.subjectId);
-  const skill = store.skills.get(run.skillId);
-  const learner = store.learnerProfiles.get(run.learnerId);
+  delta: MasteryDelta,
+): Promise<ParentLessonSummary> {
+  // Reference data + learner read through the persistence adapter so the
+  // summary keeps real names in postgres mode (the Map store is empty there;
+  // the old direct reads silently degraded to "this subject"/"Your child").
+  const curriculum = getPersistence().curriculum;
+  const subject = await curriculum.getSubjectById(run.subjectId);
+  const skill = await curriculum.getSkillById(run.skillId);
+  const learner = await getLearner(run.learnerId, run.tenantId);
   const subjectName = subject?.name ?? "this subject";
   const skillName = skill?.name ?? "this skill";
   const name = learner?.preferredName || learner?.firstName || "Your child";
@@ -2257,8 +2239,8 @@ export async function completeLessonRun(
     updatedAt: nowIso(),
   };
   await runStore.upsertRun(next);
-  const delta = applyOutcomeToMastery(next, effectiveOutcome);
-  const summary = buildParentLessonSummary(next, effectiveOutcome, delta);
+  const delta = await applyOutcomeToMastery(next, effectiveOutcome);
+  const summary = await buildParentLessonSummary(next, effectiveOutcome, delta);
   await runStore.upsertParentSummary(summary);
   await refreshLearnerReadiness(run.learnerId, tenantId);
   // Sprint 16: bump QuestProgress when the run was launched from a quest

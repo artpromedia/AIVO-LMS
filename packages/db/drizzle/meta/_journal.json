@@ -505,6 +505,20 @@
       "when": 1783286400000,
       "tag": "0091_billing_coupon_discount_default",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1783372800000,
+      "tag": "0092_web_review_schedules",
+      "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1783372801000,
+      "tag": "0093_web_review_schedules_rls",
+      "breakpoints": true
     }
   ]
 }
