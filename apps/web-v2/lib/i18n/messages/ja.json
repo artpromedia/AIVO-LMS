@@ -500,7 +500,8 @@
       "none_recorded": "まだ記録がありません。",
       "challenges": "苦手なこと",
       "accessibility_defaults": "アクセシビリティのデフォルト設定",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "承認が必要な推奨事項"
     },
     "learner_sensory": {
       "title": "感覚プロファイル",
@@ -692,6 +693,27 @@
       "last_active_today": "最終利用は今日",
       "last_active_yesterday": "最終利用は昨日",
       "last_active_days": "最終利用は{count}日前"
+    },
+    "recommendations": {
+      "loading": "推奨事項を確認中…",
+      "load_error": "推奨事項を読み込めませんでした — もう一度お試しください。",
+      "empty": "承認待ちの推奨事項はありません。",
+      "pending_badge": "承認が必要",
+      "proposed_change": "提案された変更",
+      "based_on": "{summary}に基づく",
+      "approve": "承認",
+      "adjust": "調整",
+      "decline": "却下",
+      "amend_label": "新しい値",
+      "confirm_adjust": "調整した値を適用",
+      "decline_reason_label": "却下の理由",
+      "confirm_decline": "却下を確定",
+      "cancel": "キャンセル",
+      "decision_error": "決定を記録できませんでした — もう一度お試しください。",
+      "status_applied": "承認・適用されました — 次のセッションからレッスンが更新されます。",
+      "status_declined": "却下されました — 変更はありません。",
+      "status_failed": "承認されましたが適用に失敗しました — チームに通知済みです。",
+      "history": "最近の決定 ({count})"
     }
   },
   "brain_clone": {

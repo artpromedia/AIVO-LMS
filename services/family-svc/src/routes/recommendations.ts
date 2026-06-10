@@ -38,9 +38,11 @@ const RECOMMENDATION_SVC_URL = process.env.RECOMMENDATION_SVC_URL ?? "http://loc
 
 function profileRecommendationsV2Enabled(): boolean {
   const raw = process.env.AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2;
-  if (!raw) return false;
+  // Sprint 5: the v2 recommendation loop is the system of record — default
+  // ON when unset; set the env var to 0/false/off to explicitly disable.
+  if (!raw) return true;
   const v = String(raw).trim().toLowerCase();
-  return v === "1" || v === "true" || v === "yes" || v === "on";
+  return !(v === "0" || v === "false" || v === "no" || v === "off");
 }
 
 function legacyActionToV2Path(
@@ -53,6 +55,55 @@ function legacyActionToV2Path(
       return "amend";
     case "DECLINED":
       return "decline";
+  }
+}
+
+/**
+ * Sprint 5 — v2 is the system of record. When the recommendation id exists
+ * in recommendation-svc, the decision is delegated THERE (its Sprint 4
+ * apply-persistence writes the durable effect) and the legacy effect
+ * application is skipped; the brain_recommendations row is retained as a
+ * back-compat mirror of the status only. Legacy-only rows (ids unknown to
+ * v2) keep the original authoritative path.
+ */
+async function delegateDecisionToV2(input: {
+  recId: string;
+  action: "APPROVED" | "DECLINED" | "ADJUSTED";
+  amendedValue?: unknown;
+  reason?: string;
+}): Promise<{ delegated: boolean; status?: string; error?: string }> {
+  if (!profileRecommendationsV2Enabled()) return { delegated: false };
+  try {
+    const lookup = await fetch(
+      `${RECOMMENDATION_SVC_URL}/api/recommendations/${encodeURIComponent(input.recId)}`,
+    );
+    if (lookup.status === 404) return { delegated: false };
+    if (!lookup.ok) return { delegated: false };
+    const res = await fetch(
+      `${RECOMMENDATION_SVC_URL}/api/recommendations/${encodeURIComponent(
+        input.recId,
+      )}/${legacyActionToV2Path(input.action)}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          actorRole: "parent",
+          amendedValue: input.amendedValue,
+          reason: input.reason,
+        }),
+      },
+    );
+    if (!res.ok) {
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      return { delegated: true, error: body.error ?? `v2 decision failed (${res.status})` };
+    }
+    const body = (await res.json()) as { recommendation?: { status?: string } };
+    return { delegated: true, status: body.recommendation?.status };
+  } catch (err) {
+    return {
+      delegated: true,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
 }
 
@@ -156,7 +207,8 @@ export async function registerRecommendationRoutes(app: FastifyInstance) {
             resolvedBy: claims.sub,
           })
           .where(eq(brainRecommendations.id, recId));
-        // Sprint 07: mirror decline into recommendation-svc when flag is on.
+        // Sprint 5: keep the v2 record's status aligned (decline applies no
+        // effect, so a best-effort mirror is sufficient here).
         void mirrorRecommendationDecision({
           recId,
           action: "DECLINED",
@@ -172,6 +224,39 @@ export async function registerRecommendationRoutes(app: FastifyInstance) {
       const effectivePayload: EffectPayload = amendedPayload
         ? { ...basePayload, ...amendedPayload }
         : basePayload;
+
+      // Sprint 5: a v2-owned recommendation applies through recommendation-svc
+      // (durable effect persistence) — the legacy effect must NOT double-apply.
+      const v2 = await delegateDecisionToV2({
+        recId,
+        action: body.action as "APPROVED" | "ADJUSTED",
+        amendedValue: body.action === "ADJUSTED" ? (body.amendedPayload ?? undefined) : undefined,
+        reason: body.notes,
+      });
+      if (v2.delegated) {
+        if (v2.error) {
+          await db
+            .update(brainRecommendations)
+            .set({ applyError: v2.error })
+            .where(eq(brainRecommendations.id, recId));
+          return reply.code(500).send({ error: "Failed to apply recommendation", detail: v2.error });
+        }
+        const now = new Date();
+        await db
+          .update(brainRecommendations)
+          .set({
+            status: body.action as "APPROVED" | "ADJUSTED",
+            parentNotes: body.notes || null,
+            amendedPayload: amendedPayload ?? undefined,
+            appliedPayload: effectivePayload,
+            resolvedAt: now,
+            resolvedBy: claims.sub,
+            appliedAt: now,
+            applyError: null,
+          })
+          .where(eq(brainRecommendations.id, recId));
+        return { status: "updated", action: body.action, effect: { appliedVia: "v2", v2Status: v2.status } };
+      }
 
       try {
         const result = await applyRecommendationEffect({

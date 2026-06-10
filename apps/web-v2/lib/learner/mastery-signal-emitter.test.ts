@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  buildLessonMasterySignal,
-  emitLessonMasterySignal,
-  type LessonMasteryMovement,
-} from "./mastery-signal-emitter";
+import { buildLessonMasterySignal, type LessonMasteryMovement } from "./mastery-signal-emitter";
 
 const movement: LessonMasteryMovement = {
   skillId: "skl-1",
@@ -38,10 +34,14 @@ describe("buildLessonMasterySignal", () => {
 });
 
 describe("emitLessonMasterySignal", () => {
-  it("is a no-op when the v2 flag is off", async () => {
+  it("is a no-op when the v2 flag is explicitly off", async () => {
+    // Sprint 5: unset now defaults ON, so the off-case must be explicit.
+    vi.stubEnv("AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2", "0");
+    vi.resetModules();
+    const mod = await import("./mastery-signal-emitter");
     const fetchFn = vi.fn();
     vi.stubGlobal("fetch", fetchFn);
-    await emitLessonMasterySignal({ tenantId: "t", learnerId: "l", movement });
+    await mod.emitLessonMasterySignal({ tenantId: "t", learnerId: "l", movement });
     expect(fetchFn).not.toHaveBeenCalled();
   });
 

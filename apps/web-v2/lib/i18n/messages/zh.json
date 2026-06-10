@@ -500,7 +500,8 @@
       "none_recorded": "暂无记录。",
       "challenges": "挑战",
       "accessibility_defaults": "无障碍默认设置",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "待您批准的推荐"
     },
     "learner_sensory": {
       "title": "感觉处理档案",
@@ -692,6 +693,27 @@
       "last_active_today": "上次活动：今天",
       "last_active_yesterday": "上次活动：昨天",
       "last_active_days": "上次活动：{count}天前"
+    },
+    "recommendations": {
+      "loading": "正在检查推荐…",
+      "load_error": "无法加载推荐 — 请稍后重试。",
+      "empty": "目前没有等待您批准的推荐。",
+      "pending_badge": "需要批准",
+      "proposed_change": "建议的更改",
+      "based_on": "基于{summary}",
+      "approve": "批准",
+      "adjust": "调整",
+      "decline": "拒绝",
+      "amend_label": "新值",
+      "confirm_adjust": "应用调整后的值",
+      "decline_reason_label": "拒绝原因",
+      "confirm_decline": "确认拒绝",
+      "cancel": "取消",
+      "decision_error": "无法记录您的决定 — 请重试。",
+      "status_applied": "已批准并应用 — 课程将从下次学习开始更新。",
+      "status_declined": "已拒绝 — 不会有任何更改。",
+      "status_failed": "已批准，但应用失败 — 已通知我们的团队。",
+      "history": "最近的决定 ({count})"
     }
   },
   "brain_clone": {

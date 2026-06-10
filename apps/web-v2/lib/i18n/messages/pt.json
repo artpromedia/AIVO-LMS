@@ -500,7 +500,8 @@
       "none_recorded": "Nenhum registrado ainda.",
       "challenges": "Desafios",
       "accessibility_defaults": "Configurações de acessibilidade",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "Recomendações para sua aprovação"
     },
     "learner_sensory": {
       "title": "Perfil sensorial",
@@ -692,6 +693,27 @@
       "last_active_today": "Última atividade hoje",
       "last_active_yesterday": "Última atividade ontem",
       "last_active_days": "Última atividade há {count} dias"
+    },
+    "recommendations": {
+      "loading": "Verificando recomendações…",
+      "load_error": "Não foi possível carregar as recomendações — tente novamente.",
+      "empty": "Nenhuma recomendação aguardando sua aprovação.",
+      "pending_badge": "Precisa de aprovação",
+      "proposed_change": "Mudança proposta",
+      "based_on": "Com base em {summary}",
+      "approve": "Aprovar",
+      "adjust": "Ajustar",
+      "decline": "Recusar",
+      "amend_label": "Novo valor",
+      "confirm_adjust": "Aplicar valor ajustado",
+      "decline_reason_label": "Por que recusar?",
+      "confirm_decline": "Confirmar recusa",
+      "cancel": "Cancelar",
+      "decision_error": "Não foi possível registrar sua decisão — tente novamente.",
+      "status_applied": "Aprovado e aplicado — as lições atualizam na próxima sessão.",
+      "status_declined": "Recusado — nada muda.",
+      "status_failed": "Aprovado, mas a aplicação falhou — nossa equipe foi notificada.",
+      "history": "Decisões recentes ({count})"
     }
   },
   "brain_clone": {

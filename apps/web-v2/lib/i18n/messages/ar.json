@@ -500,7 +500,8 @@
       "none_recorded": "لم يُسجَّل شيء بعد.",
       "challenges": "التحديات",
       "accessibility_defaults": "إعدادات إمكانية الوصول الافتراضية",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "توصيات بانتظار موافقتك"
     },
     "learner_sensory": {
       "title": "الملف الحسي",
@@ -692,6 +693,27 @@
       "last_active_today": "آخر نشاط اليوم",
       "last_active_yesterday": "آخر نشاط أمس",
       "last_active_days": "آخر نشاط منذ {count} أيام"
+    },
+    "recommendations": {
+      "loading": "جارٍ التحقق من التوصيات…",
+      "load_error": "تعذر تحميل التوصيات — حاول مرة أخرى.",
+      "empty": "لا توجد توصيات بانتظار موافقتك الآن.",
+      "pending_badge": "تحتاج موافقة",
+      "proposed_change": "التغيير المقترح",
+      "based_on": "استنادًا إلى {summary}",
+      "approve": "موافقة",
+      "adjust": "تعديل",
+      "decline": "رفض",
+      "amend_label": "قيمة جديدة",
+      "confirm_adjust": "تطبيق القيمة المعدلة",
+      "decline_reason_label": "سبب الرفض؟",
+      "confirm_decline": "تأكيد الرفض",
+      "cancel": "إلغاء",
+      "decision_error": "تعذر تسجيل قرارك — حاول مرة أخرى.",
+      "status_applied": "تمت الموافقة والتطبيق — تتحدث الدروس من الجلسة القادمة.",
+      "status_declined": "مرفوض — لن يتغير شيء.",
+      "status_failed": "تمت الموافقة لكن التطبيق فشل — تم إبلاغ فريقنا.",
+      "history": "القرارات الأخيرة ({count})"
     }
   },
   "brain_clone": {

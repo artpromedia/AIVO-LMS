@@ -23,7 +23,30 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(cors, { origin: true, credentials: true });
   app.get("/healthz", async () => ({ status: "ok", service: "recommendation-svc" }));
   if (!options.skipAuth) {
-    registerEnterpriseAuthHook(app, { sourceService: "recommendation-svc" });
+    // Service-to-service callers (the web-v2 BFF) present the shared
+    // INTERNAL_SERVICE_TOKEN as the bearer; real user JWTs still verify via
+    // @aivo/security. Mirrors assessment-svc's x-service-token bypass —
+    // recommendation-svc keeps the parent-role policy checks in the routes
+    // (actorRole) and the BFF enforces session + learner scope upstream.
+    const internalToken = process.env.INTERNAL_SERVICE_TOKEN;
+    registerEnterpriseAuthHook(app, {
+      sourceService: "recommendation-svc",
+      ...(internalToken
+        ? {
+            verify: async (token: string) => {
+              if (token === internalToken) {
+                return { sub: "service:internal", role: "platform_admin" };
+              }
+              try {
+                const { verifyJWT } = await import("@aivo/security");
+                return (await verifyJWT(token)) as Record<string, unknown>;
+              } catch {
+                return null;
+              }
+            },
+          }
+        : {}),
+    });
   }
 
   // Persistence: use Postgres when DATABASE_URL is set so recommendation
@@ -47,7 +70,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     // The db handle enables durable effect writes (learners / brain_states /
     // learner_profiles) when a recommendation is approved.
     registerRecommendationRoutes(app, { store, profiles, db });
-    registerCandidateRoutes(app, { store });
+    registerCandidateRoutes(app, { store, db });
   } else {
     // Shared in-memory default (also used by the test seed/clear helpers).
     registerRecommendationRoutes(app);

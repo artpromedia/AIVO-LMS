@@ -2084,6 +2084,9 @@ importers:
       '@aivo/scoring':
         specifier: workspace:*
         version: link:../../packages/scoring
+      '@aivo/security':
+        specifier: workspace:*
+        version: link:../../packages/security
       '@fastify/cors':
         specifier: ^11.0.0
         version: 11.2.0

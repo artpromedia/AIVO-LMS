@@ -500,7 +500,8 @@
       "none_recorded": "Noch keine erfasst.",
       "challenges": "Herausforderungen",
       "accessibility_defaults": "Barrierefreiheitseinstellungen",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "Empfehlungen zur Genehmigung"
     },
     "learner_sensory": {
       "title": "Sensorisches Profil",
@@ -692,6 +693,27 @@
       "last_active_today": "Zuletzt heute aktiv",
       "last_active_yesterday": "Zuletzt gestern aktiv",
       "last_active_days": "Zuletzt vor {count} Tagen aktiv"
+    },
+    "recommendations": {
+      "loading": "Empfehlungen werden geprüft…",
+      "load_error": "Empfehlungen konnten nicht geladen werden — bitte erneut versuchen.",
+      "empty": "Keine Empfehlungen warten auf deine Genehmigung.",
+      "pending_badge": "Genehmigung nötig",
+      "proposed_change": "Vorgeschlagene Änderung",
+      "based_on": "Basierend auf {summary}",
+      "approve": "Genehmigen",
+      "adjust": "Anpassen",
+      "decline": "Ablehnen",
+      "amend_label": "Neuer Wert",
+      "confirm_adjust": "Angepassten Wert anwenden",
+      "decline_reason_label": "Warum ablehnen?",
+      "confirm_decline": "Ablehnung bestätigen",
+      "cancel": "Abbrechen",
+      "decision_error": "Entscheidung konnte nicht gespeichert werden — erneut versuchen.",
+      "status_applied": "Genehmigt und angewendet — Lektionen aktualisieren sich ab der nächsten Sitzung.",
+      "status_declined": "Abgelehnt — nichts ändert sich.",
+      "status_failed": "Genehmigt, aber Anwendung fehlgeschlagen — unser Team wurde informiert.",
+      "history": "Letzte Entscheidungen ({count})"
     }
   },
   "brain_clone": {

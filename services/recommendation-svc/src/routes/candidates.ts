@@ -9,10 +9,13 @@ import {
   dedupeAgainstPending,
 } from "../services/progression-candidates.js";
 import type { RecommendationStore } from "../services/recommendation-store.js";
+import { notifyGuardianOfPending } from "../services/recommendation-notifier.js";
 import { defaultStore } from "./recommendations.js";
 
 export interface CandidateRouteDeps {
   store?: RecommendationStore;
+  /** Drizzle handle for guardian lookup when dispatching notifications. */
+  db?: { select: (...args: never[]) => unknown };
 }
 
 export function registerCandidateRoutes(app: FastifyInstance, deps: CandidateRouteDeps = {}): void {
@@ -53,6 +56,14 @@ export function registerCandidateRoutes(app: FastifyInstance, deps: CandidateRou
       // survive a restart / are visible across replicas.
       for (const rec of recommendations) {
         await store.create(rec);
+      }
+      // Sprint 5: tell the guardian (email + in-app, 24h digest-suppressed
+      // by comms-svc). Fire-and-forget — never blocks candidate generation.
+      if (recommendations.length > 0 && deps.db) {
+        void notifyGuardianOfPending(deps.db, request.log, {
+          learnerId: body.learnerId,
+          recommendations,
+        });
       }
       return { recommendations, tenantId };
     },

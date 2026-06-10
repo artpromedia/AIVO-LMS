@@ -61,6 +61,8 @@ export function renderTemplate(
       return renderSessionReminder(data);
     case "iep_update":
       return renderIEPUpdate(data);
+    case "recommendation_pending":
+      return renderRecommendationPending(data);
     case "mfa_code":
       return renderMfaCode(data);
     case "district_admin_invite":
@@ -227,6 +229,26 @@ function renderIEPUpdate(data: TemplateData) {
     subject: `IEP update for ${learnerName}: ${goalName}`,
     html,
     text: `IEP update for ${learnerName}: ${goalName}. ${(data.update as string) || ""}`,
+  };
+}
+
+function renderRecommendationPending(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "Your child";
+  const count = Number(data.count ?? 1);
+  const topTitle = (data.topTitle as string) || "a learning plan update";
+  const plural = count > 1;
+  const html = baseLayout(`
+    <h1 class="title">Approval needed: learning plan update${plural ? "s" : ""}</h1>
+    <p class="body-text">AIVO has ${plural ? `${count} recommendations` : "a recommendation"} ready for <span class="highlight">${learnerName}</span> — starting with: <strong>${topTitle}</strong>.</p>
+    <p class="body-text">Nothing changes until you approve it. Review the evidence and approve, adjust, or decline.</p>
+    <p style="text-align:center"><a href="${data.reviewUrl || "#"}" class="btn">Review recommendation${plural ? "s" : ""}</a></p>
+  `);
+  return {
+    subject: plural
+      ? `${count} learning recommendations await your approval for ${learnerName}`
+      : `A learning recommendation awaits your approval for ${learnerName}`,
+    html,
+    text: `AIVO has ${plural ? `${count} recommendations` : "a recommendation"} awaiting your approval for ${learnerName}: ${topTitle}. Review at ${data.reviewUrl || "your parent dashboard"}.`,
   };
 }
 
@@ -630,6 +652,11 @@ export const AVAILABLE_TEMPLATES = [
   { id: "milestone_achieved", name: "Milestone Achievement", channels: ["email", "push"] },
   { id: "session_reminder", name: "Session Reminder", channels: ["push", "email"] },
   { id: "iep_update", name: "IEP Goal Update", channels: ["email", "push"] },
+  {
+    id: "recommendation_pending",
+    name: "Recommendation Awaiting Approval",
+    channels: ["email", "push"],
+  },
   { id: "mfa_code", name: "MFA Verification Code", channels: ["email"] },
   { id: "district_admin_invite", name: "District Admin Invite", channels: ["email"] },
   { id: "parent_invite", name: "Parent Invite (into district tenant)", channels: ["email"] },

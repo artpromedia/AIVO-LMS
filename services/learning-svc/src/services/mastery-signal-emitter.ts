@@ -14,9 +14,11 @@ const RECOMMENDATION_SVC_URL = process.env.RECOMMENDATION_SVC_URL ?? "http://loc
 
 function profileRecommendationsV2Enabled(): boolean {
   const raw = process.env.AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2;
-  if (!raw) return false;
+  // Sprint 5: the v2 recommendation loop is the system of record — default
+  // ON when unset; set the env var to 0/false/off to explicitly disable.
+  if (!raw) return true;
   const v = String(raw).trim().toLowerCase();
-  return v === "1" || v === "true" || v === "yes" || v === "on";
+  return !(v === "0" || v === "false" || v === "no" || v === "off");
 }
 
 /** Mastery level bucket shared with the web pipeline's levelFromScore. */

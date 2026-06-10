@@ -92,6 +92,21 @@ export function registerRecommendationRoutes(
     return recommendation;
   });
 
+  // List a learner's recommendations, newest first, optionally filtered by
+  // status (e.g. ?status=PENDING for the parent approval panel). The BFF
+  // enforces the parent/learner scope; tenant scoping mirrors the candidate
+  // route (enterprise auth hook or explicit caller context).
+  app.get<{ Params: { learnerId: string }; Querystring: { status?: string } }>(
+    "/api/recommendations/learner/:learnerId",
+    async (request) => {
+      const all = await store.listByLearner(request.params.learnerId);
+      const status = request.query?.status;
+      const filtered = status ? all.filter((r) => r.status === status) : all;
+      filtered.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+      return { recommendations: filtered };
+    },
+  );
+
   app.post<{ Params: { id: string }; Body: DecisionBody }>(
     "/api/recommendations/:id/accept",
     async (request, reply) => {

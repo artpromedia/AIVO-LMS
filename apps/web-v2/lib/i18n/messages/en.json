@@ -691,7 +691,8 @@
       "none_recorded": "None recorded yet.",
       "challenges": "Challenges",
       "accessibility_defaults": "Accessibility defaults",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "Recommendations for your approval"
     },
     "learner_sensory": {
       "title": "Sensory profile",
@@ -883,6 +884,27 @@
       "last_active_today": "Last active today",
       "last_active_yesterday": "Last active yesterday",
       "last_active_days": "Last active {count} days ago"
+    },
+    "recommendations": {
+      "loading": "Checking for recommendations…",
+      "load_error": "Couldn't load recommendations — try again shortly.",
+      "empty": "No recommendations waiting for your approval right now.",
+      "pending_badge": "Needs approval",
+      "proposed_change": "Proposed change",
+      "based_on": "Based on {summary}",
+      "approve": "Approve",
+      "adjust": "Adjust",
+      "decline": "Decline",
+      "amend_label": "New value",
+      "confirm_adjust": "Apply adjusted value",
+      "decline_reason_label": "Why decline?",
+      "confirm_decline": "Confirm decline",
+      "cancel": "Cancel",
+      "decision_error": "Couldn't record your decision — try again.",
+      "status_applied": "Approved and applied — lessons update from the next session.",
+      "status_declined": "Declined — nothing changes.",
+      "status_failed": "Approved, but applying failed — our team has been notified.",
+      "history": "Recent decisions ({count})"
     }
   },
   "brain_clone": {

@@ -470,6 +470,98 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
     },
   );
 
+  // ───────── RECOMMENDATION-PENDING NOTIFY (Sprint 5) ─────────
+  // Internal endpoint called by recommendation-svc when new PENDING
+  // recommendations are persisted for a learner. Sends the guardian an
+  // email (when configured) AND an in-app notification deep-linking to the
+  // approval panel. Digest suppression lives HERE, against the durable
+  // in-app table: at most one notification per learner per 24h — additional
+  // pending recommendations fold into the one the parent already has.
+  app.post("/api/comms/internal/recommendation-pending", async (request, reply) => {
+    const internalKey = request.headers["x-internal-key"];
+    const expectedKey =
+      process.env.INTERNAL_SERVICE_KEY ||
+      (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+    if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+      return reply.status(401).send({ error: "Unauthorized" });
+    }
+    const { parentId, parentEmail, learnerId, learnerName, count, topTitle } =
+      (request.body as any) || {};
+    if (!parentId || !learnerId || !topTitle) {
+      return reply.code(400).send({ error: "parentId, learnerId and topTitle are required" });
+    }
+
+    const { parentInAppNotifications } = await import("@aivo/db");
+    const { and, eq, gte } = await import("drizzle-orm");
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const recent = await db
+      .select({ id: parentInAppNotifications.id })
+      .from(parentInAppNotifications)
+      .where(
+        and(
+          eq(parentInAppNotifications.parentId, parentId),
+          eq(parentInAppNotifications.learnerId, learnerId),
+          eq(parentInAppNotifications.template, "recommendation_pending"),
+          gte(parentInAppNotifications.createdAt, since),
+        ),
+      )
+      .limit(1);
+    if (recent.length > 0) {
+      return { status: "suppressed", reason: "digest_24h" };
+    }
+
+    const n = Math.max(1, Number(count) || 1);
+    const name = learnerName || "your learner";
+    const reviewUrl = `${process.env.WEB_APP_URL || "http://localhost:3000"}/parent/learners/${learnerId}#recommendations`;
+    const [row] = await db
+      .insert(parentInAppNotifications)
+      .values({
+        parentId,
+        learnerId,
+        category: "recommendations",
+        template: "recommendation_pending",
+        title:
+          n > 1
+            ? `${n} learning recommendations await your approval`
+            : `A learning recommendation awaits your approval`,
+        body: `Starting with: ${String(topTitle).slice(0, 500)}. Nothing changes until you approve it.`,
+        link: `/parent/learners/${learnerId}#recommendations`,
+      })
+      .returning();
+
+    let emailStatus: string = "skipped";
+    if (parentEmail && isConfigured()) {
+      const rendered = renderTemplate("recommendation_pending", {
+        learnerName: name,
+        count: n,
+        topTitle,
+        reviewUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to: parentEmail,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "recommendation_pending",
+        });
+        emailStatus = result.status;
+      } catch (err: any) {
+        logger.error({ err, parentId, learnerId }, "recommendation-pending email failed");
+        emailStatus = "failed";
+      }
+    }
+    await emitCommsAudit({
+      db,
+      request,
+      eventType: "NOTIFICATION_SENT",
+      tenantId: null,
+      resourceId: row.id,
+      details: { channel: "in_app+email", template: "recommendation_pending", emailStatus },
+    });
+    return { status: "created", id: row.id, emailStatus };
+  });
+
   // Authenticated reads/writes for the signed-in parent on their own
   // notifications. We never let one user read another's inbox.
   app.get(

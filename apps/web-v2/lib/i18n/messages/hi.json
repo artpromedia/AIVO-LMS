@@ -500,7 +500,8 @@
       "none_recorded": "अभी कोई रिकॉर्ड नहीं है।",
       "challenges": "चुनौतियाँ",
       "accessibility_defaults": "एक्सेसिबिलिटी डिफ़ॉल्ट सेटिंग्स",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "आपकी मंज़ूरी के लिए सिफ़ारिशें"
     },
     "learner_sensory": {
       "title": "संवेदी प्रोफ़ाइल",
@@ -692,6 +693,27 @@
       "last_active_today": "आज आखिरी बार सक्रिय",
       "last_active_yesterday": "कल आखिरी बार सक्रिय",
       "last_active_days": "{count} दिन पहले आखिरी बार सक्रिय"
+    },
+    "recommendations": {
+      "loading": "सिफ़ारिशें जाँची जा रही हैं…",
+      "load_error": "सिफ़ारिशें लोड नहीं हो सकीं — फिर से कोशिश करें।",
+      "empty": "अभी आपकी मंज़ूरी की प्रतीक्षा में कोई सिफ़ारिश नहीं है।",
+      "pending_badge": "मंज़ूरी चाहिए",
+      "proposed_change": "प्रस्तावित बदलाव",
+      "based_on": "{summary} के आधार पर",
+      "approve": "मंज़ूर करें",
+      "adjust": "समायोजित करें",
+      "decline": "अस्वीकार करें",
+      "amend_label": "नया मान",
+      "confirm_adjust": "समायोजित मान लागू करें",
+      "decline_reason_label": "अस्वीकार क्यों?",
+      "confirm_decline": "अस्वीकृति की पुष्टि करें",
+      "cancel": "रद्द करें",
+      "decision_error": "आपका निर्णय दर्ज नहीं हो सका — फिर से कोशिश करें।",
+      "status_applied": "मंज़ूर और लागू — अगले सत्र से पाठ अपडेट होंगे।",
+      "status_declined": "अस्वीकृत — कुछ नहीं बदलेगा।",
+      "status_failed": "मंज़ूर, लेकिन लागू करने में विफल — हमारी टीम को सूचित कर दिया गया है।",
+      "history": "हाल के निर्णय ({count})"
     }
   },
   "brain_clone": {

@@ -64,13 +64,15 @@ test("emitMasterySignals posts the candidates payload when the flag is on", asyn
   assert.equal(calls[0]!.body.currentProfile.gradeBand, "5");
 });
 
-test("emitMasterySignals is a no-op when the flag is off or nothing moved", async () => {
+test("emitMasterySignals is a no-op when the flag is explicitly off or nothing moved", async () => {
   let called = 0;
   globalThis.fetch = (async () => {
     called += 1;
     return new Response("{}");
   }) as typeof fetch;
 
+  // Sprint 5: unset now defaults ON, so the off-case must be explicit.
+  process.env.AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2 = "0";
   await emitMasterySignals({
     tenantId: "t-1",
     learnerId: "lrn-1",

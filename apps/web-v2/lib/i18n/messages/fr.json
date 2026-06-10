@@ -500,7 +500,8 @@
       "none_recorded": "Aucun enregistré pour l'instant.",
       "challenges": "Défis",
       "accessibility_defaults": "Paramètres d'accessibilité",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "Recommandations à approuver"
     },
     "learner_sensory": {
       "title": "Profil sensoriel",
@@ -692,6 +693,27 @@
       "last_active_today": "Dernière activité aujourd'hui",
       "last_active_yesterday": "Dernière activité hier",
       "last_active_days": "Dernière activité il y a {count} jours"
+    },
+    "recommendations": {
+      "loading": "Recherche de recommandations…",
+      "load_error": "Impossible de charger les recommandations — réessayez.",
+      "empty": "Aucune recommandation en attente de votre approbation.",
+      "pending_badge": "Approbation requise",
+      "proposed_change": "Changement proposé",
+      "based_on": "Basé sur {summary}",
+      "approve": "Approuver",
+      "adjust": "Ajuster",
+      "decline": "Refuser",
+      "amend_label": "Nouvelle valeur",
+      "confirm_adjust": "Appliquer la valeur ajustée",
+      "decline_reason_label": "Pourquoi refuser ?",
+      "confirm_decline": "Confirmer le refus",
+      "cancel": "Annuler",
+      "decision_error": "Impossible d'enregistrer votre décision — réessayez.",
+      "status_applied": "Approuvé et appliqué — les leçons se mettent à jour dès la prochaine session.",
+      "status_declined": "Refusé — rien ne change.",
+      "status_failed": "Approuvé, mais l'application a échoué — notre équipe est prévenue.",
+      "history": "Décisions récentes ({count})"
     }
   },
   "brain_clone": {
