@@ -14,7 +14,7 @@ import { LearningHero, FloatingMetricCard, GlassCard, InsightChip, EmptyState } 
 import { listLearnersForMember } from "@/lib/db/team-invites";
 import { getIEPForLearner, getLearner, refreshLearnerReadiness } from "@/lib/db/repos";
 import type { LearnerProfile } from "@/lib/db/types";
-import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
+import { READINESS_LABEL, READINESS_TONE, needsSupportCount, readinessBadgeClass } from "@/lib/learner/readiness";
 import { buildGreeting } from "@/lib/utils/greeting";
 
 export const dynamic = "force-dynamic";
@@ -35,12 +35,7 @@ export default async function TherapistHomePage() {
     })),
   );
   const iepCount = fresh.filter((l) => l.iep !== null).length;
-  const needsSupport = fresh.filter(
-    (l) =>
-      l.readinessState === "assessment_needed" ||
-      l.readinessState === "baseline_needed" ||
-      l.readinessState === "brain_clone_review_needed",
-  ).length;
+  const needsSupport = needsSupportCount(fresh);
 
   const heroSubhead =
     fresh.length === 0
@@ -154,11 +149,7 @@ export default async function TherapistHomePage() {
                     <span
                       className={
                         "shrink-0 inline-flex items-center rounded-iw-chip px-2 py-0.5 text-[10px] font-semibold border " +
-                        (READINESS_TONE[l.readinessState] === "success"
-                          ? "bg-[var(--aivo-color-status-success-subtle)] text-[var(--aivo-color-status-success-strong)] border-[var(--aivo-color-status-success-default)]"
-                          : READINESS_TONE[l.readinessState] === "warning"
-                            ? "bg-[var(--aivo-color-status-warning-subtle)] text-[var(--aivo-color-status-warning-strong)] border-[var(--aivo-color-status-warning-default)]"
-                            : "bg-[var(--aivo-color-surface-muted)] text-[var(--aivo-color-text-muted)] border-[var(--aivo-color-border-subtle)]")
+                        readinessBadgeClass(READINESS_TONE[l.readinessState])
                       }
                     >
                       {READINESS_LABEL[l.readinessState]}

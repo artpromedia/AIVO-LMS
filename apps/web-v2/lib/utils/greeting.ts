@@ -1,7 +1,7 @@
 /**
  * Shared greeting utilities used by role home pages.
  *
- * Centralising these two helpers prevents logic drift between the
+ * Centralizing these two helpers prevents logic drift between the
  * teacher, therapist, and caregiver home dashboards.
  */
 
