@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { eq, and, desc, isNull, asc, sql } from "drizzle-orm";
+import { eq, and, desc, isNull, asc, sql, inArray } from "drizzle-orm";
 import {
   learners,
   learnerSettings,
@@ -9,6 +9,8 @@ import {
   learnerBadges,
   users,
   parentInAppNotifications,
+  brainStates,
+  lessonRuns,
 } from "@aivo/db";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
 import {
@@ -28,6 +30,8 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-
 function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID_REGEX.test(value);
 }
+
+type ParentLearnerRow = Record<string, unknown> & { id: string };
 
 export async function registerParentDashboardRoutes(app: FastifyInstance) {
   const db = (app as any).db;
@@ -446,21 +450,25 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
         return reply.code(403).send({ error: "Forbidden" });
 
       let parent: { lastDashboardVisit: Date | null; name: string | null } | undefined;
-      let parentLearners: any[] = [];
+      let parentLearners: ParentLearnerRow[] = [];
       try {
         [parent] = await db
           .select({ lastDashboardVisit: users.lastDashboardVisit, name: users.name })
           .from(users)
           .where(eq(users.id, parentId));
-        parentLearners = await db.select().from(learners).where(eq(learners.parentId, parentId));
+        parentLearners = (await db
+          .select()
+          .from(learners)
+          .where(eq(learners.parentId, parentId))) as ParentLearnerRow[];
       } catch (_err) {
         return { parent: null, learners: [] };
       }
 
-      let learnerSummaries: any[] = [];
+      const learnerIds = parentLearners.map((learner) => learner.id);
+      let learnerSummaries: ParentLearnerRow[] = [];
       try {
         learnerSummaries = await Promise.all(
-          parentLearners.map(async (l: any) => {
+          parentLearners.map(async (l) => {
             const [streak] = await db
               .select()
               .from(learnerStreaks)
@@ -486,12 +494,51 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
         );
       } catch (err) {
         app.log.error({ err, parentId }, "Failed to build parent summary");
-        learnerSummaries = parentLearners.map((l: any) => ({
+        learnerSummaries = parentLearners.map((l) => ({
           ...l,
           streak: { currentStreak: 0, longestStreak: 0 },
           badgeCount: 0,
           recentMilestones: [],
         }));
+      }
+
+      let activeTutors = 0;
+      let sessionsThisWeek = 0;
+      if (learnerIds.length > 0) {
+        try {
+          const states = await db
+            .select({ activeTutors: brainStates.activeTutors })
+            .from(brainStates)
+            .where(inArray(brainStates.learnerId, learnerIds));
+          const tutorIds = new Set<string>();
+          for (const state of states) {
+            const tutors = Array.isArray(state.activeTutors) ? state.activeTutors : [];
+            for (const tutor of tutors) {
+              if (typeof tutor === "string" && tutor.trim().length > 0) {
+                tutorIds.add(tutor);
+              }
+            }
+          }
+          activeTutors = tutorIds.size;
+        } catch (err) {
+          app.log.error({ err, parentId }, "Failed to build parent active tutors summary");
+        }
+
+        try {
+          const weekStart = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+          const [sessionCount] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(lessonRuns)
+            .where(
+              and(
+                inArray(lessonRuns.learnerId, learnerIds),
+                sql`${lessonRuns.createdAt} >= ${weekStart}`,
+              ),
+            );
+          sessionsThisWeek = Number(sessionCount?.count || 0);
+        } catch (err) {
+          app.log.error({ err, parentId }, "Failed to build parent session summary");
+        }
       }
 
       try {
@@ -506,6 +553,10 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
       return {
         parent: { name: parent?.name, lastDashboardVisit: parent?.lastDashboardVisit },
         learners: learnerSummaries,
+        summary: {
+          activeTutors,
+          sessionsThisWeek,
+        },
       };
     },
   );

@@ -7,7 +7,8 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useLearners } from "@/hooks/useLearners";
 import { useParentInbox } from "@/hooks/useParentInbox";
-import { EmptyState } from "@aivo/mobile-ui";
+import { useParentSummary } from "@/hooks/useParentSummary";
+import { EmptyState, LoadingState } from "@aivo/mobile-ui";
 import { spacing, radius } from "@/constants/colors";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { fontFamilies } from "@/constants/typography";
@@ -20,8 +21,19 @@ import { useResponsiveType } from "@/src/design/useResponsiveType";
 export default function ParentDashboard() {
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
-  const { data: learners, refetch } = useLearners();
-  const { data: inbox } = useParentInbox(user?.id ?? "");
+  const {
+    data: learners,
+    isLoading: learnersLoading,
+    isError: learnersError,
+    refetch: refetchLearners,
+  } = useLearners();
+  const { data: inbox, refetch: refetchInbox } = useParentInbox(user?.id ?? "");
+  const {
+    data: parentSummary,
+    isLoading: summaryLoading,
+    isError: summaryError,
+    refetch: refetchSummary,
+  } = useParentSummary(user?.id ?? "");
   const unreadCount = inbox?.unreadCount ?? 0;
   const [refreshing, setRefreshing] = React.useState(false);
   const { t } = useTranslation();
@@ -40,7 +52,7 @@ export default function ParentDashboard() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await refetch();
+    await Promise.allSettled([refetchLearners(), refetchInbox(), refetchSummary()]);
     setRefreshing(false);
   };
 
@@ -111,30 +123,42 @@ export default function ParentDashboard() {
           </View>
         </View>
 
-        {/* Stats row */}
-        <View style={styles.statsRow}>
-          <StatTile
-            label={t("parent.children")}
-            value={learners?.length || 0}
-            icon="people"
-            tint={palette.primary}
-            tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
+        {learnersLoading || summaryLoading ? (
+          <LoadingState message={t("common.loading", "Loading...")} />
+        ) : learnersError || summaryError ? (
+          <EmptyState
+            icon={<Ionicons name="bar-chart-outline" size={48} color={palette.inkMuted} />}
+            title={t("parent.statsUnavailableTitle", "Stats unavailable")}
+            message={t(
+              "parent.statsUnavailableMessage",
+              "We couldn't load your family summary right now.",
+            )}
           />
-          <StatTile
-            label={t("parent.activeTutors")}
-            value={7}
-            icon="school"
-            tint={palette.accent}
-            tintSoft={palette.accentSoft}
-          />
-          <StatTile
-            label={t("parent.sessions")}
-            value={24}
-            icon="book"
-            tint={palette.warm}
-            tintSoft={palette.warmSoft}
-          />
-        </View>
+        ) : (
+          <View style={styles.statsRow}>
+            <StatTile
+              label={t("parent.children")}
+              value={learners?.length ?? 0}
+              icon="people"
+              tint={palette.primary}
+              tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
+            />
+            <StatTile
+              label={t("parent.activeTutors")}
+              value={parentSummary?.summary.activeTutors ?? 0}
+              icon="school"
+              tint={palette.accent}
+              tintSoft={palette.accentSoft}
+            />
+            <StatTile
+              label={t("parent.sessions")}
+              value={parentSummary?.summary.sessionsThisWeek ?? 0}
+              icon="book"
+              tint={palette.warm}
+              tintSoft={palette.warmSoft}
+            />
+          </View>
+        )}
 
         <View style={styles.sectionHeader}>
           <Pressable
@@ -157,7 +181,18 @@ export default function ParentDashboard() {
           </Pressable>
         </View>
 
-        {!learners || learners.length === 0 ? (
+        {learnersLoading ? (
+          <LoadingState message={t("common.loading", "Loading...")} />
+        ) : learnersError ? (
+          <EmptyState
+            icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
+            title={t("parent.childrenUnavailableTitle", "Learners unavailable")}
+            message={t(
+              "parent.childrenUnavailableMessage",
+              "We couldn't load your learners right now.",
+            )}
+          />
+        ) : !learners || learners.length === 0 ? (
           <EmptyState
             icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
             title={t("parent.noChildrenTitle")}
