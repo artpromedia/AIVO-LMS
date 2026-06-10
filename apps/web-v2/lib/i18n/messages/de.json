@@ -466,7 +466,9 @@
       "no_learners": "Noch keine Lernenden",
       "no_learners_body": "Füge einen Lernenden von der Startseite hinzu, um Fortschrittsberichte zu erstellen.",
       "open_learner": "Lernenden öffnen →",
-      "recent_lessons": "Letzte Lektionen"
+      "recent_lessons": "Letzte Lektionen",
+      "period_label_30d": "vs letzte 30 Tage",
+      "period_label_all_time": "gesamt"
     },
     "settings_account_form": {
       "display_name": "Anzeigename",
@@ -2669,7 +2671,9 @@
       "no_learners_yet": "Noch keine Lernenden",
       "connect_roster": "Liste verbinden",
       "roster_snapshot": "Listenübersicht",
-      "add_another_class": "Weitere Klasse hinzufügen"
+      "add_another_class": "Weitere Klasse hinzufügen",
+      "period_label_this_week": "diese Woche",
+      "period_label_vs_last_week": "vs letzte Woche"
     },
     "lesson_plans": {
       "page_title": "KI-Unterrichtspläne",
@@ -2822,7 +2826,11 @@
       "link_sessions": "Sitzungen →",
       "link_reports": "Berichte →",
       "section_caseload": "Fallaufkommen",
-      "empty_title": "Noch keine Lernenden"
+      "empty_title": "Noch keine Lernenden",
+      "stat_ready_for_session": "Sitzungsbereit",
+      "period_label_active": "aktiv",
+      "period_label_vs_last_week": "vs letzte Woche",
+      "period_label_this_week": "diese Woche"
     },
     "reports": {
       "title": "Berichte",
@@ -2851,7 +2859,10 @@
       "link_observations": "Beobachtungen →",
       "link_roster": "Liste →",
       "your_learners": "Ihre Lernenden",
-      "no_learners_yet": "Noch keine Lernenden"
+      "no_learners_yet": "Noch keine Lernenden",
+      "period_label_active": "aktiv",
+      "period_label_vs_last_week": "vs letzte Woche",
+      "period_label_this_week": "diese Woche"
     },
     "learners": {
       "title": "Lernende",

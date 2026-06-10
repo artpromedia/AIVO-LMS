@@ -466,7 +466,9 @@
       "no_learners": "لا يوجد متعلّمون بعد",
       "no_learners_body": "أضِف متعلّمًا من الصفحة الرئيسية للبدء في إنشاء تقارير التقدم.",
       "open_learner": "فتح المتعلّم ←",
-      "recent_lessons": "الدروس الأخيرة"
+      "recent_lessons": "الدروس الأخيرة",
+      "period_label_30d": "مقارنة بآخر 30 يومًا",
+      "period_label_all_time": "منذ البداية"
     },
     "settings_account_form": {
       "display_name": "اسم العرض",
@@ -2669,7 +2671,9 @@
       "no_learners_yet": "لا يوجد متعلّمون بعد",
       "connect_roster": "ربط القائمة",
       "roster_snapshot": "لمحة عن القائمة",
-      "add_another_class": "إضافة فصل آخر"
+      "add_another_class": "إضافة فصل آخر",
+      "period_label_this_week": "هذا الأسبوع",
+      "period_label_vs_last_week": "مقارنة بالأسبوع الماضي"
     },
     "lesson_plans": {
       "page_title": "خطط الدروس بالذكاء الاصطناعي",
@@ -2822,7 +2826,11 @@
       "link_sessions": "الجلسات →",
       "link_reports": "التقارير →",
       "section_caseload": "حجم الحالات",
-      "empty_title": "لا يوجد متعلّمون بعد"
+      "empty_title": "لا يوجد متعلّمون بعد",
+      "stat_ready_for_session": "جاهز للجلسة",
+      "period_label_active": "نشط",
+      "period_label_vs_last_week": "مقارنة بالأسبوع الماضي",
+      "period_label_this_week": "هذا الأسبوع"
     },
     "reports": {
       "title": "التقارير",
@@ -2851,7 +2859,10 @@
       "link_observations": "الملاحظات ←",
       "link_roster": "القائمة ←",
       "your_learners": "المتعلّمون لديك",
-      "no_learners_yet": "لا يوجد متعلّمون بعد"
+      "no_learners_yet": "لا يوجد متعلّمون بعد",
+      "period_label_active": "نشط",
+      "period_label_vs_last_week": "مقارنة بالأسبوع الماضي",
+      "period_label_this_week": "هذا الأسبوع"
     },
     "learners": {
       "title": "المتعلّمون",

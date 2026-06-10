@@ -466,7 +466,9 @@
       "no_learners": "Pas encore d'apprenant",
       "no_learners_body": "Ajoutez un apprenant depuis la page d'accueil pour commencer à générer des rapports de progression.",
       "open_learner": "Ouvrir l'apprenant →",
-      "recent_lessons": "Leçons récentes"
+      "recent_lessons": "Leçons récentes",
+      "period_label_30d": "vs 30 derniers jours",
+      "period_label_all_time": "depuis le début"
     },
     "settings_account_form": {
       "display_name": "Nom d'affichage",
@@ -2669,7 +2671,9 @@
       "no_learners_yet": "Aucun apprenant pour l'instant",
       "connect_roster": "Connecter la liste",
       "roster_snapshot": "Aperçu de la liste",
-      "add_another_class": "Ajouter une autre classe"
+      "add_another_class": "Ajouter une autre classe",
+      "period_label_this_week": "cette semaine",
+      "period_label_vs_last_week": "vs la semaine dernière"
     },
     "lesson_plans": {
       "page_title": "Plans de cours avec AI",
@@ -2822,7 +2826,11 @@
       "link_sessions": "Séances →",
       "link_reports": "Rapports →",
       "section_caseload": "Charge de cas",
-      "empty_title": "Aucun apprenant pour le moment"
+      "empty_title": "Aucun apprenant pour le moment",
+      "stat_ready_for_session": "Prêts pour la séance",
+      "period_label_active": "actif",
+      "period_label_vs_last_week": "vs la semaine dernière",
+      "period_label_this_week": "cette semaine"
     },
     "reports": {
       "title": "Rapports",
@@ -2851,7 +2859,10 @@
       "link_observations": "Observations →",
       "link_roster": "Liste →",
       "your_learners": "Vos apprenants",
-      "no_learners_yet": "Aucun apprenant pour le moment"
+      "no_learners_yet": "Aucun apprenant pour le moment",
+      "period_label_active": "actif",
+      "period_label_vs_last_week": "vs la semaine dernière",
+      "period_label_this_week": "cette semaine"
     },
     "learners": {
       "title": "Apprenants",

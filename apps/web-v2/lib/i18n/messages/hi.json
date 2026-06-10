@@ -466,7 +466,9 @@
       "no_learners": "अभी कोई शिक्षार्थी नहीं",
       "no_learners_body": "प्रगति रिपोर्ट बनाना शुरू करने के लिए होम पेज से एक शिक्षार्थी जोड़ें।",
       "open_learner": "शिक्षार्थी खोलें →",
-      "recent_lessons": "हाल के पाठ"
+      "recent_lessons": "हाल के पाठ",
+      "period_label_30d": "पिछले 30 दिनों की तुलना में",
+      "period_label_all_time": "शुरू से अब तक"
     },
     "settings_account_form": {
       "display_name": "प्रदर्शन नाम",
@@ -2669,7 +2671,9 @@
       "no_learners_yet": "अभी कोई शिक्षार्थी नहीं",
       "connect_roster": "सूची जोड़ें",
       "roster_snapshot": "सूची का सारांश",
-      "add_another_class": "एक और कक्षा जोड़ें"
+      "add_another_class": "एक और कक्षा जोड़ें",
+      "period_label_this_week": "इस सप्ताह",
+      "period_label_vs_last_week": "पिछले सप्ताह की तुलना में"
     },
     "lesson_plans": {
       "page_title": "AI पाठ योजनाएँ",
@@ -2822,7 +2826,11 @@
       "link_sessions": "सत्र →",
       "link_reports": "रिपोर्ट →",
       "section_caseload": "केसलोड",
-      "empty_title": "अभी कोई सीखने वाला नहीं"
+      "empty_title": "अभी कोई सीखने वाला नहीं",
+      "stat_ready_for_session": "सत्र के लिए तैयार",
+      "period_label_active": "सक्रिय",
+      "period_label_vs_last_week": "पिछले सप्ताह की तुलना में",
+      "period_label_this_week": "इस सप्ताह"
     },
     "reports": {
       "title": "रिपोर्ट",
@@ -2851,7 +2859,10 @@
       "link_observations": "अवलोकन →",
       "link_roster": "सूची →",
       "your_learners": "आपके सीखने वाले",
-      "no_learners_yet": "अभी तक कोई सीखने वाला नहीं"
+      "no_learners_yet": "अभी तक कोई सीखने वाला नहीं",
+      "period_label_active": "सक्रिय",
+      "period_label_vs_last_week": "पिछले सप्ताह की तुलना में",
+      "period_label_this_week": "इस सप्ताह"
     },
     "learners": {
       "title": "सीखने वाले",

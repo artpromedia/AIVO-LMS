@@ -657,7 +657,9 @@
       "no_learners": "No learners yet",
       "no_learners_body": "Add a learner from the home page to begin generating progress reports.",
       "open_learner": "Open learner →",
-      "recent_lessons": "Recent lessons"
+      "recent_lessons": "Recent lessons",
+      "period_label_30d": "vs last 30 days",
+      "period_label_all_time": "all time"
     },
     "settings_account_form": {
       "display_name": "Display name",
@@ -2669,7 +2671,9 @@
       "no_learners_yet": "No learners yet",
       "connect_roster": "Connect roster",
       "roster_snapshot": "Roster snapshot",
-      "add_another_class": "Add another class"
+      "add_another_class": "Add another class",
+      "period_label_this_week": "this week",
+      "period_label_vs_last_week": "vs last week"
     },
     "lesson_plans": {
       "page_title": "AI lesson plans",
@@ -2822,7 +2826,11 @@
       "link_sessions": "Sessions →",
       "link_reports": "Reports →",
       "section_caseload": "Caseload",
-      "empty_title": "No learners yet"
+      "empty_title": "No learners yet",
+      "stat_ready_for_session": "Ready for session",
+      "period_label_active": "active",
+      "period_label_vs_last_week": "vs last week",
+      "period_label_this_week": "this week"
     },
     "reports": {
       "title": "Reports",
@@ -2851,7 +2859,10 @@
       "link_observations": "Observations →",
       "link_roster": "Roster →",
       "your_learners": "Your learners",
-      "no_learners_yet": "No learners yet"
+      "no_learners_yet": "No learners yet",
+      "period_label_active": "active",
+      "period_label_vs_last_week": "vs last week",
+      "period_label_this_week": "this week"
     },
     "learners": {
       "title": "Learners",
