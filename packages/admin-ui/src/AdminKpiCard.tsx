@@ -28,12 +28,15 @@ export function AdminKpiCard({
   return (
     <section className="admin-card p-5" data-testid={testId}>
       <p className="text-sm font-semibold text-slate-500">{label}</p>
-      <p className="admin-tabular mt-2 text-3xl font-semibold">{format(value)}</p>
+      <p className="admin-tabular mt-2 text-3xl font-semibold" data-testid="kpi-value">
+        {format(value)}
+      </p>
       {delta !== undefined ? (
         <p
           className={`admin-tabular mt-1 text-sm font-semibold ${
             delta >= 0 ? "admin-kpi-delta-up" : "admin-kpi-delta-down"
           }`}
+          data-testid="kpi-delta"
         >
           {delta >= 0 ? "+" : "-"}
           {format(Math.abs(delta))} {deltaCaption}

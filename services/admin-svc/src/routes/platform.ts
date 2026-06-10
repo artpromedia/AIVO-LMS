@@ -25,6 +25,7 @@ import { Permission, verifyJWT } from "@aivo/security";
 import { asc, count, desc, eq, gte, sql } from "drizzle-orm";
 import { requirePermission } from "../lib/permissions.js";
 import { computeTrialConversion } from "../lib/trial-conversion.js";
+import { testFaultEnabled } from "./test-helpers.js";
 import {
   USAGE_TRENDS_DEFAULT_DAYS,
   buildUsageTrendSeries,
@@ -289,7 +290,12 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
       schema: getAdminSvcPlatformSystemHealthSchema,
       preHandler: (req, reply) => requirePermission(req, reply, Permission.PlatformRead),
     },
-    async () => {
+    async (_req, reply) => {
+      // e2e fault injection (ADMIN_TEST_MODE only): lets the dashboard spec
+      // prove per-widget degradation without stubbing the UI.
+      if (testFaultEnabled("system-health")) {
+        return reply.status(503).send({ error: "injected_fault" });
+      }
       const tenantTypeRows = await db
         .select({ type: tenants.type, count: count() })
         .from(tenants)

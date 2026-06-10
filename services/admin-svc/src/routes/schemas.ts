@@ -326,7 +326,7 @@ export const getAdminSvcPlatformSystemHealthSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcPlatformSystemHealth",
   summary: "GET /api/admin-svc/platform/system-health",
-  response: { 200: passthroughObject },
+  response: { 200: passthroughObject, 503: passthroughObject },
 } as const;
 
 export const getAdminSvcPlatformUsageTrendsSchema = {

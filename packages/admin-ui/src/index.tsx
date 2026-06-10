@@ -39,7 +39,7 @@ export function AdminPageFrame({
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-700">{eyebrow}</p>
-            <h1 className="mt-3 text-4xl font-black">{title}</h1>
+            <h1 className="admin-h1 mt-3 text-4xl">{title}</h1>
             {description ? <p className="mt-2 text-slate-600">{description}</p> : null}
           </div>
           {action}

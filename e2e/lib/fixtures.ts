@@ -76,6 +76,27 @@ export async function skipUnlessWebReachable(testInfo = test.info()): Promise<vo
   }
 }
 
+/** Probe admin-svc's test-mode helpers (ADMIN_TEST_MODE=1: fault injection +
+ *  platform-metrics seeds). Same environment-guard contract as the identity
+ *  probe — false means the helpers are off, not that the test is stubbed. */
+export async function adminSvcTestModeReachable(): Promise<boolean> {
+  try {
+    const ctx = await pwRequest.newContext({ baseURL: ADMIN_BASE });
+    const res = await ctx.get("/api/__test__/health", { failOnStatusCode: false });
+    await ctx.dispose();
+    return res.status() === 200;
+  } catch {
+    return false;
+  }
+}
+
+/** Skip the active test when admin-svc test-mode helpers are off. */
+export async function skipUnlessAdminSvcTestMode(testInfo = test.info()): Promise<void> {
+  if (!(await adminSvcTestModeReachable())) {
+    testInfo.skip(true, "admin-svc test-mode helpers unreachable");
+  }
+}
+
 async function seedUser(role: string, email: string, password: string): Promise<SeededUser | null> {
   try {
     const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
@@ -291,7 +312,26 @@ export const T = {
   chartCheckFunnel: "chart-check-funnel",
   chartCheckKpi: "chart-check-kpi",
   chartCheckSparkline: "chart-check-sparkline",
+  // web-admin /platform — operations dashboard panels (Sprint: overview).
+  platformQuickActions: "platform-quick-actions",
+  platformKpiTenants: "platform-kpi-tenants",
+  platformKpiUsers: "platform-kpi-users",
+  platformKpiLearners: "platform-kpi-learners",
+  platformKpiAiCost: "platform-kpi-ai-cost",
+  platformAiRequests: "platform-ai-requests",
+  platformTenantMix: "platform-tenant-mix",
+  platformCompletionGauge: "platform-completion-gauge",
+  platformTrialFunnel: "platform-trial-funnel",
+  platformPilotsTable: "platform-pilots-table",
+  pilotRow: "pilot-row",
   // Inner hooks rendered by the @aivo/admin-ui primitives themselves.
   donutCenterTotal: "donut-center-total",
   gaugeCenterLabel: "gauge-center-label",
+  kpiValue: "kpi-value",
+  kpiDelta: "kpi-delta",
 } as const;
+
+/** data-testid of a panel's degraded state (see web-admin PanelError). */
+export function tErr(panelTestId: string): string {
+  return `${panelTestId}-error`;
+}

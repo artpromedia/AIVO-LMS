@@ -31,16 +31,16 @@ body {
   color: #172033;
 }
 
-/* Enterprise heading scale — calmer than the consumer font-black tone. */
+/* Enterprise heading scale — calmer than the consumer font-black tone.
+   Size stays a utility concern (text-4xl etc.); these own weight/tracking. */
 .admin-h1 {
-  font-size: 2rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: #172033;
 }
 
 .admin-h2 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: #172033;
@@ -49,6 +49,23 @@ body {
 /* Tabular figures for KPI values and table numerics so columns align. */
 .admin-tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* Skeleton bars for a panel whose data source is degraded. */
+.admin-skeleton {
+  border-radius: 6px;
+  background: rgba(23, 32, 51, 0.08);
+  animation: admin-skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes admin-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 
 .admin-kpi-delta-up {

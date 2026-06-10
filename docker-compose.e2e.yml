@@ -173,8 +173,14 @@ services:
       INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
       # Enables /api/__test__/billing/* helpers; gated to NODE_ENV != production.
       BILLING_TEST_MODE: "1"
+      # billing's admin pilot reads verify the caller's identity-minted RS256
+      # bearer token, so it must share the stack keypair (see jwt-keygen).
+      JWT_KEY_DIR: /keys
+    volumes:
+      - jwt-keys:/keys:ro
     depends_on:
       postgres: { condition: service_healthy }
+      jwt-keygen: { condition: service_completed_successfully }
     ports:
       - "3009:3009"
     healthcheck:
@@ -247,6 +253,9 @@ services:
       IDENTITY_SVC_URL: http://identity-svc:3001
       INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
       JWT_KEY_DIR: /keys
+      # Enables /api/__test__/* helpers (fault injection + platform-metrics
+      # seeds) consumed by e2e/specs/admin. Gated to NODE_ENV != production.
+      ADMIN_TEST_MODE: "1"
     volumes:
       - jwt-keys:/keys:ro
     depends_on:
