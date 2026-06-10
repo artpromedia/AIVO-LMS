@@ -1,26 +1,63 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, queryOptions } from "@tanstack/react-query";
 import { API } from "@/constants/api";
 import { apiFetch } from "@/lib/api";
 
-// eslint-disable-next-line no-restricted-syntax -- TODO(family-svc): replace with generated @aivo/api-client type once /api/family/summary/:parentId has an explicit typed response schema.
-export interface ParentSummaryResponse {
+/**
+ * Summary shape returned by `GET /api/family/summary/:parentId`.
+ * The backend returns `{ parent, learners, summary }` — we augment this
+ * with optional server-provided 7-day trend arrays. When the server does
+ * not supply trends we return empty arrays (never fabricated data) and
+ * the dashboards simply hide the sparklines.
+ */
+export interface ParentSummaryLearner {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  gradeLevel?: string | null;
+  functioningLevel?: string | null;
+  streak?: { currentStreak: number; longestStreak: number };
+  badgeCount?: number;
+  recentMilestones?: unknown[];
+}
+
+export interface ParentSummaryData {
   parent: { name: string | null; lastDashboardVisit: string | null } | null;
-  learners: {
-    id: string;
-    firstName?: string;
-    lastName?: string;
-    gradeLevel?: string;
-    streak?: { currentStreak: number; longestStreak: number };
-    badgeCount?: number;
-    recentMilestones?: unknown[];
-  }[];
+  learners: ParentSummaryLearner[];
+  /** Nested summary exactly as returned by family-svc. */
   summary: {
     activeTutors: number;
     sessionsThisWeek: number;
   };
+  /** Raw active tutor count (latest) — convenience mirror of `summary`. */
+  activeTutors: number;
+  /** Raw session count this week (latest) — convenience mirror of `summary`. */
+  sessionsThisWeek: number;
+  /** Last 7 days of active-tutors counts (index 0 = oldest). Server-provided
+   *  only; empty when the endpoint doesn't expose history yet. */
+  activeTutorsTrend: number[];
+  /** Last 7 days of session counts (index 0 = oldest). Server-provided only. */
+  sessionsThisWeekTrend: number[];
 }
 
-export async function fetchParentSummary(parentId: string): Promise<ParentSummaryResponse> {
+// TODO: import from @aivo/api-client/family-svc once the summary route exposes
+// typed trend fields.
+// eslint-disable-next-line no-restricted-syntax -- see TODO above
+interface RawSummaryResponse {
+  parent?: { name: string | null; lastDashboardVisit: string | null } | null;
+  learners?: ParentSummaryLearner[];
+  summary?: {
+    activeTutors?: number;
+    sessionsThisWeek?: number;
+  };
+  // Future server extension: flat fields / trend arrays.
+  activeTutors?: number;
+  sessionsThisWeek?: number;
+  activeTutorsTrend?: number[];
+  sessionsThisWeekTrend?: number[];
+}
+
+/** Pure fetcher — exported for tests. */
+export async function fetchParentSummary(parentId: string): Promise<ParentSummaryData> {
   const res = await apiFetch(API.FAMILY, `/api/family/summary/${parentId}`);
   if (!res.ok) {
     let message = "Failed to load parent summary";
@@ -32,18 +69,41 @@ export async function fetchParentSummary(parentId: string): Promise<ParentSummar
     }
     throw new Error(message);
   }
-  return (await res.json()) as ParentSummaryResponse;
+
+  const raw = (await res.json()) as RawSummaryResponse;
+
+  const activeTutors = raw.summary?.activeTutors ?? raw.activeTutors ?? 0;
+  const sessionsThisWeek = raw.summary?.sessionsThisWeek ?? raw.sessionsThisWeek ?? 0;
+
+  // Only surface trends the server actually computed. No client-side
+  // fabrication — an empty array makes the dashboards hide the sparkline.
+  const activeTutorsTrend = Array.isArray(raw.activeTutorsTrend) ? raw.activeTutorsTrend : [];
+  const sessionsThisWeekTrend = Array.isArray(raw.sessionsThisWeekTrend)
+    ? raw.sessionsThisWeekTrend
+    : [];
+
+  return {
+    parent: raw.parent ?? null,
+    learners: raw.learners ?? [],
+    summary: { activeTutors, sessionsThisWeek },
+    activeTutors,
+    sessionsThisWeek,
+    activeTutorsTrend,
+    sessionsThisWeekTrend,
+  };
 }
 
+/** Query options — exported for tests and prefetching. */
 export function parentSummaryQueryOptions(parentId: string) {
-  return {
+  return queryOptions<ParentSummaryData>({
     queryKey: ["parent-summary", parentId],
     queryFn: () => fetchParentSummary(parentId),
     enabled: !!parentId,
-    staleTime: 30 * 1000,
-  } as const;
+    staleTime: 60 * 1000,
+  });
 }
 
+/** React Query wrapper. Parent-only; family-svc enforces ownership. */
 export function useParentSummary(parentId: string) {
-  return useQuery<ParentSummaryResponse>(parentSummaryQueryOptions(parentId));
+  return useQuery(parentSummaryQueryOptions(parentId));
 }

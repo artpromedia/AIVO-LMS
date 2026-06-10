@@ -153,7 +153,11 @@
     "team": "टीम",
     "tutorStore": "ट्यूटर स्टोर",
     "billing": "बिलिंग",
-    "loginAsLearner": "शिक्षार्थी के रूप में लॉगिन करें"
+    "loginAsLearner": "शिक्षार्थी के रूप में लॉगिन करें",
+    "activeTutorsTrend": "सक्रिय ट्यूटर प्रवृत्ति",
+    "sessionsTrend": "इस सप्ताह सत्र प्रवृत्ति",
+    "masteryBySubject": "विषय अनुसार महारत",
+    "reports": "रिपोर्ट"
   },
   "parentSettings": {
     "title": "सेटिंग्स",
@@ -448,7 +452,13 @@
     "homework": "होमवर्क",
     "quests": "क्वेस्ट",
     "badgesLabel": "बैज",
-    "grades": "ग्रेड"
+    "grades": "ग्रेड",
+    "xpTrend": "7 दिनों में XP",
+    "masteryBySubject": "विषय अनुसार महारत",
+    "progress": "प्रगति",
+    "subjects": "विषय",
+    "missions": "मिशन",
+    "library": "पुस्तकालय"
   },
   "learnerBrain": {
     "title": "मेरा दिमाग",

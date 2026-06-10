@@ -1,3 +1,14 @@
+/**
+ * Contract test for the `useParentSummary` hook's pure fetcher.
+ *
+ * Verifies that:
+ * - The correct family-svc endpoint is called with the parentId.
+ * - The real nested `summary { activeTutors, sessionsThisWeek }` shape is
+ *   parsed, with future flat-field support.
+ * - Server-supplied trend arrays pass through unchanged when present.
+ * - Omitted trends produce EMPTY arrays — no client-side fabrication.
+ * - Non-2xx responses surface a meaningful error message.
+ */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { fetchParentSummary, parentSummaryQueryOptions } from "../hooks/useParentSummary";
@@ -28,16 +39,23 @@ function createDeferred<T>() {
   return { promise, resolve, reject };
 }
 
-describe("useParentSummary", () => {
+const BASE_PAYLOAD = {
+  parent: { name: "Jane Doe", lastDashboardVisit: "2026-06-01T10:00:00Z" },
+  learners: [
+    { id: "l1", firstName: "Alice", lastName: "Doe", gradeLevel: "3rd" },
+    { id: "l2", firstName: "Bob", lastName: "Doe", gradeLevel: "5th" },
+  ],
+};
+
+describe("fetchParentSummary", () => {
   beforeEach(() => {
     apiFetchMock.mockReset();
   });
 
-  it("GETs /api/family/summary/:parentId and returns the parent summary payload", async () => {
+  it("GETs /api/family/summary/:parentId and parses the nested summary shape", async () => {
     apiFetchMock.mockResolvedValueOnce(
       jsonResponse({
-        parent: { name: "Pat Parent", lastDashboardVisit: "2026-06-10T00:00:00.000Z" },
-        learners: [{ id: "learner-1", badgeCount: 2 }],
+        ...BASE_PAYLOAD,
         summary: { activeTutors: 3, sessionsThisWeek: 5 },
       }),
     );
@@ -49,8 +67,99 @@ describe("useParentSummary", () => {
     expect(base).toBe("https://family.test");
     expect(path).toBe("/api/family/summary/parent-1");
     expect(init).toBeUndefined();
+    expect(result.parent?.name).toBe("Jane Doe");
+    expect(result.learners).toHaveLength(2);
     expect(result.summary).toEqual({ activeTutors: 3, sessionsThisWeek: 5 });
-    expect(result.learners).toHaveLength(1);
+    expect(result.activeTutors).toBe(3);
+    expect(result.sessionsThisWeek).toBe(5);
+  });
+
+  it("supports future flat-field responses", async () => {
+    apiFetchMock.mockResolvedValueOnce(
+      jsonResponse({ ...BASE_PAYLOAD, activeTutors: 5, sessionsThisWeek: 12 }),
+    );
+
+    const result = await fetchParentSummary("parent-flat");
+
+    expect(result.activeTutors).toBe(5);
+    expect(result.sessionsThisWeek).toBe(12);
+    expect(result.summary).toEqual({ activeTutors: 5, sessionsThisWeek: 12 });
+  });
+
+  it("passes through server-supplied trend arrays when provided", async () => {
+    const activeTutorsTrend = [4, 5, 5, 6, 6, 5, 7];
+    const sessionsThisWeekTrend = [10, 11, 12, 11, 13, 12, 14];
+    apiFetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        ...BASE_PAYLOAD,
+        summary: { activeTutors: 7, sessionsThisWeek: 14 },
+        activeTutorsTrend,
+        sessionsThisWeekTrend,
+      }),
+    );
+
+    const result = await fetchParentSummary("parent-2");
+
+    expect(result.activeTutorsTrend).toEqual(activeTutorsTrend);
+    expect(result.sessionsThisWeekTrend).toEqual(sessionsThisWeekTrend);
+  });
+
+  it("returns EMPTY trend arrays when the server omits trends — never fabricates", async () => {
+    apiFetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        ...BASE_PAYLOAD,
+        summary: { activeTutors: 8, sessionsThisWeek: 20 },
+      }),
+    );
+
+    const result = await fetchParentSummary("parent-3");
+
+    expect(result.activeTutorsTrend).toEqual([]);
+    expect(result.sessionsThisWeekTrend).toEqual([]);
+    // Scalar values still surface honestly.
+    expect(result.activeTutors).toBe(8);
+    expect(result.sessionsThisWeek).toBe(20);
+  });
+
+  it("preserves the honest empty-state payload when no learners or sessions exist", async () => {
+    apiFetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        parent: { name: null, lastDashboardVisit: null },
+        learners: [],
+        summary: { activeTutors: 0, sessionsThisWeek: 0 },
+      }),
+    );
+
+    const result = await fetchParentSummary("parent-empty");
+
+    expect(result.learners).toEqual([]);
+    expect(result.summary.activeTutors).toBe(0);
+    expect(result.summary.sessionsThisWeek).toBe(0);
+    expect(result.activeTutorsTrend).toEqual([]);
+    expect(result.sessionsThisWeekTrend).toEqual([]);
+  });
+
+  it("gracefully handles a response with no learner data", async () => {
+    apiFetchMock.mockResolvedValueOnce(jsonResponse({ parent: null, learners: [] }));
+
+    const result = await fetchParentSummary("parent-5");
+
+    expect(result.parent).toBeNull();
+    expect(result.learners).toEqual([]);
+    expect(result.activeTutors).toBe(0);
+    expect(result.activeTutorsTrend).toEqual([]);
+  });
+
+  it("throws the upstream error instead of fabricating stats on failure", async () => {
+    apiFetchMock.mockResolvedValueOnce(jsonResponse({ error: "Forbidden" }, 403));
+
+    await expect(fetchParentSummary("parent-error")).rejects.toThrow("Forbidden");
+  });
+});
+
+describe("useParentSummary", () => {
+  beforeEach(() => {
+    apiFetchMock.mockReset();
   });
 
   it("enters a loading state before the query resolves", async () => {
@@ -82,27 +191,5 @@ describe("useParentSummary", () => {
 
     unsubscribe();
     queryClient.clear();
-  });
-
-  it("preserves the honest empty-state payload when no learners or sessions exist", async () => {
-    apiFetchMock.mockResolvedValueOnce(
-      jsonResponse({
-        parent: { name: null, lastDashboardVisit: null },
-        learners: [],
-        summary: { activeTutors: 0, sessionsThisWeek: 0 },
-      }),
-    );
-
-    const result = await fetchParentSummary("parent-empty");
-
-    expect(result.learners).toEqual([]);
-    expect(result.summary.activeTutors).toBe(0);
-    expect(result.summary.sessionsThisWeek).toBe(0);
-  });
-
-  it("throws the upstream error instead of fabricating stats on failure", async () => {
-    apiFetchMock.mockResolvedValueOnce(jsonResponse({ error: "Forbidden" }, 403));
-
-    await expect(fetchParentSummary("parent-error")).rejects.toThrow("Forbidden");
   });
 });

@@ -25,19 +25,23 @@ export type { MobileLearningHeroProps } from "./MobileLearningHero";
 export * from "./shell";
 export * from "./charts";
 
+// NOTE: the legacy SVG-based `./chart` kit also exports Sparkline / BarMini /
+// ProgressRing. The View-based `./charts` versions (star-exported above) are
+// the canonical root exports; only the non-conflicting helpers from `./chart`
+// are re-exported here. Import from "./chart" directly if you need the SVG kit.
 export {
-  Sparkline,
-  BarMini,
-  ProgressRing,
+  toneColor,
+  toneSoftColor,
+  sparklinePoints,
+  buildSparklineLabel,
+  sparklineTrendText,
+  barFillRatios,
+  buildBarMiniLabel,
+  ringDash,
+  buildProgressRingLabel,
+  DEFAULT_PALETTE,
 } from "./chart";
-export type {
-  SparklineProps,
-  BarMiniProps,
-  ProgressRingProps,
-  ChartTone,
-  SensoryPalette,
-  BarItem,
-} from "./chart";
+export type { ChartTone, SensoryPalette, BarItem } from "./chart";
 
 export {
   TIER_THEMES_MOBILE,

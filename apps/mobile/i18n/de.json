@@ -153,7 +153,11 @@
     "team": "Team",
     "tutorStore": "Tutoren-Store",
     "billing": "Abrechnung",
-    "loginAsLearner": "Als Lernende:r anmelden"
+    "loginAsLearner": "Als Lernende:r anmelden",
+    "activeTutorsTrend": "Trend aktiver Tutoren",
+    "sessionsTrend": "Trend der Sitzungen diese Woche",
+    "masteryBySubject": "Beherrschung nach Fach",
+    "reports": "Berichte"
   },
   "parentSettings": {
     "title": "Einstellungen",
@@ -448,7 +452,13 @@
     "homework": "Hausaufgaben",
     "quests": "Quests",
     "badgesLabel": "Abzeichen",
-    "grades": "Noten"
+    "grades": "Noten",
+    "xpTrend": "XP in 7 Tagen",
+    "masteryBySubject": "Beherrschung nach Fach",
+    "progress": "Fortschritt",
+    "subjects": "Fächer",
+    "missions": "Missionen",
+    "library": "Bibliothek"
   },
   "learnerBrain": {
     "title": "Mein Gehirn",

@@ -153,7 +153,11 @@
     "team": "الفريق",
     "tutorStore": "متجر المدرسين",
     "billing": "الفواتير",
-    "loginAsLearner": "تسجيل الدخول كمتعلّم"
+    "loginAsLearner": "تسجيل الدخول كمتعلّم",
+    "activeTutorsTrend": "اتجاه المعلمين النشطين",
+    "sessionsTrend": "اتجاه جلسات هذا الأسبوع",
+    "masteryBySubject": "الإتقان حسب المادة",
+    "reports": "التقارير"
   },
   "parentSettings": {
     "title": "الإعدادات",
@@ -448,7 +452,13 @@
     "homework": "الواجب",
     "quests": "المهام",
     "badgesLabel": "شارات",
-    "grades": "الدرجات"
+    "grades": "الدرجات",
+    "xpTrend": "النقاط خلال 7 أيام",
+    "masteryBySubject": "الإتقان حسب المادة",
+    "progress": "التقدم",
+    "subjects": "المواد",
+    "missions": "المهمات",
+    "library": "المكتبة"
   },
   "learnerBrain": {
     "title": "دماغي",

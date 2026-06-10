@@ -153,7 +153,11 @@
     "team": "팀",
     "tutorStore": "튜터 스토어",
     "billing": "결제",
-    "loginAsLearner": "학습자로 로그인"
+    "loginAsLearner": "학습자로 로그인",
+    "activeTutorsTrend": "활성 튜터 추세",
+    "sessionsTrend": "이번 주 세션 추세",
+    "masteryBySubject": "과목별 숙달도",
+    "reports": "보고서"
   },
   "parentSettings": {
     "title": "설정",
@@ -448,7 +452,13 @@
     "homework": "숙제",
     "quests": "퀘스트",
     "badgesLabel": "배지",
-    "grades": "성적"
+    "grades": "성적",
+    "xpTrend": "7일 간의 XP",
+    "masteryBySubject": "과목별 숙달도",
+    "progress": "진도",
+    "subjects": "과목",
+    "missions": "미션",
+    "library": "라이브러리"
   },
   "learnerBrain": {
     "title": "내 두뇌",
