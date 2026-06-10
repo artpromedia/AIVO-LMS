@@ -26,6 +26,20 @@ export * from "./shell";
 export * from "./charts";
 
 export {
+  Sparkline,
+  BarMini,
+  ProgressRing,
+} from "./chart";
+export type {
+  SparklineProps,
+  BarMiniProps,
+  ProgressRingProps,
+  ChartTone,
+  SensoryPalette,
+  BarItem,
+} from "./chart";
+
+export {
   TIER_THEMES_MOBILE,
   TierThemeProvider,
   useTierTheme,
