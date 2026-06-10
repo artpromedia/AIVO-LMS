@@ -11,6 +11,7 @@ import {
   type AdminUserDetail,
   type AdminUserSummary,
   type PlatformSystemHealth,
+  type PlatformSystemHealthIssue,
   type RecentAiActivityEntry,
   adminRoleLabel,
   adminRoleTone,
@@ -147,6 +148,14 @@ export async function getPlatformSystemHealth(
     row.tenantCounts && typeof row.tenantCounts === "object"
       ? (row.tenantCounts as Record<string, unknown>)
       : {};
+  const issues: PlatformSystemHealthIssue[] = Array.isArray(row.issues)
+    ? row.issues
+        .filter((issue): issue is Record<string, unknown> => !!issue && typeof issue === "object")
+        .map((issue) => ({
+          source: String(issue.source ?? "unknown"),
+          error: String(issue.error ?? "unknown error"),
+        }))
+    : [];
   return {
     tenantCounts: {
       district: Number(rawTenantCounts.district ?? 0),
@@ -163,6 +172,8 @@ export async function getPlatformSystemHealth(
     aiModelsActive24h: Number(row.aiModelsActive24h ?? 0),
     aiAvgLatencyMs24h: Number(row.aiAvgLatencyMs24h ?? 0),
     aiEstimatedCostUsd24h: Number(row.aiEstimatedCostUsd24h ?? 0),
+    degraded: Boolean(row.degraded) || issues.length > 0,
+    issues,
   };
 }
 

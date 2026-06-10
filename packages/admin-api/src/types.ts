@@ -248,6 +248,13 @@ export interface AdminAuditEntry {
   createdAt: string;
 }
 
+export interface PlatformSystemHealthIssue {
+  /** Failing read, e.g. "lesson_runs" or "ai_usage". */
+  source: string;
+  /** Underlying DB error, e.g. `relation "ai_usage_log" does not exist`. */
+  error: string;
+}
+
 export interface PlatformSystemHealth {
   tenantCounts: Record<AdminTenantKind | "unknown", number>;
   tenantsTotal: number;
@@ -259,6 +266,9 @@ export interface PlatformSystemHealth {
   aiModelsActive24h: number;
   aiAvgLatencyMs24h: number;
   aiEstimatedCostUsd24h: number;
+  /** True when one or more source reads failed; their metrics report 0. */
+  degraded: boolean;
+  issues: PlatformSystemHealthIssue[];
 }
 
 export interface RecentAiActivityEntry {
