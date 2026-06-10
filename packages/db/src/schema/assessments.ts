@@ -107,6 +107,37 @@ export const teacherAssessments = pgTable("teacher_assessments", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+/**
+ * Therapist-led intake feeding the adaptive baseline generator
+ * (adaptive-learning E2E Sprint 6). Mirrors teacherAssessments: every field
+ * except learnerId is optional, multiple therapists (disciplines) may each
+ * submit, and the prompt builder degrades gracefully when no row exists.
+ */
+export const therapistAssessments = pgTable("therapist_assessments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  submittedBy: uuid("submitted_by").references(() => users.id),
+  /** speech | occupational | behavioral | physical | other */
+  therapyDiscipline: varchar("therapy_discipline", { length: 30 }),
+  areasOfFocus: jsonb("areas_of_focus").default([]),
+  strengths: jsonb("strengths").default([]),
+  challenges: jsonb("challenges").default([]),
+  sensoryNotes: text("sensory_notes"),
+  communicationNotes: text("communication_notes"),
+  regulationStrategies: jsonb("regulation_strategies").default([]),
+  recommendedAccommodations: jsonb("recommended_accommodations").default([]),
+  observations: text("observations"),
+  responses: jsonb("responses").default({}),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const observationalAssessments = pgTable("observational_assessments", {
   id: uuid("id").defaultRandom().primaryKey(),
   attemptId: uuid("attempt_id")

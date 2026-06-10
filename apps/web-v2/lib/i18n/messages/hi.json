@@ -2871,6 +2871,30 @@
       "section_profile": "प्रोफ़ाइल",
       "role_label": "चिकित्सक",
       "section_notifications": "सूचनाएँ"
+    },
+    "assessment": {
+      "title": "थेरेपिस्ट मूल्यांकन",
+      "description": "{name} के साथ थेरेपी में जो आप देखते हैं उसे साझा करें — यह उनकी बेसलाइन और पाठों को आकार देता है। सब कुछ वैकल्पिक है।",
+      "discipline": "थेरेपी विधा",
+      "discipline_speech": "वाक्",
+      "discipline_occupational": "व्यावसायिक",
+      "discipline_behavioral": "व्यवहारिक",
+      "discipline_physical": "शारीरिक",
+      "discipline_other": "अन्य",
+      "areas_of_focus": "मुख्य क्षेत्र",
+      "strengths": "देखी गई ताकतें",
+      "challenges": "देखी गई चुनौतियाँ",
+      "regulation_strategies": "कारगर नियमन रणनीतियाँ",
+      "recommended_accommodations": "अनुशंसित समायोजन",
+      "sensory_notes": "संवेदी नोट्स",
+      "communication_notes": "संचार नोट्स",
+      "observations": "विवरणात्मक अवलोकन",
+      "list_hint": "वस्तुओं को कॉमा या नई पंक्ति से अलग करें",
+      "submit": "मूल्यांकन भेजें",
+      "submitting": "भेजा जा रहा है…",
+      "submit_error": "मूल्यांकन सहेजा नहीं जा सका — फिर से कोशिश करें।",
+      "success_title": "मूल्यांकन सहेजा गया",
+      "success_body": "आपका इनपुट अब इस शिक्षार्थी की बेसलाइन और पाठ वैयक्तिकरण में शामिल है।"
     }
   },
   "caregiver": {

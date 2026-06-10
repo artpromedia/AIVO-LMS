@@ -2871,6 +2871,30 @@
       "section_profile": "个人资料",
       "role_label": "治疗师",
       "section_notifications": "通知"
+    },
+    "assessment": {
+      "title": "治疗师评估",
+      "description": "分享您在治疗中对{name}的观察 — 它将影响基线和课程。所有内容均为可选。",
+      "discipline": "治疗学科",
+      "discipline_speech": "言语",
+      "discipline_occupational": "职业",
+      "discipline_behavioral": "行为",
+      "discipline_physical": "物理",
+      "discipline_other": "其他",
+      "areas_of_focus": "重点领域",
+      "strengths": "观察到的优势",
+      "challenges": "观察到的挑战",
+      "regulation_strategies": "有效的调节策略",
+      "recommended_accommodations": "建议的便利措施",
+      "sensory_notes": "感官笔记",
+      "communication_notes": "沟通笔记",
+      "observations": "叙述性观察",
+      "list_hint": "用逗号或换行分隔条目",
+      "submit": "提交评估",
+      "submitting": "提交中…",
+      "submit_error": "无法保存评估 — 请重试。",
+      "success_title": "评估已保存",
+      "success_body": "您的输入现在将用于该学习者的基线和课程个性化。"
     }
   },
   "caregiver": {

@@ -2871,6 +2871,30 @@
       "section_profile": "Profil",
       "role_label": "Therapeut",
       "section_notifications": "Benachrichtigungen"
+    },
+    "assessment": {
+      "title": "Therapeuten-Einschätzung",
+      "description": "Teile, was du in der Therapie mit {name} beobachtest — es prägt Baseline und Lektionen. Alles ist optional.",
+      "discipline": "Therapierichtung",
+      "discipline_speech": "Logopädie",
+      "discipline_occupational": "Ergotherapie",
+      "discipline_behavioral": "Verhalten",
+      "discipline_physical": "Physiotherapie",
+      "discipline_other": "Andere",
+      "areas_of_focus": "Schwerpunkte",
+      "strengths": "Beobachtete Stärken",
+      "challenges": "Beobachtete Herausforderungen",
+      "regulation_strategies": "Wirksame Regulationsstrategien",
+      "recommended_accommodations": "Empfohlene Anpassungen",
+      "sensory_notes": "Sensorische Notizen",
+      "communication_notes": "Kommunikationsnotizen",
+      "observations": "Narrative Beobachtungen",
+      "list_hint": "Einträge mit Kommas oder Zeilenumbrüchen trennen",
+      "submit": "Einschätzung senden",
+      "submitting": "Wird gesendet…",
+      "submit_error": "Einschätzung konnte nicht gespeichert werden — erneut versuchen.",
+      "success_title": "Einschätzung gespeichert",
+      "success_body": "Dein Input fließt jetzt in Baseline und Lektionspersonalisierung ein."
     }
   },
   "caregiver": {

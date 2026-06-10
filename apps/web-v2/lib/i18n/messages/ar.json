@@ -2871,6 +2871,30 @@
       "section_profile": "الملف الشخصي",
       "role_label": "معالج",
       "section_notifications": "الإشعارات"
+    },
+    "assessment": {
+      "title": "تقييم المعالج",
+      "description": "شارك ما تلاحظه في الجلسات مع {name} — فهو يشكل خط الأساس والدروس. كل شيء اختياري.",
+      "discipline": "تخصص العلاج",
+      "discipline_speech": "نطق",
+      "discipline_occupational": "وظيفي",
+      "discipline_behavioral": "سلوكي",
+      "discipline_physical": "طبيعي",
+      "discipline_other": "أخرى",
+      "areas_of_focus": "مجالات التركيز",
+      "strengths": "نقاط القوة الملاحظة",
+      "challenges": "التحديات الملاحظة",
+      "regulation_strategies": "استراتيجيات التنظيم الفعالة",
+      "recommended_accommodations": "التسهيلات الموصى بها",
+      "sensory_notes": "ملاحظات حسية",
+      "communication_notes": "ملاحظات التواصل",
+      "observations": "ملاحظات سردية",
+      "list_hint": "افصل العناصر بفواصل أو أسطر جديدة",
+      "submit": "إرسال التقييم",
+      "submitting": "جارٍ الإرسال…",
+      "submit_error": "تعذر حفظ التقييم — حاول مرة أخرى.",
+      "success_title": "تم حفظ التقييم",
+      "success_body": "مدخلاتك تغذي الآن خط الأساس وتخصيص الدروس لهذا المتعلم."
     }
   },
   "caregiver": {

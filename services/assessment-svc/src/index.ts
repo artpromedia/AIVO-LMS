@@ -10,6 +10,7 @@ import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerParentAssessmentRoutes } from "./routes/parent-assessment.js";
 import { registerTeacherAssessmentRoutes } from "./routes/teacher-assessment.js";
+import { registerTherapistAssessmentRoutes } from "./routes/therapist-assessment.js";
 import { registerAssessmentRoutes } from "./routes/assessments.js";
 import { registerIepRoutes } from "./routes/iep.js";
 import { registerIepEvaluationRoutes } from "./routes/iep-evaluations.js";
@@ -92,6 +93,7 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
   await registerHealthRoutes(app);
   await registerParentAssessmentRoutes(app);
   await registerTeacherAssessmentRoutes(app);
+  await registerTherapistAssessmentRoutes(app);
   await registerAssessmentRoutes(app);
   await registerIepRoutes(app);
   await registerIepEvaluationRoutes(app);

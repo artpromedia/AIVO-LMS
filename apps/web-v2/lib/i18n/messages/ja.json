@@ -2871,6 +2871,30 @@
       "section_profile": "プロフィール",
       "role_label": "セラピスト",
       "section_notifications": "通知"
+    },
+    "assessment": {
+      "title": "セラピスト評価",
+      "description": "{name}とのセラピーで観察したことを共有してください — ベースラインとレッスンに反映されます。すべて任意です。",
+      "discipline": "セラピーの分野",
+      "discipline_speech": "言語",
+      "discipline_occupational": "作業",
+      "discipline_behavioral": "行動",
+      "discipline_physical": "理学",
+      "discipline_other": "その他",
+      "areas_of_focus": "重点領域",
+      "strengths": "観察された強み",
+      "challenges": "観察された課題",
+      "regulation_strategies": "効果的な調整戦略",
+      "recommended_accommodations": "推奨される配慮",
+      "sensory_notes": "感覚に関するメモ",
+      "communication_notes": "コミュニケーションに関するメモ",
+      "observations": "自由記述の観察",
+      "list_hint": "カンマまたは改行で区切ってください",
+      "submit": "評価を送信",
+      "submitting": "送信中…",
+      "submit_error": "評価を保存できませんでした — もう一度お試しください。",
+      "success_title": "評価を保存しました",
+      "success_body": "あなたの入力はベースラインとレッスンのパーソナライズに反映されます。"
     }
   },
   "caregiver": {

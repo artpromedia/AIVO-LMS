@@ -2871,6 +2871,30 @@
       "section_profile": "Perfil",
       "role_label": "Terapeuta",
       "section_notifications": "Notificações"
+    },
+    "assessment": {
+      "title": "Avaliação do terapeuta",
+      "description": "Compartilhe o que você observa na terapia com {name} — isso molda a linha de base e as lições. Tudo é opcional.",
+      "discipline": "Disciplina terapêutica",
+      "discipline_speech": "Fala",
+      "discipline_occupational": "Ocupacional",
+      "discipline_behavioral": "Comportamental",
+      "discipline_physical": "Física",
+      "discipline_other": "Outra",
+      "areas_of_focus": "Áreas de foco",
+      "strengths": "Pontos fortes observados",
+      "challenges": "Desafios observados",
+      "regulation_strategies": "Estratégias de regulação que funcionam",
+      "recommended_accommodations": "Acomodações recomendadas",
+      "sensory_notes": "Notas sensoriais",
+      "communication_notes": "Notas de comunicação",
+      "observations": "Observações narrativas",
+      "list_hint": "Separe os itens com vírgulas ou quebras de linha",
+      "submit": "Enviar avaliação",
+      "submitting": "Enviando…",
+      "submit_error": "Não foi possível salvar a avaliação — tente novamente.",
+      "success_title": "Avaliação salva",
+      "success_body": "Sua contribuição agora alimenta a linha de base e a personalização das lições."
     }
   },
   "caregiver": {

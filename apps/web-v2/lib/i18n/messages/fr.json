@@ -2871,6 +2871,30 @@
       "section_profile": "Profil",
       "role_label": "Thérapeute",
       "section_notifications": "Notifications"
+    },
+    "assessment": {
+      "title": "Évaluation du thérapeute",
+      "description": "Partagez ce que vous observez en thérapie avec {name} — cela façonne sa base et ses leçons. Tout est facultatif.",
+      "discipline": "Discipline thérapeutique",
+      "discipline_speech": "Orthophonie",
+      "discipline_occupational": "Ergothérapie",
+      "discipline_behavioral": "Comportementale",
+      "discipline_physical": "Physique",
+      "discipline_other": "Autre",
+      "areas_of_focus": "Domaines d'intervention",
+      "strengths": "Forces observées",
+      "challenges": "Difficultés observées",
+      "regulation_strategies": "Stratégies de régulation efficaces",
+      "recommended_accommodations": "Aménagements recommandés",
+      "sensory_notes": "Notes sensorielles",
+      "communication_notes": "Notes de communication",
+      "observations": "Observations narratives",
+      "list_hint": "Séparez les éléments par des virgules ou des sauts de ligne",
+      "submit": "Envoyer l'évaluation",
+      "submitting": "Envoi…",
+      "submit_error": "Impossible d'enregistrer l'évaluation — réessayez.",
+      "success_title": "Évaluation enregistrée",
+      "success_body": "Votre contribution alimente désormais la base et la personnalisation des leçons."
     }
   },
   "caregiver": {

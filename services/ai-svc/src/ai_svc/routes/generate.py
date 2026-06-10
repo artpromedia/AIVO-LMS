@@ -219,6 +219,11 @@ class BaselineRequest(BaseModel):
     # a parent assessment still gets a baseline generation.
     caregiver_perspectives: Optional[list] = None
     teacher_assessment: Optional[dict] = None
+    # Sprint 6 — therapist intake + caregiver observation notes. All
+    # optional; the prompt builders degrade gracefully when absent.
+    therapist_assessments: Optional[list] = None
+    therapy_goals: Optional[list] = None
+    caregiver_observations: Optional[list] = None
     # Sprint 1 — curriculum grounding. When the learner's ZIP code is
     # known, ai-svc calls curriculum-svc to inject district-scoped skill
     # anchors into the prompt. The lookup is best-effort: when ZIP is
@@ -277,6 +282,9 @@ async def generate_baseline(req: BaselineRequest):
         interest_profile=req.interest_profile,
         caregiver_perspectives=req.caregiver_perspectives,
         teacher_assessment=req.teacher_assessment,
+        therapist_assessments=req.therapist_assessments,
+        therapy_goals=req.therapy_goals,
+        caregiver_observations=req.caregiver_observations,
         curriculum_grounding=curriculum_grounding,
     )
 
@@ -414,6 +422,11 @@ class DiscoveryChapterRequest(BaseModel):
     # Optional — see BaselineRequest for the same rationale.
     caregiver_perspectives: Optional[list] = None
     teacher_assessment: Optional[dict] = None
+    # Sprint 6 — therapist intake + caregiver observation notes. All
+    # optional; the prompt builders degrade gracefully when absent.
+    therapist_assessments: Optional[list] = None
+    therapy_goals: Optional[list] = None
+    caregiver_observations: Optional[list] = None
     zip_code: Optional[str] = None
 
 
@@ -450,6 +463,9 @@ async def generate_discovery_chapter(req: DiscoveryChapterRequest):
         interest_profile=req.interest_profile,
         caregiver_perspectives=req.caregiver_perspectives,
         teacher_assessment=req.teacher_assessment,
+        therapist_assessments=req.therapist_assessments,
+        therapy_goals=req.therapy_goals,
+        caregiver_observations=req.caregiver_observations,
         curriculum_grounding=curriculum_grounding,
     )
 

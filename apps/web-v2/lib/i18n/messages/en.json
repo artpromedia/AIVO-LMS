@@ -2871,6 +2871,30 @@
       "section_profile": "Profile",
       "role_label": "Therapist",
       "section_notifications": "Notifications"
+    },
+    "assessment": {
+      "title": "Therapist assessment",
+      "description": "Share what you see in therapy with {name} — it shapes their baseline and lessons. Everything is optional.",
+      "discipline": "Therapy discipline",
+      "discipline_speech": "Speech",
+      "discipline_occupational": "Occupational",
+      "discipline_behavioral": "Behavioral",
+      "discipline_physical": "Physical",
+      "discipline_other": "Other",
+      "areas_of_focus": "Areas of focus",
+      "strengths": "Strengths you observe",
+      "challenges": "Challenges you observe",
+      "regulation_strategies": "Regulation strategies that work",
+      "recommended_accommodations": "Accommodations you recommend",
+      "sensory_notes": "Sensory notes",
+      "communication_notes": "Communication notes",
+      "observations": "Narrative observations",
+      "list_hint": "Separate items with commas or new lines",
+      "submit": "Submit assessment",
+      "submitting": "Submitting…",
+      "submit_error": "Couldn't save the assessment — try again.",
+      "success_title": "Assessment saved",
+      "success_body": "Your input now feeds this learner's baseline and lesson personalization."
     }
   },
   "caregiver": {

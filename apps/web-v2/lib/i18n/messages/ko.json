@@ -2871,6 +2871,30 @@
       "section_profile": "프로필",
       "role_label": "치료사",
       "section_notifications": "알림"
+    },
+    "assessment": {
+      "title": "치료사 평가",
+      "description": "{name}와의 치료에서 관찰한 내용을 공유하세요 — 기준선과 수업에 반영됩니다. 모두 선택 사항입니다.",
+      "discipline": "치료 분야",
+      "discipline_speech": "언어",
+      "discipline_occupational": "작업",
+      "discipline_behavioral": "행동",
+      "discipline_physical": "물리",
+      "discipline_other": "기타",
+      "areas_of_focus": "중점 영역",
+      "strengths": "관찰된 강점",
+      "challenges": "관찰된 어려움",
+      "regulation_strategies": "효과적인 조절 전략",
+      "recommended_accommodations": "권장 편의 사항",
+      "sensory_notes": "감각 메모",
+      "communication_notes": "의사소통 메모",
+      "observations": "서술형 관찰",
+      "list_hint": "쉼표 또는 줄바꿈으로 구분하세요",
+      "submit": "평가 제출",
+      "submitting": "제출 중…",
+      "submit_error": "평가를 저장하지 못했습니다 — 다시 시도하세요.",
+      "success_title": "평가 저장됨",
+      "success_body": "입력하신 내용이 기준선과 수업 개인화에 반영됩니다."
     }
   },
   "caregiver": {

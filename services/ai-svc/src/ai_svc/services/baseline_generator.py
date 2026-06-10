@@ -200,6 +200,133 @@ def _format_teacher_block(teacher: Optional[dict]) -> str:
 {obs_block}"""
 
 
+def _format_therapist_block(
+    therapists: Optional[list],
+    therapy_goals: Optional[list] = None,
+) -> str:
+    """Render the (optional) therapist-led intake (Sprint 6).
+
+    Therapist input is OPTIONAL: returns an explicit "no therapist input
+    on file" line when absent. Multiple therapists may contribute (speech,
+    OT, behavioral…) — one sub-block per discipline. Active therapy goals
+    render even when no formal assessment exists, in the same
+    "target these domains explicitly" register as the IEP block.
+    """
+    therapists = therapists if isinstance(therapists, list) else []
+    therapy_goals = therapy_goals if isinstance(therapy_goals, list) else []
+    if not therapists and not therapy_goals:
+        return (
+            "## Therapist Input\n"
+            "No therapist assessment on file (optional). "
+            "Generate from the other care-team signals."
+        )
+
+    def _bullets(items, fallback="(none recorded)"):
+        rendered = []
+        for it in (items or [])[:10]:
+            if isinstance(it, str) and it:
+                rendered.append(f"  - {it}")
+            elif isinstance(it, dict):
+                desc = it.get("description") or it.get("text") or it.get("name") or ""
+                if desc:
+                    rendered.append(f"  - {desc}")
+        return "\n".join(rendered) if rendered else f"  - {fallback}"
+
+    parts: list[str] = ["## Therapist Input"]
+    for t in therapists[:5]:
+        if not isinstance(t, dict):
+            continue
+        discipline = t.get("therapyDiscipline") or "therapist"
+        sensory = (t.get("sensoryNotes") or "").strip()
+        communication = (t.get("communicationNotes") or "").strip()
+        observations = (t.get("observations") or "").strip()
+        parts.append(
+            f"""### {str(discipline).title()} therapist
+
+#### Areas of focus
+{_bullets(t.get("areasOfFocus"))}
+
+#### Therapist-observed strengths
+{_bullets(t.get("strengths"))}
+
+#### Therapist-observed challenges
+{_bullets(t.get("challenges"))}
+
+#### Regulation strategies that work
+{_bullets(t.get("regulationStrategies"))}
+
+#### Recommended accommodations
+{_bullets(t.get("recommendedAccommodations"))}
+
+#### Sensory notes
+{sensory or "(none provided)"}
+
+#### Communication notes
+{communication or "(none provided)"}
+
+#### Narrative observations
+{observations or "(no narrative provided)"}"""
+        )
+
+    if therapy_goals:
+        goal_lines = []
+        for g in therapy_goals[:10]:
+            if not isinstance(g, dict):
+                continue
+            label = g.get("goal") or g.get("goalText") or ""
+            if not label:
+                continue
+            domain = g.get("domain")
+            target = g.get("target")
+            extra = []
+            if domain:
+                extra.append(f"domain: {domain}")
+            if target:
+                extra.append(f"target: {target}")
+            suffix = f" ({'; '.join(extra)})" if extra else ""
+            goal_lines.append(f"  - {label}{suffix}")
+        if goal_lines:
+            parts.append(
+                "### Active Therapy Goals (target these domains explicitly)\n"
+                + "\n".join(goal_lines)
+            )
+
+    return "\n\n".join(parts)
+
+
+def _format_caregiver_observations_block(observations: Optional[list]) -> str:
+    """Render recent caregiver observation NOTES (Sprint 6).
+
+    Distinct from the structured caregiver-perspective assessments: these
+    are diary-style, real-world context. Framed for the model as context,
+    not assessment data, and capped so they can't dominate the prompt.
+    Returns an empty string when none exist (the prompt simply omits the
+    section).
+    """
+    observations = observations if isinstance(observations, list) else []
+    lines: list[str] = []
+    for o in observations[:20]:
+        if not isinstance(o, dict):
+            continue
+        notes = str(o.get("notes") or "").strip()
+        if not notes:
+            continue
+        notes = notes[:280]
+        category = o.get("category") or "General"
+        mood = o.get("mood")
+        date = str(o.get("date") or "")[:10]
+        mood_part = f", mood: {mood}" if mood else ""
+        lines.append(f"  - [{date}] {category}{mood_part}: {notes}")
+    if not lines:
+        return ""
+    return (
+        "## Recent Caregiver Observations (context, NOT assessment data)\n"
+        "Day-to-day notes from the care team. Use them to flavor scenarios and "
+        "avoid known frustration triggers — do NOT treat them as ability "
+        "evidence.\n" + "\n".join(lines)
+    )
+
+
 def _format_district_block(district: Optional[dict]) -> str:
     """Render the learner's district / curriculum context as prompt-ready text."""
     if not district:
@@ -388,6 +515,9 @@ def build_discovery_adventure_prompt(
     interest_profile: Optional[dict] = None,
     caregiver_perspectives: Optional[list] = None,
     teacher_assessment: Optional[dict] = None,
+    therapist_assessments: Optional[list] = None,
+    therapy_goals: Optional[list] = None,
+    caregiver_observations: Optional[list] = None,
     curriculum_grounding: Optional[dict] = None,
 ) -> tuple[str, str]:
     responses = parent_assessment.get("responses", {})
@@ -466,6 +596,10 @@ def build_discovery_adventure_prompt(
 {_format_caregiver_perspectives_block(caregiver_perspectives)}
 
 {_format_teacher_block(teacher_assessment)}
+
+{_format_therapist_block(therapist_assessments, therapy_goals)}
+
+{_format_caregiver_observations_block(caregiver_observations)}
 
 {_format_district_block(district)}
 
@@ -554,6 +688,9 @@ def build_baseline_generation_prompt(
     interest_profile: Optional[dict] = None,
     caregiver_perspectives: Optional[list] = None,
     teacher_assessment: Optional[dict] = None,
+    therapist_assessments: Optional[list] = None,
+    therapy_goals: Optional[list] = None,
+    caregiver_observations: Optional[list] = None,
     curriculum_grounding: Optional[dict] = None,
 ) -> tuple[str, str]:
     responses = parent_assessment.get("responses", {})
@@ -623,6 +760,10 @@ def build_baseline_generation_prompt(
 {_format_caregiver_perspectives_block(caregiver_perspectives)}
 
 {_format_teacher_block(teacher_assessment)}
+
+{_format_therapist_block(therapist_assessments, therapy_goals)}
+
+{_format_caregiver_observations_block(caregiver_observations)}
 
 {_format_district_block(district)}
 
