@@ -51,6 +51,18 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Inside the app shell the content slot owns width and padding, so the
+   page frame's standalone centering becomes a no-op (see AdminPageFrame). */
+.admin-shell-content main.admin-page-frame {
+  min-height: auto;
+  padding: 0;
+}
+
+.admin-shell-content main.admin-page-frame > div {
+  max-width: none;
+  margin: 0;
+}
+
 /* Skeleton bars for a panel whose data source is degraded. */
 .admin-skeleton {
   border-radius: 6px;

@@ -395,6 +395,64 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
     };
   });
 
+  // Idempotent seed for a tenant-less SUPPORT platform-staff user. The admin
+  // console's nav-shell e2e uses it to prove role-gated items stay hidden
+  // for non-admin platform roles.
+  app.post<{ Body: { email: string; password: string } }>(
+    "/api/__test__/seed-support",
+    async (req, reply) => {
+      if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+      const db = (app as any).db;
+      const { email, password } = req.body ?? ({} as any);
+      if (!email || !password) {
+        return reply.status(400).send({ error: "email and password required" });
+      }
+      const lcEmail = email.toLowerCase();
+      const passwordHash = await argon2.hash(password);
+      let [user] = await db.select().from(users).where(eq(users.email, lcEmail)).limit(1);
+      if (user) {
+        await db
+          .update(users)
+          .set({
+            passwordHash,
+            role: "SUPPORT",
+            tenantId: null,
+            mfaEnabled: false,
+            deactivatedAt: null,
+          })
+          .where(eq(users.id, user.id));
+        [user] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+      } else {
+        [user] = await db
+          .insert(users)
+          .values({
+            email: lcEmail,
+            name: "E2E Support Staff",
+            passwordHash,
+            role: "SUPPORT" as any,
+            tenantId: null,
+            mfaEnabled: false,
+          })
+          .returning();
+      }
+      const accessToken = await signJWT({
+        sub: user.id,
+        tenantId: null,
+        role: user.role,
+        email: user.email,
+        name: user.name,
+      });
+      return {
+        id: user.id,
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        tenantId: "",
+        accessToken,
+      };
+    },
+  );
+
   // Idempotent seed for a PLATFORM_ADMIN. Used by the district-pilot e2e to
   // drive POST /api/admin/pilots with a real platform-admin bearer token.
   // Platform admins are tenant-less; the response shape mirrors the other

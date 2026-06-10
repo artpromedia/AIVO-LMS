@@ -34,7 +34,10 @@ export function AdminPageFrame({
   children: ReactNode;
 }) {
   return (
-    <main className="min-h-screen px-6 py-8">
+    // Standalone pages center themselves; inside the platform app shell the
+    // .admin-shell-content overrides in globals.css collapse this outer
+    // chrome so the shell owns width and padding.
+    <main className="admin-page-frame min-h-screen px-6 py-8">
       <div className="mx-auto max-w-6xl">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>

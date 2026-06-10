@@ -19,7 +19,6 @@ import {
   Gauge,
 } from "@aivo/admin-ui";
 import type { DonutSlice } from "@aivo/admin-ui";
-import { AdminNavGrid } from "@/components/admin-nav";
 import { describeSystemHealthFailure } from "./health-state";
 import { UsageTrendsCard } from "./usage-trends-card";
 import { PanelError, PilotsTablePanel } from "./dashboard-panels";
@@ -30,130 +29,6 @@ import {
   formatUsd,
   growthKpi,
 } from "./dashboard-data";
-
-const PLATFORM_NAV = [
-  {
-    href: "/platform/system-health",
-    title: "System health",
-    description: "Live tenant, learning, and AI-usage signals.",
-  },
-  { href: "/platform/tenants", title: "Tenants", description: "Districts, schools, and families." },
-  {
-    href: "/platform/users",
-    title: "Users",
-    description: "Admin, educator, and guardian accounts.",
-  },
-  {
-    href: "/platform/learners",
-    title: "Learners",
-    description: "Learner profiles across tenants.",
-  },
-  {
-    href: "/platform/districts",
-    title: "Districts",
-    description: "District onboarding and admin invitations.",
-  },
-  {
-    href: "/platform/pilots",
-    title: "Pilots",
-    description: "Provision pilots and track seats, uptake, and expiry.",
-  },
-  {
-    href: "/platform/identity",
-    title: "Identity",
-    description: "District invites and SCIM provisioning.",
-  },
-  { href: "/platform/content", title: "Content packs", description: "Versioned activity bundles." },
-  { href: "/platform/billing", title: "Billing", description: "Accounts and trial conversion." },
-  {
-    href: "/platform/billing/coupons",
-    title: "Coupons",
-    description: "Discount, subscription, and provisioning coupons.",
-  },
-  {
-    href: "/platform/billing/trials",
-    title: "Trials & conversion",
-    description: "Trial cohort and pilot conversion detail.",
-  },
-  {
-    href: "/platform/sales/leads",
-    title: "Sales leads",
-    description: "Demo, waitlist, and contact submissions.",
-  },
-  {
-    href: "/platform/compliance",
-    title: "Compliance",
-    description: "Controls and evidence bundles.",
-  },
-  { href: "/platform/safety", title: "Safety", description: "AI content moderation queue." },
-  {
-    href: "/platform/security",
-    title: "Security",
-    description: "SOC 2 control register and coverage.",
-  },
-  {
-    href: "/platform/ai-costs",
-    title: "AI costs",
-    description: "Per-tenant spend and budget caps.",
-  },
-  {
-    href: "/platform/ai/policies",
-    title: "AI policies",
-    description: "Stacked Responsible-AI safety policies.",
-  },
-  {
-    href: "/platform/ai/incidents",
-    title: "AI incidents",
-    description: "Responsible-AI incident register.",
-  },
-  {
-    href: "/platform/ai/optouts",
-    title: "AI opt-outs",
-    description: "Per-tenant model and feature opt-outs.",
-  },
-  {
-    href: "/platform/ai/models",
-    title: "AI models",
-    description: "Model registry, cards, and versions.",
-  },
-  {
-    href: "/platform/ai/evals",
-    title: "AI evals",
-    description: "Safety, accuracy, and bias harness runs.",
-  },
-  {
-    href: "/platform/feature-flags",
-    title: "Feature flags",
-    description: "Enterprise and sprint flag state.",
-  },
-  {
-    href: "/platform/audio/pronunciation",
-    title: "Pronunciation",
-    description: "TTS pronunciation override dictionary.",
-  },
-  {
-    href: "/platform/baseline-items",
-    title: "Baseline items",
-    description: "Item calibration analytics and recalibration.",
-  },
-  {
-    href: "/platform/iep",
-    title: "IEP oversight",
-    description: "SPED evaluations and review compliance.",
-  },
-  { href: "/platform/support", title: "Support", description: "Customer support ticket queue." },
-  {
-    href: "/platform/audit",
-    title: "Audit log",
-    description: "Hash-chained admin action history.",
-  },
-  { href: "/platform/jobs", title: "Jobs", description: "Scheduled job freshness and run health." },
-  {
-    href: "/platform/settings/api-keys",
-    title: "API keys",
-    description: "Service credentials and rotation.",
-  },
-];
 
 /** Unwrap one settled dashboard read into data + a human failure message. */
 function settle<T>(
@@ -231,9 +106,6 @@ export default async function PlatformPage() {
               </Link>
             </>
           ) : null}
-          <Link className="admin-button admin-button-secondary" href="/login">
-            Switch account
-          </Link>
         </div>
       }
     >
@@ -359,7 +231,6 @@ export default async function PlatformPage() {
           )}
         </section>
 
-        <AdminNavGrid heading="Operations" items={PLATFORM_NAV} />
       </>
     </AdminPageFrame>
   );

@@ -225,10 +225,14 @@ test.describe("Platform overview — operations dashboard (web-admin :5001)", ()
       await authenticateAdminBrowser(page, admin, "platform_admin");
       await page.goto(`${ADMIN_WEB_BASE}/platform`);
 
-      // The page is still a dashboard: chrome, quick actions, and nav render.
+      // The page is still a dashboard: chrome, quick actions, and the
+      // grouped sidebar nav (the app shell) all render.
       await expect(page.getByRole("heading", { name: "Platform operations" })).toBeVisible();
       await expect(page.getByTestId(T.platformQuickActions)).toBeVisible();
-      await expect(page.getByRole("heading", { name: "Operations", exact: true })).toBeVisible();
+      await expect(page.getByTestId(T.adminShellSidebar)).toBeVisible();
+      await expect(
+        page.getByTestId(T.adminShellSidebar).getByTestId(T.navGroupOperations),
+      ).toBeVisible();
 
       // Health-backed panels degrade individually with their own retry…
       for (const panel of [T.platformKpiAiCost, T.platformTenantMix, T.platformCompletionGauge]) {

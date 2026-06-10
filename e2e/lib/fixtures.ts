@@ -186,6 +186,9 @@ export async function seedDistrictAdmin(
 }
 export const seedPlatformAdmin = (email = `e2e-platform-${Date.now()}@aivo.test`) =>
   seedUser("platform-admin", email, "E2ePlat!Pass1");
+/** Tenant-less SUPPORT platform-staff user (non-admin platform role). */
+export const seedSupportStaff = (email = `e2e-support-${Date.now()}@aivo.test`) =>
+  seedUser("support", email, "E2eSupport!Pass1");
 
 export async function seedLearnerForParent(parent: SeededUser): Promise<SeededLearner | null> {
   try {
@@ -233,7 +236,7 @@ export async function authenticateBrowser(
 export async function authenticateAdminBrowser(
   page: import("@playwright/test").Page,
   user: SeededUser,
-  role: "platform_admin" | "district_admin" | "school_admin" = "platform_admin",
+  role: "platform_admin" | "district_admin" | "school_admin" | "support" = "platform_admin",
 ): Promise<void> {
   const profile = {
     userId: user.userId,
@@ -324,6 +327,17 @@ export const T = {
   platformTrialFunnel: "platform-trial-funnel",
   platformPilotsTable: "platform-pilots-table",
   pilotRow: "pilot-row",
+  // web-admin platform app shell (grouped sidebar + top bar).
+  adminShell: "admin-shell",
+  adminShellSidebar: "admin-shell-sidebar",
+  adminShellBreadcrumbs: "admin-shell-breadcrumbs",
+  adminShellSearch: "admin-shell-search",
+  adminShellMenu: "admin-shell-menu",
+  navGroupIdentityAccess: "nav-group-identity-access",
+  navGroupAiGovernance: "nav-group-ai-governance",
+  navGroupBillingGrowth: "nav-group-billing-growth",
+  navGroupComplianceTrust: "nav-group-compliance-trust",
+  navGroupOperations: "nav-group-operations",
   // Inner hooks rendered by the @aivo/admin-ui primitives themselves.
   donutCenterTotal: "donut-center-total",
   gaugeCenterLabel: "gauge-center-label",
