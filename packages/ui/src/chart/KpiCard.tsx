@@ -5,13 +5,14 @@ import { SoftLine } from "./SoftLine";
 import type { ChartPoint } from "./helpers";
 
 // ─── Tone maps ───────────────────────────────────────────────────────────────
-type KpiTone = "brand" | "mastery" | "success" | "risk";
+type KpiTone = "brand" | "mastery" | "success" | "risk" | "info";
 
 const VALUE_CLS: Record<KpiTone, string> = {
   brand: "text-iw-text-strong",
   mastery: "text-iw-mastery-proficient-strong",
   success: "text-iw-success",
   risk: "text-iw-risk-elevated-strong",
+  info: "text-iw-text-strong",
 };
 
 const SOFTLINE_TONE: Record<KpiTone, "brand" | "mastery" | "success" | "risk"> = {
@@ -19,6 +20,7 @@ const SOFTLINE_TONE: Record<KpiTone, "brand" | "mastery" | "success" | "risk"> =
   mastery: "mastery",
   success: "success",
   risk: "risk",
+  info: "brand",
 };
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -40,6 +42,13 @@ export type KpiCardProps = {
   series?: ReadonlyArray<ChartPoint>;
   /** Tone for the value text and sparkline. Defaults to "brand". */
   tone?: KpiTone;
+  /**
+   * Alias for `tone` used by the parent/teacher/therapist dashboards.
+   * Takes precedence over `tone` when both are supplied.
+   */
+  seriesTone?: KpiTone;
+  /** Small caption under the value, e.g. "vs last week" or "this week". */
+  periodLabel?: string;
   className?: string;
   /**
    * Accessible label for the card.
@@ -80,9 +89,12 @@ export function KpiCard({
   deltaPct,
   series,
   tone = "brand",
+  seriesTone,
+  periodLabel,
   className,
   ariaLabel,
 }: KpiCardProps) {
+  const effectiveTone: KpiTone = seriesTone ?? tone;
   const accessibleLabel =
     ariaLabel ??
     (label != null
@@ -110,7 +122,7 @@ export function KpiCard({
         <span
           className={cn(
             "font-iw-display text-3xl font-bold tracking-tight tabular-nums",
-            VALUE_CLS[tone],
+            VALUE_CLS[effectiveTone],
           )}
         >
           {value}
@@ -121,6 +133,9 @@ export function KpiCard({
           </span>
         )}
       </div>
+
+      {/* Period caption */}
+      {periodLabel && <p className="-mt-1 text-xs text-iw-text-muted">{periodLabel}</p>}
 
       {/* Sparkline with visually-hidden data table */}
       {series != null && series.length > 0 && (
@@ -146,7 +161,7 @@ export function KpiCard({
           <SoftLine
             data={series}
             height={48}
-            tone={SOFTLINE_TONE[tone]}
+            tone={SOFTLINE_TONE[effectiveTone]}
             filled
             showDots={false}
             aria-hidden="true"
