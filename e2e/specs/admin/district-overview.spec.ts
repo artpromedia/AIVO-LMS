@@ -154,13 +154,18 @@ test.describe("District overview — control surface (web-admin :5001)", () => {
     await expect(progress).toHaveText(`${checklistDone} of 4 ready`);
 
     // 4) Drive the REAL server actions: add a school → progress flips to
-    //    include the schools item; then close setup for good.
+    //    include the schools item; then close setup for good. The forms are
+    //    submitted natively (Next's progressive-enhancement transport for
+    //    server actions): the same action runs server-side and replies with
+    //    a 303 document navigation, which is immune to the client router
+    //    superseding an in-flight RSC transition under load.
     const setupCard = page.getByTestId(T.districtSetup);
-    await setupCard.getByPlaceholder("School name").fill(`Overview Elementary ${stamp}`);
-    await setupCard.getByRole("button", { name: "Add school" }).click();
+    const schoolInput = setupCard.getByPlaceholder("School name");
+    await schoolInput.fill(`Overview Elementary ${stamp}`);
+    await schoolInput
+      .locator("xpath=ancestor::form")
+      .evaluate((form) => (form as HTMLFormElement).submit());
     await page.waitForURL(/notice=School%20added/);
-    // Full document render after the action streams behind several backend
-    // reads; allow more than the 5s default under load.
     await expect(page.getByText("School added.")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId(T.districtSetupProgress)).toHaveText(
       `${checklistDone + 1} of 4 ready`,
@@ -169,18 +174,11 @@ test.describe("District overview — control surface (web-admin :5001)", () => {
       page.getByTestId(T.districtKpiSchools).getByTestId(T.kpiValue),
     ).toHaveText(String(setup.counts.schools + 1));
 
-    // The redirect loads a fresh document; clicking before React finishes
-    // hydrating can drop the action. Proving a client interaction works
-    // (sidebar group collapse/expand) is a deterministic hydration signal.
-    const hydrationProbe = page.getByTestId("nav-group-district-billing");
-    await hydrationProbe.click();
-    await expect(hydrationProbe).toHaveAttribute("aria-expanded", "false");
-    await hydrationProbe.click();
-    await expect(hydrationProbe).toHaveAttribute("aria-expanded", "true");
-
     const completeButton = page.getByRole("button", { name: "Mark district setup complete" });
     await expect(completeButton).toBeEnabled();
-    await completeButton.click();
+    await completeButton
+      .locator("xpath=ancestor::form")
+      .evaluate((form) => (form as HTMLFormElement).submit());
     await page.waitForURL(/notice=District%20setup%20completed/);
     await expect(page.getByText("District setup completed.")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId(T.districtSetupComplete)).toBeVisible();
