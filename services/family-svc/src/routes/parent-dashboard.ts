@@ -31,6 +31,8 @@ function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID_REGEX.test(value);
 }
 
+type ParentLearnerRow = Record<string, unknown> & { id: string };
+
 export async function registerParentDashboardRoutes(app: FastifyInstance) {
   const db = (app as any).db;
 
@@ -448,24 +450,25 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
         return reply.code(403).send({ error: "Forbidden" });
 
       let parent: { lastDashboardVisit: Date | null; name: string | null } | undefined;
-      let parentLearners: any[] = [];
+      let parentLearners: ParentLearnerRow[] = [];
       try {
         [parent] = await db
           .select({ lastDashboardVisit: users.lastDashboardVisit, name: users.name })
           .from(users)
           .where(eq(users.id, parentId));
-        parentLearners = await db.select().from(learners).where(eq(learners.parentId, parentId));
+        parentLearners = (await db
+          .select()
+          .from(learners)
+          .where(eq(learners.parentId, parentId))) as ParentLearnerRow[];
       } catch (_err) {
         return { parent: null, learners: [] };
       }
 
-      const learnerIds = parentLearners
-        .map((learner: any) => learner.id)
-        .filter((learnerId: unknown): learnerId is string => typeof learnerId === "string");
-      let learnerSummaries: any[] = [];
+      const learnerIds = parentLearners.map((learner) => learner.id);
+      let learnerSummaries: ParentLearnerRow[] = [];
       try {
         learnerSummaries = await Promise.all(
-          parentLearners.map(async (l: any) => {
+          parentLearners.map(async (l) => {
             const [streak] = await db
               .select()
               .from(learnerStreaks)
@@ -491,7 +494,7 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
         );
       } catch (err) {
         app.log.error({ err, parentId }, "Failed to build parent summary");
-        learnerSummaries = parentLearners.map((l: any) => ({
+        learnerSummaries = parentLearners.map((l) => ({
           ...l,
           streak: { currentStreak: 0, longestStreak: 0 },
           badgeCount: 0,
@@ -506,7 +509,7 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
           const states = await db
             .select({ activeTutors: brainStates.activeTutors })
             .from(brainStates)
-            .where(inArray(brainStates.learnerId, learnerIds as any));
+            .where(inArray(brainStates.learnerId, learnerIds));
           const tutorIds = new Set<string>();
           for (const state of states) {
             const tutors = Array.isArray(state.activeTutors) ? state.activeTutors : [];
