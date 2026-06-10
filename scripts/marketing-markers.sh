@@ -141,7 +141,7 @@ marketing_citation_guard() {
 
   # Rule 2 — the known-unsourced "+47.2%" figure must not appear in the body.
   if grep -qF '+47.2%' "$body_file" 2>/dev/null; then
-    printf 'CITATION-GUARD %s: unsourced numeric claim "+47.2%%%%" found in rendered HTML\n' "$route"
+    printf 'CITATION-GUARD %s: unsourced numeric claim "+47.2%%" found in rendered HTML\n' "$route"
   fi
 }
 
