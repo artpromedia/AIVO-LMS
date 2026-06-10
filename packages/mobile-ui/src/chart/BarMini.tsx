@@ -99,7 +99,7 @@ export function BarMini({
                   <Rect
                     x={0}
                     y={0}
-                    width={Math.max(ratio > 0 ? 4 : 0, ratio * 100)}
+                    width={Math.max(4, ratio * 100)}
                     height={BAR_HEIGHT}
                     rx={5}
                     fill={fill}
