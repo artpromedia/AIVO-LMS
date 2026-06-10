@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { ROLE_LABEL, requirePlatformPage } from "@aivo/admin-auth";
 import { getPlatformSystemHealth } from "@aivo/admin-api/platform";
+import type { PlatformSystemHealth } from "@aivo/admin-api";
 import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
 import { AdminNavGrid } from "@/components/admin-nav";
+import { describeSystemHealthFailure } from "./health-state";
 
 const PLATFORM_NAV = [
   {
@@ -105,7 +107,17 @@ const PLATFORM_NAV = [
 
 export default async function PlatformPage() {
   const session = await requirePlatformPage("platform:read");
-  const health = await getPlatformSystemHealth(session);
+
+  // The platform home is the post-login landing page, so a failing admin-svc
+  // read must degrade to a callout instead of crashing the whole console.
+  let health: PlatformSystemHealth | null = null;
+  let healthError: string | null = null;
+  try {
+    health = await getPlatformSystemHealth(session);
+  } catch (error) {
+    console.error("web-admin /platform: system-health read failed", error);
+    healthError = describeSystemHealthFailure(error);
+  }
 
   return (
     <AdminPageFrame
@@ -130,12 +142,22 @@ export default async function PlatformPage() {
         </div>
       }
     >
-      <section className="mt-8 grid gap-4 md:grid-cols-4">
-        <AdminMetricCard label="Tenants" value={health.tenantsTotal} />
-        <AdminMetricCard label="Users" value={health.usersTotal} />
-        <AdminMetricCard label="Learners" value={health.learnersTotal} />
-        <AdminMetricCard label="AI requests 24h" value={health.aiRequests24h} />
-      </section>
+      {health ? (
+        <section className="mt-8 grid gap-4 md:grid-cols-4">
+          <AdminMetricCard label="Tenants" value={health.tenantsTotal} />
+          <AdminMetricCard label="Users" value={health.usersTotal} />
+          <AdminMetricCard label="Learners" value={health.learnersTotal} />
+          <AdminMetricCard label="AI requests 24h" value={health.aiRequests24h} />
+        </section>
+      ) : (
+        <div className="admin-error mt-8">
+          <p>System health is unavailable: {healthError}</p>
+          <p className="mt-1 text-sm font-medium">
+            The rest of the console remains available; pages that read from admin-svc may fail
+            until it recovers.
+          </p>
+        </div>
+      )}
 
       <AdminCard className="mt-6 p-6">
         <h2 className="text-xl font-black">Secure district onboarding</h2>
