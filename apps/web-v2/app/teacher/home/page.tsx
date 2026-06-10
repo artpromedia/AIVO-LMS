@@ -14,26 +14,14 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { LearningHero, FloatingMetricCard, GlassCard, InsightChip, EmptyState } from "@aivo/ui";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
-import { Home, Users, ClipboardList, BarChart3, Settings, Network } from "lucide-react";
+import { TEACHER_NAV } from "@/components/layout/role-shells";
 import {
   getIEPForLearner,
   listLearnersForTeacher,
   listTeacherAssignments,
   refreshLearnerReadiness,
 } from "@/lib/db/repos";
-
-const TEACHER_NAV = [
-  { href: "/teacher/home", label: "Home", icon: <Home className="h-4 w-4" /> },
-  { href: "/teacher/classes", label: "Classes", icon: <Users className="h-4 w-4" /> },
-  { href: "/teacher/rostering", label: "Rostering", icon: <Network className="h-4 w-4" /> },
-  {
-    href: "/teacher/assignments",
-    label: "Assignments",
-    icon: <ClipboardList className="h-4 w-4" />,
-  },
-  { href: "/teacher/insights", label: "Insights", icon: <BarChart3 className="h-4 w-4" /> },
-  { href: "/teacher/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
-];
+import { greetingName } from "@/lib/utils/greeting";
 
 type InsightTone = "warning" | "primary" | "info" | "accent";
 type Insight = {
@@ -54,29 +42,6 @@ const TONE_TINT: Record<InsightTone, string> = {
     "bg-[var(--aivo-aivoTeal-50)] text-[var(--aivo-aivoTeal-700)] border-[var(--aivo-aivoTeal-100)]",
 };
 
-// Greeting first-name: skips honorifics (Ms./Mr./Mrs./Mx./Dr./Prof.)
-// so "Ms. Vega" becomes "Vega" instead of "Ms.".
-function greetingName(displayName: string): string {
-  const parts = displayName.trim().split(/\s+/);
-  const HONORIFICS = new Set([
-    "Ms.",
-    "Ms",
-    "Mr.",
-    "Mr",
-    "Mrs.",
-    "Mrs",
-    "Mx.",
-    "Mx",
-    "Dr.",
-    "Dr",
-    "Prof.",
-    "Prof",
-  ]);
-  for (const p of parts) {
-    if (!HONORIFICS.has(p)) return p;
-  }
-  return parts[0] ?? displayName;
-}
 
 export default async function TeacherHome() {
   const session = await requirePageRole(["teacher"]);
