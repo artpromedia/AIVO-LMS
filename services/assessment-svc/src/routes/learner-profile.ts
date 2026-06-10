@@ -158,10 +158,25 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
       }
 
       const bank = Array.isArray(body.bank) ? body.bank : [];
+      // Re-baseline seeding (Sprint 4): when the caller doesn't supply a
+      // prior, a learner with a completed baseline starts from their current
+      // θ estimate instead of 0 — the run converges faster and never serves
+      // wildly mis-leveled openers.
+      let priorTheta = body.priorTheta;
+      if (priorTheta === undefined) {
+        const [profileRow] = await db
+          .select({ thetaPlacement: learnerProfiles.thetaPlacement })
+          .from(learnerProfiles)
+          .where(eq(learnerProfiles.learnerId, learner.id))
+          .limit(1);
+        if (profileRow && Number.isFinite(profileRow.thetaPlacement)) {
+          priorTheta = profileRow.thetaPlacement;
+        }
+      }
       const { session, nextItem, stop } = startRun({
         bank,
         readingDifficulty: body.readingDifficulty,
-        priorTheta: body.priorTheta,
+        priorTheta,
       });
 
       const [row] = await db
@@ -369,6 +384,12 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
             updatedAt: new Date(),
           },
         });
+
+      // A finalized run satisfies any outstanding rebaseline request.
+      await db
+        .update(learnerProfiles)
+        .set({ rebaselineRequestedAt: null })
+        .where(eq(learnerProfiles.learnerId, learner.id));
 
       // Persist the θ-derived delivery level onto curriculum_alignment (the
       // learners row + latest brain state) so lesson generation targets the

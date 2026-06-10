@@ -107,6 +107,7 @@ import {
   levelFromScore,
 } from "@/lib/learner/mastery";
 import { selectNextSkills } from "@/lib/learner/select-next-skills";
+import { emitLessonMasterySignal } from "@/lib/learner/mastery-signal-emitter";
 import { deliveryLevelFromTheta, normalizeGradeBand } from "@aivo/scoring";
 import { buildBrainProfile } from "@/lib/learner/brain-profile";
 import { brainProfileStateSchema } from "@/lib/validators/brain-profile";
@@ -2134,6 +2135,7 @@ type MasteryDelta = {
   after: number;
   levelBefore: SkillMasteryLevel;
   levelAfter: SkillMasteryLevel;
+  confidenceAfter: number;
 };
 
 async function applyOutcomeToMastery(run: LessonRun, outcome: LessonOutcome): Promise<MasteryDelta> {
@@ -2164,6 +2166,7 @@ async function applyOutcomeToMastery(run: LessonRun, outcome: LessonOutcome): Pr
   const afterLevel = levelFromScore(afterScore);
   const now = nowIso();
 
+  const confidenceAfter = existing ? Math.min(1, existing.confidence + 0.05) : 0.6;
   await curriculum.upsertSkillMastery({
     learnerId: run.learnerId,
     tenantId: run.tenantId,
@@ -2171,7 +2174,7 @@ async function applyOutcomeToMastery(run: LessonRun, outcome: LessonOutcome): Pr
     subjectId: existing?.subjectId ?? run.subjectId,
     score: afterScore,
     level: afterLevel,
-    confidence: existing ? Math.min(1, existing.confidence + 0.05) : 0.6,
+    confidence: confidenceAfter,
     needsReview: outcome.abandoned || accuracy < 0.5,
     lastEvaluatedAt: now,
   });
@@ -2184,6 +2187,7 @@ async function applyOutcomeToMastery(run: LessonRun, outcome: LessonOutcome): Pr
     after: afterScore,
     levelBefore: beforeLevel,
     levelAfter: afterLevel,
+    confidenceAfter,
   };
 }
 
@@ -2324,6 +2328,29 @@ export async function completeLessonRun(
         "lesson: path regen / mastery snapshot failed (non-fatal)",
       );
     }
+  }
+  // Sprint 4: feed the recommendation loop (upward delivery-level +
+  // rebaseline rules) with this skill's mastery movement. Fire-and-forget.
+  {
+    const { map } = await getMasteryMap(next.learnerId, tenantId);
+    const learnerRow = await getLearner(next.learnerId, tenantId);
+    void emitLessonMasterySignal({
+      tenantId,
+      learnerId: next.learnerId,
+      movement: {
+        skillId: next.skillId,
+        subjectId: next.subjectId,
+        before: delta.before,
+        after: delta.after,
+        levelBefore: delta.levelBefore,
+        levelAfter: delta.levelAfter,
+        confidence: delta.confidenceAfter,
+      },
+      currentProfile: {
+        gradeBand: learnerRow?.gradeBand ?? undefined,
+        baselineCompletedAt: map?.generatedAt ?? undefined,
+      },
+    }).catch(() => {});
   }
   const summary = await buildParentLessonSummary(next, effectiveOutcome, delta);
   await runStore.upsertParentSummary(summary);

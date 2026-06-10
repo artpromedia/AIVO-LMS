@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
-import { lessonSessions, lessonContent, gradebookEntries, learningPaths, learners } from "@aivo/db";
+import { lessonSessions, lessonContent, gradebookEntries, learningPaths, learners, learnerProfiles } from "@aivo/db";
 import { emitLessonAudit } from "../lib/audit.js";
 import {
   generateLessonContent,
@@ -13,6 +13,7 @@ import {
   type LessonSignals,
 } from "../services/scoring.js";
 import { resolveGradeTargets } from "../services/grade-target.js";
+import { emitMasterySignals, type MasteryMovement } from "../services/mastery-signal-emitter.js";
 import { resolveTenantId, requireLearnerAccess } from "../lib/tenant.js";
 import { checkLearnerTutorAccess } from "../lib/entitlements.js";
 import { getRealtimeBus, subjects as busSubjects } from "../realtime/bus.js";
@@ -635,6 +636,7 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         completedAt: new Date().toISOString(),
       });
 
+      const masteryMovements: MasteryMovement[] = [];
       if (masteryUpdates) {
         for (const [skill, score] of Object.entries(masteryUpdates)) {
           const existing = await db
@@ -646,6 +648,13 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
                 eq(gradebookEntries.skill, skill),
               ),
             );
+
+          masteryMovements.push({
+            skillId: skill,
+            subjectId: session.subject,
+            before: existing.length > 0 ? (existing[0].masteryScore ?? 0) : 0,
+            after: score as number,
+          });
 
           if (existing.length > 0) {
             await db
@@ -675,6 +684,36 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
             });
           }
         }
+      }
+
+      // Sprint 4: feed the recommendation loop (upward delivery-level +
+      // rebaseline rules) with per-skill mastery movement. Fire-and-forget.
+      if (masteryMovements.length > 0) {
+        void (async () => {
+          const [learnerRow] = await db
+            .select({ curriculumAlignment: learners.curriculumAlignment })
+            .from(learners)
+            .where(eq(learners.id, session.learnerId));
+          const [profileRow] = await db
+            .select({ baselineCompletedAt: learnerProfiles.baselineCompletedAt })
+            .from(learnerProfiles)
+            .where(eq(learnerProfiles.learnerId, session.learnerId));
+          const alignment = (learnerRow?.curriculumAlignment ?? {}) as Record<string, unknown>;
+          await emitMasterySignals({
+            tenantId: session.tenantId,
+            learnerId: session.learnerId,
+            movements: masteryMovements,
+            currentProfile: {
+              deliveryLevel:
+                typeof alignment.delivery_level === "string" ? alignment.delivery_level : undefined,
+              gradeBand:
+                typeof alignment.grade_band === "string" ? alignment.grade_band : undefined,
+              baselineCompletedAt: profileRow?.baselineCompletedAt
+                ? new Date(profileRow.baselineCompletedAt).toISOString()
+                : undefined,
+            },
+          });
+        })().catch(() => {});
       }
 
       await emitLessonAudit({

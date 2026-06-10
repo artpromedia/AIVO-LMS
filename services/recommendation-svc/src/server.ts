@@ -38,13 +38,15 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
         "shared across replicas).",
     );
   }
+  const db = databaseUrl ? createDb(databaseUrl) : undefined;
   const store: RecommendationStore | undefined =
-    options.store ??
-    (databaseUrl ? new DrizzleRecommendationStore(createDb(databaseUrl)) : undefined);
+    options.store ?? (db ? new DrizzleRecommendationStore(db) : undefined);
 
   if (store) {
     const profiles = new ProfileStore();
-    registerRecommendationRoutes(app, { store, profiles });
+    // The db handle enables durable effect writes (learners / brain_states /
+    // learner_profiles) when a recommendation is approved.
+    registerRecommendationRoutes(app, { store, profiles, db });
     registerCandidateRoutes(app, { store });
   } else {
     // Shared in-memory default (also used by the test seed/clear helpers).

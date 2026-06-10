@@ -421,12 +421,25 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
         }
       } catch {}
 
+      // Sprint 4: an approved rebaseline request makes the baseline
+      // startable again — surface it so clients re-offer the flow.
+      let rebaselineRequested = false;
+      try {
+        const [profileRow] = await db
+          .select({ rebaselineRequestedAt: learnerProfiles.rebaselineRequestedAt })
+          .from(learnerProfiles)
+          .where(eq(learnerProfiles.learnerId, learner.id))
+          .limit(1);
+        rebaselineRequested = !!profileRow?.rebaselineRequestedAt;
+      } catch {}
+
       return reply.send({
         learnerId: learner.id,
         baselineCompleted: completed,
         parentAssessmentCompleted: !!parentAss?.completedAt,
         assessmentId: attempt?.id || null,
         approvalStatus,
+        rebaselineRequested,
       });
     },
   );
@@ -819,6 +832,19 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             learnerId: learner.id,
             theta: learningProfile.thetaPlacement,
           });
+          // A completed discovery run satisfies any outstanding rebaseline
+          // request (the profile upsert above refreshed the placement).
+          try {
+            await db
+              .update(learnerProfiles)
+              .set({ rebaselineRequestedAt: null })
+              .where(eq(learnerProfiles.learnerId, learner.id));
+          } catch (clearErr: any) {
+            app.log.warn(
+              { learnerId, err: clearErr?.message },
+              "[discovery/complete] rebaseline marker clear failed (non-fatal)",
+            );
+          }
         }
 
         let brainCloneStatus: string = "pending";

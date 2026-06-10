@@ -159,6 +159,12 @@ export const learnerProfiles = pgTable("learner_profiles", {
   /** Items administered to produce this profile. */
   itemsAdministered: integer("items_administered").notNull().default(0),
   baselineCompletedAt: timestamp("baseline_completed_at").defaultNow().notNull(),
+  /**
+   * Set when a parent approves a rebaseline_request recommendation (or a
+   * care-team effect requests one). The adaptive-baseline start seeds the
+   * new run with the prior θ and finalization clears the marker.
+   */
+  rebaselineRequestedAt: timestamp("rebaseline_requested_at"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

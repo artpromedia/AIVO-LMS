@@ -1,0 +1,76 @@
+/**
+ * Mastery-signal emission from the web lesson pipeline (adaptive-learning
+ * E2E Sprint 4).
+ *
+ * When `completeLessonRun` moves a skill's mastery, the movement is posted
+ * to recommendation-svc as a `mastery_signal` so the progression rules
+ * (upward delivery_level_change, rebaseline_request) have evidence to fire
+ * on. Mirrors problem-session-svc's fire-and-forget emitter: flag-gated and
+ * never allowed to fail the lesson flow.
+ */
+import { serverEnv } from "@/lib/env";
+import type { SkillMasteryLevel } from "@/lib/db/types";
+
+function profileRecommendationsV2Enabled(): boolean {
+  const raw = serverEnv.AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2;
+  if (!raw) return false;
+  const v = String(raw).trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes" || v === "on";
+}
+
+export interface LessonMasteryMovement {
+  skillId: string;
+  subjectId: string;
+  before: number;
+  after: number;
+  levelBefore: SkillMasteryLevel;
+  levelAfter: SkillMasteryLevel;
+  confidence: number;
+}
+
+export function buildLessonMasterySignal(movement: LessonMasteryMovement): {
+  source: "lesson";
+  metric: "mastery_signal";
+  value: number;
+  summary: string;
+  metadata: Record<string, unknown>;
+} {
+  return {
+    source: "lesson",
+    metric: "mastery_signal",
+    value: movement.after,
+    summary: `Mastery moved ${(movement.before * 100).toFixed(0)}% → ${(movement.after * 100).toFixed(0)}% on ${movement.skillId}.`,
+    metadata: {
+      skillId: movement.skillId,
+      subjectId: movement.subjectId,
+      before: movement.before,
+      after: movement.after,
+      levelBefore: movement.levelBefore,
+      levelAfter: movement.levelAfter,
+      confidence: movement.confidence,
+    },
+  };
+}
+
+export async function emitLessonMasterySignal(input: {
+  tenantId: string;
+  learnerId: string;
+  movement: LessonMasteryMovement;
+  currentProfile?: { gradeBand?: string; baselineCompletedAt?: string };
+}): Promise<void> {
+  if (!profileRecommendationsV2Enabled()) return;
+  try {
+    await fetch(`${serverEnv.RECOMMENDATION_SVC_URL}/api/recommendations/candidates`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        learnerId: input.learnerId,
+        tenantId: input.tenantId,
+        signals: [buildLessonMasterySignal(input.movement)],
+        currentProfile: input.currentProfile ?? {},
+      }),
+    });
+  } catch {
+    // Fire-and-forget: the recommendation loop must never break a lesson.
+  }
+}
