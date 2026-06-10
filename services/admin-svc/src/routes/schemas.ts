@@ -326,7 +326,9 @@ export const getAdminSvcPlatformSystemHealthSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcPlatformSystemHealth",
   summary: "GET /api/admin-svc/platform/system-health",
-  response: { 200: passthroughObject },
+  // 503 = every source read failed (DB-wide outage); partial failures still
+  // return 200 with `degraded: true` and per-source `issues`.
+  response: { 200: passthroughObject, 503: errorResponse },
 } as const;
 
 export const getAdminSvcPlatformAiActivitySchema = {

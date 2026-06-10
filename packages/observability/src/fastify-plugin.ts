@@ -33,6 +33,22 @@ export function registerObservabilityPlugin(app: any, serviceName: string) {
     reply.header(REQUEST_ID_HEADER, id);
   });
 
+  // Handler errors are otherwise invisible: services register Fastify with
+  // `logger: false`, so a thrown error becomes a bare 500 with no log line.
+  app.addHook("onError", async (req: any, reply: any, error: any) => {
+    const statusCode = Number(error?.statusCode ?? reply?.statusCode ?? 500);
+    const level = statusCode >= 500 ? "error" : "warn";
+    logger[level]("request_error", {
+      method: req.method ?? "UNKNOWN",
+      path: req.routeOptions?.url ?? req.url ?? "unknown",
+      status_code: statusCode,
+      request_id: req.requestId,
+      err: error?.message,
+      err_cause: error?.cause?.message,
+      stack: error?.stack,
+    });
+  });
+
   // Response logging hook
   app.addHook("onResponse", async (req: any, reply: any) => {
     const durationMs = Date.now() - (req.startMs ?? Date.now());

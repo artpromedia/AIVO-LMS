@@ -21,6 +21,7 @@ import {
   tenants,
   users,
 } from "@aivo/db";
+import { createLogger } from "@aivo/observability";
 import { Permission, verifyJWT } from "@aivo/security";
 import { asc, count, desc, eq, gte, sql } from "drizzle-orm";
 import { requirePermission } from "../lib/permissions.js";
@@ -46,6 +47,8 @@ import {
 
 const IS_PROD = process.env.NODE_ENV === "production";
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+const logger = createLogger("admin-svc:platform");
 
 function requireUrl(name: string, devDefault: string): string {
   const v = process.env[name];
@@ -266,6 +269,22 @@ async function fetchAiBudgetSnapshot(tenantId: string): Promise<AiBudgetSnapshot
   };
 }
 
+type SystemHealthIssue = { source: string; error: string };
+
+/**
+ * Drizzle wraps query failures in DrizzleQueryError whose own message is the
+ * full SQL text; the actionable part ("relation \"ai_usage_log\" does not
+ * exist", "connect ECONNREFUSED ...") lives on `cause`.
+ */
+function describeDbError(error: unknown): string {
+  if (error instanceof Error) {
+    const cause = (error as Error & { cause?: unknown }).cause;
+    if (cause instanceof Error && cause.message) return cause.message;
+    return (error.message.split("\n")[0] || error.message).slice(0, 300);
+  }
+  return String(error).slice(0, 300);
+}
+
 export function registerPlatformRoutes(app: FastifyInstance, db: any) {
   app.get(
     "/api/admin-svc/stats",
@@ -282,29 +301,73 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
       schema: getAdminSvcPlatformSystemHealthSchema,
       preHandler: (req, reply) => requirePermission(req, reply, Permission.PlatformRead),
     },
-    async () => {
-      const tenantTypeRows = await db
-        .select({ type: tenants.type, count: count() })
-        .from(tenants)
-        .groupBy(tenants.type);
-      const [userTotal] = await db.select({ count: count() }).from(users);
-      const [learnerTotal] = await db.select({ count: count() }).from(learners);
-      const [lessonTotal] = await db.select({ count: count() }).from(lessonRuns);
-      const [lessonCompleted] = await db
-        .select({ count: count() })
-        .from(lessonRuns)
-        .where(eq(lessonRuns.status, "completed"));
+    async (req, reply) => {
+      // The dashboard aggregates five independent domains. One broken read
+      // (missing table after a partial migration, a dropped grant, …) must
+      // degrade that signal — not 500 the whole landing page. Failures are
+      // logged here and named per-source in the response so the console can
+      // say exactly what is broken.
+      const issues: SystemHealthIssue[] = [];
+      const read = async <T>(source: string, fallback: T, run: () => Promise<T>): Promise<T> => {
+        try {
+          return await run();
+        } catch (error) {
+          const detail = describeDbError(error);
+          logger.error("system-health read failed", {
+            source,
+            err: detail,
+            request_id: (req as any).requestId,
+          });
+          issues.push({ source, error: detail });
+          return fallback;
+        }
+      };
 
       const since = new Date(Date.now() - DAY_MS);
-      const [aiSummary] = await db
-        .select({
-          requestCount: count(),
-          modelsActive: sql<number>`count(distinct ${aiUsageLog.model})`,
-          avgLatencyMs: sql<number>`coalesce(round(avg(${aiUsageLog.latencyMs})), 0)`,
-          estimatedCostUsd: sql<string>`coalesce(sum(${aiUsageLog.estimatedCostUsd}), 0)`,
-        })
-        .from(aiUsageLog)
-        .where(gte(aiUsageLog.createdAt, since));
+      const [tenantTypeRows, userTotal, learnerTotal, lessonStats, aiSummary] = await Promise.all([
+        read<Array<{ type: string | null; count: number | string | null }>>("tenants", [], () =>
+          db.select({ type: tenants.type, count: count() }).from(tenants).groupBy(tenants.type),
+        ),
+        read<number | null>("users", null, async () => {
+          const [row] = await db.select({ count: count() }).from(users);
+          return Number(row?.count ?? 0);
+        }),
+        read<number | null>("learners", null, async () => {
+          const [row] = await db.select({ count: count() }).from(learners);
+          return Number(row?.count ?? 0);
+        }),
+        read<{ total: number; completed: number } | null>("lesson_runs", null, async () => {
+          const [total] = await db.select({ count: count() }).from(lessonRuns);
+          const [completed] = await db
+            .select({ count: count() })
+            .from(lessonRuns)
+            .where(eq(lessonRuns.status, "completed"));
+          return { total: Number(total?.count ?? 0), completed: Number(completed?.count ?? 0) };
+        }),
+        read<Record<string, unknown> | null>("ai_usage", null, async () => {
+          const [row] = await db
+            .select({
+              requestCount: count(),
+              modelsActive: sql<number>`count(distinct ${aiUsageLog.model})`,
+              avgLatencyMs: sql<number>`coalesce(round(avg(${aiUsageLog.latencyMs})), 0)`,
+              estimatedCostUsd: sql<string>`coalesce(sum(${aiUsageLog.estimatedCostUsd}), 0)`,
+            })
+            .from(aiUsageLog)
+            .where(gte(aiUsageLog.createdAt, since));
+          return row ?? {};
+        }),
+      ]);
+
+      if (issues.length === 5) {
+        // Nothing readable — almost certainly the DB itself (bad
+        // DATABASE_URL, connection refused). Stay a hard failure, but a
+        // diagnosable one.
+        return reply.status(503).send({
+          error: "system_health_unavailable",
+          detail: issues[0]?.error,
+          issues,
+        });
+      }
 
       const tenantCounts = {
         district: 0,
@@ -324,14 +387,16 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
         tenantCounts,
         tenantsTotal:
           tenantCounts.district + tenantCounts.school + tenantCounts.family + tenantCounts.unknown,
-        usersTotal: Number(userTotal?.count ?? 0),
-        learnersTotal: Number(learnerTotal?.count ?? 0),
-        lessonRunsTotal: Number(lessonTotal?.count ?? 0),
-        lessonRunsCompleted: Number(lessonCompleted?.count ?? 0),
+        usersTotal: userTotal ?? 0,
+        learnersTotal: learnerTotal ?? 0,
+        lessonRunsTotal: lessonStats?.total ?? 0,
+        lessonRunsCompleted: lessonStats?.completed ?? 0,
         aiRequests24h: Number(aiSummary?.requestCount ?? 0),
         aiModelsActive24h: Number(aiSummary?.modelsActive ?? 0),
         aiAvgLatencyMs24h: Number(aiSummary?.avgLatencyMs ?? 0),
         aiEstimatedCostUsd24h: Number(aiSummary?.estimatedCostUsd ?? 0),
+        degraded: issues.length > 0,
+        issues,
       };
     },
   );

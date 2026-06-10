@@ -4,6 +4,7 @@ import { getPlatformSystemHealth } from "@aivo/admin-api/platform";
 import type { PlatformSystemHealth } from "@aivo/admin-api";
 import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
 import { AdminNavGrid } from "@/components/admin-nav";
+import { SystemHealthDegradedCallout } from "@/components/system-health-callout";
 import { describeSystemHealthFailure } from "./health-state";
 
 const PLATFORM_NAV = [
@@ -143,12 +144,15 @@ export default async function PlatformPage() {
       }
     >
       {health ? (
-        <section className="mt-8 grid gap-4 md:grid-cols-4">
-          <AdminMetricCard label="Tenants" value={health.tenantsTotal} />
-          <AdminMetricCard label="Users" value={health.usersTotal} />
-          <AdminMetricCard label="Learners" value={health.learnersTotal} />
-          <AdminMetricCard label="AI requests 24h" value={health.aiRequests24h} />
-        </section>
+        <>
+          <section className="mt-8 grid gap-4 md:grid-cols-4">
+            <AdminMetricCard label="Tenants" value={health.tenantsTotal} />
+            <AdminMetricCard label="Users" value={health.usersTotal} />
+            <AdminMetricCard label="Learners" value={health.learnersTotal} />
+            <AdminMetricCard label="AI requests 24h" value={health.aiRequests24h} />
+          </section>
+          <SystemHealthDegradedCallout className="mt-4" issues={health.issues} />
+        </>
       ) : (
         <div className="admin-error mt-8">
           <p>System health is unavailable: {healthError}</p>
