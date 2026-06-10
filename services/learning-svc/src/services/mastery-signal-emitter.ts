@@ -21,14 +21,10 @@ function profileRecommendationsV2Enabled(): boolean {
   return !(v === "0" || v === "false" || v === "no" || v === "off");
 }
 
-/** Mastery level bucket shared with the web pipeline's levelFromScore. */
-export function masteryLevelFromScore(score: number): string {
-  if (score >= 0.85) return "stretching";
-  if (score >= 0.65) return "on_grade_level";
-  if (score >= 0.4) return "approaching";
-  if (score > 0) return "emerging";
-  return "not_started";
-}
+import { masteryLevelFromScore } from "@aivo/scoring";
+
+// Canonical bucketing — single source of truth in @aivo/scoring (Sprint 7).
+export { masteryLevelFromScore };
 
 export interface MasteryMovement {
   skillId: string;

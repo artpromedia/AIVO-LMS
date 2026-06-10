@@ -14,6 +14,7 @@ import {
 } from "../services/scoring.js";
 import { resolveGradeTargets } from "../services/grade-target.js";
 import { emitMasterySignals, type MasteryMovement } from "../services/mastery-signal-emitter.js";
+import { writeMasteryToWebStore } from "../services/web-mastery-writer.js";
 import { resolveTenantId, requireLearnerAccess } from "../lib/tenant.js";
 import { checkLearnerTutorAccess } from "../lib/entitlements.js";
 import { getRealtimeBus, subjects as busSubjects } from "../realtime/bus.js";
@@ -683,6 +684,28 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
               lastAssessedAt: new Date(),
             });
           }
+        }
+      }
+
+      // Sprint 7: land the same evidence in the web mastery store (the one
+      // that drives selection, paths, snapshots, recommendations). Resilient
+      // — a mastery-store failure must never fail session completion.
+      if (masteryUpdates && Object.keys(masteryUpdates).length > 0) {
+        try {
+          await writeMasteryToWebStore(db, request.log, {
+            tenantId: session.tenantId,
+            learnerId: session.learnerId,
+            updates: masteryUpdates as Record<string, number>,
+          });
+        } catch (err) {
+          request.log.warn(
+            {
+              event: "web_mastery.write_failed",
+              learnerId: session.learnerId,
+              err: err instanceof Error ? err.message : String(err),
+            },
+            "web mastery store write failed (non-fatal)",
+          );
         }
       }
 

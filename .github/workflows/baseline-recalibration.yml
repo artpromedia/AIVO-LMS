@@ -1,0 +1,54 @@
+name: Baseline Item Recalibration
+
+# Weekly batch counterpart of the live adaptive recalibration
+# (adaptive-learning E2E Sprint 7): validates the captured per-item
+# telemetry, recomputes item difficulty/discrimination health per tenant,
+# and emits an operator-facing summary. The calibration map itself is
+# derived on read from the durable telemetry; this job is the scheduled
+# health check + snapshot.
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # Mondays 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      min_exposure:
+        description: "Minimum item exposures required to calibrate"
+        required: false
+        default: "20"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: baseline-recalibration
+  cancel-in-progress: false
+
+jobs:
+  recalibrate:
+    name: Recalibrate baseline items
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @aivo/db + @aivo/scoring
+        run: pnpm --filter @aivo/db --filter @aivo/scoring build
+
+      - name: Run recalibration job
+        working-directory: apps/web-v2
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          AIVO_PERSISTENCE: postgres
+        run: |
+          pnpm exec tsx scripts/recalibrate-baseline-cli.ts \
+            --min-exposure=${{ github.event.inputs.min_exposure || '20' }}

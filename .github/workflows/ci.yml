@@ -338,6 +338,55 @@ jobs:
       - name: Run in-process integration tests (service contracts, no Docker)
         run: pnpm test:integration:inprocess
 
+  adaptive-journey:
+    # Sprint 7 — the regression canary for the platform's core promise:
+    # intake → baseline → θ placement → adapted lessons → upward
+    # recommendation → parent approval → re-baseline. Real Postgres, every
+    # service in-process, only the LLM/brain HTTP boundaries stubbed.
+    name: Adaptive Learning Journey (E2E)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: lint-and-typecheck
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: aivo_journey
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm --filter @aivo/db --filter @aivo/scoring --filter @aivo/security --filter @aivo/audit-svc build
+
+      - name: Bootstrap journey schema (journal + out-of-band migrations)
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_journey
+        run: pnpm exec tsx tests/integration/journey/setup-db.ts
+
+      - name: Run the full-journey E2E suite
+        env:
+          JOURNEY_DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_journey
+        run: pnpm test:journey
+
   brain-svc:
     name: Brain Service (Python)
     runs-on: ubuntu-latest

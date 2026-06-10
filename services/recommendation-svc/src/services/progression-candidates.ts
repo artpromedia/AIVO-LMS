@@ -51,6 +51,14 @@ interface MasterySignalMeta {
   before?: number;
   after?: number;
   confidence?: number;
+  /**
+   * "snapshot" marks current-state evidence the emitter includes alongside a
+   * real movement (e.g. the subject's other on-grade skills) so the upward
+   * rule can see sustained mastery from single-skill lessons. Snapshots
+   * carry no movement and are EXCLUDED from the rebaseline level-shift and
+   * stall computations.
+   */
+  kind?: string;
 }
 
 function masterySignals(signals: LearnerSignal[]): Array<LearnerSignal & { meta: MasterySignalMeta }> {
@@ -179,9 +187,13 @@ export function buildRebaselineCandidate(
     }
   }
 
-  // (b) Level shifts since the baseline.
+  // (b) Level shifts since the baseline (snapshots carry no movement).
   const shifted = mastery.filter(
-    (s) => s.meta.levelBefore && s.meta.levelAfter && s.meta.levelBefore !== s.meta.levelAfter,
+    (s) =>
+      s.meta.kind !== "snapshot" &&
+      s.meta.levelBefore &&
+      s.meta.levelAfter &&
+      s.meta.levelBefore !== s.meta.levelAfter,
   );
   const shiftedSkills = new Set(shifted.map((s) => s.meta.skillId).filter(Boolean));
   if (shiftedSkills.size >= REBASELINE_LEVEL_SHIFT_SKILLS) {
@@ -201,9 +213,11 @@ export function buildRebaselineCandidate(
     }
   }
 
-  // (c) Stall within one subject.
-  const bySubject = new Map<string, typeof mastery>();
-  for (const s of mastery) {
+  // (c) Stall within one subject (movement signals only — snapshots would
+  // register as zero movement and fake a stall).
+  const movementSignals = mastery.filter((s) => s.meta.kind !== "snapshot");
+  const bySubject = new Map<string, typeof movementSignals>();
+  for (const s of movementSignals) {
     const subjectId = s.meta.subjectId;
     if (!subjectId) continue;
     const list = bySubject.get(subjectId);

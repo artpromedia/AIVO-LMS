@@ -209,6 +209,49 @@ describe("buildRebaselineCandidate", () => {
   });
 });
 
+describe("snapshot evidence (single-skill web lessons)", () => {
+  const belowGrade = { deliveryLevel: "3", gradeBand: "5" };
+  const snapshot = (skillId: string): LearnerSignal => ({
+    source: "lesson",
+    metric: "mastery_signal",
+    value: 0.8,
+    summary: `Currently 80% on ${skillId} (snapshot)`,
+    metadata: {
+      skillId,
+      subjectId: "sub-math",
+      before: 0.8,
+      after: 0.8,
+      levelBefore: "on_grade_level",
+      levelAfter: "on_grade_level",
+      confidence: 0.7,
+      kind: "snapshot",
+    },
+  });
+
+  it("one real movement + two snapshot peers fire the upward rule", () => {
+    const recs = buildUpwardDeliveryCandidates(
+      input([masterySignal({ skillId: "a" }), snapshot("b"), snapshot("c")], belowGrade),
+    );
+    expect(recs).toHaveLength(1);
+  });
+
+  it("snapshots never count toward the rebaseline level-shift rule", () => {
+    // Five snapshots with equal levels (no shift) + nothing else.
+    const rec = buildRebaselineCandidate(
+      input(["a", "b", "c", "d", "e"].map(snapshot)),
+      new Date("2026-06-10T00:00:00.000Z"),
+    );
+    expect(rec).toBeNull();
+  });
+
+  it("snapshots never fake a stall", () => {
+    const signals = Array.from({ length: 12 }, (_, i) => snapshot(`s${i}`));
+    expect(
+      buildRebaselineCandidate(input(signals), new Date("2026-06-10T00:00:00.000Z")),
+    ).toBeNull();
+  });
+});
+
 describe("dedupeAgainstPending", () => {
   it("drops a duplicate PENDING upward change for the same subject, keeps other subjects", () => {
     const candidates = buildUpwardDeliveryCandidates(

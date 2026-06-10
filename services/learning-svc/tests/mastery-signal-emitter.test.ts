@@ -33,11 +33,14 @@ test("buildMasterySignals carries the metadata the progression rules read", () =
   });
 });
 
-test("masteryLevelFromScore buckets match the web pipeline", () => {
+test("masteryLevelFromScore buckets match the canonical web thresholds", () => {
   assert.equal(masteryLevelFromScore(0.9), "stretching");
   assert.equal(masteryLevelFromScore(0.65), "on_grade_level");
   assert.equal(masteryLevelFromScore(0.5), "approaching");
-  assert.equal(masteryLevelFromScore(0.1), "emerging");
+  assert.equal(masteryLevelFromScore(0.2), "emerging");
+  // Canonical: anything below 0.15 is not_started (was ">0 emerging" before
+  // Sprint 7 unified the bucketing in @aivo/scoring).
+  assert.equal(masteryLevelFromScore(0.1), "not_started");
   assert.equal(masteryLevelFromScore(0), "not_started");
 });
 

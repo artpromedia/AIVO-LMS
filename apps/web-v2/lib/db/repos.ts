@@ -108,7 +108,12 @@ import {
 } from "@/lib/learner/mastery";
 import { selectNextSkills } from "@/lib/learner/select-next-skills";
 import { emitLessonMasterySignal } from "@/lib/learner/mastery-signal-emitter";
-import { deliveryLevelFromTheta, normalizeGradeBand } from "@aivo/scoring";
+import {
+  deliveryLevelFromTheta,
+  normalizeGradeBand,
+  masteryTargetFromOutcome,
+  moveMasteryScore,
+} from "@aivo/scoring";
 import { buildBrainProfile } from "@/lib/learner/brain-profile";
 import { brainProfileStateSchema } from "@/lib/validators/brain-profile";
 import type { CreateLearnerInput, PatchLearnerInput } from "@/lib/validators/learner";
@@ -2155,14 +2160,10 @@ async function applyOutcomeToMastery(run: LessonRun, outcome: LessonOutcome): Pr
   const beforeScore = existing?.score ?? run.masterySnapshot.score;
   const beforeLevel: SkillMasteryLevel = existing?.level ?? run.masterySnapshot.level;
 
-  // accuracy in [0..1]; default to 0.5 when there were no checks (intro-only run)
+  // Canonical EWMA — shared with learning-svc via @aivo/scoring (Sprint 7).
   const accuracy = outcome.checksTotal > 0 ? outcome.checksCorrect / outcome.checksTotal : 0.5;
-  // Hints and scaffolds discount the apparent accuracy.
-  const supportPenalty = Math.min(0.15, 0.04 * outcome.hintsUsed + 0.05 * outcome.scaffoldsUsed);
-  const adjusted = Math.max(0, accuracy - supportPenalty);
-  // Move 25% of the way toward the adjusted target; abandoned runs decay slightly.
-  const target = outcome.abandoned ? Math.min(beforeScore, 0.5) : adjusted;
-  const afterScore = Math.max(0, Math.min(1, beforeScore + (target - beforeScore) * 0.25));
+  const target = masteryTargetFromOutcome(outcome, beforeScore);
+  const afterScore = moveMasteryScore(beforeScore, target);
   const afterLevel = levelFromScore(afterScore);
   const now = nowIso();
 
@@ -2332,8 +2333,25 @@ export async function completeLessonRun(
   // Sprint 4: feed the recommendation loop (upward delivery-level +
   // rebaseline rules) with this skill's mastery movement. Fire-and-forget.
   {
-    const { map } = await getMasteryMap(next.learnerId, tenantId);
+    const { map, skillMasteries: currentMasteries } = await getMasteryMap(
+      next.learnerId,
+      tenantId,
+    );
     const learnerRow = await getLearner(next.learnerId, tenantId);
+    // Current-state peers (>= 0.65 in this subject, excluding the moved
+    // skill) ride along as snapshot evidence so the upward rule can see
+    // sustained mastery from single-skill lessons.
+    const subjectPeers = currentMasteries
+      .filter(
+        (m) => m.subjectId === next.subjectId && m.skillId !== next.skillId && m.score >= 0.65,
+      )
+      .map((m) => ({
+        skillId: m.skillId,
+        subjectId: m.subjectId,
+        score: m.score,
+        level: m.level,
+        confidence: m.confidence,
+      }));
     void emitLessonMasterySignal({
       tenantId,
       learnerId: next.learnerId,
@@ -2346,6 +2364,7 @@ export async function completeLessonRun(
         levelAfter: delta.levelAfter,
         confidence: delta.confidenceAfter,
       },
+      subjectPeers,
       currentProfile: {
         gradeBand: learnerRow?.gradeBand ?? undefined,
         baselineCompletedAt: map?.generatedAt ?? undefined,

@@ -30,6 +30,14 @@ export interface LessonMasteryMovement {
   confidence: number;
 }
 
+export interface SubjectPeerSnapshot {
+  skillId: string;
+  subjectId: string;
+  score: number;
+  level: SkillMasteryLevel;
+  confidence: number;
+}
+
 export function buildLessonMasterySignal(movement: LessonMasteryMovement): {
   source: "lesson";
   metric: "mastery_signal";
@@ -54,11 +62,44 @@ export function buildLessonMasterySignal(movement: LessonMasteryMovement): {
   };
 }
 
+/**
+ * Current-state evidence for the subject's OTHER on-grade skills, sent
+ * alongside the movement so the upward delivery-level rule (>= 3 distinct
+ * sustained skills) is reachable from single-skill web lessons. Flagged
+ * `kind: "snapshot"` — the rebaseline level-shift/stall rules ignore them.
+ */
+export function buildSubjectPeerSnapshotSignal(peer: SubjectPeerSnapshot): {
+  source: "lesson";
+  metric: "mastery_signal";
+  value: number;
+  summary: string;
+  metadata: Record<string, unknown>;
+} {
+  return {
+    source: "lesson",
+    metric: "mastery_signal",
+    value: peer.score,
+    summary: `Currently ${(peer.score * 100).toFixed(0)}% on ${peer.skillId} (mastery store snapshot).`,
+    metadata: {
+      skillId: peer.skillId,
+      subjectId: peer.subjectId,
+      before: peer.score,
+      after: peer.score,
+      levelBefore: peer.level,
+      levelAfter: peer.level,
+      confidence: peer.confidence,
+      kind: "snapshot",
+    },
+  };
+}
+
 export async function emitLessonMasterySignal(input: {
   tenantId: string;
   learnerId: string;
   movement: LessonMasteryMovement;
-  currentProfile?: { gradeBand?: string; baselineCompletedAt?: string };
+  /** Other on-grade skills in the same subject (current state, optional). */
+  subjectPeers?: SubjectPeerSnapshot[];
+  currentProfile?: { gradeBand?: string; deliveryLevel?: string; baselineCompletedAt?: string };
 }): Promise<void> {
   if (!profileRecommendationsV2Enabled()) return;
   try {
@@ -68,7 +109,10 @@ export async function emitLessonMasterySignal(input: {
       body: JSON.stringify({
         learnerId: input.learnerId,
         tenantId: input.tenantId,
-        signals: [buildLessonMasterySignal(input.movement)],
+        signals: [
+          buildLessonMasterySignal(input.movement),
+          ...(input.subjectPeers ?? []).map(buildSubjectPeerSnapshotSignal),
+        ],
         currentProfile: input.currentProfile ?? {},
       }),
     });

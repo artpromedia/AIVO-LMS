@@ -19,6 +19,7 @@ import type {
 } from "@/lib/db/types";
 import { newId, nowIso } from "@/lib/db/store";
 import { selectNextSkills } from "./select-next-skills";
+import { masteryLevelFromScore } from "@aivo/scoring";
 
 const DIFFICULTY_WEIGHT: Record<BaselineQuestion["difficulty"], number> = {
   foundational: 0.4,
@@ -28,11 +29,8 @@ const DIFFICULTY_WEIGHT: Record<BaselineQuestion["difficulty"], number> = {
 };
 
 export function levelFromScore(score: number): SkillMasteryLevel {
-  if (score < 0.15) return "not_started";
-  if (score < 0.4) return "emerging";
-  if (score < 0.65) return "approaching";
-  if (score < 0.9) return "on_grade_level";
-  return "stretching";
+  // Canonical bucketing lives in @aivo/scoring (shared with learning-svc).
+  return masteryLevelFromScore(score) as SkillMasteryLevel;
 }
 
 type MasteryInputs = {

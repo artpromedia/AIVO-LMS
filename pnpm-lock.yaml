@@ -2487,12 +2487,21 @@ importers:
 
   tests/integration:
     dependencies:
+      '@aivo/assessment-svc':
+        specifier: workspace:*
+        version: link:../../services/assessment-svc
       '@aivo/audit-svc':
         specifier: workspace:*
         version: link:../../services/audit-svc
+      '@aivo/comms-svc':
+        specifier: workspace:*
+        version: link:../../services/comms-svc
       '@aivo/data-governance-svc':
         specifier: workspace:*
         version: link:../../services/data-governance-svc
+      '@aivo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@aivo/enterprise-core':
         specifier: workspace:*
         version: link:../../packages/enterprise-core
@@ -2502,6 +2511,12 @@ importers:
       '@aivo/homework-svc':
         specifier: workspace:*
         version: link:../../services/homework-svc
+      '@aivo/identity-svc':
+        specifier: workspace:*
+        version: link:../../services/identity-svc
+      '@aivo/learning-svc':
+        specifier: workspace:*
+        version: link:../../services/learning-svc
       '@aivo/problem-session-svc':
         specifier: workspace:*
         version: link:../../services/problem-session-svc
@@ -2511,13 +2526,28 @@ importers:
       '@aivo/responsible-ai-svc':
         specifier: workspace:*
         version: link:../../services/responsible-ai-svc
+      '@aivo/scoring':
+        specifier: workspace:*
+        version: link:../../packages/scoring
+      '@aivo/security':
+        specifier: workspace:*
+        version: link:../../packages/security
       '@aivo/tutor-surface-protocol':
         specifier: workspace:*
         version: link:../../packages/tutor-surface-protocol
     devDependencies:
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.6.1)(gel@2.2.0)(postgres@3.4.5)
       fastify:
         specifier: '>=5.8.5'
         version: 5.8.5
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.5
+      tsx:
+        specifier: ^4.19.0
+        version: 4.21.0
       vitest:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@22.19.17)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.46.1)
