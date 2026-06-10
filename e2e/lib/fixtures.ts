@@ -19,6 +19,7 @@ export const IDENTITY_BASE = process.env.IDENTITY_BASE_URL || "http://localhost:
 export const ASSESSMENT_BASE = process.env.ASSESSMENT_SVC_URL || "http://localhost:3071";
 export const AI_BASE = process.env.AI_SVC_URL || "http://localhost:3004";
 export const ADMIN_BASE = process.env.ADMIN_SVC_URL || "http://localhost:3005";
+export const BILLING_BASE = process.env.BILLING_BASE_URL || "http://localhost:3009";
 
 export interface SeededUser {
   userId: string;
@@ -157,7 +158,7 @@ export const seedSchoolAdmin = (email = `e2e-school-${Date.now()}@aivo.test`) =>
 /** Seed a DISTRICT_ADMIN with a real bearer token and an optional pilot seat
  *  cap on its tenant. Used by the Sprint 2 parent-invite e2e. */
 export async function seedDistrictAdmin(
-  opts: { email?: string; seatLimit?: number } = {},
+  opts: { email?: string; seatLimit?: number; tenantName?: string } = {},
 ): Promise<(SeededUser & { tenantId: string }) | null> {
   const email = opts.email ?? `e2e-district-${Date.now()}@aivo.test`;
   const password = "E2eDistrict!Pass1";
@@ -165,7 +166,7 @@ export async function seedDistrictAdmin(
     const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
     try {
       const res = await ctx.post(`/api/__test__/seed-district-admin`, {
-        data: { email, password, seatLimit: opts.seatLimit },
+        data: { email, password, seatLimit: opts.seatLimit, tenantName: opts.tenantName },
         failOnStatusCode: false,
       });
       if (res.status() !== 200) return null;
@@ -190,12 +191,17 @@ export const seedPlatformAdmin = (email = `e2e-platform-${Date.now()}@aivo.test`
 export const seedSupportStaff = (email = `e2e-support-${Date.now()}@aivo.test`) =>
   seedUser("support", email, "E2eSupport!Pass1");
 
-export async function seedLearnerForParent(parent: SeededUser): Promise<SeededLearner | null> {
+export async function seedLearnerForParent(
+  parent: SeededUser,
+  opts: { name?: string } = {},
+): Promise<SeededLearner | null> {
   try {
     const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
     try {
+      // The helper is idempotent by (parent, name) — pass a distinct name to
+      // seed more than one learner for the same parent.
       const res = await ctx.post(`/api/__test__/seed-learner`, {
-        data: { parentUserId: parent.userId, tenantId: parent.tenantId },
+        data: { parentUserId: parent.userId, tenantId: parent.tenantId, name: opts.name },
         failOnStatusCode: false,
       });
       if (res.status() !== 200) return null;
@@ -338,6 +344,15 @@ export const T = {
   navGroupBillingGrowth: "nav-group-billing-growth",
   navGroupComplianceTrust: "nav-group-compliance-trust",
   navGroupOperations: "nav-group-operations",
+  // web-admin /district — district control surface.
+  districtKpiSchools: "district-kpi-schools",
+  districtKpiStaff: "district-kpi-staff",
+  districtKpiLearners: "district-kpi-learners",
+  districtSeatGauge: "district-seat-gauge",
+  districtRosterMix: "district-roster-mix",
+  districtSetup: "district-setup",
+  districtSetupProgress: "district-setup-progress",
+  districtSetupComplete: "district-setup-complete",
   // Inner hooks rendered by the @aivo/admin-ui primitives themselves.
   donutCenterTotal: "donut-center-total",
   gaugeCenterLabel: "gauge-center-label",

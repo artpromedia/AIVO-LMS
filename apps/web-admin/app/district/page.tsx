@@ -8,29 +8,14 @@ import {
   getDistrictRosteringGrant,
   getDistrictSetupOverview,
   inviteDistrictAdmin,
+  listDistrictLearners,
   setDistrictRosteringGrant,
   updateDistrictBranding,
 } from "@aivo/admin-api/identity";
 import { getDistrictPilotStatus } from "@aivo/admin-api/billing";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
-import { AdminNavGrid } from "@/components/admin-nav";
-
-const DISTRICT_NAV = [
-  { href: "/district/billing", title: "Billing", description: "Accounts and trial conversion." },
-  {
-    href: "/district/sis",
-    title: "SIS connectors",
-    description: "Roster sync (Clever, OneRoster).",
-  },
-  { href: "/district/iep", title: "IEP evaluations", description: "SPED evaluation pipeline." },
-  { href: "/district/reports", title: "Reports", description: "Run and export district reports." },
-  {
-    href: "/district/compliance",
-    title: "Compliance",
-    description: "Data-protection control monitoring.",
-  },
-  { href: "/district/audit", title: "Audit log", description: "Administrative action history." },
-];
+import { AdminCard, AdminKpiCard, AdminPageFrame, ChartCard, DonutBreakdown, Gauge } from "@aivo/admin-ui";
+import type { DonutSlice } from "@aivo/admin-ui";
+import { growthKpi } from "../platform/dashboard-data";
 
 async function completeSetup() {
   "use server";
@@ -122,6 +107,12 @@ const checklistCopy = {
   sso: ["Confirm SSO and SCIM approach", "Enable identity automation when your district is ready."],
 } as const;
 
+const EXPIRY_FORMAT = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
 export default async function DistrictPage({
   searchParams,
 }: {
@@ -133,8 +124,21 @@ export default async function DistrictPage({
   const rostering = await getDistrictRosteringGrant(session);
   // Pilot ops summary (real read model). Null when this district has no pilot
   // subscription; a transient billing error is swallowed so the console still
-  // renders its setup/roster view.
+  // renders its setup/roster view. Same tolerance for the learner growth list.
   const pilot = await getDistrictPilotStatus(session, setup.district.id).catch(() => null);
+  const learnerRows = await listDistrictLearners(session).catch(() => null);
+
+  const learnersKpi = learnerRows ? growthKpi(learnerRows) : null;
+  const checklistDone = Object.values(setup.checklist).filter(Boolean).length;
+  const checklistTotal = Object.keys(setup.checklist).length;
+
+  const seatRatio =
+    pilot && pilot.seatLimit && pilot.seatLimit > 0 ? pilot.seatsUsed / pilot.seatLimit : 0;
+  const donutSlices: DonutSlice[] = [
+    { label: "Staff", value: setup.counts.staff, tone: "primary" },
+    { label: "Learners", value: setup.counts.learners, tone: "positive" },
+    ...(pilot ? [{ label: "Parents", value: pilot.parentsOnboarded, tone: "warning" as const }] : []),
+  ];
 
   return (
     <AdminPageFrame
@@ -145,66 +149,137 @@ export default async function DistrictPage({
       {params.notice ? <p className="admin-notice mt-8">{params.notice}</p> : null}
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
 
-      {pilot ? (
-        <div className="mt-8 flex flex-wrap items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
-            Pilot
-          </span>
-          <p className="font-semibold text-blue-900">
-            {pilot.seatLimit == null
-              ? `${pilot.seatsUsed} learners (uncapped)`
-              : `${pilot.seatsUsed} of ${pilot.seatLimit} seats used`}
-            {pilot.expiresAt ? ` · expires ${new Date(pilot.expiresAt).toLocaleDateString()}` : ""}
-          </p>
-        </div>
-      ) : null}
-
+      {/* Row 1 — roster KPIs from the live setup overview. */}
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Schools" value={setup.counts.schools} />
-        <AdminMetricCard label="Staff" value={setup.counts.staff} />
-        <AdminMetricCard label="Learners" value={setup.counts.learners} />
+        <AdminKpiCard label="Schools" testId="district-kpi-schools" value={setup.counts.schools} />
+        <AdminKpiCard label="Staff" testId="district-kpi-staff" value={setup.counts.staff} />
+        <AdminKpiCard
+          label="Learners"
+          testId="district-kpi-learners"
+          value={setup.counts.learners}
+          delta={learnersKpi?.delta}
+          deltaCaption="in the last 7 days"
+          trend={learnersKpi?.trend}
+        />
       </section>
 
+      {/* Row 2 — pilot seat usage + roster composition. */}
+      <section className="mt-6 grid gap-6 lg:grid-cols-2">
+        {pilot ? (
+          <ChartCard
+            testId="district-seat-gauge"
+            title="Seat usage"
+            subtitle={[
+              pilot.seatLimit != null
+                ? `${(pilot.seatsRemaining ?? 0).toLocaleString("en-US")} seats remaining`
+                : "Uncapped pilot",
+              pilot.expiresAt ? `Expires ${EXPIRY_FORMAT.format(new Date(pilot.expiresAt))}` : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+            aspect={16 / 10}
+          >
+            <Gauge
+              ratio={seatRatio}
+              title="Pilot seat usage"
+              description={`${pilot.seatsUsed} of ${pilot.seatLimit ?? "uncapped"} pilot seats in use`}
+              label={
+                pilot.seatLimit != null
+                  ? `${pilot.seatsUsed.toLocaleString("en-US")}/${pilot.seatLimit.toLocaleString("en-US")}`
+                  : pilot.seatsUsed.toLocaleString("en-US")
+              }
+              caption="seats used"
+            />
+          </ChartCard>
+        ) : (
+          <AdminCard className="p-6" testId="district-seat-gauge">
+            <h3 className="admin-h2">Seat usage</h3>
+            <p className="mt-2 text-sm text-slate-600">
+              No active pilot subscription. Seat usage appears here once your district is
+              provisioned.
+            </p>
+          </AdminCard>
+        )}
+        <ChartCard
+          testId="district-roster-mix"
+          title="Roster composition"
+          subtitle="Staff, learners, and onboarded parents in your district."
+          aspect={16 / 10}
+        >
+          <DonutBreakdown
+            data={donutSlices}
+            title="Roster composition"
+            description="District roster broken down by staff, learners, and parents"
+            totalLabel="people"
+          />
+        </ChartCard>
+      </section>
+
+      {/* First-run setup — single progress widget; the quick-action server
+          actions (addSchool / inviteAdmin / saveSupportContact /
+          completeSetup) are unchanged. */}
       {!setup.setupComplete ? (
-        <AdminCard className="mt-6 p-6">
+        <AdminCard className="mt-6 p-6" testId="district-setup">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="admin-step">First-run setup</p>
-              <h2 className="mt-3 text-2xl font-black">Prepare your district</h2>
+              <h2 className="admin-h2 mt-3 text-2xl">Prepare your district</h2>
               <p className="mt-2 text-slate-600">
                 Complete the operational checklist. At least one school is required before setup can
                 be closed.
               </p>
             </div>
-            <p className="rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800">
-              {Object.values(setup.checklist).filter(Boolean).length} of 4 ready
+            <p
+              className="rounded-xl bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800"
+              data-testid="district-setup-progress"
+            >
+              {checklistDone} of {checklistTotal} ready
             </p>
           </div>
-          <div className="mt-6 grid gap-3 md:grid-cols-2">
+
+          <div
+            className="mt-4 h-2 w-full rounded-full"
+            style={{ background: "var(--admin-chart-grid)" }}
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={checklistTotal}
+            aria-valuenow={checklistDone}
+            aria-label="District setup progress"
+          >
+            <div
+              className="h-2 rounded-full"
+              style={{
+                width: `${Math.round((checklistDone / checklistTotal) * 100)}%`,
+                background: "var(--admin-chart-1)",
+              }}
+            />
+          </div>
+          <ul className="mt-4 grid gap-2 md:grid-cols-2">
             {Object.entries(checklistCopy).map(([key, copy]) => {
               const complete = setup.checklist[key as keyof typeof setup.checklist];
               return (
-                <article
-                  className={`admin-checklist ${complete ? "admin-checklist-complete" : ""}`}
-                  key={key}
-                >
-                  <span className="admin-checkmark">{complete ? "Done" : "Next"}</span>
-                  <h3 className="mt-3 font-black">{copy[0]}</h3>
-                  <p className="mt-1 text-sm text-slate-600">{copy[1]}</p>
-                </article>
+                <li className="flex items-baseline gap-2 text-sm" key={key}>
+                  <span
+                    className={`font-bold uppercase ${complete ? "text-emerald-700" : "text-slate-400"}`}
+                  >
+                    {complete ? "Done" : "Next"}
+                  </span>
+                  <span className="font-semibold text-slate-700">{copy[0]}</span>
+                </li>
               );
             })}
-          </div>
+          </ul>
+
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
             <form action={addSchool} className="admin-quick-action">
-              <h3 className="font-black">Add first school</h3>
+              <h3 className="font-semibold">Add first school</h3>
               <input className="admin-input mt-3" name="name" placeholder="School name" required />
               <button className="admin-action mt-3" type="submit">
                 Add school
               </button>
             </form>
             <form action={inviteAdmin} className="admin-quick-action">
-              <h3 className="font-black">Invite district admin</h3>
+              <h3 className="font-semibold">Invite district admin</h3>
               <input className="admin-input mt-3" name="name" placeholder="Full name" required />
               <input
                 className="admin-input mt-2"
@@ -218,7 +293,7 @@ export default async function DistrictPage({
               </button>
             </form>
             <form action={saveSupportContact} className="admin-quick-action">
-              <h3 className="font-black">Set support contact</h3>
+              <h3 className="font-semibold">Set support contact</h3>
               <input
                 className="admin-input mt-3"
                 name="supportEmail"
@@ -233,7 +308,7 @@ export default async function DistrictPage({
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex-1">
-              <h3 className="font-black">Invite parents into your district</h3>
+              <h3 className="font-semibold">Invite parents into your district</h3>
               <p className="text-sm text-slate-500">
                 Single or bulk CSV. Parents set their own password; their accounts live under your
                 district (no self-serve B2C tenant).
@@ -250,9 +325,9 @@ export default async function DistrictPage({
           </form>
         </AdminCard>
       ) : (
-        <AdminCard className="mt-6 p-6">
+        <AdminCard className="mt-6 p-6" testId="district-setup-complete">
           <p className="admin-step text-emerald-700">Setup complete</p>
-          <h2 className="mt-3 text-2xl font-black">District operations are ready</h2>
+          <h2 className="admin-h2 mt-3 text-2xl">District operations are ready</h2>
           <p className="mt-2 text-slate-600">
             The first-run checklist is closed. Live roster totals remain visible above.
           </p>
@@ -263,7 +338,7 @@ export default async function DistrictPage({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-2xl">
             <p className="admin-step">Teacher permissions</p>
-            <h2 className="mt-3 text-2xl font-black">Teacher-managed rostering</h2>
+            <h2 className="admin-h2 mt-3 text-2xl">Teacher-managed rostering</h2>
             <p className="mt-2 text-slate-600">
               When enabled, teachers can connect and sync their own roster sources (Google
               Classroom, Clever, ClassLink, OneRoster) from the learner app. When disabled, only
@@ -290,8 +365,6 @@ export default async function DistrictPage({
           </form>
         </div>
       </AdminCard>
-
-      <AdminNavGrid heading="District tools" items={DISTRICT_NAV} />
     </AdminPageFrame>
   );
 }

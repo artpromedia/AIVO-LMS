@@ -40,14 +40,18 @@ function activeHref(pathname: string, groups: AdminNavGroup[]): string | null {
   return best;
 }
 
-function breadcrumbsFor(pathname: string, groups: AdminNavGroup[]): Crumb[] {
-  const crumbs: Crumb[] = [{ label: "Platform", href: "/platform" }];
-  if (pathname === "/platform") {
+function breadcrumbsFor(
+  pathname: string,
+  groups: AdminNavGroup[],
+  home: { href: string; label: string },
+): Crumb[] {
+  const crumbs: Crumb[] = [{ label: home.label, href: home.href }];
+  if (pathname === home.href) {
     crumbs.push({ label: "Overview", href: null });
     return crumbs;
   }
   const href = activeHref(pathname, groups);
-  let consumed = "/platform";
+  let consumed = home.href;
   if (href) {
     const item = groups.flatMap((group) => group.items).find((entry) => entry.href === href);
     crumbs.push({ label: item?.label ?? humanizeSegment(href.split("/").at(-1) ?? ""), href });
@@ -66,19 +70,29 @@ function breadcrumbsFor(pathname: string, groups: AdminNavGroup[]): Crumb[] {
 export function AdminShell({
   groups,
   account,
+  homeHref = "/platform",
+  homeLabel = "Platform",
+  brand = "AIVO Admin",
   children,
 }: {
   groups: AdminNavGroup[];
   account: { displayName: string; roleLabel: string };
+  /** Console home route — the brand link and breadcrumb root. */
+  homeHref?: string;
+  homeLabel?: string;
+  brand?: string;
   children: ReactNode;
 }) {
-  const pathname = usePathname() ?? "/platform";
+  const pathname = usePathname() ?? homeHref;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
   const [query, setQuery] = useState("");
 
   const active = useMemo(() => activeHref(pathname, groups), [pathname, groups]);
-  const crumbs = useMemo(() => breadcrumbsFor(pathname, groups), [pathname, groups]);
+  const crumbs = useMemo(
+    () => breadcrumbsFor(pathname, groups, { href: homeHref, label: homeLabel }),
+    [pathname, groups, homeHref, homeLabel],
+  );
 
   const trimmed = query.trim().toLowerCase();
   const visibleGroups = useMemo(() => {
@@ -104,11 +118,11 @@ export function AdminShell({
     <nav aria-label="Platform sections" className="flex h-full flex-col gap-4 overflow-y-auto p-4">
       <Link
         className="px-2 text-sm font-bold uppercase tracking-[0.25em] text-blue-700"
-        href="/platform"
+        href={homeHref}
         prefetch={false}
         onClick={() => setDrawerOpen(false)}
       >
-        AIVO Admin
+        {brand}
       </Link>
       {visibleGroups.map((group) => {
         // A live search overrides collapse state so matches always show.

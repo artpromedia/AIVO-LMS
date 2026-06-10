@@ -297,6 +297,36 @@ export async function updateDistrictBranding(
   });
 }
 
+export type DistrictLearnerRow = {
+  id: string;
+  name: string;
+  createdAt: string;
+};
+
+/** District-scoped learner list (first `pageSize` rows) with createdAt, used
+ *  to compute real growth sparklines on the district overview. */
+export async function listDistrictLearners(
+  session: Pick<SessionProfile, "role">,
+  pageSize = 100,
+): Promise<DistrictLearnerRow[]> {
+  const payload = await identityRequest<{ learners?: unknown[] }>(
+    session,
+    "GET",
+    "/api/district/learners",
+    undefined,
+    { page: 1, pageSize },
+  );
+  const rows = Array.isArray(payload.learners) ? payload.learners : [];
+  return rows.map((row) => {
+    const entry = row as Record<string, unknown>;
+    return {
+      id: String(entry.id),
+      name: String(entry.name ?? entry.id),
+      createdAt: String(entry.createdAt ?? new Date(0).toISOString()),
+    };
+  });
+}
+
 export type DistrictRosteringGrant = { teacherRosteringEnabled: boolean };
 
 /**

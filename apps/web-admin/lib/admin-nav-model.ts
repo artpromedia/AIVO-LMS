@@ -90,3 +90,34 @@ export function navGroupsForRole(role: Role): AdminNavGroup[] {
     items: group.items.filter((item) => !item.roles || item.roles.includes(role)),
   })).filter((group) => group.items.length > 0);
 }
+
+/** District console IA — single role (district_admin), so no per-item gating. */
+export const DISTRICT_NAV_GROUPS: readonly AdminNavGroup[] = [
+  {
+    id: "district-operations",
+    label: "Operations",
+    items: [
+      { label: "Parents", href: "/district/parents" },
+      { label: "SIS connectors", href: "/district/sis" },
+      { label: "IEP evaluations", href: "/district/iep" },
+    ],
+  },
+  {
+    id: "district-reports",
+    label: "Reports",
+    items: [{ label: "Reports", href: "/district/reports" }],
+  },
+  {
+    id: "district-compliance",
+    label: "Compliance",
+    items: [
+      { label: "Compliance", href: "/district/compliance" },
+      { label: "Audit log", href: "/district/audit" },
+    ],
+  },
+  {
+    id: "district-billing",
+    label: "Billing",
+    items: [{ label: "Billing", href: "/district/billing" }],
+  },
+];

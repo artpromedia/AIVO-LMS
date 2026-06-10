@@ -21,6 +21,7 @@ import {
   iepProgressNotes,
   iepEvaluations,
   parentInAppNotifications,
+  webLearnerProfiles,
 } from "@aivo/db";
 import { eq, and, sql } from "drizzle-orm";
 import argon2 from "argon2";
@@ -188,6 +189,16 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
         gradeLevel: gradeLevel ?? "5",
       })
       .returning();
+    // Mirror into the web-v2 learner store: billing's pilot seat usage
+    // counts web_learner_profiles, so a seeded learner occupies a real seat.
+    await db
+      .insert(webLearnerProfiles)
+      .values({
+        id: learner.id,
+        tenantId,
+        data: { name: learnerName, createdAt: new Date().toISOString(), seededBy: "e2e" },
+      })
+      .onConflictDoNothing();
     return {
       learnerId: learner.id,
       learnerUserId: learnerUser.id,
