@@ -598,6 +598,10 @@ jobs:
                 EXTRA_SETS=(
                   --set "env.IDENTITY_SVC_URL=http://identity-svc.${NS}.svc.cluster.local:3000"
                   --set "env.ADMIN_SVC_URL=http://admin-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.BILLING_SVC_URL=http://billing-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.RESPONSIBLE_AI_SVC_URL=http://responsible-ai-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.DATA_GOVERNANCE_SVC_URL=http://data-governance-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.INTEGRATION_SVC_URL=http://integration-svc.${NS}.svc.cluster.local:3000"
                   --set "livenessProbe.httpGet.path=/api/health"
                   --set "readinessProbe.httpGet.path=/api/health"
                   --set "startupProbe.httpGet.path=/api/health"
@@ -1093,6 +1097,10 @@ jobs:
                 EXTRA_SETS=(
                   --set "env.IDENTITY_SVC_URL=http://identity-svc.aivo.svc.cluster.local:3000"
                   --set "env.ADMIN_SVC_URL=http://admin-svc.aivo.svc.cluster.local:3000"
+                  --set "env.BILLING_SVC_URL=http://billing-svc.aivo.svc.cluster.local:3000"
+                  --set "env.RESPONSIBLE_AI_SVC_URL=http://responsible-ai-svc.aivo.svc.cluster.local:3000"
+                  --set "env.DATA_GOVERNANCE_SVC_URL=http://data-governance-svc.aivo.svc.cluster.local:3000"
+                  --set "env.INTEGRATION_SVC_URL=http://integration-svc.aivo.svc.cluster.local:3000"
                   --set "env.SESSION_COOKIE_DOMAIN=.aivolearning.com"
                   --set "env.NEXT_PUBLIC_APP_URL=https://admin.aivolearning.com"
                   --set "env.NEXT_PUBLIC_CONSUMER_APP_URL=https://app.aivolearning.com"
