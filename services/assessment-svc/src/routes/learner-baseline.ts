@@ -20,6 +20,7 @@ import {
   type LearnerInterestSignal,
 } from "@aivo/special-interest-engine";
 import { deriveLearningProfile } from "../services/learning-profile.js";
+import { applyBaselineDeliveryLevel } from "../services/curriculum-alignment.js";
 import { partitionChapterActivitiesPayload } from "../services/discovery-activity-validator.js";
 import { normalizeBaselineItems } from "../services/baselineSurfaceNormalizer.js";
 import {
@@ -807,6 +808,17 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             { learnerId, attemptId: attempt.id, err: profileErr?.message },
             "[discovery/complete] learner_profile upsert failed (non-fatal)",
           );
+        }
+
+        // Persist the θ-derived delivery level onto the learner's
+        // curriculum_alignment BEFORE the brain clone below, so the cloned
+        // brain state (which learning-svc reads at lesson-generation time)
+        // carries the placement. Non-fatal by contract — logs on failure.
+        if (learningProfile) {
+          await applyBaselineDeliveryLevel(db, app.log, {
+            learnerId: learner.id,
+            theta: learningProfile.thetaPlacement,
+          });
         }
 
         let brainCloneStatus: string = "pending";

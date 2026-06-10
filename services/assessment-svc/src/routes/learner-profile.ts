@@ -32,6 +32,7 @@ import {
   hydrateSession,
   type SerializedRunSession,
 } from "../services/adaptive-baseline-runner.js";
+import { applyBaselineDeliveryLevel } from "../services/curriculum-alignment.js";
 
 async function authenticate(req: any, reply: any) {
   const auth = req.headers.authorization;
@@ -368,6 +369,14 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
             updatedAt: new Date(),
           },
         });
+
+      // Persist the θ-derived delivery level onto curriculum_alignment (the
+      // learners row + latest brain state) so lesson generation targets the
+      // learner's actual placement. Non-fatal by contract — logs on failure.
+      await applyBaselineDeliveryLevel(db, req.log, {
+        learnerId: learner.id,
+        theta: result.profile.thetaPlacement,
+      });
 
       return reply.send({
         sessionId: row.id,

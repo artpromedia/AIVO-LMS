@@ -12,6 +12,10 @@ import {
 import { verifyJWT } from "@aivo/security";
 import { and, eq, inArray } from "drizzle-orm";
 import { lookupCurriculumAsync } from "../services/curriculum-lookup.js";
+import {
+  alignmentAfterGradeChange,
+  alignmentWithEnrolledGrade,
+} from "../services/enrollment-alignment.js";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -336,7 +340,14 @@ export async function registerUserRoutes(app: FastifyInstance) {
               districtId: curriculum.districtId,
               districtName: curriculum.districtName,
               curriculumFramework: curriculum.curriculumFramework,
-              curriculumAlignment: curriculum.curriculumAlignment,
+              // Jurisdiction lookup + enrolled-grade keys: learning-svc
+              // generates from grade_band/delivery_level, so they must be
+              // present from day one (the baseline later refines
+              // delivery_level from θ).
+              curriculumAlignment: alignmentWithEnrolledGrade(
+                curriculum.curriculumAlignment,
+                body.gradeLevel,
+              ),
             })
             .returning();
         } catch (insertErr) {
@@ -427,7 +438,24 @@ export async function registerUserRoutes(app: FastifyInstance) {
 
       const updateFields: Record<string, unknown> = {};
       if (body.name) updateFields.name = body.name;
-      if (body.gradeLevel) updateFields.gradeLevel = body.gradeLevel;
+      if (body.gradeLevel) {
+        updateFields.gradeLevel = body.gradeLevel;
+        // Keep curriculum_alignment.grade_band in sync with the enrolled
+        // grade; a baseline-derived delivery_level is recomputed against the
+        // new band from the recorded θ (alignmentAfterGradeChange).
+        const nextAlignment = alignmentAfterGradeChange(
+          learner.curriculumAlignment as Record<string, unknown> | null,
+          body.gradeLevel,
+        );
+        if (nextAlignment) {
+          updateFields.curriculumAlignment = nextAlignment;
+        } else {
+          req.log.warn(
+            { event: "curriculum_alignment.grade_band_unresolvable", learnerId, gradeLevel: body.gradeLevel },
+            "gradeLevel update did not parse to a grade band; alignment left unchanged",
+          );
+        }
+      }
 
       if (Object.keys(updateFields).length > 0) {
         await db.update(learners).set(updateFields).where(eq(learners.id, learnerId));

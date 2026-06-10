@@ -81,6 +81,34 @@ READABILITY_GRADE_MAP = {
     "SIXTH_PLUS": 7,
 }
 
+
+def readability_grade(delivery_level: str | None) -> int:
+    """Resolve a delivery level to a readability tier.
+
+    Accepts both the legacy word-ordinal keys (READABILITY_GRADE_MAP) and the
+    canonical grade bands curriculum_alignment now carries ("K", "1".."12").
+    Unknown values log a warning and use the mid-band tier — readability
+    scoring is a guardrail, not a generator, so degrading here is safe but
+    must be visible.
+    """
+    key = (delivery_level or "").strip().upper()
+    if key in READABILITY_GRADE_MAP:
+        return READABILITY_GRADE_MAP[key]
+    if key in ("K", "0"):
+        return READABILITY_GRADE_MAP["KINDERGARTEN"]
+    if key.isdigit():
+        n = int(key)
+        if 1 <= n <= 5:
+            return n + 1  # grade 1 → FIRST(2) … grade 5 → FIFTH(6)
+        if n >= 6:
+            return READABILITY_GRADE_MAP["SIXTH_PLUS"]
+    logger.warning(
+        "quality_gate: unknown delivery_level %r; using mid-band readability tier",
+        delivery_level,
+    )
+    return 4
+
+
 MODERATION_LOG_PATH = Path(
     os.environ.get("CONTENT_MODERATION_LOG", "/tmp/aivo_content_moderation.log")
 )
@@ -285,7 +313,7 @@ def _gate_readability(content: str, delivery_level: str) -> dict:
     avg_words_per_sentence = word_count / sentence_count
     avg_word_length = sum(len(w) for w in words) / max(word_count, 1)
 
-    target_grade = READABILITY_GRADE_MAP.get(delivery_level, 4)
+    target_grade = readability_grade(delivery_level)
 
     if target_grade <= 2:
         max_avg_words = 8

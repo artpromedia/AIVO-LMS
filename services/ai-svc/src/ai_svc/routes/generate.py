@@ -37,8 +37,11 @@ router = APIRouter(prefix="/api/ai", tags=["content-generation"])
 class ContentRequest(BaseModel):
     subject: str
     topic: str
-    grade_target: str = "THIRD"
-    delivery_level: str = "THIRD"
+    # Required — a silent grade default ("THIRD" historically) generates
+    # wrong-grade content for every learner whose caller forgot the field.
+    # learning-svc resolves these from curriculum_alignment before calling.
+    grade_target: str
+    delivery_level: str
     functioning_level: str = "STANDARD"
     content_type: str = "LESSON"
     brain_context: dict = {}

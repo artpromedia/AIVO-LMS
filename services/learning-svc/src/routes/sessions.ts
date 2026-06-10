@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
-import { lessonSessions, lessonContent, gradebookEntries, learningPaths } from "@aivo/db";
+import { lessonSessions, lessonContent, gradebookEntries, learningPaths, learners } from "@aivo/db";
 import { emitLessonAudit } from "../lib/audit.js";
 import {
   generateLessonContent,
@@ -12,6 +12,7 @@ import {
   computeCompletionQuality,
   type LessonSignals,
 } from "../services/scoring.js";
+import { resolveGradeTargets } from "../services/grade-target.js";
 import { resolveTenantId, requireLearnerAccess } from "../lib/tenant.js";
 import { checkLearnerTutorAccess } from "../lib/entitlements.js";
 import { getRealtimeBus, subjects as busSubjects } from "../realtime/bus.js";
@@ -394,6 +395,36 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
 
     const functioningLevel = (brainContext as any).functioning_level_profile?.level || "STANDARD";
 
+    // Resolve the grade target + delivery level for generation. NEVER a
+    // hardcoded constant: alignment (enrollment + baseline placement) →
+    // learners.grade_level → 422. A wrong-grade lesson is worse than an
+    // explicit error.
+    const [learnerRow] = await db
+      .select({ gradeLevel: learners.gradeLevel })
+      .from(learners)
+      .where(eq(learners.id, learnerId));
+    const gradeResolution = resolveGradeTargets({
+      alignment: (brainContext as any).curriculum_alignment,
+      learnerGradeLevel: learnerRow?.gradeLevel ?? null,
+    });
+    if (!gradeResolution.ok) {
+      request.log.warn(
+        { event: "curriculum_alignment.grade_unresolvable", learnerId },
+        "no grade band resolvable for learner; refusing to generate at an arbitrary grade",
+      );
+      return reply.code(422).send({
+        error: "grade_unresolvable",
+        message:
+          "Learner has no resolvable grade level. Set the learner's grade (or curriculum alignment) before starting a lesson session.",
+      });
+    }
+    if (gradeResolution.source !== "alignment") {
+      request.log.warn(
+        { event: "curriculum_alignment.missing", learnerId, source: gradeResolution.source },
+        "curriculum_alignment incomplete; using fallback grade resolution",
+      );
+    }
+
     // Sprint 05: pull subject-brain context when the flag is on. The result
     // is merged into brainContext so the existing generator pipeline picks
     // it up without behavioral change when the flag is off.
@@ -454,8 +485,8 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
       const generated = await generateLessonContent({
         subject,
         topic: topic || `Introduction to ${subject}`,
-        gradeTarget: (brainContext as any).curriculum_alignment?.grade_band || "THIRD",
-        deliveryLevel: (brainContext as any).curriculum_alignment?.delivery_level || "THIRD",
+        gradeTarget: gradeResolution.gradeTarget,
+        deliveryLevel: gradeResolution.deliveryLevel,
         functioningLevel,
         brainContext: enrichedBrainContext,
         contentType: contentType || "LESSON",
@@ -488,8 +519,8 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         contentType: contentType || "LESSON",
         subject,
         topic: topic || `Introduction to ${subject}`,
-        gradeTarget: (brainContext as any).curriculum_alignment?.grade_band || "THIRD",
-        deliveryLevel: (brainContext as any).curriculum_alignment?.delivery_level || "THIRD",
+        gradeTarget: gradeResolution.gradeTarget,
+        deliveryLevel: gradeResolution.deliveryLevel,
         generatedContent: { raw: generated.content },
         qualityScore: generated.qualityScore,
         qualityGateLog: generated.qualityGateLog,
