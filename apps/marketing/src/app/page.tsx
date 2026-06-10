@@ -6,6 +6,13 @@ import { StickyHeader } from "@/components/marketing/StickyHeader";
 import { Footer } from "@/components/marketing/Footer";
 import { WEB_APP_URL } from "@/lib/constants";
 import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
+import {
+  STATS,
+  RESEARCH_INSTITUTIONS,
+  TESTIMONIALS,
+  isSourced,
+  isConsented,
+} from "@/content/claims";
 
 /**
  * Home page — Inclusive Lab — Warm rollout.
@@ -24,6 +31,15 @@ import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
 export default async function Home() {
   const sensoryMode = await getSensoryModeFromCookies();
   const t = await getTranslations("marketing.home");
+
+  // Filter content-module entries by their render guards.
+  // Stats and institutions require a non-empty `source`; testimonials require
+  // explicit `consent: true`.  All current seed entries are unsourced /
+  // unconsented, so these arrays are empty until the team documents citations
+  // or obtains consent.
+  const sourcedStats = STATS.filter(isSourced);
+  const sourcedInstitutions = RESEARCH_INSTITUTIONS.filter(isSourced);
+  const consentedTestimonials = TESTIMONIALS.filter(isConsented);
 
   const heroFeatures = [
     {
@@ -102,17 +118,6 @@ export default async function Home() {
                 </Link>
               </div>
               <div className="mt-9 flex items-center gap-4 text-sm font-medium text-slate-600">
-                <div className="flex -space-x-3" aria-hidden="true">
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[var(--aivo-calmSky-100)] flex items-center justify-center text-[var(--aivo-calmSky-800)] font-bold text-xs">
-                    S
-                  </div>
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[var(--aivo-sunshine-100)] flex items-center justify-center text-[var(--aivo-sunshine-800)] font-bold text-xs">
-                    M
-                  </div>
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[var(--aivo-aivoPurple-100)] flex items-center justify-center text-[var(--aivo-aivoPurple-800)] font-bold text-xs">
-                    J
-                  </div>
-                </div>
                 <p>{t("hero_trusted")}</p>
               </div>
             </div>
@@ -131,7 +136,9 @@ export default async function Home() {
                 className="rounded-[2rem] shadow-[0_30px_60px_-30px_rgba(15,23,42,0.30)] w-full object-cover border border-slate-200/60 aspect-square"
               />
 
-              {/* Floating stat card */}
+              {/* Floating stat card — only shows a numeric value when the stat
+                  has a documented source in the content module. Falls back to
+                  a qualitative statement when no citation is on file. */}
               <div className="absolute -bottom-5 -left-4 md:-bottom-7 md:-left-7 w-64 md:w-72 rounded-2xl bg-white shadow-[0_20px_45px_-20px_rgba(15,23,42,0.25)] border border-slate-200/80 p-5 flex items-start gap-4">
                 <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
                   <LineChart className="w-5 h-5 text-indigo-600" aria-hidden="true" />
@@ -140,9 +147,19 @@ export default async function Home() {
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
                     {t("stat_focus_label")}
                   </p>
-                  <p className="text-2xl md:text-3xl font-bold tracking-tight text-indigo-600 tabular-nums">
-                    +47.2%
-                  </p>
+                  {sourcedStats.length > 0 ? (
+                    <p
+                      className="text-2xl md:text-3xl font-bold tracking-tight text-indigo-600 tabular-nums"
+                      data-stat-value=""
+                      data-citation={sourcedStats[0]!.source}
+                    >
+                      {sourcedStats[0]!.value}
+                    </p>
+                  ) : (
+                    <p className="text-sm font-semibold text-indigo-700 leading-snug">
+                      {t("stat_focus_qualitative")}
+                    </p>
+                  )}
                   <p className="text-xs font-medium text-slate-500 mt-1">
                     {t("stat_focus_caption")}
                   </p>
@@ -152,7 +169,9 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Research banner */}
+        {/* Research banner — institution names only render when each has a
+            documented source URL in the content module (content/claims.ts).
+            All current entries are unseeded pending citation documentation. */}
         <section className="py-14 border-y border-slate-200/70" aria-labelledby="research-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <h2
@@ -161,20 +180,25 @@ export default async function Home() {
             >
               {t("research_heading")}
             </h2>
-            <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 md:gap-x-20 text-slate-700/70">
-              <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
-                Stanford University
-              </span>
-              <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
-                MIT Media Lab
-              </span>
-              <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
-                CAST
-              </span>
-              <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
-                Johns Hopkins
-              </span>
-            </div>
+            {sourcedInstitutions.length > 0 ? (
+              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 md:gap-x-20 text-slate-700/70">
+                {sourcedInstitutions.map((inst) => (
+                  <a
+                    key={inst.name}
+                    href={inst.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-heading text-base md:text-lg font-semibold tracking-tight hover:text-slate-900 transition-colors underline-offset-2 hover:underline"
+                  >
+                    {inst.sourceLabel ?? inst.name}
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-sm font-medium text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                {t("research_methodology_body")}
+              </p>
+            )}
           </div>
         </section>
 
@@ -226,73 +250,122 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Testimonials */}
+        {/* Testimonials / Value props
+            When consented testimonials exist in the content module they are
+            rendered here.  Until the team has documented consent, a set of
+            research-backed value propositions is shown instead so no
+            placeholder user identities appear on the page. */}
         <section
           className="py-24 md:py-32 bg-slate-50/60 border-y border-slate-200/70"
-          aria-labelledby="testimonials-heading"
+          aria-labelledby="social-proof-heading"
         >
           <div className="max-w-6xl mx-auto px-6 md:px-8">
-            <div className="flex flex-col items-center text-center mb-14 md:mb-16">
-              <span className="mb-5 py-1 px-3 rounded-full bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wide uppercase">
-                {t("testimonials_badge")}
-              </span>
-              <h2
-                id="testimonials-heading"
-                className="font-heading text-3xl md:text-5xl font-bold text-slate-900 tracking-tight"
-              >
-                {t("testimonials_heading")}
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
-              <article className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8 md:p-10">
-                <div className="flex gap-1 mb-6" role="img" aria-label={t("testimonials_star_alt")}>
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-amber-400 text-amber-400"
-                      aria-hidden="true"
-                    />
+            {consentedTestimonials.length > 0 ? (
+              <>
+                <div className="flex flex-col items-center text-center mb-14 md:mb-16">
+                  <span className="mb-5 py-1 px-3 rounded-full bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wide uppercase">
+                    {t("testimonials_badge")}
+                  </span>
+                  <h2
+                    id="social-proof-heading"
+                    className="font-heading text-3xl md:text-5xl font-bold text-slate-900 tracking-tight"
+                  >
+                    {t("testimonials_heading")}
+                  </h2>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
+                  {consentedTestimonials.map((testimonial) => (
+                    <article
+                      key={testimonial.id}
+                      className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8 md:p-10"
+                    >
+                      <div
+                        className="flex gap-1 mb-6"
+                        role="img"
+                        aria-label={t("testimonials_star_alt")}
+                      >
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className="w-4 h-4 fill-amber-400 text-amber-400"
+                            aria-hidden="true"
+                          />
+                        ))}
+                      </div>
+                      <p className="text-base md:text-lg mb-8 leading-relaxed font-medium text-slate-700">
+                        &ldquo;{testimonial.quote}&rdquo;
+                      </p>
+                      <div className="flex items-center gap-3">
+                        {testimonial.photo ? (
+                          <Image
+                            src={testimonial.photo}
+                            alt={testimonial.name}
+                            width={44}
+                            height={44}
+                            className="w-11 h-11 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div
+                            className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center"
+                            aria-hidden="true"
+                          >
+                            <ShieldCheck className="w-5 h-5 text-slate-400" />
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-bold text-slate-900">{testimonial.name}</p>
+                          <p className="text-sm font-medium text-slate-500">{testimonial.role}</p>
+                        </div>
+                      </div>
+                    </article>
                   ))}
                 </div>
-                <p className="text-base md:text-lg mb-8 leading-relaxed font-medium text-slate-700">
-                  {t("testimonial_1_quote")}
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center font-bold text-sm text-slate-700">
-                    S.T.
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900">{t("testimonial_1_name")}</p>
-                    <p className="text-sm font-medium text-slate-500">{t("testimonial_1_role")}</p>
-                  </div>
+              </>
+            ) : (
+              /* No consented testimonials yet — show research-backed value
+                 propositions that describe the product honestly without
+                 implying real users. */
+              <>
+                <div className="flex flex-col items-center text-center mb-14 md:mb-16">
+                  <span className="mb-5 py-1 px-3 rounded-full bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wide uppercase">
+                    {t("value_props_badge")}
+                  </span>
+                  <h2
+                    id="social-proof-heading"
+                    className="font-heading text-3xl md:text-5xl font-bold text-slate-900 tracking-tight"
+                  >
+                    {t("value_props_heading")}
+                  </h2>
+                  <p className="mt-4 text-lg text-slate-600 max-w-2xl font-medium">
+                    {t("value_props_subheading")}
+                  </p>
                 </div>
-              </article>
-
-              <article className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8 md:p-10">
-                <div className="flex gap-1 mb-6" role="img" aria-label={t("testimonials_star_alt")}>
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-amber-400 text-amber-400"
-                      aria-hidden="true"
-                    />
+                <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
+                  {(
+                    [
+                      { title: t("value_prop_1_title"), desc: t("value_prop_1_desc") },
+                      { title: t("value_prop_2_title"), desc: t("value_prop_2_desc") },
+                      { title: t("value_prop_3_title"), desc: t("value_prop_3_desc") },
+                    ] as { title: string; desc: string }[]
+                  ).map((prop) => (
+                    <div
+                      key={prop.title}
+                      className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8"
+                    >
+                      <div className="mb-4 w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                        <CheckCircle2 className="w-5 h-5 text-indigo-600" aria-hidden="true" />
+                      </div>
+                      <h3 className="font-heading font-bold text-lg mb-2 text-slate-900">
+                        {prop.title}
+                      </h3>
+                      <p className="text-slate-600 font-medium text-sm leading-relaxed">
+                        {prop.desc}
+                      </p>
+                    </div>
                   ))}
                 </div>
-                <p className="text-base md:text-lg mb-8 leading-relaxed font-medium text-slate-700">
-                  {t("testimonial_2_quote")}
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-indigo-50 flex items-center justify-center font-bold text-sm text-indigo-700">
-                    M.R.
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900">{t("testimonial_2_name")}</p>
-                    <p className="text-sm font-medium text-slate-500">{t("testimonial_2_role")}</p>
-                  </div>
-                </div>
-              </article>
-            </div>
+              </>
+            )}
           </div>
         </section>
 
