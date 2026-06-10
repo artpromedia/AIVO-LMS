@@ -26,7 +26,12 @@ import {
 } from "@/lib/db/repos";
 import type { LearnerProfile } from "@/lib/db/types";
 import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
-import { computeDeltaPct, computeMetricHistory, splitIntoPeriods } from "@/lib/analytics";
+import {
+  buildKpiAriaLabel,
+  computeDeltaPct,
+  computeMetricHistory,
+  splitIntoPeriods,
+} from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -82,14 +87,24 @@ export default async function TherapistHomePage() {
             value={String(fresh.length)}
             periodLabel={t("period_label_active")}
             seriesTone="brand"
-            ariaLabel={`Caseload size: ${fresh.length} active learners`}
+            ariaLabel={buildKpiAriaLabel(
+              t("stat_caseload"),
+              String(fresh.length),
+              null,
+              t("period_label_active"),
+            )}
           />
           <KpiCard
             label={t("stat_ieps")}
             value={String(iepCount)}
             periodLabel={iepCount === 0 ? "None on file" : "Supports applied"}
             seriesTone="info"
-            ariaLabel={`IEPs on file: ${iepCount}${iepCount === 0 ? ", none" : ""}`}
+            ariaLabel={buildKpiAriaLabel(
+              t("stat_ieps"),
+              String(iepCount),
+              null,
+              iepCount === 0 ? "none on file" : "supports applied",
+            )}
           />
           <KpiCard
             label={t("stat_ready_for_session")}
@@ -98,7 +113,12 @@ export default async function TherapistHomePage() {
             periodLabel={sessionDelta != null ? t("period_label_vs_last_week") : t("period_label_this_week")}
             series={sessionSeries.length > 1 ? sessionSeries : undefined}
             seriesTone={readyForSession > 0 ? "success" : "brand"}
-            ariaLabel={`Ready for session: ${readyForSession}${sessionDelta != null ? `, ${sessionDelta > 0 ? "up" : sessionDelta < 0 ? "down" : "no change"} ${Math.abs(sessionDelta)}% vs last week` : ""}`}
+            ariaLabel={buildKpiAriaLabel(
+              t("stat_ready_for_session"),
+              String(readyForSession),
+              sessionDelta,
+              sessionDelta != null ? t("period_label_vs_last_week") : undefined,
+            )}
           />
         </div>
       ) : null}

@@ -37,6 +37,23 @@ function deriveDeltaTone(delta: number): "text-iw-success" | "text-iw-error" | "
   return "text-iw-text-muted";
 }
 
+/** Build a consistent accessible label from label + value + optional delta. */
+function buildAriaLabel(
+  label: string,
+  value: string,
+  delta: number | null,
+  periodLabel?: string,
+): string {
+  const parts: string[] = [label, value];
+  if (delta != null) {
+    const dir = delta > 0 ? "up" : delta < 0 ? "down" : "no change";
+    const mag = delta !== 0 ? ` ${Math.abs(delta)}%` : "";
+    const period = periodLabel ? ` ${periodLabel}` : "";
+    parts.push(`${dir}${mag}${period}`);
+  }
+  return parts.join(", ");
+}
+
 /**
  * Chart/KpiCard
  *
@@ -64,21 +81,13 @@ export const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard
   ref,
 ) {
   const hasDelta = deltaPct != null;
-  const TrendIcon =
-    !hasDelta || deltaPct === 0 ? Minus : deltaPct > 0 ? TrendingUp : TrendingDown;
-  const deltaClass = hasDelta ? deriveDeltaTone(deltaPct!) : "text-iw-text-muted";
+  // Store the narrowed value once to avoid repeated non-null assertions below.
+  const delta = hasDelta ? deltaPct : 0;
+  const TrendIcon = !hasDelta || delta === 0 ? Minus : delta > 0 ? TrendingUp : TrendingDown;
+  const deltaClass = hasDelta ? deriveDeltaTone(delta) : "text-iw-text-muted";
 
-  const computedAriaLabel =
-    ariaLabel ??
-    [
-      label,
-      value,
-      hasDelta
-        ? `${deltaPct! > 0 ? "up" : deltaPct! < 0 ? "down" : "no change"} ${Math.abs(deltaPct!)}%${periodLabel ? ` ${periodLabel}` : ""}`
-        : null,
-    ]
-      .filter(Boolean)
-      .join(", ");
+  const computedAriaLabel = buildAriaLabel(label, value, hasDelta ? delta : null, periodLabel);
+  const displayedAriaLabel = ariaLabel ?? computedAriaLabel;
 
   return (
     <div
@@ -88,7 +97,7 @@ export const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard
         className,
       )}
       role="figure"
-      aria-label={computedAriaLabel}
+      aria-label={displayedAriaLabel}
     >
       {/* Label row */}
       <span className="iw-label-sm text-iw-text-muted uppercase tracking-wide truncate">
@@ -108,8 +117,8 @@ export const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard
             aria-hidden="true"
           >
             <TrendIcon className="w-3.5 h-3.5" aria-hidden />
-            {deltaPct! > 0 ? "+" : ""}
-            {deltaPct!}%
+            {delta > 0 ? "+" : ""}
+            {delta}%
           </span>
         )}
       </div>
@@ -121,7 +130,7 @@ export const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard
         </p>
       )}
 
-      {/* Inline sparkline */}
+      {/* Inline sparkline — decorative; metric + delta are already in the card ariaLabel */}
       {series && series.length > 0 && (
         <div className="mt-1 -mx-1" aria-hidden="true">
           <SoftLine
@@ -130,7 +139,6 @@ export const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard
             tone={seriesTone}
             filled
             showDots={false}
-            ariaLabel={`${label} trend sparkline`}
           />
         </div>
       )}

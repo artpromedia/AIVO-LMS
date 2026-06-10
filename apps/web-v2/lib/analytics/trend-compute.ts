@@ -23,14 +23,14 @@ export interface Timestamped {
  * Compute a signed percentage delta between the current and prior
  * periods.
  *
- * - Returns `null` when `priorValue` is 0 or when both values are 0
- *   (avoids meaningless Infinity / NaN deltas).
+ * - Returns `null` when `priorValue` is 0 (avoids division-by-zero /
+ *   Infinity). When both values are 0 this is also covered, since the
+ *   check is solely on `priorValue`.
  * - Returns a rounded integer (e.g. 5, -12) — suitable for display as
  *   "±N%" without decimal noise.
  */
 export function computeDeltaPct(currentValue: number, priorValue: number): number | null {
   if (priorValue === 0) return null;
-  if (currentValue === 0 && priorValue === 0) return null;
   const delta = ((currentValue - priorValue) / priorValue) * 100;
   return Math.round(delta);
 }
@@ -143,11 +143,42 @@ export function splitIntoPeriods<T extends Timestamped>(
   return { current, prior };
 }
 
+/**
+ * Build a consistent accessible aria-label for a KPI card with an optional delta.
+ *
+ * Examples:
+ *   buildKpiAriaLabel("Lessons completed", "42") → "Lessons completed, 42"
+ *   buildKpiAriaLabel("Lessons completed", "42", 15, "vs last 30 days")
+ *     → "Lessons completed, 42, up 15% vs last 30 days"
+ */
+export function buildKpiAriaLabel(
+  label: string,
+  value: string,
+  deltaPct?: number | null,
+  periodLabel?: string,
+): string {
+  const parts: string[] = [label, value];
+  if (deltaPct != null) {
+    const dir = deltaPct > 0 ? "up" : deltaPct < 0 ? "down" : "no change";
+    const mag = deltaPct !== 0 ? ` ${Math.abs(deltaPct)}%` : "";
+    const period = periodLabel ? ` ${periodLabel}` : "";
+    parts.push(`${dir}${mag}${period}`);
+  }
+  return parts.join(", ");
+}
+
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-/** ISO week number (1–53) for a Date. */
+/** ISO week number (1–53) for a Date.
+ *
+ * Algorithm: shift each date to the nearest Thursday (Thursday-based ISO
+ * weeks per ISO 8601). Specifically, `4 - (dayOfWeek || 7)` adjusts so
+ * that Mon→Thu is +3…0 and Fri→Sun is -1…-2, landing every date on its
+ * week's Thursday. Then divide the offset from Jan 1 by 7.
+ * 86400000 = milliseconds per day (24 × 60 × 60 × 1000).
+ */
 function isoWeek(d: Date): number {
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));

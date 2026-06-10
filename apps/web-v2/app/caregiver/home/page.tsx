@@ -20,7 +20,12 @@ import { listLearnersForMember } from "@/lib/db/team-invites";
 import { getLearner, listLessonRunsForLearner, refreshLearnerReadiness } from "@/lib/db/repos";
 import type { LearnerProfile } from "@/lib/db/types";
 import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
-import { computeDeltaPct, computeMetricHistory, splitIntoPeriods } from "@/lib/analytics";
+import {
+  buildKpiAriaLabel,
+  computeDeltaPct,
+  computeMetricHistory,
+  splitIntoPeriods,
+} from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -68,7 +73,12 @@ export default async function CaregiverHomePage() {
             value={String(fresh.length)}
             periodLabel={t("period_label_active")}
             seriesTone="brand"
-            ariaLabel={`Learners on your care team: ${fresh.length}`}
+            ariaLabel={buildKpiAriaLabel(
+              t("on_care_team"),
+              String(fresh.length),
+              null,
+              t("period_label_active"),
+            )}
           />
           <KpiCard
             label={t("active_or_ready")}
@@ -77,7 +87,12 @@ export default async function CaregiverHomePage() {
             periodLabel={activityDelta != null ? t("period_label_vs_last_week") : t("period_label_this_week")}
             series={activitySeries.length > 1 ? activitySeries : undefined}
             seriesTone={learningNow > 0 ? "success" : "brand"}
-            ariaLabel={`Active or ready learners: ${learningNow}${activityDelta != null ? `, ${activityDelta > 0 ? "up" : activityDelta < 0 ? "down" : "no change"} ${Math.abs(activityDelta)}% vs last week` : ""}`}
+            ariaLabel={buildKpiAriaLabel(
+              t("active_or_ready"),
+              String(learningNow),
+              activityDelta,
+              activityDelta != null ? t("period_label_vs_last_week") : undefined,
+            )}
           />
           <div className="rounded-iw-card bg-iw-card border border-iw-border p-4">
             <p className="text-xs text-aivo-ink-soft">{t("quick_links")}</p>

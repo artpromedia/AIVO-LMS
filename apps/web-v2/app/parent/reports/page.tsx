@@ -25,6 +25,7 @@ import {
   listSubjects,
 } from "@/lib/db/repos";
 import {
+  buildKpiAriaLabel,
   computeDeltaPct,
   computeMetricHistory,
   splitIntoPeriods,
@@ -94,9 +95,9 @@ export default async function Page() {
                 12,
               );
 
-              // --- Trend data: overall mastery (last 30 days vs prior 30) ---
-              // Proxy via completed runs in each period — more runs in recent = improving engagement
-              const masteryDelta =
+              // --- Trend data: lesson engagement (last 30 days vs prior 30) ---
+              // Proxy mastery trend via completed run counts: more completed runs = improving engagement
+              const completedLessonsDelta =
                 priorCompleted.length > 0
                   ? computeDeltaPct(recentCompleted.length, priorCompleted.length)
                   : null;
@@ -123,11 +124,16 @@ export default async function Page() {
                     <KpiCard
                       label="Overall mastery"
                       value={`${Math.round(overallAvg * 100)}%`}
-                      deltaPct={masteryDelta ?? undefined}
-                      periodLabel={masteryDelta != null ? t("period_label_30d") : undefined}
+                      deltaPct={completedLessonsDelta ?? undefined}
+                      periodLabel={completedLessonsDelta != null ? t("period_label_30d") : undefined}
                       series={lessonsSeries.length > 1 ? lessonsSeries : undefined}
                       seriesTone={overallAvg >= 0.65 ? "mastery" : "info"}
-                      ariaLabel={`Overall mastery ${Math.round(overallAvg * 100)}%${masteryDelta != null ? `, ${masteryDelta > 0 ? "up" : masteryDelta < 0 ? "down" : "no change"} ${Math.abs(masteryDelta)}% ${t("period_label_30d")}` : ""}`}
+                      ariaLabel={buildKpiAriaLabel(
+                        "Overall mastery",
+                        `${Math.round(overallAvg * 100)}%`,
+                        completedLessonsDelta,
+                        completedLessonsDelta != null ? t("period_label_30d") : undefined,
+                      )}
                     />
                     <KpiCard
                       label="Lessons completed"
@@ -136,21 +142,34 @@ export default async function Page() {
                       periodLabel={completedDelta != null ? t("period_label_30d") : undefined}
                       series={lessonsSeries.length > 1 ? lessonsSeries : undefined}
                       seriesTone="brand"
-                      ariaLabel={`Lessons completed ${completedCount}${completedDelta != null ? `, ${completedDelta > 0 ? "up" : completedDelta < 0 ? "down" : "no change"} ${Math.abs(completedDelta)}% ${t("period_label_30d")}` : ""}`}
+                      ariaLabel={buildKpiAriaLabel(
+                        "Lessons completed",
+                        `${completedCount}`,
+                        completedDelta,
+                        completedDelta != null ? t("period_label_30d") : undefined,
+                      )}
                     />
                     <KpiCard
                       label="Skills tracked"
                       value={`${skillMasteries.length}`}
                       periodLabel={t("period_label_all_time")}
                       seriesTone="info"
-                      ariaLabel={`Skills tracked ${skillMasteries.length}, from baseline`}
+                      ariaLabel={buildKpiAriaLabel(
+                        "Skills tracked",
+                        `${skillMasteries.length}`,
+                        null,
+                        t("period_label_all_time"),
+                      )}
                     />
                     <KpiCard
                       label="IEP supports"
                       value={supportsCount > 0 ? `${supportsCount} on` : "None on file"}
                       periodLabel={iep?.confirmedAt ? "Active" : "Optional"}
                       seriesTone={iep?.confirmedAt ? "success" : "brand"}
-                      ariaLabel={`IEP supports: ${supportsCount > 0 ? `${supportsCount} active` : "none on file"}`}
+                      ariaLabel={buildKpiAriaLabel(
+                        "IEP supports",
+                        supportsCount > 0 ? `${supportsCount} active` : "none on file",
+                      )}
                     />
                   </div>
 

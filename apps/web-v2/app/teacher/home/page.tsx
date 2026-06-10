@@ -26,7 +26,12 @@ import {
   listTeacherAssignments,
   refreshLearnerReadiness,
 } from "@/lib/db/repos";
-import { computeDeltaPct, computeMetricHistory, splitIntoPeriods } from "@/lib/analytics";
+import {
+  buildKpiAriaLabel,
+  computeDeltaPct,
+  computeMetricHistory,
+  splitIntoPeriods,
+} from "@/lib/analytics";
 
 const TEACHER_NAV = [
   { href: "/teacher/home", label: "Home", icon: <Home className="h-4 w-4" /> },
@@ -269,30 +274,50 @@ export default async function TeacherHome() {
           value={String(learners.length)}
           periodLabel={learners.length === 0 ? "No roster yet" : t("period_label_this_week")}
           seriesTone="info"
-          ariaLabel={`Active learners: ${learners.length}${learners.length === 0 ? ", no roster yet" : ""}`}
+          ariaLabel={buildKpiAriaLabel(
+            "Active learners",
+            String(learners.length),
+            null,
+            learners.length === 0 ? "no roster yet" : t("period_label_this_week"),
+          )}
         />
         <KpiCard
           label="Active IEPs"
           value={String(iepCount)}
           periodLabel={iepCount === 0 ? "None on file" : "Supports applied"}
           seriesTone="success"
-          ariaLabel={`Active IEPs: ${iepCount}${iepCount === 0 ? ", none on file" : ", supports applied"}`}
+          ariaLabel={buildKpiAriaLabel(
+            "Active IEPs",
+            String(iepCount),
+            null,
+            iepCount === 0 ? "none on file" : "supports applied",
+          )}
         />
         <KpiCard
-          label="Lessons in progress"
+          label="Lessons completed"
           value={String(thisWeekRuns.length)}
           deltaPct={lessonDelta ?? undefined}
           periodLabel={lessonDelta != null ? t("period_label_vs_last_week") : t("period_label_this_week")}
           series={lessonSeries.length > 1 ? lessonSeries : undefined}
           seriesTone="brand"
-          ariaLabel={`Lessons in progress this week: ${thisWeekRuns.length}${lessonDelta != null ? `, ${lessonDelta > 0 ? "up" : lessonDelta < 0 ? "down" : "no change"} ${Math.abs(lessonDelta)}% vs last week` : ""}`}
+          ariaLabel={buildKpiAriaLabel(
+            "Lessons completed this week",
+            String(thisWeekRuns.length),
+            lessonDelta,
+            lessonDelta != null ? t("period_label_vs_last_week") : undefined,
+          )}
         />
         <KpiCard
           label="Needs support"
           value={String(needsSupport)}
           periodLabel={needsSupport === 0 ? "Everyone's on track" : "Review needed"}
           seriesTone={needsSupport === 0 ? "success" : "risk"}
-          ariaLabel={`Learners needing support: ${needsSupport}${needsSupport === 0 ? ", everyone on track" : ", review needed"}`}
+          ariaLabel={buildKpiAriaLabel(
+            "Learners needing support",
+            String(needsSupport),
+            null,
+            needsSupport === 0 ? "everyone on track" : "review needed",
+          )}
         />
       </section>
 
