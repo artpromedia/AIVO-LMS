@@ -13,11 +13,14 @@ import {
   seedParent,
   seedTherapist,
   skipUnlessIdentityTestMode,
+  skipUnlessWebReachable,
 } from "../../lib/fixtures";
 
 test.describe("therapist golden paths", () => {
   test.beforeEach(async () => {
     await skipUnlessIdentityTestMode();
+    // These journeys drive web-v2 pages; a services-only harness skips them.
+    await skipUnlessWebReachable();
   });
 
   test("1. therapist home renders", async ({ page }) => {

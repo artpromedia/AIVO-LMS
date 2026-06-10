@@ -11,7 +11,7 @@ import type {
   AdminEvidenceBundle,
 } from "@aivo/admin-api/compliance";
 import type { TenantInvoice } from "@aivo/admin-api/invoices";
-import { AdminCard, AdminMetricCard } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard } from "@aivo/admin-ui";
 import type { TrialConversionReport } from "@aivo/admin-api/billing";
 import { formatBytes, formatDate, formatDateTime, formatPercent } from "@/components/admin-format";
 
@@ -125,9 +125,9 @@ export function InvoicesTable({ invoices }: { invoices: TenantInvoice[] }) {
 export function TrialMetrics({ report }: { report: TrialConversionReport }) {
   return (
     <section className="mt-8 grid gap-4 md:grid-cols-4">
-      <AdminMetricCard label="Trials started (30d)" value={report.trialsStartedLast30d} />
-      <AdminMetricCard label="Trialing now" value={report.trialingNow} />
-      <AdminMetricCard label="Ending in 7d" value={report.trialsEndingIn7d} />
+      <AdminKpiCard label="Trials started (30d)" value={report.trialsStartedLast30d} />
+      <AdminKpiCard label="Trialing now" value={report.trialingNow} />
+      <AdminKpiCard label="Ending in 7d" value={report.trialsEndingIn7d} />
       <AdminCard className="p-5">
         <p className="text-sm font-semibold text-slate-500">Conversion (30d)</p>
         <p className="mt-2 text-3xl font-black">{formatPercent(report.conversionRateLast30d)}</p>

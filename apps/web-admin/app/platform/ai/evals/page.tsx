@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { type AiEvalRunStatus, listAiEvals } from "@aivo/admin-api/ai-governance";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime, formatPercent } from "@/components/admin-format";
 
 const STATUS_TONE: Record<AiEvalRunStatus, string> = {
@@ -30,9 +30,9 @@ export default async function AiEvalsPage() {
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Runs" value={runs.length} />
-        <AdminMetricCard label="Passed" value={passed} />
-        <AdminMetricCard label="Failed" value={failed} />
+        <AdminKpiCard label="Runs" value={runs.length} />
+        <AdminKpiCard label="Passed" value={passed} />
+        <AdminKpiCard label="Failed" value={failed} />
       </section>
 
       <AdminCard className="mt-6 overflow-hidden">

@@ -39,10 +39,15 @@ jobs:
               - 'services/identity-svc/**'
               - 'services/billing-svc/**'
               - 'services/comms-svc/**'
+              - 'services/admin-svc/**'
               - 'packages/db/**'
+              - 'packages/admin-ui/**'
+              - 'packages/admin-api/**'
+              - 'packages/admin-auth/**'
               - 'e2e/lib/pilot.ts'
               - 'e2e/lib/fixtures.ts'
               - 'e2e/specs/district-pilot/**'
+              - 'e2e/specs/admin/**'
               - 'docker-compose.e2e.yml'
               - 'apps/web-v2/Dockerfile'
               - '.github/workflows/district-pilot-e2e.yml'
@@ -84,13 +89,14 @@ jobs:
           AIVO_SEED_DATABASE_URL: postgresql://aivo:aivo@localhost:55433/aivo_e2e
         run: pnpm --filter @aivo/web-v2 db:seed:postgres
 
-      - name: Bring up pilot harness (identity-svc + billing-svc + comms-svc + web-v2)
+      - name: Bring up pilot harness (identity-svc + billing-svc + comms-svc + web-v2 + admin-svc + web-admin)
         if: steps.filter.outputs.pilot == 'true'
         # Sprint 0 + Sprint 1 slice: identity-svc real auth (web-v2) and the
         # pilot-provisioning orchestration (identity → billing → comms).
+        # admin-svc + web-admin back the specs/admin console suite.
         run: >
           docker compose -f docker-compose.e2e.yml --profile pilot up -d --build --wait
-          postgres identity-svc billing-svc comms-svc web-v2
+          postgres identity-svc billing-svc comms-svc web-v2 admin-svc web-admin
           || (docker compose -f docker-compose.e2e.yml --profile pilot logs && exit 1)
 
       - name: Install Playwright browsers
@@ -104,6 +110,14 @@ jobs:
           IDENTITY_BASE_URL: http://localhost:3001
           BILLING_BASE_URL: http://localhost:3009
         run: pnpm --filter @aivo/e2e exec playwright test specs/district-pilot --reporter=line
+
+      - name: Run the admin console suite (web-admin on :5001, required)
+        if: steps.filter.outputs.pilot == 'true'
+        env:
+          ADMIN_WEB_BASE_URL: http://localhost:5001
+          ADMIN_SVC_URL: http://localhost:3005
+          IDENTITY_BASE_URL: http://localhost:3001
+        run: pnpm --filter @aivo/e2e exec playwright test specs/admin --reporter=line
 
       - name: Dump logs on failure
         if: failure() && steps.filter.outputs.pilot == 'true'

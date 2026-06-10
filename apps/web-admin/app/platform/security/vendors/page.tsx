@@ -11,7 +11,7 @@ import {
   listSecurityVendors,
   updateSecurityVendor,
 } from "@aivo/admin-api/security";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 function actionError(error: unknown): string {
@@ -87,9 +87,9 @@ export default async function SecurityVendorsPage({
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Vendors" value={vendors.length} />
-        <AdminMetricCard label="Approved" value={approved} />
-        <AdminMetricCard label="Process learner data" value={learnerData} />
+        <AdminKpiCard label="Vendors" value={vendors.length} />
+        <AdminKpiCard label="Approved" value={approved} />
+        <AdminKpiCard label="Process learner data" value={learnerData} />
       </section>
 
       <AdminCard className="mt-6 p-6">

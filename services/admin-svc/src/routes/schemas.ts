@@ -331,6 +331,14 @@ export const getAdminSvcPlatformSystemHealthSchema = {
   response: { 200: passthroughObject, 503: errorResponse },
 } as const;
 
+export const getAdminSvcPlatformUsageTrendsSchema = {
+  tags: ["Admin"],
+  operationId: "getAdminSvcPlatformUsageTrends",
+  summary: "GET /api/admin-svc/platform/usage-trends",
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject },
+} as const;
+
 export const getAdminSvcPlatformAiActivitySchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcPlatformAiActivity",

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { getModerationStats } from "@aivo/admin-api/moderation";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 
 export default async function SafetyPage() {
   const session = await requirePlatformPage("platform:read");
@@ -16,8 +16,8 @@ export default async function SafetyPage() {
       description="Trust & safety operations for AI-generated learner content."
     >
       <section className="mt-8 grid gap-4 md:grid-cols-2">
-        <AdminMetricCard label="Flagged total" value={total} />
-        <AdminMetricCard label="Pending review" value={pending} />
+        <AdminKpiCard label="Flagged total" value={total} />
+        <AdminKpiCard label="Pending review" value={pending} />
       </section>
 
       <AdminCard className="mt-6 p-6">

@@ -4,7 +4,7 @@ import {
   getBaselineMetrics,
   listBaselineRecalibration,
 } from "@aivo/admin-api/baseline";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 
 function pct(value: number): string {
   return `${Math.round(value * 100)}%`;
@@ -31,14 +31,14 @@ export default async function BaselineItemsPage() {
       description="Item calibration analytics over baseline responses (last 30 days), computed from baseline_item_response_logs."
     >
       <section className="mt-8 grid gap-4 md:grid-cols-4">
-        <AdminMetricCard label="Responses" value={totals.responses} />
+        <AdminKpiCard label="Responses" value={totals.responses} />
         <AdminCard className="p-5">
           <p className="text-sm font-semibold text-slate-500">Correct rate</p>
           <p className="mt-2 text-3xl font-black">{pct(totals.correctRate)}</p>
           <p className="mt-1 text-sm text-slate-500">skip {pct(totals.skipRate)}</p>
         </AdminCard>
-        <AdminMetricCard label="Learners" value={totals.learners} />
-        <AdminMetricCard label="Distinct items" value={totals.items} />
+        <AdminKpiCard label="Learners" value={totals.learners} />
+        <AdminKpiCard label="Distinct items" value={totals.items} />
       </section>
 
       <h2 className="mt-8 text-xl font-black">By difficulty band</h2>

@@ -9,7 +9,7 @@ import {
   listDsarRequests,
   rejectDsar,
 } from "@aivo/admin-api/dsar";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 const DSAR_ROLES = ["platform_admin", "district_admin"] as const;
@@ -73,9 +73,9 @@ export default async function DsarQueuePage({
       description="Data subject access requests with statutory SLA timers, backed by data-governance-svc (Postgres)."
     >
       <section className="mt-8 grid gap-4 md:grid-cols-4">
-        <AdminMetricCard label="Open" value={kpis.open} />
-        <AdminMetricCard label="Overdue" value={kpis.overdue} />
-        <AdminMetricCard label="Fulfilled" value={kpis.fulfilled} />
+        <AdminKpiCard label="Open" value={kpis.open} />
+        <AdminKpiCard label="Overdue" value={kpis.overdue} />
+        <AdminKpiCard label="Fulfilled" value={kpis.fulfilled} />
         <AdminCard className="p-5">
           <p className="text-sm font-semibold text-slate-500">Avg fulfillment</p>
           <p className="mt-2 text-3xl font-black">

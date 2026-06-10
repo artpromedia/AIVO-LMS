@@ -1,7 +1,21 @@
 @import "tailwindcss";
+/* Tailwind utilities referenced from the shared admin-ui package live in its
+   built dist (node_modules is skipped by default) — scan it explicitly. */
+@source "../node_modules/@aivo/admin-ui/dist";
 
 :root {
   color-scheme: light;
+
+  /* Chart tokens — series colors reuse the console palette (#174ea6 button
+     blue, emerald/amber/red notice tones, slate text) so charts never
+     introduce new hues. */
+  --admin-chart-1: #174ea6;
+  --admin-chart-2: #065f46;
+  --admin-chart-3: #b45309;
+  --admin-chart-4: #b91c1c;
+  --admin-chart-5: #475569;
+  --admin-chart-grid: rgba(23, 32, 51, 0.12);
+  --admin-chart-axis: #475569;
 }
 
 html,
@@ -17,12 +31,69 @@ body {
   color: #172033;
 }
 
+/* Enterprise heading scale — calmer than the consumer font-black tone.
+   Size stays a utility concern (text-4xl etc.); these own weight/tracking. */
+.admin-h1 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #172033;
+}
+
+.admin-h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #172033;
+}
+
+/* Tabular figures for KPI values and table numerics so columns align. */
+.admin-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inside the app shell the content slot owns width and padding, so the
+   page frame's standalone centering becomes a no-op (see AdminPageFrame). */
+.admin-shell-content main.admin-page-frame {
+  min-height: auto;
+  padding: 0;
+}
+
+.admin-shell-content main.admin-page-frame > div {
+  max-width: none;
+  margin: 0;
+}
+
+/* Skeleton bars for a panel whose data source is degraded. */
+.admin-skeleton {
+  border-radius: 6px;
+  background: rgba(23, 32, 51, 0.08);
+  animation: admin-skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes admin-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.admin-kpi-delta-up {
+  color: #065f46;
+}
+
+.admin-kpi-delta-down {
+  color: #b91c1c;
+}
+
 .admin-card {
   border: 1px solid rgba(23, 32, 51, 0.1);
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 24px 70px rgba(23, 32, 51, 0.12);
-  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 32px rgba(23, 32, 51, 0.08);
+  backdrop-filter: blur(8px);
 }
 
 .admin-input {
@@ -38,7 +109,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: 12px;
   background: #174ea6;
   padding: 0.78rem 1.1rem;
   font-weight: 700;
@@ -161,28 +232,6 @@ body {
   color: #991b1b;
 }
 
-.admin-checklist {
-  border: 1px solid rgba(23, 32, 51, 0.1);
-  border-radius: 18px;
-  padding: 1rem;
-  background: rgba(248, 250, 252, 0.8);
-}
-
-.admin-checklist-complete {
-  border-color: #a7f3d0;
-  background: #ecfdf5;
-}
-
-.admin-checkmark {
-  display: inline-flex;
-  border-radius: 999px;
-  background: #dbeafe;
-  padding: 0.25rem 0.55rem;
-  color: #1e40af;
-  font-size: 0.72rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
 
 .admin-quick-action {
   border: 1px dashed rgba(23, 78, 166, 0.28);

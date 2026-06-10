@@ -35,6 +35,7 @@ import { registerContentCmsRoutes } from "./routes/content-cms.js";
 import { registerGovernanceRoutes } from "./routes/governance.js";
 import { registerLearnerImportRoutes } from "./routes/learner-import.js";
 import { registerClassroomRoutes } from "./routes/classrooms.js";
+import { registerSchoolOverviewRoutes } from "./routes/school-overview.js";
 import { registerReportRoutes } from "./routes/reports.js";
 import { registerNotificationRoutes } from "./routes/notifications.js";
 import { registerFeatureFlagRoutes } from "./routes/feature-flags.js";
@@ -44,6 +45,7 @@ import { registerSupportRoutes } from "./routes/support.js";
 import { registerBaselineRoutes } from "./routes/baseline.js";
 import { registerIepRoutes } from "./routes/iep.js";
 import { registerSettingsRoutes } from "./routes/settings.js";
+import { registerAdminTestHelperRoutes } from "./routes/test-helpers.js";
 import { startEvidenceCron } from "./lib/soc2-evidence.js";
 import { startWatchdog, configureWatchdogAlerts } from "./lib/watchdog.js";
 import { runJanitorOnce } from "./lib/janitor.js";
@@ -83,6 +85,9 @@ export async function buildApp(
   await app.register(swaggerUI, { routePrefix: "/docs" });
 
   registerHealthRoutes(app);
+  // No-op unless ADMIN_TEST_MODE=1 outside production (e2e fault injection
+  // + deterministic platform-metrics seeds).
+  registerAdminTestHelperRoutes(app, db);
   registerPlatformRoutes(app, db);
   registerAdminIpAllowlist(app);
   // ADR 0020 — enforce the `x-aivo-active-role` header (hint, never a grant)
@@ -103,6 +108,7 @@ export async function buildApp(
   registerGovernanceRoutes(app, db);
   registerLearnerImportRoutes(app, db);
   registerClassroomRoutes(app, db);
+  registerSchoolOverviewRoutes(app, db);
   registerReportRoutes(app, db);
   registerNotificationRoutes(app, db);
   registerFeatureFlagRoutes(app);

@@ -12,6 +12,7 @@ import {
   type AdminUserSummary,
   type PlatformSystemHealth,
   type PlatformSystemHealthIssue,
+  type PlatformUsageTrendPoint,
   type RecentAiActivityEntry,
   adminRoleLabel,
   adminRoleTone,
@@ -175,6 +176,26 @@ export async function getPlatformSystemHealth(
     degraded: Boolean(row.degraded) || issues.length > 0,
     issues,
   };
+}
+
+export async function getPlatformUsageTrends(
+  session: Pick<SessionProfile, "role">,
+  days = 14,
+): Promise<PlatformUsageTrendPoint[]> {
+  const row = await adminGet<Record<string, unknown>>(
+    session,
+    "/api/admin-svc/platform/usage-trends",
+    { days },
+  );
+  const points = Array.isArray(row.points) ? row.points : [];
+  return points.map((point) => {
+    const entry = point as Record<string, unknown>;
+    return {
+      day: String(entry.day ?? ""),
+      newUsers: Number(entry.newUsers ?? 0),
+      newLearners: Number(entry.newLearners ?? 0),
+    };
+  });
 }
 
 export async function listRecentAiActivity(

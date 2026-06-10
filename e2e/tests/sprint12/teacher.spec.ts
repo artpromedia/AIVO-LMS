@@ -14,11 +14,14 @@ import {
   seedParent,
   seedTeacher,
   skipUnlessIdentityTestMode,
+  skipUnlessWebReachable,
 } from "../../lib/fixtures";
 
 test.describe("teacher golden paths", () => {
   test.beforeEach(async () => {
     await skipUnlessIdentityTestMode();
+    // These journeys drive web-v2 pages; a services-only harness skips them.
+    await skipUnlessWebReachable();
   });
 
   test("1. teacher home loads", async ({ page }) => {

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { requirePageRole, requirePlatformPage } from "@aivo/admin-auth";
 import { AdminApiError } from "@aivo/admin-api";
 import { listAiPolicies, updateAiPolicy } from "@aivo/admin-api/ai-governance";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 function actionError(error: unknown): string {
@@ -55,9 +55,9 @@ export default async function AiPoliciesPage({
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Policies" value={policies.length} />
-        <AdminMetricCard label="Enabled" value={enabled} />
-        <AdminMetricCard label="Platform-scoped" value={platformScoped} />
+        <AdminKpiCard label="Policies" value={policies.length} />
+        <AdminKpiCard label="Enabled" value={enabled} />
+        <AdminKpiCard label="Platform-scoped" value={platformScoped} />
       </section>
 
       <AdminCard className="mt-6 overflow-hidden">

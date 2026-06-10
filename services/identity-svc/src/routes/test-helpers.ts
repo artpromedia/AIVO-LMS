@@ -21,6 +21,7 @@ import {
   iepProgressNotes,
   iepEvaluations,
   parentInAppNotifications,
+  webLearnerProfiles,
 } from "@aivo/db";
 import { eq, and, sql } from "drizzle-orm";
 import argon2 from "argon2";
@@ -188,6 +189,16 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
         gradeLevel: gradeLevel ?? "5",
       })
       .returning();
+    // Mirror into the web-v2 learner store: billing's pilot seat usage
+    // counts web_learner_profiles, so a seeded learner occupies a real seat.
+    await db
+      .insert(webLearnerProfiles)
+      .values({
+        id: learner.id,
+        tenantId,
+        data: { name: learnerName, createdAt: new Date().toISOString(), seededBy: "e2e" },
+      })
+      .onConflictDoNothing();
     return {
       learnerId: learner.id,
       learnerUserId: learnerUser.id,
@@ -319,6 +330,135 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
         email: user.email,
         role: user.role,
         tenantId: tenant.id,
+        accessToken,
+      };
+    },
+  );
+
+  // Idempotent seed for a SCHOOL_ADMIN under a B2B_SCHOOL tenant. Mirrors
+  // seed-district-admin; consumed by e2e/lib/fixtures.ts seedSchoolAdmin
+  // (admin-console RBAC specs need a real non-platform admin token).
+  app.post<{
+    Body: { email: string; password: string; tenantName?: string; mfaEnabled?: boolean };
+  }>("/api/__test__/seed-school-admin", async (req, reply) => {
+    if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+    const db = (app as any).db;
+    const {
+      email,
+      password,
+      tenantName = "E2E School Tenant",
+      mfaEnabled = false,
+    } = req.body ?? ({} as any);
+    if (!email || !password) {
+      return reply.status(400).send({ error: "email and password required" });
+    }
+
+    let [tenant] = await db.select().from(tenants).where(eq(tenants.name, tenantName)).limit(1);
+    if (!tenant) {
+      [tenant] = await db
+        .insert(tenants)
+        .values({ name: tenantName, type: "B2B_SCHOOL" as any } as any)
+        .returning();
+    }
+
+    const passwordHash = await argon2.hash(password);
+    const lcEmail = email.toLowerCase();
+    let [user] = await db.select().from(users).where(eq(users.email, lcEmail)).limit(1);
+    if (user) {
+      await db
+        .update(users)
+        .set({
+          passwordHash,
+          role: "SCHOOL_ADMIN",
+          tenantId: tenant.id,
+          mfaEnabled,
+          deactivatedAt: null,
+        })
+        .where(eq(users.id, user.id));
+    } else {
+      [user] = await db
+        .insert(users)
+        .values({
+          email: lcEmail,
+          name: "E2E School Admin",
+          passwordHash,
+          role: "SCHOOL_ADMIN",
+          tenantId: tenant.id,
+          mfaEnabled,
+        })
+        .returning();
+    }
+
+    const accessToken = await signJWT({
+      sub: user.id,
+      tenantId: tenant.id,
+      role: user.role,
+      email: user.email,
+      name: user.name,
+    });
+    return {
+      id: user.id,
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      tenantId: tenant.id,
+      accessToken,
+    };
+  });
+
+  // Idempotent seed for a tenant-less SUPPORT platform-staff user. The admin
+  // console's nav-shell e2e uses it to prove role-gated items stay hidden
+  // for non-admin platform roles.
+  app.post<{ Body: { email: string; password: string } }>(
+    "/api/__test__/seed-support",
+    async (req, reply) => {
+      if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+      const db = (app as any).db;
+      const { email, password } = req.body ?? ({} as any);
+      if (!email || !password) {
+        return reply.status(400).send({ error: "email and password required" });
+      }
+      const lcEmail = email.toLowerCase();
+      const passwordHash = await argon2.hash(password);
+      let [user] = await db.select().from(users).where(eq(users.email, lcEmail)).limit(1);
+      if (user) {
+        await db
+          .update(users)
+          .set({
+            passwordHash,
+            role: "SUPPORT",
+            tenantId: null,
+            mfaEnabled: false,
+            deactivatedAt: null,
+          })
+          .where(eq(users.id, user.id));
+        [user] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+      } else {
+        [user] = await db
+          .insert(users)
+          .values({
+            email: lcEmail,
+            name: "E2E Support Staff",
+            passwordHash,
+            role: "SUPPORT" as any,
+            tenantId: null,
+            mfaEnabled: false,
+          })
+          .returning();
+      }
+      const accessToken = await signJWT({
+        sub: user.id,
+        tenantId: null,
+        role: user.role,
+        email: user.email,
+        name: user.name,
+      });
+      return {
+        id: user.id,
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        tenantId: "",
         accessToken,
       };
     },

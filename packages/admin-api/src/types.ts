@@ -271,6 +271,13 @@ export interface PlatformSystemHealth {
   issues: PlatformSystemHealthIssue[];
 }
 
+export interface PlatformUsageTrendPoint {
+  /** UTC day key, `YYYY-MM-DD`. */
+  day: string;
+  newUsers: number;
+  newLearners: number;
+}
+
 export interface RecentAiActivityEntry {
   id: string;
   provider: string;

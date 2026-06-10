@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { type AiModelStatus, listAiModels } from "@aivo/admin-api/ai-governance";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 const STATUS_TONE: Record<AiModelStatus, string> = {
@@ -30,9 +30,9 @@ export default async function AiModelsPage() {
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Models" value={models.length} />
-        <AdminMetricCard label="Active" value={active} />
-        <AdminMetricCard label="Retired" value={retired} />
+        <AdminKpiCard label="Models" value={models.length} />
+        <AdminKpiCard label="Active" value={active} />
+        <AdminKpiCard label="Retired" value={retired} />
       </section>
 
       <AdminCard className="mt-6 overflow-hidden">

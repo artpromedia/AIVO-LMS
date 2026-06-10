@@ -16,7 +16,7 @@
     "prepare": "tsc",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "test": "tsc --noEmit"
+    "test": "vitest run"
   },
   "peerDependencies": {
     "react": ">=18.2.0 <20",
@@ -25,6 +25,10 @@
   "devDependencies": {
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "recharts": "^3.8.1"
   }
 }

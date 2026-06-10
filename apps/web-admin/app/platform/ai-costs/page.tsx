@@ -1,6 +1,6 @@
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { getPlatformAiCosts } from "@aivo/admin-api/platform";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatUsd } from "@/components/admin-format";
 
 export default async function AiCostsPage() {
@@ -19,9 +19,9 @@ export default async function AiCostsPage() {
           <p className="text-sm font-semibold text-slate-500">Spend (24h)</p>
           <p className="mt-2 text-3xl font-black">{formatUsd(summary.totalEstimatedCostUsd24h)}</p>
         </AdminCard>
-        <AdminMetricCard label="Requests (24h)" value={summary.requestCount24h} />
-        <AdminMetricCard label="Warning tenants" value={summary.warningTenants} />
-        <AdminMetricCard label="Over cap" value={summary.overCapTenants} />
+        <AdminKpiCard label="Requests (24h)" value={summary.requestCount24h} />
+        <AdminKpiCard label="Warning tenants" value={summary.warningTenants} />
+        <AdminKpiCard label="Over cap" value={summary.overCapTenants} />
       </section>
 
       <AdminCard className="mt-6 overflow-hidden">

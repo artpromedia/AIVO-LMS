@@ -13,12 +13,15 @@ import {
   seedLearnerForParent,
   seedParent,
   skipUnlessIdentityTestMode,
+  skipUnlessWebReachable,
   T,
 } from "../../lib/fixtures";
 
 test.describe("caregiver golden paths", () => {
   test.beforeEach(async () => {
     await skipUnlessIdentityTestMode();
+    // These journeys drive web-v2 pages; a services-only harness skips them.
+    await skipUnlessWebReachable();
   });
 
   test("1. caregiver lands on /caregiver/home", async ({ page }) => {

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
 import { AdminApiError } from "@aivo/admin-api";
 import { getWebhooks, setWebhookActive } from "@aivo/admin-api/platform-settings";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 function actionError(error: unknown): string {
@@ -45,8 +45,8 @@ export default async function WebhooksPage({
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
 
       <section className="mt-8 grid gap-4 md:grid-cols-2">
-        <AdminMetricCard label="Endpoints" value={webhooks.length} />
-        <AdminMetricCard label="Active" value={active} />
+        <AdminKpiCard label="Endpoints" value={webhooks.length} />
+        <AdminKpiCard label="Active" value={active} />
       </section>
 
       <h2 className="mt-8 text-xl font-black">Endpoints</h2>

@@ -8,7 +8,7 @@ import {
   listOutboxEmails,
   retryOutboxEmail,
 } from "@aivo/admin-api/platform-settings";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 function actionError(error: unknown): string {
@@ -56,9 +56,9 @@ export default async function EmailsPage({
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Pending" value={counts.pending ?? 0} />
-        <AdminMetricCard label="Sent" value={counts.sent ?? 0} />
-        <AdminMetricCard label="Failed" value={counts.failed ?? 0} />
+        <AdminKpiCard label="Pending" value={counts.pending ?? 0} />
+        <AdminKpiCard label="Sent" value={counts.sent ?? 0} />
+        <AdminKpiCard label="Failed" value={counts.failed ?? 0} />
       </section>
 
       <nav className="mt-8 flex flex-wrap gap-2">

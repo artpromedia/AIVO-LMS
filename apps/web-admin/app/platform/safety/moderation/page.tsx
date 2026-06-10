@@ -8,7 +8,7 @@ import {
   listModerationEvents,
   updateModerationEventStatus,
 } from "@aivo/admin-api/moderation";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 
 const STATUSES: AdminModerationStatus[] = [
@@ -69,9 +69,9 @@ export default async function ModerationPage({
       description="AI tutor content flagged for human review, with a full decision audit trail."
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Flagged total" value={total} />
-        <AdminMetricCard label="Pending review" value={pending} />
-        <AdminMetricCard label="Escalated" value={escalated} />
+        <AdminKpiCard label="Flagged total" value={total} />
+        <AdminKpiCard label="Pending review" value={pending} />
+        <AdminKpiCard label="Escalated" value={escalated} />
       </section>
 
       <nav className="mt-8 flex flex-wrap gap-2">

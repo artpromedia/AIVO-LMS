@@ -8,6 +8,7 @@ import {
   runReport,
 } from "@aivo/admin-api/reports";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { ReportChart } from "@/components/report-chart";
 
 function ReportResultTable({ result }: { result: AdminReportResult }) {
   return (
@@ -89,24 +90,40 @@ export default async function DistrictReportsPage({
   const params = await searchParams;
   const schoolId = params.schoolId?.trim() || session.tenantId;
 
+  // Catalog and report run fetch in ONE parallel round trip (the serial
+  // chain doubled this page's latency). The run is keyed by the raw query
+  // param and only DISPLAYED once the catalog confirms the id — admin-svc
+  // independently rejects unknown report ids, so nothing leaks.
+  const wantedReportId = params.reportId?.trim() || null;
+  const [definitionsResult, runResult] = await Promise.allSettled([
+    listReportDefinitions(session, schoolId),
+    wantedReportId ? runReport(session, schoolId, wantedReportId) : Promise.resolve(null),
+  ]);
+
   let definitions: AdminReportDefinition[] = [];
   let loadError: string | null = null;
-  try {
-    definitions = await listReportDefinitions(session, schoolId);
-  } catch (error) {
-    loadError = error instanceof AdminApiError ? error.message : "Failed to load reports.";
+  if (definitionsResult.status === "fulfilled") {
+    definitions = definitionsResult.value;
+  } else {
+    loadError =
+      definitionsResult.reason instanceof AdminApiError
+        ? definitionsResult.reason.message
+        : "Failed to load reports.";
   }
 
-  const activeReportId = definitions.find((d) => d.id === params.reportId)?.id;
+  const activeReportId = definitions.find((d) => d.id === wantedReportId)?.id;
   const activeDefinition = definitions.find((d) => d.id === activeReportId);
 
   let result: AdminReportResult | null = null;
   let runError: string | null = null;
   if (activeReportId) {
-    try {
-      result = await runReport(session, schoolId, activeReportId);
-    } catch (error) {
-      runError = error instanceof AdminApiError ? error.message : "Failed to run report.";
+    if (runResult.status === "fulfilled") {
+      result = runResult.value;
+    } else {
+      runError =
+        runResult.reason instanceof AdminApiError
+          ? runResult.reason.message
+          : "Failed to run report.";
     }
   }
 
@@ -146,6 +163,7 @@ export default async function DistrictReportsPage({
       ) : null}
 
       {runError ? <p className="admin-error mt-5">{runError}</p> : null}
+      {result ? <ReportChart result={result} /> : null}
       {result ? <ReportResultTable result={result} /> : null}
     </AdminPageFrame>
   );

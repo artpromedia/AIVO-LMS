@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { getAdminTenant } from "@aivo/admin-api/platform";
-import { AdminCard, AdminMetricCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { LearnersTable, UsersTable } from "@/components/admin-tables";
 import { formatDate } from "@/components/admin-format";
 
@@ -31,8 +31,8 @@ export default async function TenantDetailPage({
       }
     >
       <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <AdminMetricCard label="Users" value={tenant.userCount} />
-        <AdminMetricCard label="Learners" value={tenant.learnerCount} />
+        <AdminKpiCard label="Users" value={tenant.userCount} />
+        <AdminKpiCard label="Learners" value={tenant.learnerCount} />
         <AdminCard className="p-5">
           <p className="text-sm font-semibold text-slate-500">Status</p>
           <p className="mt-2 text-2xl font-black">{tenant.status ?? "—"}</p>
