@@ -26,6 +26,9 @@ import {
   ProgressCurve,
   RiskIndicator,
   ClassOverviewCard,
+  AreaTrend,
+  Donut,
+  KpiCard,
   AivoIcon,
   type MasteryCell,
 } from "@aivo/ui";
@@ -63,6 +66,55 @@ const mastery: MasteryCell[] = [
   { code: "RL.3.8", level: "developing" },
   { code: "RL.3.9", level: "proficient" },
   { code: "RL.3.10", level: "mastered" },
+];
+
+// AreaTrend demo data — mimics the billing utilization chart
+const utilizationSeries = [
+  {
+    name: "Allocated",
+    points: [
+      { label: "Jan", value: 100 },
+      { label: "Feb", value: 110 },
+      { label: "Mar", value: 110 },
+      { label: "Apr", value: 120 },
+      { label: "May", value: 120 },
+      { label: "Jun", value: 130 },
+    ],
+    tone: "brand" as const,
+    dashed: true,
+    filled: true,
+  },
+  {
+    name: "Used",
+    points: [
+      { label: "Jan", value: 72 },
+      { label: "Feb", value: 85 },
+      { label: "Mar", value: 91 },
+      { label: "Apr", value: 98 },
+      { label: "May", value: 105 },
+      { label: "Jun", value: 118 },
+    ],
+    tone: "brand" as const,
+    dashed: false,
+    filled: true,
+  },
+];
+
+// Donut demo data
+const donutSegments = [
+  { label: "Reading", value: 38 },
+  { label: "Math", value: 31 },
+  { label: "Science", value: 18 },
+  { label: "Writing", value: 13 },
+];
+
+// KpiCard sparkline data
+const kpiSeries = [
+  { label: "W1", value: 210 },
+  { label: "W2", value: 218 },
+  { label: "W3", value: 225 },
+  { label: "W4", value: 231 },
+  { label: "W5", value: 240 },
 ];
 
 export default function DesignSystemPage() {
@@ -208,6 +260,48 @@ export default function DesignSystemPage() {
           >
             <MasteryHeatStrip cells={mastery} />
           </GlassCard>
+
+          {/* AreaTrend — billing utilization (same component backing admin charts) */}
+          <GlassCard
+            density="base"
+            radius="card-lg"
+            title="Seat utilization"
+            description="Jan–Jun · demo data"
+          >
+            <AreaTrend
+              series={utilizationSeries}
+              refLine={{ value: 125, label: "Hard cap" }}
+              ariaLabel="Seat utilization over time"
+            />
+          </GlassCard>
+
+          {/* Donut + KpiCards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <GlassCard
+              density="base"
+              radius="card-lg"
+              title="Subject breakdown"
+              description="Active learners"
+            >
+              <div className="flex justify-center py-2">
+                <Donut segments={donutSegments} ariaLabel="Subject breakdown by active learners" />
+              </div>
+            </GlassCard>
+            <KpiCard
+              value="240"
+              label="Active learners"
+              deltaPct={0.14}
+              series={kpiSeries}
+              ariaLabel="Active learners: 240 (+14%)"
+            />
+            <KpiCard
+              value="94%"
+              label="On-track rate"
+              deltaPct={0.03}
+              tone="success"
+              ariaLabel="On-track rate: 94% (+3%)"
+            />
+          </div>
         </section>
 
         {/* Risk + class composites */}
