@@ -654,7 +654,7 @@ export function CsvImportWizard({ schoolId }: WizardProps) {
                     aria-valuemax={100}
                     aria-label={`Import progress: ${pollJob.progress}%`}
                   >
-                    <Progress value={pollJob.progress} className="h-3" />
+                    <Progress value={pollJob.progress} className="h-3" aria-label={`${pollJob.progress}% imported`} />
                     <p className="mt-1 text-xs text-iw-ink-muted text-right">
                       {pollJob.progress}% — {pollJob.status}
                     </p>

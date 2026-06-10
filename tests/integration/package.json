@@ -19,6 +19,6 @@
   },
   "devDependencies": {
     "fastify": "^5.3.3",
-    "vitest": "^2.0.0"
+    "vitest": "^4.1.8"
   }
 }

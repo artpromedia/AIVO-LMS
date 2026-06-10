@@ -103,7 +103,7 @@ export function JobTray({ schoolId }: JobTrayProps) {
                     aria-valuemax={100}
                     aria-label={`Job progress: ${job.progress}%`}
                   >
-                    <Progress value={job.progress} className="h-1.5" />
+                    <Progress value={job.progress} className="h-1.5" aria-label={`${job.progress}% complete`} />
                   </div>
                 )}
                 {job.status === "completed" && (

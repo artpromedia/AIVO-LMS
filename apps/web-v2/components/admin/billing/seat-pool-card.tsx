@@ -88,7 +88,7 @@ export function SeatPoolCard({
               {allocated} / {total}
             </span>
           </div>
-          <Progress value={allocationPct} />
+          <Progress value={allocationPct} aria-label={`${allocationPct}% of seats allocated`} />
         </div>
         <div>
           <div className="mb-1 flex justify-between text-xs text-aivo-ink-soft">
@@ -99,6 +99,7 @@ export function SeatPoolCard({
           </div>
           <Progress
             value={utilizationPct}
+            aria-label={`${utilizationPct}% of seats in use`}
             className={utilizationPct > 90 ? "[&>div]:bg-aivo-danger" : ""}
           />
         </div>

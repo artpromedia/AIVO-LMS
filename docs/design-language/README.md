@@ -14,9 +14,18 @@ It combines rounded geometry, warm guidance mascots, audio-first controls, and c
 
 See the companion docs in this folder for principles, components, motion, a11y, and migration.
 
-## Before / after snapshots
+## Current-design snapshots
 
-- `screenshots/design-language/landing-before.png` → `landing-after.png`
-- `screenshots/design-language/login-before.png` → `login-after.png`
-- `screenshots/design-language/learner-home-before.png` → `learner-home-after.png`
-- `screenshots/design-language/rewards-before.png` → `rewards-after.png`
+- `screenshots/design-language/landing-after.png`
+- `screenshots/design-language/login-after.png`
+- `screenshots/design-language/learner-home-after.png`
+- `screenshots/design-language/rewards-after.png`
+
+> 2026-06-10: every snapshot in this folder (the four "before" captures and
+> the four "after" captures) had been committed as the same blank white
+> 1280×720 image — a capture bug, not real pixels. The blank set was removed;
+> the "after" captures were regenerated from the live app. The pre-redesign
+> "before" UI no longer exists anywhere in the repo, so that set cannot be
+> recovered and the README no longer claims it. The Playwright visual suite
+> (`apps/web-v2/e2e/visual-a11y.playwright.ts`) now refuses to record or
+> compare a near-uniform screenshot, so blank captures cannot land again.

@@ -73,7 +73,11 @@ export function StickerBook({ earned, total }: { earned: number; total: number }
       <p className="text-sm text-iw-ink-muted">
         {earned}/{total} collected
       </p>
-      <Progress className="mt-3" value={(earned / Math.max(total, 1)) * 100} />
+      <Progress
+        className="mt-3"
+        value={(earned / Math.max(total, 1)) * 100}
+        aria-label={`${earned} of ${total} stickers collected`}
+      />
     </Card>
   );
 }

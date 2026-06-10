@@ -13,6 +13,7 @@ import {
 import type { AreaTrendPoint } from "@aivo/admin-ui";
 import { describeSystemHealthFailure } from "../platform/health-state";
 import { PanelError } from "../platform/dashboard-panels";
+import { currentTermWindow } from "../../lib/report-window";
 
 const DAY_LABEL = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -61,10 +62,7 @@ export default async function SchoolHomePage() {
   // Each panel fetches and degrades independently, like the platform page.
   const [overviewResult, engagementResult] = await Promise.allSettled([
     getSchoolOverview(session),
-    runReport(session, session.tenantId, "attendance_proxy", {
-      startDate: "2024-09-01",
-      endDate: "2024-12-20",
-    }),
+    runReport(session, session.tenantId, "attendance_proxy", currentTermWindow()),
   ]);
   const overview = settle<SchoolOverview>(overviewResult, "school-overview");
   const engagement = settle<AdminReportResult>(engagementResult, "attendance-proxy report");

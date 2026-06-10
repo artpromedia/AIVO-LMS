@@ -144,7 +144,7 @@ export default async function ParentProgressPage({
                   {Math.round(avg * 100)}%
                 </Badge>
               </div>
-              <Progress className="mt-3" value={avg * 100} />
+              <Progress className="mt-3" value={avg * 100} aria-label={`${Math.round(avg * 100)}%`} />
               <ul className="mt-4 grid gap-1 text-sm sm:grid-cols-2">
                 {items.slice(0, 8).map((m) => {
                   const skill = skills.find((s) => s.id === m.skillId);

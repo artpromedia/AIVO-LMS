@@ -35,7 +35,7 @@
     "react-dom": "19.1.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.58.2",
-    "vitest": "^2.0.0"
+    "vitest": "^4.1.8"
   },
   "dependencies": {
     "@aivo/aac-bridge": "workspace:*",
