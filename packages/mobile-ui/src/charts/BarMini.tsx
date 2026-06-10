@@ -62,14 +62,13 @@ export function BarMini({
         {rows.map((subj) => {
           const pct = subj.value > 1 ? Math.min(subj.value, 100) : Math.min(subj.value * 100, 100);
           const level = masteryLevelFromScore(pct / 100);
-          const fill = subj.tone ?? MASTERY_TONES[level];
+          const fill = subj.tone ?? MASTERY_TONES[level].fill;
           const label_pct = `${Math.round(pct)}%`;
 
           return (
             <View
               key={subj.name}
               style={styles.row}
-              accessibilityRole="listitem"
               accessibilityLabel={`${subj.name} ${label_pct}`}
             >
               <Text style={styles.name} numberOfLines={1}>
