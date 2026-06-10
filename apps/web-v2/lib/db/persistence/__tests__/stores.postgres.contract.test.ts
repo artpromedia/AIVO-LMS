@@ -53,6 +53,7 @@ const MIGRATIONS = [
   "0072_web_collaboration",
   "0092_web_review_schedules",
   "0094_web_mastery_snapshots",
+  "0098_web_baseline_bank",
 ];
 
 const TABLES = [
@@ -80,6 +81,7 @@ const TABLES = [
   "web_learning_paths",
   "web_review_schedules",
   "web_mastery_snapshots",
+  "web_baseline_bank",
   "web_consent_records",
   "web_iep_documents",
   "web_age_gate_records",

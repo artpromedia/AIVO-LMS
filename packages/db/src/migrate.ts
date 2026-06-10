@@ -7,6 +7,24 @@
  * table, so this is safe to re-run; with the early migrations now
  * idempotent (see Task #181), it is also safe against dev DBs that
  * were originally bootstrapped via `db:push`.
+ *
+ * Journal unification (adaptive-learning E2E follow-up): the journal now
+ * covers EVERY SQL file in `drizzle/` — the 16 migrations historically
+ * applied out-of-band via `scripts/apply-mig-*.sh` (0024–0029, 0033–0036,
+ * 0039–0040, 0063, 0067–0069) are back-journaled in numeric position with
+ * `when` timestamps that PREDATE every long-lived environment's migration
+ * head. Consequences:
+ *   - fresh databases get the complete schema from this one command;
+ *   - long-lived environments (which already received those files
+ *     out-of-band) skip them, because the migrator only applies entries
+ *     newer than the max recorded created_at;
+ *   - a dev database migrated journal-only BEFORE the unification will
+ *     also skip them and stay incomplete — re-create it (the journey
+ *     setup, tests/integration/journey/setup-db.ts, detects and reports
+ *     this case loudly).
+ * The 0033/0034 files are guarded so their legacy-column statements
+ * (plan_id backfill, persona_id constraint relaxation) no-op on fresh
+ * databases. New migrations MUST be journaled — never applied out-of-band.
  */
 import { fileURLToPath } from "node:url";
 import path from "node:path";

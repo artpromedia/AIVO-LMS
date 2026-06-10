@@ -145,6 +145,7 @@ const TABLES = [
   "web_lesson_objective_templates",
   "web_assessment_blueprints",
   "web_curriculum_import_jobs",
+  "web_baseline_bank",
 ] as const;
 
 const POSTGRES_ENABLED =

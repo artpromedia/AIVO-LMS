@@ -22,6 +22,21 @@ ALTER TABLE tutor_sessions
   ADD COLUMN IF NOT EXISTS completion_quality real,
   ADD COLUMN IF NOT EXISTS completed_at timestamp with time zone;
 
-ALTER TABLE tutor_sessions
-  ALTER COLUMN persona_id DROP NOT NULL,
-  ALTER COLUMN subject DROP NOT NULL;
+-- Legacy columns (persona_id, and subject in its legacy NOT NULL form)
+-- only exist on long-lived environments. Guarded per-column so this
+-- migration also bootstraps fresh databases (journal unification follow-up).
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+     WHERE table_name = 'tutor_sessions' AND column_name = 'persona_id'
+  ) THEN
+    ALTER TABLE tutor_sessions ALTER COLUMN persona_id DROP NOT NULL;
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+     WHERE table_name = 'tutor_sessions' AND column_name = 'subject'
+  ) THEN
+    ALTER TABLE tutor_sessions ALTER COLUMN subject DROP NOT NULL;
+  END IF;
+END $$;

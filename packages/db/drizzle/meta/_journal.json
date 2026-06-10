@@ -145,407 +145,526 @@
     {
       "idx": 20,
       "version": "7",
+      "when": 1776900000000,
+      "tag": "0024_aac_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1776910000000,
+      "tag": "0025_learner_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1776920000000,
+      "tag": "0026_learner_interest_signals",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1776930000000,
+      "tag": "0027_ef_partner",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
       "when": 1777000000000,
       "tag": "0028_backfill_missing_tables",
       "breakpoints": true
     },
     {
-      "idx": 21,
+      "idx": 25,
+      "version": "7",
+      "when": 1777100000000,
+      "tag": "0028_teacher_assessments_and_caregiver_attrib",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1777200000000,
+      "tag": "0029_recommendation_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
       "version": "7",
       "when": 1777800000000,
       "tag": "0030_billing_stripe_columns",
       "breakpoints": true
     },
     {
-      "idx": 22,
+      "idx": 28,
       "version": "7",
       "when": 1777803600000,
       "tag": "0031_billing_payment_method_columns",
       "breakpoints": true
     },
     {
-      "idx": 23,
+      "idx": 29,
       "version": "7",
       "when": 1777807200000,
       "tag": "0032_billing_event_ordering",
       "breakpoints": true
     },
     {
-      "idx": 24,
+      "idx": 30,
+      "version": "7",
+      "when": 1778000000000,
+      "tag": "0033_billing_plan_metadata_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1778100000000,
+      "tag": "0034_tutor_sessions_schema_drift",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1778200000000,
+      "tag": "0035_tutor_sessions_id_default",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1778300000000,
+      "tag": "0036_sensory_profiles_mode",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
       "version": "7",
       "when": 1779148800000,
       "tag": "0038_nces_districts_lookup",
       "breakpoints": true
     },
     {
-      "idx": 25,
+      "idx": 35,
+      "version": "7",
+      "when": 1779200000000,
+      "tag": "0039_baseline_item_audits",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1779300000000,
+      "tag": "0040_iep_drafts",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
       "version": "7",
       "when": 1779580800000,
       "tag": "0041_school_admin_role",
       "breakpoints": true
     },
     {
-      "idx": 26,
+      "idx": 38,
       "version": "7",
       "when": 1779584400000,
       "tag": "0042_teacher_parent_invites",
       "breakpoints": true
     },
     {
-      "idx": 27,
+      "idx": 39,
       "version": "7",
       "when": 1779588000000,
       "tag": "0043_learner_teachers_classroom",
       "breakpoints": true
     },
     {
-      "idx": 28,
+      "idx": 40,
       "version": "7",
       "when": 1779591600000,
       "tag": "0044_email_outbox",
       "breakpoints": true
     },
     {
-      "idx": 29,
+      "idx": 41,
       "version": "7",
       "when": 1779595200000,
       "tag": "0045_baseline_item_response_logs",
       "breakpoints": true
     },
     {
-      "idx": 30,
+      "idx": 42,
       "version": "7",
       "when": 1779681600000,
       "tag": "0046_weekly_pacing",
       "breakpoints": true
     },
     {
-      "idx": 31,
+      "idx": 43,
       "version": "7",
       "when": 1779768000000,
       "tag": "0047_lesson_runs",
       "breakpoints": true
     },
     {
-      "idx": 32,
+      "idx": 44,
       "version": "7",
       "when": 1779854400000,
       "tag": "0048_learner_brain_profiles",
       "breakpoints": true
     },
     {
-      "idx": 33,
+      "idx": 45,
       "version": "7",
       "when": 1779940800000,
       "tag": "0049_web_domain",
       "breakpoints": true
     },
     {
-      "idx": 34,
+      "idx": 46,
       "version": "7",
       "when": 1780027200000,
       "tag": "0050_web_domain_rls",
       "breakpoints": true
     },
     {
-      "idx": 35,
+      "idx": 47,
       "version": "7",
       "when": 1780113600000,
       "tag": "0051_oidc_grants",
       "breakpoints": true
     },
     {
-      "idx": 36,
+      "idx": 48,
       "version": "7",
       "when": 1780200000000,
       "tag": "0052_profile_recommendations_v2",
       "breakpoints": true
     },
     {
-      "idx": 37,
+      "idx": 49,
       "version": "7",
       "when": 1780286400000,
       "tag": "0053_device_tokens",
       "breakpoints": true
     },
     {
-      "idx": 38,
+      "idx": 50,
       "version": "7",
       "when": 1780372800000,
       "tag": "0054_speech_buddy_consents",
       "breakpoints": true
     },
     {
-      "idx": 39,
+      "idx": 51,
       "version": "7",
       "when": 1780459200000,
       "tag": "0055_messaging",
       "breakpoints": true
     },
     {
-      "idx": 40,
+      "idx": 52,
       "version": "7",
       "when": 1780545600000,
       "tag": "0056_user_roles",
       "breakpoints": true
     },
     {
-      "idx": 41,
+      "idx": 53,
       "version": "7",
       "when": 1780632000000,
       "tag": "0057_content_packs",
       "breakpoints": true
     },
     {
-      "idx": 42,
+      "idx": 54,
       "version": "7",
       "when": 1780718400000,
       "tag": "0058_seat_pooling",
       "breakpoints": true
     },
     {
-      "idx": 43,
+      "idx": 55,
       "version": "7",
       "when": 1780804800000,
       "tag": "0059_data_governance_dsar",
       "breakpoints": true
     },
     {
-      "idx": 44,
+      "idx": 56,
       "version": "7",
       "when": 1780891200000,
       "tag": "0060_school_admin_persistence",
       "breakpoints": true
     },
     {
-      "idx": 45,
+      "idx": 57,
       "version": "7",
       "when": 1780977600000,
       "tag": "0061_teacher_insights",
       "breakpoints": true
     },
     {
-      "idx": 46,
+      "idx": 58,
       "version": "7",
       "when": 1780617600000,
       "tag": "0062_backfill_pgtable_drift",
       "breakpoints": true
     },
     {
-      "idx": 47,
+      "idx": 59,
+      "version": "7",
+      "when": 1780700000000,
+      "tag": "0063_engineering_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
       "version": "7",
       "when": 1781040000000,
       "tag": "0064_learner_accessibility_prefs",
       "breakpoints": true
     },
     {
-      "idx": 48,
+      "idx": 61,
       "version": "7",
       "when": 1781126400000,
       "tag": "0065_lead_attribution",
       "breakpoints": true
     },
     {
-      "idx": 49,
+      "idx": 62,
       "version": "7",
       "when": 1781212800000,
       "tag": "0066_trial_ending_reminder_latch",
       "breakpoints": true
     },
     {
-      "idx": 50,
+      "idx": 63,
+      "version": "7",
+      "when": 1781250000000,
+      "tag": "0067_curriculum_catalogue",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1781300000000,
+      "tag": "0068_term_syllabus",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1781350000000,
+      "tag": "0069_syllabus_validation",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
       "version": "7",
       "when": 1781472000000,
       "tag": "0070_tenant_runtime_and_idempotency",
       "breakpoints": true
     },
     {
-      "idx": 51,
+      "idx": 67,
       "version": "7",
       "when": 1781558400000,
       "tag": "0071_brain_insights_tenant_scope",
       "breakpoints": true
     },
     {
-      "idx": 52,
+      "idx": 68,
       "version": "7",
       "when": 1781644800000,
       "tag": "0072_web_collaboration",
       "breakpoints": true
     },
     {
-      "idx": 53,
+      "idx": 69,
       "version": "7",
       "when": 1781731200000,
       "tag": "0073_teacher_assignments",
       "breakpoints": true
     },
     {
-      "idx": 54,
+      "idx": 70,
       "version": "7",
       "when": 1781817600000,
       "tag": "0074_teacher_lesson_assignments_rls",
       "breakpoints": true
     },
     {
-      "idx": 55,
+      "idx": 71,
       "version": "7",
       "when": 1781904000000,
       "tag": "0075_security_controls",
       "breakpoints": true
     },
     {
-      "idx": 56,
+      "idx": 72,
       "version": "7",
       "when": 1781990400000,
       "tag": "0076_security_incidents",
       "breakpoints": true
     },
     {
-      "idx": 57,
+      "idx": 73,
       "version": "7",
       "when": 1782076800000,
       "tag": "0077_security_risk_vendor_vuln",
       "breakpoints": true
     },
     {
-      "idx": 58,
+      "idx": 74,
       "version": "7",
       "when": 1782163200000,
       "tag": "0078_responsible_ai_registry",
       "breakpoints": true
     },
     {
-      "idx": 59,
+      "idx": 75,
       "version": "7",
       "when": 1782249600000,
       "tag": "0079_pronunciation_overrides",
       "breakpoints": true
     },
     {
-      "idx": 60,
+      "idx": 76,
       "version": "7",
       "when": 1782336000000,
       "tag": "0080_support_tickets",
       "breakpoints": true
     },
     {
-      "idx": 61,
+      "idx": 77,
       "version": "7",
       "when": 1782422400000,
       "tag": "0081_web_billing",
       "breakpoints": true
     },
     {
-      "idx": 62,
+      "idx": 78,
       "version": "7",
       "when": 1782508800000,
       "tag": "0082_web_clinical",
       "breakpoints": true
     },
     {
-      "idx": 63,
+      "idx": 79,
       "version": "7",
       "when": 1782595200000,
       "tag": "0083_web_security",
       "breakpoints": true
     },
     {
-      "idx": 64,
+      "idx": 80,
       "version": "7",
       "when": 1782681600000,
       "tag": "0084_web_privacy",
       "breakpoints": true
     },
     {
-      "idx": 65,
+      "idx": 81,
       "version": "7",
       "when": 1782768000000,
       "tag": "0085_web_rostering",
       "breakpoints": true
     },
     {
-      "idx": 66,
+      "idx": 82,
       "version": "7",
       "when": 1782854400000,
       "tag": "0086_web_audio_safety",
       "breakpoints": true
     },
     {
-      "idx": 67,
+      "idx": 83,
       "version": "7",
       "when": 1782940800000,
       "tag": "0087_web_support_settings",
       "breakpoints": true
     },
     {
-      "idx": 68,
+      "idx": 84,
       "version": "7",
       "when": 1783027200000,
       "tag": "0088_web_engagement",
       "breakpoints": true
     },
     {
-      "idx": 69,
+      "idx": 85,
       "version": "7",
       "when": 1783113600000,
       "tag": "0089_web_standards",
       "breakpoints": true
     },
     {
-      "idx": 70,
+      "idx": 86,
       "version": "7",
       "when": 1783200000000,
       "tag": "0090_billing_coupons",
       "breakpoints": true
     },
     {
-      "idx": 71,
+      "idx": 87,
       "version": "7",
       "when": 1783286400000,
       "tag": "0091_billing_coupon_discount_default",
       "breakpoints": true
     },
     {
-      "idx": 72,
+      "idx": 88,
       "version": "7",
       "when": 1783372800000,
       "tag": "0092_web_review_schedules",
       "breakpoints": true
     },
     {
-      "idx": 73,
+      "idx": 89,
       "version": "7",
       "when": 1783372801000,
       "tag": "0093_web_review_schedules_rls",
       "breakpoints": true
     },
     {
-      "idx": 74,
+      "idx": 90,
       "version": "7",
       "when": 1783372802000,
       "tag": "0094_web_mastery_snapshots",
       "breakpoints": true
     },
     {
-      "idx": 75,
+      "idx": 91,
       "version": "7",
       "when": 1783372803000,
       "tag": "0095_web_mastery_snapshots_rls",
       "breakpoints": true
     },
     {
-      "idx": 76,
+      "idx": 92,
       "version": "7",
       "when": 1783372804000,
       "tag": "0096_learner_profiles_rebaseline",
       "breakpoints": true
     },
     {
-      "idx": 77,
+      "idx": 93,
       "version": "7",
       "when": 1783372805000,
       "tag": "0097_therapist_assessments",
+      "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1783372806000,
+      "tag": "0098_web_baseline_bank",
       "breakpoints": true
     }
   ]
