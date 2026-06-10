@@ -66,6 +66,7 @@ const TABLES = [
   "web_skill_masteries",
   "web_learning_paths",
   "web_review_schedules",
+  "web_mastery_snapshots",
   "web_consent_records",
   "web_iep_documents",
   "web_age_gate_records",

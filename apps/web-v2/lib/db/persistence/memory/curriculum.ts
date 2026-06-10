@@ -12,6 +12,7 @@ import { getStore } from "@/lib/db/store";
 import type {
   LearningPath,
   MasteryMap,
+  MasterySnapshot,
   ReviewSchedule,
   Skill,
   SkillMastery,
@@ -106,6 +107,24 @@ export const memoryCurriculum: CurriculumStore = {
     }
     store.learningPaths.set(next.id, next);
     return next;
+  },
+
+  async appendMasterySnapshot(row: MasterySnapshot) {
+    getStore().masterySnapshots.push(row);
+    return row;
+  },
+
+  async listMasterySnapshots(learnerId, tenantId, opts) {
+    return getStore()
+      .masterySnapshots.filter(
+        (m) =>
+          m.learnerId === learnerId &&
+          m.tenantId === tenantId &&
+          (!opts?.subjectId || m.subjectId === opts.subjectId) &&
+          (!opts?.sinceIso || m.capturedAt >= opts.sinceIso),
+      )
+      .slice()
+      .sort((a, b) => a.capturedAt.localeCompare(b.capturedAt));
   },
 
   async getReviewSchedules(learnerId, tenantId) {

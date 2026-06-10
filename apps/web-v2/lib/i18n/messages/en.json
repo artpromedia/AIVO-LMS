@@ -630,7 +630,15 @@
       "time_learning": "Time learning",
       "skills_tracked": "Skills tracked",
       "mastered": "Mastered",
-      "by_subject": "By subject"
+      "by_subject": "By subject",
+      "refresh_path": "Refresh learning path",
+      "refresh_path_done": "Path refreshed",
+      "refresh_path_error": "Couldn't refresh — try again",
+      "trajectory_title": "Progress over time",
+      "at_grade_count": "{count} of {total} skills at grade level",
+      "working_at": "Working at level {level}",
+      "grade_target": "Grade target {grade}",
+      "on_grade": "On grade level"
     },
     "learner_summary": {
       "title": "Plain-language summary",

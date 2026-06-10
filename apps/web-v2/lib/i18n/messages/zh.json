@@ -439,7 +439,15 @@
       "time_learning": "学习时间",
       "skills_tracked": "追踪技能",
       "mastered": "已掌握",
-      "by_subject": "按科目"
+      "by_subject": "按科目",
+      "refresh_path": "刷新学习路径",
+      "refresh_path_done": "路径已刷新",
+      "refresh_path_error": "刷新失败 — 请重试",
+      "trajectory_title": "随时间的进步",
+      "at_grade_count": "{total}项技能中有{count}项达到年级水平",
+      "working_at": "正在学习级别 {level}",
+      "grade_target": "目标年级 {grade}",
+      "on_grade": "达到年级水平"
     },
     "learner_summary": {
       "title": "简明摘要",

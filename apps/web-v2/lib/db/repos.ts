@@ -47,6 +47,7 @@ import type {
   LearningPath,
   LessonOutcome,
   MasteryMap,
+  MasterySnapshot,
   ParentAssessment,
   ParentAssessmentSectionId,
   ParentLessonSummary,
@@ -99,11 +100,14 @@ import {
 import { logger } from "@/lib/observability/logger";
 import {
   buildBaselineSummary,
+  buildMasterySnapshotRows,
   computeSkillMasteryFromBaseline,
   generateLearningPath,
   generateReviewSchedules,
   levelFromScore,
 } from "@/lib/learner/mastery";
+import { selectNextSkills } from "@/lib/learner/select-next-skills";
+import { deliveryLevelFromTheta, normalizeGradeBand } from "@aivo/scoring";
 import { buildBrainProfile } from "@/lib/learner/brain-profile";
 import { brainProfileStateSchema } from "@/lib/validators/brain-profile";
 import type { CreateLearnerInput, PatchLearnerInput } from "@/lib/validators/learner";
@@ -1339,6 +1343,7 @@ export async function completeBaseline(
     skillMasteries,
     skills,
     recommendedStartSkillId: summary.recommendedStartSkillId,
+    gradeBand: learner.gradeBand ?? null,
   });
 
   const reviewSchedules = generateReviewSchedules({
@@ -1390,6 +1395,7 @@ export async function completeBaseline(
   // recalibration job has live data to refine item difficulty. Adaptive
   // path only; idempotent (the main finalize path runs once per baseline,
   // but guard anyway so a replay never double-writes).
+  let adaptiveFinalTheta: number | null = null;
   if (baselineAdaptiveEnabled()) {
     const existing = await getPersistence().assessments.listBaselineTelemetry({
       tenantId,
@@ -1408,6 +1414,7 @@ export async function completeBaseline(
         calibration,
       });
       if (telemetry.length > 0) {
+        adaptiveFinalTheta = telemetry[telemetry.length - 1]!.thetaAfter;
         await getPersistence().assessments.appendBaselineTelemetry(telemetry);
         logger.info(
           {
@@ -1421,6 +1428,37 @@ export async function completeBaseline(
         );
       }
     }
+  }
+
+  // Adaptive-learning E2E Sprint 3: append one trajectory point per covered
+  // subject so the parent progress page can chart movement over time.
+  // Resilient by contract — a snapshot failure must never fail completion.
+  try {
+    const enrolledBand = normalizeGradeBand(learner.gradeBand);
+    const snapshotRows = buildMasterySnapshotRows({
+      learnerId: baseline.learnerId,
+      tenantId,
+      skillMasteries,
+      subjectIds: baseline.subjectIds,
+      gradeBand: learner.gradeBand ?? null,
+      deliveryLevel:
+        adaptiveFinalTheta !== null && enrolledBand
+          ? deliveryLevelFromTheta(adaptiveFinalTheta, enrolledBand)
+          : null,
+      trigger: "baseline",
+    });
+    for (const row of snapshotRows) {
+      await getPersistence().curriculum.appendMasterySnapshot(row);
+    }
+  } catch (snapErr) {
+    logger.warn(
+      {
+        event: "mastery_snapshot.append_failed",
+        learnerId: baseline.learnerId,
+        err: snapErr instanceof Error ? snapErr.message : String(snapErr),
+      },
+      "baseline: mastery snapshot append failed (non-fatal)",
+    );
   }
 
   return {
@@ -1530,9 +1568,16 @@ export async function regenerateLearningPath(
   const { map, skillMasteries } = await getMasteryMap(learnerId, tenantId);
   if (!map || skillMasteries.length === 0) return null;
   const skills = await listSkills();
-  // Find a "recommended first" skill: lowest-scoring, prefer reading.
-  const sorted = skillMasteries.slice().sort((a, b) => a.score - b.score);
-  const recommended = sorted[0]?.skillId ?? null;
+  const learner = await getLearner(learnerId, tenantId);
+  // Recommended first skill: head of the prerequisite-aware frontier
+  // (Sprint 3) — NOT the raw lowest score, which can point at a skill whose
+  // prerequisites the learner hasn't met yet.
+  const selection = selectNextSkills({
+    skills,
+    skillMasteries,
+    gradeBand: learner?.gradeBand ?? null,
+  });
+  const recommended = selection.frontier[0] ?? null;
   const next = generateLearningPath({
     learnerId,
     tenantId,
@@ -1540,8 +1585,17 @@ export async function regenerateLearningPath(
     skillMasteries,
     skills,
     recommendedStartSkillId: recommended,
+    gradeBand: learner?.gradeBand ?? null,
   });
   return getPersistence().curriculum.replaceLearningPath(learnerId, tenantId, next);
+}
+
+export async function listMasterySnapshots(
+  learnerId: string,
+  tenantId: string,
+  opts?: { subjectId?: string; sinceIso?: string },
+): Promise<MasterySnapshot[]> {
+  return getPersistence().curriculum.listMasterySnapshots(learnerId, tenantId, opts);
 }
 
 export type SubjectDetail = {
@@ -1589,12 +1643,13 @@ export async function getSubjectDetail(
     }
   }
 
-  // Next skill: lowest-scoring skill not yet on_grade_level, else first skill.
-  const sortedForNext = annotated
-    .slice()
-    .sort((a, b) => (a.mastery?.score ?? 0) - (b.mastery?.score ?? 0));
-  const nextSkill =
-    sortedForNext.find((s) => !s.mastery || s.mastery.score < 0.65) ?? annotated[0] ?? null;
+  // Next skill: head of the prerequisite-aware frontier (Sprint 3) — an
+  // unlocked, unmastered skill in DAG order, never one whose prerequisites
+  // are unmet. Falls back to the first skill when everything is mastered.
+  const selection = selectNextSkills({ skills, skillMasteries });
+  const nextSkill = selection.frontier.length
+    ? (annotated.find((s) => s.id === selection.frontier[0]) ?? null)
+    : (annotated[0] ?? null);
 
   const path = await getLearningPath(learnerId, tenantId);
   const pathNodesForSubject = path?.nodes.filter((n) => n.subjectId === subjectId) ?? [];
@@ -2240,6 +2295,36 @@ export async function completeLessonRun(
   };
   await runStore.upsertRun(next);
   const delta = await applyOutcomeToMastery(next, effectiveOutcome);
+  // Sprint 3: a level change re-plans the learning path and records a
+  // trajectory point. Resilient — failures log and never fail completion.
+  if (delta.levelAfter !== delta.levelBefore) {
+    try {
+      await regenerateLearningPath(next.learnerId, tenantId);
+      const { skillMasteries: refreshed } = await getMasteryMap(next.learnerId, tenantId);
+      const learnerRow = await getLearner(next.learnerId, tenantId);
+      const snapshotRows = buildMasterySnapshotRows({
+        learnerId: next.learnerId,
+        tenantId,
+        skillMasteries: refreshed,
+        subjectIds: [next.subjectId],
+        gradeBand: learnerRow?.gradeBand ?? null,
+        deliveryLevel: null,
+        trigger: "lesson",
+      });
+      for (const row of snapshotRows) {
+        await getPersistence().curriculum.appendMasterySnapshot(row);
+      }
+    } catch (snapErr) {
+      logger.warn(
+        {
+          event: "mastery_snapshot.append_failed",
+          learnerId: next.learnerId,
+          err: snapErr instanceof Error ? snapErr.message : String(snapErr),
+        },
+        "lesson: path regen / mastery snapshot failed (non-fatal)",
+      );
+    }
+  }
   const summary = await buildParentLessonSummary(next, effectiveOutcome, delta);
   await runStore.upsertParentSummary(summary);
   await refreshLearnerReadiness(run.learnerId, tenantId);

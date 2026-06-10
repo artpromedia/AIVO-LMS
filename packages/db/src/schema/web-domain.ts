@@ -223,6 +223,26 @@ export const webReviewSchedules = pgTable(
   (t) => ({ idx: index("web_review_schedules_idx").on(t.learnerId, t.tenantId) }),
 );
 
+export const webMasterySnapshots = pgTable(
+  "web_mastery_snapshots",
+  {
+    id: text("id").primaryKey(),
+    learnerId: text("learner_id").notNull(),
+    tenantId: text("tenant_id").notNull(),
+    subjectId: text("subject_id").notNull(),
+    capturedAt: text("captured_at").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({
+    idx: index("web_mastery_snapshots_idx").on(
+      t.learnerId,
+      t.tenantId,
+      t.subjectId,
+      t.capturedAt,
+    ),
+  }),
+);
+
 // ── compliance ──────────────────────────────────────────────────────
 export const webConsentRecords = pgTable(
   "web_consent_records",

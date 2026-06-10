@@ -439,7 +439,15 @@
       "time_learning": "Tempo de aprendizado",
       "skills_tracked": "Habilidades monitoradas",
       "mastered": "Dominadas",
-      "by_subject": "Por disciplina"
+      "by_subject": "Por disciplina",
+      "refresh_path": "Atualizar trilha de aprendizagem",
+      "refresh_path_done": "Trilha atualizada",
+      "refresh_path_error": "Falha ao atualizar — tente novamente",
+      "trajectory_title": "Progresso ao longo do tempo",
+      "at_grade_count": "{count} de {total} habilidades no nível da série",
+      "working_at": "Trabalhando no nível {level}",
+      "grade_target": "Série alvo {grade}",
+      "on_grade": "No nível da série"
     },
     "learner_summary": {
       "title": "Resumo em linguagem simples",

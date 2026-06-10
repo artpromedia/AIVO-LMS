@@ -4,6 +4,7 @@
  * apart from the explicit repo writes called by `repos.ts`.
  */
 import type {
+  MasterySnapshot,
   BaselineAssessment,
   BaselineAttempt,
   BaselineQuestion,
@@ -17,6 +18,7 @@ import type {
   Subject,
 } from "@/lib/db/types";
 import { newId, nowIso } from "@/lib/db/store";
+import { selectNextSkills } from "./select-next-skills";
 
 const DIFFICULTY_WEIGHT: Record<BaselineQuestion["difficulty"], number> = {
   foundational: 0.4,
@@ -226,11 +228,25 @@ export function generateLearningPath(input: {
   skillMasteries: SkillMastery[];
   skills: Skill[];
   recommendedStartSkillId: string | null;
+  /** Canonical band content is delivered at (theta-derived), when known. */
+  deliveryLevel?: string | null;
+  /** Enrolled grade band, when known. */
+  gradeBand?: string | null;
 }): LearningPath {
   const { learnerId, tenantId, basedOnMasteryMapId, skillMasteries, skills } = input;
   const skillsById = new Map(skills.map((s) => [s.id, s]));
   const masteryById = new Map(skillMasteries.map((m) => [m.skillId, m]));
   const nodes: LearningPathNode[] = [];
+
+  // Prerequisite-aware frontier (adaptive-learning E2E Sprint 3): unlocked,
+  // unmastered skills in DAG-depth order, band-proximity + score tiebroken.
+  const selection = selectNextSkills({
+    skills,
+    skillMasteries,
+    deliveryLevel: input.deliveryLevel ?? null,
+    gradeBand: input.gradeBand ?? null,
+  });
+  const lockedIds = new Set(selection.locked.map((l) => l.skillId));
 
   const used = new Set<string>();
   const pushNode = (skillId: string, kind: LearningPathNode["kind"], reason: string) => {
@@ -249,7 +265,10 @@ export function generateLearningPath(input: {
     });
   };
 
-  if (input.recommendedStartSkillId) {
+  // The recommended start skill keeps its slot ONLY when it is actually
+  // unlocked — starting a learner on a skill whose prerequisites they
+  // haven't mastered is exactly the failure mode the frontier prevents.
+  if (input.recommendedStartSkillId && !lockedIds.has(input.recommendedStartSkillId)) {
     const m = masteryById.get(input.recommendedStartSkillId);
     pushNode(
       input.recommendedStartSkillId,
@@ -260,18 +279,15 @@ export function generateLearningPath(input: {
     );
   }
 
-  const ranked = skillMasteries
-    .slice()
-    .sort((a, b) => a.score - b.score)
-    .filter((m) => !used.has(m.skillId));
-
-  for (const m of ranked) {
+  for (const skillId of selection.frontier) {
     if (nodes.length >= 4) break;
-    if (m.score >= 0.65) continue;
+    const m = masteryById.get(skillId);
     pushNode(
-      m.skillId,
+      skillId,
       "next_unmastered",
-      `Next up — currently ${(m.score * 100).toFixed(0)}% on baseline.`,
+      m
+        ? `Next up — currently ${(m.score * 100).toFixed(0)}% on baseline.`
+        : "Next up — ready to start (prerequisites mastered).",
     );
   }
 
@@ -328,3 +344,48 @@ export function generateReviewSchedules(input: {
 }
 
 export type _Unused = BaselineAssessment;
+
+/**
+ * Build append-only trajectory rows from the learner's current mastery
+ * (adaptive-learning E2E Sprint 3). One row per subject present in
+ * `skillMasteries` (optionally limited to `subjectIds`).
+ */
+export function buildMasterySnapshotRows(input: {
+  learnerId: string;
+  tenantId: string;
+  skillMasteries: SkillMastery[];
+  subjectIds?: string[];
+  deliveryLevel: string | null;
+  gradeBand: string | null;
+  trigger: MasterySnapshot["trigger"];
+}): MasterySnapshot[] {
+  const limit = input.subjectIds ? new Set(input.subjectIds) : null;
+  const bySubject = new Map<string, SkillMastery[]>();
+  for (const m of input.skillMasteries) {
+    if (limit && !limit.has(m.subjectId)) continue;
+    const list = bySubject.get(m.subjectId);
+    if (list) list.push(m);
+    else bySubject.set(m.subjectId, [m]);
+  }
+  const capturedAt = nowIso();
+  const rows: MasterySnapshot[] = [];
+  for (const [subjectId, masteries] of bySubject) {
+    const averageScore =
+      masteries.reduce((sum, m) => sum + m.score, 0) / Math.max(1, masteries.length);
+    rows.push({
+      id: newId("msnap"),
+      learnerId: input.learnerId,
+      tenantId: input.tenantId,
+      subjectId,
+      capturedAt,
+      averageScore: Math.round(averageScore * 1000) / 1000,
+      level: levelFromScore(averageScore),
+      skillsOnGradeLevel: masteries.filter((m) => m.score >= 0.65).length,
+      skillsTotal: masteries.length,
+      deliveryLevel: input.deliveryLevel,
+      gradeBand: input.gradeBand,
+      trigger: input.trigger,
+    });
+  }
+  return rows;
+}

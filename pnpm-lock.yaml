@@ -373,9 +373,15 @@ importers:
       '@aivo/nav':
         specifier: workspace:*
         version: link:../../packages/nav
+      '@aivo/scoring':
+        specifier: workspace:*
+        version: link:../../packages/scoring
       '@aivo/security':
         specifier: workspace:*
         version: link:../../packages/security
+      '@aivo/skill-graphs':
+        specifier: workspace:*
+        version: link:../../packages/skill-graphs
       '@aivo/ui':
         specifier: workspace:*
         version: link:../../packages/ui

@@ -35,6 +35,7 @@ import type {
   LearningPath,
   LessonRun,
   MasteryMap,
+  MasterySnapshot,
   ReviewSchedule,
   CollaboratorInsight,
   CollaboratorMember,
@@ -156,6 +157,7 @@ export type Store = {
   skillMasteries: SkillMastery[];
   learningPaths: Map<string, LearningPath>;
   reviewSchedules: ReviewSchedule[];
+  masterySnapshots: MasterySnapshot[];
 
   baselineAssessments: Map<string, BaselineAssessment>;
   baselineQuestions: Map<string, BaselineQuestion>;
@@ -328,6 +330,7 @@ function createStore(): Store {
     skillMasteries: [],
     learningPaths: new Map(),
     reviewSchedules: [],
+    masterySnapshots: [],
     baselineAssessments: new Map(),
     baselineQuestions: new Map(),
     baselineAttempts: [],

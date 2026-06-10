@@ -512,6 +512,35 @@ export type Skill = {
   prerequisites: ID[];
 };
 
+/**
+ * Append-only mastery trajectory point (adaptive-learning E2E Sprint 3).
+ * One row per (learner, subject) capture so the parent progress page can
+ * chart movement over time and the distance to grade level.
+ */
+export type MasterySnapshot = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  subjectId: ID;
+  capturedAt: ISODate;
+  /** Mean mastery score across the subject's evaluated skills (0..1). */
+  averageScore: number;
+  /** Level bucket derived from averageScore. */
+  level: SkillMasteryLevel;
+  /** Skills at level >= on_grade_level (score >= 0.65). */
+  skillsOnGradeLevel: number;
+  skillsTotal: number;
+  /**
+   * Canonical band content is delivered at, when known (theta-derived).
+   * Null for captures that predate a placement - the UI then leans on the
+   * skill counts alone.
+   */
+  deliveryLevel: string | null;
+  /** Enrolled grade band, when known. */
+  gradeBand: string | null;
+  trigger: "baseline" | "lesson" | "scheduled";
+};
+
 /** Sprint 9: per-learner mastery snapshot. One MasteryMap per learner. */
 export type MasteryMap = {
   id: ID;

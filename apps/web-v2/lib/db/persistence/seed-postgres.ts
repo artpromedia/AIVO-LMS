@@ -32,6 +32,7 @@ import {
   webSkillMasteries,
   webLearningPaths,
   webReviewSchedules,
+  webMasterySnapshots,
   webConsentRecords,
   webIepDocuments,
   webAgeGateRecords,
@@ -384,6 +385,22 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
         data: r,
       })),
       webReviewSchedules.id,
+    ),
+  );
+  await log(
+    "masterySnapshots",
+    await bulk(
+      db,
+      webMasterySnapshots,
+      vals(s.masterySnapshots).map((m) => ({
+        id: m.id,
+        learnerId: m.learnerId,
+        tenantId: m.tenantId,
+        subjectId: m.subjectId,
+        capturedAt: m.capturedAt,
+        data: m,
+      })),
+      webMasterySnapshots.id,
     ),
   );
   await log(

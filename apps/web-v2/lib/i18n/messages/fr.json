@@ -439,7 +439,15 @@
       "time_learning": "Temps d'apprentissage",
       "skills_tracked": "Compétences suivies",
       "mastered": "Maîtrisées",
-      "by_subject": "Par matière"
+      "by_subject": "Par matière",
+      "refresh_path": "Actualiser le parcours",
+      "refresh_path_done": "Parcours actualisé",
+      "refresh_path_error": "Échec de l'actualisation — réessayez",
+      "trajectory_title": "Progression dans le temps",
+      "at_grade_count": "{count} compétences sur {total} au niveau attendu",
+      "working_at": "Travaille au niveau {level}",
+      "grade_target": "Niveau cible {grade}",
+      "on_grade": "Au niveau attendu"
     },
     "learner_summary": {
       "title": "Résumé en langage simple",

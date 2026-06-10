@@ -439,7 +439,15 @@
       "time_learning": "सीखने का समय",
       "skills_tracked": "ट्रैक किए गए कौशल",
       "mastered": "दक्ष",
-      "by_subject": "विषय अनुसार"
+      "by_subject": "विषय अनुसार",
+      "refresh_path": "लर्निंग पथ रीफ़्रेश करें",
+      "refresh_path_done": "पथ रीफ़्रेश हो गया",
+      "refresh_path_error": "रीफ़्रेश नहीं हो सका — फिर से कोशिश करें",
+      "trajectory_title": "समय के साथ प्रगति",
+      "at_grade_count": "{total} में से {count} कौशल ग्रेड स्तर पर",
+      "working_at": "स्तर {level} पर काम कर रहे हैं",
+      "grade_target": "लक्ष्य ग्रेड {grade}",
+      "on_grade": "ग्रेड स्तर पर"
     },
     "learner_summary": {
       "title": "सरल भाषा सारांश",

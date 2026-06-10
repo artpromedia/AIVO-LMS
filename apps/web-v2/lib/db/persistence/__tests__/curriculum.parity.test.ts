@@ -105,6 +105,38 @@ runInBothModes("curriculum", (ctx) => {
     expect(rows[0]!.level).toBe("on_grade_level");
   });
 
+  it("appendMasterySnapshot/listMasterySnapshots: append-only trajectory, filtered + ordered", async () => {
+    const c = getPersistence().curriculum;
+    const snap = (id: string, subjectId: string, capturedAt: string, averageScore: number) => ({
+      id,
+      learnerId: L,
+      tenantId: T,
+      subjectId,
+      capturedAt,
+      averageScore,
+      level: "emerging" as const,
+      skillsOnGradeLevel: 1,
+      skillsTotal: 4,
+      deliveryLevel: "2",
+      gradeBand: "5",
+      trigger: "baseline" as const,
+    });
+    await c.appendMasterySnapshot(snap("ms-2", "sub-a", "2026-02-01T00:00:00.000Z", 0.4));
+    await c.appendMasterySnapshot(snap("ms-1", "sub-a", "2026-01-01T00:00:00.000Z", 0.3));
+    await c.appendMasterySnapshot(snap("ms-3", "sub-b", "2026-03-01T00:00:00.000Z", 0.5));
+
+    const all = await c.listMasterySnapshots(L, T);
+    expect(all.map((m) => m.id)).toEqual(["ms-1", "ms-2", "ms-3"]); // capturedAt ascending
+
+    const subA = await c.listMasterySnapshots(L, T, { subjectId: "sub-a" });
+    expect(subA.map((m) => m.id)).toEqual(["ms-1", "ms-2"]);
+
+    const since = await c.listMasterySnapshots(L, T, { sinceIso: "2026-01-15T00:00:00.000Z" });
+    expect(since.map((m) => m.id)).toEqual(["ms-2", "ms-3"]);
+
+    expect(await c.listMasterySnapshots("lrn-other", T)).toEqual([]);
+  });
+
   it("replaceReviewSchedules swaps the learner's schedule set", async () => {
     const c = getPersistence().curriculum;
     await c.replaceReviewSchedules(L, T, [schedule("rs-1", "skl-a1"), schedule("rs-2", "skl-b1")]);

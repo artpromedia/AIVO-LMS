@@ -439,7 +439,15 @@
       "time_learning": "Tiempo de aprendizaje",
       "skills_tracked": "Habilidades registradas",
       "mastered": "Dominadas",
-      "by_subject": "Por materia"
+      "by_subject": "Por materia",
+      "refresh_path": "Actualizar ruta de aprendizaje",
+      "refresh_path_done": "Ruta actualizada",
+      "refresh_path_error": "No se pudo actualizar — inténtalo de nuevo",
+      "trajectory_title": "Progreso a lo largo del tiempo",
+      "at_grade_count": "{count} de {total} habilidades al nivel del grado",
+      "working_at": "Trabajando en el nivel {level}",
+      "grade_target": "Grado objetivo {grade}",
+      "on_grade": "Al nivel del grado"
     },
     "learner_summary": {
       "title": "Resumen en lenguaje sencillo",

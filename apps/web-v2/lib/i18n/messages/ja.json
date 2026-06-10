@@ -439,7 +439,15 @@
       "time_learning": "学習時間",
       "skills_tracked": "追跡スキル数",
       "mastered": "習得済み",
-      "by_subject": "科目別"
+      "by_subject": "科目別",
+      "refresh_path": "学習パスを更新",
+      "refresh_path_done": "パスを更新しました",
+      "refresh_path_error": "更新できませんでした — もう一度お試しください",
+      "trajectory_title": "時間の経過による進捗",
+      "at_grade_count": "{total}スキル中{count}が学年レベル",
+      "working_at": "レベル{level}で学習中",
+      "grade_target": "目標学年 {grade}",
+      "on_grade": "学年レベル"
     },
     "learner_summary": {
       "title": "わかりやすい要約",

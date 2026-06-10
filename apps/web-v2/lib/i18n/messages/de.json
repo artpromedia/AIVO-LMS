@@ -439,7 +439,15 @@
       "time_learning": "Lernzeit",
       "skills_tracked": "Verfolgte Fertigkeiten",
       "mastered": "Beherrscht",
-      "by_subject": "Nach Fach"
+      "by_subject": "Nach Fach",
+      "refresh_path": "Lernpfad aktualisieren",
+      "refresh_path_done": "Pfad aktualisiert",
+      "refresh_path_error": "Aktualisierung fehlgeschlagen — erneut versuchen",
+      "trajectory_title": "Fortschritt über die Zeit",
+      "at_grade_count": "{count} von {total} Fähigkeiten auf Klassenniveau",
+      "working_at": "Arbeitet auf Niveau {level}",
+      "grade_target": "Ziel-Klassenstufe {grade}",
+      "on_grade": "Auf Klassenniveau"
     },
     "learner_summary": {
       "title": "Zusammenfassung in einfacher Sprache",

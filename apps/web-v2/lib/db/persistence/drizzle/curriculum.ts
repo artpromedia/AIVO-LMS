@@ -11,7 +11,7 @@
  * for the same key first, which also heals legacy rows that were seeded with
  * random surrogate ids.
  */
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, sql } from "drizzle-orm";
 import {
   webSubjects,
   webSkills,
@@ -19,10 +19,12 @@ import {
   webSkillMasteries,
   webLearningPaths,
   webReviewSchedules,
+  webMasterySnapshots,
 } from "@aivo/db";
 import type {
   LearningPath,
   MasteryMap,
+  MasterySnapshot,
   ReviewSchedule,
   Skill,
   SkillMastery,
@@ -181,6 +183,33 @@ export const drizzleCurriculum: CurriculumStore = {
         set: { learnerId, tenantId, data: next },
       });
     return next;
+  },
+
+  async appendMasterySnapshot(row) {
+    await getDb().insert(webMasterySnapshots).values({
+      id: row.id,
+      learnerId: row.learnerId,
+      tenantId: row.tenantId,
+      subjectId: row.subjectId,
+      capturedAt: row.capturedAt,
+      data: row,
+    });
+    return row;
+  },
+
+  async listMasterySnapshots(learnerId, tenantId, opts) {
+    const conditions = [
+      eq(webMasterySnapshots.learnerId, learnerId),
+      eq(webMasterySnapshots.tenantId, tenantId),
+    ];
+    if (opts?.subjectId) conditions.push(eq(webMasterySnapshots.subjectId, opts.subjectId));
+    if (opts?.sinceIso) conditions.push(gte(webMasterySnapshots.capturedAt, opts.sinceIso));
+    const rows = await getDb()
+      .select()
+      .from(webMasterySnapshots)
+      .where(and(...conditions))
+      .orderBy(asc(webMasterySnapshots.capturedAt));
+    return rows.map((r) => r.data as MasterySnapshot);
   },
 
   async getReviewSchedules(learnerId, tenantId) {

@@ -439,7 +439,15 @@
       "time_learning": "وقت التعلم",
       "skills_tracked": "المهارات المتتبعة",
       "mastered": "مُتقنة",
-      "by_subject": "حسب المادة"
+      "by_subject": "حسب المادة",
+      "refresh_path": "تحديث مسار التعلم",
+      "refresh_path_done": "تم تحديث المسار",
+      "refresh_path_error": "تعذر التحديث — حاول مرة أخرى",
+      "trajectory_title": "التقدم عبر الوقت",
+      "at_grade_count": "{count} من {total} مهارات عند مستوى الصف",
+      "working_at": "يعمل عند المستوى {level}",
+      "grade_target": "الصف المستهدف {grade}",
+      "on_grade": "عند مستوى الصف"
     },
     "learner_summary": {
       "title": "ملخص بلغة بسيطة",

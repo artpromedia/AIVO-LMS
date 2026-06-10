@@ -439,7 +439,15 @@
       "time_learning": "학습 시간",
       "skills_tracked": "추적 기술 수",
       "mastered": "숙달됨",
-      "by_subject": "과목별"
+      "by_subject": "과목별",
+      "refresh_path": "학습 경로 새로 고침",
+      "refresh_path_done": "경로가 새로 고쳐졌습니다",
+      "refresh_path_error": "새로 고치지 못했습니다 — 다시 시도하세요",
+      "trajectory_title": "시간에 따른 진행 상황",
+      "at_grade_count": "{total}개 기술 중 {count}개가 학년 수준",
+      "working_at": "레벨 {level}에서 학습 중",
+      "grade_target": "목표 학년 {grade}",
+      "on_grade": "학년 수준"
     },
     "learner_summary": {
       "title": "알기 쉬운 요약",

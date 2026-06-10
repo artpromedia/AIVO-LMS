@@ -87,6 +87,7 @@ import type {
   LessonRun,
   LearningPath,
   MasteryMap,
+  MasterySnapshot,
   ReviewSchedule,
   Notification,
   NotificationDelivery,
@@ -419,6 +420,15 @@ export interface CurriculumStore {
     tenantId: string,
     next: LearningPath,
   ): Promise<LearningPath>;
+
+  /** Append one mastery trajectory point (append-only; never updated). */
+  appendMasterySnapshot(row: MasterySnapshot): Promise<MasterySnapshot>;
+  /** Trajectory points, oldest first; optionally per-subject / since an ISO time. */
+  listMasterySnapshots(
+    learnerId: string,
+    tenantId: string,
+    opts?: { subjectId?: string; sinceIso?: string },
+  ): Promise<MasterySnapshot[]>;
 
   getReviewSchedules(learnerId: string, tenantId: string): Promise<ReviewSchedule[]>;
   /** Replace the learner's review schedules — delete prior + insert next. */
