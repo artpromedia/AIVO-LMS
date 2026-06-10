@@ -176,6 +176,16 @@ for route in "${MARKETING_ROUTES[@]}"; do
       failures+=("${route}: missing marker \"${marker}\"")
     fi
   done
+
+  # Citation-guard check: numeric claims rendered on the page must carry a
+  # documented source.  Violations are printed by marketing_citation_guard
+  # and collected here so the overall failure report stays in one place.
+  mapfile -t cite_violations < <(marketing_citation_guard "$route" "$tmp_body")
+  for v in "${cite_violations[@]}"; do
+    [[ -n "$v" ]] || continue
+    log "FAIL: ${v}"
+    failures+=("$v")
+  done
 done
 
 if (( ${#failures[@]} > 0 )); then

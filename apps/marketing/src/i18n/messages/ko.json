@@ -1251,7 +1251,18 @@
       "cta_body": "종합 기준 평가로 시작하세요. 처음 14일 동안은 신용카드가 필요 없습니다.",
       "cta_primary": "가족 체험 시작",
       "cta_secondary": "학군 영업팀과 상담",
-      "cta_image_alt": "소파에서 함께 학습하는 부모와 아이"
+      "cta_image_alt": "소파에서 함께 학습하는 부모와 아이",
+      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
+      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
+      "value_props_badge": "Our Approach",
+      "value_props_heading": "Principles that put your child first.",
+      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
+      "value_prop_1_title": "Universal Design for Learning",
+      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
+      "value_prop_2_title": "Structured & Systematic Instruction",
+      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
+      "value_prop_3_title": "Sensory-Responsive Design",
+      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
     },
     "page_reset_password": {
       "logo_aria": "AIVO 홈",

@@ -1251,7 +1251,18 @@
       "cta_body": "Commencez par une évaluation de référence complète. Aucune carte bancaire requise pendant les 14 premiers jours.",
       "cta_primary": "Démarrer l’essai familial",
       "cta_secondary": "Contacter les ventes districts",
-      "cta_image_alt": "Un parent et un enfant apprenant ensemble sur un canapé"
+      "cta_image_alt": "Un parent et un enfant apprenant ensemble sur un canapé",
+      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
+      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
+      "value_props_badge": "Our Approach",
+      "value_props_heading": "Principles that put your child first.",
+      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
+      "value_prop_1_title": "Universal Design for Learning",
+      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
+      "value_prop_2_title": "Structured & Systematic Instruction",
+      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
+      "value_prop_3_title": "Sensory-Responsive Design",
+      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
     },
     "page_reset_password": {
       "logo_aria": "Accueil AIVO",

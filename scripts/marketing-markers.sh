@@ -94,6 +94,57 @@ marketing_markers_for() {
   esac
 }
 
+# Scan a fetched HTML body for numeric-claim citation violations.
+#
+# Rules enforced on the "/" (home) route:
+#
+#   Rule 1 — any element with data-stat-value MUST also carry data-citation on
+#   the same HTML opening tag.  Content-module stats (content/claims.ts) only
+#   render with data-stat-value when their source field is non-empty, so a
+#   missing data-citation attribute indicates a stat was rendered without a
+#   documented source.
+#
+#   Rule 2 — the specific efficacy claim "+47.2%" is known to be unsourced and
+#   MUST NOT appear anywhere in the rendered HTML, regardless of how it got
+#   there.  This guards against the claim being re-introduced outside the
+#   content module.
+#
+# Usage:
+#   mapfile -t violations < <(marketing_citation_guard "/" "/tmp/body.html")
+#   (( ${#violations[@]} == 0 )) || echo "citation check failed"
+#
+# The function prints one violation string per line and always exits 0 so
+# callers can collect the output with mapfile without set -e aborting.
+# $1 = route path  $2 = path to the downloaded HTML body file
+marketing_citation_guard() {
+  local route="${1:-}"
+  local body_file="${2:-}"
+
+  # Citation guard is only applied to the marketing home page.
+  [[ "$route" == "/" ]] || return 0
+
+  if [[ ! -f "$body_file" ]]; then
+    printf 'CITATION-GUARD %s: body file not found: %s\n' "$route" "$body_file"
+    return 0
+  fi
+
+  # Rule 1 — extract every HTML opening tag that carries data-stat-value and
+  # verify each one also carries data-citation.
+  local tag
+  while IFS= read -r tag; do
+    [[ -n "$tag" ]] || continue
+    if [[ "$tag" != *"data-citation="* ]]; then
+      printf 'CITATION-GUARD %s: data-stat-value element missing data-citation (unsourced numeric claim rendered): %s\n' \
+        "$route" "${tag:0:140}"
+    fi
+  done < <(grep -oE '<[^>]*data-stat-value[^>]*>' "$body_file" 2>/dev/null || true)
+
+  # Rule 2 — the known-unsourced "+47.2%" figure must not appear in the body.
+  if grep -qF '+47.2%' "$body_file" 2>/dev/null; then
+    printf 'CITATION-GUARD %s: unsourced numeric claim "+47.2%%%%" found in rendered HTML\n' "$route"
+  fi
+}
+
 # Back-compat: callers that only know about the homepage can keep using
 # MARKETING_MARKERS without breaking. New callers should iterate
 # MARKETING_ROUTES and call marketing_markers_for for full coverage.
