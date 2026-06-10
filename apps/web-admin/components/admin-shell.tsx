@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
@@ -116,13 +117,27 @@ export function AdminShell({
 
   const sidebar = (
     <nav aria-label="Platform sections" className="flex h-full flex-col gap-4 overflow-y-auto p-4">
+      {/* Canonical brand wordmark, copied from packages/brand/assets/logo
+          into public/images (the repo's per-app asset convention). The
+          console name stays as the link's accessible label and caption. */}
       <Link
-        className="px-2 text-sm font-bold uppercase tracking-[0.25em] text-blue-700"
+        className="flex flex-col gap-1 px-2"
         href={homeHref}
         prefetch={false}
+        aria-label={brand}
         onClick={() => setDrawerOpen(false)}
       >
-        {brand}
+        <Image
+          src="/images/aivo-wordmark-light.svg"
+          alt=""
+          width={120}
+          height={34}
+          unoptimized
+          className="h-9 w-auto self-start"
+        />
+        <span className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+          {brand}
+        </span>
       </Link>
       {visibleGroups.map((group) => {
         // A live search overrides collapse state so matches always show.
