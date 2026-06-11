@@ -36,6 +36,19 @@ import {
   parseSessionRolesCookie,
 } from "@/lib/auth/role-session";
 
+/**
+ * AUTH_MODE=mock implies the dev/test in-memory fixture. Seed it the moment
+ * a mock session resolves — BEFORE any access check. The persistence adapter
+ * reads (learners.parentCanAccess etc.) go straight to the Map store and do
+ * NOT lazily seed, so on a fresh server every learner would 403/404 until
+ * some legacy `db()` code path happened to run first. Dynamic import keeps
+ * the seed fixture out of non-mock bundles; `ensureSeeded()` is idempotent.
+ */
+async function ensureMockStoreSeeded(): Promise<void> {
+  const { ensureSeeded } = await import("@/lib/db/seed");
+  ensureSeeded();
+}
+
 function cookieMapFromRequest(req: Request): Map<string, string> {
   const header = req.headers.get("cookie") ?? "";
   const map = new Map<string, string>();
@@ -52,8 +65,10 @@ function cookieMapFromRequest(req: Request): Map<string, string> {
  * profile (with multi-role overlay applied) or `null` for logged-out visitors.
  */
 export async function getSession(): Promise<SessionProfile | null> {
-  const base = isMockAuthAllowed() ? await readMockBaseSession() : await getIdentityBaseSession();
+  const mock = isMockAuthAllowed();
+  const base = mock ? await readMockBaseSession() : await getIdentityBaseSession();
   if (!base) return null;
+  if (mock) await ensureMockStoreSeeded();
   const jar = await cookies();
   return applyMultiRoleOverlay(base, {
     extraRoles: parseSessionRolesCookie(jar.get(SESSION_ROLES_COOKIE)?.value),
@@ -65,10 +80,12 @@ export async function getSession(): Promise<SessionProfile | null> {
  * Edge-friendly variant for Request-based callers (BFF guards / middleware).
  */
 export async function getRequestSession(req: Request): Promise<SessionProfile | null> {
-  const base = isMockAuthAllowed()
+  const mock = isMockAuthAllowed();
+  const base = mock
     ? readMockBaseSessionFromRequest(req)
     : await getIdentityBaseSessionFromRequest(req);
   if (!base) return null;
+  if (mock) await ensureMockStoreSeeded();
   const cookieMap = cookieMapFromRequest(req);
   return applyMultiRoleOverlay(base, {
     extraRoles: parseSessionRolesCookie(cookieMap.get(SESSION_ROLES_COOKIE)),
