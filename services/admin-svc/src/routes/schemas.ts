@@ -105,6 +105,14 @@ export const getAdminSvcAuditLogSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const postAdminSvcAuditLogReadEventsSchema = {
+  tags: ["Admin"],
+  operationId: "postAdminSvcAuditLogReadEvents",
+  summary: "POST /api/admin-svc/audit-log/read-events",
+  body: passthroughObject,
+  response: { 200: passthroughObject, 400: errorResponse },
+} as const;
+
 export const getAdminSvcActivitySchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcActivity",
@@ -484,6 +492,35 @@ export const adminSvcScimTokensByIdRevokeSchema = {
     properties: { id: { type: "string" } },
   },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
+} as const;
+
+export const getAdminSvcScimUnmappedGroupsSchema = {
+  tags: ["Admin"],
+  operationId: "getAdminSvcScimUnmappedGroups",
+  summary: "GET /api/admin-svc/scim-unmapped-groups",
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject, 400: errorResponse },
+} as const;
+
+export const adminSvcScimUnmappedGroupsByIdResolveSchema = {
+  tags: ["Admin"],
+  operationId: "adminSvcScimUnmappedGroupsByIdResolve",
+  summary: "POST /api/admin-svc/scim-unmapped-groups/:id/resolve",
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
+} as const;
+
+export const getAdminSvcScimActivitySchema = {
+  tags: ["Admin"],
+  operationId: "getAdminSvcScimActivity",
+  summary: "GET /api/admin-svc/scim-activity",
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject, 400: errorResponse },
 } as const;
 
 export const getAdminSvcSearchSchema = {

@@ -107,6 +107,7 @@ const LOANWORDS_BY_LOCALE = {
     "Version",
     "Deutsch",
     "Blog",
+    "Region",
     // genuine loanwords used as-is in German UI
     "Offline",
   ]),
@@ -157,6 +158,7 @@ const LOANWORDS_BY_LOCALE = {
     // genuine cognates that are spelled identically in French
     "Microphone",
     "client",
+    "Guides",
   ]),
   ja: new Set([]),
   ko: new Set([]),
@@ -205,6 +207,12 @@ const UNIVERSAL_BRAND_PHRASES = new Set([
   // sample LTI deployment placeholder used in the admin UI
   "Canvas — District",
   "1:abcdef…",
+  // AIVO product/feature names rendered verbatim in every locale
+  "Brain Clone",
+  "1 (Sage)",
+  // testimonial attributions — real people's names are not translated
+  "Sarah T.",
+  "Dr. Marcus R.",
 ]);
 
 function looksLikeBrandOrToken(value) {

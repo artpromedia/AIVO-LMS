@@ -85,7 +85,7 @@ export default function TherapistDashboard() {
           />
         ) : (
           clients.map((client: any) => (
-            <Pressable
+            <Pressable accessibilityRole="button"
               key={client.id}
               onPress={() => router.push(`/(therapist)/client/${client.id}` as Href)}
               style={{ marginBottom: spacing.md }}

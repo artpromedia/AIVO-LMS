@@ -4,7 +4,8 @@
     "sign_out": "Se déconnecter",
     "get_started": "Commencer",
     "loading": "Chargement...",
-    "language": "Langue"
+    "language": "Langue",
+    "get_support": "Obtenir de l'aide"
   },
   "nav": {
     "platform": "Plateforme",
@@ -480,7 +481,9 @@
     },
     "settings_account_form": {
       "display_name": "Nom d'affichage",
-      "saved": "Enregistré."
+      "saved": "Enregistré.",
+      "timezone": "Fuseau horaire",
+      "timezone_hint": "Les plannings, rapports et rappels s'affichent dans ce fuseau horaire."
     },
     "settings": {
       "eyebrow": "Paramètres",
@@ -1334,7 +1337,9 @@
       "notices": {
         "password_reset": "Votre mot de passe a été réinitialisé. Connectez-vous avec votre nouveau mot de passe.",
         "logged_out": "Vous avez été déconnecté."
-      }
+      },
+      "continue_with_sso": "Continuer avec {idp}",
+      "sso_required_note": "Votre district se connecte via {idp}. La connexion par mot de passe est désactivée pour ce domaine."
     },
     "signup": {
       "promo_eyebrow": "Démarrez votre essai familial",

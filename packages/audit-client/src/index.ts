@@ -4,3 +4,5 @@ export * from "./redact.js";
 export * from "./emit.js";
 export * from "./audited.js";
 export * from "./service.js";
+export * from "./schema.js";
+export * from "./read-dedupe.js";

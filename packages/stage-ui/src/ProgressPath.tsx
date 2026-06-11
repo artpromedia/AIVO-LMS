@@ -9,6 +9,7 @@
  */
 import React from "react";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface ProgressPathProps {
   current: number;
   total: number;
@@ -64,7 +65,7 @@ export function ProgressPath({
             position: "absolute",
             inset: 0,
             width: widthPct,
-            backgroundColor: "#7c3aed",
+            backgroundColor: SEMANTIC.color.text.accent,
             borderRadius: 4,
             transition,
           }}

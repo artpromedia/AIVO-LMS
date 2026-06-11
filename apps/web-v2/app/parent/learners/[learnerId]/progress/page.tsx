@@ -168,7 +168,11 @@ export default async function ParentProgressPage({
                   {Math.round(avg * 100)}%
                 </Badge>
               </div>
-              <Progress className="mt-3" value={avg * 100} />
+              <Progress
+                className="mt-3"
+                value={avg * 100}
+                aria-label={`${Math.round(avg * 100)}%`}
+              />
               {latest ? (
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-aivo-line/60 p-3">
                   <div className="text-sm">

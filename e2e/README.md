@@ -48,3 +48,31 @@ npm test
   redirects unauthenticated `/platform` requests to `/login` and, when
   platform-admin credentials are configured, covers login, MFA, and the
   `/platform` landing page.
+
+## Journey gate (Sprint A7)
+
+`.github/workflows/district-pilot-e2e.yml` (now titled `journeys-e2e`) is
+the **blocking user-journey gate** and runs on every PR — the path filter
+that used to skip it was removed. It brings up the compose `pilot`
+profile (postgres, redis, identity-svc, billing-svc, comms-svc,
+admin-svc, web-v2 :5000, web-admin :5001) and runs, in order:
+
+1. `specs/district-pilot` — provisioning → parent → learner stages 0-4.
+2. `specs/admin` — the standalone admin console suite, including the
+   Sprint A7 journeys: `login-mfa.spec.ts` (real form → MFA challenge →
+   role home, with wrong-password/wrong-code copy), 
+   `pilot-provision.spec.ts` (form → tenant visible → audit row), and
+   `rbac-boundaries.spec.ts` (district/school/support scope bounces).
+3. The role golden paths: `tests/sprint12/{learner,parent,teacher}` and
+   `tests/learner-lesson-loop.spec.ts`.
+
+MFA journeys use identity test-mode's `seed-platform-admin`
+(`mfaEnabled: true`) plus `/api/__test__/last-mfa-code/:email` via the
+`seedPlatformAdmin(email, { mfaEnabled })` / `lastMfaCode()` fixtures.
+
+The mobile golden path (`apps/mobile/.maestro/journeys/
+login-lesson-offline.yaml`: login → lesson → airplane-mode answer →
+reconnect → offline banner drains) runs as the `android-journey` job in
+`mobile-build.yml` on an emulator, gated on the EXPO_TOKEN /
+MAESTRO_LEARNER_* secrets with an explicit notice (never a false green)
+when absent.

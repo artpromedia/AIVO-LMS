@@ -118,7 +118,7 @@ export default function ChangePasswordScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.changePasswordCurrent")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.passwordPlaceholder")}
               style={styles.input}
               value={current}
               onChangeText={setCurrent}
@@ -133,7 +133,7 @@ export default function ChangePasswordScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.changePasswordNew")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.changePasswordNewPlaceholder")}
               style={styles.input}
               value={next}
               onChangeText={setNext}
@@ -167,7 +167,7 @@ export default function ChangePasswordScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.confirmPassword")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.confirmPasswordPlaceholder")}
               style={styles.input}
               value={confirm}
               onChangeText={setConfirm}

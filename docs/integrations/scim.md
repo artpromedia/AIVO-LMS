@@ -8,31 +8,42 @@ AIVO automatically — there is no nightly CSV import to maintain.
 ## Quick start
 
 1. **Issue a SCIM bearer token** in the AIVO district console under
-   _Settings → Single Sign-On → SCIM provisioning tokens_. Copy the token
+   _District → SIS connectors → SCIM provisioning_. Copy the token
    immediately — AIVO never shows it again.
 2. **Note your endpoints**:
    - Base URL: `https://app.aivolearning.com/scim/v2`
    - ServiceProviderConfig (read-only): `GET /scim/v2/ServiceProviderConfig`
    - Users: `/scim/v2/Users`
-   - Groups (read-only): `/scim/v2/Groups`
+   - Groups: `/scim/v2/Groups`
 3. Plug the URL + bearer token into your IdP's SCIM connector.
+
+Step-by-step IdP setup (Okta and Microsoft Entra, including push
+groups and verification) lives in the
+[SCIM runbook](./scim-runbook.md).
 
 > Each token is scoped to a single tenant. Revoke it from the same screen
 > the moment it's no longer needed; revocation takes effect immediately.
 
 ## Supported features
 
-| Feature                                           | Status                           |
-| ------------------------------------------------- | -------------------------------- |
-| Users — create, read, update, replace, deactivate | ✅                               |
-| Users — hard delete                               | ✅ (treated as deactivate)       |
-| Filter `userName eq "..."`                        | ✅                               |
-| Filter `emails[type eq "work"].value eq "..."`    | ✅                               |
-| Boolean filters with `and` / `or`                 | ✅                               |
-| Pagination (`startIndex`, `count`)                | ✅                               |
-| PATCH operations (`replace`, `add`, `remove`)     | ✅                               |
-| Groups — read, list (membership read-only)        | ✅                               |
-| Groups — create / write membership                | ❌ Use SAML role mapping instead |
+| Feature                                           | Status                                          |
+| ------------------------------------------------- | ----------------------------------------------- |
+| Users — create, read, update, replace, deactivate | ✅                                              |
+| Users — hard delete                               | ✅ (treated as deactivate)                      |
+| Filter `userName eq "..."` / `externalId eq "..."`| ✅                                              |
+| Filter `emails[type eq "work"].value eq "..."`    | ✅                                              |
+| Boolean filters with `and` / `or`                 | ✅                                              |
+| Pagination (`startIndex`, `count`)                | ✅                                              |
+| PATCH operations (`replace`, `add`, `remove`)     | ✅ (Okta no-path and Entra string-boolean forms)|
+| Groups — read, list                               | ✅ (role groups + class groups)                 |
+| Groups — class push (`Class: <School> / <Name>`)  | ✅ creates/updates the classroom + teacher      |
+| Groups — membership add/remove on class groups    | ✅                                              |
+| Groups — role-group mutation                      | ❌ change a user's `aivoRole` instead           |
+| Groups — delete                                   | ❌ archive the class in the AIVO console        |
+
+Pushed groups that do **not** match the class convention are recorded and
+surfaced on the district SIS page under _Group pushes needing review_ —
+they are skipped, never silently dropped.
 
 > **Roles:** Provisioning is restricted to `DISTRICT_ADMIN`, `TEACHER`,
 > `CAREGIVER`, and `THERAPIST`. Requests that try to provision a
@@ -132,6 +143,9 @@ true` on every sync if the user is still in the assigned group. AIVO
 
 ## Audit trail
 
-Every SCIM mutation is recorded in `district_activity_log` with the
-acting token's name and the resulting user ID. Tokens themselves are
-audited in `audit_events` on issue/revoke.
+Every SCIM mutation (`SCIM_USER_CREATED`, `SCIM_USER_PATCHED`,
+`SCIM_USER_DEACTIVATED`, `SCIM_GROUP_MAPPED`, `SCIM_GROUP_UNMAPPED`, …)
+is appended to the hash-chained `admin_audit_log` with the acting token
+id and the resulting resource id, and feeds the sync counters on the
+district SIS page. Token issue/revoke is audited the same way
+(`SCIM_TOKEN_ISSUED` / `SCIM_TOKEN_REVOKED`).

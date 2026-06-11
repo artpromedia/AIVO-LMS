@@ -141,3 +141,23 @@ export async function adminGetAllPages<T>(
     page += 1;
   }
 }
+
+/**
+ * Sprint B3 — raw passthrough for streaming responses (CSV exports).
+ * Returns the upstream Response so route handlers can pipe body +
+ * content-disposition straight to the browser.
+ */
+export async function adminGetRaw(
+  session: Pick<SessionProfile, "role">,
+  path: string,
+  query?: Record<string, QueryValue>,
+): Promise<Response> {
+  const token = await readAccessToken();
+  const headers = new Headers({
+    authorization: `Bearer ${token}`,
+    "x-aivo-active-role": String(securityRoleForWebRole(session.role)),
+  });
+  const serviceToken = internalServiceToken();
+  if (serviceToken) headers.set("x-service-token", serviceToken);
+  return fetch(buildUrl(path, query), { method: "GET", headers, cache: "no-store" });
+}

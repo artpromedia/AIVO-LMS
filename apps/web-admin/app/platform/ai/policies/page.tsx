@@ -1,14 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole, requirePlatformPage } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import { listAiPolicies, updateAiPolicy } from "@aivo/admin-api/ai-governance";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Policy update failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function toggleAction(formData: FormData) {
   "use server";
@@ -19,7 +15,7 @@ async function toggleAction(formData: FormData) {
   try {
     await updateAiPolicy(session, id, { enabled });
   } catch (error) {
-    redirect(`/platform/ai/policies?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/ai/policies?error=${encodeURIComponent(actionError(error, "Policy update failed."))}`);
   }
   redirect(
     `/platform/ai/policies?notice=${encodeURIComponent(

@@ -26,7 +26,24 @@
 import { FastifyInstance } from "fastify";
 import crypto from "crypto";
 import { eq, and, or, sql, isNull } from "drizzle-orm";
-import { users, scimTokens, tenants, adminAuditLog, appendAudit } from "@aivo/db";
+import {
+  users,
+  scimTokens,
+  tenants,
+  adminAuditLog,
+  appendAudit,
+  classrooms,
+  schools,
+} from "@aivo/db";
+import {
+  applyUserUpsert,
+  applyUserDeactivate,
+  applyClassGroupMapping,
+  applyClassGroupMembers,
+  removeClassGroupMember,
+  recordUnmappedGroup,
+  parseClassGroupName,
+} from "../services/roster-core.js";
 import {
   getScimV2ServiceProviderConfigSchema,
   getScimV2SchemasSchema,
@@ -61,6 +78,7 @@ async function emitScimAudit(
       actorId: ctx.tokenId,
       actorEmail: "scim-provisioner",
       actorRole: "SCIM_TOKEN",
+      onBehalfOfId: null,
       resourceType,
       resourceId,
       details: { ...details, provisioner: "scim" },
@@ -360,6 +378,8 @@ export async function registerScimRoutes(app: FastifyInstance) {
     }
     const externalId: string | undefined = body.externalId;
 
+    // SCIM semantics: POST of an existing userName is a uniqueness
+    // conflict (Okta/Entra then switch to PUT/PATCH against the id).
     const [existing] = await db
       .select()
       .from(users)
@@ -369,24 +389,34 @@ export async function registerScimRoutes(app: FastifyInstance) {
       return scimError(reply, 409, "User already exists", "uniqueness");
     }
 
-    const [created] = await db
-      .insert(users)
-      .values({
-        tenantId,
-        email,
-        name,
-        role,
-        emailVerified: true,
-        provisionedBy: "scim",
-        externalId,
-      } as any)
-      .returning();
-    await emitScimAudit(db, "SCIM_USER_CREATED", req.scim as ScimContext, "user", created.id, req, {
+    // Apply through the shared roster core (Sprint B5) — the same write
+    // path the SIS pipeline uses, so provisioning semantics can't drift.
+    const result = await applyUserUpsert(db, {
+      tenantId,
       email,
+      name,
       role,
       externalId,
+      provisionedBy: "scim",
     });
-    reply.status(201).type("application/scim+json").send(userToScim(created));
+    if (!result.ok) {
+      return scimError(
+        reply,
+        result.error.status,
+        result.error.message,
+        result.error.code,
+      );
+    }
+    await emitScimAudit(
+      db,
+      "SCIM_USER_CREATED",
+      req.scim as ScimContext,
+      "user",
+      result.user.id,
+      req,
+      { email, role, externalId },
+    );
+    reply.status(201).type("application/scim+json").send(userToScim(result.user));
   });
 
   app.put(
@@ -457,14 +487,26 @@ export async function registerScimRoutes(app: FastifyInstance) {
       }
       const ops: any[] = body.Operations || [];
       const patch: any = { updatedAt: new Date() };
+      // Entra sends booleans as the strings "True"/"False" in PatchOps;
+      // Okta sends real booleans (and omits `path`, nesting under value).
+      const coerceBool = (value: unknown): boolean | undefined => {
+        if (typeof value === "boolean") return value;
+        if (typeof value === "string") {
+          const lowered = value.toLowerCase();
+          if (lowered === "true") return true;
+          if (lowered === "false") return false;
+        }
+        return undefined;
+      };
       for (const op of ops) {
         const verb = String(op.op || "").toLowerCase();
         const path = op.path as string | undefined;
         const v = op.value;
         if ((verb === "replace" || verb === "add") && (!path || path === "active")) {
-          if (typeof v === "boolean") patch.deactivatedAt = v ? null : new Date();
-          else if (v && typeof v.active === "boolean")
-            patch.deactivatedAt = v.active ? null : new Date();
+          const direct = coerceBool(v);
+          const nested = v && typeof v === "object" ? coerceBool((v as any).active) : undefined;
+          const active = direct ?? nested;
+          if (active !== undefined) patch.deactivatedAt = active ? null : new Date();
         }
         if (
           (verb === "replace" || verb === "add") &&
@@ -520,84 +562,298 @@ export async function registerScimRoutes(app: FastifyInstance) {
     async (req: any, reply) => {
       const { tenantId } = req.scim as ScimContext;
       const { id } = req.params as { id: string };
-      const [u] = await db
-        .select()
-        .from(users)
-        .where(and(eq(users.id, id), eq(users.tenantId, tenantId)))
-        .limit(1);
-      if (!u) return scimError(reply, 404, "User not found");
-      if (u.role === "PLATFORM_ADMIN") {
-        return scimError(reply, 403, "PLATFORM_ADMIN cannot be deleted via SCIM", "noTarget");
+      // Per RFC 7644 §3.6 we soft-delete (deactivate) — through the shared
+      // roster core, which also owns the PLATFORM_ADMIN refusal.
+      const result = await applyUserDeactivate(db, { tenantId, userId: id });
+      if (!result.ok) {
+        return scimError(reply, result.error.status, result.error.message, result.error.code);
       }
-      // Per RFC 7644 §3.6 we soft-delete by setting active=false.
-      await db
-        .update(users)
-        .set({
-          deactivatedAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, id));
       await emitScimAudit(db, "SCIM_USER_DEACTIVATED", req.scim as ScimContext, "user", id, req, {
-        email: u.email,
+        email: result.user.email,
       });
       reply.status(204).send();
     },
   );
 
-  // Groups — virtual, derived from AIVO roles. We only support read.
-  app.get("/scim/v2/Groups", { schema: getScimV2GroupsSchema }, async (_req: any, reply) => {
-    reply.type("application/scim+json").send({
-      schemas: ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
-      totalResults: SCIM_GROUPS.length,
-      Resources: SCIM_GROUPS.map((g) => ({
-        schemas: ["urn:ietf:params:scim:schemas:core:2.0:Group"],
-        id: g.id,
-        displayName: g.displayName,
-        meta: { resourceType: "Group", location: `/scim/v2/Groups/${g.id}` },
-      })),
-    });
-  });
+  // ── Groups ───────────────────────────────────────────────────────────
+  // Two kinds (Sprint B5):
+  //   1. ROLE groups (virtual, ids = role names): read-only mirrors of
+  //      AIVO roles. Mutations are refused with `mutability` — change a
+  //      user's `aivoRole` instead.
+  //   2. CLASS groups (ids = classroom uuids): an IdP push group whose
+  //      displayName follows the documented convention
+  //      `Class: <School Name> / <Class Name>` maps to a classroom;
+  //      teacher members become the class's staff. Pushes that don't
+  //      match the convention (or name an unknown school) are RECORDED
+  //      in scim_unmapped_groups — surfaced on the district SIS page,
+  //      skipped, never silently dropped.
 
-  // Groups are virtual (derived from AIVO role) per RFC 7644 §3.7 / 3.5.2:
-  // groups' membership mutations come from changing a user's role. The
-  // endpoints below are present for SCIM-conformant clients (Okta, Azure
-  // AD, JumpCloud) that POST/PUT/PATCH Groups during initial sync — we
-  // refuse the mutation with `mutability` so the client surfaces the
-  // limitation cleanly instead of silently 404-ing.
-  const rejectGroupMutation = (reply: any) =>
-    scimError(
-      reply,
-      400,
-      "Groups are derived from AIVO roles and cannot be mutated via SCIM. Update a user's `aivoRole` instead.",
-      "mutability",
-    );
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-  app.post("/scim/v2/Groups", async (_req: any, reply) => rejectGroupMutation(reply));
-  app.put("/scim/v2/Groups/:id", async (_req: any, reply) => rejectGroupMutation(reply));
-  app.patch("/scim/v2/Groups/:id", async (_req: any, reply) => rejectGroupMutation(reply));
-  app.delete("/scim/v2/Groups/:id", async (_req: any, reply) => rejectGroupMutation(reply));
-
-  app.get("/scim/v2/Groups/:id", { schema: getScimV2GroupsByIdSchema }, async (req: any, reply) => {
-    const { tenantId } = req.scim as ScimContext;
-    const { id } = req.params as { id: string };
-    const g = SCIM_GROUPS.find((x) => x.id === id);
-    if (!g) return scimError(reply, 404, "Group not found");
-    const members = await db
-      .select({ id: users.id, email: users.email, name: users.name })
-      .from(users)
-      .where(
-        and(eq(users.tenantId, tenantId), eq(users.role, id as any), isNull(users.deactivatedAt)),
-      );
-    reply.type("application/scim+json").send({
+  function classGroupToScim(classroom: any, school: any, members: any[]): any {
+    return {
       schemas: ["urn:ietf:params:scim:schemas:core:2.0:Group"],
-      id: g.id,
-      displayName: g.displayName,
+      id: classroom.id,
+      displayName: `Class: ${school.name} / ${classroom.name}`,
       members: members.map((m: any) => ({
         value: m.id,
         display: m.name || m.email,
         $ref: `/scim/v2/Users/${m.id}`,
       })),
+      meta: { resourceType: "Group", location: `/scim/v2/Groups/${classroom.id}` },
+    };
+  }
+
+  /** Active staff shown as a class group's members (teacher of record first). */
+  async function classGroupMembers(tenantId: string, classroom: any): Promise<any[]> {
+    if (!classroom.teacherId) return [];
+    const rows = await db
+      .select({ id: users.id, email: users.email, name: users.name })
+      .from(users)
+      .where(
+        and(
+          eq(users.id, classroom.teacherId),
+          eq(users.tenantId, tenantId),
+          isNull(users.deactivatedAt),
+        ),
+      );
+    return rows;
+  }
+
+  async function loadTenantClassroom(tenantId: string, id: string): Promise<{ classroom: any; school: any } | null> {
+    if (!UUID_RE.test(id)) return null;
+    const [row] = await db
+      .select({ classroom: classrooms, school: schools })
+      .from(classrooms)
+      .innerJoin(schools, eq(classrooms.schoolId, schools.id))
+      .where(and(eq(classrooms.id, id), eq(schools.tenantId, tenantId)))
+      .limit(1);
+    return row ?? null;
+  }
+
+  app.get("/scim/v2/Groups", { schema: getScimV2GroupsSchema }, async (req: any, reply) => {
+    const { tenantId } = req.scim as ScimContext;
+    const classRows = await db
+      .select({ classroom: classrooms, school: schools })
+      .from(classrooms)
+      .innerJoin(schools, eq(classrooms.schoolId, schools.id))
+      .where(eq(schools.tenantId, tenantId))
+      .limit(200);
+    const roleGroups = SCIM_GROUPS.map((g) => ({
+      schemas: ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+      id: g.id,
+      displayName: g.displayName,
       meta: { resourceType: "Group", location: `/scim/v2/Groups/${g.id}` },
+    }));
+    const classGroups = classRows.map((row: any) => ({
+      schemas: ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+      id: row.classroom.id,
+      displayName: `Class: ${row.school.name} / ${row.classroom.name}`,
+      meta: { resourceType: "Group", location: `/scim/v2/Groups/${row.classroom.id}` },
+    }));
+    reply.type("application/scim+json").send({
+      schemas: ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+      totalResults: roleGroups.length + classGroups.length,
+      Resources: [...roleGroups, ...classGroups],
     });
+  });
+
+  const ROLE_GROUP_REFUSAL =
+    "Role groups are derived from AIVO roles and cannot be mutated via SCIM. Update a user's `aivoRole` instead. To provision a class, push a group named `Class: <School Name> / <Class Name>`.";
+
+  app.post("/scim/v2/Groups", async (req: any, reply) => {
+    const { tenantId } = req.scim as ScimContext;
+    const body = (req.body ?? {}) as any;
+    const displayName = String(body.displayName ?? "").trim();
+    const memberIds: string[] = Array.isArray(body.members)
+      ? body.members.map((m: any) => String(m?.value ?? "")).filter(Boolean)
+      : [];
+    if (!displayName) {
+      return scimError(reply, 400, "displayName is required", "invalidValue");
+    }
+
+    const mapping = await applyClassGroupMapping(db, tenantId, displayName);
+    if (!mapping.ok) {
+      // Recorded for district review — explicitly NOT silently dropped.
+      await recordUnmappedGroup(db, tenantId, displayName, mapping.reason, {
+        externalId: body.externalId ?? null,
+        memberCount: memberIds.length,
+      });
+      await emitScimAudit(db, "SCIM_GROUP_UNMAPPED", req.scim as ScimContext, "group", displayName, req, {
+        reason: mapping.reason,
+      });
+      const detail =
+        mapping.reason === "unknown_school"
+          ? `No school named "${parseClassGroupName(displayName)?.schoolName}" exists in this district. The push was recorded for review on the AIVO SIS page.`
+          : `Group name does not match the class convention \`Class: <School Name> / <Class Name>\`. The push was recorded for review on the AIVO SIS page. ${ROLE_GROUP_REFUSAL}`;
+      return scimError(reply, 400, detail, "invalidValue");
+    }
+
+    const { applied, unknown } = await applyClassGroupMembers(
+      db,
+      tenantId,
+      mapping.classroom,
+      mapping.school.id,
+      memberIds,
+    );
+    await emitScimAudit(
+      db,
+      "SCIM_GROUP_MAPPED",
+      req.scim as ScimContext,
+      "group",
+      mapping.classroom.id,
+      req,
+      { displayName, created: mapping.created, members: applied.length, unknownMembers: unknown.length },
+    );
+    const fresh = await loadTenantClassroom(tenantId, mapping.classroom.id);
+    const members = fresh ? await classGroupMembers(tenantId, fresh.classroom) : [];
+    reply
+      .status(201)
+      .type("application/scim+json")
+      .send(classGroupToScim(fresh?.classroom ?? mapping.classroom, mapping.school, members));
+  });
+
+  app.get("/scim/v2/Groups/:id", { schema: getScimV2GroupsByIdSchema }, async (req: any, reply) => {
+    const { tenantId } = req.scim as ScimContext;
+    const { id } = req.params as { id: string };
+    const roleGroup = SCIM_GROUPS.find((x) => x.id === id);
+    if (roleGroup) {
+      const members = await db
+        .select({ id: users.id, email: users.email, name: users.name })
+        .from(users)
+        .where(
+          and(eq(users.tenantId, tenantId), eq(users.role, id as any), isNull(users.deactivatedAt)),
+        );
+      return reply.type("application/scim+json").send({
+        schemas: ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+        id: roleGroup.id,
+        displayName: roleGroup.displayName,
+        members: members.map((m: any) => ({
+          value: m.id,
+          display: m.name || m.email,
+          $ref: `/scim/v2/Users/${m.id}`,
+        })),
+        meta: { resourceType: "Group", location: `/scim/v2/Groups/${roleGroup.id}` },
+      });
+    }
+    const found = await loadTenantClassroom(tenantId, id);
+    if (!found) return scimError(reply, 404, "Group not found");
+    const members = await classGroupMembers(tenantId, found.classroom);
+    reply.type("application/scim+json").send(classGroupToScim(found.classroom, found.school, members));
+  });
+
+  app.patch("/scim/v2/Groups/:id", async (req: any, reply) => {
+    const { tenantId } = req.scim as ScimContext;
+    const { id } = req.params as { id: string };
+    if (SCIM_GROUPS.some((g) => g.id === id)) {
+      return scimError(reply, 400, ROLE_GROUP_REFUSAL, "mutability");
+    }
+    const found = await loadTenantClassroom(tenantId, id);
+    if (!found) return scimError(reply, 404, "Group not found");
+
+    const ops: any[] = (req.body as any)?.Operations || [];
+    if (!Array.isArray(ops) || ops.length === 0) {
+      return scimError(reply, 400, "Operations array is required", "invalidValue");
+    }
+    let applied = 0;
+    let removed = 0;
+    for (const op of ops) {
+      const verb = String(op.op || "").toLowerCase();
+      const path = String(op.path || "");
+      if (verb === "add" && (path === "members" || !path)) {
+        const ids = (Array.isArray(op.value) ? op.value : [op.value])
+          .map((v: any) => String(v?.value ?? v ?? ""))
+          .filter(Boolean);
+        const res = await applyClassGroupMembers(db, tenantId, found.classroom, found.school.id, ids);
+        applied += res.applied.length;
+      } else if (verb === "remove" && path.startsWith("members")) {
+        // Entra style: path = 'members[value eq "<id>"]'; Okta also sends
+        // op.value arrays. Support both.
+        const m = /members\[value eq "([^"]+)"\]/.exec(path);
+        const ids = m
+          ? [m[1]]
+          : (Array.isArray(op.value) ? op.value : [op.value])
+              .map((v: any) => String(v?.value ?? v ?? ""))
+              .filter(Boolean);
+        for (const userId of ids) {
+          await removeClassGroupMember(db, tenantId, found.classroom, found.school.id, userId);
+          removed += 1;
+        }
+      } else if (verb === "replace" && (path === "displayName" || !path)) {
+        const next = typeof op.value === "string" ? op.value : op.value?.displayName;
+        if (typeof next === "string" && next.trim()) {
+          const parsed = parseClassGroupName(next);
+          if (!parsed) {
+            return scimError(
+              reply,
+              400,
+              "displayName must keep the `Class: <School Name> / <Class Name>` convention",
+              "invalidValue",
+            );
+          }
+          await db
+            .update(classrooms)
+            .set({ name: parsed.className })
+            .where(eq(classrooms.id, found.classroom.id));
+        }
+      } else {
+        return scimError(reply, 400, `Unsupported PatchOp: ${verb} ${path}`, "invalidPath");
+      }
+    }
+    await emitScimAudit(db, "SCIM_GROUP_PATCHED", req.scim as ScimContext, "group", id, req, {
+      added: applied,
+      removed,
+    });
+    const fresh = await loadTenantClassroom(tenantId, id);
+    const members = fresh ? await classGroupMembers(tenantId, fresh.classroom) : [];
+    reply
+      .type("application/scim+json")
+      .send(classGroupToScim(fresh?.classroom ?? found.classroom, found.school, members));
+  });
+
+  app.put("/scim/v2/Groups/:id", async (req: any, reply) => {
+    const { tenantId } = req.scim as ScimContext;
+    const { id } = req.params as { id: string };
+    if (SCIM_GROUPS.some((g) => g.id === id)) {
+      return scimError(reply, 400, ROLE_GROUP_REFUSAL, "mutability");
+    }
+    const found = await loadTenantClassroom(tenantId, id);
+    if (!found) return scimError(reply, 404, "Group not found");
+    const body = (req.body ?? {}) as any;
+    const memberIds: string[] = Array.isArray(body.members)
+      ? body.members.map((m: any) => String(m?.value ?? "")).filter(Boolean)
+      : [];
+    // Full replace: clear teacher-of-record, then re-apply the pushed set.
+    await db.update(classrooms).set({ teacherId: null }).where(eq(classrooms.id, found.classroom.id));
+    const { applied } = await applyClassGroupMembers(
+      db,
+      tenantId,
+      { ...found.classroom, teacherId: null },
+      found.school.id,
+      memberIds,
+    );
+    await emitScimAudit(db, "SCIM_GROUP_REPLACED", req.scim as ScimContext, "group", id, req, {
+      members: applied.length,
+    });
+    const fresh = await loadTenantClassroom(tenantId, id);
+    const members = fresh ? await classGroupMembers(tenantId, fresh.classroom) : [];
+    reply
+      .type("application/scim+json")
+      .send(classGroupToScim(fresh?.classroom ?? found.classroom, found.school, members));
+  });
+
+  app.delete("/scim/v2/Groups/:id", async (req: any, reply) => {
+    const { id } = req.params as { id: string };
+    if (SCIM_GROUPS.some((g) => g.id === id)) {
+      return scimError(reply, 400, ROLE_GROUP_REFUSAL, "mutability");
+    }
+    // Classes hold enrollment history — deleting them from an IdP group
+    // push would destroy district data. Refuse with a clear next step.
+    return scimError(
+      reply,
+      400,
+      "Classes are not deleted via SCIM group push (enrollment history would be lost). Archive the class from the AIVO admin console instead.",
+      "mutability",
+    );
   });
 }

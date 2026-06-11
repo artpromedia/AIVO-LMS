@@ -6,6 +6,7 @@ import { useLearners } from "@/hooks/useLearners";
 import { useAuth } from "@/hooks/useAuth";
 import { TierThemeProvider, useTierTheme } from "@aivo/mobile-ui";
 import { SwitchScanOverlay } from "@/src/components/SwitchScanOverlay";
+import { ScanTargetProvider } from "@/src/components/switch-scan/ScanTargetRegistry";
 import { BreakReminder } from "@/src/components/learning/BreakReminder";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
@@ -60,11 +61,14 @@ export default function LearnerLayout() {
   const switchScanEnabled = useSwitchScanningEnabled();
   return (
     <TierThemeProvider gradeLevel={gradeLevel}>
-      <ThemedLearnerTabs />
-      {/* Global switch scanning overlay — only mounted for eligible learners */}
-      <SwitchScanOverlay active={switchScanEnabled} items={[]} />
-      {/* Periodic break prompt — active only when the learner enables it. */}
-      <BreakReminder />
+      <ScanTargetProvider>
+        <ThemedLearnerTabs />
+        {/* Global switch scanning overlay — scans the actions screens
+            register via useScanTarget (Sprint A4). */}
+        <SwitchScanOverlay active={switchScanEnabled} />
+        {/* Periodic break prompt — active only when the learner enables it. */}
+        <BreakReminder />
+      </ScanTargetProvider>
     </TierThemeProvider>
   );
 }

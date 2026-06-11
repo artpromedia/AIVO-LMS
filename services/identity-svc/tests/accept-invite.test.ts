@@ -121,7 +121,11 @@ async function cleanup(db: any, seed: Seed) {
     adminAuditLog,
   } = await import("@aivo/db");
   const { eq } = await import("drizzle-orm");
-  // Order matters for FKs: child rows first.
+  // Only mutable rows are removed. The admin audit ledger is append-only
+  // (hash-chained, UPDATE/DELETE blocked by trigger — that is the product
+  // guarantee, and tests must live with it), and its tenant FK pins the
+  // tenant row, so audit/users/schools/tenants stay. Every fixture uses a
+  // unique email + tenant name, so retained rows cannot collide.
   await db.delete(districtAdminInvites).where(eq(districtAdminInvites.tenantId, seed.tenantId));
   const tenantUsers = await db
     .select({ id: users.id })
@@ -131,10 +135,9 @@ async function cleanup(db: any, seed: Seed) {
     await db.delete(passwordHistory).where(eq(passwordHistory.userId, u.id));
     await db.delete(sessions).where(eq(sessions.userId, u.id));
   }
-  await db.delete(adminAuditLog).where(eq(adminAuditLog.tenantId, seed.tenantId));
-  await db.delete(users).where(eq(users.tenantId, seed.tenantId));
-  if (seed.schoolId) await db.delete(schools).where(eq(schools.tenantId, seed.tenantId));
-  await db.delete(tenants).where(eq(tenants.id, seed.tenantId));
+  void adminAuditLog;
+  void schools;
+  void tenants;
 }
 
 test(

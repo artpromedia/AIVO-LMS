@@ -17,9 +17,11 @@ All endpoints are mounted under `/scim/v2/*` on `identity-svc`.
 | PUT                   | `/Users/:id`             | Full replace.                                                                                         |
 | PATCH                 | `/Users/:id`             | Path-based ops per RFC 7644 §3.5.2.                                                                   |
 | DELETE                | `/Users/:id`             | Soft-delete (sets `deactivatedAt`); emits audit event.                                                |
-| GET                   | `/Groups`                | Lists virtual role-derived groups.                                                                    |
-| GET                   | `/Groups/:id`            | Returns active members.                                                                               |
-| POST/PUT/PATCH/DELETE | `/Groups*`               | Refused with SCIM `mutability` (400). Groups are role-derived; mutate `aivoRole` on the user instead. |
+| GET                   | `/Groups`                | Role groups (virtual) + class groups (classrooms), Sprint B5.                                          |
+| GET                   | `/Groups/:id`            | Returns active members for either kind.                                                               |
+| POST                  | `/Groups`                | `Class: <School Name> / <Class Name>` maps to a classroom; anything else is recorded for review + 400. |
+| PATCH/PUT             | `/Groups/:id`            | Class-group membership add/remove + conventional rename. Role groups refuse with `mutability`.         |
+| DELETE                | `/Groups/:id`            | Refused — archive classes from the admin console (enrollment history).                                 |
 
 ## Authentication
 
@@ -52,3 +54,6 @@ Supports the subset SCIM clients actually emit during initial sync:
 - Compound `<expr> and <expr>`, `<expr> or <expr>`
 
 Anything unsupported falls back to "no extra filter" (returns the tenant scope alone) instead of 400ing — matches Okta's expected behaviour during reconciliation runs.
+
+
+IdP-specific setup, attribute mappings, and the verification checklist live in [docs/integrations/scim-runbook.md](../integrations/scim-runbook.md).

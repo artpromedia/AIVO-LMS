@@ -1252,17 +1252,17 @@
       "cta_primary": "Démarrer l’essai familial",
       "cta_secondary": "Contacter les ventes districts",
       "cta_image_alt": "Un parent et un enfant apprenant ensemble sur un canapé",
-      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
-      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
-      "value_props_badge": "Our Approach",
-      "value_props_heading": "Principles that put your child first.",
-      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
-      "value_prop_1_title": "Universal Design for Learning",
-      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
-      "value_prop_2_title": "Structured & Systematic Instruction",
-      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
-      "value_prop_3_title": "Sensory-Responsive Design",
-      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
+      "stat_focus_qualitative": "Les élèves montrent des progrès significatifs en concentration et en engagement",
+      "research_methodology_body": "Notre moteur d'apprentissage s'appuie sur la recherche publiée en éducation spécialisée, la conception universelle de l'apprentissage (CUA) et la science de la cognition adaptative.",
+      "value_props_badge": "Notre approche",
+      "value_props_heading": "Des principes qui placent votre enfant au premier plan.",
+      "value_props_subheading": "AIVO repose sur une science de l'apprentissage éprouvée — pas sur des suppositions quant à l'élève « typique ».",
+      "value_prop_1_title": "Conception universelle de l'apprentissage",
+      "value_prop_1_desc": "Conformément aux lignes directrices de la CUA, nous offrons de multiples moyens d'engagement, de représentation et d'action afin que chaque apprenant puisse accéder au programme.",
+      "value_prop_2_title": "Enseignement structuré et systématique",
+      "value_prop_2_desc": "Les leçons suivent des schémas explicites et séquentiels qui construisent les connaissances étape par étape — une approche adaptée aux apprenants avec dyslexie, TDAH et profils apparentés.",
+      "value_prop_3_title": "Design sensoriellement adaptatif",
+      "value_prop_3_desc": "Les apprenants contrôlent en temps réel la complexité visuelle, le contraste et le rythme — réduisant les obstacles sensoriels au lieu d'en ajouter."
     },
     "page_reset_password": {
       "logo_aria": "Accueil AIVO",
@@ -1346,7 +1346,7 @@
       "start_free_today": "Commencez gratuitement aujourd'hui",
       "create_your_account": "Créez votre compte",
       "label_full_name": "Nom complet",
-      "placeholder_name": "Alex Parker",
+      "placeholder_name": "Alex Martin",
       "label_password": "Mot de passe",
       "placeholder_password": "Au moins 8 caractères",
       "password_hint": "Mélangez lettres, chiffres et un symbole pour plus de sécurité.",
@@ -1497,45 +1497,45 @@
       "hero_title": "Cinq niveaux. Une plateforme. Chaque apprenant."
     },
     "page_accessibility": {
-      "title": "AIVO Accessibility Statement"
+      "title": "Déclaration d'accessibilité d'AIVO"
     },
     "page_cookie_policy": {
-      "title": "Cookie Policy"
+      "title": "Politique relative aux cookies"
     },
     "page_coppa_compliance": {
-      "title": "COPPA Compliance Statement"
+      "title": "Déclaration de conformité COPPA"
     },
     "page_ferpa_compliance": {
-      "title": "FERPA Compliance Statement"
+      "title": "Déclaration de conformité FERPA"
     },
     "page_privacy_policy": {
-      "title": "AIVO Privacy Policy"
+      "title": "Politique de confidentialité d'AIVO"
     },
     "page_security": {
-      "title": "How we protect your data."
+      "title": "Comment nous protégeons vos données."
     },
     "page_subprocessors": {
-      "get_started": "Get Started",
-      "badge": "Subprocessors",
-      "heading": "AIVO subprocessors",
-      "current_subprocessors": "Current subprocessors",
-      "col_subprocessor": "Subprocessor",
-      "col_purpose": "Purpose",
-      "col_data_category": "Data category",
-      "col_region": "Region",
-      "col_status": "Status",
-      "how_we_use_heading": "How we use this list",
-      "reporting_heading": "Reporting subprocessor changes",
-      "questions_heading": "Questions?",
-      "footer_privacy": "Privacy",
-      "footer_security": "Security",
-      "footer_accessibility": "Accessibility"
+      "get_started": "Commencer",
+      "badge": "Sous-traitants",
+      "heading": "Sous-traitants d'AIVO",
+      "current_subprocessors": "Sous-traitants actuels",
+      "col_subprocessor": "Sous-traitant",
+      "col_purpose": "Finalité",
+      "col_data_category": "Catégorie de données",
+      "col_region": "Région",
+      "col_status": "Statut",
+      "how_we_use_heading": "Comment nous utilisons cette liste",
+      "reporting_heading": "Notification des changements de sous-traitants",
+      "questions_heading": "Des questions ?",
+      "footer_privacy": "Confidentialité",
+      "footer_security": "Sécurité",
+      "footer_accessibility": "Accessibilité"
     },
     "page_terms_of_service": {
-      "title": "AIVO Terms of Service"
+      "title": "Conditions d'utilisation d'AIVO"
     },
     "page_trust": {
-      "title": "What we promise — and how to check."
+      "title": "Ce que nous promettons — et comment le vérifier."
     },
     "page_compare_detail": {
       "aivo_best_for": "AIVO est idéal pour",

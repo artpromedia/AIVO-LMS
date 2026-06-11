@@ -29,6 +29,11 @@ export interface EventPage {
   nextCursor: string | null;
 }
 
+export interface VerifyRange {
+  from?: string; // ISO inclusive
+  to?: string; // ISO inclusive
+}
+
 export interface EventStore {
   append(input: AuditEventInput): Promise<AuditEvent>;
   query(filter: EventFilter): Promise<EventPage>;
@@ -37,7 +42,11 @@ export interface EventStore {
   proof(id: string): Promise<{ prev_hash: string; hash: string; next_hash: string | null } | null>;
   /** Async iterator for streaming export under a filter (no full buffering). */
   stream(filter: EventFilter): AsyncIterable<AuditEvent>;
-  verify(): Promise<ChainBreak | null>;
+  /**
+   * Walk the chain (optionally only the slice covering `range`, anchored
+   * against the event immediately before it) and report the first break.
+   */
+  verify(range?: VerifyRange): Promise<ChainBreak | null>;
 }
 
 const DEFAULT_LIMIT = 50;
@@ -118,8 +127,24 @@ export class InMemoryEventStore implements EventStore {
     }
   }
 
-  async verify(): Promise<ChainBreak | null> {
-    return verifyChain(this.events, GENESIS_HASH);
+  async verify(range?: VerifyRange): Promise<ChainBreak | null> {
+    if (!range?.from && !range?.to) {
+      return verifyChain(this.events, GENESIS_HASH);
+    }
+    // The events array IS chain order; take the contiguous span covering
+    // the range and anchor it on the event immediately before the span.
+    let first = -1;
+    let last = -1;
+    for (let i = 0; i < this.events.length; i++) {
+      const at = this.events[i].occurred_at;
+      if (range.from && at < range.from) continue;
+      if (range.to && at > range.to) continue;
+      if (first === -1) first = i;
+      last = i;
+    }
+    if (first === -1) return null; // empty range = nothing to dispute
+    const anchor = first > 0 ? this.events[first - 1].hash : GENESIS_HASH;
+    return verifyChain(this.events.slice(first, last + 1), anchor);
   }
 
   /** Test-only: tamper with a stored event to exercise the verifier. */

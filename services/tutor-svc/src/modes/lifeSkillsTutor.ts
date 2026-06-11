@@ -48,6 +48,12 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     "10": "authored",
     "11": "authored",
     "12": "authored",
+    // production-gap-gate:allow-scaffold(ADULT) owner=curriculum-life-skills date=2026-06-10
+    // ADULT transition content is attested out of GA scope. The band stays
+    // declared so authors can preview it (AIVO_ALLOW_SCAFFOLD_CONTENT=true),
+    // and planSession refuses it in production — fail-closed, regression-
+    // tested in tests/tutor-session-route.test.ts (refused by default,
+    // plannable only under the preview flag).
     ADULT: "scaffold",
   },
   policy: {

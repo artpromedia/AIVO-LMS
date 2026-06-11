@@ -157,7 +157,8 @@
     "activeTutorsTrend": "Active tutors trend",
     "sessionsTrend": "Sessions this week trend",
     "masteryBySubject": "Mastery by subject",
-    "reports": "Reports"
+    "reports": "Reports",
+    "districtLogo": "District logo"
   },
   "parentSettings": {
     "title": "Settings",
@@ -221,7 +222,8 @@
     "addonPrice": "+ $4.99/mo",
     "cancelSubscription": "Cancel subscription",
     "cancelAtPeriodEnd": "Cancels at period end",
-    "addedToBill": "{{count}} add-on(s) · ${{price}}/mo"
+    "addedToBill": "{{count}} add-on(s) · ${{price}}/mo",
+    "openInvoice": "Open invoice"
   },
   "parentTutors": {
     "title": "Tutor Store",
@@ -665,7 +667,10 @@
         "homeLabel": "Return to dashboard",
         "intro": "Begin when ready."
       }
-    }
+    },
+    "hideTutor": "Hide tutor",
+    "moveUp": "Move {{label}} up",
+    "moveDown": "Move {{label}} down"
   },
   "learnerTutor": {
     "tutorNotFound": "Tutor not found",
@@ -1089,6 +1094,35 @@
       "body": "It's okay to pause. A quick calm moment can help you feel ready.",
       "accept": "Take a calm break",
       "dismiss": "Not now"
+    },
+    "notEnabled": "Calm Corner isn't turned on for your school yet. Ask a grown-up to check with your district."
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "body": "Don't worry — nothing is lost. You can try again or head back home.",
+    "tryAgain": "Try again",
+    "goHome": "Go to home"
+  },
+  "configError": {
+    "title": "This build is misconfigured",
+    "body": "The app can't reach AIVO services. Please install the latest version from the app store. If you manage this deployment, rebuild with the backend address set."
+  },
+  "parentIep": {
+    "notificationPrefs": "Notification preferences"
+  },
+  "offline": {
+    "synced": "You're back online. Your work has been saved.",
+    "banner": "You're offline. Keep going — progress is saved on this device.",
+    "bannerQueued": "Offline — {{count}} change(s) will sync when you're back.",
+    "syncing": "Syncing {{count}} change(s)…"
+  },
+  "parentLearnerNew": {
+    "birthDate": "Birth date (YYYY-MM-DD)",
+    "birthDateError": {
+      "format": "Use the YYYY-MM-DD format, e.g. 2017-09-01.",
+      "invalid": "That's not a real calendar date.",
+      "future": "The birth date can't be in the future.",
+      "tooOld": "Learners must be 21 or younger."
     }
   }
 }

@@ -1,0 +1,85 @@
+# Store-listing screenshot flow (Sprint A5).
+#
+# Captures the 7 screens store-assets/screenshots/README.md requires, in
+# carousel order. Run via scripts/capture-store-screenshots.mjs on a host
+# with simulators/emulators (macOS for iOS), against a staging backend
+# seeded with the multi-role demo account:
+#
+#   MAESTRO_APP_ID=com.artpromedia.aivo \
+#   MAESTRO_DEMO_EMAIL=... MAESTRO_DEMO_PASSWORD=... \
+#   maestro test .maestro/store-screens.yaml
+#
+# The demo account must hold all five roles (learner, parent, teacher,
+# therapist, caregiver) so the role switcher (shot 01) shows the full set.
+appId: ${MAESTRO_APP_ID}
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: "login-email"
+    optional: true
+- inputText: ${MAESTRO_DEMO_EMAIL}
+- tapOn:
+    id: "login-password"
+    optional: true
+- inputText: ${MAESTRO_DEMO_PASSWORD}
+- tapOn: "Sign in"
+- extendedWaitUntil:
+    visible: "Good"
+    timeout: 20000
+    optional: true
+
+# 01 — role switcher with all five roles
+- tapOn:
+    id: "role-switcher"
+    optional: true
+- takeScreenshot: 01-role-switcher
+- back
+
+# 02 — learner home
+- tapOn:
+    text: "Learner"
+    optional: true
+- extendedWaitUntil:
+    visible: "Your Subjects"
+    timeout: 15000
+    optional: true
+- takeScreenshot: 02-learner-home
+
+# 03 — parent home
+- tapOn:
+    id: "role-switcher"
+    optional: true
+- tapOn: "Parent"
+- extendedWaitUntil:
+    visible: "Learners"
+    timeout: 15000
+    optional: true
+- takeScreenshot: 03-parent-home
+
+# 04 — teacher home
+- tapOn:
+    id: "role-switcher"
+    optional: true
+- tapOn: "Teacher"
+- takeScreenshot: 04-teacher-home
+
+# 05 — therapist home
+- tapOn:
+    id: "role-switcher"
+    optional: true
+- tapOn: "Therapist"
+- takeScreenshot: 05-therapist-home
+
+# 06 — caregiver home
+- tapOn:
+    id: "role-switcher"
+    optional: true
+- tapOn: "Caregiver"
+- takeScreenshot: 06-caregiver-home
+
+# 07 — cross-cutting notifications
+- tapOn:
+    id: "tab-notifications"
+    optional: true
+- takeScreenshot: 07-cross-cutting-notifications

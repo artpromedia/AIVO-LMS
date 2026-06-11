@@ -157,7 +157,8 @@
     "activeTutorsTrend": "Trend aktiver Tutoren",
     "sessionsTrend": "Trend der Sitzungen diese Woche",
     "masteryBySubject": "Beherrschung nach Fach",
-    "reports": "Berichte"
+    "reports": "Berichte",
+    "districtLogo": "Bezirkslogo"
   },
   "parentSettings": {
     "title": "Einstellungen",
@@ -221,7 +222,8 @@
     "addonPrice": "+ 4,99 €/Monat",
     "cancelSubscription": "Abonnement kündigen",
     "cancelAtPeriodEnd": "Kündigung zum Periodenende",
-    "addedToBill": "{{count}} Erweiterung(en) · {{price}} €/Monat"
+    "addedToBill": "{{count}} Erweiterung(en) · {{price}} €/Monat",
+    "openInvoice": "Rechnung öffnen"
   },
   "parentTutors": {
     "title": "Tutor-Store",
@@ -665,7 +667,10 @@
         "homeLabel": "Zurück zum Dashboard",
         "intro": "Beginne, wenn du bereit bist."
       }
-    }
+    },
+    "hideTutor": "Tutor ausblenden",
+    "moveUp": "{{label}} nach oben",
+    "moveDown": "{{label}} nach unten"
   },
   "learnerTutor": {
     "tutorNotFound": "Tutor nicht gefunden",
@@ -1089,6 +1094,35 @@
       "body": "Eine Pause ist völlig okay. Ein kurzer ruhiger Moment kann dir helfen, dich bereit zu fühlen.",
       "accept": "Ruhige Pause machen",
       "dismiss": "Jetzt nicht"
+    },
+    "notEnabled": "Die Ruhe-Ecke ist für deine Schule noch nicht freigeschaltet. Bitte einen Erwachsenen, beim Bezirk nachzufragen."
+  },
+  "errorBoundary": {
+    "title": "Etwas ist schiefgelaufen",
+    "body": "Keine Sorge – nichts ist verloren. Du kannst es erneut versuchen oder zur Startseite zurückkehren.",
+    "tryAgain": "Erneut versuchen",
+    "goHome": "Zur Startseite"
+  },
+  "configError": {
+    "title": "Dieser Build ist falsch konfiguriert",
+    "body": "Die App kann die AIVO-Dienste nicht erreichen. Bitte installiere die neueste Version aus dem Store. Wenn du diese Bereitstellung verwaltest, baue mit gesetzter Backend-Adresse neu."
+  },
+  "parentIep": {
+    "notificationPrefs": "Benachrichtigungseinstellungen"
+  },
+  "offline": {
+    "synced": "Du bist wieder online. Deine Arbeit wurde gespeichert.",
+    "banner": "Offline. Mach weiter – dein Fortschritt wird auf diesem Gerät gespeichert.",
+    "bannerQueued": "Offline – {{count}} Änderung(en) werden später synchronisiert.",
+    "syncing": "{{count}} Änderung(en) werden synchronisiert …"
+  },
+  "parentLearnerNew": {
+    "birthDate": "Geburtsdatum (JJJJ-MM-TT)",
+    "birthDateError": {
+      "format": "Bitte das Format JJJJ-MM-TT verwenden, z. B. 2017-09-01.",
+      "invalid": "Dieses Datum existiert nicht.",
+      "future": "Das Geburtsdatum kann nicht in der Zukunft liegen.",
+      "tooOld": "Lernende müssen 21 Jahre oder jünger sein."
     }
   }
 }

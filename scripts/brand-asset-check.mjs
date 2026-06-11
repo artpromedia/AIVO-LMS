@@ -140,6 +140,70 @@ if (existsSync(mobileAppJsonPath)) {
   warnings.push("mobile: apps/mobile/app.json not found");
 }
 
+// ── Sprint B6 — white-label wiring pins ─────────────────────────────────
+// Tenant branding must stay contrast-guarded, learner-exempt, and
+// validated server-side. These checks fail if any leg is unwired.
+const WHITE_LABEL_PINS = [
+  {
+    file: "packages/brand/src/contrast-guard.ts",
+    patterns: [
+      ["palette evaluator", /export function evaluateBrandPalette/],
+      ["both-theme surfaces", /darkChrome: SEMANTIC\.color\.surface\.inverse/],
+      ["specific failure messages", /needs \$\{required\}:1/],
+    ],
+  },
+  {
+    file: "packages/brand/src/contrast-guard.test.ts",
+    patterns: [
+      ["default-cannot-fail test", /guard cannot reject the default/],
+      ["failing fixture test", /fails the light surfaces/],
+    ],
+  },
+  {
+    file: "services/identity-svc/src/routes/district.ts",
+    patterns: [
+      ["write route uses the guard", /evaluateBrandPalette\(/],
+      ["logo bypass stays blocked", /delete incoming\.logoUrl/],
+    ],
+  },
+  {
+    file: "apps/web-v2/components/layout/app-shell.tsx",
+    patterns: [
+      ["learner exemption", /theme === "learner" \? null : await getTenantBranding\(\)/],
+      ["tenant logo slot", /data-testid="tenant-logo"/],
+      ["support link", /shell-support-link/],
+    ],
+  },
+  {
+    file: "apps/web-v2/lib/branding.ts",
+    patterns: [["accent var mapping", /--aivo-color-interactive-primary-default/]],
+  },
+  {
+    file: "apps/web-admin/components/branding-form.tsx",
+    patterns: [["live contrast verdicts", /contrast-verdicts/]],
+  },
+  {
+    file: "docs/design/white-label.md",
+    patterns: [
+      ["learner palette exclusion documented", /NOT overridable/],
+      ["custom-domain exclusion documented", /Custom domains are out of scope/],
+    ],
+  },
+];
+for (const pin of WHITE_LABEL_PINS) {
+  const full = join(repoRoot, pin.file);
+  if (!existsSync(full)) {
+    errors.push(`white-label: required file missing: ${pin.file}`);
+    continue;
+  }
+  const content = readFileSync(full, "utf8");
+  for (const [label, pattern] of pin.patterns) {
+    if (!pattern.test(content)) {
+      errors.push(`white-label: ${pin.file} missing ${label}`);
+    }
+  }
+}
+
 if (warnings.length) {
   for (const w of warnings) console.warn(`warn: ${w}`);
 }

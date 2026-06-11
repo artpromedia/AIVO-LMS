@@ -121,7 +121,7 @@ export default function ResetPasswordScreen() {
         contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 32 }}
         keyboardShouldPersistTaps="handled"
       >
-        <Pressable onPress={() => router.replace("/(auth)/login")} style={styles.backButton}>
+        <Pressable accessibilityRole="button" onPress={() => router.replace("/(auth)/login")} style={styles.backButton}>
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
 
@@ -148,7 +148,7 @@ export default function ResetPasswordScreen() {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("auth.changePasswordNew")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel={t("auth.changePasswordNewPlaceholder")}
                   style={styles.input}
                   value={next}
                   onChangeText={setNext}
@@ -187,7 +187,7 @@ export default function ResetPasswordScreen() {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("auth.confirmPassword")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel={t("auth.confirmPasswordPlaceholder")}
                   style={styles.input}
                   value={confirm}
                   onChangeText={setConfirm}

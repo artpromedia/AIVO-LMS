@@ -122,6 +122,26 @@ async function seedUser(role: string, email: string, password: string): Promise<
 export const seedParent = (email = `e2e-parent-${Date.now()}@aivo.test`) =>
   seedUser("parent", email, "E2eParent!Pass1");
 
+
+/** Latest unused login MFA code for an email (identity test mode). */
+export async function lastMfaCode(email: string): Promise<string | null> {
+  try {
+    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
+    try {
+      const res = await ctx.get(`/api/__test__/last-mfa-code/${encodeURIComponent(email)}`, {
+        failOnStatusCode: false,
+      });
+      if (res.status() !== 200) return null;
+      const body = (await res.json()) as { code?: string };
+      return body.code ?? null;
+    } finally {
+      await ctx.dispose();
+    }
+  } catch {
+    return null;
+  }
+}
+
 /** Seed a PARENT directly INTO an existing tenant (e.g. a district tenant) so
  *  the district-pilot e2e can drive web-v2 learner-create under the seat cap. */
 export async function seedParentInTenant(
@@ -213,8 +233,30 @@ export async function seedDistrictAdmin(
     return null;
   }
 }
-export const seedPlatformAdmin = (email = `e2e-platform-${Date.now()}@aivo.test`) =>
-  seedUser("platform-admin", email, "E2ePlat!Pass1");
+/** `mfaEnabled` arms the real MFA login challenge so journey specs can
+ *  exercise the /login/mfa UI end-to-end (code via lastMfaCode()). */
+export async function seedPlatformAdmin(
+  email = `e2e-platform-${Date.now()}@aivo.test`,
+  opts: { mfaEnabled?: boolean } = {},
+): Promise<SeededUser | null> {
+  const password = "E2ePlat!Pass1";
+  try {
+    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
+    try {
+      const res = await ctx.post("/api/__test__/seed-platform-admin", {
+        data: { email, password, mfaEnabled: opts.mfaEnabled ?? false },
+        failOnStatusCode: false,
+      });
+      if (res.status() !== 200) return null;
+      const body = (await res.json()) as Omit<SeededUser, "email" | "password">;
+      return { ...body, email, password };
+    } finally {
+      await ctx.dispose();
+    }
+  } catch {
+    return null;
+  }
+}
 /** Tenant-less SUPPORT platform-staff user (non-admin platform role). */
 export const seedSupportStaff = (email = `e2e-support-${Date.now()}@aivo.test`) =>
   seedUser("support", email, "E2eSupport!Pass1");

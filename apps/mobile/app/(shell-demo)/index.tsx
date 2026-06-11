@@ -56,7 +56,7 @@ export default function ShellDemoScreen() {
     return (
       <SafeAreaView style={styles.root} edges={["top", "bottom"]}>
         <View style={styles.lockedHeader}>
-          <Pressable onPress={() => setLockedArea(null)} hitSlop={12}>
+          <Pressable accessibilityRole="button" onPress={() => setLockedArea(null)} hitSlop={12}>
             <Text style={styles.backLink}>← Back to demo</Text>
           </Pressable>
         </View>
@@ -127,7 +127,7 @@ export default function ShellDemoScreen() {
               Step-up required to enter {ROLE_META[stepUpRole].label}. In the real app a biometric /
               PIN prompt would appear here.
             </Text>
-            <Pressable onPress={() => setStepUpRole(null)}>
+            <Pressable accessibilityRole="button" onPress={() => setStepUpRole(null)}>
               <Text style={styles.stepUpDismiss}>OK</Text>
             </Pressable>
           </View>

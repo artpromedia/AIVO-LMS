@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, TextInput, View, ViewStyle } from "react-n
 import { Ionicons } from "@expo/vector-icons";
 import { GeometryCanvas, type GeometryShape } from "./GeometryCanvas";
 import { colors, radius, spacing } from "@/constants/colors";
+import i18n from "@/lib/i18n";
 
 /**
  * Normalized assessment-item schema. Mirrors the shape returned by
@@ -200,7 +201,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
             {item.options.map((opt) => {
               const isSelected = multiSelected.has(opt.id);
               return (
-                <Pressable
+                <Pressable accessibilityRole="button"
                   key={opt.id}
                   disabled={disabled}
                   onPress={() => toggle(opt.id)}
@@ -230,7 +231,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
       };
       return (
         <View>
-          <TextInput
+          <TextInput accessibilityLabel="Type your answer"
             value={text}
             onChangeText={setText}
             placeholder="Type your answer"
@@ -258,7 +259,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
       return (
         <View>
           <View style={styles.numericRow}>
-            <TextInput
+            <TextInput accessibilityLabel="0"
               value={text}
               onChangeText={setText}
               placeholder="0"
@@ -304,6 +305,9 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
                 <Text style={styles.orderIndex}>{i + 1}.</Text>
                 <Text style={styles.orderLabel}>{opt.label}</Text>
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={i18n.t("learnerStage.moveUp", "Move {{label}} up", { label: opt.label })}
+                  accessibilityState={{ disabled: disabled || i === 0 }}
                   onPress={() => moveUp(i)}
                   disabled={disabled || i === 0}
                   style={styles.orderBtn}
@@ -311,6 +315,9 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
                   <Ionicons name="chevron-up" size={20} color={colors.text} />
                 </Pressable>
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={i18n.t("learnerStage.moveDown", "Move {{label}} down", { label: opt.label })}
+                  accessibilityState={{ disabled: disabled || i === order.length - 1 }}
                   onPress={() => moveDown(i)}
                   disabled={disabled || i === order.length - 1}
                   style={styles.orderBtn}
@@ -327,7 +334,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
     case "geometry": {
       return (
         <View>
-          <TextInput
+          <TextInput accessibilityLabel="Describe your approach (we'll check your work on the scratchpad)"
             value={text}
             onChangeText={setText}
             placeholder="Describe your approach (we'll check your work on the scratchpad)"
@@ -349,7 +356,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
       const meetsMin = !item.minWords || wordCount >= item.minWords;
       return (
         <View>
-          <TextInput
+          <TextInput accessibilityLabel="Write your response"
             value={text}
             onChangeText={setText}
             placeholder="Write your response"

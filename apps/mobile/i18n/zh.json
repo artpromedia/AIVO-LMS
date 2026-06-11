@@ -157,7 +157,8 @@
     "activeTutorsTrend": "活跃导师趋势",
     "sessionsTrend": "本周课程趋势",
     "masteryBySubject": "按科目掌握程度",
-    "reports": "报告"
+    "reports": "报告",
+    "districtLogo": "学区标志"
   },
   "parentSettings": {
     "title": "设置",
@@ -221,7 +222,8 @@
     "addonPrice": "+ ¥4.99/月",
     "cancelSubscription": "取消订阅",
     "cancelAtPeriodEnd": "周期结束时取消",
-    "addedToBill": "{{count}} 个附加项 · ¥{{price}}/月"
+    "addedToBill": "{{count}} 个附加项 · ¥{{price}}/月",
+    "openInvoice": "打开账单"
   },
   "parentTutors": {
     "title": "辅导老师商店",
@@ -665,7 +667,10 @@
         "homeLabel": "返回仪表盘",
         "intro": "准备好后开始。"
       }
-    }
+    },
+    "hideTutor": "隐藏辅导员",
+    "moveUp": "上移{{label}}",
+    "moveDown": "下移{{label}}"
   },
   "learnerTutor": {
     "tutorNotFound": "未找到辅导老师",
@@ -1089,6 +1094,35 @@
       "body": "暂停一下没关系。一个短暂的平静时刻能帮你重新准备好。",
       "accept": "去平静一下",
       "dismiss": "现在不用"
+    },
+    "notEnabled": "你的学校还没有开启「平静角」。请让大人联系学区确认。"
+  },
+  "errorBoundary": {
+    "title": "出了点问题",
+    "body": "别担心——什么都没有丢失。你可以重试，或回到主页。",
+    "tryAgain": "重试",
+    "goHome": "回到主页"
+  },
+  "configError": {
+    "title": "此版本配置有误",
+    "body": "应用无法连接 AIVO 服务。请从应用商店安装最新版本。如果你负责此部署，请设置后端地址后重新构建。"
+  },
+  "parentIep": {
+    "notificationPrefs": "通知偏好设置"
+  },
+  "offline": {
+    "synced": "已恢复联网。你的进度已保存。",
+    "banner": "已离线。继续学习——进度会保存在本设备上。",
+    "bannerQueued": "离线中——{{count}} 项更改将在联网后同步。",
+    "syncing": "正在同步 {{count}} 项更改…"
+  },
+  "parentLearnerNew": {
+    "birthDate": "出生日期（YYYY-MM-DD）",
+    "birthDateError": {
+      "format": "请使用 YYYY-MM-DD 格式，例如 2017-09-01。",
+      "invalid": "这不是有效的日期。",
+      "future": "出生日期不能是未来的日期。",
+      "tooOld": "学习者年龄须不超过 21 岁。"
     }
   }
 }

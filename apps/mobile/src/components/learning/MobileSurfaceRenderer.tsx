@@ -1058,6 +1058,7 @@ function MultiStepSurface({
             Step {i + 1}. {step.prompt}
           </Text>
           <TextInput
+            accessibilityLabel={`Step ${i + 1}: ${step.prompt}`}
             style={styles.textInput}
             editable={!disabled}
             value={entries[step.id] ?? ""}

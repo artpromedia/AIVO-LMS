@@ -387,7 +387,7 @@ export function AccountSettingsCard({
               </Text>
             )}
             {enableAvatarUpload && (
-              <Pressable onPress={handlePickAvatar} disabled={avatarBusy}>
+              <Pressable accessibilityRole="button" onPress={handlePickAvatar} disabled={avatarBusy}>
                 <Text style={styles.avatarLink}>
                   {avatarUrl ? t("accountSettings.avatarChange") : t("accountSettings.avatarAdd")}
                 </Text>
@@ -397,7 +397,7 @@ export function AccountSettingsCard({
         </View>
       </AivoCard>
 
-      <Pressable onPress={openAccountModal}>
+      <Pressable accessibilityRole="button" onPress={openAccountModal}>
         <AivoCard style={styles.row}>
           <Ionicons name="person-outline" size={22} color={colors.textSecondary} />
           <Text style={styles.rowLabel}>{t("accountSettings.accountDetails")}</Text>
@@ -405,7 +405,7 @@ export function AccountSettingsCard({
         </AivoCard>
       </Pressable>
 
-      <Pressable onPress={handleChangePassword}>
+      <Pressable accessibilityRole="button" onPress={handleChangePassword}>
         <AivoCard style={styles.row}>
           <Ionicons name="lock-closed-outline" size={22} color={colors.textSecondary} />
           <Text style={styles.rowLabel}>{t("accountSettings.changePassword")}</Text>
@@ -413,7 +413,7 @@ export function AccountSettingsCard({
         </AivoCard>
       </Pressable>
 
-      <Pressable onPress={openDeleteModal}>
+      <Pressable accessibilityRole="button" onPress={openDeleteModal}>
         <AivoCard style={styles.row}>
           <Ionicons name="trash-outline" size={22} color={colors.error} />
           <Text style={[styles.rowLabel, { color: colors.error }]}>
@@ -439,7 +439,7 @@ export function AccountSettingsCard({
         {mfaEnableToken ? (
           <View style={styles.mfaInputSection}>
             <Text style={styles.mfaDesc}>{t("accountSettings.enterCode")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("accountSettings.enterCode")}
               style={[
                 styles.mfaInput,
                 {
@@ -465,7 +465,7 @@ export function AccountSettingsCard({
                 size="sm"
                 style={{ flex: 1 }}
               />
-              <Pressable
+              <Pressable accessibilityRole="button"
                 style={styles.mfaCancelBtn}
                 onPress={() => {
                   setMfaEnableToken("");
@@ -478,7 +478,7 @@ export function AccountSettingsCard({
             </View>
           </View>
         ) : !showMfaInput ? (
-          <Pressable
+          <Pressable accessibilityRole="button"
             style={[styles.mfaToggleBtn, mfaEnabled && styles.mfaToggleBtnDanger]}
             onPress={() => setShowMfaInput(true)}
             disabled={mfaForced && mfaEnabled}
@@ -489,7 +489,7 @@ export function AccountSettingsCard({
           </Pressable>
         ) : (
           <View style={styles.mfaInputSection}>
-            <TextInput
+            <TextInput accessibilityLabel={t("accountSettings.enterPassword")}
               style={styles.mfaInput}
               value={mfaPassword}
               onChangeText={setMfaPassword}
@@ -509,7 +509,7 @@ export function AccountSettingsCard({
                 size="sm"
                 style={{ flex: 1 }}
               />
-              <Pressable
+              <Pressable accessibilityRole="button"
                 style={styles.mfaCancelBtn}
                 onPress={() => {
                   setShowMfaInput(false);
@@ -525,7 +525,7 @@ export function AccountSettingsCard({
 
       <MfaFactorsCard />
 
-      <Pressable style={styles.logoutBtn} onPress={handleLogout}>
+      <Pressable accessibilityRole="button" style={styles.logoutBtn} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={20} color={colors.error} />
         <Text style={styles.logoutText}>{t("common.logOut")}</Text>
       </Pressable>
@@ -542,7 +542,7 @@ export function AccountSettingsCard({
             <Text style={styles.modalTitle}>{t("accountSettings.accountDetails")}</Text>
 
             <Text style={styles.label}>{t("accountSettings.fullName")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("accountSettings.fullName")}
               style={styles.input}
               value={editName}
               onChangeText={setEditName}
@@ -552,7 +552,7 @@ export function AccountSettingsCard({
             />
 
             <Text style={styles.label}>{t("auth.email")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.emailPlaceholder")}
               style={styles.input}
               value={editEmail}
               onChangeText={setEditEmail}
@@ -564,7 +564,7 @@ export function AccountSettingsCard({
             />
 
             <View style={styles.modalActions}>
-              <Pressable
+              <Pressable accessibilityRole="button"
                 style={styles.modalCancel}
                 onPress={() => setAccountModalVisible(false)}
                 disabled={savingAccount}
@@ -595,7 +595,7 @@ export function AccountSettingsCard({
             <Text style={styles.modalBody}>{t("accountSettings.deleteWarning")}</Text>
 
             <Text style={styles.label}>{t("auth.password")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.passwordPlaceholder")}
               style={styles.input}
               value={deletePassword}
               onChangeText={setDeletePassword}
@@ -608,14 +608,14 @@ export function AccountSettingsCard({
             />
 
             <View style={styles.modalActions}>
-              <Pressable
+              <Pressable accessibilityRole="button"
                 style={styles.modalCancel}
                 onPress={() => setDeleteModalVisible(false)}
                 disabled={deleting}
               >
                 <Text style={styles.modalCancelText}>{t("common.cancel")}</Text>
               </Pressable>
-              <Pressable
+              <Pressable accessibilityRole="button"
                 style={[styles.dangerBtn, deleting && { opacity: 0.6 }]}
                 onPress={handleDeleteAccount}
                 disabled={deleting}

@@ -205,12 +205,14 @@ export default async function NewLearnerPage({
             </header>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="ageRange" optional>
-                  {t("age_range")}
-                </Label>
+                {/* Sprint A6 — the age range drives the COPPA consent
+                    regime (recordAgeGate); collection is now REQUIRED.
+                    Server stays fail-closed (missing ⇒ under-13). */}
+                <Label htmlFor="ageRange">{t("age_range")}</Label>
                 <select
                   id="ageRange"
                   name="ageRange"
+                  required
                   defaultValue=""
                   className="h-11 w-full rounded-iw-control border border-iw-border bg-iw-raised px-3 text-sm text-iw-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
                 >

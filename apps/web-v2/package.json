@@ -13,7 +13,7 @@
     "db:up": "docker compose -f ../../docker-compose.web-v2-db.yml up -d --wait",
     "db:migrate": "pnpm --filter @aivo/db run db:migrate",
     "db:seed:postgres": "tsx scripts/seed-postgres.ts",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:persistence": "vitest run lib/db/persistence",
     "test:watch": "vitest",
     "e2e": "playwright test",
@@ -32,6 +32,7 @@
     "@aivo/learner-import": "workspace:*",
     "@aivo/learner-surfaces": "workspace:*",
     "@aivo/nav": "workspace:*",
+    "@aivo/observability": "workspace:*",
     "@aivo/scoring": "workspace:*",
     "@aivo/security": "workspace:*",
     "@aivo/skill-graphs": "workspace:*",
@@ -49,6 +50,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-toast": "^1.2.4",
+    "@sentry/nextjs": "^10.57.0",
     "@tanstack/react-query": "^5.62.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -67,6 +69,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.9",
     "@playwright/test": "^1.49.1",
     "@tailwindcss/postcss": "^4.1.8",
     "@testcontainers/postgresql": "^10.13.0",
@@ -74,15 +77,18 @@
     "@testing-library/react": "^16.1.0",
     "@types/katex": "^0.16.7",
     "@types/node": "^22.10.2",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.3.4",
     "axe-playwright": "^2.1.0",
     "jsdom": "^25.0.1",
+    "pngjs": "^7.0.0",
     "postcss": "^8.5.9",
     "tailwindcss": "^4.1.8",
     "testcontainers": "^10.13.0",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.8"
+    "vite": "^7.3.5",
+    "vitest": "^4.1.8"
   }
 }

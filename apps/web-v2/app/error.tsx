@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -29,6 +30,9 @@ export default function ErrorPage({
 
   useEffect(() => {
     console.error("[app/error]", error);
+    // Report before any auto-recovery: a crash a child silently recovers
+    // from must still be visible to the team (Sprint A2).
+    Sentry.captureException(error);
 
     if (typeof window === "undefined") return;
     if (!isStaleServerActionError(error)) return;

@@ -30,10 +30,14 @@ import { sessionClient, SessionUnavailableError } from "@/src/api/sessionClient"
 import { stageClient } from "@/src/api/stageClient";
 import { problemSessionClient } from "@/src/api/problemSessionClient";
 import type { Beat, Session } from "@/src/types/stage";
+import { enqueue, flushQueue, makeItem } from "@/lib/offline-queue";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
-// ── Offline outbox ──────────────────────────────────────────────────────────
-// Session-end payloads are queued in AsyncStorage when offline and flushed
-// when the app regains connectivity.
+// ── Offline outbox (Sprint A6: unified) ─────────────────────────────────────
+// Session-end payloads go through lib/offline-queue's "session" priority
+// lane — ONE durable queue with idempotency keys, authenticated replay,
+// and 7-day TTL. The legacy "@aivo/session_outbox" store is migrated by
+// the queue itself on first flush.
 
 interface SessionEndPayload {
   sessionId: string;
@@ -42,61 +46,25 @@ interface SessionEndPayload {
   queuedAt: number;
 }
 
-const OUTBOX_KEY = "@aivo/session_outbox";
-
-async function getAsyncStorage(): Promise<any> {
-  try {
-    return (await import("@react-native-async-storage/async-storage")).default;
-  } catch {
-    return null;
-  }
-}
-
 async function queueSessionEnd(payload: SessionEndPayload): Promise<void> {
-  const AsyncStorage = await getAsyncStorage();
-  if (!AsyncStorage) return;
-  try {
-    const raw = await AsyncStorage.getItem(OUTBOX_KEY);
-    const outbox: SessionEndPayload[] = raw ? JSON.parse(raw) : [];
-    outbox.push(payload);
-    await AsyncStorage.setItem(OUTBOX_KEY, JSON.stringify(outbox));
-  } catch {
-    /* best effort */
-  }
+  await enqueue(
+    makeItem(
+      "session.complete",
+      API.LEARNING,
+      `/api/learning/sessions/${payload.sessionId}/complete`,
+      "POST",
+      { masteryUpdates: payload.masteryUpdates, xpEarned: payload.xpEarned },
+      "session",
+    ),
+  );
 }
 
-async function flushOutbox(learningApiBase: string, authHeader: string): Promise<void> {
-  const AsyncStorage = await getAsyncStorage();
-  if (!AsyncStorage) return;
-  try {
-    const raw = await AsyncStorage.getItem(OUTBOX_KEY);
-    if (!raw) return;
-    const outbox: SessionEndPayload[] = JSON.parse(raw);
-    if (outbox.length === 0) return;
-    const remaining: SessionEndPayload[] = [];
-    for (const payload of outbox) {
-      try {
-        const res = await fetch(
-          `${learningApiBase}/api/learning/sessions/${payload.sessionId}/complete`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: authHeader },
-            body: JSON.stringify({
-              masteryUpdates: payload.masteryUpdates,
-              xpEarned: payload.xpEarned,
-            }),
-          },
-        );
-        if (!res.ok) remaining.push(payload);
-      } catch {
-        remaining.push(payload);
-      }
-    }
-    await AsyncStorage.setItem(OUTBOX_KEY, JSON.stringify(remaining));
-  } catch {
-    /* best effort */
-  }
-}
+// ── Crash snapshot ──────────────────────────────────────────────────────────
+// The stage error boundary lives OUTSIDE the stateful screen, so the screen
+// mirrors just enough progress here for onBeforeRecover to queue a
+// session-end payload if a render error ever fires mid-lesson. A child's
+// progress must survive a crash (Sprint A2).
+let crashSnapshot: SessionEndPayload | null = null;
 
 // ── Tier voice ──────────────────────────────────────────────────────────────
 
@@ -131,7 +99,7 @@ function buildVoice(tier: "EARLY" | "MIDDLE" | "HIGH", t: TFn) {
 
 // ── Screen ──────────────────────────────────────────────────────────────────
 
-export default function StageScreen() {
+function StageScreenInner() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
@@ -181,6 +149,7 @@ export default function StageScreen() {
   const [sessionComplete, setSessionComplete] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
 
+
   // Load the session from the server. No demo fallback.
   useEffect(() => {
     let cancelled = false;
@@ -209,18 +178,33 @@ export default function StageScreen() {
     };
   }, [sessionId, t]);
 
-  // Flush the offline outbox whenever the app comes to the foreground.
+  // Flush the unified offline queue whenever the app comes to the
+  // foreground — flushQueue replays authenticated (apiFetch) and migrates
+  // any legacy session outbox first (Sprint A6).
   useEffect(() => {
-    const authHeader = user ? `Bearer ${(user as any).accessToken ?? ""}` : "";
-    const learningBase = (API as any).LEARNING ?? "";
     const sub = AppState.addEventListener("change", (next) => {
-      if (next === "active") flushOutbox(learningBase, authHeader).catch(() => {});
+      if (next === "active") flushQueue().catch(() => {});
     });
-    flushOutbox(learningBase, authHeader).catch(() => {});
+    flushQueue().catch(() => {});
     return () => sub.remove();
-  }, [user]);
+  }, []);
 
   const total = session?.stagePlan.beats.length ?? 0;
+
+  // Mirror progress into the module-level crash snapshot (see header note).
+  useEffect(() => {
+    if (!sessionId || !session || sessionComplete) {
+      crashSnapshot = null;
+      return;
+    }
+    const score = total > 0 ? Math.round((correctCount / Math.max(total, 1)) * 100) : 0;
+    crashSnapshot = {
+      sessionId,
+      masteryUpdates: { [session.meta.subject || "lesson"]: score },
+      xpEarned,
+      queuedAt: Date.now(),
+    };
+  });
 
   // ── Beat handlers ─────────────────────────────────────────────────────────
 
@@ -690,4 +674,19 @@ function createStyles(bg: string) {
       flex: 1,
     },
   });
+}
+
+export default function StageScreen() {
+  return (
+    <ErrorBoundary
+      scope="stage"
+      onBeforeRecover={async () => {
+        const snapshot = crashSnapshot;
+        crashSnapshot = null;
+        if (snapshot) await queueSessionEnd(snapshot);
+      }}
+    >
+      <StageScreenInner />
+    </ErrorBoundary>
+  );
 }

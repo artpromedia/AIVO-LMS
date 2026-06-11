@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { safeNextPath } from "@/lib/safe-redirect";
+import { SsoHint } from "./sso-hint";
 import {
   extractRefreshToken,
   identityAdminLogin,
@@ -26,10 +28,15 @@ async function signInAction(formData: FormData): Promise<void> {
 
   const emailRaw = formData.get("email");
   const passwordRaw = formData.get("password");
+  // Deep-link return target set by the middleware auth redirect. Validated
+  // to a same-origin path BOTH here and at render (ZAP #65) — a hostile
+  // value can never reach a redirect() or an HTML attribute.
+  const next = safeNextPath(formData.get("next"), "");
+  const nextSuffix = next ? `&next=${encodeURIComponent(next)}` : "";
   const email = typeof emailRaw === "string" ? emailRaw.trim() : "";
   const password = typeof passwordRaw === "string" ? passwordRaw : "";
 
-  if (!email || !password) redirect("/login?error=missing_credentials");
+  if (!email || !password) redirect(`/login?error=missing_credentials${nextSuffix}`);
 
   const result = await identityAdminLogin(email, password);
   if (result.kind === "mfa") {
@@ -51,7 +58,7 @@ async function signInAction(formData: FormData): Promise<void> {
 
   if (result.kind === "error") {
     const code = result.status === 401 ? "invalid_credentials" : result.status === 403 ? "wrong_surface" : "login_failed";
-    redirect(`/login?error=${code}`);
+    redirect(`/login?error=${code}${nextSuffix}`);
   }
 
   const profile = toSessionProfile(result.user);
@@ -64,16 +71,17 @@ async function signInAction(formData: FormData): Promise<void> {
     profile,
   });
 
-  redirect(ROLE_HOME[profile.role]);
+  redirect(next || ROLE_HOME[profile.role]);
 }
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
   await requireAnonymous();
-  const { error } = await searchParams;
+  const { error, next: nextRaw } = await searchParams;
+  const next = safeNextPath(nextRaw, "");
   const errorMessage = error ? (ERROR_COPY[error] ?? ERROR_COPY.login_failed) : null;
 
   return (
@@ -100,6 +108,7 @@ export default async function LoginPage({
           </p>
 
           <form id="admin-login-form" action={signInAction} className="mt-8 space-y-4">
+            {next ? <input type="hidden" name="next" value={next} /> : null}
             <label className="block text-sm font-semibold">
               Email
               <input className="admin-input mt-2" name="email" type="email" autoComplete="email" required />
@@ -112,6 +121,7 @@ export default async function LoginPage({
               Continue
             </button>
           </form>
+          <SsoHint />
 
           {errorMessage ? (
             <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">

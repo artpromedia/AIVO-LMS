@@ -1,4 +1,5 @@
-/**
+
+import { INCLUSIVE_WARM_PALETTE, SEMANTIC } from "@aivo/brand";/**
  * Pure calculation helpers for the SVG-based mobile chart kit.
  *
  * All functions are brand-free (no React, no react-native, no theme
@@ -31,10 +32,10 @@ export interface SensoryPalette {
  * primitive.
  */
 export const DEFAULT_PALETTE: SensoryPalette = {
-  primary: "#7c3aed",
-  bgRaised: "#f8f9f8",
-  ink: "#090909",
-  inkMuted: "#6f7275",
+  primary: SEMANTIC.color.text.accent,
+  bgRaised: INCLUSIVE_WARM_PALETTE.bgRaised,
+  ink: INCLUSIVE_WARM_PALETTE.ink,
+  inkMuted: INCLUSIVE_WARM_PALETTE.inkMuted,
   border: "rgba(0,0,0,0.05)",
 };
 
@@ -53,11 +54,11 @@ export function toneColor(tone: ChartTone = "brand", palette: SensoryPalette = D
     case "brand":
       return palette.primary;
     case "success":
-      return "#22c55e";
+      return SEMANTIC.color.subject.pe;
     case "warning":
-      return "#f59e0b";
+      return INCLUSIVE_WARM_PALETTE.warning;
     case "danger":
-      return "#ef4444";
+      return INCLUSIVE_WARM_PALETTE.danger;
   }
 }
 
@@ -67,11 +68,11 @@ export function toneSoftColor(tone: ChartTone = "brand", palette: SensoryPalette
     case "brand":
       return palette.bgRaised;
     case "success":
-      return "#dcfce7";
+      return SEMANTIC.color.feedback.successSurface;
     case "warning":
-      return "#fef3c7";
+      return SEMANTIC.color.feedback.warningSurface;
     case "danger":
-      return "#fee2e2";
+      return SEMANTIC.color.feedback.dangerSurface;
   }
 }
 

@@ -1,0 +1,249 @@
+{
+  "comment": "Sprint B7 migration-debt register: every raw hex literal left in the shared UI packages, file by file. Counts can only go DOWN — the audit fails on any new file or increased count, and on decreases until this baseline is re-tightened with --update. Tier themes already consolidated into packages/brand/tokens/modes/tier-themes.json; files below are the remaining migration queue.",
+  "files": {
+    "packages/admin-ui/src/charts/tones.ts": {
+      "count": 7,
+      "note": "pending DTCG migration"
+    },
+    "packages/learner-ui/src/layout/PrimarySlot.tsx": {
+      "count": 1,
+      "note": "pending DTCG migration"
+    },
+    "packages/learner-ui/src/playful-calm/primitives.tsx": {
+      "count": 20,
+      "note": "pending DTCG migration"
+    },
+    "packages/mobile-ui/src/AivoButton.tsx": {
+      "count": 1,
+      "note": "pending DTCG migration"
+    },
+    "packages/mobile-ui/src/PlayfulPrimitives.tsx": {
+      "count": 2,
+      "note": "pending DTCG migration"
+    },
+    "packages/mobile-ui/src/shell/LockedScreenMobile.tsx": {
+      "count": 1,
+      "note": "pending DTCG migration"
+    },
+    "packages/mobile-ui/src/shell/RoleSwitcherSheet.tsx": {
+      "count": 2,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/BeatPreview.tsx": {
+      "count": 6,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/CelebrationOverlay.tsx": {
+      "count": 4,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/PlayfulPrimitives.tsx": {
+      "count": 4,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/ProgressPath.tsx": {
+      "count": 2,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/ResponseZone.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/StageContent.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/StageLayout.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/TutorCharacter.tsx": {
+      "count": 4,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/native/BeatPreview.native.tsx": {
+      "count": 5,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/native/CelebrationOverlay.native.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/native/ProgressPath.native.tsx": {
+      "count": 1,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/native/ResponseZone.native.tsx": {
+      "count": 1,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/native/StageContent.native.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/native/StageLayout.native.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/stage-ui/src/native/TutorCharacter.native.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/AssessmentFooter.tsx": {
+      "count": 6,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/AssessmentProgress.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/AssessmentShell.tsx": {
+      "count": 1,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/BaselinePendingCard.tsx": {
+      "count": 8,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/ExtractedSupportRow.tsx": {
+      "count": 12,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/PillCardGroup.tsx": {
+      "count": 11,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/QuestionCard.tsx": {
+      "count": 5,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/ScaleField.tsx": {
+      "count": 12,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/SoftTextField.tsx": {
+      "count": 5,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/SubmittedHero.tsx": {
+      "count": 8,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/UploadDropZone.tsx": {
+      "count": 12,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/assessment/UploadFileCard.tsx": {
+      "count": 17,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/auth/AuthInput.tsx": {
+      "count": 5,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/auth/AuthShell.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/auth/ConsentRow.tsx": {
+      "count": 4,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/auth/LegalCollapse.tsx": {
+      "count": 2,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/auth/ReassuranceCard.tsx": {
+      "count": 7,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/auth/StepperHeader.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/chart/AreaTrend.tsx": {
+      "count": 5,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/chart/Donut.tsx": {
+      "count": 6,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/hero/FloatingMetricCard.tsx": {
+      "count": 4,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/hero/LearningHero.tsx": {
+      "count": 18,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/hero/SetupProgressTrack.tsx": {
+      "count": 6,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/overlay/BottomSheet.tsx": {
+      "count": 2,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/overlay/ModalSheet.tsx": {
+      "count": 7,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/overlay/SidePanel.tsx": {
+      "count": 7,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/shell/AccessDeniedScreen.tsx": {
+      "count": 2,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/shell/AppShell.tsx": {
+      "count": 1,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/shell/CommandBar.tsx": {
+      "count": 4,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/shell/LockedScreen.tsx": {
+      "count": 2,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/shell/PageContainer.tsx": {
+      "count": 1,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/shell/RoleSwitcher.tsx": {
+      "count": 5,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/shell/Sidebar.tsx": {
+      "count": 2,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/states/EmptyState.tsx": {
+      "count": 14,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/states/Skeleton.tsx": {
+      "count": 3,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/surface/GlassCard.tsx": {
+      "count": 8,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/surface/HeroPanel.tsx": {
+      "count": 4,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/surface/InsightChip.tsx": {
+      "count": 32,
+      "note": "pending DTCG migration"
+    },
+    "packages/ui/src/surface/MetricCard.tsx": {
+      "count": 15,
+      "note": "pending DTCG migration"
+    }
+  }
+}

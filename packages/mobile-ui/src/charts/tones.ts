@@ -1,5 +1,6 @@
 import type { MasteryLevel } from "./helpers";
 
+import { INCLUSIVE_WARM_PALETTE, SEMANTIC } from "@aivo/brand";
 /**
  * Mastery tone palette for the mobile chart kit.
  *
@@ -19,10 +20,10 @@ export interface MasteryTone {
 }
 
 export const MASTERY_TONES: Record<MasteryLevel, MasteryTone> = {
-  emerging: { fill: "#ef4444", track: "#fee2e2", label: "Emerging" },
-  developing: { fill: "#f59e0b", track: "#fef3c7", label: "Developing" },
-  proficient: { fill: "#7c3aed", track: "#ede9fe", label: "Proficient" },
-  mastered: { fill: "#22c55e", track: "#dcfce7", label: "Mastered" },
+  emerging: { fill: INCLUSIVE_WARM_PALETTE.danger, track: SEMANTIC.color.feedback.dangerSurface, label: "Emerging" },
+  developing: { fill: INCLUSIVE_WARM_PALETTE.warning, track: SEMANTIC.color.feedback.warningSurface, label: "Developing" },
+  proficient: { fill: SEMANTIC.color.text.accent, track: SEMANTIC.color.interactive.primarySoft, label: "Proficient" },
+  mastered: { fill: SEMANTIC.color.subject.pe, track: SEMANTIC.color.feedback.successSurface, label: "Mastered" },
 };
 
 export const MASTERY_LEGEND: ReadonlyArray<{ level: MasteryLevel; label: string }> = [

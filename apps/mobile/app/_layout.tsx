@@ -12,6 +12,15 @@ import { FONT_ASSETS } from "@/constants/typography";
 import { SensoryModeProvider } from "@/context/SensoryModeProvider";
 import { PreferencesProvider } from "@/lib/preferences";
 import { SplashGate } from "@/components/SplashGate";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ConfigErrorScreen } from "@/components/ConfigErrorScreen";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { API_CONFIG_ERROR } from "@/constants/api";
+import { initSentry } from "@/lib/sentry";
+import { configureNotificationHandling } from "@/lib/notifications";
+
+// Crash reporting first — before any render can throw (Sprint A2).
+initSentry();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,6 +35,7 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
+
   // Inclusive-warm typography: Fredoka (display) + Nunito (body), both
   // bundled. See `constants/typography.ts` for the swap-point note.
   const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
@@ -45,6 +55,10 @@ export default function RootLayout() {
     void restoreSavedLocale();
   }, []);
 
+  // Foreground presentation + tap routing for push notifications, incl.
+  // the cold-start tap replay (Sprint A6).
+  useEffect(() => configureNotificationHandling(), []);
+
   // The sensory-mode provider is mounted inside the auth context
   // (as a child of AuthContext.Provider) so it can read learnerId
   // from the resolved auth state — learners get per-account backend
@@ -52,6 +66,13 @@ export default function RootLayout() {
   // `learnerId` is `null` until auth hydrates, which the provider
   // tolerates (local-only mode until an id arrives).
   const learnerId = authState.user?.role === "LEARNER" ? authState.user.id : null;
+
+  // A production build without an API origin is unusable — say so plainly
+  // instead of rendering an app where every request silently fails.
+  // (After all hooks: rules-of-hooks.)
+  if (API_CONFIG_ERROR) {
+    return <ConfigErrorScreen detail={API_CONFIG_ERROR} />;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -61,23 +82,26 @@ export default function RootLayout() {
             <SensoryModeProvider learnerId={learnerId}>
               <PreferencesProvider learnerId={learnerId}>
                 <SplashGate ready={ready}>
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                      contentStyle: { backgroundColor: colors.background },
-                    }}
-                  >
-                    <Stack.Screen name="index" />
-                    <Stack.Screen name="accept-invite" />
-                    <Stack.Screen name="settings/accessibility" />
-                    <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
-                    <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
-                    <Stack.Screen name="(parent)" />
-                    <Stack.Screen name="(learner)" />
-                    <Stack.Screen name="(teacher)" />
-                    <Stack.Screen name="(caregiver)" />
-                    <Stack.Screen name="(therapist)" />
-                  </Stack>
+                  <OfflineBanner />
+                  <ErrorBoundary scope="root">
+                    <Stack
+                      screenOptions={{
+                        headerShown: false,
+                        contentStyle: { backgroundColor: colors.background },
+                      }}
+                    >
+                      <Stack.Screen name="index" />
+                      <Stack.Screen name="accept-invite" />
+                      <Stack.Screen name="settings/accessibility" />
+                      <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
+                      <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
+                      <Stack.Screen name="(parent)" />
+                      <Stack.Screen name="(learner)" />
+                      <Stack.Screen name="(teacher)" />
+                      <Stack.Screen name="(caregiver)" />
+                      <Stack.Screen name="(therapist)" />
+                    </Stack>
+                  </ErrorBoundary>
                 </SplashGate>
               </PreferencesProvider>
             </SensoryModeProvider>

@@ -5,6 +5,7 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, Animated, StyleSheet } from "react-native";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface ProgressPathProps {
   current: number;
   total: number;
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
   },
   fill: {
     height: "100%",
-    backgroundColor: "#7c3aed",
+    backgroundColor: SEMANTIC.color.text.accent,
     borderRadius: 4,
   },
   label: {

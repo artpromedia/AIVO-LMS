@@ -93,8 +93,35 @@ for (const file of tutorFiles) {
   if (!/\bPRE_K:\s*"authored"/.test(source)) {
     errors.push(`${rel}: PRE_K coverage is not authored`);
   }
-  if (/:\s*"(?:scaffold|missing)"/.test(source)) {
-    errors.push(`${rel}: coverage matrix still contains scaffold or missing bands`);
+  if (/:\s*"missing"/.test(source)) {
+    errors.push(`${rel}: coverage matrix contains missing bands`);
+  }
+  // Scaffold bands are allowed ONLY with an explicit owner attestation marker
+  // (production-gap-gate:allow-scaffold(BAND) owner=… date=…) in the same
+  // file, because the runtime refuses scaffold bands in production unless the
+  // caller opts into preview mode. The runtime guard itself is asserted below
+  // so an attestation can never outlive the refusal it relies on.
+  const attestedBands = new Set(
+    [...source.matchAll(
+      /production-gap-gate:allow-scaffold\((\w+)\)\s+owner=\S+\s+date=\d{4}-\d{2}-\d{2}/g,
+    )].map((match) => match[1]),
+  );
+  for (const match of source.matchAll(/\b(\w+|"\d+"):\s*"scaffold"/g)) {
+    const band = match[1].replaceAll('"', "");
+    if (!attestedBands.has(band)) {
+      errors.push(
+        `${rel}: coverage matrix band ${band} is scaffold without an ` +
+          `allow-scaffold owner attestation`,
+      );
+    }
+  }
+  if (attestedBands.size > 0) {
+    requirePatterns("services/tutor-svc/src/lib/learnerContext.ts", [
+      ["scaffold preview opt-in guard", /AIVO_ALLOW_SCAFFOLD_CONTENT/],
+    ]);
+    requirePatterns("services/tutor-svc/tests/tutor-session-route.test.ts", [
+      ["scaffold refusal regression test", /scaffold/],
+    ]);
   }
   if (!/status:\s*"production"/.test(source)) {
     errors.push(`${rel}: authoring status is not production`);

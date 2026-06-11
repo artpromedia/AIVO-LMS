@@ -27,6 +27,8 @@ export type SessionProfile = {
   email: string;
   displayName: string;
   permissions: string[];
+  /** Sprint A8 — viewer's IANA timezone (user > auto > unset → UTC). */
+  timezone?: string | null;
   /** When role==="learner", the LearnerProfile.id this session owns. */
   learnerId?: string;
   /**

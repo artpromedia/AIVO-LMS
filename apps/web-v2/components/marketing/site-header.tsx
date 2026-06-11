@@ -26,7 +26,15 @@ import { Drawer, DrawerTrigger, DrawerContent } from "@/components/ui/drawer";
 const NAV_LINKS = [
   { label: "Platform", href: "/#roles" },
   { label: "Research", href: "/#roles" },
-  { label: "For Districts", href: "/admin/district" },
+  // External: the district console is its own deployment. A Next <Link> to
+  // /admin/district gets prefetched on every page and the middleware
+  // 404s/308s the RSC fetch (console errors + a browser-navigation
+  // fallback). Rendered as a plain <a> below via `external`.
+  {
+    label: "For Districts",
+    href: process.env.NEXT_PUBLIC_DISTRICT_APP_URL ?? "https://district.aivolearning.com",
+    external: true,
+  },
   { label: "Families", href: "/parent/home" },
 ];
 
@@ -61,11 +69,21 @@ export function SiteHeader() {
                 aria-label="Primary"
                 className="flex flex-col gap-1 text-base font-semibold text-iw-ink"
               >
-                {NAV_LINKS.map((link) => (
-                  <DrawerLink key={link.label} href={link.href}>
-                    {link.label}
-                  </DrawerLink>
-                ))}
+                {NAV_LINKS.map((link) =>
+                  link.external ? (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="rounded-lg px-3 py-2 hover:bg-iw-warm-soft"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <DrawerLink key={link.label} href={link.href}>
+                      {link.label}
+                    </DrawerLink>
+                  ),
+                )}
                 <div className="my-3 h-px bg-iw-border" />
                 <DrawerLink href="/login">Sign in</DrawerLink>
               </nav>
@@ -97,15 +115,25 @@ export function SiteHeader() {
             aria-label="Primary"
             className="hidden items-center gap-7 text-sm font-semibold text-iw-ink-muted md:flex"
           >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="transition-colors hover:text-iw-ink"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) =>
+              link.external ? (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="transition-colors hover:text-iw-ink"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="transition-colors hover:text-iw-ink"
+                >
+                  {link.label}
+                </Link>
+              ),
+            )}
           </nav>
         </div>
 

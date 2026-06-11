@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, RefreshControl } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet, RefreshControl, Image } from "react-native";
 import { router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
+import { useBranding } from "@/hooks/useBranding";
 import { useLearners } from "@/hooks/useLearners";
 import { useParentInbox } from "@/hooks/useParentInbox";
 import { useParentSummary } from "@/hooks/useParentSummary";
@@ -22,6 +23,7 @@ import { useResponsiveType } from "@/src/design/useResponsiveType";
 export default function ParentDashboard() {
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
+  const { branding } = useBranding();
   const {
     data: learners,
     isLoading: learnersLoading,
@@ -84,6 +86,15 @@ export default function ParentDashboard() {
       <View style={{ width: contentWidth }}>
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
+            {branding.logoUrl ? (
+              <Image
+                source={{ uri: branding.logoUrl }}
+                accessibilityLabel={branding.displayName ?? t("parent.districtLogo")}
+                style={styles.tenantLogo}
+                resizeMode="contain"
+                testID="tenant-logo"
+              />
+            ) : null}
             <Text
               style={[
                 styles.greeting,
@@ -417,6 +428,7 @@ function ChildMasteryBar({ learnerId, tint }: { learnerId: string; tint: string 
 }
 
 const styles = StyleSheet.create({
+  tenantLogo: { height: 36, width: 160, alignSelf: "flex-start", marginBottom: spacing.sm },
   container: { flex: 1 },
   header: {
     flexDirection: "row",

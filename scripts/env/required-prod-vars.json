@@ -1,6 +1,6 @@
 {
   "$schema": "./required-prod-vars.schema.json",
-  "comment": "Sprint 12.7 — vars that MUST be set in production. The production-readiness-check.mjs script consults this manifest. Add new groups when introducing services; keep placeholder patterns in sync with .env.example.",
+  "comment": "Sprint 12.7 \u2014 vars that MUST be set in production. The production-readiness-check.mjs script consults this manifest. Add new groups when introducing services; keep placeholder patterns in sync with .env.example.",
   "placeholderPatterns": [
     "change-me",
     "replace-me",
@@ -15,8 +15,16 @@
   ],
   "groups": {
     "core": {
-      "required": ["AUTH_SECRET", "COOKIE_SECRET", "DATABASE_URL", "APP_URL"],
-      "minLength": { "AUTH_SECRET": 32, "COOKIE_SECRET": 32 }
+      "required": [
+        "AUTH_SECRET",
+        "COOKIE_SECRET",
+        "DATABASE_URL",
+        "APP_URL"
+      ],
+      "minLength": {
+        "AUTH_SECRET": 32,
+        "COOKIE_SECRET": 32
+      }
     },
     "identity-svc": {
       "required": [
@@ -29,7 +37,9 @@
       ]
     },
     "comms-svc": {
-      "required": ["POSTMARK_WEBHOOK_SECRET"],
+      "required": [
+        "POSTMARK_WEBHOOK_SECRET"
+      ],
       "conditional": {
         "OONRUMAIL_API_KEY": "if email delivery enabled",
         "MAILGUN_WEBHOOK_SIGNING_KEY": "if mailgun provider enabled",
@@ -42,10 +52,17 @@
       }
     },
     "billing-svc": {
-      "required": ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
+      "required": [
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET"
+      ]
     },
     "integration-svc": {
-      "required": ["LTI_PRIVATE_KEY", "LTI_PUBLIC_KEY", "LTI_KID"]
+      "required": [
+        "LTI_PRIVATE_KEY",
+        "LTI_PUBLIC_KEY",
+        "LTI_KID"
+      ]
     },
     "ops-alerts": {
       "required": [
@@ -55,7 +72,9 @@
       ]
     },
     "secrets": {
-      "required": ["SECRETS_PROVIDER"],
+      "required": [
+        "SECRETS_PROVIDER"
+      ],
       "comment": "SECRETS_PROVIDER selects Vault | aws-secrets-manager | env. The first two require additional creds resolved at runtime by packages/security/src/secrets-client.ts."
     },
     "web-v2": {
@@ -70,12 +89,30 @@
         "REDIS_URL",
         "TTS_PROVIDER"
       ],
-      "minLength": { "SESSION_SECRET": 32, "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": 32 },
+      "minLength": {
+        "SESSION_SECRET": 32,
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": 32
+      },
       "values": {
-        "AUTH_MODE": { "notOneOf": ["mock"] },
-        "AI_PROVIDER": { "notOneOf": ["mock"] },
-        "AIVO_PERSISTENCE": { "equals": "postgres" },
-        "TTS_PROVIDER": { "oneOf": ["openai", "production"] }
+        "AUTH_MODE": {
+          "notOneOf": [
+            "mock"
+          ]
+        },
+        "AI_PROVIDER": {
+          "notOneOf": [
+            "mock"
+          ]
+        },
+        "AIVO_PERSISTENCE": {
+          "equals": "postgres"
+        },
+        "TTS_PROVIDER": {
+          "oneOf": [
+            "openai",
+            "production"
+          ]
+        }
       },
       "conditional": {
         "ANTHROPIC_API_KEY": "required when AI_PROVIDER=anthropic (lib/ai/anthropic-tutor.ts)",
@@ -85,10 +122,22 @@
     },
     "speech-eval-svc": {
       "comment": "Speech evaluation must use a configured live ASR provider in production.",
-      "required": ["SPEECH_EVAL_MODE", "ASR_PROVIDER"],
+      "required": [
+        "SPEECH_EVAL_MODE",
+        "ASR_PROVIDER"
+      ],
       "values": {
-        "SPEECH_EVAL_MODE": { "equals": "live" },
-        "ASR_PROVIDER": { "oneOf": ["openai", "openai-whisper", "azure", "azure-speech"] }
+        "SPEECH_EVAL_MODE": {
+          "equals": "live"
+        },
+        "ASR_PROVIDER": {
+          "oneOf": [
+            "openai",
+            "openai-whisper",
+            "azure",
+            "azure-speech"
+          ]
+        }
       },
       "conditional": {
         "OPENAI_API_KEY": "required when ASR_PROVIDER=openai or openai-whisper",
@@ -106,16 +155,37 @@
         "SPEECH_BUDDY_TRANSCRIPT_DIR",
         "OPENAI_API_KEY"
       ],
-      "minLength": { "SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY": 32 },
+      "minLength": {
+        "SPEECH_BUDDY_TRANSCRIPT_MASTER_KEY": 32
+      },
       "values": {
-        "SPEECH_BUDDY_STT_PROVIDER": { "equals": "whisper" },
-        "SPEECH_BUDDY_TTS_PROVIDER": { "equals": "openai" },
-        "SPEECH_BUDDY_JUDGE_PROVIDER": { "oneOf": ["llm", "moderation", "gateway"] }
+        "SPEECH_BUDDY_STT_PROVIDER": {
+          "equals": "whisper"
+        },
+        "SPEECH_BUDDY_TTS_PROVIDER": {
+          "equals": "openai"
+        },
+        "SPEECH_BUDDY_JUDGE_PROVIDER": {
+          "oneOf": [
+            "llm",
+            "moderation",
+            "gateway"
+          ]
+        }
       }
     },
     "soc2-evidence": {
       "comment": "SOC 2 evidence bundles must be retained in an S3 Object Lock bucket.",
-      "required": ["EVIDENCE_S3_BUCKET", "EVIDENCE_S3_REGION"]
+      "required": [
+        "EVIDENCE_S3_BUCKET",
+        "EVIDENCE_S3_REGION"
+      ]
+    },
+    "observability": {
+      "required": [
+        "NEXT_PUBLIC_SENTRY_DSN"
+      ],
+      "comment": "Sprint A2 \u2014 client-side error tracking is a launch requirement. The DSN powers Sentry on web-v2/web-admin (browser+server) and is mirrored to mobile via EXPO_PUBLIC_SENTRY_DSN at EAS build time."
     }
   }
 }

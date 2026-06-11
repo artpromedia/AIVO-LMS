@@ -16,10 +16,16 @@ export async function goToFixtureSurface(page: Page, surfaceType: string, surfac
     waitUntil: "domcontentloaded",
   });
   const surface = page.getByLabel(surfaceLabel);
-  for (let index = 0; index < 7; index += 1) {
+  const next = page.getByRole("button", { name: "Next" });
+  // Dev-server first visits compile on demand and hydrate late — gate on
+  // the player being interactive before advancing, and after each click
+  // wait for EITHER the target surface or the next beat's button instead
+  // of a fixed sleep (the fixed 120ms made these specs order-dependent).
+  await expect(next.or(surface).first()).toBeVisible({ timeout: 30_000 });
+  for (let index = 0; index < 10; index += 1) {
     if (await surface.isVisible()) break;
-    await page.getByRole("button", { name: "Next" }).click();
-    await page.waitForTimeout(120);
+    await next.click();
+    await expect(surface.or(next).first()).toBeVisible({ timeout: 5_000 });
   }
   await expect(surface).toBeVisible();
 }

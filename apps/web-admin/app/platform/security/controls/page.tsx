@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type SecurityControlStatus,
   type SecurityCriterion,
@@ -13,10 +12,7 @@ import {
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Control action failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
   "use server";
@@ -32,7 +28,7 @@ async function createAction(formData: FormData) {
   try {
     await createSecurityControl(session, { code, title, criterion, status, owner });
   } catch (error) {
-    redirect(`/platform/security/controls?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/controls?error=${encodeURIComponent(actionError(error, "Control action failed."))}`);
   }
   redirect(`/platform/security/controls?notice=${encodeURIComponent(`Control ${code} added.`)}`);
 }
@@ -48,7 +44,7 @@ async function statusAction(formData: FormData) {
   try {
     await updateSecurityControl(session, id, { status });
   } catch (error) {
-    redirect(`/platform/security/controls?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/controls?error=${encodeURIComponent(actionError(error, "Control action failed."))}`);
   }
   redirect("/platform/security/controls?notice=Status%20updated.");
 }

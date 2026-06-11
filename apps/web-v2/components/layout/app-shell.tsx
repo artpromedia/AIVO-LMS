@@ -12,6 +12,8 @@ import { Drawer, DrawerTrigger, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { getImpersonationState } from "@/lib/impersonation/state";
 import { ImpersonationBanner } from "@/components/admin/impersonation/ImpersonationBanner";
+import { getTenantBranding, brandingCssVars } from "@/lib/branding";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Map a session role to the visual theme it should render under.
@@ -66,11 +68,16 @@ function SidebarBody({
   ariaLabel,
   user,
   isDarkSidebar,
+  supportHref,
+  supportLabel,
 }: {
   readonly navItems: RoleNavItem[];
   readonly ariaLabel: string;
   readonly user: { displayName: string; email: string };
   readonly isDarkSidebar: boolean;
+  /** Tenant support destination (Sprint B6) — AIVO default when unbranded. */
+  readonly supportHref: string;
+  readonly supportLabel: string;
 }) {
   return (
     <>
@@ -95,6 +102,16 @@ function SidebarBody({
           </div>
         </div>
         <div className="mt-1 flex flex-col gap-1">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-8 justify-start px-2 text-xs font-medium"
+          >
+            <a href={supportHref} target="_blank" rel="noopener noreferrer" data-testid="shell-support-link">
+              {supportLabel}
+            </a>
+          </Button>
           <Button
             asChild
             variant="ghost"
@@ -191,12 +208,25 @@ export async function AppShell({
   // amber accent + diagonal watermark. No impersonation → identical to today.
   const impersonation = await getImpersonationState();
 
+  // Sprint B6 — tenant white-label. Learner surfaces keep their clinical
+  // sensory palettes (never overridden; see docs/design/white-label.md);
+  // every other role gets the tenant accent vars + header logo.
+  const tCommon = await getTranslations("common");
+  const branding = theme === "learner" ? null : await getTenantBranding();
+  const brandVars = branding ? brandingCssVars(branding) : {};
+  const supportHref =
+    branding?.supportUrl ??
+    (branding?.supportEmail ? `mailto:${branding.supportEmail}` : "https://aivolearning.com/support");
+  const supportLabel = tCommon("get_support");
+
   return (
     <div
       data-role-theme={theme}
       data-role={role}
+      data-branded={branding ? "true" : undefined}
       data-impersonating={impersonation ? "true" : undefined}
       className="min-h-screen bg-iw-bg text-iw-ink"
+      style={brandVars as React.CSSProperties}
     >
       <a href="#main" className="skip-link">
         Skip to main content
@@ -240,6 +270,8 @@ export async function AppShell({
                   ariaLabel={navAriaLabel}
                   user={user}
                   isDarkSidebar={isDarkSidebar}
+                  supportHref={supportHref}
+                  supportLabel={supportLabel}
                 />
               </DrawerContent>
             </Drawer>
@@ -247,17 +279,28 @@ export async function AppShell({
 
           <Link
             href="/"
-            aria-label="AIVO Learning home"
+            aria-label={branding?.displayName ? `${branding.displayName} home` : "AIVO Learning home"}
             className="inline-flex items-center rounded-full px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
           >
-            <Image
-              src="/images/aivo-logo-purple.png"
-              alt="AIVO Learning"
-              width={160}
-              height={48}
-              priority
-              className="h-9 w-auto"
-            />
+            {branding?.logoUrl ? (
+              /* Tenant logos are validated data URLs (PNG/SVG ≤200KB) served
+                 from our own DB — next/image cannot optimize data URLs. */
+              <img
+                src={branding.logoUrl}
+                alt={branding.displayName || "District"}
+                data-testid="tenant-logo"
+                className="h-9 w-auto"
+              />
+            ) : (
+              <Image
+                src="/images/aivo-logo-purple.png"
+                alt="AIVO Learning"
+                width={160}
+                height={48}
+                priority
+                className="h-9 w-auto"
+              />
+            )}
           </Link>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
@@ -300,6 +343,8 @@ export async function AppShell({
               ariaLabel={navAriaLabel}
               user={user}
               isDarkSidebar={isDarkSidebar}
+              supportHref={supportHref}
+              supportLabel={supportLabel}
             />
           </aside>
         )}

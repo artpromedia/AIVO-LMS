@@ -165,6 +165,7 @@ export function readMockBaseSessionFromRequest(req: Request): SessionProfile | n
  * `lib/auth/session.ts`; these remain for legacy importers and unit tests.
  */
 export async function readMockSessionFromCookies(): Promise<SessionProfile | null> {
+  if (!mockAuthAllowed()) return null;
   const base = await readMockBaseSession();
   if (!base) return null;
   const jar = await cookies();
@@ -175,6 +176,7 @@ export async function readMockSessionFromCookies(): Promise<SessionProfile | nul
 }
 
 export function getMockSession(req: Request): SessionProfile | null {
+  if (!mockAuthAllowed()) return null;
   const base = readMockBaseSessionFromRequest(req);
   if (!base) return null;
   const header = req.headers.get("cookie") ?? "";

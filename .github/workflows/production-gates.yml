@@ -98,6 +98,16 @@ jobs:
 
       - name: accessibility:audit
         run: pnpm accessibility:audit
+      - name: observability:audit
+        run: pnpm observability:audit
+      - name: mobile:a11y-ratchet
+        run: pnpm mobile:a11y-ratchet
+      - name: feature-flag:audit
+        run: pnpm feature-flag:audit
+      - name: audit-trail:audit
+        run: pnpm audit-trail:audit
+      - name: design-token:audit
+        run: pnpm design-token:audit
 
       - name: prod:no-demo scan
         run: pnpm prod:no-demo

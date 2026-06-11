@@ -375,7 +375,7 @@ export default function BrainCloneInteractive({
       )}
 
       {isCard && onOpenFull && (
-        <Pressable onPress={onOpenFull} style={styles.openFullBtn}>
+        <Pressable accessibilityRole="button" onPress={onOpenFull} style={styles.openFullBtn}>
           <Ionicons name="bulb-outline" size={14} color={colors.primary} />
           <Text style={styles.openFullText}>View full brain</Text>
         </Pressable>

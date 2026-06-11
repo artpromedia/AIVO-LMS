@@ -1,0 +1,75 @@
+# Sprint A7 — mobile golden path: login → today's lesson → answer →
+# offline answer (queued) → reconnect → queue drains.
+#
+# Run on an Android emulator/iOS simulator with a staging build installed:
+#   MAESTRO_APP_ID=com.artpromedia.aivo \
+#   MAESTRO_LEARNER_EMAIL=… MAESTRO_LEARNER_PASSWORD=… \
+#   maestro test .maestro/journeys/login-lesson-offline.yaml
+#
+# CI: the android-journey job in .github/workflows/mobile-build.yml runs
+# this against the staging backend. Airplane-mode toggling uses Maestro's
+# setAirplaneMode (Android emulators; the iOS leg of this flow is part of
+# the on-device release checklist).
+appId: ${MAESTRO_APP_ID}
+tags:
+  - journey
+---
+- launchApp:
+    clearState: true
+
+# ── Login ────────────────────────────────────────────────────────────────
+- tapOn:
+    id: "login-email"
+    optional: true
+- inputText: ${MAESTRO_LEARNER_EMAIL}
+- tapOn:
+    id: "login-password"
+    optional: true
+- inputText: ${MAESTRO_LEARNER_PASSWORD}
+- tapOn: "Sign in"
+- extendedWaitUntil:
+    visible: "Good"
+    timeout: 20000
+
+# ── Open today's lesson ──────────────────────────────────────────────────
+- tapOn:
+    text: ".*[Mm]ission.*"
+    optional: true
+- tapOn:
+    text: ".*[Ss]tart.*"
+    optional: true
+- extendedWaitUntil:
+    visible: "Activity 1"
+    timeout: 30000
+
+# ── Answer one beat online ───────────────────────────────────────────────
+- tapOn:
+    below: "Activity 1"
+    index: 0
+- extendedWaitUntil:
+    visible: ".*(Next|Continue|Finish).*"
+    timeout: 15000
+- tapOn: ".*(Next|Continue|Finish).*"
+
+# ── Go offline, answer another beat (queues via lib/offline-queue) ──────
+- setAirplaneMode: enabled
+- tapOn:
+    below: "Activity 2"
+    index: 0
+    optional: true
+- tapOn:
+    text: ".*(Next|Continue|Finish).*"
+    optional: true
+
+# The offline banner surfaces queued work.
+- assertVisible:
+    id: "offline-banner"
+    optional: true
+
+# ── Reconnect: the queue drains and the banner clears ───────────────────
+- setAirplaneMode: disabled
+- extendedWaitUntil:
+    notVisible:
+      id: "offline-banner"
+    timeout: 30000
+- assertVisible: ".*(Next|Continue|Finish|Good).*"

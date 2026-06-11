@@ -4,7 +4,8 @@
     "sign_out": "サインアウト",
     "get_started": "はじめる",
     "loading": "読み込み中...",
-    "language": "言語"
+    "language": "言語",
+    "get_support": "サポートを受ける"
   },
   "nav": {
     "platform": "プラットフォーム",
@@ -480,7 +481,9 @@
     },
     "settings_account_form": {
       "display_name": "表示名",
-      "saved": "保存しました。"
+      "saved": "保存しました。",
+      "timezone": "タイムゾーン",
+      "timezone_hint": "スケジュール、レポート、リマインダーはこのタイムゾーンで表示されます。"
     },
     "settings": {
       "eyebrow": "設定",
@@ -1334,7 +1337,9 @@
       "notices": {
         "password_reset": "パスワードがリセットされました。新しいパスワードでサインインしてください。",
         "logged_out": "サインアウトしました。"
-      }
+      },
+      "continue_with_sso": "{idp} で続行",
+      "sso_required_note": "あなたの学区は {idp} でサインインします。このドメインではパスワードログインが無効です。"
     },
     "signup": {
       "promo_eyebrow": "ご家族向けトライアルを始める",

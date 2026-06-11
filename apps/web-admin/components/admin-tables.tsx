@@ -1,5 +1,4 @@
 import type {
-  AdminAuditEntry,
   AdminBillingAccount,
   AdminLearnerSummary,
   AdminTenantSummary,
@@ -22,44 +21,6 @@ function EmptyRow({ colSpan, label }: { colSpan: number; label: string }) {
         {label}
       </td>
     </tr>
-  );
-}
-
-export function AuditLogTable({ entries }: { entries: AdminAuditEntry[] }) {
-  return (
-    <AdminCard className="mt-6 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>When</th>
-              <th>Action</th>
-              <th>Actor</th>
-              <th>Resource</th>
-              <th>Tenant</th>
-            </tr>
-          </thead>
-          <tbody>
-            {entries.map((entry) => (
-              <tr key={entry.id}>
-                <td className="text-sm">{formatDateTime(entry.createdAt)}</td>
-                <td className="font-bold">{entry.action}</td>
-                <td>
-                  <span className="block">{entry.actorEmail || entry.actorId || "—"}</span>
-                  <span className="text-sm font-normal text-slate-500">{entry.actorRoleLabel}</span>
-                </td>
-                <td className="text-sm">
-                  {entry.resourceType}
-                  {entry.resourceId ? <span className="text-slate-500"> · {entry.resourceId}</span> : null}
-                </td>
-                <td className="text-sm">{entry.tenantId ?? "—"}</td>
-              </tr>
-            ))}
-            {entries.length === 0 ? <EmptyRow colSpan={5} label="No audit activity recorded yet." /> : null}
-          </tbody>
-        </table>
-      </div>
-    </AdminCard>
   );
 }
 

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { clsx } from "clsx";
 
+import { BRAND, INCLUSIVE_WARM_PALETTE, SEMANTIC } from "@aivo/brand";
 /**
  * LearningHero
  *
@@ -132,7 +133,7 @@ function Notebook({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="aivo-hero-nb" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="0%" stopColor={SEMANTIC.color.surface.card} />
           <stop offset="100%" stopColor="#e2e8f0" />
         </linearGradient>
       </defs>
@@ -151,9 +152,9 @@ function Notebook({ className }: { className?: string }) {
       <line x1="22" y1="78" x2="78" y2="78" stroke="#cbd5e1" strokeWidth="2" />
       {/* pencil */}
       <g transform="translate(72 4) rotate(35)">
-        <rect x="0" y="0" width="6" height="50" fill="#fbbf24" />
+        <rect x="0" y="0" width="6" height="50" fill={BRAND.colors.accent} />
         <polygon points="0,50 6,50 3,58" fill="#1f2937" />
-        <rect x="0" y="-6" width="6" height="6" fill="#ef4444" />
+        <rect x="0" y="-6" width="6" height="6" fill={INCLUSIVE_WARM_PALETTE.danger} />
       </g>
     </svg>
   );
@@ -182,17 +183,17 @@ function BrainOrb({ className }: { className?: string }) {
         <defs>
           <radialGradient id="aivo-hero-orb" cx="35%" cy="30%">
             <stop offset="0%" stopColor="#f5d0fe" />
-            <stop offset="55%" stopColor="#a855f7" />
+            <stop offset="55%" stopColor={SEMANTIC.color.subject.art} />
             <stop offset="100%" stopColor="#4c1d95" />
           </radialGradient>
           <radialGradient id="aivo-hero-orb-hl" cx="30%" cy="25%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.85" />
-            <stop offset="60%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="0%" stopColor={SEMANTIC.color.surface.card} stopOpacity="0.85" />
+            <stop offset="60%" stopColor={SEMANTIC.color.surface.card} stopOpacity="0" />
           </radialGradient>
         </defs>
         <circle cx="100" cy="100" r="92" fill="url(#aivo-hero-orb)" />
         {/* brain folds */}
-        <g stroke="#ffffff" strokeOpacity="0.5" strokeWidth="2" fill="none">
+        <g stroke={SEMANTIC.color.surface.card} strokeOpacity="0.5" strokeWidth="2" fill="none">
           <path d="M40 100 Q70 60 100 80 T160 100" />
           <path d="M40 120 Q70 80 100 100 T160 120" />
           <path d="M50 140 Q80 110 110 130 T160 140" />

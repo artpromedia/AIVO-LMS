@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   approveDsar,
   fulfillDsar,
@@ -9,14 +8,12 @@ import {
   rejectDsar,
   verifyDsarIdentity,
 } from "@aivo/admin-api/dsar";
+import { recordAdminReadEvents } from "@aivo/admin-api/audit";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { actionError } from "@/lib/action-errors";
 
 const DSAR_ROLES = ["platform_admin", "district_admin"] as const;
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "DSAR action failed.";
-}
 
 async function runAction(
   id: string,
@@ -27,7 +24,7 @@ async function runAction(
   try {
     await fn(session);
   } catch (error) {
-    redirect(`/platform/compliance/dsar/${id}?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/compliance/dsar/${id}?error=${encodeURIComponent(actionError(error, "DSAR action failed."))}`);
   }
   redirect(`/platform/compliance/dsar/${id}?notice=${encodeURIComponent(notice)}`);
 }
@@ -69,6 +66,16 @@ export default async function DsarDetailPage({
   const { id } = await params;
   const query = await searchParams;
   const { request, timeline } = await getDsarRequest(session, id);
+
+  // Sprint B4 — a DSAR file is data-subject PII; viewing it is audited.
+  await recordAdminReadEvents(session, [
+    {
+      action: "admin.dsar.viewed",
+      resourceType: "dsar_request",
+      resourceId: request.id,
+      tenantId: request.tenantId,
+    },
+  ]);
 
   return (
     <AdminPageFrame

@@ -71,7 +71,7 @@ export default function TutorSessionScreen() {
   if (!tutor || !tutorKey) {
     return (
       <View style={[styles.container, { paddingTop: insets.top + 16, paddingHorizontal: hPad }]}>
-        <Pressable onPress={() => router.back()} accessibilityRole="button">
+        <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel={t("common.back", "Back")}>
           <Ionicons name="arrow-back" size={24} color="#FFF" />
         </Pressable>
         <Text style={styles.title}>{t("learnerTutor.tutorNotFound", "Tutor not found")}</Text>

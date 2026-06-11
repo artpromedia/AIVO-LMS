@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
-import { Inter, Atkinson_Hyperlegible } from "next/font/google";
+import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { PlayfulCalmProvider } from "@/components/system/playful-calm-provider";
 import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
 import { PwaRegister } from "@/components/system/pwa-register";
+import { WebVitalsReporter } from "@/components/observability/web-vitals-reporter";
+import { TzSync } from "@/components/observability/tz-sync";
+import { getSession } from "@/lib/auth/session";
+import { resolveTimeZone } from "@/lib/i18n/timezone";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
 import { dirForLocale } from "@/lib/i18n/config";
 
 // AIVO design language typography.
-//   - Body: Inter (via next/font/google, self-hosted).
+//   - Body: Inter (next/font/local, vendored in public/fonts).
 //   - Display: Satoshi Variable (loaded via Fontshare in <head> below).
 //     Satoshi is NOT on Google Fonts, so it must come from Fontshare;
 //     without it, every headline silently falls back to Inter and the
@@ -22,25 +26,32 @@ import { dirForLocale } from "@/lib/i18n/config";
 //     `[data-dyslexia-font="on"]` on <html>.
 // All faces resolve through Tailwind's `font-iw-display` / `font-iw-body`
 // / `font-iw-dyslexia` utilities (see @aivo/brand preset).
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+// Fonts are SELF-HOSTED (public/fonts, OFL-licensed) via next/font/local.
+// next/font/google downloads from fonts.googleapis.com at build/dev time,
+// which made every build network-dependent and visual baselines
+// font-nondeterministic whenever that fetch flaked. The Inter variable
+// file covers the full 100–900 weight range in one 48KB woff2.
+const inter = localFont({
+  src: "../public/fonts/Inter-Variable-latin.woff2",
+  weight: "100 900",
   variable: "--font-aivo-body",
   display: "swap",
 });
 
 // Display fallback. The CSS stack lists "Satoshi Variable" first, so this
 // Inter instance only renders if Satoshi fails to load.
-const interDisplay = Inter({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800", "900"],
+const interDisplay = localFont({
+  src: "../public/fonts/Inter-Variable-latin.woff2",
+  weight: "100 900",
   variable: "--font-aivo-display",
   display: "swap",
 });
 
-const atkinson = Atkinson_Hyperlegible({
-  subsets: ["latin"],
-  weight: ["400", "700"],
+const atkinson = localFont({
+  src: [
+    { path: "../public/fonts/AtkinsonHyperlegible-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../public/fonts/AtkinsonHyperlegible-Bold.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-aivo-dyslexia",
   display: "swap",
 });
@@ -72,6 +83,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+  const viewerTimeZone = resolveTimeZone(session?.timezone);
   // SSR the user's sensory mode onto <html> so the very first paint already
   // shows the right palette (no FOUC when calm / high-contrast users load
   // any signed-in page). The client provider keeps this in sync going
@@ -93,18 +106,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       data-brand="inclusive-warm"
     >
       <head>
-        {/* Satoshi Variable from Fontshare — the AIVO display face.
-            Defined as the first family in `--aivo-typography-fontFamily-display`
-            and in the `[data-role-theme="learner"]` font stack. Falls through to
-            Inter (loaded above via next/font) while Satoshi streams. Mirrors
-            the marketing app's setup so both surfaces render the same
-            headline aesthetic. */}
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="" />
-        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
+        {/* Satoshi — the AIVO display face, self-hosted (Sprint A3) so the
+            app serves no third-party style/font origin and CSP stays
+            'self'-only. Weights 300–900 live in public/fonts (ITF license,
+            see SATOSHI-LICENSE.txt). Falls through to Inter (next/font)
+            while Satoshi streams. */}
         <link
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800,900&display=swap"
+          rel="preload"
+          href="/fonts/satoshi-700.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
         />
+        <link rel="stylesheet" href="/fonts/satoshi.css" />
       </head>
       <body
         data-age-mode="spark"
@@ -113,11 +127,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#main" className="skip-link">
           {t("skip_to_main")}
         </a>
-        <NextIntlClientProvider locale={locale} messages={messages} timeZone="America/New_York">
+        <NextIntlClientProvider locale={locale} messages={messages} timeZone={viewerTimeZone}>
           <SensoryModeProvider initialMode={sensoryMode}>
             <PlayfulCalmProvider>{children}</PlayfulCalmProvider>
           </SensoryModeProvider>
           <PwaRegister />
+          <WebVitalsReporter />
+          <TzSync sessionTimeZone={session?.timezone ?? null} />
         </NextIntlClientProvider>
       </body>
     </html>

@@ -190,7 +190,7 @@ export default function ShopScreen() {
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll}>
         {categoryKeys.map((key, idx) => (
-          <Pressable
+          <Pressable accessibilityRole="button"
             key={key}
             style={[styles.catBtn, selectedCat === categoryOriginals[idx] && styles.catBtnActive]}
             onPress={() => setSelectedCat(categoryOriginals[idx])}

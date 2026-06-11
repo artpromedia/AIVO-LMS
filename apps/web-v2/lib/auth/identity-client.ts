@@ -52,6 +52,8 @@ export type IdentityUser = {
   name: string | null;
   role: string; // wire format (uppercase)
   tenantId: string;
+  /** Sprint A8 — set by /api/users/me + the timezone PATCH. */
+  timezone?: string | null;
 };
 
 export type IdentityLoginSuccess = {
@@ -555,6 +557,7 @@ export function toSessionProfile(user: IdentityUser): SessionProfile | null {
     displayName: user.name ?? user.email,
     permissions,
     capabilities: permissions,
+    timezone: user.timezone ?? null,
   };
 }
 
@@ -1020,5 +1023,33 @@ export async function identityCreateSchoolLearner(
   return {
     ok: true,
     learner: json.learner as SchoolLearnerRecord,
+  };
+}
+
+/** PATCH /api/users/me/timezone — Sprint A8 viewer-timezone persistence. */
+export async function identityUpdateTimezone(
+  accessToken: string,
+  input: { timezone: string; source: "auto" | "user" },
+): Promise<{ ok: boolean; status: number; timezone?: string; tzSource?: string; error?: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/users/me/timezone`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json", authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify(input),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return { ok: false, status: res.status, error: String(json.error ?? "timezone update failed") };
+  }
+  return {
+    ok: true,
+    status: res.status,
+    timezone: typeof json.timezone === "string" ? json.timezone : undefined,
+    tzSource: typeof json.tzSource === "string" ? json.tzSource : undefined,
   };
 }

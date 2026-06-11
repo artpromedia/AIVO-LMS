@@ -1252,17 +1252,17 @@
       "cta_primary": "फ़ैमिली ट्रायल शुरू करें",
       "cta_secondary": "ज़िला बिक्री से बात करें",
       "cta_image_alt": "सोफ़े पर साथ बैठकर सीखते हुए एक अभिभावक और बच्चा",
-      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
-      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
-      "value_props_badge": "Our Approach",
-      "value_props_heading": "Principles that put your child first.",
-      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
-      "value_prop_1_title": "Universal Design for Learning",
-      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
-      "value_prop_2_title": "Structured & Systematic Instruction",
-      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
-      "value_prop_3_title": "Sensory-Responsive Design",
-      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
+      "stat_focus_qualitative": "छात्र एकाग्रता और सहभागिता में सार्थक प्रगति दिखाते हैं",
+      "research_methodology_body": "हमारा लर्निंग इंजन प्रकाशित विशेष-शिक्षा अनुसंधान, यूनिवर्सल डिज़ाइन फ़ॉर लर्निंग (UDL) और अनुकूली संज्ञान विज्ञान पर आधारित है।",
+      "value_props_badge": "हमारा दृष्टिकोण",
+      "value_props_heading": "ऐसे सिद्धांत जो आपके बच्चे को सर्वोपरि रखते हैं।",
+      "value_props_subheading": "AIVO स्थापित लर्निंग साइंस पर बना है — किसी ‘सामान्य छात्र’ की धारणाओं पर नहीं।",
+      "value_prop_1_title": "यूनिवर्सल डिज़ाइन फ़ॉर लर्निंग",
+      "value_prop_1_desc": "UDL दिशानिर्देशों के अनुसार हम सहभागिता, प्रस्तुति और अभिव्यक्ति के अनेक माध्यम देते हैं, ताकि हर शिक्षार्थी पाठ्यक्रम तक पहुँच सके।",
+      "value_prop_2_title": "संरचित और व्यवस्थित शिक्षण",
+      "value_prop_2_desc": "पाठ स्पष्ट और क्रमबद्ध ढाँचों का पालन करते हुए ज्ञान को चरण-दर-चरण बनाते हैं — यह तरीका डिस्लेक्सिया, ADHD और मिलते-जुलते प्रोफ़ाइल वाले शिक्षार्थियों के लिए उपयुक्त है।",
+      "value_prop_3_title": "संवेदी-अनुक्रियाशील डिज़ाइन",
+      "value_prop_3_desc": "शिक्षार्थी दृश्य जटिलता, कंट्रास्ट और गति को रीयल-टाइम में नियंत्रित करते हैं — जिससे संवेदी बाधाएँ बढ़ने के बजाय घटती हैं।"
     },
     "page_reset_password": {
       "logo_aria": "AIVO होम",
@@ -1497,45 +1497,45 @@
       "hero_title": "पाँच स्तर। एक प्लेटफ़ॉर्म। हर सीखने वाला।"
     },
     "page_accessibility": {
-      "title": "AIVO Accessibility Statement"
+      "title": "AIVO सुगम्यता घोषणा"
     },
     "page_cookie_policy": {
-      "title": "Cookie Policy"
+      "title": "कुकी नीति"
     },
     "page_coppa_compliance": {
-      "title": "COPPA Compliance Statement"
+      "title": "COPPA अनुपालन घोषणा"
     },
     "page_ferpa_compliance": {
-      "title": "FERPA Compliance Statement"
+      "title": "FERPA अनुपालन घोषणा"
     },
     "page_privacy_policy": {
-      "title": "AIVO Privacy Policy"
+      "title": "AIVO गोपनीयता नीति"
     },
     "page_security": {
-      "title": "How we protect your data."
+      "title": "हम आपका डेटा कैसे सुरक्षित रखते हैं।"
     },
     "page_subprocessors": {
-      "get_started": "Get Started",
-      "badge": "Subprocessors",
-      "heading": "AIVO subprocessors",
-      "current_subprocessors": "Current subprocessors",
-      "col_subprocessor": "Subprocessor",
-      "col_purpose": "Purpose",
-      "col_data_category": "Data category",
-      "col_region": "Region",
-      "col_status": "Status",
-      "how_we_use_heading": "How we use this list",
-      "reporting_heading": "Reporting subprocessor changes",
-      "questions_heading": "Questions?",
-      "footer_privacy": "Privacy",
-      "footer_security": "Security",
-      "footer_accessibility": "Accessibility"
+      "get_started": "शुरू करें",
+      "badge": "उप-प्रोसेसर",
+      "heading": "AIVO के उप-प्रोसेसर",
+      "current_subprocessors": "वर्तमान उप-प्रोसेसर",
+      "col_subprocessor": "उप-प्रोसेसर",
+      "col_purpose": "उद्देश्य",
+      "col_data_category": "डेटा श्रेणी",
+      "col_region": "क्षेत्र",
+      "col_status": "स्थिति",
+      "how_we_use_heading": "हम इस सूची का उपयोग कैसे करते हैं",
+      "reporting_heading": "उप-प्रोसेसर बदलावों की सूचना",
+      "questions_heading": "प्रश्न?",
+      "footer_privacy": "गोपनीयता",
+      "footer_security": "सुरक्षा",
+      "footer_accessibility": "सुगम्यता"
     },
     "page_terms_of_service": {
-      "title": "AIVO Terms of Service"
+      "title": "AIVO सेवा की शर्तें"
     },
     "page_trust": {
-      "title": "What we promise — and how to check."
+      "title": "हम क्या वादा करते हैं — और उसे कैसे जाँचें।"
     },
     "page_compare_detail": {
       "aivo_best_for": "AIVO सबसे उपयुक्त है",

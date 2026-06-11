@@ -23,6 +23,12 @@ export const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 export interface QueueItem {
   idempotencyKey: string;
   action: string;
+  /**
+   * Replay lane (Sprint A6). "session" items — a learner's session-end
+   * progress — replay BEFORE "default" items so progress lands first when
+   * connectivity returns. Within a lane, order is preserved.
+   */
+  priority?: "session" | "default";
   /** Service base URL (e.g. `API.LEARNING`). */
   baseUrl: string;
   /** Path appended to baseUrl (e.g. `/api/learning/sessions/123/answer`). */
@@ -39,6 +45,7 @@ export function makeItem(
   path: string,
   method: string,
   body: unknown,
+  priority: "session" | "default" = "default",
 ): QueueItem {
   return {
     idempotencyKey: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
@@ -48,7 +55,15 @@ export function makeItem(
     method,
     body: body === undefined ? null : JSON.stringify(body),
     queuedAt: Date.now(),
+    priority,
   };
+}
+
+/** Stable lane sort: every "session" item ahead of every "default" item. */
+export function laneOrder(items: QueueItem[]): QueueItem[] {
+  const session = items.filter((i) => i.priority === "session");
+  const rest = items.filter((i) => i.priority !== "session");
+  return [...session, ...rest];
 }
 
 export async function loadQueue(): Promise<QueueItem[]> {
@@ -92,7 +107,8 @@ export async function enqueue(item: QueueItem): Promise<number> {
  * Returns the number of items still pending.
  */
 export async function flushQueue(now: number = Date.now()): Promise<number> {
-  const queue = dropStale(await loadQueue(), now);
+  await migrateLegacySessionOutbox();
+  const queue = laneOrder(dropStale(await loadQueue(), now));
   const remaining: QueueItem[] = [];
   let stop = false;
 
@@ -124,4 +140,53 @@ export async function flushQueue(now: number = Date.now()): Promise<number> {
 
 export async function queueLength(): Promise<number> {
   return (await loadQueue()).length;
+}
+
+// ── Legacy session-outbox migration (Sprint A6) ─────────────────────────────
+// The stage screen used to keep its own AsyncStorage outbox under
+// "@aivo/session_outbox" with a separate retry loop. Anything still queued
+// there from a previous app version is folded into this queue (session
+// lane) exactly once, so no child's progress is stranded by the upgrade.
+const LEGACY_SESSION_OUTBOX_KEY = "@aivo/session_outbox";
+
+interface LegacySessionEnd {
+  sessionId: string;
+  masteryUpdates: Record<string, number>;
+  xpEarned: number;
+  queuedAt: number;
+}
+
+export async function migrateLegacySessionOutbox(
+  learningBaseUrl?: string,
+): Promise<number> {
+  try {
+    const raw = await AsyncStorage.getItem(LEGACY_SESSION_OUTBOX_KEY);
+    if (!raw) return 0;
+    const legacy = JSON.parse(raw) as LegacySessionEnd[];
+    if (!Array.isArray(legacy) || legacy.length === 0) {
+      await AsyncStorage.removeItem(LEGACY_SESSION_OUTBOX_KEY);
+      return 0;
+    }
+    const base =
+      learningBaseUrl ?? (await import("@/constants/api")).API.LEARNING;
+    const queue = await loadQueue();
+    for (const entry of legacy) {
+      if (!entry?.sessionId) continue;
+      const item = makeItem(
+        "session.complete",
+        base,
+        `/api/learning/sessions/${entry.sessionId}/complete`,
+        "POST",
+        { masteryUpdates: entry.masteryUpdates, xpEarned: entry.xpEarned },
+        "session",
+      );
+      item.queuedAt = entry.queuedAt ?? Date.now();
+      queue.push(item);
+    }
+    await saveQueue(queue);
+    await AsyncStorage.removeItem(LEGACY_SESSION_OUTBOX_KEY);
+    return legacy.length;
+  } catch {
+    return 0;
+  }
 }

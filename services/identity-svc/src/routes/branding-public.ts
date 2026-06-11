@@ -49,8 +49,10 @@ export async function registerPublicBrandingRoutes(app: FastifyInstance) {
         branding: {
           displayName: b.displayName || tenant.name,
           primaryColor: b.primaryColor || null,
+          secondaryColor: b.secondaryColor || null,
           logoUrl: b.logoUrl || null,
           supportEmail: b.supportEmail || null,
+          supportUrl: b.supportUrl || null,
         },
       };
     },

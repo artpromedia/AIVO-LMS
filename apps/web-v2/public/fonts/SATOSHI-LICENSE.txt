@@ -1,0 +1,11 @@
+Satoshi — designed by Deni Anggara, published by the Indian Type Foundry
+via Fontshare (https://www.fontshare.com/fonts/satoshi).
+
+Licensed under the Fontshare EULA / ITF Free Font License (FFL), which
+permits free use in commercial and non-commercial digital products,
+including self-hosting the web font files in a product like this one.
+Redistribution or resale of the font files on their own is not permitted.
+
+Canonical license text: https://www.fontshare.com/licenses/itf-ffl
+Files: satoshi-{300,400,500,700,900}.woff2, fetched 2026-06-11 from
+cdn.fontshare.com via the official Fontshare CSS API.

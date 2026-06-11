@@ -40,6 +40,11 @@ export const users = pgTable("users", {
   /** Sprint 7: invited team members must change their temp password before any
    *  refresh/heartbeat succeeds. Cleared by a successful change-password call. */
   mustChangePassword: boolean("must_change_password").default(false).notNull(),
+  /** Sprint A8: IANA timezone every rendered date/time respects for this
+   *  user. `tzSource` records whether it was auto-detected from the
+   *  browser (overwritable) or explicitly chosen (never auto-overwritten). */
+  timezone: varchar("timezone", { length: 64 }),
+  tzSource: varchar("tz_source", { length: 8 }),
   /** Sprint 6: set when this user was auto-provisioned through SCIM or SAML JIT. */
   provisionedBy: varchar("provisioned_by", { length: 20 }),
   externalId: varchar("external_id", { length: 255 }),

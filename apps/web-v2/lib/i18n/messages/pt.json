@@ -4,7 +4,8 @@
     "sign_out": "Sair",
     "get_started": "Começar",
     "loading": "Carregando...",
-    "language": "Idioma"
+    "language": "Idioma",
+    "get_support": "Obter suporte"
   },
   "nav": {
     "platform": "Plataforma",
@@ -480,7 +481,9 @@
     },
     "settings_account_form": {
       "display_name": "Nome de exibição",
-      "saved": "Salvo."
+      "saved": "Salvo.",
+      "timezone": "Fuso horário",
+      "timezone_hint": "Agendas, relatórios e lembretes são exibidos neste fuso horário."
     },
     "settings": {
       "eyebrow": "Configurações",
@@ -1334,7 +1337,9 @@
       "notices": {
         "password_reset": "Sua senha foi redefinida. Entre com sua nova senha.",
         "logged_out": "Você saiu da conta."
-      }
+      },
+      "continue_with_sso": "Continuar com {idp}",
+      "sso_required_note": "Seu distrito entra com {idp}. O login por senha está desativado para este domínio."
     },
     "signup": {
       "promo_eyebrow": "Comece seu teste em família",

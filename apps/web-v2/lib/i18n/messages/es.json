@@ -4,7 +4,8 @@
     "sign_out": "Cerrar sesión",
     "get_started": "Comenzar",
     "loading": "Cargando...",
-    "language": "Idioma"
+    "language": "Idioma",
+    "get_support": "Obtener ayuda"
   },
   "nav": {
     "platform": "Plataforma",
@@ -480,7 +481,9 @@
     },
     "settings_account_form": {
       "display_name": "Nombre para mostrar",
-      "saved": "Guardado."
+      "saved": "Guardado.",
+      "timezone": "Zona horaria",
+      "timezone_hint": "Los horarios, informes y recordatorios se muestran en esta zona horaria."
     },
     "settings": {
       "eyebrow": "Configuración",
@@ -1334,7 +1337,9 @@
       "notices": {
         "password_reset": "Tu contraseña se ha restablecido. Inicia sesión con tu nueva contraseña.",
         "logged_out": "Has cerrado sesión."
-      }
+      },
+      "continue_with_sso": "Continuar con {idp}",
+      "sso_required_note": "Tu distrito inicia sesión con {idp}. El acceso con contraseña está deshabilitado para este dominio."
     },
     "signup": {
       "promo_eyebrow": "Comienza tu prueba familiar",

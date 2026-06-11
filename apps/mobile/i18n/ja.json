@@ -157,7 +157,8 @@
     "activeTutorsTrend": "アクティブな家庭教師のトレンド",
     "sessionsTrend": "今週のセッションのトレンド",
     "masteryBySubject": "科目別習熟度",
-    "reports": "レポート"
+    "reports": "レポート",
+    "districtLogo": "学区ロゴ"
   },
   "parentSettings": {
     "title": "設定",
@@ -221,7 +222,8 @@
     "addonPrice": "+ ¥4.99/月",
     "cancelSubscription": "サブスクリプションをキャンセル",
     "cancelAtPeriodEnd": "期間終了時にキャンセル",
-    "addedToBill": "{{count}}個の追加オプション · ¥{{price}}/月"
+    "addedToBill": "{{count}}個の追加オプション · ¥{{price}}/月",
+    "openInvoice": "請求書を開く"
   },
   "parentTutors": {
     "title": "チューターストア",
@@ -665,7 +667,10 @@
         "homeLabel": "ダッシュボードに戻る",
         "intro": "準備ができたら始めてください。"
       }
-    }
+    },
+    "hideTutor": "チューターを隠す",
+    "moveUp": "{{label}}を上へ",
+    "moveDown": "{{label}}を下へ"
   },
   "learnerTutor": {
     "tutorNotFound": "チューターが見つかりません",
@@ -1089,6 +1094,35 @@
       "body": "休んでも大丈夫だよ。少し落ち着く時間が、また始める力になるよ。",
       "accept": "落ち着く休けいをとる",
       "dismiss": "今はいい"
+    },
+    "notEnabled": "カームコーナーはまだあなたの学校では有効になっていません。大人の人に学区へ確認してもらってね。"
+  },
+  "errorBoundary": {
+    "title": "問題が発生しました",
+    "body": "心配しないで——何も失われていません。もう一度試すか、ホームに戻れます。",
+    "tryAgain": "もう一度試す",
+    "goHome": "ホームへ戻る"
+  },
+  "configError": {
+    "title": "このビルドは設定が正しくありません",
+    "body": "アプリが AIVO サービスに接続できません。ストアから最新バージョンをインストールしてください。デプロイ管理者の場合は、バックエンドのアドレスを設定して再ビルドしてください。"
+  },
+  "parentIep": {
+    "notificationPrefs": "通知設定"
+  },
+  "offline": {
+    "synced": "オンラインに戻りました。作業は保存されています。",
+    "banner": "オフラインです。このまま続けてOK——進捗は端末に保存されます。",
+    "bannerQueued": "オフライン——{{count}}件の変更は再接続後に同期されます。",
+    "syncing": "{{count}}件の変更を同期中…"
+  },
+  "parentLearnerNew": {
+    "birthDate": "生年月日（YYYY-MM-DD）",
+    "birthDateError": {
+      "format": "YYYY-MM-DD 形式で入力してください（例: 2017-09-01）。",
+      "invalid": "実在しない日付です。",
+      "future": "生年月日に未来の日付は使えません。",
+      "tooOld": "学習者は21歳以下である必要があります。"
     }
   }
 }

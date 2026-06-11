@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type RetentionDisposition,
   listRetentionPolicies,
@@ -8,12 +7,9 @@ import {
 } from "@aivo/admin-api/retention";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { actionError } from "@/lib/action-errors";
 
 const RETENTION_ROLES = ["platform_admin"] as const;
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Policy update failed.";
-}
 
 async function saveAction(formData: FormData) {
   "use server";
@@ -32,7 +28,7 @@ async function saveAction(formData: FormData) {
   try {
     await setRetentionPolicy(session, dataClass, { retentionDays, disposition, legalHold });
   } catch (error) {
-    redirect(`/platform/compliance/retention?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/compliance/retention?error=${encodeURIComponent(actionError(error, "Policy update failed."))}`);
   }
   redirect(`/platform/compliance/retention?notice=${encodeURIComponent(`${dataClass} policy saved.`)}`);
 }

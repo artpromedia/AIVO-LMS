@@ -610,6 +610,14 @@ export const getDistrictActivityExportSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const getDistrictActivityVerifySchema = {
+  tags: ["Identity"],
+  operationId: "getDistrictActivityVerify",
+  summary: "GET /api/district/activity/verify",
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject, 400: errorResponse },
+} as const;
+
 export const getDistrictSeatsRequestsSchema = {
   tags: ["Identity"],
   operationId: "getDistrictSeatsRequests",
@@ -726,6 +734,22 @@ export const getScimV2GroupsByIdSchema = {
     properties: { id: { type: "string" } },
   },
   response: { 200: passthroughObject },
+} as const;
+
+export const internalRosterUsersUpsertSchema = {
+  tags: ["Identity"],
+  operationId: "internalRosterUsersUpsert",
+  summary: "POST /internal/roster/users/upsert",
+  body: passthroughObject,
+  response: { 200: passthroughObject, 400: errorResponse, 422: errorResponse },
+} as const;
+
+export const internalRosterUsersDeactivateSchema = {
+  tags: ["Identity"],
+  operationId: "internalRosterUsersDeactivate",
+  summary: "POST /internal/roster/users/deactivate",
+  body: passthroughObject,
+  response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
 
 export const getSsoSamlBySlugMetadataSchema = {

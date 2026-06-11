@@ -3516,6 +3516,9 @@
                   "functioning_level": {
                     "type": "string"
                   },
+                  "learner_id": {
+                    "type": "string"
+                  },
                   "iep": {
                     "type": "object",
                     "nullable": true

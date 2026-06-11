@@ -117,7 +117,7 @@ export default function VerifyMfaScreen() {
           <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
             {t("auth.sessionExpired") || "Your session has expired."}
           </Text>
-          <Pressable onPress={() => router.replace("/(auth)/login")} style={styles.backBtn}>
+          <Pressable accessibilityRole="button" onPress={() => router.replace("/(auth)/login")} style={styles.backBtn}>
             <Text style={[styles.backText, { color: palette.primary, fontFamily: "Nunito-Bold" }]}>
               {t("auth.backToLogin")}
             </Text>
@@ -179,7 +179,7 @@ export default function VerifyMfaScreen() {
 
           <View style={styles.codeRow}>
             {code.map((digit, i) => (
-              <TextInput
+              <TextInput accessibilityLabel={resendMsg}
                 key={i}
                 ref={(el) => {
                   inputRefs.current[i] = el;
@@ -212,7 +212,7 @@ export default function VerifyMfaScreen() {
             style={{ marginTop: spacing.md }}
           />
 
-          <Pressable
+          <Pressable accessibilityRole="button"
             onPress={handleResend}
             disabled={resending || resendCooldown > 0}
             style={styles.resendBtn}
@@ -232,7 +232,7 @@ export default function VerifyMfaScreen() {
             </Text>
           </Pressable>
 
-          <Pressable onPress={() => router.back()} style={styles.backBtn}>
+          <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backBtn}>
             <Text style={[styles.backText, { color: palette.inkMuted }]}>
               {t("auth.backToLogin")}
             </Text>

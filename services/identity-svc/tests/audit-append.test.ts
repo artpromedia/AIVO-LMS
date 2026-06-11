@@ -42,15 +42,25 @@ test("audit_events trigger blocks UPDATE", { skip: SKIP }, async () => {
       ipAddress: null,
       userAgent: null,
     });
+    // drizzle >= 0.45 wraps driver errors ("Failed query: …" with the
+    // Postgres error on .cause), so match the whole cause chain.
+    const appendOnlyRejection = (err: unknown) => {
+      let cursor: unknown = err;
+      while (cursor instanceof Error) {
+        if (/append-only/i.test(cursor.message)) return true;
+        cursor = cursor.cause;
+      }
+      return false;
+    };
     await assert.rejects(
       () =>
         db.execute(sql`UPDATE audit_events SET event_type = 'HACKED' WHERE id = ${inserted.id}`),
-      /append-only/i,
+      appendOnlyRejection,
       "trigger must reject UPDATE",
     );
     await assert.rejects(
       () => db.execute(sql`DELETE FROM audit_events WHERE id = ${inserted.id}`),
-      /append-only/i,
+      appendOnlyRejection,
       "trigger must reject DELETE",
     );
   } finally {

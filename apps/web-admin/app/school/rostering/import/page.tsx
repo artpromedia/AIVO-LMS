@@ -1,18 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import { commitLearnerImport } from "@aivo/admin-api/rostering";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { actionError } from "@/lib/action-errors";
 
 /** Colocated server route that streams the auth-gated CSV template. */
 const TEMPLATE_HREF = "/school/rostering/import/template";
 
 const ROSTERING_ROLES = ["school_admin", "district_admin", "platform_admin"] as const;
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Learner import failed.";
-}
 
 async function importAction(formData: FormData) {
   "use server";
@@ -26,7 +22,7 @@ async function importAction(formData: FormData) {
     const result = await commitLearnerImport(session, session.tenantId, csvText);
     jobId = result.jobId;
   } catch (error) {
-    redirect(`/school/rostering/import?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/school/rostering/import?error=${encodeURIComponent(actionError(error, "Learner import failed."))}`);
   }
   redirect(
     `/school/rostering?jobs=${encodeURIComponent(jobId)}&notice=${encodeURIComponent(

@@ -68,6 +68,7 @@ const LOANWORDS_BY_LOCALE = {
     "Version",
     "Deutsch",
     "Blog",
+    "Region",
   ]),
   es: new Set([
     "Error",

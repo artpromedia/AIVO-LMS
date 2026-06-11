@@ -233,7 +233,7 @@ export default function LoginScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: palette.ink }]}>{t("auth.email")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.emailPlaceholder")}
               style={inputStyle}
               value={email}
               onChangeText={setEmail}
@@ -247,7 +247,7 @@ export default function LoginScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: palette.ink }]}>{t("auth.password")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.passwordPlaceholder")}
               style={inputStyle}
               value={password}
               onChangeText={setPassword}
@@ -258,7 +258,7 @@ export default function LoginScreen() {
             />
           </View>
 
-          <Pressable onPress={() => router.push("/(auth)/forgot-password")}>
+          <Pressable accessibilityRole="button" onPress={() => router.push("/(auth)/forgot-password")}>
             <Text style={[styles.forgotLink, { color: palette.primary }]}>
               {t("auth.forgotPassword")}
             </Text>
@@ -325,7 +325,7 @@ export default function LoginScreen() {
           </Pressable>
         </View>
 
-        <Pressable
+        <Pressable accessibilityRole="button"
           onPress={() => router.push("/(onboarding)/welcome" as Href)}
           style={styles.signupLink}
         >
@@ -375,7 +375,7 @@ export default function LoginScreen() {
               fullWidth
               style={{ marginTop: spacing.md }}
             />
-            <Pressable
+            <Pressable accessibilityRole="button"
               onPress={() => {
                 setConsentModal(false);
                 setPendingIdToken(null);

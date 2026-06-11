@@ -4,6 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { theme } from "./theme";
 
+import { SEMANTIC } from "@aivo/brand";
 interface AivoHeaderProps {
   title: string;
   subtitle?: string;
@@ -52,7 +53,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontFamily: theme.fonts.heading,
-    color: "#FFFFFF",
+    color: SEMANTIC.color.surface.card,
   },
   subtitle: {
     fontSize: 14,

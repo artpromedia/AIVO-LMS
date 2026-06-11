@@ -8,14 +8,16 @@
     "start": "next start --port 5001 --hostname 0.0.0.0",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "@aivo/admin-api": "workspace:*",
     "@aivo/admin-auth": "workspace:*",
     "@aivo/admin-ui": "workspace:*",
     "@aivo/brand": "workspace:*",
+    "@aivo/observability": "workspace:*",
     "@aivo/ui": "workspace:*",
+    "@sentry/nextjs": "^10.57.0",
     "lucide-react": "^0.513.0",
     "next": "^15.5.18",
     "react": "^19.1.0",
@@ -29,6 +31,6 @@
     "@types/react-dom": "^19.1.5",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.8"
   }
 }

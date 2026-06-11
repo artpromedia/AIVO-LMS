@@ -41,13 +41,13 @@ export default function WelcomeScreen() {
             size="lg"
           />
           <View style={styles.legalRow}>
-            <Pressable onPress={() => router.push("/(onboarding)/terms" as Href)} hitSlop={8}>
+            <Pressable accessibilityRole="button" onPress={() => router.push("/(onboarding)/terms" as Href)} hitSlop={8}>
               <Text style={[styles.legalLink, { color: palette.inkMuted }]}>
                 {t("onboarding.common.terms", "Terms")}
               </Text>
             </Pressable>
             <Text style={[styles.legalDot, { color: palette.inkMuted }]}>·</Text>
-            <Pressable onPress={() => router.push("/(onboarding)/privacy" as Href)} hitSlop={8}>
+            <Pressable accessibilityRole="button" onPress={() => router.push("/(onboarding)/privacy" as Href)} hitSlop={8}>
               <Text style={[styles.legalLink, { color: palette.inkMuted }]}>
                 {t("onboarding.common.privacy", "Privacy")}
               </Text>

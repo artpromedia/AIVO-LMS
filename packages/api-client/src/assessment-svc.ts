@@ -2090,6 +2090,7 @@ export interface paths {
                     "application/json": {
                         parent_assessment: Record<string, never>;
                         functioning_level?: string;
+                        learner_id?: string;
                         iep?: Record<string, never> | null;
                         district?: Record<string, never> | null;
                         interest_profile?: Record<string, never> | null;

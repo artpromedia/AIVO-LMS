@@ -4,7 +4,8 @@
     "sign_out": "Sign out",
     "get_started": "Get started",
     "loading": "Loading...",
-    "language": "Language"
+    "language": "Language",
+    "get_support": "Get support"
   },
   "nav": {
     "platform": "Platform",
@@ -52,7 +53,9 @@
       "notices": {
         "password_reset": "Your password has been reset. Please sign in with your new password.",
         "logged_out": "You've been signed out."
-      }
+      },
+      "continue_with_sso": "Continue with {idp}",
+      "sso_required_note": "Your district signs in with {idp}. Password sign-in is disabled for this email domain."
     },
     "signup": {
       "promo_eyebrow": "Start your family trial",
@@ -671,7 +674,9 @@
     },
     "settings_account_form": {
       "display_name": "Display name",
-      "saved": "Saved."
+      "saved": "Saved.",
+      "timezone": "Time zone",
+      "timezone_hint": "Schedules, reports, and reminders display in this time zone."
     },
     "settings": {
       "eyebrow": "Settings",

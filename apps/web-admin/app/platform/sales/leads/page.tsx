@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type LeadStatus,
   LEAD_STATUSES,
@@ -10,10 +9,7 @@ import {
   updateLeadStatus,
 } from "@aivo/admin-api/leads";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Lead update failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
@@ -42,7 +38,7 @@ async function changeStatusAction(formData: FormData) {
   try {
     await updateLeadStatus(session, id, status);
   } catch (error) {
-    redirect(`/platform/sales/leads?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/sales/leads?error=${encodeURIComponent(actionError(error, "Lead update failed."))}`);
   }
   redirect(`/platform/sales/leads?notice=${encodeURIComponent(`Lead moved to ${status}.`)}`);
 }

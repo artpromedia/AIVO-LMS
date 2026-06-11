@@ -10,6 +10,9 @@
 declare module "*?prod-auth-mock" {
   export * from "@/lib/env";
 }
+declare module "*?prod-no-sentry" {
+  export * from "@/lib/env";
+}
 declare module "*?prod-ai-mock" {
   export * from "@/lib/env";
 }

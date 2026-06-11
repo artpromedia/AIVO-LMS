@@ -18,7 +18,7 @@
  */
 import { createHash, randomBytes } from "node:crypto";
 import * as jose from "jose";
-import { decryptSecret } from "@aivo/security";
+import { decryptSecret, encryptSecret } from "@aivo/security";
 
 /** Stored shape of `district_settings.sso_config.oidc`. */
 export interface OidcRpStoredConfig {
@@ -58,6 +58,43 @@ export function decryptOidcRpConfig(stored: OidcRpStoredConfig): OidcRpConfig {
   const out: OidcRpConfig = { ...rest };
   if (clientSecretEnvelope) out.clientSecret = decryptSecret(clientSecretEnvelope);
   return out;
+}
+
+/**
+ * Sprint B1 — write-side counterpart of decryptOidcRpConfig. Encrypts a
+ * newly supplied plaintext client secret into the at-rest envelope;
+ * callers preserve the prior envelope when no new secret is supplied.
+ */
+export function encryptOidcRpConfig(
+  input: Omit<OidcRpStoredConfig, "clientSecretEnvelope"> & { clientSecret?: string },
+): OidcRpStoredConfig {
+  const { clientSecret, ...rest } = input;
+  const out: OidcRpStoredConfig = { ...rest };
+  if (typeof clientSecret === "string" && clientSecret.trim()) {
+    out.clientSecretEnvelope = encryptSecret(clientSecret.trim());
+  }
+  return out;
+}
+
+/**
+ * Sprint B1 — which login URL `/api/auth/discover` should hand out for a
+ * tenant's stored sso_config. OIDC wins when enabled (modern IdP path);
+ * SAML remains for tenants that configured it. Pure so it is unit-testable
+ * without a database.
+ */
+export function ssoLoginUrlFor(
+  tenantId: string,
+  ssoConfig: { enabled?: boolean; oidc?: { enabled?: boolean; idpLabel?: string }; idpLabel?: string },
+): { ssoLoginUrl: string; idpLabel: string } | null {
+  const slug = encodeURIComponent(tenantId);
+  const oidc = ssoConfig.oidc;
+  if (oidc?.enabled) {
+    return { ssoLoginUrl: `/api/sso/oidc/${slug}/login`, idpLabel: oidc.idpLabel || "SSO" };
+  }
+  if (ssoConfig.enabled) {
+    return { ssoLoginUrl: `/api/sso/saml/${slug}/login`, idpLabel: ssoConfig.idpLabel || "SSO" };
+  }
+  return null;
 }
 
 /** OIDC discovery document fields we rely on. */

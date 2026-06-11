@@ -107,3 +107,36 @@ describe("flushQueue", () => {
     expect(await flushQueue()).toBe(1);
   });
 });
+
+
+describe("Sprint A6 — session priority lane + legacy migration", () => {
+  it("laneOrder replays session items before default items, order preserved", async () => {
+    const { laneOrder, makeItem } = await import("../lib/offline-queue");
+    const a = makeItem("a", "http://x", "/a", "POST", {});
+    const s1 = makeItem("s1", "http://x", "/s1", "POST", {}, "session");
+    const b = makeItem("b", "http://x", "/b", "POST", {});
+    const s2 = makeItem("s2", "http://x", "/s2", "POST", {}, "session");
+    expect(laneOrder([a, s1, b, s2]).map((i) => i.action)).toEqual(["s1", "s2", "a", "b"]);
+  });
+
+  it("migrates the legacy session outbox into the session lane exactly once", async () => {
+    const { migrateLegacySessionOutbox, loadQueue } = await import("../lib/offline-queue");
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    await AsyncStorage.setItem(
+      "@aivo/session_outbox",
+      JSON.stringify([
+        { sessionId: "sess_1", masteryUpdates: { math: 80 }, xpEarned: 25, queuedAt: 123 },
+      ]),
+    );
+    const migrated = await migrateLegacySessionOutbox("http://learning.test");
+    expect(migrated).toBe(1);
+    const queue = await loadQueue();
+    const item = queue.find((i) => i.action === "session.complete");
+    expect(item).toBeTruthy();
+    expect(item!.priority).toBe("session");
+    expect(item!.path).toBe("/api/learning/sessions/sess_1/complete");
+    expect(JSON.parse(item!.body!)).toEqual({ masteryUpdates: { math: 80 }, xpEarned: 25 });
+    // second run is a no-op (key removed)
+    expect(await migrateLegacySessionOutbox("http://learning.test")).toBe(0);
+  });
+});

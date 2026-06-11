@@ -26,6 +26,44 @@ export function LoginForm({
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPw, setShowPw] = React.useState(false);
+  // Sprint B1 — district SSO discovery. When the email's domain belongs to
+  // a district with SSO enabled, surface "Continue with <IdP>" (OIDC
+  // preferred server-side). Best-effort: a failed lookup just leaves the
+  // password path.
+  const [sso, setSso] = React.useState<{
+    ssoLoginUrl: string;
+    idpLabel: string;
+    requireSso: boolean;
+  } | null>(null);
+  const discoverSeq = React.useRef(0);
+
+  const discover = React.useCallback(async (value: string) => {
+    const seq = (discoverSeq.current += 1);
+    if (!value.includes("@") || value.endsWith("@")) {
+      setSso(null);
+      return;
+    }
+    try {
+      const res = await fetch("/api/bff/auth/discover", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: value }),
+      });
+      const json = await res.json().catch(() => null);
+      if (seq !== discoverSeq.current) return; // stale response
+      if (json?.ok && json.data?.mode === "sso" && json.data.ssoLoginUrl) {
+        setSso({
+          ssoLoginUrl: json.data.ssoLoginUrl,
+          idpLabel: json.data.idpLabel || "SSO",
+          requireSso: Boolean(json.data.requireSso),
+        });
+      } else {
+        setSso(null);
+      }
+    } catch {
+      if (seq === discoverSeq.current) setSso(null);
+    }
+  }, []);
 
   return (
     <form id={id} action={action} className="flex flex-col gap-4">
@@ -39,9 +77,24 @@ export function LoginForm({
         autoComplete="email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
+        onBlur={() => void discover(email.trim().toLowerCase())}
         placeholder="you@example.com"
         required
       />
+      {sso ? (
+        <a
+          href={`${sso.ssoLoginUrl}${sso.ssoLoginUrl.includes("?") ? "&" : "?"}returnTo=%2F`}
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-iw-primary px-4 py-2 text-sm font-semibold text-iw-primary transition hover:bg-iw-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
+          data-testid="sso-continue"
+        >
+          {t("login.continue_with_sso", { idp: sso.idpLabel })}
+        </a>
+      ) : null}
+      {sso?.requireSso ? (
+        <p className="text-sm text-iw-ink-muted" role="status">
+          {t("login.sso_required_note", { idp: sso.idpLabel })}
+        </p>
+      ) : null}
       <AuthInput
         id="password"
         name="password"

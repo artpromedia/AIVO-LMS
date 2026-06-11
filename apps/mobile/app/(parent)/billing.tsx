@@ -390,7 +390,7 @@ export default function BillingScreen() {
       }
     >
       <View style={{ width: contentWidth }}>
-        <Pressable onPress={() => router.back()} style={styles.backRow}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
@@ -485,7 +485,7 @@ export default function BillingScreen() {
                 </Text>
               </View>
               {subscription?.cancelAtPeriodEnd && (
-                <Pressable onPress={handleResume}>
+                <Pressable accessibilityRole="button" onPress={handleResume}>
                   <Text style={styles.linkText}>{t("parentBilling.resumeSubscription")}</Text>
                 </Pressable>
               )}
@@ -637,6 +637,8 @@ export default function BillingScreen() {
                   <Text style={styles.invoiceAmount}>${inv.amount.toFixed(2)}</Text>
                   {inv.url && (
                     <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={t("parentBilling.openInvoice", "Open invoice")}
                       onPress={() => WebBrowser.openBrowserAsync(inv.url!)}
                       style={{ marginLeft: spacing.sm }}
                     >

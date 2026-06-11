@@ -187,7 +187,7 @@ export default function RecommendationsScreen() {
         {isExpanded && canAmend && (
           <View style={styles.amendBox}>
             <Text style={styles.amendLabel}>{t("parentRecommendations.adjustValueLabel")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={amendInitial}
               style={styles.amendInput}
               value={amendValues[rec.id] ?? amendInitial}
               onChangeText={(v) => setAmendValues((prev) => ({ ...prev, [rec.id]: v }))}

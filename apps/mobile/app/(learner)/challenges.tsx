@@ -106,7 +106,7 @@ export default function ChallengesScreen() {
       style={styles.container}
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
     >
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
@@ -198,11 +198,11 @@ export default function ChallengesScreen() {
       </AivoCard>
 
       <Modal visible={joinModalVisible} transparent animationType="slide">
-        <Pressable style={styles.modalOverlay} onPress={() => setJoinModalVisible(false)}>
-          <Pressable style={styles.modalContent} onPress={() => {}}>
+        <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setJoinModalVisible(false)}>
+          <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
             <Text style={styles.modalTitle}>Join a Challenge</Text>
             <Text style={styles.modalDesc}>Enter the invite code from your friend</Text>
-            <TextInput
+            <TextInput accessibilityLabel="ABCD1234"
               style={styles.codeInput}
               value={joinCode}
               onChangeText={(v) =>

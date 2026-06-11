@@ -1252,17 +1252,17 @@
       "cta_primary": "가족 체험 시작",
       "cta_secondary": "학군 영업팀과 상담",
       "cta_image_alt": "소파에서 함께 학습하는 부모와 아이",
-      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
-      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
-      "value_props_badge": "Our Approach",
-      "value_props_heading": "Principles that put your child first.",
-      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
-      "value_prop_1_title": "Universal Design for Learning",
-      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
-      "value_prop_2_title": "Structured & Systematic Instruction",
-      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
-      "value_prop_3_title": "Sensory-Responsive Design",
-      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
+      "stat_focus_qualitative": "학생들의 집중력과 참여도가 의미 있게 향상됩니다",
+      "research_methodology_body": "AIVO의 학습 엔진은 발표된 특수교육 연구, 보편적 학습 설계(UDL), 적응형 인지 과학에 기반을 두고 있습니다.",
+      "value_props_badge": "우리의 접근 방식",
+      "value_props_heading": "아이를 최우선에 두는 원칙.",
+      "value_props_subheading": "AIVO는 '전형적인 학생'에 대한 가정이 아니라 검증된 학습 과학 위에 만들어졌습니다.",
+      "value_prop_1_title": "보편적 학습 설계",
+      "value_prop_1_desc": "UDL 지침에 따라 참여·표상·행동의 다양한 수단을 제공하여 모든 학습자가 교육과정에 접근할 수 있도록 합니다.",
+      "value_prop_2_title": "구조화된 체계적 교수",
+      "value_prop_2_desc": "수업은 명시적이고 순차적인 패턴으로 지식을 단계별로 쌓아 갑니다. 난독증, ADHD 및 유사 특성을 지닌 학습자에게 적합한 방식입니다.",
+      "value_prop_3_title": "감각 반응형 디자인",
+      "value_prop_3_desc": "학습자가 시각적 복잡도, 대비, 진행 속도를 실시간으로 조절하여 감각적 장벽을 더하지 않고 줄여 줍니다."
     },
     "page_reset_password": {
       "logo_aria": "AIVO 홈",
@@ -1497,45 +1497,45 @@
       "hero_title": "다섯 레벨. 하나의 플랫폼. 모든 학습자."
     },
     "page_accessibility": {
-      "title": "AIVO Accessibility Statement"
+      "title": "AIVO 접근성 안내"
     },
     "page_cookie_policy": {
-      "title": "Cookie Policy"
+      "title": "쿠키 정책"
     },
     "page_coppa_compliance": {
-      "title": "COPPA Compliance Statement"
+      "title": "COPPA 준수 안내"
     },
     "page_ferpa_compliance": {
-      "title": "FERPA Compliance Statement"
+      "title": "FERPA 준수 안내"
     },
     "page_privacy_policy": {
-      "title": "AIVO Privacy Policy"
+      "title": "AIVO 개인정보 처리방침"
     },
     "page_security": {
-      "title": "How we protect your data."
+      "title": "고객의 데이터를 보호하는 방법."
     },
     "page_subprocessors": {
-      "get_started": "Get Started",
-      "badge": "Subprocessors",
-      "heading": "AIVO subprocessors",
-      "current_subprocessors": "Current subprocessors",
-      "col_subprocessor": "Subprocessor",
-      "col_purpose": "Purpose",
-      "col_data_category": "Data category",
-      "col_region": "Region",
-      "col_status": "Status",
-      "how_we_use_heading": "How we use this list",
-      "reporting_heading": "Reporting subprocessor changes",
-      "questions_heading": "Questions?",
-      "footer_privacy": "Privacy",
-      "footer_security": "Security",
-      "footer_accessibility": "Accessibility"
+      "get_started": "시작하기",
+      "badge": "수탁 처리자",
+      "heading": "AIVO 수탁 처리자",
+      "current_subprocessors": "현재 수탁 처리자",
+      "col_subprocessor": "수탁 처리자",
+      "col_purpose": "목적",
+      "col_data_category": "데이터 범주",
+      "col_region": "지역",
+      "col_status": "상태",
+      "how_we_use_heading": "이 목록의 활용 방식",
+      "reporting_heading": "수탁 처리자 변경 통지",
+      "questions_heading": "문의가 있으신가요?",
+      "footer_privacy": "개인정보 보호",
+      "footer_security": "보안",
+      "footer_accessibility": "접근성"
     },
     "page_terms_of_service": {
-      "title": "AIVO Terms of Service"
+      "title": "AIVO 서비스 약관"
     },
     "page_trust": {
-      "title": "What we promise — and how to check."
+      "title": "우리의 약속, 그리고 확인하는 방법."
     },
     "page_compare_detail": {
       "aivo_best_for": "AIVO가 가장 적합한 경우",

@@ -4,7 +4,8 @@
     "sign_out": "로그아웃",
     "get_started": "시작하기",
     "loading": "로딩 중...",
-    "language": "언어"
+    "language": "언어",
+    "get_support": "지원 받기"
   },
   "nav": {
     "platform": "플랫폼",
@@ -480,7 +481,9 @@
     },
     "settings_account_form": {
       "display_name": "표시 이름",
-      "saved": "저장되었습니다."
+      "saved": "저장되었습니다.",
+      "timezone": "시간대",
+      "timezone_hint": "일정, 보고서, 알림이 이 시간대로 표시됩니다."
     },
     "settings": {
       "eyebrow": "설정",
@@ -1334,7 +1337,9 @@
       "notices": {
         "password_reset": "비밀번호가 재설정되었습니다. 새 비밀번호로 로그인하세요.",
         "logged_out": "로그아웃되었습니다."
-      }
+      },
+      "continue_with_sso": "{idp}(으)로 계속",
+      "sso_required_note": "소속 교육구는 {idp}로 로그인합니다. 이 이메일 도메인은 비밀번호 로그인이 비활성화되어 있습니다."
     },
     "signup": {
       "promo_eyebrow": "가족 체험판 시작하기",

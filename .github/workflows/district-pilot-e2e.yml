@@ -1,4 +1,9 @@
-name: district-pilot-e2e
+# Sprint A7 — this harness is the blocking user-journey gate. The
+# path-filter that used to skip it on "unrelated" PRs is forced ON: the
+# flows that earn trust (district pilot stages 0-4, the admin console
+# suite incl. login+MFA/RBAC/pilot-provision, and the sprint-12 role
+# golden paths) run on every PR.
+name: journeys-e2e (district pilot + admin + role golden paths)
 
 # Containerized proof for the district-pilot journey (persona prompt pack).
 # Brings up the Dockerized harness (postgres + identity-svc + web-v2) from the
@@ -28,31 +33,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
-      - name: Detect district-pilot changes
+      - name: Journeys always run (Sprint A7)
         id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            pilot:
-              - 'apps/web-v2/**'
-              - 'apps/web-admin/**'
-              - 'services/identity-svc/**'
-              - 'services/billing-svc/**'
-              - 'services/comms-svc/**'
-              - 'services/admin-svc/**'
-              - 'packages/db/**'
-              - 'packages/admin-ui/**'
-              - 'packages/admin-api/**'
-              - 'packages/admin-auth/**'
-              - 'e2e/lib/pilot.ts'
-              - 'e2e/lib/fixtures.ts'
-              - 'e2e/specs/district-pilot/**'
-              - 'e2e/specs/admin/**'
-              - 'docker-compose.e2e.yml'
-              - 'apps/web-v2/Dockerfile'
-              - '.github/workflows/district-pilot-e2e.yml'
+        run: echo "pilot=true" >> "$GITHUB_OUTPUT"
 
-      - name: Skip when no district-pilot changes
+      - name: Gate marker (always true since Sprint A7)
         if: steps.filter.outputs.pilot != 'true'
         run: echo "No district-pilot-relevant changes — skipping."
 
@@ -118,6 +103,18 @@ jobs:
           ADMIN_SVC_URL: http://localhost:3005
           IDENTITY_BASE_URL: http://localhost:3001
         run: pnpm --filter @aivo/e2e exec playwright test specs/admin --reporter=line
+
+      - name: Run role golden-path journeys (learner/parent/teacher, required)
+        if: steps.filter.outputs.pilot == 'true'
+        env:
+          WEB_BASE_URL: http://localhost:5000
+          IDENTITY_BASE_URL: http://localhost:3001
+          ADMIN_SVC_URL: http://localhost:3005
+        run: >
+          pnpm --filter @aivo/e2e exec playwright test
+          tests/sprint12/learner.spec.ts tests/sprint12/parent.spec.ts
+          tests/sprint12/teacher.spec.ts tests/learner-lesson-loop.spec.ts
+          --reporter=line
 
       - name: Dump logs on failure
         if: failure() && steps.filter.outputs.pilot == 'true'

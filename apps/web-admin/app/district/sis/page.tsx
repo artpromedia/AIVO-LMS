@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import { listSisConnections, triggerSisSync } from "@aivo/admin-api/sis";
+import {
+  getScimActivity,
+  listScimTokens,
+  listScimUnmappedGroups,
+} from "@aivo/admin-api/scim";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { actionError } from "@/lib/action-errors";
+import { ScimSection } from "./scim-section";
 
 const SIS_ROLES = ["district_admin", "platform_admin"] as const;
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Sync could not be started.";
-}
 
 async function syncAction(formData: FormData) {
   "use server";
@@ -20,7 +22,7 @@ async function syncAction(formData: FormData) {
   try {
     await triggerSisSync(session, connectionId);
   } catch (error) {
-    redirect(`/district/sis?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/district/sis?error=${encodeURIComponent(actionError(error, "Sync could not be started."))}`);
   }
   redirect("/district/sis?notice=Roster%20sync%20started.");
 }
@@ -32,7 +34,19 @@ export default async function DistrictSisPage({
 }) {
   const session = await requirePageRole([...SIS_ROLES]);
   const params = await searchParams;
-  const connections = await listSisConnections(session, session.tenantId);
+  // Connectors (integration-svc) and SCIM (admin-svc) are independent
+  // backends — one being down must not blank the other's section, so
+  // each fetch degrades to an explicit error panel instead of throwing.
+  const [connectionsResult, scimTokens, scimUnmapped, scimActivity] = await Promise.all([
+    listSisConnections(session, session.tenantId).then(
+      (rows) => ({ ok: true as const, rows }),
+      () => ({ ok: false as const, rows: [] }),
+    ),
+    listScimTokens(session, session.tenantId),
+    listScimUnmappedGroups(session, session.tenantId),
+    getScimActivity(session, session.tenantId),
+  ]);
+  const connections = connectionsResult.rows;
 
   return (
     <AdminPageFrame
@@ -42,6 +56,12 @@ export default async function DistrictSisPage({
     >
       {params.notice ? <p className="admin-notice mt-8">{params.notice}</p> : null}
       {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
+      {!connectionsResult.ok ? (
+        <p className="admin-error mt-8">
+          SIS connector status is unavailable right now (integration service unreachable). SCIM
+          provisioning below is unaffected.
+        </p>
+      ) : null}
 
       <AdminCard className="mt-6 overflow-hidden">
         <div className="overflow-x-auto">
@@ -95,6 +115,8 @@ export default async function DistrictSisPage({
           </table>
         </div>
       </AdminCard>
+
+      <ScimSection tokens={scimTokens} unmappedGroups={scimUnmapped} activity={scimActivity} />
     </AdminPageFrame>
   );
 }

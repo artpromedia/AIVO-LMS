@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAddLearner } from "@/hooks/useLearners";
+import { validateBirthDate } from "@/lib/birth-date";
 import { isFlagOn } from "@/lib/feature-flags";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
@@ -28,6 +29,7 @@ export default function OnboardScreen() {
     firstName: "",
     lastName: "",
     gradeLevel: "",
+    dateOfBirth: "",
     pin: "",
   });
 
@@ -38,7 +40,9 @@ export default function OnboardScreen() {
   const [createdLearnerId, setCreatedLearnerId] = useState<string | null>(null);
 
   const handleAddChild = async () => {
-    if (!form.firstName || !form.gradeLevel || !form.pin) {
+    // COPPA age gate (Sprint A6): birth date is required — it determines
+    // the under-13 consent regime for this learner.
+    if (!form.firstName || !form.gradeLevel || !form.pin || validateBirthDate(form.dateOfBirth)) {
       Alert.alert(t("parentOnboard.missingInfo"), t("parentOnboard.fillRequired"));
       return;
     }
@@ -75,7 +79,7 @@ export default function OnboardScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <View style={{ width: contentWidth }}>
-        <Pressable onPress={() => router.back()} style={styles.backRow}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
@@ -99,7 +103,7 @@ export default function OnboardScreen() {
             <>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("parentOnboard.firstName")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel={t("parentOnboard.firstNamePlaceholder")}
                   style={styles.input}
                   value={form.firstName}
                   onChangeText={(v) => updateField("firstName", v)}
@@ -109,7 +113,7 @@ export default function OnboardScreen() {
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("parentOnboard.lastName")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel={t("parentOnboard.lastNamePlaceholder")}
                   style={styles.input}
                   value={form.lastName}
                   onChangeText={(v) => updateField("lastName", v)}
@@ -124,8 +128,20 @@ export default function OnboardScreen() {
           {step === 1 && (
             <>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t("parentOnboard.gradeLevel")}</Text>
+                <Text style={styles.label}>{t("parentLearnerNew.birthDate", "Birth date (YYYY-MM-DD)")}</Text>
                 <TextInput
+                  accessibilityLabel={t("parentLearnerNew.birthDate", "Birth date (YYYY-MM-DD)")}
+                  style={styles.input}
+                  value={form.dateOfBirth}
+                  onChangeText={(v) => updateField("dateOfBirth", v)}
+                  placeholder="2017-09-01"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="numbers-and-punctuation"
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>{t("parentOnboard.gradeLevel")}</Text>
+                <TextInput accessibilityLabel={t("parentOnboard.gradePlaceholder")}
                   style={styles.input}
                   value={form.gradeLevel}
                   onChangeText={(v) => updateField("gradeLevel", v)}
@@ -136,7 +152,7 @@ export default function OnboardScreen() {
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("parentOnboard.learnerPin")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel={t("parentOnboard.pinPlaceholder")}
                   style={styles.input}
                   value={form.pin}
                   onChangeText={(v) => updateField("pin", v.replace(/\D/g, "").slice(0, 4))}

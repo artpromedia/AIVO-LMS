@@ -4,7 +4,8 @@
     "sign_out": "Abmelden",
     "get_started": "Loslegen",
     "loading": "Laden...",
-    "language": "Sprache"
+    "language": "Sprache",
+    "get_support": "Support erhalten"
   },
   "nav": {
     "platform": "Plattform",
@@ -480,7 +481,9 @@
     },
     "settings_account_form": {
       "display_name": "Anzeigename",
-      "saved": "Gespeichert."
+      "saved": "Gespeichert.",
+      "timezone": "Zeitzone",
+      "timezone_hint": "Zeitpläne, Berichte und Erinnerungen werden in dieser Zeitzone angezeigt."
     },
     "settings": {
       "eyebrow": "Einstellungen",
@@ -1334,7 +1337,9 @@
       "notices": {
         "password_reset": "Dein Passwort wurde zurückgesetzt. Bitte melde dich mit deinem neuen Passwort an.",
         "logged_out": "Du wurdest abgemeldet."
-      }
+      },
+      "continue_with_sso": "Weiter mit {idp}",
+      "sso_required_note": "Dein Bezirk meldet sich über {idp} an. Passwort-Anmeldung ist für diese Domain deaktiviert."
     },
     "signup": {
       "promo_eyebrow": "Starte deine Familien-Testphase",

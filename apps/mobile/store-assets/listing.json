@@ -1,0 +1,55 @@
+{
+  "$comment": "Canonical store metadata (Sprint A5). docs/mobile/store-submission.md maps every field to the App Store Connect and Play Console forms. mobile:audit --store enforces required fields + populated screenshots before a release build ships.",
+  "appName": "AIVO Learning",
+  "bundleId": "com.artpromedia.aivo",
+  "category": { "ios": "Education", "android": "EDUCATION" },
+  "privacyPolicyUrl": "https://aivolearning.com/privacy-policy",
+  "supportUrl": "https://aivolearning.com/contact",
+  "marketingUrl": "https://aivolearning.com",
+  "coppa": {
+    "$comment": "Derived from docs/compliance/state-privacy-matrix.md + docs/legal/privacy-program.md — do not edit without compliance review.",
+    "directedToChildren": "mixed-audience",
+    "play_targetAudience": ["6-8", "9-12", "Parents"],
+    "play_designedForFamilies": false,
+    "play_familiesPolicyNote": "Mixed-audience app: children use the learner surface only after verifiable parental consent collected in-app; adult roles (parent/teacher/therapist/caregiver) are the account holders. Not enrolled in Designed for Families; child data practices follow COPPA via the in-app VPC flow.",
+    "appStore_kidsCategory": false,
+    "appStore_kidsCategoryNote": "Not in the Kids Category: accounts are created by adults and the app serves mixed audiences. Child sessions run under parent-granted consent (COPPA VPC), no third-party advertising, no tracking (NSPrivacyTracking=false)."
+  },
+  "contentRating": {
+    "play_questionnaire": {
+      "violence": "none",
+      "sexuality": "none",
+      "language": "none",
+      "controlledSubstances": "none",
+      "gambling": "none",
+      "userGeneratedContent": "yes-moderated",
+      "sharesLocation": false,
+      "personalInfoShared": false,
+      "digitalPurchases": true
+    },
+    "expected": { "esrb": "Everyone", "pegi": "3" }
+  },
+  "dataSafety": {
+    "$comment": "Play Data-Safety form rows; mirrors ios.privacyManifests in app.json. linked = associated with identity; all purposes are App functionality; nothing is shared with third parties for advertising; no data is 'sold'.",
+    "collected": [
+      { "type": "Email address", "linked": true, "optional": false, "purpose": "Account management" },
+      { "type": "Name", "linked": true, "optional": false, "purpose": "App functionality (learner display name)" },
+      { "type": "User IDs", "linked": true, "optional": false, "purpose": "App functionality" },
+      { "type": "Other in-app messages / user content", "linked": true, "optional": false, "purpose": "App functionality (learning responses, homework messages)" },
+      { "type": "Voice or sound recordings", "linked": true, "optional": true, "purpose": "App functionality (speech answers; only while using the microphone feature)" },
+      { "type": "Crash logs", "linked": false, "optional": false, "purpose": "Analytics/diagnostics (Sentry; identifiers hashed, PII scrubbed)" },
+      { "type": "Performance diagnostics", "linked": false, "optional": false, "purpose": "Analytics/diagnostics" }
+    ],
+    "encryptedInTransit": true,
+    "deletionPath": "In-app: Parent > Privacy > Delete data; also https://aivolearning.com/privacy-policy (DSAR)"
+  },
+  "screenshots": {
+    "contract": "store-assets/screenshots/README.md",
+    "requiredSets": ["ios/6.7", "ios/6.5", "ios/5.5", "android/phone", "android/tablet"],
+    "captureTool": "scripts/capture-store-screenshots.mjs + .maestro/store-screens.yaml"
+  },
+  "easOwner": {
+    "configured": "iamofemeofem",
+    "verify": "Run `eas whoami` + `eas project:info` on the release host before every production build (cannot be verified from CI containers; recorded in docs/mobile/store-submission.md)."
+  }
+}

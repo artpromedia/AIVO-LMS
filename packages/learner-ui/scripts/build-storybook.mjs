@@ -22,6 +22,11 @@
 //   * Mascot gallery (Aivo Owl × Pip Fox × Echo Whale, 6 expressions each)
 
 import fs from "node:fs";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { DataTable, AdminKpiCard, AdminCard } from "@aivo/admin-ui";
+import { BeatPreview, ProgressPath } from "@aivo/stage-ui";
+import { TIER_THEME_DATA } from "@aivo/brand";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -473,7 +478,7 @@ const script = `
 </script>
 `;
 
-const html = `<!doctype html>
+let html = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -486,6 +491,7 @@ const html = `<!doctype html>
     <h1>Aivo Playful Calm — Storybook</h1>
     <p>Live, token-driven gallery of the Playful Calm design system. Use the controls to switch theme, age mode, and dyslexia font.</p>
   </header>
+  <main>
   ${toolbar}
 
   <section class="sb-section" id="primitives">
@@ -540,9 +546,155 @@ const html = `<!doctype html>
     ${motionSection}
   </section>
 
+  </main>
   ${script}
 </body>
 </html>`;
+
+
+// ── Sprint B7 — real shared components, rendered server-side ────────────
+// These are the ACTUAL exports (admin-ui DataTable from Sprint B3, stage-ui
+// beats) rendered with realistic fixtures via react-dom/server — not
+// hand-written lookalike markup.
+const h = React.createElement;
+
+const auditRows = [
+  { id: "1", when: "2026-06-11 09:14", action: "admin.learner.viewed", actor: "j.rivera@lincoln.k12", resource: "learner/8f3a…" },
+  { id: "2", when: "2026-06-11 09:02", action: "SCIM_USER_CREATED", actor: "scim-provisioner", resource: "user/77b1…" },
+  { id: "3", when: "2026-06-10 16:48", action: "feature_flag.override_changed", actor: "support@aivo", resource: "feature_flag/calmMode" },
+];
+const dataTableDemo = renderToStaticMarkup(
+  h(DataTable, {
+    columns: [
+      { key: "when", header: "When", render: (r) => r.when, sortKey: "createdAt" },
+      { key: "action", header: "Action", render: (r) => r.action },
+      { key: "actor", header: "Actor", render: (r) => r.actor },
+      { key: "resource", header: "Resource", render: (r) => r.resource },
+    ],
+    rows: auditRows,
+    rowKey: (r) => r.id,
+    total: 128,
+    page: 2,
+    pageSize: 3,
+    basePath: "#",
+    search: "viewed",
+    sort: "createdAt:desc",
+    exportHref: "#export",
+    emptyMessage: "No audit entries match.",
+    searchPlaceholder: "Search action, actor email, or details…",
+  }),
+);
+const kpiDemo = renderToStaticMarkup(
+  h("div", { style: { display: "flex", gap: "12px", flexWrap: "wrap" } },
+    h(AdminKpiCard, { label: "Active learners", value: 1284 }),
+    h(AdminKpiCard, { label: "Schools", value: 17 }),
+    h(AdminKpiCard, { label: "Seats used", value: "82%" }),
+  ),
+);
+const adminCardDemo = renderToStaticMarkup(
+  h(AdminCard, { className: "p-6" },
+    h("h3", null, "Hash chain intact"),
+    h("p", null, "2,431 entries re-hashed — every stored fingerprint matches."),
+  ),
+);
+
+let stageDemo = "";
+try {
+  stageDemo = renderToStaticMarkup(
+    h("div", { style: { display: "grid", gap: "16px", background: "#1F1535", padding: "20px", borderRadius: "16px" } },
+      h(BeatPreview, {
+        beat: {
+          id: "beat-1",
+          type: "interaction",
+          tutorState: "asking",
+          interaction: {
+            type: "choice",
+            prompt: "Which shape has three sides?",
+            choices: [
+              { id: "a", label: "Triangle", isCorrect: true },
+              { id: "b", label: "Square", isCorrect: false },
+              { id: "c", label: "Circle", isCorrect: false },
+            ],
+            correctAnswer: "a",
+          },
+        },
+        index: 1,
+        isCurrent: true,
+      }),
+      h(ProgressPath, { current: 2, total: 5, xpEarned: 40, reducedMotion: true }),
+    ),
+  );
+} catch (err) {
+  // Stage beats need props matching the live Beat contract — fail the
+  // BUILD rather than ship an empty section if the contract moves.
+  throw new Error(`stage-ui demo failed to render: ${err && err.message}`);
+}
+
+const tierSection = Object.values(TIER_THEME_DATA)
+  .map(
+    (tier) => `
+  <div class="sb-token" style="background:${escapeHtml(tier.colors.bg)};border:1px solid ${escapeHtml(tier.colors.surfaceAlt)};border-radius:16px;padding:16px;min-width:260px">
+    <strong style="color:${escapeHtml(tier.colors.text)}">${escapeHtml(tier.name)}</strong>
+    <span style="display:block;color:${escapeHtml(tier.colors.textSoft)};font-size:12px;margin:4px 0 10px">${escapeHtml(tier.tagline)}</span>
+    <div style="display:flex;gap:6px">${["primary", "accent", "sky", "warm"]
+      .map((k) => `<span title="${k}: ${escapeHtml(tier.colors[k])}" style="width:28px;height:28px;border-radius:8px;background:${escapeHtml(tier.colors[k])};display:inline-block;border:1px solid rgba(0,0,0,.08)"></span>`)
+      .join("")}</div>
+  </div>`,
+  )
+  .join("");
+
+const axeSource = fs.readFileSync(
+  path.join(root, "node_modules", "axe-core", "axe.min.js"),
+  "utf8",
+);
+const a11ySection = `
+  <section class="sb-section" id="a11y">
+    <h2>Accessibility panel</h2>
+    <p>axe-core <span id="sb-axe-version"></span> runs against this page on load and reports the system's CURRENT findings — the same panel reviewers use to see exactly which primitives still owe contrast work.</p>
+    <div id="sb-axe-results" role="status" aria-live="polite">Running axe…</div>
+  </section>
+  <script>${axeSource}</script>
+  <script>
+    (function () {
+      document.getElementById("sb-axe-version").textContent = window.axe ? window.axe.version : "?";
+      window.axe.run(document, { resultTypes: ["violations"] }).then(function (results) {
+        var el = document.getElementById("sb-axe-results");
+        if (!results.violations.length) {
+          el.textContent = "No axe violations detected on this page.";
+          el.style.color = "#0f766e";
+          return;
+        }
+        el.innerHTML = "<strong>" + results.violations.length + " violation type(s):</strong><ul>" +
+          results.violations.map(function (v) {
+            return "<li><code>" + v.id + "</code> (" + v.impact + ", " + v.nodes.length + " node(s)) — " + v.help + "</li>";
+          }).join("") + "</ul>";
+        el.style.color = "#b91c1c";
+      });
+    })();
+  </script>`;
+
+const sharedComponentsHtml = `
+  <section class="sb-section" id="shared-components">
+    <h2>Shared console components (rendered from the real exports)</h2>
+    <h3>@aivo/admin-ui — DataTable (Sprint B3: server-driven search · sort · pager · audited export)</h3>
+    ${dataTableDemo}
+    <h3>@aivo/admin-ui — KPI cards</h3>
+    ${kpiDemo}
+    <h3>@aivo/admin-ui — Card</h3>
+    ${adminCardDemo}
+    <h3>@aivo/stage-ui — lesson beats</h3>
+    ${stageDemo}
+  </section>
+
+  <section class="sb-section" id="tier-themes">
+    <h2>Age-tier themes (single token source: packages/brand/tokens/modes/tier-themes.json)</h2>
+    <div class="sb-row">${tierSection}</div>
+  </section>
+`;
+
+html = html
+  .replace("<section class=\"sb-section\" id=\"color\">", sharedComponentsHtml + "\n  <section class=\"sb-section\" id=\"color\">")
+  .replace("  </main>", a11ySection + "\n  </main>");
 
 fs.writeFileSync(path.join(outDir, "index.html"), html);
 console.log("[learner-ui] storybook-static generated at", outDir);

@@ -157,7 +157,8 @@
     "activeTutorsTrend": "Tendencia de tutores activos",
     "sessionsTrend": "Tendencia de sesiones esta semana",
     "masteryBySubject": "Dominio por materia",
-    "reports": "Informes"
+    "reports": "Informes",
+    "districtLogo": "Logotipo del distrito"
   },
   "parentSettings": {
     "title": "Configuración",
@@ -221,7 +222,8 @@
     "addonPrice": "+ $4.99/mes",
     "cancelSubscription": "Cancelar suscripción",
     "cancelAtPeriodEnd": "Se cancela al final del período",
-    "addedToBill": "{{count}} complemento(s) · ${{price}}/mes"
+    "addedToBill": "{{count}} complemento(s) · ${{price}}/mes",
+    "openInvoice": "Abrir factura"
   },
   "parentTutors": {
     "title": "Tienda de Tutores",
@@ -665,7 +667,10 @@
         "homeLabel": "Volver al panel",
         "intro": "Empieza cuando estés listo."
       }
-    }
+    },
+    "hideTutor": "Ocultar tutor",
+    "moveUp": "Subir {{label}}",
+    "moveDown": "Bajar {{label}}"
   },
   "learnerTutor": {
     "tutorNotFound": "Tutor no encontrado",
@@ -1089,6 +1094,35 @@
       "body": "Está bien hacer una pausa. Un momento de calma puede ayudarte a sentirte listo.",
       "accept": "Tomar una pausa tranquila",
       "dismiss": "Ahora no"
+    },
+    "notEnabled": "El Rincón de Calma aún no está activado en tu escuela. Pide a un adulto que consulte con tu distrito."
+  },
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "body": "No te preocupes: no se perdió nada. Puedes intentarlo de nuevo o volver al inicio.",
+    "tryAgain": "Intentar de nuevo",
+    "goHome": "Ir al inicio"
+  },
+  "configError": {
+    "title": "Esta versión está mal configurada",
+    "body": "La aplicación no puede conectarse a los servicios de AIVO. Instala la última versión desde la tienda. Si administras esta implementación, recompila con la dirección del backend configurada."
+  },
+  "parentIep": {
+    "notificationPrefs": "Preferencias de notificaciones"
+  },
+  "offline": {
+    "synced": "Ya estás en línea. Tu trabajo se ha guardado.",
+    "banner": "Sin conexión. Sigue adelante: tu progreso se guarda en este dispositivo.",
+    "bannerQueued": "Sin conexión — {{count}} cambio(s) se sincronizarán al volver.",
+    "syncing": "Sincronizando {{count}} cambio(s)…"
+  },
+  "parentLearnerNew": {
+    "birthDate": "Fecha de nacimiento (AAAA-MM-DD)",
+    "birthDateError": {
+      "format": "Usa el formato AAAA-MM-DD, p. ej. 2017-09-01.",
+      "invalid": "Esa fecha no existe en el calendario.",
+      "future": "La fecha de nacimiento no puede ser futura.",
+      "tooOld": "El estudiante debe tener 21 años o menos."
     }
   }
 }

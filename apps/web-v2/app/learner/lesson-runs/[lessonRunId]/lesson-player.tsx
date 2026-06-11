@@ -689,7 +689,10 @@ export function LessonPlayer({
         <AudioControlBar />
       </div>
       <div className="mb-4">
-        <Progress value={((stepIdx + 1) / beats.length) * 100} />
+        <Progress
+          value={((stepIdx + 1) / beats.length) * 100}
+          aria-label={`Step ${stepIdx + 1} of ${beats.length}`}
+        />
         <p className="mt-1 text-xs text-aivo-ink-soft" aria-live="polite">
           {t("step_of", { current: stepIdx + 1, total: beats.length })}
         </p>

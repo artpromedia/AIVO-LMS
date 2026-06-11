@@ -32,7 +32,7 @@ export function MobileMathExpressionInput({ theme, prompt, disabled, onSubmit }:
         style={styles.input}
         accessibilityLabel="Math expression input"
       />
-      <Pressable
+      <Pressable accessibilityRole="button"
         onPress={() => value.trim() && onSubmit(value.trim())}
         disabled={disabled || !value.trim()}
         style={[styles.submit, (!value.trim() || disabled) && styles.submitDisabled]}

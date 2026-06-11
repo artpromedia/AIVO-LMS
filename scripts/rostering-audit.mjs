@@ -85,6 +85,76 @@ for (const rel of REQUIRED_ADMIN_APP_FILES) {
   }
 }
 
+// ── Sprint B5 — the SCIM provisioning path is part of the rostering
+// contract: one roster-apply core, SCIM endpoints incl. class-group
+// mapping with unmapped-group recording, the district token/review UI,
+// conformance tests, and the IdP runbook.
+const rosterCore = read("services/identity-svc/src/services/roster-core.ts");
+if (rosterCore) {
+  for (const symbol of [
+    "applyUserUpsert",
+    "applyUserDeactivate",
+    "applyClassGroupMapping",
+    "recordUnmappedGroup",
+    "parseClassGroupName",
+  ]) {
+    if (!new RegExp(`export (async )?function ${symbol}`).test(rosterCore)) {
+      errors.push(`roster-core.ts: missing export ${symbol} — the shared roster-apply core.`);
+    }
+  }
+}
+
+const scimRoutes = read("services/identity-svc/src/routes/scim.ts");
+if (scimRoutes) {
+  if (!/applyUserUpsert\(/.test(scimRoutes) || !/applyUserDeactivate\(/.test(scimRoutes)) {
+    errors.push("scim.ts: user create/deactivate must apply through the shared roster core.");
+  }
+  if (/db\s*\.insert\(users\)/.test(scimRoutes)) {
+    errors.push("scim.ts: direct users insert found — provisioning writes belong in roster-core.");
+  }
+  if (!/applyClassGroupMapping\(/.test(scimRoutes) || !/recordUnmappedGroup\(/.test(scimRoutes)) {
+    errors.push("scim.ts: class-group mapping + unmapped-group recording are required.");
+  }
+}
+
+const internalRoster = read("services/identity-svc/src/routes/internal-roster.ts");
+if (internalRoster) {
+  for (const route of ["/internal/roster/users/upsert", "/internal/roster/users/deactivate"]) {
+    if (!internalRoster.includes(route)) {
+      errors.push(`internal-roster.ts: missing ${route} (the SIS pipeline writer's contract).`);
+    }
+  }
+}
+
+const scimSection = read("apps/web-admin/app/district/sis/scim-section.tsx");
+if (scimSection) {
+  for (const [label, pattern] of [
+    ["once-only plaintext display", /scim-token-plaintext/],
+    ["token revoke action", /scim-token-revoke/],
+    ["sync counters", /scim-counters/],
+    ["unmapped-group review list", /scim-unmapped/],
+  ]) {
+    if (!pattern.test(scimSection)) errors.push(`scim-section.tsx: missing ${label}.`);
+  }
+}
+
+const conformance = read("services/identity-svc/tests/scim-conformance.test.ts");
+if (conformance) {
+  for (const [label, pattern] of [
+    ["Okta lifecycle test", /Okta lifecycle/],
+    ["Entra lifecycle test", /Entra lifecycle/],
+    ["tenant isolation test", /tenant isolation/],
+    ["unmapped recording test", /RECORDED, not dropped/],
+    ["malformed PatchOp test", /malformed PatchOps are rejected/],
+  ]) {
+    if (!pattern.test(conformance)) errors.push(`scim-conformance.test.ts: missing ${label}.`);
+  }
+}
+
+if (!existsSync(join(repoRoot, "docs/integrations/scim-runbook.md"))) {
+  errors.push("missing docs/integrations/scim-runbook.md (Okta + Entra setup runbook).");
+}
+
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
   console.error(`\nrostering:audit FAILED with ${errors.length} error(s).`);
@@ -92,5 +162,5 @@ if (errors.length) {
 }
 
 console.log(
-  "rostering:audit OK — SisProvider interface, Clever + ClassLink adapter factories, integration-svc index re-exports, standalone admin app foundation verified.",
+  "rostering:audit OK — SisProvider interface, Clever + ClassLink adapters, integration-svc re-exports, admin app foundation, and the SCIM provisioning path (roster core, class-group mapping, district UI, conformance tests, runbook) verified.",
 );

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type SupportTicketStatus,
   SUPPORT_TICKET_STATUSES,
@@ -10,12 +9,9 @@ import {
 } from "@aivo/admin-api/support";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { actionError } from "@/lib/action-errors";
 
 const SUPPORT_ROLES = ["platform_admin", "support"] as const;
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Ticket action failed.";
-}
 
 async function statusAction(formData: FormData) {
   "use server";
@@ -28,7 +24,7 @@ async function statusAction(formData: FormData) {
   try {
     await updateSupportTicket(session, id, { status });
   } catch (error) {
-    redirect(`/platform/support?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/support?error=${encodeURIComponent(actionError(error, "Ticket action failed."))}`);
   }
   redirect("/platform/support?notice=Ticket%20updated.");
 }

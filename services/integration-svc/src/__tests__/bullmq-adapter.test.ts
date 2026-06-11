@@ -15,16 +15,18 @@ const addMock = vi.fn(async () => undefined);
 const closeMock = vi.fn(async () => undefined);
 
 vi.mock("bullmq", () => ({
-  Queue: vi.fn().mockImplementation((name: string) => ({
-    name,
-    add: addMock,
-    close: closeMock,
-  })),
+  // vitest 4 enforces constructor semantics on `new Queue(...)` — the
+  // implementation must be a `function` (constructible), not an arrow.
+  Queue: vi.fn().mockImplementation(function (name: string) {
+    return { name, add: addMock, close: closeMock };
+  }),
   Worker: vi.fn(),
 }));
 
 vi.mock("ioredis", () => ({
-  default: vi.fn().mockImplementation((url: string) => ({ url })),
+  default: vi.fn().mockImplementation(function (url: string) {
+    return { url };
+  }),
 }));
 
 beforeEach(() => {

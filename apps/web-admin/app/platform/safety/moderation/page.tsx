@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole, requirePlatformPage } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type AdminModerationStatus,
   getModerationStats,
@@ -10,6 +9,7 @@ import {
 } from "@aivo/admin-api/moderation";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { actionError } from "@/lib/action-errors";
 
 const STATUSES: AdminModerationStatus[] = [
   "PENDING",
@@ -20,10 +20,6 @@ const STATUSES: AdminModerationStatus[] = [
 ];
 
 const DECISIONS: AdminModerationStatus[] = ["APPROVED", "REJECTED", "ESCALATED"];
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Moderation update failed.";
-}
 
 async function reviewAction(formData: FormData) {
   "use server";
@@ -36,7 +32,7 @@ async function reviewAction(formData: FormData) {
   try {
     await updateModerationEventStatus(session, id, status);
   } catch (error) {
-    redirect(`/platform/safety/moderation?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/safety/moderation?error=${encodeURIComponent(actionError(error, "Moderation update failed."))}`);
   }
   redirect(`/platform/safety/moderation?notice=${encodeURIComponent(`Event marked ${status}.`)}`);
 }

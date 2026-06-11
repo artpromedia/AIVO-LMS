@@ -1,14 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole, requirePlatformPage } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import { createAiOptOut, deleteAiOptOut, listAiOptOuts } from "@aivo/admin-api/ai-governance";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Opt-out action failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 function tenantQuery(tenantId?: string): string {
   return tenantId ? `?tenantId=${encodeURIComponent(tenantId)}` : "";
@@ -33,7 +29,7 @@ async function createAction(formData: FormData) {
       reason,
     });
   } catch (error) {
-    redirect(`/platform/ai/optouts?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/ai/optouts?error=${encodeURIComponent(actionError(error, "Opt-out action failed."))}`);
   }
   redirect(`/platform/ai/optouts${tenantQuery(tenantId)}${tenantId ? "&" : "?"}notice=Opt-out%20created.`);
 }
@@ -46,7 +42,7 @@ async function deleteAction(formData: FormData) {
   try {
     await deleteAiOptOut(session, id);
   } catch (error) {
-    redirect(`/platform/ai/optouts?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/ai/optouts?error=${encodeURIComponent(actionError(error, "Opt-out action failed."))}`);
   }
   redirect("/platform/ai/optouts?notice=Opt-out%20removed.");
 }

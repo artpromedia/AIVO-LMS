@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type DsarStatus,
   DSAR_STATUSES,
@@ -11,12 +10,9 @@ import {
 } from "@aivo/admin-api/dsar";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { actionError } from "@/lib/action-errors";
 
 const DSAR_ROLES = ["platform_admin", "district_admin"] as const;
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "DSAR action failed.";
-}
 
 async function approveAction(formData: FormData) {
   "use server";
@@ -26,7 +22,7 @@ async function approveAction(formData: FormData) {
   try {
     await approveDsar(session, id);
   } catch (error) {
-    redirect(`/platform/compliance/dsar?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/compliance/dsar?error=${encodeURIComponent(actionError(error, "DSAR action failed."))}`);
   }
   redirect("/platform/compliance/dsar?notice=Request%20approved.");
 }
@@ -40,7 +36,7 @@ async function rejectAction(formData: FormData) {
   try {
     await rejectDsar(session, id, reason);
   } catch (error) {
-    redirect(`/platform/compliance/dsar?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/compliance/dsar?error=${encodeURIComponent(actionError(error, "DSAR action failed."))}`);
   }
   redirect("/platform/compliance/dsar?notice=Request%20rejected.");
 }

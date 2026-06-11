@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface PreviewOverlayProps {
   isVisible: boolean;
   title: string;
@@ -20,7 +21,7 @@ export function PreviewOverlay({
   autoAdvanceMs = 0,
   onReady,
   onDismiss,
-  accentColor = "#7C3AED",
+  accentColor = SEMANTIC.color.text.accent,
 }: PreviewOverlayProps) {
   const [interacted, setInteracted] = useState(false);
 

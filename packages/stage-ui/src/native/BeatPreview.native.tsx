@@ -5,6 +5,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import type { Beat } from "../types.js";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface BeatPreviewProps {
   beat: Beat;
   index: number;
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
   cardCurrent: {
     backgroundColor: "rgba(124,58,237,0.3)",
     borderWidth: 1,
-    borderColor: "#7c3aed",
+    borderColor: SEMANTIC.color.text.accent,
   },
   badge: {
     width: 28,

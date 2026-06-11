@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSentryConfig } from "@sentry/nextjs";
+import bundleAnalyzer from "@next/bundle-analyzer";
 
 const withNextIntl = createNextIntlPlugin("./lib/i18n/request.ts");
 
@@ -14,6 +16,13 @@ const SECURITY_HEADERS = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
   },
+  // Sprint A3 (ZAP #65/#73): cross-origin isolation headers. COEP is left
+  // unset deliberately — the learner surfaces embed cross-origin media
+  // (TTS audio, lesson images from the asset CDN) that do not send CORP
+  // headers, and require-corp would hard-break them for no isolation win
+  // we currently need (no SharedArrayBuffer use).
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   ...(isProd
     ? [
         {
@@ -27,6 +36,8 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  // ZAP #65/#73 "Server Leaks Information via X-Powered-By".
+  poweredByHeader: false,
   allowedDevOrigins: [
     "*.replit.dev",
     "*.replit.app",
@@ -124,4 +135,21 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+// Sentry wraps the final config. Source-map upload only activates when a
+// SENTRY_AUTH_TOKEN is present (CI release builds); forks and local builds
+// without the secret build exactly as before. Runtime init lives in
+// instrumentation.ts / instrumentation-client.ts.
+// ANALYZE=1 pnpm --filter @aivo/web-v2 build → interactive treemaps in
+// .next/analyze (Sprint B7). Budgets are enforced separately by
+// scripts/ci/bundle-budget.mjs; the analyzer is the investigation tool.
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === "1" });
+
+export default withSentryConfig(withBundleAnalyzer(withNextIntl(nextConfig)), {
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT ?? "aivo-web-v2",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
+  telemetry: false,
+  disableLogger: true,
+});

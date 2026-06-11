@@ -21,6 +21,12 @@ export default async function TenantDetailPage({
       description={`${tenant.typeLabel} · created ${formatDate(tenant.createdAt)}`}
       action={
         <div className="flex flex-wrap gap-2">
+          <Link className="admin-button admin-button-secondary" href={`/platform/tenants/${tenant.id}/flags`}>
+            Feature flags
+          </Link>
+          <Link className="admin-button admin-button-secondary" href={`/platform/tenants/${tenant.id}/branding`}>
+            Branding
+          </Link>
           <Link className="admin-button" href={`/platform/billing/invoices?tenantId=${tenant.id}`}>
             Invoices
           </Link>

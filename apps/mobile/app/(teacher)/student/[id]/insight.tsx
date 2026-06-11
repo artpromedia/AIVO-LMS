@@ -23,7 +23,7 @@ export default function SubmitInsightScreen() {
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
@@ -34,7 +34,7 @@ export default function SubmitInsightScreen() {
 
       <AivoCard>
         <Text style={styles.label}>{t("teacherInsight.yourInsight")}</Text>
-        <TextInput
+        <TextInput accessibilityLabel={t("teacherInsight.placeholder")}
           style={styles.textArea}
           value={insightText}
           onChangeText={setInsightText}

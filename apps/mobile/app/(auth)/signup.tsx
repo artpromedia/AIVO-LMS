@@ -196,7 +196,7 @@ export default function SignupScreen() {
         contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 32 }}
       >
         <View style={styles.topRow}>
-          <Pressable onPress={() => router.back()} style={styles.backButton} hitSlop={12}>
+          <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton} hitSlop={12}>
             <Text style={[styles.backText, { color: palette.primary }]}>{t("common.back")}</Text>
           </Pressable>
           <SensoryToggle variant="icon" />
@@ -215,7 +215,7 @@ export default function SignupScreen() {
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <Pressable
+        <Pressable accessibilityRole="button"
           style={styles.googleButton}
           onPress={() => promptAsync()}
           disabled={!request || googleLoading}
@@ -237,7 +237,7 @@ export default function SignupScreen() {
         >
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.fullName")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.fullNamePlaceholder")}
               style={styles.input}
               value={form.name}
               onChangeText={(v) => updateField("name", v)}
@@ -249,7 +249,7 @@ export default function SignupScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.email")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.emailPlaceholder")}
               style={styles.input}
               value={form.email}
               onChangeText={(v) => updateField("email", v)}
@@ -263,7 +263,7 @@ export default function SignupScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.password")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.atLeast8Chars")}
               style={styles.input}
               value={form.password}
               onChangeText={(v) => updateField("password", v)}
@@ -275,7 +275,7 @@ export default function SignupScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.confirmPassword")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel={t("auth.confirmPasswordPlaceholder")}
               style={styles.input}
               value={form.confirmPassword}
               onChangeText={(v) => updateField("confirmPassword", v)}
@@ -306,7 +306,7 @@ export default function SignupScreen() {
           </View>
 
           {/* Coupon / Access Code */}
-          <Pressable onPress={() => setCouponExpanded((v) => !v)} style={styles.couponToggle}>
+          <Pressable accessibilityRole="button" onPress={() => setCouponExpanded((v) => !v)} style={styles.couponToggle}>
             <Text style={styles.couponToggleText}>
               {couponExpanded ? "▴" : "▾"} Have a coupon or access code?
             </Text>
@@ -314,7 +314,7 @@ export default function SignupScreen() {
 
           {couponExpanded && (
             <View style={styles.couponSection}>
-              <TextInput
+              <TextInput accessibilityLabel="ENTER CODE"
                 style={styles.input}
                 value={couponCode}
                 onChangeText={(v) => setCouponCode(v.toUpperCase())}
@@ -367,7 +367,7 @@ export default function SignupScreen() {
           />
         </View>
 
-        <Pressable onPress={() => router.push("/(auth)/login")} style={styles.loginLink}>
+        <Pressable accessibilityRole="button" onPress={() => router.push("/(auth)/login")} style={styles.loginLink}>
           <Text style={styles.loginText}>
             {t("auth.haveAccount")} <Text style={styles.loginBold}>{t("auth.signIn")}</Text>
           </Text>

@@ -157,7 +157,8 @@
     "activeTutorsTrend": "Tendance des tuteurs actifs",
     "sessionsTrend": "Tendance des séances cette semaine",
     "masteryBySubject": "Maîtrise par matière",
-    "reports": "Rapports"
+    "reports": "Rapports",
+    "districtLogo": "Logo du district"
   },
   "parentSettings": {
     "title": "Paramètres",
@@ -221,7 +222,8 @@
     "addonPrice": "+ 4,99 €/mois",
     "cancelSubscription": "Annuler l'abonnement",
     "cancelAtPeriodEnd": "Annulation en fin de période",
-    "addedToBill": "{{count}} extension(s) · {{price}} €/mois"
+    "addedToBill": "{{count}} extension(s) · {{price}} €/mois",
+    "openInvoice": "Ouvrir la facture"
   },
   "parentTutors": {
     "title": "Boutique de tuteurs",
@@ -665,7 +667,10 @@
         "homeLabel": "Retour au tableau de bord",
         "intro": "Commence quand tu es prêt."
       }
-    }
+    },
+    "hideTutor": "Masquer le tuteur",
+    "moveUp": "Monter {{label}}",
+    "moveDown": "Descendre {{label}}"
   },
   "learnerTutor": {
     "tutorNotFound": "Tuteur introuvable",
@@ -1089,6 +1094,35 @@
       "body": "C'est bien de faire une pause. Un petit moment de calme peut t'aider à te sentir prêt.",
       "accept": "Faire une pause calme",
       "dismiss": "Pas maintenant"
+    },
+    "notEnabled": "Le Coin Calme n'est pas encore activé pour ton école. Demande à un adulte de vérifier auprès de ton district."
+  },
+  "errorBoundary": {
+    "title": "Un problème est survenu",
+    "body": "Pas d'inquiétude — rien n'est perdu. Tu peux réessayer ou revenir à l'accueil.",
+    "tryAgain": "Réessayer",
+    "goHome": "Retour à l'accueil"
+  },
+  "configError": {
+    "title": "Cette version est mal configurée",
+    "body": "L'application ne peut pas joindre les services AIVO. Installez la dernière version depuis la boutique. Si vous gérez ce déploiement, recompilez avec l'adresse du backend définie."
+  },
+  "parentIep": {
+    "notificationPrefs": "Préférences de notifications"
+  },
+  "offline": {
+    "synced": "Tu es de nouveau en ligne. Ton travail a été enregistré.",
+    "banner": "Hors ligne. Continue — ta progression est enregistrée sur cet appareil.",
+    "bannerQueued": "Hors ligne — {{count}} modification(s) se synchroniseront au retour.",
+    "syncing": "Synchronisation de {{count}} modification(s)…"
+  },
+  "parentLearnerNew": {
+    "birthDate": "Date de naissance (AAAA-MM-JJ)",
+    "birthDateError": {
+      "format": "Utilise le format AAAA-MM-JJ, p. ex. 2017-09-01.",
+      "invalid": "Cette date n'existe pas.",
+      "future": "La date de naissance ne peut pas être dans le futur.",
+      "tooOld": "L'élève doit avoir 21 ans ou moins."
     }
   }
 }

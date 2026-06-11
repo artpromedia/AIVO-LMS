@@ -19,6 +19,7 @@ import {
   seatRequests,
   appendAudit,
   adminAuditLog,
+  verifyAuditChainRange,
 } from "@aivo/db";
 import { Permission, verifyJWT } from "@aivo/security";
 import { eq, and, sql, ilike, or, count, desc, asc, isNull, gte, gt, lte, between } from "drizzle-orm";
@@ -27,7 +28,8 @@ import crypto from "crypto";
 import { requireDistrictAdmin } from "../hooks/require-district-admin.js";
 import { requireStepUp } from "./step-up.js";
 import { delegatedAdminRbacV2Enabled, requestHasPermission } from "../lib/permissions.js";
-import { parseLogoDataUrl, wcagContrastRatio, WCAG_AA_NORMAL } from "../lib/branding-validation.js";
+import { parseLogoDataUrl } from "../lib/branding-validation.js";
+import { evaluateBrandPalette } from "@aivo/brand";
 import {
   getDistrictStatsSchema,
   getDistrictTenantSchema,
@@ -64,6 +66,7 @@ import {
   districtSeatsRequestSchema,
   getDistrictRosterCsvSchema,
   getDistrictActivityExportSchema,
+  getDistrictActivityVerifySchema,
   getDistrictSeatsRequestsSchema,
 } from "./schemas.js";
 void verifyJWT; // kept for potential token introspection helpers
@@ -1147,10 +1150,18 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
           .limit(1);
         const priorBranding = (prior?.branding as any) || {};
         const incoming = { ...body.branding };
+        // Explicit null clears the logo (reset to AIVO default) — only
+        // SETTING a logo must go through the validated upload route.
+        const clearLogo = incoming.logoUrl === null;
         delete incoming.logoUrl;
         delete incoming.logoMime;
         delete incoming.logoBytes;
         updates.branding = { ...priorBranding, ...incoming };
+        if (clearLogo) {
+          updates.branding.logoUrl = null;
+          updates.branding.logoMime = null;
+          updates.branding.logoBytes = null;
+        }
       }
       if (body.featureOverrides !== undefined) updates.featureOverrides = body.featureOverrides;
 
@@ -1200,14 +1211,51 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
         .where(eq(districtSettings.tenantId, req.tenantId))
         .limit(1);
       const stored = (settings?.ssoConfig || {}) as any;
-      const { idpCertEnvelope, spPrivateKeyEnvelope, ...safe } = stored;
+      const { idpCertEnvelope, spPrivateKeyEnvelope, oidc, ...safe } = stored;
+      // Sprint B1 — never return the encrypted secret envelope (even
+      // ciphertext stays server-side); the UI gets a *Set marker.
+      const { clientSecretEnvelope, ...oidcSafe } = (oidc || {}) as any;
       return {
         config: {
           ...safe,
           idpCertSet: !!idpCertEnvelope,
           spPrivateKeySet: !!spPrivateKeyEnvelope,
+          oidc: oidc
+            ? { ...oidcSafe, clientSecretSet: !!clientSecretEnvelope }
+            : undefined,
         },
       };
+    },
+  );
+
+  // Sprint B1 — dry-run an OIDC issuer before enabling it: performs LIVE
+  // discovery and reports the resolved endpoints (or the exact failure).
+  app.post(
+    "/api/district/sso/oidc/test",
+    { schema: updateDistrictSsoSchema, preHandler: requireDistrictAdmin },
+    async (req: any, reply: any) => {
+      const body = (req.body || {}) as { issuer?: string; discoveryUrl?: string };
+      if (!body.issuer && !body.discoveryUrl) {
+        return reply.status(400).send({ error: "issuer or discoveryUrl is required" });
+      }
+      const { discoverOidc } = await import("../services/oidc-rp.js");
+      try {
+        const doc = await discoverOidc({
+          issuer: body.issuer || "",
+          discoveryUrl: body.discoveryUrl,
+          clientId: "dry-run",
+          enabled: true,
+        } as any);
+        return {
+          ok: true,
+          issuer: doc.issuer,
+          authorizationEndpoint: doc.authorization_endpoint,
+          tokenEndpoint: doc.token_endpoint,
+          jwksUri: doc.jwks_uri,
+        };
+      } catch (err: any) {
+        return reply.status(422).send({ ok: false, error: String(err?.message ?? err) });
+      }
     },
   );
 
@@ -1269,6 +1317,45 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
           .send({ error: "IdP signing certificate is required to enable SSO" });
       }
 
+      // ── Sprint B1: OIDC relying-party section ─────────────────────────
+      // Lives under sso_config.oidc; consumed by routes/oidc-rp.ts. The
+      // client secret is encrypted at rest like the SAML cert/key; an
+      // omitted secret preserves the stored envelope.
+      const priorOidc = (prior.oidc || {}) as any;
+      let nextOidc: any = priorOidc;
+      if (body.oidc !== undefined) {
+        const o = body.oidc || {};
+        const { encryptOidcRpConfig } = await import("../services/oidc-rp.js");
+        nextOidc = encryptOidcRpConfig({
+          enabled: !!o.enabled,
+          idpLabel: o.idpLabel ?? priorOidc.idpLabel,
+          issuer: o.issuer ?? priorOidc.issuer,
+          discoveryUrl: o.discoveryUrl ?? priorOidc.discoveryUrl,
+          clientId: o.clientId ?? priorOidc.clientId,
+          scopes: Array.isArray(o.scopes) ? o.scopes : priorOidc.scopes,
+          emailClaim: o.emailClaim ?? priorOidc.emailClaim,
+          nameClaim: o.nameClaim ?? priorOidc.nameClaim,
+          roleClaim: o.roleClaim ?? priorOidc.roleClaim,
+          roleMap: o.roleMap ?? priorOidc.roleMap,
+          defaultRole: o.defaultRole ?? priorOidc.defaultRole,
+          emailDomains: Array.isArray(o.emailDomains)
+            ? o.emailDomains
+            : priorOidc.emailDomains,
+          clientSecret: typeof o.clientSecret === "string" ? o.clientSecret : undefined,
+        });
+        if (!nextOidc.clientSecretEnvelope && priorOidc.clientSecretEnvelope) {
+          nextOidc.clientSecretEnvelope = priorOidc.clientSecretEnvelope;
+        }
+        if (nextOidc.enabled && (!nextOidc.issuer || !nextOidc.clientId)) {
+          return reply
+            .status(400)
+            .send({ error: "issuer and clientId are required to enable OIDC SSO" });
+        }
+      }
+      if (nextOidc && Object.keys(nextOidc).length > 0) {
+        (encrypted as any).oidc = nextOidc;
+      }
+
       const updates: any = { ssoConfig: encrypted, updatedAt: new Date() };
       let result;
       if (existing) {
@@ -1311,13 +1398,42 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/activity",
     { schema: getDistrictActivitySchema, preHandler: requireDistrictAdmin },
     async (req: any) => {
-      const { page: pageStr, pageSize: pageSizeStr, action, resourceType } = req.query as any;
+      const {
+        page: pageStr,
+        pageSize: pageSizeStr,
+        action,
+        resourceType,
+        q,
+        from,
+        to,
+      } = req.query as any;
       const page = safePage(pageStr);
       const pageSize = safePageSize(pageSizeStr, 30);
 
       const conditions: any[] = [eq(districtActivityLog.tenantId, req.tenantId)];
       if (action) conditions.push(eq(districtActivityLog.action, action));
       if (resourceType) conditions.push(eq(districtActivityLog.resourceType, resourceType));
+      // Sprint B4 — free-text + date-range filters for the district audit
+      // table (same query the export honors, so preview === download).
+      if (q) {
+        const needle = `%${q}%`;
+        conditions.push(
+          or(
+            ilike(districtActivityLog.action, needle),
+            ilike(districtActivityLog.actorName, needle),
+            ilike(districtActivityLog.resourceType, needle),
+            sql`${districtActivityLog.details}::text ILIKE ${needle}`,
+          ),
+        );
+      }
+      if (from) {
+        const d = new Date(from);
+        if (!isNaN(d.getTime())) conditions.push(gte(districtActivityLog.createdAt, d));
+      }
+      if (to) {
+        const d = new Date(to);
+        if (!isNaN(d.getTime())) conditions.push(lte(districtActivityLog.createdAt, d));
+      }
 
       const where = conditions.length === 1 ? conditions[0] : and(...conditions);
 
@@ -1903,9 +2019,10 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     { schema: getDistrictActivityExportSchema, preHandler: exportStepUp },
     async (req: any, reply: any) => {
       const tid = req.tenantId;
-      const { from, to, format } = (req.query as any) || {};
+      const { from, to, format, action } = (req.query as any) || {};
       const fmt: "csv" | "json" = format === "json" ? "json" : "csv";
       const conds: any[] = [eq(districtActivityLog.tenantId, tid)];
+      if (action) conds.push(eq(districtActivityLog.action, action));
       let fromDate: Date | undefined;
       let toDate: Date | undefined;
       if (from) {
@@ -1997,6 +2114,48 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     },
   );
 
+  // Sprint B4 — district-facing hash-chain verification. Recomputes the
+  // district_activity_log chain over the requested date range server-side
+  // and returns ONLY integrity metadata (the chain is global across
+  // tenants, so row contents never leave the server — a district learns
+  // whether the ledger its rows live in is intact, not other tenants'
+  // data). The slice is anchored against the stored hash of the row
+  // immediately preceding the range.
+  app.get(
+    "/api/district/activity/verify",
+    { schema: getDistrictActivityVerifySchema, preHandler: requireDistrictAdmin },
+    async (req: any, reply: any) => {
+      const { from, to } = (req.query as any) || {};
+      let fromDate: Date | undefined;
+      let toDate: Date | undefined;
+      if (from) {
+        const d = new Date(from);
+        if (isNaN(d.getTime())) return reply.status(400).send({ error: "Invalid from date" });
+        fromDate = d;
+      }
+      if (to) {
+        const d = new Date(to);
+        if (isNaN(d.getTime())) return reply.status(400).send({ error: "Invalid to date" });
+        toDate = d;
+      }
+      const result = await verifyAuditChainRange(db, "district_activity_log", {
+        from: fromDate,
+        to: toDate,
+      });
+      return {
+        intact: result.intact,
+        checkedRows: result.checkedRows,
+        skippedLegacyRows: result.skippedLegacyRows,
+        firstSeq: result.firstSeq,
+        lastSeq: result.lastSeq,
+        brokenAtSeq: result.brokenAtSeq,
+        anchored: result.anchored,
+        from: fromDate?.toISOString() ?? null,
+        to: toDate?.toISOString() ?? null,
+      };
+    },
+  );
+
   // Seat-request list (so the dashboard can show pending requests).
   app.get(
     "/api/district/seats/requests",
@@ -2018,24 +2177,41 @@ function csvCell(v: any): string {
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-// PUT /api/district/settings is defined above; the WCAG check for
-// branding.primaryColor lives in `validateBrandingPatch` so we can
-// reuse it. We export a small helper the existing handler imports.
+// PUT /api/district/settings is defined above; palette validation lives
+// in `validateBrandingPatch` so the handler and tests share it. Sprint B6:
+// primary/secondary go through @aivo/brand's contrast guard — checked
+// against the REAL text/surface tokens in both themes, with the specific
+// per-check failure messages surfaced to the caller.
 export function validateBrandingPatch(branding: any): { ok: boolean; error?: string } {
   if (!branding || typeof branding !== "object") return { ok: true };
-  if (typeof branding.primaryColor === "string" && branding.primaryColor.trim()) {
-    const ratio = wcagContrastRatio(branding.primaryColor.trim(), "#FFFFFF");
-    if (ratio === null) return { ok: false, error: "primaryColor must be a hex color (#RRGGBB)" };
-    if (ratio < WCAG_AA_NORMAL) {
-      return {
-        ok: false,
-        error: `primaryColor contrast ratio ${ratio.toFixed(2)}:1 against white fails WCAG AA (need ≥ ${WCAG_AA_NORMAL}:1)`,
-      };
-    }
+  const verdict = evaluateBrandPalette({
+    primaryColor: typeof branding.primaryColor === "string" ? branding.primaryColor : null,
+    secondaryColor: typeof branding.secondaryColor === "string" ? branding.secondaryColor : null,
+  });
+  if (!verdict.ok) {
+    return { ok: false, error: verdict.failures.map((f) => f.message).join("; ") };
   }
   if (branding.supportEmail !== undefined && typeof branding.supportEmail === "string") {
     if (branding.supportEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(branding.supportEmail)) {
       return { ok: false, error: "supportEmail must be a valid email address" };
+    }
+  }
+  if (
+    branding.supportUrl !== undefined &&
+    typeof branding.supportUrl === "string" &&
+    branding.supportUrl
+  ) {
+    let parsed: URL;
+    try {
+      parsed = new URL(branding.supportUrl);
+    } catch {
+      return { ok: false, error: "supportUrl must be an absolute http(s) URL" };
+    }
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return { ok: false, error: "supportUrl must use http(s) — no custom schemes" };
+    }
+    if (branding.supportUrl.length > 512) {
+      return { ok: false, error: "supportUrl must be 512 characters or fewer" };
     }
   }
   if (branding.displayName !== undefined && typeof branding.displayName === "string") {

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type VulnSeverity,
   type VulnSource,
@@ -15,10 +14,7 @@ import {
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Vulnerability action failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
   "use server";
@@ -35,7 +31,7 @@ async function createAction(formData: FormData) {
       affectedComponent: String(formData.get("affectedComponent") || "").trim(),
     });
   } catch (error) {
-    redirect(`/platform/security/vulnerabilities?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/vulnerabilities?error=${encodeURIComponent(actionError(error, "Vulnerability action failed."))}`);
   }
   redirect("/platform/security/vulnerabilities?notice=Finding%20added.");
 }
@@ -52,7 +48,7 @@ async function statusAction(formData: FormData) {
   try {
     await updateSecurityVulnerability(session, id, { status, fixedIn: fixedIn || null });
   } catch (error) {
-    redirect(`/platform/security/vulnerabilities?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/vulnerabilities?error=${encodeURIComponent(actionError(error, "Vulnerability action failed."))}`);
   }
   redirect("/platform/security/vulnerabilities?notice=Finding%20updated.");
 }

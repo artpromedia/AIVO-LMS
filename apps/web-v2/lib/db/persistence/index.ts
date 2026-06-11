@@ -12,6 +12,7 @@
  * postgres while the rest stays in-memory is the supported path.
  */
 import { serverEnv } from "@/lib/env";
+import { ensureSeeded } from "@/lib/db/seed";
 import { logger } from "@/lib/observability/logger";
 import type { Persistence, PersistenceMode } from "./types";
 import { memoryNotifications } from "./memory/notifications";
@@ -256,6 +257,41 @@ export function getPersistence(): Persistence {
     engagementMode,
     standardsMode,
   ]);
+  // Memory mode serves the seeded demo fixtures — that is its entire
+  // premise (mock auth mints MOCK_USERS whose learners/tenants must exist
+  // in the store). Without this, the first adapter-routed read on a fresh
+  // worker sees an empty store and pages guard-redirect to /login, which
+  // is exactly how the visual suite once captured blank/login baselines.
+  // Postgres-only processes never reach this branch, and production env
+  // validation refuses memory adapters outright.
+  if (
+    [
+      notificationsMode,
+      auditMode,
+      identityMode,
+      learnersMode,
+      assessmentsMode,
+      lessonRunsMode,
+      brainProfilesMode,
+      curriculumMode,
+      complianceMode,
+      questsMode,
+      adminMode,
+      collaborationMode,
+      billingMode,
+      clinicalMode,
+      securityMode,
+      rosteringMode,
+      audioMode,
+      safetyMode,
+      supportMode,
+      settingsMode,
+      engagementMode,
+      standardsMode,
+    ].includes("memory")
+  ) {
+    ensureSeeded();
+  }
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).

@@ -1,5 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { IDENTITY_SESSION_COOKIE } from "@aivo/admin-auth/identity-client";
+import { buildCsp, makeNonce } from "@/lib/security/csp";
+import { checkSameOrigin } from "@/lib/security/csrf";
+
+/** Per-request CSP + nonce headers (Sprint A3, ZAP #65). */
+function withSecurity(req: NextRequest, requestId: string): NextResponse {
+  const nonce = makeNonce();
+  const csp = buildCsp({
+    nonce,
+    isProd: process.env.NODE_ENV === "production",
+    sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    reportPath: "/api/csp-report",
+  });
+  const headers = new Headers(req.headers);
+  headers.set("x-request-id", requestId);
+  headers.set("x-nonce", nonce);
+  headers.set("content-security-policy", csp);
+  const res = NextResponse.next({ request: { headers } });
+  res.headers.set("x-request-id", requestId);
+  res.headers.set("content-security-policy", csp);
+  return res;
+}
 
 const PUBLIC_PREFIXES = ["/login", "/logout", "/api/health", "/_next", "/favicon.ico", "/images", "/assets"];
 const ADMIN_ROLES = new Set([
@@ -42,8 +63,18 @@ export function middleware(req: NextRequest) {
   const headers = new Headers(req.headers);
   headers.set("x-request-id", requestId);
 
+  // CSRF — mutating requests must prove same-origin (Sprint A3). Server
+  // Actions add Next's own origin check on top; the CSP report sink is
+  // exempt like every report-uri endpoint.
+  if (req.nextUrl.pathname !== "/api/csp-report") {
+    const verdict = checkSameOrigin(req);
+    if (!verdict.ok) {
+      return new NextResponse("Cross-origin request rejected", { status: 403 });
+    }
+  }
+
   if (isPublicPath(req.nextUrl.pathname)) {
-    return NextResponse.next({ request: { headers } });
+    return withSecurity(req, requestId);
   }
 
   if (!allowlisted(req)) {
@@ -58,7 +89,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl, { headers });
   }
 
-  return NextResponse.next({ request: { headers } });
+  return withSecurity(req, requestId);
 }
 
 export const config = {
