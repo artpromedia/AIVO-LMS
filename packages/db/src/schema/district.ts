@@ -108,6 +108,13 @@ export const districtSettings = pgTable("district_settings", {
     "parent",
     "gen_ed_teacher",
   ]),
+  // Wave C (G5): recommendation-approval delegation. Parents are always
+  // authoritative; this only ADDS teacher/caregiver approval for the
+  // delegable types (see @aivo/enterprise-core). Default: parent-only.
+  approvalPolicy: jsonb("approval_policy").default({
+    teacherApproval: false,
+    caregiverApproval: false,
+  }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

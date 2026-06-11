@@ -2755,7 +2755,8 @@
       "no_lessons_started": "अभी तक कोई पाठ शुरू नहीं हुआ।",
       "skill_gaps": "कौशल की कमियाँ",
       "no_notable_gaps": "अभी कोई उल्लेखनीय कमी नहीं — जारी रखें।",
-      "accommodations_teacher_summary": "समायोजन (शिक्षक सारांश)"
+      "accommodations_teacher_summary": "समायोजन (शिक्षक सारांश)",
+      "pending_recommendations": "लंबित अनुशंसाएँ"
     },
     "learner_iep_draft": {
       "page_title": "IEP लक्ष्य मसौदा",
@@ -2931,7 +2932,8 @@
       "no_learners_yet": "अभी तक कोई सीखने वाला नहीं",
       "primary_language": "प्राथमिक भाषा",
       "reading_comfort": "पढ़ने की क्षमता",
-      "math_comfort": "गणित की क्षमता"
+      "math_comfort": "गणित की क्षमता",
+      "pending_recommendations": "लंबित अनुशंसाएँ"
     },
     "observations": {
       "page_title": "अवलोकन",

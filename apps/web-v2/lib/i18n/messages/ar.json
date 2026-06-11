@@ -2755,7 +2755,8 @@
       "no_lessons_started": "لم تبدأ أي دروس بعد.",
       "skill_gaps": "ثغرات المهارات",
       "no_notable_gaps": "لا ثغرات بارزة حتى الآن — استمر.",
-      "accommodations_teacher_summary": "التعديلات (ملخّص المعلّم)"
+      "accommodations_teacher_summary": "التعديلات (ملخّص المعلّم)",
+      "pending_recommendations": "التوصيات المعلّقة"
     },
     "learner_iep_draft": {
       "page_title": "مسودة أهداف IEP",
@@ -2931,7 +2932,8 @@
       "no_learners_yet": "لا يوجد متعلّمون بعد",
       "primary_language": "اللغة الأساسية",
       "reading_comfort": "مستوى القراءة",
-      "math_comfort": "مستوى الرياضيات"
+      "math_comfort": "مستوى الرياضيات",
+      "pending_recommendations": "التوصيات المعلّقة"
     },
     "observations": {
       "page_title": "الملاحظات",

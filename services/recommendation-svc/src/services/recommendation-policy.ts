@@ -1,8 +1,9 @@
 import {
   canApproveProfileRecommendation,
   canMutateBrainGovernanceFields,
+  DEFAULT_RECOMMENDATION_APPROVAL_POLICY,
 } from "@aivo/enterprise-core";
-import type { TenantRole } from "@aivo/enterprise-core";
+import type { RecommendationApprovalPolicy, TenantRole } from "@aivo/enterprise-core";
 import type { ProfileRecommendation, RecommendationEvidence } from "./types.js";
 
 export class RecommendationPolicyError extends Error {
@@ -15,6 +16,33 @@ export class RecommendationPolicyError extends Error {
   }
 }
 
+/**
+ * Wave C (G5) — role × type × tenant-policy approval check. Parents always
+ * pass; teachers/caregivers pass only for their delegable types when the
+ * tenant's district policy enables them; IEP-affecting recommendations
+ * never delegate. Callers without a tenant policy (dev/in-memory mode)
+ * get the parent-only default.
+ */
+export function requireApprovalPermission(
+  role: TenantRole | undefined,
+  recommendation: Pick<ProfileRecommendation, "type" | "safety">,
+  policy: RecommendationApprovalPolicy = DEFAULT_RECOMMENDATION_APPROVAL_POLICY,
+): void {
+  const allowed = canApproveProfileRecommendation(role, {
+    recType: recommendation.type,
+    affectsIep: recommendation.safety?.affectsIEP ?? false,
+    policy,
+  });
+  if (!allowed) {
+    throw new RecommendationPolicyError(
+      `Role ${role ?? "<unknown>"} cannot approve ${recommendation.type} recommendations` +
+        ` under this tenant's approval policy`,
+      "approval_role_not_allowed",
+    );
+  }
+}
+
+/** @deprecated Wave C — use requireApprovalPermission (kept for callers without a recommendation in hand). */
 export function requireParentApproval(role: TenantRole | undefined): void {
   if (!canApproveProfileRecommendation(role)) {
     throw new RecommendationPolicyError(

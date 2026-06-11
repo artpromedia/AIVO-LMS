@@ -2755,7 +2755,8 @@
       "no_lessons_started": "Noch keine Lektionen gestartet.",
       "skill_gaps": "Kompetenzlücken",
       "no_notable_gaps": "Noch keine nennenswerten Lücken — weiter so.",
-      "accommodations_teacher_summary": "Anpassungen (Lehrerzusammenfassung)"
+      "accommodations_teacher_summary": "Anpassungen (Lehrerzusammenfassung)",
+      "pending_recommendations": "Ausstehende Empfehlungen"
     },
     "learner_iep_draft": {
       "page_title": "IEP-Zielentwurf",
@@ -2931,7 +2932,8 @@
       "no_learners_yet": "Noch keine Lernenden",
       "primary_language": "Hauptsprache",
       "reading_comfort": "Lesekompetenz",
-      "math_comfort": "Mathematikkompetenz"
+      "math_comfort": "Mathematikkompetenz",
+      "pending_recommendations": "Ausstehende Empfehlungen"
     },
     "observations": {
       "page_title": "Beobachtungen",

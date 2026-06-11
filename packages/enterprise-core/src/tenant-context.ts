@@ -2,6 +2,9 @@ export type TenantRole =
   | "learner"
   | "parent"
   | "teacher"
+  // Wave C (G5): caregivers participate in the recommendation-approval
+  // flow (regulation/sensory types, district-delegated).
+  | "caregiver"
   | "school_admin"
   | "district_admin"
   | "platform_admin"

@@ -7,8 +7,9 @@ import {
 } from "../services/recommendation-effect-handlers.js";
 import {
   RecommendationPolicyError,
-  requireParentApproval,
+  requireApprovalPermission,
 } from "../services/recommendation-policy.js";
+import { loadApprovalPolicy } from "../services/approval-policy.js";
 import type { ProfileRecommendation } from "../services/types.js";
 import {
   InMemoryRecommendationStore,
@@ -113,7 +114,13 @@ export function registerRecommendationRoutes(
       const recommendation = await store.get(request.params.id);
       if (!recommendation) return reply.code(404).send({ error: "Not found" });
       try {
-        requireParentApproval(request.body?.actorRole);
+        // Wave C (G5): role × type × tenant-policy. Parents always pass;
+        // teacher/caregiver delegation comes from district_settings.
+        requireApprovalPermission(
+          request.body?.actorRole,
+          recommendation,
+          await loadApprovalPolicy(db, recommendation.learnerId),
+        );
       } catch (error) {
         if (error instanceof RecommendationPolicyError) {
           return reply.code(403).send({ error: error.code });
@@ -168,7 +175,13 @@ export function registerRecommendationRoutes(
       const recommendation = await store.get(request.params.id);
       if (!recommendation) return reply.code(404).send({ error: "Not found" });
       try {
-        requireParentApproval(request.body?.actorRole);
+        // Wave C (G5): role × type × tenant-policy. Parents always pass;
+        // teacher/caregiver delegation comes from district_settings.
+        requireApprovalPermission(
+          request.body?.actorRole,
+          recommendation,
+          await loadApprovalPolicy(db, recommendation.learnerId),
+        );
       } catch (error) {
         if (error instanceof RecommendationPolicyError) {
           return reply.code(403).send({ error: error.code });
@@ -228,7 +241,13 @@ export function registerRecommendationRoutes(
       const recommendation = await store.get(request.params.id);
       if (!recommendation) return reply.code(404).send({ error: "Not found" });
       try {
-        requireParentApproval(request.body?.actorRole);
+        // Wave C (G5): role × type × tenant-policy. Parents always pass;
+        // teacher/caregiver delegation comes from district_settings.
+        requireApprovalPermission(
+          request.body?.actorRole,
+          recommendation,
+          await loadApprovalPolicy(db, recommendation.learnerId),
+        );
       } catch (error) {
         if (error instanceof RecommendationPolicyError) {
           return reply.code(403).send({ error: error.code });

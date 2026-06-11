@@ -2755,7 +2755,8 @@
       "no_lessons_started": "Nenhuma aula iniciada ainda.",
       "skill_gaps": "Lacunas de habilidades",
       "no_notable_gaps": "Nenhuma lacuna notável ainda — continue assim.",
-      "accommodations_teacher_summary": "Adaptações (resumo do professor)"
+      "accommodations_teacher_summary": "Adaptações (resumo do professor)",
+      "pending_recommendations": "Recomendações pendentes"
     },
     "learner_iep_draft": {
       "page_title": "Rascunho de metas do IEP",
@@ -2931,7 +2932,8 @@
       "no_learners_yet": "Ainda não há alunos",
       "primary_language": "Idioma principal",
       "reading_comfort": "Conforto em leitura",
-      "math_comfort": "Conforto em matemática"
+      "math_comfort": "Conforto em matemática",
+      "pending_recommendations": "Recomendações pendentes"
     },
     "observations": {
       "page_title": "Observações",

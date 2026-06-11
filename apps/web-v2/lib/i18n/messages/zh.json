@@ -2755,7 +2755,8 @@
       "no_lessons_started": "暂未开始任何课程。",
       "skill_gaps": "技能差距",
       "no_notable_gaps": "暂无明显差距 — 继续加油。",
-      "accommodations_teacher_summary": "调整措施（教师摘要）"
+      "accommodations_teacher_summary": "调整措施（教师摘要）",
+      "pending_recommendations": "待处理的建议"
     },
     "learner_iep_draft": {
       "page_title": "IEP 目标草稿",
@@ -2931,7 +2932,8 @@
       "no_learners_yet": "暂无学习者",
       "primary_language": "主要语言",
       "reading_comfort": "阅读能力",
-      "math_comfort": "数学能力"
+      "math_comfort": "数学能力",
+      "pending_recommendations": "待处理的建议"
     },
     "observations": {
       "page_title": "观察记录",

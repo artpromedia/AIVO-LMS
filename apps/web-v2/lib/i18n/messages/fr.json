@@ -2755,7 +2755,8 @@
       "no_lessons_started": "Aucune leçon commencée pour l'instant.",
       "skill_gaps": "Lacunes de compétences",
       "no_notable_gaps": "Aucune lacune notable pour l'instant — continuez.",
-      "accommodations_teacher_summary": "Aménagements (résumé pour l'enseignant)"
+      "accommodations_teacher_summary": "Aménagements (résumé pour l'enseignant)",
+      "pending_recommendations": "Recommandations en attente"
     },
     "learner_iep_draft": {
       "page_title": "Brouillon d'objectifs IEP",
@@ -2931,7 +2932,8 @@
       "no_learners_yet": "Aucun apprenant pour le moment",
       "primary_language": "Langue principale",
       "reading_comfort": "Aisance en lecture",
-      "math_comfort": "Aisance en mathématiques"
+      "math_comfort": "Aisance en mathématiques",
+      "pending_recommendations": "Recommandations en attente"
     },
     "observations": {
       "page_title": "Observations",

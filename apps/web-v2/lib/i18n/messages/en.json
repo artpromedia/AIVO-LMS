@@ -2755,7 +2755,8 @@
       "no_lessons_started": "No lessons started yet.",
       "skill_gaps": "Skill gaps",
       "no_notable_gaps": "No notable gaps yet — keep going.",
-      "accommodations_teacher_summary": "Accommodations (teacher summary)"
+      "accommodations_teacher_summary": "Accommodations (teacher summary)",
+      "pending_recommendations": "Pending recommendations"
     },
     "learner_iep_draft": {
       "page_title": "IEP goal draft",
@@ -2931,7 +2932,8 @@
       "no_learners_yet": "No learners yet",
       "primary_language": "Primary language",
       "reading_comfort": "Reading comfort",
-      "math_comfort": "Math comfort"
+      "math_comfort": "Math comfort",
+      "pending_recommendations": "Pending recommendations"
     },
     "observations": {
       "page_title": "Observations",

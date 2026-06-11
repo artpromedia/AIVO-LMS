@@ -694,6 +694,13 @@
       "when": 1786061000000,
       "tag": "0100_learner_profiles_subject_thetas",
       "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1786061100000,
+      "tag": "0101_district_settings_approval_policy",
+      "breakpoints": true
     }
   ]
 }

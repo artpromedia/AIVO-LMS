@@ -2755,7 +2755,8 @@
       "no_lessons_started": "Aún no se han iniciado lecciones.",
       "skill_gaps": "Brechas de habilidades",
       "no_notable_gaps": "Sin brechas destacadas aún — sigue adelante.",
-      "accommodations_teacher_summary": "Acomodaciones (resumen del maestro)"
+      "accommodations_teacher_summary": "Acomodaciones (resumen del maestro)",
+      "pending_recommendations": "Recomendaciones pendientes"
     },
     "learner_iep_draft": {
       "page_title": "Borrador de metas del IEP",
@@ -2931,7 +2932,8 @@
       "no_learners_yet": "Aún no hay estudiantes",
       "primary_language": "Idioma principal",
       "reading_comfort": "Comodidad lectora",
-      "math_comfort": "Comodidad matemática"
+      "math_comfort": "Comodidad matemática",
+      "pending_recommendations": "Recomendaciones pendientes"
     },
     "observations": {
       "page_title": "Observaciones",

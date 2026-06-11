@@ -111,3 +111,105 @@ describe("district-mode role policy", () => {
     expect(canExportDistrictCompliance("teacher")).toBe(false);
   });
 });
+
+// ── Wave C (G5): role × type × tenant-policy approval matrix ────────────────
+
+describe("canApproveProfileRecommendation — delegation matrix (Wave C)", () => {
+  const delegated = { teacherApproval: true, caregiverApproval: true };
+  const parentOnly = { teacherApproval: false, caregiverApproval: false };
+
+  it("parents always pass — with or without context, any type, even affectsIep", () => {
+    expect(canApproveProfileRecommendation("parent")).toBe(true);
+    expect(
+      canApproveProfileRecommendation("parent", {
+        recType: "delivery_level_change",
+        affectsIep: true,
+        policy: parentOnly,
+      }),
+    ).toBe(true);
+  });
+
+  it("teachers pass only for instructional types in opted-in tenants", () => {
+    expect(
+      canApproveProfileRecommendation("teacher", {
+        recType: "delivery_level_change",
+        policy: delegated,
+      }),
+    ).toBe(true);
+    // Policy off → no.
+    expect(
+      canApproveProfileRecommendation("teacher", {
+        recType: "delivery_level_change",
+        policy: parentOnly,
+      }),
+    ).toBe(false);
+    // No policy supplied (B2C default) → no.
+    expect(
+      canApproveProfileRecommendation("teacher", { recType: "delivery_level_change" }),
+    ).toBe(false);
+    // Non-instructional type → no, even when delegated.
+    expect(
+      canApproveProfileRecommendation("teacher", {
+        recType: "sensory_setting_change",
+        policy: delegated,
+      }),
+    ).toBe(false);
+    // Legacy call without context → no.
+    expect(canApproveProfileRecommendation("teacher")).toBe(false);
+  });
+
+  it("caregivers pass only for regulation/sensory types in opted-in tenants", () => {
+    expect(
+      canApproveProfileRecommendation("caregiver", {
+        recType: "self_regulation_support_add",
+        policy: delegated,
+      }),
+    ).toBe(true);
+    expect(
+      canApproveProfileRecommendation("caregiver", {
+        recType: "sensory_setting_change",
+        policy: delegated,
+      }),
+    ).toBe(true);
+    expect(
+      canApproveProfileRecommendation("caregiver", {
+        recType: "delivery_level_change",
+        policy: delegated,
+      }),
+    ).toBe(false);
+    expect(
+      canApproveProfileRecommendation("caregiver", {
+        recType: "self_regulation_support_add",
+        policy: parentOnly,
+      }),
+    ).toBe(false);
+  });
+
+  it("IEP-affecting recommendations NEVER delegate", () => {
+    expect(
+      canApproveProfileRecommendation("teacher", {
+        recType: "delivery_level_change",
+        affectsIep: true,
+        policy: delegated,
+      }),
+    ).toBe(false);
+    expect(
+      canApproveProfileRecommendation("caregiver", {
+        recType: "sensory_setting_change",
+        affectsIep: true,
+        policy: delegated,
+      }),
+    ).toBe(false);
+  });
+
+  it("other roles never approve regardless of policy", () => {
+    for (const role of ["learner", "school_admin", "district_admin", "platform_admin", "service"] as const) {
+      expect(
+        canApproveProfileRecommendation(role, {
+          recType: "delivery_level_change",
+          policy: delegated,
+        }),
+      ).toBe(false);
+    }
+  });
+});

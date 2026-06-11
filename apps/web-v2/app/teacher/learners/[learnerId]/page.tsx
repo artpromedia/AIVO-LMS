@@ -13,6 +13,7 @@ import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { TEACHER_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
 import {
   getIEPForLearner,
   getLearner,
@@ -170,6 +171,17 @@ export default async function TeacherLearnerDetailPage({
           </Card>
         </section>
       )}
+
+      {/* Wave C (G5): teacher approval surface. recommendation-svc enforces
+          the district's delegation policy — decisions outside it 403 with a
+          clear message, so this panel is safe to show unconditionally. */}
+      <section className="grid gap-3 mt-6">
+        <SectionHeader title={t("pending_recommendations")} />
+        <PendingRecommendationsPanel
+          learnerId={learner.id}
+          apiBase={`/api/bff/teacher/learners/${learner.id}/recommendations`}
+        />
+      </section>
     </AppShell>
   );
 }
