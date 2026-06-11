@@ -58,7 +58,7 @@ export default function SessionNotesScreen() {
         <AivoCard>
           <View style={styles.field}>
             <Text style={styles.label}>Skill Targeted</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("therapistClient.notesSubtitle")}
               style={styles.input}
               value={skillTargeted}
               onChangeText={setSkillTargeted}
@@ -68,7 +68,7 @@ export default function SessionNotesScreen() {
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Method</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel="e.g., Play-based therapy"
               style={styles.input}
               value={method}
               onChangeText={setMethod}
@@ -78,7 +78,7 @@ export default function SessionNotesScreen() {
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Outcome</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel="Describe the session outcome..."
               style={styles.textArea}
               value={outcome}
               onChangeText={setOutcome}
@@ -91,7 +91,7 @@ export default function SessionNotesScreen() {
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Recommendations</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel="Any follow-up recommendations..."
               style={styles.textArea}
               value={recommendations}
               onChangeText={setRecommendations}

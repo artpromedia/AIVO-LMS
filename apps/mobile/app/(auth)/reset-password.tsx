@@ -148,7 +148,7 @@ export default function ResetPasswordScreen() {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("auth.changePasswordNew")}</Text>
-                <TextInput accessibilityLabel="Text input field"
+                <TextInput accessibilityLabel={t("auth.changePasswordNewPlaceholder")}
                   style={styles.input}
                   value={next}
                   onChangeText={setNext}
@@ -187,7 +187,7 @@ export default function ResetPasswordScreen() {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("auth.confirmPassword")}</Text>
-                <TextInput accessibilityLabel="Text input field"
+                <TextInput accessibilityLabel={t("auth.confirmPasswordPlaceholder")}
                   style={styles.input}
                   value={confirm}
                   onChangeText={setConfirm}

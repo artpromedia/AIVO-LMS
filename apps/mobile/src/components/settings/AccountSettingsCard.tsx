@@ -439,7 +439,7 @@ export function AccountSettingsCard({
         {mfaEnableToken ? (
           <View style={styles.mfaInputSection}>
             <Text style={styles.mfaDesc}>{t("accountSettings.enterCode")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("accountSettings.enterCode")}
               style={[
                 styles.mfaInput,
                 {
@@ -489,7 +489,7 @@ export function AccountSettingsCard({
           </Pressable>
         ) : (
           <View style={styles.mfaInputSection}>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("accountSettings.enterPassword")}
               style={styles.mfaInput}
               value={mfaPassword}
               onChangeText={setMfaPassword}
@@ -542,7 +542,7 @@ export function AccountSettingsCard({
             <Text style={styles.modalTitle}>{t("accountSettings.accountDetails")}</Text>
 
             <Text style={styles.label}>{t("accountSettings.fullName")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("accountSettings.fullName")}
               style={styles.input}
               value={editName}
               onChangeText={setEditName}
@@ -552,7 +552,7 @@ export function AccountSettingsCard({
             />
 
             <Text style={styles.label}>{t("auth.email")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.emailPlaceholder")}
               style={styles.input}
               value={editEmail}
               onChangeText={setEditEmail}
@@ -595,7 +595,7 @@ export function AccountSettingsCard({
             <Text style={styles.modalBody}>{t("accountSettings.deleteWarning")}</Text>
 
             <Text style={styles.label}>{t("auth.password")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.passwordPlaceholder")}
               style={styles.input}
               value={deletePassword}
               onChangeText={setDeletePassword}

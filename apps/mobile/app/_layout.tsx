@@ -16,6 +16,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ConfigErrorScreen } from "@/components/ConfigErrorScreen";
 import { API_CONFIG_ERROR } from "@/constants/api";
 import { initSentry } from "@/lib/sentry";
+import { configureNotificationHandling } from "@/lib/notifications";
 
 // Crash reporting first — before any render can throw (Sprint A2).
 initSentry();
@@ -52,6 +53,10 @@ export default function RootLayout() {
   useEffect(() => {
     void restoreSavedLocale();
   }, []);
+
+  // Foreground presentation + tap routing for push notifications, incl.
+  // the cold-start tap replay (Sprint A6).
+  useEffect(() => configureNotificationHandling(), []);
 
   // The sensory-mode provider is mounted inside the auth context
   // (as a child of AuthContext.Provider) so it can read learnerId

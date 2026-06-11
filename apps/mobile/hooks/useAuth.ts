@@ -18,6 +18,7 @@ import {
 } from "@/lib/auth/error-mapping";
 import { API } from "@/constants/api";
 import type { UserRole } from "@aivo/brand";
+import { registerPushToken, unregisterPushToken } from "@/lib/notifications";
 
 interface User {
   id: string;
@@ -195,6 +196,8 @@ export function useAuthState(): AuthContextValue {
             isAuthenticated: true,
             mustChangePassword: mustChange,
           });
+          // Fire-and-forget: device token registration must never gate login.
+          void registerPushToken();
           return { success: true, mustChangePassword: mustChange };
         }
       }
@@ -389,6 +392,9 @@ export function useAuthState(): AuthContextValue {
   }, []);
 
   const logout = useCallback(async () => {
+    // Revoke this device's push token BEFORE the access token is cleared —
+    // the DELETE is authenticated (Sprint A6).
+    await unregisterPushToken();
     try {
       await apiFetch(API.IDENTITY, "/api/auth/logout", { method: "POST" });
     } catch {

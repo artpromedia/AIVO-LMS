@@ -179,7 +179,7 @@ export default function VerifyMfaScreen() {
 
           <View style={styles.codeRow}>
             {code.map((digit, i) => (
-              <TextInput accessibilityLabel="Text input field"
+              <TextInput accessibilityLabel={resendMsg}
                 key={i}
                 ref={(el) => {
                   inputRefs.current[i] = el;

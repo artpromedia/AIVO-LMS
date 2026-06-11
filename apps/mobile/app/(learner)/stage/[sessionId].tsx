@@ -30,11 +30,14 @@ import { sessionClient, SessionUnavailableError } from "@/src/api/sessionClient"
 import { stageClient } from "@/src/api/stageClient";
 import { problemSessionClient } from "@/src/api/problemSessionClient";
 import type { Beat, Session } from "@/src/types/stage";
+import { enqueue, flushQueue, makeItem } from "@/lib/offline-queue";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
-// ── Offline outbox ──────────────────────────────────────────────────────────
-// Session-end payloads are queued in AsyncStorage when offline and flushed
-// when the app regains connectivity.
+// ── Offline outbox (Sprint A6: unified) ─────────────────────────────────────
+// Session-end payloads go through lib/offline-queue's "session" priority
+// lane — ONE durable queue with idempotency keys, authenticated replay,
+// and 7-day TTL. The legacy "@aivo/session_outbox" store is migrated by
+// the queue itself on first flush.
 
 interface SessionEndPayload {
   sessionId: string;
@@ -43,60 +46,17 @@ interface SessionEndPayload {
   queuedAt: number;
 }
 
-const OUTBOX_KEY = "@aivo/session_outbox";
-
-async function getAsyncStorage(): Promise<any> {
-  try {
-    return (await import("@react-native-async-storage/async-storage")).default;
-  } catch {
-    return null;
-  }
-}
-
 async function queueSessionEnd(payload: SessionEndPayload): Promise<void> {
-  const AsyncStorage = await getAsyncStorage();
-  if (!AsyncStorage) return;
-  try {
-    const raw = await AsyncStorage.getItem(OUTBOX_KEY);
-    const outbox: SessionEndPayload[] = raw ? JSON.parse(raw) : [];
-    outbox.push(payload);
-    await AsyncStorage.setItem(OUTBOX_KEY, JSON.stringify(outbox));
-  } catch {
-    /* best effort */
-  }
-}
-
-async function flushOutbox(learningApiBase: string, authHeader: string): Promise<void> {
-  const AsyncStorage = await getAsyncStorage();
-  if (!AsyncStorage) return;
-  try {
-    const raw = await AsyncStorage.getItem(OUTBOX_KEY);
-    if (!raw) return;
-    const outbox: SessionEndPayload[] = JSON.parse(raw);
-    if (outbox.length === 0) return;
-    const remaining: SessionEndPayload[] = [];
-    for (const payload of outbox) {
-      try {
-        const res = await fetch(
-          `${learningApiBase}/api/learning/sessions/${payload.sessionId}/complete`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: authHeader },
-            body: JSON.stringify({
-              masteryUpdates: payload.masteryUpdates,
-              xpEarned: payload.xpEarned,
-            }),
-          },
-        );
-        if (!res.ok) remaining.push(payload);
-      } catch {
-        remaining.push(payload);
-      }
-    }
-    await AsyncStorage.setItem(OUTBOX_KEY, JSON.stringify(remaining));
-  } catch {
-    /* best effort */
-  }
+  await enqueue(
+    makeItem(
+      "session.complete",
+      API.LEARNING,
+      `/api/learning/sessions/${payload.sessionId}/complete`,
+      "POST",
+      { masteryUpdates: payload.masteryUpdates, xpEarned: payload.xpEarned },
+      "session",
+    ),
+  );
 }
 
 // ── Crash snapshot ──────────────────────────────────────────────────────────
@@ -218,16 +178,16 @@ function StageScreenInner() {
     };
   }, [sessionId, t]);
 
-  // Flush the offline outbox whenever the app comes to the foreground.
+  // Flush the unified offline queue whenever the app comes to the
+  // foreground — flushQueue replays authenticated (apiFetch) and migrates
+  // any legacy session outbox first (Sprint A6).
   useEffect(() => {
-    const authHeader = user ? `Bearer ${(user as any).accessToken ?? ""}` : "";
-    const learningBase = (API as any).LEARNING ?? "";
     const sub = AppState.addEventListener("change", (next) => {
-      if (next === "active") flushOutbox(learningBase, authHeader).catch(() => {});
+      if (next === "active") flushQueue().catch(() => {});
     });
-    flushOutbox(learningBase, authHeader).catch(() => {});
+    flushQueue().catch(() => {});
     return () => sub.remove();
-  }, [user]);
+  }, []);
 
   const total = session?.stagePlan.beats.length ?? 0;
 

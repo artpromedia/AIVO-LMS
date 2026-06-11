@@ -122,6 +122,42 @@ for (const file of files) {
   }
 }
 
+// ── Sprint A6 — explicit age collection feeds the consent regime ───────────
+// COPPA's under-13 determination is only as good as the age data collected
+// at learner creation. Pin: (a) BOTH mobile parent creation flows collect
+// dateOfBirth and validate it, (b) identity-svc persists dateOfBirth and
+// derives requiresParentConsent fail-closed, (c) the web add-learner form
+// requires ageRange, whose recordAgeGate default stays fail-closed.
+{
+  const required = [
+    [
+      "apps/mobile/app/(parent)/learner-new/index.tsx",
+      [/validateBirthDate/, /dateOfBirth:\s*birthDate/],
+    ],
+    ["apps/mobile/app/(parent)/onboard.tsx", [/validateBirthDate/, /dateOfBirth/]],
+    ["apps/mobile/lib/birth-date.ts", [/isUnder13/, /return true; \/\/ fail closed/]],
+    [
+      "services/identity-svc/src/routes/users.ts",
+      [/requiresParentConsent/, /dateOfBirth\b/],
+    ],
+    ["apps/web-v2/app/parent/learners/new/page.tsx", [/name="ageRange"\s*\n\s*required/]],
+    ["apps/web-v2/lib/db/repos.ts", [/requiresParentConsent: input\.ageRange \? UNDER_13_AGE_RANGES\.has\(input\.ageRange\) : true/]],
+  ];
+  for (const [rel, patterns] of required) {
+    const abs = join(repoRoot, rel);
+    if (!existsSync(abs)) {
+      errors.push(`${rel}: age-gate file missing (Sprint A6 contract).`);
+      continue;
+    }
+    const src = readFileSync(abs, "utf8");
+    for (const pattern of patterns) {
+      if (!pattern.test(src)) {
+        errors.push(`${rel}: missing age-gate marker ${pattern}`);
+      }
+    }
+  }
+}
+
 if (warnings.length) {
   for (const w of warnings) console.warn(`warn: ${w}`);
 }

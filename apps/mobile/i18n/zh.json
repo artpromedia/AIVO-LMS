@@ -1100,5 +1100,14 @@
   },
   "offline": {
     "synced": "已恢复联网。你的进度已保存。"
+  },
+  "parentLearnerNew": {
+    "birthDate": "出生日期（YYYY-MM-DD）",
+    "birthDateError": {
+      "format": "请使用 YYYY-MM-DD 格式，例如 2017-09-01。",
+      "invalid": "这不是有效的日期。",
+      "future": "出生日期不能是未来的日期。",
+      "tooOld": "学习者年龄须不超过 21 岁。"
+    }
   }
 }

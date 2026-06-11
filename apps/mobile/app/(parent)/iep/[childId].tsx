@@ -467,7 +467,7 @@ export default function IEPScreen() {
                 ? t("parentIEP.acknowledgeDesc")
                 : t("parentIEP.objectDesc")}
             </Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("parentIEP.noteOptional")}
               style={[styles.modalInput, { height: 90, textAlignVertical: "top" }]}
               value={respondNote}
               onChangeText={setRespondNote}

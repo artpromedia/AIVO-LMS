@@ -241,7 +241,7 @@ export default function ParentSettings() {
             ) : null}
 
             <Text style={styles.fieldLabel}>{t("parentSettings.newPinLabel")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("parentSettings.newPinLabel")}
               style={[
                 styles.modalInput,
                 {

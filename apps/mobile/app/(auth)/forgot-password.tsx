@@ -68,7 +68,7 @@ export default function ForgotPasswordScreen() {
               {error ? <Text style={styles.error}>{error}</Text> : null}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("auth.email")}</Text>
-                <TextInput accessibilityLabel="Text input field"
+                <TextInput accessibilityLabel={t("auth.emailPlaceholder")}
                   style={styles.input}
                   value={email}
                   onChangeText={setEmail}

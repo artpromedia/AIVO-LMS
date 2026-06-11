@@ -130,7 +130,7 @@ export default function PinScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.parentEmailPlaceholder")}
               style={styles.input}
               placeholder={t("auth.parentEmailPlaceholder")}
               placeholderTextColor="rgba(255,255,255,0.4)"

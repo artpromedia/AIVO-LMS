@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAddLearner } from "@/hooks/useLearners";
+import { validateBirthDate } from "@/lib/birth-date";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
@@ -22,9 +23,15 @@ export default function ParentLearnerNewScreen() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gradeLevel, setGradeLevel] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [pin, setPin] = useState("");
 
-  const valid = firstName.trim().length > 0 && pin.trim().length >= 4;
+  // COPPA age gate (Sprint A6): the birth date is REQUIRED — it is what
+  // determines whether this learner is under 13 and therefore which
+  // consent regime applies. Format pinned to YYYY-MM-DD; future dates and
+  // ages > 21 are rejected as input errors.
+  const birthDateError = validateBirthDate(birthDate);
+  const valid = firstName.trim().length > 0 && pin.trim().length >= 4 && birthDateError === null;
 
   const onSubmit = async () => {
     try {
@@ -33,6 +40,7 @@ export default function ParentLearnerNewScreen() {
         lastName: lastName.trim(),
         gradeLevel: gradeLevel.trim(),
         pin: pin.trim(),
+        dateOfBirth: birthDate.trim(),
       });
       const id = created?.id;
       if (id) router.replace(`/(parent)/learners/${id}` as never);
@@ -75,6 +83,20 @@ export default function ParentLearnerNewScreen() {
         {field(t("parentLearnerNew.firstName", "First name"), firstName, setFirstName)}
         {field(t("parentLearnerNew.lastName", "Last name"), lastName, setLastName)}
         {field(t("parentLearnerNew.grade", "Grade level"), gradeLevel, setGradeLevel)}
+        {field(
+          t("parentLearnerNew.birthDate", "Birth date (YYYY-MM-DD)"),
+          birthDate,
+          setBirthDate,
+          { keyboard: "number-pad" },
+        )}
+        {birthDate.length > 0 && birthDateError ? (
+          <Text
+            style={[styles.label, { color: "#b91c1c" }]}
+            accessibilityLiveRegion="polite"
+          >
+            {t(`parentLearnerNew.birthDateError.${birthDateError}`)}
+          </Text>
+        ) : null}
         {field(t("parentLearnerNew.pin", "Learner PIN (4+ digits)"), pin, setPin, {
           keyboard: "number-pad",
           secure: true,
@@ -103,3 +125,4 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.bodyRegular,
   },
 });
+

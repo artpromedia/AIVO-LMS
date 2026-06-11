@@ -332,7 +332,7 @@ export default function TherapistSessionsScreen() {
                 <View style={styles.row}>
                   <View style={{ flex: 1, marginRight: spacing.sm }}>
                     <Text style={styles.label}>{t("therapistSessions.date")}</Text>
-                    <TextInput accessibilityLabel="Text input field"
+                    <TextInput accessibilityLabel={t("therapistSessions.date")}
                       style={styles.input}
                       value={logDate}
                       onChangeText={setLogDate}
@@ -344,7 +344,7 @@ export default function TherapistSessionsScreen() {
                   </View>
                   <View style={{ width: 110 }}>
                     <Text style={styles.label}>{t("therapistSessions.durationMin")}</Text>
-                    <TextInput accessibilityLabel="Text input field"
+                    <TextInput accessibilityLabel={t("therapistSessions.durationMin")}
                       style={styles.input}
                       value={logDuration}
                       onChangeText={setLogDuration}
@@ -354,7 +354,7 @@ export default function TherapistSessionsScreen() {
                 </View>
 
                 <Text style={styles.label}>{t("therapistSessions.notes")}</Text>
-                <TextInput accessibilityLabel="Text input field"
+                <TextInput accessibilityLabel={t("therapistSessions.notesPlaceholder")}
                   style={[styles.input, styles.textarea]}
                   value={logNotes}
                   onChangeText={setLogNotes}

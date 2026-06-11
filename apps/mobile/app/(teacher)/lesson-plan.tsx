@@ -245,7 +245,7 @@ export default function LessonPlanScreen() {
           </ScrollView>
 
           <Text style={styles.fieldLabel}>Topic (optional)</Text>
-          <TextInput accessibilityLabel="Text input field"
+          <TextInput accessibilityLabel="e.g. Fractions, Photosynthesis..."
             style={styles.input}
             value={topic}
             onChangeText={setTopic}
@@ -254,7 +254,7 @@ export default function LessonPlanScreen() {
           />
 
           <Text style={styles.fieldLabel}>Accommodation Notes (optional)</Text>
-          <TextInput accessibilityLabel="Text input field"
+          <TextInput accessibilityLabel="Any special needs or accommodations..."
             style={[styles.input, { height: 60 }]}
             value={accommodationNotes}
             onChangeText={setAccommodationNotes}

@@ -237,7 +237,7 @@ export default function SignupScreen() {
         >
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.fullName")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.fullNamePlaceholder")}
               style={styles.input}
               value={form.name}
               onChangeText={(v) => updateField("name", v)}
@@ -249,7 +249,7 @@ export default function SignupScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.email")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.emailPlaceholder")}
               style={styles.input}
               value={form.email}
               onChangeText={(v) => updateField("email", v)}
@@ -263,7 +263,7 @@ export default function SignupScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.password")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.atLeast8Chars")}
               style={styles.input}
               value={form.password}
               onChangeText={(v) => updateField("password", v)}
@@ -275,7 +275,7 @@ export default function SignupScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.confirmPassword")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.confirmPasswordPlaceholder")}
               style={styles.input}
               value={form.confirmPassword}
               onChangeText={(v) => updateField("confirmPassword", v)}
@@ -314,7 +314,7 @@ export default function SignupScreen() {
 
           {couponExpanded && (
             <View style={styles.couponSection}>
-              <TextInput accessibilityLabel="Text input field"
+              <TextInput accessibilityLabel="ENTER CODE"
                 style={styles.input}
                 value={couponCode}
                 onChangeText={(v) => setCouponCode(v.toUpperCase())}

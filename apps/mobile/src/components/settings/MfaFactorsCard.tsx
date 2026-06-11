@@ -313,7 +313,7 @@ export function MfaFactorsCard() {
       ) : showDisable ? (
         <View style={styles.section}>
           <Text style={styles.desc}>{t("mfaFactors.disableConfirm")}</Text>
-          <TextInput accessibilityLabel="Text input field"
+          <TextInput accessibilityLabel={t("accountSettings.enterPassword")}
             style={styles.input}
             value={disablePassword}
             onChangeText={setDisablePassword}
@@ -406,7 +406,7 @@ export function MfaFactorsCard() {
       ) : showRegenerate ? (
         <View style={styles.section}>
           <Text style={styles.desc}>{t("mfaFactors.regenConfirm")}</Text>
-          <TextInput accessibilityLabel="Text input field"
+          <TextInput accessibilityLabel={t("accountSettings.enterPassword")}
             style={styles.input}
             value={regenPassword}
             onChangeText={setRegenPassword}

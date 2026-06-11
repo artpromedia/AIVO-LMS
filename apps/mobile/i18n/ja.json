@@ -1100,5 +1100,14 @@
   },
   "offline": {
     "synced": "オンラインに戻りました。作業は保存されています。"
+  },
+  "parentLearnerNew": {
+    "birthDate": "生年月日（YYYY-MM-DD）",
+    "birthDateError": {
+      "format": "YYYY-MM-DD 形式で入力してください（例: 2017-09-01）。",
+      "invalid": "実在しない日付です。",
+      "future": "生年月日に未来の日付は使えません。",
+      "tooOld": "学習者は21歳以下である必要があります。"
+    }
   }
 }

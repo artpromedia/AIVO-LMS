@@ -191,7 +191,7 @@ export default function TeamScreen() {
             </Pressable>
           ))}
         </View>
-        <TextInput accessibilityLabel="Text input field"
+        <TextInput accessibilityLabel={t("parentTeam.emailPlaceholder")}
           style={styles.input}
           value={inviteEmail}
           onChangeText={setInviteEmail}
@@ -204,7 +204,7 @@ export default function TeamScreen() {
         {inviteRole === "THERAPIST" && (
           <>
             <Text style={styles.fieldLabel}>{t("parentTeam.specialty")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("parentTeam.specialtyPlaceholder")}
               style={styles.input}
               value={specialty}
               onChangeText={setSpecialty}
@@ -213,7 +213,7 @@ export default function TeamScreen() {
               autoCapitalize="words"
             />
             <Text style={styles.fieldLabel}>{t("parentTeam.credentials")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("parentTeam.credentialsPlaceholder")}
               style={styles.input}
               value={credentials}
               onChangeText={setCredentials}
@@ -227,7 +227,7 @@ export default function TeamScreen() {
         {inviteRole === "CAREGIVER" && (
           <>
             <Text style={styles.fieldLabel}>{t("parentTeam.relationship")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("parentTeam.relationshipPlaceholder")}
               style={styles.input}
               value={relationship}
               onChangeText={setRelationship}

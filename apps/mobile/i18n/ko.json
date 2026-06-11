@@ -1100,5 +1100,14 @@
   },
   "offline": {
     "synced": "다시 온라인 상태가 되었어요. 작업이 저장되었습니다."
+  },
+  "parentLearnerNew": {
+    "birthDate": "생년월일 (YYYY-MM-DD)",
+    "birthDateError": {
+      "format": "YYYY-MM-DD 형식으로 입력해 주세요 (예: 2017-09-01).",
+      "invalid": "달력에 없는 날짜입니다.",
+      "future": "생년월일은 미래일 수 없습니다.",
+      "tooOld": "학습자는 21세 이하여야 합니다."
+    }
   }
 }

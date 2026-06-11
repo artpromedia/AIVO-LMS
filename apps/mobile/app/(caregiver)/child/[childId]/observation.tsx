@@ -34,7 +34,7 @@ export default function ObservationScreen() {
 
       <AivoCard>
         <Text style={styles.prompt}>{t("caregiverObservation.prompt")}</Text>
-        <TextInput accessibilityLabel="Text input field"
+        <TextInput accessibilityLabel={t("caregiverObservation.placeholder")}
           style={styles.textArea}
           value={note}
           onChangeText={setNote}

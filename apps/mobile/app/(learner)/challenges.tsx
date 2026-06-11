@@ -202,7 +202,7 @@ export default function ChallengesScreen() {
           <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
             <Text style={styles.modalTitle}>Join a Challenge</Text>
             <Text style={styles.modalDesc}>Enter the invite code from your friend</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel="ABCD1234"
               style={styles.codeInput}
               value={joinCode}
               onChangeText={(v) =>

@@ -1100,5 +1100,14 @@
   },
   "offline": {
     "synced": "You're back online. Your work has been saved."
+  },
+  "parentLearnerNew": {
+    "birthDate": "Birth date (YYYY-MM-DD)",
+    "birthDateError": {
+      "format": "Use the YYYY-MM-DD format, e.g. 2017-09-01.",
+      "invalid": "That's not a real calendar date.",
+      "future": "The birth date can't be in the future.",
+      "tooOld": "Learners must be 21 or younger."
+    }
   }
 }

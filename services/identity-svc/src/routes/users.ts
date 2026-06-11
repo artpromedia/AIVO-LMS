@@ -377,7 +377,22 @@ export async function registerUserRoutes(app: FastifyInstance) {
           })
           .catch(() => {});
 
-        return { learner, user: { id: learnerUser.id, name: learnerUser.name, role: "LEARNER" } };
+        // Sprint A6 — derive the consent regime from the birth date and
+        // return it so clients gate the learner surface deterministically.
+        // No/invalid DOB fails CLOSED (treated as under 13).
+        const requiresParentConsent = (() => {
+          if (!body.dateOfBirth) return true;
+          const dob = new Date(body.dateOfBirth);
+          if (Number.isNaN(dob.getTime())) return true;
+          const ageYears = (Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+          return ageYears < 13;
+        })();
+
+        return {
+          learner,
+          requiresParentConsent,
+          user: { id: learnerUser.id, name: learnerUser.name, role: "LEARNER" },
+        };
       } catch (err: any) {
         app.log.error({ err, userSub: user?.sub, role: user?.role }, "Failed to create learner");
         return reply.status(500).send({ error: "Failed to create learner" });

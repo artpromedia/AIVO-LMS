@@ -1100,5 +1100,14 @@
   },
   "offline": {
     "synced": "Você está online novamente. Seu trabalho foi salvo."
+  },
+  "parentLearnerNew": {
+    "birthDate": "Data de nascimento (AAAA-MM-DD)",
+    "birthDateError": {
+      "format": "Use o formato AAAA-MM-DD, ex.: 2017-09-01.",
+      "invalid": "Essa data não existe no calendário.",
+      "future": "A data de nascimento não pode estar no futuro.",
+      "tooOld": "O aluno deve ter 21 anos ou menos."
+    }
   }
 }

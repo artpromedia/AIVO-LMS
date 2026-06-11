@@ -212,7 +212,7 @@ export function MessagesInbox() {
           )}
         </ScrollView>
         <View style={[styles.composer, { borderTopColor: palette.border }]}>
-          <TextInput accessibilityLabel="Text input field"
+          <TextInput accessibilityLabel="Write a reply…"
             value={draft}
             onChangeText={setDraft}
             placeholder="Write a reply…"

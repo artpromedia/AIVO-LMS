@@ -34,7 +34,7 @@ export default function SubmitInsightScreen() {
 
       <AivoCard>
         <Text style={styles.label}>{t("teacherInsight.yourInsight")}</Text>
-        <TextInput accessibilityLabel="Text input field"
+        <TextInput accessibilityLabel={t("teacherInsight.placeholder")}
           style={styles.textArea}
           value={insightText}
           onChangeText={setInsightText}

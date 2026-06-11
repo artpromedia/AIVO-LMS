@@ -231,7 +231,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
       };
       return (
         <View>
-          <TextInput accessibilityLabel="Text input field"
+          <TextInput accessibilityLabel="Type your answer"
             value={text}
             onChangeText={setText}
             placeholder="Type your answer"
@@ -259,7 +259,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
       return (
         <View>
           <View style={styles.numericRow}>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel="0"
               value={text}
               onChangeText={setText}
               placeholder="0"
@@ -334,7 +334,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
     case "geometry": {
       return (
         <View>
-          <TextInput accessibilityLabel="Text input field"
+          <TextInput accessibilityLabel="Describe your approach (we'll check your work on the scratchpad)"
             value={text}
             onChangeText={setText}
             placeholder="Describe your approach (we'll check your work on the scratchpad)"
@@ -356,7 +356,7 @@ function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRen
       const meetsMin = !item.minWords || wordCount >= item.minWords;
       return (
         <View>
-          <TextInput accessibilityLabel="Text input field"
+          <TextInput accessibilityLabel="Write your response"
             value={text}
             onChangeText={setText}
             placeholder="Write your response"

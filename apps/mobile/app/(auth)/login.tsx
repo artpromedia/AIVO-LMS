@@ -233,7 +233,7 @@ export default function LoginScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: palette.ink }]}>{t("auth.email")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.emailPlaceholder")}
               style={inputStyle}
               value={email}
               onChangeText={setEmail}
@@ -247,7 +247,7 @@ export default function LoginScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: palette.ink }]}>{t("auth.password")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("auth.passwordPlaceholder")}
               style={inputStyle}
               value={password}
               onChangeText={setPassword}

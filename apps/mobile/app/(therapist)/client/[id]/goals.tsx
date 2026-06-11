@@ -124,7 +124,7 @@ export default function TherapyGoals() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>{t("therapistClient.addGoal")}</Text>
-            <TextInput accessibilityLabel="Text input field"
+            <TextInput accessibilityLabel={t("therapistClient.addGoalPlaceholder", "Describe the goal…")}
               value={goalText}
               onChangeText={setGoalText}
               placeholder={t("therapistClient.addGoalPlaceholder", "Describe the goal…")}
