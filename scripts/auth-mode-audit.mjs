@@ -96,11 +96,35 @@ for (const file of routeFiles) {
   }
 }
 
+// ── Sprint B1 — OIDC relying-party guard rails ──────────────────────────────
+// The RP flow must keep: PKCE + state + nonce in the TX, ID-token
+// issuer/audience/nonce verification, JIT restricted to district roles,
+// and discovery preferring OIDC. Static pins so a refactor can't silently
+// drop a verification step.
+{
+  const rpRoute = readFileSync(join(repoRoot, "services/identity-svc/src/routes/oidc-rp.ts"), "utf8");
+  const rpSvc = readFileSync(join(repoRoot, "services/identity-svc/src/services/oidc-rp.ts"), "utf8");
+  const pins = [
+    ["TX carries PKCE verifier", /codeVerifier/, rpRoute],
+    ["TX carries state + nonce", /state[\s\S]*nonce/, rpRoute],
+    ["JIT role allowlist", /OIDC_PROVISIONABLE_ROLES/, rpRoute],
+    ["ID-token validation enforces issuer/aud/nonce", /validateIdToken/, rpRoute],
+    ["secret encrypted at rest", /clientSecretEnvelope/, rpSvc],
+    ["discovery prefers OIDC", /ssoLoginUrlFor/, readFileSync(join(repoRoot, "services/identity-svc/src/routes/sso.ts"), "utf8")],
+  ];
+  for (const [label, pattern, src] of pins) {
+    if (!pattern.test(src)) {
+      errors.push(`oidc-rp: missing ${label}`);
+    }
+  }
+}
+
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
   console.error(`\nauth:audit FAILED with ${errors.length} guard violation(s).`);
   process.exit(1);
 }
+
 
 console.log(
   `auth:audit OK — env guard, session guard, and ${routeFiles.length} mock auth route(s) verified.`,

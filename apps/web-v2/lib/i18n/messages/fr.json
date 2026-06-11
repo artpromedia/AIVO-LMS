@@ -1306,7 +1306,9 @@
       "notices": {
         "password_reset": "Votre mot de passe a été réinitialisé. Connectez-vous avec votre nouveau mot de passe.",
         "logged_out": "Vous avez été déconnecté."
-      }
+      },
+      "continue_with_sso": "Continuer avec {idp}",
+      "sso_required_note": "Votre district se connecte via {idp}. La connexion par mot de passe est désactivée pour ce domaine."
     },
     "signup": {
       "promo_eyebrow": "Démarrez votre essai familial",

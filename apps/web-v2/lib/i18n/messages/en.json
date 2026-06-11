@@ -52,7 +52,9 @@
       "notices": {
         "password_reset": "Your password has been reset. Please sign in with your new password.",
         "logged_out": "You've been signed out."
-      }
+      },
+      "continue_with_sso": "Continue with {idp}",
+      "sso_required_note": "Your district signs in with {idp}. Password sign-in is disabled for this email domain."
     },
     "signup": {
       "promo_eyebrow": "Start your family trial",

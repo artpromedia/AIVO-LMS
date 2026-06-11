@@ -117,3 +117,39 @@ test("validateIdToken accepts a well-formed token and enforces issuer/aud/nonce"
     .sign(privateKey);
   await assert.rejects(validateIdToken(wrongAud, discovery, CFG, "abc", getKey));
 });
+
+// ── Sprint B1 — write-side + discovery-preference helpers ───────────────────
+
+test("encryptOidcRpConfig encrypts a supplied secret and never stores plaintext", async () => {
+  process.env.MFA_ENCRYPTION_KEY ??= "a".repeat(64);
+  const { encryptOidcRpConfig, decryptOidcRpConfig } = await import("../src/services/oidc-rp.js");
+  const stored = encryptOidcRpConfig({
+    enabled: true,
+    issuer: "https://idp.example.com",
+    clientId: "abc",
+    clientSecret: "super-secret-value",
+  });
+  assert.ok(stored.clientSecretEnvelope, "envelope written");
+  assert.ok(!JSON.stringify(stored).includes("super-secret-value"), "no plaintext at rest");
+  const runtime = decryptOidcRpConfig(stored);
+  assert.equal(runtime.clientSecret, "super-secret-value");
+});
+
+test("encryptOidcRpConfig leaves the envelope unset when no secret is supplied", async () => {
+  const { encryptOidcRpConfig } = await import("../src/services/oidc-rp.js");
+  const stored = encryptOidcRpConfig({ enabled: true, issuer: "https://i", clientId: "c" });
+  assert.equal(stored.clientSecretEnvelope, undefined);
+});
+
+test("ssoLoginUrlFor prefers OIDC when enabled, falls back to SAML, else null", async () => {
+  const { ssoLoginUrlFor } = await import("../src/services/oidc-rp.js");
+  assert.deepEqual(
+    ssoLoginUrlFor("t1", { enabled: true, idpLabel: "ADFS", oidc: { enabled: true, idpLabel: "Okta" } }),
+    { ssoLoginUrl: "/api/sso/oidc/t1/login", idpLabel: "Okta" },
+  );
+  assert.deepEqual(
+    ssoLoginUrlFor("t1", { enabled: true, idpLabel: "ADFS" }),
+    { ssoLoginUrl: "/api/sso/saml/t1/login", idpLabel: "ADFS" },
+  );
+  assert.equal(ssoLoginUrlFor("t1", { enabled: false }), null);
+});

@@ -1306,7 +1306,9 @@
       "notices": {
         "password_reset": "Tu contraseña se ha restablecido. Inicia sesión con tu nueva contraseña.",
         "logged_out": "Has cerrado sesión."
-      }
+      },
+      "continue_with_sso": "Continuar con {idp}",
+      "sso_required_note": "Tu distrito inicia sesión con {idp}. El acceso con contraseña está deshabilitado para este dominio."
     },
     "signup": {
       "promo_eyebrow": "Comienza tu prueba familiar",

@@ -1306,7 +1306,9 @@
       "notices": {
         "password_reset": "Sua senha foi redefinida. Entre com sua nova senha.",
         "logged_out": "Você saiu da conta."
-      }
+      },
+      "continue_with_sso": "Continuar com {idp}",
+      "sso_required_note": "Seu distrito entra com {idp}. O login por senha está desativado para este domínio."
     },
     "signup": {
       "promo_eyebrow": "Comece seu teste em família",

@@ -32,6 +32,7 @@ import {
   type DecryptedSsoConfig,
 } from "@aivo/sso";
 import { isInternalRole, refreshTtlMs, recordAdminLogin } from "../services/admin-session.js";
+import { ssoLoginUrlFor } from "../services/oidc-rp.js";
 import { setSurfaceCookie } from "../lib/surface-cookie.js";
 import {
   getSsoSamlBySlugMetadataSchema,
@@ -113,16 +114,27 @@ export async function registerSsoRoutes(app: FastifyInstance) {
           ssoConfig: districtSettings.ssoConfig,
         })
         .from(districtSettings)
-        .where(sql`(${districtSettings.ssoConfig}->>'enabled')::boolean = true`);
+        // Sprint B1 — a tenant may enable SAML (top-level `enabled`) and/or
+        // OIDC (`oidc.enabled`); match either.
+        .where(
+          sql`(${districtSettings.ssoConfig}->>'enabled')::boolean = true
+              or (${districtSettings.ssoConfig}->'oidc'->>'enabled')::boolean = true`,
+        );
 
       for (const row of rows) {
-        const cfg = (row.ssoConfig || {}) as StoredSsoConfig;
-        const domains = (cfg.emailDomains || []).map((d) => d.toLowerCase());
+        const cfg = (row.ssoConfig || {}) as StoredSsoConfig & {
+          oidc?: { enabled?: boolean; idpLabel?: string; emailDomains?: string[] };
+        };
+        const domains = [
+          ...(cfg.emailDomains || []),
+          ...(cfg.oidc?.emailDomains || []),
+        ].map((d) => d.toLowerCase());
         if (!domains.includes(domain)) continue;
+        const target = ssoLoginUrlFor(row.tenantId, cfg);
+        if (!target) continue;
         return {
           mode: "sso" as const,
-          ssoLoginUrl: `/api/sso/saml/${encodeURIComponent(row.tenantId)}/login`,
-          idpLabel: cfg.idpLabel || "SSO",
+          ...target,
           requireSso: !!cfg.requireSso,
         };
       }

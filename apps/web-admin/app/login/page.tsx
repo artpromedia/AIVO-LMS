@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { safeNextPath } from "@/lib/safe-redirect";
+import { SsoHint } from "./sso-hint";
 import {
   extractRefreshToken,
   identityAdminLogin,
@@ -120,6 +121,7 @@ export default async function LoginPage({
               Continue
             </button>
           </form>
+          <SsoHint />
 
           {errorMessage ? (
             <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">

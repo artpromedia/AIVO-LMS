@@ -1306,7 +1306,9 @@
       "notices": {
         "password_reset": "비밀번호가 재설정되었습니다. 새 비밀번호로 로그인하세요.",
         "logged_out": "로그아웃되었습니다."
-      }
+      },
+      "continue_with_sso": "{idp}(으)로 계속",
+      "sso_required_note": "소속 교육구는 {idp}로 로그인합니다. 이 이메일 도메인은 비밀번호 로그인이 비활성화되어 있습니다."
     },
     "signup": {
       "promo_eyebrow": "가족 체험판 시작하기",

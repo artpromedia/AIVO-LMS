@@ -1306,7 +1306,9 @@
       "notices": {
         "password_reset": "パスワードがリセットされました。新しいパスワードでサインインしてください。",
         "logged_out": "サインアウトしました。"
-      }
+      },
+      "continue_with_sso": "{idp} で続行",
+      "sso_required_note": "あなたの学区は {idp} でサインインします。このドメインではパスワードログインが無効です。"
     },
     "signup": {
       "promo_eyebrow": "ご家族向けトライアルを始める",

@@ -1306,7 +1306,9 @@
       "notices": {
         "password_reset": "你的密码已重置。请使用新密码登录。",
         "logged_out": "你已退出登录。"
-      }
+      },
+      "continue_with_sso": "使用 {idp} 继续",
+      "sso_required_note": "您的学区使用 {idp} 登录。该邮箱域名已禁用密码登录。"
     },
     "signup": {
       "promo_eyebrow": "开始你的家庭试用",

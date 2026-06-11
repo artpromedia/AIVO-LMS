@@ -1200,14 +1200,51 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
         .where(eq(districtSettings.tenantId, req.tenantId))
         .limit(1);
       const stored = (settings?.ssoConfig || {}) as any;
-      const { idpCertEnvelope, spPrivateKeyEnvelope, ...safe } = stored;
+      const { idpCertEnvelope, spPrivateKeyEnvelope, oidc, ...safe } = stored;
+      // Sprint B1 — never return the encrypted secret envelope (even
+      // ciphertext stays server-side); the UI gets a *Set marker.
+      const { clientSecretEnvelope, ...oidcSafe } = (oidc || {}) as any;
       return {
         config: {
           ...safe,
           idpCertSet: !!idpCertEnvelope,
           spPrivateKeySet: !!spPrivateKeyEnvelope,
+          oidc: oidc
+            ? { ...oidcSafe, clientSecretSet: !!clientSecretEnvelope }
+            : undefined,
         },
       };
+    },
+  );
+
+  // Sprint B1 — dry-run an OIDC issuer before enabling it: performs LIVE
+  // discovery and reports the resolved endpoints (or the exact failure).
+  app.post(
+    "/api/district/sso/oidc/test",
+    { schema: updateDistrictSsoSchema, preHandler: requireDistrictAdmin },
+    async (req: any, reply: any) => {
+      const body = (req.body || {}) as { issuer?: string; discoveryUrl?: string };
+      if (!body.issuer && !body.discoveryUrl) {
+        return reply.status(400).send({ error: "issuer or discoveryUrl is required" });
+      }
+      const { discoverOidc } = await import("../services/oidc-rp.js");
+      try {
+        const doc = await discoverOidc({
+          issuer: body.issuer || "",
+          discoveryUrl: body.discoveryUrl,
+          clientId: "dry-run",
+          enabled: true,
+        } as any);
+        return {
+          ok: true,
+          issuer: doc.issuer,
+          authorizationEndpoint: doc.authorization_endpoint,
+          tokenEndpoint: doc.token_endpoint,
+          jwksUri: doc.jwks_uri,
+        };
+      } catch (err: any) {
+        return reply.status(422).send({ ok: false, error: String(err?.message ?? err) });
+      }
     },
   );
 
@@ -1267,6 +1304,45 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
         return reply
           .status(400)
           .send({ error: "IdP signing certificate is required to enable SSO" });
+      }
+
+      // ── Sprint B1: OIDC relying-party section ─────────────────────────
+      // Lives under sso_config.oidc; consumed by routes/oidc-rp.ts. The
+      // client secret is encrypted at rest like the SAML cert/key; an
+      // omitted secret preserves the stored envelope.
+      const priorOidc = (prior.oidc || {}) as any;
+      let nextOidc: any = priorOidc;
+      if (body.oidc !== undefined) {
+        const o = body.oidc || {};
+        const { encryptOidcRpConfig } = await import("../services/oidc-rp.js");
+        nextOidc = encryptOidcRpConfig({
+          enabled: !!o.enabled,
+          idpLabel: o.idpLabel ?? priorOidc.idpLabel,
+          issuer: o.issuer ?? priorOidc.issuer,
+          discoveryUrl: o.discoveryUrl ?? priorOidc.discoveryUrl,
+          clientId: o.clientId ?? priorOidc.clientId,
+          scopes: Array.isArray(o.scopes) ? o.scopes : priorOidc.scopes,
+          emailClaim: o.emailClaim ?? priorOidc.emailClaim,
+          nameClaim: o.nameClaim ?? priorOidc.nameClaim,
+          roleClaim: o.roleClaim ?? priorOidc.roleClaim,
+          roleMap: o.roleMap ?? priorOidc.roleMap,
+          defaultRole: o.defaultRole ?? priorOidc.defaultRole,
+          emailDomains: Array.isArray(o.emailDomains)
+            ? o.emailDomains
+            : priorOidc.emailDomains,
+          clientSecret: typeof o.clientSecret === "string" ? o.clientSecret : undefined,
+        });
+        if (!nextOidc.clientSecretEnvelope && priorOidc.clientSecretEnvelope) {
+          nextOidc.clientSecretEnvelope = priorOidc.clientSecretEnvelope;
+        }
+        if (nextOidc.enabled && (!nextOidc.issuer || !nextOidc.clientId)) {
+          return reply
+            .status(400)
+            .send({ error: "issuer and clientId are required to enable OIDC SSO" });
+        }
+      }
+      if (nextOidc && Object.keys(nextOidc).length > 0) {
+        (encrypted as any).oidc = nextOidc;
       }
 
       const updates: any = { ssoConfig: encrypted, updatedAt: new Date() };
