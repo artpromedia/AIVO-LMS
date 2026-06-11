@@ -164,14 +164,38 @@ export class DrizzleEventStore implements EventStore {
     }
   }
 
-  async verify(): Promise<ChainBreak | null> {
-    // Walk in chain order. For very large tables this should be windowed
-    // against the daily anchors; here we verify the full chain.
+  async verify(range?: { from?: string; to?: string }): Promise<ChainBreak | null> {
+    if (!range?.from && !range?.to) {
+      // Walk in chain order. For very large tables this should be windowed
+      // against the daily anchors; here we verify the full chain.
+      const rows: Row[] = await this.db
+        .select()
+        .from(auditEventsV2)
+        .orderBy(asc(auditEventsV2.occurredAt), asc(auditEventsV2.id));
+      return verifyChain(rows.map(rowToEvent), GENESIS_HASH);
+    }
+    // Range slice in chain order, anchored on the stored hash of the event
+    // immediately preceding the slice (GENESIS when the slice is the head).
+    const conds: SQL[] = [];
+    if (range.from) conds.push(gte(auditEventsV2.occurredAt, new Date(range.from)));
+    if (range.to) conds.push(lte(auditEventsV2.occurredAt, new Date(range.to)));
+    const where = conds.length > 1 ? and(...conds) : conds[0];
     const rows: Row[] = await this.db
       .select()
       .from(auditEventsV2)
+      .where(where)
       .orderBy(asc(auditEventsV2.occurredAt), asc(auditEventsV2.id));
-    return verifyChain(rows.map(rowToEvent), GENESIS_HASH);
+    if (rows.length === 0) return null;
+    const head = rows[0];
+    const [anchor] = await this.db
+      .select({ hash: auditEventsV2.hash })
+      .from(auditEventsV2)
+      .where(
+        sql`(${auditEventsV2.occurredAt}, ${auditEventsV2.id}) < (${head.occurredAt as Date}, ${head.id})`,
+      )
+      .orderBy(desc(auditEventsV2.occurredAt), desc(auditEventsV2.id))
+      .limit(1);
+    return verifyChain(rows.map(rowToEvent), anchor?.hash ?? GENESIS_HASH);
   }
 }
 

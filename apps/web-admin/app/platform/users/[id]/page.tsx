@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { getAdminUser } from "@aivo/admin-api/platform";
+import { recordAdminReadEvents, type AdminReadEvent } from "@aivo/admin-api/audit";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { LearnersTable } from "@/components/admin-tables";
 import { formatDate, formatDateTime } from "@/components/admin-format";
@@ -13,6 +14,25 @@ export default async function UserDetailPage({
   const session = await requirePlatformPage("platform:read");
   const { id } = await params;
   const user = await getAdminUser(session, id);
+
+  // Sprint B4 — this page renders PII (and the linked learners' rows), so
+  // the view itself is audited: one user event plus one per child shown.
+  await recordAdminReadEvents(session, [
+    {
+      action: "admin.user.viewed",
+      resourceType: "user",
+      resourceId: user.id,
+      tenantId: user.tenantId,
+    },
+    ...user.learners.map(
+      (learner): AdminReadEvent => ({
+        action: "admin.learner.viewed",
+        resourceType: "learner",
+        resourceId: learner.id,
+        tenantId: learner.tenantId ?? user.tenantId,
+      }),
+    ),
+  ]);
 
   return (
     <AdminPageFrame

@@ -61,6 +61,7 @@ async function emitScimAudit(
       actorId: ctx.tokenId,
       actorEmail: "scim-provisioner",
       actorRole: "SCIM_TOKEN",
+      onBehalfOfId: null,
       resourceType,
       resourceId,
       details: { ...details, provisioner: "scim" },

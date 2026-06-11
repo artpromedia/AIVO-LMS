@@ -25,9 +25,10 @@ test.describe("platform tables v2", () => {
     await expect(page.getByTestId("table-total")).toBeVisible();
     await expect(page.getByTestId("table-pager")).toBeVisible();
 
-    // Search round-trips through the URL (server-driven).
-    await page.getByRole("searchbox").fill("no-such-actor@nowhere.test");
-    await page.getByRole("button", { name: /^search$/i }).click();
+    // Search round-trips through the URL (server-driven). Scope to the
+    // table's search form — the admin shell has its own nav searchbox.
+    await page.getByRole("search").getByRole("searchbox").fill("no-such-actor@nowhere.test");
+    await page.getByRole("search").getByRole("button", { name: /^search$/i }).click();
     await expect(page).toHaveURL(/q=no-such-actor/);
     await expect(page.locator("main").last()).toContainText(/no audit entries match/i);
 

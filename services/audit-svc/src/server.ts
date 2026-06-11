@@ -29,6 +29,20 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     registerEnterpriseAuthHook(app, {
       sourceService: "audit-svc",
       skipPaths: ["/healthz", "/health", "/metrics"],
+      // Producers authenticate with the static INTERNAL_SERVICE_TOKEN
+      // (HttpAuditTransport sends it as the bearer). It is not a JWT, so
+      // without this override the default verifier rejected every
+      // service emit with 401 — and emission being best-effort, events
+      // were silently dropped. Match it first, then fall back to real
+      // JWT verification for human principals.
+      verify: async (token) => {
+        const serviceToken = process.env.INTERNAL_SERVICE_TOKEN;
+        if (serviceToken && token === serviceToken) {
+          return { sub: "internal-service", role: "service" };
+        }
+        const { verifyJWT } = await import("@aivo/security");
+        return (await verifyJWT(token)) as Record<string, unknown>;
+      },
     });
   }
   registerAuditEventRoutes(app, store);

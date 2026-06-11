@@ -74,6 +74,7 @@
     "observability:audit": "node scripts/observability-audit.mjs",
     "mobile:a11y-ratchet": "node scripts/mobile-a11y-label-ratchet.mjs",
     "feature-flag:audit": "node scripts/feature-flag-audit.mjs",
+    "audit-trail:audit": "node scripts/audit-trail-audit.mjs",
     "release:gate": "node scripts/release-gate.mjs",
     "backend:parity": "node scripts/backend-parity-check.mjs",
     "tutor:parity": "node scripts/tutor-parity-check.mjs",

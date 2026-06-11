@@ -19,6 +19,7 @@ import {
   seatRequests,
   appendAudit,
   adminAuditLog,
+  verifyAuditChainRange,
 } from "@aivo/db";
 import { Permission, verifyJWT } from "@aivo/security";
 import { eq, and, sql, ilike, or, count, desc, asc, isNull, gte, gt, lte, between } from "drizzle-orm";
@@ -64,6 +65,7 @@ import {
   districtSeatsRequestSchema,
   getDistrictRosterCsvSchema,
   getDistrictActivityExportSchema,
+  getDistrictActivityVerifySchema,
   getDistrictSeatsRequestsSchema,
 } from "./schemas.js";
 void verifyJWT; // kept for potential token introspection helpers
@@ -1387,13 +1389,42 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     "/api/district/activity",
     { schema: getDistrictActivitySchema, preHandler: requireDistrictAdmin },
     async (req: any) => {
-      const { page: pageStr, pageSize: pageSizeStr, action, resourceType } = req.query as any;
+      const {
+        page: pageStr,
+        pageSize: pageSizeStr,
+        action,
+        resourceType,
+        q,
+        from,
+        to,
+      } = req.query as any;
       const page = safePage(pageStr);
       const pageSize = safePageSize(pageSizeStr, 30);
 
       const conditions: any[] = [eq(districtActivityLog.tenantId, req.tenantId)];
       if (action) conditions.push(eq(districtActivityLog.action, action));
       if (resourceType) conditions.push(eq(districtActivityLog.resourceType, resourceType));
+      // Sprint B4 — free-text + date-range filters for the district audit
+      // table (same query the export honors, so preview === download).
+      if (q) {
+        const needle = `%${q}%`;
+        conditions.push(
+          or(
+            ilike(districtActivityLog.action, needle),
+            ilike(districtActivityLog.actorName, needle),
+            ilike(districtActivityLog.resourceType, needle),
+            sql`${districtActivityLog.details}::text ILIKE ${needle}`,
+          ),
+        );
+      }
+      if (from) {
+        const d = new Date(from);
+        if (!isNaN(d.getTime())) conditions.push(gte(districtActivityLog.createdAt, d));
+      }
+      if (to) {
+        const d = new Date(to);
+        if (!isNaN(d.getTime())) conditions.push(lte(districtActivityLog.createdAt, d));
+      }
 
       const where = conditions.length === 1 ? conditions[0] : and(...conditions);
 
@@ -1979,9 +2010,10 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
     { schema: getDistrictActivityExportSchema, preHandler: exportStepUp },
     async (req: any, reply: any) => {
       const tid = req.tenantId;
-      const { from, to, format } = (req.query as any) || {};
+      const { from, to, format, action } = (req.query as any) || {};
       const fmt: "csv" | "json" = format === "json" ? "json" : "csv";
       const conds: any[] = [eq(districtActivityLog.tenantId, tid)];
+      if (action) conds.push(eq(districtActivityLog.action, action));
       let fromDate: Date | undefined;
       let toDate: Date | undefined;
       if (from) {
@@ -2070,6 +2102,48 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
       reply.header("content-type", "text/csv; charset=utf-8");
       reply.header("content-disposition", `attachment; filename="activity-${tid}.csv"`);
       return lines.join("\n") + "\n";
+    },
+  );
+
+  // Sprint B4 — district-facing hash-chain verification. Recomputes the
+  // district_activity_log chain over the requested date range server-side
+  // and returns ONLY integrity metadata (the chain is global across
+  // tenants, so row contents never leave the server — a district learns
+  // whether the ledger its rows live in is intact, not other tenants'
+  // data). The slice is anchored against the stored hash of the row
+  // immediately preceding the range.
+  app.get(
+    "/api/district/activity/verify",
+    { schema: getDistrictActivityVerifySchema, preHandler: requireDistrictAdmin },
+    async (req: any, reply: any) => {
+      const { from, to } = (req.query as any) || {};
+      let fromDate: Date | undefined;
+      let toDate: Date | undefined;
+      if (from) {
+        const d = new Date(from);
+        if (isNaN(d.getTime())) return reply.status(400).send({ error: "Invalid from date" });
+        fromDate = d;
+      }
+      if (to) {
+        const d = new Date(to);
+        if (isNaN(d.getTime())) return reply.status(400).send({ error: "Invalid to date" });
+        toDate = d;
+      }
+      const result = await verifyAuditChainRange(db, "district_activity_log", {
+        from: fromDate,
+        to: toDate,
+      });
+      return {
+        intact: result.intact,
+        checkedRows: result.checkedRows,
+        skippedLegacyRows: result.skippedLegacyRows,
+        firstSeq: result.firstSeq,
+        lastSeq: result.lastSeq,
+        brokenAtSeq: result.brokenAtSeq,
+        anchored: result.anchored,
+        from: fromDate?.toISOString() ?? null,
+        to: toDate?.toISOString() ?? null,
+      };
     },
   );
 

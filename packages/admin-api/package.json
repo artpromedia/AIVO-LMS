@@ -132,6 +132,7 @@
   },
   "dependencies": {
     "@aivo/admin-auth": "workspace:*",
+    "@aivo/audit-client": "workspace:*",
     "next": "^15.5.18",
     "server-only": "^0.0.1"
   },

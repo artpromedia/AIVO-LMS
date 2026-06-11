@@ -610,6 +610,14 @@ export const getDistrictActivityExportSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const getDistrictActivityVerifySchema = {
+  tags: ["Identity"],
+  operationId: "getDistrictActivityVerify",
+  summary: "GET /api/district/activity/verify",
+  querystring: { type: "object", additionalProperties: true, properties: {} },
+  response: { 200: passthroughObject, 400: errorResponse },
+} as const;
+
 export const getDistrictSeatsRequestsSchema = {
   tags: ["Identity"],
   operationId: "getDistrictSeatsRequests",

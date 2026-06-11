@@ -105,6 +105,14 @@ export const getAdminSvcAuditLogSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const postAdminSvcAuditLogReadEventsSchema = {
+  tags: ["Admin"],
+  operationId: "postAdminSvcAuditLogReadEvents",
+  summary: "POST /api/admin-svc/audit-log/read-events",
+  body: passthroughObject,
+  response: { 200: passthroughObject, 400: errorResponse },
+} as const;
+
 export const getAdminSvcActivitySchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcActivity",

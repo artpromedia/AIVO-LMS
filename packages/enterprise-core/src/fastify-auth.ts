@@ -38,7 +38,11 @@ const TENANT_ROLES = new Set<TenantRole>([
 
 function coerceRole(value: unknown): TenantRole | undefined {
   if (typeof value !== "string") return undefined;
-  return TENANT_ROLES.has(value as TenantRole) ? (value as TenantRole) : undefined;
+  // identity-svc mints roles in UPPER_CASE ("DISTRICT_ADMIN"); normalize so
+  // those tokens get a tenant context too (Sprint B4 — audit-svc tenant
+  // scoping depends on it).
+  const normalized = value.toLowerCase() as TenantRole;
+  return TENANT_ROLES.has(normalized) ? normalized : undefined;
 }
 
 declare module "fastify" {

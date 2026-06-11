@@ -654,15 +654,20 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
     },
   ) {
     const search = (req.query as any)?.search as string | undefined;
+    // Canonical 11-key writer profile (all keys, nulls explicit) so the
+    // chain verifier can recompute this row — see audit-chain-verify.ts.
     await appendAudit(db, "admin_audit_log", adminAuditLog, {
       action: "admin.data.exported",
       actorId: req.user?.sub ?? "unknown",
       actorEmail: req.user?.email ?? null,
       actorRole: String(req.user?.role ?? "UNKNOWN"),
+      onBehalfOfId: null,
       resourceType: opts.resourceType,
       resourceId: null,
       tenantId: null,
       details: { filters: { search: search ?? null } },
+      ipAddress: (req.headers["x-forwarded-for"] as string) || req.ip || null,
+      userAgent: (req.headers["user-agent"] as string) || null,
     });
     const write = startCsv(reply, opts.filename, opts.header);
     const pageSize = 200;

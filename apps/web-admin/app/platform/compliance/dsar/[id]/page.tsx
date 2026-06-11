@@ -8,6 +8,7 @@ import {
   rejectDsar,
   verifyDsarIdentity,
 } from "@aivo/admin-api/dsar";
+import { recordAdminReadEvents } from "@aivo/admin-api/audit";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 import { actionError } from "@/lib/action-errors";
@@ -65,6 +66,16 @@ export default async function DsarDetailPage({
   const { id } = await params;
   const query = await searchParams;
   const { request, timeline } = await getDsarRequest(session, id);
+
+  // Sprint B4 — a DSAR file is data-subject PII; viewing it is audited.
+  await recordAdminReadEvents(session, [
+    {
+      action: "admin.dsar.viewed",
+      resourceType: "dsar_request",
+      resourceId: request.id,
+      tenantId: request.tenantId,
+    },
+  ]);
 
   return (
     <AdminPageFrame

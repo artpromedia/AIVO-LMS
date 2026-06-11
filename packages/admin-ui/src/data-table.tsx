@@ -36,8 +36,15 @@ export interface DataTableProps<T> {
   sort?: string;
   /** Href for the audited CSV export of the SAME filters. */
   exportHref?: string;
+  /**
+   * Extra filter params (e.g. date range) preserved across search, sort,
+   * and pager navigation — rendered as hidden inputs + merged into hrefs.
+   */
+  extraParams?: Record<string, string | undefined>;
   emptyMessage: string;
   searchPlaceholder?: string;
+  /** Render the free-text search form (default true). */
+  searchable?: boolean;
 }
 
 function buildHref(
@@ -63,8 +70,10 @@ export function DataTable<T>({
   search,
   sort,
   exportHref,
+  extraParams,
   emptyMessage,
   searchPlaceholder = "Search…",
+  searchable = true,
 }: DataTableProps<T>) {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const current = Math.min(Math.max(1, page), totalPages);
@@ -73,29 +82,40 @@ export function DataTable<T>({
     { length: Math.min(5, totalPages - windowStart + 1) },
     (_, i) => windowStart + i,
   );
+  const extras: Record<string, string | undefined> = extraParams ?? {};
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <form action={basePath} method="get" className="flex items-center gap-2" role="search">
-          {sort ? <input type="hidden" name="sort" value={sort} /> : null}
-          <input
-            className="admin-input !mt-0 w-64"
-            type="search"
-            name="q"
-            defaultValue={search ?? ""}
-            placeholder={searchPlaceholder}
-            aria-label={searchPlaceholder}
-          />
-          <button className="admin-button-secondary" type="submit">
-            Search
-          </button>
-          {search ? (
-            <a className="text-sm font-semibold text-blue-700 hover:underline" href={buildHref(basePath, { sort })}>
-              Clear
-            </a>
-          ) : null}
-        </form>
+        {searchable ? (
+          <form action={basePath} method="get" className="flex items-center gap-2" role="search">
+            {sort ? <input type="hidden" name="sort" value={sort} /> : null}
+            {Object.entries(extras).map(([name, value]) =>
+              value ? <input key={name} type="hidden" name={name} value={value} /> : null,
+            )}
+            <input
+              className="admin-input !mt-0 w-64"
+              type="search"
+              name="q"
+              defaultValue={search ?? ""}
+              placeholder={searchPlaceholder}
+              aria-label={searchPlaceholder}
+            />
+            <button className="admin-button-secondary" type="submit">
+              Search
+            </button>
+            {search ? (
+              <a
+                className="text-sm font-semibold text-blue-700 hover:underline"
+                href={buildHref(basePath, { ...extras, sort })}
+              >
+                Clear
+              </a>
+            ) : null}
+          </form>
+        ) : (
+          <span />
+        )}
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-600" data-testid="table-total">
             {total.toLocaleString()} row{total === 1 ? "" : "s"}
@@ -121,7 +141,7 @@ export function DataTable<T>({
                   <th key={column.key} aria-sort={active ? (direction === "asc" ? "ascending" : "descending") : "none"}>
                     <a
                       className="inline-flex items-center gap-1 hover:underline"
-                      href={buildHref(basePath, { q: search, sort: nextSort })}
+                      href={buildHref(basePath, { ...extras, q: search, sort: nextSort })}
                     >
                       {column.header}
                       {active ? <span aria-hidden="true">{direction === "asc" ? "↑" : "↓"}</span> : null}
@@ -153,14 +173,14 @@ export function DataTable<T>({
 
       <nav className="mt-4 flex items-center gap-2" aria-label="Pagination" data-testid="table-pager">
         <PagerLink
-          href={buildHref(basePath, { q: search, sort, page: current - 1 })}
+          href={buildHref(basePath, { ...extras, q: search, sort, page: current - 1 })}
           disabled={current <= 1}
           label="Previous"
         />
         {pageNumbers.map((n) => (
           <PagerLink
             key={n}
-            href={buildHref(basePath, { q: search, sort, page: n })}
+            href={buildHref(basePath, { ...extras, q: search, sort, page: n })}
             disabled={false}
             current={n === current}
             label={String(n)}
@@ -170,7 +190,7 @@ export function DataTable<T>({
           <span className="text-sm text-slate-500">… of {totalPages.toLocaleString()}</span>
         ) : null}
         <PagerLink
-          href={buildHref(basePath, { q: search, sort, page: current + 1 })}
+          href={buildHref(basePath, { ...extras, q: search, sort, page: current + 1 })}
           disabled={current >= totalPages}
           label="Next"
         />

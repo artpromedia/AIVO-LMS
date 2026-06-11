@@ -35,7 +35,7 @@ export default async function PlatformAuditPage({
           sort={sort}
           exportHref={`/platform/audit/export${search ? `?q=${encodeURIComponent(search)}` : ""}`}
           emptyMessage="No audit entries match."
-          searchPlaceholder="Search actor email or details…"
+          searchPlaceholder="Search action, actor email, or details…"
           columns={[
             { key: "when", header: "When", sortKey: "createdAt", render: (row) => formatDateTime(row.createdAt) },
             { key: "action", header: "Action", render: (row) => <span className="font-mono text-xs">{row.action}</span> },

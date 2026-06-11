@@ -22,7 +22,7 @@ import {
   readBooleanFromSource,
   type EnterpriseFeatureFlags,
   type EnterpriseFlagKey,
-} from "./enterprise-flags";
+} from "./enterprise-flags.js";
 
 export type TenantOverrides = Partial<Record<EnterpriseFlagKey, boolean>>;
 
