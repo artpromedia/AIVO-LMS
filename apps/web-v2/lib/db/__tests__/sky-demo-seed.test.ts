@@ -20,7 +20,9 @@ beforeAll(() => {
 });
 
 describe("Sky demo journey seed", () => {
-  it("materialises the full journey state for the demo learner", async () => {
+  // Generous timeout: this test dynamically imports the full store/seed/
+  // mission/repos module graph, which is slow under full-suite worker load.
+  it("materialises the full journey state for the demo learner", { timeout: 30_000 }, async () => {
     const { getStore } = await import("@/lib/db/store");
     const { ensureSeeded } = await import("@/lib/db/seed");
     ensureSeeded();
