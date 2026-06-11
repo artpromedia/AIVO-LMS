@@ -76,6 +76,12 @@ export interface StreamNextInput {
   /** Persist the session id on the baseline (called once when a run starts). */
   persistSessionId: (sessionId: string) => Promise<void> | void;
   calibration?: CalibrationMap;
+  /**
+   * Web subject id → slug (Wave C, G1) so bank items carry
+   * canonicalisable subject keys and the service finalizer can split
+   * per-subject θ.
+   */
+  subjectSlugById?: ReadonlyMap<string, string>;
 }
 
 export type StreamOutcome =
@@ -90,7 +96,7 @@ export type StreamOutcome =
 export async function streamNextQuestion(input: StreamNextInput): Promise<StreamOutcome> {
   const { learnerId, baseline, questions, attempts, learner, client, calibration } = input;
 
-  const bank = questionsToBank(questions, calibration);
+  const bank = questionsToBank(questions, calibration, input.subjectSlugById);
   const bankById = new Map(bank.map((b) => [b.id, b]));
   const questionById = new Map(questions.map((q) => [q.id, q]));
   // Apply answers in the order they were given (the order the server served them).

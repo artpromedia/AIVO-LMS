@@ -130,8 +130,89 @@ export const tutorSessions = pgTable("tutor_sessions", {
   xpEarned: integer("xp_earned").default(0),
   durationSeconds: integer("duration_seconds").default(0),
   completionQuality: real("completion_quality"),
+  /** Wave E (S9): agent loop state between turns — token envelope, ladder
+   *  rung + counters, turn seq. NULL for non-agent sessions. */
+  agentState: jsonb("agent_state"),
   startedAt: timestamp("started_at").defaultNow().notNull(),
   completedAt: timestamp("completed_at"),
+});
+
+/**
+ * Wave E (S9): one row per agent decision — the audit trail for every
+ * tutor-agent turn (accepted actions, guard rejections, ladder fallbacks).
+ * `seq` is monotonic per session so a session's reasoning can be replayed
+ * in order; `observationDigest` ties the row to the ai-svc decision log
+ * without storing raw learner responses here.
+ */
+export const tutorDecisionTraces = pgTable("tutor_decision_traces", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  sessionId: uuid("session_id")
+    .references(() => tutorSessions.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  tutorKey: varchar("tutor_key", { length: 32 }).notNull(),
+  seq: integer("seq").notNull(),
+  observationDigest: varchar("observation_digest", { length: 32 }).notNull(),
+  /** The validated agent action (null when the turn fell back). */
+  action: jsonb("action"),
+  rationale: text("rationale").default(""),
+  /** Decision outcome: accepted | rejected:<reason> | fallback:<reason> | skipped:<reason>. */
+  decision: varchar("decision", { length: 120 }).notNull(),
+  rung: varchar("rung", { length: 16 }).default("full").notNull(),
+  latencyMs: integer("latency_ms").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/**
+ * Wave E (S11): the agent's evidence ledger — one row per `file_evidence`
+ * tool call. `masteryDelta` is SUPPLEMENTAL and hard-clamped to ±0.05 by
+ * the adapter before insert; the gradebook nudge happens in the same
+ * transaction-shaped flow so the ledger always explains the movement.
+ */
+export const tutorSessionEvidence = pgTable("tutor_session_evidence", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  sessionId: uuid("session_id")
+    .references(() => tutorSessions.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  skillId: varchar("skill_id", { length: 200 }),
+  kind: varchar("kind", { length: 30 }).notNull(),
+  note: text("note").notNull(),
+  masteryDelta: real("mastery_delta").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/**
+ * Wave E (S12): consent-gated episodic tutor memory. Every row is
+ * parent-visible (and parent-deletable), written only behind
+ * ai_personalization consent with <=2 writes/session, kinds restricted by
+ * the tutor's memoryPolicy, expires after 180 days (admin-svc purge), and
+ * is erased with the learner via the ADR-0034 governance subscriber.
+ */
+export const tutorMemories = pgTable("tutor_memories", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  tutorKey: varchar("tutor_key", { length: 32 }).notNull(),
+  kind: varchar("kind", { length: 30 }).notNull(),
+  content: text("content").notNull(),
+  sourceSessionId: uuid("source_session_id").references(() => tutorSessions.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
 });
 
 export const tokenUsage = pgTable("token_usage", {

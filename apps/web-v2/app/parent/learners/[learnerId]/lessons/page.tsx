@@ -111,6 +111,17 @@ export default async function ParentLessonsPage({
                     ))}
                   </div>
                 )}
+                {s.tutorNote ? (
+                  <div
+                    data-testid="tutor-note"
+                    className="mt-3 rounded-md bg-aivo-primary-soft p-3 text-sm"
+                  >
+                    <p className="text-xs font-medium uppercase text-aivo-ink-soft">
+                      {t("tutor_note")}
+                    </p>
+                    <p className="mt-1">{s.tutorNote}</p>
+                  </div>
+                ) : null}
                 <p className="mt-3 text-xs text-aivo-ink-soft">
                   {new Date(s.createdAt).toLocaleString()}
                 </p>

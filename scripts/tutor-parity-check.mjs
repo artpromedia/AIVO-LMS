@@ -121,6 +121,12 @@ for (const key of CANONICAL_TUTORS) {
     const hasFunctioningLevels = /functioningLevels:\s*\[[\s\S]*?"[A-Z_]+"/.test(src);
     const hasSkillGraphRefs = /skillGraphRefs:\s*\[[\s\S]*?"[^"]+"/.test(src);
     const hasPolicy = /policy:\s*\{/.test(src);
+    // Wave E (S8): agent-policy hard fields — a tutor without a toolset,
+    // a per-level action policy, and a memory policy cannot run the agent
+    // loop and fails parity red.
+    const hasToolset = /toolset:\s*\[[\s\S]*?"[\w_]+"/.test(src);
+    const hasActionPolicy = /actionPolicy:\s*standardActionPolicy\(|actionPolicy:\s*\{/.test(src);
+    const hasMemoryPolicy = /memoryPolicy:\s*(NO_MEMORY|STANDARD_MEMORY|\{)/.test(src);
     modePerTutor.set(key, {
       file: modeFile,
       personaKey: k?.[1] ?? null,
@@ -131,6 +137,9 @@ for (const key of CANONICAL_TUTORS) {
       hasFunctioningLevels,
       hasSkillGraphRefs,
       hasPolicy,
+      hasToolset,
+      hasActionPolicy,
+      hasMemoryPolicy,
     });
   } else {
     modePerTutor.set(key, { file: modeFile, personaKey: null });
@@ -199,6 +208,10 @@ for (const tutor of CANONICAL_TUTORS) {
     if (!mode.hasFunctioningLevels) missing.push("no-functioningLevels");
     if (!mode.hasSkillGraphRefs) missing.push("no-skillGraphRefs");
     if (!mode.hasPolicy) missing.push("no-policy");
+    // Wave E (S8): agent-policy hard requirements.
+    if (!mode.hasToolset) missing.push("no-toolset");
+    if (!mode.hasActionPolicy) missing.push("no-actionPolicy");
+    if (!mode.hasMemoryPolicy) missing.push("no-memoryPolicy");
   }
 
   // Soft requirements (yellow) — GREEN-02 deep parity / GREEN-09 a11y

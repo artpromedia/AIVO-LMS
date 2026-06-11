@@ -105,3 +105,93 @@ export function deliveryLevelFromTheta(theta: number, enrolledBand: GradeBand): 
   const idx = Math.max(0, gradeBandIndex(enrolledBand) - offset);
   return GRADE_BANDS[idx] as GradeBand;
 }
+
+/**
+ * Canonical subject key for per-subject placement (Wave C, G1).
+ *
+ * Producers (assessment finalize, recommendation apply) and consumers
+ * (learning-svc grade-target, web skill selection) name subjects in
+ * different vocabularies: brand tutor domains ("Mathematics",
+ * "English Language Arts"), ai-svc chapter domains ("ela", "sel",
+ * "executive_function"), and web subject slugs ("reading", "social").
+ * `curriculum_alignment.delivery_levels` is keyed by THIS function's
+ * output — every reader and writer must round-trip through it, or a
+ * subject silently falls back to the global level.
+ */
+const SUBJECT_KEY_ALIASES: Record<string, string> = {
+  math: "math",
+  mathematics: "math",
+  reading: "reading",
+  ela: "reading",
+  english: "reading",
+  "english language arts": "reading",
+  writing: "writing",
+  science: "science",
+  social: "social",
+  sel: "social",
+  "social-emotional learning": "social",
+  "social emotional learning": "social",
+  speech: "speech",
+  "speech & language therapy": "speech",
+  "speech and language therapy": "speech",
+  "executive function": "executive-function",
+  "life skills": "life-skills",
+  "life skills & executive function": "life-skills",
+  "life skills and executive function": "life-skills",
+  "social studies": "social-studies",
+  "history & social studies": "social-studies",
+  "history and social studies": "social-studies",
+  coding: "coding",
+  "coding & computational thinking": "coding",
+  "coding and computational thinking": "coding",
+  geography: "geography",
+  "geography & world cultures": "geography",
+  "geography and world cultures": "geography",
+  music: "music",
+  "music & rhythm": "music",
+  "music and rhythm": "music",
+  "physical education": "physical-education",
+  "physical education & health": "physical-education",
+  "physical education and health": "physical-education",
+  "world languages": "world-languages",
+  engineering: "engineering",
+  "stem & engineering": "engineering",
+  "stem and engineering": "engineering",
+  art: "art",
+  "creative arts": "art",
+  "creative arts & expression": "art",
+  "creative arts and expression": "art",
+};
+
+export function canonicalSubjectKey(raw: string | null | undefined): string | null {
+  if (raw == null) return null;
+  const lowered = String(raw).trim().toLowerCase().replace(/[_]+/g, " ");
+  if (lowered.length === 0) return null;
+  const direct = SUBJECT_KEY_ALIASES[lowered] ?? SUBJECT_KEY_ALIASES[lowered.replace(/-+/g, " ")];
+  if (direct) return direct;
+  // Slugify fallback so an unknown subject still gets a stable key.
+  const slug = lowered
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug.length > 0 ? slug : null;
+}
+
+/**
+ * Per-subject θ → per-subject delivery bands (keys canonicalised).
+ * Subjects whose θ is non-finite are skipped (a caller passing garbage
+ * for one subject must not lose the others' placement).
+ */
+export function deliveryLevelsFromThetas(
+  subjectThetas: Record<string, number>,
+  enrolledBand: GradeBand,
+): Record<string, GradeBand> {
+  const out: Record<string, GradeBand> = {};
+  for (const [rawSubject, theta] of Object.entries(subjectThetas)) {
+    if (!Number.isFinite(theta)) continue;
+    const key = canonicalSubjectKey(rawSubject);
+    if (!key) continue;
+    out[key] = deliveryLevelFromTheta(theta, enrolledBand);
+  }
+  return out;
+}

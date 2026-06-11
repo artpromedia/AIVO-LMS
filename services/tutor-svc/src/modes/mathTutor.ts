@@ -10,7 +10,12 @@
  * `@aivo/skill-graphs` (`ccss-math-k`). The default content-pack ref is
  * the authored and validated `math-k-fall-2026` content pack.
  */
-import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
+import {
+  defineTutor,
+  STANDARD_MEMORY,
+  standardActionPolicy,
+  type TutorDefinition,
+} from "@aivo/tutor-sdk";
 
 export const mathTutor: TutorDefinition = defineTutor({
   id: "math-coach@1.0.0",
@@ -44,6 +49,21 @@ export const mathTutor: TutorDefinition = defineTutor({
     "11": "authored",
     "12": "authored",
   },
+  // Wave E (S8): agent loop instruments + per-level action policy.
+  // S11: onboarded pilots carry the bounded write tools (evidence ledger
+  // + parent-approved recommendation proposals).
+  toolset: [
+    "get_learner_snapshot",
+    "get_skill_position",
+    "get_curriculum_context",
+    "read_math_work",
+    "file_evidence",
+    "propose_recommendation",
+    "remember",
+  ],
+  actionPolicy: standardActionPolicy(),
+  // S12: memory-onboarded pilot — consent-gated episodic memory.
+  memoryPolicy: STANDARD_MEMORY,
   policy: {
     // `voice_out` is declared, so consent is required per the SDK
     // validator (`policy_consent_required_for_voice`). The runtime

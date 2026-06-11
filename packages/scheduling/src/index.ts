@@ -339,4 +339,10 @@ export const JOB_REGISTRY: JobRegistryEntry[] = [
       "Advance learner_pacing_weeks.status (planned/active/done) to match the calendar for active pacing plans.",
     periodMs: DEFAULT_PERIOD_MS,
   },
+  {
+    jobName: "tutor.memory-expiry",
+    service: "admin-svc",
+    description: "Purge tutor_memories rows past their 180-day expires_at.",
+    periodMs: DEFAULT_PERIOD_MS,
+  },
 ];

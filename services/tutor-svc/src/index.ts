@@ -15,6 +15,7 @@ import websocket from "@fastify/websocket";
 import { registerSpeechBuddyRoutes } from "./routes/speechBuddy.js";
 import { registerEfRoutes } from "./routes/ef.js";
 import { registerTutorSessionRoutes } from "./routes/tutorSession.js";
+import { registerAgentSessionRoutes } from "./routes/agentSession.js";
 import { registerTutorSurfaceRoutes } from "./routes/tutorSurface.js";
 import { registerTutorSurfaceSubmitRoute } from "./routes/surfaceSubmit.js";
 import { registerTutorRecommendationCandidatesRoute } from "./routes/recommendationCandidates.js";
@@ -73,6 +74,7 @@ export async function buildApp() {
   registerCurriculumRoutes(app, db);
   registerEfRoutes(app, db);
   registerTutorSessionRoutes(app);
+  registerAgentSessionRoutes(app, db);
   registerTutorSurfaceRoutes(app);
   registerTutorSurfaceSubmitRoute(app);
   registerTutorRecommendationCandidatesRoute(app);

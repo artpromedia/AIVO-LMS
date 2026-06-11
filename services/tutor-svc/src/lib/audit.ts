@@ -19,7 +19,8 @@ export type TutorAuditEventType =
   | "TUTOR_HOMEWORK_HINT_REQUESTED"
   | "TUTOR_SAFETY_INTERVENTION"
   | "TUTOR_EF_PLAN_CREATED"
-  | "TUTOR_EF_STEP_COMPLETED";
+  | "TUTOR_EF_STEP_COMPLETED"
+  | "TUTOR_AGENT_SESSION_OPENED";
 
 export interface EmitTutorAuditInput {
   db: any;

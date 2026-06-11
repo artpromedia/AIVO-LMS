@@ -33,6 +33,7 @@
     "@aivo/learner-surfaces": "workspace:*",
     "@aivo/nav": "workspace:*",
     "@aivo/observability": "workspace:*",
+    "@aivo/ops-alerts": "workspace:*",
     "@aivo/scoring": "workspace:*",
     "@aivo/security": "workspace:*",
     "@aivo/skill-graphs": "workspace:*",

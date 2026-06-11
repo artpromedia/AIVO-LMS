@@ -6,8 +6,7 @@ import {
   isBandProductionReady,
   getProductionGradeBands,
   getCoverageStatus,
-  type TutorDefinition,
-} from "../index.js";
+  type TutorDefinition, NO_MEMORY, standardActionPolicy } from "../index.js";
 
 const valid: TutorDefinition = defineTutor({
   id: "speech-buddy@1.0.0",
@@ -25,6 +24,10 @@ const valid: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL"],
   skillGraphRefs: ["speech.articulation.k2"],
   defaultContentPackRefs: ["speech-buddy-pack-1"],
+  // Wave E (S8): required agent-policy fields.
+  toolset: ["get_learner_snapshot"],
+  actionPolicy: standardActionPolicy(),
+  memoryPolicy: NO_MEMORY,
   policy: {
     requiresConsent: true,
     minAgeYears: 3,
@@ -166,5 +169,63 @@ describe("coverage helpers", () => {
     expect(getCoverageStatus(withMatrix, "K")).toBe("authored");
     expect(getCoverageStatus(withMatrix, "2")).toBe("missing");
     expect(getCoverageStatus(valid, "K")).toBeUndefined();
+  });
+});
+
+// ── Wave E (S8): agent-policy validation ────────────────────────────────────
+
+describe("agent policy validation (Wave E)", () => {
+  it("flags a declared functioning level the actionPolicy does not cover", () => {
+    const issues = validateTutorDefinition({
+      ...valid,
+      functioningLevels: ["STANDARD", "PRE_SYMBOLIC"],
+      actionPolicy: { STANDARD: ["advance", "say"] },
+    });
+    expect(issues.some((i) => i.code === "action_policy_missing_level")).toBe(true);
+  });
+
+  it("flags free-text say at LOW_VERBAL and below", () => {
+    const issues = validateTutorDefinition({
+      ...valid,
+      functioningLevels: ["STANDARD", "LOW_VERBAL"],
+      actionPolicy: {
+        STANDARD: ["advance", "say"],
+        LOW_VERBAL: ["advance", "say"],
+      },
+    });
+    expect(issues.some((i) => i.code === "action_policy_say_below_floor")).toBe(true);
+  });
+
+  it("flags unknown tools and unknown actions", () => {
+    const issues = validateTutorDefinition({
+      ...valid,
+      toolset: ["get_learner_snapshot", "rm_rf" as never],
+      actionPolicy: standardActionPolicy({ STANDARD: ["advance", "teleport" as never] }),
+    });
+    expect(issues.some((i) => i.code === "toolset_unknown_tool")).toBe(true);
+    expect(issues.some((i) => i.code === "action_policy_unknown_action")).toBe(true);
+  });
+
+  it("flags an inconsistent memory policy", () => {
+    const issues = validateTutorDefinition({
+      ...valid,
+      memoryPolicy: { canRemember: true, kinds: [] },
+    });
+    expect(issues.some((i) => i.code === "memory_policy_inconsistent")).toBe(true);
+  });
+
+  it("the standard policy itself validates clean on every level", () => {
+    const issues = validateTutorDefinition({
+      ...valid,
+      functioningLevels: [
+        "STANDARD",
+        "SUPPORTED",
+        "LOW_VERBAL",
+        "NON_VERBAL",
+        "PRE_SYMBOLIC",
+      ],
+      actionPolicy: standardActionPolicy(),
+    });
+    expect(issues).toEqual([]);
   });
 });

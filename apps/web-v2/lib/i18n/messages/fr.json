@@ -306,7 +306,10 @@
       "back_to_learner": "Retour à l'apprenant",
       "restart_baseline": "Recommencer la ligne de base",
       "in_set": "Dans l'ensemble",
-      "preview": "Aperçu"
+      "preview": "Aperçu",
+      "provenance_child_specific": "Personnalisé par l'IA pour votre enfant",
+      "provenance_cohort_bank": "Banque de questions IA — adaptée au niveau et au profil",
+      "provenance_generic": "Série de départ apaisée"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "Pas de quiz générique",
@@ -408,7 +411,8 @@
       "worked_on": "Travaillé sur",
       "went_well": "S'est bien passé",
       "needed_help": "A eu besoin d'aide",
-      "up_next": "À suivre"
+      "up_next": "À suivre",
+      "tutor_note": "Un mot du tuteur"
     },
     "learner_milestones": {
       "title": "Étapes",
@@ -719,6 +723,18 @@
       "status_declined": "Refusé — rien ne change.",
       "status_failed": "Approuvé, mais l'application a échoué — notre équipe est prévenue.",
       "history": "Décisions récentes ({count})"
+    },
+    "tutor_memories": {
+      "title": "Ce que retient ton tuteur",
+      "description": "De petites notes que les tuteurs IA conservent pour rendre les prochaines séances plus douces et plus efficaces. Vous pouvez en supprimer à tout moment, et chacune expire automatiquement après 180 jours.",
+      "empty": "Rien de mémorisé pour l'instant. Les notes apparaîtront ici quand un tuteur en enregistrera une.",
+      "kind_strategy_preference": "Ce qui aide",
+      "kind_interest": "Centre d'intérêt",
+      "kind_trigger": "Aborder avec douceur",
+      "kind_win": "Une réussite",
+      "expires": "Expire le {date}",
+      "delete": "Supprimer",
+      "delete_label": "Supprimer ce souvenir"
     }
   },
   "brain_clone": {
@@ -1285,7 +1301,26 @@
       "next": "Suivant",
       "saving": "Enregistrement…",
       "done": "J'ai fini",
-      "complete_error": "Nous n'avons pas pu enregistrer cette leçon. Réessaie avec le bouton « J'ai fini »."
+      "complete_error": "Nous n'avons pas pu enregistrer cette leçon. Réessaie avec le bouton « J'ai fini ».",
+      "summer_bridge": "☀️ Passerelle d'été · préparation à la classe suivante",
+      "tutor_panel_label": "Panneau du tuteur {name}",
+      "tutor_panel_watching": "{name} apprend avec toi",
+      "tutor_panel_thinking": "Je réfléchis à ta réponse…",
+      "tutor_panel_idle": "Je suis là si tu as besoin de moi.",
+      "tutor_panel_break_offer": "Tu veux faire une petite pause ?",
+      "tutor_panel_break_yes": "Oui, pause",
+      "tutor_panel_break_no": "Continuer",
+      "tutor_panel_end_early": "Tu as bien travaillé aujourd'hui. On peut s'arrêter ici.",
+      "tutor_panel_finish_now": "Terminer la leçon",
+      "agent_scaffold_prefix": "Astuce de ton tuteur :",
+      "agent_remediation_intro": "Regardons cela encore une fois ensemble : {focus}",
+      "agent_remediation_worked": "Regardons cela encore une fois ensemble : {focus} Voici un exemple résolu — {prompt} {explanation}",
+      "agent_remediation_msg": "J'ai ajouté une petite révision pour toi — c'est la prochaine étape.",
+      "agent_modality_visual": "Essayons de le voir avec une image en tête.",
+      "agent_modality_auditory": "Essaie de le lire à voix haute — l'entendre peut aider.",
+      "agent_modality_kinesthetic": "Essaie de compter avec tes doigts ou des objets.",
+      "agent_modality_reading": "Lisons-le lentement, une partie à la fois.",
+      "agent_new_surface": "Essayons la même question d'une autre façon."
     },
     "baseline_runner": {
       "exit_proctor_view": "Quitter la vue surveillant",
@@ -2752,7 +2787,8 @@
       "no_lessons_started": "Aucune leçon commencée pour l'instant.",
       "skill_gaps": "Lacunes de compétences",
       "no_notable_gaps": "Aucune lacune notable pour l'instant — continuez.",
-      "accommodations_teacher_summary": "Aménagements (résumé pour l'enseignant)"
+      "accommodations_teacher_summary": "Aménagements (résumé pour l'enseignant)",
+      "pending_recommendations": "Recommandations en attente"
     },
     "learner_iep_draft": {
       "page_title": "Brouillon d'objectifs IEP",
@@ -2928,7 +2964,8 @@
       "no_learners_yet": "Aucun apprenant pour le moment",
       "primary_language": "Langue principale",
       "reading_comfort": "Aisance en lecture",
-      "math_comfort": "Aisance en mathématiques"
+      "math_comfort": "Aisance en mathématiques",
+      "pending_recommendations": "Recommandations en attente"
     },
     "observations": {
       "page_title": "Observations",
@@ -3086,6 +3123,52 @@
       "empty": "Aucune plateforme enregistrée pour le moment.",
       "client_id_label": "client",
       "deployments_label": "Déploiements"
+    }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "Cette semaine",
+      "full_term": "Trimestre complet",
+      "school_calendar": "Calendrier scolaire"
+    },
+    "school_calendar": {
+      "title": "Calendrier scolaire",
+      "description": "Saisissez les dates des trimestres et des congés de {name}. AIVO suspend la synchronisation scolaire pendant les congés et propose une préparation; les plans de rythme s'appuient sur ces dates.",
+      "academic_year": "Année scolaire",
+      "terms": "Trimestres",
+      "term_n": "Trimestre {n}",
+      "term_title_placeholder": "Titre (facultatif)",
+      "start_date": "Date de début",
+      "end_date": "Date de fin",
+      "remove": "Retirer",
+      "add_term": "Ajouter un trimestre",
+      "breaks": "Congés et jours fériés",
+      "breaks_hint": "Les congés se placent dans les trimestres; marquez les grandes vacances comme Été pour préparer la classe suivante.",
+      "break_kind": "Type de congé",
+      "break_name_placeholder": "Nom (facultatif)",
+      "kind_holiday": "Jour férié",
+      "kind_break": "Congé",
+      "kind_summer": "Été",
+      "save": "Enregistrer le calendrier",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré à {time}",
+      "save_error": "Impossible d'enregistrer le calendrier. Veuillez réessayer.",
+      "error_missing_dates": "Chaque trimestre et congé doit avoir une date de début et de fin.",
+      "error_end_before_start": "Une date de fin précède sa date de début.",
+      "error_terms_overlap": "Les trimestres se chevauchent — une date ne peut appartenir qu'à un seul trimestre.",
+      "summer_bridge_title": "Passerelle d'été",
+      "summer_bridge_hint": "Pendant des vacances marquées Été, AIVO révise les acquis de l'année et donne un aperçu des premières unités de la classe suivante (programme officiel) pour que {name} commence l'année prêt(e).",
+      "summer_bridge_toggle": "Préparer {name} à la classe suivante pendant l'été",
+      "summer_bridge_error": "Impossible de mettre à jour la passerelle d'été. Veuillez réessayer."
+    },
+    "term_syllabus": {
+      "plan_start": "Début du plan",
+      "generate_plan": "Générer le plan de rythme",
+      "generating": "Génération…",
+      "generate_error": "Impossible de générer le plan de rythme. Veuillez réessayer.",
+      "plan_ready": "Plan prêt — {weeks} semaines ({instruction} d'enseignement), congés inclus.",
+      "week_kind_break": "Vacances scolaires",
+      "week_kind_holiday_prep": "Préparation aux vacances"
     }
   }
 }

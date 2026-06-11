@@ -73,11 +73,14 @@ export async function listRecommendationsForLearner(
 
 export type RecommendationAction = "accept" | "amend" | "decline";
 
+/** Approver roles the platform supports (Wave C, G5). */
+export type RecommendationActorRole = "parent" | "teacher" | "caregiver";
+
 export async function respondToRecommendation(
   session: { userId: string; tenantId: string },
   recId: string,
   action: RecommendationAction,
-  opts: { amendedValue?: unknown; reason?: string },
+  opts: { amendedValue?: unknown; reason?: string; actorRole?: RecommendationActorRole },
 ): Promise<{ ok: true; recommendation: RecommendationSummary } | { ok: false; status: number; error: string }> {
   const res = await fetch(
     `${serverEnv.RECOMMENDATION_SVC_URL}/api/recommendations/${encodeURIComponent(recId)}/${action}`,
@@ -85,7 +88,10 @@ export async function respondToRecommendation(
       method: "POST",
       headers: headers(session),
       body: JSON.stringify({
-        actorRole: "parent",
+        // recommendation-svc enforces the role × type × tenant-policy matrix
+        // (parents always pass; teacher/caregiver only when the district
+        // delegated that type) — the BFF just states who is acting.
+        actorRole: opts.actorRole ?? "parent",
         amendedValue: opts.amendedValue,
         reason: opts.reason,
       }),

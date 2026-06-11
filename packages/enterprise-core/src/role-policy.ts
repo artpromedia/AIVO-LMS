@@ -14,6 +14,48 @@ const MUTATE_LEARNER_PROFILE_ROLES = new Set<TenantRole>(["parent", "service"]);
 
 const APPROVE_PROFILE_RECOMMENDATION_ROLES = new Set<TenantRole>(["parent"]);
 
+/**
+ * Wave C (G5) — per-tenant recommendation-approval delegation.
+ *
+ * Parents are ALWAYS authoritative. Districts may additionally delegate
+ * approval to teachers (instructional types) and caregivers (regulation/
+ * sensory types) via `district_settings.approval_policy`. B2C tenants have
+ * no district_settings row, so they are parent-only by construction.
+ * IEP-affecting recommendations are NEVER delegable.
+ */
+export interface RecommendationApprovalPolicy {
+  teacherApproval: boolean;
+  caregiverApproval: boolean;
+}
+
+export const DEFAULT_RECOMMENDATION_APPROVAL_POLICY: RecommendationApprovalPolicy = {
+  teacherApproval: false,
+  caregiverApproval: false,
+};
+
+/** Instructional types a district may delegate to teachers. */
+export const TEACHER_APPROVABLE_RECOMMENDATION_TYPES: ReadonlySet<string> = new Set([
+  "delivery_level_change",
+  "tutor_strategy_change",
+  "preferred_surface_change",
+  "mastery_adjustment",
+]);
+
+/** Regulation/sensory types a district may delegate to caregivers. */
+export const CAREGIVER_APPROVABLE_RECOMMENDATION_TYPES: ReadonlySet<string> = new Set([
+  "self_regulation_support_add",
+  "sensory_setting_change",
+]);
+
+export interface RecommendationApprovalContext {
+  /** Recommendation type being decided (e.g. "delivery_level_change"). */
+  recType?: string;
+  /** IEP-affecting recommendations are parent-only, always. */
+  affectsIep?: boolean;
+  /** The tenant's delegation policy; defaults to parent-only. */
+  policy?: RecommendationApprovalPolicy;
+}
+
 const VIEW_DISTRICT_ANALYTICS_ROLES = new Set<TenantRole>([
   "school_admin",
   "district_admin",
@@ -39,9 +81,31 @@ export function canMutateLearnerProfile(role: TenantRole | undefined): boolean {
   return MUTATE_LEARNER_PROFILE_ROLES.has(role);
 }
 
-export function canApproveProfileRecommendation(role: TenantRole | undefined): boolean {
+export function canApproveProfileRecommendation(
+  role: TenantRole | undefined,
+  ctx: RecommendationApprovalContext = {},
+): boolean {
   if (!role) return false;
-  return APPROVE_PROFILE_RECOMMENDATION_ROLES.has(role);
+  // Parents are always authoritative — no policy can remove that.
+  if (APPROVE_PROFILE_RECOMMENDATION_ROLES.has(role)) return true;
+  // Everything below is delegation; IEP-affecting decisions never delegate.
+  if (ctx.affectsIep) return false;
+  const policy = ctx.policy ?? DEFAULT_RECOMMENDATION_APPROVAL_POLICY;
+  if (role === "teacher") {
+    return (
+      policy.teacherApproval &&
+      ctx.recType !== undefined &&
+      TEACHER_APPROVABLE_RECOMMENDATION_TYPES.has(ctx.recType)
+    );
+  }
+  if (role === "caregiver") {
+    return (
+      policy.caregiverApproval &&
+      ctx.recType !== undefined &&
+      CAREGIVER_APPROVABLE_RECOMMENDATION_TYPES.has(ctx.recType)
+    );
+  }
+  return false;
 }
 
 export function canViewDistrictAnalytics(role: TenantRole | undefined): boolean {

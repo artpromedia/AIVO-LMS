@@ -18,6 +18,7 @@ import { eq, sql } from "drizzle-orm";
 import { learners, brainStates } from "@aivo/db";
 import {
   deliveryLevelFromTheta,
+  deliveryLevelsFromThetas,
   normalizeGradeBand,
   type GradeBand,
 } from "@aivo/scoring";
@@ -27,6 +28,8 @@ export interface AlignmentPatch {
   alignment: Record<string, unknown>;
   gradeBand: GradeBand;
   deliveryLevel: GradeBand;
+  /** Per-subject bands written this pass (canonical keys), if any. */
+  deliveryLevels?: Record<string, GradeBand>;
 }
 
 export type AlignmentPatchResult =
@@ -44,6 +47,15 @@ export function buildBaselineAlignmentPatch(opts: {
   currentAlignment: unknown;
   gradeLevel: string | null | undefined;
   theta: number;
+  /**
+   * Per-subject θ estimates (Wave C, G1), keyed however the assessor
+   * produced them — keys are canonicalised here via
+   * `deliveryLevelsFromThetas`. Subjects measured this run OVERWRITE
+   * their prior band; subjects not re-measured keep their existing
+   * `delivery_levels` entry (a math-only re-baseline must not wipe the
+   * reading placement).
+   */
+  subjectThetas?: Record<string, number> | null;
   now?: Date;
 }): AlignmentPatchResult {
   const base: Record<string, unknown> =
@@ -61,20 +73,51 @@ export function buildBaselineAlignmentPatch(opts: {
     };
   }
   const deliveryLevel = deliveryLevelFromTheta(opts.theta, gradeBand);
+
+  const now = (opts.now ?? new Date()).toISOString();
+  const alignment: Record<string, unknown> = {
+    ...base,
+    grade_band: gradeBand,
+    delivery_level: deliveryLevel,
+    delivery_level_source: "baseline_theta",
+    delivery_level_theta: opts.theta,
+    delivery_level_updated_at: now,
+  };
+
+  let deliveryLevels: Record<string, GradeBand> | undefined;
+  if (opts.subjectThetas && Object.keys(opts.subjectThetas).length > 0) {
+    deliveryLevels = deliveryLevelsFromThetas(opts.subjectThetas, gradeBand);
+    if (Object.keys(deliveryLevels).length > 0) {
+      const existingLevels =
+        base.delivery_levels && typeof base.delivery_levels === "object"
+          ? (base.delivery_levels as Record<string, unknown>)
+          : {};
+      const existingThetas =
+        base.delivery_levels_theta && typeof base.delivery_levels_theta === "object"
+          ? (base.delivery_levels_theta as Record<string, unknown>)
+          : {};
+      const canonicalThetas: Record<string, number> = {};
+      for (const [key] of Object.entries(deliveryLevels)) {
+        // deliveryLevelsFromThetas canonicalised the keys; re-derive the
+        // matching θ map with the same keys for the audit trail.
+        canonicalThetas[key] = Number.NaN;
+      }
+      // Single pass to align θs with their canonical keys.
+      for (const [rawSubject, theta] of Object.entries(opts.subjectThetas)) {
+        const bands = deliveryLevelsFromThetas({ [rawSubject]: theta }, gradeBand);
+        const key = Object.keys(bands)[0];
+        if (key) canonicalThetas[key] = theta;
+      }
+      alignment.delivery_levels = { ...existingLevels, ...deliveryLevels };
+      alignment.delivery_levels_theta = { ...existingThetas, ...canonicalThetas };
+      alignment.delivery_levels_source = "baseline_theta";
+      alignment.delivery_levels_updated_at = now;
+    }
+  }
+
   return {
     ok: true,
-    patch: {
-      gradeBand,
-      deliveryLevel,
-      alignment: {
-        ...base,
-        grade_band: gradeBand,
-        delivery_level: deliveryLevel,
-        delivery_level_source: "baseline_theta",
-        delivery_level_theta: opts.theta,
-        delivery_level_updated_at: (opts.now ?? new Date()).toISOString(),
-      },
-    },
+    patch: { gradeBand, deliveryLevel, deliveryLevels, alignment },
   };
 }
 
@@ -103,7 +146,7 @@ interface DbLike {
 export async function applyBaselineDeliveryLevel(
   dbLike: DbLike,
   log: LogLike,
-  opts: { learnerId: string; theta: number },
+  opts: { learnerId: string; theta: number; subjectThetas?: Record<string, number> | null },
 ): Promise<AlignmentPatchResult | { ok: false; reason: "learner_not_found" | "write_failed" }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = dbLike as any;
@@ -129,6 +172,7 @@ export async function applyBaselineDeliveryLevel(
       currentAlignment: learner.curriculumAlignment,
       gradeLevel: learner.gradeLevel,
       theta: opts.theta,
+      subjectThetas: opts.subjectThetas,
     });
     if (!result.ok) {
       log.warn(
@@ -167,6 +211,7 @@ export async function applyBaselineDeliveryLevel(
         learnerId: opts.learnerId,
         gradeBand: result.patch.gradeBand,
         deliveryLevel: result.patch.deliveryLevel,
+        deliveryLevels: result.patch.deliveryLevels ?? null,
         theta: opts.theta,
       },
       "[curriculum-alignment] baseline placement persisted",

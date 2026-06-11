@@ -19,7 +19,6 @@
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   useTransition,
@@ -42,6 +41,13 @@ import {
 } from "@aivo/learner-surfaces";
 import { AACTargetProvider, AACScanRoot } from "@aivo/aac-bridge";
 import { enqueueOutbox, generateIdempotencyKey } from "@/lib/offline/outbox";
+import { InLessonTutorPanel } from "@/components/learner/in-lesson-tutor-panel";
+import {
+  PRESENTABLE_SURFACES,
+  type AgentTurnDecision,
+  type LessonAgentConfig,
+  type LessonAgentDirective,
+} from "@/lib/learner/agent-directives";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -65,6 +71,7 @@ type Beat =
       choices?: string[];
       hint: string;
       scaffold: string;
+      skillId?: string;
       media?: {
         surfaceType: "video" | "audio";
         assets: Array<{
@@ -134,6 +141,7 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       choices: g.choices,
       hint: g.hint,
       scaffold: g.scaffold,
+      skillId: g.skillId,
       media: g.media,
     }),
   );
@@ -171,6 +179,15 @@ function isCorrect(expected: string | undefined, actual: string): boolean {
   return normalizeAnswer(expected) === normalizeAnswer(actual);
 }
 
+/**
+ * Wave E (S9): identity of the agent tutor watching this lesson. Present
+ * ONLY when the tenant flag `tutorAgenticMode` is on AND the subject is
+ * piloted (see lib/bff/agent-pilot.ts). When absent the player renders
+ * and behaves byte-identically to the pre-agent build — the agent is
+ * pure enrichment. Re-exported from agent-directives for callers.
+ */
+export type { LessonAgentConfig } from "@/lib/learner/agent-directives";
+
 type Props = {
   learnerId: string;
   lessonRunId: string;
@@ -180,6 +197,7 @@ type Props = {
   v2Enabled?: boolean;
   sessionId?: string;
   subjectSlug?: string | null;
+  agent?: LessonAgentConfig | null;
 };
 
 type LessonMediaProps = {
@@ -260,13 +278,17 @@ export function LessonPlayer({
   plan,
   accessibility,
   initialStatus,
+  agent,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("learner.lesson_player");
-  const beats = useMemo(
-    () => buildBeats(plan, accessibility.shorterSteps),
-    [plan, accessibility.shorterSteps],
+  // Base beats are static per mount (plan + prefs arrive as server props).
+  // Held in state (not useMemo) because an accepted agent `remediate`
+  // splices a remediation beat after the current one — with the agent
+  // off, the state never updates and rendering is identical to before.
+  const [beats, setBeats] = useState<Beat[]>(() =>
+    buildBeats(plan, accessibility.shorterSteps),
   );
   const startStep = (() => {
     const raw = Number(searchParams?.get("step") ?? 0);
@@ -294,6 +316,26 @@ export function LessonPlayer({
   const isLastBeat = stepIdx === beats.length - 1;
   const isInteractive = beat.kind === "guided" || beat.kind === "check";
 
+  // ── Wave E (S9): agent-loop state. Inert unless `agent` is provided. ──
+  const agentSessionRef = useRef<string | null>(null);
+  const [agentMsg, setAgentMsg] = useState<string | null>(null);
+  const [agentThinking, setAgentThinking] = useState(false);
+  const [agentBreakOffer, setAgentBreakOffer] = useState<{ durationSeconds: number } | null>(
+    null,
+  );
+  const [agentEndEarly, setAgentEndEarly] = useState<{ reason: string } | null>(null);
+  const [agentScaffold, setAgentScaffold] = useState<string | null>(null);
+  const [agentSurfaceOverride, setAgentSurfaceOverride] = useState<string | null>(null);
+  const missStreakRef = useRef(0);
+  const attemptsRef = useRef<Map<string, number>>(new Map());
+  const hintsRef = useRef(0);
+  const scaffoldsRef = useRef(0);
+  const beatStartRef = useRef<number>(Date.now());
+  const stepIdxRef = useRef(0);
+  // S10: a break taken during this beat is the player's frustration
+  // signal — it triggers a fresh learner-snapshot fetch server-side.
+  const frustrationRef = useRef(false);
+
   // Mark lesson_started once on mount when status === "ready".
   // Deps are intentionally empty: this is a mount-only side-effect.
   useEffect(() => {
@@ -302,6 +344,37 @@ export function LessonPlayer({
         method: "POST",
       }).catch(() => {});
     }
+  }, []);
+
+  // Wave E (S9): open the tutor-agent session once on mount when agentic
+  // mode is on for this lesson. Any failure leaves agentSessionRef null and
+  // the player runs exactly as before — the agent is never load-bearing.
+  // Mount-only by design (agent identity is fixed per lesson run).
+  useEffect(() => {
+    if (!agent) return;
+    let cancelled = false;
+    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/agent-session`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      signal: AbortSignal.timeout(4000),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then(
+        (
+          json: {
+            data?: { enabled?: boolean; session?: { sessionId?: string } };
+          } | null,
+        ) => {
+          if (cancelled) return;
+          const data = json?.data;
+          const sid = data?.enabled === true ? data.session?.sessionId : null;
+          if (typeof sid === "string" && sid) agentSessionRef.current = sid;
+        },
+      )
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // `hapticsEnabled` preference — fire a short vibration on answer feedback
@@ -406,6 +479,146 @@ export function LessonPlayer({
     }
   }
 
+  // Wave E (S9): entering a beat resets the per-beat agent surface state.
+  useEffect(() => {
+    beatStartRef.current = Date.now();
+    stepIdxRef.current = stepIdx;
+    frustrationRef.current = false;
+    if (!agent) return;
+    setAgentScaffold(null);
+    setAgentSurfaceOverride(null);
+    setAgentMsg(null);
+  }, [stepIdx, agent]);
+
+  // S10: a break during the beat marks the frustration signal for the
+  // next observation (works for learner-initiated and reminder breaks).
+  useEffect(() => {
+    if (onBreak) frustrationRef.current = true;
+  }, [onBreak]);
+
+  /**
+   * Wave E (S9): apply one validated agent directive. Every branch is a
+   * defined, bounded behaviour; unknown shapes land on "none" upstream.
+   */
+  function applyAgentDirective(directive: LessonAgentDirective) {
+    switch (directive.type) {
+      case "none":
+        return;
+      case "advance":
+        if (directive.encouragement) setAgentMsg(directive.encouragement);
+        return;
+      case "say":
+        setAgentMsg(directive.text);
+        return;
+      case "show_scaffold":
+        setAgentScaffold(directive.text);
+        return;
+      case "insert_remediation": {
+        // Mirror of SessionMachine.insertBeat: splice right after the
+        // current beat so "Next" lands on the re-teach moment.
+        const framed =
+          directive.approach === "worked_example"
+            ? t("agent_remediation_worked", {
+                focus: directive.focus,
+                prompt: plan.example.prompt,
+                explanation: plan.example.explanation,
+              })
+            : t("agent_remediation_intro", { focus: directive.focus });
+        const remBeat: Beat = {
+          kind: "micro",
+          key: `agent-rem-${Date.now()}`,
+          body: framed,
+        };
+        setBeats((prev) => [
+          ...prev.slice(0, stepIdx + 1),
+          remBeat,
+          ...prev.slice(stepIdx + 1),
+        ]);
+        setAgentMsg(t("agent_remediation_msg"));
+        return;
+      }
+      case "offer_break":
+        setAgentBreakOffer({ durationSeconds: directive.durationSeconds });
+        return;
+      case "switch_modality":
+        setAgentMsg(t(`agent_modality_${directive.modality}`));
+        return;
+      case "present_surface":
+        if (isInteractive && PRESENTABLE_SURFACES.has(directive.surfaceType)) {
+          setAgentSurfaceOverride(directive.surfaceType);
+          setAgentMsg(t("agent_new_surface"));
+        }
+        return;
+      case "end_early":
+        setAgentEndEarly({ reason: directive.reason });
+        return;
+    }
+  }
+
+  /**
+   * Wave E (S9): one agent turn after an answer. Hard 1500ms deadline —
+   * on timeout (or any failure) the fetch aborts, the late decision is
+   * DISCARDED, and the player continues deterministically. The server
+   * still records the turn for its ladder; the learner never waits.
+   */
+  function runAgentTurn(
+    interactiveBeat: Extract<Beat, { kind: "guided" | "check" }>,
+    candidate: string,
+    correct: boolean,
+  ) {
+    const sessionId = agentSessionRef.current;
+    if (!agent || !sessionId || agentThinking || agentEndEarly) return;
+    const observation = {
+      beatIndex: stepIdx,
+      totalBeats: beats.length,
+      beatKind: interactiveBeat.kind,
+      beatKinds: beats.map((b) => b.kind),
+      prompt: interactiveBeat.prompt,
+      learnerResponse: candidate,
+      isCorrect: correct,
+      expectedAnswer: interactiveBeat.expectedAnswer,
+      attemptsOnBeat: attemptsRef.current.get(interactiveBeat.key) ?? 1,
+      hintsUsed: hintsRef.current,
+      scaffoldsUsed: scaffoldsRef.current,
+      recentMissStreak: missStreakRef.current,
+      secondsOnBeat: Math.max(0, Math.round((Date.now() - beatStartRef.current) / 1000)),
+      skillId: interactiveBeat.kind === "guided" ? interactiveBeat.skillId : undefined,
+      frustrationEvent: frustrationRef.current || undefined,
+    };
+    const requestStep = stepIdx;
+    setAgentThinking(true);
+    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/agent-turn`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ sessionId, observation }),
+      signal: AbortSignal.timeout(1500),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then(
+        (
+          json: {
+            data?: {
+              enabled?: boolean;
+              decision?: AgentTurnDecision;
+              directive?: LessonAgentDirective;
+            };
+          } | null,
+        ) => {
+          // Discard a decision that lands after the learner moved on —
+          // beats must never shift underneath the current position.
+          if (stepIdxRef.current !== requestStep) return;
+          const data = json?.data;
+          if (data?.enabled === true && data.directive) {
+            applyAgentDirective(data.directive);
+          }
+        },
+      )
+      .catch(() => {
+        // Timeout / network — deterministic advance, exactly today's flow.
+      })
+      .finally(() => setAgentThinking(false));
+  }
+
   function emitSurfaceTelemetry(event: SurfaceTelemetryEvent) {
     fetch("/api/learning/surface-telemetry", {
       method: "POST",
@@ -420,8 +633,18 @@ export function LessonPlayer({
   }
 
   function toSurfaceItem(
-    currentBeat: Extract<Beat, { kind: "guided" | "check" }>,
+    sourceBeat: Extract<Beat, { kind: "guided" | "check" }>,
   ): SurfaceRouterItem {
+    // Wave E (S9): an accepted agent `present_surface` re-presents the
+    // CURRENT item on a different (allow-listed) surface; cleared on
+    // advance. Without an override this is exactly the source beat.
+    const currentBeat =
+      agentSurfaceOverride && PRESENTABLE_SURFACES.has(agentSurfaceOverride)
+        ? {
+            ...sourceBeat,
+            surfaceType: agentSurfaceOverride as SurfaceRouterItem["surfaceType"],
+          }
+        : sourceBeat;
     return {
       id: currentBeat.kind === "guided" ? currentBeat.gpId : currentBeat.checkId,
       surfaceType: currentBeat.surfaceType,
@@ -579,41 +802,59 @@ export function LessonPlayer({
       response: candidate,
       isCorrect: correct,
     });
+    // Wave E (S9): hand the observation to the tutor agent (no-op when
+    // agentic mode is off for this lesson).
+    attemptsRef.current.set(
+      interactiveBeat.key,
+      (attemptsRef.current.get(interactiveBeat.key) ?? 0) + 1,
+    );
+    missStreakRef.current = correct ? 0 : missStreakRef.current + 1;
+    runAgentTurn(interactiveBeat, candidate, correct);
   }
 
   function requestHint() {
     if (beat.kind !== "guided") return;
     setShowHint(true);
     setHintsUsed((n) => n + 1);
+    hintsRef.current += 1;
     postStep({ stepKind: "hint_used", stepRefId: beat.gpId });
   }
 
   function useScaffold() {
     if (beat.kind !== "guided") return;
     setScaffoldsUsed((n) => n + 1);
+    scaffoldsRef.current += 1;
     postStep({ stepKind: "scaffold_used", stepRefId: beat.gpId });
   }
 
   function complete(abandoned: boolean) {
     // The BFF now derives checks/hints/scaffolds/seconds from server-recorded
     // LessonInteraction rows (post-architect-review hardening). The client
-    // only contributes `abandoned`, which is a UX signal not represented in
-    // interactions.
+    // only contributes `abandoned` (a UX signal not represented in
+    // interactions) and, for agent lessons, the agentSessionId so the BFF
+    // can close the agent session server-side and weave the agent's parent
+    // note into the run summary (Wave E S11).
+    const agentSessionId = agent ? agentSessionRef.current : null;
     startTransition(async () => {
       const res = await fetch(
         `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/complete`,
         {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ outcome: { abandoned } }),
+          body: JSON.stringify({
+            outcome: { abandoned },
+            ...(agentSessionId ? { agentSessionId } : {}),
+          }),
         },
       );
       if (!res.ok) {
         // Surface the failure instead of redirecting blindly — otherwise the
         // run would silently stay in_progress and mastery would never update.
+        // The agent session id is kept so a retry can still close it.
         setCompleteError(t("complete_error"));
         return;
       }
+      agentSessionRef.current = null;
       router.push("/learner/home");
       router.refresh();
     });
@@ -670,6 +911,10 @@ export function LessonPlayer({
         <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-ink">
           {t("holiday_prep")}
         </span>
+      ) : plan.lessonMode === "summer_bridge" ? (
+        <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-ink">
+          {t("summer_bridge")}
+        </span>
       ) : null}
       <PageHeader
         eyebrow={plan.tutorPersona}
@@ -688,6 +933,27 @@ export function LessonPlayer({
       <div className="mb-4">
         <AudioControlBar />
       </div>
+      {agent ? (
+        <InLessonTutorPanel
+          tutor={{
+            tutorKey: agent.tutorKey,
+            name: agent.name,
+            icon: agent.icon,
+            color: agent.color,
+          }}
+          message={agentMsg}
+          thinking={agentThinking}
+          breakOffer={agentBreakOffer}
+          onAcceptBreak={() => {
+            setAgentBreakOffer(null);
+            setOnBreak(true);
+          }}
+          onDeclineBreak={() => setAgentBreakOffer(null)}
+          endEarly={agentEndEarly}
+          onFinishEarly={() => complete(false)}
+          reducedMotion={accessibility.reducedMotion}
+        />
+      ) : null}
       <div className="mb-4">
         <Progress
           value={((stepIdx + 1) / beats.length) * 100}
@@ -757,6 +1023,14 @@ export function LessonPlayer({
                     {t("not_quite")} <MathText>{beat.scaffold}</MathText>
                   </p>
                 )}
+                {agentScaffold && (
+                  <p
+                    data-testid="agent-scaffold"
+                    className="rounded-md bg-amber-50 p-3 text-sm text-amber-900"
+                  >
+                    {t("agent_scaffold_prefix")} <MathText>{agentScaffold}</MathText>
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-2">
                   <Button variant="soft" onClick={requestHint} disabled={showHint}>
                     {t("hint_btn")}
@@ -793,6 +1067,14 @@ export function LessonPlayer({
                 {feedback === "incorrect" && (
                   <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
                     {t("check_close")} <MathText>{beat.supportIfWrong}</MathText>
+                  </p>
+                )}
+                {agentScaffold && (
+                  <p
+                    data-testid="agent-scaffold"
+                    className="rounded-md bg-amber-50 p-3 text-sm text-amber-900"
+                  >
+                    {t("agent_scaffold_prefix")} <MathText>{agentScaffold}</MathText>
                   </p>
                 )}
               </>

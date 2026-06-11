@@ -306,7 +306,10 @@
       "back_to_learner": "返回学习者",
       "restart_baseline": "重新开始基线",
       "in_set": "已在集合中",
-      "preview": "预览"
+      "preview": "预览",
+      "provenance_child_specific": "由 AI 为您的孩子个性化定制",
+      "provenance_cohort_bank": "AI 题库 — 匹配年级与画像",
+      "provenance_generic": "平静入门题组"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "无通用测验",
@@ -408,7 +411,8 @@
       "worked_on": "学习内容",
       "went_well": "表现良好",
       "needed_help": "需要帮助",
-      "up_next": "下一步"
+      "up_next": "下一步",
+      "tutor_note": "来自导师的留言"
     },
     "learner_milestones": {
       "title": "里程碑",
@@ -719,6 +723,18 @@
       "status_declined": "已拒绝 — 不会有任何更改。",
       "status_failed": "已批准，但应用失败 — 已通知我们的团队。",
       "history": "最近的决定 ({count})"
+    },
+    "tutor_memories": {
+      "title": "导师记住的内容",
+      "description": "AI 导师保存的小笔记，让以后的课程更贴心、更有效。您可以删除任何一条，每条都会在 180 天后自动过期。",
+      "empty": "还没有记住任何内容。当导师保存笔记时会显示在这里。",
+      "kind_strategy_preference": "有帮助的方法",
+      "kind_interest": "兴趣",
+      "kind_trigger": "温和对待",
+      "kind_win": "一次进步",
+      "expires": "{date} 过期",
+      "delete": "删除",
+      "delete_label": "删除这条记忆"
     }
   },
   "brain_clone": {
@@ -1285,7 +1301,26 @@
       "next": "下一步",
       "saving": "正在保存…",
       "done": "我做完了",
-      "complete_error": "我们无法保存这节课。请再次点击「我做完了」按钮。"
+      "complete_error": "我们无法保存这节课。请再次点击「我做完了」按钮。",
+      "summer_bridge": "☀️ 暑期衔接 · 为下一年级做准备",
+      "tutor_panel_label": "{name} 导师面板",
+      "tutor_panel_watching": "{name} 正在和你一起学习",
+      "tutor_panel_thinking": "正在思考你的答案…",
+      "tutor_panel_idle": "需要我的时候，我就在这里。",
+      "tutor_panel_break_offer": "想休息一下吗？",
+      "tutor_panel_break_yes": "好，休息一下",
+      "tutor_panel_break_no": "继续学习",
+      "tutor_panel_end_early": "你今天很努力。我们可以在这里结束。",
+      "tutor_panel_finish_now": "结束课程",
+      "agent_scaffold_prefix": "导师的提示：",
+      "agent_remediation_intro": "我们再一起看一遍：{focus}",
+      "agent_remediation_worked": "我们再一起看一遍：{focus} 这是一个示例 — {prompt} {explanation}",
+      "agent_remediation_msg": "我为你加了一个小复习 — 就在下一步。",
+      "agent_modality_visual": "试着在脑海里想象一幅画。",
+      "agent_modality_auditory": "试着大声读出来 — 听一听会有帮助。",
+      "agent_modality_kinesthetic": "试着用手指或物品数一数。",
+      "agent_modality_reading": "我们慢慢读，一部分一部分来。",
+      "agent_new_surface": "我们换一种方式试试同一道题。"
     },
     "baseline_runner": {
       "exit_proctor_view": "退出监考视图",
@@ -2752,7 +2787,8 @@
       "no_lessons_started": "暂未开始任何课程。",
       "skill_gaps": "技能差距",
       "no_notable_gaps": "暂无明显差距 — 继续加油。",
-      "accommodations_teacher_summary": "调整措施（教师摘要）"
+      "accommodations_teacher_summary": "调整措施（教师摘要）",
+      "pending_recommendations": "待处理的建议"
     },
     "learner_iep_draft": {
       "page_title": "IEP 目标草稿",
@@ -2928,7 +2964,8 @@
       "no_learners_yet": "暂无学习者",
       "primary_language": "主要语言",
       "reading_comfort": "阅读能力",
-      "math_comfort": "数学能力"
+      "math_comfort": "数学能力",
+      "pending_recommendations": "待处理的建议"
     },
     "observations": {
       "page_title": "观察记录",
@@ -3086,6 +3123,52 @@
       "empty": "尚未注册任何平台。",
       "client_id_label": "客户端",
       "deployments_label": "部署"
+    }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "本周",
+      "full_term": "整个学期",
+      "school_calendar": "学校日历"
+    },
+    "school_calendar": {
+      "title": "学校日历",
+      "description": "填写{name}的学期与假期日期。假期期间 AIVO 暂停学校同步并提供假期预备，进度计划将按这些日期排布。",
+      "academic_year": "学年",
+      "terms": "学期",
+      "term_n": "学期 {n}",
+      "term_title_placeholder": "标题（可选）",
+      "start_date": "开始日期",
+      "end_date": "结束日期",
+      "remove": "移除",
+      "add_term": "添加学期",
+      "breaks": "假期与节假日",
+      "breaks_hint": "节假日位于学期内；将长假标记为“暑假”，AIVO 会进行下一年级的衔接准备。",
+      "break_kind": "假期类型",
+      "break_name_placeholder": "名称（可选）",
+      "kind_holiday": "节假日",
+      "kind_break": "假期",
+      "kind_summer": "暑假",
+      "save": "保存日历",
+      "saving": "保存中…",
+      "saved": "已于 {time} 保存",
+      "save_error": "无法保存日历，请重试。",
+      "error_missing_dates": "每个学期和假期都需要开始与结束日期。",
+      "error_end_before_start": "存在结束日期早于开始日期。",
+      "error_terms_overlap": "学期相互重叠——一个日期只能属于一个学期。",
+      "summer_bridge_title": "暑期衔接",
+      "summer_bridge_hint": "在标记为“暑假”的假期中，AIVO 会复习本学年技能，并预习下一年级的最初单元（来自官方课程），让{name}做好准备迎接新学年。",
+      "summer_bridge_toggle": "在暑假期间帮助{name}为下一年级做准备",
+      "summer_bridge_error": "无法更新暑期衔接设置，请重试。"
+    },
+    "term_syllabus": {
+      "plan_start": "计划开始",
+      "generate_plan": "生成进度计划",
+      "generating": "生成中…",
+      "generate_error": "无法生成进度计划，请重试。",
+      "plan_ready": "计划已生成——共 {weeks} 周（教学 {instruction} 周），已避开假期。",
+      "week_kind_break": "学校假期",
+      "week_kind_holiday_prep": "假期预备"
     }
   }
 }

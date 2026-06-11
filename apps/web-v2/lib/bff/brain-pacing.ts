@@ -56,6 +56,11 @@ type HolidayPrep = {
   next_unit_title?: string | null;
 };
 
+type SummerBridge = HolidayPrep & {
+  /** The NEXT grade band the preview units belong to (Wave D, G6). */
+  next_grade_band?: string | null;
+};
+
 function strList(v: unknown): string[] {
   return Array.isArray(v) ? v.map(String).filter((s) => s.trim().length > 0) : [];
 }
@@ -102,6 +107,45 @@ export function holidayPrepToFocus(
 }
 
 /**
+ * Build a summer-bridge CurriculumFocus from a summer-break payload
+ * (Wave D, G6): review the closing grade's recent work, then preview the
+ * NEXT grade band's opening catalogue units, framed as next-grade
+ * readiness. Returns null when there's no next-grade preview — the
+ * caller then uses the plain holiday-prep focus.
+ */
+export function summerBridgeToFocus(
+  bridge: SummerBridge | null | undefined,
+  week: PacingWeek | null,
+  subject: string,
+): CurriculumFocus | null {
+  if (!bridge) return null;
+  const previewTopics = strList(bridge.preview_topics);
+  if (previewTopics.length === 0) return null;
+  const reviewTopics = strList(bridge.review_topics);
+  const band = (bridge.next_grade_band ?? "").trim();
+  const title = band ? `Summer bridge: get ready for Grade ${band}` : "Summer bridge";
+  const summaryParts: string[] = [];
+  if (reviewTopics.length) summaryParts.push(`review ${reviewTopics.slice(0, 3).join("; ")}`);
+  summaryParts.push(
+    `get a head start on ${band ? `Grade ${band}` : "next grade"}: ${previewTopics.slice(0, 2).join("; ")}`,
+  );
+  return {
+    title,
+    subject,
+    weekStart: isoDate(week?.weekStart),
+    weekEnd: isoDate(week?.weekEnd),
+    // Review first (warm up on the closing grade), then the next-grade preview.
+    topics: [...reviewTopics, ...previewTopics],
+    keywords: [...strList(bridge.review_vocabulary), ...strList(bridge.preview_vocabulary)],
+    standards: [...strList(bridge.review_standards), ...strList(bridge.preview_standards)],
+    skills: previewTopics,
+    summary: `School's out for summer — ${summaryParts.join(", and ")}.`,
+    confidence: 1,
+    mode: "summer_bridge",
+  };
+}
+
+/**
  * Map an instructional pacing week into a CurriculumFocus. Returns null for a
  * non-instructional week (break weeks are handled by `holidayPrepToFocus`).
  */
@@ -143,12 +187,17 @@ export async function brainPacingFocus(
   const data = (await res.json()) as {
     current?: PacingWeek | null;
     holidayPrep?: HolidayPrep | null;
+    summerBridge?: SummerBridge | null;
   };
   const current = data.current ?? null;
-  // A break week becomes a holiday-prep lesson (review + preview); an
+  // A break week becomes a holiday-prep lesson (review + preview); during
+  // an opted-in SUMMER break the next-grade bridge wins (Wave D, G6); an
   // instructional week syncs to the school topic.
   if (current && current.kind !== "instruction") {
-    return holidayPrepToFocus(data.holidayPrep, current, subject);
+    return (
+      summerBridgeToFocus(data.summerBridge, current, subject) ??
+      holidayPrepToFocus(data.holidayPrep, current, subject)
+    );
   }
   return weekToFocus(current, subject);
 }

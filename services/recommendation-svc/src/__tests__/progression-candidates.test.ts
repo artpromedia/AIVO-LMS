@@ -289,3 +289,72 @@ describe("dedupeAgainstPending", () => {
     expect(dedupeAgainstPending(candidates, [declined])).toHaveLength(1);
   });
 });
+
+// ── Wave C (G1): per-subject placement ─────────────────────────────────────
+
+function subjectKeyedSignal(opts: {
+  skillId: string;
+  subjectKey: string;
+  subjectId?: string;
+}): LearnerSignal {
+  const s = masterySignal({ skillId: opts.skillId, subjectId: opts.subjectId });
+  (s.metadata as Record<string, unknown>).subjectKey = opts.subjectKey;
+  return s;
+}
+
+describe("buildUpwardDeliveryCandidates — per-subject bands (Wave C)", () => {
+  it("uses the subject's OWN band from deliveryLevels and carries subjectKey on the proposal", () => {
+    const recs = buildUpwardDeliveryCandidates(
+      input(
+        [
+          subjectKeyedSignal({ skillId: "sk-1", subjectKey: "math" }),
+          subjectKeyedSignal({ skillId: "sk-2", subjectKey: "math" }),
+          subjectKeyedSignal({ skillId: "sk-3", subjectKey: "math" }),
+        ],
+        {
+          deliveryLevel: "5", // global says on grade…
+          deliveryLevels: { math: "2", reading: "5" }, // …but math is at band 2
+          gradeBand: "5",
+        },
+      ),
+    );
+    expect(recs).toHaveLength(1);
+    const proposed = recs[0]!.proposedValue as Record<string, unknown>;
+    expect(proposed.subjectKey).toBe("math");
+    expect(proposed.from).toBe("2");
+    expect(proposed.to).toBe("3");
+    expect(recs[0]!.currentValue).toBe("2");
+  });
+
+  it("does not fire for a subject already at grade even when the global band is below", () => {
+    const recs = buildUpwardDeliveryCandidates(
+      input(
+        [
+          subjectKeyedSignal({ skillId: "sk-1", subjectKey: "reading" }),
+          subjectKeyedSignal({ skillId: "sk-2", subjectKey: "reading" }),
+          subjectKeyedSignal({ skillId: "sk-3", subjectKey: "reading" }),
+        ],
+        { deliveryLevel: "3", deliveryLevels: { reading: "5" }, gradeBand: "5" },
+      ),
+    );
+    expect(recs).toHaveLength(0);
+  });
+
+  it("falls back to the global band for legacy signals without a subjectKey", () => {
+    const recs = buildUpwardDeliveryCandidates(
+      input(
+        [
+          masterySignal({ skillId: "sk-1" }),
+          masterySignal({ skillId: "sk-2" }),
+          masterySignal({ skillId: "sk-3" }),
+        ],
+        { deliveryLevel: "3", gradeBand: "5" },
+      ),
+    );
+    expect(recs).toHaveLength(1);
+    const proposed = recs[0]!.proposedValue as Record<string, unknown>;
+    expect(proposed.subjectKey).toBeUndefined();
+    expect(proposed.from).toBe("3");
+    expect(proposed.to).toBe("4");
+  });
+});

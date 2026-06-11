@@ -9,6 +9,10 @@ import type {
   LearnerProfile,
   LearnerBrainProfile,
   BaselineAssessment,
+  ParentAssessment,
+  SkillMastery,
+  LearningPathNode,
+  LessonRun,
   ParentLearnerRelationship,
   QuestWorld,
   QuestChapter,
@@ -3107,5 +3111,392 @@ export function ensureSeeded(): void {
     store.platformWebhookEndpoints.set(id, { ...w, id });
   }
 
+  if (demoJourneySeedEnabled()) seedSkyDemoJourney(store);
+
   store.seeded = true;
+}
+
+/**
+ * Wave F: the Sky journey enrichment is ON for dev servers and demos and
+ * OFF under unit tests (vitest sets NODE_ENV=test), because a dozen
+ * persistence-parity suites legitimately use the seeded learner as a
+ * blank-slate scratch subject. Override either way with
+ * AIVO_SEED_DEMO_JOURNEY=1|0.
+ */
+function demoJourneySeedEnabled(): boolean {
+  const raw = process.env.AIVO_SEED_DEMO_JOURNEY;
+  if (raw != null && raw !== "") {
+    return ["1", "true", "yes", "on"].includes(raw.trim().toLowerCase());
+  }
+  return process.env.NODE_ENV !== "test";
+}
+
+/**
+ * Wave F (S14) — the Sky demo seed: a fully lived-in learner.
+ *
+ * Sky (the mock learner login) goes from `profile_created` to a complete
+ * journey state so a demo login shows the platform's value end-to-end
+ * with zero setup: submitted parent assessment, completed baseline with a
+ * per-subject summary, an APPROVED brain profile, a mastery map +
+ * learning path the mission picker can plan from, two completed lessons
+ * with parent recaps (one carrying the agent tutor's note), and the
+ * "Start today's mission" CTA live on the learner home.
+ *
+ * The full-stack core-journey Playwright spec intentionally does NOT use
+ * Sky for the intake half — it creates a fresh learner through the real
+ * parent UI — so this seed and that spec never fight over state. Sky IS
+ * the learner-side half (mission → lesson → mastery), because the mock
+ * learner session is bound to lrn_demo_sky.
+ */
+function seedSkyDemoJourney(store: ReturnType<typeof getStore>): void {
+  const learner = store.learnerProfiles.get("lrn_demo_sky");
+  if (!learner) return;
+  const tenantId = learner.tenantId;
+  const learnerId = learner.id;
+
+  const subjBySlug = new Map<string, Subject>();
+  for (const s of store.subjects.values()) subjBySlug.set(s.slug, s);
+  const skillBySlug = new Map<string, Skill>();
+  for (const sk of store.skills.values()) skillBySlug.set(sk.slug, sk);
+  const math = subjBySlug.get("math");
+  const reading = subjBySlug.get("reading");
+  if (!math || !reading) return;
+
+  const daysAgo = (n: number, hourOffset = 0) =>
+    new Date(Date.now() - n * 86_400_000 + hourOffset * 3_600_000).toISOString();
+
+  // ── 1. Submitted parent assessment ─────────────────────────────────────
+  const assessment: ParentAssessment = {
+    id: "pas_demo_sky",
+    learnerId,
+    tenantId,
+    answers: {
+      communication: {
+        communication_mode: "verbal_sentences",
+        response_method: "talks_it_through",
+      },
+      strengths_interests: {
+        strengths: "Curious about animals; loves stories and trains.",
+        special_interests: "trains, dinosaurs",
+      },
+      challenges_supports: {
+        challenges: "Sustaining focus past 10 minutes; big transitions.",
+        supports: "Visual schedule, short breaks, warm encouragement.",
+      },
+      learning_style: {
+        attention_span: "10-15min",
+        best_time: "morning",
+        modality: "visual",
+      },
+    } as unknown as ParentAssessment["answers"],
+    completedSections: [
+      "communication",
+      "strengths_interests",
+      "challenges_supports",
+      "learning_style",
+    ] as unknown as ParentAssessment["completedSections"],
+    startedAt: daysAgo(14),
+    updatedAt: daysAgo(14, 1),
+    submittedAt: daysAgo(14, 1),
+  };
+  store.parentAssessments.set(assessment.id, assessment);
+
+  // ── 2. Completed baseline with a per-subject summary ───────────────────
+  const baselineSubjects = [reading, math];
+  const baseline: BaselineAssessment = {
+    id: "bas_demo_sky",
+    learnerId,
+    tenantId,
+    subjectIds: baselineSubjects.map((s) => s.id),
+    status: "complete",
+    startedAt: daysAgo(13),
+    completedAt: daysAgo(13, 1),
+    createdAt: daysAgo(13),
+    summary: {
+      learnerName: "Sky",
+      totalAnswered: 24,
+      perSubject: baselineSubjects.map((s) => ({
+        subjectId: s.id,
+        subjectName: s.name,
+        answered: 12,
+        correct: s.slug === "reading" ? 8 : 6,
+        accuracy: s.slug === "reading" ? 0.67 : 0.5,
+        startLevel: s.slug === "reading" ? "approaching" : "emerging",
+      })),
+      recommendedStartSkillId: skillBySlug.get("add-within-10")?.id ?? null,
+      narrative:
+        "Sky is reading close to grade level and building early addition skills. Short, story-led lessons with visual supports are the best starting point.",
+    } as unknown as BaselineAssessment["summary"],
+  } as unknown as BaselineAssessment;
+  store.baselineAssessments.set(baseline.id, baseline);
+
+  // ── 3. Approved brain profile ───────────────────────────────────────────
+  const candidate = buildBrainProfile({
+    learner,
+    assessment,
+    iepExtraction: null,
+    iepUploaded: false,
+    subjects: Array.from(store.subjects.values()),
+    baselineAttempts: 24,
+  });
+  const parsed = brainProfileStateSchema.safeParse(candidate);
+  if (parsed.success) {
+    store.brainProfiles.set("brp_demo_sky", {
+      id: "brp_demo_sky",
+      learnerId,
+      tenantId,
+      state: parsed.data,
+      approvedByParent: true,
+      approvalStatus: "approved",
+      cloneStage: "cloned",
+      clonedAt: daysAgo(12),
+      generatedAt: daysAgo(13, 1),
+      updatedAt: daysAgo(12),
+    });
+  }
+
+  // ── 4. Mastery map + per-skill masteries ────────────────────────────────
+  const masteryMapId = "mm_demo_sky";
+  store.masteryMaps.set(masteryMapId, {
+    id: masteryMapId,
+    learnerId,
+    tenantId,
+    generatedAt: daysAgo(13, 1),
+    updatedAt: daysAgo(1),
+  });
+  const masterySeed: Array<{ slug: string; score: number }> = [
+    { slug: "phonics-cvc", score: 0.72 },
+    { slug: "sight-words-50", score: 0.55 },
+    { slug: "story-sequence", score: 0.41 },
+    { slug: "main-idea", score: 0.28 },
+    { slug: "count-to-20", score: 0.7 },
+    { slug: "add-within-10", score: 0.48 },
+    { slug: "place-value-10s", score: 0.22 },
+    { slug: "subtract-within-20", score: 0.12 },
+  ];
+  const levelFor = (score: number): SkillMastery["level"] =>
+    score >= 0.85
+      ? "stretching"
+      : score >= 0.65
+        ? "on_grade_level"
+        : score >= 0.4
+          ? "approaching"
+          : score > 0
+            ? "emerging"
+            : "not_started";
+  for (const m of masterySeed) {
+    const skill = skillBySlug.get(m.slug);
+    if (!skill) continue;
+    store.skillMasteries.push({
+      learnerId,
+      skillId: skill.id,
+      subjectId: skill.subjectId,
+      tenantId,
+      confidence: 0.6,
+      level: levelFor(m.score),
+      score: m.score,
+      needsReview: m.slug === "story-sequence",
+      lastEvaluatedAt: daysAgo(1),
+    });
+  }
+
+  // ── 5. Learning path (what "today's mission" plans from) ───────────────
+  const pathSeed: Array<{ slug: string; kind: LearningPathNode["kind"]; reason: string }> = [
+    {
+      slug: "add-within-10",
+      kind: "first_skill",
+      reason: "Closest growth edge from the baseline.",
+    },
+    { slug: "story-sequence", kind: "review", reason: "Queued for review after a near miss." },
+    {
+      slug: "sight-words-50",
+      kind: "next_unmastered",
+      reason: "Build reading fluency momentum.",
+    },
+    {
+      slug: "place-value-10s",
+      kind: "next_unmastered",
+      reason: "Next step after addition within 10.",
+    },
+    { slug: "main-idea", kind: "stretch", reason: "Stretch goal once sequencing lands." },
+    { slug: "subtract-within-20", kind: "stretch", reason: "Unlocks after place value." },
+  ];
+  const nodes: LearningPathNode[] = [];
+  pathSeed.forEach((n, i) => {
+    const skill = skillBySlug.get(n.slug);
+    if (!skill) return;
+    nodes.push({
+      id: `lpn_demo_sky_${i}`,
+      order: i,
+      subjectId: skill.subjectId,
+      skillId: skill.id,
+      kind: n.kind,
+      reason: n.reason,
+      estimatedMinutes: 10,
+    });
+  });
+  store.learningPaths.set("lp_demo_sky", {
+    id: "lp_demo_sky",
+    learnerId,
+    tenantId,
+    generatedAt: daysAgo(13, 1),
+    basedOnMasteryMapId: masteryMapId,
+    nodes,
+  });
+
+  // ── 6. Two completed lessons with parent recaps ─────────────────────────
+  const brainState = store.brainProfiles.get("brp_demo_sky")?.state;
+  const completedLessons: Array<{
+    slug: string;
+    runId: string;
+    daysBack: number;
+    before: number;
+    after: number;
+    tutorNote: string | null;
+  }> = [
+    {
+      slug: "count-to-20",
+      runId: "lrun_demo_sky_1",
+      daysBack: 3,
+      before: 0.55,
+      after: 0.7,
+      tutorNote: null,
+    },
+    {
+      slug: "add-within-10",
+      runId: "lrun_demo_sky_2",
+      daysBack: 1,
+      before: 0.38,
+      after: 0.48,
+      tutorNote:
+        "Sky practised adding within ten with me today and got three of four checks right. A worked example before the tricky one really helped, and a quick break kept things calm.",
+    },
+  ];
+  for (const lesson of completedLessons) {
+    const skill = skillBySlug.get(lesson.slug);
+    if (!skill || !brainState) continue;
+    const planId = `plan_${lesson.runId}`;
+    const run: LessonRun = {
+      id: lesson.runId,
+      tenantId,
+      learnerId,
+      subjectId: skill.subjectId,
+      skillId: skill.id,
+      source: "today_mission",
+      sourceRefId: null,
+      tutorPersona: "Nova",
+      learnerContextSnapshot: {
+        displayName: "Sky",
+        ageRange: learner.ageRange,
+        gradeBand: learner.gradeBand,
+        primaryLanguage: learner.primaryLanguage,
+        preferredModalities: ["visual"],
+        tutorStyle: "warm_coach",
+      },
+      masterySnapshot: {
+        skillId: skill.id,
+        subjectId: skill.subjectId,
+        score: lesson.before,
+        level: levelFor(lesson.before),
+        confidence: 0.6,
+        subjectContext: [],
+      },
+      accommodationSnapshot: {
+        tags: ["visual_supports", "short_breaks"],
+        supportDefaults: {
+          extendedTime: false,
+          readAloud: true,
+          speechToText: false,
+          visualSchedules: true,
+          sensoryBreaks: true,
+        },
+        accessibility: learner.accessibilityDefaults,
+      },
+      brainStateSnapshot: brainState,
+      lessonPlanId: planId,
+      status: "completed",
+      retryCount: 0,
+      failureReason: null,
+      startedAt: daysAgo(lesson.daysBack),
+      completedAt: daysAgo(lesson.daysBack, 1),
+      createdAt: daysAgo(lesson.daysBack),
+      updatedAt: daysAgo(lesson.daysBack, 1),
+    };
+    store.lessonRuns.set(run.id, run);
+    store.generatedLessonPlans.set(planId, {
+      id: planId,
+      lessonRunId: run.id,
+      tenantId,
+      title: `${skill.name} with Nova`,
+      objective: `Practice ${skill.name.toLowerCase()} with friendly, visual examples.`,
+      estimatedMinutes: 10,
+      tutorPersona: "Nova",
+      tutorGreeting: "Hi Sky! Ready for a quick adventure?",
+      storyHook: "The train needs help counting its carriages before it can leave.",
+      microLesson: "We can count up from the bigger number to add quickly.",
+      example: { prompt: "3 + 2", explanation: "Start at 3, count up two: 4, 5." },
+      guidedPractice: [
+        {
+          id: `${planId}_gp1`,
+          prompt: "4 + 3 = ?",
+          expectedAnswer: "7",
+          choices: ["6", "7", "8"],
+          hint: "Start at 4 and count up three.",
+          scaffold: "4… then 5, 6, 7.",
+          skillId: skill.id,
+        },
+      ],
+      checksForUnderstanding: [
+        {
+          id: `${planId}_chk1`,
+          prompt: "5 + 2 = ?",
+          expectedAnswer: "7",
+          choices: ["6", "7", "9"],
+          supportIfWrong: "Count up from 5: 6, 7.",
+        },
+      ],
+      accessibilitySupports: ["visual supports", "short steps"],
+      encouragement: "You stuck with it — wonderful work!",
+      parentSummary: `Sky practiced ${skill.name.toLowerCase()} and finished the lesson.`,
+      nextRecommendedStep: "Keep momentum with one more short practice this week.",
+      generatedAt: daysAgo(lesson.daysBack),
+      generation: {
+        provider: "mock",
+        model: "seed-demo",
+        attempts: 1,
+        latencyMs: 1,
+        schemaVersion: 1,
+      },
+    });
+    store.parentLessonSummaries.set(`pls_${lesson.runId}`, {
+      id: `pls_${lesson.runId}`,
+      lessonRunId: run.id,
+      learnerId,
+      tenantId,
+      subjectId: skill.subjectId,
+      skillId: skill.id,
+      headline: `Sky practiced ${skill.name} and moved up ${Math.round(
+        (lesson.after - lesson.before) * 100,
+      )} points.`,
+      highlights: {
+        whatWorkedOn: skill.name,
+        wentWell: "Stayed engaged through every step and used the worked example well.",
+        neededHelp: lesson.tutorNote ? "One tricky check needed a scaffold." : null,
+        supportsUsed: ["Visual supports", "One short break"],
+        recommendedNext: "One more short practice on this skill this week.",
+      },
+      masteryDelta: {
+        before: lesson.before,
+        after: lesson.after,
+        levelBefore: levelFor(lesson.before),
+        levelAfter: levelFor(lesson.after),
+      },
+      ...(lesson.tutorNote ? { tutorNote: lesson.tutorNote } : {}),
+      createdAt: daysAgo(lesson.daysBack, 1),
+    });
+  }
+
+  // ── 7. Readiness: runs exist → active learning ─────────────────────────
+  learner.iepDecision = "skipped";
+  learner.readinessState = "active_learning";
 }

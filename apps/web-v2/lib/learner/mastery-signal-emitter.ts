@@ -23,6 +23,12 @@ function profileRecommendationsV2Enabled(): boolean {
 export interface LessonMasteryMovement {
   skillId: string;
   subjectId: string;
+  /**
+   * Canonical subject key (Wave C, G1 — @aivo/scoring canonicalSubjectKey)
+   * so progression candidates and the approval apply path are scoped to
+   * the subject's OWN delivery band.
+   */
+  subjectKey?: string;
   before: number;
   after: number;
   levelBefore: SkillMasteryLevel;
@@ -53,6 +59,7 @@ export function buildLessonMasterySignal(movement: LessonMasteryMovement): {
     metadata: {
       skillId: movement.skillId,
       subjectId: movement.subjectId,
+      ...(movement.subjectKey ? { subjectKey: movement.subjectKey } : {}),
       before: movement.before,
       after: movement.after,
       levelBefore: movement.levelBefore,
@@ -99,7 +106,13 @@ export async function emitLessonMasterySignal(input: {
   movement: LessonMasteryMovement;
   /** Other on-grade skills in the same subject (current state, optional). */
   subjectPeers?: SubjectPeerSnapshot[];
-  currentProfile?: { gradeBand?: string; deliveryLevel?: string; baselineCompletedAt?: string };
+  currentProfile?: {
+    gradeBand?: string;
+    deliveryLevel?: string;
+    /** Per-subject bands (Wave C, G1), keyed by canonical subject key. */
+    deliveryLevels?: Record<string, string>;
+    baselineCompletedAt?: string;
+  };
 }): Promise<void> {
   if (!profileRecommendationsV2Enabled()) return;
   try {

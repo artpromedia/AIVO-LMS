@@ -83,9 +83,23 @@ const gates = [
   // Sprint-owned gates implemented in GREEN-01 .. GREEN-03.
   { name: "backend:parity", script: "backend:parity", required: true, category: "backend" },
   { name: "tutor:parity", script: "tutor:parity", required: true, category: "tutor" },
+  // Wave E (S10): parity proves tutor CONFIGURATION; this replays fixture
+  // sessions through the real orchestrator and proves agentic BEHAVIOUR
+  // (observes / closed decision set / guarded / degrades / audited) for
+  // every onboarded tutor, with an onboarding ratchet.
+  { name: "tutor:behavior", script: "tutor:behavior", required: true, category: "tutor" },
   {
     name: "curriculum:coverage",
     script: "curriculum:coverage",
+    required: true,
+    category: "curriculum",
+  },
+  // Wave D (G3): coverage gate over the AUTHORITATIVE curriculum-svc
+  // catalogue (ADR-0040) — floor for the CCSS-imported subjects (math/ela
+  // K-8 ≥ 15 skills per band) plus a per-cell ratchet.
+  {
+    name: "catalogue:coverage",
+    script: "catalogue:coverage",
     required: true,
     category: "curriculum",
   },

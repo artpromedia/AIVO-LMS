@@ -471,3 +471,98 @@ export const tutorsByTutorKeyPlanSchema = {
   body: passthroughObject,
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse, 500: errorResponse },
 } as const;
+
+// ── Wave E (S9): tutor agent session routes ─────────────────────────────────
+
+export const agentSessionOpenSchema = {
+  tags: ["Tutor Agent"],
+  operationId: "tutorAgentSessionOpen",
+  summary: "POST /api/tutor/agent/session/open",
+  body: {
+    type: "object",
+    required: ["learnerId", "tutorKey"],
+    additionalProperties: true,
+    properties: {
+      learnerId: { type: "string" },
+      tutorKey: { type: "string" },
+      lessonRunId: { type: "string" },
+      functioningLevel: { type: "string" },
+      gradeBand: { type: "string" },
+      deliveryLevel: { type: "string" },
+    },
+  },
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+  },
+} as const;
+
+export const agentSessionTurnSchema = {
+  tags: ["Tutor Agent"],
+  operationId: "tutorAgentSessionTurn",
+  summary: "POST /api/tutor/agent/session/:sessionId/turn",
+  params: {
+    type: "object",
+    required: ["sessionId"],
+    additionalProperties: true,
+    properties: { sessionId: { type: "string" } },
+  },
+  body: {
+    type: "object",
+    required: ["learnerId", "observation"],
+    additionalProperties: true,
+    properties: {
+      learnerId: { type: "string" },
+      observation: passthroughObject,
+    },
+  },
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+  },
+} as const;
+
+export const agentSessionCloseSchema = {
+  tags: ["Tutor Agent"],
+  operationId: "tutorAgentSessionClose",
+  summary: "POST /api/tutor/agent/session/:sessionId/close",
+  params: {
+    type: "object",
+    required: ["sessionId"],
+    additionalProperties: true,
+    properties: { sessionId: { type: "string" } },
+  },
+  body: passthroughObject,
+  response: { 200: passthroughObject, 404: errorResponse },
+} as const;
+
+export const agentMemoriesListSchema = {
+  tags: ["Tutor Agent"],
+  operationId: "tutorAgentMemoriesList",
+  summary: "GET /api/tutor/agent/memories/:learnerId",
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
+  response: { 200: passthroughObject },
+} as const;
+
+export const agentMemoryDeleteSchema = {
+  tags: ["Tutor Agent"],
+  operationId: "tutorAgentMemoryDelete",
+  summary: "DELETE /api/tutor/agent/memories/:learnerId/:memoryId",
+  params: {
+    type: "object",
+    required: ["learnerId", "memoryId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" }, memoryId: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 404: errorResponse },
+} as const;

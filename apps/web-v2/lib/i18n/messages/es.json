@@ -306,7 +306,10 @@
       "back_to_learner": "Volver al estudiante",
       "restart_baseline": "Reiniciar línea de base",
       "in_set": "En el conjunto",
-      "preview": "Vista previa"
+      "preview": "Vista previa",
+      "provenance_child_specific": "Personalizado por IA para su hijo/a",
+      "provenance_cohort_bank": "Banco de preguntas de IA — ajustado al grado y al perfil",
+      "provenance_generic": "Set inicial tranquilo"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "Sin prueba genérica",
@@ -408,7 +411,8 @@
       "worked_on": "Trabajó en",
       "went_well": "Salió bien",
       "needed_help": "Necesitó ayuda",
-      "up_next": "Lo siguiente"
+      "up_next": "Lo siguiente",
+      "tutor_note": "Una nota del tutor"
     },
     "learner_milestones": {
       "title": "Hitos",
@@ -719,6 +723,18 @@
       "status_declined": "Rechazado — nada cambia.",
       "status_failed": "Aprobado, pero falló la aplicación — nuestro equipo fue notificado.",
       "history": "Decisiones recientes ({count})"
+    },
+    "tutor_memories": {
+      "title": "Lo que recuerda tu tutor",
+      "description": "Pequeñas notas que los tutores de IA guardan para que las próximas sesiones sean más amables y eficaces. Puedes borrar cualquiera, y cada una caduca automáticamente a los 180 días.",
+      "empty": "Aún no hay recuerdos. Las notas aparecerán aquí cuando un tutor guarde una.",
+      "kind_strategy_preference": "Lo que ayuda",
+      "kind_interest": "Interés",
+      "kind_trigger": "Tratar con cuidado",
+      "kind_win": "Un logro",
+      "expires": "Caduca el {date}",
+      "delete": "Borrar",
+      "delete_label": "Borrar este recuerdo"
     }
   },
   "brain_clone": {
@@ -1285,7 +1301,26 @@
       "next": "Siguiente",
       "saving": "Guardando…",
       "done": "Terminé",
-      "complete_error": "No pudimos guardar esta lección. Vuelve a pulsar el botón «Terminé»."
+      "complete_error": "No pudimos guardar esta lección. Vuelve a pulsar el botón «Terminé».",
+      "summer_bridge": "☀️ Puente de verano · preparándose para el próximo grado",
+      "tutor_panel_label": "Panel del tutor {name}",
+      "tutor_panel_watching": "{name} está aprendiendo contigo",
+      "tutor_panel_thinking": "Pensando en tu respuesta…",
+      "tutor_panel_idle": "Estoy aquí si me necesitas.",
+      "tutor_panel_break_offer": "¿Quieres tomar un descanso corto?",
+      "tutor_panel_break_yes": "Sí, hora de descansar",
+      "tutor_panel_break_no": "Seguir adelante",
+      "tutor_panel_end_early": "Trabajaste mucho hoy. Podemos parar aquí.",
+      "tutor_panel_finish_now": "Terminar la lección",
+      "agent_scaffold_prefix": "Consejo de tu tutor:",
+      "agent_remediation_intro": "Veamos esto otra vez juntos: {focus}",
+      "agent_remediation_worked": "Veamos esto otra vez juntos: {focus} Aquí hay un ejemplo resuelto — {prompt} {explanation}",
+      "agent_remediation_msg": "Agregué un repaso rápido para ti — es el siguiente paso.",
+      "agent_modality_visual": "Intentemos verlo con una imagen en mente.",
+      "agent_modality_auditory": "Intenta leerlo en voz alta — escucharlo puede ayudar.",
+      "agent_modality_kinesthetic": "Intenta contarlo con tus dedos u objetos.",
+      "agent_modality_reading": "Leámoslo despacio, una parte a la vez.",
+      "agent_new_surface": "Probemos la misma pregunta de otra manera."
     },
     "baseline_runner": {
       "exit_proctor_view": "Salir de la vista de supervisor",
@@ -2752,7 +2787,8 @@
       "no_lessons_started": "Aún no se han iniciado lecciones.",
       "skill_gaps": "Brechas de habilidades",
       "no_notable_gaps": "Sin brechas destacadas aún — sigue adelante.",
-      "accommodations_teacher_summary": "Acomodaciones (resumen del maestro)"
+      "accommodations_teacher_summary": "Acomodaciones (resumen del maestro)",
+      "pending_recommendations": "Recomendaciones pendientes"
     },
     "learner_iep_draft": {
       "page_title": "Borrador de metas del IEP",
@@ -2928,7 +2964,8 @@
       "no_learners_yet": "Aún no hay estudiantes",
       "primary_language": "Idioma principal",
       "reading_comfort": "Comodidad lectora",
-      "math_comfort": "Comodidad matemática"
+      "math_comfort": "Comodidad matemática",
+      "pending_recommendations": "Recomendaciones pendientes"
     },
     "observations": {
       "page_title": "Observaciones",
@@ -3086,6 +3123,52 @@
       "empty": "Aún no hay plataformas registradas.",
       "client_id_label": "cliente",
       "deployments_label": "Despliegues"
+    }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "Esta semana",
+      "full_term": "Trimestre completo",
+      "school_calendar": "Calendario escolar"
+    },
+    "school_calendar": {
+      "title": "Calendario escolar",
+      "description": "Ingrese las fechas de los períodos y descansos de {name}. AIVO pausa la sincronización escolar durante los descansos y ofrece preparación vacacional; los planes de ritmo usan estas fechas.",
+      "academic_year": "Año académico",
+      "terms": "Períodos",
+      "term_n": "Período {n}",
+      "term_title_placeholder": "Título (opcional)",
+      "start_date": "Fecha de inicio",
+      "end_date": "Fecha de fin",
+      "remove": "Quitar",
+      "add_term": "Agregar período",
+      "breaks": "Descansos y feriados",
+      "breaks_hint": "Los feriados van dentro de los períodos; marque el receso largo como Verano para que AIVO prepare el siguiente grado.",
+      "break_kind": "Tipo de descanso",
+      "break_name_placeholder": "Nombre (opcional)",
+      "kind_holiday": "Feriado",
+      "kind_break": "Descanso",
+      "kind_summer": "Verano",
+      "save": "Guardar calendario",
+      "saving": "Guardando…",
+      "saved": "Guardado a las {time}",
+      "save_error": "No se pudo guardar el calendario. Inténtelo de nuevo.",
+      "error_missing_dates": "Cada período y descanso necesita fecha de inicio y de fin.",
+      "error_end_before_start": "Una fecha de fin es anterior a su inicio.",
+      "error_terms_overlap": "Los períodos se superponen: una fecha solo puede pertenecer a un período.",
+      "summer_bridge_title": "Puente de verano",
+      "summer_bridge_hint": "Durante un receso marcado como Verano, AIVO repasa las destrezas de este año y anticipa las primeras unidades del próximo grado (del currículo oficial) para que {name} empiece el año listo/a.",
+      "summer_bridge_toggle": "Preparar a {name} para el próximo grado durante el verano",
+      "summer_bridge_error": "No se pudo actualizar el puente de verano. Inténtelo de nuevo."
+    },
+    "term_syllabus": {
+      "plan_start": "Inicio del plan",
+      "generate_plan": "Generar plan de ritmo",
+      "generating": "Generando…",
+      "generate_error": "No se pudo generar el plan de ritmo. Inténtelo de nuevo.",
+      "plan_ready": "Plan listo — {weeks} semanas ({instruction} lectivas), con descansos.",
+      "week_kind_break": "Receso escolar",
+      "week_kind_holiday_prep": "Preparación vacacional"
     }
   }
 }

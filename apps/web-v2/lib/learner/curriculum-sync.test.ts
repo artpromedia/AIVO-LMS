@@ -153,3 +153,30 @@ describe("lesson generation + curriculum focus", () => {
     expect(plan.lessonMode).toBe("holiday_prep");
   });
 });
+
+  it("frames a summer_bridge focus as NEXT-GRADE readiness (Wave D, G6)", async () => {
+    const bridgeFocus: CurriculumFocus = {
+      ...focus,
+      mode: "summer_bridge",
+      title: "Summer bridge: get ready for Grade 4",
+      topics: ["Multi-digit place value"],
+    };
+    const { plan } = await generateLessonPlanWithRetry(MockTutorProvider, {
+      learnerName: "Sam",
+      brainState: brain,
+      subject,
+      skill,
+      mastery,
+      accommodations,
+      curriculumFocus: bridgeFocus,
+      source: "today_mission",
+    });
+    expect(plan.title).toBe("Summer bridge: get ready for Grade 4");
+    expect(plan.microLesson).toContain("summer");
+    expect(plan.microLesson).toContain("get ready for Grade 4");
+    expect(plan.microLesson).not.toContain("in class this week");
+    expect(plan.storyHook).toContain("next grade");
+    expect(plan.parentSummary).toContain("Summer-bridge");
+    expect(plan.objective).toContain("get ready for Grade 4");
+    expect(plan.lessonMode).toBe("summer_bridge");
+  });

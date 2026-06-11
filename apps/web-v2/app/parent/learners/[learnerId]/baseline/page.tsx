@@ -23,6 +23,8 @@ import {
   refreshLearnerReadiness,
 } from "@/lib/db/repos";
 import { BASELINE_TUTORS, tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { baselineProvenance } from "@/lib/learner/baseline-provenance";
+import { BaselineProvenanceBadge } from "@/components/parent/baseline-provenance-badge";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { ChapterPreviewButton } from "./chapter-preview-button";
@@ -133,6 +135,9 @@ export default async function ParentBaselinePage({
 
   const questions = baseline ? await listBaselineQuestions(baseline.id) : [];
   const attempts = baseline ? await listBaselineAttempts(baseline.id, session.tenantId) : [];
+  // Honest provenance: how deeply THIS question set was personalized
+  // (child-specific LLM fusion vs cohort bank vs generic calm starter).
+  const provenance = baseline ? baselineProvenance(baseline.generationMetadata) : null;
 
   return (
     <AppShell
@@ -167,7 +172,16 @@ export default async function ParentBaselinePage({
         <Card className="flex flex-col gap-3 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
           <Play className="h-6 w-6 text-aivo-primary" />
           <div className="flex-1">
-            <p className="font-display text-lg font-semibold">{t("baseline_in_progress")}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-display text-lg font-semibold">{t("baseline_in_progress")}</p>
+              {provenance ? (
+                <BaselineProvenanceBadge
+                  personalization={provenance.personalization}
+                  tone={provenance.tone}
+                  label={t(provenance.i18nKey)}
+                />
+              ) : null}
+            </div>
             <p className="text-sm text-aivo-ink-soft">
               {attempts.length} of {questions.length} answered so far.
             </p>
@@ -189,7 +203,16 @@ export default async function ParentBaselinePage({
           <Card className="flex items-start gap-3 p-[var(--aivo-density-card-pad)]">
             <CheckCircle2 className="mt-0.5 h-6 w-6 text-aivo-success" />
             <div>
-              <p className="font-display text-lg font-semibold">{t("baseline_complete")}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-display text-lg font-semibold">{t("baseline_complete")}</p>
+                {provenance ? (
+                  <BaselineProvenanceBadge
+                    personalization={provenance.personalization}
+                    tone={provenance.tone}
+                    label={t(provenance.i18nKey)}
+                  />
+                ) : null}
+              </div>
               <p className="mt-1 text-sm">{baseline.summary?.parentSummary}</p>
             </div>
           </Card>

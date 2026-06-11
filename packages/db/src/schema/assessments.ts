@@ -172,6 +172,14 @@ export const learnerProfiles = pgTable("learner_profiles", {
   /** Final θ on the same logit scale as item difficulty. */
   thetaPlacement: real("theta_placement").notNull().default(0),
   /**
+   * Per-subject θ estimates (Wave C, G1), keyed by the canonical subject
+   * key (`@aivo/scoring` `canonicalSubjectKey`), e.g.
+   *   { "math": -0.8, "reading": 0.5 }
+   * Null/absent for profiles finalized before per-subject placement or
+   * when a run carried too few items per subject to split.
+   */
+  subjectThetas: jsonb("subject_thetas"),
+  /**
    * Ordered modality fit, e.g.
    *   [{ modality: "visual",   accuracy: 0.92, n: 6 },
    *    { modality: "auditory", accuracy: 0.71, n: 5 }, ...]

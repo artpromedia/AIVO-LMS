@@ -7,6 +7,7 @@
  * AIVO's pacing explodes it into dated, break-aware weekly foci.
  */
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -70,20 +71,44 @@ function fmtDate(d: string): string {
   return Number.isNaN(dt.getTime()) ? d : dt.toLocaleDateString();
 }
 
+type GeneratedPlanSummary = {
+  weekCount: number;
+  instructionWeeks: number;
+  planStart: string;
+  weeks: Array<{
+    week_index?: number;
+    weekIndex?: number;
+    week_start?: string;
+    weekStart?: string;
+    kind: string;
+    unit_title?: string | null;
+    unitTitle?: string | null;
+  }>;
+};
+
 export function TermSyllabusManager({
   learnerId,
   apiBase,
+  pacingApiBase,
   gradeBand,
   jurisdiction,
 }: Readonly<{
   learnerId: string;
   /** e.g. `/api/bff/parent/learners/${learnerId}/term-syllabus` */
   apiBase: string;
+  /**
+   * Wave B — sibling pacing endpoint, e.g.
+   * `/api/bff/parent/learners/${learnerId}/pacing-plan`. When provided, each
+   * saved syllabus offers "Generate pacing plan", which lays the saved units
+   * onto the learner's stored school calendar (break-aware) in brain-svc.
+   */
+  pacingApiBase?: string;
   /** Learner grade band — enables syllabus ↔ jurisdiction validation on save. */
   gradeBand?: string;
   /** Learner jurisdiction (US zip/district or country+region) for validation. */
   jurisdiction?: JurisdictionLocator;
 }>) {
+  const tPlan = useTranslations("curriculum.term_syllabus");
   const [text, setText] = useState("");
   const [subject, setSubject] = useState("math");
   const [termCount, setTermCount] = useState(1);
@@ -92,6 +117,41 @@ export function TermSyllabusManager({
   const [saved, setSaved] = useState<SavedSyllabus[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Wave B — per-syllabus pacing-plan generation state.
+  const [planStart, setPlanStart] = useState(() => new Date().toISOString().slice(0, 10));
+  const [planBusyFor, setPlanBusyFor] = useState<string | null>(null);
+  const [planError, setPlanError] = useState<string | null>(null);
+  const [planResult, setPlanResult] = useState<GeneratedPlanSummary | null>(null);
+
+  async function onGeneratePlan(s: SavedSyllabus) {
+    if (!pacingApiBase) return;
+    setPlanBusyFor(s.id);
+    setPlanError(null);
+    setPlanResult(null);
+    try {
+      const res = await fetch(pacingApiBase, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ subject: s.subject, planStart }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPlanError(data?.error?.message ?? tPlan("generate_error"));
+        return;
+      }
+      const plan = data?.data?.plan ?? {};
+      setPlanResult({
+        weekCount: plan.weekCount ?? (plan.weeks?.length || 0),
+        instructionWeeks: plan.instructionWeeks ?? 0,
+        planStart: plan.planStart ?? planStart,
+        weeks: Array.isArray(plan.weeks) ? plan.weeks : [],
+      });
+    } catch {
+      setPlanError(tPlan("generate_error"));
+    } finally {
+      setPlanBusyFor(null);
+    }
+  }
 
   async function refresh() {
     try {
@@ -251,11 +311,22 @@ export function TermSyllabusManager({
       {saved.length > 0 && (
         <Card className="p-4 space-y-2">
           <h4 className="font-semibold">Saved term syllabi</h4>
+          {pacingApiBase && (
+            <label className="block text-sm">
+              {tPlan("plan_start")}{" "}
+              <input
+                type="date"
+                className="border rounded px-2 py-1"
+                value={planStart}
+                onChange={(e) => setPlanStart(e.target.value)}
+              />
+            </label>
+          )}
           <ul className="space-y-2">
             {saved.map((s) => {
               const off = offCurriculumCount(s.units);
               return (
-                <li key={s.id} className="flex items-center justify-between text-sm">
+                <li key={s.id} className="flex items-center justify-between gap-2 text-sm">
                   <span className="flex items-center gap-2">
                     {s.title ?? s.subject} · {s.units.length} weeks · {fmtDate(s.createdAt)}
                     {off > 0 && (
@@ -264,13 +335,57 @@ export function TermSyllabusManager({
                       </span>
                     )}
                   </span>
-                  <Button variant="ghost" onClick={() => onDelete(s.id)} disabled={busy}>
-                    Remove
-                  </Button>
+                  <span className="flex items-center gap-1">
+                    {pacingApiBase && (
+                      <Button
+                        variant="outline"
+                        onClick={() => onGeneratePlan(s)}
+                        disabled={busy || planBusyFor !== null || !planStart}
+                        data-testid={`generate-plan-${s.id}`}
+                      >
+                        {planBusyFor === s.id ? tPlan("generating") : tPlan("generate_plan")}
+                      </Button>
+                    )}
+                    <Button variant="ghost" onClick={() => onDelete(s.id)} disabled={busy}>
+                      Remove
+                    </Button>
+                  </span>
                 </li>
               );
             })}
           </ul>
+          {planError && (
+            <p className="text-sm text-red-600" role="alert">
+              {planError}
+            </p>
+          )}
+          {planResult && (
+            <div className="space-y-1 rounded border border-iw-border p-3" data-testid="plan-result">
+              <p className="text-sm font-medium">
+                {tPlan("plan_ready", {
+                  weeks: planResult.weekCount,
+                  instruction: planResult.instructionWeeks,
+                })}
+              </p>
+              <ol className="max-h-48 space-y-0.5 overflow-y-auto pl-5 text-xs list-decimal">
+                {planResult.weeks.map((w, i) => {
+                  const start = w.week_start ?? w.weekStart ?? "";
+                  const unit = w.unit_title ?? w.unitTitle ?? "";
+                  const label =
+                    w.kind === "instruction"
+                      ? unit
+                      : w.kind === "break"
+                        ? tPlan("week_kind_break")
+                        : tPlan("week_kind_holiday_prep");
+                  return (
+                    <li key={i}>
+                      {fmtDate(start)} — {label}
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          )}
         </Card>
       )}
     </div>

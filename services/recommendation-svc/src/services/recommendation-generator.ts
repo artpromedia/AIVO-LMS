@@ -11,6 +11,13 @@ export interface GenerateCandidatesInput {
     accommodations?: string[];
     functioningLevel?: string;
     deliveryLevel?: string;
+    /**
+     * Per-subject delivery bands (Wave C, G1) from
+     * `curriculum_alignment.delivery_levels`, keyed by the canonical
+     * subject key. When present, the upward rule reads the SUBJECT's own
+     * band instead of the global one.
+     */
+    deliveryLevels?: Record<string, string>;
     /** Enrolled grade band — required for upward progression candidates. */
     gradeBand?: string;
     /** ISO time of the last completed baseline — drives rebaseline checks. */

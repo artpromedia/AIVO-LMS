@@ -37,7 +37,14 @@ function valueLabel(value: unknown): string {
   if (value == null) return "—";
   if (typeof value === "object") {
     const v = value as Record<string, unknown>;
-    if ("from" in v && "to" in v) return `${String(v.from)} → ${String(v.to)}`;
+    if ("from" in v && "to" in v) {
+      const range = `${String(v.from)} → ${String(v.to)}`;
+      // Wave C (G1): subject-scoped proposals name the subject so a parent
+      // knows exactly which band moves (e.g. "math: 2 → 3").
+      return typeof v.subjectKey === "string" && v.subjectKey.length > 0
+        ? `${v.subjectKey}: ${range}`
+        : range;
+    }
     if ("reason" in v) return String(v.reason);
     return JSON.stringify(v);
   }
@@ -58,11 +65,11 @@ function evidenceSummary(evidence: Evidence[]): string {
 type Decision = { state: "deciding" } | { state: "decided"; status: string } | null;
 
 function RecommendationCard({
-  learnerId,
+  apiBase,
   rec,
   onDecided,
 }: {
-  learnerId: string;
+  apiBase: string;
   rec: PanelRecommendation;
   onDecided: (id: string, status: string) => void;
 }) {
@@ -78,7 +85,7 @@ function RecommendationCard({
     setError(null);
     try {
       const res = await fetch(
-        `/api/bff/learners/${learnerId}/recommendations/${rec.id}/respond`,
+        `${apiBase}/${rec.id}/respond`,
         {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -207,7 +214,20 @@ function RecommendationCard({
   );
 }
 
-export function PendingRecommendationsPanel({ learnerId }: { learnerId: string }) {
+export function PendingRecommendationsPanel({
+  learnerId,
+  apiBase: apiBaseProp,
+}: {
+  learnerId: string;
+  /**
+   * Wave C (G5): role-scoped endpoint base. Defaults to the parent route;
+   * the teacher/caregiver surfaces pass their own BFF base so the same
+   * panel drives every approver role (the service enforces the per-tenant
+   * delegation policy and 403s out-of-policy decisions).
+   */
+  apiBase?: string;
+}) {
+  const apiBase = apiBaseProp ?? `/api/bff/learners/${learnerId}/recommendations`;
   const t = useTranslations("parent.recommendations");
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -218,7 +238,7 @@ export function PendingRecommendationsPanel({ learnerId }: { learnerId: string }
     let alive = true;
     setLoading(true);
     setError(null);
-    fetch(`/api/bff/learners/${learnerId}/recommendations`)
+    fetch(apiBase)
       .then((r) => r.json())
       .then((j) => {
         if (!alive) return;
@@ -238,7 +258,7 @@ export function PendingRecommendationsPanel({ learnerId }: { learnerId: string }
     return () => {
       alive = false;
     };
-  }, [learnerId, t]);
+  }, [apiBase, t]);
 
   const onDecided = React.useCallback((id: string, status: string) => {
     // The card renders its own decided state inline; keep the list as-is so
@@ -261,7 +281,7 @@ export function PendingRecommendationsPanel({ learnerId }: { learnerId: string }
         <p className="text-sm text-aivo-ink-soft">{t("empty")}</p>
       ) : (
         pending.map((rec) => (
-          <RecommendationCard key={rec.id} learnerId={learnerId} rec={rec} onDecided={onDecided} />
+          <RecommendationCard key={rec.id} apiBase={apiBase} rec={rec} onDecided={onDecided} />
         ))
       )}
       {!loading && decided.length > 0 ? (

@@ -306,7 +306,10 @@
       "back_to_learner": "Zurück zum Lernenden",
       "restart_baseline": "Basislinie neu starten",
       "in_set": "Im Set",
-      "preview": "Vorschau"
+      "preview": "Vorschau",
+      "provenance_child_specific": "Von KI für Ihr Kind personalisiert",
+      "provenance_cohort_bank": "KI-Fragenbank — abgestimmt auf Klassenstufe & Profil",
+      "provenance_generic": "Ruhiges Starter-Set"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "Kein generisches Quiz",
@@ -408,7 +411,8 @@
       "worked_on": "Gearbeitet an",
       "went_well": "Gut gelaufen",
       "needed_help": "Brauchte Hilfe",
-      "up_next": "Als nächstes"
+      "up_next": "Als nächstes",
+      "tutor_note": "Eine Notiz vom Tutor"
     },
     "learner_milestones": {
       "title": "Meilensteine",
@@ -719,6 +723,18 @@
       "status_declined": "Abgelehnt — nichts ändert sich.",
       "status_failed": "Genehmigt, aber Anwendung fehlgeschlagen — unser Team wurde informiert.",
       "history": "Letzte Entscheidungen ({count})"
+    },
+    "tutor_memories": {
+      "title": "Was sich dein Tutor merkt",
+      "description": "Kleine Notizen, die die KI-Tutoren behalten, damit künftige Sitzungen freundlicher und wirksamer werden. Sie können jede löschen, und jede läuft nach 180 Tagen automatisch ab.",
+      "empty": "Noch nichts gemerkt. Notizen erscheinen hier, sobald ein Tutor eine speichert.",
+      "kind_strategy_preference": "Was hilft",
+      "kind_interest": "Interesse",
+      "kind_trigger": "Behutsam angehen",
+      "kind_win": "Ein Erfolg",
+      "expires": "Läuft ab am {date}",
+      "delete": "Löschen",
+      "delete_label": "Diese Erinnerung löschen"
     }
   },
   "brain_clone": {
@@ -1285,7 +1301,26 @@
       "next": "Weiter",
       "saving": "Wird gespeichert…",
       "done": "Ich bin fertig",
-      "complete_error": "Wir konnten diese Lektion nicht speichern. Bitte versuch die Schaltfläche „Ich bin fertig“ erneut."
+      "complete_error": "Wir konnten diese Lektion nicht speichern. Bitte versuch die Schaltfläche „Ich bin fertig“ erneut.",
+      "summer_bridge": "☀️ Sommerbrücke · Vorbereitung auf die nächste Klassenstufe",
+      "tutor_panel_label": "Tutor-Bereich von {name}",
+      "tutor_panel_watching": "{name} lernt mit dir",
+      "tutor_panel_thinking": "Ich denke über deine Antwort nach…",
+      "tutor_panel_idle": "Ich bin da, wenn du mich brauchst.",
+      "tutor_panel_break_offer": "Möchtest du eine kurze Pause machen?",
+      "tutor_panel_break_yes": "Ja, Pause",
+      "tutor_panel_break_no": "Weitermachen",
+      "tutor_panel_end_early": "Du hast heute viel geschafft. Wir können hier aufhören.",
+      "tutor_panel_finish_now": "Lektion beenden",
+      "agent_scaffold_prefix": "Tipp von deinem Tutor:",
+      "agent_remediation_intro": "Schauen wir uns das noch einmal zusammen an: {focus}",
+      "agent_remediation_worked": "Schauen wir uns das noch einmal zusammen an: {focus} Hier ist ein Beispiel — {prompt} {explanation}",
+      "agent_remediation_msg": "Ich habe eine kurze Wiederholung für dich eingefügt — sie ist der nächste Schritt.",
+      "agent_modality_visual": "Versuchen wir, es uns als Bild vorzustellen.",
+      "agent_modality_auditory": "Lies es laut vor — es zu hören kann helfen.",
+      "agent_modality_kinesthetic": "Zähle es mit deinen Fingern oder Gegenständen ab.",
+      "agent_modality_reading": "Lesen wir es langsam, Schritt für Schritt.",
+      "agent_new_surface": "Versuchen wir dieselbe Frage auf eine andere Art."
     },
     "baseline_runner": {
       "exit_proctor_view": "Aufsichtsansicht verlassen",
@@ -2752,7 +2787,8 @@
       "no_lessons_started": "Noch keine Lektionen gestartet.",
       "skill_gaps": "Kompetenzlücken",
       "no_notable_gaps": "Noch keine nennenswerten Lücken — weiter so.",
-      "accommodations_teacher_summary": "Anpassungen (Lehrerzusammenfassung)"
+      "accommodations_teacher_summary": "Anpassungen (Lehrerzusammenfassung)",
+      "pending_recommendations": "Ausstehende Empfehlungen"
     },
     "learner_iep_draft": {
       "page_title": "IEP-Zielentwurf",
@@ -2928,7 +2964,8 @@
       "no_learners_yet": "Noch keine Lernenden",
       "primary_language": "Hauptsprache",
       "reading_comfort": "Lesekompetenz",
-      "math_comfort": "Mathematikkompetenz"
+      "math_comfort": "Mathematikkompetenz",
+      "pending_recommendations": "Ausstehende Empfehlungen"
     },
     "observations": {
       "page_title": "Beobachtungen",
@@ -3086,6 +3123,52 @@
       "empty": "Noch keine Plattformen registriert.",
       "client_id_label": "Client",
       "deployments_label": "Bereitstellungen"
+    }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "Diese Woche",
+      "full_term": "Ganzes Halbjahr",
+      "school_calendar": "Schulkalender"
+    },
+    "school_calendar": {
+      "title": "Schulkalender",
+      "description": "Tragen Sie {name}s Halbjahres- und Ferientermine ein. AIVO pausiert die Schulsynchronisation in den Ferien und bietet Ferienvorbereitung; Lernpläne nutzen diese Daten.",
+      "academic_year": "Schuljahr",
+      "terms": "Halbjahre",
+      "term_n": "Halbjahr {n}",
+      "term_title_placeholder": "Titel (optional)",
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "remove": "Entfernen",
+      "add_term": "Halbjahr hinzufügen",
+      "breaks": "Ferien & Feiertage",
+      "breaks_hint": "Feiertage liegen innerhalb der Halbjahre; markieren Sie die großen Ferien als Sommer, damit AIVO auf die nächste Klassenstufe vorbereitet.",
+      "break_kind": "Ferienart",
+      "break_name_placeholder": "Name (optional)",
+      "kind_holiday": "Feiertag",
+      "kind_break": "Ferien",
+      "kind_summer": "Sommer",
+      "save": "Kalender speichern",
+      "saving": "Speichern…",
+      "saved": "Gespeichert um {time}",
+      "save_error": "Kalender konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "error_missing_dates": "Jedes Halbjahr und jede Ferienzeit braucht Start- und Enddatum.",
+      "error_end_before_start": "Ein Enddatum liegt vor dem Startdatum.",
+      "error_terms_overlap": "Halbjahre überschneiden sich — ein Datum kann nur zu einem Halbjahr gehören.",
+      "summer_bridge_title": "Sommerbrücke",
+      "summer_bridge_hint": "In als Sommer markierten Ferien wiederholt AIVO die Fähigkeiten dieses Jahres und gibt eine Vorschau auf die ersten Einheiten der nächsten Klassenstufe (aus dem offiziellen Lehrplan), damit {name} vorbereitet startet.",
+      "summer_bridge_toggle": "{name} im Sommer auf die nächste Klassenstufe vorbereiten",
+      "summer_bridge_error": "Die Sommerbrücke konnte nicht aktualisiert werden. Bitte erneut versuchen."
+    },
+    "term_syllabus": {
+      "plan_start": "Planbeginn",
+      "generate_plan": "Lernplan erzeugen",
+      "generating": "Wird erzeugt…",
+      "generate_error": "Lernplan konnte nicht erzeugt werden. Bitte erneut versuchen.",
+      "plan_ready": "Plan fertig — {weeks} Wochen ({instruction} Unterricht), ferienbewusst.",
+      "week_kind_break": "Schulferien",
+      "week_kind_holiday_prep": "Ferienvorbereitung"
     }
   }
 }

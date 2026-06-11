@@ -157,3 +157,64 @@ describe("brainPacingFocusSafe", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe("summerBridgeToFocus (Wave D, G6)", () => {
+  const BRIDGE = {
+    review_topics: ["Round to 100"],
+    review_standards: ["3.NBT.A.1"],
+    review_vocabulary: ["round"],
+    preview_topics: ["Multi-digit place value", "Comparing large numbers"],
+    preview_standards: ["CCSS.Math.Content.4.NBT.A.1"],
+    preview_vocabulary: ["digit"],
+    next_grade_band: "4",
+    next_unit_title: "Grade 4 place value",
+  };
+
+  it("builds a next-grade readiness focus tagged summer_bridge", async () => {
+    const mod = await load();
+    const focus = mod.summerBridgeToFocus(BRIDGE, BREAK_WEEK, "math");
+    expect(focus).not.toBeNull();
+    expect(focus!.mode).toBe("summer_bridge");
+    expect(focus!.title).toBe("Summer bridge: get ready for Grade 4");
+    // Review first (closing grade warm-up), then the next-grade preview.
+    expect(focus!.topics).toEqual([
+      "Round to 100",
+      "Multi-digit place value",
+      "Comparing large numbers",
+    ]);
+    expect(focus!.standards).toEqual(["3.NBT.A.1", "CCSS.Math.Content.4.NBT.A.1"]);
+    expect(focus!.summary).toMatch(/summer/i);
+    expect(focus!.summary).toContain("Grade 4");
+  });
+
+  it("returns null without a next-grade preview (caller falls back to holiday prep)", async () => {
+    const mod = await load();
+    expect(mod.summerBridgeToFocus(null, BREAK_WEEK, "math")).toBeNull();
+    expect(
+      mod.summerBridgeToFocus(
+        { ...BRIDGE, preview_topics: [] },
+        BREAK_WEEK,
+        "math",
+      ),
+    ).toBeNull();
+  });
+
+  it("wins over holidayPrep for an opted-in summer break in brainPacingFocusSafe", async () => {
+    const mod = await load();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            current: BREAK_WEEK,
+            holidayPrep: HOLIDAY_PREP,
+            summerBridge: BRIDGE,
+          }),
+          { status: 200 },
+        ),
+      ) as unknown as typeof fetch,
+    );
+    const focus = await mod.brainPacingFocusSafe("lrn-1", "math");
+    expect(focus?.mode).toBe("summer_bridge");
+  });
+});

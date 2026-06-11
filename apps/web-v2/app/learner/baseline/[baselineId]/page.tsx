@@ -236,6 +236,9 @@ export default async function BaselineRunnerPage({
         attempts,
         learner,
         calibration,
+        // Wave C (G1): items carry the subject SLUG so the service finalizer
+        // splits per-subject θ with canonicalisable keys.
+        subjectSlugById: new Map(subjects.map((s) => [s.id, s.slug])),
         client: makeHttpStreamClient(streamToken, serverEnv.ASSESSMENT_SVC_URL),
         persistSessionId: (sessionId) =>
           setBaselineAdaptiveSessionId(baseline.id, session.tenantId, sessionId),

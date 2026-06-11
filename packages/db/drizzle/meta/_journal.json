@@ -687,6 +687,48 @@
       "when": 1786060900000,
       "tag": "0094_admin_audit_actor_fk",
       "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1786061000000,
+      "tag": "0100_learner_profiles_subject_thetas",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1786061100000,
+      "tag": "0101_district_settings_approval_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1786061200000,
+      "tag": "0102_pacing_summer_bridge_opt_in",
+      "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1786061300000,
+      "tag": "0103_tutor_agent_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1786061400000,
+      "tag": "0104_tutor_session_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1786061500000,
+      "tag": "0105_tutor_memories",
+      "breakpoints": true
     }
   ]
 }

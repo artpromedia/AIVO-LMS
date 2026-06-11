@@ -4,6 +4,7 @@ export {
   type SessionSnapshot,
   type AnswerRecord,
 } from "./SessionMachine.js";
+export type { AgentTransitionDecision } from "./SessionMachine.js";
 export { useSessionFlow, type UseSessionFlowResult } from "./useSessionFlow.js";
 export {
   useSensoryAdapter,

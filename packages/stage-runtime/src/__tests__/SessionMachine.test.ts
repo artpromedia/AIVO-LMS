@@ -191,3 +191,114 @@ describe("SessionMachine", () => {
     expect(machine.getState().phase).toBe("celebration");
   });
 });
+
+// ── Wave E (S8): agent transition guard ─────────────────────────────────────
+
+describe("proposeTransition (agent guard)", () => {
+  function machineAt(level: TutorSession["functioningLevel"] = "STANDARD") {
+    const m = new SessionMachine({
+      learnerId: "l1",
+      functioningLevel: level,
+      beats: makeBeats(),
+      initialPhase: "core",
+    });
+    return m;
+  }
+
+  it("accepts the legal vocabulary with the right effects", () => {
+    const m = machineAt();
+    expect(m.proposeTransition({ kind: "advance" })).toEqual({
+      accepted: true,
+      effect: "advance",
+    });
+    expect(m.proposeTransition({ kind: "remediate" })).toEqual({
+      accepted: true,
+      effect: "insert_beat",
+    });
+    expect(m.proposeTransition({ kind: "say" })).toEqual({
+      accepted: true,
+      effect: "non_structural",
+    });
+    expect(m.proposeTransition({ kind: "end_early" })).toEqual({
+      accepted: true,
+      effect: "end",
+    });
+  });
+
+  it("rejects unknown kinds with a deterministic alternative", () => {
+    const m = machineAt();
+    const decision = m.proposeTransition({ kind: "format_disk" });
+    expect(decision.accepted).toBe(false);
+    if (!decision.accepted) {
+      expect(decision.reason).toContain("unknown_action");
+      expect(decision.deterministicNext).toBe("advance");
+    }
+  });
+
+  it("enforces the free-text floor: say is rejected at LOW_VERBAL and below", () => {
+    for (const level of ["LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"] as const) {
+      const decision = machineAt(level).proposeTransition({ kind: "say" });
+      expect(decision.accepted).toBe(false);
+      if (!decision.accepted) expect(decision.reason).toBe("say_below_floor");
+    }
+    expect(machineAt("STANDARD").proposeTransition({ kind: "say" }).accepted).toBe(true);
+  });
+
+  it("locks structural inserts during celebration and everything after complete", () => {
+    const m = new SessionMachine({
+      learnerId: "l1",
+      functioningLevel: "STANDARD",
+      beats: makeBeats(),
+      initialPhase: "celebration",
+    });
+    const decision = m.proposeTransition({ kind: "remediate" });
+    expect(decision.accepted).toBe(false);
+    if (!decision.accepted) expect(decision.reason).toBe("celebration_locked");
+
+    m.endEarly("agent stop");
+    expect(m.isComplete()).toBe(true);
+    expect(m.endedEarlyReason).toBe("agent stop");
+    const after = m.proposeTransition({ kind: "advance" });
+    expect(after.accepted).toBe(false);
+    if (!after.accepted) expect(after.reason).toBe("session_complete");
+  });
+
+  it("insertBeat splices a remediation beat after the current one", () => {
+    const m = machineAt();
+    const before = m.getState().totalBeats;
+    m.insertBeat({
+      id: "agent-remediate-1",
+      type: "narration",
+      tutorState: "speaking",
+      narration: "Let's look at that one again together.",
+    } as never);
+    const state = m.getState();
+    expect(state.totalBeats).toBe(before + 1);
+    expect(state.beats[state.currentBeatIndex + 1]!.id).toBe("agent-remediate-1");
+  });
+
+  it("fuzz: 300 random/illegal proposals never mutate the machine", () => {
+    const m = machineAt();
+    const snapshot = JSON.stringify(m.getState());
+    const kinds = [
+      "advance", "remediate", "say", "offer_break", "switch_modality",
+      "insert_scaffold", "present_surface", "end_early",
+      "DROP TABLE", "", "noop", "advance ", "SAY", "🎉",
+    ];
+    let seed = 1234567;
+    const rand = () => {
+      seed = (seed * 1103515245 + 12345) % 2 ** 31;
+      return seed / 2 ** 31;
+    };
+    for (let i = 0; i < 300; i++) {
+      const kind = kinds[Math.floor(rand() * kinds.length)]!;
+      const decision = m.proposeTransition({ kind });
+      // The guard itself NEVER mutates — accepted effects are applied by
+      // the caller; rejected ones carry a deterministic alternative.
+      if (!decision.accepted) {
+        expect(decision.deterministicNext).toBe("advance");
+      }
+    }
+    expect(JSON.stringify(m.getState())).toBe(snapshot);
+  });
+});

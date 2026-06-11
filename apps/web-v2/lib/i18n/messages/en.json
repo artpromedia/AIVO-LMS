@@ -499,7 +499,10 @@
       "back_to_learner": "Back to learner",
       "restart_baseline": "Restart baseline",
       "in_set": "In set",
-      "preview": "Preview"
+      "preview": "Preview",
+      "provenance_child_specific": "Personalized by AI for your child",
+      "provenance_cohort_bank": "AI question bank — matched to grade & profile",
+      "provenance_generic": "Calm starter set"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "No generic quiz",
@@ -601,7 +604,8 @@
       "worked_on": "Worked on",
       "went_well": "Went well",
       "needed_help": "Needed help",
-      "up_next": "Up next"
+      "up_next": "Up next",
+      "tutor_note": "A note from the tutor"
     },
     "learner_milestones": {
       "title": "Milestones",
@@ -912,6 +916,18 @@
       "status_declined": "Declined — nothing changes.",
       "status_failed": "Approved, but applying failed — our team has been notified.",
       "history": "Recent decisions ({count})"
+    },
+    "tutor_memories": {
+      "title": "What your tutor remembers",
+      "description": "Small notes the AI tutors keep to make future sessions kinder and more effective. You can delete any of them, and each one expires automatically after 180 days.",
+      "empty": "Nothing remembered yet. Notes will appear here when a tutor saves one.",
+      "kind_strategy_preference": "What helps",
+      "kind_interest": "Interest",
+      "kind_trigger": "Approach gently",
+      "kind_win": "A win",
+      "expires": "Expires {date}",
+      "delete": "Delete",
+      "delete_label": "Delete this memory"
     }
   },
   "brain_clone": {
@@ -1478,7 +1494,26 @@
       "next": "Next",
       "saving": "Saving…",
       "done": "I'm done",
-      "complete_error": "We couldn't save this lesson. Please try the 'I'm done' button again."
+      "complete_error": "We couldn't save this lesson. Please try the 'I'm done' button again.",
+      "summer_bridge": "☀️ Summer bridge · getting ready for next grade",
+      "tutor_panel_label": "{name} tutor panel",
+      "tutor_panel_watching": "{name} is learning with you",
+      "tutor_panel_thinking": "Thinking about your answer…",
+      "tutor_panel_idle": "I'm here if you need me.",
+      "tutor_panel_break_offer": "Want to take a short break?",
+      "tutor_panel_break_yes": "Yes, break time",
+      "tutor_panel_break_no": "Keep going",
+      "tutor_panel_end_early": "You worked hard today. We can stop here.",
+      "tutor_panel_finish_now": "Finish lesson",
+      "agent_scaffold_prefix": "Tip from your tutor:",
+      "agent_remediation_intro": "Let's look at this again together: {focus}",
+      "agent_remediation_worked": "Let's look at this again together: {focus} Here is a worked example — {prompt} {explanation}",
+      "agent_remediation_msg": "I added a quick review for you — it's the next step.",
+      "agent_modality_visual": "Let's try seeing it with a picture in mind.",
+      "agent_modality_auditory": "Try reading it out loud — hearing it can help.",
+      "agent_modality_kinesthetic": "Try counting it out with your fingers or objects.",
+      "agent_modality_reading": "Let's read it slowly, one part at a time.",
+      "agent_new_surface": "Let's try the same question a different way."
     },
     "baseline_runner": {
       "exit_proctor_view": "Exit proctor view",
@@ -2752,7 +2787,8 @@
       "no_lessons_started": "No lessons started yet.",
       "skill_gaps": "Skill gaps",
       "no_notable_gaps": "No notable gaps yet — keep going.",
-      "accommodations_teacher_summary": "Accommodations (teacher summary)"
+      "accommodations_teacher_summary": "Accommodations (teacher summary)",
+      "pending_recommendations": "Pending recommendations"
     },
     "learner_iep_draft": {
       "page_title": "IEP goal draft",
@@ -2928,7 +2964,8 @@
       "no_learners_yet": "No learners yet",
       "primary_language": "Primary language",
       "reading_comfort": "Reading comfort",
-      "math_comfort": "Math comfort"
+      "math_comfort": "Math comfort",
+      "pending_recommendations": "Pending recommendations"
     },
     "observations": {
       "page_title": "Observations",
@@ -3086,6 +3123,52 @@
       "empty": "No platforms registered yet.",
       "client_id_label": "client",
       "deployments_label": "Deployments"
+    }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "This week",
+      "full_term": "Full term",
+      "school_calendar": "School calendar"
+    },
+    "school_calendar": {
+      "title": "School calendar",
+      "description": "Enter {name}'s term dates and breaks. AIVO pauses school-sync over breaks and serves holiday-prep instead, and pacing plans lay the syllabus onto these dates.",
+      "academic_year": "Academic year",
+      "terms": "Terms",
+      "term_n": "Term {n}",
+      "term_title_placeholder": "Title (optional)",
+      "start_date": "Start date",
+      "end_date": "End date",
+      "remove": "Remove",
+      "add_term": "Add term",
+      "breaks": "Breaks & holidays",
+      "breaks_hint": "Holidays sit inside terms; mark the long summer break as Summer so AIVO can prepare next-grade readiness.",
+      "break_kind": "Break kind",
+      "break_name_placeholder": "Name (optional)",
+      "kind_holiday": "Holiday",
+      "kind_break": "Break",
+      "kind_summer": "Summer",
+      "save": "Save calendar",
+      "saving": "Saving…",
+      "saved": "Saved at {time}",
+      "save_error": "Could not save the calendar. Please try again.",
+      "error_missing_dates": "Every term and break needs a start and end date.",
+      "error_end_before_start": "An end date is before its start date.",
+      "error_terms_overlap": "Terms overlap — a date can belong to only one term.",
+      "summer_bridge_title": "Summer bridge",
+      "summer_bridge_hint": "During a break marked Summer, AIVO reviews this year's skills and previews next grade's first units (from the official curriculum) so {name} starts the new year ready.",
+      "summer_bridge_toggle": "Prepare {name} for next grade over the summer",
+      "summer_bridge_error": "Could not update the summer bridge setting. Please try again."
+    },
+    "term_syllabus": {
+      "plan_start": "Plan start",
+      "generate_plan": "Generate pacing plan",
+      "generating": "Generating…",
+      "generate_error": "Could not generate the pacing plan. Please try again.",
+      "plan_ready": "Plan ready — {weeks} weeks ({instruction} instructional), break-aware.",
+      "week_kind_break": "School break",
+      "week_kind_holiday_prep": "Holiday prep"
     }
   }
 }

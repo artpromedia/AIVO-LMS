@@ -276,3 +276,12 @@ export function applyOutcome(
 ): MasteryRecord {
   return schedule({ current, outcome, now }).next;
 }
+
+// Wave E (S8): agent degradation ladder.
+export {
+  AgentLadder,
+  DEFAULT_LADDER_CONFIG,
+  nextRungDown,
+  p95,
+} from "./agent-ladder.js";
+export type { AgentRung, LadderConfig, LadderSnapshot, RungDrop } from "./agent-ladder.js";

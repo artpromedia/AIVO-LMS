@@ -45,22 +45,45 @@ export type PersistOutcome =
   | { ok: true; details?: Record<string, unknown> }
   | { ok: false; reason: string };
 
+/** Canonical subject key carried on a per-subject proposal (Wave C, G1). */
+export function proposedSubjectKey(proposed: unknown): string | null {
+  if (proposed && typeof proposed === "object" && "subjectKey" in proposed) {
+    const key = (proposed as { subjectKey: unknown }).subjectKey;
+    return typeof key === "string" && key.length > 0 ? key : null;
+  }
+  return null;
+}
+
 /**
  * Resolve the target delivery band from a recommendation's proposed value:
  *   - `{ to: "4" }` (upward candidates) → that band;
  *   - `"lower"` (legacy support candidate) → one band below current;
  *   - a literal band string → that band.
- * Clamped to [K, grade_band] when the enrolled band is known.
+ * "Current" is the SUBJECT's own band when the proposal carries a
+ * subjectKey and the alignment has one (Wave C, G1), else the global
+ * delivery level. Clamped to [K, grade_band] when the enrolled band is
+ * known.
  */
 export function resolveDeliveryLevelTarget(
   proposed: unknown,
   currentAlignment: Record<string, unknown>,
 ): GradeBand | null {
-  const currentBand = normalizeGradeBand(
-    typeof currentAlignment.delivery_level === "string"
-      ? currentAlignment.delivery_level
-      : null,
-  );
+  const subjectKey = proposedSubjectKey(proposed);
+  const levels =
+    currentAlignment.delivery_levels && typeof currentAlignment.delivery_levels === "object"
+      ? (currentAlignment.delivery_levels as Record<string, unknown>)
+      : null;
+  const subjectBand =
+    subjectKey && levels && typeof levels[subjectKey] === "string"
+      ? normalizeGradeBand(levels[subjectKey] as string)
+      : null;
+  const currentBand =
+    subjectBand ??
+    normalizeGradeBand(
+      typeof currentAlignment.delivery_level === "string"
+        ? currentAlignment.delivery_level
+        : null,
+    );
   const gradeBand = normalizeGradeBand(
     typeof currentAlignment.grade_band === "string" ? currentAlignment.grade_band : null,
   );
@@ -103,13 +126,47 @@ export async function persistAppliedRecommendation(
         if (!target) {
           return { ok: false, reason: "delivery_level_target_unresolvable" };
         }
-        const nextAlignment = {
-          ...alignment,
-          delivery_level: target,
-          delivery_level_source: "parent_approved_recommendation",
-          delivery_level_recommendation_id: recommendation.id,
-          delivery_level_updated_at: new Date().toISOString(),
-        };
+        const subjectKey = proposedSubjectKey(proposed);
+        const stamp = new Date().toISOString();
+        let nextAlignment: Record<string, unknown>;
+        let brainProfilePatch: Record<string, unknown>;
+        if (subjectKey) {
+          // Wave C (G1): a subject-scoped approval raises ONLY that
+          // subject's band. The legacy global `delivery_level` is left
+          // untouched — other subjects keep resolving through it.
+          const existingLevels =
+            alignment.delivery_levels && typeof alignment.delivery_levels === "object"
+              ? (alignment.delivery_levels as Record<string, unknown>)
+              : {};
+          const existingSources =
+            alignment.delivery_levels_source_by_subject &&
+            typeof alignment.delivery_levels_source_by_subject === "object"
+              ? (alignment.delivery_levels_source_by_subject as Record<string, unknown>)
+              : {};
+          const mergedLevels = { ...existingLevels, [subjectKey]: target };
+          nextAlignment = {
+            ...alignment,
+            delivery_levels: mergedLevels,
+            delivery_levels_source_by_subject: {
+              ...existingSources,
+              [subjectKey]: "parent_approved_recommendation",
+            },
+            delivery_levels_recommendation_id: recommendation.id,
+            delivery_levels_updated_at: stamp,
+          };
+          // jsonb `||` replaces top-level keys, so hand it the FULL merged
+          // map — a single-subject patch would wipe the other subjects.
+          brainProfilePatch = { deliveryLevels: mergedLevels };
+        } else {
+          nextAlignment = {
+            ...alignment,
+            delivery_level: target,
+            delivery_level_source: "parent_approved_recommendation",
+            delivery_level_recommendation_id: recommendation.id,
+            delivery_level_updated_at: stamp,
+          };
+          brainProfilePatch = { deliveryLevel: target };
+        }
         await db
           .update(learners)
           .set({ curriculumAlignment: nextAlignment, updatedAt: new Date() })
@@ -118,7 +175,7 @@ export async function persistAppliedRecommendation(
           .update(brainStates)
           .set({
             curriculumAlignment: nextAlignment,
-            functioningLevelProfile: sql`COALESCE(${brainStates.functioningLevelProfile}, '{}'::jsonb) || ${JSON.stringify({ deliveryLevel: target })}::jsonb`,
+            functioningLevelProfile: sql`COALESCE(${brainStates.functioningLevelProfile}, '{}'::jsonb) || ${JSON.stringify(brainProfilePatch)}::jsonb`,
             updatedAt: new Date(),
           })
           .where(
@@ -133,10 +190,11 @@ export async function persistAppliedRecommendation(
             learnerId: recommendation.learnerId,
             recommendationId: recommendation.id,
             deliveryLevel: target,
+            subjectKey: subjectKey ?? null,
           },
           "[apply-persistence] delivery level persisted to learner + brain state",
         );
-        return { ok: true, details: { deliveryLevel: target } };
+        return { ok: true, details: { deliveryLevel: target, subjectKey: subjectKey ?? null } };
       }
       case "rebaseline_request": {
         const result = await db

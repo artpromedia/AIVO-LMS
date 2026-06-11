@@ -5,6 +5,7 @@ export * from "./safe-logger.js";
 export * from "./learning-traces.js";
 export * from "./llm-traces.js";
 export * from "./subject-brain-metrics.js";
+export * from "./agent-metrics.js";
 export * from "./health-check.js";
 export * from "./role-context.js";
 

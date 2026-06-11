@@ -306,7 +306,10 @@
       "back_to_learner": "学習者に戻る",
       "restart_baseline": "ベースラインを再開始",
       "in_set": "セット内",
-      "preview": "プレビュー"
+      "preview": "プレビュー",
+      "provenance_child_specific": "お子さま向けにAIがパーソナライズ",
+      "provenance_cohort_bank": "AI問題バンク — 学年とプロフィールに対応",
+      "provenance_generic": "落ち着いたスターターセット"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "汎用クイズなし",
@@ -408,7 +411,8 @@
       "worked_on": "取り組んだ内容",
       "went_well": "うまくいったこと",
       "needed_help": "助けが必要だったこと",
-      "up_next": "次の内容"
+      "up_next": "次の内容",
+      "tutor_note": "チューターからのメモ"
     },
     "learner_milestones": {
       "title": "マイルストーン",
@@ -719,6 +723,18 @@
       "status_declined": "却下されました — 変更はありません。",
       "status_failed": "承認されましたが適用に失敗しました — チームに通知済みです。",
       "history": "最近の決定 ({count})"
+    },
+    "tutor_memories": {
+      "title": "チューターが覚えていること",
+      "description": "次のセッションをより優しく効果的にするために、AIチューターが保存する小さなメモです。いつでも削除でき、各メモは180日後に自動的に期限切れになります。",
+      "empty": "まだ何も覚えていません。チューターがメモを保存するとここに表示されます。",
+      "kind_strategy_preference": "役立つこと",
+      "kind_interest": "興味",
+      "kind_trigger": "やさしく接する",
+      "kind_win": "できたこと",
+      "expires": "{date} に期限切れ",
+      "delete": "削除",
+      "delete_label": "このメモを削除"
     }
   },
   "brain_clone": {
@@ -1285,7 +1301,26 @@
       "next": "次へ",
       "saving": "保存中…",
       "done": "できた",
-      "complete_error": "このレッスンを保存できませんでした。「できた」ボタンをもう一度試してください。"
+      "complete_error": "このレッスンを保存できませんでした。「できた」ボタンをもう一度試してください。",
+      "summer_bridge": "☀️ サマーブリッジ · 次学年の準備",
+      "tutor_panel_label": "{name} チューターパネル",
+      "tutor_panel_watching": "{name} がいっしょに学んでいます",
+      "tutor_panel_thinking": "答えについて考えています…",
+      "tutor_panel_idle": "必要なときはここにいるよ。",
+      "tutor_panel_break_offer": "少し休憩しますか？",
+      "tutor_panel_break_yes": "はい、休憩する",
+      "tutor_panel_break_no": "続ける",
+      "tutor_panel_end_early": "今日はよくがんばったね。ここで終わりにしてもいいよ。",
+      "tutor_panel_finish_now": "レッスンを終える",
+      "agent_scaffold_prefix": "チューターからのヒント：",
+      "agent_remediation_intro": "もう一度いっしょに見てみよう：{focus}",
+      "agent_remediation_worked": "もう一度いっしょに見てみよう：{focus} 解き方の例だよ — {prompt} {explanation}",
+      "agent_remediation_msg": "ちょっとした復習を追加したよ — 次のステップだよ。",
+      "agent_modality_visual": "絵を思いうかべて考えてみよう。",
+      "agent_modality_auditory": "声に出して読んでみよう — 聞くと分かりやすいよ。",
+      "agent_modality_kinesthetic": "指や物を使って数えてみよう。",
+      "agent_modality_reading": "ゆっくり、少しずつ読んでみよう。",
+      "agent_new_surface": "同じ問題を別のやり方で試してみよう。"
     },
     "baseline_runner": {
       "exit_proctor_view": "監督ビューを終了",
@@ -2752,7 +2787,8 @@
       "no_lessons_started": "まだレッスンが開始されていません。",
       "skill_gaps": "スキルのギャップ",
       "no_notable_gaps": "目立ったギャップはまだありません — このまま続けましょう。",
-      "accommodations_teacher_summary": "配慮事項（教師向け概要）"
+      "accommodations_teacher_summary": "配慮事項（教師向け概要）",
+      "pending_recommendations": "承認待ちの推奨"
     },
     "learner_iep_draft": {
       "page_title": "IEP 目標草案",
@@ -2928,7 +2964,8 @@
       "no_learners_yet": "まだ学習者がいません",
       "primary_language": "主要言語",
       "reading_comfort": "読解能力",
-      "math_comfort": "算数・数学の能力"
+      "math_comfort": "算数・数学の能力",
+      "pending_recommendations": "承認待ちの推奨"
     },
     "observations": {
       "page_title": "観察記録",
@@ -3086,6 +3123,52 @@
       "empty": "まだプラットフォームが登録されていません。",
       "client_id_label": "クライアント",
       "deployments_label": "デプロイメント"
+    }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "今週",
+      "full_term": "学期全体",
+      "school_calendar": "学校カレンダー"
+    },
+    "school_calendar": {
+      "title": "学校カレンダー",
+      "description": "{name}さんの学期と休暇の日程を入力してください。休暇中は学校同期を一時停止して休暇準備を提供し、ペーシング計画はこの日程に沿って作成されます。",
+      "academic_year": "学年度",
+      "terms": "学期",
+      "term_n": "学期 {n}",
+      "term_title_placeholder": "タイトル（任意）",
+      "start_date": "開始日",
+      "end_date": "終了日",
+      "remove": "削除",
+      "add_term": "学期を追加",
+      "breaks": "休暇・祝日",
+      "breaks_hint": "祝日は学期内に置きます。長期休暇は「夏休み」にすると、次学年への準備を行います。",
+      "break_kind": "休暇の種類",
+      "break_name_placeholder": "名前（任意）",
+      "kind_holiday": "祝日",
+      "kind_break": "休暇",
+      "kind_summer": "夏休み",
+      "save": "カレンダーを保存",
+      "saving": "保存中…",
+      "saved": "{time} に保存しました",
+      "save_error": "カレンダーを保存できませんでした。もう一度お試しください。",
+      "error_missing_dates": "各学期と休暇には開始日と終了日が必要です。",
+      "error_end_before_start": "終了日が開始日より前になっています。",
+      "error_terms_overlap": "学期が重なっています。1つの日付は1つの学期にのみ属します。",
+      "summer_bridge_title": "サマーブリッジ",
+      "summer_bridge_hint": "「夏休み」と設定した休暇中、AIVOは今年度のスキルを復習し、次学年の最初の単元（公式カリキュラム）を先取りして、{name}さんが準備万端で新年度を迎えられるようにします。",
+      "summer_bridge_toggle": "夏の間に{name}さんを次学年に向けて準備する",
+      "summer_bridge_error": "サマーブリッジ設定を更新できませんでした。もう一度お試しください。"
+    },
+    "term_syllabus": {
+      "plan_start": "計画開始日",
+      "generate_plan": "ペーシング計画を作成",
+      "generating": "作成中…",
+      "generate_error": "ペーシング計画を作成できませんでした。もう一度お試しください。",
+      "plan_ready": "計画完成 — 全{weeks}週（授業{instruction}週）、休暇対応。",
+      "week_kind_break": "学校休暇",
+      "week_kind_holiday_prep": "休暇準備"
     }
   }
 }

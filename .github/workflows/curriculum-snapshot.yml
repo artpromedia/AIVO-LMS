@@ -4,7 +4,10 @@ on:
     paths:
       - "packages/content-pack/data/**"
       - "services/curriculum-svc/scripts/build_snapshot.py"
+      - "services/curriculum-svc/scripts/import_ccss.py"
       - "services/curriculum-svc/src/curriculum_svc/data/skill_graphs.json"
+      - "scripts/catalogue-coverage-check.mjs"
+      - "docs/quality/catalogue-coverage*"
 jobs:
   drift:
     runs-on: ubuntu-latest
@@ -13,6 +16,13 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-      # build_snapshot.py is pure stdlib — no pip install needed.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      # Both scripts are pure stdlib — no pip/pnpm install needed.
+      - name: Verify the CCSS import matches its vendored sources (Wave D)
+        run: python3 services/curriculum-svc/scripts/import_ccss.py --check
       - name: Verify the curriculum snapshot matches its source catalogues
         run: python3 services/curriculum-svc/scripts/build_snapshot.py --check
+      - name: Verify catalogue coverage (floor + ratchet)
+        run: node scripts/catalogue-coverage-check.mjs

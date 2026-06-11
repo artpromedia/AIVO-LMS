@@ -24,6 +24,7 @@ import type {
 import { GeneratedLessonPlanSchema, type GeneratedLessonPlanInput } from "@/lib/validators/lesson";
 import { generateDeterministicLessonPlan } from "@/lib/learner/lesson-plan";
 import { logger } from "@/lib/observability/logger";
+import { emitDegradation } from "@/lib/observability/degradation";
 
 export const LESSON_PLAN_SCHEMA_VERSION = 1;
 export const LESSON_PLAN_MAX_ATTEMPTS = 3;
@@ -139,6 +140,16 @@ export async function generateLessonPlanWithRetry(
     { provider: provider.name, lastError: String(lastError) },
     "[ai/tutor] provider exhausted retries — using deterministic fallback",
   );
+  // Only a degradation when a REAL provider failed: the mock provider
+  // exhausting retries is impossible-by-construction (it returns the
+  // deterministic plan), and dev runs on mock by design.
+  if (provider.name === "ai") {
+    emitDegradation("lesson_fallback_after_retries", {
+      reason: "retries_exhausted",
+      provider: provider.model,
+      message: `lesson provider ${provider.model} failed ${LESSON_PLAN_MAX_ATTEMPTS} attempts: ${String(lastError).slice(0, 300)}`,
+    });
+  }
   const validated = GeneratedLessonPlanSchema.parse(fallback);
   return {
     plan: validated,

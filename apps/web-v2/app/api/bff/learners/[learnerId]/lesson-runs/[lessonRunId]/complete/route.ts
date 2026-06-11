@@ -5,7 +5,15 @@ import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guar
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import { z } from "zod";
-import { completeLessonRun, deriveOutcomeFromInteractions, getLessonRun } from "@/lib/db/repos";
+import {
+  attachTutorNoteToParentSummary,
+  completeLessonRun,
+  deriveOutcomeFromInteractions,
+  getLearner,
+  getLessonRun,
+} from "@/lib/db/repos";
+import { tutorAgenticModeEnabled } from "@/lib/feature-flags";
+import { isLiveTutorAgent, tutorAgentCloseSafe } from "@/lib/bff/tutor-agent";
 
 /**
  * Post-architect-review: the client is no longer trusted to report check
@@ -13,6 +21,10 @@ import { completeLessonRun, deriveOutcomeFromInteractions, getLessonRun } from "
  * outcome from server-recorded LessonInteraction rows and only accepts the
  * UX-only `abandoned` flag from the client. Submitting any other key in
  * `outcome` fails validation.
+ *
+ * Wave E (S11): `agentSessionId` (when the lesson ran with an observing
+ * agent) lets the BFF close the agent session server-side and weave the
+ * agent's quality-gated parent note into the run's summary.
  */
 const BodySchema = z
   .object({
@@ -20,6 +32,7 @@ const BodySchema = z
       .object({ abandoned: z.boolean().default(false) })
       .strict()
       .optional(),
+    agentSessionId: z.string().min(1).max(64).optional(),
   })
   .strict()
   .optional();
@@ -59,6 +72,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       );
     }
     let abandoned = false;
+    let agentSessionId: string | null = null;
     if (req.headers.get("content-length") && req.headers.get("content-length") !== "0") {
       try {
         const raw = await req.json();
@@ -73,6 +87,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
           );
         }
         abandoned = parsed.data?.outcome?.abandoned ?? false;
+        agentSessionId = parsed.data?.agentSessionId ?? null;
       } catch {
         // No JSON body — that's fine, outcome is fully optional.
       }
@@ -93,6 +108,27 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
           skillId: updated.skillId,
         },
       });
+    }
+    // Wave E (S11): close the agent session and attach the agent's
+    // quality-gated parent note to the run's summary. Best-effort — any
+    // failure leaves the deterministic summary untouched.
+    if (
+      agentSessionId &&
+      !wasAlreadyComplete &&
+      isLiveTutorAgent() &&
+      (await tutorAgenticModeEnabled())
+    ) {
+      const learner = await getLearner(learnerId, session!.tenantId);
+      const closed = await tutorAgentCloseSafe({
+        sessionId: agentSessionId,
+        reason: abandoned ? "abandoned" : "completed",
+        learnerFirstName: learner?.preferredName ?? learner?.firstName ?? undefined,
+        checksCorrect: derivedOutcome?.checksCorrect,
+        checksTotal: derivedOutcome?.checksTotal,
+      });
+      if (closed.parentNote) {
+        await attachTutorNoteToParentSummary(lessonRunId, session!.tenantId, closed.parentNote);
+      }
     }
     return ok({ lessonRun: updated, alreadyCompleted: wasAlreadyComplete }, requestId);
   } catch (e) {

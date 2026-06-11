@@ -22,7 +22,7 @@ import {
   type LearnerInterestProfile,
   type LearnerInterestSignal,
 } from "@aivo/special-interest-engine";
-import { deriveLearningProfile } from "../services/learning-profile.js";
+import { deriveLearningProfile, deriveSubjectThetas } from "../services/learning-profile.js";
 import { applyBaselineDeliveryLevel } from "../services/curriculum-alignment.js";
 import { partitionChapterActivitiesPayload } from "../services/discovery-activity-validator.js";
 import { normalizeBaselineItems } from "../services/baselineSurfaceNormalizer.js";
@@ -427,6 +427,83 @@ async function loadInterestProfile(db: any, learnerId: string) {
   } catch {
     return null;
   }
+}
+
+/**
+ * Wave F (G9 — baseline completeness): server-side enrichment for the
+ * generate-baseline LLM proxy. When the BFF supplies a learner id and
+ * omits an optional input, load it from this service's DB so the flat-LLM
+ * tier fuses the SAME nine sources as the discovery and native paths:
+ * caregiver perspectives, teacher assessment, therapist assessments,
+ * active therapy goals, caregiver observation notes, IEP, interest
+ * profile, district context, and zip code. Any failure is swallowed so
+ * enrichment can never turn a working parent-only baseline into a 5xx.
+ *
+ * Exported for the completeness test (test/baseline-proxy-enrichment) —
+ * the G9 regression was exactly a source silently missing from one tier.
+ */
+export async function enrichBaselineForwardBody(
+  db: any,
+  learnerIdHint: unknown,
+  incoming: Record<string, unknown>,
+  log?: { warn: (obj: object, msg?: string) => void },
+): Promise<Record<string, unknown>> {
+  const forwardBody: Record<string, unknown> = { ...incoming };
+  if (typeof learnerIdHint !== "string" || learnerIdHint.length === 0) {
+    return forwardBody;
+  }
+  try {
+    let [learner] = await db
+      .select()
+      .from(learners)
+      .where(eq(learners.id, learnerIdHint))
+      .limit(1);
+    if (!learner) {
+      [learner] = await db
+        .select()
+        .from(learners)
+        .where(eq(learners.userId, learnerIdHint))
+        .limit(1);
+    }
+    if (learner) {
+      if (forwardBody.caregiver_perspectives == null) {
+        forwardBody.caregiver_perspectives = await loadCaregiverPerspectives(db, learner.id);
+      }
+      if (forwardBody.teacher_assessment == null) {
+        forwardBody.teacher_assessment = await loadTeacherContext(db, learner.id);
+      }
+      if (forwardBody.therapist_assessments == null) {
+        forwardBody.therapist_assessments = await loadTherapistContext(db, learner.id);
+      }
+      if (forwardBody.therapy_goals == null) {
+        forwardBody.therapy_goals = await loadTherapyGoals(db, learner.id);
+      }
+      if (forwardBody.caregiver_observations == null) {
+        forwardBody.caregiver_observations = await loadCaregiverObservations(db, learner.id);
+      }
+      if (forwardBody.iep == null) {
+        forwardBody.iep = await loadIepContext(db, learner.id);
+      }
+      if (forwardBody.interest_profile == null) {
+        forwardBody.interest_profile = await loadInterestProfile(db, learner.id);
+      }
+      if (forwardBody.district == null) {
+        forwardBody.district = buildDistrictContext(learner);
+      }
+      if (forwardBody.zip_code == null) {
+        forwardBody.zip_code = buildZipCode(learner);
+      }
+      if (forwardBody.functioning_level == null) {
+        forwardBody.functioning_level = learner.functioningLevel || "STANDARD";
+      }
+    }
+  } catch (enrichErr: any) {
+    log?.warn(
+      { err: enrichErr?.message, learnerId: learnerIdHint },
+      "[baseline-llm-proxy] context enrichment failed; forwarding caller payload as-is",
+    );
+  }
+  return forwardBody;
 }
 
 export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
@@ -875,12 +952,18 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
         // dashboard will consume going forward.
         // ----------------------------------------------------------------
         let learningProfile: ReturnType<typeof deriveLearningProfile> | null = null;
+        let subjectThetas: Record<string, number> = {};
         try {
           learningProfile = deriveLearningProfile(
             body.chapterResults || [],
             body.responseLatencies || [],
             Array.isArray(body.surfaceSignals) ? body.surfaceSignals : [],
           );
+          // Per-subject θ (Wave C, G1): each Discovery chapter is a subject
+          // domain — split the placement so math and reading land at their
+          // own delivery bands. Empty when chapters are too small to split.
+          subjectThetas = deriveSubjectThetas(body.chapterResults || []);
+          const hasSubjectThetas = Object.keys(subjectThetas).length > 0;
           await db
             .insert(learnerProfiles)
             .values({
@@ -888,6 +971,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
               learnerId: learner.id,
               attemptId: attempt.id,
               thetaPlacement: learningProfile.thetaPlacement,
+              subjectThetas: hasSubjectThetas ? subjectThetas : null,
               modalityFit: learningProfile.modalityFit,
               processingSpeedMs: learningProfile.processingSpeedMs,
               frustrationRate: learningProfile.frustrationRate,
@@ -902,6 +986,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
               set: {
                 attemptId: attempt.id,
                 thetaPlacement: learningProfile.thetaPlacement,
+                ...(hasSubjectThetas ? { subjectThetas } : {}),
                 modalityFit: learningProfile.modalityFit,
                 processingSpeedMs: learningProfile.processingSpeedMs,
                 frustrationRate: learningProfile.frustrationRate,
@@ -931,6 +1016,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
           await applyBaselineDeliveryLevel(db, app.log, {
             learnerId: learner.id,
             theta: learningProfile.thetaPlacement,
+            subjectThetas: Object.keys(subjectThetas).length > 0 ? subjectThetas : null,
           });
           // A completed discovery run satisfies any outstanding rebaseline
           // request (the profile upsert above refreshed the placement).
@@ -1233,6 +1319,9 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             interest_profile: { type: "object", nullable: true },
             caregiver_perspectives: { type: "array", nullable: true },
             teacher_assessment: { type: "object", nullable: true },
+            therapist_assessments: { type: "array", nullable: true },
+            therapy_goals: { type: "array", nullable: true },
+            caregiver_observations: { type: "array", nullable: true },
             zip_code: { type: "string", nullable: true },
           },
         },
@@ -1249,59 +1338,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
           string,
           unknown
         >;
-        const forwardBody: Record<string, unknown> = { ...incoming };
-
-        // Server-side enrichment: when the BFF supplies a learner id and
-        // omits an optional input, load it from this service's DB. Any
-        // failure is swallowed so enrichment can never turn a working
-        // parent-only baseline into a 5xx.
-        if (typeof learnerIdHint === "string" && learnerIdHint.length > 0) {
-          try {
-            let [learner] = await db
-              .select()
-              .from(learners)
-              .where(eq(learners.id, learnerIdHint))
-              .limit(1);
-            if (!learner) {
-              [learner] = await db
-                .select()
-                .from(learners)
-                .where(eq(learners.userId, learnerIdHint))
-                .limit(1);
-            }
-            if (learner) {
-              if (forwardBody.caregiver_perspectives == null) {
-                forwardBody.caregiver_perspectives = await loadCaregiverPerspectives(
-                  db,
-                  learner.id,
-                );
-              }
-              if (forwardBody.teacher_assessment == null) {
-                forwardBody.teacher_assessment = await loadTeacherContext(db, learner.id);
-              }
-              if (forwardBody.iep == null) {
-                forwardBody.iep = await loadIepContext(db, learner.id);
-              }
-              if (forwardBody.interest_profile == null) {
-                forwardBody.interest_profile = await loadInterestProfile(db, learner.id);
-              }
-              if (forwardBody.district == null) {
-                forwardBody.district = buildDistrictContext(learner);
-              }
-              if (forwardBody.zip_code == null) {
-                forwardBody.zip_code = buildZipCode(learner);
-              }
-              if (forwardBody.functioning_level == null) {
-                forwardBody.functioning_level = learner.functioningLevel || "STANDARD";
-              }
-            }
-          } catch (enrichErr: any) {
-            app.log.warn(
-              { err: enrichErr?.message, learnerId: learnerIdHint },
-              "[baseline-llm-proxy] context enrichment failed; forwarding caller payload as-is",
-            );
-          }
-        }
+        const forwardBody = await enrichBaselineForwardBody(db, learnerIdHint, incoming, app.log);
 
         const aiRes = await fetch(`${AI_SVC_URL}/api/ai/generate-baseline`, {
           method: "POST",

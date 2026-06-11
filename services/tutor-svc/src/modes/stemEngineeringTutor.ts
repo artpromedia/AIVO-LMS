@@ -7,7 +7,12 @@
  * leans heavily on physical / virtual building. Persona /
  * subject-strategy: `ADDON_TUTOR_STEM_DESIGN`.
  */
-import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
+import {
+  defineTutor,
+  NO_MEMORY,
+  standardActionPolicy,
+  type TutorDefinition,
+} from "@aivo/tutor-sdk";
 
 export const stemEngineeringTutor: TutorDefinition = defineTutor({
   id: "forge@1.0.0",
@@ -46,6 +51,10 @@ export const stemEngineeringTutor: TutorDefinition = defineTutor({
     "11": "authored",
     "12": "authored",
   },
+  // Wave E (S8): agent loop instruments + per-level action policy.
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context"],
+  actionPolicy: standardActionPolicy(),
+  memoryPolicy: NO_MEMORY,
   policy: {
     requiresConsent: true,
     minAgeYears: 5,

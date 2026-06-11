@@ -12,6 +12,7 @@
  * tamper-evidence, and shipped to mobile clients for offline use.
  */
 import type { GradeBand, Subject } from "@aivo/skill-graphs";
+import type { AgentToolId, TutorActionPolicy, TutorMemoryPolicy } from "./agent-policy.js";
 
 /** Personality styling for a tutor's narration. */
 export interface TutorPersona {
@@ -88,6 +89,20 @@ export interface TutorDefinition {
    * second source of truth for which bands the tutor advertises.
    */
   coverageMatrix?: Partial<Record<GradeBand, TutorCoverageStatus>>;
+  /**
+   * Wave E (S8): tools the agent loop may call for this tutor. Domain
+   * tools may only be declared when their backing service exists —
+   * "agentic" without a callable instrument is a parity-gate failure.
+   */
+  toolset: readonly AgentToolId[];
+  /**
+   * Wave E (S8): allowed agent actions PER functioning level. Must cover
+   * every level in `functioningLevels`; free-text `say` is forbidden at
+   * LOW_VERBAL and below (SDK validator + SessionMachine both enforce).
+   */
+  actionPolicy: TutorActionPolicy;
+  /** Wave E (S8/S12): episodic-memory permissions for this tutor. */
+  memoryPolicy: TutorMemoryPolicy;
   /** Policy gates — checked at session start. */
   policy: TutorPolicyGates;
   /**
@@ -128,7 +143,12 @@ export type TutorDefinitionIssueCode =
   | "policy_consent_required_for_voice"
   | "duplicate_capability"
   | "coverage_matrix_grade_not_declared"
-  | "coverage_matrix_invalid_status";
+  | "coverage_matrix_invalid_status"
+  | "action_policy_missing_level"
+  | "action_policy_unknown_action"
+  | "action_policy_say_below_floor"
+  | "toolset_unknown_tool"
+  | "memory_policy_inconsistent";
 
 export interface TutorDefinitionIssue {
   code: TutorDefinitionIssueCode;

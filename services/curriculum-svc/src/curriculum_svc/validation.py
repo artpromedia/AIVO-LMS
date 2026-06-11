@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Iterable
 
 from curriculum_svc.catalogue import Skill
@@ -43,8 +44,46 @@ def _stems(text: str) -> set[str]:
     return out
 
 
-def _skill_stems(skill: Skill) -> set[str]:
-    return _stems(f"{skill.label} {skill.summary}")
+# Wave D (G3) perf: at catalogue scale (10³ skills) stemming every skill's
+# label+summary on EVERY request dominated /validate. Skills are frozen
+# (hashable) dataclasses from an immutable snapshot, so the stems are
+# memoised process-wide — computed once per skill per process, shared
+# across requests and topics. Returns a frozenset so a caller can't
+# mutate the cached value.
+@lru_cache(maxsize=None)
+def _skill_stems(skill: Skill) -> frozenset[str]:
+    return frozenset(_stems(f"{skill.label} {skill.summary}"))
+
+
+# Official-notation prefixes → canonical catalogue-id prefixes. A syllabus
+# cites "CCSS.MATH.CONTENT.3.NF.A.1"; the catalogue id is
+# "ccss.math.3.nf.a.1" (import_ccss.py). Normalising here means the exact-
+# match rule below accepts the official code, the canonical id, or the
+# skill's recorded source notation — and still NEVER fuzzy-matches.
+_STANDARD_PREFIX_MAP = (
+    ("ccss.math.content.", "ccss.math."),
+    ("ccss.ela-literacy.", "ccss.ela."),
+)
+
+
+def normalize_standard_code(raw: str) -> str:
+    """Lower-case an inbound standard code and map official notation
+    prefixes onto the canonical catalogue-id scheme."""
+    code = (raw or "").strip().lower()
+    for prefix, canonical in _STANDARD_PREFIX_MAP:
+        if code.startswith(prefix):
+            return canonical + code[len(prefix):]
+    return code
+
+
+def _approved_code_index(approved_skills: list[Skill]) -> dict[str, str]:
+    """code variant (canonical id / lowercased source notation) → skill id."""
+    index: dict[str, str] = {}
+    for skill in approved_skills:
+        index[skill.id] = skill.id
+        if skill.source:
+            index[normalize_standard_code(skill.source)] = skill.id
+    return index
 
 
 @dataclass(frozen=True)
@@ -101,19 +140,22 @@ def validate_topics_and_standards(
     max_suggestions: int = 3,
 ) -> ValidationResult:
     """Classify topics/standards against the jurisdiction's approved skills."""
-    approved_ids = {s.id for s in approved_skills}
+    code_index = _approved_code_index(approved_skills)
     matched: list[MatchedItem] = []
     unmatched: list[UnmatchedItem] = []
     suggestions: list[Suggestion] = []
 
-    # Standards: an exact catalogue-id match is required (no fuzzy matching —
-    # a standard either belongs to the jurisdiction's packs or it does not).
+    # Standards: an exact match is required (no fuzzy matching — a standard
+    # either belongs to the jurisdiction's packs or it does not). "Exact"
+    # accepts the canonical catalogue id, the official notation recorded on
+    # the skill (e.g. CCSS.MATH.CONTENT.3.NF.A.1), or either in any case.
     for raw in standards:
         code = (raw or "").strip()
         if not code:
             continue
-        if code in approved_ids:
-            matched.append(MatchedItem("standard", code, code))
+        skill_id = code_index.get(code) or code_index.get(normalize_standard_code(code))
+        if skill_id:
+            matched.append(MatchedItem("standard", code, skill_id))
         else:
             unmatched.append(UnmatchedItem("standard", code, "not_in_jurisdiction_packs"))
 

@@ -77,13 +77,16 @@ export type ActiveRunResult = ({ ok: true } & ActiveRunResponse) | Fail;
 
 /**
  * Map the persisted question set into the engine's candidate bank. Pass a
- * calibration override to send the service items at their refined θ.
+ * calibration override to send the service items at their refined θ, and a
+ * subject-slug map so items carry canonicalisable subject keys for the
+ * per-subject placement split (Wave C, G1).
  */
 export function questionsToBank(
   questions: BaselineQuestion[],
   calibration?: Parameters<typeof questionToBaselineItem>[1],
+  subjectSlugById?: Parameters<typeof questionToBaselineItem>[2],
 ): BaselineItem[] {
-  return questions.map((q) => questionToBaselineItem(q, calibration));
+  return questions.map((q) => questionToBaselineItem(q, calibration, subjectSlugById));
 }
 
 export function adaptiveBaselineEndpoint(

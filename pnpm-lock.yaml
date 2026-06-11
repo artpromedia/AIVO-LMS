@@ -398,6 +398,9 @@ importers:
       '@aivo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@aivo/ops-alerts':
+        specifier: workspace:*
+        version: link:../../packages/ops-alerts
       '@aivo/scoring':
         specifier: workspace:*
         version: link:../../packages/scoring
@@ -2532,6 +2535,12 @@ importers:
       '@aivo/special-interest-engine':
         specifier: workspace:*
         version: link:../../packages/special-interest-engine
+      '@aivo/stage-runtime':
+        specifier: workspace:*
+        version: link:../../packages/stage-runtime
+      '@aivo/stage-ui':
+        specifier: workspace:*
+        version: link:../../packages/stage-ui
       '@aivo/tutor-runtime':
         specifier: workspace:*
         version: link:../../packages/tutor-runtime

@@ -44,6 +44,7 @@ describe("resolveEnterpriseFlags", () => {
       responsibleAiGuardrails: false,
       advancedContentGenerators: false,
       selfRegulationHub: false,
+      tutorAgenticMode: false,
     });
   });
 

@@ -1,0 +1,1107 @@
+{
+ "source": "NCES Common Core of Data LEA directory 2022 (via Urban Institute Education Data API, educationdata.urban.org) — top districts by enrollment, regular local school districts (agency_type=1) only.",
+ "year": "2022",
+ "fetchedWith": "scripts/import-districts.mjs",
+ "districts": [
+  {
+   "id": "ca-los-angeles-unified",
+   "leaid": "0622710",
+   "name": "Los Angeles Unified",
+   "state": "CA",
+   "city": "Los Angeles",
+   "zipCodes": [
+    "90017"
+   ],
+   "enrollment": 427795
+  },
+  {
+   "id": "fl-miami-dade",
+   "leaid": "1200390",
+   "name": "MIAMI-DADE",
+   "state": "FL",
+   "city": "MIAMI",
+   "zipCodes": [
+    "33132"
+   ],
+   "enrollment": 334090
+  },
+  {
+   "id": "il-city-of-chicago-sd-299",
+   "leaid": "1709930",
+   "name": "City of Chicago SD 299",
+   "state": "IL",
+   "city": "Chicago",
+   "zipCodes": [
+    "60602"
+   ],
+   "enrollment": 321666
+  },
+  {
+   "id": "nv-clark-county-school-district",
+   "leaid": "3200060",
+   "name": "CLARK COUNTY SCHOOL DISTRICT",
+   "state": "NV",
+   "city": "LAS VEGAS",
+   "zipCodes": [
+    "89146"
+   ],
+   "enrollment": 314346
+  },
+  {
+   "id": "fl-broward",
+   "leaid": "1200180",
+   "name": "BROWARD",
+   "state": "FL",
+   "city": "FORT LAUDERDALE",
+   "zipCodes": [
+    "33301"
+   ],
+   "enrollment": 254732
+  },
+  {
+   "id": "fl-hillsborough",
+   "leaid": "1200870",
+   "name": "HILLSBOROUGH",
+   "state": "FL",
+   "city": "TAMPA",
+   "zipCodes": [
+    "33602"
+   ],
+   "enrollment": 224538
+  },
+  {
+   "id": "fl-orange",
+   "leaid": "1201440",
+   "name": "ORANGE",
+   "state": "FL",
+   "city": "ORLANDO",
+   "zipCodes": [
+    "32801"
+   ],
+   "enrollment": 207561
+  },
+  {
+   "id": "tx-houston-isd",
+   "leaid": "4823640",
+   "name": "HOUSTON ISD",
+   "state": "TX",
+   "city": "HOUSTON",
+   "zipCodes": [
+    "77092"
+   ],
+   "enrollment": 189934
+  },
+  {
+   "id": "fl-palm-beach",
+   "leaid": "1201500",
+   "name": "PALM BEACH",
+   "state": "FL",
+   "city": "WEST PALM BEACH",
+   "zipCodes": [
+    "33406"
+   ],
+   "enrollment": 188843
+  },
+  {
+   "id": "ga-gwinnett-county",
+   "leaid": "1302550",
+   "name": "Gwinnett County",
+   "state": "GA",
+   "city": "Lawrenceville",
+   "zipCodes": [
+    "30045"
+   ],
+   "enrollment": 181814
+  },
+  {
+   "id": "va-fairfax-county-public-schools",
+   "leaid": "5101260",
+   "name": "Fairfax County Public Schools",
+   "state": "VA",
+   "city": "Falls Church",
+   "zipCodes": [
+    "22042"
+   ],
+   "enrollment": 179858
+  },
+  {
+   "id": "hi-hawaii-department-of-education",
+   "leaid": "1500030",
+   "name": "Hawaii Department of Education",
+   "state": "HI",
+   "city": "Honolulu",
+   "zipCodes": [
+    "96813"
+   ],
+   "enrollment": 170209
+  },
+  {
+   "id": "md-montgomery-county-public-schools",
+   "leaid": "2400480",
+   "name": "Montgomery County Public Schools",
+   "state": "MD",
+   "city": "Rockville",
+   "zipCodes": [
+    "20850"
+   ],
+   "enrollment": 160554
+  },
+  {
+   "id": "nc-wake-county-schools",
+   "leaid": "3704720",
+   "name": "Wake County Schools",
+   "state": "NC",
+   "city": "Cary",
+   "zipCodes": [
+    "27518"
+   ],
+   "enrollment": 159778
+  },
+  {
+   "id": "nc-charlotte-mecklenburg-schools",
+   "leaid": "3702970",
+   "name": "Charlotte-Mecklenburg Schools",
+   "state": "NC",
+   "city": "Charlotte",
+   "zipCodes": [
+    "28208"
+   ],
+   "enrollment": 144197
+  },
+  {
+   "id": "tx-dallas-isd",
+   "leaid": "4816230",
+   "name": "DALLAS ISD",
+   "state": "TX",
+   "city": "DALLAS",
+   "zipCodes": [
+    "75231"
+   ],
+   "enrollment": 141169
+  },
+  {
+   "id": "md-prince-george-s-county-public-schools",
+   "leaid": "2400510",
+   "name": "Prince George's County Public Schools",
+   "state": "MD",
+   "city": "Upper Marlboro",
+   "zipCodes": [
+    "20772"
+   ],
+   "enrollment": 131133
+  },
+  {
+   "id": "fl-duval",
+   "leaid": "1200480",
+   "name": "DUVAL",
+   "state": "FL",
+   "city": "JACKSONVILLE",
+   "zipCodes": [
+    "32207"
+   ],
+   "enrollment": 128657
+  },
+  {
+   "id": "pa-philadelphia-city-sd",
+   "leaid": "4218990",
+   "name": "Philadelphia City SD",
+   "state": "PA",
+   "city": "Philadelphia",
+   "zipCodes": [
+    "19130"
+   ],
+   "enrollment": 118335
+  },
+  {
+   "id": "tx-cypress-fairbanks-isd",
+   "leaid": "4816110",
+   "name": "CYPRESS-FAIRBANKS ISD",
+   "state": "TX",
+   "city": "HOUSTON",
+   "zipCodes": [
+    "77065"
+   ],
+   "enrollment": 118010
+  },
+  {
+   "id": "md-baltimore-county-public-schools",
+   "leaid": "2400120",
+   "name": "Baltimore County Public Schools",
+   "state": "MD",
+   "city": "Towson",
+   "zipCodes": [
+    "21204"
+   ],
+   "enrollment": 111082
+  },
+  {
+   "id": "tn-memphis-shelby-county-schools",
+   "leaid": "4700148",
+   "name": "Memphis-Shelby County Schools",
+   "state": "TN",
+   "city": "Memphis",
+   "zipCodes": [
+    "38112"
+   ],
+   "enrollment": 109797
+  },
+  {
+   "id": "fl-polk",
+   "leaid": "1201590",
+   "name": "POLK",
+   "state": "FL",
+   "city": "BARTOW",
+   "zipCodes": [
+    "33830"
+   ],
+   "enrollment": 109558
+  },
+  {
+   "id": "ga-cobb-county",
+   "leaid": "1301290",
+   "name": "Cobb County",
+   "state": "GA",
+   "city": "Marietta",
+   "zipCodes": [
+    "30061"
+   ],
+   "enrollment": 106703
+  },
+  {
+   "id": "tx-northside-isd",
+   "leaid": "4833120",
+   "name": "NORTHSIDE ISD",
+   "state": "TX",
+   "city": "SAN ANTONIO",
+   "zipCodes": [
+    "78253"
+   ],
+   "enrollment": 102719
+  },
+  {
+   "id": "fl-lee",
+   "leaid": "1201080",
+   "name": "LEE",
+   "state": "FL",
+   "city": "FORT MYERS",
+   "zipCodes": [
+    "33966"
+   ],
+   "enrollment": 99354
+  },
+  {
+   "id": "ky-jefferson-county",
+   "leaid": "2102990",
+   "name": "Jefferson County",
+   "state": "KY",
+   "city": "Louisville",
+   "zipCodes": [
+    "40218"
+   ],
+   "enrollment": 95230
+  },
+  {
+   "id": "ca-san-diego-unified",
+   "leaid": "0634320",
+   "name": "San Diego Unified",
+   "state": "CA",
+   "city": "San Diego",
+   "zipCodes": [
+    "92103"
+   ],
+   "enrollment": 93893
+  },
+  {
+   "id": "fl-pinellas",
+   "leaid": "1201560",
+   "name": "PINELLAS",
+   "state": "FL",
+   "city": "LARGO",
+   "zipCodes": [
+    "33770"
+   ],
+   "enrollment": 93702
+  },
+  {
+   "id": "tx-katy-isd",
+   "leaid": "4825170",
+   "name": "KATY ISD",
+   "state": "TX",
+   "city": "KATY",
+   "zipCodes": [
+    "77494"
+   ],
+   "enrollment": 92667
+  },
+  {
+   "id": "ga-dekalb-county",
+   "leaid": "1301740",
+   "name": "DeKalb County",
+   "state": "GA",
+   "city": "Stone Mountain",
+   "zipCodes": [
+    "30083"
+   ],
+   "enrollment": 92368
+  },
+  {
+   "id": "va-prince-william-county-public-schools",
+   "leaid": "5103130",
+   "name": "Prince William County Public Schools",
+   "state": "VA",
+   "city": "Manassas",
+   "zipCodes": [
+    "20112"
+   ],
+   "enrollment": 91101
+  },
+  {
+   "id": "ga-fulton-county",
+   "leaid": "1302280",
+   "name": "Fulton County",
+   "state": "GA",
+   "city": "Atlanta",
+   "zipCodes": [
+    "30339"
+   ],
+   "enrollment": 89935
+  },
+  {
+   "id": "co-school-district-no-1-in-the-county-of-denver-and-state-of-c",
+   "leaid": "0803360",
+   "name": "School District No. 1 in the county of Denver and State of C",
+   "state": "CO",
+   "city": "DENVER",
+   "zipCodes": [
+    "80203"
+   ],
+   "enrollment": 87883
+  },
+  {
+   "id": "ut-alpine-district",
+   "leaid": "4900030",
+   "name": "Alpine District",
+   "state": "UT",
+   "city": "American Fork",
+   "zipCodes": [
+    "84003"
+   ],
+   "enrollment": 87136
+  },
+  {
+   "id": "md-anne-arundel-county-public-schools",
+   "leaid": "2400060",
+   "name": "Anne Arundel County Public Schools",
+   "state": "MD",
+   "city": "Annapolis",
+   "zipCodes": [
+    "21401"
+   ],
+   "enrollment": 84452
+  },
+  {
+   "id": "fl-pasco",
+   "leaid": "1201530",
+   "name": "PASCO",
+   "state": "FL",
+   "city": "LAND O LAKES",
+   "zipCodes": [
+    "34638"
+   ],
+   "enrollment": 84049
+  },
+  {
+   "id": "va-loudoun-county-public-schools",
+   "leaid": "5102250",
+   "name": "Loudoun County Public Schools",
+   "state": "VA",
+   "city": "Ashburn",
+   "zipCodes": [
+    "20148"
+   ],
+   "enrollment": 81678
+  },
+  {
+   "id": "tn-davidson-county",
+   "leaid": "4703180",
+   "name": "Davidson County",
+   "state": "TN",
+   "city": "Nashville",
+   "zipCodes": [
+    "37204"
+   ],
+   "enrollment": 80651
+  },
+  {
+   "id": "nm-albuquerque-public-schools",
+   "leaid": "3500060",
+   "name": "ALBUQUERQUE PUBLIC SCHOOLS",
+   "state": "NM",
+   "city": "ALBUQUERQUE",
+   "zipCodes": [
+    "87110"
+   ],
+   "enrollment": 79805
+  },
+  {
+   "id": "tx-fort-bend-isd",
+   "leaid": "4819650",
+   "name": "FORT BEND ISD",
+   "state": "TX",
+   "city": "SUGAR LAND",
+   "zipCodes": [
+    "77479"
+   ],
+   "enrollment": 79660
+  },
+  {
+   "id": "sc-greenville-01",
+   "leaid": "4502310",
+   "name": "Greenville 01",
+   "state": "SC",
+   "city": "Greenville",
+   "zipCodes": [
+    "29601"
+   ],
+   "enrollment": 77978
+  },
+  {
+   "id": "md-baltimore-city-public-schools",
+   "leaid": "2400090",
+   "name": "Baltimore City Public Schools",
+   "state": "MD",
+   "city": "Baltimore",
+   "zipCodes": [
+    "21202"
+   ],
+   "enrollment": 75995
+  },
+  {
+   "id": "co-jefferson-county-school-district-no-r-1",
+   "leaid": "0804800",
+   "name": "Jefferson County School District No. R-1",
+   "state": "CO",
+   "city": "GOLDEN",
+   "zipCodes": [
+    "80401"
+   ],
+   "enrollment": 75327
+  },
+  {
+   "id": "fl-brevard",
+   "leaid": "1200150",
+   "name": "BREVARD",
+   "state": "FL",
+   "city": "VIERA",
+   "zipCodes": [
+    "32940"
+   ],
+   "enrollment": 74125
+  },
+  {
+   "id": "fl-osceola",
+   "leaid": "1201470",
+   "name": "OSCEOLA",
+   "state": "FL",
+   "city": "KISSIMMEE",
+   "zipCodes": [
+    "34744"
+   ],
+   "enrollment": 73558
+  },
+  {
+   "id": "ut-davis-district",
+   "leaid": "4900210",
+   "name": "Davis District",
+   "state": "UT",
+   "city": "Farmington",
+   "zipCodes": [
+    "84025"
+   ],
+   "enrollment": 73459
+  },
+  {
+   "id": "tx-austin-isd",
+   "leaid": "4808940",
+   "name": "AUSTIN ISD",
+   "state": "TX",
+   "city": "AUSTIN",
+   "zipCodes": [
+    "78704"
+   ],
+   "enrollment": 73384
+  },
+  {
+   "id": "tx-fort-worth-isd",
+   "leaid": "4819700",
+   "name": "FORT WORTH ISD",
+   "state": "TX",
+   "city": "FORT WORTH",
+   "zipCodes": [
+    "76107"
+   ],
+   "enrollment": 72783
+  },
+  {
+   "id": "tx-conroe-isd",
+   "leaid": "4815000",
+   "name": "CONROE ISD",
+   "state": "TX",
+   "city": "CONROE",
+   "zipCodes": [
+    "77304"
+   ],
+   "enrollment": 70783
+  },
+  {
+   "id": "ca-fresno-unified",
+   "leaid": "0614550",
+   "name": "Fresno Unified",
+   "state": "CA",
+   "city": "Fresno",
+   "zipCodes": [
+    "93721"
+   ],
+   "enrollment": 69668
+  },
+  {
+   "id": "nc-guilford-county-schools",
+   "leaid": "3701920",
+   "name": "Guilford County Schools",
+   "state": "NC",
+   "city": "Greensboro",
+   "zipCodes": [
+    "27401"
+   ],
+   "enrollment": 68894
+  },
+  {
+   "id": "wi-milwaukee-school-district",
+   "leaid": "5509600",
+   "name": "Milwaukee School District",
+   "state": "WI",
+   "city": "Milwaukee",
+   "zipCodes": [
+    "53208"
+   ],
+   "enrollment": 67500
+  },
+  {
+   "id": "tx-frisco-isd",
+   "leaid": "4820010",
+   "name": "FRISCO ISD",
+   "state": "TX",
+   "city": "FRISCO",
+   "zipCodes": [
+    "75035"
+   ],
+   "enrollment": 66916
+  },
+  {
+   "id": "fl-seminole",
+   "leaid": "1201710",
+   "name": "SEMINOLE",
+   "state": "FL",
+   "city": "SANFORD",
+   "zipCodes": [
+    "32773"
+   ],
+   "enrollment": 66680
+  },
+  {
+   "id": "ca-long-beach-unified",
+   "leaid": "0622500",
+   "name": "Long Beach Unified",
+   "state": "CA",
+   "city": "Long Beach",
+   "zipCodes": [
+    "90810"
+   ],
+   "enrollment": 65554
+  },
+  {
+   "id": "va-virginia-beach-city-public-schools",
+   "leaid": "5103840",
+   "name": "Virginia Beach City Public Schools",
+   "state": "VA",
+   "city": "Virginia Beach",
+   "zipCodes": [
+    "23456"
+   ],
+   "enrollment": 65456
+  },
+  {
+   "id": "nv-washoe-county-school-district",
+   "leaid": "3200480",
+   "name": "WASHOE COUNTY SCHOOL DISTRICT",
+   "state": "NV",
+   "city": "RENO",
+   "zipCodes": [
+    "89520"
+   ],
+   "enrollment": 64990
+  },
+  {
+   "id": "va-chesterfield-county-public-schools",
+   "leaid": "5100840",
+   "name": "Chesterfield County Public Schools",
+   "state": "VA",
+   "city": "Chesterfield",
+   "zipCodes": [
+    "23832"
+   ],
+   "enrollment": 63916
+  },
+  {
+   "id": "fl-volusia",
+   "leaid": "1201920",
+   "name": "VOLUSIA",
+   "state": "FL",
+   "city": "DELAND",
+   "zipCodes": [
+    "32720"
+   ],
+   "enrollment": 63365
+  },
+  {
+   "id": "co-douglas-county-school-district-no-re-1",
+   "leaid": "0803450",
+   "name": "Douglas County School District No. Re 1",
+   "state": "CO",
+   "city": "CASTLE ROCK",
+   "zipCodes": [
+    "80104"
+   ],
+   "enrollment": 62341
+  },
+  {
+   "id": "ca-elk-grove-unified",
+   "leaid": "0612330",
+   "name": "Elk Grove Unified",
+   "state": "CA",
+   "city": "Elk Grove",
+   "zipCodes": [
+    "95624"
+   ],
+   "enrollment": 62061
+  },
+  {
+   "id": "ut-granite-district",
+   "leaid": "4900360",
+   "name": "Granite District",
+   "state": "UT",
+   "city": "SALT LAKE CITY",
+   "zipCodes": [
+    "84115"
+   ],
+   "enrollment": 61197
+  },
+  {
+   "id": "tn-knox-county",
+   "leaid": "4702220",
+   "name": "Knox County",
+   "state": "TN",
+   "city": "Knoxville",
+   "zipCodes": [
+    "37902"
+   ],
+   "enrollment": 60609
+  },
+  {
+   "id": "tx-aldine-isd",
+   "leaid": "4807710",
+   "name": "ALDINE ISD",
+   "state": "TX",
+   "city": "HOUSTON",
+   "zipCodes": [
+    "77073"
+   ],
+   "enrollment": 60074
+  },
+  {
+   "id": "ut-jordan-district",
+   "leaid": "4900420",
+   "name": "Jordan District",
+   "state": "UT",
+   "city": "WEST JORDAN",
+   "zipCodes": [
+    "84084"
+   ],
+   "enrollment": 59421
+  },
+  {
+   "id": "tx-north-east-isd",
+   "leaid": "4832940",
+   "name": "NORTH EAST ISD",
+   "state": "TX",
+   "city": "SAN ANTONIO",
+   "zipCodes": [
+    "78217"
+   ],
+   "enrollment": 59007
+  },
+  {
+   "id": "az-mesa-unified-district-4235",
+   "leaid": "0404970",
+   "name": "Mesa Unified District (4235)",
+   "state": "AZ",
+   "city": "MESA",
+   "zipCodes": [
+    "85201"
+   ],
+   "enrollment": 58343
+  },
+  {
+   "id": "md-howard-county-public-schools",
+   "leaid": "2400420",
+   "name": "Howard County Public Schools",
+   "state": "MD",
+   "city": "Ellicott City",
+   "zipCodes": [
+    "21042"
+   ],
+   "enrollment": 57676
+  },
+  {
+   "id": "tx-arlington-isd",
+   "leaid": "4808700",
+   "name": "ARLINGTON ISD",
+   "state": "TX",
+   "city": "ARLINGTON",
+   "zipCodes": [
+    "76011"
+   ],
+   "enrollment": 56167
+  },
+  {
+   "id": "ga-forsyth-county",
+   "leaid": "1302220",
+   "name": "Forsyth County",
+   "state": "GA",
+   "city": "Cumming",
+   "zipCodes": [
+    "30040"
+   ],
+   "enrollment": 54077
+  },
+  {
+   "id": "tx-klein-isd",
+   "leaid": "4825740",
+   "name": "KLEIN ISD",
+   "state": "TX",
+   "city": "KLEIN",
+   "zipCodes": [
+    "77379"
+   ],
+   "enrollment": 53712
+  },
+  {
+   "id": "tx-garland-isd",
+   "leaid": "4820340",
+   "name": "GARLAND ISD",
+   "state": "TX",
+   "city": "GARLAND",
+   "zipCodes": [
+    "75042"
+   ],
+   "enrollment": 52767
+  },
+  {
+   "id": "nc-winston-salem-forsyth-county-schools",
+   "leaid": "3701500",
+   "name": "Winston Salem / Forsyth County Schools",
+   "state": "NC",
+   "city": "Winston Salem",
+   "zipCodes": [
+    "27105"
+   ],
+   "enrollment": 52717
+  },
+  {
+   "id": "co-cherry-creek-school-district-no-5-in-the-county-of-arapah",
+   "leaid": "0802910",
+   "name": "Cherry Creek School District No. 5 in the county of Arapah",
+   "state": "CO",
+   "city": "GREENWOOD VILLAGE",
+   "zipCodes": [
+    "80111"
+   ],
+   "enrollment": 52392
+  },
+  {
+   "id": "ga-clayton-county",
+   "leaid": "1301230",
+   "name": "Clayton County",
+   "state": "GA",
+   "city": "Jonesboro",
+   "zipCodes": [
+    "30236"
+   ],
+   "enrollment": 52186
+  },
+  {
+   "id": "al-mobile-county",
+   "leaid": "0102370",
+   "name": "Mobile County",
+   "state": "AL",
+   "city": "Mobile",
+   "zipCodes": [
+    "36618"
+   ],
+   "enrollment": 51979
+  },
+  {
+   "id": "ne-omaha-public-schools",
+   "leaid": "3174820",
+   "name": "OMAHA PUBLIC SCHOOLS",
+   "state": "NE",
+   "city": "OMAHA",
+   "zipCodes": [
+    "68131"
+   ],
+   "enrollment": 51754
+  },
+  {
+   "id": "wa-seattle-school-district-no-1",
+   "leaid": "5307710",
+   "name": "Seattle School District No. 1",
+   "state": "WA",
+   "city": "SEATTLE",
+   "zipCodes": [
+    "98134"
+   ],
+   "enrollment": 51238
+  },
+  {
+   "id": "fl-manatee",
+   "leaid": "1201230",
+   "name": "MANATEE",
+   "state": "FL",
+   "city": "BRADENTON",
+   "zipCodes": [
+    "34205"
+   ],
+   "enrollment": 51234
+  },
+  {
+   "id": "ca-corona-norco-unified",
+   "leaid": "0609850",
+   "name": "Corona-Norco Unified",
+   "state": "CA",
+   "city": "Norco",
+   "zipCodes": [
+    "92860"
+   ],
+   "enrollment": 50790
+  },
+  {
+   "id": "tn-rutherford-county",
+   "leaid": "4703690",
+   "name": "Rutherford County",
+   "state": "TN",
+   "city": "Murfreesboro",
+   "zipCodes": [
+    "37128"
+   ],
+   "enrollment": 50707
+  },
+  {
+   "id": "la-jefferson-parish",
+   "leaid": "2200840",
+   "name": "Jefferson Parish",
+   "state": "LA",
+   "city": "Harvey",
+   "zipCodes": [
+    "70058"
+   ],
+   "enrollment": 50628
+  },
+  {
+   "id": "va-henrico-county-public-schools",
+   "leaid": "5101890",
+   "name": "Henrico County Public Schools",
+   "state": "VA",
+   "city": "Henrico",
+   "zipCodes": [
+    "23223"
+   ],
+   "enrollment": 50389
+  },
+  {
+   "id": "ga-atlanta-public-schools",
+   "leaid": "1300120",
+   "name": "Atlanta Public Schools",
+   "state": "GA",
+   "city": "Atlanta",
+   "zipCodes": [
+    "30335"
+   ],
+   "enrollment": 50325
+  },
+  {
+   "id": "fl-st-johns",
+   "leaid": "1201740",
+   "name": "ST. JOHNS",
+   "state": "FL",
+   "city": "ST AUGUSTINE",
+   "zipCodes": [
+    "32084"
+   ],
+   "enrollment": 50155
+  },
+  {
+   "id": "dc-district-of-columbia-public-schools",
+   "leaid": "1100030",
+   "name": "District of Columbia Public Schools",
+   "state": "DC",
+   "city": "Washington",
+   "zipCodes": [
+    "20002"
+   ],
+   "enrollment": 50131
+  },
+  {
+   "id": "tx-el-paso-isd",
+   "leaid": "4818300",
+   "name": "EL PASO ISD",
+   "state": "TX",
+   "city": "EL PASO",
+   "zipCodes": [
+    "79902"
+   ],
+   "enrollment": 50031
+  },
+  {
+   "id": "sc-charleston-01",
+   "leaid": "4501440",
+   "name": "Charleston 01",
+   "state": "SC",
+   "city": "Charleston",
+   "zipCodes": [
+    "29401"
+   ],
+   "enrollment": 49929
+  },
+  {
+   "id": "nc-cumberland-county-schools",
+   "leaid": "3700011",
+   "name": "Cumberland County Schools",
+   "state": "NC",
+   "city": "Fayetteville",
+   "zipCodes": [
+    "28306"
+   ],
+   "enrollment": 49661
+  },
+  {
+   "id": "tx-lewisville-isd",
+   "leaid": "4827300",
+   "name": "LEWISVILLE ISD",
+   "state": "TX",
+   "city": "LEWISVILLE",
+   "zipCodes": [
+    "75067"
+   ],
+   "enrollment": 49060
+  },
+  {
+   "id": "tx-plano-isd",
+   "leaid": "4835100",
+   "name": "PLANO ISD",
+   "state": "TX",
+   "city": "PLANO",
+   "zipCodes": [
+    "75075"
+   ],
+   "enrollment": 48921
+  },
+  {
+   "id": "ca-san-francisco-unified",
+   "leaid": "0634410",
+   "name": "San Francisco Unified",
+   "state": "CA",
+   "city": "San Francisco",
+   "zipCodes": [
+    "94102"
+   ],
+   "enrollment": 48785
+  },
+  {
+   "id": "tx-humble-isd",
+   "leaid": "4823910",
+   "name": "HUMBLE ISD",
+   "state": "TX",
+   "city": "HUMBLE",
+   "zipCodes": [
+    "77338"
+   ],
+   "enrollment": 48758
+  },
+  {
+   "id": "tx-pasadena-isd",
+   "leaid": "4834320",
+   "name": "PASADENA ISD",
+   "state": "TX",
+   "city": "PASADENA",
+   "zipCodes": [
+    "77502"
+   ],
+   "enrollment": 48726
+  },
+  {
+   "id": "mi-detroit-public-schools-community-district",
+   "leaid": "2601103",
+   "name": "Detroit Public Schools Community District",
+   "state": "MI",
+   "city": "DETROIT",
+   "zipCodes": [
+    "48202"
+   ],
+   "enrollment": 48548
+  },
+  {
+   "id": "fl-collier",
+   "leaid": "1200330",
+   "name": "COLLIER",
+   "state": "FL",
+   "city": "NAPLES",
+   "zipCodes": [
+    "34109"
+   ],
+   "enrollment": 48082
+  },
+  {
+   "id": "tx-socorro-isd",
+   "leaid": "4840710",
+   "name": "SOCORRO ISD",
+   "state": "TX",
+   "city": "EL PASO",
+   "zipCodes": [
+    "79928"
+   ],
+   "enrollment": 47843
+  },
+  {
+   "id": "fl-lake",
+   "leaid": "1201050",
+   "name": "LAKE",
+   "state": "FL",
+   "city": "TAVARES",
+   "zipCodes": [
+    "32778"
+   ],
+   "enrollment": 47452
+  },
+  {
+   "id": "sc-horry-01",
+   "leaid": "4502490",
+   "name": "Horry 01",
+   "state": "SC",
+   "city": "Conway",
+   "zipCodes": [
+    "29526"
+   ],
+   "enrollment": 47357
+  }
+ ]
+}

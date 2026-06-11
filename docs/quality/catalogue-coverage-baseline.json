@@ -1,0 +1,29 @@
+{
+  "comment": "catalogue:coverage ratchet — counts may only grow.",
+  "cells": {
+    "ela|1": 81,
+    "ela|2": 71,
+    "ela|3": 90,
+    "ela|4": 87,
+    "ela|5": 85,
+    "ela|6": 79,
+    "ela|7": 76,
+    "ela|8": 78,
+    "ela|Grade-1": 2,
+    "ela|K": 76,
+    "ela|Primary-3": 3,
+    "ela|Year-1": 2,
+    "math|1": 35,
+    "math|2": 38,
+    "math|3": 48,
+    "math|4": 49,
+    "math|5": 51,
+    "math|6": 57,
+    "math|7": 52,
+    "math|8": 46,
+    "math|Grade-1": 3,
+    "math|K": 34,
+    "math|Primary-3": 5,
+    "math|Year-1": 3
+  }
+}

@@ -5,6 +5,7 @@ import { registerObservabilityPlugin } from "@aivo/observability";
 import { createDb } from "@aivo/db";
 import { registerRecommendationRoutes, defaultStore } from "./routes/recommendations.js";
 import { registerCandidateRoutes } from "./routes/candidates.js";
+import { registerProposeRoute } from "./routes/propose.js";
 import { DrizzleRecommendationStore } from "./services/drizzle-recommendation-store.js";
 import { ProfileStore, type RecommendationStore } from "./services/recommendation-store.js";
 import { createObservationConsumer } from "./services/observation-consumer.js";
@@ -71,10 +72,12 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     // learner_profiles) when a recommendation is approved.
     registerRecommendationRoutes(app, { store, profiles, db });
     registerCandidateRoutes(app, { store, db });
+    registerProposeRoute(app, { store, db });
   } else {
     // Shared in-memory default (also used by the test seed/clear helpers).
     registerRecommendationRoutes(app);
     registerCandidateRoutes(app);
+    registerProposeRoute(app);
   }
 
   // Caregiver feedback loop (Sprint 5, G1/G2): consume

@@ -19,6 +19,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { serverEnv } from "@/lib/env";
+import { emitDegradation } from "@/lib/observability/degradation";
 import { MockTutorProvider, type TutorProvider, type TutorGenerationInputs } from "./tutor";
 
 // Default to the most capable model; adaptive thinking lets Claude scale
@@ -105,10 +106,18 @@ export function createAnthropicTutorProvider(client: Anthropic): TutorProvider {
 }
 
 let cachedProvider: TutorProvider | null = null;
+let mockInProdAlerted = false;
 
 /**
  * Resolve the tutor provider from configuration. Real Claude when
  * `AI_PROVIDER=anthropic` and a key is present; deterministic mock otherwise.
+ *
+ * Wave A (G2): in the production runtime, resolving the mock while
+ * AI_PROVIDER names a real provider is the silent-misconfig class this
+ * release hunts — the boot probe (lib/boot/llm-config-probe.ts) should
+ * have refused startup, but if a key is rotated out from under a running
+ * process this is the last line that notices. Page once per process
+ * (emitDegradation also dedups per-hour across the fleet).
  */
 export function getTutorProvider(): TutorProvider {
   if (serverEnv.AI_PROVIDER === "anthropic" && serverEnv.ANTHROPIC_API_KEY) {
@@ -119,10 +128,25 @@ export function getTutorProvider(): TutorProvider {
     }
     return cachedProvider;
   }
+  if (
+    serverEnv.AI_PROVIDER !== "mock" &&
+    process.env.NODE_ENV === "production" &&
+    !mockInProdAlerted
+  ) {
+    mockInProdAlerted = true;
+    emitDegradation("lesson_provider_mock_in_prod", {
+      reason: "missing_api_key",
+      provider: serverEnv.AI_PROVIDER,
+      message:
+        `AI_PROVIDER=${serverEnv.AI_PROVIDER} but no usable API key/provider ` +
+        "implementation resolved — every lesson plan is the deterministic template.",
+    });
+  }
   return MockTutorProvider;
 }
 
 /** Test-only: clear the memoized provider so env changes take effect. */
 export function resetTutorProviderForTest(): void {
   cachedProvider = null;
+  mockInProdAlerted = false;
 }

@@ -6,6 +6,7 @@ import {
   shouldStop,
   buildLearningProfile,
   finalize,
+  estimateSubjectThetas,
   assessFrustration,
   FRUSTRATION_CEILING,
   itemProbability,
@@ -380,5 +381,80 @@ describe("frustration ceiling (G5 parity)", () => {
     // Without the flag, the nearest (hard) item wins.
     const calm = stateWith(0, []);
     expect(pickNextItem(calm, pool)?.id).toBe("hard");
+  });
+});
+
+describe("estimateSubjectThetas (Wave C, G1)", () => {
+  const subjectBank = (subject: string, count: number, difficulty = 0) =>
+    Array.from({ length: count }, (_, i) => ({
+      id: `${subject}-${i}`,
+      skillId: `${subject}-skill-${i % 3}`,
+      difficulty,
+      modalities: ["visual" as const],
+      lightReading: true,
+      subjectId: subject,
+    }));
+
+  it("estimates independent per-subject thetas from one mixed run", () => {
+    const bank = [...subjectBank("math", 6), ...subjectBank("reading", 6)];
+    let state = initBaseline();
+    // Math all wrong, reading all correct — alternating order.
+    for (let i = 0; i < 6; i++) {
+      for (const [subject, correct] of [
+        ["math", false],
+        ["reading", true],
+      ] as const) {
+        const item = bank.find((b) => b.id === `${subject}-${i}`)!;
+        state = recordResponse({
+          state,
+          item,
+          response: { itemId: item.id, correct, responseTimeMs: 1000 },
+        });
+      }
+    }
+    const thetas = estimateSubjectThetas(state, bank);
+    expect(thetas.math).toBeLessThan(-0.5);
+    expect(thetas.reading).toBeGreaterThan(0.5);
+    // The overall θ from the mixed run sits between the two.
+    expect(state.theta).toBeGreaterThan(thetas.math);
+    expect(state.theta).toBeLessThan(thetas.reading);
+  });
+
+  it("omits subjects below the minimum item count and items without a subject", () => {
+    const bank = [
+      ...subjectBank("math", 6),
+      ...subjectBank("reading", 2),
+      {
+        id: "untagged-0",
+        skillId: "x",
+        difficulty: 0,
+        modalities: ["visual" as const],
+        lightReading: true,
+      },
+    ];
+    let state = initBaseline();
+    for (const item of bank) {
+      state = recordResponse({
+        state,
+        item,
+        response: { itemId: item.id, correct: true, responseTimeMs: 800 },
+      });
+    }
+    const thetas = estimateSubjectThetas(state, bank);
+    expect(Object.keys(thetas)).toEqual(["math"]);
+  });
+
+  it("matches the live engine when a run is single-subject", () => {
+    const bank = subjectBank("math", 8, -0.5);
+    let state = initBaseline();
+    for (const item of bank) {
+      state = recordResponse({
+        state,
+        item,
+        response: { itemId: item.id, correct: true, responseTimeMs: 800 },
+      });
+    }
+    const thetas = estimateSubjectThetas(state, bank);
+    expect(thetas.math).toBeCloseTo(Math.round(state.theta * 10) / 10, 5);
   });
 });

@@ -8,7 +8,7 @@
  */
 import { describe, it, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
+import { defineTutor, type TutorDefinition, NO_MEMORY, standardActionPolicy } from "@aivo/tutor-sdk";
 import {
   ToolCallError,
   requestAudioOut,
@@ -29,6 +29,10 @@ function makeTutor(caps: TutorDefinition["capabilities"]): TutorDefinition {
     functioningLevels: ["STANDARD"],
     skillGraphRefs: ["ccss-math-k"],
     defaultContentPackRefs: [],
+    // Wave E (S8): required agent-policy fields.
+    toolset: ["get_learner_snapshot"],
+    actionPolicy: standardActionPolicy(),
+    memoryPolicy: NO_MEMORY,
     policy: { requiresConsent: false },
   });
 }

@@ -25,8 +25,10 @@ import {
   getSubjectById,
   parentCanAccessLearner,
 } from "@/lib/db/repos";
-import { LessonPlayer } from "./lesson-player";
-import { lessonPlayerV2Enabled } from "@/lib/feature-flags";
+import { LessonPlayer, type LessonAgentConfig } from "./lesson-player";
+import { lessonPlayerV2Enabled, tutorAgenticModeEnabled } from "@/lib/feature-flags";
+import { isLiveTutorAgent } from "@/lib/bff/tutor-agent";
+import { agentForSubjectSlug } from "@/lib/bff/agent-pilot";
 
 // Re-export ergonomics: subject lookup by id used to pin the v2 player
 // to a learning-path subject slug.
@@ -62,6 +64,16 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
   const a11y = await getAccessibilityPrefs(learner.id, session.tenantId);
   const lessonSubject = await getSubjectById(lessonRun.subjectId);
   const v2Enabled = lessonPlayerV2Enabled();
+
+  // Wave E (S9/S10) — agentic tutor pilot. Piloted subjects (math → Nova,
+  // reading/writing → Sage) get an observing agent when the tenant flag is
+  // on AND the live tutor-svc path is configured. With either condition
+  // false `agent` stays null and the player renders byte-identically to
+  // the pre-agent build.
+  let agent: LessonAgentConfig | null = null;
+  if (isLiveTutorAgent() && (await tutorAgenticModeEnabled())) {
+    agent = agentForSubjectSlug(lessonSubject?.slug);
+  }
 
   // When the plan is still generating or has failed, we can't run the player.
   if (!plan || lessonRun.status === "generating" || lessonRun.status === "failed") {
@@ -122,6 +134,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
         // lazily on first advance.
         sessionId={lessonRun.id}
         subjectSlug={lessonSubject?.slug ?? null}
+        agent={agent}
       />
     </AppShell>
   );

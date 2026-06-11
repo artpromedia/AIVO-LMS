@@ -37,6 +37,7 @@ export const ENTERPRISE_FLAG_ENV_VARS = {
   responsibleAiGuardrails: "AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS",
   advancedContentGenerators: "AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS",
   selfRegulationHub: "AIVO_FEATURE_SELF_REGULATION_HUB",
+  tutorAgenticMode: "AIVO_FEATURE_TUTOR_AGENTIC_MODE",
 } as const;
 
 export type EnterpriseFlagKey = keyof typeof ENTERPRISE_FLAG_ENV_VARS;
@@ -96,6 +97,11 @@ export function resolveEnterpriseFlags(
       ENTERPRISE_FLAG_ENV_VARS.selfRegulationHub,
       false,
     ),
+    tutorAgenticMode: readBooleanFromSource(
+      source,
+      ENTERPRISE_FLAG_ENV_VARS.tutorAgenticMode,
+      false,
+    ),
   };
 }
 
@@ -117,6 +123,7 @@ export const enterpriseFeatureFlags: EnterpriseFeatureFlags = {
     false,
   ),
   selfRegulationHub: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.selfRegulationHub, false),
+  tutorAgenticMode: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.tutorAgenticMode, false),
 };
 
 // ---------------------------------------------------------------------------
@@ -245,6 +252,16 @@ export const ENTERPRISE_FLAG_META: Record<EnterpriseFlagKey, FlagMeta> = {
       "Learner-facing emotion / focus / break-time companion. Surfaced inside the stage runtime.",
     surface: "ux",
     riskBand: "low",
+    defaultValue: false,
+  },
+  tutorAgenticMode: {
+    key: "tutorAgenticMode",
+    envVar: ENTERPRISE_FLAG_ENV_VARS.tutorAgenticMode,
+    label: "Agentic tutor mode (Nova pilot)",
+    description:
+      "In-lesson tutor agent loop: the tutor observes each answer and may insert scaffolds, remediation, or breaks. Wave E pilot — Nova (math) only; deterministic player when off.",
+    surface: "ai",
+    riskBand: "medium",
     defaultValue: false,
   },
 };

@@ -1164,6 +1164,30 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
         }
       }
       if (body.featureOverrides !== undefined) updates.featureOverrides = body.featureOverrides;
+      // Wave C (G5): recommendation-approval delegation. Strictly-shaped:
+      // exactly the two boolean switches, normalized so a truthy string can
+      // never widen approval rights. recommendation-svc reads this row on
+      // every teacher/caregiver decision.
+      if (body.approvalPolicy !== undefined) {
+        const ap = body.approvalPolicy;
+        if (ap === null || typeof ap !== "object" || Array.isArray(ap)) {
+          return reply.status(400).send({
+            error: "approvalPolicy must be an object { teacherApproval, caregiverApproval }.",
+          });
+        }
+        const unknownKeys = Object.keys(ap).filter(
+          (k) => k !== "teacherApproval" && k !== "caregiverApproval",
+        );
+        if (unknownKeys.length > 0) {
+          return reply
+            .status(400)
+            .send({ error: `approvalPolicy has unknown keys: ${unknownKeys.join(", ")}` });
+        }
+        updates.approvalPolicy = {
+          teacherApproval: ap.teacherApproval === true,
+          caregiverApproval: ap.caregiverApproval === true,
+        };
+      }
 
       const [existing] = await db
         .select()

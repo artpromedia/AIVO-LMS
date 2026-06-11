@@ -41,6 +41,9 @@ export {
   canReadLearnerProfile,
   canMutateLearnerProfile,
   canApproveProfileRecommendation,
+  DEFAULT_RECOMMENDATION_APPROVAL_POLICY,
+  TEACHER_APPROVABLE_RECOMMENDATION_TYPES,
+  CAREGIVER_APPROVABLE_RECOMMENDATION_TYPES,
   canViewDistrictAnalytics,
   canReadParentPrivateNotes,
   canSubmitTeacherObservation,
@@ -51,4 +54,8 @@ export {
   canRunSisImport,
   canAcceptDpa,
   canExportDistrictCompliance,
+} from "./role-policy.js";
+export type {
+  RecommendationApprovalContext,
+  RecommendationApprovalPolicy,
 } from "./role-policy.js";

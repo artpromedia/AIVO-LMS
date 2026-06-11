@@ -98,3 +98,60 @@ test("records the theta and a timestamp for auditability", () => {
   assert.equal(r.patch.alignment.delivery_level_theta, -0.4);
   assert.equal(r.patch.alignment.delivery_level_updated_at, now.toISOString());
 });
+
+// ── Wave C (G1): per-subject placement ─────────────────────────────────────
+
+test("subjectThetas produce canonicalised delivery_levels alongside the global level", () => {
+  const r = buildBaselineAlignmentPatch({
+    currentAlignment: {},
+    gradeLevel: "5",
+    theta: -0.5,
+    subjectThetas: { math: -1.2, ela: 0.5 },
+  });
+  assert.equal(r.ok, true);
+  if (!r.ok) return;
+  // Global placement unchanged in semantics.
+  assert.equal(r.patch.alignment.delivery_level, "3");
+  // Per-subject: math θ -1.2 ⇒ three bands below; ela 0.5 ⇒ on grade,
+  // and the ai-svc "ela" domain canonicalises to "reading".
+  assert.deepEqual(r.patch.alignment.delivery_levels, { math: "2", reading: "5" });
+  assert.equal(r.patch.alignment.delivery_levels_source, "baseline_theta");
+  const thetas = r.patch.alignment.delivery_levels_theta as Record<string, number>;
+  assert.equal(thetas.math, -1.2);
+  assert.equal(thetas.reading, 0.5);
+});
+
+test("a re-baseline merges per-subject bands instead of wiping unmeasured subjects", () => {
+  const r = buildBaselineAlignmentPatch({
+    currentAlignment: {
+      grade_band: "5",
+      delivery_levels: { reading: "5", science: "4" },
+      delivery_levels_theta: { reading: 0.5, science: 0.1 },
+    },
+    gradeLevel: "5",
+    theta: -0.2,
+    subjectThetas: { math: -0.5 },
+  });
+  assert.equal(r.ok, true);
+  if (!r.ok) return;
+  assert.deepEqual(r.patch.alignment.delivery_levels, {
+    reading: "5",
+    science: "4",
+    math: "3",
+  });
+  const thetas = r.patch.alignment.delivery_levels_theta as Record<string, number>;
+  assert.equal(thetas.reading, 0.5);
+  assert.equal(thetas.math, -0.5);
+});
+
+test("empty/absent subjectThetas leave the alignment free of per-subject keys", () => {
+  const r = buildBaselineAlignmentPatch({
+    currentAlignment: {},
+    gradeLevel: "4",
+    theta: 0.6,
+    subjectThetas: {},
+  });
+  assert.equal(r.ok, true);
+  if (!r.ok) return;
+  assert.equal("delivery_levels" in r.patch.alignment, false);
+});

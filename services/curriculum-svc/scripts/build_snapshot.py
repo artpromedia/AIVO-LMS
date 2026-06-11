@@ -52,12 +52,20 @@ class BuildError(RuntimeError):
 
 
 def _load_sources(source_dir: Path) -> list[tuple[str, dict]]:
-    """Load every ``<jurisdiction>/catalogue.json`` under ``source_dir``,
-    sorted by path for stable iteration. Returns ``(name, data)`` tuples."""
+    """Load every ``<jurisdiction>/catalogue.json`` AND
+    ``<jurisdiction>/catalogue.imported.json`` (Wave D — machine imports,
+    e.g. the official CCSS K–8 set emitted by ``import_ccss.py``) under
+    ``source_dir``, sorted by path for stable iteration. Returns
+    ``(name, data)`` tuples. Hand-authored and imported files share one
+    id namespace — a duplicate id across them is a build error."""
     out: list[tuple[str, dict]] = []
-    for catalogue_path in sorted(source_dir.glob("*/catalogue.json")):
+    paths = sorted(
+        list(source_dir.glob("*/catalogue.json"))
+        + list(source_dir.glob("*/catalogue.imported.json"))
+    )
+    for catalogue_path in paths:
         data = json.loads(catalogue_path.read_text(encoding="utf-8"))
-        out.append((catalogue_path.parent.name, data))
+        out.append((f"{catalogue_path.parent.name}/{catalogue_path.name}", data))
     if not out:
         raise BuildError(f"no source catalogues found under {source_dir}")
     return out

@@ -12,6 +12,7 @@ import { CAREGIVER_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
 import { listLearnersForMember } from "@/lib/db/team-invites";
 import { getLearner } from "@/lib/db/repos";
 import type { LearnerProfile } from "@/lib/db/types";
@@ -97,6 +98,21 @@ export default async function CaregiverLearnersPage() {
                     ))}
                   </div>
                 ) : null}
+                {/* Wave C (G5): caregiver approval surface. The service
+                    enforces the district's delegation policy — only
+                    regulation/sensory types in opted-in tenants land;
+                    everything else 403s with a clear message. */}
+                <details className="mt-1">
+                  <summary className="cursor-pointer text-xs font-medium text-aivo-ink-soft">
+                    {t("pending_recommendations")}
+                  </summary>
+                  <div className="mt-2">
+                    <PendingRecommendationsPanel
+                      learnerId={l.id}
+                      apiBase={`/api/bff/caregiver/learners/${l.id}/recommendations`}
+                    />
+                  </div>
+                </details>
               </Card>
             </li>
           ))}

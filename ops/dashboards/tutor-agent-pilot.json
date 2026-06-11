@@ -1,0 +1,95 @@
+{
+  "uid": "aivo-tutor-agent-pilot",
+  "title": "AIVO — Tutor Agent Pilot (Wave E)",
+  "tags": ["aivo", "tutor-agent", "wave-e", "ab-pilot"],
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "timezone": "",
+  "time": { "from": "now-24h", "to": "now" },
+  "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "tutor",
+        "label": "Tutor",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "query": "label_values(agent_turns_total, tutor)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2,
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Agent turns/s by outcome (accepted / rejected / fallback / skipped)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (outcome) (rate(agent_turns_total{tutor=~\"$tutor\"}[5m]))",
+          "legendFormat": "{{outcome}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Turns by rung — the A/B arm health view (full vs checkpoint vs deterministic)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (rung) (rate(agent_turns_total{tutor=~\"$tutor\"}[5m]))",
+          "legendFormat": "{{rung}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Acceptance rate by tutor (accepted / all turns, 1h)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum by (tutor) (rate(agent_turns_total{outcome=\"accepted\",tutor=~\"$tutor\"}[1h])) / sum by (tutor) (rate(agent_turns_total{tutor=~\"$tutor\"}[1h]))",
+          "legendFormat": "{{tutor}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Rung drops/h by trigger (latency_budget / consecutive_failures / envelope_exhausted)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum by (trigger) (rate(agent_rung_drops_total{tutor=~\"$tutor\"}[1h])) * 3600",
+          "legendFormat": "{{trigger}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Fallback share by tutor (should stay < 5%)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum by (tutor) (rate(agent_turns_total{outcome=\"fallback\",tutor=~\"$tutor\"}[1h])) / sum by (tutor) (rate(agent_turns_total{tutor=~\"$tutor\"}[1h]))",
+          "legendFormat": "{{tutor}}"
+        }
+      ]
+    }
+  ]
+}

@@ -14,9 +14,13 @@
  *   3. nothing — a typed failure the route turns into a 422. A wrong-grade
  *      lesson is worse than an explicit error for this product.
  */
-import { normalizeGradeBand } from "@aivo/scoring";
+import { canonicalSubjectKey, normalizeGradeBand } from "@aivo/scoring";
 
-export type GradeTargetSource = "alignment" | "alignment_partial" | "grade_level_fallback";
+export type GradeTargetSource =
+  | "alignment_subject"
+  | "alignment"
+  | "alignment_partial"
+  | "grade_level_fallback";
 
 export type GradeTargetResolution =
   | {
@@ -34,6 +38,16 @@ export function resolveGradeTargets(opts: {
   alignment: unknown;
   /** `learners.grade_level` column, for pre-alignment learners. */
   learnerGradeLevel: string | null | undefined;
+  /**
+   * Session subject (Wave C, G1) — any producer vocabulary (brand tutor
+   * domain, web slug, ai-svc chapter domain); canonicalised here. When
+   * the alignment carries a per-subject band for it
+   * (`delivery_levels[key]`, written by the baseline finalizers and the
+   * approval flow), that band wins over the global `delivery_level`, so
+   * a learner two grades behind in math but on grade in reading is
+   * DELIVERED each subject at its own level.
+   */
+  subject?: string | null;
 }): GradeTargetResolution {
   const a =
     opts.alignment && typeof opts.alignment === "object"
@@ -43,6 +57,26 @@ export function resolveGradeTargets(opts: {
   const deliveryLevel = normalizeGradeBand(
     typeof a.delivery_level === "string" ? a.delivery_level : null,
   );
+
+  if (gradeBand) {
+    const subjectKey = canonicalSubjectKey(opts.subject);
+    const levels =
+      a.delivery_levels && typeof a.delivery_levels === "object"
+        ? (a.delivery_levels as Record<string, unknown>)
+        : null;
+    const subjectBand =
+      subjectKey && levels && typeof levels[subjectKey] === "string"
+        ? normalizeGradeBand(levels[subjectKey] as string)
+        : null;
+    if (subjectBand) {
+      return {
+        ok: true,
+        gradeTarget: gradeBand,
+        deliveryLevel: subjectBand,
+        source: "alignment_subject",
+      };
+    }
+  }
 
   if (gradeBand && deliveryLevel) {
     return { ok: true, gradeTarget: gradeBand, deliveryLevel, source: "alignment" };
