@@ -87,7 +87,7 @@
     "test:journey": "vitest run --config tests/integration/journey/vitest.config.ts"
   },
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
+    "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "^4.1.8",
     "eas-cli": "^18.6.0",
     "eslint": "^10.2.0",
