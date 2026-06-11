@@ -11,6 +11,7 @@ from .routes.term_syllabus import router as term_syllabus_router
 from .routes.speech_buddy import router as speech_buddy_router
 from .routes.budget_admin import router as budget_admin_router
 from .routes.baseline_images import router as baseline_images_router
+from .routes.tutor_agent import router as tutor_agent_router
 from ._observability import add_observability
 
 app = FastAPI(
@@ -54,6 +55,7 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(health_root_router)
 app.include_router(generate_router)
+app.include_router(tutor_agent_router)
 app.include_router(homework_router)
 app.include_router(transcribe_router)
 app.include_router(curriculum_router)
