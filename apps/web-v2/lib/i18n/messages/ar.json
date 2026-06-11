@@ -439,7 +439,15 @@
       "time_learning": "وقت التعلم",
       "skills_tracked": "المهارات المتتبعة",
       "mastered": "مُتقنة",
-      "by_subject": "حسب المادة"
+      "by_subject": "حسب المادة",
+      "refresh_path": "تحديث مسار التعلم",
+      "refresh_path_done": "تم تحديث المسار",
+      "refresh_path_error": "تعذر التحديث — حاول مرة أخرى",
+      "trajectory_title": "التقدم عبر الوقت",
+      "at_grade_count": "{count} من {total} مهارات عند مستوى الصف",
+      "working_at": "يعمل عند المستوى {level}",
+      "grade_target": "الصف المستهدف {grade}",
+      "on_grade": "عند مستوى الصف"
     },
     "learner_summary": {
       "title": "ملخص بلغة بسيطة",
@@ -494,7 +502,8 @@
       "none_recorded": "لم يُسجَّل شيء بعد.",
       "challenges": "التحديات",
       "accessibility_defaults": "إعدادات إمكانية الوصول الافتراضية",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "توصيات بانتظار موافقتك"
     },
     "learner_sensory": {
       "title": "الملف الحسي",
@@ -686,6 +695,27 @@
       "last_active_today": "آخر نشاط اليوم",
       "last_active_yesterday": "آخر نشاط أمس",
       "last_active_days": "آخر نشاط منذ {count} أيام"
+    },
+    "recommendations": {
+      "loading": "جارٍ التحقق من التوصيات…",
+      "load_error": "تعذر تحميل التوصيات — حاول مرة أخرى.",
+      "empty": "لا توجد توصيات بانتظار موافقتك الآن.",
+      "pending_badge": "تحتاج موافقة",
+      "proposed_change": "التغيير المقترح",
+      "based_on": "استنادًا إلى {summary}",
+      "approve": "موافقة",
+      "adjust": "تعديل",
+      "decline": "رفض",
+      "amend_label": "قيمة جديدة",
+      "confirm_adjust": "تطبيق القيمة المعدلة",
+      "decline_reason_label": "سبب الرفض؟",
+      "confirm_decline": "تأكيد الرفض",
+      "cancel": "إلغاء",
+      "decision_error": "تعذر تسجيل قرارك — حاول مرة أخرى.",
+      "status_applied": "تمت الموافقة والتطبيق — تتحدث الدروس من الجلسة القادمة.",
+      "status_declined": "مرفوض — لن يتغير شيء.",
+      "status_failed": "تمت الموافقة لكن التطبيق فشل — تم إبلاغ فريقنا.",
+      "history": "القرارات الأخيرة ({count})"
     }
   },
   "brain_clone": {
@@ -2849,6 +2879,30 @@
       "section_profile": "الملف الشخصي",
       "role_label": "معالج",
       "section_notifications": "الإشعارات"
+    },
+    "assessment": {
+      "title": "تقييم المعالج",
+      "description": "شارك ما تلاحظه في الجلسات مع {name} — فهو يشكل خط الأساس والدروس. كل شيء اختياري.",
+      "discipline": "تخصص العلاج",
+      "discipline_speech": "نطق",
+      "discipline_occupational": "وظيفي",
+      "discipline_behavioral": "سلوكي",
+      "discipline_physical": "طبيعي",
+      "discipline_other": "أخرى",
+      "areas_of_focus": "مجالات التركيز",
+      "strengths": "نقاط القوة الملاحظة",
+      "challenges": "التحديات الملاحظة",
+      "regulation_strategies": "استراتيجيات التنظيم الفعالة",
+      "recommended_accommodations": "التسهيلات الموصى بها",
+      "sensory_notes": "ملاحظات حسية",
+      "communication_notes": "ملاحظات التواصل",
+      "observations": "ملاحظات سردية",
+      "list_hint": "افصل العناصر بفواصل أو أسطر جديدة",
+      "submit": "إرسال التقييم",
+      "submitting": "جارٍ الإرسال…",
+      "submit_error": "تعذر حفظ التقييم — حاول مرة أخرى.",
+      "success_title": "تم حفظ التقييم",
+      "success_body": "مدخلاتك تغذي الآن خط الأساس وتخصيص الدروس لهذا المتعلم."
     }
   },
   "caregiver": {

@@ -30,6 +30,7 @@ import { createLogger } from "@aivo/observability";
 import { Permission } from "@aivo/security";
 import { requireSchoolAdmin } from "../hooks/require-school-admin.js";
 import { delegatedAdminRbacV2Enabled, requestHasPermission } from "../lib/permissions.js";
+import { alignmentWithEnrolledGrade } from "../services/enrollment-alignment.js";
 
 const logger = createLogger("identity-svc.school");
 
@@ -437,6 +438,9 @@ export async function registerSchoolRoutes(app: FastifyInstance) {
             zipCode: body.zipCode,
             country: body.country || "US",
             region: body.region,
+            // Enrolled-grade keys so lesson generation has a real grade
+            // target from day one (baseline later refines delivery_level).
+            curriculumAlignment: alignmentWithEnrolledGrade(null, body.gradeLevel),
           } as any)
           .returning();
       } catch (err) {

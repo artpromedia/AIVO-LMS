@@ -439,7 +439,15 @@
       "time_learning": "Tempo de aprendizado",
       "skills_tracked": "Habilidades monitoradas",
       "mastered": "Dominadas",
-      "by_subject": "Por disciplina"
+      "by_subject": "Por disciplina",
+      "refresh_path": "Atualizar trilha de aprendizagem",
+      "refresh_path_done": "Trilha atualizada",
+      "refresh_path_error": "Falha ao atualizar — tente novamente",
+      "trajectory_title": "Progresso ao longo do tempo",
+      "at_grade_count": "{count} de {total} habilidades no nível da série",
+      "working_at": "Trabalhando no nível {level}",
+      "grade_target": "Série alvo {grade}",
+      "on_grade": "No nível da série"
     },
     "learner_summary": {
       "title": "Resumo em linguagem simples",
@@ -494,7 +502,8 @@
       "none_recorded": "Nenhum registrado ainda.",
       "challenges": "Desafios",
       "accessibility_defaults": "Configurações de acessibilidade",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "Recomendações para sua aprovação"
     },
     "learner_sensory": {
       "title": "Perfil sensorial",
@@ -686,6 +695,27 @@
       "last_active_today": "Última atividade hoje",
       "last_active_yesterday": "Última atividade ontem",
       "last_active_days": "Última atividade há {count} dias"
+    },
+    "recommendations": {
+      "loading": "Verificando recomendações…",
+      "load_error": "Não foi possível carregar as recomendações — tente novamente.",
+      "empty": "Nenhuma recomendação aguardando sua aprovação.",
+      "pending_badge": "Precisa de aprovação",
+      "proposed_change": "Mudança proposta",
+      "based_on": "Com base em {summary}",
+      "approve": "Aprovar",
+      "adjust": "Ajustar",
+      "decline": "Recusar",
+      "amend_label": "Novo valor",
+      "confirm_adjust": "Aplicar valor ajustado",
+      "decline_reason_label": "Por que recusar?",
+      "confirm_decline": "Confirmar recusa",
+      "cancel": "Cancelar",
+      "decision_error": "Não foi possível registrar sua decisão — tente novamente.",
+      "status_applied": "Aprovado e aplicado — as lições atualizam na próxima sessão.",
+      "status_declined": "Recusado — nada muda.",
+      "status_failed": "Aprovado, mas a aplicação falhou — nossa equipe foi notificada.",
+      "history": "Decisões recentes ({count})"
     }
   },
   "brain_clone": {
@@ -2849,6 +2879,30 @@
       "section_profile": "Perfil",
       "role_label": "Terapeuta",
       "section_notifications": "Notificações"
+    },
+    "assessment": {
+      "title": "Avaliação do terapeuta",
+      "description": "Compartilhe o que você observa na terapia com {name} — isso molda a linha de base e as lições. Tudo é opcional.",
+      "discipline": "Disciplina terapêutica",
+      "discipline_speech": "Fala",
+      "discipline_occupational": "Ocupacional",
+      "discipline_behavioral": "Comportamental",
+      "discipline_physical": "Física",
+      "discipline_other": "Outra",
+      "areas_of_focus": "Áreas de foco",
+      "strengths": "Pontos fortes observados",
+      "challenges": "Desafios observados",
+      "regulation_strategies": "Estratégias de regulação que funcionam",
+      "recommended_accommodations": "Acomodações recomendadas",
+      "sensory_notes": "Notas sensoriais",
+      "communication_notes": "Notas de comunicação",
+      "observations": "Observações narrativas",
+      "list_hint": "Separe os itens com vírgulas ou quebras de linha",
+      "submit": "Enviar avaliação",
+      "submitting": "Enviando…",
+      "submit_error": "Não foi possível salvar a avaliação — tente novamente.",
+      "success_title": "Avaliação salva",
+      "success_body": "Sua contribuição agora alimenta a linha de base e a personalização das lições."
     }
   },
   "caregiver": {

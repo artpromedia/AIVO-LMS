@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
-import { lessonSessions, lessonContent, gradebookEntries, learningPaths } from "@aivo/db";
+import { lessonSessions, lessonContent, gradebookEntries, learningPaths, learners, learnerProfiles } from "@aivo/db";
 import { emitLessonAudit } from "../lib/audit.js";
 import {
   generateLessonContent,
@@ -12,6 +12,9 @@ import {
   computeCompletionQuality,
   type LessonSignals,
 } from "../services/scoring.js";
+import { resolveGradeTargets } from "../services/grade-target.js";
+import { emitMasterySignals, type MasteryMovement } from "../services/mastery-signal-emitter.js";
+import { writeMasteryToWebStore } from "../services/web-mastery-writer.js";
 import { resolveTenantId, requireLearnerAccess } from "../lib/tenant.js";
 import { checkLearnerTutorAccess } from "../lib/entitlements.js";
 import { getRealtimeBus, subjects as busSubjects } from "../realtime/bus.js";
@@ -394,6 +397,36 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
 
     const functioningLevel = (brainContext as any).functioning_level_profile?.level || "STANDARD";
 
+    // Resolve the grade target + delivery level for generation. NEVER a
+    // hardcoded constant: alignment (enrollment + baseline placement) →
+    // learners.grade_level → 422. A wrong-grade lesson is worse than an
+    // explicit error.
+    const [learnerRow] = await db
+      .select({ gradeLevel: learners.gradeLevel })
+      .from(learners)
+      .where(eq(learners.id, learnerId));
+    const gradeResolution = resolveGradeTargets({
+      alignment: (brainContext as any).curriculum_alignment,
+      learnerGradeLevel: learnerRow?.gradeLevel ?? null,
+    });
+    if (!gradeResolution.ok) {
+      request.log.warn(
+        { event: "curriculum_alignment.grade_unresolvable", learnerId },
+        "no grade band resolvable for learner; refusing to generate at an arbitrary grade",
+      );
+      return reply.code(422).send({
+        error: "grade_unresolvable",
+        message:
+          "Learner has no resolvable grade level. Set the learner's grade (or curriculum alignment) before starting a lesson session.",
+      });
+    }
+    if (gradeResolution.source !== "alignment") {
+      request.log.warn(
+        { event: "curriculum_alignment.missing", learnerId, source: gradeResolution.source },
+        "curriculum_alignment incomplete; using fallback grade resolution",
+      );
+    }
+
     // Sprint 05: pull subject-brain context when the flag is on. The result
     // is merged into brainContext so the existing generator pipeline picks
     // it up without behavioral change when the flag is off.
@@ -454,8 +487,8 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
       const generated = await generateLessonContent({
         subject,
         topic: topic || `Introduction to ${subject}`,
-        gradeTarget: (brainContext as any).curriculum_alignment?.grade_band || "THIRD",
-        deliveryLevel: (brainContext as any).curriculum_alignment?.delivery_level || "THIRD",
+        gradeTarget: gradeResolution.gradeTarget,
+        deliveryLevel: gradeResolution.deliveryLevel,
         functioningLevel,
         brainContext: enrichedBrainContext,
         contentType: contentType || "LESSON",
@@ -488,8 +521,8 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         contentType: contentType || "LESSON",
         subject,
         topic: topic || `Introduction to ${subject}`,
-        gradeTarget: (brainContext as any).curriculum_alignment?.grade_band || "THIRD",
-        deliveryLevel: (brainContext as any).curriculum_alignment?.delivery_level || "THIRD",
+        gradeTarget: gradeResolution.gradeTarget,
+        deliveryLevel: gradeResolution.deliveryLevel,
         generatedContent: { raw: generated.content },
         qualityScore: generated.qualityScore,
         qualityGateLog: generated.qualityGateLog,
@@ -604,6 +637,7 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         completedAt: new Date().toISOString(),
       });
 
+      const masteryMovements: MasteryMovement[] = [];
       if (masteryUpdates) {
         for (const [skill, score] of Object.entries(masteryUpdates)) {
           const existing = await db
@@ -615,6 +649,13 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
                 eq(gradebookEntries.skill, skill),
               ),
             );
+
+          masteryMovements.push({
+            skillId: skill,
+            subjectId: session.subject,
+            before: existing.length > 0 ? (existing[0].masteryScore ?? 0) : 0,
+            after: score as number,
+          });
 
           if (existing.length > 0) {
             await db
@@ -644,6 +685,58 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
             });
           }
         }
+      }
+
+      // Sprint 7: land the same evidence in the web mastery store (the one
+      // that drives selection, paths, snapshots, recommendations). Resilient
+      // — a mastery-store failure must never fail session completion.
+      if (masteryUpdates && Object.keys(masteryUpdates).length > 0) {
+        try {
+          await writeMasteryToWebStore(db, request.log, {
+            tenantId: session.tenantId,
+            learnerId: session.learnerId,
+            updates: masteryUpdates as Record<string, number>,
+          });
+        } catch (err) {
+          request.log.warn(
+            {
+              event: "web_mastery.write_failed",
+              learnerId: session.learnerId,
+              err: err instanceof Error ? err.message : String(err),
+            },
+            "web mastery store write failed (non-fatal)",
+          );
+        }
+      }
+
+      // Sprint 4: feed the recommendation loop (upward delivery-level +
+      // rebaseline rules) with per-skill mastery movement. Fire-and-forget.
+      if (masteryMovements.length > 0) {
+        void (async () => {
+          const [learnerRow] = await db
+            .select({ curriculumAlignment: learners.curriculumAlignment })
+            .from(learners)
+            .where(eq(learners.id, session.learnerId));
+          const [profileRow] = await db
+            .select({ baselineCompletedAt: learnerProfiles.baselineCompletedAt })
+            .from(learnerProfiles)
+            .where(eq(learnerProfiles.learnerId, session.learnerId));
+          const alignment = (learnerRow?.curriculumAlignment ?? {}) as Record<string, unknown>;
+          await emitMasterySignals({
+            tenantId: session.tenantId,
+            learnerId: session.learnerId,
+            movements: masteryMovements,
+            currentProfile: {
+              deliveryLevel:
+                typeof alignment.delivery_level === "string" ? alignment.delivery_level : undefined,
+              gradeBand:
+                typeof alignment.grade_band === "string" ? alignment.grade_band : undefined,
+              baselineCompletedAt: profileRow?.baselineCompletedAt
+                ? new Date(profileRow.baselineCompletedAt).toISOString()
+                : undefined,
+            },
+          });
+        })().catch(() => {});
       }
 
       await emitLessonAudit({

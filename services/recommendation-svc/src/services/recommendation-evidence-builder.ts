@@ -10,6 +10,8 @@ export interface LearnerSignal {
   contributorRole?: ContributorRole;
   /** Relative confidence weight (0–1), e.g. therapist > teacher > caregiver. */
   weight?: number;
+  /** Structured payload (e.g. { skillId, subjectId, levelBefore, levelAfter }). */
+  metadata?: Record<string, unknown>;
 }
 
 export function buildEvidenceFromSignals(signals: LearnerSignal[]): RecommendationEvidence[] {
@@ -21,6 +23,7 @@ export function buildEvidenceFromSignals(signals: LearnerSignal[]): Recommendati
     value: signal.value,
     contributorRole: signal.contributorRole,
     weight: signal.weight,
+    metadata: signal.metadata,
   }));
 }
 

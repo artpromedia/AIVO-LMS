@@ -36,6 +36,8 @@ export interface RecommendationEvidence {
   contributorRole?: ContributorRole;
   /** Relative confidence weight of this evidence (0–1). */
   weight?: number;
+  /** Structured payload carried by the originating signal (e.g. skillId). */
+  metadata?: Record<string, unknown>;
 }
 
 export interface RecommendationSafety {

@@ -47,6 +47,7 @@ import type {
   LearningPath,
   LessonOutcome,
   MasteryMap,
+  MasterySnapshot,
   ParentAssessment,
   ParentAssessmentSectionId,
   ParentLessonSummary,
@@ -99,11 +100,20 @@ import {
 import { logger } from "@/lib/observability/logger";
 import {
   buildBaselineSummary,
+  buildMasterySnapshotRows,
   computeSkillMasteryFromBaseline,
   generateLearningPath,
   generateReviewSchedules,
   levelFromScore,
 } from "@/lib/learner/mastery";
+import { selectNextSkills } from "@/lib/learner/select-next-skills";
+import { emitLessonMasterySignal } from "@/lib/learner/mastery-signal-emitter";
+import {
+  deliveryLevelFromTheta,
+  normalizeGradeBand,
+  masteryTargetFromOutcome,
+  moveMasteryScore,
+} from "@aivo/scoring";
 import { buildBrainProfile } from "@/lib/learner/brain-profile";
 import { brainProfileStateSchema } from "@/lib/validators/brain-profile";
 import type { CreateLearnerInput, PatchLearnerInput } from "@/lib/validators/learner";
@@ -1248,7 +1258,10 @@ export async function completeBaseline(
   /** Post-baseline clone of the brain profile; null if no pre-clone existed. */
   clonedBrainProfile: LearnerBrainProfile | null;
 } | null> {
-  const store = db();
+  // Seed the dev/test memory store before any adapter reads (no-op in
+  // postgres mode); the store handle itself is intentionally unused — every
+  // read/write below goes through the persistence adapter (ADR 0007).
+  db();
   const baseline = await getPersistence().assessments.getBaselineById(baselineId, tenantId);
   if (!baseline) return null;
   // Read the learner through the persistence adapter, not the in-memory
@@ -1261,28 +1274,18 @@ export async function completeBaseline(
 
   // Idempotent short-circuit: a completed baseline returns the existing
   // snapshot (same summary, mastery map, learning path, review schedules) so
-  // callers replaying the request get stable IDs and timestamps.
+  // callers replaying the request get stable IDs and timestamps. Read through
+  // the persistence adapter — in postgres mode the in-memory Maps are empty,
+  // so a direct store read here would wrongly rebuild on every replay.
   if (baseline.status === "complete" && baseline.summary) {
-    let existingMap: MasteryMap | null = null;
-    for (const m of store.masteryMaps.values()) {
-      if (m.learnerId === baseline.learnerId && m.tenantId === tenantId) {
-        existingMap = m;
-        break;
-      }
-    }
-    let existingPath: LearningPath | null = null;
-    for (const p of store.learningPaths.values()) {
-      if (p.learnerId === baseline.learnerId && p.tenantId === tenantId) {
-        existingPath = p;
-        break;
-      }
-    }
+    const curriculumStore = getPersistence().curriculum;
+    const { map: existingMap, skillMasteries: existingMasteries } =
+      await curriculumStore.getMasteryMapForLearner(baseline.learnerId, tenantId);
+    const existingPath = await curriculumStore.getLearningPath(baseline.learnerId, tenantId);
     if (existingMap && existingPath) {
-      const existingMasteries = store.skillMasteries.filter(
-        (m) => m.learnerId === baseline.learnerId && m.tenantId === tenantId,
-      );
-      const existingReviews = store.reviewSchedules.filter(
-        (r) => r.learnerId === baseline.learnerId && r.tenantId === tenantId,
+      const existingReviews = await curriculumStore.getReviewSchedules(
+        baseline.learnerId,
+        tenantId,
       );
       return {
         baseline,
@@ -1324,13 +1327,11 @@ export async function completeBaseline(
 
   // Compute the mastery map snapshot (existing row carried over, otherwise a
   // fresh id) without yet writing it.
-  let masteryMap: MasteryMap | null = null;
-  for (const m of store.masteryMaps.values()) {
-    if (m.learnerId === baseline.learnerId && m.tenantId === tenantId) {
-      masteryMap = m;
-      break;
-    }
-  }
+  const { map: priorMasteryMap } = await getPersistence().curriculum.getMasteryMapForLearner(
+    baseline.learnerId,
+    tenantId,
+  );
+  let masteryMap: MasteryMap | null = priorMasteryMap;
   masteryMap = masteryMap
     ? { ...masteryMap, updatedAt: nowIso() }
     : {
@@ -1348,6 +1349,7 @@ export async function completeBaseline(
     skillMasteries,
     skills,
     recommendedStartSkillId: summary.recommendedStartSkillId,
+    gradeBand: learner.gradeBand ?? null,
   });
 
   const reviewSchedules = generateReviewSchedules({
@@ -1367,33 +1369,23 @@ export async function completeBaseline(
 
   // --- Commit (atomic from this point: validation has already passed) ---
 
+  // All derived artifacts land through the persistence adapter so they
+  // survive in postgres mode (production) — writing them to the in-memory
+  // Map store would silently lose the learner's mastery/path on restart.
+  const curriculum = getPersistence().curriculum;
+
   // Replace ALL prior mastery rows in the subjects this baseline covered (not
   // just the skills it evaluated), so a sparser re-run cannot leave stale
   // data behind from a previous, denser baseline.
-  const coveredSubjectIds = new Set(baseline.subjectIds);
-  store.skillMasteries = store.skillMasteries.filter(
-    (m) =>
-      !(
-        m.learnerId === baseline.learnerId &&
-        m.tenantId === tenantId &&
-        coveredSubjectIds.has(m.subjectId)
-      ),
+  await curriculum.replaceSkillMasteriesForSubjects(
+    baseline.learnerId,
+    tenantId,
+    baseline.subjectIds,
+    skillMasteries,
   );
-  store.skillMasteries.push(...skillMasteries);
-
-  store.masteryMaps.set(masteryMap.id, masteryMap);
-
-  for (const [id, p] of store.learningPaths) {
-    if (p.learnerId === baseline.learnerId && p.tenantId === tenantId) {
-      store.learningPaths.delete(id);
-    }
-  }
-  store.learningPaths.set(learningPath.id, learningPath);
-
-  store.reviewSchedules = store.reviewSchedules.filter(
-    (r) => !(r.learnerId === baseline.learnerId && r.tenantId === tenantId),
-  );
-  store.reviewSchedules.push(...reviewSchedules);
+  await curriculum.upsertMasteryMap(masteryMap);
+  await curriculum.replaceLearningPath(baseline.learnerId, tenantId, learningPath);
+  await curriculum.replaceReviewSchedules(baseline.learnerId, tenantId, reviewSchedules);
 
   const clonedBrainProfile = await commitBrainClone(preparedClone);
 
@@ -1409,6 +1401,7 @@ export async function completeBaseline(
   // recalibration job has live data to refine item difficulty. Adaptive
   // path only; idempotent (the main finalize path runs once per baseline,
   // but guard anyway so a replay never double-writes).
+  let adaptiveFinalTheta: number | null = null;
   if (baselineAdaptiveEnabled()) {
     const existing = await getPersistence().assessments.listBaselineTelemetry({
       tenantId,
@@ -1427,6 +1420,7 @@ export async function completeBaseline(
         calibration,
       });
       if (telemetry.length > 0) {
+        adaptiveFinalTheta = telemetry[telemetry.length - 1]!.thetaAfter;
         await getPersistence().assessments.appendBaselineTelemetry(telemetry);
         logger.info(
           {
@@ -1440,6 +1434,37 @@ export async function completeBaseline(
         );
       }
     }
+  }
+
+  // Adaptive-learning E2E Sprint 3: append one trajectory point per covered
+  // subject so the parent progress page can chart movement over time.
+  // Resilient by contract — a snapshot failure must never fail completion.
+  try {
+    const enrolledBand = normalizeGradeBand(learner.gradeBand);
+    const snapshotRows = buildMasterySnapshotRows({
+      learnerId: baseline.learnerId,
+      tenantId,
+      skillMasteries,
+      subjectIds: baseline.subjectIds,
+      gradeBand: learner.gradeBand ?? null,
+      deliveryLevel:
+        adaptiveFinalTheta !== null && enrolledBand
+          ? deliveryLevelFromTheta(adaptiveFinalTheta, enrolledBand)
+          : null,
+      trigger: "baseline",
+    });
+    for (const row of snapshotRows) {
+      await getPersistence().curriculum.appendMasterySnapshot(row);
+    }
+  } catch (snapErr) {
+    logger.warn(
+      {
+        event: "mastery_snapshot.append_failed",
+        learnerId: baseline.learnerId,
+        err: snapErr instanceof Error ? snapErr.message : String(snapErr),
+      },
+      "baseline: mastery snapshot append failed (non-fatal)",
+    );
   }
 
   return {
@@ -1549,9 +1574,16 @@ export async function regenerateLearningPath(
   const { map, skillMasteries } = await getMasteryMap(learnerId, tenantId);
   if (!map || skillMasteries.length === 0) return null;
   const skills = await listSkills();
-  // Find a "recommended first" skill: lowest-scoring, prefer reading.
-  const sorted = skillMasteries.slice().sort((a, b) => a.score - b.score);
-  const recommended = sorted[0]?.skillId ?? null;
+  const learner = await getLearner(learnerId, tenantId);
+  // Recommended first skill: head of the prerequisite-aware frontier
+  // (Sprint 3) — NOT the raw lowest score, which can point at a skill whose
+  // prerequisites the learner hasn't met yet.
+  const selection = selectNextSkills({
+    skills,
+    skillMasteries,
+    gradeBand: learner?.gradeBand ?? null,
+  });
+  const recommended = selection.frontier[0] ?? null;
   const next = generateLearningPath({
     learnerId,
     tenantId,
@@ -1559,8 +1591,17 @@ export async function regenerateLearningPath(
     skillMasteries,
     skills,
     recommendedStartSkillId: recommended,
+    gradeBand: learner?.gradeBand ?? null,
   });
   return getPersistence().curriculum.replaceLearningPath(learnerId, tenantId, next);
+}
+
+export async function listMasterySnapshots(
+  learnerId: string,
+  tenantId: string,
+  opts?: { subjectId?: string; sinceIso?: string },
+): Promise<MasterySnapshot[]> {
+  return getPersistence().curriculum.listMasterySnapshots(learnerId, tenantId, opts);
 }
 
 export type SubjectDetail = {
@@ -1579,11 +1620,12 @@ export async function getSubjectDetail(
   tenantId: string,
   subjectId: string,
 ): Promise<SubjectDetail | null> {
-  const store = db();
-  const subject = store.subjects.get(subjectId);
+  // Subjects/skills are reference data — read through the persistence adapter
+  // so subject detail (and next-skill selection) works in postgres mode.
+  const subject = await getPersistence().curriculum.getSubjectById(subjectId);
   if (!subject) return null;
 
-  const skills = Array.from(store.skills.values()).filter((s) => s.subjectId === subjectId);
+  const skills = await getPersistence().curriculum.listSkills(subjectId);
   const { skillMasteries } = await getMasteryMap(learnerId, tenantId);
   const masteryBySkillId = new Map(skillMasteries.map((m) => [m.skillId, m]));
   const annotated = skills.map((s) => ({
@@ -1607,12 +1649,13 @@ export async function getSubjectDetail(
     }
   }
 
-  // Next skill: lowest-scoring skill not yet on_grade_level, else first skill.
-  const sortedForNext = annotated
-    .slice()
-    .sort((a, b) => (a.mastery?.score ?? 0) - (b.mastery?.score ?? 0));
-  const nextSkill =
-    sortedForNext.find((s) => !s.mastery || s.mastery.score < 0.65) ?? annotated[0] ?? null;
+  // Next skill: head of the prerequisite-aware frontier (Sprint 3) — an
+  // unlocked, unmastered skill in DAG order, never one whose prerequisites
+  // are unmet. Falls back to the first skill when everything is mastered.
+  const selection = selectNextSkills({ skills, skillMasteries });
+  const nextSkill = selection.frontier.length
+    ? (annotated.find((s) => s.id === selection.frontier[0]) ?? null)
+    : (annotated[0] ?? null);
 
   const path = await getLearningPath(learnerId, tenantId);
   const pathNodesForSubject = path?.nodes.filter((n) => n.subjectId === subjectId) ?? [];
@@ -1790,16 +1833,17 @@ export async function createLessonRun(
   input: CreateLessonRunInput,
   provider: TutorProvider = getTutorProvider(),
 ): Promise<CreateLessonRunResult> {
-  const store = db();
   const learner = await getLearner(input.learnerId, input.tenantId);
   if (!learner) {
     return { ok: false, code: "learner_not_found", message: "Learner not in tenant" };
   }
-  const subject = store.subjects.get(input.subjectId);
+  // Subjects/skills are reference data — read through the persistence adapter
+  // so lesson creation resolves them in postgres mode (Map store is empty there).
+  const subject = await getPersistence().curriculum.getSubjectById(input.subjectId);
   if (!subject) {
     return { ok: false, code: "subject_not_found", message: "Subject not found" };
   }
-  const skill = store.skills.get(input.skillId);
+  const skill = await getPersistence().curriculum.getSkillById(input.skillId);
   if (!skill || skill.subjectId !== input.subjectId) {
     return { ok: false, code: "skill_not_found", message: "Skill not in subject" };
   }
@@ -2091,77 +2135,75 @@ export function deriveOutcomeFromInteractions(run: LessonRun, abandoned: boolean
  * with a small penalty per hint/scaffold so we don't over-credit scaffolded work.
  * Returns the before/after mastery snapshot for the parent summary.
  */
-function applyOutcomeToMastery(
-  run: LessonRun,
-  outcome: LessonOutcome,
-): {
+type MasteryDelta = {
   before: number;
   after: number;
   levelBefore: SkillMasteryLevel;
   levelAfter: SkillMasteryLevel;
-} {
-  const store = db();
-  const existing = store.skillMasteries.find(
-    (m) =>
-      m.learnerId === run.learnerId && m.tenantId === run.tenantId && m.skillId === run.skillId,
+  confidenceAfter: number;
+};
+
+async function applyOutcomeToMastery(run: LessonRun, outcome: LessonOutcome): Promise<MasteryDelta> {
+  // Read + write through the persistence adapter: in postgres mode
+  // (production) the in-memory Map store is empty, so direct store access
+  // here would both miss the baseline-derived row AND lose the update.
+  const curriculum = getPersistence().curriculum;
+  const { map, skillMasteries } = await curriculum.getMasteryMapForLearner(
+    run.learnerId,
+    run.tenantId,
   );
+  const existing =
+    skillMasteries.find(
+      (m) =>
+        m.learnerId === run.learnerId && m.tenantId === run.tenantId && m.skillId === run.skillId,
+    ) ?? null;
   const beforeScore = existing?.score ?? run.masterySnapshot.score;
   const beforeLevel: SkillMasteryLevel = existing?.level ?? run.masterySnapshot.level;
 
-  // accuracy in [0..1]; default to 0.5 when there were no checks (intro-only run)
+  // Canonical EWMA — shared with learning-svc via @aivo/scoring (Sprint 7).
   const accuracy = outcome.checksTotal > 0 ? outcome.checksCorrect / outcome.checksTotal : 0.5;
-  // Hints and scaffolds discount the apparent accuracy.
-  const supportPenalty = Math.min(0.15, 0.04 * outcome.hintsUsed + 0.05 * outcome.scaffoldsUsed);
-  const adjusted = Math.max(0, accuracy - supportPenalty);
-  // Move 25% of the way toward the adjusted target; abandoned runs decay slightly.
-  const target = outcome.abandoned ? Math.min(beforeScore, 0.5) : adjusted;
-  const afterScore = Math.max(0, Math.min(1, beforeScore + (target - beforeScore) * 0.25));
+  const target = masteryTargetFromOutcome(outcome, beforeScore);
+  const afterScore = moveMasteryScore(beforeScore, target);
   const afterLevel = levelFromScore(afterScore);
   const now = nowIso();
 
-  if (existing) {
-    existing.score = afterScore;
-    existing.level = afterLevel;
-    existing.confidence = Math.min(1, existing.confidence + 0.05);
-    existing.needsReview = outcome.abandoned || accuracy < 0.5;
-    existing.lastEvaluatedAt = now;
-  } else {
-    store.skillMasteries.push({
-      learnerId: run.learnerId,
-      tenantId: run.tenantId,
-      skillId: run.skillId,
-      subjectId: run.subjectId,
-      score: afterScore,
-      level: afterLevel,
-      confidence: 0.6,
-      needsReview: outcome.abandoned || accuracy < 0.5,
-      lastEvaluatedAt: now,
-    });
-  }
+  const confidenceAfter = existing ? Math.min(1, existing.confidence + 0.05) : 0.6;
+  await curriculum.upsertSkillMastery({
+    learnerId: run.learnerId,
+    tenantId: run.tenantId,
+    skillId: run.skillId,
+    subjectId: existing?.subjectId ?? run.subjectId,
+    score: afterScore,
+    level: afterLevel,
+    confidence: confidenceAfter,
+    needsReview: outcome.abandoned || accuracy < 0.5,
+    lastEvaluatedAt: now,
+  });
   // Bump the MasteryMap.updatedAt so the parent dashboard reflects freshness.
-  const map = Array.from(store.masteryMaps.values()).find(
-    (m) => m.learnerId === run.learnerId && m.tenantId === run.tenantId,
-  );
   if (map) {
-    map.updatedAt = now;
+    await curriculum.upsertMasteryMap({ ...map, updatedAt: now });
   }
   return {
     before: beforeScore,
     after: afterScore,
     levelBefore: beforeLevel,
     levelAfter: afterLevel,
+    confidenceAfter,
   };
 }
 
-function buildParentLessonSummary(
+async function buildParentLessonSummary(
   run: LessonRun,
   outcome: LessonOutcome,
-  delta: ReturnType<typeof applyOutcomeToMastery>,
-): ParentLessonSummary {
-  const store = db();
-  const subject = store.subjects.get(run.subjectId);
-  const skill = store.skills.get(run.skillId);
-  const learner = store.learnerProfiles.get(run.learnerId);
+  delta: MasteryDelta,
+): Promise<ParentLessonSummary> {
+  // Reference data + learner read through the persistence adapter so the
+  // summary keeps real names in postgres mode (the Map store is empty there;
+  // the old direct reads silently degraded to "this subject"/"Your child").
+  const curriculum = getPersistence().curriculum;
+  const subject = await curriculum.getSubjectById(run.subjectId);
+  const skill = await curriculum.getSkillById(run.skillId);
+  const learner = await getLearner(run.learnerId, run.tenantId);
   const subjectName = subject?.name ?? "this subject";
   const skillName = skill?.name ?? "this skill";
   const name = learner?.preferredName || learner?.firstName || "Your child";
@@ -2257,8 +2299,79 @@ export async function completeLessonRun(
     updatedAt: nowIso(),
   };
   await runStore.upsertRun(next);
-  const delta = applyOutcomeToMastery(next, effectiveOutcome);
-  const summary = buildParentLessonSummary(next, effectiveOutcome, delta);
+  const delta = await applyOutcomeToMastery(next, effectiveOutcome);
+  // Sprint 3: a level change re-plans the learning path and records a
+  // trajectory point. Resilient — failures log and never fail completion.
+  if (delta.levelAfter !== delta.levelBefore) {
+    try {
+      await regenerateLearningPath(next.learnerId, tenantId);
+      const { skillMasteries: refreshed } = await getMasteryMap(next.learnerId, tenantId);
+      const learnerRow = await getLearner(next.learnerId, tenantId);
+      const snapshotRows = buildMasterySnapshotRows({
+        learnerId: next.learnerId,
+        tenantId,
+        skillMasteries: refreshed,
+        subjectIds: [next.subjectId],
+        gradeBand: learnerRow?.gradeBand ?? null,
+        deliveryLevel: null,
+        trigger: "lesson",
+      });
+      for (const row of snapshotRows) {
+        await getPersistence().curriculum.appendMasterySnapshot(row);
+      }
+    } catch (snapErr) {
+      logger.warn(
+        {
+          event: "mastery_snapshot.append_failed",
+          learnerId: next.learnerId,
+          err: snapErr instanceof Error ? snapErr.message : String(snapErr),
+        },
+        "lesson: path regen / mastery snapshot failed (non-fatal)",
+      );
+    }
+  }
+  // Sprint 4: feed the recommendation loop (upward delivery-level +
+  // rebaseline rules) with this skill's mastery movement. Fire-and-forget.
+  {
+    const { map, skillMasteries: currentMasteries } = await getMasteryMap(
+      next.learnerId,
+      tenantId,
+    );
+    const learnerRow = await getLearner(next.learnerId, tenantId);
+    // Current-state peers (>= 0.65 in this subject, excluding the moved
+    // skill) ride along as snapshot evidence so the upward rule can see
+    // sustained mastery from single-skill lessons.
+    const subjectPeers = currentMasteries
+      .filter(
+        (m) => m.subjectId === next.subjectId && m.skillId !== next.skillId && m.score >= 0.65,
+      )
+      .map((m) => ({
+        skillId: m.skillId,
+        subjectId: m.subjectId,
+        score: m.score,
+        level: m.level,
+        confidence: m.confidence,
+      }));
+    void emitLessonMasterySignal({
+      tenantId,
+      learnerId: next.learnerId,
+      movement: {
+        skillId: next.skillId,
+        subjectId: next.subjectId,
+        before: delta.before,
+        after: delta.after,
+        levelBefore: delta.levelBefore,
+        levelAfter: delta.levelAfter,
+        confidence: delta.confidenceAfter,
+      },
+      subjectPeers,
+      currentProfile: {
+        gradeBand: learnerRow?.gradeBand ?? undefined,
+        baselineCompletedAt: map?.generatedAt ?? undefined,
+      },
+    }).catch(() => {});
+  }
+  const summary = await buildParentLessonSummary(next, effectiveOutcome, delta);
   await runStore.upsertParentSummary(summary);
   await refreshLearnerReadiness(run.learnerId, tenantId);
   // Sprint 16: bump QuestProgress when the run was launched from a quest

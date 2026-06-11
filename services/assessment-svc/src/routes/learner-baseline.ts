@@ -11,6 +11,9 @@ import {
   learnerCaregivers,
   learnerTeachers,
   learnerTherapists,
+  therapistAssessments,
+  therapyGoals,
+  caregiverObservations,
 } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 import { eq, desc, and } from "drizzle-orm";
@@ -20,6 +23,7 @@ import {
   type LearnerInterestSignal,
 } from "@aivo/special-interest-engine";
 import { deriveLearningProfile } from "../services/learning-profile.js";
+import { applyBaselineDeliveryLevel } from "../services/curriculum-alignment.js";
 import { partitionChapterActivitiesPayload } from "../services/discovery-activity-validator.js";
 import { normalizeBaselineItems } from "../services/baselineSurfaceNormalizer.js";
 import {
@@ -310,6 +314,83 @@ async function loadTeacherContext(db: any, learnerDbId: string) {
 }
 
 /**
+ * Load EVERY completed therapist assessment for the learner, deduped to the
+ * most recent per submitter — multiple therapists (speech, OT, behavioral…)
+ * may each contribute, and the prompt renders one sub-block per discipline.
+ * Therapist input is OPTIONAL: returns [] when none exist.
+ */
+async function loadTherapistContext(db: any, learnerDbId: string) {
+  const rows = await db
+    .select()
+    .from(therapistAssessments)
+    .where(eq(therapistAssessments.learnerId, learnerDbId))
+    .orderBy(desc(therapistAssessments.createdAt))
+    .limit(25);
+  const completed = (rows || []).filter((r: any) => !!r.completedAt);
+  if (completed.length === 0) return [];
+  const bySubmitter = new Map<string, any>();
+  for (const r of completed) {
+    const key = r.submittedBy ?? r.id;
+    if (!bySubmitter.has(key)) bySubmitter.set(key, r);
+  }
+  return Array.from(bySubmitter.values()).map((row: any) => ({
+    therapyDiscipline: row.therapyDiscipline || null,
+    areasOfFocus: row.areasOfFocus || [],
+    strengths: row.strengths || [],
+    challenges: row.challenges || [],
+    sensoryNotes: row.sensoryNotes || null,
+    communicationNotes: row.communicationNotes || null,
+    regulationStrategies: row.regulationStrategies || [],
+    recommendedAccommodations: row.recommendedAccommodations || [],
+    observations: row.observations || null,
+    responses: row.responses || {},
+    submittedAt: row.completedAt instanceof Date ? row.completedAt.toISOString() : row.completedAt,
+  }));
+}
+
+/**
+ * Active therapist-authored goals (Sprint 6): the highest-signal therapist
+ * artifact, surfaced to the prompt even before a formal assessment exists.
+ */
+async function loadTherapyGoals(db: any, learnerDbId: string) {
+  const rows = await db
+    .select()
+    .from(therapyGoals)
+    .where(and(eq(therapyGoals.learnerId, learnerDbId), eq(therapyGoals.status, "active")))
+    .orderBy(desc(therapyGoals.updatedAt))
+    .limit(20);
+  return (rows || []).map((g: any) => ({
+    goal: g.goalText,
+    domain: g.domain || null,
+    baseline: g.baseline || null,
+    target: g.targetCriteria || null,
+    currentProgress: g.currentProgress || null,
+  }));
+}
+
+const OBSERVATION_NOTE_MAX = 280;
+
+/**
+ * Recent caregiver observation notes (Sprint 6) — real-world context for the
+ * generator, distinct from the structured caregiver ASSESSMENT perspectives.
+ * Notes are truncated so a long diary entry can't blow out the prompt.
+ */
+async function loadCaregiverObservations(db: any, learnerDbId: string) {
+  const rows = await db
+    .select()
+    .from(caregiverObservations)
+    .where(eq(caregiverObservations.learnerId, learnerDbId))
+    .orderBy(desc(caregiverObservations.date))
+    .limit(20);
+  return (rows || []).map((o: any) => ({
+    category: o.category || "General",
+    mood: o.mood || null,
+    notes: String(o.notes ?? "").slice(0, OBSERVATION_NOTE_MAX),
+    date: o.date instanceof Date ? o.date.toISOString() : o.date,
+  }));
+}
+
+/**
  * Load the learner's top special interests (slug + score) and the raw
  * signal stream so the ai-svc prompt can build math word problems
  * about Minecraft, reading passages about volcanoes, etc. Failure to
@@ -420,12 +501,39 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
         }
       } catch {}
 
+      // Sprint 4: an approved rebaseline request makes the baseline
+      // startable again — surface it so clients re-offer the flow.
+      let rebaselineRequested = false;
+      try {
+        const [profileRow] = await db
+          .select({ rebaselineRequestedAt: learnerProfiles.rebaselineRequestedAt })
+          .from(learnerProfiles)
+          .where(eq(learnerProfiles.learnerId, learner.id))
+          .limit(1);
+        rebaselineRequested = !!profileRow?.rebaselineRequestedAt;
+      } catch {}
+
+      // Sprint 6: therapist input is an OPTIONAL enrichment (like teacher),
+      // surfaced for UI affordances only — never a baseline gate.
+      let therapistAssessmentCompleted = false;
+      try {
+        const [therapistRow] = await db
+          .select({ completedAt: therapistAssessments.completedAt })
+          .from(therapistAssessments)
+          .where(eq(therapistAssessments.learnerId, learner.id))
+          .orderBy(desc(therapistAssessments.createdAt))
+          .limit(1);
+        therapistAssessmentCompleted = !!therapistRow?.completedAt;
+      } catch {}
+
       return reply.send({
         learnerId: learner.id,
         baselineCompleted: completed,
         parentAssessmentCompleted: !!parentAss?.completedAt,
+        therapistAssessmentCompleted,
         assessmentId: attempt?.id || null,
         approvalStatus,
+        rebaselineRequested,
       });
     },
   );
@@ -528,6 +636,9 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
       const interestProfile = await loadInterestProfile(db, learner.id);
       const caregiverPerspectives = await loadCaregiverPerspectives(db, learner.id);
       const teacherContext = await loadTeacherContext(db, learner.id);
+      const therapistContext = await loadTherapistContext(db, learner.id);
+      const therapyGoalRows = await loadTherapyGoals(db, learner.id);
+      const observationNotes = await loadCaregiverObservations(db, learner.id);
 
       try {
         const aiRes = await fetch(`${AI_SVC_URL}/api/ai/generate-discovery-chapter`, {
@@ -543,6 +654,9 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             // Optional inputs — null/empty array when not on file.
             caregiver_perspectives: caregiverPerspectives,
             teacher_assessment: teacherContext,
+            therapist_assessments: therapistContext,
+            therapy_goals: therapyGoalRows,
+            caregiver_observations: observationNotes,
             // Sprint 1 — curriculum grounding via ai-svc → curriculum-svc.
             zip_code: buildZipCode(learner),
           }),
@@ -809,6 +923,30 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
           );
         }
 
+        // Persist the θ-derived delivery level onto the learner's
+        // curriculum_alignment BEFORE the brain clone below, so the cloned
+        // brain state (which learning-svc reads at lesson-generation time)
+        // carries the placement. Non-fatal by contract — logs on failure.
+        if (learningProfile) {
+          await applyBaselineDeliveryLevel(db, app.log, {
+            learnerId: learner.id,
+            theta: learningProfile.thetaPlacement,
+          });
+          // A completed discovery run satisfies any outstanding rebaseline
+          // request (the profile upsert above refreshed the placement).
+          try {
+            await db
+              .update(learnerProfiles)
+              .set({ rebaselineRequestedAt: null })
+              .where(eq(learnerProfiles.learnerId, learner.id));
+          } catch (clearErr: any) {
+            app.log.warn(
+              { learnerId, err: clearErr?.message },
+              "[discovery/complete] rebaseline marker clear failed (non-fatal)",
+            );
+          }
+        }
+
         let brainCloneStatus: string = "pending";
         let brainCloneError: string | null = null;
         let brainStateId: string | null = null;
@@ -935,6 +1073,9 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
       const interestProfile = await loadInterestProfile(db, learner.id);
       const caregiverPerspectives = await loadCaregiverPerspectives(db, learner.id);
       const teacherContext = await loadTeacherContext(db, learner.id);
+      const therapistContext = await loadTherapistContext(db, learner.id);
+      const therapyGoalRows = await loadTherapyGoals(db, learner.id);
+      const observationNotes = await loadCaregiverObservations(db, learner.id);
 
       // Sprint 3 — graceful AI-failure fallback. When ai-svc is
       // unreachable, returns a non-2xx, or returns invalid JSON, we
@@ -982,6 +1123,9 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             // Optional inputs — null/empty array when not on file.
             caregiver_perspectives: caregiverPerspectives,
             teacher_assessment: teacherContext,
+            therapist_assessments: therapistContext,
+            therapy_goals: therapyGoalRows,
+            caregiver_observations: observationNotes,
             // Sprint 1 — curriculum grounding via ai-svc → curriculum-svc.
             zip_code: buildZipCode(learner),
           }),

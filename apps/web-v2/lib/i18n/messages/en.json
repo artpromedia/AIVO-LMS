@@ -630,7 +630,15 @@
       "time_learning": "Time learning",
       "skills_tracked": "Skills tracked",
       "mastered": "Mastered",
-      "by_subject": "By subject"
+      "by_subject": "By subject",
+      "refresh_path": "Refresh learning path",
+      "refresh_path_done": "Path refreshed",
+      "refresh_path_error": "Couldn't refresh — try again",
+      "trajectory_title": "Progress over time",
+      "at_grade_count": "{count} of {total} skills at grade level",
+      "working_at": "Working at level {level}",
+      "grade_target": "Grade target {grade}",
+      "on_grade": "On grade level"
     },
     "learner_summary": {
       "title": "Plain-language summary",
@@ -685,7 +693,8 @@
       "none_recorded": "None recorded yet.",
       "challenges": "Challenges",
       "accessibility_defaults": "Accessibility defaults",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "Recommendations for your approval"
     },
     "learner_sensory": {
       "title": "Sensory profile",
@@ -877,6 +886,27 @@
       "last_active_today": "Last active today",
       "last_active_yesterday": "Last active yesterday",
       "last_active_days": "Last active {count} days ago"
+    },
+    "recommendations": {
+      "loading": "Checking for recommendations…",
+      "load_error": "Couldn't load recommendations — try again shortly.",
+      "empty": "No recommendations waiting for your approval right now.",
+      "pending_badge": "Needs approval",
+      "proposed_change": "Proposed change",
+      "based_on": "Based on {summary}",
+      "approve": "Approve",
+      "adjust": "Adjust",
+      "decline": "Decline",
+      "amend_label": "New value",
+      "confirm_adjust": "Apply adjusted value",
+      "decline_reason_label": "Why decline?",
+      "confirm_decline": "Confirm decline",
+      "cancel": "Cancel",
+      "decision_error": "Couldn't record your decision — try again.",
+      "status_applied": "Approved and applied — lessons update from the next session.",
+      "status_declined": "Declined — nothing changes.",
+      "status_failed": "Approved, but applying failed — our team has been notified.",
+      "history": "Recent decisions ({count})"
     }
   },
   "brain_clone": {
@@ -2849,6 +2879,30 @@
       "section_profile": "Profile",
       "role_label": "Therapist",
       "section_notifications": "Notifications"
+    },
+    "assessment": {
+      "title": "Therapist assessment",
+      "description": "Share what you see in therapy with {name} — it shapes their baseline and lessons. Everything is optional.",
+      "discipline": "Therapy discipline",
+      "discipline_speech": "Speech",
+      "discipline_occupational": "Occupational",
+      "discipline_behavioral": "Behavioral",
+      "discipline_physical": "Physical",
+      "discipline_other": "Other",
+      "areas_of_focus": "Areas of focus",
+      "strengths": "Strengths you observe",
+      "challenges": "Challenges you observe",
+      "regulation_strategies": "Regulation strategies that work",
+      "recommended_accommodations": "Accommodations you recommend",
+      "sensory_notes": "Sensory notes",
+      "communication_notes": "Communication notes",
+      "observations": "Narrative observations",
+      "list_hint": "Separate items with commas or new lines",
+      "submit": "Submit assessment",
+      "submitting": "Submitting…",
+      "submit_error": "Couldn't save the assessment — try again.",
+      "success_title": "Assessment saved",
+      "success_body": "Your input now feeds this learner's baseline and lesson personalization."
     }
   },
   "caregiver": {

@@ -15,7 +15,7 @@
  * leaves the recommendation pending (and surfaces via apply_error).
  */
 import { eq, desc } from "drizzle-orm";
-import { brainStates, brainStateSnapshots } from "@aivo/db";
+import { brainStates, brainStateSnapshots, learnerProfiles } from "@aivo/db";
 
 type DbLike = ReturnType<typeof import("@aivo/db").createDb>;
 
@@ -323,9 +323,12 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
       return { applied: true, changedFields: ["curriculum_alignment"], snapshotId };
     }
     case "rebaseline": {
-      // Flag the brain state so the next baseline endpoint unlocks. We don't
-      // create the assessment row here (that's owned by assessment-svc); we
-      // just record the request in the functioning-level profile.
+      // Sprint 4: the SINGLE rebaseline mechanism is the
+      // learner_profiles.rebaseline_requested_at marker (assessment-svc
+      // seeds the new adaptive run from the prior θ and clears it on
+      // finalize; its status endpoints surface `rebaselineRequested`).
+      // The request history stays on the brain state for audit, but the
+      // dead `rebaselinePending` flag (which nothing ever consumed) is gone.
       const profile = asObject(state.functioningLevelProfile);
       const requests = asArray(profile.rebaselineRequests);
       requests.push({
@@ -334,7 +337,11 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         reason: payload.reason ?? null,
       });
       profile.rebaselineRequests = requests;
-      profile.rebaselinePending = true;
+      delete profile.rebaselinePending;
+      await db
+        .update(learnerProfiles)
+        .set({ rebaselineRequestedAt: new Date(), updatedAt: new Date() })
+        .where(eq(learnerProfiles.learnerId, learnerId));
       await db
         .update(brainStates)
         .set({ functioningLevelProfile: profile, version: newVersion, updatedAt: new Date() })

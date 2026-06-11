@@ -439,7 +439,15 @@
       "time_learning": "Lernzeit",
       "skills_tracked": "Verfolgte Fertigkeiten",
       "mastered": "Beherrscht",
-      "by_subject": "Nach Fach"
+      "by_subject": "Nach Fach",
+      "refresh_path": "Lernpfad aktualisieren",
+      "refresh_path_done": "Pfad aktualisiert",
+      "refresh_path_error": "Aktualisierung fehlgeschlagen — erneut versuchen",
+      "trajectory_title": "Fortschritt über die Zeit",
+      "at_grade_count": "{count} von {total} Fähigkeiten auf Klassenniveau",
+      "working_at": "Arbeitet auf Niveau {level}",
+      "grade_target": "Ziel-Klassenstufe {grade}",
+      "on_grade": "Auf Klassenniveau"
     },
     "learner_summary": {
       "title": "Zusammenfassung in einfacher Sprache",
@@ -494,7 +502,8 @@
       "none_recorded": "Noch keine erfasst.",
       "challenges": "Herausforderungen",
       "accessibility_defaults": "Barrierefreiheitseinstellungen",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "Empfehlungen zur Genehmigung"
     },
     "learner_sensory": {
       "title": "Sensorisches Profil",
@@ -686,6 +695,27 @@
       "last_active_today": "Zuletzt heute aktiv",
       "last_active_yesterday": "Zuletzt gestern aktiv",
       "last_active_days": "Zuletzt vor {count} Tagen aktiv"
+    },
+    "recommendations": {
+      "loading": "Empfehlungen werden geprüft…",
+      "load_error": "Empfehlungen konnten nicht geladen werden — bitte erneut versuchen.",
+      "empty": "Keine Empfehlungen warten auf deine Genehmigung.",
+      "pending_badge": "Genehmigung nötig",
+      "proposed_change": "Vorgeschlagene Änderung",
+      "based_on": "Basierend auf {summary}",
+      "approve": "Genehmigen",
+      "adjust": "Anpassen",
+      "decline": "Ablehnen",
+      "amend_label": "Neuer Wert",
+      "confirm_adjust": "Angepassten Wert anwenden",
+      "decline_reason_label": "Warum ablehnen?",
+      "confirm_decline": "Ablehnung bestätigen",
+      "cancel": "Abbrechen",
+      "decision_error": "Entscheidung konnte nicht gespeichert werden — erneut versuchen.",
+      "status_applied": "Genehmigt und angewendet — Lektionen aktualisieren sich ab der nächsten Sitzung.",
+      "status_declined": "Abgelehnt — nichts ändert sich.",
+      "status_failed": "Genehmigt, aber Anwendung fehlgeschlagen — unser Team wurde informiert.",
+      "history": "Letzte Entscheidungen ({count})"
     }
   },
   "brain_clone": {
@@ -2849,6 +2879,30 @@
       "section_profile": "Profil",
       "role_label": "Therapeut",
       "section_notifications": "Benachrichtigungen"
+    },
+    "assessment": {
+      "title": "Therapeuten-Einschätzung",
+      "description": "Teile, was du in der Therapie mit {name} beobachtest — es prägt Baseline und Lektionen. Alles ist optional.",
+      "discipline": "Therapierichtung",
+      "discipline_speech": "Logopädie",
+      "discipline_occupational": "Ergotherapie",
+      "discipline_behavioral": "Verhalten",
+      "discipline_physical": "Physiotherapie",
+      "discipline_other": "Andere",
+      "areas_of_focus": "Schwerpunkte",
+      "strengths": "Beobachtete Stärken",
+      "challenges": "Beobachtete Herausforderungen",
+      "regulation_strategies": "Wirksame Regulationsstrategien",
+      "recommended_accommodations": "Empfohlene Anpassungen",
+      "sensory_notes": "Sensorische Notizen",
+      "communication_notes": "Kommunikationsnotizen",
+      "observations": "Narrative Beobachtungen",
+      "list_hint": "Einträge mit Kommas oder Zeilenumbrüchen trennen",
+      "submit": "Einschätzung senden",
+      "submitting": "Wird gesendet…",
+      "submit_error": "Einschätzung konnte nicht gespeichert werden — erneut versuchen.",
+      "success_title": "Einschätzung gespeichert",
+      "success_body": "Dein Input fließt jetzt in Baseline und Lektionspersonalisierung ein."
     }
   },
   "caregiver": {

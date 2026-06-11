@@ -87,6 +87,8 @@ import type {
   LessonRun,
   LearningPath,
   MasteryMap,
+  MasterySnapshot,
+  ReviewSchedule,
   Notification,
   NotificationDelivery,
   ParentAssessment,
@@ -378,9 +380,10 @@ export interface BrainProfileStore {
 
 /**
  * Curriculum domain — subjects + skills (seed-time reference data),
- * plus per-learner masteryMaps + skillMasteries + learningPaths.
- * Subjects/skills are read-heavy and effectively immutable post-seed;
- * paths/masteries are per-learner mutable.
+ * plus per-learner masteryMaps + skillMasteries + learningPaths +
+ * reviewSchedules. Subjects/skills are read-heavy and effectively
+ * immutable post-seed; paths/masteries/schedules are per-learner mutable
+ * (baseline completion replaces them, lesson completion updates rows).
  */
 export interface CurriculumStore {
   listSubjects(): Promise<Subject[]>;
@@ -394,6 +397,21 @@ export interface CurriculumStore {
     learnerId: string,
     tenantId: string,
   ): Promise<{ map: MasteryMap | null; skillMasteries: SkillMastery[] }>;
+  /** Insert or update the learner's mastery-map snapshot row (keyed by id). */
+  upsertMasteryMap(map: MasteryMap): Promise<MasteryMap>;
+  /**
+   * Baseline-completion write: replace ALL prior mastery rows in the covered
+   * subjects (not just the skills evaluated), then insert the next set — so a
+   * sparser re-run cannot leave stale rows behind from a denser baseline.
+   */
+  replaceSkillMasteriesForSubjects(
+    learnerId: string,
+    tenantId: string,
+    subjectIds: string[],
+    rows: SkillMastery[],
+  ): Promise<void>;
+  /** Insert or update one mastery row, keyed by (learnerId, tenantId, skillId). */
+  upsertSkillMastery(row: SkillMastery): Promise<SkillMastery>;
 
   getLearningPath(learnerId: string, tenantId: string): Promise<LearningPath | null>;
   /** Replace the learner's path atomically — delete prior + insert next. */
@@ -402,6 +420,23 @@ export interface CurriculumStore {
     tenantId: string,
     next: LearningPath,
   ): Promise<LearningPath>;
+
+  /** Append one mastery trajectory point (append-only; never updated). */
+  appendMasterySnapshot(row: MasterySnapshot): Promise<MasterySnapshot>;
+  /** Trajectory points, oldest first; optionally per-subject / since an ISO time. */
+  listMasterySnapshots(
+    learnerId: string,
+    tenantId: string,
+    opts?: { subjectId?: string; sinceIso?: string },
+  ): Promise<MasterySnapshot[]>;
+
+  getReviewSchedules(learnerId: string, tenantId: string): Promise<ReviewSchedule[]>;
+  /** Replace the learner's review schedules — delete prior + insert next. */
+  replaceReviewSchedules(
+    learnerId: string,
+    tenantId: string,
+    rows: ReviewSchedule[],
+  ): Promise<void>;
 }
 
 /**

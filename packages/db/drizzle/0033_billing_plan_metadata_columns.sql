@@ -14,7 +14,18 @@
 ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS plan varchar(100);
 ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS metadata jsonb DEFAULT '{}'::jsonb;
 
-UPDATE subscriptions
-   SET plan = plan_id
- WHERE plan IS NULL
-   AND plan_id IS NOT NULL;
+-- Legacy backfill: `plan_id` only exists on long-lived environments that
+-- predate the Drizzle schema. Guarded so this migration also bootstraps
+-- fresh databases (journal unification follow-up).
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+     WHERE table_name = 'subscriptions' AND column_name = 'plan_id'
+  ) THEN
+    UPDATE subscriptions
+       SET plan = plan_id
+     WHERE plan IS NULL
+       AND plan_id IS NOT NULL;
+  END IF;
+END $$;

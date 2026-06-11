@@ -3,11 +3,19 @@ import {
   generateRecommendations,
   type GenerateCandidatesInput,
 } from "../services/recommendation-generator.js";
+import {
+  buildRebaselineCandidate,
+  buildUpwardDeliveryCandidates,
+  dedupeAgainstPending,
+} from "../services/progression-candidates.js";
 import type { RecommendationStore } from "../services/recommendation-store.js";
+import { notifyGuardianOfPending } from "../services/recommendation-notifier.js";
 import { defaultStore } from "./recommendations.js";
 
 export interface CandidateRouteDeps {
   store?: RecommendationStore;
+  /** Drizzle handle for guardian lookup when dispatching notifications. */
+  db?: { select: (...args: never[]) => unknown };
 }
 
 export function registerCandidateRoutes(app: FastifyInstance, deps: CandidateRouteDeps = {}): void {
@@ -32,11 +40,30 @@ export function registerCandidateRoutes(app: FastifyInstance, deps: CandidateRou
       if (!tenantId) {
         return reply.code(400).send({ error: "tenantId is required (auth context or body)" });
       }
-      const recommendations = generateRecommendations(body);
+      // Static support candidates + dynamic progression candidates
+      // (upward delivery-level change, rebaseline). Progression candidates
+      // are deduped against existing PENDING recommendations so the
+      // per-lesson signal stream cannot spam parents with duplicates.
+      const rebaseline = buildRebaselineCandidate(body);
+      const candidates = [
+        ...generateRecommendations(body),
+        ...buildUpwardDeliveryCandidates(body),
+        ...(rebaseline ? [rebaseline] : []),
+      ];
+      const existing = await store.listByLearner(body.learnerId);
+      const recommendations = dedupeAgainstPending(candidates, existing);
       // Persist so the accept/amend/decline routes can act on them and they
       // survive a restart / are visible across replicas.
       for (const rec of recommendations) {
         await store.create(rec);
+      }
+      // Sprint 5: tell the guardian (email + in-app, 24h digest-suppressed
+      // by comms-svc). Fire-and-forget — never blocks candidate generation.
+      if (recommendations.length > 0 && deps.db) {
+        void notifyGuardianOfPending(deps.db, request.log, {
+          learnerId: body.learnerId,
+          recommendations,
+        });
       }
       return { recommendations, tenantId };
     },

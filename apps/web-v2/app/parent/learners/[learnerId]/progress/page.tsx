@@ -21,10 +21,14 @@ import {
   getLearner,
   getMasteryMap,
   listLessonRunsForLearner,
+  listMasterySnapshots,
   listSkills,
   listSubjects,
   parentCanAccessLearner,
 } from "@/lib/db/repos";
+import { TrajectorySparkline } from "@/components/parent/trajectory-sparkline";
+import { RefreshLearningPathButton } from "@/components/parent/refresh-learning-path-button";
+import { normalizeGradeBand } from "@aivo/scoring";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +51,13 @@ export default async function ParentProgressPage({
   const skills = await listSkills();
   const allRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
   const completed = allRuns.filter((r) => r.status === "completed");
+  const snapshots = await listMasterySnapshots(learnerId, session.tenantId);
+  const snapshotsBySubject = new Map<string, typeof snapshots>();
+  for (const snap of snapshots) {
+    const list = snapshotsBySubject.get(snap.subjectId);
+    if (list) list.push(snap);
+    else snapshotsBySubject.set(snap.subjectId, [snap]);
+  }
 
   const bySubject = subjects
     .map((subject) => {
@@ -82,6 +93,14 @@ export default async function ParentProgressPage({
         description={t("description")}
         actions={
           <div className="flex gap-2">
+            <RefreshLearningPathButton
+              learnerId={learnerId}
+              labels={{
+                idle: t("refresh_path"),
+                done: t("refresh_path_done"),
+                error: t("refresh_path_error"),
+              }}
+            />
             <Button asChild variant="outline">
               <Link href={`/parent/learners/${learnerId}/lessons`}>{t("lessons_link")}</Link>
             </Button>
@@ -131,7 +150,12 @@ export default async function ParentProgressPage({
             Once {learner.displayName} completes a lesson, mastery shows up here.
           </Card>
         ) : (
-          bySubject.map(({ subject, avg, mastered, total, items }) => (
+          bySubject.map(({ subject, avg, mastered, total, items }) => {
+            const trajectory = snapshotsBySubject.get(subject.id) ?? [];
+            const latest = trajectory.length > 0 ? trajectory[trajectory.length - 1]! : null;
+            const deliveryBand = normalizeGradeBand(latest?.deliveryLevel);
+            const enrolledBand = normalizeGradeBand(latest?.gradeBand);
+            return (
             <Card key={subject.id} className="p-[var(--aivo-density-card-pad)]">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -145,6 +169,29 @@ export default async function ParentProgressPage({
                 </Badge>
               </div>
               <Progress className="mt-3" value={avg * 100} />
+              {latest ? (
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-aivo-line/60 p-3">
+                  <div className="text-sm">
+                    <p className="text-xs uppercase text-aivo-ink-soft">
+                      {t("trajectory_title")}
+                    </p>
+                    <p className="mt-1">
+                      {t("at_grade_count", {
+                        count: latest.skillsOnGradeLevel,
+                        total: latest.skillsTotal,
+                      })}
+                    </p>
+                    {deliveryBand && enrolledBand ? (
+                      <p className="text-aivo-ink-soft">
+                        {deliveryBand === enrolledBand
+                          ? t("on_grade")
+                          : `${t("working_at", { level: deliveryBand })} · ${t("grade_target", { grade: enrolledBand })}`}
+                      </p>
+                    ) : null}
+                  </div>
+                  <TrajectorySparkline snapshots={trajectory} label={subject.name} />
+                </div>
+              ) : null}
               <ul className="mt-4 grid gap-1 text-sm sm:grid-cols-2">
                 {items.slice(0, 8).map((m) => {
                   const skill = skills.find((s) => s.id === m.skillId);
@@ -157,7 +204,8 @@ export default async function ParentProgressPage({
                 })}
               </ul>
             </Card>
-          ))
+            );
+          })
         )}
       </div>
     </AppShell>

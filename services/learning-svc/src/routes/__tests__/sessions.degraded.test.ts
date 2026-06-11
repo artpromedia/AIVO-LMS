@@ -68,7 +68,7 @@ function makeDb() {
     select() {
       return {
         from: () => ({
-          where: async () => [{ tenantId: TENANT_ID }],
+          where: async () => [{ tenantId: TENANT_ID, gradeLevel: "3" }],
         }),
       };
     },

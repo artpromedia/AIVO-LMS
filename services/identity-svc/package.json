@@ -18,6 +18,7 @@
     "@aivo/observability": "workspace:*",
     "@aivo/ops-alerts": "workspace:*",
     "@aivo/scheduling": "workspace:*",
+    "@aivo/scoring": "workspace:*",
     "@aivo/security": "workspace:*",
     "@aivo/sso": "workspace:*",
     "@aws-sdk/client-s3": "^3.654.0",

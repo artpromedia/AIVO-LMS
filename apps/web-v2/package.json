@@ -29,9 +29,12 @@
     "@aivo/brand": "workspace:*",
     "@aivo/db": "workspace:*",
     "@aivo/feature-flags": "workspace:*",
+    "@aivo/learner-import": "workspace:*",
     "@aivo/learner-surfaces": "workspace:*",
     "@aivo/nav": "workspace:*",
+    "@aivo/scoring": "workspace:*",
     "@aivo/security": "workspace:*",
+    "@aivo/skill-graphs": "workspace:*",
     "@aivo/ui": "workspace:*",
     "@anthropic-ai/sdk": "^0.100.1",
     "@hookform/resolvers": "^3.9.1",
@@ -61,8 +64,7 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.54.2",
     "tailwind-merge": "^2.5.5",
-    "zod": "^3.24.1",
-    "@aivo/learner-import": "workspace:*"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",

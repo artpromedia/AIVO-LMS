@@ -11,6 +11,10 @@ export interface GenerateCandidatesInput {
     accommodations?: string[];
     functioningLevel?: string;
     deliveryLevel?: string;
+    /** Enrolled grade band — required for upward progression candidates. */
+    gradeBand?: string;
+    /** ISO time of the last completed baseline — drives rebaseline checks. */
+    baselineCompletedAt?: string;
     preferredInteractionModes?: string[];
     sensoryProfile?: Record<string, unknown>;
   };

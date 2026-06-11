@@ -439,7 +439,15 @@
       "time_learning": "学习时间",
       "skills_tracked": "追踪技能",
       "mastered": "已掌握",
-      "by_subject": "按科目"
+      "by_subject": "按科目",
+      "refresh_path": "刷新学习路径",
+      "refresh_path_done": "路径已刷新",
+      "refresh_path_error": "刷新失败 — 请重试",
+      "trajectory_title": "随时间的进步",
+      "at_grade_count": "{total}项技能中有{count}项达到年级水平",
+      "working_at": "正在学习级别 {level}",
+      "grade_target": "目标年级 {grade}",
+      "on_grade": "达到年级水平"
     },
     "learner_summary": {
       "title": "简明摘要",
@@ -494,7 +502,8 @@
       "none_recorded": "暂无记录。",
       "challenges": "挑战",
       "accessibility_defaults": "无障碍默认设置",
-      "whats_working": "What's working"
+      "whats_working": "What's working",
+      "recommendations": "待您批准的推荐"
     },
     "learner_sensory": {
       "title": "感觉处理档案",
@@ -686,6 +695,27 @@
       "last_active_today": "上次活动：今天",
       "last_active_yesterday": "上次活动：昨天",
       "last_active_days": "上次活动：{count}天前"
+    },
+    "recommendations": {
+      "loading": "正在检查推荐…",
+      "load_error": "无法加载推荐 — 请稍后重试。",
+      "empty": "目前没有等待您批准的推荐。",
+      "pending_badge": "需要批准",
+      "proposed_change": "建议的更改",
+      "based_on": "基于{summary}",
+      "approve": "批准",
+      "adjust": "调整",
+      "decline": "拒绝",
+      "amend_label": "新值",
+      "confirm_adjust": "应用调整后的值",
+      "decline_reason_label": "拒绝原因",
+      "confirm_decline": "确认拒绝",
+      "cancel": "取消",
+      "decision_error": "无法记录您的决定 — 请重试。",
+      "status_applied": "已批准并应用 — 课程将从下次学习开始更新。",
+      "status_declined": "已拒绝 — 不会有任何更改。",
+      "status_failed": "已批准，但应用失败 — 已通知我们的团队。",
+      "history": "最近的决定 ({count})"
     }
   },
   "brain_clone": {
@@ -2849,6 +2879,30 @@
       "section_profile": "个人资料",
       "role_label": "治疗师",
       "section_notifications": "通知"
+    },
+    "assessment": {
+      "title": "治疗师评估",
+      "description": "分享您在治疗中对{name}的观察 — 它将影响基线和课程。所有内容均为可选。",
+      "discipline": "治疗学科",
+      "discipline_speech": "言语",
+      "discipline_occupational": "职业",
+      "discipline_behavioral": "行为",
+      "discipline_physical": "物理",
+      "discipline_other": "其他",
+      "areas_of_focus": "重点领域",
+      "strengths": "观察到的优势",
+      "challenges": "观察到的挑战",
+      "regulation_strategies": "有效的调节策略",
+      "recommended_accommodations": "建议的便利措施",
+      "sensory_notes": "感官笔记",
+      "communication_notes": "沟通笔记",
+      "observations": "叙述性观察",
+      "list_hint": "用逗号或换行分隔条目",
+      "submit": "提交评估",
+      "submitting": "提交中…",
+      "submit_error": "无法保存评估 — 请重试。",
+      "success_title": "评估已保存",
+      "success_body": "您的输入现在将用于该学习者的基线和课程个性化。"
     }
   },
   "caregiver": {

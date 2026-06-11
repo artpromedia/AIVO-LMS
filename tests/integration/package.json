@@ -7,18 +7,28 @@
     "test": "vitest run --config vitest.enterprise.config.ts"
   },
   "dependencies": {
+    "@aivo/assessment-svc": "workspace:*",
     "@aivo/audit-svc": "workspace:*",
+    "@aivo/comms-svc": "workspace:*",
     "@aivo/data-governance-svc": "workspace:*",
+    "@aivo/db": "workspace:*",
     "@aivo/enterprise-core": "workspace:*",
     "@aivo/feature-flags": "workspace:*",
     "@aivo/homework-svc": "workspace:*",
+    "@aivo/identity-svc": "workspace:*",
+    "@aivo/learning-svc": "workspace:*",
     "@aivo/problem-session-svc": "workspace:*",
     "@aivo/recommendation-svc": "workspace:*",
     "@aivo/responsible-ai-svc": "workspace:*",
+    "@aivo/scoring": "workspace:*",
+    "@aivo/security": "workspace:*",
     "@aivo/tutor-surface-protocol": "workspace:*"
   },
   "devDependencies": {
+    "drizzle-orm": "^0.45.2",
     "fastify": "^5.3.3",
+    "postgres": "^3.4.5",
+    "tsx": "^4.19.0",
     "vitest": "^2.0.0"
   }
 }

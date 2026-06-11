@@ -220,7 +220,18 @@ async def adapt_homework(
 ) -> AdaptedAssignment:
     functioning_level = brain_context.get("functioning_level_profile", {}).get("level", "STANDARD")
     communication_mode = brain_context.get("disability_signals", {}).get("communication_mode", "verbal")
-    grade_level = brain_context.get("curriculum_alignment", {}).get("grade_band", "THIRD")
+    # The learner's working level: prefer the baseline-derived delivery_level,
+    # then the enrolled grade_band. NEVER a hardcoded grade — when neither is
+    # present we say so explicitly and let the model adapt from the problem
+    # content, logging the gap so it shows up in observability.
+    alignment = brain_context.get("curriculum_alignment") or {}
+    grade_level = alignment.get("delivery_level") or alignment.get("grade_band")
+    if not grade_level:
+        logger.warning(
+            "homework_adapter: no delivery_level/grade_band in curriculum_alignment; "
+            "adapting without a grade anchor"
+        )
+        grade_level = "not specified — infer an appropriate level from the problems themselves"
     accommodations = brain_context.get("active_accommodations", [])
 
     max_choices = _LEVEL_MAX_CHOICES.get(functioning_level, 4)

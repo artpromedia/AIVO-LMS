@@ -107,6 +107,37 @@ export const teacherAssessments = pgTable("teacher_assessments", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+/**
+ * Therapist-led intake feeding the adaptive baseline generator
+ * (adaptive-learning E2E Sprint 6). Mirrors teacherAssessments: every field
+ * except learnerId is optional, multiple therapists (disciplines) may each
+ * submit, and the prompt builder degrades gracefully when no row exists.
+ */
+export const therapistAssessments = pgTable("therapist_assessments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  submittedBy: uuid("submitted_by").references(() => users.id),
+  /** speech | occupational | behavioral | physical | other */
+  therapyDiscipline: varchar("therapy_discipline", { length: 30 }),
+  areasOfFocus: jsonb("areas_of_focus").default([]),
+  strengths: jsonb("strengths").default([]),
+  challenges: jsonb("challenges").default([]),
+  sensoryNotes: text("sensory_notes"),
+  communicationNotes: text("communication_notes"),
+  regulationStrategies: jsonb("regulation_strategies").default([]),
+  recommendedAccommodations: jsonb("recommended_accommodations").default([]),
+  observations: text("observations"),
+  responses: jsonb("responses").default({}),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const observationalAssessments = pgTable("observational_assessments", {
   id: uuid("id").defaultRandom().primaryKey(),
   attemptId: uuid("attempt_id")
@@ -159,6 +190,12 @@ export const learnerProfiles = pgTable("learner_profiles", {
   /** Items administered to produce this profile. */
   itemsAdministered: integer("items_administered").notNull().default(0),
   baselineCompletedAt: timestamp("baseline_completed_at").defaultNow().notNull(),
+  /**
+   * Set when a parent approves a rebaseline_request recommendation (or a
+   * care-team effect requests one). The adaptive-baseline start seeds the
+   * new run with the prior θ and finalization clears the marker.
+   */
+  rebaselineRequestedAt: timestamp("rebaseline_requested_at"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

@@ -126,6 +126,10 @@ const serverSchema = z
     ALERTS_PROXY_SVC_URL: z.string().url().default("http://localhost:3016"),
     // Sprint 10: cross-tier reports & exports framework.
     REPORTS_SVC_URL: z.string().url().default("http://localhost:3018"),
+    // Adaptive-learning E2E Sprint 4: mastery-signal emission feeds the
+    // recommendation loop (upward delivery-level + rebaseline rules).
+    RECOMMENDATION_SVC_URL: z.string().url().default("http://localhost:3066"),
+    AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2: z.string().optional(),
     // Sprint H: SIS rostering + LTI 1.3.
     INTEGRATION_SVC_URL: z.string().url().default("http://localhost:3060"),
     // Enterprise admin parity: web-v2 admin pages now source platform reads

@@ -65,6 +65,8 @@ const TABLES = [
   "web_mastery_maps",
   "web_skill_masteries",
   "web_learning_paths",
+  "web_review_schedules",
+  "web_mastery_snapshots",
   "web_consent_records",
   "web_iep_documents",
   "web_age_gate_records",
@@ -143,6 +145,7 @@ const TABLES = [
   "web_lesson_objective_templates",
   "web_assessment_blueprints",
   "web_curriculum_import_jobs",
+  "web_baseline_bank",
 ] as const;
 
 const POSTGRES_ENABLED =
