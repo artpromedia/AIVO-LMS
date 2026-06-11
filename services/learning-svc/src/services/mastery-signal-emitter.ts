@@ -29,6 +29,14 @@ export { masteryLevelFromScore };
 export interface MasteryMovement {
   skillId: string;
   subjectId: string;
+  /**
+   * Canonical subject key (Wave C, G1 — `@aivo/scoring`
+   * `canonicalSubjectKey`). Lets the recommendation generator scope
+   * upward delivery-level candidates to the subject's OWN band and the
+   * apply path write `delivery_levels[subjectKey]` instead of the
+   * global level. Optional for emitters that predate the split.
+   */
+  subjectKey?: string;
   before: number;
   after: number;
 }
@@ -48,6 +56,7 @@ export function buildMasterySignals(movements: MasteryMovement[]): Array<{
     metadata: {
       skillId: m.skillId,
       subjectId: m.subjectId,
+      ...(m.subjectKey ? { subjectKey: m.subjectKey } : {}),
       before: m.before,
       after: m.after,
       levelBefore: masteryLevelFromScore(m.before),
@@ -62,6 +71,8 @@ export async function emitMasterySignals(input: {
   movements: MasteryMovement[];
   currentProfile?: {
     deliveryLevel?: string;
+    /** Per-subject bands from curriculum_alignment.delivery_levels (Wave C). */
+    deliveryLevels?: Record<string, string>;
     gradeBand?: string;
     baselineCompletedAt?: string;
   };

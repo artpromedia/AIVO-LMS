@@ -110,6 +110,7 @@ import {
 import { selectNextSkills } from "@/lib/learner/select-next-skills";
 import { emitLessonMasterySignal } from "@/lib/learner/mastery-signal-emitter";
 import {
+  canonicalSubjectKey,
   deliveryLevelFromTheta,
   normalizeGradeBand,
   masteryTargetFromOutcome,
@@ -2384,12 +2385,18 @@ export async function completeLessonRun(
         level: m.level,
         confidence: m.confidence,
       }));
+    // Wave C (G1): tag the movement with the canonical subject key so the
+    // recommendation loop scopes upward candidates + applies per subject.
+    const movementSubject = await getPersistence().curriculum.getSubjectById(next.subjectId);
+    const movementSubjectKey =
+      canonicalSubjectKey(movementSubject?.slug ?? null) ?? undefined;
     void emitLessonMasterySignal({
       tenantId,
       learnerId: next.learnerId,
       movement: {
         skillId: next.skillId,
         subjectId: next.subjectId,
+        subjectKey: movementSubjectKey,
         before: delta.before,
         after: delta.after,
         levelBefore: delta.levelBefore,

@@ -12,6 +12,7 @@ import {
   computeCompletionQuality,
   type LessonSignals,
 } from "../services/scoring.js";
+import { canonicalSubjectKey } from "@aivo/scoring";
 import { resolveGradeTargets } from "../services/grade-target.js";
 import { emitMasterySignals, type MasteryMovement } from "../services/mastery-signal-emitter.js";
 import { writeMasteryToWebStore } from "../services/web-mastery-writer.js";
@@ -408,6 +409,9 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
     const gradeResolution = resolveGradeTargets({
       alignment: (brainContext as any).curriculum_alignment,
       learnerGradeLevel: learnerRow?.gradeLevel ?? null,
+      // Wave C (G1): per-subject placement — the subject's own band (when
+      // the baseline split it) wins over the global delivery level.
+      subject,
     });
     if (!gradeResolution.ok) {
       request.log.warn(
@@ -722,13 +726,21 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
             .from(learnerProfiles)
             .where(eq(learnerProfiles.learnerId, session.learnerId));
           const alignment = (learnerRow?.curriculumAlignment ?? {}) as Record<string, unknown>;
+          // Wave C (G1): tag every movement with the session subject's
+          // canonical key so progression candidates + applies are
+          // subject-scoped, and pass the per-subject band map through.
+          const subjectKey = canonicalSubjectKey(session.subject) ?? undefined;
           await emitMasterySignals({
             tenantId: session.tenantId,
             learnerId: session.learnerId,
-            movements: masteryMovements,
+            movements: masteryMovements.map((m) => ({ ...m, subjectKey })),
             currentProfile: {
               deliveryLevel:
                 typeof alignment.delivery_level === "string" ? alignment.delivery_level : undefined,
+              deliveryLevels:
+                alignment.delivery_levels && typeof alignment.delivery_levels === "object"
+                  ? (alignment.delivery_levels as Record<string, string>)
+                  : undefined,
               gradeBand:
                 typeof alignment.grade_band === "string" ? alignment.grade_band : undefined,
               baselineCompletedAt: profileRow?.baselineCompletedAt

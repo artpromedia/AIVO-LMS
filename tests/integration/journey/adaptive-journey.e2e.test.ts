@@ -56,6 +56,8 @@ describe.skipIf(!DB_URL)("adaptive-learning full journey", () => {
   const originalFetch = globalThis.fetch;
   let learnerId = "";
   let finalTheta = 0;
+  /** Math delivery band set by the baseline (Wave C — per-subject). */
+  let mathBaselineBand = "";
 
   /** Bridge a fetch() call into an in-process fastify app. */
   async function injectInto(
@@ -462,13 +464,17 @@ describe.skipIf(!DB_URL)("adaptive-learning full journey", () => {
     ).toBe(true);
   });
 
-  it("e. the adaptive baseline persists θ and lowers the delivery level per the mapping", async () => {
+  it("e. the adaptive baseline persists θ and lowers the delivery level per the mapping — per subject (Wave C)", async () => {
+    // A mixed math+reading bank (Wave C, G1): the learner answers math
+    // mostly wrong and reading always right, so finalize must SPLIT the
+    // placement — math lands below reading.
     const bank = Array.from({ length: 24 }, (_, i) => ({
       id: `it-${i}`,
       skillId: `sk-${i % 8}`,
       difficulty: [-1.5, -1.0, -0.5, 0, 0.5, 1.0][i % 6],
       modalities: ["visual"],
       lightReading: true,
+      subjectId: i % 2 === 0 ? "math" : "reading",
     }));
     const auth = { authorization: `Bearer ${await token(PARENT, "PARENT")}` };
 
@@ -485,8 +491,10 @@ describe.skipIf(!DB_URL)("adaptive-learning full journey", () => {
     let answered = 0;
 
     while (!stop?.stop && nextItem && answered < 30) {
-      // Mostly-wrong answers drive θ down toward a below-grade placement.
-      const correct = answered % 4 === 3;
+      // Per-subject answer pattern: reading always correct; math correct
+      // only every 4th answer — overall θ drops below -0.3 while the
+      // reading θ stays clearly above the math θ.
+      const correct = nextItem.subjectId === "reading" ? true : answered % 4 === 3;
       const res = await assessmentApp.inject({
         method: "POST",
         url: `/api/assessments/adaptive-baseline/${learnerId}/respond`,
@@ -512,17 +520,27 @@ describe.skipIf(!DB_URL)("adaptive-learning full journey", () => {
     });
     expect(finalize.statusCode).toBe(200);
     finalTheta = finalize.json().finalTheta;
-    expect(finalTheta).toBeLessThan(-0.3);
+    const subjectThetas = finalize.json().subjectThetas as Record<string, number>;
+    expect(subjectThetas).toBeTruthy();
+    expect(subjectThetas.math).toBeLessThan(subjectThetas.reading);
 
     const [profile] = await sql`
-      SELECT theta_placement FROM learner_profiles WHERE learner_id = ${learnerId}`;
+      SELECT theta_placement, subject_thetas FROM learner_profiles WHERE learner_id = ${learnerId}`;
     expect(profile!.theta_placement).toBeCloseTo(finalTheta, 1); // theta is float4
+    expect(profile!.subject_thetas.math).toBeCloseTo(subjectThetas.math, 5);
 
     const [row] = await sql`SELECT curriculum_alignment FROM learners WHERE id = ${learnerId}`;
     const expectedDelivery = deliveryLevelFromTheta(finalTheta, "5" as never);
     expect(row!.curriculum_alignment.delivery_level).toBe(expectedDelivery);
     expect(row!.curriculum_alignment.grade_band).toBe("5");
     expect(row!.curriculum_alignment.delivery_level_source).toBe("baseline_theta");
+    // Per-subject placement (Wave C): math delivered below reading.
+    const levels = row!.curriculum_alignment.delivery_levels as Record<string, string>;
+    expect(levels).toBeTruthy();
+    expect(levels.math).toBe(deliveryLevelFromTheta(subjectThetas.math, "5" as never));
+    expect(levels.reading).toBe(deliveryLevelFromTheta(subjectThetas.reading, "5" as never));
+    expect(Number(levels.math)).toBeLessThan(Number(levels.reading));
+    mathBaselineBand = levels.math;
   });
 
   async function createSession(): Promise<string> {
@@ -536,13 +554,15 @@ describe.skipIf(!DB_URL)("adaptive-learning full journey", () => {
     return res.json().sessionId;
   }
 
-  it("f. lesson generation carries gradeTarget 5 + the lowered delivery level", async () => {
+  it("f. lesson generation carries gradeTarget 5 + the MATH band (per-subject, Wave C)", async () => {
     aiCalls.length = 0;
     await createSession();
     const call = aiCalls.find((c) => c.url === "/api/ai/generate");
     expect(call, "lesson generation payload captured").toBeTruthy();
     expect(call!.body.grade_target).toBe("5");
-    expect(call!.body.delivery_level).toBe(deliveryLevelFromTheta(finalTheta, "5" as never));
+    // ADDON_TUTOR_MATH → subject "Mathematics" → canonical "math": the
+    // math lesson is delivered at MATH's band, not the global level.
+    expect(call!.body.delivery_level).toBe(mathBaselineBand);
   });
 
   it("g. three on-grade skills → PENDING upward recommendation + guardian notification", async () => {
@@ -602,18 +622,28 @@ describe.skipIf(!DB_URL)("adaptive-learning full journey", () => {
     }, "guardian in-app notification");
   });
 
-  it("h. parent approval raises the delivery level and the next lesson uses it", async () => {
+  it("h. parent approval raises MATH's band only and the next math lesson uses it (Wave C)", async () => {
     const list = await recApp.inject({
       method: "GET",
       url: `/api/recommendations/learner/${learnerId}?status=PENDING`,
     });
-    const rec = (list.json().recommendations as Array<{ type: string; id: string }>).find(
-      (r) => r.type === "delivery_level_change",
-    )!;
+    const rec = (
+      list.json().recommendations as Array<{
+        type: string;
+        id: string;
+        proposedValue?: Record<string, unknown>;
+      }>
+    ).find((r) => r.type === "delivery_level_change")!;
+    // The candidate is subject-scoped: learning-svc tagged the mastery
+    // signals with the canonical key for ADDON_TUTOR_MATH.
+    expect(rec.proposedValue?.subjectKey).toBe("math");
 
-    const beforeDelivery = (
+    const before = (
       await sql`SELECT curriculum_alignment FROM learners WHERE id = ${learnerId}`
-    )[0]!.curriculum_alignment.delivery_level as string;
+    )[0]!.curriculum_alignment as Record<string, any>;
+    const beforeMath = before.delivery_levels.math as string;
+    const beforeReading = before.delivery_levels.reading as string;
+    const beforeGlobal = before.delivery_level as string;
 
     const accept = await recApp.inject({
       method: "POST",
@@ -624,16 +654,19 @@ describe.skipIf(!DB_URL)("adaptive-learning full journey", () => {
     expect(accept.json().recommendation.status).toBe("APPLIED");
 
     const [row] = await sql`SELECT curriculum_alignment FROM learners WHERE id = ${learnerId}`;
-    const afterDelivery = row!.curriculum_alignment.delivery_level as string;
-    expect(Number(afterDelivery)).toBe(Number(beforeDelivery) + 1);
-    expect(row!.curriculum_alignment.delivery_level_source).toBe(
+    const after = row!.curriculum_alignment as Record<string, any>;
+    // ONLY math moved; reading and the global level are untouched.
+    expect(Number(after.delivery_levels.math)).toBe(Number(beforeMath) + 1);
+    expect(after.delivery_levels.reading).toBe(beforeReading);
+    expect(after.delivery_level).toBe(beforeGlobal);
+    expect(after.delivery_levels_source_by_subject.math).toBe(
       "parent_approved_recommendation",
     );
 
     aiCalls.length = 0;
     await createSession();
     const call = aiCalls.find((c) => c.url === "/api/ai/generate")!;
-    expect(call.body.delivery_level).toBe(afterDelivery);
+    expect(call.body.delivery_level).toBe(after.delivery_levels.math);
     expect(call.body.grade_target).toBe("5");
   });
 

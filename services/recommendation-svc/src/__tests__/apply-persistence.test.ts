@@ -113,7 +113,7 @@ describe("persistAppliedRecommendation", () => {
       log,
       rec("delivery_level_change", { subjectId: "s", from: "3", to: "4" }),
     );
-    expect(out).toEqual({ ok: true, details: { deliveryLevel: "4" } });
+    expect(out).toEqual({ ok: true, details: { deliveryLevel: "4", subjectKey: null } });
     // Two updates: learners row, then latest brain_states row.
     expect(updates).toHaveLength(2);
     const learnerAlignment = updates[0]!.set.curriculumAlignment as Record<string, unknown>;
@@ -185,5 +185,77 @@ describe("persistAppliedRecommendation", () => {
     );
     expect(out).toEqual({ ok: true });
     expect(updates).toHaveLength(0);
+  });
+});
+
+// ── Wave C (G1): subject-scoped applies ─────────────────────────────────────
+
+describe("per-subject delivery_level_change (Wave C)", () => {
+  it("writes ONLY the subject's band and leaves the global delivery_level untouched", async () => {
+    const { db, updates } = fakeDb({
+      learner: {
+        id: "lrn-1",
+        curriculumAlignment: {
+          grade_band: "5",
+          delivery_level: "3",
+          delivery_levels: { math: "2", reading: "5" },
+        },
+      },
+    });
+    const outcome = await persistAppliedRecommendation(
+      db as never,
+      log,
+      rec("delivery_level_change", { subjectId: "sub-math", subjectKey: "math", from: "2", to: "3" }),
+    );
+    expect(outcome.ok).toBe(true);
+    if (!outcome.ok) return;
+    expect(outcome.details?.subjectKey).toBe("math");
+    expect(outcome.details?.deliveryLevel).toBe("3");
+
+    const learnerSet = updates[0]!.set as {
+      curriculumAlignment: Record<string, unknown>;
+    };
+    const alignment = learnerSet.curriculumAlignment;
+    // Subject map raised, other subjects + the global level preserved.
+    expect(alignment.delivery_levels).toEqual({ math: "3", reading: "5" });
+    expect(alignment.delivery_level).toBe("3");
+    expect(
+      (alignment.delivery_levels_source_by_subject as Record<string, unknown>).math,
+    ).toBe("parent_approved_recommendation");
+  });
+
+  it("resolves the clamp from the SUBJECT's current band, not the global one", () => {
+    const target = resolveDeliveryLevelTarget("lower", {
+      grade_band: "5",
+      delivery_level: "5",
+      delivery_levels: { math: "3" },
+    });
+    // No subjectKey on a plain string proposal → global current ("5") - 1.
+    expect(target).toBe("4");
+    const subjectTarget = resolveDeliveryLevelTarget(
+      { subjectKey: "math", to: "9" },
+      { grade_band: "5", delivery_levels: { math: "3" } },
+    );
+    // Target above the enrolled band clamps to the grade band.
+    expect(subjectTarget).toBe("5");
+  });
+
+  it("keeps the legacy global write for proposals without a subjectKey", async () => {
+    const { db, updates } = fakeDb({
+      learner: {
+        id: "lrn-1",
+        curriculumAlignment: { grade_band: "5", delivery_level: "3" },
+      },
+    });
+    const outcome = await persistAppliedRecommendation(
+      db as never,
+      log,
+      rec("delivery_level_change", { subjectId: "sub-math", from: "3", to: "4" }),
+    );
+    expect(outcome.ok).toBe(true);
+    const alignment = (updates[0]!.set as { curriculumAlignment: Record<string, unknown> })
+      .curriculumAlignment;
+    expect(alignment.delivery_level).toBe("4");
+    expect(alignment.delivery_levels).toBeUndefined();
   });
 });

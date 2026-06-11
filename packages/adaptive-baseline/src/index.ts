@@ -55,6 +55,13 @@ export interface BaselineItem {
    * 1-PL behaviour, so 1-PL banks are unaffected.
    */
   discrimination?: number;
+  /**
+   * Subject this item assesses (Wave C, G1 — per-subject placement).
+   * Free-form here; finalize groups responses by this value and callers
+   * canonicalise the keys (`@aivo/scoring` `canonicalSubjectKey`).
+   * Optional: items without a subject contribute to the overall θ only.
+   */
+  subjectId?: string;
 }
 
 /** 2-PL discrimination default — `a=1` reduces every formula to 1-PL. */
@@ -442,4 +449,45 @@ export function finalize(state: BaselineState, bank: readonly BaselineItem[]): B
     itemsAdministered: state.administered.length,
     profile: buildLearningProfile(state, bank),
   };
+}
+
+/** Minimum responses a subject needs before its own θ is trustworthy. */
+export const SUBJECT_THETA_MIN_ITEMS = 4;
+
+/**
+ * Per-subject ability estimates (Wave C, G1).
+ *
+ * Replays the administered responses grouped by the bank items'
+ * `subjectId`, running the SAME sequential 2-PL update the live run uses
+ * (θ₀ = 0, K = 0.4), so a subject's θ is exactly what the engine would
+ * have estimated had it run that subject alone. Subjects with fewer than
+ * `minItems` responses are omitted — too little signal to place a
+ * neurodiverse learner on, and the caller falls back to the overall θ.
+ * Returned values are rounded to 0.1 like `thetaPlacement`.
+ */
+export function estimateSubjectThetas(
+  state: BaselineState,
+  bank: readonly BaselineItem[],
+  opts: { minItems?: number } = {},
+): Record<string, number> {
+  const minItems = opts.minItems ?? SUBJECT_THETA_MIN_ITEMS;
+  const itemById = new Map(bank.map((it) => [it.id, it]));
+  const perSubject = new Map<string, { theta: number; n: number }>();
+  for (const response of state.administered) {
+    const item = itemById.get(response.itemId);
+    const subject = item?.subjectId;
+    if (!item || !subject) continue;
+    const cur = perSubject.get(subject) ?? { theta: 0, n: 0 };
+    const a = item.discrimination ?? DEFAULT_DISCRIMINATION;
+    const p = 1 / (1 + Math.exp(-a * (cur.theta - item.difficulty)));
+    cur.theta = cur.theta + K * a * ((response.correct ? 1 : 0) - p);
+    cur.n += 1;
+    perSubject.set(subject, cur);
+  }
+  const out: Record<string, number> = {};
+  for (const [subject, { theta, n }] of perSubject) {
+    if (n < minItems) continue;
+    out[subject] = Math.round(theta * 10) / 10;
+  }
+  return out;
 }

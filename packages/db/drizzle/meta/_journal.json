@@ -687,6 +687,13 @@
       "when": 1786060900000,
       "tag": "0094_admin_audit_actor_fk",
       "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1786061000000,
+      "tag": "0100_learner_profiles_subject_thetas",
+      "breakpoints": true
     }
   ]
 }

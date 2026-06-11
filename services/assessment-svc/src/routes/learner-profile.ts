@@ -23,7 +23,12 @@ import { FastifyInstance } from "fastify";
 import { learners, learnerProfiles, adaptiveBaselineSessions } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 import { eq, desc } from "drizzle-orm";
-import { shouldStop, type BaselineItem, type ItemResponse } from "@aivo/adaptive-baseline";
+import {
+  estimateSubjectThetas,
+  shouldStop,
+  type BaselineItem,
+  type ItemResponse,
+} from "@aivo/adaptive-baseline";
 import {
   startRun,
   respondToItem,
@@ -105,6 +110,7 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
       return reply.send({
         learnerId: learner.id,
         thetaPlacement: profile.thetaPlacement,
+        subjectThetas: profile.subjectThetas ?? null,
         modalityFit: profile.modalityFit,
         processingSpeedMs: profile.processingSpeedMs,
         frustrationRate: profile.frustrationRate,
@@ -342,6 +348,11 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
 
       const session = hydrateSession(row.state as SerializedRunSession);
       const result = finalizeRun(session, body.bank);
+      // Per-subject θ (Wave C, G1): replay the run grouped by the bank's
+      // subjectId tags. Empty when the bank is untagged or no subject
+      // reached the minimum item count — consumers fall back to overall θ.
+      const subjectThetas = estimateSubjectThetas(session.state, body.bank ?? []);
+      const hasSubjectThetas = Object.keys(subjectThetas).length > 0;
 
       await db
         .update(adaptiveBaselineSessions)
@@ -361,6 +372,7 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
           learnerId: learner.id,
           attemptId: null,
           thetaPlacement: result.profile.thetaPlacement,
+          subjectThetas: hasSubjectThetas ? subjectThetas : null,
           modalityFit: result.profile.modalityFit,
           processingSpeedMs: result.profile.processingSpeedMs,
           frustrationRate: result.profile.frustrationRate,
@@ -374,6 +386,7 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
           target: learnerProfiles.learnerId,
           set: {
             thetaPlacement: result.profile.thetaPlacement,
+            ...(hasSubjectThetas ? { subjectThetas } : {}),
             modalityFit: result.profile.modalityFit,
             processingSpeedMs: result.profile.processingSpeedMs,
             frustrationRate: result.profile.frustrationRate,
@@ -393,15 +406,18 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
 
       // Persist the θ-derived delivery level onto curriculum_alignment (the
       // learners row + latest brain state) so lesson generation targets the
-      // learner's actual placement. Non-fatal by contract — logs on failure.
+      // learner's actual placement — per subject when the run split
+      // (Wave C, G1). Non-fatal by contract — logs on failure.
       await applyBaselineDeliveryLevel(db, req.log, {
         learnerId: learner.id,
         theta: result.profile.thetaPlacement,
+        subjectThetas: hasSubjectThetas ? subjectThetas : null,
       });
 
       return reply.send({
         sessionId: row.id,
         finalTheta: result.finalTheta,
+        subjectThetas: hasSubjectThetas ? subjectThetas : null,
         itemsAdministered: result.itemsAdministered,
         learningProfile: result.profile,
       });

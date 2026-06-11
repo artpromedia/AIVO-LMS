@@ -60,3 +60,49 @@ test("kindergarten round-trips", () => {
   });
   assert.deepEqual(r, { ok: true, gradeTarget: "K", deliveryLevel: "K", source: "alignment" });
 });
+
+// ── Wave C (G1): per-subject delivery levels ───────────────────────────────
+
+test("subject band from delivery_levels wins over the global delivery_level", () => {
+  const r = resolveGradeTargets({
+    alignment: {
+      grade_band: "5",
+      delivery_level: "4",
+      delivery_levels: { math: "2", reading: "5" },
+    },
+    learnerGradeLevel: null,
+    subject: "Mathematics", // brand tutor domain — canonicalises to "math"
+  });
+  assert.equal(r.ok, true);
+  if (!r.ok) return;
+  assert.equal(r.gradeTarget, "5");
+  assert.equal(r.deliveryLevel, "2");
+  assert.equal(r.source, "alignment_subject");
+});
+
+test("a subject without its own band falls back to the global delivery_level", () => {
+  const r = resolveGradeTargets({
+    alignment: {
+      grade_band: "5",
+      delivery_level: "4",
+      delivery_levels: { math: "2" },
+    },
+    learnerGradeLevel: null,
+    subject: "Science",
+  });
+  assert.equal(r.ok, true);
+  if (!r.ok) return;
+  assert.equal(r.deliveryLevel, "4");
+  assert.equal(r.source, "alignment");
+});
+
+test("no subject argument keeps the legacy global resolution untouched", () => {
+  const r = resolveGradeTargets({
+    alignment: { grade_band: "5", delivery_level: "3", delivery_levels: { math: "2" } },
+    learnerGradeLevel: null,
+  });
+  assert.equal(r.ok, true);
+  if (!r.ok) return;
+  assert.equal(r.deliveryLevel, "3");
+  assert.equal(r.source, "alignment");
+});

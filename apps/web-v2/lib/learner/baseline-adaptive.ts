@@ -129,12 +129,21 @@ export function itemKeyFor(q: { skillId: string; difficulty: BaselineDifficulty 
 export function questionToBaselineItem(
   q: BaselineQuestion,
   calibration?: CalibrationMap,
+  /**
+   * Web subject id → subject SLUG (Wave C, G1). When supplied, the engine
+   * item carries the slug as its `subjectId` so the assessment-svc
+   * finalizer can split per-subject θ with keys the alignment writer
+   * canonicalises ("math", "reading") — an opaque store id would never
+   * match the consumers.
+   */
+  subjectSlugById?: ReadonlyMap<string, string>,
 ): BaselineItem {
   const { modalities, lightReading } = questionModalities(q);
   const entry = calibration?.[itemKeyFor(q)];
   // Discrimination precedence: live-calibrated a > the question's authored
   // a > none (engine defaults to a=1 / 1-PL).
   const discrimination = entry?.discrimination ?? q.discrimination;
+  const subjectSlug = subjectSlugById?.get(q.subjectId);
   return {
     id: q.id,
     skillId: q.skillId,
@@ -142,6 +151,7 @@ export function questionToBaselineItem(
     modalities,
     lightReading,
     ...(discrimination !== undefined ? { discrimination } : {}),
+    ...(subjectSlug ? { subjectId: subjectSlug } : {}),
   };
 }
 

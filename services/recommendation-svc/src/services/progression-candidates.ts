@@ -46,6 +46,8 @@ const ON_GRADE_LEVELS = new Set(["on_grade_level", "stretching"]);
 interface MasterySignalMeta {
   skillId?: string;
   subjectId?: string;
+  /** Canonical subject key (Wave C, G1) — see @aivo/scoring canonicalSubjectKey. */
+  subjectKey?: string;
   levelBefore?: string;
   levelAfter?: string;
   before?: number;
@@ -103,10 +105,9 @@ function newRecommendation(
 export function buildUpwardDeliveryCandidates(
   input: GenerateCandidatesInput,
 ): ProfileRecommendation[] {
-  const deliveryBand = normalizeGradeBand(input.currentProfile?.deliveryLevel);
+  const globalBand = normalizeGradeBand(input.currentProfile?.deliveryLevel);
   const gradeBand = normalizeGradeBand(input.currentProfile?.gradeBand);
-  if (!deliveryBand || !gradeBand) return [];
-  if (gradeBandIndex(deliveryBand) >= gradeBandIndex(gradeBand)) return [];
+  if (!gradeBand) return [];
 
   const qualifying = masterySignals(input.signals).filter(
     (s) =>
@@ -115,24 +116,36 @@ export function buildUpwardDeliveryCandidates(
       (s.meta.confidence ?? UPWARD_MIN_CONFIDENCE) >= UPWARD_MIN_CONFIDENCE,
   );
 
-  const bySubject = new Map<string, typeof qualifying>();
+  // Wave C (G1): group by the canonical subject key when the emitter tagged
+  // it (so the candidate raises THAT subject's band); fall back to the raw
+  // subjectId for legacy emitters.
+  const bySubject = new Map<string, { signals: typeof qualifying; subjectKey?: string }>();
   for (const s of qualifying) {
-    const subjectId = s.meta.subjectId;
-    if (!subjectId) continue;
-    const list = bySubject.get(subjectId);
-    if (list) list.push(s);
-    else bySubject.set(subjectId, [s]);
+    const groupKey = s.meta.subjectKey ?? s.meta.subjectId;
+    if (!groupKey) continue;
+    const entry = bySubject.get(groupKey);
+    if (entry) entry.signals.push(s);
+    else bySubject.set(groupKey, { signals: [s], subjectKey: s.meta.subjectKey });
   }
 
   const out: ProfileRecommendation[] = [];
-  const nextBand = GRADE_BANDS[
-    Math.min(gradeBandIndex(deliveryBand) + 1, gradeBandIndex(gradeBand))
-  ] as GradeBand;
-  for (const [subjectId, subjectSignals] of bySubject) {
+  for (const [groupKey, { signals: subjectSignals, subjectKey }] of bySubject) {
+    // The subject's OWN band (per-subject placement) wins over the global.
+    const subjectBand = subjectKey
+      ? normalizeGradeBand(input.currentProfile?.deliveryLevels?.[subjectKey])
+      : null;
+    const deliveryBand = subjectBand ?? globalBand;
+    if (!deliveryBand) continue;
+    if (gradeBandIndex(deliveryBand) >= gradeBandIndex(gradeBand)) continue;
+    const nextBand = GRADE_BANDS[
+      Math.min(gradeBandIndex(deliveryBand) + 1, gradeBandIndex(gradeBand))
+    ] as GradeBand;
+
     const distinctSkills = new Set(subjectSignals.map((s) => s.meta.skillId).filter(Boolean));
     if (distinctSkills.size < UPWARD_MIN_SKILLS) continue;
     const evidence = buildEvidenceFromSignals(subjectSignals);
     if (!hasSufficientEvidence(evidence)) continue;
+    const subjectId = subjectSignals[0]?.meta.subjectId ?? groupKey;
     out.push(
       newRecommendation(input, {
         type: "delivery_level_change",
@@ -142,7 +155,12 @@ export function buildUpwardDeliveryCandidates(
           `while working below their enrolled grade. We recommend raising the delivery level one ` +
           `band (toward grade ${gradeBand}) so the material keeps pace with them.`,
         currentValue: deliveryBand,
-        proposedValue: { subjectId, from: deliveryBand, to: nextBand },
+        proposedValue: {
+          subjectId,
+          ...(subjectKey ? { subjectKey } : {}),
+          from: deliveryBand,
+          to: nextBand,
+        },
         evidence,
         affectsInstructionalAccess: true,
       }),

@@ -22,7 +22,7 @@ import {
   type LearnerInterestProfile,
   type LearnerInterestSignal,
 } from "@aivo/special-interest-engine";
-import { deriveLearningProfile } from "../services/learning-profile.js";
+import { deriveLearningProfile, deriveSubjectThetas } from "../services/learning-profile.js";
 import { applyBaselineDeliveryLevel } from "../services/curriculum-alignment.js";
 import { partitionChapterActivitiesPayload } from "../services/discovery-activity-validator.js";
 import { normalizeBaselineItems } from "../services/baselineSurfaceNormalizer.js";
@@ -875,12 +875,18 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
         // dashboard will consume going forward.
         // ----------------------------------------------------------------
         let learningProfile: ReturnType<typeof deriveLearningProfile> | null = null;
+        let subjectThetas: Record<string, number> = {};
         try {
           learningProfile = deriveLearningProfile(
             body.chapterResults || [],
             body.responseLatencies || [],
             Array.isArray(body.surfaceSignals) ? body.surfaceSignals : [],
           );
+          // Per-subject θ (Wave C, G1): each Discovery chapter is a subject
+          // domain — split the placement so math and reading land at their
+          // own delivery bands. Empty when chapters are too small to split.
+          subjectThetas = deriveSubjectThetas(body.chapterResults || []);
+          const hasSubjectThetas = Object.keys(subjectThetas).length > 0;
           await db
             .insert(learnerProfiles)
             .values({
@@ -888,6 +894,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
               learnerId: learner.id,
               attemptId: attempt.id,
               thetaPlacement: learningProfile.thetaPlacement,
+              subjectThetas: hasSubjectThetas ? subjectThetas : null,
               modalityFit: learningProfile.modalityFit,
               processingSpeedMs: learningProfile.processingSpeedMs,
               frustrationRate: learningProfile.frustrationRate,
@@ -902,6 +909,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
               set: {
                 attemptId: attempt.id,
                 thetaPlacement: learningProfile.thetaPlacement,
+                ...(hasSubjectThetas ? { subjectThetas } : {}),
                 modalityFit: learningProfile.modalityFit,
                 processingSpeedMs: learningProfile.processingSpeedMs,
                 frustrationRate: learningProfile.frustrationRate,
@@ -931,6 +939,7 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
           await applyBaselineDeliveryLevel(db, app.log, {
             learnerId: learner.id,
             theta: learningProfile.thetaPlacement,
+            subjectThetas: Object.keys(subjectThetas).length > 0 ? subjectThetas : null,
           });
           // A completed discovery run satisfies any outstanding rebaseline
           // request (the profile upsert above refreshed the placement).

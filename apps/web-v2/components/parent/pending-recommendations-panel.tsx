@@ -37,7 +37,14 @@ function valueLabel(value: unknown): string {
   if (value == null) return "—";
   if (typeof value === "object") {
     const v = value as Record<string, unknown>;
-    if ("from" in v && "to" in v) return `${String(v.from)} → ${String(v.to)}`;
+    if ("from" in v && "to" in v) {
+      const range = `${String(v.from)} → ${String(v.to)}`;
+      // Wave C (G1): subject-scoped proposals name the subject so a parent
+      // knows exactly which band moves (e.g. "math: 2 → 3").
+      return typeof v.subjectKey === "string" && v.subjectKey.length > 0
+        ? `${v.subjectKey}: ${range}`
+        : range;
+    }
     if ("reason" in v) return String(v.reason);
     return JSON.stringify(v);
   }

@@ -77,6 +77,41 @@ const DOMAIN_TO_MODALITY: Record<string, Modality> = {
 
 const MODALITY_ORDER: Modality[] = ["visual", "auditory", "kinesthetic", "reading"];
 
+/** Minimum chapter items before a per-subject θ is trustworthy. */
+const SUBJECT_THETA_MIN_ITEMS = 4;
+
+/**
+ * Per-subject θ from Discovery chapter results (Wave C, G1).
+ *
+ * Each chapter is a subject domain (math, ela, science, …); its accuracy
+ * maps to a logit θ with the SAME bounded transform `deriveLearningProfile`
+ * uses for the overall placement, so the per-subject and overall numbers
+ * live on one scale. Domains with fewer than `SUBJECT_THETA_MIN_ITEMS`
+ * items are omitted — consumers fall back to the overall θ. Keys are the
+ * raw chapter domains; the alignment writer canonicalises them.
+ */
+export function deriveSubjectThetas(
+  chapters: readonly ChapterResult[],
+): Record<string, number> {
+  const byDomain = new Map<string, { correct: number; total: number }>();
+  for (const ch of chapters) {
+    if (!ch.domain) continue;
+    const cur = byDomain.get(ch.domain) ?? { correct: 0, total: 0 };
+    cur.correct += ch.correct || 0;
+    cur.total += ch.total || 0;
+    byDomain.set(ch.domain, cur);
+  }
+  const out: Record<string, number> = {};
+  for (const [domain, { correct, total }] of byDomain) {
+    if (total < SUBJECT_THETA_MIN_ITEMS) continue;
+    const eps = 1e-3;
+    const a = Math.min(1 - eps, Math.max(eps, correct / total));
+    const theta = Math.max(-2.5, Math.min(2.5, Math.log(a / (1 - a))));
+    out[domain] = Math.round(theta * 10) / 10;
+  }
+  return out;
+}
+
 export function deriveLearningProfile(
   chapters: readonly ChapterResult[],
   /** Optional all-items response latencies, ms. */
