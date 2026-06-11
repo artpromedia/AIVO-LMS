@@ -89,3 +89,51 @@ describe("SchoolCalendarManager", () => {
     expect(put).not.toHaveBeenCalled();
   });
 });
+
+describe("summer bridge opt-in (Wave D, G6)", () => {
+  it("loads the current state and PATCHes the toggle to the bridge endpoint", async () => {
+    const calls: Array<{ url: string; method: string; body?: unknown }> = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
+        const method = init?.method ?? "GET";
+        calls.push({
+          url: String(url),
+          method,
+          body: init?.body ? JSON.parse(String(init.body)) : undefined,
+        });
+        if (String(url).includes("summer-bridge")) {
+          if (method === "GET") {
+            return new Response(JSON.stringify({ data: { optIn: false } }), { status: 200 });
+          }
+          return new Response(JSON.stringify({ data: { optIn: true, plansUpdated: 1 } }), {
+            status: 200,
+          });
+        }
+        return new Response(JSON.stringify({ data: { calendar: null } }), { status: 200 });
+      }) as unknown as typeof fetch,
+    );
+
+    render(
+      <SchoolCalendarManager
+        apiBase="/api/bff/parent/learners/l1/school-calendar"
+        learnerName="Sky"
+        summerBridgeApiBase="/api/bff/parent/learners/l1/summer-bridge"
+      />,
+    );
+    const toggle = (await screen.findByLabelText("summer_bridge_toggle")) as HTMLInputElement;
+    expect(toggle.checked).toBe(false);
+
+    fireEvent.click(toggle);
+    await waitFor(() => expect(toggle.checked).toBe(true));
+    const patch = calls.find((c) => c.method === "PATCH");
+    expect(patch?.url).toBe("/api/bff/parent/learners/l1/summer-bridge");
+    expect(patch?.body).toEqual({ optIn: true });
+  });
+
+  it("renders no bridge card without the prop (teacher surface)", () => {
+    stubFetch(() => {});
+    render(<SchoolCalendarManager apiBase="/api/x" learnerName="Sky" />);
+    expect(screen.queryByTestId("summer-bridge-card")).toBeNull();
+  });
+});

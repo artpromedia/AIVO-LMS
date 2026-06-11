@@ -75,6 +75,7 @@ export default async function ParentLearnerCurriculumPage({
           <SchoolCalendarManager
             apiBase={`/api/bff/parent/learners/${learnerId}/school-calendar`}
             learnerName={learner.displayName}
+            summerBridgeApiBase={`/api/bff/parent/learners/${learnerId}/summer-bridge`}
           />
         </TabsContent>
       </Tabs>

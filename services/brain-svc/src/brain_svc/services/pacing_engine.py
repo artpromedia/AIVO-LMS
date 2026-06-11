@@ -13,6 +13,7 @@ be unit-tested deterministically.
 
 from __future__ import annotations
 
+import re
 from datetime import date, timedelta
 from typing import Any
 
@@ -144,6 +145,89 @@ def build_pacing_weeks(
         week_index += 1
         cursor = we + timedelta(days=1)
     return weeks
+
+
+_GRADE_LADDER = ["K", "1", "2", "3", "4", "5", "6", "7", "8"]
+
+
+def next_grade_band(grade: str | None) -> str | None:
+    """Next K-8 band after a free-form grade value ("K", "3", "Grade 3").
+    None when the grade is unparseable or already at the catalogue ceiling
+    (grade 8) — callers fall back to plain holiday prep, never guess."""
+    raw = str(grade or "").strip().lower()
+    if raw in ("k", "kindergarten", "0"):
+        current = "K"
+    else:
+        m = re.search(r"(\d{1,2})", raw)
+        if not m:
+            return None
+        current = m.group(1)
+    if current not in _GRADE_LADDER:
+        return None
+    idx = _GRADE_LADDER.index(current)
+    if idx + 1 >= len(_GRADE_LADDER):
+        return None
+    return _GRADE_LADDER[idx + 1]
+
+
+def build_summer_bridge(
+    weeks: list[dict],
+    break_week_index: int,
+    next_grade_units: list[dict],
+    review_n: int = 2,
+) -> dict | None:
+    """Build a summer-bridge payload for a summer-break week (Wave D, G6).
+
+    The bridge keeps the learner ready for the NEXT grade: it (a) reviews
+    the closing grade's most recent instruction weeks (same review rule as
+    :func:`build_holiday_prep`) and (b) previews the next grade band's
+    opening units — which the caller fetched from the AUTHORITATIVE
+    curriculum catalogue (curriculum-svc), never from an LLM. Pure.
+
+    Returns ``None`` when there are no next-grade units (unseeded band,
+    grade-8 ceiling, catalogue unreachable) so the caller falls back to
+    plain holiday prep instead of inventing a preview.
+    """
+    units = [
+        u
+        for u in (next_grade_units or [])
+        if isinstance(u, dict) and (_clean_list(u.get("topics")) or u.get("title"))
+    ]
+    if not units:
+        return None
+
+    pos = next(
+        (i for i, w in enumerate(weeks) if w.get("week_index") == break_week_index),
+        None,
+    )
+    before: list[dict] = []
+    if pos is not None:
+        for w in reversed(weeks[:pos]):
+            if w.get("kind") == "instruction":
+                before.append(w)
+            if len(before) >= review_n:
+                break
+
+    def gather(items: list[dict], key: str) -> list[str]:
+        out: list[str] = []
+        for w in items:
+            vals = w.get(key) or []
+            if isinstance(vals, list):
+                out.extend(str(v) for v in vals if v)
+        return _uniq(out)
+
+    return {
+        "review_topics": gather(before, "topics"),
+        "review_standards": gather(before, "standards"),
+        "review_vocabulary": gather(before, "vocabulary"),
+        "next_grade_band": units[0].get("grade_band"),
+        "next_grade_units": units,
+        "preview_topics": _uniq([t for u in units for t in _clean_list(u.get("topics"))]),
+        "preview_standards": _uniq([s for u in units for s in _clean_list(u.get("standards"))]),
+        "preview_vocabulary": _uniq([v for u in units for v in _clean_list(u.get("vocabulary"))]),
+        "prior_unit_title": before[0].get("unit_title") if before else None,
+        "next_unit_title": units[0].get("title"),
+    }
 
 
 def validate_calendar_payload(terms: list[dict], breaks: list[dict]) -> list[str]:

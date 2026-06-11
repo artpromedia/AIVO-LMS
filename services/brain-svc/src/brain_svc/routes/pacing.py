@@ -19,11 +19,14 @@ from brain_svc.auth import AuthClaims, require_auth
 from brain_svc.models.database import get_db
 from brain_svc.services.access_control import safe_json_parse, verify_learner_access
 from brain_svc.services.curriculum_engine import generate_scope_sequence
+from brain_svc.services.next_grade import fetch_next_grade_units
 from brain_svc.services.pacing_engine import (
     SCOPE_SOURCE_AI,
     SCOPE_SOURCE_UPLOADED_TERM,
     build_holiday_prep,
     build_pacing_weeks,
+    build_summer_bridge,
+    next_grade_band,
     normalize_uploaded_scope,
     validate_calendar_payload,
 )
@@ -361,8 +364,10 @@ async def generate_pacing_plan(
         text(
             """INSERT INTO learner_pacing_plans
                    (tenant_id, learner_id, calendar_id, subject, framework, grade_level,
-                    status, plan_start, source_scope_sequence, pacing_rationale)
-               VALUES (:tid, :lid, :cid, :subj, :fw, :grade, 'active', :ps, :scope, :rationale)
+                    status, plan_start, source_scope_sequence, pacing_rationale,
+                    opt_in_summer_bridge)
+               VALUES (:tid, :lid, :cid, :subj, :fw, :grade, 'active', :ps, :scope, :rationale,
+                       :bridge)
                RETURNING id"""
         ),
         {
@@ -375,6 +380,9 @@ async def generate_pacing_plan(
             "ps": plan_start,
             "scope": json.dumps(scope),
             "rationale": scope.get("pacing_rationale") if isinstance(scope, dict) else None,
+            # Wave D (G6): new plans inherit the learner-level opt-in so a
+            # parent's choice survives plan regeneration.
+            "bridge": curriculum_alignment.get("summer_bridge_opt_in") is True,
         },
     ).first()
     plan_id = plan_row[0]
@@ -437,13 +445,32 @@ def _serialize_week(row) -> dict:
 def _active_plan(db: Session, learner_id: str, subject: str):
     return db.execute(
         text(
-            """SELECT id, plan_start, framework, grade_level
+            """SELECT id, plan_start, framework, grade_level, calendar_id,
+                      opt_in_summer_bridge
                FROM learner_pacing_plans
                WHERE learner_id = :lid AND subject = :subj AND status = 'active'
                ORDER BY created_at DESC LIMIT 1"""
         ),
         {"lid": learner_id, "subj": subject},
     ).mappings().first()
+
+
+def _break_kind_on(db: Session, calendar_id, on_date: str) -> str | None:
+    """Kind of the calendar break containing ``on_date`` ('summer' wins
+    when several overlap), or None when the calendar has no break there."""
+    if not calendar_id:
+        return None
+    rows = db.execute(
+        text(
+            """SELECT kind FROM school_calendar_breaks
+               WHERE calendar_id = :cid AND start_date <= :on AND end_date >= :on"""
+        ),
+        {"cid": calendar_id, "on": on_date},
+    ).mappings().all()
+    kinds = [r["kind"] for r in rows]
+    if "summer" in kinds:
+        return "summer"
+    return kinds[0] if kinds else None
 
 
 @router.get("/{learner_id}/pacing/current")
@@ -481,7 +508,12 @@ async def get_current_pacing_week(
 
     # When the current week is a break, build a holiday-prep payload (review the
     # prior units + preview the next) so the learner stays ready for resumption.
+    # Wave D (G6): during a SUMMER break, an opted-in learner instead gets a
+    # summer-bridge payload — closing-grade review + the NEXT grade band's
+    # opening units fetched from the authoritative catalogue. No units (8th
+    # grade ceiling, unseeded jurisdiction, catalogue down) → holiday prep.
     holiday_prep = None
+    summer_bridge = None
     if current and current["kind"] in ("break", "holiday_prep"):
         all_weeks = db.execute(
             text(
@@ -504,6 +536,24 @@ async def get_current_pacing_week(
         ]
         holiday_prep = build_holiday_prep(ordered, current["week_index"])
 
+        if plan.get("opt_in_summer_bridge") and _break_kind_on(
+            db, plan.get("calendar_id"), on_date
+        ) == "summer":
+            target_band = next_grade_band(plan.get("grade_level"))
+            if target_band:
+                learner_row = db.execute(
+                    text("SELECT zip_code FROM learners WHERE id = :lid"),
+                    {"lid": learner_id},
+                ).mappings().first()
+                units = await fetch_next_grade_units(
+                    subject,
+                    target_band,
+                    zip_code=(learner_row or {}).get("zip_code"),
+                )
+                summer_bridge = build_summer_bridge(
+                    ordered, current["week_index"], units
+                )
+
     return {
         "learnerId": learner_id,
         "subject": subject,
@@ -512,7 +562,81 @@ async def get_current_pacing_week(
         "current": _serialize_week(current) if current else None,
         "next": _serialize_week(nxt) if nxt else None,
         "holidayPrep": holiday_prep,
+        "summerBridge": summer_bridge,
     }
+
+
+class SummerBridgeOptIn(BaseModel):
+    optIn: bool
+
+
+@router.get("/{learner_id}/pacing/summer-bridge")
+async def get_summer_bridge_opt_in(
+    learner_id: str,
+    db: Session = Depends(get_db),
+    auth: AuthClaims = Depends(require_auth),
+):
+    """Current summer-bridge opt-in state: true when any active plan (or
+    the learner-level default on curriculum_alignment) has opted in."""
+    verify_learner_access(db, auth, learner_id)
+    plan_row = db.execute(
+        text(
+            """SELECT bool_or(opt_in_summer_bridge) AS opted
+               FROM learner_pacing_plans
+               WHERE learner_id = :lid AND status = 'active'"""
+        ),
+        {"lid": learner_id},
+    ).mappings().first()
+    learner = db.execute(
+        text("SELECT curriculum_alignment FROM learners WHERE id = :lid"),
+        {"lid": learner_id},
+    ).mappings().first()
+    alignment = safe_json_parse((learner or {}).get("curriculum_alignment"))
+    opted = bool((plan_row or {}).get("opted")) or alignment.get("summer_bridge_opt_in") is True
+    return {"learnerId": learner_id, "optIn": opted}
+
+
+@router.patch("/{learner_id}/pacing/summer-bridge")
+async def set_summer_bridge_opt_in(
+    learner_id: str,
+    body: SummerBridgeOptIn,
+    db: Session = Depends(get_db),
+    auth: AuthClaims = Depends(require_auth),
+):
+    """Parent opt-in/out of next-grade summer preparation (Wave D, G6).
+
+    Applies to every ACTIVE pacing plan and is remembered as a
+    learner-level default (curriculum_alignment.summer_bridge_opt_in) so
+    plans generated later inherit it without re-asking.
+    """
+    verify_learner_access(db, auth, learner_id)
+    result = db.execute(
+        text(
+            """UPDATE learner_pacing_plans
+               SET opt_in_summer_bridge = :opt, updated_at = NOW()
+               WHERE learner_id = :lid AND status = 'active'"""
+        ),
+        {"lid": learner_id, "opt": body.optIn},
+    )
+    db.execute(
+        text(
+            """UPDATE learners
+               SET curriculum_alignment =
+                     COALESCE(curriculum_alignment, '{}'::jsonb)
+                     || jsonb_build_object('summer_bridge_opt_in', CAST(:opt AS boolean)),
+                   updated_at = NOW()
+               WHERE id = :lid"""
+        ),
+        {"lid": learner_id, "opt": body.optIn},
+    )
+    db.commit()
+    logger.info(
+        "summer-bridge opt-in set learner=%s optIn=%s plans=%s",
+        learner_id,
+        body.optIn,
+        result.rowcount,
+    )
+    return {"learnerId": learner_id, "optIn": body.optIn, "plansUpdated": result.rowcount}
 
 
 @router.get("/{learner_id}/pacing/plan")

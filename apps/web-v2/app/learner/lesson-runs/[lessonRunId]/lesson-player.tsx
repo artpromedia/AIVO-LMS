@@ -670,6 +670,10 @@ export function LessonPlayer({
         <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-ink">
           {t("holiday_prep")}
         </span>
+      ) : plan.lessonMode === "summer_bridge" ? (
+        <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-ink">
+          {t("summer_bridge")}
+        </span>
       ) : null}
       <PageHeader
         eyebrow={plan.tutorPersona}

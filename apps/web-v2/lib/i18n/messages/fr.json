@@ -1288,7 +1288,8 @@
       "next": "Suivant",
       "saving": "Enregistrement…",
       "done": "J'ai fini",
-      "complete_error": "Nous n'avons pas pu enregistrer cette leçon. Réessaie avec le bouton « J'ai fini »."
+      "complete_error": "Nous n'avons pas pu enregistrer cette leçon. Réessaie avec le bouton « J'ai fini ».",
+      "summer_bridge": "☀️ Passerelle d'été · préparation à la classe suivante"
     },
     "baseline_runner": {
       "exit_proctor_view": "Quitter la vue surveillant",
@@ -3123,7 +3124,11 @@
       "save_error": "Impossible d'enregistrer le calendrier. Veuillez réessayer.",
       "error_missing_dates": "Chaque trimestre et congé doit avoir une date de début et de fin.",
       "error_end_before_start": "Une date de fin précède sa date de début.",
-      "error_terms_overlap": "Les trimestres se chevauchent — une date ne peut appartenir qu'à un seul trimestre."
+      "error_terms_overlap": "Les trimestres se chevauchent — une date ne peut appartenir qu'à un seul trimestre.",
+      "summer_bridge_title": "Passerelle d'été",
+      "summer_bridge_hint": "Pendant des vacances marquées Été, AIVO révise les acquis de l'année et donne un aperçu des premières unités de la classe suivante (programme officiel) pour que {name} commence l'année prêt(e).",
+      "summer_bridge_toggle": "Préparer {name} à la classe suivante pendant l'été",
+      "summer_bridge_error": "Impossible de mettre à jour la passerelle d'été. Veuillez réessayer."
     },
     "term_syllabus": {
       "plan_start": "Début du plan",

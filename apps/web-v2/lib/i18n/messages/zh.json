@@ -1288,7 +1288,8 @@
       "next": "下一步",
       "saving": "正在保存…",
       "done": "我做完了",
-      "complete_error": "我们无法保存这节课。请再次点击「我做完了」按钮。"
+      "complete_error": "我们无法保存这节课。请再次点击「我做完了」按钮。",
+      "summer_bridge": "☀️ 暑期衔接 · 为下一年级做准备"
     },
     "baseline_runner": {
       "exit_proctor_view": "退出监考视图",
@@ -3123,7 +3124,11 @@
       "save_error": "无法保存日历，请重试。",
       "error_missing_dates": "每个学期和假期都需要开始与结束日期。",
       "error_end_before_start": "存在结束日期早于开始日期。",
-      "error_terms_overlap": "学期相互重叠——一个日期只能属于一个学期。"
+      "error_terms_overlap": "学期相互重叠——一个日期只能属于一个学期。",
+      "summer_bridge_title": "暑期衔接",
+      "summer_bridge_hint": "在标记为“暑假”的假期中，AIVO 会复习本学年技能，并预习下一年级的最初单元（来自官方课程），让{name}做好准备迎接新学年。",
+      "summer_bridge_toggle": "在暑假期间帮助{name}为下一年级做准备",
+      "summer_bridge_error": "无法更新暑期衔接设置，请重试。"
     },
     "term_syllabus": {
       "plan_start": "计划开始",

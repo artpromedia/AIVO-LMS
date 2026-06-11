@@ -3,6 +3,7 @@ import {
   uuid,
   varchar,
   integer,
+  boolean,
   date,
   jsonb,
   text,
@@ -94,6 +95,14 @@ export const learnerPacingPlans = pgTable(
     gradeLevel: varchar("grade_level", { length: 16 }),
     // "active" | "archived"
     status: varchar("status", { length: 16 }).notNull().default("active"),
+    /**
+     * Wave D (G6): parent opt-in to next-grade summer preparation. When
+     * true and the current calendar break is kind "summer",
+     * /pacing/current serves a summerBridge payload (closing-grade review
+     * + next grade band's opening catalogue units) instead of plain
+     * holiday prep.
+     */
+    optInSummerBridge: boolean("opt_in_summer_bridge").notNull().default(false),
     planStart: date("plan_start").notNull(),
     /** The raw scope-&-sequence the plan was exploded from (audit/regenerate). */
     sourceScopeSequence: jsonb("source_scope_sequence").default({}),

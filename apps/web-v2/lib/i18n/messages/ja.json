@@ -1288,7 +1288,8 @@
       "next": "次へ",
       "saving": "保存中…",
       "done": "できた",
-      "complete_error": "このレッスンを保存できませんでした。「できた」ボタンをもう一度試してください。"
+      "complete_error": "このレッスンを保存できませんでした。「できた」ボタンをもう一度試してください。",
+      "summer_bridge": "☀️ サマーブリッジ · 次学年の準備"
     },
     "baseline_runner": {
       "exit_proctor_view": "監督ビューを終了",
@@ -3123,7 +3124,11 @@
       "save_error": "カレンダーを保存できませんでした。もう一度お試しください。",
       "error_missing_dates": "各学期と休暇には開始日と終了日が必要です。",
       "error_end_before_start": "終了日が開始日より前になっています。",
-      "error_terms_overlap": "学期が重なっています。1つの日付は1つの学期にのみ属します。"
+      "error_terms_overlap": "学期が重なっています。1つの日付は1つの学期にのみ属します。",
+      "summer_bridge_title": "サマーブリッジ",
+      "summer_bridge_hint": "「夏休み」と設定した休暇中、AIVOは今年度のスキルを復習し、次学年の最初の単元（公式カリキュラム）を先取りして、{name}さんが準備万端で新年度を迎えられるようにします。",
+      "summer_bridge_toggle": "夏の間に{name}さんを次学年に向けて準備する",
+      "summer_bridge_error": "サマーブリッジ設定を更新できませんでした。もう一度お試しください。"
     },
     "term_syllabus": {
       "plan_start": "計画開始日",

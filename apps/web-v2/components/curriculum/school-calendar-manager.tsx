@@ -44,10 +44,19 @@ function emptyBreak(): BreakRow {
 export function SchoolCalendarManager({
   apiBase,
   learnerName,
+  summerBridgeApiBase,
 }: Readonly<{
   /** e.g. `/api/bff/parent/learners/${learnerId}/school-calendar` */
   apiBase: string;
   learnerName: string;
+  /**
+   * Wave D (G6): when set (parent surface), renders the summer-bridge
+   * opt-in toggle — GET/PATCH against
+   * `/api/bff/parent/learners/${learnerId}/summer-bridge`. During a
+   * calendar break marked Summer, an opted-in learner gets next-grade
+   * preparation lessons instead of plain holiday prep.
+   */
+  summerBridgeApiBase?: string;
 }>) {
   const t = useTranslations("curriculum.school_calendar");
   const [academicYear, setAcademicYear] = useState("");
@@ -57,6 +66,52 @@ export function SchoolCalendarManager({
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  // Wave D (G6): summer-bridge opt-in state (parent surface only).
+  const [bridgeOptIn, setBridgeOptIn] = useState(false);
+  const [bridgeBusy, setBridgeBusy] = useState(false);
+  const [bridgeError, setBridgeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!summerBridgeApiBase) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(summerBridgeApiBase, { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled) setBridgeOptIn(data?.data?.optIn === true);
+      } catch {
+        /* read is best-effort; toggling surfaces real errors */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [summerBridgeApiBase]);
+
+  async function onToggleBridge() {
+    if (!summerBridgeApiBase) return;
+    const next = !bridgeOptIn;
+    setBridgeBusy(true);
+    setBridgeError(null);
+    try {
+      const res = await fetch(summerBridgeApiBase, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ optIn: next }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setBridgeError(data?.error?.message ?? t("summer_bridge_error"));
+        return;
+      }
+      setBridgeOptIn(data?.data?.optIn === true);
+    } catch {
+      setBridgeError(t("summer_bridge_error"));
+    } finally {
+      setBridgeBusy(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -299,6 +354,30 @@ export function SchoolCalendarManager({
           {busy ? t("saving") : t("save")}
         </Button>
       </Card>
+
+      {summerBridgeApiBase ? (
+        <Card className="space-y-2 p-4" data-testid="summer-bridge-card">
+          <h4 className="text-sm font-semibold">{t("summer_bridge_title")}</h4>
+          <p className="text-xs text-aivo-ink-soft">
+            {t("summer_bridge_hint", { name: learnerName })}
+          </p>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={bridgeOptIn}
+              disabled={bridgeBusy}
+              onChange={onToggleBridge}
+              aria-label={t("summer_bridge_toggle")}
+            />
+            {t("summer_bridge_toggle")}
+          </label>
+          {bridgeError ? (
+            <p className="text-sm text-aivo-danger" role="alert">
+              {bridgeError}
+            </p>
+          ) : null}
+        </Card>
+      ) : null}
     </div>
   );
 }

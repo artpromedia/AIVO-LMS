@@ -1288,7 +1288,8 @@
       "next": "Siguiente",
       "saving": "Guardando…",
       "done": "Terminé",
-      "complete_error": "No pudimos guardar esta lección. Vuelve a pulsar el botón «Terminé»."
+      "complete_error": "No pudimos guardar esta lección. Vuelve a pulsar el botón «Terminé».",
+      "summer_bridge": "☀️ Puente de verano · preparándose para el próximo grado"
     },
     "baseline_runner": {
       "exit_proctor_view": "Salir de la vista de supervisor",
@@ -3123,7 +3124,11 @@
       "save_error": "No se pudo guardar el calendario. Inténtelo de nuevo.",
       "error_missing_dates": "Cada período y descanso necesita fecha de inicio y de fin.",
       "error_end_before_start": "Una fecha de fin es anterior a su inicio.",
-      "error_terms_overlap": "Los períodos se superponen: una fecha solo puede pertenecer a un período."
+      "error_terms_overlap": "Los períodos se superponen: una fecha solo puede pertenecer a un período.",
+      "summer_bridge_title": "Puente de verano",
+      "summer_bridge_hint": "Durante un receso marcado como Verano, AIVO repasa las destrezas de este año y anticipa las primeras unidades del próximo grado (del currículo oficial) para que {name} empiece el año listo/a.",
+      "summer_bridge_toggle": "Preparar a {name} para el próximo grado durante el verano",
+      "summer_bridge_error": "No se pudo actualizar el puente de verano. Inténtelo de nuevo."
     },
     "term_syllabus": {
       "plan_start": "Inicio del plan",

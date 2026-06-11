@@ -143,7 +143,7 @@ export const GeneratedLessonPlanSchema = z
     nextRecommendedStep: z.string().min(1).max(200),
     // Phase 4: tags a break-week lesson as optional holiday-prep enrichment
     // so the learner UI can badge it. Omitted for normal lessons.
-    lessonMode: z.enum(["school_sync", "holiday_prep"]).optional(),
+    lessonMode: z.enum(["school_sync", "holiday_prep", "summer_bridge"]).optional(),
   })
   .strict();
 export type GeneratedLessonPlanInput = z.infer<typeof GeneratedLessonPlanSchema>;

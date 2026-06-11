@@ -1288,7 +1288,8 @@
       "next": "Weiter",
       "saving": "Wird gespeichert…",
       "done": "Ich bin fertig",
-      "complete_error": "Wir konnten diese Lektion nicht speichern. Bitte versuch die Schaltfläche „Ich bin fertig“ erneut."
+      "complete_error": "Wir konnten diese Lektion nicht speichern. Bitte versuch die Schaltfläche „Ich bin fertig“ erneut.",
+      "summer_bridge": "☀️ Sommerbrücke · Vorbereitung auf die nächste Klassenstufe"
     },
     "baseline_runner": {
       "exit_proctor_view": "Aufsichtsansicht verlassen",
@@ -3123,7 +3124,11 @@
       "save_error": "Kalender konnte nicht gespeichert werden. Bitte erneut versuchen.",
       "error_missing_dates": "Jedes Halbjahr und jede Ferienzeit braucht Start- und Enddatum.",
       "error_end_before_start": "Ein Enddatum liegt vor dem Startdatum.",
-      "error_terms_overlap": "Halbjahre überschneiden sich — ein Datum kann nur zu einem Halbjahr gehören."
+      "error_terms_overlap": "Halbjahre überschneiden sich — ein Datum kann nur zu einem Halbjahr gehören.",
+      "summer_bridge_title": "Sommerbrücke",
+      "summer_bridge_hint": "In als Sommer markierten Ferien wiederholt AIVO die Fähigkeiten dieses Jahres und gibt eine Vorschau auf die ersten Einheiten der nächsten Klassenstufe (aus dem offiziellen Lehrplan), damit {name} vorbereitet startet.",
+      "summer_bridge_toggle": "{name} im Sommer auf die nächste Klassenstufe vorbereiten",
+      "summer_bridge_error": "Die Sommerbrücke konnte nicht aktualisiert werden. Bitte erneut versuchen."
     },
     "term_syllabus": {
       "plan_start": "Planbeginn",

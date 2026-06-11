@@ -1481,7 +1481,8 @@
       "next": "Next",
       "saving": "Saving…",
       "done": "I'm done",
-      "complete_error": "We couldn't save this lesson. Please try the 'I'm done' button again."
+      "complete_error": "We couldn't save this lesson. Please try the 'I'm done' button again.",
+      "summer_bridge": "☀️ Summer bridge · getting ready for next grade"
     },
     "baseline_runner": {
       "exit_proctor_view": "Exit proctor view",
@@ -3123,7 +3124,11 @@
       "save_error": "Could not save the calendar. Please try again.",
       "error_missing_dates": "Every term and break needs a start and end date.",
       "error_end_before_start": "An end date is before its start date.",
-      "error_terms_overlap": "Terms overlap — a date can belong to only one term."
+      "error_terms_overlap": "Terms overlap — a date can belong to only one term.",
+      "summer_bridge_title": "Summer bridge",
+      "summer_bridge_hint": "During a break marked Summer, AIVO reviews this year's skills and previews next grade's first units (from the official curriculum) so {name} starts the new year ready.",
+      "summer_bridge_toggle": "Prepare {name} for next grade over the summer",
+      "summer_bridge_error": "Could not update the summer bridge setting. Please try again."
     },
     "term_syllabus": {
       "plan_start": "Plan start",

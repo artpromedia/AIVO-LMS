@@ -993,7 +993,7 @@ export type GeneratedLessonPlan = {
   /** Phase 4: "holiday_prep" badges a break-week lesson as optional
    *  enrichment in the learner UI; "school_sync" marks a class-aligned
    *  lesson. Omitted for ordinary lessons. */
-  lessonMode?: "school_sync" | "holiday_prep";
+  lessonMode?: "school_sync" | "holiday_prep" | "summer_bridge";
   generatedAt: ISODate;
   /** Generator telemetry. */
   generation: {
@@ -1263,7 +1263,7 @@ export type CurriculumFocus = {
    *  - "holiday_prep": school is on a break — review recent units and preview
    *    the next one to stay ready for resumption (Phase 4).
    */
-  mode?: "school_sync" | "holiday_prep";
+  mode?: "school_sync" | "holiday_prep" | "summer_bridge";
 };
 
 /**

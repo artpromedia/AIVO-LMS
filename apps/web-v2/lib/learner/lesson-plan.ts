@@ -243,7 +243,14 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
   const weekVocab = (curriculumFocus?.keywords ?? []).filter((k) => k && k.trim()).slice(0, 5);
   // Phase 4: a break-week focus is framed as "get ready for resumption" rather
   // than "what you're doing in class this week" (school is closed).
+  // Wave D (G6): a summer-bridge focus is framed as NEXT-GRADE readiness —
+  // the preview topics come from the next grade band's official catalogue
+  // units, so the copy says "get ready for next grade", never "this week".
+  const isSummerBridge = curriculumFocus?.mode === "summer_bridge";
   const isHolidayPrep = curriculumFocus?.mode === "holiday_prep";
+  const bridgeLabel = isSummerBridge
+    ? (curriculumFocus?.title ?? "").replace(/^Summer bridge:\s*/i, "") || "next grade"
+    : null;
   const tutorPersona = tutorNameForSubject(subject.slug);
   const greeting =
     TUTOR_GREETING_BY_STYLE[brainState.tutorPersonaRecommendation.style](learnerName);
@@ -316,11 +323,13 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
 
   const microLesson =
     `${scaffoldLine} The big idea today: ${skill.name}. ` +
-    (isHolidayPrep && schoolTopic
-      ? `School is on a break, so we'll review what you learned and get a head start on what's coming up (${schoolTopic}). `
-      : schoolTopic
-        ? `This is the same thing you're working on in class this week (${schoolTopic}), so we'll practice it together. `
-        : "") +
+    (isSummerBridge && schoolTopic
+      ? `It's summer! We'll keep your skills warm and ${bridgeLabel ?? "get ready for next grade"} — starting with ${schoolTopic}. `
+      : isHolidayPrep && schoolTopic
+        ? `School is on a break, so we'll review what you learned and get a head start on what's coming up (${schoolTopic}). `
+        : schoolTopic
+          ? `This is the same thing you're working on in class this week (${schoolTopic}), so we'll practice it together. `
+          : "") +
     (weekVocab.length > 0 ? `Words to listen for: ${weekVocab.join(", ")}. ` : "") +
     (tier.difficulty === "starter"
       ? `We'll go slow, with pictures and small steps.`
@@ -338,34 +347,42 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
 
   return {
     title:
-      isHolidayPrep && schoolTopic
-        ? `Holiday prep: getting ready for ${schoolTopic}`
-        : schoolTopic
-          ? `This week at school: ${schoolTopic}`
-          : `${skill.name} with ${tutorPersona.split(" ")[0]}`,
+      isSummerBridge && schoolTopic
+        ? `Summer bridge: ${bridgeLabel ?? "getting ready for next grade"}`
+        : isHolidayPrep && schoolTopic
+          ? `Holiday prep: getting ready for ${schoolTopic}`
+          : schoolTopic
+            ? `This week at school: ${schoolTopic}`
+            : `${skill.name} with ${tutorPersona.split(" ")[0]}`,
     objective:
-      isHolidayPrep && schoolTopic
-        ? `Stay sharp over the break and get ready for ${schoolTopic} (${skill.name}).`
-        : schoolTopic
-          ? `Stay in sync with class by practicing ${schoolTopic} (${skill.name}).`
-          : objective,
+      isSummerBridge && schoolTopic
+        ? `Keep skills strong over the summer and ${bridgeLabel ?? "get ready for next grade"} (${skill.name}).`
+        : isHolidayPrep && schoolTopic
+          ? `Stay sharp over the break and get ready for ${schoolTopic} (${skill.name}).`
+          : schoolTopic
+            ? `Stay in sync with class by practicing ${schoolTopic} (${skill.name}).`
+            : objective,
     estimatedMinutes: tier.estimatedMinutes,
     tutorPersona,
     tutorGreeting: greeting,
     storyHook:
-      isHolidayPrep && schoolTopic
-        ? `School's on a break, ${learnerName}. Let's keep your skills warm and peek at what's coming up: ${schoolTopic}.`
-        : schoolTopic
-          ? `Your class is exploring ${schoolTopic} this week. Let's look at it together, ${learnerName}, one small step at a time.`
-          : storyHook,
+      isSummerBridge && schoolTopic
+        ? `It's summer, ${learnerName}! Let's keep your skills warm and take a sneak peek at next grade: ${schoolTopic}.`
+        : isHolidayPrep && schoolTopic
+          ? `School's on a break, ${learnerName}. Let's keep your skills warm and peek at what's coming up: ${schoolTopic}.`
+          : schoolTopic
+            ? `Your class is exploring ${schoolTopic} this week. Let's look at it together, ${learnerName}, one small step at a time.`
+            : storyHook,
     microLesson,
     example: {
       prompt:
-        isHolidayPrep && schoolTopic
-          ? `Here's a warm-up example for ${schoolTopic}.`
-          : schoolTopic
-            ? `Here's a worked example of ${schoolTopic}, just like in class.`
-            : `Here's a small example of ${skill.name}.`,
+        isSummerBridge && schoolTopic
+          ? `Here's a sneak-peek example from next grade: ${schoolTopic}.`
+          : isHolidayPrep && schoolTopic
+            ? `Here's a warm-up example for ${schoolTopic}.`
+            : schoolTopic
+              ? `Here's a worked example of ${schoolTopic}, just like in class.`
+              : `Here's a small example of ${skill.name}.`,
       explanation: exampleExplanationBase,
     },
     guidedPractice,
@@ -379,11 +396,13 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
           : `Strong work, ${learnerName}. You're stretching beautifully.`,
     parentSummary:
       `${learnerName} practiced ${skill.name} in ${subject.name} at a ${tier.difficulty} level. ` +
-      (isHolidayPrep && schoolTopic
-        ? `Holiday-prep lesson: reviewing recent work and previewing ${schoolTopic} for school resumption. `
-        : schoolTopic
-          ? `This lesson was synced to this week's class topic (${schoolTopic}). `
-          : "") +
+      (isSummerBridge && schoolTopic
+        ? `Summer-bridge lesson: reviewing this year's work and previewing next grade's ${schoolTopic}. `
+        : isHolidayPrep && schoolTopic
+          ? `Holiday-prep lesson: reviewing recent work and previewing ${schoolTopic} for school resumption. `
+          : schoolTopic
+            ? `This lesson was synced to this week's class topic (${schoolTopic}). `
+            : "") +
       `Plan emphasizes ${brainState.preferredModalities[0] ?? "visual"} cues` +
       `${accommodations.tags.length > 0 ? `, with supports for ${accommodations.tags.slice(0, 3).join(", ")}.` : "."}`,
     nextRecommendedStep:
@@ -394,6 +413,12 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
           : `Try a small challenge in ${subject.name}.`,
     // Phase 4: tag break-week lessons so the learner UI can badge them as
     // optional holiday-prep enrichment; class-aligned lessons as school_sync.
-    lessonMode: isHolidayPrep ? "holiday_prep" : schoolTopic ? "school_sync" : undefined,
+    lessonMode: isSummerBridge
+      ? "summer_bridge"
+      : isHolidayPrep
+        ? "holiday_prep"
+        : schoolTopic
+          ? "school_sync"
+          : undefined,
   };
 }

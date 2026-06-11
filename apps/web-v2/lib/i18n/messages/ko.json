@@ -1288,7 +1288,8 @@
       "next": "다음",
       "saving": "저장 중…",
       "done": "다 했어",
-      "complete_error": "이 수업을 저장하지 못했어. '다 했어' 버튼을 다시 눌러 줘."
+      "complete_error": "이 수업을 저장하지 못했어. '다 했어' 버튼을 다시 눌러 줘.",
+      "summer_bridge": "☀️ 서머 브리지 · 다음 학년 준비 중"
     },
     "baseline_runner": {
       "exit_proctor_view": "감독 보기 종료",
@@ -3123,7 +3124,11 @@
       "save_error": "캘린더를 저장하지 못했습니다. 다시 시도해 주세요.",
       "error_missing_dates": "모든 학기와 방학에는 시작일과 종료일이 필요합니다.",
       "error_end_before_start": "종료일이 시작일보다 빠릅니다.",
-      "error_terms_overlap": "학기가 겹칩니다 — 한 날짜는 하나의 학기에만 속할 수 있습니다."
+      "error_terms_overlap": "학기가 겹칩니다 — 한 날짜는 하나의 학기에만 속할 수 있습니다.",
+      "summer_bridge_title": "서머 브리지",
+      "summer_bridge_hint": "여름으로 표시한 방학 동안 AIVO가 올해 배운 기술을 복습하고 다음 학년의 첫 단원(공식 교육과정)을 미리 보여 {name}이(가) 준비된 상태로 새 학년을 시작하게 합니다.",
+      "summer_bridge_toggle": "여름 동안 {name}을(를) 다음 학년에 대비시키기",
+      "summer_bridge_error": "서머 브리지 설정을 업데이트하지 못했습니다. 다시 시도해 주세요."
     },
     "term_syllabus": {
       "plan_start": "계획 시작일",
