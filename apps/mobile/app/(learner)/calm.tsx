@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
+import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card, Button } from "@/components/ui";
 import {
   affirmationKeyFor,
@@ -18,6 +19,7 @@ import { PatternFocus } from "@/src/components/learner/calm/PatternFocus";
 import { SortingCalm } from "@/src/components/learner/calm/SortingCalm";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
+import { useFlags } from "@/hooks/useFlags";
 
 /** Persisted, explicit opt-in (default off) — the mobile analog of the web
  *  `calmAudioCues` accessibility preference. */
@@ -33,6 +35,11 @@ const AUDIO_PREF_KEY = "calm.audioCues";
  */
 export default function CalmCornerScreen() {
   const { t } = useTranslation();
+  // Sprint B2 — the Calm Corner is the selfRegulationHub surface; it now
+  // respects the same tenant-scoped flag the web surface gates on
+  // (kill switch > district override > env default). Fail-closed while
+  // loading or when the flag is off.
+  const { flags, isLoading: flagsLoading } = useFlags();
   const palette = useSensoryPalette();
   const params = useLocalSearchParams<{ action?: string }>();
   const catalog = getCalmCatalog();
@@ -40,6 +47,24 @@ export default function CalmCornerScreen() {
   const [active, setActive] = useState<CalmActivity | null>(null);
   const [affirmation, setAffirmation] = useState<string | null>(null);
   const [audioCuesEnabled, setAudioCuesEnabled] = useState(false);
+
+  if (!flagsLoading && !flags.selfRegulationHub) {
+    return (
+      <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
+        <ScreenHeader title={t("learnerCalm.title", "Calm Corner")} />
+        <Text
+          accessibilityLiveRegion="polite"
+          style={{ color: palette.inkMuted, paddingHorizontal: 16 }}
+        >
+          {t(
+            "learnerCalm.notEnabled",
+            "Calm Corner isn't turned on for your school yet. Ask a grown-up to check with your district.",
+          )}
+        </Text>
+      </ResponsiveScreen>
+    );
+  }
+
 
   useEffect(() => {
     let mounted = true;

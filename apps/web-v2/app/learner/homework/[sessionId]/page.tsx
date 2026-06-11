@@ -12,7 +12,7 @@ import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { resolveEnterpriseFlags } from "@aivo/feature-flags";
+import { getTenantFlags } from "@/lib/bff/tenant-flags";
 import { getHomeworkSession } from "@/lib/db/repos";
 import { describeHomeworkAttachment } from "@/lib/homework/attachments";
 import { HomeworkChat } from "./chat";
@@ -36,7 +36,7 @@ export default async function HomeworkSessionPage({ params }: Readonly<Params>) 
   if (hw?.learnerId !== learnerId) notFound();
   const t = await getTranslations("learner.homework");
 
-  const flags = resolveEnterpriseFlags(process.env);
+  const flags = await getTenantFlags();
   const regulationEnabled = flags.selfRegulationHub;
 
   return (

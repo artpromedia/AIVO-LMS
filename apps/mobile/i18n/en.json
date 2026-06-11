@@ -1083,7 +1083,8 @@
       "body": "It's okay to pause. A quick calm moment can help you feel ready.",
       "accept": "Take a calm break",
       "dismiss": "Not now"
-    }
+    },
+    "notEnabled": "Calm Corner isn't turned on for your school yet. Ask a grown-up to check with your district."
   },
   "errorBoundary": {
     "title": "Something went wrong",

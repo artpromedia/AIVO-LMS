@@ -1083,7 +1083,8 @@
       "body": "C'est bien de faire une pause. Un petit moment de calme peut t'aider à te sentir prêt.",
       "accept": "Faire une pause calme",
       "dismiss": "Pas maintenant"
-    }
+    },
+    "notEnabled": "Le Coin Calme n'est pas encore activé pour ton école. Demande à un adulte de vérifier auprès de ton district."
   },
   "errorBoundary": {
     "title": "Un problème est survenu",

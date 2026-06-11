@@ -12,7 +12,7 @@ import { requirePageRole } from "@/lib/auth/server";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AppShell } from "@/components/layout/app-shell";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import { resolveEnterpriseFlags } from "@aivo/feature-flags";
+import { getTenantFlags } from "@/lib/bff/tenant-flags";
 import { getCalmCatalog, recommendCalmActivity } from "@/lib/learner/calm";
 import { getAccessibilityPrefs } from "@/lib/db/repos";
 import { CalmCorner } from "./calm-corner";
@@ -35,7 +35,7 @@ export default async function LearnerCalmPage({
   }
 
   const { action } = await searchParams;
-  const flags = resolveEnterpriseFlags(process.env as Record<string, string | undefined>);
+  const flags = await getTenantFlags();
   const recommended =
     flags.selfRegulationHub && action ? recommendCalmActivity(action) : null;
 

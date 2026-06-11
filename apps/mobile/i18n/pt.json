@@ -1083,7 +1083,8 @@
       "body": "Tudo bem fazer uma pausa. Um momento de calma pode ajudar você a se sentir pronto.",
       "accept": "Fazer uma pausa tranquila",
       "dismiss": "Agora não"
-    }
+    },
+    "notEnabled": "O Cantinho da Calma ainda não está ativado na sua escola. Peça a um adulto para verificar com o distrito."
   },
   "errorBoundary": {
     "title": "Algo deu errado",

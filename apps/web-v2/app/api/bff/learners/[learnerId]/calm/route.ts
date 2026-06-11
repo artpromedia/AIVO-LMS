@@ -4,7 +4,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/bff/rate-limit";
-import { resolveEnterpriseFlags } from "@aivo/feature-flags";
+import { getTenantFlags } from "@/lib/bff/tenant-flags";
 import {
   getCalmCatalog,
   isCalmActivityId,
@@ -35,7 +35,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     const scope = await requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
 
-    const flags = resolveEnterpriseFlags(process.env as Record<string, string | undefined>);
+    const flags = await getTenantFlags();
     const action = new URL(req.url).searchParams.get("action");
     const recommended =
       flags.selfRegulationHub && action ? recommendCalmActivity(action) : null;

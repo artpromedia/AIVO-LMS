@@ -102,6 +102,8 @@ jobs:
         run: pnpm observability:audit
       - name: mobile:a11y-ratchet
         run: pnpm mobile:a11y-ratchet
+      - name: feature-flag:audit
+        run: pnpm feature-flag:audit
 
       - name: prod:no-demo scan
         run: pnpm prod:no-demo

@@ -204,14 +204,14 @@ export function visualBrainBuildEnabled(): boolean {
 }
 
 /**
- * Delegated-admin RBAC v2 rollout flag. Mirrors the server-side
- * `ADMIN_ENTERPRISE_DELEGATED_ADMIN_RBAC_V2` toggle so the admin shell can
- * dark-launch platform-staff and delegated-admin capabilities without
- * drifting from identity-svc.
+ * Delegated-admin RBAC v2 rollout flag — tenant-scoped since Sprint B2:
+ * resolved through getTenantFlags() (kill switch > district override >
+ * env default), so a single district can pilot delegated-admin
+ * capabilities. Platform-staff sessions are tenant-less and read the
+ * environment default layer.
  */
-export function delegatedAdminRbacV2Enabled(): boolean {
-  const fromServer = process.env.ADMIN_ENTERPRISE_DELEGATED_ADMIN_RBAC_V2;
-  if (isTruthy(fromServer)) return true;
-  if (isExplicitlyFalsy(fromServer)) return false;
-  return false;
+export async function delegatedAdminRbacV2Enabled(): Promise<boolean> {
+  const { getTenantFlags } = await import("@/lib/bff/tenant-flags");
+  const flags = await getTenantFlags();
+  return flags.delegatedAdminRbacV2;
 }

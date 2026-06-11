@@ -38,14 +38,14 @@ export async function requirePagePermission(
   return session;
 }
 
-export function platformPageRoles(): Role[] {
-  return delegatedAdminRbacV2Enabled() ? [...PLATFORM_ROLES] : ["platform_admin"];
+export async function platformPageRoles(): Promise<Role[]> {
+  return (await delegatedAdminRbacV2Enabled()) ? [...PLATFORM_ROLES] : ["platform_admin"];
 }
 
 export async function requirePlatformPage(
   permission: Permission | string,
 ): Promise<SessionProfile> {
-  return requirePagePermission(permission, platformPageRoles());
+  return requirePagePermission(permission, await platformPageRoles());
 }
 
 /**

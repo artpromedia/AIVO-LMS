@@ -21,3 +21,10 @@ export {
   type RoleRolloutFlags,
   type RoleRolloutRoleId,
 } from "./role-rollout.js";
+export {
+  createTenantFlagResolver,
+  isValidFlagKey,
+  killSwitchEnvVar,
+  type TenantFlagResolver,
+  type TenantOverrides,
+} from "./tenant-flags.js";

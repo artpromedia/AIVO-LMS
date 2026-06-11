@@ -37,6 +37,7 @@ import { registerSchoolRoutes } from "./routes/school.js";
 import { registerRosteringRoutes } from "./routes/rostering.js";
 import { registerSsoRoutes } from "./routes/sso.js";
 import { registerOidcRpRoutes } from "./routes/oidc-rp.js";
+import { registerFeatureFlagRoutes } from "./routes/feature-flags.js";
 import { registerScimRoutes } from "./routes/scim.js";
 import { registerOidcProviderRoutes } from "./routes/oidc-provider.js";
 import { registerAvatarRoutes } from "./routes/avatars.js";
@@ -330,6 +331,7 @@ export async function buildApp() {
   await registerStaffRoutes(app);
   await registerSsoRoutes(app);
   await registerOidcRpRoutes(app);
+  await registerFeatureFlagRoutes(app);
   await registerScimRoutes(app);
   await registerOidcProviderRoutes(app);
   await registerAvatarRoutes(app);

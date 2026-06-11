@@ -1083,7 +1083,8 @@
       "body": "Está bien hacer una pausa. Un momento de calma puede ayudarte a sentirte listo.",
       "accept": "Tomar una pausa tranquila",
       "dismiss": "Ahora no"
-    }
+    },
+    "notEnabled": "El Rincón de Calma aún no está activado en tu escuela. Pide a un adulto que consulte con tu distrito."
   },
   "errorBoundary": {
     "title": "Algo salió mal",

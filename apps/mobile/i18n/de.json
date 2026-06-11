@@ -1083,7 +1083,8 @@
       "body": "Eine Pause ist völlig okay. Ein kurzer ruhiger Moment kann dir helfen, dich bereit zu fühlen.",
       "accept": "Ruhige Pause machen",
       "dismiss": "Jetzt nicht"
-    }
+    },
+    "notEnabled": "Die Ruhe-Ecke ist für deine Schule noch nicht freigeschaltet. Bitte einen Erwachsenen, beim Bezirk nachzufragen."
   },
   "errorBoundary": {
     "title": "Etwas ist schiefgelaufen",
