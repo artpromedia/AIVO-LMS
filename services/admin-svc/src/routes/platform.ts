@@ -12,15 +12,7 @@
  * append-only history row; `GET /config/history` returns the trail.
  */
 import { FastifyInstance, FastifyReply } from "fastify";
-import {
-  aiUsageLog,
-  learners,
-  lessonRuns,
-  platformConfig,
-  subscriptions,
-  tenants,
-  users,
-} from "@aivo/db";
+import { adminAuditLog, aiUsageLog, appendAudit, learners, lessonRuns, platformConfig, subscriptions, tenants, users } from "@aivo/db";
 import { createLogger } from "@aivo/observability";
 import { Permission, verifyJWT } from "@aivo/security";
 import { asc, count, desc, eq, gte, sql } from "drizzle-orm";
@@ -34,6 +26,7 @@ import {
   trendWindowStart,
 } from "../lib/usage-trends.js";
 import { logAuditEvent } from "./audit.js";
+import { startCsv, EXPORT_ROW_CAP } from "../lib/csv.js";
 import {
   adminSvcAiPlaygroundSchema,
   getAdminSvcBillingAccountsSchema,
@@ -642,6 +635,102 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
     },
     async (req: any, reply) =>
       proxyToIdentity(req, reply, `/api/admin/learners/${encodeURIComponent(req.params.id)}`),
+  );
+
+  // ── Sprint B3 — audited CSV exports (users / learners) ────────────────
+  // Streams the SAME identity-backed dataset the list endpoints serve
+  // (search passthrough), capped at EXPORT_ROW_CAP, with the export event
+  // appended to the admin audit log BEFORE streaming.
+  async function exportIdentityCollection(
+    req: any,
+    reply: FastifyReply,
+    opts: {
+      identityPath: string;
+      key: string;
+      resourceType: string;
+      filename: string;
+      header: string[];
+      mapRow: (row: Record<string, unknown>) => unknown[];
+    },
+  ) {
+    const search = (req.query as any)?.search as string | undefined;
+    await appendAudit(db, "admin_audit_log", adminAuditLog, {
+      action: "admin.data.exported",
+      actorId: req.user?.sub ?? "unknown",
+      actorEmail: req.user?.email ?? null,
+      actorRole: String(req.user?.role ?? "UNKNOWN"),
+      resourceType: opts.resourceType,
+      resourceId: null,
+      tenantId: null,
+      details: { filters: { search: search ?? null } },
+    });
+    const write = startCsv(reply, opts.filename, opts.header);
+    const pageSize = 200;
+    let written = 0;
+    for (let page = 1; written < EXPORT_ROW_CAP; page += 1) {
+      const url = new URL(opts.identityPath, IDENTITY_URL);
+      url.searchParams.set("page", String(page));
+      url.searchParams.set("pageSize", String(pageSize));
+      if (search) url.searchParams.set("search", search);
+      const res = await fetch(url, {
+        headers: { authorization: req.headers.authorization as string },
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!res.ok) break;
+      const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+      const rows = Array.isArray(json[opts.key]) ? (json[opts.key] as Record<string, unknown>[]) : [];
+      for (const row of rows) {
+        write(opts.mapRow(row));
+        written += 1;
+        if (written >= EXPORT_ROW_CAP) break;
+      }
+      if (rows.length < pageSize) break;
+    }
+    reply.raw.end();
+    return reply;
+  }
+
+  app.get(
+    "/api/admin-svc/users/export.csv",
+    {
+      schema: getAdminSvcUsersSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.UserRead),
+    },
+    async (req: any, reply) =>
+      exportIdentityCollection(req, reply, {
+        identityPath: "/api/admin/users",
+        key: "users",
+        resourceType: "users",
+        filename: "users.csv",
+        header: ["id", "email", "name", "role", "tenantId", "lastLoginAt", "createdAt", "deactivatedAt"],
+        mapRow: (row) => [
+          row.id,
+          row.email,
+          row.name,
+          row.role,
+          row.tenantId,
+          row.lastLoginAt,
+          row.createdAt,
+          row.deactivatedAt,
+        ],
+      }),
+  );
+
+  app.get(
+    "/api/admin-svc/learners/export.csv",
+    {
+      schema: getAdminSvcLearnersSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.LearnerRead),
+    },
+    async (req: any, reply) =>
+      exportIdentityCollection(req, reply, {
+        identityPath: "/api/admin/learners",
+        key: "learners",
+        resourceType: "learners",
+        filename: "learners.csv",
+        header: ["id", "name", "gradeLevel", "tenantId", "parentId", "createdAt"],
+        mapRow: (row) => [row.id, row.name, row.gradeLevel, row.tenantId, row.parentId, row.createdAt],
+      }),
   );
 
   app.get(

@@ -40,3 +40,43 @@ export async function listAdminAuditLogs(
 
   return entries;
 }
+
+/** Sprint B3 — one real page of the audit log (server-driven table). */
+export interface AuditLogPage {
+  rows: AdminAuditEntry[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export async function listAdminAuditLogsPage(
+  session: Pick<SessionProfile, "role">,
+  opts: { page?: number; pageSize?: number; search?: string; sort?: "createdAt:asc" | "createdAt:desc" } = {},
+): Promise<AuditLogPage> {
+  const page = Math.max(1, opts.page ?? 1);
+  const pageSize = Math.min(Math.max(1, opts.pageSize ?? 50), 100);
+  const payload = await adminGet<Record<string, unknown>>(session, "/api/admin-svc/audit-log", {
+    page,
+    pageSize,
+    ...(opts.search ? { search: opts.search } : {}),
+    ...(opts.sort ? { sort: opts.sort } : {}),
+  });
+  const rowsRaw = Array.isArray(payload.entries) ? payload.entries : [];
+  const rows = rowsRaw.map((row) => {
+    const item = row as Record<string, unknown>;
+    const actorRole = String(item.actorRole ?? "UNKNOWN");
+    return {
+      id: String(item.id),
+      action: String(item.action ?? "unknown"),
+      actorId: String(item.actorId ?? ""),
+      actorEmail: String(item.actorEmail ?? ""),
+      actorRole,
+      actorRoleLabel: adminRoleLabel(actorRole),
+      resourceType: String(item.resourceType ?? "unknown"),
+      resourceId: item.resourceId ? String(item.resourceId) : null,
+      tenantId: item.tenantId ? String(item.tenantId) : null,
+      createdAt: String(item.createdAt ?? new Date(0).toISOString()),
+    };
+  });
+  return { rows, total: Number(payload.total ?? rows.length), page, pageSize };
+}

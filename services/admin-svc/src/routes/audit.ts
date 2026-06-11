@@ -1,7 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { adminAuditLog, appendAudit } from "@aivo/db";
 import { Permission } from "@aivo/security";
-import { eq, desc, sql, and, gte, lte, or, count, ilike } from "drizzle-orm";
+import { eq, desc, asc, sql, and, gte, lte, or, count, ilike } from "drizzle-orm";
+import { startCsv, EXPORT_ROW_CAP } from "../lib/csv.js";
 import { getAdminSvcAuditLogSchema, getAdminSvcActivitySchema } from "./schemas.js";
 import { requirePermission } from "../lib/permissions.js";
 
@@ -57,6 +58,7 @@ export function registerAuditRoutes(app: FastifyInstance, db: any) {
         page = "1",
         pageSize = "50",
         search,
+        sort,
       } = request.query as any;
 
       const pageNum = Math.max(1, Number(page));
@@ -83,15 +85,96 @@ export function registerAuditRoutes(app: FastifyInstance, db: any) {
 
       const [totalResult] = await db.select({ count: count() }).from(adminAuditLog).where(where);
 
+      // Sprint B3 — whitelisted sort; anything else keeps newest-first.
+      const order = sort === "createdAt:asc" ? asc(adminAuditLog.createdAt) : desc(adminAuditLog.createdAt);
       const entries = await db
         .select()
         .from(adminAuditLog)
         .where(where)
-        .orderBy(desc(adminAuditLog.createdAt))
+        .orderBy(order)
         .limit(size)
         .offset(offset);
 
       return { entries, total: totalResult.count, page: pageNum, pageSize: size };
+    },
+  );
+
+  // Sprint B3 — audited CSV export of the SAME filtered query. The export
+  // event lands on the audit log BEFORE streaming begins, so "who exported
+  // what" is answerable even for aborted downloads.
+  app.get(
+    "/api/admin-svc/audit-log/export.csv",
+    {
+      schema: getAdminSvcAuditLogSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.AuditRead),
+    },
+    async (request: any, reply) => {
+      const { action, actorId, resourceType, resourceId, from, to, search, sort } =
+        request.query as any;
+      const conditions: any[] = [];
+      if (action) conditions.push(eq(adminAuditLog.action, action));
+      if (actorId) conditions.push(eq(adminAuditLog.actorId, actorId));
+      if (resourceType) conditions.push(eq(adminAuditLog.resourceType, resourceType));
+      if (resourceId) conditions.push(eq(adminAuditLog.resourceId, resourceId));
+      if (from) conditions.push(gte(adminAuditLog.createdAt, new Date(from)));
+      if (to) conditions.push(lte(adminAuditLog.createdAt, new Date(to)));
+      if (search) {
+        conditions.push(
+          or(
+            ilike(adminAuditLog.actorEmail, `%${search}%`),
+            sql`${adminAuditLog.details}::text ILIKE ${"%" + search + "%"}`,
+          ),
+        );
+      }
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+      await appendAudit(db, "admin_audit_log", adminAuditLog, {
+        action: "admin.data.exported",
+        actorId: request.user?.sub ?? "unknown",
+        actorEmail: request.user?.email ?? null,
+        actorRole: String(request.user?.role ?? "UNKNOWN"),
+        resourceType: "audit_log",
+        resourceId: null,
+        tenantId: null,
+        details: { filters: { action, actorId, resourceType, resourceId, from, to, search } },
+      });
+
+      const write = startCsv(reply, "audit-log.csv", [
+        "createdAt",
+        "action",
+        "actorEmail",
+        "actorRole",
+        "resourceType",
+        "resourceId",
+        "tenantId",
+        "details",
+      ]);
+      const order = sort === "createdAt:asc" ? asc(adminAuditLog.createdAt) : desc(adminAuditLog.createdAt);
+      const batch = 1_000;
+      for (let offset = 0; offset < EXPORT_ROW_CAP; offset += batch) {
+        const rows = await db
+          .select()
+          .from(adminAuditLog)
+          .where(where)
+          .orderBy(order)
+          .limit(batch)
+          .offset(offset);
+        for (const row of rows) {
+          write([
+            row.createdAt?.toISOString?.() ?? row.createdAt,
+            row.action,
+            row.actorEmail,
+            row.actorRole,
+            row.resourceType,
+            row.resourceId,
+            row.tenantId,
+            row.details,
+          ]);
+        }
+        if (rows.length < batch) break;
+      }
+      reply.raw.end();
+      return reply;
     },
   );
 

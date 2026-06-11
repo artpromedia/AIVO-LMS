@@ -70,3 +70,4 @@ export function AdminCard({
   );
 }
 
+export { DataTable, type DataTableColumn } from "./data-table";

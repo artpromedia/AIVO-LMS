@@ -322,3 +322,48 @@ export async function getPlatformAiCosts(
     events: events.map((event) => mapAiCostEvent(event as Record<string, unknown>)),
   };
 }
+
+/** Sprint B3 — paged users/learners for the server-driven tables. */
+export interface AdminListPage<T> {
+  rows: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+async function listIdentityPage<T>(
+  session: Pick<SessionProfile, "role">,
+  path: string,
+  key: string,
+  map: (row: Record<string, unknown>) => T,
+  opts: { page?: number; pageSize?: number; search?: string } = {},
+): Promise<AdminListPage<T>> {
+  const page = Math.max(1, opts.page ?? 1);
+  const pageSize = Math.min(Math.max(1, opts.pageSize ?? 50), 200);
+  const payload = await adminGet<Record<string, unknown>>(session, path, {
+    page,
+    pageSize,
+    ...(opts.search ? { search: opts.search } : {}),
+  });
+  const rowsRaw = Array.isArray(payload[key]) ? (payload[key] as Record<string, unknown>[]) : [];
+  return {
+    rows: rowsRaw.map(map),
+    total: Number(payload.total ?? rowsRaw.length),
+    page,
+    pageSize,
+  };
+}
+
+export function listAdminUsersPage(
+  session: Pick<SessionProfile, "role">,
+  opts: { page?: number; pageSize?: number; search?: string } = {},
+): Promise<AdminListPage<AdminUserSummary>> {
+  return listIdentityPage(session, "/api/admin-svc/users", "users", mapUser, opts);
+}
+
+export function listAdminLearnersPage(
+  session: Pick<SessionProfile, "role">,
+  opts: { page?: number; pageSize?: number; search?: string } = {},
+): Promise<AdminListPage<AdminLearnerSummary>> {
+  return listIdentityPage(session, "/api/admin-svc/learners", "learners", mapLearner, opts);
+}
