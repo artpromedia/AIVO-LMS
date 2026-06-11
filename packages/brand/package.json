@@ -27,6 +27,6 @@
     "prepare": "node ./scripts/build-tokens.mjs && tsc"
   },
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   }
 }
