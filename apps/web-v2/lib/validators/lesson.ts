@@ -86,10 +86,19 @@ const LessonMediaPayloadSchema = z
       });
       return;
     }
-    if (!captions.src.endsWith(".vtt")) {
+    // Mirror the lesson player's contract exactly (see LessonMedia in
+    // lesson-player.tsx): captions may be a .vtt URL, a data: URI, or an
+    // INLINE WEBVTT payload (the deterministic generator embeds the cue
+    // text directly so no asset host is required). A validator stricter
+    // than the renderer turned every mock-provider multimedia lesson into
+    // `generation_failed` (Wave F journey finding).
+    const src = captions.src;
+    const isInlineVtt = src.startsWith("WEBVTT") || src.includes("\n");
+    const isVttRef = src.endsWith(".vtt") || src.startsWith("data:text/vtt");
+    if (!isInlineVtt && !isVttRef) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "captions src must end with .vtt",
+        message: "captions src must be a .vtt URL, data:text/vtt URI, or inline WEBVTT text",
       });
     }
   });
