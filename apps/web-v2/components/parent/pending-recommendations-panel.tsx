@@ -247,7 +247,6 @@ export function PendingRecommendationsPanel({ learnerId }: { learnerId: string }
       const moved = pending.find((p) => p.id === id);
       return moved ? [{ ...moved, status }, ...prev].slice(0, 10) : prev;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pending]);
 
   return (
