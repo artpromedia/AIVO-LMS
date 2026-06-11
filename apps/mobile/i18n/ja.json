@@ -217,7 +217,8 @@
     "addonPrice": "+ ¥4.99/月",
     "cancelSubscription": "サブスクリプションをキャンセル",
     "cancelAtPeriodEnd": "期間終了時にキャンセル",
-    "addedToBill": "{{count}}個の追加オプション · ¥{{price}}/月"
+    "addedToBill": "{{count}}個の追加オプション · ¥{{price}}/月",
+    "openInvoice": "請求書を開く"
   },
   "parentTutors": {
     "title": "チューターストア",
@@ -655,7 +656,10 @@
         "homeLabel": "ダッシュボードに戻る",
         "intro": "準備ができたら始めてください。"
       }
-    }
+    },
+    "hideTutor": "チューターを隠す",
+    "moveUp": "{{label}}を上へ",
+    "moveDown": "{{label}}を下へ"
   },
   "learnerTutor": {
     "tutorNotFound": "チューターが見つかりません",
@@ -1090,5 +1094,11 @@
   "configError": {
     "title": "このビルドは設定が正しくありません",
     "body": "アプリが AIVO サービスに接続できません。ストアから最新バージョンをインストールしてください。デプロイ管理者の場合は、バックエンドのアドレスを設定して再ビルドしてください。"
+  },
+  "parentIep": {
+    "notificationPrefs": "通知設定"
+  },
+  "offline": {
+    "synced": "オンラインに戻りました。作業は保存されています。"
   }
 }

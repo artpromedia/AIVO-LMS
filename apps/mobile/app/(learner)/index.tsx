@@ -11,6 +11,7 @@ import { TUTORS, INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies, typography } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { useScanTarget } from "@/src/components/switch-scan/ScanTargetRegistry";
 import { Card, HeaderUserChip, SensoryToggle, DarkCapsuleNav } from "@/components/ui";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, gridColumns, pickBySizeClass } from "@/src/design/responsive";
@@ -250,6 +251,7 @@ export default function LearnerWorldMap() {
           <View style={styles.quickActions}>
             <QuickAction
               icon="camera"
+              scanOrder={10}
               label={t("learner.homework")}
               tint={palette.primary}
               tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
@@ -257,6 +259,7 @@ export default function LearnerWorldMap() {
             />
             <QuickAction
               icon="compass"
+              scanOrder={20}
               label={t("learner.quests")}
               tint={palette.accent}
               tintSoft={palette.accentSoft}
@@ -264,6 +267,7 @@ export default function LearnerWorldMap() {
             />
             <QuickAction
               icon="ribbon"
+              scanOrder={30}
               label={t("learner.badgesLabel")}
               tint={palette.warm}
               tintSoft={palette.warmSoft}
@@ -271,6 +275,7 @@ export default function LearnerWorldMap() {
             />
             <QuickAction
               icon="bar-chart"
+              scanOrder={40}
               label={t("learner.grades")}
               tint={palette.primary}
               tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
@@ -278,6 +283,7 @@ export default function LearnerWorldMap() {
             />
             <QuickAction
               icon="library"
+              scanOrder={50}
               label={t("learner.subjects", "Subjects")}
               tint={palette.accent}
               tintSoft={palette.accentSoft}
@@ -285,6 +291,7 @@ export default function LearnerWorldMap() {
             />
             <QuickAction
               icon="trending-up"
+              scanOrder={60}
               label={t("learner.progress", "Progress")}
               tint={palette.warm}
               tintSoft={palette.warmSoft}
@@ -292,6 +299,7 @@ export default function LearnerWorldMap() {
             />
             <QuickAction
               icon="flag"
+              scanOrder={70}
               label={t("learner.missions", "Missions")}
               tint={palette.accent}
               tintSoft={palette.accentSoft}
@@ -299,6 +307,7 @@ export default function LearnerWorldMap() {
             />
             <QuickAction
               icon="library"
+              scanOrder={80}
               label={t("learner.library", "Library")}
               tint={palette.primary}
               tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
@@ -350,16 +359,26 @@ function QuickAction({
   tint,
   tintSoft,
   onPress,
+  scanOrder,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   tint: string;
   tintSoft: string;
   onPress: () => void;
+  /** Switch-scan position (Sprint A4); home's primary actions scan in row order. */
+  scanOrder?: number;
 }) {
   const palette = useSensoryPalette();
+  const scanRef = useScanTarget({
+    id: `home-quick-${label}`,
+    label,
+    order: scanOrder ?? 50,
+    onActivate: onPress,
+  });
   return (
     <Pressable
+      ref={scanRef}
       style={({ pressed }) => [
         styles.quickBtn,
         {

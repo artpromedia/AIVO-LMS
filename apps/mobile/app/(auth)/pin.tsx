@@ -113,7 +113,7 @@ export default function PinScreen() {
           innerStyle={{ flex: 1 }}
         >
           <View style={styles.topRow}>
-            <Pressable onPress={() => router.back()} style={styles.back} hitSlop={12}>
+            <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back} hitSlop={12}>
               <Text style={styles.backText}>{t("common.back")}</Text>
             </Pressable>
             <SensoryToggle variant="icon" />
@@ -130,7 +130,7 @@ export default function PinScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={styles.input}
               placeholder={t("auth.parentEmailPlaceholder")}
               placeholderTextColor="rgba(255,255,255,0.4)"
@@ -165,7 +165,7 @@ export default function PinScreen() {
       innerStyle={{ flex: 1, alignItems: "center" }}
     >
       <View style={styles.topRow}>
-        <Pressable
+        <Pressable accessibilityRole="button"
           onPress={() => {
             setStep("parent");
             setPin("");

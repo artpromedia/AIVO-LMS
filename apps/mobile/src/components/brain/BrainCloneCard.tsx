@@ -226,7 +226,7 @@ export default function BrainCloneCard({
           appear here.
         </Text>
         {onBuildBrain && (
-          <Pressable onPress={onBuildBrain} style={styles.emptyBtn}>
+          <Pressable accessibilityRole="button" onPress={onBuildBrain} style={styles.emptyBtn}>
             <Ionicons name="clipboard-outline" size={14} color={colors.primary} />
             <Text style={styles.emptyBtnText}>Build the Brain</Text>
           </Pressable>

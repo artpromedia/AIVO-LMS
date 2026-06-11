@@ -33,11 +33,6 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-  // A production build without an API origin is unusable — say so plainly
-  // instead of rendering an app where every request silently fails.
-  if (API_CONFIG_ERROR) {
-    return <ConfigErrorScreen detail={API_CONFIG_ERROR} />;
-  }
 
   // Inclusive-warm typography: Fredoka (display) + Nunito (body), both
   // bundled. See `constants/typography.ts` for the swap-point note.
@@ -65,6 +60,13 @@ export default function RootLayout() {
   // `learnerId` is `null` until auth hydrates, which the provider
   // tolerates (local-only mode until an id arrives).
   const learnerId = authState.user?.role === "LEARNER" ? authState.user.id : null;
+
+  // A production build without an API origin is unusable — say so plainly
+  // instead of rendering an app where every request silently fails.
+  // (After all hooks: rules-of-hooks.)
+  if (API_CONFIG_ERROR) {
+    return <ConfigErrorScreen detail={API_CONFIG_ERROR} />;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

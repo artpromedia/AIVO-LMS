@@ -284,7 +284,7 @@ export default function ParentAssessmentScreen() {
           size="lg"
           style={{ marginTop: spacing.md }}
         />
-        <Pressable
+        <Pressable accessibilityRole="button"
           onPress={() => {
             setPhase("steps");
             setStep(0);

@@ -215,7 +215,7 @@ export default function LessonPlanScreen() {
             style={{ marginBottom: 12 }}
           >
             {SUBJECTS.map((s) => (
-              <Pressable
+              <Pressable accessibilityRole="button"
                 key={s}
                 style={[styles.chip, subject === s && styles.chipActive]}
                 onPress={() => setSubject(s)}
@@ -232,7 +232,7 @@ export default function LessonPlanScreen() {
             style={{ marginBottom: 12 }}
           >
             {GRADE_LEVELS.map((g) => (
-              <Pressable
+              <Pressable accessibilityRole="button"
                 key={g}
                 style={[styles.chip, gradeLevel === g && styles.chipActive]}
                 onPress={() => setGradeLevel(g)}
@@ -245,7 +245,7 @@ export default function LessonPlanScreen() {
           </ScrollView>
 
           <Text style={styles.fieldLabel}>Topic (optional)</Text>
-          <TextInput
+          <TextInput accessibilityLabel="Text input field"
             style={styles.input}
             value={topic}
             onChangeText={setTopic}
@@ -254,7 +254,7 @@ export default function LessonPlanScreen() {
           />
 
           <Text style={styles.fieldLabel}>Accommodation Notes (optional)</Text>
-          <TextInput
+          <TextInput accessibilityLabel="Text input field"
             style={[styles.input, { height: 60 }]}
             value={accommodationNotes}
             onChangeText={setAccommodationNotes}

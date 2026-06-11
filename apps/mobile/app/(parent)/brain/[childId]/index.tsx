@@ -27,7 +27,7 @@ export default function BrainProfileScreen() {
         paddingBottom: 32,
       }}
     >
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
@@ -48,7 +48,7 @@ export default function BrainProfileScreen() {
       </View>
 
       <View style={styles.actionsRow}>
-        <Pressable
+        <Pressable accessibilityRole="button"
           onPress={() => router.push(`/(parent)/brain/${childId}/history` as never)}
           style={styles.actionBtn}
         >

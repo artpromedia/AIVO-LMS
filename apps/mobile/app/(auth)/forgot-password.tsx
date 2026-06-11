@@ -45,7 +45,7 @@ export default function ForgotPasswordScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
 
@@ -68,7 +68,7 @@ export default function ForgotPasswordScreen() {
               {error ? <Text style={styles.error}>{error}</Text> : null}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("auth.email")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel="Text input field"
                   style={styles.input}
                   value={email}
                   onChangeText={setEmail}

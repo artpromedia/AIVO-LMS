@@ -75,7 +75,7 @@ export default function OnboardScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <View style={{ width: contentWidth }}>
-        <Pressable onPress={() => router.back()} style={styles.backRow}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
@@ -99,7 +99,7 @@ export default function OnboardScreen() {
             <>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("parentOnboard.firstName")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel="Text input field"
                   style={styles.input}
                   value={form.firstName}
                   onChangeText={(v) => updateField("firstName", v)}
@@ -109,7 +109,7 @@ export default function OnboardScreen() {
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("parentOnboard.lastName")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel="Text input field"
                   style={styles.input}
                   value={form.lastName}
                   onChangeText={(v) => updateField("lastName", v)}
@@ -125,7 +125,7 @@ export default function OnboardScreen() {
             <>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("parentOnboard.gradeLevel")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel="Text input field"
                   style={styles.input}
                   value={form.gradeLevel}
                   onChangeText={(v) => updateField("gradeLevel", v)}
@@ -136,7 +136,7 @@ export default function OnboardScreen() {
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{t("parentOnboard.learnerPin")}</Text>
-                <TextInput
+                <TextInput accessibilityLabel="Text input field"
                   style={styles.input}
                   value={form.pin}
                   onChangeText={(v) => updateField("pin", v.replace(/\D/g, "").slice(0, 4))}

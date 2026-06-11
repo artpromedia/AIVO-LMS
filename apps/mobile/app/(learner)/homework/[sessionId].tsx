@@ -16,6 +16,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useScanTarget } from "@/src/components/switch-scan/ScanTargetRegistry";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
 import {
   useHomeworkSessionState,
@@ -127,6 +128,13 @@ export default function HomeworkSessionScreen() {
       listRef.current?.scrollToEnd({ animated: true });
     });
   }, [localMessages.length]);
+
+  const sendScanRef = useScanTarget({
+    id: "homework-send",
+    label: t("learnerHomeworkSession.send", "Send"),
+    order: 20,
+    onActivate: () => void onSend(),
+  });
 
   const onSend = async () => {
     const text = input.trim();
@@ -399,6 +407,7 @@ export default function HomeworkSessionScreen() {
           editable={!sendMessage.isPending}
         />
         <Pressable
+          ref={sendScanRef}
           onPress={onSend}
           disabled={!input.trim() || sendMessage.isPending}
           style={[

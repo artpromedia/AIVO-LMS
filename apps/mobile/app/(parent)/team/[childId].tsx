@@ -97,7 +97,7 @@ export default function TeamScreen() {
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
@@ -180,7 +180,7 @@ export default function TeamScreen() {
       <AivoCard>
         <View style={styles.roleSelector}>
           {roles.map((r) => (
-            <Pressable
+            <Pressable accessibilityRole="button"
               key={r.key}
               style={[styles.roleBtn, inviteRole === r.key && styles.roleBtnActive]}
               onPress={() => setInviteRole(r.key)}
@@ -191,7 +191,7 @@ export default function TeamScreen() {
             </Pressable>
           ))}
         </View>
-        <TextInput
+        <TextInput accessibilityLabel="Text input field"
           style={styles.input}
           value={inviteEmail}
           onChangeText={setInviteEmail}
@@ -204,7 +204,7 @@ export default function TeamScreen() {
         {inviteRole === "THERAPIST" && (
           <>
             <Text style={styles.fieldLabel}>{t("parentTeam.specialty")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={styles.input}
               value={specialty}
               onChangeText={setSpecialty}
@@ -213,7 +213,7 @@ export default function TeamScreen() {
               autoCapitalize="words"
             />
             <Text style={styles.fieldLabel}>{t("parentTeam.credentials")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={styles.input}
               value={credentials}
               onChangeText={setCredentials}
@@ -227,7 +227,7 @@ export default function TeamScreen() {
         {inviteRole === "CAREGIVER" && (
           <>
             <Text style={styles.fieldLabel}>{t("parentTeam.relationship")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={styles.input}
               value={relationship}
               onChangeText={setRelationship}

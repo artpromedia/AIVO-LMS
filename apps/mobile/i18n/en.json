@@ -217,7 +217,8 @@
     "addonPrice": "+ $4.99/mo",
     "cancelSubscription": "Cancel subscription",
     "cancelAtPeriodEnd": "Cancels at period end",
-    "addedToBill": "{{count}} add-on(s) · ${{price}}/mo"
+    "addedToBill": "{{count}} add-on(s) · ${{price}}/mo",
+    "openInvoice": "Open invoice"
   },
   "parentTutors": {
     "title": "Tutor Store",
@@ -655,7 +656,10 @@
         "homeLabel": "Return to dashboard",
         "intro": "Begin when ready."
       }
-    }
+    },
+    "hideTutor": "Hide tutor",
+    "moveUp": "Move {{label}} up",
+    "moveDown": "Move {{label}} down"
   },
   "learnerTutor": {
     "tutorNotFound": "Tutor not found",
@@ -1090,5 +1094,11 @@
   "configError": {
     "title": "This build is misconfigured",
     "body": "The app can't reach AIVO services. Please install the latest version from the app store. If you manage this deployment, rebuild with the backend address set."
+  },
+  "parentIep": {
+    "notificationPrefs": "Notification preferences"
+  },
+  "offline": {
+    "synced": "You're back online. Your work has been saved."
   }
 }

@@ -217,7 +217,8 @@
     "addonPrice": "+ 4.99$/شهر",
     "cancelSubscription": "إلغاء الاشتراك",
     "cancelAtPeriodEnd": "يُلغى في نهاية الفترة",
-    "addedToBill": "{{count}} إضافة · {{price}}$/شهر"
+    "addedToBill": "{{count}} إضافة · {{price}}$/شهر",
+    "openInvoice": "فتح الفاتورة"
   },
   "parentTutors": {
     "title": "متجر المدرسين",
@@ -655,7 +656,10 @@
         "homeLabel": "العودة إلى لوحة التحكم",
         "intro": "ابدأ عندما تكون مستعدًا."
       }
-    }
+    },
+    "hideTutor": "إخفاء المعلّم",
+    "moveUp": "نقل {{label}} لأعلى",
+    "moveDown": "نقل {{label}} لأسفل"
   },
   "learnerTutor": {
     "tutorNotFound": "لم يتم العثور على المعلم",
@@ -1090,5 +1094,11 @@
   "configError": {
     "title": "هذا الإصدار غير مُهيأ بشكل صحيح",
     "body": "يتعذر على التطبيق الوصول إلى خدمات AIVO. يرجى تثبيت أحدث إصدار من المتجر. إذا كنت مسؤولاً عن هذا النشر، أعد البناء بعد ضبط عنوان الخادم."
+  },
+  "parentIep": {
+    "notificationPrefs": "تفضيلات الإشعارات"
+  },
+  "offline": {
+    "synced": "عدت إلى الاتصال بالإنترنت. تم حفظ عملك."
   }
 }

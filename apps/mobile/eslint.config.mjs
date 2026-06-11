@@ -1,4 +1,5 @@
 import expoConfig from "eslint-config-expo/flat.js";
+import reactNativeA11y from "eslint-plugin-react-native-a11y";
 
 // Phase 5.last (api-client guard): hand-rolled `interface FooResponse`
 // shapes drift from the real wire format. The generated typed client
@@ -51,6 +52,30 @@ export default [
     files: ["**/*.{ts,tsx}"],
     rules: {
       "no-restricted-syntax": ["warn", interfaceResponseSelector],
+    },
+  },
+  // Sprint A4 — screen-reader floor. Every interactive element must carry
+  // an accessibility role/label/state; violations are build-breaking
+  // (lint runs with the repo gate). The companion ratchet
+  // (scripts/mobile-a11y-label-ratchet.mjs) keeps coverage from regressing
+  // in files eslint can't parse.
+  {
+    files: ["app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}", "src/**/*.{ts,tsx}"],
+    plugins: { "react-native-a11y": reactNativeA11y },
+    rules: {
+      "react-native-a11y/has-accessibility-hint": "off",
+      "react-native-a11y/has-accessibility-props": "error",
+      "react-native-a11y/has-valid-accessibility-actions": "error",
+      "react-native-a11y/has-valid-accessibility-component-type": "error",
+      "react-native-a11y/has-valid-accessibility-descriptors": "error",
+      "react-native-a11y/has-valid-accessibility-ignores-invert-colors": "error",
+      "react-native-a11y/has-valid-accessibility-live-region": "error",
+      "react-native-a11y/has-valid-accessibility-role": "error",
+      "react-native-a11y/has-valid-accessibility-state": "error",
+      "react-native-a11y/has-valid-accessibility-states": "off",
+      "react-native-a11y/has-valid-accessibility-traits": "off",
+      "react-native-a11y/has-valid-accessibility-value": "error",
+      "react-native-a11y/no-nested-touchables": "error",
     },
   },
   // Phase 5.last allowlist: existing hand-rolled `interface *Response`

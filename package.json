@@ -72,6 +72,7 @@
     "ai-safety:audit": "node scripts/ai-safety-audit.mjs",
     "accessibility:audit": "node scripts/accessibility-audit.mjs",
     "observability:audit": "node scripts/observability-audit.mjs",
+    "mobile:a11y-ratchet": "node scripts/mobile-a11y-label-ratchet.mjs",
     "release:gate": "node scripts/release-gate.mjs",
     "backend:parity": "node scripts/backend-parity-check.mjs",
     "tutor:parity": "node scripts/tutor-parity-check.mjs",

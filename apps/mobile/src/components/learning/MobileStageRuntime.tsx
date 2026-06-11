@@ -9,6 +9,7 @@
 
 import React, { useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import { useScanTarget } from "@/src/components/switch-scan/ScanTargetRegistry";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 import type { Beat, Session } from "@/src/types/stage";
 import { MobileBeatRenderer } from "./MobileBeatRenderer";
@@ -95,6 +96,18 @@ export function MobileStageRuntime(props: Props) {
     void props.onTutorTurnContinue(beat);
   }, [beat, props]);
 
+  // Hooks before any early return (rules-of-hooks). `beat` may be null on
+  // the empty-session frame; the target stays disabled then.
+  const advanceVisible = Boolean(beat) && (props.answered || beat?.kind === "tutor-turn") && !props.submitting;
+  const advanceLabel = isLast ? props.labels.finish : props.labels.next;
+  const advanceScanRef = useScanTarget({
+    id: "stage-advance",
+    label: advanceLabel,
+    order: 90,
+    onActivate: beat?.kind === "tutor-turn" ? handleTutorContinue : props.onAdvance,
+    disabled: !advanceVisible,
+  });
+
   if (!beat) {
     return (
       <View style={styles.empty}>
@@ -103,16 +116,17 @@ export function MobileStageRuntime(props: Props) {
     );
   }
 
-  const advanceButton =
-    (props.answered || beat.kind === "tutor-turn") && !props.submitting ? (
-      <Pressable
-        style={styles.advance}
-        onPress={beat.kind === "tutor-turn" ? handleTutorContinue : props.onAdvance}
-        accessibilityRole="button"
-      >
-        <Text style={styles.advanceText}>{isLast ? props.labels.finish : props.labels.next}</Text>
-      </Pressable>
-    ) : null;
+  const advanceButton = advanceVisible ? (
+    <Pressable
+      ref={advanceScanRef}
+      style={styles.advance}
+      onPress={beat.kind === "tutor-turn" ? handleTutorContinue : props.onAdvance}
+      accessibilityRole="button"
+      accessibilityLabel={advanceLabel}
+    >
+      <Text style={styles.advanceText}>{advanceLabel}</Text>
+    </Pressable>
+  ) : null;
 
   const beatColumn = (
     <View style={styles.beatColumn}>

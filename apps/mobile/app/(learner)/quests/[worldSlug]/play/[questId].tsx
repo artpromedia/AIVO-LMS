@@ -151,7 +151,7 @@ export default function QuestPlayScreen() {
   if (loadError) {
     return (
       <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backRow}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>Back</Text>
         </Pressable>
@@ -176,7 +176,7 @@ export default function QuestPlayScreen() {
       style={styles.container}
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
     >
-      <Pressable
+      <Pressable accessibilityRole="button"
         onPress={() => router.push(`/(learner)/quests/${world.key}` as any)}
         style={styles.backRow}
       >
@@ -191,7 +191,7 @@ export default function QuestPlayScreen() {
       {phase === "intro" && (
         <AivoCard style={styles.introCard}>
           <Text style={styles.introBody}>{quest.narrativeIntro ?? quest.description ?? ""}</Text>
-          <Pressable onPress={() => setPhase("play")} style={styles.primaryButton}>
+          <Pressable accessibilityRole="button" onPress={() => setPhase("play")} style={styles.primaryButton}>
             <Text style={styles.primaryButtonText}>Begin →</Text>
           </Pressable>
         </AivoCard>
@@ -257,7 +257,7 @@ export default function QuestPlayScreen() {
             <Text style={styles.finishLabel}>Score</Text>
             <Text style={styles.finishValue}>{allAnswered ? `${score}%` : "—"}</Text>
           </View>
-          <Pressable
+          <Pressable accessibilityRole="button"
             disabled={!allAnswered || submitting}
             onPress={submitCompletion}
             style={[styles.primaryButton, (!allAnswered || submitting) && { opacity: 0.5 }]}
@@ -292,7 +292,7 @@ export default function QuestPlayScreen() {
               You finished this chapter before — rewards were not granted again.
             </Text>
           ) : null}
-          <Pressable
+          <Pressable accessibilityRole="button"
             onPress={() => router.push(`/(learner)/quests/${world.key}` as any)}
             style={styles.outroButton}
           >

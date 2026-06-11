@@ -180,7 +180,7 @@ export default function ParentSettings() {
 
       <AivoCard style={styles.parentCard}>
         {parentRows.map((row, i) => (
-          <Pressable
+          <Pressable accessibilityRole="button"
             key={row.label}
             style={[styles.row, i < parentRows.length - 1 && styles.rowBorder]}
             onPress={row.onPress}
@@ -200,8 +200,8 @@ export default function ParentSettings() {
       <Text style={styles.version}>{t("common.appVersion")}</Text>
 
       <Modal visible={pinModalVisible} transparent animationType="slide">
-        <Pressable style={styles.modalOverlay} onPress={() => setPinModalVisible(false)}>
-          <Pressable style={styles.modalContent} onPress={() => {}}>
+        <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setPinModalVisible(false)}>
+          <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
             <Text style={styles.modalTitle}>{t("parentSettings.managePins")}</Text>
 
             {learnersLoading ? (
@@ -241,7 +241,7 @@ export default function ParentSettings() {
             ) : null}
 
             <Text style={styles.fieldLabel}>{t("parentSettings.newPinLabel")}</Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={[
                 styles.modalInput,
                 {

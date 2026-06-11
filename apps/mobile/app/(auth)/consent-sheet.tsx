@@ -95,7 +95,7 @@ export default function ConsentSheetScreen() {
         >
           <Text style={styles.ctaLabel}>Save and continue</Text>
         </Pressable>
-        <Pressable onPress={() => router.back()} style={styles.cancelBtn}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.cancelBtn}>
           <Text style={styles.cancelLabel}>Cancel</Text>
         </Pressable>
       </ScrollView>

@@ -164,7 +164,7 @@ export default function SessionSwitchScreen() {
           </Text>
         </Pressable>
 
-        <Pressable onPress={() => handleTap("cancel")} style={styles.cancelBtn}>
+        <Pressable accessibilityRole="button" onPress={() => handleTap("cancel")} style={styles.cancelBtn}>
           <Text style={styles.cancelLabel}>Cancel</Text>
         </Pressable>
       </ScrollView>

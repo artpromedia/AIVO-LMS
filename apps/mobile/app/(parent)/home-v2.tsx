@@ -33,7 +33,7 @@ interface SectionRowProps {
 function SectionRow({ iconName, title, subtitle, onPress }: SectionRowProps) {
   const palette = useSensoryPalette();
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [s.row, pressed && { opacity: 0.85 }]}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [s.row, pressed && { opacity: 0.85 }]}>
       <View style={[s.rowIcon, { backgroundColor: palette.primary + "1a" }]}>
         <Ionicons name={iconName} size={18} color={palette.primary} />
       </View>
@@ -86,14 +86,14 @@ export default function ParentHomeV2() {
           Calm, personalized, and waiting for one quick check-in from you.
         </Text>
         <View style={s.heroActions}>
-          <Pressable
+          <Pressable accessibilityRole="button"
             onPress={() => openLearner("session")}
             style={[s.btnPrimary, { backgroundColor: palette.primary }]}
           >
             <Ionicons name="play" size={16} color="#fff" />
             <Text style={s.btnPrimaryText}>Start with {learnerFirstName}</Text>
           </Pressable>
-          <Pressable
+          <Pressable accessibilityRole="button"
             onPress={() => router.push("/(parent)/onboard" as Href)}
             style={s.btnSecondary}
           >

@@ -217,7 +217,8 @@
     "addonPrice": "+ 4,99 €/Monat",
     "cancelSubscription": "Abonnement kündigen",
     "cancelAtPeriodEnd": "Kündigung zum Periodenende",
-    "addedToBill": "{{count}} Erweiterung(en) · {{price}} €/Monat"
+    "addedToBill": "{{count}} Erweiterung(en) · {{price}} €/Monat",
+    "openInvoice": "Rechnung öffnen"
   },
   "parentTutors": {
     "title": "Tutor-Store",
@@ -655,7 +656,10 @@
         "homeLabel": "Zurück zum Dashboard",
         "intro": "Beginne, wenn du bereit bist."
       }
-    }
+    },
+    "hideTutor": "Tutor ausblenden",
+    "moveUp": "{{label}} nach oben",
+    "moveDown": "{{label}} nach unten"
   },
   "learnerTutor": {
     "tutorNotFound": "Tutor nicht gefunden",
@@ -1090,5 +1094,11 @@
   "configError": {
     "title": "Dieser Build ist falsch konfiguriert",
     "body": "Die App kann die AIVO-Dienste nicht erreichen. Bitte installiere die neueste Version aus dem Store. Wenn du diese Bereitstellung verwaltest, baue mit gesetzter Backend-Adresse neu."
+  },
+  "parentIep": {
+    "notificationPrefs": "Benachrichtigungseinstellungen"
+  },
+  "offline": {
+    "synced": "Du bist wieder online. Deine Arbeit wurde gespeichert."
   }
 }

@@ -85,7 +85,7 @@ export default function CaregiverDashboard() {
           />
         ) : (
           children.map((child: any) => (
-            <Pressable
+            <Pressable accessibilityRole="button"
               key={child.id}
               onPress={() => router.push(`/(caregiver)/child/${child.id}` as Href)}
               style={{ marginBottom: spacing.md }}

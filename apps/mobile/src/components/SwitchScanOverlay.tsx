@@ -6,11 +6,17 @@
  *
  * Requires @aivo/aac-bridge for SwitchScanController.
  */
-import React, { useEffect, useRef, useState } from "react";
-import { Modal, View, StyleSheet, Animated } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Modal, Pressable, StyleSheet, Animated, Text , AccessibilityInfo } from "react-native";
 import { SwitchScanController } from "@aivo/aac-bridge";
 import type { AACSessionConfig, SymbolItem } from "@aivo/aac-bridge";
+import { clampScanDelayMs } from "@aivo/accessibility-contract";
 import { colors } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
+import {
+  useScanTargets,
+  type ScanTargetRect,
+} from "@/src/components/switch-scan/ScanTargetRegistry";
 
 const DEFAULT_CONFIG: AACSessionConfig = {
   method: "switch_1",
@@ -24,24 +30,40 @@ const DEFAULT_CONFIG: AACSessionConfig = {
 export interface SwitchScanOverlayProps {
   /** Whether switch scanning is active for the current learner. */
   active: boolean;
-  /** Items to scan through (pass the current stage choices as SymbolItems). */
-  items: SymbolItem[];
-  /** Called when the user activates the currently highlighted item. */
-  onActivate?: (itemId: string) => void;
   config?: Partial<AACSessionConfig>;
 }
 
-export function SwitchScanOverlay({
-  active,
-  items,
-  onActivate,
-  config: configOverride,
-}: SwitchScanOverlayProps) {
+export function SwitchScanOverlay({ active, config: configOverride }: SwitchScanOverlayProps) {
+  // Live scan set from the registry — screens register their primary
+  // actions (Sprint A4); the overlay no longer takes an `items` prop.
+  const targets = useScanTargets();
+  const items: SymbolItem[] = useMemo(
+    () =>
+      targets.map((t, index) => ({
+        id: t.id,
+        label: t.label,
+        imageUrl: "",
+        boardId: "scan-targets",
+        position: { row: index, col: 0 },
+      })),
+    [targets],
+  );
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [highlightRect, setHighlightRect] = useState<ScanTargetRect | null>(null);
   const controllerRef = useRef<SwitchScanController | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  const config: AACSessionConfig = { ...DEFAULT_CONFIG, ...configOverride };
+  const config: AACSessionConfig = {
+    ...DEFAULT_CONFIG,
+    ...configOverride,
+    scanDelayMs: clampScanDelayMs(configOverride?.scanDelayMs ?? DEFAULT_CONFIG.scanDelayMs),
+  };
+
+  const activateTarget = (targetId: string | null | undefined) => {
+    if (!targetId) return;
+    const target = targets.find((t) => t.id === targetId);
+    target?.onActivate();
+  };
 
   useEffect(() => {
     if (!active || items.length === 0) return;
@@ -49,7 +71,16 @@ export function SwitchScanOverlay({
     const ctrl = new SwitchScanController(config, items);
     controllerRef.current = ctrl;
 
-    const unsub = ctrl.subscribe((item) => setHighlightedId(item?.id ?? null));
+    const unsub = ctrl.subscribe((item) => {
+      setHighlightedId(item?.id ?? null);
+      const target = targets.find((t) => t.id === item?.id);
+      if (target) {
+        AccessibilityInfo.announceForAccessibility(target.label);
+        void target.measure().then((rect) => setHighlightRect(rect));
+      } else {
+        setHighlightRect(null);
+      }
+    });
     ctrl.start();
 
     // Pulsing highlight animation
@@ -68,7 +99,7 @@ export function SwitchScanOverlay({
       controllerRef.current = null;
       setHighlightedId(null);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- pulseAnim is a stable Animated.Value ref; config object identity is intentionally tracked via scanDelayMs
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- pulseAnim stable; targets identity tracked via items; config via scanDelayMs
   }, [active, items, config.scanDelayMs]);
 
   // Volume key listeners (Expo / React Native volume manager integration).
@@ -94,23 +125,53 @@ export function SwitchScanOverlay({
         const ctrl = controllerRef.current;
         if (!ctrl) return;
         const event = ctrl.activate();
-        if (event.targetId) onActivate?.(event.targetId);
+        activateTarget(event.targetId);
       }
     });
 
     return () => upSub?.remove?.();
-  }, [active, onActivate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- activateTarget closes over live targets
+  }, [active]);
 
   if (!active || !highlightedId) return null;
+  const highlighted = targets.find((t) => t.id === highlightedId) ?? null;
 
   return (
-    <Modal transparent visible={active} pointerEvents="none" accessible={false}>
-      <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+    <Modal transparent visible={active} accessible={false}>
+      {/* Single-switch input surface: with one switch (or no external
+          switch at all) a tap ANYWHERE activates the highlighted target.
+          Volume keys (when available) remain switch 1 = advance /
+          switch 2 = activate. */}
+      <Pressable
+        style={StyleSheet.absoluteFillObject}
+        accessibilityRole="button"
+        accessibilityLabel={highlighted ? highlighted.label : "Switch scan"}
+        onPress={() => activateTarget(highlightedId)}
+      >
         <Animated.View
-          style={[styles.highlightBox, { transform: [{ scale: pulseAnim }] }]}
+          pointerEvents="none"
+          style={[
+            styles.highlightBox,
+            highlightRect
+              ? {
+                  top: highlightRect.y - 6,
+                  left: highlightRect.x - 6,
+                  width: highlightRect.width + 12,
+                  height: highlightRect.height + 12,
+                  right: undefined,
+                  bottom: undefined,
+                }
+              : null,
+            { transform: [{ scale: pulseAnim }] },
+          ]}
           accessibilityElementsHidden
         />
-      </View>
+        {highlighted ? (
+          <Text style={styles.label} accessibilityElementsHidden>
+            {highlighted.label}
+          </Text>
+        ) : null}
+      </Pressable>
     </Modal>
   );
 }
@@ -127,5 +188,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "transparent",
     margin: 8,
+  },
+  label: {
+    position: "absolute",
+    bottom: 48,
+    alignSelf: "center",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 18,
+    color: "#ffffff",
+    backgroundColor: "rgba(15,23,42,0.85)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 999,
+    overflow: "hidden",
   },
 });

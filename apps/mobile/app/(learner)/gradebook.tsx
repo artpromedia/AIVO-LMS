@@ -18,7 +18,7 @@ export default function GradebookScreen() {
 
   return (
     <ResponsiveScreen maxWidth="reading" background={colors.background}>
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>

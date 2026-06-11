@@ -217,7 +217,8 @@
     "addonPrice": "+ R$4,99/mês",
     "cancelSubscription": "Cancelar assinatura",
     "cancelAtPeriodEnd": "Cancela no final do período",
-    "addedToBill": "{{count}} complemento(s) · R${{price}}/mês"
+    "addedToBill": "{{count}} complemento(s) · R${{price}}/mês",
+    "openInvoice": "Abrir fatura"
   },
   "parentTutors": {
     "title": "Loja de Tutores",
@@ -655,7 +656,10 @@
         "homeLabel": "Voltar ao painel",
         "intro": "Comece quando estiver pronto."
       }
-    }
+    },
+    "hideTutor": "Ocultar tutor",
+    "moveUp": "Mover {{label}} para cima",
+    "moveDown": "Mover {{label}} para baixo"
   },
   "learnerTutor": {
     "tutorNotFound": "Tutor não encontrado",
@@ -1090,5 +1094,11 @@
   "configError": {
     "title": "Esta versão está mal configurada",
     "body": "O aplicativo não consegue acessar os serviços da AIVO. Instale a versão mais recente na loja. Se você administra esta implantação, recompile com o endereço do backend definido."
+  },
+  "parentIep": {
+    "notificationPrefs": "Preferências de notificação"
+  },
+  "offline": {
+    "synced": "Você está online novamente. Seu trabalho foi salvo."
   }
 }

@@ -44,7 +44,7 @@ export default function SessionNotesScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <View style={{ width: contentWidth }}>
-        <Pressable onPress={() => router.back()} style={styles.backRow}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
@@ -58,7 +58,7 @@ export default function SessionNotesScreen() {
         <AivoCard>
           <View style={styles.field}>
             <Text style={styles.label}>Skill Targeted</Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={styles.input}
               value={skillTargeted}
               onChangeText={setSkillTargeted}
@@ -68,7 +68,7 @@ export default function SessionNotesScreen() {
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Method</Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={styles.input}
               value={method}
               onChangeText={setMethod}
@@ -78,7 +78,7 @@ export default function SessionNotesScreen() {
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Outcome</Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={styles.textArea}
               value={outcome}
               onChangeText={setOutcome}
@@ -91,7 +91,7 @@ export default function SessionNotesScreen() {
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Recommendations</Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={styles.textArea}
               value={recommendations}
               onChangeText={setRecommendations}

@@ -133,7 +133,7 @@ export default function TeacherDashboard() {
           />
         ) : (
           students.map((student: any) => (
-            <Pressable
+            <Pressable accessibilityRole="button"
               key={student.id}
               onPress={() => router.push(`/(teacher)/student/${student.id}` as Href)}
               style={{ marginBottom: spacing.sm }}

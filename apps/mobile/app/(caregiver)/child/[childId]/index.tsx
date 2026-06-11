@@ -24,7 +24,7 @@ export default function ChildOverviewScreen() {
       style={styles.container}
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
     >
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
@@ -69,7 +69,7 @@ export default function ChildOverviewScreen() {
             path: "progress",
           },
         ].map((item) => (
-          <Pressable key={item.path} style={styles.navBtn} onPress={() => nav(item.path)}>
+          <Pressable accessibilityRole="button" key={item.path} style={styles.navBtn} onPress={() => nav(item.path)}>
             <Ionicons name={item.icon} size={24} color={colors.primary} />
             <Text style={styles.navLabel}>{item.label}</Text>
           </Pressable>

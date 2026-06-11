@@ -217,7 +217,8 @@
     "addonPrice": "+ ¥4.99/月",
     "cancelSubscription": "取消订阅",
     "cancelAtPeriodEnd": "周期结束时取消",
-    "addedToBill": "{{count}} 个附加项 · ¥{{price}}/月"
+    "addedToBill": "{{count}} 个附加项 · ¥{{price}}/月",
+    "openInvoice": "打开账单"
   },
   "parentTutors": {
     "title": "辅导老师商店",
@@ -655,7 +656,10 @@
         "homeLabel": "返回仪表盘",
         "intro": "准备好后开始。"
       }
-    }
+    },
+    "hideTutor": "隐藏辅导员",
+    "moveUp": "上移{{label}}",
+    "moveDown": "下移{{label}}"
   },
   "learnerTutor": {
     "tutorNotFound": "未找到辅导老师",
@@ -1090,5 +1094,11 @@
   "configError": {
     "title": "此版本配置有误",
     "body": "应用无法连接 AIVO 服务。请从应用商店安装最新版本。如果你负责此部署，请设置后端地址后重新构建。"
+  },
+  "parentIep": {
+    "notificationPrefs": "通知偏好设置"
+  },
+  "offline": {
+    "synced": "已恢复联网。你的进度已保存。"
   }
 }

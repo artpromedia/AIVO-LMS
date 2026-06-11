@@ -224,7 +224,7 @@ export default function IEPScreen() {
       style={styles.container}
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
     >
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
@@ -246,14 +246,19 @@ export default function IEPScreen() {
         >
           <Ionicons name="reader-outline" size={20} color={colors.primary} />
         </Pressable>
-        <Pressable style={styles.prefsBtn} onPress={() => setPrefsModalOpen(true)}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("parentIep.notificationPrefs", "Notification preferences")}
+          style={styles.prefsBtn}
+          onPress={() => setPrefsModalOpen(true)}
+        >
           <Ionicons name="notifications-outline" size={20} color={colors.primary} />
         </Pressable>
       </View>
 
       <View style={styles.tabs}>
         {(["goals", "updates"] as Tab[]).map((k) => (
-          <Pressable
+          <Pressable accessibilityRole="button"
             key={k}
             style={[styles.tab, tab === k && styles.tabActive]}
             onPress={() => setTab(k)}
@@ -347,7 +352,7 @@ export default function IEPScreen() {
             style={{ marginBottom: spacing.md }}
           >
             {(["all", "note", "report", "amendment", "reminder"] as FilterType[]).map((f) => (
-              <Pressable
+              <Pressable accessibilityRole="button"
                 key={f}
                 style={[styles.filterChip, filter === f && styles.filterChipActive]}
                 onPress={() => setFilter(f)}
@@ -380,8 +385,8 @@ export default function IEPScreen() {
         animationType="slide"
         onRequestClose={() => setPrefsModalOpen(false)}
       >
-        <Pressable style={styles.modalOverlay} onPress={() => setPrefsModalOpen(false)}>
-          <Pressable style={styles.modalContent} onPress={() => {}}>
+        <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setPrefsModalOpen(false)}>
+          <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
             <Text style={styles.modalTitle}>{t("parentIEP.prefsTitle")}</Text>
             <Text style={styles.modalDesc}>{t("parentIEP.prefsDesc")}</Text>
             {!draftPrefs ? (
@@ -449,8 +454,8 @@ export default function IEPScreen() {
         animationType="slide"
         onRequestClose={() => setRespondModal(null)}
       >
-        <Pressable style={styles.modalOverlay} onPress={() => setRespondModal(null)}>
-          <Pressable style={styles.modalContent} onPress={() => {}}>
+        <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setRespondModal(null)}>
+          <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
             <Text style={styles.modalTitle}>
               {respondModal?.mode === "acknowledged"
                 ? t("parentIEP.acknowledgeTitle")
@@ -462,7 +467,7 @@ export default function IEPScreen() {
                 ? t("parentIEP.acknowledgeDesc")
                 : t("parentIEP.objectDesc")}
             </Text>
-            <TextInput
+            <TextInput accessibilityLabel="Text input field"
               style={[styles.modalInput, { height: 90, textAlignVertical: "top" }]}
               value={respondNote}
               onChangeText={setRespondNote}

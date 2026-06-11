@@ -48,7 +48,7 @@ export default function BadgesScreen() {
       }}
     >
       <View style={{ width: contentWidth }}>
-        <Pressable onPress={() => router.back()} style={styles.backRow}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>

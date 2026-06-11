@@ -137,7 +137,7 @@ export default function QuestWorldScreen() {
   if (worldStatus === "not_found" || !world) {
     return (
       <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backRow}>
+        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backRow}>
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
@@ -166,7 +166,7 @@ export default function QuestWorldScreen() {
       style={styles.container}
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
     >
-      <Pressable onPress={() => router.push("/(learner)/quests" as any)} style={styles.backRow}>
+      <Pressable accessibilityRole="button" onPress={() => router.push("/(learner)/quests" as any)} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
@@ -202,7 +202,7 @@ export default function QuestWorldScreen() {
                 </View>
               )}
               {q.uiStatus === "available" && (
-                <Pressable
+                <Pressable accessibilityRole="button"
                   onPress={() => startQuest(q.id)}
                   disabled={starting === q.id}
                   style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.85 }]}
@@ -213,7 +213,7 @@ export default function QuestWorldScreen() {
                 </Pressable>
               )}
               {q.uiStatus === "in_progress" && (
-                <Pressable
+                <Pressable accessibilityRole="button"
                   onPress={() => router.push(`/(learner)/quests/${world.key}/play/${q.id}` as any)}
                   style={styles.primaryButton}
                 >

@@ -270,7 +270,7 @@ export function MfaFactorsCard() {
             />
           ) : null}
           <Text style={styles.helper}>{t("mfaFactors.manualEntry")}</Text>
-          <Pressable onPress={copySecret} style={styles.secretRow}>
+          <Pressable accessibilityRole="button" onPress={copySecret} style={styles.secretRow}>
             <Text style={styles.secretText} selectable>
               {enrollData.base32Secret}
             </Text>
@@ -298,7 +298,7 @@ export function MfaFactorsCard() {
               size="sm"
               style={{ flex: 1 }}
             />
-            <Pressable
+            <Pressable accessibilityRole="button"
               style={styles.cancelBtn}
               onPress={() => {
                 setEnrollData(null);
@@ -313,7 +313,7 @@ export function MfaFactorsCard() {
       ) : showDisable ? (
         <View style={styles.section}>
           <Text style={styles.desc}>{t("mfaFactors.disableConfirm")}</Text>
-          <TextInput
+          <TextInput accessibilityLabel="Text input field"
             style={styles.input}
             value={disablePassword}
             onChangeText={setDisablePassword}
@@ -334,7 +334,7 @@ export function MfaFactorsCard() {
               size="sm"
               style={{ flex: 1 }}
             />
-            <Pressable
+            <Pressable accessibilityRole="button"
               style={styles.cancelBtn}
               onPress={() => {
                 setShowDisable(false);
@@ -346,7 +346,7 @@ export function MfaFactorsCard() {
           </View>
         </View>
       ) : (
-        <Pressable
+        <Pressable accessibilityRole="button"
           style={[styles.cta, totpEnrolled && styles.ctaDanger]}
           onPress={() => (totpEnrolled ? setShowDisable(true) : startEnroll())}
           disabled={enrolling}
@@ -406,7 +406,7 @@ export function MfaFactorsCard() {
       ) : showRegenerate ? (
         <View style={styles.section}>
           <Text style={styles.desc}>{t("mfaFactors.regenConfirm")}</Text>
-          <TextInput
+          <TextInput accessibilityLabel="Text input field"
             style={styles.input}
             value={regenPassword}
             onChangeText={setRegenPassword}
@@ -426,7 +426,7 @@ export function MfaFactorsCard() {
               size="sm"
               style={{ flex: 1 }}
             />
-            <Pressable
+            <Pressable accessibilityRole="button"
               style={styles.cancelBtn}
               onPress={() => {
                 setShowRegenerate(false);
@@ -438,7 +438,7 @@ export function MfaFactorsCard() {
           </View>
         </View>
       ) : (
-        <Pressable style={styles.cta} onPress={() => setShowRegenerate(true)}>
+        <Pressable accessibilityRole="button" style={styles.cta} onPress={() => setShowRegenerate(true)}>
           <Text style={styles.ctaText}>{t("mfaFactors.regen")}</Text>
         </Pressable>
       )}

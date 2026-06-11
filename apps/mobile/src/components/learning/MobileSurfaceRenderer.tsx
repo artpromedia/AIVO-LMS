@@ -1057,7 +1057,7 @@ function MultiStepSurface({
           <Text style={{ color: theme.colors.text, fontWeight: "600" }}>
             Step {i + 1}. {step.prompt}
           </Text>
-          <TextInput
+          <TextInput accessibilityLabel="Text input field"
             style={styles.textInput}
             editable={!disabled}
             value={entries[step.id] ?? ""}

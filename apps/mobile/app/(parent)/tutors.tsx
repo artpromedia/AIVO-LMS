@@ -128,7 +128,7 @@ export default function TutorStoreScreen() {
 
       <View style={styles.filters}>
         {(["all", "core", "expansion"] as const).map((f) => (
-          <Pressable
+          <Pressable accessibilityRole="button"
             key={f}
             style={[styles.filterBtn, filter === f && styles.filterActive]}
             onPress={() => setFilter(f)}
@@ -145,7 +145,7 @@ export default function TutorStoreScreen() {
       </View>
 
       <View style={styles.bundles}>
-        <Pressable
+        <Pressable accessibilityRole="button"
           style={[styles.bundleCard, { borderColor: colors.primary }]}
           onPress={() => handleBundlePurchase("core")}
         >
@@ -155,7 +155,7 @@ export default function TutorStoreScreen() {
             <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 4 }} />
           )}
         </Pressable>
-        <Pressable
+        <Pressable accessibilityRole="button"
           style={[styles.bundleCard, { borderColor: colors.secondary }]}
           onPress={() => handleBundlePurchase("full")}
         >
@@ -180,8 +180,8 @@ export default function TutorStoreScreen() {
       ))}
 
       <Modal visible={!!selectedTutor} transparent animationType="slide">
-        <Pressable style={styles.modalOverlay} onPress={() => setSelectedTutor(null)}>
-          <Pressable style={styles.modalContent} onPress={() => {}}>
+        <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setSelectedTutor(null)}>
+          <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
             {selectedTutor && (
               <>
                 <View
@@ -228,14 +228,14 @@ export default function TutorStoreScreen() {
                 ) : purchasing ? (
                   <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.md }} />
                 ) : (
-                  <Pressable
+                  <Pressable accessibilityRole="button"
                     style={styles.addTutorBtn}
                     onPress={() => handleAddTutor(selectedTutor.key, selectedTutor.tutor.name)}
                   >
                     <Text style={styles.addTutorText}>Add for $4.99/mo</Text>
                   </Pressable>
                 )}
-                <Pressable onPress={() => setSelectedTutor(null)} style={{ marginTop: spacing.md }}>
+                <Pressable accessibilityRole="button" onPress={() => setSelectedTutor(null)} style={{ marginTop: spacing.md }}>
                   <Text
                     style={{
                       fontSize: 14,

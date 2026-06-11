@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useWindowSizeClass } from "../../design/useWindowSizeClass";
 import { ScratchPad, type ScratchStroke } from "./ScratchPad";
 import { colors, radius, spacing } from "@/constants/colors";
+import i18n from "@/lib/i18n";
 
 export interface LearningWorkspaceProps {
   /**
@@ -127,7 +128,12 @@ export function LearningWorkspace({
           <View style={styles.compactTutor}>
             <View style={styles.compactTutorHeader}>
               <Text style={styles.compactTutorTitle}>Tutor</Text>
-              <Pressable onPress={() => setTutorOpen(false)} hitSlop={10}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={i18n.t("learnerStage.hideTutor", "Hide tutor")}
+                onPress={() => setTutorOpen(false)}
+                hitSlop={10}
+              >
                 <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
               </Pressable>
             </View>
