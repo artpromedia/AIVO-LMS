@@ -11,13 +11,16 @@
 
 import { FastifyInstance } from "fastify";
 import crypto from "crypto";
-import { eq, and, desc } from "drizzle-orm";
-import { scimTokens, adminAuditLog, appendAudit } from "@aivo/db";
+import { eq, and, desc, isNull, sql, count } from "drizzle-orm";
+import { scimTokens, scimUnmappedGroups, adminAuditLog, appendAudit } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 import {
   getAdminSvcScimTokensSchema,
   adminSvcScimTokensSchema,
   adminSvcScimTokensByIdRevokeSchema,
+  getAdminSvcScimUnmappedGroupsSchema,
+  adminSvcScimUnmappedGroupsByIdResolveSchema,
+  getAdminSvcScimActivitySchema,
 } from "./schemas.js";
 
 function clientIp(req: any): string | null {
@@ -146,6 +149,102 @@ export function registerScimTokenRoutes(app: FastifyInstance, db: any) {
         tenantId: existing.tenantId,
       });
       return { ok: true };
+    },
+  );
+
+  // ── Sprint B5 — unmapped-group review + sync activity ─────────────────
+  // IdP group pushes that didn't match the class convention are recorded
+  // by identity-svc; the district SIS page lists them here so nothing the
+  // IdP sent is silently dropped.
+
+  app.get(
+    "/api/admin-svc/scim-unmapped-groups",
+    { schema: getAdminSvcScimUnmappedGroupsSchema, preHandler: requireTenantAdmin },
+    async (req: any, reply) => {
+      const tenantId =
+        req.user.role === "PLATFORM_ADMIN"
+          ? (req.query?.tenantId as string) || req.user.tenantId
+          : req.user.tenantId;
+      if (!tenantId) return reply.status(400).send({ error: "tenantId required" });
+      const includeResolved = req.query?.includeResolved === "1";
+      const where = includeResolved
+        ? eq(scimUnmappedGroups.tenantId, tenantId)
+        : and(eq(scimUnmappedGroups.tenantId, tenantId), isNull(scimUnmappedGroups.resolvedAt));
+      const rows = await db
+        .select()
+        .from(scimUnmappedGroups)
+        .where(where)
+        .orderBy(desc(scimUnmappedGroups.lastSeenAt))
+        .limit(200);
+      return { groups: rows };
+    },
+  );
+
+  app.post(
+    "/api/admin-svc/scim-unmapped-groups/:id/resolve",
+    { schema: adminSvcScimUnmappedGroupsByIdResolveSchema, preHandler: requireTenantAdmin },
+    async (req: any, reply) => {
+      const { id } = req.params as { id: string };
+      const [existing] = await db
+        .select()
+        .from(scimUnmappedGroups)
+        .where(eq(scimUnmappedGroups.id, id))
+        .limit(1);
+      if (!existing) return reply.status(404).send({ error: "Not found" });
+      if (!ensureTenantScope(req, existing.tenantId)) {
+        return reply.status(403).send({ error: "Cannot resolve another tenant's record" });
+      }
+      await db
+        .update(scimUnmappedGroups)
+        .set({ resolvedAt: new Date(), resolvedBy: req.user.sub })
+        .where(eq(scimUnmappedGroups.id, id));
+      await appendAudit(db, "admin_audit_log", adminAuditLog, {
+        action: "SCIM_UNMAPPED_GROUP_RESOLVED",
+        actorId: req.user.impersonatedBy || req.user.sub,
+        actorEmail: req.user.email || "",
+        actorRole: req.user.role,
+        onBehalfOfId: req.user.impersonatedBy ? req.user.sub : null,
+        resourceType: "scim_unmapped_group",
+        resourceId: existing.id,
+        details: { displayName: existing.displayName, reason: existing.reason },
+        ipAddress: clientIp(req),
+        userAgent: (req.headers["user-agent"] as string) || null,
+        tenantId: existing.tenantId,
+      });
+      return { ok: true };
+    },
+  );
+
+  // Per-resource sync counters for the SIS page — real numbers from the
+  // hash-chained audit trail (SCIM_* actions recorded by identity-svc).
+  app.get(
+    "/api/admin-svc/scim-activity",
+    { schema: getAdminSvcScimActivitySchema, preHandler: requireTenantAdmin },
+    async (req: any, reply) => {
+      const tenantId =
+        req.user.role === "PLATFORM_ADMIN"
+          ? (req.query?.tenantId as string) || req.user.tenantId
+          : req.user.tenantId;
+      if (!tenantId) return reply.status(400).send({ error: "tenantId required" });
+      const rows = await db
+        .select({ action: adminAuditLog.action, n: count() })
+        .from(adminAuditLog)
+        .where(
+          and(
+            eq(adminAuditLog.tenantId, tenantId),
+            sql`${adminAuditLog.action} LIKE 'SCIM_%'`,
+          ),
+        )
+        .groupBy(adminAuditLog.action);
+      const counters: Record<string, number> = {};
+      for (const row of rows) counters[row.action] = Number(row.n);
+      const [lastUsed] = await db
+        .select({ lastUsedAt: scimTokens.lastUsedAt })
+        .from(scimTokens)
+        .where(and(eq(scimTokens.tenantId, tenantId), isNull(scimTokens.revokedAt)))
+        .orderBy(desc(scimTokens.lastUsedAt))
+        .limit(1);
+      return { counters, lastSyncAt: lastUsed?.lastUsedAt ?? null };
     },
   );
 }

@@ -9,6 +9,7 @@ import {
   decimal,
   boolean,
   index,
+  uniqueIndex,
   bigserial,
 } from "drizzle-orm/pg-core";
 import { users } from "./users.js";
@@ -20,9 +21,12 @@ export const adminAuditLog = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     seq: bigserial("seq", { mode: "number" }).notNull(),
     action: varchar("action", { length: 100 }).notNull(),
-    actorId: uuid("actor_id")
-      .references(() => users.id)
-      .notNull(),
+    // No FK on purpose (Sprint B5): actors include non-user principals —
+    // SCIM tokens, service identities — and an append-only audit ledger
+    // must never refuse a record because the actor isn't a users row
+    // (the FK silently dropped EVERY SCIM audit write via the
+    // best-effort emit path).
+    actorId: uuid("actor_id").notNull(),
     actorEmail: varchar("actor_email", { length: 255 }).notNull(),
     actorRole: varchar("actor_role", { length: 50 }).notNull(),
     /** Set when actor was impersonating — actor is the real admin, this is the impersonated user. */
@@ -250,4 +254,34 @@ export const scimTokens = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [index("idx_scim_tokens_tenant").on(table.tenantId)],
+);
+
+/**
+ * Sprint B5: IdP group pushes that did NOT match the class-group naming
+ * convention (or referenced an unknown school). Recorded — never silently
+ * dropped — so the district SIS page can show exactly what the IdP tried
+ * to push and why it was skipped. `lastSeenAt`/`seenCount` dedupe repeat
+ * pushes of the same group; `resolvedAt` hides reviewed rows.
+ */
+export const scimUnmappedGroups = pgTable(
+  "scim_unmapped_groups",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: uuid("tenant_id")
+      .references(() => tenants.id)
+      .notNull(),
+    displayName: varchar("display_name", { length: 512 }).notNull(),
+    externalId: varchar("external_id", { length: 255 }),
+    reason: varchar("reason", { length: 64 }).notNull(),
+    memberCount: integer("member_count").default(0).notNull(),
+    firstSeenAt: timestamp("first_seen_at").defaultNow().notNull(),
+    lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),
+    seenCount: integer("seen_count").default(1).notNull(),
+    resolvedAt: timestamp("resolved_at"),
+    resolvedBy: uuid("resolved_by").references(() => users.id),
+  },
+  (table) => [
+    index("idx_scim_unmapped_groups_tenant").on(table.tenantId),
+    uniqueIndex("idx_scim_unmapped_groups_unique").on(table.tenantId, table.displayName),
+  ],
 );

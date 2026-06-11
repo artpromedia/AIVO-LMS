@@ -39,6 +39,7 @@ import { registerSsoRoutes } from "./routes/sso.js";
 import { registerOidcRpRoutes } from "./routes/oidc-rp.js";
 import { registerFeatureFlagRoutes } from "./routes/feature-flags.js";
 import { registerScimRoutes } from "./routes/scim.js";
+import { registerInternalRosterRoutes } from "./routes/internal-roster.js";
 import { registerOidcProviderRoutes } from "./routes/oidc-provider.js";
 import { registerAvatarRoutes } from "./routes/avatars.js";
 import { registerGovernanceRoutes } from "./routes/governance.js";
@@ -333,6 +334,7 @@ export async function buildApp() {
   await registerOidcRpRoutes(app);
   await registerFeatureFlagRoutes(app);
   await registerScimRoutes(app);
+  registerInternalRosterRoutes(app, db);
   await registerOidcProviderRoutes(app);
   await registerAvatarRoutes(app);
   registerGovernanceRoutes(app, db);

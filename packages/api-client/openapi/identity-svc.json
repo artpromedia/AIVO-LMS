@@ -5868,7 +5868,37 @@
       }
     },
     "/scim/v2/Groups/{id}": {
-      "put": {
+      "get": {
+        "operationId": "getScimV2GroupsById",
+        "summary": "GET /scim/v2/Groups/:id",
+        "tags": [
+          "Identity"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
         "parameters": [
           {
             "schema": {
@@ -5885,7 +5915,7 @@
           }
         }
       },
-      "patch": {
+      "put": {
         "parameters": [
           {
             "schema": {
@@ -5918,23 +5948,26 @@
             "description": "Default Response"
           }
         }
-      },
-      "get": {
-        "operationId": "getScimV2GroupsById",
-        "summary": "GET /scim/v2/Groups/:id",
+      }
+    },
+    "/internal/roster/users/upsert": {
+      "post": {
+        "operationId": "internalRosterUsersUpsert",
+        "summary": "POST /internal/roster/users/upsert",
         "tags": [
           "Identity"
         ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "id",
-            "required": true
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "Default Response",
@@ -5943,6 +5976,115 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/roster/users/deactivate": {
+      "post": {
+        "operationId": "internalRosterUsersDeactivate",
+        "summary": "POST /internal/roster/users/deactivate",
+        "tags": [
+          "Identity"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }

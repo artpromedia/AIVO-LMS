@@ -512,6 +512,20 @@
       "when": 1783372800000,
       "tag": "0092_district_settings_iep_signers",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1786060800000,
+      "tag": "0093_scim_unmapped_groups",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1786060900000,
+      "tag": "0094_admin_audit_actor_fk",
+      "breakpoints": true
     }
   ]
 }
