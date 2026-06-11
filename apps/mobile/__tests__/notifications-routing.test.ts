@@ -5,6 +5,8 @@
  */
 import { describe, expect, it, vi } from "vitest";
 
+import { routeFromNotification } from "../lib/notifications";
+
 vi.mock("react-native", () => ({ Platform: { OS: "ios" } }));
 vi.mock("expo-notifications", () => ({}));
 vi.mock("expo-secure-store", () => ({}));
@@ -12,8 +14,6 @@ vi.mock("expo-router", () => ({ router: { replace: vi.fn() } }));
 vi.mock("@/lib/api", () => ({ apiFetch: vi.fn() }));
 vi.mock("@/lib/sentry", () => ({ Sentry: { captureException: vi.fn() } }));
 vi.mock("@/constants/api", () => ({ API: { COMMS: "https://comms.test" } }));
-
-import { routeFromNotification } from "../lib/notifications";
 
 describe("routeFromNotification", () => {
   it("routes allowlisted in-app paths", () => {

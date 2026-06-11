@@ -48,24 +48,6 @@ export default function CalmCornerScreen() {
   const [affirmation, setAffirmation] = useState<string | null>(null);
   const [audioCuesEnabled, setAudioCuesEnabled] = useState(false);
 
-  if (!flagsLoading && !flags.selfRegulationHub) {
-    return (
-      <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
-        <ScreenHeader title={t("learnerCalm.title", "Calm Corner")} />
-        <Text
-          accessibilityLiveRegion="polite"
-          style={{ color: palette.inkMuted, paddingHorizontal: 16 }}
-        >
-          {t(
-            "learnerCalm.notEnabled",
-            "Calm Corner isn't turned on for your school yet. Ask a grown-up to check with your district.",
-          )}
-        </Text>
-      </ResponsiveScreen>
-    );
-  }
-
-
   useEffect(() => {
     let mounted = true;
     AsyncStorage.getItem(AUDIO_PREF_KEY)
@@ -96,6 +78,23 @@ export default function CalmCornerScreen() {
     setAffirmation(affirmationKeyFor(activity.id));
     setActive(null);
   }, []);
+
+  if (!flagsLoading && !flags.selfRegulationHub) {
+    return (
+      <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
+        <ScreenHeader title={t("learnerCalm.title", "Calm Corner")} />
+        <Text
+          accessibilityLiveRegion="polite"
+          style={{ color: palette.inkMuted, paddingHorizontal: 16 }}
+        >
+          {t(
+            "learnerCalm.notEnabled",
+            "Calm Corner isn't turned on for your school yet. Ask a grown-up to check with your district.",
+          )}
+        </Text>
+      </ResponsiveScreen>
+    );
+  }
 
   if (affirmation) {
     return (

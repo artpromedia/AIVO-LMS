@@ -1,14 +1,12 @@
 {
-  "total": 317,
+  "total": 57,
   "areas": {
     "(public)": 28,
     "accept-invite": 6,
-    "admin": 256,
-    "learner": 4,
     "login": 1,
     "messages": 14,
     "(root)": 2,
     "notifications": 5,
-    "parent": 1
+    "signup": 1
   }
 }

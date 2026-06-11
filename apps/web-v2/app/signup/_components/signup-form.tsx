@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthInput } from "@aivo/ui/auth";
 
@@ -16,6 +17,7 @@ export function SignupForm({
   readonly id: string;
   readonly action: (formData: FormData) => Promise<void>;
 }) {
+  const t = useTranslations("auth");
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -26,17 +28,17 @@ export function SignupForm({
       <AuthInput
         id="name"
         name="name"
-        label="Your name"
+        label={t("signup.name_label")}
         value={name}
         onChange={(event) => setName(event.target.value)}
-        placeholder="Riley Parent"
+        placeholder={t("signup.name_placeholder")}
         autoComplete="name"
         required
       />
       <AuthInput
         id="email"
         name="email"
-        label="Email"
+        label={t("signup.email_label")}
         type="email"
         inputMode="email"
         value={email}
@@ -48,18 +50,18 @@ export function SignupForm({
       <AuthInput
         id="password"
         name="password"
-        label="Password"
+        label={t("signup.password_label")}
         type={showPw ? "text" : "password"}
         value={password}
         onChange={(event) => setPassword(event.target.value)}
-        helper="At least 8 characters with a number and a symbol."
+        helper={t("signup.password_helper")}
         autoComplete="new-password"
         required
         trailing={
           <button
             type="button"
             onClick={() => setShowPw((value) => !value)}
-            aria-label={showPw ? "Hide password" : "Show password"}
+            aria-label={showPw ? t("common.hide_password") : t("common.show_password")}
             aria-pressed={showPw}
             className="inline-flex h-7 w-7 items-center justify-center rounded-full text-iw-ink-muted hover:bg-iw-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg"
           >
