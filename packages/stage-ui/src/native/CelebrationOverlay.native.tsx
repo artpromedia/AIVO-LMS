@@ -4,6 +4,7 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, View, Text, StyleSheet, Modal } from "react-native";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface CelebrationOverlayProps {
   visible: boolean;
   xpEarned: number;
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     borderWidth: 2,
-    borderColor: "#7c3aed",
+    borderColor: SEMANTIC.color.text.accent,
     minWidth: 240,
   },
   emoji: {

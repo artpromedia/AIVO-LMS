@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, AccessibilityInfo } from "react-native";
 import type { ChoiceOption } from "../types.js";
 
+import { INCLUSIVE_WARM_PALETTE, SEMANTIC } from "@aivo/brand";
 export interface ResponseZoneProps {
   choices: ChoiceOption[];
   onAnswer: (choiceId: string, isCorrect: boolean) => void;
@@ -96,11 +97,11 @@ const styles = StyleSheet.create({
   },
   correct: {
     backgroundColor: "rgba(34,197,94,0.25)",
-    borderColor: "#22c55e",
+    borderColor: SEMANTIC.color.subject.pe,
   },
   incorrect: {
     backgroundColor: "rgba(239,68,68,0.25)",
-    borderColor: "#ef4444",
+    borderColor: INCLUSIVE_WARM_PALETTE.danger,
   },
   disabled: {
     opacity: 0.6,

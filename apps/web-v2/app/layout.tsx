@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Atkinson_Hyperlegible } from "next/font/google";
+import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
@@ -16,7 +16,7 @@ import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11
 import { dirForLocale } from "@/lib/i18n/config";
 
 // AIVO design language typography.
-//   - Body: Inter (via next/font/google, self-hosted).
+//   - Body: Inter (next/font/local, vendored in public/fonts).
 //   - Display: Satoshi Variable (loaded via Fontshare in <head> below).
 //     Satoshi is NOT on Google Fonts, so it must come from Fontshare;
 //     without it, every headline silently falls back to Inter and the
@@ -26,25 +26,32 @@ import { dirForLocale } from "@/lib/i18n/config";
 //     `[data-dyslexia-font="on"]` on <html>.
 // All faces resolve through Tailwind's `font-iw-display` / `font-iw-body`
 // / `font-iw-dyslexia` utilities (see @aivo/brand preset).
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+// Fonts are SELF-HOSTED (public/fonts, OFL-licensed) via next/font/local.
+// next/font/google downloads from fonts.googleapis.com at build/dev time,
+// which made every build network-dependent and visual baselines
+// font-nondeterministic whenever that fetch flaked. The Inter variable
+// file covers the full 100–900 weight range in one 48KB woff2.
+const inter = localFont({
+  src: "../public/fonts/Inter-Variable-latin.woff2",
+  weight: "100 900",
   variable: "--font-aivo-body",
   display: "swap",
 });
 
 // Display fallback. The CSS stack lists "Satoshi Variable" first, so this
 // Inter instance only renders if Satoshi fails to load.
-const interDisplay = Inter({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800", "900"],
+const interDisplay = localFont({
+  src: "../public/fonts/Inter-Variable-latin.woff2",
+  weight: "100 900",
   variable: "--font-aivo-display",
   display: "swap",
 });
 
-const atkinson = Atkinson_Hyperlegible({
-  subsets: ["latin"],
-  weight: ["400", "700"],
+const atkinson = localFont({
+  src: [
+    { path: "../public/fonts/AtkinsonHyperlegible-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../public/fonts/AtkinsonHyperlegible-Bold.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-aivo-dyslexia",
   display: "swap",
 });

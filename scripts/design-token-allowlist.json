@@ -42,7 +42,7 @@
       "note": "pending DTCG migration"
     },
     "packages/stage-ui/src/ProgressPath.tsx": {
-      "count": 3,
+      "count": 2,
       "note": "pending DTCG migration"
     },
     "packages/stage-ui/src/ResponseZone.tsx": {
@@ -62,19 +62,19 @@
       "note": "pending DTCG migration"
     },
     "packages/stage-ui/src/native/BeatPreview.native.tsx": {
-      "count": 6,
+      "count": 5,
       "note": "pending DTCG migration"
     },
     "packages/stage-ui/src/native/CelebrationOverlay.native.tsx": {
-      "count": 4,
+      "count": 3,
       "note": "pending DTCG migration"
     },
     "packages/stage-ui/src/native/ProgressPath.native.tsx": {
-      "count": 2,
+      "count": 1,
       "note": "pending DTCG migration"
     },
     "packages/stage-ui/src/native/ResponseZone.native.tsx": {
-      "count": 3,
+      "count": 1,
       "note": "pending DTCG migration"
     },
     "packages/stage-ui/src/native/StageContent.native.tsx": {
@@ -86,7 +86,7 @@
       "note": "pending DTCG migration"
     },
     "packages/stage-ui/src/native/TutorCharacter.native.tsx": {
-      "count": 4,
+      "count": 3,
       "note": "pending DTCG migration"
     },
     "packages/ui/src/assessment/AssessmentFooter.tsx": {

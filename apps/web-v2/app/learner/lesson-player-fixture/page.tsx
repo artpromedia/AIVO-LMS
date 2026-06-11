@@ -92,7 +92,11 @@ function fixtureExpectedAnswer(surfaceType: FixtureSurfaceType): string | undefi
     case "ink_canvas":
     case "voice_response":
     case "coding_sandbox":
-      // Open-ended / process-scored surfaces accept any submission.
+    case "geometry_workspace":
+      // Open-ended / process-scored surfaces accept any submission. The
+      // geometry fixture asks the learner to manipulate the diagram and
+      // DESCRIBE what they did — there is no single string answer, so an
+      // exact-match expectation would mark every honest response wrong.
       return undefined;
     case "fill_in_blank":
       return "2";

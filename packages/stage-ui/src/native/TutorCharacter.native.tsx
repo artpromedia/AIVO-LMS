@@ -6,6 +6,7 @@ import React, { useEffect, useRef } from "react";
 import { Animated, View, Text, StyleSheet } from "react-native";
 import type { TutorState } from "../types.js";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface TutorCharacterProps {
   tutorKey: string;
   tutorState: TutorState;
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "#7c3aed",
+    borderColor: SEMANTIC.color.text.accent,
   },
   emoji: {
     fontSize: 40,
