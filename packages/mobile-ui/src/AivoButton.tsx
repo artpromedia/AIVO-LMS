@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { theme } from "./theme";
 
+import { SEMANTIC } from "@aivo/brand";
 interface AivoButtonProps {
   title: string;
   onPress: () => void;
@@ -71,7 +72,7 @@ export function AivoButton({
               {
                 fontSize: fontSizes[size],
                 color: isPrimary
-                  ? "#FFFFFF"
+                  ? SEMANTIC.color.surface.card
                   : isSecondary
                     ? theme.colors.text
                     : isGhost

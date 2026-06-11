@@ -1212,7 +1212,7 @@
       "copyright": "© {year} AIVO Lernplattform. Alle Rechte vorbehalten.",
       "built_with_care": "Mit Sorgfalt fuer jeden Lernenden gebaut.",
       "security": "Sicherheit",
-      "trust": "Trust Center",
+      "trust": "Trust-Center",
       "subprocessors": "Unterauftragsverarbeiter"
     },
     "home": {
@@ -1252,17 +1252,17 @@
       "cta_primary": "Familien-Testphase starten",
       "cta_secondary": "Mit dem Bezirksvertrieb sprechen",
       "cta_image_alt": "Eltern und Kind lernen gemeinsam auf einem Sofa",
-      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
-      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
-      "value_props_badge": "Our Approach",
-      "value_props_heading": "Principles that put your child first.",
-      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
-      "value_prop_1_title": "Universal Design for Learning",
-      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
-      "value_prop_2_title": "Structured & Systematic Instruction",
-      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
-      "value_prop_3_title": "Sensory-Responsive Design",
-      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
+      "stat_focus_qualitative": "Schülerinnen und Schüler zeigen deutliche Fortschritte bei Konzentration und Engagement",
+      "research_methodology_body": "Unsere Lern-Engine basiert auf veröffentlichter sonderpädagogischer Forschung, dem Universal Design for Learning (UDL) und der Wissenschaft adaptiver Kognition.",
+      "value_props_badge": "Unser Ansatz",
+      "value_props_heading": "Prinzipien, die Ihr Kind an die erste Stelle setzen.",
+      "value_props_subheading": "AIVO basiert auf etablierter Lernwissenschaft — nicht auf Annahmen darüber, wie ein typisches Kind zu sein hat.",
+      "value_prop_1_title": "Universal Design for Learning (UDL)",
+      "value_prop_1_desc": "Nach den UDL-Leitlinien bieten wir vielfältige Wege für Engagement, Repräsentation und Handeln, damit jedes Kind Zugang zum Lehrplan erhält.",
+      "value_prop_2_title": "Strukturierte, systematische Instruktion",
+      "value_prop_2_desc": "Die Lektionen folgen expliziten, sequenziellen Mustern und bauen Wissen Schritt für Schritt auf — ein Ansatz, der sich für Lernende mit Legasthenie, ADHS und verwandten Profilen bewährt hat.",
+      "value_prop_3_title": "Sensorisch responsives Design",
+      "value_prop_3_desc": "Lernende steuern visuelle Komplexität, Kontrast und Tempo in Echtzeit — sensorische Hürden werden abgebaut statt aufgebaut."
     },
     "page_reset_password": {
       "logo_aria": "AIVO Startseite",
@@ -1346,7 +1346,7 @@
       "start_free_today": "Heute kostenlos starten",
       "create_your_account": "Konto erstellen",
       "label_full_name": "Vollständiger Name",
-      "placeholder_name": "Alex Parker",
+      "placeholder_name": "Alex Wagner",
       "label_password": "Passwort",
       "placeholder_password": "Mindestens 8 Zeichen",
       "password_hint": "Kombinieren Sie Buchstaben, Zahlen und ein Symbol für mehr Sicherheit.",
@@ -1497,45 +1497,45 @@
       "hero_title": "Fünf Niveaus. Eine Plattform. Jeder Lernende."
     },
     "page_accessibility": {
-      "title": "AIVO Accessibility Statement"
+      "title": "Barrierefreiheitserklärung von AIVO"
     },
     "page_cookie_policy": {
-      "title": "Cookie Policy"
+      "title": "Cookie-Richtlinie"
     },
     "page_coppa_compliance": {
-      "title": "COPPA Compliance Statement"
+      "title": "COPPA-Konformitätserklärung"
     },
     "page_ferpa_compliance": {
-      "title": "FERPA Compliance Statement"
+      "title": "FERPA-Konformitätserklärung"
     },
     "page_privacy_policy": {
-      "title": "AIVO Privacy Policy"
+      "title": "Datenschutzerklärung von AIVO"
     },
     "page_security": {
-      "title": "How we protect your data."
+      "title": "So schützen wir Ihre Daten."
     },
     "page_subprocessors": {
-      "get_started": "Get Started",
-      "badge": "Subprocessors",
-      "heading": "AIVO subprocessors",
-      "current_subprocessors": "Current subprocessors",
-      "col_subprocessor": "Subprocessor",
-      "col_purpose": "Purpose",
-      "col_data_category": "Data category",
+      "get_started": "Jetzt starten",
+      "badge": "Unterauftragsverarbeiter",
+      "heading": "Unterauftragsverarbeiter von AIVO",
+      "current_subprocessors": "Aktuelle Unterauftragsverarbeiter",
+      "col_subprocessor": "Unterauftragsverarbeiter",
+      "col_purpose": "Zweck",
+      "col_data_category": "Datenkategorie",
       "col_region": "Region",
       "col_status": "Status",
-      "how_we_use_heading": "How we use this list",
-      "reporting_heading": "Reporting subprocessor changes",
-      "questions_heading": "Questions?",
-      "footer_privacy": "Privacy",
-      "footer_security": "Security",
-      "footer_accessibility": "Accessibility"
+      "how_we_use_heading": "So nutzen wir diese Liste",
+      "reporting_heading": "Meldung von Änderungen bei Unterauftragsverarbeitern",
+      "questions_heading": "Fragen?",
+      "footer_privacy": "Datenschutz",
+      "footer_security": "Sicherheit",
+      "footer_accessibility": "Barrierefreiheit"
     },
     "page_terms_of_service": {
-      "title": "AIVO Terms of Service"
+      "title": "Nutzungsbedingungen von AIVO"
     },
     "page_trust": {
-      "title": "What we promise — and how to check."
+      "title": "Was wir versprechen — und wie Sie es überprüfen."
     },
     "page_compare_detail": {
       "aivo_best_for": "AIVO ist am besten für",

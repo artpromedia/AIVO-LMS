@@ -152,9 +152,9 @@ test(
     } finally {
       globalThis.fetch = originalFetch;
       if (tenantId) {
+        // Append-only audit ledger: rows stay (trigger blocks DELETE) and
+        // pin the tenant via FK — only the invite rows are removable.
         await db.delete(districtAdminInvites).where(eq(districtAdminInvites.tenantId, tenantId));
-        await db.delete(adminAuditLog).where(eq(adminAuditLog.tenantId, tenantId));
-        await db.delete(tenants).where(eq(tenants.id, tenantId));
       }
       await db.delete(users).where(eq(users.id, platformAdmin.id));
       await app.close();

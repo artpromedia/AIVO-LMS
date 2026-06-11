@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface LearnerButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost" | "break";
   size?: "standard" | "large" | "xl";
@@ -62,7 +63,7 @@ export function LearnerButton({
           fontSize: "var(--learner-base-font, inherit)",
           letterSpacing: "var(--learner-letter-spacing, 0)",
           transitionDuration: "var(--learner-motion-ms, 300ms)",
-          "--tw-ring-color": accentColor || "#7C3AED",
+          "--tw-ring-color": accentColor || SEMANTIC.color.text.accent,
         } as React.CSSProperties
       }
       {...props}

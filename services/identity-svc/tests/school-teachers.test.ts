@@ -55,13 +55,12 @@ async function seed(db: any) {
 }
 
 async function cleanup(db: any, tenantId: string) {
-  const { tenants, schools, users, districtAdminInvites, adminAuditLog } = await import("@aivo/db");
+  const { districtAdminInvites } = await import("@aivo/db");
   const { eq } = await import("drizzle-orm");
+  // The audit ledger is append-only (trigger-enforced) and its FKs pin
+  // tenant/user rows — only the mutable invite rows are removed. Fixtures
+  // are unique per run, so the retained rows cannot collide.
   await db.delete(districtAdminInvites).where(eq(districtAdminInvites.tenantId, tenantId));
-  await db.delete(adminAuditLog).where(eq(adminAuditLog.tenantId, tenantId));
-  await db.delete(users).where(eq(users.tenantId, tenantId));
-  await db.delete(schools).where(eq(schools.tenantId, tenantId));
-  await db.delete(tenants).where(eq(tenants.id, tenantId));
 }
 
 async function schoolAdminToken(admin: any, schoolId: string, tenantId: string) {

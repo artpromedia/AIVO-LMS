@@ -1252,17 +1252,17 @@
       "cta_primary": "ابدأ التجربة العائلية",
       "cta_secondary": "تحدّث إلى مبيعات المناطق التعليمية",
       "cta_image_alt": "ولي أمر وطفل يتعلّمان معًا على أريكة",
-      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
-      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
-      "value_props_badge": "Our Approach",
-      "value_props_heading": "Principles that put your child first.",
-      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
-      "value_prop_1_title": "Universal Design for Learning",
-      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
-      "value_prop_2_title": "Structured & Systematic Instruction",
-      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
-      "value_prop_3_title": "Sensory-Responsive Design",
-      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
+      "stat_focus_qualitative": "يُظهر الطلاب تحسّنًا ملموسًا في التركيز والمشاركة",
+      "research_methodology_body": "يستند محرك التعلّم لدينا إلى أبحاث منشورة في التربية الخاصة، وإلى التصميم الشامل للتعلّم (UDL)، وعلوم الإدراك التكيفي.",
+      "value_props_badge": "نهجنا",
+      "value_props_heading": "مبادئ تضع طفلك في المقام الأول.",
+      "value_props_subheading": "بُني AIVO على علوم تعلّم راسخة — لا على افتراضات حول شكل الطالب «النمطي».",
+      "value_prop_1_title": "التصميم الشامل للتعلّم",
+      "value_prop_1_desc": "وفقًا لإرشادات التصميم الشامل للتعلّم، نوفّر وسائل متعددة للمشاركة والعرض والتعبير ليتمكّن كل متعلّم من الوصول إلى المنهج.",
+      "value_prop_2_title": "تعليم منظّم ومنهجي",
+      "value_prop_2_desc": "تتبع الدروس أنماطًا صريحة ومتسلسلة تبني المعرفة خطوة بخطوة — وهو نهج مناسب للمتعلّمين ذوي عسر القراءة وفرط الحركة وتشتت الانتباه والملفات المشابهة.",
+      "value_prop_3_title": "تصميم مستجيب حسّيًا",
+      "value_prop_3_desc": "يتحكّم المتعلّمون في التعقيد البصري والتباين والإيقاع لحظيًا — فنقلّل الحواجز الحسّية بدلًا من إضافتها."
     },
     "page_reset_password": {
       "logo_aria": "الصفحة الرئيسية لـ AIVO",
@@ -1497,45 +1497,45 @@
       "hero_title": "خمسة مستويات. منصة واحدة. كل متعلّم."
     },
     "page_accessibility": {
-      "title": "AIVO Accessibility Statement"
+      "title": "بيان إمكانية الوصول في AIVO"
     },
     "page_cookie_policy": {
-      "title": "Cookie Policy"
+      "title": "سياسة ملفات تعريف الارتباط"
     },
     "page_coppa_compliance": {
-      "title": "COPPA Compliance Statement"
+      "title": "بيان الامتثال لقانون COPPA"
     },
     "page_ferpa_compliance": {
-      "title": "FERPA Compliance Statement"
+      "title": "بيان الامتثال لقانون FERPA"
     },
     "page_privacy_policy": {
-      "title": "AIVO Privacy Policy"
+      "title": "سياسة الخصوصية في AIVO"
     },
     "page_security": {
-      "title": "How we protect your data."
+      "title": "كيف نحمي بياناتك."
     },
     "page_subprocessors": {
-      "get_started": "Get Started",
-      "badge": "Subprocessors",
-      "heading": "AIVO subprocessors",
-      "current_subprocessors": "Current subprocessors",
-      "col_subprocessor": "Subprocessor",
-      "col_purpose": "Purpose",
-      "col_data_category": "Data category",
-      "col_region": "Region",
-      "col_status": "Status",
-      "how_we_use_heading": "How we use this list",
-      "reporting_heading": "Reporting subprocessor changes",
-      "questions_heading": "Questions?",
-      "footer_privacy": "Privacy",
-      "footer_security": "Security",
-      "footer_accessibility": "Accessibility"
+      "get_started": "ابدأ الآن",
+      "badge": "المعالِجون من الباطن",
+      "heading": "المعالِجون من الباطن لدى AIVO",
+      "current_subprocessors": "المعالِجون من الباطن الحاليون",
+      "col_subprocessor": "المعالِج من الباطن",
+      "col_purpose": "الغرض",
+      "col_data_category": "فئة البيانات",
+      "col_region": "المنطقة",
+      "col_status": "الحالة",
+      "how_we_use_heading": "كيف نستخدم هذه القائمة",
+      "reporting_heading": "الإبلاغ عن تغييرات المعالِجين من الباطن",
+      "questions_heading": "أسئلة؟",
+      "footer_privacy": "الخصوصية",
+      "footer_security": "الأمان",
+      "footer_accessibility": "إمكانية الوصول"
     },
     "page_terms_of_service": {
-      "title": "AIVO Terms of Service"
+      "title": "شروط خدمة AIVO"
     },
     "page_trust": {
-      "title": "What we promise — and how to check."
+      "title": "ما نَعِد به — وكيف تتحقق منه."
     },
     "page_compare_detail": {
       "aivo_best_for": "AIVO الأنسب لـ",

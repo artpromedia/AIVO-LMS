@@ -1252,17 +1252,17 @@
       "cta_primary": "ファミリートライアルを開始",
       "cta_secondary": "学区向けセールスに相談",
       "cta_image_alt": "ソファで一緒に学ぶ保護者と子ども",
-      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
-      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
-      "value_props_badge": "Our Approach",
-      "value_props_heading": "Principles that put your child first.",
-      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
-      "value_prop_1_title": "Universal Design for Learning",
-      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
-      "value_prop_2_title": "Structured & Systematic Instruction",
-      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
-      "value_prop_3_title": "Sensory-Responsive Design",
-      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
+      "stat_focus_qualitative": "生徒の集中力と学習への関与に意味のある向上が見られます",
+      "research_methodology_body": "AIVOの学習エンジンは、公表されている特別支援教育の研究、学びのユニバーサルデザイン（UDL）、適応的認知科学に基づいています。",
+      "value_props_badge": "私たちのアプローチ",
+      "value_props_heading": "お子さまを第一に考える原則。",
+      "value_props_subheading": "AIVOは確立された学習科学に基づいています。「典型的な生徒」像という思い込みではありません。",
+      "value_prop_1_title": "学びのユニバーサルデザイン",
+      "value_prop_1_desc": "UDLガイドラインに沿って、関与・提示・行動の多様な手段を提供し、すべての学習者がカリキュラムにアクセスできるようにします。",
+      "value_prop_2_title": "構造化された体系的な指導",
+      "value_prop_2_desc": "レッスンは明示的で段階的なパターンに沿って知識を一歩ずつ積み上げます。ディスレクシアやADHDなどの特性をもつ学習者に適したアプローチです。",
+      "value_prop_3_title": "感覚に寄り添うデザイン",
+      "value_prop_3_desc": "学習者は視覚的な複雑さ・コントラスト・ペースをリアルタイムで調整でき、感覚面の障壁を増やすのではなく減らします。"
     },
     "page_reset_password": {
       "logo_aria": "AIVO ホーム",
@@ -1497,45 +1497,45 @@
       "hero_title": "5つのレベル。1つのプラットフォーム。すべての学習者。"
     },
     "page_accessibility": {
-      "title": "AIVO Accessibility Statement"
+      "title": "AIVOアクセシビリティに関する声明"
     },
     "page_cookie_policy": {
-      "title": "Cookie Policy"
+      "title": "クッキーポリシー"
     },
     "page_coppa_compliance": {
-      "title": "COPPA Compliance Statement"
+      "title": "COPPA準拠に関する声明"
     },
     "page_ferpa_compliance": {
-      "title": "FERPA Compliance Statement"
+      "title": "FERPA準拠に関する声明"
     },
     "page_privacy_policy": {
-      "title": "AIVO Privacy Policy"
+      "title": "AIVOプライバシーポリシー"
     },
     "page_security": {
-      "title": "How we protect your data."
+      "title": "お客様のデータをどのように守るか。"
     },
     "page_subprocessors": {
-      "get_started": "Get Started",
-      "badge": "Subprocessors",
-      "heading": "AIVO subprocessors",
-      "current_subprocessors": "Current subprocessors",
-      "col_subprocessor": "Subprocessor",
-      "col_purpose": "Purpose",
-      "col_data_category": "Data category",
-      "col_region": "Region",
-      "col_status": "Status",
-      "how_we_use_heading": "How we use this list",
-      "reporting_heading": "Reporting subprocessor changes",
-      "questions_heading": "Questions?",
-      "footer_privacy": "Privacy",
-      "footer_security": "Security",
-      "footer_accessibility": "Accessibility"
+      "get_started": "はじめる",
+      "badge": "再委託先",
+      "heading": "AIVOの再委託先",
+      "current_subprocessors": "現在の再委託先",
+      "col_subprocessor": "再委託先",
+      "col_purpose": "目的",
+      "col_data_category": "データ区分",
+      "col_region": "地域",
+      "col_status": "ステータス",
+      "how_we_use_heading": "このリストの使い方",
+      "reporting_heading": "再委託先変更の通知",
+      "questions_heading": "ご質問は？",
+      "footer_privacy": "プライバシー",
+      "footer_security": "セキュリティ",
+      "footer_accessibility": "アクセシビリティ"
     },
     "page_terms_of_service": {
-      "title": "AIVO Terms of Service"
+      "title": "AIVO利用規約"
     },
     "page_trust": {
-      "title": "What we promise — and how to check."
+      "title": "私たちの約束と、その確かめ方。"
     },
     "page_compare_detail": {
       "aivo_best_for": "AIVO が最適なのは",

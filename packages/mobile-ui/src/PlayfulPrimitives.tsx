@@ -1,4 +1,5 @@
 import React from "react";
+import { SEMANTIC } from "@aivo/brand";
 import {
   Pressable,
   Text,
@@ -31,7 +32,7 @@ export function MobilePlayfulButton({
       ]}
       {...props}
     >
-      <Text style={{ color: "#FFFFFF", fontWeight: "700" }}>{children}</Text>
+      <Text style={{ color: SEMANTIC.color.surface.card, fontWeight: "700" }}>{children}</Text>
     </Pressable>
   );
 }
@@ -43,7 +44,7 @@ export function MobilePlayfulCard({ style, ...props }: ViewProps) {
       style={[
         {
           borderRadius: 24,
-          backgroundColor: "#FFFFFF",
+          backgroundColor: SEMANTIC.color.surface.card,
           borderWidth: 1,
           borderColor: "#E5E7EB",
           padding: 16,

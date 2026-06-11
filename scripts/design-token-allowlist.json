@@ -5,44 +5,20 @@
       "count": 7,
       "note": "pending DTCG migration"
     },
-    "packages/learner-ui/src/feedback/Celebration.tsx": {
-      "count": 1,
-      "note": "pending DTCG migration"
-    },
-    "packages/learner-ui/src/feedback/PreviewOverlay.tsx": {
-      "count": 1,
-      "note": "pending DTCG migration"
-    },
     "packages/learner-ui/src/layout/PrimarySlot.tsx": {
-      "count": 6,
+      "count": 1,
       "note": "pending DTCG migration"
     },
     "packages/learner-ui/src/playful-calm/primitives.tsx": {
       "count": 20,
       "note": "pending DTCG migration"
     },
-    "packages/learner-ui/src/primitives/Button.tsx": {
-      "count": 1,
-      "note": "pending DTCG migration"
-    },
     "packages/mobile-ui/src/AivoButton.tsx": {
-      "count": 2,
-      "note": "pending DTCG migration"
-    },
-    "packages/mobile-ui/src/AivoHeader.tsx": {
       "count": 1,
       "note": "pending DTCG migration"
     },
     "packages/mobile-ui/src/PlayfulPrimitives.tsx": {
-      "count": 4,
-      "note": "pending DTCG migration"
-    },
-    "packages/mobile-ui/src/chart/chartHelpers.ts": {
-      "count": 10,
-      "note": "pending DTCG migration"
-    },
-    "packages/mobile-ui/src/charts/tones.ts": {
-      "count": 8,
+      "count": 2,
       "note": "pending DTCG migration"
     },
     "packages/mobile-ui/src/shell/LockedScreenMobile.tsx": {
@@ -198,7 +174,7 @@
       "note": "pending DTCG migration"
     },
     "packages/ui/src/hero/LearningHero.tsx": {
-      "count": 25,
+      "count": 18,
       "note": "pending DTCG migration"
     },
     "packages/ui/src/hero/SetupProgressTrack.tsx": {

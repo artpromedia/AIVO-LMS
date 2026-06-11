@@ -162,12 +162,37 @@ function deterministicInt(key: string, min: number, max: number): number {
   return min + (Math.abs(h) % (max - min + 1));
 }
 
+
+/**
+ * Monday week-starts inside [startDate, endDate] (ISO dates), most recent
+ * last, capped so an unbounded window can't explode a report. The window
+ * comes from the caller (the dashboards pass the CURRENT term) — weeks
+ * must never be frozen to a hardcoded school year, or every panel goes
+ * permanently empty the moment that year ends.
+ */
+function weekStartsIn(startDate: string, endDate: string, cap = 16): string[] {
+  const start = new Date(`${startDate}T00:00:00Z`);
+  const end = new Date(`${endDate}T00:00:00Z`);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) return [];
+  const cursor = new Date(end);
+  const day = cursor.getUTCDay();
+  cursor.setUTCDate(cursor.getUTCDate() - ((day + 6) % 7)); // back to Monday
+  const weeks: string[] = [];
+  while (cursor >= start && weeks.length < cap) {
+    weeks.unshift(cursor.toISOString().slice(0, 10));
+    cursor.setUTCDate(cursor.getUTCDate() - 7);
+  }
+  return weeks;
+}
+
 function generateEnrollmentRows(
   schoolId: string,
   params: Record<string, unknown>,
 ): { columns: string[]; rows: Record<string, unknown>[] } {
   const gradeFilter = params.grade !== undefined ? Number(params.grade) : null;
-  const term = String(params.term ?? "2024-fall");
+  const now = new Date();
+  const fallYear = now.getUTCMonth() >= 7 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
+  const term = String(params.term ?? `${fallYear}-fall`);
   const columns = ["grade", "term", "enrolled", "active", "iep_count", "count_504"];
   const grades = gradeFilter !== null ? [gradeFilter] : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const rows = grades.map((g) => {
@@ -194,13 +219,12 @@ function generateAttendanceRows(
   params: Record<string, unknown>,
 ): { columns: string[]; rows: Record<string, unknown>[] } {
   const gradeFilter = params.grade !== undefined ? Number(params.grade) : null;
-  const startDate = String(params.startDate ?? "2024-09-01");
-  const endDate = String(params.endDate ?? "2024-12-20");
+  const today = new Date().toISOString().slice(0, 10);
+  const startDate = String(params.startDate ?? `${today.slice(0, 4)}-01-01`);
+  const endDate = String(params.endDate ?? today);
   const columns = ["grade", "week_start", "attendance_rate_pct", "absent_learners"];
   const grades = gradeFilter !== null ? [gradeFilter] : [3, 4, 5, 6, 7, 8];
-  const weeks = ["2024-09-02", "2024-09-09", "2024-09-16", "2024-09-23"].filter(
-    (w) => w >= startDate && w <= endDate,
-  );
+  const weeks = weekStartsIn(startDate, endDate, 4);
   const rows: Record<string, unknown>[] = [];
   for (const g of grades) {
     for (const w of weeks) {
@@ -220,14 +244,16 @@ function generateLearningTimeRows(
   params: Record<string, unknown>,
 ): { columns: string[]; rows: Record<string, unknown>[] } {
   const gradeFilter = params.grade !== undefined ? Number(params.grade) : null;
-  const startDate = String(params.startDate ?? "2024-09-01");
+  const today = new Date().toISOString().slice(0, 10);
+  const startDate = String(params.startDate ?? `${today.slice(0, 4)}-01-01`);
+  const endDate = String(params.endDate ?? today);
   const columns = ["learner_id", "grade", "week_start", "instructional_minutes"];
   const grades = gradeFilter !== null ? [gradeFilter] : [4, 5, 6];
-  const weeks = ["2024-09-02", "2024-09-09"];
+  const weeks = weekStartsIn(startDate, endDate, 2);
   const rows: Record<string, unknown>[] = [];
   for (const g of grades) {
     for (let n = 0; n < 5; n++) {
-      for (const w of weeks.filter((wk) => wk >= startDate)) {
+      for (const w of weeks) {
         rows.push({
           learner_id: `learner-${schoolId}-${g}-${n}`,
           grade: g,
@@ -258,7 +284,9 @@ function generateInterventionRows(
         learner_id: `learner-${schoolId}-${g}-${n}`,
         grade: g,
         plan_type: plan,
-        last_session_at: "2024-11-15",
+        last_session_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .slice(0, 10),
         sessions_this_month: deterministicInt(`${schoolId}-${g}-${n}-sess`, 4, 12),
       });
     }

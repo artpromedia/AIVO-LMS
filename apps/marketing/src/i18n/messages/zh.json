@@ -1252,17 +1252,17 @@
       "cta_primary": "开始家庭试用",
       "cta_secondary": "联系学区销售",
       "cta_image_alt": "家长与孩子在沙发上一起学习",
-      "stat_focus_qualitative": "Students show meaningful gains in focus and engagement",
-      "research_methodology_body": "Our learning engine is grounded in published special-education research, Universal Design for Learning (UDL), and adaptive cognition science.",
-      "value_props_badge": "Our Approach",
-      "value_props_heading": "Principles that put your child first.",
-      "value_props_subheading": "AIVO is built on established learning science — not assumptions about what a typical student looks like.",
-      "value_prop_1_title": "Universal Design for Learning",
-      "value_prop_1_desc": "Following UDL guidelines, we provide multiple means of engagement, representation, and action so every learner can access the curriculum.",
-      "value_prop_2_title": "Structured & Systematic Instruction",
-      "value_prop_2_desc": "Lessons follow explicit, sequential patterns that build knowledge step by step — an approach well-suited to learners with dyslexia, ADHD, and related profiles.",
-      "value_prop_3_title": "Sensory-Responsive Design",
-      "value_prop_3_desc": "Learners control visual complexity, contrast, and pacing in real time — reducing sensory barriers to engagement rather than adding them."
+      "stat_focus_qualitative": "学生在专注力和参与度方面取得显著进步",
+      "research_methodology_body": "我们的学习引擎建立在已发表的特殊教育研究、通用学习设计（UDL）以及自适应认知科学的基础上。",
+      "value_props_badge": "我们的方法",
+      "value_props_heading": "以孩子为先的原则。",
+      "value_props_subheading": "AIVO 建立在成熟的学习科学之上，而不是对“典型学生”的假设。",
+      "value_prop_1_title": "通用学习设计",
+      "value_prop_1_desc": "我们遵循 UDL 准则，提供多元的参与、呈现和表达方式，让每位学习者都能进入课程。",
+      "value_prop_2_title": "结构化系统化教学",
+      "value_prop_2_desc": "课程遵循清晰、循序渐进的模式逐步构建知识——这种方法尤其适合有阅读障碍、多动症及相关特点的学习者。",
+      "value_prop_3_title": "感官响应式设计",
+      "value_prop_3_desc": "学习者可实时调节画面复杂度、对比度和节奏，减少而非增加感官负担。"
     },
     "page_reset_password": {
       "logo_aria": "AIVO 首页",
@@ -1497,45 +1497,45 @@
       "hero_title": "五个级别。一个平台。每位学习者。"
     },
     "page_accessibility": {
-      "title": "AIVO Accessibility Statement"
+      "title": "AIVO 无障碍声明"
     },
     "page_cookie_policy": {
-      "title": "Cookie Policy"
+      "title": "Cookie 政策"
     },
     "page_coppa_compliance": {
-      "title": "COPPA Compliance Statement"
+      "title": "COPPA 合规声明"
     },
     "page_ferpa_compliance": {
-      "title": "FERPA Compliance Statement"
+      "title": "FERPA 合规声明"
     },
     "page_privacy_policy": {
-      "title": "AIVO Privacy Policy"
+      "title": "AIVO 隐私政策"
     },
     "page_security": {
-      "title": "How we protect your data."
+      "title": "我们如何保护您的数据。"
     },
     "page_subprocessors": {
-      "get_started": "Get Started",
-      "badge": "Subprocessors",
-      "heading": "AIVO subprocessors",
-      "current_subprocessors": "Current subprocessors",
-      "col_subprocessor": "Subprocessor",
-      "col_purpose": "Purpose",
-      "col_data_category": "Data category",
-      "col_region": "Region",
-      "col_status": "Status",
-      "how_we_use_heading": "How we use this list",
-      "reporting_heading": "Reporting subprocessor changes",
-      "questions_heading": "Questions?",
-      "footer_privacy": "Privacy",
-      "footer_security": "Security",
-      "footer_accessibility": "Accessibility"
+      "get_started": "立即开始",
+      "badge": "次级处理方",
+      "heading": "AIVO 次级处理方",
+      "current_subprocessors": "当前次级处理方",
+      "col_subprocessor": "次级处理方",
+      "col_purpose": "用途",
+      "col_data_category": "数据类别",
+      "col_region": "地区",
+      "col_status": "状态",
+      "how_we_use_heading": "我们如何使用此清单",
+      "reporting_heading": "次级处理方变更通报",
+      "questions_heading": "有疑问？",
+      "footer_privacy": "隐私",
+      "footer_security": "安全",
+      "footer_accessibility": "无障碍"
     },
     "page_terms_of_service": {
-      "title": "AIVO Terms of Service"
+      "title": "AIVO 服务条款"
     },
     "page_trust": {
-      "title": "What we promise — and how to check."
+      "title": "我们的承诺——以及如何验证。"
     },
     "page_compare_detail": {
       "aivo_best_for": "AIVO 最适合",

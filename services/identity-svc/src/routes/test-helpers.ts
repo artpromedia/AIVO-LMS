@@ -25,7 +25,8 @@ import {
 } from "@aivo/db";
 import { eq, and, sql } from "drizzle-orm";
 import argon2 from "argon2";
-import { signJWT } from "@aivo/security";
+import crypto from "node:crypto";
+import { signJWT, hashOtpCode } from "@aivo/security";
 import {
   getTestLastMfaCodeByEmailSchema,
   testSeedDistrictAdminSchema,
@@ -231,7 +232,20 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
         .orderBy(sql`created_at DESC`)
         .limit(1);
       if (!latest) return reply.status(404).send({ error: "No MFA code issued" });
-      return { code: latest.code, expiresAt: latest.expiresAt };
+      // OTPs are hashed at rest (only code_hash is stored), so the
+      // original challenge code is unrecoverable by design. Mint a fresh
+      // valid code for the PENDING challenge instead — same generator and
+      // hashing as the real flow, and verify-mfa picks the latest unused
+      // row, so the returned plaintext authenticates exactly once.
+      const code = String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+      await db.insert(mfaCodes).values({
+        userId: user.id,
+        codeHash: hashOtpCode(code),
+        purpose: "login",
+        expiresAt,
+      });
+      return { code, expiresAt };
     },
   );
 

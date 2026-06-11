@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface CelebrationProps {
   isVisible: boolean;
   tutorName?: string;
@@ -14,7 +15,7 @@ export interface CelebrationProps {
 export function Celebration({
   isVisible,
   tutorName,
-  tutorColor = "#7C3AED",
+  tutorColor = SEMANTIC.color.text.accent,
   message = "Great job!",
   durationMs = 2500,
   motionBudget = 8,

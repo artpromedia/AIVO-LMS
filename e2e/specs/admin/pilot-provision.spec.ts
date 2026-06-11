@@ -36,14 +36,14 @@ test.describe("web-admin pilot provisioning", () => {
 
     // Success redirects back with ?created=<district name>.
     await expect(page).toHaveURL(/created=/, { timeout: 20_000 });
-    await expect(page.locator("main")).toContainText(districtName);
+    await expect(page.locator("main").last()).toContainText(districtName);
 
     // The tenant is real and listed.
     await page.goto(`${ADMIN_WEB_BASE}/platform/tenants`);
-    await expect(page.locator("main")).toContainText(districtName);
+    await expect(page.locator("main").last()).toContainText(districtName);
 
     // And the action left an audit trail.
     await page.goto(`${ADMIN_WEB_BASE}/platform/audit`);
-    await expect(page.locator("main")).toContainText(/pilot|tenant|provision/i);
+    await expect(page.locator("main").last()).toContainText(/pilot|tenant|provision/i);
   });
 });

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 
+import { SEMANTIC } from "@aivo/brand";
 export interface NextAction {
   type: "lesson" | "break" | "checkin" | "quest" | "assessment";
   tutorKey?: string;
@@ -60,8 +61,8 @@ export function PrimarySlot({
       <div
         className="rounded-3xl p-6 text-center border-2 shadow-lg"
         style={{
-          borderColor: action.tutorColor || "#7C3AED",
-          background: `linear-gradient(135deg, ${action.tutorColor || "#7C3AED"}08, ${action.tutorColor || "#7C3AED"}15)`,
+          borderColor: action.tutorColor || SEMANTIC.color.text.accent,
+          background: `linear-gradient(135deg, ${action.tutorColor || SEMANTIC.color.text.accent}08, ${action.tutorColor || SEMANTIC.color.text.accent}15)`,
         }}
       >
         <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Next Up</p>
@@ -84,7 +85,7 @@ export function PrimarySlot({
             onClick={onStart}
             className="inline-flex items-center gap-2 px-8 py-3 rounded-2xl text-white font-heading font-bold text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2"
             style={{
-              background: `linear-gradient(135deg, ${action.tutorColor || "#7C3AED"}, ${action.tutorColor || "#7C3AED"}cc)`,
+              background: `linear-gradient(135deg, ${action.tutorColor || SEMANTIC.color.text.accent}, ${action.tutorColor || SEMANTIC.color.text.accent}cc)`,
               minHeight: "var(--learner-hit-target, 48px)",
               transitionDuration: "var(--learner-motion-ms, 300ms)",
             }}
