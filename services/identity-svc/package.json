@@ -21,7 +21,7 @@
     "@aivo/scoring": "workspace:*",
     "@aivo/security": "workspace:*",
     "@aivo/sso": "workspace:*",
-    "@aws-sdk/client-s3": "^3.654.0",
+    "@aws-sdk/client-s3": "^3.1066.0",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.0.0",
     "@fastify/multipart": "^9.4.0",
@@ -33,14 +33,14 @@
     "argon2": "^0.44.0",
     "drizzle-orm": "^0.44.2",
     "fastify": "^5.3.3",
-    "jose": "^6.0.11",
-    "otpauth": "^9.5.0",
+    "jose": "^6.2.3",
+    "otpauth": "^9.5.1",
     "qrcode": "^1.5.4",
-    "sharp": "^0.34.5"
+    "sharp": "^0.35.0"
   },
   "devDependencies": {
     "@types/qrcode": "^1.5.6",
-    "tsx": "^4.19.4",
+    "tsx": "^4.22.4",
     "typescript": "^5.7.3"
   }
 }
