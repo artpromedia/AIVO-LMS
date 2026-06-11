@@ -81,4 +81,56 @@ describe("AgentLadder", () => {
     expect(ladder.current()).toBe("full");
     expect(onDrop).not.toHaveBeenCalled();
   });
+
+  // ── Wave E (S9): snapshot/restore across stateless turns ────────────────
+  it("round-trips through snapshot/restore without losing trigger progress", () => {
+    const ladder = new AgentLadder();
+    ladder.recordTurn(2000);
+    ladder.recordTurn(2000);
+    ladder.recordFailure("one");
+    const snap = ladder.snapshot();
+    expect(snap).toEqual({
+      rung: "full",
+      latencies: [2000, 2000],
+      consecutiveFailures: 1,
+    });
+
+    // The restored ladder continues exactly where the persisted one left
+    // off: one more failure completes the streak and drops the rung …
+    const restored = AgentLadder.restore(snap);
+    restored.recordFailure("two");
+    expect(restored.current()).toBe("checkpoint");
+
+    // … and the latency window carries over: two more slow turns reach
+    // the 4-sample minimum and breach p95.
+    const restored2 = AgentLadder.restore(snap);
+    restored2.recordTurn(2000);
+    restored2.recordTurn(2000);
+    expect(restored2.current()).toBe("checkpoint");
+  });
+
+  it("restore tolerates malformed snapshots by starting fresh", () => {
+    expect(AgentLadder.restore(null).current()).toBe("full");
+    expect(AgentLadder.restore({} as never).current()).toBe("full");
+    expect(
+      AgentLadder.restore({
+        rung: "warp" as never,
+        latencies: [-5, "x" as never, 100],
+        consecutiveFailures: -3,
+      }).current(),
+    ).toBe("full");
+    const sanitised = AgentLadder.restore({ latencies: [-5, "x" as never, 100] }).snapshot();
+    expect(sanitised.latencies).toEqual([100]);
+    expect(sanitised.consecutiveFailures).toBe(0);
+  });
+
+  it("restore preserves a sticky deterministic rung", () => {
+    const ladder = AgentLadder.restore({
+      rung: "deterministic",
+      latencies: [],
+      consecutiveFailures: 0,
+    });
+    expect(ladder.current()).toBe("deterministic");
+    expect(ladder.shouldConsult("check")).toBe(false);
+  });
 });

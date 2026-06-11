@@ -45,6 +45,19 @@ export interface RungDrop {
   detail: string;
 }
 
+/**
+ * Wave E (S9): serialisable ladder state. The orchestrator runs one turn
+ * per HTTP request, so the ladder must round-trip through
+ * `tutor_sessions.agent_state` between turns without losing the rolling
+ * latency window or the failure streak (otherwise drops would never fire
+ * across requests).
+ */
+export interface LadderSnapshot {
+  rung: AgentRung;
+  latencies: number[];
+  consecutiveFailures: number;
+}
+
 const ORDER: AgentRung[] = ["full", "checkpoint", "deterministic"];
 
 export function nextRungDown(rung: AgentRung): AgentRung {
@@ -120,6 +133,43 @@ export class AgentLadder {
         detail: "session token envelope exhausted",
       });
     }
+  }
+
+  /** Serialise the ladder for persistence between stateless turns. */
+  snapshot(): LadderSnapshot {
+    return {
+      rung: this.rung,
+      latencies: [...this.latencies],
+      consecutiveFailures: this.consecutiveFailures,
+    };
+  }
+
+  /** Rebuild a ladder from a persisted snapshot. Tolerates malformed or
+   *  missing state by starting fresh — a corrupt row must not crash a
+   *  session, and "fresh" is the safe direction only because every drop
+   *  re-fires from live signals within a few turns. */
+  static restore(
+    snapshot: Partial<LadderSnapshot> | null | undefined,
+    opts: { config?: Partial<LadderConfig>; onDrop?: (drop: RungDrop) => void } = {},
+  ): AgentLadder {
+    const ladder = new AgentLadder(opts);
+    if (!snapshot || typeof snapshot !== "object") return ladder;
+    if (snapshot.rung && ORDER.includes(snapshot.rung)) {
+      ladder.rung = snapshot.rung;
+    }
+    if (Array.isArray(snapshot.latencies)) {
+      ladder.latencies = snapshot.latencies
+        .filter((n): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0)
+        .slice(-ladder.config.latencyWindow);
+    }
+    if (
+      typeof snapshot.consecutiveFailures === "number" &&
+      Number.isInteger(snapshot.consecutiveFailures) &&
+      snapshot.consecutiveFailures >= 0
+    ) {
+      ladder.consecutiveFailures = snapshot.consecutiveFailures;
+    }
+    return ladder;
   }
 
   private drop(trigger: RungDrop["trigger"], detail: string): void {

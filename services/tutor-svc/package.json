@@ -22,6 +22,8 @@
     "@aivo/security": "workspace:*",
     "@aivo/skill-graphs": "workspace:*",
     "@aivo/special-interest-engine": "workspace:*",
+    "@aivo/stage-runtime": "workspace:*",
+    "@aivo/stage-ui": "workspace:*",
     "@aivo/tutor-runtime": "workspace:*",
     "@aivo/tutor-sdk": "workspace:*",
     "@fastify/cors": "^11.0.0",

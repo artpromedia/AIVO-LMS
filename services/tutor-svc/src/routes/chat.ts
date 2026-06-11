@@ -152,7 +152,7 @@ async function evaluateResponsibleAiChat(input: {
   }
 }
 
-const TUTOR_SKU_TO_KEY: Record<string, string> = {
+export const TUTOR_SKU_TO_KEY: Record<string, string> = {
   ADDON_TUTOR_MATH: "nova",
   ADDON_TUTOR_ELA: "sage",
   ADDON_TUTOR_SCIENCE: "spark",

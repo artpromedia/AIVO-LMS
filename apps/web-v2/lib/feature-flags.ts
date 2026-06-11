@@ -215,3 +215,20 @@ export async function delegatedAdminRbacV2Enabled(): Promise<boolean> {
   const flags = await getTenantFlags();
   return flags.delegatedAdminRbacV2;
 }
+
+/**
+ * Wave E (S9) — agentic tutor mode (Nova pilot).
+ *
+ * Tenant-scoped (kill switch > district override > env default via
+ * getTenantFlags), default OFF everywhere. When ON, the lesson player
+ * opens a tutor-agent session for piloted subjects (math → Nova) and
+ * consults the agent after each answer with a hard 1500ms client
+ * deadline; OFF (or any failure anywhere in the loop) leaves the player
+ * byte-identical to today's deterministic flow, so the flag is a true
+ * kill switch.
+ */
+export async function tutorAgenticModeEnabled(): Promise<boolean> {
+  const { getTenantFlags } = await import("@/lib/bff/tenant-flags");
+  const flags = await getTenantFlags();
+  return flags.tutorAgenticMode;
+}

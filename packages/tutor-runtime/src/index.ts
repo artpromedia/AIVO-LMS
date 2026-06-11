@@ -284,4 +284,4 @@ export {
   nextRungDown,
   p95,
 } from "./agent-ladder.js";
-export type { AgentRung, LadderConfig, RungDrop } from "./agent-ladder.js";
+export type { AgentRung, LadderConfig, LadderSnapshot, RungDrop } from "./agent-ladder.js";

@@ -130,8 +130,42 @@ export const tutorSessions = pgTable("tutor_sessions", {
   xpEarned: integer("xp_earned").default(0),
   durationSeconds: integer("duration_seconds").default(0),
   completionQuality: real("completion_quality"),
+  /** Wave E (S9): agent loop state between turns — token envelope, ladder
+   *  rung + counters, turn seq. NULL for non-agent sessions. */
+  agentState: jsonb("agent_state"),
   startedAt: timestamp("started_at").defaultNow().notNull(),
   completedAt: timestamp("completed_at"),
+});
+
+/**
+ * Wave E (S9): one row per agent decision — the audit trail for every
+ * tutor-agent turn (accepted actions, guard rejections, ladder fallbacks).
+ * `seq` is monotonic per session so a session's reasoning can be replayed
+ * in order; `observationDigest` ties the row to the ai-svc decision log
+ * without storing raw learner responses here.
+ */
+export const tutorDecisionTraces = pgTable("tutor_decision_traces", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  sessionId: uuid("session_id")
+    .references(() => tutorSessions.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  tutorKey: varchar("tutor_key", { length: 32 }).notNull(),
+  seq: integer("seq").notNull(),
+  observationDigest: varchar("observation_digest", { length: 32 }).notNull(),
+  /** The validated agent action (null when the turn fell back). */
+  action: jsonb("action"),
+  rationale: text("rationale").default(""),
+  /** Decision outcome: accepted | rejected:<reason> | fallback:<reason> | skipped:<reason>. */
+  decision: varchar("decision", { length: 120 }).notNull(),
+  rung: varchar("rung", { length: 16 }).default("full").notNull(),
+  latencyMs: integer("latency_ms").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const tokenUsage = pgTable("token_usage", {

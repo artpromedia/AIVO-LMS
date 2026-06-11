@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { TUTORS } from "@aivo/brand";
 import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/lesson-player";
 import { requirePageRole } from "@/lib/auth/server";
 import type { GeneratedLessonPlan } from "@/lib/db/types";
@@ -42,7 +43,7 @@ const FIXTURE_SURFACE_TYPES: ReadonlySet<FixtureSurfaceType> = new Set([
 ]);
 
 type FixturePageProps = {
-  searchParams?: Promise<{ surfaceType?: string }>;
+  searchParams?: Promise<{ surfaceType?: string; agent?: string }>;
 };
 
 function fixturePrompt(surfaceType: FixtureSurfaceType): string {
@@ -163,6 +164,20 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
   const learnerId =
     session.role === "learner" && session.learnerId ? session.learnerId : "lrn_demo_sky";
 
+  // Wave E (S9): `?agent=1` mounts the player with the Nova agent identity
+  // so Playwright can exercise the agent loop at the network seam
+  // (page.route on the BFF agent-session / agent-turn calls). Without the
+  // param the fixture renders exactly the pre-agent player.
+  const agent =
+    params?.agent === "1"
+      ? {
+          tutorKey: "nova",
+          name: TUTORS.nova.name,
+          icon: TUTORS.nova.icon,
+          color: TUTORS.nova.color,
+        }
+      : null;
+
   return (
     <main className="mx-auto max-w-4xl p-6">
       <LessonPlayer
@@ -192,6 +207,7 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
           updatedAt: new Date().toISOString(),
         }}
         initialStatus="in_progress"
+        agent={agent}
       />
     </main>
   );
