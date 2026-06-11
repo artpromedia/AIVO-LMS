@@ -122,3 +122,33 @@ test("PUT /api/district/settings cannot bypass logo upload validation", async (t
   });
   assert.ok([401, 403].includes(res.status), `expected 401/403, got ${res.status}`);
 });
+
+// ── Sprint B6 — contrast-guard + new field validation ───────────────────
+
+test("validateBrandingPatch routes palettes through @aivo/brand's guard", async () => {
+  const { validateBrandingPatch } = await import("../src/routes/district.js");
+  // Shipped default passes.
+  assert.equal(validateBrandingPatch({ primaryColor: "#7C3AED" }).ok, true);
+  // Pale yellow fails with the specific per-check message.
+  const yellow = validateBrandingPatch({ primaryColor: "#FFEB3B" });
+  assert.equal(yellow.ok, false);
+  assert.match(yellow.error || "", /primary on light surface fails: \d+\.\d{2}:1/);
+  // Navy fails only the dark-chrome check — message names it.
+  const navy = validateBrandingPatch({ primaryColor: "#1D4ED8" });
+  assert.equal(navy.ok, false);
+  assert.match(navy.error || "", /on dark chrome fails/);
+  // Secondary is validated when present.
+  const badSecondary = validateBrandingPatch({ primaryColor: "#0F766E", secondaryColor: "#FFFF00" });
+  assert.equal(badSecondary.ok, false);
+  assert.match(badSecondary.error || "", /secondary/);
+});
+
+test("validateBrandingPatch enforces supportUrl http(s)", async () => {
+  const { validateBrandingPatch } = await import("../src/routes/district.js");
+  assert.equal(validateBrandingPatch({ supportUrl: "https://help.district.org" }).ok, true);
+  const js = validateBrandingPatch({ supportUrl: "javascript:alert(1)" });
+  assert.equal(js.ok, false);
+  assert.match(js.error || "", /http/);
+  const rel = validateBrandingPatch({ supportUrl: "/relative" });
+  assert.equal(rel.ok, false);
+});

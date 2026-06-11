@@ -153,7 +153,8 @@
     "team": "チーム",
     "tutorStore": "チューターストア",
     "billing": "請求",
-    "loginAsLearner": "学習者としてログイン"
+    "loginAsLearner": "学習者としてログイン",
+    "districtLogo": "学区ロゴ"
   },
   "parentSettings": {
     "title": "設定",

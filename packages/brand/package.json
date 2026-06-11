@@ -24,9 +24,11 @@
   },
   "scripts": {
     "build": "node ./scripts/build-tokens.mjs && tsc",
-    "prepare": "node ./scripts/build-tokens.mjs && tsc"
+    "prepare": "node ./scripts/build-tokens.mjs && tsc",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.8"
   }
 }

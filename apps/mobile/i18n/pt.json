@@ -153,7 +153,8 @@
     "team": "Equipe",
     "tutorStore": "Loja de tutores",
     "billing": "Faturamento",
-    "loginAsLearner": "Entrar como aluno"
+    "loginAsLearner": "Entrar como aluno",
+    "districtLogo": "Logotipo do distrito"
   },
   "parentSettings": {
     "title": "Configurações",

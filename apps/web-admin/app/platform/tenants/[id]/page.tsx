@@ -24,6 +24,9 @@ export default async function TenantDetailPage({
           <Link className="admin-button admin-button-secondary" href={`/platform/tenants/${tenant.id}/flags`}>
             Feature flags
           </Link>
+          <Link className="admin-button admin-button-secondary" href={`/platform/tenants/${tenant.id}/branding`}>
+            Branding
+          </Link>
           <Link className="admin-button" href={`/platform/billing/invoices?tenantId=${tenant.id}`}>
             Invoices
           </Link>

@@ -153,7 +153,8 @@
     "team": "Team",
     "tutorStore": "Tutoren-Store",
     "billing": "Abrechnung",
-    "loginAsLearner": "Als Lernende:r anmelden"
+    "loginAsLearner": "Als Lernende:r anmelden",
+    "districtLogo": "Bezirkslogo"
   },
   "parentSettings": {
     "title": "Einstellungen",

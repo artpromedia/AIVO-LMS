@@ -153,7 +153,8 @@
     "team": "الفريق",
     "tutorStore": "متجر المدرسين",
     "billing": "الفواتير",
-    "loginAsLearner": "تسجيل الدخول كمتعلّم"
+    "loginAsLearner": "تسجيل الدخول كمتعلّم",
+    "districtLogo": "شعار المنطقة التعليمية"
   },
   "parentSettings": {
     "title": "الإعدادات",

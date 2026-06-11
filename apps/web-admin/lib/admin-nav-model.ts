@@ -131,6 +131,7 @@ export const DISTRICT_NAV_GROUPS: readonly AdminNavGroup[] = [
       { label: "Parents", href: "/district/parents" },
       { label: "SIS connectors", href: "/district/sis" },
       { label: "Single sign-on", href: "/district/sso-config" },
+      { label: "Branding", href: "/district/branding" },
       { label: "IEP evaluations", href: "/district/iep" },
     ],
   },

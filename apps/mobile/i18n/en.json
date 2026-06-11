@@ -153,7 +153,8 @@
     "iep": "IEP",
     "team": "Team",
     "tutorStore": "Tutor Store",
-    "billing": "Billing"
+    "billing": "Billing",
+    "districtLogo": "District logo"
   },
   "parentSettings": {
     "title": "Settings",

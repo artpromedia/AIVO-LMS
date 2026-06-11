@@ -153,7 +153,8 @@
     "team": "团队",
     "tutorStore": "导师商店",
     "billing": "账单",
-    "loginAsLearner": "以学习者身份登录"
+    "loginAsLearner": "以学习者身份登录",
+    "districtLogo": "学区标志"
   },
   "parentSettings": {
     "title": "设置",

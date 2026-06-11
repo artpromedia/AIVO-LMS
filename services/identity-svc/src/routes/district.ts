@@ -28,7 +28,8 @@ import crypto from "crypto";
 import { requireDistrictAdmin } from "../hooks/require-district-admin.js";
 import { requireStepUp } from "./step-up.js";
 import { delegatedAdminRbacV2Enabled, requestHasPermission } from "../lib/permissions.js";
-import { parseLogoDataUrl, wcagContrastRatio, WCAG_AA_NORMAL } from "../lib/branding-validation.js";
+import { parseLogoDataUrl } from "../lib/branding-validation.js";
+import { evaluateBrandPalette } from "@aivo/brand";
 import {
   getDistrictStatsSchema,
   getDistrictTenantSchema,
@@ -1149,10 +1150,18 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
           .limit(1);
         const priorBranding = (prior?.branding as any) || {};
         const incoming = { ...body.branding };
+        // Explicit null clears the logo (reset to AIVO default) — only
+        // SETTING a logo must go through the validated upload route.
+        const clearLogo = incoming.logoUrl === null;
         delete incoming.logoUrl;
         delete incoming.logoMime;
         delete incoming.logoBytes;
         updates.branding = { ...priorBranding, ...incoming };
+        if (clearLogo) {
+          updates.branding.logoUrl = null;
+          updates.branding.logoMime = null;
+          updates.branding.logoBytes = null;
+        }
       }
       if (body.featureOverrides !== undefined) updates.featureOverrides = body.featureOverrides;
 
@@ -2168,24 +2177,41 @@ function csvCell(v: any): string {
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-// PUT /api/district/settings is defined above; the WCAG check for
-// branding.primaryColor lives in `validateBrandingPatch` so we can
-// reuse it. We export a small helper the existing handler imports.
+// PUT /api/district/settings is defined above; palette validation lives
+// in `validateBrandingPatch` so the handler and tests share it. Sprint B6:
+// primary/secondary go through @aivo/brand's contrast guard — checked
+// against the REAL text/surface tokens in both themes, with the specific
+// per-check failure messages surfaced to the caller.
 export function validateBrandingPatch(branding: any): { ok: boolean; error?: string } {
   if (!branding || typeof branding !== "object") return { ok: true };
-  if (typeof branding.primaryColor === "string" && branding.primaryColor.trim()) {
-    const ratio = wcagContrastRatio(branding.primaryColor.trim(), "#FFFFFF");
-    if (ratio === null) return { ok: false, error: "primaryColor must be a hex color (#RRGGBB)" };
-    if (ratio < WCAG_AA_NORMAL) {
-      return {
-        ok: false,
-        error: `primaryColor contrast ratio ${ratio.toFixed(2)}:1 against white fails WCAG AA (need ≥ ${WCAG_AA_NORMAL}:1)`,
-      };
-    }
+  const verdict = evaluateBrandPalette({
+    primaryColor: typeof branding.primaryColor === "string" ? branding.primaryColor : null,
+    secondaryColor: typeof branding.secondaryColor === "string" ? branding.secondaryColor : null,
+  });
+  if (!verdict.ok) {
+    return { ok: false, error: verdict.failures.map((f) => f.message).join("; ") };
   }
   if (branding.supportEmail !== undefined && typeof branding.supportEmail === "string") {
     if (branding.supportEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(branding.supportEmail)) {
       return { ok: false, error: "supportEmail must be a valid email address" };
+    }
+  }
+  if (
+    branding.supportUrl !== undefined &&
+    typeof branding.supportUrl === "string" &&
+    branding.supportUrl
+  ) {
+    let parsed: URL;
+    try {
+      parsed = new URL(branding.supportUrl);
+    } catch {
+      return { ok: false, error: "supportUrl must be an absolute http(s) URL" };
+    }
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return { ok: false, error: "supportUrl must use http(s) — no custom schemes" };
+    }
+    if (branding.supportUrl.length > 512) {
+      return { ok: false, error: "supportUrl must be 512 characters or fewer" };
     }
   }
   if (branding.displayName !== undefined && typeof branding.displayName === "string") {

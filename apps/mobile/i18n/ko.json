@@ -153,7 +153,8 @@
     "team": "팀",
     "tutorStore": "튜터 스토어",
     "billing": "결제",
-    "loginAsLearner": "학습자로 로그인"
+    "loginAsLearner": "학습자로 로그인",
+    "districtLogo": "교육구 로고"
   },
   "parentSettings": {
     "title": "설정",

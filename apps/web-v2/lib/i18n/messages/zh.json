@@ -4,7 +4,8 @@
     "sign_out": "退出登录",
     "get_started": "开始使用",
     "loading": "加载中...",
-    "language": "语言"
+    "language": "语言",
+    "get_support": "获取支持"
   },
   "nav": {
     "platform": "平台",

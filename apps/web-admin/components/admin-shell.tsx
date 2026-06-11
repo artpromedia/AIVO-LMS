@@ -74,6 +74,7 @@ export function AdminShell({
   homeHref = "/platform",
   homeLabel = "Platform",
   brand = "AIVO Admin",
+  tenantLogoUrl = null,
   children,
 }: {
   groups: AdminNavGroup[];
@@ -82,6 +83,8 @@ export function AdminShell({
   homeHref?: string;
   homeLabel?: string;
   brand?: string;
+  /** District logo (validated data URL) — shown above the wordmark (Sprint B6). */
+  tenantLogoUrl?: string | null;
   children: ReactNode;
 }) {
   const pathname = usePathname() ?? homeHref;
@@ -127,14 +130,24 @@ export function AdminShell({
         aria-label={brand}
         onClick={() => setDrawerOpen(false)}
       >
-        <Image
-          src="/images/aivo-wordmark-light.svg"
-          alt=""
-          width={120}
-          height={34}
-          unoptimized
-          className="h-9 w-auto self-start"
-        />
+        {tenantLogoUrl ? (
+          /* Tenant logos are validated data URLs — next/image can't optimize them. */
+          <img
+            src={tenantLogoUrl}
+            alt=""
+            data-testid="tenant-logo"
+            className="h-9 w-auto self-start"
+          />
+        ) : (
+          <Image
+            src="/images/aivo-wordmark-light.svg"
+            alt=""
+            width={120}
+            height={34}
+            unoptimized
+            className="h-9 w-auto self-start"
+          />
+        )}
         <span className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
           {brand}
         </span>

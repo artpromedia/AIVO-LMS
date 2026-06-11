@@ -153,7 +153,8 @@
     "team": "टीम",
     "tutorStore": "ट्यूटर स्टोर",
     "billing": "बिलिंग",
-    "loginAsLearner": "शिक्षार्थी के रूप में लॉगिन करें"
+    "loginAsLearner": "शिक्षार्थी के रूप में लॉगिन करें",
+    "districtLogo": "डिस्ट्रिक्ट लोगो"
   },
   "parentSettings": {
     "title": "सेटिंग्स",
