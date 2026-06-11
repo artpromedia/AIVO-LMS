@@ -89,6 +89,15 @@ const gates = [
     required: true,
     category: "curriculum",
   },
+  // Wave D (G3): coverage gate over the AUTHORITATIVE curriculum-svc
+  // catalogue (ADR-0040) — floor for the CCSS-imported subjects (math/ela
+  // K-8 ≥ 15 skills per band) plus a per-cell ratchet.
+  {
+    name: "catalogue:coverage",
+    script: "catalogue:coverage",
+    required: true,
+    category: "curriculum",
+  },
 
   // Gates owned by later sprints. They are reported here so the gap is
   // visible, but they don't fail the overall run until the sprint that

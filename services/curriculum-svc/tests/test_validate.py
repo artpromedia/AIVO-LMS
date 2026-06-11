@@ -141,3 +141,68 @@ def test_route_requires_auth():
         json={"zipCode": "55104", "subject": "math", "gradeBand": "K", "standards": ["x"]},
     )
     assert r.status_code == 401
+
+
+# ── Wave D (G3): official notation matching + catalogue-scale perf ──────────
+
+
+def test_official_notation_matches_and_invented_codes_reject():
+    cat = get_catalogue()
+    district = cat.resolve_district_by_zip("90017")  # LA Unified (NCES import)
+    assert district is not None
+    approved = cat.list_skills(subject="math", grade_band="3", district_id=district.id)
+    assert len(approved) >= 15
+
+    result = validate_topics_and_standards(
+        approved,
+        topics=[],
+        standards=[
+            "CCSS.MATH.CONTENT.3.NF.A.1",  # official notation, any case
+            "ccss.math.3.md.b.3",  # canonical catalogue id
+            "CCSS.MATH.CONTENT.99.ZZ.Z.9",  # invented — must reject
+        ],
+    )
+    matched = {m.input: m.skillId for m in result.matched}
+    assert matched["CCSS.MATH.CONTENT.3.NF.A.1"] == "ccss.math.3.nf.a.1"
+    assert matched["ccss.math.3.md.b.3"] == "ccss.math.3.md.b.3"
+    assert any(
+        u.input == "CCSS.MATH.CONTENT.99.ZZ.Z.9" and u.reason == "not_in_jurisdiction_packs"
+        for u in result.unmatched
+    )
+
+
+def test_validate_route_accepts_official_notation_end_to_end():
+    r = client.post(
+        _VALIDATE,
+        headers=DEV,
+        json={
+            "zipCode": "90017",
+            "subject": "math",
+            "gradeBand": "3",
+            "standards": ["CCSS.MATH.CONTENT.3.NF.A.1"],
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["jurisdictionDistrictId"] == "ca-los-angeles-unified"
+    assert any(m["skillId"] == "ccss.math.3.nf.a.1" for m in body["matched"])
+    assert body["offCurriculumCount"] == 0
+
+
+def test_validate_stays_fast_at_catalogue_scale():
+    """Perf contract (Wave D): <50ms per call against a full grade band of
+    the imported catalogue. The stem cache makes per-request stemming a
+    dict lookup; without it this regresses ~50x at 10^3 skills."""
+    import time
+
+    cat = get_catalogue()
+    district = cat.resolve_district_by_zip("90017")
+    approved = cat.list_skills(subject="ela", grade_band="3", district_id=district.id)
+    topics = [f"reading comprehension of informational text {i}" for i in range(20)]
+    validate_topics_and_standards(approved, topics, [])  # warm the cache
+    t0 = time.perf_counter()
+    runs = 10
+    for _ in range(runs):
+        validate_topics_and_standards(approved, topics, [])
+    avg_ms = (time.perf_counter() - t0) / runs * 1000
+    assert avg_ms < 50, f"validate averaged {avg_ms:.1f}ms (limit 50)"
