@@ -20,7 +20,8 @@ function readCurrentLocale(): Locale {
 
 function writeLocaleCookie(locale: Locale) {
   if (typeof document === "undefined") return;
-  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=${COOKIE_MAX_AGE}; samesite=lax`;
+  const secure = window.location.protocol === "https:" ? "; secure" : "";
+  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=${COOKIE_MAX_AGE}; samesite=lax${secure}`;
 }
 
 export interface LanguageSwitcherProps {

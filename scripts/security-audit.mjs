@@ -105,6 +105,38 @@ requireAll("headers/next.config.ts", nextConfigSrc, [
   /"Strict-Transport-Security"/,
   /max-age=63072000/,
   /includeSubDomains/,
+  // Sprint A3 (ZAP #65/#73)
+  /"Cross-Origin-Opener-Policy"[^}]*"same-origin"/,
+  /"Cross-Origin-Resource-Policy"[^}]*"same-origin"/,
+  /poweredByHeader:\s*false/,
+]);
+
+// ----- 3b. CSP + CSRF wiring (Sprint A3) -----------------------------
+// Both web apps must build a nonce CSP in middleware and route mutating
+// requests through the same-origin CSRF guard. Static checks here; the
+// behavioural contract lives in apps/web-v2/e2e/security-headers.playwright.ts.
+for (const [app, cspImport, csrfImport] of [
+  ["apps/web-v2", "@/lib/security/csp", "@/lib/bff/csrf"],
+  ["apps/web-admin", "@/lib/security/csp", "@/lib/security/csrf"],
+]) {
+  const mwPath = join(repoRoot, app, "middleware.ts");
+  const mwSrc = readOrFail(mwPath, `${app}/middleware.ts`);
+  requireAll(`${app}/middleware.ts`, mwSrc, [
+    new RegExp(`from "${cspImport.replace(/[/@]/g, (m) => "\\" + m)}"`),
+    new RegExp(`from "${csrfImport.replace(/[/@]/g, (m) => "\\" + m)}"`),
+    /buildCsp\(/,
+    /checkSameOrigin\(/,
+    /content-security-policy/i,
+  ]);
+}
+const adminNextConfig = readOrFail(
+  join(repoRoot, "apps/web-admin/next.config.ts"),
+  "headers/web-admin next.config.ts",
+);
+requireAll("headers/web-admin next.config.ts", adminNextConfig, [
+  /"Cross-Origin-Opener-Policy"[^}]*"same-origin"/,
+  /"Cross-Origin-Resource-Policy"[^}]*"same-origin"/,
+  /poweredByHeader:\s*false/,
 ]);
 
 // ----- 4. Surface-role cookie helpers ------------------------------

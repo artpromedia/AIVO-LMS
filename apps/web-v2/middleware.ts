@@ -1,10 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { buildCsp, makeNonce } from "@/lib/security/csp";
+import { checkSameOrigin } from "@/lib/bff/csrf";
 
 /**
- * Lightweight middleware: stamps every request with an x-request-id header
- * so logs across the BFF chain can be correlated. Real auth/role enforcement
- * happens inside route handlers via the guards in lib/bff/guards.ts so the
- * middleware stays runtime-cheap.
+ * Middleware responsibilities (kept runtime-cheap; auth/role enforcement
+ * stays in route handlers via lib/bff/guards.ts):
+ *  1. x-request-id stamping for log correlation across the BFF chain.
+ *  2. Content-Security-Policy with a per-request nonce (Sprint A3,
+ *     ZAP #65/#73) — Next nonces its own inline scripts from the CSP
+ *     request header per the official guide.
+ *  3. Central CSRF same-origin verification for every mutating /api/bff
+ *     request (Sprint A3) — new BFF routes are covered by default.
+ *  4. Dev-only surface blocking + /admin topology redirects (unchanged).
  */
 // Dev-only surfaces (component gallery, render harnesses, lesson-player
 // fixtures) that ship in the route tree but must never be reachable in
@@ -38,16 +45,47 @@ export function middleware(req: NextRequest) {
     }
   }
 
+  // CSRF — every mutating BFF request must prove same-origin (the report
+  // endpoint is exempt: browsers POST CSP violation reports without
+  // fetch-metadata same-origin semantics on some engines).
+  if (pathname.startsWith("/api/bff/") && pathname !== "/api/bff/csp-report") {
+    const verdict = checkSameOrigin(req);
+    if (!verdict.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            code: "CSRF_REJECTED",
+            message: "Cross-origin state-changing requests are not allowed.",
+          },
+        },
+        { status: 403 },
+      );
+    }
+  }
+
   const requestId =
     req.headers.get("x-request-id") ??
     (typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
 
-  const res = NextResponse.next({
-    request: { headers: new Headers(req.headers) },
+  const nonce = makeNonce();
+  const csp = buildCsp({
+    nonce,
+    isProd: process.env.NODE_ENV === "production",
+    sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    reportPath: "/api/bff/csp-report",
   });
+
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-nonce", nonce);
+  // Next reads the nonce for its own inline scripts from the request CSP.
+  requestHeaders.set("content-security-policy", csp);
+
+  const res = NextResponse.next({ request: { headers: requestHeaders } });
   res.headers.set("x-request-id", requestId);
+  res.headers.set("content-security-policy", csp);
   return res;
 }
 

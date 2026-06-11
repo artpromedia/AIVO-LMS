@@ -1,0 +1,8 @@
+# AIVO learner/parent app — application surfaces are private; only the
+# public landing should be indexed. Marketing content lives on the
+# marketing site, which carries its own robots + sitemap.
+User-agent: *
+Allow: /$
+Allow: /login
+Allow: /signup
+Disallow: /

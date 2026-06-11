@@ -144,12 +144,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         {/* Satoshi Variable from Fontshare — used as the display face
             across the marketing site. Falls through to Inter while loading. */}
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="" />
-        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800,900&display=swap"
-        />
+        <link rel="stylesheet" href="/fonts/satoshi.css" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

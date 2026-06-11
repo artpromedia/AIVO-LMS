@@ -15,6 +15,13 @@ const SECURITY_HEADERS = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
   },
+  // Sprint A3 (ZAP #65/#73): cross-origin isolation headers. COEP is left
+  // unset deliberately — the learner surfaces embed cross-origin media
+  // (TTS audio, lesson images from the asset CDN) that do not send CORP
+  // headers, and require-corp would hard-break them for no isolation win
+  // we currently need (no SharedArrayBuffer use).
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   ...(isProd
     ? [
         {
@@ -28,6 +35,8 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  // ZAP #65/#73 "Server Leaks Information via X-Powered-By".
+  poweredByHeader: false,
   allowedDevOrigins: [
     "*.replit.dev",
     "*.replit.app",

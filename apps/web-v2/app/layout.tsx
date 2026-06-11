@@ -94,18 +94,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       data-brand="inclusive-warm"
     >
       <head>
-        {/* Satoshi Variable from Fontshare — the AIVO display face.
-            Defined as the first family in `--aivo-typography-fontFamily-display`
-            and in the `[data-role-theme="learner"]` font stack. Falls through to
-            Inter (loaded above via next/font) while Satoshi streams. Mirrors
-            the marketing app's setup so both surfaces render the same
-            headline aesthetic. */}
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="" />
-        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
+        {/* Satoshi — the AIVO display face, self-hosted (Sprint A3) so the
+            app serves no third-party style/font origin and CSP stays
+            'self'-only. Weights 300–900 live in public/fonts (ITF license,
+            see SATOSHI-LICENSE.txt). Falls through to Inter (next/font)
+            while Satoshi streams. */}
         <link
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800,900&display=swap"
+          rel="preload"
+          href="/fonts/satoshi-700.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
         />
+        <link rel="stylesheet" href="/fonts/satoshi.css" />
       </head>
       <body
         data-age-mode="spark"

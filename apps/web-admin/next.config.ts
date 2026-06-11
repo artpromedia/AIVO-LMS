@@ -13,6 +13,11 @@ const SECURITY_HEADERS = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-DNS-Prefetch-Control", value: "off" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  // Sprint A3 (ZAP #65): cross-origin isolation headers. COEP intentionally
+  // unset — the admin console loads cross-origin tenant logos/avatars that
+  // do not send CORP, and we have no SharedArrayBuffer need.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   ...(isProd
     ? [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" }]
     : []),
@@ -21,6 +26,8 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  // ZAP #65 "Server Leaks Information via X-Powered-By".
+  poweredByHeader: false,
   transpilePackages: ["@aivo/admin-api", "@aivo/admin-auth", "@aivo/admin-ui", "@aivo/observability"],
   typedRoutes: false,
   devIndicators: false,
