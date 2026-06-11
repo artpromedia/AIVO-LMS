@@ -168,8 +168,10 @@ export function buildDraftPack(input: {
     title: `[DRAFT] CCSS ${input.subject.toUpperCase()} Grade ${input.gradeBand} — generated ${input.generator} scaffolds`,
     version: "0.1.0",
     schemaVersion: 1,
-    subject: input.subject,
-    gradeBand: input.gradeBand,
+    // Catalogue keys are plain strings; callers run validateContentPack()
+    // on the result, which rejects unknown subject/gradeBand values.
+    subject: input.subject as ContentPack["subject"],
+    gradeBand: input.gradeBand as ContentPack["gradeBand"],
     skillGraphRefs: skillGraphRefsFor(input.skills),
     publisher: { name: "AIVO Draft Generator (Wave D)" },
     license: "CC BY 3.0 US (standards text); activities pending review",
