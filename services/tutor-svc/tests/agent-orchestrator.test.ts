@@ -414,7 +414,7 @@ describe("domain tools (S10)", () => {
 });
 
 describe("write tools (S11): offering + per-session caps", () => {
-  function makeWriteHarness(initialWrites: { evidence: number; proposals: number }) {
+  function makeWriteHarness(initialWrites: { evidence: number; proposals: number; memories: number }) {
     const h = makeHarness({ writes: initialWrites });
     const writeCalls: string[] = [];
     const orchestrator = new AgentOrchestrator({
@@ -456,7 +456,7 @@ describe("write tools (S11): offering + per-session caps", () => {
   }
 
   it("offers write tools when wired, executes them, and persists the count", async () => {
-    const { h, orchestrator, writeCalls } = makeWriteHarness({ evidence: 0, proposals: 0 });
+    const { h, orchestrator, writeCalls } = makeWriteHarness({ evidence: 0, proposals: 0, memories: 0 });
     const result = await orchestrator.runTurn({
       sessionId: SESSION,
       learnerId: LEARNER,
@@ -473,7 +473,7 @@ describe("write tools (S11): offering + per-session caps", () => {
   });
 
   it("refuses past the evidence cap without calling the executor", async () => {
-    const { orchestrator, writeCalls, h } = makeWriteHarness({ evidence: 5, proposals: 0 });
+    const { orchestrator, writeCalls, h } = makeWriteHarness({ evidence: 5, proposals: 0, memories: 0 });
     await orchestrator.runTurn({
       sessionId: SESSION,
       learnerId: LEARNER,

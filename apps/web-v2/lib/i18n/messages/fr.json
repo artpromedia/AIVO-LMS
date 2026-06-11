@@ -723,6 +723,18 @@
       "status_declined": "Refusé — rien ne change.",
       "status_failed": "Approuvé, mais l'application a échoué — notre équipe est prévenue.",
       "history": "Décisions récentes ({count})"
+    },
+    "tutor_memories": {
+      "title": "Ce que retient ton tuteur",
+      "description": "De petites notes que les tuteurs IA conservent pour rendre les prochaines séances plus douces et plus efficaces. Vous pouvez en supprimer à tout moment, et chacune expire automatiquement après 180 jours.",
+      "empty": "Rien de mémorisé pour l'instant. Les notes apparaîtront ici quand un tuteur en enregistrera une.",
+      "kind_strategy_preference": "Ce qui aide",
+      "kind_interest": "Centre d'intérêt",
+      "kind_trigger": "Aborder avec douceur",
+      "kind_win": "Une réussite",
+      "expires": "Expire le {date}",
+      "delete": "Supprimer",
+      "delete_label": "Supprimer ce souvenir"
     }
   },
   "brain_clone": {

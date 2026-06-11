@@ -723,6 +723,18 @@
       "status_declined": "Recusado — nada muda.",
       "status_failed": "Aprovado, mas a aplicação falhou — nossa equipe foi notificada.",
       "history": "Decisões recentes ({count})"
+    },
+    "tutor_memories": {
+      "title": "O que o seu tutor lembra",
+      "description": "Pequenas notas que os tutores de IA guardam para tornar as próximas sessões mais gentis e eficazes. Você pode apagar qualquer uma, e cada uma expira automaticamente após 180 dias.",
+      "empty": "Nada lembrado ainda. As notas aparecerão aqui quando um tutor salvar uma.",
+      "kind_strategy_preference": "O que ajuda",
+      "kind_interest": "Interesse",
+      "kind_trigger": "Abordar com cuidado",
+      "kind_win": "Uma conquista",
+      "expires": "Expira em {date}",
+      "delete": "Apagar",
+      "delete_label": "Apagar esta lembrança"
     }
   },
   "brain_clone": {

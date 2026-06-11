@@ -12,12 +12,13 @@
  * model turn is invoked over the shared X-Internal-Auth contract.
  */
 import type { FastifyInstance } from "fastify";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, gt } from "drizzle-orm";
 import {
   gradebookEntries,
   tutorSessions,
   tutorDecisionTraces,
   tutorSessionEvidence,
+  tutorMemories,
 } from "@aivo/db";
 import { createLogger } from "@aivo/observability";
 import type { TutorFunctioningLevel } from "@aivo/tutor-sdk";
@@ -32,6 +33,7 @@ import {
 } from "../agent/orchestrator.js";
 import { executeDomainTool } from "../agent/tools.js";
 import { executeWriteTool, type WriteToolDeps } from "../agent/write-tools.js";
+import { executeRememberTool, type MemoryDeps } from "../agent/memory.js";
 import { getTutorDefinition } from "../modes/registry.js";
 import { negotiateFunctioningLevel } from "../lib/learnerContext.js";
 import { resolveTenantIdForLearner } from "../lib/tenant.js";
@@ -42,6 +44,8 @@ import {
   agentSessionOpenSchema,
   agentSessionTurnSchema,
   agentSessionCloseSchema,
+  agentMemoriesListSchema,
+  agentMemoryDeleteSchema,
 } from "./schemas.js";
 
 const logger = createLogger("tutor-svc.agent-routes");
@@ -219,6 +223,45 @@ export function makeWriteToolDeps(db: any): WriteToolDeps {
   };
 }
 
+/** Drizzle-backed memory deps (S12). */
+export function makeMemoryDeps(db: any): MemoryDeps {
+  return {
+    async insertMemory(input) {
+      await db.insert(tutorMemories).values({
+        tenantId: input.tenantId,
+        learnerId: input.learnerId,
+        tutorKey: input.tutorKey,
+        kind: input.kind,
+        content: input.content,
+        sourceSessionId: input.sessionId,
+        expiresAt: input.expiresAt,
+      });
+    },
+    async listMemories(input) {
+      const rows = await db
+        .select()
+        .from(tutorMemories)
+        .where(
+          and(
+            eq(tutorMemories.tenantId, input.tenantId),
+            eq(tutorMemories.learnerId, input.learnerId),
+            eq(tutorMemories.tutorKey, input.tutorKey),
+            gt(tutorMemories.expiresAt, new Date()),
+          ),
+        )
+        .orderBy(desc(tutorMemories.createdAt))
+        .limit(input.k);
+      return rows as Array<{
+        id: string;
+        kind: string;
+        content: string;
+        createdAt: Date;
+        expiresAt: Date;
+      }>;
+    },
+  };
+}
+
 async function defaultFetchBrainContext(learnerId: string): Promise<Record<string, unknown>> {
   const BRAIN_SVC_URL = process.env.BRAIN_SVC_URL ?? "http://localhost:3002";
   try {
@@ -308,6 +351,12 @@ export function registerAgentSessionRoutes(
     runWriteTool:
       depOverrides.runWriteTool ??
       ((name, args, ctx) => executeWriteTool(name, args, ctx, makeWriteToolDeps(db))),
+    // Wave E (S12): episodic memory — write + top-k retrieval.
+    runMemoryTool:
+      depOverrides.runMemoryTool ??
+      ((args, ctx) => executeRememberTool(args, ctx, makeMemoryDeps(db))),
+    retrieveMemories:
+      depOverrides.retrieveMemories ?? ((input) => makeMemoryDeps(db).listMemories(input)),
     onRungDrop: depOverrides.onRungDrop,
     now: depOverrides.now,
   };
@@ -363,11 +412,15 @@ export function registerAgentSessionRoutes(
       (typeof body.gradeBand === "string" && body.gradeBand) ||
       "3";
     const lessonRunId = typeof body.lessonRunId === "string" ? body.lessonRunId : null;
+    // S12: the BFF asserts ai_personalization consent before opening and
+    // declares it here. Fail-closed: absent → no memory reads or writes.
+    const consents = (body.consents ?? {}) as Record<string, unknown>;
     const agentState = initialAgentState({
       tutorKey,
       negotiatedLevel: negotiated,
       deliveryLevel,
       lessonRunId,
+      aiPersonalizationConsent: consents.aiPersonalization === true,
     });
 
     const [session] = await db
@@ -518,4 +571,53 @@ export function registerAgentSessionRoutes(
     });
     return { status: "closed", sessionId, durationSeconds, parentNote };
   });
+
+  // ── S12: parent-facing memory surface (BFF-guarded) ────────────────────
+  // GET    /api/tutor/agent/memories/:learnerId      — list unexpired rows
+  // DELETE /api/tutor/agent/memories/:learnerId/:id  — parent delete
+  app.get(
+    "/api/tutor/agent/memories/:learnerId",
+    { schema: agentMemoriesListSchema },
+    async (request) => {
+      const { learnerId } = request.params as { learnerId: string };
+      const rows = await db
+        .select()
+        .from(tutorMemories)
+        .where(
+          and(eq(tutorMemories.learnerId, learnerId), gt(tutorMemories.expiresAt, new Date())),
+        )
+        .orderBy(desc(tutorMemories.createdAt))
+        .limit(100);
+      return {
+        memories: (rows as Array<Record<string, unknown>>).map((r) => ({
+          id: r.id,
+          tutorKey: r.tutorKey,
+          kind: r.kind,
+          content: r.content,
+          createdAt: r.createdAt,
+          expiresAt: r.expiresAt,
+        })),
+      };
+    },
+  );
+
+  app.delete(
+    "/api/tutor/agent/memories/:learnerId/:memoryId",
+    { schema: agentMemoryDeleteSchema },
+    async (request, reply) => {
+      const { learnerId, memoryId } = request.params as {
+        learnerId: string;
+        memoryId: string;
+      };
+      const deleted = await db
+        .delete(tutorMemories)
+        .where(and(eq(tutorMemories.id, memoryId), eq(tutorMemories.learnerId, learnerId)))
+        .returning({ id: tutorMemories.id });
+      if (!deleted || deleted.length === 0) {
+        return reply.code(404).send({ error: "Memory not found" });
+      }
+      logger.info("tutor memory deleted by guardian surface", { learnerId, memoryId });
+      return { deleted: true, id: memoryId };
+    },
+  );
 }

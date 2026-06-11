@@ -14,6 +14,9 @@ import {
   learningPaths,
   gradebookEntries,
   tutorSessions,
+  tutorDecisionTraces,
+  tutorSessionEvidence,
+  tutorMemories,
 } from "@aivo/db";
 import { eq } from "drizzle-orm";
 
@@ -35,6 +38,23 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
         .from(lessonRuns)
         .where(eq(lessonRuns.learnerId, uid));
       const runIds = runRows.map((r: { id: string }) => r.id);
+
+      // Wave E (S9-S12): agent child tables reference tutor_sessions by FK —
+      // they must go first or the tutor_sessions delete violates constraints.
+      const [traces, evidence, memories] = await Promise.all([
+        db
+          .delete(tutorDecisionTraces)
+          .where(eq(tutorDecisionTraces.learnerId, uid))
+          .returning({ id: tutorDecisionTraces.id }),
+        db
+          .delete(tutorSessionEvidence)
+          .where(eq(tutorSessionEvidence.learnerId, uid))
+          .returning({ id: tutorSessionEvidence.id }),
+        db
+          .delete(tutorMemories)
+          .where(eq(tutorMemories.learnerId, uid))
+          .returning({ id: tutorMemories.id }),
+      ]);
 
       const [interactions, summaries, plans, runs, sessions, paths, gradebook, tutorSess] =
         await Promise.all([
@@ -92,6 +112,9 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
           learning_paths: paths.length,
           gradebook_entries: gradebook.length,
           tutor_sessions: tutorSess.length,
+          tutor_decision_traces: traces.length,
+          tutor_session_evidence: evidence.length,
+          tutor_memories: memories.length,
         },
       };
     },
@@ -100,13 +123,16 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
       if (!db) return { counts: {}, bundle: {} };
       const uid = req.subjectId;
 
-      const [runs, sessions, paths, gradebook, tutorSess] = await Promise.all([
-        db.select().from(lessonRuns).where(eq(lessonRuns.learnerId, uid)),
-        db.select().from(lessonSessions).where(eq(lessonSessions.learnerId, uid)),
-        db.select().from(learningPaths).where(eq(learningPaths.learnerId, uid)),
-        db.select().from(gradebookEntries).where(eq(gradebookEntries.learnerId, uid)),
-        db.select().from(tutorSessions).where(eq(tutorSessions.learnerId, uid)),
-      ]);
+      const [runs, sessions, paths, gradebook, tutorSess, evidence, memories] =
+        await Promise.all([
+          db.select().from(lessonRuns).where(eq(lessonRuns.learnerId, uid)),
+          db.select().from(lessonSessions).where(eq(lessonSessions.learnerId, uid)),
+          db.select().from(learningPaths).where(eq(learningPaths.learnerId, uid)),
+          db.select().from(gradebookEntries).where(eq(gradebookEntries.learnerId, uid)),
+          db.select().from(tutorSessions).where(eq(tutorSessions.learnerId, uid)),
+          db.select().from(tutorSessionEvidence).where(eq(tutorSessionEvidence.learnerId, uid)),
+          db.select().from(tutorMemories).where(eq(tutorMemories.learnerId, uid)),
+        ]);
 
       return {
         counts: {
@@ -115,6 +141,8 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
           learning_paths: paths.length,
           gradebook_entries: gradebook.length,
           tutor_sessions: tutorSess.length,
+          tutor_session_evidence: evidence.length,
+          tutor_memories: memories.length,
         },
         bundle: {
           lesson_runs: runs,
@@ -122,6 +150,8 @@ export function registerGovernanceRoutes(app: FastifyInstance, db: any): void {
           learning_paths: paths,
           gradebook_entries: gradebook,
           tutor_sessions: tutorSess,
+          tutor_session_evidence: evidence,
+          tutor_memories: memories,
         },
       };
     },

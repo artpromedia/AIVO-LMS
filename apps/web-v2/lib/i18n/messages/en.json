@@ -916,6 +916,18 @@
       "status_declined": "Declined — nothing changes.",
       "status_failed": "Approved, but applying failed — our team has been notified.",
       "history": "Recent decisions ({count})"
+    },
+    "tutor_memories": {
+      "title": "What your tutor remembers",
+      "description": "Small notes the AI tutors keep to make future sessions kinder and more effective. You can delete any of them, and each one expires automatically after 180 days.",
+      "empty": "Nothing remembered yet. Notes will appear here when a tutor saves one.",
+      "kind_strategy_preference": "What helps",
+      "kind_interest": "Interest",
+      "kind_trigger": "Approach gently",
+      "kind_win": "A win",
+      "expires": "Expires {date}",
+      "delete": "Delete",
+      "delete_label": "Delete this memory"
     }
   },
   "brain_clone": {

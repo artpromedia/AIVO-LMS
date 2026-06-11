@@ -126,7 +126,7 @@ for (const key of CANONICAL_TUTORS) {
     // loop and fails parity red.
     const hasToolset = /toolset:\s*\[[\s\S]*?"[\w_]+"/.test(src);
     const hasActionPolicy = /actionPolicy:\s*standardActionPolicy\(|actionPolicy:\s*\{/.test(src);
-    const hasMemoryPolicy = /memoryPolicy:\s*(NO_MEMORY|\{)/.test(src);
+    const hasMemoryPolicy = /memoryPolicy:\s*(NO_MEMORY|STANDARD_MEMORY|\{)/.test(src);
     modePerTutor.set(key, {
       file: modeFile,
       personaKey: k?.[1] ?? null,

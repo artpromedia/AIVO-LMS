@@ -22,6 +22,7 @@ import { getLearner, parentCanAccessLearner, refreshLearnerReadiness } from "@/l
 import { READINESS_LABEL, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
 import { WhatsWorkingPanel } from "@/components/parent/whats-working-panel";
 import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
+import { TutorMemoryCard } from "@/components/parent/tutor-memory-card";
 import { CalmSummaryCard } from "./calm-summary-card";
 
 export default async function LearnerDetailPage({
@@ -102,6 +103,8 @@ export default async function LearnerDetailPage({
         tenantId={session.tenantId}
         learnerName={learner.displayName}
       />
+
+      <TutorMemoryCard learnerId={learner.id} />
 
       <SectionHeader title={t("explore")} />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

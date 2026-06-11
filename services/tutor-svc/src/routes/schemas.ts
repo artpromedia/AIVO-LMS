@@ -540,3 +540,29 @@ export const agentSessionCloseSchema = {
   body: passthroughObject,
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
+
+export const agentMemoriesListSchema = {
+  tags: ["Tutor Agent"],
+  operationId: "tutorAgentMemoriesList",
+  summary: "GET /api/tutor/agent/memories/:learnerId",
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
+  response: { 200: passthroughObject },
+} as const;
+
+export const agentMemoryDeleteSchema = {
+  tags: ["Tutor Agent"],
+  operationId: "tutorAgentMemoryDelete",
+  summary: "DELETE /api/tutor/agent/memories/:learnerId/:memoryId",
+  params: {
+    type: "object",
+    required: ["learnerId", "memoryId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" }, memoryId: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 404: errorResponse },
+} as const;

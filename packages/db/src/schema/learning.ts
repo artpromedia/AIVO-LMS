@@ -192,6 +192,29 @@ export const tutorSessionEvidence = pgTable("tutor_session_evidence", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+/**
+ * Wave E (S12): consent-gated episodic tutor memory. Every row is
+ * parent-visible (and parent-deletable), written only behind
+ * ai_personalization consent with <=2 writes/session, kinds restricted by
+ * the tutor's memoryPolicy, expires after 180 days (admin-svc purge), and
+ * is erased with the learner via the ADR-0034 governance subscriber.
+ */
+export const tutorMemories = pgTable("tutor_memories", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  tutorKey: varchar("tutor_key", { length: 32 }).notNull(),
+  kind: varchar("kind", { length: 30 }).notNull(),
+  content: text("content").notNull(),
+  sourceSessionId: uuid("source_session_id").references(() => tutorSessions.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
 export const tokenUsage = pgTable("token_usage", {
   id: uuid("id").defaultRandom().primaryKey(),
   tenantId: uuid("tenant_id")

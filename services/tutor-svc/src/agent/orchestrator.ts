@@ -40,6 +40,7 @@ import { createLogger } from "@aivo/observability";
 import { createHash } from "node:crypto";
 import { DOMAIN_TOOL_SCHEMAS } from "./tools.js";
 import { WRITE_TOOL_SCHEMAS } from "./write-tools.js";
+import { MEMORY_TOP_K, REMEMBER_TOOL_SCHEMA, renderMemoryContext } from "./memory.js";
 
 const logger = createLogger("tutor-svc.agent");
 
@@ -91,7 +92,10 @@ export interface AgentSessionState {
   deliveryLevel: string;
   lessonRunId: string | null;
   /** Wave E (S11): per-session write-tool usage (caps enforced here). */
-  writes: { evidence: number; proposals: number };
+  writes: { evidence: number; proposals: number; memories: number };
+  /** Wave E (S12): consent facts recorded at open (BFF-guarded). Memory
+   *  reads/writes are refused without ai_personalization. */
+  consent: { aiPersonalization: boolean };
 }
 
 /** The validated agent action, as returned by ai-svc (snake_case wire). */
@@ -190,6 +194,25 @@ export interface OrchestratorDeps {
       observation: LessonObservation;
     },
   ): Promise<Record<string, unknown>>;
+  /** Wave E (S12): the `remember` executor. `allowedKinds` carries the
+   *  tutor's declared memoryPolicy.kinds for the kind gate. */
+  runMemoryTool?(
+    args: Record<string, unknown>,
+    ctx: {
+      tenantId: string;
+      sessionId: string;
+      learnerId: string;
+      tutorKey: string;
+      allowedKinds: readonly string[];
+    },
+  ): Promise<Record<string, unknown>>;
+  /** Wave E (S12): top-k unexpired memory retrieval for the turn context. */
+  retrieveMemories?(input: {
+    tenantId: string;
+    learnerId: string;
+    tutorKey: string;
+    k: number;
+  }): Promise<Array<{ kind: string; content: string }>>;
   onRungDrop?(sessionId: string, drop: RungDrop): void;
   now?(): number;
 }
@@ -230,7 +253,12 @@ export const WRITE_TOOLS: ReadonlySet<AgentToolId> = new Set([
 ] as AgentToolId[]);
 
 /** Per-session write caps (bounded agency — see agent/write-tools.ts). */
-export const WRITE_CAPS = { evidence: 5, proposals: 1 } as const;
+export const WRITE_CAPS = { evidence: 5, proposals: 1, memories: 2 } as const;
+
+/** The memory tool id (Wave E S12) — offered only when the tutor's
+ *  memoryPolicy allows it, a memory executor is wired, AND the session
+ *  carries ai_personalization consent. */
+export const MEMORY_TOOL: AgentToolId = "remember" as AgentToolId;
 
 const TOOL_SCHEMAS: Record<string, { description: string; parameters: Record<string, unknown> }> = {
   get_learner_snapshot: {
@@ -294,6 +322,8 @@ export function initialAgentState(input: {
   negotiatedLevel: TutorFunctioningLevel;
   deliveryLevel: string;
   lessonRunId: string | null;
+  /** S12: recorded at open; the BFF only opens behind the consent guard. */
+  aiPersonalizationConsent?: boolean;
 }): AgentSessionState {
   return {
     seq: 0,
@@ -303,7 +333,8 @@ export function initialAgentState(input: {
     negotiatedLevel: input.negotiatedLevel,
     deliveryLevel: input.deliveryLevel,
     lessonRunId: input.lessonRunId,
-    writes: { evidence: 0, proposals: 0 },
+    writes: { evidence: 0, proposals: 0, memories: 0 },
+    consent: { aiPersonalization: input.aiPersonalizationConsent ?? false },
   };
 }
 
@@ -331,8 +362,15 @@ function parseAgentState(raw: unknown, fallbackTutorKey: string): AgentSessionSt
       s.writes &&
       typeof s.writes.evidence === "number" &&
       typeof s.writes.proposals === "number"
-        ? { evidence: Math.max(0, s.writes.evidence), proposals: Math.max(0, s.writes.proposals) }
+        ? {
+            evidence: Math.max(0, s.writes.evidence),
+            proposals: Math.max(0, s.writes.proposals),
+            memories: Math.max(0, typeof s.writes.memories === "number" ? s.writes.memories : 0),
+          }
         : base.writes,
+    consent: {
+      aiPersonalization: s.consent?.aiPersonalization === true,
+    },
   };
 }
 
@@ -541,11 +579,17 @@ export class AgentOrchestrator {
     const allowedActions: readonly AgentActionKind[] = def.actionPolicy[
       state.negotiatedLevel
     ] ?? ["advance", "switch_modality", "offer_break", "end_early", "present_surface"];
+    // S12: memory is offered only with policy + executor + consent aligned.
+    const memoryEnabled =
+      def.memoryPolicy.canRemember === true &&
+      Boolean(this.deps.runMemoryTool) &&
+      state.consent.aiPersonalization === true;
     const offeredTools = def.toolset.filter(
       (t) =>
         READ_TOOLS.has(t) ||
         (DOMAIN_TOOLS.has(t) && Boolean(this.deps.runDomainTool)) ||
-        (WRITE_TOOLS.has(t) && Boolean(this.deps.runWriteTool)),
+        (WRITE_TOOLS.has(t) && Boolean(this.deps.runWriteTool)) ||
+        (t === MEMORY_TOOL && memoryEnabled),
     );
     let brain = (session.brainContext ?? {}) as Record<string, unknown>;
     const subject = String(def.subjects[0] ?? "math");
@@ -573,13 +617,38 @@ export class AgentOrchestrator {
     const gradeBand =
       typeof brain.grade_band === "string" ? (brain.grade_band as string) : undefined;
     const focus = (brain as { curriculum_focus?: { title?: unknown } }).curriculum_focus;
-    const personaContext = buildPersonaContext({
+    let personaContext = buildPersonaContext({
       def,
       negotiatedLevel: state.negotiatedLevel,
       deliveryLevel: state.deliveryLevel,
       gradeBand,
       curriculumFocusTitle: typeof focus?.title === "string" ? focus.title : undefined,
     });
+
+    // S12: retrieval — top-k unexpired memories ride into the context as a
+    // compact block. Read side shares the same consent + policy gate.
+    if (memoryEnabled && this.deps.retrieveMemories) {
+      try {
+        const rows = await this.deps.retrieveMemories({
+          tenantId: session.tenantId,
+          learnerId: session.learnerId,
+          tutorKey: state.tutorKey,
+          k: MEMORY_TOP_K,
+        });
+        const block = renderMemoryContext(
+          rows.map((r) => ({
+            id: "",
+            kind: r.kind,
+            content: r.content,
+            createdAt: "",
+            expiresAt: "",
+          })),
+        );
+        if (block) personaContext = `${personaContext}\n\n${block}`;
+      } catch {
+        // Memory retrieval is enrichment — a miss never blocks the turn.
+      }
+    }
 
     // 4. Model loop with tool roundtrips (caps mirrored on the ai-svc side).
     let aiResult: AiTurnResult | null = null;
@@ -596,7 +665,9 @@ export class AgentOrchestrator {
           allowed_actions: [...allowedActions],
           allowed_tools: offeredTools.map((name) => ({
             name,
-            ...(TOOL_SCHEMAS[name] ?? DOMAIN_TOOL_SCHEMAS[name] ?? WRITE_TOOL_SCHEMAS[name]),
+            ...(name === MEMORY_TOOL
+              ? REMEMBER_TOOL_SCHEMA
+              : (TOOL_SCHEMAS[name] ?? DOMAIN_TOOL_SCHEMAS[name] ?? WRITE_TOOL_SCHEMAS[name])),
           })),
           tool_results: toolResults,
           roundtrip,
@@ -634,6 +705,7 @@ export class AgentOrchestrator {
             brain,
             observation: input.observation,
             state,
+            def,
           }),
         });
       }
@@ -692,6 +764,7 @@ export class AgentOrchestrator {
       brain: Record<string, unknown>;
       observation: LessonObservation;
       state: AgentSessionState;
+      def: TutorDefinition;
     },
   ): Promise<Record<string, unknown>> {
     try {
@@ -728,6 +801,31 @@ export class AgentOrchestrator {
               learnerId: ctx.learnerId,
               observation: ctx.observation,
             });
+          }
+          // Wave E (S12): the memory tool — consent + policy + cap gated.
+          if (name === MEMORY_TOOL && this.deps.runMemoryTool) {
+            if (ctx.state.consent.aiPersonalization !== true) {
+              return { error: "memory requires ai_personalization consent" };
+            }
+            if (ctx.def.memoryPolicy.canRemember !== true) {
+              return { error: "this tutor's memory policy does not allow remembering" };
+            }
+            if (ctx.state.writes.memories >= WRITE_CAPS.memories) {
+              return {
+                error: `memory cap reached (${WRITE_CAPS.memories}/session) — decide without writing more`,
+              };
+            }
+            const result = await this.deps.runMemoryTool(args, {
+              tenantId: ctx.tenantId,
+              sessionId: ctx.sessionId,
+              learnerId: ctx.learnerId,
+              tutorKey: ctx.tutorKey,
+              allowedKinds: ctx.def.memoryPolicy.kinds,
+            });
+            if (!result.error && result.remembered === true) {
+              ctx.state.writes.memories += 1;
+            }
+            return result;
           }
           // Wave E (S11): write tools — per-session caps enforced HERE so
           // the cap survives stateless turns via agent_state.writes.

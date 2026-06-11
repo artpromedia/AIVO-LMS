@@ -723,6 +723,18 @@
       "status_declined": "거절됨 — 변경 사항 없음.",
       "status_failed": "승인되었지만 적용에 실패했습니다 — 팀에 알렸습니다.",
       "history": "최근 결정 ({count})"
+    },
+    "tutor_memories": {
+      "title": "튜터가 기억하는 것",
+      "description": "다음 수업을 더 따뜻하고 효과적으로 만들기 위해 AI 튜터가 보관하는 짧은 메모입니다. 언제든 삭제할 수 있으며, 각 메모는 180일 후 자동으로 만료됩니다.",
+      "empty": "아직 기억된 것이 없어요. 튜터가 메모를 저장하면 여기에 표시됩니다.",
+      "kind_strategy_preference": "도움이 되는 것",
+      "kind_interest": "관심사",
+      "kind_trigger": "부드럽게 다가가기",
+      "kind_win": "잘한 일",
+      "expires": "{date} 만료",
+      "delete": "삭제",
+      "delete_label": "이 기억 삭제"
     }
   },
   "brain_clone": {

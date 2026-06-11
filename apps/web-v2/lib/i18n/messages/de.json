@@ -723,6 +723,18 @@
       "status_declined": "Abgelehnt — nichts ändert sich.",
       "status_failed": "Genehmigt, aber Anwendung fehlgeschlagen — unser Team wurde informiert.",
       "history": "Letzte Entscheidungen ({count})"
+    },
+    "tutor_memories": {
+      "title": "Was sich dein Tutor merkt",
+      "description": "Kleine Notizen, die die KI-Tutoren behalten, damit künftige Sitzungen freundlicher und wirksamer werden. Sie können jede löschen, und jede läuft nach 180 Tagen automatisch ab.",
+      "empty": "Noch nichts gemerkt. Notizen erscheinen hier, sobald ein Tutor eine speichert.",
+      "kind_strategy_preference": "Was hilft",
+      "kind_interest": "Interesse",
+      "kind_trigger": "Behutsam angehen",
+      "kind_win": "Ein Erfolg",
+      "expires": "Läuft ab am {date}",
+      "delete": "Löschen",
+      "delete_label": "Diese Erinnerung löschen"
     }
   },
   "brain_clone": {

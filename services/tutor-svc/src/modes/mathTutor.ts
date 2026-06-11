@@ -12,7 +12,7 @@
  */
 import {
   defineTutor,
-  NO_MEMORY,
+  STANDARD_MEMORY,
   standardActionPolicy,
   type TutorDefinition,
 } from "@aivo/tutor-sdk";
@@ -59,9 +59,11 @@ export const mathTutor: TutorDefinition = defineTutor({
     "read_math_work",
     "file_evidence",
     "propose_recommendation",
+    "remember",
   ],
   actionPolicy: standardActionPolicy(),
-  memoryPolicy: NO_MEMORY,
+  // S12: memory-onboarded pilot — consent-gated episodic memory.
+  memoryPolicy: STANDARD_MEMORY,
   policy: {
     // `voice_out` is declared, so consent is required per the SDK
     // validator (`policy_consent_required_for_voice`). The runtime

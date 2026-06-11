@@ -51,6 +51,7 @@ import { startWatchdog, configureWatchdogAlerts } from "./lib/watchdog.js";
 import { runJanitorOnce } from "./lib/janitor.js";
 import { runAuditRetentionOnce } from "./lib/audit-retention.js";
 import { runPacingAdvanceOnce } from "./lib/pacing-advance.js";
+import { runMemoryExpiryOnce } from "./lib/memory-expiry.js";
 
 const logger = createLogger("admin-svc");
 const PORT = parseInt(process.env.ADMIN_SVC_PORT || "3013", 10);
@@ -168,10 +169,20 @@ async function start() {
     log: logger,
     run: () => runPacingAdvanceOnce(db),
   });
+  // Wave E (S12): tutor-memory retention — purge rows past expires_at
+  // (180-day TTL) so consent-gated memories never outlive their window.
+  const memoryExpiryHandle = startSafeCron({
+    jobName: "tutor.memory-expiry",
+    ledger,
+    lock,
+    log: logger,
+    run: () => runMemoryExpiryOnce(db),
+  });
   handles["admin.soc2-evidence"] = evidenceHandle;
   handles["admin.run-history-janitor"] = janitorHandle;
   handles["admin.audit-retention"] = retentionHandle;
   handles["curriculum.pacing-advance"] = pacingAdvanceHandle;
+  handles["tutor.memory-expiry"] = memoryExpiryHandle;
 
   await app.listen({ port: PORT, host: "0.0.0.0" });
   logger.info(`AIVO Admin Service listening on port ${PORT}`);

@@ -49,6 +49,10 @@ export const AGENT_TOOL_IDS = [
   // that a parent/teacher must approve (cooldown + dedupe server-side).
   "file_evidence",
   "propose_recommendation",
+  // Episodic memory (Wave E S12) — consent-gated, parent-visible and
+  // parent-deletable, kinds restricted by the tutor's memoryPolicy,
+  // ≤2 writes/session, 180-day expiry.
+  "remember",
 ] as const;
 
 export type AgentToolId = (typeof AGENT_TOOL_IDS)[number];
@@ -64,10 +68,35 @@ export interface TutorMemoryPolicy {
   kinds: readonly string[];
 }
 
-/** Until the memory store ships (S12), every tutor declares no-memory. */
+/** Tutors that do not write episodic memory declare NO_MEMORY. */
 export const NO_MEMORY: TutorMemoryPolicy = Object.freeze({
   canRemember: false,
   kinds: Object.freeze([]) as readonly string[],
+});
+
+/**
+ * The closed memory-kind vocabulary (Wave E S12). A tutor's
+ * `memoryPolicy.kinds` must be a subset; the orchestrator rejects writes
+ * outside the tutor's declared kinds, and every kind is phrased so a
+ * parent reading the memory card understands why it was kept.
+ */
+export const MEMORY_KINDS = [
+  /** A teaching strategy that demonstrably worked for this learner. */
+  "strategy_preference",
+  /** A safe special interest worth theming around. */
+  "interest",
+  /** A situation that reliably causes frustration — approach gently. */
+  "trigger",
+  /** A win worth celebrating again ("first independent regroup"). */
+  "win",
+] as const;
+
+export type MemoryKind = (typeof MEMORY_KINDS)[number];
+
+/** The standard policy for memory-onboarded tutors: all four kinds. */
+export const STANDARD_MEMORY: TutorMemoryPolicy = Object.freeze({
+  canRemember: true,
+  kinds: Object.freeze([...MEMORY_KINDS]) as readonly string[],
 });
 
 const ALL_ACTIONS: readonly AgentActionKind[] = AGENT_ACTION_KINDS;

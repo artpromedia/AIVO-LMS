@@ -350,7 +350,7 @@ describe("POST /api/tutor/agent/session/:sessionId/close", () => {
         negotiatedLevel: "STANDARD",
         deliveryLevel: "3",
         lessonRunId: "run-1",
-        writes: { evidence: 1, proposals: 0 },
+        writes: { evidence: 1, proposals: 0, memories: 0 },
       },
     };
     const app = makeApp({

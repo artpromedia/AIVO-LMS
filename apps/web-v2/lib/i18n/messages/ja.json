@@ -723,6 +723,18 @@
       "status_declined": "却下されました — 変更はありません。",
       "status_failed": "承認されましたが適用に失敗しました — チームに通知済みです。",
       "history": "最近の決定 ({count})"
+    },
+    "tutor_memories": {
+      "title": "チューターが覚えていること",
+      "description": "次のセッションをより優しく効果的にするために、AIチューターが保存する小さなメモです。いつでも削除でき、各メモは180日後に自動的に期限切れになります。",
+      "empty": "まだ何も覚えていません。チューターがメモを保存するとここに表示されます。",
+      "kind_strategy_preference": "役立つこと",
+      "kind_interest": "興味",
+      "kind_trigger": "やさしく接する",
+      "kind_win": "できたこと",
+      "expires": "{date} に期限切れ",
+      "delete": "削除",
+      "delete_label": "このメモを削除"
     }
   },
   "brain_clone": {

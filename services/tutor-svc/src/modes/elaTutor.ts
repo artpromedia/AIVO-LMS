@@ -9,7 +9,7 @@
  */
 import {
   defineTutor,
-  NO_MEMORY,
+  STANDARD_MEMORY,
   standardActionPolicy,
   type TutorDefinition,
 } from "@aivo/tutor-sdk";
@@ -63,9 +63,11 @@ export const elaTutor: TutorDefinition = defineTutor({
     "get_curriculum_context",
     "file_evidence",
     "propose_recommendation",
+    "remember",
   ],
   actionPolicy: standardActionPolicy(),
-  memoryPolicy: NO_MEMORY,
+  // S12: memory-onboarded pilot — consent-gated episodic memory.
+  memoryPolicy: STANDARD_MEMORY,
   policy: {
     requiresConsent: true,
     minAgeYears: 4,

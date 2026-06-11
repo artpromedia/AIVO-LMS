@@ -723,6 +723,18 @@
       "status_declined": "Rechazado — nada cambia.",
       "status_failed": "Aprobado, pero falló la aplicación — nuestro equipo fue notificado.",
       "history": "Decisiones recientes ({count})"
+    },
+    "tutor_memories": {
+      "title": "Lo que recuerda tu tutor",
+      "description": "Pequeñas notas que los tutores de IA guardan para que las próximas sesiones sean más amables y eficaces. Puedes borrar cualquiera, y cada una caduca automáticamente a los 180 días.",
+      "empty": "Aún no hay recuerdos. Las notas aparecerán aquí cuando un tutor guarde una.",
+      "kind_strategy_preference": "Lo que ayuda",
+      "kind_interest": "Interés",
+      "kind_trigger": "Tratar con cuidado",
+      "kind_win": "Un logro",
+      "expires": "Caduca el {date}",
+      "delete": "Borrar",
+      "delete_label": "Borrar este recuerdo"
     }
   },
   "brain_clone": {

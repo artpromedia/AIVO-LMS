@@ -723,6 +723,18 @@
       "status_declined": "已拒绝 — 不会有任何更改。",
       "status_failed": "已批准，但应用失败 — 已通知我们的团队。",
       "history": "最近的决定 ({count})"
+    },
+    "tutor_memories": {
+      "title": "导师记住的内容",
+      "description": "AI 导师保存的小笔记，让以后的课程更贴心、更有效。您可以删除任何一条，每条都会在 180 天后自动过期。",
+      "empty": "还没有记住任何内容。当导师保存笔记时会显示在这里。",
+      "kind_strategy_preference": "有帮助的方法",
+      "kind_interest": "兴趣",
+      "kind_trigger": "温和对待",
+      "kind_win": "一次进步",
+      "expires": "{date} 过期",
+      "delete": "删除",
+      "delete_label": "删除这条记忆"
     }
   },
   "brain_clone": {

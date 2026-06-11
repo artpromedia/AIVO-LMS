@@ -60,6 +60,10 @@ export async function tutorAgentOpen(input: {
       gradeBand: input.gradeBand ?? undefined,
       functioningLevel: input.functioningLevel ?? undefined,
       deliveryLevel: input.gradeBand ?? undefined,
+      // S12: the agent-session BFF route enforces ai_personalization via
+      // requireLearnerConsent BEFORE calling open; declare that fact so
+      // tutor-svc can gate memory reads/writes on it (fail-closed).
+      consents: { aiPersonalization: true },
     }),
   });
   if (!res.ok) {
@@ -136,6 +140,51 @@ export async function tutorAgentClose(input: AgentCloseInput): Promise<AgentClos
     closed: true,
     parentNote: typeof body.parentNote === "string" && body.parentNote ? body.parentNote : null,
   };
+}
+
+// ── S12: parent-facing episodic memory surface ──────────────────────────
+
+export interface TutorMemoryView {
+  id: string;
+  tutorKey: string;
+  kind: string;
+  content: string;
+  createdAt: string;
+  expiresAt: string;
+}
+
+export async function tutorAgentListMemories(learnerId: string): Promise<TutorMemoryView[]> {
+  const res = await fetch(
+    `${base()}/api/tutor/agent/memories/${encodeURIComponent(learnerId)}`,
+    { headers: headers(), signal: AbortSignal.timeout(serverEnv.AIVO_SERVICE_TIMEOUT_MS) },
+  );
+  if (!res.ok) throw new Error(`tutor-svc list memories failed (${res.status})`);
+  const data = (await res.json()) as { memories?: Array<Record<string, unknown>> };
+  return (data.memories ?? []).map((m) => ({
+    id: String(m.id),
+    tutorKey: String(m.tutorKey ?? ""),
+    kind: String(m.kind ?? ""),
+    content: String(m.content ?? ""),
+    createdAt: String(m.createdAt ?? ""),
+    expiresAt: String(m.expiresAt ?? ""),
+  }));
+}
+
+export async function tutorAgentDeleteMemory(
+  learnerId: string,
+  memoryId: string,
+): Promise<boolean> {
+  const res = await fetch(
+    `${base()}/api/tutor/agent/memories/${encodeURIComponent(learnerId)}/${encodeURIComponent(memoryId)}`,
+    {
+      method: "DELETE",
+      headers: headers(),
+      signal: AbortSignal.timeout(serverEnv.AIVO_SERVICE_TIMEOUT_MS),
+    },
+  );
+  if (res.status === 404) return false;
+  if (!res.ok) throw new Error(`tutor-svc delete memory failed (${res.status})`);
+  return true;
 }
 
 /** Best-effort close — a failed close must never block the lesson exit. */
