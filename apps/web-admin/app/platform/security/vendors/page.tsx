@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type VendorCategory,
   type VendorRiskTier,
@@ -13,10 +12,7 @@ import {
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Vendor action failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
   "use server";
@@ -33,7 +29,7 @@ async function createAction(formData: FormData) {
       riskTier: String(formData.get("riskTier") || "tier3") as VendorRiskTier,
     });
   } catch (error) {
-    redirect(`/platform/security/vendors?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/vendors?error=${encodeURIComponent(actionError(error, "Vendor action failed."))}`);
   }
   redirect("/platform/security/vendors?notice=Vendor%20added.");
 }
@@ -50,7 +46,7 @@ async function updateAction(formData: FormData) {
       dpaSigned: String(formData.get("dpaSigned") || "") === "on",
     });
   } catch (error) {
-    redirect(`/platform/security/vendors?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/vendors?error=${encodeURIComponent(actionError(error, "Vendor action failed."))}`);
   }
   redirect("/platform/security/vendors?notice=Vendor%20updated.");
 }

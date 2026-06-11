@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import { getWebhooks, setWebhookActive } from "@aivo/admin-api/platform-settings";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Webhook update failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function toggleAction(formData: FormData) {
   "use server";
@@ -18,7 +14,7 @@ async function toggleAction(formData: FormData) {
   try {
     await setWebhookActive(session, id, active);
   } catch (error) {
-    redirect(`/platform/settings/webhooks?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/settings/webhooks?error=${encodeURIComponent(actionError(error, "Webhook update failed."))}`);
   }
   redirect(
     `/platform/settings/webhooks?notice=${encodeURIComponent(active ? "Webhook enabled." : "Webhook disabled.")}`,

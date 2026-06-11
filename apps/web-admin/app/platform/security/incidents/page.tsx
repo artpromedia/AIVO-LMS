@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type IncidentSeverity,
   type IncidentStatus,
@@ -13,10 +12,7 @@ import {
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Incident action failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
   "use server";
@@ -34,7 +30,7 @@ async function createAction(formData: FormData) {
       regulatorNotificationRequired,
     });
   } catch (error) {
-    redirect(`/platform/security/incidents?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/incidents?error=${encodeURIComponent(actionError(error, "Incident action failed."))}`);
   }
   redirect("/platform/security/incidents?notice=Incident%20opened.");
 }
@@ -50,7 +46,7 @@ async function statusAction(formData: FormData) {
   try {
     await updateSecurityIncident(session, id, { status });
   } catch (error) {
-    redirect(`/platform/security/incidents?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/incidents?error=${encodeURIComponent(actionError(error, "Incident action failed."))}`);
   }
   redirect("/platform/security/incidents?notice=Incident%20updated.");
 }

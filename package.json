@@ -71,6 +71,7 @@
     "comms:audit": "node scripts/comms-audit.mjs",
     "ai-safety:audit": "node scripts/ai-safety-audit.mjs",
     "accessibility:audit": "node scripts/accessibility-audit.mjs",
+    "observability:audit": "node scripts/observability-audit.mjs",
     "release:gate": "node scripts/release-gate.mjs",
     "backend:parity": "node scripts/backend-parity-check.mjs",
     "tutor:parity": "node scripts/tutor-parity-check.mjs",
@@ -88,7 +89,7 @@
     "prettier": "^3.6.2",
     "tsx": "^4.19.4",
     "turbo": "^2.5.0",
-    "typescript": "^5.7.3",
+    "typescript": "5.7.3",
     "typescript-eslint": "^8.58.2",
     "vitest": "^4.1.8"
   },
@@ -118,7 +119,8 @@
       "kysely@>=0.26.0 <0.28.17": ">=0.28.17",
       "vite": "^7.3.0",
       "shell-quote@<1.8.4": ">=1.8.4",
-      "undici@<6.24.0": ">=6.24.0 <7"
+      "undici@<6.24.0": ">=6.24.0 <7",
+      "typescript": "5.7.3"
     }
   }
 }

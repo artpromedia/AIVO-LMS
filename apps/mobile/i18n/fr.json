@@ -1080,5 +1080,15 @@
       "accept": "Faire une pause calme",
       "dismiss": "Pas maintenant"
     }
+  },
+  "errorBoundary": {
+    "title": "Un problème est survenu",
+    "body": "Pas d'inquiétude — rien n'est perdu. Tu peux réessayer ou revenir à l'accueil.",
+    "tryAgain": "Réessayer",
+    "goHome": "Retour à l'accueil"
+  },
+  "configError": {
+    "title": "Cette version est mal configurée",
+    "body": "L'application ne peut pas joindre les services AIVO. Installez la dernière version depuis la boutique. Si vous gérez ce déploiement, recompilez avec l'adresse du backend définie."
   }
 }

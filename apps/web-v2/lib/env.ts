@@ -266,10 +266,26 @@ const serverSchema = z
           "web-v2 login/session round-trips to identity-svc). The localhost default is dev-only.",
       });
     }
+    // Sprint A2 — production deployments must have client-side error
+    // tracking. A broken learner session that nobody can see is the worst
+    // failure mode this platform has; the DSN is part of the launch gate.
+    if (isProd && !process.env.NEXT_PUBLIC_SENTRY_DSN && !process.env.SENTRY_DSN) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["NEXT_PUBLIC_SENTRY_DSN"],
+        message:
+          "NEXT_PUBLIC_SENTRY_DSN (or SENTRY_DSN) must be set in production — " +
+          "client-side error tracking is a launch requirement (Sprint A2).",
+      });
+    }
   });
 
 const clientSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:5000"),
+  // Optional in dev/test; production presence is enforced by the server
+  // schema superRefine above (and surfaced by prod:check via
+  // scripts/env/required-prod-vars.json).
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 });
 
 function parse<S extends z.ZodTypeAny>(name: string, schema: S, input: unknown): z.infer<S> {
@@ -290,6 +306,7 @@ function parse<S extends z.ZodTypeAny>(name: string, schema: S, input: unknown):
 export const serverEnv = parse("server", serverSchema, process.env);
 export const clientEnv = parse("client", clientSchema, {
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
 });
 
 export type ServerEnv = typeof serverEnv;

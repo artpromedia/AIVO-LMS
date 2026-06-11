@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type RiskCategory,
   type RiskSeverity,
@@ -14,10 +13,7 @@ import {
   updateSecurityRisk,
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Risk action failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
   "use server";
@@ -34,7 +30,7 @@ async function createAction(formData: FormData) {
       owner: String(formData.get("owner") || "").trim(),
     });
   } catch (error) {
-    redirect(`/platform/security/risks?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/risks?error=${encodeURIComponent(actionError(error, "Risk action failed."))}`);
   }
   redirect("/platform/security/risks?notice=Risk%20added.");
 }
@@ -51,7 +47,7 @@ async function updateAction(formData: FormData) {
       open: String(formData.get("open") || "") === "open",
     });
   } catch (error) {
-    redirect(`/platform/security/risks?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/security/risks?error=${encodeURIComponent(actionError(error, "Risk action failed."))}`);
   }
   redirect("/platform/security/risks?notice=Risk%20updated.");
 }

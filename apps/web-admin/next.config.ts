@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const require = createRequire(import.meta.url);
 const isProd = process.env.NODE_ENV === "production";
@@ -20,7 +21,7 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
-  transpilePackages: ["@aivo/admin-api", "@aivo/admin-auth", "@aivo/admin-ui"],
+  transpilePackages: ["@aivo/admin-api", "@aivo/admin-auth", "@aivo/admin-ui", "@aivo/observability"],
   typedRoutes: false,
   devIndicators: false,
   async headers() {
@@ -35,4 +36,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry wraps the final config; source-map upload only activates when
+// SENTRY_AUTH_TOKEN is present. Runtime init: instrumentation*.ts.
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT ?? "aivo-web-admin",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
+  telemetry: false,
+  disableLogger: true,
+});

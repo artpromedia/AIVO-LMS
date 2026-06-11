@@ -278,3 +278,4 @@ export function propagateHeaders(
 
 // ── Re-export Fastify plugin for convenience ───────────────────────────────
 export { registerObservabilityPlugin } from "./fastify-plugin.js";
+export { scrubSentryEvent, type ScrubbableSentryEvent } from "./sentry-scrub";

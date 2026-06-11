@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./lib/i18n/request.ts");
 
@@ -124,4 +125,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+// Sentry wraps the final config. Source-map upload only activates when a
+// SENTRY_AUTH_TOKEN is present (CI release builds); forks and local builds
+// without the secret build exactly as before. Runtime init lives in
+// instrumentation.ts / instrumentation-client.ts.
+export default withSentryConfig(withNextIntl(nextConfig), {
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT ?? "aivo-web-v2",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
+  telemetry: false,
+  disableLogger: true,
+});

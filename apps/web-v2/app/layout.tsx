@@ -6,6 +6,7 @@ import "./globals.css";
 import { PlayfulCalmProvider } from "@/components/system/playful-calm-provider";
 import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
 import { PwaRegister } from "@/components/system/pwa-register";
+import { WebVitalsReporter } from "@/components/observability/web-vitals-reporter";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
@@ -118,6 +119,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <PlayfulCalmProvider>{children}</PlayfulCalmProvider>
           </SensoryModeProvider>
           <PwaRegister />
+          <WebVitalsReporter />
         </NextIntlClientProvider>
       </body>
     </html>

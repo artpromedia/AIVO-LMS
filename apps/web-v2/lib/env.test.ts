@@ -121,8 +121,16 @@ describe("lib/env production fail-closed guards", () => {
     env.AI_PROVIDER = "anthropic";
     env.AIVO_PERSISTENCE = "postgres";
     env.IDENTITY_SVC_URL = "https://identity.internal:3001";
+    env.NEXT_PUBLIC_SENTRY_DSN = "https://abc123def456abc123def456abc12345@o123456.ingest.sentry.io/4500000000000000";
     delete env.AIVO_PERSISTENCE_AUDIT;
   }
+
+  it("rejects a production env without a Sentry DSN (Sprint A2)", async () => {
+    setValidProdBaseline();
+    delete env.NEXT_PUBLIC_SENTRY_DSN;
+    delete env.SENTRY_DSN;
+    await expect(import("./env?prod-no-sentry")).rejects.toThrow(/SENTRY_DSN/);
+  });
 
   it("rejects AUTH_MODE=mock in production", async () => {
     setValidProdBaseline();

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type PronunciationEncoding,
   type PronunciationScope,
@@ -12,10 +11,7 @@ import {
 } from "@aivo/admin-api/pronunciation";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Override action failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
   "use server";
@@ -40,7 +36,7 @@ async function createAction(formData: FormData) {
       notes: String(formData.get("notes") || "").trim() || null,
     });
   } catch (error) {
-    redirect(`/platform/audio/pronunciation?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/audio/pronunciation?error=${encodeURIComponent(actionError(error, "Override action failed."))}`);
   }
   redirect(`/platform/audio/pronunciation?notice=${encodeURIComponent(`Override for "${token}" added.`)}`);
 }
@@ -53,7 +49,7 @@ async function deleteAction(formData: FormData) {
   try {
     await deletePronunciationOverride(session, id);
   } catch (error) {
-    redirect(`/platform/audio/pronunciation?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/audio/pronunciation?error=${encodeURIComponent(actionError(error, "Override action failed."))}`);
   }
   redirect("/platform/audio/pronunciation?notice=Override%20removed.");
 }

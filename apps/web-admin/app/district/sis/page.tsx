@@ -1,16 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import { listSisConnections, triggerSisSync } from "@aivo/admin-api/sis";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { actionError } from "@/lib/action-errors";
 
 const SIS_ROLES = ["district_admin", "platform_admin"] as const;
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Sync could not be started.";
-}
 
 async function syncAction(formData: FormData) {
   "use server";
@@ -20,7 +16,7 @@ async function syncAction(formData: FormData) {
   try {
     await triggerSisSync(session, connectionId);
   } catch (error) {
-    redirect(`/district/sis?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/district/sis?error=${encodeURIComponent(actionError(error, "Sync could not be started."))}`);
   }
   redirect("/district/sis?notice=Roster%20sync%20started.");
 }

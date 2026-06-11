@@ -1080,5 +1080,15 @@
       "accept": "Ruhige Pause machen",
       "dismiss": "Jetzt nicht"
     }
+  },
+  "errorBoundary": {
+    "title": "Etwas ist schiefgelaufen",
+    "body": "Keine Sorge – nichts ist verloren. Du kannst es erneut versuchen oder zur Startseite zurückkehren.",
+    "tryAgain": "Erneut versuchen",
+    "goHome": "Zur Startseite"
+  },
+  "configError": {
+    "title": "Dieser Build ist falsch konfiguriert",
+    "body": "Die App kann die AIVO-Dienste nicht erreichen. Bitte installiere die neueste Version aus dem Store. Wenn du diese Bereitstellung verwaltest, baue mit gesetzter Backend-Adresse neu."
   }
 }

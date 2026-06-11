@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type AiIncidentSeverity,
   type AiIncidentState,
@@ -13,10 +12,7 @@ import {
 } from "@aivo/admin-api/ai-governance";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Incident action failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
   "use server";
@@ -32,7 +28,7 @@ async function createAction(formData: FormData) {
   try {
     await createAiIncident(session, { title, description, severity, modelId, tenantId });
   } catch (error) {
-    redirect(`/platform/ai/incidents?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/ai/incidents?error=${encodeURIComponent(actionError(error, "Incident action failed."))}`);
   }
   redirect("/platform/ai/incidents?notice=Incident%20filed.");
 }
@@ -49,7 +45,7 @@ async function stateAction(formData: FormData) {
   try {
     await updateAiIncidentState(session, id, { state, note });
   } catch (error) {
-    redirect(`/platform/ai/incidents?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/ai/incidents?error=${encodeURIComponent(actionError(error, "Incident action failed."))}`);
   }
   redirect("/platform/ai/incidents?notice=Incident%20updated.");
 }

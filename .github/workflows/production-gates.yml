@@ -98,6 +98,8 @@ jobs:
 
       - name: accessibility:audit
         run: pnpm accessibility:audit
+      - name: observability:audit
+        run: pnpm observability:audit
 
       - name: prod:no-demo scan
         run: pnpm prod:no-demo

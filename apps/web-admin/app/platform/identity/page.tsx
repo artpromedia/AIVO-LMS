@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type DistrictInviteStatus,
   listPlatformDistrictInvites,
@@ -10,12 +9,9 @@ import {
 } from "@aivo/admin-api/identity";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { actionError } from "@/lib/action-errors";
 
 const STATUSES: DistrictInviteStatus[] = ["pending", "accepted", "expired", "revoked"];
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Invitation action failed.";
-}
 
 async function resendAction(formData: FormData) {
   "use server";
@@ -25,7 +21,7 @@ async function resendAction(formData: FormData) {
   try {
     await resendPlatformDistrictInvite(session, id);
   } catch (error) {
-    redirect(`/platform/identity?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/identity?error=${encodeURIComponent(actionError(error, "Invitation action failed."))}`);
   }
   redirect("/platform/identity?notice=Invitation%20resent.");
 }
@@ -38,7 +34,7 @@ async function revokeAction(formData: FormData) {
   try {
     await revokePlatformDistrictInvite(session, id);
   } catch (error) {
-    redirect(`/platform/identity?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/identity?error=${encodeURIComponent(actionError(error, "Invitation action failed."))}`);
   }
   redirect("/platform/identity?notice=Invitation%20revoked.");
 }

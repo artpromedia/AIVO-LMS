@@ -37,6 +37,7 @@ const GATES = [
   { name: "comms:audit", cmd: ["pnpm", "comms:audit"] },
   { name: "ai-safety:audit", cmd: ["pnpm", "ai-safety:audit"] },
   { name: "accessibility:audit", cmd: ["pnpm", "accessibility:audit"] },
+  { name: "observability:audit", cmd: ["pnpm", "observability:audit"] },
   { name: "prod:no-demo", cmd: ["pnpm", "prod:no-demo"] },
   { name: "prod:surface-contract", cmd: ["pnpm", "prod:surface-contract"] },
   { name: "prod:check", cmd: ["pnpm", "prod:check"] },

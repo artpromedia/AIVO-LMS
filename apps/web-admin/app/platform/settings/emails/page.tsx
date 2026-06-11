@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
-import { AdminApiError } from "@aivo/admin-api";
 import {
   type EmailStatus,
   EMAIL_STATUSES,
@@ -10,10 +9,7 @@ import {
 } from "@aivo/admin-api/platform-settings";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-function actionError(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : "Retry failed.";
-}
+import { actionError } from "@/lib/action-errors";
 
 async function retryAction(formData: FormData) {
   "use server";
@@ -23,7 +19,7 @@ async function retryAction(formData: FormData) {
   try {
     await retryOutboxEmail(session, id);
   } catch (error) {
-    redirect(`/platform/settings/emails?error=${encodeURIComponent(actionError(error))}`);
+    redirect(`/platform/settings/emails?error=${encodeURIComponent(actionError(error, "Retry failed."))}`);
   }
   redirect("/platform/settings/emails?notice=Email%20requeued.");
 }

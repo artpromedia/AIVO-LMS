@@ -12,10 +12,12 @@
  * admin-svc reports engine compares date columns, not timestamps.
  */
 
-export interface ReportWindow {
+// Type alias (not interface) so the implicit index signature satisfies the
+// reports engine's Record<string, unknown> params parameter.
+export type ReportWindow = {
   startDate: string;
   endDate: string;
-}
+};
 
 function isoDate(year: number, monthIndex: number, day: number): string {
   return new Date(Date.UTC(year, monthIndex, day)).toISOString().slice(0, 10);

@@ -30,6 +30,7 @@ import { sessionClient, SessionUnavailableError } from "@/src/api/sessionClient"
 import { stageClient } from "@/src/api/stageClient";
 import { problemSessionClient } from "@/src/api/problemSessionClient";
 import type { Beat, Session } from "@/src/types/stage";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // ── Offline outbox ──────────────────────────────────────────────────────────
 // Session-end payloads are queued in AsyncStorage when offline and flushed
@@ -98,6 +99,13 @@ async function flushOutbox(learningApiBase: string, authHeader: string): Promise
   }
 }
 
+// ── Crash snapshot ──────────────────────────────────────────────────────────
+// The stage error boundary lives OUTSIDE the stateful screen, so the screen
+// mirrors just enough progress here for onBeforeRecover to queue a
+// session-end payload if a render error ever fires mid-lesson. A child's
+// progress must survive a crash (Sprint A2).
+let crashSnapshot: SessionEndPayload | null = null;
+
 // ── Tier voice ──────────────────────────────────────────────────────────────
 
 type TFn = (key: string, options?: Record<string, any>) => string;
@@ -131,7 +139,7 @@ function buildVoice(tier: "EARLY" | "MIDDLE" | "HIGH", t: TFn) {
 
 // ── Screen ──────────────────────────────────────────────────────────────────
 
-export default function StageScreen() {
+function StageScreenInner() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
@@ -181,6 +189,7 @@ export default function StageScreen() {
   const [sessionComplete, setSessionComplete] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
 
+
   // Load the session from the server. No demo fallback.
   useEffect(() => {
     let cancelled = false;
@@ -221,6 +230,21 @@ export default function StageScreen() {
   }, [user]);
 
   const total = session?.stagePlan.beats.length ?? 0;
+
+  // Mirror progress into the module-level crash snapshot (see header note).
+  useEffect(() => {
+    if (!sessionId || !session || sessionComplete) {
+      crashSnapshot = null;
+      return;
+    }
+    const score = total > 0 ? Math.round((correctCount / Math.max(total, 1)) * 100) : 0;
+    crashSnapshot = {
+      sessionId,
+      masteryUpdates: { [session.meta.subject || "lesson"]: score },
+      xpEarned,
+      queuedAt: Date.now(),
+    };
+  });
 
   // ── Beat handlers ─────────────────────────────────────────────────────────
 
@@ -690,4 +714,19 @@ function createStyles(bg: string) {
       flex: 1,
     },
   });
+}
+
+export default function StageScreen() {
+  return (
+    <ErrorBoundary
+      scope="stage"
+      onBeforeRecover={async () => {
+        const snapshot = crashSnapshot;
+        crashSnapshot = null;
+        if (snapshot) await queueSessionEnd(snapshot);
+      }}
+    >
+      <StageScreenInner />
+    </ErrorBoundary>
+  );
 }

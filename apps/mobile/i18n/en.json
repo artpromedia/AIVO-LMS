@@ -1080,5 +1080,15 @@
       "accept": "Take a calm break",
       "dismiss": "Not now"
     }
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "body": "Don't worry — nothing is lost. You can try again or head back home.",
+    "tryAgain": "Try again",
+    "goHome": "Go to home"
+  },
+  "configError": {
+    "title": "This build is misconfigured",
+    "body": "The app can't reach AIVO services. Please install the latest version from the app store. If you manage this deployment, rebuild with the backend address set."
   }
 }

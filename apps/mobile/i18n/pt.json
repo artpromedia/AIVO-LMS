@@ -1080,5 +1080,15 @@
       "accept": "Fazer uma pausa tranquila",
       "dismiss": "Agora não"
     }
+  },
+  "errorBoundary": {
+    "title": "Algo deu errado",
+    "body": "Não se preocupe — nada foi perdido. Você pode tentar de novo ou voltar ao início.",
+    "tryAgain": "Tentar novamente",
+    "goHome": "Ir para o início"
+  },
+  "configError": {
+    "title": "Esta versão está mal configurada",
+    "body": "O aplicativo não consegue acessar os serviços da AIVO. Instale a versão mais recente na loja. Se você administra esta implantação, recompile com o endereço do backend definido."
   }
 }

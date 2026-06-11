@@ -2,7 +2,9 @@
 
 /* eslint-disable no-restricted-syntax -- global error boundary renders BEFORE the app's CSS/tokens are loaded (Next.js spec: global-error replaces the root layout when the layout itself crashes). Inline hex styles are intentional so the fallback works even when @aivo/brand/tokens.css fails to load. */
 
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import * as Sentry from "@sentry/nextjs";
 
 export default function GlobalError({
   error,
@@ -12,6 +14,11 @@ export default function GlobalError({
   reset: () => void;
 }) {
   const t = useTranslations("root.global_error");
+  useEffect(() => {
+    // The root layout itself crashed — the one place this MUST be reported,
+    // because nothing else is alive to do it.
+    Sentry.captureException(error);
+  }, [error]);
   return (
     <html lang="en">
       <body

@@ -17,7 +17,10 @@
       "supportsTablet": true,
       "requireFullScreen": false,
       "bundleIdentifier": "com.artpromedia.aivo",
-      "associatedDomains": ["applinks:aivo.app", "applinks:staging.aivo.app"],
+      "associatedDomains": [
+        "applinks:aivo.app",
+        "applinks:staging.aivo.app"
+      ],
       "config": {
         "usesNonExemptEncryption": false
       },
@@ -42,34 +45,120 @@
         "backgroundColor": "#7C3AED",
         "resizeMode": "contain"
       },
-      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
       "intentFilters": [
         {
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/learner" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/parent" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/teacher" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/therapist" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/caregiver" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/notifications" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/messages" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/settings" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/billing" },
-            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/role-switch" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/learner" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/parent" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/teacher" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/therapist" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/caregiver" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/notifications" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/messages" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/settings" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/billing" },
-            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/role-switch" }
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/learner"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/parent"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/teacher"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/therapist"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/caregiver"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/notifications"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/messages"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/settings"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/billing"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/role-switch"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/learner"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/parent"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/teacher"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/therapist"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/caregiver"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/notifications"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/messages"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/settings"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/billing"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/role-switch"
+            }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -108,7 +197,13 @@
           "color": "#7C3AED"
         }
       ],
-      "./plugins/withAndroidNativeBuildFixes.js"
+      "./plugins/withAndroidNativeBuildFixes.js",
+      [
+        "@sentry/react-native/expo",
+        {
+          "project": "aivo-mobile"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

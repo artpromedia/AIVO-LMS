@@ -73,12 +73,22 @@ type ServiceKey = keyof typeof DEV_PORTS;
 // silently resolves to a relative path against the empty string and the
 // failure mode is "the app appears broken" with no signal to the operator.
 // We only warn (don't throw) so that web/Metro can still boot for inspection.
-if (!__DEV__ && !PROD_BASE && Object.values(PROD_OVERRIDES).every((v) => !v)) {
-  console.warn(
-    "[aivo] EXPO_PUBLIC_API_URL is not set for this production build — " +
-      "all API calls will fail. Set it (or the per-service " +
-      "EXPO_PUBLIC_<SERVICE>_URL overrides) via EAS env / app.config and rebuild.",
-  );
+export const API_CONFIG_ERROR =
+  !__DEV__ && !PROD_BASE && Object.values(PROD_OVERRIDES).every((v) => !v)
+    ? "EXPO_PUBLIC_API_URL is not set for this production build — all API " +
+      "calls will fail. Set it (or the per-service EXPO_PUBLIC_<SERVICE>_URL " +
+      "overrides) via EAS env / app.config and rebuild."
+    : null;
+
+if (API_CONFIG_ERROR) {
+  // Console for local inspection AND Sentry so the broken build is visible
+  // to the team the moment one device boots it (Sprint A2). The root layout
+  // renders a config-error screen off API_CONFIG_ERROR instead of letting
+  // every request silently fail.
+  console.warn(`[aivo] ${API_CONFIG_ERROR}`);
+  import("@/lib/sentry")
+    .then(({ Sentry }) => Sentry.captureMessage("mobile.api_config_missing", "fatal"))
+    .catch(() => undefined);
 }
 
 function svc(key: ServiceKey): string {
