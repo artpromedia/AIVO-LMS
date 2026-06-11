@@ -156,7 +156,10 @@ jobs:
             bff:
               - 'apps/web-v2/app/api/bff/**'
               - 'apps/web-v2/lib/bff/**'
+              - 'apps/web-v2/lib/auth/**'
+              - 'apps/web-v2/lib/db/**'
               - 'apps/web-v2/tests/integration/bff/**'
+              - 'apps/web-v2/e2e/tests/brain-build-visual.spec.ts'
               - 'apps/web-v2/playwright.bff.config.ts'
               - 'services/**/routes/**'
               - 'packages/api-client/**'
