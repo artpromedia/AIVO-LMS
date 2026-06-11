@@ -1,6 +1,7 @@
 import type { TutorDefinition, TutorDefinitionIssue } from "./types.js";
+import { AGENT_ACTION_KINDS, AGENT_TOOL_IDS, NO_SAY_LEVELS } from "./agent-policy.js";
 
-const SEMVER_TAIL = /@\d+\.\d+\.\d+(?:[-+][a-zA-Z0-9.\-]+)?$/;
+const SEMVER_TAIL = /@\d+\.\d+\.\d+(?:[-+][a-zA-Z0-9.-]+)?$/;
 
 /**
  * Validate a `TutorDefinition` for missing fields, invalid id shape, and
@@ -112,6 +113,67 @@ export function validateTutorDefinition(def: TutorDefinition): TutorDefinitionIs
         path: "policy.requiresConsent",
       });
     }
+  }
+
+  // ── Wave E (S8): agent policy invariants ─────────────────────────────
+  const knownActions = new Set<string>(AGENT_ACTION_KINDS);
+  const knownTools = new Set<string>(AGENT_TOOL_IDS);
+  for (const tool of def.toolset ?? []) {
+    if (!knownTools.has(tool)) {
+      issues.push({
+        code: "toolset_unknown_tool",
+        detail: `toolset declares unknown tool "${tool}".`,
+        path: "toolset",
+      });
+    }
+  }
+  for (const level of def.functioningLevels ?? []) {
+    const actions = def.actionPolicy?.[level];
+    if (!actions || actions.length === 0) {
+      issues.push({
+        code: "action_policy_missing_level",
+        detail: `actionPolicy must cover declared functioning level "${level}".`,
+        path: `actionPolicy.${level}`,
+      });
+      continue;
+    }
+    for (const action of actions) {
+      if (!knownActions.has(action)) {
+        issues.push({
+          code: "action_policy_unknown_action",
+          detail: `actionPolicy.${level} declares unknown action "${action}".`,
+          path: `actionPolicy.${level}`,
+        });
+      }
+    }
+    if (
+      (NO_SAY_LEVELS as readonly string[]).includes(level) &&
+      (actions as readonly string[]).includes("say")
+    ) {
+      issues.push({
+        code: "action_policy_say_below_floor",
+        detail:
+          `actionPolicy.${level} allows free-text "say" — forbidden at LOW_VERBAL ` +
+          "and below (pre-approved surfaces/scaffolds only).",
+        path: `actionPolicy.${level}`,
+      });
+    }
+  }
+  if (def.memoryPolicy) {
+    const hasKinds = (def.memoryPolicy.kinds ?? []).length > 0;
+    if (def.memoryPolicy.canRemember !== hasKinds) {
+      issues.push({
+        code: "memory_policy_inconsistent",
+        detail: "memoryPolicy.kinds must be non-empty exactly when canRemember is true.",
+        path: "memoryPolicy",
+      });
+    }
+  } else {
+    issues.push({
+      code: "missing_required_field",
+      detail: "memoryPolicy is required (use NO_MEMORY until the tutor opts in).",
+      path: "memoryPolicy",
+    });
   }
 
   return issues;

@@ -7,7 +7,12 @@
  * `ADDON_TUTOR_ELA`; this declaration wires Sage into the runtime so
  * `planSession()` can adapt activities to the learner's profile.
  */
-import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
+import {
+  defineTutor,
+  NO_MEMORY,
+  standardActionPolicy,
+  type TutorDefinition,
+} from "@aivo/tutor-sdk";
 
 export const elaTutor: TutorDefinition = defineTutor({
   id: "sage@1.0.0",
@@ -49,6 +54,10 @@ export const elaTutor: TutorDefinition = defineTutor({
     "11": "authored",
     "12": "authored",
   },
+  // Wave E (S8): agent loop instruments + per-level action policy.
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context"],
+  actionPolicy: standardActionPolicy(),
+  memoryPolicy: NO_MEMORY,
   policy: {
     requiresConsent: true,
     minAgeYears: 4,

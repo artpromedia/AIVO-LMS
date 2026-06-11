@@ -6,7 +6,7 @@ import {
   TutorPolicyError,
   type LearnerContext,
 } from "../index.js";
-import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
+import { defineTutor, type TutorDefinition, NO_MEMORY, standardActionPolicy } from "@aivo/tutor-sdk";
 import type { ContentPack } from "@aivo/content-pack";
 import { initialMasteryRecord } from "@aivo/pedagogy";
 
@@ -26,6 +26,10 @@ const tutor: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL"],
   skillGraphRefs: ["ccss.math.k.cc"],
   defaultContentPackRefs: ["k-math-fall-2026"],
+  // Wave E (S8): required agent-policy fields.
+  toolset: ["get_learner_snapshot"],
+  actionPolicy: standardActionPolicy(),
+  memoryPolicy: NO_MEMORY,
   policy: { requiresConsent: false, requirePiiScrubbing: true },
 });
 

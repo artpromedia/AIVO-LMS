@@ -19,6 +19,29 @@ const MASTERY_DELTA_INCORRECT = -0.02;
 const XP_PER_CORRECT = 10;
 const COIN_PER_CORRECT = 1;
 
+// ── Wave E (S8): agent transition guard vocabulary ──────────────────────────
+// Lockstep with @aivo/tutor-sdk AGENT_ACTION_KINDS and ai-svc ACTION_KINDS.
+const AGENT_TRANSITION_KINDS = new Set([
+  "advance",
+  "remediate",
+  "switch_modality",
+  "insert_scaffold",
+  "offer_break",
+  "end_early",
+  "present_surface",
+  "say",
+]);
+
+// Free-text floor: improvised prose never reaches these levels (mirrors the
+// tutor-sdk validator + ai-svc gate, so a single mis-authored layer cannot
+// widen it).
+const NO_SAY_FUNCTIONING_LEVELS = new Set(["LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"]);
+
+/** Outcome of `SessionMachine.proposeTransition`. */
+export type AgentTransitionDecision =
+  | { accepted: true; effect: "advance" | "insert_beat" | "non_structural" | "end" }
+  | { accepted: false; reason: string; deterministicNext: "advance" };
+
 /** Minimum data the machine needs to bootstrap a session. */
 export interface TutorSession {
   sessionId?: string;
@@ -152,6 +175,95 @@ export class SessionMachine {
     this.masteryDeltas[skillKey] = (this.masteryDeltas[skillKey] ?? 0) + delta;
 
     return record;
+  }
+
+  // ── Wave E (S8): agent transition guard ─────────────────────────────────
+  //
+  // The tutor agent (ai-svc validated actions, executed by tutor-svc) may
+  // only move a session through THIS gate. A hallucinated/illegal action is
+  // rejected with a deterministic alternative — it can never corrupt the
+  // machine. The non-agent imperative API above is unchanged.
+
+  /** Why the agent ended the session early, when it did. */
+  endedEarlyReason: string | null = null;
+
+  /**
+   * Validate a proposed agent action against the machine's current state
+   * and the learner's functioning level. Pure — never mutates; the caller
+   * applies the returned effect via `nextBeat()` / `insertBeat()` /
+   * `endEarly()` or renders the non-structural action.
+   */
+  proposeTransition(action: { kind: string }): AgentTransitionDecision {
+    const reject = (reason: string): AgentTransitionDecision => ({
+      accepted: false,
+      reason,
+      deterministicNext: "advance",
+    });
+
+    if (this.complete || this.state.phase === "complete") {
+      return reject("session_complete");
+    }
+    if (!AGENT_TRANSITION_KINDS.has(action.kind)) {
+      return reject(`unknown_action:${action.kind}`);
+    }
+    if (
+      action.kind === "say" &&
+      NO_SAY_FUNCTIONING_LEVELS.has(String(this.state.functioningLevel))
+    ) {
+      return reject("say_below_floor");
+    }
+    if (this.state.phase === "loading" && action.kind !== "advance") {
+      return reject("not_started");
+    }
+
+    switch (action.kind) {
+      case "advance":
+        return { accepted: true, effect: "advance" };
+      case "end_early":
+        return { accepted: true, effect: "end" };
+      case "remediate":
+      case "insert_scaffold":
+      case "present_surface":
+        if (this.state.phase === "celebration") {
+          // The wind-down is a regulation ritual — never re-open instruction.
+          return reject("celebration_locked");
+        }
+        return { accepted: true, effect: "insert_beat" };
+      default:
+        // say / switch_modality / offer_break — render-only moves.
+        return { accepted: true, effect: "non_structural" };
+    }
+  }
+
+  /**
+   * Splice an agent-built beat (remediation / scaffold / surface) directly
+   * after the current beat. Re-checks the same structural guards so a
+   * caller cannot bypass `proposeTransition`.
+   */
+  insertBeat(beat: Beat): Beat {
+    if (this.complete || this.state.phase === "complete") {
+      throw new Error("SessionMachine.insertBeat: session is complete");
+    }
+    if (this.state.phase === "celebration" || this.state.phase === "loading") {
+      throw new Error(`SessionMachine.insertBeat: illegal during ${this.state.phase}`);
+    }
+    const at = this.state.currentBeatIndex + 1;
+    this.state.beats = [
+      ...this.state.beats.slice(0, at),
+      beat,
+      ...this.state.beats.slice(at),
+    ];
+    this.state.totalBeats = this.state.beats.length;
+    return beat;
+  }
+
+  /** Agent-initiated kind stop: mark the session complete immediately. */
+  endEarly(reason: string): void {
+    if (this.complete) return;
+    this.state.phase = "complete";
+    this.state.currentBeatIndex = this.state.totalBeats;
+    this.complete = true;
+    this.endedEarlyReason = reason;
   }
 
   /** Returns a serialisable snapshot of the full machine state. */

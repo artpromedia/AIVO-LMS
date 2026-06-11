@@ -7,7 +7,12 @@
  * NGSS K–2 Physical Science graph; deeper grade bands ship with
  * subsequent NGSS content packs.
  */
-import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
+import {
+  defineTutor,
+  NO_MEMORY,
+  standardActionPolicy,
+  type TutorDefinition,
+} from "@aivo/tutor-sdk";
 
 export const scienceTutor: TutorDefinition = defineTutor({
   id: "spark@1.0.0",
@@ -46,6 +51,10 @@ export const scienceTutor: TutorDefinition = defineTutor({
     "11": "authored",
     "12": "authored",
   },
+  // Wave E (S8): agent loop instruments + per-level action policy.
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "evaluate_science_answer"],
+  actionPolicy: standardActionPolicy(),
+  memoryPolicy: NO_MEMORY,
   policy: {
     requiresConsent: true,
     minAgeYears: 5,

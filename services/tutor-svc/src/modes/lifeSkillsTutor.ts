@@ -8,7 +8,12 @@
  * caregiver information. Persona / subject-strategy:
  * `ADDON_TUTOR_LIFE_SKILLS`.
  */
-import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
+import {
+  defineTutor,
+  NO_MEMORY,
+  standardActionPolicy,
+  type TutorDefinition,
+} from "@aivo/tutor-sdk";
 
 export const lifeSkillsTutor: TutorDefinition = defineTutor({
   id: "compass@1.0.0",
@@ -56,6 +61,10 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     // plannable only under the preview flag).
     ADULT: "scaffold",
   },
+  // Wave E (S8): agent loop instruments + per-level action policy.
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "break_down_task"],
+  actionPolicy: standardActionPolicy(),
+  memoryPolicy: NO_MEMORY,
   policy: {
     requiresConsent: true,
     minAgeYears: 5,

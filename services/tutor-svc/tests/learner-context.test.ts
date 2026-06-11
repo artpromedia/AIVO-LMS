@@ -7,6 +7,7 @@ import {
   normalizeFunctioningLevel,
   normalizeGradeBand,
 } from "../src/lib/learnerContext.js";
+import { NO_MEMORY, standardActionPolicy } from "@aivo/tutor-sdk";
 import type { TutorDefinition } from "@aivo/tutor-sdk";
 
 const standardTutor: TutorDefinition = {
@@ -19,6 +20,10 @@ const standardTutor: TutorDefinition = {
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL"],
   skillGraphRefs: ["g1"],
   defaultContentPackRefs: [],
+  // Wave E (S8): required agent-policy fields.
+  toolset: ["get_learner_snapshot"],
+  actionPolicy: standardActionPolicy(),
+  memoryPolicy: NO_MEMORY,
   policy: { requiresConsent: false },
 };
 

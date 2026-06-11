@@ -7,7 +7,12 @@
  * resolved at session start from `LearnerContext`. Persona /
  * subject-strategy: `ADDON_TUTOR_LANGUAGES`.
  */
-import { defineTutor, type TutorDefinition } from "@aivo/tutor-sdk";
+import {
+  defineTutor,
+  NO_MEMORY,
+  standardActionPolicy,
+  type TutorDefinition,
+} from "@aivo/tutor-sdk";
 
 export const worldLanguagesTutor: TutorDefinition = defineTutor({
   id: "lingua@1.0.0",
@@ -46,6 +51,10 @@ export const worldLanguagesTutor: TutorDefinition = defineTutor({
     "11": "authored",
     "12": "authored",
   },
+  // Wave E (S8): agent loop instruments + per-level action policy.
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "score_pronunciation"],
+  actionPolicy: standardActionPolicy(),
+  memoryPolicy: NO_MEMORY,
   policy: {
     requiresConsent: true,
     minAgeYears: 5,
