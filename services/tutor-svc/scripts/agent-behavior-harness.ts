@@ -33,8 +33,24 @@ import { getTutorDefinition } from "../src/modes/registry.js";
 import type { TutorFunctioningLevel } from "@aivo/tutor-sdk";
 
 /** Tutors certified for the agent pilot. Widening this list is the S13
- *  onboarding lever; the repo-root ratchet refuses silent shrinkage. */
-const ONBOARDED_TUTORS = ["nova", "sage"] as const;
+ *  onboarding lever; the repo-root ratchet refuses silent shrinkage.
+ *  S13: the full catalogue — every tutor must hold all five properties. */
+const ONBOARDED_TUTORS = [
+  "nova",
+  "sage",
+  "spark",
+  "chrono",
+  "pixel",
+  "echo",
+  "harmony",
+  "atlas",
+  "cadence",
+  "vigor",
+  "lingua",
+  "forge",
+  "compass",
+  "muse",
+] as const;
 
 const LEVELS: TutorFunctioningLevel[] = ["STANDARD", "SUPPORTED", "LOW_VERBAL"];
 

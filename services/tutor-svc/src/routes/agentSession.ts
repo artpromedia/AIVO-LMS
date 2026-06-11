@@ -38,6 +38,7 @@ import { getTutorDefinition } from "../modes/registry.js";
 import { negotiateFunctioningLevel } from "../lib/learnerContext.js";
 import { resolveTenantIdForLearner } from "../lib/tenant.js";
 import { emitTutorAudit } from "../lib/audit.js";
+import { loadDapeProfile } from "../lib/dape.js";
 import { getActiveCurriculumFocus } from "./curriculum.js";
 import { TUTOR_SKU_TO_KEY } from "./chat.js";
 import {
@@ -402,6 +403,18 @@ export function registerAgentSessionRoutes(
       if (focus) (brainContext as Record<string, unknown>).curriculum_focus = focus;
     } catch {
       // best-effort enrichment only
+    }
+    // S13: Vigor branches on DAPE — load the profile like the chat path
+    // does so the agent's context (and snapshot tool) carries it.
+    if (tutorKey === "vigor") {
+      try {
+        const dapeProfile = await loadDapeProfile(db, learnerId);
+        if (dapeProfile.active) {
+          (brainContext as Record<string, unknown>).dape_profile = dapeProfile;
+        }
+      } catch {
+        // best-effort enrichment only
+      }
     }
     if (typeof body.gradeBand === "string" && body.gradeBand) {
       (brainContext as Record<string, unknown>).grade_band = body.gradeBand;

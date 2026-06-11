@@ -36,11 +36,12 @@ import type {
   TutorDefinition,
   TutorFunctioningLevel,
 } from "@aivo/tutor-sdk";
-import { createLogger } from "@aivo/observability";
+import { createLogger, recordAgentRungDrop, recordAgentTurn } from "@aivo/observability";
 import { createHash } from "node:crypto";
 import { DOMAIN_TOOL_SCHEMAS } from "./tools.js";
 import { WRITE_TOOL_SCHEMAS } from "./write-tools.js";
 import { MEMORY_TOP_K, REMEMBER_TOOL_SCHEMA, renderMemoryContext } from "./memory.js";
+import { renderSelPhraseBankBlock } from "./sel-phrase-bank.js";
 
 const logger = createLogger("tutor-svc.agent");
 
@@ -523,6 +524,8 @@ export class AgentOrchestrator {
       onDrop: (drop) => {
         drops.push(drop);
         logger.warn("agent ladder drop", { sessionId: input.sessionId, ...drop });
+        // S13: A/B telemetry — rung drops are the pilot's key health signal.
+        recordAgentRungDrop(state.tutorKey, drop);
         this.deps.onRungDrop?.(input.sessionId, drop);
       },
     });
@@ -535,6 +538,9 @@ export class AgentOrchestrator {
       extras: { action?: AgentWireAction | null; rationale?: string } = {},
     ): Promise<TurnDecision> => {
       const latencyMs = Math.max(0, Math.round(now() - started));
+      // S13: A/B telemetry — one counter increment per turn (tutor × rung
+      // × outcome class); the deterministic arm has no turns at all.
+      recordAgentTurn(state.tutorKey, ladder.current(), decision);
       const nextState: AgentSessionState = { ...state, seq, ladder: ladder.snapshot() };
       await this.deps.store.saveAgentState(input.sessionId, nextState);
       await this.deps.store.insertTrace({
@@ -624,6 +630,19 @@ export class AgentOrchestrator {
       gradeBand,
       curriculumFocusTitle: typeof focus?.title === "string" ? focus.title : undefined,
     });
+
+    // S13: per-tutor onboarding specialisations.
+    // Vigor — an active DAPE (adapted PE) plan changes what "advance" may
+    // ask of the learner; surface it explicitly, not buried in a snapshot.
+    const dape = (brain as { dape_profile?: { active?: boolean } }).dape_profile;
+    if (dape?.active === true) {
+      personaContext +=
+        "\nThis learner has an ACTIVE DAPE (adapted physical education) plan: keep every movement or activity suggestion within the adapted track and never propose standard-intensity alternatives.";
+    }
+    // Harmony — emotional language comes from the reviewed SEL phrase bank.
+    if (def.persona.id === "harmony") {
+      personaContext += `\n\n${renderSelPhraseBankBlock()}`;
+    }
 
     // S12: retrieval — top-k unexpired memories ride into the context as a
     // compact block. Read side shares the same consent + policy gate.
