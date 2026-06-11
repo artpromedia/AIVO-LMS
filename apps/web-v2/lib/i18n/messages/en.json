@@ -499,7 +499,10 @@
       "back_to_learner": "Back to learner",
       "restart_baseline": "Restart baseline",
       "in_set": "In set",
-      "preview": "Preview"
+      "preview": "Preview",
+      "provenance_child_specific": "Personalized by AI for your child",
+      "provenance_cohort_bank": "AI question bank — matched to grade & profile",
+      "provenance_generic": "Calm starter set"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "No generic quiz",

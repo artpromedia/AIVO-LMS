@@ -306,7 +306,10 @@
       "back_to_learner": "Retour à l'apprenant",
       "restart_baseline": "Recommencer la ligne de base",
       "in_set": "Dans l'ensemble",
-      "preview": "Aperçu"
+      "preview": "Aperçu",
+      "provenance_child_specific": "Personnalisé par l'IA pour votre enfant",
+      "provenance_cohort_bank": "Banque de questions IA — adaptée au niveau et au profil",
+      "provenance_generic": "Série de départ apaisée"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "Pas de quiz générique",

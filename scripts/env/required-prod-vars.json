@@ -78,7 +78,7 @@
       "comment": "SECRETS_PROVIDER selects Vault | aws-secrets-manager | env. The first two require additional creds resolved at runtime by packages/security/src/secrets-client.ts."
     },
     "web-v2": {
-      "comment": "Next.js web app runtime invariants. apps/web-v2/lib/env.ts enforces these at process startup; this manifest enforces them at the deploy gate (fail-closed before traffic).",
+      "comment": "Next.js web app runtime invariants. apps/web-v2/lib/env.ts enforces these at process startup; this manifest enforces them at the deploy gate (fail-closed before traffic). Wave A (G2): ASSESSMENT_SVC_SERVICE_TOKEN + ASSESSMENT_SVC_URL + INTERNAL_SERVICE_TOKEN are unconditionally required — without them the baseline-LLM and curriculum-sync paths silently degrade. The boot probe (apps/web-v2/lib/boot/llm-config-probe.ts) re-verifies them end-to-end at startup.",
       "required": [
         "AUTH_MODE",
         "AI_PROVIDER",
@@ -87,7 +87,10 @@
         "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY",
         "NEXT_PUBLIC_APP_URL",
         "REDIS_URL",
-        "TTS_PROVIDER"
+        "TTS_PROVIDER",
+        "ASSESSMENT_SVC_SERVICE_TOKEN",
+        "ASSESSMENT_SVC_URL",
+        "INTERNAL_SERVICE_TOKEN"
       ],
       "minLength": {
         "SESSION_SECRET": 32,
@@ -117,7 +120,8 @@
       "conditional": {
         "ANTHROPIC_API_KEY": "required when AI_PROVIDER=anthropic (lib/ai/anthropic-tutor.ts)",
         "OPENAI_API_KEY": "required when AI_PROVIDER=openai OR TTS_PROVIDER=openai (lib/tts/provider.ts)",
-        "GOOGLE_API_KEY": "required when AI_PROVIDER=google"
+        "GOOGLE_API_KEY": "required when AI_PROVIDER=google",
+        "ALERTS_PROXY_SVC_URL": "must point at alerts-proxy-svc in production so Wave A degradation events (lib/observability/degradation.ts) page on-call; the localhost default pages nobody"
       }
     },
     "speech-eval-svc": {

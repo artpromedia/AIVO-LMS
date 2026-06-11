@@ -306,7 +306,10 @@
       "back_to_learner": "العودة إلى المتعلّم",
       "restart_baseline": "إعادة تشغيل الخط الأساسي",
       "in_set": "في المجموعة",
-      "preview": "معاينة"
+      "preview": "معاينة",
+      "provenance_child_specific": "مخصص بالذكاء الاصطناعي لطفلك",
+      "provenance_cohort_bank": "بنك أسئلة الذكاء الاصطناعي — مطابق للصف والملف الشخصي",
+      "provenance_generic": "مجموعة بداية هادئة"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "لا اختبار عام",

@@ -306,7 +306,10 @@
       "back_to_learner": "학습자로 돌아가기",
       "restart_baseline": "기준선 재시작",
       "in_set": "세트에 포함됨",
-      "preview": "미리보기"
+      "preview": "미리보기",
+      "provenance_child_specific": "자녀를 위해 AI가 맞춤 구성",
+      "provenance_cohort_bank": "AI 문제 은행 — 학년·프로필 맞춤",
+      "provenance_generic": "차분한 스타터 세트"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "일반 퀴즈 없음",

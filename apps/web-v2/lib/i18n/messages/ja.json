@@ -306,7 +306,10 @@
       "back_to_learner": "学習者に戻る",
       "restart_baseline": "ベースラインを再開始",
       "in_set": "セット内",
-      "preview": "プレビュー"
+      "preview": "プレビュー",
+      "provenance_child_specific": "お子さま向けにAIがパーソナライズ",
+      "provenance_cohort_bank": "AI問題バンク — 学年とプロフィールに対応",
+      "provenance_generic": "落ち着いたスターターセット"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "汎用クイズなし",

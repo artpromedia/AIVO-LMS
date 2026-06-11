@@ -98,6 +98,7 @@ import {
   baselineLlmEnabled,
 } from "@/lib/feature-flags";
 import { logger } from "@/lib/observability/logger";
+import { emitDegradation } from "@/lib/observability/degradation";
 import {
   buildBaselineSummary,
   buildMasterySnapshotRows,
@@ -866,11 +867,16 @@ export async function createBaseline(input: {
     const coveredSubjects = new Set(bankQuestions.map((q) => q.subjectId));
     if (bankQuestions.length > 0 && coveredSubjects.size >= subjects.length) {
       questions = bankQuestions;
-      // Bank questions are LLM-generated (offline), so the parent's
-      // "Personalized by AI" badge is correct; `model` records the bank
-      // provenance for the audit trail.
+      // Bank questions are LLM-generated offline and matched to the
+      // learner's cohort (grade band × functioning level × accommodation
+      // tags) — but NOT fused to this child's intake context, so the
+      // provenance is `cohort_bank`, never `child_specific` (Wave A, G2).
+      // `model` records the bank provenance for the audit trail. Serving
+      // the bank here is the designed instant first tier, not a
+      // degradation — no alert.
       metadata = {
         source: "ai",
+        personalization: "cohort_bank",
         model: bankModel(),
         generatedAt: nowIso(),
       };
@@ -944,6 +950,7 @@ export async function createBaseline(input: {
       questions = collected;
       metadata = {
         source: "ai",
+        personalization: "child_specific",
         model: modelUsed ?? "discovery-adventure",
         generatedAt: nowIso(),
         chaptersUsed,
@@ -1016,6 +1023,7 @@ export async function createBaseline(input: {
         questions = mapped;
         metadata = {
           source: "ai",
+          personalization: "child_specific",
           model: llmResult.response.model,
           promptTokens: llmResult.response.prompt_tokens,
           completionTokens: llmResult.response.completion_tokens,
@@ -1034,6 +1042,7 @@ export async function createBaseline(input: {
         });
         metadata = {
           source: "fallback",
+          personalization: "generic",
           fallbackReason: "no_subject_mapping",
           generatedAt: nowIso(),
         };
@@ -1047,6 +1056,13 @@ export async function createBaseline(input: {
           },
           "baseline: LLM result had no mappable subjects, used BANK fallback",
         );
+        emitDegradation("baseline_generic_fallback", {
+          reason: "no_subject_mapping",
+          learnerId: input.learnerId,
+          tenantId: input.tenantId,
+          baselineId: baseline.id,
+          message: "LLM baseline succeeded but no question mapped to a known subject",
+        });
       }
     } else {
       questions = bankGenerator({
@@ -1058,6 +1074,7 @@ export async function createBaseline(input: {
       });
       metadata = {
         source: "fallback",
+        personalization: "generic",
         fallbackReason: llmResult.reason,
         generatedAt: nowIso(),
       };
@@ -1072,6 +1089,17 @@ export async function createBaseline(input: {
         },
         "baseline: LLM generation failed, used BANK fallback",
       );
+      // The LLM tier was enabled, eligible, reached — and failed. A 401/403
+      // here is the silent-misconfig class (missing/rotated service token):
+      // emitDegradation escalates those to critical.
+      emitDegradation("baseline_generic_fallback", {
+        reason: llmResult.reason,
+        status: llmResult.status,
+        learnerId: input.learnerId,
+        tenantId: input.tenantId,
+        baselineId: baseline.id,
+        message: llmResult.message,
+      });
     }
   } else if (!bankSucceeded && !discoverySucceeded) {
     questions = bankGenerator({
@@ -1081,8 +1109,12 @@ export async function createBaseline(input: {
       subjects,
       skills,
     });
+    // Expected steady states (flag explicitly off / parent assessment not
+    // yet submitted) — honest generic provenance, but NOT a degradation
+    // alert: these are by-design paths, not failures.
     metadata = {
       source: "fallback",
+      personalization: "generic",
       fallbackReason: llmFlag ? "no_submitted_parent_assessment" : "flag_off",
       generatedAt: nowIso(),
     };

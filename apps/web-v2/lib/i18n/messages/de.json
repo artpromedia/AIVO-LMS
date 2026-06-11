@@ -306,7 +306,10 @@
       "back_to_learner": "Zurück zum Lernenden",
       "restart_baseline": "Basislinie neu starten",
       "in_set": "Im Set",
-      "preview": "Vorschau"
+      "preview": "Vorschau",
+      "provenance_child_specific": "Von KI für Ihr Kind personalisiert",
+      "provenance_cohort_bank": "KI-Fragenbank — abgestimmt auf Klassenstufe & Profil",
+      "provenance_generic": "Ruhiges Starter-Set"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "Kein generisches Quiz",

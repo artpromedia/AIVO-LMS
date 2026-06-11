@@ -306,7 +306,10 @@
       "back_to_learner": "返回学习者",
       "restart_baseline": "重新开始基线",
       "in_set": "已在集合中",
-      "preview": "预览"
+      "preview": "预览",
+      "provenance_child_specific": "由 AI 为您的孩子个性化定制",
+      "provenance_cohort_bank": "AI 题库 — 匹配年级与画像",
+      "provenance_generic": "平静入门题组"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "无通用测验",

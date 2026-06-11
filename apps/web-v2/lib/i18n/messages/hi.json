@@ -306,7 +306,10 @@
       "back_to_learner": "शिक्षार्थी पर वापस",
       "restart_baseline": "बेसलाइन फिर से शुरू करें",
       "in_set": "सेट में",
-      "preview": "पूर्वावलोकन"
+      "preview": "पूर्वावलोकन",
+      "provenance_child_specific": "आपके बच्चे के लिए AI द्वारा वैयक्तिकृत",
+      "provenance_cohort_bank": "AI प्रश्न बैंक — कक्षा और प्रोफ़ाइल के अनुसार",
+      "provenance_generic": "शांत स्टार्टर सेट"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "कोई सामान्य प्रश्नोत्तरी नहीं",

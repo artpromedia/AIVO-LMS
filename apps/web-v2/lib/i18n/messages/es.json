@@ -306,7 +306,10 @@
       "back_to_learner": "Volver al estudiante",
       "restart_baseline": "Reiniciar línea de base",
       "in_set": "En el conjunto",
-      "preview": "Vista previa"
+      "preview": "Vista previa",
+      "provenance_child_specific": "Personalizado por IA para su hijo/a",
+      "provenance_cohort_bank": "Banco de preguntas de IA — ajustado al grado y al perfil",
+      "provenance_generic": "Set inicial tranquilo"
     },
     "learner_baseline_pending": {
       "no_generic_quiz_title": "Sin prueba genérica",

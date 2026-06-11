@@ -640,13 +640,28 @@ export type BaselineAssessment = {
 };
 
 /**
+ * How deeply this baseline was personalized to THIS child. `source: "ai"`
+ * alone conflates two very different tiers: the live LLM paths fuse the
+ * parent assessment / IEP / teacher / therapist context per-child, while
+ * the offline bank is LLM-generated but only matched to the learner's
+ * cohort (grade band × functioning level × accommodation tags). The
+ * parent-facing badge must not claim child-specific personalization for
+ * a cohort pick (Wave A, G2).
+ */
+export type BaselinePersonalization = "child_specific" | "cohort_bank" | "generic";
+
+/**
  * Sprint B2: per-baseline provenance recorded when the BFF generates
  * a question set. `source` is the discriminator the parent UI uses to
  * render a "Personalized by AI" badge (when "ai") vs a "Calm starter"
- * badge (when "fallback").
+ * badge (when "fallback"); `personalization` (Wave A) refines that into
+ * the honest three-state badge. Rows written before Wave A carry no
+ * `personalization` — readers fall back on `source` for those.
  */
 export type BaselineGenerationMetadata = {
   source: "ai" | "fallback";
+  /** Honest personalization depth — see {@link BaselinePersonalization}. */
+  personalization?: BaselinePersonalization;
   /** Why we fell back (only set when source === "fallback"). */
   fallbackReason?: string;
   /** LLM model that produced the questions (only when source === "ai"). */
