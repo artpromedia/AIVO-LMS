@@ -41,6 +41,7 @@ const GATES = [
   { name: "mobile:a11y-ratchet", cmd: ["pnpm", "mobile:a11y-ratchet"] },
   { name: "feature-flag:audit", cmd: ["pnpm", "feature-flag:audit"] },
   { name: "audit-trail:audit", cmd: ["pnpm", "audit-trail:audit"] },
+  { name: "design-token:audit", cmd: ["pnpm", "design-token:audit"] },
   { name: "prod:no-demo", cmd: ["pnpm", "prod:no-demo"] },
   { name: "prod:surface-contract", cmd: ["pnpm", "prod:surface-contract"] },
   { name: "prod:check", cmd: ["pnpm", "prod:check"] },

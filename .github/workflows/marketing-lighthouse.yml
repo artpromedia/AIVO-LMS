@@ -35,8 +35,30 @@ jobs:
       - name: Build marketing site
         run: pnpm exec turbo run build --filter=@aivo/marketing
 
-      - name: Run Lighthouse CI
+      - name: Start marketing site (background)
+        env:
+          PORT: "3000"
         run: |
-          npm install -g @lhci/cli
-          lhci autorun || true
-        continue-on-error: true
+          nohup pnpm --filter @aivo/marketing start > marketing.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS -o /dev/null http://127.0.0.1:3000/; then
+              echo "marketing up after ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "marketing did not come up"; tail -50 marketing.log; exit 1
+
+      # Sprint B7 — the run now ENFORCES (no continue-on-error, no || true):
+      # LCP/CLS/TBT lab budgets + a11y >= 95 from lighthouserc.marketing.json.
+      - name: Run Lighthouse CI (blocking)
+        run: |
+          npm install -g @lhci/cli@0.14.x
+          lhci autorun --config=lighthouserc.marketing.json
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-marketing
+          path: .lighthouseci
+          retention-days: 14

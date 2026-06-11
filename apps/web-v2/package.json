@@ -13,7 +13,7 @@
     "db:up": "docker compose -f ../../docker-compose.web-v2-db.yml up -d --wait",
     "db:migrate": "pnpm --filter @aivo/db run db:migrate",
     "db:seed:postgres": "tsx scripts/seed-postgres.ts",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:persistence": "vitest run lib/db/persistence",
     "test:watch": "vitest",
     "e2e": "playwright test",
@@ -67,6 +67,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.9",
     "@playwright/test": "^1.49.1",
     "@tailwindcss/postcss": "^4.1.8",
     "@testcontainers/postgresql": "^10.13.0",

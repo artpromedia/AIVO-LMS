@@ -8,7 +8,7 @@
     "start": "next start --port 5001 --hostname 0.0.0.0",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "@aivo/admin-api": "workspace:*",

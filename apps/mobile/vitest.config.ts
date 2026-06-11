@@ -9,6 +9,19 @@ export default defineConfig({
     environment: "node",
     globals: false,
     include: ["__tests__/**/*.test.{ts,tsx}"],
+    // Sprint B7 coverage ratchet — ~2 points below the measured baseline
+    // (2026-06-11: stmts 75.16 / branch 75.99 / funcs 72.15 / lines 76.87
+    // over imported files). Only moves up.
+    coverage: {
+      provider: "v8",
+      reporter: ["text-summary"],
+      thresholds: {
+        statements: 73,
+        branches: 74,
+        functions: 70,
+        lines: 74,
+      },
+    },
   },
   resolve: {
     alias: {

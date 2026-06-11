@@ -14,7 +14,9 @@
  * the surrounding mood changes.
  */
 
-export type AgeTier = "EARLY" | "MIDDLE" | "HIGH";
+import { TIER_THEME_DATA, type AgeTierId } from "@aivo/brand";
+
+export type AgeTier = AgeTierId;
 
 export interface TierTheme {
   id: AgeTier;
@@ -58,74 +60,28 @@ export interface TierTheme {
 const FONT_DISPLAY = "'Fredoka', 'Nunito', system-ui, sans-serif";
 const FONT_BODY = "'Nunito', 'Lexend', system-ui, sans-serif";
 
-export const TIER_THEMES: Record<AgeTier, TierTheme> = {
-  EARLY: {
-    id: "EARLY",
-    name: "Soft Meadow",
-    tagline: "K–5 · picture-book daylight",
-    nameKey: "early_name",
-    taglineKey: "early_tagline",
-    colors: {
-      bg: "#FFFAEF",
-      surface: "#FFFCF4",
-      surfaceAlt: "#FBF1DE",
-      primary: "#7C3AED",
-      primarySoft: "#EDE3FE",
-      accent: "#FFB700",
-      text: "#292F3D",
-      textSoft: "#5C5067",
-      sky: "#EDE3FE",
-      warm: "#F8C4A0",
-    },
-    radius: { sm: 14, md: 22, lg: 32, pill: 999 },
-    font: { display: FONT_DISPLAY, body: FONT_BODY },
-    paceMultiplier: 1.5,
-  },
-  MIDDLE: {
-    id: "MIDDLE",
-    name: "Study Treehouse",
-    tagline: "6–8 · Ghibli twilight discovery",
-    nameKey: "middle_name",
-    taglineKey: "middle_tagline",
-    colors: {
-      bg: "#1F1535",
-      surface: "#2A1F4D",
-      surfaceAlt: "#3A2D52",
-      primary: "#7C3AED",
-      primarySoft: "rgba(124, 58, 237, 0.2)",
-      accent: "#FFB700",
-      text: "#F5EBD8",
-      textSoft: "#B89A72",
-      sky: "#3F2D6E",
-      warm: "#5D7A5C",
-    },
-    radius: { sm: 10, md: 14, lg: 20, pill: 999 },
-    font: { display: FONT_DISPLAY, body: FONT_BODY },
-    paceMultiplier: 1.0,
-  },
-  HIGH: {
-    id: "HIGH",
-    name: "Focus Studio",
-    tagline: "9–12 · editorial calm",
-    nameKey: "high_name",
-    taglineKey: "high_tagline",
-    colors: {
-      bg: "#F4EFE6",
-      surface: "#FAF6EE",
-      surfaceAlt: "#EDE6D6",
-      primary: "#7C3AED",
-      primarySoft: "#E5DBF5",
-      accent: "#FFB700",
-      text: "#292F3D",
-      textSoft: "#5C5067",
-      sky: "#E5DBF5",
-      warm: "#FFE08A",
-    },
-    radius: { sm: 8, md: 10, lg: 16, pill: 999 },
-    font: { display: FONT_DISPLAY, body: FONT_BODY },
-    paceMultiplier: 0.8,
-  },
-};
+// Palettes come from the SINGLE token source (Sprint B7):
+// packages/brand/tokens/modes/tier-themes.json → generated TS. Only the
+// web font stacks are attached here — mobile-ui consumes the same data.
+export const TIER_THEMES: Record<AgeTier, TierTheme> = Object.fromEntries(
+  (Object.keys(TIER_THEME_DATA) as AgeTier[]).map((tier) => {
+    const data = TIER_THEME_DATA[tier];
+    return [
+      tier,
+      {
+        id: data.id,
+        name: data.name,
+        tagline: data.tagline,
+        nameKey: data.nameKey,
+        taglineKey: data.taglineKey,
+        colors: { ...data.colors },
+        radius: { ...data.radius },
+        font: { display: FONT_DISPLAY, body: FONT_BODY },
+        paceMultiplier: data.paceMultiplier,
+      } satisfies TierTheme,
+    ];
+  }),
+) as Record<AgeTier, TierTheme>;
 
 /**
  * Map a learner's gradeLevel string to its age tier.

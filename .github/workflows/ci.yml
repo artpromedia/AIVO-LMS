@@ -258,6 +258,110 @@ jobs:
             apps/web-v2/test-results
           if-no-files-found: ignore
 
+  # Sprint B7 — first-load JS budgets for web-v2 (scripts/ci/bundle-budget.mjs
+  # against scripts/ci/bundle-budgets.json). Blocking on any web-v2-affecting
+  # change; the budgets file is the deliberate place a size increase lands.
+  web-bundle-budget:
+    name: Web Bundle Budget (web-v2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: lint-and-typecheck
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Detect web-v2-affecting changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            web:
+              - 'apps/web-v2/**'
+              - 'packages/ui/**'
+              - 'packages/learner-ui/**'
+              - 'packages/brand/**'
+              - 'scripts/ci/bundle-budget.mjs'
+              - 'scripts/ci/bundle-budgets.json'
+              - '.github/workflows/ci.yml'
+
+      - name: Skip (no web-v2-affecting changes)
+        if: steps.filter.outputs.web != 'true'
+        run: echo "No web-v2-affecting changes — skipping bundle budget."
+
+      - uses: pnpm/action-setup@v5
+        if: steps.filter.outputs.web == 'true'
+
+      - uses: actions/setup-node@v5
+        if: steps.filter.outputs.web == 'true'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.filter.outputs.web == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web-v2
+        if: steps.filter.outputs.web == 'true'
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
+        run: pnpm --filter @aivo/web-v2 build
+
+      - name: Enforce bundle budgets
+        if: steps.filter.outputs.web == 'true'
+        run: node scripts/ci/bundle-budget.mjs
+
+  # Sprint B7 — the living design-system gallery builds on any packages/*
+  # change and lands as a PR artifact reviewers can open directly.
+  storybook-build:
+    name: Design-system gallery (storybook:build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: lint-and-typecheck
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Detect package changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            pkgs:
+              - 'packages/**'
+              - '.github/workflows/ci.yml'
+
+      - name: Skip (no package changes)
+        if: steps.filter.outputs.pkgs != 'true'
+        run: echo "No packages/* changes — skipping gallery build."
+
+      - uses: pnpm/action-setup@v5
+        if: steps.filter.outputs.pkgs == 'true'
+
+      - uses: actions/setup-node@v5
+        if: steps.filter.outputs.pkgs == 'true'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.filter.outputs.pkgs == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build gallery
+        if: steps.filter.outputs.pkgs == 'true'
+        run: pnpm storybook:build
+
+      - name: Upload gallery artifact
+        if: steps.filter.outputs.pkgs == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-system-gallery
+          path: packages/learner-ui/storybook-static
+          retention-days: 14
+
   background-jobs-tests:
     name: Background Jobs & Scheduler Tests
     runs-on: ubuntu-latest

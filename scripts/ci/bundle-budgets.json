@@ -1,0 +1,28 @@
+{
+  "comment": "Sprint B7 — first-load JS budgets (raw bytes) per route group, measured baseline +10% headroom. Regenerate deliberately with `node scripts/ci/bundle-budget.mjs --update` and justify the bump in the PR.",
+  "sharedBaseline": 842306,
+  "groups": {
+    "/": 887305,
+    "/_not-found": 843796,
+    "/(auth)": 905767,
+    "/(public)": 889633,
+    "/accept-invite": 863087,
+    "/caregiver": 916068,
+    "/design-system": 1080923,
+    "/district": 906938,
+    "/forgot-password": 902833,
+    "/learner": 1859012,
+    "/locked": 1069381,
+    "/login": 906938,
+    "/messages": 1116681,
+    "/notifications": 1120646,
+    "/onboarding": 883609,
+    "/parent": 1113023,
+    "/reset-password": 905286,
+    "/settings": 931873,
+    "/signup": 914301,
+    "/surface-preview": 1500476,
+    "/teacher": 1108530,
+    "/therapist": 916068
+  }
+}

@@ -1,0 +1,103 @@
+name: Web Vitals Budgets
+
+# Sprint B7 — BLOCKING Lighthouse lab budgets for web-v2. Builds the app
+# exactly like the BFF integration job (AUTH_MODE=mock), serves it, and
+# asserts LCP <= 2.5s, CLS <= 0.1, TBT <= 300ms, a11y >= 95 on the four
+# core surfaces. Authenticated pages ride the mock-session cookie
+# (aivo_mock_session=<role>) the same way the BFF contract tests do.
+# No continue-on-error anywhere: a regression fails the PR.
+
+on:
+  pull_request:
+    paths:
+      - "apps/web-v2/**"
+      - "packages/ui/**"
+      - "packages/learner-ui/**"
+      - "packages/brand/**"
+      - ".github/workflows/web-vitals-budgets.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-vitals-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  lighthouse:
+    name: Lighthouse budgets (web-v2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web-v2 (AUTH_MODE=mock)
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
+        run: pnpm --filter @aivo/web-v2 build
+
+      - name: Start web-v2 (background)
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
+          PORT: "5000"
+        run: |
+          nohup pnpm --filter @aivo/web-v2 start > web-v2.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS -o /dev/null http://127.0.0.1:5000/; then
+              echo "web-v2 up after ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "web-v2 did not come up"; tail -50 web-v2.log; exit 1
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.14.x
+
+      # Three passes: anonymous pages, then each authed surface under its
+      # mock role cookie. Shared assertions live in lighthouserc.web-v2.json.
+      - name: Lighthouse — anonymous (/, /login)
+        run: |
+          lhci autorun \
+            --config=lighthouserc.web-v2.json \
+            --collect.url=http://127.0.0.1:5000/ \
+            --collect.url=http://127.0.0.1:5000/login
+
+      - name: Lighthouse — learner home (mock learner session)
+        run: |
+          lhci autorun \
+            --config=lighthouserc.web-v2.json \
+            --collect.url=http://127.0.0.1:5000/learner/home \
+            --collect.settings.extraHeaders='{"Cookie":"aivo_mock_session=learner"}'
+
+      - name: Lighthouse — parent home (mock parent session)
+        run: |
+          lhci autorun \
+            --config=lighthouserc.web-v2.json \
+            --collect.url=http://127.0.0.1:5000/parent/home \
+            --collect.settings.extraHeaders='{"Cookie":"aivo_mock_session=parent"}'
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-web-v2
+          path: .lighthouseci
+          retention-days: 14

@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { withSentryConfig } from "@sentry/nextjs";
+import bundleAnalyzer from "@next/bundle-analyzer";
 
 const withNextIntl = createNextIntlPlugin("./lib/i18n/request.ts");
 
@@ -138,7 +139,12 @@ const nextConfig: NextConfig = {
 // SENTRY_AUTH_TOKEN is present (CI release builds); forks and local builds
 // without the secret build exactly as before. Runtime init lives in
 // instrumentation.ts / instrumentation-client.ts.
-export default withSentryConfig(withNextIntl(nextConfig), {
+// ANALYZE=1 pnpm --filter @aivo/web-v2 build → interactive treemaps in
+// .next/analyze (Sprint B7). Budgets are enforced separately by
+// scripts/ci/bundle-budget.mjs; the analyzer is the investigation tool.
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === "1" });
+
+export default withSentryConfig(withBundleAnalyzer(withNextIntl(nextConfig)), {
   silent: true,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT ?? "aivo-web-v2",

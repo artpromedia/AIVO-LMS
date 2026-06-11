@@ -5,6 +5,7 @@ export * from "./playful-calm.js";
 export * from "./inclusive-warm.js";
 export * from "./subjects.js";
 export * from "./contrast-guard.js";
+export * from "./generated/tier-themes.js";
 
 // Re-imports for the `BRAND` summary object below. The `export *` lines
 // above expose the same symbols to consumers; these locals only exist so

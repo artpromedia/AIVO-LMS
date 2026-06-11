@@ -106,6 +106,8 @@ jobs:
         run: pnpm feature-flag:audit
       - name: audit-trail:audit
         run: pnpm audit-trail:audit
+      - name: design-token:audit
+        run: pnpm design-token:audit
 
       - name: prod:no-demo scan
         run: pnpm prod:no-demo

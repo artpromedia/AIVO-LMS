@@ -68,7 +68,13 @@ test.describe("Playful Calm visual and a11y", () => {
 
   test("@a11y accessibility checks", async ({ page }) => {
     for (const route of ["/", "/login", "/learner/home", "/learner/rewards"]) {
+      // Dev-server on-demand compilation triggers a full reload on a
+      // route's FIRST visit, which tears down axe's injected context.
+      // Warm the route, then audit the settled second visit.
       await page.goto(route);
+      await page.waitForSelector("#main", { state: "attached" });
+      await page.goto(route);
+      await page.waitForSelector("#main", { state: "attached" });
       await injectAxe(page);
       await checkA11y(page, "#main", {
         detailedReport: true,

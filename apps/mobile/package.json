@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "audit:single-listing": "node ./scripts/check-single-listing.mjs",
     "prebuild": "expo prebuild",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "eas-build-pre-install": "node ./scripts/eas-pre-install.js"
   },
   "dependencies": {
