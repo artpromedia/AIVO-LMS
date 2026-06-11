@@ -472,7 +472,9 @@
     },
     "settings_account_form": {
       "display_name": "Nome de exibição",
-      "saved": "Salvo."
+      "saved": "Salvo.",
+      "timezone": "Fuso horário",
+      "timezone_hint": "Agendas, relatórios e lembretes são exibidos neste fuso horário."
     },
     "settings": {
       "eyebrow": "Configurações",

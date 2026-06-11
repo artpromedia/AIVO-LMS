@@ -104,7 +104,52 @@ export async function registerUserRoutes(app: FastifyInstance) {
         role: u.role,
         tenantId: u.tenantId,
         avatarUrl: u.avatarUrl,
+        timezone: u.timezone ?? null,
+        tzSource: u.tzSource ?? null,
       };
+    },
+  );
+
+  // Sprint A8 — per-user timezone. `source:"auto"` (browser-detected) never
+  // overwrites an explicit `source:"user"` choice; the value must be a real
+  // IANA zone (validated with Intl, not a regex).
+  app.patch(
+    "/api/users/me/timezone",
+    {
+      schema: {
+        tags: ["Users"],
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          required: ["timezone", "source"],
+          additionalProperties: false,
+          properties: {
+            timezone: { type: "string", minLength: 1, maxLength: 64 },
+            source: { type: "string", enum: ["auto", "user"] },
+          },
+        },
+      },
+      preHandler: authenticate,
+    },
+    async (req, reply) => {
+      const db = (app as any).db;
+      const user = (req as any).user;
+      const { timezone, source } = req.body as { timezone: string; source: "auto" | "user" };
+      try {
+        new Intl.DateTimeFormat("en-US", { timeZone: timezone });
+      } catch {
+        return reply.status(400).send({ error: "Unknown IANA timezone" });
+      }
+      const [current] = await db.select().from(users).where(eq(users.id, user.sub)).limit(1);
+      if (!current) throw { statusCode: 404, message: "User not found" };
+      if (source === "auto" && current.tzSource === "user") {
+        return { timezone: current.timezone, tzSource: current.tzSource, unchanged: true };
+      }
+      await db
+        .update(users)
+        .set({ timezone, tzSource: source })
+        .where(eq(users.id, user.sub));
+      return { timezone, tzSource: source };
     },
   );
 

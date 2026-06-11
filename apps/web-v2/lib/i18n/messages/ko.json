@@ -472,7 +472,9 @@
     },
     "settings_account_form": {
       "display_name": "표시 이름",
-      "saved": "저장되었습니다."
+      "saved": "저장되었습니다.",
+      "timezone": "시간대",
+      "timezone_hint": "일정, 보고서, 알림이 이 시간대로 표시됩니다."
     },
     "settings": {
       "eyebrow": "설정",

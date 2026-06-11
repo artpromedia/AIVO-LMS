@@ -472,7 +472,9 @@
     },
     "settings_account_form": {
       "display_name": "Nombre para mostrar",
-      "saved": "Guardado."
+      "saved": "Guardado.",
+      "timezone": "Zona horaria",
+      "timezone_hint": "Los horarios, informes y recordatorios se muestran en esta zona horaria."
     },
     "settings": {
       "eyebrow": "Configuración",

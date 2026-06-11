@@ -472,7 +472,9 @@
     },
     "settings_account_form": {
       "display_name": "اسم العرض",
-      "saved": "تم الحفظ."
+      "saved": "تم الحفظ.",
+      "timezone": "المنطقة الزمنية",
+      "timezone_hint": "تُعرض الجداول والتقارير والتذكيرات بهذه المنطقة الزمنية."
     },
     "settings": {
       "eyebrow": "الإعدادات",

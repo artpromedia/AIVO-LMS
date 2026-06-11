@@ -472,7 +472,9 @@
     },
     "settings_account_form": {
       "display_name": "Nom d'affichage",
-      "saved": "Enregistré."
+      "saved": "Enregistré.",
+      "timezone": "Fuseau horaire",
+      "timezone_hint": "Les plannings, rapports et rappels s'affichent dans ce fuseau horaire."
     },
     "settings": {
       "eyebrow": "Paramètres",

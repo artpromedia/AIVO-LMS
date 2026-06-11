@@ -7,6 +7,9 @@ import { PlayfulCalmProvider } from "@/components/system/playful-calm-provider";
 import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
 import { PwaRegister } from "@/components/system/pwa-register";
 import { WebVitalsReporter } from "@/components/observability/web-vitals-reporter";
+import { TzSync } from "@/components/observability/tz-sync";
+import { getSession } from "@/lib/auth/session";
+import { resolveTimeZone } from "@/lib/i18n/timezone";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
@@ -73,6 +76,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+  const viewerTimeZone = resolveTimeZone(session?.timezone);
   // SSR the user's sensory mode onto <html> so the very first paint already
   // shows the right palette (no FOUC when calm / high-contrast users load
   // any signed-in page). The client provider keeps this in sync going
@@ -115,12 +120,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#main" className="skip-link">
           {t("skip_to_main")}
         </a>
-        <NextIntlClientProvider locale={locale} messages={messages} timeZone="America/New_York">
+        <NextIntlClientProvider locale={locale} messages={messages} timeZone={viewerTimeZone}>
           <SensoryModeProvider initialMode={sensoryMode}>
             <PlayfulCalmProvider>{children}</PlayfulCalmProvider>
           </SensoryModeProvider>
           <PwaRegister />
           <WebVitalsReporter />
+          <TzSync sessionTimeZone={session?.timezone ?? null} />
         </NextIntlClientProvider>
       </body>
     </html>

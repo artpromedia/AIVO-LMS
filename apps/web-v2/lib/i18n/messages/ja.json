@@ -472,7 +472,9 @@
     },
     "settings_account_form": {
       "display_name": "表示名",
-      "saved": "保存しました。"
+      "saved": "保存しました。",
+      "timezone": "タイムゾーン",
+      "timezone_hint": "スケジュール、レポート、リマインダーはこのタイムゾーンで表示されます。"
     },
     "settings": {
       "eyebrow": "設定",

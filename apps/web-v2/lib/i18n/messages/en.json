@@ -663,7 +663,9 @@
     },
     "settings_account_form": {
       "display_name": "Display name",
-      "saved": "Saved."
+      "saved": "Saved.",
+      "timezone": "Time zone",
+      "timezone_hint": "Schedules, reports, and reminders display in this time zone."
     },
     "settings": {
       "eyebrow": "Settings",

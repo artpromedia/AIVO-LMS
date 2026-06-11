@@ -472,7 +472,9 @@
     },
     "settings_account_form": {
       "display_name": "प्रदर्शन नाम",
-      "saved": "सहेजा गया।"
+      "saved": "सहेजा गया।",
+      "timezone": "समय क्षेत्र",
+      "timezone_hint": "शेड्यूल, रिपोर्ट और रिमाइंडर इसी समय क्षेत्र में दिखाए जाते हैं।"
     },
     "settings": {
       "eyebrow": "सेटिंग्स",

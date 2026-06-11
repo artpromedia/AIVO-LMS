@@ -52,6 +52,42 @@ export function SensoryModeProvider({
     // Fire-and-forget — the cookie write is best-effort; the local
     // attribute swap above is what the user sees immediately.
     void setSensoryModeCookie(resolved);
+    // Sprint A8 — propagate to every other open tab instantly. A learner's
+    // sensory mode (the motion/contrast control) must not require a reload
+    // on the second screen.
+    try {
+      new BroadcastChannel("aivo-a11y").postMessage({ kind: "sensory-mode", mode: resolved });
+    } catch {
+      // BroadcastChannel unavailable (very old engines) — same-tab still works.
+    }
+  }, []);
+
+  // Sprint A8 — live cross-tab application: listen for changes broadcast by
+  // other tabs and re-resolve on window focus so a stale background tab
+  // catches up even if the message was missed (e.g. tab was frozen).
+  React.useEffect(() => {
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel("aivo-a11y");
+      channel.onmessage = (event) => {
+        if (event.data?.kind === "sensory-mode") {
+          setModeState(resolveSensoryMode(event.data.mode));
+        }
+      };
+    } catch {
+      channel = null;
+    }
+    const onFocus = () => {
+      const attr = document.documentElement.getAttribute("data-sensory-mode");
+      const cookieMatch = document.cookie.match(/(?:^|;\s*)aivo\.sensoryMode=([^;]+)/);
+      const fromCookie = cookieMatch ? resolveSensoryMode(cookieMatch[1]) : null;
+      if (fromCookie && fromCookie !== attr) setModeState(fromCookie);
+    };
+    window.addEventListener("focus", onFocus);
+    return () => {
+      channel?.close();
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   // Keep local state aligned with a changing `initialMode` prop (e.g. after

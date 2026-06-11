@@ -28,7 +28,12 @@ export default async function Page() {
         <p className="mb-4 text-sm text-aivo-ink-soft">
           {t("signed_in_as")} <span className="font-medium">{session.email}</span>.
         </p>
-        <AccountForm initial={{ displayName: user?.displayName ?? session.displayName }} />
+        <AccountForm
+          initial={{
+            displayName: user?.displayName ?? session.displayName,
+            timezone: session.timezone ?? null,
+          }}
+        />
       </Card>
     </AppShell>
   );

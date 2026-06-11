@@ -472,7 +472,9 @@
     },
     "settings_account_form": {
       "display_name": "Anzeigename",
-      "saved": "Gespeichert."
+      "saved": "Gespeichert.",
+      "timezone": "Zeitzone",
+      "timezone_hint": "Zeitpläne, Berichte und Erinnerungen werden in dieser Zeitzone angezeigt."
     },
     "settings": {
       "eyebrow": "Einstellungen",
