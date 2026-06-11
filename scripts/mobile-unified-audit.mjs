@@ -11,7 +11,7 @@
 //    Once MOBILE_UNIFIED_APP defaults to true, flip this assertion to
 //    require their absence — see docs/mobile/unified-app-contract.md.
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -62,6 +62,56 @@ for (const group of LEGACY_ROLE_GROUPS) {
     warnings.push(
       `legacy role group ${group} is gone — if Sprint 09b/c is complete, update this audit to require absence (currently allowed).`,
     );
+  }
+}
+
+// --- 4. Store-submission pack (Sprint A5) ---------------------------
+// Always: privacy manifest + canonical listing metadata. With --store
+// (release builds, mobile-release.yml): the screenshot sets the README
+// contracts must be populated — a listing cannot ship empty.
+{
+  const appJson = JSON.parse(readFileSync(join(repoRoot, "apps/mobile/app.json"), "utf8"));
+  const manifests = appJson?.expo?.ios?.privacyManifests;
+  if (!manifests) {
+    errors.push("app.json: expo.ios.privacyManifests is missing (App Store rejects without it).");
+  } else {
+    if (manifests.NSPrivacyTracking !== false) {
+      errors.push("app.json: NSPrivacyTracking must be false — this product does not track.");
+    }
+    if (!Array.isArray(manifests.NSPrivacyAccessedAPITypes) || manifests.NSPrivacyAccessedAPITypes.length === 0) {
+      errors.push("app.json: NSPrivacyAccessedAPITypes must declare the required-reason APIs.");
+    }
+    if (!Array.isArray(manifests.NSPrivacyCollectedDataTypes) || manifests.NSPrivacyCollectedDataTypes.length === 0) {
+      errors.push("app.json: NSPrivacyCollectedDataTypes must declare collected data.");
+    }
+  }
+
+  const listingPath = join(repoRoot, "apps/mobile/store-assets/listing.json");
+  if (!existsSync(listingPath)) {
+    errors.push("store-assets/listing.json is missing (canonical store metadata).");
+  } else {
+    const listing = JSON.parse(readFileSync(listingPath, "utf8"));
+    for (const field of ["privacyPolicyUrl", "supportUrl", "coppa", "dataSafety", "contentRating"]) {
+      if (!listing[field]) errors.push(`store-assets/listing.json: required field "${field}" is missing.`);
+    }
+    if (listing.privacyPolicyUrl && !/^https:\/\//.test(listing.privacyPolicyUrl)) {
+      errors.push("store-assets/listing.json: privacyPolicyUrl must be an https URL.");
+    }
+    if (process.argv.includes("--store")) {
+      const sets = listing?.screenshots?.requiredSets ?? [];
+      for (const set of sets) {
+        const dir = join(repoRoot, "apps/mobile/store-assets/screenshots", set);
+        const pngs = existsSync(dir)
+          ? readdirSync(dir).filter((f) => f.endsWith(".png"))
+          : [];
+        if (pngs.length < 7) {
+          errors.push(
+            `store screenshots: ${set} has ${pngs.length}/7 captures — run ` +
+              "apps/mobile/scripts/capture-store-screenshots.mjs before a store release.",
+          );
+        }
+      }
+    }
   }
 }
 

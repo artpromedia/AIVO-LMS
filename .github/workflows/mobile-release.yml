@@ -70,6 +70,14 @@ jobs:
         id: build
         run: echo "number=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
+      # Sprint A5 — a store release cannot ship without the privacy
+      # manifest, canonical listing metadata, and populated screenshot
+      # sets. Same audit as PRs but with --store strictness.
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Store-submission pack gate
+        run: node scripts/mobile-unified-audit.mjs --store
+
   ios-build:
     name: iOS Build & Deploy
     runs-on: macos-14
