@@ -37,7 +37,7 @@ export function HeroVisual() {
             <p className="text-sm font-semibold leading-snug text-iw-primary">
               Students show meaningful gains in focus
             </p>
-            <p className="mt-1 text-[11px] text-iw-ink-muted">Average increase week 1</p>
+            <p className="mt-1 text-[11px] text-iw-ink-muted">Measured in early learning sessions</p>
           </div>
         </div>
       </div>
