@@ -14,6 +14,7 @@ import { PreferencesProvider } from "@/lib/preferences";
 import { SplashGate } from "@/components/SplashGate";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ConfigErrorScreen } from "@/components/ConfigErrorScreen";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { API_CONFIG_ERROR } from "@/constants/api";
 import { initSentry } from "@/lib/sentry";
 import { configureNotificationHandling } from "@/lib/notifications";
@@ -81,6 +82,7 @@ export default function RootLayout() {
             <SensoryModeProvider learnerId={learnerId}>
               <PreferencesProvider learnerId={learnerId}>
                 <SplashGate ready={ready}>
+                  <OfflineBanner />
                   <ErrorBoundary scope="root">
                     <Stack
                       screenOptions={{

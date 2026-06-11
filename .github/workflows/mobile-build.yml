@@ -110,3 +110,56 @@ jobs:
       - name: Build preview (iOS)
         working-directory: apps/mobile
         run: eas build --platform ios --profile preview --non-interactive || true
+
+  # Sprint A7 — the mobile golden-path journey (login → lesson → offline
+  # answer → reconnect → queue drains) on a real Android emulator. Needs
+  # EXPO_TOKEN (to pull the latest preview APK) + the staging demo learner
+  # credentials; when secrets are absent (forks) the job reports a clear
+  # skip instead of a false green.
+  android-journey:
+    name: Android journey (Maestro)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: eas-build-preview
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check secrets
+        id: secrets
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ] || [ -z "${{ secrets.MAESTRO_LEARNER_EMAIL }}" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::EXPO_TOKEN / MAESTRO_LEARNER_* secrets not configured — journey skipped (not green)."
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install Maestro
+        if: steps.secrets.outputs.available == 'true'
+        run: curl -Ls https://get.maestro.mobile.dev | bash && echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+      - name: Download latest preview APK
+        if: steps.secrets.outputs.available == 'true'
+        working-directory: apps/mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          npx -y eas-cli@latest build:list --platform android --profile preview --status finished --limit 1 --json --non-interactive \
+            | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const u=JSON.parse(d)[0]?.artifacts?.buildUrl;if(!u){console.error('no preview build');process.exit(1)}console.log(u)})" \
+            | xargs -I{} curl -L -o app.apk "{}"
+      - name: Run journey on emulator
+        if: steps.secrets.outputs.available == 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            adb install apps/mobile/app.apk
+            MAESTRO_APP_ID=com.artpromedia.aivo \
+            MAESTRO_LEARNER_EMAIL='${{ secrets.MAESTRO_LEARNER_EMAIL }}' \
+            MAESTRO_LEARNER_PASSWORD='${{ secrets.MAESTRO_LEARNER_PASSWORD }}' \
+            maestro test apps/mobile/.maestro/journeys/login-lesson-offline.yaml
+      - name: Upload Maestro artifacts on failure
+        if: failure() && steps.secrets.outputs.available == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-journey-artifacts
+          path: ~/.maestro/tests

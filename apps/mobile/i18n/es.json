@@ -1099,7 +1099,10 @@
     "notificationPrefs": "Preferencias de notificaciones"
   },
   "offline": {
-    "synced": "Ya estás en línea. Tu trabajo se ha guardado."
+    "synced": "Ya estás en línea. Tu trabajo se ha guardado.",
+    "banner": "Sin conexión. Sigue adelante: tu progreso se guarda en este dispositivo.",
+    "bannerQueued": "Sin conexión — {{count}} cambio(s) se sincronizarán al volver.",
+    "syncing": "Sincronizando {{count}} cambio(s)…"
   },
   "parentLearnerNew": {
     "birthDate": "Fecha de nacimiento (AAAA-MM-DD)",

@@ -1099,7 +1099,10 @@
     "notificationPrefs": "通知偏好设置"
   },
   "offline": {
-    "synced": "已恢复联网。你的进度已保存。"
+    "synced": "已恢复联网。你的进度已保存。",
+    "banner": "已离线。继续学习——进度会保存在本设备上。",
+    "bannerQueued": "离线中——{{count}} 项更改将在联网后同步。",
+    "syncing": "正在同步 {{count}} 项更改…"
   },
   "parentLearnerNew": {
     "birthDate": "出生日期（YYYY-MM-DD）",

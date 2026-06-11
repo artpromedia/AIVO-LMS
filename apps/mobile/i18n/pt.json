@@ -1099,7 +1099,10 @@
     "notificationPrefs": "Preferências de notificação"
   },
   "offline": {
-    "synced": "Você está online novamente. Seu trabalho foi salvo."
+    "synced": "Você está online novamente. Seu trabalho foi salvo.",
+    "banner": "Sem conexão. Continue — o progresso fica salvo neste aparelho.",
+    "bannerQueued": "Sem conexão — {{count}} alteração(ões) serão sincronizadas depois.",
+    "syncing": "Sincronizando {{count}} alteração(ões)…"
   },
   "parentLearnerNew": {
     "birthDate": "Data de nascimento (AAAA-MM-DD)",

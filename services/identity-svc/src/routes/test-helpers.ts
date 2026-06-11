@@ -468,12 +468,12 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
   // drive POST /api/admin/pilots with a real platform-admin bearer token.
   // Platform admins are tenant-less; the response shape mirrors the other
   // seed-* helpers (e2e/lib/fixtures.ts seedPlatformAdmin).
-  app.post<{ Body: { email: string; password: string } }>(
+  app.post<{ Body: { email: string; password: string; mfaEnabled?: boolean } }>(
     "/api/__test__/seed-platform-admin",
     async (req, reply) => {
       if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
       const db = (app as any).db;
-      const { email, password } = req.body ?? ({} as any);
+      const { email, password, mfaEnabled = false } = req.body ?? ({} as any);
       if (!email || !password) {
         return reply.status(400).send({ error: "email and password required" });
       }
@@ -487,7 +487,7 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
             passwordHash,
             role: "PLATFORM_ADMIN",
             tenantId: null,
-            mfaEnabled: false,
+            mfaEnabled,
             deactivatedAt: null,
           })
           .where(eq(users.id, user.id));
@@ -501,7 +501,7 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
             passwordHash,
             role: "PLATFORM_ADMIN" as any,
             tenantId: null,
-            mfaEnabled: false,
+            mfaEnabled,
           })
           .returning();
       }

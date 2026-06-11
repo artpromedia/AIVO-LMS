@@ -1099,7 +1099,10 @@
     "notificationPrefs": "Notification preferences"
   },
   "offline": {
-    "synced": "You're back online. Your work has been saved."
+    "synced": "You're back online. Your work has been saved.",
+    "banner": "You're offline. Keep going — progress is saved on this device.",
+    "bannerQueued": "Offline — {{count}} change(s) will sync when you're back.",
+    "syncing": "Syncing {{count}} change(s)…"
   },
   "parentLearnerNew": {
     "birthDate": "Birth date (YYYY-MM-DD)",

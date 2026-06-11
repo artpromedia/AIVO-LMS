@@ -614,7 +614,8 @@ export async function registerAuthRoutes(app: FastifyInstance) {
             mfaMethod: user.mfaMethod,
           });
           return { mfaPending: true, mfaToken: challenge.mfaToken, mfaMethod: challenge.mfaMethod };
-        } catch {
+        } catch (err) {
+          req.log.error({ err }, "mfa: failed to start login challenge");
           return reply
             .status(502)
             .send({ error: "Failed to send verification code. Please try again." });
@@ -752,7 +753,8 @@ export async function registerAuthRoutes(app: FastifyInstance) {
             mfaMethod: user.mfaMethod,
           });
           return { mfaPending: true, mfaToken: challenge.mfaToken, mfaMethod: challenge.mfaMethod };
-        } catch {
+        } catch (err) {
+          req.log.error({ err }, "mfa: failed to start login challenge");
           return reply
             .status(502)
             .send({ error: "Failed to send verification code. Please try again." });
@@ -861,7 +863,8 @@ export async function registerAuthRoutes(app: FastifyInstance) {
             mfaMethod: user.mfaMethod,
           });
           return { mfaPending: true, mfaToken: challenge.mfaToken, mfaMethod: challenge.mfaMethod };
-        } catch {
+        } catch (err) {
+          req.log.error({ err }, "mfa: failed to start login challenge");
           return reply
             .status(502)
             .send({ error: "Failed to send verification code. Please try again." });
@@ -1011,7 +1014,8 @@ export async function registerAuthRoutes(app: FastifyInstance) {
             mfaMethod: user.mfaMethod,
           });
           return { mfaPending: true, mfaToken: challenge.mfaToken, mfaMethod: challenge.mfaMethod };
-        } catch {
+        } catch (err) {
+          req.log.error({ err }, "mfa: failed to start login challenge");
           return reply
             .status(502)
             .send({ error: "Failed to send verification code. Please try again." });

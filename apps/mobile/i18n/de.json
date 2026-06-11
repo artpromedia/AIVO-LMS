@@ -1099,7 +1099,10 @@
     "notificationPrefs": "Benachrichtigungseinstellungen"
   },
   "offline": {
-    "synced": "Du bist wieder online. Deine Arbeit wurde gespeichert."
+    "synced": "Du bist wieder online. Deine Arbeit wurde gespeichert.",
+    "banner": "Offline. Mach weiter – dein Fortschritt wird auf diesem Gerät gespeichert.",
+    "bannerQueued": "Offline – {{count}} Änderung(en) werden später synchronisiert.",
+    "syncing": "{{count}} Änderung(en) werden synchronisiert …"
   },
   "parentLearnerNew": {
     "birthDate": "Geburtsdatum (JJJJ-MM-TT)",

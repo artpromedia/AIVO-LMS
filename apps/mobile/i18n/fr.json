@@ -1099,7 +1099,10 @@
     "notificationPrefs": "Préférences de notifications"
   },
   "offline": {
-    "synced": "Tu es de nouveau en ligne. Ton travail a été enregistré."
+    "synced": "Tu es de nouveau en ligne. Ton travail a été enregistré.",
+    "banner": "Hors ligne. Continue — ta progression est enregistrée sur cet appareil.",
+    "bannerQueued": "Hors ligne — {{count}} modification(s) se synchroniseront au retour.",
+    "syncing": "Synchronisation de {{count}} modification(s)…"
   },
   "parentLearnerNew": {
     "birthDate": "Date de naissance (AAAA-MM-JJ)",
