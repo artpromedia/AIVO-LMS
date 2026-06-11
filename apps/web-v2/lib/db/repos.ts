@@ -2582,6 +2582,28 @@ export async function getParentLessonSummaryForRun(
 }
 
 /**
+ * Wave E (S11): attach the agent tutor's quality-gated note to a run's
+ * parent summary. No-op when the run has no summary yet (the note is an
+ * enrichment of the deterministic summary, never a replacement for it).
+ */
+export async function attachTutorNoteToParentSummary(
+  lessonRunId: string,
+  tenantId: string,
+  note: string,
+): Promise<boolean> {
+  const summary = await getPersistence().lessonRuns.getParentSummaryForRun(
+    lessonRunId,
+    tenantId,
+  );
+  if (!summary) return false;
+  await getPersistence().lessonRuns.upsertParentSummary({
+    ...summary,
+    tutorNote: note.slice(0, 700),
+  });
+  return true;
+}
+
+/**
  * Retry a failed LessonRun: regenerate the plan with the same snapshots
  * (so accommodations and mastery context remain stable across attempts).
  * Caps at LESSON_PLAN_MAX_ATTEMPTS network attempts via the AI adapter,

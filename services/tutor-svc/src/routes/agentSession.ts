@@ -13,7 +13,12 @@
  */
 import type { FastifyInstance } from "fastify";
 import { and, eq } from "drizzle-orm";
-import { tutorSessions, tutorDecisionTraces } from "@aivo/db";
+import {
+  gradebookEntries,
+  tutorSessions,
+  tutorDecisionTraces,
+  tutorSessionEvidence,
+} from "@aivo/db";
 import { createLogger } from "@aivo/observability";
 import type { TutorFunctioningLevel } from "@aivo/tutor-sdk";
 import {
@@ -26,6 +31,7 @@ import {
   type OrchestratorDeps,
 } from "../agent/orchestrator.js";
 import { executeDomainTool } from "../agent/tools.js";
+import { executeWriteTool, type WriteToolDeps } from "../agent/write-tools.js";
 import { getTutorDefinition } from "../modes/registry.js";
 import { negotiateFunctioningLevel } from "../lib/learnerContext.js";
 import { resolveTenantIdForLearner } from "../lib/tenant.js";
@@ -125,6 +131,94 @@ async function defaultCallAiTurn(payload: Record<string, unknown>): Promise<AiTu
   return (await res.json()) as AiTurnResult;
 }
 
+/** S11 — ai-svc parent-summary composition. Null on ANY failure: the
+ *  caller keeps its deterministic summary and the close never breaks. */
+async function defaultComposeParentNote(
+  payload: Record<string, unknown>,
+): Promise<string | null> {
+  try {
+    const res = await fetch(`${AI_SVC_URL}/api/ai/tutor-agent/parent-summary`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Internal-Auth": INTERNAL_AI_TOKEN,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(2_500),
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { summary?: string | null };
+    return typeof body.summary === "string" && body.summary ? body.summary : null;
+  } catch {
+    return null;
+  }
+}
+
+const RECOMMENDATION_SVC_URL = process.env.RECOMMENDATION_SVC_URL ?? "http://localhost:3066";
+
+function clamp01(n: number): number {
+  return Math.max(0, Math.min(1, n));
+}
+
+/** Drizzle-backed write-tool deps (S11). */
+export function makeWriteToolDeps(db: any): WriteToolDeps {
+  return {
+    async insertEvidence(row) {
+      await db.insert(tutorSessionEvidence).values({
+        tenantId: row.tenantId,
+        sessionId: row.sessionId,
+        learnerId: row.learnerId,
+        skillId: row.skillId,
+        kind: row.kind,
+        note: row.note,
+        masteryDelta: row.masteryDelta,
+      });
+    },
+    async applySupplementalMastery(input) {
+      // Supplemental means it NUDGES an existing assessment; it never
+      // creates baseline truth. No gradebook row → evidence only.
+      const [entry] = await db
+        .select()
+        .from(gradebookEntries)
+        .where(
+          and(
+            eq(gradebookEntries.tenantId, input.tenantId),
+            eq(gradebookEntries.learnerId, input.learnerId),
+            eq(gradebookEntries.skill, input.skillId),
+          ),
+        );
+      if (!entry) return;
+      const next = clamp01((Number(entry.masteryScore) || 0) + input.delta);
+      await db
+        .update(gradebookEntries)
+        .set({ masteryScore: next, updatedAt: new Date() })
+        .where(eq(gradebookEntries.id, entry.id));
+    },
+    async proposeRecommendation(input) {
+      const res = await fetch(`${RECOMMENDATION_SVC_URL}/api/recommendations/propose`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(input),
+        signal: AbortSignal.timeout(2_500),
+      });
+      if (res.status === 201) {
+        const body = (await res.json()) as { recommendation?: { id?: string } };
+        return { id: body.recommendation?.id };
+      }
+      // Policy refusals come back as structured rejections the model can
+      // learn from; anything else is transport trouble → throw → { error }.
+      if (res.status === 403 || res.status === 409 || res.status === 422 || res.status === 429) {
+        const body = (await res.json().catch(() => ({}))) as {
+          error?: string;
+          message?: string;
+        };
+        return { rejected: body.error ?? `status_${res.status}`, detail: body.message ?? "" };
+      }
+      throw new Error(`recommendation-svc propose returned ${res.status}`);
+    },
+  };
+}
+
 async function defaultFetchBrainContext(learnerId: string): Promise<Record<string, unknown>> {
   const BRAIN_SVC_URL = process.env.BRAIN_SVC_URL ?? "http://localhost:3002";
   try {
@@ -145,7 +239,12 @@ export function registerAgentSessionRoutes(
   app: FastifyInstance,
   db: any,
   depOverrides: Partial<OrchestratorDeps> = {},
+  routeOpts: {
+    /** S11 — injectable for tests; default calls ai-svc /parent-summary. */
+    composeParentNote?: (payload: Record<string, unknown>) => Promise<string | null>;
+  } = {},
 ): void {
+  const composeParentNote = routeOpts.composeParentNote ?? defaultComposeParentNote;
   const store: OrchestratorDeps["store"] = {
     async loadSession(sessionId: string): Promise<AgentSessionRow | null> {
       const [row] = await db
@@ -205,6 +304,10 @@ export function registerAgentSessionRoutes(
     // science-solver-svc, speech-eval-svc, in-process EF breakdown).
     runDomainTool:
       depOverrides.runDomainTool ?? ((name, args, ctx) => executeDomainTool(name, args, ctx)),
+    // Wave E (S11): write tools — evidence ledger + recommendation proposal.
+    runWriteTool:
+      depOverrides.runWriteTool ??
+      ((name, args, ctx) => executeWriteTool(name, args, ctx, makeWriteToolDeps(db))),
     onRungDrop: depOverrides.onRungDrop,
     now: depOverrides.now,
   };
@@ -343,11 +446,76 @@ export function registerAgentSessionRoutes(
       .update(tutorSessions)
       .set({ completedAt: new Date(), durationSeconds })
       .where(eq(tutorSessions.id, sessionId));
+
+    // S11 — agent-composed parent note. Only when the agent actually made
+    // decisions; built from the decision-trace + evidence ledgers (counts
+    // and kinds, never raw learner responses). Null on any failure: the
+    // web summary stays purely deterministic.
+    let parentNote: string | null = null;
+    const agentState = (session.agentState ?? null) as AgentSessionState | null;
+    if (agentState && agentState.seq > 0) {
+      try {
+        const traces = (await db
+          .select()
+          .from(tutorDecisionTraces)
+          .where(eq(tutorDecisionTraces.sessionId, sessionId))) as Array<{
+          seq: number;
+          decision: string;
+        }>;
+        traces.sort((a, b) => a.seq - b.seq);
+        const decisions = traces.map((t) => t.decision).slice(-40);
+        const count = (prefix: string) =>
+          decisions.filter((d) => d === `accepted:${prefix}`).length;
+        const evidence = (await db
+          .select()
+          .from(tutorSessionEvidence)
+          .where(eq(tutorSessionEvidence.sessionId, sessionId))) as Array<{
+          note: string;
+          skillId: string | null;
+        }>;
+        const num = (v: unknown) =>
+          typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0;
+        parentNote = await composeParentNote({
+          tutor_key: agentState.tutorKey,
+          tenant_id: session.tenantId,
+          learner_id: session.learnerId,
+          session_id: sessionId,
+          learner_first_name:
+            typeof body.learnerFirstName === "string" && body.learnerFirstName
+              ? body.learnerFirstName.slice(0, 60)
+              : "Your learner",
+          digest: {
+            beats_completed: num(body.beatsCompleted),
+            checks_correct: num(body.checksCorrect),
+            checks_total: num(body.checksTotal),
+            scaffolds_inserted: count("insert_scaffold"),
+            remediations: count("remediate"),
+            breaks_taken: count("offer_break"),
+            ended_early: decisions.includes("accepted:end_early"),
+            focus_skills: [
+              ...new Set(evidence.map((e) => e.skillId).filter((s): s is string => Boolean(s))),
+            ].slice(0, 8),
+            decisions,
+            evidence_notes: evidence.map((e) => e.note).slice(0, 5),
+          },
+          delivery_level: agentState.deliveryLevel,
+          functioning_level: agentState.negotiatedLevel,
+          locale: typeof body.locale === "string" ? body.locale : undefined,
+        });
+      } catch (err) {
+        request.log?.warn?.(
+          { err: err instanceof Error ? err.message : String(err), sessionId },
+          "agent parent-note composition failed (non-fatal)",
+        );
+      }
+    }
+
     logger.info("agent session closed", {
       sessionId,
       durationSeconds,
       reason: typeof body.reason === "string" ? body.reason : "player_done",
+      parentNote: parentNote ? "composed" : "none",
     });
-    return { status: "closed", sessionId, durationSeconds };
+    return { status: "closed", sessionId, durationSeconds, parentNote };
   });
 }

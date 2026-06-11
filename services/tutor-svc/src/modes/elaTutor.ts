@@ -55,7 +55,15 @@ export const elaTutor: TutorDefinition = defineTutor({
     "12": "authored",
   },
   // Wave E (S8): agent loop instruments + per-level action policy.
-  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context"],
+  // S11: onboarded pilots carry the bounded write tools (evidence ledger
+  // + parent-approved recommendation proposals).
+  toolset: [
+    "get_learner_snapshot",
+    "get_skill_position",
+    "get_curriculum_context",
+    "file_evidence",
+    "propose_recommendation",
+  ],
   actionPolicy: standardActionPolicy(),
   memoryPolicy: NO_MEMORY,
   policy: {

@@ -413,6 +413,94 @@ describe("domain tools (S10)", () => {
   });
 });
 
+describe("write tools (S11): offering + per-session caps", () => {
+  function makeWriteHarness(initialWrites: { evidence: number; proposals: number }) {
+    const h = makeHarness({ writes: initialWrites });
+    const writeCalls: string[] = [];
+    const orchestrator = new AgentOrchestrator({
+      store: {
+        async loadSession(id) {
+          const row = h.sessions.get(id);
+          return row ? { ...row, agentState: structuredClone(row.agentState) } : null;
+        },
+        async saveAgentState(id, state) {
+          h.savedStates.push(structuredClone(state));
+          const row = h.sessions.get(id);
+          if (row) row.agentState = structuredClone(state);
+        },
+        async insertTrace(trace) {
+          h.traces.push(trace);
+        },
+      },
+      callAiTurn: async (payload) => {
+        h.aiCalls.push(payload);
+        if (h.aiCalls.length === 1) {
+          return {
+            kind: "tool_request",
+            tool_calls: [
+              { name: "file_evidence", arguments: { kind: "observation", note: "note one" } },
+            ],
+            usage: { prompt_tokens: 50, completion_tokens: 5 },
+          };
+        }
+        return { kind: "action", action: { kind: "advance" }, usage: {} };
+      },
+      fetchBrainContext: async () => ({}),
+      getCurriculumFocus: async () => null,
+      async runWriteTool(name) {
+        writeCalls.push(name);
+        return name === "file_evidence" ? { filed: true } : { proposed: true };
+      },
+    });
+    return { h, orchestrator, writeCalls };
+  }
+
+  it("offers write tools when wired, executes them, and persists the count", async () => {
+    const { h, orchestrator, writeCalls } = makeWriteHarness({ evidence: 0, proposals: 0 });
+    const result = await orchestrator.runTurn({
+      sessionId: SESSION,
+      learnerId: LEARNER,
+      observation: makeObservation({ recentMissStreak: 0 }),
+      getDefinition: getTutorDefinition,
+    });
+    assert.ok(!("error" in result));
+    const offered = (h.aiCalls[0].allowed_tools as Array<{ name: string }>).map((t) => t.name);
+    assert.ok(offered.includes("file_evidence"));
+    assert.ok(offered.includes("propose_recommendation"));
+    assert.deepEqual(writeCalls, ["file_evidence"]);
+    // The effective write is persisted in agent_state for the NEXT turn.
+    assert.equal(h.savedStates.at(-1)?.writes.evidence, 1);
+  });
+
+  it("refuses past the evidence cap without calling the executor", async () => {
+    const { orchestrator, writeCalls, h } = makeWriteHarness({ evidence: 5, proposals: 0 });
+    await orchestrator.runTurn({
+      sessionId: SESSION,
+      learnerId: LEARNER,
+      observation: makeObservation({ recentMissStreak: 0 }),
+      getDefinition: getTutorDefinition,
+    });
+    assert.deepEqual(writeCalls, [], "cap enforced before the executor");
+    const fedBack = h.aiCalls[1].tool_results as Array<{
+      name: string;
+      result: { error?: string };
+    }>;
+    assert.ok(String(fedBack[0].result.error).includes("evidence cap reached"));
+    assert.equal(h.savedStates.at(-1)?.writes.evidence, 5, "count unchanged");
+  });
+
+  it("never offers write tools without an executor wired", async () => {
+    const plain = makeHarness();
+    plain.setAiScript([{ kind: "action", action: { kind: "advance" }, usage: {} }]);
+    await turn(plain);
+    const offered = (plain.aiCalls[0].allowed_tools as Array<{ name: string }>).map(
+      (t) => t.name,
+    );
+    assert.ok(!offered.includes("file_evidence"));
+    assert.ok(!offered.includes("propose_recommendation"));
+  });
+});
+
 describe("snapshot re-fetch triggers (S10)", () => {
   it("fires on frustration, a 2-miss streak, or a beat over 2x processing speed", () => {
     const calm = makeObservation({ recentMissStreak: 0, secondsOnBeat: 10 });

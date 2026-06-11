@@ -411,7 +411,8 @@
       "worked_on": "取り組んだ内容",
       "went_well": "うまくいったこと",
       "needed_help": "助けが必要だったこと",
-      "up_next": "次の内容"
+      "up_next": "次の内容",
+      "tutor_note": "チューターからのメモ"
     },
     "learner_milestones": {
       "title": "マイルストーン",

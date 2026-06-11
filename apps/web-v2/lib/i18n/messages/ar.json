@@ -411,7 +411,8 @@
       "worked_on": "عمل على",
       "went_well": "سار بشكل جيد",
       "needed_help": "احتاج إلى مساعدة",
-      "up_next": "التالي"
+      "up_next": "التالي",
+      "tutor_note": "ملاحظة من المعلّم"
     },
     "learner_milestones": {
       "title": "الإنجازات",

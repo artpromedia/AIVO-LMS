@@ -39,6 +39,7 @@ import type {
 import { createLogger } from "@aivo/observability";
 import { createHash } from "node:crypto";
 import { DOMAIN_TOOL_SCHEMAS } from "./tools.js";
+import { WRITE_TOOL_SCHEMAS } from "./write-tools.js";
 
 const logger = createLogger("tutor-svc.agent");
 
@@ -89,6 +90,8 @@ export interface AgentSessionState {
   negotiatedLevel: TutorFunctioningLevel;
   deliveryLevel: string;
   lessonRunId: string | null;
+  /** Wave E (S11): per-session write-tool usage (caps enforced here). */
+  writes: { evidence: number; proposals: number };
 }
 
 /** The validated agent action, as returned by ai-svc (snake_case wire). */
@@ -170,6 +173,23 @@ export interface OrchestratorDeps {
     args: Record<string, unknown>,
     ctx: { learnerId: string; observation: LessonObservation },
   ): Promise<Record<string, unknown>>;
+  /**
+   * Wave E (S11): write-tool executor (file_evidence,
+   * propose_recommendation → agent/write-tools.ts). When absent, write
+   * tools are never offered. Per-session caps are enforced HERE (via
+   * agent_state.writes), not in the executor.
+   */
+  runWriteTool?(
+    name: string,
+    args: Record<string, unknown>,
+    ctx: {
+      tenantId: string;
+      sessionId: string;
+      learnerId: string;
+      tutorKey: string;
+      observation: LessonObservation;
+    },
+  ): Promise<Record<string, unknown>>;
   onRungDrop?(sessionId: string, drop: RungDrop): void;
   now?(): number;
 }
@@ -202,6 +222,15 @@ export const DOMAIN_TOOLS: ReadonlySet<AgentToolId> = new Set([
   "score_pronunciation",
   "break_down_task",
 ] as AgentToolId[]);
+
+/** Write tools (Wave E S11) — executable only with a runWriteTool dep. */
+export const WRITE_TOOLS: ReadonlySet<AgentToolId> = new Set([
+  "file_evidence",
+  "propose_recommendation",
+] as AgentToolId[]);
+
+/** Per-session write caps (bounded agency — see agent/write-tools.ts). */
+export const WRITE_CAPS = { evidence: 5, proposals: 1 } as const;
 
 const TOOL_SCHEMAS: Record<string, { description: string; parameters: Record<string, unknown> }> = {
   get_learner_snapshot: {
@@ -274,6 +303,7 @@ export function initialAgentState(input: {
     negotiatedLevel: input.negotiatedLevel,
     deliveryLevel: input.deliveryLevel,
     lessonRunId: input.lessonRunId,
+    writes: { evidence: 0, proposals: 0 },
   };
 }
 
@@ -297,6 +327,12 @@ function parseAgentState(raw: unknown, fallbackTutorKey: string): AgentSessionSt
     negotiatedLevel: (s.negotiatedLevel as TutorFunctioningLevel) ?? base.negotiatedLevel,
     deliveryLevel: typeof s.deliveryLevel === "string" ? s.deliveryLevel : base.deliveryLevel,
     lessonRunId: typeof s.lessonRunId === "string" ? s.lessonRunId : null,
+    writes:
+      s.writes &&
+      typeof s.writes.evidence === "number" &&
+      typeof s.writes.proposals === "number"
+        ? { evidence: Math.max(0, s.writes.evidence), proposals: Math.max(0, s.writes.proposals) }
+        : base.writes,
   };
 }
 
@@ -506,7 +542,10 @@ export class AgentOrchestrator {
       state.negotiatedLevel
     ] ?? ["advance", "switch_modality", "offer_break", "end_early", "present_surface"];
     const offeredTools = def.toolset.filter(
-      (t) => READ_TOOLS.has(t) || (DOMAIN_TOOLS.has(t) && Boolean(this.deps.runDomainTool)),
+      (t) =>
+        READ_TOOLS.has(t) ||
+        (DOMAIN_TOOLS.has(t) && Boolean(this.deps.runDomainTool)) ||
+        (WRITE_TOOLS.has(t) && Boolean(this.deps.runWriteTool)),
     );
     let brain = (session.brainContext ?? {}) as Record<string, unknown>;
     const subject = String(def.subjects[0] ?? "math");
@@ -557,7 +596,7 @@ export class AgentOrchestrator {
           allowed_actions: [...allowedActions],
           allowed_tools: offeredTools.map((name) => ({
             name,
-            ...(TOOL_SCHEMAS[name] ?? DOMAIN_TOOL_SCHEMAS[name]),
+            ...(TOOL_SCHEMAS[name] ?? DOMAIN_TOOL_SCHEMAS[name] ?? WRITE_TOOL_SCHEMAS[name]),
           })),
           tool_results: toolResults,
           roundtrip,
@@ -587,10 +626,14 @@ export class AgentOrchestrator {
         toolResults.push({
           name: call.name,
           result: await this.executeTool(call.name, call.arguments ?? {}, {
+            tenantId: session.tenantId,
+            sessionId: input.sessionId,
             learnerId: session.learnerId,
+            tutorKey: state.tutorKey,
             subject,
             brain,
             observation: input.observation,
+            state,
           }),
         });
       }
@@ -635,16 +678,20 @@ export class AgentOrchestrator {
     }, { action: aiResult.action, rationale: aiResult.rationale ?? "" });
   }
 
-  /** Execute one read tool. Errors become payloads — a flaky read never
+  /** Execute one tool. Errors become payloads — a flaky instrument never
    *  kills the turn; the model simply sees what it asked for failed. */
   private async executeTool(
     name: string,
     args: Record<string, unknown>,
     ctx: {
+      tenantId: string;
+      sessionId: string;
       learnerId: string;
+      tutorKey: string;
       subject: string;
       brain: Record<string, unknown>;
       observation: LessonObservation;
+      state: AgentSessionState;
     },
   ): Promise<Record<string, unknown>> {
     try {
@@ -681,6 +728,38 @@ export class AgentOrchestrator {
               learnerId: ctx.learnerId,
               observation: ctx.observation,
             });
+          }
+          // Wave E (S11): write tools — per-session caps enforced HERE so
+          // the cap survives stateless turns via agent_state.writes.
+          if (WRITE_TOOLS.has(name as AgentToolId) && this.deps.runWriteTool) {
+            if (name === "file_evidence" && ctx.state.writes.evidence >= WRITE_CAPS.evidence) {
+              return {
+                error: `evidence cap reached (${WRITE_CAPS.evidence}/session) — decide without filing more`,
+              };
+            }
+            if (
+              name === "propose_recommendation" &&
+              ctx.state.writes.proposals >= WRITE_CAPS.proposals
+            ) {
+              return {
+                error: `proposal cap reached (${WRITE_CAPS.proposals}/session)`,
+              };
+            }
+            const result = await this.deps.runWriteTool(name, args, {
+              tenantId: ctx.tenantId,
+              sessionId: ctx.sessionId,
+              learnerId: ctx.learnerId,
+              tutorKey: ctx.tutorKey,
+              observation: ctx.observation,
+            });
+            // Count only effective writes — a validation error costs nothing.
+            if (!result.error) {
+              if (name === "file_evidence") ctx.state.writes.evidence += 1;
+              if (name === "propose_recommendation" && result.proposed === true) {
+                ctx.state.writes.proposals += 1;
+              }
+            }
+            return result;
           }
           return { error: `tool "${name}" is not executable here` };
       }

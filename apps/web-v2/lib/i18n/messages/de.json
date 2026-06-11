@@ -411,7 +411,8 @@
       "worked_on": "Gearbeitet an",
       "went_well": "Gut gelaufen",
       "needed_help": "Brauchte Hilfe",
-      "up_next": "Als nächstes"
+      "up_next": "Als nächstes",
+      "tutor_note": "Eine Notiz vom Tutor"
     },
     "learner_milestones": {
       "title": "Meilensteine",

@@ -604,7 +604,8 @@
       "worked_on": "Worked on",
       "went_well": "Went well",
       "needed_help": "Needed help",
-      "up_next": "Up next"
+      "up_next": "Up next",
+      "tutor_note": "A note from the tutor"
     },
     "learner_milestones": {
       "title": "Milestones",

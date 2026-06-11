@@ -411,7 +411,8 @@
       "worked_on": "学习内容",
       "went_well": "表现良好",
       "needed_help": "需要帮助",
-      "up_next": "下一步"
+      "up_next": "下一步",
+      "tutor_note": "来自导师的留言"
     },
     "learner_milestones": {
       "title": "里程碑",

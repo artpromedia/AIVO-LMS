@@ -828,39 +828,33 @@ export function LessonPlayer({
   }
 
   function complete(abandoned: boolean) {
-    // Wave E (S9): fire-and-forget the agent-session close — lesson exit
-    // must never wait on agent bookkeeping.
-    if (agent && agentSessionRef.current) {
-      fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/agent-close`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          sessionId: agentSessionRef.current,
-          reason: abandoned ? "abandoned" : "completed",
-        }),
-        keepalive: true,
-      }).catch(() => {});
-      agentSessionRef.current = null;
-    }
     // The BFF now derives checks/hints/scaffolds/seconds from server-recorded
     // LessonInteraction rows (post-architect-review hardening). The client
-    // only contributes `abandoned`, which is a UX signal not represented in
-    // interactions.
+    // only contributes `abandoned` (a UX signal not represented in
+    // interactions) and, for agent lessons, the agentSessionId so the BFF
+    // can close the agent session server-side and weave the agent's parent
+    // note into the run summary (Wave E S11).
+    const agentSessionId = agent ? agentSessionRef.current : null;
     startTransition(async () => {
       const res = await fetch(
         `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/complete`,
         {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ outcome: { abandoned } }),
+          body: JSON.stringify({
+            outcome: { abandoned },
+            ...(agentSessionId ? { agentSessionId } : {}),
+          }),
         },
       );
       if (!res.ok) {
         // Surface the failure instead of redirecting blindly — otherwise the
         // run would silently stay in_progress and mastery would never update.
+        // The agent session id is kept so a retry can still close it.
         setCompleteError(t("complete_error"));
         return;
       }
+      agentSessionRef.current = null;
       router.push("/learner/home");
       router.refresh();
     });

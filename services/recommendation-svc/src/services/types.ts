@@ -21,7 +21,8 @@ export type EvidenceSource =
   | "parent_observation"
   | "caregiver_observation"
   | "therapist_observation"
-  | "regression_check";
+  | "regression_check"
+  | "tutor_session";
 
 /** Who contributed an observation-derived piece of evidence. */
 export type ContributorRole = "parent" | "teacher" | "therapist" | "caregiver";

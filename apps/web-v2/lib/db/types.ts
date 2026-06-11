@@ -1114,6 +1114,11 @@ export type ParentLessonSummary = {
     levelBefore: SkillMasteryLevel;
     levelAfter: SkillMasteryLevel;
   };
+  /** Wave E (S11): the observing agent tutor's own note to the parent —
+   *  composed from the session's decision/evidence ledgers on the teach
+   *  tier and quality-gated in ai-svc. Null/absent for non-agent lessons
+   *  or when composition fell back. */
+  tutorNote?: string | null;
   createdAt: ISODate;
 };
 

@@ -43,6 +43,12 @@ export const AGENT_TOOL_IDS = [
   "score_pronunciation", // speech-eval-svc
   "evaluate_science_answer", // science-solver-svc
   "break_down_task", // tutor-svc EF breakdown
+  // Write tools (Wave E S11) — bounded effects, never direct state edits:
+  // file_evidence appends to the evidence ledger (mastery nudge clamped
+  // to ±0.05); propose_recommendation creates a PENDING recommendation
+  // that a parent/teacher must approve (cooldown + dedupe server-side).
+  "file_evidence",
+  "propose_recommendation",
 ] as const;
 
 export type AgentToolId = (typeof AGENT_TOOL_IDS)[number];

@@ -8,7 +8,13 @@
 import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import Fastify, { type FastifyInstance } from "fastify";
-import { learners, tutorSessions, tutorDecisionTraces, auditEvents } from "@aivo/db";
+import {
+  learners,
+  tutorSessions,
+  tutorDecisionTraces,
+  tutorSessionEvidence,
+  auditEvents,
+} from "@aivo/db";
 import { registerAgentSessionRoutes } from "../src/routes/agentSession.js";
 import type { AiTurnResult } from "../src/agent/orchestrator.js";
 
@@ -27,6 +33,8 @@ interface Captured {
 function makeFakeDb(opts: {
   sessionRow: Record<string, unknown> | null;
   captured: Captured;
+  traceRows?: Record<string, unknown>[];
+  evidenceRows?: Record<string, unknown>[];
 }) {
   return {
     select(_projection?: unknown) {
@@ -37,6 +45,10 @@ function makeFakeDb(opts: {
               if (table === learners) return Promise.resolve([{ tenantId: TENANT }]);
               if (table === tutorSessions) {
                 return Promise.resolve(opts.sessionRow ? [opts.sessionRow] : []);
+              }
+              if (table === tutorDecisionTraces) return Promise.resolve(opts.traceRows ?? []);
+              if (table === tutorSessionEvidence) {
+                return Promise.resolve(opts.evidenceRows ?? []);
               }
               return Promise.resolve([]);
             },
@@ -81,23 +93,31 @@ function makeApp(opts: {
   sessionRow: Record<string, unknown> | null;
   captured: Captured;
   aiScript: Array<AiTurnResult | Error>;
+  traceRows?: Record<string, unknown>[];
+  evidenceRows?: Record<string, unknown>[];
+  composeParentNote?: (payload: Record<string, unknown>) => Promise<string | null>;
 }): FastifyInstance {
   const app = Fastify({ logger: false });
   const script = [...opts.aiScript];
-  registerAgentSessionRoutes(app, makeFakeDb(opts), {
-    async callAiTurn() {
-      const next = script.shift();
-      if (!next) throw new Error("ai script exhausted");
-      if (next instanceof Error) throw next;
-      return next;
+  registerAgentSessionRoutes(
+    app,
+    makeFakeDb(opts),
+    {
+      async callAiTurn() {
+        const next = script.shift();
+        if (!next) throw new Error("ai script exhausted");
+        if (next instanceof Error) throw next;
+        return next;
+      },
+      async fetchBrainContext() {
+        return { functioning_level_profile: { level: "STANDARD" }, grade_band: "3" };
+      },
+      async getCurriculumFocus() {
+        return null;
+      },
     },
-    async fetchBrainContext() {
-      return { functioning_level_profile: { level: "STANDARD" }, grade_band: "3" };
-    },
-    async getCurriculumFocus() {
-      return null;
-    },
-  });
+    { composeParentNote: opts.composeParentNote ?? (async () => null) },
+  );
   return app;
 }
 
@@ -310,5 +330,71 @@ describe("POST /api/tutor/agent/session/:sessionId/close", () => {
     assert.equal(again.statusCode, 200);
     assert.equal((again.json() as { alreadyClosed?: boolean }).alreadyClosed, true);
     assert.equal(captured.sessionUpdates.length, 1, "no second update");
+  });
+
+  it("composes the parent note from the decision + evidence ledgers (S11)", async () => {
+    const captured: Captured = { sessionInserts: [], sessionUpdates: [], traceInserts: [] };
+    const composePayloads: Record<string, unknown>[] = [];
+    const sessionRow: Record<string, unknown> = {
+      id: SESSION,
+      tenantId: TENANT,
+      learnerId: LEARNER,
+      sessionType: "agent_lesson",
+      completedAt: null,
+      startedAt: new Date(Date.now() - 8 * 60_000),
+      agentState: {
+        seq: 4,
+        envelope: { limit: 8000, used: 1200 },
+        ladder: { rung: "full", latencies: [], consecutiveFailures: 0 },
+        tutorKey: "nova",
+        negotiatedLevel: "STANDARD",
+        deliveryLevel: "3",
+        lessonRunId: "run-1",
+        writes: { evidence: 1, proposals: 0 },
+      },
+    };
+    const app = makeApp({
+      sessionRow,
+      captured,
+      aiScript: [],
+      traceRows: [
+        { seq: 1, decision: "accepted:insert_scaffold" },
+        { seq: 2, decision: "accepted:advance" },
+        { seq: 3, decision: "accepted:offer_break" },
+        { seq: 4, decision: "accepted:advance" },
+      ],
+      evidenceRows: [
+        { note: "worked example helped on equal groups", skillId: "ccss.3.oa.a.1" },
+      ],
+      composeParentNote: async (payload) => {
+        composePayloads.push(payload);
+        return "Sky practised multiplication with Nova and a worked example helped.";
+      },
+    });
+    const res = await app.inject({
+      method: "POST",
+      url: `/api/tutor/agent/session/${SESSION}/close`,
+      payload: { reason: "completed", learnerFirstName: "Sky", checksCorrect: 2, checksTotal: 3 },
+    });
+    assert.equal(res.statusCode, 200);
+    const body = res.json() as { parentNote: string | null };
+    assert.equal(
+      body.parentNote,
+      "Sky practised multiplication with Nova and a worked example helped.",
+    );
+    assert.equal(composePayloads.length, 1);
+    const digest = composePayloads[0].digest as {
+      scaffolds_inserted: number;
+      breaks_taken: number;
+      checks_correct: number;
+      evidence_notes: string[];
+      focus_skills: string[];
+    };
+    assert.equal(digest.scaffolds_inserted, 1);
+    assert.equal(digest.breaks_taken, 1);
+    assert.equal(digest.checks_correct, 2);
+    assert.deepEqual(digest.evidence_notes, ["worked example helped on equal groups"]);
+    assert.deepEqual(digest.focus_skills, ["ccss.3.oa.a.1"]);
+    assert.equal(composePayloads[0].learner_first_name, "Sky");
   });
 });

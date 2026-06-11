@@ -411,7 +411,8 @@
       "worked_on": "학습한 내용",
       "went_well": "잘된 점",
       "needed_help": "도움이 필요했던 부분",
-      "up_next": "다음 내용"
+      "up_next": "다음 내용",
+      "tutor_note": "튜터의 메모"
     },
     "learner_milestones": {
       "title": "마일스톤",

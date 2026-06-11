@@ -14,6 +14,11 @@ import os
 from fastapi import APIRouter, Header, HTTPException
 
 from ai_svc.agent.loop import AgentTurnRequest, TurnResult, run_turn
+from ai_svc.agent.parent_summary import (
+    ParentSummaryRequest,
+    ParentSummaryResult,
+    compose_parent_summary,
+)
 
 _INTERNAL_TOKEN = os.environ.get("INTERNAL_AI_TOKEN") or (
     "dev-tutor-svc-internal"
@@ -40,3 +45,15 @@ async def tutor_agent_turn(
 ) -> TurnResult:
     _require_internal(x_internal_auth)
     return await run_turn(request)
+
+
+@router.post("/parent-summary", response_model=ParentSummaryResult)
+async def tutor_agent_parent_summary(
+    request: ParentSummaryRequest,
+    x_internal_auth: str | None = Header(default=None, alias="X-Internal-Auth"),
+) -> ParentSummaryResult:
+    """Wave E (S11) — compose a quality-gated parent note from a session
+    digest. Returns summary=None with a fallback_reason when composition
+    fails; the caller then keeps its deterministic summary."""
+    _require_internal(x_internal_auth)
+    return await compose_parent_summary(request)

@@ -168,6 +168,30 @@ export const tutorDecisionTraces = pgTable("tutor_decision_traces", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+/**
+ * Wave E (S11): the agent's evidence ledger — one row per `file_evidence`
+ * tool call. `masteryDelta` is SUPPLEMENTAL and hard-clamped to ±0.05 by
+ * the adapter before insert; the gradebook nudge happens in the same
+ * transaction-shaped flow so the ledger always explains the movement.
+ */
+export const tutorSessionEvidence = pgTable("tutor_session_evidence", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  sessionId: uuid("session_id")
+    .references(() => tutorSessions.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  skillId: varchar("skill_id", { length: 200 }),
+  kind: varchar("kind", { length: 30 }).notNull(),
+  note: text("note").notNull(),
+  masteryDelta: real("mastery_delta").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const tokenUsage = pgTable("token_usage", {
   id: uuid("id").defaultRandom().primaryKey(),
   tenantId: uuid("tenant_id")

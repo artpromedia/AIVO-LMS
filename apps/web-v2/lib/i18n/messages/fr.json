@@ -411,7 +411,8 @@
       "worked_on": "Travaillé sur",
       "went_well": "S'est bien passé",
       "needed_help": "A eu besoin d'aide",
-      "up_next": "À suivre"
+      "up_next": "À suivre",
+      "tutor_note": "Un mot du tuteur"
     },
     "learner_milestones": {
       "title": "Étapes",
