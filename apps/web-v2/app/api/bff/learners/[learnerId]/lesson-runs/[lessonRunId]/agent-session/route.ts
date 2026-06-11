@@ -17,17 +17,12 @@ import { audit } from "@/lib/bff/audit";
 import { getLearner, getLessonRun, getSubjectById } from "@/lib/db/repos";
 import { tutorAgenticModeEnabled } from "@/lib/feature-flags";
 import { isLiveTutorAgent, tutorAgentOpen } from "@/lib/bff/tutor-agent";
+import { agentForSubjectSlug } from "@/lib/bff/agent-pilot";
 import { logger } from "@/lib/observability/logger";
 
 export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ learnerId: string; lessonRunId: string }> };
-
-/** Pilot scope: subject slug → tutor key. Nova (math) first; widening this
- *  map is the S13 onboarding lever, not a code change per tutor. */
-const PILOT_SUBJECT_TUTORS: Record<string, string> = {
-  math: "nova",
-};
 
 export async function POST(req: Request, { params }: Params): Promise<NextResponse> {
   const requestId = getRequestId(req);
@@ -56,10 +51,11 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
     }
     const subject = await getSubjectById(found.lessonRun.subjectId);
-    const tutorKey = subject ? PILOT_SUBJECT_TUTORS[subject.slug] : undefined;
-    if (!tutorKey) {
+    const pilot = agentForSubjectSlug(subject?.slug);
+    if (!pilot) {
       return ok({ enabled: false, reason: "subject_not_piloted" }, requestId);
     }
+    const tutorKey = pilot.tutorKey;
 
     const learner = await getLearner(learnerId, session!.tenantId);
     try {

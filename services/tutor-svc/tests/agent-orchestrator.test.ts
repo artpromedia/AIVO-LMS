@@ -14,6 +14,7 @@ import {
   initialAgentState,
   observationDigest,
   buildMachineMirror,
+  shouldRefetchSnapshot,
   type AgentSessionRow,
   type AgentSessionState,
   type AiTurnResult,
@@ -338,6 +339,130 @@ describe("AgentOrchestrator.runTurn", () => {
     h.sessions.get(SESSION)!.completedAt = new Date();
     const closed = await turn(h);
     assert.ok("error" in closed && closed.status === 409);
+  });
+});
+
+// ── Wave E (S10): domain tools + snapshot re-fetch triggers ────────────────
+
+describe("domain tools (S10)", () => {
+  it("offers a tutor's domain tools only when an adapter is wired, and executes through it", async () => {
+    const domainCalls: Array<{ name: string; args: Record<string, unknown> }> = [];
+    const h = makeHarness();
+    // Rebuild the orchestrator with a domain adapter injected.
+    const orchestrator = new AgentOrchestrator({
+      store: {
+        async loadSession(id) {
+          const row = h.sessions.get(id);
+          return row ? { ...row, agentState: structuredClone(row.agentState) } : null;
+        },
+        async saveAgentState(id, state) {
+          const row = h.sessions.get(id);
+          if (row) row.agentState = structuredClone(state);
+        },
+        async insertTrace(trace) {
+          h.traces.push(trace);
+        },
+      },
+      callAiTurn: async (payload) => {
+        h.aiCalls.push(payload);
+        if (h.aiCalls.length === 1) {
+          return {
+            kind: "tool_request",
+            tool_calls: [{ name: "read_math_work", arguments: { typed_work: "3+4=7" } }],
+            usage: { prompt_tokens: 100, completion_tokens: 10 },
+          };
+        }
+        return {
+          kind: "action",
+          action: { kind: "remediate", focus: "multiplication as groups" },
+          usage: { prompt_tokens: 100, completion_tokens: 10 },
+        };
+      },
+      fetchBrainContext: async () => ({}),
+      getCurriculumFocus: async () => null,
+      async runDomainTool(name, args) {
+        domainCalls.push({ name, args });
+        return { correctness: false, misconceptions: [{ label: "added instead" }] };
+      },
+    });
+
+    const result = await orchestrator.runTurn({
+      sessionId: SESSION,
+      learnerId: LEARNER,
+      observation: makeObservation({ recentMissStreak: 0 }),
+      getDefinition: getTutorDefinition,
+    });
+    assert.ok(!("error" in result));
+    assert.equal(result.kind, "action");
+
+    // Nova's read_math_work is now offered…
+    const offered = (h.aiCalls[0].allowed_tools as Array<{ name: string }>).map((t) => t.name);
+    assert.ok(offered.includes("read_math_work"));
+    // …and executed through the injected adapter, fed back on call 2.
+    assert.deepEqual(domainCalls, [{ name: "read_math_work", args: { typed_work: "3+4=7" } }]);
+    const fedBack = h.aiCalls[1].tool_results as Array<{ name: string; result: unknown }>;
+    assert.equal(fedBack[0].name, "read_math_work");
+  });
+
+  it("never offers domain tools without an adapter (S9 harness has none)", async () => {
+    const h2 = makeHarness();
+    h2.setAiScript([{ kind: "action", action: { kind: "advance" }, usage: {} }]);
+    await turn(h2);
+    const offered = (h2.aiCalls[0].allowed_tools as Array<{ name: string }>).map((t) => t.name);
+    assert.ok(!offered.includes("read_math_work"));
+  });
+});
+
+describe("snapshot re-fetch triggers (S10)", () => {
+  it("fires on frustration, a 2-miss streak, or a beat over 2x processing speed", () => {
+    const calm = makeObservation({ recentMissStreak: 0, secondsOnBeat: 10 });
+    assert.equal(shouldRefetchSnapshot(calm, {}), false);
+    assert.equal(
+      shouldRefetchSnapshot({ ...calm, frustrationEvent: true }, {}),
+      true,
+      "frustration",
+    );
+    assert.equal(
+      shouldRefetchSnapshot({ ...calm, recentMissStreak: 2 }, {}),
+      true,
+      "miss streak",
+    );
+    assert.equal(
+      shouldRefetchSnapshot(
+        { ...calm, secondsOnBeat: 25 },
+        { processing_speed_ms: 10_000 },
+      ),
+      true,
+      "slow beat vs processing speed",
+    );
+    assert.equal(
+      shouldRefetchSnapshot(
+        { ...calm, secondsOnBeat: 15 },
+        { processing_speed_ms: 10_000 },
+      ),
+      false,
+      "within 2x budget",
+    );
+  });
+
+  it("pre-seeds a fresh learner snapshot into the first model call", async () => {
+    const h = makeHarness();
+    h.setAiScript([{ kind: "action", action: { kind: "offer_break" }, usage: {} }]);
+    await turn(h, makeObservation({ recentMissStreak: 0, frustrationEvent: true }));
+    const seeded = h.aiCalls[0].tool_results as Array<{
+      name: string;
+      result: { grade_band?: string };
+    }>;
+    assert.equal(seeded.length, 1);
+    assert.equal(seeded[0].name, "get_learner_snapshot");
+    assert.equal(seeded[0].result.grade_band, "3", "fresh brain context merged in");
+  });
+
+  it("does not pre-seed on a calm turn", async () => {
+    const h = makeHarness();
+    h.setAiScript([{ kind: "action", action: { kind: "advance" }, usage: {} }]);
+    await turn(h, makeObservation({ recentMissStreak: 0 }));
+    assert.equal((h.aiCalls[0].tool_results as unknown[]).length, 0);
   });
 });
 

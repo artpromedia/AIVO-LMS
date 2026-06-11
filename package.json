@@ -79,6 +79,7 @@
     "release:gate": "node scripts/release-gate.mjs",
     "backend:parity": "node scripts/backend-parity-check.mjs",
     "tutor:parity": "node scripts/tutor-parity-check.mjs",
+    "tutor:behavior": "node scripts/tutor-behavioral-check.mjs",
     "curriculum:coverage": "node scripts/curriculum-coverage-check.mjs",
     "catalogue:coverage": "node scripts/catalogue-coverage-check.mjs",
     "ux:matrix": "node scripts/subject-tutor-ux-check.mjs",

@@ -14,6 +14,17 @@
 /** Validated agent action as returned by tutor-svc (snake_case wire). */
 export type AgentWireAction = { kind: string } & Record<string, unknown>;
 
+/**
+ * Identity of the agent tutor watching a lesson (brand tutor fields the
+ * panel renders). Present only when agentic mode is on for the lesson.
+ */
+export type LessonAgentConfig = {
+  tutorKey: string;
+  name: string;
+  icon: string;
+  color: string;
+};
+
 /** Decision envelope from POST /api/tutor/agent/session/:id/turn. */
 export type AgentTurnDecision = {
   kind: "action" | "deterministic";

@@ -25,6 +25,7 @@ import {
   type LessonObservation,
   type OrchestratorDeps,
 } from "../agent/orchestrator.js";
+import { executeDomainTool } from "../agent/tools.js";
 import { getTutorDefinition } from "../modes/registry.js";
 import { negotiateFunctioningLevel } from "../lib/learnerContext.js";
 import { resolveTenantIdForLearner } from "../lib/tenant.js";
@@ -106,6 +107,7 @@ export function parseObservation(raw: unknown): LessonObservation | null {
     recentMissStreak: num(o.recentMissStreak),
     secondsOnBeat: num(o.secondsOnBeat),
     skillId: typeof o.skillId === "string" ? o.skillId.slice(0, 200) : undefined,
+    frustrationEvent: o.frustrationEvent === true ? true : undefined,
   };
 }
 
@@ -199,6 +201,10 @@ export function registerAgentSessionRoutes(
           return null;
         }
       }),
+    // Wave E (S10): the real domain adapters (math-recognizer-svc,
+    // science-solver-svc, speech-eval-svc, in-process EF breakdown).
+    runDomainTool:
+      depOverrides.runDomainTool ?? ((name, args, ctx) => executeDomainTool(name, args, ctx)),
     onRungDrop: depOverrides.onRungDrop,
     now: depOverrides.now,
   };

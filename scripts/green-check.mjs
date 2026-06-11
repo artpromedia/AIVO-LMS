@@ -83,6 +83,11 @@ const gates = [
   // Sprint-owned gates implemented in GREEN-01 .. GREEN-03.
   { name: "backend:parity", script: "backend:parity", required: true, category: "backend" },
   { name: "tutor:parity", script: "tutor:parity", required: true, category: "tutor" },
+  // Wave E (S10): parity proves tutor CONFIGURATION; this replays fixture
+  // sessions through the real orchestrator and proves agentic BEHAVIOUR
+  // (observes / closed decision set / guarded / degrades / audited) for
+  // every onboarded tutor, with an onboarding ratchet.
+  { name: "tutor:behavior", script: "tutor:behavior", required: true, category: "tutor" },
   {
     name: "curriculum:coverage",
     script: "curriculum:coverage",

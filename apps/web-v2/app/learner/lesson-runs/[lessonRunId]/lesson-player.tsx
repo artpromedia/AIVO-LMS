@@ -45,6 +45,7 @@ import { InLessonTutorPanel } from "@/components/learner/in-lesson-tutor-panel";
 import {
   PRESENTABLE_SURFACES,
   type AgentTurnDecision,
+  type LessonAgentConfig,
   type LessonAgentDirective,
 } from "@/lib/learner/agent-directives";
 import type {
@@ -181,15 +182,11 @@ function isCorrect(expected: string | undefined, actual: string): boolean {
 /**
  * Wave E (S9): identity of the agent tutor watching this lesson. Present
  * ONLY when the tenant flag `tutorAgenticMode` is on AND the subject is
- * piloted (math → Nova). When absent the player renders and behaves
- * byte-identically to the pre-agent build — the agent is pure enrichment.
+ * piloted (see lib/bff/agent-pilot.ts). When absent the player renders
+ * and behaves byte-identically to the pre-agent build — the agent is
+ * pure enrichment. Re-exported from agent-directives for callers.
  */
-export type LessonAgentConfig = {
-  tutorKey: string;
-  name: string;
-  icon: string;
-  color: string;
-};
+export type { LessonAgentConfig } from "@/lib/learner/agent-directives";
 
 type Props = {
   learnerId: string;
@@ -335,6 +332,9 @@ export function LessonPlayer({
   const scaffoldsRef = useRef(0);
   const beatStartRef = useRef<number>(Date.now());
   const stepIdxRef = useRef(0);
+  // S10: a break taken during this beat is the player's frustration
+  // signal — it triggers a fresh learner-snapshot fetch server-side.
+  const frustrationRef = useRef(false);
 
   // Mark lesson_started once on mount when status === "ready".
   // Deps are intentionally empty: this is a mount-only side-effect.
@@ -483,11 +483,18 @@ export function LessonPlayer({
   useEffect(() => {
     beatStartRef.current = Date.now();
     stepIdxRef.current = stepIdx;
+    frustrationRef.current = false;
     if (!agent) return;
     setAgentScaffold(null);
     setAgentSurfaceOverride(null);
     setAgentMsg(null);
   }, [stepIdx, agent]);
+
+  // S10: a break during the beat marks the frustration signal for the
+  // next observation (works for learner-initiated and reminder breaks).
+  useEffect(() => {
+    if (onBreak) frustrationRef.current = true;
+  }, [onBreak]);
 
   /**
    * Wave E (S9): apply one validated agent directive. Every branch is a
@@ -576,6 +583,7 @@ export function LessonPlayer({
       recentMissStreak: missStreakRef.current,
       secondsOnBeat: Math.max(0, Math.round((Date.now() - beatStartRef.current) / 1000)),
       skillId: interactiveBeat.kind === "guided" ? interactiveBeat.skillId : undefined,
+      frustrationEvent: frustrationRef.current || undefined,
     };
     const requestStep = stepIdx;
     setAgentThinking(true);

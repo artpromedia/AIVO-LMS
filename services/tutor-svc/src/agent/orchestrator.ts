@@ -38,6 +38,7 @@ import type {
 } from "@aivo/tutor-sdk";
 import { createLogger } from "@aivo/observability";
 import { createHash } from "node:crypto";
+import { DOMAIN_TOOL_SCHEMAS } from "./tools.js";
 
 const logger = createLogger("tutor-svc.agent");
 
@@ -74,6 +75,9 @@ export interface LessonObservation {
   recentMissStreak?: number;
   secondsOnBeat?: number;
   skillId?: string;
+  /** Wave E (S10): the learner showed frustration this beat (e.g. opened
+   *  the break screen mid-item). Triggers a fresh snapshot re-fetch. */
+  frustrationEvent?: boolean;
 }
 
 /** Persisted between turns in `tutor_sessions.agent_state`. */
@@ -155,6 +159,17 @@ export interface OrchestratorDeps {
   /** Read tools. Failures resolve to an error payload, never throw a turn. */
   fetchBrainContext(learnerId: string): Promise<Record<string, unknown>>;
   getCurriculumFocus(learnerId: string, subject: string): Promise<unknown | null>;
+  /**
+   * Wave E (S10): domain tool executor (read_math_work, score_pronunciation,
+   * evaluate_science_answer, break_down_task → their backing services).
+   * Failures resolve to `{ error }`. When absent, domain tools are not
+   * offered to the model.
+   */
+  runDomainTool?(
+    name: string,
+    args: Record<string, unknown>,
+    ctx: { learnerId: string; observation: LessonObservation },
+  ): Promise<Record<string, unknown>>;
   onRungDrop?(sessionId: string, drop: RungDrop): void;
   now?(): number;
 }
@@ -168,16 +183,24 @@ export const MAX_TOOL_ROUNDTRIPS = 3;
 /** ai-svc must answer within the gateway floor; the ladder handles slowness. */
 export const ENVELOPE_FLOOR_TOKENS = 200;
 
-/**
- * Tools this orchestrator can execute TODAY. Domain tools
- * (read_math_work, score_pronunciation, evaluate_science_answer,
- * break_down_task) land with their service adapters in S10 — until then
- * they are never offered to the model, even if a tutor declares them.
- */
-export const EXECUTABLE_TOOLS: ReadonlySet<AgentToolId> = new Set([
+/** The always-executable read belt (served in-process by this module). */
+export const READ_TOOLS: ReadonlySet<AgentToolId> = new Set([
   "get_learner_snapshot",
   "get_skill_position",
   "get_curriculum_context",
+] as AgentToolId[]);
+
+/**
+ * Domain tools (Wave E S10) — executable only when the orchestrator was
+ * wired with a `runDomainTool` dep (the route wires the real adapters in
+ * `agent/tools.ts`; tests inject fakes). A tutor may DECLARE these in its
+ * toolset, but the model is offered only what this process can execute.
+ */
+export const DOMAIN_TOOLS: ReadonlySet<AgentToolId> = new Set([
+  "read_math_work",
+  "evaluate_science_answer",
+  "score_pronunciation",
+  "break_down_task",
 ] as AgentToolId[]);
 
 const TOOL_SCHEMAS: Record<string, { description: string; parameters: Record<string, unknown> }> = {
@@ -201,6 +224,32 @@ const TOOL_SCHEMAS: Record<string, { description: string; parameters: Record<str
     parameters: { type: "object", properties: {}, additionalProperties: false },
   },
 };
+
+/**
+ * Snapshot re-fetch triggers (S10): when the live session contradicts the
+ * cached learner picture, refresh it BEFORE the model decides — pre-seeded
+ * as a get_learner_snapshot tool result so no roundtrip is spent.
+ */
+export function shouldRefetchSnapshot(
+  observation: LessonObservation,
+  brain: Record<string, unknown>,
+): boolean {
+  if (observation.frustrationEvent) return true;
+  if ((observation.recentMissStreak ?? 0) >= 2) return true;
+  const processingMs = Number(
+    (brain as { processing_speed_ms?: unknown }).processing_speed_ms ??
+      (brain as { functioning_level_profile?: { processing_speed_ms?: unknown } })
+        .functioning_level_profile?.processing_speed_ms,
+  );
+  if (
+    Number.isFinite(processingMs) &&
+    processingMs > 0 &&
+    (observation.secondsOnBeat ?? 0) * 1000 > 2 * processingMs
+  ) {
+    return true;
+  }
+  return false;
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -456,9 +505,32 @@ export class AgentOrchestrator {
     const allowedActions: readonly AgentActionKind[] = def.actionPolicy[
       state.negotiatedLevel
     ] ?? ["advance", "switch_modality", "offer_break", "end_early", "present_surface"];
-    const offeredTools = def.toolset.filter((t) => EXECUTABLE_TOOLS.has(t));
-    const brain = (session.brainContext ?? {}) as Record<string, unknown>;
+    const offeredTools = def.toolset.filter(
+      (t) => READ_TOOLS.has(t) || (DOMAIN_TOOLS.has(t) && Boolean(this.deps.runDomainTool)),
+    );
+    let brain = (session.brainContext ?? {}) as Record<string, unknown>;
     const subject = String(def.subjects[0] ?? "math");
+
+    // 3b. Mid-session snapshot re-fetch (S10): frustration, a 2-miss
+    // streak, or a beat running >2× the learner's processing speed means
+    // the cached picture is stale — refresh it and pre-seed the result so
+    // the model starts from current state without spending a roundtrip.
+    let toolResults: Array<{ name: string; result: Record<string, unknown> }> = [];
+    if (shouldRefetchSnapshot(input.observation, brain)) {
+      try {
+        const fresh = await this.deps.fetchBrainContext(session.learnerId);
+        if (fresh && Object.keys(fresh).length > 0) {
+          brain = { ...brain, ...fresh };
+        }
+        toolResults.push({
+          name: "get_learner_snapshot",
+          result: compactBrainSnapshot(brain),
+        });
+      } catch {
+        // Stale context is still usable context — proceed without the refresh.
+      }
+    }
+
     const gradeBand =
       typeof brain.grade_band === "string" ? (brain.grade_band as string) : undefined;
     const focus = (brain as { curriculum_focus?: { title?: unknown } }).curriculum_focus;
@@ -472,7 +544,6 @@ export class AgentOrchestrator {
 
     // 4. Model loop with tool roundtrips (caps mirrored on the ai-svc side).
     let aiResult: AiTurnResult | null = null;
-    let toolResults: Array<{ name: string; result: Record<string, unknown> }> = [];
     let usedTokens = 0;
     for (let roundtrip = 0; roundtrip <= MAX_TOOL_ROUNDTRIPS; roundtrip += 1) {
       try {
@@ -484,7 +555,10 @@ export class AgentOrchestrator {
           persona_context: personaContext,
           observation: { ...input.observation },
           allowed_actions: [...allowedActions],
-          allowed_tools: offeredTools.map((name) => ({ name, ...TOOL_SCHEMAS[name] })),
+          allowed_tools: offeredTools.map((name) => ({
+            name,
+            ...(TOOL_SCHEMAS[name] ?? DOMAIN_TOOL_SCHEMAS[name]),
+          })),
           tool_results: toolResults,
           roundtrip,
           model_tier: "decision",
@@ -601,6 +675,13 @@ export class AgentOrchestrator {
             : { note: "no active school syllabus for this subject this week" };
         }
         default:
+          // Wave E (S10): domain tools route to the injected adapter belt.
+          if (DOMAIN_TOOLS.has(name as AgentToolId) && this.deps.runDomainTool) {
+            return await this.deps.runDomainTool(name, args, {
+              learnerId: ctx.learnerId,
+              observation: ctx.observation,
+            });
+          }
           return { error: `tool "${name}" is not executable here` };
       }
     } catch (err) {
