@@ -3090,5 +3090,47 @@
       "client_id_label": "cliente",
       "deployments_label": "Implantações"
     }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "Esta semana",
+      "full_term": "Período completo",
+      "school_calendar": "Calendário escolar"
+    },
+    "school_calendar": {
+      "title": "Calendário escolar",
+      "description": "Informe as datas dos períodos e recessos de {name}. A AIVO pausa a sincronização escolar nos recessos e oferece preparação de férias; os planos de ritmo usam essas datas.",
+      "academic_year": "Ano letivo",
+      "terms": "Períodos",
+      "term_n": "Período {n}",
+      "term_title_placeholder": "Título (opcional)",
+      "start_date": "Data de início",
+      "end_date": "Data de término",
+      "remove": "Remover",
+      "add_term": "Adicionar período",
+      "breaks": "Recessos e feriados",
+      "breaks_hint": "Feriados ficam dentro dos períodos; marque o recesso longo como Verão para a AIVO preparar a próxima série.",
+      "break_kind": "Tipo de recesso",
+      "break_name_placeholder": "Nome (opcional)",
+      "kind_holiday": "Feriado",
+      "kind_break": "Recesso",
+      "kind_summer": "Verão",
+      "save": "Salvar calendário",
+      "saving": "Salvando…",
+      "saved": "Salvo às {time}",
+      "save_error": "Não foi possível salvar o calendário. Tente novamente.",
+      "error_missing_dates": "Cada período e recesso precisa de data de início e término.",
+      "error_end_before_start": "Uma data de término é anterior ao início.",
+      "error_terms_overlap": "Os períodos se sobrepõem — uma data só pode pertencer a um período."
+    },
+    "term_syllabus": {
+      "plan_start": "Início do plano",
+      "generate_plan": "Gerar plano de ritmo",
+      "generating": "Gerando…",
+      "generate_error": "Não foi possível gerar o plano de ritmo. Tente novamente.",
+      "plan_ready": "Plano pronto — {weeks} semanas ({instruction} letivas), com recessos.",
+      "week_kind_break": "Recesso escolar",
+      "week_kind_holiday_prep": "Preparação de férias"
+    }
   }
 }

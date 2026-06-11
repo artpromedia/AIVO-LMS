@@ -3090,5 +3090,47 @@
       "client_id_label": "client",
       "deployments_label": "Deployments"
     }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "This week",
+      "full_term": "Full term",
+      "school_calendar": "School calendar"
+    },
+    "school_calendar": {
+      "title": "School calendar",
+      "description": "Enter {name}'s term dates and breaks. AIVO pauses school-sync over breaks and serves holiday-prep instead, and pacing plans lay the syllabus onto these dates.",
+      "academic_year": "Academic year",
+      "terms": "Terms",
+      "term_n": "Term {n}",
+      "term_title_placeholder": "Title (optional)",
+      "start_date": "Start date",
+      "end_date": "End date",
+      "remove": "Remove",
+      "add_term": "Add term",
+      "breaks": "Breaks & holidays",
+      "breaks_hint": "Holidays sit inside terms; mark the long summer break as Summer so AIVO can prepare next-grade readiness.",
+      "break_kind": "Break kind",
+      "break_name_placeholder": "Name (optional)",
+      "kind_holiday": "Holiday",
+      "kind_break": "Break",
+      "kind_summer": "Summer",
+      "save": "Save calendar",
+      "saving": "Saving…",
+      "saved": "Saved at {time}",
+      "save_error": "Could not save the calendar. Please try again.",
+      "error_missing_dates": "Every term and break needs a start and end date.",
+      "error_end_before_start": "An end date is before its start date.",
+      "error_terms_overlap": "Terms overlap — a date can belong to only one term."
+    },
+    "term_syllabus": {
+      "plan_start": "Plan start",
+      "generate_plan": "Generate pacing plan",
+      "generating": "Generating…",
+      "generate_error": "Could not generate the pacing plan. Please try again.",
+      "plan_ready": "Plan ready — {weeks} weeks ({instruction} instructional), break-aware.",
+      "week_kind_break": "School break",
+      "week_kind_holiday_prep": "Holiday prep"
+    }
   }
 }

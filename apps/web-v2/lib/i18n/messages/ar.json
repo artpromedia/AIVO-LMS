@@ -3090,5 +3090,47 @@
       "client_id_label": "العميل",
       "deployments_label": "عمليات النشر"
     }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "هذا الأسبوع",
+      "full_term": "الفصل كاملاً",
+      "school_calendar": "التقويم المدرسي"
+    },
+    "school_calendar": {
+      "title": "التقويم المدرسي",
+      "description": "أدخل تواريخ فصول {name} وعطلاته. توقف AIVO مزامنة المدرسة أثناء العطلات وتقدم تهيئة للعطلة، وتُبنى خطط الإيقاع على هذه التواريخ.",
+      "academic_year": "العام الدراسي",
+      "terms": "الفصول",
+      "term_n": "الفصل {n}",
+      "term_title_placeholder": "العنوان (اختياري)",
+      "start_date": "تاريخ البدء",
+      "end_date": "تاريخ الانتهاء",
+      "remove": "إزالة",
+      "add_term": "إضافة فصل",
+      "breaks": "العطلات والإجازات",
+      "breaks_hint": "تقع الإجازات داخل الفصول؛ علّم العطلة الطويلة بـ«الصيف» ليُعِدّ AIVO للصف التالي.",
+      "break_kind": "نوع العطلة",
+      "break_name_placeholder": "الاسم (اختياري)",
+      "kind_holiday": "إجازة",
+      "kind_break": "عطلة",
+      "kind_summer": "الصيف",
+      "save": "حفظ التقويم",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ في {time}",
+      "save_error": "تعذر حفظ التقويم. يُرجى المحاولة مجددًا.",
+      "error_missing_dates": "كل فصل وعطلة يحتاجان إلى تاريخ بدء وانتهاء.",
+      "error_end_before_start": "هناك تاريخ انتهاء يسبق تاريخ البدء.",
+      "error_terms_overlap": "الفصول متداخلة — التاريخ الواحد ينتمي إلى فصل واحد فقط."
+    },
+    "term_syllabus": {
+      "plan_start": "بداية الخطة",
+      "generate_plan": "إنشاء خطة الإيقاع",
+      "generating": "جارٍ الإنشاء…",
+      "generate_error": "تعذر إنشاء خطة الإيقاع. يُرجى المحاولة مجددًا.",
+      "plan_ready": "الخطة جاهزة — {weeks} أسبوعًا ({instruction} تعليمية)، مع مراعاة العطلات.",
+      "week_kind_break": "عطلة مدرسية",
+      "week_kind_holiday_prep": "تهيئة العطلة"
+    }
   }
 }

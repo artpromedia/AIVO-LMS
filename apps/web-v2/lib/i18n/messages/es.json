@@ -3090,5 +3090,47 @@
       "client_id_label": "cliente",
       "deployments_label": "Despliegues"
     }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "Esta semana",
+      "full_term": "Trimestre completo",
+      "school_calendar": "Calendario escolar"
+    },
+    "school_calendar": {
+      "title": "Calendario escolar",
+      "description": "Ingrese las fechas de los períodos y descansos de {name}. AIVO pausa la sincronización escolar durante los descansos y ofrece preparación vacacional; los planes de ritmo usan estas fechas.",
+      "academic_year": "Año académico",
+      "terms": "Períodos",
+      "term_n": "Período {n}",
+      "term_title_placeholder": "Título (opcional)",
+      "start_date": "Fecha de inicio",
+      "end_date": "Fecha de fin",
+      "remove": "Quitar",
+      "add_term": "Agregar período",
+      "breaks": "Descansos y feriados",
+      "breaks_hint": "Los feriados van dentro de los períodos; marque el receso largo como Verano para que AIVO prepare el siguiente grado.",
+      "break_kind": "Tipo de descanso",
+      "break_name_placeholder": "Nombre (opcional)",
+      "kind_holiday": "Feriado",
+      "kind_break": "Descanso",
+      "kind_summer": "Verano",
+      "save": "Guardar calendario",
+      "saving": "Guardando…",
+      "saved": "Guardado a las {time}",
+      "save_error": "No se pudo guardar el calendario. Inténtelo de nuevo.",
+      "error_missing_dates": "Cada período y descanso necesita fecha de inicio y de fin.",
+      "error_end_before_start": "Una fecha de fin es anterior a su inicio.",
+      "error_terms_overlap": "Los períodos se superponen: una fecha solo puede pertenecer a un período."
+    },
+    "term_syllabus": {
+      "plan_start": "Inicio del plan",
+      "generate_plan": "Generar plan de ritmo",
+      "generating": "Generando…",
+      "generate_error": "No se pudo generar el plan de ritmo. Inténtelo de nuevo.",
+      "plan_ready": "Plan listo — {weeks} semanas ({instruction} lectivas), con descansos.",
+      "week_kind_break": "Receso escolar",
+      "week_kind_holiday_prep": "Preparación vacacional"
+    }
   }
 }

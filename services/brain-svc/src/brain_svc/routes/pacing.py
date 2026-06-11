@@ -25,6 +25,7 @@ from brain_svc.services.pacing_engine import (
     build_holiday_prep,
     build_pacing_weeks,
     normalize_uploaded_scope,
+    validate_calendar_payload,
 )
 
 logger = logging.getLogger("brain-svc.pacing")
@@ -71,6 +72,169 @@ def _require_iso_date(value: str, field: str) -> str:
         return date.fromisoformat(value[:10]).isoformat()
     except (ValueError, TypeError):
         raise HTTPException(status_code=400, detail=f"{field} must be an ISO date (YYYY-MM-DD)")
+
+
+def _insert_calendar(db: Session, tenant_id, learner_id: str, calendar: CalendarInput):
+    """Persist a calendar + its terms/breaks; returns the new calendar id.
+
+    Calendars are append-only (the latest row is current) so a re-save never
+    mutates a calendar an existing pacing plan points at.
+    """
+    problems = validate_calendar_payload(
+        [t.model_dump() for t in calendar.terms],
+        [b.model_dump() for b in calendar.breaks],
+    )
+    if problems:
+        raise HTTPException(status_code=422, detail="; ".join(problems))
+
+    cal_row = db.execute(
+        text(
+            """INSERT INTO school_calendars
+                   (tenant_id, learner_id, name, academic_year, timezone)
+               VALUES (:tid, :lid, :name, :ay, :tz)
+               RETURNING id"""
+        ),
+        {
+            "tid": tenant_id,
+            "lid": learner_id,
+            "name": calendar.name,
+            "ay": calendar.academic_year,
+            "tz": calendar.timezone,
+        },
+    ).first()
+    calendar_id = cal_row[0]
+    for term in calendar.terms:
+        db.execute(
+            text(
+                """INSERT INTO school_calendar_terms
+                       (calendar_id, term_number, title, start_date, end_date)
+                   VALUES (:cid, :tn, :title, :sd, :ed)"""
+            ),
+            {
+                "cid": calendar_id,
+                "tn": term.term_number,
+                "title": term.title,
+                "sd": _require_iso_date(term.start_date, "term.start_date"),
+                "ed": _require_iso_date(term.end_date, "term.end_date"),
+            },
+        )
+    for br in calendar.breaks:
+        db.execute(
+            text(
+                """INSERT INTO school_calendar_breaks
+                       (calendar_id, kind, name, start_date, end_date)
+                   VALUES (:cid, :kind, :name, :sd, :ed)"""
+            ),
+            {
+                "cid": calendar_id,
+                "kind": br.kind,
+                "name": br.name,
+                "sd": _require_iso_date(br.start_date, "break.start_date"),
+                "ed": _require_iso_date(br.end_date, "break.end_date"),
+            },
+        )
+    return calendar_id
+
+
+def _iso(v) -> str | None:
+    return v.isoformat() if hasattr(v, "isoformat") else v
+
+
+def _load_latest_calendar(db: Session, learner_id: str) -> dict | None:
+    """Load the learner's current (latest) calendar with terms + breaks."""
+    cal = db.execute(
+        text(
+            """SELECT id, name, academic_year, timezone, created_at
+               FROM school_calendars WHERE learner_id = :lid
+               ORDER BY created_at DESC LIMIT 1"""
+        ),
+        {"lid": learner_id},
+    ).mappings().first()
+    if not cal:
+        return None
+    terms = db.execute(
+        text(
+            """SELECT term_number, title, start_date, end_date
+               FROM school_calendar_terms WHERE calendar_id = :cid
+               ORDER BY term_number ASC"""
+        ),
+        {"cid": cal["id"]},
+    ).mappings().all()
+    breaks = db.execute(
+        text(
+            """SELECT kind, name, start_date, end_date
+               FROM school_calendar_breaks WHERE calendar_id = :cid
+               ORDER BY start_date ASC"""
+        ),
+        {"cid": cal["id"]},
+    ).mappings().all()
+    return {
+        "id": str(cal["id"]),
+        "name": cal["name"],
+        "academicYear": cal["academic_year"],
+        "timezone": cal["timezone"],
+        "terms": [
+            {
+                "termNumber": t["term_number"],
+                "title": t["title"],
+                "startDate": _iso(t["start_date"]),
+                "endDate": _iso(t["end_date"]),
+            }
+            for t in terms
+        ],
+        "breaks": [
+            {
+                "kind": b["kind"],
+                "name": b["name"],
+                "startDate": _iso(b["start_date"]),
+                "endDate": _iso(b["end_date"]),
+            }
+            for b in breaks
+        ],
+    }
+
+
+@router.get("/{learner_id}/calendar")
+async def get_school_calendar(
+    learner_id: str,
+    db: Session = Depends(get_db),
+    auth: AuthClaims = Depends(require_auth),
+):
+    """Current school calendar (latest saved) for the learner, or null."""
+    verify_learner_access(db, auth, learner_id)
+    return {"learnerId": learner_id, "calendar": _load_latest_calendar(db, learner_id)}
+
+
+@router.put("/{learner_id}/calendar")
+async def put_school_calendar(
+    learner_id: str,
+    calendar: CalendarInput,
+    db: Session = Depends(get_db),
+    auth: AuthClaims = Depends(require_auth),
+):
+    """Save the learner's school calendar (terms + holiday/summer breaks).
+
+    Wave B: the parent/teacher calendar surface writes through here; pacing
+    generation then reuses the stored calendar when the request carries none,
+    so automated pacing + holiday-prep activate without re-entering dates.
+    """
+    verify_learner_access(db, auth, learner_id)
+    learner = db.execute(
+        text("SELECT tenant_id FROM learners WHERE id = :lid"), {"lid": learner_id}
+    ).mappings().first()
+    if not learner:
+        raise HTTPException(status_code=404, detail="Learner not found")
+
+    _insert_calendar(db, learner.get("tenant_id"), learner_id, calendar)
+    db.commit()
+    saved = _load_latest_calendar(db, learner_id)
+    logger.info(
+        "school calendar saved learner=%s terms=%d breaks=%d",
+        learner_id,
+        len(calendar.terms),
+        len(calendar.breaks),
+    )
+    return {"learnerId": learner_id, "calendar": saved}
 
 
 @router.post("/{learner_id}/pacing-plan/generate")
@@ -152,62 +316,38 @@ async def generate_pacing_plan(
     if isinstance(scope, dict):
         scope["source"] = scope_source
 
-    breaks = [b.model_dump() for b in (request.calendar.breaks if request.calendar else [])]
+    tenant_id = learner.get("tenant_id")
+
+    # Calendar resolution (Wave B): an inline calendar wins (and is persisted
+    # as the new current calendar); otherwise the learner's STORED calendar —
+    # saved via PUT /{learner_id}/calendar — drives the break-aware walk, so
+    # a parent sets dates once and every later plan stays break-aware.
+    calendar_id = None
+    if request.calendar is not None:
+        breaks = [b.model_dump() for b in request.calendar.breaks]
+    else:
+        stored = _load_latest_calendar(db, learner_id)
+        if stored:
+            calendar_id = stored["id"]
+            breaks = [
+                {
+                    "kind": b["kind"],
+                    "name": b["name"],
+                    "start_date": b["startDate"],
+                    "end_date": b["endDate"],
+                }
+                for b in stored["breaks"]
+            ]
+        else:
+            breaks = []
+
     weeks = build_pacing_weeks(scope, breaks, plan_start)
     if not weeks:
         raise HTTPException(status_code=422, detail="Scope and sequence produced no instructional weeks")
 
-    tenant_id = learner.get("tenant_id")
-
     # Persist atomically: optional calendar, archive prior active plan, new plan + weeks.
-    calendar_id = None
     if request.calendar is not None:
-        cal_row = db.execute(
-            text(
-                """INSERT INTO school_calendars
-                       (tenant_id, learner_id, name, academic_year, timezone)
-                   VALUES (:tid, :lid, :name, :ay, :tz)
-                   RETURNING id"""
-            ),
-            {
-                "tid": tenant_id,
-                "lid": learner_id,
-                "name": request.calendar.name,
-                "ay": request.calendar.academic_year,
-                "tz": request.calendar.timezone,
-            },
-        ).first()
-        calendar_id = cal_row[0]
-        for term in request.calendar.terms:
-            db.execute(
-                text(
-                    """INSERT INTO school_calendar_terms
-                           (calendar_id, term_number, title, start_date, end_date)
-                       VALUES (:cid, :tn, :title, :sd, :ed)"""
-                ),
-                {
-                    "cid": calendar_id,
-                    "tn": term.term_number,
-                    "title": term.title,
-                    "sd": _require_iso_date(term.start_date, "term.start_date"),
-                    "ed": _require_iso_date(term.end_date, "term.end_date"),
-                },
-            )
-        for br in request.calendar.breaks:
-            db.execute(
-                text(
-                    """INSERT INTO school_calendar_breaks
-                           (calendar_id, kind, name, start_date, end_date)
-                       VALUES (:cid, :kind, :name, :sd, :ed)"""
-                ),
-                {
-                    "cid": calendar_id,
-                    "kind": br.kind,
-                    "name": br.name,
-                    "sd": _require_iso_date(br.start_date, "break.start_date"),
-                    "ed": _require_iso_date(br.end_date, "break.end_date"),
-                },
-            )
+        calendar_id = _insert_calendar(db, tenant_id, learner_id, request.calendar)
 
     db.execute(
         text(

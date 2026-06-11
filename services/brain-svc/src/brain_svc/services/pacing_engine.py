@@ -146,6 +146,55 @@ def build_pacing_weeks(
     return weeks
 
 
+def validate_calendar_payload(terms: list[dict], breaks: list[dict]) -> list[str]:
+    """Pure validation for a parent/teacher-entered school calendar (Wave B).
+
+    Returns a list of human-readable problems (empty = valid):
+      - any term/break whose end precedes its start (or has unparseable dates)
+      - overlapping terms (a date can belong to at most one term)
+      - break kinds outside the supported set
+    Breaks may overlap terms (that is the normal case — a holiday sits inside
+    a term) and may overlap each other (two adjacent entries are harmless to
+    the week walk), so neither is flagged.
+    """
+    problems: list[str] = []
+    allowed_break_kinds = {"holiday", "break", "summer"}
+
+    spans: list[tuple[int, date, date]] = []
+    for t in terms:
+        number = t.get("term_number")
+        start = _parse_date(t.get("start_date"))
+        end = _parse_date(t.get("end_date"))
+        if start is None or end is None:
+            problems.append(f"term {number}: start_date/end_date must be ISO dates")
+            continue
+        if end < start:
+            problems.append(f"term {number}: end_date precedes start_date")
+            continue
+        spans.append((int(number or 0), start, end))
+
+    spans.sort(key=lambda s: s[1])
+    for (n1, _s1, e1), (n2, s2, _e2) in zip(spans, spans[1:]):
+        if s2 <= e1:
+            problems.append(f"terms {n1} and {n2} overlap ({s2.isoformat()} <= {e1.isoformat()})")
+
+    for b in breaks:
+        name = b.get("name") or b.get("kind") or "break"
+        kind = b.get("kind") or "break"
+        if kind not in allowed_break_kinds:
+            problems.append(
+                f"break '{name}': kind '{kind}' is not one of {sorted(allowed_break_kinds)}"
+            )
+        start = _parse_date(b.get("start_date"))
+        end = _parse_date(b.get("end_date"))
+        if start is None or end is None:
+            problems.append(f"break '{name}': start_date/end_date must be ISO dates")
+        elif end < start:
+            problems.append(f"break '{name}': end_date precedes start_date")
+
+    return problems
+
+
 def normalize_uploaded_scope(scope: Any) -> dict:
     """Validate/normalise an uploaded term scope-&-sequence (Sprint 6) into
     the shape the pacing walk consumes. Raises ``ValueError`` if it carries

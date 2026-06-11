@@ -3090,5 +3090,47 @@
       "client_id_label": "客户端",
       "deployments_label": "部署"
     }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "本周",
+      "full_term": "整个学期",
+      "school_calendar": "学校日历"
+    },
+    "school_calendar": {
+      "title": "学校日历",
+      "description": "填写{name}的学期与假期日期。假期期间 AIVO 暂停学校同步并提供假期预备，进度计划将按这些日期排布。",
+      "academic_year": "学年",
+      "terms": "学期",
+      "term_n": "学期 {n}",
+      "term_title_placeholder": "标题（可选）",
+      "start_date": "开始日期",
+      "end_date": "结束日期",
+      "remove": "移除",
+      "add_term": "添加学期",
+      "breaks": "假期与节假日",
+      "breaks_hint": "节假日位于学期内；将长假标记为“暑假”，AIVO 会进行下一年级的衔接准备。",
+      "break_kind": "假期类型",
+      "break_name_placeholder": "名称（可选）",
+      "kind_holiday": "节假日",
+      "kind_break": "假期",
+      "kind_summer": "暑假",
+      "save": "保存日历",
+      "saving": "保存中…",
+      "saved": "已于 {time} 保存",
+      "save_error": "无法保存日历，请重试。",
+      "error_missing_dates": "每个学期和假期都需要开始与结束日期。",
+      "error_end_before_start": "存在结束日期早于开始日期。",
+      "error_terms_overlap": "学期相互重叠——一个日期只能属于一个学期。"
+    },
+    "term_syllabus": {
+      "plan_start": "计划开始",
+      "generate_plan": "生成进度计划",
+      "generating": "生成中…",
+      "generate_error": "无法生成进度计划，请重试。",
+      "plan_ready": "计划已生成——共 {weeks} 周（教学 {instruction} 周），已避开假期。",
+      "week_kind_break": "学校假期",
+      "week_kind_holiday_prep": "假期预备"
+    }
   }
 }

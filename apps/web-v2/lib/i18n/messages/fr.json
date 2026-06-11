@@ -3090,5 +3090,47 @@
       "client_id_label": "client",
       "deployments_label": "Déploiements"
     }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "Cette semaine",
+      "full_term": "Trimestre complet",
+      "school_calendar": "Calendrier scolaire"
+    },
+    "school_calendar": {
+      "title": "Calendrier scolaire",
+      "description": "Saisissez les dates des trimestres et des congés de {name}. AIVO suspend la synchronisation scolaire pendant les congés et propose une préparation; les plans de rythme s'appuient sur ces dates.",
+      "academic_year": "Année scolaire",
+      "terms": "Trimestres",
+      "term_n": "Trimestre {n}",
+      "term_title_placeholder": "Titre (facultatif)",
+      "start_date": "Date de début",
+      "end_date": "Date de fin",
+      "remove": "Retirer",
+      "add_term": "Ajouter un trimestre",
+      "breaks": "Congés et jours fériés",
+      "breaks_hint": "Les congés se placent dans les trimestres; marquez les grandes vacances comme Été pour préparer la classe suivante.",
+      "break_kind": "Type de congé",
+      "break_name_placeholder": "Nom (facultatif)",
+      "kind_holiday": "Jour férié",
+      "kind_break": "Congé",
+      "kind_summer": "Été",
+      "save": "Enregistrer le calendrier",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré à {time}",
+      "save_error": "Impossible d'enregistrer le calendrier. Veuillez réessayer.",
+      "error_missing_dates": "Chaque trimestre et congé doit avoir une date de début et de fin.",
+      "error_end_before_start": "Une date de fin précède sa date de début.",
+      "error_terms_overlap": "Les trimestres se chevauchent — une date ne peut appartenir qu'à un seul trimestre."
+    },
+    "term_syllabus": {
+      "plan_start": "Début du plan",
+      "generate_plan": "Générer le plan de rythme",
+      "generating": "Génération…",
+      "generate_error": "Impossible de générer le plan de rythme. Veuillez réessayer.",
+      "plan_ready": "Plan prêt — {weeks} semaines ({instruction} d'enseignement), congés inclus.",
+      "week_kind_break": "Vacances scolaires",
+      "week_kind_holiday_prep": "Préparation aux vacances"
+    }
   }
 }

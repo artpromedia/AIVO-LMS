@@ -3090,5 +3090,47 @@
       "client_id_label": "クライアント",
       "deployments_label": "デプロイメント"
     }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "今週",
+      "full_term": "学期全体",
+      "school_calendar": "学校カレンダー"
+    },
+    "school_calendar": {
+      "title": "学校カレンダー",
+      "description": "{name}さんの学期と休暇の日程を入力してください。休暇中は学校同期を一時停止して休暇準備を提供し、ペーシング計画はこの日程に沿って作成されます。",
+      "academic_year": "学年度",
+      "terms": "学期",
+      "term_n": "学期 {n}",
+      "term_title_placeholder": "タイトル（任意）",
+      "start_date": "開始日",
+      "end_date": "終了日",
+      "remove": "削除",
+      "add_term": "学期を追加",
+      "breaks": "休暇・祝日",
+      "breaks_hint": "祝日は学期内に置きます。長期休暇は「夏休み」にすると、次学年への準備を行います。",
+      "break_kind": "休暇の種類",
+      "break_name_placeholder": "名前（任意）",
+      "kind_holiday": "祝日",
+      "kind_break": "休暇",
+      "kind_summer": "夏休み",
+      "save": "カレンダーを保存",
+      "saving": "保存中…",
+      "saved": "{time} に保存しました",
+      "save_error": "カレンダーを保存できませんでした。もう一度お試しください。",
+      "error_missing_dates": "各学期と休暇には開始日と終了日が必要です。",
+      "error_end_before_start": "終了日が開始日より前になっています。",
+      "error_terms_overlap": "学期が重なっています。1つの日付は1つの学期にのみ属します。"
+    },
+    "term_syllabus": {
+      "plan_start": "計画開始日",
+      "generate_plan": "ペーシング計画を作成",
+      "generating": "作成中…",
+      "generate_error": "ペーシング計画を作成できませんでした。もう一度お試しください。",
+      "plan_ready": "計画完成 — 全{weeks}週（授業{instruction}週）、休暇対応。",
+      "week_kind_break": "学校休暇",
+      "week_kind_holiday_prep": "休暇準備"
+    }
   }
 }

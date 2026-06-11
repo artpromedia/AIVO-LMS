@@ -3090,5 +3090,47 @@
       "client_id_label": "Client",
       "deployments_label": "Bereitstellungen"
     }
+  },
+  "curriculum": {
+    "tabs": {
+      "this_week": "Diese Woche",
+      "full_term": "Ganzes Halbjahr",
+      "school_calendar": "Schulkalender"
+    },
+    "school_calendar": {
+      "title": "Schulkalender",
+      "description": "Tragen Sie {name}s Halbjahres- und Ferientermine ein. AIVO pausiert die Schulsynchronisation in den Ferien und bietet Ferienvorbereitung; Lernpläne nutzen diese Daten.",
+      "academic_year": "Schuljahr",
+      "terms": "Halbjahre",
+      "term_n": "Halbjahr {n}",
+      "term_title_placeholder": "Titel (optional)",
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "remove": "Entfernen",
+      "add_term": "Halbjahr hinzufügen",
+      "breaks": "Ferien & Feiertage",
+      "breaks_hint": "Feiertage liegen innerhalb der Halbjahre; markieren Sie die großen Ferien als Sommer, damit AIVO auf die nächste Klassenstufe vorbereitet.",
+      "break_kind": "Ferienart",
+      "break_name_placeholder": "Name (optional)",
+      "kind_holiday": "Feiertag",
+      "kind_break": "Ferien",
+      "kind_summer": "Sommer",
+      "save": "Kalender speichern",
+      "saving": "Speichern…",
+      "saved": "Gespeichert um {time}",
+      "save_error": "Kalender konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "error_missing_dates": "Jedes Halbjahr und jede Ferienzeit braucht Start- und Enddatum.",
+      "error_end_before_start": "Ein Enddatum liegt vor dem Startdatum.",
+      "error_terms_overlap": "Halbjahre überschneiden sich — ein Datum kann nur zu einem Halbjahr gehören."
+    },
+    "term_syllabus": {
+      "plan_start": "Planbeginn",
+      "generate_plan": "Lernplan erzeugen",
+      "generating": "Wird erzeugt…",
+      "generate_error": "Lernplan konnte nicht erzeugt werden. Bitte erneut versuchen.",
+      "plan_ready": "Plan fertig — {weeks} Wochen ({instruction} Unterricht), ferienbewusst.",
+      "week_kind_break": "Schulferien",
+      "week_kind_holiday_prep": "Ferienvorbereitung"
+    }
   }
 }
