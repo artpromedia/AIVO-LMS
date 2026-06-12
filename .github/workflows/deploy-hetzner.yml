@@ -358,7 +358,11 @@ jobs:
             -t "ghcr.io/artpromedia/web:${TAG}" \
             .
           echo "Distributing to all nodes"
-          bash scripts/distribute-one.sh "${TAG}" web
+          # k3s containerd socket is root-only; the runner user has a
+          # narrow sudoers grant for exactly this root-owned script
+          # (/etc/sudoers.d/github-runner-distribute, provisioned by
+          # scripts/setup-runner-distribute-sudo.sh).
+          sudo -n /opt/aivo-deploy/distribute-one.sh "${TAG}" web
           echo "Rolling out (set image preserves the pinned env)"
           kubectl -n "${{ env.PROD_NAMESPACE }}" set image deployment/web "web=ghcr.io/artpromedia/web:${TAG}"
           kubectl -n "${{ env.PROD_NAMESPACE }}" rollout status deployment/web --timeout=240s
