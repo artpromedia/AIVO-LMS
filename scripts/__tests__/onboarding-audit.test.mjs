@@ -12,6 +12,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -61,4 +62,14 @@ test("audit source still scans for both page.tsx and route.ts", () => {
   const auditSrc = readFileSync(join(__dirname, "..", "onboarding-audit.mjs"), "utf8");
   assert.match(auditSrc, /page\.tsx/);
   assert.match(auditSrc, /route\.ts/);
+});
+
+test("audit accepts nested READINESS_NEXT_STEP value fields", () => {
+  const audit = spawnSync(process.execPath, ["scripts/onboarding-audit.mjs"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  });
+
+  assert.equal(audit.status, 0, `${audit.stdout}\n${audit.stderr}`);
+  assert.doesNotMatch(audit.stderr, /labelKey.*not in ReadinessState/);
 });

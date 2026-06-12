@@ -59,9 +59,9 @@ requireAll("services/identity-svc/src/routes/feature-flags.ts", [
 
 // 3 — no raw env flag reads in web-v2 request code
 const registrySource = read("packages/feature-flags/src/enterprise-flags.ts");
-const enterpriseEnvVars = [...registrySource.matchAll(/:\s*"((?:AIVO_FEATURE|ADMIN_ENTERPRISE)_[A-Z0-9_]+)"/g)].map(
-  (m) => m[1],
-);
+const enterpriseEnvVars = [
+  ...registrySource.matchAll(/:\s*"((?:AIVO_FEATURE|ADMIN_ENTERPRISE)_[A-Z0-9_]+)"/g),
+].map((m) => m[1]);
 if (enterpriseEnvVars.length === 0) {
   errors.push("packages/feature-flags: could not parse the enterprise flag registry");
 }
@@ -81,7 +81,7 @@ function* walk(dir) {
 }
 for (const dir of ["apps/web-v2/app", "apps/web-v2/lib", "apps/web-v2/components"]) {
   for (const file of walk(join(repoRoot, dir))) {
-    const rel = file.slice(repoRoot.length + 1);
+    const rel = file.slice(repoRoot.length + 1).replaceAll("\\", "/");
     if (SANCTIONED.has(rel)) continue;
     const src = readFileSync(file, "utf8");
     if (/resolveEnterpriseFlags\(/.test(src)) {

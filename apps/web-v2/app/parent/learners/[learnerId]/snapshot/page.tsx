@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { requirePageRole } from "@/lib/auth/server";
 
 /**
  * Remediation Sprint 12 — the snapshot page was a hardcoded mockup
@@ -12,6 +13,7 @@ export default async function ParentLearnerSnapshotPage({
 }: {
   params: Promise<{ learnerId: string }>;
 }) {
+  await requirePageRole(["parent"]);
   const { learnerId } = await params;
   redirect(`/parent/learners/${learnerId}/progress`);
 }

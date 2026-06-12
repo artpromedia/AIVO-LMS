@@ -16,10 +16,7 @@
  *    within one render burst.
  */
 import { cookies } from "next/headers";
-import {
-  resolveEnterpriseFlags,
-  type EnterpriseFeatureFlags,
-} from "@aivo/feature-flags";
+import { resolveEnterpriseFlags, type EnterpriseFeatureFlags } from "@aivo/feature-flags";
 import { serverEnv } from "@/lib/env";
 import { isMockAuthAllowed } from "@/lib/auth/mock-session";
 import { IDENTITY_ACCESS_TOKEN_COOKIE } from "@/lib/auth/identity-client";
@@ -50,9 +47,7 @@ export async function getTenantFlags(): Promise<EnterpriseFeatureFlags> {
     });
     if (!res.ok) throw new Error(String(res.status));
     const json = (await res.json()) as { flags?: EnterpriseFeatureFlags };
-    const envDefaults = resolveEnterpriseFlags(
-      process.env as Record<string, string | undefined>,
-    );
+    const envDefaults = resolveEnterpriseFlags(process.env as Record<string, string | undefined>);
     const flags = { ...envDefaults, ...(json.flags ?? {}) };
     memo.set(accessToken, { flags, at: Date.now() });
     return flags;

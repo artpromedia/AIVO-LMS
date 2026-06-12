@@ -48,24 +48,22 @@ if (!existsSync(typesPath) || !existsSync(readinessPath)) {
       new RegExp(`export const ${label}[^=]*=\\s*\\{([\\s\\S]*?)\\n\\s*\\};`),
     );
     if (!m) return null;
-    // Only top-level keys (those at the start of a line, after the
-    // table's opening brace). Avoid matching nested object keys like
-    // `label:` and `hrefTemplate:` inside Record<,{}> values.
+    // Top-level keys all share the shallowest indentation in the table.
+    // Derive that depth instead of maintaining a list of nested value keys,
+    // which would drift whenever a value gains a field such as `labelKey`.
     const body = m[1];
-    const keys = new Set();
-    // Indent depth varies with prettier wrapping (2 or 4 spaces depending
-    // on whether the type annotation forced a line break before the
-    // opening brace). Match any indented top-level key, but reject lines
-    // that look like nested object content (those typically have a value
-    // pattern other than a snake_case identifier, e.g. `label:` or
-    // `hrefTemplate:`, which are already covered by the dedicated
-    // hrefTemplate scan below).
-    const nestedValueKeys = new Set(["label", "hrefTemplate"]);
+    const candidates = [];
     for (const line of body.split("\n")) {
-      const km = line.match(/^\s+(\w+):/);
-      if (km && !nestedValueKeys.has(km[1])) keys.add(km[1]);
+      const km = line.match(/^(\s+)(\w+):/);
+      if (km) candidates.push({ indent: km[1].length, key: km[2] });
     }
-    return [...keys];
+    if (candidates.length === 0) return [];
+    const topLevelIndent = Math.min(...candidates.map(({ indent }) => indent));
+    return [
+      ...new Set(
+        candidates.filter(({ indent }) => indent === topLevelIndent).map(({ key }) => key),
+      ),
+    ];
   }
 
   for (const tableName of ["READINESS_LABEL", "READINESS_TONE", "READINESS_NEXT_STEP"]) {

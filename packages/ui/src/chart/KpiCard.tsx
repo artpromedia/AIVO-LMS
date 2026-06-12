@@ -10,7 +10,7 @@ type KpiTone = "brand" | "mastery" | "success" | "risk" | "info";
 const VALUE_CLS: Record<KpiTone, string> = {
   brand: "text-iw-text-strong",
   mastery: "text-iw-mastery-proficient-strong",
-  success: "text-[var(--aivo-domain-completion-complete-strong,#15803d)]",
+  success: "text-[var(--aivo-domain-completion-complete-strong)]",
   risk: "text-iw-risk-elevated-strong",
   info: "text-iw-text-strong",
 };
@@ -65,7 +65,7 @@ function formatDelta(pct: number): string {
 }
 
 function deltaToneCls(pct: number): string {
-  if (pct > 0) return "text-[var(--aivo-domain-completion-complete-strong,#15803d)]";
+  if (pct > 0) return "text-[var(--aivo-domain-completion-complete-strong)]";
   if (pct < 0) return "text-iw-risk-elevated-strong";
   return "text-iw-text-muted";
 }
