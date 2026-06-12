@@ -8,6 +8,14 @@ import {
   REDUCED_MOTION_DEFAULT,
   resolveReducedMotion,
   type ReducedMotion,
+  SPACING_COOKIE,
+  SPACING_DEFAULT,
+  resolveSpacing,
+  type Spacing,
+  SOUND_COOKIE,
+  SOUND_DEFAULT,
+  resolveSound,
+  type SoundLevel,
 } from "./typeface";
 
 /**
@@ -22,4 +30,14 @@ export async function readTypefaceFromCookies(): Promise<Typeface> {
 export async function readReducedMotionFromCookies(): Promise<ReducedMotion> {
   const store = await cookies();
   return resolveReducedMotion(store.get(REDUCED_MOTION_COOKIE)?.value ?? REDUCED_MOTION_DEFAULT);
+}
+
+export async function readSpacingFromCookies(): Promise<Spacing> {
+  const store = await cookies();
+  return resolveSpacing(store.get(SPACING_COOKIE)?.value ?? SPACING_DEFAULT);
+}
+
+export async function readSoundFromCookies(): Promise<SoundLevel> {
+  const store = await cookies();
+  return resolveSound(store.get(SOUND_COOKIE)?.value ?? SOUND_DEFAULT);
 }

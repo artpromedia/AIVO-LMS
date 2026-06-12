@@ -14,6 +14,9 @@ import { TodayFocusCard, GlassCard, InsightChip, EmptyState } from "@aivo/ui";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { getIEPForLearner, getMasteryMap, getSubjectDetail } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { getSubjectBySlug, tutorThemeCSSVars } from "@aivo/brand";
+import { TutorFace } from "@/components/learner/art/tutor-character";
+import type { CSSProperties } from "react";
 
 // Maps backend enums to their learner.subject_detail.* catalog keys.
 const LEVEL_KEY: Record<string, string> = {
@@ -49,6 +52,10 @@ export default async function LearnerSubjectDetailPage({
   const iep = await getIEPForLearner(learnerId, session.tenantId);
   const tutor = tutorForSubjectSlug(detail.subject.slug);
   const accent = tutor?.color ?? "var(--aivo-sensory-primary)";
+  // Per-tutor world theming: the WCAG-verified accent vars + data-tutor (which
+  // high-contrast mode suppresses) make each subject feel like its own world.
+  const tutorKey = getSubjectBySlug(detail.subject.slug)?.tutorKey ?? null;
+  const worldVars = (tutorKey ? tutorThemeCSSVars(tutorKey) : {}) as CSSProperties;
 
   if (!map) {
     return (
@@ -93,25 +100,44 @@ export default async function LearnerSubjectDetailPage({
       navItems={LEARNER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <header className="flex flex-col gap-2 mb-6">
-        <div className="flex items-center gap-3">
-          <span
-            className="w-14 h-14 rounded-iw-control inline-flex items-center justify-center text-3xl"
-            style={{ backgroundColor: `${accent}1A`, color: accent }}
-            aria-hidden="true"
-          >
-            {tutor?.emoji ?? "📘"}
+      <header
+        data-tutor={tutorKey ?? undefined}
+        style={{
+          ...worldVars,
+          background: "var(--tutor-accent-soft, var(--color-aivo-surface-2))",
+        }}
+        className="mb-6 flex flex-col gap-3 rounded-iw-card-lg border border-iw-border p-5"
+      >
+        <div className="flex items-center gap-4">
+          <span className="shrink-0" aria-hidden="true">
+            {tutorKey ? (
+              <TutorFace tutorKey={tutorKey} size={72} />
+            ) : (
+              <span
+                className="inline-flex h-16 w-16 items-center justify-center rounded-iw-control text-3xl"
+                style={{ backgroundColor: `${accent}1A`, color: accent }}
+              >
+                {tutor?.emoji ?? "📘"}
+              </span>
+            )}
           </span>
-          <div>
-            <p className="iw-label text-iw-text-muted">{detail.subject.name}</p>
+          <div className="min-w-0">
+            <p
+              className="iw-label"
+              style={{ color: "var(--tutor-accent-ink, var(--color-aivo-muted))" }}
+            >
+              {tutor ? `${tutor.name} · ${tutor.landmark}` : detail.subject.name}
+            </p>
             <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-tight">
               {tutor
                 ? t("with_tutor", { subject: detail.subject.name, tutor: tutor.name })
                 : detail.subject.name}
             </h1>
+            <p className="mt-1 text-sm text-iw-text-muted max-w-2xl">
+              {detail.subject.description}
+            </p>
           </div>
         </div>
-        <p className="text-sm text-iw-text-muted max-w-2xl">{detail.subject.description}</p>
         <div className="flex items-center gap-2 flex-wrap">
           <InsightChip tone="primary" size="md">
             {LEVEL_KEY[detail.currentLevel]
@@ -121,11 +147,6 @@ export default async function LearnerSubjectDetailPage({
           {iep?.confirmedAt ? (
             <InsightChip tone="accent" size="md">
               {t("iep_on")}
-            </InsightChip>
-          ) : null}
-          {tutor ? (
-            <InsightChip tone="warm" size="md">
-              {tutor.landmark}
             </InsightChip>
           ) : null}
         </div>
@@ -142,13 +163,17 @@ export default async function LearnerSubjectDetailPage({
           }
           accent={accent}
           companion={
-            <span
-              className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl"
-              style={{ backgroundColor: `${accent}1A`, color: accent }}
-              aria-hidden="true"
-            >
-              {tutor?.emoji ?? "✨"}
-            </span>
+            tutorKey ? (
+              <TutorFace tutorKey={tutorKey} size={56} />
+            ) : (
+              <span
+                className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl"
+                style={{ backgroundColor: `${accent}1A`, color: accent }}
+                aria-hidden="true"
+              >
+                {tutor?.emoji ?? "✨"}
+              </span>
+            )
           }
           meta={
             <>

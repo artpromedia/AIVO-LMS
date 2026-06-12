@@ -19,6 +19,7 @@ import { checkSameOrigin } from "@/lib/bff/csrf";
 // AIVO_TEST_MODE builds used by the production-equivalent CI server.
 const DEV_ONLY_PREFIXES = [
   "/design-system",
+  "/design-preview",
   "/surface-preview",
   "/learner/lesson-player-fixture",
   "/learner/lesson-player-smoke",

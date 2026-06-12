@@ -1214,7 +1214,9 @@
       "msg_break_body": "기지개를 켜고, 물을 마시고, 창밖을 봐. AIVO가 네 자리를 저장해 둘게.",
       "planned_week_badge": "이번 주 예정 레슨",
       "explore_subjects_title": "과목 둘러보기",
-      "explore_subjects_body": "모든 튜터와 과목이 한 번의 탭이면 돼요."
+      "explore_subjects_body": "모든 튜터와 과목이 한 번의 탭이면 돼요.",
+      "quest_label": "오늘의 퀘스트",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "학습자",
@@ -1245,7 +1247,9 @@
       "title": "보상",
       "description": "퀘스트 세계에서 완료한 모든 챕터를 추적해.",
       "open_world": "세계 열기 →",
-      "sticker_empty_encouragement": "첫 스티커가 기다리고 있어요. 챕터 하나를 끝내고 받아보세요!"
+      "sticker_empty_encouragement": "첫 스티커가 기다리고 있어요. 챕터 하나를 끝내고 받아보세요!",
+      "badges_title": "배지",
+      "badges_count": "{earned}/{total}개 획득"
     },
     "select": {
       "eyebrow": "다음으로 보기",

@@ -1395,7 +1395,7 @@
       "setup_title": "Let's get you set up",
       "setup_body_baseline": "We need a quick baseline check so we can build a lesson plan just for you.",
       "setup_body_wait": "Just a moment — we're picking something special.",
-      "setup_cta_baseline": "Finish the baseline",
+      "setup_cta_baseline": "Start your adventure",
       "setup_cta_refresh": "Refresh",
       "tutors_title": "Your AI Tutors",
       "see_all": "See All",
@@ -1412,7 +1412,9 @@
       "msg_break_body": "Stretch, sip water, look out the window. AIVO will save your place.",
       "planned_week_badge": "Planned for this week",
       "explore_subjects_title": "Explore your subjects",
-      "explore_subjects_body": "Every tutor and subject, one tap away."
+      "explore_subjects_body": "Every tutor and subject, one tap away.",
+      "quest_label": "Today’s quest",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "Learner",
@@ -1443,7 +1445,9 @@
       "title": "Rewards",
       "description": "Track every chapter you've completed across the quest worlds.",
       "open_world": "Open world →",
-      "sticker_empty_encouragement": "Your first sticker is waiting — finish a chapter to earn it!"
+      "sticker_empty_encouragement": "Your first sticker is waiting — finish a chapter to earn it!",
+      "badges_title": "Badges",
+      "badges_count": "{earned} of {total} earned"
     },
     "select": {
       "eyebrow": "View as",

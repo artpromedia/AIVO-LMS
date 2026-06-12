@@ -63,6 +63,7 @@ const learnerKeys = Object.keys(enFlat).filter((k) => k.startsWith("learner."));
 const GLOBAL_EXEMPT: ReadonlySet<string> = new Set([
   "learner.settings_a11y.reassure_wcag_title", // WCAG standard name
   "learner.home.stat_xp", // "{xp} XP" — XP is a global gaming term
+  "learner.home.xp_progress", // "{xp} / {goal} XP" — pure format + XP
   "learner.home.subject_eyebrow", // "{name} · {landmark}" — pure format
   "learner.subject_detail.min", // "~{n} min" — abbreviation
   "learner.lesson_player.min", // "≈ {n} min" — abbreviation

@@ -1214,7 +1214,9 @@
       "msg_break_body": "Étire-toi, bois de l'eau, regarde par la fenêtre. AIVO gardera ta place.",
       "planned_week_badge": "Prévue pour cette semaine",
       "explore_subjects_title": "Explore tes matières",
-      "explore_subjects_body": "Chaque tuteur et chaque matière, à un geste."
+      "explore_subjects_body": "Chaque tuteur et chaque matière, à un geste.",
+      "quest_label": "Quête du jour",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "Apprenant",
@@ -1245,7 +1247,9 @@
       "title": "Récompenses",
       "description": "Suis chaque chapitre que tu as terminé dans les mondes de quête.",
       "open_world": "Ouvrir le monde →",
-      "sticker_empty_encouragement": "Ton premier autocollant t'attend — termine un chapitre pour le gagner !"
+      "sticker_empty_encouragement": "Ton premier autocollant t'attend — termine un chapitre pour le gagner !",
+      "badges_title": "Écussons",
+      "badges_count": "{earned} sur {total} obtenus"
     },
     "select": {
       "eyebrow": "Voir en tant que",

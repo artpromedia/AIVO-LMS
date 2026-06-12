@@ -21,8 +21,10 @@
  * exported component name and props are identical to the pre-decomposition
  * lesson-player.tsx.
  */
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
+import { useChime } from "@/lib/learner/use-chime";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -38,10 +40,7 @@ import type {
   LessonRunStatus,
 } from "@/lib/db/types";
 import { useBeatMachine } from "./use-beat-machine";
-import {
-  AccessibilityShell,
-  deriveStagePresentation,
-} from "./accessibility-shell";
+import { AccessibilityShell, deriveStagePresentation } from "./accessibility-shell";
 import { BreakScreen } from "./break-screen";
 import { StaticBeat } from "./beats/static-beat";
 import { WelcomeBeat } from "./beats/welcome-beat";
@@ -109,6 +108,18 @@ export function LessonPlayer({
     tutorSlug,
   );
   const { beat, stepIdx, beats, isLastBeat, isInteractive } = machine;
+
+  // A gentle, sound-gated chime confirms each answer — correct rings once,
+  // "not quite" gets a soft, never-harsh pair. Fires once per feedback change
+  // (the rail's Sound control governs volume; Off = true silence).
+  const chime = useChime();
+  const lastFeedback = useRef<typeof machine.feedback>(null);
+  useEffect(() => {
+    if (machine.feedback === lastFeedback.current) return;
+    lastFeedback.current = machine.feedback;
+    if (machine.feedback === "correct") chime.correct();
+    else if (machine.feedback === "incorrect") chime.retry();
+  }, [machine.feedback, chime]);
 
   if (machine.onBreak) {
     return (
@@ -221,6 +232,8 @@ export function LessonPlayer({
                 surfaceItem={machine.toSurfaceItem(beat)}
                 accessibilitySettings={presentation.effectiveAccessibility}
                 feedback={machine.feedback}
+                motionOff={presentation.motionOff}
+                tutorSlug={tutorSlug}
                 showHint={machine.showHint}
                 agentScaffold={machine.agentScaffold}
                 onSubmit={machine.submitSurface}
@@ -237,6 +250,8 @@ export function LessonPlayer({
                 surfaceItem={machine.toSurfaceItem(beat)}
                 accessibilitySettings={presentation.effectiveAccessibility}
                 feedback={machine.feedback}
+                motionOff={presentation.motionOff}
+                tutorSlug={tutorSlug}
                 agentScaffold={machine.agentScaffold}
                 onSubmit={machine.submitSurface}
                 onSurfaceEvent={machine.emitSurfaceTelemetry}

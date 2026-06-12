@@ -1214,7 +1214,9 @@
       "msg_break_body": "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك.",
       "planned_week_badge": "مخطط لها هذا الأسبوع",
       "explore_subjects_title": "استكشف موادك",
-      "explore_subjects_body": "كل معلّم وكل مادة بلمسة واحدة."
+      "explore_subjects_body": "كل معلّم وكل مادة بلمسة واحدة.",
+      "quest_label": "مهمة اليوم",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "المتعلّم",
@@ -1245,7 +1247,9 @@
       "title": "المكافآت",
       "description": "تتبّع كل فصل أنهيته عبر عوالم المغامرات.",
       "open_world": "فتح العالم →",
-      "sticker_empty_encouragement": "أول ملصق بانتظارك — أنهِ فصلًا واحدًا لتحصل عليه!"
+      "sticker_empty_encouragement": "أول ملصق بانتظارك — أنهِ فصلًا واحدًا لتحصل عليه!",
+      "badges_title": "الأوسمة",
+      "badges_count": "{earned} من {total}"
     },
     "select": {
       "eyebrow": "العرض بصفة",

@@ -1214,7 +1214,9 @@
       "msg_break_body": "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。",
       "planned_week_badge": "今週の予定レッスン",
       "explore_subjects_title": "きょうかを見てみよう",
-      "explore_subjects_body": "チューターと教科はワンタップで。"
+      "explore_subjects_body": "チューターと教科はワンタップで。",
+      "quest_label": "今日のクエスト",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "学習者",
@@ -1245,7 +1247,9 @@
       "title": "ごほうび",
       "description": "クエストの世界で終えた章をすべて記録します。",
       "open_world": "世界を開く →",
-      "sticker_empty_encouragement": "はじめてのステッカーが待ってるよ。チャプターをひとつ終えてゲットしよう！"
+      "sticker_empty_encouragement": "はじめてのステッカーが待ってるよ。チャプターをひとつ終えてゲットしよう！",
+      "badges_title": "バッジ",
+      "badges_count": "{earned}/{total} 個を獲得"
     },
     "select": {
       "eyebrow": "表示の切り替え",
