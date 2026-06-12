@@ -51,11 +51,41 @@ describe("getAuthoredLessonItems", () => {
     expect(k1.length).toBeGreaterThan(0);
   });
 
-  it("returns nothing outside the pack's grade band or for template-only subjects", () => {
+  it("returns nothing outside any pack's grade band", () => {
     expect(getAuthoredLessonItems({ subjectSlug: "math", gradeBand: "7-8" })).toHaveLength(0);
-    // music has only the recognised 3-activity template pack — deliberately
-    // NOT served as authored content.
-    expect(getAuthoredLessonItems({ subjectSlug: "music", gradeBand: "K" })).toHaveLength(0);
+    expect(getAuthoredLessonItems({ subjectSlug: "music", gradeBand: "5" })).toHaveLength(0);
+  });
+
+  it("EVERY learner subject now has real authored pack content at its entry band", () => {
+    const ENTRY: Record<string, string> = {
+      math: "K",
+      reading: "K",
+      writing: "K",
+      science: "K",
+      coding: "K",
+      social: "K",
+      speech: "K",
+      geography: "K",
+      "social-studies": "K",
+      life: "K",
+      "executive-function": "K",
+      art: "K",
+      music: "K",
+      "physical-education": "K",
+      "world-languages": "K",
+      engineering: "K",
+    };
+    for (const [slug, band] of Object.entries(ENTRY)) {
+      const items = getAuthoredLessonItems({ subjectSlug: slug, gradeBand: band });
+      expect(items.length, `${slug} must serve authored items at ${band}`).toBeGreaterThan(0);
+    }
+    // Echo's K-12 coverage: speech packs serve well past K.
+    for (const band of ["3", "6", "9"]) {
+      expect(
+        getAuthoredLessonItems({ subjectSlug: "speech", gradeBand: band }).length,
+        `speech must serve authored items at grade ${band}`,
+      ).toBeGreaterThan(0);
+    }
   });
 });
 
@@ -126,8 +156,24 @@ describe("generator serves authored content first (Sprint 05)", () => {
     expect(() => GeneratedLessonPlanSchema.parse(plan)).not.toThrow();
   });
 
-  it("falls back to domain templates when no authored content exists", () => {
+  it("keeps the music sequencer signature even on authored music lessons", () => {
+    // Music now has a REAL K pack; the signature invariant still guarantees
+    // the sequencer mounts (appended template item when the pack lacks one).
     const plan = generateDeterministicLessonPlan(inputsFor("music", true));
+    const types = plan.guidedPractice.map((g) => g.surface?.surfaceType).filter(Boolean);
+    expect(types).toContain("music_sequencer");
+    expect(plan.guidedPractice.some((g) => g.prompt.includes("STEADY beat"))).toBe(true);
+  });
+
+  it("falls back to domain templates outside authored bands", () => {
+    const subject = { id: "s_music", slug: "music", name: "music" } as Parameters<
+      typeof generateDeterministicLessonPlan
+    >[0]["subject"];
+    const plan = generateDeterministicLessonPlan({
+      ...inputsFor("music", false),
+      subject,
+      authoredItems: getAuthoredLessonItems({ subjectSlug: "music", gradeBand: "5" }),
+    });
     const types = plan.guidedPractice.map((g) => g.surface?.surfaceType).filter(Boolean);
     expect(types).toContain("music_sequencer");
   });

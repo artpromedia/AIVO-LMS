@@ -34,7 +34,7 @@ export const stemEngineeringTutor: TutorDefinition = defineTutor({
     "ngss-engineering-design-3-5",
     "ngss-engineering-design-6-12",
   ],
-  defaultContentPackRefs: ["stem-engineering-3-5-fall-2026"],
+  defaultContentPackRefs: ["stem-engineering-k-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.

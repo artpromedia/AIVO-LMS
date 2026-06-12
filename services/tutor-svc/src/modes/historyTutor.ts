@@ -33,7 +33,7 @@ export const historyTutor: TutorDefinition = defineTutor({
     "c3-social-studies-3-8",
     "c3-social-studies-9-12",
   ],
-  defaultContentPackRefs: ["history-3-5-fall-2026"],
+  defaultContentPackRefs: ["social-studies-k-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.

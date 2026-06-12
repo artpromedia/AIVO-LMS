@@ -37,7 +37,7 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     "cec-life-skills-6-plus",
     "cec-life-skills-9-12",
   ],
-  defaultContentPackRefs: ["life-skills-6-plus-fall-2026"],
+  defaultContentPackRefs: ["life-skills-k-fall-2026", "executive-function-k-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.

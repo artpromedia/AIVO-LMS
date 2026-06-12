@@ -18,6 +18,21 @@ import { ela1Fall2026 } from "./ela-1-fall-2026.js";
 import { ela2Fall2026 } from "./ela-2-fall-2026.js";
 import { coding1Fall2026 } from "./coding-1-fall-2026.js";
 import { coding2Fall2026 } from "./coding-2-fall-2026.js";
+import { writingKFall2026 } from "./writing-k-fall-2026.js";
+import { selKFall2026 } from "./sel-k-fall-2026.js";
+import { speechKFall2026 } from "./speech-k-fall-2026.js";
+import { speech3Fall2026 } from "./speech-3-fall-2026.js";
+import { speech6Fall2026 } from "./speech-6-fall-2026.js";
+import { speech9Fall2026 } from "./speech-9-fall-2026.js";
+import { geographyKFall2026 } from "./geography-k-fall-2026.js";
+import { socialStudiesKFall2026 } from "./social-studies-k-fall-2026.js";
+import { lifeSkillsKFall2026 } from "./life-skills-k-fall-2026.js";
+import { executiveFunctionKFall2026 } from "./executive-function-k-fall-2026.js";
+import { creativeArtsKFall2026 } from "./creative-arts-k-fall-2026.js";
+import { musicKFall2026 } from "./music-k-fall-2026.js";
+import { peHealthKFall2026 } from "./pe-health-k-fall-2026.js";
+import { worldLanguagesKFall2026 } from "./world-languages-k-fall-2026.js";
+import { stemEngineeringKFall2026 } from "./stem-engineering-k-fall-2026.js";
 import { elaKFall2026 } from "./ela-k-fall-2026.js";
 import { scienceKFall2026 } from "./science-k-fall-2026.js";
 import { codingK2Fall2026 } from "./coding-k2-fall-2026.js";
@@ -44,6 +59,21 @@ export const SEEDED_PACKS: Readonly<Record<string, ContentPack>> = {
   [codingK2Fall2026.id]: codingK2Fall2026,
   [coding1Fall2026.id]: coding1Fall2026,
   [coding2Fall2026.id]: coding2Fall2026,
+  [writingKFall2026.id]: writingKFall2026,
+  [selKFall2026.id]: selKFall2026,
+  [speechKFall2026.id]: speechKFall2026,
+  [speech3Fall2026.id]: speech3Fall2026,
+  [speech6Fall2026.id]: speech6Fall2026,
+  [speech9Fall2026.id]: speech9Fall2026,
+  [geographyKFall2026.id]: geographyKFall2026,
+  [socialStudiesKFall2026.id]: socialStudiesKFall2026,
+  [lifeSkillsKFall2026.id]: lifeSkillsKFall2026,
+  [executiveFunctionKFall2026.id]: executiveFunctionKFall2026,
+  [creativeArtsKFall2026.id]: creativeArtsKFall2026,
+  [musicKFall2026.id]: musicKFall2026,
+  [peHealthKFall2026.id]: peHealthKFall2026,
+  [worldLanguagesKFall2026.id]: worldLanguagesKFall2026,
+  [stemEngineeringKFall2026.id]: stemEngineeringKFall2026,
   ...Object.fromEntries(AUTHORED_SUBJECT_PACKS.map((pack) => [pack.id, pack])),
 };
 
@@ -68,6 +98,21 @@ export const REAL_AUTHORED_PACK_IDS: readonly string[] = [
   "coding-k2-fall-2026",
   "coding-1-fall-2026",
   "coding-2-fall-2026",
+  "writing-k-fall-2026",
+  "sel-k-fall-2026",
+  "speech-k-fall-2026",
+  "speech-3-fall-2026",
+  "speech-6-fall-2026",
+  "speech-9-fall-2026",
+  "geography-k-fall-2026",
+  "social-studies-k-fall-2026",
+  "life-skills-k-fall-2026",
+  "executive-function-k-fall-2026",
+  "creative-arts-k-fall-2026",
+  "music-k-fall-2026",
+  "pe-health-k-fall-2026",
+  "world-languages-k-fall-2026",
+  "stem-engineering-k-fall-2026",
 ];
 
 export function isRealAuthoredPack(packId: string): boolean {

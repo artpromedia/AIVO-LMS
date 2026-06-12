@@ -12,12 +12,9 @@
  * authored content exists.
  *
  * Pack curation is explicit: `AUTHORED_LESSON_PACKS` lists the packs with
- * REAL authored activities. The `authoredPack()` template packs
- * (`packages/content-pack/src/seeds/authored-subject-catalog-2026.ts`) are
- * deliberately NOT served — they are the recognised 3-activity stubs the
- * production-readiness audit flagged (identical "Observe, explain, then
- * choose" choices for every subject); remediation Sprints 08-09 author real
- * packs and add them here.
+ * REAL authored activities. Every learner subject now has at least one REAL
+ * pack; the `authoredPack()` 3-activity template stubs the audit flagged
+ * remain excluded from the curated list and serve nothing.
  */
 import {
   getSeededPack,
@@ -37,8 +34,20 @@ type GuidedItem = GeneratedLessonPlanInput["guidedPractice"][number];
 export const AUTHORED_LESSON_PACKS: Readonly<Record<string, readonly string[]>> = {
   math: ["math-k-fall-2026", "math-1-fall-2026", "math-2-fall-2026"],
   reading: ["ela-k-fall-2026", "ela-1-fall-2026", "ela-2-fall-2026"],
+  writing: ["writing-k-fall-2026"],
   science: ["science-k-fall-2026"],
   coding: ["coding-k2-fall-2026", "coding-1-fall-2026", "coding-2-fall-2026"],
+  social: ["sel-k-fall-2026"],
+  speech: ["speech-k-fall-2026", "speech-3-fall-2026", "speech-6-fall-2026", "speech-9-fall-2026"],
+  geography: ["geography-k-fall-2026"],
+  "social-studies": ["social-studies-k-fall-2026"],
+  life: ["life-skills-k-fall-2026"],
+  "executive-function": ["executive-function-k-fall-2026"],
+  art: ["creative-arts-k-fall-2026"],
+  music: ["music-k-fall-2026"],
+  "physical-education": ["pe-health-k-fall-2026"],
+  "world-languages": ["world-languages-k-fall-2026"],
+  engineering: ["stem-engineering-k-fall-2026"],
 };
 
 /** Expand a grade-band string ("K", "K-2", "PreK-K", "1-3", "3") into the

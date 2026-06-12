@@ -130,24 +130,27 @@ describe("createLessonRun domain-surface emission (real path)", () => {
       expect(stored!.generation.contentSource).toBe("authored_pack");
       expect(stored!.guidedPractice.some((g) => g.prompt.includes("How many apples"))).toBe(true);
 
-      // A subject with only the recognised template stub stays "template".
-      const music = (await curriculum.listSubjects()).find((s) => s.slug === "music");
-      if (music) {
-        const musicSkill = (await curriculum.listSkills(music.id))[0];
-        const musicRun = await createLessonRun({
+      // Outside any authored pack's band the provenance stays "template" —
+      // pick a math skill whose grade band does not overlap the K-2 packs.
+      const upperSkill = (await curriculum.listSkills(math.id)).find((s) => {
+        const bands = expandGradeBand(s.gradeBand);
+        return bands.size > 0 && !bands.has("K") && !bands.has("1") && !bands.has("2");
+      });
+      if (upperSkill) {
+        const upperRun = await createLessonRun({
           learnerId: SKY,
           tenantId: TENANT,
-          subjectId: music.id,
-          skillId: musicSkill.id,
+          subjectId: math.id,
+          skillId: upperSkill.id,
           source: "subject_path",
         });
-        expect(musicRun.ok).toBe(true);
-        if (musicRun.ok) {
-          const musicPlan = await getPersistence().lessonRuns.getPlanById(
-            musicRun.lessonRun.lessonPlanId!,
+        expect(upperRun.ok).toBe(true);
+        if (upperRun.ok) {
+          const upperPlan = await getPersistence().lessonRuns.getPlanById(
+            upperRun.lessonRun.lessonPlanId!,
             TENANT,
           );
-          expect(musicPlan!.generation.contentSource).toBe("template");
+          expect(upperPlan!.generation.contentSource).toBe("template");
         }
       }
     },

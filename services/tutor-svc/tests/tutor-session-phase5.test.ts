@@ -119,8 +119,9 @@ describe("tutor-svc plan route — Phase 5 specialisations", () => {
     });
     assert.equal(res.statusCode, 200, `expected 200, got ${res.statusCode}: ${res.body}`);
     const plan = res.json() as { contentPackSource: string };
-    // We didn't supply a content pack either; the starter pack should kick in.
-    assert.equal(plan.contentPackSource, "starter");
+    // We didn't supply a content pack either; harmony's REAL authored pack
+    // (sel-k-fall-2026, owner directive: all subjects authored) kicks in.
+    assert.equal(plan.contentPackSource, "authored");
   });
 
   it("still 403s for a consent-required tutor when no tenantId is provided", async () => {

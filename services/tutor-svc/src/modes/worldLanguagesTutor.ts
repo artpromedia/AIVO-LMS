@@ -34,7 +34,7 @@ export const worldLanguagesTutor: TutorDefinition = defineTutor({
     "actfl-world-languages-novice-low",
     "actfl-world-languages-7-12",
   ],
-  defaultContentPackRefs: ["world-languages-novice-low-fall-2026"],
+  defaultContentPackRefs: ["world-languages-k-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.

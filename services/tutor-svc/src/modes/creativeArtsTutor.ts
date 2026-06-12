@@ -33,7 +33,7 @@ export const creativeArtsTutor: TutorDefinition = defineTutor({
     "ncas-creative-arts-k2",
     "ncas-creative-arts-3-12",
   ],
-  defaultContentPackRefs: ["creative-arts-k2-fall-2026"],
+  defaultContentPackRefs: ["creative-arts-k-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.

@@ -38,28 +38,32 @@ export const speechTutor: TutorDefinition = defineTutor({
     "asha-speech-school-age",
     "asha-speech-9-12",
   ],
-  defaultContentPackRefs: ["speech-early-fall-2026"],
+  defaultContentPackRefs: ["speech-k-fall-2026", "speech-3-fall-2026", "speech-6-fall-2026", "speech-9-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.
   // The ASHA-aligned speech item bank clears that bar at K, 3, and 7 only;
   // every other band is honestly "scaffold" until authored
   // (docs/quality/tutor-k12-coverage-gap-plan.md).
+  // Echo authored K-12 (owner directive 2026-06-12): every band is backed by
+  // >=3 real ASHA-aligned production items (machine-checked by
+  // curriculum:coverage) and the signed asha-speech early/school-age/9-12
+  // graphs. PRE_K stays scaffold on the 0.1.0-draft foundations graph.
   coverageMatrix: {
     PRE_K: "scaffold",
     K: "authored",
-    "1": "scaffold",
-    "2": "scaffold",
+    "1": "authored",
+    "2": "authored",
     "3": "authored",
-    "4": "scaffold",
-    "5": "scaffold",
-    "6": "scaffold",
+    "4": "authored",
+    "5": "authored",
+    "6": "authored",
     "7": "authored",
-    "8": "scaffold",
-    "9": "scaffold",
-    "10": "scaffold",
-    "11": "scaffold",
-    "12": "scaffold",
+    "8": "authored",
+    "9": "authored",
+    "10": "authored",
+    "11": "authored",
+    "12": "authored",
   },
   // Wave E (S8): agent loop instruments + per-level action policy.
   toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "score_pronunciation"],

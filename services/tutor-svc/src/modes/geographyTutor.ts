@@ -29,7 +29,7 @@ export const geographyTutor: TutorDefinition = defineTutor({
   gradeBands: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
   skillGraphRefs: ["prek-geography-foundations", "ncge-geography-k2", "ncge-geography-3-12"],
-  defaultContentPackRefs: ["geography-k2-fall-2026"],
+  defaultContentPackRefs: ["geography-k-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.
