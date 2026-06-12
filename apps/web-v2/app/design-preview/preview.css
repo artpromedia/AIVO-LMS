@@ -1,0 +1,406 @@
+/*
+ * Scoped styles for the /design-preview route. Everything is namespaced under
+ * `.lx-preview` so the proposed `--lx-*` token system and its animations layer
+ * over @aivo/brand without touching any production surface. The preview sets
+ * data-mood / data-spacing / data-typeface on its own root (NOT <html>), so
+ * toggling controls never mutates the real session.
+ */
+
+.lx-preview {
+  /* ---- palette (home hub) ---- */
+  --lx-ink: oklch(0.22 0.07 280);
+  --lx-ink-soft: oklch(0.42 0.05 280);
+  --lx-ink-muted: oklch(0.5 0.035 280);
+  --lx-canvas: oklch(0.985 0.006 285);
+  --lx-surface: oklch(1 0 0);
+  --lx-primary: oklch(0.54 0.25 278);
+  --lx-primary-ink: oklch(0.4 0.2 278);
+  --lx-primary-soft: oklch(0.96 0.04 278);
+  --lx-warm: oklch(0.78 0.16 55);
+  --lx-warm-ink: oklch(0.5 0.13 50);
+  --lx-mint: oklch(0.72 0.13 165);
+  --lx-petal: oklch(0.78 0.16 348);
+  --lx-border: oklch(0.92 0.01 280);
+  --lx-track: color-mix(in oklch, var(--lx-ink) 6%, var(--lx-surface));
+
+  /* ---- scales ---- */
+  --lx-motion: 1; /* mood-driven; 0 == reduced/off */
+  --lx-density: 1; /* spacing-driven */
+  --lx-radius-card: 28px;
+  --lx-radius-control: 16px;
+  --lx-elev-1: 0 1px 2px rgba(36, 26, 71, 0.06);
+  --lx-elev-2: 0 8px 24px rgba(36, 26, 71, 0.1);
+
+  background: var(--lx-canvas);
+  color: var(--lx-ink);
+  font-size: calc(1.0625rem * (0.6 + 0.4 * var(--lx-density)));
+}
+
+/* ===== Mood variants: retint + motion dial (palette only; contrast holds) ===== */
+.lx-preview[data-mood="calm"] {
+  --lx-canvas: oklch(0.98 0.004 270);
+  --lx-primary: oklch(0.52 0.18 278);
+  --lx-petal: oklch(0.72 0.1 348);
+  --lx-warm: oklch(0.74 0.11 55);
+  --lx-motion: 0.45;
+  --lx-elev-2: 0 4px 14px rgba(36, 26, 71, 0.06);
+}
+.lx-preview[data-mood="energizing"] {
+  --lx-canvas: oklch(0.985 0.012 300);
+  --lx-primary: oklch(0.56 0.27 278);
+  --lx-motion: 1.2;
+}
+
+/* ===== Spacing variants ===== */
+.lx-preview[data-spacing="compact"] {
+  --lx-density: 0.85;
+}
+.lx-preview[data-spacing="comfortable"] {
+  --lx-density: 1;
+}
+.lx-preview[data-spacing="spacious"] {
+  --lx-density: 1.2;
+}
+
+/* ===== Dyslexia-friendly typeface (scoped) ===== */
+.lx-preview[data-typeface="dyslexia"] {
+  font-family: var(--aivo-fontFamily-dyslexia, "Atkinson Hyperlegible", system-ui, sans-serif);
+  letter-spacing: 0.01em;
+}
+.lx-preview[data-typeface="dyslexia"] * {
+  line-height: 1.6 !important; /* floor — Compact cannot cross it */
+}
+
+/* ===== Surfaces ===== */
+.lx-card {
+  background: var(--lx-surface);
+  border: 1px solid var(--lx-border);
+  border-radius: var(--lx-radius-card);
+  box-shadow: var(--lx-elev-1);
+  padding: calc(1.5rem * var(--lx-density));
+}
+.lx-gap {
+  gap: calc(1.5rem * var(--lx-density));
+}
+
+.lx-cta {
+  background: var(--lx-primary);
+  color: #fff;
+  border-radius: var(--lx-radius-control);
+  font-weight: 700;
+  padding: 0.85rem 1.4rem;
+  transition: transform calc(160ms / var(--lx-motion)) ease-out, filter 160ms ease-out;
+}
+.lx-cta:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.lx-cta:active {
+  transform: translateY(0);
+}
+.lx-preview :focus-visible {
+  outline: 3px solid var(--lx-primary);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* ===== Segmented control (My Workspace) =====
+   A true segmented control: one soft track holding equal segments, with an
+   elevated white "selected" pill. Reads as a single object that echoes the
+   page's rounded, warm card language — not a grid of loose toggle boxes.
+   48px targets satisfy WCAG 2.5.8; selected state is conveyed by color +
+   shadow + ring + aria-checked, never by color alone. */
+.lx-seg {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.lx-seg-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.lx-seg-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--lx-ink);
+}
+.lx-seg-value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--lx-primary-ink);
+}
+.lx-seg-track {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 16px;
+  background: var(--lx-track);
+}
+.lx-seg-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0.4rem 0.35rem;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--lx-ink-soft);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background calc(150ms / var(--lx-motion)) ease,
+    color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+.lx-seg-btn[data-layout="inline"] {
+  flex-direction: row;
+  gap: 7px;
+}
+.lx-seg-btn:hover {
+  background: color-mix(in oklch, var(--lx-ink) 5%, transparent);
+  color: var(--lx-ink);
+}
+.lx-seg-btn:active {
+  transform: scale(0.97);
+}
+.lx-seg-btn[aria-checked="true"],
+.lx-seg-btn[aria-checked="true"]:hover {
+  background: var(--lx-surface);
+  color: var(--lx-primary-ink);
+  box-shadow:
+    var(--lx-elev-1),
+    inset 0 0 0 1.5px color-mix(in oklch, var(--lx-primary) 26%, transparent);
+}
+.lx-seg-btn svg {
+  flex-shrink: 0;
+}
+
+/* ===== XP bar ===== */
+.lx-xp-track {
+  background: var(--lx-primary-soft);
+  border-radius: 9999px;
+  height: 14px;
+  overflow: hidden;
+}
+.lx-xp-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--lx-primary), var(--lx-petal));
+  transition: width calc(900ms / var(--lx-motion)) cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lx-xp-fill[data-glow="on"] {
+  box-shadow: 0 0 12px 1px color-mix(in oklch, var(--lx-primary) 60%, transparent);
+}
+.lx-xp-float {
+  animation: lx-float-up calc(1000ms / var(--lx-motion)) ease-out forwards;
+}
+@keyframes lx-float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.9);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-22px) scale(1);
+  }
+}
+
+/* ===== Level-up burst ===== */
+.lx-levelpop {
+  animation: lx-pop calc(1100ms / var(--lx-motion)) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes lx-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  55% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.lx-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.lx-burst span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--lx-warm);
+  animation: lx-spark calc(900ms / var(--lx-motion)) ease-out forwards;
+}
+@keyframes lx-spark {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--a)) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--a)) translateY(-46px) scale(0.4);
+  }
+}
+
+/* ===== Per-tutor world ambient (Number Galaxy) ===== */
+.lx-world-stars span {
+  position: absolute;
+  border-radius: 9999px;
+  background: #fff;
+  opacity: 0.8;
+  animation: lx-drift calc(7000ms / var(--lx-motion)) ease-in-out infinite;
+}
+@keyframes lx-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-6px);
+    opacity: 0.9;
+  }
+}
+
+/* ===== Streak flame ===== */
+.lx-flame {
+  animation: lx-flicker calc(2500ms / var(--lx-motion)) ease-in-out infinite;
+}
+@keyframes lx-flicker {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+/* ===== Mascot animations (layered on static poses) ===== */
+.aivo-breathe {
+  transform-origin: 100px 120px;
+  animation: lx-breathe calc(4000ms / var(--lx-motion)) ease-in-out infinite;
+}
+@keyframes lx-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+svg[data-aivo-expression="greeting"] .aivo-wing-wave {
+  transform-origin: 48px 104px;
+  animation: lx-wave calc(700ms / var(--lx-motion)) ease-in-out 1;
+}
+@keyframes lx-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(-16deg);
+  }
+  70% {
+    transform: rotate(-6deg);
+  }
+}
+.aivo-sparkles {
+  transform-origin: center;
+  animation: lx-twinkle calc(1600ms / var(--lx-motion)) ease-in-out infinite;
+}
+@keyframes lx-twinkle {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+.aivo-think-dot {
+  animation: lx-bob calc(1800ms / var(--lx-motion)) ease-in-out infinite;
+}
+.aivo-zzz {
+  animation: lx-bob calc(3200ms / var(--lx-motion)) ease-in-out infinite;
+}
+@keyframes lx-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+.tutor-orbit {
+  transform-origin: 100px 100px;
+  animation: lx-twinkle calc(2200ms / var(--lx-motion)) ease-in-out infinite;
+}
+.tutor-leaf {
+  animation: lx-sway calc(3600ms / var(--lx-motion)) ease-in-out infinite;
+}
+@keyframes lx-sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+/* =====================================================================
+   Motion gating — Calm and prefers-reduced-motion collapse every loop to
+   a static pose. Energizing keeps full motion (handled by --lx-motion).
+   Static expressions still read correctly because meaning never depends
+   on motion (see DESIGN-DIRECTION §2.6 / §10).
+   ===================================================================== */
+.lx-preview[data-mood="calm"] .aivo-breathe,
+.lx-preview[data-mood="calm"] .aivo-sparkles,
+.lx-preview[data-mood="calm"] .aivo-think-dot,
+.lx-preview[data-mood="calm"] .aivo-zzz,
+.lx-preview[data-mood="calm"] .aivo-wing-wave,
+.lx-preview[data-mood="calm"] .tutor-orbit,
+.lx-preview[data-mood="calm"] .tutor-leaf,
+.lx-preview[data-mood="calm"] .lx-flame,
+.lx-preview[data-mood="calm"] .lx-world-stars span {
+  animation: none !important;
+}
+/* Calm hides the celebratory sparkle flourish entirely (per §2.2). */
+.lx-preview[data-mood="calm"] .aivo-sparkles {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lx-preview * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
