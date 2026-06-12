@@ -587,35 +587,46 @@
       "add_another_learner": "添加其他学习者",
       "today_at_a_glance": "今日概览",
       "details": "详情",
-      "learning_readiness": "学习准备情况",
-      "assessment_status": "评估状态",
-      "iep_support_upload": "上传 IEP / 支持文件",
       "consent_checklist": "同意确认清单",
-      "todays_recommended_actions": "今日推荐操作",
-      "notifications_title": "通知",
-      "billing_title": "账单",
       "school_connection": "学校连接",
-      "plan_generated": "计划已生成",
-      "pacing": "学习节奏",
-      "calm_extended_time_on": "平静 — 延长时间已开启",
-      "sensory_mode": "感官模式",
-      "warm_reduced_motion": "温暖 + 减少动效",
-      "parent_guardian_consent": "家长 / 监护人同意",
       "approved": "已批准",
-      "ai_personalization": "AI 个性化",
-      "school_data_sharing": "学校数据共享",
       "optional_not_set": "可选 — 未设置",
-      "approve_voice_mode": "批准语音模式",
-      "approve_voice_mode_desc": "允许 Emma 在课程中大声与 AI 导师交流。",
-      "upload_iep_optional": "上传 IEP（可选）",
-      "upload_iep_desc": "添加调整措施，让 AIVO 从第一天起就应用它们。",
-      "new_milestone": "新里程碑：",
-      "new_milestone_desc": "独立阅读了一篇 200 字的文章。",
-      "tutor_note": "导师备注：",
-      "tutor_note_desc": "本周学习节奏非常不错。",
-      "family_2_learners": "家庭 — 2 名学习者",
-      "next_renewal": "下次续费",
-      "payment_method": "支付方式"
+      "hero_ready": "{name} 已准备好今天的学习。",
+      "hero_next": "为 {name} 走出下一步吧。",
+      "hero_add_first": "添加第一个孩子，开启学习之旅。",
+      "subhead": "安静、个性化，只等你快速看一眼。",
+      "empty_description": "添加第一个孩子，开始评估并定制学习路径。",
+      "setup_for": "{name} 的设置",
+      "step_assessment": "家长评估",
+      "step_supports": "IEP 与团队（可选）",
+      "step_baseline": "起点探险",
+      "step_review": "查看学习档案",
+      "metric_learners": "孩子",
+      "metric_learners_desc_one": "家庭计划中有一个孩子。",
+      "metric_learners_desc_other": "家庭计划中有 {count} 个孩子。",
+      "metric_ready": "可以开始学习",
+      "metric_ready_desc_all": "今天的一切都已就绪。",
+      "metric_ready_desc_partial": "起点评估与同意均已完成。",
+      "metric_action": "需要你处理",
+      "metric_action_desc_zero": "没有待办事项。很棒。",
+      "metric_action_desc_some": "打开下方“下一步”完成设置。",
+      "metric_status": "{name} 的状态",
+      "next_steps_title": "下一步",
+      "next_steps_subtitle": "每个孩子一小步——每步约一分钟。",
+      "view_all_learners": "查看所有孩子",
+      "consent_subtitle": "你已为 {name} 批准的内容。",
+      "consent_of_total": "已批准 {granted}/{total}",
+      "review_consent": "查看同意设置",
+      "connect_a_school": "连接学校",
+      "school_subtitle": "如果学校使用 AIVO，可与课堂同步。",
+      "school_body": "连接学校后，老师能看到与你相同的学习档案，AI 导师也能与课堂学习协同。分享内容始终由你掌控。",
+      "legacy_note": "这是新版家长主页。旧版仍可访问：",
+      "consent_type": {
+        "child_data_collection": "儿童数据收集",
+        "ai_personalization": "AI 个性化",
+        "school_roster_import": "共享学校名册"
+      },
+      "not_found_body": "新版家长主页仍在逐步上线。你要找的页面尚未发布或地址已变更。"
     },
     "home": {
       "greeting": "问候",
@@ -722,7 +733,8 @@
       "status_applied": "已批准并应用 — 课程将从下次学习开始更新。",
       "status_declined": "已拒绝 — 不会有任何更改。",
       "status_failed": "已批准，但应用失败 — 已通知我们的团队。",
-      "history": "最近的决定 ({count})"
+      "history": "最近的决定 ({count})",
+      "retry": "重试"
     },
     "tutor_memories": {
       "title": "导师记住的内容",
@@ -735,6 +747,35 @@
       "expires": "{date} 过期",
       "delete": "删除",
       "delete_label": "删除这条记忆"
+    },
+    "readiness": {
+      "label": {
+        "profile_created": "档案已创建",
+        "assessment_needed": "评估进行中",
+        "iep_optional": "添加 IEP（可选）",
+        "team_invite_optional": "邀请支持团队（可选）",
+        "baseline_needed": "起点探险已就绪",
+        "brain_build_pending": "正在搭建学习档案",
+        "brain_clone_review_needed": "学习档案待查看",
+        "ready_for_today_mission": "今日任务已就绪",
+        "active_learning": "学习进行中"
+      },
+      "next": {
+        "profile_created": "开始家长评估",
+        "assessment_needed": "继续家长评估",
+        "iep_optional": "添加 IEP 或跳过",
+        "team_invite_optional": "邀请孩子的团队",
+        "baseline_needed": "开始起点探险",
+        "brain_build_pending": "完成档案搭建",
+        "brain_clone_review_needed": "查看学习档案",
+        "ready_for_today_mission": "打开今日任务",
+        "active_learning": "查看成长报告"
+      }
+    },
+    "learner_card": {
+      "open_profile": "打开档案",
+      "age": "{age} 岁",
+      "grade": "{grade} 年级"
     }
   },
   "brain_clone": {
@@ -765,17 +806,17 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved.",
-    "clone_eyebrow": "正在克隆大脑",
-    "clone_aria": "正在将 AIVO 的学习模型克隆到 {name} 的专属大脑中",
+    "clone_eyebrow": "正在生成学习档案",
+    "clone_aria": "正在把 AIVO 的学习模型调适给 {name}",
     "clone_master_label": "AIVO 主大脑",
     "clone_child_label": "{name} 的大脑",
-    "clone_caption": "正在将 AIVO 的学习模型克隆到 {name} 的专属大脑中…",
+    "clone_caption": "正在把 AIVO 的学习模型调适给 {name}…",
     "clone_personalising": "正在根据 {name} 的年级和学习档案进行个性化",
     "clone_finalising": "即将完成——正在生成个性化大脑",
     "clone_privacy_pii": "任何个人数据都不会以未加密的形式离开此设备",
     "clone_privacy_versioned": "版本化 · 可随时回滚",
     "clone_skip": "跳过动画",
-    "clone_replay": "重新播放克隆动画",
+    "clone_replay": "重播档案动画",
     "building_title": "正在构建 {name} 的大脑",
     "building_subtitle": "根据评估数据实时构建",
     "building_template_pill": "{grade} 年级大脑模板 — {level}",
@@ -1171,7 +1212,9 @@
       "msg_supports_body": "朗读、平和的节奏，以及来自你 IEP 的{count, plural, other {另外 # 项支持}}都已启用。",
       "msg_break_title": "休息是好事",
       "msg_break_body": "伸个懒腰、喝点水、看看窗外。AIVO 会保存你的位置。",
-      "planned_week_badge": "本周已计划"
+      "planned_week_badge": "本周已计划",
+      "explore_subjects_title": "探索你的科目",
+      "explore_subjects_body": "每位导师和科目，一点即达。"
     },
     "common": {
       "learner_eyebrow": "学习者",
@@ -1201,7 +1244,8 @@
     "rewards": {
       "title": "奖励",
       "description": "追踪你在各个任务世界中完成的每一章。",
-      "open_world": "打开世界 →"
+      "open_world": "打开世界 →",
+      "sticker_empty_encouragement": "你的第一张贴纸在等你——完成一个章节就能获得！"
     },
     "select": {
       "eyebrow": "查看身份",
@@ -1321,7 +1365,10 @@
       "agent_modality_auditory": "试着大声读出来 — 听一听会有帮助。",
       "agent_modality_kinesthetic": "试着用手指或物品数一数。",
       "agent_modality_reading": "我们慢慢读，一部分一部分来。",
-      "agent_new_surface": "我们换一种方式试试同一道题。"
+      "agent_new_surface": "我们换一种方式试试同一道题。",
+      "offline_saved_title": "已保存在此设备",
+      "offline_saved_body": "你现在离线——恢复连接后会立即同步。",
+      "offline_complete_title": "课程已保存在此设备"
     },
     "baseline_runner": {
       "exit_proctor_view": "退出监考视图",
@@ -1335,6 +1382,69 @@
     },
     "lesson_run": {
       "back_to_today": "返回今天"
+    },
+    "accessibility_voice": {
+      "title": "语音与语速。",
+      "body": "选择朗读的声音和语速。",
+      "link": "打开语音设置"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "你好，我是诺娃！一起去数字星系探险吧。",
+        "celebrate": "出色的工作！今天你让数字闪闪发光。"
+      },
+      "sage": {
+        "welcome": "我是塞奇——我为你挑了一条故事小路。",
+        "celebrate": "读得真好！有你在，故事更精彩了。"
+      },
+      "spark": {
+        "welcome": "我是斯帕克！准备好发现神奇的事物了吗？",
+        "celebrate": "实验真棒！你的好奇心点亮了实验室。"
+      },
+      "chrono": {
+        "welcome": "我是克罗诺——一起穿越回过去吧。",
+        "celebrate": "多棒的旅程！今天你让历史活了起来。"
+      },
+      "pixel": {
+        "welcome": "我是皮克塞尔！一步一步，做出很酷的东西。",
+        "celebrate": "击个掌！你的代码运行得棒极了。"
+      },
+      "echo": {
+        "welcome": "你好，我是艾可！一起来热热嗓子吧。",
+        "celebrate": "说得真好！你的话又响亮又清楚。"
+      },
+      "harmony": {
+        "welcome": "我是哈莫尼。深呼吸——这里是你的空间。",
+        "celebrate": "今天你展现了真心。为自己骄傲吧。"
+      },
+      "atlas": {
+        "welcome": "我是阿特拉斯！出发去探索世界吧。",
+        "celebrate": "了不起的旅行！今天你发现了世界的好多角落。"
+      },
+      "cadence": {
+        "welcome": "我是凯登丝！感受到节拍了吗？来做音乐吧。",
+        "celebrate": "太棒了！你的节奏充满了整个房间。"
+      },
+      "vigor": {
+        "welcome": "我是维格！一起伸展、运动、变强壮。",
+        "celebrate": "好样的！今天你拿出了最棒的能量。"
+      },
+      "lingua": {
+        "welcome": "你好！我是林瓜——一起学世界各地的新词语。",
+        "celebrate": "太棒了！今天你说了一门新语言。"
+      },
+      "forge": {
+        "welcome": "我是福吉！拿好工具——一起搭建和测试点子。",
+        "celebrate": "搭得真稳！你的发明经受住了考验。"
+      },
+      "compass": {
+        "welcome": "我是康帕斯。一次一小步——我来引路。",
+        "celebrate": "方向正确！你计划了，也做到了。"
+      },
+      "muse": {
+        "welcome": "我是缪斯！今天你的想象力就是画笔。",
+        "celebrate": "真漂亮！你的想法变成了真正的艺术。"
+      }
     }
   },
   "auth": {
@@ -1404,6 +1514,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "请至少输入 2 个字符。",
+        "email": "这看起来不像电子邮箱地址。",
+        "password": "请至少使用 8 个字符。"
       }
     },
     "forgot": {
@@ -2945,6 +3060,19 @@
       "submit_error": "无法保存评估 — 请重试。",
       "success_title": "评估已保存",
       "success_body": "您的输入现在将用于该学习者的基线和课程个性化。"
+    },
+    "not_found": {
+      "eyebrow": "未找到",
+      "heading": "找不到该页面",
+      "body": "链接可能已变更。回到你的主页吧。",
+      "home_link": "回到主页"
+    },
+    "error": {
+      "eyebrow": "出了点问题",
+      "heading": "页面遇到了小故障",
+      "body": "没有丢失任何内容。请重试，或返回主页。",
+      "retry": "重试",
+      "home_link": "回到主页"
     }
   },
   "caregiver": {
@@ -2994,6 +3122,19 @@
       "section_profile": "个人资料",
       "section_notifications": "通知",
       "role_label": "护理人员"
+    },
+    "not_found": {
+      "eyebrow": "未找到",
+      "heading": "找不到该页面",
+      "body": "链接可能已变更。回到你的主页吧。",
+      "home_link": "回到主页"
+    },
+    "error": {
+      "eyebrow": "出了点问题",
+      "heading": "页面遇到了小故障",
+      "body": "没有丢失任何内容。请重试，或返回主页。",
+      "retry": "重试",
+      "home_link": "回到主页"
     }
   },
   "accept_invite": {
@@ -3178,5 +3319,22 @@
       "ready_badge": "可开始",
       "generated_at": "{date} 已准备"
     }
+  },
+  "messages": {
+    "inbox_title": "收件箱",
+    "loading": "加载中…",
+    "empty_inbox": "还没有会话。AIVO 团队中有人给你留言时会显示在这里。",
+    "select_prompt": "选择一个会话来阅读和回复。",
+    "empty_thread": "这个会话还没有消息。",
+    "reply_placeholder": "写一条回复…",
+    "send": "发送",
+    "sending": "发送中…",
+    "threads_error_title": "无法加载你的消息",
+    "threads_error_body": "内容没有丢失——请稍后再试。",
+    "thread_error_title": "无法打开该会话",
+    "thread_error_body": "请再试一次——你的消息很安全。",
+    "send_failed_title": "消息未发送",
+    "send_failed_body": "草稿仍然保留。",
+    "send_retry": "重试"
   }
 }

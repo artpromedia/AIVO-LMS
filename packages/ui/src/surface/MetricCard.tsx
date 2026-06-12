@@ -41,7 +41,7 @@ const TONE_CLASS: Record<AivoTone, string> = {
   primary: "text-[var(--aivo-sensory-primary,#7c3aed)]",
   accent: "text-[var(--aivo-color-aivoTeal-600,#0d9488)]",
   warm: "text-[var(--aivo-color-aivoOrange-600,#ea580c)]",
-  success: "text-[var(--aivo-color-status-success-strong,#16a34a)]",
+  success: "text-[var(--aivo-domain-completion-complete-strong,#15803d)]",
   warning: "text-[var(--aivo-color-status-warning-strong,#d97706)]",
   error: "text-[var(--aivo-color-status-error-strong,#dc2626)]",
   info: "text-[var(--aivo-color-status-info-strong,#7c3aed)]",
@@ -116,14 +116,14 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(func
             "inline-flex items-center gap-1 text-xs font-semibold iw-tabular",
             TONE_CLASS[tone],
           )}
-          aria-label={
-            delta == null
-              ? "No change data"
-              : `${delta > 0 ? "Up" : delta < 0 ? "Down" : "No change"} ${Math.abs(delta)} percent`
-          }
         >
           <TrendIcon className="w-3.5 h-3.5" aria-hidden />
-          {delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta}%`}
+          <span aria-hidden="true">{delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta}%`}</span>
+          <span className="sr-only">
+            {delta == null
+              ? "No change data"
+              : `${delta > 0 ? "Up" : delta < 0 ? "Down" : "No change"} ${Math.abs(delta)} percent`}
+          </span>
         </div>
       )}
 

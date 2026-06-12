@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { TUTORS } from "@aivo/brand";
-import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/lesson-player";
+import { TUTORS, type TutorKey } from "@aivo/brand";
+import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/player";
 import { requirePageRole } from "@/lib/auth/server";
 import type { GeneratedLessonPlan } from "@/lib/db/types";
 
@@ -43,7 +43,7 @@ const FIXTURE_SURFACE_TYPES: ReadonlySet<FixtureSurfaceType> = new Set([
 ]);
 
 type FixturePageProps = {
-  searchParams?: Promise<{ surfaceType?: string; agent?: string }>;
+  searchParams?: Promise<{ surfaceType?: string; agent?: string; sensory?: string; tutor?: string }>;
 };
 
 function fixturePrompt(surfaceType: FixtureSurfaceType): string {
@@ -192,6 +192,19 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
   if (process.env.NODE_ENV === "production") notFound();
   const session = await requirePageRole(["learner", "parent"]);
   const params = await searchParams;
+  // Deterministic sensory scenarios for the stage-sensory e2e: the param maps
+  // to a parent-curated profile exactly as the repos layer would supply it.
+  const FIXTURE_SENSORY: Record<string, Record<string, string>> = {
+    "hyper-visual": { visual: "hyper" },
+    "vestibular-hyper": { vestibular: "hyper" },
+    "hypo-visual": { visual: "hypo" },
+  };
+  const sensoryModalities = params?.sensory ? (FIXTURE_SENSORY[params.sensory] ?? null) : null;
+  // Sprint 15 — `?tutor=nova|sage|…` mounts the player with that tutor's
+  // identity treatment so the theming matrix can capture it deterministically.
+  const tutorSlug: TutorKey | null =
+    params?.tutor && params.tutor in TUTORS ? (params.tutor as TutorKey) : null;
+
   const requested = params?.surfaceType;
   const surfaceType: FixtureSurfaceType = FIXTURE_SURFACE_TYPES.has(requested as FixtureSurfaceType)
     ? (requested as FixtureSurfaceType)
@@ -220,6 +233,8 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
         learnerId={learnerId}
         lessonRunId={`lesson-run-fixture-${surfaceType}`}
         plan={fixturePlan(surfaceType)}
+        tutorSlug={tutorSlug}
+        sensoryModalities={sensoryModalities}
         accessibility={{
           learnerId,
           tenantId: session.tenantId ?? "t_demo",

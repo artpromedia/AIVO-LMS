@@ -78,6 +78,16 @@ export default [
       "react-native-a11y/no-nested-touchables": "error",
     },
   },
+  // Sprint 13 — the decomposed learning surfaces are `any`-clean by
+  // construction; lock that in. The repo-wide rule stays `warn` (60
+  // recorded escape hatches outside this tree await a future pass);
+  // inside the learning dir a new `any` is a build break.
+  {
+    files: ["src/components/learning/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
   // Phase 5.last allowlist: existing hand-rolled `interface *Response`
   // declarations predate the api-client guard. Each entry should be
   // removed in a follow-up PR that replaces the interface with the

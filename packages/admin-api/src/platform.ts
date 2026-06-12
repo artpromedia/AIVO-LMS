@@ -361,6 +361,34 @@ export function listAdminUsersPage(
   return listIdentityPage(session, "/api/admin-svc/users", "users", mapUser, opts);
 }
 
+export function listAdminTenantsPage(
+  session: Pick<SessionProfile, "role">,
+  opts: { page?: number; pageSize?: number; search?: string; sort?: string } = {},
+): Promise<AdminListPage<AdminTenantSummary>> {
+  const page = Math.max(1, opts.page ?? 1);
+  const pageSize = Math.min(Math.max(1, opts.pageSize ?? 50), 200);
+  // DataTable encodes sort as "column:direction"; identity-svc takes them
+  // as separate `sort` + `order` params (whitelist: name | createdAt).
+  const [sortCol, sortDir] = (opts.sort ?? "createdAt:desc").split(":");
+  return adminGet<Record<string, unknown>>(session, "/api/admin-svc/tenants", {
+    page,
+    pageSize,
+    ...(opts.search ? { search: opts.search } : {}),
+    sort: sortCol === "name" ? "name" : "createdAt",
+    order: sortDir === "asc" ? "asc" : "desc",
+  }).then((payload) => {
+    const rowsRaw = Array.isArray(payload.tenants)
+      ? (payload.tenants as Record<string, unknown>[])
+      : [];
+    return {
+      rows: rowsRaw.map(mapTenant),
+      total: Number(payload.total ?? rowsRaw.length),
+      page,
+      pageSize,
+    };
+  });
+}
+
 export function listAdminLearnersPage(
   session: Pick<SessionProfile, "role">,
   opts: { page?: number; pageSize?: number; search?: string } = {},

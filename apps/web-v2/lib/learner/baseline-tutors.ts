@@ -27,6 +27,9 @@ export type BaselineTutor = {
   emoji: string;
   /** Brand color sourced from `@aivo/brand` TUTORS catalogue. */
   color: string;
+  /** Portrait art (256px PNG) + sensory-reduced SVG, from @aivo/brand TUTORS. */
+  avatar?: string;
+  avatarReduced?: string;
   /** Single-sentence scene description for the chapter intro. */
   scene: string;
   /** Tutor's one-line greeting shown to the learner. */
@@ -104,9 +107,14 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
   },
 ];
 
+function artForTutorName(name: string): { avatar?: string; avatarReduced?: string } {
+  const entry = Object.values(TUTORS).find((t) => t.name === name);
+  return entry ? { avatar: entry.avatar, avatarReduced: entry.avatarReduced } : {};
+}
+
 export function tutorForSubjectSlug(slug: string): BaselineTutor | null {
   const explicit = BASELINE_TUTORS.find((t) => t.subjectSlug === slug);
-  if (explicit) return explicit;
+  if (explicit) return { ...explicit, ...artForTutorName(explicit.name) };
   // Sprint 2 (subject/tutor UX): every subject — not just the six baseline
   // Discovery domains — now resolves to a tutor descriptor derived from the
   // canonical `@aivo/brand` catalog, so the subjects grid and lesson flow show
@@ -122,6 +130,8 @@ export function tutorForSubjectSlug(slug: string): BaselineTutor | null {
     landmark: tutor.domain,
     emoji: tutor.icon,
     color: tutor.color,
+    avatar: tutor.avatar,
+    avatarReduced: tutor.avatarReduced,
     scene: subject.description,
     greeting: `Hi! I'm ${tutor.name}. Let's explore ${subject.name} together.`,
   };

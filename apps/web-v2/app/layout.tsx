@@ -4,6 +4,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { PlayfulCalmProvider } from "@/components/system/playful-calm-provider";
+import { QueryProvider } from "@/components/system/query-provider";
+import { Toaster } from "@/components/ui/toaster";
 import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
 import { PwaRegister } from "@/components/system/pwa-register";
 import { WebVitalsReporter } from "@/components/observability/web-vitals-reporter";
@@ -129,7 +131,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         <NextIntlClientProvider locale={locale} messages={messages} timeZone={viewerTimeZone}>
           <SensoryModeProvider initialMode={sensoryMode}>
-            <PlayfulCalmProvider>{children}</PlayfulCalmProvider>
+            <PlayfulCalmProvider>
+              <QueryProvider>
+                {children}
+                <Toaster />
+              </QueryProvider>
+            </PlayfulCalmProvider>
           </SensoryModeProvider>
           <PwaRegister />
           <WebVitalsReporter />

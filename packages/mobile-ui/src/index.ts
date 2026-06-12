@@ -52,3 +52,4 @@ export {
   gradeToTheme,
 } from "./tierTheme";
 export type { AgeTier, TierThemeMobile, TierThemeProviderProps } from "./tierTheme";
+export { Skeleton, SkeletonRows, skeletonMotion, type SkeletonVariant } from "./Skeleton";

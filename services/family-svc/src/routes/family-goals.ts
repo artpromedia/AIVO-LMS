@@ -11,7 +11,7 @@ import {
   learnerCaregivers,
   learnerTherapists,
 } from "@aivo/db";
-import { authenticateRequest } from "../auth.js";
+import { authenticateRequest, runScoped } from "../auth.js";
 import { emitFamilyAudit } from "../lib/audit.js";
 import {
   getIepGoalsSchema,
@@ -57,17 +57,15 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
     tenantId: string,
   ): Promise<string[]> {
     if (role === "PLATFORM_ADMIN") {
-      const rows = await db
-        .select({ id: learners.id })
-        .from(learners)
-        .where(eq(learners.tenantId, tenantId));
+      const rows = await runScoped(db, { tenantId, sub: userSub, role }, (tx) =>
+        tx.select({ id: learners.id }).from(learners).where(eq(learners.tenantId, tenantId)),
+      );
       return rows.map((r) => r.id);
     }
     const ids = new Set<string>();
-    const ownedRows = await db
-      .select({ id: learners.id })
-      .from(learners)
-      .where(eq(learners.parentId, userSub));
+    const ownedRows = await runScoped(db, { tenantId, sub: userSub, role }, (tx) =>
+      tx.select({ id: learners.id }).from(learners).where(eq(learners.parentId, userSub)),
+    );
     for (const r of ownedRows) ids.add(r.id);
 
     const teacherRows = await db

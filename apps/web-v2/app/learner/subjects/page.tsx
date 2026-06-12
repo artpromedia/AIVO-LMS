@@ -18,15 +18,9 @@ import { SubjectCard, EmptyState } from "@aivo/ui";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { getIEPForLearner, getMasteryMap, listSubjects } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { masteryStageLabel } from "@/lib/learner/mastery-words";
 import { getDiscoverableSubjects } from "@aivo/brand";
 
-function masteryLabel(score: number, t: (key: string) => string): string {
-  if (score >= 0.85) return t("mastery_strong");
-  if (score >= 0.65) return t("mastery_on_grade");
-  if (score >= 0.4) return t("mastery_building");
-  if (score > 0) return t("mastery_just_starting");
-  return t("mastery_not_started");
-}
 
 export default async function LearnerSubjectsPage() {
   const session = await requirePageRole(["learner"]);
@@ -110,7 +104,7 @@ export default async function LearnerSubjectsPage() {
                 href={bff ? `/learner/subjects/${bff.id}` : `/learner/subjects/${s.slug}`}
                 name={s.name}
                 eyebrow={tutor ? `${tutor.name} · ${tutor.landmark}` : undefined}
-                masteryLabel={masteryLabel(avg, tProgress)}
+                masteryLabel={masteryStageLabel(avg, tProgress)}
                 masteryPct={Math.round(avg * 100)}
                 accent={tutor?.color}
                 icon={tutor?.emoji ?? "📘"}

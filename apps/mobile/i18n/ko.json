@@ -670,7 +670,13 @@
     },
     "hideTutor": "튜터 숨기기",
     "moveUp": "{{label}} 위로 이동",
-    "moveDown": "{{label}} 아래로 이동"
+    "moveDown": "{{label}} 아래로 이동",
+    "a11y": {
+      "beatAdvance": "{{total}}단계 중 {{index}}단계.",
+      "completed": "수업 완료! {{xp}} 포인트를 얻었어요.",
+      "beatCounter": "{{total}}개 활동 중 {{index}}번째",
+      "empty": "이 세션에는 남은 활동이 없어요."
+    }
   },
   "learnerTutor": {
     "tutorNotFound": "튜터를 찾을 수 없습니다",

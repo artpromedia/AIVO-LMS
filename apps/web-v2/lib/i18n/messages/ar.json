@@ -587,35 +587,46 @@
       "add_another_learner": "إضافة متعلّم آخر",
       "today_at_a_glance": "اليوم في لمحة",
       "details": "التفاصيل",
-      "learning_readiness": "الاستعداد للتعلّم",
-      "assessment_status": "حالة التقييم",
-      "iep_support_upload": "رفع IEP / الدعم",
       "consent_checklist": "قائمة الموافقات",
-      "todays_recommended_actions": "الإجراءات الموصى بها اليوم",
-      "notifications_title": "الإشعارات",
-      "billing_title": "الفوترة",
       "school_connection": "الربط بالمدرسة",
-      "plan_generated": "تم إنشاء الخطة",
-      "pacing": "الوتيرة",
-      "calm_extended_time_on": "هادئ — وقت إضافي مفعّل",
-      "sensory_mode": "الوضع الحسّي",
-      "warm_reduced_motion": "دافئ + حركة مخفّفة",
-      "parent_guardian_consent": "موافقة الوالد / الوصي",
       "approved": "موافق عليه",
-      "ai_personalization": "التخصيص بواسطة AI",
-      "school_data_sharing": "مشاركة بيانات المدرسة",
       "optional_not_set": "اختياري — غير محدد",
-      "approve_voice_mode": "الموافقة على الوضع الصوتي",
-      "approve_voice_mode_desc": "يتيح لـ Emma التحدث بصوت عالٍ مع المعلّم الآلي أثناء الدروس.",
-      "upload_iep_optional": "رفع IEP (اختياري)",
-      "upload_iep_desc": "أضف التعديلات حتى يطبّقها AIVO من اليوم الأول.",
-      "new_milestone": "إنجاز جديد:",
-      "new_milestone_desc": "قرأت مقطعاً من 200 كلمة بشكل مستقل.",
-      "tutor_note": "ملاحظة المعلّم:",
-      "tutor_note_desc": "الوتيرة تبدو رائعة هذا الأسبوع.",
-      "family_2_learners": "عائلة — متعلّمان",
-      "next_renewal": "التجديد التالي",
-      "payment_method": "طريقة الدفع"
+      "hero_ready": "{name} جاهز لتعلّم اليوم.",
+      "hero_next": "لنخطُ الخطوة التالية من أجل {name}.",
+      "hero_add_first": "أضف طفلك الأول لنبدأ رحلته.",
+      "subhead": "هادئ ومخصّص، وبانتظار اطلالة سريعة منك.",
+      "empty_description": "أضف طفلك الأول لبدء التقييم وتخصيص مسار التعلّم.",
+      "setup_for": "إعداد {name}",
+      "step_assessment": "تقييم الوالدين",
+      "step_supports": "الخطة الفردية والفريق (اختياري)",
+      "step_baseline": "مغامرة البداية",
+      "step_review": "مراجعة ملف التعلّم",
+      "metric_learners": "الأطفال",
+      "metric_learners_desc_one": "طفل واحد في خطة العائلة.",
+      "metric_learners_desc_other": "{count} أطفال في خطة العائلة.",
+      "metric_ready": "جاهزون للتعلّم",
+      "metric_ready_desc_all": "كل شيء جاهز لليوم.",
+      "metric_ready_desc_partial": "اكتمل خط الأساس والموافقة.",
+      "metric_action": "بانتظار إجراءك",
+      "metric_action_desc_zero": "لا شيء بانتظارك. رائع.",
+      "metric_action_desc_some": "افتح الخطوات التالية أدناه لإكمال الإعداد.",
+      "metric_status": "حالة {name}",
+      "next_steps_title": "الخطوات التالية",
+      "next_steps_subtitle": "خطوة صغيرة لكل طفل — كل واحدة نحو دقيقة.",
+      "view_all_learners": "عرض كل الأطفال",
+      "consent_subtitle": "ما وافقت عليه من أجل {name}.",
+      "consent_of_total": "تمت الموافقة على {granted} من {total}",
+      "review_consent": "مراجعة الموافقات",
+      "connect_a_school": "ربط مدرسة",
+      "school_subtitle": "زامن مع الصف إذا كانت المدرسة تستخدم AIVO.",
+      "school_body": "ربط المدرسة يتيح للمعلّمين رؤية ملف التعلّم نفسه الذي تراه، ويتيح للمعلّم الذكي التنسيق مع عمل الصف. وتبقى أنت المتحكّم فيما يُشارك.",
+      "legacy_note": "هذه هي الصفحة الرئيسية الجديدة للأهل. الواجهة السابقة متاحة على",
+      "consent_type": {
+        "child_data_collection": "جمع بيانات الطفل",
+        "ai_personalization": "تخصيص بالذكاء الاصطناعي",
+        "school_roster_import": "مشاركة قائمة المدرسة"
+      },
+      "not_found_body": "الصفحة الرئيسية الجديدة للأهل ما تزال قيد الطرح. الصفحة المطلوبة لم تصدر بعد أو تغيّر عنوانها."
     },
     "home": {
       "greeting": "التحية",
@@ -722,7 +733,8 @@
       "status_applied": "تمت الموافقة والتطبيق — تتحدث الدروس من الجلسة القادمة.",
       "status_declined": "مرفوض — لن يتغير شيء.",
       "status_failed": "تمت الموافقة لكن التطبيق فشل — تم إبلاغ فريقنا.",
-      "history": "القرارات الأخيرة ({count})"
+      "history": "القرارات الأخيرة ({count})",
+      "retry": "إعادة المحاولة"
     },
     "tutor_memories": {
       "title": "ما يتذكّره معلّمك",
@@ -735,6 +747,35 @@
       "expires": "تنتهي في {date}",
       "delete": "حذف",
       "delete_label": "حذف هذه الذكرى"
+    },
+    "readiness": {
+      "label": {
+        "profile_created": "تم إنشاء الملف",
+        "assessment_needed": "التقييم جارٍ",
+        "iep_optional": "إضافة خطة تعليم فردية (اختياري)",
+        "team_invite_optional": "دعوة فريق الدعم (اختياري)",
+        "baseline_needed": "مغامرة البداية جاهزة",
+        "brain_build_pending": "جارٍ إعداد ملف التعلّم",
+        "brain_clone_review_needed": "ملف التعلّم جاهز للمراجعة",
+        "ready_for_today_mission": "جاهز لمهمة اليوم",
+        "active_learning": "تعلّم نشط"
+      },
+      "next": {
+        "profile_created": "بدء تقييم الوالدين",
+        "assessment_needed": "متابعة تقييم الوالدين",
+        "iep_optional": "إضافة خطة فردية أو التخطي",
+        "team_invite_optional": "دعوة فريق طفلك",
+        "baseline_needed": "بدء مغامرة البداية",
+        "brain_build_pending": "إكمال إعداد الملف",
+        "brain_clone_review_needed": "مراجعة ملف التعلّم",
+        "ready_for_today_mission": "فتح مهمة اليوم",
+        "active_learning": "عرض تقرير النموّ"
+      }
+    },
+    "learner_card": {
+      "open_profile": "فتح الملف",
+      "age": "العمر {age}",
+      "grade": "الصف {grade}"
     }
   },
   "brain_clone": {
@@ -765,17 +806,17 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved.",
-    "clone_eyebrow": "جارٍ استنساخ العقل",
-    "clone_aria": "جارٍ استنساخ نموذج التعلّم من AIVO إلى العقل الشخصي لـ {name}",
+    "clone_eyebrow": "جارٍ بناء ملف التعلّم",
+    "clone_aria": "نقوم بمواءمة نموذج تعلّم AIVO مع دماغ {name}",
     "clone_master_label": "العقل الرئيسي لـ AIVO",
     "clone_child_label": "عقل {name}",
-    "clone_caption": "جارٍ استنساخ نموذج التعلّم من AIVO إلى العقل الشخصي لـ {name}…",
+    "clone_caption": "نقوم بمواءمة نموذج تعلّم AIVO مع دماغ {name}…",
     "clone_personalising": "تخصيص حسب صف {name} وملفه التعليمي",
     "clone_finalising": "أوشك على الانتهاء — جارٍ إنهاء العقل المخصّص",
     "clone_privacy_pii": "لا تغادر أي بيانات شخصية هذا الجهاز دون تشفير",
     "clone_privacy_versioned": "محفوظ بالإصدارات · يمكن التراجع في أي وقت",
     "clone_skip": "تخطّي الرسوم المتحركة",
-    "clone_replay": "إعادة تشغيل رسوم الاستنساخ",
+    "clone_replay": "إعادة تشغيل حركة الملف",
     "building_title": "جارٍ بناء عقل {name}",
     "building_subtitle": "بناء فوري من بيانات التقييم",
     "building_template_pill": "قالب عقل الصف {grade} — {level}",
@@ -1171,7 +1212,9 @@
       "msg_supports_body": "القراءة الجهرية والإيقاع الهادئ و{count, plural, other {# وسيلة دعم أخرى}} من خطة الـ IEP الخاصة بك مفعّلة.",
       "msg_break_title": "الاستراحات جيّدة",
       "msg_break_body": "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك.",
-      "planned_week_badge": "مخطط لها هذا الأسبوع"
+      "planned_week_badge": "مخطط لها هذا الأسبوع",
+      "explore_subjects_title": "استكشف موادك",
+      "explore_subjects_body": "كل معلّم وكل مادة بلمسة واحدة."
     },
     "common": {
       "learner_eyebrow": "المتعلّم",
@@ -1201,7 +1244,8 @@
     "rewards": {
       "title": "المكافآت",
       "description": "تتبّع كل فصل أنهيته عبر عوالم المغامرات.",
-      "open_world": "فتح العالم →"
+      "open_world": "فتح العالم →",
+      "sticker_empty_encouragement": "أول ملصق بانتظارك — أنهِ فصلًا واحدًا لتحصل عليه!"
     },
     "select": {
       "eyebrow": "العرض بصفة",
@@ -1321,7 +1365,10 @@
       "agent_modality_auditory": "جرّب قراءته بصوت عالٍ — سماعه قد يساعد.",
       "agent_modality_kinesthetic": "جرّب العدّ بأصابعك أو بأشياء حولك.",
       "agent_modality_reading": "لنقرأه ببطء، جزءًا جزءًا.",
-      "agent_new_surface": "لنجرّب السؤال نفسه بطريقة مختلفة."
+      "agent_new_surface": "لنجرّب السؤال نفسه بطريقة مختلفة.",
+      "offline_saved_title": "حُفظ على هذا الجهاز",
+      "offline_saved_body": "أنت دون اتصال الآن — سيتزامن عملك فور عودته.",
+      "offline_complete_title": "حُفظ الدرس على هذا الجهاز"
     },
     "baseline_runner": {
       "exit_proctor_view": "الخروج من عرض المراقب",
@@ -1335,6 +1382,69 @@
     },
     "lesson_run": {
       "back_to_today": "العودة إلى اليوم"
+    },
+    "accessibility_voice": {
+      "title": "الصوت والسرعة.",
+      "body": "اختر صوت القراءة وسرعته.",
+      "link": "فتح إعدادات الصوت"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "مرحبًا، أنا نوفا! هيا نستكشف مجرّة الأرقام معًا.",
+        "celebrate": "عمل رائع كالنجوم! اليوم جعلتَ الأرقام تتلألأ."
+      },
+      "sage": {
+        "welcome": "أنا سيج — وجدتُ طريق قصصٍ خاصًا بك.",
+        "celebrate": "قراءة جميلة! صارت القصة أجمل بوجودك."
+      },
+      "spark": {
+        "welcome": "أنا سبارك! هل أنت مستعد لاكتشاف شيء مدهش؟",
+        "celebrate": "تجربة رائعة! فضولك أضاء المختبر كله."
+      },
+      "chrono": {
+        "welcome": "أنا كرونو — هيا نسافر معًا إلى الماضي.",
+        "celebrate": "يا لها من رحلة! اليوم جعلتَ التاريخ ينبض بالحياة."
+      },
+      "pixel": {
+        "welcome": "أنا بيكسل! لنبنِ شيئًا رائعًا خطوة بخطوة.",
+        "celebrate": "صافحني! شيفرتك عملت بشكل مدهش."
+      },
+      "echo": {
+        "welcome": "مرحبًا، أنا إيكو! لنحمِّ أصواتنا معًا.",
+        "celebrate": "نطق جميل! كانت كلماتك عالية وواضحة."
+      },
+      "harmony": {
+        "welcome": "أنا هارموني. خذ نفسًا عميقًا — هذه مساحتك.",
+        "celebrate": "أظهرتَ اليوم قلبًا كبيرًا. كن فخورًا بنفسك."
+      },
+      "atlas": {
+        "welcome": "أنا أطلس! هيا ننطلق لاستكشاف العالم.",
+        "celebrate": "رحلة مذهلة! اكتشفتَ اليوم الكثير من العالم."
+      },
+      "cadence": {
+        "welcome": "أنا كادنس! هل تشعر بالإيقاع؟ هيا نصنع موسيقى.",
+        "celebrate": "أحسنت! ملأ إيقاعُك الغرفة اليوم."
+      },
+      "vigor": {
+        "welcome": "أنا فيغور! لنتمدد ونتحرك ونصبح أقوياء معًا.",
+        "celebrate": "أحسنت صنعًا! بذلتَ اليوم أفضل طاقتك."
+      },
+      "lingua": {
+        "welcome": "مرحبًا! أنا لينغوا — لنتعلم كلمات من كل العالم.",
+        "celebrate": "رائع! اليوم تحدثتَ لغة جديدة."
+      },
+      "forge": {
+        "welcome": "أنا فورج! أمسك أدواتك — لنبنِ الأفكار ونختبرها.",
+        "celebrate": "بناء متين! صمد اختراعك بقوة."
+      },
+      "compass": {
+        "welcome": "أنا كومباس. خطوة صغيرة في كل مرة — سأرشدك.",
+        "celebrate": "على المسار الصحيح! خططتَ ونجحت."
+      },
+      "muse": {
+        "welcome": "أنا ميوز! خيالك هو الفرشاة اليوم.",
+        "celebrate": "جميل جدًا! تحوّلت أفكارك إلى فن حقيقي."
+      }
     }
   },
   "auth": {
@@ -1404,6 +1514,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "يرجى إدخال حرفين على الأقل.",
+        "email": "لا يبدو هذا عنوان بريد إلكتروني.",
+        "password": "استخدم 8 أحرف على الأقل."
       }
     },
     "forgot": {
@@ -2945,6 +3060,19 @@
       "submit_error": "تعذر حفظ التقييم — حاول مرة أخرى.",
       "success_title": "تم حفظ التقييم",
       "success_body": "مدخلاتك تغذي الآن خط الأساس وتخصيص الدروس لهذا المتعلم."
+    },
+    "not_found": {
+      "eyebrow": "غير موجود",
+      "heading": "تعذّر العثور على الصفحة",
+      "body": "ربما تغيّر الرابط. لنعد بك إلى صفحتك الرئيسية.",
+      "home_link": "إلى الرئيسية"
+    },
+    "error": {
+      "eyebrow": "حدث خطأ ما",
+      "heading": "واجهت هذه الصفحة عثرة",
+      "body": "لم يُفقد شيء. حاول مجددًا أو عد إلى الرئيسية.",
+      "retry": "إعادة المحاولة",
+      "home_link": "إلى الرئيسية"
     }
   },
   "caregiver": {
@@ -2994,6 +3122,19 @@
       "section_profile": "الملف الشخصي",
       "section_notifications": "الإشعارات",
       "role_label": "مقدّم الرعاية"
+    },
+    "not_found": {
+      "eyebrow": "غير موجود",
+      "heading": "تعذّر العثور على الصفحة",
+      "body": "ربما تغيّر الرابط. لنعد بك إلى صفحتك الرئيسية.",
+      "home_link": "إلى الرئيسية"
+    },
+    "error": {
+      "eyebrow": "حدث خطأ ما",
+      "heading": "واجهت هذه الصفحة عثرة",
+      "body": "لم يُفقد شيء. حاول مجددًا أو عد إلى الرئيسية.",
+      "retry": "إعادة المحاولة",
+      "home_link": "إلى الرئيسية"
     }
   },
   "accept_invite": {
@@ -3178,5 +3319,22 @@
       "ready_badge": "جاهز للتشغيل",
       "generated_at": "أُعدّ {date}"
     }
+  },
+  "messages": {
+    "inbox_title": "الوارد",
+    "loading": "جارٍ التحميل…",
+    "empty_inbox": "لا توجد محادثات بعد. عندما يراسلك أحد من فريق AIVO ستظهر هنا.",
+    "select_prompt": "اختر محادثة للقراءة والرد.",
+    "empty_thread": "لا رسائل في هذه المحادثة بعد.",
+    "reply_placeholder": "اكتب ردًا…",
+    "send": "إرسال",
+    "sending": "جارٍ الإرسال…",
+    "threads_error_title": "تعذّر تحميل رسائلك",
+    "threads_error_body": "لم يُفقد شيء — حاول مجددًا بعد قليل.",
+    "thread_error_title": "تعذّر فتح المحادثة",
+    "thread_error_body": "حاول مرة أخرى — رسائلك بأمان.",
+    "send_failed_title": "لم تُرسل الرسالة",
+    "send_failed_body": "مسودتك ما زالت هنا.",
+    "send_retry": "إعادة المحاولة"
   }
 }

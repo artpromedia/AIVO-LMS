@@ -14,6 +14,16 @@ vi.mock("next-intl", () => ({
 
 import { WhatsWorkingPanel } from "./whats-working-panel";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+function renderWithQuery(ui: React.ReactElement) {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>);
+}
+
+
 function mockFetch(payload: unknown, ok = true, status = 200) {
   const fn = vi.fn(async () => ({
     ok,
@@ -33,6 +43,8 @@ afterEach(() => {
 describe("<WhatsWorkingPanel>", () => {
   it("hits /api/bff/parent/learners/:id/whats-working with the active window and renders all three signals when seeded", async () => {
     const fetchSpy = mockFetch({
+      ok: true,
+      requestId: "t",
       data: {
         windowDays: 30,
         totalSessions: 12,
@@ -45,7 +57,7 @@ describe("<WhatsWorkingPanel>", () => {
       },
     });
 
-    render(<WhatsWorkingPanel learnerId="lr_1" learnerName="Sam" />);
+    renderWithQuery(<WhatsWorkingPanel learnerId="lr_1" learnerName="Sam" />);
 
     await waitFor(() => expect(fetchSpy).toHaveBeenCalled());
     const url = (fetchSpy as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
@@ -65,6 +77,8 @@ describe("<WhatsWorkingPanel>", () => {
 
   it("renders the calm empty state (no placeholder card) when there are fewer than two observations", async () => {
     mockFetch({
+      ok: true,
+      requestId: "t",
       data: {
         windowDays: 30,
         totalSessions: 0,
@@ -74,7 +88,7 @@ describe("<WhatsWorkingPanel>", () => {
       },
     });
 
-    render(<WhatsWorkingPanel learnerId="lr_2" learnerName="Riley" />);
+    renderWithQuery(<WhatsWorkingPanel learnerId="lr_2" learnerName="Riley" />);
 
     await waitFor(() => {
       expect(screen.getByText("empty")).toBeTruthy();
@@ -88,7 +102,7 @@ describe("<WhatsWorkingPanel>", () => {
   it("surfaces a load error instead of inventing data when the BFF response has no payload", async () => {
     mockFetch({ error: "UPSTREAM_UNAVAILABLE" }, false, 502);
 
-    render(<WhatsWorkingPanel learnerId="lr_3" learnerName="Jules" />);
+    renderWithQuery(<WhatsWorkingPanel learnerId="lr_3" learnerName="Jules" />);
 
     await waitFor(() => {
       const alert = screen.getByRole("alert");

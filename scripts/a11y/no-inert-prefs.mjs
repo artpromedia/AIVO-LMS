@@ -186,6 +186,42 @@ for (const platform of PLATFORMS) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Structural proofs (Sprint 03) — not per-preference fields but whole
+// subsystems that must stay wired into a render path. The sensory adapter
+// shipped for months computing adaptations nobody consumed; these entries
+// make that regression a build failure.
+// ---------------------------------------------------------------------------
+const STRUCTURAL_PROOFS = [
+  {
+    name: "sensory adaptations applied to the lesson player",
+    token: "sensoryCSSVars|deriveSensoryAdaptations",
+    scope: ["apps/web-v2/app/learner/lesson-runs"],
+  },
+  {
+    name: "stage saturation var consumed by lesson UI",
+    token: "stage-saturation",
+    scope: ["apps/web-v2/app/learner"],
+  },
+  {
+    name: "stage motion speed honored by canvas experiences",
+    token: "stage-animation-speed",
+    scope: ["apps/web-v2/components/brain"],
+  },
+];
+
+for (const proof of STRUCTURAL_PROOFS) {
+  const hit = findProof(proof.token, proof.scope, EXCLUDE);
+  if (!hit) {
+    errors.push(
+      `structural: "${proof.name}" is INERT — no consumer found ` +
+        `(searched /${proof.token}/ in ${proof.scope.join(", ")}).`,
+    );
+  } else {
+    console.log(`  ✓ structural ${proof.name}  ⇐ ${hit}`);
+  }
+}
+
 if (errors.length) {
   console.error("\nno-inert-prefs FAILED:\n - " + errors.join("\n - "));
   process.exit(1);

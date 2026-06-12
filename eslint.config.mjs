@@ -112,4 +112,36 @@ export default tseslint.config(
       ],
     },
   },
+  // Sprint 08 — client data-path discipline: components/ are client-heavy;
+  // new network calls go through lib/api/client.ts (bffFetch) or a Query
+  // hook. The CI ratchet (scripts/ci/check-bare-fetch.mjs) is the hard
+  // gate; this rule is the in-editor nudge at the highest-traffic spot.
+  {
+    // Enforced where the migration is complete; remaining families (admin
+    // legacy, auth, forms, admin-adjacent) are frozen by the CI ratchet's
+    // baseline and join this list as they are migrated.
+    files: [
+      "apps/web-v2/components/parent/**/*.{ts,tsx}",
+      "apps/web-v2/components/learner/**/*.{ts,tsx}",
+      "apps/web-v2/components/layout/**/*.{ts,tsx}",
+      "apps/web-v2/components/system/**/*.{ts,tsx}",
+      "apps/web-v2/components/ui/**/*.{ts,tsx}",
+      "apps/web-v2/components/playful-calm/**/*.{ts,tsx}",
+    ],
+    // components/admin/** predate the data layer and belong to the legacy
+    // /admin surfaces (now served by apps/web-admin); they are frozen by the
+    // CI ratchet's baseline rather than migrated piecemeal here.
+    ignores: ["**/*.test.*", "**/__tests__/**"],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "CallExpression[callee.name='fetch']",
+          message:
+            "Use bffFetch from @/lib/api/client (or a TanStack Query hook) instead of bare fetch — typed envelope, retries and error surfacing come free.",
+        },
+      ],
+    },
+  },
 );
+

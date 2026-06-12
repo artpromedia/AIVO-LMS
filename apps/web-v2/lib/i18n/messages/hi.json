@@ -587,35 +587,46 @@
       "add_another_learner": "एक और शिक्षार्थी जोड़ें",
       "today_at_a_glance": "आज एक नज़र में",
       "details": "विवरण",
-      "learning_readiness": "सीखने की तैयारी",
-      "assessment_status": "मूल्यांकन स्थिति",
-      "iep_support_upload": "IEP / सहायता अपलोड करें",
       "consent_checklist": "सहमति सूची",
-      "todays_recommended_actions": "आज की सुझाई गई क्रियाएँ",
-      "notifications_title": "सूचनाएँ",
-      "billing_title": "बिलिंग",
       "school_connection": "विद्यालय से जुड़ाव",
-      "plan_generated": "योजना तैयार की गई",
-      "pacing": "गति",
-      "calm_extended_time_on": "शांत — विस्तारित समय चालू",
-      "sensory_mode": "संवेदी मोड",
-      "warm_reduced_motion": "गर्म + कम गति",
-      "parent_guardian_consent": "माता-पिता / अभिभावक की सहमति",
       "approved": "स्वीकृत",
-      "ai_personalization": "AI वैयक्तिकरण",
-      "school_data_sharing": "विद्यालय डेटा साझाकरण",
       "optional_not_set": "वैकल्पिक — सेट नहीं किया",
-      "approve_voice_mode": "वॉइस मोड स्वीकृत करें",
-      "approve_voice_mode_desc": "Emma को पाठों के दौरान AI ट्यूटर से ज़ोर से बात करने की अनुमति देता है।",
-      "upload_iep_optional": "IEP अपलोड करें (वैकल्पिक)",
-      "upload_iep_desc": "AIVO को पहले दिन से लागू करने के लिए समायोजन जोड़ें।",
-      "new_milestone": "नई उपलब्धि:",
-      "new_milestone_desc": "200 शब्दों का अनुच्छेद स्वतंत्र रूप से पढ़ा।",
-      "tutor_note": "ट्यूटर नोट:",
-      "tutor_note_desc": "इस सप्ताह गति बहुत अच्छी दिख रही है।",
-      "family_2_learners": "परिवार — 2 शिक्षार्थी",
-      "next_renewal": "अगला नवीनीकरण",
-      "payment_method": "भुगतान विधि"
+      "hero_ready": "{name} आज की पढ़ाई के लिए तैयार है।",
+      "hero_next": "चलिए {name} के लिए अगला कदम उठाएँ।",
+      "hero_add_first": "अपने पहले बच्चे को जोड़ें और सीखने की यात्रा शुरू करें।",
+      "subhead": "शांत, व्यक्तिगत — बस आपकी एक छोटी सी नज़र बाकी है।",
+      "empty_description": "मूल्यांकन शुरू करने और सीखने की राह को निजी बनाने के लिए पहला बच्चा जोड़ें।",
+      "setup_for": "{name} के लिए सेटअप",
+      "step_assessment": "अभिभावक मूल्यांकन",
+      "step_supports": "IEP और टीम (वैकल्पिक)",
+      "step_baseline": "शुरुआती रोमांच",
+      "step_review": "सीखने की प्रोफ़ाइल देखें",
+      "metric_learners": "बच्चे",
+      "metric_learners_desc_one": "आपके पारिवारिक प्लान में एक बच्चा।",
+      "metric_learners_desc_other": "आपके पारिवारिक प्लान में {count} बच्चे।",
+      "metric_ready": "सीखने को तैयार",
+      "metric_ready_desc_all": "आज के लिए सब तैयार है।",
+      "metric_ready_desc_partial": "बेसलाइन और सहमति पूरी।",
+      "metric_action": "आपकी कार्रवाई चाहिए",
+      "metric_action_desc_zero": "कुछ भी बाकी नहीं। बढ़िया!",
+      "metric_action_desc_some": "सेटअप पूरा करने के लिए नीचे अगले कदम खोलें।",
+      "metric_status": "{name} की स्थिति",
+      "next_steps_title": "अगले कदम",
+      "next_steps_subtitle": "हर बच्चे के लिए एक छोटा कदम — हर एक में करीब एक मिनट।",
+      "view_all_learners": "सभी बच्चे देखें",
+      "consent_subtitle": "आपने {name} के लिए जो मंज़ूर किया है।",
+      "consent_of_total": "{total} में से {granted} मंज़ूर",
+      "review_consent": "सहमति देखें",
+      "connect_a_school": "स्कूल जोड़ें",
+      "school_subtitle": "अगर स्कूल AIVO इस्तेमाल करता है तो कक्षा से जोड़ें।",
+      "school_body": "स्कूल जोड़ने पर शिक्षक वही सीखने की प्रोफ़ाइल देखते हैं जो आप देखते हैं — और AI ट्यूटर कक्षा के काम के साथ तालमेल रखता है। क्या साझा होगा, यह आप तय करते हैं।",
+      "legacy_note": "यह नया अभिभावक होम है। पुराना दृश्य यहाँ उपलब्ध है:",
+      "consent_type": {
+        "child_data_collection": "बच्चे का डेटा संग्रह",
+        "ai_personalization": "AI वैयक्तिकरण",
+        "school_roster_import": "स्कूल सूची साझा करना"
+      },
+      "not_found_body": "नया अभिभावक होम अभी रोल आउट हो रहा है। जो पेज आप ढूँढ रहे थे वह अभी नहीं है या उसका पता बदल गया है।"
     },
     "home": {
       "greeting": "अभिवादन",
@@ -722,7 +733,8 @@
       "status_applied": "मंज़ूर और लागू — अगले सत्र से पाठ अपडेट होंगे।",
       "status_declined": "अस्वीकृत — कुछ नहीं बदलेगा।",
       "status_failed": "मंज़ूर, लेकिन लागू करने में विफल — हमारी टीम को सूचित कर दिया गया है।",
-      "history": "हाल के निर्णय ({count})"
+      "history": "हाल के निर्णय ({count})",
+      "retry": "फिर कोशिश करें"
     },
     "tutor_memories": {
       "title": "आपका ट्यूटर क्या याद रखता है",
@@ -735,6 +747,35 @@
       "expires": "{date} को समाप्त",
       "delete": "हटाएँ",
       "delete_label": "यह स्मृति हटाएँ"
+    },
+    "readiness": {
+      "label": {
+        "profile_created": "प्रोफ़ाइल बन गई",
+        "assessment_needed": "मूल्यांकन जारी है",
+        "iep_optional": "IEP जोड़ें (वैकल्पिक)",
+        "team_invite_optional": "सहायता टीम आमंत्रित करें (वैकल्पिक)",
+        "baseline_needed": "शुरुआती रोमांच तैयार",
+        "brain_build_pending": "सीखने की प्रोफ़ाइल बन रही है",
+        "brain_clone_review_needed": "सीखने की प्रोफ़ाइल समीक्षा हेतु तैयार",
+        "ready_for_today_mission": "आज के मिशन के लिए तैयार",
+        "active_learning": "सक्रिय सीखना"
+      },
+      "next": {
+        "profile_created": "अभिभावक मूल्यांकन शुरू करें",
+        "assessment_needed": "अभिभावक मूल्यांकन जारी रखें",
+        "iep_optional": "IEP जोड़ें या छोड़ें",
+        "team_invite_optional": "बच्चे की टीम आमंत्रित करें",
+        "baseline_needed": "शुरुआती रोमांच शुरू करें",
+        "brain_build_pending": "प्रोफ़ाइल पूरी करें",
+        "brain_clone_review_needed": "सीखने की प्रोफ़ाइल देखें",
+        "ready_for_today_mission": "आज का मिशन खोलें",
+        "active_learning": "प्रगति रिपोर्ट देखें"
+      }
+    },
+    "learner_card": {
+      "open_profile": "प्रोफ़ाइल खोलें",
+      "age": "उम्र {age}",
+      "grade": "कक्षा {grade}"
     }
   },
   "brain_clone": {
@@ -765,17 +806,17 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved.",
-    "clone_eyebrow": "ब्रेन क्लोन हो रहा है",
-    "clone_aria": "AIVO के लर्निंग मॉडल को {name} के निजी ब्रेन में क्लोन किया जा रहा है",
+    "clone_eyebrow": "सीखने की प्रोफ़ाइल बन रही है",
+    "clone_aria": "AIVO का लर्निंग मॉडल {name} के अनुरूप ढाला जा रहा है",
     "clone_master_label": "AIVO मास्टर ब्रेन",
     "clone_child_label": "{name} का ब्रेन",
-    "clone_caption": "AIVO के लर्निंग मॉडल को {name} के निजी ब्रेन में क्लोन किया जा रहा है…",
+    "clone_caption": "AIVO का लर्निंग मॉडल {name} के अनुरूप ढाला जा रहा है…",
     "clone_personalising": "{name} के ग्रेड और प्रोफ़ाइल के अनुसार वैयक्तिकृत किया जा रहा है",
     "clone_finalising": "लगभग तैयार — वैयक्तिकृत ब्रेन को अंतिम रूप दिया जा रहा है",
     "clone_privacy_pii": "कोई भी निजी डेटा बिना एन्क्रिप्शन के इस डिवाइस से बाहर नहीं जाता",
     "clone_privacy_versioned": "वर्शन सहित · कभी भी पहले जैसा करें",
     "clone_skip": "एनिमेशन छोड़ें",
-    "clone_replay": "क्लोन एनिमेशन फिर से चलाएँ",
+    "clone_replay": "प्रोफ़ाइल एनिमेशन दोबारा चलाएँ",
     "building_title": "{name} का ब्रेन बन रहा है",
     "building_subtitle": "मूल्यांकन डेटा से वास्तविक समय में निर्माण",
     "building_template_pill": "ग्रेड {grade} ब्रेन टेम्पलेट — {level}",
@@ -1171,7 +1212,9 @@
       "msg_supports_body": "ज़ोर से पढ़ना, शांत गति, और तुम्हारे IEP से {count, plural, one {# और सहायता} other {# और सहायताएँ}} सक्रिय हैं।",
       "msg_break_title": "विराम अच्छे होते हैं",
       "msg_break_body": "अंगड़ाई लो, पानी पियो, खिड़की से बाहर देखो। AIVO तुम्हारी जगह सहेज लेगा।",
-      "planned_week_badge": "इस सप्ताह के लिए नियोजित"
+      "planned_week_badge": "इस सप्ताह के लिए नियोजित",
+      "explore_subjects_title": "अपने विषय देखें",
+      "explore_subjects_body": "हर ट्यूटर और विषय, बस एक टैप दूर।"
     },
     "common": {
       "learner_eyebrow": "सीखने वाला",
@@ -1201,7 +1244,8 @@
     "rewards": {
       "title": "पुरस्कार",
       "description": "क्वेस्ट दुनियाओं में तुमने जो भी अध्याय पूरे किए, उन्हें ट्रैक करो।",
-      "open_world": "दुनिया खोलें →"
+      "open_world": "दुनिया खोलें →",
+      "sticker_empty_encouragement": "तुम्हारा पहला स्टिकर इंतज़ार कर रहा है — एक अध्याय पूरा करो और पा लो!"
     },
     "select": {
       "eyebrow": "इस रूप में देखें",
@@ -1321,7 +1365,10 @@
       "agent_modality_auditory": "इसे ज़ोर से पढ़कर देखें — सुनने से मदद मिल सकती है।",
       "agent_modality_kinesthetic": "अपनी उँगलियों या चीज़ों से गिनकर देखें।",
       "agent_modality_reading": "आइए इसे धीरे-धीरे, एक-एक हिस्सा करके पढ़ें।",
-      "agent_new_surface": "आइए वही सवाल एक अलग तरीके से आज़माएँ।"
+      "agent_new_surface": "आइए वही सवाल एक अलग तरीके से आज़माएँ।",
+      "offline_saved_title": "इस डिवाइस पर सहेजा गया",
+      "offline_saved_body": "अभी आप ऑफ़लाइन हैं — कनेक्शन लौटते ही काम सिंक हो जाएगा।",
+      "offline_complete_title": "पाठ इस डिवाइस पर सहेजा गया"
     },
     "baseline_runner": {
       "exit_proctor_view": "प्रॉक्टर व्यू से बाहर निकलें",
@@ -1335,6 +1382,69 @@
     },
     "lesson_run": {
       "back_to_today": "आज पर वापस जाएँ"
+    },
+    "accessibility_voice": {
+      "title": "आवाज़ और गति।",
+      "body": "पढ़कर सुनाने की आवाज़ और गति चुनें।",
+      "link": "आवाज़ सेटिंग खोलें"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "नमस्ते, मैं नोवा हूँ! चलो साथ में संख्याओं की आकाशगंगा घूमें।",
+        "celebrate": "शानदार काम! आज तुमने संख्याओं को चमका दिया।"
+      },
+      "sage": {
+        "welcome": "मैं सेज हूँ — तुम्हारे लिए एक कहानी की राह चुनी है।",
+        "celebrate": "कितना सुंदर पढ़ा! तुम्हारे साथ कहानी और चमक उठी।"
+      },
+      "spark": {
+        "welcome": "मैं स्पार्क हूँ! कुछ कमाल की खोज के लिए तैयार हो?",
+        "celebrate": "बढ़िया प्रयोग! तुम्हारी जिज्ञासा से पूरा लैब जगमगा उठा।"
+      },
+      "chrono": {
+        "welcome": "मैं क्रोनो हूँ — चलो साथ में बीते समय की सैर करें।",
+        "celebrate": "क्या सफर था! आज तुमने इतिहास को जीवंत कर दिया।"
+      },
+      "pixel": {
+        "welcome": "मैं पिक्सेल हूँ! चलो कदम-कदम पर कुछ मज़ेदार बनाएँ।",
+        "celebrate": "हाई फाइव! तुम्हारा कोड बिल्कुल सही चला।"
+      },
+      "echo": {
+        "welcome": "नमस्ते, मैं इको हूँ! चलो मिलकर आवाज़ का अभ्यास करें।",
+        "celebrate": "कितना सुंदर बोला! तुम्हारे शब्द साफ़ और स्पष्ट थे।"
+      },
+      "harmony": {
+        "welcome": "मैं हार्मनी हूँ। गहरी साँस लो — यह तुम्हारी जगह है।",
+        "celebrate": "आज तुमने सच्चा दिल दिखाया। खुद पर गर्व करो।"
+      },
+      "atlas": {
+        "welcome": "मैं एटलस हूँ! चलो दुनिया की सैर पर निकलें।",
+        "celebrate": "शानदार यात्रा! आज तुमने दुनिया का बहुत कुछ देखा।"
+      },
+      "cadence": {
+        "welcome": "मैं केडेंस हूँ! ताल महसूस हो रही है? चलो संगीत बनाएँ।",
+        "celebrate": "वाह! आज तुम्हारी ताल से कमरा गूँज उठा।"
+      },
+      "vigor": {
+        "welcome": "मैं विगर हूँ! चलो स्ट्रेच करें, चलें और मज़बूत बनें।",
+        "celebrate": "बहुत खूब! आज तुमने अपनी पूरी ऊर्जा लगाई।"
+      },
+      "lingua": {
+        "welcome": "नमस्ते! मैं लिंगुआ हूँ — चलो दुनिया भर के नए शब्द सीखें।",
+        "celebrate": "कमाल! आज तुमने एक नई भाषा बोली।"
+      },
+      "forge": {
+        "welcome": "मैं फोर्ज हूँ! औज़ार उठाओ — चलो विचार बनाएँ और परखें।",
+        "celebrate": "मज़बूत निर्माण! तुम्हारा आविष्कार टिका रहा।"
+      },
+      "compass": {
+        "welcome": "मैं कम्पस हूँ। एक छोटा कदम एक बार — मैं राह दिखाऊँगा।",
+        "celebrate": "सही दिशा! तुमने योजना बनाई और कर दिखाया।"
+      },
+      "muse": {
+        "welcome": "मैं म्यूज़ हूँ! आज तुम्हारी कल्पना ही तूलिका है।",
+        "celebrate": "बहुत सुंदर! तुम्हारे विचार सच्ची कला बन गए।"
+      }
     }
   },
   "auth": {
@@ -1404,6 +1514,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "कम से कम 2 अक्षर लिखें।",
+        "email": "यह ईमेल पता जैसा नहीं लगता।",
+        "password": "कम से कम 8 अक्षर इस्तेमाल करें।"
       }
     },
     "forgot": {
@@ -2945,6 +3060,19 @@
       "submit_error": "मूल्यांकन सहेजा नहीं जा सका — फिर से कोशिश करें।",
       "success_title": "मूल्यांकन सहेजा गया",
       "success_body": "आपका इनपुट अब इस शिक्षार्थी की बेसलाइन और पाठ वैयक्तिकरण में शामिल है।"
+    },
+    "not_found": {
+      "eyebrow": "नहीं मिला",
+      "heading": "वह पेज नहीं मिला",
+      "body": "लिंक बदल गया होगा। चलिए आपके होम पर लौटते हैं।",
+      "home_link": "होम पर जाएँ"
+    },
+    "error": {
+      "eyebrow": "कुछ गड़बड़ हुई",
+      "heading": "इस पेज में अड़चन आई",
+      "body": "कुछ भी खोया नहीं। फिर कोशिश करें या होम पर जाएँ।",
+      "retry": "फिर कोशिश करें",
+      "home_link": "होम पर जाएँ"
     }
   },
   "caregiver": {
@@ -2994,6 +3122,19 @@
       "section_profile": "प्रोफ़ाइल",
       "section_notifications": "सूचनाएँ",
       "role_label": "देखभालकर्ता"
+    },
+    "not_found": {
+      "eyebrow": "नहीं मिला",
+      "heading": "वह पेज नहीं मिला",
+      "body": "लिंक बदल गया होगा। चलिए आपके होम पर लौटते हैं।",
+      "home_link": "होम पर जाएँ"
+    },
+    "error": {
+      "eyebrow": "कुछ गड़बड़ हुई",
+      "heading": "इस पेज में अड़चन आई",
+      "body": "कुछ भी खोया नहीं। फिर कोशिश करें या होम पर जाएँ।",
+      "retry": "फिर कोशिश करें",
+      "home_link": "होम पर जाएँ"
     }
   },
   "accept_invite": {
@@ -3178,5 +3319,22 @@
       "ready_badge": "खेलने के लिए तैयार",
       "generated_at": "{date} को तैयार"
     }
+  },
+  "messages": {
+    "inbox_title": "इनबॉक्स",
+    "loading": "लोड हो रहा है…",
+    "empty_inbox": "अभी कोई बातचीत नहीं। जब आपकी AIVO टीम से कोई संदेश भेजेगा, वह यहाँ दिखेगा।",
+    "select_prompt": "पढ़ने और जवाब देने के लिए कोई बातचीत चुनें।",
+    "empty_thread": "इस बातचीत में अभी कोई संदेश नहीं।",
+    "reply_placeholder": "जवाब लिखें…",
+    "send": "भेजें",
+    "sending": "भेजा जा रहा है…",
+    "threads_error_title": "आपके संदेश लोड नहीं हो सके",
+    "threads_error_body": "कुछ भी खोया नहीं — थोड़ी देर में फिर कोशिश करें।",
+    "thread_error_title": "वह बातचीत खुल नहीं सकी",
+    "thread_error_body": "फिर कोशिश करें — आपके संदेश सुरक्षित हैं।",
+    "send_failed_title": "संदेश नहीं भेजा गया",
+    "send_failed_body": "आपका ड्राफ़्ट अभी भी यहाँ है।",
+    "send_retry": "फिर कोशिश करें"
   }
 }

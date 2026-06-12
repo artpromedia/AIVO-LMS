@@ -587,35 +587,46 @@
       "add_another_learner": "Añadir otro estudiante",
       "today_at_a_glance": "Hoy de un vistazo",
       "details": "Detalles",
-      "learning_readiness": "Preparación para aprender",
-      "assessment_status": "Estado de la evaluación",
-      "iep_support_upload": "Subir IEP / soporte",
       "consent_checklist": "Lista de consentimientos",
-      "todays_recommended_actions": "Acciones recomendadas para hoy",
-      "notifications_title": "Notificaciones",
-      "billing_title": "Facturación",
       "school_connection": "Conexión con la escuela",
-      "plan_generated": "Plan generado",
-      "pacing": "Ritmo",
-      "calm_extended_time_on": "Tranquilo — tiempo extendido activado",
-      "sensory_mode": "Modo sensorial",
-      "warm_reduced_motion": "Cálido + movimiento reducido",
-      "parent_guardian_consent": "Consentimiento del padre / tutor",
       "approved": "Aprobado",
-      "ai_personalization": "Personalización con AI",
-      "school_data_sharing": "Compartir datos con la escuela",
       "optional_not_set": "Opcional — no configurado",
-      "approve_voice_mode": "Aprobar modo de voz",
-      "approve_voice_mode_desc": "Permite que Emma hable con el tutor AI en voz alta durante las lecciones.",
-      "upload_iep_optional": "Subir IEP (opcional)",
-      "upload_iep_desc": "Añade adaptaciones para que AIVO las aplique desde el primer día.",
-      "new_milestone": "Nuevo hito:",
-      "new_milestone_desc": "Leyó un pasaje de 200 palabras de forma independiente.",
-      "tutor_note": "Nota del tutor:",
-      "tutor_note_desc": "El ritmo se ve genial esta semana.",
-      "family_2_learners": "Familia — 2 estudiantes",
-      "next_renewal": "Próxima renovación",
-      "payment_method": "Método de pago"
+      "hero_ready": "{name} está a punto para aprender hoy.",
+      "hero_next": "Demos el siguiente paso para {name}.",
+      "hero_add_first": "Añade a tu primer peque para empezar su camino.",
+      "subhead": "Tranquilo, personalizado y esperando un repaso rápido tuyo.",
+      "empty_description": "Añade a tu primer peque para comenzar la evaluación y personalizar su aprendizaje.",
+      "setup_for": "Configuración para {name}",
+      "step_assessment": "Evaluación familiar",
+      "step_supports": "IEP y equipo de apoyo (opcional)",
+      "step_baseline": "Aventura inicial",
+      "step_review": "Revisar perfil de aprendizaje",
+      "metric_learners": "Peques",
+      "metric_learners_desc_one": "Un peque en tu plan familiar.",
+      "metric_learners_desc_other": "{count} peques en tu plan familiar.",
+      "metric_ready": "Listos para aprender",
+      "metric_ready_desc_all": "Todo está preparado para hoy.",
+      "metric_ready_desc_partial": "Línea base y consentimiento completos.",
+      "metric_action": "Requiere tu acción",
+      "metric_action_desc_zero": "Nada pendiente de ti. Genial.",
+      "metric_action_desc_some": "Abre Próximos pasos para terminar la configuración.",
+      "metric_status": "Estado de {name}",
+      "next_steps_title": "Próximos pasos",
+      "next_steps_subtitle": "Un pequeño paso por peque — cada uno toma un minuto.",
+      "view_all_learners": "Ver todos los peques",
+      "consent_subtitle": "Lo que has aprobado para {name}.",
+      "consent_of_total": "{granted} de {total} aprobados",
+      "review_consent": "Revisar consentimiento",
+      "connect_a_school": "Conectar una escuela",
+      "school_subtitle": "Sincroniza con el aula, si la escuela usa AIVO.",
+      "school_body": "Vincular una escuela permite que el profesorado vea el mismo perfil de aprendizaje que tú, y que el tutor de IA se coordine con el trabajo del aula. Tú controlas lo que se comparte.",
+      "legacy_note": "Este es el nuevo inicio para familias. La vista anterior sigue disponible en",
+      "consent_type": {
+        "child_data_collection": "Datos del menor",
+        "ai_personalization": "Personalización con IA",
+        "school_roster_import": "Compartir lista escolar"
+      },
+      "not_found_body": "El nuevo inicio para familias aún se está desplegando. La página que buscas todavía no existe o cambió de dirección."
     },
     "home": {
       "greeting": "Saludo",
@@ -722,7 +733,8 @@
       "status_applied": "Aprobado y aplicado — las lecciones se actualizan en la próxima sesión.",
       "status_declined": "Rechazado — nada cambia.",
       "status_failed": "Aprobado, pero falló la aplicación — nuestro equipo fue notificado.",
-      "history": "Decisiones recientes ({count})"
+      "history": "Decisiones recientes ({count})",
+      "retry": "Reintentar"
     },
     "tutor_memories": {
       "title": "Lo que recuerda tu tutor",
@@ -735,6 +747,35 @@
       "expires": "Caduca el {date}",
       "delete": "Borrar",
       "delete_label": "Borrar este recuerdo"
+    },
+    "readiness": {
+      "label": {
+        "profile_created": "Perfil creado",
+        "assessment_needed": "Evaluación en curso",
+        "iep_optional": "Añadir un IEP (opcional)",
+        "team_invite_optional": "Invitar al equipo de apoyo (opcional)",
+        "baseline_needed": "Aventura inicial lista",
+        "brain_build_pending": "Preparando el perfil de aprendizaje",
+        "brain_clone_review_needed": "Perfil de aprendizaje listo para revisar",
+        "ready_for_today_mission": "Listo para la misión de hoy",
+        "active_learning": "Aprendizaje activo"
+      },
+      "next": {
+        "profile_created": "Iniciar la evaluación familiar",
+        "assessment_needed": "Continuar la evaluación familiar",
+        "iep_optional": "Añadir un IEP u omitir",
+        "team_invite_optional": "Invitar al equipo de tu peque",
+        "baseline_needed": "Iniciar la aventura inicial",
+        "brain_build_pending": "Terminar el perfil",
+        "brain_clone_review_needed": "Revisar el perfil de aprendizaje",
+        "ready_for_today_mission": "Abrir la misión de hoy",
+        "active_learning": "Ver informe de progreso"
+      }
+    },
+    "learner_card": {
+      "open_profile": "Abrir perfil",
+      "age": "{age} años",
+      "grade": "Curso {grade}"
     }
   },
   "brain_clone": {
@@ -765,17 +806,17 @@
     "watch_amend": "Agregar contexto y reconstruir",
     "watch_back": "Volver al estudiante",
     "watch_already_approved": "Este cerebro ya ha sido aprobado.",
-    "clone_eyebrow": "Clonando el cerebro",
-    "clone_aria": "Clonando el modelo de aprendizaje de AIVO en el cerebro personal de {name}",
+    "clone_eyebrow": "Creando el perfil de aprendizaje",
+    "clone_aria": "Adaptando el modelo de AIVO al cerebro de {name}",
     "clone_master_label": "Cerebro maestro de AIVO",
     "clone_child_label": "Cerebro de {name}",
-    "clone_caption": "Clonando el modelo de aprendizaje de AIVO en el cerebro personal de {name}…",
+    "clone_caption": "Adaptando el modelo de AIVO al cerebro de {name}…",
     "clone_personalising": "Personalizando para el grado y el perfil de {name}",
     "clone_finalising": "Casi listo: finalizando el cerebro personalizado",
     "clone_privacy_pii": "Ningún dato personal sale de este dispositivo sin cifrar",
     "clone_privacy_versioned": "Versionado · revertir en cualquier momento",
     "clone_skip": "Saltar animación",
-    "clone_replay": "Repetir la animación de clonación",
+    "clone_replay": "Repetir la animación del perfil",
     "building_title": "Construyendo el cerebro de {name}",
     "building_subtitle": "Construcción en tiempo real a partir de los datos de evaluación",
     "building_template_pill": "Plantilla de cerebro de grado {grade} — {level}",
@@ -1171,7 +1212,9 @@
       "msg_supports_body": "La lectura en voz alta, el ritmo tranquilo y {count, plural, one {# apoyo más} other {# apoyos más}} de tu IEP están activos.",
       "msg_break_title": "Los descansos son buenos",
       "msg_break_body": "Estírate, bebe agua, mira por la ventana. AIVO guardará tu lugar.",
-      "planned_week_badge": "Planificada para esta semana"
+      "planned_week_badge": "Planificada para esta semana",
+      "explore_subjects_title": "Explora tus materias",
+      "explore_subjects_body": "Cada tutor y materia, a un toque."
     },
     "common": {
       "learner_eyebrow": "Estudiante",
@@ -1201,7 +1244,8 @@
     "rewards": {
       "title": "Recompensas",
       "description": "Sigue cada capítulo que has completado en los mundos de aventuras.",
-      "open_world": "Abrir mundo →"
+      "open_world": "Abrir mundo →",
+      "sticker_empty_encouragement": "Tu primera pegatina te espera: ¡termina un capítulo para ganarla!"
     },
     "select": {
       "eyebrow": "Ver como",
@@ -1321,7 +1365,10 @@
       "agent_modality_auditory": "Intenta leerlo en voz alta — escucharlo puede ayudar.",
       "agent_modality_kinesthetic": "Intenta contarlo con tus dedos u objetos.",
       "agent_modality_reading": "Leámoslo despacio, una parte a la vez.",
-      "agent_new_surface": "Probemos la misma pregunta de otra manera."
+      "agent_new_surface": "Probemos la misma pregunta de otra manera.",
+      "offline_saved_title": "Guardado en este dispositivo",
+      "offline_saved_body": "Ahora estás sin conexión: tu trabajo se sincronizará en cuanto vuelvas.",
+      "offline_complete_title": "Lección guardada en este dispositivo"
     },
     "baseline_runner": {
       "exit_proctor_view": "Salir de la vista de supervisor",
@@ -1335,6 +1382,69 @@
     },
     "lesson_run": {
       "back_to_today": "Volver a hoy"
+    },
+    "accessibility_voice": {
+      "title": "Voz y velocidad.",
+      "body": "Elige la voz de lectura y su rapidez.",
+      "link": "Abrir ajustes de voz"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "¡Hola, soy Nova! Exploremos juntos la galaxia de los números.",
+        "celebrate": "¡Trabajo estelar! Hoy hiciste brillar los números."
+      },
+      "sage": {
+        "welcome": "Aquí Sage: encontré un camino de cuentos solo para ti.",
+        "celebrate": "¡Qué bien leíste! Ese cuento brilló más contigo."
+      },
+      "spark": {
+        "welcome": "¡Aquí Spark! ¿Listo para descubrir algo asombroso?",
+        "celebrate": "¡Gran experimento! Tu curiosidad iluminó el laboratorio."
+      },
+      "chrono": {
+        "welcome": "Aquí Chrono: viajemos juntos al pasado.",
+        "celebrate": "¡Qué viaje! Hoy le diste vida a la historia."
+      },
+      "pixel": {
+        "welcome": "¡Aquí Pixel! Construyamos algo genial, paso a paso.",
+        "celebrate": "¡Choca esos cinco! Tu código funcionó de maravilla."
+      },
+      "echo": {
+        "welcome": "¡Hola, soy Echo! Calentemos la voz juntos.",
+        "celebrate": "¡Hablaste precioso! Tus palabras se oyeron fuerte y claro."
+      },
+      "harmony": {
+        "welcome": "Aquí Harmony. Respira hondo: este es tu espacio.",
+        "celebrate": "Hoy mostraste mucho corazón. Siéntete orgulloso."
+      },
+      "atlas": {
+        "welcome": "¡Aquí Atlas! Salgamos a explorar el mundo.",
+        "celebrate": "¡Gran expedición! Hoy descubriste mucho del mundo."
+      },
+      "cadence": {
+        "welcome": "¡Aquí Cadence! ¿Sientes el ritmo? Hagamos música.",
+        "celebrate": "¡Bravo! Tu ritmo llenó toda la sala."
+      },
+      "vigor": {
+        "welcome": "¡Aquí Vigor! A estirar, movernos y hacernos fuertes.",
+        "celebrate": "¡Muy bien! Hoy diste tu mejor energía."
+      },
+      "lingua": {
+        "welcome": "¡Hola! Aquí Lingua: aprendamos palabras de todo el mundo.",
+        "celebrate": "¡Fantástico! Hoy hablaste un idioma nuevo."
+      },
+      "forge": {
+        "welcome": "¡Aquí Forge! Toma tus herramientas: a construir y probar ideas.",
+        "celebrate": "¡Buena construcción! Tu invento aguantó firme."
+      },
+      "compass": {
+        "welcome": "Aquí Compass. Un pasito a la vez: yo te guío.",
+        "celebrate": "¡Buen rumbo! Lo planeaste y lo lograste."
+      },
+      "muse": {
+        "welcome": "¡Aquí Muse! Hoy tu imaginación es el pincel.",
+        "celebrate": "¡Precioso! Tus ideas se volvieron arte de verdad."
+      }
     }
   },
   "auth": {
@@ -1404,6 +1514,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "Escribe al menos 2 caracteres.",
+        "email": "Eso no parece un correo electrónico.",
+        "password": "Usa al menos 8 caracteres."
       }
     },
     "forgot": {
@@ -2945,6 +3060,19 @@
       "submit_error": "No se pudo guardar la evaluación — inténtalo de nuevo.",
       "success_title": "Evaluación guardada",
       "success_body": "Tu aporte ahora alimenta la línea base y la personalización de lecciones."
+    },
+    "not_found": {
+      "eyebrow": "No encontrado",
+      "heading": "No encontramos esa página",
+      "body": "El enlace puede haber cambiado. Volvamos a tu inicio.",
+      "home_link": "Ir al inicio"
+    },
+    "error": {
+      "eyebrow": "Algo salió mal",
+      "heading": "Esta página tuvo un tropiezo",
+      "body": "No se perdió nada. Inténtalo de nuevo o vuelve al inicio.",
+      "retry": "Reintentar",
+      "home_link": "Ir al inicio"
     }
   },
   "caregiver": {
@@ -2994,6 +3122,19 @@
       "section_profile": "Perfil",
       "section_notifications": "Notificaciones",
       "role_label": "Cuidador"
+    },
+    "not_found": {
+      "eyebrow": "No encontrado",
+      "heading": "No encontramos esa página",
+      "body": "El enlace puede haber cambiado. Volvamos a tu inicio.",
+      "home_link": "Ir al inicio"
+    },
+    "error": {
+      "eyebrow": "Algo salió mal",
+      "heading": "Esta página tuvo un tropiezo",
+      "body": "No se perdió nada. Inténtalo de nuevo o vuelve al inicio.",
+      "retry": "Reintentar",
+      "home_link": "Ir al inicio"
     }
   },
   "accept_invite": {
@@ -3178,5 +3319,22 @@
       "ready_badge": "Lista para jugar",
       "generated_at": "Preparada {date}"
     }
+  },
+  "messages": {
+    "inbox_title": "Bandeja",
+    "loading": "Cargando…",
+    "empty_inbox": "Aún no hay conversaciones. Cuando alguien de tu equipo AIVO te escriba, aparecerá aquí.",
+    "select_prompt": "Elige una conversación para leer y responder.",
+    "empty_thread": "Todavía no hay mensajes en esta conversación.",
+    "reply_placeholder": "Escribe una respuesta…",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "threads_error_title": "No pudimos cargar tus mensajes",
+    "threads_error_body": "No se perdió nada; inténtalo de nuevo en un momento.",
+    "thread_error_title": "No pudimos abrir esa conversación",
+    "thread_error_body": "Inténtalo otra vez; tus mensajes están a salvo.",
+    "send_failed_title": "Mensaje no enviado",
+    "send_failed_body": "Tu borrador sigue aquí.",
+    "send_retry": "Reintentar"
   }
 }

@@ -21,7 +21,8 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["lib/**/*.test.ts", "components/**/*.test.tsx"],
+    // app/** added in Sprint 12 for the lesson-player machine tests.
+    include: ["lib/**/*.test.ts", "components/**/*.test.tsx", "app/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
       reporter: ["text-summary"],

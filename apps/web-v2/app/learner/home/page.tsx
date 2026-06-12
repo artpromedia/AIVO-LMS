@@ -27,6 +27,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
+import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,7 @@ import {
   TutorAvatarCard,
   type TutorAvatarTone,
 } from "@aivo/ui/learner-dashboard";
-import { SubjectCard, MessageCard } from "@aivo/ui";
+import { MessageCard } from "@aivo/ui";
 import { LearnerWorkspaceRail } from "@/components/learner/learner-workspace-rail";
 import { readTypefaceFromCookies } from "@/lib/a11y/server";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
@@ -111,13 +112,6 @@ async function startMissionAction(formData: FormData) {
 }
 
 // Maps a mastery score to its learner.progress.* catalog key.
-function masteryKey(score: number): string {
-  if (score >= 0.85) return "mastery_strong";
-  if (score >= 0.65) return "mastery_on_grade";
-  if (score >= 0.4) return "mastery_building";
-  if (score > 0) return "mastery_just_starting";
-  return "mastery_not_started";
-}
 
 // Maps an overall average to its learner.home.level_* catalog key.
 function adaptiveLevelKey(score: number): string {
@@ -155,9 +149,11 @@ export default async function LearnerHome({
   searchParams: Promise<{ blocker?: string }>;
 }) {
   const session = await requirePageRole(["learner", "parent"]);
+  // Calm / high-contrast learners get the flatter "-reduced" tutor art.
+  const sensoryMode = await readSensoryModeFromCookies();
+  const reducedArt = sensoryMode !== "standard";
   const params = await searchParams;
   const t = await getTranslations("learner.home");
-  const tp = await getTranslations("learner.progress");
 
   let learnerId: string | null = null;
   if (session.role === "learner") {
@@ -193,11 +189,6 @@ export default async function LearnerHome({
     entry.count += 1;
     subjectScore.set(sm.subjectId, entry);
   }
-  const subjectAvg = (subjectId: string) => {
-    const e = subjectScore.get(subjectId);
-    if (!e || e.count === 0) return 0;
-    return e.score / e.count;
-  };
   const overallAvg =
     skillMasteries.length === 0
       ? 0
@@ -248,6 +239,7 @@ export default async function LearnerHome({
         name: t.name,
         subject: s.name,
         glyph: t.emoji,
+        imageUrl: reducedArt ? t.avatarReduced : t.avatar,
         tone: tones.tutorTone,
       };
     })
@@ -336,6 +328,13 @@ export default async function LearnerHome({
                   : t("tutor_personality_default")
               }
               tutorGlyph={featuredTutor?.emoji ?? "🤖"}
+              tutorImageUrl={
+                featuredTutor
+                  ? reducedArt
+                    ? featuredTutor.avatarReduced
+                    : featuredTutor.avatar
+                  : undefined
+              }
               tutorTone={featuredTones.tutorTone}
               secondaryActions={
                 <>
@@ -387,7 +386,7 @@ export default async function LearnerHome({
               primaryAction={
                 <form action={startMissionAction}>
                   <input type="hidden" name="learnerId" value={learnerId} />
-                  <Button type="submit" size="lg" data-primary-cta="todays-mission">
+                  <Button type="submit" size="lg" data-primary-cta="todays-mission" data-testid="learner-primary-cta">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                       <path d="M8 5v14l11-7L8 5Z" />
                     </svg>
@@ -404,6 +403,7 @@ export default async function LearnerHome({
               </p>
               <Link
                 href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}
+                data-testid="learner-primary-cta"
                 className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
               >
                 {blocker === "no_baseline" ? t("setup_cta_baseline") : t("setup_cta_refresh")}
@@ -431,6 +431,7 @@ export default async function LearnerHome({
                     name={t.name}
                     subject={t.subject}
                     glyph={t.glyph}
+                    imageUrl={t.imageUrl}
                     tone={t.tone}
                   />
                 ))}
@@ -438,47 +439,24 @@ export default async function LearnerHome({
             </section>
           ) : null}
 
-          {/* Subjects */}
-          <section className="flex flex-col gap-4">
-            <header className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-iw-text-strong">{t("subjects_title")}</h2>
-              <Link
-                href="/learner/subjects"
-                className="text-sm font-bold text-[var(--color-aivo-primary)] hover:underline"
-              >
-                {t("see_all")}
-              </Link>
-            </header>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {allSubjects.slice(0, 6).map((s) => {
-                const tutor = tutorForSubjectSlug(s.slug);
-                const avg = subjectAvg(s.id);
-                return (
-                  <SubjectCard
-                    key={s.id}
-                    href={`/learner/subjects/${s.id}`}
-                    name={s.name}
-                    eyebrow={
-                      tutor
-                        ? t("subject_eyebrow", { name: tutor.name, landmark: tutor.landmark })
-                        : undefined
-                    }
-                    masteryLabel={tp(masteryKey(avg))}
-                    masteryPct={Math.round(avg * 100)}
-                    accent={tutor?.color}
-                    icon={tutor?.emoji ?? "📘"}
-                    nextAction={
-                      today.ready && today.mission.subjectId === s.id
-                        ? today.mission.skillName
-                        : t("next_default")
-                    }
-                    support={iep?.confirmedAt ? t("supports_on") : undefined}
-                    locked={avg === 0 && !today.ready}
-                  />
-                );
-              })}
-            </div>
-          </section>
+          {/* Explore subjects — one tap away; the home stays single-mission. */}
+          <Link
+            href="/learner/subjects"
+            className="group flex items-center justify-between rounded-[24px] bg-white border border-iw-border/60 px-6 py-5 hover:border-[var(--color-aivo-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
+          >
+            <span className="flex flex-col">
+              <span className="text-lg font-bold text-iw-text-strong">
+                {t("explore_subjects_title")}
+              </span>
+              <span className="text-sm text-iw-text-muted">{t("explore_subjects_body")}</span>
+            </span>
+            <span
+              aria-hidden="true"
+              className="text-2xl text-[var(--color-aivo-primary)] transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+            >
+              →
+            </span>
+          </Link>
 
           {/* Messages */}
           <section className="flex flex-col gap-4">
@@ -489,14 +467,18 @@ export default async function LearnerHome({
                 sender="AIVO"
                 title={t("msg_hint_title")}
                 body={t("msg_hint_body")}
-                avatar="✨"
+                avatar={
+                  <img src="/images/mascots/aivo-owl-happy.svg" alt="" aria-hidden="true" className="h-8 w-8" />
+                }
               />
               {iep?.confirmedAt ? (
                 <MessageCard
                   from="system"
                   title={t("msg_supports_title")}
                   body={t("msg_supports_body", { count: supportsCount })}
-                  avatar="🛡"
+                  avatar={
+                    <img src="/images/mascots/aivo-owl-idle.svg" alt="" aria-hidden="true" className="h-8 w-8" />
+                  }
                 />
               ) : (
                 <Link
@@ -507,7 +489,9 @@ export default async function LearnerHome({
                     from="break"
                     title={t("msg_break_title")}
                     body={t("msg_break_body")}
-                    avatar="🌿"
+                    avatar={
+                      <img src="/images/mascots/echo-whale-happy.svg" alt="" aria-hidden="true" className="h-8 w-8" />
+                    }
                   />
                 </Link>
               )}

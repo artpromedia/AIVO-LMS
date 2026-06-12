@@ -44,8 +44,43 @@ export default function SignupPage() {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  // Inline, per-field validation (mirrors registerAction's server rules:
+  // name ≥ 2 chars, email shape, password ≥ 8). The submit button stays
+  // ENABLED — a disabled "dead button" gives no recovery path; instead an
+  // invalid submit blocks the action, marks the fields and focuses the
+  // first problem.
+  const [fieldErrors, setFieldErrors] = React.useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+  }>({});
 
-  const canSubmit = name.trim().length > 1 && /.+@.+\..+/.test(email) && password.length >= 8;
+  const validators = React.useMemo(
+    () => ({
+      name: (v: string) => (v.trim().length >= 2 ? undefined : t("errors_inline.name")),
+      email: (v: string) => (/.+@.+\..+/.test(v) ? undefined : t("errors_inline.email")),
+      password: (v: string) => (v.length >= 8 ? undefined : t("errors_inline.password")),
+    }),
+    [t],
+  );
+
+  const validateField = (field: "name" | "email" | "password", value: string) => {
+    setFieldErrors((prev) => ({ ...prev, [field]: validators[field](value) }));
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const next = {
+      name: validators.name(name),
+      email: validators.email(email),
+      password: validators.password(password),
+    };
+    setFieldErrors(next);
+    const firstInvalid = (["name", "email", "password"] as const).find((f) => next[f]);
+    if (firstInvalid) {
+      e.preventDefault();
+      document.getElementById(firstInvalid)?.focus();
+    }
+  };
 
   return (
     <>
@@ -113,13 +148,7 @@ export default function SignupPage() {
               </>
             }
             actions={
-              <Button
-                type="submit"
-                form="signup-form"
-                size="lg"
-                disabled={!canSubmit}
-                className="w-full"
-              >
+              <Button type="submit" form="signup-form" size="lg" className="w-full">
                 {t("submit")}
               </Button>
             }
@@ -132,6 +161,7 @@ export default function SignupPage() {
             <form
               id="signup-form"
               action={registerAction}
+              onSubmit={handleSubmit}
               className="flex flex-col gap-4"
               noValidate
             >
@@ -143,6 +173,8 @@ export default function SignupPage() {
                 label={t("name_label")}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
+                onBlur={(event) => validateField("name", event.target.value)}
+                error={fieldErrors.name}
                 placeholder={t("name_placeholder")}
                 autoComplete="name"
                 required
@@ -155,6 +187,8 @@ export default function SignupPage() {
                 inputMode="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
+                onBlur={(event) => validateField("email", event.target.value)}
+                error={fieldErrors.email}
                 placeholder="you@example.com"
                 autoComplete="email"
                 required
@@ -166,6 +200,8 @@ export default function SignupPage() {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                onBlur={(event) => validateField("password", event.target.value)}
+                error={fieldErrors.password}
                 helper={t("password_helper")}
                 autoComplete="new-password"
                 required

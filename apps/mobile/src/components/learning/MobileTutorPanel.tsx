@@ -5,6 +5,7 @@
 
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useA11yStyle } from "@/lib/a11y-style";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function MobileTutorPanel({ theme, tier, message }: Props) {
+  const { bodyFontFamily } = useA11yStyle();
   if (tier === "HIGH") return null;
   const styles = createStyles(theme);
   return (
@@ -24,7 +26,9 @@ export function MobileTutorPanel({ theme, tier, message }: Props) {
         </Text>
       </View>
       <View style={styles.speechBubble}>
-        <Text style={styles.speechText}>{message}</Text>
+        <Text style={[styles.speechText, { fontFamily: bodyFontFamily }]} accessibilityRole="text">
+          {message}
+        </Text>
       </View>
     </View>
   );

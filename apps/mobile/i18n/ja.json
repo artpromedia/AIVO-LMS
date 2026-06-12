@@ -670,7 +670,13 @@
     },
     "hideTutor": "チューターを隠す",
     "moveUp": "{{label}}を上へ",
-    "moveDown": "{{label}}を下へ"
+    "moveDown": "{{label}}を下へ",
+    "a11y": {
+      "beatAdvance": "ステップ {{index}} / {{total}}。",
+      "completed": "レッスン完了！{{xp}} ポイントを獲得しました。",
+      "beatCounter": "アクティビティ {{index}} / {{total}}",
+      "empty": "このセッションには残りのアクティビティがありません。"
+    }
   },
   "learnerTutor": {
     "tutorNotFound": "チューターが見つかりません",

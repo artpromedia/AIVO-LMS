@@ -587,35 +587,46 @@
       "add_another_learner": "学習者を追加する",
       "today_at_a_glance": "今日の概要",
       "details": "詳細",
-      "learning_readiness": "学習準備状況",
-      "assessment_status": "評価ステータス",
-      "iep_support_upload": "IEP / サポートをアップロード",
       "consent_checklist": "同意チェックリスト",
-      "todays_recommended_actions": "今日のおすすめアクション",
-      "notifications_title": "通知",
-      "billing_title": "請求",
       "school_connection": "学校との接続",
-      "plan_generated": "プラン生成済み",
-      "pacing": "ペース",
-      "calm_extended_time_on": "穏やか — 延長時間オン",
-      "sensory_mode": "感覚モード",
-      "warm_reduced_motion": "温かみ + 動きを抑える",
-      "parent_guardian_consent": "保護者 / 後見人の同意",
       "approved": "承認済み",
-      "ai_personalization": "AI パーソナライゼーション",
-      "school_data_sharing": "学校データ共有",
       "optional_not_set": "任意 — 未設定",
-      "approve_voice_mode": "音声モードを承認",
-      "approve_voice_mode_desc": "Emma がレッスン中に AI チューターと声で話せるようになります。",
-      "upload_iep_optional": "IEP をアップロード（任意）",
-      "upload_iep_desc": "AIVO が初日から適用できるよう、配慮事項を追加してください。",
-      "new_milestone": "新しいマイルストーン：",
-      "new_milestone_desc": "200 語のパッセージを自力で読んだ。",
-      "tutor_note": "チューターメモ：",
-      "tutor_note_desc": "今週のペースは素晴らしい。",
-      "family_2_learners": "家族 — 学習者 2 名",
-      "next_renewal": "次回更新日",
-      "payment_method": "支払い方法"
+      "hero_ready": "{name} は今日の学びの準備ができています。",
+      "hero_next": "{name} の次の一歩を進めましょう。",
+      "hero_add_first": "最初のお子さまを追加して、学びの旅を始めましょう。",
+      "subhead": "落ち着いた、その子だけの学び。あとはあなたのひと目だけ。",
+      "empty_description": "最初のお子さまを追加すると、アセスメントが始まり学びが個別化されます。",
+      "setup_for": "{name} のセットアップ",
+      "step_assessment": "保護者アセスメント",
+      "step_supports": "IEP とチーム（任意）",
+      "step_baseline": "スタートの冒険",
+      "step_review": "学習プロフィールの確認",
+      "metric_learners": "お子さま",
+      "metric_learners_desc_one": "ファミリープランに 1 人。",
+      "metric_learners_desc_other": "ファミリープランに {count} 人。",
+      "metric_ready": "学習の準備OK",
+      "metric_ready_desc_all": "今日の準備はすべて整っています。",
+      "metric_ready_desc_partial": "ベースラインと同意が完了。",
+      "metric_action": "対応が必要",
+      "metric_action_desc_zero": "待ち項目はありません。",
+      "metric_action_desc_some": "下の「次のステップ」からセットアップを完了してください。",
+      "metric_status": "{name} のステータス",
+      "next_steps_title": "次のステップ",
+      "next_steps_subtitle": "お子さまごとに小さな一歩 — それぞれ約 1 分です。",
+      "view_all_learners": "すべてのお子さまを見る",
+      "consent_subtitle": "{name} について承認した内容。",
+      "consent_of_total": "{total} 件中 {granted} 件承認済み",
+      "review_consent": "同意内容を確認",
+      "connect_a_school": "学校と連携",
+      "school_subtitle": "学校が AIVO を使っていれば教室と同期できます。",
+      "school_body": "学校と連携すると、先生もあなたと同じ学習プロフィールを見られ、AI チューターが教室の学びと連携します。共有内容はいつでもあなたが管理できます。",
+      "legacy_note": "こちらは新しい保護者ホームです。従来の画面はこちら：",
+      "consent_type": {
+        "child_data_collection": "お子さまのデータ収集",
+        "ai_personalization": "AI パーソナライズ",
+        "school_roster_import": "学校名簿の共有"
+      },
+      "not_found_body": "新しい保護者ホームは展開中です。お探しのページは未公開か、アドレスが変わりました。"
     },
     "home": {
       "greeting": "挨拶",
@@ -722,7 +733,8 @@
       "status_applied": "承認・適用されました — 次のセッションからレッスンが更新されます。",
       "status_declined": "却下されました — 変更はありません。",
       "status_failed": "承認されましたが適用に失敗しました — チームに通知済みです。",
-      "history": "最近の決定 ({count})"
+      "history": "最近の決定 ({count})",
+      "retry": "再試行"
     },
     "tutor_memories": {
       "title": "チューターが覚えていること",
@@ -735,6 +747,35 @@
       "expires": "{date} に期限切れ",
       "delete": "削除",
       "delete_label": "このメモを削除"
+    },
+    "readiness": {
+      "label": {
+        "profile_created": "プロフィール作成済み",
+        "assessment_needed": "アセスメント進行中",
+        "iep_optional": "IEP を追加（任意）",
+        "team_invite_optional": "サポートチームを招待（任意）",
+        "baseline_needed": "スタートの冒険の準備完了",
+        "brain_build_pending": "学習プロフィールを準備中",
+        "brain_clone_review_needed": "学習プロフィールの確認待ち",
+        "ready_for_today_mission": "今日のミッション準備完了",
+        "active_learning": "学習中"
+      },
+      "next": {
+        "profile_created": "保護者アセスメントを開始",
+        "assessment_needed": "保護者アセスメントを続ける",
+        "iep_optional": "IEP を追加またはスキップ",
+        "team_invite_optional": "お子さまのチームを招待",
+        "baseline_needed": "スタートの冒険を開始",
+        "brain_build_pending": "プロフィール設定を完了",
+        "brain_clone_review_needed": "学習プロフィールを確認",
+        "ready_for_today_mission": "今日のミッションを開く",
+        "active_learning": "成長レポートを見る"
+      }
+    },
+    "learner_card": {
+      "open_profile": "プロフィールを開く",
+      "age": "{age} 歳",
+      "grade": "{grade} 年生"
     }
   },
   "brain_clone": {
@@ -765,17 +806,17 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved.",
-    "clone_eyebrow": "ブレインをクローン中",
-    "clone_aria": "AIVO の学習モデルを {name} 専用のブレインにクローンしています",
+    "clone_eyebrow": "学習プロフィールを作成中",
+    "clone_aria": "AIVO の学習モデルを {name} に合わせています",
     "clone_master_label": "AIVO マスターブレイン",
     "clone_child_label": "{name} のブレイン",
-    "clone_caption": "AIVO の学習モデルを {name} 専用のブレインにクローンしています…",
+    "clone_caption": "AIVO の学習モデルを {name} に合わせています…",
     "clone_personalising": "{name} の学年とプロフィールに合わせて調整中",
     "clone_finalising": "まもなく完了 — パーソナライズされたブレインを仕上げています",
     "clone_privacy_pii": "個人データが暗号化されずにこの端末から出ることはありません",
     "clone_privacy_versioned": "バージョン管理 · いつでもロールバック可能",
     "clone_skip": "アニメーションをスキップ",
-    "clone_replay": "クローンアニメーションを再生",
+    "clone_replay": "プロフィールのアニメーションを再生",
     "building_title": "{name} のブレインを構築中",
     "building_subtitle": "評価データからリアルタイムに構築",
     "building_template_pill": "学年 {grade} のブレインテンプレート — {level}",
@@ -1171,7 +1212,9 @@
       "msg_supports_body": "読み上げ、落ち着いたペース、そして IEP からの{count, plural, other {他 # 件のサポート}}が有効です。",
       "msg_break_title": "休憩はいいこと",
       "msg_break_body": "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。",
-      "planned_week_badge": "今週の予定レッスン"
+      "planned_week_badge": "今週の予定レッスン",
+      "explore_subjects_title": "きょうかを見てみよう",
+      "explore_subjects_body": "チューターと教科はワンタップで。"
     },
     "common": {
       "learner_eyebrow": "学習者",
@@ -1201,7 +1244,8 @@
     "rewards": {
       "title": "ごほうび",
       "description": "クエストの世界で終えた章をすべて記録します。",
-      "open_world": "世界を開く →"
+      "open_world": "世界を開く →",
+      "sticker_empty_encouragement": "はじめてのステッカーが待ってるよ。チャプターをひとつ終えてゲットしよう！"
     },
     "select": {
       "eyebrow": "表示の切り替え",
@@ -1321,7 +1365,10 @@
       "agent_modality_auditory": "声に出して読んでみよう — 聞くと分かりやすいよ。",
       "agent_modality_kinesthetic": "指や物を使って数えてみよう。",
       "agent_modality_reading": "ゆっくり、少しずつ読んでみよう。",
-      "agent_new_surface": "同じ問題を別のやり方で試してみよう。"
+      "agent_new_surface": "同じ問題を別のやり方で試してみよう。",
+      "offline_saved_title": "この端末に保存しました",
+      "offline_saved_body": "今はオフラインです。接続が戻り次第、同期します。",
+      "offline_complete_title": "レッスンをこの端末に保存しました"
     },
     "baseline_runner": {
       "exit_proctor_view": "監督ビューを終了",
@@ -1335,6 +1382,69 @@
     },
     "lesson_run": {
       "back_to_today": "今日に戻る"
+    },
+    "accessibility_voice": {
+      "title": "声と速さ。",
+      "body": "読み上げの声と速さを選べます。",
+      "link": "音声設定を開く"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "こんにちは、ノヴァだよ！いっしょに数字のぎんがを探検しよう。",
+        "celebrate": "ばっちり！今日はきみが数字をかがやかせたね。"
+      },
+      "sage": {
+        "welcome": "セージだよ。きみのために物語の道を見つけたよ。",
+        "celebrate": "すてきな読書だったね！きみと一緒で物語がもっと輝いたよ。"
+      },
+      "spark": {
+        "welcome": "スパークだよ！すごい発見の準備はいい？",
+        "celebrate": "いい実験だった!きみの好奇心でラボが明るくなったよ。"
+      },
+      "chrono": {
+        "welcome": "クロノだよ。いっしょに昔の世界へ旅しよう。",
+        "celebrate": "すごい旅だった！今日はきみが歴史を生き返らせたね。"
+      },
+      "pixel": {
+        "welcome": "ピクセルだよ！一歩ずつ、かっこいいものを作ろう。",
+        "celebrate": "ハイタッチ！きみのコード、ばっちり動いたよ。"
+      },
+      "echo": {
+        "welcome": "こんにちは、エコーだよ！いっしょに声のじゅんびをしよう。",
+        "celebrate": "じょうずに話せたね！言葉がはっきり聞こえたよ。"
+      },
+      "harmony": {
+        "welcome": "ハーモニーだよ。深呼吸して。ここはきみの場所だよ。",
+        "celebrate": "今日は本当の優しさを見せてくれたね。誇りに思っていいよ。"
+      },
+      "atlas": {
+        "welcome": "アトラスだよ！世界の探検に出かけよう。",
+        "celebrate": "すごい探検だった！今日は世界をたくさん発見したね。"
+      },
+      "cadence": {
+        "welcome": "ケイデンスだよ！リズムを感じる？音楽を作ろう。",
+        "celebrate": "ブラボー！きみのリズムが部屋いっぱいに響いたよ。"
+      },
+      "vigor": {
+        "welcome": "ヴィガーだよ！のびて、動いて、強くなろう。",
+        "celebrate": "よくがんばった！今日は最高のエネルギーだったね。"
+      },
+      "lingua": {
+        "welcome": "こんにちは！リングアだよ。世界中の新しい言葉を学ぼう。",
+        "celebrate": "すばらしい！今日は新しい言語を話せたね。"
+      },
+      "forge": {
+        "welcome": "フォージだよ！道具を持って、アイデアを作って試そう。",
+        "celebrate": "がんじょうにできた！きみの発明はびくともしなかったよ。"
+      },
+      "compass": {
+        "welcome": "コンパスだよ。一歩ずつでいいよ。道案内するね。",
+        "celebrate": "進む道はばっちり！計画して、やりとげたね。"
+      },
+      "muse": {
+        "welcome": "ミューズだよ！今日はきみの想像力が絵筆だよ。",
+        "celebrate": "とってもきれい！きみのアイデアが本物のアートになったね。"
+      }
     }
   },
   "auth": {
@@ -1404,6 +1514,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "2文字以上で入力してください。",
+        "email": "メールアドレスの形式ではないようです。",
+        "password": "8文字以上にしてください。"
       }
     },
     "forgot": {
@@ -2945,6 +3060,19 @@
       "submit_error": "評価を保存できませんでした — もう一度お試しください。",
       "success_title": "評価を保存しました",
       "success_body": "あなたの入力はベースラインとレッスンのパーソナライズに反映されます。"
+    },
+    "not_found": {
+      "eyebrow": "見つかりません",
+      "heading": "ページが見つかりません",
+      "body": "リンクが変わったかもしれません。ホームに戻りましょう。",
+      "home_link": "ホームへ"
+    },
+    "error": {
+      "eyebrow": "問題が発生しました",
+      "heading": "ページに不具合がありました",
+      "body": "何も失われていません。もう一度試すか、ホームへ戻ってください。",
+      "retry": "再試行",
+      "home_link": "ホームへ"
     }
   },
   "caregiver": {
@@ -2994,6 +3122,19 @@
       "section_profile": "プロフィール",
       "section_notifications": "通知",
       "role_label": "介護者"
+    },
+    "not_found": {
+      "eyebrow": "見つかりません",
+      "heading": "ページが見つかりません",
+      "body": "リンクが変わったかもしれません。ホームに戻りましょう。",
+      "home_link": "ホームへ"
+    },
+    "error": {
+      "eyebrow": "問題が発生しました",
+      "heading": "ページに不具合がありました",
+      "body": "何も失われていません。もう一度試すか、ホームへ戻ってください。",
+      "retry": "再試行",
+      "home_link": "ホームへ"
     }
   },
   "accept_invite": {
@@ -3178,5 +3319,22 @@
       "ready_badge": "プレイ可能",
       "generated_at": "{date} に準備済み"
     }
+  },
+  "messages": {
+    "inbox_title": "受信箱",
+    "loading": "読み込み中…",
+    "empty_inbox": "まだ会話はありません。AIVO チームの誰かからメッセージが届くと、ここに表示されます。",
+    "select_prompt": "会話を選んで読み、返信しましょう。",
+    "empty_thread": "この会話にはまだメッセージがありません。",
+    "reply_placeholder": "返信を書く…",
+    "send": "送信",
+    "sending": "送信中…",
+    "threads_error_title": "メッセージを読み込めませんでした",
+    "threads_error_body": "何も失われていません。少ししてからもう一度お試しください。",
+    "thread_error_title": "その会話を開けませんでした",
+    "thread_error_body": "もう一度お試しください。メッセージは安全です。",
+    "send_failed_title": "メッセージを送信できませんでした",
+    "send_failed_body": "下書きはそのまま残っています。",
+    "send_retry": "再試行"
   }
 }

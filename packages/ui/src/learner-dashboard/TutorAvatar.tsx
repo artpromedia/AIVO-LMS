@@ -58,9 +58,9 @@ export function TutorAvatar({
         TONE_MAP[tone],
         className,
       )}
-      role={imageUrl ? "img" : undefined}
-      aria-label={imageUrl ? alt : undefined}
-      aria-hidden={imageUrl ? undefined : "true"}
+      role={imageUrl && alt ? "img" : undefined}
+      aria-label={imageUrl && alt ? alt : undefined}
+      aria-hidden={imageUrl && alt ? undefined : "true"}
     >
       {imageUrl ? (
         <img src={imageUrl} alt={alt ?? ""} className="w-[80%] h-[80%] object-contain" />

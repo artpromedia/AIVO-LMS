@@ -34,10 +34,12 @@ test.describe("@a11y homework calm nudge", () => {
     await context.addCookies([learnerCookie]);
   });
 
-  test("surfaces a dismissible calm break on inactivity", async ({ page, request }) => {
+  test("surfaces a dismissible calm break on inactivity", async ({ page }) => {
     // Bootstrap a homework session (the demo learner is consent-seeded and the
     // opening reply is generated deterministically — no live AI dependency).
-    const created = await request.post(`/api/bff/learners/${LEARNER_ID}/homework`, {
+    // page.request shares the browser context cookie jar — the bare `request`
+    // fixture does not, so the mock-session cookie never reached the BFF.
+    const created = await page.request.post(`/api/bff/learners/${LEARNER_ID}/homework`, {
       data: { topic: "Fractions practice" },
     });
     expect(created.ok()).toBeTruthy();

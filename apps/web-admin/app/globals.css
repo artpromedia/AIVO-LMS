@@ -239,3 +239,68 @@ body {
   background: rgba(238, 246, 255, 0.5);
   padding: 1rem;
 }
+
+/* Sprint 10 — destructive-action confirmation dialog (native <dialog>). */
+.admin-dialog {
+  margin: auto;
+  border: 1px solid rgba(23, 32, 51, 0.12);
+  border-radius: 16px;
+  padding: 0;
+  max-width: 28rem;
+  width: calc(100vw - 2rem);
+  box-shadow: 0 24px 60px -30px rgba(15, 23, 42, 0.45);
+}
+.admin-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.45);
+}
+.admin-dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+}
+.admin-dialog-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #172033;
+}
+.admin-dialog-body {
+  font-size: 0.875rem;
+  color: #475569;
+}
+.admin-dialog-typed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: #475569;
+}
+.admin-dialog-typed-target {
+  font-weight: 700;
+  color: #172033;
+}
+.admin-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.admin-button-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #ffffff;
+  background: #b91c1c;
+  border: 1px solid #b91c1c;
+}
+.admin-button-danger:hover {
+  background: #991b1b;
+}
+.admin-button-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

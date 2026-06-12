@@ -266,7 +266,7 @@ function BoxBreathing({
 
   return (
     <Card className="mt-6 flex flex-col items-center gap-5 p-8 text-center">
-      <p className="text-sm text-aivo-muted">{t("round", { round, rounds })}</p>
+      <p className="text-sm text-aivo-ink-soft">{t("round", { round, rounds })}</p>
       <div
         aria-hidden="true"
         data-phase={phase}

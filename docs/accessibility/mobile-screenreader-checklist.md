@@ -48,3 +48,13 @@ step succeeds without sighted help.
 
 Failures file as `a11y` + `release-blocker` issues; a release cannot ship
 with an open row.
+
+## Sprint 04 additions (2026-06-12)
+
+| Check | Steps | Result |
+| --- | --- | --- |
+| Stage answer feedback announced | TalkBack/VoiceOver on → answer a choice beat → the tier voice line (encourage or miss) is spoken without focusing the tutor panel | _pending device pass_ |
+| Stage beat advancement announced | Advance past the first beat → "Step N of M." is spoken | _pending device pass_ |
+| Stage completion announced | Finish a session → completion + XP line is spoken | _pending device pass_ |
+| Break modal honors reduce-motion | OS reduce-motion ON → break reminder appears with no fade animation | _pending device pass_ |
+| Choice state exposed | Focus a selected answer → screen reader reports "selected"; after answering, options report "disabled" | _pending device pass_ |

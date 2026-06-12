@@ -9,7 +9,7 @@ import {
   lessonSessions,
   tutorSessions,
 } from "@aivo/db";
-import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { authenticateRequest, runScoped, verifyParentOwnership } from "../auth.js";
 import {
   DAPE_LIBRARY,
   DAPE_CATEGORY_LABELS,
@@ -70,7 +70,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -91,7 +91,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId, goalId } = request.params as GoalIdParams;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -114,7 +114,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -137,7 +137,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -158,7 +158,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -223,12 +223,14 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
 
-      const learnerRows = await db.select().from(learners).where(eq(learners.id, learnerId));
+      const learnerRows = await runScoped(db, claims, (tx) =>
+        tx.select().from(learners).where(eq(learners.id, learnerId)),
+      );
       if (learnerRows.length === 0) return reply.code(404).send({ error: "Learner not found" });
       const learner = learnerRows[0];
 
@@ -397,7 +399,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       // Learners can read their own DAPE profile (needed by the Vigor lesson
       // start screen to decide whether to show the DAPE track entry point).
       const isSelfLearner = claims.role === "LEARNER" && claims.sub === learnerId;
@@ -447,7 +449,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       // LEARNER role: only allow access to *their own* DAPE activity. Without
       // this, any learner could enumerate other learners' UUIDs and pull their
       // motor goal data.
@@ -457,7 +459,9 @@ export async function registerIepRoutes(app: FastifyInstance) {
       }
 
       const q = request.query as { category?: string };
-      const learnerRows = await db.select().from(learners).where(eq(learners.id, learnerId));
+      const learnerRows = await runScoped(db, claims, (tx) =>
+        tx.select().from(learners).where(eq(learners.id, learnerId)),
+      );
       if (learnerRows.length === 0) return reply.code(404).send({ error: "Learner not found" });
       const level = (learnerRows[0].functioningLevel || "STANDARD") as DapeFunctioningTier;
 
@@ -491,7 +495,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }

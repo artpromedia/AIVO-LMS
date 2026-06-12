@@ -24,13 +24,14 @@ function contributorRoleFromClaims(role: string | undefined): ContributorRole {
 
 async function verifyLearnerAccess(
   db: ReturnType<typeof import("@aivo/db").createDb>,
+  tenantId: string,
   userId: string,
   learnerId: string,
   role?: string,
 ): Promise<boolean> {
   if (role === "PLATFORM_ADMIN") return true;
 
-  const isParent = await verifyParentOwnership(db, userId, learnerId);
+  const isParent = await verifyParentOwnership(db, tenantId, userId, learnerId);
   if (isParent) return true;
 
   const caregiver = await db
@@ -58,7 +59,7 @@ export async function registerObservationRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "learnerId required" });
     }
 
-    const hasAccess = await verifyLearnerAccess(db, claims.sub, learnerId, claims.role);
+    const hasAccess = await verifyLearnerAccess(db, claims.tenantId, claims.sub, learnerId, claims.role);
     if (!hasAccess) {
       return reply.status(403).send({ error: "Access denied" });
     }
@@ -89,7 +90,7 @@ export async function registerObservationRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "learnerId and notes required" });
     }
 
-    const hasAccess = await verifyLearnerAccess(db, claims.sub, body.learnerId, claims.role);
+    const hasAccess = await verifyLearnerAccess(db, claims.tenantId, claims.sub, body.learnerId, claims.role);
     if (!hasAccess) {
       return reply.status(403).send({ error: "Access denied" });
     }

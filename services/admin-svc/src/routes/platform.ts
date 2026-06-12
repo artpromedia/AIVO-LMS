@@ -747,6 +747,22 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
     async (req, reply) => proxyToIdentity(req, reply, "/api/admin/tenants"),
   );
   app.get(
+    "/api/admin-svc/tenants/export.csv",
+    {
+      schema: getAdminSvcTenantsSchema,
+      preHandler: (req, reply) => requirePermission(req, reply, Permission.TenantRead),
+    },
+    async (req: any, reply) =>
+      exportIdentityCollection(req, reply, {
+        identityPath: "/api/admin/tenants",
+        key: "tenants",
+        resourceType: "tenants",
+        filename: "tenants.csv",
+        header: ["id", "name", "type", "status", "createdAt", "updatedAt"],
+        mapRow: (row) => [row.id, row.name, row.type, row.status, row.createdAt, row.updatedAt],
+      }),
+  );
+  app.get(
     "/api/admin-svc/tenants/:id",
     {
       schema: getAdminSvcTenantsByIdSchema,

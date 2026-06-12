@@ -20,12 +20,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   getAccessibilityPrefs,
+  getLearnerSensoryProfile,
   getLearner,
   getLessonRun,
   getSubjectById,
   parentCanAccessLearner,
 } from "@/lib/db/repos";
-import { LessonPlayer, type LessonAgentConfig } from "./lesson-player";
+import { toStageFunctioningLevel } from "@aivo/stage-runtime";
+import { getSubjectBySlug } from "@aivo/brand";
+import { LessonPlayer, type LessonAgentConfig } from "./player";
 import { lessonPlayerV2Enabled, tutorAgenticModeEnabled } from "@/lib/feature-flags";
 import { isLiveTutorAgent } from "@/lib/bff/tutor-agent";
 import { agentForSubjectSlug } from "@/lib/bff/agent-pilot";
@@ -62,6 +65,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
     if (active !== learner.id) redirect("/learner/select");
   }
   const a11y = await getAccessibilityPrefs(learner.id, session.tenantId);
+  const sensory = await getLearnerSensoryProfile(learner.id, session.tenantId);
   const lessonSubject = await getSubjectById(lessonRun.subjectId);
   const v2Enabled = lessonPlayerV2Enabled();
 
@@ -70,6 +74,13 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
   // on AND the live tutor-svc path is configured. With either condition
   // false `agent` stays null and the player renders byte-identically to
   // the pre-agent build.
+  // Sprint 15 — the lesson's owning tutor, from the canonical
+  // subject→tutor map in @aivo/brand. Null (unknown subject) renders the
+  // neutral chrome.
+  const tutorSlug = lessonSubject?.slug
+    ? (getSubjectBySlug(lessonSubject.slug)?.tutorKey ?? null)
+    : null;
+
   let agent: LessonAgentConfig | null = null;
   if (isLiveTutorAgent() && (await tutorAgenticModeEnabled())) {
     agent = agentForSubjectSlug(lessonSubject?.slug);
@@ -126,6 +137,8 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
         lessonRunId={lessonRun.id}
         plan={plan}
         accessibility={a11y}
+        sensoryModalities={sensory?.modalities ?? null}
+        functioningLevel={toStageFunctioningLevel(learner.functioningLevel)}
         initialStatus={lessonRun.status}
         v2Enabled={v2Enabled}
         // Treat the lesson-run id as the v2 session correlator when no
@@ -135,6 +148,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
         sessionId={lessonRun.id}
         subjectSlug={lessonSubject?.slug ?? null}
         agent={agent}
+        tutorSlug={tutorSlug}
       />
     </AppShell>
   );

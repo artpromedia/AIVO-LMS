@@ -71,6 +71,7 @@ describe("RefreshLearningPathButton", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "done" })).toBeTruthy());
     expect(fetchFn).toHaveBeenCalledWith("/api/bff/learners/lrn-1/learning-path/generate", {
       method: "POST",
+      headers: {},
     });
   });
 

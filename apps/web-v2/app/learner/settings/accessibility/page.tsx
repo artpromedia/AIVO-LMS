@@ -61,6 +61,7 @@ export default async function LearnerAccessibilitySettingsPage() {
 
       <section className="mt-6 grid gap-4 lg:grid-cols-[1fr,320px]">
         <GlassCard
+          headingAs="h2"
           elevation="raised"
           density="comfortable"
           title={t("card_title")}
@@ -69,7 +70,7 @@ export default async function LearnerAccessibilitySettingsPage() {
           <AccessibilityForm learnerId={learnerId} initial={prefs} />
         </GlassCard>
 
-        <aside className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <ReassuranceCard
             tone="info"
             title={t("reassure_wcag_title")}
@@ -85,7 +86,7 @@ export default async function LearnerAccessibilitySettingsPage() {
             title={t("reassure_teachers_title")}
             body={t("reassure_teachers_body")}
           />
-        </aside>
+        </div>
       </section>
     </AppShell>
   );

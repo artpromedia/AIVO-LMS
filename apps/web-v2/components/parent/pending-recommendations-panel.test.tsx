@@ -12,6 +12,16 @@ vi.mock("next-intl", () => ({
   useTranslations: (_ns?: string) => stableT,
 }));
 
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+function renderWithQuery(ui: React.ReactElement) {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>);
+}
+
 import {
   PendingRecommendationsPanel,
   type PanelRecommendation,
@@ -51,9 +61,9 @@ afterEach(() => {
 describe("PendingRecommendationsPanel", () => {
   it("renders pending recommendations with the proposed change", async () => {
     stubFetch({
-      "/recommendations": () => ({ data: { pending: [REC], decided: [] } }),
+      "/recommendations": () => ({ ok: true, requestId: "t", data: { pending: [REC], decided: [] } }),
     });
-    render(<PendingRecommendationsPanel learnerId="lrn-1" />);
+    renderWithQuery(<PendingRecommendationsPanel learnerId="lrn-1" />);
     await waitFor(() =>
       expect(screen.getByText("Raise delivery level — sustained mastery")).toBeTruthy(),
     );
@@ -62,17 +72,17 @@ describe("PendingRecommendationsPanel", () => {
   });
 
   it("renders the empty state", async () => {
-    stubFetch({ "/recommendations": () => ({ data: { pending: [], decided: [] } }) });
-    render(<PendingRecommendationsPanel learnerId="lrn-1" />);
+    stubFetch({ "/recommendations": () => ({ ok: true, requestId: "t", data: { pending: [], decided: [] } }) });
+    renderWithQuery(<PendingRecommendationsPanel learnerId="lrn-1" />);
     await waitFor(() => expect(screen.getByText("empty")).toBeTruthy());
   });
 
   it("approve posts to the respond route and renders applied inline", async () => {
     const fn = stubFetch({
-      "/respond": () => ({ data: { recommendation: { ...REC, status: "APPLIED" } } }),
-      "/recommendations": () => ({ data: { pending: [REC], decided: [] } }),
+      "/respond": () => ({ ok: true, requestId: "t", data: { recommendation: { ...REC, status: "APPLIED" } } }),
+      "/recommendations": () => ({ ok: true, requestId: "t", data: { pending: [REC], decided: [] } }),
     });
-    render(<PendingRecommendationsPanel learnerId="lrn-1" />);
+    renderWithQuery(<PendingRecommendationsPanel learnerId="lrn-1" />);
     await waitFor(() => expect(screen.getByRole("button", { name: "approve" })).toBeTruthy());
     fireEvent.click(screen.getByRole("button", { name: "approve" }));
     await waitFor(() => expect(screen.getByTestId("decided-card")).toBeTruthy());
@@ -90,10 +100,10 @@ describe("PendingRecommendationsPanel", () => {
 
   it("decline requires a reason before posting", async () => {
     stubFetch({
-      "/respond": () => ({ data: { recommendation: { ...REC, status: "DECLINED" } } }),
-      "/recommendations": () => ({ data: { pending: [REC], decided: [] } }),
+      "/respond": () => ({ ok: true, requestId: "t", data: { recommendation: { ...REC, status: "DECLINED" } } }),
+      "/recommendations": () => ({ ok: true, requestId: "t", data: { pending: [REC], decided: [] } }),
     });
-    render(<PendingRecommendationsPanel learnerId="lrn-1" />);
+    renderWithQuery(<PendingRecommendationsPanel learnerId="lrn-1" />);
     await waitFor(() => expect(screen.getByRole("button", { name: "decline" })).toBeTruthy());
     fireEvent.click(screen.getByRole("button", { name: "decline" }));
     const confirm = screen.getByRole("button", { name: "confirm_decline" });
@@ -113,7 +123,7 @@ describe("PendingRecommendationsPanel", () => {
         throw new Error("boom");
       }) as unknown as typeof fetch,
     );
-    render(<PendingRecommendationsPanel learnerId="lrn-1" />);
+    renderWithQuery(<PendingRecommendationsPanel learnerId="lrn-1" />);
     await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
   });
 });

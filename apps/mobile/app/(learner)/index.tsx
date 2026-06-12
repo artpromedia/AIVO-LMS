@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, RefreshControl } from "react-native";
+import { Image, View, Text, ScrollView, Pressable, StyleSheet, RefreshControl } from "react-native";
 import { router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,12 +18,14 @@ import { Card, HeaderUserChip, SensoryToggle, DarkCapsuleNav } from "@/component
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, gridColumns, pickBySizeClass } from "@/src/design/responsive";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
-import { ProgressRing, Sparkline, BarMini } from "@aivo/mobile-ui";
+import { ProgressRing, Sparkline, BarMini, SkeletonRows } from "@aivo/mobile-ui";
+import { getTutorArt } from "@/src/lib/tutor-art";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export default function LearnerWorldMap() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
-  const { data: engagement, refetch } = useEngagement(user?.id || "");
+  const { data: engagement, refetch, isPending: engagementPending } = useEngagement(user?.id || "");
   const { data: trend } = useEngagementTrend(user?.id || "");
   const { subjects: masterySubjects } = useLearnerMastery(user?.id || "", 4);
   const { t } = useTranslation();
@@ -32,6 +34,7 @@ export default function LearnerWorldMap() {
   const palette = useSensoryPalette();
   const type = useResponsiveType();
 
+  const reduceMotion = useReducedMotion();
   const domainTutors = Object.entries(TUTORS);
 
   const cols = gridColumns(sizeClass);
@@ -93,6 +96,9 @@ export default function LearnerWorldMap() {
         }
       >
         <View style={{ width: contentWidth }}>
+          {engagementPending && !engagement ? (
+            <SkeletonRows variant="hero" reduceMotion={reduceMotion} />
+          ) : null}
           {/* Header — chip + sensory toggle */}
           <View style={styles.header}>
             <HeaderUserChip
@@ -275,7 +281,16 @@ export default function LearnerWorldMap() {
                       <Ionicons name="lock-closed" size={11} color="#FFF" />
                     </View>
                   )}
-                  <Text style={styles.worldIcon}>{tutor.icon}</Text>
+                  {getTutorArt(key) ? (
+                    <Image
+                      source={getTutorArt(key)!}
+                      style={styles.worldArt}
+                      accessibilityElementsHidden
+                      importantForAccessibility="no-hide-descendants"
+                    />
+                  ) : (
+                    <Text style={styles.worldIcon}>{tutor.icon}</Text>
+                  )}
                   <Text style={[styles.worldName, { color: palette.ink }]}>{tutor.name}</Text>
                   <Text style={[styles.worldDomain, { color: palette.inkMuted }]} numberOfLines={1}>
                     {tutor.domain}
@@ -557,6 +572,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   worldIcon: { fontSize: 32, marginBottom: 6 },
+  worldArt: { width: 56, height: 56, borderRadius: 16, marginBottom: 4 },
   worldName: { fontFamily: fontFamilies.bodyBold, fontSize: 13 },
   worldDomain: {
     fontFamily: fontFamilies.bodyRegular,

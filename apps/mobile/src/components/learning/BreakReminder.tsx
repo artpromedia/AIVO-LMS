@@ -8,6 +8,7 @@
  */
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useA11yPreferences } from "@/lib/preferences";
 import { useA11yStyle } from "@/lib/a11y-style";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
@@ -17,6 +18,7 @@ import { spacing, radius } from "@/constants/colors";
 export function BreakReminder() {
   const { prefs } = useA11yPreferences();
   const { announce, bodyFontFamily } = useA11yStyle();
+  const reducedMotion = useReducedMotion();
   const { t } = useTranslation();
   const palette = useSensoryPalette();
   const [open, setOpen] = useState(false);
@@ -32,7 +34,12 @@ export function BreakReminder() {
   }, [prefs.breakReminders, prefs.breakIntervalMinutes, announce, t]);
 
   return (
-    <Modal transparent visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
+    <Modal
+      transparent
+      visible={open}
+      animationType={reducedMotion ? "none" : "fade"}
+      onRequestClose={() => setOpen(false)}
+    >
       <View style={styles.backdrop}>
         <View
           accessibilityRole="alert"

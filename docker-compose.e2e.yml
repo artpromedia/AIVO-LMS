@@ -46,6 +46,71 @@ services:
     volumes:
       - jwt-keys:/keys
 
+  # Sprint 14 — one-shot initializer for the non-bypassing RLS runtime
+  # role. Migration 0106 creates `app_runtime` (no password — secrets never
+  # live in migrations); this job sets the password from env so services
+  # can log in as it. Idempotent and order-safe: it also creates the role
+  # when the harness is booted before host-side `db:migrate` has run.
+  app-runtime-init:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: aivo
+      APP_RUNTIME_PASSWORD: ${APP_RUNTIME_PASSWORD:-e2e-app-runtime-pw}
+    # Escaping note: compose collapses `$$$$` → `$$` (the psql dollar-quote,
+    # protected from the shell by the quoted heredoc) and `$$VAR` → `$VAR`
+    # (expanded by the container shell, not the host).
+    command:
+      - sh
+      - -c
+      - |
+        psql -h postgres -U aivo -d aivo_e2e -v ON_ERROR_STOP=1 <<'SQL'
+        DO $$$$
+        BEGIN
+          IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_runtime') THEN
+            CREATE ROLE app_runtime LOGIN;
+          END IF;
+        END
+        $$$$;
+        SQL
+        psql -h postgres -U aivo -d aivo_e2e -v ON_ERROR_STOP=1 -c "ALTER ROLE app_runtime PASSWORD '$$APP_RUNTIME_PASSWORD';"
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  # Sprint 14 — the RLS reference adoption: family-svc connects as
+  # app_runtime (no BYPASSRLS), so every read of users/learners/schools/
+  # classrooms runs behind the 0106 policies via withTenantContext.
+  family-svc:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: family-svc
+    environment:
+      NODE_ENV: test
+      PORT: "3007"
+      FAMILY_PORT: "3007"
+      DATABASE_URL: postgresql://app_runtime:${APP_RUNTIME_PASSWORD:-e2e-app-runtime-pw}@postgres:5432/aivo_e2e
+      JWT_KEY_DIR: /keys
+      INTERNAL_SERVICE_KEY: aivo-internal-dev-key
+    depends_on:
+      postgres: { condition: service_healthy }
+      app-runtime-init: { condition: service_completed_successfully }
+      jwt-keygen: { condition: service_completed_successfully }
+    volumes:
+      - jwt-keys:/keys:ro
+    ports:
+      - "3007:3007"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3007/health',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
   identity-svc:
     build:
       context: .

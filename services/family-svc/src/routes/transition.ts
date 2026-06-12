@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 import { transitionPlans } from "@aivo/db";
 import { eq } from "drizzle-orm";
 import { transitionByLearnerIdSchema, getTransitionByLearnerIdSchema } from "./schemas.js";
@@ -15,7 +16,7 @@ export async function registerTransitionRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = req.params as any;
-      const isOwner = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isOwner = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isOwner && claims.role !== "admin") {
         return reply.status(403).send({ error: "Not authorized for this learner" });
       }
@@ -43,6 +44,14 @@ export async function registerTransitionRoutes(app: FastifyInstance) {
             updatedAt: new Date(),
           })
           .where(eq(transitionPlans.learnerId, learnerId));
+        await emitFamilyAudit({
+          db,
+          request: req,
+          eventType: "TRANSITION_PLAN_UPDATED",
+          tenantId: claims.tenantId || null,
+          learnerId,
+          details: { mode: "updated" },
+        });
         return { status: "updated", learnerId };
       }
 
@@ -62,6 +71,15 @@ export async function registerTransitionRoutes(app: FastifyInstance) {
         })
         .returning();
 
+      await emitFamilyAudit({
+        db,
+        request: req,
+        eventType: "TRANSITION_PLAN_UPDATED",
+        tenantId: claims.tenantId || null,
+        learnerId,
+        resourceId: plan.id,
+        details: { mode: "created" },
+      });
       return { status: "created", plan };
     },
   );
@@ -74,7 +92,7 @@ export async function registerTransitionRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = req.params as any;
-      const isOwner = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isOwner = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isOwner && claims.role !== "admin") {
         return reply.status(403).send({ error: "Not authorized for this learner" });
       }

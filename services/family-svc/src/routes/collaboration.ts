@@ -15,8 +15,12 @@ import {
   classrooms,
   classroomEnrollments,
   schools,
+  withTenantContext,
+  withoutTenantContext,
+  type TenantTransaction,
 } from "@aivo/db";
-import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { type AuthUser, authenticateRequest, isUuid, verifyParentOwnership } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 import {
   getCollaborationByLearnerIdMembersSchema,
   collaborationByLearnerIdInviteTeacherSchema,
@@ -180,24 +184,29 @@ async function sendTeacherParentInviteEmail(
 // can be personalised. Returns sane fallbacks if either lookup misses.
 async function loadInviteContext(
   db: ReturnType<typeof import("@aivo/db").createDb>,
+  tenantId: string,
   inviterId: string,
   learnerId: string,
 ): Promise<{ inviterName: string; learnerName: string }> {
   try {
-    const [inviter] = await db
-      .select({ name: users.name })
-      .from(users)
-      .where(eq(users.id, inviterId))
-      .limit(1);
-    const [learner] = await db
-      .select({ name: learners.name })
-      .from(learners)
-      .where(eq(learners.id, learnerId))
-      .limit(1);
-    return {
-      inviterName: inviter?.name || "A parent",
-      learnerName: learner?.name || "their child",
-    };
+    // Sprint 14 (RLS): inviter is the learner's parent, so both rows live
+    // in the caller's tenant — a plain tenant context covers the reads.
+    return await withTenantContext(db, tenantId, async (tx) => {
+      const [inviter] = await tx
+        .select({ name: users.name })
+        .from(users)
+        .where(eq(users.id, inviterId))
+        .limit(1);
+      const [learner] = await tx
+        .select({ name: learners.name })
+        .from(learners)
+        .where(eq(learners.id, learnerId))
+        .limit(1);
+      return {
+        inviterName: inviter?.name || "A parent",
+        learnerName: learner?.name || "their child",
+      };
+    });
   } catch {
     return { inviterName: "A parent", learnerName: "their child" };
   }
@@ -212,12 +221,25 @@ async function findExistingUser(
   emailLower: string,
 ): Promise<{ id: string } | null> {
   try {
-    const [u] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, emailLower))
-      .limit(1);
-    return u ?? null;
+    // Sprint 14 (RLS): looking up an invitee's account by email is
+    // cross-tenant BY DESIGN (a family can invite a school-tenant
+    // teacher). On the app_runtime role the users policy hides foreign
+    // rows, so this returns null and the invite simply follows the
+    // standard pending flow instead of auto-accepting — graceful, and
+    // recorded loudly via withoutTenantContext until a platform
+    // email-lookup policy ships (docs/security/rls-rollout.md).
+    return await withoutTenantContext(
+      db,
+      "invite auto-accept: cross-tenant user lookup by email",
+      async (tx) => {
+        const [u] = await tx
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.email, emailLower))
+          .limit(1);
+        return u ?? null;
+      },
+    );
   } catch {
     return null;
   }
@@ -258,6 +280,21 @@ interface InsightBody {
 }
 
 export async function registerCollaborationRoutes(app: FastifyInstance) {
+  /**
+   * Sprint 14 (RLS): run a read/write batch in the caller's tenant
+   * context, with app.user_id set so the learners_collaboration_read
+   * policy also surfaces cross-tenant learners linked to this user via
+   * an ACCEPTED team membership. Platform-staff tokens carry no tenant
+   * uuid — their access runs explicitly unscoped (zero RLS rows on
+   * app_runtime; unchanged on owner-role deployments).
+   */
+  const scoped = <T>(claims: AuthUser, fn: (tx: TenantTransaction) => Promise<T>): Promise<T> =>
+    isUuid(claims.tenantId)
+      ? withTenantContext(db, claims.tenantId, fn, {
+          userId: isUuid(claims.sub) ? claims.sub : undefined,
+        })
+      : withoutTenantContext(db, `platform-scoped caller (${claims.role})`, fn);
+
   const db = (app as unknown as { db: ReturnType<typeof import("@aivo/db").createDb> }).db;
 
   app.get(
@@ -268,7 +305,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -307,7 +344,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent) return reply.code(403).send({ error: "Only parents can invite team members" });
 
       const rl = checkInviteRateLimit(claims.sub);
@@ -343,7 +380,9 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: "B2C plan allows 1 teacher slot. Upgrade for more." });
       }
 
-      const learnerRows = await db.select().from(learners).where(eq(learners.id, learnerId));
+      const learnerRows = await scoped(claims, (tx) =>
+        tx.select().from(learners).where(eq(learners.id, learnerId)),
+      );
       if (learnerRows.length === 0) return reply.code(404).send({ error: "Learner not found" });
       const tenantId = learnerRows[0].tenantId;
 
@@ -363,7 +402,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         })
         .returning();
 
-      const ctx = await loadInviteContext(db, claims.sub, learnerId);
+      const ctx = await loadInviteContext(db, claims.tenantId, claims.sub, learnerId);
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "CAREGIVER_INVITED",
+        tenantId,
+        learnerId,
+        resourceId: record.id,
+        details: { role: "teacher", autoAccept },
+      });
       void sendTeamInviteEmail(app, { to: normalizedEmail, role: "teacher", ...ctx });
 
       return reply.code(201).send(record);
@@ -378,7 +426,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent) return reply.code(403).send({ error: "Only parents can invite team members" });
 
       const rl = checkInviteRateLimit(claims.sub);
@@ -414,7 +462,9 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: "Maximum 2 caregivers allowed" });
       }
 
-      const learnerRows = await db.select().from(learners).where(eq(learners.id, learnerId));
+      const learnerRows = await scoped(claims, (tx) =>
+        tx.select().from(learners).where(eq(learners.id, learnerId)),
+      );
       if (learnerRows.length === 0) return reply.code(404).send({ error: "Learner not found" });
       const tenantId = learnerRows[0].tenantId;
 
@@ -435,7 +485,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         })
         .returning();
 
-      const ctx = await loadInviteContext(db, claims.sub, learnerId);
+      const ctx = await loadInviteContext(db, claims.tenantId, claims.sub, learnerId);
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "CAREGIVER_INVITED",
+        tenantId,
+        learnerId,
+        resourceId: record.id,
+        details: { role: "caregiver", autoAccept },
+      });
       void sendTeamInviteEmail(app, {
         to: normalizedEmail,
         role: body.relationship || "co-parent / caregiver",
@@ -454,7 +513,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent) return reply.code(403).send({ error: "Only parents can invite team members" });
 
       const rl = checkInviteRateLimit(claims.sub);
@@ -490,7 +549,9 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: "Maximum 1 therapist allowed per learner" });
       }
 
-      const learnerRows = await db.select().from(learners).where(eq(learners.id, learnerId));
+      const learnerRows = await scoped(claims, (tx) =>
+        tx.select().from(learners).where(eq(learners.id, learnerId)),
+      );
       if (learnerRows.length === 0) return reply.code(404).send({ error: "Learner not found" });
       const tenantId = learnerRows[0].tenantId;
 
@@ -512,7 +573,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         })
         .returning();
 
-      const ctx = await loadInviteContext(db, claims.sub, learnerId);
+      const ctx = await loadInviteContext(db, claims.tenantId, claims.sub, learnerId);
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "CAREGIVER_INVITED",
+        tenantId,
+        learnerId,
+        resourceId: record.id,
+        details: { role: "therapist", autoAccept },
+      });
       void sendTeamInviteEmail(app, {
         to: normalizedEmail,
         role: body.specialty || "therapist",
@@ -531,7 +601,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId, memberId } = request.params as MemberParams;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent) return reply.code(403).send({ error: "Only parents can remove team members" });
 
       const { memberType } = request.query as MemberTypeQuery;
@@ -558,6 +628,15 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
           .send({ error: "memberType query param required (teacher|caregiver|therapist)" });
       }
 
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "TEAM_MEMBER_REMOVED",
+        tenantId: claims.tenantId || null,
+        learnerId,
+        resourceId: memberId,
+        details: { memberType },
+      });
       return { status: "removed" };
     },
   );
@@ -574,7 +653,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       // Track which relationship authorized the insight so the brain
       // builder (Sprint 4) can weight a perspective by its author's role.
       let authorRole = "parent";
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent) {
         const teacherMatch = await db
           .select()
@@ -632,11 +711,9 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       // Stamp the tenant from the learner row so the insight is tenant-scoped
       // (Sprint 2) — the learner already passed the ownership/member check.
-      const [learnerRow] = await db
-        .select({ tenantId: learners.tenantId })
-        .from(learners)
-        .where(eq(learners.id, learnerId))
-        .limit(1);
+      const [learnerRow] = await scoped(claims, (tx) =>
+        tx.select({ tenantId: learners.tenantId }).from(learners).where(eq(learners.id, learnerId)).limit(1),
+      );
 
       const [record] = await db
         .insert(brainInsights)
@@ -651,6 +728,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         })
         .returning();
 
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "TEACHER_INSIGHT_SUBMITTED",
+        tenantId: learnerRow?.tenantId ?? null,
+        learnerId,
+        resourceId: record.id,
+        details: { authorRole, domain: body.domain || null },
+      });
+
       return reply.code(201).send(record);
     },
   );
@@ -664,7 +751,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       const { learnerId } = request.params as LearnerId;
 
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       const teacherMatch = await db
         .select()
         .from(learnerTeachers)
@@ -706,7 +793,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       const { learnerId } = request.params as LearnerId;
 
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       const caregiverMatch = await db
         .select()
         .from(learnerCaregivers)
@@ -759,7 +846,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       const { learnerId } = request.params as LearnerId;
 
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       const therapistMatch = await db
         .select()
         .from(learnerTherapists)
@@ -860,8 +947,11 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       }
 
       const results: ConnectedLearnerDto[] = [];
+      const learnerRowsById = await scoped(claims, (tx) =>
+        tx.select().from(learners).where(inArray(learners.id, Array.from(learnerIds))),
+      );
       for (const lid of learnerIds) {
-        const [learner] = await db.select().from(learners).where(eq(learners.id, lid));
+        const learner = learnerRowsById.find((l) => l.id === lid);
         if (learner) {
           results.push({
             id: learner.id,
@@ -973,20 +1063,22 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
             .where(eq(teacherParentInvites.id, row.id));
           continue;
         }
-        const [learnerRow] = await db
-          .select({
-            id: learners.id,
-            parentId: learners.parentId,
-            tenantId: learners.tenantId,
-          })
-          .from(learners)
-          .where(eq(learners.id, row.learnerId))
-          .limit(1);
+        const [learnerRow] = await scoped(claims, (tx) =>
+          tx
+            .select({
+              id: learners.id,
+              parentId: learners.parentId,
+              tenantId: learners.tenantId,
+            })
+            .from(learners)
+            .where(eq(learners.id, row.learnerId))
+            .limit(1),
+        );
         if (!learnerRow) {
-          await db
-            .update(teacherParentInvites)
-            .set({ status: "REVOKED", revokedAt: now })
-            .where(eq(teacherParentInvites.id, row.id));
+          // Sprint 14 (RLS): a learner row that isn't visible here is
+          // indistinguishable from a deleted one, so leave the invite
+          // PENDING (fail-safe) rather than auto-revoking — the learner's
+          // actual parent can still accept it.
           continue;
         }
         if (learnerRow.parentId !== claims.sub) {
@@ -999,28 +1091,35 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         // enrolled, record the classroom on the new learner_teachers row.
         let classroomId: string | null = row.classroomId ?? null;
         if (!classroomId) {
-          const [match] = await db
-            .select({ id: classrooms.id })
-            .from(classrooms)
-            .innerJoin(
-              classroomEnrollments,
-              and(
-                eq(classroomEnrollments.classroomId, classrooms.id),
-                eq(classroomEnrollments.learnerId, row.learnerId),
-                isNull(classroomEnrollments.removedAt),
-              ),
-            )
-            .where(eq(classrooms.teacherId, row.teacherUserId))
-            .limit(1);
-          classroomId = match?.id ?? null;
+          classroomId = await withoutTenantContext(
+            db,
+            "accept-invite classroom backfill: teacher-tenant read from parent context",
+            async (tx) => {
+              const [match] = await tx
+                .select({ id: classrooms.id })
+                .from(classrooms)
+                .innerJoin(
+                  classroomEnrollments,
+                  and(
+                    eq(classroomEnrollments.classroomId, classrooms.id),
+                    eq(classroomEnrollments.learnerId, row.learnerId),
+                    isNull(classroomEnrollments.removedAt),
+                  ),
+                )
+                .where(eq(classrooms.teacherId, row.teacherUserId))
+                .limit(1);
+              return match?.id ?? null;
+            },
+          );
         }
 
         // Look up the teacher's email to seed learner_teachers.
-        const [teacherUser] = await db
-          .select({ email: users.email })
-          .from(users)
-          .where(eq(users.id, row.teacherUserId))
-          .limit(1);
+        const [teacherUser] = await withoutTenantContext(
+          db,
+          "accept-invite teacher email seed: teacher-tenant read from parent context",
+          (tx) =>
+            tx.select({ email: users.email }).from(users).where(eq(users.id, row.teacherUserId)).limit(1),
+        );
 
         const [existingLink] = await db
           .select({ id: learnerTeachers.id, status: learnerTeachers.status })
@@ -1062,6 +1161,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         accepted.push({ role: "teacher_parent", learnerId: row.learnerId });
       }
 
+      if (accepted.length > 0) {
+        await emitFamilyAudit({
+          db,
+          request,
+          eventType: "TEAM_INVITE_ACCEPTED",
+          tenantId: claims.tenantId || null,
+          learnerId: accepted[0].learnerId,
+          details: { accepted },
+        });
+      }
       return { accepted, count: accepted.length };
     },
   );
@@ -1158,7 +1267,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         const [row] = await db.select().from(table).where(eq(table.id, id)).limit(1);
         if (!row) return reply.code(404).send({ error: "Invite not found" });
 
-        const isParent = await verifyParentOwnership(db, claims.sub, row.learnerId);
+        const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, row.learnerId);
         if (!isParent && claims.role !== "PLATFORM_ADMIN") {
           return reply.code(403).send({ error: "Not authorized to resend this invite" });
         }
@@ -1177,7 +1286,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
             : kind === "caregiver"
               ? (row as any).caregiverEmail
               : (row as any).therapistEmail;
-        const ctx = await loadInviteContext(db, claims.sub, row.learnerId);
+        const ctx = await loadInviteContext(db, claims.tenantId, claims.sub, row.learnerId);
         void sendTeamInviteEmail(app, {
           to: inviteEmail,
           role: kind,
@@ -1211,25 +1320,28 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
           .set({ tokenHash, expiresAt, status: "PENDING" })
           .where(eq(teacherParentInvites.id, id));
 
-        const [learner] = await db
-          .select({ name: learners.name, schoolId: learners.schoolId })
-          .from(learners)
-          .where(eq(learners.id, row.learnerId))
-          .limit(1);
-        const [teacher] = await db
-          .select({ name: users.name })
-          .from(users)
-          .where(eq(users.id, row.teacherUserId))
-          .limit(1);
-        let schoolName: string | undefined;
-        if (learner?.schoolId) {
-          const [s] = await db
-            .select({ name: schools.name })
-            .from(schools)
-            .where(eq(schools.id, learner.schoolId))
+        const { learner, teacher, schoolName } = await scoped(claims, async (tx) => {
+          const [l] = await tx
+            .select({ name: learners.name, schoolId: learners.schoolId })
+            .from(learners)
+            .where(eq(learners.id, row.learnerId))
             .limit(1);
-          schoolName = s?.name;
-        }
+          const [t] = await tx
+            .select({ name: users.name })
+            .from(users)
+            .where(eq(users.id, row.teacherUserId))
+            .limit(1);
+          let sn: string | undefined;
+          if (l?.schoolId) {
+            const [sc] = await tx
+              .select({ name: schools.name })
+              .from(schools)
+              .where(eq(schools.id, l.schoolId))
+              .limit(1);
+            sn = sc?.name;
+          }
+          return { learner: l, teacher: t, schoolName: sn };
+        });
         void sendTeacherParentInviteEmail(app, {
           to: row.parentEmail,
           teacherName: teacher?.name || "Your child's teacher",
@@ -1264,7 +1376,7 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
               : learnerTherapists;
         const [row] = await db.select().from(table).where(eq(table.id, id)).limit(1);
         if (!row) return reply.code(404).send({ error: "Invite not found" });
-        const isParent = await verifyParentOwnership(db, claims.sub, row.learnerId);
+        const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, row.learnerId);
         if (!isParent && claims.role !== "PLATFORM_ADMIN") {
           return reply.code(403).send({ error: "Not authorized to revoke this invite" });
         }
@@ -1355,17 +1467,19 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
           });
       }
 
-      const [learner] = await db
-        .select({
-          id: learners.id,
-          name: learners.name,
-          tenantId: learners.tenantId,
-          parentId: learners.parentId,
-          schoolId: learners.schoolId,
-        })
-        .from(learners)
-        .where(eq(learners.id, learnerId))
-        .limit(1);
+      const [learner] = await scoped(claims, (tx) =>
+        tx
+          .select({
+            id: learners.id,
+            name: learners.name,
+            tenantId: learners.tenantId,
+            parentId: learners.parentId,
+            schoolId: learners.schoolId,
+          })
+          .from(learners)
+          .where(eq(learners.id, learnerId))
+          .limit(1),
+      );
       if (!learner) return reply.code(404).send({ error: "Learner not found" });
 
       // Authorize. TEACHER must be linked to the learner via a classroom
@@ -1381,19 +1495,21 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       let classroomId: string | null = null;
       if (role === "TEACHER") {
-        const [enrolledClassroom] = await db
-          .select({ id: classrooms.id })
-          .from(classrooms)
-          .innerJoin(
-            classroomEnrollments,
-            and(
-              eq(classroomEnrollments.classroomId, classrooms.id),
-              eq(classroomEnrollments.learnerId, learnerId),
-              isNull(classroomEnrollments.removedAt),
-            ),
-          )
-          .where(eq(classrooms.teacherId, teacherUserId))
-          .limit(1);
+        const [enrolledClassroom] = await scoped(claims, (tx) =>
+          tx
+            .select({ id: classrooms.id })
+            .from(classrooms)
+            .innerJoin(
+              classroomEnrollments,
+              and(
+                eq(classroomEnrollments.classroomId, classrooms.id),
+                eq(classroomEnrollments.learnerId, learnerId),
+                isNull(classroomEnrollments.removedAt),
+              ),
+            )
+            .where(eq(classrooms.teacherId, teacherUserId))
+            .limit(1),
+        );
         if (enrolledClassroom) {
           classroomId = enrolledClassroom.id;
         } else {
@@ -1459,20 +1575,23 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         .returning();
 
       // Resolve teacher + school names for the email.
-      const [teacher] = await db
-        .select({ name: users.name })
-        .from(users)
-        .where(eq(users.id, teacherUserId))
-        .limit(1);
-      let schoolName: string | undefined;
-      if (learner.schoolId) {
-        const [school] = await db
-          .select({ name: schools.name })
-          .from(schools)
-          .where(eq(schools.id, learner.schoolId))
+      const { teacher, schoolName } = await scoped(claims, async (tx) => {
+        const [t] = await tx
+          .select({ name: users.name })
+          .from(users)
+          .where(eq(users.id, teacherUserId))
           .limit(1);
-        schoolName = school?.name;
-      }
+        let sn: string | undefined;
+        if (learner.schoolId) {
+          const [school] = await tx
+            .select({ name: schools.name })
+            .from(schools)
+            .where(eq(schools.id, learner.schoolId))
+            .limit(1);
+          sn = school?.name;
+        }
+        return { teacher: t, schoolName: sn };
+      });
 
       void sendTeacherParentInviteEmail(app, {
         to: parentEmail,
@@ -1533,25 +1652,28 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         .set({ tokenHash, expiresAt, status: "PENDING" })
         .where(eq(teacherParentInvites.id, id));
 
-      const [learner] = await db
-        .select({ name: learners.name, schoolId: learners.schoolId })
-        .from(learners)
-        .where(eq(learners.id, invite.learnerId))
-        .limit(1);
-      const [teacher] = await db
-        .select({ name: users.name })
-        .from(users)
-        .where(eq(users.id, invite.teacherUserId))
-        .limit(1);
-      let schoolName: string | undefined;
-      if (learner?.schoolId) {
-        const [s] = await db
-          .select({ name: schools.name })
-          .from(schools)
-          .where(eq(schools.id, learner.schoolId))
+      const { learner, teacher, schoolName } = await scoped(claims, async (tx) => {
+        const [l] = await tx
+          .select({ name: learners.name, schoolId: learners.schoolId })
+          .from(learners)
+          .where(eq(learners.id, invite.learnerId))
           .limit(1);
-        schoolName = s?.name;
-      }
+        const [t] = await tx
+          .select({ name: users.name })
+          .from(users)
+          .where(eq(users.id, invite.teacherUserId))
+          .limit(1);
+        let sn: string | undefined;
+        if (l?.schoolId) {
+          const [sc] = await tx
+            .select({ name: schools.name })
+            .from(schools)
+            .where(eq(schools.id, l.schoolId))
+            .limit(1);
+          sn = sc?.name;
+        }
+        return { learner: l, teacher: t, schoolName: sn };
+      });
 
       void sendTeacherParentInviteEmail(app, {
         to: invite.parentEmail,
@@ -1560,6 +1682,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         childName: learner?.name || "your child",
         notes: invite.notes,
         token: rawToken,
+      });
+
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "TEAM_INVITE_RESENT",
+        tenantId: claims.tenantId || null,
+        learnerId: invite.learnerId,
+        resourceId: id,
+        details: { kind: "teacher_parent" },
       });
 
       return { success: true, expiresAt };
@@ -1594,6 +1726,15 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         .update(teacherParentInvites)
         .set({ status: "REVOKED", revokedAt: new Date() })
         .where(eq(teacherParentInvites.id, id));
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "TEAM_INVITE_REVOKED",
+        tenantId: claims.tenantId || null,
+        learnerId: invite.learnerId,
+        resourceId: id,
+        details: { kind: "teacher_parent" },
+      });
       return { success: true };
     },
   );
@@ -1644,18 +1785,20 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
     const teacherUserId = claims.sub;
 
     // Classroom path.
-    const classroomRows = await db
-      .select({
-        learnerId: classroomEnrollments.learnerId,
-        classroomId: classrooms.id,
-        classroomName: classrooms.name,
-        gradeLevel: classrooms.gradeLevel,
-        subject: classrooms.subject,
-        schoolId: classrooms.schoolId,
-      })
-      .from(classroomEnrollments)
-      .innerJoin(classrooms, eq(classroomEnrollments.classroomId, classrooms.id))
-      .where(and(eq(classrooms.teacherId, teacherUserId), isNull(classroomEnrollments.removedAt)));
+    const classroomRows = await scoped(claims, (tx) =>
+      tx
+        .select({
+          learnerId: classroomEnrollments.learnerId,
+          classroomId: classrooms.id,
+          classroomName: classrooms.name,
+          gradeLevel: classrooms.gradeLevel,
+          subject: classrooms.subject,
+          schoolId: classrooms.schoolId,
+        })
+        .from(classroomEnrollments)
+        .innerJoin(classrooms, eq(classroomEnrollments.classroomId, classrooms.id))
+        .where(and(eq(classrooms.teacherId, teacherUserId), isNull(classroomEnrollments.removedAt))),
+    );
 
     // Parent-invite path.
     const inviteRows = await db
@@ -1709,24 +1852,30 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
     // Hydrate learner + parent display info in one query.
     const learnerIds = Array.from(merged.keys());
-    const learnerRows = await db
-      .select({
-        id: learners.id,
-        name: learners.name,
-        gradeLevel: learners.gradeLevel,
-        functioningLevel: learners.functioningLevel,
-        parentId: learners.parentId,
-      })
-      .from(learners)
-      .where(inArray(learners.id, learnerIds));
-    const parentIds = Array.from(new Set(learnerRows.map((l) => l.parentId).filter(Boolean)));
-    const parentRows =
-      parentIds.length > 0
-        ? await db
-            .select({ id: users.id, name: users.name, email: users.email })
-            .from(users)
-            .where(inArray(users.id, parentIds as string[]))
-        : [];
+    // Cross-tenant parent rows (B2C families linked by invite) are not
+    // user-policy-visible on app_runtime — their display fields fall back
+    // to null below, which the roster UI already tolerates.
+    const { learnerRows, parentRows } = await scoped(claims, async (tx) => {
+      const lr = await tx
+        .select({
+          id: learners.id,
+          name: learners.name,
+          gradeLevel: learners.gradeLevel,
+          functioningLevel: learners.functioningLevel,
+          parentId: learners.parentId,
+        })
+        .from(learners)
+        .where(inArray(learners.id, learnerIds));
+      const parentIds = Array.from(new Set(lr.map((l) => l.parentId).filter(Boolean)));
+      const pr =
+        parentIds.length > 0
+          ? await tx
+              .select({ id: users.id, name: users.name, email: users.email })
+              .from(users)
+              .where(inArray(users.id, parentIds as string[]))
+          : [];
+      return { learnerRows: lr, parentRows: pr };
+    });
     const parentById = new Map(parentRows.map((p) => [p.id, p]));
 
     return learnerRows.map((l) => {

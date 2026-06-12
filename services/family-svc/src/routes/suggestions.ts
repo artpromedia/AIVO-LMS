@@ -47,12 +47,13 @@ export function contributorRoleFromClaims(role: string | undefined): Contributor
 
 async function verifyContributorAccess(
   db: ReturnType<typeof import("@aivo/db").createDb>,
+  tenantId: string,
   userId: string,
   learnerId: string,
   role?: string,
 ): Promise<boolean> {
   if (role === "PLATFORM_ADMIN") return true;
-  if (await verifyParentOwnership(db, userId, learnerId)) return true;
+  if (await verifyParentOwnership(db, tenantId, userId, learnerId)) return true;
   const accepted = await db
     .select()
     .from(learnerCaregivers)
@@ -85,7 +86,7 @@ export async function registerSuggestionRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "learnerId, title and rationale are required" });
     }
 
-    const hasAccess = await verifyContributorAccess(db, claims.sub, body.learnerId, claims.role);
+    const hasAccess = await verifyContributorAccess(db, claims.tenantId, claims.sub, body.learnerId, claims.role);
     if (!hasAccess) {
       // Non-roster teacher / non-accepted caregiver cannot suggest.
       return reply.status(403).send({ error: "Access denied" });

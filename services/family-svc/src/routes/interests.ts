@@ -21,7 +21,8 @@ import {
   type LearnerInterestSignal,
   type LearnerInterestProfile,
 } from "@aivo/special-interest-engine";
-import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { authenticateRequest, runScoped, verifyParentOwnership } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 import {
   getInterestsByLearnerIdSchema,
   interestsByLearnerIdSchema,
@@ -67,7 +68,7 @@ export async function registerInterestRoutes(app: FastifyInstance) {
       const auth = await authenticateRequest(req, reply);
       if (!auth) return;
       const { learnerId } = req.params as { learnerId: string };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const rows = await db
@@ -116,7 +117,7 @@ export async function registerInterestRoutes(app: FastifyInstance) {
         return reply.code(429).send({ error: "Too many requests" });
       }
       const { learnerId } = req.params as { learnerId: string };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const body = (req.body ?? {}) as {
@@ -152,7 +153,7 @@ export async function registerInterestRoutes(app: FastifyInstance) {
         .values({
           // Pull tenantId via the learner the parent already passed
           // ownership against; verifyParentOwnership has loaded it.
-          tenantId: (await getLearnerTenantId(db, learnerId)) as string,
+          tenantId: (await getLearnerTenantId(db, auth, learnerId)) as string,
           learnerId,
           slug,
           source,
@@ -163,6 +164,16 @@ export async function registerInterestRoutes(app: FastifyInstance) {
           recordedBy: auth.sub,
         })
         .returning();
+
+      await emitFamilyAudit({
+        db,
+        request: req,
+        eventType: "PARENT_INTEREST_ADDED",
+        tenantId: row.tenantId,
+        learnerId,
+        resourceId: row.id,
+        details: { slug: row.slug, source: row.source, polarity: row.polarity },
+      });
 
       return reply.code(201).send({
         id: row.id,
@@ -189,7 +200,7 @@ export async function registerInterestRoutes(app: FastifyInstance) {
         learnerId: string;
         signalId: string;
       };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const result = await db
@@ -203,17 +214,32 @@ export async function registerInterestRoutes(app: FastifyInstance) {
       // drizzle-orm/postgres returns no count by default; we rely on
       // the upstream ownership check to constrain the delete.
       void result;
+
+      await emitFamilyAudit({
+        db,
+        request: req,
+        eventType: "PARENT_INTEREST_REMOVED",
+        tenantId: auth.tenantId || null,
+        learnerId,
+        resourceId: signalId,
+      });
       return reply.code(204).send();
     },
   );
 }
 
-async function getLearnerTenantId(db: any, learnerId: string): Promise<string | null> {
+async function getLearnerTenantId(
+  db: any,
+  claims: { tenantId: string; sub: string; role: string },
+  learnerId: string,
+): Promise<string | null> {
   const { learners } = await import("@aivo/db");
-  const [row] = await db
-    .select({ tenantId: learners.tenantId })
-    .from(learners)
-    .where(eq(learners.id, learnerId))
-    .limit(1);
+  const [row] = await runScoped(db, claims, (tx) =>
+    tx
+      .select({ tenantId: learners.tenantId })
+      .from(learners)
+      .where(eq(learners.id, learnerId))
+      .limit(1),
+  );
   return row?.tenantId ?? null;
 }

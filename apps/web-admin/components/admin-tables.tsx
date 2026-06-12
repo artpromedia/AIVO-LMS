@@ -1,7 +1,6 @@
 import type {
   AdminBillingAccount,
   AdminLearnerSummary,
-  AdminTenantSummary,
   AdminUserSummary,
 } from "@aivo/admin-api/types";
 import type {
@@ -240,40 +239,6 @@ export function LearnersTable({ learners }: { learners: AdminLearnerSummary[] })
               </tr>
             ))}
             {learners.length === 0 ? <EmptyRow colSpan={5} label="No learners found." /> : null}
-          </tbody>
-        </table>
-      </div>
-    </AdminCard>
-  );
-}
-
-export function TenantsTable({ tenants }: { tenants: AdminTenantSummary[] }) {
-  return (
-    <AdminCard className="mt-6 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Tenant</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tenants.map((tenant) => (
-              <tr key={tenant.id}>
-                <td className="font-bold">
-                  <a className="text-blue-700" href={`/platform/tenants/${tenant.id}`}>
-                    {tenant.name}
-                  </a>
-                </td>
-                <td>{tenant.typeLabel}</td>
-                <td className="text-sm">{tenant.status ?? "—"}</td>
-                <td className="text-sm">{formatDate(tenant.createdAt)}</td>
-              </tr>
-            ))}
-            {tenants.length === 0 ? <EmptyRow colSpan={4} label="No tenants found." /> : null}
           </tbody>
         </table>
       </div>

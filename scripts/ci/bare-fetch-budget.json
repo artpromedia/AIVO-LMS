@@ -1,0 +1,4 @@
+{
+  "_doc": "Ratchet: bare fetch( calls in 'use client' files under apps/web-v2. Only goes down. Sanctioned transports (lib/api/client.ts, lib/offline/outbox.ts) are excluded. Baseline recorded after Sprint 08 migrated the lesson player, messages inbox and parent panels.",
+  "maxBareFetchCalls": 101
+}

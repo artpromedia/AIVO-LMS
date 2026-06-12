@@ -125,7 +125,7 @@ test.describe.serial("core journey", () => {
 
     // ── 4. Baseline: start via the real UI, answer via the real BFF ──────
     await page.goto(`/parent/learners/${learnerId}`, { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("link", { name: "Start baseline assessment" })).toBeVisible({
+    await expect(page.getByRole("link", { name: "Start baseline adventure" })).toBeVisible({
       timeout: 15_000,
     });
     await page.goto(`/parent/learners/${learnerId}/baseline`, { waitUntil: "domcontentloaded" });

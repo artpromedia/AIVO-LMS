@@ -15,6 +15,8 @@ export interface TutorAvatarCardProps {
   name: string;
   subject: React.ReactNode;
   glyph: React.ReactNode;
+  /** Portrait art URL — emoji glyph stays as the loading/missing fallback. */
+  imageUrl?: string;
   tone?: TutorAvatarTone;
   href?: string;
   className?: string;
@@ -24,13 +26,14 @@ export function TutorAvatarCard({
   name,
   subject,
   glyph,
+  imageUrl,
   tone = "lavender",
   href,
   className,
 }: TutorAvatarCardProps) {
   const inner = (
     <>
-      <TutorAvatar glyph={glyph} tone={tone} size="lg" />
+      <TutorAvatar glyph={glyph} imageUrl={imageUrl} tone={tone} size="lg" />
       <div className="flex flex-col items-center gap-0.5">
         <span className="font-bold text-iw-text-strong">{name}</span>
         <span className="text-sm text-iw-text-muted">{subject}</span>

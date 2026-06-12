@@ -11,6 +11,7 @@
  *     log; the page is the district's, not a dead platform call.
  */
 import { test, expect } from "@playwright/test";
+import { expectNoSeriousA11yViolations } from "../../lib/a11y";
 import {
   ADMIN_WEB_BASE,
   authenticateAdminBrowser,
@@ -43,6 +44,7 @@ test.describe("sensitive-read auditing", () => {
       `${ADMIN_WEB_BASE}/platform/audit?q=${encodeURIComponent("admin.user.viewed")}`,
     );
     await expect(page.locator("main").last()).toContainText("admin.user.viewed");
+    await expectNoSeriousA11yViolations(page);
     const rowsForViewed = page.locator("tbody tr", { hasText: viewed!.userId });
     await expect(rowsForViewed).toHaveCount(1);
     await expect(rowsForViewed.first()).toContainText(admin!.email);
@@ -57,6 +59,7 @@ test.describe("sensitive-read auditing", () => {
     await page.goto(`${ADMIN_WEB_BASE}/district/audit/export`);
     await expect(page.getByTestId("district-export-csv")).toBeVisible();
     await expect(page.getByTestId("district-export-jsonl")).toBeVisible();
+    await expectNoSeriousA11yViolations(page);
 
     // CSV download round-trips (and is itself recorded on the trail).
     const csv = await page.request.get(`${ADMIN_WEB_BASE}/district/audit/download?format=csv`);

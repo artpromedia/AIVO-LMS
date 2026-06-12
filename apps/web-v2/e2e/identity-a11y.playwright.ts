@@ -6,6 +6,10 @@
  * session cookie, injects axe-core, and fails on any serious/critical
  * violation. Tagged `@a11y` so `pnpm test:a11y` picks it up.
  *
+ * The legacy /admin/* identity pages moved to the standalone web-admin app
+ * (middleware 308s them off this host); their axe coverage lives in the
+ * root `e2e/specs/admin` compose suite via expectNoSeriousA11yViolations.
+ *
  * The same baseline rule exemptions as the existing a11y specs are applied
  * so we hold the new pages to the project's current bar (not a stricter one
  * that would also flag pre-existing shells).
@@ -36,29 +40,8 @@ async function scan(page: import("@playwright/test").Page) {
 }
 
 test.describe("@a11y enterprise identity surfaces", () => {
-  test("@a11y platform IdP catalog", async ({ context, page }) => {
-    await context.addCookies([cookie("platform_admin")]);
-    await page.goto("/admin/platform/identity");
-    await scan(page);
-  });
 
-  test("@a11y platform IdP detail", async ({ context, page }) => {
-    await context.addCookies([cookie("platform_admin")]);
-    await page.goto("/admin/platform/identity");
-    await page.waitForSelector("main", { timeout: 30_000 });
-    // Follow the first tenant card into its detail page.
-    const firstDetail = page.locator('a[href^="/admin/platform/identity/"]').first();
-    await firstDetail.waitFor({ timeout: 30_000 });
-    await firstDetail.click();
-    await page.waitForURL(/\/admin\/platform\/identity\/.+/, { timeout: 30_000 });
-    await scan(page);
-  });
 
-  test("@a11y district identity read view", async ({ context, page }) => {
-    await context.addCookies([cookie("district_admin")]);
-    await page.goto("/admin/district/identity");
-    await scan(page);
-  });
 
   test("@a11y MFA enrollment", async ({ context, page }) => {
     await context.addCookies([cookie("platform_admin")]);

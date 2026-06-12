@@ -10,6 +10,20 @@ import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PARENT_NAV } from "@/components/layout/role-shells";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  listLearnersForParent,
+  refreshLearnerReadiness,
+  listConsentsForLearner,
+} from "@/lib/db/repos";
+import {
+  READINESS_LABEL_KEY,
+  READINESS_NEXT_STEP,
+  READINESS_TONE,
+  nextStepFor,
+} from "@/lib/learner/readiness";
+import type { ConsentRecord, ConsentType, LearnerProfile, ReadinessState } from "@/lib/db/types";
 import { SectionCard } from "./_components/SectionCard";
 
 /**
@@ -19,45 +33,168 @@ import { SectionCard } from "./_components/SectionCard";
  * this lives at a separate route. When the redesign passes QA the
  * team can flip the navigation to point here.
  *
- * Sprint-4 verbatim acceptance criteria enforced here:
- *
- *   "Parent home feels premium and calm. All cards have real
- *    destinations. Parent can add learner, upload IEP, review
- *    assessment status, and approve permissions."
- *
- *   Greeting: "Hi, [name]. [Child] is ready for today's learning."
- *
- * Now rendered inside the shared AppShell so this surface gets the
- * same top-bar + sidebar chrome (hamburger drawer on mobile, sensory
- * popover, Avatar) as every other parent screen. Previously the page
- * shipped its own bare `<main>` and bypassed AppShell entirely.
+ * Every value on this page is read from the same repos the legacy
+ * home uses — the hero learner, the setup track, the glance metrics
+ * and the secondary cards all derive from `listLearnersForParent`,
+ * the readiness engine and the consent ledger. Nothing is invented:
+ * a card with no real backing read does not render.
  */
+
+const READY_STATES = new Set<ReadinessState>(["ready_for_today_mission", "active_learning"]);
+
+/** Journey order used to derive setup-track status from the readiness cache. */
+const READINESS_ORDER: ReadinessState[] = [
+  "profile_created",
+  "assessment_needed",
+  "team_invite_optional",
+  "iep_optional",
+  "baseline_needed",
+  "brain_build_pending",
+  "brain_clone_review_needed",
+  "ready_for_today_mission",
+  "active_learning",
+];
+const rank = (s: ReadinessState) => READINESS_ORDER.indexOf(s);
+
+function stepStatus(
+  state: ReadinessState,
+  activeStates: ReadinessState[],
+  lastCoveredState: ReadinessState,
+): SetupStep["status"] {
+  if (activeStates.includes(state)) return "active";
+  return rank(state) > rank(lastCoveredState) ? "done" : "upcoming";
+}
+
+function buildSetupSteps(
+  learner: Pick<LearnerProfile, "id" | "readinessState">,
+  t: Awaited<ReturnType<typeof getTranslations<"parent.home_v2">>>,
+): SetupStep[] {
+  const s = learner.readinessState;
+  const href = (state: ReadinessState) =>
+    READINESS_NEXT_STEP[state].hrefTemplate.replace("{learnerId}", learner.id);
+  return [
+    {
+      id: "assessment",
+      label: t("step_assessment"),
+      status: stepStatus(s, ["profile_created", "assessment_needed"], "assessment_needed"),
+      href: href("assessment_needed"),
+    },
+    {
+      id: "supports",
+      label: t("step_supports"),
+      status: stepStatus(s, ["team_invite_optional", "iep_optional"], "iep_optional"),
+      href: href("iep_optional"),
+    },
+    {
+      id: "baseline",
+      label: t("step_baseline"),
+      status: stepStatus(s, ["baseline_needed"], "baseline_needed"),
+      href: href("baseline_needed"),
+    },
+    {
+      id: "review",
+      label: t("step_review"),
+      status: stepStatus(
+        s,
+        ["brain_build_pending", "brain_clone_review_needed"],
+        "brain_clone_review_needed",
+      ),
+      href: href("brain_clone_review_needed"),
+    },
+  ];
+}
+
+/** Latest non-revoked consent record per type. */
+function activeConsentTypes(records: ConsentRecord[]): Set<ConsentType> {
+  const latest = new Map<ConsentType, ConsentRecord>();
+  for (const r of records) {
+    const prev = latest.get(r.consentType);
+    if (!prev || r.acceptedAt > prev.acceptedAt) latest.set(r.consentType, r);
+  }
+  const active = new Set<ConsentType>();
+  for (const [type, rec] of latest) if (!rec.revokedAt) active.add(type);
+  return active;
+}
+
+const METRIC_TONE: Record<
+  (typeof READINESS_TONE)[ReadinessState],
+  "neutral" | "success" | "warning" | "info"
+> = { neutral: "neutral", warning: "warning", primary: "info", success: "success" };
+
+/** Consent types surfaced on the card — the three a parent asks about first. */
+const CONSENT_CARD_TYPES = [
+  "child_data_collection",
+  "ai_personalization",
+  "school_roster_import",
+] as const satisfies readonly ConsentType[];
+
 export default async function ParentHomeV2() {
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("parent.home_v2");
+  const tHome = await getTranslations("parent.home");
+  const tReadiness = await getTranslations("parent.readiness");
 
-  // Placeholder content data — wiring to listLearnersForParent is a
-  // separate task and is intentionally out of scope here.
-  const learnerFirstName = "Emma";
-  const learnerHref = "/parent/learners/emma";
-  const parentFirstName = session.displayName.split(" ")[0] ?? "there";
+  const initial = await listLearnersForParent(session.userId, session.tenantId);
+  for (const l of initial) await refreshLearnerReadiness(l.id, session.tenantId);
+  const learners = await listLearnersForParent(session.userId, session.tenantId);
 
-  const setupSteps: SetupStep[] = [
-    { id: "verify", label: "Verify parent", status: "done", href: "/onboarding/parent-verify" },
-    { id: "consent", label: "Review consent", status: "done", href: "/onboarding/consent" },
-    {
-      id: "iep",
-      label: "Upload IEP / 504 (optional)",
-      status: "active",
-      href: "/parent/learners/new/iep",
-    },
-    {
-      id: "approve",
-      label: "Approve learner access",
-      status: "upcoming",
-      href: "/onboarding/child-approval",
-    },
-  ];
+  const parentFirstName = session.displayName.split(" ")[0] ?? "";
+
+  if (learners.length === 0) {
+    return (
+      <AppShell
+        role="parent"
+        roleLabel="Parent"
+        navItems={PARENT_NAV}
+        user={{ displayName: session.displayName, email: session.email }}
+      >
+        <div className="flex flex-col gap-6" data-testid="home-v2-empty">
+          <LearningHero
+            greeting={
+              <>
+                Hi, {parentFirstName}.
+                <br />
+                <span className="text-iw-text-muted font-bold">{t("hero_add_first")}</span>
+              </>
+            }
+            subhead={t("subhead")}
+            actions={
+              <Button asChild size="lg" data-testid="home-v2-primary-cta">
+                <Link href="/parent/learners/new">{tHome("add_your_first_learner")}</Link>
+              </Button>
+            }
+          />
+          <EmptyState
+            title={tHome("no_learners_yet")}
+            description={t("empty_description")}
+            action={
+              <Button asChild>
+                <Link href="/parent/learners/new">{tHome("add_your_first_learner")}</Link>
+              </Button>
+            }
+          />
+        </div>
+      </AppShell>
+    );
+  }
+
+  // Feature the learner with the most actionable next step; fall back to the
+  // first learner when everyone is ready.
+  const featured = learners.find((l) => !READY_STATES.has(l.readinessState)) ?? learners[0];
+  const featuredFirst = featured.displayName.split(" ")[0];
+  const featuredNext = nextStepFor(featured);
+  const featuredReady = READY_STATES.has(featured.readinessState);
+
+  const readyCount = learners.filter((l) => READY_STATES.has(l.readinessState)).length;
+  const needsActionCount = learners.length - readyCount;
+
+  const setupSteps = buildSetupSteps(featured, t);
+  const consentRecords = await listConsentsForLearner(
+    session.userId,
+    featured.id,
+    session.tenantId,
+  );
+  const grantedTypes = activeConsentTypes(consentRecords);
 
   return (
     <AppShell
@@ -69,259 +206,160 @@ export default async function ParentHomeV2() {
       <div className="flex flex-col gap-6">
         <LearningHero
           greeting={
-            <>
+            <span data-testid="home-v2-greeting">
               Hi, {parentFirstName}.
               <br />
               <span className="text-iw-text-muted font-bold">
-                {learnerFirstName} is ready for today's learning.
+                {featuredReady
+                  ? t("hero_ready", { name: featuredFirst })
+                  : t("hero_next", { name: featuredFirst })}
               </span>
-            </>
+            </span>
           }
-          subhead="Calm, personalized, and waiting for one quick check-in from you."
+          subhead={t("subhead")}
           actions={
             <>
-              <Link
-                href={`${learnerHref}/lessons`}
-                className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold shadow-sm hover:opacity-95"
-              >
-                <AivoIcon name="care" size={18} />
-                Start with {learnerFirstName}
-              </Link>
-              <Link
-                href="/parent/learners/new"
-                className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-white text-iw-text-strong font-semibold border border-iw-border hover:border-iw-text-muted"
-              >
-                <AivoIcon name="rosterStudents" size={18} />
-                {t("add_another_learner")}
-              </Link>
+              <Button asChild size="lg" data-testid="home-v2-primary-cta">
+                <Link href={featuredNext.href}>
+                  <AivoIcon name="care" size={18} />
+                  {tReadiness(featuredNext.labelKey)}
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/parent/learners/new">
+                  <AivoIcon name="rosterStudents" size={18} />
+                  {t("add_another_learner")}
+                </Link>
+              </Button>
             </>
           }
         />
 
-        <SetupProgressTrack steps={setupSteps} />
+        <section aria-label={t("setup_for", { name: featuredFirst })}>
+          <h2 className="iw-label uppercase tracking-wider text-iw-text-muted mb-3">
+            {t("setup_for", { name: featuredFirst })}
+          </h2>
+          <SetupProgressTrack steps={setupSteps} />
+        </section>
 
         <section aria-label={t("today_at_a_glance")}>
           <h2 className="iw-label uppercase tracking-wider text-iw-text-muted mb-3">
             {t("today_at_a_glance")}
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <FloatingMetricCard
-              label="Baseline status"
-              value="In progress"
-              description="Discovery adventure 60% complete."
-              icon={<AivoIcon name="aiBrain" size={20} />}
-              href={`${learnerHref}/assessment`}
+              label={t("metric_learners")}
+              value={learners.length}
+              description={
+                learners.length === 1
+                  ? t("metric_learners_desc_one")
+                  : t("metric_learners_desc_other", { count: learners.length })
+              }
+              icon={<AivoIcon name="rosterStudents" size={20} />}
+              href="/parent/learners"
               tone="info"
             />
             <FloatingMetricCard
-              label="Stress / support signal"
-              value="Calm"
-              delta={{ value: "no flags this week", tone: "flat" }}
-              description="Tutor pacing and break frequency look healthy."
-              icon={<AivoIcon name="safetyOk" size={20} />}
-              href={`${learnerHref}/summary`}
-              tone="success"
+              label={t("metric_ready")}
+              value={readyCount}
+              description={
+                readyCount === learners.length
+                  ? t("metric_ready_desc_all")
+                  : t("metric_ready_desc_partial")
+              }
+              icon={<AivoIcon name="aiSparkle" size={20} />}
+              tone={readyCount === learners.length ? "success" : "neutral"}
             />
             <FloatingMetricCard
-              label="Mastery trend"
-              value="+4"
-              delta={{ value: "skills this week", tone: "up" }}
-              description="Reading and number sense both moving up."
-              icon={<AivoIcon name="growth" size={20} />}
-              href={`${learnerHref}/progress`}
-              tone="success"
-            />
-            <FloatingMetricCard
-              label="Today's learning time"
-              value="22 min"
-              description="Planned: 35 minutes. Emma can start whenever."
-              icon={<AivoIcon name="goal" size={20} />}
-              href={`${learnerHref}/lessons`}
-            />
-            <FloatingMetricCard
-              label="Needs your approval"
-              value="1 thing"
-              description="Approve voice mode for the AI tutor."
+              label={t("metric_action")}
+              value={needsActionCount}
+              description={
+                needsActionCount === 0
+                  ? t("metric_action_desc_zero")
+                  : t("metric_action_desc_some")
+              }
               icon={<AivoIcon name="consentCheck" size={20} />}
-              href="/onboarding/child-approval"
-              tone="warning"
+              tone={needsActionCount === 0 ? "success" : "warning"}
             />
             <FloatingMetricCard
-              label="IEP support status"
-              value="Active"
-              description="3 accommodations applied. Update from learner profile."
-              icon={<AivoIcon name="iep" size={20} />}
-              href={`${learnerHref}/iep`}
-              tone="info"
+              label={t("metric_status", { name: featuredFirst })}
+              value={tReadiness(READINESS_LABEL_KEY[featured.readinessState])}
+              description={tReadiness(featuredNext.labelKey)}
+              icon={<AivoIcon name="aiBrain" size={20} />}
+              href={featuredNext.href}
+              tone={METRIC_TONE[READINESS_TONE[featured.readinessState]]}
             />
           </div>
         </section>
 
         <section aria-label={t("details")} className="grid gap-4 lg:grid-cols-2">
           <SectionCard
-            title={t("learning_readiness")}
-            iconName="aiBrain"
-            subtitle="How prepared today's plan is for Emma right now."
-            badge="Ready"
-            badgeTone="success"
-            cta={{ href: `${learnerHref}/lessons`, label: "Open today's plan" }}
+            title={t("next_steps_title")}
+            iconName="goal"
+            subtitle={t("next_steps_subtitle")}
+            badge={needsActionCount > 0 ? String(needsActionCount) : undefined}
+            badgeTone={needsActionCount > 0 ? "warning" : "success"}
+            cta={{ href: "/parent/learners", label: t("view_all_learners") }}
           >
-            <ul className="space-y-2">
-              <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">{t("plan_generated")}</span>
-                <span>This morning, 6:42 AM</span>
-              </li>
-              <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">{t("pacing")}</span>
-                <span>{t("calm_extended_time_on")}</span>
-              </li>
-              <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">{t("sensory_mode")}</span>
-                <span>{t("warm_reduced_motion")}</span>
-              </li>
-            </ul>
-          </SectionCard>
-
-          <SectionCard
-            title={t("assessment_status")}
-            iconName="aiSparkle"
-            subtitle="Where Emma is in the discovery adventure baseline."
-            badge="60% done"
-            badgeTone="info"
-            cta={{ href: `${learnerHref}/assessment`, label: "Resume assessment" }}
-          >
-            <p className="text-iw-text-muted">
-              No score is shown to Emma. You'll see the brain-profile summary as soon as she
-              finishes the last 4 activities.
-            </p>
-          </SectionCard>
-
-          <SectionCard
-            title={t("iep_support_upload")}
-            iconName="iep"
-            subtitle="Extracted accommodations and goals."
-            badge="3 accommodations"
-            badgeTone="info"
-            cta={{ href: `${learnerHref}/iep`, label: "Review IEP details" }}
-          >
-            <ul className="space-y-2">
-              <li>• Extended time on timed activities</li>
-              <li>• Audio supports for reading passages</li>
-              <li>• Movement breaks every 15 minutes</li>
+            <ul className="space-y-3">
+              {learners.map((l) => {
+                const next = nextStepFor(l);
+                return (
+                  <li key={l.id} className="flex items-center justify-between gap-3">
+                    <span className="font-semibold text-iw-text-strong">
+                      {l.displayName.split(" ")[0]}
+                    </span>
+                    <Link
+                      href={next.href}
+                      className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
+                    >
+                      {tReadiness(next.labelKey)}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </SectionCard>
 
           <SectionCard
             title={t("consent_checklist")}
             iconName="consentCheck"
-            subtitle="What you've approved and what's still optional."
-            badge="2 of 3"
-            badgeTone="neutral"
-            cta={{ href: "/onboarding/consent", label: "Review consent" }}
-          >
-            <ul className="space-y-2">
-              <li className="flex justify-between gap-3">
-                <span>{t("parent_guardian_consent")}</span>
-                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">
-                  {t("approved")}
-                </span>
-              </li>
-              <li className="flex justify-between gap-3">
-                <span>{t("ai_personalization")}</span>
-                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">
-                  {t("approved")}
-                </span>
-              </li>
-              <li className="flex justify-between gap-3">
-                <span>{t("school_data_sharing")}</span>
-                <span className="text-iw-text-muted">{t("optional_not_set")}</span>
-              </li>
-            </ul>
-          </SectionCard>
-
-          <SectionCard
-            title={t("todays_recommended_actions")}
-            iconName="goal"
-            subtitle="Just two small things. Both take under a minute."
-            badge="2 items"
-            badgeTone="warning"
-            cta={{ href: "/onboarding/child-approval", label: "Open approvals" }}
-          >
-            <ul className="space-y-3">
-              <li>
-                <span className="font-semibold text-iw-text-strong">{t("approve_voice_mode")}</span>
-                <p className="text-iw-text-muted text-sm">{t("approve_voice_mode_desc")}</p>
-              </li>
-              <li>
-                <span className="font-semibold text-iw-text-strong">
-                  {t("upload_iep_optional")}
-                </span>
-                <p className="text-iw-text-muted text-sm">{t("upload_iep_desc")}</p>
-              </li>
-            </ul>
-          </SectionCard>
-
-          <SectionCard
-            title={t("notifications_title")}
-            iconName="aiWand"
-            subtitle="Quiet, recent, parent-relevant only."
-            badge="1 new"
+            subtitle={t("consent_subtitle", { name: featuredFirst })}
+            badge={t("consent_of_total", {
+              granted: CONSENT_CARD_TYPES.filter((c) => grantedTypes.has(c)).length,
+              total: CONSENT_CARD_TYPES.length,
+            })}
             badgeTone="info"
-            cta={{ href: "/notifications", label: "Open notifications" }}
+            cta={{ href: `/parent/consent/${featured.id}`, label: t("review_consent") }}
           >
             <ul className="space-y-2">
-              <li>
-                <span className="text-iw-text-strong font-semibold">{t("new_milestone")}</span>{" "}
-                <span className="text-iw-text-muted">{t("new_milestone_desc")}</span>
-              </li>
-              <li>
-                <span className="text-iw-text-strong font-semibold">{t("tutor_note")}</span>{" "}
-                <span className="text-iw-text-muted">{t("tutor_note_desc")}</span>
-              </li>
-            </ul>
-          </SectionCard>
-
-          <SectionCard
-            title={t("billing_title")}
-            iconName="billingCard"
-            subtitle="Plan + next renewal."
-            badge="Family · monthly"
-            badgeTone="neutral"
-            cta={{ href: "/parent/billing", label: "Manage billing" }}
-          >
-            <ul className="space-y-2">
-              <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">Plan</span>
-                <span>{t("family_2_learners")}</span>
-              </li>
-              <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">{t("next_renewal")}</span>
-                <span>Apr 14</span>
-              </li>
-              <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">{t("payment_method")}</span>
-                <span>Visa · 4242</span>
-              </li>
+              {CONSENT_CARD_TYPES.map((type) => (
+                <li key={type} className="flex justify-between gap-3">
+                  <span>{t(`consent_type.${type}`)}</span>
+                  {grantedTypes.has(type) ? (
+                    <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">
+                      {t("approved")}
+                    </span>
+                  ) : (
+                    <span className="text-iw-text-muted">{t("optional_not_set")}</span>
+                  )}
+                </li>
+              ))}
             </ul>
           </SectionCard>
 
           <SectionCard
             title={t("school_connection")}
             iconName="rosterSchool"
-            subtitle="Sync with the classroom, if Emma's school uses AIVO."
-            badge="Not linked"
-            badgeTone="neutral"
-            cta={{ href: "/onboarding/invite/school", label: "Connect a school" }}
+            subtitle={t("school_subtitle")}
+            cta={{ href: "/onboarding/invite/school", label: t("connect_a_school") }}
           >
-            <p className="text-iw-text-muted">
-              Linking a school lets teachers see the same learning profile you do — and lets the AI
-              tutor coordinate with classroom work. You stay in control of what's shared.
-            </p>
+            <p className="text-iw-text-muted">{t("school_body")}</p>
           </SectionCard>
         </section>
 
         <p className="text-xs text-iw-text-muted text-center pt-2">
-          This is the redesigned parent home. The legacy view is still available at{" "}
+          {t("legacy_note")}{" "}
           <Link href="/parent/home" className="underline hover:text-iw-text-strong">
             /parent/home
           </Link>

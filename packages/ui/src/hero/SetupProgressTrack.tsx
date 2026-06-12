@@ -65,6 +65,7 @@ export function SetupProgressTrack({ steps, className }: SetupProgressTrackProps
           className="h-full rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] transition-[width] duration-500"
           style={{ width: `${pct}%` }}
           role="progressbar"
+          aria-label="Family setup progress"
           aria-valuenow={pct}
           aria-valuemin={0}
           aria-valuemax={100}

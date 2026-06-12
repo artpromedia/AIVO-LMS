@@ -38,6 +38,8 @@
     "@aivo/scoring": "workspace:*",
     "@aivo/security": "workspace:*",
     "@aivo/skill-graphs": "workspace:*",
+    "@aivo/stage-runtime": "workspace:*",
+    "@aivo/stage-ui": "workspace:*",
     "@aivo/ui": "workspace:*",
     "@anthropic-ai/sdk": "^0.100.1",
     "@hookform/resolvers": "^3.9.1",

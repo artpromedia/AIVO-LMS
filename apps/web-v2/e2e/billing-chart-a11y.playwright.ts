@@ -36,9 +36,9 @@ test.describe("@a11y chart primitives (design-system)", () => {
     });
 
     // Verify the key chart headings are present so we know the section rendered
-    await expect(page.locator("text=Seat utilization")).toBeVisible();
-    await expect(page.locator("text=Subject breakdown")).toBeVisible();
-    await expect(page.locator("text=Active learners")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Seat utilization" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Subject breakdown" })).toBeVisible();
+    await expect(page.getByRole("region", { name: /Active learners/ })).toBeVisible();
   });
 
   test("@a11y billing AreaTrend data table is in the DOM for screen readers", async ({ page }) => {

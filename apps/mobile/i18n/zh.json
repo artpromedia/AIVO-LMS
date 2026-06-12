@@ -670,7 +670,13 @@
     },
     "hideTutor": "隐藏辅导员",
     "moveUp": "上移{{label}}",
-    "moveDown": "下移{{label}}"
+    "moveDown": "下移{{label}}",
+    "a11y": {
+      "beatAdvance": "第 {{index}} 步，共 {{total}} 步。",
+      "completed": "课程完成！你获得了 {{xp}} 分。",
+      "beatCounter": "第 {{index}} 个活动，共 {{total}} 个",
+      "empty": "本次学习没有剩余活动了。"
+    }
   },
   "learnerTutor": {
     "tutorNotFound": "未找到辅导老师",

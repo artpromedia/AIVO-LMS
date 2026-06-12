@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -24,6 +24,12 @@ import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { ScratchPad } from "@/src/components/learning/ScratchPad";
 import { MobileSessionHeader } from "@/src/components/learning/MobileSessionHeader";
 import { MobileStageRuntime } from "@/src/components/learning/MobileStageRuntime";
+import { useA11yStyle } from "@/lib/a11y-style";
+import {
+  buildAnswerAnnouncement,
+  buildBeatAnnouncement,
+  buildCompletionAnnouncement,
+} from "@/src/components/learning/stage-announcements";
 import { MobileStageCompletion } from "@/src/components/learning/MobileStageCompletion";
 import { Button, type DarkCapsuleNavItem } from "@/components/ui";
 import { sessionClient, SessionUnavailableError } from "@/src/api/sessionClient";
@@ -130,6 +136,7 @@ function StageScreenInner() {
     [tierTheme, palette],
   );
   const voice = useMemo(() => buildVoice(tier, t), [tier, t]);
+
   const { isTablet, isLandscape, sizeClass } = useWindowSizeClass();
   const isExpanded = sizeClass === "expanded";
   // Landscape tablet session-map rail is only shown when there are
@@ -148,6 +155,41 @@ function StageScreenInner() {
   const [correctCount, setCorrectCount] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
+
+  const { announce } = useA11yStyle();
+
+  // ----- Screen-reader narration (Sprint 04) -----
+  // TalkBack/VoiceOver hear exactly what a sighted learner sees on the
+  // tutor panel: the tier voice's encourage line on a correct answer, the
+  // miss line (which names the right answer) otherwise. Manual announce is
+  // used instead of an Android live region so iOS gets parity and Android
+  // never double-speaks.
+  const announcedBeatRef = useRef<number>(-1);
+  useEffect(() => {
+    if (!session || !answered || lastCorrect == null) return;
+    const beat = session.stagePlan.beats[currentIndex];
+    const missLine =
+      beat && beat.kind === "choice" ? voice.miss(beat.correctAnswer) : voice.intro;
+    announce(
+      buildAnswerAnnouncement({ correct: lastCorrect, encourage: voice.encourage, missLine }),
+    );
+  }, [answered, lastCorrect, session, currentIndex, voice, announce]);
+
+  useEffect(() => {
+    if (!session || sessionComplete) return;
+    if (announcedBeatRef.current === currentIndex) return;
+    // Skip the very first beat — the session header + tutor intro already
+    // orient the learner; narrate advancement only.
+    if (announcedBeatRef.current !== -1) {
+      announce(
+        buildBeatAnnouncement(t, {
+          index: currentIndex + 1,
+          total: session.stagePlan.beats.length,
+        }),
+      );
+    }
+    announcedBeatRef.current = currentIndex;
+  }, [currentIndex, session, sessionComplete, announce, t]);
 
 
   // Load the session from the server. No demo fallback.
@@ -323,6 +365,7 @@ function StageScreenInner() {
       return;
     }
     setSessionComplete(true);
+    announce(buildCompletionAnnouncement(t, { xpEarned: xpEarned + 5 }));
     if (!sessionId) return;
     const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
     const masteryUpdates: Record<string, number> = {
@@ -344,7 +387,7 @@ function StageScreenInner() {
       });
       Alert.alert(t("learnerStage.offline.title"), t("learnerStage.offline.message"));
     }
-  }, [session, sessionId, currentIndex, total, correctCount, xpEarned, t]);
+  }, [session, sessionId, currentIndex, total, correctCount, xpEarned, t, announce]);
 
   const handlePause = useCallback(() => {
     Alert.alert(
@@ -532,6 +575,9 @@ function StageScreenInner() {
               encourage: voice.encourage,
               miss: voice.miss,
               intro: voice.intro,
+              counter: (index, totalBeats) =>
+                t("learnerStage.a11y.beatCounter", { index, total: totalBeats }),
+              empty: t("learnerStage.a11y.empty"),
             }}
             submitting={submitting}
             selected={selected}

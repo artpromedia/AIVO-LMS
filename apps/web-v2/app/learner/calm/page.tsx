@@ -56,7 +56,7 @@ export default async function LearnerCalmPage({
       user={{ displayName: session.displayName, email: session.email }}
     >
       <header className="flex flex-col gap-2">
-        <p className="text-sm font-medium uppercase tracking-wide text-aivo-muted">
+        <p className="text-sm font-medium uppercase tracking-wide text-aivo-ink-soft">
           {t("eyebrow")}
         </p>
         <h1 className="font-display text-3xl md:text-4xl font-bold text-iw-text-strong">

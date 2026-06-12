@@ -9,6 +9,9 @@
  * history renders below so parents can see what they already actioned.
  */
 import * as React from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { bffFetch } from "@/lib/api/client";
+import { toast } from "@/lib/use-toast";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, ShieldQuestion, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -80,35 +83,38 @@ function RecommendationCard({
   const [declineReason, setDeclineReason] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
 
-  async function respond(action: "accept" | "amend" | "decline") {
-    setDecision({ state: "deciding" });
-    setError(null);
-    try {
-      const res = await fetch(
-        `${apiBase}/${rec.id}/respond`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            action,
-            ...(action === "amend" ? { amendedValue: amendValue } : {}),
-            ...(action === "decline" ? { declineReason } : {}),
-          }),
+  const respondMutation = useMutation({
+    mutationFn: (action: "accept" | "amend" | "decline") =>
+      bffFetch<{ recommendation: { status: string } }>(`${apiBase}/${rec.id}/respond`, {
+        method: "POST",
+        body: {
+          action,
+          ...(action === "amend" ? { amendedValue: amendValue } : {}),
+          ...(action === "decline" ? { declineReason } : {}),
         },
-      );
-      const json = await res.json();
-      if (!res.ok || !json?.data?.recommendation) {
-        setDecision(null);
-        setError(t("decision_error"));
-        return;
-      }
-      const status = String(json.data.recommendation.status);
+      }),
+    onMutate: () => {
+      setDecision({ state: "deciding" });
+      setError(null);
+    },
+    onSuccess: (data) => {
+      const status = String(data.recommendation.status);
       setDecision({ state: "decided", status });
       onDecided(rec.id, status);
-    } catch {
+    },
+    onError: (_e, action) => {
       setDecision(null);
       setError(t("decision_error"));
-    }
+      toast({
+        title: t("decision_error"),
+        variant: "danger",
+        action: { label: t("retry"), onClick: () => respondMutation.mutate(action) },
+      });
+    },
+  });
+
+  function respond(action: "accept" | "amend" | "decline") {
+    respondMutation.mutate(action);
   }
 
   if (decision?.state === "decided") {
@@ -229,45 +235,32 @@ export function PendingRecommendationsPanel({
 }) {
   const apiBase = apiBaseProp ?? `/api/bff/learners/${learnerId}/recommendations`;
   const t = useTranslations("parent.recommendations");
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-  const [pending, setPending] = React.useState<PanelRecommendation[]>([]);
-  const [decided, setDecided] = React.useState<PanelRecommendation[]>([]);
+  const queryClient = useQueryClient();
+  const listQuery = useQuery({
+    queryKey: ["recommendations", apiBase],
+    queryFn: () =>
+      bffFetch<{ pending?: PanelRecommendation[]; decided?: PanelRecommendation[] }>(apiBase),
+  });
+  const loading = listQuery.isPending;
+  const error = listQuery.isError ? t("load_error") : null;
+  const pending = listQuery.data?.pending ?? [];
+  const [decidedLocal, setDecidedLocal] = React.useState<PanelRecommendation[]>([]);
+  const decided = React.useMemo(
+    () => [...decidedLocal, ...(listQuery.data?.decided ?? [])].slice(0, 10),
+    [decidedLocal, listQuery.data?.decided],
+  );
 
-  React.useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    setError(null);
-    fetch(apiBase)
-      .then((r) => r.json())
-      .then((j) => {
-        if (!alive) return;
-        if (j?.data) {
-          setPending(j.data.pending ?? []);
-          setDecided(j.data.decided ?? []);
-        } else {
-          setError(t("load_error"));
-        }
-      })
-      .catch(() => {
-        if (alive) setError(t("load_error"));
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, [apiBase, t]);
-
-  const onDecided = React.useCallback((id: string, status: string) => {
-    // The card renders its own decided state inline; keep the list as-is so
-    // the parent sees the outcome where they acted, and update history.
-    setDecided((prev) => {
-      const moved = pending.find((p) => p.id === id);
-      return moved ? [{ ...moved, status }, ...prev].slice(0, 10) : prev;
-    });
-  }, [pending]);
+  const onDecided = React.useCallback(
+    (id: string, status: string) => {
+      // The card renders its own decided state inline; keep the list as-is so
+      // the parent sees the outcome where they acted, and update history.
+      const moved = pending.find((rec) => rec.id === id);
+      if (moved) setDecidedLocal((prev) => [{ ...moved, status }, ...prev].slice(0, 10));
+      // Refresh in the background so the server's view wins on next visit.
+      void queryClient.invalidateQueries({ queryKey: ["recommendations", apiBase] });
+    },
+    [pending, queryClient, apiBase],
+  );
 
   return (
     <div className="flex flex-col gap-3" id="recommendations">

@@ -95,7 +95,7 @@ export async function registerWhatsWorkingRoutes(app: FastifyInstance) {
         return reply.code(429).send({ error: "Too many requests" });
       }
       const { learnerId } = req.params as { learnerId: string };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const q = (req.query ?? {}) as { windowDays?: string };
@@ -121,7 +121,7 @@ export async function registerWhatsWorkingRoutes(app: FastifyInstance) {
         return reply.code(429).send({ error: "Too many requests" });
       }
       const { learnerId } = req.params as { learnerId: string };
-      const allowed = await verifyTeacherAccess(db, auth.sub, learnerId);
+      const allowed = await verifyTeacherAccess(db, auth.tenantId, auth.sub, learnerId);
       if (!allowed) return reply.code(403).send({ error: "Forbidden" });
 
       const q = (req.query ?? {}) as { windowDays?: string };
@@ -133,6 +133,8 @@ export async function registerWhatsWorkingRoutes(app: FastifyInstance) {
     },
   );
 
+  // audit-exempt(whats-working POST: pure analytics compute over caller-
+  // supplied or ledger rows; writes nothing)
   app.post(
     "/api/family/whats-working/:learnerId",
     { schema: whatsWorkingByLearnerIdSchema },
@@ -143,7 +145,7 @@ export async function registerWhatsWorkingRoutes(app: FastifyInstance) {
         return reply.code(429).send({ error: "Too many requests" });
       }
       const { learnerId } = req.params as { learnerId: string };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const body = (req.body ?? {}) as WhatsWorkingBody;

@@ -5,6 +5,7 @@
 
 import React from "react";
 import { View, Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+import { useA11yStyle } from "@/lib/a11y-style";
 import { useScanTarget } from "@/src/components/switch-scan/ScanTargetRegistry";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 import { colors } from "@/constants/colors";
@@ -100,6 +101,7 @@ function ChoiceCard({
   submitting: boolean;
   onSelect: (answer: string) => void;
 }) {
+  const { bodyFontFamily } = useA11yStyle();
   const isSelected = selected === answer;
   const isCorrect = answer === correctAnswer;
   const showResult = answered && isSelected;
@@ -114,7 +116,8 @@ function ChoiceCard({
     <Pressable
       ref={scanRef}
       accessibilityRole="button"
-      accessibilityLabel={`Answer ${answer}`}
+      accessibilityLabel={answer}
+      accessibilityState={{ selected: isSelected, disabled: answered }}
       style={({ pressed }) => [
         styles.answerCard,
         pressed && !answered && styles.answerPressed,
@@ -128,7 +131,13 @@ function ChoiceCard({
       {submitting && isSelected ? (
         <ActivityIndicator color={theme.colors.surface} />
       ) : (
-        <Text style={[styles.answerText, showResult && { color: theme.colors.surface }]}>
+        <Text
+          style={[
+            styles.answerText,
+            { fontFamily: bodyFontFamily },
+            showResult && { color: theme.colors.surface },
+          ]}
+        >
           {answer}
         </Text>
       )}

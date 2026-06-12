@@ -10,7 +10,7 @@ import {
   bulkInviteDistrictParents,
   type BulkParentResult,
 } from "@aivo/admin-api/identity";
-import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminPageFrame, BulkSelectionBar, ConfirmDangerDialog } from "@aivo/admin-ui";
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
@@ -97,6 +97,27 @@ async function revokeParentAction(formData: FormData) {
   redirect("/district/parents?revoked=1");
 }
 
+async function bulkRevokeParentsAction(formData: FormData) {
+  "use server";
+  const session = await requirePageRole(["district_admin"]);
+  const ids = String(formData.get("ids") || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (ids.length === 0) redirect("/district/parents");
+  let revoked = 0;
+  let failed = 0;
+  for (const id of ids) {
+    try {
+      await revokeDistrictParentInvite(session, id);
+      revoked += 1;
+    } catch {
+      failed += 1;
+    }
+  }
+  redirect(`/district/parents?bulkRevoked=${revoked}&bulkRevokeFailed=${failed}`);
+}
+
 async function resendParentAction(formData: FormData) {
   "use server";
   const session = await requirePageRole(["district_admin"]);
@@ -129,6 +150,8 @@ export default async function DistrictParentsPage({
     bulkInvited?: string;
     bulkTotal?: string;
     bulkSkipped?: string;
+    bulkRevoked?: string;
+    bulkRevokeFailed?: string;
     error?: string;
   }>;
 }) {
@@ -175,6 +198,12 @@ export default async function DistrictParentsPage({
       {params.revoked ? (
         <p className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 font-semibold text-slate-700">
           Invitation revoked.
+        </p>
+      ) : null}
+      {params.bulkRevoked ? (
+        <p className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 font-semibold text-slate-700">
+          Bulk revoke: {params.bulkRevoked} invitation(s) revoked
+          {Number(params.bulkRevokeFailed) > 0 ? `, ${params.bulkRevokeFailed} failed.` : "."}
         </p>
       ) : null}
       {params.resent ? (
@@ -256,9 +285,22 @@ export default async function DistrictParentsPage({
           </p>
         ) : data && data.parents.length > 0 ? (
           <div className="mt-4 overflow-x-auto">
+            <div className="mb-3">
+              <BulkSelectionBar
+                checkboxName="bulk-parent-invites"
+                action={bulkRevokeParentsAction}
+                triggerLabel="Revoke selected ({count})"
+                title="Revoke selected invitations?"
+                body="{count} selected invitation(s) will be revoked. Seats open back up; you can re-invite at any time."
+                confirmLabel="Revoke {count} invitation(s)"
+              />
+            </div>
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                  <th className="py-2">
+                    <span className="sr-only">Select</span>
+                  </th>
                   <th className="py-2">Name</th>
                   <th className="py-2">Email</th>
                   <th className="py-2">Status</th>
@@ -268,6 +310,17 @@ export default async function DistrictParentsPage({
               <tbody>
                 {data.parents.map((p) => (
                   <tr key={p.id} className="border-b border-slate-100">
+                    <td className="py-3 pr-2">
+                      {p.status === "pending" || p.status === "expired" ? (
+                        <input
+                          type="checkbox"
+                          name="bulk-parent-invites"
+                          value={p.id}
+                          aria-label={`Select invitation for ${p.email}`}
+                          className="h-4 w-4 accent-blue-700"
+                        />
+                      ) : null}
+                    </td>
                     <td className="py-3 font-semibold">{p.name}</td>
                     <td className="py-3 text-slate-600">{p.email}</td>
                     <td className="py-3">
@@ -289,15 +342,15 @@ export default async function DistrictParentsPage({
                               Resend
                             </button>
                           </form>
-                          <form action={revokeParentAction}>
-                            <input type="hidden" name="id" value={p.id} />
-                            <button
-                              className="admin-button admin-button-secondary px-3 py-1 text-xs"
-                              type="submit"
-                            >
-                              Revoke
-                            </button>
-                          </form>
+                          <ConfirmDangerDialog
+                            action={revokeParentAction}
+                            hiddenFields={{ id: p.id }}
+                            trigger="Revoke"
+                            triggerClassName="admin-button admin-button-secondary px-3 py-1 text-xs"
+                            title="Revoke this parent invitation?"
+                            body={`${p.email} will lose this invitation. A seat opens back up; you can re-invite at any time.`}
+                            confirmLabel="Revoke invitation"
+                          />
                         </div>
                       ) : (
                         <span className="text-xs text-slate-400">—</span>

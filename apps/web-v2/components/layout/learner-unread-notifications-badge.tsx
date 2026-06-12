@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-
-type Json = { ok: boolean; data?: { unread: number }; error?: { message: string } };
+import { bffFetch } from "@/lib/api/client";
 
 /**
  * Sprint 2 (learner roadmap): live unread-count badge rendered inside the
@@ -17,14 +16,12 @@ export function LearnerUnreadNotificationsBadge() {
 
   const load = React.useCallback(async () => {
     try {
-      const res = await fetch("/api/bff/me/notifications/unread-count", {
+      const data = await bffFetch<{ unread: number }>("/api/bff/me/notifications/unread-count", {
         method: "GET",
         // Always read the latest server-side count; the route disables caching.
         cache: "no-store",
       });
-      if (!res.ok) return;
-      const body = (await res.json()) as Json;
-      if (body.ok && body.data) setCount(body.data.unread);
+      setCount(data.unread);
     } catch {
       // Silently ignore — badge is non-essential chrome.
     }

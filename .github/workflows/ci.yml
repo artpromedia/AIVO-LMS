@@ -38,6 +38,18 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Client data-path ratchet (no new bare fetch)
+        run: node scripts/ci/check-bare-fetch.mjs
+
+      - name: Admin destructive-action confirmation gate
+        run: node scripts/ci/check-admin-destructive-confirm.mjs
+
+      - name: File-length ratchet (no god files, 600-line max)
+        run: node scripts/ci/check-file-length.mjs
+
+      - name: Audited-writes gate (service mutations audit or exempt)
+        run: node scripts/ci/check-audited-writes.mjs
+
   repo-tests:
     name: Sequential Repo Test Gate
     runs-on: ubuntu-latest
@@ -315,6 +327,113 @@ jobs:
       - name: Enforce bundle budgets
         if: steps.filter.outputs.web == 'true'
         run: node scripts/ci/bundle-budget.mjs
+
+  # Sprint 02 (remediation) — the axe-core accessibility lane. Runs every
+  # @a11y-tagged Playwright spec (apps/web-v2/e2e/*-a11y*, plus any spec
+  # carrying the tag) against a real server with the mock session, and
+  # BLOCKS the PR on serious/critical violations. Accessibility is the
+  # product's core promise; this is its runtime regression gate.
+  web-a11y-axe:
+    name: Accessibility axe gate (web-v2 @a11y)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: lint-and-typecheck
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Detect a11y-affecting changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            web:
+              - 'apps/web-v2/**'
+              - 'packages/ui/**'
+              - 'packages/learner-ui/**'
+              - 'packages/learner-surfaces/**'
+              - 'packages/stage-ui/**'
+              - 'packages/stage-runtime/**'
+              - 'packages/brand/**'
+              - 'packages/accessibility-contract/**'
+              - 'scripts/a11y/**'
+              - '.github/workflows/ci.yml'
+
+      - name: Skip (no a11y-affecting changes)
+        if: steps.filter.outputs.web != 'true'
+        run: echo "No a11y-affecting changes — skipping axe lane."
+
+      - uses: pnpm/action-setup@v5
+        if: steps.filter.outputs.web == 'true'
+
+      - uses: actions/setup-node@v5
+        if: steps.filter.outputs.web == 'true'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.filter.outputs.web == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser deps
+        if: steps.filter.outputs.web == 'true'
+        run: pnpm --filter @aivo/web-v2 exec playwright install --with-deps chromium
+
+      - name: Build web-v2
+        if: steps.filter.outputs.web == 'true'
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
+        run: pnpm --filter @aivo/web-v2 build
+
+      - name: Start web-v2 (background, AUTH_MODE=mock)
+        if: steps.filter.outputs.web == 'true'
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+          AIVO_TEST_MODE: "1"
+          AIVO_FEATURE_SELF_REGULATION_HUB: "true"
+          PORT: "5000"
+        run: |
+          nohup pnpm --filter @aivo/web-v2 start > web-v2-a11y.log 2>&1 &
+          echo $! > web-v2-a11y.pid
+
+      - name: Wait for web-v2 to accept connections
+        if: steps.filter.outputs.web == 'true'
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS -o /dev/null http://127.0.0.1:5000/; then
+              echo "web-v2 is up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::web-v2 did not become ready within 90s"
+          tail -n 200 web-v2-a11y.log || true
+          exit 1
+
+      - name: Run @a11y axe suite
+        if: steps.filter.outputs.web == 'true'
+        env:
+          AIVO_FEATURE_SELF_REGULATION_HUB: "true"
+        run: pnpm --filter @aivo/web-v2 run test:a11y
+
+      - name: Upload Playwright traces on failure
+        if: failure() && steps.filter.outputs.web == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-a11y-axe-traces
+          path: |
+            apps/web-v2/test-results/
+            web-v2-a11y.log
+          retention-days: 7
+
+      - name: Stop web-v2
+        if: always() && steps.filter.outputs.web == 'true'
+        run: |
+          if [ -f web-v2-a11y.pid ]; then kill "$(cat web-v2-a11y.pid)" 2>/dev/null || true; fi
 
   # Sprint B7 — the living design-system gallery builds on any packages/*
   # change and lands as a PR artifact reviewers can open directly.

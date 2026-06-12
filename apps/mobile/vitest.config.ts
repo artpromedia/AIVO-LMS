@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { coverageConfigDefaults, defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
@@ -8,13 +8,31 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: false,
-    include: ["__tests__/**/*.test.{ts,tsx}"],
+    // src/** added in Sprint 13 for the per-surface tests (this also
+    // resurrects src/components/learning/__tests__/stage-announcements,
+    // which the old pattern never collected).
+    include: ["__tests__/**/*.test.{ts,tsx}", "src/**/__tests__/**/*.test.{ts,tsx}"],
     // Sprint B7 coverage ratchet — ~2 points below the measured baseline
     // (2026-06-11: stmts 75.16 / branch 75.99 / funcs 72.15 / lines 76.87
     // over imported files). Only moves up.
     coverage: {
       provider: "v8",
       reporter: ["text-summary"],
+      // Sprint 13: the per-surface RN component files are imported by the
+      // surface-logic tests (registry identity assertions) but their render
+      // paths CANNOT execute in this node-only harness — no react-native
+      // rendering stack exists in the repo. Excluding them from REPORTING
+      // keeps the ratchet measuring what it measured before the
+      // decomposition (the monolith was never imported by a test, so it
+      // never entered the denominator); the new pure modules (types,
+      // shared, surface-registry) stay measured and tested.
+      exclude: [
+        ...coverageConfigDefaults.exclude,
+        "src/components/learning/surfaces/**/*.tsx",
+        "src/components/learning/surface-renderer.tsx",
+        // Imported BY the surfaces (ink workspace) — same unrenderable class.
+        "src/components/learning/ScratchPad.tsx",
+      ],
       thresholds: {
         statements: 73,
         branches: 74,
