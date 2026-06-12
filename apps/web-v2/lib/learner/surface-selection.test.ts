@@ -18,7 +18,13 @@ import type {
   Subject,
 } from "@/lib/db/types";
 import { generateDeterministicLessonPlan, type LessonPlanInputs } from "./lesson-plan";
-import { deriveNumberLineSpec, selectSurfaceForItem } from "./surface-selection";
+import {
+  buildGraphSurface,
+  buildReadingAnnotationSurface,
+  buildScienceDiagramSurface,
+  deriveNumberLineSpec,
+  selectSurfaceForItem,
+} from "./surface-selection";
 
 describe("deriveNumberLineSpec", () => {
   it("derives a 0-anchored range covering answer and choices", () => {
@@ -161,12 +167,107 @@ describe("generateDeterministicLessonPlan surface emission", () => {
     expect(() => GeneratedLessonPlanSchema.parse(plan)).not.toThrow();
   });
 
-  it("emits no surfaces for reading (sage is a later sprint)", () => {
+  it("never gives reading a math number line (domains stay distinct)", () => {
     const plan = generateDeterministicLessonPlan(inputsFor("reading", "emerging"));
     for (const item of [...plan.guidedPractice, ...plan.checksForUnderstanding]) {
-      expect(item.surface).toBeUndefined();
+      expect(item.surface?.surfaceType).not.toBe("number_line");
     }
     expect(() => GeneratedLessonPlanSchema.parse(plan)).not.toThrow();
+  });
+});
+
+// ── Sprint 03 — literacy & science builders ─────────────────────────────────
+
+describe("buildReadingAnnotationSurface", () => {
+  it("splits the passage into spans and scores by the evidence span id", () => {
+    const built = buildReadingAnnotationSurface({
+      passage: "Pip ran fast. Pip stopped at the stream to drink. Pip went home.",
+      question: "Why did Pip stop?",
+      evidenceSentence: "Pip stopped at the stream to drink.",
+    });
+    expect(built).not.toBeNull();
+    expect(built!.surface.surfaceType).toBe("reading_annotation");
+    const spec = built!.surface.readingAnnotation!;
+    expect(spec.passage).toHaveLength(3);
+    expect(spec.expectedEvidenceIds).toEqual(["s2"]);
+    // expectedAnswer is exactly what ReadingAnnotationSurface submits.
+    expect(built!.expectedAnswer).toBe("s2");
+    expect(LessonSurfaceSchema.safeParse(built!.surface).success).toBe(true);
+  });
+
+  it("returns null when the evidence is not a passage sentence", () => {
+    expect(
+      buildReadingAnnotationSurface({
+        passage: "One sentence here. Another sentence there.",
+        question: "q",
+        evidenceSentence: "A sentence that is not in the passage.",
+      }),
+    ).toBeNull();
+  });
+});
+
+describe("buildGraphSurface / buildScienceDiagramSurface", () => {
+  it("graph expectedAnswer matches the surface's exact serialization", () => {
+    const built = buildGraphSurface({ point: { x: 2, y: 3 } });
+    expect(built!.expectedAnswer).toBe(JSON.stringify([{ x: 2, y: 3 }]));
+    expect(built!.surface.graph!.expectedPoints).toEqual([{ x: 2, y: 3 }]);
+    expect(LessonSurfaceSchema.safeParse(built!.surface).success).toBe(true);
+    expect(buildGraphSurface({ point: { x: 9, y: 9 }, xMax: 6, yMax: 6 })).toBeNull();
+  });
+
+  it("science diagram scores the single target's label placement", () => {
+    const built = buildScienceDiagramSurface({
+      shapes: [{ id: "c", kind: "circle", cx: 100, cy: 100, r: 40 }],
+      target: { id: "t1", x: 100, y: 100, correctLabelId: "roots" },
+      labels: [
+        { id: "roots", text: "Roots" },
+        { id: "leaf", text: "Leaf" },
+      ],
+    });
+    expect(built!.expectedAnswer).toBe(JSON.stringify({ t1: "roots" }));
+    expect(LessonSurfaceSchema.safeParse(built!.surface).success).toBe(true);
+    // A correct label outside the bank is unrepresentable.
+    expect(
+      buildScienceDiagramSurface({
+        shapes: [{ id: "c", kind: "circle", cx: 1, cy: 1, r: 1 }],
+        target: { id: "t1", x: 0, y: 0, correctLabelId: "missing" },
+        labels: [
+          { id: "a", text: "A" },
+          { id: "b", text: "B" },
+        ],
+      }),
+    ).toBeNull();
+  });
+});
+
+describe("generator emission — reading & science (Sprint 03)", () => {
+  it("reading lessons carry a reading_annotation item whose answer is its evidence id", () => {
+    for (const level of ["emerging", "approaching", "stretching"] as const) {
+      const plan = generateDeterministicLessonPlan(inputsFor("reading", level));
+      const annotated = plan.guidedPractice.filter(
+        (g) => g.surface?.surfaceType === "reading_annotation",
+      );
+      expect(annotated.length, `tier for ${level} must include an annotation item`).toBeGreaterThan(
+        0,
+      );
+      for (const item of annotated) {
+        const spec = item.surface!.readingAnnotation!;
+        expect(spec.expectedEvidenceIds).toContain(item.expectedAnswer);
+      }
+      expect(() => GeneratedLessonPlanSchema.parse(plan)).not.toThrow();
+    }
+  });
+
+  it("science lessons carry a diagram or graph item, schema-valid", () => {
+    for (const level of ["emerging", "approaching", "stretching"] as const) {
+      const plan = generateDeterministicLessonPlan(inputsFor("science", level));
+      const domain = plan.guidedPractice.filter(
+        (g) =>
+          g.surface?.surfaceType === "science_diagram" || g.surface?.surfaceType === "graph",
+      );
+      expect(domain.length, `science ${level} must include a domain surface`).toBeGreaterThan(0);
+      expect(() => GeneratedLessonPlanSchema.parse(plan)).not.toThrow();
+    }
   });
 });
 

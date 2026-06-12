@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { walkLessonUntil } from "./lesson-player-surfaces.helpers";
 
 const learnerCookie = {
   name: "aivo_mock_session",
@@ -26,12 +27,17 @@ test.describe("Lesson player multimedia captions smoke", () => {
 
   for (const subjectSlug of ["math", "reading", "science"] as const) {
     test(`activates captions for ${subjectSlug} multimedia lesson item`, async ({ page }) => {
-      await page.goto(`/learner/lesson-player-smoke?subject=${subjectSlug}&step=5`, {
+      // Remediation Sprint 03: the multimedia overlay now lands on the first
+      // item WITHOUT a domain surface, so the media beat's index varies by
+      // subject — walk the lesson to it instead of assuming ?step=5.
+      await page.goto(`/learner/lesson-player-smoke?subject=${subjectSlug}`, {
         waitUntil: "domcontentloaded",
       });
       const media = page
         .locator('[data-testid="lesson-media-video"], [data-testid="lesson-media-audio"]')
         .first();
+      const found = await walkLessonUntil(page, media);
+      expect(found, "lesson must reach the multimedia beat").toBe(true);
       await expect(media).toBeVisible();
       const runId = await page.locator('[data-testid="smoke-run-id"]').getAttribute("data-run-id");
       expect(runId).toBeTruthy();

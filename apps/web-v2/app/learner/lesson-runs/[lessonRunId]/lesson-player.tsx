@@ -49,6 +49,7 @@ import {
   type LessonAgentDirective,
 } from "@/lib/learner/agent-directives";
 import { deriveNumberLineSpec } from "@/lib/learner/surface-selection";
+import type { LessonSurface } from "@/lib/validators/lesson";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -67,9 +68,12 @@ type Beat =
       key: string;
       gpId: string;
       surfaceType: SurfaceRouterItem["surfaceType"];
-      /** Remediation Sprint 02: validated, content-derived number-line range
-       *  from the plan's `surface` envelope (never a hardcoded fixture). */
+      /** Remediation Sprints 02-03: validated, content-derived surface specs
+       *  from the plan's `surface` envelope (never hardcoded fixtures). */
       numberLine?: { min: number; max: number; step: number };
+      readingAnnotation?: NonNullable<LessonSurface["readingAnnotation"]>;
+      scienceDiagram?: NonNullable<LessonSurface["scienceDiagram"]>;
+      graph?: NonNullable<LessonSurface["graph"]>;
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -95,8 +99,11 @@ type Beat =
       key: string;
       checkId: string;
       surfaceType: SurfaceRouterItem["surfaceType"];
-      /** Remediation Sprint 02: see the guided beat — same envelope. */
+      /** Remediation Sprints 02-03: see the guided beat — same envelope. */
       numberLine?: { min: number; max: number; step: number };
+      readingAnnotation?: NonNullable<LessonSurface["readingAnnotation"]>;
+      scienceDiagram?: NonNullable<LessonSurface["scienceDiagram"]>;
+      graph?: NonNullable<LessonSurface["graph"]>;
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -147,6 +154,9 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
         (g.surface?.surfaceType as SurfaceRouterItem["surfaceType"] | undefined) ??
         (g.choices?.length ? "choice_grid" : "math_expression"),
       numberLine: g.surface?.numberLine,
+      readingAnnotation: g.surface?.readingAnnotation,
+      scienceDiagram: g.surface?.scienceDiagram,
+      graph: g.surface?.graph,
       prompt: g.prompt,
       expectedAnswer: g.expectedAnswer,
       choices: g.choices,
@@ -165,6 +175,9 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
         (c.surface?.surfaceType as SurfaceRouterItem["surfaceType"] | undefined) ??
         (c.choices?.length ? "choice_grid" : "math_expression"),
       numberLine: c.surface?.numberLine,
+      readingAnnotation: c.surface?.readingAnnotation,
+      scienceDiagram: c.surface?.scienceDiagram,
+      graph: c.surface?.graph,
       prompt: c.prompt,
       expectedAnswer: c.expectedAnswer,
       choices: c.choices,
@@ -711,35 +724,16 @@ export function LessonPlayer({
       artCanvas: currentBeat.surfaceType === "art_canvas" ? { showGuides: true } : undefined,
       voiceResponse:
         currentBeat.surfaceType === "voice_response" ? { language: "en-US" } : undefined,
-      // Sprint 4–8 surfaces. Authored specs ride on the beat when the
-      // curriculum/item-bank provides them; otherwise a coherent default
-      // fixture keeps the activity playable (and serves as the authoring
-      // template) instead of rendering blank.
+      // Remediation Sprint 03: reading/graph/science specs are the plan's
+      // validated, content-derived payloads (LessonSurfaceSchema guarantees
+      // a spec rides with its surfaceType). The fox/stream and 0-10-grid
+      // fixture defaults are gone — these surfaces only mount with real
+      // authored content.
       readingAnnotation:
         currentBeat.surfaceType === "reading_annotation"
-          ? ((currentBeat as { readingAnnotation?: SurfaceRouterItem["readingAnnotation"] })
-              .readingAnnotation ?? {
-              question: currentBeat.prompt,
-              tools: ["highlight"],
-              passage: [
-                { id: "s1", text: "The little fox was thirsty." },
-                { id: "s2", text: "It ran all the way to the cool stream." },
-                { id: "s3", text: "Then it took a long, happy drink." },
-              ],
-              expectedEvidenceIds: ["s2"],
-            })
+          ? currentBeat.readingAnnotation
           : undefined,
-      graph:
-        currentBeat.surfaceType === "graph"
-          ? ((currentBeat as { graph?: SurfaceRouterItem["graph"] }).graph ?? {
-              xMin: 0,
-              xMax: 10,
-              yMin: 0,
-              yMax: 10,
-              step: 1,
-              mode: "points",
-            })
-          : undefined,
+      graph: currentBeat.surfaceType === "graph" ? currentBeat.graph : undefined,
       dragManipulative:
         currentBeat.surfaceType === "drag_manipulative"
           ? ((currentBeat as { dragManipulative?: SurfaceRouterItem["dragManipulative"] })
@@ -766,27 +760,7 @@ export function LessonPlayer({
             })
           : undefined,
       scienceDiagram:
-        currentBeat.surfaceType === "science_diagram"
-          ? ((currentBeat as { scienceDiagram?: SurfaceRouterItem["scienceDiagram"] })
-              .scienceDiagram ?? {
-              width: 480,
-              height: 320,
-              diagram: {
-                canvasMode: "svg",
-                width: 480,
-                height: 320,
-                shapes: [{ id: "cell", kind: "circle", cx: 240, cy: 160, r: 110 }],
-              },
-              targets: [
-                { id: "t1", x: 240, y: 160, correctLabelId: "nucleus" },
-                { id: "t2", x: 240, y: 60, correctLabelId: "membrane" },
-              ],
-              labels: [
-                { id: "nucleus", text: "Nucleus" },
-                { id: "membrane", text: "Membrane" },
-              ],
-            })
-          : undefined,
+        currentBeat.surfaceType === "science_diagram" ? currentBeat.scienceDiagram : undefined,
       musicSequencer:
         currentBeat.surfaceType === "music_sequencer"
           ? ((currentBeat as { musicSequencer?: SurfaceRouterItem["musicSequencer"] })

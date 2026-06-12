@@ -1,4 +1,4 @@
-import { expect, type BrowserContext, type Page } from "@playwright/test";
+import { expect, type BrowserContext, type Locator, type Page } from "@playwright/test";
 
 export const learnerCookie = {
   name: "aivo_mock_session",
@@ -39,15 +39,45 @@ export async function goToFixtureSurface(page: Page, surfaceType: string, surfac
  * matches.
  */
 async function answerCurrentBeat(page: Page): Promise<void> {
-  const radio = page.getByRole("radio").first();
-  if (await radio.isVisible().catch(() => false)) {
-    await radio.click().catch(() => {});
+  const click = { timeout: 2_000 } as const;
+  // Science-diagram beats: pick a label from the bank, place it on the
+  // numbered target, then submit.
+  const diagramTarget = page.getByRole("button", { name: /choose a label/i }).first();
+  if (await diagramTarget.isVisible().catch(() => false)) {
+    const label = page.locator('[aria-label="labels"] button:not([disabled])').first();
+    await label.click(click).catch(() => {});
+    await diagramTarget.click(click).catch(() => {});
+  }
+  // Graph beats: clicking the grid plots a snapped point.
+  const grid = page.getByLabel("coordinate grid").first();
+  if (await grid.isVisible().catch(() => false)) {
+    await grid.click({ ...click, position: { x: 60, y: 60 } }).catch(() => {});
+  }
+  // Reading-annotation beats: select an evidence span (the tool picker is a
+  // radiogroup too, so spans must be tried FIRST or the radio branch would
+  // pick a tool and leave submit disabled).
+  const span = page.getByRole("button", { name: /select evidence:/i }).first();
+  if (await span.isVisible().catch(() => false)) {
+    await span.click(click).catch(() => {});
   } else {
-    const textbox = page.getByRole("textbox").first();
-    if (await textbox.isVisible().catch(() => false)) await textbox.fill("0").catch(() => {});
+    const option = page.getByRole("option").first();
+    if (await option.isVisible().catch(() => false)) {
+      await option.click(click).catch(() => {});
+    } else {
+      const radio = page.getByRole("radio").first();
+      if (await radio.isVisible().catch(() => false)) {
+        await radio.click(click).catch(() => {});
+      } else {
+        const textbox = page.getByRole("textbox").first();
+        if (await textbox.isVisible().catch(() => false))
+          await textbox.fill("0", click).catch(() => {});
+      }
+    }
   }
   const submit = page.getByRole("button", { name: /^submit/i }).first();
-  if (await submit.isVisible().catch(() => false)) await submit.click().catch(() => {});
+  if (await submit.isVisible().catch(() => false)) {
+    if (await submit.isEnabled().catch(() => false)) await submit.click(click).catch(() => {});
+  }
 }
 
 /**
@@ -68,9 +98,19 @@ export async function findSurfaceInRealLesson(
   await page.goto(`/learner/lesson-player-smoke?subject=${subject}`, {
     waitUntil: "domcontentloaded",
   });
-  const surface = page.getByLabel(surfaceLabel);
+  return walkLessonUntil(page, page.getByLabel(surfaceLabel));
+}
+
+/**
+ * Advance an already-open lesson beat by beat (answering generic interactive
+ * beats so "Next" re-enables) until `target` is visible. Returns whether the
+ * target appeared before the lesson ended or a beat could not be cleared.
+ */
+export async function walkLessonUntil(page: Page, target: Locator): Promise<boolean> {
+  const surface = target;
   const next = page.getByRole("button", { name: "Next" });
   await expect(next.or(surface).first()).toBeVisible({ timeout: 30_000 });
+  let stalled = 0;
   for (let index = 0; index < 30; index += 1) {
     if (await surface.isVisible().catch(() => false)) return true;
     if (!(await next.isVisible().catch(() => false))) break;
@@ -81,7 +121,12 @@ export async function findSurfaceInRealLesson(
     }
     if (await surface.isVisible().catch(() => false)) return true;
     if (await next.isEnabled().catch(() => false)) {
-      await next.click().catch(() => {});
+      stalled = 0;
+      await next.click({ timeout: 5_000 }).catch(() => {});
+    } else if ((stalled += 1) >= 4) {
+      // A beat our generic answerer cannot clear (and it is not the target
+      // surface) — stop walking instead of spinning to the test timeout.
+      break;
     }
     await page.waitForTimeout(150);
   }

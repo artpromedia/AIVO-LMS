@@ -160,24 +160,201 @@ export const NumberLineSpecSchema = z
     }
   });
 
+/** Remediation Sprint 03 — reading-annotation passage spec (sage). The
+ *  learner answers by selecting evidence spans; the surface submits the
+ *  selected span IDs joined with "," (see ReadingAnnotationSurface), so the
+ *  item's expectedAnswer must be the evidence span id(s). */
+export const ReadingAnnotationSpecSchema = z
+  .object({
+    passage: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1).max(24),
+            text: z.string().min(1).max(300),
+            selectable: z.boolean().optional(),
+            breakAfter: z.boolean().optional(),
+          })
+          .strict(),
+      )
+      .min(2)
+      .max(12),
+    tools: z.array(z.enum(["highlight", "underline"])).min(1).max(2).optional(),
+    expectedEvidenceIds: z.array(z.string().min(1)).min(1).max(3).optional(),
+    question: z.string().min(1).max(400).optional(),
+  })
+  .strict()
+  .superRefine((spec, ctx) => {
+    const ids = new Set(spec.passage.map((s) => s.id));
+    if (ids.size !== spec.passage.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "passage span ids must be unique" });
+    }
+    for (const evidence of spec.expectedEvidenceIds ?? []) {
+      if (!ids.has(evidence)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `expectedEvidenceIds entry "${evidence}" is not a passage span id`,
+        });
+      }
+    }
+  });
+
+/** Remediation Sprint 03 — coordinate-grid spec (spark/nova quantitative).
+ *  GraphSurface submits JSON.stringify(points), so a scored item's
+ *  expectedAnswer must be that exact serialization. */
+export const GraphSpecSchema = z
+  .object({
+    xMin: z.number().int().min(-20),
+    xMax: z.number().int().max(20),
+    yMin: z.number().int().min(-20),
+    yMax: z.number().int().max(20),
+    step: z.number().int().positive().optional(),
+    mode: z.enum(["points", "line"]).optional(),
+    expectedPoints: z
+      .array(z.object({ x: z.number().int(), y: z.number().int() }).strict())
+      .min(1)
+      .max(3)
+      .optional(),
+    tolerance: z.number().int().min(0).max(2).optional(),
+  })
+  .strict()
+  .superRefine((spec, ctx) => {
+    if (spec.xMax <= spec.xMin || spec.yMax <= spec.yMin) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "graph bounds must be non-empty" });
+      return;
+    }
+    for (const p of spec.expectedPoints ?? []) {
+      if (p.x < spec.xMin || p.x > spec.xMax || p.y < spec.yMin || p.y > spec.yMax) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `expected point (${p.x},${p.y}) is outside the grid bounds`,
+        });
+      }
+    }
+  });
+
+/** Deterministic diagram primitives a science-diagram may draw. Mirrors the
+ *  GeometryShape union in @aivo/learner-surfaces for the shapes our
+ *  generators emit. */
+export const GeometryShapeSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      id: z.string().min(1),
+      kind: z.literal("circle"),
+      cx: z.number(),
+      cy: z.number(),
+      r: z.number().positive(),
+    })
+    .strict(),
+  z
+    .object({
+      id: z.string().min(1),
+      kind: z.literal("rectangle"),
+      x: z.number(),
+      y: z.number(),
+      width: z.number().positive(),
+      height: z.number().positive(),
+    })
+    .strict(),
+  z
+    .object({
+      id: z.string().min(1),
+      kind: z.literal("segment"),
+      start: z.object({ x: z.number(), y: z.number() }).strict(),
+      end: z.object({ x: z.number(), y: z.number() }).strict(),
+    })
+    .strict(),
+]);
+
+export const GeometryDiagramSpecSchema = z
+  .object({
+    canvasMode: z.enum(["svg", "canvas", "hybrid"]),
+    width: z.number().int().positive().max(1200).optional(),
+    height: z.number().int().positive().max(1200).optional(),
+    shapes: z.array(GeometryShapeSchema).min(1).max(12),
+  })
+  .strict();
+
+/** Remediation Sprint 03 — science diagram labelling spec (spark / atlas).
+ *  ScienceDiagramSurface submits JSON.stringify(placement) where placement =
+ *  { targetId: labelId }; a scored item's expectedAnswer is that exact
+ *  serialization (single-target items keep it order-stable). */
+export const ScienceDiagramSpecSchema = z
+  .object({
+    width: z.number().int().positive().max(1200).optional(),
+    height: z.number().int().positive().max(1200).optional(),
+    diagram: GeometryDiagramSpecSchema.optional(),
+    targets: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            x: z.number(),
+            y: z.number(),
+            correctLabelId: z.string().min(1).optional(),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(4),
+    labels: z
+      .array(z.object({ id: z.string().min(1), text: z.string().min(1).max(80) }).strict())
+      .min(2)
+      .max(6),
+  })
+  .strict()
+  .superRefine((spec, ctx) => {
+    const labelIds = new Set(spec.labels.map((l) => l.id));
+    for (const target of spec.targets) {
+      if (target.correctLabelId && !labelIds.has(target.correctLabelId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `target "${target.id}" expects unknown label "${target.correctLabelId}"`,
+        });
+      }
+    }
+  });
+
+/** Which sub-spec key each surfaceType requires. Surfaces not listed here
+ *  carry no payload yet (their sub-specs land in later remediation sprints
+ *  or they are payload-free, e.g. choice_grid). */
+const SURFACE_SPEC_KEYS = {
+  number_line: "numberLine",
+  reading_annotation: "readingAnnotation",
+  science_diagram: "scienceDiagram",
+  graph: "graph",
+} as const;
+
 export const LessonSurfaceSchema = z
   .object({
     surfaceType: z.enum(LESSON_SURFACE_TYPES),
     numberLine: NumberLineSpecSchema.optional(),
+    readingAnnotation: ReadingAnnotationSpecSchema.optional(),
+    scienceDiagram: ScienceDiagramSpecSchema.optional(),
+    graph: GraphSpecSchema.optional(),
   })
   .strict()
   .superRefine((surface, ctx) => {
-    if (surface.surfaceType === "number_line" && !surface.numberLine) {
+    const specKeys = Object.values(SURFACE_SPEC_KEYS) as Array<
+      (typeof SURFACE_SPEC_KEYS)[keyof typeof SURFACE_SPEC_KEYS]
+    >;
+    const required = (SURFACE_SPEC_KEYS as Partial<Record<string, (typeof specKeys)[number]>>)[
+      surface.surfaceType
+    ];
+    const present = specKeys.filter((key) => surface[key] !== undefined);
+    if (required && !present.includes(required)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "number_line surfaces require a content-derived numberLine spec",
+        message: `${surface.surfaceType} surfaces require a content-derived ${required} spec`,
       });
     }
-    if (surface.surfaceType !== "number_line" && surface.numberLine) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "numberLine spec is only valid on number_line surfaces",
-      });
+    for (const key of present) {
+      if (key !== required) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${key} spec is only valid on its matching surfaceType`,
+        });
+      }
     }
   });
 export type LessonSurface = z.infer<typeof LessonSurfaceSchema>;

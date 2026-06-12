@@ -95,7 +95,7 @@ describe("createLessonRun domain-surface emission (real path)", () => {
   );
 
   it(
-    "emits no domain surface on a reading lesson (math ≠ reading)",
+    "reading lessons carry the READING surface, never math's number line",
     { timeout: 30_000 },
     async () => {
       const { ensureSeeded } = await import("@/lib/db/seed");
@@ -122,9 +122,12 @@ describe("createLessonRun domain-surface emission (real path)", () => {
         result.lessonRun.lessonPlanId!,
         TENANT,
       );
-      for (const item of [...stored!.guidedPractice, ...stored!.checksForUnderstanding]) {
-        expect(item.surface, "reading items must stay on the generic surface in S02").toBeUndefined();
-      }
+      // Sprint 03: reading rides its own domain surface — and never math's.
+      const types = [...stored!.guidedPractice, ...stored!.checksForUnderstanding]
+        .map((item) => item.surface?.surfaceType)
+        .filter(Boolean);
+      expect(types).toContain("reading_annotation");
+      expect(types).not.toContain("number_line");
     },
   );
 });
