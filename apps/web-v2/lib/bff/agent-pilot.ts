@@ -40,11 +40,30 @@ export const PILOT_SUBJECT_TUTORS: Readonly<Record<string, keyof typeof TUTORS>>
   engineering: "forge",
 };
 
-/** Agent identity for a lesson subject, or null when not piloted. */
+/**
+ * Remediation Sprint 10 — the per-tutor EVAL gate.
+ *
+ * A tutor may run the in-lesson agent only after its REAL-MODEL evaluation
+ * passes (services/ai-svc/tests/agent_quality_eval, scored into
+ * docs/quality/agent-eval-scorecard.json and enforced by
+ * `pnpm agent:eval`). The roster above says which tutor FRONTS each
+ * subject; THIS list says which of them may actually open an agent
+ * session. It is empty until a keyed eval run records passing scores —
+ * the gate script fails the build if a tutor appears here without one.
+ */
+export const AGENT_ENABLED_TUTORS: ReadonlyArray<keyof typeof TUTORS> = [];
+
+export function isAgentEnabledForTutor(tutorKey: string): boolean {
+  return (AGENT_ENABLED_TUTORS as readonly string[]).includes(tutorKey);
+}
+
+/** Agent identity for a lesson subject, or null when not piloted OR the
+ *  fronting tutor has not passed the real-model eval gate. */
 export function agentForSubjectSlug(slug: string | null | undefined): LessonAgentConfig | null {
   if (!slug) return null;
   const tutorKey = PILOT_SUBJECT_TUTORS[slug];
   if (!tutorKey) return null;
+  if (!isAgentEnabledForTutor(tutorKey)) return null;
   const tutor = TUTORS[tutorKey];
   if (!tutor) return null;
   return { tutorKey, name: tutor.name, icon: tutor.icon, color: tutor.color };

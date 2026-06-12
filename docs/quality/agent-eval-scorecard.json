@@ -1,0 +1,5 @@
+{
+  "_comment": "REAL-MODEL agent quality scorecard (remediation Sprint 10). Written by services/ai-svc/tests/agent_quality_eval when run WITH a model key; pnpm agent:eval refuses any tutor listed in web-v2 AGENT_ENABLED_TUTORS without a status=passed entry here. No keyed eval run has been recorded yet, so AGENT_ENABLED_TUTORS is empty and the in-lesson agent stays off for every tutor — the honest state until real scores land.",
+  "passThreshold": 0.75,
+  "tutors": {}
+}
