@@ -10,7 +10,7 @@ import type { TierThemeMobile } from "@aivo/mobile-ui";
 import type { Beat } from "@/src/types/stage";
 import { MobileChoiceGrid } from "./MobileChoiceGrid";
 import { MobileMathExpressionInput } from "./MobileMathExpressionInput";
-import { MobileSurfaceRenderer } from "./MobileSurfaceRenderer";
+import { MobileSurfaceRenderer } from "./surface-renderer";
 
 interface Props {
   theme: TierThemeMobile;
