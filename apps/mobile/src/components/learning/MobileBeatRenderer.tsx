@@ -5,6 +5,7 @@
 
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useA11yStyle } from "@/lib/a11y-style";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 import type { Beat } from "@/src/types/stage";
 import { MobileChoiceGrid } from "./MobileChoiceGrid";
@@ -26,11 +27,12 @@ interface Props {
 export function MobileBeatRenderer(props: Props) {
   const { theme, beat } = props;
   const styles = createStyles(theme);
+  const { bodyFontFamily } = useA11yStyle();
 
   if (beat.kind === "choice") {
     return (
       <View style={styles.wrap}>
-        <Text style={styles.question}>{beat.text}</Text>
+        <Text style={[styles.question, { fontFamily: bodyFontFamily }]}>{beat.text}</Text>
         <MobileChoiceGrid
           theme={theme}
           options={beat.options}
@@ -69,7 +71,7 @@ export function MobileBeatRenderer(props: Props) {
   // tutor-turn — render the line and let the runtime auto-advance.
   return (
     <View style={styles.wrap}>
-      <Text style={styles.tutorText}>{beat.text}</Text>
+      <Text style={[styles.tutorText, { fontFamily: bodyFontFamily }]}>{beat.text}</Text>
     </View>
   );
 }

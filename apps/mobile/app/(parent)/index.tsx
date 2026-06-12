@@ -11,6 +11,7 @@ import { useParentInbox } from "@/hooks/useParentInbox";
 import { useParentSummary } from "@/hooks/useParentSummary";
 import { useLearnerMastery } from "@/hooks/useLearnerMastery";
 import { EmptyState, LoadingState, Sparkline, BarMini } from "@aivo/mobile-ui";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { spacing, radius } from "@/constants/colors";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { fontFamilies } from "@/constants/typography";
@@ -21,6 +22,7 @@ import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
 
 export default function ParentDashboard() {
+  const reduceMotion = useReducedMotion();
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
   const { branding } = useBranding();
@@ -143,7 +145,11 @@ export default function ParentDashboard() {
 
         {/* Stats row */}
         {learnersLoading || summaryLoading ? (
-          <LoadingState message={t("common.loading", "Loading...")} />
+          <LoadingState
+            message={t("common.loading", "Loading...")}
+            variant="skeleton-list"
+            reduceMotion={reduceMotion}
+          />
         ) : learnersError || summaryError ? (
           <EmptyState
             icon={<Ionicons name="bar-chart-outline" size={48} color={palette.inkMuted} />}
@@ -205,7 +211,11 @@ export default function ParentDashboard() {
         </View>
 
         {learnersLoading ? (
-          <LoadingState message={t("common.loading", "Loading...")} />
+          <LoadingState
+            message={t("common.loading", "Loading...")}
+            variant="skeleton-list"
+            reduceMotion={reduceMotion}
+          />
         ) : learnersError ? (
           <EmptyState
             icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}

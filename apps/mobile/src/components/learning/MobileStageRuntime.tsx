@@ -9,6 +9,7 @@
 
 import React, { useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useA11yStyle } from "@/lib/a11y-style";
 import { useScanTarget } from "@/src/components/switch-scan/ScanTargetRegistry";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 import type { Beat, Session } from "@/src/types/stage";
@@ -60,6 +61,7 @@ export function MobileStageRuntime(props: Props) {
   const isLast = props.currentIndex >= total - 1;
   const layout = useStageLayout();
   const styles = createStyles(props.theme);
+  const { bodyFontFamily } = useA11yStyle();
 
   const tutorMessage = useMemo(() => {
     if (!beat) return props.labels.intro;
@@ -115,7 +117,7 @@ export function MobileStageRuntime(props: Props) {
   if (!beat) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.emptyText}>{props.labels.empty}</Text>
+        <Text style={[styles.emptyText, { fontFamily: bodyFontFamily }]}>{props.labels.empty}</Text>
       </View>
     );
   }
@@ -128,14 +130,16 @@ export function MobileStageRuntime(props: Props) {
       accessibilityRole="button"
       accessibilityLabel={advanceLabel}
     >
-      <Text style={styles.advanceText}>{advanceLabel}</Text>
+      <Text style={[styles.advanceText, { fontFamily: bodyFontFamily }]}>{advanceLabel}</Text>
     </Pressable>
   ) : null;
 
   const beatColumn = (
     <View style={styles.beatColumn}>
       <View style={styles.counterRow}>
-        <Text style={styles.counter}>{props.labels.counter(props.currentIndex + 1, total)}</Text>
+        <Text style={[styles.counter, { fontFamily: bodyFontFamily }]}>
+          {props.labels.counter(props.currentIndex + 1, total)}
+        </Text>
       </View>
       <MobileBeatRenderer
         theme={props.theme}

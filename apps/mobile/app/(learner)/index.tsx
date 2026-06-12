@@ -18,12 +18,13 @@ import { Card, HeaderUserChip, SensoryToggle, DarkCapsuleNav } from "@/component
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, gridColumns, pickBySizeClass } from "@/src/design/responsive";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
-import { ProgressRing, Sparkline, BarMini } from "@aivo/mobile-ui";
+import { ProgressRing, Sparkline, BarMini, SkeletonRows } from "@aivo/mobile-ui";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export default function LearnerWorldMap() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
-  const { data: engagement, refetch } = useEngagement(user?.id || "");
+  const { data: engagement, refetch, isPending: engagementPending } = useEngagement(user?.id || "");
   const { data: trend } = useEngagementTrend(user?.id || "");
   const { subjects: masterySubjects } = useLearnerMastery(user?.id || "", 4);
   const { t } = useTranslation();
@@ -32,6 +33,7 @@ export default function LearnerWorldMap() {
   const palette = useSensoryPalette();
   const type = useResponsiveType();
 
+  const reduceMotion = useReducedMotion();
   const domainTutors = Object.entries(TUTORS);
 
   const cols = gridColumns(sizeClass);
@@ -93,6 +95,9 @@ export default function LearnerWorldMap() {
         }
       >
         <View style={{ width: contentWidth }}>
+          {engagementPending && !engagement ? (
+            <SkeletonRows variant="hero" reduceMotion={reduceMotion} />
+          ) : null}
           {/* Header — chip + sensory toggle */}
           <View style={styles.header}>
             <HeaderUserChip
