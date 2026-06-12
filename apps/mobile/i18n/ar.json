@@ -670,7 +670,13 @@
     },
     "hideTutor": "إخفاء المعلّم",
     "moveUp": "نقل {{label}} لأعلى",
-    "moveDown": "نقل {{label}} لأسفل"
+    "moveDown": "نقل {{label}} لأسفل",
+    "a11y": {
+      "beatAdvance": "الخطوة {{index}} من {{total}}.",
+      "completed": "اكتمل الدرس! حصلت على {{xp}} نقطة.",
+      "beatCounter": "النشاط {{index}} من {{total}}",
+      "empty": "لا توجد أنشطة متبقية في هذه الجلسة."
+    }
   },
   "learnerTutor": {
     "tutorNotFound": "لم يتم العثور على المعلم",

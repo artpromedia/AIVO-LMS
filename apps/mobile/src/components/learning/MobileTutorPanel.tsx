@@ -24,7 +24,9 @@ export function MobileTutorPanel({ theme, tier, message }: Props) {
         </Text>
       </View>
       <View style={styles.speechBubble}>
-        <Text style={styles.speechText}>{message}</Text>
+        <Text style={styles.speechText} accessibilityRole="text">
+          {message}
+        </Text>
       </View>
     </View>
   );

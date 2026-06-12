@@ -114,7 +114,8 @@ function ChoiceCard({
     <Pressable
       ref={scanRef}
       accessibilityRole="button"
-      accessibilityLabel={`Answer ${answer}`}
+      accessibilityLabel={answer}
+      accessibilityState={{ selected: isSelected, disabled: answered }}
       style={({ pressed }) => [
         styles.answerCard,
         pressed && !answered && styles.answerPressed,

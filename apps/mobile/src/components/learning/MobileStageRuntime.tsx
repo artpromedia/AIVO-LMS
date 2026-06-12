@@ -8,7 +8,7 @@
  */
 
 import React, { useCallback, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useScanTarget } from "@/src/components/switch-scan/ScanTargetRegistry";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 import type { Beat, Session } from "@/src/types/stage";
@@ -35,6 +35,10 @@ interface Props {
     encourage: string;
     miss: (correct: string) => string;
     intro: string;
+    /** "Activity {index} of {total}" — translated by the screen. */
+    counter: (index: number, total: number) => string;
+    /** Empty-session message — translated by the screen. */
+    empty: string;
   };
   submitting: boolean;
   selected: string | null;
@@ -111,7 +115,7 @@ export function MobileStageRuntime(props: Props) {
   if (!beat) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.emptyText}>This session has no remaining activities.</Text>
+        <Text style={styles.emptyText}>{props.labels.empty}</Text>
       </View>
     );
   }
@@ -131,9 +135,7 @@ export function MobileStageRuntime(props: Props) {
   const beatColumn = (
     <View style={styles.beatColumn}>
       <View style={styles.counterRow}>
-        <Text style={styles.counter}>
-          Activity {props.currentIndex + 1} of {total}
-        </Text>
+        <Text style={styles.counter}>{props.labels.counter(props.currentIndex + 1, total)}</Text>
       </View>
       <MobileBeatRenderer
         theme={props.theme}
@@ -197,5 +199,3 @@ function createStyles(theme: TierThemeMobile) {
   });
 }
 
-// silence unused import for Alert until Sprint 05 wires error toasts.
-void Alert;

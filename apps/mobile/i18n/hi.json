@@ -670,7 +670,13 @@
     },
     "hideTutor": "ट्यूटर छिपाएँ",
     "moveUp": "{{label}} ऊपर करें",
-    "moveDown": "{{label}} नीचे करें"
+    "moveDown": "{{label}} नीचे करें",
+    "a11y": {
+      "beatAdvance": "चरण {{index}}/{{total}}।",
+      "completed": "पाठ पूरा! आपने {{xp}} अंक कमाए।",
+      "beatCounter": "गतिविधि {{index}}/{{total}}",
+      "empty": "इस सत्र में कोई गतिविधि बाकी नहीं है।"
+    }
   },
   "learnerTutor": {
     "tutorNotFound": "ट्यूटर नहीं मिला",

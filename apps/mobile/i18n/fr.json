@@ -670,7 +670,13 @@
     },
     "hideTutor": "Masquer le tuteur",
     "moveUp": "Monter {{label}}",
-    "moveDown": "Descendre {{label}}"
+    "moveDown": "Descendre {{label}}",
+    "a11y": {
+      "beatAdvance": "Étape {{index}} sur {{total}}.",
+      "completed": "Leçon terminée ! Tu as gagné {{xp}} points.",
+      "beatCounter": "Activité {{index}} sur {{total}}",
+      "empty": "Cette session n'a plus d'activités."
+    }
   },
   "learnerTutor": {
     "tutorNotFound": "Tuteur introuvable",
