@@ -1249,7 +1249,13 @@
       "open_world": "Abrir mundo →",
       "sticker_empty_encouragement": "Tu primera pegatina te espera: ¡termina un capítulo para ganarla!",
       "badges_title": "Insignias",
-      "badges_count": "{earned} de {total} conseguidas"
+      "badges_count": "{earned} de {total} conseguidas",
+      "themes_title": "Temas del espacio",
+      "themes_hint": "Sube de nivel para desbloquear nuevos estilos para tu espacio.",
+      "theme_locked": "Alcanza el nivel {level}",
+      "theme_active": "Activo",
+      "badge_earned": "Conseguida",
+      "badge_howto": "Sigue explorando para conseguirla."
     },
     "select": {
       "eyebrow": "Ver como",

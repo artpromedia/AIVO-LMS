@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AivoMascot } from "@/components/learner/art/aivo-mascot";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import {
   listActiveAssignmentsForLearner,
@@ -75,6 +76,7 @@ export default async function Page() {
         ))}
         {assignments.length === 0 && runs.length === 0 ? (
           <EmptyState
+            icon={<AivoMascot expression="resting" size={72} />}
             title={t("nothing_waiting")}
             description={t("nothing_desc")}
             action={

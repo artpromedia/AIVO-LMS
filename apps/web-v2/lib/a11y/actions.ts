@@ -11,6 +11,7 @@ import {
   SOUND_COOKIE,
   resolveSound,
 } from "./typeface";
+import { WORKSPACE_THEME_COOKIE, resolveWorkspaceTheme } from "@/lib/learner/workspace-themes";
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
@@ -51,6 +52,17 @@ export async function setSoundCookie(v: string): Promise<void> {
   const resolved = resolveSound(v);
   const store = await cookies();
   store.set(SOUND_COOKIE, resolved, {
+    path: "/",
+    maxAge: ONE_YEAR,
+    sameSite: "lax",
+    httpOnly: false,
+  });
+}
+
+export async function setWorkspaceThemeCookie(v: string): Promise<void> {
+  const resolved = resolveWorkspaceTheme(v);
+  const store = await cookies();
+  store.set(WORKSPACE_THEME_COOKIE, resolved, {
     path: "/",
     maxAge: ONE_YEAR,
     sameSite: "lax",

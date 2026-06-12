@@ -1249,7 +1249,13 @@
       "open_world": "打开世界 →",
       "sticker_empty_encouragement": "你的第一张贴纸在等你——完成一个章节就能获得！",
       "badges_title": "徽章",
-      "badges_count": "已获得 {earned}/{total}"
+      "badges_count": "已获得 {earned}/{total}",
+      "themes_title": "工作区主题",
+      "themes_hint": "升级以解锁你空间的新外观。",
+      "theme_locked": "达到 {level} 级",
+      "theme_active": "已启用",
+      "badge_earned": "已获得",
+      "badge_howto": "继续探索来获得它。"
     },
     "select": {
       "eyebrow": "查看身份",

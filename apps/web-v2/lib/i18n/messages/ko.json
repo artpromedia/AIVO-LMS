@@ -1249,7 +1249,13 @@
       "open_world": "세계 열기 →",
       "sticker_empty_encouragement": "첫 스티커가 기다리고 있어요. 챕터 하나를 끝내고 받아보세요!",
       "badges_title": "배지",
-      "badges_count": "{earned}/{total}개 획득"
+      "badges_count": "{earned}/{total}개 획득",
+      "themes_title": "작업 공간 테마",
+      "themes_hint": "레벨을 올려 내 공간의 새로운 모습을 잠금 해제하세요.",
+      "theme_locked": "레벨 {level} 도달",
+      "theme_active": "켜짐",
+      "badge_earned": "획득함",
+      "badge_howto": "계속 탐험해서 획득하세요."
     },
     "select": {
       "eyebrow": "다음으로 보기",

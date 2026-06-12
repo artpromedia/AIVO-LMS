@@ -19,6 +19,7 @@ import {
   readReducedMotionFromCookies,
   readSpacingFromCookies,
   readSoundFromCookies,
+  readWorkspaceThemeFromCookies,
 } from "@/lib/a11y/server";
 import { dirForLocale } from "@/lib/i18n/config";
 
@@ -106,6 +107,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const reducedMotion = await readReducedMotionFromCookies();
   const spacing = await readSpacingFromCookies();
   const sound = await readSoundFromCookies();
+  const workspaceTheme = await readWorkspaceThemeFromCookies();
   const locale = await getLocale();
   const messages = await getMessages();
   const t = await getTranslations("root.layout");
@@ -119,6 +121,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       data-reduced-motion={reducedMotion}
       data-spacing={spacing}
       data-sound={sound}
+      data-workspace-theme={workspaceTheme}
       data-brand="inclusive-warm"
     >
       <head>

@@ -1249,7 +1249,13 @@
       "open_world": "दुनिया खोलें →",
       "sticker_empty_encouragement": "तुम्हारा पहला स्टिकर इंतज़ार कर रहा है — एक अध्याय पूरा करो और पा लो!",
       "badges_title": "बैज",
-      "badges_count": "{total} में से {earned} अर्जित"
+      "badges_count": "{total} में से {earned} अर्जित",
+      "themes_title": "वर्कस्पेस थीम",
+      "themes_hint": "अपने स्थान के लिए नए रूप अनलॉक करने हेतु लेवल बढ़ाएँ।",
+      "theme_locked": "लेवल {level} तक पहुँचें",
+      "theme_active": "चालू",
+      "badge_earned": "अर्जित",
+      "badge_howto": "इसे पाने के लिए खोज जारी रखें।"
     },
     "select": {
       "eyebrow": "इस रूप में देखें",

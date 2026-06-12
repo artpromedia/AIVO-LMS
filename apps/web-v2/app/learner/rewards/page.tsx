@@ -17,7 +17,11 @@ import {
 import { StickerBook } from "@/components/playful-calm";
 import { AivoMascot } from "@/components/learner/art/aivo-mascot";
 import { BadgeCollection, ALL_BADGES } from "@/components/learner/badge-collection";
+import { WorkspaceThemePicker } from "@/components/learner/workspace-theme-picker";
+import { TutorFace } from "@/components/learner/art/tutor-character";
+import { tutorKeyForWorldSlug } from "@/lib/learner/quest-worlds";
 import { XP_PER_LEVEL } from "@/lib/learner/engagement-award";
+import { readWorkspaceThemeFromCookies } from "@/lib/a11y/server";
 import type { BadgeKey } from "@/lib/db/types";
 
 export default async function Page() {
@@ -51,6 +55,7 @@ export default async function Page() {
   const xpPct = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
   const badges = await listLearnerBadges(learnerId, session.tenantId);
   const earnedKeys = new Set<BadgeKey>(badges.map((b) => b.badgeKey));
+  const workspaceTheme = await readWorkspaceThemeFromCookies();
 
   return (
     <AppShell
@@ -116,9 +121,13 @@ export default async function Page() {
         </div>
         <BadgeCollection
           earnedKeys={earnedKeys}
-          ariaLabel={t("badges_count", { earned: badges.length, total: ALL_BADGES.length })}
+          earnedLabel={t("badge_earned")}
+          howtoLabel={t("badge_howto")}
         />
       </section>
+
+      {/* Unlockable workspace themes — progress buys personalization */}
+      <WorkspaceThemePicker learnerLevel={level} initialTheme={workspaceTheme} />
 
       <div className="mb-4">
         <StickerBook
@@ -132,10 +141,14 @@ export default async function Page() {
           worlds.map(async (w) => {
             const chapters = await listQuestChapters(w.id);
             const done = chapters.filter((c) => completedByChapter.get(c.id)).length;
+            const worldTutor = tutorKeyForWorldSlug(w.slug);
             return (
               <Card key={w.id} className="p-[var(--aivo-density-card-pad)]">
-                <div className="flex items-center justify-between">
-                  <p className="font-display text-lg font-semibold">{w.name}</p>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {worldTutor ? <TutorFace tutorKey={worldTutor} size={44} /> : null}
+                    <p className="font-display text-lg font-semibold">{w.name}</p>
+                  </div>
                   <Badge tone={done === chapters.length ? "success" : "primary"}>
                     {done}/{chapters.length}
                   </Badge>

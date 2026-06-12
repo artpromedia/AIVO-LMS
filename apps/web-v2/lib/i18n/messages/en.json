@@ -1447,7 +1447,13 @@
       "open_world": "Open world →",
       "sticker_empty_encouragement": "Your first sticker is waiting — finish a chapter to earn it!",
       "badges_title": "Badges",
-      "badges_count": "{earned} of {total} earned"
+      "badges_count": "{earned} of {total} earned",
+      "themes_title": "Workspace themes",
+      "themes_hint": "Level up to unlock new looks for your space.",
+      "theme_locked": "Reach level {level}",
+      "theme_active": "On",
+      "badge_earned": "Earned",
+      "badge_howto": "Keep exploring to earn this one."
     },
     "select": {
       "eyebrow": "View as",

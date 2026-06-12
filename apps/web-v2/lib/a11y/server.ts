@@ -1,5 +1,11 @@
 import { cookies } from "next/headers";
 import {
+  WORKSPACE_THEME_COOKIE,
+  WORKSPACE_THEME_DEFAULT,
+  resolveWorkspaceTheme,
+  type WorkspaceThemeId,
+} from "@/lib/learner/workspace-themes";
+import {
   TYPEFACE_COOKIE,
   TYPEFACE_DEFAULT,
   resolveTypeface,
@@ -40,4 +46,9 @@ export async function readSpacingFromCookies(): Promise<Spacing> {
 export async function readSoundFromCookies(): Promise<SoundLevel> {
   const store = await cookies();
   return resolveSound(store.get(SOUND_COOKIE)?.value ?? SOUND_DEFAULT);
+}
+
+export async function readWorkspaceThemeFromCookies(): Promise<WorkspaceThemeId> {
+  const store = await cookies();
+  return resolveWorkspaceTheme(store.get(WORKSPACE_THEME_COOKIE)?.value ?? WORKSPACE_THEME_DEFAULT);
 }
