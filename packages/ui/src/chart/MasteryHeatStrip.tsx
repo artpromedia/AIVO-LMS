@@ -125,6 +125,7 @@ export const MasteryHeatStrip = forwardRef<HTMLDivElement, MasteryHeatStripProps
                 CELL_BG[c.level],
                 CELL_RING[c.level],
               )}
+              role="img"
               title={`${c.code}${c.name ? ` — ${c.name}` : ""}: ${c.level}`}
               aria-label={`${c.code} ${c.level}`}
             />

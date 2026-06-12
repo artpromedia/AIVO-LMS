@@ -75,4 +75,24 @@ test.describe("@a11y per-role home routes", () => {
       await expect(page.locator("main")).toBeVisible();
     });
   }
+
+  // Sprint 02 — the accessibility settings page is the product's front door
+  // for neurodiverse supports; it must itself clear the axe bar.
+  test("@a11y learner accessibility settings (/learner/settings/accessibility)", async ({
+    context,
+    page,
+  }) => {
+    await context.addCookies([
+      { name: "aivo_mock_session", value: "learner", domain: "127.0.0.1", path: "/" },
+    ]);
+    await page.goto("/learner/settings/accessibility");
+    await page.waitForSelector("main", { timeout: 30_000 });
+    await injectAxe(page);
+    await checkA11y(page, "main", {
+      detailedReport: true,
+      detailedReportOptions: { html: true },
+      axeOptions: { rules: AXE_RULES },
+    });
+    await expect(page.locator("main")).toBeVisible();
+  });
 });

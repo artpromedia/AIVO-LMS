@@ -16,6 +16,7 @@
  * admin-svc + web-admin on :5001), like platform-usage-trends.spec.ts.
  */
 import { test, expect } from "@playwright/test";
+import { expectNoSeriousA11yViolations } from "../../lib/a11y";
 import {
   ADMIN_WEB_BASE,
   T,
@@ -40,6 +41,7 @@ test.describe("Chart primitives — /platform/__chart-check harness (web-admin :
     await authenticateAdminBrowser(page, admin, "platform_admin");
     await page.goto(HARNESS_URL);
     await expect(page.getByRole("heading", { name: "Chart self-test" })).toBeVisible();
+    await expectNoSeriousA11yViolations(page);
 
     // Every primitive is on screen.
     for (const testId of [

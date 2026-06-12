@@ -384,6 +384,7 @@ Image build pipeline: GitHub Actions → GHCR → Hetzner cluster pull.
 GitHub Actions workflows live in [`.github/workflows/`](.github/workflows/) and cover:
 
 - Lint, type check, unit tests (per-package matrix)
+- Accessibility axe gate (`web-a11y-axe`): every `@a11y`-tagged Playwright spec runs against a real web-v2 server and blocks the PR on violations — run locally with `corepack pnpm --filter @aivo/web-v2 run test:a11y`
 - Background Jobs & Scheduler integration tests (admin-svc, identity-svc) with auto-migrated Postgres
 - i18n file audit
 - Python service builds (brain-svc, ai-svc) with `pip-audit` CVE checks

@@ -125,10 +125,10 @@ export default async function TherapistHomePage() {
       ) : null}
 
       <div className="mt-4 flex flex-col gap-1 text-sm">
-        <Link href="/therapist/sessions" className="text-aivo-accent hover:underline">
+        <Link href="/therapist/sessions" className="text-iw-primary hover:underline">
           {t("link_sessions")}
         </Link>
-        <Link href="/therapist/reports" className="text-aivo-accent hover:underline">
+        <Link href="/therapist/reports" className="text-iw-primary hover:underline">
           {t("link_reports")}
         </Link>
       </div>

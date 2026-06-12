@@ -31,6 +31,8 @@ export interface GlassCardProps extends Omit<React.HTMLAttributes<HTMLDivElement
   glass?: boolean;
   /** Optional headline rendered at the top of the card. */
   title?: React.ReactNode;
+  /** Heading element for `title` — pick to fit the page outline. */
+  headingAs?: "h2" | "h3" | "h4";
   /** Optional sub-headline / supporting copy under `title`. */
   description?: React.ReactNode;
   /** Right-aligned actions slot (button group, menu, etc). */
@@ -70,6 +72,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(functi
     radius = "card-lg",
     glass = false,
     title,
+    headingAs: HeadingTag = "h3",
     description,
     actions,
     className,
@@ -114,9 +117,9 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(functi
         <header className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex flex-col gap-1">
             {title && (
-              <h3 className="iw-label text-[var(--aivo-color-text-default,#0f172a)] truncate">
+              <HeadingTag className="iw-label text-[var(--aivo-color-text-default,#0f172a)] truncate">
                 {title}
-              </h3>
+              </HeadingTag>
             )}
             {description && (
               <p className="text-sm text-[var(--aivo-color-text-muted,#64748b)] truncate">

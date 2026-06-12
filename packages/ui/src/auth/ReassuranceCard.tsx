@@ -39,7 +39,8 @@ export function ReassuranceCard({
   className,
 }: ReassuranceCardProps) {
   return (
-    <aside
+    <div
+      role="note"
       className={cn(
         "rounded-iw-card border border-iw-border bg-white",
         "p-4 flex items-start gap-3",
@@ -69,7 +70,7 @@ export function ReassuranceCard({
           </a>
         ) : null}
       </div>
-    </aside>
+    </div>
   );
 }
 
