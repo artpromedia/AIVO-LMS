@@ -35,6 +35,27 @@ export const SEEDED_PACKS: Readonly<Record<string, ContentPack>> = {
   ...Object.fromEntries(AUTHORED_SUBJECT_PACKS.map((pack) => [pack.id, pack])),
 };
 
+/**
+ * Remediation Sprint 05 — the packs whose activities are REAL authored
+ * content (verified by hand). The `authoredPack()` template packs in
+ * authored-subject-catalog-2026.ts are deliberately excluded: they are the
+ * recognised 3-activity stubs (identical "Observe, explain, then choose"
+ * choices for every subject) the production-readiness audit flagged.
+ * Consumers (web-v2 lesson generation, tutor-svc planSession) must only
+ * serve packs from this list as authored content; Sprints 08-09 extend it
+ * as real packs land.
+ */
+export const REAL_AUTHORED_PACK_IDS: readonly string[] = [
+  "math-k-fall-2026",
+  "ela-k-fall-2026",
+  "science-k-fall-2026",
+  "coding-k2-fall-2026",
+];
+
+export function isRealAuthoredPack(packId: string): boolean {
+  return REAL_AUTHORED_PACK_IDS.includes(packId);
+}
+
 export function getSeededPack(id: string): ContentPack | undefined {
   return SEEDED_PACKS[id];
 }

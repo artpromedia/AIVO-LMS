@@ -95,6 +95,65 @@ describe("createLessonRun domain-surface emission (real path)", () => {
   );
 
   it(
+    "K-band lessons serve AUTHORED pack content and stamp contentSource (Sprint 05)",
+    { timeout: 30_000 },
+    async () => {
+      const { ensureSeeded } = await import("@/lib/db/seed");
+      const { createLessonRun } = await import("@/lib/db/repos");
+      const { getPersistence } = await import("@/lib/db/persistence");
+      const { expandGradeBand } = await import("@/lib/learner/authored-content");
+      ensureSeeded();
+
+      const curriculum = getPersistence().curriculum;
+      const math = (await curriculum.listSubjects()).find((s) => s.slug === "math")!;
+      const kSkill = (await curriculum.listSkills(math.id)).find((s) =>
+        expandGradeBand(s.gradeBand).has("K"),
+      );
+      expect(kSkill, "seed must include a K-band math skill").toBeTruthy();
+
+      const result = await createLessonRun({
+        learnerId: SKY,
+        tenantId: TENANT,
+        subjectId: math.id,
+        skillId: kSkill!.id,
+        source: "subject_path",
+      });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      const stored = await getPersistence().lessonRuns.getPlanById(
+        result.lessonRun.lessonPlanId!,
+        TENANT,
+      );
+      // The plan's practice items are the REAL math-k-fall-2026 activities —
+      // authoring a pack now changes what the learner sees — and the
+      // provenance is stamped on the generation telemetry.
+      expect(stored!.generation.contentSource).toBe("authored_pack");
+      expect(stored!.guidedPractice.some((g) => g.prompt.includes("How many apples"))).toBe(true);
+
+      // A subject with only the recognised template stub stays "template".
+      const music = (await curriculum.listSubjects()).find((s) => s.slug === "music");
+      if (music) {
+        const musicSkill = (await curriculum.listSkills(music.id))[0];
+        const musicRun = await createLessonRun({
+          learnerId: SKY,
+          tenantId: TENANT,
+          subjectId: music.id,
+          skillId: musicSkill.id,
+          source: "subject_path",
+        });
+        expect(musicRun.ok).toBe(true);
+        if (musicRun.ok) {
+          const musicPlan = await getPersistence().lessonRuns.getPlanById(
+            musicRun.lessonRun.lessonPlanId!,
+            TENANT,
+          );
+          expect(musicPlan!.generation.contentSource).toBe("template");
+        }
+      }
+    },
+  );
+
+  it(
     "reading lessons carry the READING surface, never math's number line",
     { timeout: 30_000 },
     async () => {

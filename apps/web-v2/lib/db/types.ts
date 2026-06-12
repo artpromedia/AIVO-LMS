@@ -1007,6 +1007,9 @@ export type GeneratedLessonPlan = {
     attempts: number;
     latencyMs: number;
     schemaVersion: number;
+    /** Sprint 05: where the practice items came from — REAL authored pack
+     *  content vs the deterministic domain templates. */
+    contentSource?: "authored_pack" | "template";
   };
 };
 

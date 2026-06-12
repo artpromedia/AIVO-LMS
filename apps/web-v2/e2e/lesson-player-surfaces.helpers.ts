@@ -48,6 +48,18 @@ async function answerCurrentBeat(page: Page): Promise<void> {
     await label.click(click).catch(() => {});
     await diagramTarget.click(click).catch(() => {});
   }
+  // Drag-manipulative beats: pick up each token, drop it into the first
+  // target bin, then submit the placement.
+  const token = page.getByRole("button", { name: /pick up /i }).first();
+  if (await token.isVisible().catch(() => false)) {
+    for (let i = 0; i < 6; i += 1) {
+      const nextToken = page.getByRole("button", { name: /pick up /i }).first();
+      if (!(await nextToken.isVisible().catch(() => false))) break;
+      await nextToken.click(click).catch(() => {});
+      const bin = page.getByRole("button", { name: /drop into /i }).first();
+      if (await bin.isVisible().catch(() => false)) await bin.click(click).catch(() => {});
+    }
+  }
   // Graph beats: clicking the grid plots a snapped point.
   const grid = page.getByLabel("coordinate grid").first();
   if (await grid.isVisible().catch(() => false)) {

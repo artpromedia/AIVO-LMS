@@ -63,6 +63,12 @@ function buildUserPrompt(input: TutorGenerationInputs, example: unknown): string
     input.curriculumFocus
       ? `This week's school curriculum focus (teach in sync): ${JSON.stringify(input.curriculumFocus)}`
       : "No school curriculum upload — teach the skill on its own.",
+    input.authoredItems && input.authoredItems.length > 0
+      ? "AUTHORED SOURCE ACTIVITIES — the curriculum team authored these for this skill/grade. " +
+        "Base your guidedPractice on them: keep each activity's skill intent, answer fidelity, " +
+        "and surface object intact; adapt only the wording to the learner's profile.\n" +
+        JSON.stringify(input.authoredItems, null, 2)
+      : "",
     "",
     "Return JSON with EXACTLY this shape (same keys and value types), with original content tailored to the above:",
     JSON.stringify(example, null, 2),

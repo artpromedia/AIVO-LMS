@@ -34,7 +34,9 @@ export const scienceTutor: TutorDefinition = defineTutor({
     "ngss-science-3-8",
     "ngss-science-9-12",
   ],
-  defaultContentPackRefs: ["science-k2-fall-2026"],
+  // Sprint 05: science-k-fall-2026 is the REAL hand-authored pack (5
+  // activities); the previous ref pointed at the 3-activity template stub.
+  defaultContentPackRefs: ["science-k-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.

@@ -341,6 +341,32 @@ function writingPractice(_skillName: string): GuidedItems {
 }
 
 /**
+ * The signature domain surface each subject must mount in every lesson —
+ * the per-subject invariant Sprints 02-04 established. The generator
+ * guarantees it even when authored pack content (Sprint 05) provides the
+ * practice items: if the authored set lacks the signature surface, the
+ * first template item carrying it is appended.
+ */
+export const SIGNATURE_SURFACE: Readonly<Record<string, readonly string[]>> = {
+  math: ["number_line"],
+  reading: ["reading_annotation"],
+  writing: ["reading_annotation"],
+  science: ["science_diagram", "graph"],
+  "social-studies": ["reading_annotation"],
+  geography: ["science_diagram"],
+  speech: ["voice_response"],
+  social: ["drag_manipulative"],
+  life: ["multi_step_workspace"],
+  "executive-function": ["multi_step_workspace"],
+  art: ["art_canvas"],
+  music: ["music_sequencer"],
+  "physical-education": ["drag_manipulative"],
+  "world-languages": ["voice_response"],
+  coding: ["coding_sandbox"],
+  engineering: ["multi_step_workspace"],
+};
+
+/**
  * Domain practice for one subject, or null when the subject has no domain
  * builder yet (the caller falls back to the generic exploration items).
  */

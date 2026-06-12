@@ -1770,6 +1770,7 @@ import {
   type TutorProvider,
 } from "@/lib/ai/tutor";
 import { getTutorProvider } from "@/lib/ai/anthropic-tutor";
+import { getAuthoredLessonItems } from "@/lib/learner/authored-content";
 
 function buildAccommodationSnapshotFrom(
   state: LearnerBrainProfileState,
@@ -1918,6 +1919,15 @@ export async function createLessonRun(
       } as Record<string, string>
     )[subject.slug] ?? "Nimbus the Calm Explorer";
 
+  // Remediation Sprint 05: resolve REAL authored pack content for this
+  // (subject, skill grade band). When present it becomes the lesson's
+  // practice items (and the AI provider's source material); the domain
+  // templates remain the fallback.
+  const authoredItems = getAuthoredLessonItems({
+    subjectSlug: subject.slug,
+    gradeBand: skill.gradeBand,
+  });
+
   const now = nowIso();
   const run: LessonRun = {
     id: newId("lr"),
@@ -1956,6 +1966,7 @@ export async function createLessonRun(
       mastery: masterySnapshot,
       accommodations: accommodationSnapshot,
       curriculumFocus,
+      authoredItems,
       source: input.source,
     });
 
@@ -1970,7 +1981,11 @@ export async function createLessonRun(
         id: newId("chk"),
       })),
       generatedAt: nowIso(),
-      generation: telemetry,
+      generation: {
+        ...telemetry,
+        contentSource:
+          authoredItems.length > 0 ? ("authored_pack" as const) : ("template" as const),
+      },
     };
     await getPersistence().lessonRuns.upsertPlan(planRecord);
 
@@ -2637,6 +2652,10 @@ export async function retryLessonRun(
   if (!skill) throw new Error("skill missing");
 
   try {
+    const retryAuthoredItems = getAuthoredLessonItems({
+      subjectSlug: subject.slug,
+      gradeBand: skill.gradeBand,
+    });
     const { plan, telemetry } = await generateLessonPlanWithRetry(provider, {
       learnerName: run.learnerContextSnapshot.displayName,
       // Use the frozen snapshot, NOT a fresh brain-profile read, so retry
@@ -2651,6 +2670,7 @@ export async function retryLessonRun(
       objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
       mastery: run.masterySnapshot,
       accommodations: run.accommodationSnapshot,
+      authoredItems: retryAuthoredItems,
       source: run.source,
     });
     const planRecord: GeneratedLessonPlan = {
@@ -2664,7 +2684,12 @@ export async function retryLessonRun(
         id: newId("chk"),
       })),
       generatedAt: nowIso(),
-      generation: { ...telemetry, schemaVersion: LESSON_PLAN_SCHEMA_VERSION },
+      generation: {
+        ...telemetry,
+        schemaVersion: LESSON_PLAN_SCHEMA_VERSION,
+        contentSource:
+          retryAuthoredItems.length > 0 ? ("authored_pack" as const) : ("template" as const),
+      },
     };
     await runStore.upsertPlan(planRecord);
     const ready: LessonRun = {

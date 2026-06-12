@@ -19,7 +19,7 @@ import type {
 import type { GeneratedLessonPlanInput } from "@/lib/validators/lesson";
 import { getSubjectBySlug, TUTORS } from "@aivo/brand";
 import { pickMultimediaFixtureForSubject } from "./multimedia-item-bank";
-import { domainPractice } from "./domain-practice";
+import { domainPractice, SIGNATURE_SURFACE } from "./domain-practice";
 import {
   buildGraphSurface,
   buildReadingAnnotationSurface,
@@ -299,6 +299,8 @@ export type LessonPlanInputs = {
   accommodations: LessonAccommodationSnapshot;
   /** Phase 1: active school-week curriculum to teach in sync with class. */
   curriculumFocus?: CurriculumFocus | null;
+  /** Sprint 05: authored-pack practice items — served first when present. */
+  authoredItems?: GeneratedLessonPlanInput["guidedPractice"];
   source: string;
 };
 
@@ -342,7 +344,11 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
   const scaffoldLine = modalityScaffold(brainState.preferredModalities);
 
   let guidedRaw: GeneratedLessonPlanInput["guidedPractice"];
-  if (subject.slug === "reading") {
+  if (input.authoredItems && input.authoredItems.length > 0) {
+    // Sprint 05: REAL authored pack content takes priority over every
+    // template builder — authoring a pack changes what the learner sees.
+    guidedRaw = input.authoredItems;
+  } else if (subject.slug === "reading") {
     guidedRaw = readingPractice(skill.name, tier.difficulty);
   } else if (subject.slug === "math") {
     guidedRaw = mathPractice(skill.name, tier.difficulty);
@@ -396,7 +402,34 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
   // replaces the first item's prompt/answer/choices). The selector returns
   // undefined for items that cannot honestly carry a domain surface, which
   // keeps them on the generic choice/text surface.
-  const guidedWithSurfaces = guidedPractice.map((g) => withSelectedSurface(g, subject.slug));
+  let guidedWithSurfaces = guidedPractice.map((g) => withSelectedSurface(g, subject.slug));
+  // Sprint 05: authored pack items take priority as CONTENT, but the
+  // per-subject domain-surface invariant (Sprints 02-04) still holds — a
+  // reading lesson always mounts the annotation surface, a music lesson the
+  // sequencer, etc. When the authored set lacks the subject's signature
+  // surface, append the first template item that carries it.
+  const signatures = SIGNATURE_SURFACE[subject.slug] ?? [];
+  if (
+    signatures.length > 0 &&
+    !guidedWithSurfaces.some((g) => g.surface && signatures.includes(g.surface.surfaceType)) &&
+    guidedWithSurfaces.length < 8
+  ) {
+    const templates =
+      subject.slug === "reading"
+        ? readingPractice(skill.name, tier.difficulty)
+        : subject.slug === "math"
+          ? mathPractice(skill.name, tier.difficulty)
+          : subject.slug === "science"
+            ? sciencePractice(skill.name, tier.difficulty)
+            : (domainPractice(subject.slug, skill.name, tier.difficulty) ?? []);
+    const signatureItem = templates
+      .map((g) => withSelectedSurface({ ...g, skillId: skill.id }, subject.slug))
+      .find((g) => g.surface && signatures.includes(g.surface.surfaceType));
+    // Lead with the signature item so the domain surface is the learner's
+    // first interaction (and is reachable regardless of how later authored
+    // beats are answered).
+    if (signatureItem) guidedWithSurfaces = [signatureItem, ...guidedWithSurfaces];
+  }
 
   const checksForUnderstanding: GeneratedLessonPlanInput["checksForUnderstanding"] = [
     {

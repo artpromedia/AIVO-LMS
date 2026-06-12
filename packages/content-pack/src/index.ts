@@ -28,4 +28,6 @@ export {
   scienceKFall2026,
   codingK2Fall2026,
   AUTHORED_SUBJECT_PACKS,
+  REAL_AUTHORED_PACK_IDS,
+  isRealAuthoredPack,
 } from "./seeds/index.js";

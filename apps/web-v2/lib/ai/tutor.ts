@@ -52,6 +52,16 @@ export type TutorGenerationInputs = {
    * topic so AIVO teaches in sync with class. Null when there's nothing to sync.
    */
   curriculumFocus?: CurriculumFocus | null;
+  /**
+   * Remediation Sprint 05: guided-practice items sourced from the REAL
+   * authored content packs for this (subject, grade band), mapped by
+   * lib/learner/authored-content.ts. When present the deterministic
+   * generator serves THESE as the practice items, and the AI provider is
+   * instructed to use them as its source material — authoring a pack now
+   * changes what the learner actually sees. Empty/undefined → the domain
+   * template builders are the fallback.
+   */
+  authoredItems?: GeneratedLessonPlanInput["guidedPractice"];
   source: string;
 };
 

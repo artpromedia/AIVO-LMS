@@ -27,6 +27,7 @@
     "@aivo/admin-auth": "workspace:*",
     "@aivo/api-client": "workspace:*",
     "@aivo/brand": "workspace:*",
+    "@aivo/content-pack": "workspace:*",
     "@aivo/db": "workspace:*",
     "@aivo/feature-flags": "workspace:*",
     "@aivo/learner-import": "workspace:*",
