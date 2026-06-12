@@ -104,9 +104,10 @@ function areaOf(file) {
 }
 
 // Internal developer tooling — not shipped product UI, so intentionally
-// out of the translation scope. The component gallery (design-system) and
-// the surface-preview harness exist for engineers, never end users.
-const IGNORED_AREAS = new Set(["design-system", "surface-preview"]);
+// out of the translation scope. The component gallery (design-system), the
+// surface-preview harness, and the design-preview replica (dev-only via
+// middleware DEV_ONLY_PREFIXES) exist for engineers, never end users.
+const IGNORED_AREAS = new Set(["design-system", "surface-preview", "design-preview"]);
 
 const findings = [];
 for (const file of walk(appRoot)) {
