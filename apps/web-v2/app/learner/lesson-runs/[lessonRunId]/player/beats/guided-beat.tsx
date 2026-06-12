@@ -15,15 +15,19 @@ import {
   type SurfaceRouterSubmitResult,
   type SurfaceTelemetryEvent,
 } from "@aivo/learner-surfaces";
+import type { TutorKey } from "@aivo/brand";
 import type { AccessibilityPreferences } from "@/lib/db/types";
 import type { Beat } from "../beats";
 import { LessonMedia } from "../lesson-media";
+import { AnswerFeedback } from "./answer-feedback";
 
 export interface GuidedBeatProps {
   beat: Extract<Beat, { kind: "guided" }>;
   surfaceItem: SurfaceRouterItem;
   accessibilitySettings: AccessibilityPreferences;
   feedback: null | "correct" | "incorrect";
+  motionOff: boolean;
+  tutorSlug: TutorKey | null;
   showHint: boolean;
   agentScaffold: string | null;
   onSubmit: (result: SurfaceRouterSubmitResult) => void;
@@ -38,6 +42,8 @@ export function GuidedBeat({
   surfaceItem,
   accessibilitySettings,
   feedback,
+  motionOff,
+  tutorSlug,
   showHint,
   agentScaffold,
   onSubmit,
@@ -70,14 +76,14 @@ export function GuidedBeat({
         </p>
       )}
       {feedback === "correct" && (
-        <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
+        <AnswerFeedback tone="correct" motionOff={motionOff} tutorSlug={tutorSlug}>
           {t("nice_work")}
-        </p>
+        </AnswerFeedback>
       )}
       {feedback === "incorrect" && (
-        <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
+        <AnswerFeedback tone="incorrect" motionOff={motionOff} tutorSlug={tutorSlug}>
           {t("not_quite")} <MathText>{beat.scaffold}</MathText>
-        </p>
+        </AnswerFeedback>
       )}
       {agentScaffold && (
         <p
