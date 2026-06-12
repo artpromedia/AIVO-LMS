@@ -1209,7 +1209,9 @@
       "msg_supports_title": "你的支持已开启",
       "msg_supports_body": "朗读、平和的节奏，以及来自你 IEP 的{count, plural, other {另外 # 项支持}}都已启用。",
       "msg_break_title": "休息是好事",
-      "msg_break_body": "伸个懒腰、喝点水、看看窗外。AIVO 会保存你的位置。"
+      "msg_break_body": "伸个懒腰、喝点水、看看窗外。AIVO 会保存你的位置。",
+      "explore_subjects_title": "探索你的科目",
+      "explore_subjects_body": "每位导师和科目，一点即达。"
     },
     "common": {
       "learner_eyebrow": "学习者",

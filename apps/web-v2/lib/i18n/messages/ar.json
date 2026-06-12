@@ -1209,7 +1209,9 @@
       "msg_supports_title": "وسائل دعمك مفعّلة",
       "msg_supports_body": "القراءة الجهرية والإيقاع الهادئ و{count, plural, other {# وسيلة دعم أخرى}} من خطة الـ IEP الخاصة بك مفعّلة.",
       "msg_break_title": "الاستراحات جيّدة",
-      "msg_break_body": "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك."
+      "msg_break_body": "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك.",
+      "explore_subjects_title": "استكشف موادك",
+      "explore_subjects_body": "كل معلّم وكل مادة بلمسة واحدة."
     },
     "common": {
       "learner_eyebrow": "المتعلّم",

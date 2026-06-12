@@ -7,6 +7,7 @@
  * never recreate the machine and lose state. The snapshot in `useState`
  * is what triggers re-renders when the underlying machine mutates.
  */
+"use client";
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { Beat } from "@aivo/stage-ui";
 import { SessionMachine, type SessionSnapshot, type TutorSession } from "./SessionMachine.js";

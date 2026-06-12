@@ -1402,7 +1402,9 @@
       "msg_supports_title": "Your supports are on",
       "msg_supports_body": "Read-aloud, calm pacing, and {count, plural, one {# other support} other {# other supports}} from your IEP are active.",
       "msg_break_title": "Breaks are good",
-      "msg_break_body": "Stretch, sip water, look out the window. AIVO will save your place."
+      "msg_break_body": "Stretch, sip water, look out the window. AIVO will save your place.",
+      "explore_subjects_title": "Explore your subjects",
+      "explore_subjects_body": "Every tutor and subject, one tap away."
     },
     "common": {
       "learner_eyebrow": "Learner",

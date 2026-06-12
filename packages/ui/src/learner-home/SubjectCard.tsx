@@ -114,8 +114,6 @@ export function SubjectCard({
         <h3 className="text-lg font-semibold text-iw-text-strong">{name}</h3>
         <p className="text-sm text-iw-text-muted">
           <span className="font-semibold text-iw-text-strong">{masteryLabel}</span>
-          <span className="mx-1.5 text-iw-text-muted/40">·</span>
-          <span className="tabular-nums">{Math.round(masteryPct)}%</span>
         </p>
       </div>
       {(nextAction || support || teacherAssigned) && (

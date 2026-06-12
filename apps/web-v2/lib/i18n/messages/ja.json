@@ -1209,7 +1209,9 @@
       "msg_supports_title": "あなたのサポートはオンです",
       "msg_supports_body": "読み上げ、落ち着いたペース、そして IEP からの{count, plural, other {他 # 件のサポート}}が有効です。",
       "msg_break_title": "休憩はいいこと",
-      "msg_break_body": "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。"
+      "msg_break_body": "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。",
+      "explore_subjects_title": "きょうかを見てみよう",
+      "explore_subjects_body": "チューターと教科はワンタップで。"
     },
     "common": {
       "learner_eyebrow": "学習者",

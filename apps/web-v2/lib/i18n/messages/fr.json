@@ -1209,7 +1209,9 @@
       "msg_supports_title": "Tes aides sont activées",
       "msg_supports_body": "La lecture à voix haute, le rythme apaisé et {count, plural, one {# autre aide} other {# autres aides}} de ton IEP sont actifs.",
       "msg_break_title": "Les pauses, c'est bien",
-      "msg_break_body": "Étire-toi, bois de l'eau, regarde par la fenêtre. AIVO gardera ta place."
+      "msg_break_body": "Étire-toi, bois de l'eau, regarde par la fenêtre. AIVO gardera ta place.",
+      "explore_subjects_title": "Explore tes matières",
+      "explore_subjects_body": "Chaque tuteur et chaque matière, à un geste."
     },
     "common": {
       "learner_eyebrow": "Apprenant",

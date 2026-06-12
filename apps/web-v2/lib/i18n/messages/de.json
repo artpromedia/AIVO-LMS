@@ -1209,7 +1209,9 @@
       "msg_supports_title": "Deine Hilfen sind an",
       "msg_supports_body": "Vorlesen, ruhiges Tempo und {count, plural, one {# weitere Hilfe} other {# weitere Hilfen}} aus deinem IEP sind aktiv.",
       "msg_break_title": "Pausen sind gut",
-      "msg_break_body": "Streck dich, trink Wasser, schau aus dem Fenster. AIVO merkt sich deinen Platz."
+      "msg_break_body": "Streck dich, trink Wasser, schau aus dem Fenster. AIVO merkt sich deinen Platz.",
+      "explore_subjects_title": "Entdecke deine Fächer",
+      "explore_subjects_body": "Jeder Tutor, jedes Fach — einen Tipp entfernt."
     },
     "common": {
       "learner_eyebrow": "Lernende/r",
