@@ -208,6 +208,118 @@ export function buildGraphSurface(input: {
   };
 }
 
+// ── Sprint 04 — expressive & interactive builders ───────────────────────────
+
+/**
+ * Coding sandbox (pixel). Open-scored in the lesson outcome — the in-surface
+ * test runner gives the learner real pass/fail feedback against the rubric,
+ * but the surface submits the code text, not a verdict, so the item carries
+ * no expectedAnswer.
+ */
+export function buildCodingSandboxSurface(input: {
+  language: "javascript" | "typescript" | "python";
+  starterCode: string;
+  tests: Array<{ name: string; kind: "stdout" | "returns"; expected: string; input?: string }>;
+  hint?: string;
+}): LessonSurface {
+  return {
+    surfaceType: "coding_sandbox",
+    codingSandbox: {
+      language: input.language,
+      starterCode: input.starterCode,
+      hint: input.hint,
+      correctness: {
+        type: "coding",
+        language: input.language,
+        starterCode: input.starterCode,
+        tests: input.tests,
+      },
+    },
+  };
+}
+
+/**
+ * Rhythm sequencer (cadence). Scored: the surface submits
+ * JSON.stringify(pattern) with pattern[trackIndex] = sorted active steps, so
+ * the expectedAnswer is exactly that serialization of the target pattern.
+ */
+export function buildMusicSequencerSurface(input: {
+  tracks: string[];
+  steps: number;
+  tempo?: number;
+  expectedPattern: number[][];
+}): ScoredSurface | null {
+  if (input.expectedPattern.length !== input.tracks.length) return null;
+  const sorted = input.expectedPattern.map((row) => [...row].sort((a, b) => a - b));
+  if (sorted.some((row) => row.some((s) => s < 0 || s >= input.steps))) return null;
+  return {
+    surface: {
+      surfaceType: "music_sequencer",
+      musicSequencer: {
+        tracks: input.tracks,
+        steps: input.steps,
+        tempo: input.tempo,
+        expectedPattern: sorted,
+      },
+    },
+    expectedAnswer: JSON.stringify(sorted),
+  };
+}
+
+/** Voice response (echo / lingua). Open-scored; speech evaluation happens
+ *  in-surface via the speech services. */
+export function buildVoiceResponseSurface(input: {
+  language: string;
+  targetText: string;
+}): LessonSurface {
+  return {
+    surfaceType: "voice_response",
+    voiceResponse: { language: input.language, targetText: input.targetText },
+  };
+}
+
+/**
+ * Single-token drag sort (harmony / vigor / nova manipulatives). One token
+ * keeps the placement serialization (JSON.stringify({ itemId: targetId }))
+ * order-stable, so the expectedAnswer is deterministic.
+ */
+export function buildDragSortSurface(input: {
+  item: { id: string; label: string; emoji?: string };
+  targets: Array<{ id: string; label: string }>;
+  correctTargetId: string;
+}): ScoredSurface | null {
+  if (!input.targets.some((t) => t.id === input.correctTargetId)) return null;
+  return {
+    surface: {
+      surfaceType: "drag_manipulative",
+      dragManipulative: {
+        items: [input.item],
+        targets: input.targets,
+        correctPlacement: { [input.item.id]: input.correctTargetId },
+      },
+    },
+    expectedAnswer: JSON.stringify({ [input.item.id]: input.correctTargetId }),
+  };
+}
+
+/** Multi-step workspace (compass / forge). Open-scored process surface. */
+export function buildMultiStepSurface(input: {
+  steps: Array<{ id: string; prompt: string; hint?: string }>;
+}): LessonSurface {
+  return { surfaceType: "multi_step_workspace", multiStep: { steps: input.steps } };
+}
+
+/** Art canvas (muse). Open-ended by design. */
+export function buildArtCanvasSurface(input?: {
+  showGuides?: boolean;
+  palette?: string[];
+}): LessonSurface {
+  return {
+    surfaceType: "art_canvas",
+    artCanvas: { showGuides: input?.showGuides ?? true, palette: input?.palette },
+  };
+}
+
 export type DiagramShapeInput =
   | { id: string; kind: "circle"; cx: number; cy: number; r: number }
   | { id: string; kind: "rectangle"; x: number; y: number; width: number; height: number }

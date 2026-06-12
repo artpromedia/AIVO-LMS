@@ -74,6 +74,13 @@ type Beat =
       readingAnnotation?: NonNullable<LessonSurface["readingAnnotation"]>;
       scienceDiagram?: NonNullable<LessonSurface["scienceDiagram"]>;
       graph?: NonNullable<LessonSurface["graph"]>;
+      codingSandbox?: NonNullable<LessonSurface["codingSandbox"]>;
+      artCanvas?: NonNullable<LessonSurface["artCanvas"]>;
+      musicSequencer?: NonNullable<LessonSurface["musicSequencer"]>;
+      voiceResponse?: NonNullable<LessonSurface["voiceResponse"]>;
+      dragManipulative?: NonNullable<LessonSurface["dragManipulative"]>;
+      multiStep?: NonNullable<LessonSurface["multiStep"]>;
+      geometryDiagram?: NonNullable<LessonSurface["geometryDiagram"]>;
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -104,6 +111,13 @@ type Beat =
       readingAnnotation?: NonNullable<LessonSurface["readingAnnotation"]>;
       scienceDiagram?: NonNullable<LessonSurface["scienceDiagram"]>;
       graph?: NonNullable<LessonSurface["graph"]>;
+      codingSandbox?: NonNullable<LessonSurface["codingSandbox"]>;
+      artCanvas?: NonNullable<LessonSurface["artCanvas"]>;
+      musicSequencer?: NonNullable<LessonSurface["musicSequencer"]>;
+      voiceResponse?: NonNullable<LessonSurface["voiceResponse"]>;
+      dragManipulative?: NonNullable<LessonSurface["dragManipulative"]>;
+      multiStep?: NonNullable<LessonSurface["multiStep"]>;
+      geometryDiagram?: NonNullable<LessonSurface["geometryDiagram"]>;
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -157,6 +171,13 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       readingAnnotation: g.surface?.readingAnnotation,
       scienceDiagram: g.surface?.scienceDiagram,
       graph: g.surface?.graph,
+      codingSandbox: g.surface?.codingSandbox,
+      artCanvas: g.surface?.artCanvas,
+      musicSequencer: g.surface?.musicSequencer,
+      voiceResponse: g.surface?.voiceResponse,
+      dragManipulative: g.surface?.dragManipulative,
+      multiStep: g.surface?.multiStep,
+      geometryDiagram: g.surface?.geometryDiagram,
       prompt: g.prompt,
       expectedAnswer: g.expectedAnswer,
       choices: g.choices,
@@ -178,6 +199,13 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       readingAnnotation: c.surface?.readingAnnotation,
       scienceDiagram: c.surface?.scienceDiagram,
       graph: c.surface?.graph,
+      codingSandbox: c.surface?.codingSandbox,
+      artCanvas: c.surface?.artCanvas,
+      musicSequencer: c.surface?.musicSequencer,
+      voiceResponse: c.surface?.voiceResponse,
+      dragManipulative: c.surface?.dragManipulative,
+      multiStep: c.surface?.multiStep,
+      geometryDiagram: c.surface?.geometryDiagram,
       prompt: c.prompt,
       expectedAnswer: c.expectedAnswer,
       choices: c.choices,
@@ -681,7 +709,11 @@ export function LessonPlayer({
     const overrideApplies =
       agentSurfaceOverride !== null &&
       PRESENTABLE_SURFACES.has(agentSurfaceOverride) &&
-      (agentSurfaceOverride !== "number_line" || overrideNumberLine !== undefined);
+      (agentSurfaceOverride !== "number_line" || overrideNumberLine !== undefined) &&
+      // Sprint 04: drag has no fixture default either — the override only
+      // applies when the item itself authored a drag spec.
+      (agentSurfaceOverride !== "drag_manipulative" ||
+        sourceBeat.dragManipulative !== undefined);
     const currentBeat = overrideApplies
       ? {
           ...sourceBeat,
@@ -702,28 +734,23 @@ export function LessonPlayer({
         currentBeat.surfaceType === "scratchpad" || currentBeat.surfaceType === "ink_canvas"
           ? { enabled: true, width: 520, height: 300 }
           : undefined,
+      // Remediation Sprint 04: every remaining surface spec comes from the
+      // validated `surface` envelope — the geometry rectangle, "// write your
+      // solution" sandbox, en-US voice, odd/even drag bins, and 3-step
+      // multi-step fixture defaults are gone.
       diagram:
         currentBeat.surfaceType === "geometry_workspace" || currentBeat.surfaceType === "geometry"
-          ? {
-              canvasMode: "svg",
-              width: 480,
-              height: 320,
-              shapes: [
-                { id: "fixture-rect", kind: "rectangle", x: 110, y: 70, width: 220, height: 150 },
-              ],
-            }
+          ? currentBeat.geometryDiagram
           : undefined,
       // Remediation Sprint 02: the range is the plan's validated,
       // content-derived spec (or freshly derived for an agent override) —
       // never a hardcoded fixture.
       numberLine: currentBeat.surfaceType === "number_line" ? currentBeat.numberLine : undefined,
       codingSandbox:
-        currentBeat.surfaceType === "coding_sandbox"
-          ? { language: "javascript", starterCode: "// write your solution\n" }
-          : undefined,
-      artCanvas: currentBeat.surfaceType === "art_canvas" ? { showGuides: true } : undefined,
+        currentBeat.surfaceType === "coding_sandbox" ? currentBeat.codingSandbox : undefined,
+      artCanvas: currentBeat.surfaceType === "art_canvas" ? currentBeat.artCanvas : undefined,
       voiceResponse:
-        currentBeat.surfaceType === "voice_response" ? { language: "en-US" } : undefined,
+        currentBeat.surfaceType === "voice_response" ? currentBeat.voiceResponse : undefined,
       // Remediation Sprint 03: reading/graph/science specs are the plan's
       // validated, content-derived payloads (LessonSurfaceSchema guarantees
       // a spec rides with its surfaceType). The fox/stream and 0-10-grid
@@ -735,41 +762,13 @@ export function LessonPlayer({
           : undefined,
       graph: currentBeat.surfaceType === "graph" ? currentBeat.graph : undefined,
       dragManipulative:
-        currentBeat.surfaceType === "drag_manipulative"
-          ? ((currentBeat as { dragManipulative?: SurfaceRouterItem["dragManipulative"] })
-              .dragManipulative ?? {
-              items: [
-                { id: "i1", label: "3" },
-                { id: "i2", label: "8" },
-              ],
-              targets: [
-                { id: "odd", label: "Odd" },
-                { id: "even", label: "Even" },
-              ],
-              correctPlacement: { i1: "odd", i2: "even" },
-            })
-          : undefined,
+        currentBeat.surfaceType === "drag_manipulative" ? currentBeat.dragManipulative : undefined,
       multiStep:
-        currentBeat.surfaceType === "multi_step_workspace"
-          ? ((currentBeat as { multiStep?: SurfaceRouterItem["multiStep"] }).multiStep ?? {
-              steps: [
-                { id: "a", prompt: "Show your first step." },
-                { id: "b", prompt: "Show your next step." },
-                { id: "c", prompt: "Write your final answer." },
-              ],
-            })
-          : undefined,
+        currentBeat.surfaceType === "multi_step_workspace" ? currentBeat.multiStep : undefined,
       scienceDiagram:
         currentBeat.surfaceType === "science_diagram" ? currentBeat.scienceDiagram : undefined,
       musicSequencer:
-        currentBeat.surfaceType === "music_sequencer"
-          ? ((currentBeat as { musicSequencer?: SurfaceRouterItem["musicSequencer"] })
-              .musicSequencer ?? {
-              tracks: ["Clap", "Drum"],
-              steps: 8,
-              tempo: 90,
-            })
-          : undefined,
+        currentBeat.surfaceType === "music_sequencer" ? currentBeat.musicSequencer : undefined,
     };
   }
 

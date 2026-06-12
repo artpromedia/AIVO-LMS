@@ -19,6 +19,7 @@ import type {
 import type { GeneratedLessonPlanInput } from "@/lib/validators/lesson";
 import { getSubjectBySlug, TUTORS } from "@aivo/brand";
 import { pickMultimediaFixtureForSubject } from "./multimedia-item-bank";
+import { domainPractice } from "./domain-practice";
 import {
   buildGraphSurface,
   buildReadingAnnotationSurface,
@@ -348,7 +349,13 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
   } else if (subject.slug === "science") {
     guidedRaw = sciencePractice(skill.name, tier.difficulty);
   } else {
-    guidedRaw = genericPractice(subject.name, skill.name);
+    // Sprint 04: every remaining subject teaches on its domain surface
+    // (coding sandbox, rhythm grid, voice, canvas, multi-step, drag sort,
+    // annotation, map labelling) — generic exploration only when no domain
+    // builder exists.
+    guidedRaw =
+      domainPractice(subject.slug, skill.name, tier.difficulty) ??
+      genericPractice(subject.name, skill.name);
   }
   const guidedPractice = guidedRaw.map((g) => ({ ...g, skillId: skill.id }));
   const multimedia = pickMultimediaFixtureForSubject(subject.slug, `${skill.id}:${learnerName}`);

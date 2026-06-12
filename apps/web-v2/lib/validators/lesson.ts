@@ -315,14 +315,173 @@ export const ScienceDiagramSpecSchema = z
     }
   });
 
+/** Remediation Sprint 04 — coding sandbox spec (pixel). The in-surface test
+ *  runner gives real pass/fail feedback; lesson scoring treats the item as
+ *  open-ended (the surface submits the code text, not a verdict). */
+export const CodingSandboxSpecSchema = z
+  .object({
+    language: z.enum(["javascript", "typescript", "python"]),
+    starterCode: z.string().min(1).max(2000).optional(),
+    prelude: z.string().min(1).max(2000).optional(),
+    hint: z.string().min(1).max(400).optional(),
+    correctness: z
+      .object({
+        type: z.literal("coding"),
+        language: z.enum(["javascript", "typescript", "python"]),
+        starterCode: z.string().max(2000),
+        tests: z
+          .array(
+            z
+              .object({
+                name: z.string().min(1).max(120),
+                hidden: z.boolean().optional(),
+                kind: z.enum(["stdout", "returns"]),
+                input: z.string().max(400).optional(),
+                expected: z.string().max(400),
+              })
+              .strict(),
+          )
+          .min(1)
+          .max(6),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
+/** Remediation Sprint 04 — art canvas (muse). Open-ended by design. */
+export const ArtCanvasSpecSchema = z
+  .object({
+    width: z.number().int().positive().max(1200).optional(),
+    height: z.number().int().positive().max(1200).optional(),
+    palette: z.array(z.string().min(1).max(32)).min(2).max(12).optional(),
+    highContrastPalette: z.array(z.string().min(1).max(32)).min(2).max(12).optional(),
+    showGuides: z.boolean().optional(),
+  })
+  .strict();
+
+/** Remediation Sprint 04 — rhythm sequencer (cadence). The surface submits
+ *  JSON.stringify(pattern) with pattern[trackIndex] = SORTED active steps,
+ *  so a scored item's expectedAnswer is that exact serialization. */
+export const MusicSequencerSpecSchema = z
+  .object({
+    tracks: z.array(z.string().min(1).max(40)).min(1).max(4),
+    steps: z.number().int().min(2).max(16).optional(),
+    tempo: z.number().int().min(40).max(200).optional(),
+    expectedPattern: z.array(z.array(z.number().int().min(0))).optional(),
+  })
+  .strict()
+  .superRefine((spec, ctx) => {
+    if (!spec.expectedPattern) return;
+    if (spec.expectedPattern.length !== spec.tracks.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "expectedPattern must have one row per track",
+      });
+      return;
+    }
+    const steps = spec.steps ?? 8;
+    for (const row of spec.expectedPattern) {
+      if (row.some((s) => s >= steps)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "expectedPattern step index outside the grid",
+        });
+      }
+    }
+  });
+
+/** Remediation Sprint 04 — voice response (echo / lingua). Open-scored in
+ *  lessons (speech evaluation happens in-surface / via speech services). */
+export const VoiceResponseSpecSchema = z
+  .object({
+    language: z.string().min(2).max(20),
+    targetText: z.string().min(1).max(200).optional(),
+    maxDurationSeconds: z.number().int().min(3).max(120).optional(),
+  })
+  .strict();
+
+/** Remediation Sprint 04 — drag-and-place sorting (harmony / vigor / nova
+ *  manipulatives). The surface submits JSON.stringify({ itemId: targetId });
+ *  single-token items keep that serialization order-stable for scoring. */
+export const DragManipulativeSpecSchema = z
+  .object({
+    items: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            label: z.string().min(1).max(60),
+            emoji: z.string().max(8).optional(),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(6),
+    targets: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            label: z.string().min(1).max(60),
+            capacity: z.number().int().positive().optional(),
+          })
+          .strict(),
+      )
+      .min(2)
+      .max(4),
+    correctPlacement: z.record(z.string(), z.string()).optional(),
+  })
+  .strict()
+  .superRefine((spec, ctx) => {
+    if (!spec.correctPlacement) return;
+    const itemIds = new Set(spec.items.map((i) => i.id));
+    const targetIds = new Set(spec.targets.map((t) => t.id));
+    for (const [itemId, targetId] of Object.entries(spec.correctPlacement)) {
+      if (!itemIds.has(itemId) || !targetIds.has(targetId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `correctPlacement entry ${itemId}→${targetId} references unknown ids`,
+        });
+      }
+    }
+  });
+
+/** Remediation Sprint 04 — multi-step workspace (compass / forge). Open-
+ *  scored process surface: each step is captured for telemetry. */
+export const MultiStepSpecSchema = z
+  .object({
+    steps: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            prompt: z.string().min(1).max(300),
+            expectedAnswer: z.string().min(1).max(200).optional(),
+            hint: z.string().min(1).max(300).optional(),
+          })
+          .strict(),
+      )
+      .min(2)
+      .max(5),
+  })
+  .strict();
+
 /** Which sub-spec key each surfaceType requires. Surfaces not listed here
- *  carry no payload yet (their sub-specs land in later remediation sprints
- *  or they are payload-free, e.g. choice_grid). */
+ *  are payload-free (e.g. choice_grid, scratchpad). */
 const SURFACE_SPEC_KEYS = {
   number_line: "numberLine",
   reading_annotation: "readingAnnotation",
   science_diagram: "scienceDiagram",
   graph: "graph",
+  coding_sandbox: "codingSandbox",
+  art_canvas: "artCanvas",
+  music_sequencer: "musicSequencer",
+  voice_response: "voiceResponse",
+  drag_manipulative: "dragManipulative",
+  multi_step_workspace: "multiStep",
+  geometry_workspace: "geometryDiagram",
+  geometry: "geometryDiagram",
 } as const;
 
 export const LessonSurfaceSchema = z
@@ -332,6 +491,13 @@ export const LessonSurfaceSchema = z
     readingAnnotation: ReadingAnnotationSpecSchema.optional(),
     scienceDiagram: ScienceDiagramSpecSchema.optional(),
     graph: GraphSpecSchema.optional(),
+    codingSandbox: CodingSandboxSpecSchema.optional(),
+    artCanvas: ArtCanvasSpecSchema.optional(),
+    musicSequencer: MusicSequencerSpecSchema.optional(),
+    voiceResponse: VoiceResponseSpecSchema.optional(),
+    dragManipulative: DragManipulativeSpecSchema.optional(),
+    multiStep: MultiStepSpecSchema.optional(),
+    geometryDiagram: GeometryDiagramSpecSchema.optional(),
   })
   .strict()
   .superRefine((surface, ctx) => {

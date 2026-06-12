@@ -39,13 +39,16 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
       : await readActiveLearnerFromCookies(session);
   if (!learnerId) return <div data-testid="smoke-error">{SMOKE_ERROR_COPY.missingLearner}</div>;
   const requested = (await searchParams)?.subject ?? "math";
-  const mapped =
-    requested === "reading" || requested === "ela"
-      ? "reading"
-      : requested === "science"
-        ? "science"
-        : "math";
-  const subject = (await listSubjects()).find((s) => s.slug === mapped) ?? null;
+  // Remediation Sprint 04: every seeded subject is smoke-testable so the
+  // per-domain surface e2e can drive REAL lessons for coding/music/art/
+  // speech/etc. "ela" stays an alias for reading; unknown slugs fall back
+  // to math.
+  const allSubjects = await listSubjects();
+  const mapped = requested === "ela" ? "reading" : requested;
+  const subject =
+    allSubjects.find((s) => s.slug === mapped) ??
+    allSubjects.find((s) => s.slug === "math") ??
+    null;
   if (!subject) return <div data-testid="smoke-error">{SMOKE_ERROR_COPY.missingSubject}</div>;
   const detail = await getSubjectDetail(learnerId, session.tenantId, subject.id);
   const skillId = detail?.nextSkillId ?? detail?.skills[0]?.id ?? null;

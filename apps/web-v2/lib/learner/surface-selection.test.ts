@@ -271,6 +271,59 @@ describe("generator emission — reading & science (Sprint 03)", () => {
   });
 });
 
+// ── Sprint 04 — every subject (all 14 tutors) gets a domain surface ─────────
+
+describe("generator emission — full tutor coverage (Sprint 04)", () => {
+  /** subject slug → the domain surfaceType(s) its lessons must mount. */
+  const EXPECTED: Record<string, string[]> = {
+    math: ["number_line"],
+    reading: ["reading_annotation"],
+    writing: ["reading_annotation"],
+    science: ["science_diagram", "graph"],
+    "social-studies": ["reading_annotation"],
+    geography: ["science_diagram"],
+    speech: ["voice_response"],
+    social: ["drag_manipulative"],
+    life: ["multi_step_workspace"],
+    "executive-function": ["multi_step_workspace"],
+    art: ["art_canvas"],
+    music: ["music_sequencer"],
+    "physical-education": ["drag_manipulative"],
+    "world-languages": ["voice_response"],
+    coding: ["coding_sandbox"],
+    engineering: ["multi_step_workspace"],
+  };
+
+  it("every learner subject mounts a domain-appropriate surface (no subject left generic)", () => {
+    for (const [slug, expectedTypes] of Object.entries(EXPECTED)) {
+      const plan = generateDeterministicLessonPlan(inputsFor(slug, "emerging"));
+      const types = plan.guidedPractice
+        .map((g) => g.surface?.surfaceType)
+        .filter((t): t is NonNullable<typeof t> => Boolean(t));
+      expect(
+        types.some((t) => expectedTypes.includes(t)),
+        `${slug} must mount one of [${expectedTypes.join(", ")}], got [${types.join(", ")}]`,
+      ).toBe(true);
+      // Domain isolation: no subject borrows math's number line except math.
+      if (slug !== "math") expect(types).not.toContain("number_line");
+      expect(() => GeneratedLessonPlanSchema.parse(plan)).not.toThrow();
+    }
+  });
+
+  it("scored interactive items carry the exact serialization their surface submits", () => {
+    // music: pattern JSON; drag: placement JSON — both must match the
+    // component serialization byte for byte or the router marks every
+    // learner wrong.
+    const music = generateDeterministicLessonPlan(inputsFor("music", "emerging"));
+    const seq = music.guidedPractice.find((g) => g.surface?.surfaceType === "music_sequencer")!;
+    expect(seq.expectedAnswer).toBe(JSON.stringify(seq.surface!.musicSequencer!.expectedPattern));
+
+    const sel = generateDeterministicLessonPlan(inputsFor("social", "emerging"));
+    const drag = sel.guidedPractice.find((g) => g.surface?.surfaceType === "drag_manipulative")!;
+    expect(drag.expectedAnswer).toBe(JSON.stringify(drag.surface!.dragManipulative!.correctPlacement));
+  });
+});
+
 describe("LessonSurfaceSchema / plan schema", () => {
   it("requires a numberLine spec on number_line surfaces", () => {
     expect(LessonSurfaceSchema.safeParse({ surfaceType: "number_line" }).success).toBe(false);
