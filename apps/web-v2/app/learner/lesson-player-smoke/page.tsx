@@ -28,10 +28,10 @@ type Props = {
 };
 
 export default async function LessonPlayerSmokePage({ searchParams }: Props) {
-  // Dev/test affordance only — refuse to render this smoke surface in
-  // production. The fixture wires mock data through the production
-  // lesson-player and would otherwise be navigable by real users.
-  if (process.env.NODE_ENV === "production") notFound();
+  // Dev/test affordance only — refuse to render this smoke surface in a
+  // real production runtime. The fixture wires mock data through the
+  // production lesson-player and would otherwise be navigable by real users.
+  if (process.env.NODE_ENV === "production" && process.env.AIVO_TEST_MODE !== "1") notFound();
   const session = await requirePageRole(["learner", "parent"]);
   const learnerId =
     session.role === "learner"

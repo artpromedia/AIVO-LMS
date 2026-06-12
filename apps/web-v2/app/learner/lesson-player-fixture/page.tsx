@@ -7,8 +7,9 @@ import type { GeneratedLessonPlan } from "@/lib/db/types";
 /**
  * Lesson-player fixture page. Exercises one surface type per visit via
  * `?surfaceType=...`. Role-gated to `learner` and `parent`, and
- * additionally locked out of production builds (NODE_ENV=production)
- * so this dev-only surface never reaches real users.
+ * additionally locked out of production builds unless AIVO_TEST_MODE=1,
+ * so this dev-only surface never reaches real users but remains available
+ * to the production-equivalent CI server.
  */
 
 type FixtureSurfaceType =
@@ -187,9 +188,9 @@ function fixturePlan(surfaceType: FixtureSurfaceType): GeneratedLessonPlan {
 }
 
 export default async function LessonPlayerFixturePage({ searchParams }: FixturePageProps) {
-  // Dev/test affordance only — refuse to render the fixture in
-  // production builds even if a role-authorised user navigates here.
-  if (process.env.NODE_ENV === "production") notFound();
+  // Dev/test affordance only — refuse to render the fixture in a real
+  // production runtime even if a role-authorised user navigates here.
+  if (process.env.NODE_ENV === "production" && process.env.AIVO_TEST_MODE !== "1") notFound();
   const session = await requirePageRole(["learner", "parent"]);
   const params = await searchParams;
   // Deterministic sensory scenarios for the stage-sensory e2e: the param maps

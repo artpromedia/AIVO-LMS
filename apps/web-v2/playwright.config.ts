@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const baseURL = process.env.WEB_V2_BASE_URL ?? "http://127.0.0.1:5000";
+
 export default defineConfig({
   // Two roots: the original `./e2e` (smoke + visual-a11y) and the
   // Sprint 1.2 `./tests/e2e` (v2 lesson player + other feature specs).
@@ -7,7 +9,7 @@ export default defineConfig({
   testMatch: ["e2e/**/*.playwright.ts", "e2e/**/*.spec.ts", "tests/e2e/**/*.spec.ts"],
   timeout: 60_000,
   use: {
-    baseURL: "http://127.0.0.1:5000",
+    baseURL,
     trace: "on-first-retry",
   },
   webServer: {

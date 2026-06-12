@@ -15,7 +15,8 @@ import { checkSameOrigin } from "@/lib/bff/csrf";
  */
 // Dev-only surfaces (component gallery, render harnesses, lesson-player
 // fixtures) that ship in the route tree but must never be reachable in
-// production. Blocked with a 404 there; available in dev.
+// production. Blocked with a 404 there; available in dev and explicit
+// AIVO_TEST_MODE builds used by the production-equivalent CI server.
 const DEV_ONLY_PREFIXES = [
   "/design-system",
   "/surface-preview",
@@ -25,6 +26,7 @@ const DEV_ONLY_PREFIXES = [
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const testMode = process.env.AIVO_TEST_MODE === "1";
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     if (process.env.NODE_ENV === "production") {
       const targetPath = pathname.replace(/^\/admin/, "") || "/platform";
@@ -39,7 +41,7 @@ export function middleware(req: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && !testMode) {
     if (DEV_ONLY_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
       return new NextResponse(null, { status: 404 });
     }

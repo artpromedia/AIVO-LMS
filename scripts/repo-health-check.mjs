@@ -39,7 +39,6 @@ const REQUIRED_PACKAGES = [
   "mobile-ui",
   "nav",
   "observability",
-  "ops-alert",
   "ops-alerts",
   "otel-bootstrap",
   "pedagogy",

@@ -59,6 +59,7 @@ test.describe("visual brain build", () => {
 
     // Approval redirects to the learner detail; re-entering the watch route
     // now shows the already-approved note (cloneStage === "approved").
+    await page.waitForURL(`/parent/learners/${CLONE_LEARNER}`, { timeout: 15_000 });
     await page.goto(`/parent/learners/${CLONE_LEARNER}/brain-clone-watch`);
     await expect(page.getByText(/approved/i).first()).toBeVisible({ timeout: 15_000 });
   });

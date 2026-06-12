@@ -145,7 +145,9 @@ async function buildAccessReview(db: any): Promise<{ csv: string; rows: number }
   // with "op ANY/ALL (array) requires array". We instead build the ARRAY[]
   // literal at template-substitution time. INTERNAL_ROLES is a hard-coded
   // constant, so SQL injection isn't a concern.
-  const rolesArray = sql.raw(`ARRAY[${INTERNAL_ROLES.map((r) => `'${r}'`).join(",")}]::text[]`);
+  const rolesArray = sql.raw(
+    `ARRAY[${INTERNAL_ROLES.map((r) => `'${r}'`).join(",")}]::user_role[]`,
+  );
   const rows = await db.execute(sql`
     SELECT u.id, u.email, u.name, u.role, u.tenant_id,
            u.mfa_enabled,

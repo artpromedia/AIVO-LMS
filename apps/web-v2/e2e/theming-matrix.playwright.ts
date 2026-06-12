@@ -18,7 +18,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { injectAxe, checkA11y } from "axe-playwright";
 import { PNG } from "pngjs";
 
-const BASE = "http://127.0.0.1:5000";
+const BASE = process.env.WEB_V2_BASE_URL ?? "http://127.0.0.1:5000";
 const SENSORY_MODES = ["standard", "calm", "high-contrast"] as const;
 type SensoryMode = (typeof SENSORY_MODES)[number];
 
