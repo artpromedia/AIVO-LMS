@@ -23,6 +23,7 @@
     "@aivo/enterprise-core": "workspace:*",
     "@aivo/feature-flags": "workspace:*",
     "@aivo/observability": "workspace:*",
+    "@aivo/security": "workspace:*",
     "@aivo/tutor-surface-protocol": "workspace:*",
     "@fastify/cors": "^11.0.0",
     "drizzle-orm": "^0.45.0",

@@ -25,6 +25,7 @@
     "@aivo/events": "workspace:*",
     "@aivo/feature-flags": "workspace:*",
     "@aivo/observability": "workspace:*",
+    "@aivo/security": "workspace:*",
     "@fastify/cors": "^11.0.0",
     "drizzle-orm": "^0.45.2",
     "fastify": "^5.3.3"
