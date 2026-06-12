@@ -41,11 +41,11 @@ export function BadgeCollection({
             key={key}
             aria-hidden="true"
             className={`grid h-16 w-16 place-items-center rounded-2xl text-2xl ${
-              earned ? "lx-pop-in" : ""
+              earned ? "lx-theme-soft-bg lx-pop-in" : ""
             }`}
             style={
               earned
-                ? { background: "var(--color-aivo-primary-soft)" }
+                ? undefined
                 : {
                     background: "var(--color-aivo-surface-2)",
                     opacity: 0.45,

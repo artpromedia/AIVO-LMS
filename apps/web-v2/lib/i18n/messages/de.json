@@ -1249,7 +1249,11 @@
       "open_world": "Welt öffnen →",
       "sticker_empty_encouragement": "Dein erster Sticker wartet — schließe ein Kapitel ab und hol ihn dir!",
       "badges_title": "Abzeichen",
-      "badges_count": "{earned} von {total} erhalten"
+      "badges_count": "{earned} von {total} erhalten",
+      "themes_title": "Arbeitsbereich-Themes",
+      "themes_hint": "Steige im Level auf, um neue Looks für deinen Bereich freizuschalten.",
+      "theme_locked": "Erreiche Level {level}",
+      "theme_active": "Aktiv"
     },
     "select": {
       "eyebrow": "Ansehen als",

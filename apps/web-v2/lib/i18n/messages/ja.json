@@ -1249,7 +1249,11 @@
       "open_world": "世界を開く →",
       "sticker_empty_encouragement": "はじめてのステッカーが待ってるよ。チャプターをひとつ終えてゲットしよう！",
       "badges_title": "バッジ",
-      "badges_count": "{earned}/{total} 個を獲得"
+      "badges_count": "{earned}/{total} 個を獲得",
+      "themes_title": "ワークスペースのテーマ",
+      "themes_hint": "レベルアップして、あなたの空間の新しい見た目をアンロックしよう。",
+      "theme_locked": "レベル {level} に到達",
+      "theme_active": "オン"
     },
     "select": {
       "eyebrow": "表示の切り替え",

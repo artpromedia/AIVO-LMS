@@ -1249,7 +1249,11 @@
       "open_world": "فتح العالم →",
       "sticker_empty_encouragement": "أول ملصق بانتظارك — أنهِ فصلًا واحدًا لتحصل عليه!",
       "badges_title": "الأوسمة",
-      "badges_count": "{earned} من {total}"
+      "badges_count": "{earned} من {total}",
+      "themes_title": "سمات مساحة العمل",
+      "themes_hint": "ارتقِ بمستواك لفتح مظاهر جديدة لمساحتك.",
+      "theme_locked": "اوصل إلى المستوى {level}",
+      "theme_active": "مُفعّل"
     },
     "select": {
       "eyebrow": "العرض بصفة",

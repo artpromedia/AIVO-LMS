@@ -17,7 +17,9 @@ import {
 import { StickerBook } from "@/components/playful-calm";
 import { AivoMascot } from "@/components/learner/art/aivo-mascot";
 import { BadgeCollection, ALL_BADGES } from "@/components/learner/badge-collection";
+import { WorkspaceThemePicker } from "@/components/learner/workspace-theme-picker";
 import { XP_PER_LEVEL } from "@/lib/learner/engagement-award";
+import { readWorkspaceThemeFromCookies } from "@/lib/a11y/server";
 import type { BadgeKey } from "@/lib/db/types";
 
 export default async function Page() {
@@ -51,6 +53,7 @@ export default async function Page() {
   const xpPct = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
   const badges = await listLearnerBadges(learnerId, session.tenantId);
   const earnedKeys = new Set<BadgeKey>(badges.map((b) => b.badgeKey));
+  const workspaceTheme = await readWorkspaceThemeFromCookies();
 
   return (
     <AppShell
@@ -119,6 +122,9 @@ export default async function Page() {
           ariaLabel={t("badges_count", { earned: badges.length, total: ALL_BADGES.length })}
         />
       </section>
+
+      {/* Unlockable workspace themes — progress buys personalization */}
+      <WorkspaceThemePicker learnerLevel={level} initialTheme={workspaceTheme} />
 
       <div className="mb-4">
         <StickerBook

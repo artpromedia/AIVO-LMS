@@ -1249,7 +1249,11 @@
       "open_world": "Ouvrir le monde →",
       "sticker_empty_encouragement": "Ton premier autocollant t'attend — termine un chapitre pour le gagner !",
       "badges_title": "Écussons",
-      "badges_count": "{earned} sur {total} obtenus"
+      "badges_count": "{earned} sur {total} obtenus",
+      "themes_title": "Thèmes d’espace",
+      "themes_hint": "Montez de niveau pour débloquer de nouveaux styles pour votre espace.",
+      "theme_locked": "Atteins le niveau {level}",
+      "theme_active": "Activé"
     },
     "select": {
       "eyebrow": "Voir en tant que",

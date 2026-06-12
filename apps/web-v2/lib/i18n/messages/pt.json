@@ -1249,7 +1249,11 @@
       "open_world": "Abrir mundo →",
       "sticker_empty_encouragement": "Seu primeiro adesivo está esperando — termine um capítulo para ganhá-lo!",
       "badges_title": "Emblemas",
-      "badges_count": "{earned} de {total} conquistados"
+      "badges_count": "{earned} de {total} conquistados",
+      "themes_title": "Temas do espaço",
+      "themes_hint": "Suba de nível para desbloquear novos visuais para o seu espaço.",
+      "theme_locked": "Alcance o nível {level}",
+      "theme_active": "Ativo"
     },
     "select": {
       "eyebrow": "Ver como",
