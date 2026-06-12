@@ -33,6 +33,13 @@ nodeSelector:
 envFrom:
   - secretRef:
       name: aivo-common-env
+  # Enterprise feature flags (AIVO_FEATURE_*) — committed source of truth is
+  # infra/k8s/base/enterprise/feature-flags-configmap.yaml, applied to the
+  # namespace by the deploy workflows. Optional so pods still start in
+  # clusters where the ConfigMap has not been applied yet.
+  - configMapRef:
+      name: aivo-enterprise-flags
+      optional: true
 
 env:
   NODE_ENV: production

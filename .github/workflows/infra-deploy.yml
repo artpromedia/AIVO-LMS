@@ -50,6 +50,11 @@ jobs:
 
           kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
 
+          # Enterprise feature flags (AIVO_FEATURE_*). Mounted into every
+          # service via envFrom in the values file so the admin-svc flag
+          # dashboard and the consuming services resolve identical values.
+          kubectl apply -n "$NS" -f infra/k8s/base/enterprise/feature-flags-configmap.yaml
+
           SERVICES=(
             identity-svc assessment-svc brain-svc ai-svc learning-svc
             tutor-svc family-svc engagement-svc billing-svc comms-svc

@@ -473,6 +473,12 @@ jobs:
             externalName: nats.aivo.svc.cluster.local
           EOF
 
+          # Enterprise feature flags (AIVO_FEATURE_*). The committed ConfigMap
+          # is the source of truth for which sprint features are on; every
+          # service mounts it via envFrom below so the admin-svc flag
+          # dashboard and the consuming services resolve identical values.
+          kubectl apply -n "$NS" -f infra/k8s/base/enterprise/feature-flags-configmap.yaml
+
           SERVICES=(
             identity-svc assessment-svc brain-svc ai-svc learning-svc
             tutor-svc family-svc engagement-svc billing-svc comms-svc
@@ -511,6 +517,8 @@ jobs:
               --set envFrom[1].secretRef.name=db-secrets \
               --set envFrom[2].secretRef.name=identity-secrets \
               --set envFrom[3].secretRef.name=jwt-secrets \
+              --set envFrom[4].configMapRef.name=aivo-enterprise-flags \
+              --set envFrom[4].configMapRef.optional=true \
               --set service.port=$port \
               --set service.targetPort=$port \
               --set replicaCount=1 \
@@ -980,6 +988,12 @@ jobs:
           [ -z "$VERSION" ] && VERSION="latest"
           kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
 
+          # Enterprise feature flags (AIVO_FEATURE_*). The committed ConfigMap
+          # is the source of truth for which sprint features are on; every
+          # service mounts it via envFrom below so the admin-svc flag
+          # dashboard and the consuming services resolve identical values.
+          kubectl apply -n "$NS" -f infra/k8s/base/enterprise/feature-flags-configmap.yaml
+
           SERVICES=(
             identity-svc assessment-svc brain-svc ai-svc learning-svc
             tutor-svc family-svc engagement-svc billing-svc comms-svc
@@ -1104,7 +1118,7 @@ jobs:
                   --set "env.SESSION_COOKIE_DOMAIN=.aivolearning.com"
                   --set "env.NEXT_PUBLIC_APP_URL=https://admin.aivolearning.com"
                   --set "env.NEXT_PUBLIC_CONSUMER_APP_URL=https://app.aivolearning.com"
-                  --set "envFrom[1].secretRef.name=jwt-secrets"
+                  --set "envFrom[2].secretRef.name=jwt-secrets"
                   --set "livenessProbe.httpGet.path=/api/health"
                   --set "readinessProbe.httpGet.path=/api/health"
                   --set "startupProbe.httpGet.path=/api/health"
@@ -1139,6 +1153,8 @@ jobs:
                 --set service.targetPort=$PORT \
                 --set env.PORT="$PORT" \
                 --set envFrom[0].secretRef.name=aivo-common-env \
+                --set envFrom[1].configMapRef.name=aivo-enterprise-flags \
+                --set envFrom[1].configMapRef.optional=true \
                 "${EXTRA_SETS[@]}" \
                 -n "$NS" --timeout 3m 2>&1
             }
