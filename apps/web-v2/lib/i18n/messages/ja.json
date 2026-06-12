@@ -1239,7 +1239,8 @@
     "rewards": {
       "title": "ごほうび",
       "description": "クエストの世界で終えた章をすべて記録します。",
-      "open_world": "世界を開く →"
+      "open_world": "世界を開く →",
+      "sticker_empty_encouragement": "はじめてのステッカーが待ってるよ。チャプターをひとつ終えてゲットしよう！"
     },
     "select": {
       "eyebrow": "表示の切り替え",

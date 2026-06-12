@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Sage tutor avatar (reduced motion)">
+  <title>Sage</title>
+  <desc>Static brand-color disc with the tutor's monogram. Rendered when prefers-reduced-motion is enabled.</desc>
+  <circle cx="48" cy="48" r="46" fill="#10B981"/>
+  <text x="48" y="63" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="48" font-weight="700" text-anchor="middle" fill="#FFFFFF">S</text>
+</svg>

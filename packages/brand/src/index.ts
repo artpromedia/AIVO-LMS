@@ -98,6 +98,7 @@ export const TUTORS = {
     tier: "core",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/nova.png",
+    avatarReduced: "/images/tutors/nova-reduced.svg",
   },
   sage: {
     name: "Sage",
@@ -107,6 +108,7 @@ export const TUTORS = {
     tier: "core",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/sage.png",
+    avatarReduced: "/images/tutors/sage-reduced.svg",
   },
   spark: {
     name: "Spark",
@@ -116,6 +118,7 @@ export const TUTORS = {
     tier: "core",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/spark.png",
+    avatarReduced: "/images/tutors/spark-reduced.svg",
   },
   chrono: {
     name: "Chrono",
@@ -125,6 +128,7 @@ export const TUTORS = {
     tier: "core",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/chrono.png",
+    avatarReduced: "/images/tutors/chrono-reduced.svg",
   },
   pixel: {
     name: "Pixel",
@@ -134,6 +138,7 @@ export const TUTORS = {
     tier: "core",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/pixel.png",
+    avatarReduced: "/images/tutors/pixel-reduced.svg",
   },
   echo: {
     name: "Echo",
@@ -143,6 +148,7 @@ export const TUTORS = {
     tier: "core",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/echo.png",
+    avatarReduced: "/images/tutors/echo-reduced.svg",
   },
   harmony: {
     name: "Harmony",
@@ -152,6 +158,7 @@ export const TUTORS = {
     tier: "core",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/harmony.png",
+    avatarReduced: "/images/tutors/harmony-reduced.svg",
   },
   atlas: {
     name: "Atlas",
@@ -161,6 +168,7 @@ export const TUTORS = {
     tier: "expansion",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/atlas.png",
+    avatarReduced: "/images/tutors/atlas-reduced.svg",
   },
   cadence: {
     name: "Cadence",
@@ -170,6 +178,7 @@ export const TUTORS = {
     tier: "expansion",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/cadence.png",
+    avatarReduced: "/images/tutors/cadence-reduced.svg",
   },
   vigor: {
     name: "Vigor",
@@ -179,6 +188,7 @@ export const TUTORS = {
     tier: "expansion",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/vigor.png",
+    avatarReduced: "/images/tutors/vigor-reduced.svg",
     tracks: ["fitness", "health", "dape"] as const,
     subDomains: { dape: "Adapted Physical Education (DAPE)" },
   },
@@ -190,6 +200,7 @@ export const TUTORS = {
     tier: "expansion",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/lingua.png",
+    avatarReduced: "/images/tutors/lingua-reduced.svg",
   },
   forge: {
     name: "Forge",
@@ -199,6 +210,7 @@ export const TUTORS = {
     tier: "expansion",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/forge.png",
+    avatarReduced: "/images/tutors/forge-reduced.svg",
   },
   compass: {
     name: "Compass",
@@ -208,6 +220,7 @@ export const TUTORS = {
     tier: "expansion",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/compass.png",
+    avatarReduced: "/images/tutors/compass-reduced.svg",
   },
   muse: {
     name: "Muse",
@@ -217,6 +230,7 @@ export const TUTORS = {
     tier: "expansion",
     tiers: ALL_TIERS,
     avatar: "/images/tutors/muse.png",
+    avatarReduced: "/images/tutors/muse-reduced.svg",
   },
 } as const;
 

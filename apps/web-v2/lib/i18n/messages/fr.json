@@ -1239,7 +1239,8 @@
     "rewards": {
       "title": "Récompenses",
       "description": "Suis chaque chapitre que tu as terminé dans les mondes de quête.",
-      "open_world": "Ouvrir le monde →"
+      "open_world": "Ouvrir le monde →",
+      "sticker_empty_encouragement": "Ton premier autocollant t'attend — termine un chapitre pour le gagner !"
     },
     "select": {
       "eyebrow": "Voir en tant que",

@@ -66,13 +66,33 @@ export function AudioControlBar() {
   );
 }
 
-export function StickerBook({ earned, total }: { earned: number; total: number }) {
+export function StickerBook({
+  earned,
+  total,
+  emptyEncouragement,
+}: {
+  earned: number;
+  total: number;
+  /** Shown with the mascot while the book is still empty (translated by the page). */
+  emptyEncouragement?: string;
+}) {
   return (
     <Card variant="warm" className="p-[var(--aivo-density-card-pad,1.25rem)]">
       <p className="font-iw-display text-xl font-semibold text-iw-ink">Sticker Book</p>
       <p className="text-sm text-iw-ink-muted">
         {earned}/{total} collected
       </p>
+      {earned === 0 && emptyEncouragement ? (
+        <div className="mt-3 flex items-center gap-3">
+          <img
+            src="/images/mascots/aivo-owl-encouraging.svg"
+            alt=""
+            aria-hidden="true"
+            className="h-12 w-12"
+          />
+          <p className="text-sm text-iw-ink">{emptyEncouragement}</p>
+        </div>
+      ) : null}
       <Progress
         className="mt-3"
         value={(earned / Math.max(total, 1)) * 100}

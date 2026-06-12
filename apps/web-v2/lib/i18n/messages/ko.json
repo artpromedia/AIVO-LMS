@@ -1239,7 +1239,8 @@
     "rewards": {
       "title": "보상",
       "description": "퀘스트 세계에서 완료한 모든 챕터를 추적해.",
-      "open_world": "세계 열기 →"
+      "open_world": "세계 열기 →",
+      "sticker_empty_encouragement": "첫 스티커가 기다리고 있어요. 챕터 하나를 끝내고 받아보세요!"
     },
     "select": {
       "eyebrow": "다음으로 보기",

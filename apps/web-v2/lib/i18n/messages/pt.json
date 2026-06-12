@@ -1239,7 +1239,8 @@
     "rewards": {
       "title": "Recompensas",
       "description": "Acompanhe cada capítulo que você concluiu nos mundos de aventura.",
-      "open_world": "Abrir mundo →"
+      "open_world": "Abrir mundo →",
+      "sticker_empty_encouragement": "Seu primeiro adesivo está esperando — termine um capítulo para ganhá-lo!"
     },
     "select": {
       "eyebrow": "Ver como",

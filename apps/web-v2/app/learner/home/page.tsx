@@ -27,6 +27,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
+import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -155,6 +156,9 @@ export default async function LearnerHome({
   searchParams: Promise<{ blocker?: string }>;
 }) {
   const session = await requirePageRole(["learner", "parent"]);
+  // Calm / high-contrast learners get the flatter "-reduced" tutor art.
+  const sensoryMode = await readSensoryModeFromCookies();
+  const reducedArt = sensoryMode !== "standard";
   const params = await searchParams;
   const t = await getTranslations("learner.home");
   const tp = await getTranslations("learner.progress");
@@ -248,6 +252,7 @@ export default async function LearnerHome({
         name: t.name,
         subject: s.name,
         glyph: t.emoji,
+        imageUrl: reducedArt ? t.avatarReduced : t.avatar,
         tone: tones.tutorTone,
       };
     })
@@ -328,6 +333,13 @@ export default async function LearnerHome({
                   : t("tutor_personality_default")
               }
               tutorGlyph={featuredTutor?.emoji ?? "🤖"}
+              tutorImageUrl={
+                featuredTutor
+                  ? reducedArt
+                    ? featuredTutor.avatarReduced
+                    : featuredTutor.avatar
+                  : undefined
+              }
               tutorTone={featuredTones.tutorTone}
               secondaryActions={
                 <>
@@ -423,6 +435,7 @@ export default async function LearnerHome({
                     name={t.name}
                     subject={t.subject}
                     glyph={t.glyph}
+                    imageUrl={t.imageUrl}
                     tone={t.tone}
                   />
                 ))}
@@ -481,14 +494,18 @@ export default async function LearnerHome({
                 sender="AIVO"
                 title={t("msg_hint_title")}
                 body={t("msg_hint_body")}
-                avatar="✨"
+                avatar={
+                  <img src="/images/mascots/aivo-owl-happy.svg" alt="" aria-hidden="true" className="h-8 w-8" />
+                }
               />
               {iep?.confirmedAt ? (
                 <MessageCard
                   from="system"
                   title={t("msg_supports_title")}
                   body={t("msg_supports_body", { count: supportsCount })}
-                  avatar="🛡"
+                  avatar={
+                    <img src="/images/mascots/aivo-owl-idle.svg" alt="" aria-hidden="true" className="h-8 w-8" />
+                  }
                 />
               ) : (
                 <Link
@@ -499,7 +516,9 @@ export default async function LearnerHome({
                     from="break"
                     title={t("msg_break_title")}
                     body={t("msg_break_body")}
-                    avatar="🌿"
+                    avatar={
+                      <img src="/images/mascots/echo-whale-happy.svg" alt="" aria-hidden="true" className="h-8 w-8" />
+                    }
                   />
                 </Link>
               )}

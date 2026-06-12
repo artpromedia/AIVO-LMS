@@ -30,6 +30,8 @@ export interface FeaturedLessonCardProps {
   tutorName: string;
   tutorPersonality?: string;
   tutorGlyph: React.ReactNode;
+  /** Portrait art URL for the tutor — glyph remains the fallback. */
+  tutorImageUrl?: string;
   tutorTone?: TutorAvatarTone;
   className?: string;
 }
@@ -55,6 +57,7 @@ export function FeaturedLessonCard({
   tutorName,
   tutorPersonality,
   tutorGlyph,
+  tutorImageUrl,
   tutorTone = "lavender",
   className,
 }: FeaturedLessonCardProps) {
@@ -108,7 +111,7 @@ export function FeaturedLessonCard({
       </div>
 
       <div className="flex flex-col items-center gap-2 md:pl-2">
-        <TutorAvatar glyph={tutorGlyph} tone={tutorTone} size="xl" />
+        <TutorAvatar glyph={tutorGlyph} imageUrl={tutorImageUrl} tone={tutorTone} size="xl" />
         <span className="font-bold text-iw-text-strong">{tutorName}</span>
         {tutorPersonality ? (
           <span className="text-sm text-[var(--color-aivo-primary)] font-medium">

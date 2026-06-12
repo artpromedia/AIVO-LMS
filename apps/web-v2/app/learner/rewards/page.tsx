@@ -45,6 +45,7 @@ export default async function Page() {
       />
       <div className="mb-4">
         <StickerBook
+          emptyEncouragement={t("sticker_empty_encouragement")}
           earned={progress.filter((p) => p.progress >= 1).length}
           total={Math.max(progress.length, 1)}
         />

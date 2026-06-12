@@ -1239,7 +1239,8 @@
     "rewards": {
       "title": "Recompensas",
       "description": "Sigue cada capítulo que has completado en los mundos de aventuras.",
-      "open_world": "Abrir mundo →"
+      "open_world": "Abrir mundo →",
+      "sticker_empty_encouragement": "Tu primera pegatina te espera: ¡termina un capítulo para ganarla!"
     },
     "select": {
       "eyebrow": "Ver como",

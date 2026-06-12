@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
+import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import {
   LearnerBaselineShell,
   AICompanionHero,
@@ -30,6 +31,8 @@ export default async function BaselineIntroPage({
 }: {
   searchParams: Promise<{ b?: string }>;
 }) {
+  const sensoryMode = await readSensoryModeFromCookies();
+  const reducedArt = sensoryMode !== "standard";
   const session = await requirePageRole(["learner"]);
   if (!session.learnerId) redirect("/learner/home");
   const sp = await searchParams;
@@ -93,7 +96,18 @@ export default async function BaselineIntroPage({
               })
             : t("intro.body_default")
         }
-        tutorAvatar={firstTutor?.emoji}
+        tutorAvatar={
+          firstTutor?.avatar ? (
+            <img
+              src={reducedArt ? (firstTutor.avatarReduced ?? firstTutor.avatar) : firstTutor.avatar}
+              alt=""
+              aria-hidden="true"
+              className="h-16 w-16 rounded-2xl object-contain"
+            />
+          ) : (
+            firstTutor?.emoji
+          )
+        }
         chips={chips.slice(0, 4).map((v) => (
           <PersonalizationChip key={v} variant={v} />
         ))}
