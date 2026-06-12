@@ -84,6 +84,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "Please enter at least 2 characters.",
+        "email": "That doesn't look like an email address.",
+        "password": "Use at least 8 characters."
       }
     },
     "forgot": {
@@ -818,7 +823,8 @@
         "child_data_collection": "Child data collection",
         "ai_personalization": "AI personalization",
         "school_roster_import": "School roster sharing"
-      }
+      },
+      "not_found_body": "The redesigned parent home is still rolling out. The page you were looking for either hasn't shipped yet or has a different address."
     },
     "home": {
       "greeting": "Greeting",
@@ -2995,6 +3001,19 @@
       "submit_error": "Couldn't save the assessment — try again.",
       "success_title": "Assessment saved",
       "success_body": "Your input now feeds this learner's baseline and lesson personalization."
+    },
+    "not_found": {
+      "eyebrow": "Not found",
+      "heading": "We couldn't find that page",
+      "body": "The link may have moved. Let's get you back to your home.",
+      "home_link": "Go to home"
+    },
+    "error": {
+      "eyebrow": "Something went wrong",
+      "heading": "This page hit a snag",
+      "body": "Nothing was lost. Try again, or head back home.",
+      "retry": "Try again",
+      "home_link": "Go to home"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "Profile",
       "section_notifications": "Notifications",
       "role_label": "Caregiver"
+    },
+    "not_found": {
+      "eyebrow": "Not found",
+      "heading": "We couldn't find that page",
+      "body": "The link may have moved. Let's get you back to your home.",
+      "home_link": "Go to home"
+    },
+    "error": {
+      "eyebrow": "Something went wrong",
+      "heading": "This page hit a snag",
+      "body": "Nothing was lost. Try again, or head back home.",
+      "retry": "Try again",
+      "home_link": "Go to home"
     }
   },
   "accept_invite": {

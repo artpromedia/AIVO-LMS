@@ -625,7 +625,8 @@
         "child_data_collection": "Données de l'enfant",
         "ai_personalization": "Personnalisation par IA",
         "school_roster_import": "Partage de la liste scolaire"
-      }
+      },
+      "not_found_body": "Le nouvel accueil famille est en cours de déploiement. La page recherchée n'existe pas encore ou a changé d'adresse."
     },
     "home": {
       "greeting": "Accueil",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "Saisissez au moins 2 caractères.",
+        "email": "Cela ne ressemble pas à une adresse e-mail.",
+        "password": "Utilisez au moins 8 caractères."
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "Impossible d'enregistrer l'évaluation — réessayez.",
       "success_title": "Évaluation enregistrée",
       "success_body": "Votre contribution alimente désormais la base et la personnalisation des leçons."
+    },
+    "not_found": {
+      "eyebrow": "Introuvable",
+      "heading": "Page introuvable",
+      "body": "Le lien a peut-être changé. Revenons à votre accueil.",
+      "home_link": "Aller à l'accueil"
+    },
+    "error": {
+      "eyebrow": "Un problème est survenu",
+      "heading": "Cette page a rencontré un souci",
+      "body": "Rien n'est perdu. Réessayez ou revenez à l'accueil.",
+      "retry": "Réessayer",
+      "home_link": "Aller à l'accueil"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "Profil",
       "section_notifications": "Notifications",
       "role_label": "Aidant"
+    },
+    "not_found": {
+      "eyebrow": "Introuvable",
+      "heading": "Page introuvable",
+      "body": "Le lien a peut-être changé. Revenons à votre accueil.",
+      "home_link": "Aller à l'accueil"
+    },
+    "error": {
+      "eyebrow": "Un problème est survenu",
+      "heading": "Cette page a rencontré un souci",
+      "body": "Rien n'est perdu. Réessayez ou revenez à l'accueil.",
+      "retry": "Réessayer",
+      "home_link": "Aller à l'accueil"
     }
   },
   "accept_invite": {

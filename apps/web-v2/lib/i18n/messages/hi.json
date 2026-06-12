@@ -625,7 +625,8 @@
         "child_data_collection": "बच्चे का डेटा संग्रह",
         "ai_personalization": "AI वैयक्तिकरण",
         "school_roster_import": "स्कूल सूची साझा करना"
-      }
+      },
+      "not_found_body": "नया अभिभावक होम अभी रोल आउट हो रहा है। जो पेज आप ढूँढ रहे थे वह अभी नहीं है या उसका पता बदल गया है।"
     },
     "home": {
       "greeting": "अभिवादन",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "कम से कम 2 अक्षर लिखें।",
+        "email": "यह ईमेल पता जैसा नहीं लगता।",
+        "password": "कम से कम 8 अक्षर इस्तेमाल करें।"
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "मूल्यांकन सहेजा नहीं जा सका — फिर से कोशिश करें।",
       "success_title": "मूल्यांकन सहेजा गया",
       "success_body": "आपका इनपुट अब इस शिक्षार्थी की बेसलाइन और पाठ वैयक्तिकरण में शामिल है।"
+    },
+    "not_found": {
+      "eyebrow": "नहीं मिला",
+      "heading": "वह पेज नहीं मिला",
+      "body": "लिंक बदल गया होगा। चलिए आपके होम पर लौटते हैं।",
+      "home_link": "होम पर जाएँ"
+    },
+    "error": {
+      "eyebrow": "कुछ गड़बड़ हुई",
+      "heading": "इस पेज में अड़चन आई",
+      "body": "कुछ भी खोया नहीं। फिर कोशिश करें या होम पर जाएँ।",
+      "retry": "फिर कोशिश करें",
+      "home_link": "होम पर जाएँ"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "प्रोफ़ाइल",
       "section_notifications": "सूचनाएँ",
       "role_label": "देखभालकर्ता"
+    },
+    "not_found": {
+      "eyebrow": "नहीं मिला",
+      "heading": "वह पेज नहीं मिला",
+      "body": "लिंक बदल गया होगा। चलिए आपके होम पर लौटते हैं।",
+      "home_link": "होम पर जाएँ"
+    },
+    "error": {
+      "eyebrow": "कुछ गड़बड़ हुई",
+      "heading": "इस पेज में अड़चन आई",
+      "body": "कुछ भी खोया नहीं। फिर कोशिश करें या होम पर जाएँ।",
+      "retry": "फिर कोशिश करें",
+      "home_link": "होम पर जाएँ"
     }
   },
   "accept_invite": {

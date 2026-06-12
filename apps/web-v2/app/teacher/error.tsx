@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { StaticRoleShell } from "@/components/layout/static-role-shell";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -18,8 +19,8 @@ export default function TeacherError({
   }, [error]);
 
   return (
-    <main
-      id="main"
+    <StaticRoleShell role="teacher">
+    <div
       className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center"
     >
       <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">{t("eyebrow")}</p>
@@ -34,6 +35,7 @@ export default function TeacherError({
           <Link href="/teacher/home">{t("home_link")}</Link>
         </Button>
       </div>
-    </main>
+    </div>
+    </StaticRoleShell>
   );
 }

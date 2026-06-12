@@ -625,7 +625,8 @@
         "child_data_collection": "お子さまのデータ収集",
         "ai_personalization": "AI パーソナライズ",
         "school_roster_import": "学校名簿の共有"
-      }
+      },
+      "not_found_body": "新しい保護者ホームは展開中です。お探しのページは未公開か、アドレスが変わりました。"
     },
     "home": {
       "greeting": "挨拶",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "2文字以上で入力してください。",
+        "email": "メールアドレスの形式ではないようです。",
+        "password": "8文字以上にしてください。"
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "評価を保存できませんでした — もう一度お試しください。",
       "success_title": "評価を保存しました",
       "success_body": "あなたの入力はベースラインとレッスンのパーソナライズに反映されます。"
+    },
+    "not_found": {
+      "eyebrow": "見つかりません",
+      "heading": "ページが見つかりません",
+      "body": "リンクが変わったかもしれません。ホームに戻りましょう。",
+      "home_link": "ホームへ"
+    },
+    "error": {
+      "eyebrow": "問題が発生しました",
+      "heading": "ページに不具合がありました",
+      "body": "何も失われていません。もう一度試すか、ホームへ戻ってください。",
+      "retry": "再試行",
+      "home_link": "ホームへ"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "プロフィール",
       "section_notifications": "通知",
       "role_label": "介護者"
+    },
+    "not_found": {
+      "eyebrow": "見つかりません",
+      "heading": "ページが見つかりません",
+      "body": "リンクが変わったかもしれません。ホームに戻りましょう。",
+      "home_link": "ホームへ"
+    },
+    "error": {
+      "eyebrow": "問題が発生しました",
+      "heading": "ページに不具合がありました",
+      "body": "何も失われていません。もう一度試すか、ホームへ戻ってください。",
+      "retry": "再試行",
+      "home_link": "ホームへ"
     }
   },
   "accept_invite": {

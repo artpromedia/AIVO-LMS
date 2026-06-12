@@ -625,7 +625,8 @@
         "child_data_collection": "儿童数据收集",
         "ai_personalization": "AI 个性化",
         "school_roster_import": "共享学校名册"
-      }
+      },
+      "not_found_body": "新版家长主页仍在逐步上线。你要找的页面尚未发布或地址已变更。"
     },
     "home": {
       "greeting": "问候",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "请至少输入 2 个字符。",
+        "email": "这看起来不像电子邮箱地址。",
+        "password": "请至少使用 8 个字符。"
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "无法保存评估 — 请重试。",
       "success_title": "评估已保存",
       "success_body": "您的输入现在将用于该学习者的基线和课程个性化。"
+    },
+    "not_found": {
+      "eyebrow": "未找到",
+      "heading": "找不到该页面",
+      "body": "链接可能已变更。回到你的主页吧。",
+      "home_link": "回到主页"
+    },
+    "error": {
+      "eyebrow": "出了点问题",
+      "heading": "页面遇到了小故障",
+      "body": "没有丢失任何内容。请重试，或返回主页。",
+      "retry": "重试",
+      "home_link": "回到主页"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "个人资料",
       "section_notifications": "通知",
       "role_label": "护理人员"
+    },
+    "not_found": {
+      "eyebrow": "未找到",
+      "heading": "找不到该页面",
+      "body": "链接可能已变更。回到你的主页吧。",
+      "home_link": "回到主页"
+    },
+    "error": {
+      "eyebrow": "出了点问题",
+      "heading": "页面遇到了小故障",
+      "body": "没有丢失任何内容。请重试，或返回主页。",
+      "retry": "重试",
+      "home_link": "回到主页"
     }
   },
   "accept_invite": {

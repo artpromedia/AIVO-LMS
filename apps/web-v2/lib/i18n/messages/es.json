@@ -625,7 +625,8 @@
         "child_data_collection": "Datos del menor",
         "ai_personalization": "Personalización con IA",
         "school_roster_import": "Compartir lista escolar"
-      }
+      },
+      "not_found_body": "El nuevo inicio para familias aún se está desplegando. La página que buscas todavía no existe o cambió de dirección."
     },
     "home": {
       "greeting": "Saludo",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "Escribe al menos 2 caracteres.",
+        "email": "Eso no parece un correo electrónico.",
+        "password": "Usa al menos 8 caracteres."
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "No se pudo guardar la evaluación — inténtalo de nuevo.",
       "success_title": "Evaluación guardada",
       "success_body": "Tu aporte ahora alimenta la línea base y la personalización de lecciones."
+    },
+    "not_found": {
+      "eyebrow": "No encontrado",
+      "heading": "No encontramos esa página",
+      "body": "El enlace puede haber cambiado. Volvamos a tu inicio.",
+      "home_link": "Ir al inicio"
+    },
+    "error": {
+      "eyebrow": "Algo salió mal",
+      "heading": "Esta página tuvo un tropiezo",
+      "body": "No se perdió nada. Inténtalo de nuevo o vuelve al inicio.",
+      "retry": "Reintentar",
+      "home_link": "Ir al inicio"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "Perfil",
       "section_notifications": "Notificaciones",
       "role_label": "Cuidador"
+    },
+    "not_found": {
+      "eyebrow": "No encontrado",
+      "heading": "No encontramos esa página",
+      "body": "El enlace puede haber cambiado. Volvamos a tu inicio.",
+      "home_link": "Ir al inicio"
+    },
+    "error": {
+      "eyebrow": "Algo salió mal",
+      "heading": "Esta página tuvo un tropiezo",
+      "body": "No se perdió nada. Inténtalo de nuevo o vuelve al inicio.",
+      "retry": "Reintentar",
+      "home_link": "Ir al inicio"
     }
   },
   "accept_invite": {

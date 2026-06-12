@@ -625,7 +625,8 @@
         "child_data_collection": "جمع بيانات الطفل",
         "ai_personalization": "تخصيص بالذكاء الاصطناعي",
         "school_roster_import": "مشاركة قائمة المدرسة"
-      }
+      },
+      "not_found_body": "الصفحة الرئيسية الجديدة للأهل ما تزال قيد الطرح. الصفحة المطلوبة لم تصدر بعد أو تغيّر عنوانها."
     },
     "home": {
       "greeting": "التحية",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "يرجى إدخال حرفين على الأقل.",
+        "email": "لا يبدو هذا عنوان بريد إلكتروني.",
+        "password": "استخدم 8 أحرف على الأقل."
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "تعذر حفظ التقييم — حاول مرة أخرى.",
       "success_title": "تم حفظ التقييم",
       "success_body": "مدخلاتك تغذي الآن خط الأساس وتخصيص الدروس لهذا المتعلم."
+    },
+    "not_found": {
+      "eyebrow": "غير موجود",
+      "heading": "تعذّر العثور على الصفحة",
+      "body": "ربما تغيّر الرابط. لنعد بك إلى صفحتك الرئيسية.",
+      "home_link": "إلى الرئيسية"
+    },
+    "error": {
+      "eyebrow": "حدث خطأ ما",
+      "heading": "واجهت هذه الصفحة عثرة",
+      "body": "لم يُفقد شيء. حاول مجددًا أو عد إلى الرئيسية.",
+      "retry": "إعادة المحاولة",
+      "home_link": "إلى الرئيسية"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "الملف الشخصي",
       "section_notifications": "الإشعارات",
       "role_label": "مقدّم الرعاية"
+    },
+    "not_found": {
+      "eyebrow": "غير موجود",
+      "heading": "تعذّر العثور على الصفحة",
+      "body": "ربما تغيّر الرابط. لنعد بك إلى صفحتك الرئيسية.",
+      "home_link": "إلى الرئيسية"
+    },
+    "error": {
+      "eyebrow": "حدث خطأ ما",
+      "heading": "واجهت هذه الصفحة عثرة",
+      "body": "لم يُفقد شيء. حاول مجددًا أو عد إلى الرئيسية.",
+      "retry": "إعادة المحاولة",
+      "home_link": "إلى الرئيسية"
     }
   },
   "accept_invite": {

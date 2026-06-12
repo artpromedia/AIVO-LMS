@@ -625,7 +625,8 @@
         "child_data_collection": "Dados da criança",
         "ai_personalization": "Personalização com IA",
         "school_roster_import": "Compartilhar lista escolar"
-      }
+      },
+      "not_found_body": "A nova página inicial da família ainda está sendo lançada. A página procurada ainda não existe ou mudou de endereço."
     },
     "home": {
       "greeting": "Saudação",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "Digite pelo menos 2 caracteres.",
+        "email": "Isso não parece um e-mail.",
+        "password": "Use pelo menos 8 caracteres."
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "Não foi possível salvar a avaliação — tente novamente.",
       "success_title": "Avaliação salva",
       "success_body": "Sua contribuição agora alimenta a linha de base e a personalização das lições."
+    },
+    "not_found": {
+      "eyebrow": "Não encontrado",
+      "heading": "Não encontramos essa página",
+      "body": "O link pode ter mudado. Vamos voltar para o seu início.",
+      "home_link": "Ir para o início"
+    },
+    "error": {
+      "eyebrow": "Algo deu errado",
+      "heading": "Esta página teve um percalço",
+      "body": "Nada se perdeu. Tente de novo ou volte ao início.",
+      "retry": "Tentar de novo",
+      "home_link": "Ir para o início"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "Perfil",
       "section_notifications": "Notificações",
       "role_label": "Cuidador"
+    },
+    "not_found": {
+      "eyebrow": "Não encontrado",
+      "heading": "Não encontramos essa página",
+      "body": "O link pode ter mudado. Vamos voltar para o seu início.",
+      "home_link": "Ir para o início"
+    },
+    "error": {
+      "eyebrow": "Algo deu errado",
+      "heading": "Esta página teve um percalço",
+      "body": "Nada se perdeu. Tente de novo ou volte ao início.",
+      "retry": "Tentar de novo",
+      "home_link": "Ir para o início"
     }
   },
   "accept_invite": {

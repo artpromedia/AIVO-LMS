@@ -625,7 +625,8 @@
         "child_data_collection": "Daten des Kindes",
         "ai_personalization": "KI-Personalisierung",
         "school_roster_import": "Klassenliste teilen"
-      }
+      },
+      "not_found_body": "Die neue Eltern-Startseite wird noch ausgerollt. Die gesuchte Seite gibt es noch nicht oder sie hat eine andere Adresse."
     },
     "home": {
       "greeting": "Begrüßung",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "Bitte mindestens 2 Zeichen eingeben.",
+        "email": "Das sieht nicht wie eine E-Mail-Adresse aus.",
+        "password": "Mindestens 8 Zeichen verwenden."
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "Einschätzung konnte nicht gespeichert werden — erneut versuchen.",
       "success_title": "Einschätzung gespeichert",
       "success_body": "Dein Input fließt jetzt in Baseline und Lektionspersonalisierung ein."
+    },
+    "not_found": {
+      "eyebrow": "Nicht gefunden",
+      "heading": "Diese Seite gibt es nicht",
+      "body": "Der Link hat sich vielleicht geändert. Zurück zu deiner Startseite.",
+      "home_link": "Zur Startseite"
+    },
+    "error": {
+      "eyebrow": "Etwas ist schiefgelaufen",
+      "heading": "Diese Seite hatte einen Schluckauf",
+      "body": "Nichts ist verloren. Versuch es erneut oder geh zur Startseite.",
+      "retry": "Erneut versuchen",
+      "home_link": "Zur Startseite"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "Profil",
       "section_notifications": "Benachrichtigungen",
       "role_label": "Betreuungsperson"
+    },
+    "not_found": {
+      "eyebrow": "Nicht gefunden",
+      "heading": "Diese Seite gibt es nicht",
+      "body": "Der Link hat sich vielleicht geändert. Zurück zu deiner Startseite.",
+      "home_link": "Zur Startseite"
+    },
+    "error": {
+      "eyebrow": "Etwas ist schiefgelaufen",
+      "heading": "Diese Seite hatte einen Schluckauf",
+      "body": "Nichts ist verloren. Versuch es erneut oder geh zur Startseite.",
+      "retry": "Erneut versuchen",
+      "home_link": "Zur Startseite"
     }
   },
   "accept_invite": {

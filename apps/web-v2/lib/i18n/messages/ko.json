@@ -625,7 +625,8 @@
         "child_data_collection": "아동 데이터 수집",
         "ai_personalization": "AI 맞춤화",
         "school_roster_import": "학교 명단 공유"
-      }
+      },
+      "not_found_body": "새 보호자 홈은 아직 배포 중이에요. 찾으시는 페이지는 아직 없거나 주소가 바뀌었어요."
     },
     "home": {
       "greeting": "인사말",
@@ -1454,6 +1455,11 @@
         "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
         "unsupported_role": "This account type can't be created here.",
         "signup_failed": "We couldn't create your account. Please try again."
+      },
+      "errors_inline": {
+        "name": "2자 이상 입력해 주세요.",
+        "email": "이메일 주소 형식이 아니에요.",
+        "password": "8자 이상 사용해 주세요."
       }
     },
     "forgot": {
@@ -2995,6 +3001,19 @@
       "submit_error": "평가를 저장하지 못했습니다 — 다시 시도하세요.",
       "success_title": "평가 저장됨",
       "success_body": "입력하신 내용이 기준선과 수업 개인화에 반영됩니다."
+    },
+    "not_found": {
+      "eyebrow": "찾을 수 없음",
+      "heading": "페이지를 찾을 수 없어요",
+      "body": "링크가 바뀌었을 수 있어요. 홈으로 돌아가요.",
+      "home_link": "홈으로"
+    },
+    "error": {
+      "eyebrow": "문제가 생겼어요",
+      "heading": "페이지에 문제가 있었어요",
+      "body": "잃어버린 건 없어요. 다시 시도하거나 홈으로 가세요.",
+      "retry": "다시 시도",
+      "home_link": "홈으로"
     }
   },
   "caregiver": {
@@ -3044,6 +3063,19 @@
       "section_profile": "프로필",
       "section_notifications": "알림",
       "role_label": "보호자"
+    },
+    "not_found": {
+      "eyebrow": "찾을 수 없음",
+      "heading": "페이지를 찾을 수 없어요",
+      "body": "링크가 바뀌었을 수 있어요. 홈으로 돌아가요.",
+      "home_link": "홈으로"
+    },
+    "error": {
+      "eyebrow": "문제가 생겼어요",
+      "heading": "페이지에 문제가 있었어요",
+      "body": "잃어버린 건 없어요. 다시 시도하거나 홈으로 가세요.",
+      "retry": "다시 시도",
+      "home_link": "홈으로"
     }
   },
   "accept_invite": {
