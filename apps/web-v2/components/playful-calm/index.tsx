@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ReadAloudButton } from "@/components/playful-calm/read-aloud-button";
+import { AivoMascot } from "@/components/learner/art/aivo-mascot";
 
 /**
  * Shared dashboard primitives. The folder name is `playful-calm/` for
@@ -84,12 +85,7 @@ export function StickerBook({
       </p>
       {earned === 0 && emptyEncouragement ? (
         <div className="mt-3 flex items-center gap-3">
-          <img
-            src="/images/mascots/aivo-owl-encouraging.svg"
-            alt=""
-            aria-hidden="true"
-            className="h-12 w-12"
-          />
+          <AivoMascot expression="encouraging" size={48} />
           <p className="text-sm text-iw-ink">{emptyEncouragement}</p>
         </div>
       ) : null}

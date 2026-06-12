@@ -1247,7 +1247,9 @@
       "title": "المكافآت",
       "description": "تتبّع كل فصل أنهيته عبر عوالم المغامرات.",
       "open_world": "فتح العالم →",
-      "sticker_empty_encouragement": "أول ملصق بانتظارك — أنهِ فصلًا واحدًا لتحصل عليه!"
+      "sticker_empty_encouragement": "أول ملصق بانتظارك — أنهِ فصلًا واحدًا لتحصل عليه!",
+      "badges_title": "الأوسمة",
+      "badges_count": "{earned} من {total}"
     },
     "select": {
       "eyebrow": "العرض بصفة",

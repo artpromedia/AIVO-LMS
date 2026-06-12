@@ -1247,7 +1247,9 @@
       "title": "奖励",
       "description": "追踪你在各个任务世界中完成的每一章。",
       "open_world": "打开世界 →",
-      "sticker_empty_encouragement": "你的第一张贴纸在等你——完成一个章节就能获得！"
+      "sticker_empty_encouragement": "你的第一张贴纸在等你——完成一个章节就能获得！",
+      "badges_title": "徽章",
+      "badges_count": "已获得 {earned}/{total}"
     },
     "select": {
       "eyebrow": "查看身份",

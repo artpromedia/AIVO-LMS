@@ -1247,7 +1247,9 @@
       "title": "Recompensas",
       "description": "Acompanhe cada capítulo que você concluiu nos mundos de aventura.",
       "open_world": "Abrir mundo →",
-      "sticker_empty_encouragement": "Seu primeiro adesivo está esperando — termine um capítulo para ganhá-lo!"
+      "sticker_empty_encouragement": "Seu primeiro adesivo está esperando — termine um capítulo para ganhá-lo!",
+      "badges_title": "Emblemas",
+      "badges_count": "{earned} de {total} conquistados"
     },
     "select": {
       "eyebrow": "Ver como",

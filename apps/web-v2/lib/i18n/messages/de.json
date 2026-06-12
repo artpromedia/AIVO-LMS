@@ -1247,7 +1247,9 @@
       "title": "Belohnungen",
       "description": "Verfolge jedes Kapitel, das du in den Quest-Welten abgeschlossen hast.",
       "open_world": "Welt öffnen →",
-      "sticker_empty_encouragement": "Dein erster Sticker wartet — schließe ein Kapitel ab und hol ihn dir!"
+      "sticker_empty_encouragement": "Dein erster Sticker wartet — schließe ein Kapitel ab und hol ihn dir!",
+      "badges_title": "Abzeichen",
+      "badges_count": "{earned} von {total} erhalten"
     },
     "select": {
       "eyebrow": "Ansehen als",

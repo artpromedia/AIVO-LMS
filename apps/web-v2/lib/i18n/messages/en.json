@@ -1445,7 +1445,9 @@
       "title": "Rewards",
       "description": "Track every chapter you've completed across the quest worlds.",
       "open_world": "Open world →",
-      "sticker_empty_encouragement": "Your first sticker is waiting — finish a chapter to earn it!"
+      "sticker_empty_encouragement": "Your first sticker is waiting — finish a chapter to earn it!",
+      "badges_title": "Badges",
+      "badges_count": "{earned} of {total} earned"
     },
     "select": {
       "eyebrow": "View as",
