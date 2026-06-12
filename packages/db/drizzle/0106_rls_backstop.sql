@@ -16,8 +16,11 @@
 --     app_runtime and threading withTenantContext (packages/db/src/
 --     tenant-context.ts). family-svc is the reference adoption; the
 --     playbook is docs/security/rls-rollout.md.
---   * Policies read current_setting('app.tenant_id', true); the second
---     argument makes an unset context yield NULL → comparison is false →
+--   * Policies read NULLIF(current_setting('app.tenant_id', true), '');
+--     the second argument makes a never-set context yield NULL, and the
+--     NULLIF guards the pooled-connection case where a previous SET LOCAL
+--     leaves the GUC as EMPTY STRING after its transaction ends — ''::uuid
+--     would ERROR instead of failing closed. NULL → comparison is false →
 --     ZERO rows. Fail-closed for app_runtime, invisible for owners.
 --
 -- PER-TABLE POLICY DECISIONS:
@@ -68,16 +71,16 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS users_tenant_isolation ON users;
 --> statement-breakpoint
 CREATE POLICY users_tenant_isolation ON users
-  USING (tenant_id = current_setting('app.tenant_id', true)::uuid)
-  WITH CHECK (tenant_id = current_setting('app.tenant_id', true)::uuid);
+  USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid)
+  WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 --> statement-breakpoint
 ALTER TABLE learners ENABLE ROW LEVEL SECURITY;
 --> statement-breakpoint
 DROP POLICY IF EXISTS learners_tenant_isolation ON learners;
 --> statement-breakpoint
 CREATE POLICY learners_tenant_isolation ON learners
-  USING (tenant_id = current_setting('app.tenant_id', true)::uuid)
-  WITH CHECK (tenant_id = current_setting('app.tenant_id', true)::uuid);
+  USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid)
+  WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 --> statement-breakpoint
 DROP POLICY IF EXISTS learners_collaboration_read ON learners;
 --> statement-breakpoint
@@ -85,15 +88,15 @@ CREATE POLICY learners_collaboration_read ON learners FOR SELECT
   USING (
     id IN (
       SELECT learner_id FROM learner_teachers
-        WHERE teacher_user_id = current_setting('app.user_id', true)::uuid
+        WHERE teacher_user_id = NULLIF(current_setting('app.user_id', true), '')::uuid
           AND status = 'ACCEPTED'
       UNION
       SELECT learner_id FROM learner_caregivers
-        WHERE caregiver_user_id = current_setting('app.user_id', true)::uuid
+        WHERE caregiver_user_id = NULLIF(current_setting('app.user_id', true), '')::uuid
           AND status = 'ACCEPTED'
       UNION
       SELECT learner_id FROM learner_therapists
-        WHERE therapist_user_id = current_setting('app.user_id', true)::uuid
+        WHERE therapist_user_id = NULLIF(current_setting('app.user_id', true), '')::uuid
           AND status = 'ACCEPTED'
     )
   );
@@ -103,29 +106,29 @@ ALTER TABLE schools ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS schools_tenant_isolation ON schools;
 --> statement-breakpoint
 CREATE POLICY schools_tenant_isolation ON schools
-  USING (tenant_id = current_setting('app.tenant_id', true)::uuid)
-  WITH CHECK (tenant_id = current_setting('app.tenant_id', true)::uuid);
+  USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid)
+  WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 --> statement-breakpoint
 ALTER TABLE classrooms ENABLE ROW LEVEL SECURITY;
 --> statement-breakpoint
 DROP POLICY IF EXISTS classrooms_tenant_isolation ON classrooms;
 --> statement-breakpoint
 CREATE POLICY classrooms_tenant_isolation ON classrooms
-  USING (school_id IN (SELECT id FROM schools WHERE tenant_id = current_setting('app.tenant_id', true)::uuid))
-  WITH CHECK (school_id IN (SELECT id FROM schools WHERE tenant_id = current_setting('app.tenant_id', true)::uuid));
+  USING (school_id IN (SELECT id FROM schools WHERE tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid))
+  WITH CHECK (school_id IN (SELECT id FROM schools WHERE tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid));
 --> statement-breakpoint
 ALTER TABLE classroom_enrollments ENABLE ROW LEVEL SECURITY;
 --> statement-breakpoint
 DROP POLICY IF EXISTS classroom_enrollments_tenant_isolation ON classroom_enrollments;
 --> statement-breakpoint
 CREATE POLICY classroom_enrollments_tenant_isolation ON classroom_enrollments
-  USING (learner_id IN (SELECT id FROM learners WHERE tenant_id = current_setting('app.tenant_id', true)::uuid))
-  WITH CHECK (learner_id IN (SELECT id FROM learners WHERE tenant_id = current_setting('app.tenant_id', true)::uuid));
+  USING (learner_id IN (SELECT id FROM learners WHERE tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid))
+  WITH CHECK (learner_id IN (SELECT id FROM learners WHERE tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid));
 --> statement-breakpoint
 ALTER TABLE staff_assignments ENABLE ROW LEVEL SECURITY;
 --> statement-breakpoint
 DROP POLICY IF EXISTS staff_assignments_tenant_isolation ON staff_assignments;
 --> statement-breakpoint
 CREATE POLICY staff_assignments_tenant_isolation ON staff_assignments
-  USING (school_id IN (SELECT id FROM schools WHERE tenant_id = current_setting('app.tenant_id', true)::uuid))
-  WITH CHECK (school_id IN (SELECT id FROM schools WHERE tenant_id = current_setting('app.tenant_id', true)::uuid));
+  USING (school_id IN (SELECT id FROM schools WHERE tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid))
+  WITH CHECK (school_id IN (SELECT id FROM schools WHERE tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid));

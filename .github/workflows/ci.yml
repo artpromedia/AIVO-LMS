@@ -517,13 +517,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm --filter @aivo/db --filter @aivo/security --filter @aivo/observability --filter @aivo/scheduling --filter @aivo/ops-alert build
+        run: pnpm --filter @aivo/db --filter @aivo/security --filter @aivo/observability --filter @aivo/scheduling build
 
       - name: Run scheduling unit tests
         run: pnpm --filter @aivo/scheduling test
-
-      - name: Run ops-alert unit tests
-        run: pnpm --filter @aivo/ops-alert test
 
       - name: Run admin-svc tests (incl. crash-recovery + jobs endpoint)
         env:

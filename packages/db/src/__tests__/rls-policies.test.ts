@@ -150,15 +150,31 @@ describe("RLS backstop (migration 0106)", () => {
 
   it("rejects a write whose tenant_id mismatches the context (WITH CHECK)", async (ctx) => {
     if (!runtimeDb) return ctx.skip(skipReason);
-    await expect(
-      withTenantContext(runtimeDb, tenantA, async (tx) => {
+    // Drizzle wraps the Postgres error ("new row violates row-level
+    // security policy") in a DrizzleQueryError — match the cause chain.
+    const flatten = (e: unknown): string => {
+      const parts: string[] = [];
+      let cur = e as { message?: string; cause?: unknown } | undefined;
+      while (cur) {
+        if (cur.message) parts.push(cur.message);
+        cur = cur.cause as typeof cur;
+      }
+      return parts.join(" | ");
+    };
+    let thrown: unknown = null;
+    try {
+      await withTenantContext(runtimeDb, tenantA, async (tx) => {
         await tx.execute(
           sql.raw(
             `INSERT INTO users (tenant_id, name, role) VALUES ('${tenantB}', 'Smuggled', 'PARENT')`,
           ),
         );
-      }),
-    ).rejects.toThrow(/row-level security|policy/i);
+      });
+    } catch (e) {
+      thrown = e;
+    }
+    expect(thrown, "cross-tenant INSERT must be rejected").not.toBeNull();
+    expect(flatten(thrown)).toMatch(/row-level security|policy/i);
   });
 
   it("allows a write whose tenant_id matches the context", async (ctx) => {
