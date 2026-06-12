@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AivoMascot } from "@/components/learner/art/aivo-mascot";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { listLessonRunsForLearner } from "@/lib/db/repos";
 
@@ -43,7 +44,11 @@ export default async function Page() {
         description={t("description")}
       />
       {runs.length === 0 ? (
-        <EmptyState title={t("nothing_finished")} description={t("nothing_finished_desc")} />
+        <EmptyState
+          icon={<AivoMascot expression="resting" size={72} />}
+          title={t("nothing_finished")}
+          description={t("nothing_finished_desc")}
+        />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {runs.map((r) => (
