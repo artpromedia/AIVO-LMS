@@ -122,6 +122,14 @@ function vals<T>(c: Map<string, T> | T[]): T[] {
   return Array.isArray(c) ? c : Array.from(c.values());
 }
 
+function skillMasteryRowId(row: {
+  learnerId: string;
+  tenantId: string;
+  skillId: string;
+}): string {
+  return `sm:${row.tenantId}:${row.learnerId}:${row.skillId}`;
+}
+
 /**
  * Insert in chunks; skip duplicates on a natural-key target. Idempotent:
  * re-running against an already-seeded database is a no-op (every row
@@ -348,13 +356,13 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
   await log(
     "skillMasteries",
     await bulk(
-      db,
-      webSkillMasteries,
-      vals(s.skillMasteries).map((m) => ({
-        id: (m as { id?: string }).id,
-        learnerId: m.learnerId,
-        tenantId: m.tenantId,
-        data: m,
+       db,
+       webSkillMasteries,
+       vals(s.skillMasteries).map((m) => ({
+         id: skillMasteryRowId(m),
+         learnerId: m.learnerId,
+         tenantId: m.tenantId,
+         data: m,
       })),
       webSkillMasteries.id,
     ),

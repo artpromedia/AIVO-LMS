@@ -5,6 +5,7 @@ import { createReadDedupe } from "@aivo/audit-client";
 import { eq, desc, asc, sql, and, gte, lte, or, count, ilike } from "drizzle-orm";
 import { startCsv, EXPORT_ROW_CAP } from "../lib/csv.js";
 import {
+  getAdminSvcAuditLogExportSchema,
   getAdminSvcAuditLogSchema,
   getAdminSvcActivitySchema,
   postAdminSvcAuditLogReadEventsSchema,
@@ -111,7 +112,7 @@ export function registerAuditRoutes(app: FastifyInstance, db: any) {
   app.get(
     "/api/admin-svc/audit-log/export.csv",
     {
-      schema: getAdminSvcAuditLogSchema,
+      schema: getAdminSvcAuditLogExportSchema,
       preHandler: (req, reply) => requirePermission(req, reply, Permission.AuditRead),
     },
     async (request: any, reply) => {

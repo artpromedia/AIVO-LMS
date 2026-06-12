@@ -3543,8 +3543,8 @@
     },
     "/api/district/sso/oidc/test": {
       "post": {
-        "operationId": "updateDistrictSso",
-        "summary": "PUT /api/district/sso",
+        "operationId": "testDistrictSsoOidc",
+        "summary": "POST /api/district/sso/oidc/test",
         "tags": [
           "Identity"
         ],

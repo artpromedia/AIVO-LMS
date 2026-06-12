@@ -105,6 +105,12 @@ export const getAdminSvcAuditLogSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const getAdminSvcAuditLogExportSchema = {
+  ...getAdminSvcAuditLogSchema,
+  operationId: "getAdminSvcAuditLogExport",
+  summary: "GET /api/admin-svc/audit-log/export.csv",
+} as const;
+
 export const postAdminSvcAuditLogReadEventsSchema = {
   tags: ["Admin"],
   operationId: "postAdminSvcAuditLogReadEvents",
@@ -370,6 +376,12 @@ export const getAdminSvcUsersSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const getAdminSvcUsersExportSchema = {
+  ...getAdminSvcUsersSchema,
+  operationId: "getAdminSvcUsersExport",
+  summary: "GET /api/admin-svc/users/export.csv",
+} as const;
+
 export const getAdminSvcUsersByIdSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcUsersById",
@@ -390,6 +402,12 @@ export const getAdminSvcLearnersSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const getAdminSvcLearnersExportSchema = {
+  ...getAdminSvcLearnersSchema,
+  operationId: "getAdminSvcLearnersExport",
+  summary: "GET /api/admin-svc/learners/export.csv",
+} as const;
+
 export const getAdminSvcLearnersByIdSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcLearnersById",
@@ -408,6 +426,12 @@ export const getAdminSvcTenantsSchema = {
   operationId: "getAdminSvcTenants",
   summary: "GET /api/admin-svc/tenants",
   response: { 200: passthroughObject },
+} as const;
+
+export const getAdminSvcTenantsExportSchema = {
+  ...getAdminSvcTenantsSchema,
+  operationId: "getAdminSvcTenantsExport",
+  summary: "GET /api/admin-svc/tenants/export.csv",
 } as const;
 
 export const getAdminSvcTenantsByIdSchema = {

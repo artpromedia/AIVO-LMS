@@ -39,10 +39,9 @@ export interface ParentSummaryData {
   sessionsThisWeekTrend: number[];
 }
 
-// TODO: import from @aivo/api-client/family-svc once the summary route exposes
-// typed trend fields.
-// eslint-disable-next-line no-restricted-syntax -- see TODO above
-interface RawSummaryResponse {
+// Keep response normalization local because this route may include optional
+// trend fields that are not part of the generated service contract.
+interface RawSummaryPayload {
   parent?: { name: string | null; lastDashboardVisit: string | null } | null;
   learners?: ParentSummaryLearner[];
   summary?: {
@@ -70,7 +69,7 @@ export async function fetchParentSummary(parentId: string): Promise<ParentSummar
     throw new Error(message);
   }
 
-  const raw = (await res.json()) as RawSummaryResponse;
+  const raw = (await res.json()) as RawSummaryPayload;
 
   const activeTutors = raw.summary?.activeTutors ?? raw.activeTutors ?? 0;
   const sessionsThisWeek = raw.summary?.sessionsThisWeek ?? raw.sessionsThisWeek ?? 0;

@@ -198,8 +198,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** GET /api/admin-svc/users */
-        get: operations["getAdminSvcUsers"];
+        /** GET /api/admin-svc/users/export.csv */
+        get: operations["getAdminSvcUsersExport"];
         put?: never;
         post?: never;
         delete?: never;
@@ -215,8 +215,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** GET /api/admin-svc/learners */
-        get: operations["getAdminSvcLearners"];
+        /** GET /api/admin-svc/learners/export.csv */
+        get: operations["getAdminSvcLearnersExport"];
         put?: never;
         post?: never;
         delete?: never;
@@ -234,6 +234,23 @@ export interface paths {
         };
         /** GET /api/admin-svc/tenants */
         get: operations["getAdminSvcTenants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin-svc/tenants/export.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** GET /api/admin-svc/tenants/export.csv */
+        get: operations["getAdminSvcTenantsExport"];
         put?: never;
         post?: never;
         delete?: never;
@@ -385,8 +402,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** GET /api/admin-svc/audit-log */
-        get: operations["getAdminSvcAuditLog"];
+        /** GET /api/admin-svc/audit-log/export.csv */
+        get: operations["getAdminSvcAuditLogExport"];
         put?: never;
         post?: never;
         delete?: never;
@@ -491,6 +508,39 @@ export interface paths {
         put?: never;
         /** POST /api/admin-svc/leads */
         post: operations["adminSvcLeads"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin-svc/leads/export.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2725,7 +2775,73 @@ export interface operations {
             };
         };
     };
+    getAdminSvcUsersExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    getAdminSvcLearnersExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     getAdminSvcTenants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    getAdminSvcTenantsExport: {
         parameters: {
             query?: never;
             header?: never;
@@ -2907,6 +3023,28 @@ export interface operations {
         };
     };
     getAdminSvcAuditLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    getAdminSvcAuditLogExport: {
         parameters: {
             query?: never;
             header?: never;

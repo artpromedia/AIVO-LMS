@@ -10,6 +10,7 @@
  */
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { bffFetch } from "@/lib/api/client";
 
 interface NextWeekLesson {
   lessonRunId: string;
@@ -26,11 +27,9 @@ export function NextWeekPanel({ apiBase }: { apiBase: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(apiBase)
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const body = (await res.json()) as { data?: { lessons?: NextWeekLesson[] } };
-        if (!cancelled) setLessons(body.data?.lessons ?? []);
+    bffFetch<{ lessons?: NextWeekLesson[] }>(apiBase)
+      .then((data) => {
+        if (!cancelled) setLessons(data.lessons ?? []);
       })
       .catch((e: unknown) => {
         if (!cancelled) setError(e instanceof Error ? e.message : String(e));

@@ -509,7 +509,7 @@
       "none_recorded": "Noch keine erfasst.",
       "challenges": "Herausforderungen",
       "accessibility_defaults": "Barrierefreiheitseinstellungen",
-      "whats_working": "What's working",
+      "whats_working": "Was gut funktioniert",
       "recommendations": "Empfehlungen zur Genehmigung"
     },
     "learner_sensory": {
@@ -679,7 +679,7 @@
       "age_13_15": "Ages 13–15"
     },
     "whats_working": {
-      "title": "What's working",
+      "title": "Was gut funktioniert",
       "intro": "Patterns from {name}'s recent sessions — bring these to your next IEP meeting.",
       "loading": "Loading insights…",
       "load_error": "Couldn't load insights right now.",

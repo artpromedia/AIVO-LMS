@@ -1276,6 +1276,15 @@
         }
       }
     },
+    "/api/comms/internal/recommendation-pending": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
     "/api/comms/in-app-notifications": {
       "get": {
         "operationId": "listInAppNotifications",

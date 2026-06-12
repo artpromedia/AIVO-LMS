@@ -298,8 +298,8 @@
     },
     "/api/admin-svc/users/export.csv": {
       "get": {
-        "operationId": "getAdminSvcUsers",
-        "summary": "GET /api/admin-svc/users",
+        "operationId": "getAdminSvcUsersExport",
+        "summary": "GET /api/admin-svc/users/export.csv",
         "tags": [
           "Admin"
         ],
@@ -320,8 +320,8 @@
     },
     "/api/admin-svc/learners/export.csv": {
       "get": {
-        "operationId": "getAdminSvcLearners",
-        "summary": "GET /api/admin-svc/learners",
+        "operationId": "getAdminSvcLearnersExport",
+        "summary": "GET /api/admin-svc/learners/export.csv",
         "tags": [
           "Admin"
         ],
@@ -344,6 +344,28 @@
       "get": {
         "operationId": "getAdminSvcTenants",
         "summary": "GET /api/admin-svc/tenants",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin-svc/tenants/export.csv": {
+      "get": {
+        "operationId": "getAdminSvcTenantsExport",
+        "summary": "GET /api/admin-svc/tenants/export.csv",
         "tags": [
           "Admin"
         ],
@@ -576,8 +598,8 @@
     },
     "/api/admin-svc/audit-log/export.csv": {
       "get": {
-        "operationId": "getAdminSvcAuditLog",
-        "summary": "GET /api/admin-svc/audit-log",
+        "operationId": "getAdminSvcAuditLogExport",
+        "summary": "GET /api/admin-svc/audit-log/export.csv",
         "tags": [
           "Admin"
         ],
@@ -768,6 +790,15 @@
           }
         }
       },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/api/admin-svc/leads/export.csv": {
       "get": {
         "responses": {
           "200": {

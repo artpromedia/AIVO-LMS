@@ -2886,8 +2886,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** PUT /api/district/sso */
-        post: operations["updateDistrictSso"];
+        /** POST /api/district/sso/oidc/test */
+        post: operations["testDistrictSsoOidc"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6061,6 +6061,47 @@ export interface operations {
         };
     };
     updateDistrictSso: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    } & {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    testDistrictSsoOidc: {
         parameters: {
             query?: never;
             header?: never;

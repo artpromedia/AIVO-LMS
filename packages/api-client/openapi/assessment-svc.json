@@ -258,6 +258,120 @@
         }
       }
     },
+    "/api/assessments/therapist/{learnerId}/status": {
+      "get": {
+        "tags": [
+          "Therapist Assessment"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "learnerId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/api/assessments/therapist": {
+      "post": {
+        "tags": [
+          "Therapist Assessment"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "learnerId"
+                ],
+                "properties": {
+                  "learnerId": {
+                    "type": "string"
+                  },
+                  "therapyDiscipline": {
+                    "type": "string",
+                    "enum": [
+                      "speech",
+                      "occupational",
+                      "behavioral",
+                      "physical",
+                      "other"
+                    ]
+                  },
+                  "areasOfFocus": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "strengths": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "challenges": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "sensoryNotes": {
+                    "type": "string"
+                  },
+                  "communicationNotes": {
+                    "type": "string"
+                  },
+                  "regulationStrategies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "recommendedAccommodations": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "observations": {
+                    "type": "string"
+                  },
+                  "additionalResponses": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
     "/api/assessments": {
       "post": {
         "tags": [
@@ -3537,6 +3651,18 @@
                   },
                   "teacher_assessment": {
                     "type": "object",
+                    "nullable": true
+                  },
+                  "therapist_assessments": {
+                    "type": "array",
+                    "nullable": true
+                  },
+                  "therapy_goals": {
+                    "type": "array",
+                    "nullable": true
+                  },
+                  "caregiver_observations": {
+                    "type": "array",
                     "nullable": true
                   },
                   "zip_code": {

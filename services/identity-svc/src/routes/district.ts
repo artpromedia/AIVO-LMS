@@ -51,6 +51,7 @@ import {
   getDistrictSettingsSchema,
   updateDistrictSettingsSchema,
   getDistrictSsoSchema,
+  testDistrictSsoOidcSchema,
   updateDistrictSsoSchema,
   getDistrictActivitySchema,
   getDistrictAnalyticsCohortsSchema,
@@ -1256,7 +1257,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
   // discovery and reports the resolved endpoints (or the exact failure).
   app.post(
     "/api/district/sso/oidc/test",
-    { schema: updateDistrictSsoSchema, preHandler: requireDistrictAdmin },
+    { schema: testDistrictSsoOidcSchema, preHandler: requireDistrictAdmin },
     async (req: any, reply: any) => {
       const body = (req.body || {}) as { issuer?: string; discoveryUrl?: string };
       if (!body.issuer && !body.discoveryUrl) {

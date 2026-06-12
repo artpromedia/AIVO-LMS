@@ -12,9 +12,8 @@
  * EXCEEDS the recorded budget; lowering the budget after migrations is the
  * expected ritual (numbers only go down).
  */
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -29,23 +28,33 @@ const ALLOW = [
   /\/e2e\//,
 ];
 
-let files = [];
-try {
-  files = execFileSync(
-    "grep",
-    ["-rl", "--include=*.tsx", "--include=*.ts", '"use client"',
-      join(repoRoot, "apps/web-v2/app"), join(repoRoot, "apps/web-v2/components"),
-      join(repoRoot, "apps/web-v2/lib")],
-    { encoding: "utf8" },
-  ).split("\n").filter(Boolean);
-} catch {
-  files = [];
+function clientComponentFiles(root) {
+  const files = [];
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...clientComponentFiles(path));
+    } else if (
+      entry.isFile() &&
+      (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) &&
+      readFileSync(path, "utf8").includes('"use client"')
+    ) {
+      files.push(path);
+    }
+  }
+  return files;
 }
+
+const files = [
+  ...clientComponentFiles(join(repoRoot, "apps/web-v2/app")),
+  ...clientComponentFiles(join(repoRoot, "apps/web-v2/components")),
+  ...clientComponentFiles(join(repoRoot, "apps/web-v2/lib")),
+];
 
 let total = 0;
 const offenders = [];
 for (const file of files) {
-  const rel = file.replace(repoRoot + "/", "");
+  const rel = relative(repoRoot, file).replaceAll("\\", "/");
   if (ALLOW.some((re) => re.test(rel))) continue;
   const src = readFileSync(file, "utf8");
   // fetch( calls — excluding bffFetch( and property access like page.request.fetch

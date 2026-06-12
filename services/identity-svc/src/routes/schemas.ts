@@ -505,6 +505,12 @@ export const updateDistrictSsoSchema = {
   response: { 200: passthroughObject, 400: errorResponse },
 } as const;
 
+export const testDistrictSsoOidcSchema = {
+  ...updateDistrictSsoSchema,
+  operationId: "testDistrictSsoOidc",
+  summary: "POST /api/district/sso/oidc/test",
+} as const;
+
 export const getDistrictActivitySchema = {
   tags: ["Identity"],
   operationId: "getDistrictActivity",

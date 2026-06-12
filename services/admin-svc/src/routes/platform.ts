@@ -33,6 +33,7 @@ import {
   getAdminSvcConfigHistorySchema,
   getAdminSvcConfigSchema,
   getAdminSvcLearnersByIdSchema,
+  getAdminSvcLearnersExportSchema,
   getAdminSvcLearnersSchema,
   getAdminSvcPlatformAiActivitySchema,
   getAdminSvcPlatformAiCostsSchema,
@@ -40,8 +41,10 @@ import {
   getAdminSvcPlatformUsageTrendsSchema,
   getAdminSvcStatsSchema,
   getAdminSvcTenantsByIdSchema,
+  getAdminSvcTenantsExportSchema,
   getAdminSvcTenantsSchema,
   getAdminSvcUsersByIdSchema,
+  getAdminSvcUsersExportSchema,
   getAdminSvcUsersSchema,
   updateAdminSvcConfigSchema,
 } from "./schemas.js";
@@ -698,7 +701,7 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
   app.get(
     "/api/admin-svc/users/export.csv",
     {
-      schema: getAdminSvcUsersSchema,
+      schema: getAdminSvcUsersExportSchema,
       preHandler: (req, reply) => requirePermission(req, reply, Permission.UserRead),
     },
     async (req: any, reply) =>
@@ -724,7 +727,7 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
   app.get(
     "/api/admin-svc/learners/export.csv",
     {
-      schema: getAdminSvcLearnersSchema,
+      schema: getAdminSvcLearnersExportSchema,
       preHandler: (req, reply) => requirePermission(req, reply, Permission.LearnerRead),
     },
     async (req: any, reply) =>
@@ -749,7 +752,7 @@ export function registerPlatformRoutes(app: FastifyInstance, db: any) {
   app.get(
     "/api/admin-svc/tenants/export.csv",
     {
-      schema: getAdminSvcTenantsSchema,
+      schema: getAdminSvcTenantsExportSchema,
       preHandler: (req, reply) => requirePermission(req, reply, Permission.TenantRead),
     },
     async (req: any, reply) =>
