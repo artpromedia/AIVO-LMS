@@ -43,7 +43,7 @@ const FIXTURE_SURFACE_TYPES: ReadonlySet<FixtureSurfaceType> = new Set([
 ]);
 
 type FixturePageProps = {
-  searchParams?: Promise<{ surfaceType?: string; agent?: string }>;
+  searchParams?: Promise<{ surfaceType?: string; agent?: string; sensory?: string }>;
 };
 
 function fixturePrompt(surfaceType: FixtureSurfaceType): string {
@@ -156,6 +156,14 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
   if (process.env.NODE_ENV === "production") notFound();
   const session = await requirePageRole(["learner", "parent"]);
   const params = await searchParams;
+  // Deterministic sensory scenarios for the stage-sensory e2e: the param maps
+  // to a parent-curated profile exactly as the repos layer would supply it.
+  const FIXTURE_SENSORY: Record<string, Record<string, string>> = {
+    "hyper-visual": { visual: "hyper" },
+    "vestibular-hyper": { vestibular: "hyper" },
+    "hypo-visual": { visual: "hypo" },
+  };
+  const sensoryModalities = params?.sensory ? (FIXTURE_SENSORY[params.sensory] ?? null) : null;
   const requested = params?.surfaceType;
   const surfaceType: FixtureSurfaceType = FIXTURE_SURFACE_TYPES.has(requested as FixtureSurfaceType)
     ? (requested as FixtureSurfaceType)
@@ -184,6 +192,7 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
         learnerId={learnerId}
         lessonRunId={`lesson-run-fixture-${surfaceType}`}
         plan={fixturePlan(surfaceType)}
+        sensoryModalities={sensoryModalities}
         accessibility={{
           learnerId,
           tenantId: session.tenantId ?? "t_demo",

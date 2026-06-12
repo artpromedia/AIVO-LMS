@@ -44,7 +44,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       requestId,
     );
     if (consentErr) return consentErr;
-    if (!getLearner(learnerId, session!.tenantId)) {
+    if (!(await getLearner(learnerId, session!.tenantId))) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
     const prefs = await getAccessibilityPrefs(learnerId, session!.tenantId);
@@ -71,7 +71,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
       requestId,
     );
     if (consentErr) return consentErr;
-    if (!getLearner(learnerId, session!.tenantId)) {
+    if (!(await getLearner(learnerId, session!.tenantId))) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
     const raw = await req.json().catch(() => ({}));

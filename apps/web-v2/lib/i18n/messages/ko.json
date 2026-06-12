@@ -1373,6 +1373,11 @@
     },
     "lesson_run": {
       "back_to_today": "오늘로 돌아가기"
+    },
+    "accessibility_voice": {
+      "title": "목소리와 속도.",
+      "body": "읽어주기 목소리와 속도를 고르세요.",
+      "link": "음성 설정 열기"
     }
   },
   "auth": {

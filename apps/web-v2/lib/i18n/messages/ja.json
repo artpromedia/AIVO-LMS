@@ -1373,6 +1373,11 @@
     },
     "lesson_run": {
       "back_to_today": "今日に戻る"
+    },
+    "accessibility_voice": {
+      "title": "声と速さ。",
+      "body": "読み上げの声と速さを選べます。",
+      "link": "音声設定を開く"
     }
   },
   "auth": {

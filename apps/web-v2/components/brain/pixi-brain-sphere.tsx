@@ -177,14 +177,30 @@ export default function PixiBrainSphere(props: PixiBrainSphereProps) {
   const [usePixi, setUsePixi] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
+  const [motionScale, setMotionScale] = useState(1);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    // Sensory system speed: the stage profile var when the sphere renders
+    // inside a lesson, else the global sensory-mode scale (calm 0.5, HC 0).
+    const host = hostRef.current;
+    const read = (el: Element | null, name: string) =>
+      el ? Number.parseFloat(getComputedStyle(el).getPropertyValue(name)) : Number.NaN;
+    const fromStage = read(host, "--stage-animation-speed");
+    const fromMode = read(document.documentElement, "--aivo-sensory-motionScale");
+    const scale = Number.isFinite(fromStage)
+      ? fromStage
+      : Number.isFinite(fromMode)
+        ? fromMode
+        : 1;
+    setMotionScale(Math.min(1, Math.max(0, scale)));
   }, []);
 
   useEffect(() => {
-    // Honour reduced-motion by skipping the live render entirely.
-    if (reducedMotion) {
+    // Honour reduced-motion (OS) and a zero sensory motion scale (high
+    // contrast mode / motion-reduced profile) by skipping the live render.
+    if (reducedMotion || motionScale === 0) {
       setUsePixi(false);
       return;
     }
@@ -252,7 +268,9 @@ export default function PixiBrainSphere(props: PixiBrainSphereProps) {
 
         const start = performance.now();
         const onTick = () => {
-          const t = (performance.now() - start) / 1000;
+          // Sensory speed scales shader time directly — calm mode (0.5)
+          // halves every pulse/rotation without touching the geometry.
+          const t = ((performance.now() - start) / 1000) * motionScale;
           shader.resources.uniforms.uniforms.uTime = t;
         };
         app.ticker.add(onTick);
@@ -278,7 +296,7 @@ export default function PixiBrainSphere(props: PixiBrainSphereProps) {
       cleanup?.();
     };
     // Re-init when the visual signature or size changes.
-  }, [primaryHue, secondaryHues, pulseRate, intensity, size, reducedMotion]);
+  }, [primaryHue, secondaryHues, pulseRate, intensity, size, reducedMotion, motionScale]);
 
   return (
     <div
@@ -290,7 +308,7 @@ export default function PixiBrainSphere(props: PixiBrainSphereProps) {
       data-render-mode={usePixi ? "webgl" : "css-fallback"}
       style={{ width: size, height: size, lineHeight: 0 }}
     >
-      {!usePixi ? <CssFallbackSphere {...props} animated={!reducedMotion} /> : null}
+      {!usePixi ? <CssFallbackSphere {...props} animated={!reducedMotion && motionScale > 0} /> : null}
     </div>
   );
 }

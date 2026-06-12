@@ -1373,6 +1373,11 @@
     },
     "lesson_run": {
       "back_to_today": "返回今天"
+    },
+    "accessibility_voice": {
+      "title": "语音与语速。",
+      "body": "选择朗读的声音和语速。",
+      "link": "打开语音设置"
     }
   },
   "auth": {

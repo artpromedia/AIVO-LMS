@@ -20,11 +20,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   getAccessibilityPrefs,
+  getLearnerSensoryProfile,
   getLearner,
   getLessonRun,
   getSubjectById,
   parentCanAccessLearner,
 } from "@/lib/db/repos";
+import { toStageFunctioningLevel } from "@aivo/stage-runtime";
 import { LessonPlayer, type LessonAgentConfig } from "./lesson-player";
 import { lessonPlayerV2Enabled, tutorAgenticModeEnabled } from "@/lib/feature-flags";
 import { isLiveTutorAgent } from "@/lib/bff/tutor-agent";
@@ -62,6 +64,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
     if (active !== learner.id) redirect("/learner/select");
   }
   const a11y = await getAccessibilityPrefs(learner.id, session.tenantId);
+  const sensory = await getLearnerSensoryProfile(learner.id, session.tenantId);
   const lessonSubject = await getSubjectById(lessonRun.subjectId);
   const v2Enabled = lessonPlayerV2Enabled();
 
@@ -126,6 +129,8 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
         lessonRunId={lessonRun.id}
         plan={plan}
         accessibility={a11y}
+        sensoryModalities={sensory?.modalities ?? null}
+        functioningLevel={toStageFunctioningLevel(learner.functioningLevel)}
         initialStatus={lessonRun.status}
         v2Enabled={v2Enabled}
         // Treat the lesson-run id as the v2 session correlator when no

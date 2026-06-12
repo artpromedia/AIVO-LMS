@@ -40,6 +40,12 @@ import {
   type SurfaceTelemetryEvent,
 } from "@aivo/learner-surfaces";
 import { AACTargetProvider, AACScanRoot } from "@aivo/aac-bridge";
+import {
+  deriveSensoryAdaptations,
+  sensoryCSSVars,
+  toStageSensoryProfile,
+} from "@aivo/stage-runtime";
+import type { FunctioningLevel } from "@aivo/stage-ui";
 import { enqueueOutbox, generateIdempotencyKey } from "@/lib/offline/outbox";
 import { InLessonTutorPanel } from "@/components/learner/in-lesson-tutor-panel";
 import {
@@ -193,6 +199,13 @@ type Props = {
   lessonRunId: string;
   plan: GeneratedLessonPlan;
   accessibility: AccessibilityPreferences;
+  /**
+   * Parent-curated sensory modalities (LearnerSensoryProfile.modalities),
+   * loaded server-side by the route. Null when no profile is curated yet —
+   * the stage then runs on neutral defaults.
+   */
+  sensoryModalities?: Record<string, string> | null;
+  functioningLevel?: FunctioningLevel;
   initialStatus: LessonRunStatus;
   v2Enabled?: boolean;
   sessionId?: string;
@@ -277,6 +290,8 @@ export function LessonPlayer({
   lessonRunId,
   plan,
   accessibility,
+  sensoryModalities = null,
+  functioningLevel = "STANDARD",
   initialStatus,
   agent,
 }: Props) {
@@ -871,7 +886,33 @@ export function LessonPlayer({
   ]
     .filter(Boolean)
     .join(" ");
-  const transitionClass = accessibility.reducedMotion ? "" : "transition-all";
+
+  // ----- Sensory profile → stage adaptations (Sprint 03) -----
+  // The per-learner profile sets the BASE vars; the global sensory mode
+  // multiplies on top in CSS (var(--aivo-sensory-motionScale): standard 1,
+  // calm 0.5, high-contrast 0) so the calmer of the two always wins and the
+  // values stay hydration-safe (no client-only reads).
+  const sensoryAdaptations = deriveSensoryAdaptations(
+    toStageSensoryProfile(sensoryModalities),
+    { functioningLevel },
+  );
+  const stageVars = sensoryCSSVars(sensoryAdaptations) as React.CSSProperties;
+  const stageDensity =
+    sensoryAdaptations.maxOnScreenElements <= 3
+      ? "minimal"
+      : sensoryAdaptations.maxOnScreenElements <= 4
+        ? "reduced"
+        : "standard";
+  // Surfaces consume reducedMotion through their existing settings prop —
+  // a vestibular/proprioceptive-hyper profile quiets them with no API change.
+  const effectiveAccessibility =
+    sensoryAdaptations.motionReduced && !accessibility.reducedMotion
+      ? { ...accessibility, reducedMotion: true }
+      : accessibility;
+  const motionOff = accessibility.reducedMotion || sensoryAdaptations.motionReduced;
+  const transitionClass = motionOff
+    ? ""
+    : "transition-all duration-[calc(var(--stage-transition-duration,300ms)*var(--aivo-sensory-motionScale,1))]";
 
   // Data attributes consumed by app/a11y-modes.css + app/fonts-dyslexia.css so
   // the remaining preferences actually render rather than just persisting.
@@ -906,7 +947,12 @@ export function LessonPlayer({
   // device mapped to those keys can drive the whole flow.
   const aacEnabled = accessibility.aacEnabled === true;
   const innerTree = (
-    <div className={rootClass} {...a11yAttrs}>
+    <div
+      className={`${rootClass} [filter:saturate(var(--stage-saturation,100%))]`}
+      style={stageVars}
+      data-stage-density={stageDensity}
+      {...a11yAttrs}
+    >
       {plan.lessonMode === "holiday_prep" ? (
         <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-ink">
           {t("holiday_prep")}
@@ -1004,7 +1050,7 @@ export function LessonPlayer({
                 ) : null}
                 <SurfaceRouter
                   item={toSurfaceItem(beat)}
-                  accessibilitySettings={accessibility}
+                  accessibilitySettings={effectiveAccessibility}
                   onSubmitAndAdvance={submitSurface}
                   onEvent={emitSurfaceTelemetry}
                 />
@@ -1055,7 +1101,7 @@ export function LessonPlayer({
                 ) : null}
                 <SurfaceRouter
                   item={toSurfaceItem(beat)}
-                  accessibilitySettings={accessibility}
+                  accessibilitySettings={effectiveAccessibility}
                   onSubmitAndAdvance={submitSurface}
                   onEvent={emitSurfaceTelemetry}
                 />

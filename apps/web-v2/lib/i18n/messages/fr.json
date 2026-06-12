@@ -1373,6 +1373,11 @@
     },
     "lesson_run": {
       "back_to_today": "Retour à aujourd'hui"
+    },
+    "accessibility_voice": {
+      "title": "Voix et vitesse.",
+      "body": "Choisissez la voix de lecture et son débit.",
+      "link": "Ouvrir les réglages de voix"
     }
   },
   "auth": {

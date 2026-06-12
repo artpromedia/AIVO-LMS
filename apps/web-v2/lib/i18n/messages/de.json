@@ -1373,6 +1373,11 @@
     },
     "lesson_run": {
       "back_to_today": "Zurück zu heute"
+    },
+    "accessibility_voice": {
+      "title": "Stimme & Tempo.",
+      "body": "Wähle die Vorlesestimme und ihr Tempo.",
+      "link": "Stimm-Einstellungen öffnen"
     }
   },
   "auth": {

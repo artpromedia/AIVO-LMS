@@ -1566,6 +1566,11 @@
     },
     "lesson_run": {
       "back_to_today": "Back to today"
+    },
+    "accessibility_voice": {
+      "title": "Voice & speed.",
+      "body": "Pick the read-aloud voice and how fast it talks.",
+      "link": "Open voice settings"
     }
   },
   "onboarding": {

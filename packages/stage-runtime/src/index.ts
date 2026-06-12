@@ -9,8 +9,18 @@ export { useSessionFlow, type UseSessionFlowResult } from "./useSessionFlow.js";
 export {
   useSensoryAdapter,
   type SensoryAdapterApi,
-  _computeSensoryAdaptations,
+  type UseSensoryAdapterOptions,
 } from "./useSensoryAdapter.js";
+export {
+  deriveSensoryAdaptations,
+  deriveRegulationBreak,
+  sensoryCSSVars,
+  toStageSensoryProfile,
+  toStageFunctioningLevel,
+  DEFAULT_SENSORY_PROFILE,
+  DEFAULT_SENSORY_ADAPTATIONS,
+  type DeriveSensoryOptions,
+} from "./derive-sensory-adaptations.js";
 export { useTTS, type UseTTSResult } from "./useTTS.js";
 export {
   useSpeechInput,
