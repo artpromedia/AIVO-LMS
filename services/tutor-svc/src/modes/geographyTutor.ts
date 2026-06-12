@@ -30,21 +30,29 @@ export const geographyTutor: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
   skillGraphRefs: ["prek-geography-foundations", "ncge-geography-k2", "ncge-geography-3-12"],
   defaultContentPackRefs: ["geography-k2-fall-2026"],
+  // Honest coverage (remediation Sprint 01): a band is "authored" only when
+  // ≥3 real production items back it AND a signed, non-draft skill graph
+  // covers it — machine-checked by `pnpm curriculum:coverage`.
+  // This subject's item bank has fewer than 3 items at every band (the
+  // expansion seed recycles 5 prompts across 20 items), so NO band is
+  // production-authored yet. The catalog shows "authoring in progress" and
+  // planSession refuses these bands outside preview mode
+  // (AIVO_ALLOW_SCAFFOLD_CONTENT). See docs/quality/tutor-k12-coverage-gap-plan.md.
   coverageMatrix: {
-    PRE_K: "authored",
-    K: "authored",
-    "1": "authored",
-    "2": "authored",
-    "3": "authored",
-    "4": "authored",
-    "5": "authored",
-    "6": "authored",
-    "7": "authored",
-    "8": "authored",
-    "9": "authored",
-    "10": "authored",
-    "11": "authored",
-    "12": "authored",
+    PRE_K: "scaffold",
+    K: "scaffold",
+    "1": "scaffold",
+    "2": "scaffold",
+    "3": "scaffold",
+    "4": "scaffold",
+    "5": "scaffold",
+    "6": "scaffold",
+    "7": "scaffold",
+    "8": "scaffold",
+    "9": "scaffold",
+    "10": "scaffold",
+    "11": "scaffold",
+    "12": "scaffold",
   },
   // Wave E (S8): agent loop instruments + per-level action policy.
   toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context"],

@@ -11,6 +11,12 @@
  *   S13: full roster — every learner subject with a certified tutor
  *        (eval corpus + tutor:behavior green for all 14; Vigor carries
  *        the DAPE context branch, Harmony the reviewed SEL phrase bank)
+ *
+ * NOTE (remediation Sprint 01): this roster existing does NOT mean the agent
+ * is on. The `tutorAgenticMode` enterprise flag defaults OFF, and enablement
+ * is eval-gated — `tutor:behavior` certifies guard/ladder plumbing with a
+ * scripted model only; live decision quality per tutor is proven by the
+ * real-model eval (remediation Sprint 10) before any tenant flips the flag.
  */
 import { TUTORS } from "@aivo/brand";
 import type { LessonAgentConfig } from "@/lib/learner/agent-directives";

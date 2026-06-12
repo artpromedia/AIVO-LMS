@@ -1,8 +1,13 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { TUTORS } from "@aivo/brand";
+import { countAuthoredItems, type RequiredSubjectSlug } from "@aivo/item-bank";
 import { validateTutorDefinition } from "@aivo/tutor-sdk";
 import { TUTOR_REGISTRY, getTutorDefinition, listTutorDefinitions } from "../src/modes/registry.js";
+
+/** Mirror of MIN_AUTHORED_ITEMS_PER_BAND in scripts/curriculum-coverage-check.mjs —
+ *  one real production item per difficulty rung (intro/core/stretch). */
+const MIN_AUTHORED_ITEMS_PER_BAND = 3;
 
 describe("tutor-svc tutor registry", () => {
   it("declares one TutorDefinition for every catalog tutor key", () => {
@@ -68,6 +73,30 @@ describe("tutor-svc tutor registry", () => {
         assert.ok(
           status === "authored" || status === "scaffold" || status === "missing",
           `tutor "${key}" gradeBand "${band}" has no coverageMatrix entry`,
+        );
+      }
+    }
+  });
+
+  it("every authored coverageMatrix band is backed by real production items", () => {
+    // Honest-coverage invariant (remediation Sprint 01): "authored" means a
+    // learner at that band can actually be routed through real item-bank
+    // content. The curriculum:coverage gate enforces the same bar repo-wide;
+    // this test pins it at the registry level so an inflated matrix can
+    // never even compile-and-pass locally.
+    for (const [key, def] of listTutorDefinitions()) {
+      if (!def.coverageMatrix) continue;
+      for (const [band, status] of Object.entries(def.coverageMatrix)) {
+        if (status !== "authored") continue;
+        const items = def.subjects.reduce(
+          (sum, subject) => sum + countAuthoredItems(subject as RequiredSubjectSlug, band),
+          0,
+        );
+        assert.ok(
+          items >= MIN_AUTHORED_ITEMS_PER_BAND,
+          `tutor "${key}" claims band "${band}" is authored but ` +
+            `${def.subjects.join("+")} has only ${items} production item(s) there ` +
+            `(needs ≥ ${MIN_AUTHORED_ITEMS_PER_BAND}). Author items or mark it "scaffold".`,
         );
       }
     }
