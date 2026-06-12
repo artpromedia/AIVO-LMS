@@ -25,7 +25,11 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { sql } from "drizzle-orm";
 import { createDb } from "../index.js";
-import { withTenantContext, withoutTenantContext } from "../tenant-context.js";
+import {
+  withTenantContext,
+  withoutTenantContext,
+  type TenantTransaction,
+} from "../tenant-context.js";
 
 type Db = ReturnType<typeof createDb>;
 
@@ -211,26 +215,21 @@ describe("RLS backstop (migration 0106)", () => {
     );
 
     // Unscoped runtime: nothing.
-    expect(await count(runtimeDb!, "schools")).toBe(0);
-    expect(await count(runtimeDb!, "classrooms")).toBe(0);
-    expect(await count(runtimeDb!, "classroom_enrollments")).toBe(0);
+    expect(await count(runtimeDb, "schools")).toBe(0);
+    expect(await count(runtimeDb, "classrooms")).toBe(0);
+    expect(await count(runtimeDb, "classroom_enrollments")).toBe(0);
 
     // Tenant A context: the seeded graph; tenant B: none of it.
-    const aCounts = await withTenantContext(runtimeDb!, tenantA, async (tx) => {
+    const membershipCounts = async (tx: TenantTransaction): Promise<number[]> => {
       const n = async (t: string) =>
         ((await tx.execute(sql.raw(`SELECT count(*)::int AS n FROM ${t}`))) as unknown as Array<{
           n: number;
         }>)[0].n;
       return [await n("schools"), await n("classrooms"), await n("classroom_enrollments")];
-    });
+    };
+    const aCounts = await withTenantContext(runtimeDb, tenantA, membershipCounts);
     expect(aCounts).toEqual([1, 1, 1]);
-    const bCounts = await withTenantContext(runtimeDb!, tenantB, async (tx) => {
-      const n = async (t: string) =>
-        ((await tx.execute(sql.raw(`SELECT count(*)::int AS n FROM ${t}`))) as unknown as Array<{
-          n: number;
-        }>)[0].n;
-      return [await n("schools"), await n("classrooms"), await n("classroom_enrollments")];
-    });
+    const bCounts = await withTenantContext(runtimeDb, tenantB, membershipCounts);
     expect(bCounts).toEqual([0, 0, 0]);
   });
 
@@ -322,7 +321,7 @@ describe("RLS backstop (migration 0106)", () => {
 
   it("withTenantContext validates the tenant id shape", async () => {
     // Pure validation — runs even without a database.
-    const db = (ownerDb ?? createDb("postgres://invalid:5432/none")) as Db;
+    const db = ownerDb ?? createDb("postgres://invalid:5432/none");
     await expect(
       withTenantContext(db, "not-a-uuid'; DROP TABLE users;--", async () => undefined),
     ).rejects.toThrow(/must be a UUID/);
