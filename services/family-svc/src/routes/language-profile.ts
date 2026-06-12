@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 import { languageProfiles, aacSyncState, familySettings } from "@aivo/db";
 import { eq, and } from "drizzle-orm";
 import { encryptSecret, decryptSecret } from "@aivo/security";
@@ -24,7 +25,7 @@ export async function registerLanguageProfileRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = req.params as any;
-      const isOwner = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isOwner = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isOwner && claims.role !== "admin") {
         return reply.status(403).send({ error: "Not authorized for this learner" });
       }
@@ -52,6 +53,14 @@ export async function registerLanguageProfileRoutes(app: FastifyInstance) {
             updatedAt: new Date(),
           })
           .where(eq(languageProfiles.learnerId, learnerId));
+        await emitFamilyAudit({
+          db,
+          request: req,
+          eventType: "LANGUAGE_PROFILE_UPDATED",
+          tenantId: claims.tenantId || null,
+          learnerId,
+          details: { primaryLanguage: body.primaryLanguage, mode: "updated" },
+        });
         return { status: "updated", learnerId };
       }
 
@@ -68,6 +77,15 @@ export async function registerLanguageProfileRoutes(app: FastifyInstance) {
         })
         .returning();
 
+      await emitFamilyAudit({
+        db,
+        request: req,
+        eventType: "LANGUAGE_PROFILE_UPDATED",
+        tenantId: claims.tenantId || null,
+        learnerId,
+        resourceId: profile.id,
+        details: { primaryLanguage: body.primaryLanguage, mode: "created" },
+      });
       return { status: "created", profile };
     },
   );
@@ -80,7 +98,7 @@ export async function registerLanguageProfileRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = req.params as any;
-      const isOwner = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isOwner = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isOwner && claims.role !== "admin") {
         return reply.status(403).send({ error: "Not authorized for this learner" });
       }
@@ -97,6 +115,8 @@ export async function registerLanguageProfileRoutes(app: FastifyInstance) {
 
   // ── CoughDrop Sync ─────────────────────────────────────────────────────────
 
+  // audit-exempt(coughdrop-sync: builds the AAC board read-only and pushes
+  // it to the external CoughDrop API; no AIVO data mutation in this route)
   app.post(
     "/api/family/language-profile/:learnerId/coughdrop-sync",
     { schema: languageProfileByLearnerIdCoughdropSyncSchema },
@@ -105,7 +125,7 @@ export async function registerLanguageProfileRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = req.params as { learnerId: string };
-      const isOwner = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isOwner = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isOwner && claims.role !== "admin") {
         return reply.status(403).send({ error: "Not authorized for this learner" });
       }
@@ -203,7 +223,7 @@ export async function registerLanguageProfileRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = req.params as { learnerId: string };
-      const isOwner = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isOwner = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isOwner && claims.role !== "admin") {
         return reply.status(403).send({ error: "Not authorized for this learner" });
       }

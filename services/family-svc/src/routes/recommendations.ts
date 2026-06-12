@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
 import { brainRecommendations, brainInsights } from "@aivo/db";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 import { applyRecommendationEffect, EffectPayload } from "./recommendation-effects.js";
 import {
   getRecommendationsByLearnerIdSchema,
@@ -145,7 +146,7 @@ export async function registerRecommendationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -174,7 +175,7 @@ export async function registerRecommendationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId, recId } = request.params as RespondParams;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent)
         return reply.code(403).send({ error: "Only parents can respond to recommendations" });
 
@@ -213,6 +214,15 @@ export async function registerRecommendationRoutes(app: FastifyInstance) {
           recId,
           action: "DECLINED",
           reason: body.notes,
+        });
+        await emitFamilyAudit({
+          db,
+          request,
+          eventType: "RECOMMENDATION_DECIDED",
+          tenantId: claims.tenantId || null,
+          learnerId,
+          resourceId: recId,
+          details: { action: "DECLINED" },
         });
         return { status: "updated", action: "DECLINED" };
       }
@@ -255,6 +265,15 @@ export async function registerRecommendationRoutes(app: FastifyInstance) {
             applyError: null,
           })
           .where(eq(brainRecommendations.id, recId));
+        await emitFamilyAudit({
+          db,
+          request,
+          eventType: "RECOMMENDATION_DECIDED",
+          tenantId: claims.tenantId || null,
+          learnerId,
+          resourceId: recId,
+          details: { action: body.action, appliedVia: "v2" },
+        });
         return { status: "updated", action: body.action, effect: { appliedVia: "v2", v2Status: v2.status } };
       }
 
@@ -322,7 +341,7 @@ export async function registerRecommendationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -348,7 +367,7 @@ export async function registerRecommendationRoutes(app: FastifyInstance) {
       if (!claims) return;
 
       const { learnerId } = request.params as LearnerId;
-      const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
       if (!isParent && claims.role !== "PLATFORM_ADMIN") {
         return reply.code(403).send({ error: "Access denied" });
       }

@@ -1,0 +1,30 @@
+{
+  "comment": "Sprint 14 frozen baseline for check-audited-writes.mjs: per-service count of route files containing POST/PUT/PATCH/DELETE registrations with neither an audit call (audited()/appendAudit()/logAuditEvent()/emitFamilyAudit()) nor an audit-exempt(reason) marker. The gate fails when a count RISES. This list only ratchets DOWN; family-svc is the reference adoption at 0.",
+  "services": {
+    "admin-svc": 3,
+    "assessment-svc": 14,
+    "audit-svc": 0,
+    "billing-svc": 5,
+    "comms-svc": 3,
+    "data-governance-svc": 0,
+    "engagement-svc": 8,
+    "family-svc": 0,
+    "homework-svc": 0,
+    "i18n-svc": 0,
+    "identity-svc": 8,
+    "integration-svc": 0,
+    "learning-svc": 2,
+    "math-recognizer-svc": 0,
+    "problem-session-svc": 0,
+    "recommendation-svc": 0,
+    "reports-svc": 0,
+    "research-svc": 0,
+    "responsible-ai-svc": 0,
+    "science-solver-svc": 0,
+    "speech-eval-svc": 1,
+    "status-page-svc": 1,
+    "subject-brain-svc": 0,
+    "tenant-svc": 0,
+    "tutor-svc": 6
+  }
+}

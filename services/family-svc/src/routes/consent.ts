@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { consentRecords } from "@aivo/db";
 import { authenticateRequest } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 
 /**
  * Parent consent records (mobile + web consent center).
@@ -82,8 +83,25 @@ export async function registerConsentRoutes(app: FastifyInstance) {
           version: CONSENT_VERSION,
         })
         .returning();
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "PARENT_CONSENT_CHANGED",
+        tenantId: claims.tenantId || null,
+        learnerId: childId ?? "",
+        resourceId: inserted.id,
+        details: { consentType, granted: true, version: CONSENT_VERSION },
+      });
       return rowView(inserted);
     }
+    await emitFamilyAudit({
+      db,
+      request,
+      eventType: "PARENT_CONSENT_CHANGED",
+      tenantId: claims.tenantId || null,
+      learnerId: childId ?? "",
+      details: { consentType, granted: false },
+    });
     return { status: "revoked", consentType, learnerId: childId };
   });
 }

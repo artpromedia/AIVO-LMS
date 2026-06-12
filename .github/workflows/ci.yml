@@ -47,6 +47,9 @@ jobs:
       - name: File-length ratchet (no god files, 600-line max)
         run: node scripts/ci/check-file-length.mjs
 
+      - name: Audited-writes gate (service mutations audit or exempt)
+        run: node scripts/ci/check-audited-writes.mjs
+
   repo-tests:
     name: Sequential Repo Test Gate
     runs-on: ubuntu-latest

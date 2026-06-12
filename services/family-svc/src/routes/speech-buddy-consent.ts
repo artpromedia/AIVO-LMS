@@ -22,6 +22,7 @@ import type { FastifyInstance } from "fastify";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { speechBuddyConsents } from "@aivo/db";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 import {
   internalSpeechBuddyConsentVerifySchema,
   getSpeechBuddyConsentSchema,
@@ -75,7 +76,7 @@ export async function registerSpeechBuddyConsentRoutes(app: FastifyInstance) {
       const auth = await authenticateRequest(req, reply);
       if (!auth) return;
       const { learnerId } = req.params as { learnerId: string };
-      if (!(await verifyParentOwnership(db, auth.sub, learnerId))) {
+      if (!(await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId))) {
         return reply.code(403).send({ error: "Forbidden" });
       }
       const active = await activeConsent(db, auth.tenantId, learnerId);
@@ -99,7 +100,7 @@ export async function registerSpeechBuddyConsentRoutes(app: FastifyInstance) {
       if (!ageBand || !AGE_BANDS.includes(ageBand)) {
         return reply.code(400).send({ error: "ageBand must be 3-5 / 6-9 / 10-12 / 13-15" });
       }
-      if (!(await verifyParentOwnership(db, auth.sub, learnerId))) {
+      if (!(await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId))) {
         return reply.code(403).send({ error: "Forbidden" });
       }
       // Supersede any existing active grant, then record the new one (history
@@ -124,6 +125,14 @@ export async function registerSpeechBuddyConsentRoutes(app: FastifyInstance) {
           scope: SCOPE,
         })
         .returning();
+      await emitFamilyAudit({
+        db,
+        request: req,
+        eventType: "SPEECH_BUDDY_CONSENT_CHANGED",
+        tenantId: auth.tenantId || null,
+        learnerId,
+        details: { granted: true },
+      });
       return reply.send({
         granted: true,
         consentRecordId: row.id,
@@ -142,7 +151,7 @@ export async function registerSpeechBuddyConsentRoutes(app: FastifyInstance) {
       const auth = await authenticateRequest(req, reply);
       if (!auth) return;
       const { learnerId } = req.params as { learnerId: string };
-      if (!(await verifyParentOwnership(db, auth.sub, learnerId))) {
+      if (!(await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId))) {
         return reply.code(403).send({ error: "Forbidden" });
       }
       await db
@@ -155,11 +164,21 @@ export async function registerSpeechBuddyConsentRoutes(app: FastifyInstance) {
             isNull(speechBuddyConsents.revokedAt),
           ),
         );
+      await emitFamilyAudit({
+        db,
+        request: req,
+        eventType: "SPEECH_BUDDY_CONSENT_CHANGED",
+        tenantId: auth.tenantId || null,
+        learnerId,
+        details: { granted: false },
+      });
       return reply.send({ revoked: true, learnerId });
     },
   );
 
   // --- Internal: verify (tutor-svc) --------------------------------------
+  // audit-exempt(internal consent VERIFY: service-to-service read in POST
+  // form; mutates nothing)
   app.post(
     "/api/family/internal/speech-buddy/consent/verify",
     { schema: internalSpeechBuddyConsentVerifySchema },

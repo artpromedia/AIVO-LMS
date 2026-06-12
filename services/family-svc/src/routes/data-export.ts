@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { verifyJWT } from "@aivo/security";
+import { runScoped } from "../auth.js";
 import {
   learners,
   sensoryProfiles,
@@ -38,7 +39,11 @@ export async function registerDataExportRoutes(app: FastifyInstance) {
 
       const { learnerId } = req.params as any;
 
-      const [learner] = await db.select().from(learners).where(eq(learners.id, learnerId)).limit(1);
+      const [learner] = await runScoped(
+        db,
+        { tenantId: String(auth.tenantId ?? ""), sub: auth.sub, role: auth.role },
+        (tx) => tx.select().from(learners).where(eq(learners.id, learnerId)).limit(1),
+      );
       if (!learner) return reply.status(404).send({ error: "Learner not found" });
 
       if (learner.parentId !== auth.sub && !["PLATFORM_ADMIN"].includes(auth.role)) {

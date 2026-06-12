@@ -12,7 +12,8 @@ import {
   brainStates,
   lessonRuns,
 } from "@aivo/db";
-import { authenticateRequest, verifyParentOwnership } from "../auth.js";
+import { authenticateRequest, runScoped, verifyParentOwnership } from "../auth.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 import {
   getLearnerSettingsByLearnerIdSchema,
   updateLearnerSettingsByLearnerIdSchema,
@@ -43,7 +44,7 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
       const auth = await authenticateRequest(req, reply);
       if (!auth) return;
       const { learnerId } = req.params as { learnerId: string };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const [existing] = await db
@@ -93,7 +94,7 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
       const auth = await authenticateRequest(req, reply);
       if (!auth) return;
       const { learnerId } = req.params as { learnerId: string };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const body = req.body as any;
@@ -125,6 +126,14 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
         });
       }
 
+      await emitFamilyAudit({
+        db,
+        request: req,
+        eventType: "PARENT_PREFERENCES_UPDATED",
+        tenantId: auth.tenantId || null,
+        learnerId,
+        details: { surface: "learner_settings" },
+      });
       const [updated] = await db
         .select()
         .from(learnerSettings)
@@ -266,6 +275,8 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
     return null;
   }
 
+  // audit-exempt(inbox read flag: per-user notification state flip, no
+  // tenant data mutation)
   app.put(
     "/api/family/inbox/:notificationId/read",
     { schema: updateInboxByNotificationIdReadSchema },
@@ -295,6 +306,8 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
     },
   );
 
+  // audit-exempt(inbox dismiss flag: per-user notification state flip, no
+  // tenant data mutation)
   app.put(
     "/api/family/inbox/:notificationId/dismiss",
     { schema: updateInboxByNotificationIdDismissSchema },
@@ -348,10 +361,12 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
 
       let parentLearners: Array<{ id: string; name: string }> = [];
       try {
-        parentLearners = await db
-          .select({ id: learners.id, name: learners.name })
-          .from(learners)
-          .where(eq(learners.parentId, parentId));
+        parentLearners = await runScoped(db, auth, (tx) =>
+          tx
+            .select({ id: learners.id, name: learners.name })
+            .from(learners)
+            .where(eq(learners.parentId, parentId)),
+        );
       } catch (_err) {
         return { activities: [], learners: [] };
       }
@@ -396,7 +411,7 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
       const auth = await authenticateRequest(req, reply);
       if (!auth) return;
       const { learnerId } = req.params as { learnerId: string };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const milestones = await db
@@ -427,7 +442,7 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
       const auth = await authenticateRequest(req, reply);
       if (!auth) return;
       const { learnerId } = req.params as { learnerId: string };
-      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      const owns = await verifyParentOwnership(db, auth.tenantId, auth.sub, learnerId);
       if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
       const [streak] = await db
@@ -452,14 +467,19 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
       let parent: { lastDashboardVisit: Date | null; name: string | null } | undefined;
       let parentLearners: ParentLearnerRow[] = [];
       try {
-        [parent] = await db
-          .select({ lastDashboardVisit: users.lastDashboardVisit, name: users.name })
-          .from(users)
-          .where(eq(users.id, parentId));
-        parentLearners = (await db
-          .select()
-          .from(learners)
-          .where(eq(learners.parentId, parentId))) as ParentLearnerRow[];
+        const scopedRows = await runScoped(db, auth, async (tx) => {
+          const [p] = await tx
+            .select({ lastDashboardVisit: users.lastDashboardVisit, name: users.name })
+            .from(users)
+            .where(eq(users.id, parentId));
+          const ls = (await tx
+            .select()
+            .from(learners)
+            .where(eq(learners.parentId, parentId))) as ParentLearnerRow[];
+          return { p, ls };
+        });
+        parent = scopedRows.p;
+        parentLearners = scopedRows.ls;
       } catch (_err) {
         return { parent: null, learners: [] };
       }
@@ -542,10 +562,9 @@ export async function registerParentDashboardRoutes(app: FastifyInstance) {
       }
 
       try {
-        await db
-          .update(users)
-          .set({ lastDashboardVisit: new Date() })
-          .where(eq(users.id, parentId));
+        await runScoped(db, auth, (tx) =>
+          tx.update(users).set({ lastDashboardVisit: new Date() }).where(eq(users.id, parentId)),
+        );
       } catch (_err) {
         // Ignore non-critical update failures so dashboard data can still be returned.
       }

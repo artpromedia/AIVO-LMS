@@ -51,5 +51,6 @@ export function getPoolMetrics() {
 export type Database = ReturnType<typeof createDb>;
 export * from "./schema/index.js";
 export * from "./audit-append.js";
+export * from "./tenant-context.js";
 export * from "./audit-chain-verify.js";
 export * from "./test-helpers.js";

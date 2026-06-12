@@ -406,6 +406,8 @@ GitHub Actions workflows live in [`.github/workflows/`](.github/workflows/) and 
 - **Dependencies**: `pip-audit` and `pnpm audit` run in CI
 - **Web**: OWASP ZAP weekly baseline scan
 - **Privacy**: COPPA consent flow built into the Brain-Clone approval pipeline
+- **Tenant isolation**: Postgres RLS backstop on the core tenant tables for the non-bypassing `app_runtime` role (family-svc enforces it end-to-end; rollout playbook in `docs/security/rls-rollout.md`)
+- **Audit coverage**: CI gate `scripts/ci/check-audited-writes.mjs` — service write routes must audit or carry an explicit `audit-exempt(reason)`; per-service baselines only ratchet down
 
 Report security issues privately to the maintainers (see `SECURITY.md` if present).
 
