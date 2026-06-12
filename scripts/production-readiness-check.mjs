@@ -231,6 +231,30 @@ await runHealthScan();
 // ---------------------------------------------------------------------------
 // 3. Report.
 // ---------------------------------------------------------------------------
+
+// ── Remediation Sprint 11: syllabus/pacing/holiday live dependencies ────────
+// Full-term syllabus alignment, weekly pacing, and the summer-bridge holiday
+// path run through brain-svc behind the shared INTERNAL_SERVICE_TOKEN. They
+// fail closed without it (by design), which in production means three
+// HEADLINE features silently do nothing — that is a deploy blocker, not a
+// preference.
+if (IS_PROD || STRICT) {
+  if (!process.env.INTERNAL_SERVICE_TOKEN) {
+    blocker(
+      "live-deps-internal-token",
+      "INTERNAL_SERVICE_TOKEN is unset — term-syllabus auto-pacing, weekly pacing reads, the summer bridge, and the Creator's internal route all fail closed without it.",
+      "Set INTERNAL_SERVICE_TOKEN (shared service-to-service secret) on web-v2 AND the calling services (admin-svc Creator, brain-svc clients).",
+    );
+  }
+  if (!process.env.BRAIN_SVC_URL) {
+    blocker(
+      "live-deps-brain-svc",
+      "BRAIN_SVC_URL is unset — pacing-plan generation and the holiday/summer-bridge path have no upstream.",
+      "Point BRAIN_SVC_URL at the deployed brain-svc (see HETZNER_DEPLOYMENT_GUIDE.md / docs runbooks).",
+    );
+  }
+}
+
 const blockers = findings.filter((f) => f.severity === "blocker");
 const warnings = findings.filter((f) => f.severity === "warning");
 

@@ -198,7 +198,7 @@ async function svcPutCalendar(
   return { ok: true, calendar: data.calendar ?? null };
 }
 
-async function svcGeneratePlan(
+export async function svcGeneratePlan(
   learnerId: string,
   body: { subject: string; planStart: string; termScopeSequence: Record<string, unknown> },
 ): Promise<
