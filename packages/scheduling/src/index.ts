@@ -65,10 +65,61 @@ export type JobLedger = {
   }): Promise<void>;
 };
 
+/**
+ * Remediation Sprint 06 — a fixed weekly wall-clock target ("Sunday 23:00").
+ * The period-based scheduler cannot express day-of-week; jobs that must run
+ * at a specific weekly moment (the Creator's Sunday-night lesson
+ * pre-generation) declare one of these instead of a period.
+ *
+ * Times are interpreted in UTC plus `utcOffsetMinutes` (e.g. -300 for
+ * US-Eastern standard time). A run is due on the first tick AFTER the most
+ * recent weekly target that `lastRunAt` predates — exactly once per week,
+ * regardless of tick cadence or how long the fleet was down.
+ */
+export interface WeeklySchedule {
+  /** 0 = Sunday … 6 = Saturday. */
+  dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  /** Hour of day, 0-23. */
+  hour: number;
+  /** Minute of hour, default 0. */
+  minute?: number;
+  /** Fixed offset from UTC in minutes (default 0 = UTC). */
+  utcOffsetMinutes?: number;
+}
+
+/** The most recent occurrence of the weekly target at or before `now`. */
+export function lastWeeklyTarget(schedule: WeeklySchedule, now: Date): Date {
+  const offsetMs = (schedule.utcOffsetMinutes ?? 0) * 60_000;
+  const local = new Date(now.getTime() + offsetMs);
+  const target = new Date(local.getTime());
+  target.setUTCHours(schedule.hour, schedule.minute ?? 0, 0, 0);
+  const dayDelta = (local.getUTCDay() - schedule.dayOfWeek + 7) % 7;
+  target.setUTCDate(target.getUTCDate() - dayDelta);
+  if (target.getTime() > local.getTime()) target.setUTCDate(target.getUTCDate() - 7);
+  return new Date(target.getTime() - offsetMs);
+}
+
+/** Weekly-schedule due check: has the most recent target passed without a
+ *  run at/after it? */
+export function isDueWeekly(opts: {
+  lastRunAt: Date | null;
+  now: Date;
+  schedule: WeeklySchedule;
+}): boolean {
+  const target = lastWeeklyTarget(opts.schedule, opts.now);
+  if (!opts.lastRunAt) return opts.now.getTime() >= target.getTime();
+  return opts.lastRunAt.getTime() < target.getTime();
+}
+
 export interface SafeCronOptions {
   jobName: string;
-  /** Wall-clock period between runs. Default: 24h. */
+  /** Wall-clock period between runs. Default: 24h. Ignored when `schedule`
+   *  is set. */
   periodMs?: number;
+  /** Remediation Sprint 06: fixed weekly wall-clock target. When set, the
+   *  job is due exactly once per week — on the first tick after the target
+   *  — instead of on a rolling period. */
+  schedule?: WeeklySchedule;
   /** How often each replica wakes up to race for the lock. Default: 5min. */
   tickIntervalMs?: number;
   /** Replica identifier baked into the ledger row for diagnostics. */
@@ -151,7 +202,10 @@ export function startSafeCron(opts: SafeCronOptions): SafeCronHandle {
     try {
       const lastRunAt = await opts.ledger.getLastRunAt(opts.jobName);
       const now = new Date();
-      if (!force && !isDue({ lastRunAt, now, periodMs, jitterMs: tickIntervalMs / 2 })) {
+      const due = opts.schedule
+        ? isDueWeekly({ lastRunAt, now, schedule: opts.schedule })
+        : isDue({ lastRunAt, now, periodMs, jitterMs: tickIntervalMs / 2 });
+      if (!force && !due) {
         return { ran: false, reason: "not-due" };
       }
       await opts.ledger.markStarted({ jobName: opts.jobName, runAt: now, replicaId });
@@ -344,5 +398,14 @@ export const JOB_REGISTRY: JobRegistryEntry[] = [
     service: "admin-svc",
     description: "Purge tutor_memories rows past their 180-day expires_at.",
     periodMs: DEFAULT_PERIOD_MS,
+  },
+  {
+    jobName: "creator.weekly-generation",
+    service: "admin-svc",
+    description:
+      "Sunday-night Creator: pre-generate each active learner's next playable lesson " +
+      "(ready LessonRun + plan) via web-v2's internal creator route, so the week starts " +
+      "with zero generation latency.",
+    periodMs: 7 * DEFAULT_PERIOD_MS,
   },
 ];
