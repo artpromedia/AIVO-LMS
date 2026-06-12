@@ -41,6 +41,13 @@ const SYSTEM_PROMPT = [
   "- Honor accommodations and sensory/regulation needs. Keep the voice warm,",
   "  concrete, and calm. Keep step counts and durations realistic for the",
   "  difficulty. Never include unsafe, off-topic, or age-inappropriate content.",
+  "- Practice items may carry an optional `surface` object choosing the",
+  "  interactive surface. When the reference example uses one (e.g.",
+  '  {"surfaceType":"number_line","numberLine":{"min":0,"max":8,"step":1}}),',
+  "  keep the same surfaceType for items where it fits and make its spec match",
+  "  YOUR item's content — a number_line range MUST include the expected answer",
+  "  and every numeric choice. Omit `surface` entirely when no interactive",
+  "  surface fits the item; never invent surfaceType values not in the example.",
 ].join("\n");
 
 function buildUserPrompt(input: TutorGenerationInputs, example: unknown): string {

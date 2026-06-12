@@ -104,6 +104,86 @@ const LessonMediaPayloadSchema = z
   });
 
 /**
+ * Remediation Sprint 02 — the validated domain-surface envelope on practice
+ * items. `surfaceType` selects which interactive surface the lesson player
+ * mounts (the full set `@aivo/learner-surfaces` SurfaceRouter understands,
+ * including the authored aliases its surface-type-map normalises). Per-type
+ * payloads are validated sub-specs: `number_line` REQUIRES a content-derived
+ * `numberLine` range (the player no longer ships a hardcoded 0-10 fixture).
+ * Later remediation sprints (03/04) add the remaining sub-specs; until a
+ * type's sub-spec lands here, emitting that bare type is for the dev fixture
+ * page only — the production generators emit a surface only when they can
+ * derive its spec from content.
+ */
+export const LESSON_SURFACE_TYPES = [
+  "choice_grid",
+  "math_expression",
+  "scratchpad",
+  "geometry_workspace",
+  "geometry",
+  "number_line",
+  "graph",
+  "drag_manipulative",
+  "reading_annotation",
+  "science_diagram",
+  "voice_response",
+  "multi_step_workspace",
+  "coding_sandbox",
+  "art_canvas",
+  "music_sequencer",
+  "ink_canvas",
+  "multiple_choice",
+  "short_response",
+  "fill_in_blank",
+  "drag_drop",
+] as const;
+
+export const NumberLineSpecSchema = z
+  .object({
+    min: z.number().int().min(-100),
+    max: z.number().int().max(100),
+    step: z.number().int().positive(),
+  })
+  .strict()
+  .superRefine((spec, ctx) => {
+    if (spec.max <= spec.min) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "max must be greater than min" });
+      return;
+    }
+    // Mirror NumberLineSurface's render cap (50 ticks) so a validated spec
+    // can never produce a truncated, unanswerable line.
+    if ((spec.max - spec.min) / spec.step + 1 > 50) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "number line would exceed 50 ticks — widen step or narrow the range",
+      });
+    }
+  });
+
+export const LessonSurfaceSchema = z
+  .object({
+    surfaceType: z.enum(LESSON_SURFACE_TYPES),
+    numberLine: NumberLineSpecSchema.optional(),
+  })
+  .strict()
+  .superRefine((surface, ctx) => {
+    if (surface.surfaceType === "number_line" && !surface.numberLine) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "number_line surfaces require a content-derived numberLine spec",
+      });
+    }
+    if (surface.surfaceType !== "number_line" && surface.numberLine) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "numberLine spec is only valid on number_line surfaces",
+      });
+    }
+  });
+export type LessonSurface = z.infer<typeof LessonSurfaceSchema>;
+export type LessonSurfaceType = (typeof LESSON_SURFACE_TYPES)[number];
+
+/**
  * Strict schema for the AI-generated plan. We require non-empty arrays and
  * stable field names so the player can render every section.
  */
@@ -129,6 +209,7 @@ export const GeneratedLessonPlanSchema = z
           hint: z.string().min(1).max(400),
           scaffold: z.string().min(1).max(400),
           skillId: z.string().min(1),
+          surface: LessonSurfaceSchema.optional(),
           media: LessonMediaPayloadSchema.optional(),
         }),
       )
@@ -141,6 +222,7 @@ export const GeneratedLessonPlanSchema = z
           expectedAnswer: z.string().min(1).max(400).optional(),
           choices: z.array(z.string().min(1).max(200)).min(2).max(6).optional(),
           supportIfWrong: z.string().min(1).max(400),
+          surface: LessonSurfaceSchema.optional(),
           media: LessonMediaPayloadSchema.optional(),
         }),
       )

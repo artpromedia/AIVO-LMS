@@ -19,6 +19,7 @@ import type {
 import type { GeneratedLessonPlanInput } from "@/lib/validators/lesson";
 import { getSubjectBySlug, TUTORS } from "@aivo/brand";
 import { pickMultimediaFixtureForSubject } from "./multimedia-item-bank";
+import { withSelectedSurface } from "./surface-selection";
 
 /**
  * Resolve the canonical brand tutor name for a subject. Sprint 2 (subject/tutor
@@ -292,6 +293,13 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
     );
   }
 
+  // Remediation Sprint 02: attach the domain surface AFTER the multimedia
+  // overlay so derivation sees each item's FINAL answer space (the overlay
+  // replaces the first item's prompt/answer/choices). The selector returns
+  // undefined for items that cannot honestly carry a domain surface, which
+  // keeps them on the generic choice/text surface.
+  const guidedWithSurfaces = guidedPractice.map((g) => withSelectedSurface(g, subject.slug));
+
   const checksForUnderstanding: GeneratedLessonPlanInput["checksForUnderstanding"] = [
     {
       prompt: `In your own words, what did we learn about ${skill.name}?`,
@@ -305,7 +313,7 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
       expectedAnswer: "2 — getting it",
       supportIfWrong: "All answers are okay. We use it to pick what's next.",
     },
-  ];
+  ].map((c) => withSelectedSurface(c, subject.slug));
 
   const objective =
     tier.difficulty === "starter"
@@ -385,7 +393,7 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
               : `Here's a small example of ${skill.name}.`,
       explanation: exampleExplanationBase,
     },
-    guidedPractice,
+    guidedPractice: guidedWithSurfaces,
     checksForUnderstanding,
     accessibilitySupports: supports,
     encouragement:

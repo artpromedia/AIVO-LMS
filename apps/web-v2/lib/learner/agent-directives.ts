@@ -126,8 +126,11 @@ export function directiveFromDecision(
 
 /**
  * Surface types the lesson player can re-present an item on without
- * authored specs (toSurfaceItem ships coherent defaults for these).
- * A `present_surface` outside this set degrades to a panel message.
+ * authored specs. A `present_surface` outside this set degrades to a panel
+ * message. Remediation Sprint 02: `number_line` no longer has a hardcoded
+ * fixture — the player derives its range from the item's own answer space
+ * (deriveNumberLineSpec) and keeps the source surface when underivable;
+ * the remaining entries still use toSurfaceItem's coherent defaults.
  */
 export const PRESENTABLE_SURFACES: ReadonlySet<string> = new Set([
   "choice_grid",

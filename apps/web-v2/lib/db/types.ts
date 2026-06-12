@@ -4,6 +4,7 @@
  * Every entity carries tenantId for multi-tenant scoping.
  */
 import type { Role } from "@/lib/auth/types";
+import type { LessonSurface } from "@/lib/validators/lesson";
 import {
   ACCESSIBILITY_DEFAULTS as CONTRACT_ACCESSIBILITY_DEFAULTS,
   type AccessibilityProfile,
@@ -950,7 +951,10 @@ export type GeneratedLessonPlan = {
     hint: string;
     scaffold: string;
     skillId: ID;
-    surfaceType?: string;
+    /** Remediation Sprint 02: validated domain-surface envelope (see
+     *  LessonSurfaceSchema). Replaces the old unvalidated `surfaceType`
+     *  string the schema rejected and no generator ever emitted. */
+    surface?: LessonSurface;
     media?: {
       surfaceType: "video" | "audio";
       assets: Array<{
@@ -971,7 +975,8 @@ export type GeneratedLessonPlan = {
     expectedAnswer?: string;
     choices?: string[];
     supportIfWrong: string;
-    surfaceType?: string;
+    /** Remediation Sprint 02: validated domain-surface envelope. */
+    surface?: LessonSurface;
     media?: {
       surfaceType: "video" | "audio";
       assets: Array<{

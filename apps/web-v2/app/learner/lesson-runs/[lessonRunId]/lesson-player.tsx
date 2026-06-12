@@ -48,6 +48,7 @@ import {
   type LessonAgentConfig,
   type LessonAgentDirective,
 } from "@/lib/learner/agent-directives";
+import { deriveNumberLineSpec } from "@/lib/learner/surface-selection";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -66,6 +67,9 @@ type Beat =
       key: string;
       gpId: string;
       surfaceType: SurfaceRouterItem["surfaceType"];
+      /** Remediation Sprint 02: validated, content-derived number-line range
+       *  from the plan's `surface` envelope (never a hardcoded fixture). */
+      numberLine?: { min: number; max: number; step: number };
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -91,6 +95,8 @@ type Beat =
       key: string;
       checkId: string;
       surfaceType: SurfaceRouterItem["surfaceType"];
+      /** Remediation Sprint 02: see the guided beat — same envelope. */
+      numberLine?: { min: number; max: number; step: number };
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -128,14 +134,19 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
   ];
   // shorterSteps preference: drop the story-hook beat to slim the lesson.
   const trimmed = shorter ? beats.filter((b) => b.kind !== "story") : beats;
+  // Remediation Sprint 02: the surface comes from the plan's VALIDATED
+  // `surface` envelope (emitted by the generators, enforced by
+  // GeneratedLessonPlanSchema). Items without one keep the generic
+  // choice/text fallback — exactly the pre-sprint behaviour.
   plan.guidedPractice.forEach((g, i) =>
     trimmed.push({
       kind: "guided",
       key: `gp-${i}`,
       gpId: g.id,
       surfaceType:
-        (g as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+        (g.surface?.surfaceType as SurfaceRouterItem["surfaceType"] | undefined) ??
         (g.choices?.length ? "choice_grid" : "math_expression"),
+      numberLine: g.surface?.numberLine,
       prompt: g.prompt,
       expectedAnswer: g.expectedAnswer,
       choices: g.choices,
@@ -151,8 +162,9 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       key: `chk-${i}`,
       checkId: c.id,
       surfaceType:
-        (c as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+        (c.surface?.surfaceType as SurfaceRouterItem["surfaceType"] | undefined) ??
         (c.choices?.length ? "choice_grid" : "math_expression"),
+      numberLine: c.surface?.numberLine,
       prompt: c.prompt,
       expectedAnswer: c.expectedAnswer,
       choices: c.choices,
@@ -638,13 +650,32 @@ export function LessonPlayer({
     // Wave E (S9): an accepted agent `present_surface` re-presents the
     // CURRENT item on a different (allow-listed) surface; cleared on
     // advance. Without an override this is exactly the source beat.
-    const currentBeat =
-      agentSurfaceOverride && PRESENTABLE_SURFACES.has(agentSurfaceOverride)
-        ? {
-            ...sourceBeat,
-            surfaceType: agentSurfaceOverride as SurfaceRouterItem["surfaceType"],
-          }
-        : sourceBeat;
+    // Remediation Sprint 02: a number_line override additionally requires a
+    // range derivable from the item's own answer space — there is no
+    // hardcoded 0-10 fixture to fall back on, and a line that cannot carry
+    // the expected answer would be unanswerable. Underivable overrides keep
+    // the source surface.
+    const overrideNumberLine =
+      agentSurfaceOverride === "number_line"
+        ? (sourceBeat.numberLine ??
+          deriveNumberLineSpec({
+            prompt: sourceBeat.prompt,
+            expectedAnswer: sourceBeat.expectedAnswer,
+            choices: sourceBeat.choices,
+          }) ??
+          undefined)
+        : undefined;
+    const overrideApplies =
+      agentSurfaceOverride !== null &&
+      PRESENTABLE_SURFACES.has(agentSurfaceOverride) &&
+      (agentSurfaceOverride !== "number_line" || overrideNumberLine !== undefined);
+    const currentBeat = overrideApplies
+      ? {
+          ...sourceBeat,
+          surfaceType: agentSurfaceOverride as SurfaceRouterItem["surfaceType"],
+          numberLine: overrideNumberLine ?? sourceBeat.numberLine,
+        }
+      : sourceBeat;
     return {
       id: currentBeat.kind === "guided" ? currentBeat.gpId : currentBeat.checkId,
       surfaceType: currentBeat.surfaceType,
@@ -669,14 +700,10 @@ export function LessonPlayer({
               ],
             }
           : undefined,
-      numberLine:
-        currentBeat.surfaceType === "number_line"
-          ? {
-              min: 0,
-              max: 10,
-              step: 1,
-            }
-          : undefined,
+      // Remediation Sprint 02: the range is the plan's validated,
+      // content-derived spec (or freshly derived for an agent override) —
+      // never a hardcoded fixture.
+      numberLine: currentBeat.surfaceType === "number_line" ? currentBeat.numberLine : undefined,
       codingSandbox:
         currentBeat.surfaceType === "coding_sandbox"
           ? { language: "javascript", starterCode: "// write your solution\n" }

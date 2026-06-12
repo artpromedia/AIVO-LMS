@@ -131,7 +131,13 @@ function fixturePlan(surfaceType: FixtureSurfaceType): GeneratedLessonPlan {
         hint: "Try counting up from two.",
         scaffold: "2 + 2 means two groups of two.",
         skillId: "sk_fixture",
-        surfaceType,
+        // Remediation Sprint 02: the fixture exercises the same validated
+        // `surface` envelope production plans carry; number_line carries the
+        // mandatory range spec (covering the expected answer "4").
+        surface: {
+          surfaceType,
+          ...(surfaceType === "number_line" ? { numberLine: { min: 0, max: 10, step: 1 } } : {}),
+        },
       },
     ],
     checksForUnderstanding: [],
