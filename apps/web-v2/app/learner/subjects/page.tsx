@@ -20,7 +20,7 @@ import { getIEPForLearner, getMasteryMap, listSubjects } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 import { masteryStageLabel } from "@/lib/learner/mastery-words";
 import { getDiscoverableSubjects } from "@aivo/brand";
-
+import { TutorFace } from "@/components/learner/art/tutor-character";
 
 export default async function LearnerSubjectsPage() {
   const session = await requirePageRole(["learner"]);
@@ -107,7 +107,7 @@ export default async function LearnerSubjectsPage() {
                 masteryLabel={masteryStageLabel(avg, tProgress)}
                 masteryPct={Math.round(avg * 100)}
                 accent={tutor?.color}
-                icon={tutor?.emoji ?? "📘"}
+                icon={<TutorFace tutorKey={s.tutorKey} size={40} />}
                 nextAction={avg > 0 ? "Pick where to start" : "Start your first skill"}
                 support={iep?.confirmedAt ? tSubjects("supports_on") : undefined}
               />

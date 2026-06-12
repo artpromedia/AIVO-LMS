@@ -27,7 +27,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
-import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,7 +44,16 @@ import {
   readSoundFromCookies,
 } from "@/lib/a11y/server";
 import { AivoMascot } from "@/components/learner/art/aivo-mascot";
+import { TutorFace } from "@/components/learner/art/tutor-character";
+import { TUTORS, type TutorKey } from "@aivo/brand";
 import { XP_PER_LEVEL } from "@/lib/learner/engagement-award";
+
+/** Reverse-lookup a tutor's catalogue key from its (unique) display name, so
+ *  the home grid can render the right character without re-plumbing the
+ *  baseline-tutor descriptor. */
+function tutorKeyForName(name: string): TutorKey | null {
+  return (Object.keys(TUTORS) as TutorKey[]).find((k) => TUTORS[k].name === name) ?? null;
+}
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import {
   createLessonRun,
@@ -154,9 +162,6 @@ export default async function LearnerHome({
   searchParams: Promise<{ blocker?: string }>;
 }) {
   const session = await requirePageRole(["learner", "parent"]);
-  // Calm / high-contrast learners get the flatter "-reduced" tutor art.
-  const sensoryMode = await readSensoryModeFromCookies();
-  const reducedArt = sensoryMode !== "standard";
   const params = await searchParams;
   const t = await getTranslations("learner.home");
 
@@ -229,6 +234,7 @@ export default async function LearnerHome({
     ? (allSubjects.find((s) => s.id === today.mission.subjectId)?.slug ?? "")
     : "";
   const featuredTutor = today.ready ? tutorForSubjectSlug(featuredSubjectSlug) : null;
+  const featuredTutorKey = featuredTutor ? tutorKeyForName(featuredTutor.name) : null;
   const featuredTones = today.ready
     ? (SUBJECT_LESSON_TONE[featuredSubjectSlug] ?? {
         lessonTone: "neutral" as const,
@@ -251,7 +257,7 @@ export default async function LearnerHome({
         name: t.name,
         subject: s.name,
         glyph: t.emoji,
-        imageUrl: reducedArt ? t.avatarReduced : t.avatar,
+        tutorKey: tutorKeyForName(t.name),
         tone: tones.tutorTone,
       };
     })
@@ -385,13 +391,12 @@ export default async function LearnerHome({
                     ? t("tutor_personality", { subtitle: featuredTutor.subtitle })
                     : t("tutor_personality_default")
                 }
-                tutorGlyph={featuredTutor?.emoji ?? "🤖"}
-                tutorImageUrl={
-                  featuredTutor
-                    ? reducedArt
-                      ? featuredTutor.avatarReduced
-                      : featuredTutor.avatar
-                    : undefined
+                tutorGlyph={
+                  featuredTutorKey ? (
+                    <TutorFace tutorKey={featuredTutorKey} size={80} />
+                  ) : (
+                    (featuredTutor?.emoji ?? "🤖")
+                  )
                 }
                 tutorTone={featuredTones.tutorTone}
                 secondaryActions={
@@ -500,8 +505,7 @@ export default async function LearnerHome({
                     href={t.href}
                     name={t.name}
                     subject={t.subject}
-                    glyph={t.glyph}
-                    imageUrl={t.imageUrl}
+                    glyph={t.tutorKey ? <TutorFace tutorKey={t.tutorKey} size={64} /> : t.glyph}
                     tone={t.tone}
                   />
                 ))}

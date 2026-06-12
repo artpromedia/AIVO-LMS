@@ -17,6 +17,27 @@
  * themeable UI chrome. Surrounding UI uses brand tokens.
  */
 import * as React from "react";
+import { TUTORS, type TutorKey } from "@aivo/brand";
+
+/**
+ * Picks the right character for a tutor: the bespoke Nova / Sage exemplars,
+ * and the generic kit creature (tinted by the tutor's brand color) for every
+ * other tutor — so the whole cast reads as one family. One call site for the
+ * subjects grid, the home tutor grid, and the per-subject world surfaces.
+ */
+export function TutorFace({
+  tutorKey,
+  size = 96,
+  className,
+}: {
+  tutorKey: TutorKey;
+  size?: number;
+  className?: string;
+}) {
+  if (tutorKey === "nova") return <NovaCharacter size={size} className={className} />;
+  if (tutorKey === "sage") return <SageCharacter size={size} className={className} />;
+  return <TutorCharacter color={TUTORS[tutorKey].color} size={size} className={className} />;
+}
 
 function KitFace({ look = 0 }: { look?: number }) {
   return (
