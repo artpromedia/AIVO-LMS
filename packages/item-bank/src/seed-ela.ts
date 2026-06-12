@@ -344,4 +344,73 @@ export const ELA_PRODUCTION_ITEMS: readonly Item[] = [
       "choice_grid",
     ),
   },
+  // ---- Sprint 09: grade 1-2 depth (pack-aligned) ----
+  {
+    id: "ela.1.rf.3.digraph-chair",
+    skillId: "ccss-ela.1.RF.3",
+    variants: [
+      {
+        id: "ela.1.rf.3.digraph-chair@1.0.0",
+        itemId: "ela.1.rf.3.digraph-chair",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: 'Which word starts like "chair"?', correctAnswer: "cheese", choices: ["cheese", "car", "shoe"] },
+        defectCount: 0,
+        surfaceType: "choice_grid",
+      },
+    ],
+  },
+  {
+    id: "ela.1.l.1.verb-agreement",
+    skillId: "ccss-ela.1.L.1",
+    variants: [
+      {
+        id: "ela.1.l.1.verb-agreement@1.0.0",
+        itemId: "ela.1.l.1.verb-agreement",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "Which sentence is correct?", correctAnswer: "The dogs run fast.", choices: ["The dogs run fast.", "The dogs runs fast.", "The dogs running."] },
+        defectCount: 0,
+        surfaceType: "choice_grid",
+      },
+    ],
+  },
+  {
+    id: "ela.2.l.4.prefix-rewrite",
+    skillId: "ccss-ela.2.L.4",
+    variants: [
+      {
+        id: "ela.2.l.4.prefix-rewrite@1.0.0",
+        itemId: "ela.2.l.4.prefix-rewrite",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: 'What does "rewrite" mean?', correctAnswer: "Write again", choices: ["Write again", "Write before", "Never write"] },
+        defectCount: 0,
+        surfaceType: "choice_grid",
+      },
+    ],
+  },
+  {
+    id: "ela.2.ri.2.bees-main-idea",
+    skillId: "ccss-ela.2.RI.2",
+    variants: [
+      {
+        id: "ela.2.ri.2.bees-main-idea@1.0.0",
+        itemId: "ela.2.ri.2.bees-main-idea",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "Bees carry pollen between flowers, helping plants grow. What is the text mostly about?", correctAnswer: "How bees help plants", choices: ["How bees help plants", "What flowers smell like", "Where bees sleep"] },
+        defectCount: 0,
+        surfaceType: "choice_grid",
+      },
+    ],
+  },
 ];

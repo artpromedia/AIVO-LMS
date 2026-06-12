@@ -19,7 +19,7 @@
 | lingua | S | S | S | S | S | S | S | S | S | S | S | S | S | S | · |
 | muse | S | S | S | S | S | S | S | S | S | S | S | S | S | S | · |
 | nova | S | A | A | A | A | A | A | A | A | A | S | S | S | S | · |
-| pixel | S | S | S | S | S | S | S | S | S | S | S | S | S | S | · |
+| pixel | S | A | A | A | S | S | S | S | S | S | S | S | S | S | · |
 | sage | S | A | A | A | A | A | A | A | A | A | S | S | S | S | · |
 | spark | S | A | S | S | A | S | A | S | S | A | S | S | S | S | · |
 | vigor | S | S | S | S | S | S | S | S | S | S | S | S | S | S | · |
@@ -28,8 +28,8 @@
 
 | Status | Count |
 | --- | ---: |
-| authored | 37 |
-| scaffold | 160 |
+| authored | 40 |
+| scaffold | 157 |
 | missing | 0 |
 
 See `docs/quality/tutor-k12-coverage-gap-plan.md` for the rollout plan and `docs/quality/tutor-content-signoffs.json` for the SME sign-off ledger.

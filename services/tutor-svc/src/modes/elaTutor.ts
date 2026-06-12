@@ -37,7 +37,7 @@ export const elaTutor: TutorDefinition = defineTutor({
     "ccss-ela-9-12",
     "ccss-writing-9-12",
   ],
-  defaultContentPackRefs: ["ela-k-fall-2026"],
+  defaultContentPackRefs: ["ela-k-fall-2026", "ela-1-fall-2026", "ela-2-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`. ela+writing

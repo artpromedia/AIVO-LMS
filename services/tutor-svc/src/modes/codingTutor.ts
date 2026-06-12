@@ -29,7 +29,7 @@ export const codingTutor: TutorDefinition = defineTutor({
   gradeBands: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL"],
   skillGraphRefs: ["prek-coding-foundations", "csta-coding-k2", "csta-coding-3-12"],
-  defaultContentPackRefs: ["coding-k2-fall-2026"],
+  defaultContentPackRefs: ["coding-k2-fall-2026", "coding-1-fall-2026", "coding-2-fall-2026"],
   // Honest coverage (remediation Sprint 01): a band is "authored" only when
   // ≥3 real production items back it AND a signed, non-draft skill graph
   // covers it — machine-checked by `pnpm curriculum:coverage`.
@@ -38,11 +38,14 @@ export const codingTutor: TutorDefinition = defineTutor({
   // production-authored yet. The catalog shows "authoring in progress" and
   // planSession refuses these bands outside preview mode
   // (AIVO_ALLOW_SCAFFOLD_CONTENT). See docs/quality/tutor-k12-coverage-gap-plan.md.
+  // Sprint 09: K-2 flipped to authored LEGITIMATELY — real coding-k2/1/2
+  // packs + >=3 pack-aligned production items per band now back them
+  // (machine-checked by curriculum:coverage's promotion guard).
   coverageMatrix: {
     PRE_K: "scaffold",
-    K: "scaffold",
-    "1": "scaffold",
-    "2": "scaffold",
+    K: "authored",
+    "1": "authored",
+    "2": "authored",
     "3": "scaffold",
     "4": "scaffold",
     "5": "scaffold",

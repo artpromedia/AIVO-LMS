@@ -36,9 +36,9 @@ type GuidedItem = GeneratedLessonPlanInput["guidedPractice"][number];
  */
 export const AUTHORED_LESSON_PACKS: Readonly<Record<string, readonly string[]>> = {
   math: ["math-k-fall-2026", "math-1-fall-2026", "math-2-fall-2026"],
-  reading: ["ela-k-fall-2026"],
+  reading: ["ela-k-fall-2026", "ela-1-fall-2026", "ela-2-fall-2026"],
   science: ["science-k-fall-2026"],
-  coding: ["coding-k2-fall-2026"],
+  coding: ["coding-k2-fall-2026", "coding-1-fall-2026", "coding-2-fall-2026"],
 };
 
 /** Expand a grade-band string ("K", "K-2", "PreK-K", "1-3", "3") into the

@@ -14,6 +14,10 @@ import type { ContentPack } from "../types.js";
 import { mathKFall2026 } from "./math-k-fall-2026.js";
 import { math1Fall2026 } from "./math-1-fall-2026.js";
 import { math2Fall2026 } from "./math-2-fall-2026.js";
+import { ela1Fall2026 } from "./ela-1-fall-2026.js";
+import { ela2Fall2026 } from "./ela-2-fall-2026.js";
+import { coding1Fall2026 } from "./coding-1-fall-2026.js";
+import { coding2Fall2026 } from "./coding-2-fall-2026.js";
 import { elaKFall2026 } from "./ela-k-fall-2026.js";
 import { scienceKFall2026 } from "./science-k-fall-2026.js";
 import { codingK2Fall2026 } from "./coding-k2-fall-2026.js";
@@ -34,8 +38,12 @@ export const SEEDED_PACKS: Readonly<Record<string, ContentPack>> = {
   [math1Fall2026.id]: math1Fall2026,
   [math2Fall2026.id]: math2Fall2026,
   [elaKFall2026.id]: elaKFall2026,
+  [ela1Fall2026.id]: ela1Fall2026,
+  [ela2Fall2026.id]: ela2Fall2026,
   [scienceKFall2026.id]: scienceKFall2026,
   [codingK2Fall2026.id]: codingK2Fall2026,
+  [coding1Fall2026.id]: coding1Fall2026,
+  [coding2Fall2026.id]: coding2Fall2026,
   ...Object.fromEntries(AUTHORED_SUBJECT_PACKS.map((pack) => [pack.id, pack])),
 };
 
@@ -54,8 +62,12 @@ export const REAL_AUTHORED_PACK_IDS: readonly string[] = [
   "math-1-fall-2026",
   "math-2-fall-2026",
   "ela-k-fall-2026",
+  "ela-1-fall-2026",
+  "ela-2-fall-2026",
   "science-k-fall-2026",
   "coding-k2-fall-2026",
+  "coding-1-fall-2026",
+  "coding-2-fall-2026",
 ];
 
 export function isRealAuthoredPack(packId: string): boolean {
