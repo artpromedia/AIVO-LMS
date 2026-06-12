@@ -41,6 +41,16 @@ describe("getAuthoredLessonItems", () => {
     expect(voice?.expectedAnswer).toBeUndefined();
   });
 
+  it("serves the Sprint 08 grade-1/2 packs for their bands", () => {
+    const grade1 = getAuthoredLessonItems({ subjectSlug: "math", gradeBand: "1" });
+    expect(grade1.some((i) => i.prompt.includes("Maya has 8 stickers"))).toBe(true);
+    const grade2 = getAuthoredLessonItems({ subjectSlug: "math", gradeBand: "2" });
+    expect(grade2.some((i) => i.prompt.includes("36 + 27"))).toBe(true);
+    // A K-1 skill band overlaps both the K and grade-1 packs.
+    const k1 = getAuthoredLessonItems({ subjectSlug: "math", gradeBand: "K-1" });
+    expect(k1.length).toBeGreaterThan(0);
+  });
+
   it("returns nothing outside the pack's grade band or for template-only subjects", () => {
     expect(getAuthoredLessonItems({ subjectSlug: "math", gradeBand: "7-8" })).toHaveLength(0);
     // music has only the recognised 3-activity template pack — deliberately

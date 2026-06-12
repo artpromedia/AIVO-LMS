@@ -35,7 +35,7 @@ type GuidedItem = GeneratedLessonPlanInput["guidedPractice"][number];
  * not the template factory). Keyed by web-v2 learner-subject slug.
  */
 export const AUTHORED_LESSON_PACKS: Readonly<Record<string, readonly string[]>> = {
-  math: ["math-k-fall-2026"],
+  math: ["math-k-fall-2026", "math-1-fall-2026", "math-2-fall-2026"],
   reading: ["ela-k-fall-2026"],
   science: ["science-k-fall-2026"],
   coding: ["coding-k2-fall-2026"],
