@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@aivo/admin-auth";
 import { getWebhooks, setWebhookActive } from "@aivo/admin-api/platform-settings";
-import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame , ConfirmDangerDialog, FlashRegion } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 import { actionError } from "@/lib/action-errors";
 
@@ -37,8 +37,7 @@ export default async function WebhooksPage({
       title="Webhooks"
       description="Registered webhook endpoints and recent delivery attempts, read from the webhooks tables (Postgres). Secrets are never shown."
     >
-      {params.notice ? <p className="admin-notice mt-8">{params.notice}</p> : null}
-      {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
+      <FlashRegion className="mt-8" notice={params.notice} error={params.error} />
 
       <section className="mt-8 grid gap-4 md:grid-cols-2">
         <AdminKpiCard label="Endpoints" value={webhooks.length} />
@@ -70,13 +69,25 @@ export default async function WebhooksPage({
                   <td className="text-sm">{formatDateTime(webhook.lastDeliveryAt)}</td>
                   <td className="text-sm">{webhook.lastDeliveryStatus ?? "—"}</td>
                   <td>
-                    <form action={toggleAction}>
-                      <input name="id" type="hidden" value={webhook.id} />
-                      <input name="active" type="hidden" value={webhook.active ? "false" : "true"} />
-                      <button className="admin-action" type="submit">
-                        {webhook.active ? "Disable" : "Enable"}
-                      </button>
-                    </form>
+                    {webhook.active ? (
+                      <ConfirmDangerDialog
+                        action={toggleAction}
+                        hiddenFields={{ id: webhook.id, active: "false" }}
+                        trigger="Disable"
+                        triggerClassName="admin-action"
+                        title="Disable this webhook?"
+                        body={`Deliveries to ${webhook.url} stop immediately until it is re-enabled.`}
+                        confirmLabel="Disable webhook"
+                      />
+                    ) : (
+                      <form action={toggleAction}>
+                        <input name="id" type="hidden" value={webhook.id} />
+                        <input name="active" type="hidden" value="true" />
+                        <button className="admin-action" type="submit">
+                          Enable
+                        </button>
+                      </form>
+                    )}
                   </td>
                 </tr>
               ))}

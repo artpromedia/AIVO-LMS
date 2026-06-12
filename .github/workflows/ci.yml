@@ -41,6 +41,9 @@ jobs:
       - name: Client data-path ratchet (no new bare fetch)
         run: node scripts/ci/check-bare-fetch.mjs
 
+      - name: Admin destructive-action confirmation gate
+        run: node scripts/ci/check-admin-destructive-confirm.mjs
+
   repo-tests:
     name: Sequential Repo Test Gate
     runs-on: ubuntu-latest

@@ -10,7 +10,7 @@ import {
   bulkInviteDistrictParents,
   type BulkParentResult,
 } from "@aivo/admin-api/identity";
-import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminPageFrame , ConfirmDangerDialog } from "@aivo/admin-ui";
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
@@ -289,15 +289,15 @@ export default async function DistrictParentsPage({
                               Resend
                             </button>
                           </form>
-                          <form action={revokeParentAction}>
-                            <input type="hidden" name="id" value={p.id} />
-                            <button
-                              className="admin-button admin-button-secondary px-3 py-1 text-xs"
-                              type="submit"
-                            >
-                              Revoke
-                            </button>
-                          </form>
+                          <ConfirmDangerDialog
+                            action={revokeParentAction}
+                            hiddenFields={{ id: p.id }}
+                            trigger="Revoke"
+                            triggerClassName="admin-button admin-button-secondary px-3 py-1 text-xs"
+                            title="Revoke this parent invitation?"
+                            body={`${p.email} will lose this invitation. A seat opens back up; you can re-invite at any time.`}
+                            confirmLabel="Revoke invitation"
+                          />
                         </div>
                       ) : (
                         <span className="text-xs text-slate-400">—</span>

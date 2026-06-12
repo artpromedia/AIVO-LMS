@@ -1,0 +1,1 @@
+{ "_doc": "Files with destructive-verb actions allowed to skip ConfirmDangerDialog, each with a reason. Keep empty.", "files": {} }

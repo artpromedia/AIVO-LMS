@@ -7,7 +7,7 @@ import {
   resendPlatformDistrictInvite,
   revokePlatformDistrictInvite,
 } from "@aivo/admin-api/identity";
-import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminPageFrame , ConfirmDangerDialog } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 import { actionError } from "@/lib/action-errors";
 
@@ -127,12 +127,15 @@ export default async function PlatformIdentityPage({
                             Resend
                           </button>
                         </form>
-                        <form action={revokeAction}>
-                          <input name="id" type="hidden" value={invite.id} />
-                          <button className="admin-action admin-action-danger" type="submit">
-                            Revoke
-                          </button>
-                        </form>
+                        <ConfirmDangerDialog
+                          action={revokeAction}
+                          hiddenFields={{ id: invite.id }}
+                          trigger="Revoke"
+                          triggerClassName="admin-action admin-action-danger"
+                          title="Revoke this admin invitation?"
+                          body={`${invite.email} will no longer be able to accept it.`}
+                          confirmLabel="Revoke invitation"
+                        />
                       </div>
                     ) : (
                       <span className="text-sm text-slate-400">—</span>

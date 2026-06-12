@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { requirePageRole } from "@aivo/admin-auth";
 import {
   type SecurityControlStatus,
@@ -13,14 +13,22 @@ import {
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 import { actionError } from "@/lib/action-errors";
+import {
+  AddControlForm,
+  ControlStatusForm,
+  type ControlActionState,
+} from "./controls-forms";
 
-async function createAction(formData: FormData) {
+async function createAction(
+  _prev: ControlActionState,
+  formData: FormData,
+): Promise<ControlActionState> {
   "use server";
   const session = await requirePageRole(["platform_admin"]);
   const code = String(formData.get("code") || "").trim();
   const title = String(formData.get("title") || "").trim();
   if (!code || !title) {
-    redirect("/platform/security/controls?error=Code%20and%20title%20are%20required.");
+    return { error: "Code and title are required." };
   }
   const criterion = String(formData.get("criterion") || "security") as SecurityCriterion;
   const status = String(formData.get("status") || "not_started") as SecurityControlStatus;
@@ -28,25 +36,30 @@ async function createAction(formData: FormData) {
   try {
     await createSecurityControl(session, { code, title, criterion, status, owner });
   } catch (error) {
-    redirect(`/platform/security/controls?error=${encodeURIComponent(actionError(error, "Control action failed."))}`);
+    return { error: actionError(error, "Control action failed.") };
   }
-  redirect(`/platform/security/controls?notice=${encodeURIComponent(`Control ${code} added.`)}`);
+  revalidatePath("/platform/security/controls");
+  return { notice: `Control ${code} added.` };
 }
 
-async function statusAction(formData: FormData) {
+async function statusAction(
+  _prev: ControlActionState,
+  formData: FormData,
+): Promise<ControlActionState> {
   "use server";
   const session = await requirePageRole(["platform_admin"]);
   const id = String(formData.get("id") || "");
   const status = String(formData.get("status") || "") as SecurityControlStatus;
   if (!id || !SECURITY_CONTROL_STATUSES.includes(status)) {
-    redirect("/platform/security/controls?error=Missing%20control%20or%20status.");
+    return { error: "Missing control or status." };
   }
   try {
     await updateSecurityControl(session, id, { status });
   } catch (error) {
-    redirect(`/platform/security/controls?error=${encodeURIComponent(actionError(error, "Control action failed."))}`);
+    return { error: actionError(error, "Control action failed.") };
   }
-  redirect("/platform/security/controls?notice=Status%20updated.");
+  revalidatePath("/platform/security/controls");
+  return { notice: "Status updated." };
 }
 
 const STATUS_TONE: Record<SecurityControlStatus, string> = {
@@ -56,13 +69,8 @@ const STATUS_TONE: Record<SecurityControlStatus, string> = {
   not_applicable: "text-slate-500",
 };
 
-export default async function SecurityControlsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ notice?: string; error?: string }>;
-}) {
+export default async function SecurityControlsPage() {
   const session = await requirePageRole(["platform_admin"]);
-  const params = await searchParams;
   const controls = await listSecurityControls(session);
 
   return (
@@ -76,33 +84,13 @@ export default async function SecurityControlsPage({
         </Link>
       }
     >
-      {params.notice ? <p className="admin-notice mt-8">{params.notice}</p> : null}
-      {params.error ? <p className="admin-error mt-8">{params.error}</p> : null}
-
       <AdminCard className="mt-6 p-6">
         <h2 className="text-lg font-black">Add control</h2>
-        <form action={createAction} className="mt-4 flex flex-wrap items-end gap-3">
-          <input className="admin-input w-28" name="code" placeholder="Code" required />
-          <input className="admin-input flex-1" name="title" placeholder="Title" required />
-          <input className="admin-input w-40" name="owner" placeholder="Owner" />
-          <select className="admin-input" name="criterion" defaultValue="security">
-            {SECURITY_CRITERIA.map((criterion) => (
-              <option key={criterion} value={criterion}>
-                {criterion}
-              </option>
-            ))}
-          </select>
-          <select className="admin-input" name="status" defaultValue="not_started">
-            {SECURITY_CONTROL_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-          <button className="admin-button" type="submit">
-            Add
-          </button>
-        </form>
+<AddControlForm
+          action={createAction}
+          criteria={SECURITY_CRITERIA}
+          statuses={SECURITY_CONTROL_STATUSES}
+        />
       </AdminCard>
 
       <AdminCard className="mt-6 overflow-hidden">
@@ -136,19 +124,12 @@ export default async function SecurityControlsPage({
                   </td>
                   <td className="text-sm">{formatDateTime(control.lastReviewedAt)}</td>
                   <td>
-                    <form action={statusAction} className="flex items-center gap-2">
-                      <input name="id" type="hidden" value={control.id} />
-                      <select className="admin-input" name="status" defaultValue={control.status}>
-                        {SECURITY_CONTROL_STATUSES.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
-                      <button className="admin-action" type="submit">
-                        Save
-                      </button>
-                    </form>
+<ControlStatusForm
+                      action={statusAction}
+                      controlId={control.id}
+                      current={control.status}
+                      statuses={SECURITY_CONTROL_STATUSES}
+                    />
                   </td>
                 </tr>
               ))}

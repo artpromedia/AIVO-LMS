@@ -7,7 +7,7 @@ import {
   resendPlatformDistrictInvite,
   revokePlatformDistrictInvite,
 } from "@aivo/admin-api/identity";
-import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminPageFrame , ConfirmDangerDialog } from "@aivo/admin-ui";
 import { actionError } from "@/lib/action-errors";
 
 const STATUSES: DistrictInviteStatus[] = ["pending", "accepted", "expired", "revoked"];
@@ -118,12 +118,15 @@ export default async function DistrictInvitesPage({
                           </button>
                         </form>
                         {invite.status === "pending" ? (
-                          <form action={revokeInvite}>
-                            <input name="id" type="hidden" value={invite.id} />
-                            <button className="admin-action admin-action-danger" type="submit">
-                              Revoke
-                            </button>
-                          </form>
+                          <ConfirmDangerDialog
+                            action={revokeInvite}
+                            hiddenFields={{ id: invite.id }}
+                            trigger="Revoke"
+                            triggerClassName="admin-action admin-action-danger"
+                            title="Revoke this invitation?"
+                            body={`${invite.email} will no longer be able to accept it. You can send a new invitation later.`}
+                            confirmLabel="Revoke invitation"
+                          />
                         ) : null}
                       </div>
                     ) : (

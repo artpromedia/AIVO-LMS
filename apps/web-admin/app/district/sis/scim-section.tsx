@@ -8,6 +8,7 @@
  * dropped.
  */
 import { useState, useTransition } from "react";
+import { ConfirmDangerDialog } from "@aivo/admin-ui";
 import { useRouter } from "next/navigation";
 
 export interface ScimTokenView {
@@ -220,14 +221,20 @@ export function ScimSection({
                   </td>
                   <td>
                     {!token.revokedAt ? (
-                      <button
-                        className="text-sm font-semibold text-red-700 hover:underline"
-                        type="button"
-                        onClick={() => revoke(token.id)}
-                        data-testid={`scim-token-revoke-${token.prefix}`}
-                      >
-                        Revoke
-                      </button>
+                      <span data-testid={`scim-token-revoke-${token.prefix}`}>
+                        <ConfirmDangerDialog
+                          action={async () => {
+                            await revoke(token.id);
+                          }}
+                          trigger="Revoke"
+                          triggerClassName="text-sm font-semibold text-red-700 hover:underline"
+                          title="Revoke this SCIM token?"
+                          body="Provisioning calls signed with it stop immediately. This cannot be undone — issue a new token to restore sync."
+                          confirmLabel="Revoke token"
+                          requireTypedValue={token.name}
+                          typedValueLabel="Type the token name to confirm"
+                        />
+                      </span>
                     ) : null}
                   </td>
                 </tr>

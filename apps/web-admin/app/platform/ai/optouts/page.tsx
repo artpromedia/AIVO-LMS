@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole, requirePlatformPage } from "@aivo/admin-auth";
 import { createAiOptOut, deleteAiOptOut, listAiOptOuts } from "@aivo/admin-api/ai-governance";
-import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminKpiCard, AdminPageFrame , ConfirmDangerDialog } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 import { actionError } from "@/lib/action-errors";
 
@@ -141,12 +141,15 @@ export default async function AiOptOutsPage({
                   </td>
                   <td className="text-sm">{formatDateTime(optOut.createdAt)}</td>
                   <td>
-                    <form action={deleteAction}>
-                      <input name="id" type="hidden" value={optOut.id} />
-                      <button className="admin-action" type="submit">
-                        Remove
-                      </button>
-                    </form>
+                    <ConfirmDangerDialog
+                      action={deleteAction}
+                      hiddenFields={{ id: optOut.id }}
+                      trigger="Remove"
+                      triggerClassName="admin-action"
+                      title="Remove this LLM opt-out?"
+                      body="AI processing resumes for this scope. Make sure the family or district asked for this in writing."
+                      confirmLabel="Remove opt-out"
+                    />
                   </td>
                 </tr>
               ))}

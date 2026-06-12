@@ -9,7 +9,7 @@ import {
   deletePronunciationOverride,
   listPronunciationOverrides,
 } from "@aivo/admin-api/pronunciation";
-import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { AdminCard, AdminPageFrame , ConfirmDangerDialog } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
 import { actionError } from "@/lib/action-errors";
 
@@ -125,12 +125,15 @@ export default async function PronunciationPage({
                   <td className="text-sm">{override.tenantId ?? "all"}</td>
                   <td className="text-sm">{formatDateTime(override.createdAt)}</td>
                   <td>
-                    <form action={deleteAction}>
-                      <input name="id" type="hidden" value={override.id} />
-                      <button className="admin-action admin-action-danger" type="submit">
-                        Remove
-                      </button>
-                    </form>
+                    <ConfirmDangerDialog
+                      action={deleteAction}
+                      hiddenFields={{ id: override.id }}
+                      trigger="Remove"
+                      triggerClassName="admin-action admin-action-danger"
+                      title="Remove this pronunciation override?"
+                      body="TTS falls back to the default pronunciation for every learner using it."
+                      confirmLabel="Remove override"
+                    />
                   </td>
                 </tr>
               ))}

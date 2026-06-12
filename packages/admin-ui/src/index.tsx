@@ -71,3 +71,6 @@ export function AdminCard({
 }
 
 export { DataTable, type DataTableColumn } from "./data-table.js";
+
+export { ConfirmDangerDialog, type ConfirmDangerDialogProps } from "./ConfirmDangerDialog.js";
+export { FlashRegion } from "./FlashRegion.js";
