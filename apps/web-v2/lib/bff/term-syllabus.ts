@@ -14,6 +14,7 @@ import { fail, failFromUnknown, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
+import { buildTermScopeSequence, isPacingLive, svcGeneratePlan } from "@/lib/bff/school-calendar";
 import type { SessionProfile } from "@/lib/auth/types";
 import {
   createTermSyllabus,
@@ -61,6 +62,15 @@ function clampTermCount(v: unknown): number {
 }
 
 /** GET — list a learner's saved term syllabi. */
+/** The coming Monday (UTC) — pacing plans start on week boundaries. */
+function nextMondayIso(): string {
+  const now = new Date();
+  const day = now.getUTCDay();
+  const delta = ((8 - day) % 7) || 7;
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + delta));
+  return monday.toISOString().slice(0, 10);
+}
+
 export async function handleListTermSyllabi(
   req: Request,
   requestId: string,
@@ -191,7 +201,49 @@ export async function handleSaveTermSyllabus(
       learnerId,
       metadata: { syllabusId: syllabus.id, subject, units: units.length, offCurriculum },
     });
-    return ok({ syllabus, offCurriculum }, requestId, { status: 201 });
+
+    // Remediation Sprint 11: saving auto-paces. The audit found the saved
+    // syllabus silently did nothing until a separate "Generate pacing plan"
+    // click — now save⇒pace is one action when pacing is live, and the
+    // response says exactly what happened when it is not. Pacing failure
+    // NEVER fails the save (the syllabus is durably stored either way).
+    let pacing:
+      | { status: "generated"; weeks?: number }
+      | { status: "unavailable"; reason: string }
+      | { status: "failed"; reason: string };
+    if (!isPacingLive()) {
+      pacing = {
+        status: "unavailable",
+        reason:
+          "Pacing runs in brain-svc; set INTERNAL_SERVICE_TOKEN (and run brain-svc) to auto-generate plans in this environment.",
+      };
+    } else {
+      try {
+        const result = await svcGeneratePlan(learnerId, {
+          subject,
+          // Pace from the coming Monday so the plan starts on a week
+          // boundary (matches the manual generate flow's default).
+          planStart: nextMondayIso(),
+          termScopeSequence: buildTermScopeSequence(syllabus),
+        });
+        if (result.ok) {
+          const weeks = (result.plan as { weeks?: unknown[] }).weeks?.length;
+          pacing = { status: "generated", weeks };
+          audit(session, "pacing_plan.generated", requestId, {
+            learnerId,
+            metadata: { subject, trigger: "term_syllabus.save" },
+          });
+        } else {
+          pacing = { status: "failed", reason: result.detail };
+        }
+      } catch (pacingErr) {
+        pacing = {
+          status: "failed",
+          reason: pacingErr instanceof Error ? pacingErr.message : String(pacingErr),
+        };
+      }
+    }
+    return ok({ syllabus, offCurriculum, pacing }, requestId, { status: 201 });
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

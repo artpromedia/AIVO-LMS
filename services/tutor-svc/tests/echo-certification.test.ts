@@ -85,7 +85,11 @@ describe("Echo certification — voice delegation is preserved", () => {
       payload: {
         learnerId: "lrn-cert",
         functioningLevel: "STANDARD",
-        gradeBand: "2",
+        // Echo's honest coverageMatrix (remediation Sprint 01) authors K, 3,
+        // and 7 only — this certification exercises the Speech-Buddy
+        // delegation handshake, so it must run on an authored band; grade 2
+        // is now correctly refused as grade_band_not_production.
+        gradeBand: "3",
         consentRecordId: "consent-cert",
       },
     });

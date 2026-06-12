@@ -1,0 +1,11 @@
+{
+  "_comment": "REAL-MODEL agent quality scorecard (remediation Sprint 10). Written by services/ai-svc/tests/agent_quality_eval when run WITH a model key; pnpm agent:eval HARD-FAILS any tutor in web-v2 AGENT_ENABLED_TUTORS whose recorded eval failed. Missing entries for enabled tutors are tolerated ONLY because of the explicit owner decision below \u2014 run the eval on the keyed live server to replace this debt with real scores.",
+  "passThreshold": 0.75,
+  "ownerEnabledWithoutEval": {
+    "decision": "Enable the full 14-tutor roster ahead of recorded eval scores.",
+    "by": "project-owner",
+    "date": "2026-06-12",
+    "rationale": "ANTHROPIC_API_KEY lives on the live server only; the eval suite must run there (cd services/ai-svc && pytest tests/agent_quality_eval) and commit this file with real scores."
+  },
+  "tutors": {}
+}

@@ -6,12 +6,25 @@
  * durable authority state, fail-closed learner scoring, immutable evidence,
  * and complete agentic PRE-K-12 tutor declarations backed by seeded packs.
  */
+import { execSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const errors = [];
+
+// Honest-coverage handshake (remediation Sprint 01): the per-band item
+// counts come from the SAME compiled @aivo/item-bank module the
+// curriculum:coverage promotion guard uses, so the two gates can never
+// disagree about whether a band has real content behind it.
+const itemBankDist = join(repoRoot, "packages/item-bank/dist/index.js");
+if (!existsSync(itemBankDist)) {
+  execSync("corepack pnpm --filter @aivo/item-bank build", { cwd: repoRoot, stdio: "inherit" });
+}
+const itemBank = await import(pathToFileURL(itemBankDist).href);
+/** Mirror of MIN_AUTHORED_ITEMS_PER_BAND in scripts/curriculum-coverage-check.mjs. */
+const MIN_AUTHORED_ITEMS_PER_BAND = 3;
 
 function read(rel) {
   const abs = resolve(repoRoot, rel);
@@ -90,32 +103,48 @@ for (const file of tutorFiles) {
   if (!/gradeBands:\s*\[[^\]]*"PRE_K"/s.test(source)) {
     errors.push(`${rel}: tutor is missing PRE_K scope`);
   }
-  if (!/\bPRE_K:\s*"authored"/.test(source)) {
-    errors.push(`${rel}: PRE_K coverage is not authored`);
-  }
   if (/:\s*"missing"/.test(source)) {
     errors.push(`${rel}: coverage matrix contains missing bands`);
   }
-  // Scaffold bands are allowed ONLY with an explicit owner attestation marker
-  // (production-gap-gate:allow-scaffold(BAND) owner=… date=…) in the same
-  // file, because the runtime refuses scaffold bands in production unless the
-  // caller opts into preview mode. The runtime guard itself is asserted below
-  // so an attestation can never outlive the refusal it relies on.
+  // Honest coverage (remediation Sprint 01): curriculum:coverage forbids
+  // "authored" bands without ≥3 real production items + a signed non-draft
+  // graph, so "scaffold" is the EXPECTED, honest state for bands whose
+  // content the curriculum team has not authored yet — demanding
+  // authored-everywhere here would only reward inflated matrices. What this
+  // gate still refuses is the inverse gap: a band whose item bank IS deep
+  // enough but that someone left scaffold without an explicit decision.
+  // Deliberately holding ready content back from production requires an
+  // owner attestation marker
+  // (production-gap-gate:allow-scaffold(BAND) owner=… date=…).
   const attestedBands = new Set(
     [...source.matchAll(
       /production-gap-gate:allow-scaffold\((\w+)\)\s+owner=\S+\s+date=\d{4}-\d{2}-\d{2}/g,
     )].map((match) => match[1]),
   );
+  const tutorSubjects = [
+    ...(source.match(/subjects:\s*\[([^\]]*)\]/s)?.[1] ?? "").matchAll(/"([^"]+)"/g),
+  ].map((m) => m[1]);
+  let hasScaffoldBand = false;
   for (const match of source.matchAll(/\b(\w+|"\d+"):\s*"scaffold"/g)) {
     const band = match[1].replaceAll('"', "");
-    if (!attestedBands.has(band)) {
+    hasScaffoldBand = true;
+    if (attestedBands.has(band)) continue;
+    const bandItems = tutorSubjects.reduce(
+      (sum, subject) => sum + itemBank.countAuthoredItems(subject, band),
+      0,
+    );
+    if (bandItems >= MIN_AUTHORED_ITEMS_PER_BAND) {
       errors.push(
-        `${rel}: coverage matrix band ${band} is scaffold without an ` +
-          `allow-scaffold owner attestation`,
+        `${rel}: coverage matrix band ${band} is scaffold despite ${bandItems} production ` +
+          `item(s) backing it — promote it to authored (and pass curriculum:coverage) or add ` +
+          `an allow-scaffold owner attestation recording the hold-back decision`,
       );
     }
   }
-  if (attestedBands.size > 0) {
+  if (hasScaffoldBand) {
+    // The runtime refusal an honest scaffold relies on must stay in place:
+    // planSession refuses non-authored bands in production unless the caller
+    // opts into preview mode (AIVO_ALLOW_SCAFFOLD_CONTENT).
     requirePatterns("services/tutor-svc/src/lib/learnerContext.ts", [
       ["scaffold preview opt-in guard", /AIVO_ALLOW_SCAFFOLD_CONTENT/],
     ]);

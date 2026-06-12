@@ -51,6 +51,7 @@ import { startWatchdog, configureWatchdogAlerts } from "./lib/watchdog.js";
 import { runJanitorOnce } from "./lib/janitor.js";
 import { runAuditRetentionOnce } from "./lib/audit-retention.js";
 import { runPacingAdvanceOnce } from "./lib/pacing-advance.js";
+import { runCreatorWeeklyOnce } from "./lib/creator-weekly.js";
 import { runMemoryExpiryOnce } from "./lib/memory-expiry.js";
 
 const logger = createLogger("admin-svc");
@@ -178,6 +179,18 @@ async function start() {
     log: logger,
     run: () => runMemoryExpiryOnce(db),
   });
+  // Remediation Sprint 06: the Sunday-night Creator — pre-generates each
+  // active learner's next playable lesson via web-v2's internal route.
+  // WeeklySchedule (not period) so it fires exactly once, Sunday 23:00 UTC.
+  const creatorWeeklyHandle = startSafeCron({
+    jobName: "creator.weekly-generation",
+    schedule: { dayOfWeek: 0, hour: 23 },
+    ledger,
+    lock,
+    log: logger,
+    run: () => runCreatorWeeklyOnce(db),
+  });
+  handles["creator.weekly-generation"] = creatorWeeklyHandle;
   handles["admin.soc2-evidence"] = evidenceHandle;
   handles["admin.run-history-janitor"] = janitorHandle;
   handles["admin.audit-retention"] = retentionHandle;

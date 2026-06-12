@@ -48,6 +48,8 @@ import {
   type LessonAgentConfig,
   type LessonAgentDirective,
 } from "@/lib/learner/agent-directives";
+import { deriveNumberLineSpec } from "@/lib/learner/surface-selection";
+import type { LessonSurface } from "@/lib/validators/lesson";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -66,6 +68,19 @@ type Beat =
       key: string;
       gpId: string;
       surfaceType: SurfaceRouterItem["surfaceType"];
+      /** Remediation Sprints 02-03: validated, content-derived surface specs
+       *  from the plan's `surface` envelope (never hardcoded fixtures). */
+      numberLine?: { min: number; max: number; step: number };
+      readingAnnotation?: NonNullable<LessonSurface["readingAnnotation"]>;
+      scienceDiagram?: NonNullable<LessonSurface["scienceDiagram"]>;
+      graph?: NonNullable<LessonSurface["graph"]>;
+      codingSandbox?: NonNullable<LessonSurface["codingSandbox"]>;
+      artCanvas?: NonNullable<LessonSurface["artCanvas"]>;
+      musicSequencer?: NonNullable<LessonSurface["musicSequencer"]>;
+      voiceResponse?: NonNullable<LessonSurface["voiceResponse"]>;
+      dragManipulative?: NonNullable<LessonSurface["dragManipulative"]>;
+      multiStep?: NonNullable<LessonSurface["multiStep"]>;
+      geometryDiagram?: NonNullable<LessonSurface["geometryDiagram"]>;
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -91,6 +106,18 @@ type Beat =
       key: string;
       checkId: string;
       surfaceType: SurfaceRouterItem["surfaceType"];
+      /** Remediation Sprints 02-03: see the guided beat — same envelope. */
+      numberLine?: { min: number; max: number; step: number };
+      readingAnnotation?: NonNullable<LessonSurface["readingAnnotation"]>;
+      scienceDiagram?: NonNullable<LessonSurface["scienceDiagram"]>;
+      graph?: NonNullable<LessonSurface["graph"]>;
+      codingSandbox?: NonNullable<LessonSurface["codingSandbox"]>;
+      artCanvas?: NonNullable<LessonSurface["artCanvas"]>;
+      musicSequencer?: NonNullable<LessonSurface["musicSequencer"]>;
+      voiceResponse?: NonNullable<LessonSurface["voiceResponse"]>;
+      dragManipulative?: NonNullable<LessonSurface["dragManipulative"]>;
+      multiStep?: NonNullable<LessonSurface["multiStep"]>;
+      geometryDiagram?: NonNullable<LessonSurface["geometryDiagram"]>;
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -128,14 +155,29 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
   ];
   // shorterSteps preference: drop the story-hook beat to slim the lesson.
   const trimmed = shorter ? beats.filter((b) => b.kind !== "story") : beats;
+  // Remediation Sprint 02: the surface comes from the plan's VALIDATED
+  // `surface` envelope (emitted by the generators, enforced by
+  // GeneratedLessonPlanSchema). Items without one keep the generic
+  // choice/text fallback — exactly the pre-sprint behaviour.
   plan.guidedPractice.forEach((g, i) =>
     trimmed.push({
       kind: "guided",
       key: `gp-${i}`,
       gpId: g.id,
       surfaceType:
-        (g as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+        (g.surface?.surfaceType as SurfaceRouterItem["surfaceType"] | undefined) ??
         (g.choices?.length ? "choice_grid" : "math_expression"),
+      numberLine: g.surface?.numberLine,
+      readingAnnotation: g.surface?.readingAnnotation,
+      scienceDiagram: g.surface?.scienceDiagram,
+      graph: g.surface?.graph,
+      codingSandbox: g.surface?.codingSandbox,
+      artCanvas: g.surface?.artCanvas,
+      musicSequencer: g.surface?.musicSequencer,
+      voiceResponse: g.surface?.voiceResponse,
+      dragManipulative: g.surface?.dragManipulative,
+      multiStep: g.surface?.multiStep,
+      geometryDiagram: g.surface?.geometryDiagram,
       prompt: g.prompt,
       expectedAnswer: g.expectedAnswer,
       choices: g.choices,
@@ -151,8 +193,19 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       key: `chk-${i}`,
       checkId: c.id,
       surfaceType:
-        (c as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+        (c.surface?.surfaceType as SurfaceRouterItem["surfaceType"] | undefined) ??
         (c.choices?.length ? "choice_grid" : "math_expression"),
+      numberLine: c.surface?.numberLine,
+      readingAnnotation: c.surface?.readingAnnotation,
+      scienceDiagram: c.surface?.scienceDiagram,
+      graph: c.surface?.graph,
+      codingSandbox: c.surface?.codingSandbox,
+      artCanvas: c.surface?.artCanvas,
+      musicSequencer: c.surface?.musicSequencer,
+      voiceResponse: c.surface?.voiceResponse,
+      dragManipulative: c.surface?.dragManipulative,
+      multiStep: c.surface?.multiStep,
+      geometryDiagram: c.surface?.geometryDiagram,
       prompt: c.prompt,
       expectedAnswer: c.expectedAnswer,
       choices: c.choices,
@@ -638,13 +691,36 @@ export function LessonPlayer({
     // Wave E (S9): an accepted agent `present_surface` re-presents the
     // CURRENT item on a different (allow-listed) surface; cleared on
     // advance. Without an override this is exactly the source beat.
-    const currentBeat =
-      agentSurfaceOverride && PRESENTABLE_SURFACES.has(agentSurfaceOverride)
-        ? {
-            ...sourceBeat,
-            surfaceType: agentSurfaceOverride as SurfaceRouterItem["surfaceType"],
-          }
-        : sourceBeat;
+    // Remediation Sprint 02: a number_line override additionally requires a
+    // range derivable from the item's own answer space — there is no
+    // hardcoded 0-10 fixture to fall back on, and a line that cannot carry
+    // the expected answer would be unanswerable. Underivable overrides keep
+    // the source surface.
+    const overrideNumberLine =
+      agentSurfaceOverride === "number_line"
+        ? (sourceBeat.numberLine ??
+          deriveNumberLineSpec({
+            prompt: sourceBeat.prompt,
+            expectedAnswer: sourceBeat.expectedAnswer,
+            choices: sourceBeat.choices,
+          }) ??
+          undefined)
+        : undefined;
+    const overrideApplies =
+      agentSurfaceOverride !== null &&
+      PRESENTABLE_SURFACES.has(agentSurfaceOverride) &&
+      (agentSurfaceOverride !== "number_line" || overrideNumberLine !== undefined) &&
+      // Sprint 04: drag has no fixture default either — the override only
+      // applies when the item itself authored a drag spec.
+      (agentSurfaceOverride !== "drag_manipulative" ||
+        sourceBeat.dragManipulative !== undefined);
+    const currentBeat = overrideApplies
+      ? {
+          ...sourceBeat,
+          surfaceType: agentSurfaceOverride as SurfaceRouterItem["surfaceType"],
+          numberLine: overrideNumberLine ?? sourceBeat.numberLine,
+        }
+      : sourceBeat;
     return {
       id: currentBeat.kind === "guided" ? currentBeat.gpId : currentBeat.checkId,
       surfaceType: currentBeat.surfaceType,
@@ -658,117 +734,41 @@ export function LessonPlayer({
         currentBeat.surfaceType === "scratchpad" || currentBeat.surfaceType === "ink_canvas"
           ? { enabled: true, width: 520, height: 300 }
           : undefined,
+      // Remediation Sprint 04: every remaining surface spec comes from the
+      // validated `surface` envelope — the geometry rectangle, "// write your
+      // solution" sandbox, en-US voice, odd/even drag bins, and 3-step
+      // multi-step fixture defaults are gone.
       diagram:
         currentBeat.surfaceType === "geometry_workspace" || currentBeat.surfaceType === "geometry"
-          ? {
-              canvasMode: "svg",
-              width: 480,
-              height: 320,
-              shapes: [
-                { id: "fixture-rect", kind: "rectangle", x: 110, y: 70, width: 220, height: 150 },
-              ],
-            }
+          ? currentBeat.geometryDiagram
           : undefined,
-      numberLine:
-        currentBeat.surfaceType === "number_line"
-          ? {
-              min: 0,
-              max: 10,
-              step: 1,
-            }
-          : undefined,
+      // Remediation Sprint 02: the range is the plan's validated,
+      // content-derived spec (or freshly derived for an agent override) —
+      // never a hardcoded fixture.
+      numberLine: currentBeat.surfaceType === "number_line" ? currentBeat.numberLine : undefined,
       codingSandbox:
-        currentBeat.surfaceType === "coding_sandbox"
-          ? { language: "javascript", starterCode: "// write your solution\n" }
-          : undefined,
-      artCanvas: currentBeat.surfaceType === "art_canvas" ? { showGuides: true } : undefined,
+        currentBeat.surfaceType === "coding_sandbox" ? currentBeat.codingSandbox : undefined,
+      artCanvas: currentBeat.surfaceType === "art_canvas" ? currentBeat.artCanvas : undefined,
       voiceResponse:
-        currentBeat.surfaceType === "voice_response" ? { language: "en-US" } : undefined,
-      // Sprint 4–8 surfaces. Authored specs ride on the beat when the
-      // curriculum/item-bank provides them; otherwise a coherent default
-      // fixture keeps the activity playable (and serves as the authoring
-      // template) instead of rendering blank.
+        currentBeat.surfaceType === "voice_response" ? currentBeat.voiceResponse : undefined,
+      // Remediation Sprint 03: reading/graph/science specs are the plan's
+      // validated, content-derived payloads (LessonSurfaceSchema guarantees
+      // a spec rides with its surfaceType). The fox/stream and 0-10-grid
+      // fixture defaults are gone — these surfaces only mount with real
+      // authored content.
       readingAnnotation:
         currentBeat.surfaceType === "reading_annotation"
-          ? ((currentBeat as { readingAnnotation?: SurfaceRouterItem["readingAnnotation"] })
-              .readingAnnotation ?? {
-              question: currentBeat.prompt,
-              tools: ["highlight"],
-              passage: [
-                { id: "s1", text: "The little fox was thirsty." },
-                { id: "s2", text: "It ran all the way to the cool stream." },
-                { id: "s3", text: "Then it took a long, happy drink." },
-              ],
-              expectedEvidenceIds: ["s2"],
-            })
+          ? currentBeat.readingAnnotation
           : undefined,
-      graph:
-        currentBeat.surfaceType === "graph"
-          ? ((currentBeat as { graph?: SurfaceRouterItem["graph"] }).graph ?? {
-              xMin: 0,
-              xMax: 10,
-              yMin: 0,
-              yMax: 10,
-              step: 1,
-              mode: "points",
-            })
-          : undefined,
+      graph: currentBeat.surfaceType === "graph" ? currentBeat.graph : undefined,
       dragManipulative:
-        currentBeat.surfaceType === "drag_manipulative"
-          ? ((currentBeat as { dragManipulative?: SurfaceRouterItem["dragManipulative"] })
-              .dragManipulative ?? {
-              items: [
-                { id: "i1", label: "3" },
-                { id: "i2", label: "8" },
-              ],
-              targets: [
-                { id: "odd", label: "Odd" },
-                { id: "even", label: "Even" },
-              ],
-              correctPlacement: { i1: "odd", i2: "even" },
-            })
-          : undefined,
+        currentBeat.surfaceType === "drag_manipulative" ? currentBeat.dragManipulative : undefined,
       multiStep:
-        currentBeat.surfaceType === "multi_step_workspace"
-          ? ((currentBeat as { multiStep?: SurfaceRouterItem["multiStep"] }).multiStep ?? {
-              steps: [
-                { id: "a", prompt: "Show your first step." },
-                { id: "b", prompt: "Show your next step." },
-                { id: "c", prompt: "Write your final answer." },
-              ],
-            })
-          : undefined,
+        currentBeat.surfaceType === "multi_step_workspace" ? currentBeat.multiStep : undefined,
       scienceDiagram:
-        currentBeat.surfaceType === "science_diagram"
-          ? ((currentBeat as { scienceDiagram?: SurfaceRouterItem["scienceDiagram"] })
-              .scienceDiagram ?? {
-              width: 480,
-              height: 320,
-              diagram: {
-                canvasMode: "svg",
-                width: 480,
-                height: 320,
-                shapes: [{ id: "cell", kind: "circle", cx: 240, cy: 160, r: 110 }],
-              },
-              targets: [
-                { id: "t1", x: 240, y: 160, correctLabelId: "nucleus" },
-                { id: "t2", x: 240, y: 60, correctLabelId: "membrane" },
-              ],
-              labels: [
-                { id: "nucleus", text: "Nucleus" },
-                { id: "membrane", text: "Membrane" },
-              ],
-            })
-          : undefined,
+        currentBeat.surfaceType === "science_diagram" ? currentBeat.scienceDiagram : undefined,
       musicSequencer:
-        currentBeat.surfaceType === "music_sequencer"
-          ? ((currentBeat as { musicSequencer?: SurfaceRouterItem["musicSequencer"] })
-              .musicSequencer ?? {
-              tracks: ["Clap", "Drum"],
-              steps: 8,
-              tempo: 90,
-            })
-          : undefined,
+        currentBeat.surfaceType === "music_sequencer" ? currentBeat.musicSequencer : undefined,
     };
   }
 

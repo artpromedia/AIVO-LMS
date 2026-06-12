@@ -28,7 +28,7 @@ describe("tutor-svc plan route — Phase 5 specialisations", () => {
     await app.close();
   });
 
-  it("falls back to the starter content pack when the request omits one", async () => {
+  it("serves the REAL authored pack when the request omits one (Sprint 05)", async () => {
     const res = await app.inject({
       method: "POST",
       url: "/api/tutors/nova/plan",
@@ -39,7 +39,11 @@ describe("tutor-svc plan route — Phase 5 specialisations", () => {
       contentPackSource: string;
       activities: unknown[];
     };
-    assert.equal(plan.contentPackSource, "starter");
+    // Sprint 05: defaultContentPackRefs are dereferenced for real — nova's
+    // math-k-fall-2026 (hand-authored) is the default planSession source;
+    // the engineering starter scaffold is only the last fallback for tutors
+    // whose authored pack hasn't shipped.
+    assert.equal(plan.contentPackSource, "authored");
     assert.ok(Array.isArray(plan.activities) && plan.activities.length > 0);
   });
 
@@ -115,8 +119,9 @@ describe("tutor-svc plan route — Phase 5 specialisations", () => {
     });
     assert.equal(res.statusCode, 200, `expected 200, got ${res.statusCode}: ${res.body}`);
     const plan = res.json() as { contentPackSource: string };
-    // We didn't supply a content pack either; the starter pack should kick in.
-    assert.equal(plan.contentPackSource, "starter");
+    // We didn't supply a content pack either; harmony's REAL authored pack
+    // (sel-k-fall-2026, owner directive: all subjects authored) kicks in.
+    assert.equal(plan.contentPackSource, "authored");
   });
 
   it("still 403s for a consent-required tutor when no tenantId is provided", async () => {

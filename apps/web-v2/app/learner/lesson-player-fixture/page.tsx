@@ -131,7 +131,43 @@ function fixturePlan(surfaceType: FixtureSurfaceType): GeneratedLessonPlan {
         hint: "Try counting up from two.",
         scaffold: "2 + 2 means two groups of two.",
         skillId: "sk_fixture",
-        surfaceType,
+        // Remediation Sprints 02/04: the fixture exercises the same validated
+        // `surface` envelope production plans carry. Since the player no
+        // longer ships per-surface fixture defaults, each spec-bearing
+        // surface type supplies its spec here.
+        surface: {
+          surfaceType,
+          ...(surfaceType === "number_line" ? { numberLine: { min: 0, max: 10, step: 1 } } : {}),
+          ...(surfaceType === "geometry_workspace"
+            ? {
+                geometryDiagram: {
+                  canvasMode: "svg" as const,
+                  width: 480,
+                  height: 320,
+                  shapes: [
+                    {
+                      id: "fixture-rect",
+                      kind: "rectangle" as const,
+                      x: 110,
+                      y: 70,
+                      width: 220,
+                      height: 150,
+                    },
+                  ],
+                },
+              }
+            : {}),
+          ...(surfaceType === "coding_sandbox"
+            ? {
+                codingSandbox: {
+                  language: "javascript" as const,
+                  starterCode: "// write your solution\n",
+                },
+              }
+            : {}),
+          ...(surfaceType === "art_canvas" ? { artCanvas: { showGuides: true } } : {}),
+          ...(surfaceType === "voice_response" ? { voiceResponse: { language: "en-US" } } : {}),
+        },
       },
     ],
     checksForUnderstanding: [],

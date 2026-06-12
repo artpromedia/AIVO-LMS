@@ -12,6 +12,7 @@
  * a coverage report). Wire `--persist=prisma` (or other adapters) once
  * the assessment-svc model lands.
  */
+import { createFileBankPersistAdapter } from "./file-persist.js";
 import * as path from "node:path";
 import { runImport, type PersistAdapter, NULL_PERSIST_ADAPTER } from "./import.js";
 
@@ -25,7 +26,7 @@ function parseArgs(argv: string[]): {
   let inputDir: string | null = null;
   let dryRun = false;
   let subjects: string[] | null = null;
-  let persistKind = "null";
+  let persistKind = "file";
   let jsonReport = false;
   for (const a of argv) {
     if (a.startsWith("--subjects=")) {
@@ -49,6 +50,9 @@ function parseArgs(argv: string[]): {
 
 function getPersist(kind: string, dryRun: boolean): PersistAdapter {
   if (dryRun || kind === "null") return NULL_PERSIST_ADAPTER;
+  // Remediation Sprint 05: the default adapter persists for REAL — imported
+  // items land in src/imported-items.ts and flow into the production banks.
+  if (kind === "file") return createFileBankPersistAdapter();
   // The Prisma adapter lives in the assessment-svc once the items model
   // ships; importing it from here would create a cycle. We therefore
   // honour an env var that points at the JS file to load lazily.

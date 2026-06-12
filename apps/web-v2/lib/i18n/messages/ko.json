@@ -1170,7 +1170,8 @@
       "msg_supports_title": "너의 지원이 켜져 있어",
       "msg_supports_body": "소리 내어 읽기, 차분한 속도, 그리고 IEP의 {count, plural, other {다른 지원 #개}}가 활성화되어 있어.",
       "msg_break_title": "쉬는 건 좋은 거야",
-      "msg_break_body": "기지개를 켜고, 물을 마시고, 창밖을 봐. AIVO가 네 자리를 저장해 둘게."
+      "msg_break_body": "기지개를 켜고, 물을 마시고, 창밖을 봐. AIVO가 네 자리를 저장해 둘게.",
+      "planned_week_badge": "이번 주 예정 레슨"
     },
     "common": {
       "learner_eyebrow": "학습자",
@@ -3129,7 +3130,8 @@
     "tabs": {
       "this_week": "이번 주",
       "full_term": "학기 전체",
-      "school_calendar": "학교 캘린더"
+      "school_calendar": "학교 캘린더",
+      "next_week": "다음 주"
     },
     "school_calendar": {
       "title": "학교 캘린더",
@@ -3169,6 +3171,12 @@
       "plan_ready": "계획 완성 — 총 {weeks}주(수업 {instruction}주), 방학 반영.",
       "week_kind_break": "방학",
       "week_kind_holiday_prep": "방학 준비"
+    },
+    "next_week": {
+      "title": "다음 주 레슨",
+      "empty": "아직 미리 생성된 레슨이 없습니다. 크리에이터는 매주 일요일 밤에 다음 주를 준비합니다.",
+      "ready_badge": "플레이 준비 완료",
+      "generated_at": "{date} 준비됨"
     }
   }
 }

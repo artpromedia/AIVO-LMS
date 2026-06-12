@@ -11,6 +11,12 @@
  *   S13: full roster — every learner subject with a certified tutor
  *        (eval corpus + tutor:behavior green for all 14; Vigor carries
  *        the DAPE context branch, Harmony the reviewed SEL phrase bank)
+ *
+ * NOTE (remediation Sprint 01): this roster existing does NOT mean the agent
+ * is on. The `tutorAgenticMode` enterprise flag defaults OFF, and enablement
+ * is eval-gated — `tutor:behavior` certifies guard/ladder plumbing with a
+ * scripted model only; live decision quality per tutor is proven by the
+ * real-model eval (remediation Sprint 10) before any tenant flips the flag.
  */
 import { TUTORS } from "@aivo/brand";
 import type { LessonAgentConfig } from "@/lib/learner/agent-directives";
@@ -34,11 +40,46 @@ export const PILOT_SUBJECT_TUTORS: Readonly<Record<string, keyof typeof TUTORS>>
   engineering: "forge",
 };
 
-/** Agent identity for a lesson subject, or null when not piloted. */
+/**
+ * Remediation Sprint 10 — the per-tutor EVAL gate.
+ *
+ * Which roster tutors may actually open agent sessions. The project owner
+ * has enabled the full roster (2026-06-12): the live server carries
+ * ANTHROPIC_API_KEY, so the real-model evaluation
+ * (services/ai-svc/tests/agent_quality_eval) runs THERE and records scores
+ * into docs/quality/agent-eval-scorecard.json. `pnpm agent:eval` still
+ * HARD-FAILS any enabled tutor whose recorded eval FAILED — an owner
+ * decision can enable ahead of a recorded score, but never over a failure.
+ * Tenant rollout remains separately gated by the `tutorAgenticMode` flag.
+ */
+export const AGENT_ENABLED_TUTORS: ReadonlyArray<keyof typeof TUTORS> = [
+  "nova",
+  "sage",
+  "spark",
+  "chrono",
+  "pixel",
+  "echo",
+  "harmony",
+  "atlas",
+  "cadence",
+  "vigor",
+  "lingua",
+  "forge",
+  "compass",
+  "muse",
+];
+
+export function isAgentEnabledForTutor(tutorKey: string): boolean {
+  return (AGENT_ENABLED_TUTORS as readonly string[]).includes(tutorKey);
+}
+
+/** Agent identity for a lesson subject, or null when not piloted OR the
+ *  fronting tutor has not passed the real-model eval gate. */
 export function agentForSubjectSlug(slug: string | null | undefined): LessonAgentConfig | null {
   if (!slug) return null;
   const tutorKey = PILOT_SUBJECT_TUTORS[slug];
   if (!tutorKey) return null;
+  if (!isAgentEnabledForTutor(tutorKey)) return null;
   const tutor = TUTORS[tutorKey];
   if (!tutor) return null;
   return { tutorKey, name: tutor.name, icon: tutor.icon, color: tutor.color };

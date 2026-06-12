@@ -318,7 +318,15 @@ export default async function LearnerHome({
               subject={today.mission.subjectName}
               subjectTone={featuredTones.lessonTone}
               durationLabel={`${today.mission.estimatedMinutes} mins`}
-              difficultyLabel={overallAvg >= 0.65 ? t("diff_steady") : t("diff_easy")}
+              difficultyLabel={
+                // Sprint 07: Creator-planned lessons announce themselves —
+                // the learner sees this week was prepared for them.
+                today.mission.existingRunSource === "weekly_creator"
+                  ? t("planned_week_badge")
+                  : overallAvg >= 0.65
+                    ? t("diff_steady")
+                    : t("diff_easy")
+              }
               title={today.mission.skillName}
               description={today.mission.learnerReason}
               tutorName={featuredTutor?.name ?? t("tutor_fallback")}

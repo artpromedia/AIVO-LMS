@@ -37,9 +37,16 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     "cec-life-skills-6-plus",
     "cec-life-skills-9-12",
   ],
-  defaultContentPackRefs: ["life-skills-6-plus-fall-2026"],
+  defaultContentPackRefs: ["life-skills-k-fall-2026", "executive-function-k-fall-2026"],
+  // Honest coverage (remediation Sprint 01): a band is "authored" only when
+  // ≥3 real production items back it AND a signed, non-draft skill graph
+  // covers it — machine-checked by `pnpm curriculum:coverage`.
+  // life_skills + executive_function items together clear the bar K-8;
+  // PRE_K (draft foundations graph) and 9-12 (too few items) are
+  // honestly "scaffold" until authored
+  // (docs/quality/tutor-k12-coverage-gap-plan.md).
   coverageMatrix: {
-    PRE_K: "authored",
+    PRE_K: "scaffold",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -49,10 +56,10 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     "6": "authored",
     "7": "authored",
     "8": "authored",
-    "9": "authored",
-    "10": "authored",
-    "11": "authored",
-    "12": "authored",
+    "9": "scaffold",
+    "10": "scaffold",
+    "11": "scaffold",
+    "12": "scaffold",
     // production-gap-gate:allow-scaffold(ADULT) owner=curriculum-life-skills date=2026-06-10
     // ADULT transition content is attested out of GA scope. The band stays
     // declared so authors can preview it (AIVO_ALLOW_SCAFFOLD_CONTENT=true),

@@ -35,6 +35,10 @@ export const memoryEngagement: EngagementStore = {
   async getEngagement(learnerId): Promise<LearnerEngagement | null> {
     return getStore().learnerEngagement.get(learnerId) ?? null;
   },
+  async upsertEngagement(engagement) {
+    getStore().learnerEngagement.set(engagement.learnerId, engagement);
+    return engagement;
+  },
   async listBadges(): Promise<LearnerBadge[]> {
     return Array.from(getStore().learnerBadges.values());
   },

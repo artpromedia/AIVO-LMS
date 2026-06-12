@@ -30,6 +30,7 @@
  * DAPE branch, Compass's transition module) lives downstream and rides
  * the persona key the registry already exposes.
  */
+import { getSeededPack, isRealAuthoredPack } from "@aivo/content-pack";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import {
   planSession,
@@ -110,7 +111,7 @@ interface PlanResponse extends SessionPlan {
   /** Source of the content pack that drove the plan. `request` means the
    *  caller supplied it; `starter` means tutor-svc fell back to the
    *  registered starter pack. */
-  contentPackSource: "request" | "starter";
+  contentPackSource: "request" | "authored" | "starter";
 }
 
 export function registerTutorSessionRoutes(app: FastifyInstance): void {
@@ -167,18 +168,30 @@ export function registerTutorSessionRoutes(app: FastifyInstance): void {
         return reply.code(400).send({ error: "learnerId is required" });
       }
 
-      // Phase 4: fall back to the tutor's starter content pack when
-      // the caller hasn't shipped one. This keeps the route functional
-      // end-to-end before the curriculum CMS is online.
-      let contentPackSource: "request" | "starter" = "request";
+      // Remediation Sprint 05: the tutor's AUTHORED seeded pack
+      // (defaultContentPackRefs → @aivo/content-pack SEEDED_PACKS) is the
+      // default planSession source — previously the refs were never
+      // dereferenced and the engineering starter scaffolds served every
+      // session. Starter packs remain only as the last fallback for tutors
+      // whose authored pack hasn't shipped yet.
+      let contentPackSource: "request" | "authored" | "starter" = "request";
       let contentPack = body.contentPack;
       if (!contentPack || !Array.isArray(contentPack.activities)) {
-        const starter = getStarterContentPack(tutorKey);
-        if (!starter) {
-          return reply.code(400).send({ error: "contentPack with activities[] is required" });
+        const authored = def.defaultContentPackRefs
+          .filter((ref) => isRealAuthoredPack(ref))
+          .map((ref) => getSeededPack(ref))
+          .find((pack) => pack && pack.activities.length > 0);
+        if (authored) {
+          contentPack = authored;
+          contentPackSource = "authored";
+        } else {
+          const starter = getStarterContentPack(tutorKey);
+          if (!starter) {
+            return reply.code(400).send({ error: "contentPack with activities[] is required" });
+          }
+          contentPack = starter;
+          contentPackSource = "starter";
         }
-        contentPack = starter;
-        contentPackSource = "starter";
       }
 
       // Phase 5: generic family-consent gate. When the tutor's policy

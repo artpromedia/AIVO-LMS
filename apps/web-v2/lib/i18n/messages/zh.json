@@ -1170,7 +1170,8 @@
       "msg_supports_title": "你的支持已开启",
       "msg_supports_body": "朗读、平和的节奏，以及来自你 IEP 的{count, plural, other {另外 # 项支持}}都已启用。",
       "msg_break_title": "休息是好事",
-      "msg_break_body": "伸个懒腰、喝点水、看看窗外。AIVO 会保存你的位置。"
+      "msg_break_body": "伸个懒腰、喝点水、看看窗外。AIVO 会保存你的位置。",
+      "planned_week_badge": "本周已计划"
     },
     "common": {
       "learner_eyebrow": "学习者",
@@ -3129,7 +3130,8 @@
     "tabs": {
       "this_week": "本周",
       "full_term": "整个学期",
-      "school_calendar": "学校日历"
+      "school_calendar": "学校日历",
+      "next_week": "下周"
     },
     "school_calendar": {
       "title": "学校日历",
@@ -3169,6 +3171,12 @@
       "plan_ready": "计划已生成——共 {weeks} 周（教学 {instruction} 周），已避开假期。",
       "week_kind_break": "学校假期",
       "week_kind_holiday_prep": "假期预备"
+    },
+    "next_week": {
+      "title": "下周课程",
+      "empty": "尚无预生成的课程。创建者每周日晚为下一周做准备。",
+      "ready_badge": "可开始",
+      "generated_at": "{date} 已准备"
     }
   }
 }

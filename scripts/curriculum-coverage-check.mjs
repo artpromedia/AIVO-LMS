@@ -23,12 +23,63 @@
 // missing grade bands. That is the correct signal — silencing it would
 // violate the no-fake-progress rule.
 
+import { execSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..");
+
+// ---------------------------------------------------------------------------
+// 0. Authoritative item counts — @aivo/item-bank's coverage-query module.
+//
+// Sprint 01 (remediation): the gate previously trusted the hand-maintained
+// production-manifest.json for item counts, which let declared coverage
+// drift above the real item set. The counts now come from the SAME compiled
+// module production consumers use (`countAuthoredItems` /
+// `authoredItemCountsByBand`), so the gate and reality cannot disagree.
+// The dist build is refreshed automatically when the package sources are
+// newer (or dist is missing), mirroring the `item-bank:validate` pattern.
+// ---------------------------------------------------------------------------
+
+const itemBankDist = join(repoRoot, "packages/item-bank/dist/index.js");
+const itemBankSrcDir = join(repoRoot, "packages/item-bank/src");
+
+function itemBankDistStale() {
+  if (!existsSync(itemBankDist)) return true;
+  const distMtime = statSync(itemBankDist).mtimeMs;
+  const newest = (dir) => {
+    let max = 0;
+    for (const name of readdirSync(dir)) {
+      const full = join(dir, name);
+      const st = statSync(full);
+      if (st.isDirectory()) {
+        if (name !== "__tests__") max = Math.max(max, newest(full));
+      } else if (name.endsWith(".ts") || name.endsWith(".json")) {
+        max = Math.max(max, st.mtimeMs);
+      }
+    }
+    return max;
+  };
+  return newest(itemBankSrcDir) > distMtime;
+}
+
+if (itemBankDistStale()) {
+  console.log("@aivo/item-bank dist is missing or stale — building it for the coverage gate …");
+  execSync("corepack pnpm --filter @aivo/item-bank build", { cwd: repoRoot, stdio: "inherit" });
+}
+const itemBank = await import(pathToFileURL(itemBankDist).href);
+
+/**
+ * Minimum production items a (tutor-subject, grade band) cell needs before a
+ * `coverageMatrix` entry may claim `"authored"`. Three is the floor because
+ * the item difficulty ladder has three rungs (intro / core / stretch) — one
+ * real item per rung is the least a band can carry and still honestly route
+ * a learner through it. Raising the bar later only requires authoring more
+ * items; it can never be satisfied by editing a manifest.
+ */
+const MIN_AUTHORED_ITEMS_PER_BAND = 3;
 
 // Subjects → required grade bands (lowercase canonical).
 // Grade bands are matched as substring tokens against seed `gradeBand`
@@ -132,77 +183,25 @@ for (const file of seedFiles) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. Item bank: count items per inferred subject (via skillId prefix)
+// 2. Item bank: REAL counts from the compiled @aivo/item-bank production
+//    loader. No regex scans, no manifest overrides — `production-manifest.json`
+//    is now only a consistency fixture for the package's own tests; the gate
+//    counts the items production code actually serves. Per-band counts come
+//    from `authoredItemCountsByBand` (skillId-decoded grade bands), which the
+//    promotion guard compares against MIN_AUTHORED_ITEMS_PER_BAND.
 // ---------------------------------------------------------------------------
 
-function walk(dir, out = []) {
-  if (!existsSync(dir)) return out;
-  for (const name of readdirSync(dir)) {
-    const full = join(dir, name);
-    let st;
-    try {
-      st = statSync(full);
-    } catch {
-      continue;
-    }
-    if (st.isDirectory()) walk(full, out);
-    else if (st.isFile()) out.push(full);
-  }
-  return out;
-}
-
-const itemBankSrc = join(repoRoot, "packages/item-bank/src");
-const itemFiles = walk(itemBankSrc).filter(
-  (p) =>
-    p.endsWith(".ts") &&
-    !p.includes("__tests__") &&
-    !p.endsWith("/index.ts") &&
-    !p.endsWith("/types.ts") &&
-    !p.endsWith("/routing.ts") &&
-    !p.endsWith("/validate.ts"),
+const itemCountsBySubject = new Map(Object.entries(itemBank.getProductionItemCounts()));
+/** subject → Record<gradeBand, count> over the real production items. */
+const bandCountsBySubject = new Map(
+  Object.keys(REQUIRED_COVERAGE).map((subject) => [
+    subject,
+    itemBank.authoredItemCountsByBand(subject),
+  ]),
 );
-const itemCountsBySubject = new Map();
-for (const file of itemFiles) {
-  const src = readFileSync(file, "utf8");
-  const itemRe = /\{\s*id:\s*"([^"]+)"[\s\S]*?skillId:\s*"([^"]+)"/g;
-  for (const m of src.matchAll(itemRe)) {
-    const skillId = m[2];
-    // skillId looks like "ccss-math.K.CC.A.1" or "ccss-ela.K..." etc.
-    let subject = "unknown";
-    if (/stem-engineering|stem_engineering|engineering/i.test(skillId)) subject = "stem_engineering";
-    else if (/executive-function|executive_function/i.test(skillId)) subject = "executive_function";
-    else if (/world-languages|world_languages|actfl/i.test(skillId)) subject = "world_languages";
-    else if (/social-studies|social_studies|c3\./i.test(skillId)) subject = "social_studies";
-    else if (/creative-arts|creative_arts|ncas\.arts/i.test(skillId)) subject = "creative_arts";
-    else if (/life-skills|life_skills/i.test(skillId)) subject = "life_skills";
-    else if (/pe-health|pe_health|shape\./i.test(skillId)) subject = "pe_health";
-    else if (/geography|ncge/i.test(skillId)) subject = "geography";
-    else if (/coding|csta/i.test(skillId)) subject = "coding";
-    else if (/speech|asha/i.test(skillId)) subject = "speech";
-    else if (/music|ncas\.music/i.test(skillId)) subject = "music";
-    else if (/sel|casel/i.test(skillId)) subject = "sel";
-    else if (/math/i.test(skillId)) subject = "math";
-    else if (/ela|reading/i.test(skillId)) subject = "ela";
-    else if (/science|ngss/i.test(skillId)) subject = "science";
-    else if (/writing/i.test(skillId)) subject = "writing";
-    itemCountsBySubject.set(subject, (itemCountsBySubject.get(subject) ?? 0) + 1);
-  }
-}
-const productionManifestPath = join(repoRoot, "packages/item-bank/src/production-manifest.json");
-if (existsSync(productionManifestPath)) {
-  const manifest = JSON.parse(readFileSync(productionManifestPath, "utf8"));
-  for (const [subject, count] of Object.entries(manifest)) {
-    if (Number.isInteger(count) && count >= 0) itemCountsBySubject.set(subject, count);
-  }
-}
-const preKItemCountsBySubject = new Map();
-const preKManifestPath = join(repoRoot, "packages/item-bank/src/production-prek-manifest.json");
-if (existsSync(preKManifestPath)) {
-  const manifest = JSON.parse(readFileSync(preKManifestPath, "utf8"));
-  for (const [subject, count] of Object.entries(manifest)) {
-    if (Number.isInteger(count) && count >= 0) preKItemCountsBySubject.set(subject, count);
-  }
-}
+const preKItemCountsBySubject = new Map(
+  [...bandCountsBySubject.entries()].map(([subject, bands]) => [subject, bands.PRE_K ?? 0]),
+);
 
 // ---------------------------------------------------------------------------
 // 3. Report
@@ -300,10 +299,14 @@ for (const file of tutorFiles) {
     personaId ?? (src.match(/id:\s*"([^"@]+)@/) || [])[1] ?? file.replace(/Tutor\.ts$/, "");
   const bands = parseArrayLiteral(src, "gradeBands") ?? [];
   const matrix = parseCoverageMatrix(src);
+  const tutorSubjects = parseArrayLiteral(src, "subjects") ?? [];
   if (bands.length === 0) continue;
+  if (tutorSubjects.length === 0) {
+    tutorErrors.push(`${id}: could not parse a \`subjects\` array — authored bands cannot be verified against the item bank`);
+  }
   if (!matrix) {
     tutorErrors.push(`${id}: declares ${bands.length} gradeBand(s) but no coverageMatrix`);
-    tutorRows.push({ id, file, src, bands, matrix: {} });
+    tutorRows.push({ id, file, src, bands, subjects: tutorSubjects, matrix: {} });
     continue;
   }
   for (const band of bands) {
@@ -311,7 +314,7 @@ for (const file of tutorFiles) {
       tutorErrors.push(`${id}: gradeBand "${band}" has no coverageMatrix entry`);
     }
   }
-  tutorRows.push({ id, file, src, bands, matrix });
+  tutorRows.push({ id, file, src, bands, subjects: tutorSubjects, matrix });
 }
 
 if (tutorRows.length) {
@@ -496,20 +499,47 @@ for (const id of graphVersionById.keys()) {
 if (signoffs === null) {
   errors.push("docs/quality/tutor-content-signoffs.json missing — promotion guard cannot run.");
 } else {
-  // For every `authored` cell, at least one referenced graph that covers
-  // the cell's band must be production-ready: non-draft version AND have
-  // an entry in tutor-content-signoffs.json.
+  // For every `authored` cell, BOTH of:
+  //   (a) at least one referenced graph that covers the cell's band must be
+  //       production-ready: non-draft version AND signed off in
+  //       tutor-content-signoffs.json, and
+  //   (b) the tutor's subject item bank(s) must carry at least
+  //       MIN_AUTHORED_ITEMS_PER_BAND real production items at that band
+  //       (counted from the compiled @aivo/item-bank, never a manifest).
+  // (b) is the Sprint 01 honesty bar: a signed graph without items is a
+  // catalog promise the runtime cannot keep.
   for (const row of tutorRows) {
     const refs = parseArrayLiteral(row.src, "skillGraphRefs") ?? [];
+    const tutorSubjects = (row.subjects ?? []).filter((s) => s in REQUIRED_COVERAGE);
     for (const [band, status] of Object.entries(row.matrix)) {
       if (status !== "authored") continue;
-      // Candidates = refs that claim to cover this band per the id heuristic.
+      // (b) item-count bar — sum across the tutor's declared subjects (the
+      // tutor's whole teachable pool counts toward the band).
+      const bandItems = tutorSubjects.reduce(
+        (sum, subject) => sum + (bandCountsBySubject.get(subject)?.[band] ?? 0),
+        0,
+      );
+      if (tutorSubjects.length === 0) {
+        errors.push(
+          `tutor "${row.id}" claims band "${band}" is authored but its subjects ` +
+            `could not be mapped to item-bank subjects — cannot verify item backing.`,
+        );
+      } else if (bandItems < MIN_AUTHORED_ITEMS_PER_BAND) {
+        errors.push(
+          `tutor "${row.id}" claims band "${band}" is authored but ` +
+            `${tutorSubjects.join("+")} has only ${bandItems} production item(s) at that band ` +
+            `(authored requires ≥ ${MIN_AUTHORED_ITEMS_PER_BAND}). ` +
+            `Author real items or mark the band "scaffold".`,
+        );
+      }
+      // (a) graph readiness — candidates = refs that cover this band.
       const candidates = refs
         .filter((ref) => graphBandsById.get(ref)?.has(band))
         .map((ref) => ({
           ref,
           version: graphVersionById.get(ref) ?? "unknown",
           signed: (signoffs[ref]?.length ?? 0) > 0,
+          smeSigned: (signoffs[ref] ?? []).some((entry) => entry.tier === "sme_signoff"),
         }));
       if (candidates.length === 0) {
         errors.push(
@@ -532,6 +562,14 @@ if (signoffs === null) {
           `tutor "${row.id}" claims band "${band}" is authored but its ` +
             `band-covering graphs aren't production-ready: ${why}.`,
         );
+      } else if (!ready.some((c) => c.smeSigned)) {
+        // Tiered signoffs (docs/quality/tutor-content-signoffs.schema.md):
+        // owner attestation keeps the gate green only alongside the item
+        // bar; flag it so SME review debt stays visible.
+        warnings.push(
+          `tutor "${row.id}" band "${band}": authored on owner/engineering attestation only ` +
+            `(${ready.map((c) => c.ref).join(", ")}) — schedule a credentialed SME signoff.`,
+        );
       }
     }
   }
@@ -549,6 +587,10 @@ console.log("\nrequired thresholds:");
 console.log(`  - every subject covers grade bands PRE_K through 12`);
 console.log(`  - every subject has ≥ ${MIN_ITEMS_PER_SUBJECT} item bank entries`);
 console.log(`  - every subject has at least one explicit PRE_K production item`);
+console.log(
+  `  - every "authored" coverageMatrix cell is backed by ≥ ${MIN_AUTHORED_ITEMS_PER_BAND} ` +
+    `real production items at that band AND a signed, non-draft skill graph`,
+);
 
 // ---------------------------------------------------------------------------
 // 4. Regenerate docs/quality/coverage-dashboard.md from the live matrix.

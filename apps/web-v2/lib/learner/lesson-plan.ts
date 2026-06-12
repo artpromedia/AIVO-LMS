@@ -19,6 +19,13 @@ import type {
 import type { GeneratedLessonPlanInput } from "@/lib/validators/lesson";
 import { getSubjectBySlug, TUTORS } from "@aivo/brand";
 import { pickMultimediaFixtureForSubject } from "./multimedia-item-bank";
+import { domainPractice, SIGNATURE_SURFACE } from "./domain-practice";
+import {
+  buildGraphSurface,
+  buildReadingAnnotationSurface,
+  buildScienceDiagramSurface,
+  withSelectedSurface,
+} from "./surface-selection";
 
 /**
  * Resolve the canonical brand tutor name for a subject. Sprint 2 (subject/tutor
@@ -79,19 +86,30 @@ function difficultyTierForLevel(level: LessonMasterySnapshot["level"]): {
   }
 }
 
+// Sprint 03: every reading tier carries a real passage item answered ON the
+// reading-annotation surface (highlight the evidence sentence). The builder
+// returns the surface AND the expectedAnswer (the evidence span id the
+// surface submits) together, so the item can never disagree with its
+// surface. A second choice/text item keeps variety per tier.
 function readingPractice(
   skillName: string,
   tier: "starter" | "core" | "stretch",
 ): GeneratedLessonPlanInput["guidedPractice"] {
   if (tier === "starter") {
+    const annotated = buildReadingAnnotationSurface({
+      passage:
+        "Bee is busy today. Bee lives in a hive with her family. She flies home before the rain.",
+      question: "Highlight the sentence that tells where Bee lives.",
+      evidenceSentence: "Bee lives in a hive with her family.",
+    });
     return [
       {
-        prompt: "Which word means a small home for a bee?",
-        choices: ["hive", "river", "tree"],
-        expectedAnswer: "hive",
-        hint: "Bees live there together.",
-        scaffold: "Listen to each word. Picture the bee.",
+        prompt: "Highlight the sentence that tells where Bee lives.",
+        expectedAnswer: annotated?.expectedAnswer,
+        hint: "Look for the word 'lives'.",
+        scaffold: "Read each sentence out loud. Which one talks about a home?",
         skillId: "",
+        surface: annotated?.surface,
       },
       {
         prompt: 'Pick the word that rhymes with "cat".',
@@ -104,13 +122,20 @@ function readingPractice(
     ];
   }
   if (tier === "core") {
+    const annotated = buildReadingAnnotationSurface({
+      passage:
+        "Pip the fox trotted down the quiet path. The sun was warm on his back. Pip stopped at the stream to take a long drink. Then he padded home before dark.",
+      question: "Why did Pip stop? Highlight the sentence that tells you.",
+      evidenceSentence: "Pip stopped at the stream to take a long drink.",
+    });
     return [
       {
-        prompt: `In the story, why did the fox stop at the stream?`,
-        expectedAnswer: "to take a drink",
+        prompt: "Why did Pip stop? Highlight the sentence that tells you.",
+        expectedAnswer: annotated?.expectedAnswer,
         hint: "Foxes need water just like we do.",
-        scaffold: `Re-read the line about the fox and the stream.`,
+        scaffold: "Re-read the line about the stream.",
         skillId: "",
+        surface: annotated?.surface,
       },
       {
         prompt: `Pick the best title for our story about ${skillName}.`,
@@ -122,15 +147,72 @@ function readingPractice(
       },
     ];
   }
+  const annotated = buildReadingAnnotationSurface({
+    passage:
+      "The fox reached the bend in the path. He paused, ears turning toward a sound only he could hear. After a long moment he chose the darker trail.",
+    question: "Which sentence shows the fox was uncertain? Highlight it.",
+    evidenceSentence: "He paused, ears turning toward a sound only he could hear.",
+  });
   return [
     {
-      prompt: "What does the author imply when the fox 'paused at the bend'?",
-      expectedAnswer: "the fox was uncertain",
+      prompt: "Which sentence shows the fox was uncertain? Highlight it.",
+      expectedAnswer: annotated?.expectedAnswer,
       hint: "Pausing can mean thinking, not just resting.",
-      scaffold: "Look for clues in the sentences right before and after.",
+      scaffold: "Look for the sentence where the fox stops moving.",
       skillId: "",
+      surface: annotated?.surface,
     },
   ];
+}
+
+// Sprint 03: science practice replaces the generic builder — a real
+// diagram-labelling item (single target keeps scoring order-stable) plus a
+// coordinate-grid plotting item, mixed by tier.
+function sciencePractice(
+  skillName: string,
+  tier: "starter" | "core" | "stretch",
+): GeneratedLessonPlanInput["guidedPractice"] {
+  const plantDiagram = buildScienceDiagramSurface({
+    shapes: [
+      { id: "stem", kind: "rectangle", x: 230, y: 110, width: 20, height: 120 },
+      { id: "leaf", kind: "circle", cx: 290, cy: 140, r: 26 },
+      { id: "roots", kind: "segment", start: { x: 240, y: 230 }, end: { x: 200, y: 290 } },
+      { id: "roots2", kind: "segment", start: { x: 240, y: 230 }, end: { x: 280, y: 290 } },
+    ],
+    target: { id: "below-soil", x: 240, y: 280, correctLabelId: "roots" },
+    labels: [
+      { id: "roots", text: "Roots" },
+      { id: "leaf", text: "Leaf" },
+      { id: "stem", text: "Stem" },
+    ],
+  });
+  const diagramItem = {
+    prompt: "Which plant part grows below the soil? Place its label on the diagram.",
+    expectedAnswer: plantDiagram?.expectedAnswer,
+    hint: "It drinks water from the ground.",
+    scaffold: "Roots hold the plant in the soil and pull up water.",
+    skillId: "",
+    surface: plantDiagram?.surface,
+  };
+  const plotted = buildGraphSurface({ point: { x: 2, y: 3 }, xMax: 6, yMax: 6 });
+  const graphItem = {
+    prompt: "We measured 3 cm of growth on day 2. Plot that point: day 2, height 3.",
+    expectedAnswer: plotted?.expectedAnswer,
+    hint: "Go right to 2, then up to 3.",
+    scaffold: "The first number is across (days); the second is up (cm).",
+    skillId: "",
+    surface: plotted?.surface,
+  };
+  const observeItem = {
+    prompt: `Tell me one thing you observed about ${skillName}.`,
+    expectedAnswer: "any thoughtful response",
+    hint: "Observing means using your senses.",
+    scaffold: "Start with 'I noticed that…' and add one detail.",
+    skillId: "",
+  };
+  if (tier === "starter") return [diagramItem, observeItem];
+  if (tier === "core") return [diagramItem, graphItem];
+  return [graphItem];
 }
 
 function mathPractice(
@@ -217,6 +299,8 @@ export type LessonPlanInputs = {
   accommodations: LessonAccommodationSnapshot;
   /** Phase 1: active school-week curriculum to teach in sync with class. */
   curriculumFocus?: CurriculumFocus | null;
+  /** Sprint 05: authored-pack practice items — served first when present. */
+  authoredItems?: GeneratedLessonPlanInput["guidedPractice"];
   source: string;
 };
 
@@ -260,36 +344,91 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
   const scaffoldLine = modalityScaffold(brainState.preferredModalities);
 
   let guidedRaw: GeneratedLessonPlanInput["guidedPractice"];
-  if (subject.slug === "reading") {
+  if (input.authoredItems && input.authoredItems.length > 0) {
+    // Sprint 05: REAL authored pack content takes priority over every
+    // template builder — authoring a pack changes what the learner sees.
+    guidedRaw = input.authoredItems;
+  } else if (subject.slug === "reading") {
     guidedRaw = readingPractice(skill.name, tier.difficulty);
   } else if (subject.slug === "math") {
     guidedRaw = mathPractice(skill.name, tier.difficulty);
+  } else if (subject.slug === "science") {
+    guidedRaw = sciencePractice(skill.name, tier.difficulty);
   } else {
-    guidedRaw = genericPractice(subject.name, skill.name);
+    // Sprint 04: every remaining subject teaches on its domain surface
+    // (coding sandbox, rhythm grid, voice, canvas, multi-step, drag sort,
+    // annotation, map labelling) — generic exploration only when no domain
+    // builder exists.
+    guidedRaw =
+      domainPractice(subject.slug, skill.name, tier.difficulty) ??
+      genericPractice(subject.name, skill.name);
   }
   const guidedPractice = guidedRaw.map((g) => ({ ...g, skillId: skill.id }));
   const multimedia = pickMultimediaFixtureForSubject(subject.slug, `${skill.id}:${learnerName}`);
   if (multimedia && guidedPractice.length > 0) {
-    const [first, ...rest] = guidedPractice;
-    guidedPractice.splice(
-      0,
-      guidedPractice.length,
-      {
-        ...first,
-        prompt: multimedia.prompt,
-        expectedAnswer: multimedia.expectedAnswer ?? first.expectedAnswer,
-        choices: multimedia.choices?.length ? multimedia.choices : first.choices,
-        hint: multimedia.hint ?? first.hint,
-        scaffold: multimedia.scaffold ?? first.scaffold,
-        media: {
-          surfaceType: multimedia.surfaceType,
-          assets: multimedia.assets.map((asset) =>
-            asset.kind === "captions" ? { ...asset, src: multimedia.captionText } : asset,
-          ),
-        },
+    // Sprint 03: overlay the first item WITHOUT an authored domain surface —
+    // replacing an annotation/diagram item with a video question would lose
+    // the domain interaction. When every item carries a surface, the
+    // multimedia item is appended instead (schema allows up to 8).
+    const overlayIndex = guidedPractice.findIndex((g) => !g.surface);
+    const base = overlayIndex >= 0 ? guidedPractice[overlayIndex] : guidedPractice[0];
+    const overlayItem = {
+      ...base,
+      prompt: multimedia.prompt,
+      expectedAnswer: multimedia.expectedAnswer ?? base.expectedAnswer,
+      choices: multimedia.choices?.length ? multimedia.choices : base.choices,
+      hint: multimedia.hint ?? base.hint,
+      scaffold: multimedia.scaffold ?? base.scaffold,
+      // The overlay replaces the item's content, so any inherited surface
+      // no longer matches — drop it and let withSelectedSurface re-derive
+      // from the final answer space below.
+      surface: undefined,
+      media: {
+        surfaceType: multimedia.surfaceType,
+        assets: multimedia.assets.map((asset) =>
+          asset.kind === "captions" ? { ...asset, src: multimedia.captionText } : asset,
+        ),
       },
-      ...rest,
-    );
+    };
+    if (overlayIndex >= 0) {
+      guidedPractice.splice(overlayIndex, 1, overlayItem);
+    } else if (guidedPractice.length < 8) {
+      guidedPractice.push(overlayItem);
+    }
+  }
+
+  // Remediation Sprint 02: attach the domain surface AFTER the multimedia
+  // overlay so derivation sees each item's FINAL answer space (the overlay
+  // replaces the first item's prompt/answer/choices). The selector returns
+  // undefined for items that cannot honestly carry a domain surface, which
+  // keeps them on the generic choice/text surface.
+  let guidedWithSurfaces = guidedPractice.map((g) => withSelectedSurface(g, subject.slug));
+  // Sprint 05: authored pack items take priority as CONTENT, but the
+  // per-subject domain-surface invariant (Sprints 02-04) still holds — a
+  // reading lesson always mounts the annotation surface, a music lesson the
+  // sequencer, etc. When the authored set lacks the subject's signature
+  // surface, append the first template item that carries it.
+  const signatures = SIGNATURE_SURFACE[subject.slug] ?? [];
+  if (
+    signatures.length > 0 &&
+    !guidedWithSurfaces.some((g) => g.surface && signatures.includes(g.surface.surfaceType)) &&
+    guidedWithSurfaces.length < 8
+  ) {
+    const templates =
+      subject.slug === "reading"
+        ? readingPractice(skill.name, tier.difficulty)
+        : subject.slug === "math"
+          ? mathPractice(skill.name, tier.difficulty)
+          : subject.slug === "science"
+            ? sciencePractice(skill.name, tier.difficulty)
+            : (domainPractice(subject.slug, skill.name, tier.difficulty) ?? []);
+    const signatureItem = templates
+      .map((g) => withSelectedSurface({ ...g, skillId: skill.id }, subject.slug))
+      .find((g) => g.surface && signatures.includes(g.surface.surfaceType));
+    // Lead with the signature item so the domain surface is the learner's
+    // first interaction (and is reachable regardless of how later authored
+    // beats are answered).
+    if (signatureItem) guidedWithSurfaces = [signatureItem, ...guidedWithSurfaces];
   }
 
   const checksForUnderstanding: GeneratedLessonPlanInput["checksForUnderstanding"] = [
@@ -305,7 +444,7 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
       expectedAnswer: "2 — getting it",
       supportIfWrong: "All answers are okay. We use it to pick what's next.",
     },
-  ];
+  ].map((c) => withSelectedSurface(c, subject.slug));
 
   const objective =
     tier.difficulty === "starter"
@@ -385,7 +524,7 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
               : `Here's a small example of ${skill.name}.`,
       explanation: exampleExplanationBase,
     },
-    guidedPractice,
+    guidedPractice: guidedWithSurfaces,
     checksForUnderstanding,
     accessibilitySupports: supports,
     encouragement:

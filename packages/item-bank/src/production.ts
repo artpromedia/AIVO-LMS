@@ -32,6 +32,7 @@ import {
   WORLD_LANGUAGES_PRODUCTION_ITEMS,
 } from "./seed-expansion-subjects.js";
 import { PREK_FOUNDATION_ITEMS } from "./seed-prek-foundations.js";
+import { IMPORTED_PRODUCTION_ITEMS } from "./imported-items.js";
 
 export type RequiredSubjectSlug =
   | "math"
@@ -51,26 +52,35 @@ export type RequiredSubjectSlug =
   | "pe_health"
   | "stem_engineering";
 
+/** Items landed via `pnpm item-bank:import` (Sprint 05 — the import CLI
+ *  persists for real; see cli/file-persist.ts). Merged per subject below. */
+function importedFor(subject: RequiredSubjectSlug): Item[] {
+  return IMPORTED_PRODUCTION_ITEMS.filter((entry) => entry.subject === subject).map(
+    (entry) => entry.item as Item,
+  );
+}
+
 const SUBJECT_ITEMS: Record<RequiredSubjectSlug, readonly Item[]> = {
-  math: [...PREK_FOUNDATION_ITEMS.math, ...MATH_PRODUCTION_ITEMS],
-  ela: [...PREK_FOUNDATION_ITEMS.ela, ...ELA_PRODUCTION_ITEMS],
-  science: [...PREK_FOUNDATION_ITEMS.science, ...SCIENCE_PRODUCTION_ITEMS],
-  writing: [...PREK_FOUNDATION_ITEMS.writing, ...WRITING_PRODUCTION_ITEMS],
-  sel: [...PREK_FOUNDATION_ITEMS.sel, ...SEL_PRODUCTION_ITEMS],
-  speech: [...PREK_FOUNDATION_ITEMS.speech, ...SPEECH_PRODUCTION_ITEMS],
+  math: [...PREK_FOUNDATION_ITEMS.math, ...MATH_PRODUCTION_ITEMS, ...importedFor("math")],
+  ela: [...PREK_FOUNDATION_ITEMS.ela, ...ELA_PRODUCTION_ITEMS, ...importedFor("ela")],
+  science: [...PREK_FOUNDATION_ITEMS.science, ...SCIENCE_PRODUCTION_ITEMS, ...importedFor("science")],
+  writing: [...PREK_FOUNDATION_ITEMS.writing, ...WRITING_PRODUCTION_ITEMS, ...importedFor("writing")],
+  sel: [...PREK_FOUNDATION_ITEMS.sel, ...SEL_PRODUCTION_ITEMS, ...importedFor("sel")],
+  speech: [...PREK_FOUNDATION_ITEMS.speech, ...SPEECH_PRODUCTION_ITEMS, ...importedFor("speech")],
   executive_function: [
     ...PREK_FOUNDATION_ITEMS.executive_function,
     ...EXECUTIVE_FUNCTION_PRODUCTION_ITEMS,
+    ...importedFor("executive_function"),
   ],
-  life_skills: [...PREK_FOUNDATION_ITEMS.life_skills, ...LIFE_SKILLS_PRODUCTION_ITEMS],
-  creative_arts: [...PREK_FOUNDATION_ITEMS.creative_arts, ...CREATIVE_ARTS_PRODUCTION_ITEMS],
-  social_studies: [...PREK_FOUNDATION_ITEMS.social_studies, ...SOCIAL_STUDIES_PRODUCTION_ITEMS],
-  world_languages: [...PREK_FOUNDATION_ITEMS.world_languages, ...WORLD_LANGUAGES_PRODUCTION_ITEMS],
-  coding: [...PREK_FOUNDATION_ITEMS.coding, ...CODING_PRODUCTION_ITEMS],
-  geography: [...PREK_FOUNDATION_ITEMS.geography, ...GEOGRAPHY_PRODUCTION_ITEMS],
-  music: [...PREK_FOUNDATION_ITEMS.music, ...MUSIC_PRODUCTION_ITEMS],
-  pe_health: [...PREK_FOUNDATION_ITEMS.pe_health, ...PE_HEALTH_PRODUCTION_ITEMS],
-  stem_engineering: [...PREK_FOUNDATION_ITEMS.stem_engineering, ...STEM_ENGINEERING_PRODUCTION_ITEMS],
+  life_skills: [...PREK_FOUNDATION_ITEMS.life_skills, ...LIFE_SKILLS_PRODUCTION_ITEMS, ...importedFor("life_skills")],
+  creative_arts: [...PREK_FOUNDATION_ITEMS.creative_arts, ...CREATIVE_ARTS_PRODUCTION_ITEMS, ...importedFor("creative_arts")],
+  social_studies: [...PREK_FOUNDATION_ITEMS.social_studies, ...SOCIAL_STUDIES_PRODUCTION_ITEMS, ...importedFor("social_studies")],
+  world_languages: [...PREK_FOUNDATION_ITEMS.world_languages, ...WORLD_LANGUAGES_PRODUCTION_ITEMS, ...importedFor("world_languages")],
+  coding: [...PREK_FOUNDATION_ITEMS.coding, ...CODING_PRODUCTION_ITEMS, ...importedFor("coding")],
+  geography: [...PREK_FOUNDATION_ITEMS.geography, ...GEOGRAPHY_PRODUCTION_ITEMS, ...importedFor("geography")],
+  music: [...PREK_FOUNDATION_ITEMS.music, ...MUSIC_PRODUCTION_ITEMS, ...importedFor("music")],
+  pe_health: [...PREK_FOUNDATION_ITEMS.pe_health, ...PE_HEALTH_PRODUCTION_ITEMS, ...importedFor("pe_health")],
+  stem_engineering: [...PREK_FOUNDATION_ITEMS.stem_engineering, ...STEM_ENGINEERING_PRODUCTION_ITEMS, ...importedFor("stem_engineering")],
 };
 
 /** Default defect budget for production banks — auto-retire variants

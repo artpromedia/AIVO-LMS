@@ -211,6 +211,109 @@ export const MATH_PRODUCTION_ITEMS: readonly Item[] = [
     ],
   },
 
+  // ---- Sprint 08: grade 1-2 depth (pack-aligned) ----
+  {
+    id: "math.1.oa.a.1.birds-fly-away",
+    skillId: "ccss-math.1.OA.A.1",
+    variants: [
+      {
+        id: "math.1.oa.a.1.birds-fly-away@1.0.0",
+        itemId: "math.1.oa.a.1.birds-fly-away",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "There are 14 birds. 6 fly away. How many are left?", correctAnswer: "8", choices: ["7", "8", "9"] },
+        defectCount: 0,
+        surfaceType: "choice_grid",
+      },
+    ],
+  },
+  {
+    id: "math.1.nbt.c.4.add-tens",
+    skillId: "ccss-math.1.NBT.C.4",
+    variants: [
+      {
+        id: "math.1.nbt.c.4.add-tens@1.0.0",
+        itemId: "math.1.nbt.c.4.add-tens",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "30 + 40 = ?", correctAnswer: "70" },
+        defectCount: 0,
+        surfaceType: "math_expression",
+      },
+    ],
+  },
+  {
+    id: "math.1.g.a.2.equal-halves",
+    skillId: "ccss-math.1.G.A.2",
+    variants: [
+      {
+        id: "math.1.g.a.2.equal-halves@1.0.0",
+        itemId: "math.1.g.a.2.equal-halves",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "A pizza is cut into 2 equal pieces. Each piece is a…", correctAnswer: "half", choices: ["half", "quarter", "third"] },
+        defectCount: 0,
+        surfaceType: "choice_grid",
+      },
+    ],
+  },
+  {
+    id: "math.2.nbt.b.5.add-regroup",
+    skillId: "ccss-math.2.NBT.B.5",
+    variants: [
+      {
+        id: "math.2.nbt.b.5.add-regroup@1.0.0",
+        itemId: "math.2.nbt.b.5.add-regroup",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "36 + 27 = ?", correctAnswer: "63" },
+        defectCount: 0,
+        surfaceType: "math_expression",
+      },
+    ],
+  },
+  {
+    id: "math.2.g.a.1.three-sides",
+    skillId: "ccss-math.2.G.A.1",
+    variants: [
+      {
+        id: "math.2.g.a.1.three-sides@1.0.0",
+        itemId: "math.2.g.a.1.three-sides",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "Which shape has exactly 3 sides?", correctAnswer: "triangle", choices: ["triangle", "square", "pentagon"] },
+        defectCount: 0,
+        surfaceType: "choice_grid",
+      },
+    ],
+  },
+  {
+    id: "math.2.md.a.1.coins",
+    skillId: "ccss-math.2.MD.A.1",
+    variants: [
+      {
+        id: "math.2.md.a.1.coins@1.0.0",
+        itemId: "math.2.md.a.1.coins",
+        version: "1.0.0",
+        status: "active",
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "2 dimes and 1 nickel make how many cents?", correctAnswer: "25", choices: ["20", "25", "30"] },
+        defectCount: 0,
+        surfaceType: "choice_grid",
+      },
+    ],
+  },
   // ---- Grade 3 ----
   {
     id: "math.3.oa.a.1.multiply",

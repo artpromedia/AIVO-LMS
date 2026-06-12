@@ -1,12 +1,13 @@
 {
-  "_comment": "SME sign-off ledger for production tutor content. A skill graph can only back an `authored` coverageMatrix cell if (a) its file's version is NOT a -draft, and (b) it has a non-empty signoffs entry below with at least one curriculum-designer review and (where applicable) a special-education reviewer. The promotion guard in scripts/curriculum-coverage-check.mjs enforces this. To promote a `scaffold` band to `authored`: review the seed file → bump its version from 0.1.0-draft to 1.0.0 → add a signoff entry here → flip the tutor's coverageMatrix entry. See docs/quality/tutor-k12-coverage-gap-plan.md.",
+  "_comment": "SME sign-off ledger for production tutor content. A skill graph can only back an authored coverageMatrix cell if (a) its file version is NOT a -draft, (b) it has a non-empty signoffs entry below, AND — since remediation Sprint 01 — (c) the tutor subject item bank carries >=3 real production items at that band (the promotion guard in scripts/curriculum-coverage-check.mjs enforces all three; the item bar can never be satisfied by editing this file). Every entry carries a tier: sme_signoff (credentialed curriculum designer + SpEd specialist) | owner_attestation | engineering_baseline. Non-sme tiers keep the gate green only together with the item bar, and each such authored band emits a warning until a real SME signoff lands. Schema: docs/quality/tutor-content-signoffs.schema.md.",
   "signoffs": {
     "ccss-math-k": [
       {
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from GREEN-03 K-8 production seed."
+        "notes": "Inherited from GREEN-03 K-8 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ccss-math-1-8": [
@@ -14,7 +15,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from GREEN-03 K-8 production seed."
+        "notes": "Inherited from GREEN-03 K-8 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ngss-k2-physical-science": [
@@ -22,7 +24,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from GREEN-03 K-8 production seed."
+        "notes": "Inherited from GREEN-03 K-8 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ngss-science-3-8": [
@@ -30,7 +33,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from GREEN-03 K-8 production seed."
+        "notes": "Inherited from GREEN-03 K-8 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ccss-ela-k": [
@@ -38,7 +42,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from GREEN-03 K-8 production seed."
+        "notes": "Inherited from GREEN-03 K-8 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ccss-ela-1-8": [
@@ -46,7 +51,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from GREEN-03 K-8 production seed."
+        "notes": "Inherited from GREEN-03 K-8 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ccss-writing-k-8": [
@@ -54,7 +60,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from GREEN-03 K-8 production seed."
+        "notes": "Inherited from GREEN-03 K-8 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "c3-social-studies-k2": [
@@ -62,7 +69,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 K-2 production seed."
+        "notes": "Inherited from Sprint 5 K-2 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ncge-geography-k2": [
@@ -70,7 +78,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 K-2 production seed."
+        "notes": "Inherited from Sprint 5 K-2 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "csta-coding-k2": [
@@ -78,7 +87,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 K-2 production seed."
+        "notes": "Inherited from Sprint 5 K-2 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "asha-speech-early": [
@@ -86,7 +96,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 PRE_K-2 production seed."
+        "notes": "Inherited from Sprint 5 PRE_K-2 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "casel-sel-k2": [
@@ -94,7 +105,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 K-2 production seed."
+        "notes": "Inherited from Sprint 5 K-2 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ncas-music-k2": [
@@ -102,7 +114,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 K-2 production seed."
+        "notes": "Inherited from Sprint 5 K-2 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "shape-pe-health-k2": [
@@ -110,7 +123,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 K-2 production seed."
+        "notes": "Inherited from Sprint 5 K-2 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "actfl-world-languages-novice-low": [
@@ -118,7 +132,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 grade-6 Novice-Low production seed."
+        "notes": "Inherited from Sprint 5 grade-6 Novice-Low production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ngss-engineering-design-3-5": [
@@ -126,7 +141,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 3-5 production seed."
+        "notes": "Inherited from Sprint 5 3-5 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "cec-life-skills-6-plus": [
@@ -134,7 +150,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 grade-6+ production seed."
+        "notes": "Inherited from Sprint 5 grade-6+ production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ncas-creative-arts-k2": [
@@ -142,7 +159,8 @@
         "reviewer": "platform-baseline",
         "role": "engineering-baseline",
         "date": "2026-05-18",
-        "notes": "Inherited from Sprint 5 K-2 production seed."
+        "notes": "Inherited from Sprint 5 K-2 production seed.",
+        "tier": "engineering_baseline"
       }
     ],
     "ccss-math-9-12": [
@@ -150,7 +168,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ccss-ela-9-12": [
@@ -158,7 +177,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ccss-writing-9-12": [
@@ -166,7 +186,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ngss-science-9-12": [
@@ -174,7 +195,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "c3-social-studies-3-8": [
@@ -182,7 +204,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "c3-social-studies-9-12": [
@@ -190,7 +213,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "csta-coding-3-12": [
@@ -198,7 +222,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "asha-speech-school-age": [
@@ -206,7 +231,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "asha-speech-9-12": [
@@ -214,7 +240,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "casel-sel-3-12": [
@@ -222,7 +249,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ncge-geography-3-12": [
@@ -230,7 +258,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ncas-music-3-8": [
@@ -238,7 +267,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ncas-music-9-12": [
@@ -246,7 +276,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "shape-pe-health-3-12": [
@@ -254,7 +285,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "actfl-world-languages-k-5": [
@@ -262,7 +294,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "actfl-world-languages-7-12": [
@@ -270,7 +303,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ngss-engineering-design-k-2": [
@@ -278,7 +312,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ngss-engineering-design-6-12": [
@@ -286,7 +321,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "cec-life-skills-k-5": [
@@ -294,7 +330,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "cec-executive-function-k-12": [
@@ -302,7 +339,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the K-12 completion content was human reviewed."
+        "notes": "Project owner confirmed the K-12 completion content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "cec-life-skills-9-12": [
@@ -310,7 +348,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "ncas-creative-arts-3-12": [
@@ -318,7 +357,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-06",
-        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed."
+        "notes": "Project owner confirmed the previously scaffolded K-12 content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-math-foundations": [
@@ -326,7 +366,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-ela-foundations": [
@@ -334,7 +375,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-writing-foundations": [
@@ -342,7 +384,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-science-foundations": [
@@ -350,7 +393,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-sel-foundations": [
@@ -358,7 +402,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-speech-foundations": [
@@ -366,7 +411,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-executive-function-foundations": [
@@ -374,7 +420,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-life-skills-foundations": [
@@ -382,7 +429,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-creative-arts-foundations": [
@@ -390,7 +438,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-social-studies-foundations": [
@@ -398,7 +447,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-world-languages-foundations": [
@@ -406,7 +456,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-coding-foundations": [
@@ -414,7 +465,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-geography-foundations": [
@@ -422,7 +474,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-music-foundations": [
@@ -430,7 +483,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-pe-health-foundations": [
@@ -438,7 +492,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ],
     "prek-stem-engineering-foundations": [
@@ -446,7 +501,8 @@
         "reviewer": "project-owner-attestation",
         "role": "human-review-attestation",
         "date": "2026-06-07",
-        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed."
+        "notes": "Project owner confirmed the PRE-K foundation content was human reviewed.",
+        "tier": "owner_attestation"
       }
     ]
   },

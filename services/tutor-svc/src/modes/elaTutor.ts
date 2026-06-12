@@ -37,9 +37,15 @@ export const elaTutor: TutorDefinition = defineTutor({
     "ccss-ela-9-12",
     "ccss-writing-9-12",
   ],
-  defaultContentPackRefs: ["ela-k-fall-2026"],
+  defaultContentPackRefs: ["ela-k-fall-2026", "ela-1-fall-2026", "ela-2-fall-2026", "writing-k-fall-2026"],
+  // Honest coverage (remediation Sprint 01): a band is "authored" only when
+  // ≥3 real production items back it AND a signed, non-draft skill graph
+  // covers it — machine-checked by `pnpm curriculum:coverage`. ela+writing
+  // items exist K-8; PRE_K rides on a 0.1.0-draft foundations graph and
+  // 9-12 has no item-bank content yet, so those bands are honestly
+  // "scaffold" until authored (docs/quality/tutor-k12-coverage-gap-plan.md).
   coverageMatrix: {
-    PRE_K: "authored",
+    PRE_K: "scaffold",
     K: "authored",
     "1": "authored",
     "2": "authored",
@@ -49,10 +55,10 @@ export const elaTutor: TutorDefinition = defineTutor({
     "6": "authored",
     "7": "authored",
     "8": "authored",
-    "9": "authored",
-    "10": "authored",
-    "11": "authored",
-    "12": "authored",
+    "9": "scaffold",
+    "10": "scaffold",
+    "11": "scaffold",
+    "12": "scaffold",
   },
   // Wave E (S8): agent loop instruments + per-level action policy.
   // S11: onboarded pilots carry the bounded write tools (evidence ledger

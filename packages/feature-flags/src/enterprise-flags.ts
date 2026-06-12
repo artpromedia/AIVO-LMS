@@ -257,9 +257,9 @@ export const ENTERPRISE_FLAG_META: Record<EnterpriseFlagKey, FlagMeta> = {
   tutorAgenticMode: {
     key: "tutorAgenticMode",
     envVar: ENTERPRISE_FLAG_ENV_VARS.tutorAgenticMode,
-    label: "Agentic tutor mode (Nova pilot)",
+    label: "Agentic tutor mode (eval-gated, all subjects)",
     description:
-      "In-lesson tutor agent loop: the tutor observes each answer and may insert scaffolds, remediation, or breaks. Wave E pilot — Nova (math) only; deterministic player when off.",
+      "In-lesson tutor agent loop: the tutor observes each answer and may insert scaffolds, remediation, or breaks. Available for all 14 tutors via the runtime roster (apps/web-v2/lib/bff/agent-pilot.ts); deterministic player when off. Defaults OFF and must stay OFF for a tutor until that tutor passes the real-model eval gate — the all-14 tutor:behavior gate proves guard/ladder plumbing with a scripted model, not live decision quality.",
     surface: "ai",
     riskBand: "medium",
     defaultValue: false,

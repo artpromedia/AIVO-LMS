@@ -1,20 +1,76 @@
 {
-  "_comment": "Baseline snapshot of per-tutor PRE-K-12 coverageMatrix after project-owner confirmation that all previously scaffolded bands were human reviewed. Drift is checked by scripts/curriculum-coverage-check.mjs; any tutor's authored count decreasing or missing count increasing is a hard fail.",
-  "snapshotDate": "2026-06-07",
+  "_comment": "Baseline snapshot of per-tutor PRE-K-12 coverageMatrix counts. Remediation Sprint 01 reset this to the HONEST floor: a band counts as authored only when >=3 real production item-bank items back it AND a signed, non-draft skill graph covers it (machine-checked by scripts/curriculum-coverage-check.mjs \u2014 promotion guard + item-count bar). The previous all-authored snapshot was owner-attestation only and is superseded. Drift rule unchanged: any tutor's authored count decreasing or missing count increasing is a hard fail; increases require updating this file in the same PR.",
+  "snapshotDate": "2026-06-12",
   "tutors": {
-    "atlas": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "cadence": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "chrono": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "compass": { "authored": 15, "scaffold": 0, "missing": 0 },
-    "echo": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "forge": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "harmony": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "lingua": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "muse": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "nova": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "pixel": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "sage": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "spark": { "authored": 14, "scaffold": 0, "missing": 0 },
-    "vigor": { "authored": 14, "scaffold": 0, "missing": 0 }
+    "atlas": {
+      "authored": 0,
+      "scaffold": 14,
+      "missing": 0
+    },
+    "cadence": {
+      "authored": 0,
+      "scaffold": 14,
+      "missing": 0
+    },
+    "chrono": {
+      "authored": 0,
+      "scaffold": 14,
+      "missing": 0
+    },
+    "compass": {
+      "authored": 9,
+      "scaffold": 6,
+      "missing": 0
+    },
+    "echo": {
+      "authored": 13,
+      "scaffold": 1,
+      "missing": 0
+    },
+    "forge": {
+      "authored": 0,
+      "scaffold": 14,
+      "missing": 0
+    },
+    "harmony": {
+      "authored": 3,
+      "scaffold": 11,
+      "missing": 0
+    },
+    "lingua": {
+      "authored": 0,
+      "scaffold": 14,
+      "missing": 0
+    },
+    "muse": {
+      "authored": 0,
+      "scaffold": 14,
+      "missing": 0
+    },
+    "nova": {
+      "authored": 9,
+      "scaffold": 5,
+      "missing": 0
+    },
+    "pixel": {
+      "authored": 3,
+      "scaffold": 11,
+      "missing": 0
+    },
+    "sage": {
+      "authored": 9,
+      "scaffold": 5,
+      "missing": 0
+    },
+    "spark": {
+      "authored": 4,
+      "scaffold": 10,
+      "missing": 0
+    },
+    "vigor": {
+      "authored": 0,
+      "scaffold": 14,
+      "missing": 0
+    }
   }
 }

@@ -1363,7 +1363,8 @@
       "msg_supports_title": "Your supports are on",
       "msg_supports_body": "Read-aloud, calm pacing, and {count, plural, one {# other support} other {# other supports}} from your IEP are active.",
       "msg_break_title": "Breaks are good",
-      "msg_break_body": "Stretch, sip water, look out the window. AIVO will save your place."
+      "msg_break_body": "Stretch, sip water, look out the window. AIVO will save your place.",
+      "planned_week_badge": "Planned for this week"
     },
     "common": {
       "learner_eyebrow": "Learner",
@@ -3129,7 +3130,8 @@
     "tabs": {
       "this_week": "This week",
       "full_term": "Full term",
-      "school_calendar": "School calendar"
+      "school_calendar": "School calendar",
+      "next_week": "Next week"
     },
     "school_calendar": {
       "title": "School calendar",
@@ -3169,6 +3171,12 @@
       "plan_ready": "Plan ready — {weeks} weeks ({instruction} instructional), break-aware.",
       "week_kind_break": "School break",
       "week_kind_holiday_prep": "Holiday prep"
+    },
+    "next_week": {
+      "title": "Next week's lessons",
+      "empty": "No lessons are pre-generated yet. The Creator prepares the coming week every Sunday night.",
+      "ready_badge": "Ready to play",
+      "generated_at": "Prepared {date}"
     }
   }
 }

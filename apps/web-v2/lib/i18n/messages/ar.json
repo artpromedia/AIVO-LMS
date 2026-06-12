@@ -1170,7 +1170,8 @@
       "msg_supports_title": "وسائل دعمك مفعّلة",
       "msg_supports_body": "القراءة الجهرية والإيقاع الهادئ و{count, plural, other {# وسيلة دعم أخرى}} من خطة الـ IEP الخاصة بك مفعّلة.",
       "msg_break_title": "الاستراحات جيّدة",
-      "msg_break_body": "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك."
+      "msg_break_body": "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك.",
+      "planned_week_badge": "مخطط لها هذا الأسبوع"
     },
     "common": {
       "learner_eyebrow": "المتعلّم",
@@ -3129,7 +3130,8 @@
     "tabs": {
       "this_week": "هذا الأسبوع",
       "full_term": "الفصل كاملاً",
-      "school_calendar": "التقويم المدرسي"
+      "school_calendar": "التقويم المدرسي",
+      "next_week": "الأسبوع القادم"
     },
     "school_calendar": {
       "title": "التقويم المدرسي",
@@ -3169,6 +3171,12 @@
       "plan_ready": "الخطة جاهزة — {weeks} أسبوعًا ({instruction} تعليمية)، مع مراعاة العطلات.",
       "week_kind_break": "عطلة مدرسية",
       "week_kind_holiday_prep": "تهيئة العطلة"
+    },
+    "next_week": {
+      "title": "دروس الأسبوع القادم",
+      "empty": "لا توجد دروس مُعدّة مسبقًا بعد. يُعدّ المنشئ الأسبوع القادم كل ليلة أحد.",
+      "ready_badge": "جاهز للتشغيل",
+      "generated_at": "أُعدّ {date}"
     }
   }
 }

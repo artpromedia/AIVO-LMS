@@ -143,7 +143,114 @@ function makeItems(subject: ExpansionSubject): Item[] {
 export const CREATIVE_ARTS_PRODUCTION_ITEMS = makeItems("creative_arts");
 export const SOCIAL_STUDIES_PRODUCTION_ITEMS = makeItems("social_studies");
 export const WORLD_LANGUAGES_PRODUCTION_ITEMS = makeItems("world_languages");
-export const CODING_PRODUCTION_ITEMS = makeItems("coding");
+/** Sprint 09: hand-authored K-2 depth (pack-aligned) layered over the
+ *  generated baseline so each band clears the >=3 authored-items bar. */
+const CODING_AUTHORED_K2: Item[] = [
+  {
+    id: "coding.K.sequencing.toast-order",
+    skillId: "coding.K.sequencing",
+    variants: [
+      {
+        id: "coding.K.sequencing.toast-order@1.0.0",
+        itemId: "coding.K.sequencing.toast-order",
+        version: "1.0.0",
+        status: "active" as const,
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "To make toast: which comes FIRST?", correctAnswer: "Put bread in", choices: ["Put bread in", "Press the lever", "Take toast out"] },
+        defectCount: 0,
+        surfaceType: "choice_grid" as const,
+      },
+    ],
+  },
+  {
+    id: "coding.K.sequencing.morning-steps",
+    skillId: "coding.K.sequencing",
+    variants: [
+      {
+        id: "coding.K.sequencing.morning-steps@1.0.0",
+        itemId: "coding.K.sequencing.morning-steps",
+        version: "1.0.0",
+        status: "active" as const,
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "Which comes first when getting dressed?", correctAnswer: "Socks", choices: ["Socks", "Shoes", "Walk outside"] },
+        defectCount: 0,
+        surfaceType: "choice_grid" as const,
+      },
+    ],
+  },
+  {
+    id: "coding.1.loops.clap-five",
+    skillId: "coding.1.loops",
+    variants: [
+      {
+        id: "coding.1.loops.clap-five@1.0.0",
+        itemId: "coding.1.loops.clap-five",
+        version: "1.0.0",
+        status: "active" as const,
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "The robot claps 5 times. Which loop does the same job?", correctAnswer: "Repeat 5 times: clap", choices: ["Repeat 5 times: clap", "Clap once", "Repeat 2 times: clap"] },
+        defectCount: 0,
+        surfaceType: "choice_grid" as const,
+      },
+    ],
+  },
+  {
+    id: "coding.1.debugging.square-bug",
+    skillId: "coding.1.debugging",
+    variants: [
+      {
+        id: "coding.1.debugging.square-bug@1.0.0",
+        itemId: "coding.1.debugging.square-bug",
+        version: "1.0.0",
+        status: "active" as const,
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "The square program repeats 3 times instead of 4. What is the fix?", correctAnswer: "Repeat 4 times", choices: ["Repeat 4 times", "Draw faster", "Turn it off"] },
+        defectCount: 0,
+        surfaceType: "choice_grid" as const,
+      },
+    ],
+  },
+  {
+    id: "coding.2.conditionals.umbrella",
+    skillId: "coding.2.conditionals",
+    variants: [
+      {
+        id: "coding.2.conditionals.umbrella@1.0.0",
+        itemId: "coding.2.conditionals.umbrella",
+        version: "1.0.0",
+        status: "active" as const,
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "IF it rains THEN take an umbrella. When do you take it?", correctAnswer: "Only when it rains", choices: ["Only when it rains", "Every day", "Never"] },
+        defectCount: 0,
+        surfaceType: "choice_grid" as const,
+      },
+    ],
+  },
+  {
+    id: "coding.2.events.space-key",
+    skillId: "coding.2.events",
+    variants: [
+      {
+        id: "coding.2.events.space-key@1.0.0",
+        itemId: "coding.2.events.space-key",
+        version: "1.0.0",
+        status: "active" as const,
+        cohortWeight: 1,
+        publishedAt: PUBLISHED,
+        body: { stem: "The character jumps WHEN space is pressed. The key press is…", correctAnswer: "An event", choices: ["An event", "A loop", "A bug"] },
+        defectCount: 0,
+        surfaceType: "choice_grid" as const,
+      },
+    ],
+  },
+];
+
+export const CODING_PRODUCTION_ITEMS = [...makeItems("coding"), ...CODING_AUTHORED_K2];
 export const GEOGRAPHY_PRODUCTION_ITEMS = makeItems("geography");
 export const MUSIC_PRODUCTION_ITEMS = makeItems("music");
 export const PE_HEALTH_PRODUCTION_ITEMS = makeItems("pe_health");

@@ -86,7 +86,8 @@
     "green:check": "node scripts/green-check.mjs",
     "ci:doc-vs-gate": "node scripts/ci/doc-vs-gate-consistency.mjs",
     "ci:doc-vs-gate:verify": "node scripts/ci/doc-vs-gate-consistency.mjs --verify",
-    "test:journey": "vitest run --config tests/integration/journey/vitest.config.ts"
+    "test:journey": "vitest run --config tests/integration/journey/vitest.config.ts",
+    "agent:eval": "node scripts/agent-eval-gate.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",

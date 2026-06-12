@@ -380,6 +380,9 @@ importers:
       '@aivo/brand':
         specifier: workspace:*
         version: link:../../packages/brand
+      '@aivo/content-pack':
+        specifier: workspace:*
+        version: link:../../packages/content-pack
       '@aivo/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -2599,6 +2602,9 @@ importers:
         specifier: '>=5.8.5'
         version: 5.8.5
     devDependencies:
+      '@aivo/item-bank':
+        specifier: workspace:*
+        version: link:../../packages/item-bank
       tsx:
         specifier: ^4.19.4
         version: 4.21.0

@@ -1170,7 +1170,8 @@
       "msg_supports_title": "Seus apoios estão ativados",
       "msg_supports_body": "Leitura em voz alta, ritmo calmo e {count, plural, one {# outro apoio} other {# outros apoios}} do seu IEP estão ativos.",
       "msg_break_title": "Pausas são boas",
-      "msg_break_body": "Alongue-se, beba água, olhe pela janela. A AIVO guardará seu lugar."
+      "msg_break_body": "Alongue-se, beba água, olhe pela janela. A AIVO guardará seu lugar.",
+      "planned_week_badge": "Planejada para esta semana"
     },
     "common": {
       "learner_eyebrow": "Aluno",
@@ -3129,7 +3130,8 @@
     "tabs": {
       "this_week": "Esta semana",
       "full_term": "Período completo",
-      "school_calendar": "Calendário escolar"
+      "school_calendar": "Calendário escolar",
+      "next_week": "Próxima semana"
     },
     "school_calendar": {
       "title": "Calendário escolar",
@@ -3169,6 +3171,12 @@
       "plan_ready": "Plano pronto — {weeks} semanas ({instruction} letivas), com recessos.",
       "week_kind_break": "Recesso escolar",
       "week_kind_holiday_prep": "Preparação de férias"
+    },
+    "next_week": {
+      "title": "Lições da próxima semana",
+      "empty": "Ainda não há lições pré-geradas. O Criador prepara a próxima semana todo domingo à noite.",
+      "ready_badge": "Pronta para jogar",
+      "generated_at": "Preparada {date}"
     }
   }
 }

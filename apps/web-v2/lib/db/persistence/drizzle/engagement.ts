@@ -64,6 +64,16 @@ export const drizzleEngagement: EngagementStore = {
       .limit(1);
     return row ? (row.data as LearnerEngagement) : null;
   },
+  async upsertEngagement(engagement) {
+    await getDb()
+      .insert(webLearnerEngagement)
+      .values({ learnerId: engagement.learnerId, tenantId: engagement.tenantId, data: engagement })
+      .onConflictDoUpdate({
+        target: webLearnerEngagement.learnerId,
+        set: { data: engagement },
+      });
+    return engagement;
+  },
   async listBadges(): Promise<LearnerBadge[]> {
     const rows = await getDb().select().from(webLearnerBadges);
     return rows.map((r) => r.data as LearnerBadge);

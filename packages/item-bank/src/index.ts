@@ -78,6 +78,16 @@ export {
   type RequiredSubjectSlug,
 } from "./production.js";
 
+// Sprint 01 (remediation) — authoritative per-(subject, grade-band) item
+// counts for the curriculum:coverage promotion guard and tutor tests.
+export {
+  countAuthoredItems,
+  authoredItemCountsByBand,
+  gradeBandForItem,
+  COVERAGE_GRADE_BANDS,
+  type CoverageGradeBand,
+} from "./coverage-query.js";
+
 // Sprint 3 — surface-type routability check (mirror of SurfaceRouter coverage).
 export { ROUTABLE_SURFACE_TYPES } from "./validate.js";
 

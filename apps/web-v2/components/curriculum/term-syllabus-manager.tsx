@@ -117,6 +117,7 @@ export function TermSyllabusManager({
   const [saved, setSaved] = useState<SavedSyllabus[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saveNotice, setSaveNotice] = useState<string | null>(null);
   // Wave B — per-syllabus pacing-plan generation state.
   const [planStart, setPlanStart] = useState(() => new Date().toISOString().slice(0, 10));
   const [planBusyFor, setPlanBusyFor] = useState<string | null>(null);
@@ -212,6 +213,26 @@ export function TermSyllabusManager({
       setParsed(null);
       setSummary(null);
       setText("");
+      // Sprint 11: save now auto-paces — tell the parent exactly what
+      // happened instead of leaving a saved-but-unpaced syllabus silent.
+      const pacing = data?.data?.pacing as
+        | { status: "generated"; weeks?: number }
+        | { status: "unavailable" | "failed"; reason?: string }
+        | undefined;
+      if (pacing?.status === "generated") {
+        setSaveNotice(
+          pacing.weeks
+            ? `Saved — pacing plan generated (${pacing.weeks} weeks).`
+            : "Saved — pacing plan generated.",
+        );
+      } else if (pacing) {
+        setSaveNotice(
+          `Saved. Pacing not generated: ${pacing.reason ?? "pacing unavailable"} ` +
+            'You can retry with "Generate pacing plan" below.',
+        );
+      } else {
+        setSaveNotice("Saved.");
+      }
       await refresh();
     } catch {
       setError("Could not save. Please try again.");
@@ -284,6 +305,11 @@ export function TermSyllabusManager({
           )}
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
+        {saveNotice && (
+          <p role="status" className="text-sm text-emerald-700" data-testid="syllabus-save-notice">
+            {saveNotice}
+          </p>
+        )}
       </Card>
 
       {parsed && summary && (

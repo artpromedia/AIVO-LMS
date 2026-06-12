@@ -1170,7 +1170,8 @@
       "msg_supports_title": "Deine Hilfen sind an",
       "msg_supports_body": "Vorlesen, ruhiges Tempo und {count, plural, one {# weitere Hilfe} other {# weitere Hilfen}} aus deinem IEP sind aktiv.",
       "msg_break_title": "Pausen sind gut",
-      "msg_break_body": "Streck dich, trink Wasser, schau aus dem Fenster. AIVO merkt sich deinen Platz."
+      "msg_break_body": "Streck dich, trink Wasser, schau aus dem Fenster. AIVO merkt sich deinen Platz.",
+      "planned_week_badge": "Für diese Woche geplant"
     },
     "common": {
       "learner_eyebrow": "Lernende/r",
@@ -3129,7 +3130,8 @@
     "tabs": {
       "this_week": "Diese Woche",
       "full_term": "Ganzes Halbjahr",
-      "school_calendar": "Schulkalender"
+      "school_calendar": "Schulkalender",
+      "next_week": "Nächste Woche"
     },
     "school_calendar": {
       "title": "Schulkalender",
@@ -3169,6 +3171,12 @@
       "plan_ready": "Plan fertig — {weeks} Wochen ({instruction} Unterricht), ferienbewusst.",
       "week_kind_break": "Schulferien",
       "week_kind_holiday_prep": "Ferienvorbereitung"
+    },
+    "next_week": {
+      "title": "Lektionen der nächsten Woche",
+      "empty": "Noch keine vorbereiteten Lektionen. Der Creator bereitet die kommende Woche jeden Sonntagabend vor.",
+      "ready_badge": "Spielbereit",
+      "generated_at": "Vorbereitet {date}"
     }
   }
 }

@@ -37,6 +37,9 @@ export type TodayMissionPlan = {
   source: LessonRunSource;
   /** Existing in-progress LessonRun to resume (null when we'd create a new one). */
   existingRunId: string | null;
+  /** Sprint 07: the resumed run's source — lets the home card badge
+   *  Creator-planned lessons ("weekly_creator"). Null for fresh missions. */
+  existingRunSource?: LessonRunSource | null;
   subjectId: string;
   subjectName: string;
   skillId: string;
@@ -87,13 +90,23 @@ export async function pickTodaysMission(
   const learner = await getLearner(learnerId, tenantId);
   if (!learner) return { ready: false, blocker: "no_learner" };
 
-  // 1. Resume in-progress LessonRun.
-  const inProgress: LessonRun | undefined = Array.from(store.lessonRuns.values()).find(
-    (r) =>
-      r.learnerId === learnerId &&
-      r.tenantId === tenantId &&
-      (r.status === "in_progress" || r.status === "ready"),
-  );
+  // 1. Resume in-progress LessonRun. Sprint 07: with the Creator
+  // pre-generating one ready run per subject, selection must be
+  // DETERMINISTIC — in-progress work first, then ready runs oldest-first
+  // (the order the Creator planned the week), id as the tiebreaker.
+  const inProgress: LessonRun | undefined = Array.from(store.lessonRuns.values())
+    .filter(
+      (r) =>
+        r.learnerId === learnerId &&
+        r.tenantId === tenantId &&
+        (r.status === "in_progress" || r.status === "ready"),
+    )
+    .sort(
+      (a, b) =>
+        (a.status === "in_progress" ? 0 : 1) - (b.status === "in_progress" ? 0 : 1) ||
+        a.createdAt.localeCompare(b.createdAt) ||
+        a.id.localeCompare(b.id),
+    )[0];
   if (inProgress) {
     const subj = store.subjects.get(inProgress.subjectId);
     const skill = store.skills.get(inProgress.skillId);
@@ -102,6 +115,7 @@ export async function pickTodaysMission(
         ready: true,
         mission: {
           kind: "resume_in_progress",
+          existingRunSource: inProgress.source,
           source: inProgress.source,
           existingRunId: inProgress.id,
           subjectId: subj.id,
