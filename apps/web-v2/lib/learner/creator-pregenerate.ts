@@ -19,7 +19,7 @@
  */
 import { getPersistence } from "@/lib/db/persistence";
 import { createLessonRun } from "@/lib/db/repos";
-import type { LearningPathNode, LessonRun } from "@/lib/db/types";
+import type { LearningPathNode } from "@/lib/db/types";
 
 /** Mirrors the learner home's mission ordering (lib/learner/today.ts). */
 const KIND_PRIORITY: Record<LearningPathNode["kind"], number> = {
@@ -68,8 +68,41 @@ export async function pickNextPathTarget(
   return null;
 }
 
-function hasOpenRun(runs: LessonRun[]): boolean {
-  return runs.some((r) => r.status === "ready" || r.status === "in_progress");
+/** Sprint 07: per-week lesson budget per learner (one per enrolled subject,
+ *  capped so a wide path can never fan out unboundedly). */
+export const MAX_WEEK_LESSONS_PER_LEARNER = 5;
+
+/**
+ * Sprint 07 — enumerate the learner's COMING WEEK: one target per
+ * learning-path subject (first eligible node per subject by the same
+ * kind-priority/completion semantics the learner home uses), capped at
+ * MAX_WEEK_LESSONS_PER_LEARNER.
+ */
+export async function enumerateWeekTargets(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearningPathNode[]> {
+  const persistence = getPersistence();
+  const path = await persistence.curriculum.getLearningPath(learnerId, tenantId);
+  if (!path || path.nodes.length === 0) return [];
+  const runs = await persistence.lessonRuns.listForLearner(learnerId, tenantId, { limit: 200 });
+  const completedRuns = runs.filter((r) => r.status === "completed");
+  const completedNodeIds = new Set(
+    completedRuns.map((r) => r.sourceRefId).filter((id): id is string => Boolean(id)),
+  );
+  const completedSkillIds = new Set(completedRuns.map((r) => r.skillId));
+  const candidates = [...path.nodes].sort(
+    (a, b) => KIND_PRIORITY[a.kind] - KIND_PRIORITY[b.kind] || a.order - b.order,
+  );
+  const bySubject = new Map<string, LearningPathNode>();
+  for (const node of candidates) {
+    if (bySubject.has(node.subjectId)) continue;
+    if (completedNodeIds.has(node.id)) continue;
+    if (node.kind !== "review" && completedSkillIds.has(node.skillId)) continue;
+    bySubject.set(node.subjectId, node);
+    if (bySubject.size >= MAX_WEEK_LESSONS_PER_LEARNER) break;
+  }
+  return [...bySubject.values()];
 }
 
 /**
@@ -100,34 +133,50 @@ export async function pregenerateNextLessons(input: {
       result.scanned += 1;
       try {
         const runs = await persistence.lessonRuns.listForLearner(learner.id, tenantId, {
-          limit: 50,
+          limit: 100,
         });
-        if (hasOpenRun(runs)) {
+        // Sprint 07: the Creator prepares the WHOLE coming week — one lesson
+        // per enrolled subject. Idempotency is per subject: a subject with an
+        // open (ready/in_progress) run is skipped, so re-runs top the week
+        // up without ever stacking duplicates.
+        const openSubjectIds = new Set(
+          runs
+            .filter((r) => r.status === "ready" || r.status === "in_progress")
+            .map((r) => r.subjectId),
+        );
+        const targets = (await enumerateWeekTargets(learner.id, tenantId)).filter(
+          (t) => !openSubjectIds.has(t.subjectId),
+        );
+        if (targets.length === 0) {
+          if (openSubjectIds.size > 0) result.skippedExistingRun += 1;
+          else result.skippedNoPath += 1;
+          continue;
+        }
+        let generatedForLearner = 0;
+        for (const target of targets) {
+          const created = await createLessonRun({
+            learnerId: learner.id,
+            tenantId,
+            subjectId: target.subjectId,
+            skillId: target.skillId,
+            source: "weekly_creator",
+            sourceRefId: target.id,
+          });
+          if (created.ok) {
+            generatedForLearner += 1;
+            result.generated += 1;
+            if (result.createdRunIds.length < 25) result.createdRunIds.push(created.lessonRun.id);
+          } else if (created.code === "brain_profile_missing") {
+            // Not onboarded far enough for generation — expected for
+            // learners who haven't completed the baseline; not a failure.
+            result.skippedNotReady += 1;
+            break;
+          } else {
+            result.failed += 1;
+          }
+        }
+        if (generatedForLearner === 0 && openSubjectIds.size > 0) {
           result.skippedExistingRun += 1;
-          continue;
-        }
-        const target = await pickNextPathTarget(learner.id, tenantId);
-        if (!target) {
-          result.skippedNoPath += 1;
-          continue;
-        }
-        const created = await createLessonRun({
-          learnerId: learner.id,
-          tenantId,
-          subjectId: target.subjectId,
-          skillId: target.skillId,
-          source: "subject_path",
-          sourceRefId: target.id,
-        });
-        if (created.ok) {
-          result.generated += 1;
-          if (result.createdRunIds.length < 25) result.createdRunIds.push(created.lessonRun.id);
-        } else if (created.code === "brain_profile_missing") {
-          // Not onboarded far enough for generation — expected for learners
-          // who haven't completed the baseline; not a failure.
-          result.skippedNotReady += 1;
-        } else {
-          result.failed += 1;
         }
       } catch {
         result.failed += 1;

@@ -1170,7 +1170,8 @@
       "msg_supports_title": "あなたのサポートはオンです",
       "msg_supports_body": "読み上げ、落ち着いたペース、そして IEP からの{count, plural, other {他 # 件のサポート}}が有効です。",
       "msg_break_title": "休憩はいいこと",
-      "msg_break_body": "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。"
+      "msg_break_body": "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。",
+      "planned_week_badge": "今週の予定レッスン"
     },
     "common": {
       "learner_eyebrow": "学習者",
@@ -3129,7 +3130,8 @@
     "tabs": {
       "this_week": "今週",
       "full_term": "学期全体",
-      "school_calendar": "学校カレンダー"
+      "school_calendar": "学校カレンダー",
+      "next_week": "来週"
     },
     "school_calendar": {
       "title": "学校カレンダー",
@@ -3169,6 +3171,12 @@
       "plan_ready": "計画完成 — 全{weeks}週（授業{instruction}週）、休暇対応。",
       "week_kind_break": "学校休暇",
       "week_kind_holiday_prep": "休暇準備"
+    },
+    "next_week": {
+      "title": "来週のレッスン",
+      "empty": "事前生成されたレッスンはまだありません。クリエイターは毎週日曜の夜に翌週分を準備します。",
+      "ready_badge": "プレイ可能",
+      "generated_at": "{date} に準備済み"
     }
   }
 }

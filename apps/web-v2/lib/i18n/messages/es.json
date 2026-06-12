@@ -1170,7 +1170,8 @@
       "msg_supports_title": "Tus apoyos están activados",
       "msg_supports_body": "La lectura en voz alta, el ritmo tranquilo y {count, plural, one {# apoyo más} other {# apoyos más}} de tu IEP están activos.",
       "msg_break_title": "Los descansos son buenos",
-      "msg_break_body": "Estírate, bebe agua, mira por la ventana. AIVO guardará tu lugar."
+      "msg_break_body": "Estírate, bebe agua, mira por la ventana. AIVO guardará tu lugar.",
+      "planned_week_badge": "Planificada para esta semana"
     },
     "common": {
       "learner_eyebrow": "Estudiante",
@@ -3129,7 +3130,8 @@
     "tabs": {
       "this_week": "Esta semana",
       "full_term": "Trimestre completo",
-      "school_calendar": "Calendario escolar"
+      "school_calendar": "Calendario escolar",
+      "next_week": "Próxima semana"
     },
     "school_calendar": {
       "title": "Calendario escolar",
@@ -3169,6 +3171,12 @@
       "plan_ready": "Plan listo — {weeks} semanas ({instruction} lectivas), con descansos.",
       "week_kind_break": "Receso escolar",
       "week_kind_holiday_prep": "Preparación vacacional"
+    },
+    "next_week": {
+      "title": "Lecciones de la próxima semana",
+      "empty": "Aún no hay lecciones pregeneradas. El Creador prepara la próxima semana cada domingo por la noche.",
+      "ready_badge": "Lista para jugar",
+      "generated_at": "Preparada {date}"
     }
   }
 }

@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CurriculumManager } from "@/components/curriculum/curriculum-manager";
 import { TermSyllabusManager } from "@/components/curriculum/term-syllabus-manager";
 import { SchoolCalendarManager } from "@/components/curriculum/school-calendar-manager";
+import { NextWeekPanel } from "@/components/curriculum/next-week-panel";
 import {
   getLearner,
   listCurriculumUploadsForLearner,
@@ -31,8 +32,12 @@ export default async function ParentLearnerCurriculumPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
+  // Sprint 07 hardening: the uploads list rides on tutor-svc when the
+  // service token is configured. A dead upstream must not 500 the WHOLE
+  // page — the calendar / next-week / term tabs are independent of it, and
+  // the "this week" manager surfaces its own fetch errors client-side.
   const [uploads, subjects] = await Promise.all([
-    listCurriculumUploadsForLearner(learnerId, session.tenantId),
+    listCurriculumUploadsForLearner(learnerId, session.tenantId).catch(() => []),
     listSubjects(),
   ]);
 
@@ -53,6 +58,7 @@ export default async function ParentLearnerCurriculumPage({
           <TabsTrigger value="week">{t("this_week")}</TabsTrigger>
           <TabsTrigger value="term">{t("full_term")}</TabsTrigger>
           <TabsTrigger value="calendar">{t("school_calendar")}</TabsTrigger>
+          <TabsTrigger value="next_week">{t("next_week")}</TabsTrigger>
         </TabsList>
         <TabsContent value="week">
           <CurriculumManager
@@ -77,6 +83,9 @@ export default async function ParentLearnerCurriculumPage({
             learnerName={learner.displayName}
             summerBridgeApiBase={`/api/bff/parent/learners/${learnerId}/summer-bridge`}
           />
+        </TabsContent>
+        <TabsContent value="next_week">
+          <NextWeekPanel apiBase={`/api/bff/parent/learners/${learnerId}/next-week`} />
         </TabsContent>
       </Tabs>
     </AppShell>
