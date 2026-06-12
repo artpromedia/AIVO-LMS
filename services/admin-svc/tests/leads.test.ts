@@ -50,6 +50,49 @@ test("LEAD_TRANSITIONS: won/lost terminal; new→contacted allowed", async () =>
   assert.ok(!LEAD_TRANSITIONS.new.includes("won"));
 });
 
+test("parseLeadListQuery: defaults, clamps and whitelists (Sprint 11 paging)", async () => {
+  const { parseLeadListQuery } = await import("../src/routes/leads.js");
+
+  // Defaults when nothing is supplied.
+  assert.deepEqual(parseLeadListQuery({}), {
+    page: 1,
+    pageSize: 50,
+    status: undefined,
+    search: undefined,
+  });
+
+  // Page floors at 1; garbage falls back to defaults.
+  assert.equal(parseLeadListQuery({ page: "0" }).page, 1);
+  assert.equal(parseLeadListQuery({ page: "-3" }).page, 1);
+  assert.equal(parseLeadListQuery({ page: "banana" }).page, 1);
+  assert.equal(parseLeadListQuery({ page: "7" }).page, 7);
+
+  // Page size clamps to [1, 200].
+  assert.equal(parseLeadListQuery({ pageSize: "0" }).pageSize, 1);
+  assert.equal(parseLeadListQuery({ pageSize: "9999" }).pageSize, 200);
+  assert.equal(parseLeadListQuery({ pageSize: "25" }).pageSize, 25);
+  assert.equal(parseLeadListQuery({ pageSize: "nope" }).pageSize, 50);
+
+  // Status is whitelisted against the lifecycle; unknown values are dropped
+  // rather than passed into SQL.
+  assert.equal(parseLeadListQuery({ status: "qualified" }).status, "qualified");
+  assert.equal(parseLeadListQuery({ status: "Robert'); DROP" }).status, undefined);
+
+  // Search trims; whitespace-only collapses to undefined.
+  assert.equal(parseLeadListQuery({ search: "  ada " }).search, "ada");
+  assert.equal(parseLeadListQuery({ search: "   " }).search, undefined);
+});
+
+test("csvEscape: RFC 4180 quoting for commas, quotes, newlines and null", async () => {
+  const { csvEscape } = await import("../src/routes/leads.js");
+  assert.equal(csvEscape("plain"), "plain");
+  assert.equal(csvEscape(null), "");
+  assert.equal(csvEscape(undefined), "");
+  assert.equal(csvEscape("a,b"), '"a,b"');
+  assert.equal(csvEscape('say "hi"'), '"say ""hi"""');
+  assert.equal(csvEscape("line1\nline2"), '"line1\nline2"');
+});
+
 const stubDb = { execute: async () => ({}) } as any;
 
 async function bootstrap() {
@@ -74,6 +117,7 @@ test("lead read/patch reject missing token with 401", async () => {
   try {
     const cases: Array<["GET" | "PATCH", string]> = [
       ["GET", "/api/admin-svc/leads"],
+      ["GET", "/api/admin-svc/leads/export.csv"],
       ["GET", "/api/admin-svc/leads/abc"],
       ["PATCH", "/api/admin-svc/leads/abc/status"],
     ];
@@ -95,6 +139,7 @@ test("lead read/patch reject non-sales/non-admin with 403", async () => {
   try {
     const cases: Array<["GET" | "PATCH", string]> = [
       ["GET", "/api/admin-svc/leads"],
+      ["GET", "/api/admin-svc/leads/export.csv"],
       ["PATCH", "/api/admin-svc/leads/abc/status"],
     ];
     for (const [method, url] of cases) {

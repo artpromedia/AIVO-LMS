@@ -1,19 +1,75 @@
 import { requirePlatformPage } from "@aivo/admin-auth";
-import { listAdminTenants } from "@aivo/admin-api/platform";
-import { AdminPageFrame } from "@aivo/admin-ui";
-import { TenantsTable } from "@/components/admin-tables";
+import { listAdminTenantsPage } from "@aivo/admin-api/platform";
+import { AdminPageFrame, DataTable } from "@aivo/admin-ui";
+import { formatDateTime } from "@/components/admin-format";
 
-export default async function TenantsPage() {
-  const session = await requirePlatformPage("platform:read");
-  const tenants = await listAdminTenants(session);
+const PAGE_SIZE = 50;
+
+export default async function TenantsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; q?: string; sort?: string }>;
+}) {
+  const session = await requirePlatformPage("tenant:read");
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page) || 1);
+  const search = params.q?.trim() || undefined;
+  const sort = params.sort;
+  const result = await listAdminTenantsPage(session, {
+    page,
+    pageSize: PAGE_SIZE,
+    search,
+    sort,
+  });
 
   return (
     <AdminPageFrame
       eyebrow="Platform"
       title="Tenants"
-      description={`${tenants.length} districts, schools, and family accounts.`}
+      description={`${result.total.toLocaleString()} districts, schools, and family workspaces.`}
     >
-      <TenantsTable tenants={tenants} />
+      <div className="mt-8">
+        <DataTable
+          basePath="/platform/tenants"
+          rows={result.rows}
+          rowKey={(row) => row.id}
+          total={result.total}
+          page={result.page}
+          pageSize={result.pageSize}
+          search={search}
+          sort={sort}
+          exportHref={`/platform/tenants/export${search ? `?q=${encodeURIComponent(search)}` : ""}`}
+          emptyMessage="No tenants match."
+          searchPlaceholder="Search tenant name…"
+          columns={[
+            {
+              key: "name",
+              header: "Tenant",
+              sortKey: "name",
+              render: (row) => (
+                <a
+                  className="font-semibold text-blue-700 hover:underline"
+                  href={`/platform/tenants/${row.id}`}
+                >
+                  {row.name}
+                </a>
+              ),
+            },
+            { key: "type", header: "Type", render: (row) => row.typeLabel },
+            {
+              key: "status",
+              header: "Status",
+              render: (row) => <span className="admin-status">{row.status ?? "active"}</span>,
+            },
+            {
+              key: "created",
+              header: "Created",
+              sortKey: "createdAt",
+              render: (row) => formatDateTime(row.createdAt),
+            },
+          ]}
+        />
+      </div>
     </AdminPageFrame>
   );
 }

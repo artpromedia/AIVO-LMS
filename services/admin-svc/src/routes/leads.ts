@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { leadSubmissions } from "@aivo/db";
-import { desc, eq, sql } from "drizzle-orm";
+import { adminAuditLog, appendAudit, leadSubmissions } from "@aivo/db";
+import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { createLogger } from "@aivo/observability";
 import { verifyJWT } from "@aivo/security";
 import { adminSvcLeadsSchema, adminSvcNewsletterSchema } from "./schemas.js";
@@ -76,6 +76,48 @@ async function sendNewsletterConfirmation(email: string): Promise<void> {
     // Fail-soft: subscription is already stored; email failure is non-fatal.
     logger.warn({ err: String(err), email }, "Newsletter confirmation email failed");
   }
+}
+
+/** Parse + clamp lead list query params (pure; unit-tested). */
+export function parseLeadListQuery(query: {
+  status?: string;
+  page?: string;
+  pageSize?: string;
+  search?: string;
+}): { page: number; pageSize: number; status?: LeadStatus; search?: string } {
+  const rawPage = Number.parseInt(query.page ?? "", 10);
+  const page = Number.isFinite(rawPage) ? Math.max(1, rawPage) : 1;
+  const rawSize = Number.parseInt(query.pageSize ?? "", 10);
+  const pageSize = Number.isFinite(rawSize) ? Math.min(Math.max(1, rawSize), 200) : 50;
+  const status =
+    query.status && (LEAD_STATUSES as readonly string[]).includes(query.status)
+      ? (query.status as LeadStatus)
+      : undefined;
+  const search = query.search?.trim() ? query.search.trim() : undefined;
+  return { page, pageSize, status, search };
+}
+
+/** Shared status/search filter for list + export. */
+function leadWhere(status?: LeadStatus, search?: string) {
+  const conditions = [];
+  if (status) conditions.push(eq(leadSubmissions.status, status));
+  if (search) {
+    const term = `%${search}%`;
+    conditions.push(
+      or(
+        ilike(leadSubmissions.name, term),
+        ilike(leadSubmissions.email, term),
+        ilike(leadSubmissions.company, term),
+      ),
+    );
+  }
+  return conditions.length > 0 ? and(...conditions) : undefined;
+}
+
+/** RFC 4180-style CSV field escaping (pure; unit-tested). */
+export function csvEscape(v: unknown): string {
+  const str = v == null ? "" : String(v);
+  return /[",\n]/.test(str) ? `"${str.replaceAll('"', '""')}"` : str;
 }
 
 function normalizeLead(row: Record<string, unknown>): NormalizedLead {
@@ -181,17 +223,70 @@ export function registerLeadRoutes(app: FastifyInstance, db: any) {
 
   app.get("/api/admin-svc/leads", async (request, reply) => {
     if (!(await requireLeadAccess(request, reply))) return;
-    const query = (request.query ?? {}) as { status?: string };
-    const status = query.status;
-    const base = db.select().from(leadSubmissions);
-    const rows =
-      status && (LEAD_STATUSES as readonly string[]).includes(status)
-        ? await base
-            .where(eq(leadSubmissions.status, status))
-            .orderBy(desc(leadSubmissions.createdAt))
-            .limit(500)
-        : await base.orderBy(desc(leadSubmissions.createdAt)).limit(500);
-    return { leads: rows };
+    const { page, pageSize, status, search } = parseLeadListQuery(
+      (request.query ?? {}) as Record<string, string | undefined>,
+    );
+    const offset = (page - 1) * pageSize;
+    const where = leadWhere(status, search);
+
+    const [totalRow] = await db.select({ count: count() }).from(leadSubmissions).where(where);
+    const rows = await db
+      .select()
+      .from(leadSubmissions)
+      .where(where)
+      .orderBy(desc(leadSubmissions.createdAt))
+      .limit(pageSize)
+      .offset(offset);
+    return { leads: rows, total: Number(totalRow.count), page, pageSize };
+  });
+
+  // Sprint 11 — audited CSV export with the same status/search filters as
+  // the list endpoint. Streams up to 10k rows newest-first.
+  app.get("/api/admin-svc/leads/export.csv", async (request, reply) => {
+    const me = await requireLeadAccess(request, reply);
+    if (!me) return;
+    const { status, search } = parseLeadListQuery(
+      (request.query ?? {}) as Record<string, string | undefined>,
+    );
+    const where = leadWhere(status, search);
+
+    // Canonical 11-key writer profile (all keys, nulls explicit) so the
+    // chain verifier can recompute this row — mirrors exportIdentityCollection.
+    await appendAudit(db, "admin_audit_log", adminAuditLog, {
+      action: "admin.data.exported",
+      actorId: me.sub,
+      actorEmail: me.email ?? null,
+      actorRole: String(me.role ?? "UNKNOWN"),
+      onBehalfOfId: null,
+      resourceType: "leads",
+      resourceId: null,
+      tenantId: null,
+      details: { filters: { status: status ?? null, search: search ?? null } },
+      ipAddress: (request.headers["x-forwarded-for"] as string) || request.ip || null,
+      userAgent: (request.headers["user-agent"] as string) || null,
+    });
+
+    const rows = await db
+      .select()
+      .from(leadSubmissions)
+      .where(where)
+      .orderBy(desc(leadSubmissions.createdAt))
+      .limit(10_000);
+
+    const header = ["id", "type", "name", "email", "company", "source", "status", "createdAt"];
+    const csv = [
+      header.join(","),
+      ...rows.map((r: (typeof rows)[number]) =>
+        [r.id, r.type, r.name, r.email, r.company, r.source, r.status, r.createdAt?.toISOString?.() ?? r.createdAt]
+          .map(csvEscape)
+          .join(","),
+      ),
+    ].join("\n");
+
+    reply
+      .header("content-type", "text/csv; charset=utf-8")
+      .header("content-disposition", 'attachment; filename="leads.csv"')
+      .send(csv);
   });
 
   app.get("/api/admin-svc/leads/:id", async (request, reply) => {

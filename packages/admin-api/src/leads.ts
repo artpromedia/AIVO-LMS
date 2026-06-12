@@ -85,6 +85,35 @@ export async function listLeads(
   return rows.map((r) => mapLead(r as Record<string, unknown>));
 }
 
+export interface LeadListPage {
+  rows: AdminLead[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Paged lead list — search spans name / email / company; status optional. */
+export async function listLeadsPage(
+  session: Pick<SessionProfile, "role">,
+  opts: { page?: number; pageSize?: number; search?: string; status?: LeadStatus } = {},
+): Promise<LeadListPage> {
+  const page = Math.max(1, opts.page ?? 1);
+  const pageSize = Math.min(Math.max(1, opts.pageSize ?? 50), 200);
+  const payload = await adminGet<Record<string, unknown>>(session, "/api/admin-svc/leads", {
+    page,
+    pageSize,
+    ...(opts.search ? { search: opts.search } : {}),
+    ...(opts.status ? { status: opts.status } : {}),
+  });
+  const rows = Array.isArray(payload.leads) ? payload.leads : [];
+  return {
+    rows: rows.map((r) => mapLead(r as Record<string, unknown>)),
+    total: Number(payload.total ?? rows.length),
+    page,
+    pageSize,
+  };
+}
+
 /** Fetch a single lead, or null if it doesn't exist. */
 export async function getLead(
   session: Pick<SessionProfile, "role">,

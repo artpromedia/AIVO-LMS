@@ -21,6 +21,12 @@ export interface ConfirmDangerDialogProps {
   action: (formData: FormData) => void | Promise<void>;
   /** Hidden inputs posted with the action (ids etc.). */
   hiddenFields?: Record<string, string>;
+  /**
+   * Hidden inputs resolved when the dialog OPENS — for values that don't
+   * exist at render time (e.g. a bulk selection read from checkboxes).
+   * Merged over `hiddenFields`.
+   */
+  getHiddenFields?: () => Record<string, string>;
   trigger: React.ReactNode;
   triggerClassName?: string;
   title: string;
@@ -36,6 +42,7 @@ export interface ConfirmDangerDialogProps {
 export function ConfirmDangerDialog({
   action,
   hiddenFields = {},
+  getHiddenFields,
   trigger,
   triggerClassName,
   title,
@@ -49,9 +56,11 @@ export function ConfirmDangerDialog({
   const titleId = React.useId();
   const bodyId = React.useId();
   const [typed, setTyped] = React.useState("");
+  const [dynamicFields, setDynamicFields] = React.useState<Record<string, string>>({});
 
   const open = () => {
     setTyped("");
+    if (getHiddenFields) setDynamicFields(getHiddenFields());
     dialogRef.current?.showModal();
   };
   const close = () => dialogRef.current?.close();
@@ -70,7 +79,7 @@ export function ConfirmDangerDialog({
         className="admin-dialog"
       >
         <form action={action} onSubmit={() => close()} className="admin-dialog-form">
-          {Object.entries(hiddenFields).map(([name, value]) => (
+          {Object.entries({ ...hiddenFields, ...dynamicFields }).map(([name, value]) => (
             <input key={name} type="hidden" name={name} value={value} />
           ))}
           <h2 id={titleId} className="admin-dialog-title">
