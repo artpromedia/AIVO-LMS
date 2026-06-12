@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { TUTORS } from "@aivo/brand";
+import { TUTORS, type TutorKey } from "@aivo/brand";
 import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/player";
 import { requirePageRole } from "@/lib/auth/server";
 import type { GeneratedLessonPlan } from "@/lib/db/types";
@@ -43,7 +43,7 @@ const FIXTURE_SURFACE_TYPES: ReadonlySet<FixtureSurfaceType> = new Set([
 ]);
 
 type FixturePageProps = {
-  searchParams?: Promise<{ surfaceType?: string; agent?: string; sensory?: string }>;
+  searchParams?: Promise<{ surfaceType?: string; agent?: string; sensory?: string; tutor?: string }>;
 };
 
 function fixturePrompt(surfaceType: FixtureSurfaceType): string {
@@ -164,6 +164,11 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
     "hypo-visual": { visual: "hypo" },
   };
   const sensoryModalities = params?.sensory ? (FIXTURE_SENSORY[params.sensory] ?? null) : null;
+  // Sprint 15 — `?tutor=nova|sage|…` mounts the player with that tutor's
+  // identity treatment so the theming matrix can capture it deterministically.
+  const tutorSlug: TutorKey | null =
+    params?.tutor && params.tutor in TUTORS ? (params.tutor as TutorKey) : null;
+
   const requested = params?.surfaceType;
   const surfaceType: FixtureSurfaceType = FIXTURE_SURFACE_TYPES.has(requested as FixtureSurfaceType)
     ? (requested as FixtureSurfaceType)
@@ -192,6 +197,7 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
         learnerId={learnerId}
         lessonRunId={`lesson-run-fixture-${surfaceType}`}
         plan={fixturePlan(surfaceType)}
+        tutorSlug={tutorSlug}
         sensoryModalities={sensoryModalities}
         accessibility={{
           learnerId,

@@ -27,6 +27,7 @@ import {
   parentCanAccessLearner,
 } from "@/lib/db/repos";
 import { toStageFunctioningLevel } from "@aivo/stage-runtime";
+import { getSubjectBySlug } from "@aivo/brand";
 import { LessonPlayer, type LessonAgentConfig } from "./player";
 import { lessonPlayerV2Enabled, tutorAgenticModeEnabled } from "@/lib/feature-flags";
 import { isLiveTutorAgent } from "@/lib/bff/tutor-agent";
@@ -73,6 +74,13 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
   // on AND the live tutor-svc path is configured. With either condition
   // false `agent` stays null and the player renders byte-identically to
   // the pre-agent build.
+  // Sprint 15 — the lesson's owning tutor, from the canonical
+  // subject→tutor map in @aivo/brand. Null (unknown subject) renders the
+  // neutral chrome.
+  const tutorSlug = lessonSubject?.slug
+    ? (getSubjectBySlug(lessonSubject.slug)?.tutorKey ?? null)
+    : null;
+
   let agent: LessonAgentConfig | null = null;
   if (isLiveTutorAgent() && (await tutorAgenticModeEnabled())) {
     agent = agentForSubjectSlug(lessonSubject?.slug);
@@ -140,6 +148,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
         sessionId={lessonRun.id}
         subjectSlug={lessonSubject?.slug ?? null}
         agent={agent}
+        tutorSlug={tutorSlug}
       />
     </AppShell>
   );

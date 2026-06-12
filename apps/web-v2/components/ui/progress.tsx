@@ -6,15 +6,19 @@ import { cn } from "@/lib/utils";
 
 export const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & { value?: number }
->(({ className, value = 0, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & {
+    value?: number;
+    /** Extra classes for the fill bar (Sprint 15: tutor accent). */
+    indicatorClassName?: string;
+  }
+>(({ className, indicatorClassName, value = 0, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
     className={cn("relative h-2 w-full overflow-hidden rounded-full bg-aivo-surface-2", className)}
     {...props}
   >
     <ProgressPrimitive.Indicator
-      className="h-full bg-aivo-primary transition-transform"
+      className={cn("h-full bg-aivo-primary transition-transform", indicatorClassName)}
       style={{ transform: `translateX(-${100 - (value ?? 0)}%)` }}
     />
   </ProgressPrimitive.Root>

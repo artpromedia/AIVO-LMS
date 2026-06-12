@@ -23,6 +23,7 @@ import {
   sensoryCSSVars,
   toStageSensoryProfile,
 } from "@aivo/stage-runtime";
+import { type TutorKey, tutorThemeCSSVars } from "@aivo/brand";
 import type { FunctioningLevel } from "@aivo/stage-ui";
 import type { SurfaceTelemetryEvent } from "@aivo/learner-surfaces";
 import type { AccessibilityPreferences } from "@/lib/db/types";
@@ -40,6 +41,13 @@ export function a11yRootClass(accessibility: AccessibilityPreferences): string {
 export interface StagePresentation {
   rootClass: string;
   stageVars: CSSProperties;
+  /**
+   * Sprint 15 — true when the tutor accent vars are emitted. The
+   * suppression rule lives HERE (one place): high-contrast mode always
+   * wins, so the vars are withheld and every var()-consuming accent site
+   * falls back to its neutral treatment.
+   */
+  tutorThemed: boolean;
   stageDensity: "minimal" | "reduced" | "standard";
   /** Surfaces consume reducedMotion through their existing settings prop. */
   effectiveAccessibility: AccessibilityPreferences;
@@ -56,6 +64,7 @@ export function deriveStagePresentation(
   accessibility: AccessibilityPreferences,
   sensoryModalities: Record<string, string> | null,
   functioningLevel: FunctioningLevel,
+  tutorSlug?: TutorKey | null,
 ): StagePresentation {
   // ----- Accessibility-derived classes + DOM attributes -----
   // Dyslexia font is applied via `data-typeface="dyslexia"` (see below), which
@@ -73,7 +82,13 @@ export function deriveStagePresentation(
     toStageSensoryProfile(sensoryModalities),
     { functioningLevel },
   );
-  const stageVars = sensoryCSSVars(sensoryAdaptations) as CSSProperties;
+  // Sensory supremacy: tutor accents are dropped entirely under
+  // high-contrast — the HC palette owns every color decision there.
+  const tutorThemed = Boolean(tutorSlug) && !accessibility.highContrast;
+  const stageVars = {
+    ...(sensoryCSSVars(sensoryAdaptations) as CSSProperties),
+    ...(tutorThemed && tutorSlug ? tutorThemeCSSVars(tutorSlug) : {}),
+  } as CSSProperties;
   const stageDensity =
     sensoryAdaptations.maxOnScreenElements <= 3
       ? "minimal"
@@ -102,6 +117,7 @@ export function deriveStagePresentation(
   return {
     rootClass,
     stageVars,
+    tutorThemed,
     stageDensity,
     effectiveAccessibility,
     motionOff,
@@ -113,6 +129,10 @@ export function deriveStagePresentation(
 export interface AccessibilityShellProps {
   accessibility: AccessibilityPreferences;
   presentation: StagePresentation;
+  /** Sprint 15 — marks the lesson DOM with the owning tutor (always set
+   *  when known, even in high-contrast where the accent VARS are
+   *  suppressed — the attribute itself is non-visual). */
+  tutorSlug?: TutorKey | null;
   /** AAC activations mirror into the surface-telemetry sink. */
   onSurfaceTelemetry: (event: SurfaceTelemetryEvent) => void;
   children: ReactNode;
@@ -121,6 +141,7 @@ export interface AccessibilityShellProps {
 export function AccessibilityShell({
   accessibility,
   presentation,
+  tutorSlug,
   onSurfaceTelemetry,
   children,
 }: AccessibilityShellProps) {
@@ -129,6 +150,7 @@ export function AccessibilityShell({
       className={`${presentation.rootClass} [filter:saturate(var(--stage-saturation,100%))]`}
       style={presentation.stageVars}
       data-stage-density={presentation.stageDensity}
+      data-tutor={tutorSlug ?? undefined}
       {...presentation.a11yAttrs}
     >
       {children}

@@ -304,3 +304,17 @@ body {
     repeating-linear-gradient(-45deg, #d97706 0, #d97706 2px, transparent 2px, transparent 22px);
   background-repeat: repeat, repeat;
 }
+
+/* Sprint 15 — sensory supremacy for tutor theming. The GLOBAL
+   high-contrast mode (aivo.sensoryMode cookie → <html data-sensory-mode>)
+   strips the tutor accent custom properties so every accent site falls
+   back to its neutral treatment. !important is required and correct here:
+   the shell applies the vars as inline styles on the [data-tutor] node,
+   and only an important stylesheet declaration outranks inline values.
+   (The per-learner highContrast preference is suppressed earlier, in
+   deriveStagePresentation — this rule covers the global mode.) */
+[data-sensory-mode="high-contrast"] [data-tutor] {
+  --tutor-accent: initial !important;
+  --tutor-accent-soft: initial !important;
+  --tutor-accent-ink: initial !important;
+}

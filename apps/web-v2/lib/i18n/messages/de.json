@@ -1386,6 +1386,64 @@
       "title": "Stimme & Tempo.",
       "body": "Wähle die Vorlesestimme und ihr Tempo.",
       "link": "Stimm-Einstellungen öffnen"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "Hallo, ich bin Nova! Lass uns die Zahlen-Galaxie erkunden.",
+        "celebrate": "Sternenstarke Arbeit! Du hast die Zahlen zum Leuchten gebracht."
+      },
+      "sage": {
+        "welcome": "Hier ist Sage — ich habe einen Geschichtenpfad nur für dich.",
+        "celebrate": "Wunderbar gelesen! Die Geschichte wurde mit dir noch schöner."
+      },
+      "spark": {
+        "welcome": "Hier ist Spark! Bereit, etwas Erstaunliches zu entdecken?",
+        "celebrate": "Toll experimentiert! Deine Neugier hat das Labor erhellt."
+      },
+      "chrono": {
+        "welcome": "Hier ist Chrono — reisen wir zusammen in die Vergangenheit.",
+        "celebrate": "Was für eine Reise! Du hast Geschichte lebendig gemacht."
+      },
+      "pixel": {
+        "welcome": "Hier ist Pixel! Bauen wir etwas Cooles, Schritt für Schritt.",
+        "celebrate": "High five! Dein Code lief wie am Schnürchen."
+      },
+      "echo": {
+        "welcome": "Hallo, ich bin Echo! Wärmen wir unsere Stimmen auf.",
+        "celebrate": "Schön gesprochen! Deine Worte waren laut und klar."
+      },
+      "harmony": {
+        "welcome": "Hier ist Harmony. Atme tief durch — das ist dein Raum.",
+        "celebrate": "Du hast heute viel Herz gezeigt. Sei stolz auf dich."
+      },
+      "atlas": {
+        "welcome": "Hier ist Atlas! Lass uns die Welt erkunden.",
+        "celebrate": "Tolle Expedition! Du hast heute viel von der Welt entdeckt."
+      },
+      "cadence": {
+        "welcome": "Hier ist Cadence! Spürst du den Takt? Machen wir Musik.",
+        "celebrate": "Bravo! Dein Rhythmus hat den Raum erfüllt."
+      },
+      "vigor": {
+        "welcome": "Hier ist Vigor! Dehnen, bewegen, stark werden — los!",
+        "celebrate": "Super! Du hast heute deine beste Energie gegeben."
+      },
+      "lingua": {
+        "welcome": "Hallo! Hier ist Lingua — lernen wir Wörter aus aller Welt.",
+        "celebrate": "Fantastisch! Du hast heute eine neue Sprache gesprochen."
+      },
+      "forge": {
+        "welcome": "Hier ist Forge! Hol dein Werkzeug — wir bauen und testen Ideen.",
+        "celebrate": "Stabil gebaut! Deine Erfindung hat gehalten."
+      },
+      "compass": {
+        "welcome": "Hier ist Compass. Ein kleiner Schritt nach dem anderen — ich führe dich.",
+        "celebrate": "Genau auf Kurs! Du hast es geplant und geschafft."
+      },
+      "muse": {
+        "welcome": "Hier ist Muse! Deine Fantasie ist heute der Pinsel.",
+        "celebrate": "Wunderschön! Deine Ideen wurden echte Kunst."
+      }
     }
   },
   "auth": {

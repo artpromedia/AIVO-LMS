@@ -30,6 +30,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { AudioControlBar, FocusMode } from "@/components/playful-calm";
 import { InLessonTutorPanel } from "@/components/learner/in-lesson-tutor-panel";
 import type { FunctioningLevel } from "@aivo/stage-ui";
+import type { TutorKey } from "@aivo/brand";
 import type { LessonAgentConfig } from "@/lib/learner/agent-directives";
 import type {
   AccessibilityPreferences,
@@ -43,6 +44,8 @@ import {
 } from "./accessibility-shell";
 import { BreakScreen } from "./break-screen";
 import { StaticBeat } from "./beats/static-beat";
+import { WelcomeBeat } from "./beats/welcome-beat";
+import { CelebrateBeat } from "./beats/celebrate-beat";
 import { ExampleBeat } from "./beats/example-beat";
 import { GuidedBeat } from "./beats/guided-beat";
 import { CheckBeat } from "./beats/check-beat";
@@ -73,6 +76,10 @@ type Props = {
   sessionId?: string;
   subjectSlug?: string | null;
   agent?: LessonAgentConfig | null;
+  /** Sprint 15 — owning tutor for the lesson's identity treatment
+   *  (accent vars, portrait, signature lines). Resolved server-side from
+   *  the plan's subject; null renders the neutral pre-15 chrome. */
+  tutorSlug?: TutorKey | null;
 };
 
 export function LessonPlayer({
@@ -84,6 +91,7 @@ export function LessonPlayer({
   functioningLevel = "STANDARD",
   initialStatus,
   agent,
+  tutorSlug = null,
 }: Props) {
   const t = useTranslations("learner.lesson_player");
   const machine = useBeatMachine({
@@ -98,6 +106,7 @@ export function LessonPlayer({
     accessibility,
     sensoryModalities,
     functioningLevel,
+    tutorSlug,
   );
   const { beat, stepIdx, beats, isLastBeat, isInteractive } = machine;
 
@@ -116,6 +125,7 @@ export function LessonPlayer({
     <AccessibilityShell
       accessibility={accessibility}
       presentation={presentation}
+      tutorSlug={tutorSlug}
       onSurfaceTelemetry={machine.emitSurfaceTelemetry}
     >
       {plan.lessonMode === "holiday_prep" ? (
@@ -166,6 +176,9 @@ export function LessonPlayer({
         <Progress
           value={((stepIdx + 1) / beats.length) * 100}
           aria-label={`Step ${stepIdx + 1} of ${beats.length}`}
+          indicatorClassName={
+            presentation.tutorThemed ? "bg-[color:var(--tutor-accent)]" : undefined
+          }
         />
         <p className="mt-1 text-xs text-aivo-ink-soft" aria-live="polite">
           {t("step_of", { current: stepIdx + 1, total: beats.length })}
@@ -176,11 +189,25 @@ export function LessonPlayer({
         <Card className={`p-6 ${presentation.transitionClass}`}>
           {/* Each beat sets aria-live so read-aloud announces it. */}
           <div aria-live="polite" className="space-y-4">
-            {beat.kind === "welcome" ||
-            beat.kind === "goal" ||
+            {beat.kind === "welcome" ? (
+              <WelcomeBeat
+                body={beat.body}
+                tutorSlug={tutorSlug}
+                motionOff={presentation.motionOff}
+              />
+            ) : null}
+
+            {beat.kind === "celebrate" ? (
+              <CelebrateBeat
+                body={beat.body}
+                tutorSlug={tutorSlug}
+                motionOff={presentation.motionOff}
+              />
+            ) : null}
+
+            {beat.kind === "goal" ||
             beat.kind === "story" ||
             beat.kind === "micro" ||
-            beat.kind === "celebrate" ||
             beat.kind === "progress" ||
             beat.kind === "next" ? (
               <StaticBeat body={beat.body} />

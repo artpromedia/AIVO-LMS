@@ -1386,6 +1386,64 @@
       "title": "Voix et vitesse.",
       "body": "Choisissez la voix de lecture et son débit.",
       "link": "Ouvrir les réglages de voix"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "Salut, c'est Nova ! Explorons ensemble la galaxie des nombres.",
+        "celebrate": "Travail stellaire ! Tu as fait briller les nombres aujourd'hui."
+      },
+      "sage": {
+        "welcome": "Ici Sage — j'ai trouvé un chemin d'histoires rien que pour toi.",
+        "celebrate": "Quelle belle lecture ! L'histoire a brillé grâce à toi."
+      },
+      "spark": {
+        "welcome": "Ici Spark ! Prêt à découvrir quelque chose d'incroyable ?",
+        "celebrate": "Belle expérience ! Ta curiosité a illuminé le labo."
+      },
+      "chrono": {
+        "welcome": "Ici Chrono — voyageons ensemble dans le passé.",
+        "celebrate": "Quel voyage ! Tu as fait vivre l'histoire aujourd'hui."
+      },
+      "pixel": {
+        "welcome": "Ici Pixel ! Construisons un truc génial, étape par étape.",
+        "celebrate": "Tope là ! Ton code a marché à merveille."
+      },
+      "echo": {
+        "welcome": "Salut, c'est Echo ! Échauffons nos voix ensemble.",
+        "celebrate": "Tu as très bien parlé ! Tes mots étaient clairs et forts."
+      },
+      "harmony": {
+        "welcome": "Ici Harmony. Respire — cet espace est à toi.",
+        "celebrate": "Tu as montré un grand cœur aujourd'hui. Sois fier de toi."
+      },
+      "atlas": {
+        "welcome": "Ici Atlas ! Partons explorer le monde.",
+        "celebrate": "Belle expédition ! Tu as découvert tant de choses."
+      },
+      "cadence": {
+        "welcome": "Ici Cadence ! Tu sens le rythme ? Faisons de la musique.",
+        "celebrate": "Bravo ! Ton rythme a rempli toute la pièce."
+      },
+      "vigor": {
+        "welcome": "Ici Vigor ! On s'étire, on bouge, on devient fort.",
+        "celebrate": "Bien joué ! Tu as donné ta meilleure énergie."
+      },
+      "lingua": {
+        "welcome": "Bonjour ! Ici Lingua — apprenons des mots du monde entier.",
+        "celebrate": "Fantastique ! Tu as parlé une nouvelle langue aujourd'hui."
+      },
+      "forge": {
+        "welcome": "Ici Forge ! Prends tes outils — construisons et testons des idées.",
+        "celebrate": "Belle construction ! Ton invention a tenu bon."
+      },
+      "compass": {
+        "welcome": "Ici Compass. Un petit pas à la fois — je te guide.",
+        "celebrate": "Bon cap ! Tu l'as planifié et tu l'as fait."
+      },
+      "muse": {
+        "welcome": "Ici Muse ! Ton imagination est le pinceau aujourd'hui.",
+        "celebrate": "Magnifique ! Tes idées sont devenues de l'art."
+      }
     }
   },
   "auth": {

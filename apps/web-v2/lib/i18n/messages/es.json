@@ -1386,6 +1386,64 @@
       "title": "Voz y velocidad.",
       "body": "Elige la voz de lectura y su rapidez.",
       "link": "Abrir ajustes de voz"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "¡Hola, soy Nova! Exploremos juntos la galaxia de los números.",
+        "celebrate": "¡Trabajo estelar! Hoy hiciste brillar los números."
+      },
+      "sage": {
+        "welcome": "Aquí Sage: encontré un camino de cuentos solo para ti.",
+        "celebrate": "¡Qué bien leíste! Ese cuento brilló más contigo."
+      },
+      "spark": {
+        "welcome": "¡Aquí Spark! ¿Listo para descubrir algo asombroso?",
+        "celebrate": "¡Gran experimento! Tu curiosidad iluminó el laboratorio."
+      },
+      "chrono": {
+        "welcome": "Aquí Chrono: viajemos juntos al pasado.",
+        "celebrate": "¡Qué viaje! Hoy le diste vida a la historia."
+      },
+      "pixel": {
+        "welcome": "¡Aquí Pixel! Construyamos algo genial, paso a paso.",
+        "celebrate": "¡Choca esos cinco! Tu código funcionó de maravilla."
+      },
+      "echo": {
+        "welcome": "¡Hola, soy Echo! Calentemos la voz juntos.",
+        "celebrate": "¡Hablaste precioso! Tus palabras se oyeron fuerte y claro."
+      },
+      "harmony": {
+        "welcome": "Aquí Harmony. Respira hondo: este es tu espacio.",
+        "celebrate": "Hoy mostraste mucho corazón. Siéntete orgulloso."
+      },
+      "atlas": {
+        "welcome": "¡Aquí Atlas! Salgamos a explorar el mundo.",
+        "celebrate": "¡Gran expedición! Hoy descubriste mucho del mundo."
+      },
+      "cadence": {
+        "welcome": "¡Aquí Cadence! ¿Sientes el ritmo? Hagamos música.",
+        "celebrate": "¡Bravo! Tu ritmo llenó toda la sala."
+      },
+      "vigor": {
+        "welcome": "¡Aquí Vigor! A estirar, movernos y hacernos fuertes.",
+        "celebrate": "¡Muy bien! Hoy diste tu mejor energía."
+      },
+      "lingua": {
+        "welcome": "¡Hola! Aquí Lingua: aprendamos palabras de todo el mundo.",
+        "celebrate": "¡Fantástico! Hoy hablaste un idioma nuevo."
+      },
+      "forge": {
+        "welcome": "¡Aquí Forge! Toma tus herramientas: a construir y probar ideas.",
+        "celebrate": "¡Buena construcción! Tu invento aguantó firme."
+      },
+      "compass": {
+        "welcome": "Aquí Compass. Un pasito a la vez: yo te guío.",
+        "celebrate": "¡Buen rumbo! Lo planeaste y lo lograste."
+      },
+      "muse": {
+        "welcome": "¡Aquí Muse! Hoy tu imaginación es el pincel.",
+        "celebrate": "¡Precioso! Tus ideas se volvieron arte de verdad."
+      }
     }
   },
   "auth": {

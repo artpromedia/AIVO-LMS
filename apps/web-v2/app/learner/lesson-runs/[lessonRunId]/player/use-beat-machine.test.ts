@@ -108,7 +108,7 @@ function mount(
 }
 
 const submit = (answer: string) => ({
-  response: { answer },
+  response: { surfaceId: "s", answer },
   isCorrect: null,
   surfaceId: "s",
   occurredAt: new Date().toISOString(),

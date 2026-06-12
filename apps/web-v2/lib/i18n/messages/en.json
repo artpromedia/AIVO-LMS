@@ -1584,6 +1584,64 @@
       "title": "Voice & speed.",
       "body": "Pick the read-aloud voice and how fast it talks.",
       "link": "Open voice settings"
+    },
+    "tutor_lines": {
+      "nova": {
+        "welcome": "Hi, I'm Nova! Let's explore the number galaxy together.",
+        "celebrate": "Stellar work! You made the numbers shine today."
+      },
+      "sage": {
+        "welcome": "Sage here — I found a story path just for you.",
+        "celebrate": "Wonderful reading! That story grew brighter with you in it."
+      },
+      "spark": {
+        "welcome": "Spark here! Ready to discover something amazing?",
+        "celebrate": "Great experimenting! Your curiosity lit up the whole lab."
+      },
+      "chrono": {
+        "welcome": "Chrono here — let's travel back in time together.",
+        "celebrate": "What a journey! You brought history to life today."
+      },
+      "pixel": {
+        "welcome": "Pixel here! Let's build something cool, one step at a time.",
+        "celebrate": "High five! Your code ran like a charm."
+      },
+      "echo": {
+        "welcome": "Hi, I'm Echo! Let's warm up our voices together.",
+        "celebrate": "Beautiful speaking! Your words came through loud and clear."
+      },
+      "harmony": {
+        "welcome": "Harmony here. Take a breath — this is your space.",
+        "celebrate": "You showed real heart today. Be proud of yourself."
+      },
+      "atlas": {
+        "welcome": "Atlas here! Let's set off and explore the world.",
+        "celebrate": "Amazing trek! You discovered so much of the world today."
+      },
+      "cadence": {
+        "welcome": "Cadence here! Can you feel the beat? Let's make music.",
+        "celebrate": "Bravo! Your rhythm filled the room today."
+      },
+      "vigor": {
+        "welcome": "Vigor here! Let's stretch, move, and get strong together.",
+        "celebrate": "Way to go! You gave it your best energy today."
+      },
+      "lingua": {
+        "welcome": "¡Hola! Lingua here — let's learn new words from around the world.",
+        "celebrate": "Fantastic! You spoke a whole new language today."
+      },
+      "forge": {
+        "welcome": "Forge here! Grab your tools — let's build and test ideas.",
+        "celebrate": "Solid build! Your invention held strong today."
+      },
+      "compass": {
+        "welcome": "Compass here. One small step at a time — I'll guide you.",
+        "celebrate": "Right on course! You planned it and you did it."
+      },
+      "muse": {
+        "welcome": "Muse here! Your imagination is the paintbrush today.",
+        "celebrate": "Gorgeous work! Your ideas turned into real art."
+      }
     }
   },
   "onboarding": {
