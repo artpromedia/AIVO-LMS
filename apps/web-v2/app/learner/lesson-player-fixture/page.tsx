@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { TUTORS } from "@aivo/brand";
-import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/lesson-player";
+import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/player";
 import { requirePageRole } from "@/lib/auth/server";
 import type { GeneratedLessonPlan } from "@/lib/db/types";
 

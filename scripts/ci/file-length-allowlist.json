@@ -1,0 +1,29 @@
+{
+  "comment": "Sprint 12 frozen baseline for check-file-length.mjs (600-line max). Entries record the line count at freeze time — growing past it fails CI. This list only shrinks: decompose a file, delete its entry. Never add.",
+  "files": {
+    "apps/web-v2/app/learner/baseline/[baselineId]/page.tsx": {
+      "lines": 679,
+      "reason": "Baseline assessment runner — discovered at Sprint 12 freeze; future decomposition."
+    },
+    "apps/web-v2/app/parent/learners/[learnerId]/assessment/page.tsx": {
+      "lines": 1145,
+      "reason": "Parent assessment review — known audit offender; future decomposition."
+    },
+    "apps/web-v2/components/admin/import/csv-import-wizard.tsx": {
+      "lines": 722,
+      "reason": "CSV import wizard — known audit offender; future decomposition."
+    },
+    "apps/mobile/src/components/learning/MobileSurfaceRenderer.tsx": {
+      "lines": 1579,
+      "reason": "Mobile surface monolith — Sprint 13 decomposes it and removes this entry."
+    },
+    "apps/mobile/src/components/settings/AccountSettingsCard.tsx": {
+      "lines": 831,
+      "reason": "Mobile account settings — discovered at Sprint 12 freeze; future decomposition."
+    },
+    "apps/mobile/src/components/settings/MfaFactorsCard.tsx": {
+      "lines": 628,
+      "reason": "Mobile MFA factors — discovered at Sprint 12 freeze; future decomposition."
+    }
+  }
+}

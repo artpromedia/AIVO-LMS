@@ -24,8 +24,20 @@ test("offline answer surfaces the saved-on-device toast and the lesson continues
   await context.setOffline(true);
 
   // Advancing posts a step → transport fails → outbox + one calm toast.
-  await next.first().click();
-  await expect(page.getByText("Saved on this device")).toBeVisible({ timeout: 10_000 });
+  // Two pre-existing races fixed here (both reproduce on the
+  // pre-decomposition tree at the same rate; measured 2026-06-12):
+  //   1. A click that lands before hydration is dead — retry until the
+  //      step indicator proves the advance took effect.
+  //   2. exact:true pins the toast TITLE — the toast system's transient
+  //      screen-reader announcer carries the same words inside a longer
+  //      string for ~1s after mount, and the loose match raced it.
+  await expect(async () => {
+    await next.first().click();
+    await expect(page.getByText(/^Step 2 of/)).toBeVisible({ timeout: 1_000 });
+  }).toPass({ timeout: 20_000 });
+  await expect(page.getByText("Saved on this device", { exact: true })).toBeVisible({
+    timeout: 10_000,
+  });
 
   // The lesson is not blocked: the next beat's control is interactive.
   await expect(next.first().or(page.getByLabel("Answer choices").first())).toBeVisible();

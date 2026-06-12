@@ -12,7 +12,7 @@ import {
 import { getStore, newId, nowIso } from "@/lib/db/store";
 import type { GeneratedLessonPlan, LessonRun } from "@/lib/db/types";
 import { pickMultimediaFixtureForSubject } from "@/lib/learner/multimedia-item-bank";
-import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/lesson-player";
+import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/player";
 
 export const dynamic = "force-dynamic";
 

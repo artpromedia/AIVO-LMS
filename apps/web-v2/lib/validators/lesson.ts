@@ -87,7 +87,7 @@ const LessonMediaPayloadSchema = z
       return;
     }
     // Mirror the lesson player's contract exactly (see LessonMedia in
-    // lesson-player.tsx): captions may be a .vtt URL, a data: URI, or an
+    // lesson-runs/[lessonRunId]/player/lesson-media.tsx): captions may be a .vtt URL, a data: URI, or an
     // INLINE WEBVTT payload (the deterministic generator embeds the cue
     // text directly so no asset host is required). A validator stricter
     // than the renderer turned every mock-provider multimedia lesson into

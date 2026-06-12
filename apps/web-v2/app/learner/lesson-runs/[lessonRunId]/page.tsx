@@ -27,7 +27,7 @@ import {
   parentCanAccessLearner,
 } from "@/lib/db/repos";
 import { toStageFunctioningLevel } from "@aivo/stage-runtime";
-import { LessonPlayer, type LessonAgentConfig } from "./lesson-player";
+import { LessonPlayer, type LessonAgentConfig } from "./player";
 import { lessonPlayerV2Enabled, tutorAgenticModeEnabled } from "@/lib/feature-flags";
 import { isLiveTutorAgent } from "@/lib/bff/tutor-agent";
 import { agentForSubjectSlug } from "@/lib/bff/agent-pilot";
