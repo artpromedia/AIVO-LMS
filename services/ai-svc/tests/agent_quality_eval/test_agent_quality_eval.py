@@ -31,7 +31,10 @@ HAS_MODEL_KEY = bool(os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPEN
 
 # The tutors under evaluation. Extend as enablement is requested; the gate
 # only requires entries for tutors web-v2 actually enables.
-EVAL_TUTORS = ("nova", "sage", "pixel")
+EVAL_TUTORS = (
+    "nova", "sage", "spark", "chrono", "pixel", "echo", "harmony",
+    "atlas", "cadence", "vigor", "lingua", "forge", "compass", "muse",
+)
 
 # A tutor passes when at least this fraction of scenario runs choose an
 # acceptable action AND no run ever chooses an unacceptable one.

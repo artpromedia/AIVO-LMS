@@ -51,25 +51,39 @@ if (!existsSync(scorecardPath)) {
   }
 }
 
+const ownerWaiver = scorecard?.ownerEnabledWithoutEval;
+const warnings = [];
 for (const tutorKey of enabled) {
   const entry = scorecard?.tutors?.[tutorKey];
   if (!entry) {
-    errors.push(
-      `tutor "${tutorKey}" is in AGENT_ENABLED_TUTORS but has NO scorecard entry — ` +
-        `run the real-model eval (services/ai-svc/tests/agent_quality_eval) first.`,
-    );
+    if (ownerWaiver && typeof ownerWaiver.date === "string" && ownerWaiver.by) {
+      // An explicit, dated owner decision may enable AHEAD of a recorded
+      // score (the keyed live server runs the eval) — but it is visible
+      // debt, never silence.
+      warnings.push(
+        `tutor "${tutorKey}" is enabled WITHOUT a recorded eval (owner decision ` +
+          `${ownerWaiver.date}) — run services/ai-svc/tests/agent_quality_eval on the ` +
+          `keyed server and commit the scorecard.`,
+      );
+    } else {
+      errors.push(
+        `tutor "${tutorKey}" is in AGENT_ENABLED_TUTORS but has NO scorecard entry and ` +
+          `no recorded owner decision — run the real-model eval first.`,
+      );
+    }
     continue;
   }
   if (entry.status !== "passed") {
     errors.push(
       `tutor "${tutorKey}" is enabled but its real-model eval status is "${entry.status}" ` +
-        `(score=${entry.score}). Disable it or fix the model behaviour and re-run the eval.`,
+        `(score=${entry.score}). An owner decision cannot override a recorded failure.`,
     );
   }
   if (entry.hardFail) {
     errors.push(`tutor "${tutorKey}" recorded an UNACCEPTABLE action in eval — must stay disabled.`);
   }
 }
+for (const w of warnings) console.warn(`  warn: ${w}`);
 
 console.log(
   `agent:eval — enabled tutors: ${enabled.length ? enabled.join(", ") : "(none)"} · ` +

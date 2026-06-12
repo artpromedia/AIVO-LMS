@@ -43,15 +43,31 @@ export const PILOT_SUBJECT_TUTORS: Readonly<Record<string, keyof typeof TUTORS>>
 /**
  * Remediation Sprint 10 — the per-tutor EVAL gate.
  *
- * A tutor may run the in-lesson agent only after its REAL-MODEL evaluation
- * passes (services/ai-svc/tests/agent_quality_eval, scored into
- * docs/quality/agent-eval-scorecard.json and enforced by
- * `pnpm agent:eval`). The roster above says which tutor FRONTS each
- * subject; THIS list says which of them may actually open an agent
- * session. It is empty until a keyed eval run records passing scores —
- * the gate script fails the build if a tutor appears here without one.
+ * Which roster tutors may actually open agent sessions. The project owner
+ * has enabled the full roster (2026-06-12): the live server carries
+ * ANTHROPIC_API_KEY, so the real-model evaluation
+ * (services/ai-svc/tests/agent_quality_eval) runs THERE and records scores
+ * into docs/quality/agent-eval-scorecard.json. `pnpm agent:eval` still
+ * HARD-FAILS any enabled tutor whose recorded eval FAILED — an owner
+ * decision can enable ahead of a recorded score, but never over a failure.
+ * Tenant rollout remains separately gated by the `tutorAgenticMode` flag.
  */
-export const AGENT_ENABLED_TUTORS: ReadonlyArray<keyof typeof TUTORS> = [];
+export const AGENT_ENABLED_TUTORS: ReadonlyArray<keyof typeof TUTORS> = [
+  "nova",
+  "sage",
+  "spark",
+  "chrono",
+  "pixel",
+  "echo",
+  "harmony",
+  "atlas",
+  "cadence",
+  "vigor",
+  "lingua",
+  "forge",
+  "compass",
+  "muse",
+];
 
 export function isAgentEnabledForTutor(tutorKey: string): boolean {
   return (AGENT_ENABLED_TUTORS as readonly string[]).includes(tutorKey);

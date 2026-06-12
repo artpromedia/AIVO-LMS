@@ -31,13 +31,33 @@ describe("agent eval gate", () => {
     }
   });
 
-  it("ships disabled until a keyed real-model eval records passing scores", () => {
-    // This assertion is intentionally about the CURRENT committed state: the
-    // scorecard has no entries, so nothing may be enabled. When a real eval
-    // run lands scores and a tutor is added to AGENT_ENABLED_TUTORS, update
-    // this test alongside the scorecard — `pnpm agent:eval` cross-checks the
-    // pair either way.
-    expect(AGENT_ENABLED_TUTORS).toHaveLength(0);
-    expect(agentForSubjectSlug("math")).toBeNull();
+  it("every enabled tutor is either eval-passed or covered by the recorded owner decision", () => {
+    // Owner decision (2026-06-12): the full roster is enabled — the keyed
+    // live server runs the real-model eval and commits the scorecard. A
+    // recorded FAILURE still blocks (pnpm agent:eval); this test pins the
+    // consistency triangle between the enabled list, the roster, and the
+    // scorecard's waiver/entries.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const scorecard = require("../../../../docs/quality/agent-eval-scorecard.json") as {
+      ownerEnabledWithoutEval?: { date?: string; by?: string };
+      tutors: Record<string, { status?: string; hardFail?: boolean }>;
+    };
+    const rosterTutors = new Set(Object.values(PILOT_SUBJECT_TUTORS));
+    expect(AGENT_ENABLED_TUTORS.length).toBeGreaterThan(0);
+    for (const tutorKey of AGENT_ENABLED_TUTORS) {
+      expect(rosterTutors.has(tutorKey), `${tutorKey} must front a subject`).toBe(true);
+      const entry = scorecard.tutors[tutorKey];
+      if (entry) {
+        expect(entry.status, `${tutorKey} has a recorded eval`).toBe("passed");
+        expect(entry.hardFail ?? false).toBe(false);
+      } else {
+        expect(
+          Boolean(scorecard.ownerEnabledWithoutEval?.date),
+          `${tutorKey} enabled without eval requires the recorded owner decision`,
+        ).toBe(true);
+      }
+    }
+    // And the enablement actually reaches lessons: math gets its agent.
+    expect(agentForSubjectSlug("math")?.tutorKey).toBe("nova");
   });
 });
