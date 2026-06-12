@@ -1771,6 +1771,7 @@ import {
 } from "@/lib/ai/tutor";
 import { getTutorProvider } from "@/lib/ai/anthropic-tutor";
 import { getAuthoredLessonItems } from "@/lib/learner/authored-content";
+import { awardLessonEngagement } from "@/lib/learner/engagement-award";
 
 function buildAccommodationSnapshotFrom(
   state: LearnerBrainProfileState,
@@ -2348,6 +2349,26 @@ export async function completeLessonRun(
   };
   await runStore.upsertRun(next);
   const delta = await applyOutcomeToMastery(next, effectiveOutcome);
+  // Remediation Sprint 12: completion AWARDS engagement (XP/streak) — the
+  // early already-completed return above makes this exactly-once per run.
+  // Resilient: an engagement write failure never fails the completion.
+  try {
+    await awardLessonEngagement({
+      learnerId: next.learnerId,
+      tenantId: next.tenantId,
+      outcome: effectiveOutcome,
+      completedAt: next.completedAt ?? nowIso(),
+    });
+  } catch (engagementErr) {
+    logger.warn(
+      {
+        event: "engagement_award.failed",
+        learnerId: next.learnerId,
+        err: engagementErr instanceof Error ? engagementErr.message : String(engagementErr),
+      },
+      "lesson completed but engagement award failed",
+    );
+  }
   // Sprint 3: a level change re-plans the learning path and records a
   // trajectory point. Resilient — failures log and never fail completion.
   if (delta.levelAfter !== delta.levelBefore) {

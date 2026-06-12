@@ -164,6 +164,9 @@ export interface EngagementStore {
   appendCalmSession(session: CalmSessionRecord): Promise<CalmSessionRecord>;
   listCalmSessions(): Promise<CalmSessionRecord[]>;
   getEngagement(learnerId: string): Promise<LearnerEngagement | null>;
+  /** Remediation Sprint 12: lesson completion WRITES engagement (XP/streak)
+   *  — before this, the row was seed-only and the home stats were frozen. */
+  upsertEngagement(engagement: LearnerEngagement): Promise<LearnerEngagement>;
   listBadges(): Promise<LearnerBadge[]>;
   getSensoryProfile(learnerId: string): Promise<LearnerSensoryProfile | null>;
   upsertSensoryProfile(profile: LearnerSensoryProfile): Promise<LearnerSensoryProfile>;
