@@ -1214,7 +1214,9 @@
       "msg_break_body": "Alongue-se, beba água, olhe pela janela. A AIVO guardará seu lugar.",
       "planned_week_badge": "Planejada para esta semana",
       "explore_subjects_title": "Explore suas matérias",
-      "explore_subjects_body": "Cada tutor e matéria a um toque."
+      "explore_subjects_body": "Cada tutor e matéria a um toque.",
+      "quest_label": "Missão de hoje",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "Aluno",

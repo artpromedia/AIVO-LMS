@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
@@ -14,7 +14,12 @@ import { getSession } from "@/lib/auth/session";
 import { resolveTimeZone } from "@/lib/i18n/timezone";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
-import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
+import {
+  readTypefaceFromCookies,
+  readReducedMotionFromCookies,
+  readSpacingFromCookies,
+  readSoundFromCookies,
+} from "@/lib/a11y/server";
 import { dirForLocale } from "@/lib/i18n/config";
 
 // AIVO design language typography.
@@ -58,11 +63,16 @@ const atkinson = localFont({
   display: "swap",
 });
 
+// Next 15 moved theme-color out of `metadata` into the dedicated `viewport`
+// export; keeping it here removes the per-page build warning.
+export const viewport: Viewport = {
+  themeColor: INCLUSIVE_WARM_PALETTE.primary,
+};
+
 export const metadata: Metadata = {
   title: "AIVO Learning",
   description: "Personalized learning adventures for every child.",
   manifest: "/manifest.webmanifest",
-  themeColor: INCLUSIVE_WARM_PALETTE.primary,
   icons: {
     icon: [{ url: "/images/favicon-192.png", type: "image/png", sizes: "192x192" }],
     apple: [{ url: "/images/favicon-192.png", sizes: "192x192" }],
@@ -94,6 +104,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const sensoryMode = await readSensoryModeFromCookies();
   const typeface = await readTypefaceFromCookies();
   const reducedMotion = await readReducedMotionFromCookies();
+  const spacing = await readSpacingFromCookies();
+  const sound = await readSoundFromCookies();
   const locale = await getLocale();
   const messages = await getMessages();
   const t = await getTranslations("root.layout");
@@ -105,6 +117,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       data-sensory-mode={sensoryMode}
       data-typeface={typeface}
       data-reduced-motion={reducedMotion}
+      data-spacing={spacing}
+      data-sound={sound}
       data-brand="inclusive-warm"
     >
       <head>

@@ -1214,7 +1214,9 @@
       "msg_break_body": "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك.",
       "planned_week_badge": "مخطط لها هذا الأسبوع",
       "explore_subjects_title": "استكشف موادك",
-      "explore_subjects_body": "كل معلّم وكل مادة بلمسة واحدة."
+      "explore_subjects_body": "كل معلّم وكل مادة بلمسة واحدة.",
+      "quest_label": "مهمة اليوم",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "المتعلّم",

@@ -1,0 +1,276 @@
+/*
+ * Learner Experience (Phase 2) — production token + motion foundation.
+ *
+ * Layers a small set of `--lx-*` accent tokens over the learner role theme
+ * and wires the two previously-inert workspace controls (Spacing density)
+ * plus the mascot / XP / streak animations used by the learner home.
+ *
+ * Motion contract: every loop and entrance here is gated so it collapses to
+ * a correct static state under BOTH the OS `prefers-reduced-motion` setting
+ * and the in-app sensory modes — Calm slows motion, high-contrast removes it.
+ * Information is never conveyed by motion alone (the XP fill's resting width
+ * is the real value; the keyframe is pure enhancement).
+ */
+
+/* ---- Spacing density (wires the data-spacing attribute the rail sets on
+   <html>; previously no production CSS consumed it). ---- */
+:root {
+  --lx-density: 1;
+}
+[data-spacing="compact"] {
+  --lx-density: 0.85;
+}
+[data-spacing="comfortable"] {
+  --lx-density: 1;
+}
+[data-spacing="spacious"] {
+  --lx-density: 1.2;
+}
+
+/* ---- Learner accent tokens (XP / streak / reward warmth). Reuses the role
+   theme's ink + surface so contrast math stays in one place. ---- */
+[data-role-theme="learner"] {
+  --lx-warm: oklch(0.78 0.16 55);
+  --lx-warm-ink: oklch(0.5 0.13 50);
+  --lx-mint: oklch(0.62 0.12 165);
+  --lx-petal: var(--color-aivo-accent);
+  --lx-track: color-mix(in oklch, var(--color-aivo-ink) 6%, var(--color-aivo-surface));
+}
+
+/* =====================================================================
+   XP bar
+   ===================================================================== */
+.lx-xpbar {
+  position: relative;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--color-aivo-primary-soft);
+  overflow: hidden;
+}
+.lx-xpbar__fill {
+  height: 100%;
+  border-radius: 9999px;
+  width: var(--lx-xp-pct, 0%); /* resting width IS the real value */
+  background: linear-gradient(90deg, var(--color-aivo-primary), var(--lx-petal));
+  animation: lx-xpfill 900ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes lx-xpfill {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--lx-xp-pct, 0%);
+  }
+}
+[data-sensory-mode="calm"] .lx-xpbar__fill {
+  animation-duration: 1500ms;
+}
+[data-sensory-mode="high-contrast"] .lx-xpbar__fill,
+[data-reduced-motion="reduce"] .lx-xpbar__fill {
+  animation: none;
+}
+
+/* =====================================================================
+   Streak flame
+   ===================================================================== */
+.lx-flame {
+  animation: lx-flicker 2500ms ease-in-out infinite;
+  transform-origin: center bottom;
+}
+@keyframes lx-flicker {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+[data-sensory-mode="calm"] .lx-flame {
+  animation-duration: 4200ms;
+}
+
+/* =====================================================================
+   Aivo mascot — idle + per-expression flourishes. Class names match the
+   <AivoMascot> SVG component (components/learner/art/aivo-mascot.tsx).
+   ===================================================================== */
+.aivo-breathe {
+  transform-origin: 100px 120px;
+  animation: lx-breathe 4000ms ease-in-out infinite;
+}
+@keyframes lx-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+svg[data-aivo-expression="greeting"] .aivo-wing-wave {
+  transform-origin: 48px 104px;
+  animation: lx-wave 700ms ease-in-out 1;
+}
+@keyframes lx-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(-16deg);
+  }
+  70% {
+    transform: rotate(-6deg);
+  }
+}
+.aivo-sparkles {
+  transform-origin: center;
+  animation: lx-twinkle 1600ms ease-in-out infinite;
+}
+@keyframes lx-twinkle {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+.aivo-think-dot,
+.aivo-zzz {
+  animation: lx-bob 2400ms ease-in-out infinite;
+}
+@keyframes lx-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* Calm slows the mascot; high-contrast freezes it and hides sparkles. The
+   static pose carries the expression on its own. */
+[data-sensory-mode="calm"] .aivo-breathe {
+  animation-duration: 6500ms;
+}
+[data-sensory-mode="calm"] .aivo-sparkles {
+  display: none;
+}
+[data-sensory-mode="high-contrast"] .aivo-breathe,
+[data-sensory-mode="high-contrast"] .aivo-wing-wave,
+[data-sensory-mode="high-contrast"] .aivo-sparkles,
+[data-sensory-mode="high-contrast"] .aivo-think-dot,
+[data-sensory-mode="high-contrast"] .aivo-zzz {
+  animation: none;
+}
+[data-sensory-mode="high-contrast"] .aivo-sparkles {
+  display: none;
+}
+
+/* =====================================================================
+   Workspace segmented control (production rail). True segmented track with
+   an elevated selected pill; 48px targets; selection by color + shadow +
+   ring + aria-checked (never color alone). Mirrors the approved preview.
+   ===================================================================== */
+.lxws {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.lxws__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.lxws__label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--color-aivo-ink);
+}
+.lxws__value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-aivo-primary);
+}
+.lxws__track {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 16px;
+  background: var(--lx-track);
+}
+.lxws__btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0.4rem 0.35rem;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-aivo-ink-soft);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+.lxws__btn[data-layout="inline"] {
+  flex-direction: row;
+  gap: 7px;
+}
+.lxws__btn:hover {
+  background: color-mix(in oklch, var(--color-aivo-ink) 5%, transparent);
+  color: var(--color-aivo-ink);
+}
+.lxws__btn:active {
+  transform: scale(0.97);
+}
+.lxws__btn[aria-checked="true"],
+.lxws__btn[aria-checked="true"]:hover {
+  background: var(--color-aivo-surface);
+  color: var(--color-aivo-primary);
+  box-shadow:
+    0 1px 2px rgba(36, 26, 71, 0.06),
+    inset 0 0 0 1.5px color-mix(in oklch, var(--color-aivo-primary) 26%, transparent);
+}
+.lxws__btn svg {
+  flex-shrink: 0;
+}
+[data-reduced-motion="reduce"] .lxws__btn {
+  transition: none;
+}
+
+/* =====================================================================
+   Global reduced-motion backstop for everything in this file.
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .lx-xpbar__fill,
+  .lx-flame,
+  .aivo-breathe,
+  .aivo-wing-wave,
+  .aivo-sparkles,
+  .aivo-think-dot,
+  .aivo-zzz {
+    animation: none !important;
+  }
+}

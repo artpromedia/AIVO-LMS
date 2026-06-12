@@ -1214,7 +1214,9 @@
       "msg_break_body": "अंगड़ाई लो, पानी पियो, खिड़की से बाहर देखो। AIVO तुम्हारी जगह सहेज लेगा।",
       "planned_week_badge": "इस सप्ताह के लिए नियोजित",
       "explore_subjects_title": "अपने विषय देखें",
-      "explore_subjects_body": "हर ट्यूटर और विषय, बस एक टैप दूर।"
+      "explore_subjects_body": "हर ट्यूटर और विषय, बस एक टैप दूर।",
+      "quest_label": "आज का क्वेस्ट",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "सीखने वाला",

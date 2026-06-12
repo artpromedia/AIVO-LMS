@@ -1214,7 +1214,9 @@
       "msg_break_body": "Estírate, bebe agua, mira por la ventana. AIVO guardará tu lugar.",
       "planned_week_badge": "Planificada para esta semana",
       "explore_subjects_title": "Explora tus materias",
-      "explore_subjects_body": "Cada tutor y materia, a un toque."
+      "explore_subjects_body": "Cada tutor y materia, a un toque.",
+      "quest_label": "Misión de hoy",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "Estudiante",

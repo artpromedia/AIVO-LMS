@@ -6,6 +6,7 @@
  * @font-face binaries and the data-* mode rules are easy to audit. */
 @import "./fonts-dyslexia.css";
 @import "./a11y-modes.css";
+@import "./learner-experience.css";
 
 /* Pull in the v3-style @aivo/brand Tailwind preset (iw-*, brand-*, sensory-mode
  * aware utility colors). Tailwind v4 ignores `tailwind.config.cjs` unless it is

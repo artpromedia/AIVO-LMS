@@ -1214,7 +1214,9 @@
       "msg_break_body": "伸个懒腰、喝点水、看看窗外。AIVO 会保存你的位置。",
       "planned_week_badge": "本周已计划",
       "explore_subjects_title": "探索你的科目",
-      "explore_subjects_body": "每位导师和科目，一点即达。"
+      "explore_subjects_body": "每位导师和科目，一点即达。",
+      "quest_label": "今日任务",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "学习者",

@@ -31,7 +31,6 @@ import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import {
-  StatChip,
   LearnerLevelBadge,
   FeaturedLessonCard,
   LessonSecondaryAction,
@@ -40,7 +39,13 @@ import {
 } from "@aivo/ui/learner-dashboard";
 import { MessageCard } from "@aivo/ui";
 import { LearnerWorkspaceRail } from "@/components/learner/learner-workspace-rail";
-import { readTypefaceFromCookies } from "@/lib/a11y/server";
+import {
+  readTypefaceFromCookies,
+  readSpacingFromCookies,
+  readSoundFromCookies,
+} from "@/lib/a11y/server";
+import { AivoMascot } from "@/components/learner/art/aivo-mascot";
+import { XP_PER_LEVEL } from "@/lib/learner/engagement-award";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import {
   createLessonRun,
@@ -181,6 +186,8 @@ export default async function LearnerHome({
   const { skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
   const iep = await getIEPForLearner(learnerId, session.tenantId);
   const typeface = await readTypefaceFromCookies();
+  const spacingPref = await readSpacingFromCookies();
+  const soundPref = await readSoundFromCookies();
 
   const subjectScore = new Map<string, { score: number; count: number }>();
   for (const sm of skillMasteries) {
@@ -204,6 +211,11 @@ export default async function LearnerHome({
   const streakDays = engagement?.currentStreakDays ?? 0;
   const levelNumber = engagement?.level ?? 1;
   const xp = engagement?.totalXp ?? 0;
+  // Progress *within* the current level, using the canonical XP curve
+  // (level = 1 + floor(totalXp / XP_PER_LEVEL)). The bar's resting width is
+  // the real value; the fill animation is enhancement only.
+  const xpInLevel = xp % XP_PER_LEVEL;
+  const xpPct = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
   const displayName = learner.preferredName || learner.firstName;
   const initialSource = learner.displayName || learner.firstName || displayName;
   const initials = initialSource
@@ -269,132 +281,190 @@ export default async function LearnerHome({
           initials={initials}
           approvalStatus="approved"
           initialTypeface={typeface}
+          initialSpacing={spacingPref}
+          initialSound={soundPref}
         />
 
         <div className="flex flex-col gap-6 min-w-0">
-          {/* Top stat strip */}
-          <div className="flex items-center gap-3 p-4 rounded-3xl bg-white border border-iw-border/60 flex-wrap">
-            <StatChip
-              tone="warm"
-              label={t("stat_level", { level: levelNumber })}
-              value={t("stat_xp", { xp: xp.toLocaleString() })}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="m12 2 2.6 6.4 6.9.5-5.3 4.4 1.7 6.7L12 16.8 6.1 20l1.7-6.7L2.5 8.9l6.9-.5L12 2Z" />
-                </svg>
-              }
-            />
-            <StatChip
-              tone="primary"
-              label={t("streak_label")}
-              value={t("streak_value", { days: streakDays })}
-              icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
-                </svg>
-              }
-            />
-            <span className="ml-auto">
-              <LearnerLevelBadge level={t(adaptiveLevelKey(overallAvg))} />
-            </span>
+          {/* Greeting — Aivo greets the learner by name */}
+          <div className="flex items-center gap-4">
+            <AivoMascot expression="greeting" size={84} className="shrink-0" />
+            <h1 className="text-3xl md:text-4xl font-bold text-iw-text-strong leading-tight">
+              {t(`greeting_${greetingSlot()}`, { name: displayName })}
+            </h1>
           </div>
 
-          {/* Greeting */}
-          <h1 className="text-3xl md:text-4xl font-bold text-iw-text-strong leading-tight">
-            {t(`greeting_${greetingSlot()}`, { name: displayName })}
-          </h1>
+          {/* Progress you can feel — animated XP within the level + streak (grace, never shame) */}
+          <section
+            className="grid gap-4 sm:grid-cols-[1.6fr_1fr] rounded-3xl bg-white border border-iw-border/60"
+            style={{ padding: "calc(1.25rem * var(--lx-density, 1))" }}
+            aria-label={t("stat_level", { level: levelNumber })}
+          >
+            <div className="flex flex-col gap-2.5 min-w-0">
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-2 font-bold text-iw-text-strong">
+                  <span
+                    className="grid h-9 w-9 place-items-center rounded-full text-sm font-bold text-white"
+                    style={{ background: "var(--color-aivo-primary)" }}
+                    aria-hidden="true"
+                  >
+                    {levelNumber}
+                  </span>
+                  {t("stat_level", { level: levelNumber })}
+                </span>
+                <LearnerLevelBadge level={t(adaptiveLevelKey(overallAvg))} />
+              </div>
+              <div
+                className="lx-xpbar"
+                role="progressbar"
+                aria-valuenow={xpInLevel}
+                aria-valuemin={0}
+                aria-valuemax={XP_PER_LEVEL}
+                aria-label={`${t("stat_level", { level: levelNumber })}, ${t("xp_progress", {
+                  xp: xpInLevel,
+                  goal: XP_PER_LEVEL,
+                })}`}
+              >
+                <div
+                  className="lx-xpbar__fill"
+                  style={{ ["--lx-xp-pct" as string]: `${xpPct}%` }}
+                />
+              </div>
+              <span
+                className="text-sm font-bold tabular-nums"
+                style={{ color: "var(--lx-warm-ink)" }}
+              >
+                {t("xp_progress", { xp: xpInLevel, goal: XP_PER_LEVEL })}
+              </span>
+            </div>
 
-          {/* Featured lesson */}
+            <div className="flex items-center gap-3 sm:border-l sm:border-iw-border/60 sm:pl-4">
+              <svg
+                className="lx-flame shrink-0"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M13 2 C13 6 9 7 9 12 a4 4 0 0 0 8 0 c0-2-1-3-1-3 0 2-1 3-2 3 1-3-1-7-1-10Z"
+                  fill="var(--lx-warm)"
+                />
+              </svg>
+              <div className="flex flex-col">
+                <span className="text-sm text-iw-text-muted">{t("streak_label")}</span>
+                <span className="font-bold text-iw-text-strong">
+                  {t("streak_value", { days: streakDays })}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          {/* Today's quest — the single framed mission */}
           {today.ready ? (
-            <FeaturedLessonCard
-              subject={today.mission.subjectName}
-              subjectTone={featuredTones.lessonTone}
-              durationLabel={`${today.mission.estimatedMinutes} mins`}
-              difficultyLabel={
-                // Sprint 07: Creator-planned lessons announce themselves —
-                // the learner sees this week was prepared for them.
-                today.mission.existingRunSource === "weekly_creator"
-                  ? t("planned_week_badge")
-                  : overallAvg >= 0.65
-                    ? t("diff_steady")
-                    : t("diff_easy")
-              }
-              title={today.mission.skillName}
-              description={today.mission.learnerReason}
-              tutorName={featuredTutor?.name ?? t("tutor_fallback")}
-              tutorPersonality={
-                featuredTutor
-                  ? t("tutor_personality", { subtitle: featuredTutor.subtitle })
-                  : t("tutor_personality_default")
-              }
-              tutorGlyph={featuredTutor?.emoji ?? "🤖"}
-              tutorImageUrl={
-                featuredTutor
-                  ? reducedArt
-                    ? featuredTutor.avatarReduced
-                    : featuredTutor.avatar
-                  : undefined
-              }
-              tutorTone={featuredTones.tutorTone}
-              secondaryActions={
-                <>
-                  <LessonSecondaryAction
-                    icon={
+            <div className="flex flex-col gap-3">
+              <h2 className="text-lg font-bold text-iw-text-strong">{t("quest_label")}</h2>
+              <FeaturedLessonCard
+                subject={today.mission.subjectName}
+                subjectTone={featuredTones.lessonTone}
+                durationLabel={`${today.mission.estimatedMinutes} mins`}
+                difficultyLabel={
+                  // Sprint 07: Creator-planned lessons announce themselves —
+                  // the learner sees this week was prepared for them.
+                  today.mission.existingRunSource === "weekly_creator"
+                    ? t("planned_week_badge")
+                    : overallAvg >= 0.65
+                      ? t("diff_steady")
+                      : t("diff_easy")
+                }
+                title={today.mission.skillName}
+                description={today.mission.learnerReason}
+                tutorName={featuredTutor?.name ?? t("tutor_fallback")}
+                tutorPersonality={
+                  featuredTutor
+                    ? t("tutor_personality", { subtitle: featuredTutor.subtitle })
+                    : t("tutor_personality_default")
+                }
+                tutorGlyph={featuredTutor?.emoji ?? "🤖"}
+                tutorImageUrl={
+                  featuredTutor
+                    ? reducedArt
+                      ? featuredTutor.avatarReduced
+                      : featuredTutor.avatar
+                    : undefined
+                }
+                tutorTone={featuredTones.tutorTone}
+                secondaryActions={
+                  <>
+                    <LessonSecondaryAction
+                      icon={
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden
+                        >
+                          <path d="M3 10v4a1 1 0 0 0 1 1h3l4 4V5l-4 4H4a1 1 0 0 0-1 1Z" />
+                          <path d="M15 9a4 4 0 0 1 0 6" />
+                          <path d="M18 6a8 8 0 0 1 0 12" />
+                        </svg>
+                      }
+                    >
+                      {t("read_aloud")}
+                    </LessonSecondaryAction>
+                    <LessonSecondaryAction
+                      icon={
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden
+                        >
+                          <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                          <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                          <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                          <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                        </svg>
+                      }
+                    >
+                      {t("overview")}
+                    </LessonSecondaryAction>
+                  </>
+                }
+                primaryAction={
+                  <form action={startMissionAction}>
+                    <input type="hidden" name="learnerId" value={learnerId} />
+                    <Button
+                      type="submit"
+                      size="lg"
+                      data-primary-cta="todays-mission"
+                      data-testid="learner-primary-cta"
+                    >
                       <svg
-                        width="16"
-                        height="16"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        fill="currentColor"
                         aria-hidden
                       >
-                        <path d="M3 10v4a1 1 0 0 0 1 1h3l4 4V5l-4 4H4a1 1 0 0 0-1 1Z" />
-                        <path d="M15 9a4 4 0 0 1 0 6" />
-                        <path d="M18 6a8 8 0 0 1 0 12" />
+                        <path d="M8 5v14l11-7L8 5Z" />
                       </svg>
-                    }
-                  >
-                    {t("read_aloud")}
-                  </LessonSecondaryAction>
-                  <LessonSecondaryAction
-                    icon={
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden
-                      >
-                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                      </svg>
-                    }
-                  >
-                    {t("overview")}
-                  </LessonSecondaryAction>
-                </>
-              }
-              primaryAction={
-                <form action={startMissionAction}>
-                  <input type="hidden" name="learnerId" value={learnerId} />
-                  <Button type="submit" size="lg" data-primary-cta="todays-mission" data-testid="learner-primary-cta">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                      <path d="M8 5v14l11-7L8 5Z" />
-                    </svg>
-                    {today.mission.existingRunId ? t("resume_lesson") : t("start_lesson")}
-                  </Button>
-                </form>
-              }
-            />
+                      {today.mission.existingRunId ? t("resume_lesson") : t("start_lesson")}
+                    </Button>
+                  </form>
+                }
+              />
+            </div>
           ) : (
             <div className="rounded-[28px] bg-white border border-iw-border/60 p-8 flex flex-col gap-4">
               <h2 className="text-2xl font-bold text-iw-text-strong">{t("setup_title")}</h2>
@@ -467,18 +537,14 @@ export default async function LearnerHome({
                 sender="AIVO"
                 title={t("msg_hint_title")}
                 body={t("msg_hint_body")}
-                avatar={
-                  <img src="/images/mascots/aivo-owl-happy.svg" alt="" aria-hidden="true" className="h-8 w-8" />
-                }
+                avatar={<AivoMascot expression="encouraging" size={36} />}
               />
               {iep?.confirmedAt ? (
                 <MessageCard
                   from="system"
                   title={t("msg_supports_title")}
                   body={t("msg_supports_body", { count: supportsCount })}
-                  avatar={
-                    <img src="/images/mascots/aivo-owl-idle.svg" alt="" aria-hidden="true" className="h-8 w-8" />
-                  }
+                  avatar={<AivoMascot expression="thinking" size={36} />}
                 />
               ) : (
                 <Link
@@ -489,9 +555,7 @@ export default async function LearnerHome({
                     from="break"
                     title={t("msg_break_title")}
                     body={t("msg_break_body")}
-                    avatar={
-                      <img src="/images/mascots/echo-whale-happy.svg" alt="" aria-hidden="true" className="h-8 w-8" />
-                    }
+                    avatar={<AivoMascot expression="resting" size={36} />}
                   />
                 </Link>
               )}

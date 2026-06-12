@@ -1214,7 +1214,9 @@
       "msg_break_body": "Streck dich, trink Wasser, schau aus dem Fenster. AIVO merkt sich deinen Platz.",
       "planned_week_badge": "Für diese Woche geplant",
       "explore_subjects_title": "Entdecke deine Fächer",
-      "explore_subjects_body": "Jeder Tutor, jedes Fach — einen Tipp entfernt."
+      "explore_subjects_body": "Jeder Tutor, jedes Fach — einen Tipp entfernt.",
+      "quest_label": "Heutige Quest",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "Lernende/r",

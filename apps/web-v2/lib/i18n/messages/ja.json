@@ -1214,7 +1214,9 @@
       "msg_break_body": "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。",
       "planned_week_badge": "今週の予定レッスン",
       "explore_subjects_title": "きょうかを見てみよう",
-      "explore_subjects_body": "チューターと教科はワンタップで。"
+      "explore_subjects_body": "チューターと教科はワンタップで。",
+      "quest_label": "今日のクエスト",
+      "xp_progress": "{xp} / {goal} XP"
     },
     "common": {
       "learner_eyebrow": "学習者",
