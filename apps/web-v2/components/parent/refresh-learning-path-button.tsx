@@ -6,6 +6,7 @@
  * (prerequisite-aware regeneration) to the parent progress page.
  */
 import * as React from "react";
+import { bffFetch } from "@/lib/api/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -25,13 +26,9 @@ export function RefreshLearningPathButton({
   async function refresh() {
     setPhase("pending");
     try {
-      const res = await fetch(`/api/bff/learners/${learnerId}/learning-path/generate`, {
+      await bffFetch(`/api/bff/learners/${learnerId}/learning-path/generate`, {
         method: "POST",
       });
-      if (!res.ok) {
-        setPhase("error");
-        return;
-      }
       setPhase("done");
       router.refresh();
     } catch {

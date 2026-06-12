@@ -732,7 +732,8 @@
       "status_applied": "承認・適用されました — 次のセッションからレッスンが更新されます。",
       "status_declined": "却下されました — 変更はありません。",
       "status_failed": "承認されましたが適用に失敗しました — チームに通知済みです。",
-      "history": "最近の決定 ({count})"
+      "history": "最近の決定 ({count})",
+      "retry": "再試行"
     },
     "tutor_memories": {
       "title": "チューターが覚えていること",
@@ -1362,7 +1363,10 @@
       "agent_modality_auditory": "声に出して読んでみよう — 聞くと分かりやすいよ。",
       "agent_modality_kinesthetic": "指や物を使って数えてみよう。",
       "agent_modality_reading": "ゆっくり、少しずつ読んでみよう。",
-      "agent_new_surface": "同じ問題を別のやり方で試してみよう。"
+      "agent_new_surface": "同じ問題を別のやり方で試してみよう。",
+      "offline_saved_title": "この端末に保存しました",
+      "offline_saved_body": "今はオフラインです。接続が戻り次第、同期します。",
+      "offline_complete_title": "レッスンをこの端末に保存しました"
     },
     "baseline_runner": {
       "exit_proctor_view": "監督ビューを終了",
@@ -3217,5 +3221,22 @@
       "week_kind_break": "学校休暇",
       "week_kind_holiday_prep": "休暇準備"
     }
+  },
+  "messages": {
+    "inbox_title": "受信箱",
+    "loading": "読み込み中…",
+    "empty_inbox": "まだ会話はありません。AIVO チームの誰かからメッセージが届くと、ここに表示されます。",
+    "select_prompt": "会話を選んで読み、返信しましょう。",
+    "empty_thread": "この会話にはまだメッセージがありません。",
+    "reply_placeholder": "返信を書く…",
+    "send": "送信",
+    "sending": "送信中…",
+    "threads_error_title": "メッセージを読み込めませんでした",
+    "threads_error_body": "何も失われていません。少ししてからもう一度お試しください。",
+    "thread_error_title": "その会話を開けませんでした",
+    "thread_error_body": "もう一度お試しください。メッセージは安全です。",
+    "send_failed_title": "メッセージを送信できませんでした",
+    "send_failed_body": "下書きはそのまま残っています。",
+    "send_retry": "再試行"
   }
 }

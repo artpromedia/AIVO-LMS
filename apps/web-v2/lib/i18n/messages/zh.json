@@ -732,7 +732,8 @@
       "status_applied": "已批准并应用 — 课程将从下次学习开始更新。",
       "status_declined": "已拒绝 — 不会有任何更改。",
       "status_failed": "已批准，但应用失败 — 已通知我们的团队。",
-      "history": "最近的决定 ({count})"
+      "history": "最近的决定 ({count})",
+      "retry": "重试"
     },
     "tutor_memories": {
       "title": "导师记住的内容",
@@ -1362,7 +1363,10 @@
       "agent_modality_auditory": "试着大声读出来 — 听一听会有帮助。",
       "agent_modality_kinesthetic": "试着用手指或物品数一数。",
       "agent_modality_reading": "我们慢慢读，一部分一部分来。",
-      "agent_new_surface": "我们换一种方式试试同一道题。"
+      "agent_new_surface": "我们换一种方式试试同一道题。",
+      "offline_saved_title": "已保存在此设备",
+      "offline_saved_body": "你现在离线——恢复连接后会立即同步。",
+      "offline_complete_title": "课程已保存在此设备"
     },
     "baseline_runner": {
       "exit_proctor_view": "退出监考视图",
@@ -3217,5 +3221,22 @@
       "week_kind_break": "学校假期",
       "week_kind_holiday_prep": "假期预备"
     }
+  },
+  "messages": {
+    "inbox_title": "收件箱",
+    "loading": "加载中…",
+    "empty_inbox": "还没有会话。AIVO 团队中有人给你留言时会显示在这里。",
+    "select_prompt": "选择一个会话来阅读和回复。",
+    "empty_thread": "这个会话还没有消息。",
+    "reply_placeholder": "写一条回复…",
+    "send": "发送",
+    "sending": "发送中…",
+    "threads_error_title": "无法加载你的消息",
+    "threads_error_body": "内容没有丢失——请稍后再试。",
+    "thread_error_title": "无法打开该会话",
+    "thread_error_body": "请再试一次——你的消息很安全。",
+    "send_failed_title": "消息未发送",
+    "send_failed_body": "草稿仍然保留。",
+    "send_retry": "重试"
   }
 }

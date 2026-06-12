@@ -732,7 +732,8 @@
       "status_applied": "Genehmigt und angewendet — Lektionen aktualisieren sich ab der nächsten Sitzung.",
       "status_declined": "Abgelehnt — nichts ändert sich.",
       "status_failed": "Genehmigt, aber Anwendung fehlgeschlagen — unser Team wurde informiert.",
-      "history": "Letzte Entscheidungen ({count})"
+      "history": "Letzte Entscheidungen ({count})",
+      "retry": "Erneut versuchen"
     },
     "tutor_memories": {
       "title": "Was sich dein Tutor merkt",
@@ -1362,7 +1363,10 @@
       "agent_modality_auditory": "Lies es laut vor — es zu hören kann helfen.",
       "agent_modality_kinesthetic": "Zähle es mit deinen Fingern oder Gegenständen ab.",
       "agent_modality_reading": "Lesen wir es langsam, Schritt für Schritt.",
-      "agent_new_surface": "Versuchen wir dieselbe Frage auf eine andere Art."
+      "agent_new_surface": "Versuchen wir dieselbe Frage auf eine andere Art.",
+      "offline_saved_title": "Auf diesem Gerät gespeichert",
+      "offline_saved_body": "Du bist gerade offline — deine Arbeit synchronisiert sich, sobald du zurück bist.",
+      "offline_complete_title": "Lektion auf diesem Gerät gespeichert"
     },
     "baseline_runner": {
       "exit_proctor_view": "Aufsichtsansicht verlassen",
@@ -3217,5 +3221,22 @@
       "week_kind_break": "Schulferien",
       "week_kind_holiday_prep": "Ferienvorbereitung"
     }
+  },
+  "messages": {
+    "inbox_title": "Posteingang",
+    "loading": "Lädt…",
+    "empty_inbox": "Noch keine Unterhaltungen. Sobald dir jemand aus deinem AIVO-Team schreibt, erscheint es hier.",
+    "select_prompt": "Wähle eine Unterhaltung zum Lesen und Antworten.",
+    "empty_thread": "Noch keine Nachrichten in dieser Unterhaltung.",
+    "reply_placeholder": "Antwort schreiben…",
+    "send": "Senden",
+    "sending": "Wird gesendet…",
+    "threads_error_title": "Nachrichten konnten nicht geladen werden",
+    "threads_error_body": "Nichts ist verloren — versuche es gleich noch einmal.",
+    "thread_error_title": "Unterhaltung konnte nicht geöffnet werden",
+    "thread_error_body": "Versuch es erneut — deine Nachrichten sind sicher.",
+    "send_failed_title": "Nachricht nicht gesendet",
+    "send_failed_body": "Dein Entwurf ist noch da.",
+    "send_retry": "Erneut versuchen"
   }
 }

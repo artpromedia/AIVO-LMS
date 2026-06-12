@@ -732,7 +732,8 @@
       "status_applied": "Approuvé et appliqué — les leçons se mettent à jour dès la prochaine session.",
       "status_declined": "Refusé — rien ne change.",
       "status_failed": "Approuvé, mais l'application a échoué — notre équipe est prévenue.",
-      "history": "Décisions récentes ({count})"
+      "history": "Décisions récentes ({count})",
+      "retry": "Réessayer"
     },
     "tutor_memories": {
       "title": "Ce que retient ton tuteur",
@@ -1362,7 +1363,10 @@
       "agent_modality_auditory": "Essaie de le lire à voix haute — l'entendre peut aider.",
       "agent_modality_kinesthetic": "Essaie de compter avec tes doigts ou des objets.",
       "agent_modality_reading": "Lisons-le lentement, une partie à la fois.",
-      "agent_new_surface": "Essayons la même question d'une autre façon."
+      "agent_new_surface": "Essayons la même question d'une autre façon.",
+      "offline_saved_title": "Enregistré sur cet appareil",
+      "offline_saved_body": "Tu es hors ligne — ton travail se synchronisera dès ton retour.",
+      "offline_complete_title": "Leçon enregistrée sur cet appareil"
     },
     "baseline_runner": {
       "exit_proctor_view": "Quitter la vue surveillant",
@@ -3217,5 +3221,22 @@
       "week_kind_break": "Vacances scolaires",
       "week_kind_holiday_prep": "Préparation aux vacances"
     }
+  },
+  "messages": {
+    "inbox_title": "Boîte de réception",
+    "loading": "Chargement…",
+    "empty_inbox": "Pas encore de conversations. Quand quelqu'un de votre équipe AIVO vous écrira, cela apparaîtra ici.",
+    "select_prompt": "Choisissez une conversation pour lire et répondre.",
+    "empty_thread": "Pas encore de messages dans cette conversation.",
+    "reply_placeholder": "Écrire une réponse…",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "threads_error_title": "Impossible de charger vos messages",
+    "threads_error_body": "Rien n'est perdu — réessayez dans un instant.",
+    "thread_error_title": "Impossible d'ouvrir cette conversation",
+    "thread_error_body": "Réessayez — vos messages sont en sécurité.",
+    "send_failed_title": "Message non envoyé",
+    "send_failed_body": "Votre brouillon est toujours là.",
+    "send_retry": "Réessayer"
   }
 }

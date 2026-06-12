@@ -379,6 +379,12 @@ Production is hosted on Hetzner with images pushed to GitHub Container Registry.
 
 Image build pipeline: GitHub Actions → GHCR → Hetzner cluster pull.
 
+### Client data-path conventions (web-v2)
+
+- Server components fetch on the server (repos / BFF helpers) — unchanged.
+- Client components call the BFF through `bffFetch` (`apps/web-v2/lib/api/client.ts`) or a TanStack Query hook built on it; bare `fetch(` is gated by `scripts/ci/check-bare-fetch.mjs` (ratchet — the budget only goes down).
+- User-visible failures surface through the toast layer (`@/lib/use-toast` + the root `<Toaster />`); lesson-critical writes ride the idempotent offline outbox.
+
 ## Continuous Integration
 
 GitHub Actions workflows live in [`.github/workflows/`](.github/workflows/) and cover:

@@ -38,6 +38,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Client data-path ratchet (no new bare fetch)
+        run: node scripts/ci/check-bare-fetch.mjs
+
   repo-tests:
     name: Sequential Repo Test Gate
     runs-on: ubuntu-latest

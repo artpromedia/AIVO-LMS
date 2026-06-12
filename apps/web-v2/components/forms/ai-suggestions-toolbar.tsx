@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { bffFetch, isBffError } from "@/lib/api/client";
 import { Sparkles, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FieldType, SuggestionContext } from "@/lib/ai/suggestions";
@@ -95,31 +96,30 @@ export function AISuggestionsToolbar({
       const ctrl = new AbortController();
       abortRef.current = ctrl;
       try {
-        const res = await fetch("/api/bff/ai/suggest", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          credentials: "same-origin",
-          signal: ctrl.signal,
-          body: JSON.stringify({
-            fieldType,
-            currentText: textNow,
-            context: {
-              ageRange: context?.ageRange ?? null,
-              gradeBand: context?.gradeBand ?? null,
-              existingItems,
+        const data = await bffFetch<Extract<ServerResponse, { ok: true }>["data"]>(
+          "/api/bff/ai/suggest",
+          {
+            method: "POST",
+            credentials: "same-origin",
+            signal: ctrl.signal,
+            body: {
+              fieldType,
+              currentText: textNow,
+              context: {
+                ageRange: context?.ageRange ?? null,
+                gradeBand: context?.gradeBand ?? null,
+                existingItems,
+              },
             },
-          }),
-        });
-        const json = (await res.json()) as ServerResponse;
-        if (!json.ok) {
-          if (!silent) setError(json.error.userMessage);
-          return;
-        }
-        setSuggestions(json.data.suggestions);
-        setCompletion(json.data.completion);
+          },
+        );
+        setSuggestions(data.suggestions);
+        setCompletion(data.completion);
       } catch (e) {
         if ((e as Error)?.name === "AbortError") return;
-        if (!silent) setError("Couldn't fetch suggestions. Try again.");
+        if (!silent) {
+          setError(isBffError(e) ? e.userMessage : "Couldn't fetch suggestions. Try again.");
+        }
       } finally {
         if (!silent) setLoading(false);
       }

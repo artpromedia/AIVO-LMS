@@ -925,7 +925,8 @@
       "status_applied": "Approved and applied — lessons update from the next session.",
       "status_declined": "Declined — nothing changes.",
       "status_failed": "Approved, but applying failed — our team has been notified.",
-      "history": "Recent decisions ({count})"
+      "history": "Recent decisions ({count})",
+      "retry": "Try again"
     },
     "tutor_memories": {
       "title": "What your tutor remembers",
@@ -1555,7 +1556,10 @@
       "agent_modality_auditory": "Try reading it out loud — hearing it can help.",
       "agent_modality_kinesthetic": "Try counting it out with your fingers or objects.",
       "agent_modality_reading": "Let's read it slowly, one part at a time.",
-      "agent_new_surface": "Let's try the same question a different way."
+      "agent_new_surface": "Let's try the same question a different way.",
+      "offline_saved_title": "Saved on this device",
+      "offline_saved_body": "You're offline right now — your work will sync the moment you're back.",
+      "offline_complete_title": "Lesson saved on this device"
     },
     "baseline_runner": {
       "exit_proctor_view": "Exit proctor view",
@@ -3217,5 +3221,22 @@
       "week_kind_break": "School break",
       "week_kind_holiday_prep": "Holiday prep"
     }
+  },
+  "messages": {
+    "inbox_title": "Inbox",
+    "loading": "Loading…",
+    "empty_inbox": "No conversations yet. When someone on your AIVO team messages you it will appear here.",
+    "select_prompt": "Select a conversation to read and reply.",
+    "empty_thread": "No messages in this conversation yet.",
+    "reply_placeholder": "Write a reply…",
+    "send": "Send",
+    "sending": "Sending…",
+    "threads_error_title": "Couldn't load your messages",
+    "threads_error_body": "Nothing was lost — try again in a moment.",
+    "thread_error_title": "Couldn't open that conversation",
+    "thread_error_body": "Try again — your messages are safe.",
+    "send_failed_title": "Message not sent",
+    "send_failed_body": "Your draft is still here.",
+    "send_retry": "Try again"
   }
 }

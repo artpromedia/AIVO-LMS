@@ -13,6 +13,7 @@
  * (enabled:false with no rows), so non-pilot parents see no empty shell.
  */
 import * as React from "react";
+import { bffFetch } from "@/lib/api/client";
 import { useTranslations } from "next-intl";
 import { TUTORS } from "@aivo/brand";
 import { Card } from "@/components/ui/card";
@@ -37,15 +38,18 @@ export function TutorMemoryCard({ learnerId }: { learnerId: string }) {
 
   React.useEffect(() => {
     let cancelled = false;
-    fetch(`/api/bff/learners/${learnerId}/tutor-memories`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json: { data?: { enabled?: boolean; memories?: MemoryRow[] } } | null) => {
+    bffFetch<{ enabled?: boolean; memories?: MemoryRow[] }>(
+      `/api/bff/learners/${learnerId}/tutor-memories`,
+    )
+      .then((data) => {
         if (cancelled) return;
-        setEnabled(json?.data?.enabled === true);
-        setMemories(Array.isArray(json?.data?.memories) ? json.data.memories : []);
-        setLoaded(true);
+        setEnabled(data.enabled === true);
+        setMemories(Array.isArray(data.memories) ? data.memories : []);
       })
       .catch(() => {
+        // Memory card is additive parent context — absence reads as "off".
+      })
+      .finally(() => {
         if (!cancelled) setLoaded(true);
       });
     return () => {
@@ -56,12 +60,10 @@ export function TutorMemoryCard({ learnerId }: { learnerId: string }) {
   async function remove(memoryId: string) {
     setDeleting(memoryId);
     try {
-      const res = await fetch(`/api/bff/learners/${learnerId}/tutor-memories/${memoryId}`, {
+      await bffFetch(`/api/bff/learners/${learnerId}/tutor-memories/${memoryId}`, {
         method: "DELETE",
       });
-      if (res.ok) {
-        setMemories((prev) => prev.filter((m) => m.id !== memoryId));
-      }
+      setMemories((prev) => prev.filter((m) => m.id !== memoryId));
     } finally {
       setDeleting(null);
     }

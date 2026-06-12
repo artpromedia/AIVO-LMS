@@ -732,7 +732,8 @@
       "status_applied": "تمت الموافقة والتطبيق — تتحدث الدروس من الجلسة القادمة.",
       "status_declined": "مرفوض — لن يتغير شيء.",
       "status_failed": "تمت الموافقة لكن التطبيق فشل — تم إبلاغ فريقنا.",
-      "history": "القرارات الأخيرة ({count})"
+      "history": "القرارات الأخيرة ({count})",
+      "retry": "إعادة المحاولة"
     },
     "tutor_memories": {
       "title": "ما يتذكّره معلّمك",
@@ -1362,7 +1363,10 @@
       "agent_modality_auditory": "جرّب قراءته بصوت عالٍ — سماعه قد يساعد.",
       "agent_modality_kinesthetic": "جرّب العدّ بأصابعك أو بأشياء حولك.",
       "agent_modality_reading": "لنقرأه ببطء، جزءًا جزءًا.",
-      "agent_new_surface": "لنجرّب السؤال نفسه بطريقة مختلفة."
+      "agent_new_surface": "لنجرّب السؤال نفسه بطريقة مختلفة.",
+      "offline_saved_title": "حُفظ على هذا الجهاز",
+      "offline_saved_body": "أنت دون اتصال الآن — سيتزامن عملك فور عودته.",
+      "offline_complete_title": "حُفظ الدرس على هذا الجهاز"
     },
     "baseline_runner": {
       "exit_proctor_view": "الخروج من عرض المراقب",
@@ -3217,5 +3221,22 @@
       "week_kind_break": "عطلة مدرسية",
       "week_kind_holiday_prep": "تهيئة العطلة"
     }
+  },
+  "messages": {
+    "inbox_title": "الوارد",
+    "loading": "جارٍ التحميل…",
+    "empty_inbox": "لا توجد محادثات بعد. عندما يراسلك أحد من فريق AIVO ستظهر هنا.",
+    "select_prompt": "اختر محادثة للقراءة والرد.",
+    "empty_thread": "لا رسائل في هذه المحادثة بعد.",
+    "reply_placeholder": "اكتب ردًا…",
+    "send": "إرسال",
+    "sending": "جارٍ الإرسال…",
+    "threads_error_title": "تعذّر تحميل رسائلك",
+    "threads_error_body": "لم يُفقد شيء — حاول مجددًا بعد قليل.",
+    "thread_error_title": "تعذّر فتح المحادثة",
+    "thread_error_body": "حاول مرة أخرى — رسائلك بأمان.",
+    "send_failed_title": "لم تُرسل الرسالة",
+    "send_failed_body": "مسودتك ما زالت هنا.",
+    "send_retry": "إعادة المحاولة"
   }
 }

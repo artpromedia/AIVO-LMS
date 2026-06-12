@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { bffFetch } from "@/lib/api/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -107,32 +108,28 @@ export function ZipDistrictField({
       setStatus("loading");
 
       try {
-        const res = await fetch(`/api/bff/curriculum/lookup?zipCode=${encodeURIComponent(zip)}`, {
-          signal: ctrl.signal,
-        });
-        const json = (await res.json()) as LookupResponse;
-        if (!json.ok) {
-          setStatus("error");
-          return;
-        }
-        const dominant = json.data.districts?.dominant ?? null;
+        const data = await bffFetch<Extract<LookupResponse, { ok: true }>["data"]>(
+          `/api/bff/curriculum/lookup?zipCode=${encodeURIComponent(zip)}`,
+          { signal: ctrl.signal },
+        );
+        const dominant = data.districts?.dominant ?? null;
         if (dominant) {
           setDistrictId(dominant.ncesId);
           setDistrictName(dominant.name);
           setDistrictState(dominant.state);
-          setAlternates(json.data.districts?.alternates ?? []);
+          setAlternates(data.districts?.alternates ?? []);
           setStatus("resolved");
-        } else if (json.data.curriculum.districtId) {
+        } else if (data.curriculum.districtId) {
           // Legacy static-map fallback resolved a major district.
-          setDistrictId(json.data.curriculum.districtId);
-          setDistrictName(json.data.curriculum.districtName ?? "");
-          setDistrictState(json.data.curriculum.state ?? "");
+          setDistrictId(data.curriculum.districtId);
+          setDistrictName(data.curriculum.districtName ?? "");
+          setDistrictState(data.curriculum.state ?? "");
           setAlternates([]);
           setStatus("resolved");
         } else {
           setDistrictId("");
           setDistrictName("");
-          setDistrictState(json.data.curriculum.state ?? "");
+          setDistrictState(data.curriculum.state ?? "");
           setAlternates([]);
           setStatus("no_match");
         }
@@ -159,11 +156,11 @@ export function ZipDistrictField({
       try {
         const params = new URLSearchParams({ q: searchQuery.trim() });
         if (districtState) params.set("state", districtState);
-        const res = await fetch(`/api/bff/curriculum/districts/search?${params.toString()}`, {
-          signal: ctrl.signal,
-        });
-        const json = (await res.json()) as SearchResponse;
-        if (json.ok) setSearchResults(json.data.matches);
+        const data = await bffFetch<Extract<SearchResponse, { ok: true }>["data"]>(
+          `/api/bff/curriculum/districts/search?${params.toString()}`,
+          { signal: ctrl.signal },
+        );
+        setSearchResults(data.matches);
       } catch (err) {
         if ((err as { name?: string })?.name === "AbortError") return;
       } finally {

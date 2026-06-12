@@ -19,6 +19,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useTransition,
@@ -46,7 +47,8 @@ import {
   toStageSensoryProfile,
 } from "@aivo/stage-runtime";
 import type { FunctioningLevel } from "@aivo/stage-ui";
-import { enqueueOutbox, generateIdempotencyKey } from "@/lib/offline/outbox";
+import { createLessonRunApi } from "./lesson-player-mutations";
+import { toast } from "@/lib/use-toast";
 import { InLessonTutorPanel } from "@/components/learner/in-lesson-tutor-panel";
 import {
   PRESENTABLE_SURFACES,
@@ -298,6 +300,23 @@ export function LessonPlayer({
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("learner.lesson_player");
+  // One typed, outbox-backed network layer for every write this player
+  // makes — see lesson-player-mutations.ts. The first offline queue event
+  // per run surfaces a single calm toast.
+  const runApi = useMemo(
+    () =>
+      createLessonRunApi({
+        learnerId,
+        lessonRunId,
+        onQueuedOffline: (kind) =>
+          toast({
+            title: t(kind === "complete" ? "offline_complete_title" : "offline_saved_title"),
+            description: t("offline_saved_body"),
+            variant: "success",
+          }),
+      }),
+    [learnerId, lessonRunId, t],
+  );
   // Base beats are static per mount (plan + prefs arrive as server props).
   // Held in state (not useMemo) because an accepted agent `remediate`
   // splices a remediation beat after the current one — with the agent
@@ -355,9 +374,7 @@ export function LessonPlayer({
   // Deps are intentionally empty: this is a mount-only side-effect.
   useEffect(() => {
     if (initialStatus === "ready") {
-      fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/start`, {
-        method: "POST",
-      }).catch(() => {});
+      runApi.markStarted();
     }
   }, []);
 
@@ -386,7 +403,10 @@ export function LessonPlayer({
           if (typeof sid === "string" && sid) agentSessionRef.current = sid;
         },
       )
-      .catch(() => {});
+      .catch(() => {
+        // Agent open failed (timeout/offline). Explicitly degradable: the
+        // ref stays null and the lesson runs exactly as a non-agent lesson.
+      });
     return () => {
       cancelled = true;
     };
@@ -470,20 +490,7 @@ export function LessonPlayer({
    * mid-flight crash + reconnect can't double-record a step.
    */
   function postStep(payload: Record<string, unknown>): void {
-    const url = `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`;
-    const idemKey = generateIdempotencyKey("lesson-step");
-    const headers = { "content-type": "application/json", "idempotency-key": idemKey };
-    const body = JSON.stringify(payload);
-    fetch(url, { method: "POST", headers, body }).catch(() => {
-      enqueueOutbox({
-        id: idemKey,
-        url,
-        method: "POST",
-        headers,
-        body,
-        label: `lesson-step ${String(payload.stepKind ?? "unknown")}`,
-      }).catch(() => undefined);
-    });
+    runApi.postStep(payload);
   }
 
   function advance() {
@@ -635,16 +642,12 @@ export function LessonPlayer({
   }
 
   function emitSurfaceTelemetry(event: SurfaceTelemetryEvent) {
-    fetch("/api/learning/surface-telemetry", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        learnerId,
-        sessionId: lessonRunId,
-        eventType: event.type,
-        payload: event.payload ?? {},
-      }),
-    }).catch(() => {});
+    runApi.postSurfaceTelemetry({
+      learnerId,
+      sessionId: lessonRunId,
+      eventType: event.type,
+      payload: event.payload ?? {},
+    });
   }
 
   function toSurfaceItem(
@@ -851,24 +854,19 @@ export function LessonPlayer({
     // note into the run summary (Wave E S11).
     const agentSessionId = agent ? agentSessionRef.current : null;
     startTransition(async () => {
-      const res = await fetch(
-        `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/complete`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            outcome: { abandoned },
-            ...(agentSessionId ? { agentSessionId } : {}),
-          }),
-        },
-      );
-      if (!res.ok) {
+      const { done } = await runApi.complete({
+        outcome: { abandoned },
+        ...(agentSessionId ? { agentSessionId } : {}),
+      });
+      if (!done) {
         // Surface the failure instead of redirecting blindly — otherwise the
         // run would silently stay in_progress and mastery would never update.
         // The agent session id is kept so a retry can still close it.
         setCompleteError(t("complete_error"));
         return;
       }
+      // Completed — or queued offline with a toast; the outbox replay
+      // finishes the run server-side. Either way the learner moves on.
       agentSessionRef.current = null;
       router.push("/learner/home");
       router.refresh();

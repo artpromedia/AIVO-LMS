@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { RetryPanel } from "@/components/ui/retry-panel";
+import { bffFetch } from "@/lib/api/client";
+import { toast } from "@/lib/use-toast";
 import { useLiveRefresh } from "@/lib/use-live-refresh";
 import { useSse } from "@/lib/realtime/use-sse";
 
@@ -28,47 +34,39 @@ function timeLabel(iso: string): string {
     : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
+const THREADS_KEY = ["messages", "threads"] as const;
+const threadMessagesKey = (id: string) => ["messages", "thread", id] as const;
+
 /**
  * Threaded inbox for `/messages`. Lists the signed-in user's threads, opens a
  * thread, and lets them reply. Backed by `/api/bff/messages/*` (dual-path:
  * comms-svc when enabled, in-memory store in dev/mock).
+ *
+ * Data layer: TanStack Query over `bffFetch` — list + thread reads cache and
+ * retry through the shared client; SSE pushes append straight into the query
+ * cache; the 6s/12s polling stays as the documented fallback. Send failures
+ * surface a danger toast with a retry action and never clear the draft.
  */
 export function MessagesInbox() {
-  const [threads, setThreads] = React.useState<ThreadListItem[]>([]);
-  const [loadingThreads, setLoadingThreads] = React.useState(true);
+  const t = useTranslations("messages");
+  const queryClient = useQueryClient();
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [activeSubject, setActiveSubject] = React.useState<string>("");
-  const [messages, setMessages] = React.useState<ThreadMessage[] | null>(null);
   const [draft, setDraft] = React.useState("");
-  const [sending, startSend] = React.useTransition();
-  const [error, setError] = React.useState<string | null>(null);
 
-  const loadThreads = React.useCallback(async () => {
-    try {
-      const res = await fetch("/api/bff/messages/threads");
-      const j = await res.json().catch(() => ({}));
-      if (res.ok && j?.data?.threads) setThreads(j.data.threads as ThreadListItem[]);
-    } catch {
-      setError("Couldn't load your messages.");
-    } finally {
-      setLoadingThreads(false);
-    }
-  }, []);
+  const threadsQuery = useQuery({
+    queryKey: THREADS_KEY,
+    queryFn: () => bffFetch<{ threads: ThreadListItem[] }>("/api/bff/messages/threads"),
+  });
+  const threads = threadsQuery.data?.threads ?? [];
 
-  React.useEffect(() => {
-    void loadThreads();
-  }, [loadThreads]);
-
-  const loadActiveMessages = React.useCallback(async () => {
-    if (!activeId) return;
-    try {
-      const r = await fetch(`/api/bff/messages/threads/${activeId}/messages`);
-      const j = await r.json().catch(() => ({}));
-      if (j?.data?.messages) setMessages(j.data.messages as ThreadMessage[]);
-    } catch {
-      // Transient; the next tick retries.
-    }
-  }, [activeId]);
+  const messagesQuery = useQuery({
+    queryKey: threadMessagesKey(activeId ?? "none"),
+    queryFn: () =>
+      bffFetch<{ messages: ThreadMessage[] }>(`/api/bff/messages/threads/${activeId}/messages`),
+    enabled: activeId !== null,
+  });
+  const messages = activeId === null ? null : (messagesQuery.data?.messages ?? null);
 
   // Live updates: prefer cross-replica SSE fan-out from comms-svc (a NATS
   // subject keyed by thread id). When the stream is open we skip the
@@ -78,64 +76,88 @@ export function MessagesInbox() {
   const sse = useSse(activeId ? `/api/bff/messages/threads/${activeId}/stream` : null, {
     enabled: !!activeId,
     onNamedEvent: (name, data) => {
-      if (name !== "message") return;
+      if (name !== "message" || !activeId) return;
       const payload = data as { type?: string; message?: ThreadMessage } | null;
       if (payload?.type !== "message.created" || !payload.message) return;
-      setMessages((prev) => {
-        const next = prev ? [...prev] : [];
-        // Dedupe — a poll might have raced us to the same row.
-        if (next.some((m) => m.id === payload.message!.id)) return next;
-        next.push(payload.message!);
-        return next;
-      });
+      queryClient.setQueryData<{ messages: ThreadMessage[] }>(
+        threadMessagesKey(activeId),
+        (prev) => {
+          const next = prev?.messages ? [...prev.messages] : [];
+          // Dedupe — a poll might have raced us to the same row.
+          if (next.some((m) => m.id === payload.message!.id)) return prev ?? { messages: next };
+          next.push(payload.message!);
+          return { messages: next };
+        },
+      );
       // Thread list lastMessage/unread also need to refresh; cheap.
-      void loadThreads();
+      void queryClient.invalidateQueries({ queryKey: THREADS_KEY });
     },
   });
   const streamHealthy = sse.state === "open";
 
-  useLiveRefresh(loadThreads, 12000);
-  useLiveRefresh(loadActiveMessages, 6000, { enabled: activeId !== null && !streamHealthy });
+  const refetchThreads = React.useCallback(
+    () => queryClient.invalidateQueries({ queryKey: THREADS_KEY }),
+    [queryClient],
+  );
+  const refetchActive = React.useCallback(async () => {
+    if (activeId) await queryClient.invalidateQueries({ queryKey: threadMessagesKey(activeId) });
+  }, [queryClient, activeId]);
 
-  const openThread = React.useCallback(async (id: string, subject: string) => {
-    setActiveId(id);
-    setActiveSubject(subject);
-    setMessages(null);
-    setError(null);
-    try {
-      const res = await fetch(`/api/bff/messages/threads/${id}/messages`);
-      const j = await res.json().catch(() => ({}));
-      if (res.ok && j?.data) {
-        setMessages((j.data.messages ?? []) as ThreadMessage[]);
-        void fetch(`/api/bff/messages/threads/${id}/read`, { method: "POST" });
-        setThreads((prev) => prev.map((t) => (t.id === id ? { ...t, unread: 0 } : t)));
-      } else {
-        setError("Couldn't open that conversation.");
+  useLiveRefresh(refetchThreads, 12000);
+  useLiveRefresh(refetchActive, 6000, { enabled: activeId !== null && !streamHealthy });
+
+  const markRead = useMutation({
+    mutationFn: (id: string) =>
+      bffFetch(`/api/bff/messages/threads/${id}/read`, { method: "POST" }),
+    onSuccess: (_data, id) => {
+      queryClient.setQueryData<{ threads: ThreadListItem[] }>(THREADS_KEY, (prev) =>
+        prev
+          ? { threads: prev.threads.map((th) => (th.id === id ? { ...th, unread: 0 } : th)) }
+          : prev,
+      );
+    },
+  });
+
+  const openThread = React.useCallback(
+    (id: string, subject: string) => {
+      setActiveId(id);
+      setActiveSubject(subject);
+      markRead.mutate(id);
+    },
+    [markRead],
+  );
+
+  const sendMutation = useMutation({
+    mutationFn: (body: string) =>
+      bffFetch<{ message: ThreadMessage }>(`/api/bff/messages/threads/${activeId}/messages`, {
+        method: "POST",
+        body: { body },
+      }),
+    onSuccess: (data) => {
+      if (activeId) {
+        queryClient.setQueryData<{ messages: ThreadMessage[] }>(
+          threadMessagesKey(activeId),
+          (prev) => ({ messages: [...(prev?.messages ?? []), data.message] }),
+        );
       }
-    } catch {
-      setError("Couldn't open that conversation.");
-    }
-  }, []);
+      setDraft("");
+      void queryClient.invalidateQueries({ queryKey: THREADS_KEY });
+    },
+    onError: (_err, body) => {
+      // Draft is preserved; the toast offers a one-tap retry.
+      toast({
+        title: t("send_failed_title"),
+        description: t("send_failed_body"),
+        variant: "danger",
+        action: { label: t("send_retry"), onClick: () => sendMutation.mutate(body) },
+      });
+    },
+  });
 
   function send() {
     const body = draft.trim();
-    if (!body || !activeId) return;
-    setError(null);
-    startSend(async () => {
-      const res = await fetch(`/api/bff/messages/threads/${activeId}/messages`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ body }),
-      });
-      const j = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(j?.error?.message ?? "Couldn't send your message.");
-        return;
-      }
-      setMessages((prev) => [...(prev ?? []), j.data.message as ThreadMessage]);
-      setDraft("");
-      void loadThreads();
-    });
+    if (!body || !activeId || sendMutation.isPending) return;
+    sendMutation.mutate(body);
   }
 
   return (
@@ -143,39 +165,49 @@ export function MessagesInbox() {
       {/* Thread list */}
       <aside className="rounded-iw-card border border-iw-border bg-iw-card">
         <header className="border-b border-iw-border px-4 py-3">
-          <h2 className="text-sm font-semibold text-iw-text-strong">Inbox</h2>
+          <h2 className="text-sm font-semibold text-iw-text-strong">{t("inbox_title")}</h2>
         </header>
-        {loadingThreads ? (
-          <p className="px-4 py-6 text-sm text-iw-text-muted">Loading…</p>
+        {threadsQuery.isPending ? (
+          <div className="flex flex-col gap-3 px-4 py-4" aria-busy="true">
+            <span className="sr-only">{t("loading")}</span>
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-5/6" />
+          </div>
+        ) : threadsQuery.isError ? (
+          <RetryPanel
+            className="m-3"
+            title={t("threads_error_title")}
+            message={t("threads_error_body")}
+            onRetry={() => threadsQuery.refetch()}
+          />
         ) : threads.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-iw-text-muted">
-            No conversations yet. When someone on your AIVO team messages you it will appear here.
-          </p>
+          <p className="px-4 py-6 text-sm text-iw-text-muted">{t("empty_inbox")}</p>
         ) : (
           <ul className="divide-y divide-iw-border">
-            {threads.map((t) => (
-              <li key={t.id}>
+            {threads.map((th) => (
+              <li key={th.id}>
                 <button
                   type="button"
-                  onClick={() => void openThread(t.id, t.subject)}
-                  aria-current={t.id === activeId}
+                  onClick={() => openThread(th.id, th.subject)}
+                  aria-current={th.id === activeId}
                   className={`flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors hover:bg-iw-raised ${
-                    t.id === activeId ? "bg-iw-raised" : ""
+                    th.id === activeId ? "bg-iw-raised" : ""
                   }`}
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="truncate text-sm font-semibold text-iw-text-strong">
-                      {t.subject}
+                      {th.subject}
                     </span>
-                    {t.unread > 0 ? (
+                    {th.unread > 0 ? (
                       <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--aivo-sensory-primary)] px-1.5 text-xs font-semibold text-white">
-                        {t.unread}
+                        {th.unread}
                       </span>
                     ) : null}
                   </span>
-                  {t.lastMessage ? (
+                  {th.lastMessage ? (
                     <span className="truncate text-xs text-iw-text-muted">
-                      {t.lastMessage.body}
+                      {th.lastMessage.body}
                     </span>
                   ) : null}
                 </button>
@@ -189,7 +221,7 @@ export function MessagesInbox() {
       <section className="flex min-h-[420px] flex-col rounded-iw-card border border-iw-border bg-iw-card">
         {activeId === null ? (
           <div className="flex flex-1 items-center justify-center p-8 text-center text-sm text-iw-text-muted">
-            Select a conversation to read and reply.
+            {t("select_prompt")}
           </div>
         ) : (
           <>
@@ -197,10 +229,21 @@ export function MessagesInbox() {
               <h2 className="text-sm font-semibold text-iw-text-strong">{activeSubject}</h2>
             </header>
             <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
-              {messages === null ? (
-                <p className="text-sm text-iw-text-muted">Loading…</p>
+              {messagesQuery.isError ? (
+                <RetryPanel
+                  title={t("thread_error_title")}
+                  message={t("thread_error_body")}
+                  onRetry={() => messagesQuery.refetch()}
+                />
+              ) : messages === null ? (
+                <div className="flex flex-col gap-3" aria-busy="true">
+                  <span className="sr-only">{t("loading")}</span>
+                  <Skeleton className="h-10 w-3/5" />
+                  <Skeleton className="ml-auto h-10 w-2/5" />
+                  <Skeleton className="h-10 w-1/2" />
+                </div>
               ) : messages.length === 0 ? (
-                <p className="text-sm text-iw-text-muted">No messages in this conversation yet.</p>
+                <p className="text-sm text-iw-text-muted">{t("empty_thread")}</p>
               ) : (
                 messages.map((m) => (
                   <div
@@ -229,24 +272,22 @@ export function MessagesInbox() {
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   rows={2}
-                  placeholder="Write a reply…"
-                  aria-label="Write a reply"
+                  placeholder={t("reply_placeholder")}
+                  aria-label={t("reply_placeholder")}
                   className="flex-1 resize-none rounded-iw-control border border-iw-border bg-iw-raised px-3 py-2 text-sm text-iw-text-strong outline-none focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary)]/20"
                 />
-                <Button size="sm" disabled={sending || draft.trim().length === 0} onClick={send}>
-                  {sending ? "Sending…" : "Send"}
+                <Button
+                  size="sm"
+                  disabled={sendMutation.isPending || draft.trim().length === 0}
+                  onClick={send}
+                >
+                  {sendMutation.isPending ? t("sending") : t("send")}
                 </Button>
               </div>
             </div>
           </>
         )}
       </section>
-
-      {error ? (
-        <p role="alert" className="text-sm text-aivo-danger lg:col-span-2">
-          {error}
-        </p>
-      ) : null}
     </div>
   );
 }

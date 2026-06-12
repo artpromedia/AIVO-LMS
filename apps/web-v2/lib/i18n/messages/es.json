@@ -732,7 +732,8 @@
       "status_applied": "Aprobado y aplicado — las lecciones se actualizan en la próxima sesión.",
       "status_declined": "Rechazado — nada cambia.",
       "status_failed": "Aprobado, pero falló la aplicación — nuestro equipo fue notificado.",
-      "history": "Decisiones recientes ({count})"
+      "history": "Decisiones recientes ({count})",
+      "retry": "Reintentar"
     },
     "tutor_memories": {
       "title": "Lo que recuerda tu tutor",
@@ -1362,7 +1363,10 @@
       "agent_modality_auditory": "Intenta leerlo en voz alta — escucharlo puede ayudar.",
       "agent_modality_kinesthetic": "Intenta contarlo con tus dedos u objetos.",
       "agent_modality_reading": "Leámoslo despacio, una parte a la vez.",
-      "agent_new_surface": "Probemos la misma pregunta de otra manera."
+      "agent_new_surface": "Probemos la misma pregunta de otra manera.",
+      "offline_saved_title": "Guardado en este dispositivo",
+      "offline_saved_body": "Ahora estás sin conexión: tu trabajo se sincronizará en cuanto vuelvas.",
+      "offline_complete_title": "Lección guardada en este dispositivo"
     },
     "baseline_runner": {
       "exit_proctor_view": "Salir de la vista de supervisor",
@@ -3217,5 +3221,22 @@
       "week_kind_break": "Receso escolar",
       "week_kind_holiday_prep": "Preparación vacacional"
     }
+  },
+  "messages": {
+    "inbox_title": "Bandeja",
+    "loading": "Cargando…",
+    "empty_inbox": "Aún no hay conversaciones. Cuando alguien de tu equipo AIVO te escriba, aparecerá aquí.",
+    "select_prompt": "Elige una conversación para leer y responder.",
+    "empty_thread": "Todavía no hay mensajes en esta conversación.",
+    "reply_placeholder": "Escribe una respuesta…",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "threads_error_title": "No pudimos cargar tus mensajes",
+    "threads_error_body": "No se perdió nada; inténtalo de nuevo en un momento.",
+    "thread_error_title": "No pudimos abrir esa conversación",
+    "thread_error_body": "Inténtalo otra vez; tus mensajes están a salvo.",
+    "send_failed_title": "Mensaje no enviado",
+    "send_failed_body": "Tu borrador sigue aquí.",
+    "send_retry": "Reintentar"
   }
 }

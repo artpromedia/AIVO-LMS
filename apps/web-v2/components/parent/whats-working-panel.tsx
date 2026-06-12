@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { bffFetch } from "@/lib/api/client";
 import { useTranslations } from "next-intl";
 import { Clock, Sparkles, AlertTriangle } from "lucide-react";
 
@@ -40,31 +42,16 @@ export function WhatsWorkingPanel({
 }) {
   const t = useTranslations("parent.whats_working");
   const [windowDays, setWindowDays] = React.useState(30);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-  const [data, setData] = React.useState<Insights | null>(null);
-
-  React.useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    setError(null);
-    fetch(`/api/bff/parent/learners/${learnerId}/whats-working?windowDays=${windowDays}`)
-      .then((r) => r.json())
-      .then((j) => {
-        if (!alive) return;
-        if (j?.data) setData(j.data as Insights);
-        else setError(t("load_error"));
-      })
-      .catch(() => {
-        if (alive) setError(t("load_error"));
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, [learnerId, windowDays, t]);
+  const insights = useQuery({
+    queryKey: ["whats-working", learnerId, windowDays],
+    queryFn: () =>
+      bffFetch<Insights>(
+        `/api/bff/parent/learners/${learnerId}/whats-working?windowDays=${windowDays}`,
+      ),
+  });
+  const loading = insights.isPending;
+  const error = insights.isError ? t("load_error") : null;
+  const data = insights.data ?? null;
 
   const pct = (n: number) => Math.round(n * 100);
   const tod = (key: string) => t(`tod_${key}`);

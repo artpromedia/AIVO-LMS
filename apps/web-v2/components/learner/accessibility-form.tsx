@@ -7,6 +7,7 @@
  * happen server-side.
  */
 import { useState, useTransition } from "react";
+import { bffFetch } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -181,17 +182,15 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
       patch.aacScanDelayMs = prefs.aacScanDelayMs;
     }
     startSaving(async () => {
-      const res = await fetch(`/api/bff/learners/${learnerId}/accessibility`, {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(patch),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setPrefs(data.data.accessibility);
+      try {
+        const data = await bffFetch<{ accessibility: AccessibilityPreferences }>(
+          `/api/bff/learners/${learnerId}/accessibility`,
+          { method: "PATCH", body: patch },
+        );
+        setPrefs(data.accessibility);
         setStatus("saved");
         router.refresh();
-      } else {
+      } catch {
         setStatus("error");
       }
     });
@@ -199,15 +198,15 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
 
   function reset() {
     startSaving(async () => {
-      const res = await fetch(`/api/bff/learners/${learnerId}/accessibility/reset`, {
-        method: "POST",
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setPrefs(data.data.accessibility);
+      try {
+        const data = await bffFetch<{ accessibility: AccessibilityPreferences }>(
+          `/api/bff/learners/${learnerId}/accessibility/reset`,
+          { method: "POST" },
+        );
+        setPrefs(data.accessibility);
         setStatus("reset");
         router.refresh();
-      } else {
+      } catch {
         setStatus("error");
       }
     });
