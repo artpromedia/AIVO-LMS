@@ -1253,7 +1253,9 @@
       "themes_title": "Arbeitsbereich-Themes",
       "themes_hint": "Steige im Level auf, um neue Looks für deinen Bereich freizuschalten.",
       "theme_locked": "Erreiche Level {level}",
-      "theme_active": "Aktiv"
+      "theme_active": "Aktiv",
+      "badge_earned": "Erhalten",
+      "badge_howto": "Erkunde weiter, um es zu erhalten."
     },
     "select": {
       "eyebrow": "Ansehen als",

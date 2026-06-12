@@ -1451,7 +1451,9 @@
       "themes_title": "Workspace themes",
       "themes_hint": "Level up to unlock new looks for your space.",
       "theme_locked": "Reach level {level}",
-      "theme_active": "On"
+      "theme_active": "On",
+      "badge_earned": "Earned",
+      "badge_howto": "Keep exploring to earn this one."
     },
     "select": {
       "eyebrow": "View as",

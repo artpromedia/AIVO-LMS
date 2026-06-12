@@ -1253,7 +1253,9 @@
       "themes_title": "वर्कस्पेस थीम",
       "themes_hint": "अपने स्थान के लिए नए रूप अनलॉक करने हेतु लेवल बढ़ाएँ।",
       "theme_locked": "लेवल {level} तक पहुँचें",
-      "theme_active": "चालू"
+      "theme_active": "चालू",
+      "badge_earned": "अर्जित",
+      "badge_howto": "इसे पाने के लिए खोज जारी रखें।"
     },
     "select": {
       "eyebrow": "इस रूप में देखें",

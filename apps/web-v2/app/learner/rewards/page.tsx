@@ -119,7 +119,8 @@ export default async function Page() {
         </div>
         <BadgeCollection
           earnedKeys={earnedKeys}
-          ariaLabel={t("badges_count", { earned: badges.length, total: ALL_BADGES.length })}
+          earnedLabel={t("badge_earned")}
+          howtoLabel={t("badge_howto")}
         />
       </section>
 

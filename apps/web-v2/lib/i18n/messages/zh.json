@@ -1253,7 +1253,9 @@
       "themes_title": "工作区主题",
       "themes_hint": "升级以解锁你空间的新外观。",
       "theme_locked": "达到 {level} 级",
-      "theme_active": "已启用"
+      "theme_active": "已启用",
+      "badge_earned": "已获得",
+      "badge_howto": "继续探索来获得它。"
     },
     "select": {
       "eyebrow": "查看身份",

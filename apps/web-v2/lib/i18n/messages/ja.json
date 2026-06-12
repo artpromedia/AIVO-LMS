@@ -1253,7 +1253,9 @@
       "themes_title": "ワークスペースのテーマ",
       "themes_hint": "レベルアップして、あなたの空間の新しい見た目をアンロックしよう。",
       "theme_locked": "レベル {level} に到達",
-      "theme_active": "オン"
+      "theme_active": "オン",
+      "badge_earned": "獲得済み",
+      "badge_howto": "探検を続けて手に入れよう。"
     },
     "select": {
       "eyebrow": "表示の切り替え",

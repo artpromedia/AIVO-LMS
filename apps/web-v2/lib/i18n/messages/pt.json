@@ -1253,7 +1253,9 @@
       "themes_title": "Temas do espaço",
       "themes_hint": "Suba de nível para desbloquear novos visuais para o seu espaço.",
       "theme_locked": "Alcance o nível {level}",
-      "theme_active": "Ativo"
+      "theme_active": "Ativo",
+      "badge_earned": "Conquistada",
+      "badge_howto": "Continue explorando para conquistá-la."
     },
     "select": {
       "eyebrow": "Ver como",

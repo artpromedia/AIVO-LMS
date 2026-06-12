@@ -1253,7 +1253,9 @@
       "themes_title": "작업 공간 테마",
       "themes_hint": "레벨을 올려 내 공간의 새로운 모습을 잠금 해제하세요.",
       "theme_locked": "레벨 {level} 도달",
-      "theme_active": "켜짐"
+      "theme_active": "켜짐",
+      "badge_earned": "획득함",
+      "badge_howto": "계속 탐험해서 획득하세요."
     },
     "select": {
       "eyebrow": "다음으로 보기",

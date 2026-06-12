@@ -1253,7 +1253,9 @@
       "themes_title": "Thèmes d’espace",
       "themes_hint": "Montez de niveau pour débloquer de nouveaux styles pour votre espace.",
       "theme_locked": "Atteins le niveau {level}",
-      "theme_active": "Activé"
+      "theme_active": "Activé",
+      "badge_earned": "Obtenu",
+      "badge_howto": "Continue d’explorer pour l’obtenir."
     },
     "select": {
       "eyebrow": "Voir en tant que",
