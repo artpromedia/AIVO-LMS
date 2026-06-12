@@ -25,7 +25,7 @@ import {
   refreshLearnerReadiness,
 } from "@/lib/db/repos";
 import type { LearnerProfile } from "@/lib/db/types";
-import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
+import { READINESS_LABEL_KEY, READINESS_TONE } from "@/lib/learner/readiness";
 import {
   buildKpiAriaLabel,
   computeDeltaPct,
@@ -37,6 +37,7 @@ export const dynamic = "force-dynamic";
 
 export default async function TherapistHomePage() {
   const t = await getTranslations("therapist.home");
+  const tReadiness = await getTranslations("parent.readiness");
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = await listLearnersForMember(session.userId, session.email, "therapist", session.tenantId);
   const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
@@ -152,7 +153,7 @@ export default async function TherapistHomePage() {
                     </p>
                   </div>
                   <Badge tone={READINESS_TONE[l.readinessState]}>
-                    {READINESS_LABEL[l.readinessState]}
+                    {tReadiness(READINESS_LABEL_KEY[l.readinessState])}
                   </Badge>
                 </div>
               </div>

@@ -4,7 +4,8 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { getLearner, refreshLearnerReadiness } from "@/lib/db/repos";
-import { READINESS_LABEL, nextStepFor } from "@/lib/learner/readiness";
+import { getTranslations } from "next-intl/server";
+import { READINESS_LABEL_KEY, nextStepFor } from "@/lib/learner/readiness";
 
 export const dynamic = "force-dynamic";
 
@@ -37,12 +38,13 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     const state = await refreshLearnerReadiness(learnerId, session!.tenantId);
     if (!state) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     const next = nextStepFor({ id: learnerId, readinessState: state });
+    const t = await getTranslations("parent.readiness");
     return ok(
       {
         learnerId,
         state,
-        label: READINESS_LABEL[state],
-        nextStep: next,
+        label: t(READINESS_LABEL_KEY[state]),
+        nextStep: { label: t(next.labelKey), href: next.href },
       },
       requestId,
     );

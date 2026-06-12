@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { getLearner, parentCanAccessLearner, refreshLearnerReadiness } from "@/lib/db/repos";
-import { READINESS_LABEL, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
+import { READINESS_LABEL_KEY, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
 import { WhatsWorkingPanel } from "@/components/parent/whats-working-panel";
 import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
 import { TutorMemoryCard } from "@/components/parent/tutor-memory-card";
@@ -31,6 +31,7 @@ export default async function LearnerDetailPage({
   params: Promise<{ learnerId: string }>;
 }) {
   const t = await getTranslations("parent.learner_overview");
+  const tReadiness = await getTranslations("parent.readiness");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
@@ -70,9 +71,9 @@ export default async function LearnerDetailPage({
         <LearnerAvatar name={learner.displayName} size="lg" />
         <div className="flex-1">
           <p className="text-xs text-aivo-ink-soft">{t("next_step")}</p>
-          <p className="font-display text-lg font-semibold">{next.label}</p>
+          <p className="font-display text-lg font-semibold">{tReadiness(next.labelKey)}</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <Badge tone={tone}>{READINESS_LABEL[learner.readinessState]}</Badge>
+            <Badge tone={tone}>{tReadiness(READINESS_LABEL_KEY[learner.readinessState])}</Badge>
             {learner.schoolContext ? (
               <Badge tone="neutral">{learner.schoolContext.replace("_", " ")}</Badge>
             ) : null}
@@ -83,7 +84,7 @@ export default async function LearnerDetailPage({
         </div>
         <Button asChild>
           <Link href={next.href}>
-            {next.label} <ArrowRight className="ml-1 h-4 w-4" />
+            {tReadiness(next.labelKey)} <ArrowRight className="ml-1 h-4 w-4" />
           </Link>
         </Button>
       </Card>

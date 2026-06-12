@@ -1,15 +1,26 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
-import { READINESS_LABEL, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
+import { READINESS_LABEL_KEY, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
 import type { LearnerProfile } from "@/lib/db/types";
 
-export function LearnerCard({ learner }: { learner: LearnerProfile }) {
+export async function LearnerCard({ learner }: { learner: LearnerProfile }) {
+  const t = await getTranslations("parent.readiness");
+  const tCard = await getTranslations("parent.learner_card");
   const next = nextStepFor(learner);
   const tone = READINESS_TONE[learner.readinessState];
+  const age = new Date().getFullYear() - learner.birthYear;
+  const meta = [
+    tCard("age", { age }),
+    learner.gradeBand ? tCard("grade", { grade: learner.gradeBand }) : null,
+    learner.pronouns ?? null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <Card className="group relative flex flex-col gap-5 overflow-hidden rounded-iw-hero border-0 bg-white p-7 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.22)] transition-shadow hover:shadow-[0_40px_100px_-40px_rgba(124,58,237,0.28)]">
       <div
@@ -24,26 +35,22 @@ export function LearnerCard({ learner }: { learner: LearnerProfile }) {
           <p className="truncate font-iw-display text-2xl font-bold tracking-tight text-iw-text-strong">
             {learner.displayName}
           </p>
-          <p className="text-sm text-iw-text-muted">
-            Age {new Date().getFullYear() - learner.birthYear}
-            {learner.gradeBand ? ` · Grade ${learner.gradeBand}` : ""}
-            {learner.pronouns ? ` · ${learner.pronouns}` : ""}
-          </p>
+          <p className="text-sm text-iw-text-muted">{meta}</p>
         </div>
       </div>
       <div className="relative flex flex-wrap gap-2">
-        <Badge tone={tone}>{READINESS_LABEL[learner.readinessState]}</Badge>
+        <Badge tone={tone}>{t(READINESS_LABEL_KEY[learner.readinessState])}</Badge>
         {learner.functioningLevel ? (
           <Badge tone="neutral">{learner.functioningLevel.replace("_", " ")}</Badge>
         ) : null}
       </div>
       <div className="relative mt-auto flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Button asChild variant="outline" size="sm">
-          <Link href={`/parent/learners/${learner.id}`}>Open profile</Link>
+          <Link href={`/parent/learners/${learner.id}`}>{tCard("open_profile")}</Link>
         </Button>
         <Button asChild size="sm">
           <Link href={next.href}>
-            {next.label} <ArrowRight className="ml-1 h-4 w-4" />
+            {t(next.labelKey)} <ArrowRight className="ml-1 h-4 w-4" />
           </Link>
         </Button>
       </div>
