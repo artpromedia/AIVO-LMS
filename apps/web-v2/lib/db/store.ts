@@ -28,6 +28,9 @@ import type {
   IEPDocument,
   LearnerBadge,
   LearnerBrainProfile,
+  BrainProfileApproval,
+  LearnerBrainProfileChange,
+  ContributionAcknowledgement,
   LearnerEngagement,
   LearnerProfile,
   LearnerSensoryProfile,
@@ -40,6 +43,8 @@ import type {
   CollaboratorInsight,
   CollaboratorMember,
   ParentAssessment,
+  TeacherAssessmentDraft,
+  TherapistAssessmentDraft,
   ParentLearnerRelationship,
   ParentLessonSummary,
   ParentProgressSummary,
@@ -65,6 +70,7 @@ import type {
   DataInventoryItem,
   DataRetentionPolicy,
   DisclosureLog,
+  ChildProfileDisclosure,
   DataExportRequest,
   DataDeletionRequest,
   IEPDocumentAccessLog,
@@ -147,9 +153,26 @@ export type Store = {
   learnerProfiles: Map<string, LearnerProfile>;
   parentLearnerRelationships: ParentLearnerRelationship[];
   parentAssessments: Map<string, ParentAssessment>;
+  /** Sprint C-07: teacher assessment wizard autosave drafts (system of
+   *  record is assessment-svc). Keyed by draft id. */
+  teacherAssessmentDrafts: Map<string, TeacherAssessmentDraft>;
+  /** Sprint C-10: therapist assessment autosave drafts (system of record is
+   *  assessment-svc). Sibling of teacherAssessmentDrafts. Keyed by draft id. */
+  therapistAssessmentDrafts: Map<string, TherapistAssessmentDraft>;
   iepDocuments: Map<string, IEPDocument>;
   accommodationSummaries: Map<string, AccommodationSummary>;
   brainProfiles: Map<string, LearnerBrainProfile>;
+  /** Sprint C-06: append-only parent approval/amend/decline records. */
+  brainProfileApprovals: BrainProfileApproval[];
+  /** Sprint C-13: append-only brain-profile change records (mastery|structural)
+   *  powering the "what changed since you approved" timeline. `ackedAt` is the
+   *  one mutable field, set when the parent acknowledges a structural delta. */
+  brainProfileChanges: LearnerBrainProfileChange[];
+  /** Sprint C-16: contributor acknowledgements — one row per contributor whose
+   *  OWN folded input landed in an approved profile. Idempotent on
+   *  (learnerId, profileRevision, role, contributorEmail). Powers the "Your
+   *  contributions" card + the repeat-contribution retention metric. */
+  contributionAcknowledgements: ContributionAcknowledgement[];
 
   subjects: Map<string, Subject>;
   skills: Map<string, Skill>;
@@ -203,6 +226,8 @@ export type Store = {
   dataExportRequests: Map<string, DataExportRequest>;
   dataDeletionRequests: Map<string, DataDeletionRequest>;
   iepDocumentAccessLogs: IEPDocumentAccessLog[];
+  // Sprint C-12 (ADR 0042): FERPA cross-role brain-profile reads (web-v2 side).
+  childProfileDisclosures: ChildProfileDisclosure[];
   policyVersions: Map<string, PolicyVersion>;
   dpaRecords: Map<string, DPARecord>;
   subprocessors: Map<string, SubprocessorRecord>;
@@ -321,9 +346,14 @@ function createStore(): Store {
     learnerProfiles: new Map(),
     parentLearnerRelationships: [],
     parentAssessments: new Map(),
+    teacherAssessmentDrafts: new Map(),
+    therapistAssessmentDrafts: new Map(),
     iepDocuments: new Map(),
     accommodationSummaries: new Map(),
     brainProfiles: new Map(),
+    brainProfileApprovals: [],
+    brainProfileChanges: [],
+    contributionAcknowledgements: [],
     subjects: new Map(),
     skills: new Map(),
     masteryMaps: new Map(),
@@ -367,6 +397,7 @@ function createStore(): Store {
     dataExportRequests: new Map(),
     dataDeletionRequests: new Map(),
     iepDocumentAccessLogs: [],
+    childProfileDisclosures: [],
     policyVersions: new Map(),
     dpaRecords: new Map(),
     subprocessors: new Map(),

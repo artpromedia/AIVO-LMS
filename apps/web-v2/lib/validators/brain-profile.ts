@@ -66,6 +66,20 @@ const signalDecisionSchema = z.object({
   reasoning: z.string().max(1000),
 });
 
+/**
+ * Sprint C-05: a field-level parent correction — same shape as brain-svc
+ * `ParentModification` (`models/schemas.py`), camelCased. Used both for the
+ * applied record (`xaiExplanation.parentModifications`) and the staged draft
+ * (`parentCorrectionsDraft`).
+ */
+export const parentModificationSchema = z.object({
+  field: z.string().min(1).max(200),
+  originalValue: z.union([z.number(), z.string().max(500), z.boolean(), z.null()]),
+  parentValue: z.union([z.number(), z.string().max(500), z.boolean(), z.null()]),
+  parentNote: z.string().max(500).nullable(),
+  modifiedAt: z.string().min(1).max(64),
+});
+
 export const brainProfileStateSchema = z.object({
   learnerProfileSnapshot: z.object({
     learnerId: z.string(),
@@ -153,7 +167,18 @@ export const brainProfileStateSchema = z.object({
     tutorDecisionsDetailed: z.array(tutorDecisionSchema).optional(),
     signalDecisionsDetailed: z.array(signalDecisionSchema).optional(),
     raiComplianceDetail: raiComplianceDetailSchema.optional(),
+    // Sprint C-05: parent corrections applied at approval (brain-svc
+    // `xai_explanation.parent_modifications` parity).
+    parentModifications: z.array(parentModificationSchema).max(200).optional(),
   }),
+  // Sprint C-05: review-screen corrections saved but not yet approved —
+  // server-side resume state. See `LearnerBrainProfileState` for semantics.
+  parentCorrectionsDraft: z
+    .object({
+      modifications: z.array(parentModificationSchema).max(100),
+      savedAt: z.string().min(1).max(64),
+    })
+    .optional(),
   source: z.enum(["ai_generated", "deterministic_fallback"]),
   schemaVersion: z.literal(BRAIN_PROFILE_SCHEMA_VERSION),
 });

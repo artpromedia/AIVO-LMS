@@ -26,6 +26,15 @@ export interface ReadAloudButtonProps {
   /** Optional short label override ("Read aloud" / "Stop"). */
   label?: React.ReactNode;
   className?: string;
+  /**
+   * Sprint C-15 — opt into switch/AAC scanning. When set, the rendered
+   * control carries `data-scan-target` + `data-scan-action="read-aloud"` so
+   * the baseline scan controller activates the spoken read-aloud instead of
+   * following the SSR `href`. `scanReadText` is the text the scanner speaks.
+   */
+  scanTargetId?: string;
+  scanLabel?: string;
+  scanReadText?: string;
 }
 
 export function ReadAloudButton({
@@ -35,8 +44,19 @@ export function ReadAloudButton({
   disabled,
   label,
   className,
+  scanTargetId,
+  scanLabel,
+  scanReadText,
 }: ReadAloudButtonProps) {
   const ariaLabel = playing ? "Stop reading aloud" : "Read this aloud";
+  const scanProps = scanTargetId
+    ? {
+        "data-scan-target": scanTargetId,
+        "data-scan-action": "read-aloud",
+        "data-scan-label": scanLabel,
+        "data-scan-read": scanReadText,
+      }
+    : undefined;
   const content = (
     <>
       <span
@@ -92,6 +112,7 @@ export function ReadAloudButton({
         aria-label={ariaLabel}
         aria-pressed={playing || undefined}
         className={baseClass}
+        {...scanProps}
       >
         {content}
       </a>
@@ -105,6 +126,7 @@ export function ReadAloudButton({
       aria-label={ariaLabel}
       aria-pressed={playing || undefined}
       className={baseClass}
+      {...scanProps}
     >
       {content}
     </button>

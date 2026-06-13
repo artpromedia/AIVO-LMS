@@ -15,6 +15,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
 import {
+  ContributorContributionsCard,
+  buildContributorCardCopy,
+} from "@/components/collaboration/contributor-contributions-card";
+import { getContributorLearnerSummaries } from "@/lib/collaboration/contributor-summary";
+import {
   getIEPForLearner,
   getLearner,
   getMasteryMap,
@@ -22,6 +27,7 @@ import {
   listLessonRunsForLearner,
   listSkills,
   listSubjects,
+  findTeacherAssessmentDraft,
 } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
@@ -33,9 +39,33 @@ export default async function TeacherLearnerDetailPage({
 }) {
   const session = await requirePageRole(["teacher"]);
   const t = await getTranslations("teacher.learner_overview");
+  const ta = await getTranslations("teacher.learner_assessment");
+  const tContrib = await getTranslations("contributor");
   const { learnerId } = await params;
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
+
+  // C-16 — this teacher's own "Your contributions" summary, scoped to the
+  // learner being viewed (own items only; derived server-side).
+  const contributorSummaries = (
+    await getContributorLearnerSummaries({
+      role: "teacher",
+      tenantId: session.tenantId,
+      contributorUserId: session.userId,
+      contributorEmail: session.email,
+    })
+  ).filter((s) => s.learnerId === learnerId);
+
+  // C-07 entry point: surface the teacher assessment CTA with resume/done
+  // state from the teacher's own draft.
+  const taDraft = await findTeacherAssessmentDraft(learnerId, session.tenantId, session.userId);
+  const taSubmitted = Boolean(taDraft?.submittedAt);
+  const taInProgress =
+    !taSubmitted &&
+    Boolean(taDraft && Object.values(taDraft.answers ?? {}).some((v) => v && Object.keys(v).length > 0));
+  const taHref = taInProgress
+    ? `/teacher/learners/${learner.id}/assessment?step=1`
+    : `/teacher/learners/${learner.id}/assessment/intro`;
 
   const recent = await listLessonRunsForLearner(learnerId, session.tenantId, { limit: 10 });
   const { skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
@@ -61,6 +91,38 @@ export default async function TeacherLearnerDetailPage({
         eyebrow="Learner"
         title={learner.displayName}
         description={`Functioning level ${learner.functioningLevel} · ${learner.readinessState}`}
+      />
+
+      <Card
+        className={`p-4 ${taSubmitted ? "border-emerald-200 bg-emerald-50/40" : "border-aivo-accent/40 bg-aivo-accent/5"}`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold">
+                {taSubmitted
+                  ? ta("cta_done")
+                  : ta("cta_title", { name: learner.displayName })}
+              </p>
+              {taSubmitted ? <Badge tone="success">{ta("cta_done")}</Badge> : null}
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {taSubmitted ? ta("cta_done_body") : ta("cta_body", { name: learner.displayName })}
+            </p>
+          </div>
+          <Link
+            href={taHref}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-aivo-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            {taSubmitted ? ta("entry_update") : taInProgress ? ta("cta_resume") : ta("cta_action")}
+          </Link>
+        </div>
+      </Card>
+
+      {/* C-16 — the teacher learns whether their input is now in use. */}
+      <ContributorContributionsCard
+        summaries={contributorSummaries}
+        copy={buildContributorCardCopy(tContrib)}
       />
 
       <Link href={`/teacher/learners/${learner.id}/curriculum`}>

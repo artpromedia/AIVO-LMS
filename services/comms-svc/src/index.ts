@@ -14,6 +14,11 @@ import { registerMessageRoutes } from "./routes/messages.js";
 import { registerInboxStreamRoutes } from "./routes/inbox-stream.js";
 import { registerEmailEventsRoutes } from "./routes/webhook-email-events.js";
 import { runDigestCleanupOnce } from "./lib/digest-cleanup.js";
+import {
+  runContributionNudgeForScheduler,
+  runExpiryWarningForScheduler,
+} from "./lib/inviteReminderService.js";
+import { runBrainChangeReminderForScheduler } from "./lib/brainChangeReminderService.js";
 import { setEmailOutboxDb } from "./lib/postmark.js";
 import { recordProviderEvent } from "./lib/email-outbox.js";
 import { startEmailOutboxWorker, type EmailWorkerHandle } from "./lib/email-worker.js";
@@ -77,12 +82,47 @@ async function start() {
   await bootstrapOpsAlerts({ service: "comms-svc", app, beforeExit: () => app.close() });
 
   // Sprint 7: fleet-wide daily digest cleanup via the shared scheduler.
+  const lock = createDrizzleAdvisoryLock(db as any);
+  const ledger = createDrizzleLedger(db as any);
   startSafeCron({
     jobName: "comms.digest-cleanup",
-    lock: createDrizzleAdvisoryLock(db as any),
-    ledger: createDrizzleLedger(db as any),
+    lock,
+    ledger,
     log: logger,
     run: () => runDigestCleanupOnce(db),
+  });
+
+  // Sprint C-08: invite reminder batches.
+  //  - contribution-nudge: accepted-≥48h-no-contribution teammates get one
+  //    warm nudge, ledger-capped to 1 per member per 7 days, opt-out honored.
+  //  - expiry-warning: teacher→parent token invites expiring within 24h get a
+  //    pre-expiry warning so completion doesn't depend on chasing.
+  startSafeCron({
+    jobName: "comms.invite-contribution-nudge",
+    lock,
+    ledger,
+    log: logger,
+    run: () => runContributionNudgeForScheduler(db),
+  });
+  startSafeCron({
+    jobName: "comms.invite-expiry-warning",
+    lock,
+    ledger,
+    log: logger,
+    run: () => runExpiryWarningForScheduler(db),
+  });
+
+  // Sprint C-13: brain-profile change review reminder. A structural change the
+  // parent hasn't acknowledged within 7 days gets ONE warm reminder, latched
+  // per-change on `reminder_sent_at` so it never repeats; opt-out honored via
+  // the parent's brain_profile_changed email preference. Non-blocking: lessons
+  // keep running; window expiry escalates to a persistent in-app badge web-side.
+  startSafeCron({
+    jobName: "comms.brain-change-review-reminder",
+    lock,
+    ledger,
+    log: logger,
+    run: () => runBrainChangeReminderForScheduler(db),
   });
 
   // Durable email outbox drainer. One replica wins the advisory lock and

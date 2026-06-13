@@ -25,6 +25,11 @@ export interface HintCardProps {
   /** Optional label override for the collapsed state. */
   collapsedLabel?: React.ReactNode;
   className?: string;
+  /** Sprint C-15 — opt the toggle into switch/AAC scanning. When set, the
+   *  expand/collapse `<button>` carries `data-scan-target` (+ `data-scan-label`)
+   *  so the baseline scan controller can open the hint. */
+  scanTargetId?: string;
+  scanLabel?: string;
 }
 
 export function HintCard({
@@ -33,6 +38,8 @@ export function HintCard({
   onReveal,
   collapsedLabel,
   className,
+  scanTargetId,
+  scanLabel,
 }: HintCardProps) {
   const [open, setOpen] = React.useState(policy === "auto_reveal");
   const fired = React.useRef(false);
@@ -83,6 +90,8 @@ export function HintCard({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
+        data-scan-target={scanTargetId}
+        data-scan-label={scanTargetId ? scanLabel : undefined}
         className={cn(
           "w-full flex items-center justify-between gap-3 px-4 py-3 text-sm font-semibold",
           "text-iw-text-strong hover:bg-[var(--aivo-color-aivoPurple-50)]/30",

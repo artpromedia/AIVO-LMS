@@ -12,6 +12,10 @@ import {
   brainStates,
   iepGoals,
   therapyGoals,
+  teacherAssessments,
+  therapistAssessments,
+  caregiverObservations,
+  contributionAcknowledgements,
   classrooms,
   classroomEnrollments,
   schools,
@@ -19,9 +23,18 @@ import {
   withoutTenantContext,
   type TenantTransaction,
 } from "@aivo/db";
-import { type AuthUser, authenticateRequest, isUuid, verifyParentOwnership } from "../auth.js";
-import { emitFamilyAudit } from "../lib/audit.js";
 import {
+  deriveContributionStatus,
+  summariseVoices,
+  type MemberInput,
+  type ContributionSignal,
+  type InviteStatus,
+} from "../lib/contribution-status.js";
+import { type AuthUser, authenticateRequest, isUuid, verifyParentOwnership } from "../auth.js";
+import { emitFamilyAudit, emitChildProfileDisclosure } from "../lib/audit.js";
+import {
+  getCollaborationByLearnerIdContributionsSchema,
+  collaborationContributionOptOutSchema,
   getCollaborationByLearnerIdMembersSchema,
   collaborationByLearnerIdInviteTeacherSchema,
   collaborationByLearnerIdInviteCaregiverSchema,
@@ -333,6 +346,175 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
           therapist: { used: therapists.length, max: 1 },
         },
       };
+    },
+  );
+
+  // ─── Sprint C-08: contribution-status hub feed ──────────────────────
+  //
+  // Single source (web + mobile) of where each invited teammate stands:
+  // invited → accepted → contributed. Reads the per-role invite tables and
+  // the contribution signals (teacher_assessments / therapist_assessments /
+  // caregiver_observations) from the shared @aivo/db schema — family-svc has
+  // access to those tables, so the status is composed HERE rather than in the
+  // web BFF (the UI contract is identical either way; see Sprint C-08
+  // Checkpoint). Derivation is a pure helper (lib/contribution-status) so the
+  // per-role rules are unit-tested without a DB.
+  //
+  // Authz: parent-of-learner (verifyParentOwnership) or PLATFORM_ADMIN. A
+  // non-parent, non-admin caller gets 403 (regression test in
+  // collaboration.test.ts) — a teammate cannot enumerate the team roster.
+  app.get(
+    "/api/family/collaboration/:learnerId/contributions",
+    { schema: getCollaborationByLearnerIdContributionsSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+
+      const { learnerId } = request.params as LearnerId;
+      const isParent = await verifyParentOwnership(db, claims.tenantId, claims.sub, learnerId);
+      if (!isParent && claims.role !== "PLATFORM_ADMIN") {
+        return reply.code(403).send({ error: "Access denied" });
+      }
+
+      const [teachers, caregivers, therapists] = await Promise.all([
+        db.select().from(learnerTeachers).where(eq(learnerTeachers.learnerId, learnerId)),
+        db.select().from(learnerCaregivers).where(eq(learnerCaregivers.learnerId, learnerId)),
+        db.select().from(learnerTherapists).where(eq(learnerTherapists.learnerId, learnerId)),
+      ]);
+
+      // Resolve display names for accepted members (the invitee's account
+      // name once they have one); pending invites show the email.
+      const memberUserIds = [
+        ...teachers.map((t) => t.teacherUserId),
+        ...caregivers.map((c) => c.caregiverUserId),
+        ...therapists.map((t) => t.therapistUserId),
+      ].filter((id): id is string => !!id);
+      const nameById = new Map<string, string>();
+      if (memberUserIds.length > 0) {
+        const userRows = await db
+          .select({ id: users.id, name: users.name })
+          .from(users)
+          .where(inArray(users.id, Array.from(new Set(memberUserIds))));
+        for (const u of userRows) if (u.name) nameById.set(u.id, u.name);
+      }
+
+      const members: MemberInput[] = [
+        ...teachers.map((t) => ({
+          id: t.id,
+          kind: "teacher" as const,
+          email: t.teacherEmail,
+          displayName: t.teacherUserId ? (nameById.get(t.teacherUserId) ?? null) : null,
+          status: t.status as InviteStatus,
+          acceptedAt: t.acceptedAt,
+          memberUserId: t.teacherUserId,
+        })),
+        ...caregivers.map((c) => ({
+          id: c.id,
+          kind: "caregiver" as const,
+          email: c.caregiverEmail,
+          displayName: c.caregiverUserId ? (nameById.get(c.caregiverUserId) ?? null) : null,
+          status: c.status as InviteStatus,
+          acceptedAt: c.acceptedAt,
+          memberUserId: c.caregiverUserId,
+        })),
+        ...therapists.map((t) => ({
+          id: t.id,
+          kind: "therapist" as const,
+          email: t.therapistEmail,
+          displayName: t.therapistUserId ? (nameById.get(t.therapistUserId) ?? null) : null,
+          status: t.status as InviteStatus,
+          acceptedAt: t.acceptedAt,
+          memberUserId: t.therapistUserId,
+        })),
+      ];
+
+      // Contribution signals: only COMPLETED assessment rows count; any
+      // observation counts. Each carries its author (submittedBy) so the
+      // derivation credits the right member.
+      const [teacherRows, therapistRows, observationRows] = await Promise.all([
+        db
+          .select({ submittedBy: teacherAssessments.submittedBy, completedAt: teacherAssessments.completedAt })
+          .from(teacherAssessments)
+          .where(eq(teacherAssessments.learnerId, learnerId)),
+        db
+          .select({ submittedBy: therapistAssessments.submittedBy, completedAt: therapistAssessments.completedAt })
+          .from(therapistAssessments)
+          .where(eq(therapistAssessments.learnerId, learnerId)),
+        db
+          .select({ submittedBy: caregiverObservations.submittedBy, date: caregiverObservations.date })
+          .from(caregiverObservations)
+          .where(eq(caregiverObservations.learnerId, learnerId)),
+      ]);
+
+      const signals: ContributionSignal[] = [
+        ...teacherRows
+          .filter((r) => r.completedAt)
+          .map((r) => ({ kind: "teacher" as const, contributorUserId: r.submittedBy, at: r.completedAt as Date })),
+        ...therapistRows
+          .filter((r) => r.completedAt)
+          .map((r) => ({ kind: "therapist" as const, contributorUserId: r.submittedBy, at: r.completedAt as Date })),
+        ...observationRows.map((r) => ({
+          kind: "caregiver" as const,
+          contributorUserId: r.submittedBy,
+          at: (r.date as Date) ?? new Date(),
+        })),
+      ];
+
+      // Sprint C-16 — most-recent acknowledgement per contributor email (rides
+      // this endpoint, not a parallel one). Reads the shared
+      // contribution_acknowledgements table (@aivo/db); family-svc has access.
+      const ackRows = await db
+        .select({
+          contributorEmail: contributionAcknowledgements.contributorEmail,
+          acknowledgedAt: contributionAcknowledgements.acknowledgedAt,
+        })
+        .from(contributionAcknowledgements)
+        .where(eq(contributionAcknowledgements.learnerId, learnerId));
+      const acknowledgedAtByEmail = new Map<string, string>();
+      for (const r of ackRows) {
+        const key = (r.contributorEmail ?? "").trim().toLowerCase();
+        if (!key) continue;
+        const prev = acknowledgedAtByEmail.get(key);
+        // Keep the latest acknowledgement (TEXT ISO sorts chronologically).
+        if (!prev || r.acknowledgedAt > prev) acknowledgedAtByEmail.set(key, r.acknowledgedAt);
+      }
+
+      const statuses = deriveContributionStatus(members, signals, acknowledgedAtByEmail);
+      const voices = summariseVoices(statuses);
+      return { members: statuses, voices };
+    },
+  );
+
+  // Sprint C-08 — contribution-nudge opt-out. Sets the per-member flag the
+  // reminder job honors so the recipient stops getting nudges. Internal-key
+  // auth: the web BFF's unsubscribe page calls this server-side on the
+  // recipient's behalf (the invite id from the unsubscribe link is the intent
+  // token). Idempotent and only ever turns reminders OFF.
+  app.post(
+    "/api/family/collaboration/invites/:kind/:id/contribution-opt-out",
+    { schema: collaborationContributionOptOutSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      if (!internalKey || !INTERNAL_KEY || internalKey !== INTERNAL_KEY) {
+        return reply.code(401).send({ error: "Unauthorized" });
+      }
+      const { kind, id } = request.params as { kind: string; id: string };
+      if (kind !== "teacher" && kind !== "caregiver" && kind !== "therapist") {
+        return reply.code(400).send({ error: "kind must be teacher | caregiver | therapist" });
+      }
+      const table =
+        kind === "teacher"
+          ? learnerTeachers
+          : kind === "caregiver"
+            ? learnerCaregivers
+            : learnerTherapists;
+      const [row] = await db.select().from(table).where(eq(table.id, id)).limit(1);
+      if (!row) return reply.code(404).send({ error: "Invite not found" });
+      await db
+        .update(table)
+        .set({ contributionNudgeOptOut: true, updatedAt: new Date() } as any)
+        .where(eq(table.id, id));
+      return { success: true };
     },
   );
 
@@ -771,6 +953,20 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       if (brain.length === 0) return { brainState: null };
 
       const state = brain[0];
+      // ADR 0042 §5 — a teacher (not the parent) reading a child's profile is a
+      // FERPA cross-role disclosure. Record it (append-only, queryable).
+      if (!isParent) {
+        await emitChildProfileDisclosure({
+          db,
+          request,
+          tenantId: claims.tenantId || null,
+          learnerId,
+          readerUserId: claims.sub,
+          readerRole: claims.role,
+          surface: "family-svc:GET /api/family/collaboration/{learnerId}/brain/teacher",
+          dataClass: "brain_state_teacher_scoped",
+        });
+      }
       return {
         brainState: {
           masteryLevels: state.masteryLevels,
@@ -811,6 +1007,21 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       const brain = await db.select().from(brainStates).where(eq(brainStates.learnerId, learnerId));
       if (brain.length === 0) return { summary: null };
+
+      // ADR 0042 §5 — a caregiver (not the parent) reading a child's profile
+      // summary is a FERPA cross-role disclosure.
+      if (!isParent) {
+        await emitChildProfileDisclosure({
+          db,
+          request,
+          tenantId: claims.tenantId || null,
+          learnerId,
+          readerUserId: claims.sub,
+          readerRole: claims.role,
+          surface: "family-svc:GET /api/family/collaboration/{learnerId}/brain/caregiver",
+          dataClass: "brain_summary_caregiver_scoped",
+        });
+      }
 
       const state = brain[0];
       const mastery = (state.masteryLevels as Record<string, unknown>) || {};
@@ -868,6 +1079,22 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         .select()
         .from(therapyGoals)
         .where(eq(therapyGoals.learnerId, learnerId));
+
+      // ADR 0042 §5 — a therapist (not the parent) reading a child's profile is
+      // a FERPA cross-role disclosure. This view exposes disabilitySignals + IEP
+      // + therapy goals (HIPAA-scoped), so the record matters most here.
+      if (!isParent) {
+        await emitChildProfileDisclosure({
+          db,
+          request,
+          tenantId: claims.tenantId || null,
+          learnerId,
+          readerUserId: claims.sub,
+          readerRole: claims.role,
+          surface: "family-svc:GET /api/family/collaboration/{learnerId}/brain/therapist",
+          dataClass: "brain_clinical_therapist_scoped",
+        });
+      }
 
       const state = brain[0] || null;
 

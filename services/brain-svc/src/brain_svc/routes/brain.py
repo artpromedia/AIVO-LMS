@@ -8,13 +8,26 @@ from sqlalchemy import text
 from brain_svc.models.database import get_db
 from brain_svc.models.schemas import BrainCloneRequest, BrainRollbackRequest, BrainApproveRequest, BrainAmendRequest, BrainDeclineRequest
 from brain_svc.services.clone_pipeline import clone_brain
-from brain_svc.audit import emit_brain_audit
+from brain_svc.services.access_control import verify_learner_access
+from brain_svc.audit import emit_brain_audit, emit_child_profile_disclosure
 from brain_svc.auth import AuthClaims, require_auth
+from brain_svc.contracts.approval_contract import (
+    BrainProfileApprovalRecord,
+    assert_can_teach,
+)
+from brain_svc.contracts.change_contract import (
+    BrainProfileChangeRecord,
+    change_requires_ack,
+)
 
 LEARNING_SVC_URL = os.environ.get("LEARNING_SVC_URL", "http://localhost:3005")
 RECOMMENDATION_SVC_URL = os.environ.get(
     "RECOMMENDATION_SVC_URL", "http://localhost:3066"
 )
+# Sprint C-16 — web-v2 owns the contributor surfaces + acknowledgement records;
+# on approval brain-svc signals it (best-effort) to derive + send the "your
+# input shaped X" acknowledgements. Defaults to the dev web-v2 port.
+WEB_SVC_URL = os.environ.get("WEB_SVC_URL", "http://localhost:5000")
 
 router = APIRouter()
 
@@ -72,6 +85,31 @@ async def _maybe_emit_regression_candidates(
     except Exception:  # pragma: no cover — fire-and-forget
         return
 
+# Roles that, when reading a child's profile, constitute a FERPA cross-role
+# disclosure (ADR 0042 §5). A parent reading their own child, or a trusted
+# service/admin principal, is not a cross-role read. TEACHER / CAREGIVER /
+# THERAPIST reading a learner's profile IS — record it.
+_CROSS_ROLE_READER_ROLES = {"TEACHER", "CAREGIVER", "THERAPIST"}
+
+
+async def _maybe_record_disclosure(
+    auth: AuthClaims, learner_id: str, *, surface: str, data_class: str
+) -> None:
+    """Emit a CHILD_PROFILE_DISCLOSED event when a non-parent role reads a
+    child's brain profile. Best-effort; never raises."""
+    role = getattr(auth, "role", None)
+    if role not in _CROSS_ROLE_READER_ROLES:
+        return
+    await emit_child_profile_disclosure(
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        reader_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        reader_role=role,
+        surface=surface,
+        data_class=data_class,
+    )
+
+
 def _snake_to_camel(name: str) -> str:
     components = name.split('_')
     return components[0] + ''.join(x.title() for x in components[1:])
@@ -87,6 +125,73 @@ def _to_camel_case(data: dict) -> dict:
                 pass
         result[camel_key] = value
     return result
+
+
+def _emit_brain_change(
+    db: Session,
+    *,
+    tenant_id: str,
+    learner_id: str,
+    brain_profile_id: str,
+    revision: int,
+    kind: str,
+    fields: list,
+    summary: str,
+    source: str,
+) -> None:
+    """Sprint C-13 — write one shared-shape change record to the cross-stack
+    ``brain_profile_changes`` table (the same table web-v2 reads for the "what
+    changed since you approved" timeline; in production both stacks share one
+    Postgres). Validated through ``BrainProfileChangeRecord`` so a drift from the
+    shared contract is caught here, not downstream. ``requires_ack`` is the
+    contract-derived structural flag — never set ad-hoc. Caller commits.
+
+    Best-effort by contract: a change-capture failure must never break the
+    mutation that triggered it (the brain must keep working). The
+    ``brain_profile_changes`` table may not exist in every legacy schema, so the
+    insert is guarded.
+    """
+    record = BrainProfileChangeRecord(
+        id=str(uuid.uuid4()),
+        tenantId=str(tenant_id or ""),
+        learnerId=str(learner_id),
+        brainProfileId=str(brain_profile_id),
+        revision=int(revision or 1),
+        kind=kind,
+        fields=list(fields or []),
+        summary=summary,
+        source=source,
+        requiresAck=change_requires_ack(kind),
+        ackedAt=None,
+        reminderSentAt=None,
+        createdAt=_utcnow().isoformat(),
+    )
+    try:
+        db.execute(
+            text(
+                """INSERT INTO brain_profile_changes
+                    (id, tenant_id, learner_id, brain_profile_id, revision, kind,
+                     fields, summary, source, requires_ack, acked_at,
+                     reminder_sent_at, created_at)
+                    VALUES (:id, :tid, :lid, :bpid, :rev, :kind, :fields, :summary,
+                            :source, :req, NULL, NULL, :now)"""
+            ),
+            {
+                "id": record.id,
+                "tid": record.tenantId,
+                "lid": record.learnerId,
+                "bpid": record.brainProfileId,
+                "rev": record.revision,
+                "kind": record.kind,
+                "fields": json.dumps(record.fields),
+                "summary": record.summary,
+                "source": record.source,
+                "req": record.requiresAck,
+                "now": record.createdAt,
+            },
+        )
+    except Exception:  # pragma: no cover — table may be absent in legacy schema
+        return
 
 @router.post("/clone")
 async def clone_brain_endpoint(request: BrainCloneRequest, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
@@ -191,6 +296,8 @@ async def clone_brain_endpoint(request: BrainCloneRequest, db: Session = Depends
 
 @router.get("/{learner_id}")
 async def get_brain_state(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    verify_learner_access(db, auth, learner_id)
+
     result = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),
         {"lid": learner_id}
@@ -198,6 +305,12 @@ async def get_brain_state(learner_id: str, db: Session = Depends(get_db), auth: 
 
     if not result:
         raise HTTPException(status_code=404, detail="Brain state not found")
+
+    # ADR 0042 §5 — a non-parent role reading a child's profile is a FERPA
+    # cross-role disclosure; record it (append-only, queryable).
+    await _maybe_record_disclosure(
+        auth, learner_id, surface="brain-svc:GET /api/brain/{learner_id}", data_class="brain_state"
+    )
 
     return _to_camel_case(dict(result))
 
@@ -475,6 +588,81 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
 
     db.commit()
 
+    # Sprint C-06: emit a BRAIN_APPROVED audit event in parity with
+    # BRAIN_CLONED (clone route, above). Approval is the single most
+    # consequential parent act — it must leave the same hash-chained audit
+    # trail as the clone that preceded it. Best-effort: emit_brain_audit
+    # never raises, so a degraded audit-svc cannot break the approval.
+    await emit_brain_audit(
+        event_type="BRAIN_APPROVED",
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        resource_id=str(current["id"]),
+        actor_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        actor_role=getattr(auth, "role", None),
+        details={
+            "version": new_version,
+            "consent_version": request.consent_version,
+            "rai_version": rai_acknowledgement["rai_version"],
+            "modifications": len(parent_mods_record),
+        },
+    )
+
+    # Sprint C-12 (ADR 0042): build the shared-shape approval record in parity
+    # with web-v2's `brain_profile_approvals`. This supplements the C-06 audit
+    # event (above) and the consent fields persisted in xai_explanation — it is
+    # the cross-stack contract record, validated before we proceed so a drift
+    # from the shared contract is caught here, not downstream. consent/RAI
+    # versions are the cross-stack consent anchor.
+    approval_record = BrainProfileApprovalRecord(
+        id=str(uuid.uuid4()),
+        tenantId=str(getattr(auth, "tenant_id", None) or ""),
+        learnerId=learner_id,
+        brainProfileId=str(current["id"]),
+        profileRevision=new_version,
+        actorUserId=str(getattr(auth, "user_id", None) or getattr(auth, "sub", None) or ""),
+        action="amended" if parent_mods_record else "approved",
+        consentVersion=request.consent_version,
+        raiVersion=rai_acknowledgement["rai_version"],
+        modifications=parent_mods_record,
+        ipHash=None,
+        createdAt=now.isoformat(),
+    )
+
+    # Sprint C-16 — close the orchestration loop from the contributor's side.
+    # web-v2 owns the contributor surfaces, the acknowledgement records, and the
+    # notification machinery (the privacy logic lives in one place). On approval
+    # we signal it best-effort to derive + send each contributor's "your input
+    # shaped X" acknowledgement from the approved profile's collaborator-sourced
+    # decisions. Idempotent on (contributor, learner, revision), so this firing
+    # alongside the web-v2 ceremony's own trigger never double-sends. A failure
+    # here never breaks the approval (the brain keeps teaching) — same best-effort
+    # posture as the learning-path init below and the C-13 change capture.
+    try:
+        import httpx
+        web_token = os.environ.get("INTERNAL_SERVICE_TOKEN") or (
+            "" if os.environ.get("NODE_ENV") == "production" else "aivo-internal-dev-token"
+        )
+        httpx.post(
+            f"{WEB_SVC_URL}/api/internal/contribution-acknowledge",
+            json={
+                "learnerId": learner_id,
+                "tenantId": str(getattr(auth, "tenant_id", None) or ""),
+                "profileRevision": new_version,
+            },
+            headers={"x-service-token": web_token},
+            timeout=5.0,
+        )
+    except Exception:
+        pass
+
+    # Sprint C-12 (ADR 0042) — EXPLICIT teach gate, not sequencing-only. The
+    # status we just wrote must be teachable before we initialise any learning
+    # path. `assert_can_teach` raises 403 brain_not_approved otherwise; here it
+    # always passes (we set 'approved'), but the guard makes the Python intent
+    # explicit and is the same predicate the services path-init enforces.
+    assert_can_teach("approved")
+
     try:
         import httpx
         fl = current.get("functioning_level_profile", {})
@@ -503,6 +691,7 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
         "snapshot_id": snap_id,
         "consent": consent_record,
         "rai_acknowledgement": rai_acknowledgement,
+        "approval_record": approval_record.model_dump(),
     }
 
 @router.post("/{learner_id}/amend")
@@ -581,6 +770,41 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
 
     db.commit()
 
+    # Sprint C-06: BRAIN_AMENDED audit event, parity with BRAIN_APPROVED /
+    # BRAIN_CLONED. An amendment is a recorded parent act too.
+    await emit_brain_audit(
+        event_type="BRAIN_AMENDED",
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        resource_id=str(current["id"]),
+        actor_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        actor_role=getattr(auth, "role", None),
+        details={"version": new_version},
+    )
+
+    # Sprint C-12 (ADR 0042): shared-shape approval record (action "amended"),
+    # in parity with web-v2's `brain_profile_approvals`. An amendment is a
+    # recorded parent act and a teaching status.
+    approval_record = BrainProfileApprovalRecord(
+        id=str(uuid.uuid4()),
+        tenantId=str(getattr(auth, "tenant_id", None) or ""),
+        learnerId=learner_id,
+        brainProfileId=str(current["id"]),
+        profileRevision=new_version,
+        actorUserId=str(getattr(auth, "user_id", None) or getattr(auth, "sub", None) or ""),
+        action="amended",
+        # Amend does not re-collect consent/RAI; the prior approval's versions
+        # remain the consent anchor. "1.0" is the legacy default (ADR 0042 §4).
+        consentVersion="1.0",
+        raiVersion=str(new_version),
+        modifications=[],
+        ipHash=None,
+        createdAt=now.isoformat(),
+    )
+
+    # Sprint C-12 (ADR 0042) — EXPLICIT teach gate before path init.
+    assert_can_teach("amended")
+
     try:
         import httpx
         mastery = current.get("mastery_levels", {})
@@ -606,7 +830,12 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
     except Exception:
         pass
 
-    return {"status": "amended", "version": new_version, "snapshot_id": snap_id}
+    return {
+        "status": "amended",
+        "version": new_version,
+        "snapshot_id": snap_id,
+        "approval_record": approval_record.model_dump(),
+    }
 
 @router.post("/{learner_id}/decline")
 async def decline_brain(learner_id: str, request: BrainDeclineRequest, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
@@ -621,29 +850,86 @@ async def decline_brain(learner_id: str, request: BrainDeclineRequest, db: Sessi
     if current.get("approval_status") not in ("pending_parent_review", None):
         raise HTTPException(status_code=400, detail=f"Brain already {current.get('approval_status')}")
 
-    db.execute(text("DELETE FROM brain_state_snapshots WHERE brain_state_id = :bsid"), {"bsid": current["id"]})
-    db.execute(text("DELETE FROM brain_states WHERE id = :id"), {"id": current["id"]})
+    # Sprint C-06: ARCHIVE, never destroy. The previous behaviour deleted the
+    # brain, every snapshot, AND the child's discovery_adventure
+    # assessment_attempts — wiping out the baseline work the child actually
+    # did. Declining a profile is a guardian rejecting the AI's *inference*,
+    # not the child's effort. We keep the brain row (status 'declined'), keep
+    # the snapshot history, write a parent_declined snapshot for the trail,
+    # and leave assessment_attempts untouched so the parent can rebuild from
+    # the same baseline with corrections.
+    now = _utcnow()
+
+    snap_data = {}
+    for field in ["mastery_levels", "disability_signals", "functioning_level_profile",
+                  "iep_profile", "sensory_profile", "active_accommodations",
+                  "active_tutors", "functional_curriculum", "episodic_memory",
+                  "visual_identity"]:
+        val = current.get(field)
+        if isinstance(val, str):
+            try: val = json.loads(val)
+            except: pass
+        snap_data[field] = val
+    snap_data["declined_reason"] = request.reason
 
     db.execute(
-        text("""DELETE FROM assessment_attempts
-                WHERE learner_id = :lid AND type = 'discovery_adventure'"""),
-        {"lid": learner_id}
+        text("""UPDATE brain_states
+                SET approval_status = 'declined', parent_notes = :reason, updated_at = :now
+                WHERE id = :id"""),
+        {"reason": request.reason, "now": now, "id": current["id"]}
+    )
+
+    snap_id = str(uuid.uuid4())
+    db.execute(
+        text("""INSERT INTO brain_state_snapshots
+                (id, brain_state_id, learner_id, version, trigger, snapshot, created_at)
+                VALUES (:id, :bsid, :lid, :v, 'parent_declined', :snap, :now)"""),
+        {"id": snap_id, "bsid": current["id"], "lid": learner_id,
+         "v": current["version"] or 1, "snap": json.dumps(snap_data), "now": now}
     )
 
     db.commit()
 
-    return {"status": "declined", "reason": request.reason, "message": "Brain clone removed. Learner can retake the baseline assessment."}
+    await emit_brain_audit(
+        event_type="BRAIN_DECLINED",
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        resource_id=str(current["id"]),
+        actor_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        actor_role=getattr(auth, "role", None),
+        details={"version": current["version"] or 1, "reason": request.reason},
+    )
+
+    return {
+        "status": "declined",
+        "reason": request.reason,
+        "snapshot_id": snap_id,
+        "message": "Profile set aside. The baseline is kept — you can rebuild this profile with your corrections.",
+    }
 
 @router.get("/{learner_id}/history")
 async def get_brain_history(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    verify_learner_access(db, auth, learner_id)
+
     results = db.execute(
         text("SELECT * FROM brain_state_snapshots WHERE learner_id = :lid ORDER BY version DESC"),
         {"lid": learner_id}
     ).mappings().all()
+
+    # ADR 0042 §5 — snapshot history exposes prior profile states; a non-parent
+    # read is a cross-role disclosure.
+    await _maybe_record_disclosure(
+        auth, learner_id, surface="brain-svc:GET /api/brain/{learner_id}/history", data_class="brain_history"
+    )
+
     return [dict(r) for r in results]
 
 @router.post("/{learner_id}/rollback")
 async def rollback_brain(learner_id: str, request: BrainRollbackRequest, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    # Rolling a child's brain back to an earlier snapshot is a guardian
+    # act: parent of this learner (or admin / trusted service) only.
+    _verify_parent_access(db, auth, learner_id)
+
     snapshot = db.execute(
         text("SELECT * FROM brain_state_snapshots WHERE id = :sid AND learner_id = :lid"),
         {"sid": request.snapshot_id, "lid": learner_id}
@@ -699,11 +985,32 @@ async def rollback_brain(learner_id: str, request: BrainRollbackRequest, db: Ses
         }
     )
 
+    # Sprint C-13: a rollback restores an earlier profile — supports, tutors and
+    # functioning level can all shift — so it is a STRUCTURAL change the parent
+    # should re-acknowledge. Emit a shared-shape change record to the timeline.
+    _emit_brain_change(
+        db,
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        brain_profile_id=str(current["id"]) if current else "",
+        revision=new_version,
+        kind="structural",
+        fields=["activeAccommodations", "activeTutors", "functioningLevel"],
+        summary=(
+            "This learner's profile was restored to an earlier version. "
+            "Their supports, tutors and learning pace were set back to how they "
+            "were at that point — take a look and confirm it's right."
+        ),
+        source="rollback",
+    )
+
     db.commit()
     return {"status": "rolled_back", "version": new_version, "snapshot_id": new_snap_id}
 
 @router.get("/{learner_id}/context")
 async def get_brain_context(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    verify_learner_access(db, auth, learner_id)
+
     brain = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),
         {"lid": learner_id}
@@ -746,6 +1053,12 @@ async def get_brain_context(learner_id: str, db: Session = Depends(get_db), auth
         {"lid": learner_id}
     ).mappings().first()
 
+    # ADR 0042 §5 — context is the richest scoped read (full brain + IEP +
+    # sensory); a non-parent read is a cross-role disclosure.
+    await _maybe_record_disclosure(
+        auth, learner_id, surface="brain-svc:GET /api/brain/{learner_id}/context", data_class="brain_context"
+    )
+
     brain_dict = dict(brain)
     return {
         "learner": dict(learner) if learner else {},
@@ -765,6 +1078,8 @@ async def get_brain_context(learner_id: str, db: Session = Depends(get_db), auth
 
 @router.post("/{learner_id}/regression-check")
 async def check_regression(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    verify_learner_access(db, auth, learner_id)
+
     brain = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),
         {"lid": learner_id}
@@ -869,12 +1184,103 @@ async def check_regression(learner_id: str, db: Session = Depends(get_db), auth:
     }
 
 
+# Sprint C-13 — domain → warm parent label + a constructive, non-alarmist next
+# step. Regression detections must read as care, never as a deficit verdict, so
+# a stored `causal_analyses` hypothesis ("Mastery in {domain} dropped by {x}%…")
+# is NEVER shown raw to a parent — it is rewritten through this map.
+_DOMAIN_PARENT_LABEL = {
+    "math": "math", "mathematics": "math",
+    "ela": "reading and writing", "english": "reading and writing",
+    "reading": "reading", "writing": "writing",
+    "science": "science", "history": "history",
+    "social_studies": "social studies",
+    "coding": "coding", "speech": "speech and language",
+    "language": "language", "sel": "social-emotional skills",
+}
+
+
+def _parent_regression_label(domain: str) -> str:
+    key = (domain or "").lower()
+    return _DOMAIN_PARENT_LABEL.get(key, (domain or "this area").replace("_", " "))
+
+
+@router.get("/{learner_id}/regression-insights")
+async def get_regression_insights(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    """Sprint C-13 — parent-readable regression insights.
+
+    Surfaces the detector's `causal_analyses` rows as warm, plain-language
+    cards instead of leaving them as unread DB rows. The raw hypothesis ("Mastery
+    in {domain} dropped by {x}%…") is rewritten to a strengths-respecting,
+    never-alarmist message ALWAYS paired with a constructive next step.
+
+    Scoped per C-02: `_verify_parent_access` (parent / admin / service only) —
+    a regression insight reveals a learning-difficulty signal, which a teacher
+    must not read (the disability-signal rule). This is deliberately stricter
+    than the engagement/context reads, which use `verify_learner_access`.
+    """
+    _verify_parent_access(db, auth, learner_id)
+
+    learner = db.execute(
+        text("SELECT name FROM learners WHERE id = :lid"),
+        {"lid": learner_id},
+    ).mappings().first()
+    name = (learner or {}).get("name") or "your learner"
+
+    rows = db.execute(
+        text(
+            """SELECT id, domain, mastery_drop, previous_mastery, current_mastery,
+                      hypothesis, confidence, status, created_at
+               FROM causal_analyses
+               WHERE learner_id = :lid AND status = 'DETECTED'
+               ORDER BY created_at DESC LIMIT 10"""
+        ),
+        {"lid": learner_id},
+    ).mappings().all()
+
+    insights = []
+    for r in rows:
+        area = _parent_regression_label(r.get("domain"))
+        # Warm, non-alarmist headline + body. We frame a dip as a normal,
+        # temporary fluctuation and lead with what we'll do about it.
+        headline = f"We're giving {name} some extra practice in {area}"
+        body = (
+            f"{name}'s {area} has dipped a little recently. Dips like this are a "
+            f"normal part of learning — they often bounce back with a bit of "
+            f"focused practice. We've already started weaving more {area} into "
+            f"{name}'s lessons."
+        )
+        next_step = (
+            f"Nothing for you to do right now. If you've noticed anything going on "
+            f"for {name} lately — a change in routine, sleep, or mood — adding a "
+            f"quick note helps us understand the bigger picture."
+        )
+        insights.append({
+            "id": r.get("id"),
+            "domain": r.get("domain"),
+            "area": area,
+            "headline": headline,
+            "body": body,
+            "nextStep": next_step,
+            "createdAt": (
+                r["created_at"].isoformat()
+                if hasattr(r.get("created_at"), "isoformat")
+                else r.get("created_at")
+            ),
+        })
+
+    return {"learnerId": learner_id, "insights": insights}
+
+
 @router.post("/{learner_id}/engagement")
 async def update_engagement_profile(learner_id: str, request: dict = None, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
     import json as json_mod
 
-    if auth.sub != learner_id and auth.role not in ("admin", "teacher", "service"):
-        raise HTTPException(status_code=403, detail="Not authorized to update engagement for this learner")
+    # Trusted service principals and a learner syncing their own brain are
+    # allowed; every other caller must hold a verified relationship to this
+    # learner (parent via learners.parent_id, teacher/caregiver/therapist via
+    # an ACCEPTED link, admin bypass) — a bare role string is not enough.
+    if auth.role != "service" and auth.sub != learner_id:
+        verify_learner_access(db, auth, learner_id)
 
     current = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),

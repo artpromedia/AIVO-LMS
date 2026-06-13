@@ -27,7 +27,7 @@
  *    intro on revisit while keeping a deliberate "Replay" affordance.
  */
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { Brain, Lock, Sparkles } from "lucide-react";
+import { Lock, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import AudioMuteToggle from "./audio-mute-toggle";
 import { playChime, playSwell } from "@/lib/audio";
@@ -353,12 +353,11 @@ export default function MasterToChildClone({
           />
         </div>
 
+        {/* Truthful privacy line (C-03): states only what the backend honors —
+            access is scoped to the family and their invited care team. */}
         <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-[11px] text-white/50">
           <span className="inline-flex items-center gap-1.5">
-            <Lock className="w-3 h-3" aria-hidden="true" /> {t("clone_privacy_pii")}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Brain className="w-3 h-3" aria-hidden="true" /> {t("clone_privacy_versioned")}
+            <Lock className="w-3 h-3" aria-hidden="true" /> {t("privacy_family")}
           </span>
         </div>
 

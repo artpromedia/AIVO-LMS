@@ -26,6 +26,8 @@ import {
   listAllDataDeletionRequests,
   logIepAccess,
   listIepAccessForLearner,
+  recordChildProfileDisclosure,
+  listChildProfileDisclosures,
 } from "@/lib/db/repos";
 import { runInBothModes } from "./parity.harness";
 
@@ -130,5 +132,52 @@ runInBothModes("privacy", (ctx) => {
     const logs = await listIepAccessForLearner(L, T);
     expect(logs.some((x) => x.documentId === "doc-1")).toBe(true);
     expect(await listIepAccessForLearner(L, "t_wrong")).toHaveLength(0);
+  });
+
+  it("child-profile disclosures append, scope per-learner/tenant, and time-bound (ADR 0042)", async () => {
+    await recordChildProfileDisclosure({
+      id: "cpd-a",
+      tenantId: T,
+      learnerId: L,
+      readerUserId: "u_parent",
+      readerRole: "parent",
+      surface: "web-v2:GET /api/bff/learners/{learnerId}/brain-profile",
+      dataClass: "brain_profile_full",
+      disclosedAt: "2026-06-13T10:00:00.000Z",
+    });
+    await recordChildProfileDisclosure({
+      id: "cpd-b",
+      tenantId: T,
+      learnerId: L,
+      readerUserId: "u_parent",
+      readerRole: "parent",
+      surface: "web-v2:GET /api/bff/learners/{learnerId}/brain-profile",
+      dataClass: "brain_profile_full",
+      disclosedAt: "2026-06-13T12:00:00.000Z",
+    });
+    // A different tenant's row must not bleed in.
+    await recordChildProfileDisclosure({
+      id: "cpd-other",
+      tenantId: "t_other_priv",
+      learnerId: L,
+      readerUserId: "u_x",
+      readerRole: "parent",
+      surface: "x",
+      dataClass: "brain_profile_full",
+      disclosedAt: "2026-06-13T11:00:00.000Z",
+    });
+
+    const all = await listChildProfileDisclosures(L, T);
+    expect(all.map((d) => d.id)).toEqual(["cpd-b", "cpd-a"]); // newest-first
+    expect(all.every((d) => d.tenantId === T)).toBe(true);
+
+    // Inclusive time window narrows to the earlier row only.
+    const windowed = await listChildProfileDisclosures(L, T, {
+      fromIso: "2026-06-13T09:00:00.000Z",
+      toIso: "2026-06-13T11:00:00.000Z",
+    });
+    expect(windowed.map((d) => d.id)).toEqual(["cpd-a"]);
+
+    expect(await listChildProfileDisclosures(L, "t_wrong")).toHaveLength(0);
   });
 });

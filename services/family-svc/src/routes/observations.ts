@@ -4,9 +4,12 @@ import { caregiverObservations, learnerCaregivers } from "@aivo/db";
 import type { CaregiverObservationCreatedPayload, ContributorRole } from "@aivo/events";
 import { EVENTS } from "@aivo/events";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
-import { getObservationsSchema, observationsSchema } from "./schemas.js";
+import { getObservationsSchema, observationsSchema, updateObservationSchema } from "./schemas.js";
 import { emitFamilyAudit } from "../lib/audit.js";
 import { getRealtimeBus } from "../realtime/bus.js";
+
+/** Author-only edit window for caregiver observations (Sprint C-10). */
+const EDIT_WINDOW_MS = 15 * 60 * 1000;
 
 function contributorRoleFromClaims(role: string | undefined): ContributorRole {
   switch ((role ?? "").toUpperCase()) {
@@ -146,4 +149,90 @@ export async function registerObservationRoutes(app: FastifyInstance) {
 
     return obs;
   });
+
+  // Author-only edit within a 15-minute window (Sprint C-10). The author may
+  // correct an observation they just logged; after 15 minutes it is immutable.
+  // Enforcement is server-side (Trust rule):
+  //   - the editor MUST be the original author (`submittedBy`), else 403;
+  //   - the edit MUST land within 15 min of creation, else 409;
+  //   - the PRIOR field values are written to the audit detail before the
+  //     overwrite, so a correction never erases history without a trace.
+  app.patch(
+    "/api/family/observations/:id",
+    { schema: updateObservationSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+
+      const { id } = request.params as { id: string };
+      const body = request.body as {
+        notes?: string;
+        category?: string;
+        mood?: string | null;
+      };
+
+      const [existing] = await db
+        .select()
+        .from(caregiverObservations)
+        .where(eq(caregiverObservations.id, id))
+        .limit(1);
+
+      if (!existing) {
+        return reply.status(404).send({ error: "Observation not found" });
+      }
+
+      // Ownership: only the author may edit. Platform admins are intentionally
+      // NOT granted an edit bypass here — an observation is a first-person
+      // record; an admin override would falsify authorship.
+      if (existing.submittedBy !== claims.sub) {
+        return reply.status(403).send({ error: "Only the author may edit this observation" });
+      }
+
+      // 15-minute window from creation.
+      const createdMs = new Date(existing.createdAt as unknown as string).getTime();
+      if (Date.now() - createdMs > EDIT_WINDOW_MS) {
+        return reply.status(409).send({
+          error: "The 15-minute window to edit this observation has passed.",
+          code: "edit_window_expired",
+        });
+      }
+
+      const nextNotes = typeof body.notes === "string" ? body.notes : existing.notes;
+      if (!nextNotes || !nextNotes.trim()) {
+        return reply.status(400).send({ error: "notes cannot be empty" });
+      }
+      const nextCategory =
+        typeof body.category === "string" && body.category.trim()
+          ? body.category
+          : existing.category;
+      const nextMood = body.mood === undefined ? existing.mood : body.mood || null;
+
+      const [updated] = await db
+        .update(caregiverObservations)
+        .set({ notes: nextNotes, category: nextCategory, mood: nextMood })
+        .where(eq(caregiverObservations.id, id))
+        .returning();
+
+      // Append-only history: the prior values live in the audit detail so the
+      // edit is fully traceable (the table itself is overwrite-in-place).
+      await emitFamilyAudit({
+        db,
+        request,
+        eventType: "CAREGIVER_OBSERVATION_EDITED",
+        tenantId: existing.tenantId,
+        learnerId: existing.learnerId,
+        resourceId: id,
+        details: {
+          previous: {
+            notes: existing.notes,
+            category: existing.category,
+            mood: existing.mood,
+          },
+          editedBy: claims.sub,
+        },
+      });
+
+      return updated;
+    },
+  );
 }

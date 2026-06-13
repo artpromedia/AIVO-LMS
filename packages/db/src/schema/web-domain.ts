@@ -114,6 +114,56 @@ export const webParentAssessments = pgTable(
   (t) => ({ idx: index("web_parent_assessments_idx").on(t.learnerId, t.tenantId) }),
 );
 
+// Sprint C-07 — teacher assessment wizard autosave DRAFT. The system of
+// record is assessment-svc's `teacher_assessments`; this row only buffers
+// the in-progress wizard so a teacher resumes after closing the tab. One
+// row per (learner, tenant, submitting teacher) — the composite index
+// keys the per-teacher lookup. `data` holds the full draft object.
+export const webTeacherAssessments = pgTable(
+  "web_teacher_assessments",
+  {
+    id: text("id").primaryKey(),
+    learnerId: text("learner_id").notNull(),
+    tenantId: text("tenant_id").notNull(),
+    submittedByUserId: text("submitted_by_user_id").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({
+    idx: index("web_teacher_assessments_idx").on(
+      t.learnerId,
+      t.tenantId,
+      t.submittedByUserId,
+    ),
+  }),
+);
+
+// Sprint C-10 — therapist assessment autosave DRAFT. Sibling of
+// web_teacher_assessments: the system of record for a SUBMITTED therapist
+// assessment is assessment-svc's `therapist_assessments`; this row only
+// buffers the in-progress single-page form so a clinician who closes the tab
+// mid-entry resumes exactly where they left off. One row per (learner, tenant,
+// submitting therapist) so two therapists on the same caseload each keep their
+// own draft. App-generated TEXT id (no FK), the full draft object in `data`
+// JSONB — mirrors web_teacher_assessments. Table + index in
+// 0112_web_therapist_assessments; RLS + grant in 0113, the same 0109/0110 split.
+export const webTherapistAssessments = pgTable(
+  "web_therapist_assessments",
+  {
+    id: text("id").primaryKey(),
+    learnerId: text("learner_id").notNull(),
+    tenantId: text("tenant_id").notNull(),
+    submittedByUserId: text("submitted_by_user_id").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({
+    idx: index("web_therapist_assessments_idx").on(
+      t.learnerId,
+      t.tenantId,
+      t.submittedByUserId,
+    ),
+  }),
+);
+
 export const webBaselineAssessments = pgTable(
   "web_baseline_assessments",
   {

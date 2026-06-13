@@ -181,26 +181,35 @@ test.describe.serial("core journey", () => {
     expect(baseline?.status, "baseline reached complete").toBe("complete");
     expect(baseline?.summary, "summary was built").toBeTruthy();
 
-    // ── 5. Parent reviews + approves the brain clone ─────────────────────
+    // ── 5. Parent reviews + approves the brain clone (C-06 ceremony) ─────
+    // Reduced motion lands straight on the recap + ceremony, skipping the
+    // multi-second cinematic intro and exercising the keyboard-friendly
+    // two-step approve (no press-and-hold).
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`/parent/learners/${learnerId}/brain-clone-watch`, {
       waitUntil: "domcontentloaded",
     });
-    // The cinematic build sequence animates for tens of seconds before its
-    // "Review & decide" CTA appears; clicking it reveals the recap timeline
-    // with the approval gate.
-    const review = page.getByRole("button", { name: /review & decide/i });
-    const approve = page.getByRole("button", { name: /approve & activate/i });
-    await expect(review.or(approve).first()).toBeVisible({ timeout: 120_000 });
-    if (await review.count()) await review.click();
-    await expect(approve).toBeVisible({ timeout: 30_000 });
-    await expect(approve).toBeEnabled({ timeout: 30_000 });
-    // Approval redirects back to the learner page…
-    await Promise.all([
-      page.waitForURL(`**/parent/learners/${learnerId}`, { timeout: 30_000 }),
-      approve.click(),
-    ]);
+    // The ceremony gates approval behind the Responsible-AI panel + an explicit
+    // consent checkbox, then a deliberate two-step Review → Confirm.
+    const reviewApprove = page.getByRole("button", { name: /review & approve/i });
+    await expect(reviewApprove).toBeVisible({ timeout: 120_000 });
 
-    // ── 6. …where the journey lands on "ready for today's mission" ──────
+    // Open the RAI disclosures (satisfies the acknowledgement gate).
+    await page.getByRole("button", { name: /what aivo based this on/i }).click();
+    // Give explicit consent.
+    await page.getByRole("checkbox").check();
+
+    // Step 1 → Confirm step.
+    await expect(reviewApprove).toBeEnabled({ timeout: 10_000 });
+    await reviewApprove.click();
+    const confirm = page.getByRole("button", { name: /yes, approve & activate/i });
+    await expect(confirm).toBeVisible({ timeout: 10_000 });
+    // Approval lands on the "what happens next" celebration screen…
+    await confirm.click();
+    await expect(page.getByTestId("brain-approval-next")).toBeVisible({ timeout: 30_000 });
+
+    // ── 6. …and the "Go to learner's page" CTA reaches today's mission ──
+    await page.getByRole("link", { name: /go to .*page/i }).click();
     await expect(page.getByRole("link", { name: /today's mission/i })).toBeVisible({
       timeout: 15_000,
     });

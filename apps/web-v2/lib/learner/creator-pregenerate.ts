@@ -19,6 +19,7 @@
  */
 import { getPersistence } from "@/lib/db/persistence";
 import { createLessonRun } from "@/lib/db/repos";
+import { logger } from "@/lib/observability/logger";
 import type { LearningPathNode } from "@/lib/db/types";
 
 /** Mirrors the learner home's mission ordering (lib/learner/today.ts). */
@@ -169,6 +170,18 @@ export async function pregenerateNextLessons(input: {
           } else if (created.code === "brain_profile_missing") {
             // Not onboarded far enough for generation — expected for
             // learners who haven't completed the baseline; not a failure.
+            result.skippedNotReady += 1;
+            break;
+          } else if (created.code === "brain_not_approved") {
+            // C-01 teach gate: the profile exists but the parent hasn't
+            // approved it yet. Skip the learner with a structured log —
+            // a pending approval must never fail the fleet pass.
+            logger.info({
+              event: "creator.pregenerate.skipped",
+              learnerId: learner.id,
+              tenantId,
+              reason: "brain_not_approved",
+            });
             result.skippedNotReady += 1;
             break;
           } else {

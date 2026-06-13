@@ -87,6 +87,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aivo/accessibility-contract": "workspace:*",
     "@aivo/brand": "workspace:*",
     "@aivo/nav": "workspace:*",
     "clsx": "^2.1.1",

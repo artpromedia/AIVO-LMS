@@ -38,7 +38,7 @@ export function AssessmentShell({
   className,
 }: AssessmentShellProps) {
   return (
-    <div
+    <main
       className={cn(
         "relative min-h-[100dvh] w-full",
         "bg-[var(--aivo-color-surface-canvas,#f4f6f5)]",
@@ -68,7 +68,7 @@ export function AssessmentShell({
           ) : null}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

@@ -25,7 +25,19 @@ import { StaffAcceptForm } from "./staff-accept-form";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = Promise<{ email?: string; token?: string }>;
+type SearchParams = Promise<{ email?: string; token?: string; next?: string }>;
+
+/**
+ * Sanitize a `next` intent to a safe in-app path. Only same-origin
+ * absolute paths (`/teacher/...`) are honored — never an external URL or
+ * a protocol-relative `//host` — so the invite link can't be turned into
+ * an open redirect.
+ */
+function safeNext(next: string | undefined): string | null {
+  if (!next) return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
 
 export default async function AcceptInvitePage({ searchParams }: { searchParams: SearchParams }) {
   const t = await getTranslations("accept_invite.page");
@@ -66,13 +78,18 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
   }
 
   const invitedEmail = (params.email ?? "").trim().toLowerCase();
+  const nextIntent = safeNext(params.next);
   const session = await getSession();
 
-  // Unauthenticated → bounce to login with a return URL.
+  // Unauthenticated → bounce to login with a return URL that PRESERVES the
+  // `next` intent, so an accepted teacher lands on the assessment one click
+  // after signing in (C-07 entry path).
   if (!session) {
-    const redirect = `/accept-invite${
-      invitedEmail ? `?email=${encodeURIComponent(invitedEmail)}` : ""
-    }`;
+    const acceptQuery = new URLSearchParams();
+    if (invitedEmail) acceptQuery.set("email", invitedEmail);
+    if (nextIntent) acceptQuery.set("next", nextIntent);
+    const qs = acceptQuery.toString();
+    const redirect = `/accept-invite${qs ? `?${qs}` : ""}`;
     return (
       <Shell heading={t("accept_heading")}>
         <p className="text-center text-sm text-aivo-ink-soft">
@@ -122,7 +139,10 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
   }
 
   const pending = await listPendingInvitesForEmail(session.email, session.tenantId);
-  const continueHref = ROLE_HOME[session.role] ?? "/parent/home";
+  // Honor a `next` intent (e.g. a teacher invite that points at the
+  // assessment) so accepting lands one click from the destination; else
+  // fall back to the role home.
+  const continueHref = nextIntent ?? ROLE_HOME[session.role] ?? "/parent/home";
 
   return (
     <Shell heading={t("accept_heading")}>
@@ -139,14 +159,17 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
 
 function Shell({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-aivo-surface-soft p-6">
+    <main className="flex min-h-screen items-center justify-center bg-aivo-surface-soft p-6">
       <Card className="w-full max-w-md space-y-5 p-8">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-aivo-accent/10 text-aivo-accent">
+        <div
+          className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-aivo-accent/10 text-aivo-accent"
+          aria-hidden="true"
+        >
           <Mail className="h-7 w-7" />
         </div>
         <h1 className="text-center text-2xl font-bold">{heading}</h1>
         {children}
       </Card>
-    </div>
+    </main>
   );
 }

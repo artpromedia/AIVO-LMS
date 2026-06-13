@@ -65,6 +65,12 @@ export default defineConfig({
         here,
         "../../packages/learner-ui/src/tokens/age-tiers.ts",
       ),
+      // The canonical baseline break cadence lives in @aivo/adaptive-baseline.
+      // Mobile MIRRORS the value as a literal (the engine is not in the RN
+      // bundle / Metro watch folders); the parity test imports the canonical
+      // constant to keep the mirror honest. Alias to source so the test needs
+      // no dist build (same rationale as @aivo/nav above).
+      "@aivo/adaptive-baseline": resolve(here, "../../packages/adaptive-baseline/src/index.ts"),
     },
   },
 });

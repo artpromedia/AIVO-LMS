@@ -22,6 +22,7 @@ import { registerWhatsWorkingRoutes } from "./routes/whats-working.js";
 import { registerInterestRoutes } from "./routes/interests.js";
 import { registerFamilyGoalsRoutes } from "./routes/family-goals.js";
 import { registerConsentRoutes } from "./routes/consent.js";
+import { registerComplianceRoutes } from "./routes/compliance.js";
 
 const logger = createLogger("family-svc");
 const PORT = parseInt(process.env.FAMILY_PORT || "3007", 10);
@@ -79,6 +80,7 @@ export async function buildApp() {
   await registerInterestRoutes(app);
   await registerFamilyGoalsRoutes(app);
   await registerConsentRoutes(app);
+  await registerComplianceRoutes(app);
 
   return app;
 }

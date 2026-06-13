@@ -34,6 +34,42 @@ export const memoryAssessments: AssessmentStore = {
     return assessment;
   },
 
+  async findTeacherAssessmentDraft(learnerId, tenantId, submittedByUserId) {
+    for (const d of getStore().teacherAssessmentDrafts.values()) {
+      if (
+        d.learnerId === learnerId &&
+        d.tenantId === tenantId &&
+        d.submittedByUserId === submittedByUserId
+      ) {
+        return d;
+      }
+    }
+    return null;
+  },
+
+  async upsertTeacherAssessmentDraft(draft) {
+    getStore().teacherAssessmentDrafts.set(draft.id, draft);
+    return draft;
+  },
+
+  async findTherapistAssessmentDraft(learnerId, tenantId, submittedByUserId) {
+    for (const d of getStore().therapistAssessmentDrafts.values()) {
+      if (
+        d.learnerId === learnerId &&
+        d.tenantId === tenantId &&
+        d.submittedByUserId === submittedByUserId
+      ) {
+        return d;
+      }
+    }
+    return null;
+  },
+
+  async upsertTherapistAssessmentDraft(draft) {
+    getStore().therapistAssessmentDrafts.set(draft.id, draft);
+    return draft;
+  },
+
   async getBaselineById(baselineId, tenantId) {
     const b = getStore().baselineAssessments.get(baselineId);
     if (!b || b.tenantId !== tenantId) return null;

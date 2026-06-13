@@ -18,6 +18,19 @@ export interface BaselineQuestion {
   correctAnswer: string | null;
 }
 
+/**
+ * Subject the learner can pick at the baseline pre-flight. Served by
+ * assessment-svc alongside the questions (`subjects: [...]` on both the AI and
+ * curated-fallback paths) so the mobile picker renders the SAME canonical set
+ * the backend chose for this learner — never a hardcoded client list.
+ */
+export interface BaselineSubject {
+  key: string;
+  label: string;
+  emoji?: string;
+  color?: string;
+}
+
 interface RawQuestion {
   id?: string;
   questionText?: string;
@@ -25,9 +38,16 @@ interface RawQuestion {
   correctAnswer?: string;
 }
 
+interface RawSubject {
+  key?: string;
+  label?: string;
+  emoji?: string;
+  color?: string;
+}
+
 export type BaselineLoad =
-  | { status: "ready"; questions: BaselineQuestion[] }
-  | { status: "not_ready"; message: string };
+  | { status: "ready"; questions: BaselineQuestion[]; subjects: BaselineSubject[] }
+  | { status: "not_ready"; message: string; subjects: BaselineSubject[] };
 
 function mapQuestion(raw: RawQuestion, idx: number): BaselineQuestion | null {
   const q = (raw.questionText ?? "").trim();
@@ -43,6 +63,18 @@ function mapQuestion(raw: RawQuestion, idx: number): BaselineQuestion | null {
   };
 }
 
+function mapSubject(raw: RawSubject): BaselineSubject | null {
+  const label = (raw.label ?? "").trim();
+  const key = (raw.key ?? label).trim();
+  if (!label || !key) return null;
+  return { key, label, emoji: raw.emoji, color: raw.color };
+}
+
+function parseSubjects(raw: unknown): BaselineSubject[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map(mapSubject).filter((s): s is BaselineSubject => s !== null);
+}
+
 /**
  * Fetch the learner's baseline questions. Throws on a network/transport
  * error so the screen can show a retry state; returns `not_ready` when the
@@ -55,8 +87,10 @@ export async function fetchBaselineQuestions(learnerId: string): Promise<Baselin
   }
   const json = (await res.json().catch(() => ({}))) as {
     questions?: RawQuestion[] | null;
+    subjects?: RawSubject[] | null;
     message?: string;
   };
+  const subjects = parseSubjects(json.subjects);
   const raw = Array.isArray(json.questions) ? json.questions : [];
   const questions = raw.map(mapQuestion).filter((x): x is BaselineQuestion => x !== null);
   if (questions.length === 0) {
@@ -65,7 +99,23 @@ export async function fetchBaselineQuestions(learnerId: string): Promise<Baselin
       message:
         json.message ??
         "Your baseline isn't ready yet. Ask your grown-up to finish the quick setup first.",
+      subjects,
     };
   }
-  return { status: "ready", questions };
+  return { status: "ready", questions, subjects };
+}
+
+/**
+ * Fetch just the canonical subject list for the baseline pre-flight picker.
+ * Reuses {@link fetchBaselineQuestions} so the picker and the runner agree on
+ * the learner's subjects. Returns `[]` (never throws) on transport failure so
+ * the pre-flight screen can degrade gracefully instead of dead-ending.
+ */
+export async function fetchBaselineSubjects(learnerId: string): Promise<BaselineSubject[]> {
+  try {
+    const load = await fetchBaselineQuestions(learnerId);
+    return load.subjects;
+  } catch {
+    return [];
+  }
 }

@@ -181,6 +181,67 @@ export type ParentAssessment = {
   submittedAt: ISODate | null;
 };
 
+// ===== Teacher assessment draft (Sprint C-07) =====
+export type TeacherAssessmentSectionId = "context" | "strengths" | "supports" | "observations";
+
+/**
+ * Web-v2 section-patch DRAFT for the teacher assessment wizard. The
+ * system of record is assessment-svc (`teacher_assessments`); this row
+ * is the autosave buffer so a teacher who closes the tab mid-wizard
+ * resumes where they left off. One row per (learner, teacher) — keyed by
+ * `submittedByUserId` so two co-teachers of the same learner each keep
+ * their own draft. `answers` holds the validated per-section payloads
+ * (open-shape; the section Zod schemas in lib/validators/teacher-assessment.ts
+ * own the real types). `startedAtMs` is the wall-clock the wizard began,
+ * used to compute elapsed time-to-complete telemetry at submit.
+ */
+export type TeacherAssessmentDraft = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  submittedByUserId: ID;
+  answers: Partial<Record<TeacherAssessmentSectionId, Record<string, unknown>>>;
+  completedSections: TeacherAssessmentSectionId[];
+  /** Epoch ms when the wizard was first started — drives elapsed telemetry. */
+  startedAtMs: number;
+  startedAt: ISODate;
+  updatedAt: ISODate;
+  /** Set when the teacher submits to assessment-svc (system of record). */
+  submittedAt: ISODate | null;
+};
+
+// ===== Therapist assessment draft (Sprint C-10) =====
+/**
+ * Web-v2 autosave DRAFT for the therapist intake form. Sibling of
+ * TeacherAssessmentDraft: the system of record is assessment-svc
+ * (`therapist_assessments`); this row is the autosave buffer so a clinician
+ * who closes the tab mid-entry resumes where they left off. One row per
+ * (learner, therapist) — keyed by `submittedByUserId` so two therapists on the
+ * same caseload each keep their own draft.
+ *
+ * The therapist form is a SINGLE page (not a sectioned wizard), so `answers`
+ * holds the one validated form payload under a single `"form"` key — the same
+ * open-record shape the teacher draft uses, kept for store + contract parity.
+ * `startedAtMs` is the wall-clock the form was opened, used to anchor the
+ * elapsed time-to-complete telemetry at submit.
+ */
+export type TherapistAssessmentSectionId = "form";
+
+export type TherapistAssessmentDraft = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  submittedByUserId: ID;
+  answers: Partial<Record<TherapistAssessmentSectionId, Record<string, unknown>>>;
+  completedSections: TherapistAssessmentSectionId[];
+  /** Epoch ms when the form was first opened — anchors elapsed telemetry. */
+  startedAtMs: number;
+  startedAt: ISODate;
+  updatedAt: ISODate;
+  /** Set when the therapist submits to assessment-svc (system of record). */
+  submittedAt: ISODate | null;
+};
+
 // ===== Collaboration (Sprint 4) =====
 export type CollaboratorRole = "teacher" | "caregiver" | "therapist" | "parent";
 
@@ -330,6 +391,27 @@ export type BrainSignalDecision = {
 };
 
 /**
+ * Sprint C-05: one field-level correction a parent made while reviewing the
+ * cloned profile. Mirrors the brain-svc `ParentModification` contract shape
+ * (`services/brain-svc/src/brain_svc/models/schemas.py` — `field`,
+ * `original_value`, `parent_value`, `parent_note`, `modified_at`) so C-12 can
+ * unify the two stores cheaply. `field` is folded by prefix:
+ *   `mastery_levels.<domain>`  — numeric mastery override (clamped to [0,1])
+ *   `accommodation.<slug>`     — boolean: support on/off (+ matching
+ *                                 `supportDefaults` flag for the core five)
+ *   `tutor.<key>`              — boolean: tutor kept/released
+ *   `readingComfort`/`mathComfort` — qualitative comfort estimate
+ * Unknown fields are recorded but not folded (same as the Python route).
+ */
+export type ParentModification = {
+  field: string;
+  originalValue: number | string | boolean | null;
+  parentValue: number | string | boolean | null;
+  parentNote: string | null;
+  modifiedAt: ISODate;
+};
+
+/**
  * Sprint 7: typed snapshot of the AI-generated brain profile. Persisted via
  * `LearnerBrainProfile.state` and validated by the Zod schema in
  * `lib/validators/brain-profile.ts` before being stored.
@@ -440,6 +522,28 @@ export type LearnerBrainProfileState = {
     tutorDecisionsDetailed?: BrainTutorDecision[];
     signalDecisionsDetailed?: BrainSignalDecision[];
     raiComplianceDetail?: BrainRaiCompliance;
+    /**
+     * Sprint C-05: corrections the parent applied at approval, recorded with
+     * original + parent values — parity with brain-svc
+     * `xai_explanation.parent_modifications` (`routes/brain.py`). Appended by
+     * `approveBrainClone` when it folds the corrections into the live fields;
+     * never written from the client directly.
+     */
+    parentModifications?: ParentModification[];
+  };
+  /**
+   * Sprint C-05: corrections the parent saved on the review screen but has
+   * not approved yet. Server-side resume state (never component-state-only) —
+   * the review screen prefills from it and the approve action folds it.
+   * Lives inside the state JSON so persistence needs no migration; cleared
+   * when approval folds it into the live fields, and naturally discarded by
+   * a regenerate/re-clone (both rebuild `state` from scratch). Web-only:
+   * intentionally NOT part of the brain-svc contract, which only defines the
+   * applied `parent_modifications` record.
+   */
+  parentCorrectionsDraft?: {
+    modifications: ParentModification[];
+    savedAt: ISODate;
   };
   source: "ai_generated" | "deterministic_fallback";
   schemaVersion: number;
@@ -474,10 +578,199 @@ export type LearnerBrainProfile = {
   approvedByParent: boolean;
   approvalStatus: BrainProfileApprovalStatus;
   cloneStage: BrainProfileCloneStage;
+  /**
+   * Sprint C-06: monotonic integer that increments every time the profile's
+   * `state` is rebuilt (regenerate, re-clone) or folded at approval. The
+   * approval record (`BrainProfileApproval`) keys off this so a stored
+   * approval always names the exact profile revision the parent reviewed —
+   * a later re-clone bumps the revision and the old approval no longer
+   * describes the live profile. Backfilled to 1 in both adapters for rows
+   * written before the field existed.
+   */
+  revision: number;
   /** Timestamp of the post-baseline clone, null while in pre_clone. */
   clonedAt: ISODate | null;
   generatedAt: ISODate;
   updatedAt: ISODate;
+};
+
+/**
+ * Sprint C-06: the deliberate, recorded act of a parent approving (or
+ * declining) a child's learning profile. Persisted in a dedicated store —
+ * `brain_profile_approvals` — instead of being buried in the profile's
+ * display JSON, so consent + Responsible-AI acknowledgement are first-class,
+ * queryable audit evidence with the actor, the consent/RAI versions, the
+ * profile revision, and a hashed request IP.
+ *
+ * Web mirror of the brain-svc consent/RAI record persisted in
+ * `xai_explanation` (`services/brain-svc/src/brain_svc/routes/brain.py`); the
+ * cross-stack unification is C-12, out of scope here.
+ */
+export type BrainProfileApprovalAction = "approved" | "amended" | "declined";
+
+export type BrainProfileApproval = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  brainProfileId: ID;
+  /** The `LearnerBrainProfile.revision` the parent reviewed and acted on. */
+  profileRevision: number;
+  /** The parent (or guardian) who performed the act. */
+  actorUserId: ID;
+  action: BrainProfileApprovalAction;
+  /** Version string of the COPPA consent copy the parent agreed to. */
+  consentVersion: string;
+  /** Version of the Responsible-AI disclosures acknowledged. Defaults to the
+   *  reviewed `profileRevision` (mirrors brain-svc `rai_version` semantics). */
+  raiVersion: string;
+  /** Field-level corrections folded at approval (Sprint C-05 contract shape);
+   *  empty for an unamended approve or a decline. */
+  modifications: ParentModification[];
+  /** SHA-256 hash of the request IP (consent evidence; raw IP never stored). */
+  ipHash: string | null;
+  createdAt: ISODate;
+};
+
+/**
+ * Sprint C-13 — the kind of change a `LearnerBrainProfileChange` records.
+ *
+ *   mastery    — a per-domain mastery level moved. These flow freely: recorded
+ *                for the timeline, but never demand re-acknowledgement and never
+ *                fire an email (`requiresAck: false`).
+ *   structural — functioning level, accommodations added/removed, tutor
+ *                activation, or an IEP-derived shift. These notify the parent
+ *                and set `requiresAck: true` on the DELTA — non-blocking (the
+ *                approved profile keeps teaching), acknowledgement within an
+ *                N-day window (BRAIN_CHANGE_ACK_WINDOW_DAYS).
+ */
+export type BrainProfileChangeKind = "mastery" | "structural";
+
+/**
+ * Sprint C-13 — where a brain-profile change originated. Drives the
+ * plain-language source line on the timeline ("recommended after her last 3
+ * reading sessions") and lets the digest job scope its reminders. Parent-
+ * authored corrections (C-05) are deliberately NOT a source here: an amendment
+ * the parent made themselves is never a notify-to-self.
+ */
+export type BrainProfileChangeSource =
+  | "baseline_reclone" // a new baseline rebuilt the profile (web re-clone)
+  | "regenerate" // the parent/system regenerated from current inputs
+  | "iep_update" // an IEP upload/extraction shifted supports
+  | "engagement_sync" // learning activity moved mastery (brain-svc engagement)
+  | "regression_detected" // a regression detector flagged a mastery drop
+  | "amendment" // brain-svc parent amendment (recorded, never requiresAck)
+  | "rollback"; // a guardian rolled the profile back to an earlier snapshot
+
+/**
+ * Sprint C-13 — one recorded change to a learner's brain profile, newest-first
+ * on the "what changed since you approved" timeline. The Learning Brain stops
+ * changing silently: a structural change (functioning level, accommodations,
+ * tutors, IEP-derived) is captured here with `requiresAck: true` and notifies
+ * the parent; a mastery change is captured with `requiresAck: false` (cheap,
+ * enables the timeline) and flows freely.
+ *
+ * Shared-shape with brain-svc where practical (the C-12-aligned change contract
+ * in `@aivo/db` `change-contract.ts` / brain-svc `contracts/change_contract.py`)
+ * — the camelCase record fields below are the cross-stack wire shape. Anchored
+ * to the same `revision` the C-06 `BrainProfileApproval` keys off, so the
+ * timeline can interleave changes and approvals on one spine.
+ */
+export type LearnerBrainProfileChange = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  brainProfileId: ID;
+  /** The `LearnerBrainProfile.revision` this change produced. */
+  revision: number;
+  kind: BrainProfileChangeKind;
+  /** The changed field paths (e.g. ["accommodation.read_aloud", "functioningLevel"]). */
+  fields: string[];
+  /** Plain-language, strengths-first summary of what changed and why. */
+  summary: string;
+  source: BrainProfileChangeSource;
+  /** True only for structural changes — the parent must acknowledge the delta. */
+  requiresAck: boolean;
+  /** When the parent acknowledged this delta; null while pending. */
+  ackedAt: ISODate | null;
+  /** Sprint C-13 — when the 7-day digest reminder was sent for this change;
+   *  null until the comms-svc reminder job latches it (one reminder per change,
+   *  ledger-capped). Only ever set for structural (`requiresAck`) rows. */
+  reminderSentAt: ISODate | null;
+  createdAt: ISODate;
+};
+
+/**
+ * Sprint C-16 — the contributor role whose input was folded + acknowledged.
+ * Mirrors the `collaborator:<role>` source tag the clone fold stamps on each
+ * accommodation/tutor decision (`lib/learner/brain-profile.ts`).
+ */
+export type ContributionRole = "teacher" | "caregiver" | "therapist";
+
+/**
+ * Sprint C-16 — one acknowledgement that a contributor's OWN folded input is
+ * now in use, written when the parent APPROVES a brain profile (the honest
+ * trigger — folding alone isn't; approval is). It is THREE things at once:
+ *
+ *   1. The idempotency latch — one row per (contributor, learnerId,
+ *      profileRevision). Re-approving the same revision never re-spams; a later
+ *      revision whose fold newly changed this contributor's contribution earns
+ *      a fresh row.
+ *   2. The summary card's "acknowledged on" date + the contributor's OWN folded
+ *      items (their decision labels + reasoning snippets — never another
+ *      contributor's content, never the child's levels/diagnoses).
+ *   3. The retention metric's data spine (acknowledged → did they contribute
+ *      again within 60 days).
+ *
+ * PRIVACY: `foldedItems` is derived ONLY from the decisions this contributor's
+ * role+domain raised. It carries the contributor's own reasoning snippet and a
+ * support display label — nothing about the learner's functioning level,
+ * diagnoses, mastery, or any other contributor's note. Content-safety tested.
+ *
+ * Same conventions as `brain_profile_changes` (sibling): app-generated TEXT
+ * ids (no FK), ISO-8601 TEXT timestamps, JSONB for the variable-shape
+ * `foldedItems` array. No RLS — tenant-scoped in app code via the indexed
+ * tenant_id column.
+ */
+export type ContributionFoldedItem = {
+  /** The kind of decision this contributor shaped. */
+  kind: "accommodation" | "tutor";
+  /** Stable key of the support/tutor (e.g. "aac_communication_support", "echo"). */
+  key: string;
+  /** Human display label ("AAC / communication support"). Privacy-safe. */
+  label: string;
+  /** The contributor's OWN reasoning snippet, as folded. Privacy-safe (their
+   *  words about their own observation). */
+  reasoning: string;
+};
+
+export type ContributionAcknowledgement = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  /** The brain profile whose approval triggered this acknowledgement. */
+  brainProfileId: ID;
+  /** The reviewed `LearnerBrainProfile.revision` (the idempotency key's third
+   *  component). */
+  profileRevision: number;
+  role: ContributionRole;
+  /** The contributor's account, once they have one (account-holding
+   *  contributors get an in-app notification keyed off this). Null for an
+   *  email-only invitee. */
+  contributorUserId: ID | null;
+  /** Lowercased invitee email — the stable identity for an email-only
+   *  contributor and the second component of the idempotency key. */
+  contributorEmail: string;
+  /** The learner's first name (the only learner datum the note may name). */
+  learnerFirstName: string;
+  /** The contributor's OWN folded contributions — privacy-safe (see type doc). */
+  foldedItems: ContributionFoldedItem[];
+  /** When the acknowledgement was recorded (== approval time). */
+  acknowledgedAt: ISODate;
+  /** Whether the in-app/email notifications were dispatched (best-effort; the
+   *  record is the source of truth for the summary card regardless). */
+  notifiedInApp: boolean;
+  notifiedEmail: boolean;
+  createdAt: ISODate;
 };
 
 /**
@@ -1533,6 +1826,30 @@ export type IEPDocumentAccessLog = {
   purpose: "view_summary" | "view_raw" | "extract" | "delete" | "download";
 };
 
+/**
+ * Sprint C-12 (ADR 0042) — FERPA cross-role read of a child's brain profile,
+ * web-v2 side. The web counterpart of the services' `CHILD_PROFILE_DISCLOSED`
+ * audit event: the same disclosure tuple `(tenantId, learnerId, readerUserId,
+ * readerRole, surface, dataClass, timestamp)`, recorded for reads on web-v2 BFF
+ * surfaces (the parent-only brain-profile route). Append-only; queried
+ * per-learner by the compliance surface. Mirrors the `IEPDocumentAccessLog`
+ * per-learner access-log pattern already in the compliance store.
+ */
+export type ChildProfileDisclosure = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  /** The user who read the profile. */
+  readerUserId: ID;
+  /** The reader's role at read time (e.g. "parent"). */
+  readerRole: string;
+  /** The route/surface the read happened on. */
+  surface: string;
+  /** The data class disclosed (e.g. "brain_profile_full"). */
+  dataClass: string;
+  disclosedAt: ISODate;
+};
+
 export type PolicyKind =
   | "privacy_policy"
   | "terms_of_service"
@@ -2154,7 +2471,16 @@ export type NotificationType =
   | "iep_extraction_ready"
   | "data_request_completed"
   | "billing_notice"
-  | "safety_review_required";
+  | "safety_review_required"
+  // Sprint C-13 — brain evolution:
+  /** SCREEN 0 — the drafted profile is ready for first review. */
+  | "brain_profile_ready"
+  /** A structural change landed; the parent should review + acknowledge it. */
+  | "brain_profile_changed"
+  // Sprint C-16 — contributor feedback loop:
+  /** A contributor's (teacher/caregiver/therapist) OWN folded input is now in
+   *  an approved profile — the warm "your input shaped X" note. */
+  | "contribution_acknowledged";
 
 export type NotificationChannel = "in_app" | "email" | "push";
 
@@ -2788,9 +3114,36 @@ export type CaregiverObservation = {
   consequence: string;
   durationMinutes: number | null;
   location: string;
+  /**
+   * Sprint C-10: optional learner mood at the time of the observation
+   * (gentle picker). Mirrors the `mood` column the schema already carries
+   * (collaboration.ts caregiver_observations). `null` when not provided.
+   */
+  mood: string | null;
   /** Optional attachment reference — image / video uploaded separately. */
   attachmentUrl: string | null;
   createdAt: ISODate;
+  /**
+   * Sprint C-10: set when the AUTHOR edits within the 15-minute window. Drives
+   * the "edited" affordance; the prior text is preserved in `editHistory` so an
+   * edit never silently overwrites without a trace (Trust rule).
+   */
+  updatedAt: ISODate | null;
+  /**
+   * Append-only edit trail. Each entry snapshots the fields as they were
+   * BEFORE the edit that produced the current values, with the edit time.
+   */
+  editHistory: CaregiverObservationEdit[];
+};
+
+export type CaregiverObservationEdit = {
+  editedAt: ISODate;
+  behaviour: string;
+  antecedent: string;
+  consequence: string;
+  durationMinutes: number | null;
+  location: string;
+  mood: string | null;
 };
 
 // ---------------------------------------------------------------------------

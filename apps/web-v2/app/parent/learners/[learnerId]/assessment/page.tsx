@@ -15,6 +15,7 @@ import {
   ReassuranceCard,
 } from "@aivo/ui";
 import { AISuggestionsToolbar } from "@/components/forms/ai-suggestions-toolbar";
+import { AssessmentAutosave } from "./assessment-autosave";
 import type { FieldType, SuggestionContext } from "@/lib/ai/suggestions";
 import {
   getLearner,
@@ -536,6 +537,28 @@ function renderSection(
             options={DIAGNOSES_OPTIONS}
             defaultValues={fieldArray(assessment, "background", "diagnoses")}
           />
+          {/* Sprint C-11: the one clinical moment carries its reassurance BESIDE
+              the grid (not three steps later). Warmth at the point of the
+              question — labels stay as-is (parents expect them); the fix is
+              proximity, not relabeling. */}
+          <p
+            className="-mt-2 flex items-start gap-2 rounded-iw-card border border-iw-border bg-[var(--aivo-color-aivoPurple-50)]/50 px-3 py-2 text-xs text-iw-text-muted leading-relaxed"
+            data-testid="diagnoses-reassurance"
+          >
+            <svg
+              className="mt-0.5 w-4 h-4 shrink-0 text-[var(--aivo-sensory-primary)]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span>{t("diagnoses_reassurance")}</span>
+          </p>
           <SoftTextField
             name="background.diagnosesOther"
             label="Anything else to add"
@@ -1067,78 +1090,81 @@ export default async function AssessmentWizard({
             strokeLinejoin="round"
             aria-hidden="true"
           >
-            <polyline points="20 6 9 17 4 12" />
+            <path d="M19 21v-8H5v8" />
+            <path d="M7 3v5h8" />
           </svg>
           {t("autosave_indicator")}
         </span>
       }
       reassurance={<ReassuranceColumn stepNum={stepNum} t={t} />}
     >
-      <form action={saveStepAction}>
-        <input type="hidden" name="learnerId" value={learner.id} />
-        <input type="hidden" name="step" value={stepNum} />
-        <QuestionCard
-          eyebrow={step.label}
-          title={step.longLabel}
-          helper={step.helper}
-          tag={isLast ? "Final step" : undefined}
-          error={errorMessage || undefined}
-          actions={
-            <AssessmentFooter
-              back={
-                stepNum > 1 ? (
-                  <Link
-                    href={`/parent/learners/${learner.id}/assessment?step=${stepNum - 1}`}
-                    className={ASSESSMENT_BACK_CLASS}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
+      <AssessmentAutosave learnerId={learner.id} sections={step.sections}>
+        <form action={saveStepAction}>
+          <input type="hidden" name="learnerId" value={learner.id} />
+          <input type="hidden" name="step" value={stepNum} />
+          <QuestionCard
+            eyebrow={step.label}
+            title={step.longLabel}
+            helper={step.helper}
+            tag={isLast ? "Final step" : undefined}
+            error={errorMessage || undefined}
+            actions={
+              <AssessmentFooter
+                back={
+                  stepNum > 1 ? (
+                    <Link
+                      href={`/parent/learners/${learner.id}/assessment?step=${stepNum - 1}`}
+                      className={ASSESSMENT_BACK_CLASS}
                     >
-                      <path d="M19 12H5" />
-                      <path d="m12 19-7-7 7-7" />
-                    </svg>
-                    Back
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.25"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M19 12H5" />
+                        <path d="m12 19-7-7 7-7" />
+                      </svg>
+                      Back
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/parent/learners/${learner.id}/assessment/intro`}
+                      className={ASSESSMENT_BACK_CLASS}
+                    >
+                      {t("back_to_intro")}
+                    </Link>
+                  )
+                }
+                saveExit={
+                  <Link href={`/parent/learners/${learner.id}`} className={ASSESSMENT_GHOST_CLASS}>
+                    {t("save_exit")}
                   </Link>
-                ) : (
-                  <Link
-                    href={`/parent/learners/${learner.id}/assessment/intro`}
-                    className={ASSESSMENT_BACK_CLASS}
-                  >
-                    {t("back_to_intro")}
-                  </Link>
-                )
-              }
-              saveExit={
-                <Link href={`/parent/learners/${learner.id}`} className={ASSESSMENT_GHOST_CLASS}>
-                  {t("save_exit")}
-                </Link>
-              }
-              primaryLabel={isLast ? "Review answers" : "Save & continue"}
-            />
-          }
-        >
-          <div className="flex flex-col gap-6">
-            {step.sections.map((s) =>
-              renderSection(
-                s,
-                assessment,
-                {
-                  ageRange: learner.ageRange,
-                  gradeBand: learner.gradeBand,
-                },
-                t,
-              ),
-            )}
-          </div>
-        </QuestionCard>
-      </form>
+                }
+                primaryLabel={isLast ? "Review answers" : "Save & continue"}
+              />
+            }
+          >
+            <div className="flex flex-col gap-6">
+              {step.sections.map((s) =>
+                renderSection(
+                  s,
+                  assessment,
+                  {
+                    ageRange: learner.ageRange,
+                    gradeBand: learner.gradeBand,
+                  },
+                  t,
+                ),
+              )}
+            </div>
+          </QuestionCard>
+        </form>
+      </AssessmentAutosave>
     </AssessmentShell>
   );
 }

@@ -84,13 +84,21 @@ export async function hasLearnerConsent(
   return true;
 }
 
-/** Hash a client IP for consent evidence without persisting the raw value. */
-export function hashIpFromRequest(req: Request): string | null {
-  const fwd = req.headers.get("x-forwarded-for");
+/** Hash a forwarded client IP for consent evidence without persisting the raw
+ *  value. Shared by `hashIpFromRequest` (BFF routes, which hold a `Request`)
+ *  and server actions, which only have access to `headers()` from
+ *  `next/headers`. Returns null when no forwarded IP is present. */
+export function hashIpFromHeaders(headers: Headers): string | null {
+  const fwd = headers.get("x-forwarded-for");
   const ip = fwd ? fwd.split(",")[0]!.trim() : null;
   if (!ip) return null;
   return createHash("sha256")
     .update(ip + ":" + (process.env.IP_HASH_SALT ?? "aivo-consent-v1"))
     .digest("hex")
     .slice(0, 32);
+}
+
+/** Hash a client IP for consent evidence without persisting the raw value. */
+export function hashIpFromRequest(req: Request): string | null {
+  return hashIpFromHeaders(req.headers);
 }

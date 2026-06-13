@@ -97,11 +97,14 @@ class TestApproveRaiGate:
 
     @pytest.mark.asyncio
     async def test_persists_rai_acknowledgement_on_success(self, monkeypatch):
-        # Force the post-approval learning-svc fan-out to no-op so we don't
-        # need a real httpx connection in the test environment.
+        # Stub the audit emit (now awaited in the approve handler, Sprint C-06)
+        # so the test doesn't need a real audit-svc connection.
         import brain_svc.routes.brain as brain_module
 
-        monkeypatch.setattr(brain_module, "emit_brain_audit", lambda *a, **k: None, raising=False)
+        async def _noop_audit(*a, **k):
+            return None
+
+        monkeypatch.setattr(brain_module, "emit_brain_audit", _noop_audit, raising=False)
 
         request = BrainApproveRequest(
             consent_given=True,
@@ -128,10 +131,17 @@ class TestApproveRaiGate:
         datetime.fromisoformat(ack["rai_timestamp"])
 
     @pytest.mark.asyncio
-    async def test_defaults_rai_version_to_brain_state_version(self):
+    async def test_defaults_rai_version_to_brain_state_version(self, monkeypatch):
         # When the client doesn't pin rai_version, the route falls back
         # to the brain-state version the parent reviewed (so a later
         # re-clone bumps `version` and invalidates the ack window).
+        import brain_svc.routes.brain as brain_module
+
+        async def _noop_audit(*a, **k):
+            return None
+
+        monkeypatch.setattr(brain_module, "emit_brain_audit", _noop_audit, raising=False)
+
         request = BrainApproveRequest(
             consent_given=True,
             consent_version="1.0",

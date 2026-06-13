@@ -29,6 +29,12 @@ import { memoryLessonRuns } from "./memory/lesson-runs";
 import { drizzleLessonRuns } from "./drizzle/lesson-runs";
 import { memoryBrainProfiles } from "./memory/brain-profiles";
 import { drizzleBrainProfiles } from "./drizzle/brain-profiles";
+import { memoryBrainProfileApprovals } from "./memory/brain-profile-approvals";
+import { drizzleBrainProfileApprovals } from "./drizzle/brain-profile-approvals";
+import { memoryBrainProfileChanges } from "./memory/brain-profile-changes";
+import { drizzleBrainProfileChanges } from "./drizzle/brain-profile-changes";
+import { memoryContributionAcknowledgements } from "./memory/contribution-acknowledgements";
+import { drizzleContributionAcknowledgements } from "./drizzle/contribution-acknowledgements";
 import { memoryCurriculum } from "./memory/curriculum";
 import { drizzleCurriculum } from "./drizzle/curriculum";
 import { memoryCompliance } from "./memory/compliance";
@@ -66,6 +72,9 @@ type DomainKey =
   | "assessments"
   | "lessonRuns"
   | "brainProfiles"
+  | "brainProfileApprovals"
+  | "brainProfileChanges"
+  | "contributionAcknowledgements"
   | "curriculum"
   | "compliance"
   | "quests"
@@ -108,6 +117,21 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     assessments: serverEnv.AIVO_PERSISTENCE_ASSESSMENTS,
     lessonRuns: serverEnv.AIVO_PERSISTENCE_LESSON_RUNS,
     brainProfiles: serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
+    // C-06: approval records are written in the same flow as brain profiles,
+    // so they co-locate — the override defaults to the brain-profiles knob
+    // (which itself must match assessments, asserted below).
+    brainProfileApprovals:
+      serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILE_APPROVALS ?? serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
+    // C-13: change records are written in the same flow as brain profiles
+    // (every structural mutation captures one), so they co-locate too — the
+    // override defaults to the brain-profiles knob.
+    brainProfileChanges:
+      serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILE_CHANGES ?? serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
+    // C-16 — sibling of approvals/changes; defaults to the brain-profiles knob
+    // so a single AIVO_PERSISTENCE_BRAIN_PROFILES=postgres flips all three.
+    contributionAcknowledgements:
+      serverEnv.AIVO_PERSISTENCE_CONTRIBUTION_ACKNOWLEDGEMENTS ??
+      serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
     curriculum: serverEnv.AIVO_PERSISTENCE_CURRICULUM,
     compliance: serverEnv.AIVO_PERSISTENCE_COMPLIANCE,
     quests: serverEnv.AIVO_PERSISTENCE_QUESTS,
@@ -216,6 +240,9 @@ export function getPersistence(): Persistence {
   const assessmentsMode = resolveMode("assessments");
   const lessonRunsMode = resolveMode("lessonRuns");
   const brainProfilesMode = resolveMode("brainProfiles");
+  const brainProfileApprovalsMode = resolveMode("brainProfileApprovals");
+  const brainProfileChangesMode = resolveMode("brainProfileChanges");
+  const contributionAcknowledgementsMode = resolveMode("contributionAcknowledgements");
   const curriculumMode = resolveMode("curriculum");
   const complianceMode = resolveMode("compliance");
   const questsMode = resolveMode("quests");
@@ -241,6 +268,9 @@ export function getPersistence(): Persistence {
     assessmentsMode,
     lessonRunsMode,
     brainProfilesMode,
+    brainProfileApprovalsMode,
+    brainProfileChangesMode,
+    contributionAcknowledgementsMode,
     curriculumMode,
     complianceMode,
     questsMode,
@@ -304,6 +334,18 @@ export function getPersistence(): Persistence {
     assessments: assessmentsMode === "postgres" ? drizzleAssessments : memoryAssessments,
     lessonRuns: lessonRunsMode === "postgres" ? drizzleLessonRuns : memoryLessonRuns,
     brainProfiles: brainProfilesMode === "postgres" ? drizzleBrainProfiles : memoryBrainProfiles,
+    brainProfileApprovals:
+      brainProfileApprovalsMode === "postgres"
+        ? drizzleBrainProfileApprovals
+        : memoryBrainProfileApprovals,
+    brainProfileChanges:
+      brainProfileChangesMode === "postgres"
+        ? drizzleBrainProfileChanges
+        : memoryBrainProfileChanges,
+    contributionAcknowledgements:
+      contributionAcknowledgementsMode === "postgres"
+        ? drizzleContributionAcknowledgements
+        : memoryContributionAcknowledgements,
     curriculum: curriculumMode === "postgres" ? drizzleCurriculum : memoryCurriculum,
     compliance: complianceMode === "postgres" ? drizzleCompliance : memoryCompliance,
     quests: questsMode === "postgres" ? drizzleQuests : memoryQuests,

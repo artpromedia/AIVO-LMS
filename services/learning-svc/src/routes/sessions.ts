@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
-import { lessonSessions, lessonContent, gradebookEntries, learningPaths, learners, learnerProfiles } from "@aivo/db";
+import { lessonSessions, lessonContent, gradebookEntries, learningPaths, learners, learnerProfiles, brainStates } from "@aivo/db";
+import { canTeach } from "@aivo/db";
 import { emitLessonAudit } from "../lib/audit.js";
 import {
   generateLessonContent,
@@ -251,6 +252,53 @@ async function recordProblemSessionForLesson(
       tracker: ctx.tracker,
     });
   }
+}
+
+/**
+ * Sprint C-12 (ADR 0042) — the EXPLICIT services-side teach gate.
+ *
+ * Before this, the only thing stopping an unapproved child's learning path from
+ * initialising was *sequencing*: brain-svc happened to call init only from
+ * inside approve/amend. Any OTHER caller of this internal-token route (a retry,
+ * a scheduler, a future integration) would initialise a path for an unapproved
+ * child and nothing at teach time would catch it.
+ *
+ * learning-svc shares the database with brain-svc, so it reads
+ * `brain_states.approval_status` directly and refuses unless the status may
+ * teach (`{approved, amended}` — the shared `canTeach` predicate from the
+ * approval contract). Runs regardless of caller identity, INTERNAL-TOKEN
+ * INCLUDED: brain-svc's own approve/amend init calls pass because by then the
+ * status is approved/amended. Returns the typed `brain_not_approved` code in
+ * parity with web-v2's `createLessonRun`.
+ *
+ * Returns true to proceed, or false after sending a 403 (caller must `return`).
+ * Fail-closed: a missing brain row is "not approved".
+ */
+async function ensureBrainApprovedForTeaching(
+  db: any,
+  reply: any,
+  learnerId: string,
+): Promise<boolean> {
+  let status: string | null = null;
+  try {
+    const [brain] = await db
+      .select({ approvalStatus: brainStates.approvalStatus })
+      .from(brainStates)
+      .where(eq(brainStates.learnerId, learnerId))
+      .orderBy(desc(brainStates.version));
+    status = brain?.approvalStatus ?? null;
+  } catch {
+    status = null;
+  }
+  if (!canTeach(status)) {
+    reply.code(403).send({
+      error: "Brain profile awaiting parent approval before lesson generation",
+      code: "brain_not_approved",
+      approvalStatus: status ?? "pending_parent_review",
+    });
+    return false;
+  }
+  return true;
 }
 
 export function registerSessionRoutes(app: FastifyInstance, db: any) {
@@ -942,6 +990,13 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
 
       const access = await requireLearnerAccess(request, reply, db, learnerId);
       if (!access) return;
+
+      // Sprint C-12 (ADR 0042) — explicit teach gate. No learning path is
+      // initialised for a child whose brain profile is not approved/amended,
+      // regardless of caller (internal-token included). This is the services
+      // half of the cross-stack teach gate proven by the integration test.
+      const approved = await ensureBrainApprovedForTeaching(db, reply, learnerId);
+      if (!approved) return;
 
       const [existing] = await db
         .select()

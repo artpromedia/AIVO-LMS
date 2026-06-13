@@ -44,6 +44,18 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (consentErr) return consentErr;
     const picked = await pickTodaysMission(learnerId, session!.tenantId);
     if (!picked.ready) {
+      // C-01: the approval gate gets a typed code (not the generic
+      // PRECONDITION_FAILED) so clients can branch on it.
+      if (picked.blocker === "brain_not_approved") {
+        return fail(
+          {
+            ...ERRORS.PRECONDITION_FAILED,
+            code: "brain_not_approved",
+            message: "Brain profile awaiting parent approval before lesson generation",
+          },
+          requestId,
+        );
+      }
       return fail(
         {
           ...ERRORS.PRECONDITION_FAILED,
@@ -91,6 +103,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         subject_not_found: ERRORS.NOT_FOUND,
         skill_not_found: ERRORS.NOT_FOUND,
         brain_profile_missing: ERRORS.PRECONDITION_FAILED,
+        brain_not_approved: { ...ERRORS.PRECONDITION_FAILED, code: "brain_not_approved" },
         generation_failed: ERRORS.UPSTREAM_UNAVAILABLE,
       } as const;
       return fail({ ...errMap[result.code], message: result.message }, requestId);

@@ -41,6 +41,10 @@ import {
   internalTeacherInviteSchema,
   internalStaffCredentialsSchema,
   internalTeacherInviteParentSchema,
+  internalContributionNudgeSchema,
+  internalInviteExpiryWarningSchema,
+  internalBrainChangeReminderSchema,
+  internalContributionAcknowledgedSchema,
   internalAdminAlertSchema,
   internalSpeechBuddySafetySchema,
   internalBillingAlertSchema,
@@ -1106,6 +1110,232 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
       } catch (err: any) {
         logger.error({ err, to }, "Failed to send teacher→parent invite email");
         return reply.code(500).send({ error: "Failed to send invite" });
+      }
+    },
+  );
+
+  // Sprint C-08 — team contribution nudge. Called by comms-svc's own
+  // invite-reminder batch (and reusable by family-svc) when a teammate who
+  // accepted ≥48h ago still hasn't contributed. The batch enforces the 7-day
+  // cap + opt-out; this route just renders + sends the warm one-CTA email.
+  // The CTA lands the teammate on accept-invite (which routes them to the
+  // role-appropriate contribution surface); the unsubscribe link records an
+  // opt-out so the batch skips them next time.
+  app.post(
+    "/api/comms/internal/contribution-nudge",
+    { schema: internalContributionNudgeSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, kind, inviteId, learnerName, inviterName } = (request.body as any) || {};
+      if (!to || !kind) {
+        return reply.code(400).send({ error: "to and kind required" });
+      }
+      const appUrl = process.env.WEB_APP_URL || "http://localhost:3000";
+      const contributeUrl = `${appUrl.replace(/\/$/, "")}/accept-invite?email=${encodeURIComponent(to)}`;
+      const unsubscribeUrl = inviteId
+        ? `${appUrl.replace(/\/$/, "")}/notifications/unsubscribe?kind=${encodeURIComponent(
+            kind,
+          )}&invite=${encodeURIComponent(inviteId)}`
+        : "";
+      if (!isConfigured()) {
+        logger.warn({ to, kind }, "Contribution nudge requested but email not configured (dev mode)");
+        return { status: "dev_mode", contributeUrl };
+      }
+      const rendered = renderTemplate("contribution_nudge", {
+        kind,
+        learnerName,
+        inviterName,
+        contributeUrl,
+        unsubscribeUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "contribution_nudge",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send contribution nudge email");
+        return { status: "failed" };
+      }
+    },
+  );
+
+  // Sprint C-08 — teacher→parent invite expiry warning. Called by the
+  // invite-reminder batch when a PENDING token invite is < 24h from expiry.
+  app.post(
+    "/api/comms/internal/invite-expiry-warning",
+    { schema: internalInviteExpiryWarningSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, learnerName, teacherName, acceptUrl, expiresAt } = (request.body as any) || {};
+      if (!to) {
+        return reply.code(400).send({ error: "to required" });
+      }
+      let hoursLeft: number | null = null;
+      if (expiresAt) {
+        const ms = new Date(expiresAt).getTime() - Date.now();
+        if (!Number.isNaN(ms)) hoursLeft = Math.max(0, Math.round(ms / (60 * 60 * 1000)));
+      }
+      const appUrl = process.env.WEB_APP_URL || "http://localhost:3000";
+      const resolvedAcceptUrl =
+        acceptUrl || `${appUrl.replace(/\/$/, "")}/accept-invite?email=${encodeURIComponent(to)}`;
+      if (!isConfigured()) {
+        logger.warn({ to }, "Invite expiry warning requested but email not configured (dev mode)");
+        return { status: "dev_mode", acceptUrl: resolvedAcceptUrl };
+      }
+      const rendered = renderTemplate("invite_expiry_warning", {
+        learnerName,
+        teacherName,
+        acceptUrl: resolvedAcceptUrl,
+        hoursLeft,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "invite_expiry_warning",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send invite expiry warning email");
+        return { status: "failed" };
+      }
+    },
+  );
+
+  // Sprint C-13 — brain-profile change review reminder. Called by the
+  // brain-change-reminder batch when a structural change has gone un-acked for
+  // 7 days. The CTA lands the parent on the change timeline; the unsubscribe
+  // link routes to the notification preferences (the single brain_profile_changed
+  // toggle that the batch's opt-out check reads). One reminder per change.
+  app.post(
+    "/api/comms/internal/brain-change-reminder",
+    { schema: internalBrainChangeReminderSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, learnerId, learnerName, count } = (request.body as any) || {};
+      if (!to || !learnerId) {
+        return reply.code(400).send({ error: "to and learnerId required" });
+      }
+      const appUrl = (process.env.WEB_APP_URL || "http://localhost:3000").replace(/\/$/, "");
+      const reviewUrl = `${appUrl}/parent/learners/${encodeURIComponent(learnerId)}/brain-timeline`;
+      const unsubscribeUrl = `${appUrl}/notifications`;
+      if (!isConfigured()) {
+        logger.warn({ to, learnerId }, "Brain change reminder requested but email not configured (dev mode)");
+        return { status: "dev_mode", reviewUrl };
+      }
+      const rendered = renderTemplate("brain_changes_reminder", {
+        learnerName,
+        count: count ?? 1,
+        reviewUrl,
+        unsubscribeUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "brain_changes_reminder",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send brain change reminder email");
+        return { status: "failed" };
+      }
+    },
+  );
+
+  // Sprint C-16 — the contributor "your input shaped X" acknowledgement email.
+  // Called by web-v2's approval write path when a parent APPROVES a profile that
+  // folded THIS contributor's input. Role-aware (teacher/caregiver/therapist),
+  // one optional CTA to the contributor's "Your contributions" surface,
+  // unsubscribe link to their notification preferences. PRIVACY: the payload
+  // carries ONLY the contributor's own folded items (label + their reasoning
+  // snippet) + the learner's first name — the route rejects anything else by
+  // construction (it only reads those fields), and the template escapes the
+  // user-authored snippet. Content-safety tested.
+  app.post(
+    "/api/comms/internal/contribution-acknowledged",
+    { schema: internalContributionAcknowledgedSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, role, learnerFirstName, items, contributionsUrl, unsubscribeUrl } =
+        (request.body as any) || {};
+      if (!to || (role !== "teacher" && role !== "caregiver" && role !== "therapist")) {
+        return reply
+          .code(400)
+          .send({ error: "to and role (teacher|caregiver|therapist) required" });
+      }
+      const appUrl = (process.env.WEB_APP_URL || "http://localhost:3000").replace(/\/$/, "");
+      const resolvedContributionsUrl =
+        typeof contributionsUrl === "string" && contributionsUrl.length > 0
+          ? contributionsUrl
+          : appUrl;
+      const resolvedUnsubscribeUrl =
+        typeof unsubscribeUrl === "string" && unsubscribeUrl.length > 0
+          ? unsubscribeUrl
+          : `${appUrl}/notifications`;
+      // Privacy: forward ONLY label + reasoning for the contributor's own items.
+      const safeItems = Array.isArray(items)
+        ? items.map((i: any) => ({ label: i?.label, reasoning: i?.reasoning }))
+        : [];
+      if (!isConfigured()) {
+        logger.warn(
+          { to, role },
+          "Contribution acknowledgement requested but email not configured (dev mode)",
+        );
+        return { status: "dev_mode", contributionsUrl: resolvedContributionsUrl };
+      }
+      const template = `contribution_acknowledged_${role}`;
+      const rendered = renderTemplate(template, {
+        learnerFirstName,
+        items: safeItems,
+        contributionsUrl: resolvedContributionsUrl,
+        unsubscribeUrl: resolvedUnsubscribeUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: template,
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send contribution acknowledgement email");
+        return { status: "failed" };
       }
     },
   );

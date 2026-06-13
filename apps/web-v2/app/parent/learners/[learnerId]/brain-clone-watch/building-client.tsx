@@ -11,9 +11,12 @@
  * in lockstep with the learner's awakening sequence. Each stage is a
  * card that flips from "computing" → "complete" with the real XAI
  * annotation from `state.xaiExplanation`. The final stage exposes
- * Approve / Amend buttons. Approve POSTs back to the server action;
- * Amend routes to `/parent/learners/[id]/brain-profile` where overrides
- * are edited (and the approval is recorded as "amended" afterwards).
+ * Approve / "Check & adjust" buttons. Approve POSTs back to the server
+ * action (folding any corrections the parent staged on the review
+ * screen — the approval is recorded as "amended" when corrections are
+ * present). "Check & adjust" routes to
+ * `/parent/learners/[id]/brain-review`, the Sprint C-05 review & correct
+ * screen, where individual inferences are confirmed or corrected inline.
  *
  * The animation is intentionally calm: stage cards fade up + show a
  * brief shimmer while "computing", then settle. No external runtime
@@ -27,8 +30,20 @@ import BrainBuildingSequence, {
   type MasteryDecisionDTO,
   type AccommodationDecisionDTO,
   type TutorDecisionDTO,
+  type StrengthsDTO,
 } from "@/components/brain/brain-building-sequence";
 import { hasSeenClone } from "@/lib/clone-flags";
+import {
+  ApprovalCeremony,
+  type CeremonyRai,
+  type CeremonyStrings,
+  type CeremonyVoices,
+} from "./approval-ceremony";
+import { WhatHappensNext, type NextMission, type NextStepsStrings } from "./what-happens-next";
+import { RevealFlow, type RevealFlowData } from "./reveal/reveal-flow";
+import { ShareArtifact } from "./reveal/share-artifact";
+import { useRevealTelemetry } from "./reveal/use-reveal-telemetry";
+import { shareArtifactHasContent } from "@/lib/learner/reveal-assembly";
 
 type StageItem = { label: string; value?: string };
 type Stage = {
@@ -40,12 +55,17 @@ type Stage = {
 };
 
 export type BuildingSequenceData = {
-  enrolledGrade: number;
-  functioningLevel: string;
+  strengths: StrengthsDTO;
   masteryDecisions: MasteryDecisionDTO[];
   accommodationDecisions: AccommodationDecisionDTO[];
   tutorDecisions: TutorDecisionDTO[];
   pulseRate: "calm" | "steady" | "energetic";
+};
+
+/** Sprint C-14 — strings + content for the screen-7 strengths-only share card. */
+export type ShareStrings = {
+  primaryHue: string;
+  secondaryHues: string[];
 };
 
 export function BrainBuildingClient({
@@ -53,34 +73,66 @@ export function BrainBuildingClient({
   learnerName,
   title,
   description,
+  eyebrowLabel,
+  sphereAriaLabel,
   doneLabel,
-  approveLabel,
-  amendLabel,
   backLabel,
   alreadyApprovedLabel,
   replayCloneLabel,
+  privacyNoteLabel,
+  privacyLinkLabel,
+  detailsToggleLabel,
   alreadyApproved,
+  celebrate,
   stages,
   primaryHue,
   secondaryHues,
   sequence,
+  reveal,
+  ceremony,
+  nextSteps,
   approveAction,
 }: {
   learnerId: string;
   learnerName: string;
   title: string;
   description: string;
+  eyebrowLabel: string;
+  sphereAriaLabel: string;
   doneLabel: string;
-  approveLabel: string;
-  amendLabel: string;
   backLabel: string;
   alreadyApprovedLabel: string;
   replayCloneLabel: string;
+  privacyNoteLabel: string;
+  privacyLinkLabel: string;
+  /** Sprint C-14 — label for the demoted "review the details" disclosure. */
+  detailsToggleLabel: string;
   alreadyApproved: boolean;
+  /** Sprint C-06: true immediately after approval — render the ignition +
+   *  "what happens next" screen instead of the recap/ceremony. */
+  celebrate: boolean;
   stages: Stage[];
   primaryHue: string;
   secondaryHues: string[];
   sequence: BuildingSequenceData;
+  /** Sprint C-14: the stitched reveal screens 1–4 data + the screen-7 share
+   *  artifact content (built server-side, safe by construction). */
+  reveal: RevealFlowData;
+  /** Sprint C-06: the approval-ceremony content (RAI disclosures + strings). */
+  ceremony: {
+    rai: CeremonyRai;
+    strings: CeremonyStrings;
+    /** Sprint C-08: "N of M voices" chip; null when no teammate was invited. */
+    voices: CeremonyVoices | null;
+    consentVersion: string;
+    raiVersion: string;
+  };
+  /** Sprint C-06: screen-7 content (first mission, active supports, strings). */
+  nextSteps: {
+    mission: NextMission;
+    supports: string[];
+    strings: NextStepsStrings;
+  };
   approveAction: (formData: FormData) => void | Promise<void>;
 }) {
   const [active, setActive] = useState(0);
@@ -102,6 +154,14 @@ export function BrainBuildingClient({
   // The cinematic build sequence plays after the clone intro and before
   // the approval recap. Already-approved brains skip straight to the recap.
   const [sequenceDone, setSequenceDone] = useState(false);
+  // Sprint C-14 — the stitched reveal flow (screens 1–4) plays after the
+  // cinematic build and before the recap/ceremony. An already-approved brain
+  // skips it (the moment already happened); a first-time parent steps through
+  // it. `null` until we decide on the client so SSR + first paint agree.
+  const [revealDone, setRevealDone] = useState<boolean | null>(null);
+
+  // Sprint C-14 — reveal instrumentation (audit-backed; see use-reveal-telemetry).
+  const track = useRevealTelemetry(learnerId);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -115,6 +175,11 @@ export function BrainBuildingClient({
     // reduced motion is requested (the recap shows the same persistent brain
     // sphere, minus the auto-playing build animation).
     setSequenceDone(alreadyApproved || seen || reducedMotion);
+    // The stitched reveal is the first-run experience: an approved brain or a
+    // parent who has already seen the clone goes straight to the recap. Reduced
+    // motion still STEPS THROUGH the reveal (it is button-paced, not animated)
+    // so those parents get the transparency narrative too.
+    setRevealDone(alreadyApproved || seen);
   }, [alreadyApproved, learnerId]);
 
   // The recap timeline below the cinematic sequence shows the finished
@@ -126,10 +191,46 @@ export function BrainBuildingClient({
 
   const allDone = active >= stages.length;
 
-  // Phase 0 — the master→child cloning animation. While `showClone` is
-  // undecided (null) we render nothing visible to avoid a flash of the
-  // timeline before the clone intro takes over on the client.
-  if (showClone === null) return <div className="bc-watch-root" aria-hidden="true" />;
+  // Sprint C-14 — the ceremony surface is reached once the reveal is done, the
+  // build timeline is complete, and the brain is not already approved (the
+  // approval gate is live). Fired once for the funnel's ceremony→approval leg.
+  const ceremonyLive = revealDone === true && allDone && !alreadyApproved && !celebrate;
+  useEffect(() => {
+    if (ceremonyLive) track("ceremony_reached", { once: true });
+  }, [ceremonyLive, track]);
+
+  // Sprint C-06 — on approval success the page redirects back here with
+  // `?celebrate=1`. Render the ignition + "what happens next" screen straight
+  // away, bypassing the cinematic recap entirely (the moment already happened).
+  if (celebrate && alreadyApproved) {
+    return (
+      <div className="bc-watch-root">
+        <WhatHappensNext
+          learnerId={learnerId}
+          primaryHue={primaryHue}
+          secondaryHues={secondaryHues}
+          pulseRate={sequence.pulseRate}
+          mission={nextSteps.mission}
+          supports={nextSteps.supports}
+          strings={nextSteps.strings}
+        />
+        {/* Sprint C-14 — the strengths-ONLY share artifact closes screen 7. */}
+        <ShareArtifact
+          learnerName={learnerName}
+          content={reveal.shareContent}
+          hasContent={shareArtifactHasContent(reveal.shareContent)}
+          primaryHue={primaryHue}
+          onCreate={() => track("share_artifact_created", { once: true })}
+        />
+      </div>
+    );
+  }
+
+  // Phase 0 — the master→child cloning animation. While `showClone` /
+  // `revealDone` are undecided (null) we render nothing visible to avoid a
+  // flash of the timeline before the client decides which phase to show.
+  if (showClone === null || revealDone === null)
+    return <div className="bc-watch-root" aria-hidden="true" />;
   if (showClone) {
     return (
       <div className="bc-watch-root">
@@ -152,8 +253,7 @@ export function BrainBuildingClient({
       <div className="bc-watch-root">
         <BrainBuildingSequence
           learnerName={learnerName}
-          enrolledGrade={sequence.enrolledGrade}
-          functioningLevel={sequence.functioningLevel}
+          strengths={sequence.strengths}
           masteryDecisions={sequence.masteryDecisions}
           accommodationDecisions={sequence.accommodationDecisions}
           tutorDecisions={sequence.tutorDecisions}
@@ -169,6 +269,29 @@ export function BrainBuildingClient({
     );
   }
 
+  // Phase 2 (Sprint C-14) — the stitched reveal: inputs assembling → strengths
+  // recap → how she learns best → where we'll start. One paged story leading to
+  // the approval ceremony. Fires reveal_started on mount + per-screen advances.
+  if (!revealDone) {
+    return (
+      <div className="bc-watch-root" style={{ "--bc-primary": primaryHue } as React.CSSProperties}>
+        <RevealFlow
+          learnerName={learnerName}
+          primaryHue={primaryHue}
+          secondaryHues={secondaryHues}
+          pulseRate={sequence.pulseRate}
+          sphereAriaLabel={sphereAriaLabel}
+          data={reveal}
+          onScreenAdvance={(screen) => {
+            if (screen === 1) track("reveal_started", { once: true });
+            track("screen_advanced", { screen });
+          }}
+          onComplete={() => setRevealDone(true)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="bc-watch-root" style={{ "--bc-primary": primaryHue } as React.CSSProperties}>
       <header className="bc-watch-header">
@@ -179,10 +302,10 @@ export function BrainBuildingClient({
             pulseRate={sequence.pulseRate}
             intensity={1}
             size={160}
-            ariaLabel={`${learnerName}'s brain`}
+            ariaLabel={sphereAriaLabel}
           />
         </div>
-        <p className="bc-watch-eyebrow">For {learnerName}</p>
+        <p className="bc-watch-eyebrow">{eyebrowLabel}</p>
         <h1 className="bc-watch-title">{title}</h1>
         <p className="bc-watch-description">{description}</p>
         <button type="button" onClick={() => setShowClone(true)} className="bc-watch-replay-btn">
@@ -190,81 +313,99 @@ export function BrainBuildingClient({
         </button>
       </header>
 
-      <ol className="bc-watch-timeline">
-        {stages.map((s, idx) => {
-          const status: "pending" | "active" | "done" =
-            idx < active ? "done" : idx === active ? "active" : "pending";
-          return (
-            <li key={s.key} data-status={status} className="bc-watch-stage">
-              <div className="bc-watch-stage-marker" aria-hidden="true">
-                <span className="bc-watch-stage-dot" />
-              </div>
-              <div className="bc-watch-stage-card">
-                <p className="bc-watch-stage-title">{s.title}</p>
-                {s.detail ? <p className="bc-watch-stage-detail">{s.detail}</p> : null}
-                {s.swatches ? (
-                  <div className="bc-watch-swatches">
-                    {s.swatches.map((c, i) => (
-                      <span
-                        key={i}
-                        className="bc-watch-swatch"
-                        style={{ background: c }}
-                        title={c}
-                      />
-                    ))}
-                  </div>
-                ) : null}
-                {s.items && s.items.length > 0 ? (
-                  <ul className="bc-watch-stage-items">
-                    {s.items.map((it, i) => (
-                      <li key={i}>
-                        <span className="bc-watch-stage-item-label">{it.label}</span>
-                        {it.value ? (
-                          <span className="bc-watch-stage-item-value">{it.value}</span>
-                        ) : null}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+      {/* Sprint C-14 — the legacy recap timeline is DEMOTED from the primary
+          post-build surface (the stitched reveal screens 1–4 now tell the
+          story). It survives as a compact "review the details" disclosure for
+          parents who want the full step-by-step list view. The data rendering
+          is unchanged — only its prominence. */}
+      <details className="bc-watch-details">
+        <summary className="bc-watch-details-summary">{detailsToggleLabel}</summary>
+        <ol className="bc-watch-timeline">
+          {stages.map((s, idx) => {
+            const status: "pending" | "active" | "done" =
+              idx < active ? "done" : idx === active ? "active" : "pending";
+            return (
+              <li key={s.key} data-status={status} className="bc-watch-stage">
+                <div className="bc-watch-stage-marker" aria-hidden="true">
+                  <span className="bc-watch-stage-dot" />
+                </div>
+                <div className="bc-watch-stage-card">
+                  <p className="bc-watch-stage-title">{s.title}</p>
+                  {s.detail ? <p className="bc-watch-stage-detail">{s.detail}</p> : null}
+                  {s.swatches ? (
+                    <div className="bc-watch-swatches">
+                      {s.swatches.map((c, i) => (
+                        <span
+                          key={i}
+                          className="bc-watch-swatch"
+                          style={{ background: c }}
+                          title={c}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
+                  {s.items && s.items.length > 0 ? (
+                    <ul className="bc-watch-stage-items">
+                      {s.items.map((it, i) => (
+                        <li key={i}>
+                          <span className="bc-watch-stage-item-label">{it.label}</span>
+                          {it.value ? (
+                            <span className="bc-watch-stage-item-value">{it.value}</span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </details>
 
       <section className="bc-watch-actions" data-state={allDone ? "done" : "running"}>
         {alreadyApproved ? (
-          <p className="bc-watch-approved-note">{alreadyApprovedLabel}</p>
+          <>
+            <p className="bc-watch-approved-note">{alreadyApprovedLabel}</p>
+            <Link href={`/parent/learners/${learnerId}`} className="bc-watch-back-link">
+              {backLabel}
+            </Link>
+          </>
+        ) : !allDone ? (
+          <p className="bc-watch-done-label" aria-live="polite">
+            {`${active} / ${stages.length}`}
+          </p>
         ) : (
           <>
-            <p className="bc-watch-done-label" aria-live="polite">
-              {allDone ? doneLabel : `${active} / ${stages.length}`}
-            </p>
-            <div className="bc-watch-buttons">
-              <Link
-                href={`/parent/learners/${learnerId}/brain-profile`}
-                className="bc-watch-amend-btn"
-              >
-                {amendLabel}
-              </Link>
-              <form action={approveAction}>
-                <input type="hidden" name="learnerId" value={learnerId} />
-                <button
-                  type="submit"
-                  className="bc-watch-approve-btn"
-                  disabled={!allDone}
-                  aria-disabled={!allDone}
-                >
-                  {approveLabel}
-                </button>
-              </form>
-            </div>
+            <p className="bc-watch-done-label">{doneLabel}</p>
+            {/* Sprint C-06 — the approval ceremony replaces the bare button:
+                recap line, RAI panel, consent, deliberate two-step approve. */}
+            <ApprovalCeremony
+              learnerId={learnerId}
+              rai={ceremony.rai}
+              strings={ceremony.strings}
+              voices={ceremony.voices}
+              consentVersion={ceremony.consentVersion}
+              raiVersion={ceremony.raiVersion}
+              approveAction={approveAction}
+              onAmend={() => track("corrections_opened", { once: true })}
+            />
             <Link href={`/parent/learners/${learnerId}`} className="bc-watch-back-link">
               {backLabel}
             </Link>
           </>
         )}
       </section>
+
+      {/* Truthful privacy footnote (C-03): replaces the deleted encryption /
+          versioning claims with a statement the backend honors, linking to
+          the parent privacy centre for the full picture. */}
+      <p className="bc-watch-privacy">
+        {privacyNoteLabel}{" "}
+        <Link href="/parent/privacy" className="bc-watch-privacy-link">
+          {privacyLinkLabel}
+        </Link>
+      </p>
 
       <style>{`
         .bc-watch-root {
@@ -314,10 +455,38 @@ export function BrainBuildingClient({
         .bc-watch-replay-btn:hover {
           background: color-mix(in oklch, var(--bc-primary) 18%, transparent);
         }
+        .bc-watch-details {
+          margin: 1.5rem 0;
+          border: 1px solid var(--iw-border, #e2e6f0);
+          border-radius: 14px;
+          background: var(--iw-raised, #fff);
+          padding: 0 1rem;
+        }
+        .bc-watch-details-summary {
+          cursor: pointer;
+          padding: 0.9rem 0;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: var(--bc-primary);
+          list-style: none;
+        }
+        .bc-watch-details-summary::-webkit-details-marker { display: none; }
+        .bc-watch-details-summary::before {
+          content: "▸";
+          display: inline-block;
+          margin-right: 0.5rem;
+          transition: transform 200ms ease;
+        }
+        .bc-watch-details[open] .bc-watch-details-summary::before { transform: rotate(90deg); }
+        .bc-watch-details-summary:focus-visible {
+          outline: 2px solid var(--bc-primary);
+          outline-offset: 3px;
+          border-radius: 4px;
+        }
         .bc-watch-timeline {
           list-style: none;
           padding: 0;
-          margin: 1.5rem 0;
+          margin: 0.5rem 0 1.2rem;
           display: flex;
           flex-direction: column;
           gap: 0.6rem;
@@ -445,43 +614,8 @@ export function BrainBuildingClient({
           font-size: 0.95rem;
           color: var(--iw-ink, #0b1020);
         }
-        .bc-watch-buttons {
-          display: flex;
-          flex-direction: column-reverse;
-          gap: 0.6rem;
-        }
-        @media (min-width: 540px) {
-          .bc-watch-buttons {
-            flex-direction: row;
-            justify-content: flex-end;
-          }
-        }
-        .bc-watch-amend-btn,
-        .bc-watch-approve-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0.75rem 1.4rem;
-          font-size: 0.95rem;
-          font-weight: 600;
-          border-radius: 9999px;
-          text-decoration: none;
-          cursor: pointer;
-          border: 1px solid var(--iw-border, #e2e6f0);
-          background: transparent;
-          color: var(--iw-ink, #0b1020);
-        }
-        .bc-watch-approve-btn {
-          background: var(--bc-primary);
-          color: #fff;
-          border-color: var(--bc-primary);
-        }
-        .bc-watch-approve-btn:disabled,
-        .bc-watch-approve-btn[aria-disabled="true"] {
-          opacity: 0.55;
-          cursor: not-allowed;
-        }
-        .bc-watch-amend-btn:hover { background: var(--iw-raised, #f4f6fb); }
+        /* Approve / amend button styles now live in the ApprovalCeremony
+           component (C-06), which owns the recap's approval gate. */
         .bc-watch-back-link {
           font-size: 0.9rem;
           color: var(--iw-ink-muted, #4b5573);
@@ -489,6 +623,17 @@ export function BrainBuildingClient({
           text-decoration: none;
         }
         .bc-watch-back-link:hover { text-decoration: underline; }
+        .bc-watch-privacy {
+          margin: 0.9rem 0 0;
+          text-align: center;
+          font-size: 0.82rem;
+          color: var(--iw-ink-muted, #4b5573);
+        }
+        .bc-watch-privacy-link {
+          color: var(--iw-ink, #0b1020);
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
         .bc-watch-approved-note {
           margin: 0;
           color: var(--iw-ink, #0b1020);

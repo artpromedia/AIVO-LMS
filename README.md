@@ -79,6 +79,18 @@ is rejected. See:
 - [ADR 0041 — Agentic boundaries (LLMs never emit authoritative standards)](docs/adr/0041-agentic-boundaries.md)
 - [docs/curriculum/ARCHITECTURE.md](docs/curriculum/ARCHITECTURE.md) — target end-state (jurisdiction → framework → content pack → skill → scaffolded lesson).
 
+### Approval & the teach-gate
+
+One answer to *"is this child's profile approved, by whom, under which
+consent?"* across both brain pipelines. A single **shared approval/consent
+contract** (status enum, record shape, revision semantics) is honored by web-v2
+and brain-svc; the teach gate is asserted **server-side on every lesson
+pipeline** (web `createLessonRun` and the explicit `approval_status` check at
+the services lesson/path-init); and every cross-role read of a child's profile
+is recorded in a FERPA disclosure log with a compliance query surface. See:
+
+- [ADR 0042 — One brain, one gate (shared approval/consent contract)](docs/adr/0042-one-brain-one-gate.md)
+
 ### Stage & learner experience
 
 - **Stage hooks ported into packages.** `useTTS`, `useSpeechInput`, `useSensoryAdapter`, `voiceMatch`, and `StageBreakCloud` extracted from the web app into shared packages so mobile + web share one source of truth.

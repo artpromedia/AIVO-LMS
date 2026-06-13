@@ -357,6 +357,28 @@ export const JOB_REGISTRY: JobRegistryEntry[] = [
     periodMs: DEFAULT_PERIOD_MS,
   },
   {
+    jobName: "comms.invite-contribution-nudge",
+    service: "comms-svc",
+    description:
+      "Nudge learning-team members who accepted ≥48h ago but haven't contributed " +
+      "(max 1 per member per 7 days; opt-out honored).",
+    periodMs: DEFAULT_PERIOD_MS,
+  },
+  {
+    jobName: "comms.invite-expiry-warning",
+    service: "comms-svc",
+    description: "Warn recipients of teacher→parent token invites expiring within 24h.",
+    periodMs: DEFAULT_PERIOD_MS,
+  },
+  {
+    jobName: "comms.brain-change-review-reminder",
+    service: "comms-svc",
+    description:
+      "Remind a parent once about a structural brain-profile change they haven't " +
+      "acknowledged within 7 days (latched per change; opt-out honored; non-blocking).",
+    periodMs: DEFAULT_PERIOD_MS,
+  },
+  {
     jobName: "engagement.weekly-rollup",
     service: "engagement-svc",
     description: "Aggregate the previous week's XP into the per-learner rollup table.",

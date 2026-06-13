@@ -24,6 +24,8 @@ function rowToProfile(row: Row): LearnerBrainProfile {
     approvalStatus: (row.approvalStatus ??
       "pending_parent_review") as LearnerBrainProfile["approvalStatus"],
     cloneStage: (row.cloneStage ?? "pre_clone") as LearnerBrainProfile["cloneStage"],
+    // Backfill default for rows written before the column existed (C-06).
+    revision: row.revision ?? 1,
     clonedAt: row.clonedAt ?? null,
     generatedAt: row.generatedAt,
     updatedAt: row.updatedAt,
@@ -55,6 +57,7 @@ export const drizzleBrainProfiles: BrainProfileStore = {
       approvalStatus: profile.approvalStatus,
       cloneStage: profile.cloneStage,
       approvedByParent: profile.approvedByParent,
+      revision: profile.revision,
       clonedAt: profile.clonedAt,
       generatedAt: profile.generatedAt,
       updatedAt: profile.updatedAt,

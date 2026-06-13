@@ -136,3 +136,31 @@ export function sendCoParentInviteSvc(
     },
   });
 }
+
+/**
+ * Sprint C-08 — re-send a care-team invite email when the parent taps
+ * "Remind" on the team hub. Reuses the `collaboration_invite` template (same
+ * one the initial invite used), so the teammate gets a consistent, warm nudge.
+ * comms-svc owns delivery; the hub action owns the kind per-member rate limit.
+ */
+export function remindTeamMemberSvc(
+  bearer: string,
+  email: string,
+  data: { role: string; inviterName?: string; learnerName?: string; acceptUrl?: string },
+): Promise<ServiceResult<{ status: string; messageId?: string }>> {
+  return commsFetch("/api/comms/send", {
+    method: "POST",
+    bearer,
+    body: {
+      channel: "email",
+      recipient: email,
+      template: "collaboration_invite",
+      data: {
+        role: data.role,
+        inviterName: data.inviterName,
+        learnerName: data.learnerName,
+        acceptUrl: data.acceptUrl,
+      },
+    },
+  });
+}

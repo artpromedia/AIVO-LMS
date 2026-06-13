@@ -44,12 +44,15 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       chapterId,
     });
     if (!result.ok) {
+      // C-01: the approval gate is a typed precondition, not a server error.
       const errBase =
         result.code === "chapter_not_found"
           ? ERRORS.NOT_FOUND
           : result.code === "locked"
             ? ERRORS.PRECONDITION_FAILED
-            : ERRORS.INTERNAL_ERROR;
+            : result.code === "brain_not_approved"
+              ? { ...ERRORS.PRECONDITION_FAILED, code: "brain_not_approved" }
+              : ERRORS.INTERNAL_ERROR;
       return fail({ ...errBase, message: result.message }, requestId);
     }
     audit(session!, "quest.chapter_start", requestId, {

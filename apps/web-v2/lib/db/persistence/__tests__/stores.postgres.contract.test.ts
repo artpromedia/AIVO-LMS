@@ -16,6 +16,8 @@ import { sql } from "drizzle-orm";
 import { createDb, type Database } from "@aivo/db";
 import { __setDbClient, __resetDbClient } from "../drizzle/client";
 import { drizzleBrainProfiles } from "../drizzle/brain-profiles";
+import { drizzleBrainProfileApprovals } from "../drizzle/brain-profile-approvals";
+import { drizzleBrainProfileChanges } from "../drizzle/brain-profile-changes";
 import { drizzleLessonRuns } from "../drizzle/lesson-runs";
 import { drizzleNotifications } from "../drizzle/notifications";
 import { drizzleAudit } from "../drizzle/audit";
@@ -28,6 +30,8 @@ import { drizzleQuests } from "../drizzle/quests";
 import { drizzleAdmin } from "../drizzle/admin";
 import { drizzleCollaboration } from "../drizzle/collaboration";
 import { brainProfileStoreContract } from "./contract/brain-profiles.contract";
+import { brainProfileApprovalStoreContract } from "./contract/brain-profile-approvals.contract";
+import { brainProfileChangeStoreContract } from "./contract/brain-profile-changes.contract";
 import { lessonRunStoreContract } from "./contract/lesson-runs.contract";
 import { assessmentSubmitContract } from "./contract/assessments.contract";
 import { collaborationStoreContract } from "./contract/collaboration.contract";
@@ -54,6 +58,22 @@ const MIGRATIONS = [
   "0092_web_review_schedules",
   "0094_web_mastery_snapshots",
   "0098_web_baseline_bank",
+  "0108_brain_profile_approvals",
+  // C-07 teacher assessment draft store (table + index; RLS lives in 0110
+  // and is skipped here the same way 0050 is, per the hermetic-schema split).
+  "0109_web_teacher_assessments",
+  // C-10 therapist assessment draft store — sibling of the teacher table; its
+  // RLS (0113) is skipped here the same way 0110 is.
+  "0112_web_therapist_assessments",
+  // C-12 (ADR 0042) FERPA child-profile disclosure log (web side). No RLS —
+  // sibling of web_disclosure_logs / web_iep_doc_access_logs.
+  "0114_web_child_profile_disclosures",
+  // C-13 brain-profile change records — sibling of brain_profile_approvals
+  // (0108). No RLS; tenant-filtered in app code.
+  "0115_brain_profile_changes",
+  // C-16 contributor acknowledgements — sibling of brain_profile_changes
+  // (0115). No RLS; tenant-filtered in app code.
+  "0116_contribution_acknowledgements",
 ];
 
 const TABLES = [
@@ -62,6 +82,9 @@ const TABLES = [
   "generated_lesson_plans",
   "lesson_runs",
   "learner_brain_profiles",
+  "brain_profile_approvals",
+  "brain_profile_changes",
+  "contribution_acknowledgements",
   "web_notifications",
   "web_notification_deliveries",
   "web_audit_logs",
@@ -70,6 +93,8 @@ const TABLES = [
   "web_learner_profiles",
   "web_parent_learner_relationships",
   "web_parent_assessments",
+  "web_teacher_assessments",
+  "web_therapist_assessments",
   "web_baseline_assessments",
   "web_baseline_questions",
   "web_baseline_attempts",
@@ -96,6 +121,7 @@ const TABLES = [
   "web_teacher_assignments",
   "web_collaborator_insights",
   "web_collaborator_members",
+  "web_child_profile_disclosures",
 ];
 
 let db: Database;
@@ -136,6 +162,8 @@ afterAll(() => {
 if (TEST_URL) {
   const P = "postgres";
   brainProfileStoreContract(P, () => drizzleBrainProfiles, truncateAll);
+  brainProfileApprovalStoreContract(P, () => drizzleBrainProfileApprovals, truncateAll);
+  brainProfileChangeStoreContract(P, () => drizzleBrainProfileChanges, truncateAll);
   lessonRunStoreContract(P, () => drizzleLessonRuns, truncateAll);
   notificationStoreContract(P, () => drizzleNotifications, truncateAll);
   auditStoreContract(P, () => drizzleAudit, truncateAll);

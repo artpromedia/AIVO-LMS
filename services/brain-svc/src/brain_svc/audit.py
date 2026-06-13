@@ -76,6 +76,47 @@ async def emit_brain_audit(
             **(details or {}),
         },
     }
+    return await _post_audit_event(payload, event_type, learner_id)
+
+
+async def emit_child_profile_disclosure(
+    *,
+    tenant_id: str | None,
+    learner_id: str,
+    reader_user_id: str | None,
+    reader_role: str | None,
+    surface: str,
+    data_class: str,
+) -> None:
+    """Record a FERPA cross-role read of a child's profile (ADR 0042 §5).
+
+    Emits a ``CHILD_PROFILE_DISCLOSED`` event carrying the disclosure tuple
+    ``(tenantId, learnerId, readerUserId, readerRole, surface, dataClass,
+    timestamp)``. The audit-svc store stamps the timestamp + hash chain. Never
+    raises — a degraded audit-svc must not break a scoped read.
+    """
+    payload: dict[str, Any] = {
+        "action": "CHILD_PROFILE_DISCLOSED",
+        "resourceType": "brain",
+        "resourceId": learner_id,
+        "tenantId": tenant_id,
+        "actorUserId": reader_user_id,
+        "actorRole": reader_role or "service",
+        "details": {
+            "learnerId": learner_id,
+            "readerUserId": reader_user_id,
+            "readerRole": reader_role,
+            "surface": surface,
+            "dataClass": data_class,
+        },
+    }
+    return await _post_audit_event(payload, "CHILD_PROFILE_DISCLOSED", learner_id)
+
+
+async def _post_audit_event(
+    payload: dict[str, Any], event_type: str, learner_id: str
+) -> None:
+    """Best-effort POST of one event to audit-svc. Never raises."""
     try:
         client = await _get_client()
         resp = await client.post(

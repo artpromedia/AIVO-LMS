@@ -12,6 +12,79 @@ function requireUrl(name: string, devDefault: string): string {
 }
 const AI_SVC_URL = requireUrl("AI_SVC_URL", "http://localhost:3004");
 
+/** Browser-declared MIME types accepted for an IEP upload. Some browsers omit
+ *  or generalize the type, so an empty / octet-stream value is tolerated and
+ *  the magic-byte sniff below is the real gate. */
+const PDF_CONTENT_TYPES = new Set([
+  "application/pdf",
+  "application/x-pdf",
+  "application/octet-stream",
+  "binary/octet-stream",
+  "",
+]);
+
+export type PdfSafetyResult =
+  | { ok: true }
+  | { ok: false; status: number; error: string; code: string };
+
+/**
+ * In-code upload hardening for the IEP PDF intake (Sprint C-10 / D6). Pure +
+ * exported so it is unit-testable without booting Fastify:
+ *   - content-type allowlist (browser-declared MIME);
+ *   - magic-byte sniff — the bytes MUST begin with the "%PDF-" signature;
+ *   - reject encrypted PDFs (an /Encrypt dictionary in the trailer) and
+ *     active-content PDFs (/JavaScript, /JS, /Launch, /EmbeddedFile, or an
+ *     OpenAction auto-run), which are a malware-delivery vector and which the
+ *     downstream text extraction cannot use anyway.
+ * This is defense-in-depth, NOT antivirus — real AV is a named follow-up.
+ */
+export function assertPdfSafety(buffer: Buffer, mimetype?: string): PdfSafetyResult {
+  const declared = (mimetype ?? "").toLowerCase().split(";")[0].trim();
+  if (!PDF_CONTENT_TYPES.has(declared)) {
+    return {
+      ok: false,
+      status: 415,
+      error: "Only PDF uploads are accepted.",
+      code: "unsupported_content_type",
+    };
+  }
+
+  // Magic bytes: a real PDF starts with "%PDF-" (allowing a few leading bytes
+  // of BOM / whitespace that some producers emit).
+  const head = buffer.subarray(0, 1024).toString("latin1");
+  const sig = head.indexOf("%PDF-");
+  if (sig === -1 || sig > 8) {
+    return {
+      ok: false,
+      status: 415,
+      error: "That file is not a valid PDF (missing PDF signature).",
+      code: "not_a_pdf",
+    };
+  }
+
+  // Scan the raw bytes for encryption + active-content markers. PDF keywords
+  // are ASCII tokens, so a latin1 scan of the whole buffer reliably finds them.
+  const body = buffer.toString("latin1");
+  if (/\/Encrypt\b/.test(body)) {
+    return {
+      ok: false,
+      status: 422,
+      error: "Encrypted/password-protected PDFs can't be processed. Please upload an unlocked PDF.",
+      code: "pdf_encrypted",
+    };
+  }
+  if (/\/JavaScript\b|\/JS\b|\/Launch\b|\/EmbeddedFile\b|\/OpenAction\b/.test(body)) {
+    return {
+      ok: false,
+      status: 422,
+      error: "This PDF contains active content (scripts or embedded files) and was rejected.",
+      code: "pdf_active_content",
+    };
+  }
+
+  return { ok: true };
+}
+
 async function authenticate(req: any, reply: any) {
   const auth = req.headers.authorization;
   if (!auth?.startsWith("Bearer ")) return reply.status(401).send({ error: "Unauthorized" });
@@ -395,6 +468,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
       let fileNameOverride: string | undefined;
       let fileName: string | undefined;
       let fileBuffer: Buffer | undefined;
+      let fileMimetype: string | undefined;
 
       try {
         // Iterate parts so file + learnerId can arrive in any order. The
@@ -402,6 +476,7 @@ export async function registerIepRoutes(app: FastifyInstance) {
         for await (const part of (req as any).parts()) {
           if (part.type === "file") {
             fileName = part.filename;
+            fileMimetype = part.mimetype;
             try {
               fileBuffer = await part.toBuffer();
             } catch (err: any) {
@@ -431,6 +506,22 @@ export async function registerIepRoutes(app: FastifyInstance) {
       }
       if (fileBuffer.length === 0) {
         return reply.status(400).send({ error: "Empty PDF." });
+      }
+
+      // ── Upload hardening (Sprint C-10, Decision D6) ───────────────────────
+      // Infra-level AV scanning does NOT exist yet (verified — no ClamAV /
+      // gateway scanner in infra/, docker/, helm/, or docs); integrating one is
+      // a NAMED FOLLOW-UP. Until then we harden in-code so an obviously-hostile
+      // or malformed upload is rejected before it reaches pdf-parse / the LLM:
+      //   1. content-type allowlist (the browser-declared MIME);
+      //   2. magic-byte sniff — the bytes MUST actually begin with "%PDF-";
+      //   3. reject encrypted / active-content (JavaScript / embedded-launch)
+      //      PDFs, which are a classic malware-delivery vector and which we
+      //      cannot meaningfully parse anyway.
+      // This is defense-in-depth, NOT a substitute for AV; see the D6 follow-up.
+      const safety = assertPdfSafety(fileBuffer, fileMimetype);
+      if (!safety.ok) {
+        return reply.status(safety.status).send({ error: safety.error, code: safety.code });
       }
 
       // Extract the document text. Lazy-import `pdf-parse` from its inner

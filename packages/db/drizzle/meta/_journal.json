@@ -743,6 +743,69 @@
       "when": 1786061700000,
       "tag": "0107_users_timezone",
       "breakpoints": true
+    },
+    {
+      "idx": 104,
+      "version": "7",
+      "when": 1786061800000,
+      "tag": "0108_brain_profile_approvals",
+      "breakpoints": true
+    },
+    {
+      "idx": 105,
+      "version": "7",
+      "when": 1786061900000,
+      "tag": "0109_web_teacher_assessments",
+      "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1786062000000,
+      "tag": "0110_web_teacher_assessments_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 107,
+      "version": "7",
+      "when": 1786062100000,
+      "tag": "0111_invite_reminder_latches",
+      "breakpoints": true
+    },
+    {
+      "idx": 108,
+      "version": "7",
+      "when": 1786062200000,
+      "tag": "0112_web_therapist_assessments",
+      "breakpoints": true
+    },
+    {
+      "idx": 109,
+      "version": "7",
+      "when": 1786062300000,
+      "tag": "0113_web_therapist_assessments_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "7",
+      "when": 1786062400000,
+      "tag": "0114_web_child_profile_disclosures",
+      "breakpoints": true
+    },
+    {
+      "idx": 111,
+      "version": "7",
+      "when": 1786062500000,
+      "tag": "0115_brain_profile_changes",
+      "breakpoints": true
+    },
+    {
+      "idx": 112,
+      "version": "7",
+      "when": 1786148900000,
+      "tag": "0116_contribution_acknowledgements",
+      "breakpoints": true
     }
   ]
 }

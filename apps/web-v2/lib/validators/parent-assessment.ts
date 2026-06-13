@@ -136,10 +136,18 @@ export const ASSESSMENT_SECTION_LABEL: Record<AssessmentSectionId, string> = {
   concerns: "Your concerns",
 };
 
-/** Group the 17 sections into 8 wizard steps for a calmer flow. The first
- *  step (Basics) and the new Background/Strengths/Learning-profile sections
- *  feed the legacy brain-clone signals (functioning level, diagnoses,
- *  communication mode) — see `lib/learner/brain-profile.ts`. */
+/** Group the 17 sections into 12 wizard steps for a calmer flow — one thought
+ *  at a time, never more than ~4 inputs per screen. The first step (Basics)
+ *  and the Background/Strengths/Learning-profile sections feed the legacy
+ *  brain-clone signals (functioning level, diagnoses, communication mode) —
+ *  see `lib/learner/brain-profile.ts`.
+ *
+ *  Sprint C-11 split the old overloaded step 10 (homework + goals + motivation,
+ *  ~7 inputs) into two calmer screens: step 10 "Routine" (homework) and step 11
+ *  "Goals & motivation". Section ids are unchanged — only their grouping moved —
+ *  so in-progress drafts keyed by section id resume correctly under the new
+ *  mapping (a pre-split draft's `goals`/`motivation` answers simply surface on
+ *  the new step 11). */
 export const WIZARD_STEPS: {
   id: number;
   /** Short label for the step (used in legacy stepper). */
@@ -224,14 +232,22 @@ export const WIZARD_STEPS: {
   },
   {
     id: 10,
-    label: "Routine & goals",
-    longLabel: "When does learning fit best, and what's the goal?",
+    label: "Routine",
+    longLabel: "When does learning fit best?",
     helper:
-      "Best time of day, typical session length, what you'd like AIVO to help with, and what motivates your learner.",
-    sections: ["homework", "goals", "motivation"],
+      "Best time of day and a rough session length. AIVO plans around the rhythm that already works for your family.",
+    sections: ["homework"],
   },
   {
     id: 11,
+    label: "Goals & motivation",
+    longLabel: "What's the goal, and what keeps your learner going?",
+    helper:
+      "What you'd like AIVO to help with, and the rewards or motivators that help. There's no wrong answer here.",
+    sections: ["goals", "motivation"],
+  },
+  {
+    id: 12,
     label: "Concerns",
     longLabel: "Anything else AIVO should know?",
     helper:
@@ -250,4 +266,113 @@ export function validateSection(
     return { ok: false, message: parsed.error.message };
   }
   return { ok: true, data: parsed.data as Record<string, unknown> };
+}
+
+/**
+ * Draft-lenient section validator for FIELD-LEVEL AUTOSAVE (Sprint C-11).
+ *
+ * Submit validation (`validateSection`) is strict: every required field must be
+ * present and well-formed before the assessment can be submitted. Autosave is
+ * different — a parent typing one field mid-screen must have that field saved
+ * without first satisfying the whole section's required shape (draft ≠ submit).
+ *
+ * This makes every field optional (so a half-filled section persists) while
+ * still enforcing each field's *type* and bounds (string length, enum values,
+ * array caps, numeric ranges) so the draft store can never accept garbage.
+ * Unknown keys are stripped. Empty objects are allowed (nothing to save yet).
+ *
+ * Implementation: Zod's `.partial()` relaxes required → optional; for sections
+ * whose fields are themselves arrays/strings we keep the element constraints.
+ * The strict submit gate still runs on Next/Submit, which remains the
+ * authoritative write — autosave only ever advances the draft, never the
+ * submitted state.
+ */
+export function draftValidateSection(
+  section: AssessmentSectionId,
+  data: unknown,
+): { ok: true; data: Record<string, unknown> } | { ok: false; message: string } {
+  const schema = assessmentSectionSchemas[section];
+  // `.partial()` turns every top-level key optional but preserves each field's
+  // own validators (enum membership, max-length, numeric range). `.strip()` is
+  // Zod's default object behaviour, so unknown keys are dropped silently.
+  const draftSchema = schema.partial();
+  const parsed = draftSchema.safeParse(data ?? {});
+  if (!parsed.success) {
+    return { ok: false, message: parsed.error.message };
+  }
+  // Drop keys whose value resolved to `undefined` so the stored draft stays
+  // clean (a cleared field shouldn't persist an explicit `undefined`).
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(parsed.data as Record<string, unknown>)) {
+    if (v !== undefined) out[k] = v;
+  }
+  return { ok: true, data: out };
+}
+
+/**
+ * Resume-progress derivation (Sprint C-11).
+ *
+ * Powers the welcoming resume card ("You're 7 of 12 screens in — about 2
+ * minutes left. Your answers are saved.") on the intro and the learner detail
+ * page, and the intro's "Continue where I left off" target.
+ *
+ * A wizard STEP counts as DONE when every section it groups has been answered
+ * (has at least one stored value) AND passes strict submit validation — so an
+ * untouched optional step (e.g. Strengths left blank) never inflates "7 of 12"
+ * and an invalid step never counts. `nextStep` is the first step the parent has
+ * not finished — the first step with an unanswered or invalid section — exactly
+ * the "first incomplete step" the intro has always resumed to; it is `null`
+ * only when every step is done.
+ *
+ * The minute estimate mirrors the per-step wizard hint logic
+ * (`About {remaining} minutes left`, ~1 screen/minute) so the intro card, the
+ * learner detail card, and the in-wizard progress hint all tell the same story.
+ */
+export interface AssessmentProgressSummary {
+  total: number;
+  /** Number of fully-complete wizard steps. */
+  done: number;
+  /** First incomplete step id (the Continue target), or null if all done. */
+  nextStep: number | null;
+  /** Honest minutes-left estimate (≥ 0). */
+  minutesLeft: number;
+  /** True once at least one section has been answered (resume affordance). */
+  started: boolean;
+}
+
+export function deriveAssessmentProgress(
+  answers: Partial<Record<AssessmentSectionId, Record<string, unknown> | undefined>>,
+): AssessmentProgressSummary {
+  const total = WIZARD_STEPS.length;
+  let firstIncomplete: number | null = null;
+  let done = 0;
+  let answeredAny = false;
+
+  for (const step of WIZARD_STEPS) {
+    // A step is DONE when EVERY section it groups has been answered (non-empty)
+    // and passes strict validation. An all-optional step left blank is NOT done
+    // — it stays the resume target until the parent visits it, matching the
+    // intro's long-standing "first step with an unanswered section" behaviour.
+    const stepDone = step.sections.every((sec) => {
+      const sectionAnswers = answers[sec];
+      const answered = !!sectionAnswers && Object.keys(sectionAnswers).length > 0;
+      if (answered) answeredAny = true;
+      return answered && validateSection(sec, sectionAnswers ?? {}).ok;
+    });
+    if (stepDone) {
+      done += 1;
+    } else if (firstIncomplete === null) {
+      firstIncomplete = step.id;
+    }
+  }
+
+  return {
+    total,
+    done,
+    nextStep: firstIncomplete,
+    // One calm screen ≈ one minute; never below zero, never below 1 while work
+    // remains so the card never reads "0 minutes left" with steps outstanding.
+    minutesLeft: firstIncomplete === null ? 0 : Math.max(1, total - done),
+    started: answeredAny,
+  };
 }

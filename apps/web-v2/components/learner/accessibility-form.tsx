@@ -127,14 +127,15 @@ const TOGGLES: Array<{
     group: "support",
   },
   // Sprint 7 — AAC bridge. Turning this on mounts the AACTargetProvider
-  // around the lesson player and tutor/homework chat composers. Input
-  // method + scan delay live on AccessibilityPreferences too; the form
-  // currently exposes the on/off toggle and defaults to single-switch
-  // touch input — the device-pairing UI is a follow-up.
+  // around the lesson player and tutor/homework chat composers, and (Sprint
+  // C-15) drives switch scanning in the baseline runner. Input method + scan
+  // delay live on AccessibilityPreferences too. The AAC group's label/help are
+  // overridden with child-friendly i18n copy at render time (the `tAac(...)`
+  // calls below); these static strings are only a fallback.
   {
     key: "aacEnabled",
-    label: "AAC support",
-    help: "Turn on switch-scan / eye-gaze input. Space activates; ArrowRight advances the scanner.",
+    label: "Switch & button steering",
+    help: "Steer with a switch or button instead of tapping.",
     group: "aac",
   },
 ];
@@ -153,6 +154,7 @@ type Props = {
 
 export function AccessibilityForm({ learnerId, initial }: Props) {
   const tVoice = useTranslations("learner.accessibility_voice");
+  const tAac = useTranslations("learner.settings_a11y.aac");
   const router = useRouter();
   const [prefs, setPrefs] = useState(initial);
   const [status, setStatus] = useState<null | "saved" | "reset" | "error">(null);
@@ -219,38 +221,50 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
     "aac",
   ];
 
-  const AAC_INPUT_METHODS: Array<{ value: AccessibilityPreferences["aacInputMethod"]; label: string }> = [
-    { value: "touch", label: "Touch / direct select" },
-    { value: "switch_1", label: "Single switch (auto-scan)" },
-    { value: "switch_2", label: "Two switches (step scan)" },
-    { value: "eye_gaze", label: "Eye gaze" },
-    { value: "head_pointer", label: "Head pointer" },
+  const AAC_INPUT_METHODS: Array<{
+    value: AccessibilityPreferences["aacInputMethod"];
+    label: string;
+  }> = [
+    { value: "touch", label: tAac("method_touch") },
+    { value: "switch_1", label: tAac("method_switch_1") },
+    { value: "switch_2", label: tAac("method_switch_2") },
+    { value: "eye_gaze", label: tAac("method_eye_gaze") },
+    { value: "head_pointer", label: tAac("method_head_pointer") },
   ];
 
   return (
     <div className="grid gap-4">
       {groups.map((g) => (
         <Card key={g} className="p-5">
-          <p className="mb-3 font-semibold">{GROUP_LABEL[g]}</p>
+          <p className="mb-3 font-semibold">{g === "aac" ? tAac("group_label") : GROUP_LABEL[g]}</p>
+          {g === "aac" ? (
+            <p className="-mt-2 mb-3 text-xs text-aivo-ink-soft">{tAac("group_desc")}</p>
+          ) : null}
           <ul className="grid gap-3 sm:grid-cols-2">
-            {TOGGLES.filter((t) => t.group === g).map((t) => (
-              <li
-                key={t.key}
-                className="flex items-start gap-3 rounded-md border border-aivo-line p-3"
-              >
-                <Checkbox
-                  id={t.key}
-                  checked={Boolean(prefs[t.key])}
-                  onCheckedChange={() => toggle(t.key)}
-                />
-                <div className="flex-1">
-                  <Label htmlFor={t.key} className="font-medium">
-                    {t.label}
-                  </Label>
-                  <p className="text-xs text-aivo-ink-soft">{t.help}</p>
-                </div>
-              </li>
-            ))}
+            {TOGGLES.filter((t) => t.group === g).map((t) => {
+              // The AAC group reads in child-friendly language from i18n; all
+              // other groups keep their existing static labels.
+              const label = t.key === "aacEnabled" ? tAac("enable_label") : t.label;
+              const help = t.key === "aacEnabled" ? tAac("enable_help") : t.help;
+              return (
+                <li
+                  key={t.key}
+                  className="flex items-start gap-3 rounded-md border border-aivo-line p-3"
+                >
+                  <Checkbox
+                    id={t.key}
+                    checked={Boolean(prefs[t.key])}
+                    onCheckedChange={() => toggle(t.key)}
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor={t.key} className="font-medium">
+                      {label}
+                    </Label>
+                    <p className="text-xs text-aivo-ink-soft">{help}</p>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
 
           {g === "reading" && (
@@ -270,7 +284,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
             <div className="mt-4 grid gap-4 rounded-md border border-aivo-line p-3 sm:grid-cols-2">
               <div className="flex flex-col gap-1">
                 <Label htmlFor="aacInputMethod" className="font-medium">
-                  Input method
+                  {tAac("method_label")}
                 </Label>
                 <select
                   id="aacInputMethod"
@@ -292,7 +306,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
               </div>
               <div className="flex flex-col gap-1">
                 <Label htmlFor="aacScanDelayMs" className="font-medium">
-                  Scan / dwell time (ms)
+                  {tAac("dwell_label")}
                 </Label>
                 <input
                   id="aacScanDelayMs"
@@ -307,9 +321,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
                   }}
                   className="rounded-md border border-aivo-line bg-transparent px-2 py-2 text-sm"
                 />
-                <p className="text-xs text-aivo-ink-soft">
-                  How long the scanner waits on each option (300–5000 ms).
-                </p>
+                <p className="text-xs text-aivo-ink-soft">{tAac("dwell_help")}</p>
               </div>
             </div>
           )}

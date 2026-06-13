@@ -9,6 +9,7 @@ import {
   estimateSubjectThetas,
   assessFrustration,
   FRUSTRATION_CEILING,
+  BASELINE_BREAK_EVERY,
   itemProbability,
   itemInformation,
   pickNextItem as pick2,
@@ -456,5 +457,12 @@ describe("estimateSubjectThetas (Wave C, G1)", () => {
     }
     const thetas = estimateSubjectThetas(state, bank);
     expect(thetas.math).toBeCloseTo(Math.round(state.theta * 10) / 10, 5);
+  });
+});
+
+describe("break cadence constant", () => {
+  it("is the single shared source of truth for web + mobile pacing", () => {
+    // Pinned so a drift back to the old web=5 / mobile=3 split fails loudly.
+    expect(BASELINE_BREAK_EVERY).toBe(5);
   });
 });

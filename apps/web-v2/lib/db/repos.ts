@@ -21,7 +21,19 @@ import {
 import { brainPacingFocusSafe } from "@/lib/bff/brain-pacing";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
-import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
+import { listLearnersForMember as listLearnersForTeamMember, getCareTeam } from "@/lib/db/team-invites";
+import {
+  deriveRoleAcknowledgements,
+  type RoleAcknowledgementPayload,
+} from "@/lib/collaboration/contribution-acknowledgement";
+import { dispatchContributionAckEmail } from "@/lib/collaboration/contribution-acknowledgement-dispatch";
+import {
+  contributionAction,
+  contributionEventsFromAuditLogs,
+  computeContributionRetention,
+  type ContributionEvent,
+  type ContributionRetention,
+} from "@/lib/collaboration/contribution-retention";
 import type {
   AuditLog,
   BaselineAssessment,
@@ -38,10 +50,16 @@ import type {
 } from "@/lib/db/types";
 import { ACCESSIBILITY_DEFAULTS } from "@/lib/db/types";
 import type {
+  ChildProfileDisclosure,
   CollaboratorInsight,
   IEPDocument,
   IEPExtraction,
   LearnerBrainProfile,
+  BrainProfileApproval,
+  LearnerBrainProfileChange,
+  BrainProfileChangeSource,
+  ContributionAcknowledgement,
+  ContributionRole,
   LearnerBrainProfileState,
   LearnerProfile,
   LearningPath,
@@ -50,7 +68,11 @@ import type {
   MasterySnapshot,
   ParentAssessment,
   ParentAssessmentSectionId,
+  TeacherAssessmentDraft,
+  TeacherAssessmentSectionId,
+  TherapistAssessmentDraft,
   ParentLessonSummary,
+  ParentModification,
   ReadinessState,
   ReviewSchedule,
   Skill,
@@ -75,6 +97,8 @@ import {
   generateAdaptiveBaselinePool,
   generateBaselineQuestions,
 } from "@/lib/learner/baseline";
+import { assertCorrectionsAllowed, foldParentModifications } from "@/lib/db/brain-corrections";
+import { detectBrainProfileChange } from "@/lib/db/brain-profile-changes";
 import {
   aggregateItemPsychometrics,
   buildRunTelemetry,
@@ -98,6 +122,7 @@ import {
   baselineLlmEnabled,
 } from "@/lib/feature-flags";
 import { logger } from "@/lib/observability/logger";
+import { clientEnv } from "@/lib/env";
 import { emitDegradation } from "@/lib/observability/degradation";
 import {
   buildBaselineSummary,
@@ -329,6 +354,175 @@ export async function patchParentAssessmentSection(
     updatedAt: nowIso(),
   };
   return getPersistence().assessments.upsertParentAssessment(next);
+}
+
+/* ===== Teacher assessment DRAFT (Sprint C-07) =====
+ * The autosave buffer for the teacher wizard. The system of record is
+ * assessment-svc (`teacher_assessments`); these helpers persist the
+ * in-progress draft so a teacher resumes after closing the tab. Keyed by
+ * (learner, tenant, submitting teacher) so co-teachers keep separate
+ * drafts. Mirrors the parent-assessment get-or-create + section-patch
+ * pattern above. */
+
+export async function findTeacherAssessmentDraft(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TeacherAssessmentDraft | null> {
+  return getPersistence().assessments.findTeacherAssessmentDraft(
+    learnerId,
+    tenantId,
+    submittedByUserId,
+  );
+}
+
+export async function getOrCreateTeacherAssessmentDraft(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TeacherAssessmentDraft> {
+  const existing = await findTeacherAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  if (existing) return existing;
+  const now = nowIso();
+  const draft: TeacherAssessmentDraft = {
+    id: newId("tad"),
+    learnerId,
+    tenantId,
+    submittedByUserId,
+    answers: {},
+    completedSections: [],
+    startedAtMs: Date.now(),
+    startedAt: now,
+    updatedAt: now,
+    submittedAt: null,
+  };
+  return getPersistence().assessments.upsertTeacherAssessmentDraft(draft);
+}
+
+export async function patchTeacherAssessmentSection(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+  section: TeacherAssessmentSectionId,
+  data: Record<string, unknown>,
+): Promise<TeacherAssessmentDraft> {
+  const current = await getOrCreateTeacherAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  const completed = new Set(current.completedSections);
+  completed.add(section);
+  const next: TeacherAssessmentDraft = {
+    ...current,
+    answers: { ...current.answers, [section]: data },
+    completedSections: Array.from(completed),
+    updatedAt: nowIso(),
+  };
+  return getPersistence().assessments.upsertTeacherAssessmentDraft(next);
+}
+
+/**
+ * Stamp the draft submitted (idempotent buffer cleanup). The real record
+ * is written to assessment-svc by the BFF; this only marks the local
+ * draft so the wizard's resume logic shows the completed state and the
+ * elapsed-time computation has a stable anchor.
+ */
+export async function markTeacherAssessmentDraftSubmitted(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TeacherAssessmentDraft | null> {
+  const current = await findTeacherAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  if (!current) return null;
+  const next: TeacherAssessmentDraft = {
+    ...current,
+    submittedAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+  return getPersistence().assessments.upsertTeacherAssessmentDraft(next);
+}
+
+/* ===== Therapist assessment DRAFT (Sprint C-10) =====
+ * The autosave buffer for the single-page therapist intake form. The system
+ * of record is assessment-svc (`therapist_assessments`); these helpers persist
+ * the in-progress draft so a clinician resumes after closing the tab. Keyed by
+ * (learner, tenant, submitting therapist) so two therapists on the same
+ * caseload keep separate drafts. Sibling of the teacher draft helpers above —
+ * the therapist form is single-page, so the whole payload lives under the one
+ * `"form"` section key. */
+
+export async function findTherapistAssessmentDraft(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TherapistAssessmentDraft | null> {
+  return getPersistence().assessments.findTherapistAssessmentDraft(
+    learnerId,
+    tenantId,
+    submittedByUserId,
+  );
+}
+
+export async function getOrCreateTherapistAssessmentDraft(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TherapistAssessmentDraft> {
+  const existing = await findTherapistAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  if (existing) return existing;
+  const now = nowIso();
+  const draft: TherapistAssessmentDraft = {
+    id: newId("thad"),
+    learnerId,
+    tenantId,
+    submittedByUserId,
+    answers: {},
+    completedSections: [],
+    startedAtMs: Date.now(),
+    startedAt: now,
+    updatedAt: now,
+    submittedAt: null,
+  };
+  return getPersistence().assessments.upsertTherapistAssessmentDraft(draft);
+}
+
+/**
+ * Persist the single-page therapist form payload (autosave). The whole form
+ * lives under the `"form"` section so the draft round-trips on resume. Marks
+ * `"form"` complete (the form has content) and stamps updatedAt.
+ */
+export async function patchTherapistAssessmentForm(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+  data: Record<string, unknown>,
+): Promise<TherapistAssessmentDraft> {
+  const current = await getOrCreateTherapistAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  const next: TherapistAssessmentDraft = {
+    ...current,
+    answers: { ...current.answers, form: data },
+    completedSections: ["form"],
+    updatedAt: nowIso(),
+  };
+  return getPersistence().assessments.upsertTherapistAssessmentDraft(next);
+}
+
+/**
+ * Stamp the therapist draft submitted (idempotent buffer cleanup). The real
+ * record is written to assessment-svc by the BFF; this only marks the local
+ * draft so the form's resume logic shows the completed state and the
+ * elapsed-time computation has a stable anchor.
+ */
+export async function markTherapistAssessmentDraftSubmitted(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TherapistAssessmentDraft | null> {
+  const current = await findTherapistAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  if (!current) return null;
+  const next: TherapistAssessmentDraft = {
+    ...current,
+    submittedAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+  return getPersistence().assessments.upsertTherapistAssessmentDraft(next);
 }
 
 export async function submitParentAssessment(
@@ -570,10 +764,18 @@ export async function upsertBrainProfile(
       approvedByParent: false,
       approvalStatus: "pending_parent_review",
       cloneStage: "pre_clone",
+      // C-06: a fresh generation rebuilds `state`, so the revision advances —
+      // any prior approval no longer describes the live profile.
+      revision: (existing.revision ?? 1) + 1,
       clonedAt: null,
       generatedAt: now,
     };
-    return getPersistence().brainProfiles.upsert(next);
+    const committed = await getPersistence().brainProfiles.upsert(next);
+    // C-13: a regenerate from a profile the parent already reviewed/approved is
+    // a structural-change origin — capture the delta off the prior reviewable
+    // state. Pre-clone→pre-clone churn captures nothing (no review anchor).
+    await captureBrainProfileChange({ before: existing, after: committed, source: "regenerate" });
+    return committed;
   }
   const profile: LearnerBrainProfile = {
     id: newId("brp"),
@@ -583,6 +785,7 @@ export async function upsertBrainProfile(
     approvedByParent: false,
     approvalStatus: "pending_parent_review",
     cloneStage: "pre_clone",
+    revision: 1,
     clonedAt: null,
     generatedAt: now,
     updatedAt: now,
@@ -663,6 +866,7 @@ async function prepareBrainCloneFromSummary(
       approvedByParent: false,
       approvalStatus: "pending_parent_review",
       cloneStage: "cloned",
+      revision: 1,
       clonedAt: now,
       generatedAt: now,
       updatedAt: now,
@@ -672,14 +876,28 @@ async function prepareBrainCloneFromSummary(
     ...existing,
     state: parsed.data,
     cloneStage: existing.cloneStage === "approved" ? "approved" : "cloned",
+    // C-06: re-clone rebuilds `state` from a fresh baseline → revision advances.
+    revision: (existing.revision ?? 1) + 1,
     clonedAt: existing.clonedAt ?? now,
     updatedAt: now,
   };
 }
 
-/** Internal: commit a prepared brain clone to the store. */
-async function commitBrainClone(profile: LearnerBrainProfile): Promise<LearnerBrainProfile> {
-  return getPersistence().brainProfiles.upsert(profile);
+/** Internal: commit a prepared brain clone to the store.
+ *
+ *  C-13: capture the change off the profile's prior committed state. The brain
+ *  store is untouched between `prepareBrainCloneFromSummary` and here, so the
+ *  current row IS the BEFORE state. A first clone (no prior reviewable profile)
+ *  fires SCREEN 0; a re-clone that shifts supports/level/tutors records a
+ *  structural change and notifies. `source` defaults to a baseline re-clone. */
+async function commitBrainClone(
+  profile: LearnerBrainProfile,
+  source: BrainProfileChangeSource = "baseline_reclone",
+): Promise<LearnerBrainProfile> {
+  const before = await getBrainProfile(profile.learnerId, profile.tenantId);
+  const committed = await getPersistence().brainProfiles.upsert(profile);
+  await captureBrainProfileChange({ before, after: committed, source });
+  return committed;
 }
 
 /**
@@ -706,29 +924,670 @@ export async function cloneBrainFromBaseline(
 }
 
 /**
+ * Sprint C-05: stage the parent's review-screen corrections server-side so
+ * they survive navigation (resume state lives in the profile record, never
+ * in component state). Replaces any previously staged draft; an empty list
+ * clears it (the confirm-all fast path). The corrections are NOT folded yet
+ * — `approveBrainClone` folds them when the parent approves.
+ *
+ * Therapist-pinned supports are enforced here as well as at fold time: a
+ * forged "turn it off" modification throws `BrainCorrectionLockedError`.
+ * Returns null when there is nothing reviewable (no profile, still
+ * `pre_clone`, or already `approved` — the review is closed).
+ */
+export async function stageBrainCorrections(
+  learnerId: string,
+  tenantId: string,
+  modifications: ParentModification[],
+): Promise<LearnerBrainProfile | null> {
+  const existing = await getBrainProfile(learnerId, tenantId);
+  if (!existing) return null;
+  if (existing.cloneStage !== "cloned") return null;
+  assertCorrectionsAllowed(existing.state, modifications);
+  const state: LearnerBrainProfileState = { ...existing.state };
+  if (modifications.length > 0) {
+    state.parentCorrectionsDraft = { modifications, savedAt: nowIso() };
+  } else {
+    delete state.parentCorrectionsDraft;
+  }
+  const next: LearnerBrainProfile = { ...existing, state, updatedAt: nowIso() };
+  return getPersistence().brainProfiles.upsert(next);
+}
+
+/**
  * Parent approval gate (Sprint 14 brain-clone watch). Transitions a cloned
- * brain profile to `approved` (or `amended` if the parent adjusted any
- * settings before approving). Idempotent: re-approving an already-approved
- * profile is a no-op. Returns null when no clone exists or it's still in
- * `pre_clone` (baseline not yet finished).
+ * brain profile to `approved` — or `amended` when the parent corrected any
+ * inference first (Sprint C-05). Idempotent: re-approving an already-approved
+ * profile returns it unchanged (a duplicate submit must never re-fold or
+ * duplicate the modification record). Returns null when no clone exists or
+ * it's still in `pre_clone` (baseline not yet finished).
+ *
+ * `options.modifications` (C-05) carries field-level corrections in the
+ * brain-svc `parent_modifications` contract shape. When omitted, any
+ * corrections the parent staged on the review screen
+ * (`state.parentCorrectionsDraft`) are folded instead — this is the default
+ * flow (stage on the review screen, return to the recap, approve), so the
+ * recap's plain Approve button applies them without re-collecting anything.
+ * Either way the corrections are folded into the live state by the Python
+ * prefix rules (`lib/db/brain-corrections.ts`), recorded into
+ * `state.xaiExplanation.parentModifications`, and the staged draft is cleared.
+ * Any correction present ⇒ `approvalStatus: "amended"`. A forged unlock of a
+ * therapist-pinned support throws `BrainCorrectionLockedError` — server-side
+ * enforcement, not just UI. `options.amended` is the legacy boolean flag and
+ * still forces "amended".
  */
 export async function approveBrainClone(
   learnerId: string,
   tenantId: string,
-  options: { amended?: boolean } = {},
+  options: { amended?: boolean; modifications?: ParentModification[] } = {},
 ): Promise<LearnerBrainProfile | null> {
   const existing = await getBrainProfile(learnerId, tenantId);
   if (!existing) return null;
   if (existing.cloneStage === "pre_clone") return null;
-  const status: LearnerBrainProfile["approvalStatus"] = options.amended ? "amended" : "approved";
+  if (existing.cloneStage === "approved") return existing;
+  // Explicit modifications win; otherwise fold whatever the parent staged on
+  // the review screen. The staged draft is the resume-safe source of truth —
+  // approving must apply it, never silently discard it.
+  const modifications =
+    options.modifications ?? existing.state.parentCorrectionsDraft?.modifications ?? [];
+  let state = existing.state;
+  if (modifications.length > 0) {
+    // foldParentModifications appends the applied record AND clears the draft.
+    state = foldParentModifications(existing.state, modifications, nowIso());
+  } else if (existing.state.parentCorrectionsDraft) {
+    // No corrections to apply (an empty staged draft) — close the review by
+    // dropping the stale draft so the approved profile carries none.
+    state = { ...existing.state };
+    delete state.parentCorrectionsDraft;
+  }
+  const status: LearnerBrainProfile["approvalStatus"] =
+    modifications.length > 0 || options.amended ? "amended" : "approved";
   const next: LearnerBrainProfile = {
     ...existing,
+    state,
     approvedByParent: true,
     approvalStatus: status,
     cloneStage: "approved",
+    // C-06: folding corrections mutates the live `state`, so the revision
+    // advances; a plain approve (no fold) leaves the reviewed revision intact.
+    revision: modifications.length > 0 ? (existing.revision ?? 1) + 1 : (existing.revision ?? 1),
     updatedAt: nowIso(),
   };
   return getPersistence().brainProfiles.upsert(next);
+}
+
+/**
+ * Sprint C-06 — write one dedicated approval record (approve / amend /
+ * decline). This is the audit evidence the ceremony produces: actor, action,
+ * consent + RAI versions, the reviewed profile revision, folded modifications,
+ * and a hashed request IP — kept out of the profile's display JSON so consent
+ * is first-class, queryable. The caller (the approve server action) is
+ * responsible for having enforced consent + RAI first; this just persists the
+ * record. `id`/`createdAt` are filled in here when omitted.
+ */
+export async function recordBrainApproval(
+  input: Omit<BrainProfileApproval, "id" | "createdAt"> &
+    Partial<Pick<BrainProfileApproval, "id" | "createdAt">>,
+): Promise<BrainProfileApproval> {
+  const approval: BrainProfileApproval = {
+    id: input.id ?? newId("bpa"),
+    createdAt: input.createdAt ?? nowIso(),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    brainProfileId: input.brainProfileId,
+    profileRevision: input.profileRevision,
+    actorUserId: input.actorUserId,
+    action: input.action,
+    consentVersion: input.consentVersion,
+    raiVersion: input.raiVersion,
+    modifications: input.modifications,
+    ipHash: input.ipHash,
+  };
+  return getPersistence().brainProfileApprovals.record(approval);
+}
+
+/** Sprint C-06 — the tenant-scoped approval history for a learner, newest-first. */
+export async function listBrainApprovals(
+  learnerId: string,
+  tenantId: string,
+): Promise<BrainProfileApproval[]> {
+  return getPersistence().brainProfileApprovals.listForLearner(learnerId, tenantId);
+}
+
+// ===== Contributor acknowledgements (Sprint C-16) =====
+
+const CONTRIBUTOR_NOTIFY_TARGET_ROLE: Record<ContributionRole, "teacher" | "caregiver" | "therapist"> = {
+  teacher: "teacher",
+  caregiver: "caregiver",
+  therapist: "therapist",
+};
+
+/** Where a contributor's "Your contributions" surface lives, per role. The CTA
+ *  in the acknowledgement note + the in-app notification deep-link here. */
+function contributionsPathFor(role: ContributionRole, learnerId: string): string {
+  switch (role) {
+    case "teacher":
+      return `/teacher/learners/${learnerId}`;
+    case "caregiver":
+      return `/caregiver/home`;
+    case "therapist":
+      return `/therapist/home`;
+  }
+}
+
+/**
+ * Sprint C-16 — the warm, role-aware in-app + email body for one contributor.
+ * Privacy-safe by construction: names only the learner's first name + the
+ * contributor's OWN folded item labels (never another contributor's content,
+ * never the child's levels/diagnoses). Returned as a small struct so the same
+ * copy backs both the in-app Notification row and the comms-svc email payload.
+ */
+export function buildContributionAckCopy(input: {
+  role: ContributionRole;
+  learnerFirstName: string;
+  foldedItems: RoleAcknowledgementPayload["foldedItems"];
+}): { title: string; body: string } {
+  const { role, learnerFirstName, foldedItems } = input;
+  // Lead with the contributor's most concrete folded item (a support label),
+  // preferring an accommodation over a tutor since it is the more tangible
+  // "this is what your note did". Gratitude without flattery; one specific fact.
+  const lead =
+    foldedItems.find((i) => i.kind === "accommodation") ?? foldedItems[0] ?? null;
+  const roleWord =
+    role === "therapist" ? "clinical note" : role === "teacher" ? "classroom note" : "observation";
+  const title = `Your input shaped ${learnerFirstName}'s learning plan`;
+  const body = lead
+    ? `Thank you — your ${roleWord} helped keep ${lead.label} active for ${learnerFirstName}. It's now part of ${learnerFirstName}'s approved plan.`
+    : `Thank you — your ${roleWord} is now part of ${learnerFirstName}'s approved plan.`;
+  return { title, body };
+}
+
+/**
+ * Sprint C-16 — on parent APPROVAL (the honest "your input is now in use"
+ * trigger), derive per-contributor acknowledgements from the approved profile's
+ * collaborator-sourced decisions and, for each contributor whose OWN input
+ * folded, write an idempotent acknowledgement record + fire notifications.
+ *
+ *   - Idempotent per (contributor, learnerId, profileRevision, role): the store
+ *     skips a duplicate natural key, so re-approving the same revision sends no
+ *     duplicate. A later revision whose fold newly changed a contributor's
+ *     contribution earns a fresh row (the unique key includes the revision).
+ *   - A role whose input did NOT fold is ABSENT from the derivation → that
+ *     contributor is acknowledged nothing and notified nothing (the negative
+ *     case the sprint requires).
+ *   - Notifications: the in-app Notification + per-channel preference gating go
+ *     through `createNotification` (the contributor's own account, with a
+ *     `targetRole` so the inbox routes them into the right role); the warm,
+ *     role-aware EMAIL body is rendered by comms-svc's template route. Both are
+ *     best-effort and never block the approval.
+ *   - Each NEW acknowledgement also emits a `contribution.acknowledged` audit
+ *     row (the retention metric's spine).
+ *
+ * A contributor is matched to their account by resolving the learner's care
+ * team: the role's accepted member(s) supply the email + (when present) the
+ * account id. A caregiver-sourced fold is acknowledged to every accepted
+ * caregiver (shared role tag, 2 seats) — see the derivation module's note.
+ *
+ * Best-effort throughout: a failure here never breaks the approval (the brain
+ * keeps teaching). Returns the records written (created + pre-existing) for the
+ * caller's evidence/tests.
+ */
+export async function recordContributionAcknowledgements(input: {
+  profile: LearnerBrainProfile;
+  /** The reviewed revision the approval keyed off (C-06 pins this). */
+  profileRevision: number;
+  requestId?: string;
+}): Promise<ContributionAcknowledgement[]> {
+  const { profile, profileRevision } = input;
+  const requestId = input.requestId ?? newId("req");
+  const written: ContributionAcknowledgement[] = [];
+  try {
+    // Only approved/amended profiles acknowledge — folding alone never does.
+    if (profile.cloneStage !== "approved") return written;
+
+    const learner = await getLearner(profile.learnerId, profile.tenantId);
+    const learnerFirstName =
+      (learner?.firstName && learner.firstName.trim()) ||
+      (learner?.preferredName && learner.preferredName.trim()) ||
+      undefined;
+
+    const payloads = deriveRoleAcknowledgements(profile.state, learnerFirstName);
+    if (payloads.length === 0) return written; // nothing folded → nothing to do
+
+    // Resolve the care team once so each role maps to its accepted member(s).
+    const team = await getCareTeam(profile.learnerId, profile.tenantId);
+    const acceptedByRole: Record<ContributionRole, { email: string; userId: string | null }[]> = {
+      teacher: team.teachers
+        .filter((m) => m.status === "ACCEPTED")
+        .map((m) => ({ email: m.email, userId: m.memberUserId })),
+      caregiver: team.caregivers
+        .filter((m) => m.status === "ACCEPTED")
+        .map((m) => ({ email: m.email, userId: m.memberUserId })),
+      therapist: team.therapists
+        .filter((m) => m.status === "ACCEPTED")
+        .map((m) => ({ email: m.email, userId: m.memberUserId })),
+    };
+
+    for (const payload of payloads) {
+      const members = acceptedByRole[payload.role];
+      // A folded role with no accepted member on the team (e.g. the member was
+      // removed after the insight landed) is skipped — there is no one to
+      // notify, and over-claiming to a stranger would breach the privacy rule.
+      if (!members || members.length === 0) continue;
+
+      for (const member of members) {
+        const email = member.email.trim().toLowerCase();
+        const ack: ContributionAcknowledgement = {
+          id: newId("cack"),
+          tenantId: profile.tenantId,
+          learnerId: profile.learnerId,
+          brainProfileId: profile.id,
+          profileRevision,
+          role: payload.role,
+          contributorUserId: member.userId,
+          contributorEmail: email,
+          learnerFirstName: payload.learnerFirstName,
+          foldedItems: payload.foldedItems,
+          acknowledgedAt: nowIso(),
+          notifiedInApp: false,
+          notifiedEmail: false,
+          createdAt: nowIso(),
+        };
+        const { ack: stored, created } =
+          await getPersistence().contributionAcknowledgements.record(ack);
+        written.push(stored);
+        // Idempotency: a pre-existing row (re-approval of the same revision)
+        // never re-notifies and never re-emits the retention event.
+        if (!created) continue;
+
+        // Retention spine: one audit row per NEW acknowledgement.
+        await recordAudit({
+          userId: member.userId,
+          tenantId: profile.tenantId,
+          learnerId: profile.learnerId,
+          action: contributionAction("acknowledged"),
+          metadata: {
+            contributorKey: email,
+            role: payload.role,
+            profileRevision,
+            foldedItemCount: payload.foldedItems.length,
+          },
+          requestId,
+        });
+
+        // Notifications (best-effort, never block approval).
+        await notifyContributionAcknowledged(stored).catch(() => {});
+      }
+    }
+  } catch (err) {
+    logger.warn({
+      event: "contribution_acknowledgement.capture_failed",
+      learnerId: profile.learnerId,
+      tenantId: profile.tenantId,
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+  return written;
+}
+
+/**
+ * Sprint C-16 — fire the in-app + email acknowledgement for ONE recorded
+ * acknowledgement. In-app + per-channel preference gating ride
+ * `createNotification` keyed to the contributor's account (account-holding
+ * contributors only — an email-only invitee gets just the email). The warm,
+ * role-aware email body is rendered by comms-svc's template route. Stamps the
+ * record's delivery flags. Best-effort.
+ */
+async function notifyContributionAcknowledged(
+  ack: ContributionAcknowledgement,
+): Promise<void> {
+  const { title, body } = buildContributionAckCopy({
+    role: ack.role,
+    learnerFirstName: ack.learnerFirstName,
+    foldedItems: ack.foldedItems,
+  });
+  const href = contributionsPathFor(ack.role, ack.learnerId);
+  let notifiedInApp = false;
+  let notifiedEmail = false;
+
+  // In-app notification — only for an account-holding contributor (a row keyed
+  // to a userId). `createNotification` applies the contributor's per-channel
+  // preferences (opt-out honored) and stamps the targetRole so the inbox routes
+  // them into the right role before navigating.
+  if (ack.contributorUserId) {
+    try {
+      await createNotification({
+        tenantId: ack.tenantId,
+        userId: ack.contributorUserId,
+        type: "contribution_acknowledged",
+        title,
+        body,
+        href,
+        learnerId: ack.learnerId,
+        targetRole: CONTRIBUTOR_NOTIFY_TARGET_ROLE[ack.role],
+      });
+      notifiedInApp = true;
+    } catch {
+      /* best-effort */
+    }
+  }
+
+  // Warm role-aware email via comms-svc.
+  const appUrl = clientEnv.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  const ok = await dispatchContributionAckEmail({
+    to: ack.contributorEmail,
+    role: ack.role,
+    learnerFirstName: ack.learnerFirstName,
+    foldedItems: ack.foldedItems,
+    contributionsUrl: `${appUrl}${href}`,
+    unsubscribeUrl: `${appUrl}/notifications`,
+  });
+  notifiedEmail = ok;
+
+  if (notifiedInApp || notifiedEmail) {
+    await getPersistence()
+      .contributionAcknowledgements.markNotified(ack.id, { notifiedInApp, notifiedEmail })
+      .catch(() => {});
+  }
+}
+
+/** Sprint C-16 — a contributor's OWN acknowledgements (by userId or email),
+ *  optionally scoped to one learner. Newest-first. The summary card + the
+ *  contributions endpoint read this — it returns only the caller's own items. */
+export async function listContributorAcknowledgements(opts: {
+  tenantId: string;
+  contributorUserId: string | null;
+  contributorEmail: string;
+  learnerId?: string;
+}): Promise<ContributionAcknowledgement[]> {
+  return getPersistence().contributionAcknowledgements.listForContributor(opts);
+}
+
+/** Sprint C-16 — every acknowledgement for a learner (the admin/retention read).
+ *  Newest-first. */
+export async function listLearnerContributionAcknowledgements(
+  learnerId: string,
+  tenantId: string,
+): Promise<ContributionAcknowledgement[]> {
+  return getPersistence().contributionAcknowledgements.listForLearner(learnerId, tenantId);
+}
+
+/** Sprint C-16 — every acknowledgement in a tenant (the retention read path).
+ *  Newest-first. */
+export async function listTenantContributionAcknowledgements(
+  tenantId: string,
+): Promise<ContributionAcknowledgement[]> {
+  return getPersistence().contributionAcknowledgements.listForTenant(tenantId);
+}
+
+/**
+ * Sprint C-16 — the DoD retention metric (repeat-contribution rate) for a
+ * tenant. The computation rides the same durable, queryable read-paths C-14's
+ * funnel uses: the acknowledgement records supply the `acknowledged` events and
+ * the audit log supplies the `contribution.submitted` events. The pure reducer
+ * (`computeContributionRetention`) then computes the share of acknowledged
+ * contributors who contributed again within `windowDays` (default 60).
+ *
+ * No dashboard (out of scope) — a computable rate read by the admin/analytics
+ * surface. `auditLimit` bounds how many recent audit rows we scan for
+ * submissions (default 5000 — generous for a tenant's contribution cadence).
+ */
+export async function computeContributorRetentionForTenant(opts: {
+  tenantId: string;
+  windowDays?: number;
+  auditLimit?: number;
+}): Promise<ContributionRetention> {
+  const { tenantId, windowDays = 60, auditLimit = 5000 } = opts;
+  // `acknowledged` events from the acknowledgement records (the spine).
+  const acks = await getPersistence().contributionAcknowledgements.listForTenant(tenantId);
+  const ackEvents: ContributionEvent[] = acks.map((a) => ({
+    name: "acknowledged" as const,
+    contributorKey: a.contributorEmail.trim().toLowerCase(),
+    role: a.role,
+    occurredAt: a.acknowledgedAt,
+  }));
+  // `submitted` events from the audit log (`contribution.submitted` rows).
+  const auditRows = await getPersistence().audit.recentForTenant(tenantId, auditLimit);
+  const submittedEvents = contributionEventsFromAuditLogs(
+    auditRows.map((r) => ({
+      action: r.action,
+      occurredAt: r.occurredAt,
+      metadata: r.metadata ?? null,
+    })),
+  ).filter((e) => e.name === "submitted");
+
+  return computeContributionRetention([...ackEvents, ...submittedEvents], windowDays);
+}
+
+// ===== Brain profile change records (Sprint C-13) =====
+
+/**
+ * Sprint C-13 — persist one change record. Append-only. The caller has already
+ * detected + classified the delta (`detectBrainProfileChange`); this just
+ * stamps id/createdAt and stores it. `requiresAck` is the contract-derived
+ * structural flag — never set ad-hoc here.
+ */
+export async function recordBrainProfileChange(
+  input: Omit<LearnerBrainProfileChange, "id" | "createdAt" | "ackedAt" | "reminderSentAt"> &
+    Partial<Pick<LearnerBrainProfileChange, "id" | "createdAt" | "ackedAt" | "reminderSentAt">>,
+): Promise<LearnerBrainProfileChange> {
+  const change: LearnerBrainProfileChange = {
+    id: input.id ?? newId("bpc"),
+    createdAt: input.createdAt ?? nowIso(),
+    ackedAt: input.ackedAt ?? null,
+    reminderSentAt: input.reminderSentAt ?? null,
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    brainProfileId: input.brainProfileId,
+    revision: input.revision,
+    kind: input.kind,
+    fields: input.fields,
+    summary: input.summary,
+    source: input.source,
+    requiresAck: input.requiresAck,
+  };
+  return getPersistence().brainProfileChanges.record(change);
+}
+
+/** Sprint C-13 — the tenant-scoped change history for a learner, newest-first. */
+export async function listBrainProfileChanges(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBrainProfileChange[]> {
+  return getPersistence().brainProfileChanges.listForLearner(learnerId, tenantId);
+}
+
+/** Sprint C-13 — un-acked structural changes for a learner (drives the
+ *  persistent in-app badge after the N-day window lapses). Newest-first. */
+export async function listPendingStructuralChanges(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBrainProfileChange[]> {
+  return getPersistence().brainProfileChanges.listPendingStructural(learnerId, tenantId);
+}
+
+/**
+ * Sprint C-13 — acknowledge a structural change (the parent has seen the
+ * delta). Idempotent: re-acking returns the row unchanged. Returns null when
+ * `changeId` isn't a pending structural change for this learner (so the caller
+ * can 404). The audit/disclosure trail is written by the calling server action
+ * per C-12 conventions, not here.
+ */
+export async function ackBrainProfileChange(
+  changeId: string,
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBrainProfileChange | null> {
+  return getPersistence().brainProfileChanges.ack(changeId, learnerId, tenantId, nowIso());
+}
+
+/**
+ * Sprint C-13 — the change-capture orchestration that runs at every mutation
+ * path (see the Checkpoint's enumerated list). Given the profile state BEFORE
+ * a mutation and the committed profile AFTER, it:
+ *
+ *   1. On the FIRST transition into `cloned` (no prior cloned/approved state) —
+ *      fires the SCREEN 0 "ready for review" notification, deduped once per
+ *      clone event. No change record (there is no prior state to diff).
+ *   2. On any subsequent change from a cloned/approved baseline — detects +
+ *      classifies the delta, writes a change record, and (structural only)
+ *      notifies the parent with the plain-language summary + review CTA.
+ *
+ * Pre-clone regenerate churn (the BEFORE profile was missing or still
+ * `pre_clone`, and the result is not the first clone) is intentionally NOT
+ * captured: there is no approved profile to re-acknowledge and the parent has
+ * seen nothing yet. Best-effort throughout — a capture failure never breaks the
+ * mutation that triggered it (the brain must keep working).
+ */
+async function captureBrainProfileChange(input: {
+  before: LearnerBrainProfile | null;
+  after: LearnerBrainProfile;
+  source: BrainProfileChangeSource;
+}): Promise<void> {
+  const { before, after, source } = input;
+  try {
+    const hadReviewable =
+      before != null && (before.cloneStage === "cloned" || before.cloneStage === "approved");
+    const becameCloned =
+      after.cloneStage === "cloned" || after.cloneStage === "approved";
+
+    // 1) First clone → SCREEN 0. Deduped: only when there was no reviewable
+    //    profile before (a true first transition into cloned).
+    if (!hadReviewable && becameCloned && after.cloneStage === "cloned") {
+      await notifyBrainProfileReady(after);
+      return;
+    }
+
+    // 2) Subsequent change from a reviewable baseline → detect + record.
+    if (!hadReviewable || !before) return;
+    const learner = await getLearner(after.learnerId, after.tenantId);
+    const learnerName = learner?.displayName ?? "your learner";
+    const delta = detectBrainProfileChange({
+      before: before.state,
+      after: after.state,
+      source,
+      learnerName,
+    });
+    if (!delta) return;
+
+    await recordBrainProfileChange({
+      tenantId: after.tenantId,
+      learnerId: after.learnerId,
+      brainProfileId: after.id,
+      revision: after.revision,
+      kind: delta.kind,
+      fields: delta.fields,
+      summary: delta.summary,
+      source,
+      requiresAck: delta.requiresAck,
+    });
+
+    // Structural changes notify the parent (mastery flows freely — no notice).
+    if (delta.requiresAck) {
+      await notifyBrainProfileChanged(after, delta.summary);
+    }
+  } catch (err) {
+    logger.warn({
+      event: "brain_profile_change.capture_failed",
+      learnerId: after.learnerId,
+      tenantId: after.tenantId,
+      source,
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
+
+/**
+ * Sprint C-13 — SCREEN 0: notify the primary parent that the profile is ready
+ * for first review. In-app + email (the `brain_profile_ready` type's default
+ * preference enables both); the parent's saved preferences are honored by
+ * `createNotification`'s per-channel gating. Best-effort.
+ */
+async function notifyBrainProfileReady(profile: LearnerBrainProfile): Promise<void> {
+  const parentId = await getPersistence().learners.findPrimaryParent(
+    profile.learnerId,
+    profile.tenantId,
+  );
+  if (!parentId) return;
+  const learner = await getLearner(profile.learnerId, profile.tenantId);
+  const name = learner?.displayName ?? "your learner";
+  await createNotification({
+    tenantId: profile.tenantId,
+    userId: parentId,
+    type: "brain_profile_ready",
+    title: `${name}'s learning profile is ready`,
+    body: `${name} finished their Discovery Adventure. We've drafted ${name}'s learning profile — it's waiting for you to review it.`,
+    href: `/parent/learners/${profile.learnerId}/brain-clone-watch`,
+    learnerId: profile.learnerId,
+  });
+}
+
+/**
+ * Sprint C-13 — notify the primary parent that the profile MEANINGFULLY (i.e.
+ * structurally) changed since they approved it. In-app + email, with the
+ * plain-language delta summary and a link to the change timeline. Best-effort.
+ */
+async function notifyBrainProfileChanged(
+  profile: LearnerBrainProfile,
+  summary: string,
+): Promise<void> {
+  const parentId = await getPersistence().learners.findPrimaryParent(
+    profile.learnerId,
+    profile.tenantId,
+  );
+  if (!parentId) return;
+  const learner = await getLearner(profile.learnerId, profile.tenantId);
+  const name = learner?.displayName ?? "your learner";
+  await createNotification({
+    tenantId: profile.tenantId,
+    userId: parentId,
+    type: "brain_profile_changed",
+    title: `We adjusted ${name}'s supports — take a look`,
+    body: summary,
+    href: `/parent/learners/${profile.learnerId}/brain-timeline`,
+    learnerId: profile.learnerId,
+  });
+}
+
+/**
+ * Sprint C-12 (ADR 0042) — record a FERPA cross-role read of a child's brain
+ * profile on a web-v2 surface. Append-only. The web counterpart of the
+ * services' `CHILD_PROFILE_DISCLOSED` audit event; the same disclosure tuple.
+ * `id`/`disclosedAt` are filled in here when omitted. Best-effort at the call
+ * site (a read must not fail because the disclosure write did).
+ */
+export async function recordChildProfileDisclosure(
+  input: Omit<ChildProfileDisclosure, "id" | "disclosedAt"> &
+    Partial<Pick<ChildProfileDisclosure, "id" | "disclosedAt">>,
+): Promise<ChildProfileDisclosure> {
+  const entry: ChildProfileDisclosure = {
+    id: input.id ?? newId("cpd"),
+    disclosedAt: input.disclosedAt ?? nowIso(),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    readerUserId: input.readerUserId,
+    readerRole: input.readerRole,
+    surface: input.surface,
+    dataClass: input.dataClass,
+  };
+  return getPersistence().compliance.appendChildProfileDisclosure(entry);
+}
+
+/**
+ * Sprint C-12 (ADR 0042) — the per-learner disclosure history, newest-first,
+ * optionally bounded by an inclusive ISO time window. The compliance/admin
+ * query surface for web-v2-side reads.
+ */
+export async function listChildProfileDisclosures(
+  learnerId: string,
+  tenantId: string,
+  opts?: { fromIso?: string; toIso?: string },
+): Promise<ChildProfileDisclosure[]> {
+  return getPersistence().compliance.listChildProfileDisclosuresForLearner(
+    learnerId,
+    tenantId,
+    opts,
+  );
 }
 
 // ===== Baseline (Sprint 8) =====
@@ -1853,6 +2712,7 @@ export type CreateLessonRunResult =
         | "subject_not_found"
         | "skill_not_found"
         | "brain_profile_missing"
+        | "brain_not_approved"
         | "generation_failed";
       message: string;
       lessonRun?: LessonRun;
@@ -1888,6 +2748,17 @@ export async function createLessonRun(
       ok: false,
       code: "brain_profile_missing",
       message: "Brain profile required before lesson generation",
+    };
+  }
+  // Sprint C-01 teach gate: nothing teaches from the brain before parent
+  // approval. The check lives HERE — not in routing — so every caller
+  // (today/start, quests, teacher assignments, creator pre-generation, any
+  // future path) inherits it instead of re-implementing it.
+  if (brain.cloneStage !== "approved") {
+    return {
+      ok: false,
+      code: "brain_not_approved",
+      message: "Brain profile awaiting parent approval before lesson generation",
     };
   }
 
@@ -2519,7 +3390,7 @@ export async function startQuestChapter(input: {
   | { ok: true; lessonRunId: string }
   | {
       ok: false;
-      code: "chapter_not_found" | "locked" | "lesson_failed";
+      code: "chapter_not_found" | "locked" | "brain_not_approved" | "lesson_failed";
       message: string;
     }
 > {
@@ -2564,9 +3435,11 @@ export async function startQuestChapter(input: {
     sourceRefId: chapter.id,
   });
   if (!result.ok) {
+    // Surface the teach gate distinctly so quest callers can render the
+    // calm waiting state instead of a generic failure.
     return {
       ok: false,
-      code: "lesson_failed",
+      code: result.code === "brain_not_approved" ? "brain_not_approved" : "lesson_failed",
       message: result.message ?? "Could not start quest lesson",
     };
   }
@@ -5366,13 +6239,34 @@ const DEFAULT_NOTIFICATION_TYPES: NotificationType[] = [
   "data_request_completed",
   "billing_notice",
   "safety_review_required",
+  // Sprint C-13 — brain evolution notifications.
+  "brain_profile_ready",
+  "brain_profile_changed",
+  // Sprint C-16 — contributor feedback loop.
+  "contribution_acknowledged",
 ];
+
+/** Types that default to ALSO emailing (in addition to in-app). The C-13 brain
+ *  notifications are care-not-surveillance moments worth one warm email: the
+ *  profile being ready for first review (SCREEN 0) and a structural change the
+ *  parent should re-acknowledge. Mastery moves never get here — they are never
+ *  their own notification. The parent can opt out of either channel. */
+const EMAIL_BY_DEFAULT: ReadonlySet<NotificationType> = new Set<NotificationType>([
+  "parent_progress_summary",
+  "safety_review_required",
+  "brain_profile_ready",
+  "brain_profile_changed",
+  // C-16 — the contributor "your input shaped X" note is the single
+  // highest-leverage retention moment for teachers/therapists; it earns one
+  // warm email by default (the contributor can opt out of either channel).
+  "contribution_acknowledged",
+]);
 
 function defaultPreferenceMap(): Record<string, boolean> {
   const m: Record<string, boolean> = {};
   for (const t of DEFAULT_NOTIFICATION_TYPES) {
     m[`${t}:in_app`] = true;
-    m[`${t}:email`] = t === "parent_progress_summary" || t === "safety_review_required";
+    m[`${t}:email`] = EMAIL_BY_DEFAULT.has(t);
     m[`${t}:push`] = false;
   }
   return m;
@@ -5429,6 +6323,9 @@ export async function createNotification(input: {
   body: string;
   href: string | null;
   learnerId: string | null;
+  /** ADR 0020 — the role the recipient must be in to act on this. When set, the
+   *  inbox routes them through role-switch before navigating. Optional. */
+  targetRole?: Notification["targetRole"];
 }): Promise<{ notification: Notification; deliveries: NotificationDelivery[] }> {
   const rec: Notification = {
     id: newId("nfn"),
@@ -5439,6 +6336,7 @@ export async function createNotification(input: {
     body: input.body,
     href: input.href,
     learnerId: input.learnerId,
+    ...(input.targetRole ? { targetRole: input.targetRole } : {}),
     readAt: null,
     createdAt: nowIso(),
   };
@@ -7136,6 +8034,7 @@ export function createCaregiverObservation(input: {
   consequence?: string;
   durationMinutes?: number | null;
   location?: string;
+  mood?: string | null;
   attachmentUrl?: string | null;
 }): import("./types").CaregiverObservation {
   const rec: import("./types").CaregiverObservation = {
@@ -7149,11 +8048,86 @@ export function createCaregiverObservation(input: {
     consequence: input.consequence ?? "",
     durationMinutes: input.durationMinutes ?? null,
     location: input.location ?? "home",
+    mood: input.mood ?? null,
     attachmentUrl: input.attachmentUrl ?? null,
     createdAt: nowIso(),
+    updatedAt: null,
+    editHistory: [],
   };
   db().caregiverObservations.set(rec.id, rec);
   return rec;
+}
+
+export function getCaregiverObservation(
+  id: string,
+  tenantId: string,
+): import("./types").CaregiverObservation | null {
+  const o = db().caregiverObservations.get(id);
+  if (!o || o.tenantId !== tenantId) return null;
+  return o;
+}
+
+/** The author-only edit window (15 minutes from creation). Shared with the
+ *  family-svc PATCH route so the web + service surfaces enforce the same rule. */
+export const CAREGIVER_EDIT_WINDOW_MS = 15 * 60 * 1000;
+
+export type CaregiverObservationEditResult =
+  | { ok: true; observation: import("./types").CaregiverObservation }
+  | { ok: false; reason: "not_found" | "forbidden" | "window_expired" };
+
+/**
+ * Author-only edit within the 15-minute window. Enforced here (server-side, the
+ * web store's source of truth) AND independently in the family-svc PATCH route:
+ *   - the editor MUST be the author (`caregiverUserId`), else `forbidden`;
+ *   - the edit MUST land within {@link CAREGIVER_EDIT_WINDOW_MS} of creation,
+ *     else `window_expired`;
+ *   - the PRIOR field values are snapshotted into `editHistory` before applying
+ *     the new ones — an edit never silently overwrites without a trace.
+ * `now` is injectable so tests can drive the window past expiry deterministically.
+ */
+export function updateCaregiverObservation(
+  input: {
+    id: string;
+    tenantId: string;
+    editorUserId: string;
+    behaviour?: string;
+    antecedent?: string;
+    consequence?: string;
+    durationMinutes?: number | null;
+    location?: string;
+    mood?: string | null;
+  },
+  now: number = Date.now(),
+): CaregiverObservationEditResult {
+  const current = getCaregiverObservation(input.id, input.tenantId);
+  if (!current) return { ok: false, reason: "not_found" };
+  if (current.caregiverUserId !== input.editorUserId) return { ok: false, reason: "forbidden" };
+  const createdMs = new Date(current.createdAt).getTime();
+  if (now - createdMs > CAREGIVER_EDIT_WINDOW_MS) return { ok: false, reason: "window_expired" };
+
+  const priorSnapshot: import("./types").CaregiverObservationEdit = {
+    editedAt: new Date(now).toISOString(),
+    behaviour: current.behaviour,
+    antecedent: current.antecedent,
+    consequence: current.consequence,
+    durationMinutes: current.durationMinutes,
+    location: current.location,
+    mood: current.mood,
+  };
+  const next: import("./types").CaregiverObservation = {
+    ...current,
+    behaviour: input.behaviour ?? current.behaviour,
+    antecedent: input.antecedent ?? current.antecedent,
+    consequence: input.consequence ?? current.consequence,
+    durationMinutes:
+      input.durationMinutes !== undefined ? input.durationMinutes : current.durationMinutes,
+    location: input.location ?? current.location,
+    mood: input.mood !== undefined ? input.mood : current.mood,
+    updatedAt: new Date(now).toISOString(),
+    editHistory: [...current.editHistory, priorSnapshot],
+  };
+  db().caregiverObservations.set(next.id, next);
+  return { ok: true, observation: next };
 }
 
 // ---------------------------------------------------------------------------

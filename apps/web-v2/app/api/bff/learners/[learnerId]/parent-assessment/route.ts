@@ -14,6 +14,7 @@ import {
   ASSESSMENT_SECTION_ORDER,
   assessmentSectionSchemas,
   validateSection,
+  draftValidateSection,
   type AssessmentSectionId,
 } from "@/lib/validators/parent-assessment";
 
@@ -50,10 +51,22 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   }
 }
 
+/**
+ * Apply a single-section patch to the parent-assessment draft.
+ *
+ * `mode: "draft"` (PATCH — field-level autosave, Sprint C-11) validates only
+ * the touched section and tolerates a partial/half-filled section (draft ≠
+ * submit): every field is optional but each field's type/bounds are enforced,
+ * unknown keys are stripped. Autosave only ever advances the draft.
+ *
+ * `mode: "strict"` (POST — section-commit parity with the server action)
+ * requires the full section shape, exactly as before.
+ */
 async function applyPatch(
   req: Request,
   learnerId: string,
   requestId: string,
+  mode: "draft" | "strict",
 ): Promise<NextResponse> {
   const { session, response } = await requireSession(req, requestId);
   if (response) return response;
@@ -78,7 +91,10 @@ async function applyPatch(
   if (!(sectionId in assessmentSectionSchemas)) {
     return fail({ ...ERRORS.VALIDATION_FAILED, message: "Unknown section" }, requestId);
   }
-  const v = validateSection(sectionId, parsed.data.data);
+  const v =
+    mode === "draft"
+      ? draftValidateSection(sectionId, parsed.data.data)
+      : validateSection(sectionId, parsed.data.data);
   if (!v.ok) {
     return fail({ ...ERRORS.VALIDATION_FAILED, message: v.message }, requestId);
   }
@@ -86,16 +102,16 @@ async function applyPatch(
   await refreshLearnerReadiness(learnerId, session!.tenantId);
   audit(session, "parent_assessment.section.patch", requestId, {
     learnerId,
-    metadata: { section: sectionId },
+    metadata: { section: sectionId, draft: mode === "draft" },
   });
-  return ok({ assessment: next }, requestId);
+  return ok({ assessment: next, savedAt: next.updatedAt }, requestId);
 }
 
 export async function POST(req: Request, { params }: Params): Promise<NextResponse> {
   const requestId = getRequestId(req);
   const { learnerId } = await params;
   try {
-    return await applyPatch(req, learnerId, requestId);
+    return await applyPatch(req, learnerId, requestId, "strict");
   } catch (e) {
     return failFromUnknown(e, requestId);
   }
@@ -105,7 +121,8 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
   const requestId = getRequestId(req);
   const { learnerId } = await params;
   try {
-    return await applyPatch(req, learnerId, requestId);
+    // Field-level autosave: draft-lenient so a half-filled section persists.
+    return await applyPatch(req, learnerId, requestId, "draft");
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

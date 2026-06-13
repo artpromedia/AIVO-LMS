@@ -79,6 +79,24 @@ export function renderTemplate(
       return renderStaffCredentials(data);
     case "teacher_invite_parent":
       return renderTeacherInviteParent(data);
+    case "contribution_nudge":
+      return renderContributionNudge(data);
+    case "invite_expiry_warning":
+      return renderInviteExpiryWarning(data);
+    case "brain_profile_ready":
+      return renderBrainProfileReady(data);
+    case "brain_profile_changed":
+      return renderBrainProfileChanged(data);
+    case "brain_changes_reminder":
+      return renderBrainChangesReminder(data);
+    // Sprint C-16 — contributor "your input shaped X" acknowledgement. One
+    // template family, role-aware wording (teacher / caregiver / therapist).
+    case "contribution_acknowledged_teacher":
+      return renderContributionAcknowledged(data, "teacher");
+    case "contribution_acknowledged_caregiver":
+      return renderContributionAcknowledged(data, "caregiver");
+    case "contribution_acknowledged_therapist":
+      return renderContributionAcknowledged(data, "therapist");
     case "iep_in_review_parent":
       return renderIepInReviewParent(data);
     case "iep_finalised_parent":
@@ -406,6 +424,155 @@ function renderTeacherInviteParent(data: TemplateData) {
   };
 }
 
+// Sprint C-08 — warm nudge to a teammate who accepted a learning-team invite
+// but hasn't added their perspective yet. ONE call to action, opt-out honored
+// via the preferences link, never a nagging tone. Sent at most once per
+// member per 7 days (comms-svc invite-reminder batch enforces the cap).
+function renderContributionNudge(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "a learner";
+  const inviterName = (data.inviterName as string) || "Their family";
+  const kind = (data.kind as string) || "teammate";
+  const contributeUrl = (data.contributeUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const roleWord =
+    kind === "teacher"
+      ? "classroom view"
+      : kind === "therapist"
+        ? "clinical view"
+        : "everyday view";
+  const html = baseLayout(`
+    <h1 class="title">${learnerName}'s plan is waiting on your perspective</h1>
+    <p class="body-text">${inviterName} invited you to ${learnerName}'s learning team, and you're in — thank you.</p>
+    <p class="body-text">When you're ready, about <strong>10 minutes</strong> of your ${roleWord} helps shape ${learnerName}'s learning plan. There are no wrong answers — just what you see.</p>
+    <p style="text-align:center"><a href="${contributeUrl}" class="btn">Add my perspective</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">No rush, and no pressure — you can do this whenever it suits you.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these reminders, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+  return {
+    subject: `${learnerName}'s family invited you — 10 minutes of your perspective shapes their learning plan`,
+    html,
+    text: `${inviterName} invited you to ${learnerName}'s learning team. About 10 minutes of your perspective helps shape ${learnerName}'s learning plan — there are no wrong answers. Add yours: ${contributeUrl}${
+      unsubscribeUrl ? `\n\nTo stop these reminders: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
+// Sprint C-08 — pre-expiry warning for a teacher→parent token invite that is
+// still pending and about to lapse. Warm, single CTA, honest about the clock.
+function renderInviteExpiryWarning(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "your child";
+  const teacherName = (data.teacherName as string) || "Your child's teacher";
+  const acceptUrl = (data.acceptUrl as string) || "#";
+  const hoursLeft = data.hoursLeft != null ? Number(data.hoursLeft) : null;
+  const whenText =
+    hoursLeft != null && hoursLeft >= 0
+      ? hoursLeft <= 1
+        ? "within the hour"
+        : `in about ${hoursLeft} hours`
+      : "soon";
+  const html = baseLayout(`
+    <h1 class="title">${teacherName}'s invitation expires ${whenText}</h1>
+    <p class="body-text"><strong>${teacherName}</strong> invited you to connect on AIVO Learning about <strong>${learnerName}</strong>. That invitation link expires <span class="highlight">${whenText}</span>.</p>
+    <p class="body-text">Accepting takes a minute and lets the two of you share progress, observations, and goals for ${learnerName}.</p>
+    <p style="text-align:center"><a href="${acceptUrl}" class="btn">Accept before it expires</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">If the link has already expired, ask ${teacherName} to send a fresh one. If you weren't expecting this, you can safely ignore this email.</p>
+  `);
+  return {
+    subject: `Reminder: ${teacherName}'s invitation about ${learnerName} expires ${whenText}`,
+    html,
+    text: `${teacherName} invited you to connect about ${learnerName} on AIVO Learning, and the link expires ${whenText}. Accept: ${acceptUrl}\n\nIf it has already expired, ask ${teacherName} for a fresh invitation.`,
+  };
+}
+
+// Sprint C-13 — SCREEN 0: the drafted learning profile is ready for first
+// review. Warm, single CTA, no jargon. Copy intent per report §4.2:
+// "Maya finished her Discovery Adventure. AIVO has drafted her learning
+// profile — it's waiting for you to review it." CTA "See what we learned."
+function renderBrainProfileReady(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "your learner";
+  const reviewUrl = (data.reviewUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const html = baseLayout(`
+    <h1 class="title">${learnerName}'s learning profile is ready</h1>
+    <p class="body-text"><strong>${learnerName}</strong> finished their Discovery Adventure. We've drafted ${learnerName}'s learning profile — it's waiting for you to review it.</p>
+    <p class="body-text">You'll see what we learned about how ${learnerName} likes to learn, the supports we suggest, and where they're already strong. Nothing starts until you've had a look and approved it.</p>
+    <p style="text-align:center"><a href="${reviewUrl}" class="btn">See what we learned</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">Take your time — there's no deadline.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these emails, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+  return {
+    subject: `${learnerName}'s learning profile is ready for you to review`,
+    html,
+    text: `${learnerName} finished their Discovery Adventure. We've drafted ${learnerName}'s learning profile — it's waiting for you to review it. See what we learned: ${reviewUrl}${
+      unsubscribeUrl ? `\n\nTo stop these emails: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
+// Sprint C-13 — a structural change landed after approval (supports/level/team
+// shift). Honest about what changed and why, strengths-respecting, one CTA to
+// the change timeline where the parent can review + acknowledge or adjust.
+function renderBrainProfileChanged(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "your learner";
+  const summary = (data.summary as string) || `We adjusted ${learnerName}'s supports.`;
+  const reviewUrl = (data.reviewUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const html = baseLayout(`
+    <h1 class="title">We adjusted ${learnerName}'s supports — take a look</h1>
+    <p class="body-text">${summary}</p>
+    <p class="body-text">${learnerName}'s lessons are carrying on as usual. When you have a moment, have a look at what changed and let us know it looks right — or adjust it.</p>
+    <p style="text-align:center"><a href="${reviewUrl}" class="btn">See what changed</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">There's no rush, and nothing is paused.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these emails, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+  return {
+    subject: `A quick update to ${learnerName}'s learning profile`,
+    html,
+    text: `${summary}\n\n${learnerName}'s lessons are carrying on as usual. See what changed and confirm it looks right (or adjust it): ${reviewUrl}${
+      unsubscribeUrl ? `\n\nTo stop these emails: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
+// Sprint C-13 — the gentle digest reminder for structural changes that have sat
+// un-acknowledged for a week. One reminder per change (ledger-capped). Never
+// nagging: the window is non-blocking and lessons keep running.
+function renderBrainChangesReminder(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "your learner";
+  const count = data.count != null ? Number(data.count) : 1;
+  const reviewUrl = (data.reviewUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const changeWord = count === 1 ? "an update" : `${count} updates`;
+  const itWord = count === 1 ? "it" : "them";
+  const html = baseLayout(`
+    <h1 class="title">${changeWord.charAt(0).toUpperCase() + changeWord.slice(1)} to ${learnerName}'s profile is waiting for you</h1>
+    <p class="body-text">A little while ago we adjusted ${learnerName}'s learning profile, and ${itWord} ${count === 1 ? "is" : "are"} still waiting for your review.</p>
+    <p class="body-text">Nothing is paused — ${learnerName}'s lessons are running as usual. Reviewing takes a moment and helps us keep the profile matched to ${learnerName}.</p>
+    <p style="text-align:center"><a href="${reviewUrl}" class="btn">Review what changed</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">This is the only reminder we'll send about ${itWord}.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these emails, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+  return {
+    subject: `${changeWord.charAt(0).toUpperCase() + changeWord.slice(1)} to ${learnerName}'s profile is waiting for your review`,
+    html,
+    text: `A little while ago we adjusted ${learnerName}'s learning profile, and ${itWord} ${count === 1 ? "is" : "are"} still waiting for your review. Nothing is paused. Review: ${reviewUrl}${
+      unsubscribeUrl ? `\n\nTo stop these emails: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
 function renderStaffCredentials(data: TemplateData) {
   const name = (data.name as string) || "there";
   const roleLabel = (data.roleLabel as string) || "staff member";
@@ -644,6 +811,104 @@ function renderNewsletterConfirmation(_data: TemplateData) {
   };
 }
 
+/** HTML-escape an interpolated value. The contributor acknowledgement folds a
+ *  user-authored reasoning snippet into the email body, so it must be escaped
+ *  (defence against HTML/script injection — the snippet is the contributor's
+ *  own words, never trusted markup). */
+function escapeHtml(s: string): string {
+  return s.replace(
+    /[<>&"']/g,
+    (c) =>
+      (({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }) as Record<
+        string,
+        string
+      >)[c] ?? c,
+  );
+}
+
+/**
+ * Sprint C-16 — the contributor "your input shaped X" acknowledgement. One
+ * template family, role-aware wording. Sent when a parent APPROVES a brain
+ * profile that folded THIS contributor's input.
+ *
+ * THE PRIVACY RULE (content-safety tested). This template names ONLY:
+ *   - the learner's FIRST name (`learnerFirstName`),
+ *   - the contributor's OWN folded item labels + their own reasoning snippets
+ *     (`items` — each { label, reasoning }).
+ * It MUST NOT surface another contributor's content, the child's functioning
+ * level / diagnoses / mastery, or any parent-private data. The web stack passes
+ * only label + reasoning for the contributor's own role; this renderer never
+ * receives anything else. The reasoning snippet is escaped (user-authored).
+ *
+ * Tone: gratitude without flattery, specificity without disclosure, ONE optional
+ * CTA ("see your contributions"). A therapist is addressed as a clinical
+ * professional; a caregiver may be ESL — plain, warm language.
+ */
+function renderContributionAcknowledged(
+  data: TemplateData,
+  role: "teacher" | "caregiver" | "therapist",
+) {
+  const learnerFirstName = escapeHtml((data.learnerFirstName as string) || "your learner");
+  const contributionsUrl = (data.contributionsUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const rawItems = Array.isArray(data.items) ? (data.items as Array<Record<string, unknown>>) : [];
+  // Normalise + escape. Only label + reasoning are ever present (privacy).
+  const items = rawItems
+    .map((i) => ({
+      label: escapeHtml(String(i.label ?? "").trim()),
+      reasoning: escapeHtml(String(i.reasoning ?? "").trim()),
+    }))
+    .filter((i) => i.label.length > 0);
+
+  const inputWord =
+    role === "therapist"
+      ? "clinical note"
+      : role === "teacher"
+        ? "classroom note"
+        : "observation";
+  const youWord = role === "therapist" ? "your clinical input" : "what you shared";
+
+  // The headline support — the most tangible "this is what your note did".
+  const lead = items[0];
+  const leadLine = lead
+    ? `your ${inputWord} helped keep <span class="highlight">${lead.label}</span> active for ${learnerFirstName}`
+    : `your ${inputWord} is now part of ${learnerFirstName}'s plan`;
+
+  const itemsHtml =
+    items.length > 0
+      ? `<ul class="body-text">${items
+          .map(
+            (i) =>
+              `<li><strong>${i.label}</strong>${i.reasoning ? ` — <span style="color:#6b7280">${i.reasoning}</span>` : ""}</li>`,
+          )
+          .join("")}</ul>`
+      : "";
+
+  const html = baseLayout(`
+    <h1 class="title">Your input shaped ${learnerFirstName}'s learning plan</h1>
+    <p class="body-text">Thank you — ${leadLine}. It's now part of ${learnerFirstName}'s approved learning plan.</p>
+    ${items.length > 0 ? `<p class="body-text">Here's what ${youWord} helped put in place:</p>${itemsHtml}` : ""}
+    <p style="text-align:center"><a href="${contributionsUrl}" class="btn">See your contributions</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">Have something new to add? You can share another ${inputWord} any time.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these emails, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+
+  const textItems =
+    items.length > 0
+      ? `\n\n${items.map((i) => `- ${i.label}${i.reasoning ? `: ${i.reasoning}` : ""}`).join("\n")}`
+      : "";
+  return {
+    subject: `Your input shaped ${learnerFirstName}'s learning plan`,
+    html,
+    text: `Thank you — ${lead ? `your ${inputWord} helped keep ${lead.label} active for ${learnerFirstName}` : `your ${inputWord} is now part of ${learnerFirstName}'s plan`}. It's now part of ${learnerFirstName}'s approved learning plan.${textItems}\n\nSee your contributions: ${contributionsUrl}${
+      unsubscribeUrl ? `\n\nTo stop these emails: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
 export const AVAILABLE_TEMPLATES = [
   { id: "welcome", name: "Welcome Email", channels: ["email"] },
   { id: "collaboration_invite", name: "Collaboration Invite", channels: ["email"] },
@@ -665,6 +930,26 @@ export const AVAILABLE_TEMPLATES = [
   { id: "teacher_invite", name: "Teacher Invite", channels: ["email"] },
   { id: "staff_credentials", name: "Staff Credentials (Temp Password)", channels: ["email"] },
   { id: "teacher_invite_parent", name: "Teacher → Parent Invite", channels: ["email"] },
+  { id: "contribution_nudge", name: "Team Contribution Nudge", channels: ["email"] },
+  { id: "invite_expiry_warning", name: "Invite Expiry Warning", channels: ["email"] },
+  { id: "brain_profile_ready", name: "Learning Profile Ready (Screen 0)", channels: ["email", "in_app"] },
+  { id: "brain_profile_changed", name: "Learning Profile Changed", channels: ["email", "in_app"] },
+  { id: "brain_changes_reminder", name: "Profile Change Review Reminder", channels: ["email"] },
+  {
+    id: "contribution_acknowledged_teacher",
+    name: "Contribution Acknowledged (Teacher)",
+    channels: ["email", "in_app"],
+  },
+  {
+    id: "contribution_acknowledged_caregiver",
+    name: "Contribution Acknowledged (Caregiver)",
+    channels: ["email", "in_app"],
+  },
+  {
+    id: "contribution_acknowledged_therapist",
+    name: "Contribution Acknowledged (Therapist)",
+    channels: ["email", "in_app"],
+  },
   { id: "iep_in_review_parent", name: "IEP — In Review (Parent)", channels: ["email"] },
   { id: "iep_finalised_parent", name: "IEP — Finalised (Parent)", channels: ["email"] },
   { id: "iep_comment_mention", name: "IEP — Comment Mention", channels: ["email"] },

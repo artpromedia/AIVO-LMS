@@ -67,6 +67,7 @@ import type {
   SISConnection,
   CollaboratorInsight,
   CollaboratorMember,
+  ChildProfileDisclosure,
   ConsentRecord,
   ConsentType,
   ConsentVersion,
@@ -82,6 +83,9 @@ import type {
   IEPDocument,
   AccessibilityPreferences,
   LearnerBrainProfile,
+  BrainProfileApproval,
+  LearnerBrainProfileChange,
+  ContributionAcknowledgement,
   LearnerProfile,
   LessonInteraction,
   LessonRun,
@@ -92,6 +96,8 @@ import type {
   Notification,
   NotificationDelivery,
   ParentAssessment,
+  TeacherAssessmentDraft,
+  TherapistAssessmentDraft,
   ParentLessonSummary,
   PolicyVersion,
   QuestChapter,
@@ -306,6 +312,35 @@ export interface AssessmentStore {
   findParentAssessment(learnerId: string, tenantId: string): Promise<ParentAssessment | null>;
   upsertParentAssessment(assessment: ParentAssessment): Promise<ParentAssessment>;
 
+  // Teacher assessment DRAFT (Sprint C-07). The autosave buffer for the
+  // teacher wizard; the system of record is assessment-svc. Keyed by
+  // (learner, tenant, submitting teacher) so co-teachers keep separate
+  // drafts. Co-located in the assessments domain so it shares the
+  // assessments persistence mode (and the assessments↔brainProfiles
+  // same-mode guard).
+  findTeacherAssessmentDraft(
+    learnerId: string,
+    tenantId: string,
+    submittedByUserId: string,
+  ): Promise<TeacherAssessmentDraft | null>;
+  upsertTeacherAssessmentDraft(
+    draft: TeacherAssessmentDraft,
+  ): Promise<TeacherAssessmentDraft>;
+
+  // Therapist assessment DRAFT (Sprint C-10). The autosave buffer for the
+  // single-page therapist intake form; the system of record is assessment-svc.
+  // Keyed by (learner, tenant, submitting therapist) — sibling of the teacher
+  // draft. Co-located in the assessments domain so it shares the assessments
+  // persistence mode (and the assessments↔brainProfiles same-mode guard).
+  findTherapistAssessmentDraft(
+    learnerId: string,
+    tenantId: string,
+    submittedByUserId: string,
+  ): Promise<TherapistAssessmentDraft | null>;
+  upsertTherapistAssessmentDraft(
+    draft: TherapistAssessmentDraft,
+  ): Promise<TherapistAssessmentDraft>;
+
   // Baseline assessments
   getBaselineById(baselineId: string, tenantId: string): Promise<BaselineAssessment | null>;
   /** Most-recent baseline (by createdAt) for the learner, regardless of status. */
@@ -379,6 +414,83 @@ export interface LessonRunStore {
 export interface BrainProfileStore {
   getForLearner(learnerId: string, tenantId: string): Promise<LearnerBrainProfile | null>;
   upsert(profile: LearnerBrainProfile): Promise<LearnerBrainProfile>;
+}
+
+/**
+ * Sprint C-06 — the dedicated approval-record store. Append-only: one row per
+ * parent decision (approve / amend / decline), carrying consent + RAI
+ * versions, actor, the reviewed profile revision, folded modifications, and a
+ * hashed request IP. `record` writes a new row; `listForLearner` returns the
+ * tenant-scoped history newest-first.
+ */
+export interface BrainProfileApprovalStore {
+  record(approval: BrainProfileApproval): Promise<BrainProfileApproval>;
+  listForLearner(learnerId: string, tenantId: string): Promise<BrainProfileApproval[]>;
+}
+
+/**
+ * Sprint C-13 — the brain-profile change-record store. Append-only except for
+ * the one `ackedAt` mutation: `record` writes a new change row; `listForLearner`
+ * returns the tenant-scoped history newest-first; `ack` stamps `ackedAt` on a
+ * pending structural delta (idempotent — re-acking returns the row unchanged);
+ * `listPendingStructural` returns un-acked structural changes (drives the
+ * persistent in-app badge after the N-day window). Powers the "what changed
+ * since you approved" timeline.
+ */
+export interface BrainProfileChangeStore {
+  record(change: LearnerBrainProfileChange): Promise<LearnerBrainProfileChange>;
+  listForLearner(learnerId: string, tenantId: string): Promise<LearnerBrainProfileChange[]>;
+  /** Stamp `ackedAt` on a pending structural change. Returns the updated row,
+   *  or null if the id isn't a pending structural change for this learner. */
+  ack(
+    id: string,
+    learnerId: string,
+    tenantId: string,
+    ackedAt: string,
+  ): Promise<LearnerBrainProfileChange | null>;
+  /** Un-acked structural changes for a learner, newest-first. */
+  listPendingStructural(
+    learnerId: string,
+    tenantId: string,
+  ): Promise<LearnerBrainProfileChange[]>;
+}
+
+/**
+ * Sprint C-16 — the contributor-acknowledgement store. Append-only with an
+ * idempotent insert: `record` writes one acknowledgement row UNLESS one already
+ * exists for the natural key (learnerId, profileRevision, role,
+ * contributorEmail) — in which case it returns the existing row unchanged (so a
+ * re-approval of the same revision never re-spams). `listForContributor`
+ * returns a contributor's OWN acknowledgements (scoped by userId OR email — the
+ * summary card shows only their own items); `listForLearner` returns every
+ * acknowledgement for a learner (the retention metric + admin reads).
+ * `markNotified` stamps the per-channel delivery flags after dispatch.
+ */
+export interface ContributionAcknowledgementStore {
+  /** Idempotent insert keyed on (learnerId, profileRevision, role,
+   *  contributorEmail). Returns the row written, or the existing row when the
+   *  key already exists ({ created } tells the caller which). */
+  record(
+    ack: ContributionAcknowledgement,
+  ): Promise<{ ack: ContributionAcknowledgement; created: boolean }>;
+  /** A contributor's OWN acknowledgements (by userId or lowercased email),
+   *  optionally scoped to one learner. Newest-first. */
+  listForContributor(opts: {
+    tenantId: string;
+    contributorUserId: string | null;
+    contributorEmail: string;
+    learnerId?: string;
+  }): Promise<ContributionAcknowledgement[]>;
+  /** Every acknowledgement for a learner (newest-first) — retention + admin. */
+  listForLearner(learnerId: string, tenantId: string): Promise<ContributionAcknowledgement[]>;
+  /** Every acknowledgement in a tenant (newest-first) — the retention read
+   *  path. */
+  listForTenant(tenantId: string): Promise<ContributionAcknowledgement[]>;
+  /** Stamp the per-channel delivery flags on a recorded row (best-effort). */
+  markNotified(
+    id: string,
+    flags: { notifiedInApp?: boolean; notifiedEmail?: boolean },
+  ): Promise<ContributionAcknowledgement | null>;
 }
 
 /**
@@ -504,6 +616,20 @@ export interface ComplianceStore {
   /** Append an IEP-document access log entry (append-only audit integrity). */
   appendIepAccessLog(entry: IEPDocumentAccessLog): Promise<IEPDocumentAccessLog>;
   listIepAccessForLearner(learnerId: string, tenantId: string): Promise<IEPDocumentAccessLog[]>;
+  /**
+   * Sprint C-12 (ADR 0042) — append a FERPA child-profile disclosure (a
+   * cross-role read of a learner's brain profile). Append-only.
+   */
+  appendChildProfileDisclosure(entry: ChildProfileDisclosure): Promise<ChildProfileDisclosure>;
+  /**
+   * Disclosures for a learner, newest-first, optionally bounded by an inclusive
+   * ISO time window. The compliance/admin query surface.
+   */
+  listChildProfileDisclosuresForLearner(
+    learnerId: string,
+    tenantId: string,
+    opts?: { fromIso?: string; toIso?: string },
+  ): Promise<ChildProfileDisclosure[]>;
 }
 
 /**
@@ -840,6 +966,9 @@ export interface Persistence {
   assessments: AssessmentStore;
   lessonRuns: LessonRunStore;
   brainProfiles: BrainProfileStore;
+  brainProfileApprovals: BrainProfileApprovalStore;
+  brainProfileChanges: BrainProfileChangeStore;
+  contributionAcknowledgements: ContributionAcknowledgementStore;
   curriculum: CurriculumStore;
   compliance: ComplianceStore;
   quests: QuestStore;

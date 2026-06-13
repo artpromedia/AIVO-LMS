@@ -187,8 +187,65 @@ test(
         headers: { authorization: `Bearer ${parentBToken}` },
       });
       assert.equal(crossTenantRes.statusCode, 403, "cross-tenant read must be denied");
+
+      // 6. Sprint C-08 — contributions endpoint.
+      //    6a. Authz: a non-parent (the teammate themselves, or another
+      //        tenant's parent) gets 403 — a teammate cannot enumerate the team.
+      const contribDenied = await app.inject({
+        method: "GET",
+        url: `/api/family/collaboration/${learner.id}/contributions`,
+        headers: { authorization: `Bearer ${parentBToken}` },
+      });
+      assert.equal(contribDenied.statusCode, 403, "non-parent contributions read must be 403");
+      const teacherContribDenied = await app.inject({
+        method: "GET",
+        url: `/api/family/collaboration/${learner.id}/contributions`,
+        headers: { authorization: `Bearer ${teacherToken}` },
+      });
+      assert.equal(
+        teacherContribDenied.statusCode,
+        403,
+        "an accepted teacher is not a parent — contributions read must be 403",
+      );
+
+      //    6b. The parent sees the accepted (now-linked) teacher with
+      //        contributed=false (no teacher_assessments row yet).
+      const contribRes = await app.inject({
+        method: "GET",
+        url: `/api/family/collaboration/${learner.id}/contributions`,
+        headers: { authorization: `Bearer ${parentAToken}` },
+      });
+      assert.equal(contribRes.statusCode, 200, contribRes.body);
+      const contrib = contribRes.json() as any;
+      const teacherStatus = contrib.members.find((m: any) => m.kind === "teacher");
+      assert.ok(teacherStatus, "teacher appears in the contributions feed");
+      assert.equal(teacherStatus.status, "ACCEPTED");
+      assert.equal(teacherStatus.contributed, false, "no assessment yet ⇒ not contributed");
+      assert.equal(contrib.voices.invited, 1);
+      assert.equal(contrib.voices.contributed, 0);
+
+      //    6c. After a completed teacher_assessments row lands, the same
+      //        teacher flips to contributed=true and the voices roll up.
+      const { teacherAssessments } = await import("@aivo/db");
+      await db.insert(teacherAssessments).values({
+        tenantId: tenantA.id,
+        learnerId: learner.id,
+        submittedBy: teacherUser.id,
+        completedAt: new Date(),
+      } as any);
+      const contribRes2 = await app.inject({
+        method: "GET",
+        url: `/api/family/collaboration/${learner.id}/contributions`,
+        headers: { authorization: `Bearer ${parentAToken}` },
+      });
+      const contrib2 = contribRes2.json() as any;
+      const teacherStatus2 = contrib2.members.find((m: any) => m.kind === "teacher");
+      assert.equal(teacherStatus2.contributed, true, "completed assessment ⇒ contributed");
+      assert.equal(contrib2.voices.contributed, 1);
     } finally {
       try {
+        const { teacherAssessments } = await import("@aivo/db");
+        await db.delete(teacherAssessments).where(eq(teacherAssessments.learnerId, learner.id));
         await db.delete(brainInsights).where(eq(brainInsights.learnerId, learner.id));
         await db.delete(learnerTherapists).where(eq(learnerTherapists.tenantId, tenantA.id));
         await db.delete(learnerCaregivers).where(eq(learnerCaregivers.tenantId, tenantA.id));

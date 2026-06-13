@@ -71,3 +71,24 @@ export const webIepDocAccessLogs = pgTable(
   },
   (t) => ({ idx: index("web_iep_doc_access_logs_idx").on(t.tenantId, t.learnerId) }),
 );
+
+/**
+ * Sprint C-12 (ADR 0042) — FERPA cross-role reads of a child's brain profile,
+ * web-v2 side. The web counterpart of the services' `CHILD_PROFILE_DISCLOSED`
+ * audit event. Append-only, queried per-learner + time-bounded by the
+ * compliance surface. `disclosed_at` is a predicate column so the time-window
+ * query is indexed; the full tuple lives in `data`.
+ */
+export const webChildProfileDisclosures = pgTable(
+  "web_child_profile_disclosures",
+  {
+    id: text("id").primaryKey(),
+    learnerId: text("learner_id").notNull(),
+    tenantId: text("tenant_id").notNull(),
+    disclosedAt: text("disclosed_at").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({
+    idx: index("web_child_profile_disclosures_idx").on(t.tenantId, t.learnerId, t.disclosedAt),
+  }),
+);
