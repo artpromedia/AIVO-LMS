@@ -18,8 +18,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import { getLearner, parentCanAccessLearner, refreshLearnerReadiness } from "@/lib/db/repos";
+import {
+  getLearner,
+  getOrCreateParentAssessment,
+  parentCanAccessLearner,
+  refreshLearnerReadiness,
+} from "@/lib/db/repos";
 import { READINESS_LABEL_KEY, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
+import {
+  deriveAssessmentProgress,
+  type AssessmentSectionId,
+} from "@/lib/validators/parent-assessment";
+import { AssessmentResumeCard } from "./assessment/assessment-resume-card";
 import { WhatsWorkingPanel } from "@/components/parent/whats-working-panel";
 import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
 import { TutorMemoryCard } from "@/components/parent/tutor-memory-card";
@@ -40,6 +50,14 @@ export default async function LearnerDetailPage({
   await refreshLearnerReadiness(learnerId, session.tenantId);
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
+
+  // Resume affordance for a part-finished parent assessment (Sprint C-11): the
+  // same derivation the intro card uses, so the counts agree on both surfaces.
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessmentProgress = deriveAssessmentProgress(
+    assessment.answers as Partial<Record<AssessmentSectionId, Record<string, unknown>>>,
+  );
+  const showResume = !assessment.submittedAt;
 
   const next = nextStepFor(learner);
   const tone = READINESS_TONE[learner.readinessState];
@@ -88,6 +106,14 @@ export default async function LearnerDetailPage({
           </Link>
         </Button>
       </Card>
+
+      {showResume ? (
+        <AssessmentResumeCard
+          learnerId={learner.id}
+          progress={assessmentProgress}
+          variant="panel"
+        />
+      ) : null}
 
       <SectionHeader title={t("whats_working")} />
       <Card className="p-[var(--aivo-density-card-pad)]">

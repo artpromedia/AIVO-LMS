@@ -209,7 +209,20 @@
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Suas respostas ficam com você",
       "reassurance_no_diagnosis_title": "Nenhum diagnóstico necessário",
-      "not_now": "Agora não"
+      "not_now": "Agora não",
+      "road_time_label": "Cerca de {minutes} minutos",
+      "road_time_body": "{screens} ecrãs tranquilos, um grupo de perguntas por ecrã. As suas respostas vão sendo guardadas.",
+      "road_private_label": "Privado para si",
+      "road_private_body": "Nunca mostramos as suas respostas em bruto ao seu educando — apenas resumos seguros para o aluno.",
+      "road_iep_label": "PEI opcional",
+      "road_iep_body": "Se tiver um PEI ou 504, irá carregá-lo depois. Se não, as suas respostas são suficientes.",
+      "road_baseline_label": "Base personalizada",
+      "road_baseline_body": "Usamos as suas respostas para criar uma avaliação inicial ajustada ao seu educando — não um questionário genérico."
+    },
+    "learner_assessment_resume": {
+      "headline": "Está em {done} de {total} ecrãs",
+      "minutes_saved": "Faltam cerca de {minutes} minutos. As suas respostas estão guardadas.",
+      "continue": "Continuar de onde parou"
     },
     "learner_assessment": {
       "placeholder_pronouns": "ela / dela, ele / dele, elu / delu…",
@@ -231,9 +244,13 @@
       "aac_body": "AIVO mudará para padrões de resposta amigáveis com CAA.",
       "homework_coaching_label": "Meu filho/a precisa de ajuda para começar a fazer a lição de casa",
       "homework_coaching_body": "AIVO oferecerá impulsos de início com andaimento.",
-      "autosave_indicator": "As respostas são salvas automaticamente ao avançar",
+      "autosave_indicator": "Guarda à medida que escreve",
       "back_to_intro": "Voltar à introdução",
-      "save_exit": "Salvar e sair"
+      "save_exit": "Salvar e sair",
+      "autosave_saving": "A guardar…",
+      "autosave_saved": "Guardado ✓ · agora mesmo",
+      "autosave_retry": "Não foi possível guardar — a tentar de novo…",
+      "diagnoses_reassurance": "Escolha o que lhe parecer certo. O AIVO não precisa de um diagnóstico formal — apenas do que ajuda no dia a dia. Pode alterar isto a qualquer momento."
     },
     "learner_assessment_review": {
       "reassurance_review_title": "Mais uma revisão antes de aplicar",

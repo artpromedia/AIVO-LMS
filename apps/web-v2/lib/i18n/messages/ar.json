@@ -209,7 +209,20 @@
     "learner_assessment_intro": {
       "reassurance_privacy_title": "إجاباتك تخصك وحدك",
       "reassurance_no_diagnosis_title": "لا يلزم أي تشخيص",
-      "not_now": "ليس الآن"
+      "not_now": "ليس الآن",
+      "road_time_label": "حوالي {minutes} دقيقة",
+      "road_time_body": "{screens} شاشات هادئة، مجموعة أسئلة واحدة لكل شاشة. تُحفظ إجاباتك أولًا بأول.",
+      "road_private_label": "خاص بك",
+      "road_private_body": "لا نُظهر إجاباتك الأصلية لطفلك أبدًا — فقط ملخصات آمنة للمتعلم.",
+      "road_iep_label": "خطة التعليم الفردي اختيارية",
+      "road_iep_body": "إذا كانت لديك خطة تعليم فردي أو 504، فستحمّلها لاحقًا. وإن لم تكن، فإجاباتك كافية.",
+      "road_baseline_label": "خط أساس مخصّص",
+      "road_baseline_body": "نستخدم إجاباتك لبناء اختبار أساس مُهيّأ لطفلك — وليس اختبارًا عامًا."
+    },
+    "learner_assessment_resume": {
+      "headline": "أنت في الشاشة {done} من {total}",
+      "minutes_saved": "يتبقّى حوالي {minutes} دقيقة. إجاباتك محفوظة.",
+      "continue": "تابِع من حيث توقّفت"
     },
     "learner_assessment": {
       "placeholder_pronouns": "هي / لها، هو / له، they / them…",
@@ -231,9 +244,13 @@
       "aac_body": "سيتحول AIVO إلى أنماط استجابة ملائمة لـ AAC.",
       "homework_coaching_label": "يحتاج طفلي إلى مساعدة للبدء في الواجبات المنزلية",
       "homework_coaching_body": "سيقدم AIVO تلميحات بدء متدرجة.",
-      "autosave_indicator": "تُحفظ الإجابات تلقائياً مع المضي قدماً",
+      "autosave_indicator": "يُحفظ أثناء الكتابة",
       "back_to_intro": "العودة إلى المقدمة",
-      "save_exit": "حفظ والخروج"
+      "save_exit": "حفظ والخروج",
+      "autosave_saving": "جارٍ الحفظ…",
+      "autosave_saved": "تم الحفظ ✓ · للتو",
+      "autosave_retry": "تعذّر الحفظ — جارٍ إعادة المحاولة…",
+      "diagnoses_reassurance": "اختر ما يناسبك. لا يحتاج AIVO إلى تشخيص رسمي — فقط ما يساعد يوميًا. يمكنك تغيير هذا في أي وقت."
     },
     "learner_assessment_review": {
       "reassurance_review_title": "مراجعة أخيرة قبل التطبيق",

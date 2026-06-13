@@ -209,7 +209,20 @@
     "learner_assessment_intro": {
       "reassurance_privacy_title": "आपके जवाब केवल आपके पास रहते हैं",
       "reassurance_no_diagnosis_title": "किसी निदान की आवश्यकता नहीं",
-      "not_now": "अभी नहीं"
+      "not_now": "अभी नहीं",
+      "road_time_label": "लगभग {minutes} मिनट",
+      "road_time_body": "{screens} शांत स्क्रीन, हर स्क्रीन पर एक प्रश्न समूह। आपके उत्तर साथ-साथ सहेजे जाते हैं।",
+      "road_private_label": "केवल आपके लिए निजी",
+      "road_private_body": "हम आपके मूल उत्तर आपके बच्चे को कभी नहीं दिखाते — केवल शिक्षार्थी-सुरक्षित सारांश।",
+      "road_iep_label": "IEP वैकल्पिक",
+      "road_iep_body": "यदि आपके पास IEP या 504 है, तो आप इसे बाद में अपलोड करेंगे। यदि नहीं, तो आपके उत्तर पर्याप्त हैं।",
+      "road_baseline_label": "वैयक्तिकृत आधार रेखा",
+      "road_baseline_body": "हम आपके उत्तरों का उपयोग आपके बच्चे के अनुरूप एक आधार जाँच बनाने के लिए करते हैं — कोई सामान्य क्विज़ नहीं।"
+    },
+    "learner_assessment_resume": {
+      "headline": "आप {total} में से {done} स्क्रीन पर हैं",
+      "minutes_saved": "लगभग {minutes} मिनट शेष। आपके उत्तर सहेजे गए हैं।",
+      "continue": "जहाँ छोड़ा था वहीं से जारी रखें"
     },
     "learner_assessment": {
       "placeholder_pronouns": "वह / उसकी, वह / उसका, they / them…",
@@ -231,9 +244,13 @@
       "aac_body": "AIVO AAC-अनुकूल प्रतिक्रिया पैटर्न पर स्विच करेगा।",
       "homework_coaching_label": "मेरे बच्चे को होमवर्क शुरू करने में मदद चाहिए",
       "homework_coaching_body": "AIVO स्कैफोल्डेड स्टार्ट-अप संकेत प्रदान करेगा।",
-      "autosave_indicator": "आगे बढ़ने पर उत्तर स्वतः सहेजे जाते हैं",
+      "autosave_indicator": "टाइप करते ही सहेजा जाता है",
       "back_to_intro": "परिचय पर वापस जाएँ",
-      "save_exit": "सहेजें और बाहर निकलें"
+      "save_exit": "सहेजें और बाहर निकलें",
+      "autosave_saving": "सहेजा जा रहा है…",
+      "autosave_saved": "सहेजा गया ✓ · अभी",
+      "autosave_retry": "सहेजा नहीं जा सका — पुनः प्रयास हो रहा है…",
+      "diagnoses_reassurance": "जो सही लगे चुनें। AIVO को औपचारिक निदान की ज़रूरत नहीं — बस वही जो रोज़मर्रा में मदद करे। आप इसे कभी भी बदल सकते हैं।"
     },
     "learner_assessment_review": {
       "reassurance_review_title": "इसे लागू करने से पहले एक बार और देखें",

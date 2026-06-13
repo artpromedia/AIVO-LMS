@@ -209,7 +209,20 @@
     "learner_assessment_intro": {
       "reassurance_privacy_title": "您的回答只属于您自己",
       "reassurance_no_diagnosis_title": "无需诊断",
-      "not_now": "暂不填写"
+      "not_now": "暂不填写",
+      "road_time_label": "大约 {minutes} 分钟",
+      "road_time_body": "{screens} 个舒缓的页面，每页一组问题。你的答案会随时保存。",
+      "road_private_label": "仅你可见",
+      "road_private_body": "我们绝不会向你的孩子展示原始答案——只展示对学习者安全的摘要。",
+      "road_iep_label": "IEP 可选",
+      "road_iep_body": "如果你有 IEP 或 504 计划，可在之后上传。如果没有，你的回答就足够了。",
+      "road_baseline_label": "个性化基线",
+      "road_baseline_body": "我们用你的回答为孩子量身打造一份基线评估——而非通用测验。"
+    },
+    "learner_assessment_resume": {
+      "headline": "你已完成 {total} 个页面中的 {done} 个",
+      "minutes_saved": "还剩大约 {minutes} 分钟。你的答案已保存。",
+      "continue": "从上次中断处继续"
     },
     "learner_assessment": {
       "placeholder_pronouns": "她 / 她的，他 / 他的，TA / TA 的…",
@@ -231,9 +244,13 @@
       "aac_body": "AIVO 将切换至适合 AAC 的回应模式。",
       "homework_coaching_label": "我的孩子需要帮助才能开始做作业",
       "homework_coaching_body": "AIVO 将提供脚手架式的启动提示。",
-      "autosave_indicator": "前进时答案自动保存",
+      "autosave_indicator": "输入时自动保存",
       "back_to_intro": "返回介绍",
-      "save_exit": "保存并退出"
+      "save_exit": "保存并退出",
+      "autosave_saving": "正在保存…",
+      "autosave_saved": "已保存 ✓ · 刚刚",
+      "autosave_retry": "无法保存——正在重试…",
+      "diagnoses_reassurance": "选择你觉得合适的即可。AIVO 不需要正式的诊断——只需要对日常有帮助的信息。你可以随时更改。"
     },
     "learner_assessment_review": {
       "reassurance_review_title": "应用前再过一遍",

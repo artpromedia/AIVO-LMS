@@ -209,7 +209,20 @@
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Deine Antworten gehören nur dir",
       "reassurance_no_diagnosis_title": "Kein Diagnose erforderlich",
-      "not_now": "Nicht jetzt"
+      "not_now": "Nicht jetzt",
+      "road_time_label": "Etwa {minutes} Minuten",
+      "road_time_body": "{screens} ruhige Bildschirme, eine Fragengruppe pro Bildschirm. Ihre Antworten werden laufend gespeichert.",
+      "road_private_label": "Privat für Sie",
+      "road_private_body": "Wir zeigen Ihrem Kind nie Ihre Rohantworten — nur lernsichere Zusammenfassungen.",
+      "road_iep_label": "IEP optional",
+      "road_iep_body": "Wenn Sie einen IEP oder 504 haben, laden Sie ihn danach hoch. Falls nicht, genügen Ihre Antworten.",
+      "road_baseline_label": "Personalisierte Ausgangsbasis",
+      "road_baseline_body": "Wir nutzen Ihre Antworten, um eine auf Ihr Kind abgestimmte Ausgangsprüfung zu erstellen — kein Standardtest."
+    },
+    "learner_assessment_resume": {
+      "headline": "Sie sind bei {done} von {total} Bildschirmen",
+      "minutes_saved": "Noch etwa {minutes} Minuten. Ihre Antworten sind gespeichert.",
+      "continue": "Dort weitermachen, wo Sie aufgehört haben"
     },
     "learner_assessment": {
       "placeholder_pronouns": "sie / ihr, er / ihm, they / them…",
@@ -231,9 +244,13 @@
       "aac_body": "AIVO wechselt zu UK-freundlichen Antwortmustern.",
       "homework_coaching_label": "Mein Kind braucht Hilfe beim Starten mit den Hausaufgaben",
       "homework_coaching_body": "AIVO wird schrittweise Startimpulse anbieten.",
-      "autosave_indicator": "Antworten werden beim Fortschreiten automatisch gespeichert",
+      "autosave_indicator": "Speichert während der Eingabe",
       "back_to_intro": "Zurück zur Einführung",
-      "save_exit": "Speichern & beenden"
+      "save_exit": "Speichern & beenden",
+      "autosave_saving": "Wird gespeichert…",
+      "autosave_saved": "Gespeichert ✓ · gerade eben",
+      "autosave_retry": "Konnte nicht speichern — wird erneut versucht…",
+      "diagnoses_reassurance": "Wählen Sie, was sich richtig anfühlt. AIVO braucht keine formale Diagnose — nur das, was im Alltag hilft. Sie können dies jederzeit ändern."
     },
     "learner_assessment_review": {
       "reassurance_review_title": "Noch ein letzter Blick, bevor wir dies anwenden",

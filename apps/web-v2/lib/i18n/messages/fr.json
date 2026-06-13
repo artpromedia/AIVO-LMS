@@ -209,7 +209,20 @@
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Vos réponses vous appartiennent",
       "reassurance_no_diagnosis_title": "Aucun diagnostic requis",
-      "not_now": "Pas maintenant"
+      "not_now": "Pas maintenant",
+      "road_time_label": "Environ {minutes} minutes",
+      "road_time_body": "{screens} écrans apaisants, un groupe de questions par écran. Vos réponses sont enregistrées au fil de l’eau.",
+      "road_private_label": "Privé, rien que pour vous",
+      "road_private_body": "Nous ne montrons jamais vos réponses brutes à votre enfant — seulement des résumés adaptés à l’apprenant.",
+      "road_iep_label": "PEI facultatif",
+      "road_iep_body": "Si vous avez un PEI ou un plan 504, vous le téléverserez ensuite. Sinon, vos réponses suffisent.",
+      "road_baseline_label": "Base de référence personnalisée",
+      "road_baseline_body": "Nous utilisons vos réponses pour créer un test de référence adapté à votre enfant — pas un quiz générique."
+    },
+    "learner_assessment_resume": {
+      "headline": "Vous en êtes à {done} sur {total} écrans",
+      "minutes_saved": "Environ {minutes} minutes restantes. Vos réponses sont enregistrées.",
+      "continue": "Reprendre où vous en étiez"
     },
     "learner_assessment": {
       "placeholder_pronouns": "elle / la, il / le, iel / iel…",
@@ -231,9 +244,13 @@
       "aac_body": "AIVO passera aux schémas de réponse adaptés à la CAA.",
       "homework_coaching_label": "Mon enfant a besoin d'aide pour démarrer ses devoirs",
       "homework_coaching_body": "AIVO proposera des déclencheurs de démarrage avec étayage.",
-      "autosave_indicator": "Les réponses sont sauvegardées automatiquement au fil de la progression",
+      "autosave_indicator": "Enregistré au fur et à mesure",
       "back_to_intro": "Retour à l'introduction",
-      "save_exit": "Enregistrer et quitter"
+      "save_exit": "Enregistrer et quitter",
+      "autosave_saving": "Enregistrement…",
+      "autosave_saved": "Enregistré ✓ · à l’instant",
+      "autosave_retry": "Échec de l’enregistrement — nouvelle tentative…",
+      "diagnoses_reassurance": "Choisissez ce qui vous semble juste. AIVO n’a pas besoin d’un diagnostic formel — seulement de ce qui aide au quotidien. Vous pouvez le modifier à tout moment."
     },
     "learner_assessment_review": {
       "reassurance_review_title": "Une dernière vérification avant d'appliquer",

@@ -407,7 +407,20 @@
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Your answers stay with you",
       "reassurance_no_diagnosis_title": "No diagnosis required",
-      "not_now": "Not now"
+      "not_now": "Not now",
+      "road_time_label": "About {minutes} minutes",
+      "road_time_body": "{screensWord} calm screens, one question group per screen. Your answers save as you go.",
+      "road_private_label": "Private to you",
+      "road_private_body": "We never show your raw answers to your learner — only learner-safe summaries.",
+      "road_iep_label": "IEP optional",
+      "road_iep_body": "If you have an IEP or 504, you’ll upload it after. If not, your answers are enough.",
+      "road_baseline_label": "Personalized baseline",
+      "road_baseline_body": "We use your answers to build a baseline check that’s tuned to your learner — no generic quiz."
+    },
+    "learner_assessment_resume": {
+      "headline": "You’re {done} of {total} screens in",
+      "minutes_saved": "About {minutes} minutes left. Your answers are saved.",
+      "continue": "Continue where I left off"
     },
     "learner_assessment": {
       "placeholder_pronouns": "she / her, he / him, they / them…",
@@ -429,9 +442,13 @@
       "aac_body": "AIVO will switch to AAC-friendly response patterns.",
       "homework_coaching_label": "My child needs help getting started with homework",
       "homework_coaching_body": "AIVO will offer scaffolded start-up nudges.",
-      "autosave_indicator": "Answers autosave as you move forward",
+      "autosave_indicator": "Saves as you type",
       "back_to_intro": "Back to intro",
-      "save_exit": "Save & exit"
+      "save_exit": "Save & exit",
+      "autosave_saving": "Saving…",
+      "autosave_saved": "Saved ✓ · just now",
+      "autosave_retry": "Couldn’t save — retrying…",
+      "diagnoses_reassurance": "Pick what feels right. AIVO doesn’t need a formal label — only what helps day to day. You can change this anytime."
     },
     "learner_assessment_review": {
       "reassurance_review_title": "One more pass before we apply this",

@@ -209,7 +209,20 @@
     "learner_assessment_intro": {
       "reassurance_privacy_title": "回答はあなただけのものです",
       "reassurance_no_diagnosis_title": "診断は必要ありません",
-      "not_now": "今はしない"
+      "not_now": "今はしない",
+      "road_time_label": "約{minutes}分",
+      "road_time_body": "{screens}つの落ち着いた画面、画面ごとに1つの質問グループ。回答は進めながら保存されます。",
+      "road_private_label": "あなただけのもの",
+      "road_private_body": "お子さまに元の回答を見せることはありません — 学習者向けの安全な要約のみです。",
+      "road_iep_label": "IEPは任意",
+      "road_iep_body": "IEPや504がある場合は後でアップロードします。なくても、回答だけで十分です。",
+      "road_baseline_label": "個別化されたベースライン",
+      "road_baseline_body": "回答をもとに、お子さまに合わせたベースラインチェックを作成します — 汎用的なクイズではありません。"
+    },
+    "learner_assessment_resume": {
+      "headline": "{total}画面中{done}画面まで進んでいます",
+      "minutes_saved": "残りは約{minutes}分です。回答は保存されています。",
+      "continue": "続きから再開する"
     },
     "learner_assessment": {
       "placeholder_pronouns": "彼女 / 彼女の、彼 / 彼の、they / them…",
@@ -231,9 +244,13 @@
       "aac_body": "AIVO は AAC に対応した回答パターンに切り替えます。",
       "homework_coaching_label": "子どもは宿題を始めるのに助けが必要です",
       "homework_coaching_body": "AIVO はスキャフォールドされた開始促進を提供します。",
-      "autosave_indicator": "進めると回答は自動的に保存されます",
+      "autosave_indicator": "入力中に自動保存されます",
       "back_to_intro": "はじめに戻る",
-      "save_exit": "保存して終了"
+      "save_exit": "保存して終了",
+      "autosave_saving": "保存中…",
+      "autosave_saved": "保存しました ✓ · たった今",
+      "autosave_retry": "保存できませんでした — 再試行しています…",
+      "diagnoses_reassurance": "しっくりくるものを選んでください。AIVOに正式な診断名は必要ありません — 日々の助けになることだけで十分です。いつでも変更できます。"
     },
     "learner_assessment_review": {
       "reassurance_review_title": "適用前にもう一度確認",
