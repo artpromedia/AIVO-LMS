@@ -7,7 +7,7 @@
  * → approved) verbatim. Same conventions as `lesson_runs`: app-generated
  * TEXT ids (no FK), ISO-8601 TEXT timestamps, heavy state in JSONB.
  */
-import { pgTable, text, boolean, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, integer, jsonb, index } from "drizzle-orm/pg-core";
 
 export const learnerBrainProfiles = pgTable(
   "learner_brain_profiles",
@@ -18,6 +18,8 @@ export const learnerBrainProfiles = pgTable(
     approvalStatus: text("approval_status"),
     cloneStage: text("clone_stage"),
     approvedByParent: boolean("approved_by_parent").notNull().default(false),
+    /** Sprint C-06: monotonic profile revision; the approval record keys off it. */
+    revision: integer("revision").notNull().default(1),
     clonedAt: text("cloned_at"),
     generatedAt: text("generated_at").notNull(),
     updatedAt: text("updated_at").notNull(),

@@ -82,6 +82,7 @@ import type {
   IEPDocument,
   AccessibilityPreferences,
   LearnerBrainProfile,
+  BrainProfileApproval,
   LearnerProfile,
   LessonInteraction,
   LessonRun,
@@ -379,6 +380,18 @@ export interface LessonRunStore {
 export interface BrainProfileStore {
   getForLearner(learnerId: string, tenantId: string): Promise<LearnerBrainProfile | null>;
   upsert(profile: LearnerBrainProfile): Promise<LearnerBrainProfile>;
+}
+
+/**
+ * Sprint C-06 — the dedicated approval-record store. Append-only: one row per
+ * parent decision (approve / amend / decline), carrying consent + RAI
+ * versions, actor, the reviewed profile revision, folded modifications, and a
+ * hashed request IP. `record` writes a new row; `listForLearner` returns the
+ * tenant-scoped history newest-first.
+ */
+export interface BrainProfileApprovalStore {
+  record(approval: BrainProfileApproval): Promise<BrainProfileApproval>;
+  listForLearner(learnerId: string, tenantId: string): Promise<BrainProfileApproval[]>;
 }
 
 /**
@@ -840,6 +853,7 @@ export interface Persistence {
   assessments: AssessmentStore;
   lessonRuns: LessonRunStore;
   brainProfiles: BrainProfileStore;
+  brainProfileApprovals: BrainProfileApprovalStore;
   curriculum: CurriculumStore;
   compliance: ComplianceStore;
   quests: QuestStore;

@@ -575,6 +575,7 @@ export async function seedPostgres(db: Database): Promise<SeedResult> {
         approvalStatus: p.approvalStatus,
         cloneStage: p.cloneStage,
         approvedByParent: p.approvedByParent,
+        revision: p.revision ?? 1,
         clonedAt: p.clonedAt ?? null,
         generatedAt: p.generatedAt,
         updatedAt: p.updatedAt,

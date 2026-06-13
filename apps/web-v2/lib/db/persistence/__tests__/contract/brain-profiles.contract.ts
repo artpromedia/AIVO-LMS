@@ -18,6 +18,7 @@ function profile(over: Partial<LearnerBrainProfile> = {}): LearnerBrainProfile {
     approvedByParent: false,
     approvalStatus: "pending_parent_review",
     cloneStage: "pre_clone",
+    revision: 1,
     clonedAt: null,
     generatedAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
@@ -60,6 +61,16 @@ export function brainProfileStoreContract(
       expect(got!.approvalStatus).toBe("approved");
       expect(got!.approvedByParent).toBe(true);
       expect(got!.cloneStage).toBe("approved");
+    });
+
+    // Sprint C-06: the monotonic `revision` rides on the profile row (a real
+    // column in drizzle, a field in memory), so it must round-trip and update
+    // in place identically in both backends — the approval record keys off it.
+    it("round-trips and updates the C-06 revision", async () => {
+      await store.upsert(profile({ revision: 1 }));
+      expect((await store.getForLearner("lrn_1", "t_1"))!.revision).toBe(1);
+      await store.upsert(profile({ revision: 4 }));
+      expect((await store.getForLearner("lrn_1", "t_1"))!.revision).toBe(4);
     });
 
     it("scopes reads by tenant", async () => {

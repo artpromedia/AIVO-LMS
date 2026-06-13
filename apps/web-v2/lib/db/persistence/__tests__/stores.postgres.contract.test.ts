@@ -16,6 +16,7 @@ import { sql } from "drizzle-orm";
 import { createDb, type Database } from "@aivo/db";
 import { __setDbClient, __resetDbClient } from "../drizzle/client";
 import { drizzleBrainProfiles } from "../drizzle/brain-profiles";
+import { drizzleBrainProfileApprovals } from "../drizzle/brain-profile-approvals";
 import { drizzleLessonRuns } from "../drizzle/lesson-runs";
 import { drizzleNotifications } from "../drizzle/notifications";
 import { drizzleAudit } from "../drizzle/audit";
@@ -28,6 +29,7 @@ import { drizzleQuests } from "../drizzle/quests";
 import { drizzleAdmin } from "../drizzle/admin";
 import { drizzleCollaboration } from "../drizzle/collaboration";
 import { brainProfileStoreContract } from "./contract/brain-profiles.contract";
+import { brainProfileApprovalStoreContract } from "./contract/brain-profile-approvals.contract";
 import { lessonRunStoreContract } from "./contract/lesson-runs.contract";
 import { assessmentSubmitContract } from "./contract/assessments.contract";
 import { collaborationStoreContract } from "./contract/collaboration.contract";
@@ -54,6 +56,7 @@ const MIGRATIONS = [
   "0092_web_review_schedules",
   "0094_web_mastery_snapshots",
   "0098_web_baseline_bank",
+  "0108_brain_profile_approvals",
 ];
 
 const TABLES = [
@@ -62,6 +65,7 @@ const TABLES = [
   "generated_lesson_plans",
   "lesson_runs",
   "learner_brain_profiles",
+  "brain_profile_approvals",
   "web_notifications",
   "web_notification_deliveries",
   "web_audit_logs",
@@ -136,6 +140,7 @@ afterAll(() => {
 if (TEST_URL) {
   const P = "postgres";
   brainProfileStoreContract(P, () => drizzleBrainProfiles, truncateAll);
+  brainProfileApprovalStoreContract(P, () => drizzleBrainProfileApprovals, truncateAll);
   lessonRunStoreContract(P, () => drizzleLessonRuns, truncateAll);
   notificationStoreContract(P, () => drizzleNotifications, truncateAll);
   auditStoreContract(P, () => drizzleAudit, truncateAll);

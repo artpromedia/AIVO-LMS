@@ -66,6 +66,7 @@ runInBothModes("assessments/brainProfiles same-backend", (ctx) => {
       approvedByParent: false,
       approvalStatus: "pending_parent_review",
       cloneStage: "pre_clone",
+      revision: 1,
       clonedAt: null,
       generatedAt: now,
       updatedAt: now,

@@ -517,10 +517,57 @@ export type LearnerBrainProfile = {
   approvedByParent: boolean;
   approvalStatus: BrainProfileApprovalStatus;
   cloneStage: BrainProfileCloneStage;
+  /**
+   * Sprint C-06: monotonic integer that increments every time the profile's
+   * `state` is rebuilt (regenerate, re-clone) or folded at approval. The
+   * approval record (`BrainProfileApproval`) keys off this so a stored
+   * approval always names the exact profile revision the parent reviewed —
+   * a later re-clone bumps the revision and the old approval no longer
+   * describes the live profile. Backfilled to 1 in both adapters for rows
+   * written before the field existed.
+   */
+  revision: number;
   /** Timestamp of the post-baseline clone, null while in pre_clone. */
   clonedAt: ISODate | null;
   generatedAt: ISODate;
   updatedAt: ISODate;
+};
+
+/**
+ * Sprint C-06: the deliberate, recorded act of a parent approving (or
+ * declining) a child's learning profile. Persisted in a dedicated store —
+ * `brain_profile_approvals` — instead of being buried in the profile's
+ * display JSON, so consent + Responsible-AI acknowledgement are first-class,
+ * queryable audit evidence with the actor, the consent/RAI versions, the
+ * profile revision, and a hashed request IP.
+ *
+ * Web mirror of the brain-svc consent/RAI record persisted in
+ * `xai_explanation` (`services/brain-svc/src/brain_svc/routes/brain.py`); the
+ * cross-stack unification is C-12, out of scope here.
+ */
+export type BrainProfileApprovalAction = "approved" | "amended" | "declined";
+
+export type BrainProfileApproval = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  brainProfileId: ID;
+  /** The `LearnerBrainProfile.revision` the parent reviewed and acted on. */
+  profileRevision: number;
+  /** The parent (or guardian) who performed the act. */
+  actorUserId: ID;
+  action: BrainProfileApprovalAction;
+  /** Version string of the COPPA consent copy the parent agreed to. */
+  consentVersion: string;
+  /** Version of the Responsible-AI disclosures acknowledged. Defaults to the
+   *  reviewed `profileRevision` (mirrors brain-svc `rai_version` semantics). */
+  raiVersion: string;
+  /** Field-level corrections folded at approval (Sprint C-05 contract shape);
+   *  empty for an unamended approve or a decline. */
+  modifications: ParentModification[];
+  /** SHA-256 hash of the request IP (consent evidence; raw IP never stored). */
+  ipHash: string | null;
+  createdAt: ISODate;
 };
 
 /**

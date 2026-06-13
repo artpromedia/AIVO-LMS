@@ -42,6 +42,7 @@ import type {
   IEPDocument,
   IEPExtraction,
   LearnerBrainProfile,
+  BrainProfileApproval,
   LearnerBrainProfileState,
   LearnerProfile,
   LearningPath,
@@ -572,6 +573,9 @@ export async function upsertBrainProfile(
       approvedByParent: false,
       approvalStatus: "pending_parent_review",
       cloneStage: "pre_clone",
+      // C-06: a fresh generation rebuilds `state`, so the revision advances —
+      // any prior approval no longer describes the live profile.
+      revision: (existing.revision ?? 1) + 1,
       clonedAt: null,
       generatedAt: now,
     };
@@ -585,6 +589,7 @@ export async function upsertBrainProfile(
     approvedByParent: false,
     approvalStatus: "pending_parent_review",
     cloneStage: "pre_clone",
+    revision: 1,
     clonedAt: null,
     generatedAt: now,
     updatedAt: now,
@@ -665,6 +670,7 @@ async function prepareBrainCloneFromSummary(
       approvedByParent: false,
       approvalStatus: "pending_parent_review",
       cloneStage: "cloned",
+      revision: 1,
       clonedAt: now,
       generatedAt: now,
       updatedAt: now,
@@ -674,6 +680,8 @@ async function prepareBrainCloneFromSummary(
     ...existing,
     state: parsed.data,
     cloneStage: existing.cloneStage === "approved" ? "approved" : "cloned",
+    // C-06: re-clone rebuilds `state` from a fresh baseline → revision advances.
+    revision: (existing.revision ?? 1) + 1,
     clonedAt: existing.clonedAt ?? now,
     updatedAt: now,
   };
@@ -792,9 +800,50 @@ export async function approveBrainClone(
     approvedByParent: true,
     approvalStatus: status,
     cloneStage: "approved",
+    // C-06: folding corrections mutates the live `state`, so the revision
+    // advances; a plain approve (no fold) leaves the reviewed revision intact.
+    revision: modifications.length > 0 ? (existing.revision ?? 1) + 1 : (existing.revision ?? 1),
     updatedAt: nowIso(),
   };
   return getPersistence().brainProfiles.upsert(next);
+}
+
+/**
+ * Sprint C-06 — write one dedicated approval record (approve / amend /
+ * decline). This is the audit evidence the ceremony produces: actor, action,
+ * consent + RAI versions, the reviewed profile revision, folded modifications,
+ * and a hashed request IP — kept out of the profile's display JSON so consent
+ * is first-class, queryable. The caller (the approve server action) is
+ * responsible for having enforced consent + RAI first; this just persists the
+ * record. `id`/`createdAt` are filled in here when omitted.
+ */
+export async function recordBrainApproval(
+  input: Omit<BrainProfileApproval, "id" | "createdAt"> &
+    Partial<Pick<BrainProfileApproval, "id" | "createdAt">>,
+): Promise<BrainProfileApproval> {
+  const approval: BrainProfileApproval = {
+    id: input.id ?? newId("bpa"),
+    createdAt: input.createdAt ?? nowIso(),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    brainProfileId: input.brainProfileId,
+    profileRevision: input.profileRevision,
+    actorUserId: input.actorUserId,
+    action: input.action,
+    consentVersion: input.consentVersion,
+    raiVersion: input.raiVersion,
+    modifications: input.modifications,
+    ipHash: input.ipHash,
+  };
+  return getPersistence().brainProfileApprovals.record(approval);
+}
+
+/** Sprint C-06 — the tenant-scoped approval history for a learner, newest-first. */
+export async function listBrainApprovals(
+  learnerId: string,
+  tenantId: string,
+): Promise<BrainProfileApproval[]> {
+  return getPersistence().brainProfileApprovals.listForLearner(learnerId, tenantId);
 }
 
 // ===== Baseline (Sprint 8) =====

@@ -33,6 +33,12 @@ import BrainBuildingSequence, {
   type StrengthsDTO,
 } from "@/components/brain/brain-building-sequence";
 import { hasSeenClone } from "@/lib/clone-flags";
+import {
+  ApprovalCeremony,
+  type CeremonyRai,
+  type CeremonyStrings,
+} from "./approval-ceremony";
+import { WhatHappensNext, type NextMission, type NextStepsStrings } from "./what-happens-next";
 
 type StageItem = { label: string; value?: string };
 type Stage = {
@@ -59,19 +65,19 @@ export function BrainBuildingClient({
   eyebrowLabel,
   sphereAriaLabel,
   doneLabel,
-  approveLabel,
-  amendLabel,
-  stagedCorrectionsLabel,
   backLabel,
   alreadyApprovedLabel,
   replayCloneLabel,
   privacyNoteLabel,
   privacyLinkLabel,
   alreadyApproved,
+  celebrate,
   stages,
   primaryHue,
   secondaryHues,
   sequence,
+  ceremony,
+  nextSteps,
   approveAction,
 }: {
   learnerId: string;
@@ -81,21 +87,32 @@ export function BrainBuildingClient({
   eyebrowLabel: string;
   sphereAriaLabel: string;
   doneLabel: string;
-  approveLabel: string;
-  amendLabel: string;
-  /** Sprint C-05: honest line about corrections staged on the review screen
-   *  that the Approve button will apply (null when none are staged). */
-  stagedCorrectionsLabel: string | null;
   backLabel: string;
   alreadyApprovedLabel: string;
   replayCloneLabel: string;
   privacyNoteLabel: string;
   privacyLinkLabel: string;
   alreadyApproved: boolean;
+  /** Sprint C-06: true immediately after approval — render the ignition +
+   *  "what happens next" screen instead of the recap/ceremony. */
+  celebrate: boolean;
   stages: Stage[];
   primaryHue: string;
   secondaryHues: string[];
   sequence: BuildingSequenceData;
+  /** Sprint C-06: the approval-ceremony content (RAI disclosures + strings). */
+  ceremony: {
+    rai: CeremonyRai;
+    strings: CeremonyStrings;
+    consentVersion: string;
+    raiVersion: string;
+  };
+  /** Sprint C-06: screen-7 content (first mission, active supports, strings). */
+  nextSteps: {
+    mission: NextMission;
+    supports: string[];
+    strings: NextStepsStrings;
+  };
   approveAction: (formData: FormData) => void | Promise<void>;
 }) {
   const [active, setActive] = useState(0);
@@ -140,6 +157,25 @@ export function BrainBuildingClient({
   }, [sequenceDone, stages.length]);
 
   const allDone = active >= stages.length;
+
+  // Sprint C-06 — on approval success the page redirects back here with
+  // `?celebrate=1`. Render the ignition + "what happens next" screen straight
+  // away, bypassing the cinematic recap entirely (the moment already happened).
+  if (celebrate && alreadyApproved) {
+    return (
+      <div className="bc-watch-root">
+        <WhatHappensNext
+          learnerId={learnerId}
+          primaryHue={primaryHue}
+          secondaryHues={secondaryHues}
+          pulseRate={sequence.pulseRate}
+          mission={nextSteps.mission}
+          supports={nextSteps.supports}
+          strings={nextSteps.strings}
+        />
+      </div>
+    );
+  }
 
   // Phase 0 — the master→child cloning animation. While `showClone` is
   // undecided (null) we render nothing visible to avoid a flash of the
@@ -248,36 +284,29 @@ export function BrainBuildingClient({
 
       <section className="bc-watch-actions" data-state={allDone ? "done" : "running"}>
         {alreadyApproved ? (
-          <p className="bc-watch-approved-note">{alreadyApprovedLabel}</p>
+          <>
+            <p className="bc-watch-approved-note">{alreadyApprovedLabel}</p>
+            <Link href={`/parent/learners/${learnerId}`} className="bc-watch-back-link">
+              {backLabel}
+            </Link>
+          </>
+        ) : !allDone ? (
+          <p className="bc-watch-done-label" aria-live="polite">
+            {`${active} / ${stages.length}`}
+          </p>
         ) : (
           <>
-            <p className="bc-watch-done-label" aria-live="polite">
-              {allDone ? doneLabel : `${active} / ${stages.length}`}
-            </p>
-            {stagedCorrectionsLabel ? (
-              <p className="bc-watch-corrections-staged" role="status">
-                {stagedCorrectionsLabel}
-              </p>
-            ) : null}
-            <div className="bc-watch-buttons">
-              <Link
-                href={`/parent/learners/${learnerId}/brain-review`}
-                className="bc-watch-amend-btn"
-              >
-                {amendLabel}
-              </Link>
-              <form action={approveAction}>
-                <input type="hidden" name="learnerId" value={learnerId} />
-                <button
-                  type="submit"
-                  className="bc-watch-approve-btn"
-                  disabled={!allDone}
-                  aria-disabled={!allDone}
-                >
-                  {approveLabel}
-                </button>
-              </form>
-            </div>
+            <p className="bc-watch-done-label">{doneLabel}</p>
+            {/* Sprint C-06 — the approval ceremony replaces the bare button:
+                recap line, RAI panel, consent, deliberate two-step approve. */}
+            <ApprovalCeremony
+              learnerId={learnerId}
+              rai={ceremony.rai}
+              strings={ceremony.strings}
+              consentVersion={ceremony.consentVersion}
+              raiVersion={ceremony.raiVersion}
+              approveAction={approveAction}
+            />
             <Link href={`/parent/learners/${learnerId}`} className="bc-watch-back-link">
               {backLabel}
             </Link>
@@ -474,50 +503,8 @@ export function BrainBuildingClient({
           font-size: 0.95rem;
           color: var(--iw-ink, #0b1020);
         }
-        .bc-watch-corrections-staged {
-          margin: 0.35rem 0 0;
-          font-size: 0.875rem;
-          /* --iw-ink-soft is the AA-contrast muted ink token used across the
-             watch surface for secondary copy. */
-          color: var(--iw-ink-soft, #475569);
-        }
-        .bc-watch-buttons {
-          display: flex;
-          flex-direction: column-reverse;
-          gap: 0.6rem;
-        }
-        @media (min-width: 540px) {
-          .bc-watch-buttons {
-            flex-direction: row;
-            justify-content: flex-end;
-          }
-        }
-        .bc-watch-amend-btn,
-        .bc-watch-approve-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0.75rem 1.4rem;
-          font-size: 0.95rem;
-          font-weight: 600;
-          border-radius: 9999px;
-          text-decoration: none;
-          cursor: pointer;
-          border: 1px solid var(--iw-border, #e2e6f0);
-          background: transparent;
-          color: var(--iw-ink, #0b1020);
-        }
-        .bc-watch-approve-btn {
-          background: var(--bc-primary);
-          color: #fff;
-          border-color: var(--bc-primary);
-        }
-        .bc-watch-approve-btn:disabled,
-        .bc-watch-approve-btn[aria-disabled="true"] {
-          opacity: 0.55;
-          cursor: not-allowed;
-        }
-        .bc-watch-amend-btn:hover { background: var(--iw-raised, #f4f6fb); }
+        /* Approve / amend button styles now live in the ApprovalCeremony
+           component (C-06), which owns the recap's approval gate. */
         .bc-watch-back-link {
           font-size: 0.9rem;
           color: var(--iw-ink-muted, #4b5573);

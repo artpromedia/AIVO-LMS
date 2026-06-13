@@ -1,12 +1,12 @@
 /**
- * Sprint C-03 — axe coverage for the parent brain reveal.
+ * Sprint C-03 / C-06 — axe coverage + keyboard-path coverage for the parent
+ * brain reveal and the approval ceremony.
  *
- * The reveal at `/parent/learners/[learnerId]/brain-clone-watch` is the
- * single most emotionally loaded parent surface (often read at 11pm on a
- * phone), so it must clear the same axe bar as the role homes in
- * `role-a11y.playwright.ts`. We audit the recap state — the stable
- * post-cinematic surface that carries the build summary, the truthful
- * privacy footnote, and the approve/amend gate.
+ * The reveal at `/parent/learners/[learnerId]/brain-clone-watch` is the single
+ * most emotionally loaded parent surface (often read at 11pm on a phone) AND
+ * the most consequential act they perform, so it must clear the same axe bar
+ * as the role homes in `role-a11y.playwright.ts` AND offer a fully
+ * keyboard/switch-accessible approve path (the C-06 two-step Review → Confirm).
  *
  * Conventions mirror `role-a11y.playwright.ts`: `@a11y` tag (picked up by
  * `pnpm test:a11y`), mock parent session cookie, `injectAxe` + `checkA11y`
@@ -14,10 +14,9 @@
  *
  * Targets the seeded demo clone learner (`lib/db/seed.ts` → lrn_demo_clone),
  * deterministically at the brain-clone-review stage. `prefers-reduced-motion`
- * is emulated so the page lands directly on the recap (the cinematic intro
- * auto-skips), which also keeps the audit deterministic. The recap renders
- * for both the to-review and already-approved stages, so this spec stays
- * green regardless of whether a sibling spec has approved the clone.
+ * is emulated so the page lands directly on the recap + ceremony (the cinematic
+ * intro auto-skips), which keeps the audit deterministic and exercises the
+ * reduced-motion approve variant (two-step confirm, no hold animation).
  */
 import { test, expect } from "@playwright/test";
 import { injectAxe, checkA11y } from "axe-playwright";
@@ -41,17 +40,17 @@ test.describe("@a11y brain-clone-watch reveal", () => {
     await context.addCookies([
       { name: "aivo_mock_session", value: "parent", domain: "127.0.0.1", path: "/" },
     ]);
-    // Reduced motion lands straight on the recap + approval gate (see
+    // Reduced motion lands straight on the recap + ceremony (see
     // building-client.tsx), the state this audit pins.
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`/parent/learners/${CLONE_LEARNER}/brain-clone-watch`);
     await page.waitForSelector("main", { timeout: 30_000 });
 
-    // The recap is up: either the approval gate (fresh clone) or the
-    // already-approved note (a sibling spec approved it earlier).
+    // The recap is up: either the ceremony's "Review & approve" gate (fresh
+    // clone) or the already-approved note (a sibling spec approved it earlier).
     await expect(
       page
-        .getByRole("button", { name: /approve/i })
+        .getByRole("button", { name: /review & approve|approve/i })
         .or(page.getByText(/approved/i))
         .first(),
     ).toBeVisible({ timeout: 30_000 });
@@ -65,5 +64,59 @@ test.describe("@a11y brain-clone-watch reveal", () => {
     // Sanity assertion so a 200-with-blank-body regression is caught even
     // when axe reports no violations against an empty region.
     await expect(page.locator("main")).toBeVisible();
+  });
+
+  test(`@a11y keyboard-only approve via the two-step ceremony (${CLONE_LEARNER})`, async ({
+    context,
+    page,
+  }) => {
+    await context.addCookies([
+      { name: "aivo_mock_session", value: "parent", domain: "127.0.0.1", path: "/" },
+    ]);
+    // Reduced motion → the ceremony renders the keyboard-friendly two-step
+    // approve (no press-and-hold), exactly the path a switch/keyboard user
+    // takes. Bail out gracefully if a sibling spec already approved the clone.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`/parent/learners/${CLONE_LEARNER}/brain-clone-watch`);
+    await page.waitForSelector("main", { timeout: 30_000 });
+
+    const reviewBtn = page.getByRole("button", { name: /review & approve/i });
+    if (!(await reviewBtn.count())) {
+      test.skip(true, "clone already approved by a sibling spec — nothing to approve");
+      return;
+    }
+
+    // The Responsible-AI panel must be reachable and operable by keyboard.
+    const raiToggle = page.getByRole("button", { name: /what aivo based this on/i });
+    await raiToggle.focus();
+    await expect(raiToggle).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(raiToggle).toHaveAttribute("aria-expanded", "true");
+
+    // The consent checkbox must be operable by keyboard.
+    const consent = page.getByRole("checkbox");
+    await consent.focus();
+    await page.keyboard.press("Space");
+    await expect(consent).toBeChecked();
+
+    // Step 1: "Review & approve" is now enabled — activate it with the keyboard.
+    await expect(reviewBtn).toBeEnabled();
+    await reviewBtn.focus();
+    await page.keyboard.press("Enter");
+
+    // Step 2: the confirm step appears; activate the confirm button by keyboard.
+    const confirmBtn = page.getByRole("button", { name: /approve & activate|yes, approve/i });
+    await expect(confirmBtn).toBeVisible();
+    await confirmBtn.focus();
+    await page.keyboard.press("Enter");
+
+    // Lands on the "what happens next" celebration screen.
+    await expect(page.getByTestId("brain-approval-next")).toBeVisible({ timeout: 30_000 });
+    await injectAxe(page);
+    await checkA11y(page, "main", {
+      detailedReport: true,
+      detailedReportOptions: { html: true },
+      axeOptions: { rules: AXE_RULES },
+    });
   });
 });

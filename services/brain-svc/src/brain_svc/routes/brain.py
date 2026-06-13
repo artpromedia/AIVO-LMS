@@ -478,6 +478,26 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
 
     db.commit()
 
+    # Sprint C-06: emit a BRAIN_APPROVED audit event in parity with
+    # BRAIN_CLONED (clone route, above). Approval is the single most
+    # consequential parent act — it must leave the same hash-chained audit
+    # trail as the clone that preceded it. Best-effort: emit_brain_audit
+    # never raises, so a degraded audit-svc cannot break the approval.
+    await emit_brain_audit(
+        event_type="BRAIN_APPROVED",
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        resource_id=str(current["id"]),
+        actor_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        actor_role=getattr(auth, "role", None),
+        details={
+            "version": new_version,
+            "consent_version": request.consent_version,
+            "rai_version": rai_acknowledgement["rai_version"],
+            "modifications": len(parent_mods_record),
+        },
+    )
+
     try:
         import httpx
         fl = current.get("functioning_level_profile", {})
@@ -584,6 +604,18 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
 
     db.commit()
 
+    # Sprint C-06: BRAIN_AMENDED audit event, parity with BRAIN_APPROVED /
+    # BRAIN_CLONED. An amendment is a recorded parent act too.
+    await emit_brain_audit(
+        event_type="BRAIN_AMENDED",
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        resource_id=str(current["id"]),
+        actor_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        actor_role=getattr(auth, "role", None),
+        details={"version": new_version},
+    )
+
     try:
         import httpx
         mastery = current.get("mastery_levels", {})
@@ -624,18 +656,62 @@ async def decline_brain(learner_id: str, request: BrainDeclineRequest, db: Sessi
     if current.get("approval_status") not in ("pending_parent_review", None):
         raise HTTPException(status_code=400, detail=f"Brain already {current.get('approval_status')}")
 
-    db.execute(text("DELETE FROM brain_state_snapshots WHERE brain_state_id = :bsid"), {"bsid": current["id"]})
-    db.execute(text("DELETE FROM brain_states WHERE id = :id"), {"id": current["id"]})
+    # Sprint C-06: ARCHIVE, never destroy. The previous behaviour deleted the
+    # brain, every snapshot, AND the child's discovery_adventure
+    # assessment_attempts — wiping out the baseline work the child actually
+    # did. Declining a profile is a guardian rejecting the AI's *inference*,
+    # not the child's effort. We keep the brain row (status 'declined'), keep
+    # the snapshot history, write a parent_declined snapshot for the trail,
+    # and leave assessment_attempts untouched so the parent can rebuild from
+    # the same baseline with corrections.
+    now = _utcnow()
+
+    snap_data = {}
+    for field in ["mastery_levels", "disability_signals", "functioning_level_profile",
+                  "iep_profile", "sensory_profile", "active_accommodations",
+                  "active_tutors", "functional_curriculum", "episodic_memory",
+                  "visual_identity"]:
+        val = current.get(field)
+        if isinstance(val, str):
+            try: val = json.loads(val)
+            except: pass
+        snap_data[field] = val
+    snap_data["declined_reason"] = request.reason
 
     db.execute(
-        text("""DELETE FROM assessment_attempts
-                WHERE learner_id = :lid AND type = 'discovery_adventure'"""),
-        {"lid": learner_id}
+        text("""UPDATE brain_states
+                SET approval_status = 'declined', parent_notes = :reason, updated_at = :now
+                WHERE id = :id"""),
+        {"reason": request.reason, "now": now, "id": current["id"]}
+    )
+
+    snap_id = str(uuid.uuid4())
+    db.execute(
+        text("""INSERT INTO brain_state_snapshots
+                (id, brain_state_id, learner_id, version, trigger, snapshot, created_at)
+                VALUES (:id, :bsid, :lid, :v, 'parent_declined', :snap, :now)"""),
+        {"id": snap_id, "bsid": current["id"], "lid": learner_id,
+         "v": current["version"] or 1, "snap": json.dumps(snap_data), "now": now}
     )
 
     db.commit()
 
-    return {"status": "declined", "reason": request.reason, "message": "Brain clone removed. Learner can retake the baseline assessment."}
+    await emit_brain_audit(
+        event_type="BRAIN_DECLINED",
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        resource_id=str(current["id"]),
+        actor_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        actor_role=getattr(auth, "role", None),
+        details={"version": current["version"] or 1, "reason": request.reason},
+    )
+
+    return {
+        "status": "declined",
+        "reason": request.reason,
+        "snapshot_id": snap_id,
+        "message": "Profile set aside. The baseline is kept — you can rebuild this profile with your corrections.",
+    }
 
 @router.get("/{learner_id}/history")
 async def get_brain_history(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):

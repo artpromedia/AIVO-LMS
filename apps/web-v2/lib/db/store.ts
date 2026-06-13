@@ -28,6 +28,7 @@ import type {
   IEPDocument,
   LearnerBadge,
   LearnerBrainProfile,
+  BrainProfileApproval,
   LearnerEngagement,
   LearnerProfile,
   LearnerSensoryProfile,
@@ -150,6 +151,8 @@ export type Store = {
   iepDocuments: Map<string, IEPDocument>;
   accommodationSummaries: Map<string, AccommodationSummary>;
   brainProfiles: Map<string, LearnerBrainProfile>;
+  /** Sprint C-06: append-only parent approval/amend/decline records. */
+  brainProfileApprovals: BrainProfileApproval[];
 
   subjects: Map<string, Subject>;
   skills: Map<string, Skill>;
@@ -324,6 +327,7 @@ function createStore(): Store {
     iepDocuments: new Map(),
     accommodationSummaries: new Map(),
     brainProfiles: new Map(),
+    brainProfileApprovals: [],
     subjects: new Map(),
     skills: new Map(),
     masteryMaps: new Map(),

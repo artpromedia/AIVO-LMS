@@ -250,6 +250,7 @@ runInBothModes("persistence adapter", (ctx) => {
       approvedByParent: false,
       approvalStatus: "pending_parent_review",
       cloneStage: "pre_clone",
+      revision: 1,
       clonedAt: null,
       generatedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

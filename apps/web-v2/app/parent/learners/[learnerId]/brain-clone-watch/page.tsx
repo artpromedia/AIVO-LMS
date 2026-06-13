@@ -1,26 +1,30 @@
 /**
- * Sprint 14: Parent-side Brain Clone "Building Sequence" + approval gate.
+ * Sprint 14 / C-06: Parent-side Brain Clone "Building Sequence" + the approval
+ * ceremony.
  *
  * Runs in parallel with the learner's Awakening sequence
- * (`/learner/brain-clone/[learnerId]`). The parent sees the same brain
- * being assembled, but with explainable-AI annotations and the ability
- * to approve / amend the clone before it activates. Spec source:
- * `attached_assets/AIVO_Brain_Clone_Building_Sequence_*.md`.
+ * (`/learner/brain-clone/[learnerId]`). The parent sees the same profile being
+ * assembled, then performs the **approval ceremony** (C-06): the Responsible-AI
+ * disclosures, an explicit consent checkbox, and a deliberate two-step approve
+ * — after which the system writes a dedicated approval record (actor, consent
+ * version, RAI version, profile revision, modifications, ipHash) and lands the
+ * parent on the ignition + "what happens next" screen.
  *
  * Server actions:
- *   - approveBrainCloneAction — flips cloneStage to "approved" and audits.
- *   - amendBrainCloneAction   — re-routes the parent to the brain-profile
- *                                edit surface; flagged "amended" once they
- *                                confirm.
+ *   - approveBrainCloneAction — REQUIRES consentGiven + raiAcknowledged
+ *     server-side (defense-in-depth; a forged POST without them is rejected),
+ *     folds any C-05 staged corrections via `approveBrainClone`, writes the
+ *     approval record, then redirects to the celebration screen.
+ *   - rebuildBrainCloneAction — re-runs the clone from the latest baseline.
  */
 import { notFound, redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { TUTORS, type TutorKey } from "@aivo/brand";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import {
-  approveBrainClone,
   cloneBrainFromBaseline,
   getActiveBaselineForLearner,
   getBrainProfile,
@@ -31,11 +35,58 @@ import {
 } from "@/lib/db/repos";
 import { assessmentSectionSchemas } from "@/lib/validators/parent-assessment";
 import { MASTERY_ESTIMATE_LABEL_KEY, estimateForScore } from "@/lib/learner/mastery-estimate";
+import { selectBrainExplainability } from "@/lib/learner/brain-explainability";
+import { pickTodaysMission } from "@/lib/learner/today";
+import { SUPPORT_DEFAULT_BY_SLUG, type CoreSupportSlug } from "@/lib/db/brain-corrections";
+import { hashIpFromHeaders } from "@/lib/bff/consent-guard";
 import { visualBrainBuildEnabled } from "@/lib/feature-flags";
 import { audit } from "@/lib/bff/audit";
-import { newRequestId } from "@/lib/observability/logger";
+import { newRequestId, logger } from "@/lib/observability/logger";
+import type { LearnerBrainProfileState } from "@/lib/db/types";
 import { BrainBuildingClient } from "./building-client";
 import { BrainBuildPending } from "./build-pending";
+import { performBrainApproval, BRAIN_CONSENT_VERSION } from "./approve-action";
+
+/** The five core supports, with the translated label key used on the review
+ *  screen (`parent.brain_review.support_*`) — reused here so screen 7's active
+ *  supports list speaks the same language without new i18n keys. */
+const CORE_SUPPORTS: Array<{ slug: CoreSupportSlug; labelKey: string }> = [
+  { slug: "extended_time", labelKey: "support_extended_time" },
+  { slug: "read_aloud", labelKey: "support_read_aloud" },
+  { slug: "speech_to_text", labelKey: "support_speech_to_text" },
+  { slug: "visual_schedules", labelKey: "support_visual_schedules" },
+  { slug: "sensory_breaks", labelKey: "support_sensory_breaks" },
+];
+const EXTRA_SUPPORT_LABEL_KEY: Record<string, string> = {
+  aac_communication_support: "support_aac_communication_support",
+};
+
+function humanizeSupport(value: string): string {
+  const spaced = value.replace(/[-_]/g, " ").trim();
+  return spaced.length === 0 ? value : spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+/** The active support labels for screen 7 (core supports that are ON + any
+ *  non-core active accommodation), humanised via the review-screen catalog. */
+function activeSupportLabels(
+  state: LearnerBrainProfileState,
+  tReview: Awaited<ReturnType<typeof getTranslations>>,
+): string[] {
+  const labels: string[] = [];
+  for (const core of CORE_SUPPORTS) {
+    const on =
+      state.supportDefaults[SUPPORT_DEFAULT_BY_SLUG[core.slug]] ||
+      state.activeAccommodations.includes(core.slug);
+    if (on) labels.push(tReview(core.labelKey));
+  }
+  const coreSlugs = new Set<string>(CORE_SUPPORTS.map((c) => c.slug));
+  for (const acc of state.activeAccommodations) {
+    if (coreSlugs.has(acc)) continue;
+    const labelKey = EXTRA_SUPPORT_LABEL_KEY[acc];
+    labels.push(labelKey ? tReview(labelKey) : humanizeSupport(acc));
+  }
+  return labels;
+}
 
 async function approveBrainCloneAction(formData: FormData) {
   "use server";
@@ -46,13 +97,40 @@ async function approveBrainCloneAction(formData: FormData) {
   if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     redirect("/parent/learners");
   }
-  const amended = String(formData.get("amended") ?? "") === "true";
-  const result = await approveBrainClone(learnerId, session.tenantId, { amended });
+
+  // Sprint C-06 — the trust gate + fold + record live in `performBrainApproval`
+  // (testable without Next's redirect machinery). The ceremony UI disables the
+  // action until the RAI panel is opened and the consent box is checked, but a
+  // forged POST that omits either field is REJECTED here regardless of the UI.
+  const result = await performBrainApproval({
+    tenantId: session.tenantId,
+    actorUserId: session.userId,
+    learnerId,
+    consentGiven: String(formData.get("consentGiven") ?? "") === "true",
+    raiAcknowledged: String(formData.get("raiAcknowledged") ?? "") === "true",
+    consentVersion: String(formData.get("consentVersion") ?? "") || BRAIN_CONSENT_VERSION,
+    raiVersion: String(formData.get("raiVersion") ?? "") || null,
+    ipHash: hashIpFromHeaders(await headers()),
+  });
+
+  if (!result.ok) {
+    logger.warn({ event: "brain_profile.approve_rejected", learnerId, reason: result.reason });
+    // Bounce back to the ceremony — nothing was approved or recorded.
+    redirect(`/parent/learners/${learnerId}/brain-clone-watch`);
+  }
+
   audit(session, "brain_profile.approve", newRequestId(), {
     learnerId,
-    metadata: { amended, ok: Boolean(result) },
+    metadata: {
+      amended: result.profile.approvalStatus === "amended",
+      approvalRecordId: result.record.id,
+      profileRevision: result.record.profileRevision,
+      consentVersion: result.record.consentVersion,
+      raiVersion: result.record.raiVersion,
+    },
   });
-  redirect(`/parent/learners/${learnerId}`);
+  // Land on the ignition + "what happens next" celebration screen.
+  redirect(`/parent/learners/${learnerId}/brain-clone-watch?celebrate=1`);
 }
 
 async function rebuildBrainCloneAction(formData: FormData) {
@@ -78,11 +156,14 @@ async function rebuildBrainCloneAction(formData: FormData) {
 
 export default async function BrainCloneWatchPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ learnerId: string }>;
+  searchParams: Promise<{ celebrate?: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const { celebrate } = await searchParams;
   if (!(await parentCanAccessLearner(session.userId, learnerId, session.tenantId))) {
     notFound();
   }
@@ -123,6 +204,7 @@ export default async function BrainCloneWatchPage({
 
   const s = profile.state;
   const alreadyApproved = profile.cloneStage === "approved";
+  const celebrating = celebrate === "1" && alreadyApproved;
   // Sprint C-05: corrections the parent staged on the review screen are
   // applied when they approve here. Surface the count so the recap's Approve
   // button is honest about what it will do (the fold happens in
@@ -247,6 +329,91 @@ export default async function BrainCloneWatchPage({
     },
   ];
 
+  // ── Sprint C-06: ceremony (screen 6) + "what happens next" (screen 7) ──
+  const explain = selectBrainExplainability(s);
+  const ceremony = {
+    rai: {
+      sources: explain.raiComplianceDetail.dataSources,
+      biasMitigations: explain.raiComplianceDetail.biasMitigations,
+      transparency: explain.raiComplianceDetail.transparency,
+      humanOversight: explain.raiComplianceDetail.humanOversight,
+    },
+    consentVersion: BRAIN_CONSENT_VERSION,
+    // The RAI disclosures are pinned to the revision the parent is reviewing.
+    raiVersion: String(profile.revision),
+    strings: {
+      recap: t("ceremony_recap"),
+      raiToggle: t("ceremony_rai_toggle"),
+      raiClose: t("ceremony_rai_close"),
+      raiSourcesTitle: t("ceremony_rai_sources_title"),
+      raiSourcesEmpty: t("ceremony_rai_sources_empty", { name: learner.displayName }),
+      raiBiasTitle: t("ceremony_rai_bias_title"),
+      raiTransparencyTitle: t("ceremony_rai_transparency_title"),
+      raiOversightTitle: t("ceremony_rai_oversight_title"),
+      consentTitle: t("ceremony_consent_title", { name: learner.displayName }),
+      consentDesc: t("ceremony_consent_desc"),
+      gateHint: t("ceremony_gate_hint"),
+      review: t("ceremony_review"),
+      confirmTitle: t("ceremony_confirm_title", { name: learner.displayName }),
+      confirmBody: t("ceremony_confirm_body"),
+      confirm: t("ceremony_confirm"),
+      cancel: t("ceremony_cancel"),
+      hold: t("ceremony_hold"),
+      holdRelease: t("ceremony_hold_release"),
+      holdProgress: t("ceremony_hold_progress"),
+      submitting: t("ceremony_submitting"),
+      amendLabel: t("watch_amend"),
+      stagedCorrections:
+        stagedCorrectionCount > 0
+          ? t("watch_corrections_staged", { count: stagedCorrectionCount })
+          : null,
+    },
+  };
+
+  // Screen 7 is only rendered when celebrating; compute its data only then to
+  // avoid the mission-picker work on the recap path.
+  const tReview = await getTranslations("parent.brain_review");
+  let nextSteps;
+  const nextStepsStrings = {
+    eyebrow: t("next_eyebrow"),
+    title: t("next_title", { name: learner.displayName }),
+    subtitle: t("next_subtitle"),
+    missionTitle: t("next_mission_title", { name: learner.displayName }),
+    missionBlocked: t("next_mission_blocked", { name: learner.displayName }),
+    supportsTitle: t("next_supports_title"),
+    supportsEmpty: t("next_supports_empty"),
+    inviteTitle: t("next_invite_title", { name: learner.displayName }),
+    inviteBody: t("next_invite_body"),
+    inviteCta: t("next_invite_cta", { name: learner.displayName }),
+    reassure: t("next_reassure", { name: learner.displayName }),
+    done: t("next_done", { name: learner.displayName }),
+    sphereAriaLabel: t("clone_child_label", { name: learner.displayName }),
+  };
+  if (celebrating) {
+    const mission = await pickTodaysMission(learnerId, session.tenantId);
+    nextSteps = {
+      mission: mission.ready
+        ? {
+            ready: true as const,
+            caption: t("next_mission_ready_caption", {
+              name: learner.displayName,
+              subject: mission.mission.subjectName,
+            }),
+          }
+        : ({ ready: false as const }),
+      supports: activeSupportLabels(s, tReview),
+      strings: nextStepsStrings,
+    };
+  } else {
+    // A non-celebrating render never mounts WhatHappensNext, but the client
+    // prop is required — pass a cheap, valid placeholder bundle.
+    nextSteps = {
+      mission: { ready: false as const },
+      supports: [] as string[],
+      strings: nextStepsStrings,
+    };
+  }
+
   return (
     <AppShell
       role="parent"
@@ -262,23 +429,19 @@ export default async function BrainCloneWatchPage({
         eyebrowLabel={t("watch_eyebrow", { name: learner.displayName })}
         sphereAriaLabel={t("clone_child_label", { name: learner.displayName })}
         doneLabel={t("watch_step_done")}
-        approveLabel={t("watch_approve")}
-        amendLabel={t("watch_amend")}
-        stagedCorrectionsLabel={
-          stagedCorrectionCount > 0
-            ? t("watch_corrections_staged", { count: stagedCorrectionCount })
-            : null
-        }
         backLabel={t("watch_back")}
         alreadyApprovedLabel={t("watch_already_approved")}
         replayCloneLabel={t("clone_replay")}
         privacyNoteLabel={t("privacy_family")}
         privacyLinkLabel={t("watch_privacy_link")}
         alreadyApproved={alreadyApproved}
+        celebrate={celebrating}
         stages={stages}
         primaryHue={s.visualIdentity.primaryHue}
         secondaryHues={s.visualIdentity.secondaryHues}
         sequence={sequence}
+        ceremony={ceremony}
+        nextSteps={nextSteps}
         approveAction={approveBrainCloneAction}
       />
     </AppShell>
