@@ -11,6 +11,7 @@ export * from "./learning.js";
 export * from "./lesson-runs.js";
 export * from "./learner-brain-profiles.js";
 export * from "./brain-profile-approvals.js";
+export * from "./approval-contract.js";
 export * from "./web-domain.js";
 export * from "./web-billing.js";
 export * from "./web-clinical.js";

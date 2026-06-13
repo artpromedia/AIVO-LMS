@@ -54,5 +54,6 @@ ADR.
 | [0001](./0001-cors-allowlist-policy.md) | CORS allow-list & fail-closed policy | Accepted |
 | [0040](./0040-curriculum-source-of-truth.md) | Curriculum source of truth | Accepted |
 | [0041](./0041-agentic-boundaries.md) | Agentic boundaries (LLMs never emit standards) | Accepted |
+| [0042](./0042-one-brain-one-gate.md) | One brain, one gate (shared approval/consent contract) | Accepted |
 
 > Keep this table sorted by ID. Add new rows as ADRs land.

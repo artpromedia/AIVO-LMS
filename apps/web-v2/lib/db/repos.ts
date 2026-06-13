@@ -38,6 +38,7 @@ import type {
 } from "@/lib/db/types";
 import { ACCESSIBILITY_DEFAULTS } from "@/lib/db/types";
 import type {
+  ChildProfileDisclosure,
   CollaboratorInsight,
   IEPDocument,
   IEPExtraction,
@@ -1016,6 +1017,47 @@ export async function listBrainApprovals(
   tenantId: string,
 ): Promise<BrainProfileApproval[]> {
   return getPersistence().brainProfileApprovals.listForLearner(learnerId, tenantId);
+}
+
+/**
+ * Sprint C-12 (ADR 0042) — record a FERPA cross-role read of a child's brain
+ * profile on a web-v2 surface. Append-only. The web counterpart of the
+ * services' `CHILD_PROFILE_DISCLOSED` audit event; the same disclosure tuple.
+ * `id`/`disclosedAt` are filled in here when omitted. Best-effort at the call
+ * site (a read must not fail because the disclosure write did).
+ */
+export async function recordChildProfileDisclosure(
+  input: Omit<ChildProfileDisclosure, "id" | "disclosedAt"> &
+    Partial<Pick<ChildProfileDisclosure, "id" | "disclosedAt">>,
+): Promise<ChildProfileDisclosure> {
+  const entry: ChildProfileDisclosure = {
+    id: input.id ?? newId("cpd"),
+    disclosedAt: input.disclosedAt ?? nowIso(),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    readerUserId: input.readerUserId,
+    readerRole: input.readerRole,
+    surface: input.surface,
+    dataClass: input.dataClass,
+  };
+  return getPersistence().compliance.appendChildProfileDisclosure(entry);
+}
+
+/**
+ * Sprint C-12 (ADR 0042) — the per-learner disclosure history, newest-first,
+ * optionally bounded by an inclusive ISO time window. The compliance/admin
+ * query surface for web-v2-side reads.
+ */
+export async function listChildProfileDisclosures(
+  learnerId: string,
+  tenantId: string,
+  opts?: { fromIso?: string; toIso?: string },
+): Promise<ChildProfileDisclosure[]> {
+  return getPersistence().compliance.listChildProfileDisclosuresForLearner(
+    learnerId,
+    tenantId,
+    opts,
+  );
 }
 
 // ===== Baseline (Sprint 8) =====

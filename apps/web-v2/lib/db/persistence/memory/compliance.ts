@@ -10,6 +10,7 @@
 import { getStore } from "@/lib/db/store";
 import type {
   AgeGateRecord,
+  ChildProfileDisclosure,
   ConsentRecord,
   ConsentVersion,
   DataDeletionRequest,
@@ -172,5 +173,20 @@ export const memoryCompliance: ComplianceStore = {
     return getStore()
       .iepDocumentAccessLogs.filter((r) => r.learnerId === learnerId && r.tenantId === tenantId)
       .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
+  },
+  async appendChildProfileDisclosure(entry): Promise<ChildProfileDisclosure> {
+    getStore().childProfileDisclosures.push(entry);
+    return entry;
+  },
+  async listChildProfileDisclosuresForLearner(learnerId, tenantId, opts): Promise<ChildProfileDisclosure[]> {
+    return getStore()
+      .childProfileDisclosures.filter(
+        (r) =>
+          r.learnerId === learnerId &&
+          r.tenantId === tenantId &&
+          (!opts?.fromIso || r.disclosedAt >= opts.fromIso) &&
+          (!opts?.toIso || r.disclosedAt <= opts.toIso),
+      )
+      .sort((a, b) => b.disclosedAt.localeCompare(a.disclosedAt) || b.id.localeCompare(a.id));
   },
 };

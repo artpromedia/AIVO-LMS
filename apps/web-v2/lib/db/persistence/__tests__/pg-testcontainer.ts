@@ -62,6 +62,8 @@ const WEB_SCHEMA_MIGRATIONS = [
   "0092_web_review_schedules",
   "0094_web_mastery_snapshots",
   "0098_web_baseline_bank",
+  // C-12 (ADR 0042) FERPA child-profile disclosure log (web side).
+  "0114_web_child_profile_disclosures",
 ];
 
 /** Reset `public` and apply the web-domain schema (hermetic, idempotent). */

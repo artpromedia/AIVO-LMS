@@ -30,7 +30,7 @@ import {
   type InviteStatus,
 } from "../lib/contribution-status.js";
 import { type AuthUser, authenticateRequest, isUuid, verifyParentOwnership } from "../auth.js";
-import { emitFamilyAudit } from "../lib/audit.js";
+import { emitFamilyAudit, emitChildProfileDisclosure } from "../lib/audit.js";
 import {
   getCollaborationByLearnerIdContributionsSchema,
   collaborationContributionOptOutSchema,
@@ -933,6 +933,20 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       if (brain.length === 0) return { brainState: null };
 
       const state = brain[0];
+      // ADR 0042 §5 — a teacher (not the parent) reading a child's profile is a
+      // FERPA cross-role disclosure. Record it (append-only, queryable).
+      if (!isParent) {
+        await emitChildProfileDisclosure({
+          db,
+          request,
+          tenantId: claims.tenantId || null,
+          learnerId,
+          readerUserId: claims.sub,
+          readerRole: claims.role,
+          surface: "family-svc:GET /api/family/collaboration/{learnerId}/brain/teacher",
+          dataClass: "brain_state_teacher_scoped",
+        });
+      }
       return {
         brainState: {
           masteryLevels: state.masteryLevels,
@@ -973,6 +987,21 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
 
       const brain = await db.select().from(brainStates).where(eq(brainStates.learnerId, learnerId));
       if (brain.length === 0) return { summary: null };
+
+      // ADR 0042 §5 — a caregiver (not the parent) reading a child's profile
+      // summary is a FERPA cross-role disclosure.
+      if (!isParent) {
+        await emitChildProfileDisclosure({
+          db,
+          request,
+          tenantId: claims.tenantId || null,
+          learnerId,
+          readerUserId: claims.sub,
+          readerRole: claims.role,
+          surface: "family-svc:GET /api/family/collaboration/{learnerId}/brain/caregiver",
+          dataClass: "brain_summary_caregiver_scoped",
+        });
+      }
 
       const state = brain[0];
       const mastery = (state.masteryLevels as Record<string, unknown>) || {};
@@ -1030,6 +1059,22 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         .select()
         .from(therapyGoals)
         .where(eq(therapyGoals.learnerId, learnerId));
+
+      // ADR 0042 §5 — a therapist (not the parent) reading a child's profile is
+      // a FERPA cross-role disclosure. This view exposes disabilitySignals + IEP
+      // + therapy goals (HIPAA-scoped), so the record matters most here.
+      if (!isParent) {
+        await emitChildProfileDisclosure({
+          db,
+          request,
+          tenantId: claims.tenantId || null,
+          learnerId,
+          readerUserId: claims.sub,
+          readerRole: claims.role,
+          surface: "family-svc:GET /api/family/collaboration/{learnerId}/brain/therapist",
+          dataClass: "brain_clinical_therapist_scoped",
+        });
+      }
 
       const state = brain[0] || null;
 

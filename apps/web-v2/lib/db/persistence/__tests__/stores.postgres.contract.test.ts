@@ -63,6 +63,9 @@ const MIGRATIONS = [
   // C-10 therapist assessment draft store — sibling of the teacher table; its
   // RLS (0113) is skipped here the same way 0110 is.
   "0112_web_therapist_assessments",
+  // C-12 (ADR 0042) FERPA child-profile disclosure log (web side). No RLS —
+  // sibling of web_disclosure_logs / web_iep_doc_access_logs.
+  "0114_web_child_profile_disclosures",
 ];
 
 const TABLES = [
@@ -108,6 +111,7 @@ const TABLES = [
   "web_teacher_assignments",
   "web_collaborator_insights",
   "web_collaborator_members",
+  "web_child_profile_disclosures",
 ];
 
 let db: Database;

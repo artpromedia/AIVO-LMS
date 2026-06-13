@@ -19,9 +19,11 @@ import {
   webDataExportRequests,
   webDataDeletionRequests,
   webIepDocAccessLogs,
+  webChildProfileDisclosures,
 } from "@aivo/db";
 import type {
   AgeGateRecord,
+  ChildProfileDisclosure,
   ConsentRecord,
   ConsentVersion,
   DataDeletionRequest,
@@ -277,5 +279,37 @@ export const drizzleCompliance: ComplianceStore = {
     return rows
       .map((r) => r.data as IEPDocumentAccessLog)
       .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
+  },
+  async appendChildProfileDisclosure(entry): Promise<ChildProfileDisclosure> {
+    await getDb()
+      .insert(webChildProfileDisclosures)
+      .values({
+        id: entry.id,
+        learnerId: entry.learnerId,
+        tenantId: entry.tenantId,
+        disclosedAt: entry.disclosedAt,
+        data: entry,
+      })
+      .onConflictDoNothing({ target: webChildProfileDisclosures.id });
+    return entry;
+  },
+  async listChildProfileDisclosuresForLearner(learnerId, tenantId, opts): Promise<ChildProfileDisclosure[]> {
+    const rows = await getDb()
+      .select()
+      .from(webChildProfileDisclosures)
+      .where(
+        and(
+          eq(webChildProfileDisclosures.learnerId, learnerId),
+          eq(webChildProfileDisclosures.tenantId, tenantId),
+        ),
+      );
+    return rows
+      .map((r) => r.data as ChildProfileDisclosure)
+      .filter(
+        (r) =>
+          (!opts?.fromIso || r.disclosedAt >= opts.fromIso) &&
+          (!opts?.toIso || r.disclosedAt <= opts.toIso),
+      )
+      .sort((a, b) => b.disclosedAt.localeCompare(a.disclosedAt) || b.id.localeCompare(a.id));
   },
 };

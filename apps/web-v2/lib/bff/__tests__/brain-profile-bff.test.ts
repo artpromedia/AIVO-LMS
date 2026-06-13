@@ -45,6 +45,7 @@ import { GET } from "@/app/api/bff/learners/[learnerId]/brain-profile/route";
 import { ensureSeeded } from "@/lib/db/seed";
 import { getStore, resetStore } from "@/lib/db/store";
 import { resetPersistence } from "@/lib/db/persistence";
+import { listChildProfileDisclosures } from "@/lib/db/repos";
 
 function req(learnerId: string): Request {
   return new Request(`http://localhost/api/bff/learners/${learnerId}/brain-profile`, {
@@ -107,6 +108,27 @@ describe("brain-profile BFF route", () => {
     expect(json.data.brainProfile.learnerId).toBe(CLONE_LEARNER);
     expect(json.data.brainProfile.cloneStage).toBe("cloned");
     expect(json.data.brainProfile.state.disabilitySignals).toBeDefined();
+  });
+
+  it("C-12 (ADR 0042): a successful read writes a FERPA disclosure row", async () => {
+    currentSession = asSession({});
+    expect(await listChildProfileDisclosures(CLONE_LEARNER, TENANT)).toHaveLength(0);
+    const res = await GET(req(CLONE_LEARNER), params(CLONE_LEARNER));
+    expect(res.status).toBe(200);
+    const rows = await listChildProfileDisclosures(CLONE_LEARNER, TENANT);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].readerUserId).toBe(PARENT);
+    expect(rows[0].readerRole).toBe("parent");
+    expect(rows[0].dataClass).toBe("brain_profile_full");
+    expect(rows[0].surface).toContain("brain-profile");
+  });
+
+  it("C-12 (ADR 0042): a refused read (wrong parent) writes NO disclosure row", async () => {
+    currentSession = asSession({ userId: "u_parent_2" });
+    const res = await GET(req(CLONE_LEARNER), params(CLONE_LEARNER));
+    expect(res.status).toBe(403);
+    // The read never returned data, so nothing was disclosed.
+    expect(await listChildProfileDisclosures(CLONE_LEARNER, TENANT)).toHaveLength(0);
   });
 
   it("blocks a parent of a different learner via requireLearnerScope", async () => {

@@ -68,6 +68,7 @@ import type {
   DataInventoryItem,
   DataRetentionPolicy,
   DisclosureLog,
+  ChildProfileDisclosure,
   DataExportRequest,
   DataDeletionRequest,
   IEPDocumentAccessLog,
@@ -214,6 +215,8 @@ export type Store = {
   dataExportRequests: Map<string, DataExportRequest>;
   dataDeletionRequests: Map<string, DataDeletionRequest>;
   iepDocumentAccessLogs: IEPDocumentAccessLog[];
+  // Sprint C-12 (ADR 0042): FERPA cross-role brain-profile reads (web-v2 side).
+  childProfileDisclosures: ChildProfileDisclosure[];
   policyVersions: Map<string, PolicyVersion>;
   dpaRecords: Map<string, DPARecord>;
   subprocessors: Map<string, SubprocessorRecord>;
@@ -381,6 +384,7 @@ function createStore(): Store {
     dataExportRequests: new Map(),
     dataDeletionRequests: new Map(),
     iepDocumentAccessLogs: [],
+    childProfileDisclosures: [],
     policyVersions: new Map(),
     dpaRecords: new Map(),
     subprocessors: new Map(),

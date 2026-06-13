@@ -12,6 +12,7 @@
  * suite breaks if the lifecycle and the gate ever drift apart.
  */
 import { describe, it, expect, beforeEach } from "vitest";
+import { canTeach, TEACHING_APPROVAL_STATUSES } from "@aivo/db";
 import { ensureSeeded } from "@/lib/db/seed";
 import { getStore, newId, nowIso, resetStore } from "@/lib/db/store";
 import { getPersistence, resetPersistence } from "@/lib/db/persistence";
@@ -253,5 +254,67 @@ describe("pickTodaysMission — honest home surface ahead of the hard gate", () 
     if (!after.ready) return;
     expect(after.mission.source).toBe("teacher_assigned");
     expect(after.mission.sourceRefId).toBe(assignment.id);
+  });
+});
+
+/**
+ * Sprint C-12 (ADR 0042) — the WEB HALF of the cross-stack teach gate, bound to
+ * the shared approval contract. The services half (learning-svc path-init,
+ * brain-svc guard) asserts the same `{approved, amended}` teaching set against
+ * the same predicate; see:
+ *   - services/learning-svc/src/routes/__tests__/path-init-gate.test.ts
+ *   - services/brain-svc/tests/test_services_teach_gate.py
+ */
+describe("createLessonRun — bound to the shared teaching set (ADR 0042, web half)", () => {
+  beforeEach(() => {
+    resetStore();
+    ensureSeeded();
+    resetPersistence();
+  });
+
+  it("the gate's accept set is exactly the shared TEACHING_APPROVAL_STATUSES", () => {
+    // The web gate keys off `cloneStage === "approved"`, which both a plain
+    // approve and an amend produce. The shared contract names that set.
+    expect([...TEACHING_APPROVAL_STATUSES]).toEqual(["approved", "amended"]);
+    expect(canTeach("approved")).toBe(true);
+    expect(canTeach("amended")).toBe(true);
+    expect(canTeach("pending_parent_review")).toBe(false);
+    expect(canTeach("declined")).toBe(false);
+  });
+
+  it("UNAPPROVED (cloned) → web createLessonRun refuses with brain_not_approved", async () => {
+    const l = await setup("cloned");
+    const result = await attemptLesson(l.id);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.code).toBe("brain_not_approved");
+    expect(runsForLearner(l.id)).toBe(0);
+  });
+
+  it("AMENDED → web createLessonRun proceeds (an amendment teaches)", async () => {
+    const l = await setup("cloned");
+    // Amend = approve with a field-level correction; sets cloneStage approved
+    // AND approvalStatus 'amended' — the second member of the teaching set.
+    const amended = await approveBrainClone(l.id, TENANT, {
+      modifications: [
+        {
+          field: "accommodation.read_aloud",
+          originalValue: false,
+          parentValue: true,
+          parentNote: "Follows along better aloud.",
+          modifiedAt: nowIso(),
+        },
+      ],
+    });
+    expect(amended?.approvalStatus).toBe("amended");
+    expect(canTeach(amended!.approvalStatus)).toBe(true);
+    const result = await attemptLesson(l.id);
+    expect(result.ok, result.ok ? "" : `createLessonRun failed: ${result.message}`).toBe(true);
+  });
+
+  it("APPROVED → web createLessonRun proceeds", async () => {
+    const l = await setup("approved");
+    const result = await attemptLesson(l.id);
+    expect(result.ok).toBe(true);
   });
 });

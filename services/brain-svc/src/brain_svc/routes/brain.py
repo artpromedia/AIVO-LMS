@@ -9,8 +9,12 @@ from brain_svc.models.database import get_db
 from brain_svc.models.schemas import BrainCloneRequest, BrainRollbackRequest, BrainApproveRequest, BrainAmendRequest, BrainDeclineRequest
 from brain_svc.services.clone_pipeline import clone_brain
 from brain_svc.services.access_control import verify_learner_access
-from brain_svc.audit import emit_brain_audit
+from brain_svc.audit import emit_brain_audit, emit_child_profile_disclosure
 from brain_svc.auth import AuthClaims, require_auth
+from brain_svc.contracts.approval_contract import (
+    BrainProfileApprovalRecord,
+    assert_can_teach,
+)
 
 LEARNING_SVC_URL = os.environ.get("LEARNING_SVC_URL", "http://localhost:3005")
 RECOMMENDATION_SVC_URL = os.environ.get(
@@ -72,6 +76,31 @@ async def _maybe_emit_regression_candidates(
             )
     except Exception:  # pragma: no cover — fire-and-forget
         return
+
+# Roles that, when reading a child's profile, constitute a FERPA cross-role
+# disclosure (ADR 0042 §5). A parent reading their own child, or a trusted
+# service/admin principal, is not a cross-role read. TEACHER / CAREGIVER /
+# THERAPIST reading a learner's profile IS — record it.
+_CROSS_ROLE_READER_ROLES = {"TEACHER", "CAREGIVER", "THERAPIST"}
+
+
+async def _maybe_record_disclosure(
+    auth: AuthClaims, learner_id: str, *, surface: str, data_class: str
+) -> None:
+    """Emit a CHILD_PROFILE_DISCLOSED event when a non-parent role reads a
+    child's brain profile. Best-effort; never raises."""
+    role = getattr(auth, "role", None)
+    if role not in _CROSS_ROLE_READER_ROLES:
+        return
+    await emit_child_profile_disclosure(
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        reader_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        reader_role=role,
+        surface=surface,
+        data_class=data_class,
+    )
+
 
 def _snake_to_camel(name: str) -> str:
     components = name.split('_')
@@ -201,6 +230,12 @@ async def get_brain_state(learner_id: str, db: Session = Depends(get_db), auth: 
 
     if not result:
         raise HTTPException(status_code=404, detail="Brain state not found")
+
+    # ADR 0042 §5 — a non-parent role reading a child's profile is a FERPA
+    # cross-role disclosure; record it (append-only, queryable).
+    await _maybe_record_disclosure(
+        auth, learner_id, surface="brain-svc:GET /api/brain/{learner_id}", data_class="brain_state"
+    )
 
     return _to_camel_case(dict(result))
 
@@ -498,6 +533,34 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
         },
     )
 
+    # Sprint C-12 (ADR 0042): build the shared-shape approval record in parity
+    # with web-v2's `brain_profile_approvals`. This supplements the C-06 audit
+    # event (above) and the consent fields persisted in xai_explanation — it is
+    # the cross-stack contract record, validated before we proceed so a drift
+    # from the shared contract is caught here, not downstream. consent/RAI
+    # versions are the cross-stack consent anchor.
+    approval_record = BrainProfileApprovalRecord(
+        id=str(uuid.uuid4()),
+        tenantId=str(getattr(auth, "tenant_id", None) or ""),
+        learnerId=learner_id,
+        brainProfileId=str(current["id"]),
+        profileRevision=new_version,
+        actorUserId=str(getattr(auth, "user_id", None) or getattr(auth, "sub", None) or ""),
+        action="amended" if parent_mods_record else "approved",
+        consentVersion=request.consent_version,
+        raiVersion=rai_acknowledgement["rai_version"],
+        modifications=parent_mods_record,
+        ipHash=None,
+        createdAt=now.isoformat(),
+    )
+
+    # Sprint C-12 (ADR 0042) — EXPLICIT teach gate, not sequencing-only. The
+    # status we just wrote must be teachable before we initialise any learning
+    # path. `assert_can_teach` raises 403 brain_not_approved otherwise; here it
+    # always passes (we set 'approved'), but the guard makes the Python intent
+    # explicit and is the same predicate the services path-init enforces.
+    assert_can_teach("approved")
+
     try:
         import httpx
         fl = current.get("functioning_level_profile", {})
@@ -526,6 +589,7 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
         "snapshot_id": snap_id,
         "consent": consent_record,
         "rai_acknowledgement": rai_acknowledgement,
+        "approval_record": approval_record.model_dump(),
     }
 
 @router.post("/{learner_id}/amend")
@@ -616,6 +680,29 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
         details={"version": new_version},
     )
 
+    # Sprint C-12 (ADR 0042): shared-shape approval record (action "amended"),
+    # in parity with web-v2's `brain_profile_approvals`. An amendment is a
+    # recorded parent act and a teaching status.
+    approval_record = BrainProfileApprovalRecord(
+        id=str(uuid.uuid4()),
+        tenantId=str(getattr(auth, "tenant_id", None) or ""),
+        learnerId=learner_id,
+        brainProfileId=str(current["id"]),
+        profileRevision=new_version,
+        actorUserId=str(getattr(auth, "user_id", None) or getattr(auth, "sub", None) or ""),
+        action="amended",
+        # Amend does not re-collect consent/RAI; the prior approval's versions
+        # remain the consent anchor. "1.0" is the legacy default (ADR 0042 §4).
+        consentVersion="1.0",
+        raiVersion=str(new_version),
+        modifications=[],
+        ipHash=None,
+        createdAt=now.isoformat(),
+    )
+
+    # Sprint C-12 (ADR 0042) — EXPLICIT teach gate before path init.
+    assert_can_teach("amended")
+
     try:
         import httpx
         mastery = current.get("mastery_levels", {})
@@ -641,7 +728,12 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
     except Exception:
         pass
 
-    return {"status": "amended", "version": new_version, "snapshot_id": snap_id}
+    return {
+        "status": "amended",
+        "version": new_version,
+        "snapshot_id": snap_id,
+        "approval_record": approval_record.model_dump(),
+    }
 
 @router.post("/{learner_id}/decline")
 async def decline_brain(learner_id: str, request: BrainDeclineRequest, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
@@ -721,6 +813,13 @@ async def get_brain_history(learner_id: str, db: Session = Depends(get_db), auth
         text("SELECT * FROM brain_state_snapshots WHERE learner_id = :lid ORDER BY version DESC"),
         {"lid": learner_id}
     ).mappings().all()
+
+    # ADR 0042 §5 — snapshot history exposes prior profile states; a non-parent
+    # read is a cross-role disclosure.
+    await _maybe_record_disclosure(
+        auth, learner_id, surface="brain-svc:GET /api/brain/{learner_id}/history", data_class="brain_history"
+    )
+
     return [dict(r) for r in results]
 
 @router.post("/{learner_id}/rollback")
@@ -832,6 +931,12 @@ async def get_brain_context(learner_id: str, db: Session = Depends(get_db), auth
         text("SELECT * FROM language_profiles WHERE learner_id = :lid ORDER BY created_at DESC LIMIT 1"),
         {"lid": learner_id}
     ).mappings().first()
+
+    # ADR 0042 §5 — context is the richest scoped read (full brain + IEP +
+    # sensory); a non-parent read is a cross-role disclosure.
+    await _maybe_record_disclosure(
+        auth, learner_id, surface="brain-svc:GET /api/brain/{learner_id}/context", data_class="brain_context"
+    )
 
     brain_dict = dict(brain)
     return {

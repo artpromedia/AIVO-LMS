@@ -105,6 +105,7 @@ const TABLES = [
   "web_data_export_requests",
   "web_data_deletion_requests",
   "web_iep_doc_access_logs",
+  "web_child_profile_disclosures",
   "web_courses",
   "web_roster_import_jobs",
   "web_roster_import_errors",

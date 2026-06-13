@@ -3,7 +3,8 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
-import { getBrainProfile } from "@/lib/db/repos";
+import { getBrainProfile, recordChildProfileDisclosure } from "@/lib/db/repos";
+import { logger } from "@/lib/observability/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,31 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     const profile = await getBrainProfile(learnerId, session!.tenantId);
     if (!profile) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Brain profile not generated yet" }, requestId);
+    }
+    // Sprint C-12 (ADR 0042) — record the FERPA disclosure for this read. This
+    // route returns the full profile (disabilitySignals + private assessment
+    // summary), so the read is logged even though it is parent-scoped. Best-
+    // effort: a disclosure-write failure must never block the parent's read.
+    try {
+      await recordChildProfileDisclosure({
+        tenantId: session!.tenantId,
+        learnerId,
+        readerUserId: session!.userId,
+        readerRole: session!.role,
+        surface: "web-v2:GET /api/bff/learners/{learnerId}/brain-profile",
+        dataClass: "brain_profile_full",
+      });
+    } catch (err) {
+      logger.error(
+        {
+          event: "disclosure.persist_failed",
+          requestId,
+          learnerId,
+          tenantId: session!.tenantId,
+          message: err instanceof Error ? err.message : String(err),
+        },
+        "[disclosure] write failed",
+      );
     }
     return ok({ brainProfile: profile }, requestId);
   } catch (e) {

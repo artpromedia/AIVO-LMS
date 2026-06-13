@@ -1684,6 +1684,30 @@ export type IEPDocumentAccessLog = {
   purpose: "view_summary" | "view_raw" | "extract" | "delete" | "download";
 };
 
+/**
+ * Sprint C-12 (ADR 0042) — FERPA cross-role read of a child's brain profile,
+ * web-v2 side. The web counterpart of the services' `CHILD_PROFILE_DISCLOSED`
+ * audit event: the same disclosure tuple `(tenantId, learnerId, readerUserId,
+ * readerRole, surface, dataClass, timestamp)`, recorded for reads on web-v2 BFF
+ * surfaces (the parent-only brain-profile route). Append-only; queried
+ * per-learner by the compliance surface. Mirrors the `IEPDocumentAccessLog`
+ * per-learner access-log pattern already in the compliance store.
+ */
+export type ChildProfileDisclosure = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  /** The user who read the profile. */
+  readerUserId: ID;
+  /** The reader's role at read time (e.g. "parent"). */
+  readerRole: string;
+  /** The route/surface the read happened on. */
+  surface: string;
+  /** The data class disclosed (e.g. "brain_profile_full"). */
+  dataClass: string;
+  disclosedAt: ISODate;
+};
+
 export type PolicyKind =
   | "privacy_policy"
   | "terms_of_service"

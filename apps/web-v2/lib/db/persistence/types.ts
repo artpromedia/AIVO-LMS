@@ -67,6 +67,7 @@ import type {
   SISConnection,
   CollaboratorInsight,
   CollaboratorMember,
+  ChildProfileDisclosure,
   ConsentRecord,
   ConsentType,
   ConsentVersion,
@@ -548,6 +549,20 @@ export interface ComplianceStore {
   /** Append an IEP-document access log entry (append-only audit integrity). */
   appendIepAccessLog(entry: IEPDocumentAccessLog): Promise<IEPDocumentAccessLog>;
   listIepAccessForLearner(learnerId: string, tenantId: string): Promise<IEPDocumentAccessLog[]>;
+  /**
+   * Sprint C-12 (ADR 0042) — append a FERPA child-profile disclosure (a
+   * cross-role read of a learner's brain profile). Append-only.
+   */
+  appendChildProfileDisclosure(entry: ChildProfileDisclosure): Promise<ChildProfileDisclosure>;
+  /**
+   * Disclosures for a learner, newest-first, optionally bounded by an inclusive
+   * ISO time window. The compliance/admin query surface.
+   */
+  listChildProfileDisclosuresForLearner(
+    learnerId: string,
+    tenantId: string,
+    opts?: { fromIso?: string; toIso?: string },
+  ): Promise<ChildProfileDisclosure[]>;
 }
 
 /**
