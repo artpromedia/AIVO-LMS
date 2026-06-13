@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { cn } from "../utils/cn";
+import { LEARNER_PREF_CSS_VARS } from "@aivo/accessibility-contract";
 
 /**
  * Baseline/LearnerChoiceCard
@@ -84,7 +85,23 @@ export function LearnerChoiceCard({
       >
         {lead ?? (typeof index === "number" ? letter(index) : null)}
       </span>
-      <span className="flex-1 text-base md:text-lg text-iw-text-strong leading-relaxed">
+      {/*
+        Answer label honors the learner's reading prefs (font family, scale,
+        spacing) via the same `--learner-*` contract vars as the prompt. The
+        card's `min-h-[64px]` floor is unconditional, so the touch target is
+        always the LARGER of 64px and the (pref-scaled) content height — a
+        larger-text learner gets a taller card, never a smaller one.
+      */}
+      <span
+        data-learner-answer
+        className="flex-1 [--answer-base:1rem] md:[--answer-base:1.125rem] text-iw-text-strong"
+        style={{
+          fontFamily: `var(${LEARNER_PREF_CSS_VARS.fontFamily}, inherit)`,
+          fontSize: `calc(var(--answer-base) * var(${LEARNER_PREF_CSS_VARS.fontScale}, 1))`,
+          letterSpacing: `var(${LEARNER_PREF_CSS_VARS.letterSpacing}, normal)`,
+          lineHeight: `var(${LEARNER_PREF_CSS_VARS.lineHeight}, 1.625)`,
+        }}
+      >
         {label}
       </span>
       {checked ? (

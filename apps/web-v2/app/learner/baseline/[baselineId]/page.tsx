@@ -20,6 +20,7 @@ import {
 } from "@aivo/ui";
 import {
   completeBaseline,
+  getAccessibilityPrefs,
   getBaselineById,
   getBaselineCalibrationMap,
   setBaselineAdaptiveSessionId,
@@ -34,6 +35,7 @@ import {
   refreshLearnerReadiness,
   startBaseline,
 } from "@/lib/db/repos";
+import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
@@ -49,6 +51,7 @@ import {
 import { streamNextQuestion, makeHttpStreamClient } from "@/lib/learner/baseline-session";
 import { mintAssessmentSvcToken } from "@/lib/learner/assessment-svc-auth";
 import { serverEnv } from "@/lib/env";
+import { BASELINE_BREAK_EVERY } from "@aivo/adaptive-baseline";
 import { LatencyTimer } from "./latency-timer";
 import type { BaselineQuestion } from "@/lib/db/types";
 
@@ -61,11 +64,12 @@ import type { BaselineQuestion } from "@/lib/db/types";
  * confirm the baseline actually belongs to the form-supplied
  * learnerId before mutating anything.
  *
- * Break cadence: after every BREAK_EVERY answered questions we show
- * a BreakCard before the next question. The learner taps "Resume" to
- * continue — break is just a soft pause, no state is mutated.
+ * Break cadence: after every BASELINE_BREAK_EVERY answered questions we
+ * show a BreakCard before the next question. The learner taps "Resume" to
+ * continue — break is just a soft pause, no state is mutated. The cadence
+ * constant is shared with the mobile runner via @aivo/adaptive-baseline so
+ * the two clients pace the baseline identically.
  */
-const BREAK_EVERY = 5;
 
 async function assertBaselineMatchesLearner(
   baselineId: string,
@@ -203,6 +207,11 @@ export default async function BaselineRunnerPage({
   }
 
   const learner = await getLearner(baseline.learnerId, session.tenantId);
+  // The learner's persisted reading preferences (dyslexia-friendly font,
+  // larger text, looser spacing) → `--learner-*` CSS vars stamped on the
+  // baseline shell so they apply INSIDE the question card, not just on chrome.
+  const a11yPrefs = await getAccessibilityPrefs(baseline.learnerId, session.tenantId);
+  const shellStyle = learnerPrefStyleVars(a11yPrefs);
   const subjects = await listSubjects();
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
   const questions = await listBaselineQuestions(baseline.id);
@@ -301,6 +310,7 @@ export default async function BaselineRunnerPage({
     return (
       <LearnerBaselineShell
         topBanner={topBanner}
+        style={shellStyle}
         headerLeft={
           <Link
             href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
@@ -369,7 +379,7 @@ export default async function BaselineRunnerPage({
   /* --------- Ready-to-submit screen (every question answered) --------- */
   if (!next) {
     return (
-      <LearnerBaselineShell topBanner={topBanner}>
+      <LearnerBaselineShell topBanner={topBanner} style={shellStyle}>
         <CompletionHero
           learnerName={learner?.preferredName || learner?.firstName}
           title={t("ready_title")}
@@ -403,8 +413,8 @@ export default async function BaselineRunnerPage({
   }
 
   /* --------- Break screen (between question blocks) --------- */
-  // Show a break every BREAK_EVERY answered questions, but only if the
-  // learner hasn't already passed it (sp.resume=1 skips the break).
+  // Show a break every BASELINE_BREAK_EVERY answered questions, but only if
+  // the learner hasn't already passed it (sp.resume=1 skips the break).
   // Kindness tightening (G5): also offer a break the moment a struggle
   // run reaches the high threshold — fired once (== STREAK_HIGH) so a
   // hard patch doesn't break on every question.
@@ -413,17 +423,25 @@ export default async function BaselineRunnerPage({
   const dueForBreak =
     totalAnswered > 0 &&
     sp.resume !== "1" &&
-    (totalAnswered % BREAK_EVERY === 0 || frustrationBreak);
+    (totalAnswered % BASELINE_BREAK_EVERY === 0 || frustrationBreak);
   if (dueForBreak) {
+    // When a struggle run triggered the break, use the gentle struggle copy so
+    // the pause explains itself. A plain cadence break keeps the existing
+    // wording. The struggle copy is shame-free and never names a wrong count.
+    const struggleVariant = frustrationBreak;
     return (
       <LearnerBaselineShell
         topBanner={topBanner}
+        style={shellStyle}
         status={[
           <PersonalizationChip key="paused" variant="paused" />,
           ...chips.slice(0, 3).map((v) => <PersonalizationChip key={v} variant={v} />),
         ]}
       >
         <BreakCard
+          variant={struggleVariant ? "struggle" : "cadence"}
+          title={struggleVariant ? t("struggle_break_title") : undefined}
+          body={struggleVariant ? t("struggle_break_body") : undefined}
           learnerName={learner?.preferredName || learner?.firstName}
           answered={totalAnswered}
           total={questions.length}
@@ -509,6 +527,7 @@ export default async function BaselineRunnerPage({
   return (
     <LearnerBaselineShell
       topBanner={topBanner}
+      style={shellStyle}
       headerLeft={
         <p className="text-xs text-iw-text-muted">
           {subject?.name ?? "Question"} · {Math.min(totalAnswered + 1, questions.length)} of{" "}
@@ -665,7 +684,14 @@ export default async function BaselineRunnerPage({
                 name="response"
                 required
                 placeholder={t("type_answer")}
-                className="w-full rounded-iw-control border border-iw-border bg-white px-4 py-3 text-base text-iw-text-strong placeholder:text-iw-text-muted/70 focus:outline-none focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)]/40"
+                // Free-text answers honor the learner's reading prefs too, via
+                // the same `--learner-*` contract vars the shell stamps.
+                style={{
+                  fontFamily: "var(--learner-font-family, inherit)",
+                  fontSize: "calc(1rem * var(--learner-font-scale, 1))",
+                  letterSpacing: "var(--learner-letter-spacing, normal)",
+                }}
+                className="w-full rounded-iw-control border border-iw-border bg-white px-4 py-3 text-iw-text-strong placeholder:text-iw-text-muted/70 focus:outline-none focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)]/40"
               />
             </label>
           )}

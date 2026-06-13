@@ -1546,7 +1546,9 @@
       "resume": "Continuar",
       "stop_for_today": "Parar por hoje",
       "choose_one": "Escolha uma",
-      "type_answer": "Digite sua resposta"
+      "type_answer": "Digite sua resposta",
+      "struggle_break_title": "Vamos respirar fundo juntos.",
+      "struggle_break_body": "Algumas foram difíceis, e é exatamente aí que respirar ajuda. Alongue-se e continue quando estiver pronto."
     },
     "lesson_run": {
       "back_to_today": "Voltar para hoje"

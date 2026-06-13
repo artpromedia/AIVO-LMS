@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { cn } from "../utils/cn";
+import { LEARNER_PREF_CSS_VARS } from "@aivo/accessibility-contract";
 
 /**
  * Baseline/LearnerQuestionCard
@@ -81,7 +82,26 @@ export function LearnerQuestionCard({
           </div>
         ) : null}
         <div className="flex flex-col gap-5">
-          <h2 className="text-2xl md:text-3xl leading-snug font-semibold text-iw-text-strong">
+          {/*
+            Prompt typography honors the learner's reading preferences via the
+            `--learner-*` CSS vars (set on the baseline shell from the
+            persisted AccessibilityProfile — see @aivo/accessibility-contract
+            `accessibilityProfileToCssVars`). `--prompt-base` carries the card's
+            responsive base size (1.5rem → 1.875rem at md) so the learner's
+            `--learner-font-scale` multiplies on top of it rather than replacing
+            it; font-family / letter-spacing / line-height fall through to the
+            card defaults when no preference is set.
+          */}
+          <h2
+            data-learner-prompt
+            className="[--prompt-base:1.5rem] md:[--prompt-base:1.875rem] font-semibold text-iw-text-strong"
+            style={{
+              fontFamily: `var(${LEARNER_PREF_CSS_VARS.fontFamily}, inherit)`,
+              fontSize: `calc(var(--prompt-base) * var(${LEARNER_PREF_CSS_VARS.fontScale}, 1))`,
+              letterSpacing: `var(${LEARNER_PREF_CSS_VARS.letterSpacing}, normal)`,
+              lineHeight: `var(${LEARNER_PREF_CSS_VARS.lineHeight}, 1.375)`,
+            }}
+          >
             {prompt}
           </h2>
           <div className="flex flex-col gap-3">{children}</div>

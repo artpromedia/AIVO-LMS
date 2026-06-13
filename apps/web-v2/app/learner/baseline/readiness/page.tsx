@@ -4,12 +4,14 @@ import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { LearnerBaselineShell, PersonalizationChip, type PersonalizationVariant } from "@aivo/ui";
 import {
+  getAccessibilityPrefs,
   getActiveBaselineForLearner,
   getBaselineById,
   getIEPForLearner,
   getLearner,
   getOrCreateParentAssessment,
 } from "@/lib/db/repos";
+import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
 
 /**
  * /learner/baseline/readiness
@@ -54,8 +56,14 @@ export default async function BaselineReadinessPage({
   if (calmMode) chips.push("calm_mode");
   if (extendedTime) chips.push("extended_time");
 
+  // Carry the learner's reading prefs onto the shell so the whole baseline
+  // flow (not only the runner) honors dyslexia font / larger text / spacing.
+  const a11yPrefs = await getAccessibilityPrefs(session.learnerId, session.tenantId);
+  const shellStyle = learnerPrefStyleVars(a11yPrefs);
+
   return (
     <LearnerBaselineShell
+      style={shellStyle}
       headerLeft={
         <Link
           href="/learner/baseline/subjects"

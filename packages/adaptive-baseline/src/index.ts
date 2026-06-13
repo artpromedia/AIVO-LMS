@@ -121,6 +121,19 @@ const SE_STOP = 0.35;
 const MIN_ITEMS = 6;
 const MAX_ITEMS = 20;
 
+/**
+ * Break cadence — a calm pause is offered after every `BASELINE_BREAK_EVERY`
+ * answered items. The single source of truth shared by the web runner
+ * (`apps/web-v2/app/learner/baseline/[baselineId]`) and the mobile runner
+ * (`apps/mobile/app/(learner)/baseline/run.tsx`) so the two clients pace the
+ * baseline identically. Before this constant existed the clients drifted
+ * (web 5, mobile 3); change the cadence here and both move together.
+ *
+ * This is a pure UI-pacing constant, independent of the θ stop rule above —
+ * it never ends the assessment, it only inserts a "take a breath" card.
+ */
+export const BASELINE_BREAK_EVERY = 5;
+
 export interface InitBaselineOptions {
   readingDifficulty?: boolean;
   /** Optional initial θ from a prior baseline / parent intake. */

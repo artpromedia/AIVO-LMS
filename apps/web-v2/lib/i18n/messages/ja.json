@@ -1546,7 +1546,9 @@
       "resume": "再開",
       "stop_for_today": "今日はここまで",
       "choose_one": "1つ選んでください",
-      "type_answer": "回答を入力"
+      "type_answer": "回答を入力",
+      "struggle_break_title": "いっしょにひと息つきましょう。",
+      "struggle_break_body": "いくつかは難しかったね。そんなときこそ深呼吸が助けになります。背のびをして、準備ができたら続けましょう。"
     },
     "lesson_run": {
       "back_to_today": "今日に戻る"

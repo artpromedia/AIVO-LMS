@@ -1546,7 +1546,9 @@
       "resume": "Reprendre",
       "stop_for_today": "Arrêter pour aujourd'hui",
       "choose_one": "Choisissez-en une",
-      "type_answer": "Saisissez votre réponse"
+      "type_answer": "Saisissez votre réponse",
+      "struggle_break_title": "Respirons un instant ensemble.",
+      "struggle_break_body": "Certaines étaient difficiles, et c'est justement là qu'une respiration aide. Étire-toi et continue quand tu es prêt."
     },
     "lesson_run": {
       "back_to_today": "Retour à aujourd'hui"

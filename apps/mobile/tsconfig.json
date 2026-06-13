@@ -4,6 +4,7 @@
     "strict": true,
     "paths": {
       "@/*": ["./*"],
+      "@aivo/adaptive-baseline": ["../../packages/adaptive-baseline/src"],
       "@aivo/brand": ["../../packages/brand/src"],
       "@aivo/events": ["../../packages/events/src"],
       "@aivo/mobile-ui": ["../../packages/mobile-ui/src"],

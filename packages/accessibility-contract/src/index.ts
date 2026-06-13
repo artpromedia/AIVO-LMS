@@ -146,3 +146,97 @@ export const ACCESSIBILITY_DEFAULTS: AccessibilityProfile = {
   aacInputMethod: "touch",
   aacScanDelayMs: DEFAULT_AAC_SCAN_DELAY_MS,
 };
+
+/* --------------------- Reading prefs → CSS custom props ------------------ */
+
+/**
+ * Canonical CSS custom-property names a learner surface stamps onto its
+ * shell so the reading preferences declared on the {@link AccessibilityProfile}
+ * (dyslexia-friendly font, larger text, looser spacing) take visible effect
+ * *inside the content* — not just on the app chrome.
+ *
+ * These four variables are the single contract between the contract package
+ * (which owns the field NAMES) and any renderer (web question card, lesson
+ * player, mobile): a component reads `var(--learner-font-scale)` etc. and the
+ * shell sets them from {@link accessibilityProfileToCssVars}. Declaring the
+ * variable names here is what stops a renderer from inventing its own ad-hoc
+ * mapping and drifting from the persisted profile.
+ */
+export const LEARNER_PREF_CSS_VARS = {
+  /** Font family stack for body/prompt text. */
+  fontFamily: "--learner-font-family",
+  /** Multiplier applied on top of the base type scale (1 = unchanged). */
+  fontScale: "--learner-font-scale",
+  /** Tracking added between letters (a CSS length, e.g. "0.03em"). */
+  letterSpacing: "--learner-letter-spacing",
+  /** Line-height multiplier for prompt/answer copy (unitless). */
+  lineHeight: "--learner-line-height",
+} as const;
+
+/**
+ * Tunables for the reading-pref → CSS-var mapping. Kept here (not in the
+ * renderer) so web and mobile scale type/spacing by the same amounts and a
+ * "larger text" learner gets an identical bump on every surface.
+ *
+ *  - `fontScale` is multiplicative so it composes with any base size a card
+ *    already uses; AA reflow holds because nothing is pinned to viewport px.
+ *  - The dyslexia value is the SENTINEL `"dyslexia"`, not a font stack, so
+ *    the host (which knows which face it actually loaded — Atkinson
+ *    Hyperlegible on web) resolves it to a real `font-family` token. The
+ *    contract must not hard-code a web font name it cannot guarantee is
+ *    loaded on a given client.
+ */
+export const LEARNER_PREF_SCALE = {
+  /** `largeText` ON → +25% type, looser tracking + leading. */
+  largeTextFontScale: 1.25,
+  /** Baseline (no large-text) scale. */
+  baseFontScale: 1,
+  /** Letter-spacing applied when largeText OR dyslexiaFriendlyFont is on. */
+  looseLetterSpacing: "0.03em",
+  /** Default tracking (browser/token default). */
+  baseLetterSpacing: "normal",
+  /** Line-height when largeText OR dyslexiaFriendlyFont is on. */
+  looseLineHeight: 1.7,
+  /** Default line-height multiplier for prompt copy. */
+  baseLineHeight: 1.4,
+  /** Sentinel the host swaps for its loaded dyslexia-friendly face. */
+  dyslexiaFontSentinel: "dyslexia",
+} as const;
+
+/** The CSS-var map produced by {@link accessibilityProfileToCssVars}. */
+export type LearnerPrefCssVars = Partial<
+  Record<(typeof LEARNER_PREF_CSS_VARS)[keyof typeof LEARNER_PREF_CSS_VARS], string>
+>;
+
+/**
+ * Map the reading-relevant fields of an {@link AccessibilityProfile} onto the
+ * canonical `--learner-*` CSS custom properties. Pure + framework-free so it
+ * is safe to call from a React Server Component, a client component, or the
+ * mobile bundle.
+ *
+ * Only emits a variable when the corresponding preference is ON, so the
+ * caller can spread the result over a base style object and let unset prefs
+ * fall through to the surface's defaults (no `undefined`/`"normal"` noise in
+ * the inline style when nothing is customised).
+ *
+ * `fontFamily` is emitted as the {@link LEARNER_PREF_SCALE.dyslexiaFontSentinel}
+ * sentinel; the host maps that to the dyslexia face it has actually loaded.
+ */
+export function accessibilityProfileToCssVars(
+  profile: Pick<AccessibilityProfile, "largeText" | "dyslexiaFriendlyFont">,
+): LearnerPrefCssVars {
+  const vars: LearnerPrefCssVars = {};
+  const loosened = profile.largeText || profile.dyslexiaFriendlyFont;
+
+  if (profile.dyslexiaFriendlyFont) {
+    vars[LEARNER_PREF_CSS_VARS.fontFamily] = LEARNER_PREF_SCALE.dyslexiaFontSentinel;
+  }
+  if (profile.largeText) {
+    vars[LEARNER_PREF_CSS_VARS.fontScale] = String(LEARNER_PREF_SCALE.largeTextFontScale);
+  }
+  if (loosened) {
+    vars[LEARNER_PREF_CSS_VARS.letterSpacing] = LEARNER_PREF_SCALE.looseLetterSpacing;
+    vars[LEARNER_PREF_CSS_VARS.lineHeight] = String(LEARNER_PREF_SCALE.looseLineHeight);
+  }
+  return vars;
+}

@@ -1546,7 +1546,9 @@
       "resume": "متابعة",
       "stop_for_today": "التوقف لهذا اليوم",
       "choose_one": "اختر واحدة",
-      "type_answer": "اكتب إجابتك"
+      "type_answer": "اكتب إجابتك",
+      "struggle_break_title": "لنأخذ نفسًا معًا.",
+      "struggle_break_body": "كان بعضها صعبًا، وهذا هو الوقت الذي يساعد فيه أخذ نفس. تمدّد وواصل عندما تكون جاهزًا."
     },
     "lesson_run": {
       "back_to_today": "العودة إلى اليوم"

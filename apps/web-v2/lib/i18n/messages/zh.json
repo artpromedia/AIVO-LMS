@@ -1546,7 +1546,9 @@
       "resume": "继续",
       "stop_for_today": "今天就到这里",
       "choose_one": "选择一项",
-      "type_answer": "输入你的答案"
+      "type_answer": "输入你的答案",
+      "struggle_break_title": "我们一起深呼吸一下。",
+      "struggle_break_body": "有些题确实有点难——而这正是深呼吸最有用的时候。伸个懒腰，准备好了再继续。"
     },
     "lesson_run": {
       "back_to_today": "返回今天"

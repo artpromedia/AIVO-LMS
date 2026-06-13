@@ -19,6 +19,7 @@
  *   Baseline/ProctorBanner          parent / teacher proctor-mode banner
  */
 export * from "./LearnerBaselineShell.js";
+export * from "./learner-prefs.js";
 export * from "./AICompanionHero.js";
 export * from "./PersonalizationChip.js";
 export * from "./BaselineProgressDots.js";

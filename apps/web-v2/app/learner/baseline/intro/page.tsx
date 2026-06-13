@@ -10,6 +10,7 @@ import {
   type PersonalizationVariant,
 } from "@aivo/ui";
 import {
+  getAccessibilityPrefs,
   getActiveBaselineForLearner,
   getBaselineById,
   getIEPForLearner,
@@ -18,6 +19,7 @@ import {
   listSubjects,
 } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
 
 /**
  * /learner/baseline/intro
@@ -60,8 +62,13 @@ export default async function BaselineIntroPage({
   if (iep?.confirmedAt) chips.unshift("iep");
   chips.push("pacing");
 
+  // Reading prefs → `--learner-*` vars on the shell (same bridge as the runner).
+  const a11yPrefs = await getAccessibilityPrefs(session.learnerId, session.tenantId);
+  const shellStyle = learnerPrefStyleVars(a11yPrefs);
+
   return (
     <LearnerBaselineShell
+      style={shellStyle}
       headerLeft={
         <Link
           href={`/learner/baseline/readiness?b=${baseline.id}`}

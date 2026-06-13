@@ -1546,7 +1546,9 @@
       "resume": "계속하기",
       "stop_for_today": "오늘은 여기까지",
       "choose_one": "하나를 선택하세요",
-      "type_answer": "답을 입력하세요"
+      "type_answer": "답을 입력하세요",
+      "struggle_break_title": "함께 숨을 한번 고를까요.",
+      "struggle_break_body": "몇 개는 까다로웠어요. 바로 그럴 때 잠시 숨을 고르면 도움이 돼요. 스트레칭하고 준비되면 계속해요."
     },
     "lesson_run": {
       "back_to_today": "오늘로 돌아가기"

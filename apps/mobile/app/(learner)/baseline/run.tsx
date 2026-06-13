@@ -21,7 +21,17 @@ import { fetchBaselineQuestions, type BaselineQuestion } from "@/src/api/baselin
  * :learnerId`), which serves an AI-generated set or a curated fallback bank
  * — so there is no hardcoded client-side item source.
  */
-const BREAK_EVERY = 3;
+
+// Break cadence — unified with the web runner (was 3, web was 5, which made
+// the two clients pace the baseline differently). The canonical value lives
+// in `@aivo/adaptive-baseline` as `BASELINE_BREAK_EVERY`; we MIRROR it here as
+// a plain literal rather than importing the adaptive engine into the RN bundle
+// (that package is not a mobile runtime dependency / Metro watch folder). The
+// values are kept in lock-step by a parity test:
+//   apps/mobile/__tests__/baseline-break-parity.test.ts
+// which imports the canonical constant and asserts it equals this one. If you
+// change one, change the source and let the test confirm the mirror.
+const BREAK_EVERY = 5;
 
 type LoadState =
   | { kind: "loading" }

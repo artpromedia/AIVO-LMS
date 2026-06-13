@@ -29,6 +29,14 @@ export interface LearnerBaselineShellProps {
   /** Optional bottom bar — typically the submit / continue action. */
   bottomBar?: React.ReactNode;
   className?: string;
+  /**
+   * Inline style for the shell root. The baseline pages use this to stamp the
+   * learner's `--learner-*` reading-preference CSS vars (from
+   * `accessibilityProfileToCssVars` in @aivo/accessibility-contract) so the
+   * question card + answer cards beneath inherit them and the learner's
+   * dyslexia font / larger text / looser spacing apply *inside the question*.
+   */
+  style?: React.CSSProperties;
 }
 
 export function LearnerBaselineShell({
@@ -39,9 +47,11 @@ export function LearnerBaselineShell({
   status,
   bottomBar,
   className,
+  style,
 }: LearnerBaselineShellProps) {
   return (
     <div
+      style={style}
       className={cn(
         "relative min-h-[100dvh] flex flex-col",
         "bg-[var(--aivo-color-surface-canvas)]",

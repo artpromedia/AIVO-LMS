@@ -1546,7 +1546,9 @@
       "resume": "Fortsetzen",
       "stop_for_today": "Für heute beenden",
       "choose_one": "Wählen Sie eine aus",
-      "type_answer": "Geben Sie Ihre Antwort ein"
+      "type_answer": "Geben Sie Ihre Antwort ein",
+      "struggle_break_title": "Atmen wir kurz zusammen durch.",
+      "struggle_break_body": "Einige waren knifflig — und genau dann hilft eine Atempause. Streck dich und mach weiter, wenn du bereit bist."
     },
     "lesson_run": {
       "back_to_today": "Zurück zu heute"
