@@ -19,6 +19,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { getStore as db } from "@/lib/db/store";
 import { getLearner, getUserById, parentCanAccessLearner } from "@/lib/db/repos";
 import { getCareTeam } from "@/lib/db/team-invites";
+import { hasTeacherContributed } from "@/lib/teacher/teacher-assessment-status";
 import { TeamInviteSection } from "./team-invite-section";
 import { completeTeamInviteStepAction } from "./actions";
 export const dynamic = "force-dynamic";
@@ -39,6 +40,8 @@ type TeamMember = {
   role: string;
   context: string;
   isPrimary?: boolean;
+  /** C-07: a teacher whose assessment is submitted shows "Contributed ✓". */
+  contributed?: boolean;
 };
 
 export default async function ParentTeamPage({
@@ -120,6 +123,17 @@ export default async function ParentTeamPage({
   // intentionally omitted — generic tenant membership does not imply a link
   // to this specific learner and surfacing them would leak unrelated adults.
 
+  // C-07 EDIT-1: flag teachers who have submitted their assessment so the
+  // parent sees a "Contributed ✓" badge. Status comes from the assessment
+  // status route with a local-draft fallback (see teacher-assessment-status).
+  await Promise.all(
+    Array.from(members.values())
+      .filter((m) => m.role === "teacher")
+      .map(async (m) => {
+        m.contributed = await hasTeacherContributed(learner.id, learner.tenantId, m.userId);
+      }),
+  );
+
   const list = Array.from(members.values()).sort((a, b) => {
     if (a.role === "parent" && b.role !== "parent") return -1;
     if (b.role === "parent" && a.role !== "parent") return 1;
@@ -190,6 +204,7 @@ export default async function ParentTeamPage({
                     <p className="truncate font-medium">{m.displayName}</p>
                     {m.isPrimary ? <Badge tone="success">{t("primary")}</Badge> : null}
                     <Badge tone="neutral">{ROLE_LABEL[m.role] ?? m.role}</Badge>
+                    {m.contributed ? <Badge tone="success">{t("contributed")}</Badge> : null}
                   </div>
                   <p className="mt-0.5 truncate text-xs text-aivo-ink-soft">{m.context}</p>
                   <a

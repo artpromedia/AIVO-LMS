@@ -8,6 +8,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import {
   webParentAssessments,
+  webTeacherAssessments,
   webBaselineAssessments,
   webBaselineQuestions,
   webBaselineAttempts,
@@ -19,6 +20,7 @@ import type {
   BaselineItemResponseLog,
   BaselineQuestion,
   ParentAssessment,
+  TeacherAssessmentDraft,
 } from "@/lib/db/types";
 import type { AssessmentStore } from "../types";
 import { getDb, withTenantContext } from "./client";
@@ -62,6 +64,52 @@ export const drizzleAssessments: AssessmentStore = {
           set: { learnerId: assessment.learnerId, tenantId: assessment.tenantId, data: assessment },
         });
       return assessment;
+    });
+  },
+
+  async findTeacherAssessmentDraft(learnerId, tenantId, submittedByUserId) {
+    // web_teacher_assessments carries the same `tenant_isolation` RLS
+    // policy as web_parent_assessments (0109_web_teacher_assessments).
+    // withTenantContext sets app.current_tenant so the fail-closed policy
+    // permits the scoped read/write. (Passthrough in memory mode.)
+    return withTenantContext(tenantId, async () => {
+      const [row] = await getDb()
+        .select()
+        .from(webTeacherAssessments)
+        .where(
+          and(
+            eq(webTeacherAssessments.learnerId, learnerId),
+            eq(webTeacherAssessments.tenantId, tenantId),
+            eq(webTeacherAssessments.submittedByUserId, submittedByUserId),
+          ),
+        )
+        .limit(1);
+      return row ? (row.data as TeacherAssessmentDraft) : null;
+    });
+  },
+
+  async upsertTeacherAssessmentDraft(draft) {
+    return withTenantContext(draft.tenantId, async () => {
+      const db = getDb();
+      await db
+        .insert(webTeacherAssessments)
+        .values({
+          id: draft.id,
+          learnerId: draft.learnerId,
+          tenantId: draft.tenantId,
+          submittedByUserId: draft.submittedByUserId,
+          data: draft,
+        })
+        .onConflictDoUpdate({
+          target: webTeacherAssessments.id,
+          set: {
+            learnerId: draft.learnerId,
+            tenantId: draft.tenantId,
+            submittedByUserId: draft.submittedByUserId,
+            data: draft,
+          },
+        });
+      return draft;
     });
   },
 

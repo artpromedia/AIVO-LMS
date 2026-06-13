@@ -41,6 +41,7 @@ import type {
   CollaboratorInsight,
   CollaboratorMember,
   ParentAssessment,
+  TeacherAssessmentDraft,
   ParentLearnerRelationship,
   ParentLessonSummary,
   ParentProgressSummary,
@@ -148,6 +149,9 @@ export type Store = {
   learnerProfiles: Map<string, LearnerProfile>;
   parentLearnerRelationships: ParentLearnerRelationship[];
   parentAssessments: Map<string, ParentAssessment>;
+  /** Sprint C-07: teacher assessment wizard autosave drafts (system of
+   *  record is assessment-svc). Keyed by draft id. */
+  teacherAssessmentDrafts: Map<string, TeacherAssessmentDraft>;
   iepDocuments: Map<string, IEPDocument>;
   accommodationSummaries: Map<string, AccommodationSummary>;
   brainProfiles: Map<string, LearnerBrainProfile>;
@@ -324,6 +328,7 @@ function createStore(): Store {
     learnerProfiles: new Map(),
     parentLearnerRelationships: [],
     parentAssessments: new Map(),
+    teacherAssessmentDrafts: new Map(),
     iepDocuments: new Map(),
     accommodationSummaries: new Map(),
     brainProfiles: new Map(),

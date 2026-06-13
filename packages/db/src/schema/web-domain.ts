@@ -114,6 +114,29 @@ export const webParentAssessments = pgTable(
   (t) => ({ idx: index("web_parent_assessments_idx").on(t.learnerId, t.tenantId) }),
 );
 
+// Sprint C-07 — teacher assessment wizard autosave DRAFT. The system of
+// record is assessment-svc's `teacher_assessments`; this row only buffers
+// the in-progress wizard so a teacher resumes after closing the tab. One
+// row per (learner, tenant, submitting teacher) — the composite index
+// keys the per-teacher lookup. `data` holds the full draft object.
+export const webTeacherAssessments = pgTable(
+  "web_teacher_assessments",
+  {
+    id: text("id").primaryKey(),
+    learnerId: text("learner_id").notNull(),
+    tenantId: text("tenant_id").notNull(),
+    submittedByUserId: text("submitted_by_user_id").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({
+    idx: index("web_teacher_assessments_idx").on(
+      t.learnerId,
+      t.tenantId,
+      t.submittedByUserId,
+    ),
+  }),
+);
+
 export const webBaselineAssessments = pgTable(
   "web_baseline_assessments",
   {

@@ -57,6 +57,9 @@ const MIGRATIONS = [
   "0094_web_mastery_snapshots",
   "0098_web_baseline_bank",
   "0108_brain_profile_approvals",
+  // C-07 teacher assessment draft store (table + index; RLS lives in 0110
+  // and is skipped here the same way 0050 is, per the hermetic-schema split).
+  "0109_web_teacher_assessments",
 ];
 
 const TABLES = [
@@ -74,6 +77,7 @@ const TABLES = [
   "web_learner_profiles",
   "web_parent_learner_relationships",
   "web_parent_assessments",
+  "web_teacher_assessments",
   "web_baseline_assessments",
   "web_baseline_questions",
   "web_baseline_attempts",

@@ -12,10 +12,27 @@
  * store. Import and call from a `*.test.ts`.
  */
 import { describe, it, expect, beforeEach } from "vitest";
-import type { ParentAssessment } from "@/lib/db/types";
+import type { ParentAssessment, TeacherAssessmentDraft } from "@/lib/db/types";
 import type { AssessmentStore } from "../../types";
 
 const T = "t_1";
+
+function tad(over: Partial<TeacherAssessmentDraft> = {}): TeacherAssessmentDraft {
+  const now = "2026-01-01T00:00:00.000Z";
+  return {
+    id: "tad_c1",
+    learnerId: "lrn_c1",
+    tenantId: T,
+    submittedByUserId: "tch_c1",
+    answers: {},
+    completedSections: [],
+    startedAtMs: 1_700_000_000_000,
+    startedAt: now,
+    updatedAt: now,
+    submittedAt: null,
+    ...over,
+  };
+}
 
 function pa(over: Partial<ParentAssessment> = {}): ParentAssessment {
   const now = "2026-01-01T00:00:00.000Z";
@@ -70,6 +87,48 @@ export function assessmentSubmitContract(
     it("scopes reads by tenant — a second tenant sees nothing", async () => {
       await store.upsertParentAssessment(pa());
       expect(await store.findParentAssessment("lrn_c1", "t_other")).toBeNull();
+    });
+
+    // ===== Teacher assessment DRAFT (Sprint C-07) =====
+
+    it("round-trips an upserted teacher draft, keyed per teacher", async () => {
+      await store.upsertTeacherAssessmentDraft(tad());
+      const got = await store.findTeacherAssessmentDraft("lrn_c1", T, "tch_c1");
+      expect(got).not.toBeNull();
+      expect(got!.id).toBe("tad_c1");
+      expect(got!.submittedAt).toBeNull();
+    });
+
+    it("accumulates teacher draft answers + completed sections across patches", async () => {
+      await store.upsertTeacherAssessmentDraft(
+        tad({ answers: { context: { teacherRole: "general_ed" } }, completedSections: ["context"] }),
+      );
+      await store.upsertTeacherAssessmentDraft(
+        tad({
+          answers: {
+            context: { teacherRole: "general_ed" },
+            strengths: { strengths: ["asks questions"] },
+          },
+          completedSections: ["context", "strengths"],
+        }),
+      );
+      const got = await store.findTeacherAssessmentDraft("lrn_c1", T, "tch_c1");
+      expect(got!.completedSections).toEqual(["context", "strengths"]);
+      expect((got!.answers.strengths as { strengths: string[] }).strengths).toEqual([
+        "asks questions",
+      ]);
+    });
+
+    it("isolates teacher drafts by submitting teacher (co-teachers don't collide)", async () => {
+      await store.upsertTeacherAssessmentDraft(tad({ id: "tad_a", submittedByUserId: "tch_a" }));
+      await store.upsertTeacherAssessmentDraft(tad({ id: "tad_b", submittedByUserId: "tch_b" }));
+      expect((await store.findTeacherAssessmentDraft("lrn_c1", T, "tch_a"))!.id).toBe("tad_a");
+      expect((await store.findTeacherAssessmentDraft("lrn_c1", T, "tch_b"))!.id).toBe("tad_b");
+    });
+
+    it("scopes teacher draft reads by tenant — a second tenant sees nothing", async () => {
+      await store.upsertTeacherAssessmentDraft(tad());
+      expect(await store.findTeacherAssessmentDraft("lrn_c1", "t_other", "tch_c1")).toBeNull();
     });
   });
 }

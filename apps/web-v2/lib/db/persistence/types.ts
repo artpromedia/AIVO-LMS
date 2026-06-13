@@ -93,6 +93,7 @@ import type {
   Notification,
   NotificationDelivery,
   ParentAssessment,
+  TeacherAssessmentDraft,
   ParentLessonSummary,
   PolicyVersion,
   QuestChapter,
@@ -306,6 +307,21 @@ export interface AssessmentStore {
   // Parent assessment
   findParentAssessment(learnerId: string, tenantId: string): Promise<ParentAssessment | null>;
   upsertParentAssessment(assessment: ParentAssessment): Promise<ParentAssessment>;
+
+  // Teacher assessment DRAFT (Sprint C-07). The autosave buffer for the
+  // teacher wizard; the system of record is assessment-svc. Keyed by
+  // (learner, tenant, submitting teacher) so co-teachers keep separate
+  // drafts. Co-located in the assessments domain so it shares the
+  // assessments persistence mode (and the assessments↔brainProfiles
+  // same-mode guard).
+  findTeacherAssessmentDraft(
+    learnerId: string,
+    tenantId: string,
+    submittedByUserId: string,
+  ): Promise<TeacherAssessmentDraft | null>;
+  upsertTeacherAssessmentDraft(
+    draft: TeacherAssessmentDraft,
+  ): Promise<TeacherAssessmentDraft>;
 
   // Baseline assessments
   getBaselineById(baselineId: string, tenantId: string): Promise<BaselineAssessment | null>;

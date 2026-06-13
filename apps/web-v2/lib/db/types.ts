@@ -181,6 +181,35 @@ export type ParentAssessment = {
   submittedAt: ISODate | null;
 };
 
+// ===== Teacher assessment draft (Sprint C-07) =====
+export type TeacherAssessmentSectionId = "context" | "strengths" | "supports" | "observations";
+
+/**
+ * Web-v2 section-patch DRAFT for the teacher assessment wizard. The
+ * system of record is assessment-svc (`teacher_assessments`); this row
+ * is the autosave buffer so a teacher who closes the tab mid-wizard
+ * resumes where they left off. One row per (learner, teacher) — keyed by
+ * `submittedByUserId` so two co-teachers of the same learner each keep
+ * their own draft. `answers` holds the validated per-section payloads
+ * (open-shape; the section Zod schemas in lib/validators/teacher-assessment.ts
+ * own the real types). `startedAtMs` is the wall-clock the wizard began,
+ * used to compute elapsed time-to-complete telemetry at submit.
+ */
+export type TeacherAssessmentDraft = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  submittedByUserId: ID;
+  answers: Partial<Record<TeacherAssessmentSectionId, Record<string, unknown>>>;
+  completedSections: TeacherAssessmentSectionId[];
+  /** Epoch ms when the wizard was first started — drives elapsed telemetry. */
+  startedAtMs: number;
+  startedAt: ISODate;
+  updatedAt: ISODate;
+  /** Set when the teacher submits to assessment-svc (system of record). */
+  submittedAt: ISODate | null;
+};
+
 // ===== Collaboration (Sprint 4) =====
 export type CollaboratorRole = "teacher" | "caregiver" | "therapist" | "parent";
 

@@ -51,6 +51,8 @@ import type {
   MasterySnapshot,
   ParentAssessment,
   ParentAssessmentSectionId,
+  TeacherAssessmentDraft,
+  TeacherAssessmentSectionId,
   ParentLessonSummary,
   ParentModification,
   ReadinessState,
@@ -332,6 +334,89 @@ export async function patchParentAssessmentSection(
     updatedAt: nowIso(),
   };
   return getPersistence().assessments.upsertParentAssessment(next);
+}
+
+/* ===== Teacher assessment DRAFT (Sprint C-07) =====
+ * The autosave buffer for the teacher wizard. The system of record is
+ * assessment-svc (`teacher_assessments`); these helpers persist the
+ * in-progress draft so a teacher resumes after closing the tab. Keyed by
+ * (learner, tenant, submitting teacher) so co-teachers keep separate
+ * drafts. Mirrors the parent-assessment get-or-create + section-patch
+ * pattern above. */
+
+export async function findTeacherAssessmentDraft(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TeacherAssessmentDraft | null> {
+  return getPersistence().assessments.findTeacherAssessmentDraft(
+    learnerId,
+    tenantId,
+    submittedByUserId,
+  );
+}
+
+export async function getOrCreateTeacherAssessmentDraft(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TeacherAssessmentDraft> {
+  const existing = await findTeacherAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  if (existing) return existing;
+  const now = nowIso();
+  const draft: TeacherAssessmentDraft = {
+    id: newId("tad"),
+    learnerId,
+    tenantId,
+    submittedByUserId,
+    answers: {},
+    completedSections: [],
+    startedAtMs: Date.now(),
+    startedAt: now,
+    updatedAt: now,
+    submittedAt: null,
+  };
+  return getPersistence().assessments.upsertTeacherAssessmentDraft(draft);
+}
+
+export async function patchTeacherAssessmentSection(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+  section: TeacherAssessmentSectionId,
+  data: Record<string, unknown>,
+): Promise<TeacherAssessmentDraft> {
+  const current = await getOrCreateTeacherAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  const completed = new Set(current.completedSections);
+  completed.add(section);
+  const next: TeacherAssessmentDraft = {
+    ...current,
+    answers: { ...current.answers, [section]: data },
+    completedSections: Array.from(completed),
+    updatedAt: nowIso(),
+  };
+  return getPersistence().assessments.upsertTeacherAssessmentDraft(next);
+}
+
+/**
+ * Stamp the draft submitted (idempotent buffer cleanup). The real record
+ * is written to assessment-svc by the BFF; this only marks the local
+ * draft so the wizard's resume logic shows the completed state and the
+ * elapsed-time computation has a stable anchor.
+ */
+export async function markTeacherAssessmentDraftSubmitted(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TeacherAssessmentDraft | null> {
+  const current = await findTeacherAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  if (!current) return null;
+  const next: TeacherAssessmentDraft = {
+    ...current,
+    submittedAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+  return getPersistence().assessments.upsertTeacherAssessmentDraft(next);
 }
 
 export async function submitParentAssessment(

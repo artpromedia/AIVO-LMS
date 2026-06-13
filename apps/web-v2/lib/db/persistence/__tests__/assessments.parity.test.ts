@@ -9,6 +9,7 @@ import type {
   BaselineAttempt,
   BaselineQuestion,
   ParentAssessment,
+  TeacherAssessmentDraft,
 } from "@/lib/db/types";
 import { getPersistence } from "@/lib/db/persistence";
 import { runInBothModes } from "./parity.harness";
@@ -30,6 +31,28 @@ runInBothModes("assessments", () => {
     } as unknown as ParentAssessment;
     await a.upsertParentAssessment(pa);
     expect((await a.findParentAssessment(L, T))?.id).toBe("pa-parity-1");
+  });
+
+  it("teacher assessment draft upsert + find round-trips, scoped per teacher", async () => {
+    const a = getPersistence().assessments;
+    const draft = {
+      id: "tad-parity-1",
+      learnerId: L,
+      tenantId: T,
+      submittedByUserId: "tch-parity",
+      answers: { context: { teacherRole: "special_ed", gradeLevel: "3-5" } },
+      completedSections: ["context"],
+      startedAtMs: 1_700_000_000_000,
+      startedAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      submittedAt: null,
+    } as TeacherAssessmentDraft;
+    await a.upsertTeacherAssessmentDraft(draft);
+    const got = await a.findTeacherAssessmentDraft(L, T, "tch-parity");
+    expect(got?.id).toBe("tad-parity-1");
+    expect(got?.completedSections).toEqual(["context"]);
+    // A different teacher on the same learner sees no draft.
+    expect(await a.findTeacherAssessmentDraft(L, T, "other-tch")).toBeNull();
   });
 
   it("getActiveBaseline returns the most recent, scoped by tenant", async () => {
