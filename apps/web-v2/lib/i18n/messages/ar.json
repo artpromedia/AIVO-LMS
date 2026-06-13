@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "في تطوّر — سنحافظ على الزخم",
     "reveal_start_estimate_confident": "بثقة — سنواصل التوسّع",
     "reveal_start_estimate_advanced": "ينطلق بقوة — سنُبقيه مليئًا بالتحدّي",
+    "reveal_start_grade_band": "عادةً حول {band}",
     "reveal_start_footnote": "هذه نقاط انطلاق، لا تصنيفات. ستتغيّر كلما تعلّم {name}.",
     "reveal_start_empty_title": "سنكتشف نقاط انطلاق {name} معًا",
     "reveal_start_empty_body": "بمجرد أن يُنهي {name} مغامرة البداية، ستظهر نقطة انطلاق كل مادة هنا.",

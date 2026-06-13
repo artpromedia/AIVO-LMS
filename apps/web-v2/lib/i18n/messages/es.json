@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "creciendo: mantendremos el impulso",
     "reveal_start_estimate_confident": "con confianza: seguiremos avanzando",
     "reveal_start_estimate_advanced": "volando: lo mantendremos desafiante",
+    "reveal_start_grade_band": "normalmente en torno a {band}",
     "reveal_start_footnote": "Son puntos de partida, no etiquetas. Cambiarán a medida que {name} aprenda.",
     "reveal_start_empty_title": "Encontraremos juntos los puntos de partida de {name}",
     "reveal_start_empty_body": "Cuando {name} termine la aventura inicial, aquí aparecerá el punto de partida de cada materia.",

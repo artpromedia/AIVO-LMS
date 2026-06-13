@@ -9,10 +9,14 @@
  *
  * Qualitative, growth-framed starting points per subject ("Reading: building —
  * we'll start gently and move at her pace"). NEVER a grade-equivalent or any
- * score×grade math (C-03 deleted `scoreToGradeEquiv`; Decision D4(b) would
- * permit grade language ONLY from the curriculum-svc catalogue, which is not
- * wired into web-v2 — so per the pre-decided fallback we ship qualitative
- * framing only and surface curriculum grounding as a follow-up).
+ * score×grade math (C-03 deleted `scoreToGradeEquiv`).
+ *
+ * Decision D4(b): a grade-band *label* may accompany the qualitative estimate,
+ * but ONLY when it is grounded in the curriculum-svc catalogue (ADR 0040) and
+ * passed through on `StartingPoint.gradeBandLabel`. It is rendered as quiet
+ * supplementary context (never the headline) and is simply absent when the
+ * builder grounded none — so the screen degrades to qualitative-only framing
+ * with no fabrication.
  *
  * The footnote restates the frame the parent of a newly-diagnosed child most
  * needs to hear: these are starting points, not labels.
@@ -67,6 +71,11 @@ export function WhereWellStart({
                 <span className="reveal-start-estimate">
                   {t(ESTIMATE_KEY[p.estimate], { name: learnerName })}
                 </span>
+                {p.gradeBandLabel ? (
+                  <span className="reveal-start-grade" data-testid="reveal-start-grade">
+                    {t("reveal_start_grade_band", { band: p.gradeBandLabel })}
+                  </span>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -109,6 +118,14 @@ export function WhereWellStart({
         .reveal-start-estimate {
           font-size: 0.92rem;
           color: var(--iw-ink-muted, #475569);
+        }
+        /* D4(b): quiet, catalogue-grounded grade-band label — supplementary
+           context, never the headline. Reads as a soft pill after the estimate. */
+        .reveal-start-grade {
+          flex-basis: 100%;
+          font-size: 0.8rem;
+          color: var(--iw-ink-muted, #64748b);
+          font-style: italic;
         }
         .reveal-start-footnote {
           margin: 1rem 0 0;

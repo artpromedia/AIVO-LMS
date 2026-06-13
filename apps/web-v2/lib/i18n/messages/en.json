@@ -1301,6 +1301,7 @@
     "reveal_start_estimate_growing": "building — we'll keep the momentum going",
     "reveal_start_estimate_confident": "confident — we'll keep stretching",
     "reveal_start_estimate_advanced": "flying — we'll keep it challenging",
+    "reveal_start_grade_band": "typically around {band}",
     "reveal_start_footnote": "These are starting points, not labels. They'll change as {name} learns.",
     "reveal_start_empty_title": "We'll find {name}'s starting points together",
     "reveal_start_empty_body": "Once {name} finishes the baseline adventure, each subject's starting point shows up here.",

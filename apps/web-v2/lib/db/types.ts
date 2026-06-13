@@ -456,6 +456,11 @@ export type LearnerBrainProfileState = {
     subjectId: ID;
     subjectName: string;
     estimate: "new" | "growing" | "confident" | "advanced";
+    /** Decision D4(b): an authoritative grade-band LABEL from the curriculum-svc
+     *  catalogue (ADR 0040), e.g. "Early elementary range". Present ONLY when the
+     *  brain-profile builder grounded it in the catalogue; never computed from a
+     *  score. Absent/null → the reveal shows qualitative framing only. */
+    gradeBandLabel?: string | null;
   }[];
   confidenceSignals: {
     parentAssessment: boolean;

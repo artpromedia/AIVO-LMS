@@ -198,13 +198,35 @@ describe("assembleStartingPoints (screen 4)", () => {
   it("passes qualitative estimates through with no grade numbers", () => {
     const points = assembleStartingPoints(makeState());
     expect(points).toEqual([
-      { subjectId: "reading", subjectName: "Reading", estimate: "new" },
-      { subjectId: "math", subjectName: "Math", estimate: "growing" },
+      { subjectId: "reading", subjectName: "Reading", estimate: "new", gradeBandLabel: null },
+      { subjectId: "math", subjectName: "Math", estimate: "growing", gradeBandLabel: null },
     ]);
     // No numeric grade anywhere on the view-model.
     for (const p of points) {
       expect(typeof (p as unknown as { grade?: unknown }).grade).toBe("undefined");
     }
+  });
+
+  it("defaults gradeBandLabel to null when the builder grounded none (D4b fallback)", () => {
+    const points = assembleStartingPoints(makeState());
+    expect(points.every((p) => p.gradeBandLabel === null)).toBe(true);
+  });
+
+  it("passes through an authoritative curriculum-svc grade-band label when present (D4b)", () => {
+    const state = makeState();
+    state.masteryOverview = [
+      {
+        subjectId: "reading",
+        subjectName: "Reading",
+        estimate: "new",
+        gradeBandLabel: "Early elementary range",
+      },
+      { subjectId: "math", subjectName: "Math", estimate: "growing" },
+    ];
+    const points = assembleStartingPoints(state);
+    expect(points[0].gradeBandLabel).toBe("Early elementary range");
+    // A subject the catalogue didn't ground stays null — never fabricated.
+    expect(points[1].gradeBandLabel).toBeNull();
   });
 });
 

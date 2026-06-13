@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "성장 중 — 흐름을 이어갈게요",
     "reveal_start_estimate_confident": "자신 있음 — 계속 넓혀갈게요",
     "reveal_start_estimate_advanced": "날아오르는 중 — 도전을 유지할게요",
+    "reveal_start_grade_band": "보통 {band} 정도",
     "reveal_start_footnote": "이것은 출발점이지 꼬리표가 아닙니다. {name}이(가) 배우면서 바뀝니다.",
     "reveal_start_empty_title": "{name}의 출발점을 함께 찾을게요",
     "reveal_start_empty_body": "{name}이(가) 초기 모험을 마치면 각 과목의 출발점이 여기에 표시됩니다.",

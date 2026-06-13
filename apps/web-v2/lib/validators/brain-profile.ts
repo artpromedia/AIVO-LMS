@@ -121,6 +121,10 @@ export const brainProfileStateSchema = z.object({
       subjectId: z.string(),
       subjectName: z.string(),
       estimate: comfortEnum,
+      // Decision D4(b): authoritative grade-band label from the curriculum-svc
+      // catalogue (ADR 0040). Optional + nullable so profiles built before the
+      // grounding lands still validate; never a computed grade-equivalent.
+      gradeBandLabel: z.string().min(1).max(60).nullish(),
     }),
   ),
   confidenceSignals: z.object({

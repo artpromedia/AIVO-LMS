@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "em desenvolvimento — vamos manter o impulso",
     "reveal_start_estimate_confident": "confiante — vamos continuar avançando",
     "reveal_start_estimate_advanced": "decolando — vamos manter o desafio",
+    "reveal_start_grade_band": "normalmente em torno de {band}",
     "reveal_start_footnote": "São pontos de partida, não rótulos. Vão mudar à medida que {name} aprende.",
     "reveal_start_empty_title": "Vamos encontrar juntos os pontos de partida de {name}",
     "reveal_start_empty_body": "Quando {name} terminar a aventura inicial, o ponto de partida de cada matéria aparecerá aqui.",

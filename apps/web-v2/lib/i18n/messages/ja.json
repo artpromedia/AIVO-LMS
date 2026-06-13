@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "成長中——勢いを保ちます",
     "reveal_start_estimate_confident": "自信あり——さらに伸ばします",
     "reveal_start_estimate_advanced": "絶好調——挑戦を保ちます",
+    "reveal_start_grade_band": "おおむね{band}くらい",
     "reveal_start_footnote": "これはスタート地点であってレッテルではありません。{name}さんが学ぶにつれて変わります。",
     "reveal_start_empty_title": "{name}さんのスタート地点を一緒に見つけます",
     "reveal_start_empty_body": "{name}さんが最初の冒険を終えると、各教科のスタート地点がここに表示されます。",

@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "en progression : nous garderons l'élan",
     "reveal_start_estimate_confident": "à l'aise : nous continuerons à progresser",
     "reveal_start_estimate_advanced": "en plein vol : nous garderons le défi",
+    "reveal_start_grade_band": "généralement autour de {band}",
     "reveal_start_footnote": "Ce sont des points de départ, pas des étiquettes. Ils évolueront à mesure que {name} apprend.",
     "reveal_start_empty_title": "Nous trouverons ensemble les points de départ de {name}",
     "reveal_start_empty_body": "Une fois que {name} aura terminé l'aventure de départ, le point de départ de chaque matière apparaîtra ici.",

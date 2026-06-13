@@ -311,23 +311,31 @@ function focusKey(
 export type StartingPoint = {
   subjectId: string;
   subjectName: string;
-  /** Qualitative estimate (the only "level" parents ever see). */
+  /** Qualitative estimate (the only computed "level" parents ever see). */
   estimate: "new" | "growing" | "confident" | "advanced";
+  /** Decision D4(b): an authoritative grade-band LABEL sourced from the
+   *  curriculum-svc catalogue (ADR 0040), e.g. "Early elementary range". It is
+   *  passed straight through from `masteryOverview[].gradeBandLabel` and is
+   *  `null` whenever the builder did not ground one — there is NO score×grade
+   *  math here. Screen 4 renders it as supplementary context only when present. */
+  gradeBandLabel: string | null;
 };
 
 /**
  * Screen 4 reads the authoritative `masteryOverview` estimates straight
- * through. Decision D4(b): grade language would come ONLY from the
- * curriculum-svc catalogue (ADR 0040). That grounding is not wired into web-v2
- * (curriculum-svc is read-only and not called per-learner here), so per the
- * pre-decided fallback we ship qualitative growth framing only and never
- * fabricate a number. No `scoreToGradeEquiv`, no score×grade math.
+ * through. Decision D4(b): grade language is shown ONLY when the brain-profile
+ * builder attached a `gradeBandLabel` grounded in the curriculum-svc catalogue
+ * (ADR 0040). This module never fabricates one — when the builder supplies no
+ * label (the current default until per-learner curriculum grounding is wired),
+ * `gradeBandLabel` is `null` and the screen falls back to qualitative growth
+ * framing. No `scoreToGradeEquiv`, no score×grade math, ever.
  */
 export function assembleStartingPoints(state: LearnerBrainProfileState): StartingPoint[] {
   return state.masteryOverview.map((m) => ({
     subjectId: m.subjectId,
     subjectName: m.subjectName,
     estimate: m.estimate,
+    gradeBandLabel: m.gradeBandLabel ?? null,
   }));
 }
 

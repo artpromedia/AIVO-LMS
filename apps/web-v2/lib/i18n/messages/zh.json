@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "正在成长——我们会保持势头",
     "reveal_start_estimate_confident": "自信——我们会继续拓展",
     "reveal_start_estimate_advanced": "游刃有余——我们会保持挑战",
+    "reveal_start_grade_band": "通常在{band}左右",
     "reveal_start_footnote": "这些是起点，不是标签。它们会随着{name}的学习而变化。",
     "reveal_start_empty_title": "我们会一起找到{name}的起点",
     "reveal_start_empty_body": "等{name}完成初始探险后，每门学科的起点会显示在这里。",

@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "बढ़ रहा है — हम गति बनाए रखेंगे",
     "reveal_start_estimate_confident": "आत्मविश्वासी — हम आगे बढ़ाते रहेंगे",
     "reveal_start_estimate_advanced": "उड़ान भर रहा है — हम चुनौती बनाए रखेंगे",
+    "reveal_start_grade_band": "आमतौर पर {band} के आसपास",
     "reveal_start_footnote": "ये शुरुआती बिंदु हैं, लेबल नहीं। {name} के सीखने के साथ ये बदलेंगे।",
     "reveal_start_empty_title": "हम {name} के शुरुआती बिंदु साथ मिलकर ढूँढ़ेंगे",
     "reveal_start_empty_body": "जैसे ही {name} शुरुआती रोमांच पूरा करेगा/करेगी, हर विषय का शुरुआती बिंदु यहाँ दिखेगा।",

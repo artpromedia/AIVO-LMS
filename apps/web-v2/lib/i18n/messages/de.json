@@ -1103,6 +1103,7 @@
     "reveal_start_estimate_growing": "im Aufbau – wir halten den Schwung",
     "reveal_start_estimate_confident": "sicher – wir fordern weiter heraus",
     "reveal_start_estimate_advanced": "im Höhenflug – wir halten es spannend",
+    "reveal_start_grade_band": "typischerweise rund um {band}",
     "reveal_start_footnote": "Das sind Startpunkte, keine Etiketten. Sie verändern sich, während {name} lernt.",
     "reveal_start_empty_title": "Wir finden {name}s Startpunkte gemeinsam",
     "reveal_start_empty_body": "Sobald {name} das Einstiegsabenteuer abgeschlossen hat, erscheint hier der Startpunkt jedes Fachs.",
