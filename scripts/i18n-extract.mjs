@@ -58,7 +58,11 @@ function walk(dir, out = []) {
     const full = join(dir, name);
     const st = statSync(full);
     if (st.isDirectory()) walk(full, out);
-    else if (st.isFile() && /\.(tsx|jsx)$/.test(name)) out.push(full);
+    // Co-located test/spec fixtures are engineer-only, not shipped UI — their
+    // literal strings (mock labels, `aria-label="concerns"`, etc.) are not
+    // translatable product copy, so they're excluded like the design galleries.
+    else if (st.isFile() && /\.(tsx|jsx)$/.test(name) && !/\.(test|spec)\.(tsx|jsx)$/.test(name))
+      out.push(full);
   }
   return out;
 }
@@ -85,6 +89,7 @@ function isCodey(s) {
   if (SKIP_VALUES.has(s)) return true;
   if (!/[a-zA-Z]/.test(s)) return true;
   if (/^[A-Z0-9_\-/.]+$/.test(s)) return true; // looks like an ENUM/CONST
+  if (/\w\(/.test(s)) return true; // a call expression — `from(`, `querySelectorAll(` — is code, not prose
   if (/^\$\{/.test(s)) return true; // template literal
   if (/^(http|https|mailto|tel|\/)/.test(s)) return true;
   // common email/number placeholder examples — symbolic, not prose
@@ -128,6 +133,9 @@ for (const file of walk(appRoot)) {
   JSX_TEXT.lastIndex = 0;
   let m2;
   while ((m2 = JSX_TEXT.exec(src))) {
+    // A `>` preceded by `=` is the arrow of `=> Promise<T>` / `=> JSX`, not a
+    // tag close, so the captured token is a TS return type, not JSX text.
+    if (src[m2.index] === ">" && src[m2.index - 1] === "=") continue;
     const value = m2[1].trim();
     if (isCodey(value)) continue;
     if (looksTranslated(src, m2.index)) continue;
