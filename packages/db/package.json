@@ -12,6 +12,7 @@
     "db:migrate": "tsx src/migrate.ts",
     "db:seed": "tsx src/seed.ts",
     "db:seed:demo": "tsx src/seed-demo.ts",
+    "db:seed:pilots": "tsx src/seed-pilots.ts",
     "db:studio": "drizzle-kit studio",
     "check:schema-drift": "tsx scripts/check-schema-drift.ts"
   },
