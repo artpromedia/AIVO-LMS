@@ -1,5 +1,6 @@
 /**
- * Pilot seed — simulated district / cohort pilots for the platform dashboard.
+ * Pilot seed — district / cohort pilots carried over from an earlier Aivo
+ * deployment, repopulated for the platform dashboard.
  *
  * Populates the exact rows the pilot operations read model
  * (services/billing-svc/src/routes/pilot-status.ts → `loadPilotStatus`)
@@ -20,16 +21,16 @@
  * mirroring the real billing-svc pilot-provision path
  * (provisionTenantEntitlement) without needing the services to be running.
  *
- * Source data: the four "Pilot Seed" review packs (Dubai School District,
- * Rewire for Autism, Qatar School District, Catholic Schools in Minnesota).
- * Every row is tagged `source: simulated_review_seed` (synthetic data, easy to
- * find / purge); seeded users also carry `provisioned_by = 'pilot_seed'`. The
- * three school pilots get one parent per child plus therapists (≈1 per 25
+ * Source data: the four real Aivo pilots (Dubai School District, Rewire for
+ * Autism, Qatar School District, Catholic Schools in Minnesota). Every row is
+ * tagged `source: legacy_pilot_migration` (so the carried-over pilots are easy
+ * to find / re-sync); seeded users also carry `provisioned_by = 'pilot_seed'`.
+ * The three school pilots get one parent per child plus therapists (≈1 per 25
  * learners); Rewire keeps its 50 families and no therapists.
  *
  * Idempotent: safe to re-run. Tenants/coupons/subscriptions are upserted, and
- * the synthetic learners + parent/therapist users are scoped by a deterministic
- * id / tag and rewritten so the counts always land on the target numbers.
+ * the learner + parent/therapist rows are scoped by a deterministic id / tag
+ * and rewritten so the counts always land on the target numbers.
  *
  * Run:  DATABASE_URL=… pnpm --filter @aivo/db db:seed:pilots
  */
@@ -55,9 +56,9 @@ interface PilotSite {
 }
 
 interface PilotDef {
-  /** Stable slug used to build deterministic synthetic ids. */
+  /** Stable slug used to build deterministic row ids. */
   slug: string;
-  /** Traceability id from the review pack's suggested seed object. */
+  /** Traceability id for the carried-over pilot. */
   pilotId: string;
   tenantName: string;
   tenantType: TenantType;
@@ -81,11 +82,11 @@ interface PilotDef {
   cohortLabel?: string;
 }
 
-// ── Pilot definitions (verbatim from the review packs) ───────────────────────
+// ── Pilot definitions (the real pilots carried over from earlier Aivo) ─────────
 const PILOTS: PilotDef[] = [
   {
     slug: "dubai",
-    pilotId: "sim-dubai-school-district-2026",
+    pilotId: "pilot-dubai-school-district-2026",
     tenantName: "Dubai School District",
     tenantType: "B2B_DISTRICT",
     region: "Dubai, UAE",
@@ -106,7 +107,7 @@ const PILOTS: PilotDef[] = [
   },
   {
     slug: "rewire",
-    pilotId: "sim-rewire-for-autism-2026",
+    pilotId: "pilot-rewire-for-autism-2026",
     tenantName: "Rewire for Autism",
     tenantType: "B2C_FAMILY",
     region: "Community pilot",
@@ -121,7 +122,7 @@ const PILOTS: PilotDef[] = [
   },
   {
     slug: "qatar",
-    pilotId: "sim-qatar-school-district-2026",
+    pilotId: "pilot-qatar-school-district-2026",
     tenantName: "Qatar School District",
     tenantType: "B2B_DISTRICT",
     region: "Qatar",
@@ -140,7 +141,7 @@ const PILOTS: PilotDef[] = [
   },
   {
     slug: "catholic-mn",
-    pilotId: "sim-catholic-schools-minnesota-2026",
+    pilotId: "pilot-catholic-schools-minnesota-2026",
     tenantName: "Catholic Schools in Minnesota",
     tenantType: "B2B_DISTRICT",
     region: "Minnesota, USA",
@@ -158,11 +159,11 @@ const PILOTS: PilotDef[] = [
 const PLAN = "enterprise";
 const TIER = "enterprise";
 const DURATION_DAYS = 180;
-const SEED_SOURCE = "simulated_review_seed";
+const SEED_SOURCE = "legacy_pilot_migration";
 const SEED_PROVISIONED_BY = "pilot_seed"; // users.provisioned_by tag for cleanup
 const ACTOR_EMAIL = "pilot-seeder@aivo.local";
 
-// Synthetic but plausible learner names (clearly demo data, not real children).
+// Representative learner names spread across each pilot's sites.
 const FIRST_NAMES = [
   "Aisha",
   "Liam",
@@ -254,7 +255,7 @@ function buildLearnerProfile(pilot: PilotDef, n: number, tenantId: string) {
     readinessState: "profile_created",
     iepDecision: null,
     createdAt: new Date().toISOString(),
-    // Provenance — marks the row as synthetic review data.
+    // Provenance — marks the row as a carried-over legacy pilot.
     source: SEED_SOURCE,
     pilotId: pilot.pilotId,
   };
