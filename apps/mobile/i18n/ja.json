@@ -223,7 +223,11 @@
     "cancelSubscription": "サブスクリプションをキャンセル",
     "cancelAtPeriodEnd": "期間終了時にキャンセル",
     "addedToBill": "{{count}}個の追加オプション · ¥{{price}}/月",
-    "openInvoice": "請求書を開く"
+    "openInvoice": "請求書を開く",
+    "termsTitle": "サブスクリプション規約",
+    "termsMessage": "お子様1人あたり月額$39.99、30日間の無料トライアル終了後に課金されます。いつでも解約できます。これらの規約に同意しますか？",
+    "termsAgree": "同意します",
+    "allTutorsIncluded": "お子様ごとに14人のAIチューターすべてが含まれます（アドオンなし）。"
   },
   "parentTutors": {
     "title": "チューターストア",
@@ -234,7 +238,8 @@
     "core7Bundle": "コア7バンドル",
     "includedWithSub": "サブスクリプションに含まれています",
     "full14Bundle": "フル14バンドル",
-    "full14Price": "¥9.99/月のアドオン"
+    "full14Price": "¥9.99/月のアドオン",
+    "allIncluded": "あなたのプランには14人のAIチューターすべてが含まれています。"
   },
   "parentRecommendations": {
     "title": "おすすめ",

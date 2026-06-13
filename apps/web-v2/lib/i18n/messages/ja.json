@@ -200,11 +200,13 @@
       "sub_canceling": "解約中...",
       "sub_cancel_at_period_end": "期間終了時に解約",
       "checkout": {
-        "success_title": "Payment received",
-        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
-        "cancelled_title": "Checkout cancelled",
-        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
-      }
+        "success_title": "お支払いを受け付けました",
+        "success_body": "ありがとうございます！プランを有効化しています — まもなくここに表示されます。",
+        "cancelled_title": "チェックアウトをキャンセルしました",
+        "cancelled_body": "請求は発生していません。準備ができたらいつでもプランを選べます。"
+      },
+      "sub_terms_label": "サブスクリプション規約に同意します：お子様1人あたり月額$39.99、30日間の無料トライアル終了後に課金されます。いつでも解約できます。",
+      "sub_terms_required": "続行するにはサブスクリプション規約に同意してください。"
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "回答はあなただけのものです",

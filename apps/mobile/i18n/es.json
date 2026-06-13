@@ -223,7 +223,11 @@
     "cancelSubscription": "Cancelar suscripción",
     "cancelAtPeriodEnd": "Se cancela al final del período",
     "addedToBill": "{{count}} complemento(s) · ${{price}}/mes",
-    "openInvoice": "Abrir factura"
+    "openInvoice": "Abrir factura",
+    "termsTitle": "Términos de suscripción",
+    "termsMessage": "$39.99 al mes por niño, cobrado después de tu prueba gratuita de 30 días. Puedes cancelar cuando quieras. ¿Aceptas estos términos?",
+    "termsAgree": "Acepto",
+    "allTutorsIncluded": "Los 14 tutores de IA están incluidos para cada niño, sin complementos."
   },
   "parentTutors": {
     "title": "Tienda de Tutores",
@@ -234,7 +238,8 @@
     "core7Bundle": "Paquete 7 Básicos",
     "includedWithSub": "Incluido con la suscripción",
     "full14Bundle": "Paquete Completo 14",
-    "full14Price": "$9.99/mes adicional"
+    "full14Price": "$9.99/mes adicional",
+    "allIncluded": "Los 14 tutores de IA están incluidos en tu plan."
   },
   "parentRecommendations": {
     "title": "Recomendaciones",

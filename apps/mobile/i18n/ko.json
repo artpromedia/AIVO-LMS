@@ -223,7 +223,11 @@
     "cancelSubscription": "구독 취소",
     "cancelAtPeriodEnd": "기간 종료 시 취소",
     "addedToBill": "{{count}}개 부가 기능 · ₩{{price}}/월",
-    "openInvoice": "청구서 열기"
+    "openInvoice": "청구서 열기",
+    "termsTitle": "구독 약관",
+    "termsMessage": "자녀 1명당 월 $39.99, 30일 무료 체험 종료 후 청구됩니다. 언제든 취소할 수 있습니다. 이 약관에 동의하시나요?",
+    "termsAgree": "동의합니다",
+    "allTutorsIncluded": "자녀마다 14명의 AI 튜터가 모두 포함됩니다(추가 구성 없음)."
   },
   "parentTutors": {
     "title": "튜터 스토어",
@@ -234,7 +238,8 @@
     "core7Bundle": "핵심 7 번들",
     "includedWithSub": "구독에 포함됨",
     "full14Bundle": "전체 14 번들",
-    "full14Price": "월 $9.99 부가 기능"
+    "full14Price": "월 $9.99 부가 기능",
+    "allIncluded": "요금제에 14명의 AI 튜터가 모두 포함되어 있습니다."
   },
   "parentRecommendations": {
     "title": "추천",

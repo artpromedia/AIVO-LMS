@@ -223,7 +223,11 @@
     "cancelSubscription": "Cancel subscription",
     "cancelAtPeriodEnd": "Cancels at period end",
     "addedToBill": "{{count}} add-on(s) · ${{price}}/mo",
-    "openInvoice": "Open invoice"
+    "openInvoice": "Open invoice",
+    "termsTitle": "Subscription terms",
+    "termsMessage": "$39.99/month per child, billed after your 30-day free trial. You can cancel anytime. Do you agree to these terms?",
+    "termsAgree": "I agree",
+    "allTutorsIncluded": "All 14 AI tutors are included for every child — no add-ons."
   },
   "parentTutors": {
     "title": "Tutor Store",
@@ -234,7 +238,8 @@
     "core7Bundle": "Core 7 Bundle",
     "includedWithSub": "Included with subscription",
     "full14Bundle": "Full 14 Bundle",
-    "full14Price": "$9.99/mo add-on"
+    "full14Price": "$9.99/mo add-on",
+    "allIncluded": "All 14 AI tutors are included with your plan."
   },
   "parentRecommendations": {
     "title": "Recommendations",

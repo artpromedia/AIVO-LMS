@@ -200,11 +200,13 @@
       "sub_canceling": "Cancelando...",
       "sub_cancel_at_period_end": "Cancelar al final del período",
       "checkout": {
-        "success_title": "Payment received",
-        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
-        "cancelled_title": "Checkout cancelled",
-        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
-      }
+        "success_title": "Pago recibido",
+        "success_body": "¡Gracias! Tu plan se está activando — aparecerá aquí en un momento.",
+        "cancelled_title": "Pago cancelado",
+        "cancelled_body": "No se realizó ningún cargo. Puedes elegir un plan cuando estés listo."
+      },
+      "sub_terms_label": "Acepto los términos de suscripción: $39.99 al mes por niño, cobrado después de la prueba gratuita de 30 días. Cancela cuando quieras.",
+      "sub_terms_required": "Acepta los términos de suscripción para continuar."
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Tus respuestas son solo tuyas",

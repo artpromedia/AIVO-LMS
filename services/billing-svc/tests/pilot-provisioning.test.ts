@@ -67,7 +67,7 @@ async function seedActorUser(db: any): Promise<string> {
 function provisionBody(tenantId: string, actorUserId = "00000000-0000-0000-0000-0000000000aa") {
   return {
     tenantId,
-    plan: "district",
+    plan: "enterprise",
     tier: "enterprise",
     seatLimit: 25,
     durationDays: 90,
@@ -94,7 +94,7 @@ test("provision sets tier + seat_limit, inserts ACTIVE subscription, redeems cou
     assert.equal(body.ok, true);
     assert.equal(body.provisioned, true);
     assert.equal(body.tier, "enterprise");
-    assert.equal(body.plan, "district");
+    assert.equal(body.plan, "enterprise");
     assert.equal(body.seatLimit, 25);
     assert.ok(body.couponCode.startsWith("PILOT-"));
 
@@ -111,7 +111,7 @@ test("provision sets tier + seat_limit, inserts ACTIVE subscription, redeems cou
     const subs = Array.isArray(subRows) ? subRows : subRows.rows;
     assert.equal(subs.length, 1);
     assert.equal(subs[0].status, "ACTIVE");
-    assert.equal(subs[0].plan, "district");
+    assert.equal(subs[0].plan, "enterprise");
 
     const couponRows: any = await db.execute(
       sql`SELECT redemptions, coupon_type, max_redemptions FROM billing_coupons WHERE code = ${body.couponCode}`,

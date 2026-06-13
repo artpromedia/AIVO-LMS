@@ -223,7 +223,11 @@
     "cancelSubscription": "Abonnement kündigen",
     "cancelAtPeriodEnd": "Kündigung zum Periodenende",
     "addedToBill": "{{count}} Erweiterung(en) · {{price}} €/Monat",
-    "openInvoice": "Rechnung öffnen"
+    "openInvoice": "Rechnung öffnen",
+    "termsTitle": "Abonnementbedingungen",
+    "termsMessage": "$39.99/Monat pro Kind, abgebucht nach deiner 30-tägigen kostenlosen Testphase. Du kannst jederzeit kündigen. Stimmst du diesen Bedingungen zu?",
+    "termsAgree": "Ich stimme zu",
+    "allTutorsIncluded": "Alle 14 KI-Tutoren sind für jedes Kind enthalten – ohne Zusatzmodule."
   },
   "parentTutors": {
     "title": "Tutor-Store",
@@ -234,7 +238,8 @@
     "core7Bundle": "Kern-7-Paket",
     "includedWithSub": "Im Abonnement enthalten",
     "full14Bundle": "Vollständiges 14er-Paket",
-    "full14Price": "9,99 €/Monat Erweiterung"
+    "full14Price": "9,99 €/Monat Erweiterung",
+    "allIncluded": "Alle 14 KI-Tutoren sind in deinem Tarif enthalten."
   },
   "parentRecommendations": {
     "title": "Empfehlungen",

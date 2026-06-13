@@ -62,7 +62,8 @@ async function loadSubscription(db: any, tenantId: string): Promise<Subscription
     .limit(1);
   const row = rows[0];
   if (!row) return null;
-  const plan: PlanId = isPlanId(row.plan) ? row.plan : "free";
+  // Legacy rows fall back to the all-access Family tier (see tutor-svc).
+  const plan: PlanId = isPlanId(row.plan) ? row.plan : "family";
   return {
     plan,
     status: normalizeStatus(row.stripeStatus, row.status),

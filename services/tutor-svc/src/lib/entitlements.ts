@@ -40,7 +40,9 @@ async function loadSubscriptionForTenant(
     .limit(1);
   const row = rows[0];
   if (!row) return null;
-  const plan: PlanId = isPlanId(row.plan) ? row.plan : "free";
+  // Legacy rows (single/district/free) fall back to the all-access Family
+  // tier so no existing subscriber is locked out by the tier collapse.
+  const plan: PlanId = isPlanId(row.plan) ? row.plan : "family";
   const status: SubscriptionStatus = normalizeStatus(row.stripeStatus, row.status);
   return {
     plan,

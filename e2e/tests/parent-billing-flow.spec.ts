@@ -108,7 +108,7 @@ test.describe("parent billing flow", () => {
     await ctx.dispose();
   });
 
-  test("loads the catalog and shows free-plan state by default", async ({ page }) => {
+  test("loads the catalog with the two tiers (Family + Enterprise)", async ({ page }) => {
     // Stash the auth token before navigation so the page mounts logged in.
     await page.addInitScript((authToken) => {
       try {
@@ -117,11 +117,11 @@ test.describe("parent billing flow", () => {
     }, token);
     await page.goto(`${WEB_BASE}/dashboard/parent/billing`);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/Billing|Subscription/i);
-    // Free plan card should be the active one.
-    await expect(page.getByText(/Free Trial|Free/i).first()).toBeVisible();
-    // Catalog should include Single + Family.
-    await expect(page.getByText("Single Learner")).toBeVisible();
-    await expect(page.getByText("Family")).toBeVisible();
+    // Two tiers only: Family (listed price) and Enterprise (contact sales).
+    await expect(page.getByText("Family").first()).toBeVisible();
+    await expect(page.getByText(/Enterprise/i).first()).toBeVisible();
+    // The legacy Single Learner tier is gone.
+    await expect(page.getByText("Single Learner")).toHaveCount(0);
   });
 
   test("renders payment-failed banner for a past_due subscription", async ({ page }) => {
@@ -169,7 +169,7 @@ test.describe("parent billing flow", () => {
   test("locked tutor on learner home is aria-disabled and surfaces error in lesson page", async ({
     page,
   }) => {
-    // Free plan → Coding is locked.
+    // No active subscription → every tutor (including Coding) is locked.
     await page.addInitScript((authToken) => {
       try {
         window.localStorage.setItem("accessToken", authToken as string);

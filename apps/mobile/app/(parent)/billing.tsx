@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -14,8 +14,7 @@ import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { TUTOR_KEY_TO_SKU, type TutorKey, type TutorSku } from "@aivo/billing-entitlements";
-import { TUTORS } from "@aivo/brand";
+import { type TutorSku } from "@aivo/billing-entitlements";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { apiFetch } from "@/lib/api";
@@ -155,7 +154,6 @@ export default function BillingScreen() {
 
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
-  const [addonLoading, setAddonLoading] = useState<TutorKey | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const plansQuery = useQuery<{ plans: Plan[] }>({
@@ -217,69 +215,24 @@ export default function BillingScreen() {
   }, [tenantId, queryClient]);
 
   const subscription = subscriptionQuery.data;
-  const entitlements = entitlementsQuery.data;
   const invoices = invoicesQuery.data?.invoices ?? [];
   const plans = plansQuery.data?.plans ?? [];
-  const currentPlanId = subscription?.plan || "free";
-  const includedSkus = useMemo(
-    () => new Set<TutorSku>(entitlements?.includedTutorSkus ?? []),
-    [entitlements?.includedTutorSkus],
-  );
-  const purchasedSkus = useMemo(
-    () => new Set<TutorSku>(entitlements?.purchasedTutorSkus ?? []),
-    [entitlements?.purchasedTutorSkus],
-  );
+  const currentPlanId = subscription?.plan || "none";
   const paymentFailed =
     subscription?.paymentStatus === "failed" || subscription?.status === "past_due";
   const incomplete =
     subscription?.status === "incomplete" || subscription?.status === "incomplete_expired";
   const trialDays = describeTrialDays(subscription?.trialEndsAt);
 
-  const startCheckout = useCallback(
+  const launchCheckout = useCallback(
     async (planId: string, planName: string) => {
-      if (planId === "district") {
-        Alert.alert(
-          t("parentBilling.contactSales"),
-          "District plans require a custom agreement. Please contact sales@aivolearning.com.",
-        );
-        return;
-      }
-      if (planId === "free") {
-        Alert.alert(
-          t("parentBilling.downgradeAlertTitle"),
-          t("parentBilling.downgradeAlertMessage"),
-          [
-            { text: t("common.cancel"), style: "cancel" },
-            {
-              text: t("parentBilling.downgradeConfirm"),
-              style: "destructive",
-              onPress: async () => {
-                const res = await apiFetch(
-                  API.BILLING,
-                  `/api/billing/subscription/${tenantId}/cancel`,
-                  { method: "POST" },
-                );
-                if (res.ok) {
-                  Alert.alert(
-                    t("parentBilling.downgradeScheduled"),
-                    t("parentBilling.downgradeScheduledMessage"),
-                  );
-                  refetchAll();
-                } else {
-                  const data = await res.json().catch(() => ({}));
-                  Alert.alert(t("common.error"), data.error || "Could not cancel");
-                }
-              },
-            },
-          ],
-        );
-        return;
-      }
       setCheckoutLoading(planId);
       try {
         const res = await apiFetch(API.BILLING, "/api/billing/checkout/session", {
           method: "POST",
-          body: JSON.stringify({ tenantId, planId }),
+          // termsAccepted records the parent's agreement to the per-child
+          // subscription terms ($39.99/mo per child after the 30-day trial).
+          body: JSON.stringify({ tenantId, planId, termsAccepted: true }),
         });
         const data = await res.json();
         if (res.ok && data.checkoutUrl) {
@@ -295,6 +248,29 @@ export default function BillingScreen() {
       }
     },
     [tenantId, t, refetchAll],
+  );
+
+  const startCheckout = useCallback(
+    async (planId: string, planName: string) => {
+      // Enterprise (and the legacy "district") is a contract sale.
+      if (planId === "enterprise" || planId === "district") {
+        Alert.alert(
+          t("parentBilling.contactSales"),
+          "Enterprise plans are set up with your school or district. Please contact sales@aivolearning.com.",
+        );
+        return;
+      }
+      // Family: require explicit agreement to the per-child terms before we
+      // start a (trialing) subscription that bills $39.99/mo per child.
+      Alert.alert(t("parentBilling.termsTitle"), t("parentBilling.termsMessage"), [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("parentBilling.termsAgree"),
+          onPress: () => launchCheckout(planId, planName),
+        },
+      ]);
+    },
+    [t, launchCheckout],
   );
 
   const openPortal = useCallback(async () => {
@@ -324,52 +300,6 @@ export default function BillingScreen() {
     });
     if (res.ok) refetchAll();
   }, [tenantId, refetchAll]);
-
-  const addAddon = useCallback(
-    async (key: TutorKey) => {
-      setAddonLoading(key);
-      try {
-        const res = await apiFetch(API.BILLING, "/api/billing/addons", {
-          method: "POST",
-          body: JSON.stringify({ tenantId, tutorSku: TUTOR_KEY_TO_SKU[key] }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (res.ok) {
-          refetchAll();
-        } else {
-          Alert.alert(t("common.error"), data.error || "Could not add tutor");
-        }
-      } catch {
-        Alert.alert(t("common.error"), t("parentBilling.networkError"));
-      } finally {
-        setAddonLoading(null);
-      }
-    },
-    [tenantId, t, refetchAll],
-  );
-
-  const removeAddon = useCallback(
-    async (key: TutorKey) => {
-      setAddonLoading(key);
-      try {
-        const sku = TUTOR_KEY_TO_SKU[key];
-        const res = await apiFetch(API.BILLING, `/api/billing/addons/${tenantId}/${sku}`, {
-          method: "DELETE",
-        });
-        const data = await res.json().catch(() => ({}));
-        if (res.ok) {
-          refetchAll();
-        } else {
-          Alert.alert(t("common.error"), data.error || "Could not remove tutor");
-        }
-      } catch {
-        Alert.alert(t("common.error"), t("parentBilling.networkError"));
-      } finally {
-        setAddonLoading(null);
-      }
-    },
-    [tenantId, t, refetchAll],
-  );
 
   const forbidden = (subscriptionQuery.error as any)?.status === 403;
   const networkErr =
@@ -443,7 +373,7 @@ export default function BillingScreen() {
                 </Text>
                 <AivoButton
                   title={t("parentBilling.switchPlan")}
-                  onPress={() => startCheckout(currentPlanId, subscription?.plan ?? "single")}
+                  onPress={() => startCheckout(currentPlanId, subscription?.plan ?? "family")}
                   size="sm"
                   style={{ marginTop: spacing.sm }}
                 />
@@ -523,11 +453,9 @@ export default function BillingScreen() {
                     ) : (
                       <AivoButton
                         title={
-                          plan.id === "district"
+                          plan.id === "enterprise" || plan.id === "district"
                             ? t("parentBilling.contactSales")
-                            : plan.id === "free"
-                              ? t("parentBilling.downgradeToFree")
-                              : t("parentBilling.switchPlan")
+                            : t("parentBilling.switchPlan")
                         }
                         onPress={() => startCheckout(plan.id, plan.name)}
                         variant="outline"
@@ -574,46 +502,18 @@ export default function BillingScreen() {
               )}
             </AivoCard>
 
-            {/* Tutor add-ons */}
+            {/* Tutors — all included on every plan (no add-ons). */}
             <Text
               style={[styles.sectionTitle, { marginTop: spacing.lg, marginBottom: spacing.md }]}
             >
               {t("parentBilling.tutorAddons")}
             </Text>
-            {(Object.entries(TUTORS) as [TutorKey, (typeof TUTORS)[TutorKey]][]).map(
-              ([key, tutor]) => {
-                const sku = TUTOR_KEY_TO_SKU[key];
-                const isIncluded = includedSkus.has(sku);
-                const isPurchased = purchasedSkus.has(sku);
-                const isProcessing = addonLoading === key;
-                return (
-                  <AivoCard key={key} style={styles.tutorRow}>
-                    <View style={styles.tutorInfo}>
-                      <Text style={styles.tutorName}>{tutor.name}</Text>
-                      <Text style={styles.tutorDomain}>{tutor.domain}</Text>
-                    </View>
-                    {isIncluded ? (
-                      <Text style={styles.includedTag}>{t("parentBilling.included")}</Text>
-                    ) : isPurchased ? (
-                      <AivoButton
-                        title={isProcessing ? "..." : t("parentBilling.remove")}
-                        onPress={() => removeAddon(key)}
-                        variant="outline"
-                        size="sm"
-                        disabled={isProcessing}
-                      />
-                    ) : (
-                      <AivoButton
-                        title={isProcessing ? "..." : t("parentBilling.addonPrice")}
-                        onPress={() => addAddon(key)}
-                        size="sm"
-                        disabled={isProcessing || !subscription?.hasStripeCustomer}
-                      />
-                    )}
-                  </AivoCard>
-                );
-              },
-            )}
+            <AivoCard style={styles.tutorRow}>
+              <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+              <Text style={[styles.featureText, { flex: 1, marginLeft: spacing.sm }]}>
+                {t("parentBilling.allTutorsIncluded")}
+              </Text>
+            </AivoCard>
 
             {/* Invoice list */}
             <Text

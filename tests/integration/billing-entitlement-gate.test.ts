@@ -43,13 +43,12 @@ describe("entitlement gate end-to-end", () => {
     });
     expect(res.status).toBe(200);
     const data = (await res.json()) as { plan: string; effectiveTutorSkus: string[] };
-    expect(data.plan).toBe("free");
-    // Free plan still includes ELA, but nothing else.
-    expect(data.effectiveTutorSkus).toContain("ADDON_TUTOR_ELA");
-    expect(data.effectiveTutorSkus).not.toContain("ADDON_TUTOR_MATH");
+    // There is no free tier — an un-subscribed tenant has no plan and no tutors.
+    expect(data.plan).toBe("none");
+    expect(data.effectiveTutorSkus).toEqual([]);
   });
 
-  it("rejects /api/tutor/session/start for ADDON_TUTOR_CODING on the free plan", async () => {
+  it("rejects /api/tutor/session/start before any subscription (no free tier)", async () => {
     const res = await fetch(serviceUrl("tutor-svc", "/api/tutor/session/start"), {
       method: "POST",
       headers: {
@@ -65,10 +64,11 @@ describe("entitlement gate end-to-end", () => {
       upgradePath: string;
     };
     expect(data.requiredSku).toBe("ADDON_TUTOR_CODING");
-    expect(data.upgradePath).toBe("purchase_addon");
+    // No subscription → the path forward is to subscribe, not buy an add-on.
+    expect(data.upgradePath).toBe("renew_subscription");
   });
 
-  it("allows ADDON_TUTOR_ELA on the free plan (plan-included tutor)", async () => {
+  it("gates even ADDON_TUTOR_ELA before any subscription (no free tier)", async () => {
     const res = await fetch(serviceUrl("tutor-svc", "/api/tutor/session/start"), {
       method: "POST",
       headers: {
@@ -77,21 +77,15 @@ describe("entitlement gate end-to-end", () => {
       },
       body: JSON.stringify({ learnerId, tutorSku: "ADDON_TUTOR_ELA" }),
     });
-    expect(res.status).toBe(200);
-    const data = (await res.json()) as { sessionId: string };
-    expect(data.sessionId).toBeTruthy();
+    expect(res.status).toBe(403);
   });
 
-  it("seeds a family-plan subscription with a Coding add-on and allows Coding session start", async () => {
+  it("seeds a Family subscription and unlocks every tutor (all-access)", async () => {
     // Direct DB seed: the easier path than going through Stripe in a
     // test environment without keys.
     await sql`
       INSERT INTO subscriptions (tenant_id, user_id, plan, stripe_subscription_id, stripe_status, status, cancel_at_period_end)
       VALUES (${tenantId}, ${parentUserId}, 'family', 'sub_int_test_1', 'active', 'ACTIVE', false)
-    `;
-    await sql`
-      INSERT INTO tutor_subscriptions (tenant_id, user_id, tutor_sku, status)
-      VALUES (${tenantId}, ${parentUserId}, 'ADDON_TUTOR_CODING', 'active')
     `;
 
     const entitlements = await (
@@ -100,8 +94,10 @@ describe("entitlement gate end-to-end", () => {
       })
     ).json();
     expect(entitlements.plan).toBe("family");
-    expect(entitlements.effectiveTutorSkus).toContain("ADDON_TUTOR_MATH"); // family included
-    expect(entitlements.effectiveTutorSkus).toContain("ADDON_TUTOR_CODING"); // add-on
+    // Family is all-access: ELA, Math, and Coding are all included.
+    expect(entitlements.effectiveTutorSkus).toContain("ADDON_TUTOR_ELA");
+    expect(entitlements.effectiveTutorSkus).toContain("ADDON_TUTOR_MATH");
+    expect(entitlements.effectiveTutorSkus).toContain("ADDON_TUTOR_CODING");
 
     const res = await fetch(serviceUrl("tutor-svc", "/api/tutor/session/start"), {
       method: "POST",

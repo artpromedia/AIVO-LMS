@@ -223,7 +223,11 @@
     "cancelSubscription": "إلغاء الاشتراك",
     "cancelAtPeriodEnd": "يُلغى في نهاية الفترة",
     "addedToBill": "{{count}} إضافة · {{price}}$/شهر",
-    "openInvoice": "فتح الفاتورة"
+    "openInvoice": "فتح الفاتورة",
+    "termsTitle": "شروط الاشتراك",
+    "termsMessage": "$39.99 شهريًا لكل طفل، تُحصَّل بعد تجربتك المجانية لمدة 30 يومًا. يمكنك الإلغاء في أي وقت. هل توافق على هذه الشروط؟",
+    "termsAgree": "أوافق",
+    "allTutorsIncluded": "جميع المعلمين الـ 14 بالذكاء الاصطناعي مشمولون لكل طفل — بدون إضافات."
   },
   "parentTutors": {
     "title": "متجر المدرسين",
@@ -234,7 +238,8 @@
     "core7Bundle": "حزمة الأساسية 7",
     "includedWithSub": "مضمّن مع الاشتراك",
     "full14Bundle": "حزمة الكاملة 14",
-    "full14Price": "إضافة بـ 9.99$/شهر"
+    "full14Price": "إضافة بـ 9.99$/شهر",
+    "allIncluded": "جميع المعلمين الـ 14 بالذكاء الاصطناعي مشمولون في خطتك."
   },
   "parentRecommendations": {
     "title": "التوصيات",

@@ -38,7 +38,22 @@ export type TutorSku =
   | "ADDON_TUTOR_LIFE_SKILLS"
   | "ADDON_TUTOR_CREATIVE_WRITING";
 
-export type PlanId = "free" | "single" | "family" | "district";
+/**
+ * Two customer-facing subscription tiers (ADR: two-path business model):
+ *
+ *   - `family`     — B2C direct subscription. Parents pay $39.99/mo per
+ *                    child; each added child agrees to subscription terms.
+ *                    A 30-day free trial requires a card up front (not
+ *                    charged until the trial ends). Includes ALL tutors.
+ *   - `enterprise` — B2B / district path. Schools contact sales, then
+ *                    invite parents and provision child accounts. Seats
+ *                    are pooled and billed via contract, not self-serve
+ *                    checkout. Includes ALL tutors.
+ *
+ * The legacy `free` / `single` / `district` tiers were collapsed into
+ * these two. `district` is superseded by `enterprise`.
+ */
+export type PlanId = "family" | "enterprise";
 
 /**
  * Subscription statuses we accept on the customer surface, normalized
@@ -79,14 +94,15 @@ export const TUTOR_SKU_TO_KEY: Record<TutorSku, TutorKey> = Object.fromEntries(
 ) as Record<TutorSku, TutorKey>;
 
 /**
- * Tutors a plan includes at no extra charge. Anything outside this list
- * requires an add-on subscription. `district` is treated as all-access.
+ * Tutors a plan includes. Both tiers are all-access — the flat $39.99/mo
+ * Family price and the Enterprise contract both unlock every tutor, so
+ * there are no per-tutor add-ons to purchase.
  */
+const ALL_TUTOR_SKUS_LIST: readonly TutorSku[] = Object.values(TUTOR_KEY_TO_SKU) as TutorSku[];
+
 export const PLAN_INCLUDED_TUTOR_SKUS: Record<PlanId, readonly TutorSku[]> = {
-  free: ["ADDON_TUTOR_ELA"],
-  single: ["ADDON_TUTOR_ELA", "ADDON_TUTOR_MATH", "ADDON_TUTOR_SCIENCE", "ADDON_TUTOR_HISTORY"],
-  family: ["ADDON_TUTOR_ELA", "ADDON_TUTOR_MATH", "ADDON_TUTOR_SCIENCE", "ADDON_TUTOR_HISTORY"],
-  district: Object.values(TUTOR_KEY_TO_SKU) as TutorSku[],
+  family: ALL_TUTOR_SKUS_LIST,
+  enterprise: ALL_TUTOR_SKUS_LIST,
 };
 
 /**
@@ -130,7 +146,7 @@ export function isTutorSku(value: string): value is TutorSku {
 }
 
 export function isPlanId(value: string): value is PlanId {
-  return value === "free" || value === "single" || value === "family" || value === "district";
+  return value === "family" || value === "enterprise";
 }
 
 export function getTutorSkuForTutorKey(key: TutorKey): TutorSku {
@@ -255,7 +271,7 @@ export function computeEffectiveTutorSkus(args: {
 
 export const ALL_TUTOR_SKUS: readonly TutorSku[] = Object.values(TUTOR_KEY_TO_SKU);
 export const ALL_TUTOR_KEYS: readonly TutorKey[] = Object.keys(TUTOR_KEY_TO_SKU) as TutorKey[];
-export const ALL_PLAN_IDS: readonly PlanId[] = ["free", "single", "family", "district"];
+export const ALL_PLAN_IDS: readonly PlanId[] = ["family", "enterprise"];
 
 /**
  * Learner-scoped entitlement snapshot returned by

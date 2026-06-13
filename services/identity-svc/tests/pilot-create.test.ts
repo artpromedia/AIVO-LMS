@@ -47,7 +47,7 @@ async function buildSetup() {
       provisioned: true,
       couponCode: "PILOT-STUB1234",
       tier: b.tier ?? "enterprise",
-      plan: b.plan ?? "district",
+      plan: b.plan ?? "enterprise",
       seatLimit: b.seatLimit ?? null,
       expiresAt: new Date(Date.now() + 60 * 86_400_000).toISOString(),
     };

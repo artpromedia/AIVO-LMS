@@ -274,11 +274,11 @@ test.describe("Stripe purchase → entitlement", () => {
     expect(ent.status()).toBe(200);
     const body = await ent.json();
     await ctx.dispose();
-    // After cancellation, the plan must NOT continue to report as
-    // active family. Either it drops back to "free" or status becomes
-    // canceled — either is an acceptable end state for this contract.
+    // After cancellation, the plan must NOT continue to report as an
+    // active family subscription. There is no free tier to drop to, so the
+    // end state is a canceled status (or cancel-at-period-end scheduled).
     const downgraded =
-      body.plan === "free" ||
+      body.plan === "none" ||
       body.status === "canceled" ||
       body.status === "cancelled" ||
       body.cancelAtPeriodEnd === true;

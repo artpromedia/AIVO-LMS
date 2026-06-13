@@ -22,7 +22,7 @@ import { pickCheckoutAttribution } from "@/lib/bff/checkout-attribution";
 
 export const dynamic = "force-dynamic";
 
-const BILLING_PLAN_IDS = new Set<BillingPlanId>(["single", "family"]);
+const BILLING_PLAN_IDS = new Set<BillingPlanId>(["family"]);
 
 export async function GET(req: Request): Promise<NextResponse> {
   const requestId = getRequestId(req);
@@ -43,6 +43,9 @@ export async function GET(req: Request): Promise<NextResponse> {
 const postSchema = z.object({
   planId: z.string().min(1),
   priceId: z.string().min(1),
+  // Parent's acceptance of the per-child subscription terms. Required to
+  // start a (trialing) Family subscription that bills $39.99/mo per child.
+  termsAccepted: z.boolean().optional(),
   // Optional campaign attribution from the ?plan=…&coupon=…&utm_… signup link.
   couponCode: z.string().optional(),
   utmSource: z.string().optional(),
@@ -85,6 +88,15 @@ export async function POST(req: Request): Promise<NextResponse> {
           requestId,
         );
       }
+      if (parsed.data.termsAccepted !== true) {
+        return fail(
+          {
+            ...ERRORS.VALIDATION_FAILED,
+            message: "You must accept the subscription terms to continue.",
+          },
+          requestId,
+        );
+      }
       const origin = req.headers.get("origin") ?? new URL(req.url).origin;
       const attribution = pickCheckoutAttribution(parsed.data);
       const checkout = await createParentCheckout({
@@ -92,6 +104,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         planId: parsed.data.planId as BillingPlanId,
         origin,
         bearer,
+        termsAccepted: true,
         attribution,
       });
       if (!checkout.ok) {

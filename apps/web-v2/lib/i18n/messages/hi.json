@@ -200,11 +200,13 @@
       "sub_canceling": "रद्द किया जा रहा है...",
       "sub_cancel_at_period_end": "अवधि के अंत में रद्द करें",
       "checkout": {
-        "success_title": "Payment received",
-        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
-        "cancelled_title": "Checkout cancelled",
-        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
-      }
+        "success_title": "भुगतान प्राप्त हुआ",
+        "success_body": "धन्यवाद! आपकी योजना सक्रिय की जा रही है — यह कुछ ही क्षणों में यहाँ दिखाई देगी।",
+        "cancelled_title": "चेकआउट रद्द किया गया",
+        "cancelled_body": "कोई शुल्क नहीं लिया गया। आप तैयार होने पर कोई योजना चुन सकते हैं।"
+      },
+      "sub_terms_label": "मैं सदस्यता शर्तों से सहमत हूँ: $39.99/माह प्रति बच्चा, 30-दिन के मुफ़्त ट्रायल के बाद शुल्क लिया जाएगा। कभी भी रद्द करें।",
+      "sub_terms_required": "जारी रखने के लिए कृपया सदस्यता शर्तें स्वीकार करें।"
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "आपके जवाब केवल आपके पास रहते हैं",

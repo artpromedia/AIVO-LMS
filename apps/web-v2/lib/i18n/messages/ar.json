@@ -200,11 +200,13 @@
       "sub_canceling": "جارٍ الإلغاء...",
       "sub_cancel_at_period_end": "الإلغاء في نهاية الفترة",
       "checkout": {
-        "success_title": "Payment received",
-        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
-        "cancelled_title": "Checkout cancelled",
-        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
-      }
+        "success_title": "تم استلام الدفع",
+        "success_body": "شكرًا لك! يتم تفعيل خطتك — ستظهر هنا خلال لحظات.",
+        "cancelled_title": "تم إلغاء الدفع",
+        "cancelled_body": "لم يتم تحصيل أي رسوم. يمكنك اختيار خطة عندما تكون مستعدًا."
+      },
+      "sub_terms_label": "أوافق على شروط الاشتراك: $39.99 شهريًا لكل طفل، تُحصَّل بعد التجربة المجانية لمدة 30 يومًا. ألغِ في أي وقت.",
+      "sub_terms_required": "يرجى قبول شروط الاشتراك للمتابعة."
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "إجاباتك تخصك وحدك",

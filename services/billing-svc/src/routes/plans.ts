@@ -1,6 +1,6 @@
 import { audited } from "@aivo/audit-client";
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { and, desc, eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import {
   verifyJWT,
   type JWTPayload,
@@ -26,23 +26,16 @@ import {
   type PlanId,
   type SubscriptionRecord,
   type SubscriptionStatus,
-  type TutorSku,
   type TutorSubscriptionRecord,
   type TutorSubscriptionStatus,
 } from "@aivo/billing-entitlements";
 import {
   createPlanCheckoutSession,
   createBillingPortalSession,
-  addTutorAddonToSubscription,
-  removeStripeSubscriptionItem,
   cancelStripeSubscriptionAtPeriodEnd,
   StripeNotConfiguredError,
 } from "../lib/stripe.js";
-import {
-  checkoutSessionsCreated,
-  portalSessionsCreated,
-  tutorEntitlementChanges,
-} from "../lib/metrics.js";
+import { checkoutSessionsCreated, portalSessionsCreated } from "../lib/metrics.js";
 import { emitBillingAudit } from "../lib/audit.js";
 import { createLogger } from "@aivo/observability";
 import {
@@ -51,15 +44,15 @@ import {
   createSubscriptionSchema,
   cancelSubscriptionSchema,
   getUsageSchema,
-  listAddonsSchema,
-  addAddonSchema,
-  removeAddonSchema,
   listInvoicesSchema,
   createCheckoutSessionSchema,
   createPortalSessionSchema,
   resumeSubscriptionSchema,
   getEntitlementsSchema,
 } from "./schemas.js";
+
+/** Per-child monthly price for the self-serve Family plan, in USD. */
+const FAMILY_PRICE_PER_CHILD = 39.99;
 
 const PRIVILEGED_ROLES = new Set(["PLATFORM_ADMIN", "DISTRICT_ADMIN"]);
 const auditLog = createLogger("billing-svc.plans");
@@ -149,7 +142,9 @@ async function loadTutorSubsForTenant(db: any, tenantId: string) {
 
 function toSubscriptionRecord(row: any): SubscriptionRecord | null {
   if (!row) return null;
-  const plan: PlanId = isPlanId(row.plan) ? row.plan : "free";
+  // Legacy rows (single/district/free) and any unrecognized plan resolve
+  // to the all-access Family tier so no existing subscriber loses access.
+  const plan: PlanId = isPlanId(row.plan) ? row.plan : "family";
   return {
     plan,
     status: normalizeStatus(row.stripeStatus ?? null, row.status ?? null),
@@ -167,74 +162,42 @@ function toTutorSubRecords(rows: any[]): TutorSubscriptionRecord[] {
   return out;
 }
 
-/**
- * Resolve `tutorId` from path or body to a canonical TutorSku. Legacy
- * callers passed a tutor key (e.g., "nova") or a SKU; we accept either
- * shape but always store/operate on the SKU.
- */
-function coerceTutorSku(raw: unknown): TutorSku | null {
-  if (typeof raw !== "string") return null;
-  if (isTutorSku(raw)) return raw;
-  // Map tutor key → SKU.
-  const upper = `ADDON_TUTOR_${raw.toUpperCase()}`;
-  if (isTutorSku(upper)) return upper;
-  return null;
-}
-
+// Two customer-facing tiers (two-path business model):
+//   • Family    — B2C self-serve, $39.99/mo per child, all tutors, 30-day
+//                 card-required trial. Billed as one subscription whose
+//                 quantity is the number of children.
+//   • Enterprise — B2B/district, contact sales; schools invite parents and
+//                 provision children, billed via contract.
 const PLAN_CATALOG = [
-  {
-    id: "free",
-    name: "Free Trial",
-    price: 0,
-    interval: "month",
-    learnerLimit: 1,
-    features: ["1 learner", "ELA tutor only", "Basic brain clone", "Parent dashboard"],
-  },
-  {
-    id: "single",
-    name: "Single Learner",
-    price: 24.99,
-    interval: "month",
-    priceLabel: "$24.99/mo per learner",
-    learnerLimit: 1,
-    features: [
-      "1 learner",
-      "ELA + Math tutors",
-      "2 core tutors included",
-      "Full brain clone",
-      "Parent dashboard",
-      "Add extra tutors at $4.99/mo each",
-    ],
-  },
   {
     id: "family",
     name: "Family",
-    price: 19.99,
+    price: FAMILY_PRICE_PER_CHILD,
     interval: "month",
-    priceLabel: "$19.99/mo per learner",
-    learnerLimit: 10,
-    learnerMinimum: 2,
+    priceLabel: `$${FAMILY_PRICE_PER_CHILD.toFixed(2)}/mo per child`,
+    perChild: true,
+    trialDays: 30,
+    learnerLimit: -1,
     features: [
-      "2+ learners",
-      "ELA + Math tutors",
-      "2 core tutors included",
+      "$39.99/mo per child",
+      "30-day free trial (card required, not charged until trial ends)",
+      "All 14 AI tutors included",
       "Full brain clone",
       "Parent dashboard",
-      "Multi-learner discount",
-      "Add extra tutors at $4.99/mo each",
+      "Cancel anytime",
     ],
   },
   {
-    id: "district",
-    name: "District / School",
+    id: "enterprise",
+    name: "Enterprise",
     price: 0,
     interval: "month",
     priceLabel: "Contact Sales",
     learnerLimit: -1,
     features: [
       "Unlimited learners",
-      "All 14 AI tutors",
-      "Full brain clone",
+      "All 14 AI tutors included",
+      "Schools invite parents & provision children",
       "Admin dashboard",
       "IEP tracking & reporting",
       "Research access",
@@ -244,15 +207,9 @@ const PLAN_CATALOG = [
   },
 ] as const;
 
-const ADDON_CATALOG = [
-  {
-    id: "extra-tutor",
-    name: "Additional Tutor",
-    price: 4.99,
-    interval: "month",
-    description: "Add any extra AI tutor beyond your plan's included tutors",
-  },
-] as const;
+// Add-ons were removed: both tiers are all-access. The catalog endpoint
+// keeps returning an (empty) `addons` array for backward compatibility.
+const ADDON_CATALOG = [] as const;
 
 function handleStripeError(err: unknown, reply: FastifyReply) {
   if (err instanceof StripeNotConfiguredError) {
@@ -280,11 +237,12 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
 
       const row = await loadSubscriptionRow(db, tenantId);
       if (!row) {
-        // No row in DB → tenant is on the implicit free trial.
+        // No row in DB → tenant has never subscribed. There is no free
+        // tier; the parent must start a (card-required) Family trial.
         return {
           tenantId,
-          plan: "free",
-          status: "active",
+          plan: "none",
+          status: "inactive",
           paymentStatus: null,
           currentPeriodStart: null,
           currentPeriodEnd: null,
@@ -344,34 +302,18 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
         return reply.code(400).send({ error: "tenantId and planId required" });
       if (!ensureTenantAccess(user, tenantId, reply)) return;
 
-      // The free plan is the implicit default. We model it as "no row";
-      // downgrading to free is handled by canceling the Stripe sub.
-      if (planId === "free") {
-        const row = await loadSubscriptionRow(db, tenantId);
-        if (!row?.stripeSubscriptionId) {
-          return { status: "active", subscription: { tenantId, planId: "free", status: "active" } };
-        }
-        try {
-          await cancelStripeSubscriptionAtPeriodEnd(row.stripeSubscriptionId, true);
-        } catch (err) {
-          return handleStripeError(err, reply);
-        }
-        await db
-          .update(subscriptions)
-          .set({ cancelAtPeriodEnd: true, canceledAt: new Date(), updatedAt: new Date() })
-          .where(eq(subscriptions.id, row.id));
-        return { status: "cancel_scheduled", subscription: { tenantId, planId: "free" } };
-      }
-
-      if (planId === "district") {
-        return reply.code(400).send({ error: "District plan requires sales contact" });
+      // Enterprise is a contract sale, never self-serve. To stop billing,
+      // callers use POST /subscription/:tenantId/cancel (there is no free
+      // tier to downgrade to).
+      if (planId === "enterprise") {
+        return reply.code(400).send({ error: "Enterprise plan requires sales contact" });
       }
 
       if (!isPlanId(planId)) return reply.code(400).send({ error: "Invalid planId" });
 
-      // For paid plans we no longer create subscriptions here; the
-      // caller must use Checkout. Returning 303 + Location for HTTP
-      // clients, JSON for API clients, but always pointing at Checkout.
+      // Family is purchased via Stripe Checkout; we never create the
+      // subscription here. Return 303 + Location for HTTP clients, JSON
+      // for API clients, but always point at Checkout.
       return (reply as any).code(303).header("Location", "/api/billing/checkout/session").send({
         status: "redirect",
         next: "/api/billing/checkout/session",
@@ -392,14 +334,25 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
         successUrl?: string;
         cancelUrl?: string;
         learnerCount?: number;
+        termsAccepted?: boolean;
         couponCode?: string;
         utmSource?: string;
         utmMedium?: string;
         utmCampaign?: string;
       };
       if (!ensureTenantAccess(user, body.tenantId, reply)) return;
-      if (body.planId !== "single" && body.planId !== "family") {
-        return reply.code(400).send({ error: "planId must be 'single' or 'family'" });
+      if (body.planId !== "family") {
+        return reply
+          .code(400)
+          .send({ error: "Only the 'family' plan is self-serve; enterprise is contact-sales" });
+      }
+      // Per-child subscription terms must be explicitly accepted before we
+      // start a paid (trialing) subscription — the parent agrees to pay
+      // $39.99/mo per child once the 30-day trial ends.
+      if (body.termsAccepted !== true) {
+        return reply
+          .code(400)
+          .send({ error: "Subscription terms must be accepted (termsAccepted: true)" });
       }
       const existing = await loadSubscriptionRow(db, body.tenantId);
       try {
@@ -431,6 +384,7 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
           details: {
             plan: body.planId,
             learnerCount: body.learnerCount ?? 1,
+            termsAccepted: true,
             couponCode: body.couponCode ?? null,
           },
         });
@@ -570,151 +524,6 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
   );
 
   app.get(
-    "/api/billing/addons/:tenantId",
-    { schema: listAddonsSchema, preHandler: requireAuth },
-    async (request, reply) => {
-      const { tenantId } = request.params as { tenantId: string };
-      const user = (request as any).user as JWTPayload;
-      if (!ensureTenantAccess(user, tenantId, reply)) return;
-      const rows = await loadTutorSubsForTenant(db, tenantId);
-      return {
-        tenantId,
-        addons: rows.map((r: any) => ({
-          tutorSku: r.tutorSku,
-          tutorId: r.tutorSku,
-          status: r.status,
-          activatedAt: r.activatedAt?.toISOString?.() ?? null,
-          graceEndsAt: r.graceEndsAt?.toISOString?.() ?? null,
-        })),
-      };
-    },
-  );
-
-  app.post(
-    "/api/billing/addons",
-    { schema: addAddonSchema, preHandler: requireAuth },
-    async (request, reply) => {
-      const body = request.body as { tenantId: string; tutorSku?: string; tutorId?: string };
-      const user = (request as any).user as JWTPayload;
-      if (!body.tenantId) return reply.code(400).send({ error: "tenantId required" });
-      if (!ensureTenantAccess(user, body.tenantId, reply)) return;
-
-      const sku = coerceTutorSku(body.tutorSku ?? body.tutorId);
-      if (!sku)
-        return reply
-          .code(400)
-          .send({ error: "tutorSku or tutorId required (must be a known tutor SKU or key)" });
-
-      const subRow = await loadSubscriptionRow(db, body.tenantId);
-      if (!subRow?.stripeSubscriptionId) {
-        return reply.code(404).send({
-          error: "Add-ons require an active Stripe subscription. Subscribe to a paid plan first.",
-        });
-      }
-
-      const existing = await db
-        .select()
-        .from(tutorSubscriptions)
-        .where(
-          and(
-            eq(tutorSubscriptions.tenantId, body.tenantId),
-            eq(tutorSubscriptions.tutorSku, sku),
-            eq(tutorSubscriptions.status, "active"),
-          ),
-        );
-      if (existing.length > 0) {
-        return (reply as any)
-          .code(409)
-          .send({ error: "Add-on already active", addon: existing[0] });
-      }
-
-      try {
-        const item = await addTutorAddonToSubscription({
-          tenantId: body.tenantId,
-          userId: user.sub,
-          stripeSubscriptionId: subRow.stripeSubscriptionId,
-          tutorSku: sku,
-        });
-        // Persist pending → webhook (`customer.subscription.updated`)
-        // will flip to active once payment confirms. We mark it active
-        // optimistically here because the API call already debited the
-        // customer per Stripe's proration model; the webhook is the
-        // authoritative source if anything diverges.
-        const [row] = await db
-          .insert(tutorSubscriptions)
-          .values({
-            tenantId: body.tenantId,
-            userId: subRow.userId,
-            tutorSku: sku,
-            status: "active",
-            stripeItemId: item.id,
-          })
-          .returning();
-        tutorEntitlementChanges.increment(1, { action: "grant" });
-        await emitBillingAudit(db, auditLog, {
-          eventType: "billing.addon.attached",
-          tenantId: body.tenantId,
-          userId: user.sub,
-          resourceId: item.id,
-          details: { tutorSku: sku, stripeSubscriptionId: subRow.stripeSubscriptionId },
-        });
-        return { status: "active", addon: { ...row, stripeItemId: item.id } };
-      } catch (err) {
-        return handleStripeError(err, reply);
-      }
-    },
-  );
-
-  app.delete(
-    "/api/billing/addons/:tenantId/:tutorId",
-    {
-      schema: removeAddonSchema,
-      preHandler: requireAuth,
-      ...audited("billing.addon.removed", {
-        entityType: "addon",
-        entityId: (r) => (r.params as { tutorId?: string })?.tutorId ?? "",
-      }),
-    },
-    async (request, reply) => {
-      const { tenantId, tutorId } = request.params as { tenantId: string; tutorId: string };
-      const user = (request as any).user as JWTPayload;
-      if (!ensureTenantAccess(user, tenantId, reply)) return;
-      const sku = coerceTutorSku(tutorId);
-      if (!sku) return (reply as any).code(400).send({ error: "Unknown tutor SKU" });
-
-      const [row] = await db
-        .select()
-        .from(tutorSubscriptions)
-        .where(
-          and(eq(tutorSubscriptions.tenantId, tenantId), eq(tutorSubscriptions.tutorSku, sku)),
-        );
-      if (!row) return reply.code(404).send({ error: "Add-on not found" });
-
-      if (row.stripeItemId) {
-        try {
-          await removeStripeSubscriptionItem(row.stripeItemId);
-        } catch (err) {
-          return handleStripeError(err, reply);
-        }
-      }
-      const graceEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      await db
-        .update(tutorSubscriptions)
-        .set({ status: "grace_period", deactivatedAt: new Date(), graceEndsAt })
-        .where(eq(tutorSubscriptions.id, row.id));
-      tutorEntitlementChanges.increment(1, { action: "grace" });
-      await emitBillingAudit(db, auditLog, {
-        eventType: "billing.addon.detached",
-        tenantId,
-        userId: user.sub,
-        resourceId: row.stripeItemId ?? row.id,
-        details: { tutorSku: sku, graceEndsAt: graceEndsAt.toISOString() },
-      });
-      return { status: "removed", tenantId, tutorId: sku };
-    },
-  );
-
-  app.get(
     "/api/billing/invoices/:tenantId",
     { schema: listInvoicesSchema, preHandler: requireAuth },
     async (request, reply) => {
@@ -758,14 +567,15 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
       ]);
       const subscription = toSubscriptionRecord(subRow);
       const tutorSubs = toTutorSubRecords(tutorRows);
-      const plan: PlanId = subscription?.plan ?? "free";
-      const status = subscription?.status ?? "active";
-      const included = getIncludedTutorSkusForPlan(plan);
+      // No subscription → no plan, no entitlements. There is no free tier.
+      const plan: PlanId | "none" = subscription?.plan ?? "none";
+      const status = subscription?.status ?? "inactive";
+      const included = subscription ? getIncludedTutorSkusForPlan(subscription.plan) : [];
       const purchased = tutorSubs
         .filter((t) => t.status === "active" || t.status === "grace_period")
         .map((t) => t.tutorSku);
       const effective = computeEffectiveTutorSkus({
-        subscription: subscription ?? { plan: "free", status: "active" },
+        subscription,
         tutorSubscriptions: tutorSubs,
       });
       return {
