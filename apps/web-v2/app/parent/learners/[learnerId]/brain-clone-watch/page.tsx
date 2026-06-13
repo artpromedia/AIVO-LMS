@@ -15,6 +15,7 @@
  */
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { TUTORS, type TutorKey } from "@aivo/brand";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PARENT_NAV } from "@/components/layout/role-shells";
@@ -24,9 +25,12 @@ import {
   getActiveBaselineForLearner,
   getBrainProfile,
   getLearner,
+  getOrCreateParentAssessment,
   parentCanAccessLearner,
   refreshLearnerReadiness,
 } from "@/lib/db/repos";
+import { assessmentSectionSchemas } from "@/lib/validators/parent-assessment";
+import { MASTERY_ESTIMATE_LABEL_KEY, estimateForScore } from "@/lib/learner/mastery-estimate";
 import { visualBrainBuildEnabled } from "@/lib/feature-flags";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
@@ -120,45 +124,46 @@ export default async function BrainCloneWatchPage({
   const s = profile.state;
   const alreadyApproved = profile.cloneStage === "approved";
 
-  // Representative grade number for the cinematic build sequence's grade
-  // ladders (the snapshot stores a band like "6-8", not a single grade).
-  const GRADE_BAND_TO_NUMBER: Record<string, number> = {
-    preK: 0,
-    K: 0,
-    "1-2": 2,
-    "3-5": 4,
-    "6-8": 7,
-    "9-12": 10,
-    post_secondary: 13,
+  // Strengths-first reveal (C-03): the parent assessment's strengths section
+  // (the parent's own words) plus the subjects where the baseline estimate is
+  // already confident/advanced — mirroring the learner Awakening's "memories"
+  // selection in `app/learner/brain-clone/[learnerId]/page.tsx`.
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
+  const strengthsParsed = assessmentSectionSchemas.strengths.safeParse(
+    assessment.answers.strengths ?? {},
+  );
+  const strengthsAnswers = strengthsParsed.success ? strengthsParsed.data : {};
+  const strengths = {
+    loves: (strengthsAnswers.loves ?? "").trim(),
+    goodAt: (strengthsAnswers.goodAt ?? []).map((g) => g.trim()).filter(Boolean),
+    motivates: (strengthsAnswers.motivates ?? "").trim(),
+    strongSubjects: s.masteryOverview
+      .filter((m) => m.estimate === "confident" || m.estimate === "advanced")
+      .slice(0, 5)
+      .map((m) => m.subjectName),
   };
-  const enrolledGrade = GRADE_BAND_TO_NUMBER[s.learnerProfileSnapshot.gradeBand ?? ""] ?? 6;
 
   // The cinematic BrainBuildingSequence prefers the rich `*Detailed` XAI
   // arrays (camelCase decision objects). When the deterministic fallback
   // path produced only flat string arrays, synthesise equivalents so the
-  // sequence still renders meaningful cards.
+  // sequence still renders meaningful cards. Levels are always passed as
+  // qualitative estimates — never grade numbers (C-03, Decision D4): the
+  // authoritative `masteryOverview` estimate wins when the domain matches a
+  // subject; otherwise the normalised score maps through the same thresholds.
   const xai = s.xaiExplanation;
+  const estimateBySubject = new Map(s.masteryOverview.map((m) => [m.subjectId, m.estimate]));
   const masteryDecisions =
     xai.masteryDecisionsDetailed?.map((d) => ({
       domain: d.domain,
-      score: d.score,
       displayLabel: d.displayLabel,
       reasoning: d.reasoning,
+      estimate: estimateBySubject.get(d.domain) ?? estimateForScore(d.score),
     })) ??
     s.masteryOverview.map((m) => ({
       domain: m.subjectId,
-      // Map the qualitative estimate to a rough normalised score so the
-      // grade ladder has something to plot.
-      score:
-        m.estimate === "advanced"
-          ? 0.95
-          : m.estimate === "confident"
-            ? 0.8
-            : m.estimate === "growing"
-              ? 0.55
-              : 0.3,
       displayLabel: m.subjectName,
       reasoning: "",
+      estimate: m.estimate,
     }));
   const accommodationDecisions =
     xai.accommodationDecisionsDetailed?.map((d) => ({
@@ -179,13 +184,18 @@ export default async function BrainCloneWatchPage({
     })) ?? s.activeTutors.map((slug) => ({ tutorKey: slug, reasoning: "" }));
 
   const sequence = {
-    enrolledGrade,
-    functioningLevel: s.functioningLevel,
+    strengths,
     masteryDecisions,
     accommodationDecisions,
     tutorDecisions,
     pulseRate: s.visualIdentity.pulseRate,
   };
+
+  // Parents see tutor display names from the brand catalogue, never raw
+  // slugs. Unknown slugs (future tutors) are humanised defensively.
+  const tutorDisplayName = (slug: string): string =>
+    TUTORS[slug as TutorKey]?.name ??
+    slug.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   // Hand the client component just the data it needs to render the seven
   // build stages with real XAI annotations. We keep the parent-facing
@@ -201,7 +211,8 @@ export default async function BrainCloneWatchPage({
       title: t("watch_step_domains"),
       items: s.masteryOverview.map((m) => ({
         label: m.subjectName,
-        value: m.estimate,
+        // Qualitative estimate, humanised — never the raw enum (C-03).
+        value: t(MASTERY_ESTIMATE_LABEL_KEY[m.estimate]),
       })),
     },
     {
@@ -222,13 +233,12 @@ export default async function BrainCloneWatchPage({
     {
       key: "identity" as const,
       title: t("watch_step_identity"),
-      detail: `${s.visualIdentity.primaryHue} · ${s.visualIdentity.pulseRate}`,
       swatches: [s.visualIdentity.primaryHue, ...s.visualIdentity.secondaryHues],
     },
     {
       key: "paths" as const,
       title: t("watch_step_paths"),
-      items: s.activeTutors.map((slug) => ({ label: slug })),
+      items: s.activeTutors.map((slug) => ({ label: tutorDisplayName(slug) })),
     },
   ];
 
@@ -244,12 +254,16 @@ export default async function BrainCloneWatchPage({
         learnerName={learner.displayName}
         title={t("watch_title", { name: learner.displayName })}
         description={t("watch_description")}
+        eyebrowLabel={t("watch_eyebrow", { name: learner.displayName })}
+        sphereAriaLabel={t("clone_child_label", { name: learner.displayName })}
         doneLabel={t("watch_step_done")}
         approveLabel={t("watch_approve")}
         amendLabel={t("watch_amend")}
         backLabel={t("watch_back")}
         alreadyApprovedLabel={t("watch_already_approved")}
         replayCloneLabel={t("clone_replay")}
+        privacyNoteLabel={t("privacy_family")}
+        privacyLinkLabel={t("watch_privacy_link")}
         alreadyApproved={alreadyApproved}
         stages={stages}
         primaryHue={s.visualIdentity.primaryHue}

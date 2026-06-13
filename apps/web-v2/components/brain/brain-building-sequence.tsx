@@ -8,13 +8,19 @@
 /**
  * BrainBuildingSequence (web-v2)
  * ------------------------------
- * Cinematic, multi-stage "watch your child's Brain being built" experience,
- * ported from `aivo-ai-learning/apps/web/src/components/brain/BrainBuildingSequence.tsx`
+ * Cinematic, multi-stage "watch your child's learning profile come together"
+ * experience, ported from
+ * `aivo-ai-learning/apps/web/src/components/brain/BrainBuildingSequence.tsx`
  * and adapted to web-v2's data model (camelCase `*Detailed` XAI arrays from
  * `state.xaiExplanation`, `@aivo/brand` TUTORS) and design language.
  *
- * Stages auto-advance:
- *   template → domains → accommodations → activation → tutors → complete
+ * Stages auto-advance, strengths-first (Sprint C-03 — the second thing a
+ * parent sees is what their child is good at, never a row of deficit cards):
+ *   template → strengths → domains → accommodations → activation → tutors → complete
+ *
+ * Every level shown is qualitative ("Just starting / Growing / Confident /
+ * Advanced") — no fabricated grade-equivalents, no gap years, and no claims
+ * (encryption, versioning, rollback) the backend does not honor.
  *
  * The `activation` and `complete` stages render the GPU-accelerated
  * PixiBrainSphere (the learner's living brain), so the sequence culminates
@@ -25,18 +31,25 @@
  * Honours `prefers-reduced-motion`: stages still advance but on a faster,
  * motion-free cadence, and the sphere falls back to a static CSS orb.
  */
-import { useCallback, useEffect, useRef, useState } from "react";
+import * as React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { Brain, Lock, ClipboardList, Undo2, Star } from "lucide-react";
+import { Brain, Lock, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { TUTORS, type TutorKey } from "@aivo/brand";
+import type { ComfortLevel } from "@/lib/db/types";
+import {
+  MASTERY_ESTIMATE_LABEL_KEY,
+  MASTERY_ESTIMATE_SCORE,
+} from "@/lib/learner/mastery-estimate";
 import PixiBrainSphere from "./pixi-brain-sphere";
 
 export interface MasteryDecisionDTO {
   domain: string;
-  score: number;
   displayLabel: string;
   reasoning: string;
+  /** Qualitative estimate — the only "level" language parents ever see. */
+  estimate: ComfortLevel;
 }
 export interface AccommodationDecisionDTO {
   accommodation: string;
@@ -48,12 +61,21 @@ export interface TutorDecisionDTO {
   tutorKey: string;
   reasoning: string;
 }
+/** What the parent told us the child shines at, plus baseline highlights. */
+export interface StrengthsDTO {
+  /** "Good at" entries from the parent assessment (the parent's own words). */
+  goodAt: string[];
+  /** Free-text "what they love" from the parent assessment ("" when unset). */
+  loves: string;
+  /** Free-text "what motivates them" from the parent assessment ("" when unset). */
+  motivates: string;
+  /** Subjects where the baseline estimate is confident/advanced (may be empty). */
+  strongSubjects: string[];
+}
 
 export interface BrainBuildingSequenceProps {
   learnerName: string;
-  /** Enrolled grade as a number (best-effort; defaults to 6 if unknown). */
-  enrolledGrade: number;
-  functioningLevel: string;
+  strengths: StrengthsDTO;
   masteryDecisions: MasteryDecisionDTO[];
   accommodationDecisions: AccommodationDecisionDTO[];
   tutorDecisions: TutorDecisionDTO[];
@@ -63,10 +85,19 @@ export interface BrainBuildingSequenceProps {
   onSequenceComplete: () => void;
 }
 
-type BuildStage = "template" | "domains" | "accommodations" | "activation" | "tutors" | "complete";
+type BuildStage =
+  | "template"
+  | "strengths"
+  | "domains"
+  | "accommodations"
+  | "activation"
+  | "tutors"
+  | "complete";
 
-const STAGE_ORDER: BuildStage[] = [
+/** Exported so tests can pin the strengths-first ordering (C-03 DoD). */
+export const STAGE_ORDER: BuildStage[] = [
   "template",
+  "strengths",
   "domains",
   "accommodations",
   "activation",
@@ -93,18 +124,13 @@ function domainColor(domain: string): string {
   return DOMAIN_COLORS[domain.toLowerCase()] ?? "#8B5CF6";
 }
 
-function scoreToGradeEquiv(score: number, enrolled: number): number {
-  return Math.round(score * enrolled * 10) / 10;
-}
-
-function formatFL(fl: string): string {
-  return fl.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
+/** One card in the strengths stage. `body` for the parent's longer free text,
+ *  `meta` for the small source line under short items. */
+type StrengthCard = { key: string; title: string; body?: string; meta?: string };
 
 export default function BrainBuildingSequence({
   learnerName,
-  enrolledGrade,
-  functioningLevel,
+  strengths,
   masteryDecisions,
   accommodationDecisions,
   tutorDecisions,
@@ -115,6 +141,7 @@ export default function BrainBuildingSequence({
 }: BrainBuildingSequenceProps) {
   const t = useTranslations("brain_clone");
   const [currentStage, setCurrentStage] = useState<BuildStage>("template");
+  const [strengthsRevealed, setStrengthsRevealed] = useState(0);
   const [domainsRevealed, setDomainsRevealed] = useState(0);
   const [accommodationsRevealed, setAccommodationsRevealed] = useState(0);
   const [tutorsRevealed, setTutorsRevealed] = useState(0);
@@ -123,7 +150,40 @@ export default function BrainBuildingSequence({
   const [reducedMotion, setReducedMotion] = useState(false);
   const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const enrolled = enrolledGrade > 0 ? enrolledGrade : 6;
+  // 3–5 strengths cards, the parent's own words first, then baseline
+  // highlights. Mirrors the learner Awakening's "memories" selection.
+  const strengthCards = useMemo<StrengthCard[]>(() => {
+    const cards: StrengthCard[] = [];
+    for (const item of strengths.goodAt.slice(0, 3)) {
+      cards.push({
+        key: `good_${item}`,
+        title: item,
+        meta: t("building_strengths_goodat_label"),
+      });
+    }
+    if (strengths.loves) {
+      cards.push({
+        key: "loves",
+        title: t("building_strengths_loves_label", { name: learnerName }),
+        body: strengths.loves,
+      });
+    }
+    if (strengths.motivates) {
+      cards.push({
+        key: "motivates",
+        title: t("building_strengths_motivates_label", { name: learnerName }),
+        body: strengths.motivates,
+      });
+    }
+    for (const subject of strengths.strongSubjects) {
+      cards.push({
+        key: `subject_${subject}`,
+        title: subject,
+        meta: t("building_strengths_subject_label"),
+      });
+    }
+    return cards.slice(0, 5);
+  }, [strengths, learnerName, t]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -155,6 +215,22 @@ export default function BrainBuildingSequence({
       if (autoTimerRef.current) clearTimeout(autoTimerRef.current);
     };
   }, [currentStage, advanceStage, ms]);
+
+  useEffect(() => {
+    if (currentStage !== "strengths") return;
+    const total = strengthCards.length;
+    if (total === 0) {
+      // Warm empty state — dwell long enough to read, then move on.
+      const x = setTimeout(() => advanceStage(), ms(2200));
+      return () => clearTimeout(x);
+    }
+    if (strengthsRevealed < total) {
+      const x = setTimeout(() => setStrengthsRevealed((s) => s + 1), ms(900));
+      return () => clearTimeout(x);
+    }
+    const x = setTimeout(() => advanceStage(), ms(1800));
+    return () => clearTimeout(x);
+  }, [currentStage, strengthsRevealed, strengthCards.length, advanceStage, ms]);
 
   useEffect(() => {
     if (currentStage !== "domains") return;
@@ -258,13 +334,36 @@ export default function BrainBuildingSequence({
               <span className="bbs-ring bbs-ring-2" />
               <Brain className="bbs-template-brain" strokeWidth={1.5} aria-hidden="true" />
             </div>
-            <p className="bbs-pill">
-              {t("building_template_pill", {
-                grade: enrolled,
-                level: formatFL(functioningLevel),
-              })}
-            </p>
+            <p className="bbs-pill">{t("building_template_pill", { name: learnerName })}</p>
             <p className="bbs-muted">{t("building_template_caption", { name: learnerName })}</p>
+          </div>
+        )}
+
+        {currentStage === "strengths" && (
+          <div>
+            <div className="bbs-stage-head">
+              <h2 className="bbs-h2">{t("building_strengths_title", { name: learnerName })}</h2>
+              <p className="bbs-muted">{t("building_strengths_caption")}</p>
+            </div>
+            {strengthCards.length === 0 ? (
+              <div className="bbs-center">
+                <Star className="w-12 h-12 bbs-star" strokeWidth={2} aria-hidden="true" />
+                <p className="bbs-muted">{t("building_strengths_empty", { name: learnerName })}</p>
+              </div>
+            ) : (
+              <div className="bbs-grid">
+                {strengthCards.map((c, i) => (
+                  <div key={c.key} className={`bbs-card ${i < strengthsRevealed ? "is-in" : ""}`}>
+                    <div className="bbs-card-head">
+                      <Star className="w-4 h-4 bbs-star" strokeWidth={2.5} aria-hidden="true" />
+                      <span className="bbs-card-title">{c.title}</span>
+                    </div>
+                    {c.body ? <p className="bbs-muted bbs-reason">{c.body}</p> : null}
+                    {c.meta ? <p className="bbs-strength-meta">{c.meta}</p> : null}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -276,9 +375,7 @@ export default function BrainBuildingSequence({
             </div>
             <div className="bbs-grid">
               {masteryDecisions.map((m, i) => {
-                const grade = scoreToGradeEquiv(m.score, enrolled);
-                const gap = Math.round((enrolled - grade) * 10) / 10;
-                const fillPct = Math.max(5, (grade / enrolled) * 100);
+                const fillPct = Math.max(5, MASTERY_ESTIMATE_SCORE[m.estimate] * 100);
                 const color = domainColor(m.domain);
                 const revealed = i < domainsRevealed;
                 return (
@@ -294,11 +391,7 @@ export default function BrainBuildingSequence({
                       />
                     </div>
                     <div className="bbs-card-meta">
-                      <span>{t("building_level", { grade })}</span>
-                      <span>{t("building_enrolled", { grade: enrolled })}</span>
-                      {gap > 0 && (
-                        <span className="bbs-gap">{t("building_gap", { years: gap })}</span>
-                      )}
+                      <span>{t(MASTERY_ESTIMATE_LABEL_KEY[m.estimate])}</span>
                     </div>
                   </div>
                 );
@@ -349,16 +442,7 @@ export default function BrainBuildingSequence({
             <p className="bbs-muted">{t("building_activation_caption", { name: learnerName })}</p>
             <div className="bbs-chips">
               <span className="bbs-chip">
-                <Lock className="w-3.5 h-3.5" aria-hidden="true" />{" "}
-                {t("building_activation_encrypted")}
-              </span>
-              <span className="bbs-chip">
-                <ClipboardList className="w-3.5 h-3.5" aria-hidden="true" />{" "}
-                {t("building_activation_version")}
-              </span>
-              <span className="bbs-chip">
-                <Undo2 className="w-3.5 h-3.5" aria-hidden="true" />{" "}
-                {t("building_activation_rollback")}
+                <Lock className="w-3.5 h-3.5" aria-hidden="true" /> {t("privacy_family")}
               </span>
             </div>
           </div>
@@ -486,7 +570,7 @@ export default function BrainBuildingSequence({
         .bbs-bar { width: 100%; height: 16px; border-radius: 9999px; overflow: hidden; background: rgba(255,255,255,0.1); }
         .bbs-bar-fill { height: 100%; border-radius: 9999px; transition: width 1000ms ease 200ms; }
         .bbs-card-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.78rem; color: rgba(255,255,255,0.6); flex-wrap: wrap; }
-        .bbs-gap { color: rgba(251,191,36,0.85); font-weight: 600; }
+        .bbs-strength-meta { margin: 0.4rem 0 0; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; color: rgba(255,255,255,0.65); }
         .bbs-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 0.4rem; font-size: 0.72rem; color: rgba(255,255,255,0.5); }
         .bbs-chip { display: inline-flex; align-items: center; gap: 0.3rem; }
         .bbs-star { color: #fbbf24; }

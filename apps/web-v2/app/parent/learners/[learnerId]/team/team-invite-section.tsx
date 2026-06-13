@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useActionState, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { GraduationCap, HeartHandshake, Brain, UserPlus, X } from "lucide-react";
@@ -12,11 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import type { LearnerCareTeam, TeamRole } from "@/lib/db/team-invites";
+import type { InviteStatus, LearnerCareTeam, TeamRole } from "@/lib/db/team-invites";
 
 type Props = {
   learnerId: string;
   careTeam: LearnerCareTeam;
+};
+
+/** i18n keys (under `parent.learner_team`) for invite statuses — parents see
+ *  plain language ("Invited — waiting to join"), never raw enums (C-03). */
+const STATUS_LABEL_KEY: Record<InviteStatus, string> = {
+  PENDING: "status_pending",
+  ACCEPTED: "status_accepted",
+  DECLINED: "status_declined",
+  REVOKED: "status_revoked",
 };
 
 const ROLE_META: Record<TeamRole, { label: string; icon: React.ReactNode; accent: string }> = {
@@ -226,7 +236,7 @@ function PendingInviteList({
                     {meta.icon} {meta.label}
                   </span>
                   <Badge tone={record.status === "ACCEPTED" ? "success" : "neutral"}>
-                    {record.status}
+                    {t(STATUS_LABEL_KEY[record.status])}
                   </Badge>
                   {record.relationship ? <span>· {record.relationship}</span> : null}
                   {record.specialty ? <span>· {record.specialty}</span> : null}

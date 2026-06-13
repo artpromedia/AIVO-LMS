@@ -27,6 +27,7 @@ import BrainBuildingSequence, {
   type MasteryDecisionDTO,
   type AccommodationDecisionDTO,
   type TutorDecisionDTO,
+  type StrengthsDTO,
 } from "@/components/brain/brain-building-sequence";
 import { hasSeenClone } from "@/lib/clone-flags";
 
@@ -40,8 +41,7 @@ type Stage = {
 };
 
 export type BuildingSequenceData = {
-  enrolledGrade: number;
-  functioningLevel: string;
+  strengths: StrengthsDTO;
   masteryDecisions: MasteryDecisionDTO[];
   accommodationDecisions: AccommodationDecisionDTO[];
   tutorDecisions: TutorDecisionDTO[];
@@ -53,12 +53,16 @@ export function BrainBuildingClient({
   learnerName,
   title,
   description,
+  eyebrowLabel,
+  sphereAriaLabel,
   doneLabel,
   approveLabel,
   amendLabel,
   backLabel,
   alreadyApprovedLabel,
   replayCloneLabel,
+  privacyNoteLabel,
+  privacyLinkLabel,
   alreadyApproved,
   stages,
   primaryHue,
@@ -70,12 +74,16 @@ export function BrainBuildingClient({
   learnerName: string;
   title: string;
   description: string;
+  eyebrowLabel: string;
+  sphereAriaLabel: string;
   doneLabel: string;
   approveLabel: string;
   amendLabel: string;
   backLabel: string;
   alreadyApprovedLabel: string;
   replayCloneLabel: string;
+  privacyNoteLabel: string;
+  privacyLinkLabel: string;
   alreadyApproved: boolean;
   stages: Stage[];
   primaryHue: string;
@@ -152,8 +160,7 @@ export function BrainBuildingClient({
       <div className="bc-watch-root">
         <BrainBuildingSequence
           learnerName={learnerName}
-          enrolledGrade={sequence.enrolledGrade}
-          functioningLevel={sequence.functioningLevel}
+          strengths={sequence.strengths}
           masteryDecisions={sequence.masteryDecisions}
           accommodationDecisions={sequence.accommodationDecisions}
           tutorDecisions={sequence.tutorDecisions}
@@ -179,10 +186,10 @@ export function BrainBuildingClient({
             pulseRate={sequence.pulseRate}
             intensity={1}
             size={160}
-            ariaLabel={`${learnerName}'s brain`}
+            ariaLabel={sphereAriaLabel}
           />
         </div>
-        <p className="bc-watch-eyebrow">For {learnerName}</p>
+        <p className="bc-watch-eyebrow">{eyebrowLabel}</p>
         <h1 className="bc-watch-title">{title}</h1>
         <p className="bc-watch-description">{description}</p>
         <button type="button" onClick={() => setShowClone(true)} className="bc-watch-replay-btn">
@@ -265,6 +272,16 @@ export function BrainBuildingClient({
           </>
         )}
       </section>
+
+      {/* Truthful privacy footnote (C-03): replaces the deleted encryption /
+          versioning claims with a statement the backend honors, linking to
+          the parent privacy centre for the full picture. */}
+      <p className="bc-watch-privacy">
+        {privacyNoteLabel}{" "}
+        <Link href="/parent/privacy" className="bc-watch-privacy-link">
+          {privacyLinkLabel}
+        </Link>
+      </p>
 
       <style>{`
         .bc-watch-root {
@@ -489,6 +506,17 @@ export function BrainBuildingClient({
           text-decoration: none;
         }
         .bc-watch-back-link:hover { text-decoration: underline; }
+        .bc-watch-privacy {
+          margin: 0.9rem 0 0;
+          text-align: center;
+          font-size: 0.82rem;
+          color: var(--iw-ink-muted, #4b5573);
+        }
+        .bc-watch-privacy-link {
+          color: var(--iw-ink, #0b1020);
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
         .bc-watch-approved-note {
           margin: 0;
           color: var(--iw-ink, #0b1020);
