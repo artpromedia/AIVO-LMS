@@ -9,6 +9,7 @@ import { and, eq, sql } from "drizzle-orm";
 import {
   webParentAssessments,
   webTeacherAssessments,
+  webTherapistAssessments,
   webBaselineAssessments,
   webBaselineQuestions,
   webBaselineAttempts,
@@ -21,6 +22,7 @@ import type {
   BaselineQuestion,
   ParentAssessment,
   TeacherAssessmentDraft,
+  TherapistAssessmentDraft,
 } from "@/lib/db/types";
 import type { AssessmentStore } from "../types";
 import { getDb, withTenantContext } from "./client";
@@ -102,6 +104,52 @@ export const drizzleAssessments: AssessmentStore = {
         })
         .onConflictDoUpdate({
           target: webTeacherAssessments.id,
+          set: {
+            learnerId: draft.learnerId,
+            tenantId: draft.tenantId,
+            submittedByUserId: draft.submittedByUserId,
+            data: draft,
+          },
+        });
+      return draft;
+    });
+  },
+
+  async findTherapistAssessmentDraft(learnerId, tenantId, submittedByUserId) {
+    // web_therapist_assessments carries the same `tenant_isolation` RLS policy
+    // as web_teacher_assessments (0113_web_therapist_assessments_rls).
+    // withTenantContext sets app.current_tenant so the fail-closed policy
+    // permits the scoped read/write. (Passthrough in memory mode.)
+    return withTenantContext(tenantId, async () => {
+      const [row] = await getDb()
+        .select()
+        .from(webTherapistAssessments)
+        .where(
+          and(
+            eq(webTherapistAssessments.learnerId, learnerId),
+            eq(webTherapistAssessments.tenantId, tenantId),
+            eq(webTherapistAssessments.submittedByUserId, submittedByUserId),
+          ),
+        )
+        .limit(1);
+      return row ? (row.data as TherapistAssessmentDraft) : null;
+    });
+  },
+
+  async upsertTherapistAssessmentDraft(draft) {
+    return withTenantContext(draft.tenantId, async () => {
+      const db = getDb();
+      await db
+        .insert(webTherapistAssessments)
+        .values({
+          id: draft.id,
+          learnerId: draft.learnerId,
+          tenantId: draft.tenantId,
+          submittedByUserId: draft.submittedByUserId,
+          data: draft,
+        })
+        .onConflictDoUpdate({
+          target: webTherapistAssessments.id,
           set: {
             learnerId: draft.learnerId,
             tenantId: draft.tenantId,

@@ -210,6 +210,38 @@ export type TeacherAssessmentDraft = {
   submittedAt: ISODate | null;
 };
 
+// ===== Therapist assessment draft (Sprint C-10) =====
+/**
+ * Web-v2 autosave DRAFT for the therapist intake form. Sibling of
+ * TeacherAssessmentDraft: the system of record is assessment-svc
+ * (`therapist_assessments`); this row is the autosave buffer so a clinician
+ * who closes the tab mid-entry resumes where they left off. One row per
+ * (learner, therapist) — keyed by `submittedByUserId` so two therapists on the
+ * same caseload each keep their own draft.
+ *
+ * The therapist form is a SINGLE page (not a sectioned wizard), so `answers`
+ * holds the one validated form payload under a single `"form"` key — the same
+ * open-record shape the teacher draft uses, kept for store + contract parity.
+ * `startedAtMs` is the wall-clock the form was opened, used to anchor the
+ * elapsed time-to-complete telemetry at submit.
+ */
+export type TherapistAssessmentSectionId = "form";
+
+export type TherapistAssessmentDraft = {
+  id: ID;
+  learnerId: ID;
+  tenantId: ID;
+  submittedByUserId: ID;
+  answers: Partial<Record<TherapistAssessmentSectionId, Record<string, unknown>>>;
+  completedSections: TherapistAssessmentSectionId[];
+  /** Epoch ms when the form was first opened — anchors elapsed telemetry. */
+  startedAtMs: number;
+  startedAt: ISODate;
+  updatedAt: ISODate;
+  /** Set when the therapist submits to assessment-svc (system of record). */
+  submittedAt: ISODate | null;
+};
+
 // ===== Collaboration (Sprint 4) =====
 export type CollaboratorRole = "teacher" | "caregiver" | "therapist" | "parent";
 
@@ -2907,9 +2939,36 @@ export type CaregiverObservation = {
   consequence: string;
   durationMinutes: number | null;
   location: string;
+  /**
+   * Sprint C-10: optional learner mood at the time of the observation
+   * (gentle picker). Mirrors the `mood` column the schema already carries
+   * (collaboration.ts caregiver_observations). `null` when not provided.
+   */
+  mood: string | null;
   /** Optional attachment reference — image / video uploaded separately. */
   attachmentUrl: string | null;
   createdAt: ISODate;
+  /**
+   * Sprint C-10: set when the AUTHOR edits within the 15-minute window. Drives
+   * the "edited" affordance; the prior text is preserved in `editHistory` so an
+   * edit never silently overwrites without a trace (Trust rule).
+   */
+  updatedAt: ISODate | null;
+  /**
+   * Append-only edit trail. Each entry snapshots the fields as they were
+   * BEFORE the edit that produced the current values, with the edit time.
+   */
+  editHistory: CaregiverObservationEdit[];
+};
+
+export type CaregiverObservationEdit = {
+  editedAt: ISODate;
+  behaviour: string;
+  antecedent: string;
+  consequence: string;
+  durationMinutes: number | null;
+  location: string;
+  mood: string | null;
 };
 
 // ---------------------------------------------------------------------------

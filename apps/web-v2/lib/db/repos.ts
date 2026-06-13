@@ -53,6 +53,7 @@ import type {
   ParentAssessmentSectionId,
   TeacherAssessmentDraft,
   TeacherAssessmentSectionId,
+  TherapistAssessmentDraft,
   ParentLessonSummary,
   ParentModification,
   ReadinessState,
@@ -417,6 +418,92 @@ export async function markTeacherAssessmentDraftSubmitted(
     updatedAt: nowIso(),
   };
   return getPersistence().assessments.upsertTeacherAssessmentDraft(next);
+}
+
+/* ===== Therapist assessment DRAFT (Sprint C-10) =====
+ * The autosave buffer for the single-page therapist intake form. The system
+ * of record is assessment-svc (`therapist_assessments`); these helpers persist
+ * the in-progress draft so a clinician resumes after closing the tab. Keyed by
+ * (learner, tenant, submitting therapist) so two therapists on the same
+ * caseload keep separate drafts. Sibling of the teacher draft helpers above —
+ * the therapist form is single-page, so the whole payload lives under the one
+ * `"form"` section key. */
+
+export async function findTherapistAssessmentDraft(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TherapistAssessmentDraft | null> {
+  return getPersistence().assessments.findTherapistAssessmentDraft(
+    learnerId,
+    tenantId,
+    submittedByUserId,
+  );
+}
+
+export async function getOrCreateTherapistAssessmentDraft(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TherapistAssessmentDraft> {
+  const existing = await findTherapistAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  if (existing) return existing;
+  const now = nowIso();
+  const draft: TherapistAssessmentDraft = {
+    id: newId("thad"),
+    learnerId,
+    tenantId,
+    submittedByUserId,
+    answers: {},
+    completedSections: [],
+    startedAtMs: Date.now(),
+    startedAt: now,
+    updatedAt: now,
+    submittedAt: null,
+  };
+  return getPersistence().assessments.upsertTherapistAssessmentDraft(draft);
+}
+
+/**
+ * Persist the single-page therapist form payload (autosave). The whole form
+ * lives under the `"form"` section so the draft round-trips on resume. Marks
+ * `"form"` complete (the form has content) and stamps updatedAt.
+ */
+export async function patchTherapistAssessmentForm(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+  data: Record<string, unknown>,
+): Promise<TherapistAssessmentDraft> {
+  const current = await getOrCreateTherapistAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  const next: TherapistAssessmentDraft = {
+    ...current,
+    answers: { ...current.answers, form: data },
+    completedSections: ["form"],
+    updatedAt: nowIso(),
+  };
+  return getPersistence().assessments.upsertTherapistAssessmentDraft(next);
+}
+
+/**
+ * Stamp the therapist draft submitted (idempotent buffer cleanup). The real
+ * record is written to assessment-svc by the BFF; this only marks the local
+ * draft so the form's resume logic shows the completed state and the
+ * elapsed-time computation has a stable anchor.
+ */
+export async function markTherapistAssessmentDraftSubmitted(
+  learnerId: string,
+  tenantId: string,
+  submittedByUserId: string,
+): Promise<TherapistAssessmentDraft | null> {
+  const current = await findTherapistAssessmentDraft(learnerId, tenantId, submittedByUserId);
+  if (!current) return null;
+  const next: TherapistAssessmentDraft = {
+    ...current,
+    submittedAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+  return getPersistence().assessments.upsertTherapistAssessmentDraft(next);
 }
 
 export async function submitParentAssessment(
@@ -7350,6 +7437,7 @@ export function createCaregiverObservation(input: {
   consequence?: string;
   durationMinutes?: number | null;
   location?: string;
+  mood?: string | null;
   attachmentUrl?: string | null;
 }): import("./types").CaregiverObservation {
   const rec: import("./types").CaregiverObservation = {
@@ -7363,11 +7451,86 @@ export function createCaregiverObservation(input: {
     consequence: input.consequence ?? "",
     durationMinutes: input.durationMinutes ?? null,
     location: input.location ?? "home",
+    mood: input.mood ?? null,
     attachmentUrl: input.attachmentUrl ?? null,
     createdAt: nowIso(),
+    updatedAt: null,
+    editHistory: [],
   };
   db().caregiverObservations.set(rec.id, rec);
   return rec;
+}
+
+export function getCaregiverObservation(
+  id: string,
+  tenantId: string,
+): import("./types").CaregiverObservation | null {
+  const o = db().caregiverObservations.get(id);
+  if (!o || o.tenantId !== tenantId) return null;
+  return o;
+}
+
+/** The author-only edit window (15 minutes from creation). Shared with the
+ *  family-svc PATCH route so the web + service surfaces enforce the same rule. */
+export const CAREGIVER_EDIT_WINDOW_MS = 15 * 60 * 1000;
+
+export type CaregiverObservationEditResult =
+  | { ok: true; observation: import("./types").CaregiverObservation }
+  | { ok: false; reason: "not_found" | "forbidden" | "window_expired" };
+
+/**
+ * Author-only edit within the 15-minute window. Enforced here (server-side, the
+ * web store's source of truth) AND independently in the family-svc PATCH route:
+ *   - the editor MUST be the author (`caregiverUserId`), else `forbidden`;
+ *   - the edit MUST land within {@link CAREGIVER_EDIT_WINDOW_MS} of creation,
+ *     else `window_expired`;
+ *   - the PRIOR field values are snapshotted into `editHistory` before applying
+ *     the new ones — an edit never silently overwrites without a trace.
+ * `now` is injectable so tests can drive the window past expiry deterministically.
+ */
+export function updateCaregiverObservation(
+  input: {
+    id: string;
+    tenantId: string;
+    editorUserId: string;
+    behaviour?: string;
+    antecedent?: string;
+    consequence?: string;
+    durationMinutes?: number | null;
+    location?: string;
+    mood?: string | null;
+  },
+  now: number = Date.now(),
+): CaregiverObservationEditResult {
+  const current = getCaregiverObservation(input.id, input.tenantId);
+  if (!current) return { ok: false, reason: "not_found" };
+  if (current.caregiverUserId !== input.editorUserId) return { ok: false, reason: "forbidden" };
+  const createdMs = new Date(current.createdAt).getTime();
+  if (now - createdMs > CAREGIVER_EDIT_WINDOW_MS) return { ok: false, reason: "window_expired" };
+
+  const priorSnapshot: import("./types").CaregiverObservationEdit = {
+    editedAt: new Date(now).toISOString(),
+    behaviour: current.behaviour,
+    antecedent: current.antecedent,
+    consequence: current.consequence,
+    durationMinutes: current.durationMinutes,
+    location: current.location,
+    mood: current.mood,
+  };
+  const next: import("./types").CaregiverObservation = {
+    ...current,
+    behaviour: input.behaviour ?? current.behaviour,
+    antecedent: input.antecedent ?? current.antecedent,
+    consequence: input.consequence ?? current.consequence,
+    durationMinutes:
+      input.durationMinutes !== undefined ? input.durationMinutes : current.durationMinutes,
+    location: input.location ?? current.location,
+    mood: input.mood !== undefined ? input.mood : current.mood,
+    updatedAt: new Date(now).toISOString(),
+    editHistory: [...current.editHistory, priorSnapshot],
+  };
+  db().caregiverObservations.set(next.id, next);
+  return { ok: true, observation: next };
 }
 
 // ---------------------------------------------------------------------------

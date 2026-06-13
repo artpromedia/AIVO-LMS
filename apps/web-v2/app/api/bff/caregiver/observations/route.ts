@@ -59,6 +59,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       consequence?: string;
       durationMinutes?: number | null;
       location?: string;
+      mood?: string | null;
       attachmentUrl?: string | null;
     } | null;
     if (!body?.learnerId || !body.behaviour) {
@@ -82,6 +83,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       consequence: body.consequence,
       durationMinutes: body.durationMinutes,
       location: body.location,
+      mood: body.mood,
       attachmentUrl: body.attachmentUrl,
     });
     return ok({ observation: obs }, requestId, { status: 201 });

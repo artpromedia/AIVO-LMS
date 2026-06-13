@@ -94,6 +94,7 @@ import type {
   NotificationDelivery,
   ParentAssessment,
   TeacherAssessmentDraft,
+  TherapistAssessmentDraft,
   ParentLessonSummary,
   PolicyVersion,
   QuestChapter,
@@ -322,6 +323,20 @@ export interface AssessmentStore {
   upsertTeacherAssessmentDraft(
     draft: TeacherAssessmentDraft,
   ): Promise<TeacherAssessmentDraft>;
+
+  // Therapist assessment DRAFT (Sprint C-10). The autosave buffer for the
+  // single-page therapist intake form; the system of record is assessment-svc.
+  // Keyed by (learner, tenant, submitting therapist) — sibling of the teacher
+  // draft. Co-located in the assessments domain so it shares the assessments
+  // persistence mode (and the assessments↔brainProfiles same-mode guard).
+  findTherapistAssessmentDraft(
+    learnerId: string,
+    tenantId: string,
+    submittedByUserId: string,
+  ): Promise<TherapistAssessmentDraft | null>;
+  upsertTherapistAssessmentDraft(
+    draft: TherapistAssessmentDraft,
+  ): Promise<TherapistAssessmentDraft>;
 
   // Baseline assessments
   getBaselineById(baselineId: string, tenantId: string): Promise<BaselineAssessment | null>;

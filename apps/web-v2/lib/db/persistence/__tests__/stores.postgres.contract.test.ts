@@ -60,6 +60,9 @@ const MIGRATIONS = [
   // C-07 teacher assessment draft store (table + index; RLS lives in 0110
   // and is skipped here the same way 0050 is, per the hermetic-schema split).
   "0109_web_teacher_assessments",
+  // C-10 therapist assessment draft store — sibling of the teacher table; its
+  // RLS (0113) is skipped here the same way 0110 is.
+  "0112_web_therapist_assessments",
 ];
 
 const TABLES = [
@@ -78,6 +81,7 @@ const TABLES = [
   "web_parent_learner_relationships",
   "web_parent_assessments",
   "web_teacher_assessments",
+  "web_therapist_assessments",
   "web_baseline_assessments",
   "web_baseline_questions",
   "web_baseline_attempts",

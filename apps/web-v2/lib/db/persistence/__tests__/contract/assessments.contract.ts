@@ -12,7 +12,11 @@
  * store. Import and call from a `*.test.ts`.
  */
 import { describe, it, expect, beforeEach } from "vitest";
-import type { ParentAssessment, TeacherAssessmentDraft } from "@/lib/db/types";
+import type {
+  ParentAssessment,
+  TeacherAssessmentDraft,
+  TherapistAssessmentDraft,
+} from "@/lib/db/types";
 import type { AssessmentStore } from "../../types";
 
 const T = "t_1";
@@ -24,6 +28,23 @@ function tad(over: Partial<TeacherAssessmentDraft> = {}): TeacherAssessmentDraft
     learnerId: "lrn_c1",
     tenantId: T,
     submittedByUserId: "tch_c1",
+    answers: {},
+    completedSections: [],
+    startedAtMs: 1_700_000_000_000,
+    startedAt: now,
+    updatedAt: now,
+    submittedAt: null,
+    ...over,
+  };
+}
+
+function thad(over: Partial<TherapistAssessmentDraft> = {}): TherapistAssessmentDraft {
+  const now = "2026-01-01T00:00:00.000Z";
+  return {
+    id: "thad_c1",
+    learnerId: "lrn_c1",
+    tenantId: T,
+    submittedByUserId: "thr_c1",
     answers: {},
     completedSections: [],
     startedAtMs: 1_700_000_000_000,
@@ -129,6 +150,45 @@ export function assessmentSubmitContract(
     it("scopes teacher draft reads by tenant — a second tenant sees nothing", async () => {
       await store.upsertTeacherAssessmentDraft(tad());
       expect(await store.findTeacherAssessmentDraft("lrn_c1", "t_other", "tch_c1")).toBeNull();
+    });
+
+    // ===== Therapist assessment DRAFT (Sprint C-10) =====
+
+    it("round-trips an upserted therapist draft, keyed per therapist", async () => {
+      await store.upsertTherapistAssessmentDraft(thad());
+      const got = await store.findTherapistAssessmentDraft("lrn_c1", T, "thr_c1");
+      expect(got).not.toBeNull();
+      expect(got!.id).toBe("thad_c1");
+      expect(got!.submittedAt).toBeNull();
+    });
+
+    it("persists the single-page therapist form payload across patches", async () => {
+      await store.upsertTherapistAssessmentDraft(
+        thad({ answers: { form: { therapyDiscipline: "speech" } }, completedSections: ["form"] }),
+      );
+      await store.upsertTherapistAssessmentDraft(
+        thad({
+          answers: { form: { therapyDiscipline: "speech", strengths: ["responds to modeling"] } },
+          completedSections: ["form"],
+        }),
+      );
+      const got = await store.findTherapistAssessmentDraft("lrn_c1", T, "thr_c1");
+      expect(got!.completedSections).toEqual(["form"]);
+      expect((got!.answers.form as { strengths: string[] }).strengths).toEqual([
+        "responds to modeling",
+      ]);
+    });
+
+    it("isolates therapist drafts by submitting therapist (co-treaters don't collide)", async () => {
+      await store.upsertTherapistAssessmentDraft(thad({ id: "thad_a", submittedByUserId: "thr_a" }));
+      await store.upsertTherapistAssessmentDraft(thad({ id: "thad_b", submittedByUserId: "thr_b" }));
+      expect((await store.findTherapistAssessmentDraft("lrn_c1", T, "thr_a"))!.id).toBe("thad_a");
+      expect((await store.findTherapistAssessmentDraft("lrn_c1", T, "thr_b"))!.id).toBe("thad_b");
+    });
+
+    it("scopes therapist draft reads by tenant — a second tenant sees nothing", async () => {
+      await store.upsertTherapistAssessmentDraft(thad());
+      expect(await store.findTherapistAssessmentDraft("lrn_c1", "t_other", "thr_c1")).toBeNull();
     });
   });
 }

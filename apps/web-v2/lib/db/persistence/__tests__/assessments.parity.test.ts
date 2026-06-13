@@ -10,6 +10,7 @@ import type {
   BaselineQuestion,
   ParentAssessment,
   TeacherAssessmentDraft,
+  TherapistAssessmentDraft,
 } from "@/lib/db/types";
 import { getPersistence } from "@/lib/db/persistence";
 import { runInBothModes } from "./parity.harness";
@@ -53,6 +54,28 @@ runInBothModes("assessments", () => {
     expect(got?.completedSections).toEqual(["context"]);
     // A different teacher on the same learner sees no draft.
     expect(await a.findTeacherAssessmentDraft(L, T, "other-tch")).toBeNull();
+  });
+
+  it("therapist assessment draft upsert + find round-trips, scoped per therapist", async () => {
+    const a = getPersistence().assessments;
+    const draft = {
+      id: "thad-parity-1",
+      learnerId: L,
+      tenantId: T,
+      submittedByUserId: "thr-parity",
+      answers: { form: { therapyDiscipline: "speech", strengths: ["responds to modeling"] } },
+      completedSections: ["form"],
+      startedAtMs: 1_700_000_000_000,
+      startedAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      submittedAt: null,
+    } as TherapistAssessmentDraft;
+    await a.upsertTherapistAssessmentDraft(draft);
+    const got = await a.findTherapistAssessmentDraft(L, T, "thr-parity");
+    expect(got?.id).toBe("thad-parity-1");
+    expect(got?.completedSections).toEqual(["form"]);
+    // A different therapist on the same learner sees no draft.
+    expect(await a.findTherapistAssessmentDraft(L, T, "other-thr")).toBeNull();
   });
 
   it("getActiveBaseline returns the most recent, scoped by tenant", async () => {

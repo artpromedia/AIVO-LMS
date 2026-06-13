@@ -24,6 +24,9 @@ import {
 } from "@/lib/db/repos";
 import type { LearnerProfile, LessonRun } from "@/lib/db/types";
 import { CaregiverObservationForm } from "./observation-form";
+import { ObservationRow, type ObservationView } from "./observation-row";
+
+const EDIT_WINDOW_MS = 15 * 60 * 1000;
 
 export const dynamic = "force-dynamic";
 
@@ -111,39 +114,35 @@ export default async function CaregiverObservationsPage() {
         />
       )}
 
-      <SectionHeader title={`Your observations (${authored.length})`} />
+      <SectionHeader title={`${t("section_your_observations")} (${authored.length})`} />
       {authored.length === 0 ? (
         <p className="text-sm text-aivo-ink-soft">{t("no_observations_yet")}</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {authored.map((obs) => {
             const learner = learnerById.get(obs.learnerId);
+            const view: ObservationView = {
+              id: obs.id,
+              learnerName: learner?.displayName ?? "Learner",
+              location: obs.location,
+              observedAt: obs.observedAt,
+              createdAt: obs.createdAt,
+              durationMinutes: obs.durationMinutes,
+              behaviour: obs.behaviour,
+              antecedent: obs.antecedent,
+              consequence: obs.consequence,
+              mood: obs.mood,
+              edited: Boolean(obs.updatedAt),
+            };
+            // Author-only edit window: this surface only lists the caregiver's
+            // OWN observations, and the window is open for 15 min from creation.
+            // The server-side BFF re-enforces both on save.
+            const canEdit =
+              obs.caregiverUserId === session.userId &&
+              Date.now() - new Date(obs.createdAt).getTime() <= EDIT_WINDOW_MS;
             return (
               <li key={obs.id}>
-                <Card className="flex flex-col gap-1 p-4">
-                  <p className="text-sm font-semibold">
-                    {learner?.displayName ?? "Learner"} ·{" "}
-                    <span className="text-aivo-ink-soft">{obs.location}</span>
-                  </p>
-                  <p className="text-xs text-aivo-ink-soft">
-                    {formatWhen(obs.observedAt)}
-                    {obs.durationMinutes !== null ? ` · ${obs.durationMinutes} min` : ""}
-                  </p>
-                  <dl className="mt-2 grid grid-cols-1 gap-1 text-sm md:grid-cols-3">
-                    <div>
-                      <dt className="iw-label text-aivo-ink-soft">{t("label_antecedent")}</dt>
-                      <dd>{obs.antecedent || "—"}</dd>
-                    </div>
-                    <div>
-                      <dt className="iw-label text-aivo-ink-soft">{t("label_behaviour")}</dt>
-                      <dd className="font-medium">{obs.behaviour}</dd>
-                    </div>
-                    <div>
-                      <dt className="iw-label text-aivo-ink-soft">{t("label_consequence")}</dt>
-                      <dd>{obs.consequence || "—"}</dd>
-                    </div>
-                  </dl>
-                </Card>
+                <ObservationRow obs={view} canEdit={canEdit} />
               </li>
             );
           })}

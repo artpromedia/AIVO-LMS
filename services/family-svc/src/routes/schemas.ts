@@ -685,6 +685,27 @@ export const observationsSchema = {
   response: { 200: passthroughObject, 400: errorResponse, 403: errorResponse },
 } as const;
 
+export const updateObservationSchema = {
+  tags: ["Family"],
+  operationId: "updateObservation",
+  summary: "PATCH /api/family/observations/:id",
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
+  body: passthroughObject,
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+  },
+} as const;
+
 export const getLearnerSettingsByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getLearnerSettingsByLearnerId",

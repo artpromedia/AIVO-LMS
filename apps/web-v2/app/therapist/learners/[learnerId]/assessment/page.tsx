@@ -51,7 +51,7 @@ export default async function TherapistAssessmentPage({
         title={t("title")}
         description={t("description", { name: learner.displayName })}
       />
-      <Card className="max-w-2xl p-[var(--aivo-density-card-pad)]">
+      <Card className="max-w-5xl p-[var(--aivo-density-card-pad)]">
         <TherapistAssessmentForm learnerId={learnerId} />
       </Card>
     </AppShell>
