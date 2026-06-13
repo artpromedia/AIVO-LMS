@@ -32,6 +32,9 @@ export function SubscribeForm({
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // Per-plan acceptance of the per-child subscription terms. The parent must
+  // tick the box before we start a (trialing) $39.99/mo-per-child plan.
+  const [accepted, setAccepted] = useState<Record<string, boolean>>({});
 
   // Persist any utm_*/coupon present when the billing page loads so a campaign
   // deep-link is still attributed when the parent subscribes.
@@ -41,11 +44,20 @@ export function SubscribeForm({
 
   function subscribe(planId: string, priceId: string) {
     setError(null);
+    if (!accepted[planId]) {
+      setError(t("sub_terms_required"));
+      return;
+    }
     start(async () => {
       const res = await fetch("/api/bff/parent/subscription", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ planId, priceId, ...readCheckoutAttribution() }),
+        body: JSON.stringify({
+          planId,
+          priceId,
+          termsAccepted: true,
+          ...readCheckoutAttribution(),
+        }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -101,10 +113,23 @@ export function SubscribeForm({
                 <li key={f}>• {f}</li>
               ))}
             </ul>
+            {!isActive ? (
+              <label className="mt-4 flex items-start gap-2 text-xs text-aivo-ink-soft">
+                <input
+                  type="checkbox"
+                  className="mt-0.5"
+                  checked={Boolean(accepted[row.plan.id])}
+                  onChange={(e) =>
+                    setAccepted((prev) => ({ ...prev, [row.plan.id]: e.target.checked }))
+                  }
+                />
+                <span>{t("sub_terms_label")}</span>
+              </label>
+            ) : null}
             <Button
               className="mt-4 w-full"
               variant={isActive ? "outline" : "default"}
-              disabled={pending || isActive || !price}
+              disabled={pending || isActive || !price || (!isActive && !accepted[row.plan.id])}
               onClick={() => price && subscribe(row.plan.id, price.id)}
             >
               {isActive ? t("sub_current_plan") : pending ? t("sub_working") : t("sub_switch")}

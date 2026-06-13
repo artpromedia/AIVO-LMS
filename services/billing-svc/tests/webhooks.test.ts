@@ -77,8 +77,13 @@ test("readTenantFromMetadata extracts the tenant id", () => {
 });
 
 test("readPlanFromMetadata only accepts known plans", () => {
-  assert.equal(readPlanFromMetadata({ aivo_plan_id: "single" } as Stripe.Metadata), "single");
   assert.equal(readPlanFromMetadata({ aivo_plan_id: "family" } as Stripe.Metadata), "family");
+  assert.equal(
+    readPlanFromMetadata({ aivo_plan_id: "enterprise" } as Stripe.Metadata),
+    "enterprise",
+  );
+  // Legacy tiers are no longer valid plan ids.
+  assert.equal(readPlanFromMetadata({ aivo_plan_id: "single" } as Stripe.Metadata), null);
   assert.equal(readPlanFromMetadata({ aivo_plan_id: "bogus" } as Stripe.Metadata), null);
 });
 

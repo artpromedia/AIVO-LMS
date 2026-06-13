@@ -223,7 +223,11 @@
     "cancelSubscription": "Cancelar assinatura",
     "cancelAtPeriodEnd": "Cancela no final do período",
     "addedToBill": "{{count}} complemento(s) · R${{price}}/mês",
-    "openInvoice": "Abrir fatura"
+    "openInvoice": "Abrir fatura",
+    "termsTitle": "Subscription terms",
+    "termsMessage": "$39.99/month per child, billed after your 30-day free trial. You can cancel anytime. Do you agree to these terms?",
+    "termsAgree": "I agree",
+    "allTutorsIncluded": "All 14 AI tutors are included for every child — no add-ons."
   },
   "parentTutors": {
     "title": "Loja de Tutores",
@@ -234,7 +238,8 @@
     "core7Bundle": "Pacote Principais 7",
     "includedWithSub": "Incluído na assinatura",
     "full14Bundle": "Pacote Completo 14",
-    "full14Price": "R$9,99/mês complemento"
+    "full14Price": "R$9,99/mês complemento",
+    "allIncluded": "All 14 AI tutors are included with your plan."
   },
   "parentRecommendations": {
     "title": "Recomendações",

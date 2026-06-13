@@ -7,7 +7,7 @@ import { SITE_URL, WEB_APP_URL } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Pricing — AIVO Learning",
   description:
-    "Simple, honest pricing for families, schools, and districts. Free to start. Family plan from $19.99 per learner. Schools and districts: request a quote.",
+    "Simple, honest pricing. Family plan is $39.99/month per child with a 30-day free trial. Schools and districts: request an Enterprise quote.",
   alternates: { canonical: `${SITE_URL}/pricing` },
 };
 
@@ -25,53 +25,25 @@ type Plan = {
 
 const FAMILY_PLANS: Plan[] = [
   {
-    key: "free",
-    name: "Free",
-    price: "$0",
-    cadence: "forever",
-    description: "Try AIVO with one learner. No card required.",
+    key: "family",
+    name: "Family",
+    price: "$39.99",
+    cadence: "per child / month",
+    description:
+      "Subscribe directly. Add a child anytime — agree to the terms and your child is set up.",
     features: [
-      "1 learner profile",
-      "Today's Mission (limited)",
-      "Sample LessonRun lessons",
-      "Parent visibility dashboard",
-    ],
-    cta: { label: "Start free", href: `${WEB_APP_URL}/signup?plan=free` },
-  },
-  {
-    key: "single",
-    name: "Single Learner",
-    price: "$24.99",
-    cadence: "per month",
-    description: "Full AIVO for one learner.",
-    features: [
-      "1 learner profile",
-      "All 14 AI tutors",
+      "30-day free trial — card required, not charged until the trial ends",
+      "All 14 AI tutors included for every child",
       "Unlimited LessonRun lessons",
       "Homework Helper (anti-answer-dump)",
       "Sensory adaptations & 5 functioning levels",
-      "Parent dashboard + weekly summary",
+      "Parent dashboard with per-child views",
+      "Add a child anytime at $39.99/month each",
+      "Cancel anytime",
     ],
-    cta: { label: "Choose Single", href: `${WEB_APP_URL}/signup?plan=single` },
-  },
-  {
-    key: "family",
-    name: "Family",
-    price: "$19.99",
-    cadence: "per learner / month",
-    description: "Best value for households with two or more learners.",
-    features: [
-      "Up to 6 learner profiles",
-      "All 14 AI tutors per learner",
-      "Unlimited LessonRun lessons",
-      "Homework Helper across learners",
-      "Sensory adaptations & 5 functioning levels",
-      "Parent dashboard with per-learner views",
-      "Sibling-aware scheduling in Today's Mission",
-    ],
-    cta: { label: "Choose Family", href: `${WEB_APP_URL}/signup?plan=family` },
+    cta: { label: "Start free trial", href: `${WEB_APP_URL}/signup?plan=family` },
     highlight: true,
-    badge: "Most popular",
+    badge: "For families",
   },
 ];
 
@@ -106,20 +78,24 @@ const INSTITUTIONAL = [
 
 const FAQ = [
   {
-    q: "Are these the final prices?",
-    a: "Family prices above are current. School and District pricing depends on learner counts and rollout scope — we send a written quote within one business day of a demo.",
+    q: "How does Family pricing work?",
+    a: "It's $39.99/month per child. Each time you add a child you'll agree to the subscription terms for that child, and your monthly total goes up by $39.99. You start with a 30-day free trial.",
   },
   {
-    q: "Is there a trial or money-back guarantee?",
-    a: "Yes. Family plans include a 30-day money-back guarantee on paid subscriptions. Schools and districts run a scoped pilot before annual commitment.",
+    q: "Do I need a card for the free trial?",
+    a: "Yes — you add a payment method to start the 30-day trial, but you are not charged until the trial ends. Cancel before then and you pay nothing.",
   },
   {
     q: "What if my child only uses AIVO sometimes?",
-    a: "Family plans are month-to-month. Pause or cancel any time from your account — your learner's progress is saved if you come back.",
+    a: "Family is month-to-month. Pause or cancel any time from your account — your child's progress is saved if you come back.",
   },
   {
     q: "Do you charge per tutor or per subject?",
-    a: "No. Every paid plan includes all 14 tutors and every subject. We don't gate features by paywalled add-ons.",
+    a: "No. Both Family and Enterprise include all 14 tutors and every subject. We don't gate features behind paywalled add-ons.",
+  },
+  {
+    q: "How is Enterprise different?",
+    a: "With Enterprise, your school or district provisions accounts and invites parents — there's no per-parent card. Pricing scales with learner count; we send a written quote.",
   },
 ];
 
@@ -129,7 +105,7 @@ export default async function PricingPage() {
     <LandingPageLayout
       badge="Pricing"
       title={t("hero_title")}
-      subtitle="Free to start. Family plans by the month. Schools and districts get a written quote — never a black-box invoice."
+      subtitle="$39.99/month per child with a 30-day free trial — or get AIVO through your school with an Enterprise quote."
       breadcrumbs={[{ name: "Pricing", href: "/pricing" }]}
       finalCta={{
         title: "Still deciding?",
@@ -143,7 +119,7 @@ export default async function PricingPage() {
           {t("for_families")}
         </h2>
         <p className="mt-1 font-body text-slate-600">{t("family_disclaimer")}</p>
-        <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:max-w-md">
           {FAMILY_PLANS.map((p) => (
             <article
               key={p.key}

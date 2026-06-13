@@ -668,7 +668,7 @@ export const COMPARISONS: ComparisonSpec[] = [
       { feature: "Sensory profiles", aivo: "Yes — visuals, audio, pacing", competitor: "Limited" },
       {
         feature: "Family pricing",
-        aivo: "$19.99/mo per learner (Family plan, 2+ learners)",
+        aivo: "$39.99/mo per child (all 14 tutors included)",
         competitor: "From $9.95/mo (Family plan)",
       },
       {
@@ -705,7 +705,7 @@ export const COMPARISONS: ComparisonSpec[] = [
     rows: [
       {
         feature: "Pricing",
-        aivo: "Free trial, then $19.99–$24.99/mo per learner",
+        aivo: "30-day free trial, then $39.99/mo per child",
         competitor: "Free, forever",
       },
       {

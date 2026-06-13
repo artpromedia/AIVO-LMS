@@ -223,7 +223,11 @@
     "cancelSubscription": "구독 취소",
     "cancelAtPeriodEnd": "기간 종료 시 취소",
     "addedToBill": "{{count}}개 부가 기능 · ₩{{price}}/월",
-    "openInvoice": "청구서 열기"
+    "openInvoice": "청구서 열기",
+    "termsTitle": "Subscription terms",
+    "termsMessage": "$39.99/month per child, billed after your 30-day free trial. You can cancel anytime. Do you agree to these terms?",
+    "termsAgree": "I agree",
+    "allTutorsIncluded": "All 14 AI tutors are included for every child — no add-ons."
   },
   "parentTutors": {
     "title": "튜터 스토어",
@@ -234,7 +238,8 @@
     "core7Bundle": "핵심 7 번들",
     "includedWithSub": "구독에 포함됨",
     "full14Bundle": "전체 14 번들",
-    "full14Price": "월 $9.99 부가 기능"
+    "full14Price": "월 $9.99 부가 기능",
+    "allIncluded": "All 14 AI tutors are included with your plan."
   },
   "parentRecommendations": {
     "title": "추천",

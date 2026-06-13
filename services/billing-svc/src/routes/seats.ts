@@ -57,13 +57,16 @@ const log = createLogger("billing-svc.seats");
 
 /** Per-seat list price (cents/month) by plan, for MRR/ARR rollups. */
 const PLAN_SEAT_RATE_CENTS: Record<string, number> = {
-  free: 0,
-  single: 2499,
-  family: 1999,
-  // District contracts are negotiated; default to a list rate but allow a
+  // Family: $39.99/mo per child.
+  family: 3999,
+  // Enterprise contracts are negotiated; default to a list rate but allow a
   // per-pool override via `seat_pools.metadata.perSeatCents`.
+  enterprise: 1000,
+  // Legacy plan slugs kept so historical rows still roll up sensibly.
+  single: 2499,
   district: 1000,
   school: 1000,
+  free: 0,
 };
 
 async function requireAuth(req: FastifyRequest, reply: FastifyReply): Promise<JWTPayload | null> {
@@ -584,15 +587,12 @@ export function registerSeatRoutes(app: FastifyInstance, db: any) {
 
       const { planId } = request.body as { planId: string };
       const sub = await loadSubscription(db, tenantId);
-      const previousPlan = sub?.plan ?? "free";
+      const previousPlan = sub?.plan ?? "none";
 
       // Push the change to Stripe when a live subscription + price exist.
-      const newPriceId =
-        planId === "single"
-          ? process.env.STRIPE_PRICE_SINGLE
-          : planId === "family"
-            ? process.env.STRIPE_PRICE_FAMILY
-            : null;
+      // Family is the only plan with a self-serve price; enterprise is a
+      // contract sale (no price), so we only update our DB for it.
+      const newPriceId = planId === "family" ? process.env.STRIPE_PRICE_FAMILY : null;
       if (sub?.stripeSubscriptionId && newPriceId) {
         try {
           await changeSubscriptionPlan({

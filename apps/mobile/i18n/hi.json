@@ -223,7 +223,11 @@
     "cancelSubscription": "सदस्यता रद्द करें",
     "cancelAtPeriodEnd": "अवधि के अंत में रद्द",
     "addedToBill": "{{count}} ऐड-ऑन · {{price}}/माह",
-    "openInvoice": "चालान खोलें"
+    "openInvoice": "चालान खोलें",
+    "termsTitle": "Subscription terms",
+    "termsMessage": "$39.99/month per child, billed after your 30-day free trial. You can cancel anytime. Do you agree to these terms?",
+    "termsAgree": "I agree",
+    "allTutorsIncluded": "All 14 AI tutors are included for every child — no add-ons."
   },
   "parentTutors": {
     "title": "ट्यूटर स्टोर",
@@ -234,7 +238,8 @@
     "core7Bundle": "मुख्य 7 बंडल",
     "includedWithSub": "सदस्यता के साथ शामिल",
     "full14Bundle": "पूर्ण 14 बंडल",
-    "full14Price": "₹9.99/माह ऐड-ऑन"
+    "full14Price": "₹9.99/माह ऐड-ऑन",
+    "allIncluded": "All 14 AI tutors are included with your plan."
   },
   "parentRecommendations": {
     "title": "सिफारिशें",

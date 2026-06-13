@@ -244,7 +244,7 @@ async function handleCheckoutCompleted(
     .limit(1);
   if (existing.length > 0) return;
 
-  const plan = readPlanFromMetadata(session.metadata) ?? "single";
+  const plan = readPlanFromMetadata(session.metadata) ?? "family";
   const userId = (session.metadata?.userId as string | undefined) ?? null;
   if (!userId) {
     log.warn("Checkout session missing userId metadata; cannot create subscription row", {
@@ -288,7 +288,7 @@ async function handleSubscriptionUpsert(
   eventType: string,
 ) {
   const tenantId = readTenantFromMetadata(sub.metadata);
-  const plan = readPlanFromMetadata(sub.metadata) ?? "single";
+  const plan = readPlanFromMetadata(sub.metadata) ?? "family";
   const stripeCustomerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
   const stripeStatus = sub.status as string;
   const cancelAtPeriodEnd = Boolean(sub.cancel_at_period_end);

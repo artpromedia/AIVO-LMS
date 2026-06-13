@@ -204,7 +204,9 @@
         "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
         "cancelled_title": "Checkout cancelled",
         "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
-      }
+      },
+      "sub_terms_label": "I agree to the subscription terms: $39.99/month per child, billed after the 30-day free trial. Cancel anytime.",
+      "sub_terms_required": "Please accept the subscription terms to continue."
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Deine Antworten gehören nur dir",

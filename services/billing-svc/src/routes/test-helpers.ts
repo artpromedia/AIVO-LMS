@@ -36,7 +36,7 @@ export function registerBillingTestHelperRoutes(app: FastifyInstance, db: any): 
     const body = req.body as {
       tenantId: string;
       userId: string;
-      plan: "single" | "family" | "free" | "district";
+      plan: "family" | "enterprise";
       stripeStatus?: string;
       cancelAtPeriodEnd?: boolean;
       trialEndsAt?: string | null;

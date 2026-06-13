@@ -143,7 +143,7 @@ describe("billing-svc webhook → DB", () => {
       createdSecs,
       subscription: {
         id: subId,
-        metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "single", userId },
+        metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "family", userId },
         status: "active",
         customer: `cus_${createdSecs}`,
         cancel_at_period_end: false,
@@ -152,7 +152,7 @@ describe("billing-svc webhook → DB", () => {
         trial_end: null,
         canceled_at: null,
         items: {
-          data: [{ id: "si_1", price: { id: "price_single" }, metadata: {} }],
+          data: [{ id: "si_1", price: { id: "price_family" }, metadata: {} }],
         },
       },
     });
@@ -168,7 +168,7 @@ describe("billing-svc webhook → DB", () => {
     `;
     expect(rows.length).toBe(1);
     expect(rows[0].stripe_status).toBe("active");
-    expect(rows[0].plan).toBe("single");
+    expect(rows[0].plan).toBe("family");
     expect(rows[0].tenant_id).toBe(tenantId);
   });
 
@@ -235,7 +235,7 @@ describe("billing-svc webhook → DB", () => {
       createdSecs,
       subscription: {
         id: subId,
-        metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "single", userId },
+        metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "family", userId },
         status: "active",
         customer: `cus_dup_${createdSecs}`,
         cancel_at_period_end: false,
@@ -243,7 +243,7 @@ describe("billing-svc webhook → DB", () => {
         current_period_end: createdSecs + 30 * 24 * 60 * 60,
         trial_end: null,
         canceled_at: null,
-        items: { data: [{ id: "si_3", price: { id: "price_single" }, metadata: {} }] },
+        items: { data: [{ id: "si_3", price: { id: "price_family" }, metadata: {} }] },
       },
     });
     const first = await (await postWebhook(evt)).json();
@@ -263,7 +263,7 @@ describe("billing-svc webhook → DB", () => {
         createdSecs,
         subscription: {
           id: subId,
-          metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "single", userId },
+          metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "family", userId },
           status: "active",
           customer: `cus_ord_${createdSecs}`,
           cancel_at_period_end: false,
@@ -271,7 +271,7 @@ describe("billing-svc webhook → DB", () => {
           current_period_end: createdSecs + 30 * 24 * 60 * 60,
           trial_end: null,
           canceled_at: null,
-          items: { data: [{ id: "si_4", price: { id: "price_single" }, metadata: {} }] },
+          items: { data: [{ id: "si_4", price: { id: "price_family" }, metadata: {} }] },
         },
       }),
     );
@@ -283,7 +283,7 @@ describe("billing-svc webhook → DB", () => {
         createdSecs: createdSecs + 10,
         subscription: {
           id: subId,
-          metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "single", userId },
+          metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "family", userId },
           status: "past_due",
           customer: `cus_ord_${createdSecs}`,
           cancel_at_period_end: false,
@@ -291,7 +291,7 @@ describe("billing-svc webhook → DB", () => {
           current_period_end: createdSecs + 30 * 24 * 60 * 60,
           trial_end: null,
           canceled_at: null,
-          items: { data: [{ id: "si_4", price: { id: "price_single" }, metadata: {} }] },
+          items: { data: [{ id: "si_4", price: { id: "price_family" }, metadata: {} }] },
         },
       }),
     );
@@ -303,7 +303,7 @@ describe("billing-svc webhook → DB", () => {
         createdSecs: createdSecs + 1,
         subscription: {
           id: subId,
-          metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "single", userId },
+          metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "family", userId },
           status: "active",
           customer: `cus_ord_${createdSecs}`,
           cancel_at_period_end: false,
@@ -311,7 +311,7 @@ describe("billing-svc webhook → DB", () => {
           current_period_end: createdSecs + 30 * 24 * 60 * 60,
           trial_end: null,
           canceled_at: null,
-          items: { data: [{ id: "si_4", price: { id: "price_single" }, metadata: {} }] },
+          items: { data: [{ id: "si_4", price: { id: "price_family" }, metadata: {} }] },
         },
       }),
     );
@@ -335,7 +335,7 @@ describe("billing-svc webhook → DB", () => {
         createdSecs,
         subscription: {
           id: subId,
-          metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "single", userId },
+          metadata: { aivo_tenant_id: tenantId, aivo_plan_id: "family", userId },
           status: "past_due",
           customer: `cus_inv_${createdSecs}`,
           cancel_at_period_end: false,
@@ -343,7 +343,7 @@ describe("billing-svc webhook → DB", () => {
           current_period_end: createdSecs + 30 * 24 * 60 * 60,
           trial_end: null,
           canceled_at: null,
-          items: { data: [{ id: "si_5", price: { id: "price_single" }, metadata: {} }] },
+          items: { data: [{ id: "si_5", price: { id: "price_family" }, metadata: {} }] },
         },
       }),
     );

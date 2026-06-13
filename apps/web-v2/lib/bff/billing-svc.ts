@@ -13,9 +13,10 @@
  * it falls back to the in-memory store simulation so dev/demo and the mock
  * AUTH_MODE keep working unchanged.
  *
- * billing-svc speaks the canonical plan vocabulary (`single` / `family`);
- * it owns the Stripe Price IDs via its own env, so the web never maps to a
- * Stripe price itself.
+ * billing-svc speaks the canonical plan vocabulary: `family` is the only
+ * self-serve consumer tier ($39.99/mo per child, 30-day card-required
+ * trial); `enterprise` is contact-sales. billing-svc owns the Stripe Price
+ * IDs via its own env, so the web never maps to a Stripe price itself.
  */
 import { cookies } from "next/headers";
 import { serverEnv } from "@/lib/env";
@@ -25,8 +26,8 @@ import type { SessionProfile } from "@/lib/auth/types";
 import type { CheckoutAttribution } from "@/lib/bff/checkout-attribution";
 import { logger } from "@/lib/observability/logger";
 
-/** Canonical purchasable consumer plans, in display order. */
-export type BillingPlanId = "single" | "family";
+/** Canonical purchasable consumer plan. Enterprise is contact-sales. */
+export type BillingPlanId = "family";
 
 export interface BillingPlanView {
   plan: {
@@ -158,7 +159,7 @@ interface SvcInvoice {
   paidAt: string | null;
 }
 
-const PURCHASABLE: BillingPlanId[] = ["single", "family"];
+const PURCHASABLE: BillingPlanId[] = ["family"];
 
 function mapCatalog(plans: SvcCatalogPlan[]): BillingPlanView[] {
   return plans
@@ -177,15 +178,18 @@ function mapCatalog(plans: SvcCatalogPlan[]): BillingPlanView[] {
           id: p.id,
           amountCents: Math.round(p.price * 100),
           interval: p.interval,
-          trialDays: 0,
+          // Family ships a 30-day card-required trial; other plans none.
+          trialDays: p.id === "family" ? 30 : 0,
         },
       ],
     }));
 }
 
 function mapSubscription(s: SvcSubscription): BillingSubscriptionView | null {
-  // Free / no-row tenants render as "no active plan", matching the store.
-  if (s.plan === "free" || !s.currentPeriodStart || !s.currentPeriodEnd) return null;
+  // No-subscription tenants ("none") render as "no active plan". There is
+  // no free tier; a tenant either has a Family/Enterprise plan or nothing.
+  if (s.plan === "none" || s.plan === "free" || !s.currentPeriodStart || !s.currentPeriodEnd)
+    return null;
   return {
     id: s.plan, // billing-svc cancels by tenantId, so the id is informational
     planId: s.plan,
@@ -272,6 +276,8 @@ export async function createParentCheckout(params: {
   planId: BillingPlanId;
   origin: string;
   bearer: string;
+  /** Parent must have accepted the per-child subscription terms. */
+  termsAccepted: boolean;
   attribution?: CheckoutAttribution;
 }): Promise<ServiceResult<{ checkoutUrl: string; sessionId: string }>> {
   const attribution = params.attribution ?? {};
@@ -281,6 +287,7 @@ export async function createParentCheckout(params: {
     body: {
       tenantId: params.tenantId,
       planId: params.planId,
+      termsAccepted: params.termsAccepted,
       successUrl: `${params.origin}/parent/settings/billing?checkout=success`,
       cancelUrl: `${params.origin}/parent/settings/billing?checkout=cancelled`,
       ...(attribution.couponCode ? { couponCode: attribution.couponCode } : {}),

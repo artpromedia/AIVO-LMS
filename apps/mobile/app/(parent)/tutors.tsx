@@ -1,20 +1,8 @@
-import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Pressable,
-  Alert,
-  Modal,
-  ActivityIndicator,
-} from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, StyleSheet, Pressable, Modal } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useAuth } from "@/hooks/useAuth";
-import { apiFetch } from "@/lib/api";
-import { API } from "@/constants/api";
 import { TUTORS } from "@aivo/brand";
 import { TutorCard } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
@@ -25,98 +13,15 @@ export default function TutorStoreScreen() {
   const insets = useSafeAreaInsets();
   const [filter, setFilter] = useState<"all" | "core" | "expansion">("all");
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const tenantId = user?.tenantId || "";
 
   const [selectedTutor, setSelectedTutor] = useState<{
     key: string;
     tutor: (typeof TUTORS)[TutorKey];
   } | null>(null);
-  const [purchasing, setPurchasing] = useState(false);
 
   const tutorEntries = Object.entries(TUTORS) as [TutorKey, (typeof TUTORS)[TutorKey]][];
   const filtered =
     filter === "all" ? tutorEntries : tutorEntries.filter(([, t]) => t.tier === filter);
-
-  const handleAddTutor = useCallback(
-    async (tutorKey: string, tutorName: string) => {
-      if (!tenantId) {
-        Alert.alert(t("common.error"), "No account found.");
-        return;
-      }
-      Alert.alert(`Add ${tutorName}`, `Add ${tutorName} tutor for $4.99/month?`, [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: "Add Tutor",
-          onPress: async () => {
-            setPurchasing(true);
-            try {
-              const res = await apiFetch(API.BILLING, "/api/billing/addons", {
-                method: "POST",
-                body: JSON.stringify({ tenantId, tutorId: tutorKey }),
-              });
-              const data = await res.json();
-              if (res.ok) {
-                Alert.alert("✅", `${tutorName} added to your plan!`);
-                setSelectedTutor(null);
-              } else {
-                Alert.alert(t("common.error"), data.error || "Failed to add tutor");
-              }
-            } catch {
-              Alert.alert(t("common.error"), "Network error. Please try again.");
-            } finally {
-              setPurchasing(false);
-            }
-          },
-        },
-      ]);
-    },
-    [tenantId, t],
-  );
-
-  const handleBundlePurchase = useCallback(
-    async (bundleType: "core" | "full") => {
-      if (!tenantId) {
-        Alert.alert(t("common.error"), "No account found.");
-        return;
-      }
-
-      const bundleName = bundleType === "core" ? "Core 7 Bundle" : "Full 14 Bundle";
-      const planId = bundleType === "core" ? "single" : "family";
-      const price = bundleType === "core" ? "included with subscription" : "$34.99/mo";
-
-      Alert.alert(
-        bundleName,
-        `${bundleName} (${price}). Switch to this plan to get all ${bundleType === "core" ? "7 core" : "14"} tutors.`,
-        [
-          { text: t("common.cancel"), style: "cancel" },
-          {
-            text: "Switch Plan",
-            onPress: async () => {
-              setPurchasing(true);
-              try {
-                const res = await apiFetch(API.BILLING, "/api/billing/subscription", {
-                  method: "POST",
-                  body: JSON.stringify({ tenantId, planId }),
-                });
-                const data = await res.json();
-                if (res.ok) {
-                  Alert.alert("✅", `Switched to ${bundleName}!`);
-                } else {
-                  Alert.alert(t("common.error"), data.error || "Failed to switch plan");
-                }
-              } catch {
-                Alert.alert(t("common.error"), "Network error. Please try again.");
-              } finally {
-                setPurchasing(false);
-              }
-            },
-          },
-        ],
-      );
-    },
-    [tenantId, t],
-  );
 
   return (
     <ScrollView
@@ -128,7 +33,8 @@ export default function TutorStoreScreen() {
 
       <View style={styles.filters}>
         {(["all", "core", "expansion"] as const).map((f) => (
-          <Pressable accessibilityRole="button"
+          <Pressable
+            accessibilityRole="button"
             key={f}
             style={[styles.filterBtn, filter === f && styles.filterActive]}
             onPress={() => setFilter(f)}
@@ -144,27 +50,10 @@ export default function TutorStoreScreen() {
         ))}
       </View>
 
-      <View style={styles.bundles}>
-        <Pressable accessibilityRole="button"
-          style={[styles.bundleCard, { borderColor: colors.primary }]}
-          onPress={() => handleBundlePurchase("core")}
-        >
-          <Text style={styles.bundleName}>{t("parentTutors.core7Bundle")}</Text>
-          <Text style={styles.bundlePrice}>{t("parentTutors.includedWithSub")}</Text>
-          {purchasing && (
-            <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 4 }} />
-          )}
-        </Pressable>
-        <Pressable accessibilityRole="button"
-          style={[styles.bundleCard, { borderColor: colors.secondary }]}
-          onPress={() => handleBundlePurchase("full")}
-        >
-          <Text style={styles.bundleName}>{t("parentTutors.full14Bundle")}</Text>
-          <Text style={styles.bundlePrice}>{t("parentTutors.full14Price")}</Text>
-          {purchasing && (
-            <ActivityIndicator size="small" color={colors.secondary} style={{ marginTop: 4 }} />
-          )}
-        </Pressable>
+      {/* Every plan includes all 14 tutors — no add-ons, no bundles. */}
+      <View style={styles.includedBanner}>
+        <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+        <Text style={styles.includedBannerText}>{t("parentTutors.allIncluded")}</Text>
       </View>
 
       {filtered.map(([key, tutor]) => (
@@ -174,13 +63,17 @@ export default function TutorStoreScreen() {
           domain={tutor.domain}
           icon={tutor.icon}
           color={tutor.color}
-          subscribed={tutor.tier === "core"}
+          subscribed
           onPress={() => setSelectedTutor({ key, tutor })}
         />
       ))}
 
       <Modal visible={!!selectedTutor} transparent animationType="slide">
-        <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setSelectedTutor(null)}>
+        <Pressable
+          accessibilityRole="button"
+          style={styles.modalOverlay}
+          onPress={() => setSelectedTutor(null)}
+        >
           <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
             {selectedTutor && (
               <>
@@ -220,22 +113,15 @@ export default function TutorStoreScreen() {
                   {selectedTutor.tutor.name} specializes in {selectedTutor.tutor.domain} and adapts
                   to each learner&apos;s unique needs and pace.
                 </Text>
-                {selectedTutor.tutor.tier === "core" ? (
-                  <View style={styles.activeRow}>
-                    <Ionicons name="checkmark-circle" size={20} color={colors.success} />
-                    <Text style={styles.activeText}>Included in your plan</Text>
-                  </View>
-                ) : purchasing ? (
-                  <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.md }} />
-                ) : (
-                  <Pressable accessibilityRole="button"
-                    style={styles.addTutorBtn}
-                    onPress={() => handleAddTutor(selectedTutor.key, selectedTutor.tutor.name)}
-                  >
-                    <Text style={styles.addTutorText}>Add for $4.99/mo</Text>
-                  </Pressable>
-                )}
-                <Pressable accessibilityRole="button" onPress={() => setSelectedTutor(null)} style={{ marginTop: spacing.md }}>
+                <View style={styles.activeRow}>
+                  <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+                  <Text style={styles.activeText}>Included in your plan</Text>
+                </View>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => setSelectedTutor(null)}
+                  style={{ marginTop: spacing.md }}
+                >
                   <Text
                     style={{
                       fontSize: 14,
@@ -276,21 +162,16 @@ const styles = StyleSheet.create({
   filterActive: { backgroundColor: colors.primary },
   filterText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
   filterTextActive: { color: "#FFF" },
-  bundles: { flexDirection: "row", gap: 8, marginBottom: spacing.lg },
-  bundleCard: {
-    flex: 1,
+  includedBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
     padding: spacing.md,
     borderRadius: radius.xl,
-    borderWidth: 2,
     backgroundColor: colors.card,
+    marginBottom: spacing.lg,
   },
-  bundleName: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
-  bundlePrice: {
-    fontSize: 12,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
+  includedBannerText: { flex: 1, fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.text },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
   modalContent: {
     backgroundColor: colors.card,

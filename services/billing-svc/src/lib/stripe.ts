@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import type { PlanId, TutorSku } from "@aivo/billing-entitlements";
+import type { PlanId } from "@aivo/billing-entitlements";
 
 /**
  * Lazy Stripe client. The service can boot without keys (for local dev
@@ -46,24 +46,24 @@ export function getReturnUrl(kind: "billing_success" | "billing_cancel" | "porta
   return v;
 }
 
-/** Stripe Price IDs are configured per-plan via env vars. */
+/**
+ * Stripe Price ID for the only self-serve plan: Family, billed at
+ * $39.99/mo per child (one subscription, quantity = number of children).
+ * Enterprise is a contract sale and has no self-serve checkout price.
+ */
 export function getPriceIdForPlan(plan: PlanId): string {
-  const v =
-    plan === "single"
-      ? process.env.STRIPE_PRICE_SINGLE
-      : plan === "family"
-        ? process.env.STRIPE_PRICE_FAMILY
-        : null;
-  if (!v) throw new StripeNotConfiguredError(`STRIPE_PRICE_${plan.toUpperCase()}`);
+  if (plan !== "family") {
+    throw new StripeNotConfiguredError(
+      `no self-serve Stripe price for plan "${plan}" (only "family" is purchasable; enterprise is contact-sales)`,
+    );
+  }
+  const v = process.env.STRIPE_PRICE_FAMILY;
+  if (!v) throw new StripeNotConfiguredError("STRIPE_PRICE_FAMILY");
   return v;
 }
 
-/** One Price ID covers any tutor add-on; the line item carries the SKU as metadata. */
-export function getTutorAddonPriceId(): string {
-  const v = process.env.STRIPE_PRICE_TUTOR_ADDON;
-  if (!v) throw new StripeNotConfiguredError("STRIPE_PRICE_TUTOR_ADDON");
-  return v;
-}
+/** Length of the card-required free trial offered on the Family plan. */
+export const FAMILY_TRIAL_PERIOD_DAYS = 30;
 
 /**
  * Best-effort tenant identifier for Stripe API objects so we can map
@@ -71,6 +71,11 @@ export function getTutorAddonPriceId(): string {
  */
 export const STRIPE_METADATA_TENANT_KEY = "aivo_tenant_id";
 export const STRIPE_METADATA_PLAN_KEY = "aivo_plan_id";
+/**
+ * Retained for reconciliation/webhook sync of pre-existing tutor add-on
+ * line items. Add-ons are no longer sold (both tiers are all-access), but
+ * legacy Stripe items may still carry this metadata key.
+ */
 export const STRIPE_METADATA_TUTOR_SKU_KEY = "aivo_tutor_sku";
 
 export interface CheckoutForPlanArgs {
@@ -78,7 +83,8 @@ export interface CheckoutForPlanArgs {
   userId: string;
   customerId?: string | null;
   customerEmail?: string | null;
-  plan: Exclude<PlanId, "free" | "district">;
+  /** Family is the only self-serve plan; enterprise is contact-sales. */
+  plan: Extract<PlanId, "family">;
   successUrl?: string;
   cancelUrl?: string;
   learnerCount?: number;
@@ -123,7 +129,16 @@ export async function createPlanCheckoutSession(
         userId: args.userId,
         ...attributionMetadata(args),
       },
+      // Require a card up front, then start a 30-day free trial. Stripe
+      // collects the payment method during Checkout but does not charge
+      // until the trial ends; if no card is on file at trial end the
+      // subscription is paused rather than silently lapsing.
+      payment_method_collection: "always",
       subscription_data: {
+        trial_period_days: FAMILY_TRIAL_PERIOD_DAYS,
+        trial_settings: {
+          end_behavior: { missing_payment_method: "pause" },
+        },
         metadata: {
           [STRIPE_METADATA_TENANT_KEY]: args.tenantId,
           [STRIPE_METADATA_PLAN_KEY]: args.plan,
@@ -165,46 +180,6 @@ export async function createBillingPortalSession(
       idempotencyKey: `portal:${args.customerId}:${minuteBucket}`,
     },
   );
-}
-
-export interface AddonAttachArgs {
-  tenantId: string;
-  userId: string;
-  stripeSubscriptionId: string;
-  tutorSku: TutorSku;
-}
-
-export async function addTutorAddonToSubscription({
-  tenantId,
-  userId,
-  stripeSubscriptionId,
-  tutorSku,
-}: AddonAttachArgs): Promise<Stripe.SubscriptionItem> {
-  const stripe = getStripe();
-  const priceId = getTutorAddonPriceId();
-  return stripe.subscriptionItems.create(
-    {
-      subscription: stripeSubscriptionId,
-      price: priceId,
-      quantity: 1,
-      proration_behavior: "create_prorations",
-      metadata: {
-        [STRIPE_METADATA_TENANT_KEY]: tenantId,
-        [STRIPE_METADATA_TUTOR_SKU_KEY]: tutorSku,
-        userId,
-      },
-    },
-    {
-      idempotencyKey: `addon:add:${stripeSubscriptionId}:${tutorSku}`,
-    },
-  );
-}
-
-export async function removeStripeSubscriptionItem(itemId: string): Promise<void> {
-  const stripe = getStripe();
-  await stripe.subscriptionItems.del(itemId, {
-    proration_behavior: "create_prorations",
-  });
 }
 
 export async function cancelStripeSubscriptionAtPeriodEnd(

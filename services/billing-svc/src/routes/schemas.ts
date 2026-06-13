@@ -633,10 +633,13 @@ export const createCheckoutSessionSchema = {
     additionalProperties: true,
     properties: {
       tenantId: { type: "string" },
-      planId: { type: "string", enum: ["single", "family"] },
+      planId: { type: "string", enum: ["family"] },
       successUrl: { type: "string" },
       cancelUrl: { type: "string" },
+      // Number of children to provision seats for; each is billed $39.99/mo.
       learnerCount: { type: "integer", minimum: 1 },
+      // Parent must accept per-child subscription terms before checkout.
+      termsAccepted: { type: "boolean" },
       couponCode: { type: "string" },
       utmSource: { type: "string" },
       utmMedium: { type: "string" },

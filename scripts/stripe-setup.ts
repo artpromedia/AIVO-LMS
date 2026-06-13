@@ -3,9 +3,11 @@
  * Provision the Stripe Products and Prices that billing-svc expects.
  *
  * What it creates (idempotent — re-running matches by metadata.aivo_kind):
- *   - Product "AIVO Single Learner"   → recurring price ($24.99/mo) → STRIPE_PRICE_SINGLE
- *   - Product "AIVO Family"           → recurring price ($19.99/mo) → STRIPE_PRICE_FAMILY
- *   - Product "AIVO Tutor Add-on"     → recurring price ($4.99/mo)  → STRIPE_PRICE_TUTOR_ADDON
+ *   - Product "AIVO Family" → recurring price ($39.99/mo per child) → STRIPE_PRICE_FAMILY
+ *
+ * Family is the only self-serve plan (one subscription, quantity = number
+ * of children). Enterprise is a contract sale with no self-serve price, so
+ * there is nothing to provision here for it.
  *
  * Required: STRIPE_SECRET_KEY (test or live). Run from repo root:
  *
@@ -27,26 +29,12 @@ interface Spec {
 
 const SPECS: Spec[] = [
   {
-    envVar: "STRIPE_PRICE_SINGLE",
-    productName: "AIVO Single Learner",
-    productKind: "plan:single",
-    unitAmountCents: 2499,
-    description: "Single learner plan — ELA + Math tutors included, add extras at $4.99/mo.",
-  },
-  {
     envVar: "STRIPE_PRICE_FAMILY",
     productName: "AIVO Family",
     productKind: "plan:family",
-    unitAmountCents: 1999,
-    description: "Family plan — 2+ learners, ELA + Math tutors included, add extras at $4.99/mo.",
-  },
-  {
-    envVar: "STRIPE_PRICE_TUTOR_ADDON",
-    productName: "AIVO Tutor Add-on",
-    productKind: "addon:tutor",
-    unitAmountCents: 499,
+    unitAmountCents: 3999,
     description:
-      "$4.99/mo per additional AI tutor. The chosen tutor SKU is carried in subscription-item metadata.",
+      "Family plan — $39.99/mo per child (subscription quantity = number of children). All 14 AI tutors included. 30-day free trial, card required.",
   },
 ];
 

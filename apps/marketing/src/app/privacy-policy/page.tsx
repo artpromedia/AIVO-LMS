@@ -132,7 +132,7 @@ export default async function PrivacyPolicyPage() {
         {
           title: "Paid Products",
           content:
-            "If you purchase a Single Learner Plan ($24.99 per month per learner), a Family Plan ($19.99 per month per learner), or another paid offering, our payment processor (Stripe) collects payment-card and billing information directly from you, subject to its own privacy policy. AIVO receives only a tokenized reference, the last four digits of the card, the card brand, and the billing ZIP code, which we use to manage your subscription, send receipts, prevent fraud, and comply with tax and accounting obligations.",
+            "If you purchase a Family Plan ($39.99 per month per child) or another paid offering, our payment processor (Stripe) collects payment-card and billing information directly from you, subject to its own privacy policy. To start the 30-day free trial we require a payment method on file, but you are not charged until the trial ends. AIVO receives only a tokenized reference, the last four digits of the card, the card brand, and the billing ZIP code, which we use to manage your subscription, send receipts, prevent fraud, and comply with tax and accounting obligations.",
         },
         {
           title: "Applicant Information",
