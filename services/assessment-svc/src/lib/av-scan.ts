@@ -83,7 +83,12 @@ export function scanBuffer(buffer: Buffer, opts: AvScanOptions = {}): Promise<Av
     opts.timeoutMs ??
     (process.env.CLAMAV_TIMEOUT_MS ? Number(process.env.CLAMAV_TIMEOUT_MS) : DEFAULT_TIMEOUT_MS);
   const chunkSize = opts.chunkSize ?? DEFAULT_CHUNK;
-  const connect = opts.connect ?? ((p, h) => net.connect(p, h));
+  // net.Socket provides write/end/destroy/on/setTimeout but its `on` overload
+  // set is broader than AvSocket's narrowed three events, so TS won't treat it
+  // as directly assignable — bridge through `unknown` at this single boundary.
+  const defaultConnect = (p: number, h: string): AvSocket =>
+    net.connect(p, h) as unknown as AvSocket;
+  const connect = opts.connect ?? defaultConnect;
 
   return new Promise<AvScanVerdict>((resolve) => {
     let settled = false;
