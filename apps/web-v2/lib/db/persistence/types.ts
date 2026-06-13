@@ -85,6 +85,7 @@ import type {
   LearnerBrainProfile,
   BrainProfileApproval,
   LearnerBrainProfileChange,
+  ContributionAcknowledgement,
   LearnerProfile,
   LessonInteraction,
   LessonRun,
@@ -452,6 +453,44 @@ export interface BrainProfileChangeStore {
     learnerId: string,
     tenantId: string,
   ): Promise<LearnerBrainProfileChange[]>;
+}
+
+/**
+ * Sprint C-16 — the contributor-acknowledgement store. Append-only with an
+ * idempotent insert: `record` writes one acknowledgement row UNLESS one already
+ * exists for the natural key (learnerId, profileRevision, role,
+ * contributorEmail) — in which case it returns the existing row unchanged (so a
+ * re-approval of the same revision never re-spams). `listForContributor`
+ * returns a contributor's OWN acknowledgements (scoped by userId OR email — the
+ * summary card shows only their own items); `listForLearner` returns every
+ * acknowledgement for a learner (the retention metric + admin reads).
+ * `markNotified` stamps the per-channel delivery flags after dispatch.
+ */
+export interface ContributionAcknowledgementStore {
+  /** Idempotent insert keyed on (learnerId, profileRevision, role,
+   *  contributorEmail). Returns the row written, or the existing row when the
+   *  key already exists ({ created } tells the caller which). */
+  record(
+    ack: ContributionAcknowledgement,
+  ): Promise<{ ack: ContributionAcknowledgement; created: boolean }>;
+  /** A contributor's OWN acknowledgements (by userId or lowercased email),
+   *  optionally scoped to one learner. Newest-first. */
+  listForContributor(opts: {
+    tenantId: string;
+    contributorUserId: string | null;
+    contributorEmail: string;
+    learnerId?: string;
+  }): Promise<ContributionAcknowledgement[]>;
+  /** Every acknowledgement for a learner (newest-first) — retention + admin. */
+  listForLearner(learnerId: string, tenantId: string): Promise<ContributionAcknowledgement[]>;
+  /** Every acknowledgement in a tenant (newest-first) — the retention read
+   *  path. */
+  listForTenant(tenantId: string): Promise<ContributionAcknowledgement[]>;
+  /** Stamp the per-channel delivery flags on a recorded row (best-effort). */
+  markNotified(
+    id: string,
+    flags: { notifiedInApp?: boolean; notifiedEmail?: boolean },
+  ): Promise<ContributionAcknowledgement | null>;
 }
 
 /**
@@ -929,6 +968,7 @@ export interface Persistence {
   brainProfiles: BrainProfileStore;
   brainProfileApprovals: BrainProfileApprovalStore;
   brainProfileChanges: BrainProfileChangeStore;
+  contributionAcknowledgements: ContributionAcknowledgementStore;
   curriculum: CurriculumStore;
   compliance: ComplianceStore;
   quests: QuestStore;

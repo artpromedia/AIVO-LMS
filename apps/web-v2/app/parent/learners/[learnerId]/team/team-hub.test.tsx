@@ -35,6 +35,7 @@ function status(over: Partial<MemberContributionStatus>): MemberContributionStat
     contributed: false,
     lastContributionAt: null,
     resendable: true,
+    acknowledgedAt: null,
     ...over,
   };
 }

@@ -320,6 +320,10 @@ export const internalBrainChangeReminderSchema = internalSchema(
   "internalSendBrainChangeReminder",
   "Internal: send a brain-profile structural-change review reminder email",
 );
+export const internalContributionAcknowledgedSchema = internalSchema(
+  "internalSendContributionAcknowledged",
+  "Internal: send a contributor 'your input shaped X' acknowledgement email (role-aware)",
+);
 export const internalAdminAlertSchema = internalSchema(
   "internalSendAdminSafetyAlert",
   "Internal: dispatch an admin safety alert email",

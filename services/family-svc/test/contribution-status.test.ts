@@ -137,6 +137,27 @@ test("pending member is resendable; the most recent contribution date wins", () 
   assert.equal(s2.lastContributionAt, T1.toISOString());
 });
 
+test("C-16: acknowledgedAt is populated from the by-email map (rides this endpoint)", () => {
+  const ackMap = new Map<string, string>([["teacher@x.com", "2026-06-12T09:00:00.000Z"]]);
+  const [s] = deriveContributionStatus(
+    [teacher()],
+    [{ kind: "teacher", contributorUserId: "u-teacher", at: T1 }],
+    ackMap,
+  );
+  assert.equal(s.acknowledgedAt, "2026-06-12T09:00:00.000Z");
+});
+
+test("C-16: a member with no acknowledgement has acknowledgedAt null", () => {
+  const ackMap = new Map<string, string>([["someone-else@x.com", "2026-06-12T09:00:00.000Z"]]);
+  const [s] = deriveContributionStatus([teacher()], [], ackMap);
+  assert.equal(s.acknowledgedAt, null);
+});
+
+test("C-16: omitting the ack map (C-08 callers) keeps acknowledgedAt null", () => {
+  const [s] = deriveContributionStatus([teacher()], []);
+  assert.equal(s.acknowledgedAt, null);
+});
+
 test("summariseVoices counts live (non-revoked) members and the contributed subset", () => {
   const members: MemberInput[] = [
     teacher({ id: "a", memberUserId: "ua" }),

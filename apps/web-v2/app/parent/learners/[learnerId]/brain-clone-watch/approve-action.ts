@@ -17,6 +17,7 @@ import {
   approveBrainClone,
   getBrainProfile,
   recordBrainApproval,
+  recordContributionAcknowledgements,
 } from "@/lib/db/repos";
 import type { BrainProfileApproval, LearnerBrainProfile } from "@/lib/db/types";
 
@@ -83,6 +84,18 @@ export async function performBrainApproval(
     modifications: profile.state.xaiExplanation.parentModifications ?? [],
     ipHash: input.ipHash,
   });
+
+  // 5) C-16 — close the orchestration loop from the contributor's side. Approval
+  //    is the honest "your input is now in use" trigger: derive per-contributor
+  //    acknowledgements from the approved profile's collaborator-sourced
+  //    decisions and notify each contributor whose OWN input folded. Idempotent
+  //    per (contributor, learner, revision) — a re-approval of the same revision
+  //    never re-spams. Best-effort: a failure here never blocks the approval the
+  //    parent just made (the brain keeps teaching).
+  await recordContributionAcknowledgements({
+    profile,
+    profileRevision: reviewedRevision,
+  }).catch(() => {});
 
   return { ok: true, profile, record };
 }

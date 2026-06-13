@@ -15,6 +15,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
 import {
+  ContributorContributionsCard,
+  buildContributorCardCopy,
+} from "@/components/collaboration/contributor-contributions-card";
+import { getContributorLearnerSummaries } from "@/lib/collaboration/contributor-summary";
+import {
   getIEPForLearner,
   getLearner,
   getMasteryMap,
@@ -35,9 +40,21 @@ export default async function TeacherLearnerDetailPage({
   const session = await requirePageRole(["teacher"]);
   const t = await getTranslations("teacher.learner_overview");
   const ta = await getTranslations("teacher.learner_assessment");
+  const tContrib = await getTranslations("contributor");
   const { learnerId } = await params;
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
+
+  // C-16 — this teacher's own "Your contributions" summary, scoped to the
+  // learner being viewed (own items only; derived server-side).
+  const contributorSummaries = (
+    await getContributorLearnerSummaries({
+      role: "teacher",
+      tenantId: session.tenantId,
+      contributorUserId: session.userId,
+      contributorEmail: session.email,
+    })
+  ).filter((s) => s.learnerId === learnerId);
 
   // C-07 entry point: surface the teacher assessment CTA with resume/done
   // state from the teacher's own draft.
@@ -101,6 +118,12 @@ export default async function TeacherLearnerDetailPage({
           </Link>
         </div>
       </Card>
+
+      {/* C-16 — the teacher learns whether their input is now in use. */}
+      <ContributorContributionsCard
+        summaries={contributorSummaries}
+        copy={buildContributorCardCopy(tContrib)}
+      />
 
       <Link href={`/teacher/learners/${learner.id}/curriculum`}>
         <Card className="p-4 transition hover:border-aivo-accent">

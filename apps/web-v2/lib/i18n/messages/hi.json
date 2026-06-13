@@ -3863,5 +3863,23 @@
       "error": "We couldn't update that just now. Please try the link again in a moment.",
       "invalid": "This unsubscribe link is missing some details. Please use the link from your most recent email."
     }
+  },
+  "contributor": {
+    "card_title": "आपका योगदान",
+    "card_subtitle_one": "{name} के बारे में आपने जो साझा किया और वह कहाँ शामिल हुआ।",
+    "never_title": "{name} के बारे में अपना नज़रिया साझा करें",
+    "never_body": "आपने अभी तक कुछ नहीं जोड़ा है। आप जो देखते हैं उसके कुछ मिनट {name} की सीखने की योजना को आकार देने में मदद करते हैं — कोई गलत उत्तर नहीं है।",
+    "never_cta": "मेरा नज़रिया जोड़ें",
+    "pending_title": "साझा किया गया — परिवार समीक्षा कर रहा है",
+    "pending_body": "धन्यवाद — {name} के बारे में आपने जो साझा किया वह प्राप्त हो गया है। योजना का हिस्सा बनने से पहले परिवार इसकी समीक्षा करता है; उपयोग में आने पर हम आपको बताएंगे।",
+    "pending_shared_on": "{date} को साझा किया",
+    "ack_title": "आपके योगदान ने {name} की योजना को आकार दिया",
+    "ack_body": "धन्यवाद — आपका योगदान अब {name} की स्वीकृत सीखने की योजना का हिस्सा है।",
+    "ack_on": "{date} से उपयोग में",
+    "ack_items_label": "आपके योगदान ने जो स्थापित करने में मदद की",
+    "add_another_cta": "कुछ और साझा करें",
+    "loading": "आपका योगदान लोड हो रहा है…",
+    "error_title": "हम आपका योगदान लोड नहीं कर सके",
+    "error_body": "कृपया एक क्षण में पुनः प्रयास करें।"
   }
 }

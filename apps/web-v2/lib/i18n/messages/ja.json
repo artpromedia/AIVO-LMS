@@ -3863,5 +3863,23 @@
       "error": "We couldn't update that just now. Please try the link again in a moment.",
       "invalid": "This unsubscribe link is missing some details. Please use the link from your most recent email."
     }
+  },
+  "contributor": {
+    "card_title": "あなたの貢献",
+    "card_subtitle_one": "{name} について共有した内容と、それが反映された場所。",
+    "never_title": "{name} についてのあなたの見方を共有してください",
+    "never_body": "まだ何も追加されていません。あなたが見ていることを数分共有するだけで、{name} の学習プラン作りに役立ちます—間違った答えはありません。",
+    "never_cta": "見方を追加する",
+    "pending_title": "共有済み—ご家族が確認中です",
+    "pending_body": "ありがとうございます—{name} について共有していただいた内容は届いています。プランに反映される前にご家族が確認します。使用されたらお知らせします。",
+    "pending_shared_on": "{date} に共有",
+    "ack_title": "あなたの入力が {name} のプランを形作りました",
+    "ack_body": "ありがとうございます—あなたの入力は {name} の承認済み学習プランの一部になりました。",
+    "ack_on": "{date} から使用中",
+    "ack_items_label": "あなたの入力が実現に役立ったもの",
+    "add_another_cta": "もう一つ共有する",
+    "loading": "あなたの貢献を読み込み中…",
+    "error_title": "あなたの貢献を読み込めませんでした",
+    "error_body": "しばらくしてからもう一度お試しください。"
   }
 }

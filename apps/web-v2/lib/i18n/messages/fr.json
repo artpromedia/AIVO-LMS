@@ -3863,5 +3863,23 @@
       "error": "We couldn't update that just now. Please try the link again in a moment.",
       "invalid": "This unsubscribe link is missing some details. Please use the link from your most recent email."
     }
+  },
+  "contributor": {
+    "card_title": "Vos contributions",
+    "card_subtitle_one": "Ce que vous avez partagé pour {name}, et où cela a été pris en compte.",
+    "never_title": "Partagez votre point de vue sur {name}",
+    "never_body": "Vous n'avez encore rien ajouté. Quelques minutes de ce que vous observez aident à façonner le plan d'apprentissage de {name} — il n'y a pas de mauvaise réponse.",
+    "never_cta": "Ajouter mon point de vue",
+    "pending_title": "Partagé — la famille examine",
+    "pending_body": "Merci — ce que vous avez partagé sur {name} est bien enregistré. La famille l'examine avant qu'il ne fasse partie du plan ; nous vous préviendrons lorsqu'il sera utilisé.",
+    "pending_shared_on": "Partagé le {date}",
+    "ack_title": "Votre contribution a façonné le plan de {name}",
+    "ack_body": "Merci — votre contribution fait maintenant partie du plan d'apprentissage approuvé de {name}.",
+    "ack_on": "Utilisé depuis le {date}",
+    "ack_items_label": "Ce que votre contribution a permis de mettre en place",
+    "add_another_cta": "Partager autre chose",
+    "loading": "Chargement de vos contributions…",
+    "error_title": "Impossible de charger vos contributions",
+    "error_body": "Veuillez réessayer dans un instant."
   }
 }

@@ -33,6 +33,8 @@ import { memoryBrainProfileApprovals } from "./memory/brain-profile-approvals";
 import { drizzleBrainProfileApprovals } from "./drizzle/brain-profile-approvals";
 import { memoryBrainProfileChanges } from "./memory/brain-profile-changes";
 import { drizzleBrainProfileChanges } from "./drizzle/brain-profile-changes";
+import { memoryContributionAcknowledgements } from "./memory/contribution-acknowledgements";
+import { drizzleContributionAcknowledgements } from "./drizzle/contribution-acknowledgements";
 import { memoryCurriculum } from "./memory/curriculum";
 import { drizzleCurriculum } from "./drizzle/curriculum";
 import { memoryCompliance } from "./memory/compliance";
@@ -72,6 +74,7 @@ type DomainKey =
   | "brainProfiles"
   | "brainProfileApprovals"
   | "brainProfileChanges"
+  | "contributionAcknowledgements"
   | "curriculum"
   | "compliance"
   | "quests"
@@ -124,6 +127,11 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     // override defaults to the brain-profiles knob.
     brainProfileChanges:
       serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILE_CHANGES ?? serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
+    // C-16 — sibling of approvals/changes; defaults to the brain-profiles knob
+    // so a single AIVO_PERSISTENCE_BRAIN_PROFILES=postgres flips all three.
+    contributionAcknowledgements:
+      serverEnv.AIVO_PERSISTENCE_CONTRIBUTION_ACKNOWLEDGEMENTS ??
+      serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
     curriculum: serverEnv.AIVO_PERSISTENCE_CURRICULUM,
     compliance: serverEnv.AIVO_PERSISTENCE_COMPLIANCE,
     quests: serverEnv.AIVO_PERSISTENCE_QUESTS,
@@ -234,6 +242,7 @@ export function getPersistence(): Persistence {
   const brainProfilesMode = resolveMode("brainProfiles");
   const brainProfileApprovalsMode = resolveMode("brainProfileApprovals");
   const brainProfileChangesMode = resolveMode("brainProfileChanges");
+  const contributionAcknowledgementsMode = resolveMode("contributionAcknowledgements");
   const curriculumMode = resolveMode("curriculum");
   const complianceMode = resolveMode("compliance");
   const questsMode = resolveMode("quests");
@@ -261,6 +270,7 @@ export function getPersistence(): Persistence {
     brainProfilesMode,
     brainProfileApprovalsMode,
     brainProfileChangesMode,
+    contributionAcknowledgementsMode,
     curriculumMode,
     complianceMode,
     questsMode,
@@ -332,6 +342,10 @@ export function getPersistence(): Persistence {
       brainProfileChangesMode === "postgres"
         ? drizzleBrainProfileChanges
         : memoryBrainProfileChanges,
+    contributionAcknowledgements:
+      contributionAcknowledgementsMode === "postgres"
+        ? drizzleContributionAcknowledgements
+        : memoryContributionAcknowledgements,
     curriculum: curriculumMode === "postgres" ? drizzleCurriculum : memoryCurriculum,
     compliance: complianceMode === "postgres" ? drizzleCompliance : memoryCompliance,
     quests: questsMode === "postgres" ? drizzleQuests : memoryQuests,

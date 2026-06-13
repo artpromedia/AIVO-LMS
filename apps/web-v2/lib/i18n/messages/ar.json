@@ -3863,5 +3863,23 @@
       "error": "We couldn't update that just now. Please try the link again in a moment.",
       "invalid": "This unsubscribe link is missing some details. Please use the link from your most recent email."
     }
+  },
+  "contributor": {
+    "card_title": "مساهماتك",
+    "card_subtitle_one": "ما شاركته بشأن {name}، وأين تم اعتماده.",
+    "never_title": "شارك وجهة نظرك حول {name}",
+    "never_body": "لم تضف شيئًا بعد. دقائق قليلة مما تلاحظه تساعد في تشكيل خطة تعلّم {name} — لا توجد إجابات خاطئة.",
+    "never_cta": "أضف وجهة نظري",
+    "pending_title": "تمت المشاركة — العائلة تراجعها",
+    "pending_body": "شكرًا — ما شاركته عن {name} قد وصل. تراجعه العائلة قبل أن يصبح جزءًا من الخطة؛ سنعلمك عندما يدخل حيز الاستخدام.",
+    "pending_shared_on": "تمت المشاركة في {date}",
+    "ack_title": "ساهمت مدخلاتك في تشكيل خطة {name}",
+    "ack_body": "شكرًا — أصبحت مساهمتك الآن جزءًا من خطة تعلّم {name} المعتمدة.",
+    "ack_on": "قيد الاستخدام منذ {date}",
+    "ack_items_label": "ما ساعدت مدخلاتك على إرسائه",
+    "add_another_cta": "شارك شيئًا آخر",
+    "loading": "جارٍ تحميل مساهماتك…",
+    "error_title": "تعذر تحميل مساهماتك",
+    "error_body": "يرجى المحاولة مجددًا بعد لحظة."
   }
 }

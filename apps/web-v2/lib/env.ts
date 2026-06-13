@@ -178,6 +178,7 @@ const serverSchema = z
     AIVO_PERSISTENCE_BRAIN_PROFILES: aivoPersistenceOverrideSchema,
     AIVO_PERSISTENCE_BRAIN_PROFILE_APPROVALS: aivoPersistenceOverrideSchema,
     AIVO_PERSISTENCE_BRAIN_PROFILE_CHANGES: aivoPersistenceOverrideSchema,
+    AIVO_PERSISTENCE_CONTRIBUTION_ACKNOWLEDGEMENTS: aivoPersistenceOverrideSchema,
     AIVO_PERSISTENCE_CURRICULUM: aivoPersistenceOverrideSchema,
     AIVO_PERSISTENCE_COMPLIANCE: aivoPersistenceOverrideSchema,
     AIVO_PERSISTENCE_QUESTS: aivoPersistenceOverrideSchema,

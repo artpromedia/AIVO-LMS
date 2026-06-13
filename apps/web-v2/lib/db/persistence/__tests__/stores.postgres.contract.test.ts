@@ -71,6 +71,9 @@ const MIGRATIONS = [
   // C-13 brain-profile change records — sibling of brain_profile_approvals
   // (0108). No RLS; tenant-filtered in app code.
   "0115_brain_profile_changes",
+  // C-16 contributor acknowledgements — sibling of brain_profile_changes
+  // (0115). No RLS; tenant-filtered in app code.
+  "0116_contribution_acknowledgements",
 ];
 
 const TABLES = [
@@ -81,6 +84,7 @@ const TABLES = [
   "learner_brain_profiles",
   "brain_profile_approvals",
   "brain_profile_changes",
+  "contribution_acknowledgements",
   "web_notifications",
   "web_notification_deliveries",
   "web_audit_logs",

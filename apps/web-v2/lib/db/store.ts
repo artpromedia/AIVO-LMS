@@ -30,6 +30,7 @@ import type {
   LearnerBrainProfile,
   BrainProfileApproval,
   LearnerBrainProfileChange,
+  ContributionAcknowledgement,
   LearnerEngagement,
   LearnerProfile,
   LearnerSensoryProfile,
@@ -167,6 +168,11 @@ export type Store = {
    *  powering the "what changed since you approved" timeline. `ackedAt` is the
    *  one mutable field, set when the parent acknowledges a structural delta. */
   brainProfileChanges: LearnerBrainProfileChange[];
+  /** Sprint C-16: contributor acknowledgements — one row per contributor whose
+   *  OWN folded input landed in an approved profile. Idempotent on
+   *  (learnerId, profileRevision, role, contributorEmail). Powers the "Your
+   *  contributions" card + the repeat-contribution retention metric. */
+  contributionAcknowledgements: ContributionAcknowledgement[];
 
   subjects: Map<string, Subject>;
   skills: Map<string, Skill>;
@@ -347,6 +353,7 @@ function createStore(): Store {
     brainProfiles: new Map(),
     brainProfileApprovals: [],
     brainProfileChanges: [],
+    contributionAcknowledgements: [],
     subjects: new Map(),
     skills: new Map(),
     masteryMaps: new Map(),

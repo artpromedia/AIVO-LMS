@@ -3863,5 +3863,23 @@
       "error": "We couldn't update that just now. Please try the link again in a moment.",
       "invalid": "This unsubscribe link is missing some details. Please use the link from your most recent email."
     }
+  },
+  "contributor": {
+    "card_title": "당신의 기여",
+    "card_subtitle_one": "{name}에 대해 공유한 내용과 그것이 반영된 곳.",
+    "never_title": "{name}에 대한 의견을 공유하세요",
+    "never_body": "아직 아무것도 추가하지 않았습니다. 당신이 본 것을 몇 분만 공유해도 {name}의 학습 계획을 만드는 데 도움이 됩니다 — 틀린 답은 없습니다.",
+    "never_cta": "내 의견 추가하기",
+    "pending_title": "공유됨 — 가족이 검토 중",
+    "pending_body": "감사합니다 — {name}에 대해 공유하신 내용이 접수되었습니다. 계획에 포함되기 전에 가족이 검토합니다. 사용되면 알려드리겠습니다.",
+    "pending_shared_on": "{date}에 공유함",
+    "ack_title": "당신의 의견이 {name}의 계획을 만들었습니다",
+    "ack_body": "감사합니다 — 당신의 의견이 이제 {name}의 승인된 학습 계획의 일부가 되었습니다.",
+    "ack_on": "{date}부터 사용 중",
+    "ack_items_label": "당신의 의견이 마련하는 데 도움을 준 것",
+    "add_another_cta": "다른 의견 공유하기",
+    "loading": "당신의 기여를 불러오는 중…",
+    "error_title": "기여를 불러올 수 없었습니다",
+    "error_body": "잠시 후 다시 시도해 주세요."
   }
 }

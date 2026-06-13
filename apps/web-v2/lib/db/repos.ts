@@ -21,7 +21,19 @@ import {
 import { brainPacingFocusSafe } from "@/lib/bff/brain-pacing";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
-import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
+import { listLearnersForMember as listLearnersForTeamMember, getCareTeam } from "@/lib/db/team-invites";
+import {
+  deriveRoleAcknowledgements,
+  type RoleAcknowledgementPayload,
+} from "@/lib/collaboration/contribution-acknowledgement";
+import { dispatchContributionAckEmail } from "@/lib/collaboration/contribution-acknowledgement-dispatch";
+import {
+  contributionAction,
+  contributionEventsFromAuditLogs,
+  computeContributionRetention,
+  type ContributionEvent,
+  type ContributionRetention,
+} from "@/lib/collaboration/contribution-retention";
 import type {
   AuditLog,
   BaselineAssessment,
@@ -46,6 +58,8 @@ import type {
   BrainProfileApproval,
   LearnerBrainProfileChange,
   BrainProfileChangeSource,
+  ContributionAcknowledgement,
+  ContributionRole,
   LearnerBrainProfileState,
   LearnerProfile,
   LearningPath,
@@ -108,6 +122,7 @@ import {
   baselineLlmEnabled,
 } from "@/lib/feature-flags";
 import { logger } from "@/lib/observability/logger";
+import { clientEnv } from "@/lib/env";
 import { emitDegradation } from "@/lib/observability/degradation";
 import {
   buildBaselineSummary,
@@ -1037,6 +1052,311 @@ export async function listBrainApprovals(
   tenantId: string,
 ): Promise<BrainProfileApproval[]> {
   return getPersistence().brainProfileApprovals.listForLearner(learnerId, tenantId);
+}
+
+// ===== Contributor acknowledgements (Sprint C-16) =====
+
+const CONTRIBUTOR_NOTIFY_TARGET_ROLE: Record<ContributionRole, "teacher" | "caregiver" | "therapist"> = {
+  teacher: "teacher",
+  caregiver: "caregiver",
+  therapist: "therapist",
+};
+
+/** Where a contributor's "Your contributions" surface lives, per role. The CTA
+ *  in the acknowledgement note + the in-app notification deep-link here. */
+function contributionsPathFor(role: ContributionRole, learnerId: string): string {
+  switch (role) {
+    case "teacher":
+      return `/teacher/learners/${learnerId}`;
+    case "caregiver":
+      return `/caregiver/home`;
+    case "therapist":
+      return `/therapist/home`;
+  }
+}
+
+/**
+ * Sprint C-16 — the warm, role-aware in-app + email body for one contributor.
+ * Privacy-safe by construction: names only the learner's first name + the
+ * contributor's OWN folded item labels (never another contributor's content,
+ * never the child's levels/diagnoses). Returned as a small struct so the same
+ * copy backs both the in-app Notification row and the comms-svc email payload.
+ */
+export function buildContributionAckCopy(input: {
+  role: ContributionRole;
+  learnerFirstName: string;
+  foldedItems: RoleAcknowledgementPayload["foldedItems"];
+}): { title: string; body: string } {
+  const { role, learnerFirstName, foldedItems } = input;
+  // Lead with the contributor's most concrete folded item (a support label),
+  // preferring an accommodation over a tutor since it is the more tangible
+  // "this is what your note did". Gratitude without flattery; one specific fact.
+  const lead =
+    foldedItems.find((i) => i.kind === "accommodation") ?? foldedItems[0] ?? null;
+  const roleWord =
+    role === "therapist" ? "clinical note" : role === "teacher" ? "classroom note" : "observation";
+  const title = `Your input shaped ${learnerFirstName}'s learning plan`;
+  const body = lead
+    ? `Thank you — your ${roleWord} helped keep ${lead.label} active for ${learnerFirstName}. It's now part of ${learnerFirstName}'s approved plan.`
+    : `Thank you — your ${roleWord} is now part of ${learnerFirstName}'s approved plan.`;
+  return { title, body };
+}
+
+/**
+ * Sprint C-16 — on parent APPROVAL (the honest "your input is now in use"
+ * trigger), derive per-contributor acknowledgements from the approved profile's
+ * collaborator-sourced decisions and, for each contributor whose OWN input
+ * folded, write an idempotent acknowledgement record + fire notifications.
+ *
+ *   - Idempotent per (contributor, learnerId, profileRevision, role): the store
+ *     skips a duplicate natural key, so re-approving the same revision sends no
+ *     duplicate. A later revision whose fold newly changed a contributor's
+ *     contribution earns a fresh row (the unique key includes the revision).
+ *   - A role whose input did NOT fold is ABSENT from the derivation → that
+ *     contributor is acknowledged nothing and notified nothing (the negative
+ *     case the sprint requires).
+ *   - Notifications: the in-app Notification + per-channel preference gating go
+ *     through `createNotification` (the contributor's own account, with a
+ *     `targetRole` so the inbox routes them into the right role); the warm,
+ *     role-aware EMAIL body is rendered by comms-svc's template route. Both are
+ *     best-effort and never block the approval.
+ *   - Each NEW acknowledgement also emits a `contribution.acknowledged` audit
+ *     row (the retention metric's spine).
+ *
+ * A contributor is matched to their account by resolving the learner's care
+ * team: the role's accepted member(s) supply the email + (when present) the
+ * account id. A caregiver-sourced fold is acknowledged to every accepted
+ * caregiver (shared role tag, 2 seats) — see the derivation module's note.
+ *
+ * Best-effort throughout: a failure here never breaks the approval (the brain
+ * keeps teaching). Returns the records written (created + pre-existing) for the
+ * caller's evidence/tests.
+ */
+export async function recordContributionAcknowledgements(input: {
+  profile: LearnerBrainProfile;
+  /** The reviewed revision the approval keyed off (C-06 pins this). */
+  profileRevision: number;
+  requestId?: string;
+}): Promise<ContributionAcknowledgement[]> {
+  const { profile, profileRevision } = input;
+  const requestId = input.requestId ?? newId("req");
+  const written: ContributionAcknowledgement[] = [];
+  try {
+    // Only approved/amended profiles acknowledge — folding alone never does.
+    if (profile.cloneStage !== "approved") return written;
+
+    const learner = await getLearner(profile.learnerId, profile.tenantId);
+    const learnerFirstName =
+      (learner?.firstName && learner.firstName.trim()) ||
+      (learner?.preferredName && learner.preferredName.trim()) ||
+      undefined;
+
+    const payloads = deriveRoleAcknowledgements(profile.state, learnerFirstName);
+    if (payloads.length === 0) return written; // nothing folded → nothing to do
+
+    // Resolve the care team once so each role maps to its accepted member(s).
+    const team = await getCareTeam(profile.learnerId, profile.tenantId);
+    const acceptedByRole: Record<ContributionRole, { email: string; userId: string | null }[]> = {
+      teacher: team.teachers
+        .filter((m) => m.status === "ACCEPTED")
+        .map((m) => ({ email: m.email, userId: m.memberUserId })),
+      caregiver: team.caregivers
+        .filter((m) => m.status === "ACCEPTED")
+        .map((m) => ({ email: m.email, userId: m.memberUserId })),
+      therapist: team.therapists
+        .filter((m) => m.status === "ACCEPTED")
+        .map((m) => ({ email: m.email, userId: m.memberUserId })),
+    };
+
+    for (const payload of payloads) {
+      const members = acceptedByRole[payload.role];
+      // A folded role with no accepted member on the team (e.g. the member was
+      // removed after the insight landed) is skipped — there is no one to
+      // notify, and over-claiming to a stranger would breach the privacy rule.
+      if (!members || members.length === 0) continue;
+
+      for (const member of members) {
+        const email = member.email.trim().toLowerCase();
+        const ack: ContributionAcknowledgement = {
+          id: newId("cack"),
+          tenantId: profile.tenantId,
+          learnerId: profile.learnerId,
+          brainProfileId: profile.id,
+          profileRevision,
+          role: payload.role,
+          contributorUserId: member.userId,
+          contributorEmail: email,
+          learnerFirstName: payload.learnerFirstName,
+          foldedItems: payload.foldedItems,
+          acknowledgedAt: nowIso(),
+          notifiedInApp: false,
+          notifiedEmail: false,
+          createdAt: nowIso(),
+        };
+        const { ack: stored, created } =
+          await getPersistence().contributionAcknowledgements.record(ack);
+        written.push(stored);
+        // Idempotency: a pre-existing row (re-approval of the same revision)
+        // never re-notifies and never re-emits the retention event.
+        if (!created) continue;
+
+        // Retention spine: one audit row per NEW acknowledgement.
+        await recordAudit({
+          userId: member.userId,
+          tenantId: profile.tenantId,
+          learnerId: profile.learnerId,
+          action: contributionAction("acknowledged"),
+          metadata: {
+            contributorKey: email,
+            role: payload.role,
+            profileRevision,
+            foldedItemCount: payload.foldedItems.length,
+          },
+          requestId,
+        });
+
+        // Notifications (best-effort, never block approval).
+        await notifyContributionAcknowledged(stored).catch(() => {});
+      }
+    }
+  } catch (err) {
+    logger.warn({
+      event: "contribution_acknowledgement.capture_failed",
+      learnerId: profile.learnerId,
+      tenantId: profile.tenantId,
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+  return written;
+}
+
+/**
+ * Sprint C-16 — fire the in-app + email acknowledgement for ONE recorded
+ * acknowledgement. In-app + per-channel preference gating ride
+ * `createNotification` keyed to the contributor's account (account-holding
+ * contributors only — an email-only invitee gets just the email). The warm,
+ * role-aware email body is rendered by comms-svc's template route. Stamps the
+ * record's delivery flags. Best-effort.
+ */
+async function notifyContributionAcknowledged(
+  ack: ContributionAcknowledgement,
+): Promise<void> {
+  const { title, body } = buildContributionAckCopy({
+    role: ack.role,
+    learnerFirstName: ack.learnerFirstName,
+    foldedItems: ack.foldedItems,
+  });
+  const href = contributionsPathFor(ack.role, ack.learnerId);
+  let notifiedInApp = false;
+  let notifiedEmail = false;
+
+  // In-app notification — only for an account-holding contributor (a row keyed
+  // to a userId). `createNotification` applies the contributor's per-channel
+  // preferences (opt-out honored) and stamps the targetRole so the inbox routes
+  // them into the right role before navigating.
+  if (ack.contributorUserId) {
+    try {
+      await createNotification({
+        tenantId: ack.tenantId,
+        userId: ack.contributorUserId,
+        type: "contribution_acknowledged",
+        title,
+        body,
+        href,
+        learnerId: ack.learnerId,
+        targetRole: CONTRIBUTOR_NOTIFY_TARGET_ROLE[ack.role],
+      });
+      notifiedInApp = true;
+    } catch {
+      /* best-effort */
+    }
+  }
+
+  // Warm role-aware email via comms-svc.
+  const appUrl = clientEnv.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  const ok = await dispatchContributionAckEmail({
+    to: ack.contributorEmail,
+    role: ack.role,
+    learnerFirstName: ack.learnerFirstName,
+    foldedItems: ack.foldedItems,
+    contributionsUrl: `${appUrl}${href}`,
+    unsubscribeUrl: `${appUrl}/notifications`,
+  });
+  notifiedEmail = ok;
+
+  if (notifiedInApp || notifiedEmail) {
+    await getPersistence()
+      .contributionAcknowledgements.markNotified(ack.id, { notifiedInApp, notifiedEmail })
+      .catch(() => {});
+  }
+}
+
+/** Sprint C-16 — a contributor's OWN acknowledgements (by userId or email),
+ *  optionally scoped to one learner. Newest-first. The summary card + the
+ *  contributions endpoint read this — it returns only the caller's own items. */
+export async function listContributorAcknowledgements(opts: {
+  tenantId: string;
+  contributorUserId: string | null;
+  contributorEmail: string;
+  learnerId?: string;
+}): Promise<ContributionAcknowledgement[]> {
+  return getPersistence().contributionAcknowledgements.listForContributor(opts);
+}
+
+/** Sprint C-16 — every acknowledgement for a learner (the admin/retention read).
+ *  Newest-first. */
+export async function listLearnerContributionAcknowledgements(
+  learnerId: string,
+  tenantId: string,
+): Promise<ContributionAcknowledgement[]> {
+  return getPersistence().contributionAcknowledgements.listForLearner(learnerId, tenantId);
+}
+
+/** Sprint C-16 — every acknowledgement in a tenant (the retention read path).
+ *  Newest-first. */
+export async function listTenantContributionAcknowledgements(
+  tenantId: string,
+): Promise<ContributionAcknowledgement[]> {
+  return getPersistence().contributionAcknowledgements.listForTenant(tenantId);
+}
+
+/**
+ * Sprint C-16 — the DoD retention metric (repeat-contribution rate) for a
+ * tenant. The computation rides the same durable, queryable read-paths C-14's
+ * funnel uses: the acknowledgement records supply the `acknowledged` events and
+ * the audit log supplies the `contribution.submitted` events. The pure reducer
+ * (`computeContributionRetention`) then computes the share of acknowledged
+ * contributors who contributed again within `windowDays` (default 60).
+ *
+ * No dashboard (out of scope) — a computable rate read by the admin/analytics
+ * surface. `auditLimit` bounds how many recent audit rows we scan for
+ * submissions (default 5000 — generous for a tenant's contribution cadence).
+ */
+export async function computeContributorRetentionForTenant(opts: {
+  tenantId: string;
+  windowDays?: number;
+  auditLimit?: number;
+}): Promise<ContributionRetention> {
+  const { tenantId, windowDays = 60, auditLimit = 5000 } = opts;
+  // `acknowledged` events from the acknowledgement records (the spine).
+  const acks = await getPersistence().contributionAcknowledgements.listForTenant(tenantId);
+  const ackEvents: ContributionEvent[] = acks.map((a) => ({
+    name: "acknowledged" as const,
+    contributorKey: a.contributorEmail.trim().toLowerCase(),
+    role: a.role,
+    occurredAt: a.acknowledgedAt,
+  }));
+  // `submitted` events from the audit log (`contribution.submitted` rows).
+  const auditRows = await getPersistence().audit.recentForTenant(tenantId, auditLimit);
+  const submittedEvents = contributionEventsFromAuditLogs(
+    auditRows.map((r) => ({
+      action: r.action,
+      occurredAt: r.occurredAt,
+      metadata: r.metadata ?? null,
+    })),
+  ).filter((e) => e.name === "submitted");
+
+  return computeContributionRetention([...ackEvents, ...submittedEvents], windowDays);
 }
 
 // ===== Brain profile change records (Sprint C-13) =====
@@ -5922,6 +6242,8 @@ const DEFAULT_NOTIFICATION_TYPES: NotificationType[] = [
   // Sprint C-13 — brain evolution notifications.
   "brain_profile_ready",
   "brain_profile_changed",
+  // Sprint C-16 — contributor feedback loop.
+  "contribution_acknowledged",
 ];
 
 /** Types that default to ALSO emailing (in addition to in-app). The C-13 brain
@@ -5934,6 +6256,10 @@ const EMAIL_BY_DEFAULT: ReadonlySet<NotificationType> = new Set<NotificationType
   "safety_review_required",
   "brain_profile_ready",
   "brain_profile_changed",
+  // C-16 — the contributor "your input shaped X" note is the single
+  // highest-leverage retention moment for teachers/therapists; it earns one
+  // warm email by default (the contributor can opt out of either channel).
+  "contribution_acknowledged",
 ]);
 
 function defaultPreferenceMap(): Record<string, boolean> {
@@ -5997,6 +6323,9 @@ export async function createNotification(input: {
   body: string;
   href: string | null;
   learnerId: string | null;
+  /** ADR 0020 — the role the recipient must be in to act on this. When set, the
+   *  inbox routes them through role-switch before navigating. Optional. */
+  targetRole?: Notification["targetRole"];
 }): Promise<{ notification: Notification; deliveries: NotificationDelivery[] }> {
   const rec: Notification = {
     id: newId("nfn"),
@@ -6007,6 +6336,7 @@ export async function createNotification(input: {
     body: input.body,
     href: input.href,
     learnerId: input.learnerId,
+    ...(input.targetRole ? { targetRole: input.targetRole } : {}),
     readAt: null,
     createdAt: nowIso(),
   };

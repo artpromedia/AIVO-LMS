@@ -285,6 +285,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       },
     });
 
+    // C-16 — the retention metric's submission spine (see teacher route).
+    audit(session, "contribution.submitted", requestId, {
+      learnerId,
+      metadata: { contributorKey: session.email.trim().toLowerCase(), role: "therapist" },
+    });
+
     // The submission summary record — exactly what was shared, timestamped, so
     // the form can render the post-submit record screen and the clinician keeps
     // a reviewable trace of their contribution.

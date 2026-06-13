@@ -13,6 +13,9 @@ import type { LearnerCareTeam, TeamMemberRecord } from "@/lib/db/team-invites";
 const hasTeacherContributed = vi.fn();
 const listInsightsForLearner = vi.fn();
 const listCaregiverObservations = vi.fn();
+// C-16 — getContributionStatus now reads contributor acknowledgements to fill
+// `acknowledgedAt`; default to none so the existing assertions are unaffected.
+const listAcknowledgementsForLearner = vi.fn();
 
 vi.mock("@/lib/teacher/teacher-assessment-status", () => ({
   hasTeacherContributed: (...a: unknown[]) => hasTeacherContributed(...a),
@@ -20,10 +23,14 @@ vi.mock("@/lib/teacher/teacher-assessment-status", () => ({
 vi.mock("@/lib/db/persistence", () => ({
   getPersistence: () => ({
     collaboration: { listInsightsForLearner: (...a: unknown[]) => listInsightsForLearner(...a) },
+    contributionAcknowledgements: {
+      listForLearner: (...a: unknown[]) => listAcknowledgementsForLearner(...a),
+    },
   }),
 }));
 vi.mock("@/lib/db/repos", () => ({
   listCaregiverObservations: (...a: unknown[]) => listCaregiverObservations(...a),
+  listContributorAcknowledgements: (...a: unknown[]) => listAcknowledgementsForLearner(...a),
 }));
 // getCareTeam is only used when no careTeam is passed; we always pass one.
 vi.mock("@/lib/db/team-invites", async (orig) => {
@@ -69,6 +76,7 @@ beforeEach(() => {
   hasTeacherContributed.mockReset().mockResolvedValue(false);
   listInsightsForLearner.mockReset().mockResolvedValue([]);
   listCaregiverObservations.mockReset().mockReturnValue([]);
+  listAcknowledgementsForLearner.mockReset().mockResolvedValue([]);
 });
 
 describe("getContributionStatus", () => {
@@ -156,5 +164,18 @@ describe("getContributionStatus", () => {
     const res = await getContributionStatus("l1", "t1", team);
     // teacher + therapist contributed; caregiver pending.
     expect(res.voices).toEqual({ invited: 3, contributed: 2 });
+  });
+
+  it("C-16: populates acknowledgedAt for a member whose input was acknowledged", async () => {
+    listAcknowledgementsForLearner.mockResolvedValue([
+      {
+        contributorEmail: "person@x.com",
+        acknowledgedAt: "2026-06-12T09:00:00.000Z",
+        role: "teacher",
+      },
+    ]);
+    const team = careTeam({ teachers: [member({ id: "t", email: "person@x.com" })] });
+    const res = await getContributionStatus("l1", "t1", team);
+    expect(res.members[0].acknowledgedAt).toBe("2026-06-12T09:00:00.000Z");
   });
 });

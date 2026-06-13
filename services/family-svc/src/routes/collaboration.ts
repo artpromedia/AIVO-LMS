@@ -15,6 +15,7 @@ import {
   teacherAssessments,
   therapistAssessments,
   caregiverObservations,
+  contributionAcknowledgements,
   classrooms,
   classroomEnrollments,
   schools,
@@ -459,7 +460,26 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         })),
       ];
 
-      const statuses = deriveContributionStatus(members, signals);
+      // Sprint C-16 — most-recent acknowledgement per contributor email (rides
+      // this endpoint, not a parallel one). Reads the shared
+      // contribution_acknowledgements table (@aivo/db); family-svc has access.
+      const ackRows = await db
+        .select({
+          contributorEmail: contributionAcknowledgements.contributorEmail,
+          acknowledgedAt: contributionAcknowledgements.acknowledgedAt,
+        })
+        .from(contributionAcknowledgements)
+        .where(eq(contributionAcknowledgements.learnerId, learnerId));
+      const acknowledgedAtByEmail = new Map<string, string>();
+      for (const r of ackRows) {
+        const key = (r.contributorEmail ?? "").trim().toLowerCase();
+        if (!key) continue;
+        const prev = acknowledgedAtByEmail.get(key);
+        // Keep the latest acknowledgement (TEXT ISO sorts chronologically).
+        if (!prev || r.acknowledgedAt > prev) acknowledgedAtByEmail.set(key, r.acknowledgedAt);
+      }
+
+      const statuses = deriveContributionStatus(members, signals, acknowledgedAtByEmail);
       const voices = summariseVoices(statuses);
       return { members: statuses, voices };
     },

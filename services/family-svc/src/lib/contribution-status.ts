@@ -60,6 +60,10 @@ export interface MemberContributionStatus {
   lastContributionAt: string | null;
   /** A pending/declined member can be resent; accepted/revoked cannot. */
   resendable: boolean;
+  /** Sprint C-16 — ISO timestamp this member's OWN folded input was last
+   *  acknowledged into an approved profile; null when never acknowledged.
+   *  Rides this endpoint (not a parallel one). */
+  acknowledgedAt: string | null;
 }
 
 function iso(d: Date | null): string | null {
@@ -92,6 +96,10 @@ function signalsForMember(
 export function deriveContributionStatus(
   members: MemberInput[],
   signals: ContributionSignal[],
+  /** Sprint C-16 — most-recent acknowledgement ISO per lowercased contributor
+   *  email. Members not present have `acknowledgedAt: null`. Optional so the
+   *  C-08 callers that don't pass it keep working. */
+  acknowledgedAtByEmail?: Map<string, string>,
 ): MemberContributionStatus[] {
   return members.map((m) => {
     const mine = signalsForMember(m, signals);
@@ -110,6 +118,7 @@ export function deriveContributionStatus(
       contributed,
       lastContributionAt: iso(last),
       resendable: m.status === "PENDING" || m.status === "DECLINED",
+      acknowledgedAt: acknowledgedAtByEmail?.get(m.email.trim().toLowerCase()) ?? null,
     };
   });
 }

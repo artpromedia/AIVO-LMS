@@ -89,6 +89,14 @@ export function renderTemplate(
       return renderBrainProfileChanged(data);
     case "brain_changes_reminder":
       return renderBrainChangesReminder(data);
+    // Sprint C-16 — contributor "your input shaped X" acknowledgement. One
+    // template family, role-aware wording (teacher / caregiver / therapist).
+    case "contribution_acknowledged_teacher":
+      return renderContributionAcknowledged(data, "teacher");
+    case "contribution_acknowledged_caregiver":
+      return renderContributionAcknowledged(data, "caregiver");
+    case "contribution_acknowledged_therapist":
+      return renderContributionAcknowledged(data, "therapist");
     case "iep_in_review_parent":
       return renderIepInReviewParent(data);
     case "iep_finalised_parent":
@@ -803,6 +811,104 @@ function renderNewsletterConfirmation(_data: TemplateData) {
   };
 }
 
+/** HTML-escape an interpolated value. The contributor acknowledgement folds a
+ *  user-authored reasoning snippet into the email body, so it must be escaped
+ *  (defence against HTML/script injection — the snippet is the contributor's
+ *  own words, never trusted markup). */
+function escapeHtml(s: string): string {
+  return s.replace(
+    /[<>&"']/g,
+    (c) =>
+      (({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }) as Record<
+        string,
+        string
+      >)[c] ?? c,
+  );
+}
+
+/**
+ * Sprint C-16 — the contributor "your input shaped X" acknowledgement. One
+ * template family, role-aware wording. Sent when a parent APPROVES a brain
+ * profile that folded THIS contributor's input.
+ *
+ * THE PRIVACY RULE (content-safety tested). This template names ONLY:
+ *   - the learner's FIRST name (`learnerFirstName`),
+ *   - the contributor's OWN folded item labels + their own reasoning snippets
+ *     (`items` — each { label, reasoning }).
+ * It MUST NOT surface another contributor's content, the child's functioning
+ * level / diagnoses / mastery, or any parent-private data. The web stack passes
+ * only label + reasoning for the contributor's own role; this renderer never
+ * receives anything else. The reasoning snippet is escaped (user-authored).
+ *
+ * Tone: gratitude without flattery, specificity without disclosure, ONE optional
+ * CTA ("see your contributions"). A therapist is addressed as a clinical
+ * professional; a caregiver may be ESL — plain, warm language.
+ */
+function renderContributionAcknowledged(
+  data: TemplateData,
+  role: "teacher" | "caregiver" | "therapist",
+) {
+  const learnerFirstName = escapeHtml((data.learnerFirstName as string) || "your learner");
+  const contributionsUrl = (data.contributionsUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const rawItems = Array.isArray(data.items) ? (data.items as Array<Record<string, unknown>>) : [];
+  // Normalise + escape. Only label + reasoning are ever present (privacy).
+  const items = rawItems
+    .map((i) => ({
+      label: escapeHtml(String(i.label ?? "").trim()),
+      reasoning: escapeHtml(String(i.reasoning ?? "").trim()),
+    }))
+    .filter((i) => i.label.length > 0);
+
+  const inputWord =
+    role === "therapist"
+      ? "clinical note"
+      : role === "teacher"
+        ? "classroom note"
+        : "observation";
+  const youWord = role === "therapist" ? "your clinical input" : "what you shared";
+
+  // The headline support — the most tangible "this is what your note did".
+  const lead = items[0];
+  const leadLine = lead
+    ? `your ${inputWord} helped keep <span class="highlight">${lead.label}</span> active for ${learnerFirstName}`
+    : `your ${inputWord} is now part of ${learnerFirstName}'s plan`;
+
+  const itemsHtml =
+    items.length > 0
+      ? `<ul class="body-text">${items
+          .map(
+            (i) =>
+              `<li><strong>${i.label}</strong>${i.reasoning ? ` — <span style="color:#6b7280">${i.reasoning}</span>` : ""}</li>`,
+          )
+          .join("")}</ul>`
+      : "";
+
+  const html = baseLayout(`
+    <h1 class="title">Your input shaped ${learnerFirstName}'s learning plan</h1>
+    <p class="body-text">Thank you — ${leadLine}. It's now part of ${learnerFirstName}'s approved learning plan.</p>
+    ${items.length > 0 ? `<p class="body-text">Here's what ${youWord} helped put in place:</p>${itemsHtml}` : ""}
+    <p style="text-align:center"><a href="${contributionsUrl}" class="btn">See your contributions</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">Have something new to add? You can share another ${inputWord} any time.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these emails, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+
+  const textItems =
+    items.length > 0
+      ? `\n\n${items.map((i) => `- ${i.label}${i.reasoning ? `: ${i.reasoning}` : ""}`).join("\n")}`
+      : "";
+  return {
+    subject: `Your input shaped ${learnerFirstName}'s learning plan`,
+    html,
+    text: `Thank you — ${lead ? `your ${inputWord} helped keep ${lead.label} active for ${learnerFirstName}` : `your ${inputWord} is now part of ${learnerFirstName}'s plan`}. It's now part of ${learnerFirstName}'s approved learning plan.${textItems}\n\nSee your contributions: ${contributionsUrl}${
+      unsubscribeUrl ? `\n\nTo stop these emails: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
 export const AVAILABLE_TEMPLATES = [
   { id: "welcome", name: "Welcome Email", channels: ["email"] },
   { id: "collaboration_invite", name: "Collaboration Invite", channels: ["email"] },
@@ -829,6 +935,21 @@ export const AVAILABLE_TEMPLATES = [
   { id: "brain_profile_ready", name: "Learning Profile Ready (Screen 0)", channels: ["email", "in_app"] },
   { id: "brain_profile_changed", name: "Learning Profile Changed", channels: ["email", "in_app"] },
   { id: "brain_changes_reminder", name: "Profile Change Review Reminder", channels: ["email"] },
+  {
+    id: "contribution_acknowledged_teacher",
+    name: "Contribution Acknowledged (Teacher)",
+    channels: ["email", "in_app"],
+  },
+  {
+    id: "contribution_acknowledged_caregiver",
+    name: "Contribution Acknowledged (Caregiver)",
+    channels: ["email", "in_app"],
+  },
+  {
+    id: "contribution_acknowledged_therapist",
+    name: "Contribution Acknowledged (Therapist)",
+    channels: ["email", "in_app"],
+  },
   { id: "iep_in_review_parent", name: "IEP — In Review (Parent)", channels: ["email"] },
   { id: "iep_finalised_parent", name: "IEP — Finalised (Parent)", channels: ["email"] },
   { id: "iep_comment_mention", name: "IEP — Comment Mention", channels: ["email"] },

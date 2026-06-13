@@ -12,6 +12,7 @@
 import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole } from "@/lib/bff/guards";
+import { audit } from "@/lib/bff/audit";
 import { createCaregiverObservation, listCaregiverObservations } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
@@ -85,6 +86,13 @@ export async function POST(req: Request): Promise<NextResponse> {
       location: body.location,
       mood: body.mood,
       attachmentUrl: body.attachmentUrl,
+    });
+    // C-16 — the retention metric's submission spine (see teacher route): a
+    // `contribution.submitted` audit row lets the repeat-contribution reducer
+    // see this caregiver contributed.
+    audit(session!, "contribution.submitted", requestId, {
+      learnerId: body.learnerId,
+      metadata: { contributorKey: session!.email.trim().toLowerCase(), role: "caregiver" },
     });
     return ok({ observation: obs }, requestId, { status: 201 });
   } catch (e) {

@@ -280,6 +280,15 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       },
     });
 
+    // C-16 — the retention metric's submission spine. A `contribution.submitted`
+    // audit row (contributor key + role in metadata) lets the repeat-contribution
+    // reducer see this teacher contributed (again, when it lands after an
+    // acknowledgement). Same durable audit pipeline.
+    audit(session, "contribution.submitted", requestId, {
+      learnerId,
+      metadata: { contributorKey: session.email.trim().toLowerCase(), role: "teacher" },
+    });
+
     // Best-effort mirror to family-svc so the brain-clone collaborator fold
     // sees the teacher's contribution. A failure here NEVER fails the submit
     // (the system-of-record write already succeeded) — we report it as a

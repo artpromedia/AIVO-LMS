@@ -3863,5 +3863,23 @@
       "error": "We couldn't update that just now. Please try the link again in a moment.",
       "invalid": "This unsubscribe link is missing some details. Please use the link from your most recent email."
     }
+  },
+  "contributor": {
+    "card_title": "您的贡献",
+    "card_subtitle_one": "您就 {name} 分享的内容，以及它的体现之处。",
+    "never_title": "分享您对 {name} 的看法",
+    "never_body": "您还没有添加任何内容。分享您所观察到的几分钟内容，有助于塑造 {name} 的学习计划 — 没有错误答案。",
+    "never_cta": "添加我的看法",
+    "pending_title": "已分享 — 家长正在审阅",
+    "pending_body": "谢谢 — 您分享的关于 {name} 的内容已收到。家长会在其纳入计划前进行审阅；启用后我们会通知您。",
+    "pending_shared_on": "分享于 {date}",
+    "ack_title": "您的输入塑造了 {name} 的计划",
+    "ack_body": "谢谢 — 您的输入现在已成为 {name} 已批准学习计划的一部分。",
+    "ack_on": "自 {date} 起使用",
+    "ack_items_label": "您的输入帮助落实的内容",
+    "add_another_cta": "再分享一项",
+    "loading": "正在加载您的贡献…",
+    "error_title": "无法加载您的贡献",
+    "error_body": "请稍后重试。"
   }
 }

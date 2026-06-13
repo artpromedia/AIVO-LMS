@@ -14,6 +14,7 @@ export * from "./brain-profile-approvals.js";
 export * from "./approval-contract.js";
 export * from "./brain-profile-changes.js";
 export * from "./change-contract.js";
+export * from "./contribution-acknowledgements.js";
 export * from "./web-domain.js";
 export * from "./web-billing.js";
 export * from "./web-clinical.js";

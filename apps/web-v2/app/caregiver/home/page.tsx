@@ -18,6 +18,11 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { KpiCard } from "@aivo/ui/chart";
 import { listLearnersForMember } from "@/lib/db/team-invites";
 import { getLearner, listLessonRunsForLearner, refreshLearnerReadiness } from "@/lib/db/repos";
+import {
+  ContributorContributionsCard,
+  buildContributorCardCopy,
+} from "@/components/collaboration/contributor-contributions-card";
+import { getContributorLearnerSummaries } from "@/lib/collaboration/contributor-summary";
 import type { LearnerProfile } from "@/lib/db/types";
 import { READINESS_LABEL_KEY, READINESS_TONE } from "@/lib/learner/readiness";
 import {
@@ -32,8 +37,16 @@ export const dynamic = "force-dynamic";
 export default async function CaregiverHomePage() {
   const t = await getTranslations("caregiver.home");
   const tReadiness = await getTranslations("parent.readiness");
+  const tContrib = await getTranslations("contributor");
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = await listLearnersForMember(session.userId, session.email, "caregiver", session.tenantId);
+  // C-16 — this caregiver's own "Your contributions" summaries across learners.
+  const contributorSummaries = await getContributorLearnerSummaries({
+    role: "caregiver",
+    tenantId: session.tenantId,
+    contributorUserId: session.userId,
+    contributorEmail: session.email,
+  });
   const maybeLearners = await Promise.all(learnerIds.map((id) => getLearner(id, session.tenantId)));
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   for (const l of learners) await refreshLearnerReadiness(l.id, session.tenantId);
@@ -108,6 +121,12 @@ export default async function CaregiverHomePage() {
           </div>
         </div>
       ) : null}
+
+      {/* C-16 — the caregiver learns whether their observations are in use. */}
+      <ContributorContributionsCard
+        summaries={contributorSummaries}
+        copy={buildContributorCardCopy(tContrib)}
+      />
 
       <SectionHeader title={t("your_learners")} />
       {fresh.length === 0 ? (

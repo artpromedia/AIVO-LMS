@@ -700,6 +700,80 @@ export type LearnerBrainProfileChange = {
 };
 
 /**
+ * Sprint C-16 — the contributor role whose input was folded + acknowledged.
+ * Mirrors the `collaborator:<role>` source tag the clone fold stamps on each
+ * accommodation/tutor decision (`lib/learner/brain-profile.ts`).
+ */
+export type ContributionRole = "teacher" | "caregiver" | "therapist";
+
+/**
+ * Sprint C-16 — one acknowledgement that a contributor's OWN folded input is
+ * now in use, written when the parent APPROVES a brain profile (the honest
+ * trigger — folding alone isn't; approval is). It is THREE things at once:
+ *
+ *   1. The idempotency latch — one row per (contributor, learnerId,
+ *      profileRevision). Re-approving the same revision never re-spams; a later
+ *      revision whose fold newly changed this contributor's contribution earns
+ *      a fresh row.
+ *   2. The summary card's "acknowledged on" date + the contributor's OWN folded
+ *      items (their decision labels + reasoning snippets — never another
+ *      contributor's content, never the child's levels/diagnoses).
+ *   3. The retention metric's data spine (acknowledged → did they contribute
+ *      again within 60 days).
+ *
+ * PRIVACY: `foldedItems` is derived ONLY from the decisions this contributor's
+ * role+domain raised. It carries the contributor's own reasoning snippet and a
+ * support display label — nothing about the learner's functioning level,
+ * diagnoses, mastery, or any other contributor's note. Content-safety tested.
+ *
+ * Same conventions as `brain_profile_changes` (sibling): app-generated TEXT
+ * ids (no FK), ISO-8601 TEXT timestamps, JSONB for the variable-shape
+ * `foldedItems` array. No RLS — tenant-scoped in app code via the indexed
+ * tenant_id column.
+ */
+export type ContributionFoldedItem = {
+  /** The kind of decision this contributor shaped. */
+  kind: "accommodation" | "tutor";
+  /** Stable key of the support/tutor (e.g. "aac_communication_support", "echo"). */
+  key: string;
+  /** Human display label ("AAC / communication support"). Privacy-safe. */
+  label: string;
+  /** The contributor's OWN reasoning snippet, as folded. Privacy-safe (their
+   *  words about their own observation). */
+  reasoning: string;
+};
+
+export type ContributionAcknowledgement = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  /** The brain profile whose approval triggered this acknowledgement. */
+  brainProfileId: ID;
+  /** The reviewed `LearnerBrainProfile.revision` (the idempotency key's third
+   *  component). */
+  profileRevision: number;
+  role: ContributionRole;
+  /** The contributor's account, once they have one (account-holding
+   *  contributors get an in-app notification keyed off this). Null for an
+   *  email-only invitee. */
+  contributorUserId: ID | null;
+  /** Lowercased invitee email — the stable identity for an email-only
+   *  contributor and the second component of the idempotency key. */
+  contributorEmail: string;
+  /** The learner's first name (the only learner datum the note may name). */
+  learnerFirstName: string;
+  /** The contributor's OWN folded contributions — privacy-safe (see type doc). */
+  foldedItems: ContributionFoldedItem[];
+  /** When the acknowledgement was recorded (== approval time). */
+  acknowledgedAt: ISODate;
+  /** Whether the in-app/email notifications were dispatched (best-effort; the
+   *  record is the source of truth for the summary card regardless). */
+  notifiedInApp: boolean;
+  notifiedEmail: boolean;
+  createdAt: ISODate;
+};
+
+/**
  * Per-learner accessibility preferences. The preference fields are the
  * canonical `AccessibilityProfile` from @aivo/accessibility-contract (the same
  * model the mobile client and the BFF Zod schema derive from); this type only
@@ -2402,7 +2476,11 @@ export type NotificationType =
   /** SCREEN 0 — the drafted profile is ready for first review. */
   | "brain_profile_ready"
   /** A structural change landed; the parent should review + acknowledge it. */
-  | "brain_profile_changed";
+  | "brain_profile_changed"
+  // Sprint C-16 — contributor feedback loop:
+  /** A contributor's (teacher/caregiver/therapist) OWN folded input is now in
+   *  an approved profile — the warm "your input shaped X" note. */
+  | "contribution_acknowledged";
 
 export type NotificationChannel = "in_app" | "email" | "push";
 

@@ -24,6 +24,10 @@ LEARNING_SVC_URL = os.environ.get("LEARNING_SVC_URL", "http://localhost:3005")
 RECOMMENDATION_SVC_URL = os.environ.get(
     "RECOMMENDATION_SVC_URL", "http://localhost:3066"
 )
+# Sprint C-16 — web-v2 owns the contributor surfaces + acknowledgement records;
+# on approval brain-svc signals it (best-effort) to derive + send the "your
+# input shaped X" acknowledgements. Defaults to the dev web-v2 port.
+WEB_SVC_URL = os.environ.get("WEB_SVC_URL", "http://localhost:5000")
 
 router = APIRouter()
 
@@ -624,6 +628,33 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
         ipHash=None,
         createdAt=now.isoformat(),
     )
+
+    # Sprint C-16 — close the orchestration loop from the contributor's side.
+    # web-v2 owns the contributor surfaces, the acknowledgement records, and the
+    # notification machinery (the privacy logic lives in one place). On approval
+    # we signal it best-effort to derive + send each contributor's "your input
+    # shaped X" acknowledgement from the approved profile's collaborator-sourced
+    # decisions. Idempotent on (contributor, learner, revision), so this firing
+    # alongside the web-v2 ceremony's own trigger never double-sends. A failure
+    # here never breaks the approval (the brain keeps teaching) — same best-effort
+    # posture as the learning-path init below and the C-13 change capture.
+    try:
+        import httpx
+        web_token = os.environ.get("INTERNAL_SERVICE_TOKEN") or (
+            "" if os.environ.get("NODE_ENV") == "production" else "aivo-internal-dev-token"
+        )
+        httpx.post(
+            f"{WEB_SVC_URL}/api/internal/contribution-acknowledge",
+            json={
+                "learnerId": learner_id,
+                "tenantId": str(getattr(auth, "tenant_id", None) or ""),
+                "profileRevision": new_version,
+            },
+            headers={"x-service-token": web_token},
+            timeout=5.0,
+        )
+    except Exception:
+        pass
 
     # Sprint C-12 (ADR 0042) — EXPLICIT teach gate, not sequencing-only. The
     # status we just wrote must be teachable before we initialise any learning

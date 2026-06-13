@@ -3863,5 +3863,23 @@
     "send_failed_title": "Message not sent",
     "send_failed_body": "Your draft is still here.",
     "send_retry": "Try again"
+  },
+  "contributor": {
+    "card_title": "Your contributions",
+    "card_subtitle_one": "What you've shared for {name}, and where it landed.",
+    "never_title": "Share your perspective on {name}",
+    "never_body": "You haven't added anything yet. A few minutes of what you see helps shape {name}'s learning plan — there are no wrong answers.",
+    "never_cta": "Add your perspective",
+    "pending_title": "Shared — the family is reviewing",
+    "pending_body": "Thank you — what you shared about {name} is in. The family reviews it before it becomes part of the plan; we'll let you know when it's in use.",
+    "pending_shared_on": "Shared {date}",
+    "ack_title": "Your input shaped {name}'s plan",
+    "ack_body": "Thank you — your input is now part of {name}'s approved learning plan.",
+    "ack_on": "In use since {date}",
+    "ack_items_label": "What your input helped put in place",
+    "add_another_cta": "Share another",
+    "loading": "Loading your contributions…",
+    "error_title": "We couldn't load your contributions",
+    "error_body": "Please try again in a moment."
   }
 }
