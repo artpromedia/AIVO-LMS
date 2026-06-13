@@ -25,6 +25,7 @@ import { newRequestId } from "@/lib/observability/logger";
 import { buildBrainProfile } from "@/lib/learner/brain-profile";
 import { brainProfileStateSchema } from "@/lib/validators/brain-profile";
 import type { LearnerBrainProfileState } from "@/lib/db/types";
+import { RegenerateConfirm } from "./regenerate-confirm";
 
 const PERSONA_LABEL: Record<
   LearnerBrainProfileState["tutorPersonaRecommendation"]["style"],
@@ -69,7 +70,11 @@ async function regenerateAction(formData: FormData) {
     learnerId,
     metadata: { ok: v.success },
   });
-  redirect(`/parent/learners/${learnerId}/brain-profile`);
+  // Sprint C-05 (EDIT-2): regenerate resets the clone to `pre_clone`
+  // (`upsertBrainProfile`), so route the parent forward to the brain-clone-watch
+  // surface that owns the pending/rebuild flow — never silently strand them back
+  // on this read-only page the way HEAD did.
+  redirect(`/parent/learners/${learnerId}/brain-clone-watch`);
 }
 
 export default async function BrainProfilePage({
@@ -173,14 +178,33 @@ export default async function BrainProfilePage({
         title={t("page_title")}
         description="Generated from your assessment and any IEP you shared. You can re-generate at any time after updating your inputs."
         actions={
-          <form action={regenerateAction}>
-            <input type="hidden" name="learnerId" value={learner.id} />
-            <Button type="submit" variant="outline">
-              <RefreshCw className="mr-1 h-4 w-4" /> {t("regenerate")}
-            </Button>
-          </form>
+          <RegenerateConfirm
+            learnerId={learner.id}
+            regenerateAction={regenerateAction}
+            triggerLabel={t("regenerate")}
+            title={t("regenerate_confirm_title")}
+            body={t("regenerate_confirm_body", { name: learner.displayName })}
+            confirmLabel={t("regenerate_confirm_cta")}
+            cancelLabel={t("regenerate_confirm_cancel")}
+          />
         }
       />
+
+      {/* Sprint C-05 (EDIT-3): once the brain is cloned and awaiting review,
+          surface the review & correct screen prominently — the parent's path to
+          confirm/adjust each inference before approving. Hidden once approved. */}
+      {profile.cloneStage === "cloned" ? (
+        <Card className="mb-4 flex flex-wrap items-center justify-between gap-3 border-aivo-primary/40 bg-aivo-primary/5 p-4">
+          <p className="text-sm font-medium text-aivo-ink">
+            {t("review_and_adjust_hint", { name: learner.displayName })}
+          </p>
+          <Button asChild>
+            <Link href={`/parent/learners/${learner.id}/brain-review`}>
+              {t("review_and_adjust")} <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        </Card>
+      ) : null}
 
       <Card className="mb-4 flex items-start gap-3 p-4">
         <Sparkles className="h-5 w-5 shrink-0 text-aivo-primary" />

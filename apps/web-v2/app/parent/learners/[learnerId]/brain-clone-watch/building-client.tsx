@@ -11,9 +11,12 @@
  * in lockstep with the learner's awakening sequence. Each stage is a
  * card that flips from "computing" → "complete" with the real XAI
  * annotation from `state.xaiExplanation`. The final stage exposes
- * Approve / Amend buttons. Approve POSTs back to the server action;
- * Amend routes to `/parent/learners/[id]/brain-profile` where overrides
- * are edited (and the approval is recorded as "amended" afterwards).
+ * Approve / "Check & adjust" buttons. Approve POSTs back to the server
+ * action (folding any corrections the parent staged on the review
+ * screen — the approval is recorded as "amended" when corrections are
+ * present). "Check & adjust" routes to
+ * `/parent/learners/[id]/brain-review`, the Sprint C-05 review & correct
+ * screen, where individual inferences are confirmed or corrected inline.
  *
  * The animation is intentionally calm: stage cards fade up + show a
  * brief shimmer while "computing", then settle. No external runtime
@@ -58,6 +61,7 @@ export function BrainBuildingClient({
   doneLabel,
   approveLabel,
   amendLabel,
+  stagedCorrectionsLabel,
   backLabel,
   alreadyApprovedLabel,
   replayCloneLabel,
@@ -79,6 +83,9 @@ export function BrainBuildingClient({
   doneLabel: string;
   approveLabel: string;
   amendLabel: string;
+  /** Sprint C-05: honest line about corrections staged on the review screen
+   *  that the Approve button will apply (null when none are staged). */
+  stagedCorrectionsLabel: string | null;
   backLabel: string;
   alreadyApprovedLabel: string;
   replayCloneLabel: string;
@@ -247,9 +254,14 @@ export function BrainBuildingClient({
             <p className="bc-watch-done-label" aria-live="polite">
               {allDone ? doneLabel : `${active} / ${stages.length}`}
             </p>
+            {stagedCorrectionsLabel ? (
+              <p className="bc-watch-corrections-staged" role="status">
+                {stagedCorrectionsLabel}
+              </p>
+            ) : null}
             <div className="bc-watch-buttons">
               <Link
-                href={`/parent/learners/${learnerId}/brain-profile`}
+                href={`/parent/learners/${learnerId}/brain-review`}
                 className="bc-watch-amend-btn"
               >
                 {amendLabel}
@@ -461,6 +473,13 @@ export function BrainBuildingClient({
           font-weight: 600;
           font-size: 0.95rem;
           color: var(--iw-ink, #0b1020);
+        }
+        .bc-watch-corrections-staged {
+          margin: 0.35rem 0 0;
+          font-size: 0.875rem;
+          /* --iw-ink-soft is the AA-contrast muted ink token used across the
+             watch surface for secondary copy. */
+          color: var(--iw-ink-soft, #475569);
         }
         .bc-watch-buttons {
           display: flex;

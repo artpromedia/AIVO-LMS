@@ -123,6 +123,11 @@ export default async function BrainCloneWatchPage({
 
   const s = profile.state;
   const alreadyApproved = profile.cloneStage === "approved";
+  // Sprint C-05: corrections the parent staged on the review screen are
+  // applied when they approve here. Surface the count so the recap's Approve
+  // button is honest about what it will do (the fold happens in
+  // `approveBrainClone`, which reads the staged draft).
+  const stagedCorrectionCount = s.parentCorrectionsDraft?.modifications.length ?? 0;
 
   // Strengths-first reveal (C-03): the parent assessment's strengths section
   // (the parent's own words) plus the subjects where the baseline estimate is
@@ -259,6 +264,11 @@ export default async function BrainCloneWatchPage({
         doneLabel={t("watch_step_done")}
         approveLabel={t("watch_approve")}
         amendLabel={t("watch_amend")}
+        stagedCorrectionsLabel={
+          stagedCorrectionCount > 0
+            ? t("watch_corrections_staged", { count: stagedCorrectionCount })
+            : null
+        }
         backLabel={t("watch_back")}
         alreadyApprovedLabel={t("watch_already_approved")}
         replayCloneLabel={t("clone_replay")}

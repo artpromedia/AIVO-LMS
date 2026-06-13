@@ -43,4 +43,43 @@ runInBothModes("brainProfiles", () => {
     expect(got?.approvalStatus).toBe("approved");
     expect(got?.approvedByParent).toBe(true);
   });
+
+  // Sprint C-05: the correction-loop state fields (the applied
+  // `xaiExplanation.parentModifications` audit record and the
+  // `parentCorrectionsDraft` resume state) ride inside the `state` JSON, so
+  // they must survive memory and drizzle identically (drizzle stores `state`
+  // as JSONB). This proves the round-trip in both modes.
+  it("round-trips C-05 parentModifications + parentCorrectionsDraft (memory == postgres)", async () => {
+    const s = getPersistence().brainProfiles;
+    const state = {
+      tutors: [],
+      xaiExplanation: {
+        summary: "x",
+        parentModifications: [
+          {
+            field: "accommodation.read_aloud",
+            originalValue: true,
+            parentValue: false,
+            parentNote: "Silent reading is the hard part.",
+            modifiedAt: "2026-06-13T12:00:00.000Z",
+          },
+        ],
+      },
+      parentCorrectionsDraft: {
+        modifications: [
+          {
+            field: "mathComfort",
+            originalValue: "growing",
+            parentValue: "new",
+            parentNote: null,
+            modifiedAt: "2026-06-13T12:00:00.000Z",
+          },
+        ],
+        savedAt: "2026-06-13T12:00:00.000Z",
+      },
+    } as unknown as LearnerBrainProfile["state"];
+    await s.upsert(profile({ state }));
+    const got = await s.getForLearner(L, T);
+    expect(got?.state).toEqual(state);
+  });
 });

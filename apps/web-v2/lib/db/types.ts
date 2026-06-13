@@ -330,6 +330,27 @@ export type BrainSignalDecision = {
 };
 
 /**
+ * Sprint C-05: one field-level correction a parent made while reviewing the
+ * cloned profile. Mirrors the brain-svc `ParentModification` contract shape
+ * (`services/brain-svc/src/brain_svc/models/schemas.py` — `field`,
+ * `original_value`, `parent_value`, `parent_note`, `modified_at`) so C-12 can
+ * unify the two stores cheaply. `field` is folded by prefix:
+ *   `mastery_levels.<domain>`  — numeric mastery override (clamped to [0,1])
+ *   `accommodation.<slug>`     — boolean: support on/off (+ matching
+ *                                 `supportDefaults` flag for the core five)
+ *   `tutor.<key>`              — boolean: tutor kept/released
+ *   `readingComfort`/`mathComfort` — qualitative comfort estimate
+ * Unknown fields are recorded but not folded (same as the Python route).
+ */
+export type ParentModification = {
+  field: string;
+  originalValue: number | string | boolean | null;
+  parentValue: number | string | boolean | null;
+  parentNote: string | null;
+  modifiedAt: ISODate;
+};
+
+/**
  * Sprint 7: typed snapshot of the AI-generated brain profile. Persisted via
  * `LearnerBrainProfile.state` and validated by the Zod schema in
  * `lib/validators/brain-profile.ts` before being stored.
@@ -440,6 +461,28 @@ export type LearnerBrainProfileState = {
     tutorDecisionsDetailed?: BrainTutorDecision[];
     signalDecisionsDetailed?: BrainSignalDecision[];
     raiComplianceDetail?: BrainRaiCompliance;
+    /**
+     * Sprint C-05: corrections the parent applied at approval, recorded with
+     * original + parent values — parity with brain-svc
+     * `xai_explanation.parent_modifications` (`routes/brain.py`). Appended by
+     * `approveBrainClone` when it folds the corrections into the live fields;
+     * never written from the client directly.
+     */
+    parentModifications?: ParentModification[];
+  };
+  /**
+   * Sprint C-05: corrections the parent saved on the review screen but has
+   * not approved yet. Server-side resume state (never component-state-only) —
+   * the review screen prefills from it and the approve action folds it.
+   * Lives inside the state JSON so persistence needs no migration; cleared
+   * when approval folds it into the live fields, and naturally discarded by
+   * a regenerate/re-clone (both rebuild `state` from scratch). Web-only:
+   * intentionally NOT part of the brain-svc contract, which only defines the
+   * applied `parent_modifications` record.
+   */
+  parentCorrectionsDraft?: {
+    modifications: ParentModification[];
+    savedAt: ISODate;
   };
   source: "ai_generated" | "deterministic_fallback";
   schemaVersion: number;

@@ -51,6 +51,7 @@ import type {
   ParentAssessment,
   ParentAssessmentSectionId,
   ParentLessonSummary,
+  ParentModification,
   ReadinessState,
   ReviewSchedule,
   Skill,
@@ -75,6 +76,7 @@ import {
   generateAdaptiveBaselinePool,
   generateBaselineQuestions,
 } from "@/lib/learner/baseline";
+import { assertCorrectionsAllowed, foldParentModifications } from "@/lib/db/brain-corrections";
 import {
   aggregateItemPsychometrics,
   buildRunTelemetry,
@@ -706,23 +708,87 @@ export async function cloneBrainFromBaseline(
 }
 
 /**
+ * Sprint C-05: stage the parent's review-screen corrections server-side so
+ * they survive navigation (resume state lives in the profile record, never
+ * in component state). Replaces any previously staged draft; an empty list
+ * clears it (the confirm-all fast path). The corrections are NOT folded yet
+ * — `approveBrainClone` folds them when the parent approves.
+ *
+ * Therapist-pinned supports are enforced here as well as at fold time: a
+ * forged "turn it off" modification throws `BrainCorrectionLockedError`.
+ * Returns null when there is nothing reviewable (no profile, still
+ * `pre_clone`, or already `approved` — the review is closed).
+ */
+export async function stageBrainCorrections(
+  learnerId: string,
+  tenantId: string,
+  modifications: ParentModification[],
+): Promise<LearnerBrainProfile | null> {
+  const existing = await getBrainProfile(learnerId, tenantId);
+  if (!existing) return null;
+  if (existing.cloneStage !== "cloned") return null;
+  assertCorrectionsAllowed(existing.state, modifications);
+  const state: LearnerBrainProfileState = { ...existing.state };
+  if (modifications.length > 0) {
+    state.parentCorrectionsDraft = { modifications, savedAt: nowIso() };
+  } else {
+    delete state.parentCorrectionsDraft;
+  }
+  const next: LearnerBrainProfile = { ...existing, state, updatedAt: nowIso() };
+  return getPersistence().brainProfiles.upsert(next);
+}
+
+/**
  * Parent approval gate (Sprint 14 brain-clone watch). Transitions a cloned
- * brain profile to `approved` (or `amended` if the parent adjusted any
- * settings before approving). Idempotent: re-approving an already-approved
- * profile is a no-op. Returns null when no clone exists or it's still in
- * `pre_clone` (baseline not yet finished).
+ * brain profile to `approved` — or `amended` when the parent corrected any
+ * inference first (Sprint C-05). Idempotent: re-approving an already-approved
+ * profile returns it unchanged (a duplicate submit must never re-fold or
+ * duplicate the modification record). Returns null when no clone exists or
+ * it's still in `pre_clone` (baseline not yet finished).
+ *
+ * `options.modifications` (C-05) carries field-level corrections in the
+ * brain-svc `parent_modifications` contract shape. When omitted, any
+ * corrections the parent staged on the review screen
+ * (`state.parentCorrectionsDraft`) are folded instead — this is the default
+ * flow (stage on the review screen, return to the recap, approve), so the
+ * recap's plain Approve button applies them without re-collecting anything.
+ * Either way the corrections are folded into the live state by the Python
+ * prefix rules (`lib/db/brain-corrections.ts`), recorded into
+ * `state.xaiExplanation.parentModifications`, and the staged draft is cleared.
+ * Any correction present ⇒ `approvalStatus: "amended"`. A forged unlock of a
+ * therapist-pinned support throws `BrainCorrectionLockedError` — server-side
+ * enforcement, not just UI. `options.amended` is the legacy boolean flag and
+ * still forces "amended".
  */
 export async function approveBrainClone(
   learnerId: string,
   tenantId: string,
-  options: { amended?: boolean } = {},
+  options: { amended?: boolean; modifications?: ParentModification[] } = {},
 ): Promise<LearnerBrainProfile | null> {
   const existing = await getBrainProfile(learnerId, tenantId);
   if (!existing) return null;
   if (existing.cloneStage === "pre_clone") return null;
-  const status: LearnerBrainProfile["approvalStatus"] = options.amended ? "amended" : "approved";
+  if (existing.cloneStage === "approved") return existing;
+  // Explicit modifications win; otherwise fold whatever the parent staged on
+  // the review screen. The staged draft is the resume-safe source of truth —
+  // approving must apply it, never silently discard it.
+  const modifications =
+    options.modifications ?? existing.state.parentCorrectionsDraft?.modifications ?? [];
+  let state = existing.state;
+  if (modifications.length > 0) {
+    // foldParentModifications appends the applied record AND clears the draft.
+    state = foldParentModifications(existing.state, modifications, nowIso());
+  } else if (existing.state.parentCorrectionsDraft) {
+    // No corrections to apply (an empty staged draft) — close the review by
+    // dropping the stale draft so the approved profile carries none.
+    state = { ...existing.state };
+    delete state.parentCorrectionsDraft;
+  }
+  const status: LearnerBrainProfile["approvalStatus"] =
+    modifications.length > 0 || options.amended ? "amended" : "approved";
   const next: LearnerBrainProfile = {
     ...existing,
+    state,
     approvedByParent: true,
     approvalStatus: status,
     cloneStage: "approved",

@@ -66,5 +66,54 @@ export function brainProfileStoreContract(
       await store.upsert(profile());
       expect(await store.getForLearner("lrn_1", "other_tenant")).toBeNull();
     });
+
+    // Sprint C-05: the correction loop persists two new nested state fields —
+    // the applied audit record (`xaiExplanation.parentModifications`) and the
+    // resume-state draft (`parentCorrectionsDraft`). Both live inside the
+    // `state` JSON blob, so they must survive a round-trip through whichever
+    // backend this contract runs against (memory now, drizzle/JSONB in CI),
+    // byte-for-byte — that is what lets C-12 trust the two stores are the same.
+    it("round-trips C-05 parentModifications + parentCorrectionsDraft inside state", async () => {
+      const state = {
+        summary: "seed",
+        xaiExplanation: {
+          summary: "x",
+          parentModifications: [
+            {
+              field: "accommodation.read_aloud",
+              originalValue: true,
+              parentValue: false,
+              parentNote: "Silent reading is the hard part.",
+              modifiedAt: "2026-06-13T12:00:00.000Z",
+            },
+            {
+              field: "readingComfort",
+              originalValue: "growing",
+              parentValue: "confident",
+              parentNote: null,
+              modifiedAt: "2026-06-13T12:00:00.000Z",
+            },
+          ],
+        },
+        parentCorrectionsDraft: {
+          modifications: [
+            {
+              field: "mathComfort",
+              originalValue: "growing",
+              parentValue: "new",
+              parentNote: null,
+              modifiedAt: "2026-06-13T12:00:00.000Z",
+            },
+          ],
+          savedAt: "2026-06-13T12:00:00.000Z",
+        },
+      } as unknown as LearnerBrainProfile["state"];
+
+      await store.upsert(profile({ state }));
+      const got = await store.getForLearner("lrn_1", "t_1");
+      expect(got).not.toBeNull();
+      // Deep-equal the whole state blob: nothing dropped, reordered, or coerced.
+      expect(got!.state).toEqual(state);
+    });
   });
 }
