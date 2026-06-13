@@ -200,13 +200,13 @@
       "sub_canceling": "Annulation...",
       "sub_cancel_at_period_end": "Annuler à la fin de la période",
       "checkout": {
-        "success_title": "Payment received",
-        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
-        "cancelled_title": "Checkout cancelled",
-        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
+        "success_title": "Paiement reçu",
+        "success_body": "Merci ! Votre forfait est en cours d'activation — il apparaîtra ici dans un instant.",
+        "cancelled_title": "Paiement annulé",
+        "cancelled_body": "Aucun montant n'a été prélevé. Vous pouvez choisir un forfait quand vous le souhaitez."
       },
-      "sub_terms_label": "I agree to the subscription terms: $39.99/month per child, billed after the 30-day free trial. Cancel anytime.",
-      "sub_terms_required": "Please accept the subscription terms to continue."
+      "sub_terms_label": "J'accepte les conditions d'abonnement : $39.99/mois par enfant, facturé après l'essai gratuit de 30 jours. Annulable à tout moment.",
+      "sub_terms_required": "Veuillez accepter les conditions d'abonnement pour continuer."
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Vos réponses vous appartiennent",

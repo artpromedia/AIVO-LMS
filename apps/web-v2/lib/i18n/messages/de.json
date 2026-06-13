@@ -200,13 +200,13 @@
       "sub_canceling": "Wird gekündigt...",
       "sub_cancel_at_period_end": "Zum Ende des Zeitraums kündigen",
       "checkout": {
-        "success_title": "Payment received",
-        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
-        "cancelled_title": "Checkout cancelled",
-        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
+        "success_title": "Zahlung erhalten",
+        "success_body": "Danke! Dein Tarif wird aktiviert – er erscheint gleich hier.",
+        "cancelled_title": "Bezahlung abgebrochen",
+        "cancelled_body": "Es wurde nichts abgebucht. Du kannst jederzeit einen Tarif wählen."
       },
-      "sub_terms_label": "I agree to the subscription terms: $39.99/month per child, billed after the 30-day free trial. Cancel anytime.",
-      "sub_terms_required": "Please accept the subscription terms to continue."
+      "sub_terms_label": "Ich stimme den Abonnementbedingungen zu: $39.99/Monat pro Kind, abgebucht nach der 30-tägigen kostenlosen Testphase. Jederzeit kündbar.",
+      "sub_terms_required": "Bitte akzeptiere die Abonnementbedingungen, um fortzufahren."
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "Deine Antworten gehören nur dir",

@@ -224,10 +224,10 @@
     "cancelAtPeriodEnd": "يُلغى في نهاية الفترة",
     "addedToBill": "{{count}} إضافة · {{price}}$/شهر",
     "openInvoice": "فتح الفاتورة",
-    "termsTitle": "Subscription terms",
-    "termsMessage": "$39.99/month per child, billed after your 30-day free trial. You can cancel anytime. Do you agree to these terms?",
-    "termsAgree": "I agree",
-    "allTutorsIncluded": "All 14 AI tutors are included for every child — no add-ons."
+    "termsTitle": "شروط الاشتراك",
+    "termsMessage": "$39.99 شهريًا لكل طفل، تُحصَّل بعد تجربتك المجانية لمدة 30 يومًا. يمكنك الإلغاء في أي وقت. هل توافق على هذه الشروط؟",
+    "termsAgree": "أوافق",
+    "allTutorsIncluded": "جميع المعلمين الـ 14 بالذكاء الاصطناعي مشمولون لكل طفل — بدون إضافات."
   },
   "parentTutors": {
     "title": "متجر المدرسين",
@@ -239,7 +239,7 @@
     "includedWithSub": "مضمّن مع الاشتراك",
     "full14Bundle": "حزمة الكاملة 14",
     "full14Price": "إضافة بـ 9.99$/شهر",
-    "allIncluded": "All 14 AI tutors are included with your plan."
+    "allIncluded": "جميع المعلمين الـ 14 بالذكاء الاصطناعي مشمولون في خطتك."
   },
   "parentRecommendations": {
     "title": "التوصيات",

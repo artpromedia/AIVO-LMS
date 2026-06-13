@@ -52,7 +52,7 @@ export const AUDIENCES: Audience[] = [
       "Replace 3+ apps (tutor + reading app + speech app) with one personalized platform",
       "IEP goals tracked and reinforced automatically across every tutor session",
       "Sensory-friendly visuals and audio that respect your child's preferences",
-      "Multi-learner discount for families with two or more children",
+      "All 14 AI tutors included for every child — no add-ons, no upsells",
     ],
     faqs: [
       {
@@ -277,8 +277,8 @@ export const AUDIENCES: Audience[] = [
       "Whether you teach to a classical curriculum, unschool, or follow a state-aligned scope-and-sequence, AIVO becomes the patient co-teacher who handles practice, fluency, and mastery while you focus on the experiences that matter.",
     benefits: [
       {
-        title: "Multi-learner Family plan",
-        desc: "Up to 10 learners on one account at the lowest per-learner price — every child gets their own Brain Clone and tutor team.",
+        title: "One simple Family plan",
+        desc: "$39.99/month per child on a single parent account — every child gets their own Brain Clone and full team of 14 tutors. Add a child anytime.",
       },
       {
         title: "Standards-aligned, but flexible",
@@ -294,7 +294,7 @@ export const AUDIENCES: Audience[] = [
       },
     ],
     outcomes: [
-      "Up to 10 learners under one Family plan",
+      "$39.99/month per child — all 14 tutors included, on one Family account",
       "State-standards-aligned reports for record-keeping requirements",
       "Works for any philosophy — classical, Charlotte Mason, eclectic, unschool",
       "Sensory-friendly defaults and IEP-aware features for homeschooled SPED learners",
@@ -306,7 +306,7 @@ export const AUDIENCES: Audience[] = [
       },
       {
         q: "Can we use AIVO co-op style with other families?",
-        a: "Each Family plan covers one household with up to 10 learners. Co-ops with multiple households should contact us for a small-school plan with admin views.",
+        a: "The Family plan is $39.99/month per child, billed to one parent account, with all 14 tutors included. Co-ops spanning multiple households should contact us about an Enterprise plan with admin views.",
       },
     ],
   },

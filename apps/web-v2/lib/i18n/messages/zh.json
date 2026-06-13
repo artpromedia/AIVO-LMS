@@ -200,13 +200,13 @@
       "sub_canceling": "正在取消...",
       "sub_cancel_at_period_end": "在周期结束时取消",
       "checkout": {
-        "success_title": "Payment received",
-        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
-        "cancelled_title": "Checkout cancelled",
-        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
+        "success_title": "已收到付款",
+        "success_body": "谢谢！您的套餐正在激活——稍后将显示在此处。",
+        "cancelled_title": "结账已取消",
+        "cancelled_body": "未产生任何费用。您可以在准备好时选择套餐。"
       },
-      "sub_terms_label": "I agree to the subscription terms: $39.99/month per child, billed after the 30-day free trial. Cancel anytime.",
-      "sub_terms_required": "Please accept the subscription terms to continue."
+      "sub_terms_label": "我同意订阅条款：每月每个孩子 $39.99，在 30 天免费试用结束后收费。可随时取消。",
+      "sub_terms_required": "请接受订阅条款以继续。"
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "您的回答只属于您自己",

@@ -224,10 +224,10 @@
     "cancelAtPeriodEnd": "周期结束时取消",
     "addedToBill": "{{count}} 个附加项 · ¥{{price}}/月",
     "openInvoice": "打开账单",
-    "termsTitle": "Subscription terms",
-    "termsMessage": "$39.99/month per child, billed after your 30-day free trial. You can cancel anytime. Do you agree to these terms?",
-    "termsAgree": "I agree",
-    "allTutorsIncluded": "All 14 AI tutors are included for every child — no add-ons."
+    "termsTitle": "订阅条款",
+    "termsMessage": "每月每个孩子 $39.99，在您的 30 天免费试用结束后收费。您可以随时取消。您同意这些条款吗？",
+    "termsAgree": "我同意",
+    "allTutorsIncluded": "每个孩子均包含全部 14 位 AI 导师，无需附加组件。"
   },
   "parentTutors": {
     "title": "辅导老师商店",
@@ -239,7 +239,7 @@
     "includedWithSub": "订阅已包含",
     "full14Bundle": "完整 14 套餐",
     "full14Price": "¥9.99/月附加项",
-    "allIncluded": "All 14 AI tutors are included with your plan."
+    "allIncluded": "您的套餐包含全部 14 位 AI 导师。"
   },
   "parentRecommendations": {
     "title": "推荐",
