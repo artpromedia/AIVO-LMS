@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
+import { StartLearningButton } from "@/components/parent/start-learning-button";
 import { READINESS_LABEL_KEY, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
 import type { LearnerProfile } from "@/lib/db/types";
 
@@ -48,11 +49,19 @@ export async function LearnerCard({ learner }: { learner: LearnerProfile }) {
         <Button asChild variant="outline" size="sm">
           <Link href={`/parent/learners/${learner.id}`}>{tCard("open_profile")}</Link>
         </Button>
-        <Button asChild size="sm">
-          <Link href={next.href}>
-            {t(next.labelKey)} <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
+        {learner.readinessState === "ready_for_today_mission" ? (
+          // Switching into the learner experience must set the active-learner
+          // cookie and redirect — done via a Server Action so the navigation is
+          // reliable (a <Link> to the cookie-setting route handler bounces back
+          // to this dashboard). All other next steps are plain page links.
+          <StartLearningButton learnerId={learner.id} label={t(next.labelKey)} size="sm" />
+        ) : (
+          <Button asChild size="sm">
+            <Link href={next.href}>
+              {t(next.labelKey)} <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        )}
       </div>
     </Card>
   );

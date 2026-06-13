@@ -6,7 +6,6 @@
  * Single-child parents are bounced through automatically.
  */
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
@@ -19,26 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { listLearnersForParent } from "@/lib/db/repos";
-import { ACTIVE_LEARNER_COOKIE, verifyActiveLearner } from "@/lib/auth/active-learner";
-
-async function chooseLearner(formData: FormData) {
-  "use server";
-  const learnerId = String(formData.get("learnerId") ?? "");
-  const session = await requirePageRole(["parent"]);
-  const ok = await verifyActiveLearner(session, learnerId);
-  if (!ok) redirect("/learner/select?error=forbidden");
-  const jar = await cookies();
-  jar.set({
-    name: ACTIVE_LEARNER_COOKIE,
-    value: ok,
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-  });
-  redirect("/learner/home");
-}
+import { enterLearnerHome } from "@/lib/learner/active-learner-actions";
 
 export default async function LearnerSelectPage({
   searchParams,
@@ -83,7 +63,7 @@ export default async function LearnerSelectPage({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {learners.map((l) => (
-            <form key={l.id} action={chooseLearner}>
+            <form key={l.id} action={enterLearnerHome}>
               <input type="hidden" name="learnerId" value={l.id} />
               <button
                 type="submit"
