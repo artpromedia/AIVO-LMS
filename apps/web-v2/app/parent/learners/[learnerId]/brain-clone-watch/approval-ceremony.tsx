@@ -105,6 +105,7 @@ export function ApprovalCeremony({
   consentVersion,
   raiVersion,
   approveAction,
+  onAmend,
 }: {
   learnerId: string;
   rai: CeremonyRai;
@@ -114,6 +115,9 @@ export function ApprovalCeremony({
   consentVersion: string;
   raiVersion: string;
   approveAction: (formData: FormData) => void | Promise<void>;
+  /** Sprint C-14 — fired when the parent opens the C-05 correction screen (the
+   *  "corrections_opened" funnel event). Optional; navigation is unaffected. */
+  onAmend?: () => void;
 }) {
   const [raiOpen, setRaiOpen] = useState(false);
   // Acknowledgement is satisfied once the parent has opened the RAI panel at
@@ -279,6 +283,7 @@ export function ApprovalCeremony({
               <Link
                 href={`/parent/learners/${learnerId}/brain-review`}
                 className="bc-ceremony-amend-btn"
+                onClick={() => onAmend?.()}
               >
                 {strings.amendLabel}
               </Link>

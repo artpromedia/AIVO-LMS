@@ -38,6 +38,14 @@ import { MASTERY_ESTIMATE_LABEL_KEY, estimateForScore } from "@/lib/learner/mast
 import { selectBrainExplainability } from "@/lib/learner/brain-explainability";
 import { getContributionStatus } from "@/lib/collaboration/contribution-status";
 import { pickTodaysMission } from "@/lib/learner/today";
+import {
+  assembleContributions,
+  assembleOperatingInstructions,
+  assembleStartingPoints,
+  buildShareArtifact,
+} from "@/lib/learner/reveal-assembly";
+import { revealAction } from "@/lib/learner/reveal-telemetry";
+import { getPersistence } from "@/lib/db/persistence";
 import { SUPPORT_DEFAULT_BY_SLUG, type CoreSupportSlug } from "@/lib/db/brain-corrections";
 import { hashIpFromHeaders } from "@/lib/bff/consent-guard";
 import { visualBrainBuildEnabled } from "@/lib/feature-flags";
@@ -129,6 +137,13 @@ async function approveBrainCloneAction(formData: FormData) {
       consentVersion: result.record.consentVersion,
       raiVersion: result.record.raiVersion,
     },
+  });
+  // Sprint C-14 — the AUTHORITATIVE terminal reveal event (approved | amended),
+  // recorded server-side from the approval result so a forged client POST can't
+  // inflate the conversion funnel. `computeRevealFunnel` reads this back.
+  audit(session, revealAction(result.record.action === "amended" ? "amended" : "approved"), newRequestId(), {
+    learnerId,
+    metadata: { surface: "reveal", approvalRecordId: result.record.id },
   });
   // Land on the ignition + "what happens next" celebration screen.
   redirect(`/parent/learners/${learnerId}/brain-clone-watch?celebrate=1`);
@@ -277,6 +292,53 @@ export default async function BrainCloneWatchPage({
     accommodationDecisions,
     tutorDecisions,
     pulseRate: s.visualIdentity.pulseRate,
+  };
+
+  // ── Sprint C-14: the stitched reveal (screens 1–4) + share artifact ──
+  // All view-models are assembled server-side by the pure `reveal-assembly`
+  // module so contribution counts, source chips, and the share artifact's
+  // field surface are deterministic + tested. The baseline-answered count is
+  // already on the profile (`confidenceSignals.baselineAttempts` ===
+  // BaselineSummary.totalAnswered — see repos.ts), so no extra fetch is needed.
+  // Best-effort read (mirrors repos' isolated insight fetch): an optional input
+  // never blocks the reveal. Returns [] on any failure.
+  const collaboratorInsights = await getPersistence()
+    .collaboration.listInsightsForLearner(learnerId, session.tenantId)
+    .catch(() => []);
+  const baselineAnswered = s.confidenceSignals.baselineAttempts;
+  const contributions = assembleContributions({
+    parentCompletedSections: assessment.completedSections.length,
+    parentSubmitted: s.confidenceSignals.parentAssessment,
+    baselineAnswered,
+    collaboratorInsights: collaboratorInsights.map((i) => ({ authorRole: i.authorRole })),
+    iepOnFile: s.confidenceSignals.iep || Boolean(s.iepProfile?.uploaded),
+  });
+  const instructions = assembleOperatingInstructions({ state: s, baselineAnswered });
+  const startingPoints = assembleStartingPoints(s);
+  // First-name-only for the share artifact (never the display name, which may
+  // carry a surname initial). Falls back through preferredName → firstName.
+  const childFirstName =
+    learner.preferredName?.trim() || learner.firstName?.trim() || learner.displayName.split(" ")[0];
+  const shareContent = buildShareArtifact({
+    firstName: childFirstName,
+    goodAt: strengths.goodAt,
+    strongSubjects: strengths.strongSubjects,
+    loves: strengths.loves,
+    motivates: strengths.motivates,
+  });
+  const reveal = {
+    contributions,
+    strengths: {
+      goodAt: strengths.goodAt,
+      loves: strengths.loves,
+      strongSubjects: strengths.strongSubjects,
+      // Web-v2 state carries no baseline process signals today; degrade
+      // gracefully (no fabricated "self-corrected N times" line).
+      observedStrength: null,
+    },
+    instructions,
+    startingPoints,
+    shareContent,
   };
 
   // Parents see tutor display names from the brand catalogue, never raw
@@ -429,7 +491,8 @@ export default async function BrainCloneWatchPage({
     };
   } else {
     // A non-celebrating render never mounts WhatHappensNext, but the client
-    // prop is required — pass a cheap, valid placeholder bundle.
+    // prop is required — pass a cheap, fully-valid default bundle (the
+    // not-ready mission is a real designed state, not an empty fill).
     nextSteps = {
       mission: { ready: false as const },
       supports: [] as string[],
@@ -457,12 +520,14 @@ export default async function BrainCloneWatchPage({
         replayCloneLabel={t("clone_replay")}
         privacyNoteLabel={t("privacy_family")}
         privacyLinkLabel={t("watch_privacy_link")}
+        detailsToggleLabel={t("reveal_details_toggle")}
         alreadyApproved={alreadyApproved}
         celebrate={celebrating}
         stages={stages}
         primaryHue={s.visualIdentity.primaryHue}
         secondaryHues={s.visualIdentity.secondaryHues}
         sequence={sequence}
+        reveal={reveal}
         ceremony={ceremony}
         nextSteps={nextSteps}
         approveAction={approveBrainCloneAction}
