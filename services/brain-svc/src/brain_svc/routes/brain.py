@@ -8,6 +8,7 @@ from sqlalchemy import text
 from brain_svc.models.database import get_db
 from brain_svc.models.schemas import BrainCloneRequest, BrainRollbackRequest, BrainApproveRequest, BrainAmendRequest, BrainDeclineRequest
 from brain_svc.services.clone_pipeline import clone_brain
+from brain_svc.services.access_control import verify_learner_access
 from brain_svc.audit import emit_brain_audit
 from brain_svc.auth import AuthClaims, require_auth
 
@@ -191,6 +192,8 @@ async def clone_brain_endpoint(request: BrainCloneRequest, db: Session = Depends
 
 @router.get("/{learner_id}")
 async def get_brain_state(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    verify_learner_access(db, auth, learner_id)
+
     result = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),
         {"lid": learner_id}
@@ -636,6 +639,8 @@ async def decline_brain(learner_id: str, request: BrainDeclineRequest, db: Sessi
 
 @router.get("/{learner_id}/history")
 async def get_brain_history(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    verify_learner_access(db, auth, learner_id)
+
     results = db.execute(
         text("SELECT * FROM brain_state_snapshots WHERE learner_id = :lid ORDER BY version DESC"),
         {"lid": learner_id}
@@ -644,6 +649,10 @@ async def get_brain_history(learner_id: str, db: Session = Depends(get_db), auth
 
 @router.post("/{learner_id}/rollback")
 async def rollback_brain(learner_id: str, request: BrainRollbackRequest, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    # Rolling a child's brain back to an earlier snapshot is a guardian
+    # act: parent of this learner (or admin / trusted service) only.
+    _verify_parent_access(db, auth, learner_id)
+
     snapshot = db.execute(
         text("SELECT * FROM brain_state_snapshots WHERE id = :sid AND learner_id = :lid"),
         {"sid": request.snapshot_id, "lid": learner_id}
@@ -704,6 +713,8 @@ async def rollback_brain(learner_id: str, request: BrainRollbackRequest, db: Ses
 
 @router.get("/{learner_id}/context")
 async def get_brain_context(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    verify_learner_access(db, auth, learner_id)
+
     brain = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),
         {"lid": learner_id}
@@ -765,6 +776,8 @@ async def get_brain_context(learner_id: str, db: Session = Depends(get_db), auth
 
 @router.post("/{learner_id}/regression-check")
 async def check_regression(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    verify_learner_access(db, auth, learner_id)
+
     brain = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),
         {"lid": learner_id}
@@ -873,8 +886,12 @@ async def check_regression(learner_id: str, db: Session = Depends(get_db), auth:
 async def update_engagement_profile(learner_id: str, request: dict = None, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
     import json as json_mod
 
-    if auth.sub != learner_id and auth.role not in ("admin", "teacher", "service"):
-        raise HTTPException(status_code=403, detail="Not authorized to update engagement for this learner")
+    # Trusted service principals and a learner syncing their own brain are
+    # allowed; every other caller must hold a verified relationship to this
+    # learner (parent via learners.parent_id, teacher/caregiver/therapist via
+    # an ACCEPTED link, admin bypass) — a bare role string is not enough.
+    if auth.role != "service" and auth.sub != learner_id:
+        verify_learner_access(db, auth, learner_id)
 
     current = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),

@@ -15,7 +15,11 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const roleErr = requireRole(session!, ["parent", "teacher", "school_admin"], requestId);
+    // Least privilege: the full brain profile carries disabilitySignals and
+    // the parent's private assessment summary, so only the parent may read
+    // it here. Teachers get the deliberately role-scoped views served by
+    // family-svc (services/family-svc/src/routes/collaboration.ts).
+    const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
     const scope = await requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
@@ -26,7 +30,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       requestId,
     );
     if (consentErr) return consentErr;
-    const profile = getBrainProfile(learnerId, session!.tenantId);
+    const profile = await getBrainProfile(learnerId, session!.tenantId);
     if (!profile) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Brain profile not generated yet" }, requestId);
     }
