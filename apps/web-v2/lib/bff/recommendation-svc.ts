@@ -55,10 +55,22 @@ export async function listRecommendationsForLearner(
   session: { userId: string; tenantId: string },
   learnerId: string,
 ): Promise<{ pending: RecommendationSummary[]; decided: RecommendationSummary[] }> {
-  const res = await fetch(
-    `${serverEnv.RECOMMENDATION_SVC_URL}/api/recommendations/learner/${encodeURIComponent(learnerId)}`,
-    { headers: headers(session), cache: "no-store" },
-  );
+  let res: Response;
+  try {
+    res = await fetch(
+      `${serverEnv.RECOMMENDATION_SVC_URL}/api/recommendations/learner/${encodeURIComponent(learnerId)}`,
+      { headers: headers(session), cache: "no-store" },
+    );
+  } catch (e) {
+    // Network failure (svc down / unreachable / DNS / timeout). `fetch`
+    // rejects rather than returning a non-2xx, so without this the error
+    // escaped as a raw 500 INTERNAL_ERROR. Surface it as the same
+    // "list failed" error the BFF route maps to UPSTREAM_UNAVAILABLE (502,
+    // retryable) so the panel shows its graceful "unavailable" state.
+    throw new Error(
+      `recommendation-svc list failed: ${e instanceof Error ? e.message : "network error"}`,
+    );
+  }
   if (!res.ok) {
     throw new Error(`recommendation-svc list failed: ${res.status}`);
   }
@@ -82,21 +94,28 @@ export async function respondToRecommendation(
   action: RecommendationAction,
   opts: { amendedValue?: unknown; reason?: string; actorRole?: RecommendationActorRole },
 ): Promise<{ ok: true; recommendation: RecommendationSummary } | { ok: false; status: number; error: string }> {
-  const res = await fetch(
-    `${serverEnv.RECOMMENDATION_SVC_URL}/api/recommendations/${encodeURIComponent(recId)}/${action}`,
-    {
-      method: "POST",
-      headers: headers(session),
-      body: JSON.stringify({
-        // recommendation-svc enforces the role × type × tenant-policy matrix
-        // (parents always pass; teacher/caregiver only when the district
-        // delegated that type) — the BFF just states who is acting.
-        actorRole: opts.actorRole ?? "parent",
-        amendedValue: opts.amendedValue,
-        reason: opts.reason,
-      }),
-    },
-  );
+  let res: Response;
+  try {
+    res = await fetch(
+      `${serverEnv.RECOMMENDATION_SVC_URL}/api/recommendations/${encodeURIComponent(recId)}/${action}`,
+      {
+        method: "POST",
+        headers: headers(session),
+        body: JSON.stringify({
+          // recommendation-svc enforces the role × type × tenant-policy matrix
+          // (parents always pass; teacher/caregiver only when the district
+          // delegated that type) — the BFF just states who is acting.
+          actorRole: opts.actorRole ?? "parent",
+          amendedValue: opts.amendedValue,
+          reason: opts.reason,
+        }),
+      },
+    );
+  } catch (e) {
+    // Network failure — return a retryable upstream status instead of letting
+    // `fetch` reject into an unhandled 500 at the route.
+    return { ok: false, status: 502, error: e instanceof Error ? e.message : "network error" };
+  }
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) {
     return { ok: false, status: res.status, error: String(body.error ?? "upstream_error") };

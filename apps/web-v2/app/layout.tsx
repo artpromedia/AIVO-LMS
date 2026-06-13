@@ -10,7 +10,9 @@ import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
 import { PwaRegister } from "@/components/system/pwa-register";
 import { WebVitalsReporter } from "@/components/observability/web-vitals-reporter";
 import { TzSync } from "@/components/observability/tz-sync";
+import { SessionRefresher } from "@/components/observability/session-refresher";
 import { getSession } from "@/lib/auth/session";
+import { isMockAuthAllowed } from "@/lib/auth/mock-session";
 import { resolveTimeZone } from "@/lib/i18n/timezone";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
@@ -116,6 +118,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={locale}
       dir={dirForLocale(locale)}
+      // The <html> element carries cookie-driven theme/sensory data-* set at
+      // SSR, and third-party scripts (analytics/feature collectors) and
+      // browser extensions commonly mutate <html> before React hydrates. Both
+      // can trip a root-level hydration mismatch (React #418). suppressing the
+      // warning here is the React-recommended escape hatch for the top-level
+      // element whose attributes are legitimately adjusted outside React; it
+      // only relaxes attribute checking on <html> itself, not its subtree.
+      suppressHydrationWarning
       data-sensory-mode={sensoryMode}
       data-typeface={typeface}
       data-reduced-motion={reducedMotion}
@@ -158,6 +168,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <PwaRegister />
           <WebVitalsReporter />
           <TzSync sessionTimeZone={session?.timezone ?? null} />
+          {/* Keep the 15-min access token (and the session it derives) alive on
+              long-open tabs so token-scoped BFF calls don't start 401/403-ing.
+              Real auth only — mock has no refresh endpoint. */}
+          <SessionRefresher enabled={Boolean(session) && !isMockAuthAllowed()} />
         </NextIntlClientProvider>
       </body>
     </html>
