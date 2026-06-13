@@ -1354,7 +1354,21 @@
       "reassure_labels_title": "Mesmo produto, sem rótulos",
       "reassure_labels_body": "Ativar apoios nunca marca seu aluno como diferente — a interface continua calma e premium.",
       "reassure_teachers_title": "Os professores respeitam isto",
-      "reassure_teachers_body": "O que você ativar aqui é aplicado durante as lições, as tarefas e o tutor de IA — sem configuração extra."
+      "reassure_teachers_body": "O que você ativar aqui é aplicado durante as lições, as tarefas e o tutor de IA — sem configuração extra.",
+      "aac": {
+        "group_label": "Controle por acionador e botões",
+        "group_desc": "Para estudantes que usam um acionador, botão ou dispositivo de CAA em vez de tocar.",
+        "enable_label": "Controle por acionador e botões",
+        "enable_help": "Controle com um acionador ou botão. Um toque escolhe o que brilha; uma seta move o brilho.",
+        "method_label": "Como você controla",
+        "method_touch": "Tocar ou clicar",
+        "method_switch_1": "Um acionador (move sozinho)",
+        "method_switch_2": "Dois acionadores (você move e escolhe)",
+        "method_eye_gaze": "Controle pelo olhar",
+        "method_head_pointer": "Ponteiro de cabeça",
+        "dwell_label": "Quanto esperar em cada opção",
+        "dwell_help": "Quanto tempo o brilho fica em cada opção antes de seguir."
+      }
     },
     "settings_audio": {
       "no_learner_title": "Áudio",
@@ -1436,7 +1450,11 @@
         "extratime_title": "Tempo extra",
         "extratime_body": "De qualquer forma não há relógio. Use todo o tempo que precisar.",
         "tell_me_more": "Conte-me mais",
-        "im_ready": "Estou pronto"
+        "im_ready": "Estou pronto",
+        "buttons_title": "Quer o modo com botões?",
+        "buttons_body": "Um adulto disse que você gosta de usar um acionador ou botões. Você pode ligar isso nas suas configurações para fazer com o seu acionador.",
+        "buttons_cta": "Configurar botões",
+        "buttons_dismiss": "Talvez mais tarde"
       },
       "intro": {
         "step": "Etapa 3 de 3",
@@ -1675,7 +1693,16 @@
       "choose_one": "Escolha uma",
       "type_answer": "Digite sua resposta",
       "struggle_break_title": "Vamos respirar fundo juntos.",
-      "struggle_break_body": "Algumas foram difíceis, e é exatamente aí que respirar ajuda. Alongue-se e continue quando estiver pronto."
+      "struggle_break_body": "Algumas foram difíceis, e é exatamente aí que respirar ajuda. Alongue-se e continue quando estiver pronto.",
+      "scan": {
+        "help_one_switch": "Aperte seu acionador para escolher o que está brilhando.",
+        "help_two_switch": "Um acionador move o brilho. O outro escolhe.",
+        "announce": "Agora em: {label}",
+        "target_skip": "Pular esta",
+        "target_next": "Ir para a próxima",
+        "target_read_aloud": "Ouvir a pergunta",
+        "target_hint": "Pedir uma dica"
+      }
     },
     "lesson_run": {
       "back_to_today": "Voltar para hoje"

@@ -1552,7 +1552,21 @@
       "reassure_labels_title": "Same product, no labels",
       "reassure_labels_body": "Turning on supports never marks your learner as different — the interface stays calm and premium.",
       "reassure_teachers_title": "Teachers honour these",
-      "reassure_teachers_body": "Whatever you turn on here is applied during lessons, homework, and the AI tutor — no extra setup."
+      "reassure_teachers_body": "Whatever you turn on here is applied during lessons, homework, and the AI tutor — no extra setup.",
+      "aac": {
+        "group_label": "Switch & button steering",
+        "group_desc": "For learners who use a switch, button, or AAC device instead of tapping.",
+        "enable_label": "Switch & button steering",
+        "enable_help": "Steer with a switch or button. One press picks what's glowing; an arrow key moves the glow.",
+        "method_label": "How you steer",
+        "method_touch": "Tap or click",
+        "method_switch_1": "One switch (it moves on its own)",
+        "method_switch_2": "Two switches (you move and pick)",
+        "method_eye_gaze": "Eye gaze",
+        "method_head_pointer": "Head pointer",
+        "dwell_label": "How long to wait on each choice",
+        "dwell_help": "How long the glow rests on each choice before moving on."
+      }
     },
     "settings_audio": {
       "no_learner_title": "Audio",
@@ -1634,7 +1648,11 @@
         "extratime_title": "Extra time",
         "extratime_body": "There's no clock anyway. Take all the time you need.",
         "tell_me_more": "Tell me more",
-        "im_ready": "I'm ready"
+        "im_ready": "I'm ready",
+        "buttons_title": "Want button-friendly mode?",
+        "buttons_body": "A grown-up said you like using a switch or buttons. You can turn that on in your settings so you can do this with your switch.",
+        "buttons_cta": "Set up buttons",
+        "buttons_dismiss": "Maybe later"
       },
       "intro": {
         "step": "Step 3 of 3",
@@ -1873,7 +1891,16 @@
       "choose_one": "Choose one",
       "type_answer": "Type your answer",
       "struggle_break_title": "Let's take a breath together.",
-      "struggle_break_body": "Some of those were tricky — that's exactly when a breath helps. Stretch, and keep going when you're ready."
+      "struggle_break_body": "Some of those were tricky — that's exactly when a breath helps. Stretch, and keep going when you're ready.",
+      "scan": {
+        "help_one_switch": "Press your switch to pick what's glowing.",
+        "help_two_switch": "One switch moves the glow. The other one picks it.",
+        "announce": "Now on: {label}",
+        "target_skip": "Skip this one",
+        "target_next": "Go to the next one",
+        "target_read_aloud": "Hear the question",
+        "target_hint": "Get a hint"
+      }
     },
     "lesson_run": {
       "back_to_today": "Back to today"

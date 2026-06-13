@@ -12,6 +12,8 @@ import {
   getOrCreateParentAssessment,
 } from "@/lib/db/repos";
 import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
+import { shouldSuggestButtonFriendlyMode } from "@/lib/a11y/baseline-scan";
+import { ButtonFriendlySuggestion } from "./button-friendly-suggestion";
 
 /**
  * /learner/baseline/readiness
@@ -61,6 +63,24 @@ export default async function BaselineReadinessPage({
   const a11yPrefs = await getAccessibilityPrefs(session.learnerId, session.tenantId);
   const shellStyle = learnerPrefStyleVars(a11yPrefs);
 
+  // Sprint C-15 — gently suggest button-friendly (switch/AAC) steering when
+  // the parent assessment recorded a switch / eye-gaze response method. This
+  // NEVER auto-enables scanning; it only links to the settings page where the
+  // learner (or grown-up) turns it on. Suppressed once AAC is already enabled.
+  const learningProfile = (assessment.answers.learning_profile ?? {}) as {
+    responseMethod?: string;
+    deviceInteraction?: string;
+    communicationMode?: string;
+  };
+  const suggestButtonFriendly = shouldSuggestButtonFriendlyMode(
+    {
+      responseMethod: learningProfile.responseMethod,
+      deviceInteraction: learningProfile.deviceInteraction,
+      communicationMode: learningProfile.communicationMode,
+    },
+    a11yPrefs.aacEnabled === true,
+  );
+
   return (
     <LearnerBaselineShell
       style={shellStyle}
@@ -90,6 +110,16 @@ export default async function BaselineReadinessPage({
         <PersonalizationChip key={v} variant={v} />
       ))}
     >
+      {suggestButtonFriendly ? (
+        <ButtonFriendlySuggestion
+          title={t("readiness.buttons_title")}
+          body={t("readiness.buttons_body")}
+          cta={t("readiness.buttons_cta")}
+          dismissLabel={t("readiness.buttons_dismiss")}
+          settingsHref="/learner/settings/accessibility"
+        />
+      ) : null}
+
       <section className="flex flex-col gap-2">
         <p className="iw-label text-iw-text-muted">{t("readiness.step")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-snug">

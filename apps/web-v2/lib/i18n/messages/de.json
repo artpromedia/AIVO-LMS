@@ -1354,7 +1354,21 @@
       "reassure_labels_title": "Gleiches Produkt, keine Etiketten",
       "reassure_labels_body": "Das Aktivieren von Hilfen kennzeichnet deine Lernenden niemals als anders — die Oberfläche bleibt ruhig und hochwertig.",
       "reassure_teachers_title": "Lehrkräfte respektieren diese",
-      "reassure_teachers_body": "Was du hier aktivierst, wird in Lektionen, Hausaufgaben und beim KI-Tutor angewendet — ohne zusätzliche Einrichtung."
+      "reassure_teachers_body": "Was du hier aktivierst, wird in Lektionen, Hausaufgaben und beim KI-Tutor angewendet — ohne zusätzliche Einrichtung.",
+      "aac": {
+        "group_label": "Steuerung mit Schalter und Tasten",
+        "group_desc": "Für Lernende, die einen Schalter, eine Taste oder ein UK-Gerät statt Tippen nutzen.",
+        "enable_label": "Steuerung mit Schalter und Tasten",
+        "enable_help": "Steuere mit einem Schalter oder einer Taste. Ein Druck wählt das Leuchtende; eine Pfeiltaste bewegt das Leuchten.",
+        "method_label": "Wie du steuerst",
+        "method_touch": "Tippen oder klicken",
+        "method_switch_1": "Ein Schalter (bewegt sich von selbst)",
+        "method_switch_2": "Zwei Schalter (du bewegst und wählst)",
+        "method_eye_gaze": "Augensteuerung",
+        "method_head_pointer": "Kopfzeiger",
+        "dwell_label": "Wie lange bei jeder Auswahl warten",
+        "dwell_help": "Wie lange das Leuchten auf jeder Auswahl bleibt, bevor es weitergeht."
+      }
     },
     "settings_audio": {
       "no_learner_title": "Audio",
@@ -1436,7 +1450,11 @@
         "extratime_title": "Mehr Zeit",
         "extratime_body": "Es gibt sowieso keine Uhr. Nimm dir so viel Zeit, wie du brauchst.",
         "tell_me_more": "Erzähl mir mehr",
-        "im_ready": "Ich bin bereit"
+        "im_ready": "Ich bin bereit",
+        "buttons_title": "Möchtest du den Tasten-Modus?",
+        "buttons_body": "Eine erwachsene Person hat gesagt, dass du gern einen Schalter oder Tasten benutzt. Du kannst das in deinen Einstellungen einschalten, um es mit deinem Schalter zu machen.",
+        "buttons_cta": "Tasten einrichten",
+        "buttons_dismiss": "Vielleicht später"
       },
       "intro": {
         "step": "Schritt 3 von 3",
@@ -1675,7 +1693,16 @@
       "choose_one": "Wählen Sie eine aus",
       "type_answer": "Geben Sie Ihre Antwort ein",
       "struggle_break_title": "Atmen wir kurz zusammen durch.",
-      "struggle_break_body": "Einige waren knifflig — und genau dann hilft eine Atempause. Streck dich und mach weiter, wenn du bereit bist."
+      "struggle_break_body": "Einige waren knifflig — und genau dann hilft eine Atempause. Streck dich und mach weiter, wenn du bereit bist.",
+      "scan": {
+        "help_one_switch": "Drücke deinen Schalter, um das Leuchtende auszuwählen.",
+        "help_two_switch": "Ein Schalter bewegt das Leuchten. Der andere wählt es aus.",
+        "announce": "Jetzt auf: {label}",
+        "target_skip": "Diese überspringen",
+        "target_next": "Zur nächsten gehen",
+        "target_read_aloud": "Frage anhören",
+        "target_hint": "Einen Tipp holen"
+      }
     },
     "lesson_run": {
       "back_to_today": "Zurück zu heute"

@@ -1354,7 +1354,21 @@
       "reassure_labels_title": "同じ製品、ラベルなし",
       "reassure_labels_body": "サポートを有効にしても、学習者が「違う」と見なされることはありません。画面は穏やかで上質なままです。",
       "reassure_teachers_title": "教師もこれを尊重します",
-      "reassure_teachers_body": "ここで有効にしたものは、レッスン・宿題・AI チューターで適用されます — 追加設定は不要です。"
+      "reassure_teachers_body": "ここで有効にしたものは、レッスン・宿題・AI チューターで適用されます — 追加設定は不要です。",
+      "aac": {
+        "group_label": "スイッチとボタンの操作",
+        "group_desc": "タップの代わりにスイッチ・ボタン・AAC機器を使う学習者のために。",
+        "enable_label": "スイッチとボタンの操作",
+        "enable_help": "スイッチやボタンで操作します。1回押すと光っているものを選び、矢印キーで光を動かします。",
+        "method_label": "操作のしかた",
+        "method_touch": "タップまたはクリック",
+        "method_switch_1": "スイッチ1つ（ひとりでに動く）",
+        "method_switch_2": "スイッチ2つ（動かして選ぶ）",
+        "method_eye_gaze": "視線入力",
+        "method_head_pointer": "ヘッドポインター",
+        "dwell_label": "それぞれの選択肢で待つ時間",
+        "dwell_help": "次に動くまで、光が各選択肢にとどまる時間。"
+      }
     },
     "settings_audio": {
       "no_learner_title": "オーディオ",
@@ -1436,7 +1450,11 @@
         "extratime_title": "追加の時間",
         "extratime_body": "どのみち時計はありません。必要なだけ時間をかけてね。",
         "tell_me_more": "もっと教えて",
-        "im_ready": "準備できた"
+        "im_ready": "準備できた",
+        "buttons_title": "ボタン操作モードを使う？",
+        "buttons_body": "大人の人が、あなたはスイッチやボタンを使うのが好きだと教えてくれました。設定でオンにすると、自分のスイッチで進められます。",
+        "buttons_cta": "ボタンを設定する",
+        "buttons_dismiss": "あとでにする"
       },
       "intro": {
         "step": "ステップ 3 / 3",
@@ -1675,7 +1693,16 @@
       "choose_one": "1つ選んでください",
       "type_answer": "回答を入力",
       "struggle_break_title": "いっしょにひと息つきましょう。",
-      "struggle_break_body": "いくつかは難しかったね。そんなときこそ深呼吸が助けになります。背のびをして、準備ができたら続けましょう。"
+      "struggle_break_body": "いくつかは難しかったね。そんなときこそ深呼吸が助けになります。背のびをして、準備ができたら続けましょう。",
+      "scan": {
+        "help_one_switch": "スイッチを押して、光っているものを選んでね。",
+        "help_two_switch": "片方のスイッチで光を動かし、もう片方で選びます。",
+        "announce": "いま選択中：{label}",
+        "target_skip": "これをとばす",
+        "target_next": "次へ進む",
+        "target_read_aloud": "問題を聞く",
+        "target_hint": "ヒントをもらう"
+      }
     },
     "lesson_run": {
       "back_to_today": "今日に戻る"

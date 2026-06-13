@@ -38,6 +38,7 @@ const AXE_RULES = {
 } as const;
 
 const SEEDED_BASELINE = "bas_demo_sky";
+const SEEDED_LEARNER = "lrn_demo_sky";
 
 const learnerCookie = {
   name: "aivo_mock_session",
@@ -98,5 +99,29 @@ test.describe("@a11y learner baseline flow", () => {
       () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     );
     expect(reduced).toBe(true);
+  });
+
+  // Sprint C-15 — scan-mode states. With switch scanning enabled the runner
+  // mounts the scan controller and paints a high-contrast scan-focus ring on
+  // the highlighted control (`data-scan-current`). The ring must hold the axe
+  // bar in calm, high-contrast, and reduced-motion — the binding UX rule.
+  test(`@a11y baseline runner scan mode (/learner/baseline/${SEEDED_BASELINE})`, async ({
+    page,
+  }) => {
+    // Enable single-switch scanning via the real accessibility BFF (the
+    // persisted-pref path the runner reads).
+    const res = await page.request.patch(`/api/bff/learners/${SEEDED_LEARNER}/accessibility`, {
+      data: { aacEnabled: true, aacInputMethod: "switch_1", aacScanDelayMs: 1200 },
+    });
+    expect(res.ok()).toBeTruthy();
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`/learner/baseline/${SEEDED_BASELINE}`);
+    await page.waitForSelector("main", { timeout: 30_000 });
+    // The scanner highlights the first operable control; wait for the ring.
+    await expect(page.locator('[data-scan-current="true"]').first()).toBeVisible({
+      timeout: 30_000,
+    });
+    await auditMain(page);
   });
 });

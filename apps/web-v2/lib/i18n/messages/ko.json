@@ -1354,7 +1354,21 @@
       "reassure_labels_title": "같은 제품, 라벨 없음",
       "reassure_labels_body": "지원을 켠다고 해서 학습자를 다르게 표시하지 않습니다 — 인터페이스는 차분하고 고급스럽게 유지됩니다.",
       "reassure_teachers_title": "교사도 이를 존중합니다",
-      "reassure_teachers_body": "여기서 켠 것은 수업, 숙제, AI 튜터에 적용됩니다 — 추가 설정이 필요 없습니다."
+      "reassure_teachers_body": "여기서 켠 것은 수업, 숙제, AI 튜터에 적용됩니다 — 추가 설정이 필요 없습니다.",
+      "aac": {
+        "group_label": "스위치와 버튼 조작",
+        "group_desc": "두드리는 대신 스위치, 버튼 또는 AAC 기기를 쓰는 학습자를 위한 기능이에요.",
+        "enable_label": "스위치와 버튼 조작",
+        "enable_help": "스위치나 버튼으로 조작해요. 한 번 누르면 빛나는 것을 선택하고, 화살표 키로 빛을 옮겨요.",
+        "method_label": "조작 방법",
+        "method_touch": "두드리기 또는 클릭",
+        "method_switch_1": "스위치 하나 (저절로 움직임)",
+        "method_switch_2": "스위치 둘 (옮기고 선택)",
+        "method_eye_gaze": "시선 입력",
+        "method_head_pointer": "헤드 포인터",
+        "dwell_label": "각 선택지에서 기다리는 시간",
+        "dwell_help": "빛이 다음으로 가기 전에 각 선택지에 머무는 시간이에요."
+      }
     },
     "settings_audio": {
       "no_learner_title": "오디오",
@@ -1436,7 +1450,11 @@
         "extratime_title": "추가 시간",
         "extratime_body": "어차피 시계는 없어. 필요한 만큼 시간을 써.",
         "tell_me_more": "더 알려줘",
-        "im_ready": "준비됐어"
+        "im_ready": "준비됐어",
+        "buttons_title": "버튼 모드를 쓸까요?",
+        "buttons_body": "어른이 네가 스위치나 버튼 쓰는 걸 좋아한다고 했어요. 설정에서 켜면 네 스위치로 할 수 있어요.",
+        "buttons_cta": "버튼 설정하기",
+        "buttons_dismiss": "나중에 할래요"
       },
       "intro": {
         "step": "3/3 단계",
@@ -1675,7 +1693,16 @@
       "choose_one": "하나를 선택하세요",
       "type_answer": "답을 입력하세요",
       "struggle_break_title": "함께 숨을 한번 고를까요.",
-      "struggle_break_body": "몇 개는 까다로웠어요. 바로 그럴 때 잠시 숨을 고르면 도움이 돼요. 스트레칭하고 준비되면 계속해요."
+      "struggle_break_body": "몇 개는 까다로웠어요. 바로 그럴 때 잠시 숨을 고르면 도움이 돼요. 스트레칭하고 준비되면 계속해요.",
+      "scan": {
+        "help_one_switch": "스위치를 눌러 빛나는 것을 선택하세요.",
+        "help_two_switch": "한 스위치는 빛을 옮기고, 다른 스위치는 선택해요.",
+        "announce": "현재 선택: {label}",
+        "target_skip": "이 문제 건너뛰기",
+        "target_next": "다음으로 가기",
+        "target_read_aloud": "문제 듣기",
+        "target_hint": "힌트 받기"
+      }
     },
     "lesson_run": {
       "back_to_today": "오늘로 돌아가기"

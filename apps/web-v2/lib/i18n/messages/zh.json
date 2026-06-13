@@ -1354,7 +1354,21 @@
       "reassure_labels_title": "同一产品，没有标签",
       "reassure_labels_body": "开启支持绝不会把你的学习者标记为与众不同——界面始终保持平和而精致。",
       "reassure_teachers_title": "教师会尊重这些设置",
-      "reassure_teachers_body": "你在此开启的内容会在课程、作业和 AI 导师中应用——无需额外设置。"
+      "reassure_teachers_body": "你在此开启的内容会在课程、作业和 AI 导师中应用——无需额外设置。",
+      "aac": {
+        "group_label": "开关与按钮操控",
+        "group_desc": "为使用开关、按钮或 AAC 设备而非点触的学习者准备。",
+        "enable_label": "开关与按钮操控",
+        "enable_help": "用开关或按钮操控。按一下选择发光的项；方向键移动光亮。",
+        "method_label": "你如何操控",
+        "method_touch": "点触或点击",
+        "method_switch_1": "一个开关（自动移动）",
+        "method_switch_2": "两个开关（你移动并选择）",
+        "method_eye_gaze": "眼动追踪",
+        "method_head_pointer": "头部指针",
+        "dwell_label": "在每个选项上等待多久",
+        "dwell_help": "光亮在每个选项上停留多久后再移动。"
+      }
     },
     "settings_audio": {
       "no_learner_title": "音频",
@@ -1436,7 +1450,11 @@
         "extratime_title": "额外时间",
         "extratime_body": "反正没有计时。需要多久就用多久。",
         "tell_me_more": "告诉我更多",
-        "im_ready": "我准备好了"
+        "im_ready": "我准备好了",
+        "buttons_title": "想用按钮模式吗？",
+        "buttons_body": "大人说你喜欢用开关或按钮。你可以在设置里打开它，这样就能用你的开关来完成。",
+        "buttons_cta": "设置按钮",
+        "buttons_dismiss": "以后再说"
       },
       "intro": {
         "step": "第 3 步，共 3 步",
@@ -1675,7 +1693,16 @@
       "choose_one": "选择一项",
       "type_answer": "输入你的答案",
       "struggle_break_title": "我们一起深呼吸一下。",
-      "struggle_break_body": "有些题确实有点难——而这正是深呼吸最有用的时候。伸个懒腰，准备好了再继续。"
+      "struggle_break_body": "有些题确实有点难——而这正是深呼吸最有用的时候。伸个懒腰，准备好了再继续。",
+      "scan": {
+        "help_one_switch": "按下你的开关，选择正在发光的那个。",
+        "help_two_switch": "一个开关移动光亮，另一个开关选择它。",
+        "announce": "当前：{label}",
+        "target_skip": "跳过这一题",
+        "target_next": "去下一题",
+        "target_read_aloud": "听这道题",
+        "target_hint": "获取提示"
+      }
     },
     "lesson_run": {
       "back_to_today": "返回今天"

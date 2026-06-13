@@ -1354,7 +1354,21 @@
       "reassure_labels_title": "Même produit, sans étiquettes",
       "reassure_labels_body": "Activer des aides ne marque jamais votre apprenant comme différent — l'interface reste apaisée et soignée.",
       "reassure_teachers_title": "Les enseignants les respectent",
-      "reassure_teachers_body": "Tout ce que vous activez ici s'applique pendant les leçons, les devoirs et le tuteur IA — sans configuration supplémentaire."
+      "reassure_teachers_body": "Tout ce que vous activez ici s'applique pendant les leçons, les devoirs et le tuteur IA — sans configuration supplémentaire.",
+      "aac": {
+        "group_label": "Pilotage par contacteur et boutons",
+        "group_desc": "Pour les élèves qui utilisent un contacteur, un bouton ou un dispositif de CAA au lieu de toucher.",
+        "enable_label": "Pilotage par contacteur et boutons",
+        "enable_help": "Pilote avec un contacteur ou un bouton. Une pression choisit ce qui brille ; une flèche déplace la lumière.",
+        "method_label": "Comment tu pilotes",
+        "method_touch": "Toucher ou cliquer",
+        "method_switch_1": "Un contacteur (il bouge tout seul)",
+        "method_switch_2": "Deux contacteurs (tu déplaces et choisis)",
+        "method_eye_gaze": "Suivi du regard",
+        "method_head_pointer": "Pointeur de tête",
+        "dwell_label": "Temps d'attente sur chaque choix",
+        "dwell_help": "Combien de temps la lumière reste sur chaque choix avant de continuer."
+      }
     },
     "settings_audio": {
       "no_learner_title": "Audio",
@@ -1436,7 +1450,11 @@
         "extratime_title": "Temps supplémentaire",
         "extratime_body": "De toute façon, il n'y a pas d'horloge. Prends tout le temps qu'il te faut.",
         "tell_me_more": "Dis-m'en plus",
-        "im_ready": "Je suis prêt"
+        "im_ready": "Je suis prêt",
+        "buttons_title": "Tu veux le mode boutons ?",
+        "buttons_body": "Un adulte a dit que tu aimes utiliser un contacteur ou des boutons. Tu peux l'activer dans tes réglages pour le faire avec ton contacteur.",
+        "buttons_cta": "Configurer les boutons",
+        "buttons_dismiss": "Peut-être plus tard"
       },
       "intro": {
         "step": "Étape 3 sur 3",
@@ -1675,7 +1693,16 @@
       "choose_one": "Choisissez-en une",
       "type_answer": "Saisissez votre réponse",
       "struggle_break_title": "Respirons un instant ensemble.",
-      "struggle_break_body": "Certaines étaient difficiles, et c'est justement là qu'une respiration aide. Étire-toi et continue quand tu es prêt."
+      "struggle_break_body": "Certaines étaient difficiles, et c'est justement là qu'une respiration aide. Étire-toi et continue quand tu es prêt.",
+      "scan": {
+        "help_one_switch": "Appuie sur ton contacteur pour choisir ce qui brille.",
+        "help_two_switch": "Un contacteur déplace la lumière. L'autre la choisit.",
+        "announce": "Maintenant sur : {label}",
+        "target_skip": "Passer celle-ci",
+        "target_next": "Aller à la suivante",
+        "target_read_aloud": "Écouter la question",
+        "target_hint": "Demander un indice"
+      }
     },
     "lesson_run": {
       "back_to_today": "Retour à aujourd'hui"

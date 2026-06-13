@@ -1354,7 +1354,21 @@
       "reassure_labels_title": "El mismo producto, sin etiquetas",
       "reassure_labels_body": "Activar apoyos nunca marca a tu estudiante como diferente: la interfaz sigue siendo tranquila y de calidad.",
       "reassure_teachers_title": "Los docentes los respetan",
-      "reassure_teachers_body": "Lo que actives aquí se aplica durante las lecciones, las tareas y el tutor con IA, sin configuración adicional."
+      "reassure_teachers_body": "Lo que actives aquí se aplica durante las lecciones, las tareas y el tutor con IA, sin configuración adicional.",
+      "aac": {
+        "group_label": "Control con interruptor y botones",
+        "group_desc": "Para estudiantes que usan un interruptor, botón o dispositivo CAA en vez de tocar.",
+        "enable_label": "Control con interruptor y botones",
+        "enable_help": "Controla con un interruptor o botón. Una pulsación elige lo que brilla; una tecla de flecha mueve el brillo.",
+        "method_label": "Cómo controlas",
+        "method_touch": "Tocar o hacer clic",
+        "method_switch_1": "Un interruptor (se mueve solo)",
+        "method_switch_2": "Dos interruptores (mueves y eliges)",
+        "method_eye_gaze": "Mirada ocular",
+        "method_head_pointer": "Puntero de cabeza",
+        "dwell_label": "Cuánto esperar en cada opción",
+        "dwell_help": "Cuánto tiempo se queda el brillo en cada opción antes de seguir."
+      }
     },
     "settings_audio": {
       "no_learner_title": "Audio",
@@ -1436,7 +1450,11 @@
         "extratime_title": "Tiempo extra",
         "extratime_body": "De todos modos no hay reloj. Tómate todo el tiempo que necesites.",
         "tell_me_more": "Cuéntame más",
-        "im_ready": "Estoy listo"
+        "im_ready": "Estoy listo",
+        "buttons_title": "¿Quieres el modo con botones?",
+        "buttons_body": "Una persona adulta dijo que te gusta usar un interruptor o botones. Puedes activarlo en tus ajustes para hacerlo con tu interruptor.",
+        "buttons_cta": "Configurar botones",
+        "buttons_dismiss": "Quizás más tarde"
       },
       "intro": {
         "step": "Paso 3 de 3",
@@ -1675,7 +1693,16 @@
       "choose_one": "Elige una",
       "type_answer": "Escribe tu respuesta",
       "struggle_break_title": "Tomemos aire juntos.",
-      "struggle_break_body": "Algunas fueron difíciles, y justo ahí es cuando respirar ayuda. Estírate y sigue cuando estés listo."
+      "struggle_break_body": "Algunas fueron difíciles, y justo ahí es cuando respirar ayuda. Estírate y sigue cuando estés listo.",
+      "scan": {
+        "help_one_switch": "Pulsa tu interruptor para elegir lo que brilla.",
+        "help_two_switch": "Un interruptor mueve el brillo. El otro lo elige.",
+        "announce": "Ahora en: {label}",
+        "target_skip": "Saltar esta",
+        "target_next": "Ir a la siguiente",
+        "target_read_aloud": "Escuchar la pregunta",
+        "target_hint": "Pedir una pista"
+      }
     },
     "lesson_run": {
       "back_to_today": "Volver a hoy"

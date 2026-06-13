@@ -31,6 +31,17 @@ export interface LearnerChoiceCardProps {
   disabled?: boolean;
   required?: boolean;
   className?: string;
+  /**
+   * Sprint C-15 — opt the card into switch/AAC scanning. When set, the
+   * rendered `<label>` carries the `data-scan-target` (+ `data-scan-label`)
+   * attributes the baseline scan controller discovers in DOM order. The
+   * label is the focus/click surface, so activating the scanned target checks
+   * this radio. Omit on surfaces that don't scan (no behavioural change).
+   */
+  scanTargetId?: string;
+  /** Human-readable label announced / spoken when this card is scanned.
+   *  Defaults to the string `label` when that is a string. */
+  scanLabel?: string;
 }
 
 function letter(i: number): string {
@@ -47,10 +58,19 @@ export function LearnerChoiceCard({
   disabled,
   required,
   className,
+  scanTargetId,
+  scanLabel,
 }: LearnerChoiceCardProps) {
   const [checked, setChecked] = React.useState(Boolean(defaultChecked));
+  const scanProps = scanTargetId
+    ? {
+        "data-scan-target": scanTargetId,
+        "data-scan-label": scanLabel ?? (typeof label === "string" ? label : undefined),
+      }
+    : undefined;
   return (
     <label
+      {...scanProps}
       className={cn(
         "group relative flex items-center gap-4 cursor-pointer select-none",
         "rounded-iw-card-lg border-2 bg-white p-4 md:p-5 min-h-[64px] transition-all duration-150",

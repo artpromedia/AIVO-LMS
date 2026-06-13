@@ -36,6 +36,8 @@ import {
   startBaseline,
 } from "@/lib/db/repos";
 import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
+import { resolveBaselineScanConfig } from "@/lib/a11y/baseline-scan";
+import { BaselineScanProvider } from "./baseline-scan-provider";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
@@ -212,6 +214,14 @@ export default async function BaselineRunnerPage({
   // baseline shell so they apply INSIDE the question card, not just on chrome.
   const a11yPrefs = await getAccessibilityPrefs(baseline.learnerId, session.tenantId);
   const shellStyle = learnerPrefStyleVars(a11yPrefs);
+  // Sprint C-15 — switch/AAC scanning. Resolve the learner's persisted AAC
+  // prefs into a scan config; the runner wraps its interactive region in the
+  // aac-bridge scan provider (single-source SwitchScanController) when the
+  // learner has explicitly enabled a switch input method. Read-aloud pairs
+  // with scan focus only for audio-first learners (off by default).
+  const scanConfig = resolveBaselineScanConfig(a11yPrefs);
+  const speakOnScanFocus = scanConfig.active && a11yPrefs.audioFirst === true;
+  const tScan = await getTranslations("learner.baseline_runner.scan");
   const subjects = await listSubjects();
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
   const questions = await listBaselineQuestions(baseline.id);
@@ -380,34 +390,46 @@ export default async function BaselineRunnerPage({
   if (!next) {
     return (
       <LearnerBaselineShell topBanner={topBanner} style={shellStyle}>
-        <CompletionHero
-          learnerName={learner?.preferredName || learner?.firstName}
-          title={t("ready_title")}
-          body={t("ready_body")}
-          primary={
-            <form action={completeAction}>
-              <input type="hidden" name="baselineId" value={baseline.id} />
-              <input type="hidden" name="learnerId" value={baseline.learnerId} />
-              {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
-              <Button type="submit" size="lg">
-                {t("finish_baseline")}
-                <svg
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
+        <BaselineScanProvider
+          config={scanConfig}
+          speakOnFocus={speakOnScanFocus}
+          scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
+          announceTemplate={(label) => tScan("announce", { label })}
+        >
+          <CompletionHero
+            learnerName={learner?.preferredName || learner?.firstName}
+            title={t("ready_title")}
+            body={t("ready_body")}
+            primary={
+              <form action={completeAction}>
+                <input type="hidden" name="baselineId" value={baseline.id} />
+                <input type="hidden" name="learnerId" value={baseline.learnerId} />
+                {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+                <Button
+                  type="submit"
+                  size="lg"
+                  data-scan-target={scanConfig.active ? "finish-baseline" : undefined}
+                  data-scan-label={scanConfig.active ? t("finish_baseline") : undefined}
                 >
-                  <path d="M5 12h14" />
-                  <path d="m13 5 7 7-7 7" />
-                </svg>
-              </Button>
-            </form>
-          }
-        />
+                  {t("finish_baseline")}
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m13 5 7 7-7 7" />
+                  </svg>
+                </Button>
+              </form>
+            }
+          />
+        </BaselineScanProvider>
       </LearnerBaselineShell>
     );
   }
@@ -438,42 +460,55 @@ export default async function BaselineRunnerPage({
           ...chips.slice(0, 3).map((v) => <PersonalizationChip key={v} variant={v} />),
         ]}
       >
-        <BreakCard
-          variant={struggleVariant ? "struggle" : "cadence"}
-          title={struggleVariant ? t("struggle_break_title") : undefined}
-          body={struggleVariant ? t("struggle_break_body") : undefined}
-          learnerName={learner?.preferredName || learner?.firstName}
-          answered={totalAnswered}
-          total={questions.length}
-          resume={
-            <Link
-              href={`/learner/baseline/${baseline.id}?resume=1${asParent ? "&as=parent" : ""}`}
-              className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
-            >
-              {t("resume")}
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+        <BaselineScanProvider
+          config={scanConfig}
+          speakOnFocus={speakOnScanFocus}
+          scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
+          announceTemplate={(label) => tScan("announce", { label })}
+        >
+          <BreakCard
+            variant={struggleVariant ? "struggle" : "cadence"}
+            title={struggleVariant ? t("struggle_break_title") : undefined}
+            body={struggleVariant ? t("struggle_break_body") : undefined}
+            learnerName={learner?.preferredName || learner?.firstName}
+            answered={totalAnswered}
+            total={questions.length}
+            resume={
+              <Link
+                href={`/learner/baseline/${baseline.id}?resume=1${asParent ? "&as=parent" : ""}`}
+                className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
+                data-scan-target={scanConfig.active ? "break-resume" : undefined}
+                data-scan-label={scanConfig.active ? t("resume") : undefined}
               >
-                <polygon points="5 3 19 12 5 21 5 3" />
-              </svg>
-            </Link>
-          }
-          secondary={
-            <Link
-              href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
-              className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
-            >
-              {t("stop_for_today")}
-            </Link>
-          }
-        />
+                {t("resume")}
+                <svg
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+              </Link>
+            }
+            secondary={
+              <Link
+                href={
+                  asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"
+                }
+                className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
+                data-scan-target={scanConfig.active ? "break-stop" : undefined}
+                data-scan-label={scanConfig.active ? t("stop_for_today") : undefined}
+              >
+                {t("stop_for_today")}
+              </Link>
+            }
+          />
+        </BaselineScanProvider>
       </LearnerBaselineShell>
     );
   }
@@ -559,146 +594,183 @@ export default async function BaselineRunnerPage({
         <PersonalizationChip key={v} variant={v} />
       ))}
     >
-      <BaselineProgressDots states={dots} ariaLabel="Baseline progress" />
+      <BaselineScanProvider
+        config={scanConfig}
+        speakOnFocus={speakOnScanFocus}
+        scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
+        announceTemplate={(label) => tScan("announce", { label })}
+      >
+        <BaselineProgressDots states={dots} ariaLabel="Baseline progress" />
 
-      <LearnerQuestionCard
-        eyebrow={tutor ? `With ${tutor.name} · ${tutor.landmark}` : subject?.name}
-        companion={
-          tutor ? (
-            <span
-              className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl"
-              style={{ backgroundColor: `${tutor.color}1A`, color: tutor.color }}
-              aria-hidden="true"
-            >
-              {tutor.emoji}
-            </span>
-          ) : null
-        }
-        prompt={
-          <>
-            {promptHeader}
-            <span>{next.prompt}</span>
-          </>
-        }
-        readAloud={next.readAloudText ? <ReadAloudButton href={`?read=${next.id}`} /> : null}
-        footer={
-          <>
-            <div className="flex items-center gap-2">
-              <form action={answerAction}>
-                <input type="hidden" name="baselineId" value={baseline.id} />
-                <input type="hidden" name="learnerId" value={baseline.learnerId} />
-                <input type="hidden" name="questionId" value={next.id} />
-                <input type="hidden" name="skipped" value="1" />
-                {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
-                <Button type="submit" variant="outline" size="sm" formNoValidate>
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <polygon points="5 4 15 12 5 20 5 4" />
-                    <line x1="19" y1="5" x2="19" y2="19" />
-                  </svg>
-                  Skip
-                </Button>
-              </form>
-            </div>
-            <Button type="submit" form={`answer-form-${next.id}`}>
-              Next
-              <svg
-                className="w-4 h-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+        <LearnerQuestionCard
+          eyebrow={tutor ? `With ${tutor.name} · ${tutor.landmark}` : subject?.name}
+          companion={
+            tutor ? (
+              <span
+                className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl"
+                style={{ backgroundColor: `${tutor.color}1A`, color: tutor.color }}
                 aria-hidden="true"
               >
-                <path d="M5 12h14" />
-                <path d="m13 5 7 7-7 7" />
-              </svg>
-            </Button>
-          </>
-        }
-      >
-        <form id={`answer-form-${next.id}`} action={answerAction} className="flex flex-col gap-3">
-          <input type="hidden" name="baselineId" value={baseline.id} />
-          <input type="hidden" name="learnerId" value={baseline.learnerId} />
-          <input type="hidden" name="questionId" value={next.id} />
-          {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
-          {/* Stamps time-on-item into `latencyMs` at submit. Keyed by
+                {tutor.emoji}
+              </span>
+            ) : null
+          }
+          prompt={
+            <>
+              {promptHeader}
+              <span>{next.prompt}</span>
+            </>
+          }
+          readAloud={
+            next.readAloudText ? (
+              <ReadAloudButton
+                href={`?read=${next.id}`}
+                scanTargetId={scanConfig.active ? `q-${next.id}-readaloud` : undefined}
+                scanLabel={tScan("target_read_aloud")}
+                scanReadText={`${next.prompt}. ${next.readAloudText}`}
+              />
+            ) : null
+          }
+          footer={
+            <>
+              <div className="flex items-center gap-2">
+                <form action={answerAction}>
+                  <input type="hidden" name="baselineId" value={baseline.id} />
+                  <input type="hidden" name="learnerId" value={baseline.learnerId} />
+                  <input type="hidden" name="questionId" value={next.id} />
+                  <input type="hidden" name="skipped" value="1" />
+                  {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    size="sm"
+                    formNoValidate
+                    data-scan-target={scanConfig.active ? `q-${next.id}-skip` : undefined}
+                    data-scan-label={scanConfig.active ? tScan("target_skip") : undefined}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polygon points="5 4 15 12 5 20 5 4" />
+                      <line x1="19" y1="5" x2="19" y2="19" />
+                    </svg>
+                    Skip
+                  </Button>
+                </form>
+              </div>
+              <Button
+                type="submit"
+                form={`answer-form-${next.id}`}
+                data-scan-target={scanConfig.active ? `q-${next.id}-next` : undefined}
+                data-scan-label={scanConfig.active ? tScan("target_next") : undefined}
+              >
+                Next
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m13 5 7 7-7 7" />
+                </svg>
+              </Button>
+            </>
+          }
+        >
+          <form id={`answer-form-${next.id}`} action={answerAction} className="flex flex-col gap-3">
+            <input type="hidden" name="baselineId" value={baseline.id} />
+            <input type="hidden" name="learnerId" value={baseline.learnerId} />
+            <input type="hidden" name="questionId" value={next.id} />
+            {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+            {/* Stamps time-on-item into `latencyMs` at submit. Keyed by
               question id so the timer resets for each new item. */}
-          <LatencyTimer key={next.id} />
+            <LatencyTimer key={next.id} />
 
-          {next.choices && next.choices.length > 0 ? (
-            <fieldset className="flex flex-col gap-3">
-              <legend className="sr-only">{t("choose_one")}</legend>
-              {next.choices.map((choice, i) => {
-                const emoji = next.choiceEmojis?.[i];
-                // Upgrade the bare emoji to a Twemoji SVG so each
-                // option looks like a real cartoon picture (dog, cat,
-                // car). Falls back to the raw emoji glyph if the
-                // codepoint isn't in Twemoji's pack.
-                const choiceImg = emoji ? resolveBaselineImage({ sceneEmoji: emoji }) : undefined;
-                let lead: ReactNode = undefined;
-                if (choiceImg?.imageUrl) {
-                  lead = (
-                    <img
-                      src={choiceImg.imageUrl}
-                      alt=""
-                      className="h-10 w-10 object-contain select-none"
-                      draggable={false}
+            {next.choices && next.choices.length > 0 ? (
+              <fieldset className="flex flex-col gap-3">
+                <legend className="sr-only">{t("choose_one")}</legend>
+                {next.choices.map((choice, i) => {
+                  const emoji = next.choiceEmojis?.[i];
+                  // Upgrade the bare emoji to a Twemoji SVG so each
+                  // option looks like a real cartoon picture (dog, cat,
+                  // car). Falls back to the raw emoji glyph if the
+                  // codepoint isn't in Twemoji's pack.
+                  const choiceImg = emoji ? resolveBaselineImage({ sceneEmoji: emoji }) : undefined;
+                  let lead: ReactNode = undefined;
+                  if (choiceImg?.imageUrl) {
+                    lead = (
+                      <img
+                        src={choiceImg.imageUrl}
+                        alt=""
+                        className="h-10 w-10 object-contain select-none"
+                        draggable={false}
+                      />
+                    );
+                  } else if (emoji) {
+                    lead = (
+                      <span className="text-3xl leading-none" aria-hidden="true">
+                        {emoji}
+                      </span>
+                    );
+                  }
+                  return (
+                    <LearnerChoiceCard
+                      key={choice}
+                      name="response"
+                      value={choice}
+                      label={choice}
+                      index={i}
+                      lead={lead}
+                      required
+                      scanTargetId={scanConfig.active ? `q-${next.id}-choice-${i}` : undefined}
+                      scanLabel={choice}
                     />
                   );
-                } else if (emoji) {
-                  lead = (
-                    <span className="text-3xl leading-none" aria-hidden="true">
-                      {emoji}
-                    </span>
-                  );
-                }
-                return (
-                  <LearnerChoiceCard
-                    key={choice}
-                    name="response"
-                    value={choice}
-                    label={choice}
-                    index={i}
-                    lead={lead}
-                    required
-                  />
-                );
-              })}
-            </fieldset>
-          ) : (
-            <label className="flex flex-col gap-1.5">
-              <span className="sr-only">{t("type_answer")}</span>
-              <input
-                type="text"
-                name="response"
-                required
-                placeholder={t("type_answer")}
-                // Free-text answers honor the learner's reading prefs too, via
-                // the same `--learner-*` contract vars the shell stamps.
-                style={{
-                  fontFamily: "var(--learner-font-family, inherit)",
-                  fontSize: "calc(1rem * var(--learner-font-scale, 1))",
-                  letterSpacing: "var(--learner-letter-spacing, normal)",
-                }}
-                className="w-full rounded-iw-control border border-iw-border bg-white px-4 py-3 text-iw-text-strong placeholder:text-iw-text-muted/70 focus:outline-none focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)]/40"
-              />
-            </label>
-          )}
+                })}
+              </fieldset>
+            ) : (
+              <label className="flex flex-col gap-1.5">
+                <span className="sr-only">{t("type_answer")}</span>
+                <input
+                  type="text"
+                  name="response"
+                  required
+                  placeholder={t("type_answer")}
+                  // Free-text answers honor the learner's reading prefs too, via
+                  // the same `--learner-*` contract vars the shell stamps.
+                  style={{
+                    fontFamily: "var(--learner-font-family, inherit)",
+                    fontSize: "calc(1rem * var(--learner-font-scale, 1))",
+                    letterSpacing: "var(--learner-letter-spacing, normal)",
+                  }}
+                  className="w-full rounded-iw-control border border-iw-border bg-white px-4 py-3 text-iw-text-strong placeholder:text-iw-text-muted/70 focus:outline-none focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)]/40"
+                />
+              </label>
+            )}
 
-          {next.hint ? <HintCard hint={next.hint} policy="available" /> : null}
-        </form>
-      </LearnerQuestionCard>
+            {next.hint ? (
+              <HintCard
+                hint={next.hint}
+                policy="available"
+                scanTargetId={scanConfig.active ? `q-${next.id}-hint` : undefined}
+                scanLabel={tScan("target_hint")}
+              />
+            ) : null}
+          </form>
+        </LearnerQuestionCard>
+      </BaselineScanProvider>
     </LearnerBaselineShell>
   );
 }

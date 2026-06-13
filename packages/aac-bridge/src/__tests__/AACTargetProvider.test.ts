@@ -89,6 +89,52 @@ describe("AAC target → SwitchScanController integration", () => {
   });
 });
 
+describe("step-scan (two-switch) — autoScan=false maps to autoStart=false", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it("does not auto-advance when autoStart is false (the provider's step-scan path)", () => {
+    // The provider builds `autoStart: autoScan`, so a `switch_2` step-scan
+    // session passes autoStart=false. The highlight must NOT drift on the
+    // timer — it only moves when the learner presses the advance switch.
+    const targets: SymbolItem[] = [
+      targetToSymbol("skip", "Skip", 0),
+      targetToSymbol("a", "Choice A", 1),
+      targetToSymbol("b", "Choice B", 2),
+    ];
+    const ctrl = new SwitchScanController({ ...baseConfig, autoStart: false }, targets);
+    ctrl.start();
+    expect(ctrl.getHighlightedItem()?.id).toBe("skip");
+    // Time passes — nothing moves without a switch press.
+    vi.advanceTimersByTime(1000);
+    expect(ctrl.getHighlightedItem()?.id).toBe("skip");
+    // Advance switch (mapped to ArrowRight via AACScanRoot → ctx.advance()).
+    ctrl.advance();
+    expect(ctrl.getHighlightedItem()?.id).toBe("a");
+    ctrl.advance();
+    expect(ctrl.getHighlightedItem()?.id).toBe("b");
+    // Wraps so the cycle never dead-ends — Skip is always reachable again.
+    ctrl.advance();
+    expect(ctrl.getHighlightedItem()?.id).toBe("skip");
+    ctrl.stop();
+  });
+
+  it("Skip target is included in the scan cycle (no-fail: skipping is never harder than answering)", () => {
+    // The runner registers Skip as the FIRST target so a switch user reaches
+    // it before any answer — skipping must never cost more presses.
+    const targets: SymbolItem[] = [
+      targetToSymbol("skip", "Skip", 0),
+      targetToSymbol("a", "Choice A", 1),
+    ];
+    const ctrl = new SwitchScanController({ ...baseConfig, autoStart: false }, targets);
+    ctrl.start();
+    // First highlight is Skip — one press of "select" skips the question.
+    expect(ctrl.getHighlightedItem()?.id).toBe("skip");
+    const evt = ctrl.activate();
+    expect(evt.targetId).toBe("skip");
+  });
+});
+
 describe("AACTargetProvider exports", () => {
   it("re-exports the React hooks + provider symbols", async () => {
     const mod = await import("../index.js");

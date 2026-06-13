@@ -40,3 +40,58 @@
 [data-text-scale="xlarge"] {
   font-size: 1.1875rem;
 }
+
+/* ---------------------------------------------------------------------------
+ * Switch / AAC scan focus (Sprint C-15).
+ *
+ * The baseline scan controller (@aivo/aac-bridge driven) sets
+ * `data-scan-current="true"` on the element it is currently highlighting. The
+ * highlight must be a single, unmistakable, HIGH-CONTRAST ring that a
+ * neurodiverse child can track — and it must honor the learner's sensory mode
+ * and reduced-motion.
+ *
+ *  - The ring color resolves through `--aivo-sensory-ringFocus`, the same
+ *    token the rest of the learner UI focuses with, so calm mode (softer
+ *    palette) and high-contrast mode (the HC palette redefines the token to a
+ *    maximum-contrast value) are both honored automatically — no mode-specific
+ *    overrides needed here.
+ *  - A solid box-shadow halo (not just an outline) plus an outline guarantees
+ *    the highlight reads against any card background, including the selected
+ *    choice's tinted fill.
+ *  - The highlight is applied instantly. Any transition is gated OUT under
+ *    `prefers-reduced-motion: reduce` so focus *moves without animation* for
+ *    learners who need that — the ring simply appears on the new target.
+ * ------------------------------------------------------------------------- */
+[data-scan-current="true"] {
+  outline: 4px solid var(--aivo-sensory-ringFocus, #3b5bdb);
+  outline-offset: 3px;
+  /* Inner white separator + outer colored halo so the ring is legible on both
+     light cards and tinted (selected) cards. */
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 8px var(--aivo-sensory-ringFocus, #3b5bdb);
+  border-radius: var(--radius-iw-card-lg, 1rem);
+  /* Calm motion: a gentle ring fade is fine in standard motion, but it must
+     not animate the *position* — only opacity. Disabled entirely below for
+     reduced motion. */
+  transition: box-shadow 120ms ease-out;
+  /* Keep the highlighted control above neighbours so its halo isn't clipped. */
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scan-current="true"] {
+    transition: none;
+  }
+}
+
+/* Honor the document-level reduced-motion + high-contrast flags too (set on
+   <html> by the root layout): when motion is quieted, drop the transition so
+   the ring appears instantly with no fade. High-contrast mode also redefines
+   `--aivo-sensory-ringFocus` to its maximum-contrast value, so the ring above
+   automatically becomes the HC ring. */
+[data-reduced-motion="reduce"] [data-scan-current="true"],
+[data-sensory-mode="high-contrast"] [data-scan-current="true"] {
+  transition: none;
+}
