@@ -43,6 +43,7 @@ import {
   internalTeacherInviteParentSchema,
   internalContributionNudgeSchema,
   internalInviteExpiryWarningSchema,
+  internalBrainChangeReminderSchema,
   internalAdminAlertSchema,
   internalSpeechBuddySafetySchema,
   internalBillingAlertSchema,
@@ -1214,6 +1215,55 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
         return { status: result.status, messageId: result.messageId };
       } catch (err: any) {
         logger.error({ err, to }, "Failed to send invite expiry warning email");
+        return { status: "failed" };
+      }
+    },
+  );
+
+  // Sprint C-13 — brain-profile change review reminder. Called by the
+  // brain-change-reminder batch when a structural change has gone un-acked for
+  // 7 days. The CTA lands the parent on the change timeline; the unsubscribe
+  // link routes to the notification preferences (the single brain_profile_changed
+  // toggle that the batch's opt-out check reads). One reminder per change.
+  app.post(
+    "/api/comms/internal/brain-change-reminder",
+    { schema: internalBrainChangeReminderSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, learnerId, learnerName, count } = (request.body as any) || {};
+      if (!to || !learnerId) {
+        return reply.code(400).send({ error: "to and learnerId required" });
+      }
+      const appUrl = (process.env.WEB_APP_URL || "http://localhost:3000").replace(/\/$/, "");
+      const reviewUrl = `${appUrl}/parent/learners/${encodeURIComponent(learnerId)}/brain-timeline`;
+      const unsubscribeUrl = `${appUrl}/notifications`;
+      if (!isConfigured()) {
+        logger.warn({ to, learnerId }, "Brain change reminder requested but email not configured (dev mode)");
+        return { status: "dev_mode", reviewUrl };
+      }
+      const rendered = renderTemplate("brain_changes_reminder", {
+        learnerName,
+        count: count ?? 1,
+        reviewUrl,
+        unsubscribeUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "brain_changes_reminder",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send brain change reminder email");
         return { status: "failed" };
       }
     },

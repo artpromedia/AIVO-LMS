@@ -44,6 +44,8 @@ import type {
   IEPExtraction,
   LearnerBrainProfile,
   BrainProfileApproval,
+  LearnerBrainProfileChange,
+  BrainProfileChangeSource,
   LearnerBrainProfileState,
   LearnerProfile,
   LearningPath,
@@ -82,6 +84,7 @@ import {
   generateBaselineQuestions,
 } from "@/lib/learner/baseline";
 import { assertCorrectionsAllowed, foldParentModifications } from "@/lib/db/brain-corrections";
+import { detectBrainProfileChange } from "@/lib/db/brain-profile-changes";
 import {
   aggregateItemPsychometrics,
   buildRunTelemetry,
@@ -752,7 +755,12 @@ export async function upsertBrainProfile(
       clonedAt: null,
       generatedAt: now,
     };
-    return getPersistence().brainProfiles.upsert(next);
+    const committed = await getPersistence().brainProfiles.upsert(next);
+    // C-13: a regenerate from a profile the parent already reviewed/approved is
+    // a structural-change origin — capture the delta off the prior reviewable
+    // state. Pre-clone→pre-clone churn captures nothing (no review anchor).
+    await captureBrainProfileChange({ before: existing, after: committed, source: "regenerate" });
+    return committed;
   }
   const profile: LearnerBrainProfile = {
     id: newId("brp"),
@@ -860,9 +868,21 @@ async function prepareBrainCloneFromSummary(
   };
 }
 
-/** Internal: commit a prepared brain clone to the store. */
-async function commitBrainClone(profile: LearnerBrainProfile): Promise<LearnerBrainProfile> {
-  return getPersistence().brainProfiles.upsert(profile);
+/** Internal: commit a prepared brain clone to the store.
+ *
+ *  C-13: capture the change off the profile's prior committed state. The brain
+ *  store is untouched between `prepareBrainCloneFromSummary` and here, so the
+ *  current row IS the BEFORE state. A first clone (no prior reviewable profile)
+ *  fires SCREEN 0; a re-clone that shifts supports/level/tutors records a
+ *  structural change and notifies. `source` defaults to a baseline re-clone. */
+async function commitBrainClone(
+  profile: LearnerBrainProfile,
+  source: BrainProfileChangeSource = "baseline_reclone",
+): Promise<LearnerBrainProfile> {
+  const before = await getBrainProfile(profile.learnerId, profile.tenantId);
+  const committed = await getPersistence().brainProfiles.upsert(profile);
+  await captureBrainProfileChange({ before, after: committed, source });
+  return committed;
 }
 
 /**
@@ -1017,6 +1037,196 @@ export async function listBrainApprovals(
   tenantId: string,
 ): Promise<BrainProfileApproval[]> {
   return getPersistence().brainProfileApprovals.listForLearner(learnerId, tenantId);
+}
+
+// ===== Brain profile change records (Sprint C-13) =====
+
+/**
+ * Sprint C-13 — persist one change record. Append-only. The caller has already
+ * detected + classified the delta (`detectBrainProfileChange`); this just
+ * stamps id/createdAt and stores it. `requiresAck` is the contract-derived
+ * structural flag — never set ad-hoc here.
+ */
+export async function recordBrainProfileChange(
+  input: Omit<LearnerBrainProfileChange, "id" | "createdAt" | "ackedAt" | "reminderSentAt"> &
+    Partial<Pick<LearnerBrainProfileChange, "id" | "createdAt" | "ackedAt" | "reminderSentAt">>,
+): Promise<LearnerBrainProfileChange> {
+  const change: LearnerBrainProfileChange = {
+    id: input.id ?? newId("bpc"),
+    createdAt: input.createdAt ?? nowIso(),
+    ackedAt: input.ackedAt ?? null,
+    reminderSentAt: input.reminderSentAt ?? null,
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    brainProfileId: input.brainProfileId,
+    revision: input.revision,
+    kind: input.kind,
+    fields: input.fields,
+    summary: input.summary,
+    source: input.source,
+    requiresAck: input.requiresAck,
+  };
+  return getPersistence().brainProfileChanges.record(change);
+}
+
+/** Sprint C-13 — the tenant-scoped change history for a learner, newest-first. */
+export async function listBrainProfileChanges(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBrainProfileChange[]> {
+  return getPersistence().brainProfileChanges.listForLearner(learnerId, tenantId);
+}
+
+/** Sprint C-13 — un-acked structural changes for a learner (drives the
+ *  persistent in-app badge after the N-day window lapses). Newest-first. */
+export async function listPendingStructuralChanges(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBrainProfileChange[]> {
+  return getPersistence().brainProfileChanges.listPendingStructural(learnerId, tenantId);
+}
+
+/**
+ * Sprint C-13 — acknowledge a structural change (the parent has seen the
+ * delta). Idempotent: re-acking returns the row unchanged. Returns null when
+ * `changeId` isn't a pending structural change for this learner (so the caller
+ * can 404). The audit/disclosure trail is written by the calling server action
+ * per C-12 conventions, not here.
+ */
+export async function ackBrainProfileChange(
+  changeId: string,
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBrainProfileChange | null> {
+  return getPersistence().brainProfileChanges.ack(changeId, learnerId, tenantId, nowIso());
+}
+
+/**
+ * Sprint C-13 — the change-capture orchestration that runs at every mutation
+ * path (see the Checkpoint's enumerated list). Given the profile state BEFORE
+ * a mutation and the committed profile AFTER, it:
+ *
+ *   1. On the FIRST transition into `cloned` (no prior cloned/approved state) —
+ *      fires the SCREEN 0 "ready for review" notification, deduped once per
+ *      clone event. No change record (there is no prior state to diff).
+ *   2. On any subsequent change from a cloned/approved baseline — detects +
+ *      classifies the delta, writes a change record, and (structural only)
+ *      notifies the parent with the plain-language summary + review CTA.
+ *
+ * Pre-clone regenerate churn (the BEFORE profile was missing or still
+ * `pre_clone`, and the result is not the first clone) is intentionally NOT
+ * captured: there is no approved profile to re-acknowledge and the parent has
+ * seen nothing yet. Best-effort throughout — a capture failure never breaks the
+ * mutation that triggered it (the brain must keep working).
+ */
+async function captureBrainProfileChange(input: {
+  before: LearnerBrainProfile | null;
+  after: LearnerBrainProfile;
+  source: BrainProfileChangeSource;
+}): Promise<void> {
+  const { before, after, source } = input;
+  try {
+    const hadReviewable =
+      before != null && (before.cloneStage === "cloned" || before.cloneStage === "approved");
+    const becameCloned =
+      after.cloneStage === "cloned" || after.cloneStage === "approved";
+
+    // 1) First clone → SCREEN 0. Deduped: only when there was no reviewable
+    //    profile before (a true first transition into cloned).
+    if (!hadReviewable && becameCloned && after.cloneStage === "cloned") {
+      await notifyBrainProfileReady(after);
+      return;
+    }
+
+    // 2) Subsequent change from a reviewable baseline → detect + record.
+    if (!hadReviewable || !before) return;
+    const learner = await getLearner(after.learnerId, after.tenantId);
+    const learnerName = learner?.displayName ?? "your learner";
+    const delta = detectBrainProfileChange({
+      before: before.state,
+      after: after.state,
+      source,
+      learnerName,
+    });
+    if (!delta) return;
+
+    await recordBrainProfileChange({
+      tenantId: after.tenantId,
+      learnerId: after.learnerId,
+      brainProfileId: after.id,
+      revision: after.revision,
+      kind: delta.kind,
+      fields: delta.fields,
+      summary: delta.summary,
+      source,
+      requiresAck: delta.requiresAck,
+    });
+
+    // Structural changes notify the parent (mastery flows freely — no notice).
+    if (delta.requiresAck) {
+      await notifyBrainProfileChanged(after, delta.summary);
+    }
+  } catch (err) {
+    logger.warn({
+      event: "brain_profile_change.capture_failed",
+      learnerId: after.learnerId,
+      tenantId: after.tenantId,
+      source,
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
+
+/**
+ * Sprint C-13 — SCREEN 0: notify the primary parent that the profile is ready
+ * for first review. In-app + email (the `brain_profile_ready` type's default
+ * preference enables both); the parent's saved preferences are honored by
+ * `createNotification`'s per-channel gating. Best-effort.
+ */
+async function notifyBrainProfileReady(profile: LearnerBrainProfile): Promise<void> {
+  const parentId = await getPersistence().learners.findPrimaryParent(
+    profile.learnerId,
+    profile.tenantId,
+  );
+  if (!parentId) return;
+  const learner = await getLearner(profile.learnerId, profile.tenantId);
+  const name = learner?.displayName ?? "your learner";
+  await createNotification({
+    tenantId: profile.tenantId,
+    userId: parentId,
+    type: "brain_profile_ready",
+    title: `${name}'s learning profile is ready`,
+    body: `${name} finished their Discovery Adventure. We've drafted ${name}'s learning profile — it's waiting for you to review it.`,
+    href: `/parent/learners/${profile.learnerId}/brain-clone-watch`,
+    learnerId: profile.learnerId,
+  });
+}
+
+/**
+ * Sprint C-13 — notify the primary parent that the profile MEANINGFULLY (i.e.
+ * structurally) changed since they approved it. In-app + email, with the
+ * plain-language delta summary and a link to the change timeline. Best-effort.
+ */
+async function notifyBrainProfileChanged(
+  profile: LearnerBrainProfile,
+  summary: string,
+): Promise<void> {
+  const parentId = await getPersistence().learners.findPrimaryParent(
+    profile.learnerId,
+    profile.tenantId,
+  );
+  if (!parentId) return;
+  const learner = await getLearner(profile.learnerId, profile.tenantId);
+  const name = learner?.displayName ?? "your learner";
+  await createNotification({
+    tenantId: profile.tenantId,
+    userId: parentId,
+    type: "brain_profile_changed",
+    title: `We adjusted ${name}'s supports — take a look`,
+    body: summary,
+    href: `/parent/learners/${profile.learnerId}/brain-timeline`,
+    learnerId: profile.learnerId,
+  });
 }
 
 /**
@@ -5709,13 +5919,28 @@ const DEFAULT_NOTIFICATION_TYPES: NotificationType[] = [
   "data_request_completed",
   "billing_notice",
   "safety_review_required",
+  // Sprint C-13 — brain evolution notifications.
+  "brain_profile_ready",
+  "brain_profile_changed",
 ];
+
+/** Types that default to ALSO emailing (in addition to in-app). The C-13 brain
+ *  notifications are care-not-surveillance moments worth one warm email: the
+ *  profile being ready for first review (SCREEN 0) and a structural change the
+ *  parent should re-acknowledge. Mastery moves never get here — they are never
+ *  their own notification. The parent can opt out of either channel. */
+const EMAIL_BY_DEFAULT: ReadonlySet<NotificationType> = new Set<NotificationType>([
+  "parent_progress_summary",
+  "safety_review_required",
+  "brain_profile_ready",
+  "brain_profile_changed",
+]);
 
 function defaultPreferenceMap(): Record<string, boolean> {
   const m: Record<string, boolean> = {};
   for (const t of DEFAULT_NOTIFICATION_TYPES) {
     m[`${t}:in_app`] = true;
-    m[`${t}:email`] = t === "parent_progress_summary" || t === "safety_review_required";
+    m[`${t}:email`] = EMAIL_BY_DEFAULT.has(t);
     m[`${t}:push`] = false;
   }
   return m;

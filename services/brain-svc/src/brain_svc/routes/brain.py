@@ -15,6 +15,10 @@ from brain_svc.contracts.approval_contract import (
     BrainProfileApprovalRecord,
     assert_can_teach,
 )
+from brain_svc.contracts.change_contract import (
+    BrainProfileChangeRecord,
+    change_requires_ack,
+)
 
 LEARNING_SVC_URL = os.environ.get("LEARNING_SVC_URL", "http://localhost:3005")
 RECOMMENDATION_SVC_URL = os.environ.get(
@@ -117,6 +121,73 @@ def _to_camel_case(data: dict) -> dict:
                 pass
         result[camel_key] = value
     return result
+
+
+def _emit_brain_change(
+    db: Session,
+    *,
+    tenant_id: str,
+    learner_id: str,
+    brain_profile_id: str,
+    revision: int,
+    kind: str,
+    fields: list,
+    summary: str,
+    source: str,
+) -> None:
+    """Sprint C-13 — write one shared-shape change record to the cross-stack
+    ``brain_profile_changes`` table (the same table web-v2 reads for the "what
+    changed since you approved" timeline; in production both stacks share one
+    Postgres). Validated through ``BrainProfileChangeRecord`` so a drift from the
+    shared contract is caught here, not downstream. ``requires_ack`` is the
+    contract-derived structural flag — never set ad-hoc. Caller commits.
+
+    Best-effort by contract: a change-capture failure must never break the
+    mutation that triggered it (the brain must keep working). The
+    ``brain_profile_changes`` table may not exist in every legacy schema, so the
+    insert is guarded.
+    """
+    record = BrainProfileChangeRecord(
+        id=str(uuid.uuid4()),
+        tenantId=str(tenant_id or ""),
+        learnerId=str(learner_id),
+        brainProfileId=str(brain_profile_id),
+        revision=int(revision or 1),
+        kind=kind,
+        fields=list(fields or []),
+        summary=summary,
+        source=source,
+        requiresAck=change_requires_ack(kind),
+        ackedAt=None,
+        reminderSentAt=None,
+        createdAt=_utcnow().isoformat(),
+    )
+    try:
+        db.execute(
+            text(
+                """INSERT INTO brain_profile_changes
+                    (id, tenant_id, learner_id, brain_profile_id, revision, kind,
+                     fields, summary, source, requires_ack, acked_at,
+                     reminder_sent_at, created_at)
+                    VALUES (:id, :tid, :lid, :bpid, :rev, :kind, :fields, :summary,
+                            :source, :req, NULL, NULL, :now)"""
+            ),
+            {
+                "id": record.id,
+                "tid": record.tenantId,
+                "lid": record.learnerId,
+                "bpid": record.brainProfileId,
+                "rev": record.revision,
+                "kind": record.kind,
+                "fields": json.dumps(record.fields),
+                "summary": record.summary,
+                "source": record.source,
+                "req": record.requiresAck,
+                "now": record.createdAt,
+            },
+        )
+    except Exception:  # pragma: no cover — table may be absent in legacy schema
+        return
 
 @router.post("/clone")
 async def clone_brain_endpoint(request: BrainCloneRequest, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
@@ -883,6 +954,25 @@ async def rollback_brain(learner_id: str, request: BrainRollbackRequest, db: Ses
         }
     )
 
+    # Sprint C-13: a rollback restores an earlier profile — supports, tutors and
+    # functioning level can all shift — so it is a STRUCTURAL change the parent
+    # should re-acknowledge. Emit a shared-shape change record to the timeline.
+    _emit_brain_change(
+        db,
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=learner_id,
+        brain_profile_id=str(current["id"]) if current else "",
+        revision=new_version,
+        kind="structural",
+        fields=["activeAccommodations", "activeTutors", "functioningLevel"],
+        summary=(
+            "This learner's profile was restored to an earlier version. "
+            "Their supports, tutors and learning pace were set back to how they "
+            "were at that point — take a look and confirm it's right."
+        ),
+        source="rollback",
+    )
+
     db.commit()
     return {"status": "rolled_back", "version": new_version, "snapshot_id": new_snap_id}
 
@@ -1061,6 +1151,93 @@ async def check_regression(learner_id: str, db: Session = Depends(get_db), auth:
         "regressionsDetected": len(regressions),
         "regressions": regressions,
     }
+
+
+# Sprint C-13 — domain → warm parent label + a constructive, non-alarmist next
+# step. Regression detections must read as care, never as a deficit verdict, so
+# a stored `causal_analyses` hypothesis ("Mastery in {domain} dropped by {x}%…")
+# is NEVER shown raw to a parent — it is rewritten through this map.
+_DOMAIN_PARENT_LABEL = {
+    "math": "math", "mathematics": "math",
+    "ela": "reading and writing", "english": "reading and writing",
+    "reading": "reading", "writing": "writing",
+    "science": "science", "history": "history",
+    "social_studies": "social studies",
+    "coding": "coding", "speech": "speech and language",
+    "language": "language", "sel": "social-emotional skills",
+}
+
+
+def _parent_regression_label(domain: str) -> str:
+    key = (domain or "").lower()
+    return _DOMAIN_PARENT_LABEL.get(key, (domain or "this area").replace("_", " "))
+
+
+@router.get("/{learner_id}/regression-insights")
+async def get_regression_insights(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    """Sprint C-13 — parent-readable regression insights.
+
+    Surfaces the detector's `causal_analyses` rows as warm, plain-language
+    cards instead of leaving them as unread DB rows. The raw hypothesis ("Mastery
+    in {domain} dropped by {x}%…") is rewritten to a strengths-respecting,
+    never-alarmist message ALWAYS paired with a constructive next step.
+
+    Scoped per C-02: `_verify_parent_access` (parent / admin / service only) —
+    a regression insight reveals a learning-difficulty signal, which a teacher
+    must not read (the disability-signal rule). This is deliberately stricter
+    than the engagement/context reads, which use `verify_learner_access`.
+    """
+    _verify_parent_access(db, auth, learner_id)
+
+    learner = db.execute(
+        text("SELECT name FROM learners WHERE id = :lid"),
+        {"lid": learner_id},
+    ).mappings().first()
+    name = (learner or {}).get("name") or "your learner"
+
+    rows = db.execute(
+        text(
+            """SELECT id, domain, mastery_drop, previous_mastery, current_mastery,
+                      hypothesis, confidence, status, created_at
+               FROM causal_analyses
+               WHERE learner_id = :lid AND status = 'DETECTED'
+               ORDER BY created_at DESC LIMIT 10"""
+        ),
+        {"lid": learner_id},
+    ).mappings().all()
+
+    insights = []
+    for r in rows:
+        area = _parent_regression_label(r.get("domain"))
+        # Warm, non-alarmist headline + body. We frame a dip as a normal,
+        # temporary fluctuation and lead with what we'll do about it.
+        headline = f"We're giving {name} some extra practice in {area}"
+        body = (
+            f"{name}'s {area} has dipped a little recently. Dips like this are a "
+            f"normal part of learning — they often bounce back with a bit of "
+            f"focused practice. We've already started weaving more {area} into "
+            f"{name}'s lessons."
+        )
+        next_step = (
+            f"Nothing for you to do right now. If you've noticed anything going on "
+            f"for {name} lately — a change in routine, sleep, or mood — adding a "
+            f"quick note helps us understand the bigger picture."
+        )
+        insights.append({
+            "id": r.get("id"),
+            "domain": r.get("domain"),
+            "area": area,
+            "headline": headline,
+            "body": body,
+            "nextStep": next_step,
+            "createdAt": (
+                r["created_at"].isoformat()
+                if hasattr(r.get("created_at"), "isoformat")
+                else r.get("created_at")
+            ),
+        })
+
+    return {"learnerId": learner_id, "insights": insights}
 
 
 @router.post("/{learner_id}/engagement")

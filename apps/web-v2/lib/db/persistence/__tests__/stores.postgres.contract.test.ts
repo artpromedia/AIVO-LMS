@@ -17,6 +17,7 @@ import { createDb, type Database } from "@aivo/db";
 import { __setDbClient, __resetDbClient } from "../drizzle/client";
 import { drizzleBrainProfiles } from "../drizzle/brain-profiles";
 import { drizzleBrainProfileApprovals } from "../drizzle/brain-profile-approvals";
+import { drizzleBrainProfileChanges } from "../drizzle/brain-profile-changes";
 import { drizzleLessonRuns } from "../drizzle/lesson-runs";
 import { drizzleNotifications } from "../drizzle/notifications";
 import { drizzleAudit } from "../drizzle/audit";
@@ -30,6 +31,7 @@ import { drizzleAdmin } from "../drizzle/admin";
 import { drizzleCollaboration } from "../drizzle/collaboration";
 import { brainProfileStoreContract } from "./contract/brain-profiles.contract";
 import { brainProfileApprovalStoreContract } from "./contract/brain-profile-approvals.contract";
+import { brainProfileChangeStoreContract } from "./contract/brain-profile-changes.contract";
 import { lessonRunStoreContract } from "./contract/lesson-runs.contract";
 import { assessmentSubmitContract } from "./contract/assessments.contract";
 import { collaborationStoreContract } from "./contract/collaboration.contract";
@@ -66,6 +68,9 @@ const MIGRATIONS = [
   // C-12 (ADR 0042) FERPA child-profile disclosure log (web side). No RLS —
   // sibling of web_disclosure_logs / web_iep_doc_access_logs.
   "0114_web_child_profile_disclosures",
+  // C-13 brain-profile change records — sibling of brain_profile_approvals
+  // (0108). No RLS; tenant-filtered in app code.
+  "0115_brain_profile_changes",
 ];
 
 const TABLES = [
@@ -75,6 +80,7 @@ const TABLES = [
   "lesson_runs",
   "learner_brain_profiles",
   "brain_profile_approvals",
+  "brain_profile_changes",
   "web_notifications",
   "web_notification_deliveries",
   "web_audit_logs",
@@ -153,6 +159,7 @@ if (TEST_URL) {
   const P = "postgres";
   brainProfileStoreContract(P, () => drizzleBrainProfiles, truncateAll);
   brainProfileApprovalStoreContract(P, () => drizzleBrainProfileApprovals, truncateAll);
+  brainProfileChangeStoreContract(P, () => drizzleBrainProfileChanges, truncateAll);
   lessonRunStoreContract(P, () => drizzleLessonRuns, truncateAll);
   notificationStoreContract(P, () => drizzleNotifications, truncateAll);
   auditStoreContract(P, () => drizzleAudit, truncateAll);

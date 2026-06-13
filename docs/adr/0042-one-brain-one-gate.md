@@ -205,7 +205,20 @@ Concretely:
     inherit a still-thin family-svc consent surface.
 - **Neutral / follow-ups:**
   - C-13 (re-approval thresholds, parent change-notifications) consumes this
-    contract and the revision semantics.
+    contract and the revision semantics. **Now landed**: C-13 adds a sibling
+    *change contract* (`packages/db/src/schema/change-contract.ts` ↔
+    `services/brain-svc/src/brain_svc/contracts/change_contract.py`, parity-tested
+    on both sides like the approval contract) defining the `brain_profile_changes`
+    record shape, the `mastery | structural` kinds, and the invariant
+    `requiresAck ⇔ structural`. A structural change (functioning level,
+    accommodations, tutor activation, IEP-derived shift) sets `requiresAck` on the
+    DELTA and notifies the parent; mastery changes flow freely. The
+    acknowledgement window is **14 days** (`BRAIN_CHANGE_ACK_WINDOW_DAYS`),
+    **non-blocking** — it never revokes teaching (the C-01/D-gate predicate is
+    unaffected); on lapse the un-acked delta escalates from one 7-day digest
+    reminder (`BRAIN_CHANGE_REMINDER_AFTER_DAYS`) to a persistent in-app badge.
+    Change records anchor to the same `revision` the approval record keys off, so
+    the "what changed since you approved" timeline interleaves both on one spine.
   - tutor-svc still does not re-check approval. It does not initialise lesson
     paths (learning-svc does), so it is not a teach-gate entry point today; if a
     future tutor-svc route ever becomes one, it must call the same

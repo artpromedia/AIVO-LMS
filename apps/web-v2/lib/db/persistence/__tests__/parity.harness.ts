@@ -49,6 +49,7 @@ const TABLES = [
   "lesson_runs",
   "learner_brain_profiles",
   "brain_profile_approvals",
+  "brain_profile_changes",
   "web_notifications",
   "web_notification_deliveries",
   "web_audit_logs",

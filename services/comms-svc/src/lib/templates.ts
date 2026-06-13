@@ -83,6 +83,12 @@ export function renderTemplate(
       return renderContributionNudge(data);
     case "invite_expiry_warning":
       return renderInviteExpiryWarning(data);
+    case "brain_profile_ready":
+      return renderBrainProfileReady(data);
+    case "brain_profile_changed":
+      return renderBrainProfileChanged(data);
+    case "brain_changes_reminder":
+      return renderBrainChangesReminder(data);
     case "iep_in_review_parent":
       return renderIepInReviewParent(data);
     case "iep_finalised_parent":
@@ -473,6 +479,92 @@ function renderInviteExpiryWarning(data: TemplateData) {
   };
 }
 
+// Sprint C-13 — SCREEN 0: the drafted learning profile is ready for first
+// review. Warm, single CTA, no jargon. Copy intent per report §4.2:
+// "Maya finished her Discovery Adventure. AIVO has drafted her learning
+// profile — it's waiting for you to review it." CTA "See what we learned."
+function renderBrainProfileReady(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "your learner";
+  const reviewUrl = (data.reviewUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const html = baseLayout(`
+    <h1 class="title">${learnerName}'s learning profile is ready</h1>
+    <p class="body-text"><strong>${learnerName}</strong> finished their Discovery Adventure. We've drafted ${learnerName}'s learning profile — it's waiting for you to review it.</p>
+    <p class="body-text">You'll see what we learned about how ${learnerName} likes to learn, the supports we suggest, and where they're already strong. Nothing starts until you've had a look and approved it.</p>
+    <p style="text-align:center"><a href="${reviewUrl}" class="btn">See what we learned</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">Take your time — there's no deadline.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these emails, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+  return {
+    subject: `${learnerName}'s learning profile is ready for you to review`,
+    html,
+    text: `${learnerName} finished their Discovery Adventure. We've drafted ${learnerName}'s learning profile — it's waiting for you to review it. See what we learned: ${reviewUrl}${
+      unsubscribeUrl ? `\n\nTo stop these emails: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
+// Sprint C-13 — a structural change landed after approval (supports/level/team
+// shift). Honest about what changed and why, strengths-respecting, one CTA to
+// the change timeline where the parent can review + acknowledge or adjust.
+function renderBrainProfileChanged(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "your learner";
+  const summary = (data.summary as string) || `We adjusted ${learnerName}'s supports.`;
+  const reviewUrl = (data.reviewUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const html = baseLayout(`
+    <h1 class="title">We adjusted ${learnerName}'s supports — take a look</h1>
+    <p class="body-text">${summary}</p>
+    <p class="body-text">${learnerName}'s lessons are carrying on as usual. When you have a moment, have a look at what changed and let us know it looks right — or adjust it.</p>
+    <p style="text-align:center"><a href="${reviewUrl}" class="btn">See what changed</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">There's no rush, and nothing is paused.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these emails, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+  return {
+    subject: `A quick update to ${learnerName}'s learning profile`,
+    html,
+    text: `${summary}\n\n${learnerName}'s lessons are carrying on as usual. See what changed and confirm it looks right (or adjust it): ${reviewUrl}${
+      unsubscribeUrl ? `\n\nTo stop these emails: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
+// Sprint C-13 — the gentle digest reminder for structural changes that have sat
+// un-acknowledged for a week. One reminder per change (ledger-capped). Never
+// nagging: the window is non-blocking and lessons keep running.
+function renderBrainChangesReminder(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "your learner";
+  const count = data.count != null ? Number(data.count) : 1;
+  const reviewUrl = (data.reviewUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const changeWord = count === 1 ? "an update" : `${count} updates`;
+  const itWord = count === 1 ? "it" : "them";
+  const html = baseLayout(`
+    <h1 class="title">${changeWord.charAt(0).toUpperCase() + changeWord.slice(1)} to ${learnerName}'s profile is waiting for you</h1>
+    <p class="body-text">A little while ago we adjusted ${learnerName}'s learning profile, and ${itWord} ${count === 1 ? "is" : "are"} still waiting for your review.</p>
+    <p class="body-text">Nothing is paused — ${learnerName}'s lessons are running as usual. Reviewing takes a moment and helps us keep the profile matched to ${learnerName}.</p>
+    <p style="text-align:center"><a href="${reviewUrl}" class="btn">Review what changed</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">This is the only reminder we'll send about ${itWord}.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these emails, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+  return {
+    subject: `${changeWord.charAt(0).toUpperCase() + changeWord.slice(1)} to ${learnerName}'s profile is waiting for your review`,
+    html,
+    text: `A little while ago we adjusted ${learnerName}'s learning profile, and ${itWord} ${count === 1 ? "is" : "are"} still waiting for your review. Nothing is paused. Review: ${reviewUrl}${
+      unsubscribeUrl ? `\n\nTo stop these emails: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
 function renderStaffCredentials(data: TemplateData) {
   const name = (data.name as string) || "there";
   const roleLabel = (data.roleLabel as string) || "staff member";
@@ -734,6 +826,9 @@ export const AVAILABLE_TEMPLATES = [
   { id: "teacher_invite_parent", name: "Teacher → Parent Invite", channels: ["email"] },
   { id: "contribution_nudge", name: "Team Contribution Nudge", channels: ["email"] },
   { id: "invite_expiry_warning", name: "Invite Expiry Warning", channels: ["email"] },
+  { id: "brain_profile_ready", name: "Learning Profile Ready (Screen 0)", channels: ["email", "in_app"] },
+  { id: "brain_profile_changed", name: "Learning Profile Changed", channels: ["email", "in_app"] },
+  { id: "brain_changes_reminder", name: "Profile Change Review Reminder", channels: ["email"] },
   { id: "iep_in_review_parent", name: "IEP — In Review (Parent)", channels: ["email"] },
   { id: "iep_finalised_parent", name: "IEP — Finalised (Parent)", channels: ["email"] },
   { id: "iep_comment_mention", name: "IEP — Comment Mention", channels: ["email"] },

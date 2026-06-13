@@ -632,6 +632,74 @@ export type BrainProfileApproval = {
 };
 
 /**
+ * Sprint C-13 — the kind of change a `LearnerBrainProfileChange` records.
+ *
+ *   mastery    — a per-domain mastery level moved. These flow freely: recorded
+ *                for the timeline, but never demand re-acknowledgement and never
+ *                fire an email (`requiresAck: false`).
+ *   structural — functioning level, accommodations added/removed, tutor
+ *                activation, or an IEP-derived shift. These notify the parent
+ *                and set `requiresAck: true` on the DELTA — non-blocking (the
+ *                approved profile keeps teaching), acknowledgement within an
+ *                N-day window (BRAIN_CHANGE_ACK_WINDOW_DAYS).
+ */
+export type BrainProfileChangeKind = "mastery" | "structural";
+
+/**
+ * Sprint C-13 — where a brain-profile change originated. Drives the
+ * plain-language source line on the timeline ("recommended after her last 3
+ * reading sessions") and lets the digest job scope its reminders. Parent-
+ * authored corrections (C-05) are deliberately NOT a source here: an amendment
+ * the parent made themselves is never a notify-to-self.
+ */
+export type BrainProfileChangeSource =
+  | "baseline_reclone" // a new baseline rebuilt the profile (web re-clone)
+  | "regenerate" // the parent/system regenerated from current inputs
+  | "iep_update" // an IEP upload/extraction shifted supports
+  | "engagement_sync" // learning activity moved mastery (brain-svc engagement)
+  | "regression_detected" // a regression detector flagged a mastery drop
+  | "amendment" // brain-svc parent amendment (recorded, never requiresAck)
+  | "rollback"; // a guardian rolled the profile back to an earlier snapshot
+
+/**
+ * Sprint C-13 — one recorded change to a learner's brain profile, newest-first
+ * on the "what changed since you approved" timeline. The Learning Brain stops
+ * changing silently: a structural change (functioning level, accommodations,
+ * tutors, IEP-derived) is captured here with `requiresAck: true` and notifies
+ * the parent; a mastery change is captured with `requiresAck: false` (cheap,
+ * enables the timeline) and flows freely.
+ *
+ * Shared-shape with brain-svc where practical (the C-12-aligned change contract
+ * in `@aivo/db` `change-contract.ts` / brain-svc `contracts/change_contract.py`)
+ * — the camelCase record fields below are the cross-stack wire shape. Anchored
+ * to the same `revision` the C-06 `BrainProfileApproval` keys off, so the
+ * timeline can interleave changes and approvals on one spine.
+ */
+export type LearnerBrainProfileChange = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  brainProfileId: ID;
+  /** The `LearnerBrainProfile.revision` this change produced. */
+  revision: number;
+  kind: BrainProfileChangeKind;
+  /** The changed field paths (e.g. ["accommodation.read_aloud", "functioningLevel"]). */
+  fields: string[];
+  /** Plain-language, strengths-first summary of what changed and why. */
+  summary: string;
+  source: BrainProfileChangeSource;
+  /** True only for structural changes — the parent must acknowledge the delta. */
+  requiresAck: boolean;
+  /** When the parent acknowledged this delta; null while pending. */
+  ackedAt: ISODate | null;
+  /** Sprint C-13 — when the 7-day digest reminder was sent for this change;
+   *  null until the comms-svc reminder job latches it (one reminder per change,
+   *  ledger-capped). Only ever set for structural (`requiresAck`) rows. */
+  reminderSentAt: ISODate | null;
+  createdAt: ISODate;
+};
+
+/**
  * Per-learner accessibility preferences. The preference fields are the
  * canonical `AccessibilityProfile` from @aivo/accessibility-contract (the same
  * model the mobile client and the BFF Zod schema derive from); this type only
@@ -2329,7 +2397,12 @@ export type NotificationType =
   | "iep_extraction_ready"
   | "data_request_completed"
   | "billing_notice"
-  | "safety_review_required";
+  | "safety_review_required"
+  // Sprint C-13 — brain evolution:
+  /** SCREEN 0 — the drafted profile is ready for first review. */
+  | "brain_profile_ready"
+  /** A structural change landed; the parent should review + acknowledge it. */
+  | "brain_profile_changed";
 
 export type NotificationChannel = "in_app" | "email" | "push";
 

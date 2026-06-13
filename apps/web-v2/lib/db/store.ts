@@ -29,6 +29,7 @@ import type {
   LearnerBadge,
   LearnerBrainProfile,
   BrainProfileApproval,
+  LearnerBrainProfileChange,
   LearnerEngagement,
   LearnerProfile,
   LearnerSensoryProfile,
@@ -162,6 +163,10 @@ export type Store = {
   brainProfiles: Map<string, LearnerBrainProfile>;
   /** Sprint C-06: append-only parent approval/amend/decline records. */
   brainProfileApprovals: BrainProfileApproval[];
+  /** Sprint C-13: append-only brain-profile change records (mastery|structural)
+   *  powering the "what changed since you approved" timeline. `ackedAt` is the
+   *  one mutable field, set when the parent acknowledges a structural delta. */
+  brainProfileChanges: LearnerBrainProfileChange[];
 
   subjects: Map<string, Subject>;
   skills: Map<string, Skill>;
@@ -341,6 +346,7 @@ function createStore(): Store {
     accommodationSummaries: new Map(),
     brainProfiles: new Map(),
     brainProfileApprovals: [],
+    brainProfileChanges: [],
     subjects: new Map(),
     skills: new Map(),
     masteryMaps: new Map(),

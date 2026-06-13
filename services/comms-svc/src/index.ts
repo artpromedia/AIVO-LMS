@@ -18,6 +18,7 @@ import {
   runContributionNudgeForScheduler,
   runExpiryWarningForScheduler,
 } from "./lib/inviteReminderService.js";
+import { runBrainChangeReminderForScheduler } from "./lib/brainChangeReminderService.js";
 import { setEmailOutboxDb } from "./lib/postmark.js";
 import { recordProviderEvent } from "./lib/email-outbox.js";
 import { startEmailOutboxWorker, type EmailWorkerHandle } from "./lib/email-worker.js";
@@ -109,6 +110,19 @@ async function start() {
     ledger,
     log: logger,
     run: () => runExpiryWarningForScheduler(db),
+  });
+
+  // Sprint C-13: brain-profile change review reminder. A structural change the
+  // parent hasn't acknowledged within 7 days gets ONE warm reminder, latched
+  // per-change on `reminder_sent_at` so it never repeats; opt-out honored via
+  // the parent's brain_profile_changed email preference. Non-blocking: lessons
+  // keep running; window expiry escalates to a persistent in-app badge web-side.
+  startSafeCron({
+    jobName: "comms.brain-change-review-reminder",
+    lock,
+    ledger,
+    log: logger,
+    run: () => runBrainChangeReminderForScheduler(db),
   });
 
   // Durable email outbox drainer. One replica wins the advisory lock and

@@ -34,6 +34,57 @@ export interface BrainSvcContext {
 }
 
 /**
+ * Sprint C-13 — one parent-readable regression insight (a `causal_analyses`
+ * row rewritten to warm, non-alarmist parent language with a constructive next
+ * step). The shape brain-svc's `/regression-insights` returns.
+ */
+export interface RegressionInsight {
+  id: string;
+  domain: string | null;
+  area: string;
+  headline: string;
+  body: string;
+  nextStep: string;
+  createdAt: string | null;
+}
+
+/**
+ * Read parent-readable regression insights for a learner from brain-svc
+ * (`GET /api/brain/{learnerId}/regression-insights`, parent-scoped per C-02).
+ *
+ * The LIVE web-v2 stack has NO regression source of its own — regression
+ * detection lives only in brain-svc — so this is the authorized BFF read the
+ * sprint calls for. When brain-svc is disabled (the default dev/demo path) or
+ * unavailable, there are simply no insights to show: return [] (lenient read,
+ * like `getBrainProfile`) so the timeline renders its empty state rather than
+ * erroring. The parent sees insight cards only where a real detection exists.
+ */
+export async function getRegressionInsights(
+  learnerId: string,
+  tenantId: string,
+  ctx: BrainSvcContext = {},
+): Promise<RegressionInsight[]> {
+  if (!brainSvcEnabled()) return [];
+  const result = await callService<{ insights: RegressionInsight[] }>({
+    service: "brain-svc",
+    baseUrl: serverEnv.BRAIN_SVC_URL,
+    url: `/api/brain/${encodeURIComponent(learnerId)}/regression-insights`,
+    headers: { "x-tenant-id": tenantId },
+    serviceToken: serverEnv.BRAIN_SVC_SERVICE_TOKEN,
+    requestId: ctx.requestId,
+    retries: 1,
+  });
+  if (result.ok) return result.data.insights ?? [];
+  logger.warn({
+    event: "service_call.degraded",
+    service: "brain-svc",
+    operation: "getRegressionInsights",
+    reason: result.reason,
+  });
+  return [];
+}
+
+/**
  * Read the current brain profile for a learner. Service path is
  * lenient: a service-side failure logs `service_call.degraded` and
  * falls back to the in-memory repo so dashboards keep loading.

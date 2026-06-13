@@ -308,7 +308,8 @@
       "regenerate_confirm_title": "重新生成此档案？",
       "regenerate_confirm_body": "重新生成会根据你当前的回答从头开始建立档案，并清除你已开始的查看内容，包括尚未批准的任何修正。在你批准新档案之前，{name} 的课程将保持暂停。",
       "regenerate_confirm_cta": "是的，重新生成",
-      "regenerate_confirm_cancel": "保留我现有的"
+      "regenerate_confirm_cancel": "保留我现有的",
+      "what_changed": "What changed since you approved"
     },
     "brain_review": {
       "eyebrow": "关于 {name} 的确认",
@@ -902,6 +903,37 @@
       "remove_confirm": "Yes, remove",
       "remove_cancel": "Keep",
       "remove_removing": "Removing…"
+    },
+    "learner_brain_timeline": {
+      "eyebrow": "What's changed for {name}",
+      "page_title": "What changed since you approved",
+      "page_description": "A clear record of how {name}'s learning profile has changed over time. We'll tell you whenever something meaningful shifts.",
+      "back_to_profile": "Back to profile",
+      "review_changes_cta": "Review & adjust",
+      "empty_title": "No changes since you approved",
+      "empty_body": "Nothing has shifted in {name}'s profile yet. We'll tell you here when something meaningful changes — and you'll never have to go looking.",
+      "pending_badge": "Needs your review",
+      "acked_badge": "Reviewed",
+      "mastery_badge": "Progress update",
+      "approval_badge": "You approved",
+      "amended_badge": "You adjusted",
+      "declined_badge": "You set aside",
+      "ack_cta": "Got it, looks right",
+      "ack_done": "Reviewed",
+      "ack_error": "We couldn't save that just now. Please try again.",
+      "adjust_hint": "Want to change something instead? You can adjust {name}'s profile any time.",
+      "adjust_cta": "Adjust this profile",
+      "pending_window_note": "Take your time — {name}'s lessons keep running while you review this.",
+      "approval_summary": "You reviewed and approved {name}'s profile.",
+      "amended_summary": "You reviewed and adjusted {name}'s profile.",
+      "declined_summary": "You set this profile aside to rebuild it.",
+      "revision_label": "Profile v{revision}",
+      "insights_title": "Things we're keeping an eye on",
+      "insights_hint": "Gentle observations — never alarms. Each one comes with what we're already doing about it.",
+      "insight_next_step_label": "What happens next",
+      "section_changes": "Change history",
+      "pending_summary_one": "1 change is waiting for your review.",
+      "pending_summary_other": "{count} changes are waiting for your review."
     }
   },
   "brain_clone": {

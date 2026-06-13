@@ -15,6 +15,7 @@ import {
   getIEPForLearner,
   getLearner,
   getOrCreateParentAssessment,
+  listPendingStructuralChanges,
   listSubjects,
   parentCanAccessLearner,
   refreshLearnerReadiness,
@@ -166,6 +167,14 @@ export default async function BrainProfilePage({
 
   const s = profile.state;
 
+  // C-13: the persistent in-app badge — un-acked structural changes show a
+  // count on the "what changed" link until the parent acknowledges them. This
+  // is what the N-day window escalates to; it never blocks teaching.
+  const pendingChanges =
+    profile.cloneStage !== "pre_clone"
+      ? (await listPendingStructuralChanges(learner.id, session.tenantId)).length
+      : 0;
+
   return (
     <AppShell
       role="parent"
@@ -178,15 +187,32 @@ export default async function BrainProfilePage({
         title={t("page_title")}
         description="Generated from your assessment and any IEP you shared. You can re-generate at any time after updating your inputs."
         actions={
-          <RegenerateConfirm
-            learnerId={learner.id}
-            regenerateAction={regenerateAction}
-            triggerLabel={t("regenerate")}
-            title={t("regenerate_confirm_title")}
-            body={t("regenerate_confirm_body", { name: learner.displayName })}
-            confirmLabel={t("regenerate_confirm_cta")}
-            cancelLabel={t("regenerate_confirm_cancel")}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            {/* C-13: the change timeline is reachable once a clone exists. The
+                pending-ack count is the persistent badge the N-day window
+                escalates to — visible until the parent acknowledges. */}
+            {profile.cloneStage !== "pre_clone" ? (
+              <Button variant="outline" asChild>
+                <Link href={`/parent/learners/${learner.id}/brain-timeline`}>
+                  {t("what_changed")}
+                  {pendingChanges > 0 ? (
+                    <Badge tone="primary" className="ml-2">
+                      {pendingChanges}
+                    </Badge>
+                  ) : null}
+                </Link>
+              </Button>
+            ) : null}
+            <RegenerateConfirm
+              learnerId={learner.id}
+              regenerateAction={regenerateAction}
+              triggerLabel={t("regenerate")}
+              title={t("regenerate_confirm_title")}
+              body={t("regenerate_confirm_body", { name: learner.displayName })}
+              confirmLabel={t("regenerate_confirm_cta")}
+              cancelLabel={t("regenerate_confirm_cancel")}
+            />
+          </div>
         }
       />
 

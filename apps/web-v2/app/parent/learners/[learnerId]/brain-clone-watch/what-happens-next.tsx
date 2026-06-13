@@ -15,9 +15,9 @@
  * immediately (no ramp).
  *
  * Then the panel: the learner's first step (handles ready/blocked), the active
- * supports summary, and an "invite teacher" CTA. The reassurance line only
- * claims what is true NOW ("you can review this profile anytime") — change
- * notifications are C-13 and out of scope, so we never promise them.
+ * supports summary, and an "invite teacher" CTA. The reassurance line now claims
+ * the change-notification promise C-13 makes true ("You'll get a note when this
+ * profile meaningfully changes — and you can review it anytime").
  */
 import { useEffect, useState } from "react";
 import Link from "next/link";

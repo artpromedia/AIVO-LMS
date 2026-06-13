@@ -84,6 +84,7 @@ import type {
   AccessibilityPreferences,
   LearnerBrainProfile,
   BrainProfileApproval,
+  LearnerBrainProfileChange,
   LearnerProfile,
   LessonInteraction,
   LessonRun,
@@ -424,6 +425,33 @@ export interface BrainProfileStore {
 export interface BrainProfileApprovalStore {
   record(approval: BrainProfileApproval): Promise<BrainProfileApproval>;
   listForLearner(learnerId: string, tenantId: string): Promise<BrainProfileApproval[]>;
+}
+
+/**
+ * Sprint C-13 — the brain-profile change-record store. Append-only except for
+ * the one `ackedAt` mutation: `record` writes a new change row; `listForLearner`
+ * returns the tenant-scoped history newest-first; `ack` stamps `ackedAt` on a
+ * pending structural delta (idempotent — re-acking returns the row unchanged);
+ * `listPendingStructural` returns un-acked structural changes (drives the
+ * persistent in-app badge after the N-day window). Powers the "what changed
+ * since you approved" timeline.
+ */
+export interface BrainProfileChangeStore {
+  record(change: LearnerBrainProfileChange): Promise<LearnerBrainProfileChange>;
+  listForLearner(learnerId: string, tenantId: string): Promise<LearnerBrainProfileChange[]>;
+  /** Stamp `ackedAt` on a pending structural change. Returns the updated row,
+   *  or null if the id isn't a pending structural change for this learner. */
+  ack(
+    id: string,
+    learnerId: string,
+    tenantId: string,
+    ackedAt: string,
+  ): Promise<LearnerBrainProfileChange | null>;
+  /** Un-acked structural changes for a learner, newest-first. */
+  listPendingStructural(
+    learnerId: string,
+    tenantId: string,
+  ): Promise<LearnerBrainProfileChange[]>;
 }
 
 /**
@@ -900,6 +928,7 @@ export interface Persistence {
   lessonRuns: LessonRunStore;
   brainProfiles: BrainProfileStore;
   brainProfileApprovals: BrainProfileApprovalStore;
+  brainProfileChanges: BrainProfileChangeStore;
   curriculum: CurriculumStore;
   compliance: ComplianceStore;
   quests: QuestStore;

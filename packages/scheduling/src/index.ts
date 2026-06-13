@@ -371,6 +371,14 @@ export const JOB_REGISTRY: JobRegistryEntry[] = [
     periodMs: DEFAULT_PERIOD_MS,
   },
   {
+    jobName: "comms.brain-change-review-reminder",
+    service: "comms-svc",
+    description:
+      "Remind a parent once about a structural brain-profile change they haven't " +
+      "acknowledged within 7 days (latched per change; opt-out honored; non-blocking).",
+    periodMs: DEFAULT_PERIOD_MS,
+  },
+  {
     jobName: "engagement.weekly-rollup",
     service: "engagement-svc",
     description: "Aggregate the previous week's XP into the per-learner rollup table.",
