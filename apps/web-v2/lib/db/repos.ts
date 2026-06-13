@@ -1853,6 +1853,7 @@ export type CreateLessonRunResult =
         | "subject_not_found"
         | "skill_not_found"
         | "brain_profile_missing"
+        | "brain_not_approved"
         | "generation_failed";
       message: string;
       lessonRun?: LessonRun;
@@ -1888,6 +1889,17 @@ export async function createLessonRun(
       ok: false,
       code: "brain_profile_missing",
       message: "Brain profile required before lesson generation",
+    };
+  }
+  // Sprint C-01 teach gate: nothing teaches from the brain before parent
+  // approval. The check lives HERE — not in routing — so every caller
+  // (today/start, quests, teacher assignments, creator pre-generation, any
+  // future path) inherits it instead of re-implementing it.
+  if (brain.cloneStage !== "approved") {
+    return {
+      ok: false,
+      code: "brain_not_approved",
+      message: "Brain profile awaiting parent approval before lesson generation",
     };
   }
 
@@ -2519,7 +2531,7 @@ export async function startQuestChapter(input: {
   | { ok: true; lessonRunId: string }
   | {
       ok: false;
-      code: "chapter_not_found" | "locked" | "lesson_failed";
+      code: "chapter_not_found" | "locked" | "brain_not_approved" | "lesson_failed";
       message: string;
     }
 > {
@@ -2564,9 +2576,11 @@ export async function startQuestChapter(input: {
     sourceRefId: chapter.id,
   });
   if (!result.ok) {
+    // Surface the teach gate distinctly so quest callers can render the
+    // calm waiting state instead of a generic failure.
     return {
       ok: false,
-      code: "lesson_failed",
+      code: result.code === "brain_not_approved" ? "brain_not_approved" : "lesson_failed",
       message: result.message ?? "Could not start quest lesson",
     };
   }

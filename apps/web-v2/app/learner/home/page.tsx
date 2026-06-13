@@ -112,7 +112,14 @@ async function startMissionAction(formData: FormData) {
     source: picked.mission.source,
     sourceRefId: picked.mission.sourceRefId,
   });
-  if (!result.ok) redirect("/learner/home?blocker=generation");
+  if (!result.ok) {
+    // C-01: the teach gate renders the calm waiting card, not a generic
+    // generation failure.
+    redirect(
+      "/learner/home?blocker=" +
+        (result.code === "brain_not_approved" ? "brain_not_approved" : "generation"),
+    );
+  }
   audit(session, "today.start", "page-action", {
     learnerId,
     metadata: {
@@ -469,6 +476,42 @@ export default async function LearnerHome({
                   </form>
                 }
               />
+            </div>
+          ) : blocker === "brain_not_approved" ? (
+            /* C-01 teach gate: calm, blame-free waiting card. The child gets
+               a real place to go (Calm Corner) — never the parent approval
+               page; a parent in learner view gets the approval link. */
+            <div
+              data-testid="mission-blocked-approval"
+              className="rounded-[28px] bg-white border border-iw-border/60 p-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center"
+            >
+              <AivoMascot expression="resting" size={96} className="shrink-0" />
+              <div className="flex flex-col gap-3">
+                <h2 className="text-2xl font-bold text-iw-text-strong">{t("blocked_title")}</h2>
+                <p className="text-base text-iw-text-muted">{t("blocked_body")}</p>
+                {session.role === "parent" ? (
+                  <>
+                    <p className="text-sm text-iw-text-muted">
+                      {t("blocked_parent_hint", { name: displayName })}
+                    </p>
+                    <Link
+                      href={`/parent/learners/${learnerId}/brain-clone-watch`}
+                      data-testid="learner-primary-cta"
+                      className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
+                    >
+                      {t("blocked_parent_cta")}
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    href="/learner/calm"
+                    data-testid="learner-primary-cta"
+                    className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
+                  >
+                    {t("blocked_cta_calm")}
+                  </Link>
+                )}
+              </div>
             </div>
           ) : (
             <div className="rounded-[28px] bg-white border border-iw-border/60 p-8 flex flex-col gap-4">

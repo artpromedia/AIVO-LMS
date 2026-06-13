@@ -3248,7 +3248,9 @@ function seedSkyDemoJourney(store: ReturnType<typeof getStore>): void {
       state: parsed.data,
       approvedByParent: true,
       approvalStatus: "approved",
-      cloneStage: "cloned",
+      // Mirrors approveBrainClone: an approved profile always carries
+      // cloneStage "approved" — the C-01 teach gate keys off this field.
+      cloneStage: "approved",
       clonedAt: daysAgo(12),
       generatedAt: daysAgo(13, 1),
       updatedAt: daysAgo(12),

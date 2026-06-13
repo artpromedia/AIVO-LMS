@@ -43,10 +43,12 @@ describe("Sky demo journey seed", () => {
 
     // The brain profile must parse the canonical schema AND be approved —
     // a schema rejection is silently skipped at seed time, so assert hard.
+    // C-01: "approved" means cloneStage === "approved" (the teach gate's
+    // field, set by approveBrainClone) — not just the approvalStatus flag.
     const profile = store.brainProfiles.get("brp_demo_sky");
     expect(profile, "brain profile failed brainProfileStateSchema at seed time").toBeTruthy();
     expect(profile?.approvalStatus).toBe("approved");
-    expect(profile?.cloneStage).toBe("cloned");
+    expect(profile?.cloneStage).toBe("approved");
 
     // Mastery + path drive the mission picker.
     expect(store.masteryMaps.get("mm_demo_sky")).toBeTruthy();

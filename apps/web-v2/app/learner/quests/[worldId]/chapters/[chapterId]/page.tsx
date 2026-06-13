@@ -46,6 +46,9 @@ export default async function QuestChapterStartPage({ params }: Params) {
   }
 
   const t = await getTranslations("learner.quests");
+  // C-01 teach gate: show the calm learner-safe waiting copy, never the
+  // engineering-facing repo message.
+  const tHome = await getTranslations("learner.home");
 
   // Locked / not-found / failed — show a recovery panel with a retry path.
   return (
@@ -62,7 +65,7 @@ export default async function QuestChapterStartPage({ params }: Params) {
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <p className="text-sm" role="alert">
-          {result.message}
+          {result.code === "brain_not_approved" ? tHome("blocked_body") : result.message}
         </p>
         <div className="mt-4 flex gap-2">
           <Button asChild variant="soft">

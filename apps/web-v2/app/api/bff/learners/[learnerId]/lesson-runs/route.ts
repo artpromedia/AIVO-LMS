@@ -87,6 +87,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         subject_not_found: ERRORS.NOT_FOUND,
         skill_not_found: ERRORS.NOT_FOUND,
         brain_profile_missing: ERRORS.PRECONDITION_FAILED,
+        brain_not_approved: { ...ERRORS.PRECONDITION_FAILED, code: "brain_not_approved" },
         generation_failed: ERRORS.UPSTREAM_UNAVAILABLE,
       } as const;
       audit(session!, "lesson_run.create.failed", requestId, {

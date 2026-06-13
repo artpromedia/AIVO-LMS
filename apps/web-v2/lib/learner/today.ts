@@ -4,10 +4,15 @@
  * baseline). The home page renders this; `POST /today/start` creates the
  * matching LessonRun.
  *
- * Priority order:
+ * Gate (Sprint C-01): no mission of ANY kind surfaces until the brain
+ * profile is parent-approved — including teacher-assigned work (Decision
+ * D8). This keeps the home surface honest before `createLessonRun`'s hard
+ * `brain_not_approved` gate would fire.
+ *
+ * Priority order (post-gate):
  *   1. Resume in-progress LessonRun
  *   2. Continue active quest chapter
- *   3. Teacher-assigned work (surfaces even pre-baseline)
+ *   3. Teacher-assigned work
  *   4. Address baseline weakness              (first_skill path node)
  *   5. Schedule review                        (review path node)
  *   6. Continue next unmastered skill         (next_unmastered path node)
@@ -15,6 +20,8 @@
  */
 import { getStore } from "@/lib/db/store";
 import {
+  getActiveBaselineForLearner,
+  getBrainProfile,
   getLearner,
   getLearningPath,
   getMasteryMap,
@@ -54,7 +61,7 @@ export type TodayMissionPlan = {
 
 export type TodayMissionResult =
   | { ready: true; mission: TodayMissionPlan }
-  | { ready: false; blocker: "no_learner" | "no_baseline" | "no_path" };
+  | { ready: false; blocker: "no_learner" | "no_baseline" | "no_path" | "brain_not_approved" };
 
 function nodeReason(node: LearningPathNode, subj: Subject, skillName: string): string {
   switch (node.kind) {
@@ -89,6 +96,20 @@ export async function pickTodaysMission(
   const store = getStore();
   const learner = await getLearner(learnerId, tenantId);
   if (!learner) return { ready: false, blocker: "no_learner" };
+
+  // 0. Teach gate (Sprint C-01). An unapproved brain profile blocks every
+  // mission kind — resume, quest, teacher-assigned (D8), and path — because
+  // they all create/serve lessons snapshotted from the brain state. Pre-
+  // baseline keeps `no_baseline` semantics: the baseline is still the
+  // learner's actionable next step.
+  const brain = await getBrainProfile(learnerId, tenantId);
+  if (!brain || brain.cloneStage !== "approved") {
+    const baseline = await getActiveBaselineForLearner(learnerId, tenantId);
+    return {
+      ready: false,
+      blocker: baseline?.status === "complete" ? "brain_not_approved" : "no_baseline",
+    };
+  }
 
   // 1. Resume in-progress LessonRun. Sprint 07: with the Creator
   // pre-generating one ready run per subject, selection must be
@@ -167,9 +188,9 @@ export async function pickTodaysMission(
     }
   }
 
-  // 3. Teacher-assigned work. Surfaces even pre-baseline since teachers can
-  // legitimately assign work to a learner who hasn't finished their baseline,
-  // and the assignment-skill mapping doesn't depend on the learning path.
+  // 3. Teacher-assigned work. The assignment-skill mapping doesn't depend on
+  // the learning path, but per Decision D8 it still waits behind the teach
+  // gate above — assigned lessons snapshot the same brain state.
   const assignments = await listActiveAssignmentsForLearner(learnerId, tenantId);
   if (assignments.length > 0) {
     const completedAssignmentIds = new Set(
