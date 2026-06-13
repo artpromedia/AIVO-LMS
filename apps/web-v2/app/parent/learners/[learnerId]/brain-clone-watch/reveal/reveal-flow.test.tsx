@@ -51,7 +51,9 @@ const DATA: RevealFlowData = {
   },
   strengths: { goodAt: ["Drawing"], loves: "Space", strongSubjects: [], observedStrength: null },
   instructions: INSTRUCTIONS,
-  startingPoints: [{ subjectId: "reading", subjectName: "Reading", estimate: "new" }],
+  startingPoints: [
+    { subjectId: "reading", subjectName: "Reading", estimate: "new", gradeBandLabel: null },
+  ],
   shareContent: { firstName: "Maya", strengths: ["Drawing"], interests: ["Space"] },
 };
 
