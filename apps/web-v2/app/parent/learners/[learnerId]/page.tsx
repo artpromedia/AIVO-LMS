@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
+import { StartLearningButton } from "@/components/parent/start-learning-button";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import {
   getLearner,
@@ -100,11 +101,18 @@ export default async function LearnerDetailPage({
             ) : null}
           </div>
         </div>
-        <Button asChild>
-          <Link href={next.href}>
-            {tReadiness(next.labelKey)} <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
+        {learner.readinessState === "ready_for_today_mission" ? (
+          // Entering the learner experience sets the active-learner cookie and
+          // redirects via a Server Action — a <Link> to the cookie-setting route
+          // handler bounces back here instead of opening the mission.
+          <StartLearningButton learnerId={learner.id} label={tReadiness(next.labelKey)} />
+        ) : (
+          <Button asChild>
+            <Link href={next.href}>
+              {tReadiness(next.labelKey)} <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        )}
       </Card>
 
       {showResume ? (
