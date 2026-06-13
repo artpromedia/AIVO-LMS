@@ -42,6 +42,8 @@ import {
   billingCoupons,
   webLearnerProfiles,
   webParentLearnerRelationships,
+  learners as learnersTable,
+  lessonRuns,
 } from "./schema/index.js";
 import { and, eq, sql } from "drizzle-orm";
 
@@ -215,7 +217,83 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return out;
 }
 
-function buildLearnerProfile(pilot: PilotDef, n: number, tenantId: string) {
+// ── Dates ──────────────────────────────────────────────────────────────────────────────────
+// Spread the pilots across Feb 2026 → now so the dashboard growth curves read
+// as gradual adoption, not a single vertical spike on the day we seed.
+const PILOT_WINDOW_START_MS = Date.UTC(2026, 1, 1); // 1 Feb 2026
+const SEED_NOW_MS = Date.now();
+const PILOT_STAGGER_MS = 18 * 86_400_000; // each pilot opens ~18 days after the last
+const MIN_ONBOARD_WINDOW_MS = 30 * 86_400_000;
+
+function pilotStartMs(pilotIndex: number): number {
+  const start = PILOT_WINDOW_START_MS + pilotIndex * PILOT_STAGGER_MS;
+  // Always leave at least a month of onboarding runway before "now".
+  return Math.min(start, SEED_NOW_MS - MIN_ONBOARD_WINDOW_MS);
+}
+
+/** Linear onboarding date for learner i (1-based) between the pilot start and now. */
+function learnerCreatedMs(startMs: number, i: number, total: number): number {
+  const frac = total <= 1 ? 0 : (i - 1) / (total - 1);
+  return Math.round(startMs + frac * (SEED_NOW_MS - startMs));
+}
+
+function isoAt(ms: number): string {
+  return new Date(ms).toISOString();
+}
+
+// ── Learner identity (shared by the web profile + the learners-of-record) ──
+function childDisplayName(i: number): string {
+  const firstName = FIRST_NAMES[(i - 1) % FIRST_NAMES.length];
+  const lastInitial = LAST_INITIALS[(i - 1) % LAST_INITIALS.length];
+  return `${firstName} ${lastInitial}.`;
+}
+function gradeBandFor(i: number): GradeBand {
+  return GRADE_BANDS[(i - 1) % GRADE_BANDS.length];
+}
+
+// ── Lessons ───────────────────────────────────────────────────────────────────────────
+const LESSON_SUBJECTS = ["math", "ela", "science", "sel", "life_skills"];
+/** Deterministic 3–8 lessons per child. */
+function lessonCountFor(i: number): number {
+  return 3 + ((i * 7) % 6);
+}
+function buildLessonRuns(
+  pilot: PilotDef,
+  i: number,
+  tenantId: string,
+  learnerId: string,
+  createdMs: number,
+): (typeof lessonRuns.$inferInsert)[] {
+  const count = lessonCountFor(i);
+  const rows: (typeof lessonRuns.$inferInsert)[] = [];
+  for (let n = 1; n <= count; n++) {
+    const ms = Math.round(createdMs + (n / (count + 1)) * (SEED_NOW_MS - createdMs));
+    // ~1 in 4 children has their latest lesson still in progress; the rest done.
+    const inProgress = n === count && i % 4 === 0;
+    const startedIso = isoAt(ms);
+    const endedIso = isoAt(Math.min(ms + 12 * 60_000, SEED_NOW_MS));
+    rows.push({
+      id: `lr-pilot-${pilot.slug}-${i}-${n}`,
+      tenantId,
+      learnerId,
+      subjectId: LESSON_SUBJECTS[(i + n) % LESSON_SUBJECTS.length],
+      source: "pilot_seed",
+      status: inProgress ? "in_progress" : "completed",
+      startedAt: startedIso,
+      completedAt: inProgress ? null : endedIso,
+      createdAt: startedIso,
+      updatedAt: endedIso,
+    });
+  }
+  return rows;
+}
+
+function buildLearnerProfile(
+  pilot: PilotDef,
+  n: number,
+  tenantId: string,
+  createdAtIso: string,
+) {
   const site = pilot.sites.length ? pilot.sites[(n - 1) % pilot.sites.length] : null;
   const schoolContext = site
     ? site.campus
@@ -223,8 +301,7 @@ function buildLearnerProfile(pilot: PilotDef, n: number, tenantId: string) {
       : site.school
     : (pilot.cohortLabel ?? null);
   const firstName = FIRST_NAMES[(n - 1) % FIRST_NAMES.length];
-  const lastInitial = LAST_INITIALS[(n - 1) % LAST_INITIALS.length];
-  const displayName = `${firstName} ${lastInitial}.`;
+  const displayName = childDisplayName(n);
   return {
     id: `lrn-pilot-${pilot.slug}-${n}`,
     tenantId,
@@ -234,7 +311,7 @@ function buildLearnerProfile(pilot: PilotDef, n: number, tenantId: string) {
     // Spread birth years across a plausible K-12 range (ages ~5–18 in 2026).
     birthYear: 2008 + (n % 13),
     ageRange: null,
-    gradeBand: GRADE_BANDS[(n - 1) % GRADE_BANDS.length],
+    gradeBand: gradeBandFor(n),
     schoolContext,
     primaryLanguage: null,
     readingComfort: null,
@@ -254,7 +331,7 @@ function buildLearnerProfile(pilot: PilotDef, n: number, tenantId: string) {
     functioningLevel: null,
     readinessState: "profile_created",
     iepDecision: null,
-    createdAt: new Date().toISOString(),
+    createdAt: createdAtIso,
     // Provenance — marks the row as a carried-over legacy pilot.
     source: SEED_SOURCE,
     pilotId: pilot.pilotId,
@@ -292,6 +369,9 @@ async function seedPilots() {
   console.log(`✓ platform actor ${ACTOR_EMAIL} — ${actorId}\n`);
 
   for (const pilot of PILOTS) {
+    const pilotIndex = PILOTS.indexOf(pilot);
+    const startMs = pilotStartMs(pilotIndex);
+
     // 1) Tenant (upsert by name).
     const [existingTenant] = await db
       .select()
@@ -359,7 +439,7 @@ async function seedPilots() {
       });
 
     // 3) ACTIVE pilot subscription (insert-once on (tenant, couponCode)).
-    const periodEnd = new Date(Date.now() + DURATION_DAYS * 86_400_000);
+    const periodEnd = new Date(startMs + DURATION_DAYS * 86_400_000);
     const metadata = {
       couponCode: pilot.couponCode,
       provisionedBy: "pilot",
@@ -382,7 +462,7 @@ async function seedPilots() {
         .set({
           plan: PLAN,
           status: "ACTIVE",
-          currentPeriodStart: new Date(),
+          currentPeriodStart: new Date(startMs),
           currentPeriodEnd: periodEnd,
           metadata,
           updatedAt: new Date(),
@@ -394,14 +474,24 @@ async function seedPilots() {
         userId: actorId,
         plan: PLAN,
         status: "ACTIVE",
-        currentPeriodStart: new Date(),
+        currentPeriodStart: new Date(startMs),
         currentPeriodEnd: periodEnd,
         metadata,
       });
     }
 
-    // 4) Learner profiles → seatsUsed / learnersCreated. Rewrite to hit the
-    //    target count exactly (scoped to this pilot's deterministic id prefix).
+    // 4) Learner profiles → seatsUsed / learnersCreated. Clear the prior seed
+    //    first. FK order matters: lesson_runs and the learners-of-record (which
+    //    reference the parent users) must be deleted before step 5 drops users.
+    await db
+      .delete(lessonRuns)
+      .where(
+        and(
+          eq(lessonRuns.tenantId, tenantId),
+          sql`${lessonRuns.id} LIKE ${`lr-pilot-${pilot.slug}-%`}`,
+        ),
+      );
+    await db.delete(learnersTable).where(eq(learnersTable.tenantId, tenantId));
     await db
       .delete(webLearnerProfiles)
       .where(
@@ -411,7 +501,8 @@ async function seedPilots() {
         ),
       );
     const learnerRows = Array.from({ length: pilot.children }, (_, i) => {
-      const profile = buildLearnerProfile(pilot, i + 1, tenantId);
+      const createdAtIso = isoAt(learnerCreatedMs(startMs, i + 1, pilot.children));
+      const profile = buildLearnerProfile(pilot, i + 1, tenantId, createdAtIso);
       return { id: profile.id, tenantId, data: profile };
     });
     for (const c of chunk(learnerRows, 500)) {
@@ -471,6 +562,40 @@ async function seedPilots() {
           };
         });
         await db.insert(webParentLearnerRelationships).values(rels);
+
+        // Learner of record → the platform "Learners" KPI counts `learners`.
+        // userId = parentId: "each parent represents a learner", so the Users
+        // KPI grows only by the parents (no separate learner logins).
+        const learnersOfRecord = inserted.map((p, j) => {
+          const idx = batch[j];
+          const created = new Date(learnerCreatedMs(startMs, idx, pilot.children));
+          return {
+            tenantId,
+            userId: p.id,
+            parentId: p.id,
+            name: childDisplayName(idx),
+            gradeLevel: gradeBandFor(idx),
+            region: pilot.region,
+            districtName: pilot.tenantName,
+            createdAt: created,
+            updatedAt: created,
+          };
+        });
+        await db.insert(learnersTable).values(learnersOfRecord);
+
+        // 3–8 lessons per child → the platform "Lesson runs" total.
+        const lessonBatch = batch.flatMap((idx) =>
+          buildLessonRuns(
+            pilot,
+            idx,
+            tenantId,
+            `lrn-pilot-${pilot.slug}-${idx}`,
+            learnerCreatedMs(startMs, idx, pilot.children),
+          ),
+        );
+        for (const c of chunk(lessonBatch, 500)) {
+          await db.insert(lessonRuns).values(c);
+        }
       }
     }
 
@@ -523,15 +648,25 @@ async function seedPilots() {
       SELECT count(*)::int AS c FROM users
       WHERE tenant_id = ${t.id} AND role = 'THERAPIST' AND deactivated_at IS NULL
     `)) as unknown as { rows?: Array<{ c: number }> } | Array<{ c: number }>;
+    const ofRecord = (await db.execute(sql`
+      SELECT count(*)::int AS c FROM learners WHERE tenant_id = ${t.id}
+    `)) as unknown as { rows?: Array<{ c: number }> } | Array<{ c: number }>;
+    const lessonRows = (await db.execute(sql`
+      SELECT count(*)::int AS c FROM lesson_runs WHERE tenant_id = ${t.id}
+    `)) as unknown as { rows?: Array<{ c: number }> } | Array<{ c: number }>;
     const lc = Number((Array.isArray(learners) ? learners : (learners.rows ?? []))[0]?.c ?? 0);
     const pc = Number((Array.isArray(parents) ? parents : (parents.rows ?? []))[0]?.c ?? 0);
     const tc = Number(
       (Array.isArray(therapists) ? therapists : (therapists.rows ?? []))[0]?.c ?? 0,
     );
+    const lor = Number((Array.isArray(ofRecord) ? ofRecord : (ofRecord.rows ?? []))[0]?.c ?? 0);
+    const lessons = Number(
+      (Array.isArray(lessonRows) ? lessonRows : (lessonRows.rows ?? []))[0]?.c ?? 0,
+    );
     const inList = listedRows.some((r) => r.tenant_id === t.id);
     console.log(
       `  ${inList ? "•" : "✗"} ${pilot.tenantName.padEnd(32)} ` +
-        `learners=${lc}/${pilot.seatLimit}  parents=${pc}  therapists=${tc}  ` +
+        `learners=${lor}(profiles=${lc})/${pilot.seatLimit}  parents=${pc}  therapists=${tc}  lessons=${lessons}  ` +
         `${inList ? "(listed)" : "(NOT LISTED)"}`,
     );
   }
