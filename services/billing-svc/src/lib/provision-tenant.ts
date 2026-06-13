@@ -17,7 +17,7 @@ export interface ProvisionTenantInput {
   tenantId: string;
   /** The subscription's `user_id`. Pilot provisioning uses the platform actor. */
   userId: string;
-  /** Subscription plan slug (the coupon's `grants_plan`, e.g. "district"). */
+  /** Subscription plan slug (the coupon's `grants_plan`, e.g. "enterprise"). */
   plan: string;
   /** `tenants.licensing_tier` to set (the coupon's `grants_tier`). */
   tier: string;

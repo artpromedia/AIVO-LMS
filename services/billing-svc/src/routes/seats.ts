@@ -200,7 +200,9 @@ async function loadPool(db: any, tenantId: string) {
   return {
     id: null,
     tenantId,
-    planId: sub?.plan ?? "district",
+    // Seat pools are the B2B/Enterprise path; default an un-provisioned
+    // synthetic pool to the enterprise plan.
+    planId: sub?.plan ?? "enterprise",
     total: tenant?.seatLimit ?? 0,
     allocated: 0,
     used: 0,

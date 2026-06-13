@@ -421,7 +421,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Internal: mint + redeem a PROVISIONING coupon for a district tenant */
+        /** Internal: mint + redeem a PROVISIONING coupon for an Enterprise (school/district) tenant */
         post: operations["provisionPilotEntitlement"];
         delete?: never;
         options?: never;

@@ -137,7 +137,9 @@ async function loadPilotStatus(db: any, tenantId: string): Promise<PilotStatus |
 }
 
 export function registerPilotStatusRoutes(app: FastifyInstance, db: any) {
-  // List active pilots (district subscriptions provisioned by the pilot flow).
+  // List active pilots (Enterprise subscriptions provisioned by the pilot
+  // flow). `plan = 'district'` is matched for legacy pilots provisioned
+  // before the Enterprise rename.
   app.get("/api/billing/admin/pilots", async (req, reply) => {
     const me = await requirePlatformAdmin(req, reply);
     if (!me) return;
@@ -146,7 +148,7 @@ export function registerPilotStatusRoutes(app: FastifyInstance, db: any) {
         SELECT DISTINCT s.tenant_id
         FROM subscriptions s
         WHERE s.status = 'ACTIVE'
-          AND (s.metadata ->> 'provisionedBy' = 'pilot' OR s.plan = 'district')
+          AND (s.metadata ->> 'provisionedBy' = 'pilot' OR s.plan IN ('enterprise', 'district'))
         ORDER BY s.tenant_id
         LIMIT 500
       `)) as Rows,

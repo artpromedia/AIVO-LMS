@@ -584,7 +584,7 @@ export const runInternalJobSchema = {
 export const internalProvisionPilotSchema = {
   tags: ["Billing"],
   operationId: "provisionPilotEntitlement",
-  summary: "Internal: mint + redeem a PROVISIONING coupon for a district tenant",
+  summary: "Internal: mint + redeem a PROVISIONING coupon for an Enterprise (school/district) tenant",
   body: {
     type: "object",
     required: ["tenantId", "plan", "durationDays", "actorUserId"],

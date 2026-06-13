@@ -32,7 +32,11 @@ const IS_PROD = process.env.NODE_ENV === "production";
 const DEFAULT_SEAT_LIMIT = 50;
 const DEFAULT_DURATION_DAYS = 90;
 const PILOT_TIER = "enterprise";
-const PILOT_PLAN = "district";
+// Pilots provision the all-access Enterprise plan (B2B path). Historically
+// this was the legacy "district" slug; it is now "enterprise" so the
+// subscription's plan is a recognized PlanId and resolves to all tutors
+// without relying on the legacy-row fallback.
+const PILOT_PLAN = "enterprise";
 
 function internalToken(): string {
   return (

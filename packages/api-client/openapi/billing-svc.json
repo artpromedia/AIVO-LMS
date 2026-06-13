@@ -2250,7 +2250,7 @@
     "/api/billing/internal/pilots/provision": {
       "post": {
         "operationId": "provisionPilotEntitlement",
-        "summary": "Internal: mint + redeem a PROVISIONING coupon for a district tenant",
+        "summary": "Internal: mint + redeem a PROVISIONING coupon for an Enterprise (school/district) tenant",
         "tags": [
           "Billing"
         ],
