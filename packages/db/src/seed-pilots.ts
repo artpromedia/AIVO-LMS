@@ -307,7 +307,10 @@ async function seedPilots() {
           type: pilot.tenantType,
           licensingTier: TIER,
           seatLimit: pilot.seatLimit,
-          status: "active",
+          // Prod tenants.status is an ENUM (tenant_status) with UPPERCASE
+          // values; the drizzle schema types it as varchar, so lowercase would
+          // pass typecheck but fails in prod (invalid input value for enum).
+          status: "ACTIVE",
           updatedAt: new Date(),
         })
         .where(eq(tenants.id, tenantId));
@@ -319,7 +322,7 @@ async function seedPilots() {
           type: pilot.tenantType,
           licensingTier: TIER,
           seatLimit: pilot.seatLimit,
-          status: "active",
+          status: "ACTIVE",
         })
         .returning();
       tenantId = t.id;
