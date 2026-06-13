@@ -67,6 +67,16 @@ test("returns a district's live pilot status from real reads", async (t) => {
       } as any)
       .returning();
 
+    // A therapist onboarded under the same tenant → therapistsOnboarded = 1.
+    await db.insert(users).values({
+      email: `pstat-therapist-${Date.now()}@fam.test`,
+      name: "Stat Therapist",
+      role: "THERAPIST",
+      tenantId: tenant.id,
+      passwordHash:
+        "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    } as any);
+
     const code = `PILOT-STAT-${Date.now()}`.toUpperCase().slice(0, 40);
     await db.execute(sql`
       INSERT INTO billing_coupons
@@ -100,6 +110,7 @@ test("returns a district's live pilot status from real reads", async (t) => {
     assert.equal(pilot.seatsUsed, 0); // no web learners yet
     assert.equal(pilot.seatsRemaining, 5);
     assert.equal(pilot.parentsOnboarded, 1);
+    assert.equal(pilot.therapistsOnboarded, 1);
     assert.equal(pilot.couponCode, code);
     assert.equal(pilot.redemptions, 1);
     assert.equal(pilot.status, "active");

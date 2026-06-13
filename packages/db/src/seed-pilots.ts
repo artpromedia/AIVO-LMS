@@ -9,6 +9,7 @@
  *   - District          → `tenants.name`
  *   - Seats used / cap   → count(web_learner_profiles) / tenants.seat_limit
  *   - Parents            → count(users role=PARENT, not deactivated)
+ *   - Therapists         → count(users role=THERAPIST, not deactivated)
  *   - Learners           → count(web_learner_profiles)
  *   - Coupon ×           → billing_coupons.redemptions (provisioning coupon)
  *   - Expires / Status   → ACTIVE subscription's current_period_end
@@ -21,13 +22,13 @@
  *
  * Source data: the four "Pilot Seed" review packs (Dubai School District,
  * Rewire for Autism, Qatar School District, Catholic Schools in Minnesota).
- * Every row is tagged `source: simulated_review_seed` so it is unambiguously
- * synthetic and easy to find / purge later. Where a pilot's family count is
- * "Not specified", no parent users are created (the dashboard then shows 0
- * parents) rather than inferring one parent per child.
+ * Every row is tagged `source: simulated_review_seed` (synthetic data, easy to
+ * find / purge); seeded users also carry `provisioned_by = 'pilot_seed'`. The
+ * three school pilots get one parent per child plus therapists (≈1 per 25
+ * learners); Rewire keeps its 50 families and no therapists.
  *
  * Idempotent: safe to re-run. Tenants/coupons/subscriptions are upserted, and
- * the synthetic learner profiles + parent users are scoped by a deterministic
+ * the synthetic learners + parent/therapist users are scoped by a deterministic
  * id / tag and rewritten so the counts always land on the target numbers.
  *
  * Run:  DATABASE_URL=… pnpm --filter @aivo/db db:seed:pilots
@@ -68,8 +69,12 @@ interface PilotDef {
   seatLimit: number;
   /** Children participating → this many web_learner_profiles rows. */
   children: number;
-  /** Families participating → this many PARENT users (0 = not specified). */
-  families: number;
+  /** PARENT users to create (one per child for the school pilots), each linked
+   *  1:1 to a learner. The dashboard's "Parents" column counts these. */
+  parents: number;
+  /** THERAPIST users to create (≈1 per 25 learners for the school pilots).
+   *  The dashboard's "Therapists" column counts these. 0 = none. */
+  therapists: number;
   /** Named schools/campuses; learners are spread across them round-robin. */
   sites: PilotSite[];
   /** Label used as schoolContext when a pilot has no named sites (cohort). */
@@ -88,7 +93,8 @@ const PILOTS: PilotDef[] = [
     couponCode: "PILOT-DUBAI-2026",
     seatLimit: 1200,
     children: 1200,
-    families: 0, // not specified
+    parents: 1200, // one parent per child
+    therapists: 48, // 1 per 25 learners
     sites: [
       { school: "Al Ittihad Private School", campus: "Al Mamzar" },
       { school: "Al Ittihad Private School", campus: "Al Safa" },
@@ -108,7 +114,8 @@ const PILOTS: PilotDef[] = [
     couponCode: "PILOT-REWIRE-2026",
     seatLimit: 50,
     children: 50,
-    families: 50,
+    parents: 50, // 50 participating families
+    therapists: 0, // family cohort — left as-is
     sites: [],
     cohortLabel: "Rewire for Autism family cohort",
   },
@@ -122,7 +129,8 @@ const PILOTS: PilotDef[] = [
     couponCode: "PILOT-QATAR-2026",
     seatLimit: 312,
     children: 312,
-    families: 0, // not specified
+    parents: 312, // one parent per child
+    therapists: 13, // 1 per 25 learners (ceil)
     sites: [
       { school: "Philippine International School Qatar", campus: "Doha" },
       { school: "Al Jazeera Academy", campus: "Al Wakra" },
@@ -140,7 +148,8 @@ const PILOTS: PilotDef[] = [
     couponCode: "PILOT-CATHOLIC-MN-2026",
     seatLimit: 20,
     children: 20,
-    families: 0, // not specified
+    parents: 20, // one parent per child
+    therapists: 1, // 1 per 25 learners (ceil)
     sites: [{ school: "Annunciation Catholic School", campus: "Minnesota" }],
   },
 ];
@@ -405,9 +414,9 @@ async function seedPilots() {
       await db.insert(webLearnerProfiles).values(c);
     }
 
-    // 5) Parent users → parentsOnboarded (only when families are specified).
-    //    Scoped + rewritten via the provisioned_by tag, plus their 1:1
-    //    parent↔learner relationships.
+    // 5) Parent + therapist users. Both are scoped + rewritten via the
+    //    provisioned_by tag so re-runs land on the exact counts. The delete
+    //    spares the platform actor (tenant_id IS NULL, so it never matches).
     await db
       .delete(webParentLearnerRelationships)
       .where(
@@ -418,31 +427,26 @@ async function seedPilots() {
       );
     await db
       .delete(users)
-      .where(
-        and(
-          eq(users.tenantId, tenantId),
-          eq(users.role, "PARENT"),
-          eq(users.provisionedBy, SEED_PROVISIONED_BY),
-        ),
-      );
-    if (pilot.families > 0) {
-      const familyNumbers = Array.from({ length: pilot.families }, (_, i) => i + 1);
-      for (const batch of chunk(familyNumbers, 500)) {
+      .where(and(eq(users.tenantId, tenantId), eq(users.provisionedBy, SEED_PROVISIONED_BY)));
+
+    // Parents → parentsOnboarded, each linked 1:1 to the learner at the same index.
+    if (pilot.parents > 0) {
+      const parentNumbers = Array.from({ length: pilot.parents }, (_, i) => i + 1);
+      for (const batch of chunk(parentNumbers, 500)) {
         const inserted = await db
           .insert(users)
           .values(
             batch.map((idx) => ({
               tenantId,
-              email: `${pilot.slug}-family-${idx}@pilot.aivo.local`,
-              name: `${pilot.tenantName} Family ${idx}`,
+              email: `${pilot.slug}-parent-${idx}@pilot.aivo.local`,
+              name: `${pilot.tenantName} Parent ${idx}`,
               role: "PARENT" as const,
               emailVerified: true,
               provisionedBy: SEED_PROVISIONED_BY,
-              externalId: `${pilot.slug}-family-${idx}`,
+              externalId: `${pilot.slug}-parent-${idx}`,
             })),
           )
           .returning({ id: users.id });
-        // Link each freshly-created parent 1:1 to the learner at the same index.
         const rels = inserted.map((p, j) => {
           const idx = batch[j];
           const relId = `plr-pilot-${pilot.slug}-${idx}`;
@@ -466,9 +470,28 @@ async function seedPilots() {
       }
     }
 
+    // 6) Therapist users → therapistsOnboarded. Site staff serving the whole
+    //    pilot, so they aren't tied to an individual learner.
+    if (pilot.therapists > 0) {
+      const therapistNumbers = Array.from({ length: pilot.therapists }, (_, i) => i + 1);
+      for (const batch of chunk(therapistNumbers, 500)) {
+        await db.insert(users).values(
+          batch.map((idx) => ({
+            tenantId,
+            email: `${pilot.slug}-therapist-${idx}@pilot.aivo.local`,
+            name: `${pilot.tenantName} Therapist ${idx}`,
+            role: "THERAPIST" as const,
+            emailVerified: true,
+            provisionedBy: SEED_PROVISIONED_BY,
+            externalId: `${pilot.slug}-therapist-${idx}`,
+          })),
+        );
+      }
+    }
+
     console.log(
       `✓ ${pilot.tenantName.padEnd(32)} tenant=${tenantId}\n` +
-        `    seats=${pilot.seatLimit}  learners=${pilot.children}  parents=${pilot.families}  coupon=${pilot.couponCode}`,
+        `    seats=${pilot.seatLimit}  learners=${pilot.children}  parents=${pilot.parents}  therapists=${pilot.therapists}  coupon=${pilot.couponCode}`,
     );
   }
 
@@ -492,12 +515,20 @@ async function seedPilots() {
       SELECT count(*)::int AS c FROM users
       WHERE tenant_id = ${t.id} AND role = 'PARENT' AND deactivated_at IS NULL
     `)) as unknown as { rows?: Array<{ c: number }> } | Array<{ c: number }>;
+    const therapists = (await db.execute(sql`
+      SELECT count(*)::int AS c FROM users
+      WHERE tenant_id = ${t.id} AND role = 'THERAPIST' AND deactivated_at IS NULL
+    `)) as unknown as { rows?: Array<{ c: number }> } | Array<{ c: number }>;
     const lc = Number((Array.isArray(learners) ? learners : (learners.rows ?? []))[0]?.c ?? 0);
     const pc = Number((Array.isArray(parents) ? parents : (parents.rows ?? []))[0]?.c ?? 0);
+    const tc = Number(
+      (Array.isArray(therapists) ? therapists : (therapists.rows ?? []))[0]?.c ?? 0,
+    );
     const inList = listedRows.some((r) => r.tenant_id === t.id);
     console.log(
       `  ${inList ? "•" : "✗"} ${pilot.tenantName.padEnd(32)} ` +
-        `learners=${lc}/${pilot.seatLimit}  parents=${pc}  ${inList ? "(listed)" : "(NOT LISTED)"}`,
+        `learners=${lc}/${pilot.seatLimit}  parents=${pc}  therapists=${tc}  ` +
+        `${inList ? "(listed)" : "(NOT LISTED)"}`,
     );
   }
 
