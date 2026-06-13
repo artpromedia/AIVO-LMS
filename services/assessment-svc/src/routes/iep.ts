@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { iepDocuments, iepProfiles, iepGoals, learners, learnerFunctioningLevels } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 import { eq } from "drizzle-orm";
+import { scanUploadOrReject } from "../lib/av-scan.js";
 
 const IS_PROD = process.env.NODE_ENV === "production";
 function requireUrl(name: string, devDefault: string): string {
@@ -36,7 +37,9 @@ export type PdfSafetyResult =
  *     active-content PDFs (/JavaScript, /JS, /Launch, /EmbeddedFile, or an
  *     OpenAction auto-run), which are a malware-delivery vector and which the
  *     downstream text extraction cannot use anyway.
- * This is defense-in-depth, NOT antivirus — real AV is a named follow-up.
+ * This is defense-in-depth that runs BEFORE the real antivirus scan
+ * (`lib/av-scan.ts`, Decision D6): structural checks reject malformed/active
+ * content cheaply, then clamd (when configured) scans the bytes for malware.
  */
 export function assertPdfSafety(buffer: Buffer, mimetype?: string): PdfSafetyResult {
   const declared = (mimetype ?? "").toLowerCase().split(";")[0].trim();
@@ -509,19 +512,32 @@ export async function registerIepRoutes(app: FastifyInstance) {
       }
 
       // ── Upload hardening (Sprint C-10, Decision D6) ───────────────────────
-      // Infra-level AV scanning does NOT exist yet (verified — no ClamAV /
-      // gateway scanner in infra/, docker/, helm/, or docs); integrating one is
-      // a NAMED FOLLOW-UP. Until then we harden in-code so an obviously-hostile
-      // or malformed upload is rejected before it reaches pdf-parse / the LLM:
+      // Structural defense-in-depth runs first so an obviously-hostile or
+      // malformed upload is rejected before it reaches pdf-parse / the LLM:
       //   1. content-type allowlist (the browser-declared MIME);
       //   2. magic-byte sniff — the bytes MUST actually begin with "%PDF-";
       //   3. reject encrypted / active-content (JavaScript / embedded-launch)
       //      PDFs, which are a classic malware-delivery vector and which we
       //      cannot meaningfully parse anyway.
-      // This is defense-in-depth, NOT a substitute for AV; see the D6 follow-up.
       const safety = assertPdfSafety(fileBuffer, fileMimetype);
       if (!safety.ok) {
         return reply.status(safety.status).send({ error: safety.error, code: safety.code });
+      }
+
+      // ── Real antivirus (Decision D6 follow-up) ────────────────────────────
+      // The structural checks above are NOT antivirus. When a clamd sidecar is
+      // configured (CLAMAV_HOST), every IEP PDF is streamed to it before we
+      // parse or persist anything. A FOUND verdict rejects the file (422); a
+      // scanner outage fails CLOSED in production / when IEP_AV_REQUIRED=true
+      // (503) and otherwise proceeds. With no CLAMAV_HOST set the scan is
+      // skipped and only the structural hardening applies — see lib/av-scan.ts.
+      const av = await scanUploadOrReject(fileBuffer);
+      if (!av.ok) {
+        req.log?.warn?.(
+          { event: "iep.av_reject", code: av.code, verdict: av.verdict.status, learnerId },
+          "IEP upload rejected by antivirus policy",
+        );
+        return reply.status(av.status).send({ error: av.error, code: av.code });
       }
 
       // Extract the document text. Lazy-import `pdf-parse` from its inner
