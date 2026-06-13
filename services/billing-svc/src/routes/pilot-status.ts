@@ -57,6 +57,7 @@ interface PilotStatus {
   seatsUsed: number;
   seatsRemaining: number | null;
   parentsOnboarded: number;
+  therapistsOnboarded: number;
   learnersCreated: number;
   couponCode: string | null;
   redemptions: number;
@@ -110,6 +111,14 @@ async function loadPilotStatus(db: any, tenantId: string): Promise<PilotStatus |
       `)) as Rows,
     )[0]?.c ?? 0,
   );
+  const therapistsOnboarded = Number(
+    asRows(
+      (await db.execute(sql`
+        SELECT count(*)::int AS c FROM users
+        WHERE tenant_id = ${tenantId} AND role = 'THERAPIST' AND deactivated_at IS NULL
+      `)) as Rows,
+    )[0]?.c ?? 0,
+  );
 
   const seatLimit = typeof tenant.seat_limit === "number" ? tenant.seat_limit : null;
   const expiresAt = sub?.current_period_end ? new Date(sub.current_period_end).toISOString() : null;
@@ -128,6 +137,7 @@ async function loadPilotStatus(db: any, tenantId: string): Promise<PilotStatus |
     seatsUsed: learnersCreated,
     seatsRemaining: seatLimit == null ? null : Math.max(0, seatLimit - learnersCreated),
     parentsOnboarded,
+    therapistsOnboarded,
     learnersCreated,
     couponCode,
     redemptions,

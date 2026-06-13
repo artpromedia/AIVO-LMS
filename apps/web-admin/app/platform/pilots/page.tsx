@@ -57,6 +57,7 @@ export default async function PilotsPage() {
                   <th className="py-2">District</th>
                   <th className="py-2">Seats used</th>
                   <th className="py-2">Parents</th>
+                  <th className="py-2">Therapists</th>
                   <th className="py-2">Learners</th>
                   <th className="py-2">Coupon ×</th>
                   <th className="py-2">Expires</th>
@@ -76,6 +77,7 @@ export default async function PilotsPage() {
                     </td>
                     <td className="py-3">{seatsLabel(p)}</td>
                     <td className="py-3">{p.parentsOnboarded}</td>
+                    <td className="py-3">{p.therapistsOnboarded}</td>
                     <td className="py-3">{p.learnersCreated}</td>
                     <td className="py-3">{p.redemptions}</td>
                     <td className="py-3">

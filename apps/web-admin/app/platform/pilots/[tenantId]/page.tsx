@@ -51,6 +51,7 @@ export default async function PilotDetailPage({
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Seats used" value={seatsLabel} sub={`${remaining} remaining`} />
         <StatCard label="Parents onboarded" value={String(pilot.parentsOnboarded)} />
+        <StatCard label="Therapists onboarded" value={String(pilot.therapistsOnboarded)} />
         <StatCard label="Learners created" value={String(pilot.learnersCreated)} />
         <StatCard
           label="Status"

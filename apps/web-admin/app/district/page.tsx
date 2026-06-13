@@ -13,7 +13,14 @@ import {
   updateDistrictBranding,
 } from "@aivo/admin-api/identity";
 import { getDistrictPilotStatus } from "@aivo/admin-api/billing";
-import { AdminCard, AdminKpiCard, AdminPageFrame, ChartCard, DonutBreakdown, Gauge } from "@aivo/admin-ui";
+import {
+  AdminCard,
+  AdminKpiCard,
+  AdminPageFrame,
+  ChartCard,
+  DonutBreakdown,
+  Gauge,
+} from "@aivo/admin-ui";
 import type { DonutSlice } from "@aivo/admin-ui";
 import { growthKpi } from "../platform/dashboard-data";
 
@@ -139,7 +146,12 @@ export default async function DistrictPage({
   const donutSlices: DonutSlice[] = [
     { label: "Staff", value: setup.counts.staff, tone: "primary" },
     { label: "Learners", value: setup.counts.learners, tone: "positive" },
-    ...(pilot ? [{ label: "Parents", value: pilot.parentsOnboarded, tone: "warning" as const }] : []),
+    ...(pilot
+      ? [{ label: "Parents", value: pilot.parentsOnboarded, tone: "warning" as const }]
+      : []),
+    ...(pilot
+      ? [{ label: "Therapists", value: pilot.therapistsOnboarded, tone: "neutral" as const }]
+      : []),
   ];
 
   return (

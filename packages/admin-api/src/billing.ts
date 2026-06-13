@@ -58,6 +58,7 @@ export type PilotStatus = {
   seatsUsed: number;
   seatsRemaining: number | null;
   parentsOnboarded: number;
+  therapistsOnboarded: number;
   learnersCreated: number;
   couponCode: string | null;
   redemptions: number;

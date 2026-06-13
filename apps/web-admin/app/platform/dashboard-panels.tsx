@@ -67,6 +67,7 @@ export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; te
                 <th>District</th>
                 <th>Seats</th>
                 <th>Parents</th>
+                <th>Therapists</th>
                 <th>Learners</th>
                 <th>Expires</th>
                 <th>Status</th>
@@ -101,8 +102,15 @@ export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; te
                         />
                       </span>
                     </td>
-                    <td className="admin-tabular">{pilot.parentsOnboarded.toLocaleString("en-US")}</td>
-                    <td className="admin-tabular">{pilot.learnersCreated.toLocaleString("en-US")}</td>
+                    <td className="admin-tabular">
+                      {pilot.parentsOnboarded.toLocaleString("en-US")}
+                    </td>
+                    <td className="admin-tabular">
+                      {pilot.therapistsOnboarded.toLocaleString("en-US")}
+                    </td>
+                    <td className="admin-tabular">
+                      {pilot.learnersCreated.toLocaleString("en-US")}
+                    </td>
                     <td>
                       {pilot.expiresAt
                         ? new Date(pilot.expiresAt).toLocaleDateString("en-US", {
