@@ -37,6 +37,7 @@ import {
   ApprovalCeremony,
   type CeremonyRai,
   type CeremonyStrings,
+  type CeremonyVoices,
 } from "./approval-ceremony";
 import { WhatHappensNext, type NextMission, type NextStepsStrings } from "./what-happens-next";
 
@@ -104,6 +105,8 @@ export function BrainBuildingClient({
   ceremony: {
     rai: CeremonyRai;
     strings: CeremonyStrings;
+    /** Sprint C-08: "N of M voices" chip; null when no teammate was invited. */
+    voices: CeremonyVoices | null;
     consentVersion: string;
     raiVersion: string;
   };
@@ -303,6 +306,7 @@ export function BrainBuildingClient({
               learnerId={learnerId}
               rai={ceremony.rai}
               strings={ceremony.strings}
+              voices={ceremony.voices}
               consentVersion={ceremony.consentVersion}
               raiVersion={ceremony.raiVersion}
               approveAction={approveAction}

@@ -642,7 +642,8 @@
       "onboarding_title": "Invite your child’s team (optional)",
       "onboarding_subtitle": "Invite a teacher, caregiver, or therapist to add their perspective before AIVO builds the brain. You can do this now or skip and add them later.",
       "continue_to_baseline": "Continue to baseline",
-      "skip_for_now": "Skip for now"
+      "skip_for_now": "Skip for now",
+      "classroom_connections_title": "Also connected through {name}’s classroom"
     },
     "schedule": {
       "title": "Horario",
@@ -855,6 +856,35 @@
       "open_profile": "Abrir perfil",
       "age": "{age} años",
       "grade": "Curso {grade}"
+    },
+    "team_hub": {
+      "section_title": "Where everyone stands",
+      "voices_summary": "Built from {contributed} of {invited} invited {invited, plural, one {voice} other {voices}} — every perspective makes {name}’s profile more complete.",
+      "empty_title": "Invite the people who know {name}",
+      "empty_body": "Each voice makes {name}’s profile more complete — invite a teacher, caregiver, or therapist to add their view.",
+      "role_teacher": "Teacher",
+      "role_caregiver": "Caregiver",
+      "role_therapist": "Therapist",
+      "stage_invited": "Invited",
+      "stage_invited_line": "Invited — waiting for them to join.",
+      "stage_accepted": "On the team",
+      "stage_accepted_line": "On the team — their perspective hasn’t come in yet.",
+      "stage_accepted_on": "Joined {date} — their perspective hasn’t come in yet.",
+      "stage_contributed": "Contributed",
+      "stage_contributed_line": "Added their perspective — thank you, it shaped the profile.",
+      "stage_contributed_on": "Added their perspective on {date} — it shaped the profile.",
+      "stage_declined": "Declined",
+      "stage_declined_line": "Declined the invite. You can invite someone else any time.",
+      "remind": "Remind",
+      "remind_sending": "Sending…",
+      "remind_sent": "Reminder sent",
+      "remind_sent_detail": "We’ve sent a gentle reminder.",
+      "remind_rate_limited": "Just reminded them — you can send another in about {minutes} {minutes, plural, one {minute} other {minutes}}.",
+      "remove": "Remove",
+      "remove_confirm_title": "Remove this person from the team?",
+      "remove_confirm": "Yes, remove",
+      "remove_cancel": "Keep",
+      "remove_removing": "Removing…"
     }
   },
   "brain_clone": {
@@ -962,7 +992,10 @@
     "next_invite_body": "Invita a un docente o terapeuta para que comparta lo que observa y añada sus propias notas.",
     "next_invite_cta": "Invitar al profe de {name}",
     "next_reassure": "Puedes revisar este perfil cuando quieras desde la página de {name}.",
-    "next_done": "Ir a la página de {name}"
+    "next_done": "Ir a la página de {name}",
+    "ceremony_voices_label": "Built from {contributed} of {invited} invited {invited, plural, one {voice} other {voices}}",
+    "ceremony_voices_zero": "Built from your answers and {name}’s adventure — teammates can still add their view",
+    "ceremony_voices_link": "See the team"
   },
   "learner": {
     "errors": {
@@ -3610,5 +3643,15 @@
     "send_failed_title": "Mensaje no enviado",
     "send_failed_body": "Tu borrador sigue aquí.",
     "send_retry": "Reintentar"
+  },
+  "notifications": {
+    "unsubscribe": {
+      "title": "Reminder settings",
+      "prompt": "We'll stop sending you reminders about adding your perspective to this learner's team.",
+      "confirm": "Turn off these reminders",
+      "done": "Done — you won't get these reminders anymore. Thank you for being on the team.",
+      "error": "We couldn't update that just now. Please try the link again in a moment.",
+      "invalid": "This unsubscribe link is missing some details. Please use the link from your most recent email."
+    }
   }
 }

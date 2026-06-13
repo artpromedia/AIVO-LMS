@@ -159,14 +159,17 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
 
 function Shell({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-aivo-surface-soft p-6">
+    <main className="flex min-h-screen items-center justify-center bg-aivo-surface-soft p-6">
       <Card className="w-full max-w-md space-y-5 p-8">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-aivo-accent/10 text-aivo-accent">
+        <div
+          className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-aivo-accent/10 text-aivo-accent"
+          aria-hidden="true"
+        >
           <Mail className="h-7 w-7" />
         </div>
         <h1 className="text-center text-2xl font-bold">{heading}</h1>
         {children}
       </Card>
-    </div>
+    </main>
   );
 }

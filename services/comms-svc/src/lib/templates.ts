@@ -79,6 +79,10 @@ export function renderTemplate(
       return renderStaffCredentials(data);
     case "teacher_invite_parent":
       return renderTeacherInviteParent(data);
+    case "contribution_nudge":
+      return renderContributionNudge(data);
+    case "invite_expiry_warning":
+      return renderInviteExpiryWarning(data);
     case "iep_in_review_parent":
       return renderIepInReviewParent(data);
     case "iep_finalised_parent":
@@ -406,6 +410,69 @@ function renderTeacherInviteParent(data: TemplateData) {
   };
 }
 
+// Sprint C-08 — warm nudge to a teammate who accepted a learning-team invite
+// but hasn't added their perspective yet. ONE call to action, opt-out honored
+// via the preferences link, never a nagging tone. Sent at most once per
+// member per 7 days (comms-svc invite-reminder batch enforces the cap).
+function renderContributionNudge(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "a learner";
+  const inviterName = (data.inviterName as string) || "Their family";
+  const kind = (data.kind as string) || "teammate";
+  const contributeUrl = (data.contributeUrl as string) || "#";
+  const unsubscribeUrl = (data.unsubscribeUrl as string) || "";
+  const roleWord =
+    kind === "teacher"
+      ? "classroom view"
+      : kind === "therapist"
+        ? "clinical view"
+        : "everyday view";
+  const html = baseLayout(`
+    <h1 class="title">${learnerName}'s plan is waiting on your perspective</h1>
+    <p class="body-text">${inviterName} invited you to ${learnerName}'s learning team, and you're in — thank you.</p>
+    <p class="body-text">When you're ready, about <strong>10 minutes</strong> of your ${roleWord} helps shape ${learnerName}'s learning plan. There are no wrong answers — just what you see.</p>
+    <p style="text-align:center"><a href="${contributeUrl}" class="btn">Add my perspective</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">No rush, and no pressure — you can do this whenever it suits you.${
+      unsubscribeUrl
+        ? ` If you'd rather not get these reminders, <a href="${unsubscribeUrl}" style="color:#6b7280;text-decoration:underline">turn them off</a>.`
+        : ""
+    }</p>
+  `);
+  return {
+    subject: `${learnerName}'s family invited you — 10 minutes of your perspective shapes their learning plan`,
+    html,
+    text: `${inviterName} invited you to ${learnerName}'s learning team. About 10 minutes of your perspective helps shape ${learnerName}'s learning plan — there are no wrong answers. Add yours: ${contributeUrl}${
+      unsubscribeUrl ? `\n\nTo stop these reminders: ${unsubscribeUrl}` : ""
+    }`,
+  };
+}
+
+// Sprint C-08 — pre-expiry warning for a teacher→parent token invite that is
+// still pending and about to lapse. Warm, single CTA, honest about the clock.
+function renderInviteExpiryWarning(data: TemplateData) {
+  const learnerName = (data.learnerName as string) || "your child";
+  const teacherName = (data.teacherName as string) || "Your child's teacher";
+  const acceptUrl = (data.acceptUrl as string) || "#";
+  const hoursLeft = data.hoursLeft != null ? Number(data.hoursLeft) : null;
+  const whenText =
+    hoursLeft != null && hoursLeft >= 0
+      ? hoursLeft <= 1
+        ? "within the hour"
+        : `in about ${hoursLeft} hours`
+      : "soon";
+  const html = baseLayout(`
+    <h1 class="title">${teacherName}'s invitation expires ${whenText}</h1>
+    <p class="body-text"><strong>${teacherName}</strong> invited you to connect on AIVO Learning about <strong>${learnerName}</strong>. That invitation link expires <span class="highlight">${whenText}</span>.</p>
+    <p class="body-text">Accepting takes a minute and lets the two of you share progress, observations, and goals for ${learnerName}.</p>
+    <p style="text-align:center"><a href="${acceptUrl}" class="btn">Accept before it expires</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">If the link has already expired, ask ${teacherName} to send a fresh one. If you weren't expecting this, you can safely ignore this email.</p>
+  `);
+  return {
+    subject: `Reminder: ${teacherName}'s invitation about ${learnerName} expires ${whenText}`,
+    html,
+    text: `${teacherName} invited you to connect about ${learnerName} on AIVO Learning, and the link expires ${whenText}. Accept: ${acceptUrl}\n\nIf it has already expired, ask ${teacherName} for a fresh invitation.`,
+  };
+}
+
 function renderStaffCredentials(data: TemplateData) {
   const name = (data.name as string) || "there";
   const roleLabel = (data.roleLabel as string) || "staff member";
@@ -665,6 +732,8 @@ export const AVAILABLE_TEMPLATES = [
   { id: "teacher_invite", name: "Teacher Invite", channels: ["email"] },
   { id: "staff_credentials", name: "Staff Credentials (Temp Password)", channels: ["email"] },
   { id: "teacher_invite_parent", name: "Teacher → Parent Invite", channels: ["email"] },
+  { id: "contribution_nudge", name: "Team Contribution Nudge", channels: ["email"] },
+  { id: "invite_expiry_warning", name: "Invite Expiry Warning", channels: ["email"] },
   { id: "iep_in_review_parent", name: "IEP — In Review (Parent)", channels: ["email"] },
   { id: "iep_finalised_parent", name: "IEP — Finalised (Parent)", channels: ["email"] },
   { id: "iep_comment_mention", name: "IEP — Comment Mention", channels: ["email"] },

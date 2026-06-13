@@ -36,6 +36,7 @@ import {
 import { assessmentSectionSchemas } from "@/lib/validators/parent-assessment";
 import { MASTERY_ESTIMATE_LABEL_KEY, estimateForScore } from "@/lib/learner/mastery-estimate";
 import { selectBrainExplainability } from "@/lib/learner/brain-explainability";
+import { getContributionStatus } from "@/lib/collaboration/contribution-status";
 import { pickTodaysMission } from "@/lib/learner/today";
 import { SUPPORT_DEFAULT_BY_SLUG, type CoreSupportSlug } from "@/lib/db/brain-corrections";
 import { hashIpFromHeaders } from "@/lib/bff/consent-guard";
@@ -331,6 +332,27 @@ export default async function BrainCloneWatchPage({
 
   // ── Sprint C-06: ceremony (screen 6) + "what happens next" (screen 7) ──
   const explain = selectBrainExplainability(s);
+
+  // Sprint C-08 — "N of M voices": which invited teammates shaped the
+  // profile. When nobody contributed (or nobody was invited), the chip is
+  // honest about what the profile was built from; when contributed < invited,
+  // a quiet link points the parent to the team hub to nudge the rest.
+  const { voices: voiceCounts } = await getContributionStatus(learnerId, session.tenantId);
+  const ceremonyVoices =
+    voiceCounts.invited > 0
+      ? {
+          invited: voiceCounts.invited,
+          contributed: voiceCounts.contributed,
+          label: t("ceremony_voices_label", {
+            contributed: voiceCounts.contributed,
+            invited: voiceCounts.invited,
+          }),
+          zeroLabel: t("ceremony_voices_zero", { name: learner.displayName }),
+          linkLabel: t("ceremony_voices_link"),
+          hubHref: `/parent/learners/${learner.id}/team`,
+        }
+      : null;
+
   const ceremony = {
     rai: {
       sources: explain.raiComplianceDetail.dataSources,
@@ -338,6 +360,7 @@ export default async function BrainCloneWatchPage({
       transparency: explain.raiComplianceDetail.transparency,
       humanOversight: explain.raiComplianceDetail.humanOversight,
     },
+    voices: ceremonyVoices,
     consentVersion: BRAIN_CONSENT_VERSION,
     // The RAI disclosures are pinned to the revision the parent is reviewing.
     raiVersion: String(profile.revision),

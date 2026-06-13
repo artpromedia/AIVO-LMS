@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, timestamp, text, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, timestamp, text, jsonb, boolean, index } from "drizzle-orm/pg-core";
 import { learners } from "./learners.js";
 import { users } from "./users.js";
 import { tenants } from "./tenants.js";
@@ -27,6 +27,10 @@ export const learnerTeachers = pgTable("learner_teachers", {
   classroomId: uuid("classroom_id").references(() => classrooms.id),
   invitedAt: timestamp("invited_at").defaultNow().notNull(),
   acceptedAt: timestamp("accepted_at"),
+  // Sprint C-08: invite-reminder latch + opt-out. The contribution-nudge job
+  // stamps last-sent on success (7-day cap) and skips opted-out members.
+  contributionNudgeLastSentAt: timestamp("contribution_nudge_last_sent_at"),
+  contributionNudgeOptOut: boolean("contribution_nudge_opt_out").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -49,6 +53,9 @@ export const learnerCaregivers = pgTable("learner_caregivers", {
   permissions: jsonb("permissions").default(["read_summary", "submit_observations"]),
   invitedAt: timestamp("invited_at").defaultNow().notNull(),
   acceptedAt: timestamp("accepted_at"),
+  // Sprint C-08: invite-reminder latch + opt-out (see learner_teachers).
+  contributionNudgeLastSentAt: timestamp("contribution_nudge_last_sent_at"),
+  contributionNudgeOptOut: boolean("contribution_nudge_opt_out").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -76,6 +83,9 @@ export const learnerTherapists = pgTable("learner_therapists", {
   ]),
   invitedAt: timestamp("invited_at").defaultNow().notNull(),
   acceptedAt: timestamp("accepted_at"),
+  // Sprint C-08: invite-reminder latch + opt-out (see learner_teachers).
+  contributionNudgeLastSentAt: timestamp("contribution_nudge_last_sent_at"),
+  contributionNudgeOptOut: boolean("contribution_nudge_opt_out").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -164,6 +174,9 @@ export const teacherParentInvites = pgTable(
     acceptedAt: timestamp("accepted_at"),
     acceptedUserId: uuid("accepted_user_id").references(() => users.id),
     revokedAt: timestamp("revoked_at"),
+    // Sprint C-08: latched once when the pre-expiry warning email is sent, so
+    // a still-pending token invite is warned exactly once before it lapses.
+    expiryWarningSentAt: timestamp("expiry_warning_sent_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

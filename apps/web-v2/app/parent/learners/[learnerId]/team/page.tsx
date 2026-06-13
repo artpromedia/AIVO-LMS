@@ -15,12 +15,13 @@ import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
 import { getStore as db } from "@/lib/db/store";
 import { getLearner, getUserById, parentCanAccessLearner } from "@/lib/db/repos";
 import { getCareTeam } from "@/lib/db/team-invites";
 import { hasTeacherContributed } from "@/lib/teacher/teacher-assessment-status";
+import { getContributionStatus } from "@/lib/collaboration/contribution-status";
 import { TeamInviteSection } from "./team-invite-section";
+import { TeamHub } from "./team-hub";
 import { completeTeamInviteStepAction } from "./actions";
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,7 @@ export default async function ParentTeamPage({
   searchParams: Promise<{ onboarding?: string }>;
 }) {
   const t = await getTranslations("parent.learner_team");
+  const tHub = await getTranslations("parent.team_hub");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const { onboarding } = await searchParams;
@@ -61,6 +63,11 @@ export default async function ParentTeamPage({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
+
+  // C-08: one care-team read, shared by the invite section + the hub +
+  // the contribution-status derivation (avoids three duplicate reads).
+  const careTeam = await getCareTeam(learner.id, session.tenantId);
+  const contributions = await getContributionStatus(learner.id, session.tenantId, careTeam);
 
   const store = db();
   const members = new Map<string, TeamMember>();
@@ -183,42 +190,55 @@ export default async function ParentTeamPage({
       ) : null}
 
       <SectionHeader title={t("invite_member")} />
-      <TeamInviteSection
+      <TeamInviteSection learnerId={learner.id} careTeam={careTeam} />
+
+      {/* Sprint C-08 — the orchestration hub: where each invited teammate
+          stands (invited → on the team → contributed), one-tap remind, remove
+          with confirm. Fed by the contribution-status derivation. */}
+      <SectionHeader title={tHub("section_title")} />
+      {contributions.members.length > 0 ? (
+        <p className="mb-2 text-sm text-aivo-ink-soft">
+          {tHub("voices_summary", {
+            contributed: contributions.voices.contributed,
+            invited: contributions.voices.invited,
+            name: learner.displayName,
+          })}
+        </p>
+      ) : null}
+      <TeamHub
         learnerId={learner.id}
-        careTeam={await getCareTeam(learner.id, session.tenantId)}
+        learnerName={learner.displayName}
+        members={contributions.members}
       />
 
-      <SectionHeader title={`${list.length} member${list.length === 1 ? "" : "s"}`} />
-      {list.length === 0 ? (
-        <EmptyState
-          title={t("no_members_title")}
-          description="Once a teacher is enrolled in your learner's classroom or a therapist joins your family tenant, they'll appear here."
-        />
-      ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {list.map((m) => (
-            <li key={m.userId}>
-              <Card className="flex items-start justify-between gap-3 p-4">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="truncate font-medium">{m.displayName}</p>
-                    {m.isPrimary ? <Badge tone="success">{t("primary")}</Badge> : null}
-                    <Badge tone="neutral">{ROLE_LABEL[m.role] ?? m.role}</Badge>
-                    {m.contributed ? <Badge tone="success">{t("contributed")}</Badge> : null}
+      {list.length > 0 ? (
+        <>
+          <SectionHeader title={t("classroom_connections_title")} />
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {list.map((m) => (
+              <li key={m.userId}>
+                <Card className="flex items-start justify-between gap-3 p-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate font-medium">{m.displayName}</p>
+                      {m.isPrimary ? <Badge tone="success">{t("primary")}</Badge> : null}
+                      <Badge tone="neutral">{ROLE_LABEL[m.role] ?? m.role}</Badge>
+                      {m.contributed ? <Badge tone="success">{t("contributed")}</Badge> : null}
+                    </div>
+                    <p className="mt-0.5 truncate text-xs text-aivo-ink-soft">{m.context}</p>
+                    <a
+                      href={`mailto:${m.email}`}
+                      className="mt-1 flex items-center gap-1 text-xs text-aivo-accent hover:underline"
+                    >
+                      <Mail className="h-3 w-3" /> {m.email}
+                    </a>
                   </div>
-                  <p className="mt-0.5 truncate text-xs text-aivo-ink-soft">{m.context}</p>
-                  <a
-                    href={`mailto:${m.email}`}
-                    className="mt-1 flex items-center gap-1 text-xs text-aivo-accent hover:underline"
-                  >
-                    <Mail className="h-3 w-3" /> {m.email}
-                  </a>
-                </div>
-              </Card>
-            </li>
-          ))}
-        </ul>
-      )}
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
 
       <SectionHeader title={t("how_collab_works")} />
       <Card className="p-[var(--aivo-density-card-pad)]">

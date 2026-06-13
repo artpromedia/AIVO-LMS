@@ -308,6 +308,14 @@ export const internalTeacherInviteParentSchema = internalSchema(
   "internalSendTeacherInviteParent",
   "Internal: send a teacher → parent invitation email",
 );
+export const internalContributionNudgeSchema = internalSchema(
+  "internalSendContributionNudge",
+  "Internal: send a team-contribution nudge email",
+);
+export const internalInviteExpiryWarningSchema = internalSchema(
+  "internalSendInviteExpiryWarning",
+  "Internal: send a teacher→parent invite expiry-warning email",
+);
 export const internalAdminAlertSchema = internalSchema(
   "internalSendAdminSafetyAlert",
   "Internal: dispatch an admin safety alert email",

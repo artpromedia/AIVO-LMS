@@ -27,6 +27,7 @@
  * The "Check & adjust" link routes to the C-05 review screen. Honours
  * `prefers-reduced-motion`.
  */
+import * as React from "react";
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
@@ -37,6 +38,20 @@ export type CeremonyRai = {
   biasMitigations: string[];
   transparency: string;
   humanOversight: string;
+};
+
+/** Sprint C-08 — the "N of M voices" chip shown on the ceremony surface. */
+export type CeremonyVoices = {
+  invited: number;
+  contributed: number;
+  /** "Built from {contributed} of {invited} invited voices" (pre-resolved). */
+  label: string;
+  /** Honest zero-contributor line shown when contributed === 0. */
+  zeroLabel: string;
+  /** Quiet link text to the team hub, shown when contributed < invited. */
+  linkLabel: string;
+  /** Href to the team hub. */
+  hubHref: string;
 };
 
 export type CeremonyStrings = {
@@ -86,6 +101,7 @@ export function ApprovalCeremony({
   learnerId,
   rai,
   strings,
+  voices,
   consentVersion,
   raiVersion,
   approveAction,
@@ -93,6 +109,8 @@ export function ApprovalCeremony({
   learnerId: string;
   rai: CeremonyRai;
   strings: CeremonyStrings;
+  /** Sprint C-08 — "N of M voices" chip; omitted when no one was invited. */
+  voices?: CeremonyVoices | null;
   consentVersion: string;
   raiVersion: string;
   approveAction: (formData: FormData) => void | Promise<void>;
@@ -162,6 +180,22 @@ export function ApprovalCeremony({
   return (
     <div className="bc-ceremony">
       <p className="bc-ceremony-recap">{strings.recap}</p>
+
+      {/* Sprint C-08 — "N of M voices": which sources shaped the profile.
+          Honest line when no teammate contributed; a quiet link to the team
+          hub while contributed < invited. */}
+      {voices ? (
+        <p className="bc-ceremony-voices" role="status">
+          <span className="bc-ceremony-voices-chip">
+            {voices.contributed === 0 ? voices.zeroLabel : voices.label}
+          </span>
+          {voices.contributed < voices.invited ? (
+            <Link href={voices.hubHref} className="bc-ceremony-voices-link">
+              {voices.linkLabel}
+            </Link>
+          ) : null}
+        </p>
+      ) : null}
 
       {/* RAI disclosures — expandable, real content. */}
       <div className="bc-ceremony-rai">
@@ -323,6 +357,37 @@ export function ApprovalCeremony({
           color: var(--iw-ink, #0b1020);
           font-size: 1rem;
           line-height: 1.55;
+        }
+        .bc-ceremony-voices {
+          margin: 0;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.5rem 0.75rem;
+        }
+        .bc-ceremony-voices-chip {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.35rem 0.75rem;
+          border-radius: 9999px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          line-height: 1.3;
+          color: var(--bc-primary, #5b3df5);
+          background: color-mix(in oklch, var(--bc-primary, #5b3df5) 10%, var(--iw-bg, #fff));
+          border: 1px solid color-mix(in oklch, var(--bc-primary, #5b3df5) 22%, var(--iw-border, #e2e6f0));
+        }
+        .bc-ceremony-voices-link {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--bc-primary, #5b3df5);
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+        .bc-ceremony-voices-link:focus-visible {
+          outline: 2px solid var(--bc-primary, #5b3df5);
+          outline-offset: 3px;
+          border-radius: 4px;
         }
         .bc-ceremony-rai { border-top: 1px solid var(--iw-border, #e2e6f0); padding-top: 0.9rem; }
         .bc-ceremony-rai-toggle {

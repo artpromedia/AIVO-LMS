@@ -44,6 +44,32 @@ export const healthSchema = {
   response: { 200: healthResponseSchema },
 } as const;
 
+export const getCollaborationByLearnerIdContributionsSchema = {
+  tags: ["Family"],
+  operationId: "getCollaborationByLearnerIdContributions",
+  summary: "GET /api/family/collaboration/:learnerId/contributions",
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 403: errorResponse },
+} as const;
+
+export const collaborationContributionOptOutSchema = {
+  tags: ["Family"],
+  operationId: "collaborationContributionOptOut",
+  summary: "POST /api/family/collaboration/invites/:kind/:id/contribution-opt-out",
+  params: {
+    type: "object",
+    required: ["kind", "id"],
+    additionalProperties: true,
+    properties: { kind: { type: "string" }, id: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 404: errorResponse },
+} as const;
+
 export const getCollaborationByLearnerIdMembersSchema = {
   tags: ["Family"],
   operationId: "getCollaborationByLearnerIdMembers",

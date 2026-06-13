@@ -41,6 +41,8 @@ import {
   internalTeacherInviteSchema,
   internalStaffCredentialsSchema,
   internalTeacherInviteParentSchema,
+  internalContributionNudgeSchema,
+  internalInviteExpiryWarningSchema,
   internalAdminAlertSchema,
   internalSpeechBuddySafetySchema,
   internalBillingAlertSchema,
@@ -1106,6 +1108,113 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
       } catch (err: any) {
         logger.error({ err, to }, "Failed to send teacher→parent invite email");
         return reply.code(500).send({ error: "Failed to send invite" });
+      }
+    },
+  );
+
+  // Sprint C-08 — team contribution nudge. Called by comms-svc's own
+  // invite-reminder batch (and reusable by family-svc) when a teammate who
+  // accepted ≥48h ago still hasn't contributed. The batch enforces the 7-day
+  // cap + opt-out; this route just renders + sends the warm one-CTA email.
+  // The CTA lands the teammate on accept-invite (which routes them to the
+  // role-appropriate contribution surface); the unsubscribe link records an
+  // opt-out so the batch skips them next time.
+  app.post(
+    "/api/comms/internal/contribution-nudge",
+    { schema: internalContributionNudgeSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, kind, inviteId, learnerName, inviterName } = (request.body as any) || {};
+      if (!to || !kind) {
+        return reply.code(400).send({ error: "to and kind required" });
+      }
+      const appUrl = process.env.WEB_APP_URL || "http://localhost:3000";
+      const contributeUrl = `${appUrl.replace(/\/$/, "")}/accept-invite?email=${encodeURIComponent(to)}`;
+      const unsubscribeUrl = inviteId
+        ? `${appUrl.replace(/\/$/, "")}/notifications/unsubscribe?kind=${encodeURIComponent(
+            kind,
+          )}&invite=${encodeURIComponent(inviteId)}`
+        : "";
+      if (!isConfigured()) {
+        logger.warn({ to, kind }, "Contribution nudge requested but email not configured (dev mode)");
+        return { status: "dev_mode", contributeUrl };
+      }
+      const rendered = renderTemplate("contribution_nudge", {
+        kind,
+        learnerName,
+        inviterName,
+        contributeUrl,
+        unsubscribeUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "contribution_nudge",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send contribution nudge email");
+        return { status: "failed" };
+      }
+    },
+  );
+
+  // Sprint C-08 — teacher→parent invite expiry warning. Called by the
+  // invite-reminder batch when a PENDING token invite is < 24h from expiry.
+  app.post(
+    "/api/comms/internal/invite-expiry-warning",
+    { schema: internalInviteExpiryWarningSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, learnerName, teacherName, acceptUrl, expiresAt } = (request.body as any) || {};
+      if (!to) {
+        return reply.code(400).send({ error: "to required" });
+      }
+      let hoursLeft: number | null = null;
+      if (expiresAt) {
+        const ms = new Date(expiresAt).getTime() - Date.now();
+        if (!Number.isNaN(ms)) hoursLeft = Math.max(0, Math.round(ms / (60 * 60 * 1000)));
+      }
+      const appUrl = process.env.WEB_APP_URL || "http://localhost:3000";
+      const resolvedAcceptUrl =
+        acceptUrl || `${appUrl.replace(/\/$/, "")}/accept-invite?email=${encodeURIComponent(to)}`;
+      if (!isConfigured()) {
+        logger.warn({ to }, "Invite expiry warning requested but email not configured (dev mode)");
+        return { status: "dev_mode", acceptUrl: resolvedAcceptUrl };
+      }
+      const rendered = renderTemplate("invite_expiry_warning", {
+        learnerName,
+        teacherName,
+        acceptUrl: resolvedAcceptUrl,
+        hoursLeft,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "invite_expiry_warning",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send invite expiry warning email");
+        return { status: "failed" };
       }
     },
   );
