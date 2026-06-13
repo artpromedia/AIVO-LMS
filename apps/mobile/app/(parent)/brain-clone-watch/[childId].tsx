@@ -1,7 +1,9 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, router, type Href } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
+import * as Clipboard from "expo-clipboard";
+import * as Linking from "expo-linking";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLearner } from "@/hooks/useLearners";
 import { useBrain, labelForDomain } from "@/hooks/useBrain";
@@ -11,7 +13,7 @@ import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card, Button } from "@/components/ui";
 import { LoadingState } from "@aivo/mobile-ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 const STAGES = [
@@ -37,10 +39,50 @@ const STAGES = [
 ];
 
 /**
- * Parent brain-clone watch + approval (MOB-PAR-006) — mirror of web's
- * `/parent/learners/[learnerId]/brain-clone-watch`. Closes the gap where
- * mobile-only parents couldn't approve the initial clone. Shows the
- * build stages with XAI decisions and an approve/amend action.
+ * Path of the web review page for a learner — the mobile mirror of
+ * `apps/web-v2/app/parent/learners/[learnerId]/brain-clone-watch`. Also
+ * what "Copy link" copies when the build has no web origin configured.
+ */
+function webReviewPath(learnerId: string): string {
+  return `/parent/learners/${learnerId}/brain-clone-watch`;
+}
+
+/**
+ * Web-app origin for the parent review link. The mobile app has no
+ * canonical web-origin constant yet (`constants/api.ts` only knows
+ * API-service origins), so this resolves the same way those service
+ * origins do: the `EXPO_PUBLIC_WEB_URL` build-time env var in
+ * production builds, and the local web-v2 dev server in development
+ * (port 5000 per `apps/web-v2/package.json`, host mapping matching
+ * `DEV_HOST` in `constants/api.ts`). Returns null when a production
+ * build shipped without `EXPO_PUBLIC_WEB_URL`; the handoff card then
+ * renders its copy-link-only state instead of a dead "open" button.
+ * If a second screen ever needs web URLs, graduate this into a shared
+ * constant next to `constants/api.ts`.
+ */
+function resolveWebOrigin(): string | null {
+  const configured = (process.env.EXPO_PUBLIC_WEB_URL || "").replace(/\/+$/, "");
+  if (configured) return configured;
+  if (__DEV__) {
+    return (
+      Platform.select({
+        android: "http://10.0.2.2:5000",
+        default: "http://localhost:5000",
+      }) ?? null
+    );
+  }
+  return null;
+}
+
+/**
+ * Parent brain-clone watch (MOB-PAR-006) — mirror of web's
+ * `/parent/learners/[learnerId]/brain-clone-watch`. Parents review the
+ * build stages and XAI decisions here; the approval itself (which
+ * captures COPPA consent + the Responsible-AI acknowledgement) happens
+ * on the web review page, so the unapproved state renders an honest
+ * open/copy handoff to that page instead of approval controls this
+ * screen cannot honor. Mobile approval parity is a tracked follow-up
+ * (SPRINT-PLAN Decisions, D1) once the web consent ceremony lands.
  */
 export default function ParentBrainCloneWatchScreen() {
   const { t } = useTranslation();
@@ -176,25 +218,134 @@ export default function ParentBrainCloneWatchScreen() {
               </Text>
             </Card>
           ) : (
-            <View style={{ gap: spacing.sm }}>
-              <Button
-                title={t("brainClone.approve", "Approve profile")}
-                onPress={() => router.push(`/(parent)/recommendations` as Href)}
-                fullWidth
-                size="lg"
-              />
-              <Button
-                title={t("brainClone.amend", "Ask for changes")}
-                onPress={() => router.push(`/(parent)/recommendations` as Href)}
-                variant="outline"
-                fullWidth
-                size="lg"
-              />
-            </View>
+            <WebReviewHandoff
+              learnerId={id}
+              name={learner?.firstName ?? t("parentHub.learner", "your learner")}
+            />
           )}
         </View>
       )}
     </ResponsiveScreen>
+  );
+}
+
+type HandoffNotice = "copied" | "openFailed" | "copyFailed";
+
+/**
+ * Honest unapproved-state handoff (Sprint C-04, decision D1a). Mobile
+ * shows the full review above; the approval itself — which captures
+ * COPPA consent and the Responsible-AI acknowledgement — lives on the
+ * web review page, so this card opens (or copies) that page's link
+ * instead of rendering approve/amend controls the app cannot honor.
+ * When no web origin is configured for the build, the open button is
+ * not rendered at all (never a dead tap) and copy-link carries the
+ * page path.
+ */
+function WebReviewHandoff({ learnerId, name }: { learnerId: string; name: string }) {
+  const { t } = useTranslation();
+  const palette = useSensoryPalette();
+  const [notice, setNotice] = useState<HandoffNotice | null>(null);
+
+  const path = webReviewPath(learnerId);
+  const origin = resolveWebOrigin();
+  const url = origin ? `${origin}${path}` : null;
+
+  // Only rendered behind `url ?`, so `url` is always a string here; guard
+  // anyway so a future caller can't fall through to a dead tap.
+  const handleOpen = async () => {
+    if (!url) {
+      setNotice("openFailed");
+      return;
+    }
+    try {
+      await Linking.openURL(url);
+      setNotice(null);
+    } catch {
+      setNotice("openFailed");
+    }
+  };
+
+  const handleCopy = async () => {
+    try {
+      const copied = await Clipboard.setStringAsync(url ?? path);
+      setNotice(copied ? "copied" : "copyFailed");
+    } catch {
+      setNotice("copyFailed");
+    }
+  };
+
+  const noticeText =
+    notice === "copied"
+      ? url
+        ? t("brainClone.linkCopied", "Link copied — paste it into your browser when you're ready.")
+        : t(
+            "brainClone.pathCopied",
+            "Copied — paste it after your AIVO web address in your browser.",
+          )
+      : notice === "openFailed"
+        ? t(
+            "brainClone.openOnWebFailed",
+            "We couldn't open your browser from here. Copy the link instead — it works anywhere.",
+          )
+        : notice === "copyFailed"
+          ? t(
+              "brainClone.copyLinkFailed",
+              "Copying didn't work on this device. Sign in to AIVO on the web to review and approve.",
+            )
+          : null;
+
+  return (
+    <Card tone="raised" style={{ gap: spacing.sm }}>
+      <View style={styles.handoffRow}>
+        <Ionicons name="laptop-outline" size={22} color={palette.primary} />
+        <Text style={[styles.body, { color: palette.ink, flex: 1 }]}>
+          {t("brainClone.webHandoff", {
+            name,
+            defaultValue: `Reviewing and approving ${name}'s profile happens on the web for now.`,
+          })}
+        </Text>
+      </View>
+      {url ? (
+        <Button
+          title={t("brainClone.openOnWeb", "Open on the web")}
+          accessibilityLabel={t("brainClone.openOnWebA11y", {
+            name,
+            defaultValue: `Open ${name}'s profile review on the web`,
+          })}
+          onPress={handleOpen}
+          fullWidth
+          size="lg"
+        />
+      ) : (
+        <Text style={[styles.body, { color: palette.inkMuted }]}>
+          {t(
+            "brainClone.webHandoffNoLink",
+            "Sign in to AIVO on the web to review and approve. Copy the link below to have it ready.",
+          )}
+        </Text>
+      )}
+      <Button
+        title={t("brainClone.copyLink", "Copy link")}
+        accessibilityLabel={t("brainClone.copyLinkA11y", {
+          name,
+          defaultValue: `Copy the link to ${name}'s profile review`,
+        })}
+        onPress={handleCopy}
+        variant="outline"
+        fullWidth
+        size="lg"
+      />
+      {noticeText ? (
+        <View style={styles.handoffRow} accessibilityLiveRegion="polite">
+          <Ionicons
+            name={notice === "copied" ? "checkmark-circle" : "alert-circle"}
+            size={18}
+            color={notice === "copied" ? palette.primary : colors.error}
+          />
+          <Text style={[styles.notice, { color: palette.ink, flex: 1 }]}>{noticeText}</Text>
+        </View>
+      ) : null}
+    </Card>
   );
 }
 
@@ -211,4 +362,6 @@ const styles = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 8 },
   chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.lg, borderWidth: 1 },
   chipText: { fontSize: 12, fontFamily: fontFamilies.bodySemiBold },
+  handoffRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  notice: { fontSize: 13, fontFamily: fontFamilies.bodySemiBold, lineHeight: 19 },
 });
