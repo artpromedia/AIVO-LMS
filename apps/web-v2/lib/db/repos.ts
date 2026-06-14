@@ -2624,11 +2624,11 @@ import type {
   CurriculumFocus,
 } from "@/lib/db/types";
 import {
-  generateLessonPlanWithRetry,
+  generateLessonPlanWithFallback,
   LESSON_PLAN_SCHEMA_VERSION,
   type TutorProvider,
 } from "@/lib/ai/tutor";
-import { getTutorProvider } from "@/lib/ai/anthropic-tutor";
+import { getTutorProviderChain, taskForSubject } from "@/lib/ai/provider-chain";
 import { getAuthoredLessonItems } from "@/lib/learner/authored-content";
 import { awardLessonEngagement } from "@/lib/learner/engagement-award";
 
@@ -2826,21 +2826,24 @@ export async function createLessonRun(
   await getPersistence().lessonRuns.upsertRun(run);
 
   try {
-    const { plan, telemetry } = await generateLessonPlanWithRetry(provider ?? getTutorProvider(), {
-      learnerName: learner.displayName,
-      brainState: brain.state,
-      subject,
-      skill,
-      // S26: pass curriculum constraints (active version + objective template)
-      // so the generator scopes the plan to the canonical scope of the skill.
-      skillVersion: await getCurrentSkillVersion(skill.id),
-      objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
-      mastery: masterySnapshot,
-      accommodations: accommodationSnapshot,
-      curriculumFocus,
-      authoredItems,
-      source: input.source,
-    });
+    const { plan, telemetry } = await generateLessonPlanWithFallback(
+      provider ? [provider] : getTutorProviderChain(taskForSubject(subject)),
+      {
+        learnerName: learner.displayName,
+        brainState: brain.state,
+        subject,
+        skill,
+        // S26: pass curriculum constraints (active version + objective template)
+        // so the generator scopes the plan to the canonical scope of the skill.
+        skillVersion: await getCurrentSkillVersion(skill.id),
+        objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
+        mastery: masterySnapshot,
+        accommodations: accommodationSnapshot,
+        curriculumFocus,
+        authoredItems,
+        source: input.source,
+      },
+    );
 
     const planRecord: GeneratedLessonPlan = {
       id: newId("plan"),
@@ -3522,7 +3525,7 @@ export async function attachTutorNoteToParentSummary(
 export async function retryLessonRun(
   lessonRunId: string,
   tenantId: string,
-  provider: TutorProvider = getTutorProvider(),
+  provider?: TutorProvider,
 ): Promise<{
   ok: boolean;
   code?: "not_retryable" | "generation_failed";
@@ -3550,23 +3553,26 @@ export async function retryLessonRun(
       subjectSlug: subject.slug,
       gradeBand: skill.gradeBand,
     });
-    const { plan, telemetry } = await generateLessonPlanWithRetry(provider, {
-      learnerName: run.learnerContextSnapshot.displayName,
-      // Use the frozen snapshot, NOT a fresh brain-profile read, so retry
-      // produces a plan consistent with the original run's context.
-      brainState: run.brainStateSnapshot,
-      subject,
-      skill,
-      // S26: keep retries scoped to the same curriculum constraints the
-      // initial generation read. Retry reads the *current* version, not the
-      // snapshot — a republished v2 should pull the retry forward.
-      skillVersion: await getCurrentSkillVersion(skill.id),
-      objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
-      mastery: run.masterySnapshot,
-      accommodations: run.accommodationSnapshot,
-      authoredItems: retryAuthoredItems,
-      source: run.source,
-    });
+    const { plan, telemetry } = await generateLessonPlanWithFallback(
+      provider ? [provider] : getTutorProviderChain(taskForSubject(subject)),
+      {
+        learnerName: run.learnerContextSnapshot.displayName,
+        // Use the frozen snapshot, NOT a fresh brain-profile read, so retry
+        // produces a plan consistent with the original run's context.
+        brainState: run.brainStateSnapshot,
+        subject,
+        skill,
+        // S26: keep retries scoped to the same curriculum constraints the
+        // initial generation read. Retry reads the *current* version, not the
+        // snapshot — a republished v2 should pull the retry forward.
+        skillVersion: await getCurrentSkillVersion(skill.id),
+        objectiveTemplate: await getActiveLessonObjectiveTemplate(skill.id),
+        mastery: run.masterySnapshot,
+        accommodations: run.accommodationSnapshot,
+        authoredItems: retryAuthoredItems,
+        source: run.source,
+      },
+    );
     const planRecord: GeneratedLessonPlan = {
       id: newId("plan"),
       lessonRunId: run.id,

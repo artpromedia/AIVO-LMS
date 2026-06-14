@@ -39,6 +39,8 @@ export type DegradationEvent =
   | "baseline_generic_fallback"
   /** AI_PROVIDER names a real provider but the runtime resolved the mock. */
   | "lesson_provider_mock_in_prod"
+  /** A lesson provider exhausted retries; the chain failed over to the next. */
+  | "lesson_provider_failover"
   /** The lesson provider exhausted retries; deterministic fallback served. */
   | "lesson_fallback_after_retries";
 
@@ -58,6 +60,7 @@ export type DegradationDetail = {
 const BASE_SEVERITY: Record<DegradationEvent, "warning" | "critical"> = {
   baseline_generic_fallback: "warning",
   lesson_provider_mock_in_prod: "critical",
+  lesson_provider_failover: "warning",
   lesson_fallback_after_retries: "warning",
 };
 

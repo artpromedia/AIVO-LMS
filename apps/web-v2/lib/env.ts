@@ -158,6 +158,11 @@ const serverSchema = z
     ANTHROPIC_API_KEY: z.string().optional(),
     OPENAI_API_KEY: z.string().optional(),
     GOOGLE_API_KEY: z.string().optional(),
+    // Optional model overrides for the fallback tutor providers, so a model
+    // can be rolled forward without a code change. Defaults live in the
+    // provider modules (openai-tutor.ts / google-tutor.ts).
+    OPENAI_TUTOR_MODEL: z.string().optional(),
+    GOOGLE_TUTOR_MODEL: z.string().optional(),
     OBJECT_STORAGE_BUCKET: z.string().optional(),
     OBJECT_STORAGE_REGION: z.string().optional(),
     LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),

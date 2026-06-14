@@ -40,6 +40,6 @@ describe("anthropic-tutor layering", () => {
     expect(/generate\s*\(\s*input\s*,\s*example\s*\)/.test(src)).toBe(true);
     // And it must actually use `example` in the prompt construction —
     // a parameter that's never read would defeat the purpose.
-    expect(/buildUserPrompt\([^)]*example[^)]*\)/.test(src)).toBe(true);
+    expect(/buildLessonUserPrompt\([^)]*example[^)]*\)/.test(src)).toBe(true);
   });
 });

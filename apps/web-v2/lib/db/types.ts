@@ -1302,7 +1302,7 @@ export type GeneratedLessonPlan = {
   generatedAt: ISODate;
   /** Generator telemetry. */
   generation: {
-    provider: "mock" | "ai";
+    provider: "mock" | "ai" | "openai" | "google";
     model: string;
     attempts: number;
     latencyMs: number;
