@@ -1,5 +1,5 @@
 import argon2 from "argon2";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { learnerPinCredentials, learners, users } from "@aivo/db";
 
 export const LEARNER_PIN_LOCK_THRESHOLD = 5;
@@ -72,9 +72,6 @@ export async function setLearnerPin(db: any, learnerUserId: string, rawPin: stri
         updatedAt: now,
       },
     });
-  // Defense-in-depth for legacy rows: the old plaintext users.pin column must
-  // never remain populated after the new credential is set.
-  await db.update(users).set({ pin: null, updatedAt: now }).where(eq(users.id, learnerUserId));
   return { learnerUserId, pinSetAt: now };
 }
 
@@ -133,10 +130,4 @@ export async function verifyLearnerPin(
     .set({ failedAttempts: 0, failedLastAt: null, lockedUntil: null, updatedAt: new Date() })
     .where(eq(learnerPinCredentials.learnerUserId, learner.userId));
   return { ok: true, learnerUser, learner };
-}
-
-export async function plaintextPinRowsRemaining(db: any): Promise<number> {
-  const result: any = await db.execute(sql`SELECT count(*)::int AS n FROM users WHERE role = 'LEARNER' AND pin ~ '^[0-9]{4,6}$'`);
-  const row = (Array.isArray(result) ? result : result.rows)[0];
-  return Number(row?.n ?? 0);
 }

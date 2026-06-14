@@ -78,10 +78,10 @@ test("learner PINs are hashed, learner-bound, and lock out after repeated failur
   assert.equal(createB.statusCode, 200, createB.body);
   const learnerB = createB.json().learner;
 
-  const plaintextRows: any = await db.execute(
-    sql`SELECT count(*)::int AS n FROM users WHERE role = 'LEARNER' AND pin ~ '^[0-9]{4,6}$'`,
+  const credentialCountRows: any = await db.execute(
+    sql`SELECT count(*)::int AS n FROM learner_pin_credentials WHERE learner_user_id IN (${learnerA.userId}, ${learnerB.userId})`,
   );
-  assert.equal((Array.isArray(plaintextRows) ? plaintextRows : plaintextRows.rows)[0].n, 0);
+  assert.equal((Array.isArray(credentialCountRows) ? credentialCountRows : credentialCountRows.rows)[0].n, 2);
 
   const credentialRows: any = await db.execute(
     sql`SELECT pin_hash FROM learner_pin_credentials WHERE learner_user_id = ${learnerA.userId}`,

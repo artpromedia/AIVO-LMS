@@ -3,8 +3,8 @@
  * PIN step when identity-svc is not wired (mirrors the dual-path the Speech
  * Buddy consent + billing surfaces use). In production (`AIVO_USE_IDENTITY_SVC`
  * / `AIVO_USE_SERVICE_STACK` on, real token present) the BFF sets the PIN on
- * identity-svc's `users.pin` instead — that is the value the mobile learner
- * `pin-login` flow verifies.
+ * identity-svc's learner_pin_credentials table instead — that is the value
+ * the mobile learner `pin-login` flow verifies.
  *
  * The PIN is a credential, so even in this throwaway dev store we never keep it
  * in plaintext: it is salted + hashed (scrypt) and only `hasPin` / `pinSetAt`

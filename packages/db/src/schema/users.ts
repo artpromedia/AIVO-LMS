@@ -19,7 +19,6 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   name: varchar("name", { length: 255 }).notNull(),
   role: userRoleEnum("role").notNull(),
-  pin: varchar("pin", { length: 10 }),
   emailVerified: boolean("email_verified").default(false),
   mfaEnabled: boolean("mfa_enabled").default(false),
   mfaMethod: varchar("mfa_method", { length: 20 }).default("email"),
@@ -55,9 +54,9 @@ export const users = pgTable("users", {
 /**
  * Learner PIN credentials.
  *
- * `users.pin` is a legacy plaintext column kept only for backwards-compatible
- * migrations; production auth must read this table instead. The hash is an
- * Argon2id encoded string, so all verifier parameters travel with the hash.
+ * The hash is an Argon2id encoded string, so all verifier parameters travel
+ * with the hash. Legacy plaintext PIN columns are dropped by migration 0118
+ * and must not be reintroduced.
  */
 export const learnerPinCredentials = pgTable(
   "learner_pin_credentials",
