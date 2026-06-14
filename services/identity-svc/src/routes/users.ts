@@ -16,6 +16,7 @@ import {
   alignmentAfterGradeChange,
   alignmentWithEnrolledGrade,
 } from "../services/enrollment-alignment.js";
+import { setLearnerPin } from "../services/learner-pin.js";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -358,7 +359,6 @@ export async function registerUserRoutes(app: FastifyInstance) {
             tenantId,
             name: body.name,
             role: "LEARNER",
-            pin: body.pin,
           })
           .returning();
 
@@ -421,6 +421,10 @@ export async function registerUserRoutes(app: FastifyInstance) {
               preferredInstructionLanguage: body.preferredLanguage,
             })
             .catch(() => {});
+        }
+
+        if (body.pin) {
+          await setLearnerPin(db, learnerUser.id, body.pin);
         }
 
         await db
@@ -493,7 +497,7 @@ export async function registerUserRoutes(app: FastifyInstance) {
       }
 
       if (body.pin && learner.userId) {
-        await db.update(users).set({ pin: body.pin }).where(eq(users.id, learner.userId));
+        await setLearnerPin(db, learner.userId, body.pin);
       }
 
       const updateFields: Record<string, unknown> = {};

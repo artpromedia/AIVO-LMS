@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, type Href } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import * as Haptics from "expo-haptics";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +37,7 @@ export default function PinScreen() {
   // identity-svc subject id of the parent account.
   const params = useLocalSearchParams<{ parentId?: string; learnerId?: string }>();
   const presetParentId = typeof params.parentId === "string" ? params.parentId.trim() : "";
+  const learnerId = typeof params.learnerId === "string" ? params.learnerId.trim() : "";
   const [parentId, setParentId] = useState(presetParentId);
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
@@ -68,7 +69,12 @@ export default function PinScreen() {
       setError("");
 
       if (newPin.length === 4) {
-        const result = await loginWithPin(newPin, parentId.trim());
+        if (!learnerId) {
+          setPin("");
+          setError(t("auth.selectLearnerFirst", "Select your learner profile first."));
+          return;
+        }
+        const result = await loginWithPin({ pin: newPin, parentId: parentId.trim(), learnerId });
         if (result.success) {
           router.replace("/");
         } else {
@@ -83,7 +89,7 @@ export default function PinScreen() {
         }
       }
     },
-    [pin, attempts, loginWithPin, parentId, t, tapHaptic],
+    [pin, attempts, loginWithPin, parentId, learnerId, t, tapHaptic],
   );
 
   const handleDelete = useCallback(() => {
@@ -142,9 +148,17 @@ export default function PinScreen() {
             />
             {error ? <Text style={[styles.error, { color: errorTint }]}>{error}</Text> : null}
             <Button
-              title={t("auth.continueToPin")}
-              onPress={handleParentSubmit}
-              disabled={!parentId.trim()}
+              title={
+                learnerId
+                  ? t("auth.continueToPin")
+                  : t("auth.chooseLearnerProfile", "Choose learner profile")
+              }
+              onPress={
+                learnerId
+                  ? handleParentSubmit
+                  : () => router.replace("/(auth)/learner-login" as Href)
+              }
+              disabled={learnerId ? !parentId.trim() : false}
               size="lg"
               fullWidth
               style={{ marginTop: 16 }}

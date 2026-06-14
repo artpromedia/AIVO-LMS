@@ -11,9 +11,9 @@ import { useTranslations } from "next-intl";
  *
  * Age-appropriate learner PIN. 4 digits, big touch targets, no
  * keyboard-only assumption. The PIN is the learner's gate into their
- * own profile after a parent has set up the account — it is NOT a
- * sign-in credential by itself; the device must already be associated
- * with a verified parent account.
+ * own profile after a parent has set up the account and approved the cloned
+ * AIVO brain — it is NOT a sign-in credential by itself; the device must
+ * already be associated with a verified parent account.
  *
  * Slice 4 (gap #7): the step now persists. A PIN belongs to a specific
  * learner, so the page resolves a `learnerId` from the `?learnerId=` query
@@ -21,29 +21,32 @@ import { useTranslations } from "next-intl";
  * parent's learners) — the same resolution pattern as the slice 3 IEP step.
  * On Save it POSTs the PIN to `/api/bff/learners/[learnerId]/pin`, which
  * dual-paths to identity-svc (the value the mobile `pin-login` flow verifies)
- * or the in-memory store in dev/mock. Skipping is always allowed and simply
+ * or the in-memory store in development fallback. Skipping is always allowed and simply
  * advances without setting a PIN.
  */
 
 type LearnerOption = { id: string; firstName: string };
 
-const NEXT_STEP = "/onboarding/parent-verify";
+const NEXT_STEP = (learnerId: string) => `/learner/select/auto?learnerId=${encodeURIComponent(learnerId)}`;
+const REVIEW_STEP = (learnerId: string) => `/parent/learners/${encodeURIComponent(learnerId)}/brain-clone-watch`;
 
-async function postPin(learnerId: string, pin: string): Promise<void> {
+async function postPin(learnerId: string, pin: string): Promise<{ blockedForApproval: boolean }> {
   const res = await fetch(`/api/bff/learners/${learnerId}/pin`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ pin }),
   });
-  let json: { ok?: boolean } = {};
+  let json: { ok?: boolean; error?: { code?: string } } = {};
   try {
     json = (await res.json()) as { ok?: boolean };
   } catch {
     /* ignore — !res.ok branch handles it */
   }
   if (!res.ok || json.ok !== true) {
+    if (json.error?.code === "brain_not_approved") return { blockedForApproval: true };
     throw new Error("pin_persist_failed");
   }
+  return { blockedForApproval: false };
 }
 
 export default function PinSetupPage() {
@@ -99,8 +102,13 @@ export default function PinSetupPage() {
     setSubmitting(true);
     setError(null);
     try {
-      await postPin(selectedLearnerId, pin);
-      router.push(NEXT_STEP);
+      const result = await postPin(selectedLearnerId, pin);
+      if (result.blockedForApproval) {
+        setError("Review and approve this learner's AIVO brain before creating their app PIN.");
+        setSubmitting(false);
+        return;
+      }
+      router.push(NEXT_STEP(selectedLearnerId));
     } catch {
       setError(t("save_error"));
       setSubmitting(false);
@@ -147,10 +155,10 @@ export default function PinSetupPage() {
                 ) : null}
               </form>
               <Link
-                href={NEXT_STEP}
+                href={selectedLearnerId ? REVIEW_STEP(selectedLearnerId) : "/parent/learners"}
                 className="text-xs text-iw-text-muted text-center hover:underline"
               >
-                {t("skip")}
+                Review the brain first
               </Link>
             </>
           )
@@ -241,4 +249,3 @@ function PinRing({
     </div>
   );
 }
-

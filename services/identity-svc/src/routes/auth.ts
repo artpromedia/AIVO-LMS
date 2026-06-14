@@ -83,6 +83,7 @@ import {
 } from "../services/mfa-webauthn.js";
 import { getAuthPublicKeySchema, updateAuthSessionHeartbeatSchema } from "./schemas.js";
 import { recordDistrictInviteAccepted } from "../lib/district-onboarding-observability.js";
+import { verifyLearnerPin } from "../services/learner-pin.js";
 
 async function hashPassword(password: string): Promise<string> {
   return argon2.hash(password);
@@ -419,6 +420,7 @@ type AccessTokenUser = {
   email?: string | null;
   name?: string | null;
   schoolId?: string | null;
+  learnerId?: string | null;
 };
 
 async function buildAccessTokenClaims(db: any, user: AccessTokenUser) {
@@ -431,6 +433,7 @@ async function buildAccessTokenClaims(db: any, user: AccessTokenUser) {
     email: user.email || undefined,
     name: user.name || undefined,
     ...(user.schoolId ? { schoolId: user.schoolId } : {}),
+    ...(user.learnerId ? { learnerId: user.learnerId } : {}),
   };
 }
 
@@ -1068,58 +1071,37 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         tags: ["Auth"],
         body: {
           type: "object",
-          required: ["parentId", "pin"],
+          required: ["parentId", "learnerId", "pin"],
           properties: {
             parentId: { type: "string" },
+            learnerId: { type: "string" },
             pin: { type: "string", minLength: 4, maxLength: 6 },
           },
         },
       },
     },
     async (req, reply) => {
-      const { parentId, pin } = req.body as any;
+      const { parentId, learnerId, pin } = req.body as any;
       const db = (app as any).db;
 
-      const isEmail = parentId.includes("@");
-      let parent;
-      if (isEmail) {
-        const [found] = await db
-          .select()
-          .from(users)
-          .where(and(eq(users.email, parentId), eq(users.role, "PARENT")))
-          .limit(1);
-        parent = found;
-      } else {
-        const [found] = await db
-          .select()
-          .from(users)
-          .where(and(eq(users.id, parentId), eq(users.role, "PARENT")))
-          .limit(1);
-        parent = found;
+      const verified = await verifyLearnerPin(db, { parentId, learnerId, pin });
+      if (!verified.ok) {
+        if (verified.retryAfterSeconds) reply.header("retry-after", String(verified.retryAfterSeconds));
+        return reply.status(verified.status).send({
+          error: verified.error,
+          retryAfterSeconds: verified.retryAfterSeconds,
+        });
       }
 
-      if (!parent) {
-        return reply.status(401).send({ error: "Invalid parent email or ID" });
-      }
-
-      const learnerList = await db.select().from(learners).where(eq(learners.parentId, parent.id));
-      const learnerUserIds = learnerList.map((l: any) => l.userId);
-
-      if (learnerUserIds.length === 0) {
-        return reply.status(401).send({ error: "No learners found" });
-      }
-
-      const allLearnerUsers = await db
-        .select()
-        .from(users)
-        .where(and(eq(users.role, "LEARNER"), eq(users.pin, pin)));
-      const matchedLearner = allLearnerUsers.find((u: any) => learnerUserIds.includes(u.id));
-
-      if (!matchedLearner) {
-        return reply.status(401).send({ error: "Invalid PIN" });
-      }
-
-      const accessToken = await mintAccessToken(db, matchedLearner, "2h");
+      const accessToken = await mintAccessToken(
+        db,
+        {
+          ...verified.learnerUser,
+          tenantId: verified.learnerUser.tenantId ?? verified.learner.tenantId,
+          learnerId: verified.learner.id,
+        },
+        "2h",
+      );
 
       // Establish a refresh session so the learner's PIN sign-in survives the
       // 2h access-token expiry. It previously had no sessions row / refresh
@@ -1127,7 +1109,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs("LEARNER");
       await db.insert(sessions).values({
-        userId: matchedLearner.id,
+        userId: verified.learnerUser.id,
         refreshToken: hashRefreshToken(rawRefreshToken),
         expiresAt: new Date(Date.now() + ttlMs),
       });
@@ -1142,10 +1124,11 @@ export async function registerAuthRoutes(app: FastifyInstance) {
 
       return {
         user: {
-          id: matchedLearner.id,
-          name: matchedLearner.name,
+          id: verified.learnerUser.id,
+          learnerId: verified.learner.id,
+          name: verified.learnerUser.name,
           role: "LEARNER",
-          tenantId: matchedLearner.tenantId,
+          tenantId: verified.learnerUser.tenantId,
         },
         accessToken,
       };

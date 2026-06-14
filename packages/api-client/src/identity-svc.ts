@@ -348,6 +348,7 @@ export interface paths {
                 content: {
                     "application/json": {
                         parentId: string;
+                        learnerId: string;
                         pin: string;
                     };
                 };

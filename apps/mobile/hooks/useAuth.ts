@@ -58,7 +58,11 @@ interface AuthContextValue extends AuthState {
     mfaToken?: string;
     mustChangePassword?: boolean;
   }>;
-  loginWithPin: (pin: string, parentId: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithPin: (input: {
+    pin: string;
+    parentId: string;
+    learnerId: string;
+  }) => Promise<{ success: boolean; error?: string }>;
   signup: (data: SignupData) => Promise<{ success: boolean; error?: string }>;
   loginWithGoogle: (
     idToken: string,
@@ -208,11 +212,11 @@ export function useAuthState(): AuthContextValue {
     }
   }, []);
 
-  const loginWithPin = useCallback(async (pin: string, parentId: string) => {
+  const loginWithPin = useCallback(async (input: { pin: string; parentId: string; learnerId: string }) => {
     try {
       const response = await apiFetch(API.IDENTITY, "/api/auth/pin-login", {
         method: "POST",
-        body: JSON.stringify({ parentId, pin }),
+        body: JSON.stringify(input),
         skipAuth: true,
       });
 

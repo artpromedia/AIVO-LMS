@@ -53,6 +53,32 @@ export const users = pgTable("users", {
 });
 
 /**
+ * Learner PIN credentials.
+ *
+ * `users.pin` is a legacy plaintext column kept only for backwards-compatible
+ * migrations; production auth must read this table instead. The hash is an
+ * Argon2id encoded string, so all verifier parameters travel with the hash.
+ */
+export const learnerPinCredentials = pgTable(
+  "learner_pin_credentials",
+  {
+    learnerUserId: uuid("learner_user_id")
+      .references(() => users.id)
+      .primaryKey(),
+    pinHash: text("pin_hash").notNull(),
+    pinSetAt: timestamp("pin_set_at").defaultNow().notNull(),
+    failedAttempts: integer("failed_attempts").default(0).notNull(),
+    failedLastAt: timestamp("failed_last_at"),
+    lockedUntil: timestamp("locked_until"),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("learner_pin_credentials_locked_until_idx").on(table.lockedUntil),
+    index("learner_pin_credentials_updated_at_idx").on(table.updatedAt),
+  ],
+);
+
+/**
  * Sprint 7: prior password hashes. We keep the last N (default 5) so a user
  * cannot rotate back into a recently-used credential.
  */

@@ -286,10 +286,14 @@
                 "type": "object",
                 "required": [
                   "parentId",
+                  "learnerId",
                   "pin"
                 ],
                 "properties": {
                   "parentId": {
+                    "type": "string"
+                  },
+                  "learnerId": {
                     "type": "string"
                   },
                   "pin": {

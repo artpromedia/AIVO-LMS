@@ -8,6 +8,7 @@ import type { Role } from "@/lib/auth/types";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { LoginForm } from "./_components/login-form";
+import { LearnerPinForm } from "./_components/learner-pin-form";
 
 async function signInAction(formData: FormData) {
   "use server";
@@ -21,8 +22,8 @@ async function signInAction(formData: FormData) {
   const email = typeof emailRaw === "string" ? emailRaw.trim() : "";
   const password = typeof passwordRaw === "string" ? passwordRaw : "";
 
-  // --- Mock path: developer affordance, identical to the previous
-  // behavior so AUTH_MODE=mock dev workflows keep working. -----------
+  // --- Development path: developer affordance, identical to the previous
+  // behavior so AUTH_MODE=development workflows keep working. -----------
   if (serverEnv.AUTH_MODE === "mock") {
     const { MOCK_COOKIE_NAME } = await import("@/lib/auth/mock-session");
     const raw = formData.get("role");
@@ -111,6 +112,43 @@ async function signInAction(formData: FormData) {
   redirect(ROLE_HOME[profile.role]);
 }
 
+async function learnerSignInAction(formData: FormData) {
+  "use server";
+  const { cookies } = await import("next/headers");
+  const { redirect } = await import("next/navigation");
+  const { ROLE_HOME } = await import("@/lib/auth/types");
+  const { identityPinLogin, extractRefreshToken, toSessionProfile } = await import("@/lib/auth/identity-client");
+  const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
+
+  const parentId = String(formData.get("parentId") ?? "").trim();
+  const learnerId = String(formData.get("learnerId") ?? "").trim();
+  const pin = String(formData.get("pin") ?? "").trim();
+  if (!parentId || !learnerId || !/^\d{4,6}$/.test(pin)) {
+    redirect("/login?mode=learner&error=missing_credentials");
+  }
+
+  const result = await identityPinLogin({ parentId, learnerId, pin });
+  if (result.kind === "ok") {
+    const profile = toSessionProfile(result.user);
+    if (!profile || profile.role !== "learner" || profile.learnerId !== learnerId) {
+      redirect("/login?mode=learner&error=unsupported_role");
+      throw new Error("unsupported learner PIN session");
+    }
+    const learnerProfile = profile;
+    const jar = await cookies();
+    setAuthSessionCookies(jar, {
+      accessToken: result.accessToken,
+      refreshToken: extractRefreshToken(result.setCookies),
+      profile: learnerProfile,
+    });
+    redirect(ROLE_HOME.learner);
+  }
+  if (result.kind === "error") {
+    redirect(`/login?mode=learner&error=${"invalid_credentials"}`);
+  }
+  redirect("/login?mode=learner&error=invalid_credentials");
+}
+
 /**
  * Login surface — parent / educator entry into AIVO.
  *
@@ -147,9 +185,10 @@ const NOTICE_CODES = new Set(["password_reset", "logged_out"]);
 export default async function LoginPage({
   searchParams,
 }: {
-  readonly searchParams: Promise<{ error?: string; notice?: string }>;
+  readonly searchParams: Promise<{ error?: string; notice?: string; mode?: string }>;
 }) {
-  const { error, notice } = await searchParams;
+  const { error, notice, mode } = await searchParams;
+  const loginMode = mode === "learner" ? "learner" : "adult";
   const t = await getTranslations("auth.login");
   const errorMessage = error
     ? t(`errors.${ERROR_CODES.has(error) ? error : "login_failed"}` as never)
@@ -210,18 +249,18 @@ export default async function LoginPage({
 
             <AuthCard
               eyebrow={t("card_eyebrow")}
-              title={t("card_title")}
-              subtitle={t("card_subtitle")}
+              title={loginMode === "learner" ? "Learner PIN sign-in" : t("card_title")}
+              subtitle={loginMode === "learner" ? "Learners enter a PIN only after a parent has set up and approved their profile." : t("card_subtitle")}
               actions={
                 <>
                   <Button
                     type="submit"
-                    form="login-form"
+                    form={loginMode === "learner" ? "learner-pin-form" : "login-form"}
                     variant="default"
                     size="lg"
                     className="w-full"
                   >
-                    {t("submit")}
+                    {loginMode === "learner" ? "Enter learner app" : t("submit")}
                   </Button>
                   <p className="text-sm text-iw-ink-muted text-center">
                     {t("new_here")}{" "}
@@ -236,7 +275,19 @@ export default async function LoginPage({
                 </>
               }
             >
-              <LoginForm id="login-form" action={signInAction} />
+              <div className="mb-5 grid grid-cols-2 rounded-full bg-iw-card p-1 text-sm font-semibold" role="tablist" aria-label="Choose sign-in mode">
+                <Link href="/login?mode=learner" role="tab" aria-selected={loginMode === "learner"} className={`rounded-full px-3 py-2 text-center ${loginMode === "learner" ? "bg-iw-primary text-white" : "text-iw-ink-muted hover:text-iw-ink"}`}>
+                  Learner — PIN only
+                </Link>
+                <Link href="/login?mode=adult" role="tab" aria-selected={loginMode === "adult"} className={`rounded-full px-3 py-2 text-center ${loginMode === "adult" ? "bg-iw-primary text-white" : "text-iw-ink-muted hover:text-iw-ink"}`}>
+                  All other users
+                </Link>
+              </div>
+              {loginMode === "learner" ? (
+                <LearnerPinForm id="learner-pin-form" action={learnerSignInAction} />
+              ) : (
+                <LoginForm id="login-form" action={signInAction} />
+              )}
             </AuthCard>
 
             {noticeMessage ? (
