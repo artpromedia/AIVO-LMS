@@ -55,6 +55,37 @@
   --aivo-density-h1-font: 1.875rem;
 }
 
+/* =====================================================================
+   WCAG 2 AA contrast overrides (axe `@a11y` gate).
+   The @aivo/brand status/accent/muted tokens are tuned for fills and
+   decoration; as TEXT or control colors on white they fall under the
+   4.5:1 minimum (e.g. status-success #22c55e ≈ 2.3:1, sunshine accent
+   #fbbf24 ≈ 1.5:1). Darken them app-wide so every text/status/link/CTA
+   usage clears AA. Brand-scale and `-color-` dual-emit names are both
+   overridden because components reference either form directly. Hues are
+   preserved; only lightness drops. Fills/tints (banner color-mix washes)
+   stay legible because their text is always `text-iw-ink`.
+   ===================================================================== */
+:root {
+  --aivo-status-success: #15803d;
+  --aivo-status-warning: #b45309;
+  --aivo-status-error: #b91c1c;
+  --aivo-status-info: #6d28d9;
+  --aivo-color-status-success: #15803d;
+  --aivo-color-status-warning: #b45309;
+  --aivo-color-status-error: #b91c1c;
+  --aivo-color-status-info: #6d28d9;
+  --aivo-color-text-muted: #4b5563;
+  --aivo-semantic-color-text-muted: #4b5563;
+  --aivo-color-feedback-error: #b91c1c;
+  --aivo-semantic-color-feedback-error: #b91c1c;
+  /* Accent (base teacher/admin themes) — sunshine gold fails AA both as
+     link text and as a white-on-accent button. A deep amber clears 4.5:1
+     in both directions. Parent/learner/platform accents are darkened in
+     their own theme blocks below. */
+  --color-aivo-accent: #92400e;
+}
+
 html,
 body {
   background: var(--color-aivo-surface);
@@ -102,7 +133,10 @@ body {
   --color-aivo-surface-2: oklch(0.965 0.018 75);
   --color-aivo-primary: oklch(0.56 0.14 265);
   --color-aivo-primary-soft: oklch(0.95 0.035 280);
-  --color-aivo-accent: oklch(0.74 0.16 55);
+  /* AA: the warm peach accent fails 4.5:1 as link text; deepen it while
+     keeping the orange hue. Decorative peach moments use brand fills, not
+     this text/interactive token. */
+  --color-aivo-accent: oklch(0.5 0.14 55);
   --color-aivo-page-bg: oklch(0.965 0.018 75);
   --color-aivo-sidebar-bg: oklch(0.99 0.012 75);
   --radius-card: 16px;

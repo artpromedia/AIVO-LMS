@@ -120,8 +120,6 @@ export function PillCardGroup(props: PillCardGroupProps) {
     <fieldset
       className={cn("flex flex-col gap-3", compact && "gap-2", className)}
       aria-describedby={describedBy}
-      aria-required={required || undefined}
-      aria-invalid={error ? true : undefined}
     >
       <legend className="text-sm font-semibold text-iw-text-strong">
         {legend}
