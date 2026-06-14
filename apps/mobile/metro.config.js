@@ -18,6 +18,7 @@ config.watchFolders = [
   path.resolve(monorepoRoot, "packages/brand"),
   path.resolve(monorepoRoot, "packages/mobile-ui"),
   path.resolve(monorepoRoot, "packages/nav"),
+  path.resolve(monorepoRoot, "packages/observability"),
 ];
 
 config.resolver.nodeModulesPaths = [
