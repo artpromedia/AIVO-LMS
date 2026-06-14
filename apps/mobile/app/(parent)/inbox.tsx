@@ -6,7 +6,8 @@ import {
   Pressable,
   ScrollView,
   ActivityIndicator,
-  Alert,
+  Linking,
+  Platform,
   RefreshControl,
 } from "react-native";
 import { router } from "expo-router";
@@ -58,6 +59,28 @@ function filterNotifications(items: InboxNotification[], tab: TabKey) {
   return items;
 }
 
+function resolveWebOrigin(): string | null {
+  const configured = (process.env.EXPO_PUBLIC_WEB_URL || "").replace(/\/+$/, "");
+  if (configured) return configured;
+  if (__DEV__) {
+    return (
+      Platform.select({
+        android: "http://10.0.2.2:5000",
+        default: "http://localhost:5000",
+      }) ?? null
+    );
+  }
+  return null;
+}
+
+function toWebUrl(actionUrl: string | undefined): string | null {
+  if (!actionUrl) return null;
+  if (/^https?:\/\//i.test(actionUrl)) return actionUrl;
+  const origin = resolveWebOrigin();
+  if (!origin) return null;
+  return `${origin}${actionUrl.startsWith("/") ? actionUrl : `/${actionUrl}`}`;
+}
+
 export default function ParentInboxScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
@@ -79,14 +102,17 @@ export default function ParentInboxScreen() {
     setRefreshing(false);
   };
 
-  const onView = (n: InboxNotification) => {
+  const onView = async (n: InboxNotification) => {
     if (!n.readAt) markRead.mutate(n.id);
     const target = mapInboxUrlToMobileRoute(n.actionUrl);
     if (target) {
       router.push({ pathname: target.pathname, params: target.params } as Href);
       return;
     }
-    Alert.alert(n.title, t("parentInbox.openOnWeb"));
+    const webUrl = toWebUrl(n.actionUrl);
+    if (webUrl) {
+      await Linking.openURL(webUrl);
+    }
   };
 
   return (
@@ -174,7 +200,8 @@ export default function ParentInboxScreen() {
                       </Text>
                     ) : null}
                     <View style={styles.actions}>
-                      {n.actionUrl ? (
+                      {n.actionUrl &&
+                      (mapInboxUrlToMobileRoute(n.actionUrl) || toWebUrl(n.actionUrl)) ? (
                         <Pressable
                           onPress={() => onView(n)}
                           style={[styles.actionBtn, styles.actionPrimary]}

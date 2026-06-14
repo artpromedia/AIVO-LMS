@@ -272,29 +272,6 @@ export default function IEPScreen() {
 
       {tab === "goals" && (
         <>
-          <AivoCard style={styles.uploadCard}>
-            <Ionicons name="cloud-upload-outline" size={32} color={colors.primary} />
-            <Text style={styles.uploadTitle}>{t("parentOnboard.uploadIEP")}</Text>
-            <Text style={styles.uploadDesc}>{t("parentIEP.uploadDesc")}</Text>
-            <View style={styles.uploadActions}>
-              <AivoButton
-                title={t("parentIEP.camera")}
-                onPress={() => Alert.alert(t("parentIEP.camera"), t("common.featureUnavailable"))}
-                size="sm"
-                icon={<Ionicons name="camera-outline" size={16} color="#FFF" />}
-                style={{ flex: 1, marginRight: 8 }}
-              />
-              <AivoButton
-                title="PDF"
-                onPress={() => Alert.alert("PDF", t("common.featureUnavailable"))}
-                variant="outline"
-                size="sm"
-                icon={<Ionicons name="document-outline" size={16} color={colors.primary} />}
-                style={{ flex: 1 }}
-              />
-            </View>
-          </AivoCard>
-
           <Text style={[styles.sectionTitle, { marginBottom: spacing.md }]}>
             {t("parentIEP.iepGoals")}
           </Text>
@@ -386,7 +363,11 @@ export default function IEPScreen() {
         onRequestClose={() => setPrefsModalOpen(false)}
       >
         <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setPrefsModalOpen(false)}>
-          <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
+          <Pressable
+            accessibilityRole="none"
+            style={styles.modalContent}
+            onPress={(event) => event.stopPropagation()}
+          >
             <Text style={styles.modalTitle}>{t("parentIEP.prefsTitle")}</Text>
             <Text style={styles.modalDesc}>{t("parentIEP.prefsDesc")}</Text>
             {!draftPrefs ? (
@@ -455,7 +436,11 @@ export default function IEPScreen() {
         onRequestClose={() => setRespondModal(null)}
       >
         <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setRespondModal(null)}>
-          <Pressable accessibilityRole="button" style={styles.modalContent} onPress={() => {}}>
+          <Pressable
+            accessibilityRole="none"
+            style={styles.modalContent}
+            onPress={(event) => event.stopPropagation()}
+          >
             <Text style={styles.modalTitle}>
               {respondModal?.mode === "acknowledged"
                 ? t("parentIEP.acknowledgeTitle")
@@ -533,20 +518,6 @@ const styles = StyleSheet.create({
   tabActive: { backgroundColor: colors.primary },
   tabText: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
   tabTextActive: { color: "#FFF" },
-  uploadCard: {
-    alignItems: "center" as const,
-    marginBottom: spacing.lg,
-    paddingVertical: spacing.lg,
-  },
-  uploadTitle: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text, marginTop: 8 },
-  uploadDesc: {
-    fontSize: 13,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
-    marginTop: 4,
-    marginBottom: spacing.md,
-  },
-  uploadActions: { flexDirection: "row", width: "100%" },
   sectionTitle: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.text },
   goalCard: { marginBottom: spacing.sm },
   goalHeader: {

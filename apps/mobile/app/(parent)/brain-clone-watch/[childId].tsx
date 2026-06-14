@@ -79,10 +79,9 @@ function resolveWebOrigin(): string | null {
  * `/parent/learners/[learnerId]/brain-clone-watch`. Parents review the
  * build stages and XAI decisions here; the approval itself (which
  * captures COPPA consent + the Responsible-AI acknowledgement) happens
- * on the web review page, so the unapproved state renders an honest
- * open/copy handoff to that page instead of approval controls this
- * screen cannot honor. Mobile approval parity is a tracked follow-up
- * (SPRINT-PLAN Decisions, D1) once the web consent ceremony lands.
+ * on the web review page. Mobile therefore treats web review as the
+ * product contract: the unapproved state renders an honest open/copy
+ * handoff instead of approval controls this screen cannot honor.
  */
 export default function ParentBrainCloneWatchScreen() {
   const { t } = useTranslation();
@@ -232,11 +231,11 @@ export default function ParentBrainCloneWatchScreen() {
 type HandoffNotice = "copied" | "openFailed" | "copyFailed";
 
 /**
- * Honest unapproved-state handoff (Sprint C-04, decision D1a). Mobile
- * shows the full review above; the approval itself — which captures
- * COPPA consent and the Responsible-AI acknowledgement — lives on the
- * web review page, so this card opens (or copies) that page's link
- * instead of rendering approve/amend controls the app cannot honor.
+ * Honest unapproved-state handoff. Mobile shows the full review above;
+ * the approval itself — which captures COPPA consent and the
+ * Responsible-AI acknowledgement — lives on the web review page, so this
+ * card opens (or copies) that page's link instead of rendering
+ * approve/amend controls the app cannot honor.
  * When no web origin is configured for the build, the open button is
  * not rendered at all (never a dead tap) and copy-link carries the
  * page path.

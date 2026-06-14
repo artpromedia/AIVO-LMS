@@ -21,8 +21,14 @@ export const stageClient = {
       .then(() => ({ correct }));
   },
 
-  /** Acknowledge a non-interactive beat (tutor-turn etc.). */
-  ackBeat(_beat: Beat) {
-    return Promise.resolve();
+  /** Acknowledge a non-interactive beat (tutor-turn etc.) through the session progress API. */
+  ackBeat(params: { sessionId: string; learnerId: string; beat: Beat }) {
+    return sessionClient.submitBeatResponse({
+      sessionId: params.sessionId,
+      learnerId: params.learnerId,
+      beat: params.beat,
+      answer: "acknowledged",
+      correct: true,
+    });
   },
 };
