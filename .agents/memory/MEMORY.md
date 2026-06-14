@@ -1,0 +1,1 @@
+- [Replit workflow port detection](replit-workflow-ports.md) — supervisor only sees ports declared as `localPort` in `.replit`; bind that exact port and set `waitForPort` to it.
