@@ -147,7 +147,7 @@ export function LessonSecondaryAction({
       className={cn(
         "inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-semibold",
         "bg-white border border-iw-border/80 text-iw-text-strong",
-        "hover:bg-iw-bg hover:border-[var(--color-aivo-primary)]/40",
+        "hover:bg-iw-bg hover:border-[var(--color-aivo-primary)]/40 disabled:cursor-not-allowed disabled:opacity-60",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-aivo-primary)] focus-visible:ring-offset-2",
         "transition-colors",
         className,

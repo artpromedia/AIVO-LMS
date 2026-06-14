@@ -2719,14 +2719,14 @@ export type CreateLessonRunResult =
     };
 
 /**
- * Create a LessonRun + generate its plan synchronously via the mock provider.
+ * Create a LessonRun + generate its plan synchronously via the configured tutor provider.
  * In production this becomes async: the BFF returns a `generating` run and
  * a background worker calls back. The contract (LessonRun.lessonPlanId set
  * when status === "ready") is identical.
  */
 export async function createLessonRun(
   input: CreateLessonRunInput,
-  provider: TutorProvider = getTutorProvider(),
+  provider?: TutorProvider,
 ): Promise<CreateLessonRunResult> {
   const learner = await getLearner(input.learnerId, input.tenantId);
   if (!learner) {
@@ -2826,7 +2826,7 @@ export async function createLessonRun(
   await getPersistence().lessonRuns.upsertRun(run);
 
   try {
-    const { plan, telemetry } = await generateLessonPlanWithRetry(provider, {
+    const { plan, telemetry } = await generateLessonPlanWithRetry(provider ?? getTutorProvider(), {
       learnerName: learner.displayName,
       brainState: brain.state,
       subject,

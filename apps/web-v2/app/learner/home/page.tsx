@@ -32,7 +32,6 @@ import { Button } from "@/components/ui/button";
 import {
   LearnerLevelBadge,
   FeaturedLessonCard,
-  LessonSecondaryAction,
   TutorAvatarCard,
   type TutorAvatarTone,
 } from "@aivo/ui/learner-dashboard";
@@ -62,6 +61,7 @@ import {
   getLearner,
   getLearnerEngagement,
   getMasteryMap,
+  getSkill,
   listSubjects,
 } from "@/lib/db/repos";
 import LivingBrainIndicator from "@/components/brain/living-brain-indicator";
@@ -71,10 +71,13 @@ import { audit } from "@/lib/bff/audit";
 import { hasLearnerConsent } from "@/lib/bff/consent-guard";
 import { tryConsumeRateLimit, RATE_LIMITS } from "@/lib/bff/rate-limit";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { FeaturedLessonActions } from "@/components/learner/featured-lesson-actions";
 
 async function startMissionAction(formData: FormData) {
   "use server";
   const learnerId = String(formData.get("learnerId") ?? "");
+  const requestedSubjectId = String(formData.get("subjectId") ?? "");
+  const requestedSkillId = String(formData.get("skillId") ?? "");
   const session = await requirePageRole(["learner", "parent"]);
   if (session.role === "learner" && session.learnerId !== learnerId) {
     redirect("/learner/home");
@@ -99,18 +102,19 @@ async function startMissionAction(formData: FormData) {
   ) {
     redirect("/learner/home?blocker=rate_limit");
   }
-  const picked = await pickTodaysMission(learnerId, session.tenantId);
-  if (!picked.ready) redirect("/learner/home?blocker=" + picked.blocker);
-  if (picked.mission.existingRunId) {
+  const hasRequestedSkill = requestedSubjectId.length > 0 && requestedSkillId.length > 0;
+  const picked = hasRequestedSkill ? null : await pickTodaysMission(learnerId, session.tenantId);
+  if (picked && !picked.ready) redirect("/learner/home?blocker=" + picked.blocker);
+  if (picked?.ready && picked.mission.existingRunId) {
     redirect(`/learner/lesson-runs/${picked.mission.existingRunId}`);
   }
   const result = await createLessonRun({
     learnerId,
     tenantId: session.tenantId,
-    subjectId: picked.mission.subjectId,
-    skillId: picked.mission.skillId,
-    source: picked.mission.source,
-    sourceRefId: picked.mission.sourceRefId,
+    subjectId: hasRequestedSkill ? requestedSubjectId : picked!.mission.subjectId,
+    skillId: hasRequestedSkill ? requestedSkillId : picked!.mission.skillId,
+    source: hasRequestedSkill ? "subject_path" : picked!.mission.source,
+    sourceRefId: hasRequestedSkill ? null : picked!.mission.sourceRefId,
   });
   if (!result.ok) {
     // C-01: the teach gate renders the calm waiting card, not a generic
@@ -124,8 +128,10 @@ async function startMissionAction(formData: FormData) {
     learnerId,
     metadata: {
       lessonRunId: result.lessonRun.id,
-      missionKind: picked.mission.kind,
-      source: picked.mission.source,
+      missionKind: hasRequestedSkill ? "subject_path" : picked!.mission.kind,
+      source: hasRequestedSkill ? "subject_path" : picked!.mission.source,
+      subjectId: hasRequestedSkill ? requestedSubjectId : picked!.mission.subjectId,
+      skillId: hasRequestedSkill ? requestedSkillId : picked!.mission.skillId,
     },
   });
   redirect(`/learner/lesson-runs/${result.lessonRun.id}`);
@@ -166,7 +172,7 @@ const SUBJECT_LESSON_TONE: Record<
 export default async function LearnerHome({
   searchParams,
 }: {
-  searchParams: Promise<{ blocker?: string }>;
+  searchParams: Promise<{ blocker?: string; subjectId?: string; skillId?: string }>;
 }) {
   const session = await requirePageRole(["learner", "parent"]);
   const params = await searchParams;
@@ -240,10 +246,37 @@ export default async function LearnerHome({
   const featuredSubjectSlug = today.ready
     ? (allSubjects.find((s) => s.id === today.mission.subjectId)?.slug ?? "")
     : "";
+  const requestedSubject = params.subjectId
+    ? (allSubjects.find((s) => s.id === params.subjectId) ?? null)
+    : null;
+  const requestedSkill =
+    requestedSubject && params.skillId ? await getSkill(params.skillId) : null;
+  const requestedMission =
+    requestedSubject && requestedSkill && requestedSkill.subjectId === requestedSubject.id
+      ? {
+          subjectId: requestedSubject.id,
+          subjectName: requestedSubject.name,
+          skillId: requestedSkill.id,
+          skillName: requestedSkill.name,
+          learnerReason: `A focused ${requestedSubject.name} lesson from your subject path.`,
+          estimatedMinutes: 10,
+          existingRunId: null as string | null,
+          existingRunSource: null,
+        }
+      : null;
+  const featuredMission = requestedMission ?? (today.ready ? today.mission : null);
+  const featuredSlug =
+    featuredMission && requestedMission
+      ? requestedSubject!.slug
+      : today.ready
+        ? featuredSubjectSlug
+        : "";
   const featuredTutor = today.ready ? tutorForSubjectSlug(featuredSubjectSlug) : null;
-  const featuredTutorKey = featuredTutor ? tutorKeyForName(featuredTutor.name) : null;
-  const featuredTones = today.ready
-    ? (SUBJECT_LESSON_TONE[featuredSubjectSlug] ?? {
+  const requestedTutor = requestedMission ? tutorForSubjectSlug(featuredSlug) : null;
+  const activeTutor = requestedTutor ?? featuredTutor;
+  const featuredTutorKey = activeTutor ? tutorKeyForName(activeTutor.name) : null;
+  const featuredTones = featuredMission
+    ? (SUBJECT_LESSON_TONE[featuredSlug] ?? {
         lessonTone: "neutral" as const,
         tutorTone: "lavender" as const,
       })
@@ -374,88 +407,51 @@ export default async function LearnerHome({
           </section>
 
           {/* Today's quest — the single framed mission */}
-          {today.ready ? (
+          {featuredMission ? (
             <div className="flex flex-col gap-3">
               <h2 className="text-lg font-bold text-iw-text-strong">{t("quest_label")}</h2>
               <FeaturedLessonCard
-                subject={today.mission.subjectName}
+                subject={featuredMission.subjectName}
                 subjectTone={featuredTones.lessonTone}
-                durationLabel={`${today.mission.estimatedMinutes} mins`}
+                durationLabel={`${featuredMission.estimatedMinutes} mins`}
                 difficultyLabel={
                   // Sprint 07: Creator-planned lessons announce themselves —
                   // the learner sees this week was prepared for them.
-                  today.mission.existingRunSource === "weekly_creator"
+                  featuredMission.existingRunSource === "weekly_creator"
                     ? t("planned_week_badge")
                     : overallAvg >= 0.65
                       ? t("diff_steady")
                       : t("diff_easy")
                 }
-                title={today.mission.skillName}
-                description={today.mission.learnerReason}
-                tutorName={featuredTutor?.name ?? t("tutor_fallback")}
+                title={featuredMission.skillName}
+                description={featuredMission.learnerReason}
+                tutorName={activeTutor?.name ?? t("tutor_fallback")}
                 tutorPersonality={
-                  featuredTutor
-                    ? t("tutor_personality", { subtitle: featuredTutor.subtitle })
+                  activeTutor
+                    ? t("tutor_personality", { subtitle: activeTutor.subtitle })
                     : t("tutor_personality_default")
                 }
                 tutorGlyph={
                   featuredTutorKey ? (
                     <TutorFace tutorKey={featuredTutorKey} size={80} />
                   ) : (
-                    (featuredTutor?.emoji ?? "🤖")
+                    (activeTutor?.emoji ?? "🤖")
                   )
                 }
                 tutorTone={featuredTones.tutorTone}
                 secondaryActions={
-                  <>
-                    <LessonSecondaryAction
-                      icon={
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden
-                        >
-                          <path d="M3 10v4a1 1 0 0 0 1 1h3l4 4V5l-4 4H4a1 1 0 0 0-1 1Z" />
-                          <path d="M15 9a4 4 0 0 1 0 6" />
-                          <path d="M18 6a8 8 0 0 1 0 12" />
-                        </svg>
-                      }
-                    >
-                      {t("read_aloud")}
-                    </LessonSecondaryAction>
-                    <LessonSecondaryAction
-                      icon={
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden
-                        >
-                          <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                          <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                          <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                          <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                        </svg>
-                      }
-                    >
-                      {t("overview")}
-                    </LessonSecondaryAction>
-                  </>
+                  <FeaturedLessonActions
+                    readAloudLabel={t("read_aloud")}
+                    overviewLabel={t("overview")}
+                    overviewHref={`/learner/subjects/${featuredMission.subjectId}`}
+                    speechText={`${featuredMission.subjectName}. ${featuredMission.skillName}. ${featuredMission.learnerReason}`}
+                  />
                 }
                 primaryAction={
                   <form action={startMissionAction}>
                     <input type="hidden" name="learnerId" value={learnerId} />
+                    <input type="hidden" name="subjectId" value={featuredMission.subjectId} />
+                    <input type="hidden" name="skillId" value={featuredMission.skillId} />
                     <Button
                       type="submit"
                       size="lg"
@@ -471,7 +467,7 @@ export default async function LearnerHome({
                       >
                         <path d="M8 5v14l11-7L8 5Z" />
                       </svg>
-                      {today.mission.existingRunId ? t("resume_lesson") : t("start_lesson")}
+                      {featuredMission.existingRunId ? t("resume_lesson") : t("start_lesson")}
                     </Button>
                   </form>
                 }

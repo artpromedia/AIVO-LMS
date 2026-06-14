@@ -2,11 +2,11 @@
  * Sprint 11: AI adapter interface for tutor lesson generation.
  *
  * - `TutorProvider` is the swappable contract.
- * - `MockTutorProvider` returns the deterministic plan (always valid).
+ * - `MockTutorProvider` returns the deterministic development/test plan.
  * - `generateLessonPlanWithRetry` is the production-shaped entry point:
- *     calls the provider, validates with Zod, repairs/retries on schema
- *     failures, and falls back to the deterministic generator after the
- *     retry budget is exhausted.
+ *     calls the provider, validates with Zod, and repairs/retries on schema
+ *     failures. Real-provider exhaustion raises a generation failure instead
+ *     of silently returning deterministic content.
  *
  * The real-AI provider lives behind the same interface; we just swap the
  * import. No call site needs to change.
@@ -99,9 +99,10 @@ export type TutorGenerationResult = {
 };
 
 /**
- * Generate, validate, repair, and fall back. Always returns a valid plan
- * (or throws — but the deterministic fallback is itself validated, so
- * production callers see a plan in every realistic case).
+ * Generate, validate, and retry. Development/test providers keep the
+ * deterministic safety net so contract and scheduler tests can run without
+ * network credentials; production real-provider failures throw so the UI can
+ * show an honest generation blocker.
  */
 export async function generateLessonPlanWithRetry(
   provider: TutorProvider,
@@ -109,10 +110,9 @@ export async function generateLessonPlanWithRetry(
 ): Promise<TutorGenerationResult> {
   const start = Date.now();
   let lastError: unknown = null;
-  // Compute the deterministic plan once: it both anchors the provider's output
-  // shape (passed in as the `example`) and is the validated safety-net
-  // `fallback` below. This is the single place that reaches the deterministic
-  // generator, so real providers never import it.
+  // Compute the deterministic reference once: it anchors the provider's output
+  // shape (passed in as the `example`) and is the development/test provider's
+  // own response. Real providers never import the generator directly.
   const fallback = generateDeterministicLessonPlan(input);
   for (let attempt = 1; attempt <= LESSON_PLAN_MAX_ATTEMPTS; attempt++) {
     try {
@@ -144,31 +144,38 @@ export async function generateLessonPlanWithRetry(
     }
   }
 
-  // Deterministic fallback. We treat it as the safety net so the learner
-  // ALWAYS gets a usable lesson even when the upstream provider misbehaves.
   logger.error(
     { provider: provider.name, lastError: String(lastError) },
-    "[ai/tutor] provider exhausted retries — using deterministic fallback",
+    "[ai/tutor] provider exhausted retries",
   );
-  // Only a degradation when a REAL provider failed: the mock provider
-  // exhausting retries is impossible-by-construction (it returns the
-  // deterministic plan), and dev runs on mock by design.
   if (provider.name === "ai") {
     emitDegradation("lesson_fallback_after_retries", {
       reason: "retries_exhausted",
       provider: provider.model,
-      message: `lesson provider ${provider.model} failed ${LESSON_PLAN_MAX_ATTEMPTS} attempts: ${String(lastError).slice(0, 300)}`,
+      message:
+        `lesson provider ${provider.model} failed ${LESSON_PLAN_MAX_ATTEMPTS} attempts; ` +
+        (process.env.NODE_ENV === "production"
+          ? `no deterministic learner-facing fallback was served: ${String(lastError).slice(0, 300)}`
+          : `served deterministic non-production fallback: ${String(lastError).slice(0, 300)}`),
     });
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        `lesson provider ${provider.model} failed after ${LESSON_PLAN_MAX_ATTEMPTS} attempts`,
+      );
+    }
+    const validated = GeneratedLessonPlanSchema.parse(fallback);
+    return {
+      plan: validated,
+      telemetry: {
+        provider: "mock",
+        model: "deterministic-non-production-fallback",
+        attempts: LESSON_PLAN_MAX_ATTEMPTS,
+        latencyMs: Date.now() - start,
+        schemaVersion: LESSON_PLAN_SCHEMA_VERSION,
+      },
+    };
   }
-  const validated = GeneratedLessonPlanSchema.parse(fallback);
-  return {
-    plan: validated,
-    telemetry: {
-      provider: "mock",
-      model: "deterministic-fallback",
-      attempts: LESSON_PLAN_MAX_ATTEMPTS,
-      latencyMs: Date.now() - start,
-      schemaVersion: LESSON_PLAN_SCHEMA_VERSION,
-    },
-  };
+  throw new Error(
+    `lesson provider ${provider.model} failed after ${LESSON_PLAN_MAX_ATTEMPTS} attempts`,
+  );
 }

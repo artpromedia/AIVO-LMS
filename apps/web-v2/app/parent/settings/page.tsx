@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CreditCard, User } from "lucide-react";
+import { CreditCard, ShieldCheck, User } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
@@ -54,6 +54,17 @@ export default async function Page() {
         </Link>
       </div>
       <SectionHeader className="mt-10" title={t("privacy_label")} description={t("privacy_desc")} />
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <Link href="/parent/privacy" className="block">
+          <Card className="p-[var(--aivo-density-card-pad)] hover:bg-aivo-surface-2">
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="h-5 w-5 text-aivo-primary" />
+              <h3 className="font-display text-lg font-semibold">{t("privacy_label")}</h3>
+            </div>
+            <p className="mt-2 text-sm text-aivo-ink-soft">{t("privacy_desc")}</p>
+          </Card>
+        </Link>
+      </div>
     </AppShell>
   );
 }

@@ -3,15 +3,13 @@
  *
  * Implements the same `TutorProvider` contract as `MockTutorProvider`, so it
  * drops into `generateLessonPlanWithRetry` unchanged: the harness validates
- * the returned JSON against `GeneratedLessonPlanSchema`, repairs/retries on
- * mismatch, and falls back to the deterministic plan if the model misbehaves.
- * That safety net is why this provider can return raw `unknown` and let the
- * caller enforce the schema.
+ * the returned JSON against `GeneratedLessonPlanSchema` and repairs/retries
+ * on mismatch. Production failures surface as typed generation failures rather
+ * than silently teaching from a deterministic plan.
  *
  * Selection is config-driven via `getTutorProvider()`: a real Claude provider
- * when `AI_PROVIDER=anthropic` and a key is present, else the deterministic
- * mock. Production refuses `AI_PROVIDER=mock` (lib/env.ts + the release gate),
- * so a prod deploy lands on the real provider here.
+ * when `AI_PROVIDER=anthropic` and a key is present, else the development
+ * provider. Production refuses a missing real provider/key.
  *
  * The client is injectable so unit tests can run without network/credentials;
  * a live conformance test exercises the real API only when ANTHROPIC_API_KEY
@@ -119,18 +117,11 @@ export function createAnthropicTutorProvider(client: Anthropic): TutorProvider {
 }
 
 let cachedProvider: TutorProvider | null = null;
-let mockInProdAlerted = false;
-
 /**
  * Resolve the tutor provider from configuration. Real Claude when
- * `AI_PROVIDER=anthropic` and a key is present; deterministic mock otherwise.
- *
- * Wave A (G2): in the production runtime, resolving the mock while
- * AI_PROVIDER names a real provider is the silent-misconfig class this
- * release hunts — the boot probe (lib/boot/llm-config-probe.ts) should
- * have refused startup, but if a key is rotated out from under a running
- * process this is the last line that notices. Page once per process
- * (emitDegradation also dedups per-hour across the fleet).
+ * `AI_PROVIDER=anthropic` and a key is present. Development and test may use
+ * the deterministic provider; production raises a typed configuration failure
+ * so lesson-start UI can show an honest generation blocker.
  */
 export function getTutorProvider(): TutorProvider {
   if (serverEnv.AI_PROVIDER === "anthropic" && serverEnv.ANTHROPIC_API_KEY) {
@@ -141,19 +132,16 @@ export function getTutorProvider(): TutorProvider {
     }
     return cachedProvider;
   }
-  if (
-    serverEnv.AI_PROVIDER !== "mock" &&
-    process.env.NODE_ENV === "production" &&
-    !mockInProdAlerted
-  ) {
-    mockInProdAlerted = true;
+  if (process.env.NODE_ENV === "production") {
     emitDegradation("lesson_provider_mock_in_prod", {
       reason: "missing_api_key",
       provider: serverEnv.AI_PROVIDER,
       message:
-        `AI_PROVIDER=${serverEnv.AI_PROVIDER} but no usable API key/provider ` +
-        "implementation resolved — every lesson plan is the deterministic template.",
+        `AI_PROVIDER=${serverEnv.AI_PROVIDER} but no usable tutor provider/key resolved.`,
     });
+    throw new Error(
+      `Lesson generation requires a configured provider; AI_PROVIDER=${serverEnv.AI_PROVIDER} has no usable API key/provider.`,
+    );
   }
   return MockTutorProvider;
 }
@@ -161,5 +149,4 @@ export function getTutorProvider(): TutorProvider {
 /** Test-only: clear the memoized provider so env changes take effect. */
 export function resetTutorProviderForTest(): void {
   cachedProvider = null;
-  mockInProdAlerted = false;
 }

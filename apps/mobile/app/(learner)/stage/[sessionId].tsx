@@ -345,14 +345,23 @@ function StageScreenInner() {
 
   const handleTutorTurnContinue = useCallback(
     async (beat: Extract<Beat, { kind: "tutor-turn" }>) => {
-      await stageClient.ackBeat(beat);
-      // tutor-turn auto-advances; we just step the index.
-      setSelected(null);
-      setAnswered(false);
-      setLastCorrect(null);
-      setCurrentIndex((i) => i + 1);
+      if (!sessionId || !learnerId || submitting) return;
+      const start = Date.now();
+      setSubmitting(true);
+      try {
+        await stageClient.ackBeat({ sessionId, learnerId, beat });
+        recordLedger(beat, "partial", start);
+        setSelected(null);
+        setAnswered(false);
+        setLastCorrect(null);
+        setCurrentIndex((i) => i + 1);
+      } catch {
+        Alert.alert(t("learnerStage.saveError.title"), t("learnerStage.saveError.message"));
+      } finally {
+        setSubmitting(false);
+      }
     },
-    [],
+    [sessionId, learnerId, submitting, recordLedger, t],
   );
 
   const handleAdvance = useCallback(async () => {
