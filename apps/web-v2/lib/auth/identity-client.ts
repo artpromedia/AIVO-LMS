@@ -450,7 +450,11 @@ export async function identityRefresh(refreshToken: string): Promise<IdentityRef
     res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/refresh`, {
       method: "POST",
       headers: {
-        "content-type": "application/json",
+        // No request body — identity-svc reads the refresh token from the
+        // `refreshToken` cookie. Do NOT set `content-type: application/json`:
+        // Fastify's default JSON parser rejects an empty body with a 400
+        // (FST_ERR_CTP_EMPTY_JSON_BODY), which the BFF would forward as a
+        // spurious 400 on every SessionRefresher tick.
         cookie: `refreshToken=${encodeURIComponent(refreshToken)}`,
       },
       cache: "no-store",
@@ -564,10 +568,10 @@ export async function identityLogout(refreshToken: string | null): Promise<void>
     await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/logout`, {
       method: "POST",
       headers: {
-        "content-type": "application/json",
-        // identity-svc reads the refresh token from the `refreshToken`
-        // cookie. Send it on the server-to-server call so the row is
-        // invalidated in the sessions table.
+        // No request body. identity-svc reads the refresh token from the
+        // `refreshToken` cookie. Omit `content-type: application/json` so
+        // Fastify's JSON parser doesn't 400 on the empty body (it's
+        // best-effort anyway, but keep it clean).
         cookie: `refreshToken=${encodeURIComponent(refreshToken)}`,
       },
       cache: "no-store",
