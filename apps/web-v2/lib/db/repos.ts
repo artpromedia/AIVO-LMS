@@ -2726,7 +2726,7 @@ export type CreateLessonRunResult =
  */
 export async function createLessonRun(
   input: CreateLessonRunInput,
-  provider: TutorProvider = getTutorProvider(),
+  provider?: TutorProvider,
 ): Promise<CreateLessonRunResult> {
   const learner = await getLearner(input.learnerId, input.tenantId);
   if (!learner) {
@@ -2826,7 +2826,7 @@ export async function createLessonRun(
   await getPersistence().lessonRuns.upsertRun(run);
 
   try {
-    const { plan, telemetry } = await generateLessonPlanWithRetry(provider, {
+    const { plan, telemetry } = await generateLessonPlanWithRetry(provider ?? getTutorProvider(), {
       learnerName: learner.displayName,
       brainState: brain.state,
       subject,

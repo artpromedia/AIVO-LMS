@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { createAnthropicTutorProvider, ANTHROPIC_TUTOR_MODEL } from "./anthropic-tutor";
 import {
@@ -78,6 +78,9 @@ function fakeClient(text: string, opts?: { capture?: (args: unknown) => void }):
 }
 
 describe("AnthropicTutorProvider", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
   it("sends opus-4-8 + a cached system prompt and parses the JSON response", async () => {
     type SentShape = {
       model: string;
@@ -118,7 +121,16 @@ describe("AnthropicTutorProvider", () => {
     expect(raw.title).toEqual(validPlan.title);
   });
 
-  it("raises an honest generation failure when the model returns garbage", async () => {
+  it("uses the deterministic safety net outside production when the model returns garbage", async () => {
+    const provider = createAnthropicTutorProvider(fakeClient("not json at all"));
+    const { plan, telemetry } = await generateLessonPlanWithRetry(provider, INPUT);
+    expect(telemetry.provider).toBe("mock");
+    expect(telemetry.model).toBe("deterministic-non-production-fallback");
+    expect(plan.title.length).toBeGreaterThan(0);
+  });
+
+  it("raises an honest production generation failure when the model returns garbage", async () => {
+    vi.stubEnv("NODE_ENV", "production");
     const provider = createAnthropicTutorProvider(fakeClient("not json at all"));
     await expect(generateLessonPlanWithRetry(provider, INPUT)).rejects.toThrow(
       /failed after 3 attempts/,
