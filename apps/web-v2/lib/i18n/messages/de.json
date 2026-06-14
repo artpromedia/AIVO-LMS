@@ -1812,7 +1812,18 @@
         "logged_out": "Du wurdest abgemeldet."
       },
       "continue_with_sso": "Weiter mit {idp}",
-      "sso_required_note": "Dein Bezirk meldet sich über {idp} an. Passwort-Anmeldung ist für diese Domain deaktiviert."
+      "sso_required_note": "Dein Bezirk meldet sich über {idp} an. Passwort-Anmeldung ist für diese Domain deaktiviert.",
+      "learner_title": "Lernenden-Anmeldung mit PIN",
+      "learner_subtitle": "Lernende geben erst dann eine PIN ein, nachdem ein Elternteil ihr Profil eingerichtet und genehmigt hat.",
+      "learner_submit": "Lernenden-App öffnen",
+      "mode_toggle_label": "Anmeldemodus wählen",
+      "mode_learner": "Lernende — nur PIN",
+      "mode_adult": "Alle anderen Nutzer",
+      "learner_parent_label": "Eltern-E-Mail oder Familien-ID",
+      "learner_profile_label": "Profil-ID des Lernenden",
+      "learner_pin_label": "PIN des Lernenden",
+      "learner_pin_helper": "Lernende verwenden nur ihre App-PIN. Erwachsene sollten den Standard-Anmelde-Tab verwenden.",
+      "learner_help_link": "Brauchst du Hilfe beim Finden eines Lernendenprofils?"
     },
     "signup": {
       "promo_eyebrow": "Starte deine Familien-Testphase",
@@ -2170,7 +2181,9 @@
       "select_learner_placeholder": "Kind auswählen",
       "no_learner_title": "Fügen Sie zuerst ein Kind hinzu",
       "no_learner_body": "Eine PIN gehört zu einem bestimmten Kind. Fügen Sie ein Kind hinzu, dann können Sie dessen PIN festlegen.",
-      "no_learner_cta": "Kind hinzufügen"
+      "no_learner_cta": "Kind hinzufügen",
+      "approval_required": "Prüfe und genehmige das AIVO-Brain dieses Lernenden, bevor du seine App-PIN erstellst.",
+      "review_first": "Zuerst das Brain prüfen"
     },
     "parent_verify": {
       "eyebrow": "Eltern-Verifizierung",

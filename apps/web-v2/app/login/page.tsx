@@ -249,8 +249,8 @@ export default async function LoginPage({
 
             <AuthCard
               eyebrow={t("card_eyebrow")}
-              title={loginMode === "learner" ? "Learner PIN sign-in" : t("card_title")}
-              subtitle={loginMode === "learner" ? "Learners enter a PIN only after a parent has set up and approved their profile." : t("card_subtitle")}
+              title={loginMode === "learner" ? t("learner_title") : t("card_title")}
+              subtitle={loginMode === "learner" ? t("learner_subtitle") : t("card_subtitle")}
               actions={
                 <>
                   <Button
@@ -260,7 +260,7 @@ export default async function LoginPage({
                     size="lg"
                     className="w-full"
                   >
-                    {loginMode === "learner" ? "Enter learner app" : t("submit")}
+                    {loginMode === "learner" ? t("learner_submit") : t("submit")}
                   </Button>
                   <p className="text-sm text-iw-ink-muted text-center">
                     {t("new_here")}{" "}
@@ -275,12 +275,12 @@ export default async function LoginPage({
                 </>
               }
             >
-              <div className="mb-5 grid grid-cols-2 rounded-full bg-iw-card p-1 text-sm font-semibold" role="tablist" aria-label="Choose sign-in mode">
+              <div className="mb-5 grid grid-cols-2 rounded-full bg-iw-card p-1 text-sm font-semibold" role="tablist" aria-label={t("mode_toggle_label")}>
                 <Link href="/login?mode=learner" role="tab" aria-selected={loginMode === "learner"} className={`rounded-full px-3 py-2 text-center ${loginMode === "learner" ? "bg-iw-primary text-white" : "text-iw-ink-muted hover:text-iw-ink"}`}>
-                  Learner — PIN only
+                  {t("mode_learner")}
                 </Link>
                 <Link href="/login?mode=adult" role="tab" aria-selected={loginMode === "adult"} className={`rounded-full px-3 py-2 text-center ${loginMode === "adult" ? "bg-iw-primary text-white" : "text-iw-ink-muted hover:text-iw-ink"}`}>
-                  All other users
+                  {t("mode_adult")}
                 </Link>
               </div>
               {loginMode === "learner" ? (

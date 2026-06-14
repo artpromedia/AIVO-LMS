@@ -1812,7 +1812,18 @@
         "logged_out": "サインアウトしました。"
       },
       "continue_with_sso": "{idp} で続行",
-      "sso_required_note": "あなたの学区は {idp} でサインインします。このドメインではパスワードログインが無効です。"
+      "sso_required_note": "あなたの学区は {idp} でサインインします。このドメインではパスワードログインが無効です。",
+      "learner_title": "学習者 PIN サインイン",
+      "learner_subtitle": "学習者は、保護者がプロフィールを設定して承認した後にのみ PIN を入力します。",
+      "learner_submit": "学習者アプリに入る",
+      "mode_toggle_label": "サインイン方法を選択",
+      "mode_learner": "学習者 — PIN のみ",
+      "mode_adult": "その他すべてのユーザー",
+      "learner_parent_label": "保護者メールまたはファミリー ID",
+      "learner_profile_label": "学習者プロフィール ID",
+      "learner_pin_label": "学習者 PIN",
+      "learner_pin_helper": "学習者はアプリ PIN のみを使用します。大人は標準サインインタブを使用してください。",
+      "learner_help_link": "学習者プロフィールを見つけるためのヘルプが必要ですか？"
     },
     "signup": {
       "promo_eyebrow": "ご家族向けトライアルを始める",
@@ -2170,7 +2181,9 @@
       "select_learner_placeholder": "お子さまを選択",
       "no_learner_title": "まずお子さまを追加してください",
       "no_learner_body": "PIN は特定のお子さまに紐づきます。お子さまを追加すると、PIN を設定できます。",
-      "no_learner_cta": "お子さまを追加"
+      "no_learner_cta": "お子さまを追加",
+      "approval_required": "アプリ PIN を作成する前に、この学習者の AIVO ブレインを確認して承認してください。",
+      "review_first": "先にブレインを確認"
     },
     "parent_verify": {
       "eyebrow": "保護者の確認",

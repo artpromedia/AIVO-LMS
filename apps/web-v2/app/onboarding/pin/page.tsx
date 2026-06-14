@@ -104,7 +104,7 @@ export default function PinSetupPage() {
     try {
       const result = await postPin(selectedLearnerId, pin);
       if (result.blockedForApproval) {
-        setError("Review and approve this learner's AIVO brain before creating their app PIN.");
+        setError(t("approval_required"));
         setSubmitting(false);
         return;
       }
@@ -158,7 +158,7 @@ export default function PinSetupPage() {
                 href={selectedLearnerId ? REVIEW_STEP(selectedLearnerId) : "/parent/learners"}
                 className="text-xs text-iw-text-muted text-center hover:underline"
               >
-                Review the brain first
+                {t("review_first")}
               </Link>
             </>
           )

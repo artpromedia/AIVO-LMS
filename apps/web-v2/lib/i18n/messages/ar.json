@@ -1812,7 +1812,18 @@
         "logged_out": "تم تسجيل خروجك."
       },
       "continue_with_sso": "المتابعة باستخدام {idp}",
-      "sso_required_note": "تسجّل منطقتك الدخول عبر {idp}. تسجيل الدخول بكلمة المرور معطّل لهذا النطاق."
+      "sso_required_note": "تسجّل منطقتك الدخول عبر {idp}. تسجيل الدخول بكلمة المرور معطّل لهذا النطاق.",
+      "learner_title": "تسجيل دخول المتعلّم برمز PIN",
+      "learner_subtitle": "يُدخل المتعلّمون رمز PIN فقط بعد أن يجهّز أحد الوالدين ملفهم ويوافق عليه.",
+      "learner_submit": "الدخول إلى تطبيق المتعلّم",
+      "mode_toggle_label": "اختر طريقة تسجيل الدخول",
+      "mode_learner": "المتعلّم — PIN فقط",
+      "mode_adult": "كل المستخدمين الآخرين",
+      "learner_parent_label": "بريد ولي الأمر أو معرّف العائلة",
+      "learner_profile_label": "معرّف ملف المتعلّم",
+      "learner_pin_label": "رمز PIN للمتعلّم",
+      "learner_pin_helper": "يستخدم المتعلّمون رمز PIN الخاص بالتطبيق فقط. على البالغين استخدام تبويب تسجيل الدخول القياسي.",
+      "learner_help_link": "هل تحتاج إلى مساعدة في العثور على ملف المتعلّم؟"
     },
     "signup": {
       "promo_eyebrow": "ابدأ تجربتك العائلية",
@@ -2170,7 +2181,9 @@
       "select_learner_placeholder": "اختر طفلاً",
       "no_learner_title": "أضف طفلاً أولاً",
       "no_learner_body": "يخص رمز PIN طفلاً محدداً. أضف طفلاً، ثم يمكنك تعيين رمزه.",
-      "no_learner_cta": "إضافة طفل"
+      "no_learner_cta": "إضافة طفل",
+      "approval_required": "راجع واعتمد دماغ AIVO لهذا المتعلّم قبل إنشاء رمز PIN للتطبيق.",
+      "review_first": "راجع الدماغ أولًا"
     },
     "parent_verify": {
       "eyebrow": "التحقّق من الوالد",

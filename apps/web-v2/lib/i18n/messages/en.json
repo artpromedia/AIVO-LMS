@@ -55,7 +55,18 @@
         "logged_out": "You've been signed out."
       },
       "continue_with_sso": "Continue with {idp}",
-      "sso_required_note": "Your district signs in with {idp}. Password sign-in is disabled for this email domain."
+      "sso_required_note": "Your district signs in with {idp}. Password sign-in is disabled for this email domain.",
+      "learner_title": "Learner PIN sign-in",
+      "learner_subtitle": "Learners enter a PIN only after a parent has set up and approved their profile.",
+      "learner_submit": "Enter learner app",
+      "mode_toggle_label": "Choose sign-in mode",
+      "mode_learner": "Learner — PIN only",
+      "mode_adult": "All other users",
+      "learner_parent_label": "Parent email or family ID",
+      "learner_profile_label": "Learner profile ID",
+      "learner_pin_label": "Learner PIN",
+      "learner_pin_helper": "Learners use only their app PIN. Adults should use the standard sign-in tab.",
+      "learner_help_link": "Need help finding a learner profile?"
     },
     "signup": {
       "promo_eyebrow": "Start your family trial",
@@ -2170,7 +2181,9 @@
       "select_learner_placeholder": "Select a child",
       "no_learner_title": "Add a child first",
       "no_learner_body": "A PIN belongs to a specific child. Add a child, then you can set their PIN.",
-      "no_learner_cta": "Add a child"
+      "no_learner_cta": "Add a child",
+      "approval_required": "Review and approve this learner's AIVO brain before creating their app PIN.",
+      "review_first": "Review the brain first"
     },
     "parent_verify": {
       "eyebrow": "Parent verification",

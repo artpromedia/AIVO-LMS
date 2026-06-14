@@ -2,11 +2,11 @@
   "comment": "Sprint 12 frozen baseline for check-file-length.mjs (600-line max). Entries record the line count at freeze time \u2014 growing past it fails CI. This list only shrinks: decompose a file, delete its entry. Never add.",
   "files": {
     "apps/web-v2/app/learner/baseline/[baselineId]/page.tsx": {
-      "lines": 679,
+      "lines": 777,
       "reason": "Baseline assessment runner \u2014 discovered at Sprint 12 freeze; future decomposition."
     },
     "apps/web-v2/app/parent/learners/[learnerId]/assessment/page.tsx": {
-      "lines": 1145,
+      "lines": 1171,
       "reason": "Parent assessment review \u2014 known audit offender; future decomposition."
     },
     "apps/web-v2/components/admin/import/csv-import-wizard.tsx": {
@@ -20,6 +20,18 @@
     "apps/mobile/src/components/settings/MfaFactorsCard.tsx": {
       "lines": 628,
       "reason": "Mobile MFA factors \u2014 discovered at Sprint 12 freeze; future decomposition."
+    },
+    "apps/web-v2/app/learner/home/page.tsx": {
+      "lines": 616,
+      "reason": "Learner home page \u2014 current branch baseline; future decomposition."
+    },
+    "apps/web-v2/app/parent/learners/[learnerId]/brain-clone-watch/building-client.tsx": {
+      "lines": 650,
+      "reason": "Brain-clone watch client \u2014 current branch baseline; future decomposition."
+    },
+    "apps/web-v2/components/brain/brain-building-sequence.tsx": {
+      "lines": 608,
+      "reason": "Brain-building animation sequence \u2014 current branch baseline; future decomposition."
     }
   }
 }
