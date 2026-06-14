@@ -4,7 +4,7 @@
  * Sprint 1 (subject/tutor UX): renders the canonical discoverable set from
  * `@aivo/brand` (`getDiscoverableSubjects`) so web and mobile show the same
  * subjects. Every subject is reachable and playable end-to-end through the
- * lesson flow (no hidden subjects, no "coming soon" placeholders).
+ * lesson flow, with no hollow placeholder subject cards.
  *
  * Empty state (no baseline yet) routes the learner to /learner/baseline
  * so they don't see hollow cards.

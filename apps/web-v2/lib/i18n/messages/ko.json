@@ -1812,7 +1812,18 @@
         "logged_out": "로그아웃되었습니다."
       },
       "continue_with_sso": "{idp}(으)로 계속",
-      "sso_required_note": "소속 교육구는 {idp}로 로그인합니다. 이 이메일 도메인은 비밀번호 로그인이 비활성화되어 있습니다."
+      "sso_required_note": "소속 교육구는 {idp}로 로그인합니다. 이 이메일 도메인은 비밀번호 로그인이 비활성화되어 있습니다.",
+      "learner_title": "학습자 PIN 로그인",
+      "learner_subtitle": "학습자는 부모가 프로필을 설정하고 승인한 후에만 PIN을 입력합니다.",
+      "learner_submit": "학습자 앱 들어가기",
+      "mode_toggle_label": "로그인 모드 선택",
+      "mode_learner": "학습자 — PIN만",
+      "mode_adult": "그 외 모든 사용자",
+      "learner_parent_label": "부모 이메일 또는 가족 ID",
+      "learner_profile_label": "학습자 프로필 ID",
+      "learner_pin_label": "학습자 PIN",
+      "learner_pin_helper": "학습자는 앱 PIN만 사용합니다. 성인은 표준 로그인 탭을 사용하세요.",
+      "learner_help_link": "학습자 프로필을 찾는 데 도움이 필요하신가요?"
     },
     "signup": {
       "promo_eyebrow": "가족 체험판 시작하기",
@@ -2170,7 +2181,9 @@
       "select_learner_placeholder": "자녀 선택",
       "no_learner_title": "먼저 자녀를 추가하세요",
       "no_learner_body": "PIN은 특정 자녀에 속합니다. 자녀를 추가하면 PIN을 설정할 수 있습니다.",
-      "no_learner_cta": "자녀 추가"
+      "no_learner_cta": "자녀 추가",
+      "approval_required": "앱 PIN을 만들기 전에 이 학습자의 AIVO 브레인을 검토하고 승인하세요.",
+      "review_first": "먼저 브레인 검토"
     },
     "parent_verify": {
       "eyebrow": "학부모 확인",

@@ -1812,7 +1812,18 @@
         "logged_out": "Vous avez été déconnecté."
       },
       "continue_with_sso": "Continuer avec {idp}",
-      "sso_required_note": "Votre district se connecte via {idp}. La connexion par mot de passe est désactivée pour ce domaine."
+      "sso_required_note": "Votre district se connecte via {idp}. La connexion par mot de passe est désactivée pour ce domaine.",
+      "learner_title": "Connexion par PIN apprenant",
+      "learner_subtitle": "Les apprenants saisissent un PIN uniquement après qu’un parent a configuré et approuvé leur profil.",
+      "learner_submit": "Entrer dans l’app apprenant",
+      "mode_toggle_label": "Choisir le mode de connexion",
+      "mode_learner": "Apprenant — PIN uniquement",
+      "mode_adult": "Tous les autres utilisateurs",
+      "learner_parent_label": "E-mail du parent ou ID famille",
+      "learner_profile_label": "ID du profil apprenant",
+      "learner_pin_label": "PIN apprenant",
+      "learner_pin_helper": "Les apprenants utilisent uniquement leur PIN d’app. Les adultes doivent utiliser l’onglet de connexion standard.",
+      "learner_help_link": "Besoin d’aide pour trouver un profil apprenant ?"
     },
     "signup": {
       "promo_eyebrow": "Démarrez votre essai familial",
@@ -2170,7 +2181,9 @@
       "select_learner_placeholder": "Sélectionnez un enfant",
       "no_learner_title": "Ajoutez d'abord un enfant",
       "no_learner_body": "Un code PIN appartient à un enfant précis. Ajoutez un enfant, puis vous pourrez définir son code PIN.",
-      "no_learner_cta": "Ajouter un enfant"
+      "no_learner_cta": "Ajouter un enfant",
+      "approval_required": "Examinez et approuvez le cerveau AIVO de cet apprenant avant de créer son PIN d’app.",
+      "review_first": "Examiner d’abord le cerveau"
     },
     "parent_verify": {
       "eyebrow": "Vérification du parent",

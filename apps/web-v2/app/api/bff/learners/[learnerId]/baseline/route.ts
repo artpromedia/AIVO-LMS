@@ -12,6 +12,7 @@ import {
   listBaselineQuestions,
 } from "@/lib/db/repos";
 import { BaselineCreateInput } from "@/lib/validators/baseline";
+import { advanceOnboarding, requireOnboardingState } from "@/lib/onboarding-state";
 
 export const dynamic = "force-dynamic";
 
@@ -80,7 +81,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
-    const brain = getBrainProfile(learnerId, session!.tenantId);
+    const brain = await getBrainProfile(learnerId, session!.tenantId);
     if (!brain) {
       return fail(
         {
@@ -103,6 +104,11 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!parsed.success) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
+    const stateGate = await requireOnboardingState(learnerId, session!.tenantId, ["baseline_ready", "baseline_complete", "brain_clone_pending", "brain_review_required", "brain_approved", "pin_ready", "learner_app_open"]);
+    if (!stateGate.ok) {
+      return fail({ ...ERRORS.PRECONDITION_FAILED, message: `Baseline cannot start from onboarding state ${stateGate.record.state}` }, requestId);
+    }
+    await advanceOnboarding(learnerId, session!.tenantId, "baseline_started", session!.userId);
     const result = await createBaseline({
       learnerId,
       tenantId: session!.tenantId,

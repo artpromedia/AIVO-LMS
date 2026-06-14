@@ -2,13 +2,19 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
+import {
+  requireSession,
+  requireRole,
+  requireLearnerScope,
+  requireApprovedBrainForPin,
+} from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import {
   isIdentitySvcEnabled,
   getIdentityBearer,
   setLearnerPinViaIdentity,
 } from "@/lib/bff/identity-learners";
+import { advanceOnboarding } from "@/lib/onboarding-state";
 import {
   isValidPin,
   setStoredLearnerPin,
@@ -43,7 +49,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   try {
     const auth = await authorize(req, requestId, learnerId);
     if (auth.error) return auth.error;
-    // The PIN itself lives in identity-svc (or, in mock mode, the in-memory
+    // The PIN itself lives in identity-svc (or, in development mode, the in-memory
     // store) and is never returned. Only expose whether one is set so the UI
     // can reflect prior state without leaking the credential.
     return ok(getStoredLearnerPinMeta(auth.session.tenantId, learnerId), requestId);
@@ -62,6 +68,8 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
   try {
     const auth = await authorize(req, requestId, learnerId);
     if (auth.error) return auth.error;
+    const brainGate = await requireApprovedBrainForPin(auth.session, learnerId, requestId);
+    if (brainGate) return brainGate;
 
     const body = (await req.json().catch(() => ({}))) as { pin?: unknown };
     const parsed = postSchema.safeParse(body);
@@ -72,12 +80,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
 
     // Dual-path: when identity-svc is wired and a real access token is present,
     // set the PIN on identity-svc — the value the mobile learner `pin-login`
-    // flow verifies. Otherwise persist to the in-memory store so dev/mock keep
+    // flow verifies. Otherwise persist to the in-memory store so development fallback keep
     // working without standing up the service stack.
     const bearer = await getIdentityBearer();
     if (isIdentitySvcEnabled() && bearer) {
       const r = await setLearnerPinViaIdentity(bearer, learnerId, pin);
       if (!r.ok) return upstreamFail(requestId, r.status, r.error);
+      await advanceOnboarding(learnerId, auth.session.tenantId, "pin_created", auth.session.userId, { via: "identity-svc" });
       audit(auth.session, "learner.pin.set", requestId, {
         learnerId,
         metadata: { via: "identity-svc" },
@@ -86,6 +95,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
 
     const meta = setStoredLearnerPin(auth.session.tenantId, learnerId, pin);
+    await advanceOnboarding(learnerId, auth.session.tenantId, "pin_created", auth.session.userId, { via: "memory" });
     audit(auth.session, "learner.pin.set", requestId, {
       learnerId,
       metadata: { via: "memory" },

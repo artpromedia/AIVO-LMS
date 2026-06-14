@@ -1812,7 +1812,18 @@
         "logged_out": "Você saiu da conta."
       },
       "continue_with_sso": "Continuar com {idp}",
-      "sso_required_note": "Seu distrito entra com {idp}. O login por senha está desativado para este domínio."
+      "sso_required_note": "Seu distrito entra com {idp}. O login por senha está desativado para este domínio.",
+      "learner_title": "Entrada do aluno com PIN",
+      "learner_subtitle": "Os alunos inserem um PIN somente depois que um responsável configura e aprova o perfil.",
+      "learner_submit": "Entrar no app do aluno",
+      "mode_toggle_label": "Escolha o modo de entrada",
+      "mode_learner": "Aluno — somente PIN",
+      "mode_adult": "Todos os outros usuários",
+      "learner_parent_label": "E-mail do responsável ou ID da família",
+      "learner_profile_label": "ID do perfil do aluno",
+      "learner_pin_label": "PIN do aluno",
+      "learner_pin_helper": "Os alunos usam apenas o PIN do app. Adultos devem usar a aba de entrada padrão.",
+      "learner_help_link": "Precisa de ajuda para encontrar um perfil de aluno?"
     },
     "signup": {
       "promo_eyebrow": "Comece seu teste em família",
@@ -2170,7 +2181,9 @@
       "select_learner_placeholder": "Selecione uma criança",
       "no_learner_title": "Adicione uma criança primeiro",
       "no_learner_body": "Um PIN pertence a uma criança específica. Adicione uma criança e então você poderá definir o PIN dela.",
-      "no_learner_cta": "Adicionar uma criança"
+      "no_learner_cta": "Adicionar uma criança",
+      "approval_required": "Revise e aprove o cérebro AIVO deste aluno antes de criar o PIN do app.",
+      "review_first": "Revisar o cérebro primeiro"
     },
     "parent_verify": {
       "eyebrow": "Verificação do responsável",

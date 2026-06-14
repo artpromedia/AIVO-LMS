@@ -5,6 +5,7 @@ import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guar
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import { completeBaseline, getBaselineById, refreshLearnerReadiness } from "@/lib/db/repos";
+import { advanceOnboarding } from "@/lib/onboarding-state";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,10 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     const result = await completeBaseline(baselineId, session!.tenantId);
     if (!result) {
       return fail({ ...ERRORS.INTERNAL_ERROR, message: "Could not complete baseline" }, requestId);
+    }
+    await advanceOnboarding(learnerId, session!.tenantId, "baseline_completed", session!.userId);
+    if (result.clonedBrainProfile) {
+      await advanceOnboarding(learnerId, session!.tenantId, "brain_clone_completed", session!.userId);
     }
     await refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "baseline.complete", requestId, {

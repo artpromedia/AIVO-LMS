@@ -1812,7 +1812,18 @@
         "logged_out": "Has cerrado sesión."
       },
       "continue_with_sso": "Continuar con {idp}",
-      "sso_required_note": "Tu distrito inicia sesión con {idp}. El acceso con contraseña está deshabilitado para este dominio."
+      "sso_required_note": "Tu distrito inicia sesión con {idp}. El acceso con contraseña está deshabilitado para este dominio.",
+      "learner_title": "Inicio de sesión con PIN del estudiante",
+      "learner_subtitle": "Los estudiantes introducen un PIN solo después de que un padre configure y apruebe su perfil.",
+      "learner_submit": "Entrar en la app del estudiante",
+      "mode_toggle_label": "Elige el modo de inicio de sesión",
+      "mode_learner": "Estudiante — solo PIN",
+      "mode_adult": "Todos los demás usuarios",
+      "learner_parent_label": "Correo del padre o ID de familia",
+      "learner_profile_label": "ID del perfil del estudiante",
+      "learner_pin_label": "PIN del estudiante",
+      "learner_pin_helper": "Los estudiantes usan solo su PIN de la app. Los adultos deben usar la pestaña de inicio de sesión estándar.",
+      "learner_help_link": "¿Necesitas ayuda para encontrar un perfil de estudiante?"
     },
     "signup": {
       "promo_eyebrow": "Comienza tu prueba familiar",
@@ -2170,7 +2181,9 @@
       "select_learner_placeholder": "Selecciona un niño",
       "no_learner_title": "Primero agrega un niño",
       "no_learner_body": "Un PIN pertenece a un niño específico. Agrega un niño y luego podrás establecer su PIN.",
-      "no_learner_cta": "Agregar un niño"
+      "no_learner_cta": "Agregar un niño",
+      "approval_required": "Revisa y aprueba el cerebro AIVO de este estudiante antes de crear su PIN de app.",
+      "review_first": "Revisar primero el cerebro"
     },
     "parent_verify": {
       "eyebrow": "Verificación del padre",

@@ -52,6 +52,7 @@ export default function LoginScreen() {
     label: string;
   }>({ armed: false, email: null, label: "" });
   const [biometricLoading, setBiometricLoading] = useState(false);
+  const [loginMode, setLoginMode] = useState<"learner" | "adult">("adult");
 
   useEffect(() => {
     let cancelled = false;
@@ -225,6 +226,32 @@ export default function LoginScreen() {
             {t("auth.signInSubtitle")}
           </Text>
 
+          <View style={[styles.modeToggle, { borderColor: palette.border, backgroundColor: palette.bgPage }]}>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                setLoginMode("learner");
+                router.push("/(auth)/learner-login" as Href);
+              }}
+              style={[
+                styles.modeButton,
+                loginMode === "learner" ? { backgroundColor: palette.primary } : null,
+              ]}
+            >
+              <Text style={[styles.modeText, { color: loginMode === "learner" ? "#ffffff" : palette.inkMuted }]}>Learner — PIN only</Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setLoginMode("adult")}
+              style={[
+                styles.modeButton,
+                loginMode === "adult" ? { backgroundColor: palette.primary } : null,
+              ]}
+            >
+              <Text style={[styles.modeText, { color: loginMode === "adult" ? "#ffffff" : palette.inkMuted }]}>All other users</Text>
+            </Pressable>
+          </View>
+
           {error ? (
             <View style={[styles.errorBox, { backgroundColor: "rgba(220, 38, 38, 0.08)" }]}>
               <Text style={styles.errorText}>{error}</Text>
@@ -314,15 +341,9 @@ export default function LoginScreen() {
             </Text>
           </Pressable>
 
-          <Pressable
-            style={[styles.pinButton, { borderColor: palette.accent }]}
-            onPress={() => router.push("/(auth)/learner-login" as Href)}
-            accessibilityRole="button"
-          >
-            <Text style={[styles.pinButtonText, { color: palette.accent }]}>
-              {t("auth.learnerPinLogin")}
-            </Text>
-          </Pressable>
+          <Text style={[styles.pinHint, { color: palette.inkMuted }]}>
+            {t("auth.learnerUseToggle", "Learners use the PIN-only tab above.")}
+          </Text>
         </View>
 
         <Pressable accessibilityRole="button"
@@ -477,6 +498,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: fontFamilies.bodyBold,
   },
+  modeToggle: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderRadius: 9999,
+    padding: 4,
+    marginBottom: spacing.md,
+  },
+  modeButton: { flex: 1, borderRadius: 9999, minHeight: 44, alignItems: "center", justifyContent: "center", paddingHorizontal: spacing.sm },
+  modeText: { fontFamily: fontFamilies.bodyBold, fontSize: 13, textAlign: "center" },
+  pinHint: { fontFamily: fontFamilies.bodyRegular, fontSize: 12, textAlign: "center" },
   pinButton: {
     marginTop: spacing.md,
     alignItems: "center",

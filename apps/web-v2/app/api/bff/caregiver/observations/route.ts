@@ -11,7 +11,8 @@
  */
 import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
-import { requireSession, requireRole } from "@/lib/bff/guards";
+import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
+import { requireCaregiverCapability } from "@/lib/bff/caregiver-capabilities";
 import { audit } from "@/lib/bff/audit";
 import { createCaregiverObservation, listCaregiverObservations } from "@/lib/db/repos";
 
@@ -39,6 +40,12 @@ export async function GET(req: Request): Promise<NextResponse> {
         },
         requestId,
       );
+    const scope = await requireLearnerScope(session!, learnerId, requestId);
+    if (scope) return scope;
+    if (session!.role === "caregiver") {
+      const cap = await requireCaregiverCapability(session!, learnerId, "caregiver.view_summary", requestId);
+      if (cap) return cap;
+    }
     return ok({ observations: listCaregiverObservations(learnerId, session!.tenantId) }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -74,6 +81,8 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
+    const cap = await requireCaregiverCapability(session!, body.learnerId, "caregiver.add_observation", requestId);
+    if (cap) return cap;
     const obs = createCaregiverObservation({
       tenantId: session!.tenantId,
       learnerId: body.learnerId,

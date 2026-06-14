@@ -52,6 +52,7 @@ export type IdentityUser = {
   name: string | null;
   role: string; // wire format (uppercase)
   tenantId: string;
+  learnerId?: string;
   /** Sprint A8 — set by /api/users/me + the timezone PATCH. */
   timezone?: string | null;
 };
@@ -156,6 +157,42 @@ export async function identityLogin(email: string, password: string): Promise<Id
     user: json.user as IdentityUser,
     accessToken: typeof json.accessToken === "string" ? json.accessToken : "",
     mustChangePassword: Boolean(json.mustChangePassword),
+    setCookies: readSetCookies(res.headers),
+  };
+}
+
+export async function identityPinLogin(input: {
+  parentId: string;
+  learnerId: string;
+  pin: string;
+}): Promise<IdentityLoginSuccess | IdentityLoginError> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/pin-login`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(input),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return {
+      kind: "error",
+      status: 502,
+      error: `identity-svc unreachable: ${(err as Error).message}`,
+    };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      kind: "error",
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "PIN login failed",
+    };
+  }
+  return {
+    kind: "ok",
+    user: json.user as IdentityUser,
+    accessToken: typeof json.accessToken === "string" ? json.accessToken : "",
     setCookies: readSetCookies(res.headers),
   };
 }
@@ -558,6 +595,7 @@ export function toSessionProfile(user: IdentityUser): SessionProfile | null {
     permissions,
     capabilities: permissions,
     timezone: user.timezone ?? null,
+    learnerId: role === "learner" ? user.learnerId : undefined,
   };
 }
 

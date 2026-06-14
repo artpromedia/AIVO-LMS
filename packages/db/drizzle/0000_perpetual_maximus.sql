@@ -42,7 +42,6 @@ CREATE TABLE "users" (
 	"password_hash" text,
 	"name" varchar(255) NOT NULL,
 	"role" "user_role" NOT NULL,
-	"pin" varchar(10),
 	"email_verified" boolean DEFAULT false,
 	"avatar_url" text,
 	"google_id" varchar(255),

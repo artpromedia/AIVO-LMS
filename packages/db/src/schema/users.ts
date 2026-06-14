@@ -19,7 +19,6 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   name: varchar("name", { length: 255 }).notNull(),
   role: userRoleEnum("role").notNull(),
-  pin: varchar("pin", { length: 10 }),
   emailVerified: boolean("email_verified").default(false),
   mfaEnabled: boolean("mfa_enabled").default(false),
   mfaMethod: varchar("mfa_method", { length: 20 }).default("email"),
@@ -51,6 +50,32 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Learner PIN credentials.
+ *
+ * The hash is an Argon2id encoded string, so all verifier parameters travel
+ * with the hash. Legacy plaintext PIN columns are dropped by migration 0118
+ * and must not be reintroduced.
+ */
+export const learnerPinCredentials = pgTable(
+  "learner_pin_credentials",
+  {
+    learnerUserId: uuid("learner_user_id")
+      .references(() => users.id)
+      .primaryKey(),
+    pinHash: text("pin_hash").notNull(),
+    pinSetAt: timestamp("pin_set_at").defaultNow().notNull(),
+    failedAttempts: integer("failed_attempts").default(0).notNull(),
+    failedLastAt: timestamp("failed_last_at"),
+    lockedUntil: timestamp("locked_until"),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("learner_pin_credentials_locked_until_idx").on(table.lockedUntil),
+    index("learner_pin_credentials_updated_at_idx").on(table.updatedAt),
+  ],
+);
 
 /**
  * Sprint 7: prior password hashes. We keep the last N (default 5) so a user

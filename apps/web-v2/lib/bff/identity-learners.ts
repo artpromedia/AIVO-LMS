@@ -8,7 +8,8 @@
  * Dual-path (ADR 0009): when identity-svc is enabled (`AIVO_USE_IDENTITY_SVC`,
  * falling back to `AIVO_USE_SERVICE_STACK`) AND a real identity-svc access
  * token is present, the onboarding PIN step sets the learner's PIN on
- * identity-svc (`users.pin`, the value the mobile `pin-login` flow verifies).
+ * identity-svc (hashed learner PIN credentials, the value the mobile
+ * `pin-login` flow verifies).
  * Otherwise the caller uses the in-memory PIN store so dev/demo and mock auth
  * keep working.
  */

@@ -4,6 +4,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
+import { advanceOnboarding } from "@/lib/onboarding-state";
 import {
   getOrCreateParentAssessment,
   refreshLearnerReadiness,
@@ -66,6 +67,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
+    await advanceOnboarding(learnerId, session!.tenantId, "parent_assessment_submitted", session!.userId);
     await refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "parent_assessment.submit", requestId, { learnerId });
     return ok({ assessment: submitted }, requestId);

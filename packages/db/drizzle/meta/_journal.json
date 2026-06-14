@@ -806,6 +806,20 @@
       "when": 1786148900000,
       "tag": "0116_contribution_acknowledgements",
       "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1786149000000,
+      "tag": "0117_learner_pin_credentials",
+      "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1786149100000,
+      "tag": "0118_drop_users_plaintext_pin",
+      "breakpoints": true
     }
   ]
 }
