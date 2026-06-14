@@ -82,12 +82,16 @@ test(
       .returning();
 
     // Link the teacher (ACCEPTED) and seed a brain state to read.
+    // learner_teachers requires NOT NULL tenant_id + invited_by (the parent
+    // invited the teacher) — provide both so the seed inserts cleanly.
     await db
       .insert(learnerTeachers)
       .values({
+        tenantId: tenant.id,
         learnerId: learner.id,
         teacherEmail: teacher.email,
         teacherUserId: teacher.id,
+        invitedBy: parent.id,
         status: "ACCEPTED",
       } as any);
     await db

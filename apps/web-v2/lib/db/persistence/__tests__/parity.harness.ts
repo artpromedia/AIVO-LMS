@@ -59,6 +59,8 @@ const TABLES = [
   "web_learner_profiles",
   "web_parent_learner_relationships",
   "web_parent_assessments",
+  "web_teacher_assessments",
+  "web_therapist_assessments",
   "web_baseline_assessments",
   "web_baseline_questions",
   "web_baseline_attempts",

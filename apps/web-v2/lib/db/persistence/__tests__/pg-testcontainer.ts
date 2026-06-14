@@ -62,8 +62,19 @@ const WEB_SCHEMA_MIGRATIONS = [
   "0092_web_review_schedules",
   "0094_web_mastery_snapshots",
   "0098_web_baseline_bank",
+  // C-06 approval ceremony: learner_brain_profiles.revision +
+  // brain_profile_approvals (both truncated by the parity harness).
+  "0108_brain_profile_approvals",
+  // C-07 / C-10 teacher + therapist assessment autosave DRAFT stores (table +
+  // index only; the RLS files 0110/0113 are skipped like 0050, see 0109 note).
+  "0109_web_teacher_assessments",
+  "0112_web_therapist_assessments",
   // C-12 (ADR 0042) FERPA child-profile disclosure log (web side).
   "0114_web_child_profile_disclosures",
+  // C-13 brain-evolution timeline + C-16 contributor acknowledgements
+  // (both truncated by the parity harness).
+  "0115_brain_profile_changes",
+  "0116_contribution_acknowledgements",
 ];
 
 /** Reset `public` and apply the web-domain schema (hermetic, idempotent). */
