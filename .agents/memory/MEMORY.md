@@ -1,1 +1,2 @@
 - [Replit workflow port detection](replit-workflow-ports.md) — supervisor only sees ports declared as `localPort` in `.replit`; bind that exact port and set `waitForPort` to it.
+- [Importing a remote branch when object writes are blocked](remote-branch-import-when-object-writes-blocked.md) — all .git/objects writes are guarded (fetch/merge impossible); pull a public branch via GitHub compare API + raw downloads.
