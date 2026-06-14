@@ -24,6 +24,11 @@ import { join } from "node:path";
 
 const TARGETS = [
   {
+    name: "web-v2",
+    baseFile: "apps/web-v2/lib/i18n/messages/en.json",
+    dir: "apps/web-v2/lib/i18n/messages",
+  },
+  {
     name: "marketing",
     baseFile: "apps/marketing/src/i18n/messages/en.json",
     dir: "apps/marketing/src/i18n/messages",

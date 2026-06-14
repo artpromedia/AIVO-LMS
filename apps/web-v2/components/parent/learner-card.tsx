@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
-import { StartLearningButton } from "@/components/parent/start-learning-button";
+import { LearnerEntryButtons } from "@/components/parent/learner-entry-buttons";
 import { READINESS_LABEL_KEY, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
 import type { LearnerProfile } from "@/lib/db/types";
 
@@ -45,18 +45,18 @@ export async function LearnerCard({ learner }: { learner: LearnerProfile }) {
           <Badge tone="neutral">{learner.functioningLevel.replace("_", " ")}</Badge>
         ) : null}
       </div>
-      <div className="relative mt-auto flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <Button asChild variant="outline" size="sm">
+      <div className="relative mt-auto flex flex-col gap-2">
+        <Button asChild variant="outline" size="sm" className="self-start">
           <Link href={`/parent/learners/${learner.id}`}>{tCard("open_profile")}</Link>
         </Button>
         {learner.readinessState === "ready_for_today_mission" ? (
-          // Switching into the learner experience must set the active-learner
-          // cookie and redirect — done via a Server Action so the navigation is
-          // reliable (a <Link> to the cookie-setting route handler bounces back
-          // to this dashboard). All other next steps are plain page links.
-          <StartLearningButton learnerId={learner.id} label={t(next.labelKey)} size="sm" />
+          // A set-up learner: offer both entry paths — "Open in parent view"
+          // (keeps the parent session) and "Enter as learner" (PIN-gated
+          // session swap). Both Server-Action paths enforce parent↔learner
+          // authorization regardless of readiness.
+          <LearnerEntryButtons learnerId={learner.id} size="sm" />
         ) : (
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="self-start">
             <Link href={next.href}>
               {t(next.labelKey)} <ArrowRight className="ml-1 h-4 w-4" />
             </Link>

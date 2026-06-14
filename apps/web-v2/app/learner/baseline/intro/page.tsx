@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
+import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import {
   LearnerBaselineShell,
@@ -35,17 +36,18 @@ export default async function BaselineIntroPage({
 }) {
   const sensoryMode = await readSensoryModeFromCookies();
   const reducedArt = sensoryMode !== "standard";
-  const session = await requirePageRole(["learner"]);
-  if (!session.learnerId) redirect("/learner/home");
+  const session = await requirePageRole(["learner", "parent"]);
+  const learnerId = await readActiveLearnerFromCookies(session);
+  if (!learnerId) redirect(session.role === "parent" ? "/learner/select" : "/login");
   const sp = await searchParams;
   const baseline = sp.b
     ? await getBaselineById(sp.b, session.tenantId)
-    : await getActiveBaselineForLearner(session.learnerId, session.tenantId);
-  if (!baseline || baseline.learnerId !== session.learnerId) {
+    : await getActiveBaselineForLearner(learnerId, session.tenantId);
+  if (!baseline || baseline.learnerId !== learnerId) {
     redirect("/learner/baseline/subjects");
   }
 
-  const learner = await getLearner(session.learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
   const t = await getTranslations("learner.baseline");
   const questions = await listBaselineQuestions(baseline.id);
@@ -57,13 +59,13 @@ export default async function BaselineIntroPage({
   const tutors = subjects.map((s) => tutorForSubjectSlug(s.slug)).filter(Boolean);
   const firstTutor = tutors[0];
 
-  const iep = await getIEPForLearner(session.learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const chips: PersonalizationVariant[] = ["parent_assessment", "no_grades"];
   if (iep?.confirmedAt) chips.unshift("iep");
   chips.push("pacing");
 
   // Reading prefs → `--learner-*` vars on the shell (same bridge as the runner).
-  const a11yPrefs = await getAccessibilityPrefs(session.learnerId, session.tenantId);
+  const a11yPrefs = await getAccessibilityPrefs(learnerId, session.tenantId);
   const shellStyle = learnerPrefStyleVars(a11yPrefs);
 
   return (

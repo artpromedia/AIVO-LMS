@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
+import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { Button } from "@/components/ui/button";
 import { LearnerBaselineShell, PersonalizationChip } from "@aivo/ui";
 import {
@@ -19,8 +20,9 @@ async function startWithSubjectsAction(formData: FormData) {
   "use server";
   const { getSession } = await import("@/lib/auth/session");
   const session = await getSession();
-  if (!session || session.role !== "learner" || !session.learnerId) redirect("/login");
-  const learnerId = session.learnerId;
+  if (!session || (session.role !== "learner" && session.role !== "parent")) redirect("/login");
+  const learnerId = await readActiveLearnerFromCookies(session);
+  if (!learnerId) redirect(session.role === "parent" ? "/learner/select" : "/login");
   const subjectIds = formData.getAll("subjectIds").map(String).filter(Boolean);
   if (subjectIds.length === 0) {
     redirect("/learner/baseline/subjects?error=pick_one");
@@ -52,14 +54,15 @@ export default async function BaselineSubjectsPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const session = await requirePageRole(["learner"]);
+  const session = await requirePageRole(["learner", "parent"]);
   const t = await getTranslations("learner.baseline");
   const sp = await searchParams;
-  if (!session.learnerId) redirect("/learner/home");
+  const learnerId = await readActiveLearnerFromCookies(session);
+  if (!learnerId) redirect(session.role === "parent" ? "/learner/select" : "/login");
   const subjects = await listSubjects();
   const focusSubjects =
     (
-      (await await getOrCreateParentAssessment(session.learnerId, session.tenantId)).answers
+      (await getOrCreateParentAssessment(learnerId, session.tenantId)).answers
         .grade_subject as { focusSubjects?: string[] } | undefined
     )?.focusSubjects ?? [];
 

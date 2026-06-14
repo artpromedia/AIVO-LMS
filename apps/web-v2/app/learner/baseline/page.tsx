@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
+import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import {
   LearnerBaselineShell,
   AICompanionHero,
@@ -25,10 +26,10 @@ import {
  * into the runner.
  */
 export default async function LearnerBaselineIndex() {
-  const session = await requirePageRole(["learner"]);
+  const session = await requirePageRole(["learner", "parent"]);
   const t = await getTranslations("learner.baseline");
-  const learnerId = session.learnerId;
-  if (!learnerId) redirect("/learner/home");
+  const learnerId = await readActiveLearnerFromCookies(session);
+  if (!learnerId) redirect(session.role === "parent" ? "/learner/select" : "/login");
 
   const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   const ready =

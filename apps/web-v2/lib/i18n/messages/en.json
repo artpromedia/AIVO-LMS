@@ -1144,7 +1144,20 @@
     "learner_card": {
       "open_profile": "Open profile",
       "age": "Age {age}",
-      "grade": "Grade {grade}"
+      "grade": "Grade {grade}",
+      "enter_parent_view": "Open in parent view",
+      "enter_as_learner": "Enter as learner"
+    },
+    "handoff": {
+      "back": "Back to {name}",
+      "title": "Hand the device to {name}",
+      "body": "Enter the learner's PIN to sign in as them. They'll see their own learner app — you can switch back anytime by signing out.",
+      "pin_label": "Learner PIN",
+      "pin_helper": "Enter the learner's 4–6 digit PIN. This keeps their learning space theirs.",
+      "submit": "Sign in as learner",
+      "set_pin_cta": "No PIN yet? Set one up",
+      "error_invalid": "That PIN didn't match. Try again, or set a new PIN.",
+      "error_locked": "Too many tries. Please wait a moment before trying again."
     }
   },
   "brain_clone": {

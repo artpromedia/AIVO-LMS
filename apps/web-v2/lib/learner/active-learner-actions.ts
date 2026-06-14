@@ -50,3 +50,60 @@ export async function enterLearnerHome(formData: FormData): Promise<void> {
   });
   redirect("/learner/home");
 }
+
+/**
+ * Server Action: a parent hands the device to the child — a true sign-in AS
+ * the learner, gated by the learner's PIN.
+ *
+ * Unlike `enterLearnerHome` (which keeps the parent session and only sets the
+ * active-learner cookie for "parent · learner view"), this SWAPS the session:
+ * it verifies the learner's PIN via identity-svc's `pin-login`, then replaces
+ * the parent's auth cookies with the learner's so the child is genuinely
+ * signed in as themselves. The parent is already authenticated, so `parentId`
+ * is taken from the session and the form only collects the PIN.
+ *
+ * Routing by `verifyLearnerPin` outcome (see services/identity-svc):
+ *   - ok       → swap to the learner session, land on /learner/home.
+ *   - 404      → the learner has no PIN yet: route to the set-PIN step first.
+ *   - 429      → PIN temporarily locked: bounce back with the retry window.
+ *   - else     → invalid PIN / unreachable: bounce back with a generic error.
+ */
+export async function enterAsLearner(formData: FormData): Promise<void> {
+  const learnerId = String(formData.get("learnerId") ?? "").trim();
+  const pin = String(formData.get("pin") ?? "").trim();
+  const session = await requirePageRole(["parent"]);
+  const authorized = learnerId ? await verifyActiveLearner(session, learnerId) : null;
+  if (!authorized) redirect("/learner/select?error=forbidden");
+  const handoff = `/parent/learners/${authorized}/enter`;
+  if (!/^\d{4,6}$/.test(pin)) redirect(`${handoff}?error=invalid`);
+
+  const { identityPinLogin, extractRefreshToken, toSessionProfile } = await import(
+    "@/lib/auth/identity-client"
+  );
+  const result = await identityPinLogin({ parentId: session.userId, learnerId: authorized, pin });
+
+  if (result.kind === "error") {
+    if (result.status === 404) redirect(`/onboarding/pin?learnerId=${encodeURIComponent(authorized)}`);
+    if (result.status === 429) redirect(`${handoff}?error=locked`);
+    redirect(`${handoff}?error=invalid`);
+  }
+
+  const profile = toSessionProfile(result.user);
+  if (!profile || profile.role !== "learner" || profile.learnerId !== authorized) {
+    redirect(`${handoff}?error=invalid`);
+  }
+  const learnerProfile = profile;
+
+  const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
+  const jar = await cookies();
+  // Drop the parent's active-learner cookie — it's meaningless once the session
+  // is the learner (readActiveLearnerFromCookies returns session.learnerId for
+  // the learner role), and leaving it set is stale parent state.
+  jar.set({ name: ACTIVE_LEARNER_COOKIE, value: "", path: "/", maxAge: 0 });
+  setAuthSessionCookies(jar, {
+    accessToken: result.accessToken,
+    refreshToken: extractRefreshToken(result.setCookies),
+    profile: learnerProfile,
+  });
+  redirect("/learner/home");
+}

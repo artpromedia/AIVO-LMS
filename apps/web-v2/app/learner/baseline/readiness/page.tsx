@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
+import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { LearnerBaselineShell, PersonalizationChip, type PersonalizationVariant } from "@aivo/ui";
 import {
   getAccessibilityPrefs,
@@ -28,22 +29,23 @@ export default async function BaselineReadinessPage({
 }: {
   searchParams: Promise<{ b?: string }>;
 }) {
-  const session = await requirePageRole(["learner"]);
-  if (!session.learnerId) redirect("/learner/home");
+  const session = await requirePageRole(["learner", "parent"]);
+  const learnerId = await readActiveLearnerFromCookies(session);
+  if (!learnerId) redirect(session.role === "parent" ? "/learner/select" : "/login");
   const sp = await searchParams;
   const t = await getTranslations("learner.baseline");
-  const learner = await getLearner(session.learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
 
   const baseline = sp.b
     ? await getBaselineById(sp.b, session.tenantId)
-    : await getActiveBaselineForLearner(session.learnerId, session.tenantId);
-  if (!baseline || baseline.learnerId !== session.learnerId) {
+    : await getActiveBaselineForLearner(learnerId, session.tenantId);
+  if (!baseline || baseline.learnerId !== learnerId) {
     redirect("/learner/baseline/subjects");
   }
 
-  const assessment = await getOrCreateParentAssessment(session.learnerId, session.tenantId);
-  const iep = await getIEPForLearner(session.learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const hasReadAloud = Boolean(
     learner.accessibilityDefaults.audioFirst || iep?.extraction?.readingSupport,
   );
@@ -60,7 +62,7 @@ export default async function BaselineReadinessPage({
 
   // Carry the learner's reading prefs onto the shell so the whole baseline
   // flow (not only the runner) honors dyslexia font / larger text / spacing.
-  const a11yPrefs = await getAccessibilityPrefs(session.learnerId, session.tenantId);
+  const a11yPrefs = await getAccessibilityPrefs(learnerId, session.tenantId);
   const shellStyle = learnerPrefStyleVars(a11yPrefs);
 
   // Sprint C-15 — gently suggest button-friendly (switch/AAC) steering when
