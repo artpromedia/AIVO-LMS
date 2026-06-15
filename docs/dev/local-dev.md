@@ -87,7 +87,7 @@ reads `process.env.<NAME>_PORT` first and falls back to these defaults.
 | --------------------- | ----------------------- | -------- | ------------------------------------------------------ |
 | `identity-svc`        | `IDENTITY_SVC_URL`      | `3001`   | `/api/{admin,auth,users,avatars,consent,curriculum}/*` |
 | `brain-svc`           | `BRAIN_SVC_URL`         | `3002`   | `/api/brain/*`                                         |
-| `assessment-svc`      | `ASSESSMENT_PORT`       | `3003`   | `/api/{assessments,iep}/*`                             |
+| `assessment-svc`      | `ASSESSMENT_PORT`       | `3012`   | `/api/{assessments,iep}/*`                             |
 | `ai-svc`              | (python)                | `3004`   | `/api/ai/*`                                            |
 | `learning-svc`        | `LEARNING_PORT`         | `3005`   | `/api/learning/*`                                      |
 | `tutor-svc`           | `TUTOR_PORT`            | `3006`   | `/api/{tutors,tutor}/*`                                |
@@ -112,6 +112,16 @@ reads `process.env.<NAME>_PORT` first and falls back to these defaults.
 | `audit-svc`           | `AUDIT_PORT`            | `3069`   | server-to-server                                       |
 | `data-governance-svc` | `DATA_GOVERNANCE_PORT`  | `3070`   | (Sprint 04 wires the rewrite)                          |
 | `responsible-ai-svc`  | `RESPONSIBLE_AI_PORT`   | `3071`   | invoked by ai-svc                                      |
+
+> **`assessment-svc` moved `3003` → `3012`.** It was historically on `3003`,
+> but on Replit that port is reserved for the Marketing Site dev workflow, so a
+> fresh boot collided (`EADDRINUSE`) — see the port-collision note in
+> `replit.md`. `assessment-svc` now defaults to `3012` (`ASSESSMENT_PORT`).
+> Note the nominal overlap with `integrations-svc` in this table: the two are
+> never started together — `scripts/start-services.sh` runs `assessment-svc`
+> (`3012`) and `integration-svc` (`3068`), not the `integrations-svc` BFF — so
+> `3012` is free for assessment in the default dev stack. If you start
+> `integrations-svc` manually, override one of them via its `*_PORT` env var.
 
 ### Web app rewrite drift to resolve (Sprint 02)
 
