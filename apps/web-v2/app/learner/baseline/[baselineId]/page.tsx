@@ -57,6 +57,7 @@ import { mintAssessmentSvcToken } from "@/lib/learner/assessment-svc-auth";
 import { serverEnv } from "@/lib/env";
 import { BASELINE_BREAK_EVERY } from "@aivo/adaptive-baseline";
 import { LatencyTimer } from "./latency-timer";
+import { BaselineListenAudio } from "./listen-audio";
 import type { BaselineQuestion } from "@/lib/db/types";
 
 /**
@@ -656,17 +657,35 @@ export default async function BaselineRunnerPage({
           readAloud={
             next.readAloudText ? (
               <div className="flex flex-col gap-1.5">
-                <ReadAloudButton
-                  href={`?read=${next.id}${listenMode ? "&listen=1" : ""}${asParent ? "&as=parent" : ""}`}
-                  className={
-                    listenMode
-                      ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
-                      : undefined
-                  }
-                  scanTargetId={scanConfig.active ? `q-${next.id}-readaloud` : undefined}
-                  scanLabel={tScan("target_read_aloud")}
-                  scanReadText={`${next.prompt}. ${next.readAloudText}`}
-                />
+                {scanConfig.active ? (
+                  // Scan/AAC path: the scan controller speaks `data-scan-read`
+                  // on activation, so this stays a link-backed scan target.
+                  <ReadAloudButton
+                    href={`?read=${next.id}${listenMode ? "&listen=1" : ""}${asParent ? "&as=parent" : ""}`}
+                    className={
+                      listenMode
+                        ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
+                        : undefined
+                    }
+                    scanTargetId={`q-${next.id}-readaloud`}
+                    scanLabel={tScan("target_read_aloud")}
+                    scanReadText={`${next.prompt}. ${next.readAloudText}`}
+                  />
+                ) : (
+                  // Non-scan path: a real Speech-API-backed control. Taps speak
+                  // the prompt, and in listening mode it auto-starts on load.
+                  // Keyed by question id so each new question re-fires.
+                  <BaselineListenAudio
+                    key={next.id}
+                    text={`${next.prompt}. ${next.readAloudText}`}
+                    autoStart={listenMode}
+                    className={
+                      listenMode
+                        ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
+                        : undefined
+                    }
+                  />
+                )}
                 {listenMode ? (
                   <p className="text-xs text-[var(--aivo-color-aivoPurple-700)]">
                     {t("listen_mode_hint")}
