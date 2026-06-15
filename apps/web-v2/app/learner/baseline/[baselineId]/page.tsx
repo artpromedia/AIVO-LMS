@@ -11,7 +11,6 @@ import {
   BaselineProgressDots,
   PersonalizationChip,
   HintCard,
-  ReadAloudButton,
   BreakCard,
   CompletionHero,
   ProctorBanner,
@@ -663,18 +662,28 @@ export default async function BaselineRunnerPage({
             next.readAloudText ? (
               <div className="flex flex-col gap-1.5">
                 {scanConfig.active ? (
-                  // Scan/AAC path: the scan controller speaks `data-scan-read`
-                  // on activation, so this stays a link-backed scan target.
-                  <ReadAloudButton
-                    href={`?read=${next.id}${listenMode ? "&listen=1" : ""}${asParent ? "&as=parent" : ""}`}
+                  // Scan/AAC path: the same server-TTS listen island as the
+                  // non-scan path, but registered as a scan target. The scan
+                  // controller activates it by clicking the real control (no
+                  // `data-scan-action`), so it speaks via the server TTS
+                  // pipeline AND shows captions in sync — falling back to the
+                  // browser voice (no caption timings) when the server can't
+                  // help. Keyed by question id so each new question re-fires.
+                  <BaselineListenAudio
+                    key={next.id}
+                    learnerId={baseline.learnerId}
+                    text={`${next.prompt}. ${next.readAloudText}`}
+                    contextRefId={next.id}
+                    speed={voicePref?.speed}
+                    voiceId={voicePref?.voiceId}
+                    captionsAlways={voicePref?.captionsAlways}
+                    scanTargetId={`q-${next.id}-readaloud`}
+                    scanLabel={tScan("target_read_aloud")}
                     className={
                       listenMode
                         ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
                         : undefined
                     }
-                    scanTargetId={`q-${next.id}-readaloud`}
-                    scanLabel={tScan("target_read_aloud")}
-                    scanReadText={`${next.prompt}. ${next.readAloudText}`}
                   />
                 ) : (
                   // Non-scan path: a real read-aloud control backed by the

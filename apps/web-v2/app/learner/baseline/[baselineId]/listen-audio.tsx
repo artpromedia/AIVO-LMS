@@ -139,6 +139,8 @@ export function BaselineListenAudio({
   voiceId,
   languageCode,
   captionsAlways = false,
+  scanTargetId,
+  scanLabel,
 }: {
   learnerId: string;
   text: string;
@@ -153,6 +155,16 @@ export function BaselineListenAudio({
   languageCode?: string;
   /** When true, keep the transcript visible even while audio isn't playing. */
   captionsAlways?: boolean;
+  /**
+   * Switch/AAC scanning. When set, the play pill registers as a scan target so
+   * the baseline scan controller can reach it. The button carries no
+   * `data-scan-action`, so the controller activates it by *clicking* the real
+   * control — driving this island's server-TTS + caption playback (with the
+   * browser-voice fallback) instead of the controller's browser-only `speak()`.
+   * That's what brings synced captions to the scan/AAC read-aloud path.
+   */
+  scanTargetId?: string;
+  scanLabel?: string;
 }) {
   const [supported, setSupported] = React.useState(false);
   const [status, setStatus] = React.useState<PlaybackStatus>("idle");
@@ -437,8 +449,18 @@ export function BaselineListenAudio({
         <ReadAloudButton
           playing={active}
           onToggle={toggle}
-          disabled={!supported}
+          // In scan mode the control is always client-driven (the scan provider
+          // only mounts with JS), so keep it enabled and registrable — a button
+          // that's `disabled` at the registrar's discovery pass would be dropped
+          // from the scan cycle (the observer doesn't re-scan on attr changes).
+          disabled={scanTargetId ? undefined : !supported}
           className={className}
+          scanTargetId={scanTargetId}
+          scanLabel={scanLabel}
+          // No `data-scan-action`: the controller clicks the real control,
+          // firing `toggle` → server TTS + synced captions (browser fallback
+          // keeps working, just without caption timings).
+          scanAction={scanTargetId ? null : undefined}
         />
         {active ? (
           <>
