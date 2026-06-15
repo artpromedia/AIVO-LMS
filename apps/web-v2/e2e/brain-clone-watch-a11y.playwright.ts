@@ -34,6 +34,27 @@ const AXE_RULES = {
   "page-has-heading-one": { enabled: false },
 } as const;
 
+/**
+ * C-14: under reduced motion a FIRST-TIME parent still steps through the
+ * stitched reveal (screens 1–4) before the recap/ceremony. The specs that pin
+ * the recap/ceremony surface seed the per-learner "seen clone" flag the
+ * building client reads (lib/clone-flags.ts → `aivo:seen-clone:{id}`) so they
+ * land straight on it — the returning-parent state. The reveal itself is
+ * covered by the screens-1–4 spec, which intentionally does NOT seed the flag.
+ */
+async function seedSeenClone(
+  context: import("@playwright/test").BrowserContext,
+): Promise<void> {
+  await context.addInitScript((id) => {
+    try {
+      globalThis.localStorage.setItem(`aivo:seen-clone:${id}`, "1");
+    } catch {
+      /* localStorage unavailable — the reveal will play and the spec's
+         approved-state fallback still applies. */
+    }
+  }, CLONE_LEARNER);
+}
+
 test.describe("@a11y brain-clone-watch reveal", () => {
   test(`@a11y parent reveal recap (/parent/learners/${CLONE_LEARNER}/brain-clone-watch)`, async ({
     context,
@@ -42,8 +63,10 @@ test.describe("@a11y brain-clone-watch reveal", () => {
     await context.addCookies([
       { name: "aivo_mock_session", value: "parent", domain: "127.0.0.1", path: "/" },
     ]);
-    // Reduced motion lands straight on the recap + ceremony (see
-    // building-client.tsx), the state this audit pins.
+    // Land on the recap + ceremony (the state this audit pins): seed the
+    // "seen clone" flag so reduced motion skips the first-run stitched reveal
+    // (C-14) and renders the recap directly, same as a returning parent.
+    await seedSeenClone(context);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`/parent/learners/${CLONE_LEARNER}/brain-clone-watch`);
     await page.waitForSelector("main", { timeout: 30_000 });
@@ -77,7 +100,10 @@ test.describe("@a11y brain-clone-watch reveal", () => {
     ]);
     // Reduced motion → the ceremony renders the keyboard-friendly two-step
     // approve (no press-and-hold), exactly the path a switch/keyboard user
-    // takes. Bail out gracefully if a sibling spec already approved the clone.
+    // takes. Seed the "seen clone" flag so reduced motion skips the first-run
+    // stitched reveal (C-14) and lands on the ceremony. Bail out gracefully if
+    // a sibling spec already approved the clone.
+    await seedSeenClone(context);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`/parent/learners/${CLONE_LEARNER}/brain-clone-watch`);
     await page.waitForSelector("main", { timeout: 30_000 });

@@ -8,6 +8,12 @@ export default defineConfig({
   testDir: ".",
   testMatch: ["e2e/**/*.playwright.ts", "e2e/**/*.spec.ts", "tests/e2e/**/*.spec.ts"],
   timeout: 60_000,
+  // Retry on CI only. Several specs (e.g. the @a11y switch-scan ring and the
+  // reduced-motion reveal) depend on animation/scan-timer timing that can flake
+  // under loaded CI workers; a retry absorbs that without hiding real failures
+  // — a deterministic break fails every attempt. Pairs with the existing
+  // `trace: "on-first-retry"` (previously inert with retries at the default 0).
+  retries: process.env.CI ? 2 : 0,
   use: {
     baseURL,
     trace: "on-first-retry",

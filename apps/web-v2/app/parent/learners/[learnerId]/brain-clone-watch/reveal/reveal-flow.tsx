@@ -205,7 +205,10 @@ export function RevealFlow({
           font-size: 0.82rem;
           font-weight: 600;
           letter-spacing: 0.04em;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: --bc-primary is the learner's brain-palette hue and can be
+             light; mix toward near-black so this small transition copy always
+             clears 4.5:1 on the light reveal canvas (mirrors the eyebrow). */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
         }
         .reveal-flow-stage {
           animation: revealStageIn 420ms ease;
