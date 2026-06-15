@@ -563,6 +563,12 @@ def build_discovery_adventure_prompt(
     focus_rating = responses.get("ls-3", 3)
     confidence = responses.get("se-1", 3)
 
+    # "choices" here is the *generation target* asked of the LLM — how many
+    # options to author per activity. It is intentionally distinct from (and
+    # ≤) the learner-facing render cap (fl-profiles.ts) and the server safety
+    # ceiling enforced post-generation (scaffold_enforcer.RULES.max_options).
+    # Invariant: generator target ≤ render cap ≤ server reject-above. See
+    # learner-experience/BASELINE-SPEC.md → "Two caps, one direction".
     fl_config = {
         "STANDARD": {"activities": 4, "choices": 4, "interaction_types": "tap_image, tap_word, drag_sort, sequence, pattern_fill, memory", "complexity": "age-appropriate"},
         "SUPPORTED": {"activities": 3, "choices": 3, "interaction_types": "tap_image, tap_word, drag_sort, sequence", "complexity": "simplified language, clearer options"},

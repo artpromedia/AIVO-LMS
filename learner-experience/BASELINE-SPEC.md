@@ -74,6 +74,43 @@ becomes audio-first at the bottom of the ramp:
 > targets, audio-first, no scores.** If the adventure is calm and operable here, it is calm
 > everywhere.
 
+#### Two caps, one direction — render cap vs. server safety ceiling
+
+The `maxChoices` column above is the **learner-facing render cap** — how many choice cards the
+runner ever shows. It is the single source of truth for what the child sees and is defined once in
+`packages/learner-ui/src/tokens/fl-profiles.ts`, mirrored by the mobile runner
+(`apps/mobile/src/api/baselineClient.ts` → `FL_MAX_CHOICES`) and the web-v2 previews. The runner
+trims to it *keeping the correct option* (it never blind-slices, because the client item shape has no
+correct-answer field).
+
+Separately, the **server-side scaffold enforcer**
+(`services/ai-svc/src/ai_svc/services/scaffold_enforcer.py` → `RULES.max_options`) applies a
+deliberately **looser safety ceiling** that rejects egregiously malformed LLM output *before* it ever
+reaches the client. It is intentionally **not** the same number as the render cap, and it is **not**
+stale drift:
+
+| FL | Render cap (`fl-profiles.ts`) | Generator target (`baseline_generator.py`) | Server reject-above (`scaffold_enforcer RULES`) |
+| --- | --- | --- | --- |
+| STANDARD | 5 | 4 | 10 |
+| SUPPORTED | 3 | 3 | 4 |
+| LOW_VERBAL | 2 | 2 | 3 |
+| NON_VERBAL | 2 | 2 | 2 |
+| PRE_SYMBOLIC | 2¹ | 0 | 0 (no MC at all) |
+
+> ¹ PRE_SYMBOLIC's render cap exists only as a defensive default; in practice these learners never
+> get a multiple-choice baseline at all. The server bypasses the LLM and returns a caregiver
+> **observation checklist** (`build_pre_symbolic_observation_payload`), and the enforcer rejects
+> *any* MC item for this level — hence `0`.
+>
+> **Why the server ceiling is looser, not equal:** the enforcer is a guardrail against garbage
+> (a 200-word stem, 12 options), not the render budget. Tightening it down to the render cap would
+> reject otherwise-fine items the client would have trimmed cleanly — more dropped items, no learner
+> benefit. So **generator target ≤ render cap ≤ server reject-above** is the invariant to preserve
+> (PRE_SYMBOLIC is the exception: no MC at all, so the server rejects every MC item regardless of the
+> defensive render default). Do **not** "reconcile" these by forcing them equal; change the render cap
+> in `fl-profiles.ts` and the server ceiling in `scaffold_enforcer.py` independently, each for its own
+> reason.
+
 ---
 
 ## (b) Interaction + audio / AAC spec

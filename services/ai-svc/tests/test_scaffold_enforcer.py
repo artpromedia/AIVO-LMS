@@ -192,8 +192,14 @@ class TestEnforceBatch:
 # failing in CI.
 
 
-# The authoritative per-level cap. Mirrors BASELINE-SPEC.md's intent:
-# choices shrink as support increases, and PRE_SYMBOLIC has no MC at all.
+# The authoritative per-level *server safety ceiling* — the value above
+# which the enforcer rejects an item outright. This is intentionally
+# looser than (and distinct from) the learner-facing render cap in
+# packages/learner-ui/src/tokens/fl-profiles.ts (5/3/2/2/2): the enforcer
+# is a guardrail against malformed LLM output, not the render budget. See
+# BASELINE-SPEC.md → "Two caps, one direction" for the generator-target ≤
+# render-cap ≤ server-reject-above invariant. Choices shrink as support
+# increases, and PRE_SYMBOLIC has no MC at all.
 EXPECTED_MAX_CHOICES = {
     "STANDARD": 10,
     "SUPPORTED": 4,
