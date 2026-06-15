@@ -39,6 +39,7 @@ import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
 import { resolveBaselineScanConfig } from "@/lib/a11y/baseline-scan";
 import { BaselineScanProvider } from "./baseline-scan-provider";
 import { buildBaselineAnswerRedirect } from "./answer-redirect";
+import { buildCompletionLearnedChips } from "./completion-chips";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
@@ -360,15 +361,7 @@ export default async function BaselineRunnerPage({
           total={baseline.summary?.totalQuestions ?? 0}
           showAnswered={asParent}
           body={baseline.summary?.learnerSafeSummary ?? undefined}
-          learned={[
-            ...(asParent
-              ? subjectMastery.map(
-                  (s) => `${s.subjectName}: starting at ${s.estimate.replaceAll("_", " ")}`,
-                )
-              : []),
-            ...(chips.includes("iep") ? ["IEP supports stay on"] : []),
-            ...(chips.includes("calm_mode") ? ["Calm pacing locked in"] : []),
-          ]}
+          learned={buildCompletionLearnedChips({ asParent, subjectMastery, chips })}
           primary={
             <Link
               href={
