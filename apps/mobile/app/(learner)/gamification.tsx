@@ -5,13 +5,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEngagement } from "@/hooks/useEngagement";
+import { useShopItems, useInventory } from "@/hooks/useAvatar";
 import { AivoCard, StatCard, AivoButton } from "@aivo/mobile-ui";
+import { AvatarPreview } from "@/src/components/learner/AvatarPreview";
 import { colors, spacing, radius } from "@/constants/colors";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 
 export default function GamificationScreen() {
   const { user, logout } = useAuth();
-  const { data: engagement } = useEngagement(user?.id || "");
+  const learnerId = user?.id || "";
+  const { data: engagement } = useEngagement(learnerId);
+  const { data: avatarItems } = useShopItems();
+  const { data: inventory } = useInventory(learnerId);
   const { t } = useTranslation();
 
   return (
@@ -39,9 +44,13 @@ export default function GamificationScreen() {
       </View>
 
       <AivoCard style={styles.profileCard}>
-        <View style={styles.avatarLarge}>
-          <Text style={{ fontSize: 40 }}>🎮</Text>
-        </View>
+        <AvatarPreview
+          items={avatarItems}
+          inventory={inventory}
+          variant="compact"
+          size={80}
+        />
+        <View style={{ height: 8 }} />
         <Text style={styles.userName}>{user?.name}</Text>
         <Text style={styles.userLevel}>
           {t("learner.level", { level: engagement?.level || 1 })}
@@ -141,15 +150,6 @@ const styles = StyleSheet.create({
     alignItems: "center" as const,
     marginBottom: spacing.lg,
     paddingVertical: spacing.lg,
-  },
-  avatarLarge: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary + "15",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
   },
   userName: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
   userLevel: {
