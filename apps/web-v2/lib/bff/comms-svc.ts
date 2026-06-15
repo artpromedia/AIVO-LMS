@@ -85,6 +85,19 @@ export function sendMessageSvc(
   });
 }
 
+/**
+ * Start a new thread (parent → care-team member). comms-svc owns the
+ * `message_threads` / `message_thread_participants` / `messages` rows and adds
+ * the caller as a participant; the BFF owns recipient authorization + rate
+ * limiting before calling this.
+ */
+export function createThreadSvc(
+  bearer: string,
+  input: { subject: string; participantUserIds: string[]; body?: string; learnerId?: string | null },
+): Promise<ServiceResult<{ thread: { id: string }; message?: unknown }>> {
+  return commsFetch("/api/comms/threads", { method: "POST", bearer, body: input });
+}
+
 export function markThreadReadSvc(
   bearer: string,
   threadId: string,

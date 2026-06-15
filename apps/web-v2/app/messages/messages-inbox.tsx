@@ -3,6 +3,8 @@
 import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RetryPanel } from "@/components/ui/retry-panel";
@@ -10,6 +12,7 @@ import { bffFetch } from "@/lib/api/client";
 import { toast } from "@/lib/use-toast";
 import { useLiveRefresh } from "@/lib/use-live-refresh";
 import { useSse } from "@/lib/realtime/use-sse";
+import { ComposeDialog } from "./compose-dialog";
 
 interface ThreadListItem {
   id: string;
@@ -50,9 +53,18 @@ const threadMessagesKey = (id: string) => ["messages", "thread", id] as const;
 export function MessagesInbox() {
   const t = useTranslations("messages");
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [activeSubject, setActiveSubject] = React.useState<string>("");
   const [draft, setDraft] = React.useState("");
+  // Compose can be deep-linked from the care-team page:
+  // /messages?compose=1&to=<userId>&learner=<learnerId>.
+  const [composeOpen, setComposeOpen] = React.useState(false);
+  const presetTo = searchParams?.get("to") ?? null;
+  const presetLearner = searchParams?.get("learner") ?? null;
+  React.useEffect(() => {
+    if (searchParams?.get("compose") === "1") setComposeOpen(true);
+  }, [searchParams]);
 
   const threadsQuery = useQuery({
     queryKey: THREADS_KEY,
@@ -162,10 +174,25 @@ export function MessagesInbox() {
 
   return (
     <div className="mt-6 grid gap-4 lg:grid-cols-[320px,1fr]">
+      <ComposeDialog
+        open={composeOpen}
+        onOpenChange={setComposeOpen}
+        presetTo={presetTo}
+        presetLearner={presetLearner}
+        onCreated={(threadId, subject) => {
+          setActiveId(threadId);
+          setActiveSubject(subject);
+          void queryClient.invalidateQueries({ queryKey: THREADS_KEY });
+        }}
+      />
       {/* Thread list */}
       <aside className="rounded-iw-card border border-iw-border bg-iw-card">
-        <header className="border-b border-iw-border px-4 py-3">
+        <header className="flex items-center justify-between gap-2 border-b border-iw-border px-4 py-3">
           <h2 className="text-sm font-semibold text-iw-text-strong">{t("inbox_title")}</h2>
+          <Button size="sm" variant="outline" onClick={() => setComposeOpen(true)}>
+            <Plus className="mr-1 h-3.5 w-3.5" aria-hidden />
+            {t("new_message")}
+          </Button>
         </header>
         {threadsQuery.isPending ? (
           <div className="flex flex-col gap-3 px-4 py-4" aria-busy="true">

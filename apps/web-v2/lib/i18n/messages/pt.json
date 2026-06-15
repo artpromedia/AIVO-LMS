@@ -665,7 +665,8 @@
       "onboarding_subtitle": "Invite a teacher, caregiver, or therapist to add their perspective before AIVO builds the brain. You can do this now or skip and add them later.",
       "continue_to_baseline": "Continue to baseline",
       "skip_for_now": "Skip for now",
-      "classroom_connections_title": "Also connected through {name}’s classroom"
+      "classroom_connections_title": "Also connected through {name}’s classroom",
+      "message_team": "Message team"
     },
     "schedule": {
       "title": "Agenda",
@@ -737,7 +738,8 @@
       "add_your_first_learner": "Adicione seu primeiro aluno",
       "add_another_learner": "Adicionar outro aluno",
       "your_learners": "Seus alunos",
-      "no_learners_yet": "Nenhum aluno ainda"
+      "no_learners_yet": "Nenhum aluno ainda",
+      "messages_section": "Messages"
     },
     "error": {
       "eyebrow": "Erro",
@@ -981,6 +983,35 @@
       "sessions": "Sessions",
       "time": "Time on task",
       "minutes": "{count} min"
+    },
+    "compose": {
+      "title": "New message",
+      "subtitle": "Message a member of your learner’s care team.",
+      "to": "To",
+      "to_placeholder": "Choose a recipient",
+      "subject": "Subject (optional)",
+      "subject_placeholder": "What’s this about?",
+      "message": "Message",
+      "message_placeholder": "Write your message…",
+      "send": "Send",
+      "sending": "Sending…",
+      "cancel": "Cancel",
+      "loading_contacts": "Loading your care team…",
+      "no_contacts": "No care-team members to message yet. Invite a teacher, therapist, caregiver, or coach from a learner’s Care team page.",
+      "error_title": "Message not sent",
+      "error_body": "Your draft is still here — try again.",
+      "contact_line": "{name} · {role} for {learner}",
+      "role_teacher": "Teacher",
+      "role_therapist": "Therapist",
+      "role_caregiver": "Caregiver",
+      "role_coach": "Coach"
+    },
+    "messages_card": {
+      "title": "Messages",
+      "unread": "{count, plural, one {# unread} other {# unread}}",
+      "empty": "No messages yet. Reach out to your learner’s care team any time.",
+      "open": "Open messages",
+      "start": "Start a conversation"
     }
   },
   "brain_clone": {
@@ -3913,7 +3944,8 @@
     "thread_error_body": "Tente de novo — suas mensagens estão seguras.",
     "send_failed_title": "Mensagem não enviada",
     "send_failed_body": "Seu rascunho continua aqui.",
-    "send_retry": "Tentar de novo"
+    "send_retry": "Tentar de novo",
+    "new_message": "New message"
   },
   "notifications": {
     "unsubscribe": {

@@ -25,10 +25,12 @@ import {
   UploadCloud,
   Bell,
   Wind,
+  MessageCircle,
 } from "lucide-react";
 import { Permission } from "@aivo/security";
 import type { RoleNavItem } from "@/components/layout/role-nav";
 import { LearnerUnreadNotificationsBadge } from "@/components/layout/learner-unread-notifications-badge";
+import { MessagesUnreadBadge } from "@/components/layout/messages-unread-badge";
 import type { SessionProfile } from "@/lib/auth/types";
 import { sessionHasPermission } from "@/lib/auth/permissions";
 
@@ -36,6 +38,12 @@ export const PARENT_NAV: RoleNavItem[] = [
   { href: "/parent/home", label: "Home", icon: <Home className="h-4 w-4" /> },
   { href: "/parent/learners", label: "Learners", icon: <Users className="h-4 w-4" /> },
   { href: "/parent/schedule", label: "Schedule", icon: <Calendar className="h-4 w-4" /> },
+  {
+    href: "/messages",
+    label: "Messages",
+    icon: <MessageCircle className="h-4 w-4" />,
+    badgeSlot: <MessagesUnreadBadge />,
+  },
   { href: "/parent/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
   { href: "/parent/privacy", label: "Privacy", icon: <ShieldCheck className="h-4 w-4" /> },
   { href: "/notifications", label: "Notifications", icon: <Bell className="h-4 w-4" /> },

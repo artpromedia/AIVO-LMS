@@ -7,12 +7,13 @@
  */
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { PARENT_NAV } from "@/components/layout/role-shells";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getStore as db } from "@/lib/db/store";
@@ -158,6 +159,13 @@ export default async function ParentTeamPage({
         eyebrow={learner.displayName}
         title={t("title")}
         description="Everyone supporting this learner. Parents, teachers, therapists, and caregivers can all see progress."
+        actions={
+          <Button asChild variant="outline">
+            <Link href="/messages?compose=1">
+              <MessageCircle className="mr-1 h-4 w-4" /> {t("message_team")}
+            </Link>
+          </Button>
+        }
       />
 
       {isOnboarding ? (

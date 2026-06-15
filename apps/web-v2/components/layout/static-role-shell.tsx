@@ -15,6 +15,7 @@ import {
   GraduationCap,
   ClipboardList,
   Eye,
+  MessageCircle,
 } from "lucide-react";
 import { AivoIcon } from "@aivo/ui/icon";
 
@@ -37,6 +38,7 @@ export const STATIC_NAV = {
     { href: "/parent/home", label: "Home", icon: Home },
     { href: "/parent/learners", label: "Learners", icon: Users },
     { href: "/parent/schedule", label: "Schedule", icon: Calendar },
+    { href: "/messages", label: "Messages", icon: MessageCircle },
     { href: "/parent/reports", label: "Reports", icon: FileText },
     { href: "/parent/privacy", label: "Privacy", icon: ShieldCheck },
     { href: "/notifications", label: "Notifications", icon: Bell },

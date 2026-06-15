@@ -10,6 +10,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { listLearnersForParent, refreshLearnerReadiness } from "@/lib/db/repos";
 import { LearnerCard } from "@/components/parent/learner-card";
+import { MessagesSummaryCard } from "@/components/parent/messages-summary-card";
+import { getParentMessagesSummary } from "@/lib/messaging/summary";
 
 const READY_STATES = new Set(["ready_for_today_mission", "active_learning"]);
 
@@ -19,6 +21,7 @@ export default async function ParentHome() {
   const initial = await listLearnersForParent(session.userId, session.tenantId);
   for (const l of initial) await refreshLearnerReadiness(l.id, session.tenantId);
   const learners = await listLearnersForParent(session.userId, session.tenantId);
+  const messagesSummary = await getParentMessagesSummary(session);
 
   const firstName = session.displayName.split(" ")[0];
   const primary = learners[0];
@@ -114,6 +117,12 @@ export default async function ParentHome() {
             icon={<ShieldCheck className="h-5 w-5" aria-hidden />}
             tone={needsActionCount === 0 ? "success" : "warning"}
           />
+        </section>
+      ) : null}
+
+      {learners.length > 0 ? (
+        <section aria-label={t("messages_section")} className="grid gap-4 sm:max-w-md">
+          <MessagesSummaryCard summary={messagesSummary} />
         </section>
       ) : null}
 
