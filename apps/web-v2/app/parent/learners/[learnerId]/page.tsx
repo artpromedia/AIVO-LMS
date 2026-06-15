@@ -190,6 +190,12 @@ export default async function LearnerDetailPage({
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           {
+            href: `/parent/learners/${learner.id}/sessions`,
+            label: t("sessions_card"),
+            desc: t("sessions_card_desc"),
+            Icon: CalendarDays,
+          },
+          {
             href: `/parent/learners/${learner.id}/milestones`,
             label: "Milestones",
             desc: "XP, streaks, and badges.",

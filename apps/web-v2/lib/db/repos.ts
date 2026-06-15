@@ -22,6 +22,7 @@ import { brainPacingFocusSafe } from "@/lib/bff/brain-pacing";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
 import { listLearnersForMember as listLearnersForTeamMember, getCareTeam } from "@/lib/db/team-invites";
+import { isWithinAvailability, hasConflict, isFuture } from "@/lib/parent/sessions";
 import {
   deriveRoleAcknowledgements,
   type RoleAcknowledgementPayload,
@@ -8062,6 +8063,175 @@ export function createCaregiverObservation(input: {
   };
   db().caregiverObservations.set(rec.id, rec);
   return rec;
+}
+
+// ===== Human coach/therapist sessions (blended model) =====
+
+type Provider = import("./types").Provider;
+type CoachingSession = import("./types").CoachingSession;
+type SessionLocation = import("./types").SessionLocation;
+
+export type SessionMutationResult =
+  | { ok: true; session: CoachingSession }
+  | {
+      ok: false;
+      code: "forbidden" | "not_assigned" | "unavailable" | "conflict" | "not_found" | "invalid";
+      error: string;
+    };
+
+/** Providers assigned to (bookable for) a learner. */
+export function listProvidersForLearner(learnerId: string, tenantId: string): Provider[] {
+  const links = Array.from(db().learnerProviderLinks.values()).filter(
+    (l) => l.learnerId === learnerId && l.tenantId === tenantId,
+  );
+  const providerIds = new Set(links.map((l) => l.providerId));
+  return Array.from(db().providers.values())
+    .filter((p) => p.tenantId === tenantId && providerIds.has(p.id))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
+
+export function getProvider(providerId: string, tenantId: string): Provider | null {
+  const p = db().providers.get(providerId);
+  return p && p.tenantId === tenantId ? p : null;
+}
+
+/** All sessions for a learner, soonest scheduled first. */
+export function listSessionsForLearner(learnerId: string, tenantId: string): CoachingSession[] {
+  return Array.from(db().coachingSessions.values())
+    .filter((s) => s.learnerId === learnerId && s.tenantId === tenantId)
+    .sort((a, b) => a.scheduledStart.localeCompare(b.scheduledStart));
+}
+
+/** All sessions a parent owns across their learners (for calendar / home). */
+export async function listSessionsForParent(
+  parentUserId: string,
+  tenantId: string,
+): Promise<CoachingSession[]> {
+  return Array.from(db().coachingSessions.values())
+    .filter((s) => s.parentUserId === parentUserId && s.tenantId === tenantId)
+    .sort((a, b) => a.scheduledStart.localeCompare(b.scheduledStart));
+}
+
+export async function bookSession(input: {
+  parentUserId: string;
+  tenantId: string;
+  learnerId: string;
+  providerId: string;
+  scheduledStart: string;
+  durationMinutes: number;
+  location: SessionLocation;
+  title?: string;
+}): Promise<SessionMutationResult> {
+  if (!(await parentCanAccessLearner(input.parentUserId, input.learnerId, input.tenantId))) {
+    return { ok: false, code: "forbidden", error: "not your learner" };
+  }
+  const provider = getProvider(input.providerId, input.tenantId);
+  const assigned = listProvidersForLearner(input.learnerId, input.tenantId).some(
+    (p) => p.id === input.providerId,
+  );
+  if (!provider || !assigned) {
+    return { ok: false, code: "not_assigned", error: "provider is not assigned to this learner" };
+  }
+  if (input.durationMinutes <= 0 || input.durationMinutes > 240) {
+    return { ok: false, code: "invalid", error: "invalid duration" };
+  }
+  if (!isFuture(input.scheduledStart)) {
+    return { ok: false, code: "invalid", error: "session must be in the future" };
+  }
+  if (!isWithinAvailability(provider, input.scheduledStart, input.durationMinutes)) {
+    return { ok: false, code: "unavailable", error: "outside the provider's availability" };
+  }
+  const existing = listSessionsForLearner(input.learnerId, input.tenantId);
+  if (hasConflict(existing, input.providerId, input.scheduledStart, input.durationMinutes)) {
+    return { ok: false, code: "conflict", error: "overlaps an existing session" };
+  }
+  const now = nowIso();
+  const session: CoachingSession = {
+    id: newId("ses"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    providerId: input.providerId,
+    parentUserId: input.parentUserId,
+    kind: provider.kind,
+    title: input.title?.trim() || provider.specialty || provider.displayName,
+    scheduledStart: input.scheduledStart,
+    durationMinutes: input.durationMinutes,
+    location: input.location,
+    status: "scheduled",
+    feedback: null,
+    cancelReason: null,
+    rescheduleHistory: [],
+    createdAt: now,
+    updatedAt: now,
+  };
+  db().coachingSessions.set(session.id, session);
+  return { ok: true, session };
+}
+
+export async function rescheduleSession(input: {
+  sessionId: string;
+  tenantId: string;
+  parentUserId: string;
+  newStart: string;
+}): Promise<SessionMutationResult> {
+  const session = db().coachingSessions.get(input.sessionId);
+  if (!session || session.tenantId !== input.tenantId) {
+    return { ok: false, code: "not_found", error: "session not found" };
+  }
+  if (session.parentUserId !== input.parentUserId) {
+    return { ok: false, code: "forbidden", error: "not your session" };
+  }
+  if (session.status !== "scheduled") {
+    return { ok: false, code: "invalid", error: "only scheduled sessions can be rescheduled" };
+  }
+  if (!isFuture(input.newStart)) {
+    return { ok: false, code: "invalid", error: "new time must be in the future" };
+  }
+  const provider = getProvider(session.providerId, input.tenantId);
+  if (!provider) return { ok: false, code: "not_found", error: "provider not found" };
+  if (!isWithinAvailability(provider, input.newStart, session.durationMinutes)) {
+    return { ok: false, code: "unavailable", error: "outside the provider's availability" };
+  }
+  const existing = listSessionsForLearner(session.learnerId, input.tenantId);
+  if (
+    hasConflict(existing, session.providerId, input.newStart, session.durationMinutes, session.id)
+  ) {
+    return { ok: false, code: "conflict", error: "overlaps an existing session" };
+  }
+  const now = nowIso();
+  session.rescheduleHistory.push({
+    fromStart: session.scheduledStart,
+    toStart: input.newStart,
+    at: now,
+    byUserId: input.parentUserId,
+  });
+  session.scheduledStart = input.newStart;
+  session.updatedAt = now;
+  db().coachingSessions.set(session.id, session);
+  return { ok: true, session };
+}
+
+export async function cancelSession(input: {
+  sessionId: string;
+  tenantId: string;
+  parentUserId: string;
+  reason?: string;
+}): Promise<SessionMutationResult> {
+  const session = db().coachingSessions.get(input.sessionId);
+  if (!session || session.tenantId !== input.tenantId) {
+    return { ok: false, code: "not_found", error: "session not found" };
+  }
+  if (session.parentUserId !== input.parentUserId) {
+    return { ok: false, code: "forbidden", error: "not your session" };
+  }
+  if (session.status === "cancelled") {
+    return { ok: true, session };
+  }
+  session.status = "cancelled";
+  session.cancelReason = input.reason?.trim() || null;
+  session.updatedAt = nowIso();
+  db().coachingSessions.set(session.id, session);
+  return { ok: true, session };
 }
 
 export function getCaregiverObservation(

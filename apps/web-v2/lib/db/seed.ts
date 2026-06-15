@@ -29,6 +29,9 @@ import type {
   DataRetentionPolicy,
   PolicyVersion,
   SubprocessorRecord,
+  Provider,
+  LearnerProviderLink,
+  CoachingSession,
 } from "@/lib/db/types";
 import { CONSENT_TYPES, DATA_CLASSIFICATIONS } from "@/lib/db/types";
 import type { NotificationPreference, NotificationType, AICostEvent } from "@/lib/db/types";
@@ -550,6 +553,96 @@ export function ensureSeeded(): void {
     isPrimary: true,
   };
   store.parentLearnerRelationships.push(rel);
+
+  // ===== Human coach/therapist sessions (blended model) =====
+  // Two real provider records (a coach and a therapist), assigned to Sky, plus
+  // two upcoming sessions the parent can reschedule or cancel. Providers are
+  // configured records (not fabricated at render); further sessions are written
+  // at runtime through the booking flow.
+  const nextWeekdayIso = (dayOfWeek: number, hour: number): string => {
+    const now = new Date();
+    const d = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, 0, 0),
+    );
+    let delta = (dayOfWeek - d.getUTCDay() + 7) % 7;
+    if (delta === 0 && d.getTime() <= now.getTime()) delta = 7;
+    d.setUTCDate(d.getUTCDate() + delta);
+    return d.toISOString();
+  };
+  const coach: Provider = {
+    id: "prv_coach_emma",
+    tenantId: parent.tenantId,
+    userId: null,
+    kind: "coach",
+    displayName: "Emma Rivera",
+    specialty: "Learning coach",
+    bio: "Executive-function and study-skills coaching for young learners.",
+    timezone: "UTC",
+    availability: [1, 2, 3, 4, 5].map((dayOfWeek) => ({ dayOfWeek, startHour: 9, endHour: 17 })),
+    createdAt: nowIso(),
+  };
+  const therapist: Provider = {
+    id: "prv_therapist_alex",
+    tenantId: parent.tenantId,
+    userId: null,
+    kind: "therapist",
+    displayName: "Alex Kim",
+    specialty: "Speech Therapy",
+    bio: "Speech-language pathologist focused on articulation and fluency.",
+    timezone: "UTC",
+    availability: [2, 4].map((dayOfWeek) => ({ dayOfWeek, startHour: 13, endHour: 17 })),
+    createdAt: nowIso(),
+  };
+  for (const p of [coach, therapist]) {
+    store.providers.set(p.id, p);
+    const link: LearnerProviderLink = {
+      id: newId("lpl"),
+      tenantId: parent.tenantId,
+      learnerId,
+      providerId: p.id,
+      createdAt: nowIso(),
+    };
+    store.learnerProviderLinks.set(link.id, link);
+  }
+  const seededSessions: CoachingSession[] = [
+    {
+      id: "ses_demo_coach",
+      tenantId: parent.tenantId,
+      learnerId,
+      providerId: coach.id,
+      parentUserId: parent.userId,
+      kind: "coach",
+      title: "Learning coaching",
+      scheduledStart: nextWeekdayIso(1, 10), // next Monday 10:00 UTC
+      durationMinutes: 30,
+      location: "video",
+      status: "scheduled",
+      feedback: null,
+      cancelReason: null,
+      rescheduleHistory: [],
+      createdAt: nowIso(),
+      updatedAt: nowIso(),
+    },
+    {
+      id: "ses_demo_therapy",
+      tenantId: parent.tenantId,
+      learnerId,
+      providerId: therapist.id,
+      parentUserId: parent.userId,
+      kind: "therapist",
+      title: "Speech Therapy",
+      scheduledStart: nextWeekdayIso(2, 15), // next Tuesday 15:00 UTC (3:00 PM)
+      durationMinutes: 45,
+      location: "video",
+      status: "scheduled",
+      feedback: null,
+      cancelReason: null,
+      rescheduleHistory: [],
+      createdAt: nowIso(),
+      updatedAt: nowIso(),
+    },
+  ];
+  for (const s of seededSessions) store.coachingSessions.set(s.id, s);
 
   // ===== Sprint 5 fold-in: a deterministic learner already at the brain-clone
   // stage, so the visual-build e2e (e2e/tests/brain-build-visual.spec.ts) can

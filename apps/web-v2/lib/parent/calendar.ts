@@ -19,6 +19,8 @@ import {
   listActiveAssignmentsForLearner,
   listLessonRunsForLearner,
   listSubjects,
+  listSessionsForLearner,
+  getProvider,
 } from "@/lib/db/repos";
 
 export type CalendarEventKind = "assignment" | "lesson" | "session" | "therapy";
@@ -174,6 +176,24 @@ export async function getCalendarEvents(input: {
         learnerName: learner.displayName,
         subjectName: subjects.get(r.subjectId) ?? null,
         href: `/parent/learners/${learner.id}/summary`,
+      });
+    }
+
+    // Human coach/therapy sessions — real bookings, with a reschedule hook back
+    // to the learner's Sessions surface.
+    for (const s of listSessionsForLearner(learner.id, input.tenantId)) {
+      if (s.status === "cancelled") continue;
+      const provider = getProvider(s.providerId, input.tenantId);
+      events.push({
+        id: `session:${s.id}`,
+        kind: s.kind === "therapist" ? "therapy" : "session",
+        at: s.scheduledStart,
+        title: provider?.displayName ?? s.title,
+        learnerId: learner.id,
+        learnerName: learner.displayName,
+        subjectName: provider?.specialty ?? null,
+        href: `/parent/learners/${learner.id}/sessions`,
+        rescheduleHref: s.status === "scheduled" ? `/parent/learners/${learner.id}/sessions` : null,
       });
     }
   }

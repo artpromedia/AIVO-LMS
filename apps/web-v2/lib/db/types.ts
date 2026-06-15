@@ -3152,6 +3152,83 @@ export type CaregiverObservationEdit = {
 };
 
 // ---------------------------------------------------------------------------
+// Human coach / therapist sessions (blended model).
+//
+// AIVO offers real human providers — coaches (a dedicated provider role) and
+// therapists — that families can book scheduled sessions with. Providers are
+// real configured records with weekly availability; sessions are written at
+// booking time and can be rescheduled or cancelled. No provider is fabricated
+// at render: the booking UI only ever shows providers assigned to the learner.
+// ---------------------------------------------------------------------------
+
+export type ProviderKind = "coach" | "therapist";
+
+export type ProviderAvailability = {
+  /** 0 = Sunday … 6 = Saturday. */
+  dayOfWeek: number;
+  /** Local hour [0–23] the bookable window opens / closes (provider timezone). */
+  startHour: number;
+  endHour: number;
+};
+
+export type Provider = {
+  id: ID;
+  tenantId: ID;
+  /** Linked user account when the provider also has one; null otherwise. */
+  userId: ID | null;
+  kind: ProviderKind;
+  displayName: string;
+  /** e.g. "Speech Therapy", "Learning coach". */
+  specialty: string | null;
+  bio: string | null;
+  /** IANA timezone the availability windows are expressed in. */
+  timezone: string;
+  availability: ProviderAvailability[];
+  createdAt: ISODate;
+};
+
+/** Which providers are assigned to (bookable for) a learner. */
+export type LearnerProviderLink = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  providerId: ID;
+  createdAt: ISODate;
+};
+
+export type SessionStatus = "scheduled" | "completed" | "cancelled";
+export type SessionLocation = "video" | "in_person" | "phone";
+
+export type SessionReschedule = {
+  fromStart: ISODate;
+  toStart: ISODate;
+  at: ISODate;
+  byUserId: ID;
+};
+
+export type CoachingSession = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  providerId: ID;
+  /** The parent who booked / owns the session. */
+  parentUserId: ID;
+  kind: ProviderKind;
+  title: string;
+  /** Scheduled start instant (ISO). */
+  scheduledStart: ISODate;
+  durationMinutes: number;
+  location: SessionLocation;
+  status: SessionStatus;
+  /** Post-session feedback the provider leaves for the family; null until added. */
+  feedback: string | null;
+  cancelReason: string | null;
+  rescheduleHistory: SessionReschedule[];
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};
+
+// ---------------------------------------------------------------------------
 // Sprint 11 — AI-drafted IEPs surfaced to the teacher review queue.
 // Mirrors the iep_drafts postgres table introduced by services/ai-svc
 // Sprint 6; here we use it client-side so the teacher dashboard can

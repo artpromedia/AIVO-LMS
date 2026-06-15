@@ -11,7 +11,9 @@ import { PARENT_NAV } from "@/components/layout/role-shells";
 import { listLearnersForParent, refreshLearnerReadiness } from "@/lib/db/repos";
 import { LearnerCard } from "@/components/parent/learner-card";
 import { MessagesSummaryCard } from "@/components/parent/messages-summary-card";
+import { NextSessionCard, type NextSession } from "@/components/parent/next-session-card";
 import { getParentMessagesSummary } from "@/lib/messaging/summary";
+import { listSessionsForParent, getProvider } from "@/lib/db/repos";
 
 const READY_STATES = new Set(["ready_for_today_mission", "active_learning"]);
 
@@ -22,6 +24,22 @@ export default async function ParentHome() {
   for (const l of initial) await refreshLearnerReadiness(l.id, session.tenantId);
   const learners = await listLearnersForParent(session.userId, session.tenantId);
   const messagesSummary = await getParentMessagesSummary(session);
+
+  // Soonest upcoming human session across the family (real bookings only).
+  const allSessions = await listSessionsForParent(session.userId, session.tenantId);
+  const nowMs = Date.now();
+  const nextBooking = allSessions
+    .filter((s) => s.status === "scheduled" && new Date(s.scheduledStart).getTime() > nowMs)
+    .sort((a, b) => a.scheduledStart.localeCompare(b.scheduledStart))[0];
+  const nextSession: NextSession = nextBooking
+    ? {
+        learnerId: nextBooking.learnerId,
+        providerName:
+          getProvider(nextBooking.providerId, session.tenantId)?.displayName ?? nextBooking.title,
+        kind: nextBooking.kind,
+        scheduledStart: nextBooking.scheduledStart,
+      }
+    : null;
 
   const firstName = session.displayName.split(" ")[0];
   const primary = learners[0];
@@ -121,8 +139,9 @@ export default async function ParentHome() {
       ) : null}
 
       {learners.length > 0 ? (
-        <section aria-label={t("messages_section")} className="grid gap-4 sm:max-w-md">
+        <section aria-label={t("messages_section")} className="grid gap-4 sm:grid-cols-2">
           <MessagesSummaryCard summary={messagesSummary} />
+          <NextSessionCard next={nextSession} />
         </section>
       ) : null}
 

@@ -141,6 +141,9 @@ import type {
   IepGoalRecord,
   TherapistSessionNote,
   CaregiverObservation,
+  Provider,
+  LearnerProviderLink,
+  CoachingSession,
   IepAiDraftRecord,
   TermSyllabus,
 } from "@/lib/db/types";
@@ -283,6 +286,12 @@ export type Store = {
   iepGoalRecords: Map<string, IepGoalRecord>;
   therapistSessionNotes: Map<string, TherapistSessionNote>;
   caregiverObservations: Map<string, CaregiverObservation>;
+
+  // Human coach/therapist sessions (blended model): providers + their
+  // per-learner assignment + booked sessions.
+  providers: Map<string, Provider>;
+  learnerProviderLinks: Map<string, LearnerProviderLink>;
+  coachingSessions: Map<string, CoachingSession>;
 
   // Sprint 11 — AI-drafted IEPs from services/ai-svc /api/ai/iep/draft.
   // One row per learner; regenerations upsert. Tracks the review
@@ -441,6 +450,9 @@ function createStore(): Store {
     iepGoalRecords: new Map(),
     therapistSessionNotes: new Map(),
     caregiverObservations: new Map(),
+    providers: new Map(),
+    learnerProviderLinks: new Map(),
+    coachingSessions: new Map(),
     iepAiDrafts: new Map(),
 
     plans: new Map(),

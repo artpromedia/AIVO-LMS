@@ -109,6 +109,23 @@ export function markThreadReadSvc(
 }
 
 /**
+ * Best-effort email notice that a human coach/therapist session is upcoming
+ * (booking confirmation / reschedule notice). Reuses comms-svc's
+ * `session_reminder` template; the caller treats failure as non-fatal.
+ */
+export function sendSessionNoticeSvc(
+  bearer: string,
+  email: string,
+  data: { learnerName: string; tutorName: string; sessionUrl?: string },
+): Promise<ServiceResult<{ status: string; messageId?: string }>> {
+  return commsFetch("/api/comms/send", {
+    method: "POST",
+    bearer,
+    body: { channel: "email", recipient: email, template: "session_reminder", data },
+  });
+}
+
+/**
  * Deliver a one-time verification code over SMS via comms-svc
  * (`POST /api/comms/send`, channel `sms`, `mfa_code` template). comms-svc only
  * transmits — the code/expiry/verification logic stays in the BFF
