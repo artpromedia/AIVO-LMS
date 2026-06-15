@@ -13,7 +13,7 @@ import {
   LineChart,
   Lock,
   MessagesSquare,
-  PlayCircle,
+  Play,
   Presentation,
   School,
   ShieldCheck,
@@ -45,6 +45,14 @@ export default async function Home() {
   const t = await getTranslations("marketing.home");
 
   const signupHref = `${WEB_APP_URL}/signup?plan=free`;
+
+  // Pill CTAs with soft elevation, matching the reference design.
+  const heroPrimaryBtn =
+    "group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-[var(--aivo-sensory-primary)] px-7 text-base font-semibold text-white shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:brightness-110";
+  const heroSecondaryBtn =
+    "group inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full border border-slate-200 bg-white px-7 text-base font-semibold text-slate-900 shadow-[0_14px_34px_-16px_rgba(15,23,42,0.4)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50";
+  // Shared soft, purple-tinted card elevation so no card reads as flat.
+  const cardShadow = "shadow-[0_22px_55px_-30px_rgba(76,29,149,0.28)]";
 
   const adultViews = [
     {
@@ -166,23 +174,22 @@ export default async function Home() {
               <p className="mt-6 text-lg font-medium leading-relaxed text-slate-600 md:text-xl">
                 {t("hero_body")}
               </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href={signupHref}
-                  className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--aivo-sensory-primary)] px-6 text-[15px] font-semibold text-white shadow-[0_10px_30px_-8px_rgba(124,58,237,0.55)] transition hover:brightness-110"
-                >
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <a href={signupHref} className={heroPrimaryBtn}>
                   {t("hero_cta_primary")}
-                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
                 </a>
-                <Link
-                  href="/demo"
-                  className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-6 text-[15px] font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
-                >
-                  <PlayCircle className="mr-2 h-4 w-4" aria-hidden="true" />
+                <Link href="/demo" className={heroSecondaryBtn}>
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--aivo-sensory-primary)] text-white">
+                    <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
+                  </span>
                   {t("hero_cta_secondary")}
                 </Link>
               </div>
-              <p className="mt-7 text-sm font-medium text-slate-500">{t("hero_trust_line")}</p>
+              <p className="mt-8 text-sm font-medium text-slate-500">{t("hero_trust_line")}</p>
             </div>
 
             <div className="lg:pl-6">
@@ -224,7 +231,7 @@ export default async function Home() {
               {adultViews.map(({ Icon, title, desc, cta, href }) => (
                 <article
                   key={title}
-                  className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 shadow-[0_18px_50px_-32px_rgba(15,23,42,0.3)]"
+                  className={`flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 transition hover:-translate-y-0.5 ${cardShadow}`}
                 >
                   <span className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
                     <Icon className="h-6 w-6" aria-hidden="true" />
@@ -260,7 +267,7 @@ export default async function Home() {
               {steps.map(({ n, title, desc }) => (
                 <li
                   key={n}
-                  className="relative rounded-3xl border border-slate-200/70 bg-white p-7"
+                  className={`relative rounded-3xl border border-slate-200/70 bg-white p-7 ${cardShadow}`}
                 >
                   <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--aivo-sensory-primary)] font-heading text-lg font-bold text-white">
                     {n}
@@ -289,7 +296,7 @@ export default async function Home() {
               {features.map(({ Icon, title, desc }) => (
                 <article
                   key={title}
-                  className="rounded-3xl border border-slate-200/70 bg-white p-6 transition hover:border-purple-200 hover:shadow-[0_18px_50px_-32px_rgba(124,58,237,0.4)]"
+                  className={`rounded-3xl border border-slate-200/70 bg-white p-6 transition hover:-translate-y-0.5 hover:border-purple-200 ${cardShadow} hover:shadow-[0_30px_64px_-28px_rgba(124,58,237,0.5)]`}
                 >
                   <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
@@ -336,7 +343,7 @@ export default async function Home() {
               {testimonials.map(({ quote, author }) => (
                 <figure
                   key={author}
-                  className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 shadow-[0_18px_50px_-32px_rgba(15,23,42,0.25)]"
+                  className={`flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 ${cardShadow}`}
                 >
                   <blockquote className="flex-1 text-base font-medium leading-relaxed text-slate-700">
                     &ldquo;{quote}&rdquo;
@@ -369,7 +376,7 @@ export default async function Home() {
               {trustItems.map(({ Icon, title, desc, cta, href }) => (
                 <article
                   key={title}
-                  className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-6"
+                  className={`flex flex-col rounded-3xl border border-slate-200/70 bg-white p-6 ${cardShadow}`}
                 >
                   <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
@@ -402,7 +409,10 @@ export default async function Home() {
             </h2>
             <div className="mx-auto mt-14 grid max-w-5xl gap-6 md:grid-cols-2">
               {faqs.map(({ q, a }) => (
-                <div key={q} className="rounded-3xl border border-slate-200/70 bg-white p-6">
+                <div
+                  key={q}
+                  className={`rounded-3xl border border-slate-200/70 bg-white p-6 ${cardShadow}`}
+                >
                   <h3 className="font-heading text-base font-bold text-slate-900">{q}</h3>
                   <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{a}</p>
                 </div>
@@ -432,13 +442,13 @@ export default async function Home() {
                 <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row md:justify-start">
                   <a
                     href={signupHref}
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-white px-6 text-[15px] font-bold text-[var(--aivo-sensory-primary)] transition hover:bg-slate-50"
+                    className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-white px-7 text-base font-bold text-[var(--aivo-sensory-primary)] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.4)] transition hover:-translate-y-0.5 hover:bg-slate-50"
                   >
                     {t("cta_primary")}
                   </a>
                   <Link
                     href="/demo"
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/30 px-6 text-[15px] font-semibold text-white transition hover:bg-white/10"
+                    className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/40 px-7 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
                   >
                     {t("cta_secondary")}
                   </Link>

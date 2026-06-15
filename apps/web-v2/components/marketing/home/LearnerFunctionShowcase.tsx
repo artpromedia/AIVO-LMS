@@ -6,6 +6,9 @@ type Panel = { title: string; caption: string };
  * "Built around how each learner functions" — a row of four mini product
  * mockups. Titles and captions are passed in (translatable marketing copy);
  * the small in-mockup labels are illustrative product UI kept as plain text.
+ *
+ * Ported from apps/marketing so both public landing pages match. The only
+ * divergence is `font-iw-display` in place of marketing's `font-heading`.
  */
 export function LearnerFunctionShowcase({ panels }: { panels: [Panel, Panel, Panel, Panel] }) {
   const bodies = [
@@ -23,7 +26,7 @@ export function LearnerFunctionShowcase({ panels }: { panels: [Panel, Panel, Pan
           className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-5 shadow-[0_22px_55px_-30px_rgba(76,29,149,0.28)]"
         >
           <div className="mb-4 flex-1 rounded-2xl bg-[var(--aivo-cloud-50)] p-4">{bodies[i]}</div>
-          <h3 className="font-heading text-base font-bold text-slate-900">{panel.title}</h3>
+          <h3 className="font-iw-display text-base font-bold text-slate-900">{panel.title}</h3>
           <p className="mt-1 text-sm font-medium text-slate-500">{panel.caption}</p>
         </article>
       ))}
@@ -92,7 +95,7 @@ function SupportLevels() {
         <PanelIcon Icon={SlidersHorizontal} />
         <p className="text-sm font-semibold text-slate-700">Support level</p>
       </div>
-      <p className="mb-3 text-center font-heading text-sm font-bold text-[var(--aivo-sensory-primary)]">
+      <p className="mb-3 text-center font-iw-display text-sm font-bold text-[var(--aivo-sensory-primary)]">
         Just Right
       </p>
       <div className="relative h-1.5 w-full rounded-full bg-slate-200">
