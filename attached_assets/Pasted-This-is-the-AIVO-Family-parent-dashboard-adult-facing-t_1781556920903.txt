@@ -1,0 +1,190 @@
+This is the AIVO Family parent dashboard — adult-facing (teal/green register), with the same cloud mascot as the learner Stage. Before writing per-page prompts, I need to map what actually exists in the platform versus what this mockup invents (human "Coach Emma"/"Therapist Alex" sessions, messaging, calendar, etc.). Let me explore the real parent surfaces and cross-check the audit findings.
+
+
+Ran 2 commands
+Now let me confirm the current state of the parent home redesign (home-v2), the parent assessment flow, and which mockup features lack a backend — so I can split design prompts from implementation prompts accurately.
+
+
+Ran 2 commands
+I mapped the mockup against the real platform. Key findings that split this into redesign vs build-new:
+
+/parent/home exists, and there's already a /parent/home-v2 redesign-in-progress (non-destructive, uses LearningHero/FloatingMetricCard/SetupProgressTrack) — your screenshot is essentially its target.
+Real & DB-backed: Progress, Goals (IEP), Reports, Settings/account/billing, Parent Assessment (already has solid @aivo/ui primitives: AssessmentShell, QuestionCard, PillCardGroup, ScaleField, ReassuranceCard…), plus brain-review/profile/timeline, baseline summary, team, whats-working, recommendations.
+In the mockup but NOT on the platform: Messages, Calendar, Resources routes are all missing. Human "Coach Emma / Therapist Alex" scheduled sessions + reschedule don't exist (no human-session model in scheduling; only a care team + AI tutors).
+Cosmetic/hardcoded today (audit GAP-6): the learner snapshot is a static mockup (hardcoded "Emma", "2h 14m"), and XP/streak are never written (seed math only). So the hero card's "7 day streak / 12 sessions / 24m / 18% improved" would be fake unless wired.
+Exists vs. New
+Mockup page/feature	Real route	Verdict
+Home dashboard	/parent/home (+ home-v2 WIP)	Redesign
+Progress	/parent/learners/[id]/progress	Redesign (DB-backed)
+Goals (IEP)	/parent/learners/[id]/iep (+/review)	Redesign
+Reports	/parent/reports	Redesign
+Settings	/parent/settings (+account,billing)	Redesign
+Parent assessment	/parent/learners/[id]/assessment/*	Redesign to language
+Sessions (human coach/therapist)	— (only team + AI tutors)	Implement (new model)
+Messages	— (comms-svc backend exists)	Implement
+Calendar	— (/parent/schedule exists)	Implement
+Resources	—	Implement
+Hero snapshot / XP / streak / time-on-task / Insight	snapshot = hardcoded; XP unwritten	Implement (data-truth)
+# AIVO Parent Dashboard Design Constitution (prepend to every prompt below)
+
+You are designing/building AIVO's **parent ("AIVO Family") dashboard** in `apps/web-v2` (Next 15,
+Tailwind v4, Radix, `@aivo/brand` + `@aivo/ui`). Audience: **a parent/caregiver** — an adult,
+often anxious, managing a neurodiverse child's learning. This is the calm, clear, trustworthy adult
+register of the AIVO brand (NOT a learner surface).
+
+Design language (match the reference mockup):
+- **Family register tokens** — formalize a "Family" accent (the teal/green + violet-insight pairing
+  in the mockup) as `@aivo/brand` role-theme tokens; do NOT hardcode teal. Violet stays the brand
+  spine; the cloud host mascot appears in an adult, encouraging tone. No raw hex (ESLint enforces).
+- **Card-based, scannable, low-anxiety** — generous spacing, rounded cards, one clear "what to do
+  next," progress shown warmly (rings, sparklines), supportive microcopy ("You're doing great").
+- **Type/a11y:** Satoshi/Inter + Atkinson Hyperlegible option; WCAG **2.2 AA** (this is a B2C +
+  school-procurement surface), full keyboard, visible focus, semantic landmarks, RTL + 10 locales.
+
+Two hard rules:
+1. **Truthful data only.** Every number (streak, sessions, time-on-task, "18% improved", mastery)
+   must trace to a real service/DB value, or render an honest empty/loading state. No hardcoded
+   mockups (the current `snapshot` page and unwritten XP/streak — audit GAP-6 — are the anti-pattern
+   to eliminate). No fabricated outcome stats.
+2. **Access control.** Every learner-scoped view enforces `parentCanAccessLearner`; never leak one
+   learner's data to another guardian. Compliance footer uses approved hedged wording linking real
+   pages (Privacy, Security, Accessibility, COPPA, FERPA).
+
+Shared chrome: `AppShell` + `PARENT_NAV` left rail (Home, Progress, Sessions, Goals (IEP), Messages,
+Reports, Calendar, Resources, Settings), header greeting + notifications + account menu, encouragement
+rail, compliance footer.
+
+For each page: don't jump to code. First return (a) the data contract (every value → its source or
+empty state), (b) the layout/state map (loading/empty/error/multi-learner), (c) the visual direction
+in tokens. Pause for approval.
+Design / redesign prompts (one per page)
+# Prompt — Home (parent dashboard)  ·  Inherits the Constitution
+Route: `/parent/home` (consolidate the `home-v2` redesign; retire the legacy once QA passes).
+Goal: the single-glance "Liam's snapshot for today" hub — warm, truthful, action-oriented.
+Unique focus:
+- Hero learner card (avatar, age, streak, weekly-goal ring, day dots) wired to REAL engagement +
+  readiness; multi-learner switch when >1 child.
+- Stat tiles (Today's lessons, Time on task, Skills mastered, Next session), an Insight Highlight,
+  Upcoming Schedule, Recent Activity, Parent Actions, Today's Recommendations, Coach Message — each
+  bound to real data or an honest empty state (see the data-truth implementation prompt).
+- One primary next action; encouragement rail with cloud host + tips.
+Reuse: `@aivo/ui/hero` (LearningHero, FloatingMetricCard, SetupProgressTrack), `components/parent/*`
+(learner-card, whats-working-panel, pending-recommendations-panel, trajectory-sparkline).
+DoD: zero hardcoded values; AA; multi-learner + empty/loading states; primary action obvious.
+# Prompt — Progress  ·  Inherits the Constitution
+Route: `/parent/learners/[learnerId]/progress` (DB-backed today).
+Goal: an evidence-clear, strengths-first view of how the child is growing.
+Unique focus:
+- Mastery/trajectory over time (reuse `trajectory-sparkline`, `whats-working-panel`), subjects/skills
+  breakdown, the "Insight Highlight" narrative — all from real analytics, strengths-framed (no
+  deficit/grade-gap framing flagged in the assessment audit).
+- Surface the learner "Virtual Brain" links (review/profile/timeline) consistently.
+Reuse: `components/parent/*`, brain/insight links, reports export.
+DoD: every metric sourced; strengths-first copy; AA charts (not color-alone); empty states.
+# Prompt — Sessions  ·  Inherits the Constitution  ·  PAIRS WITH the "Coach/Therapist Sessions" impl prompt
+Route: `/parent/sessions` (new) — design the page; the model is built in the impl prompt.
+Goal: see and manage the child's learning + therapy sessions (AI lessons and/or human coach/therapist).
+Unique focus:
+- List upcoming + past sessions with type, time, provider, and status; per-session detail, notes,
+  and a "reschedule/cancel" affordance (only if the human-session model is approved — see impl).
+- If AIVO stays AI-tutor-only, reframe "Sessions" as scheduled AI lesson blocks, not human appts.
+DoD: design honors whichever model the product decision selects; no fake providers; AA.
+# Prompt — Goals (IEP)  ·  Inherits the Constitution
+Route: `/parent/learners/[learnerId]/iep` (+ `/iep/review`).
+Goal: make IEP goals legible, trackable, and meeting-ready for parents.
+Unique focus:
+- Goal cards with progress, evidence ("what's working"), and IEP-notes PDF download/update (real
+  `reports-svc` template, dated); alignment to sessions/skills.
+- Plain-language explanations; export for IEP meetings.
+Reuse: family-svc `iep` route, reports-svc templates, `whats-working-panel`.
+DoD: goals + progress from real data; PDF reflects real notes + date; AA; access-controlled.
+# Prompt — Messages  ·  Inherits the Constitution  ·  PAIRS WITH the "Parent Messaging" impl prompt
+Route: `/parent/messages` (new) — design the UI; backend in the impl prompt (comms-svc exists).
+Goal: a calm, safe parent ↔ care-team (coach/teacher/therapist) message surface.
+Unique focus:
+- Thread list + conversation view, the "Coach Message + Reply" pattern from the mockup, unread
+  badges, safe/COPPA-aware messaging (no child PII leakage), attachments where appropriate.
+DoD: real threads via comms-svc or honest empty state; access-controlled; AA; no notification dark
+patterns.
+# Prompt — Reports  ·  Inherits the Constitution
+Route: `/parent/reports`.
+Goal: generate, view, and download trustworthy progress/IEP reports.
+Unique focus:
+- Report list + preview + PDF export (reports-svc), each clearly dated and sourced; "View report"
+  deep-links from Home/Parent Actions.
+DoD: reports reflect real data; dated; AA; export works; access-controlled.
+# Prompt — Calendar  ·  Inherits the Constitution  ·  PAIRS WITH the "Calendar" impl prompt
+Route: `/parent/calendar` (new) — design over the existing `/parent/schedule` data.
+Goal: month/week/agenda view of sessions, lessons, and therapy across learners.
+Unique focus:
+- Calendar with session chips (type/provider/time), agenda fallback, "View full calendar" target;
+  add/reschedule only if the session model supports it.
+DoD: events from real schedule/session data; AA (keyboard-navigable grid); empty states.
+# Prompt — Resources  ·  Inherits the Constitution  ·  PAIRS WITH the "Resources" impl prompt
+Route: `/parent/resources` (new).
+Goal: a curated, parent-facing library (guides, IEP help, neurodiversity explainers, tips).
+Unique focus:
+- Categorized, searchable resource cards; ties to the "View tips" encouragement; reuse marketing
+  guides content model where sensible; cite sources, no medical advice.
+DoD: real/curated content (no lorem); AA; readable long-form; sourced claims.
+# Prompt — Settings  ·  Inherits the Constitution
+Route: `/parent/settings` (+ `/account`, `/billing`), plus per-learner accessibility/sensory/audio.
+Goal: clear control over account, billing, privacy, and each learner's accessibility profile.
+Unique focus:
+- Account + billing; privacy/data-export/delete (real routes); per-learner accessibility settings
+  mapping to the `AccessibilityProfile` contract (so they round-trip with the learner apps).
+DoD: real settings persist; privacy actions work; AA forms (label/error/focus); access-controlled.
+# Prompt — Parent Assessment (design to the dashboard language)  ·  Inherits the Constitution
+Routes: `/parent/learners/[learnerId]/assessment` (+ `/intro`, `/review`, `/submitted`).
+Goal: bring the multi-step parent assessment fully into the AIVO Family look — calm, reassuring,
+strengths-first — so it feels continuous with the dashboard.
+Unique focus:
+- Restyle the existing `@aivo/ui` primitives (`AssessmentShell`, `AssessmentProgress`, `QuestionCard`,
+  `PillCardGroup`, `ScaleField`, `SoftTextField`, `ReassuranceCard`, `InsightChip`) to the family
+  register (cards, teal/violet tokens, host encouragement, clear one-question focus).
+- **Fix the audit gaps:** import `@aivo/accessibility-contract` so font/letter-spacing/text-size
+  prefs apply (replace hardcoded `text-2xl md:text-3xl`); ensure progress, reassurance, and review
+  steps are AA and keyboard-complete.
+- Truthful framing on review/submitted (no pseudo-scores); clear hand-off into the brain/baseline flow.
+Reuse: `@aivo/ui` assessment kit, `WIZARD_STEPS`, parent-assessment BFF, `parentCanAccessLearner`.
+DoD: visually continuous with the dashboard; accessibility-contract applied; AA; truthful copy;
+access-controlled.
+Implementation prompts (mockup features not yet on the platform)
+# IMPLEMENTATION — Human Coach/Therapist sessions + scheduling + reschedule  ·  Inherits the Constitution
+Why: the mockup shows scheduled human sessions ("Coach Emma", "Therapist Alex", Speech Therapy, 3:00PM,
+reschedule). No human-session model exists (only a care `team` + AI tutors + a system `scheduling` pkg).
+DECISION REQUIRED FIRST: does AIVO offer human coaches/therapists (blended model), or is "Coach" the
+AI tutor's persona? This changes everything below.
+Scope (if human/blended): provider profiles + availability, session booking/reschedule/cancel,
+reminders (comms-svc), session notes/feedback (observations), and wiring to Sessions/Calendar/Home.
+Scope (if AI-only): reframe "sessions" as scheduled AI lesson blocks; drop human-provider UI.
+DoD: a real, access-controlled session model end-to-end; no fake providers; reschedule actually
+reschedules; surfaces feed Home/Calendar/Sessions truthfully.
+# IMPLEMENTATION — Parent ↔ care-team messaging  ·  Inherits the Constitution
+Why: Messages nav + "Message coach" + "Coach Message / Reply" have no parent UI (comms-svc backend
+exists). Build the parent messaging surface on comms-svc.
+Scope: thread model parent↔team (coach/teacher/therapist), realtime (comms-svc realtime), unread state,
+COPPA-aware (no child PII leakage), rate-limited, access-controlled; feeds the Home "Coach Message" card.
+DoD: real send/receive, persisted, access-controlled, AA; honest empty state; no dark patterns.
+# IMPLEMENTATION — Calendar view  ·  Inherits the Constitution
+Why: Calendar nav has no route; `/parent/schedule` data exists.
+Scope: aggregate lessons + sessions (+ therapy if approved) into month/week/agenda; reschedule hooks
+(if session model supports); per-learner filtering; ICS export optional.
+DoD: events from real data; keyboard-navigable AA calendar; empty/loading states.
+# IMPLEMENTATION — Parent Resources library  ·  Inherits the Constitution
+Why: Resources nav has no route.
+Scope: content model (curated guides/explainers/tips), categories, search; reuse the marketing guides
+content pipeline where sensible; editorial a11y; sourced claims, no medical advice.
+DoD: real curated content, AA, searchable; sources cited.
+# IMPLEMENTATION — Data-truth wiring (snapshot, XP/streak, time-on-task, Insight, activity)  ·  Inherits the Constitution
+Why: audit GAP-6 — the parent `snapshot` page is a hardcoded mockup and XP/streak are never written
+(seed math only). The hero card's numbers must be REAL.
+Scope:
+- Write engagement on lesson/session completion (XP, streak, sessions count, time-on-task) so
+  `LearnerEngagement` reflects reality; remove/replace the static `snapshot` page.
+- An Insight Highlight generator that derives narratives ("Reading fluency improved 18%") from real
+  analytics (whats-working / mastery / trajectory) — never fabricated; include the source + window.
+- A Recent Activity feed aggregating real events (lesson completions, therapist feedback/observations,
+  recommendations).
+DoD: every Home/Progress number traces to a real write path; no hardcoded values remain; insights are
+reproducible from data; honest empty states before data exists.
