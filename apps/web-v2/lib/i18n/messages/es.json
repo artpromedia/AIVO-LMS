@@ -52,8 +52,8 @@
       "optional": "Opcional",
       "cancel": "Cancelar",
       "submit": "Agregar estudiante",
-      "grade_preK": "Pre-K",
-      "grade_K": "Kindergarten",
+      "grade_preK": "Preescolar",
+      "grade_K": "Jardín de infancia",
       "grade_1_2": "Grados 1–2",
       "grade_3_5": "Grados 3–5",
       "grade_6_8": "Grados 6–8",
@@ -311,7 +311,7 @@
       "regenerate_confirm_body": "Reconstruir empieza el perfil de nuevo a partir de tus respuestas actuales y descarta la revisión que iniciaste, incluidas las correcciones que aún no has aprobado. Las lecciones de {name} siguen en pausa hasta que apruebes el nuevo perfil.",
       "regenerate_confirm_cta": "Sí, reconstruirlo",
       "regenerate_confirm_cancel": "Conservar lo que tengo",
-      "what_changed": "What changed since you approved"
+      "what_changed": "Qué cambió desde que aprobaste"
     },
     "brain_review": {
       "eyebrow": "Comprobando lo de {name}",
@@ -1797,7 +1797,7 @@
     "login": {
       "brand_heading": "Inicia sesión para continuar tu viaje con AIVO.",
       "brand_body": "Tus tutores, misiones e información para la familia, todo en un solo lugar, ajustado a la forma en que aprende tu estudiante.",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 verificado",
       "quote": "AIVO se adapta a cómo aprende realmente mi hija. La primera plataforma que no nos hizo sentir que luchábamos contra ella.",
       "quote_attribution": "— Madre de una estudiante de 3.º grado",
       "welcome_back": "Bienvenido de nuevo.",
@@ -1857,14 +1857,14 @@
       "email_label": "Correo electrónico",
       "password_label": "Contraseña",
       "password_helper": "Al menos 8 caracteres con un número y un símbolo.",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "Riley, madre o padre",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "Ingresa tu nombre, un correo electrónico válido y una contraseña de al menos 8 caracteres.",
+        "email_taken": "Ese correo ya está registrado. Intenta iniciar sesión.",
+        "weak_password": "Esa contraseña no cumple nuestra política de seguridad. Usa al menos 8 caracteres con un número y un símbolo.",
+        "service_unavailable": "No pudimos comunicarnos con el servicio de registro. Inténtalo de nuevo en un momento.",
+        "unsupported_role": "Este tipo de cuenta no se puede crear aquí.",
+        "signup_failed": "No pudimos crear tu cuenta. Inténtalo de nuevo."
       },
       "errors_inline": {
         "name": "Escribe al menos 2 caracteres.",
@@ -1948,11 +1948,11 @@
     "sso_start": {
       "eyebrow": "Inicio de sesión único",
       "title": "Continuar con {idp}",
-      "subtitle": "Le redirigiremos al proveedor de identidad de su organización para completar el inicio de sesión.",
-      "continue": "Continuar con {idp}",
-      "redirect_note": "Se le está redirigiendo automáticamente. Si no ocurre nada, use el botón de abajo.",
+      "subtitle": "Te enviaremos al proveedor de identidad de tu organización para terminar de iniciar sesión.",
+      "continue": "Continuar",
+      "redirect_note": "La redirección puede tardar unos segundos.",
       "back_to_login": "Volver al inicio de sesión",
-      "default_idp": "su proveedor de identidad"
+      "default_idp": "Proveedor de identidad"
     },
     "mfa_enroll": {
       "eyebrow": "Seguridad de la cuenta",

@@ -1797,7 +1797,7 @@
     "login": {
       "brand_heading": "サインインして AIVO の旅を続けましょう。",
       "brand_body": "チューター、ミッション、家族向けのインサイトをひとつの場所に。お子さまの考え方に合わせて調整されています。",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 検証済み",
       "quote": "AIVO は娘の実際の学び方に合わせてくれます。私たちが対抗していると感じさせなかった初めてのプラットフォームです。",
       "quote_attribution": "— 3年生の保護者",
       "welcome_back": "おかえりなさい。",
@@ -1857,14 +1857,14 @@
       "email_label": "メールアドレス",
       "password_label": "パスワード",
       "password_helper": "数字と記号を含む 8 文字以上。",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "保護者 Riley",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "名前、有効なメールアドレス、8文字以上のパスワードを入力してください。",
+        "email_taken": "そのメールアドレスはすでに登録されています。代わりにサインインしてください。",
+        "weak_password": "そのパスワードはセキュリティポリシーを満たしていません。数字と記号を含む8文字以上を使用してください。",
+        "service_unavailable": "サインアップサービスに接続できませんでした。しばらくしてからもう一度お試しください。",
+        "unsupported_role": "この種類のアカウントはここでは作成できません。",
+        "signup_failed": "アカウントを作成できませんでした。もう一度お試しください。"
       },
       "errors_inline": {
         "name": "2文字以上で入力してください。",
@@ -1946,13 +1946,13 @@
       }
     },
     "sso_start": {
-      "eyebrow": "Single sign-on",
-      "title": "Continue with {idp}",
-      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
-      "continue": "Continue with {idp}",
-      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
-      "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider"
+      "eyebrow": "シングルサインオン",
+      "title": "{idp}で続行",
+      "subtitle": "サインインを完了するため、組織のIDプロバイダーに移動します。",
+      "continue": "続行",
+      "redirect_note": "リダイレクトには数秒かかる場合があります。",
+      "back_to_login": "サインインに戻る",
+      "default_idp": "IDプロバイダー"
     },
     "mfa_enroll": {
       "eyebrow": "Account security",

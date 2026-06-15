@@ -1797,7 +1797,7 @@
     "login": {
       "brand_heading": "Melde dich an, um deine AIVO-Reise fortzusetzen.",
       "brand_body": "Deine Tutoren, Missionen und Familieneinblicke – alles an einem Ort, abgestimmt darauf, wie dein Lernender denkt.",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 geprüft",
       "quote": "AIVO passt sich daran an, wie meine Tochter wirklich lernt. Die erste Plattform, bei der wir nicht das Gefühl hatten, dagegen anzukämpfen.",
       "quote_attribution": "— Elternteil einer Drittklässlerin",
       "welcome_back": "Willkommen zurück.",
@@ -1857,14 +1857,14 @@
       "email_label": "E-Mail",
       "password_label": "Passwort",
       "password_helper": "Mindestens 8 Zeichen mit einer Zahl und einem Symbol.",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "Riley Elternteil",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "Gib bitte deinen Namen, eine gültige E-Mail-Adresse und ein Passwort mit mindestens 8 Zeichen ein.",
+        "email_taken": "Diese E-Mail-Adresse ist bereits registriert. Melde dich stattdessen an.",
+        "weak_password": "Dieses Passwort erfüllt unsere Sicherheitsrichtlinie nicht. Verwende mindestens 8 Zeichen mit einer Zahl und einem Symbol.",
+        "service_unavailable": "Wir konnten unseren Registrierungsdienst nicht erreichen. Bitte versuche es gleich erneut.",
+        "unsupported_role": "Dieser Kontotyp kann hier nicht erstellt werden.",
+        "signup_failed": "Wir konnten dein Konto nicht erstellen. Bitte versuche es erneut."
       },
       "errors_inline": {
         "name": "Bitte mindestens 2 Zeichen eingeben.",
@@ -1946,13 +1946,13 @@
       }
     },
     "sso_start": {
-      "eyebrow": "Single sign-on",
-      "title": "Continue with {idp}",
-      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
-      "continue": "Continue with {idp}",
-      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
-      "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider"
+      "eyebrow": "Einmalanmeldung",
+      "title": "Mit {idp} fortfahren",
+      "subtitle": "Wir leiten dich zum Identitätsanbieter deiner Organisation weiter, damit du die Anmeldung abschließen kannst.",
+      "continue": "Fortfahren",
+      "redirect_note": "Die Weiterleitung kann einige Sekunden dauern.",
+      "back_to_login": "Zurück zur Anmeldung",
+      "default_idp": "Identitätsanbieter"
     },
     "mfa_enroll": {
       "eyebrow": "Account security",

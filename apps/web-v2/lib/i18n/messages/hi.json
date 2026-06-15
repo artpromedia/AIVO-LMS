@@ -1797,7 +1797,7 @@
     "login": {
       "brand_heading": "अपनी AIVO यात्रा जारी रखने के लिए साइन इन करें।",
       "brand_body": "आपके ट्यूटर, मिशन और परिवार की जानकारी—सब एक ही जगह, इस तरह से ढली कि आपका सीखने वाला कैसे सोचता है।",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 सत्यापित",
       "quote": "AIVO इस बात के अनुसार ढल जाता है कि मेरी बेटी वास्तव में कैसे सीखती है। यह पहला प्लेटफ़ॉर्म है जिसने हमें ऐसा महसूस नहीं कराया कि हम इससे लड़ रहे हैं।",
       "quote_attribution": "— कक्षा 3 के एक विद्यार्थी के अभिभावक",
       "welcome_back": "वापसी पर स्वागत है।",
@@ -1857,14 +1857,14 @@
       "email_label": "ईमेल",
       "password_label": "पासवर्ड",
       "password_helper": "एक संख्या और एक प्रतीक के साथ कम से कम 8 अक्षर।",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "राइली अभिभावक",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "कृपया अपना नाम, एक मान्य ईमेल और कम से कम 8 अक्षरों का पासवर्ड दर्ज करें।",
+        "email_taken": "यह ईमेल पहले से पंजीकृत है। इसके बजाय साइन इन करके देखें।",
+        "weak_password": "यह पासवर्ड हमारी सुरक्षा नीति को पूरा नहीं करता। कम से कम 8 अक्षर, एक संख्या और एक प्रतीक का उपयोग करें।",
+        "service_unavailable": "हम अपनी साइन-अप सेवा तक नहीं पहुँच सके। कृपया थोड़ी देर में फिर कोशिश करें।",
+        "unsupported_role": "यह खाता प्रकार यहाँ बनाया नहीं जा सकता।",
+        "signup_failed": "हम आपका खाता नहीं बना सके। कृपया फिर कोशिश करें।"
       },
       "errors_inline": {
         "name": "कम से कम 2 अक्षर लिखें।",
@@ -1946,13 +1946,13 @@
       }
     },
     "sso_start": {
-      "eyebrow": "Single sign-on",
-      "title": "Continue with {idp}",
-      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
-      "continue": "Continue with {idp}",
-      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
-      "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider"
+      "eyebrow": "एकल साइन-ऑन",
+      "title": "{idp} के साथ जारी रखें",
+      "subtitle": "साइन इन पूरा करने के लिए हम आपको आपके संगठन के पहचान प्रदाता पर भेजेंगे।",
+      "continue": "जारी रखें",
+      "redirect_note": "रीडायरेक्ट में कुछ सेकंड लग सकते हैं।",
+      "back_to_login": "साइन इन पर वापस जाएँ",
+      "default_idp": "पहचान प्रदाता"
     },
     "mfa_enroll": {
       "eyebrow": "Account security",
