@@ -13,7 +13,6 @@ import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -112,27 +111,27 @@ export default async function ParentProgressPage({
       />
 
       <div className="grid gap-4 sm:grid-cols-4">
-        <Card className="p-4">
-          <p className="text-xs uppercase text-aivo-ink-soft">{t("lessons_done")}</p>
-          <p className="text-2xl font-semibold">{completed.length}</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs uppercase text-aivo-ink-soft">{t("time_learning")}</p>
-          <p className="text-2xl font-semibold">{totalMinutes} min</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs uppercase text-aivo-ink-soft">{t("skills_tracked")}</p>
-          <p className="text-2xl font-semibold">{skillMasteries.length}</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs uppercase text-aivo-ink-soft">{t("mastered")}</p>
-          <p className="text-2xl font-semibold">
+        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+          <p className="text-xs uppercase text-iw-text-muted">{t("lessons_done")}</p>
+          <p className="text-2xl font-semibold text-iw-text-strong">{completed.length}</p>
+        </div>
+        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+          <p className="text-xs uppercase text-iw-text-muted">{t("time_learning")}</p>
+          <p className="text-2xl font-semibold text-iw-text-strong">{totalMinutes} min</p>
+        </div>
+        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+          <p className="text-xs uppercase text-iw-text-muted">{t("skills_tracked")}</p>
+          <p className="text-2xl font-semibold text-iw-text-strong">{skillMasteries.length}</p>
+        </div>
+        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+          <p className="text-xs uppercase text-iw-text-muted">{t("mastered")}</p>
+          <p className="text-2xl font-semibold text-iw-text-strong">
             {
               skillMasteries.filter((m) => m.level === "on_grade_level" || m.level === "stretching")
                 .length
             }
           </p>
-        </Card>
+        </div>
       </div>
 
       <SectionHeader
@@ -146,9 +145,9 @@ export default async function ParentProgressPage({
       />
       <div className="grid gap-4">
         {bySubject.length === 0 ? (
-          <Card className="p-6 text-aivo-ink-soft">
+          <div className="rounded-iw-card-lg bg-white border border-iw-border p-6 text-sm text-iw-text-muted shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
             Once {learner.displayName} completes a lesson, mastery shows up here.
-          </Card>
+          </div>
         ) : (
           bySubject.map(({ subject, avg, mastered, total, items }) => {
             const trajectory = snapshotsBySubject.get(subject.id) ?? [];
@@ -156,11 +155,11 @@ export default async function ParentProgressPage({
             const deliveryBand = normalizeGradeBand(latest?.deliveryLevel);
             const enrolledBand = normalizeGradeBand(latest?.gradeBand);
             return (
-            <Card key={subject.id} className="p-[var(--aivo-density-card-pad)]">
+            <div key={subject.id} className="rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="font-semibold">{subject.name}</p>
-                  <p className="text-sm text-aivo-ink-soft">
+                  <p className="font-semibold text-iw-text-strong">{subject.name}</p>
+                  <p className="text-sm text-iw-text-muted">
                     {mastered} of {total} skills mastered
                   </p>
                 </div>
@@ -174,19 +173,19 @@ export default async function ParentProgressPage({
                 aria-label={`${Math.round(avg * 100)}%`}
               />
               {latest ? (
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-aivo-line/60 p-3">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-iw-control border border-iw-border p-3">
                   <div className="text-sm">
-                    <p className="text-xs uppercase text-aivo-ink-soft">
+                    <p className="text-xs uppercase text-iw-text-muted">
                       {t("trajectory_title")}
                     </p>
-                    <p className="mt-1">
+                    <p className="mt-1 text-iw-text-strong">
                       {t("at_grade_count", {
                         count: latest.skillsOnGradeLevel,
                         total: latest.skillsTotal,
                       })}
                     </p>
                     {deliveryBand && enrolledBand ? (
-                      <p className="text-aivo-ink-soft">
+                      <p className="text-iw-text-muted">
                         {deliveryBand === enrolledBand
                           ? t("on_grade")
                           : `${t("working_at", { level: deliveryBand })} · ${t("grade_target", { grade: enrolledBand })}`}
@@ -201,13 +200,13 @@ export default async function ParentProgressPage({
                   const skill = skills.find((s) => s.id === m.skillId);
                   return (
                     <li key={m.skillId} className="flex items-center justify-between gap-2">
-                      <span className="truncate">{skill?.name ?? m.skillId}</span>
-                      <span className="text-aivo-ink-soft">{m.level}</span>
+                      <span className="truncate text-iw-text-strong">{skill?.name ?? m.skillId}</span>
+                      <span className="text-iw-text-muted">{m.level}</span>
                     </li>
                   );
                 })}
               </ul>
-            </Card>
+            </div>
             );
           })
         )}
