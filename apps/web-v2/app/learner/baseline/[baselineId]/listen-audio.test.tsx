@@ -144,3 +144,87 @@ describe("BaselineListenAudio — audio cleanup on leaving a question", () => {
     }
   });
 });
+
+describe("BaselineListenAudio — visible playback controls (idle → playing → paused → idle)", () => {
+  /** Start playback via the browser fallback (server fetch is rejected). */
+  async function startPlayback() {
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Read this aloud" }));
+    });
+  }
+
+  it("shows Replay + Pause controls only while audio is active", async () => {
+    render(<BaselineListenAudio learnerId="l1" text="What comes next?" />);
+
+    // Idle: the extra controls are not in the DOM (no dead affordance).
+    expect(screen.queryByRole("button", { name: "Replay from the start" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Pause reading" })).toBeNull();
+
+    // Playing: both controls appear.
+    await startPlayback();
+    expect(synth.speak).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Replay from the start" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Pause reading" })).toBeTruthy();
+
+    // Stop via the primary pill: back to idle, controls are gone again.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Stop reading aloud" }));
+    });
+    expect(screen.queryByRole("button", { name: "Replay from the start" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Pause reading" })).toBeNull();
+  });
+
+  it("Pause halts the active path and Resume picks it back up", async () => {
+    render(<BaselineListenAudio learnerId="l1" text="What comes next?" />);
+    await startPlayback();
+
+    // Pause: the browser path's pause() fires and the control flips to Resume.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Pause reading" }));
+    });
+    expect(synth.pause).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Resume reading" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Pause reading" })).toBeNull();
+
+    // Resume: the browser path's resume() fires and the control returns to Pause.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Resume reading" }));
+    });
+    expect(synth.resume).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Pause reading" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Resume reading" })).toBeNull();
+  });
+
+  it("Stop after a Pause returns to idle and hides the extra controls", async () => {
+    render(<BaselineListenAudio learnerId="l1" text="What comes next?" />);
+    await startPlayback();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Pause reading" }));
+    });
+    expect(screen.getByRole("button", { name: "Resume reading" })).toBeTruthy();
+
+    // The primary pill stays a Stop while paused; clicking it returns to idle.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Stop reading aloud" }));
+    });
+    expect(synth.cancel).toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Read this aloud" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Replay from the start" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Resume reading" })).toBeNull();
+  });
+
+  it("Replay re-speaks the prompt from the start", async () => {
+    render(<BaselineListenAudio learnerId="l1" text="What comes next?" />);
+    await startPlayback();
+    expect(synth.speak).toHaveBeenCalledTimes(1);
+
+    // Replay issues a fresh utterance (re-speak from the very start).
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Replay from the start" }));
+    });
+    expect(synth.speak).toHaveBeenCalledTimes(2);
+    // Still active afterwards, so the controls remain available.
+    expect(screen.getByRole("button", { name: "Pause reading" })).toBeTruthy();
+  });
+});
