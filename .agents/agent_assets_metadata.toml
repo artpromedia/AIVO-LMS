@@ -480,6 +480,24 @@ uri = "file://apps/marketing/public/images/mascot/cloud-buddy.png"
 type = "image"
 title = "cloud buddy mascot"
 
+[[generated]]
+id = "rOhkEjH985X-r8ZT_s623"
+uri = "file://attached_assets/generated_images/tutor-robots/nova.png"
+type = "image"
+title = "nova robot tutor"
+
+[[generated]]
+id = "SxtLfPnnXW8Yr-E3FEaFt"
+uri = "file://attached_assets/generated_images/tutor-robots/sage.png"
+type = "image"
+title = "sage robot tutor"
+
+[[generated]]
+id = "oZD9d-8fPCQYhdfxRAlh2"
+uri = "file://attached_assets/generated_images/tutor-robots/spark.png"
+type = "image"
+title = "spark robot tutor"
+
 [[outputs]]
 id = "0e7lRmti5tdoSwrX0-ySG"
 uri = "file://.local/preview/marketing-hero.jpg"
@@ -509,3 +527,21 @@ id = "bP6_v1-24oBejDBufWBm0"
 uri = "file://.local/preview/marketing-hero-fixed.jpg"
 type = "image"
 title = "Marketing site — Sign In button now visible"
+
+[[outputs]]
+id = "Flg3tzxCp63cjvjtjxgJv"
+uri = "file://attached_assets/generated_images/tutor-robots/nova.png"
+type = "image"
+title = "Nova — Mathematics (purple)"
+
+[[outputs]]
+id = "J_K3BReV38yrl_xn_O9xb"
+uri = "file://attached_assets/generated_images/tutor-robots/sage.png"
+type = "image"
+title = "Sage — English Language Arts (emerald)"
+
+[[outputs]]
+id = "_yBl4C61QktWuMnIrpzkq"
+uri = "file://attached_assets/generated_images/tutor-robots/spark.png"
+type = "image"
+title = "Spark — Science (amber)"
