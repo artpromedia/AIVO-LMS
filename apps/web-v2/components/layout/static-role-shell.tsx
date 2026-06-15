@@ -42,6 +42,7 @@ export const STATIC_NAV = {
     { href: "/parent/calendar", label: "Calendar", icon: CalendarDays },
     { href: "/messages", label: "Messages", icon: MessageCircle },
     { href: "/parent/reports", label: "Reports", icon: FileText },
+    { href: "/parent/resources", label: "Resources", icon: BookOpen },
     { href: "/parent/privacy", label: "Privacy", icon: ShieldCheck },
     { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/parent/settings", label: "Settings", icon: Settings },

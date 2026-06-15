@@ -1261,6 +1261,28 @@
       "reschedule": "Reschedule",
       "empty_title": "Nothing coming up",
       "empty_body": "New assignments and sessions will appear here as they are scheduled."
+    },
+    "resources": {
+      "title": "Resources",
+      "description": "Curated, source-cited guides for families — not medical advice.",
+      "search_placeholder": "Search resources…",
+      "search_label": "Search resources",
+      "category_label": "Filter by category",
+      "all_categories": "All",
+      "category_getting_started": "Getting started",
+      "category_learning_at_home": "Learning at home",
+      "category_accessibility": "Accessibility",
+      "category_advocacy": "Advocacy",
+      "category_wellbeing": "Wellbeing",
+      "result_count": "{count, plural, =0 {No resources} one {# resource} other {# resources}}",
+      "read_minutes": "{count} min read",
+      "no_results_title": "No matching resources",
+      "no_results_body": "Try a different search term or category.",
+      "back": "Back to Resources",
+      "updated": "Updated {date}",
+      "sources_heading": "Sources",
+      "disclaimer": "These resources are educational and are not medical or clinical advice. For guidance about your child, talk with your pediatrician or care team.",
+      "opens_new_tab": "(opens in a new tab)"
     }
   },
   "brain_clone": {
