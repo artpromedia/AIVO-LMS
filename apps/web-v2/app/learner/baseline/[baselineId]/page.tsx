@@ -38,6 +38,7 @@ import {
 import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
 import { resolveBaselineScanConfig } from "@/lib/a11y/baseline-scan";
 import { BaselineScanProvider } from "./baseline-scan-provider";
+import { buildBaselineAnswerRedirect } from "./answer-redirect";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
@@ -93,8 +94,6 @@ async function answerAction(formData: FormData) {
   const questionId = String(formData.get("questionId") || "");
   const response = String(formData.get("response") || "");
   const skipped = String(formData.get("skipped") || "") === "1";
-  const asParent = String(formData.get("asParent") || "") === "1";
-  const listen = String(formData.get("listen") || "") === "1";
   const latencyRaw = Number.parseInt(String(formData.get("latencyMs") || ""), 10);
   const latencyMs = Number.isFinite(latencyRaw) && latencyRaw >= 0 ? latencyRaw : undefined;
 
@@ -128,12 +127,7 @@ async function answerAction(formData: FormData) {
       metadata: { baselineId, questionId, skipped, isCorrect: attempt.isCorrect },
     });
   }
-  const params = new URLSearchParams();
-  if (asParent) params.set("as", "parent");
-  // Keep the audio-first "listening mode" on across questions once chosen.
-  if (listen) params.set("listen", "1");
-  const qs = params.toString();
-  redirect(`/learner/baseline/${baselineId}${qs ? `?${qs}` : ""}`);
+  redirect(buildBaselineAnswerRedirect(baselineId, formData));
 }
 
 async function completeAction(formData: FormData) {
