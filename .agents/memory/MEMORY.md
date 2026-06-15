@@ -1,3 +1,3 @@
 - [Replit workflow port detection](replit-workflow-ports.md) — supervisor only sees ports declared as `localPort` in `.replit`; bind that exact port and set `waitForPort` to it.
 - [Importing a remote branch when object writes are blocked](remote-branch-import-when-object-writes-blocked.md) — all .git/objects writes are guarded (fetch/merge impossible); pull a public branch via GitHub compare API + raw downloads.
-- [AIVO Stage companion vs. tutor identities](aivo-stage-companion.md) — robot is an ADDITIVE brand companion (web+mobile); the 14 subject tutors keep their own faces; reuse the existing transparent PNG.
+- [AIVO robot family — companion + 14 tutors](aivo-stage-companion.md) — one chibi-3D robot family: purple companion + all 14 tutor avatars (recolor + subject motif) at /images/tutors/{key}.png; no more human portraits.

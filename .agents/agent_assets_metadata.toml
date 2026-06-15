@@ -498,6 +498,72 @@ uri = "file://attached_assets/generated_images/tutor-robots/spark.png"
 type = "image"
 title = "spark robot tutor"
 
+[[generated]]
+id = "ApENZv0El8uz9L54g91lK"
+uri = "file://attached_assets/generated_images/tutor-robots/chrono.png"
+type = "image"
+title = "chrono robot tutor"
+
+[[generated]]
+id = "OqhlEFaepndT-tUhEESyd"
+uri = "file://attached_assets/generated_images/tutor-robots/pixel.png"
+type = "image"
+title = "pixel robot tutor"
+
+[[generated]]
+id = "EvhTUuZZilFRpRGI2MBQq"
+uri = "file://attached_assets/generated_images/tutor-robots/echo.png"
+type = "image"
+title = "echo robot tutor"
+
+[[generated]]
+id = "1HHxyLBaQy5jnP_E2TZZH"
+uri = "file://attached_assets/generated_images/tutor-robots/harmony.png"
+type = "image"
+title = "harmony robot tutor"
+
+[[generated]]
+id = "fA77J-dmWH0PeBvDWMVEL"
+uri = "file://attached_assets/generated_images/tutor-robots/atlas.png"
+type = "image"
+title = "atlas robot tutor"
+
+[[generated]]
+id = "R4i093ql_I1pkbsLkKqNi"
+uri = "file://attached_assets/generated_images/tutor-robots/cadence.png"
+type = "image"
+title = "cadence robot tutor"
+
+[[generated]]
+id = "8jq29gDn0uGGbYls2obfy"
+uri = "file://attached_assets/generated_images/tutor-robots/vigor.png"
+type = "image"
+title = "vigor robot tutor"
+
+[[generated]]
+id = "Kb-A9tauJNUV5XQfuyMkG"
+uri = "file://attached_assets/generated_images/tutor-robots/lingua.png"
+type = "image"
+title = "lingua robot tutor"
+
+[[generated]]
+id = "P7nuTNkHqjddGQiRWw6kV"
+uri = "file://attached_assets/generated_images/tutor-robots/forge.png"
+type = "image"
+title = "forge robot tutor"
+
+[[generated]]
+id = "2_F1bdcLI1abRuewNsBPG"
+uri = "file://attached_assets/generated_images/tutor-robots/compass.png"
+type = "image"
+title = "compass robot tutor"
+
+[[generated]]
+id = "mL8JvyyXs7HcipRkE_8Bg"
+uri = "file://attached_assets/generated_images/tutor-robots/muse.png"
+type = "image"
+title = "muse robot tutor"
+
 [[outputs]]
 id = "0e7lRmti5tdoSwrX0-ySG"
 uri = "file://.local/preview/marketing-hero.jpg"
@@ -532,16 +598,82 @@ title = "Marketing site — Sign In button now visible"
 id = "Flg3tzxCp63cjvjtjxgJv"
 uri = "file://attached_assets/generated_images/tutor-robots/nova.png"
 type = "image"
-title = "Nova — Mathematics (purple)"
+title = "Nova — Mathematics"
 
 [[outputs]]
 id = "J_K3BReV38yrl_xn_O9xb"
 uri = "file://attached_assets/generated_images/tutor-robots/sage.png"
 type = "image"
-title = "Sage — English Language Arts (emerald)"
+title = "Sage — English Language Arts"
 
 [[outputs]]
 id = "_yBl4C61QktWuMnIrpzkq"
 uri = "file://attached_assets/generated_images/tutor-robots/spark.png"
 type = "image"
-title = "Spark — Science (amber)"
+title = "Spark — Science"
+
+[[outputs]]
+id = "sxtk7tLEucllyhy0Rm3cW"
+uri = "file://attached_assets/generated_images/tutor-robots/chrono.png"
+type = "image"
+title = "Chrono — History & Social Studies"
+
+[[outputs]]
+id = "wVS00z6xXG2sIQ6TQaI_t"
+uri = "file://attached_assets/generated_images/tutor-robots/pixel.png"
+type = "image"
+title = "Pixel — Coding"
+
+[[outputs]]
+id = "gKLjeuAO9CI2I_XzWvDwc"
+uri = "file://attached_assets/generated_images/tutor-robots/echo.png"
+type = "image"
+title = "Echo — Speech & Language"
+
+[[outputs]]
+id = "2fju5MAhL6ylAWYRrJu_1"
+uri = "file://attached_assets/generated_images/tutor-robots/harmony.png"
+type = "image"
+title = "Harmony — Social-Emotional Learning"
+
+[[outputs]]
+id = "1Jx-kwIwwbylUk2hl_BfR"
+uri = "file://attached_assets/generated_images/tutor-robots/atlas.png"
+type = "image"
+title = "Atlas — Geography"
+
+[[outputs]]
+id = "RnVqovpjFPOE8SEXN1FXd"
+uri = "file://attached_assets/generated_images/tutor-robots/cadence.png"
+type = "image"
+title = "Cadence — Music"
+
+[[outputs]]
+id = "LqtNn0ALW-8_CMILkQVXG"
+uri = "file://attached_assets/generated_images/tutor-robots/vigor.png"
+type = "image"
+title = "Vigor — PE & Health"
+
+[[outputs]]
+id = "jddQG9enbze6xeFuaNQSb"
+uri = "file://attached_assets/generated_images/tutor-robots/lingua.png"
+type = "image"
+title = "Lingua — World Languages"
+
+[[outputs]]
+id = "q93qyIGPFqtZFehlC6uRK"
+uri = "file://attached_assets/generated_images/tutor-robots/forge.png"
+type = "image"
+title = "Forge — STEM & Engineering"
+
+[[outputs]]
+id = "rdntL1P3sYI0JHulj9-fa"
+uri = "file://attached_assets/generated_images/tutor-robots/compass.png"
+type = "image"
+title = "Compass — Life Skills"
+
+[[outputs]]
+id = "Z-b20JBK3idBX-UcAzJDY"
+uri = "file://attached_assets/generated_images/tutor-robots/muse.png"
+type = "image"
+title = "Muse — Creative Arts"
