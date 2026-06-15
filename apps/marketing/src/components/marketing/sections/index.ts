@@ -1,3 +1,6 @@
+export { AudienceHero } from "./AudienceHero";
+export { ComplianceBar } from "./ComplianceBar";
+export { ClosingCTA } from "./ClosingCTA";
 export { PainPointsGrid } from "./PainPointsGrid";
 export { NumberedSteps } from "./NumberedSteps";
 export { CalloutCard } from "./CalloutCard";

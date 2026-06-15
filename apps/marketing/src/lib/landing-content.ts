@@ -80,7 +80,7 @@ export const AUDIENCES: Audience[] = [
     title: "Differentiated instruction, finally automated",
     metaTitle: "AIVO for Teachers – AI-Powered Differentiation for Every Classroom",
     metaDescription:
-      "Spend less time prepping differentiated materials and more time teaching. AIVO assigns work, tracks mastery, and writes IEP-aligned progress notes for every student — including those at every functioning level.",
+      "Spend less time prepping differentiated materials and more time teaching. AIVO differentiates work, tracks mastery, and surfaces IEP-aligned, plain-language progress summaries for every student — including those at every functioning level.",
     subtitle:
       "AIVO's Brain Clone runs differentiation for you. Assign one lesson; every student gets a version tuned to their level, accommodations, and pacing — with progress data ready for your IEP and RTI meetings.",
     benefits: [
@@ -129,7 +129,7 @@ export const AUDIENCES: Audience[] = [
     title: "Personalized learning across your whole building",
     metaTitle: "AIVO for Schools – AI Adaptive Learning for K-12 Buildings",
     metaDescription:
-      "Bring AIVO to a single school with admin dashboards, MTSS-aligned reporting, IEP integration, and dedicated onboarding. COPPA, FERPA, SOC 2, WCAG 2.2 AA compliant.",
+      "Bring AIVO to a single school with admin dashboards, MTSS-aligned reporting, IEP integration, and dedicated onboarding. Designed for COPPA-aware and FERPA-aware workflows, with SOC 2-aligned controls and a WCAG 2.2 AA design target.",
     subtitle:
       "Equip every classroom in your building with AI tutors that adapt to every learner — including those on IEPs and 504s — and give your admin team real-time mastery data they can actually act on.",
     benefits: [
