@@ -26,6 +26,7 @@ import {
   Bell,
   Wind,
   MessageCircle,
+  CalendarDays,
 } from "lucide-react";
 import { Permission } from "@aivo/security";
 import type { RoleNavItem } from "@/components/layout/role-nav";
@@ -38,6 +39,7 @@ export const PARENT_NAV: RoleNavItem[] = [
   { href: "/parent/home", label: "Home", icon: <Home className="h-4 w-4" /> },
   { href: "/parent/learners", label: "Learners", icon: <Users className="h-4 w-4" /> },
   { href: "/parent/schedule", label: "Schedule", icon: <Calendar className="h-4 w-4" /> },
+  { href: "/parent/calendar", label: "Calendar", icon: <CalendarDays className="h-4 w-4" /> },
   {
     href: "/messages",
     label: "Messages",
