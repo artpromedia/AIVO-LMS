@@ -30,6 +30,12 @@ interface FlBits {
   motionZero: boolean;
 }
 
+// Mirror of the canonical FL profile (packages/learner-ui/src/tokens/fl-profiles.ts).
+// `maxChoices` and `textWeight` MUST match the canonical values exactly — they
+// change what the learner actually sees, so a drift gives a misleading demo and
+// is failed by scripts/ci/check-answer-choice-caps.mjs. `hitTarget` (tap-target
+// px) is INTENTIONALLY enlarged here so the demo reads on a desktop display; the
+// check only requires preview hitTarget >= the canonical value (never smaller).
 const FL_BITS: Record<FL, FlBits> = {
   STANDARD: { maxChoices: 5, textWeight: "full", hitTarget: 88, motionZero: false },
   SUPPORTED: { maxChoices: 3, textWeight: "reduced", hitTarget: 92, motionZero: false },

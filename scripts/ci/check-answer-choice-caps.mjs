@@ -164,6 +164,42 @@ function parseServerCeiling() {
   return map;
 }
 
+const TEXT_WEIGHTS = ["full", "reduced", "icons-primary", "icons-only", "none"];
+
+/**
+ * Per-functioning-level layout bits beyond the render cap. Both the canonical
+ * profile (FL_PROFILES[*] in fl-profiles.ts) and the two preview FL_BITS maps
+ * carry their entries as a single `LEVEL: { ... }` block with no nested braces,
+ * so a per-level block grab + field match is safe for either source.
+ */
+function parseProfileFields(fileKey) {
+  const src = read(FILES[fileKey]);
+  const textWeight = {};
+  const hitTarget = {};
+  for (const level of LEVELS) {
+    const block = src.match(new RegExp(`${level}:\\s*\\{([^}]*)\\}`));
+    if (!block) continue;
+    const tw = block[1].match(/textWeight:\s*"([^"]+)"/);
+    const ht = block[1].match(/hitTarget:\s*(\d+)/);
+    if (tw) textWeight[level] = tw[1];
+    if (ht) hitTarget[level] = Number(ht[1]);
+  }
+  return { textWeight, hitTarget };
+}
+
+/** Ensure a parsed textWeight map has a known enum value per functioning level. */
+function validateTextWeightMap(label, map) {
+  for (const level of LEVELS) {
+    if (!TEXT_WEIGHTS.includes(map[level])) {
+      errors.push(
+        `Could not parse the ${level} textWeight from ${label} ` +
+          `(${FILES[labelToFile(label)] ?? label}). The check's parser may be ` +
+          `stale — update scripts/ci/check-answer-choice-caps.mjs alongside the source.`,
+      );
+    }
+  }
+}
+
 const renderCap = parseRenderCap();
 const mobileRenderCap = parseMobileRenderCap();
 const baselinePreviewCap = parsePreviewCap("baselinePreview");
@@ -171,12 +207,23 @@ const stagePreviewCap = parsePreviewCap("stagePreview");
 const generatorTarget = parseGeneratorTarget();
 const serverCeiling = parseServerCeiling();
 
+const canonicalFields = parseProfileFields("renderCap");
+const baselinePreviewFields = parseProfileFields("baselinePreview");
+const stagePreviewFields = parseProfileFields("stagePreview");
+
 validateMap("render cap (fl-profiles.ts)", renderCap);
 validateMap("mobile render cap (baselineClient.ts FL_MAX_CHOICES)", mobileRenderCap);
 validateMap("baseline preview render cap (baseline-preview-client.tsx FL_BITS)", baselinePreviewCap);
 validateMap("stage preview render cap (stage-preview-client.tsx FL_BITS)", stagePreviewCap);
 validateMap("generator target (baseline_generator.py fl_config)", generatorTarget);
 validateMap("server reject-above (scaffold_enforcer.py RULES)", serverCeiling);
+
+validateTextWeightMap("textWeight (fl-profiles.ts)", canonicalFields.textWeight);
+validateTextWeightMap("baseline preview textWeight (baseline-preview-client.tsx FL_BITS)", baselinePreviewFields.textWeight);
+validateTextWeightMap("stage preview textWeight (stage-preview-client.tsx FL_BITS)", stagePreviewFields.textWeight);
+validateMap("hitTarget (fl-profiles.ts)", canonicalFields.hitTarget);
+validateMap("baseline preview hitTarget (baseline-preview-client.tsx FL_BITS)", baselinePreviewFields.hitTarget);
+validateMap("stage preview hitTarget (stage-preview-client.tsx FL_BITS)", stagePreviewFields.hitTarget);
 
 // Bail before the comparisons if any layer failed to parse — comparing
 // `undefined` would produce confusing secondary errors.
@@ -215,6 +262,54 @@ if (errors.length === 0) {
           `fl-profiles.ts maxChoices=${render} but stage-preview-client.tsx FL_BITS=${stagePreview}. ` +
           `Update FL_BITS in apps/web-v2/app/design-system/stage/stage-preview-client.tsx ` +
           `to match (previews mirror the single render cap; ${SPEC_REF}).`,
+      );
+    }
+
+    // (a3) textWeight drives real preview behavior (icons-only/none hides the
+    // choice labels, full/reduced shows them), so a drift here gives a
+    // misleading demo. It must match the canonical profile EXACTLY.
+    const canonTextWeight = canonicalFields.textWeight[level];
+    if (canonTextWeight !== baselinePreviewFields.textWeight[level]) {
+      errors.push(
+        `${level}: baseline preview textWeight drifted from the source of truth — ` +
+          `fl-profiles.ts textWeight="${canonTextWeight}" but ` +
+          `baseline-preview-client.tsx FL_BITS="${baselinePreviewFields.textWeight[level]}". ` +
+          `Update FL_BITS in apps/web-v2/app/design-system/discovery/baseline-preview-client.tsx ` +
+          `to match (textWeight changes what the learner sees; ${SPEC_REF}).`,
+      );
+    }
+    if (canonTextWeight !== stagePreviewFields.textWeight[level]) {
+      errors.push(
+        `${level}: stage preview textWeight drifted from the source of truth — ` +
+          `fl-profiles.ts textWeight="${canonTextWeight}" but ` +
+          `stage-preview-client.tsx FL_BITS="${stagePreviewFields.textWeight[level]}". ` +
+          `Update FL_BITS in apps/web-v2/app/design-system/stage/stage-preview-client.tsx ` +
+          `to match (textWeight changes what the learner sees; ${SPEC_REF}).`,
+      );
+    }
+
+    // (a4) hitTarget (tap-target px) is INTENTIONALLY enlarged in the previews
+    // so the demo reads on a desktop display, so we do not require equality.
+    // But a preview tap target must never be SMALLER than the real one — that
+    // would understate the accessibility the learner actually gets. Pin the
+    // documented relationship: preview hitTarget >= canonical hitTarget.
+    const canonHit = canonicalFields.hitTarget[level];
+    if (!(baselinePreviewFields.hitTarget[level] >= canonHit)) {
+      errors.push(
+        `${level}: baseline preview hitTarget is smaller than the real tap target — ` +
+          `fl-profiles.ts hitTarget=${canonHit} but ` +
+          `baseline-preview-client.tsx FL_BITS=${baselinePreviewFields.hitTarget[level]}. ` +
+          `The preview may enlarge tap targets but must never shrink below the canonical value ` +
+          `(it would understate accessibility; ${SPEC_REF}).`,
+      );
+    }
+    if (!(stagePreviewFields.hitTarget[level] >= canonHit)) {
+      errors.push(
+        `${level}: stage preview hitTarget is smaller than the real tap target — ` +
+          `fl-profiles.ts hitTarget=${canonHit} but ` +
+          `stage-preview-client.tsx FL_BITS=${stagePreviewFields.hitTarget[level]}. ` +
+          `The preview may enlarge tap targets but must never shrink below the canonical value ` +
+          `(it would understate accessibility; ${SPEC_REF}).`,
       );
     }
 
@@ -276,5 +371,16 @@ for (const level of LEVELS) {
     `  ${level.padEnd(13)} generator ${generatorTarget[level]}` +
       ` <= render ${renderCap[level]} (web=mobile=previews)` +
       ` <= server ${fmt(serverCeiling[level])}`,
+  );
+}
+console.log(
+  "\ncheck-answer-choice-caps OK — preview layout bits agree with fl-profiles.ts:",
+);
+for (const level of LEVELS) {
+  console.log(
+    `  ${level.padEnd(13)} textWeight "${canonicalFields.textWeight[level]}" (web=previews)` +
+      `  hitTarget canonical ${canonicalFields.hitTarget[level]}` +
+      ` <= preview ${baselinePreviewFields.hitTarget[level]} (baseline) /` +
+      ` ${stagePreviewFields.hitTarget[level]} (stage)`,
   );
 }
