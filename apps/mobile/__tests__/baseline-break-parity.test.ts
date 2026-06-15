@@ -1,12 +1,13 @@
 /**
- * C-09 — mobile/web baseline pacing parity.
+ * C-09 — mobile baseline pacing + adaptivity wiring.
  *
- * The break cadence drifted (web 5, mobile 3), so a learner moving between
- * devices got a different rhythm. The canonical value now lives in
- * `@aivo/adaptive-baseline` as `BASELINE_BREAK_EVERY`; the mobile runner
- * MIRRORS it as a literal (the adaptive engine is not bundled into the RN app
- * — see apps/mobile/metro.config.js watch folders). These tests keep the
- * mirror honest and prove the subject list is no longer hardcoded.
+ * The break cadence once drifted (web 5, mobile 3), so a learner moving
+ * between devices got a different rhythm. The canonical value now lives in
+ * `@aivo/adaptive-baseline` as `BASELINE_BREAK_EVERY`, and the mobile runner
+ * IMPORTS it (the adaptive engine is now a mobile runtime dependency / Metro
+ * watch folder), instead of mirroring a literal. These tests prove the runner
+ * is wired to the real engine and no longer carries a hard-coded cadence, and
+ * that the subject list is no longer hardcoded.
  */
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
@@ -24,23 +25,55 @@ const indexSrc = readFileSync(
   "utf8",
 );
 
-describe("baseline break cadence parity (mobile mirror ↔ canonical)", () => {
+describe("baseline break cadence is the shared canonical value", () => {
   it("the canonical constant is 5", () => {
     expect(BASELINE_BREAK_EVERY).toBe(5);
   });
 
-  it("the mobile runner mirrors the canonical cadence exactly", () => {
-    // Extract the literal the mobile runner uses and assert it equals the
-    // shared source of truth. If someone edits one without the other, this
-    // fails — which is the whole point of the mirror+parity pattern.
-    const match = runSrc.match(/const\s+BREAK_EVERY\s*=\s*(\d+)\s*;/);
-    expect(match, "BREAK_EVERY literal not found in run.tsx").not.toBeNull();
-    const mobileValue = Number(match![1]);
-    expect(mobileValue).toBe(BASELINE_BREAK_EVERY);
+  it("the mobile runner imports the cadence from the engine, not a literal", () => {
+    expect(runSrc).toMatch(/import\s*\{[^}]*BASELINE_BREAK_EVERY[^}]*\}\s*from\s*["']@aivo\/adaptive-baseline["']/s);
+    expect(runSrc).toMatch(/\bBASELINE_BREAK_EVERY\b/);
   });
 
-  it("the mobile runner no longer uses the old cadence of 3", () => {
-    expect(runSrc).not.toMatch(/const\s+BREAK_EVERY\s*=\s*3\s*;/);
+  it("the mobile runner no longer hard-codes a BREAK_EVERY literal", () => {
+    expect(runSrc).not.toMatch(/const\s+BREAK_EVERY\s*=\s*\d+\s*;/);
+  });
+});
+
+describe("baseline item selection is engine-driven, not a static index walk", () => {
+  it("the runner drives selection through the adaptive engine", () => {
+    expect(runSrc).toMatch(/\bpickNextItem\b/);
+    expect(runSrc).toMatch(/\brecordResponse\b/);
+    expect(runSrc).toMatch(/\bshouldStop\b/);
+  });
+});
+
+describe("baseline read-aloud is functional, not just declarative", () => {
+  it("the runner imports a real TTS engine (expo-speech)", () => {
+    expect(runSrc).toMatch(/from\s*["']expo-speech["']/);
+    expect(runSrc).toMatch(/Speech\.speak\(/);
+  });
+
+  it("exposes a learner-facing read-aloud control with an accessible label", () => {
+    expect(runSrc).toMatch(/baselineRun\.playQuestion/);
+    expect(runSrc).toMatch(/accessibilityLabel=\{t\(\s*["']baselineRun\.playQuestion["']/);
+  });
+
+  it("auto-presents items aurally on the audio-first path", () => {
+    // The auto-speak effect speaks the current item whenever audio-first is on
+    // (PRE_SYMBOLIC / NON_VERBAL / LOW_VERBAL, or learner-selected listen mode).
+    expect(runSrc).toMatch(/!audioFirst\)\s*return/);
+    expect(runSrc).toMatch(/speakText\(/);
+  });
+
+  it("cancels in-flight speech when the learner answers or skips", () => {
+    // respond() must stop any prior utterance (manual Play or auto-speak) so it
+    // never bleeds into the next prompt — independent of functioning level.
+    const respondIdx = runSrc.indexOf("const respond =");
+    const guardIdx = runSrc.indexOf("if (!item || !engItem) return;", respondIdx);
+    expect(respondIdx).toBeGreaterThan(-1);
+    const respondHead = runSrc.slice(respondIdx, guardIdx);
+    expect(respondHead).toMatch(/Speech\.stop\(\)/);
   });
 });
 

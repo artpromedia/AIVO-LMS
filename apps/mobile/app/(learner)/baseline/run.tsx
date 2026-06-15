@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import * as Speech from "expo-speech";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
@@ -11,9 +12,26 @@ import { LoadingState } from "@aivo/mobile-ui";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import {
+  initBaseline,
+  pickNextItem,
+  recordResponse,
+  shouldStop,
+  assessFrustration,
+  BASELINE_BREAK_EVERY,
+  type BaselineItem,
+  type BaselineState,
+  type ItemResponse,
+} from "@aivo/adaptive-baseline";
+import {
   fetchBaselineQuestions,
   completeBaseline,
+  difficultyToTheta,
+  capChoices,
+  FL_MAX_CHOICES,
+  FL_AUDIO_FIRST,
   type BaselineQuestion,
+  type BaselineChoice,
+  type FunctioningLevel,
 } from "@/src/api/baselineClient";
 
 // Shared brand companion robot (same friendly figure as web + the landing
@@ -22,55 +40,103 @@ const AIVO_COMPANION_PNG = require("@/assets/images/aivo-companion.png");
 
 /**
  * Learner adaptive baseline runner (MOB-LRN-005) — mirror of web's
- * /learner/baseline/[baselineId]. Calm question flow with progress dots,
- * a break cadence, supports banner, and a completion hero.
+ * /learner/baseline/[baselineId]. Item selection is driven by the real
+ * `@aivo/adaptive-baseline` engine (1-PL θ), not a static next-index walk:
+ * each answer updates θ and the engine picks the next item nearest θ (with a
+ * frustration "kindness ceiling" so a struggling learner is never pushed
+ * harder), spreads across the learner's subjects, and stops early once the
+ * estimate is confident (SE ≤ 0.35 after ≥ 6 items, hard cap 20).
  *
  * Questions come from assessment-svc (`/api/assessments/learner/baseline/
  * :learnerId`), which serves an AI-generated set or a curated fallback bank
- * — so there is no hardcoded client-side item source.
+ * — so there is no hardcoded client-side item source. The break cadence is
+ * the engine's shared `BASELINE_BREAK_EVERY`, not a local literal, so web and
+ * mobile pace the baseline identically.
+ *
+ * Nothing here is shown as a score/grade: correctness is recorded silently to
+ * drive selection + the strengths-first parent handoff, and a self-paced skip
+ * ("Not sure") never reads as failure.
  */
 
-// Break cadence — unified with the web runner (was 3, web was 5, which made
-// the two clients pace the baseline differently). The canonical value lives
-// in `@aivo/adaptive-baseline` as `BASELINE_BREAK_EVERY`; we MIRROR it here as
-// a plain literal rather than importing the adaptive engine into the RN bundle
-// (that package is not a mobile runtime dependency / Metro watch folder). The
-// values are kept in lock-step by a parity test:
-//   apps/mobile/__tests__/baseline-break-parity.test.ts
-// which imports the canonical constant and asserts it equals this one. If you
-// change one, change the source and let the test confirm the mirror.
-const BREAK_EVERY = 5;
+// Engine hard cap (MAX_ITEMS in @aivo/adaptive-baseline). Used only as an
+// upper bound for the calm "Question n of N" label — the run usually stops
+// earlier once θ is confident.
+const MAX_ITEMS_DISPLAY = 20;
 
 type LoadState =
   | { kind: "loading" }
   | { kind: "error" }
   | { kind: "not_ready"; message: string }
-  | { kind: "ready"; questions: BaselineQuestion[] };
+  | { kind: "ready"; questions: BaselineQuestion[]; functioningLevel: FunctioningLevel };
 
-/** Silently-recorded outcome for one question (never shown to the learner). */
-type QuestionResponse = {
+/** Silently-recorded outcome for one item (never shown to the learner). */
+type ItemRecord = {
+  subject: string;
+  difficulty: number;
   correct: boolean;
   skipped: boolean;
   latencyMs: number;
 };
 
+const EMPTY_QUESTIONS: BaselineQuestion[] = [];
+
 export default function LearnerBaselineRunScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const palette = useSensoryPalette();
   const { user } = useAuth();
   const learnerId = user?.id ?? "";
 
   const [state, setState] = useState<LoadState>({ kind: "loading" });
-  const [i, setI] = useState(0);
+  // Adaptive engine state + the id of the item currently on screen.
+  const [engine, setEngine] = useState<BaselineState | null>(null);
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  // Items the learner skipped — excluded from the bank we offer the engine so
+  // a skip is "seen" without an unfair θ penalty (mirrors the web bridge).
+  const [skipped, setSkipped] = useState<Set<string>>(() => new Set());
+  // Per-item record (correctness captured SILENTLY) for the parent handoff.
+  const [responses, setResponses] = useState<ItemRecord[]>([]);
+  // "Listen instead" modality switch offered on a break — never shame, just a
+  // calmer way in. Sticky for the rest of the run once chosen.
+  const [listenMode, setListenMode] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
   const [done, setDone] = useState(false);
-  // Per-question record of what happened. Correctness is captured SILENTLY
-  // (the learner never sees right/wrong) and only used for the parent handoff
-  // + learning plan on completion.
-  const [responses, setResponses] = useState<QuestionResponse[]>([]);
-  // When the current question first became visible — used to measure response
+  // When the current item first became visible — used to measure response
   // latency (process signal), reset on advance and after a break.
   const [qStartedAt, setQStartedAt] = useState(() => Date.now());
+
+  const questions = state.kind === "ready" ? state.questions : EMPTY_QUESTIONS;
+  const functioningLevel: FunctioningLevel =
+    state.kind === "ready" ? state.functioningLevel : "STANDARD";
+  const audioFirst = FL_AUDIO_FIRST[functioningLevel] || listenMode;
+  const maxChoices = FL_MAX_CHOICES[functioningLevel];
+
+  // Display question lookup + the engine bank (BaselineItem[]) derived from it.
+  // `subject` doubles as the engine skill so selection spreads across the
+  // learner's subjects; numeric difficulty is calibrated onto the θ logit scale.
+  const byId = useMemo(() => {
+    const m = new Map<string, BaselineQuestion>();
+    for (const q of questions) m.set(q.id, q);
+    return m;
+  }, [questions]);
+
+  const bank = useMemo<BaselineItem[]>(
+    () =>
+      questions.map((q) => ({
+        id: q.id,
+        skillId: q.subject,
+        subjectId: q.subject,
+        difficulty: difficultyToTheta(q.difficulty),
+        modalities: ["visual", "auditory"] as const,
+        lightReading: false,
+      })),
+    [questions],
+  );
+
+  const engItemById = useMemo(() => {
+    const m = new Map<string, BaselineItem>();
+    for (const it of bank) m.set(it.id, it);
+    return m;
+  }, [bank]);
 
   const load = useCallback(async () => {
     if (!learnerId) {
@@ -78,13 +144,23 @@ export default function LearnerBaselineRunScreen() {
       return;
     }
     setState({ kind: "loading" });
+    setEngine(null);
+    setCurrentId(null);
+    setSkipped(new Set());
+    setResponses([]);
+    setListenMode(false);
+    setOnBreak(false);
+    setDone(false);
     try {
       const res = await fetchBaselineQuestions(learnerId);
       if (res.status === "not_ready") {
         setState({ kind: "not_ready", message: res.message });
       } else {
-        setState({ kind: "ready", questions: res.questions });
-        setQStartedAt(Date.now());
+        setState({
+          kind: "ready",
+          questions: res.questions,
+          functioningLevel: res.functioningLevel,
+        });
       }
     } catch {
       setState({ kind: "error" });
@@ -95,31 +171,83 @@ export default function LearnerBaselineRunScreen() {
     void load();
   }, [load]);
 
-  const questions = state.kind === "ready" ? state.questions : [];
+  // Initialise the engine once the bank is ready and pick the first item.
+  useEffect(() => {
+    if (state.kind !== "ready" || engine !== null || bank.length === 0) return;
+    const initial = initBaseline({
+      readingDifficulty: FL_AUDIO_FIRST[state.functioningLevel],
+    });
+    const first = pickNextItem(initial, bank, { applyFrustrationCeiling: true });
+    setEngine(initial);
+    setCurrentId(first?.id ?? null);
+    setQStartedAt(Date.now());
+    if (!first) setDone(true);
+  }, [state, engine, bank]);
 
-  // Persist the finished baseline as a discovery_adventure attempt. Single
-  // "baseline" domain bucket because the flat question feed carries no
-  // per-question domain. Fire-and-forget-safe: failures never block the warm
-  // completion screen.
+  // Best-effort read-aloud. Read-aloud is offered to every learner (the support
+  // banner promises it) and never blocks the flow if TTS is unavailable.
+  const speakText = useCallback(
+    (text: string) => {
+      try {
+        Speech.stop();
+        Speech.speak(text, { language: i18n.language });
+      } catch {
+        // Read-aloud is an enhancement, not a gate — swallow any TTS error.
+      }
+    },
+    [i18n.language],
+  );
+
+  // Auto-present each new item aurally for audio-first functioning levels (or
+  // once a learner opts into "Listen instead"), so the auditory path is real,
+  // not just metadata. Stop speech when the item changes or the screen leaves.
+  useEffect(() => {
+    if (!currentId || done || onBreak || !audioFirst) return;
+    const itm = byId.get(currentId);
+    if (!itm) return;
+    const choices = capChoices(itm.options, itm.correctAnswer, maxChoices);
+    speakText([itm.q, ...choices.map((c) => c.label)].join(". "));
+    return () => {
+      try {
+        Speech.stop();
+      } catch {
+        // noop
+      }
+    };
+  }, [currentId, done, onBreak, audioFirst, byId, maxChoices, speakText]);
+
+  // Persist the finished baseline as a discovery_adventure attempt, grouped by
+  // subject (now that every item carries its domain). Fire-and-forget-safe:
+  // failures never block the warm completion screen.
   const finish = useCallback(
-    async (all: QuestionResponse[]) => {
+    async (all: ItemRecord[]) => {
       if (!learnerId || all.length === 0) return;
-      const attempted = all.filter((r) => !r.skipped);
-      const totalCorrect = all.filter((r) => r.correct).length;
-      const avgLatencyMs = attempted.length
-        ? Math.round(attempted.reduce((sum, r) => sum + r.latencyMs, 0) / attempted.length)
-        : 0;
+      const byDomain = new Map<
+        string,
+        { correct: number; total: number; latencies: number[]; difficulties: number[] }
+      >();
+      for (const r of all) {
+        const bucket =
+          byDomain.get(r.subject) ??
+          { correct: 0, total: 0, latencies: [] as number[], difficulties: [] as number[] };
+        bucket.total += 1;
+        if (r.correct) bucket.correct += 1;
+        bucket.latencies.push(r.latencyMs);
+        if (r.difficulty > 0) bucket.difficulties.push(r.difficulty);
+        byDomain.set(r.subject, bucket);
+      }
+      const avg = (xs: number[]) =>
+        xs.length ? Math.round(xs.reduce((s, x) => s + x, 0) / xs.length) : 0;
+      const chapterResults = Array.from(byDomain.entries()).map(([domain, b]) => ({
+        domain,
+        correct: b.correct,
+        total: b.total,
+        difficulty: b.difficulties.length ? avg(b.difficulties) : 1,
+        avgLatencyMs: avg(b.latencies),
+      }));
       await completeBaseline(learnerId, {
-        chapterResults: [
-          {
-            domain: "baseline",
-            correct: totalCorrect,
-            total: all.length,
-            difficulty: 1,
-            avgLatencyMs,
-          },
-        ],
-        totalCorrect,
+        chapterResults,
+        totalCorrect: all.filter((r) => r.correct).length,
         totalAttempts: all.length,
         responseLatencies: all.map((r) => r.latencyMs),
         xpEarned: 0,
@@ -128,33 +256,77 @@ export default function LearnerBaselineRunScreen() {
     [learnerId],
   );
 
-  // Record the response (chosen vs. correctAnswer, latency, skip) and advance.
-  // `chosen === null` means the learner tapped "Not sure" — a self-paced skip,
-  // recorded without any failure framing.
-  const recordAndAdvance = (chosen: string | null) => {
-    const item = questions[i];
+  // Record the response and let the engine choose what comes next. `chosen ===
+  // null` means the learner tapped "Not sure" — a self-paced skip, recorded
+  // without any failure framing and excluded from the θ estimate.
+  const respond = (chosen: BaselineChoice | null) => {
+    if (!engine || !currentId) return;
+    // Cancel any in-flight read-aloud (manual Play or auto-speak) so the prior
+    // item's audio never bleeds into the next prompt or the break/finish screen.
+    try {
+      Speech.stop();
+    } catch {
+      // noop
+    }
+    const item = byId.get(currentId);
+    const engItem = engItemById.get(currentId);
+    if (!item || !engItem) return;
+
+    const isSkip = chosen === null;
     const correct =
-      chosen != null && item?.correctAnswer != null && chosen === item.correctAnswer;
-    const entry: QuestionResponse = {
-      correct,
-      skipped: chosen === null,
-      latencyMs: Math.max(0, Date.now() - qStartedAt),
-    };
-    const all = [...responses, entry];
+      !isSkip && item.correctAnswer != null && chosen.value === item.correctAnswer;
+    const latencyMs = Math.max(0, Date.now() - qStartedAt);
+
+    const all: ItemRecord[] = [
+      ...responses,
+      { subject: item.subject, difficulty: item.difficulty, correct, skipped: isSkip, latencyMs },
+    ];
+
+    // Skips are "seen" but not scored: keep them out of the engine bank rather
+    // than recording a wrong answer that would unfairly drag θ down.
+    let nextEngine = engine;
+    let nextSkipped = skipped;
+    if (isSkip) {
+      nextSkipped = new Set(skipped);
+      nextSkipped.add(currentId);
+    } else {
+      const response: ItemResponse = {
+        itemId: currentId,
+        correct,
+        responseTimeMs: latencyMs,
+        consumedModality: audioFirst ? "auditory" : "visual",
+      };
+      nextEngine = recordResponse({ state: engine, item: engItem, response });
+    }
+
+    const availableBank = bank.filter((it) => !nextSkipped.has(it.id));
+    const stop = shouldStop(nextEngine);
+    const next = stop.stop
+      ? null
+      : pickNextItem(nextEngine, availableBank, { applyFrustrationCeiling: true });
+
+    setEngine(nextEngine);
+    setSkipped(nextSkipped);
     setResponses(all);
 
-    const nextIdx = i + 1;
-    if (nextIdx >= questions.length) {
+    if (!next) {
       void finish(all);
       setDone(true);
       return;
     }
-    if (nextIdx % BREAK_EVERY === 0) setOnBreak(true);
-    setI(nextIdx);
-    setQStartedAt(Date.now());
+
+    setCurrentId(next.id);
+    // Pause for a breath on the shared cadence, or sooner if the engine reads
+    // sustained struggle — a break, never a "you're failing" signal.
+    const frustrated = assessFrustration(nextEngine).level === "high";
+    if (frustrated || all.length % BASELINE_BREAK_EVERY === 0) {
+      setOnBreak(true);
+    } else {
+      setQStartedAt(Date.now());
+    }
   };
 
-  if (state.kind === "loading") {
+  if (state.kind === "loading" || (state.kind === "ready" && !done && !currentId)) {
     return (
       <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
         <LoadingState />
@@ -241,6 +413,7 @@ export default function LearnerBaselineRunScreen() {
   }
 
   if (onBreak) {
+    const canSwitchToListen = !FL_AUDIO_FIRST[functioningLevel] && !listenMode;
     return (
       <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
         <Card tone="hero" style={[styles.card, { alignItems: "center", marginTop: spacing.xl }]}>
@@ -263,12 +436,41 @@ export default function LearnerBaselineRunScreen() {
             size="lg"
             style={{ marginTop: spacing.md }}
           />
+          {canSwitchToListen ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t("baselineRun.listenInstead", "Listen instead")}
+              onPress={() => {
+                setListenMode(true);
+                setOnBreak(false);
+                setQStartedAt(Date.now());
+              }}
+              style={styles.listen}
+            >
+              <Ionicons name="headset" size={18} color={palette.accent} />
+              <Text style={[styles.listenText, { color: palette.accent }]}>
+                {t("baselineRun.listenInstead", "Listen instead")}
+              </Text>
+            </Pressable>
+          ) : null}
         </Card>
       </ResponsiveScreen>
     );
   }
 
-  const item = questions[i];
+  const item = currentId ? byId.get(currentId) : undefined;
+  if (!item) {
+    return (
+      <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
+        <LoadingState />
+      </ResponsiveScreen>
+    );
+  }
+
+  const visibleChoices = capChoices(item.options, item.correctAnswer, maxChoices);
+  const shownTotal = Math.min(questions.length, MAX_ITEMS_DISPLAY);
+  const shownNumber = Math.min(responses.length + 1, shownTotal);
+
   return (
     <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
       <View style={[styles.companion, { backgroundColor: palette.accentSoft }]}>
@@ -289,54 +491,55 @@ export default function LearnerBaselineRunScreen() {
         </Text>
       </View>
       <View style={[styles.supports, { backgroundColor: palette.accentSoft }]}>
-        <Ionicons name="volume-high" size={16} color={palette.accent} />
+        <Ionicons name={audioFirst ? "headset" : "volume-high"} size={16} color={palette.accent} />
         <Text style={[styles.supportsText, { color: palette.ink }]}>
-          {t("baselineRun.supports", "Read-aloud + extra time are on")}
+          {audioFirst
+            ? t("baselineRun.supportsListening", "Listening mode + extra time are on")
+            : t("baselineRun.supports", "Read-aloud + extra time are on")}
         </Text>
-      </View>
-      <View style={styles.dots}>
-        {questions.map((_, idx) => (
-          <View
-            key={idx}
-            style={[
-              styles.dot,
-              {
-                backgroundColor: idx <= i ? palette.primary : palette.border,
-                width: idx === i ? 22 : 8,
-              },
-            ]}
-          />
-        ))}
       </View>
       <Card tone="raised" style={[styles.card, { marginTop: spacing.md }]}>
         <Text style={[styles.count, { color: palette.inkMuted }]}>
           {t("baselineRun.progress", {
-            n: i + 1,
-            total: questions.length,
-            defaultValue: `Question ${i + 1} of ${questions.length}`,
+            n: shownNumber,
+            total: shownTotal,
+            defaultValue: `Question ${shownNumber} of ${shownTotal}`,
           })}
         </Text>
         <Text style={[styles.question, { color: palette.ink }]}>{item.q}</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("baselineRun.playQuestion", "Read this to me out loud")}
+          onPress={() =>
+            speakText([item.q, ...visibleChoices.map((c) => c.label)].join(". "))
+          }
+          style={[styles.play, { backgroundColor: palette.accentSoft }]}
+        >
+          <Ionicons name="volume-high" size={18} color={palette.accent} />
+          <Text style={[styles.playText, { color: palette.accent }]}>
+            {t("baselineRun.playQuestion", "Read this to me")}
+          </Text>
+        </Pressable>
         <View style={{ gap: spacing.sm, marginTop: spacing.sm }}>
-          {item.options.map((opt, idx) => (
+          {visibleChoices.map((opt, idx) => (
             <Pressable
-              key={`${item.id}-${idx}`}
+              key={`${item.id}-${opt.value}-${idx}`}
               accessibilityRole="button"
-              accessibilityLabel={opt}
-              onPress={() => recordAndAdvance(opt)}
+              accessibilityLabel={opt.label}
+              onPress={() => respond(opt)}
               style={[
                 styles.option,
                 { borderColor: palette.border, backgroundColor: palette.bgPage },
               ]}
             >
-              <Text style={[styles.optionText, { color: palette.ink }]}>{opt}</Text>
+              <Text style={[styles.optionText, { color: palette.ink }]}>{opt.label}</Text>
             </Pressable>
           ))}
         </View>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t("baselineRun.notSure", "Not sure — skip for now")}
-          onPress={() => recordAndAdvance(null)}
+          onPress={() => respond(null)}
           style={styles.skip}
         >
           <Ionicons name="arrow-forward-circle-outline" size={18} color={palette.inkMuted} />
@@ -387,8 +590,26 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   skipText: { fontSize: 14, fontFamily: fontFamilies.bodySemiBold },
-  dots: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: spacing.md },
-  dot: { height: 8, borderRadius: 4 },
+  listen: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    marginTop: spacing.xs,
+  },
+  listenText: { fontSize: 14, fontFamily: fontFamilies.bodySemiBold },
+  play: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: radius.full,
+    marginTop: spacing.xs,
+  },
+  playText: { fontSize: 13, fontFamily: fontFamilies.bodySemiBold },
   card: { gap: spacing.sm },
   iconWrap: {
     width: 60,
