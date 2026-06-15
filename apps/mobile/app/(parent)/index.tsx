@@ -342,6 +342,16 @@ export default function ParentDashboard() {
             />
           </View>
         </View>
+
+        <View style={{ marginTop: 8 }}>
+          <Button
+            title={t("parent.resources", "Resources")}
+            onPress={() => router.push("/(parent)/resources" as Href)}
+            variant="outline"
+            fullWidth
+            iconLeft={<Ionicons name="library-outline" size={18} color={palette.primary} />}
+          />
+        </View>
       </View>
     </ScrollView>
   );

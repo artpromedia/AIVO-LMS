@@ -158,7 +158,8 @@
     "sessionsTrend": "Trend der Sitzungen diese Woche",
     "masteryBySubject": "Beherrschung nach Fach",
     "reports": "Berichte",
-    "districtLogo": "Bezirkslogo"
+    "districtLogo": "Bezirkslogo",
+    "resources": "Resources"
   },
   "parentSettings": {
     "title": "Einstellungen",
@@ -1135,5 +1136,20 @@
       "future": "Das Geburtsdatum kann nicht in der Zukunft liegen.",
       "tooOld": "Lernende müssen 21 Jahre oder jünger sein."
     }
+  },
+  "parentResources": {
+    "title": "Resources",
+    "intro": "Quick links to the tools you already have. A curated library of guides is on the way.",
+    "reportsLink": "Reports",
+    "reportsDesc": "Weekly mastery and progress for each learner.",
+    "messagesLink": "Messages",
+    "messagesDesc": "Talk with your learner's care team.",
+    "privacyLink": "Privacy & data",
+    "privacyDesc": "Review consent, export, or delete data.",
+    "settingsLink": "Settings",
+    "settingsDesc": "Manage your account and preferences.",
+    "libraryTitle": "Guides & library",
+    "libraryEmptyTitle": "Library coming soon",
+    "libraryEmptyBody": "Curated guides for supporting your learner aren't available yet. We'll add them here when they're ready."
   }
 }

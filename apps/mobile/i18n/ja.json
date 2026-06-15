@@ -158,7 +158,8 @@
     "sessionsTrend": "今週のセッションのトレンド",
     "masteryBySubject": "科目別習熟度",
     "reports": "レポート",
-    "districtLogo": "学区ロゴ"
+    "districtLogo": "学区ロゴ",
+    "resources": "Resources"
   },
   "parentSettings": {
     "title": "設定",
@@ -1135,5 +1136,20 @@
       "future": "生年月日に未来の日付は使えません。",
       "tooOld": "学習者は21歳以下である必要があります。"
     }
+  },
+  "parentResources": {
+    "title": "Resources",
+    "intro": "Quick links to the tools you already have. A curated library of guides is on the way.",
+    "reportsLink": "Reports",
+    "reportsDesc": "Weekly mastery and progress for each learner.",
+    "messagesLink": "Messages",
+    "messagesDesc": "Talk with your learner's care team.",
+    "privacyLink": "Privacy & data",
+    "privacyDesc": "Review consent, export, or delete data.",
+    "settingsLink": "Settings",
+    "settingsDesc": "Manage your account and preferences.",
+    "libraryTitle": "Guides & library",
+    "libraryEmptyTitle": "Library coming soon",
+    "libraryEmptyBody": "Curated guides for supporting your learner aren't available yet. We'll add them here when they're ready."
   }
 }

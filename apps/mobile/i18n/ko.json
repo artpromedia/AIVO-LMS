@@ -158,7 +158,8 @@
     "sessionsTrend": "이번 주 세션 추세",
     "masteryBySubject": "과목별 숙달도",
     "reports": "보고서",
-    "districtLogo": "교육구 로고"
+    "districtLogo": "교육구 로고",
+    "resources": "Resources"
   },
   "parentSettings": {
     "title": "설정",
@@ -1135,5 +1136,20 @@
       "future": "생년월일은 미래일 수 없습니다.",
       "tooOld": "학습자는 21세 이하여야 합니다."
     }
+  },
+  "parentResources": {
+    "title": "Resources",
+    "intro": "Quick links to the tools you already have. A curated library of guides is on the way.",
+    "reportsLink": "Reports",
+    "reportsDesc": "Weekly mastery and progress for each learner.",
+    "messagesLink": "Messages",
+    "messagesDesc": "Talk with your learner's care team.",
+    "privacyLink": "Privacy & data",
+    "privacyDesc": "Review consent, export, or delete data.",
+    "settingsLink": "Settings",
+    "settingsDesc": "Manage your account and preferences.",
+    "libraryTitle": "Guides & library",
+    "libraryEmptyTitle": "Library coming soon",
+    "libraryEmptyBody": "Curated guides for supporting your learner aren't available yet. We'll add them here when they're ready."
   }
 }

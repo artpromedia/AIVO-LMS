@@ -158,7 +158,8 @@
     "sessionsTrend": "Tendencia de sesiones esta semana",
     "masteryBySubject": "Dominio por materia",
     "reports": "Informes",
-    "districtLogo": "Logotipo del distrito"
+    "districtLogo": "Logotipo del distrito",
+    "resources": "Resources"
   },
   "parentSettings": {
     "title": "Configuración",
@@ -1135,5 +1136,20 @@
       "future": "La fecha de nacimiento no puede ser futura.",
       "tooOld": "El estudiante debe tener 21 años o menos."
     }
+  },
+  "parentResources": {
+    "title": "Resources",
+    "intro": "Quick links to the tools you already have. A curated library of guides is on the way.",
+    "reportsLink": "Reports",
+    "reportsDesc": "Weekly mastery and progress for each learner.",
+    "messagesLink": "Messages",
+    "messagesDesc": "Talk with your learner's care team.",
+    "privacyLink": "Privacy & data",
+    "privacyDesc": "Review consent, export, or delete data.",
+    "settingsLink": "Settings",
+    "settingsDesc": "Manage your account and preferences.",
+    "libraryTitle": "Guides & library",
+    "libraryEmptyTitle": "Library coming soon",
+    "libraryEmptyBody": "Curated guides for supporting your learner aren't available yet. We'll add them here when they're ready."
   }
 }

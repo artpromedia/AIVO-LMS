@@ -144,6 +144,7 @@ export default function ParentLayout() {
         <Tabs.Screen name="summary/[childId]" options={{ href: null }} />
         <Tabs.Screen name="snapshot/[childId]" options={{ href: null }} />
         <Tabs.Screen name="reports" options={{ href: null }} />
+        <Tabs.Screen name="resources" options={{ href: null }} />
         <Tabs.Screen name="sensory/[childId]" options={{ href: null }} />
         <Tabs.Screen name="lessons/[childId]" options={{ href: null }} />
         <Tabs.Screen name="homework/[childId]" options={{ href: null }} />
