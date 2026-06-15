@@ -1,21 +1,15 @@
 @import "tailwindcss";
+/* Admin chart palette + console surface tokens (--admin-chart-*,
+   --admin-login-sidebar) are the single source of truth in @aivo/brand
+   (tokens/semantic/admin.json → ADMIN_CHART_PALETTE). Do not redefine the
+   values here — change the brand token source instead. */
+@import "@aivo/brand/admin-tokens.css";
 /* Tailwind utilities referenced from the shared admin-ui package live in its
    built dist (node_modules is skipped by default) — scan it explicitly. */
 @source "../node_modules/@aivo/admin-ui/dist";
 
 :root {
   color-scheme: light;
-
-  /* Chart tokens — series colors reuse the console palette (#174ea6 button
-     blue, emerald/amber/red notice tones, slate text) so charts never
-     introduce new hues. */
-  --admin-chart-1: #174ea6;
-  --admin-chart-2: #065f46;
-  --admin-chart-3: #b45309;
-  --admin-chart-4: #b91c1c;
-  --admin-chart-5: #475569;
-  --admin-chart-grid: rgba(23, 32, 51, 0.12);
-  --admin-chart-axis: #475569;
 }
 
 html,

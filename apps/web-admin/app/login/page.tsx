@@ -86,7 +86,10 @@ export default async function LoginPage({
 
   return (
     <main className="grid min-h-screen lg:grid-cols-[0.95fr_1.05fr]">
-      <section className="hidden flex-col justify-between bg-[#0d2748] p-12 text-white lg:flex">
+      <section
+        className="hidden flex-col justify-between p-12 text-white lg:flex"
+        style={{ background: "var(--admin-login-sidebar)" }}
+      >
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-blue-200">AIVO Admin</p>
           <h1 className="mt-8 max-w-xl text-6xl font-black leading-[0.95]">

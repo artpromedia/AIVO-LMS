@@ -682,6 +682,9 @@ importers:
 
   packages/admin-ui:
     dependencies:
+      '@aivo/brand':
+        specifier: workspace:*
+        version: link:../brand
       react:
         specifier: 19.1.0
         version: 19.1.0

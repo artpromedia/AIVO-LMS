@@ -29,6 +29,7 @@
     "vitest": "^4.1.8"
   },
   "dependencies": {
+    "@aivo/brand": "workspace:*",
     "recharts": "^3.8.1"
   }
 }

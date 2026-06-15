@@ -1,0 +1,180 @@
+Important reality check that makes these prompts *realistic*: *this dashboard already largely exists.* The current `apps/web-admin/app/platform/page.tsx` already imports `AdminKpiCard`, `AreaTrend`, `ChartCard`, `DonutBreakdown`, `Funnel`, `Gauge` and wires `getPlatformSystemHealth`, `listAdminTenants/Users/Learners`, `getTrialConversion`, `listPilots`. `admin-svc/platform.ts` already computes tenant-mix-by-type, user/learner counts, lesson-run completion, and AI request/latency aggregates. The grouped collapsible nav exists in `admin-shell.tsx`.
+
+So "implement this exact design" really means: **a token/chart-palette pass + shell-and-search polish + composing the overview to match + rolling the look across all ~28 section pages + filling a few real gaps** — not greenfield.
+
+## Exists vs. gap
+
+| Mockup element | Already backed by | Real work |
+|---|---|---|
+| Grouped collapsible nav | `admin-shell.tsx` (`AdminNavGroup`) | Restyle to exact groups/icons/labels |
+| ⌘K "search tenants, users, pilots…" | `admin-svc/search.ts` exists; shell only **filters nav** | **Gap:** wire a real command palette |
+| KPI cards + sparkline + delta | `admin-ui/AdminKpiCard` | Restyle + confirm wiring |
+| AI requests 24h (requests + latency) | `platform.ts` `aiUsageLog`; `AreaTrend` | **Dual-axis** variant + range selector |
+| Tenant mix donut | tenants grouped by `type`; `DonutBreakdown` | Done — restyle to palette |
+| Lesson completion gauge | `lessonRuns` total/completed; `Gauge` | Done — restyle |
+| Trial→Pilot→Won funnel | `getTrialConversion`; `Funnel` | Done — restyle |
+| Usage trends 14d | `getPlatformUsageTrends`; `AreaTrend` | Done — restyle |
+| Active pilots table | `listPilots`/billing-svc; `data-table` | Restyle + confirm columns |
+| Chart colors (violet/teal/orange) | `globals.css --admin-chart-*` = **blue/green/amber** (wrong) | **Gap:** redefine + move to `@aivo/brand` |
+
+---
+
+````markdown
+# AIVO Platform-Admin Design Constitution (prepend to every prompt below)
+
+You are implementing the EXACT reference design for AIVO's platform admin (`apps/web-admin`, Next 15,
+Tailwind v4, `@aivo/brand` + `@aivo/admin-ui` + `@aivo/admin-api` + `@aivo/admin-auth`). Audience:
+platform/district/school operators — power users who need dense, fast, trustworthy data.
+
+This is **refine + wire, not greenfield** — the primitives and routes already exist; match the
+reference and remove drift.
+
+Design language (match the mockup exactly):
+- **One token source.** Violet `#7C3AED` primary. **Fix the chart palette:** the hardcoded
+  `--admin-chart-1..5` (blue/green/amber) must become the reference's violet/teal/orange set and be
+  exported from `@aivo/brand` as `ADMIN_CHART_PALETTE` (+ grid/axis). No second palette, no raw hex,
+  no one-off login color. ESLint hex ban applies.
+- **The admin-ui kit IS the system** — compose, don't reinvent: `AdminKpiCard`, `charts/{Sparkline,
+  AreaTrend,BarSeries,DonutBreakdown,Funnel,Gauge,ChartCard}`, `data-table`, `BulkSelectionBar`,
+  `ConfirmDangerDialog`, `FlashRegion`, `AdminPageFrame`.
+- **Shell** — `AIVO ADMIN` lockup + collapse; grouped, collapsible left nav (Identity & Access /
+  AI Governance / Billing & Growth / Compliance & Trust / Operations) with section labels + icons;
+  global ⌘K search; breadcrumb + title + "Signed in as …" + page actions + notifications + account.
+- **Density + a11y:** card grid, `tabular-nums`, status pills; WCAG **2.2 AA** — charts never rely on
+  color alone (labels/legends/patterns), full keyboard, visible focus, accessible data tables.
+
+Two hard rules:
+1. **Truthful aggregates.** Every number/chart reads a real service/DB aggregate (`admin-svc`,
+   `admin-api`, billing-svc, ai-svc) or renders an honest empty/zero/error state. Panels **fetch and
+   degrade independently** — one failing source never blanks the dashboard (the existing
+   `/platform/page.tsx` `settle()` pattern). No hardcoded demo numbers.
+2. **RBAC everywhere.** Gate via `requirePlatformPage(<scope>)`; nav is role-filtered server-side;
+   district/school shells see only their tenant. Sensitive actions are audited.
+
+For each prompt: don't jump to code. First return (a) the data contract (each widget → its real
+endpoint + empty/error state), (b) the layout to pixel-match the reference, (c) the tokens/chart
+palette used. Verify against `/platform/__chart-check`. Pause for approval.
+````
+
+## Foundational prompts
+
+````markdown
+# Prompt 1 — Admin chart palette + tokens into @aivo/brand  ·  Inherits the Constitution  ·  DO FIRST
+Why: `apps/web-admin/app/globals.css` hardcodes `--admin-chart-1..5` as blue/green/amber/red/slate —
+the WRONG colors for the reference (violet/teal/orange) and a second source of truth (audit finding).
+Scope:
+- Define the reference chart ramp (violet, teal, orange, + supporting) as `ADMIN_CHART_PALETTE` (plus
+  `grid`/`axis`) in `@aivo/brand`, AA-verified for series-on-surface (≥3:1 non-text) and legend text.
+- Re-point `globals.css` and `packages/admin-ui/src/charts/tones.ts` to consume it; delete the
+  hardcoded values and the one-off login hex (`bg-[#0d2748]`).
+- Rebuild brand tokens; ensure ESLint hex check + `/platform/__chart-check` stay green.
+DoD: zero hardcoded admin chart hex; every chart renders the reference palette from one brand source;
+contrast verified; chart-check page matches the mockup's colors.
+````
+
+````markdown
+# Prompt 2 — Admin shell: lockup, grouped nav, ⌘K global search, header  ·  Inherits the Constitution
+Files: `apps/web-admin/components/admin-shell.tsx`, role-filtered nav groups, `AdminPageFrame`.
+Scope:
+- Lockup "AIVO ADMIN" + collapse control; the five nav groups with the reference's exact items/icons
+  and section labels, collapsible, active/breadcrumb state (extend the existing `AdminNavGroup`).
+- **Upgrade search from a nav-label filter to a real ⌘K command palette** wired to
+  `admin-svc/routes/search.ts` (tenants, users, pilots, learners, …) with keyboard nav + recent +
+  deep-link results.
+- Header row: breadcrumb (e.g., Operations › Platform Operations), page title, "Signed in as … (role)",
+  page actions slot (Provision pilot +, Onboard district +), notifications (count), account menu.
+DoD: pixel-match to the reference; ⌘K searches real entities; AA keyboard/focus throughout; nav
+role-filtered server-side; collapse persists.
+````
+
+````markdown
+# Prompt 3 — Platform Operations overview (refine to exact design)  ·  Inherits the Constitution
+File: `apps/web-admin/app/platform/page.tsx` (+ `dashboard-data.ts`, `dashboard-panels.tsx`,
+`usage-trends-card.tsx`). The page exists — match the reference layout exactly and keep panels
+independently resilient.
+Scope (each wired to its real aggregate, with empty/zero/error states):
+- 4 KPI cards — Tenants / Users / Learners / AI cost 24h — value + signed delta + sparkline
+  (`AdminKpiCard`, `growthKpi`, `aiCostDelta`).
+- AI requests (24h): **dual-axis** Requests + Avg latency (ms) with a range selector
+  (`aiRequestsByHour` + latency from `platform.ts`); add a dual-axis `AreaTrend`/`ChartCard` variant
+  if needed.
+- Tenant mix donut (`DonutBreakdown`, tenants-by-type, % labels); Lesson completion `Gauge`
+  (lessonRuns total/completed); Trial→Pilot→Won `Funnel` (`getTrialConversion`); Usage trends 14d
+  (`getPlatformUsageTrends`).
+- Active pilots `data-table`: District/Org, Seats (x/y bar), Parents, Therapists, Learners, Expires,
+  Status pill, row actions (⋮), "View all pilots →" (`listPilots`/billing-svc).
+DoD: matches the reference; no hardcoded numbers; per-panel degrade; AA tables/charts; actions wired.
+````
+
+## Section roll-out prompts (apply the exact look across all pages)
+
+````markdown
+# Prompt 4 — Identity & Access section  ·  Inherits the Constitution
+Pages: `/platform/tenants` (+ `[id]`, branding, flags), `/platform/users` (+ `[id]`),
+`/platform/learners`, `/platform/identity` (+ `[tenantId]`), `/platform/settings/api-keys`.
+Scope: bring each list to the reference `data-table` look (filters, bulk actions, status pills, row
+actions), detail pages to the card/section layout, wired to `admin-api/{identity,api-keys}` /
+`admin-svc`. Tenant detail shows type, seats, branding, flags.
+DoD: consistent table/detail design; real data + empty states; RBAC; AA; audited mutations.
+````
+
+````markdown
+# Prompt 5 — AI Governance section  ·  Inherits the Constitution
+Pages: `/platform/ai/models` (+ `[id]`), `/ai/policies`, `/ai/incidents`, `/ai/evals`, `/ai/optouts`,
+`/ai/moderation`, `/platform/ai-costs`, `/platform/safety` (+ `/moderation`).
+Scope: governance tables + detail (models registry, policy editor, incident timeline, eval runs,
+opt-out ledger, cost breakdown charts) on the chart/table kit, wired to
+`admin-api/ai-governance` + `admin-svc/routes/{governance,moderation}` + ai-svc/responsible-ai-svc.
+DoD: real governance data; cost charts use the brand palette; AA; RBAC; honest empty states.
+````
+
+````markdown
+# Prompt 6 — Billing & Growth section  ·  Inherits the Constitution
+Pages: `/platform/billing` (+ invoices), `/platform/pilots` (+ `[tenantId]`, `new`),
+`/platform/billing/coupons` (+ `[code]`, `new`), `/platform/billing/trials`, `/platform/sales/leads`.
+Scope: billing/pilots/coupons/leads tables + detail + create flows (Provision pilot, Onboard district)
+on the kit, wired to `admin-api/{billing,invoices,leads}` + billing-svc; the Trial→Pilot→Won funnel
+shares the overview's source.
+DoD: real billing/pilot data; create flows work + audited; status pills; AA; RBAC.
+````
+
+````markdown
+# Prompt 7 — Compliance & Trust section  ·  Inherits the Constitution
+Pages: `/platform/compliance` (+ dsar `[id]`, retention), `/platform/security` (+ controls, incidents,
+risks, vendors, vulnerabilities), `/platform/audit`, `/platform/iep`.
+Scope: compliance/DSAR queues, security posture (controls/risks/vendors/vulns) tables + detail, audit
+log viewer (with `audit-verify`), IEP oversight — wired to `admin-api/{compliance,audit,dsar,iep}` +
+`admin-svc/routes/{compliance,security,audit,iep,evidence}` + audit-svc/data-governance-svc.
+DoD: real records; tamper-evident audit view; AA; strict RBAC; export where applicable.
+````
+
+````markdown
+# Prompt 8 — Operations section  ·  Inherits the Constitution
+Pages: `/platform/system-health`, `/platform/jobs`, `/platform/feature-flags`, `/platform/support`,
+`/platform/content` (+ `[id]`), `/platform/audio/pronunciation`, `/platform/baseline-items`,
+`/platform/settings` (+ emails, webhooks).
+Scope: ops surfaces — health status (status-page-svc), job runs, flag toggles (feature-flags pkg),
+support queue, content CMS, pronunciation, baseline item bank — on the kit, wired to
+`admin-svc/routes/{health,jobs,internal-jobs,feature-flags,support,content-cms,pronunciation,baseline,
+settings}`.
+DoD: real ops data + actions (flag toggles/job re-runs audited); AA; RBAC; honest health states.
+````
+
+## Gap-fill prompt
+
+````markdown
+# Prompt 9 — Aggregate + search endpoints the exact design needs  ·  Inherits the Constitution
+Why: most overview data exists in `admin-svc/platform.ts`; close the specific gaps so nothing is faked.
+Scope (only what's missing after audit):
+- AI requests + **avg latency** dual series for the selected range (24h/range selector).
+- Tenant-mix percentages, funnel for arbitrary windows, usage-trends 14d, AI-cost 24h delta — confirm
+  each is a real endpoint, not client-side mock.
+- Global search coverage in `admin-svc/routes/search.ts` for tenants/users/pilots/learners (for ⌘K).
+- District/school shells: equivalent scoped aggregates so their dashboards reuse the same components.
+DoD: every overview widget + ⌘K result traces to a real, RBAC-scoped, tested endpoint; no hardcoded
+series remain.
+````
+
+The honest headline: **you're ~80% there.** The highest-leverage, genuinely-needed work is **Prompt 1 (chart palette → brand)**, **Prompt 2 (⌘K real search + shell polish)**, and **Prompt 3 (compose the overview to pixel-match)** — then Prompts 4–8 roll the identical look across the existing section pages, and Prompt 9 closes the few real data gaps.
+
+Want me to **save** these to `sprint-prompts/admin/` on `claude/trusting-hamilton-0q6uwy`, or start with **Prompt 1** and actually do the chart-palette-into-brand change (it's concrete and unblocks the whole look)?

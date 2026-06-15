@@ -395,3 +395,62 @@ export function listAdminLearnersPage(
 ): Promise<AdminListPage<AdminLearnerSummary>> {
   return listIdentityPage(session, "/api/admin-svc/learners", "learners", mapLearner, opts);
 }
+
+/**
+ * Global ⌘K search — fans a single query across tenants / users / learners
+ * via admin-svc `/search` (each capped server-side). Powers the command
+ * palette in the admin shell. Returns honest empty arrays for a blank or
+ * sub-threshold query; never throws on "no matches".
+ */
+export interface AdminSearchHitTenant {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+}
+export interface AdminSearchHitUser {
+  id: string;
+  name: string | null;
+  email: string;
+  role: string;
+}
+export interface AdminSearchHitLearner {
+  id: string;
+  name: string;
+  tenantId: string;
+}
+export interface AdminSearchResults {
+  tenants: AdminSearchHitTenant[];
+  users: AdminSearchHitUser[];
+  learners: AdminSearchHitLearner[];
+}
+
+export async function searchAdminEntities(
+  session: Pick<SessionProfile, "role">,
+  query: string,
+): Promise<AdminSearchResults> {
+  const q = query.trim();
+  if (q.length === 0) return { tenants: [], users: [], learners: [] };
+  const payload = await adminGet<Record<string, unknown>>(session, "/api/admin-svc/search", { q });
+  const rows = (key: string): Record<string, unknown>[] =>
+    Array.isArray(payload[key]) ? (payload[key] as Record<string, unknown>[]) : [];
+  return {
+    tenants: rows("tenants").map((t) => ({
+      id: String(t.id),
+      name: String(t.name ?? ""),
+      type: String(t.type ?? ""),
+      status: String(t.status ?? ""),
+    })),
+    users: rows("users").map((u) => ({
+      id: String(u.id),
+      name: u.name == null ? null : String(u.name),
+      email: String(u.email ?? ""),
+      role: String(u.role ?? ""),
+    })),
+    learners: rows("learners").map((l) => ({
+      id: String(l.id),
+      name: String(l.name ?? ""),
+      tenantId: String(l.tenantId ?? ""),
+    })),
+  };
+}
