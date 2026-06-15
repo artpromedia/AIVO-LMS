@@ -361,9 +361,11 @@ export default async function BaselineRunnerPage({
           showAnswered={asParent}
           body={baseline.summary?.learnerSafeSummary ?? undefined}
           learned={[
-            ...subjectMastery.map(
-              (s) => `${s.subjectName}: starting at ${s.estimate.replaceAll("_", " ")}`,
-            ),
+            ...(asParent
+              ? subjectMastery.map(
+                  (s) => `${s.subjectName}: starting at ${s.estimate.replaceAll("_", " ")}`,
+                )
+              : []),
             ...(chips.includes("iep") ? ["IEP supports stay on"] : []),
             ...(chips.includes("calm_mode") ? ["Calm pacing locked in"] : []),
           ]}
