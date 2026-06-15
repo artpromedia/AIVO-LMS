@@ -149,7 +149,7 @@ export default function AboutPage() {
                 trackCTAClick("about_get_started", `${WEB_APP_URL}/signup?plan=free`);
                 trackSignupInitiation("about");
               }}
-              className="px-5 py-2.5 rounded-full bg-primary text-white font-bold hover:bg-primary-dark transition shadow-lg shadow-purple-200"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--aivo-sensory-primary)] px-5 text-sm font-semibold text-white shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:brightness-110"
             >
               {t("get_started")}
             </a>
@@ -328,13 +328,13 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/careers"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-white text-primary font-bold text-lg hover:bg-purple-50 transition shadow-xl min-h-[44px]"
+                className="group inline-flex min-h-[52px] items-center justify-center rounded-full bg-white px-7 text-base font-semibold text-primary shadow-[0_16px_36px_-12px_rgba(0,0,0,0.4)] transition hover:-translate-y-0.5 hover:bg-purple-50"
               >
                 {t("view_open_positions")}
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border-2 border-white/30 text-white font-bold text-lg hover:bg-white/10 transition min-h-[44px]"
+                className="group inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/40 px-7 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
               >
                 {t("contact_us")}
               </Link>

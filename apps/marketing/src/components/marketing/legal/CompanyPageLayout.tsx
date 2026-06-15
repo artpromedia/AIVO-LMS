@@ -83,7 +83,7 @@ export function CompanyPageLayout({
                 trackCTAClick("company_get_started", `${WEB_APP_URL}/signup?plan=free`);
                 trackSignupInitiation("company_page");
               }}
-              className="px-5 py-2.5 rounded-full bg-primary text-white font-bold hover:bg-primary-dark transition shadow-lg shadow-purple-200 min-h-[44px] inline-flex items-center"
+              className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-6 text-sm font-semibold text-white shadow-[0_14px_32px_-14px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:bg-primary-dark"
             >
               Get Started
             </a>

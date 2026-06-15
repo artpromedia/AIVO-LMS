@@ -157,7 +157,7 @@ export async function LegalPageLayout({
           </p>
           <a
             href={`mailto:${contactEmail}`}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-bold transition hover:opacity-90 shadow-lg"
+            className="group inline-flex min-h-[52px] items-center gap-2 rounded-full px-7 text-base font-semibold text-white shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:brightness-110"
             style={{ backgroundColor: accentColor }}
           >
             <svg

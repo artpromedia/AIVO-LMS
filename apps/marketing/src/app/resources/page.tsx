@@ -43,7 +43,7 @@ export default async function ResourcesPage() {
             </Link>
             <a
               href={`${WEB_APP_URL}/signup?plan=free`}
-              className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 py-2.5 font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-primary-dark"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--aivo-sensory-primary)] px-5 text-sm font-semibold text-white shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:brightness-110"
             >
               {t("cta_get_started")}
             </a>
