@@ -26,6 +26,7 @@ import {
   setBaselineAdaptiveSessionId,
   getIEPForLearner,
   getLearner,
+  getLearnerVoicePreference,
   getOrCreateParentAssessment,
   listBaselineAttempts,
   listBaselineQuestions,
@@ -221,6 +222,10 @@ export default async function BaselineRunnerPage({
   // baseline shell so they apply INSIDE the question card, not just on chrome.
   const a11yPrefs = await getAccessibilityPrefs(baseline.learnerId, session.tenantId);
   const shellStyle = learnerPrefStyleVars(a11yPrefs);
+  // The learner's saved read-aloud voice/speed (set by the parent). The non-scan
+  // listen control tunes the browser SpeechSynthesis voice + rate to match these
+  // so playback respects the learner's preference instead of the browser default.
+  const voicePref = await getLearnerVoicePreference(baseline.learnerId);
   // Sprint C-15 — switch/AAC scanning. Resolve the learner's persisted AAC
   // prefs into a scan config; the runner wraps its interactive region in the
   // aac-bridge scan provider (single-source SwitchScanController) when the
@@ -679,6 +684,8 @@ export default async function BaselineRunnerPage({
                     key={next.id}
                     text={`${next.prompt}. ${next.readAloudText}`}
                     autoStart={listenMode}
+                    speed={voicePref?.speed}
+                    voiceId={voicePref?.voiceId}
                     className={
                       listenMode
                         ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
