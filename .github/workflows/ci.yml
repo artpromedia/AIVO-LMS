@@ -44,6 +44,9 @@ jobs:
       - name: Admin destructive-action confirmation gate
         run: node scripts/ci/check-admin-destructive-confirm.mjs
 
+      - name: Answer-choice cap invariant (generator <= render <= server)
+        run: node scripts/ci/check-answer-choice-caps.mjs
+
       - name: File-length ratchet (no god files, 600-line max)
         run: node scripts/ci/check-file-length.mjs
 
