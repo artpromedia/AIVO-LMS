@@ -41,10 +41,19 @@ import type { TTSVoiceId } from "@/lib/db/types";
  * auto-starts when listening mode is on. Any in-flight speech/generation is
  * cancelled on unmount so the voice never trails past the screen that started
  * it, and a generation that resolves after stop/unmount is discarded.
+ *
+ * Captions: the server TTS pipeline returns time-coded caption lines
+ * (`asset.captions`). While the server clip plays we surface the current line
+ * near the prompt, synced to the audio's playback position, so a learner who
+ * benefits from seeing the words as they're spoken can follow along. The
+ * browser-voice fallback has no caption timings, so it degrades to no captions.
+ * When the learner's `captionsAlways` preference is on, the full transcript
+ * stays visible even when audio isn't playing (once a clip has been generated).
  */
 
 type PlaybackStatus = "idle" | "playing" | "paused";
 type PlaybackMode = "server" | "browser";
+type Caption = { startMs: number; endMs: number; text: string };
 
 /**
  * How each saved voice should sound on the browser Speech API. `female` picks
@@ -129,6 +138,7 @@ export function BaselineListenAudio({
   speed,
   voiceId,
   languageCode,
+  captionsAlways = false,
 }: {
   learnerId: string;
   text: string;
@@ -141,9 +151,18 @@ export function BaselineListenAudio({
   voiceId?: TTSVoiceId;
   /** BCP-47 tag for the prompt; defaults to the document language. */
   languageCode?: string;
+  /** When true, keep the transcript visible even while audio isn't playing. */
+  captionsAlways?: boolean;
 }) {
   const [supported, setSupported] = React.useState(false);
   const [status, setStatus] = React.useState<PlaybackStatus>("idle");
+  // Time-coded caption lines from the server clip, plus the line that matches
+  // the current playback position (-1 = before the first line / none active).
+  const [captions, setCaptions] = React.useState<Caption[]>([]);
+  const [captionIndex, setCaptionIndex] = React.useState(-1);
+  // Mirror captions into a ref so the audio `timeupdate` handler (a stable
+  // closure on the <audio> element) always reads the latest list.
+  const captionsRef = React.useRef<Caption[]>([]);
   const voicesRef = React.useRef<SpeechSynthesisVoice[]>([]);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   // Cache the generated server clip so repeated taps/replays reuse it (no cost).
@@ -168,6 +187,14 @@ export function BaselineListenAudio({
     if (browserSupported()) window.speechSynthesis.cancel();
   }, []);
 
+  // Set the caption list in both the ref (read by the audio timeupdate handler)
+  // and state (drives the rendered line). Resets the active line.
+  const applyCaptions = React.useCallback((list: Caption[]) => {
+    captionsRef.current = list;
+    setCaptions(list);
+    setCaptionIndex(-1);
+  }, []);
+
   const stopServer = React.useCallback(() => {
     const a = audioRef.current;
     if (a) {
@@ -181,12 +208,16 @@ export function BaselineListenAudio({
     stopServer();
     stopBrowser();
     modeRef.current = null;
+    setCaptionIndex(-1);
     setStatus("idle");
   }, [stopServer, stopBrowser]);
 
   // Browser fallback voice (varies by device; used only when the server can't).
   // Respects the saved speed/voice preference as closely as the device allows.
   const speakBrowser = React.useCallback(() => {
+    // The browser voice has no caption timings — drop any captions so a stale
+    // server line never lingers over a fallback read.
+    applyCaptions([]);
     if (!browserSupported()) {
       modeRef.current = null;
       setStatus("idle");
@@ -217,7 +248,7 @@ export function BaselineListenAudio({
     modeRef.current = "browser";
     synth.speak(utterance);
     setStatus("playing");
-  }, [text, rate, profile, lang]);
+  }, [text, rate, profile, lang, applyCaptions]);
 
   // Play a server-generated clip; on any playback error fall back to the voice.
   const playServerSrc = React.useCallback(
@@ -225,7 +256,24 @@ export function BaselineListenAudio({
       let a = audioRef.current;
       if (!a) {
         a = new Audio();
-        a.onended = () => setStatus("idle");
+        a.onended = () => {
+          setCaptionIndex(-1);
+          setStatus("idle");
+        };
+        // Sync the visible caption line to the clip's playback position. Caption
+        // timings live on the clip's own timeline, so currentTime maps directly
+        // regardless of playbackRate.
+        a.ontimeupdate = () => {
+          const list = captionsRef.current;
+          if (list.length === 0) return;
+          const ms = (audioRef.current?.currentTime ?? 0) * 1000;
+          let idx = list.findIndex((c) => ms >= c.startMs && ms < c.endMs);
+          // Past the last boundary: hold on the final line until playback ends.
+          if (idx === -1 && ms >= (list[list.length - 1]?.endMs ?? 0)) {
+            idx = list.length - 1;
+          }
+          setCaptionIndex(idx);
+        };
         audioRef.current = a;
       }
       a.onerror = () => {
@@ -235,6 +283,7 @@ export function BaselineListenAudio({
       a.currentTime = 0;
       a.playbackRate = rate;
       modeRef.current = "server";
+      setCaptionIndex(-1);
       setStatus("playing");
       void a.play().catch(() => {
         speakBrowser();
@@ -282,6 +331,9 @@ export function BaselineListenAudio({
         throw new Error("tts_unavailable");
       }
       serverSrcRef.current = src;
+      // Surface the clip's time-coded captions (empty/missing → no captions).
+      const lines = json?.data?.asset?.captions;
+      applyCaptions(Array.isArray(lines) ? lines : []);
       playServerSrc(src);
     } catch {
       if (token !== activeRef.current) return;
@@ -299,6 +351,7 @@ export function BaselineListenAudio({
     stopBrowser,
     playServerSrc,
     speakBrowser,
+    applyCaptions,
   ]);
 
   // Replay restarts the prompt from the very beginning (re-speak).
@@ -364,47 +417,72 @@ export function BaselineListenAudio({
 
   const active = status !== "idle";
 
+  // What to show in the caption region:
+  //  - while a server clip plays: the line synced to the current position;
+  //  - while idle, only if `captionsAlways` is on: the full transcript.
+  // The browser fallback clears `captions`, so it never shows a caption line.
+  const liveLine =
+    captionIndex >= 0 && captionIndex < captions.length
+      ? captions[captionIndex].text
+      : null;
+  const captionText = active
+    ? liveLine
+    : captionsAlways && captions.length > 0
+      ? captions.map((c) => c.text).join(" ")
+      : null;
+
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <ReadAloudButton
-        playing={active}
-        onToggle={toggle}
-        disabled={!supported}
-        className={className}
-      />
-      {active ? (
-        <>
-          <ControlButton
-            label="Replay"
-            ariaLabel="Replay from the start"
-            onClick={replay}
-            disabled={!supported}
-            icon={
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <polyline points="1 4 1 10 7 10" />
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-              </svg>
-            }
-          />
-          <ControlButton
-            label={status === "paused" ? "Resume" : "Pause"}
-            ariaLabel={status === "paused" ? "Resume reading" : "Pause reading"}
-            onClick={togglePause}
-            disabled={!supported}
-            icon={
-              status === "paused" ? (
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <polygon points="6 4 20 12 6 20 6 4" />
+    <div className="flex flex-col gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <ReadAloudButton
+          playing={active}
+          onToggle={toggle}
+          disabled={!supported}
+          className={className}
+        />
+        {active ? (
+          <>
+            <ControlButton
+              label="Replay"
+              ariaLabel="Replay from the start"
+              onClick={replay}
+              disabled={!supported}
+              icon={
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                 </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <rect x="6" y="5" width="4" height="14" rx="1" />
-                  <rect x="14" y="5" width="4" height="14" rx="1" />
-                </svg>
-              )
-            }
-          />
-        </>
+              }
+            />
+            <ControlButton
+              label={status === "paused" ? "Resume" : "Pause"}
+              ariaLabel={status === "paused" ? "Resume reading" : "Pause reading"}
+              onClick={togglePause}
+              disabled={!supported}
+              icon={
+                status === "paused" ? (
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <polygon points="6 4 20 12 6 20 6 4" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <rect x="6" y="5" width="4" height="14" rx="1" />
+                    <rect x="14" y="5" width="4" height="14" rx="1" />
+                  </svg>
+                )
+              }
+            />
+          </>
+        ) : null}
+      </div>
+      {captionText ? (
+        <p
+          data-testid="baseline-listen-caption"
+          aria-live="polite"
+          className="rounded-iw-chip bg-[var(--aivo-color-aivoPurple-50)] px-3 py-1.5 text-sm font-medium text-[var(--aivo-color-aivoPurple-800)]"
+        >
+          {captionText}
+        </p>
       ) : null}
     </div>
   );

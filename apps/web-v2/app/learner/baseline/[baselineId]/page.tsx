@@ -690,6 +690,7 @@ export default async function BaselineRunnerPage({
                     autoStart={listenMode}
                     speed={voicePref?.speed}
                     voiceId={voicePref?.voiceId}
+                    captionsAlways={voicePref?.captionsAlways}
                     className={
                       listenMode
                         ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
