@@ -655,7 +655,7 @@ jobs:
           ENVIRONMENT: test
         run: |
           pip install pytest pytest-cov pytest-asyncio httpx
-          pytest tests/ --cov=src/brain_svc --cov-report=term-missing -v || true
+          pytest tests/ --cov=src/brain_svc --cov-report=term-missing -v
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -725,7 +725,7 @@ jobs:
         run: |
           pip install pytest pytest-asyncio httpx 2>/dev/null || true
           if [ -d tests ]; then
-            pytest tests/ -v || true
+            pytest tests/ -v
           fi
 
       - name: Run cross-service integration tests (curriculum-svc app)
