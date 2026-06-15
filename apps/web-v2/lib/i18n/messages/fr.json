@@ -19,9 +19,9 @@
   },
   "parent": {
     "add_learner": {
-      "title": "Add a learner",
-      "description": "Just the basics now — you can update everything later from learner settings.",
-      "error_invalid_title": "A few details still need fixing.",
+      "title": "Ajouter un apprenant",
+      "description": "Seulement l’essentiel pour l’instant — vous pourrez tout mettre à jour plus tard dans les paramètres de l’apprenant.",
+      "error_invalid_title": "Quelques détails doivent encore être corrigés.",
       "error_invalid_description": "At minimum we need a first name and a valid birth year. Scroll up to see which fields are required.",
       "section_about_title": "About your learner",
       "section_about_description": "The name AIVO will use and a few identity basics.",
@@ -1797,7 +1797,7 @@
     "login": {
       "brand_heading": "Connectez-vous pour continuer votre parcours AIVO.",
       "brand_body": "Vos tuteurs, vos missions et les informations pour la famille, réunis au même endroit et adaptés à la façon dont votre apprenant réfléchit.",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 vérifié",
       "quote": "AIVO s'adapte à la façon dont ma fille apprend vraiment. La première plateforme qui ne nous a pas donné l'impression de lutter contre elle.",
       "quote_attribution": "— Parent d'une élève de CE2",
       "welcome_back": "Bon retour.",
@@ -1857,14 +1857,14 @@
       "email_label": "E-mail",
       "password_label": "Mot de passe",
       "password_helper": "Au moins 8 caractères avec un chiffre et un symbole.",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "Riley, parent",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "Saisissez votre nom, une adresse e-mail valide et un mot de passe d’au moins 8 caractères.",
+        "email_taken": "Cette adresse e-mail est déjà inscrite. Essayez plutôt de vous connecter.",
+        "weak_password": "Ce mot de passe ne respecte pas notre politique de sécurité. Utilisez au moins 8 caractères avec un chiffre et un symbole.",
+        "service_unavailable": "Nous n’avons pas pu joindre notre service d’inscription. Veuillez réessayer dans un instant.",
+        "unsupported_role": "Ce type de compte ne peut pas être créé ici.",
+        "signup_failed": "Nous n’avons pas pu créer votre compte. Veuillez réessayer."
       },
       "errors_inline": {
         "name": "Saisissez au moins 2 caractères.",
@@ -1948,11 +1948,11 @@
     "sso_start": {
       "eyebrow": "Authentification unique",
       "title": "Continuer avec {idp}",
-      "subtitle": "Nous vous redirigeons vers le fournisseur d'identité de votre organisation pour terminer la connexion.",
-      "continue": "Continuer avec {idp}",
-      "redirect_note": "Vous êtes redirigé automatiquement. Si rien ne se passe, utilisez le bouton ci-dessous.",
+      "subtitle": "Nous vous redirigerons vers le fournisseur d’identité de votre organisation pour terminer la connexion.",
+      "continue": "Continuer",
+      "redirect_note": "La redirection peut prendre quelques secondes.",
       "back_to_login": "Retour à la connexion",
-      "default_idp": "votre fournisseur d'identité"
+      "default_idp": "Fournisseur d’identité"
     },
     "mfa_enroll": {
       "eyebrow": "Sécurité du compte",

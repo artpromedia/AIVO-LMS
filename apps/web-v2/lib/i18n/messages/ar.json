@@ -1797,7 +1797,7 @@
     "login": {
       "brand_heading": "سجّل الدخول لمواصلة رحلتك مع AIVO.",
       "brand_body": "معلّموك ومهامك ورؤى العائلة، كلها في مكان واحد، ومضبوطة وفق طريقة تفكير المتعلّم لديك.",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 موثّق",
       "quote": "تتكيّف AIVO مع الطريقة التي تتعلّم بها ابنتي فعلًا. إنها أول منصة لم تشعرنا بأننا نقاومها.",
       "quote_attribution": "— أحد والدي طالبة في الصف الثالث",
       "welcome_back": "مرحبًا بعودتك.",
@@ -1857,14 +1857,14 @@
       "email_label": "البريد الإلكتروني",
       "password_label": "كلمة المرور",
       "password_helper": "‏8 أحرف على الأقل مع رقم ورمز.",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "رايلي ولي الأمر",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "يرجى إدخال اسمك وبريد إلكتروني صالح وكلمة مرور لا تقل عن 8 أحرف.",
+        "email_taken": "هذا البريد الإلكتروني مسجل بالفعل. جرّب تسجيل الدخول بدلاً من ذلك.",
+        "weak_password": "كلمة المرور هذه لا تطابق سياسة الأمان لدينا. استخدم 8 أحرف على الأقل مع رقم ورمز.",
+        "service_unavailable": "تعذر علينا الوصول إلى خدمة التسجيل. يرجى المحاولة مرة أخرى بعد قليل.",
+        "unsupported_role": "لا يمكن إنشاء هذا النوع من الحسابات هنا.",
+        "signup_failed": "تعذر علينا إنشاء حسابك. يرجى المحاولة مرة أخرى."
       },
       "errors_inline": {
         "name": "يرجى إدخال حرفين على الأقل.",
@@ -1946,13 +1946,13 @@
       }
     },
     "sso_start": {
-      "eyebrow": "Single sign-on",
-      "title": "Continue with {idp}",
-      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
-      "continue": "Continue with {idp}",
-      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
-      "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider"
+      "eyebrow": "تسجيل الدخول الموحّد",
+      "title": "المتابعة باستخدام {idp}",
+      "subtitle": "سنحوّلك إلى موفّر هوية مؤسستك لإكمال تسجيل الدخول.",
+      "continue": "متابعة",
+      "redirect_note": "قد يستغرق التحويل بضع ثوانٍ.",
+      "back_to_login": "العودة إلى تسجيل الدخول",
+      "default_idp": "موفّر الهوية"
     },
     "mfa_enroll": {
       "eyebrow": "Account security",

@@ -1797,7 +1797,7 @@
     "login": {
       "brand_heading": "로그인하여 AIVO 여정을 계속하세요.",
       "brand_body": "튜터, 미션, 가족 인사이트를 한곳에 모았습니다. 학습자가 생각하는 방식에 맞춰 조정됩니다.",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 검증됨",
       "quote": "AIVO는 제 딸이 실제로 배우는 방식에 맞춰 줍니다. 우리가 맞서 싸운다는 느낌을 주지 않은 첫 번째 플랫폼입니다.",
       "quote_attribution": "— 3학년 학습자의 학부모",
       "welcome_back": "다시 오신 것을 환영합니다.",
@@ -1857,14 +1857,14 @@
       "email_label": "이메일",
       "password_label": "비밀번호",
       "password_helper": "숫자와 기호를 포함해 8자 이상.",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "보호자 Riley",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "이름, 올바른 이메일, 8자 이상의 비밀번호를 입력하세요.",
+        "email_taken": "이미 등록된 이메일입니다. 대신 로그인해 보세요.",
+        "weak_password": "이 비밀번호는 보안 정책을 충족하지 않습니다. 숫자와 기호를 포함해 8자 이상을 사용하세요.",
+        "service_unavailable": "가입 서비스에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
+        "unsupported_role": "이 계정 유형은 여기에서 만들 수 없습니다.",
+        "signup_failed": "계정을 만들 수 없습니다. 다시 시도하세요."
       },
       "errors_inline": {
         "name": "2자 이상 입력해 주세요.",
@@ -1946,13 +1946,13 @@
       }
     },
     "sso_start": {
-      "eyebrow": "Single sign-on",
-      "title": "Continue with {idp}",
-      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
-      "continue": "Continue with {idp}",
-      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
-      "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider"
+      "eyebrow": "싱글 사인온",
+      "title": "{idp}로 계속",
+      "subtitle": "로그인을 완료할 수 있도록 조직의 ID 제공업체로 이동합니다.",
+      "continue": "계속",
+      "redirect_note": "리디렉션에 몇 초가 걸릴 수 있습니다.",
+      "back_to_login": "로그인으로 돌아가기",
+      "default_idp": "ID 제공업체"
     },
     "mfa_enroll": {
       "eyebrow": "Account security",

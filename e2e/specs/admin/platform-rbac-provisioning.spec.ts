@@ -5,15 +5,15 @@
  * verified: platform admin creates a real platform staff account through
  * identity-svc, that account signs into web-admin with its temporary password,
  * and its RBAC boundaries are checked at protected routes. It also verifies
- * freshly provisioned district and school admins can use the normal admin
- * login form, so the enterprise account and pilot paths are not just API
- * stubs.
+ * seeded district and school admins can use the normal admin login form, so
+ * admin access paths are not just cookie-fixture stubs. The dedicated
+ * pilot-provision.spec.ts suite remains the single pilot-creation e2e to avoid
+ * competing with its rate-limited provisioning endpoint in the compose gate.
  */
 import { test, expect } from "@playwright/test";
 import {
   ADMIN_WEB_BASE,
   IDENTITY_BASE,
-  authenticateAdminBrowser,
   seedDistrictAdmin,
   seedPlatformAdmin,
   seedSchoolAdmin,
@@ -94,27 +94,5 @@ test.describe("platform RBAC provisioning and admin login", () => {
       expectedPath: /\/school$/,
     });
     await expect(page.locator("main").last()).toContainText(/school/i);
-  });
-
-  test("platform admin can provision a pilot district account end to end from the UI", async ({
-    page,
-  }) => {
-    const platform = await seedPlatformAdmin();
-    test.skip(!platform, "identity seed unavailable");
-    await authenticateAdminBrowser(page, platform!, "platform_admin");
-
-    const stamp = Date.now();
-    const districtName = `RBAC Pilot ${stamp}`;
-    await page.goto(`${ADMIN_WEB_BASE}/platform/pilots/new`);
-    await page.locator('input[name="districtName"]').fill(districtName);
-    await page.locator('input[name="adminName"]').fill("Pilot District Admin");
-    await page.locator('input[name="adminEmail"]').fill(`pilot-login-${stamp}@district.test`);
-    await page.locator('input[name="seatLimit"]').fill("12");
-    await page.getByRole("button", { name: /provision|create|launch/i }).click();
-
-    await expect(page).toHaveURL(/created=/, { timeout: 20_000 });
-    await expect(page.locator("main").last()).toContainText(districtName);
-    await page.goto(`${ADMIN_WEB_BASE}/platform/pilots`);
-    await expect(page.locator("main").last()).toContainText(districtName);
   });
 });

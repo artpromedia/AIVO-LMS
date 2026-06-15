@@ -1797,7 +1797,7 @@
     "login": {
       "brand_heading": "登录以继续你的 AIVO 之旅。",
       "brand_body": "你的导师、任务和家庭洞察，全都集中在一处，并根据你的学习者的思维方式进行调整。",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 已验证",
       "quote": "AIVO 会适应我女儿真正的学习方式。这是第一个不会让我们觉得在与之对抗的平台。",
       "quote_attribution": "——一位三年级学生的家长",
       "welcome_back": "欢迎回来。",
@@ -1857,14 +1857,14 @@
       "email_label": "电子邮箱",
       "password_label": "密码",
       "password_helper": "至少 8 个字符，包含一个数字和一个符号。",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "Riley 家长",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "请输入你的姓名、有效电子邮件，以及至少 8 个字符的密码。",
+        "email_taken": "该电子邮件已注册。请改为尝试登录。",
+        "weak_password": "该密码不符合我们的安全政策。请使用至少 8 个字符，并包含一个数字和一个符号。",
+        "service_unavailable": "我们无法连接注册服务。请稍后再试。",
+        "unsupported_role": "此处无法创建这种账户类型。",
+        "signup_failed": "我们无法创建你的账户。请重试。"
       },
       "errors_inline": {
         "name": "请至少输入 2 个字符。",
@@ -1946,13 +1946,13 @@
       }
     },
     "sso_start": {
-      "eyebrow": "Single sign-on",
-      "title": "Continue with {idp}",
-      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
-      "continue": "Continue with {idp}",
-      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
-      "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider"
+      "eyebrow": "单点登录",
+      "title": "继续使用 {idp}",
+      "subtitle": "我们会将你转到所在组织的身份提供商以完成登录。",
+      "continue": "继续",
+      "redirect_note": "重定向可能需要几秒钟。",
+      "back_to_login": "返回登录",
+      "default_idp": "身份提供商"
     },
     "mfa_enroll": {
       "eyebrow": "Account security",
