@@ -11,6 +11,8 @@ from __future__ import annotations
 import pytest
 
 from ai_svc.services.scaffold_enforcer import (
+    FUNCTIONING_LEVELS,
+    RULES,
     build_pre_symbolic_observation_payload,
     enforce_batch,
     evaluate_item,
@@ -176,3 +178,106 @@ class TestEnforceBatch:
         allowed, rejected = enforce_batch(items, "BIZARRE")
         assert len(allowed) == 1
         assert len(rejected) == 0
+
+
+# ── choice-count invariant (Task #9 regression guard) ────────────────
+#
+# Answer choices are intentionally NOT sliced at render time (the client
+# question shape has no correct-answer field, so trimming could drop the
+# correct option). The only thing standing between the LLM and a baseline
+# that shows too many choices — or a multiple-choice item to a
+# PRE_SYMBOLIC learner — is this enforcement layer. These tests pin the
+# per-functioning-level cap so a future generator change can't silently
+# raise it (or remove the PRE_SYMBOLIC short-circuit) without a test
+# failing in CI.
+
+
+# The authoritative per-level cap. Mirrors BASELINE-SPEC.md's intent:
+# choices shrink as support increases, and PRE_SYMBOLIC has no MC at all.
+EXPECTED_MAX_CHOICES = {
+    "STANDARD": 10,
+    "SUPPORTED": 4,
+    "LOW_VERBAL": 3,
+    "NON_VERBAL": 2,
+    "PRE_SYMBOLIC": 0,
+}
+
+# Picture-glyph labels so the LOW_VERBAL / NON_VERBAL "requires emoji"
+# rule never interferes with a pure option-count assertion. Long enough
+# to build an over-cap item for every level.
+_GLYPHS = ["🍎", "🍌", "🥕", "🌿", "⭐", "🔵", "🟢", "🟣", "🔺", "🔶", "💛", "🧡", "💙", "💜"]
+
+
+def _item_with_n_options(n: int, *, qid: str) -> dict:
+    """A short-stemmed picture-choice item carrying exactly ``n`` options."""
+    opts = [{"value": f"o{i}", "label": _GLYPHS[i]} for i in range(n)]
+    return {
+        "id": qid,
+        "subject": "math",
+        "questionText": "?",
+        "options": opts,
+        "correctAnswer": opts[0]["value"] if opts else None,
+    }
+
+
+class TestChoiceCountInvariant:
+    def test_every_functioning_level_has_a_pinned_cap(self):
+        # If a new functioning level is added (or one is renamed/removed),
+        # this fails so the cap table here is kept in lockstep with the
+        # enforcer's RULES — no level may ship without an explicit cap.
+        assert set(RULES) == set(FUNCTIONING_LEVELS) == set(EXPECTED_MAX_CHOICES)
+
+    @pytest.mark.parametrize("level,cap", sorted(EXPECTED_MAX_CHOICES.items()))
+    def test_rule_cap_matches_spec(self, level, cap):
+        # Pin the actual enforced cap. A generator change that bumps
+        # max_options for any level fails here.
+        assert RULES[level].max_options == cap
+
+    @pytest.mark.parametrize(
+        "level", ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL"]
+    )
+    def test_allowed_items_never_exceed_cap(self, level):
+        cap = EXPECTED_MAX_CHOICES[level]
+        # Feed items with 1 .. cap+3 options; nothing that survives
+        # enforcement may carry more options than the cap.
+        items = [
+            _item_with_n_options(n, qid=f"{level}-{n}")
+            for n in range(1, cap + 4)
+        ]
+        allowed, rejected = enforce_batch(items, level)
+
+        assert allowed, "at least the at-cap items should survive"
+        for q in allowed:
+            assert len(q["options"]) <= cap, (
+                f"{level} leaked {len(q['options'])} options (cap {cap})"
+            )
+        # Conversely, every over-cap item must be rejected for that reason.
+        for q in rejected:
+            if len(q["options"]) > cap:
+                codes = [v["code"] for v in q["_scaffoldViolations"]]
+                assert "TOO_MANY_OPTIONS" in codes
+
+    def test_pre_symbolic_yields_no_multiple_choice(self):
+        # No matter how few options an MC item has, PRE_SYMBOLIC must
+        # reject every one — these learners only ever get the observation
+        # checklist, never a tap-to-choose question.
+        items = [
+            _item_with_n_options(1, qid="ps-1"),
+            _item_with_n_options(2, qid="ps-2"),
+            _mc("?", [("a", "🍎"), ("b", "🍌")], qid="ps-mc"),
+        ]
+        allowed, rejected = enforce_batch(items, "PRE_SYMBOLIC")
+        assert allowed == []
+        assert len(rejected) == len(items)
+        for q in rejected:
+            codes = [v["code"] for v in q["_scaffoldViolations"]]
+            assert "PRE_SYMBOLIC_REJECTS_MC" in codes
+
+    def test_pre_symbolic_observation_payload_is_not_scored_mc(self):
+        # The substitute payload is an observation checklist, never a
+        # scored multiple-choice baseline.
+        payload = build_pre_symbolic_observation_payload()
+        assert payload["source"] == "pre_symbolic_observation"
+        for q in payload["questions"]:
+            assert q["interactionType"] == "observation_checklist"
+            assert q["difficulty"] == "observation"
