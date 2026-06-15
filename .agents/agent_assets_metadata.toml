@@ -468,6 +468,18 @@ uri = "file://artifacts/mockup-sandbox/public/images/aivo-inclusive-warm/compani
 type = "image"
 title = "3D friendly companion figure"
 
+[[generated]]
+id = "8DLHr_yDCrzwWFPSBe5NK"
+uri = "file://apps/marketing/public/images/mascot/virtual-brain-robot.png"
+type = "image"
+title = "virtual brain robot mascot"
+
+[[generated]]
+id = "7evY3-uqQ3aw1Rb7-ye8m"
+uri = "file://apps/marketing/public/images/mascot/cloud-buddy.png"
+type = "image"
+title = "cloud buddy mascot"
+
 [[outputs]]
 id = "0e7lRmti5tdoSwrX0-ySG"
 uri = "file://.local/preview/marketing-hero.jpg"

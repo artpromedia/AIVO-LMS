@@ -1,59 +1,136 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, Building2, CheckCircle2, LineChart, ShieldCheck, Star } from "lucide-react";
+import {
+  Accessibility,
+  ArrowRight,
+  Brain,
+  Building2,
+  ClipboardCheck,
+  FileCheck2,
+  GraduationCap,
+  LayoutDashboard,
+  LineChart,
+  Lock,
+  MessagesSquare,
+  PlayCircle,
+  Presentation,
+  School,
+  ShieldCheck,
+  Target,
+  UserCheck,
+  Users,
+} from "lucide-react";
 import { StickyHeader } from "@/components/marketing/StickyHeader";
 import { Footer } from "@/components/marketing/Footer";
+import { HomeHeroDevice } from "@/components/marketing/home/HomeHeroDevice";
+import { LearnerFunctionShowcase } from "@/components/marketing/home/LearnerFunctionShowcase";
 import { WEB_APP_URL } from "@/lib/constants";
 import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
-import {
-  STATS,
-  RESEARCH_INSTITUTIONS,
-  TESTIMONIALS,
-  isSourced,
-  isConsented,
-} from "@/content/claims";
 
 /**
- * Home page — Inclusive Lab — Warm rollout.
+ * Home page — "A calmer, more personal way to learn" redesign.
  *
- * All copy is sourced from `marketing.home.*` translations and is
+ * All marketing copy is sourced from `marketing.home.*` translations and is
  * locale-aware via the aivo_locale cookie (see apps/marketing/src/i18n).
  *
- * The hero headline "Learning that adapts to your child." is split into
- * three keys (hero_headline_pre / hero_headline_emph / hero_headline_post)
- * so the gradient/underline can sit around the emphasized word. The
- * production smoke check in scripts/marketing-markers.sh asserts the
- * two halves on either side of the emphasized word; keep the English
- * values of hero_headline_pre ("Learning that") and hero_headline_post
- * ("to your child.") in sync with that script.
+ * The hero headline is split into hero_headline_pre / hero_headline_emph /
+ * hero_headline_post so the gradient can sit around the emphasized word. The
+ * production smoke check in scripts/marketing-markers.sh asserts the stable
+ * substrings "calmer, more personal way to" (hero) and "Everything needed to
+ * support" (features section); keep those English values in sync with it.
  */
 export default async function Home() {
   const sensoryMode = await getSensoryModeFromCookies();
   const t = await getTranslations("marketing.home");
 
-  // Filter content-module entries by their render guards.
-  // Stats and institutions require a non-empty `source`; testimonials require
-  // explicit `consent: true`.  All current seed entries are unsourced /
-  // unconsented, so these arrays are empty until the team documents citations
-  // or obtains consent.
-  const sourcedStats = STATS.filter(isSourced);
-  const sourcedInstitutions = RESEARCH_INSTITUTIONS.filter(isSourced);
-  const consentedTestimonials = TESTIMONIALS.filter(isConsented);
+  const signupHref = `${WEB_APP_URL}/signup?plan=free`;
 
-  const heroFeatures = [
+  const adultViews = [
     {
-      title: t("philosophy_feature_tutors_title"),
-      desc: t("philosophy_feature_tutors_desc"),
+      Icon: Users,
+      title: t("view_parents_title"),
+      desc: t("view_parents_desc"),
+      cta: t("view_parents_cta"),
+      href: "/for-parents",
     },
     {
-      title: t("philosophy_feature_levels_title"),
-      desc: t("philosophy_feature_levels_desc"),
+      Icon: GraduationCap,
+      title: t("view_teachers_title"),
+      desc: t("view_teachers_desc"),
+      cta: t("view_teachers_cta"),
+      href: "/for-teachers",
     },
     {
-      title: t("philosophy_feature_sensory_title"),
-      desc: t("philosophy_feature_sensory_desc"),
+      Icon: School,
+      title: t("view_schools_title"),
+      desc: t("view_schools_desc"),
+      cta: t("view_schools_cta"),
+      href: "/for-schools",
     },
+  ];
+
+  const steps = [1, 2, 3, 4].map((n) => ({
+    n,
+    title: t(`step_${n}_title`),
+    desc: t(`step_${n}_desc`),
+  }));
+
+  const featureIcons = [
+    Brain,
+    ClipboardCheck,
+    Target,
+    LayoutDashboard,
+    Presentation,
+    Building2,
+    LineChart,
+    MessagesSquare,
+  ];
+  const features = featureIcons.map((Icon, i) => ({
+    Icon,
+    title: t(`feat_${i + 1}_title`),
+    desc: t(`feat_${i + 1}_desc`),
+  }));
+
+  const showcasePanels = [1, 2, 3, 4].map((n) => ({
+    title: t(`panel_${n}_title`),
+    caption: t(`panel_${n}_caption`),
+  })) as [
+    { title: string; caption: string },
+    { title: string; caption: string },
+    { title: string; caption: string },
+    { title: string; caption: string },
+  ];
+
+  const testimonials = [1, 2, 3].map((n) => ({
+    quote: t(`testimonial_${n}_quote`),
+    author: t(`testimonial_${n}_author`),
+  }));
+
+  const trustItems = [
+    { Icon: UserCheck, n: 1, href: "/privacy-policy" },
+    { Icon: ShieldCheck, n: 2, href: "/coppa-compliance" },
+    { Icon: FileCheck2, n: 3, href: "/ferpa-compliance" },
+    { Icon: Lock, n: 4, href: "/security" },
+    { Icon: Accessibility, n: 5, href: "/accessibility" },
+  ].map(({ Icon, n, href }) => ({
+    Icon,
+    href,
+    title: t(`trust_${n}_title`),
+    desc: t(`trust_${n}_desc`),
+    cta: t(`trust_${n}_cta`),
+  }));
+
+  const faqs = [1, 2, 3, 4, 5, 6].map((n) => ({
+    q: t(`faq_${n}_q`),
+    a: t(`faq_${n}_a`),
+  }));
+
+  const trustBadges = [
+    { Icon: ShieldCheck, label: "COPPA-Aware" },
+    { Icon: FileCheck2, label: "FERPA-Aware" },
+    { Icon: Lock, label: "SOC 2 Aligned" },
+    { Icon: Accessibility, label: "WCAG 2.2 AA" },
   ];
 
   return (
@@ -62,358 +139,318 @@ export default async function Home() {
 
       <main>
         {/* Hero */}
-        <section className="pt-20 pb-24 md:pt-24 md:pb-32 overflow-hidden relative">
+        <section className="relative overflow-hidden bg-gradient-to-b from-[var(--aivo-aivoPurple-100)]/40 via-white to-white pt-16 pb-28 md:pt-24">
           <div
-            className="absolute top-0 right-0 -translate-y-16 translate-x-1/4 w-[640px] h-[640px] rounded-full blur-3xl -z-10"
-            style={{ backgroundColor: "rgba(124, 58, 237, 0.10)" }}
+            className="absolute right-0 top-0 -z-10 h-[640px] w-[640px] -translate-y-24 translate-x-1/3 rounded-full bg-purple-200/30 blur-3xl"
             aria-hidden="true"
           />
-          <div
-            className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-[520px] h-[520px] rounded-full blur-3xl -z-10"
-            style={{ backgroundColor: "rgba(59, 130, 246, 0.06)" }}
-            aria-hidden="true"
-          />
-
-          <div className="max-w-6xl mx-auto px-6 md:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div className="max-w-2xl relative z-10">
-              <span className="inline-flex items-center gap-2 mb-7 py-1.5 px-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-semibold text-xs tracking-wide uppercase">
-                <ShieldCheck
-                  className="w-3.5 h-3.5 text-[var(--aivo-sensory-primary)]"
-                  aria-hidden="true"
-                />
-                {t("hero_badge")}
+          <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 md:px-8 lg:grid-cols-2">
+            <div className="max-w-xl">
+              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-purple-100 bg-white px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--aivo-sensory-primary)]">
+                <Brain className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("hero_eyebrow")}
               </span>
-              <h1 className="font-heading text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-7 text-slate-900">
+              <h1 className="font-heading text-4xl font-bold leading-[1.08] tracking-tight text-slate-900 md:text-6xl">
                 {t("hero_headline_pre")}{" "}
-                <span className="relative inline-block">
-                  <span
-                    className="relative z-10 bg-clip-text text-transparent"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(135deg, var(--aivo-calmSky-500) 0%, var(--aivo-aivoPurple-400) 100%)",
-                    }}
-                  >
-                    {t("hero_headline_emph")}
-                  </span>
-                </span>{" "}
+                <span
+                  className="bg-clip-text text-transparent"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(135deg, var(--aivo-aivoPurple-400) 0%, var(--aivo-aivoPurple-600) 100%)",
+                  }}
+                >
+                  {t("hero_headline_emph")}
+                </span>
                 {t("hero_headline_post")}
               </h1>
-              <p className="text-lg md:text-xl text-slate-600 mb-9 leading-relaxed font-medium">
+              <p className="mt-6 text-lg font-medium leading-relaxed text-slate-600 md:text-xl">
                 {t("hero_body")}
               </p>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href={`${WEB_APP_URL}/signup?plan=family`}
-                  className="inline-flex items-center justify-center h-12 px-6 text-[15px] rounded-xl bg-[var(--aivo-sensory-primary)] hover:brightness-110 text-white font-semibold shadow-[0_6px_20px_-6px_rgba(124,58,237,0.45)] transition min-h-[44px]"
+                  href={signupHref}
+                  className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--aivo-sensory-primary)] px-6 text-[15px] font-semibold text-white shadow-[0_10px_30px_-8px_rgba(124,58,237,0.55)] transition hover:brightness-110"
                 >
                   {t("hero_cta_primary")}
-                  <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                 </a>
                 <Link
-                  href="/for-districts"
-                  className="inline-flex items-center justify-center h-12 px-6 text-[15px] rounded-xl bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-900 font-semibold transition min-h-[44px]"
+                  href="/demo"
+                  className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-6 text-[15px] font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
                 >
-                  <Building2 className="w-4 h-4 mr-2" aria-hidden="true" />
+                  <PlayCircle className="mr-2 h-4 w-4" aria-hidden="true" />
                   {t("hero_cta_secondary")}
                 </Link>
               </div>
-              <div className="mt-9 flex items-center gap-4 text-sm font-medium text-slate-600">
-                <p>{t("hero_trusted")}</p>
-              </div>
+              <p className="mt-7 text-sm font-medium text-slate-500">{t("hero_trust_line")}</p>
             </div>
 
-            <div className="relative">
-              <div
-                className="absolute inset-0 rounded-[2rem] scale-[1.02] -z-10 bg-gradient-to-br from-indigo-100/50 via-white to-sky-100/40"
-                aria-hidden="true"
-              />
-              <Image
-                src="/images/hero/girl-laptop.png"
-                alt={t("hero_image_alt")}
-                width={720}
-                height={720}
-                priority
-                className="rounded-[2rem] shadow-[0_30px_60px_-30px_rgba(15,23,42,0.30)] w-full object-cover border border-slate-200/60 aspect-square"
-              />
-
-              {/* Floating stat card — only shows a numeric value when the stat
-                  has a documented source in the content module. Falls back to
-                  a qualitative statement when no citation is on file. */}
-              <div className="absolute -bottom-5 -left-4 md:-bottom-7 md:-left-7 w-64 md:w-72 rounded-2xl bg-white shadow-[0_20px_45px_-20px_rgba(15,23,42,0.25)] border border-slate-200/80 p-5 flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
-                  <LineChart className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
-                    {t("stat_focus_label")}
-                  </p>
-                  {sourcedStats.length > 0 ? (
-                    <p
-                      className="text-2xl md:text-3xl font-bold tracking-tight text-indigo-600 tabular-nums"
-                      data-stat-value=""
-                      data-citation={sourcedStats[0]!.source}
-                    >
-                      {sourcedStats[0]!.value}
-                    </p>
-                  ) : (
-                    <p className="text-sm font-semibold text-indigo-700 leading-snug">
-                      {t("stat_focus_qualitative")}
-                    </p>
-                  )}
-                  <p className="text-xs font-medium text-slate-500 mt-1">
-                    {t("stat_focus_caption")}
-                  </p>
-                </div>
-              </div>
+            <div className="lg:pl-6">
+              <HomeHeroDevice />
             </div>
           </div>
         </section>
 
-        {/* Research banner — institution names only render when each has a
-            documented source URL in the content module (content/claims.ts).
-            All current entries are unseeded pending citation documentation. */}
-        <section className="py-14 border-y border-slate-200/70" aria-labelledby="research-heading">
-          <div className="max-w-6xl mx-auto px-6 md:px-8">
+        {/* Trust badge strip */}
+        <section aria-label="Privacy and accessibility commitments" className="border-y border-slate-100 bg-white py-8">
+          <div className="mx-auto max-w-6xl px-6 md:px-8">
+            <ul className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              {trustBadges.map(({ Icon, label }) => (
+                <li
+                  key={label}
+                  className="flex items-center justify-center gap-2.5 rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3"
+                >
+                  <Icon className="h-5 w-5 text-[var(--aivo-sensory-primary)]" aria-hidden="true" />
+                  <span className="text-sm font-bold text-slate-800">{label}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 text-center text-sm font-medium text-slate-500">
+              {t("trust_strip_caption")}
+            </p>
+          </div>
+        </section>
+
+        {/* Three adult views */}
+        <section className="py-20 md:py-28" aria-labelledby="views-heading">
+          <div className="mx-auto max-w-6xl px-6 md:px-8">
             <h2
-              id="research-heading"
-              className="text-center text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase mb-8"
+              id="views-heading"
+              className="mx-auto max-w-3xl text-center font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
             >
-              {t("research_heading")}
+              {t("views_heading")}
             </h2>
-            {sourcedInstitutions.length > 0 ? (
-              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 md:gap-x-20 text-slate-700/70">
-                {sourcedInstitutions.map((inst) => (
-                  <a
-                    key={inst.name}
-                    href={inst.source}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-heading text-base md:text-lg font-semibold tracking-tight hover:text-slate-900 transition-colors underline-offset-2 hover:underline"
+            <div className="mt-14 grid gap-6 md:grid-cols-3">
+              {adultViews.map(({ Icon, title, desc, cta, href }) => (
+                <article
+                  key={title}
+                  className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 shadow-[0_18px_50px_-32px_rgba(15,23,42,0.3)]"
+                >
+                  <span className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
+                    <Icon className="h-6 w-6" aria-hidden="true" />
+                  </span>
+                  <h3 className="font-heading text-xl font-bold text-slate-900">{title}</h3>
+                  <p className="mt-3 flex-1 font-medium leading-relaxed text-slate-600">{desc}</p>
+                  <Link
+                    href={href}
+                    className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:gap-2.5 transition-all"
                   >
-                    {inst.sourceLabel ?? inst.name}
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-sm font-medium text-slate-500 max-w-2xl mx-auto leading-relaxed">
-                {t("research_methodology_body")}
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* Philosophy */}
-        <section className="py-24 md:py-32" id="features" aria-labelledby="philosophy-heading">
-          <div className="max-w-6xl mx-auto px-6 md:px-8 grid md:grid-cols-2 gap-16 md:gap-20 items-center">
-            <div className="relative order-2 md:order-1">
-              <div
-                className="absolute inset-0 rounded-[2rem] scale-[1.02] -z-10 bg-gradient-to-br from-sky-100/40 via-white to-indigo-100/40"
-                aria-hidden="true"
-              />
-              <Image
-                src="/images/hero/boy-tablet.png"
-                alt={t("philosophy_image_alt")}
-                width={640}
-                height={640}
-                className="rounded-[2rem] shadow-[0_30px_60px_-30px_rgba(15,23,42,0.25)] w-full object-cover border border-slate-200/60 aspect-square"
-              />
-            </div>
-            <div className="order-1 md:order-2">
-              <h2
-                id="philosophy-heading"
-                className="font-heading text-3xl md:text-5xl font-bold mb-8 leading-tight text-slate-900"
-              >
-                {t("philosophy_heading_line1")}
-                <br />
-                <span className="text-slate-500">{t("philosophy_heading_line2")}</span>
-              </h2>
-              <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed font-medium">
-                {t("philosophy_body")}
-              </p>
-
-              <ul className="space-y-6">
-                {heroFeatures.map((feature) => (
-                  <li key={feature.title} className="flex gap-4">
-                    <div className="mt-0.5 bg-indigo-50 p-2.5 rounded-xl h-fit shrink-0">
-                      <CheckCircle2 className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <h3 className="font-heading font-bold text-lg mb-1 text-slate-900">
-                        {feature.title}
-                      </h3>
-                      <p className="text-slate-600 font-medium">{feature.desc}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                    {cta}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </article>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Testimonials / Value props
-            When consented testimonials exist in the content module they are
-            rendered here.  Until the team has documented consent, a set of
-            research-backed value propositions is shown instead so no
-            placeholder user identities appear on the page. */}
+        {/* How AIVO adapts support — 4 steps */}
         <section
-          className="py-24 md:py-32 bg-slate-50/60 border-y border-slate-200/70"
-          aria-labelledby="social-proof-heading"
+          className="bg-[var(--aivo-cloud-50)] py-20 md:py-28"
+          aria-labelledby="steps-heading"
         >
-          <div className="max-w-6xl mx-auto px-6 md:px-8">
-            {consentedTestimonials.length > 0 ? (
-              <>
-                <div className="flex flex-col items-center text-center mb-14 md:mb-16">
-                  <span className="mb-5 py-1 px-3 rounded-full bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wide uppercase">
-                    {t("testimonials_badge")}
+          <div className="mx-auto max-w-6xl px-6 md:px-8">
+            <h2
+              id="steps-heading"
+              className="mx-auto max-w-3xl text-center font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+            >
+              {t("steps_heading")}
+            </h2>
+            <ol className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {steps.map(({ n, title, desc }) => (
+                <li
+                  key={n}
+                  className="relative rounded-3xl border border-slate-200/70 bg-white p-7"
+                >
+                  <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--aivo-sensory-primary)] font-heading text-lg font-bold text-white">
+                    {n}
                   </span>
-                  <h2
-                    id="social-proof-heading"
-                    className="font-heading text-3xl md:text-5xl font-bold text-slate-900 tracking-tight"
-                  >
-                    {t("testimonials_heading")}
-                  </h2>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
-                  {consentedTestimonials.map((testimonial) => (
-                    <article
-                      key={testimonial.id}
-                      className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8 md:p-10"
-                    >
-                      <div
-                        className="flex gap-1 mb-6"
-                        role="img"
-                        aria-label={t("testimonials_star_alt")}
-                      >
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className="w-4 h-4 fill-amber-400 text-amber-400"
-                            aria-hidden="true"
-                          />
-                        ))}
-                      </div>
-                      <p className="text-base md:text-lg mb-8 leading-relaxed font-medium text-slate-700">
-                        &ldquo;{testimonial.quote}&rdquo;
-                      </p>
-                      <div className="flex items-center gap-3">
-                        {testimonial.photo ? (
-                          <Image
-                            src={testimonial.photo}
-                            alt={testimonial.name}
-                            width={44}
-                            height={44}
-                            className="w-11 h-11 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div
-                            className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center"
-                            aria-hidden="true"
-                          >
-                            <ShieldCheck className="w-5 h-5 text-slate-400" />
-                          </div>
-                        )}
-                        <div>
-                          <p className="font-bold text-slate-900">{testimonial.name}</p>
-                          <p className="text-sm font-medium text-slate-500">{testimonial.role}</p>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </>
-            ) : (
-              /* No consented testimonials yet — show research-backed value
-                 propositions that describe the product honestly without
-                 implying real users. */
-              <>
-                <div className="flex flex-col items-center text-center mb-14 md:mb-16">
-                  <span className="mb-5 py-1 px-3 rounded-full bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wide uppercase">
-                    {t("value_props_badge")}
-                  </span>
-                  <h2
-                    id="social-proof-heading"
-                    className="font-heading text-3xl md:text-5xl font-bold text-slate-900 tracking-tight"
-                  >
-                    {t("value_props_heading")}
-                  </h2>
-                  <p className="mt-4 text-lg text-slate-600 max-w-2xl font-medium">
-                    {t("value_props_subheading")}
-                  </p>
-                </div>
-                <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
-                  {(
-                    [
-                      { title: t("value_prop_1_title"), desc: t("value_prop_1_desc") },
-                      { title: t("value_prop_2_title"), desc: t("value_prop_2_desc") },
-                      { title: t("value_prop_3_title"), desc: t("value_prop_3_desc") },
-                    ] as { title: string; desc: string }[]
-                  ).map((prop) => (
-                    <div
-                      key={prop.title}
-                      className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8"
-                    >
-                      <div className="mb-4 w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                        <CheckCircle2 className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-                      </div>
-                      <h3 className="font-heading font-bold text-lg mb-2 text-slate-900">
-                        {prop.title}
-                      </h3>
-                      <p className="text-slate-600 font-medium text-sm leading-relaxed">
-                        {prop.desc}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+                  <h3 className="font-heading text-lg font-bold text-slate-900">{title}</h3>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{desc}</p>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-24 md:py-32" aria-labelledby="cta-heading">
-          <div className="max-w-6xl mx-auto px-6 md:px-8">
-            <div className="text-white shadow-[0_30px_80px_-30px_rgba(76,29,149,0.45)] rounded-3xl md:rounded-[2rem] overflow-hidden border-0 relative bg-gradient-to-br from-[var(--aivo-sensory-primary)] to-indigo-800">
-              <div
-                className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.10)" }}
-                aria-hidden="true"
-              />
-              <div className="relative z-10 grid md:grid-cols-2">
-                <div className="p-10 md:p-16 lg:p-20 flex flex-col justify-center">
-                  <h2
-                    id="cta-heading"
-                    className="font-heading text-3xl md:text-5xl font-bold mb-6 leading-tight tracking-tight"
-                  >
-                    {t("cta_heading")}
-                  </h2>
-                  <p className="text-white/85 mb-9 text-base md:text-lg font-medium leading-relaxed">
-                    {t("cta_body")}
+        {/* Features — 8 cards */}
+        <section className="py-20 md:py-28" aria-labelledby="features-heading">
+          <div className="mx-auto max-w-6xl px-6 md:px-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <h2
+                id="features-heading"
+                className="font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+              >
+                {t("features_heading")}
+              </h2>
+              <p className="mt-4 text-lg font-medium text-slate-600">{t("features_subheading")}</p>
+            </div>
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {features.map(({ Icon, title, desc }) => (
+                <article
+                  key={title}
+                  className="rounded-3xl border border-slate-200/70 bg-white p-6 transition hover:border-purple-200 hover:shadow-[0_18px_50px_-32px_rgba(124,58,237,0.4)]"
+                >
+                  <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <h3 className="font-heading text-base font-bold text-slate-900">{title}</h3>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{desc}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Built around how each learner functions */}
+        <section
+          className="bg-[var(--aivo-cloud-50)] py-20 md:py-28"
+          aria-labelledby="functions-heading"
+        >
+          <div className="mx-auto max-w-6xl px-6 md:px-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <h2
+                id="functions-heading"
+                className="font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+              >
+                {t("functions_heading")}
+              </h2>
+              <p className="mt-4 text-lg font-medium text-slate-600">{t("functions_subheading")}</p>
+            </div>
+            <div className="mt-14">
+              <LearnerFunctionShowcase panels={showcasePanels} />
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="py-20 md:py-28" aria-labelledby="testimonials-heading">
+          <div className="mx-auto max-w-6xl px-6 md:px-8">
+            <h2
+              id="testimonials-heading"
+              className="mx-auto max-w-3xl text-center font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+            >
+              {t("testimonials_heading")}
+            </h2>
+            <div className="mt-14 grid gap-6 md:grid-cols-3">
+              {testimonials.map(({ quote, author }) => (
+                <figure
+                  key={author}
+                  className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 shadow-[0_18px_50px_-32px_rgba(15,23,42,0.25)]"
+                >
+                  <blockquote className="flex-1 text-base font-medium leading-relaxed text-slate-700">
+                    &ldquo;{quote}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-6 flex items-center gap-3">
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-50 text-[var(--aivo-sensory-primary)]">
+                      <UserCheck className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <span className="text-sm font-semibold text-slate-600">{author}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Trust details */}
+        <section
+          className="bg-[var(--aivo-cloud-50)] py-20 md:py-28"
+          aria-labelledby="trust-heading"
+        >
+          <div className="mx-auto max-w-6xl px-6 md:px-8">
+            <h2
+              id="trust-heading"
+              className="mx-auto max-w-3xl text-center font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+            >
+              {t("trust_heading")}
+            </h2>
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+              {trustItems.map(({ Icon, title, desc, cta, href }) => (
+                <article
+                  key={title}
+                  className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-6"
+                >
+                  <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <h3 className="font-heading text-base font-bold text-slate-900">{title}</h3>
+                  <p className="mt-2 flex-1 text-sm font-medium leading-relaxed text-slate-600">
+                    {desc}
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <a
-                      href={`${WEB_APP_URL}/signup?plan=family`}
-                      className="inline-flex items-center justify-center h-12 bg-white text-[var(--aivo-sensory-primary)] hover:bg-slate-50 rounded-xl text-[15px] font-bold px-6 min-h-[44px] transition"
-                    >
-                      {t("cta_primary")}
-                    </a>
-                    <Link
-                      href="/for-districts"
-                      className="inline-flex items-center justify-center h-12 text-white border border-white/30 hover:bg-white/10 rounded-xl text-[15px] font-semibold px-6 min-h-[44px] transition"
-                    >
-                      {t("cta_secondary")}
-                    </Link>
-                  </div>
+                  <Link
+                    href={href}
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:gap-2.5 transition-all"
+                  >
+                    {cta}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="py-20 md:py-28" aria-labelledby="faq-heading">
+          <div className="mx-auto max-w-6xl px-6 md:px-8">
+            <h2
+              id="faq-heading"
+              className="mx-auto max-w-3xl text-center font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+            >
+              {t("faq_heading")}
+            </h2>
+            <div className="mx-auto mt-14 grid max-w-5xl gap-6 md:grid-cols-2">
+              {faqs.map(({ q, a }) => (
+                <div key={q} className="rounded-3xl border border-slate-200/70 bg-white p-6">
+                  <h3 className="font-heading text-base font-bold text-slate-900">{q}</h3>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{a}</p>
                 </div>
-                <div className="hidden md:flex items-center justify-center p-12 lg:p-16 relative">
-                  <Image
-                    src="/images/hero/mother-son-sofa.webp"
-                    alt={t("cta_image_alt")}
-                    width={560}
-                    height={560}
-                    className="w-full max-w-md object-cover rounded-2xl shadow-[0_30px_60px_-20px_rgba(0,0,0,0.4)] aspect-square"
-                  />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="px-6 pb-24 md:px-8" aria-labelledby="cta-heading">
+          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-[var(--aivo-sensory-primary)] to-indigo-800 px-8 py-16 text-white shadow-[0_40px_90px_-40px_rgba(76,29,149,0.6)] md:px-16 md:py-20">
+            <div
+              className="absolute right-0 top-0 h-[480px] w-[480px] -translate-y-1/3 translate-x-1/4 rounded-full bg-white/10 blur-3xl"
+              aria-hidden="true"
+            />
+            <div className="relative z-10 flex flex-col items-center gap-10 text-center md:flex-row md:justify-between md:text-left">
+              <div className="max-w-xl">
+                <h2
+                  id="cta-heading"
+                  className="font-heading text-3xl font-bold leading-tight tracking-tight md:text-5xl"
+                >
+                  {t("cta_heading")}
+                </h2>
+                <p className="mt-5 text-base font-medium leading-relaxed text-white/85 md:text-lg">
+                  {t("cta_body")}
+                </p>
+                <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row md:justify-start">
+                  <a
+                    href={signupHref}
+                    className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-white px-6 text-[15px] font-bold text-[var(--aivo-sensory-primary)] transition hover:bg-slate-50"
+                  >
+                    {t("cta_primary")}
+                  </a>
+                  <Link
+                    href="/demo"
+                    className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/30 px-6 text-[15px] font-semibold text-white transition hover:bg-white/10"
+                  >
+                    {t("cta_secondary")}
+                  </Link>
                 </div>
               </div>
+              <Image
+                src="/images/mascot/virtual-brain-robot.png"
+                alt=""
+                width={220}
+                height={220}
+                className="h-40 w-40 shrink-0 drop-shadow-[0_25px_40px_rgba(0,0,0,0.35)] md:h-52 md:w-52"
+              />
             </div>
           </div>
         </section>

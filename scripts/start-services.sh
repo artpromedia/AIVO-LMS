@@ -41,7 +41,7 @@ sleep "$GROUP_PAUSE"
 
 # ── Group 2: data services ────────────────────────────────────────────────
 echo "Group 2: assessment-svc, learning-svc"
-( cd /home/runner/workspace/services/assessment-svc && ASSESSMENT_PORT=3003 NODE_ENV=development $TSX_BIN src/index.ts > /tmp/svc-logs/assessment-svc.log 2>&1 ) &
+( cd /home/runner/workspace/services/assessment-svc && ASSESSMENT_PORT=3012 NODE_ENV=development $TSX_BIN src/index.ts > /tmp/svc-logs/assessment-svc.log 2>&1 ) &
 ( cd /home/runner/workspace/services/learning-svc && LEARNING_PORT=3005 NODE_ENV=development $TSX_BIN src/index.ts ) &
 sleep "$GROUP_PAUSE"
 

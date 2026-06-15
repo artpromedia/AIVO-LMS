@@ -24,7 +24,7 @@ import { registerSensoryProfileRoutes } from "./routes/sensory-profile.js";
 import { registerAccessibilityPreferencesRoutes } from "./routes/accessibility-preferences.js";
 
 const logger = createLogger("assessment-svc");
-const PORT = parseInt(process.env.ASSESSMENT_PORT || "3003", 10);
+const PORT = parseInt(process.env.ASSESSMENT_PORT || "3012", 10);
 
 export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
   const app = Fastify({ logger: false });

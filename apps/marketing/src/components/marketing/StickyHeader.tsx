@@ -37,10 +37,12 @@ export function StickyHeader({
   const isScrolled = scrollY > 20;
 
   const NAV_LINKS = [
-    { label: "Platform", href: "/#features" },
-    { label: "Research", href: "/trust" },
-    { label: "For Districts", href: "/for-districts" },
-    { label: "Families", href: "/for-parents" },
+    { label: "For Parents", href: "/for-parents" },
+    { label: "For Teachers", href: "/for-teachers" },
+    { label: "For Schools", href: "/for-schools" },
+    { label: "Features", href: "/#features-heading" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "Resources", href: "/resources" },
   ];
 
   return (

@@ -13,7 +13,7 @@
 set -euo pipefail
 
 AI_SVC_URL="${AI_SVC_URL:-http://localhost:3004}"
-ASSESSMENT_SVC_URL="${ASSESSMENT_SVC_URL:-http://localhost:3003}"
+ASSESSMENT_SVC_URL="${ASSESSMENT_SVC_URL:-http://localhost:3012}"
 INTERNAL_AI_TOKEN="${INTERNAL_AI_TOKEN:-iep-local-internal-ai-token}"
 IEP_DRAFT_PATH="${IEP_DRAFT_PATH:-/api/ai/iep/draft}"
 

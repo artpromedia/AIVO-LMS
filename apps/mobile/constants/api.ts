@@ -16,7 +16,7 @@ const DEV_HOST = Platform.select({
 const DEV_PORTS = {
   IDENTITY: 3001,
   BRAIN: 3002,
-  ASSESSMENT: 3003,
+  ASSESSMENT: 3012,
   AI: 3004,
   LEARNING: 3005,
   TUTOR: 3006,

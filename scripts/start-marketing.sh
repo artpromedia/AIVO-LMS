@@ -24,7 +24,27 @@ set -e
 # Inclusive-Lab Warm tokens never load.
 (cd "$(dirname "$0")/../packages/brand" && node ./scripts/build-tokens.mjs)
 
-cd "$(dirname "$0")/../apps/marketing"
+# Free port 3003 before we bind it. Replit's workflow supervisor signals the
+# workflow's main process, but Next.js in Turbopack mode forks a separate
+# `next-server` child (cwd = apps/marketing) that can outlive the parent and
+# keep port 3003 bound — making the next restart die with
+# `EADDRINUSE: address already in use 0.0.0.0:3003`. Neither `fuser` nor `ss`
+# is available in this image, so we find strays by matching their working
+# directory via /proc and kill them. Scoped to apps/marketing so the Web App's
+# own next-server (cwd = apps/web-v2) is never touched.
+MARKETING_DIR="$(cd "$(dirname "$0")/../apps/marketing" && pwd)"
+for pid_dir in /proc/[0-9]*; do
+  pid="${pid_dir#/proc/}"
+  [ "$pid" = "$$" ] && continue
+  [ "$(readlink "$pid_dir/cwd" 2>/dev/null || true)" = "$MARKETING_DIR" ] || continue
+  cmd="$(tr '\0' ' ' < "$pid_dir/cmdline" 2>/dev/null || true)"
+  case "$cmd" in
+    *next*) echo "[start-marketing] Killing stray marketing process $pid ($cmd)"; kill "$pid" 2>/dev/null || true ;;
+  esac
+done
+sleep 1
+
+cd "$MARKETING_DIR"
 
 (
   for i in $(seq 1 60); do
