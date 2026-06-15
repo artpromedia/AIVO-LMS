@@ -1,21 +1,31 @@
 // @vitest-environment jsdom
 
 /**
- * Unmount/cleanup coverage for the baseline listen control.
+ * Tests for the baseline read-aloud island (`BaselineListenAudio`).
  *
- * The visible playback state machine, rate clamping, voice mapping and button
- * rendering are exercised elsewhere; this file pins the behaviour a future
- * refactor of the mount effect could silently break: the component must never
- * let speech trail past the screen that started it.
+ * Three concerns are covered:
  *
- *   1. When playback is in flight and the component unmounts, the in-flight
- *      browser speech is cancelled (`window.speechSynthesis.cancel()`).
- *   2. When `autoStart` is set and the component unmounts before the deferred
- *      auto-start timer fires, no speech is ever issued — the timer is cleared.
+ *   1. Audio cleanup on leaving a question — in-flight browser speech is
+ *      cancelled on unmount, and the deferred auto-start timer is cleared so
+ *      speech never trails past the screen that started it.
+ *   2. Visible playback controls — Replay / Pause / Resume appear only while
+ *      audio is active and drive the underlying playback path.
+ *   3. Captions — the visible caption line tracks the `<audio>` playback
+ *      position (and holds the final line past the last boundary), the full
+ *      transcript stays visible while idle ONLY when the learner's
+ *      `captionsAlways` preference is on, and the browser-voice fallback shows
+ *      no captions because that path has no caption timings.
  *
- * Browser speech is the deterministic path to assert against here: jsdom ships
- * no `speechSynthesis`, so we install a fully-spied stub and force the server
- * TTS fetch to reject, which routes playback through the browser fallback.
+ * The pill itself is owned by @aivo/ui and stubbed to a plain button so these
+ * tests target BaselineListenAudio's effects, not the design-system component.
+ * jsdom ships no Web Speech API, so a fully-spied `speechSynthesis` +
+ * `SpeechSynthesisUtterance` are installed; `<audio>` is a fake so the caption
+ * suite can drive `currentTime` and fire the handlers directly. The server clip
+ * is mocked at the `fetch` boundary using the real `/api/bff/learners/:id/tts`
+ * response shape; caption objects mirror `fakeCaptions` from
+ * `lib/tts/provider.ts`. By default `fetch` rejects (routing playback through
+ * the deterministic browser fallback the cleanup/controls suites assert
+ * against); the caption suite overrides `fetch` per-test with a success.
  */
 import * as React from "react";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
@@ -46,6 +56,62 @@ vi.mock("@aivo/ui", () => ({
 }));
 
 import { BaselineListenAudio } from "./listen-audio";
+
+type Caption = { startMs: number; endMs: number; text: string };
+
+const CAPTIONS: Caption[] = [
+  { startMs: 0, endMs: 1000, text: "First line." },
+  { startMs: 1000, endMs: 2000, text: "Second line." },
+];
+const TRANSCRIPT = "First line. Second line.";
+
+/**
+ * Minimal `<audio>` stand-in. Records the handlers the component assigns so the
+ * test can fire `timeupdate`/`ended` after setting `currentTime`, and resolves
+ * `play()` like a successful clip.
+ */
+class FakeAudio {
+  static instances: FakeAudio[] = [];
+  currentTime = 0;
+  playbackRate = 1;
+  src = "";
+  onended: (() => void) | null = null;
+  ontimeupdate: (() => void) | null = null;
+  onerror: (() => void) | null = null;
+  play = vi.fn(() => Promise.resolve());
+  pause = vi.fn();
+  constructor() {
+    FakeAudio.instances.push(this);
+  }
+}
+
+/** A successful server TTS response carrying the canned captions. */
+function ttsOkResponse(captions: Caption[] = CAPTIONS) {
+  return {
+    ok: true,
+    json: async () => ({
+      ok: true,
+      data: { asset: { storageKey: "data:audio/mpeg;base64,AAAA", captions } },
+    }),
+  };
+}
+
+function getAudio(): FakeAudio {
+  const a = FakeAudio.instances.at(-1);
+  if (!a) throw new Error("no <audio> instance was created");
+  return a;
+}
+
+function caption(): HTMLElement | null {
+  return screen.queryByTestId("baseline-listen-caption");
+}
+
+/** Click the read-aloud pill and flush the async server generation. */
+async function startReadAloud() {
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("Read this aloud"));
+  });
+}
 
 /** A fully-spied stand-in for the platform `speechSynthesis` jsdom lacks. */
 function installSpeechSynthesis() {
@@ -90,8 +156,11 @@ let fetchMock: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   synth = installSpeechSynthesis();
-  // Force the server TTS path to fail so playback falls back to browser speech,
-  // the deterministic path this test asserts against.
+  FakeAudio.instances = [];
+  vi.stubGlobal("Audio", FakeAudio as unknown as typeof Audio);
+  // Default: force the server TTS path to fail so playback falls back to
+  // browser speech, the deterministic path the cleanup/controls suites assert
+  // against. The caption suite overrides fetch per-test with a success.
   fetchMock = vi.fn().mockRejectedValue(new Error("tts_unavailable"));
   vi.stubGlobal("fetch", fetchMock);
 });
@@ -226,5 +295,90 @@ describe("BaselineListenAudio — visible playback controls (idle → playing �
     expect(synth.speak).toHaveBeenCalledTimes(2);
     // Still active afterwards, so the controls remain available.
     expect(screen.getByRole("button", { name: "Pause reading" })).toBeTruthy();
+  });
+});
+
+describe("BaselineListenAudio captions", () => {
+  it("advances the visible caption line as audio playback position moves", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => ttsOkResponse()));
+    render(<BaselineListenAudio learnerId="lrn_1" text={TRANSCRIPT} />);
+
+    await startReadAloud();
+    const audio = getAudio();
+
+    // 0.5s in → first line is active.
+    act(() => {
+      audio.currentTime = 0.5;
+      audio.ontimeupdate?.();
+    });
+    expect(caption()?.textContent).toBe("First line.");
+
+    // 1.5s in → second line is active.
+    act(() => {
+      audio.currentTime = 1.5;
+      audio.ontimeupdate?.();
+    });
+    expect(caption()?.textContent).toBe("Second line.");
+
+    // Past the last boundary → hold on the final line (not blank).
+    act(() => {
+      audio.currentTime = 2.5;
+      audio.ontimeupdate?.();
+    });
+    expect(caption()?.textContent).toBe("Second line.");
+  });
+
+  it("keeps the full transcript visible while idle only when captionsAlways is on", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => ttsOkResponse()));
+    const { rerender } = render(
+      <BaselineListenAudio learnerId="lrn_1" text={TRANSCRIPT} captionsAlways />,
+    );
+
+    await startReadAloud();
+    // While the clip plays we show the synced line, not the whole transcript.
+    act(() => {
+      getAudio().currentTime = 0.5;
+      getAudio().ontimeupdate?.();
+    });
+    expect(caption()?.textContent).toBe("First line.");
+
+    // Playback ends → idle. With captionsAlways on, the full transcript stays.
+    act(() => {
+      getAudio().onended?.();
+    });
+    expect(caption()?.textContent).toBe(TRANSCRIPT);
+
+    // Same idle state with captionsAlways off → no caption at all.
+    rerender(
+      <BaselineListenAudio learnerId="lrn_1" text={TRANSCRIPT} captionsAlways={false} />,
+    );
+    expect(caption()).toBeNull();
+  });
+
+  it("does not show the transcript while idle before any clip is generated", () => {
+    vi.stubGlobal("fetch", vi.fn(async () => ttsOkResponse()));
+    render(<BaselineListenAudio learnerId="lrn_1" text={TRANSCRIPT} captionsAlways />);
+    // Nothing has played yet — there are no captions to show.
+    expect(caption()).toBeNull();
+  });
+
+  it("shows no captions on the browser-voice fallback (server generation failed)", async () => {
+    // Server generation fails → component falls back to the browser voice,
+    // which has no caption timings.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw new Error("network down");
+      }),
+    );
+    render(<BaselineListenAudio learnerId="lrn_1" text={TRANSCRIPT} captionsAlways />);
+
+    await startReadAloud();
+
+    // No <audio> clip was played, and no caption is rendered despite
+    // captionsAlways being on.
+    expect(FakeAudio.instances).toHaveLength(0);
+    expect(synth.speak).toHaveBeenCalledTimes(1);
+    expect(caption()).toBeNull();
   });
 });
