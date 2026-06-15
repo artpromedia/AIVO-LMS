@@ -677,12 +677,16 @@ export default async function BaselineRunnerPage({
                     scanReadText={`${next.prompt}. ${next.readAloudText}`}
                   />
                 ) : (
-                  // Non-scan path: a real Speech-API-backed control. Taps speak
-                  // the prompt, and in listening mode it auto-starts on load.
-                  // Keyed by question id so each new question re-fires.
+                  // Non-scan path: a real read-aloud control backed by the
+                  // server TTS pipeline (falls back to the browser voice).
+                  // Taps speak the prompt, and in listening mode it
+                  // auto-starts on load. Keyed by question id so each new
+                  // question re-fires.
                   <BaselineListenAudio
                     key={next.id}
+                    learnerId={baseline.learnerId}
                     text={`${next.prompt}. ${next.readAloudText}`}
+                    contextRefId={next.id}
                     autoStart={listenMode}
                     speed={voicePref?.speed}
                     voiceId={voicePref?.voiceId}

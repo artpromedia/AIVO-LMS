@@ -10,34 +10,41 @@ import type { TTSVoiceId } from "@/lib/db/types";
  *
  * The server-rendered runner can only emit a link (`?read=…`) for read-aloud,
  * which never actually played audio for non-scan learners — the scan path was
- * the only one wired to the browser Speech API. This client island closes that
- * gap: it backs the read-aloud pill with `speechSynthesis` so a tap really
- * speaks the prompt, and, when `autoStart` is set (listening mode), it begins
- * playing the question on its own once the screen loads — no tap required.
+ * the only one wired to read-aloud. This client island closes that gap.
+ *
+ * Voice quality: it plays audio from the **server TTS pipeline** (the same
+ * `/api/bff/learners/:id/tts` endpoint the rest of the app uses — consistent,
+ * kid-friendly voice, plus caching, consent and cost/usage tracking). When the
+ * server can't help — generation fails, the learner lacks consent, or the
+ * generated clip won't play — it gracefully falls back to the browser's
+ * `speechSynthesis` voice so a tap still speaks the prompt. Usage is recorded
+ * server-side on every successful generation, exactly like other read-aloud
+ * surfaces.
  *
  * On-screen controls (Done looks like): beyond the play/stop pill the learner
  * gets a **Replay** button (restart the prompt from the very start) and a
  * **Pause/Resume** button (hold and pick playback back up) so a non-reader can
  * hear a question again without re-navigating. These appear only while audio is
- * active so they never present a dead affordance.
+ * active so they never present a dead affordance. They drive whichever path is
+ * currently speaking — the server `<audio>` clip or the browser fallback voice.
  *
  * Voice + speed respect the learner's saved read-aloud preference (`speed` /
- * `voiceId`, sourced from `getLearnerVoicePreference`) instead of the browser
- * default: `speed` drives the utterance rate (clamped 0.5–2.0 to stay
- * intelligible) and `voiceId` selects the closest matching browser voice +
- * pitch. The six saved voices don't map 1:1 onto a device's installed voices,
- * so this is a best-effort match — the higher-fidelity server voices are a
- * separate path.
+ * `voiceId`, sourced from `getLearnerVoicePreference`). `speed` is sent to the
+ * server TTS request and also drives the browser fallback's utterance rate
+ * (clamped 0.5–2.0 to stay intelligible); `voiceId` is sent to the server and,
+ * for the fallback, selects the closest matching browser voice + pitch. The six
+ * saved voices don't map 1:1 onto a device's installed voices, so the fallback
+ * match is best-effort — the higher-fidelity server voices are the primary path.
  *
  * Calm + shame-free: it speaks the prompt exactly once per mount (the call site
  * keys it by question id so each new question re-fires), never loops, and only
- * auto-starts when listening mode is on. If `speechSynthesis` is unavailable
- * (SSR / unsupported browser) the controls disable themselves instead of
- * presenting dead affordances, and any in-flight speech is cancelled on unmount
- * so the voice never trails past the screen that started it.
+ * auto-starts when listening mode is on. Any in-flight speech/generation is
+ * cancelled on unmount so the voice never trails past the screen that started
+ * it, and a generation that resolves after stop/unmount is discarded.
  */
 
 type PlaybackStatus = "idle" | "playing" | "paused";
+type PlaybackMode = "server" | "browser";
 
 /**
  * How each saved voice should sound on the browser Speech API. `female` picks
@@ -114,19 +121,23 @@ function pickVoice(
 }
 
 export function BaselineListenAudio({
+  learnerId,
   text,
+  contextRefId,
   autoStart = false,
   className,
   speed,
   voiceId,
   languageCode,
 }: {
+  learnerId: string;
   text: string;
+  contextRefId?: string | null;
   autoStart?: boolean;
   className?: string;
   /** Saved playback speed (0.5–2.0). Defaults to 1.0 when unset. */
   speed?: number;
-  /** Saved voice preference; selects the closest browser voice + pitch. */
+  /** Saved voice preference; sent to the server and matched on the fallback. */
   voiceId?: TTSVoiceId;
   /** BCP-47 tag for the prompt; defaults to the document language. */
   languageCode?: string;
@@ -134,6 +145,14 @@ export function BaselineListenAudio({
   const [supported, setSupported] = React.useState(false);
   const [status, setStatus] = React.useState<PlaybackStatus>("idle");
   const voicesRef = React.useRef<SpeechSynthesisVoice[]>([]);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  // Cache the generated server clip so repeated taps/replays reuse it (no cost).
+  const serverSrcRef = React.useRef<string | null>(null);
+  // Monotonic token: bumped on every stop/new-speak so a generation that
+  // resolves late (after stop/unmount/another tap) can detect it's stale.
+  const activeRef = React.useRef(0);
+  // Which pathway is currently speaking, so pause/resume targets the right one.
+  const modeRef = React.useRef<PlaybackMode | null>(null);
 
   const rate = Math.min(2, Math.max(0.5, speed ?? 1));
   const profile = (voiceId && VOICE_PROFILES[voiceId]) || VOICE_PROFILES.calm_neutral;
@@ -142,17 +161,44 @@ export function BaselineListenAudio({
     (typeof document !== "undefined" ? document.documentElement.lang : "") ??
     "en-US";
 
-  const stop = React.useCallback(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    setStatus("idle");
+  const browserSupported = () =>
+    typeof window !== "undefined" && "speechSynthesis" in window;
+
+  const stopBrowser = React.useCallback(() => {
+    if (browserSupported()) window.speechSynthesis.cancel();
   }, []);
 
-  const speak = React.useCallback(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  const stopServer = React.useCallback(() => {
+    const a = audioRef.current;
+    if (a) {
+      a.pause();
+      a.currentTime = 0;
+    }
+  }, []);
+
+  const stop = React.useCallback(() => {
+    activeRef.current += 1;
+    stopServer();
+    stopBrowser();
+    modeRef.current = null;
+    setStatus("idle");
+  }, [stopServer, stopBrowser]);
+
+  // Browser fallback voice (varies by device; used only when the server can't).
+  // Respects the saved speed/voice preference as closely as the device allows.
+  const speakBrowser = React.useCallback(() => {
+    if (!browserSupported()) {
+      modeRef.current = null;
+      setStatus("idle");
+      return;
+    }
     const synth = window.speechSynthesis;
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      modeRef.current = null;
+      setStatus("idle");
+      return;
+    }
     // Cancel anything in flight so taps/replays never queue up.
     synth.cancel();
     const utterance = new SpeechSynthesisUtterance(trimmed);
@@ -168,35 +214,125 @@ export function BaselineListenAudio({
     }
     utterance.onend = () => setStatus("idle");
     utterance.onerror = () => setStatus("idle");
+    modeRef.current = "browser";
     synth.speak(utterance);
     setStatus("playing");
   }, [text, rate, profile, lang]);
 
-  // Replay restarts the prompt from the very beginning (cancel + re-speak).
-  const replay = React.useCallback(() => speak(), [speak]);
+  // Play a server-generated clip; on any playback error fall back to the voice.
+  const playServerSrc = React.useCallback(
+    (src: string) => {
+      let a = audioRef.current;
+      if (!a) {
+        a = new Audio();
+        a.onended = () => setStatus("idle");
+        audioRef.current = a;
+      }
+      a.onerror = () => {
+        speakBrowser();
+      };
+      a.src = src;
+      a.currentTime = 0;
+      a.playbackRate = rate;
+      modeRef.current = "server";
+      setStatus("playing");
+      void a.play().catch(() => {
+        speakBrowser();
+      });
+    },
+    [speakBrowser, rate],
+  );
 
-  // Pause holds speech in place; resume picks it back up where it stopped.
+  // Try the higher-quality server voice first; fall back to the browser voice
+  // when generation fails or the learner lacks consent.
+  const speak = React.useCallback(async () => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    // Cancel anything already speaking so taps never overlap.
+    stopServer();
+    stopBrowser();
+
+    // Reuse an already-generated clip on repeat taps/replays.
+    if (serverSrcRef.current) {
+      playServerSrc(serverSrcRef.current);
+      return;
+    }
+
+    const token = (activeRef.current += 1);
+    setStatus("playing");
+    try {
+      const res = await fetch(`/api/bff/learners/${learnerId}/tts`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          text: trimmed,
+          contextKind: "baseline_question",
+          contextRefId: contextRefId ?? null,
+          ...(voiceId ? { voiceId } : {}),
+          ...(speed != null ? { speed: rate } : {}),
+          ...(languageCode ? { languageCode } : {}),
+        }),
+      });
+      const json = await res.json().catch(() => null);
+      // Stale: a stop/unmount/newer tap happened while we were waiting.
+      if (token !== activeRef.current) return;
+      const src: string | undefined = json?.data?.asset?.storageKey;
+      if (!res.ok || !json?.ok || !src) {
+        throw new Error("tts_unavailable");
+      }
+      serverSrcRef.current = src;
+      playServerSrc(src);
+    } catch {
+      if (token !== activeRef.current) return;
+      speakBrowser();
+    }
+  }, [
+    text,
+    learnerId,
+    contextRefId,
+    voiceId,
+    speed,
+    rate,
+    languageCode,
+    stopServer,
+    stopBrowser,
+    playServerSrc,
+    speakBrowser,
+  ]);
+
+  // Replay restarts the prompt from the very beginning (re-speak).
+  const replay = React.useCallback(() => void speak(), [speak]);
+
+  // Pause holds playback in place; resume picks it back up where it stopped.
+  // Targets whichever pathway is currently active.
   const togglePause = React.useCallback(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    const synth = window.speechSynthesis;
     if (status === "playing") {
-      synth.pause();
+      if (modeRef.current === "server") {
+        audioRef.current?.pause();
+      } else if (browserSupported()) {
+        window.speechSynthesis.pause();
+      }
       setStatus("paused");
     } else if (status === "paused") {
-      synth.resume();
+      if (modeRef.current === "server") {
+        void audioRef.current?.play().catch(() => speakBrowser());
+      } else if (browserSupported()) {
+        window.speechSynthesis.resume();
+      }
       setStatus("playing");
     }
-  }, [status]);
+  }, [status, speakBrowser]);
 
   // Primary pill: start when idle, stop otherwise (covers playing + paused).
   const toggle = React.useCallback(() => {
-    if (status === "idle") speak();
+    if (status === "idle") void speak();
     else stop();
   }, [status, speak, stop]);
 
   // Keep the installed-voice list fresh — browsers populate it asynchronously.
   React.useEffect(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (!browserSupported()) return;
     const synth = window.speechSynthesis;
     const load = () => {
       voicesRef.current = synth.getVoices();
@@ -207,26 +343,23 @@ export function BaselineListenAudio({
   }, []);
 
   React.useEffect(() => {
-    const ok = typeof window !== "undefined" && "speechSynthesis" in window;
-    setSupported(ok);
-    if (!ok || !autoStart) {
-      return () => {
-        if (typeof window !== "undefined" && "speechSynthesis" in window) {
-          window.speechSynthesis.cancel();
-        }
-      };
+    // Usable whenever JS runs: server TTS is the primary path, browser speech
+    // the fallback. Disables only during SSR.
+    setSupported(typeof window !== "undefined");
+    if (typeof window === "undefined" || !autoStart) {
+      return () => stop();
     }
     // Defer briefly so the question DOM has settled and the user-activation from
-    // the navigation that brought us here still applies. The timeout is cleared
-    // on unmount (and on React StrictMode's dev re-mount), so we speak exactly
-    // once and never double-fire.
-    const id = window.setTimeout(() => speak(), 150);
+    // the navigation that brought us here still applies. Cleared on unmount (and
+    // on React StrictMode's dev re-mount) so we speak exactly once.
+    const id = window.setTimeout(() => void speak(), 150);
     return () => {
       window.clearTimeout(id);
-      window.speechSynthesis.cancel();
+      stop();
     };
     // Auto-start is mount-only; the call site keys this by question id so a new
     // question remounts and re-fires.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const active = status !== "idle";
