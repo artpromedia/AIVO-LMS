@@ -224,10 +224,32 @@ svg[data-aivo-expression="greeting"] .aivo-wing-wave {
   }
 }
 
+/* AIVO companion robot — a gentle, translate-only idle float (no opacity
+   change, so the figure never reads as "fading"). Ported into the Stage as
+   the shared brand companion. Gated below alongside the mascot. */
+.aivo-companion-float {
+  animation: lx-companion-float 3200ms ease-in-out infinite;
+}
+@keyframes lx-companion-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 /* Calm slows the mascot; high-contrast freezes it and hides sparkles. The
    static pose carries the expression on its own. */
 [data-sensory-mode="calm"] .aivo-breathe {
   animation-duration: 6500ms;
+}
+[data-sensory-mode="calm"] .aivo-companion-float {
+  animation-duration: 5200ms;
+}
+[data-sensory-mode="high-contrast"] .aivo-companion-float {
+  animation: none;
 }
 [data-sensory-mode="calm"] .aivo-sparkles {
   display: none;
@@ -407,6 +429,7 @@ svg[data-aivo-expression="greeting"] .aivo-wing-wave {
   .aivo-sparkles,
   .aivo-think-dot,
   .aivo-zzz,
+  .aivo-companion-float,
   .lx-pop-in,
   .lx-check-pop,
   .lx-burst span {

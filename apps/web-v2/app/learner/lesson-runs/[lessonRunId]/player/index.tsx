@@ -31,6 +31,7 @@ import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/layout/page-header";
 import { AudioControlBar, FocusMode } from "@/components/playful-calm";
 import { InLessonTutorPanel } from "@/components/learner/in-lesson-tutor-panel";
+import { AivoCompanion } from "@/components/learner/art/aivo-companion";
 import type { FunctioningLevel } from "@aivo/stage-ui";
 import type { TutorKey } from "@aivo/brand";
 import type { LessonAgentConfig } from "@/lib/learner/agent-directives";
@@ -284,6 +285,14 @@ export function LessonPlayer({
           ) : null}
         </Card>
       </FocusMode>
+
+      {/* AIVO companion — the shared brand robot, present through the whole
+          session. Decorative + non-interactive; hidden on narrow screens so
+          it never crowds the stage content. */}
+      <AivoCompanion
+        motionOff={presentation.motionOff}
+        className="fixed bottom-4 right-4 z-30 hidden lg:block"
+      />
     </AccessibilityShell>
   );
 }
