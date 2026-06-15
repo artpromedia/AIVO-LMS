@@ -604,7 +604,9 @@
       "challenges": "苦手なこと",
       "accessibility_defaults": "アクセシビリティのデフォルト設定",
       "whats_working": "What's working",
-      "recommendations": "承認が必要な推奨事項"
+      "recommendations": "承認が必要な推奨事項",
+      "at_a_glance": "At a glance",
+      "recent_activity": "Recent activity"
     },
     "learner_sensory": {
       "title": "感覚プロファイル",
@@ -949,6 +951,36 @@
       "set_pin_cta": "No PIN yet? Set one up",
       "error_invalid": "That PIN didn't match. Try again, or set a new PIN.",
       "error_locked": "Too many tries. Please wait a moment before trying again."
+    },
+    "insight": {
+      "eyebrow": "Insight",
+      "mastery_up": "{subject} mastery improved {delta} points",
+      "mastery_down": "{subject} mastery dipped {delta} points",
+      "from_to": "From {from}% to {to}%",
+      "window": "over the last {days} days",
+      "source": "Source: mastery snapshots · {count, plural, one {# capture} other {# captures}}",
+      "empty": "Insights appear once {name} has a few sessions across a couple of weeks."
+    },
+    "activity": {
+      "empty_title": "No activity yet",
+      "empty_body": "Completed lessons, observations, and recommendations will appear here.",
+      "aria_list": "Recent activity",
+      "view": "View",
+      "lesson_completed": "Completed a {subject} lesson",
+      "observation_added": "Caregiver logged an observation",
+      "therapy_note_added": "Therapist added a session note ({minutes} min)",
+      "recommendation_pending": "New recommendation: {title}"
+    },
+    "engagement": {
+      "empty": "No sessions yet — XP, streaks, and time-on-task appear after the first lesson.",
+      "xp": "XP",
+      "level": "Level {level}",
+      "streak": "Current streak",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "longest": "Longest {count, plural, one {# day} other {# days}}",
+      "sessions": "Sessions",
+      "time": "Time on task",
+      "minutes": "{count} min"
     }
   },
   "brain_clone": {

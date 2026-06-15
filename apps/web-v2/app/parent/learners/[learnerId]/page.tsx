@@ -24,15 +24,24 @@ import {
   getOrCreateParentAssessment,
   parentCanAccessLearner,
   refreshLearnerReadiness,
+  getLearnerEngagement,
+  listMasterySnapshots,
+  listSubjects,
+  listLessonRunsForLearner,
 } from "@/lib/db/repos";
 import { READINESS_LABEL_KEY, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
 import {
   deriveAssessmentProgress,
   type AssessmentSectionId,
 } from "@/lib/validators/parent-assessment";
+import { deriveInsightHighlight } from "@/lib/parent/insight-highlight";
+import { getRecentActivity } from "@/lib/parent/recent-activity";
 import { AssessmentResumeCard } from "./assessment/assessment-resume-card";
 import { WhatsWorkingPanel } from "@/components/parent/whats-working-panel";
 import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
+import { InsightHighlightCard } from "@/components/parent/insight-highlight-card";
+import { RecentActivityFeed } from "@/components/parent/recent-activity-feed";
+import { LearnerEngagementStrip } from "@/components/parent/learner-engagement-strip";
 import { TutorMemoryCard } from "@/components/parent/tutor-memory-card";
 import { CalmSummaryCard } from "./calm-summary-card";
 
@@ -63,6 +72,29 @@ export default async function LearnerDetailPage({
   const next = nextStepFor(learner);
   const tone = READINESS_TONE[learner.readinessState];
   const age = new Date().getFullYear() - learner.birthYear;
+
+  // Data-truth wiring: real engagement + a single data-derived insight + the
+  // recent-activity feed. Every number below traces to a write path — none is
+  // seeded or hardcoded.
+  const [engagement, snapshots, subjects, lessonRuns] = await Promise.all([
+    getLearnerEngagement(learner.id, session.tenantId),
+    listMasterySnapshots(learner.id, session.tenantId),
+    listSubjects(),
+    listLessonRunsForLearner(learner.id, session.tenantId),
+  ]);
+  const subjectName = (id: string) => subjects.find((s) => s.id === id)?.name ?? id;
+  const completedRuns = lessonRuns.filter((r) => r.status === "completed");
+  const minutesOnTask = completedRuns.reduce((acc, r) => {
+    if (!r.completedAt || !r.startedAt) return acc;
+    return acc + Math.round((new Date(r.completedAt).getTime() - new Date(r.startedAt).getTime()) / 60000);
+  }, 0);
+  const insight = deriveInsightHighlight(snapshots, subjectName);
+  const activity = await getRecentActivity({
+    learnerId: learner.id,
+    tenantId: session.tenantId,
+    session: { userId: session.userId, tenantId: session.tenantId },
+    subjectName,
+  });
 
   return (
     <AppShell
@@ -116,6 +148,8 @@ export default async function LearnerDetailPage({
         )}
       </Card>
 
+      <InsightHighlightCard highlight={insight} learnerName={learner.displayName} />
+
       {showResume ? (
         <AssessmentResumeCard
           learnerId={learner.id}
@@ -123,6 +157,13 @@ export default async function LearnerDetailPage({
           variant="panel"
         />
       ) : null}
+
+      <SectionHeader title={t("at_a_glance")} />
+      <LearnerEngagementStrip
+        engagement={engagement}
+        sessionsCompleted={completedRuns.length}
+        minutesOnTask={minutesOnTask}
+      />
 
       <SectionHeader title={t("whats_working")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
@@ -133,6 +174,9 @@ export default async function LearnerDetailPage({
       <Card className="p-[var(--aivo-density-card-pad)]">
         <PendingRecommendationsPanel learnerId={learner.id} />
       </Card>
+
+      <SectionHeader title={t("recent_activity")} />
+      <RecentActivityFeed items={activity} />
 
       <CalmSummaryCard
         learnerId={learner.id}
