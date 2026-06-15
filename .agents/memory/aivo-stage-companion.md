@@ -37,6 +37,11 @@ a robot mascot and human teachers.
   hidden); real text + SR-labelled UI carry meaning. Idle motion must be gated
   under Calm / high-contrast / reduced-motion AND the Stage's `motionOff`.
 
-**Known gap:** the `{key}-reduced.svg` motion-off fallbacks in the same dir are
-still the OLD simplified vectors, not robot-shaped. They're abstract enough to
-work but don't visually match the new robots.
+**Reduced-motion fallbacks:** the `{key}-reduced.svg` motion-off avatars (in
+web-v2/public, marketing/public, and brand canonical — mobile has none) are now
+flat robot-family vectors that match the PNGs: white rounded head, dark screen
+face with glowing accent eyes + smile, antenna, headphone ears, accent chest
+heart, on a calm pale accent-tinted disc with an accent ring. Each is the same
+96×96 template recolored to `TUTORS[key].color` (eyes/smile use the accent
+lightened ~18%). Regenerate via the same parametric template; keep them calm
+(no animation, soft tint) since reduced motion pairs with low-sensory mode.
