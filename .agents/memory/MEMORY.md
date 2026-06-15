@@ -3,3 +3,4 @@
 - [Stage elevation state](stage-elevation-state.md) — production Stage already robot-themed; legacy emoji host lived only in unused @aivo/stage-ui TutorCharacter; mobile host has no tutor slug.
 - [AIVO robot family — companion + 14 tutors](aivo-stage-companion.md) — one chibi-3D robot family: purple companion + all 14 tutor avatars (recolor + subject motif) at /images/tutors/{key}.png; no more human portraits.
 - [Baseline recording paths](baseline-recording-paths.md) — web records per-answer to its OWN db (resumability); mobile runs engine in-memory + posts once via discovery /complete (assessment-svc has no per-answer endpoint).
+- [web-v2 i18n audit semantics](i18n-audit-semantics.md) — audit checks only base↔locale key parity (missing/orphan=FAIL, untranslated=warn); never scans code usage; mirror new keys to all 10 locales.
