@@ -3,6 +3,8 @@ type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/aivo-brave-explorer/Mobile.tsx": () => import("../components/mockups/aivo-brave-explorer/Mobile.tsx"),
   "./components/mockups/aivo-brave-explorer/Web.tsx": () => import("../components/mockups/aivo-brave-explorer/Web.tsx"),
+  "./components/mockups/aivo-cosmic-friendly/Mobile.tsx": () => import("../components/mockups/aivo-cosmic-friendly/Mobile.tsx"),
+  "./components/mockups/aivo-cosmic-friendly/Web.tsx": () => import("../components/mockups/aivo-cosmic-friendly/Web.tsx"),
   "./components/mockups/aivo-calm/Auth.tsx": () => import("../components/mockups/aivo-calm/Auth.tsx"),
   "./components/mockups/aivo-calm/Marketing.tsx": () => import("../components/mockups/aivo-calm/Marketing.tsx"),
   "./components/mockups/aivo-cosmic-lab/Mobile.tsx": () => import("../components/mockups/aivo-cosmic-lab/Mobile.tsx"),
@@ -15,8 +17,6 @@ export const modules: ModuleMap = {
   "./components/mockups/aivo-friendly-universe/Web.tsx": () => import("../components/mockups/aivo-friendly-universe/Web.tsx"),
   "./components/mockups/aivo-inclusive-lab/Mobile.tsx": () => import("../components/mockups/aivo-inclusive-lab/Mobile.tsx"),
   "./components/mockups/aivo-inclusive-lab/Web.tsx": () => import("../components/mockups/aivo-inclusive-lab/Web.tsx"),
-  "./components/mockups/aivo-cosmic-friendly/Mobile.tsx": () => import("../components/mockups/aivo-cosmic-friendly/Mobile.tsx"),
-  "./components/mockups/aivo-cosmic-friendly/Web.tsx": () => import("../components/mockups/aivo-cosmic-friendly/Web.tsx"),
   "./components/mockups/aivo-inclusive-warm/Mobile.tsx": () => import("../components/mockups/aivo-inclusive-warm/Mobile.tsx"),
   "./components/mockups/aivo-inclusive-warm/Tablet.tsx": () => import("../components/mockups/aivo-inclusive-warm/Tablet.tsx"),
   "./components/mockups/aivo-inclusive-warm/Web.tsx": () => import("../components/mockups/aivo-inclusive-warm/Web.tsx"),
