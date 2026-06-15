@@ -11,7 +11,10 @@
  *   2. Render cap — how many choice cards the learner ever sees, the single
  *      source of truth for the client (packages/learner-ui/.../fl-profiles.ts
  *      -> FL_PROFILES[*].maxChoices), mirrored by the mobile runner
- *      (apps/mobile/src/api/baselineClient.ts -> FL_MAX_CHOICES).
+ *      (apps/mobile/src/api/baselineClient.ts -> FL_MAX_CHOICES) and by the
+ *      two dev-only web-v2 design-system previews, which hardcode their own
+ *      copy of the cap (apps/web-v2/.../discovery|stage/*-preview-client.tsx
+ *      -> FL_BITS[*].maxChoices).
  *   3. Server reject-above — the looser safety ceiling that rejects malformed
  *      LLM output before it reaches the client
  *      (services/ai-svc/.../scaffold_enforcer.py -> RULES[*].max_options).
@@ -43,6 +46,9 @@ const LEVELS = ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOL
 const FILES = {
   renderCap: "packages/learner-ui/src/tokens/fl-profiles.ts",
   mobileRenderCap: "apps/mobile/src/api/baselineClient.ts",
+  baselinePreview:
+    "apps/web-v2/app/design-system/discovery/baseline-preview-client.tsx",
+  stagePreview: "apps/web-v2/app/design-system/stage/stage-preview-client.tsx",
   generator: "services/ai-svc/src/ai_svc/services/baseline_generator.py",
   serverCeiling: "services/ai-svc/src/ai_svc/services/scaffold_enforcer.py",
 };
@@ -77,6 +83,8 @@ function labelToFile(label) {
   return {
     "render cap (fl-profiles.ts)": "renderCap",
     "mobile render cap (baselineClient.ts FL_MAX_CHOICES)": "mobileRenderCap",
+    "baseline preview render cap (baseline-preview-client.tsx FL_BITS)": "baselinePreview",
+    "stage preview render cap (stage-preview-client.tsx FL_BITS)": "stagePreview",
     "generator target (baseline_generator.py fl_config)": "generator",
     "server reject-above (scaffold_enforcer.py RULES)": "serverCeiling",
   }[label];
@@ -88,6 +96,24 @@ function labelToFile(label) {
  */
 function parseRenderCap() {
   const src = read(FILES.renderCap);
+  const map = {};
+  const re = new RegExp(
+    `(${LEVELS.join("|")}):\\s*\\{[^}]*?maxChoices:\\s*(\\d+)`,
+    "g",
+  );
+  let m;
+  while ((m = re.exec(src)) !== null) map[m[1]] = Number(m[2]);
+  return map;
+}
+
+/**
+ * Preview render cap — FL_BITS[*].maxChoices in the two dev-only web-v2
+ * design-system previews. Each entry is a single-line object literal with no
+ * nested braces, so the same per-level `LEVEL: { ... maxChoices: N }` match is
+ * safe as for the canonical render cap.
+ */
+function parsePreviewCap(fileKey) {
+  const src = read(FILES[fileKey]);
   const map = {};
   const re = new RegExp(
     `(${LEVELS.join("|")}):\\s*\\{[^}]*?maxChoices:\\s*(\\d+)`,
@@ -140,11 +166,15 @@ function parseServerCeiling() {
 
 const renderCap = parseRenderCap();
 const mobileRenderCap = parseMobileRenderCap();
+const baselinePreviewCap = parsePreviewCap("baselinePreview");
+const stagePreviewCap = parsePreviewCap("stagePreview");
 const generatorTarget = parseGeneratorTarget();
 const serverCeiling = parseServerCeiling();
 
 validateMap("render cap (fl-profiles.ts)", renderCap);
 validateMap("mobile render cap (baselineClient.ts FL_MAX_CHOICES)", mobileRenderCap);
+validateMap("baseline preview render cap (baseline-preview-client.tsx FL_BITS)", baselinePreviewCap);
+validateMap("stage preview render cap (stage-preview-client.tsx FL_BITS)", stagePreviewCap);
 validateMap("generator target (baseline_generator.py fl_config)", generatorTarget);
 validateMap("server reject-above (scaffold_enforcer.py RULES)", serverCeiling);
 
@@ -154,6 +184,8 @@ if (errors.length === 0) {
   for (const level of LEVELS) {
     const render = renderCap[level];
     const mobile = mobileRenderCap[level];
+    const baselinePreview = baselinePreviewCap[level];
+    const stagePreview = stagePreviewCap[level];
     const gen = generatorTarget[level];
     const server = serverCeiling[level];
 
@@ -163,6 +195,26 @@ if (errors.length === 0) {
         `${level}: render cap disagrees between web and mobile — ` +
           `fl-profiles.ts maxChoices=${render} but baselineClient.ts FL_MAX_CHOICES=${mobile}. ` +
           `These must be identical (single source of truth; ${SPEC_REF}).`,
+      );
+    }
+
+    // (a2) The dev-only web-v2 design-system previews hardcode their own copy
+    // of the render cap; keep them mirroring fl-profiles.ts so the preview can
+    // never misrepresent how many choices a learner actually sees.
+    if (render !== baselinePreview) {
+      errors.push(
+        `${level}: baseline preview render cap drifted from the source of truth — ` +
+          `fl-profiles.ts maxChoices=${render} but baseline-preview-client.tsx FL_BITS=${baselinePreview}. ` +
+          `Update FL_BITS in apps/web-v2/app/design-system/discovery/baseline-preview-client.tsx ` +
+          `to match (previews mirror the single render cap; ${SPEC_REF}).`,
+      );
+    }
+    if (render !== stagePreview) {
+      errors.push(
+        `${level}: stage preview render cap drifted from the source of truth — ` +
+          `fl-profiles.ts maxChoices=${render} but stage-preview-client.tsx FL_BITS=${stagePreview}. ` +
+          `Update FL_BITS in apps/web-v2/app/design-system/stage/stage-preview-client.tsx ` +
+          `to match (previews mirror the single render cap; ${SPEC_REF}).`,
       );
     }
 
@@ -222,7 +274,7 @@ console.log("check-answer-choice-caps OK — caps agree across all layers:");
 for (const level of LEVELS) {
   console.log(
     `  ${level.padEnd(13)} generator ${generatorTarget[level]}` +
-      ` <= render ${renderCap[level]} (web=mobile)` +
+      ` <= render ${renderCap[level]} (web=mobile=previews)` +
       ` <= server ${fmt(serverCeiling[level])}`,
   );
 }
