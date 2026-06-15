@@ -1710,6 +1710,8 @@
       "type_answer": "답을 입력하세요",
       "struggle_break_title": "함께 숨을 한번 고를까요.",
       "struggle_break_body": "몇 개는 까다로웠어요. 바로 그럴 때 잠시 숨을 고르면 도움이 돼요. 스트레칭하고 준비되면 계속해요.",
+      "listen_instead": "대신 듣기",
+      "listen_mode_hint": "듣기 모드가 켜졌어요 — 재생을 누르면 각 문제를 읽어 줘요.",
       "scan": {
         "help_one_switch": "스위치를 눌러 빛나는 것을 선택하세요.",
         "help_two_switch": "한 스위치는 빛을 옮기고, 다른 스위치는 선택해요.",

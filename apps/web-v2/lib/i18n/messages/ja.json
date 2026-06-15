@@ -1710,6 +1710,8 @@
       "type_answer": "回答を入力",
       "struggle_break_title": "いっしょにひと息つきましょう。",
       "struggle_break_body": "いくつかは難しかったね。そんなときこそ深呼吸が助けになります。背のびをして、準備ができたら続けましょう。",
+      "listen_instead": "音声で聞く",
+      "listen_mode_hint": "リスニングモードがオンです。再生をタップすると各問題を読み上げます。",
       "scan": {
         "help_one_switch": "スイッチを押して、光っているものを選んでね。",
         "help_two_switch": "片方のスイッチで光を動かし、もう片方で選びます。",

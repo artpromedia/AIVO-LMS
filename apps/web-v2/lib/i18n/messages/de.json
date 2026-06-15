@@ -1710,6 +1710,8 @@
       "type_answer": "Geben Sie Ihre Antwort ein",
       "struggle_break_title": "Atmen wir kurz zusammen durch.",
       "struggle_break_body": "Einige waren knifflig — und genau dann hilft eine Atempause. Streck dich und mach weiter, wenn du bereit bist.",
+      "listen_instead": "Stattdessen zuhören",
+      "listen_mode_hint": "Der Hörmodus ist an – tippe auf Wiedergabe, um jede Frage zu hören.",
       "scan": {
         "help_one_switch": "Drücke deinen Schalter, um das Leuchtende auszuwählen.",
         "help_two_switch": "Ein Schalter bewegt das Leuchten. Der andere wählt es aus.",

@@ -41,6 +41,7 @@ import { BaselineScanProvider } from "./baseline-scan-provider";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { TutorFace } from "@/components/learner/art/tutor-character";
 import { resolveBaselineImage } from "@/lib/learner/baseline-image";
 import { baselineAdaptiveEnabled, baselineStreamingEnabled } from "@/lib/feature-flags";
 import {
@@ -93,6 +94,7 @@ async function answerAction(formData: FormData) {
   const response = String(formData.get("response") || "");
   const skipped = String(formData.get("skipped") || "") === "1";
   const asParent = String(formData.get("asParent") || "") === "1";
+  const listen = String(formData.get("listen") || "") === "1";
   const latencyRaw = Number.parseInt(String(formData.get("latencyMs") || ""), 10);
   const latencyMs = Number.isFinite(latencyRaw) && latencyRaw >= 0 ? latencyRaw : undefined;
 
@@ -126,10 +128,12 @@ async function answerAction(formData: FormData) {
       metadata: { baselineId, questionId, skipped, isCorrect: attempt.isCorrect },
     });
   }
-  const path = asParent
-    ? `/learner/baseline/${baselineId}?as=parent`
-    : `/learner/baseline/${baselineId}`;
-  redirect(path);
+  const params = new URLSearchParams();
+  if (asParent) params.set("as", "parent");
+  // Keep the audio-first "listening mode" on across questions once chosen.
+  if (listen) params.set("listen", "1");
+  const qs = params.toString();
+  redirect(`/learner/baseline/${baselineId}${qs ? `?${qs}` : ""}`);
 }
 
 async function completeAction(formData: FormData) {
@@ -189,10 +193,18 @@ export default async function BaselineRunnerPage({
   searchParams,
 }: {
   params: Promise<{ baselineId: string }>;
-  searchParams: Promise<{ as?: string; resume?: string; paused?: string }>;
+  searchParams: Promise<{
+    as?: string;
+    resume?: string;
+    paused?: string;
+    listen?: string;
+  }>;
 }) {
   const sp = await searchParams;
   const asParent = sp.as === "parent";
+  // Audio-first modality switch offered at a struggle break (never shame):
+  // the learner can resume "listening" instead of pushing through.
+  const listenMode = sp.listen === "1";
   const session = await requirePageRole(asParent ? ["parent"] : ["learner", "parent"]);
   const { baselineId } = await params;
   const t = await getTranslations("learner.baseline_runner");
@@ -496,16 +508,42 @@ export default async function BaselineRunnerPage({
               </Link>
             }
             secondary={
-              <Link
-                href={
-                  asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"
-                }
-                className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
-                data-scan-target={scanConfig.active ? "break-stop" : undefined}
-                data-scan-label={scanConfig.active ? t("stop_for_today") : undefined}
-              >
-                {t("stop_for_today")}
-              </Link>
+              <>
+                {struggleVariant ? (
+                  <Link
+                    href={`/learner/baseline/${baseline.id}?resume=1&listen=1${asParent ? "&as=parent" : ""}`}
+                    className="inline-flex items-center gap-2 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-[var(--aivo-color-aivoPurple-700)] bg-[var(--aivo-color-aivoPurple-50)] border border-[var(--aivo-color-aivoPurple-100)] hover:brightness-105"
+                    data-scan-target={scanConfig.active ? "break-listen" : undefined}
+                    data-scan-label={scanConfig.active ? t("listen_instead") : undefined}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                    </svg>
+                    {t("listen_instead")}
+                  </Link>
+                ) : null}
+                <Link
+                  href={
+                    asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"
+                  }
+                  className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
+                  data-scan-target={scanConfig.active ? "break-stop" : undefined}
+                  data-scan-label={scanConfig.active ? t("stop_for_today") : undefined}
+                >
+                  {t("stop_for_today")}
+                </Link>
+              </>
             }
           />
         </BaselineScanProvider>
@@ -607,11 +645,11 @@ export default async function BaselineRunnerPage({
           companion={
             tutor ? (
               <span
-                className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl"
-                style={{ backgroundColor: `${tutor.color}1A`, color: tutor.color }}
+                className="w-12 h-12 rounded-full inline-flex items-center justify-center overflow-hidden"
+                style={{ backgroundColor: `${tutor.color}1A` }}
                 aria-hidden="true"
               >
-                {tutor.emoji}
+                <TutorFace tutorKey={tutor.tutorKey} size={36} />
               </span>
             ) : null
           }
@@ -623,12 +661,24 @@ export default async function BaselineRunnerPage({
           }
           readAloud={
             next.readAloudText ? (
-              <ReadAloudButton
-                href={`?read=${next.id}`}
-                scanTargetId={scanConfig.active ? `q-${next.id}-readaloud` : undefined}
-                scanLabel={tScan("target_read_aloud")}
-                scanReadText={`${next.prompt}. ${next.readAloudText}`}
-              />
+              <div className="flex flex-col gap-1.5">
+                <ReadAloudButton
+                  href={`?read=${next.id}${listenMode ? "&listen=1" : ""}${asParent ? "&as=parent" : ""}`}
+                  className={
+                    listenMode
+                      ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
+                      : undefined
+                  }
+                  scanTargetId={scanConfig.active ? `q-${next.id}-readaloud` : undefined}
+                  scanLabel={tScan("target_read_aloud")}
+                  scanReadText={`${next.prompt}. ${next.readAloudText}`}
+                />
+                {listenMode ? (
+                  <p className="text-xs text-[var(--aivo-color-aivoPurple-700)]">
+                    {t("listen_mode_hint")}
+                  </p>
+                ) : null}
+              </div>
             ) : null
           }
           footer={
@@ -640,6 +690,7 @@ export default async function BaselineRunnerPage({
                   <input type="hidden" name="questionId" value={next.id} />
                   <input type="hidden" name="skipped" value="1" />
                   {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+                  {listenMode ? <input type="hidden" name="listen" value="1" /> : null}
                   <Button
                     type="submit"
                     variant="outline"
@@ -694,6 +745,7 @@ export default async function BaselineRunnerPage({
             <input type="hidden" name="learnerId" value={baseline.learnerId} />
             <input type="hidden" name="questionId" value={next.id} />
             {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+            {listenMode ? <input type="hidden" name="listen" value="1" /> : null}
             {/* Stamps time-on-item into `latencyMs` at submit. Keyed by
               question id so the timer resets for each new item. */}
             <LatencyTimer key={next.id} />

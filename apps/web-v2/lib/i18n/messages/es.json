@@ -1710,6 +1710,8 @@
       "type_answer": "Escribe tu respuesta",
       "struggle_break_title": "Tomemos aire juntos.",
       "struggle_break_body": "Algunas fueron difíciles, y justo ahí es cuando respirar ayuda. Estírate y sigue cuando estés listo.",
+      "listen_instead": "Escuchar en su lugar",
+      "listen_mode_hint": "El modo de escucha está activado: toca Reproducir para oír cada pregunta.",
       "scan": {
         "help_one_switch": "Pulsa tu interruptor para elegir lo que brilla.",
         "help_two_switch": "Un interruptor mueve el brillo. El otro lo elige.",

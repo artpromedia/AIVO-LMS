@@ -1710,6 +1710,8 @@
       "type_answer": "Saisissez votre réponse",
       "struggle_break_title": "Respirons un instant ensemble.",
       "struggle_break_body": "Certaines étaient difficiles, et c'est justement là qu'une respiration aide. Étire-toi et continue quand tu es prêt.",
+      "listen_instead": "Écouter plutôt",
+      "listen_mode_hint": "Le mode écoute est activé — appuie sur Lecture pour entendre chaque question.",
       "scan": {
         "help_one_switch": "Appuie sur ton contacteur pour choisir ce qui brille.",
         "help_two_switch": "Un contacteur déplace la lumière. L'autre la choisit.",

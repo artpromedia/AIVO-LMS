@@ -1710,6 +1710,8 @@
       "type_answer": "输入你的答案",
       "struggle_break_title": "我们一起深呼吸一下。",
       "struggle_break_body": "有些题确实有点难——而这正是深呼吸最有用的时候。伸个懒腰，准备好了再继续。",
+      "listen_instead": "改为聆听",
+      "listen_mode_hint": "聆听模式已开启——点按播放即可听每道题。",
       "scan": {
         "help_one_switch": "按下你的开关，选择正在发光的那个。",
         "help_two_switch": "一个开关移动光亮，另一个开关选择它。",

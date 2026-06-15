@@ -119,3 +119,46 @@ export async function fetchBaselineSubjects(learnerId: string): Promise<Baseline
     return [];
   }
 }
+
+/** One domain bucket in a completion payload (mirrors the web/discovery shape). */
+export interface BaselineChapterResult {
+  domain: string;
+  correct: number;
+  total: number;
+  difficulty: number;
+  avgLatencyMs: number;
+}
+
+export interface BaselineCompletionPayload {
+  chapterResults: BaselineChapterResult[];
+  totalCorrect: number;
+  totalAttempts: number;
+  responseLatencies: number[];
+  xpEarned?: number;
+}
+
+/**
+ * Persist a finished baseline as a `discovery_adventure` attempt via
+ * `POST /api/assessments/learner/discovery/:learnerId/complete`. The server
+ * records correctness/latency silently for the parent handoff and learning
+ * plan — the learner never sees a score.
+ *
+ * Returns `true` when the attempt persisted, `false` on any transport/HTTP
+ * failure. Never throws: the runner shows the warm completion screen
+ * regardless, so a flaky network can't trap a child mid-celebration.
+ */
+export async function completeBaseline(
+  learnerId: string,
+  payload: BaselineCompletionPayload,
+): Promise<boolean> {
+  try {
+    const res = await apiFetch(
+      API.ASSESSMENT,
+      `/api/assessments/learner/discovery/${learnerId}/complete`,
+      { method: "POST", body: JSON.stringify(payload) },
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
+}

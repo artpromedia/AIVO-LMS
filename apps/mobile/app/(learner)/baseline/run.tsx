@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -10,7 +10,15 @@ import { Card, Button } from "@/components/ui";
 import { LoadingState } from "@aivo/mobile-ui";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
-import { fetchBaselineQuestions, type BaselineQuestion } from "@/src/api/baselineClient";
+import {
+  fetchBaselineQuestions,
+  completeBaseline,
+  type BaselineQuestion,
+} from "@/src/api/baselineClient";
+
+// Shared brand companion robot (same friendly figure as web + the landing
+// page). Replaces any emoji host so the baseline always has a warm guide.
+const AIVO_COMPANION_PNG = require("@/assets/images/aivo-companion.png");
 
 /**
  * Learner adaptive baseline runner (MOB-LRN-005) — mirror of web's
@@ -39,6 +47,13 @@ type LoadState =
   | { kind: "not_ready"; message: string }
   | { kind: "ready"; questions: BaselineQuestion[] };
 
+/** Silently-recorded outcome for one question (never shown to the learner). */
+type QuestionResponse = {
+  correct: boolean;
+  skipped: boolean;
+  latencyMs: number;
+};
+
 export default function LearnerBaselineRunScreen() {
   const { t } = useTranslation();
   const palette = useSensoryPalette();
@@ -49,6 +64,13 @@ export default function LearnerBaselineRunScreen() {
   const [i, setI] = useState(0);
   const [onBreak, setOnBreak] = useState(false);
   const [done, setDone] = useState(false);
+  // Per-question record of what happened. Correctness is captured SILENTLY
+  // (the learner never sees right/wrong) and only used for the parent handoff
+  // + learning plan on completion.
+  const [responses, setResponses] = useState<QuestionResponse[]>([]);
+  // When the current question first became visible — used to measure response
+  // latency (process signal), reset on advance and after a break.
+  const [qStartedAt, setQStartedAt] = useState(() => Date.now());
 
   const load = useCallback(async () => {
     if (!learnerId) {
@@ -62,6 +84,7 @@ export default function LearnerBaselineRunScreen() {
         setState({ kind: "not_ready", message: res.message });
       } else {
         setState({ kind: "ready", questions: res.questions });
+        setQStartedAt(Date.now());
       }
     } catch {
       setState({ kind: "error" });
@@ -74,11 +97,61 @@ export default function LearnerBaselineRunScreen() {
 
   const questions = state.kind === "ready" ? state.questions : [];
 
-  const answer = () => {
+  // Persist the finished baseline as a discovery_adventure attempt. Single
+  // "baseline" domain bucket because the flat question feed carries no
+  // per-question domain. Fire-and-forget-safe: failures never block the warm
+  // completion screen.
+  const finish = useCallback(
+    async (all: QuestionResponse[]) => {
+      if (!learnerId || all.length === 0) return;
+      const attempted = all.filter((r) => !r.skipped);
+      const totalCorrect = all.filter((r) => r.correct).length;
+      const avgLatencyMs = attempted.length
+        ? Math.round(attempted.reduce((sum, r) => sum + r.latencyMs, 0) / attempted.length)
+        : 0;
+      await completeBaseline(learnerId, {
+        chapterResults: [
+          {
+            domain: "baseline",
+            correct: totalCorrect,
+            total: all.length,
+            difficulty: 1,
+            avgLatencyMs,
+          },
+        ],
+        totalCorrect,
+        totalAttempts: all.length,
+        responseLatencies: all.map((r) => r.latencyMs),
+        xpEarned: 0,
+      });
+    },
+    [learnerId],
+  );
+
+  // Record the response (chosen vs. correctAnswer, latency, skip) and advance.
+  // `chosen === null` means the learner tapped "Not sure" — a self-paced skip,
+  // recorded without any failure framing.
+  const recordAndAdvance = (chosen: string | null) => {
+    const item = questions[i];
+    const correct =
+      chosen != null && item?.correctAnswer != null && chosen === item.correctAnswer;
+    const entry: QuestionResponse = {
+      correct,
+      skipped: chosen === null,
+      latencyMs: Math.max(0, Date.now() - qStartedAt),
+    };
+    const all = [...responses, entry];
+    setResponses(all);
+
     const nextIdx = i + 1;
-    if (nextIdx >= questions.length) return setDone(true);
+    if (nextIdx >= questions.length) {
+      void finish(all);
+      setDone(true);
+      return;
+    }
     if (nextIdx % BREAK_EVERY === 0) setOnBreak(true);
     setI(nextIdx);
+    setQStartedAt(Date.now());
   };
 
   if (state.kind === "loading") {
@@ -182,7 +255,10 @@ export default function LearnerBaselineRunScreen() {
           </Text>
           <Button
             title={t("baselineRun.continue", "Keep going")}
-            onPress={() => setOnBreak(false)}
+            onPress={() => {
+              setOnBreak(false);
+              setQStartedAt(Date.now());
+            }}
             fullWidth
             size="lg"
             style={{ marginTop: spacing.md }}
@@ -195,6 +271,23 @@ export default function LearnerBaselineRunScreen() {
   const item = questions[i];
   return (
     <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
+      <View style={[styles.companion, { backgroundColor: palette.accentSoft }]}>
+        <View style={[styles.companionCircle, { backgroundColor: palette.bgPage }]}>
+          <Image
+            source={AIVO_COMPANION_PNG}
+            style={styles.companionImg}
+            resizeMode="contain"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
+        </View>
+        <Text style={[styles.companionMsg, { color: palette.ink }]} accessibilityRole="text">
+          {t(
+            "baselineRun.companion",
+            "Pick whatever feels right — every answer here helps AIVO get to know you.",
+          )}
+        </Text>
+      </View>
       <View style={[styles.supports, { backgroundColor: palette.accentSoft }]}>
         <Ionicons name="volume-high" size={16} color={palette.accent} />
         <Text style={[styles.supportsText, { color: palette.ink }]}>
@@ -230,7 +323,7 @@ export default function LearnerBaselineRunScreen() {
               key={`${item.id}-${idx}`}
               accessibilityRole="button"
               accessibilityLabel={opt}
-              onPress={answer}
+              onPress={() => recordAndAdvance(opt)}
               style={[
                 styles.option,
                 { borderColor: palette.border, backgroundColor: palette.bgPage },
@@ -240,6 +333,17 @@ export default function LearnerBaselineRunScreen() {
             </Pressable>
           ))}
         </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("baselineRun.notSure", "Not sure — skip for now")}
+          onPress={() => recordAndAdvance(null)}
+          style={styles.skip}
+        >
+          <Ionicons name="arrow-forward-circle-outline" size={18} color={palette.inkMuted} />
+          <Text style={[styles.skipText, { color: palette.inkMuted }]}>
+            {t("baselineRun.notSure", "Not sure — skip for now")}
+          </Text>
+        </Pressable>
       </Card>
     </ResponsiveScreen>
   );
@@ -256,6 +360,33 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   supportsText: { fontSize: 12, fontFamily: fontFamilies.bodySemiBold },
+  companion: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 10,
+    borderRadius: radius.lg,
+    marginBottom: spacing.sm,
+  },
+  companionCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  companionImg: { width: 40, height: 40 },
+  companionMsg: { flex: 1, fontSize: 13, fontFamily: fontFamilies.bodySemiBold, lineHeight: 19 },
+  skip: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    marginTop: spacing.xs,
+  },
+  skipText: { fontSize: 14, fontFamily: fontFamilies.bodySemiBold },
   dots: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: spacing.md },
   dot: { height: 8, borderRadius: 4 },
   card: { gap: spacing.sm },

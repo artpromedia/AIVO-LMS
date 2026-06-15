@@ -10,13 +10,19 @@
  * `@aivo/brand` rather than re-declared, so the baseline UI stays in lockstep
  * with the rest of the platform (tutor avatars, tier copy, marketing).
  */
-import { TUTORS, getSubjectBySlug } from "@aivo/brand";
+import { TUTORS, getSubjectBySlug, type TutorKey } from "@aivo/brand";
 
 export type BaselineTutor = {
   /** Stable id (also the legacy chapter id). */
   id: string;
   /** Tutor first name shown to learners. */
   name: string;
+  /**
+   * Canonical `@aivo/brand` tutor key (sage, nova, …). Join key for the
+   * shared robot host (`TutorFace`) so the baseline never renders a bare
+   * emoji avatar.
+   */
+  tutorKey: TutorKey;
   /** Subject.slug this tutor owns. */
   subjectSlug: string;
   /** Short subtitle, e.g. "Reading & Language". */
@@ -40,6 +46,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
   {
     id: "sage_story_garden",
     name: "Sage",
+    tutorKey: "sage",
     subjectSlug: "reading",
     subtitle: "Reading & Language",
     landmark: "Story Garden",
@@ -51,6 +58,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
   {
     id: "nova_number_galaxy",
     name: "Nova",
+    tutorKey: "nova",
     subjectSlug: "math",
     subtitle: "Math",
     landmark: "Number Galaxy",
@@ -63,6 +71,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
   {
     id: "spark_discovery_lab",
     name: "Spark",
+    tutorKey: "spark",
     subjectSlug: "science",
     subtitle: "Science",
     landmark: "Discovery Lab",
@@ -75,17 +84,19 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
   {
     id: "harmony_feelings_treehouse",
     name: "Harmony",
+    tutorKey: "harmony",
     subjectSlug: "social",
     subtitle: "Social-Emotional",
     landmark: "Feelings Treehouse",
     emoji: TUTORS.harmony.icon,
     color: TUTORS.harmony.color,
     scene: "A warm, cozy treehouse with soft lighting, cushions, and a window to the world.",
-    greeting: "I care about how you feel — there are no wrong answers here.",
+    greeting: "I care about how you feel — every answer here is a good one.",
   },
   {
     id: "echo_sound_studio",
     name: "Echo",
+    tutorKey: "echo",
     subjectSlug: "speech",
     subtitle: "Speech & Language",
     landmark: "Sound Studio",
@@ -97,6 +108,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
   {
     id: "compass_puzzle_palace",
     name: TUTORS.compass.name,
+    tutorKey: "compass",
     subjectSlug: "executive-function",
     subtitle: "Executive Function",
     landmark: "Puzzle Palace",
@@ -125,6 +137,7 @@ export function tutorForSubjectSlug(slug: string): BaselineTutor | null {
   return {
     id: `${subject.tutorKey}_${slug}`,
     name: tutor.name,
+    tutorKey: subject.tutorKey,
     subjectSlug: slug,
     subtitle: subject.name,
     landmark: tutor.domain,

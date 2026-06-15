@@ -1919,6 +1919,8 @@
       "type_answer": "Type your answer",
       "struggle_break_title": "Let's take a breath together.",
       "struggle_break_body": "Some of those were tricky — that's exactly when a breath helps. Stretch, and keep going when you're ready.",
+      "listen_instead": "Listen instead",
+      "listen_mode_hint": "Listening mode is on — tap Play to hear each question.",
       "scan": {
         "help_one_switch": "Press your switch to pick what's glowing.",
         "help_two_switch": "One switch moves the glow. The other one picks it.",

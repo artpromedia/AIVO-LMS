@@ -1710,6 +1710,8 @@
       "type_answer": "Digite sua resposta",
       "struggle_break_title": "Vamos respirar fundo juntos.",
       "struggle_break_body": "Algumas foram difíceis, e é exatamente aí que respirar ajuda. Alongue-se e continue quando estiver pronto.",
+      "listen_instead": "Ouvir em vez disso",
+      "listen_mode_hint": "O modo de escuta está ativado — toque em Reproduzir para ouvir cada pergunta.",
       "scan": {
         "help_one_switch": "Aperte seu acionador para escolher o que está brilhando.",
         "help_two_switch": "Um acionador move o brilho. O outro escolhe.",
