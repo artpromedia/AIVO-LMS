@@ -13,9 +13,9 @@
  * reduced-motion render the identical static, fully-legible callout. The
  * accompanying chime is fired by the player (use-chime), gated by data-sound.
  */
+import * as React from "react";
 import { Check } from "lucide-react";
 import { TUTORS, type TutorKey } from "@aivo/brand";
-import { TutorCharacter } from "@/components/learner/art/tutor-character";
 
 export function AnswerFeedback({
   tone,
@@ -45,7 +45,14 @@ export function AnswerFeedback({
         {correct ? (
           <Check size={20} className="text-emerald-700" strokeWidth={3} />
         ) : tutorSlug ? (
-          <TutorCharacter color={TUTORS[tutorSlug].color} size={34} />
+          <img
+            src={motionOff ? TUTORS[tutorSlug].avatarReduced : TUTORS[tutorSlug].avatar}
+            alt=""
+            aria-hidden="true"
+            width={34}
+            height={34}
+            className="h-[34px] w-[34px] rounded-full object-contain"
+          />
         ) : (
           <span className="text-base">💪</span>
         )}

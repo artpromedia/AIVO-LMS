@@ -1,10 +1,23 @@
 /**
- * TutorCharacter.tsx — animated tutor avatar for web. CSS transitions stand
- * in for the React Native `Animated.spring` used in the native variant.
- * Keeps a stable 88×88px touch area (WCAG 2.5.5) regardless of the inner
- * scale transform.
+ * TutorCharacter.tsx — the tutor host avatar for web. Renders the per-tutor
+ * robot portrait (the canonical robot family in `@aivo/brand` TUTORS), tinted
+ * by the derived, AA-safe accent ring, and scaled by `tutorState` so the host
+ * visibly reacts (idle / speaking / thinking / celebrating). CSS transitions
+ * stand in for the React Native `Animated.spring` used in the native variant.
+ *
+ * Accessibility:
+ *   - A stable 88×88px touch area (WCAG 2.5.5) regardless of the inner scale.
+ *   - The portrait is decorative (`aria-hidden`); the host's meaning is carried
+ *     by the `role="img"` label and the live speech bubble.
+ *   - `reducedMotion` swaps in the flat `-reduced.svg` portrait and drops every
+ *     transition, so a vestibular-hyper / reduced-motion learner gets a fully
+ *     static host.
+ *   - The accent ring consumes `--tutor-accent` (suppressed to neutral by the
+ *     accessibility shell in high-contrast) and falls back to the tutor's
+ *     derived accent so the component is correct even when rendered standalone.
  */
 import React from "react";
+import { TUTORS, tutorThemeCSSVars, type TutorKey } from "@aivo/brand";
 import type { TutorState } from "./types.js";
 
 export interface TutorCharacterProps {
@@ -13,23 +26,6 @@ export interface TutorCharacterProps {
   speechText?: string;
   reducedMotion?: boolean;
 }
-
-const TUTOR_EMOJIS: Record<string, string> = {
-  nova: "🤖",
-  sage: "🦉",
-  spark: "⚡",
-  chrono: "⏱",
-  pixel: "💻",
-  echo: "🎵",
-  harmony: "💜",
-  atlas: "🌍",
-  cadence: "🎶",
-  vigor: "🏃",
-  lingua: "🌐",
-  forge: "⚙️",
-  compass: "🧭",
-  muse: "🎨",
-};
 
 const STATE_SCALE: Record<TutorState, number> = {
   idle: 1,
@@ -40,6 +36,13 @@ const STATE_SCALE: Record<TutorState, number> = {
   pointing: 1.02,
 };
 
+/** The shared AIVO companion robot — host fallback for an unknown tutor key. */
+const COMPANION_SRC = "/images/mascot/virtual-brain-robot.png";
+
+function isTutorKey(key: string): key is TutorKey {
+  return Object.prototype.hasOwnProperty.call(TUTORS, key);
+}
+
 export function TutorCharacter({
   tutorKey,
   tutorState,
@@ -47,13 +50,18 @@ export function TutorCharacter({
   reducedMotion = false,
 }: TutorCharacterProps) {
   const scale = STATE_SCALE[tutorState] ?? 1;
-  const emoji = TUTOR_EMOJIS[tutorKey] ?? "🤖";
   const transition = reducedMotion ? "none" : "transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)";
+
+  const known = isTutorKey(tutorKey);
+  const tutor = known ? TUTORS[tutorKey] : null;
+  const portrait = tutor ? (reducedMotion ? tutor.avatarReduced : tutor.avatar) : COMPANION_SRC;
+  const accent = known ? tutorThemeCSSVars(tutorKey)["--tutor-accent"] : "#7c3aed";
+  const label = tutor ? `${tutor.name} is ${tutorState}` : `Tutor is ${tutorState}`;
 
   return (
     <div
       role="img"
-      aria-label={`Tutor ${tutorKey} is ${tutorState}`}
+      aria-label={label}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -77,17 +85,24 @@ export function TutorCharacter({
             width: 80,
             height: 80,
             borderRadius: "50%",
-            backgroundColor: "rgba(124,58,237,0.25)",
-            border: "2px solid #7c3aed",
+            backgroundColor: "var(--tutor-accent-soft, rgba(124,58,237,0.12))",
+            border: `2px solid var(--tutor-accent, ${accent})`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 40,
+            overflow: "hidden",
             transform: `scale(${scale})`,
             transition,
           }}
         >
-          {emoji}
+          <img
+            src={portrait}
+            alt=""
+            aria-hidden="true"
+            width={72}
+            height={72}
+            style={{ width: 72, height: 72, objectFit: "contain" }}
+          />
         </div>
       </div>
       {speechText ? (
