@@ -298,6 +298,88 @@ describe("BaselineListenAudio — visible playback controls (idle → playing �
   });
 });
 
+describe("BaselineListenAudio — playback controls drive the server <audio> path", () => {
+  /** Start playback with a successful server clip so the <audio> path is live. */
+  async function startServerPlayback() {
+    vi.stubGlobal("fetch", vi.fn(async () => ttsOkResponse()));
+    await startReadAloud();
+  }
+
+  it("Replay restarts the server clip from the very start", async () => {
+    render(<BaselineListenAudio learnerId="lrn_1" text={TRANSCRIPT} />);
+    await startServerPlayback();
+
+    const audio = getAudio();
+    // Initial play fired once; the controls are visible while the clip plays.
+    expect(audio.play).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Replay from the start" })).toBeTruthy();
+
+    // Advance the clip, then Replay — the same <audio> element rewinds to 0 and
+    // plays again (no new clip generated; the cached server src is reused).
+    act(() => {
+      audio.currentTime = 1.2;
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Replay from the start" }));
+    });
+    expect(FakeAudio.instances).toHaveLength(1);
+    expect(audio).toBe(getAudio());
+    expect(audio.currentTime).toBe(0);
+    expect(audio.play).toHaveBeenCalledTimes(2);
+    // No browser fallback was used — the server path stayed in control.
+    expect(synth.speak).not.toHaveBeenCalled();
+    // Still active, so the controls remain available.
+    expect(screen.getByRole("button", { name: "Pause reading" })).toBeTruthy();
+  });
+
+  it("Pause then Resume toggles the <audio> element and flips the button", async () => {
+    render(<BaselineListenAudio learnerId="lrn_1" text={TRANSCRIPT} />);
+    await startServerPlayback();
+
+    const audio = getAudio();
+    expect(audio.play).toHaveBeenCalledTimes(1);
+
+    // Pause: the <audio> element is paused and the control flips to Resume.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Pause reading" }));
+    });
+    expect(audio.pause).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Resume reading" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Pause reading" })).toBeNull();
+    // The browser voice is never engaged on the server path.
+    expect(synth.pause).not.toHaveBeenCalled();
+
+    // Resume: the same <audio> element plays on (no rewind) and the control
+    // returns to Pause.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Resume reading" }));
+    });
+    expect(audio.play).toHaveBeenCalledTimes(2);
+    expect(audio).toBe(getAudio());
+    expect(screen.getByRole("button", { name: "Pause reading" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Resume reading" })).toBeNull();
+    expect(synth.resume).not.toHaveBeenCalled();
+  });
+
+  it("Stop pill returns the server path to idle and hides the controls", async () => {
+    render(<BaselineListenAudio learnerId="lrn_1" text={TRANSCRIPT} />);
+    await startServerPlayback();
+
+    const audio = getAudio();
+    expect(screen.getByRole("button", { name: "Replay from the start" })).toBeTruthy();
+
+    // Stop: the <audio> element rewinds + pauses and the component resets to idle.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Stop reading aloud" }));
+    });
+    expect(audio.pause).toHaveBeenCalled();
+    expect(audio.currentTime).toBe(0);
+    expect(screen.getByRole("button", { name: "Read this aloud" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Replay from the start" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Pause reading" })).toBeNull();
+  });
+});
+
 describe("BaselineListenAudio captions", () => {
   it("advances the visible caption line as audio playback position moves", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => ttsOkResponse()));
