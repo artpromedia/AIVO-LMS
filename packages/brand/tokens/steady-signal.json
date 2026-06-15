@@ -1,26 +1,26 @@
 {
   "steadySignal": {
-    "$description": "Steady Signal is AIVO's clean-sheet, neurodiverse-first design language. This file is the single editable source for web CSS variables and React Native theme resolution.",
+    "$description": "Steady Signal is AIVO's neurodiverse-first design language. This file is the single editable source for web CSS variables and React Native theme resolution. Palette is the calmer, more personal AIVO direction: soft lavender canvas, deep plum ink, and an AIVO violet signal.",
     "foundation": {
       "color": {
-        "canvas": "#F2F5F2",
+        "canvas": "#F7F5FF",
         "surface": "#FFFFFF",
-        "surfaceRaised": "#E8EFED",
-        "ink": "#102A32",
-        "inkMuted": "#405D64",
-        "line": "#B7C8C5",
-        "lineStrong": "#6D8582",
-        "signal": "#006A73",
-        "signalHover": "#00545C",
-        "signalSoft": "#D9EEF0",
+        "surfaceRaised": "#F1ECFE",
+        "ink": "#241B3D",
+        "inkMuted": "#6A6188",
+        "line": "#E5DEF6",
+        "lineStrong": "#BBAEE0",
+        "signal": "#7C3AED",
+        "signalHover": "#6D28D9",
+        "signalSoft": "#EDE7FE",
         "signalOn": "#FFFFFF",
-        "beacon": "#9B5700",
-        "beaconSoft": "#FCEBCB",
-        "positive": "#176B48",
-        "positiveSoft": "#DCEFE5",
-        "danger": "#A73535",
-        "dangerSoft": "#F8E2E0",
-        "focus": "#006A73"
+        "beacon": "#B45309",
+        "beaconSoft": "#FDEBC8",
+        "positive": "#15803D",
+        "positiveSoft": "#DCFCE7",
+        "danger": "#B91C1C",
+        "dangerSoft": "#FEE2E2",
+        "focus": "#7C3AED"
       },
       "typography": {
         "family": {
@@ -36,9 +36,9 @@
           "bold": 700
         },
         "leading": {
-          "display": 1.02,
-          "heading": 1.15,
-          "body": 1.55,
+          "display": 1.04,
+          "heading": 1.18,
+          "body": 1.6,
           "reading": 1.7
         }
       },
@@ -56,17 +56,17 @@
         "20": "80px"
       },
       "shape": {
-        "control": "10px",
-        "surface": "14px",
-        "region": "18px",
+        "control": "12px",
+        "surface": "18px",
+        "region": "24px",
         "pill": "9999px",
-        "notch": "18px",
+        "notch": "16px",
         "line": "2px"
       },
       "elevation": {
-        "rest": "0 1px 0 rgba(16,42,50,0.08), 0 8px 24px rgba(16,42,50,0.06)",
-        "raised": "0 2px 0 rgba(16,42,50,0.10), 0 16px 36px rgba(16,42,50,0.10)",
-        "focus": "0 0 0 4px rgba(0,106,115,0.24)"
+        "rest": "0 1px 2px rgba(60,40,120,0.06), 0 8px 24px rgba(60,40,120,0.08)",
+        "raised": "0 2px 4px rgba(60,40,120,0.08), 0 16px 40px rgba(60,40,120,0.12)",
+        "focus": "0 0 0 4px rgba(124,58,237,0.28)"
       },
       "motion": {
         "durationInstant": "0ms",
@@ -94,44 +94,44 @@
     "modes": {
       "appearance": {
         "light": {
-          "canvas": "#F2F5F2",
+          "canvas": "#F7F5FF",
           "surface": "#FFFFFF",
-          "surfaceRaised": "#E8EFED",
-          "ink": "#102A32",
-          "inkMuted": "#405D64",
-          "line": "#B7C8C5",
-          "lineStrong": "#6D8582",
-          "signal": "#006A73",
-          "signalHover": "#00545C",
-          "signalSoft": "#D9EEF0",
+          "surfaceRaised": "#F1ECFE",
+          "ink": "#241B3D",
+          "inkMuted": "#6A6188",
+          "line": "#E5DEF6",
+          "lineStrong": "#BBAEE0",
+          "signal": "#7C3AED",
+          "signalHover": "#6D28D9",
+          "signalSoft": "#EDE7FE",
           "signalOn": "#FFFFFF",
-          "beacon": "#9B5700",
-          "beaconSoft": "#FCEBCB",
-          "positive": "#176B48",
-          "positiveSoft": "#DCEFE5",
-          "danger": "#A73535",
-          "dangerSoft": "#F8E2E0",
-          "focus": "#006A73"
+          "beacon": "#B45309",
+          "beaconSoft": "#FDEBC8",
+          "positive": "#15803D",
+          "positiveSoft": "#DCFCE7",
+          "danger": "#B91C1C",
+          "dangerSoft": "#FEE2E2",
+          "focus": "#7C3AED"
         },
         "dark": {
-          "canvas": "#091619",
-          "surface": "#102328",
-          "surfaceRaised": "#173239",
-          "ink": "#F2F8F7",
-          "inkMuted": "#B8CBC8",
-          "line": "#38545A",
-          "lineStrong": "#78918E",
-          "signal": "#68D8E0",
-          "signalHover": "#93E7EC",
-          "signalSoft": "#173B40",
-          "signalOn": "#071719",
-          "beacon": "#FFC66D",
-          "beaconSoft": "#493718",
-          "positive": "#7FD7AD",
-          "positiveSoft": "#173A2C",
-          "danger": "#FF9A9A",
-          "dangerSoft": "#4A2527",
-          "focus": "#68D8E0"
+          "canvas": "#15111F",
+          "surface": "#1E1830",
+          "surfaceRaised": "#281F40",
+          "ink": "#F4F1FB",
+          "inkMuted": "#BDB4D6",
+          "line": "#3A3052",
+          "lineStrong": "#6E6090",
+          "signal": "#A78BFA",
+          "signalHover": "#C4B5FD",
+          "signalSoft": "#2E2348",
+          "signalOn": "#15111F",
+          "beacon": "#FBBF24",
+          "beaconSoft": "#43320F",
+          "positive": "#4ADE80",
+          "positiveSoft": "#14331F",
+          "danger": "#FB7185",
+          "dangerSoft": "#3F1D24",
+          "focus": "#A78BFA"
         },
         "high-contrast": {
           "canvas": "#000000",
@@ -141,7 +141,7 @@
           "inkMuted": "#FFFFFF",
           "line": "#FFFFFF",
           "lineStrong": "#FFFFFF",
-          "signal": "#00FFFF",
+          "signal": "#E9D5FF",
           "signalHover": "#FFFFFF",
           "signalSoft": "#000000",
           "signalOn": "#000000",
@@ -215,26 +215,26 @@
       },
       "role": {
         "learner": {
-          "accent": "#006A73",
-          "accentSoft": "#D9EEF0",
+          "accent": "#7C3AED",
+          "accentSoft": "#EDE7FE",
           "accentOn": "#FFFFFF",
           "registerDensity": 0.82
         },
         "care": {
-          "accent": "#176B48",
-          "accentSoft": "#DCEFE5",
+          "accent": "#0F766E",
+          "accentSoft": "#CCFBF1",
           "accentOn": "#FFFFFF",
           "registerDensity": 1
         },
         "professional": {
-          "accent": "#244D61",
-          "accentSoft": "#DFE9ED",
+          "accent": "#4338CA",
+          "accentSoft": "#E0E7FF",
           "accentOn": "#FFFFFF",
           "registerDensity": 1.2
         },
         "marketing": {
-          "accent": "#006A73",
-          "accentSoft": "#D9EEF0",
+          "accent": "#7C3AED",
+          "accentSoft": "#EDE7FE",
           "accentOn": "#FFFFFF",
           "registerDensity": 0.9
         }

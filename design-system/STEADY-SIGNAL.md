@@ -116,7 +116,7 @@ const layout = classifySteadySignalStage(width, height);
 
 ### Color
 
-Steady Signal uses mineral neutrals, deep ink, a cyan-teal signal, and a restrained amber beacon.
+Steady Signal uses soft lavender neutrals, deep plum ink, an AIVO violet signal, and a restrained amber beacon — the calmer, more personal AIVO direction.
 
 - `signal` identifies the primary action and active state.
 - `beacon` identifies something that needs attention without using alarm red.
@@ -137,9 +137,9 @@ with denser spacing and tabular figures.
 
 ### Shape
 
-- Controls: 10px radius
-- Surfaces: 14px radius where clipping is unavailable
-- Regions: 18px radius
+- Controls: 12px radius
+- Surfaces: 18px radius where clipping is unavailable
+- Regions: 24px radius
 - Signature regions: notched corner
 - Pills: reserved for statuses and compact filters, never used as the universal control shape
 
