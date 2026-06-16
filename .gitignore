@@ -72,3 +72,11 @@ infra/helm/values/image-overrides.yaml
 *.tar
 .deploy-tag
 .deploy-tag-pending
+.deploytag
+
+# Generated esbuild bundles for one-shot k8s seed/backfill Jobs
+# (regenerated on demand, e.g. scripts/run-seed-pilots.sh). The tracked
+# artifacts/ content (lighthouse/, mockup-sandbox/) stays tracked.
+artifacts/*.cjs
+# Dev-server / scratch logs dropped into artifacts/.
+artifacts/*.log
