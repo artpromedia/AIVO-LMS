@@ -1693,7 +1693,25 @@
       "add_learner": "Adicionar um aluno",
       "view_as_aria": "Ver como {name}",
       "age_not_set": "Idade não definida",
-      "readiness": "Prontidão: {state}"
+      "readiness": "Prontidão: {state}",
+      "choose_profile_title": "Choose your profile",
+      "choose_profile_subtitle": "Pick your avatar, then enter your PIN.",
+      "enter_pin": "Enter your PIN",
+      "add_profile": "Add profile",
+      "clear": "Clear",
+      "help_listen": "Help & listen",
+      "sign_in": "Sign in",
+      "backspace": "Delete",
+      "panel_title": "You can do it!",
+      "panel_body": "Take your time. We're here to help you learn and grow.",
+      "live_feedback": "Live feedback",
+      "feedback_pick": "Tap your photo to get started!",
+      "feedback_ready": "Great — now type your PIN.",
+      "need_break": "Need a break?",
+      "take_break": "Take a calm break",
+      "error_pick_first": "Pick your avatar first.",
+      "error_pin": "That PIN didn't match. Try again.",
+      "error_locked": "Too many tries. Please wait a moment."
     },
     "not_found": {
       "title": "Não consigo encontrar isso.",
@@ -1945,7 +1963,11 @@
       "learner_profile_label": "ID do perfil do aluno",
       "learner_pin_label": "PIN do aluno",
       "learner_pin_helper": "Os alunos usam apenas o PIN do app. Adultos devem usar a aba de entrada padrão.",
-      "learner_help_link": "Precisa de ajuda para encontrar um perfil de aluno?"
+      "learner_help_link": "Precisa de ajuda para encontrar um perfil de aluno?",
+      "panel_title": "We're here to help your learner",
+      "panel_accent": "thrive.",
+      "panel_body": "From progress updates to personalized support, AIVO Learning gives you the tools and insights to support every step of their learning journey.",
+      "sso_cta": "Continue with your school or district SSO"
     },
     "signup": {
       "promo_eyebrow": "Comece seu teste em família",
@@ -1979,7 +2001,16 @@
         "name": "Digite pelo menos 2 caracteres.",
         "email": "Isso não parece um e-mail.",
         "password": "Use pelo menos 8 caracteres."
-      }
+      },
+      "panel_title": "Designed for families. Built for",
+      "panel_accent": "growth.",
+      "panel_body": "Create your free AIVO Learning account to personalize your experience, track progress, and get helpful support every step of the way.",
+      "role_label": "I am a…",
+      "role_parent_title": "Parent or caregiver",
+      "role_parent_sub": "I'll be supporting a learner at home.",
+      "role_teacher_title": "Teacher",
+      "role_teacher_sub": "I support learners in a classroom.",
+      "waitlist": "Join the waitlist for early access"
     },
     "forgot": {
       "heading": "Redefina sua senha",
@@ -1997,7 +2028,14 @@
       "submit": "Enviar link de redefinição",
       "remembered": "Lembrou?",
       "sign_in": "Entrar",
-      "email_label": "E-mail"
+      "email_label": "E-mail",
+      "panel_title": "Check your email",
+      "panel_body": "If an account matches the email you entered, we'll send a password reset link with next steps.",
+      "panel_body2": "Be sure to check your inbox and spam folder.",
+      "email_helper": "We'll email a secure link to reset your password.",
+      "panel_help_title": "Let's get you back",
+      "panel_help_accent": "in.",
+      "panel_help_body": "Enter the email on your account and we'll send a secure link to set a new password — no stress, no rush."
     },
     "reset": {
       "heading": "Escolha uma nova senha",
@@ -2052,7 +2090,16 @@
       },
       "notices": {
         "resent": "Um novo código foi enviado para o seu e-mail."
-      }
+      },
+      "panel_title": "We're here to help your learner",
+      "panel_accent": "thrive.",
+      "panel_body": "From progress updates to personalized support, AIVO Learning gives you the tools and insights to support every step of their learning journey.",
+      "confirm_title": "Confirm it's you",
+      "code_boxes_aria": "Verification code",
+      "use_another_method": "Use another method",
+      "resend_in": "Resend code in {seconds}s",
+      "resend_now": "Resend code",
+      "no_code": "Didn't get a code?"
     },
     "sso_start": {
       "eyebrow": "Single sign-on",
@@ -2061,7 +2108,17 @@
       "continue": "Continue with {idp}",
       "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
       "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider"
+      "default_idp": "your identity provider",
+      "district_badge": "District Access",
+      "continue_with_name": "Continue with {name}",
+      "district_subtitle": "You'll be redirected to your district's secure sign-in to access AIVO Learning.",
+      "verified": "Verified district",
+      "use_email": "Use email instead",
+      "redirecting": "You'll be redirected in a few seconds…",
+      "redirect_hint": "If nothing happens, use the button above.",
+      "panel_title": "We're here to help your district",
+      "panel_accent": "thrive.",
+      "panel_body": "AIVO Learning gives your community the tools, support, and insights to help every learner succeed."
     },
     "mfa_enroll": {
       "eyebrow": "Account security",
@@ -2103,6 +2160,23 @@
       "enroll_cta": "Set up authenticator",
       "error_invalid_code": "That code is incorrect or expired.",
       "error_network": "Network error — please try again."
+    },
+    "shell": {
+      "secure_signin": "Secure sign-in powered by AIVO.",
+      "secure_signup": "Secure sign-up powered by AIVO.",
+      "secure_recovery": "Secure password recovery powered by AIVO.",
+      "encrypted": "Your information is encrypted and always protected.",
+      "wordmark_learning": "Learning",
+      "wordmark_family": "Family",
+      "trust_districts": "AIVO is trusted by school districts across the country to keep families' data safe and secure.",
+      "mode_adult": "Adult",
+      "mode_learner": "Learner",
+      "mode_toggle_aria": "Choose who is signing in",
+      "or": "or",
+      "wordmark_account": "Account",
+      "wordmark_schools": "Schools",
+      "trust_support": "Our support team is here to help you and your family every step of the way.",
+      "trust_secure": "Your account is protected with bank-level encryption and multi-factor security."
     }
   },
   "onboarding": {
@@ -2305,7 +2379,23 @@
       "no_learner_body": "Um PIN pertence a uma criança específica. Adicione uma criança e então você poderá definir o PIN dela.",
       "no_learner_cta": "Adicionar uma criança",
       "approval_required": "Revise e aprove o cérebro AIVO deste aluno antes de criar o PIN do app.",
-      "review_first": "Revisar o cérebro primeiro"
+      "review_first": "Revisar o cérebro primeiro",
+      "set_title": "Set {name}'s PIN",
+      "set_subtitle": "Create a simple 4-digit PIN {name} will use to sign in. It keeps their learning space safe and just for them.",
+      "step_create": "Create PIN",
+      "step_confirm": "Confirm PIN",
+      "enter_4": "Enter a 4-digit PIN",
+      "reenter_4": "Re-enter the PIN to confirm",
+      "back": "Back",
+      "approved_title": "Parent-approved & child-safe",
+      "approved_body": "This PIN is created and approved by you. Only {name} can use it to open their learning space.",
+      "next_title": "Next: hand the device to {name}",
+      "next_body": "Once you save the PIN, {name} can use it to sign in and start learning with AIVO.",
+      "check_simple": "Simple 4-digit PIN",
+      "check_just": "Just for {name}",
+      "check_safe": "Keeps their space safe",
+      "help_title": "Need help?",
+      "help_body": "If {name} forgets their PIN, you can reset it anytime from your parent account."
     },
     "parent_verify": {
       "eyebrow": "Verificação do responsável",
