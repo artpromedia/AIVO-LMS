@@ -19,11 +19,11 @@ import { AivoBrandMark } from "@/components/auth/auth-brand-mark";
 
 /**
  * Sign-up surface — redesigned onto the shared auth split layout. The form
- * still posts to `registerAction` (a real PARENT account via identity-svc,
- * AUTH_MODE=mock falls back to the demo login). The "I am a…" block is a
- * real role branch (see SIGNUP_ROLES): the account is always created as
- * PARENT, but the chosen role sets the post-signup `next` destination so
- * each persona is routed into its own experience / sub-app.
+ * posts to `registerAction` (a real account via identity-svc, AUTH_MODE=mock
+ * falls back to the demo login). The "I am a…" block is a real role branch
+ * (see SIGNUP_ROLES): the chosen role is created as the account's actual
+ * identity-svc role AND sets the post-signup `next` destination so each
+ * persona lands in its own experience / sub-app.
  */
 const SIGNUP_ERROR_CODES = new Set([
   "invalid_input",
@@ -35,17 +35,22 @@ const SIGNUP_ERROR_CODES = new Set([
 ]);
 
 /**
- * Role branch. identity-svc always creates the account as PARENT (the only
- * self-serve role); the real branch is the post-signup destination, which
- * routes each persona into its own experience — mirroring the platform's
- * per-role sub-apps (mobile `(parent)` / `(teacher)` / … route groups and
- * the web role homes). Parents self-onboard; staff land on their invite
- * flow. This is the same mapping as `/onboarding/role`, surfaced earlier so
- * the user picks their world up front. `next` is validated server-side by
- * `safePath`, so a tampered value can't become an open redirect.
+ * Role branch. The chosen `role` is the account's actual identity-svc role
+ * (wire format, uppercase) — self-serve registration now provisions PARENT,
+ * TEACHER, SCHOOL_ADMIN, or DISTRICT_ADMIN accounts, each in an appropriate
+ * tenant. The `next` destination routes each persona into its own experience
+ * — mirroring the platform's per-role sub-apps (mobile `(parent)` /
+ * `(teacher)` / … route groups and the web role homes). Parents self-onboard;
+ * staff land on their invite flow. This is the same mapping as
+ * `/onboarding/role`, surfaced earlier so the user picks their world up front.
+ * Both `role` and `next` are validated server-side (`registerAction` allowlist
+ * + `safePath`), so a tampered value can't escalate privileges or become an
+ * open redirect.
  */
 interface SignupRole {
   readonly id: "parent" | "teacher" | "schoolAdmin" | "districtAdmin";
+  /** identity-svc wire role (uppercase) created for this persona. */
+  readonly role: "PARENT" | "TEACHER" | "SCHOOL_ADMIN" | "DISTRICT_ADMIN";
   readonly labelKey: string;
   readonly descKey: string;
   readonly icon: AivoIconName;
@@ -53,10 +58,10 @@ interface SignupRole {
 }
 
 const SIGNUP_ROLES: ReadonlyArray<SignupRole> = [
-  { id: "parent", labelKey: "parent_label", descKey: "parent_desc", icon: "care", next: "/onboarding/parent-setup" },
-  { id: "teacher", labelKey: "teacher_label", descKey: "teacher_desc", icon: "classroom", next: "/onboarding/invite/school" },
-  { id: "schoolAdmin", labelKey: "school_admin_label", descKey: "school_admin_desc", icon: "rosterSchool", next: "/onboarding/invite/school" },
-  { id: "districtAdmin", labelKey: "district_admin_label", descKey: "district_admin_desc", icon: "rosterDistrict", next: "/onboarding/invite/district" },
+  { id: "parent", role: "PARENT", labelKey: "parent_label", descKey: "parent_desc", icon: "care", next: "/onboarding/parent-setup" },
+  { id: "teacher", role: "TEACHER", labelKey: "teacher_label", descKey: "teacher_desc", icon: "classroom", next: "/onboarding/invite/school" },
+  { id: "schoolAdmin", role: "SCHOOL_ADMIN", labelKey: "school_admin_label", descKey: "school_admin_desc", icon: "rosterSchool", next: "/onboarding/invite/school" },
+  { id: "districtAdmin", role: "DISTRICT_ADMIN", labelKey: "district_admin_label", descKey: "district_admin_desc", icon: "rosterDistrict", next: "/onboarding/invite/district" },
 ];
 
 export default function SignupPage() {
@@ -137,6 +142,7 @@ export default function SignupPage() {
           className="flex flex-col gap-4"
           noValidate
         >
+          <input type="hidden" name="role" value={activeRole.role} />
           <input type="hidden" name="next" value={activeRole.next} />
           <input type="hidden" name="errorReturn" value="/signup" />
           <AuthInput

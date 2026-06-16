@@ -222,15 +222,19 @@ export type IdentityRegisterResult = IdentityRegisterSuccess | IdentityRegisterE
 
 /**
  * POST /api/auth/register on identity-svc to create a self-service
- * account. Self-registration is PARENT-only server-side (it provisions a
- * B2C_FAMILY tenant), so `role` is fixed to "PARENT". The success shape
- * mirrors /api/auth/login — `{ user, accessToken }` plus a `refreshToken`
- * Set-Cookie — so the caller can re-use the same cookie-setting path.
+ * account. The caller passes the chosen self-serve `role` (PARENT,
+ * TEACHER, SCHOOL_ADMIN, or DISTRICT_ADMIN — defaults to PARENT);
+ * identity-svc provisions an appropriate tenant for it (B2C_FAMILY for
+ * parents, B2B_SCHOOL for teachers/school admins, B2B_DISTRICT for
+ * district admins). The success shape mirrors /api/auth/login —
+ * `{ user, accessToken }` plus a `refreshToken` Set-Cookie — so the
+ * caller can re-use the same cookie-setting path.
  */
 export async function identityRegister(input: {
   name: string;
   email: string;
   password: string;
+  role?: "PARENT" | "TEACHER" | "SCHOOL_ADMIN" | "DISTRICT_ADMIN";
 }): Promise<IdentityRegisterResult> {
   let res: Response;
   try {
@@ -241,7 +245,7 @@ export async function identityRegister(input: {
         name: input.name,
         email: input.email,
         password: input.password,
-        role: "PARENT",
+        role: input.role ?? "PARENT",
       }),
       cache: "no-store",
     });

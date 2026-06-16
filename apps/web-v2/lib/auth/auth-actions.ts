@@ -41,16 +41,35 @@ function safePath(value: FormDataEntryValue | null, fallback: string): string {
 }
 
 /**
- * Create a real PARENT account via identity-svc and establish the web-v2
- * session, then continue into onboarding.
+ * Self-serve roles that may be created through the public signup form.
+ * Kept in lockstep with the signup page's role branch and the identity-svc
+ * `/api/auth/register` enum. A tampered `role` field falls back to PARENT so
+ * a crafted request can't escalate into an unsupported/privileged role.
+ */
+const SELF_SERVE_ROLES = new Set(["PARENT", "TEACHER", "SCHOOL_ADMIN", "DISTRICT_ADMIN"]);
+type SelfServeRole = "PARENT" | "TEACHER" | "SCHOOL_ADMIN" | "DISTRICT_ADMIN";
+
+function safeRole(value: FormDataEntryValue | null): SelfServeRole {
+  if (typeof value === "string" && SELF_SERVE_ROLES.has(value)) {
+    return value as SelfServeRole;
+  }
+  return "PARENT";
+}
+
+/**
+ * Create a real account via identity-svc with the persona the user picked
+ * (parent / teacher / school admin / district admin), establish the web-v2
+ * session, then continue into the matching onboarding flow.
  *
- * Form fields: `name`, `email`, `password`, optional `next` (post-signup
- * destination) and `errorReturn` (page to bounce back to on failure).
+ * Form fields: `name`, `email`, `password`, `role` (self-serve persona),
+ * optional `next` (post-signup destination) and `errorReturn` (page to
+ * bounce back to on failure).
  */
 export async function registerAction(formData: FormData): Promise<void> {
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const role = safeRole(formData.get("role"));
   const next = safePath(formData.get("next"), "/onboarding/parent-setup");
   const errorReturn = safePath(formData.get("errorReturn"), "/signup");
 
@@ -64,7 +83,7 @@ export async function registerAction(formData: FormData): Promise<void> {
     redirect(`${errorReturn}?error=invalid_input`);
   }
 
-  const result = await identityRegister({ name, email, password });
+  const result = await identityRegister({ name, email, password, role });
 
   if (result.kind === "error") {
     let code = "signup_failed";

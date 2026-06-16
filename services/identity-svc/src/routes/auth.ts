@@ -467,7 +467,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
             email: { type: "string", format: "email" },
             password: { type: "string", minLength: 8 },
             name: { type: "string", minLength: 1 },
-            role: { type: "string", enum: ["PARENT"] },
+            // Self-serve personas. PARENT provisions a B2C_FAMILY tenant;
+            // staff personas provision a B2B tenant (see TENANT_FOR_ROLE).
+            role: {
+              type: "string",
+              enum: ["PARENT", "TEACHER", "SCHOOL_ADMIN", "DISTRICT_ADMIN"],
+            },
           },
         },
       },
@@ -481,11 +486,27 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         return reply.status(409).send({ error: "Email already registered" });
       }
 
+      // Each self-serve persona gets its own freshly-provisioned tenant so
+      // the new account is isolated and can be scoped/upgraded later (staff
+      // typically then join an existing org via the invite flow). Tenant
+      // type drives the licensing model downstream (see users.ts seat
+      // enforcement): B2C_FAMILY → parent-pay, B2B_* → seat-licensed.
+      const TENANT_FOR_ROLE: Record<
+        string,
+        { type: "B2C_FAMILY" | "B2B_SCHOOL" | "B2B_DISTRICT"; name: string }
+      > = {
+        PARENT: { type: "B2C_FAMILY", name: `${name}'s Family` },
+        TEACHER: { type: "B2B_SCHOOL", name: `${name}'s School` },
+        SCHOOL_ADMIN: { type: "B2B_SCHOOL", name: `${name}'s School` },
+        DISTRICT_ADMIN: { type: "B2B_DISTRICT", name: `${name}'s District` },
+      };
+      const tenantSpec = TENANT_FOR_ROLE[role] ?? TENANT_FOR_ROLE.PARENT;
+
       const [tenant] = await db
         .insert(tenants)
         .values({
-          name: `${name}'s Family`,
-          type: "B2C_FAMILY",
+          name: tenantSpec.name,
+          type: tenantSpec.type,
         })
         .returning();
 
