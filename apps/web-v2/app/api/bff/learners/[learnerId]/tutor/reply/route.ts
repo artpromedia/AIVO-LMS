@@ -11,6 +11,7 @@ import {
   SAFETY_SANITIZE,
   SAFETY_VALIDATE_TUTOR,
   getActiveSafetyPolicy,
+  getLearner,
   recordBlockedGeneration,
   recordModerationEvent,
   recordTutorResponseAudit,
@@ -124,6 +125,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       return ok({ reply: { role: "tutor", text: fallback }, blocked: true }, requestId);
     }
 
+    const learner = await getLearner(learnerId, session!.tenantId);
     const reply = await generateGuidedReply({
       topic,
       subjectId: null,
@@ -131,6 +133,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       latestLearnerMessage: sanitized.cleaned,
       learnerId,
       tenantId: session!.tenantId,
+      primaryLanguage: learner?.primaryLanguage ?? null,
     });
 
     // Post-classify the tutor output and substitute a safe fallback when

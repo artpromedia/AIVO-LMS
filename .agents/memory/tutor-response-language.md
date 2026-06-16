@@ -36,3 +36,27 @@ have a `brain_context`, `_resolve_locale` otherwise) so it honours the stored
 language. The agentic path gets its locale from tutor-svc orchestrator, which
 derives it from `brain.language_profile` and forwards it as `locale` in the
 callAiTurn payload.
+
+## web-v2 (the previewed app) does NOT seed brain-svc
+
+The signed-in app `apps/web-v2` is its OWN system of record: learners,
+brain-clone approval, lessons, etc. all live in its `web_*` tables
+(`web_learner_profiles`, via `@/lib/db/repos`). It never writes the backend
+microservice tables (`learners` / `brain_states` / `language_profiles`) that
+brain-svc reads. Consequences:
+- For a web-v2-enrolled learner there is **no brain-svc `/context`
+  `language_profile`** to read — the agentic Stage path (web-v2
+  `tutorAgentOpen` → tutor-svc → brain-svc) is inert for them and is also gated
+  behind `INTERNAL_SERVICE_TOKEN`. Don't "fix" language there for web-v2.
+- The ONLY live AI-tutor surface web-v2 itself invokes is the homework tutor:
+  `lib/homework/tutor.ts` `generateGuidedReply` → ai-svc `/api/ai/homework/chat`.
+  web-v2 **builds the `brain_context` payload by hand**, so the enrolled
+  language must be put there explicitly as
+  `brain_context.language_profile.primary_language` (free text — name or code;
+  ai-svc resolves it). web-v2 stores only one field: `primaryLanguage`.
+
+**Why:** "the delivery layer (ai-svc) is correct" is necessary but not
+sufficient — for the previewed app the language never reached ai-svc because
+web-v2's hand-built `brain_context` omitted it. Any new web-v2 ai-svc tutor call
+must carry the learner's language in its own payload; do not assume brain-svc
+holds it.

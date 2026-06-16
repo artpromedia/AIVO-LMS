@@ -8,6 +8,7 @@ import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import {
   appendHomeworkMessage,
   getHomeworkSession,
+  getLearner,
   SAFETY_BLOCKED_FALLBACK,
   SAFETY_CLASSIFY,
   SAFETY_SANITIZE,
@@ -142,6 +143,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       guidedOnly: false,
     });
     const priorTutorTurns = existing.messages.filter((m) => m.role === "tutor").length;
+    const learner = await getLearner(learnerId, session!.tenantId);
     const reply = await generateGuidedReply({
       topic: existing.topic,
       subjectId: existing.subjectId,
@@ -149,6 +151,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       latestLearnerMessage: sanitized.cleaned,
       learnerId,
       tenantId: session!.tenantId,
+      primaryLanguage: learner?.primaryLanguage ?? null,
     });
 
     // Post-classify tutor output. We always audit the tutor turn; if rule

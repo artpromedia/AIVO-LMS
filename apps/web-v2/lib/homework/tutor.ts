@@ -25,6 +25,14 @@ type GuidedReplyInput = {
   learnerId?: string;
   tenantId?: string;
   functioningLevel?: string;
+  /**
+   * The learner's stored language from enrollment (web-v2 system of record —
+   * `web_learner_profiles.primary_language`). Free text: a locale code ("es")
+   * OR a language name ("Spanish"). Forwarded into `brain_context.language_profile`
+   * so ai-svc's prompt builder delivers the tutor turn in the learner's language
+   * (it resolves names→locales and falls back to English when absent/unknown).
+   */
+  primaryLanguage?: string | null;
 };
 
 type HomeworkChatResponse = {
@@ -99,6 +107,15 @@ export async function generateGuidedReply(
       brain_context: {
         learner_id: input.learnerId,
         tenant_id: input.tenantId,
+        // Forward the enrolled language so ai-svc delivers in the learner's
+        // language. web-v2 is the system of record for learner data and does
+        // NOT seed brain-svc, so the language must travel in this payload —
+        // there is no brain-svc `/context` language_profile to read for these
+        // learners. ai-svc prefers `preferred_instruction_language`, then
+        // `primary_language`; enrollment captures exactly one field.
+        ...(input.primaryLanguage && input.primaryLanguage.trim()
+          ? { language_profile: { primary_language: input.primaryLanguage.trim() } }
+          : {}),
       },
       homework_context: {
         subject: input.subjectId ?? classifySubject(input.topic) ?? "general",
