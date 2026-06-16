@@ -1,35 +1,58 @@
 ---
-name: Post-merge pnpm install OOM in this repl
-description: Why scripts/post-merge.sh must serialize pnpm lifecycle builds, and how to tune it.
+name: Post-merge pnpm install resource exhaustion in this repl
+description: Why scripts/post-merge.sh must serialize builds, cap threads, lock, and retry — and how to tune it.
 ---
 
-# Post-merge `pnpm install` OOM-aborts unless lifecycle scripts are serialized
+# Post-merge `pnpm install` fails under resource pressure unless tamed
 
-`scripts/post-merge.sh` runs `pnpm install` (which executes every workspace
-package's `prepare`/build lifecycle script, mostly `tsc`). With the monorepo's
-~73 packages, pnpm spawns up to 5 `tsc` compilers in parallel by default.
+`scripts/post-merge.sh` runs `pnpm install`, which executes every workspace
+package's `prepare`/build lifecycle script (mostly `tsc`; ~39 of the ~73
+packages have one). This runs **while all dev workflows stay resident**
+(Marketing, Web App, Brain, Identity, mockup-sandbox), so the container is
+already loaded when the install starts.
 
-**Symptom:** the post-merge install aborts almost immediately (~12 s) with
-`ELIFECYCLE Command failed with exit code -11` / `Aborted` on several packages
-at once (e.g. adaptive-baseline + aac-bridge). Exit -11 / "Aborted" is an
-out-of-memory abort, not a code bug.
+There are TWO distinct failure modes, both environmental (not code bugs):
 
-**Why:** this repl keeps all dev workflows running during a merge (Marketing,
-Web App, Brain, Identity, mockup-sandbox). They already hold ~13 GB of the
-16 GB container, leaving only ~3 GB free — not enough for 5 concurrent `tsc`
-heaps on top.
+1. **Heap OOM abort.** Parallel `tsc` compilers exhaust memory →
+   `ELIFECYCLE ... exit code -11` / "Aborted" on several packages at once.
+   **Fix:** `--child-concurrency=1` so only one lifecycle build (one tsc heap)
+   runs at a time.
 
-**Fix / rule:** pass `--child-concurrency=1` to `pnpm install` in the
-post-merge script so only one lifecycle build runs at a time. This trades
-wall-clock for a build that finishes. Do NOT bump concurrency back up while the
-workflows stay resident.
+2. **PID/thread exhaustion.** The cgroup caps the container at
+   `pids.max=1024`, and the resident workflows alone sit at ~900 PIDs
+   (`/sys/fs/cgroup/pids.current`), leaving only ~100 free. A `pnpm install`
+   adds its link-worker pool (~`nproc`=8 node Worker threads) + tsc forks; when
+   several merges land close together, each fires its own post-merge install
+   and they collectively blow past 1024. Symptoms: `tsc: 2: Cannot fork` from
+   the `.bin/tsc` shim and `new Worker (node:internal/worker...)` failures
+   during pnpm's `symlinkAllModules`. NOTE: `ulimit -u` is ~64k and
+   `memory.current` is ~10/16G during these — so it is the **cgroup pids cap**,
+   not heap memory or the per-user nproc limit. Check `pids.current` vs
+   `pids.max`, not `free`/`ulimit`, when you see "Cannot fork".
 
-**How to apply:**
-- Keep `--child-concurrency=1` on both the frozen-lockfile call and its fallback.
-- Serial builds are slower, so the post-merge timeout is set to 1800000 ms
-  (30 min) via `setPostMergeConfig` — keep headroom; a timeout-kill mid-install
-  is worse than a slow finish.
-- Concurrent merges write to and clear `/tmp`, so don't rely on `/tmp` probe
-  logs surviving during heavy merge activity; pnpm's store lock serializes
-  overlapping installs (the platform's `WAITING_FOR_LOCK`), so they queue rather
-  than corrupt node_modules.
+## Fix / rules (all four are load-bearing; do not remove)
+
+- `--child-concurrency=1` on both the frozen-lockfile call and its fallback
+  (mode 1).
+- **flock mutex** on fd 9 (`/tmp/aivo-post-merge-install.lock`) around the
+  install so overlapping post-merge runs from near-simultaneous merges QUEUE
+  instead of colliding into the PID ceiling (mode 2). Lock auto-releases on
+  process exit — no stale locks.
+- **`export UV_THREADPOOL_SIZE=2`** shrinks each node process's libuv pool
+  (default 4) so pnpm + every tsc child claim fewer of the scarce PIDs.
+- **retry-with-backoff** loop (`until install_deps`) for genuinely momentary
+  fork spikes; invoked as an `until` condition so `set -e` doesn't abort on one
+  attempt's failure.
+
+## How to apply / tune
+- Post-merge timeout is 1800000 ms (30 min) via `setPostMergeConfig` — keep the
+  headroom; a timeout-kill mid-install is worse than a slow finish. A clean
+  single pass takes ~130 s.
+- Do NOT pass `--ignore-scripts`: the `prepare` hooks (package builds, Drizzle
+  codegen) are required for downstream services to boot.
+- Validation gotcha: a manual `nohup bash scripts/post-merge.sh &` gets
+  SIGKILLed when the bash tool call returns (the platform reaps spawned process
+  trees). Validate with `runPostMergeSetup()` (code_execution) instead — it is
+  platform-managed and survives. If concurrent runaway `pnpm install`
+  processes pile up (ppid=1, long `etime`, queued on the pnpm store lock), kill
+  them to free PIDs before re-validating.
