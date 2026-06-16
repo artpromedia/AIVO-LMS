@@ -72,7 +72,9 @@ const WEB_ONLY_PREFIXES = [
   "/admin", // school + district + platform admin (web-only roles)
   "/district", // district admin login
   "/design-system", // internal component gallery
+  "/design-preview", // internal design render preview harness
   "/surface-preview", // internal render harness
+  "/notifications/unsubscribe", // email one-click unsubscribe landing (opened from email)
   "/locked", // generic locked-area shell
   "/api", // route handlers, not screens
   "/onboarding/invite/district", // district-admin invite
@@ -352,6 +354,41 @@ const PARITY_MATRIX = {
     { web: "/parent/settings", mobile: "(parent)/settings", status: P },
     { web: "/parent/settings/account", mobile: "(parent)/settings-account/index", status: P },
     { web: "/parent/settings/billing", mobile: "(parent)/billing", status: P },
+    {
+      web: "/parent/calendar",
+      mobile: "(parent)/schedule/[childId]",
+      status: PARTIAL,
+      gap: "Mobile is a child-scoped schedule (lessons + activity trend); no cross-learner agenda or assignment-by-due-date grouping yet.",
+    },
+    {
+      web: "/parent/sessions",
+      mobile: "(parent)/session/[childId]",
+      status: PARTIAL,
+      gap: "Mobile is a single-child live-session co-view; no multi-learner sessions list or care-team roster yet.",
+    },
+    { web: "/parent/resources", mobile: "(parent)/resources", status: P },
+    {
+      // "Enter as learner" device handoff = the session-swap-to-learner flow,
+      // delivered natively by the (auth)/session-switch screen (PIN-gated swap).
+      web: "/parent/learners/[learnerId]/enter",
+      mobile: "(auth)/session-switch",
+      status: P,
+    },
+    {
+      // brain-clone-watch is the mobile mirror of the web review surface, but it
+      // renders the review state and hands the approve/correct actions off to web
+      // (WebReviewHandoff) — no native correction controls yet.
+      web: "/parent/learners/[learnerId]/brain-review",
+      mobile: "(parent)/brain-clone-watch/[childId]",
+      status: PARTIAL,
+      gap: "Mobile shows the review state but defers approve/correct to the web review page (handoff); no native correction controls yet.",
+    },
+    {
+      web: "/parent/learners/[learnerId]/brain-timeline",
+      mobile: "(parent)/brain/[childId]/history",
+      status: PARTIAL,
+      gap: "Mobile history screen is a placeholder shell; no change/approval/regression records or acknowledgements yet.",
+    },
   ],
 
   Teacher: [
@@ -380,6 +417,30 @@ const PARITY_MATRIX = {
     },
     { web: "/teacher/reports", mobile: "(teacher)/analytics", status: P },
     { web: "/teacher/settings", mobile: "(teacher)/settings", status: P },
+    {
+      web: "/teacher/learners/[learnerId]/assessment",
+      mobile: null,
+      status: MISSING,
+      gap: "Teacher assessment flow (8-section stepper) has no mobile screen yet — next phase.",
+    },
+    {
+      web: "/teacher/learners/[learnerId]/assessment/intro",
+      mobile: null,
+      status: MISSING,
+      gap: "Teacher assessment intro/overview state — next phase.",
+    },
+    {
+      web: "/teacher/learners/[learnerId]/assessment/review",
+      mobile: null,
+      status: MISSING,
+      gap: "Teacher assessment review/summary state — next phase.",
+    },
+    {
+      web: "/teacher/rostering",
+      mobile: null,
+      status: MISSING,
+      gap: "Roster sync (Classroom/Clever/ClassLink/Canvas) — no mobile screen yet; next phase.",
+    },
   ],
 
   Therapist: [
@@ -387,6 +448,12 @@ const PARITY_MATRIX = {
     { web: "/therapist/sessions", mobile: "(therapist)/sessions", status: P },
     { web: "/therapist/reports", mobile: "(therapist)/reports", status: P },
     { web: "/therapist/settings", mobile: "(therapist)/settings", status: P },
+    {
+      web: "/therapist/learners/[learnerId]/assessment",
+      mobile: null,
+      status: MISSING,
+      gap: "Therapist assessment flow has no mobile screen yet — next phase.",
+    },
   ],
 
   Caregiver: [

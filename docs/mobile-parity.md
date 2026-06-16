@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status | Count |
 | ------ | ----- |
-| Parity | 114 |
-| Partial | 0 |
-| Missing | 0 |
-| **In-scope total** | **114** |
+| Parity | 116 |
+| Partial | 4 |
+| Missing | 5 |
+| **In-scope total** | **125** |
 
-Full parity: **100%**. 22 web-only routes excluded.
+Full parity: **93%**. 26 web-only routes excluded.
 
 ## Surface-Type Parity
 
@@ -82,7 +82,7 @@ Both learner subject grids consume the canonical `getDiscoverableSubjects()` reg
 
 | Tutor | Available to EARLY / PRE-K |
 | ----- | -------------------------- |
-| `colors` | Yes |
+| `nova` | Yes |
 | `sage` | Yes |
 | `spark` | Yes |
 | `chrono` | Yes |
@@ -209,6 +209,12 @@ Both learner subject grids consume the canonical `getDiscoverableSubjects()` reg
 | `/parent/settings` | `(parent)/settings` | Parity | — |
 | `/parent/settings/account` | `(parent)/settings-account/index` | Parity | — |
 | `/parent/settings/billing` | `(parent)/billing` | Parity | — |
+| `/parent/calendar` | `(parent)/schedule/[childId]` | **Partial** | Mobile is a child-scoped schedule (lessons + activity trend); no cross-learner agenda or assignment-by-due-date grouping yet. |
+| `/parent/sessions` | `(parent)/session/[childId]` | **Partial** | Mobile is a single-child live-session co-view; no multi-learner sessions list or care-team roster yet. |
+| `/parent/resources` | `(parent)/resources` | Parity | — |
+| `/parent/learners/[learnerId]/enter` | `(auth)/session-switch` | Parity | — |
+| `/parent/learners/[learnerId]/brain-review` | `(parent)/brain-clone-watch/[childId]` | **Partial** | Mobile shows the review state but defers approve/correct to the web review page (handoff); no native correction controls yet. |
+| `/parent/learners/[learnerId]/brain-timeline` | `(parent)/brain/[childId]/history` | **Partial** | Mobile history screen is a placeholder shell; no change/approval/regression records or acknowledgements yet. |
 
 ## Teacher
 
@@ -227,6 +233,10 @@ Both learner subject grids consume the canonical `getDiscoverableSubjects()` reg
 | `/teacher/lesson-plans` | `(teacher)/lesson-plan` | Parity | — |
 | `/teacher/reports` | `(teacher)/analytics` | Parity | — |
 | `/teacher/settings` | `(teacher)/settings` | Parity | — |
+| `/teacher/learners/[learnerId]/assessment` | — | **Missing** | Teacher assessment flow (8-section stepper) has no mobile screen yet — next phase. |
+| `/teacher/learners/[learnerId]/assessment/intro` | — | **Missing** | Teacher assessment intro/overview state — next phase. |
+| `/teacher/learners/[learnerId]/assessment/review` | — | **Missing** | Teacher assessment review/summary state — next phase. |
+| `/teacher/rostering` | — | **Missing** | Roster sync (Classroom/Clever/ClassLink/Canvas) — no mobile screen yet; next phase. |
 
 ## Therapist
 
@@ -236,6 +246,7 @@ Both learner subject grids consume the canonical `getDiscoverableSubjects()` reg
 | `/therapist/sessions` | `(therapist)/sessions` | Parity | — |
 | `/therapist/reports` | `(therapist)/reports` | Parity | — |
 | `/therapist/settings` | `(therapist)/settings` | Parity | — |
+| `/therapist/learners/[learnerId]/assessment` | — | **Missing** | Therapist assessment flow has no mobile screen yet — next phase. |
 
 ## Caregiver
 
@@ -245,3 +256,4 @@ Both learner subject grids consume the canonical `getDiscoverableSubjects()` reg
 | `/caregiver/learners` | `(caregiver)/learners` | Parity | — |
 | `/caregiver/observations` | `(caregiver)/child/[childId]/observation` | Parity | — |
 | `/caregiver/settings` | `(caregiver)/settings` | Parity | — |
+
