@@ -272,3 +272,86 @@ describe("enterAsLearner (PIN-gated session hand-off)", () => {
     expect(setAuthSessionCookies).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * Open-redirect guard for the PIN sign-in path — the third auth entry point
+ * (alongside email/password sign-in and signup, which already have parity
+ * coverage). `enterAsLearner` is the only PIN consumer that does its OWN
+ * post-login navigation off a form-supplied destination (`returnTo`), so it
+ * is the one place a crafted value could try to bounce the user off-site.
+ *
+ * Two invariants are pinned here:
+ *   1. The post-login (success) navigation is hardcoded to the learner role
+ *      home and must IGNORE any `returnTo` — a hostile destination cannot
+ *      hijack a *successful* PIN login.
+ *   2. The error bounce only honors `returnTo` through an exact-match
+ *      allowlist (the kid picker); every off-site / protocol-relative /
+ *      non-path value falls back to the in-app per-learner hand-off page,
+ *      never an attacker-controlled host. No session is swapped on error.
+ */
+describe("enterAsLearner PIN open-redirect guard (returnTo can't go off-site)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    requirePageRole.mockResolvedValue(SESSION);
+    extractRefreshToken.mockReturnValue("refresh_tok");
+  });
+
+  const HOSTILE_RETURN_TO = [
+    { label: "an off-site absolute URL", value: "https://evil.example/phish" },
+    { label: "a protocol-relative URL", value: "//evil.example" },
+    { label: "a javascript: scheme", value: "javascript:alert(1)" },
+    { label: "a bare host (no leading slash)", value: "evil.example/path" },
+    { label: "a backslash-prefixed path", value: "\\evil.example" },
+    { label: "a non-allowlisted in-app path", value: "/parent/dashboard" },
+  ];
+
+  for (const { label, value } of HOSTILE_RETURN_TO) {
+    it(`ignores ${label} on the error bounce → safe in-app hand-off page, no swap`, async () => {
+      verifyActiveLearner.mockResolvedValue("lrn_ok");
+      identityPinLogin.mockResolvedValue({ kind: "error", status: 401, error: "bad pin" });
+
+      await expect(
+        enterAsLearner(pinFormWith({ learnerId: "lrn_ok", pin: "9999", returnTo: value })),
+      ).rejects.toThrow("NEXT_REDIRECT:/parent/learners/lrn_ok/enter?error=invalid");
+
+      expect(setAuthSessionCookies).not.toHaveBeenCalled();
+    });
+  }
+
+  it("a successful PIN login IGNORES a hostile returnTo and lands on the role home", async () => {
+    verifyActiveLearner.mockResolvedValue("lrn_ok");
+    identityPinLogin.mockResolvedValue({
+      kind: "ok",
+      user: { id: "lrn_ok", role: "LEARNER" },
+      accessToken: "access_tok",
+      setCookies: ["refreshToken=raw"],
+    });
+    toSessionProfile.mockReturnValue(LEARNER_PROFILE);
+
+    // Even with an off-site returnTo on the form, the post-login redirect is
+    // the hardcoded learner role home (ROLE_HOME.learner === "/learner/home").
+    await expect(
+      enterAsLearner(
+        pinFormWith({ learnerId: "lrn_ok", pin: "1234", returnTo: "https://evil.example/phish" }),
+      ),
+    ).rejects.toThrow("NEXT_REDIRECT:/learner/home");
+
+    expect(setAuthSessionCookies).toHaveBeenCalledTimes(1);
+  });
+
+  it("a 403 wrong-surface error stays in-app (off-site returnTo ignored), no swap", async () => {
+    verifyActiveLearner.mockResolvedValue("lrn_ok");
+    // identity-svc could return a 403 with an off-site redirectTo, but the PIN
+    // client never surfaces it (see identity-client.test.ts) and a 403 is not
+    // specially routed — so the bounce stays on the safe in-app hand-off page.
+    identityPinLogin.mockResolvedValue({ kind: "error", status: 403, error: "wrong surface" });
+
+    await expect(
+      enterAsLearner(
+        pinFormWith({ learnerId: "lrn_ok", pin: "9999", returnTo: "https://evil.example/portal" }),
+      ),
+    ).rejects.toThrow("NEXT_REDIRECT:/parent/learners/lrn_ok/enter?error=invalid");
+
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+});
