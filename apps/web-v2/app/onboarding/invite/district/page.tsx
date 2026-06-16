@@ -1,14 +1,17 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AuthShell, AuthCard, AuthInput, ReassuranceCard, StepperHeader } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { joinOrganizationAction } from "../actions";
 
 export default function DistrictInvitePage() {
   const t = useTranslations("onboarding.invite_district");
   const tc = useTranslations("onboarding.common");
   const ts = useTranslations("onboarding.steps");
+  const router = useRouter();
   const STEPS = [
     { label: ts("about_you") },
     { label: ts("role") },
@@ -17,6 +20,20 @@ export default function DistrictInvitePage() {
   ] as const;
   const [code, setCode] = React.useState("");
   const [adminEmail, setAdminEmail] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const [pending, startTransition] = React.useTransition();
+
+  function handleJoin() {
+    setError(null);
+    startTransition(async () => {
+      const result = await joinOrganizationAction({ code, email: adminEmail });
+      if (result.ok) {
+        router.push(result.redirectTo);
+      } else {
+        setError(result.error);
+      }
+    });
+  }
 
   return (
     <AuthShell>
@@ -32,12 +49,14 @@ export default function DistrictInvitePage() {
           }
           actions={
             <>
-              <Link
-                href="/onboarding/consent"
-                className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
+              <button
+                type="button"
+                onClick={handleJoin}
+                disabled={pending}
+                className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95 disabled:opacity-60"
               >
                 {tc("continue")}
-              </Link>
+              </button>
               <p className="text-xs text-iw-text-muted text-center">
                 <Link href="/onboarding/role" className="hover:underline">
                   {tc("back")}
@@ -53,6 +72,7 @@ export default function DistrictInvitePage() {
             onChange={(e) => setCode(e.target.value)}
             placeholder={t("code_placeholder")}
             autoComplete="one-time-code"
+            error={error ?? undefined}
           />
           <AuthInput
             id="admin-email"

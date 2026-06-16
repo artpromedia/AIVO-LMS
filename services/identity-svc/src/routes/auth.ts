@@ -1684,6 +1684,163 @@ export async function registerAuthRoutes(app: FastifyInstance) {
     },
   );
 
+  // POST join-organization — authenticated. The self-serve onboarding funnel
+  // gives every new staff signup its OWN freshly-provisioned tenant. When the
+  // person was actually invited into an existing school/district, this lets
+  // them paste the invite code from their email to MOVE their account into the
+  // inviting org's tenant (+ school + the role the admin assigned) instead of
+  // standing up a duplicate org. The self-serve tenant created at signup is
+  // torn down afterwards. Differs from /accept-invite, which CREATES a brand
+  // new account from the invite for people who never self-registered.
+  const JOIN_ORG_ROLES = ["DISTRICT_ADMIN", "SCHOOL_ADMIN", "TEACHER"] as const;
+
+  app.post(
+    "/api/auth/join-organization",
+    {
+      schema: {
+        tags: ["Auth"],
+        body: {
+          type: "object",
+          required: ["code"],
+          properties: {
+            code: { type: "string", minLength: 16 },
+            email: { type: "string" },
+          },
+        },
+      },
+    },
+    async (req, reply) => {
+      const ctx = await requireUser(app, req, reply);
+      if (!ctx) return;
+      const { user, db } = ctx;
+      const { code, email } = req.body as { code: string; email?: string };
+
+      const found = await lookupValidInvite(db, code);
+      if (!found.ok) return reply.status(found.status).send({ error: found.error });
+      const invite = found.invite;
+
+      const role = String(invite.role || "").toUpperCase();
+      if (!(JOIN_ORG_ROLES as readonly string[]).includes(role)) {
+        return reply
+          .status(400)
+          .send({ error: "This invitation can't be used to join from here." });
+      }
+
+      // The invite is bound to a specific address: it must match the signed-in
+      // account (so a code can't be redeemed by whoever holds it) and, when the
+      // form sends one, the typed email (so a typo gives feedback).
+      const inviteEmail = invite.email.trim().toLowerCase();
+      const accountEmail = String(user.email || "")
+        .trim()
+        .toLowerCase();
+      if (!accountEmail || inviteEmail !== accountEmail) {
+        return reply.status(403).send({
+          error:
+            "This invitation was sent to a different email address. Sign in with that email to join.",
+        });
+      }
+      if (email && inviteEmail !== email.trim().toLowerCase()) {
+        return reply.status(403).send({
+          error: "That email doesn't match this invitation. Use the email the invite was sent to.",
+        });
+      }
+
+      const previousTenantId = user.tenantId;
+
+      // Move the account into the inviting org's tenant + school + assigned role.
+      const [updated] = await db
+        .update(users)
+        .set({
+          tenantId: invite.tenantId,
+          schoolId: invite.schoolId ?? null,
+          role,
+          updatedAt: new Date(),
+        } as any)
+        .where(eq(users.id, user.id))
+        .returning();
+
+      await db
+        .update(districtAdminInvites)
+        .set({ acceptedAt: new Date(), acceptedUserId: user.id })
+        .where(eq(districtAdminInvites.id, invite.id));
+      recordDistrictInviteAccepted({ inviteId: invite.id, tenantId: invite.tenantId, role });
+
+      // Tear down the now-orphaned self-serve tenant — but only when nothing
+      // else references it, so we never delete a shared org by mistake.
+      if (previousTenantId && previousTenantId !== invite.tenantId) {
+        try {
+          const [otherUser] = await db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.tenantId, previousTenantId))
+            .limit(1);
+          const [schoolRef] = await db
+            .select({ id: schools.id })
+            .from(schools)
+            .where(eq(schools.tenantId, previousTenantId))
+            .limit(1);
+          if (!otherUser && !schoolRef) {
+            await db.delete(tenants).where(eq(tenants.id, previousTenantId));
+          }
+        } catch (err) {
+          req.log.warn(
+            { err: String(err) },
+            "join-organization: orphan tenant cleanup skipped",
+          );
+        }
+      }
+
+      try {
+        await appendAudit(db, "admin_audit_log", adminAuditLog, {
+          tenantId: invite.tenantId,
+          action: "staff_invite.joined",
+          actorId: updated.id,
+          actorEmail: accountEmail,
+          actorRole: role,
+          onBehalfOfId: null,
+          resourceType: "district_admin_invite",
+          resourceId: invite.id,
+          details: { role, schoolId: invite.schoolId ?? null, fromTenantId: previousTenantId },
+          ipAddress: req.ip ?? null,
+          userAgent: (req.headers["user-agent"] as string) ?? null,
+        });
+      } catch (err) {
+        req.log.warn({ err: String(err) }, "join-organization audit append failed");
+      }
+
+      // Re-mint the access token (tenant + role claims changed) and refresh a
+      // session so the surface cookie and tokens reflect the move.
+      const accessToken = await mintAccessToken(db, updated);
+      const rawRefreshToken = crypto.randomUUID();
+      await db.insert(sessions).values({
+        userId: updated.id,
+        refreshToken: hashRefreshToken(rawRefreshToken),
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      });
+      reply.setCookie("refreshToken", rawRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60,
+      });
+      await setSurfaceCookie(reply, role);
+
+      return {
+        ok: true,
+        accessToken,
+        user: {
+          id: updated.id,
+          email: updated.email,
+          name: updated.name,
+          role: updated.role,
+          tenantId: updated.tenantId,
+          schoolId: updated.schoolId ?? null,
+        },
+      };
+    },
+  );
+
   app.put(
     "/api/auth/password",
     {
