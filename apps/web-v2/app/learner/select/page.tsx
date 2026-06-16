@@ -57,9 +57,13 @@ export default async function LearnerSelectPage({
         <AivoBrandMark sublabel={tShell("wordmark_family")} />
       </div>
 
-      {params.error === "forbidden" && (
+      {params.error && (
         <Card className="mb-4 border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert">
-          {t("forbidden")}
+          {params.error === "forbidden"
+            ? t("forbidden")
+            : params.error === "locked"
+              ? t("error_locked")
+              : t("error_pin")}
         </Card>
       )}
 

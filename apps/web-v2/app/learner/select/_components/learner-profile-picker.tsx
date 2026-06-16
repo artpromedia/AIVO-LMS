@@ -101,6 +101,9 @@ export function LearnerProfilePicker({
     <form action={action} className="flex flex-col gap-6">
       <input type="hidden" name="learnerId" value={selected.id} />
       <input type="hidden" name="pin" value={pin} />
+      {/* Keep a wrong/locked PIN on the picker instead of bouncing the child to
+          the parent hand-off page (the action reads this to route errors). */}
+      <input type="hidden" name="returnTo" value="/learner/select" />
       <div className="flex flex-col items-center gap-3 text-center">
         <LearnerAvatar name={selected.displayName} size="lg" className="h-20 w-20 text-2xl" />
         <div>

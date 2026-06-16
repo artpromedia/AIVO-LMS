@@ -74,8 +74,17 @@ export async function enterAsLearner(formData: FormData): Promise<void> {
   const session = await requirePageRole(["parent"]);
   const authorized = learnerId ? await verifyActiveLearner(session, learnerId) : null;
   if (!authorized) redirect("/learner/select?error=forbidden");
+  // Surface-aware error routing: the kid-facing profile picker
+  // (/learner/select) and the parent hand-off page
+  // (/parent/learners/:id/enter) both post here, but a wrong/locked PIN must
+  // bounce the user back to the SAME surface they were on — not kick a child
+  // off the picker onto the parent page. The form supplies `returnTo`; we
+  // allowlist it (only the picker) to avoid an open redirect, defaulting to
+  // the per-learner hand-off page for every other caller.
   const handoff = `/parent/learners/${authorized}/enter`;
-  if (!/^\d{4,6}$/.test(pin)) redirect(`${handoff}?error=invalid`);
+  const returnTo = String(formData.get("returnTo") ?? "").trim();
+  const errorBase = returnTo === "/learner/select" ? "/learner/select" : handoff;
+  if (!/^\d{4,6}$/.test(pin)) redirect(`${errorBase}?error=invalid`);
 
   const { identityPinLogin, extractRefreshToken, toSessionProfile } = await import(
     "@/lib/auth/identity-client"
@@ -84,13 +93,13 @@ export async function enterAsLearner(formData: FormData): Promise<void> {
 
   if (result.kind === "error") {
     if (result.status === 404) redirect(`/onboarding/pin?learnerId=${encodeURIComponent(authorized)}`);
-    if (result.status === 429) redirect(`${handoff}?error=locked`);
-    redirect(`${handoff}?error=invalid`);
+    if (result.status === 429) redirect(`${errorBase}?error=locked`);
+    redirect(`${errorBase}?error=invalid`);
   }
 
   const profile = toSessionProfile(result.user);
   if (!profile || profile.role !== "learner" || profile.learnerId !== authorized) {
-    redirect(`${handoff}?error=invalid`);
+    redirect(`${errorBase}?error=invalid`);
   }
   const learnerProfile = profile;
 
