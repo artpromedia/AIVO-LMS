@@ -1,115 +1,12 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
-import { MOCK_USERS } from "@/lib/auth/mock-session";
-import type { Role } from "@/lib/auth/types";
 import { AuthSplitLayout, AuthSidePanel, AuthTrustCard, AuthSecureFooter } from "@/components/auth/auth-split-layout";
 import { AivoBrandMark } from "@/components/auth/auth-brand-mark";
 import { AudienceToggle } from "@/components/auth/audience-toggle";
+import { loginAction } from "@/lib/auth/auth-actions";
 import { LoginForm } from "./_components/login-form";
 import { LearnerPinForm } from "./_components/learner-pin-form";
-
-async function signInAction(formData: FormData) {
-  "use server";
-  const { cookies } = await import("next/headers");
-  const { redirect } = await import("next/navigation");
-  const { ROLE_HOME } = await import("@/lib/auth/types");
-  const { serverEnv } = await import("@/lib/env");
-
-  const emailRaw = formData.get("email");
-  const passwordRaw = formData.get("password");
-  const email = typeof emailRaw === "string" ? emailRaw.trim() : "";
-  const password = typeof passwordRaw === "string" ? passwordRaw : "";
-
-  // --- Development path: developer affordance, identical to the previous
-  // behavior so AUTH_MODE=development workflows keep working. -----------
-  if (serverEnv.AUTH_MODE === "mock") {
-    const { MOCK_COOKIE_NAME } = await import("@/lib/auth/mock-session");
-    const raw = formData.get("role");
-    const role = (typeof raw === "string" ? raw : "parent") as Role;
-    if (!(role in MOCK_USERS)) {
-      redirect("/login?error=invalid_role");
-    }
-    const jar = await cookies();
-    jar.set(MOCK_COOKIE_NAME, role, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
-    redirect(ROLE_HOME[role]);
-  }
-
-  // --- Real path: services/identity-svc -----------------------------
-  if (!email || !password) {
-    redirect("/login?error=missing_credentials");
-  }
-
-  const { identityLogin, extractRefreshToken, toSessionProfile } =
-    await import("@/lib/auth/identity-client");
-  const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
-  const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } =
-    await import("@/lib/auth/mfa-cookies");
-
-  const result = await identityLogin(email, password);
-
-  if (result.kind === "mfa") {
-    // Stash the mfaToken in a short-lived httpOnly cookie instead of the
-    // URL so the bearer credential never appears in browser history,
-    // server logs, or the Referer header. /login/mfa reads it back.
-    const jar = await cookies();
-    jar.set(
-      MFA_CHALLENGE_COOKIE,
-      encodeURIComponent(JSON.stringify({ token: result.mfaToken, method: result.mfaMethod })),
-      {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: MFA_CHALLENGE_MAX_AGE_SECONDS,
-      },
-    );
-    redirect("/login/mfa");
-    return;
-  }
-
-  if (result.kind === "error") {
-    // 403 + redirectTo: identity-svc is telling us the user belongs on a
-    // different portal (admin / district). Forward them straight there
-    // instead of stranding them on the consumer login with an opaque error.
-    if (result.status === 403 && result.redirectTo) {
-      const { isSafeSurfaceRedirect } = await import("@/lib/auth/surface-redirect");
-      if (isSafeSurfaceRedirect(result.redirectTo)) {
-        redirect(result.redirectTo);
-      }
-    }
-    let code: string;
-    if (result.status === 401) {
-      code = "invalid_credentials";
-    } else if (result.status === 403) {
-      code = "wrong_surface";
-    } else {
-      code = "login_failed";
-    }
-    redirect(`/login?error=${code}`);
-    return;
-  }
-
-  const profile = toSessionProfile(result.user);
-  if (!profile) {
-    redirect("/login?error=unsupported_role");
-    return;
-  }
-
-  const jar = await cookies();
-  setAuthSessionCookies(jar, {
-    accessToken: result.accessToken,
-    refreshToken: extractRefreshToken(result.setCookies),
-    profile,
-  });
-
-  redirect(ROLE_HOME[profile.role]);
-}
 
 async function learnerSignInAction(formData: FormData) {
   "use server";
@@ -154,7 +51,7 @@ async function learnerSignInAction(formData: FormData) {
  * Redesign: the screen is the shared auth split layout (form card left,
  * cloud-mascot panel right) with the Adult / Learner audience toggle, a
  * static district-SSO affordance, and the "Secure sign-in powered by AIVO"
- * footer. All wiring (signInAction, learnerSignInAction, the email-driven
+ * footer. All wiring (loginAction, learnerSignInAction, the email-driven
  * SSO discovery inside LoginForm) is unchanged — only the chrome moved.
  *
  * No inline hex. All interactive colors flow through `iw-*` Tailwind
@@ -246,7 +143,7 @@ export default async function LoginPage({
         {loginMode === "learner" ? (
           <LearnerPinForm id="learner-pin-form" action={learnerSignInAction} />
         ) : (
-          <LoginForm id="login-form" action={signInAction} />
+          <LoginForm id="login-form" action={loginAction} />
         )}
 
         <div className="flex flex-col gap-3">

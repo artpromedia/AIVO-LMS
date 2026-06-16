@@ -18,7 +18,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { serverEnv } from "@/lib/env";
-import { ROLE_HOME } from "@/lib/auth/types";
+import { ROLE_HOME, type Role } from "@/lib/auth/types";
 import {
   identityRegister,
   identityLogin,
@@ -178,4 +178,96 @@ export async function onboardingSignInAction(formData: FormData): Promise<void> 
   });
 
   redirect(next || ROLE_HOME[profile.role]);
+}
+
+/**
+ * Canonical sign-in for the main `/login` page — the action most returning
+ * users hit. Owns the friendly error-code mapping (identity-svc failure
+ * status → `?error=` code), the MFA challenge handoff, the safe-surface 403
+ * redirect (with an unsafe-redirect fallback), the unsupported-role case,
+ * and the successful redirect to the role home. `onboardingSignInAction`
+ * mirrors this for the wizard; keep the two in sync.
+ *
+ * Form fields: `email`, `password` (real mode) or `role` (mock dev mode).
+ */
+export async function loginAction(formData: FormData): Promise<void> {
+  // Development path: developer affordance, identical to the previous
+  // behavior so AUTH_MODE=mock workflows keep working.
+  if (serverEnv.AUTH_MODE === "mock") {
+    const { MOCK_USERS, MOCK_COOKIE_NAME } = await import("@/lib/auth/mock-session");
+    const raw = formData.get("role");
+    const role = (typeof raw === "string" ? raw : "parent") as Role;
+    if (!(role in MOCK_USERS)) {
+      redirect("/login?error=invalid_role");
+    }
+    const jar = await cookies();
+    jar.set(MOCK_COOKIE_NAME, role, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    redirect(ROLE_HOME[role]);
+  }
+
+  // Real path: services/identity-svc.
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  if (!email || !password) {
+    redirect("/login?error=missing_credentials");
+  }
+
+  const result = await identityLogin(email, password);
+
+  if (result.kind === "mfa") {
+    // Stash the mfaToken in a short-lived httpOnly cookie instead of the
+    // URL so the bearer credential never appears in browser history,
+    // server logs, or the Referer header. /login/mfa reads it back.
+    const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } =
+      await import("@/lib/auth/mfa-cookies");
+    const jar = await cookies();
+    jar.set(
+      MFA_CHALLENGE_COOKIE,
+      encodeURIComponent(JSON.stringify({ token: result.mfaToken, method: result.mfaMethod })),
+      {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: MFA_CHALLENGE_MAX_AGE_SECONDS,
+      },
+    );
+    redirect("/login/mfa");
+  }
+
+  if (result.kind === "error") {
+    // 403 + redirectTo: identity-svc is telling us the user belongs on a
+    // different portal (admin / district). Forward them straight there
+    // instead of stranding them on the consumer login with an opaque error.
+    if (result.status === 403 && result.redirectTo) {
+      const { isSafeSurfaceRedirect } = await import("@/lib/auth/surface-redirect");
+      if (isSafeSurfaceRedirect(result.redirectTo)) {
+        redirect(result.redirectTo);
+      }
+    }
+    let code: string;
+    if (result.status === 401) code = "invalid_credentials";
+    else if (result.status === 403) code = "wrong_surface";
+    else code = "login_failed";
+    redirect(`/login?error=${code}`);
+  }
+
+  const profile = toSessionProfile(result.user);
+  if (!profile) {
+    redirect("/login?error=unsupported_role");
+  }
+
+  const jar = await cookies();
+  setAuthSessionCookies(jar, {
+    accessToken: result.accessToken,
+    refreshToken: extractRefreshToken(result.setCookies),
+    profile,
+  });
+
+  redirect(ROLE_HOME[profile.role]);
 }
