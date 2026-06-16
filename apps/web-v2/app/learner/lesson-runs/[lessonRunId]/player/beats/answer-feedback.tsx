@@ -31,19 +31,19 @@ export function AnswerFeedback({
   const correct = tone === "correct";
   return (
     <div
-      className={`flex items-start gap-3 rounded-2xl p-3 text-sm ${
-        correct ? "bg-emerald-50 text-emerald-900" : "bg-rose-50 text-rose-900"
+      className={`flex items-start gap-3 rounded-iw-card p-3 text-sm ${
+        correct ? "bg-iw-success-subtle text-iw-success-strong" : "bg-iw-error-subtle text-iw-error-strong"
       } ${motionOff ? "" : "lx-pop-in"}`}
       data-feedback={tone}
     >
       <span
         className={`grid h-9 w-9 shrink-0 place-items-center rounded-full ${
-          correct ? "bg-emerald-100" : "bg-white/70"
+          correct ? "bg-iw-success-subtle" : "bg-white/70"
         } ${correct && !motionOff ? "lx-check-pop" : ""}`}
         aria-hidden="true"
       >
         {correct ? (
-          <Check size={20} className="text-emerald-700" strokeWidth={3} />
+          <Check size={20} className="text-iw-success-strong" strokeWidth={3} />
         ) : tutorSlug ? (
           <img
             src={motionOff ? TUTORS[tutorSlug].avatarReduced : TUTORS[tutorSlug].avatar}

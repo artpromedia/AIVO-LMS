@@ -58,7 +58,7 @@ export default async function LearnerSelectPage({
       </div>
 
       {params.error && (
-        <Card className="mb-4 border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert">
+        <Card className="mb-4 border-iw-error bg-iw-error-subtle p-4 text-sm text-iw-error-strong" role="alert">
           {params.error === "forbidden"
             ? t("forbidden")
             : params.error === "locked"

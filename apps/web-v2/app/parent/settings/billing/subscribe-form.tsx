@@ -84,37 +84,37 @@ export function SubscribeForm({
         return (
           <div
             key={row.plan.id}
-            className="rounded-xl border border-aivo-border bg-aivo-surface p-5"
+            className="rounded-iw-card border border-iw-border bg-iw-card p-5"
           >
             <div className="flex items-start justify-between gap-2">
               <div>
                 <h3 className="font-display text-lg font-semibold">{row.plan.name}</h3>
-                <p className="mt-1 text-sm text-aivo-ink-soft">{row.plan.description}</p>
+                <p className="mt-1 text-sm text-iw-ink-muted">{row.plan.description}</p>
               </div>
               {isActive ? (
-                <span className="rounded-full bg-aivo-success/10 px-2 py-0.5 text-xs font-medium text-aivo-success">
+                <span className="rounded-full bg-iw-success/10 px-2 py-0.5 text-xs font-medium text-iw-success">
                   {t("sub_current_badge")}
                 </span>
               ) : null}
             </div>
             <p className="mt-3 font-display text-2xl font-bold">
               {price ? `$${(price.amountCents / 100).toFixed(2)}` : "—"}
-              <span className="ml-1 text-sm font-normal text-aivo-ink-soft">
+              <span className="ml-1 text-sm font-normal text-iw-ink-muted">
                 / {price?.interval ?? "month"}
               </span>
             </p>
             {price && price.trialDays > 0 ? (
-              <p className="mt-1 text-xs text-aivo-ink-soft">
+              <p className="mt-1 text-xs text-iw-ink-muted">
                 {t("sub_free_trial", { days: price.trialDays })}
               </p>
             ) : null}
-            <ul className="mt-3 space-y-1 text-sm text-aivo-ink-soft">
+            <ul className="mt-3 space-y-1 text-sm text-iw-ink-muted">
               {row.plan.features.map((f) => (
                 <li key={f}>• {f}</li>
               ))}
             </ul>
             {!isActive ? (
-              <label className="mt-4 flex items-start gap-2 text-xs text-aivo-ink-soft">
+              <label className="mt-4 flex items-start gap-2 text-xs text-iw-ink-muted">
                 <input
                   type="checkbox"
                   className="mt-0.5"
@@ -137,7 +137,7 @@ export function SubscribeForm({
           </div>
         );
       })}
-      {error ? <p className="text-sm text-aivo-danger md:col-span-2">{error}</p> : null}
+      {error ? <p className="text-sm text-iw-error md:col-span-2">{error}</p> : null}
     </div>
   );
 }
@@ -154,7 +154,7 @@ export function CancelButton({
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   if (cancelAtPeriodEnd) {
-    return <p className="text-sm text-aivo-ink-soft">{t("sub_set_to_cancel")}</p>;
+    return <p className="text-sm text-iw-ink-muted">{t("sub_set_to_cancel")}</p>;
   }
   return (
     <div>
@@ -181,7 +181,7 @@ export function CancelButton({
       >
         {t(pending ? "sub_canceling" : "sub_cancel_at_period_end")}
       </Button>
-      {error ? <p className="mt-2 text-sm text-aivo-danger">{error}</p> : null}
+      {error ? <p className="mt-2 text-sm text-iw-error">{error}</p> : null}
     </div>
   );
 }

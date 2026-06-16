@@ -34,7 +34,7 @@ export default async function ComparePage() {
           return (
             <li
               key={c.slug}
-              className="rounded-2xl border border-aivo-border bg-white p-6 shadow-sm transition hover:shadow-md"
+              className="rounded-iw-card border border-aivo-border bg-white p-6 shadow-soft-1 transition hover:shadow-soft-3"
             >
               <Link
                 href={`/compare/${c.slug}`}

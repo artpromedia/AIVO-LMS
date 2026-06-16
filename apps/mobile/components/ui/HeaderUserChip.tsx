@@ -6,6 +6,7 @@
 import React from "react";
 import { Pressable, View, Text, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { useSensoryPalette, useSensoryMode } from "@/context/SensoryModeProvider";
+import { colors } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 interface HeaderUserChipProps {
@@ -29,7 +30,7 @@ export function HeaderUserChip({ name, subtitle, initial, onPress, style }: Head
       shadowOpacity: shadowStrength * 0.5,
       shadowRadius: 6,
       shadowOffset: { width: 0, height: 2 } as const,
-      shadowColor: "#000",
+      shadowColor: colors.black,
       elevation: Math.round(shadowStrength * 6),
     },
     style,

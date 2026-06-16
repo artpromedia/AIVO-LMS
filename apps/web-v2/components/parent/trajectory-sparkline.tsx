@@ -65,10 +65,10 @@ export function TrajectorySparkline({
         strokeLinejoin="round"
         className={
           direction === "rising"
-            ? "text-emerald-500"
+            ? "text-iw-success"
             : direction === "falling"
-              ? "text-amber-500"
-              : "text-aivo-ink-soft"
+              ? "text-iw-warning"
+              : "text-iw-ink-muted"
         }
       />
       <circle
@@ -77,10 +77,10 @@ export function TrajectorySparkline({
         r="3"
         className={
           direction === "rising"
-            ? "fill-emerald-500"
+            ? "fill-iw-success"
             : direction === "falling"
-              ? "fill-amber-500"
-              : "fill-aivo-ink-soft"
+              ? "fill-iw-warning"
+              : "fill-iw-ink-muted"
         }
       />
     </svg>

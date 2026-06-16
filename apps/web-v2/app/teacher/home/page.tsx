@@ -59,7 +59,7 @@ const TEACHER_NAV = [
 ];
 
 const cardShadow =
-  "shadow-[0_10px_30px_-18px_rgba(124,58,237,0.35)] border border-iw-border";
+  "shadow-soft-3 border border-iw-border";
 const sectionLink =
   "inline-flex items-center gap-1 text-sm font-semibold text-iw-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--aivo-sensory-ringFocus)] focus-visible:ring-offset-2 rounded-iw-control";
 
@@ -147,7 +147,7 @@ export default async function TeacherHome() {
             Here&rsquo;s what&rsquo;s happening in your classrooms today.
           </p>
         </div>
-        <div className="inline-flex overflow-hidden rounded-full bg-iw-primary text-white shadow-[0_10px_24px_-10px_rgba(124,58,237,0.6)]">
+        <div className="inline-flex overflow-hidden rounded-full bg-iw-primary text-white shadow-soft-3">
           <Link
             href="/teacher/assignments"
             className="inline-flex min-h-[48px] items-center gap-2 px-6 text-sm font-semibold transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"

@@ -123,7 +123,7 @@ export default function AboutPage() {
   const t = useTranslations("marketing.page_about");
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-iw-border sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 md:px-8 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image
@@ -139,7 +139,7 @@ export default function AboutPage() {
             <LanguageSwitcher compact />
             <Link
               href="/"
-              className="px-5 py-2 rounded-lg text-slate-600 font-semibold hover:text-primary transition hidden sm:inline-flex"
+              className="px-5 py-2 rounded-lg text-iw-ink-muted font-semibold hover:text-primary transition hidden sm:inline-flex"
             >
               Home
             </Link>
@@ -149,7 +149,7 @@ export default function AboutPage() {
                 trackCTAClick("about_get_started", `${WEB_APP_URL}/signup?plan=free`);
                 trackSignupInitiation("about");
               }}
-              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--aivo-sensory-primary)] px-5 text-sm font-semibold text-white shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:brightness-110"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-iw-control bg-[var(--aivo-sensory-primary)] px-5 text-sm font-semibold text-white shadow-soft-3 transition hover:-translate-y-0.5 hover:brightness-110"
             >
               {t("get_started")}
             </a>
@@ -165,20 +165,20 @@ export default function AboutPage() {
         }}
       >
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full blur-3xl opacity-20 bg-purple-400" />
+          <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full blur-3xl opacity-20 bg-iw-purple-400" />
           <div className="absolute bottom-0 -left-20 w-60 h-60 rounded-full blur-3xl opacity-10 bg-indigo-400" />
         </div>
         <div className="max-w-4xl mx-auto px-6 md:px-8 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-purple-50/80 border border-purple-100 mb-6">
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-iw-chip bg-iw-purple-100/80 border border-iw-purple-200 mb-6">
             <span className="text-lg">🎯</span>
             <span className="text-sm font-bold text-primary uppercase tracking-widest">
               {t("our_mission")}
             </span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-heading font-bold text-slate-900 mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-heading font-bold text-iw-ink mb-6 leading-tight">
             {t("no_learner_left_behind")}
           </h1>
-          <p className="text-lg md:text-xl text-slate-500 font-body max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-iw-ink-muted font-body max-w-3xl mx-auto leading-relaxed">
             AIVO Learning was founded on a simple belief: every student deserves a learning
             experience that adapts to them, not the other way around. Our AI-powered platform
             creates a unique learning profile — a Brain Clone — for every student, ensuring that no
@@ -188,28 +188,28 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-slate-50/50">
+      <section className="py-16 md:py-24 bg-iw-raised/50">
         <div className="max-w-6xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-iw-ink mb-4">
               {t("core_principles")}
             </h2>
-            <p className="text-lg text-slate-500 font-body">{t("core_principles_sub")}</p>
+            <p className="text-lg text-iw-ink-muted font-body">{t("core_principles_sub")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {PRINCIPLES.map((p) => (
               <div
                 key={p.title}
-                className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 text-center"
+                className="bg-white rounded-iw-card p-6 border border-iw-border shadow-soft-1 hover:shadow-soft-3 transition-all hover:-translate-y-1 text-center"
               >
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4"
+                  className="w-14 h-14 rounded-iw-control flex items-center justify-center text-2xl mx-auto mb-4"
                   style={{ backgroundColor: `${p.color}10` }}
                 >
                   {p.icon}
                 </div>
-                <h3 className="text-lg font-heading font-bold text-slate-900 mb-2">{p.title}</h3>
-                <p className="text-sm text-slate-500 font-body leading-relaxed">{p.description}</p>
+                <h3 className="text-lg font-heading font-bold text-iw-ink mb-2">{p.title}</h3>
+                <p className="text-sm text-iw-ink-muted font-body leading-relaxed">{p.description}</p>
               </div>
             ))}
           </div>
@@ -219,26 +219,26 @@ export default function AboutPage() {
       <section className="py-16 md:py-24">
         <div className="max-w-5xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-iw-ink mb-4">
               {t("our_values")}
             </h2>
-            <p className="text-lg text-slate-500 font-body">{t("our_values_sub")}</p>
+            <p className="text-lg text-iw-ink-muted font-body">{t("our_values_sub")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {VALUES.map((v) => (
               <div
                 key={v.title}
-                className="flex gap-5 p-6 rounded-2xl border border-slate-100 bg-white hover:shadow-lg transition-all"
+                className="flex gap-5 p-6 rounded-iw-card border border-iw-border bg-white hover:shadow-soft-3 transition-all"
               >
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                  className="w-14 h-14 rounded-iw-control flex items-center justify-center text-2xl flex-shrink-0"
                   style={{ backgroundColor: `${v.color}10` }}
                 >
                   {v.icon}
                 </div>
                 <div>
-                  <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">{v.title}</h3>
-                  <p className="text-slate-500 font-body leading-relaxed">{v.description}</p>
+                  <h3 className="text-xl font-heading font-bold text-iw-ink mb-2">{v.title}</h3>
+                  <p className="text-iw-ink-muted font-body leading-relaxed">{v.description}</p>
                 </div>
               </div>
             ))}
@@ -246,13 +246,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-slate-50/50">
+      <section className="py-16 md:py-24 bg-iw-raised/50">
         <div className="max-w-6xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-iw-ink mb-4">
               {t("meet_our_leadership")}
             </h2>
-            <p className="text-lg text-slate-500 font-body max-w-3xl mx-auto">
+            <p className="text-lg text-iw-ink-muted font-body max-w-3xl mx-auto">
               AIVO is led by a team of seasoned executives who bring decades of cross-sector
               experience in healthcare, business strategy, education, public service, and
               technology.
@@ -262,7 +262,7 @@ export default function AboutPage() {
             {LEADERS.map((leader, i) => (
               <div
                 key={leader.name}
-                className={`flex flex-col ${i % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"} gap-8 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl transition-all`}
+                className={`flex flex-col ${i % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"} gap-8 bg-white rounded-iw-card-lg border border-iw-border shadow-soft-1 overflow-hidden hover:shadow-soft-5 transition-all`}
               >
                 <div className="relative w-full md:w-80 h-80 md:h-auto flex-shrink-0">
                   <div
@@ -285,7 +285,7 @@ export default function AboutPage() {
                       className="w-1.5 h-8 rounded-full"
                       style={{ backgroundColor: leader.color }}
                     />
-                    <h3 className="text-2xl font-heading font-bold text-slate-900">
+                    <h3 className="text-2xl font-heading font-bold text-iw-ink">
                       {leader.name}
                     </h3>
                   </div>
@@ -295,7 +295,7 @@ export default function AboutPage() {
                   >
                     {leader.role}
                   </p>
-                  <p className="text-slate-600 font-body leading-relaxed mb-6">{leader.bio}</p>
+                  <p className="text-iw-ink-muted font-body leading-relaxed mb-6">{leader.bio}</p>
                   <a
                     href={leader.linkedin}
                     target="_blank"
@@ -317,7 +317,7 @@ export default function AboutPage() {
 
       <section className="py-16 md:py-20">
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
-          <div className="bg-gradient-to-r from-primary to-purple-600 rounded-3xl p-10 md:p-16 text-white">
+          <div className="bg-gradient-to-r from-primary to-iw-purple-600 rounded-iw-card-lg p-10 md:p-16 text-white">
             <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
               {t("join_our_mission")}
             </h2>
@@ -328,13 +328,13 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/careers"
-                className="group inline-flex min-h-[52px] items-center justify-center rounded-full bg-white px-7 text-base font-semibold text-primary shadow-[0_16px_36px_-12px_rgba(0,0,0,0.4)] transition hover:-translate-y-0.5 hover:bg-purple-50"
+                className="group inline-flex min-h-[52px] items-center justify-center rounded-iw-control bg-white px-7 text-base font-semibold text-primary shadow-soft-3 transition hover:-translate-y-0.5 hover:bg-iw-purple-100"
               >
                 {t("view_open_positions")}
               </Link>
               <Link
                 href="/contact"
-                className="group inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/40 px-7 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+                className="group inline-flex min-h-[52px] items-center justify-center rounded-iw-control border border-white/40 px-7 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
               >
                 {t("contact_us")}
               </Link>

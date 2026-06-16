@@ -159,7 +159,7 @@ export function LearningWorkspace({
           accessibilityRole="button"
           accessibilityLabel={scratchOpen ? "Close scratchpad" : "Open scratchpad"}
         >
-          <Ionicons name={scratchOpen ? "close" : "pencil"} size={22} color="#FFF" />
+          <Ionicons name={scratchOpen ? "close" : "pencil"} size={22} color={colors.white} />
         </Pressable>
       ) : null}
 
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     elevation: 4,
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOpacity: 0.2,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },

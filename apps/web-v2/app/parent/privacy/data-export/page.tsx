@@ -34,10 +34,10 @@ export default async function Page() {
       <Card className="mt-4 p-[var(--aivo-density-card-pad)]">
         <h2 className="font-display font-semibold">{t("past_requests")}</h2>
         {requests.length === 0 ? (
-          <p className="mt-2 text-sm text-aivo-ink-soft">{t("no_requests")}</p>
+          <p className="mt-2 text-sm text-iw-ink-muted">{t("no_requests")}</p>
         ) : (
           <table className="mt-3 w-full text-sm">
-            <thead className="text-left text-aivo-muted">
+            <thead className="text-left text-iw-ink-muted">
               <tr>
                 <th className="py-2">{t("th_requested")}</th>
                 <th className="py-2">{t("th_scope")}</th>
@@ -47,7 +47,7 @@ export default async function Page() {
             </thead>
             <tbody>
               {requests.map((r) => (
-                <tr key={r.id} className="border-t border-aivo-border">
+                <tr key={r.id} className="border-t border-iw-border">
                   <td className="py-2">{new Date(r.requestedAt).toLocaleString()}</td>
                   <td className="py-2">
                     {r.learnerId
@@ -67,7 +67,7 @@ export default async function Page() {
                       {r.status}
                     </Badge>
                   </td>
-                  <td className="py-2 text-aivo-ink-soft">
+                  <td className="py-2 text-iw-ink-muted">
                     {r.completedAt ? new Date(r.completedAt).toLocaleString() : "—"}
                   </td>
                 </tr>

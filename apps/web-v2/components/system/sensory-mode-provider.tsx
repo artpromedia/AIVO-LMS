@@ -224,7 +224,7 @@ export function SensoryModePopover({ className }: { className?: string }) {
           align="end"
           sideOffset={8}
           className={cn(
-            "z-50 w-64 rounded-iw-control border border-iw-border bg-iw-raised p-2 shadow-lg",
+            "z-50 w-64 rounded-iw-control border border-iw-border bg-iw-raised p-2 shadow-soft-3",
             "focus-visible:outline-none",
             "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
           )}

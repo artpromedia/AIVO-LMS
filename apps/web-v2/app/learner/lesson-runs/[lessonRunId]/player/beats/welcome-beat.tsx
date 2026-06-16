@@ -47,10 +47,10 @@ export function WelcomeBeat({ body, tutorSlug, motionOff }: WelcomeBeatProps) {
           width={72}
           height={72}
           data-testid="tutor-portrait"
-          className="h-18 w-18 shrink-0 rounded-full border-2 border-[color:var(--tutor-accent,transparent)] bg-aivo-surface-2 object-cover"
+          className="h-18 w-18 shrink-0 rounded-full border-2 border-[color:var(--tutor-accent,transparent)] bg-iw-raised object-cover"
         />
         <p
-          className="rounded-xl bg-[color:var(--tutor-accent-soft,transparent)] px-4 py-2 font-display text-lg text-[color:var(--tutor-accent-ink,inherit)]"
+          className="rounded-iw-card bg-[color:var(--tutor-accent-soft,transparent)] px-4 py-2 font-display text-lg text-[color:var(--tutor-accent-ink,inherit)]"
           data-testid="tutor-welcome-line"
         >
           {t(`${tutorSlug}.welcome`)}

@@ -13,10 +13,10 @@ export function BudgetBurnChart({ budgets }: { budgets: SloBudget[] }) {
           const frac = Math.max(0, Math.min(1, b.consumedFraction));
           const over = b.consumedFraction > 1;
           const fillClass = over
-            ? "bg-aivo-danger"
+            ? "bg-iw-error"
             : frac >= 0.75
-              ? "bg-aivo-warning"
-              : "bg-aivo-success";
+              ? "bg-iw-warning"
+              : "bg-iw-success";
           return (
             <li key={b.sloId}>
               <div className="mb-1 flex items-center justify-between text-xs">

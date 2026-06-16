@@ -48,7 +48,7 @@ export function ImpersonationBanner({ state }: { state: ImpersonationState }) {
     <div
       role="status"
       aria-live="polite"
-      className="sticky top-0 z-50 w-full border-b-2 border-amber-700 bg-amber-500 text-black"
+      className="sticky top-0 z-50 w-full border-b-2 border-iw-warning-strong bg-iw-warning text-black"
     >
       <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-sm sm:px-6">
         <span className="inline-flex items-center gap-2 font-bold uppercase tracking-wide">
@@ -63,7 +63,7 @@ export function ImpersonationBanner({ state }: { state: ImpersonationState }) {
         <span
           className={
             "rounded-full px-2 py-0.5 text-xs font-bold " +
-            (state.allowWrites ? "bg-red-700 text-white" : "bg-black/15 text-black")
+            (state.allowWrites ? "bg-iw-error text-white" : "bg-black/15 text-black")
           }
         >
           {state.allowWrites ? "writes on" : "writes off"}
@@ -79,7 +79,7 @@ export function ImpersonationBanner({ state }: { state: ImpersonationState }) {
           type="button"
           onClick={onExit}
           disabled={exiting}
-          className="ml-auto inline-flex h-8 items-center rounded-full bg-black px-4 text-xs font-bold text-amber-400 hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black disabled:opacity-60"
+          className="ml-auto inline-flex h-8 items-center rounded-full bg-black px-4 text-xs font-bold text-iw-warning hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black disabled:opacity-60"
         >
           {exiting ? "Exiting…" : "Exit View-As"}
         </button>

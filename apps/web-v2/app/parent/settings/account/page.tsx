@@ -25,7 +25,7 @@ export default async function Page() {
         description="Update how your name appears across AIVO."
       />
       <Card className="max-w-lg p-6">
-        <p className="mb-4 text-sm text-aivo-ink-soft">
+        <p className="mb-4 text-sm text-iw-ink-muted">
           {t("signed_in_as")} <span className="font-medium">{session.email}</span>.
         </p>
         <AccountForm

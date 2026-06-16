@@ -14,9 +14,11 @@ import {
 } from "@/hooks/useAvatar";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
-import { AivoCard, AivoButton } from "@aivo/mobile-ui";
+import { SEMANTIC } from "@aivo/brand";
+import { Card, Button } from "@/components/ui";
 import { AvatarPreview } from "@/src/components/learner/AvatarPreview";
 import { colors, spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { gridColumns } from "@/src/design/responsive";
@@ -196,7 +198,7 @@ export default function ShopScreen() {
         </View>
       </View>
 
-      <AivoCard style={styles.previewCard}>
+      <Card style={styles.previewCard}>
         <AvatarPreview
           items={items}
           inventory={inventory}
@@ -205,7 +207,7 @@ export default function ShopScreen() {
           emptyLabel={t("learnerShop.noLook", "No look equipped yet — buy and equip an item below.")}
           wearingLabel={t("learnerShop.wearing", "Wearing")}
         />
-      </AivoCard>
+      </Card>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll}>
         {categories.map((cat) => (
@@ -243,7 +245,7 @@ export default function ShopScreen() {
             const equipped = equippedIds.has(item.id);
             const price = priceFor(item);
             return (
-              <AivoCard key={item.id} style={[styles.itemCard, { width: cardWidthPct }]}>
+              <Card key={item.id} style={[styles.itemCard, { width: cardWidthPct }]}>
                 <View style={[styles.rarityDot, { backgroundColor: rarityColors[item.rarity] }]} />
                 <View style={styles.itemPreview}>
                   <Text style={{ fontSize: 30 }}>{categoryGlyph[item.category] ?? "🌟"}</Text>
@@ -271,7 +273,7 @@ export default function ShopScreen() {
                       <Text style={styles.equippedText}>{t("learnerShop.equipped", "Equipped")}</Text>
                     </View>
                   ) : (
-                    <AivoButton
+                    <Button
                       title={t("learnerShop.equip", "Equip")}
                       onPress={() => handleEquip(item, true)}
                       size="sm"
@@ -280,14 +282,14 @@ export default function ShopScreen() {
                     />
                   )
                 ) : (
-                  <AivoButton
+                  <Button
                     title={price ? t("common.buy") : t("learnerShop.get", "Get")}
                     onPress={() => handlePurchase(item)}
                     size="sm"
                     style={{ marginTop: 8 }}
                   />
                 )}
-              </AivoCard>
+              </Card>
             );
           })}
         </View>
@@ -303,7 +305,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: spacing.md,
   },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  title: { fontSize: 24, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   currencyRow: { flexDirection: "row", gap: 8 },
   currencyBadge: {
     flexDirection: "row",
@@ -314,7 +316,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     gap: 4,
   },
-  currencyText: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
+  currencyText: { fontSize: 14, fontFamily: fontFamilies.bodyBold, color: colors.text },
   previewCard: { alignItems: "center", paddingVertical: spacing.md, marginBottom: spacing.md },
   catScroll: { marginBottom: spacing.md },
   catBtn: {
@@ -325,8 +327,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   catBtnActive: { backgroundColor: colors.primary },
-  catText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  catTextActive: { color: "#FFF" },
+  catText: { fontSize: 13, fontFamily: fontFamilies.bodySemiBold, color: colors.textSecondary },
+  catTextActive: { color: colors.white },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   itemCard: { alignItems: "center" as const, padding: spacing.sm },
   rarityDot: { width: 8, height: 8, borderRadius: 4, position: "absolute", top: 8, right: 8 },
@@ -339,10 +341,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 8,
   },
-  itemName: { fontSize: 13, fontFamily: "Nunito-Bold", color: colors.text, textAlign: "center" },
+  itemName: { fontSize: 13, fontFamily: fontFamilies.bodyBold, color: colors.text, textAlign: "center" },
   priceRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 4, minHeight: 18 },
-  priceText: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
-  freeText: { fontSize: 13, fontFamily: "Nunito-Bold", color: colors.success },
+  priceText: { fontSize: 14, fontFamily: fontFamilies.bodyBold, color: colors.text },
+  freeText: { fontSize: 13, fontFamily: fontFamilies.bodyBold, color: colors.success },
   equippedPill: {
     flexDirection: "row",
     alignItems: "center",
@@ -353,12 +355,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     backgroundColor: colors.primary + "15",
   },
-  equippedText: { fontSize: 12, fontFamily: "Nunito-Bold", color: colors.primary },
+  equippedText: { fontSize: 12, fontFamily: fontFamilies.bodyBold, color: colors.primary },
   errorBlock: {
     marginTop: spacing.xl,
     padding: spacing.md,
-    backgroundColor: "#fee2e2",
+    backgroundColor: SEMANTIC.color.feedback.dangerSurface,
     borderRadius: 12,
   },
-  errorText: { color: "#991b1b", fontFamily: "Nunito-SemiBold", fontSize: 14 },
+  errorText: { color: SEMANTIC.color.feedback.danger, fontFamily: fontFamilies.bodySemiBold, fontSize: 14 },
 });

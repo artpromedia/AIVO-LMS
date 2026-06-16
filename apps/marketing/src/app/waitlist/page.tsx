@@ -28,40 +28,40 @@ export default async function WaitlistPage() {
     >
       <section
         aria-labelledby="waitlist-form-heading"
-        className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
+        className="rounded-iw-card-lg border border-iw-border bg-white p-6 shadow-soft-1 md:p-8"
       >
-        <h2 id="waitlist-form-heading" className="font-heading text-2xl font-bold text-slate-900">
+        <h2 id="waitlist-form-heading" className="font-heading text-2xl font-bold text-iw-ink">
           {t("form_heading")}
         </h2>
-        <p className="mt-1 mb-6 font-body text-slate-600">{t("form_subheading")}</p>
+        <p className="mt-1 mb-6 font-body text-iw-ink-muted">{t("form_subheading")}</p>
         <WaitlistForm />
       </section>
 
       <section
         aria-labelledby="waitlist-promise-heading"
-        className="mt-10 rounded-3xl border border-slate-200 bg-slate-50/60 p-6 md:p-8"
+        className="mt-10 rounded-iw-card-lg border border-iw-border bg-iw-raised/60 p-6 md:p-8"
       >
-        <h2 id="waitlist-promise-heading" className="font-heading text-xl font-bold text-slate-900">
+        <h2 id="waitlist-promise-heading" className="font-heading text-xl font-bold text-iw-ink">
           {t("promise_heading")}
         </h2>
         <ul className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">
+          <li className="rounded-iw-card border border-iw-border bg-white p-5">
+            <span className="font-heading text-sm font-bold text-iw-success-strong">
               {t("promise_no_spam_title")}
             </span>
-            <p className="mt-1 font-body text-slate-700">{t("promise_no_spam_body")}</p>
+            <p className="mt-1 font-body text-iw-ink">{t("promise_no_spam_body")}</p>
           </li>
-          <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">
+          <li className="rounded-iw-card border border-iw-border bg-white p-5">
+            <span className="font-heading text-sm font-bold text-iw-success-strong">
               {t("promise_no_sharing_title")}
             </span>
-            <p className="mt-1 font-body text-slate-700">{t("promise_no_sharing_body")}</p>
+            <p className="mt-1 font-body text-iw-ink">{t("promise_no_sharing_body")}</p>
           </li>
-          <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">
+          <li className="rounded-iw-card border border-iw-border bg-white p-5">
+            <span className="font-heading text-sm font-bold text-iw-success-strong">
               {t("promise_easy_out_title")}
             </span>
-            <p className="mt-1 font-body text-slate-700">{t("promise_easy_out_body")}</p>
+            <p className="mt-1 font-body text-iw-ink">{t("promise_easy_out_body")}</p>
           </li>
         </ul>
       </section>

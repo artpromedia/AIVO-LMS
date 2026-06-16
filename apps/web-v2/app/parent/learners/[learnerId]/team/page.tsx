@@ -161,16 +161,16 @@ export default async function ParentTeamPage({
       />
 
       {isOnboarding ? (
-        <Card className="mb-2 border-aivo-accent/40 bg-aivo-accent/5 p-[var(--aivo-density-card-pad)]">
-          <p className="text-sm font-semibold text-aivo-ink">{t("onboarding_title")}</p>
-          <p className="mt-1 text-sm text-aivo-ink-soft">{t("onboarding_subtitle")}</p>
+        <Card className="mb-2 border-iw-warm/40 bg-iw-warm/5 p-[var(--aivo-density-card-pad)]">
+          <p className="text-sm font-semibold text-iw-ink">{t("onboarding_title")}</p>
+          <p className="mt-1 text-sm text-iw-ink-muted">{t("onboarding_subtitle")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <form action={completeTeamInviteStepAction}>
               <input type="hidden" name="learnerId" value={learner.id} />
               <input type="hidden" name="intent" value="continue" />
               <button
                 type="submit"
-                className="rounded-md bg-aivo-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+                className="rounded-md bg-iw-warm px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
               >
                 {t("continue_to_baseline")}
               </button>
@@ -180,7 +180,7 @@ export default async function ParentTeamPage({
               <input type="hidden" name="intent" value="skip" />
               <button
                 type="submit"
-                className="rounded-md border border-aivo-border px-4 py-2 text-sm font-semibold text-aivo-ink-soft hover:bg-aivo-surface-soft"
+                className="rounded-md border border-iw-border px-4 py-2 text-sm font-semibold text-iw-ink-muted hover:bg-iw-raised"
               >
                 {t("skip_for_now")}
               </button>
@@ -197,7 +197,7 @@ export default async function ParentTeamPage({
           with confirm. Fed by the contribution-status derivation. */}
       <SectionHeader title={tHub("section_title")} />
       {contributions.members.length > 0 ? (
-        <p className="mb-2 text-sm text-aivo-ink-soft">
+        <p className="mb-2 text-sm text-iw-ink-muted">
           {tHub("voices_summary", {
             contributed: contributions.voices.contributed,
             invited: contributions.voices.invited,
@@ -225,10 +225,10 @@ export default async function ParentTeamPage({
                       <Badge tone="neutral">{ROLE_LABEL[m.role] ?? m.role}</Badge>
                       {m.contributed ? <Badge tone="success">{t("contributed")}</Badge> : null}
                     </div>
-                    <p className="mt-0.5 truncate text-xs text-aivo-ink-soft">{m.context}</p>
+                    <p className="mt-0.5 truncate text-xs text-iw-ink-muted">{m.context}</p>
                     <a
                       href={`mailto:${m.email}`}
-                      className="mt-1 flex items-center gap-1 text-xs text-aivo-accent hover:underline"
+                      className="mt-1 flex items-center gap-1 text-xs text-iw-warm hover:underline"
                     >
                       <Mail className="h-3 w-3" /> {m.email}
                     </a>
@@ -242,7 +242,7 @@ export default async function ParentTeamPage({
 
       <SectionHeader title={t("how_collab_works")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <ul className="list-disc space-y-1 pl-5 text-sm text-aivo-ink-soft">
+        <ul className="list-disc space-y-1 pl-5 text-sm text-iw-ink-muted">
           <li>{t("collab_parents")}</li>
           <li>{t("collab_teachers")}</li>
           <li>{t("collab_therapists")}</li>
@@ -250,7 +250,7 @@ export default async function ParentTeamPage({
             Any member can be removed at any time from{" "}
             <Link
               href={`/parent/learners/${learner.id}/settings`}
-              className="text-aivo-accent underline underline-offset-4"
+              className="text-iw-warm underline underline-offset-4"
             >
               learner settings
             </Link>

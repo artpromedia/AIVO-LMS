@@ -75,7 +75,7 @@ export function SensoryControlGroup<V extends string = string>({
               onClick={() => onChange(opt.value)}
               onKeyDown={(e) => onKeyDown(e, idx)}
               className={cn(
-                "group flex flex-col items-center justify-center gap-1 rounded-2xl border px-2 transition-all",
+                "group flex flex-col items-center justify-center gap-1 rounded-iw-control border px-2 transition-all",
                 density === "comfortable" ? "py-3" : "py-2",
                 selected
                   ? "bg-[var(--color-aivo-primary-soft)] border-[var(--color-aivo-primary)] text-[var(--color-aivo-primary)] shadow-[inset_0_0_0_1px_var(--color-aivo-primary)]"

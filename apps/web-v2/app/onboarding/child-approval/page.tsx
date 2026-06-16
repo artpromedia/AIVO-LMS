@@ -153,7 +153,7 @@ export default function ChildApprovalPage() {
                 {submitting ? t("saving") : t("approve")}
               </button>
               {error ? (
-                <p role="alert" className="text-xs text-aivo-danger text-center">
+                <p role="alert" className="text-xs text-iw-error text-center">
                   {error}
                 </p>
               ) : null}

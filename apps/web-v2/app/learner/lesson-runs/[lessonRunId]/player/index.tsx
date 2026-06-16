@@ -192,7 +192,7 @@ export function LessonPlayer({
             presentation.tutorThemed ? "bg-[color:var(--tutor-accent)]" : undefined
           }
         />
-        <p className="mt-1 text-xs text-aivo-ink-soft" aria-live="polite">
+        <p className="mt-1 text-xs text-iw-ink-muted" aria-live="polite">
           {t("step_of", { current: stepIdx + 1, total: beats.length })}
         </p>
       </div>
@@ -279,7 +279,7 @@ export function LessonPlayer({
             )}
           </div>
           {machine.completeError ? (
-            <p role="alert" className="mt-3 text-sm text-red-600">
+            <p role="alert" className="mt-3 text-sm text-iw-error-strong">
               {machine.completeError}
             </p>
           ) : null}

@@ -256,14 +256,14 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
     switch (saveState) {
       case "saving":
         return (
-          <span className="text-xs text-aivo-ink-soft" data-testid="therapist-save-indicator">
+          <span className="text-xs text-iw-ink-muted" data-testid="therapist-save-indicator">
             {t("save_saving")}
           </span>
         );
       case "saved":
         return (
           <span
-            className="text-xs text-emerald-700"
+            className="text-xs text-iw-success-strong"
             data-testid="therapist-save-indicator"
             data-state="saved"
           >
@@ -273,7 +273,7 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
       case "save_error":
         return (
           <span
-            className="text-xs text-aivo-danger"
+            className="text-xs text-iw-error"
             role="status"
             data-testid="therapist-save-indicator"
             data-state="error"
@@ -299,7 +299,7 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
       <textarea
         id={id}
         rows={2}
-        className="rounded-md border border-aivo-line px-2 py-1.5 text-sm"
+        className="rounded-md border border-iw-border px-2 py-1.5 text-sm"
         placeholder={t("list_hint")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -311,14 +311,14 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <form onSubmit={submit} className="flex flex-col gap-4 lg:col-span-2">
         {/* Up-front time estimate + the always-optional framing (preserved). */}
-        <p className="rounded-md bg-aivo-surface-soft px-3 py-2 text-sm text-aivo-ink-soft">
+        <p className="rounded-md bg-iw-raised px-3 py-2 text-sm text-iw-ink-muted">
           {t("time_estimate")}
         </p>
 
         {/* Polite, non-intrusive autosave status for screen readers + sighted users. */}
         <div className="flex items-center justify-end" aria-live="polite">
           {phase === "loading" ? (
-            <span className="text-xs text-aivo-ink-soft">{t("loading")}</span>
+            <span className="text-xs text-iw-ink-muted">{t("loading")}</span>
           ) : (
             saveIndicator
           )}
@@ -330,7 +330,7 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
           </label>
           <select
             id="discipline"
-            className="w-fit rounded-md border border-aivo-line px-2 py-1.5 text-sm"
+            className="w-fit rounded-md border border-iw-border px-2 py-1.5 text-sm"
             value={discipline}
             onChange={(e) => setDiscipline(e.target.value as Discipline)}
           >
@@ -365,7 +365,7 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
           <textarea
             id="sensory"
             rows={2}
-            className="rounded-md border border-aivo-line px-2 py-1.5 text-sm"
+            className="rounded-md border border-iw-border px-2 py-1.5 text-sm"
             value={sensoryNotes}
             onChange={(e) => setSensoryNotes(e.target.value)}
           />
@@ -377,7 +377,7 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
           <textarea
             id="communication"
             rows={2}
-            className="rounded-md border border-aivo-line px-2 py-1.5 text-sm"
+            className="rounded-md border border-iw-border px-2 py-1.5 text-sm"
             value={communicationNotes}
             onChange={(e) => setCommunicationNotes(e.target.value)}
           />
@@ -389,7 +389,7 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
           <textarea
             id="observations"
             rows={4}
-            className="rounded-md border border-aivo-line px-2 py-1.5 text-sm"
+            className="rounded-md border border-iw-border px-2 py-1.5 text-sm"
             value={observations}
             onChange={(e) => setObservations(e.target.value)}
           />
@@ -399,7 +399,7 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
           <p
             id="therapist-submit-error"
             role="alert"
-            className="text-sm text-aivo-danger"
+            className="text-sm text-iw-error"
             aria-describedby="discipline"
           >
             {t("submit_error")}
@@ -428,23 +428,23 @@ export function TherapistAssessmentForm({ learnerId }: { learnerId: string }) {
 function IepSidePanel({ iep, loading }: { iep: IepPanel | null; loading: boolean }) {
   const t = useTranslations("therapist.assessment.iep_panel");
   return (
-    <div className="rounded-lg border border-aivo-line bg-aivo-surface-soft p-4">
-      <h2 id="iep-panel-title" className="text-sm font-semibold text-aivo-ink">
+    <div className="rounded-lg border border-iw-border bg-iw-raised p-4">
+      <h2 id="iep-panel-title" className="text-sm font-semibold text-iw-ink">
         {t("title")}
       </h2>
-      <p className="mt-1 text-xs text-aivo-ink-soft">{t("subtitle")}</p>
+      <p className="mt-1 text-xs text-iw-ink-muted">{t("subtitle")}</p>
 
       {loading || iep === null ? (
-        <p className="mt-3 text-sm text-aivo-ink-soft">{t("loading")}</p>
+        <p className="mt-3 text-sm text-iw-ink-muted">{t("loading")}</p>
       ) : !iep.onFile ? (
-        <p className="mt-3 text-sm text-aivo-ink-soft" data-testid="iep-panel-empty">
+        <p className="mt-3 text-sm text-iw-ink-muted" data-testid="iep-panel-empty">
           {t("empty")}
         </p>
       ) : (
         <div className="mt-3 flex flex-col gap-3" data-testid="iep-panel-content">
           {iep.goals.length > 0 ? (
             <section>
-              <h3 className="iw-label text-aivo-ink-soft">{t("goals")}</h3>
+              <h3 className="iw-label text-iw-ink-muted">{t("goals")}</h3>
               <ul className="mt-1 list-disc pl-4 text-sm">
                 {iep.goals.map((g, i) => (
                   <li key={i}>{g}</li>
@@ -454,7 +454,7 @@ function IepSidePanel({ iep, loading }: { iep: IepPanel | null; loading: boolean
           ) : null}
           {iep.accommodations.length > 0 ? (
             <section>
-              <h3 className="iw-label text-aivo-ink-soft">{t("accommodations")}</h3>
+              <h3 className="iw-label text-iw-ink-muted">{t("accommodations")}</h3>
               <ul className="mt-1 list-disc pl-4 text-sm">
                 {iep.accommodations.map((a, i) => (
                   <li key={i}>{a}</li>
@@ -464,14 +464,14 @@ function IepSidePanel({ iep, loading }: { iep: IepPanel | null; loading: boolean
           ) : null}
           {iep.serviceAreas.length > 0 ? (
             <section>
-              <h3 className="iw-label text-aivo-ink-soft">{t("service_areas")}</h3>
+              <h3 className="iw-label text-iw-ink-muted">{t("service_areas")}</h3>
               <p className="mt-1 text-sm">{iep.serviceAreas.join(", ")}</p>
             </section>
           ) : null}
           {iep.summary ? (
             <section>
-              <h3 className="iw-label text-aivo-ink-soft">{t("summary")}</h3>
-              <p className="mt-1 text-sm text-aivo-ink-soft">{iep.summary}</p>
+              <h3 className="iw-label text-iw-ink-muted">{t("summary")}</h3>
+              <p className="mt-1 text-sm text-iw-ink-muted">{iep.summary}</p>
             </section>
           ) : null}
         </div>
@@ -504,26 +504,26 @@ function SubmissionSummary({ record }: { record: SubmissionRecord | null }) {
 
   return (
     <div
-      className="rounded-lg border border-emerald-200 bg-emerald-50 p-4"
+      className="rounded-lg border border-iw-success bg-iw-success-subtle p-4"
       role="status"
       data-testid="therapist-submission-record"
     >
       <p className="font-medium">{t("success_title")}</p>
-      <p className="mt-1 text-sm text-aivo-ink-soft">{t("success_body")}</p>
+      <p className="mt-1 text-sm text-iw-ink-muted">{t("success_body")}</p>
 
       {record ? (
         <div className="mt-4 flex flex-col gap-3 rounded-md bg-white p-3">
-          <p className="text-xs text-aivo-ink-soft">
+          <p className="text-xs text-iw-ink-muted">
             {ts("submitted_at", { when: new Date(record.submittedAt).toLocaleString() })}
           </p>
           <dl className="flex flex-col gap-2 text-sm">
             <div>
-              <dt className="iw-label text-aivo-ink-soft">{ts("discipline")}</dt>
+              <dt className="iw-label text-iw-ink-muted">{ts("discipline")}</dt>
               <dd>{t(`discipline_${record.therapyDiscipline}`)}</dd>
             </div>
             {lists.map((l) => (
               <div key={l.label}>
-                <dt className="iw-label text-aivo-ink-soft">{l.label}</dt>
+                <dt className="iw-label text-iw-ink-muted">{l.label}</dt>
                 <dd>
                   <ul className="list-disc pl-4">
                     {l.items.map((it, i) => (
@@ -535,7 +535,7 @@ function SubmissionSummary({ record }: { record: SubmissionRecord | null }) {
             ))}
             {notes.map((n) => (
               <div key={n.label}>
-                <dt className="iw-label text-aivo-ink-soft">{n.label}</dt>
+                <dt className="iw-label text-iw-ink-muted">{n.label}</dt>
                 <dd className="whitespace-pre-wrap">{n.text}</dd>
               </div>
             ))}

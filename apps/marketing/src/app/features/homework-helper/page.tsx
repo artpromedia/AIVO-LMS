@@ -52,16 +52,16 @@ export default async function Page() {
         mockupTitle="Homework Helper · New problem"
         mockup={
           <div className="space-y-3">
-            <div className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center text-sm text-slate-500">
+            <div className="rounded-iw-card border-2 border-dashed border-iw-border bg-iw-raised p-5 text-center text-sm text-iw-ink-muted">
               📷 Snap a photo · or paste text
             </div>
             <textarea
               readOnly
               rows={2}
-              className="w-full resize-none rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-700"
+              className="w-full resize-none rounded-lg border border-iw-border bg-white p-2 text-sm text-iw-ink"
               value="Maya has 4 bags of marbles. Each bag has 3 marbles. How many in all?"
             />
-            <div className="rounded-lg bg-slate-900 py-2 text-center text-sm font-semibold text-white">
+            <div className="rounded-lg bg-iw-ink py-2 text-center text-sm font-semibold text-white">
               {t("get_help_cta")}
             </div>
           </div>
@@ -82,14 +82,14 @@ export default async function Page() {
         mockupTitle="Homework Helper · Clarifying"
         mockup={
           <div className="space-y-3">
-            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700">
+            <div className="rounded-iw-card border border-iw-border bg-iw-raised/60 p-3 text-sm text-iw-ink">
               {t("clarifying_question")}
             </div>
             <div className="grid grid-cols-2 gap-2">
               {["Add them up", "Multiply", "Not sure", "Show me an example"].map((w) => (
                 <div
                   key={w}
-                  className="rounded-lg border-2 border-slate-200 bg-white py-2 text-center text-sm font-body text-slate-700"
+                  className="rounded-lg border-2 border-iw-border bg-white py-2 text-center text-sm font-body text-iw-ink"
                 >
                   {w}
                 </div>
@@ -112,11 +112,11 @@ export default async function Page() {
         mockupTitle="Homework Helper · Step"
         mockup={
           <div className="space-y-3">
-            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700">
+            <div className="rounded-iw-card border border-iw-border bg-iw-raised/60 p-3 text-sm text-iw-ink">
               Great — “in all” means we're combining. We have 4 bags. Each bag has 3 marbles. Let's
               draw the first bag together. How many marbles go in bag 1?
             </div>
-            <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-700">
+            <div className="rounded-lg bg-white border border-iw-border p-2 text-sm text-iw-ink">
               {t("your_answer_label")} <span className="font-mono">3</span>
             </div>
           </div>
@@ -137,11 +137,11 @@ export default async function Page() {
         mockupTitle="What we just did"
         mockup={
           <div className="space-y-3">
-            <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-3 text-sm text-slate-700">
+            <div className="rounded-iw-card bg-iw-success-subtle border border-iw-success p-3 text-sm text-iw-ink">
               {t("explanation_text")}
               <span className="font-semibold"> multiplication as repeated addition.</span>
             </div>
-            <p className="text-xs text-slate-500">{t("mastery_updated")}</p>
+            <p className="text-xs text-iw-ink-muted">{t("mastery_updated")}</p>
           </div>
         }
       />
@@ -159,16 +159,16 @@ export default async function Page() {
         mockupTitle="Next up · Today's Mission"
         mockup={
           <div className="space-y-2">
-            <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-3 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">
+            <div className="rounded-iw-card bg-iw-primary p-3 text-white">
+              <p className="text-xs uppercase tracking-wider text-iw-primary-fg/80">
                 {t("recommended_next_label")}
               </p>
               <h3 className="mt-1 font-heading text-base font-bold">
                 {t("recommended_lesson_title")}
               </h3>
-              <p className="mt-0.5 text-xs text-purple-100">{t("recommended_lesson_meta")}</p>
+              <p className="mt-0.5 text-xs text-iw-primary-fg/80">{t("recommended_lesson_meta")}</p>
             </div>
-            <p className="text-xs text-slate-500">{t("added_to_session")}</p>
+            <p className="text-xs text-iw-ink-muted">{t("added_to_session")}</p>
           </div>
         }
       />
@@ -189,7 +189,7 @@ export default async function Page() {
               or a specialist — graded test items, IEP assessments, formal evaluation tasks — and
               decline rather than try.
             </p>
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-iw-ink-muted">
               Safety controls are tuned with educators. We log what the helper declined and why, and
               surface it to parents on request.
             </p>

@@ -7,7 +7,7 @@ import { WEB_APP_URL, SITE_URL } from "@/lib/constants";
 
 const CHECK_ICON = (
   <svg
-    className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5"
+    className="w-5 h-5 text-iw-success flex-shrink-0 mt-0.5"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -19,7 +19,7 @@ const CHECK_ICON = (
 
 const CHECK_WHITE = (
   <svg
-    className="w-4 h-4 text-emerald-300"
+    className="w-4 h-4 text-iw-success"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -80,7 +80,7 @@ export function Pricing() {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-b from-white to-slate-50/50" id="pricing">
+    <section className="py-24 bg-gradient-to-b from-white to-iw-raised/50" id="pricing">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }}
@@ -90,36 +90,36 @@ export function Pricing() {
           <p className="text-sm font-bold text-primary uppercase tracking-widest mb-3">
             {t("label")}
           </p>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-heading font-bold text-iw-ink mb-4">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-body">{t("subtitle")}</p>
+          <p className="text-lg text-iw-ink-muted max-w-2xl mx-auto font-body">{t("subtitle")}</p>
         </div>
 
         {/* Two tiers: Family (self-serve, listed price) and Enterprise (contact sales). */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
           {/* Family — B2C */}
-          <div className="relative bg-gradient-to-b from-purple-50 to-white border border-purple-200 rounded-3xl p-8 shadow-xl shadow-purple-200/50 flex flex-col">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white text-xs font-bold shadow-lg">
+          <div className="relative bg-gradient-to-b from-iw-purple-50 to-white border border-iw-purple-200 rounded-iw-card-lg p-8 shadow-soft-5 flex flex-col">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-iw-chip bg-gradient-to-r from-primary to-iw-purple-600 text-white text-xs font-bold shadow-soft-3">
               {t("best_value")}
             </div>
             <div className="mb-6">
-              <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">
+              <h3 className="text-xl font-heading font-bold text-iw-ink mb-2">
                 {t("family_name")}
               </h3>
               <div className="flex items-baseline gap-1 flex-wrap">
-                <span className="text-4xl font-heading font-bold text-slate-900">
+                <span className="text-4xl font-heading font-bold text-iw-ink">
                   ${FAMILY_PRICE.toFixed(2)}
                 </span>
-                <span className="text-slate-500 font-body text-sm">/mo</span>
+                <span className="text-iw-ink-muted font-body text-sm">/mo</span>
               </div>
               <p className="text-xs text-primary font-semibold mt-1">{t("per_learner")}</p>
-              <p className="text-sm text-slate-500 font-body mt-2">{t("family_desc")}</p>
+              <p className="text-sm text-iw-ink-muted font-body mt-2">{t("family_desc")}</p>
             </div>
 
             <ul className="space-y-3 mb-8 flex-1">
               {FAMILY_FEATURES.map((fk) => (
-                <li key={fk} className="flex items-start gap-2.5 text-sm text-slate-600 font-body">
+                <li key={fk} className="flex items-start gap-2.5 text-sm text-iw-ink-muted font-body">
                   {CHECK_ICON}
                   {t(fk)}
                 </li>
@@ -133,35 +133,35 @@ export function Pricing() {
                 trackCTAClick("pricing_family", `${WEB_APP_URL}/signup?plan=family`);
                 trackSignupInitiation("pricing");
               }}
-              className="block w-full py-3.5 rounded-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary-dark hover:to-purple-700 text-white font-bold text-center transition shadow-lg min-h-[44px] flex items-center justify-center"
+              className="block w-full py-3.5 rounded-iw-control bg-gradient-to-r from-primary to-iw-purple-600 hover:from-primary-dark hover:to-iw-purple-700 text-white font-bold text-center transition shadow-soft-3 min-h-[44px] flex items-center justify-center"
             >
               {t("family_cta")}
             </a>
           </div>
 
           {/* Enterprise — B2B / district */}
-          <div className="relative bg-white border border-slate-200 rounded-3xl p-8 hover:shadow-lg transition-all duration-300 flex flex-col">
+          <div className="relative bg-white border border-iw-border rounded-iw-card-lg p-8 hover:shadow-soft-3 transition-all duration-300 flex flex-col">
             <div className="mb-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-iw-chip bg-iw-raised mb-3">
                 <span className="text-base" aria-hidden="true">
                   🏫
                 </span>
-                <span className="text-xs font-bold text-slate-600">{t("district_badge")}</span>
+                <span className="text-xs font-bold text-iw-ink-muted">{t("district_badge")}</span>
               </div>
-              <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">
+              <h3 className="text-xl font-heading font-bold text-iw-ink mb-2">
                 {t("district_title")}
               </h3>
               <div className="flex items-baseline gap-1 flex-wrap">
-                <span className="text-4xl font-heading font-bold text-slate-900">
+                <span className="text-4xl font-heading font-bold text-iw-ink">
                   {t("district_sales")}
                 </span>
               </div>
-              <p className="text-sm text-slate-500 font-body mt-2">{t("district_desc")}</p>
+              <p className="text-sm text-iw-ink-muted font-body mt-2">{t("district_desc")}</p>
             </div>
 
             <ul className="space-y-3 mb-8 flex-1">
               {ENTERPRISE_FEATURES.map((fk) => (
-                <li key={fk} className="flex items-start gap-2.5 text-sm text-slate-600 font-body">
+                <li key={fk} className="flex items-start gap-2.5 text-sm text-iw-ink-muted font-body">
                   {CHECK_ICON}
                   {t(fk)}
                 </li>
@@ -172,14 +172,14 @@ export function Pricing() {
               <Link
                 href="/contact#demo"
                 onClick={() => trackCTAClick("pricing_enterprise_demo", "/contact#demo")}
-                className="flex-1 inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-center transition shadow-lg min-h-[44px]"
+                className="flex-1 inline-flex items-center justify-center px-6 py-3.5 rounded-iw-control bg-iw-ink hover:bg-iw-ink text-white font-bold text-center transition shadow-soft-3 min-h-[44px]"
               >
                 {t("district_demo")}
               </Link>
               <Link
                 href="/contact"
                 onClick={() => trackCTAClick("pricing_enterprise_sales", "/contact")}
-                className="flex-1 inline-flex items-center justify-center px-6 py-3.5 rounded-full border-2 border-slate-200 text-slate-700 font-bold text-center hover:bg-slate-50 transition min-h-[44px]"
+                className="flex-1 inline-flex items-center justify-center px-6 py-3.5 rounded-iw-control border-2 border-iw-border text-iw-ink font-bold text-center hover:bg-iw-raised transition min-h-[44px]"
               >
                 {t("district_sales")}
               </Link>
@@ -189,13 +189,13 @@ export function Pricing() {
 
         {/* Money-back guarantee */}
         <div className="max-w-3xl mx-auto mt-12">
-          <div className="flex items-start gap-4 rounded-3xl border border-emerald-200 bg-emerald-50/60 p-5 md:p-6">
-            <span className="inline-flex w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 items-center justify-center shrink-0">
+          <div className="flex items-start gap-4 rounded-iw-card-lg border border-iw-success bg-iw-success-subtle/60 p-5 md:p-6">
+            <span className="inline-flex w-10 h-10 rounded-iw-control bg-iw-success-subtle text-iw-success-strong items-center justify-center shrink-0">
               <ShieldCheck className="w-5 h-5" aria-hidden="true" />
             </span>
             <div>
-              <p className="font-heading font-bold text-emerald-900">{t("guarantee_title")}</p>
-              <p className="text-sm text-emerald-800/90 font-body mt-1 leading-relaxed">
+              <p className="font-heading font-bold text-iw-success-strong">{t("guarantee_title")}</p>
+              <p className="text-sm text-iw-success-strong/90 font-body mt-1 leading-relaxed">
                 {t("guarantee_desc")}
               </p>
             </div>
@@ -204,7 +204,7 @@ export function Pricing() {
 
         {/* Enterprise contact band */}
         <div className="max-w-4xl mx-auto mt-10">
-          <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-primary rounded-3xl p-8 md:p-10 text-center relative overflow-hidden">
+          <div className="bg-iw-primary rounded-iw-card-lg p-8 md:p-10 text-center relative overflow-hidden">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl" />

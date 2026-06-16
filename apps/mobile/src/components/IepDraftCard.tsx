@@ -6,7 +6,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { useGradebook } from "@/hooks/useGradebook";
 import { groupBySubject } from "@/lib/gradebook-logic";
 import { Card } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -69,7 +69,7 @@ export function IepDraftCard({ learnerId }: { learnerId: string }) {
           onPress={() => setGenerated(true)}
           style={[styles.cta, { backgroundColor: palette.primary }]}
         >
-          <Ionicons name="create-outline" size={18} color="#fff" />
+          <Ionicons name="create-outline" size={18} color={colors.white} />
           <Text style={styles.ctaText}>{t("teacherIepDraft.generate", "Generate drafts")}</Text>
         </Pressable>
       ) : drafts.length === 0 ? (
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: radius.xl,
   },
-  ctaText: { color: "#fff", fontSize: 15, fontFamily: fontFamilies.bodyBold },
+  ctaText: { color: colors.white, fontSize: 15, fontFamily: fontFamilies.bodyBold },
   goal: { padding: spacing.md, borderRadius: radius.lg, borderWidth: 1, gap: 4 },
   goalSkill: { fontSize: 14, fontFamily: fontFamilies.bodyBold },
   goalMeta: { fontSize: 12, fontFamily: fontFamilies.bodySemiBold },

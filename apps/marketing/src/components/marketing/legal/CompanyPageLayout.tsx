@@ -57,7 +57,7 @@ export function CompanyPageLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
       )}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-iw-border sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 md:px-8 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image
@@ -73,7 +73,7 @@ export function CompanyPageLayout({
             <LanguageSwitcher compact />
             <Link
               href="/"
-              className="px-5 py-2 rounded-lg text-slate-600 font-semibold hover:text-primary transition hidden sm:inline-flex min-h-[44px] items-center"
+              className="px-5 py-2 rounded-lg text-iw-ink-muted font-semibold hover:text-iw-primary transition hidden sm:inline-flex min-h-[44px] items-center"
             >
               Home
             </Link>
@@ -83,7 +83,7 @@ export function CompanyPageLayout({
                 trackCTAClick("company_get_started", `${WEB_APP_URL}/signup?plan=free`);
                 trackSignupInitiation("company_page");
               }}
-              className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-6 text-sm font-semibold text-white shadow-[0_14px_32px_-14px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:bg-primary-dark"
+              className="inline-flex min-h-[44px] items-center rounded-iw-control bg-iw-primary px-6 text-sm font-semibold text-white shadow-soft-3 transition hover:-translate-y-0.5 hover:bg-iw-primary-hover"
             >
               Get Started
             </a>
@@ -110,7 +110,7 @@ export function CompanyPageLayout({
         <div className="max-w-4xl mx-auto px-6 md:px-8 relative z-10">
           <div className="flex items-center gap-3 mb-6">
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-lg"
+              className="w-12 h-12 rounded-iw-control flex items-center justify-center text-2xl shadow-soft-3"
               style={{ backgroundColor: `${accentColor}15` }}
             >
               {icon}
@@ -122,10 +122,10 @@ export function CompanyPageLayout({
               {badge}
             </span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-iw-ink mb-4 leading-tight">
             {title}
           </h1>
-          <p className="text-lg text-slate-500 font-body max-w-2xl">{subtitle}</p>
+          <p className="text-lg text-iw-ink-muted font-body max-w-2xl">{subtitle}</p>
         </div>
       </div>
 

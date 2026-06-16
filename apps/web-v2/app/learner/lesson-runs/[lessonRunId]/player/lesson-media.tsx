@@ -30,7 +30,7 @@ export function LessonMedia({ media, onTelemetry }: LessonMediaProps) {
 
   const props = {
     controls: true,
-    className: "w-full rounded-md border border-aivo-border",
+    className: "w-full rounded-md border border-iw-border",
     onPlay: () => onTelemetry("play"),
     onPause: () => onTelemetry("pause"),
     onSeeked: () => onTelemetry("seek"),

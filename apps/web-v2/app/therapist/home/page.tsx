@@ -166,7 +166,7 @@ export default async function TherapistHomePage() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold">{l.displayName}</p>
-                    <p className="mt-0.5 text-xs text-aivo-ink-soft">
+                    <p className="mt-0.5 text-xs text-iw-ink-muted">
                       {l.gradeBand ? `Grade ${l.gradeBand}` : "Therapy caseload"}
                       {l.iep ? " · IEP on file" : ""}
                     </p>

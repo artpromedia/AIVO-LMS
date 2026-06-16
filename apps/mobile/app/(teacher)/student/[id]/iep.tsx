@@ -64,7 +64,7 @@ export default function TeacherIEPUpload() {
               if (d) setUploaded(d.name);
             }}
             size="sm"
-            icon={<Ionicons name="document-outline" size={16} color="#FFF" />}
+            icon={<Ionicons name="document-outline" size={16} color={colors.white} />}
             style={{ flex: 1 }}
           />
         </View>

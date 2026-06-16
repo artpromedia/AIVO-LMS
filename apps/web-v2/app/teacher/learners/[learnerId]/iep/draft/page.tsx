@@ -83,7 +83,7 @@ export default async function TeacherIepDraftPage({
         actions={
           <Link
             href={`/teacher/learners/${learner.id}`}
-            className="text-sm text-aivo-accent underline underline-offset-4"
+            className="text-sm text-iw-warm underline underline-offset-4"
           >
             ← Learner profile
           </Link>
@@ -103,7 +103,7 @@ export default async function TeacherIepDraftPage({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="font-medium">{iep.fileName}</p>
-                <p className="mt-0.5 text-xs text-aivo-ink-soft">
+                <p className="mt-0.5 text-xs text-iw-ink-muted">
                   Uploaded {new Date(iep.uploadedAt).toLocaleDateString()} ·{" "}
                   {Math.round(iep.bytes / 1024)} KB
                 </p>
@@ -123,11 +123,11 @@ export default async function TeacherIepDraftPage({
             {iep.extraction ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+                  <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
                     {t("existing_learning_goals")}
                   </p>
                   {iep.extraction.learningGoals.length === 0 ? (
-                    <p className="mt-1 text-sm text-aivo-ink-soft">{t("none_on_file")}</p>
+                    <p className="mt-1 text-sm text-iw-ink-muted">{t("none_on_file")}</p>
                   ) : (
                     <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm">
                       {iep.extraction.learningGoals.map((g) => (
@@ -137,11 +137,11 @@ export default async function TeacherIepDraftPage({
                   )}
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+                  <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
                     {t("accommodations")}
                   </p>
                   {iep.extraction.accommodations.length === 0 ? (
-                    <p className="mt-1 text-sm text-aivo-ink-soft">{t("none_recorded")}</p>
+                    <p className="mt-1 text-sm text-iw-ink-muted">{t("none_recorded")}</p>
                   ) : (
                     <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm">
                       {iep.extraction.accommodations.slice(0, 6).map((a) => (
@@ -159,7 +159,7 @@ export default async function TeacherIepDraftPage({
       <SectionHeader title={t("suggested_goal_drafts")} />
       {drafts.length === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-sm text-aivo-ink-soft">
+          <p className="text-sm text-iw-ink-muted">
             No skills currently below 60% mastery — this learner is on track. Goal drafts will
             appear when fresh mastery data indicates a gap.
           </p>
@@ -170,7 +170,7 @@ export default async function TeacherIepDraftPage({
             <li key={d.key}>
               <Card className="p-[var(--aivo-density-card-pad)]">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-aivo-accent/10 text-aivo-accent">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-iw-warm/10 text-iw-warm">
                     <Target className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -192,8 +192,8 @@ export default async function TeacherIepDraftPage({
       <SectionHeader title={t("how_drafts_generated")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <div className="flex items-start gap-3">
-          <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-aivo-accent" />
-          <div className="space-y-1 text-sm text-aivo-ink-soft">
+          <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-iw-warm" />
+          <div className="space-y-1 text-sm text-iw-ink-muted">
             <p>
               Drafts pull from the learner's current MasteryMap snapshot. Skills below 60% mastery
               are surfaced first, with a target lift of +25 percentage points.

@@ -66,14 +66,14 @@ export function WorkspaceThemePicker({
               }
               tabIndex={isActive ? 0 : -1}
               onClick={() => unlocked && choose(theme.id)}
-              className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
+              className={`flex items-center gap-3 rounded-iw-card border p-3 text-left transition ${
                 isActive
                   ? "border-[var(--color-aivo-primary)] bg-[var(--color-aivo-primary-soft)]"
                   : "border-iw-border/60 bg-white hover:border-[var(--color-aivo-primary)]/40"
               } ${unlocked ? "cursor-pointer" : "cursor-not-allowed"}`}
             >
               <span
-                className={`relative grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl ${
+                className={`relative grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-iw-control ${
                   unlocked ? "" : "opacity-40 grayscale"
                 }`}
               >

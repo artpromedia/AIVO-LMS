@@ -27,8 +27,8 @@ export interface TutorAvatarProps {
 }
 
 const SIZE_MAP: Record<TutorAvatarSize, string> = {
-  sm: "w-12 h-12 text-2xl rounded-xl",
-  md: "w-16 h-16 text-3xl rounded-2xl",
+  sm: "w-12 h-12 text-2xl rounded-iw-control",
+  md: "w-16 h-16 text-3xl rounded-iw-control",
   lg: "w-20 h-20 text-4xl rounded-[20px]",
   xl: "w-28 h-28 text-5xl rounded-[24px]",
 };

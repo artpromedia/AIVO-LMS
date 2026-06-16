@@ -302,7 +302,7 @@ export default function OnboardScreen() {
                   }
                 }}
                 size="lg"
-                icon={<Ionicons name="play" size={18} color="#FFF" />}
+                icon={<Ionicons name="play" size={18} color={colors.white} />}
               />
               <AivoButton
                 title={t("parentOnboard.skipBaseline", { defaultValue: "Skip for now" })}
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   },
   stepActive: { backgroundColor: colors.primary },
   stepNum: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.textSecondary },
-  stepNumActive: { color: "#FFF" },
+  stepNumActive: { color: colors.white },
   stepLabel: {
     fontSize: 11,
     fontFamily: "Nunito-Regular",

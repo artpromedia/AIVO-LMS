@@ -25,23 +25,23 @@ export function TrustStripInline({
     <section className="mb-14" aria-labelledby={headingId}>
       <h2
         id={headingId}
-        className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-3"
+        className="text-2xl md:text-3xl font-heading font-bold text-iw-ink mb-3"
       >
         {heading}
       </h2>
-      {subheading && <p className="text-slate-600 font-body mb-6 leading-relaxed">{subheading}</p>}
+      {subheading && <p className="text-iw-ink-muted font-body mb-6 leading-relaxed">{subheading}</p>}
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {chips.map((c) => {
           const Icon = c.icon;
           return (
             <li
               key={c.label}
-              className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4"
+              className="flex items-center gap-3 rounded-iw-card border border-iw-border bg-white p-4"
             >
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-purple-50 text-purple-700">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-iw-chip bg-iw-purple-100 text-iw-primary">
                 <Icon className="w-4 h-4" aria-hidden="true" />
               </span>
-              <span className="font-body text-sm text-slate-700">{c.label}</span>
+              <span className="font-body text-sm text-iw-ink">{c.label}</span>
             </li>
           );
         })}

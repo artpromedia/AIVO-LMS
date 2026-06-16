@@ -302,10 +302,18 @@ const preset = `module.exports = {
           // mode-scoped status overrides). The brand-scale status
           // palette is intentional here; the semantic feedback palette
           // (--aivo-semantic-color-feedback-X) reads differently.
-          success: "var(--aivo-color-status-success)",
-          warning: "var(--aivo-color-status-warning)",
-          error:   "var(--aivo-color-status-error)",
-          info:    "var(--aivo-color-status-info)",
+          success:          "var(--aivo-color-status-success)",
+          "success-subtle": "var(--aivo-color-status-success-subtle)",
+          "success-strong": "var(--aivo-color-status-success-strong)",
+          warning:          "var(--aivo-color-status-warning)",
+          "warning-subtle": "var(--aivo-color-status-warning-subtle)",
+          "warning-strong": "var(--aivo-color-status-warning-strong)",
+          error:            "var(--aivo-color-status-error)",
+          "error-subtle":   "var(--aivo-color-status-error-subtle)",
+          "error-strong":   "var(--aivo-color-status-error-strong)",
+          info:             "var(--aivo-color-status-info)",
+          "info-subtle":    "var(--aivo-color-status-info-subtle)",
+          "info-strong":    "var(--aivo-color-status-info-strong)",
           // Domain status (each has subtle / default / strong / on)
           mastery: {
             "emerging-subtle":   "var(--aivo-domain-mastery-emerging-subtle)",

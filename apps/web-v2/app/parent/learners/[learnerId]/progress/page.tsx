@@ -111,19 +111,19 @@ export default async function ParentProgressPage({
       />
 
       <div className="grid gap-4 sm:grid-cols-4">
-        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-soft-3">
           <p className="text-xs uppercase text-iw-text-muted">{t("lessons_done")}</p>
           <p className="text-2xl font-semibold text-iw-text-strong">{completed.length}</p>
         </div>
-        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-soft-3">
           <p className="text-xs uppercase text-iw-text-muted">{t("time_learning")}</p>
           <p className="text-2xl font-semibold text-iw-text-strong">{totalMinutes} min</p>
         </div>
-        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-soft-3">
           <p className="text-xs uppercase text-iw-text-muted">{t("skills_tracked")}</p>
           <p className="text-2xl font-semibold text-iw-text-strong">{skillMasteries.length}</p>
         </div>
-        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+        <div className="rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-soft-3">
           <p className="text-xs uppercase text-iw-text-muted">{t("mastered")}</p>
           <p className="text-2xl font-semibold text-iw-text-strong">
             {
@@ -145,7 +145,7 @@ export default async function ParentProgressPage({
       />
       <div className="grid gap-4">
         {bySubject.length === 0 ? (
-          <div className="rounded-iw-card-lg bg-white border border-iw-border p-6 text-sm text-iw-text-muted shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+          <div className="rounded-iw-card-lg bg-white border border-iw-border p-6 text-sm text-iw-text-muted shadow-soft-3">
             Once {learner.displayName} completes a lesson, mastery shows up here.
           </div>
         ) : (
@@ -155,7 +155,7 @@ export default async function ParentProgressPage({
             const deliveryBand = normalizeGradeBand(latest?.deliveryLevel);
             const enrolledBand = normalizeGradeBand(latest?.gradeBand);
             return (
-            <div key={subject.id} className="rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+            <div key={subject.id} className="rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-soft-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <p className="font-semibold text-iw-text-strong">{subject.name}</p>

@@ -19,8 +19,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLearners } from "@/hooks/useLearners";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
-import { AivoCard, AivoButton } from "@aivo/mobile-ui";
+import { Card, Button } from "@/components/ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 
 export default function ChallengesScreen() {
   const insets = useSafeAreaInsets();
@@ -114,7 +115,7 @@ export default function ChallengesScreen() {
       <Text style={styles.subtitle}>{t("learnerChallenges.subtitle")}</Text>
 
       {createdChallenge && (
-        <AivoCard style={[styles.battleCard, { borderWidth: 2, borderColor: colors.success }]}>
+        <Card style={[styles.battleCard, { borderWidth: 2, borderColor: colors.success }]}>
           <Ionicons name="checkmark-circle" size={28} color={colors.success} />
           <Text style={styles.battleTitle}>{createdChallenge.title}</Text>
           <Text style={styles.battleDesc}>Share this code with a friend to start!</Text>
@@ -122,58 +123,58 @@ export default function ChallengesScreen() {
             <Text style={styles.codeText}>{createdChallenge.inviteCode}</Text>
           </View>
           <View style={{ flexDirection: "row", gap: 8, marginTop: spacing.md }}>
-            <AivoButton
+            <Button
               title={t("learnerChallenges.copyCode")}
               onPress={() => handleShareCode(createdChallenge.inviteCode)}
               variant="outline"
               size="sm"
             />
-            <AivoButton title="Done" onPress={() => setCreatedChallenge(null)} size="sm" />
+            <Button title="Done" onPress={() => setCreatedChallenge(null)} size="sm" />
           </View>
-        </AivoCard>
+        </Card>
       )}
 
-      <AivoCard style={styles.battleCard}>
+      <Card style={styles.battleCard}>
         <Ionicons name="flash" size={32} color={colors.accent} />
         <Text style={styles.battleTitle}>{t("learnerChallenges.quickBattle")}</Text>
         <Text style={styles.battleDesc}>{t("learnerChallenges.quickBattleDesc")}</Text>
         {creatingType === "daily" ? (
           <ActivityIndicator color={colors.accent} style={{ marginTop: spacing.md }} />
         ) : (
-          <AivoButton
+          <Button
             title={t("learnerChallenges.findMatch")}
             onPress={() => handleCreateChallenge("daily", "Quick Math Battle", "Mathematics")}
             size="sm"
             style={{ marginTop: spacing.md }}
           />
         )}
-      </AivoCard>
+      </Card>
 
-      <AivoCard style={styles.battleCard}>
+      <Card style={styles.battleCard}>
         <Ionicons name="people" size={32} color={colors.secondary} />
         <Text style={styles.battleTitle}>{t("learnerChallenges.teamChallenge")}</Text>
         <Text style={styles.battleDesc}>{t("learnerChallenges.teamChallengeDesc")}</Text>
         {creatingType === "multiplayer" ? (
           <ActivityIndicator color={colors.secondary} style={{ marginTop: spacing.md }} />
         ) : (
-          <AivoButton
+          <Button
             title={t("learnerChallenges.joinTeam")}
             onPress={() => setJoinModalVisible(true)}
-            variant="secondary"
+            variant="ghost"
             size="sm"
             style={{ marginTop: spacing.md }}
           />
         )}
-      </AivoCard>
+      </Card>
 
-      <AivoCard style={styles.battleCard}>
+      <Card style={styles.battleCard}>
         <Ionicons name="trophy" size={32} color={colors.primary} />
         <Text style={styles.battleTitle}>{t("learnerChallenges.weeklyTournament")}</Text>
         <Text style={styles.battleDesc}>{t("learnerChallenges.weeklyTournamentDesc")}</Text>
         {creatingType === "weekly" ? (
           <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.md }} />
         ) : (
-          <AivoButton
+          <Button
             title={t("learnerChallenges.enterTournament")}
             onPress={() => handleCreateChallenge("weekly", "Weekly Tournament", "Mathematics")}
             variant="outline"
@@ -181,21 +182,21 @@ export default function ChallengesScreen() {
             style={{ marginTop: spacing.md }}
           />
         )}
-      </AivoCard>
+      </Card>
 
       <Text style={[styles.sectionTitle, { marginTop: spacing.lg }]}>
         {t("learnerChallenges.inviteFriend")}
       </Text>
-      <AivoCard>
+      <Card>
         <Text style={styles.inviteText}>{t("learnerChallenges.inviteText")}</Text>
-        <AivoButton
+        <Button
           title="Create & Share Invite"
           onPress={() => handleCreateChallenge("multiplayer", "Friend Challenge", "Mathematics")}
           variant="outline"
           size="sm"
           style={{ marginTop: spacing.md }}
         />
-      </AivoCard>
+      </Card>
 
       <Modal visible={joinModalVisible} transparent animationType="slide">
         <Pressable accessibilityRole="button" style={styles.modalOverlay} onPress={() => setJoinModalVisible(false)}>
@@ -219,7 +220,7 @@ export default function ChallengesScreen() {
               maxLength={8}
             />
             <View style={{ flexDirection: "row", gap: 8, marginTop: spacing.md }}>
-              <AivoButton
+              <Button
                 title={t("common.cancel")}
                 onPress={() => {
                   setJoinModalVisible(false);
@@ -232,7 +233,7 @@ export default function ChallengesScreen() {
               {joining ? (
                 <ActivityIndicator color={colors.primary} style={{ flex: 1 }} />
               ) : (
-                <AivoButton
+                <Button
                   title="Join"
                   onPress={handleJoinChallenge}
                   size="sm"
@@ -250,11 +251,11 @@ export default function ChallengesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
-  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  backText: { fontSize: 16, fontFamily: fontFamilies.bodySemiBold, color: colors.primary },
+  title: { fontSize: 24, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
@@ -263,23 +264,23 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     paddingVertical: spacing.lg,
   },
-  battleTitle: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.text, marginTop: 8 },
+  battleTitle: { fontSize: 18, fontFamily: fontFamilies.bodyBold, color: colors.text, marginTop: 8 },
   battleDesc: {
     fontSize: 13,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: 4,
     textAlign: "center",
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.text,
     marginBottom: spacing.md,
   },
   inviteText: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     textAlign: "center",
   },
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
   },
   codeText: {
     fontSize: 24,
-    fontFamily: "Nunito-ExtraBold",
+    fontFamily: fontFamilies.bodyExtraBold,
     color: colors.primary,
     letterSpacing: 4,
   },
@@ -311,13 +312,13 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontFamily: "Nunito-ExtraBold",
+    fontFamily: fontFamilies.bodyExtraBold,
     color: colors.text,
     textAlign: "center",
   },
   modalDesc: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     textAlign: "center",
     marginTop: 4,
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     textAlign: "center",
     fontSize: 22,
-    fontFamily: "Nunito-ExtraBold",
+    fontFamily: fontFamilies.bodyExtraBold,
     color: colors.text,
     letterSpacing: 4,
   },

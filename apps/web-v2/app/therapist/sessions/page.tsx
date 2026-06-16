@@ -120,11 +120,11 @@ export default async function TherapistSessionsPage() {
                   <div>
                     <p className="text-sm font-semibold">
                       {learner?.displayName ?? "Learner"} ·{" "}
-                      <span className="text-aivo-ink-soft">
+                      <span className="text-iw-ink-muted">
                         {subjectName.get(run.subjectId) ?? "Subject"}
                       </span>
                     </p>
-                    <p className="mt-0.5 text-xs text-aivo-ink-soft">
+                    <p className="mt-0.5 text-xs text-iw-ink-muted">
                       {skillName.get(run.skillId) ?? "Skill"} · {formatDate(run.createdAt)} ·{" "}
                       {durationLabel(run)}
                     </p>

@@ -72,7 +72,7 @@ export default function TutorSessionScreen() {
     return (
       <View style={[styles.container, { paddingTop: insets.top + 16, paddingHorizontal: hPad }]}>
         <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel={t("common.back", "Back")}>
-          <Ionicons name="arrow-back" size={24} color="#FFF" />
+          <Ionicons name="arrow-back" size={24} color={colors.white} />
         </Pressable>
         <Text style={styles.title}>{t("learnerTutor.tutorNotFound", "Tutor not found")}</Text>
       </View>
@@ -257,7 +257,7 @@ export default function TutorSessionScreen() {
 
               {!entitled && !entitlementsLoading ? (
                 <View style={styles.lockedCallout} accessibilityLiveRegion="polite">
-                  <Ionicons name="lock-closed" size={18} color="#FFF" />
+                  <Ionicons name="lock-closed" size={18} color={colors.white} />
                   <Text style={styles.lockedText}>
                     {t(
                       "learnerTutor.lockedBody",
@@ -277,10 +277,10 @@ export default function TutorSessionScreen() {
                 accessibilityRole="button"
               >
                 {startTutor.isPending ? (
-                  <ActivityIndicator color="#FFF" />
+                  <ActivityIndicator color={colors.white} />
                 ) : (
                   <>
-                    <Ionicons name="chatbubbles" size={20} color="#FFF" />
+                    <Ionicons name="chatbubbles" size={20} color={colors.white} />
                     <Text style={styles.primaryButtonText}>
                       {t("learnerTutor.startGuidance", "Start guided conversation")}
                     </Text>
@@ -295,10 +295,10 @@ export default function TutorSessionScreen() {
                 accessibilityRole="button"
               >
                 {structuredStarting ? (
-                  <ActivityIndicator color="#FFF" />
+                  <ActivityIndicator color={colors.white} />
                 ) : (
                   <>
-                    <Ionicons name="play" size={18} color="#FFF" />
+                    <Ionicons name="play" size={18} color={colors.white} />
                     <Text style={styles.secondaryButtonText}>
                       {t("learnerTutor.startLesson", "Start structured lesson")}
                     </Text>
@@ -331,14 +331,14 @@ export default function TutorSessionScreen() {
                         accessibilityLabel={t("learnerTutor.readAloud", "Read response aloud")}
                         style={styles.speakButton}
                       >
-                        <Ionicons name="volume-high-outline" size={17} color="#FFF" />
+                        <Ionicons name="volume-high-outline" size={17} color={colors.white} />
                       </Pressable>
                     ) : null}
                   </View>
                 ))}
                 {sendMessage.isPending ? (
                   <View style={[styles.bubble, styles.tutorBubble]}>
-                    <ActivityIndicator color="#FFF" />
+                    <ActivityIndicator color={colors.white} />
                   </View>
                 ) : null}
               </ScrollView>
@@ -354,7 +354,7 @@ export default function TutorSessionScreen() {
                   <Ionicons
                     name={autoSpeak ? "volume-high" : "volume-mute-outline"}
                     size={20}
-                    color="#FFF"
+                    color={colors.white}
                   />
                 </Pressable>
                 {speechInput.isSupported ? (
@@ -375,12 +375,12 @@ export default function TutorSessionScreen() {
                     }
                   >
                     {speechInput.status === "processing" ? (
-                      <ActivityIndicator color="#FFF" size="small" />
+                      <ActivityIndicator color={colors.white} size="small" />
                     ) : (
                       <Ionicons
                         name={speechInput.status === "listening" ? "stop" : "mic"}
                         size={20}
-                        color="#FFF"
+                        color={colors.white}
                       />
                     )}
                   </Pressable>
@@ -402,7 +402,7 @@ export default function TutorSessionScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={t("learnerTutor.send", "Send")}
                 >
-                  <Ionicons name="arrow-up" size={22} color="#FFF" />
+                  <Ionicons name="arrow-up" size={22} color={colors.white} />
                 </Pressable>
               </View>
             </>
@@ -440,8 +440,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     backgroundColor: "rgba(255,255,255,0.12)",
   },
-  endButtonText: { color: "#FFF", fontFamily: "Nunito-Bold" },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: "#FFF", marginTop: spacing.md },
+  endButtonText: { color: colors.white, fontFamily: "Nunito-Bold" },
+  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.white, marginTop: spacing.md },
   tutorIntro: {
     flexDirection: "row",
     alignItems: "center",
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tutorIcon: { fontSize: 34 },
-  tutorName: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: "#FFF" },
+  tutorName: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.white },
   tutorDomain: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: "rgba(255,255,255,0.75)" },
   scopeText: {
     fontSize: 12,
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: spacing.md,
   },
-  infoText: { flex: 1, fontSize: 14, lineHeight: 20, fontFamily: "Nunito-SemiBold", color: "#FFF" },
+  infoText: { flex: 1, fontSize: 14, lineHeight: 20, fontFamily: "Nunito-SemiBold", color: colors.white },
   lockedCallout: {
     marginTop: spacing.lg,
     padding: spacing.md,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.sm,
   },
-  lockedText: { flex: 1, fontSize: 14, fontFamily: "Nunito-SemiBold", color: "#FFF" },
+  lockedText: { flex: 1, fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.white },
   primaryButton: {
     minHeight: 54,
     marginTop: spacing.xl,
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.sm,
   },
-  primaryButtonText: { color: "#FFF", fontSize: 16, fontFamily: "Nunito-Bold" },
+  primaryButtonText: { color: colors.white, fontSize: 16, fontFamily: "Nunito-Bold" },
   secondaryButton: {
     minHeight: 50,
     marginTop: spacing.sm,
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.sm,
   },
-  secondaryButtonText: { color: "#FFF", fontSize: 15, fontFamily: "Nunito-Bold" },
+  secondaryButtonText: { color: colors.white, fontSize: 15, fontFamily: "Nunito-Bold" },
   chat: { flex: 1 },
   chatContent: { paddingVertical: spacing.sm, gap: spacing.sm },
   bubble: {
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   },
   tutorBubble: { alignSelf: "flex-start", backgroundColor: "rgba(255,255,255,0.12)" },
   learnerBubble: { alignSelf: "flex-end", backgroundColor: "rgba(124,58,237,0.8)" },
-  bubbleText: { flexShrink: 1, color: "#FFF", fontFamily: "Nunito-SemiBold", fontSize: 15, lineHeight: 21 },
+  bubbleText: { flexShrink: 1, color: colors.white, fontFamily: "Nunito-SemiBold", fontSize: 15, lineHeight: 21 },
   speakButton: { padding: 3 },
   chatControls: {
     flexDirection: "row",
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 11,
     borderRadius: 22,
-    color: "#FFF",
+    color: colors.white,
     backgroundColor: "rgba(255,255,255,0.1)",
     fontFamily: "Nunito-SemiBold",
   },

@@ -51,12 +51,12 @@ export default async function Page() {
                 <Card key={l.id} className="p-[var(--aivo-density-card-pad)]">
                   <div className="flex items-center justify-between">
                     <p className="font-display text-lg font-semibold">{l.displayName}</p>
-                    <p className="text-sm text-aivo-ink-soft">
+                    <p className="text-sm text-iw-ink-muted">
                       {completed} of {runs.length} lessons complete
                     </p>
                   </div>
                   {masteries.length === 0 ? (
-                    <p className="mt-3 text-sm text-aivo-ink-soft">
+                    <p className="mt-3 text-sm text-iw-ink-muted">
                       No mastery scores recorded yet — encourage {l.displayName} to start a lesson.
                     </p>
                   ) : (
@@ -69,7 +69,7 @@ export default async function Page() {
                             <span>
                               {skill?.name ?? m.skillId}
                               {subject ? (
-                                <span className="ml-2 text-xs text-aivo-muted">{subject.name}</span>
+                                <span className="ml-2 text-xs text-iw-ink-muted">{subject.name}</span>
                               ) : null}
                             </span>
                             <span className="font-medium">{Math.round(m.score * 100)}%</span>

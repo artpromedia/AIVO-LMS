@@ -152,7 +152,7 @@ export default function TherapyGoals() {
                 ]}
               >
                 {createGoal.isPending ? (
-                  <ActivityIndicator color="#ffffff" size="small" />
+                  <ActivityIndicator color={colors.white} size="small" />
                 ) : (
                   <Text style={styles.modalBtnPrimaryText}>{t("common.save", "Save")}</Text>
                 )}
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     textAlignVertical: "top",
   },
-  modalError: { fontSize: 13, color: "#ef4444", fontFamily: "Nunito-Regular" },
+  modalError: { fontSize: 13, color: colors.error, fontFamily: "Nunito-Regular" },
   modalActions: {
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -231,5 +231,5 @@ const styles = StyleSheet.create({
   modalBtnGhost: { backgroundColor: "transparent" },
   modalBtnGhostText: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.textSecondary },
   modalBtnPrimary: { backgroundColor: colors.primary, minWidth: 88 },
-  modalBtnPrimaryText: { fontSize: 15, fontFamily: "Nunito-Bold", color: "#ffffff" },
+  modalBtnPrimaryText: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.white },
 });

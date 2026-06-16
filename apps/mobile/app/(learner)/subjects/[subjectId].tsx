@@ -19,7 +19,7 @@ import { useGradebook } from "@/hooks/useGradebook";
 import { skillsForSubject } from "@/lib/gradebook-logic";
 import { masteryLabel } from "@/lib/subject-display";
 import { getSubjectBySlug, getDiscoverableSubjects, TUTORS } from "@aivo/brand";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -44,7 +44,7 @@ export default function SubjectDetailScreen() {
     getDiscoverableSubjects().find((s) => s.name.toLowerCase() === slug.toLowerCase());
   const tutor = subject ? TUTORS[subject.tutorKey] : undefined;
   const name = subject?.name ?? slug;
-  const accent = tutor?.color ?? "#7c3aed";
+  const accent = tutor?.color ?? colors.accent;
   const domain = useMemo(
     () => domains.find((d) => d.domain.toLowerCase() === name.toLowerCase()),
     [domains, name],
@@ -172,7 +172,7 @@ export default function SubjectDetailScreen() {
             onPress={() => router.push(`/(learner)/tutor/${subject.tutorKey}` as Href)}
             style={[styles.cta, { backgroundColor: accent }]}
           >
-            <Ionicons name="chatbubbles" size={18} color="#fff" />
+            <Ionicons name="chatbubbles" size={18} color={colors.white} />
             <Text style={styles.ctaText}>
               {t("subjects.exploreWithTutor", "Explore with your tutor")}
             </Text>
@@ -226,5 +226,5 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: radius.xl,
   },
-  ctaText: { color: "#fff", fontSize: 16, fontFamily: fontFamilies.bodyBold },
+  ctaText: { color: colors.white, fontSize: 16, fontFamily: fontFamilies.bodyBold },
 });

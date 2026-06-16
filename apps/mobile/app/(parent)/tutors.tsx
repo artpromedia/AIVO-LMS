@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   filterActive: { backgroundColor: colors.primary },
   filterText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  filterTextActive: { color: "#FFF" },
+  filterTextActive: { color: colors.white },
   includedBanner: {
     flexDirection: "row",
     alignItems: "center",
@@ -214,5 +214,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     marginTop: spacing.md,
   },
-  addTutorText: { fontSize: 16, fontFamily: "Nunito-Bold", color: "#FFF" },
+  addTutorText: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.white },
 });

@@ -208,7 +208,7 @@ export default function ParentBrainCloneWatchScreen() {
 
           {approved ? (
             <Card tone="raised" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-              <Ionicons name="checkmark-circle" size={22} color="#22c55e" />
+              <Ionicons name="checkmark-circle" size={22} color={colors.success} />
               <Text style={[styles.body, { color: palette.ink, flex: 1 }]}>
                 {t(
                   "brainClone.alreadyApproved",
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   stageRow: { flexDirection: "row", gap: spacing.md },
   rail: { alignItems: "center", width: 28 },
   node: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  nodeNum: { color: "#fff", fontSize: 13, fontFamily: fontFamilies.bodyBold },
+  nodeNum: { color: colors.white, fontSize: 13, fontFamily: fontFamilies.bodyBold },
   line: { width: 2, flex: 1, marginTop: 2 },
   stageLabel: { fontSize: 15, fontFamily: fontFamilies.bodyBold },
   stageDesc: { fontSize: 13, fontFamily: fontFamilies.bodyRegular, marginTop: 2, lineHeight: 19 },

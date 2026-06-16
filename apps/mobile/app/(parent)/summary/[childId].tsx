@@ -11,7 +11,7 @@ import { Card } from "@/components/ui";
 import { MasteryBar, LoadingState, EmptyState } from "@aivo/mobile-ui";
 import { summarizeDomains } from "@/lib/learner-progress";
 import { subjectAccent } from "@/lib/subject-display";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -91,7 +91,7 @@ export default function ParentSummaryScreen() {
           {strongest.length > 0 && (
             <Card tone="raised" style={styles.card}>
               <View style={styles.cardHead}>
-                <Ionicons name="star" size={18} color="#22c55e" />
+                <Ionicons name="star" size={18} color={colors.success} />
                 <Text style={[styles.sectionTitle, { color: palette.ink }]}>
                   {t("parentSummary.strongest", "Strongest right now")}
                 </Text>
@@ -118,7 +118,7 @@ export default function ParentSummaryScreen() {
           {practice.length > 0 && (
             <Card tone="raised" style={styles.card}>
               <View style={styles.cardHead}>
-                <Ionicons name="heart" size={18} color="#f59e0b" />
+                <Ionicons name="heart" size={18} color={colors.warning} />
                 <Text style={[styles.sectionTitle, { color: palette.ink }]}>
                   {t("parentSummary.keepPracticing", "Keep practising")}
                 </Text>

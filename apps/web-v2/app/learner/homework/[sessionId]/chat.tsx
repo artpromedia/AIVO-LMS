@@ -229,7 +229,7 @@ export function HomeworkChat({
                   {m.role === "tutor" ? (
                     <div className="flex max-w-[85%] items-start gap-2">
                       <NovaCharacter size={36} className="mt-0.5 shrink-0" />
-                      <div className="rounded-2xl rounded-tl-sm bg-iw-accent-soft px-4 py-2.5 text-sm text-iw-ink">
+                      <div className="rounded-iw-card rounded-tl-sm bg-iw-accent-soft px-4 py-2.5 text-sm text-iw-ink">
                         <p className="whitespace-pre-wrap">{m.text}</p>
                         <button
                           type="button"
@@ -243,13 +243,13 @@ export function HomeworkChat({
                       </div>
                     </div>
                   ) : (
-                    <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-iw-primary px-4 py-2.5 text-sm text-white">
+                    <div className="max-w-[85%] rounded-iw-card rounded-tr-sm bg-iw-primary px-4 py-2.5 text-sm text-white">
                       <p className="whitespace-pre-wrap">{m.text}</p>
                     </div>
                   )}
                 </div>
                 {item ? (
-                  <div className="ml-10 rounded-2xl border border-iw-border bg-iw-surface p-3">
+                  <div className="ml-10 rounded-iw-card border border-iw-border bg-iw-surface p-3">
                     <SurfaceRouter
                       item={item}
                       disabled={surfaceDisabled || busy}
@@ -280,7 +280,7 @@ export function HomeworkChat({
             type="button"
             onClick={chip.action}
             disabled={busy}
-            className="rounded-full border border-iw-border bg-iw-surface px-4 py-2 text-sm font-medium text-iw-ink transition-colors hover:bg-iw-accent-soft disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary"
+            className="rounded-iw-control border border-iw-border bg-iw-surface px-4 py-2 text-sm font-medium text-iw-ink transition-colors hover:bg-iw-accent-soft disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary"
           >
             {chip.label}
           </button>
@@ -291,11 +291,11 @@ export function HomeworkChat({
           blocks the chat. Announced politely so it doesn't steal focus. */}
       <div aria-live="polite">
         {nudge ? (
-          <Card className="border-aivo-primary bg-aivo-primary/5 p-4">
+          <Card className="border-iw-primary bg-iw-primary/5 p-4">
             <h2 className="font-display text-lg font-semibold text-iw-text-strong">
               {t("calm_nudge.title")}
             </h2>
-            <p className="mt-1 text-sm text-aivo-ink-soft">{t("calm_nudge.body")}</p>
+            <p className="mt-1 text-sm text-iw-ink-muted">{t("calm_nudge.body")}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild>
                 <Link href={`/learner/calm?action=${nudge.recommendedAction}`}>
@@ -331,7 +331,7 @@ export function HomeworkChat({
               }
             }}
             placeholder={t("input_placeholder")}
-            className="min-h-[52px] w-full rounded-2xl border border-input bg-background p-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="min-h-[52px] w-full rounded-iw-card border border-input bg-background p-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           />
           {speech.isSupported ? (
             <button

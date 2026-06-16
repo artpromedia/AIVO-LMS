@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   primaryLabel: {
     fontFamily: fontFamilies.bodyBold,
     fontSize: 16,
-    color: "#ffffff",
+    color: colors.white,
   },
   secondaryButton: {
     marginTop: 12,

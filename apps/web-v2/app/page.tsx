@@ -68,12 +68,12 @@ export default async function Home() {
   // Pill CTAs with soft elevation, matching the reference design. Shared so the
   // signed-in and signed-out hero branches stay visually identical.
   const heroPrimaryBtn =
-    "group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-[var(--aivo-sensory-primary)] px-7 text-base font-semibold text-white shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:brightness-110";
+    "group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-iw-control bg-[var(--aivo-sensory-primary)] px-7 text-base font-semibold text-white shadow-soft-3 transition hover:-translate-y-0.5 hover:brightness-110";
   const heroSecondaryBtn =
-    "group inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full border border-slate-200 bg-white px-7 text-base font-semibold text-slate-900 shadow-[0_14px_34px_-16px_rgba(15,23,42,0.4)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50";
+    "group inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-iw-control border border-iw-border bg-white px-7 text-base font-semibold text-iw-ink shadow-soft-3 transition hover:-translate-y-0.5 hover:border-iw-border hover:bg-iw-raised";
   // Shared soft, purple-tinted card elevation used across every section so no
   // card reads as flat.
-  const cardShadow = "shadow-[0_22px_55px_-30px_rgba(76,29,149,0.28)]";
+  const cardShadow = "shadow-soft-3";
 
   const adultViews = [
     {
@@ -163,23 +163,23 @@ export default async function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-iw-ink">
       <SiteHeader />
 
       <main id="main">
         {/* Hero */}
         <section className="relative overflow-hidden bg-gradient-to-b from-[var(--aivo-aivoPurple-100)]/40 via-white to-white pt-16 pb-28 md:pt-24">
           <div
-            className="absolute right-0 top-0 -z-10 h-[640px] w-[640px] -translate-y-24 translate-x-1/3 rounded-full bg-purple-200/30 blur-3xl"
+            className="absolute right-0 top-0 -z-10 h-[640px] w-[640px] -translate-y-24 translate-x-1/3 rounded-full bg-iw-purple-200/30 blur-3xl"
             aria-hidden="true"
           />
           <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 md:px-8 lg:grid-cols-2">
             <div className="max-w-xl">
-              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-purple-100 bg-white px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--aivo-sensory-primary)]">
+              <span className="mb-6 inline-flex items-center gap-2 rounded-iw-chip border border-iw-purple-100 bg-white px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--aivo-sensory-primary)]">
                 <Brain className="h-3.5 w-3.5" aria-hidden="true" />
                 {t("hero_eyebrow")}
               </span>
-              <h1 className="font-iw-display text-4xl font-bold leading-[1.08] tracking-tight text-slate-900 md:text-6xl">
+              <h1 className="font-iw-display text-4xl font-bold leading-[1.08] tracking-tight text-iw-ink md:text-6xl">
                 {t("hero_headline_pre")}{" "}
                 <span
                   className="bg-clip-text text-transparent"
@@ -192,7 +192,7 @@ export default async function Home() {
                 </span>
                 {t("hero_headline_post")}
               </h1>
-              <p className="mt-6 text-lg font-medium leading-relaxed text-slate-600 md:text-xl">
+              <p className="mt-6 text-lg font-medium leading-relaxed text-iw-ink-muted md:text-xl">
                 {t("hero_body")}
               </p>
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
@@ -219,7 +219,7 @@ export default async function Home() {
                       />
                     </Link>
                     <a href={demoHref} className={heroSecondaryBtn}>
-                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--aivo-sensory-primary)] text-white">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-iw-chip bg-[var(--aivo-sensory-primary)] text-white">
                         <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
                       </span>
                       {t("hero_cta_secondary")}
@@ -227,7 +227,7 @@ export default async function Home() {
                   </>
                 )}
               </div>
-              <p className="mt-8 text-sm font-medium text-slate-500">{t("hero_trust_line")}</p>
+              <p className="mt-8 text-sm font-medium text-iw-ink-muted">{t("hero_trust_line")}</p>
             </div>
 
             <div className="lg:pl-6">
@@ -239,21 +239,21 @@ export default async function Home() {
         {/* Trust badge strip */}
         <section
           aria-label="Privacy and accessibility commitments"
-          className="border-y border-slate-100 bg-white py-8"
+          className="border-y border-iw-border bg-white py-8"
         >
           <div className="mx-auto max-w-6xl px-6 md:px-8">
             <ul className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {trustBadges.map(({ Icon, label }) => (
                 <li
                   key={label}
-                  className="flex items-center justify-center gap-2.5 rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3"
+                  className="flex items-center justify-center gap-2.5 rounded-iw-card border border-iw-border bg-iw-raised/70 px-4 py-3"
                 >
                   <Icon className="h-5 w-5 text-[var(--aivo-sensory-primary)]" aria-hidden="true" />
-                  <span className="text-sm font-bold text-slate-800">{label}</span>
+                  <span className="text-sm font-bold text-iw-ink">{label}</span>
                 </li>
               ))}
             </ul>
-            <p className="mt-5 text-center text-sm font-medium text-slate-500">
+            <p className="mt-5 text-center text-sm font-medium text-iw-ink-muted">
               {t("trust_strip_caption")}
             </p>
           </div>
@@ -264,7 +264,7 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl px-6 md:px-8">
             <h2
               id="views-heading"
-              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-iw-ink md:text-4xl"
             >
               {t("views_heading")}
             </h2>
@@ -272,13 +272,13 @@ export default async function Home() {
               {adultViews.map(({ Icon, title, desc, cta, href }) => (
                 <article
                   key={title}
-                  className={`flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 transition hover:-translate-y-0.5 ${cardShadow}`}
+                  className={`flex flex-col rounded-iw-card-lg border border-iw-border/70 bg-white p-7 transition hover:-translate-y-0.5 ${cardShadow}`}
                 >
-                  <span className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
+                  <span className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-iw-control bg-iw-purple-100 text-[var(--aivo-sensory-primary)]">
                     <Icon className="h-6 w-6" aria-hidden="true" />
                   </span>
-                  <h3 className="font-iw-display text-xl font-bold text-slate-900">{title}</h3>
-                  <p className="mt-3 flex-1 font-medium leading-relaxed text-slate-600">{desc}</p>
+                  <h3 className="font-iw-display text-xl font-bold text-iw-ink">{title}</h3>
+                  <p className="mt-3 flex-1 font-medium leading-relaxed text-iw-ink-muted">{desc}</p>
                   <a
                     href={href}
                     className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--aivo-sensory-primary)] transition-all hover:gap-2.5"
@@ -297,7 +297,7 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl px-6 md:px-8">
             <h2
               id="steps-heading"
-              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-iw-ink md:text-4xl"
             >
               {t("steps_heading")}
             </h2>
@@ -305,13 +305,13 @@ export default async function Home() {
               {steps.map(({ n, title, desc }) => (
                 <li
                   key={n}
-                  className={`relative rounded-3xl border border-slate-200/70 bg-white p-7 ${cardShadow}`}
+                  className={`relative rounded-iw-card-lg border border-iw-border/70 bg-white p-7 ${cardShadow}`}
                 >
-                  <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--aivo-sensory-primary)] font-iw-display text-lg font-bold text-white">
+                  <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-iw-control bg-[var(--aivo-sensory-primary)] font-iw-display text-lg font-bold text-white">
                     {n}
                   </span>
-                  <h3 className="font-iw-display text-lg font-bold text-slate-900">{title}</h3>
-                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{desc}</p>
+                  <h3 className="font-iw-display text-lg font-bold text-iw-ink">{title}</h3>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-iw-ink-muted">{desc}</p>
                 </li>
               ))}
             </ol>
@@ -324,23 +324,23 @@ export default async function Home() {
             <div className="mx-auto max-w-3xl text-center">
               <h2
                 id="features-heading"
-                className="font-iw-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+                className="font-iw-display text-3xl font-bold tracking-tight text-iw-ink md:text-4xl"
               >
                 {t("features_heading")}
               </h2>
-              <p className="mt-4 text-lg font-medium text-slate-600">{t("features_subheading")}</p>
+              <p className="mt-4 text-lg font-medium text-iw-ink-muted">{t("features_subheading")}</p>
             </div>
             <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {features.map(({ Icon, title, desc }) => (
                 <article
                   key={title}
-                  className={`rounded-3xl border border-slate-200/70 bg-white p-6 transition hover:-translate-y-0.5 hover:border-purple-200 ${cardShadow} hover:shadow-[0_30px_64px_-28px_rgba(124,58,237,0.5)]`}
+                  className={`rounded-iw-card-lg border border-iw-border/70 bg-white p-6 transition hover:-translate-y-0.5 hover:border-iw-purple-200 ${cardShadow} hover:shadow-soft-5`}
                 >
-                  <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
+                  <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-iw-control bg-iw-purple-100 text-[var(--aivo-sensory-primary)]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <h3 className="font-iw-display text-base font-bold text-slate-900">{title}</h3>
-                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{desc}</p>
+                  <h3 className="font-iw-display text-base font-bold text-iw-ink">{title}</h3>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-iw-ink-muted">{desc}</p>
                 </article>
               ))}
             </div>
@@ -356,11 +356,11 @@ export default async function Home() {
             <div className="mx-auto max-w-3xl text-center">
               <h2
                 id="functions-heading"
-                className="font-iw-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+                className="font-iw-display text-3xl font-bold tracking-tight text-iw-ink md:text-4xl"
               >
                 {t("functions_heading")}
               </h2>
-              <p className="mt-4 text-lg font-medium text-slate-600">{t("functions_subheading")}</p>
+              <p className="mt-4 text-lg font-medium text-iw-ink-muted">{t("functions_subheading")}</p>
             </div>
             <div className="mt-14">
               <LearnerFunctionShowcase panels={showcasePanels} />
@@ -373,7 +373,7 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl px-6 md:px-8">
             <h2
               id="testimonials-heading"
-              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-iw-ink md:text-4xl"
             >
               {t("testimonials_heading")}
             </h2>
@@ -381,16 +381,16 @@ export default async function Home() {
               {testimonials.map(({ quote, author }) => (
                 <figure
                   key={author}
-                  className={`flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 ${cardShadow}`}
+                  className={`flex flex-col rounded-iw-card-lg border border-iw-border/70 bg-white p-7 ${cardShadow}`}
                 >
-                  <blockquote className="flex-1 text-base font-medium leading-relaxed text-slate-700">
+                  <blockquote className="flex-1 text-base font-medium leading-relaxed text-iw-ink">
                     &ldquo;{quote}&rdquo;
                   </blockquote>
                   <figcaption className="mt-6 flex items-center gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-50 text-[var(--aivo-sensory-primary)]">
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-iw-chip bg-iw-purple-100 text-[var(--aivo-sensory-primary)]">
                       <UserCheck className="h-5 w-5" aria-hidden="true" />
                     </span>
-                    <span className="text-sm font-semibold text-slate-600">{author}</span>
+                    <span className="text-sm font-semibold text-iw-ink-muted">{author}</span>
                   </figcaption>
                 </figure>
               ))}
@@ -403,7 +403,7 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl px-6 md:px-8">
             <h2
               id="trust-heading"
-              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-iw-ink md:text-4xl"
             >
               {t("trust_heading")}
             </h2>
@@ -411,13 +411,13 @@ export default async function Home() {
               {trustItems.map(({ Icon, title, desc, cta, href }) => (
                 <article
                   key={title}
-                  className={`flex flex-col rounded-3xl border border-slate-200/70 bg-white p-6 ${cardShadow}`}
+                  className={`flex flex-col rounded-iw-card-lg border border-iw-border/70 bg-white p-6 ${cardShadow}`}
                 >
-                  <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-[var(--aivo-sensory-primary)]">
+                  <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-iw-control bg-iw-purple-100 text-[var(--aivo-sensory-primary)]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <h3 className="font-iw-display text-base font-bold text-slate-900">{title}</h3>
-                  <p className="mt-2 flex-1 text-sm font-medium leading-relaxed text-slate-600">
+                  <h3 className="font-iw-display text-base font-bold text-iw-ink">{title}</h3>
+                  <p className="mt-2 flex-1 text-sm font-medium leading-relaxed text-iw-ink-muted">
                     {desc}
                   </p>
                   <a
@@ -438,7 +438,7 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl px-6 md:px-8">
             <h2
               id="faq-heading"
-              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl"
+              className="mx-auto max-w-3xl text-center font-iw-display text-3xl font-bold tracking-tight text-iw-ink md:text-4xl"
             >
               {t("faq_heading")}
             </h2>
@@ -446,10 +446,10 @@ export default async function Home() {
               {faqs.map(({ q, a }) => (
                 <div
                   key={q}
-                  className={`rounded-3xl border border-slate-200/70 bg-white p-6 ${cardShadow}`}
+                  className={`rounded-iw-card-lg border border-iw-border/70 bg-white p-6 ${cardShadow}`}
                 >
-                  <h3 className="font-iw-display text-base font-bold text-slate-900">{q}</h3>
-                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{a}</p>
+                  <h3 className="font-iw-display text-base font-bold text-iw-ink">{q}</h3>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-iw-ink-muted">{a}</p>
                 </div>
               ))}
             </div>
@@ -458,7 +458,7 @@ export default async function Home() {
 
         {/* Final CTA */}
         <section className="px-6 pb-24 md:px-8" aria-labelledby="cta-heading">
-          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-[var(--aivo-sensory-primary)] to-indigo-800 px-8 py-16 text-white shadow-[0_40px_90px_-40px_rgba(76,29,149,0.6)] md:px-16 md:py-20">
+          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-iw-primary px-8 py-16 text-white shadow-soft-5 md:px-16 md:py-20">
             <div
               className="absolute right-0 top-0 h-[480px] w-[480px] -translate-y-1/3 translate-x-1/4 rounded-full bg-white/10 blur-3xl"
               aria-hidden="true"
@@ -477,13 +477,13 @@ export default async function Home() {
                 <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row md:justify-start">
                   <Link
                     href={signupHref}
-                    className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-white px-7 text-base font-bold text-[var(--aivo-sensory-primary)] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.4)] transition hover:-translate-y-0.5 hover:bg-slate-50"
+                    className="inline-flex min-h-[52px] items-center justify-center rounded-iw-control bg-white px-7 text-base font-bold text-[var(--aivo-sensory-primary)] shadow-soft-3 transition hover:-translate-y-0.5 hover:bg-iw-raised"
                   >
                     {t("cta_primary")}
                   </Link>
                   <a
                     href={demoHref}
-                    className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/40 px-7 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+                    className="inline-flex min-h-[52px] items-center justify-center rounded-iw-control border border-white/40 px-7 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
                   >
                     {t("cta_secondary")}
                   </a>

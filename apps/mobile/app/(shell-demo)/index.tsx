@@ -12,6 +12,7 @@ import {
   type NavArea,
   type Role,
 } from "@aivo/nav";
+import { colors } from "@/constants/colors";
 
 /**
  * Map our NavArea ids to Ionicons glyphs. Mobile-ui itself stays
@@ -63,7 +64,7 @@ export default function ShellDemoScreen() {
         <LockedScreenMobile
           role={role}
           area={lockedArea}
-          renderIcon={(a) => <Ionicons name={ICONS[a]} size={40} color="#6D28D9" />}
+          renderIcon={(a) => <Ionicons name={ICONS[a]} size={40} color={colors.primary} />}
         />
       </SafeAreaView>
     );
@@ -111,9 +112,9 @@ export default function ShellDemoScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={`Preview locked screen for ${NAV_AREA_META[a].label}`}
                 >
-                  <Ionicons name={ICONS[a]} size={20} color="#6B7280" />
+                  <Ionicons name={ICONS[a]} size={20} color={colors.textSecondary} />
                   <Text style={styles.lockedRowLabel}>{NAV_AREA_META[a].label}</Text>
-                  <Ionicons name="lock-closed" size={14} color="#6B7280" />
+                  <Ionicons name="lock-closed" size={14} color={colors.textSecondary} />
                 </Pressable>
               ))}
             </View>
@@ -122,7 +123,7 @@ export default function ShellDemoScreen() {
 
         {stepUpRole && (
           <View style={styles.stepUpBanner}>
-            <Ionicons name="shield-checkmark" size={18} color="#FFFFFF" />
+            <Ionicons name="shield-checkmark" size={18} color={colors.white} />
             <Text style={styles.stepUpText}>
               Step-up required to enter {ROLE_META[stepUpRole].label}. In the real app a biometric /
               PIN prompt would appear here.
@@ -139,7 +140,7 @@ export default function ShellDemoScreen() {
         activeArea={activeArea}
         onSelect={(area) => setActiveArea(area)}
         renderIcon={(area, active) => (
-          <Ionicons name={ICONS[area]} size={22} color={active ? "#6D28D9" : "#6B7280"} />
+          <Ionicons name={ICONS[area]} size={22} color={active ? colors.primary : colors.textSecondary} />
         )}
       />
 
@@ -169,85 +170,85 @@ export default function ShellDemoScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#F4F6F5" },
+  root: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20, paddingBottom: 40, gap: 12 },
   eyebrow: {
     fontSize: 12,
-    color: "#6B7280",
+    color: colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 1.2,
     fontWeight: "600",
   },
-  title: { fontSize: 28, fontWeight: "700", color: "#0F172A" },
-  subtitle: { fontSize: 14, color: "#475569", lineHeight: 20, marginBottom: 4 },
+  title: { fontSize: 28, fontWeight: "700", color: colors.text },
+  subtitle: { fontSize: 14, color: colors.textSecondary, lineHeight: 20, marginBottom: 4 },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 20,
     padding: 16,
     gap: 8,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: colors.border,
   },
   cardTitle: {
     fontSize: 12,
-    color: "#6B7280",
+    color: colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 1,
     fontWeight: "600",
   },
   rolePill: {
     alignSelf: "flex-start",
-    backgroundColor: "#EDE9FE",
+    backgroundColor: colors.primaryLight,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
   },
-  rolePillText: { color: "#6D28D9", fontWeight: "700", fontSize: 14 },
-  cardBody: { fontSize: 13, color: "#475569", lineHeight: 19 },
+  rolePillText: { color: colors.primary, fontWeight: "700", fontSize: 14 },
+  cardBody: { fontSize: 13, color: colors.textSecondary, lineHeight: 19 },
   button: {
     alignSelf: "flex-start",
     marginTop: 8,
-    backgroundColor: "#6D28D9",
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 999,
   },
   buttonPressed: { opacity: 0.85 },
-  buttonText: { color: "#FFFFFF", fontWeight: "700", fontSize: 14 },
+  buttonText: { color: colors.white, fontWeight: "700", fontSize: 14 },
   sectionTitle: {
     marginTop: 16,
     fontSize: 13,
-    color: "#6B7280",
+    color: colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 1,
     fontWeight: "600",
   },
-  sectionBody: { fontSize: 14, color: "#0F172A", lineHeight: 20 },
+  sectionBody: { fontSize: 14, color: colors.text, lineHeight: 20 },
   lockedList: { gap: 8 },
   lockedRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: colors.border,
   },
   lockedRowPressed: { opacity: 0.7 },
-  lockedRowLabel: { flex: 1, fontSize: 14, color: "#0F172A", fontWeight: "600" },
+  lockedRowLabel: { flex: 1, fontSize: 14, color: colors.text, fontWeight: "600" },
   lockedHeader: { padding: 16 },
-  backLink: { color: "#6D28D9", fontWeight: "700", fontSize: 14 },
+  backLink: { color: colors.primary, fontWeight: "700", fontSize: 14 },
   stepUpBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
     marginTop: 12,
     padding: 12,
-    backgroundColor: "#2563EB",
+    backgroundColor: colors.accent,
     borderRadius: 14,
   },
-  stepUpText: { flex: 1, color: "#FFFFFF", fontSize: 13, lineHeight: 18 },
-  stepUpDismiss: { color: "#FFFFFF", fontWeight: "700", fontSize: 14 },
+  stepUpText: { flex: 1, color: colors.white, fontSize: 13, lineHeight: 18 },
+  stepUpDismiss: { color: colors.white, fontWeight: "700", fontSize: 14 },
 });

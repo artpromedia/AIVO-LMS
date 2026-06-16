@@ -33,12 +33,12 @@ export function LearnerButton({
 
   const variantClasses: Record<string, string> = {
     primary:
-      "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
+      "bg-gradient-to-r from-iw-purple-600 to-iw-purple-700 text-white shadow-soft-3 hover:shadow-soft-5 hover:scale-[1.02] active:scale-[0.98]",
     secondary:
-      "bg-white border-2 border-slate-200 text-slate-700 hover:border-purple-300 hover:bg-purple-50",
-    ghost: "bg-transparent text-slate-600 hover:bg-slate-100",
+      "bg-white border-2 border-iw-border text-iw-ink hover:border-iw-purple-300 hover:bg-iw-purple-100",
+    ghost: "bg-transparent text-iw-ink-muted hover:bg-iw-raised",
     break:
-      "bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 border border-sky-200 hover:from-sky-200 hover:to-blue-200",
+      "bg-iw-accent-soft text-iw-teal-800 border border-iw-accent hover:brightness-95",
   };
 
   const accentStyle =
@@ -49,7 +49,7 @@ export function LearnerButton({
   return (
     <button
       className={`
-        inline-flex items-center justify-center gap-2 rounded-2xl font-heading font-bold
+        inline-flex items-center justify-center gap-2 rounded-iw-control font-iw-display font-bold
         transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2
         disabled:opacity-50 disabled:pointer-events-none
         ${sizeClasses[size]}

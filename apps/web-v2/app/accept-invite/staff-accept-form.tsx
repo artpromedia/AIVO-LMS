@@ -51,8 +51,8 @@ export function StaffAcceptForm({ token, email, name, role, schoolName, district
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <div className="rounded-lg bg-aivo-surface-soft p-3 text-sm">
-        <p className="text-aivo-ink">
+      <div className="rounded-lg bg-iw-raised p-3 text-sm">
+        <p className="text-iw-ink">
           Welcome, <strong>{name}</strong>. You&apos;ve been invited as a{" "}
           <strong>{roleLabel}</strong>
           {scope ? (
@@ -63,8 +63,8 @@ export function StaffAcceptForm({ token, email, name, role, schoolName, district
           ) : null}
           .
         </p>
-        <p className="mt-1 text-aivo-ink-soft">
-          Sign-in email: <strong className="text-aivo-ink">{email}</strong>
+        <p className="mt-1 text-iw-ink-muted">
+          Sign-in email: <strong className="text-iw-ink">{email}</strong>
         </p>
       </div>
 
@@ -99,12 +99,12 @@ export function StaffAcceptForm({ token, email, name, role, schoolName, district
       </div>
 
       {error ? (
-        <div className="flex items-start gap-2 rounded-lg bg-rose-50 p-3" role="alert">
-          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-700" />
-          <div className="text-sm text-aivo-ink">
+        <div className="flex items-start gap-2 rounded-lg bg-iw-error-subtle p-3" role="alert">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-iw-error-strong" />
+          <div className="text-sm text-iw-ink">
             <p>{error}</p>
             {reasons.length > 0 ? (
-              <ul className="mt-1 list-disc pl-5 text-aivo-ink-soft">
+              <ul className="mt-1 list-disc pl-5 text-iw-ink-muted">
                 {reasons.map((r) => (
                   <li key={r}>{r}</li>
                 ))}

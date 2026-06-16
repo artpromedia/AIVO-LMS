@@ -102,7 +102,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(functi
         PAD_CLASS[density],
         ELEVATION_CLASS[elevation],
         glass ? "bg-white/70 backdrop-blur-xl" : "bg-[var(--aivo-color-surface-card,#ffffff)]",
-        state === "hover" && "-translate-y-px shadow-lg",
+        state === "hover" && "-translate-y-px shadow-soft-3",
         state === "focus" &&
           "outline-none ring-2 ring-offset-2 ring-[var(--aivo-sensory-ringFocus,#7c3aed)] ring-offset-[var(--aivo-color-surface-canvas,#f4f6f5)]",
         isDisabled && "opacity-50 pointer-events-none select-none",

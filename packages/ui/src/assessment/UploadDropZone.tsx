@@ -130,7 +130,7 @@ export function UploadDropZone({
       >
         <span
           className={cn(
-            "w-14 h-14 rounded-2xl flex items-center justify-center",
+            "w-14 h-14 rounded-iw-control flex items-center justify-center",
             "bg-white shadow-[0_2px_8px_rgba(124,58,237,0.12)]",
             "text-[var(--aivo-sensory-primary,#7c3aed)]",
           )}

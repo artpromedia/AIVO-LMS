@@ -21,7 +21,7 @@ export function LearnerShell({
 }: LearnerShellProps) {
   return (
     <div
-      className={`min-h-screen bg-gradient-to-br from-purple-50 via-white to-cyan-50 ${className}`}
+      className={`min-h-screen bg-gradient-to-br from-iw-purple-50 via-white to-iw-teal-50 ${className}`}
       style={{ fontSize: "var(--learner-base-font, 16px)" }}
     >
       <SkipLink />

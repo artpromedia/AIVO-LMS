@@ -24,7 +24,7 @@ export function UnsubscribeConfirm({
 
   if (state === "done") {
     return (
-      <p className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800" role="status">
+      <p className="rounded-lg bg-iw-success-subtle p-3 text-sm text-iw-success-strong" role="status">
         {doneLabel}
       </p>
     );
@@ -32,9 +32,9 @@ export function UnsubscribeConfirm({
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-aivo-ink-soft">{prompt}</p>
+      <p className="text-sm text-iw-ink-muted">{prompt}</p>
       {state === "error" ? (
-        <p className="text-sm text-rose-700" role="alert">
+        <p className="text-sm text-iw-error-strong" role="alert">
           {errorLabel}
         </p>
       ) : null}

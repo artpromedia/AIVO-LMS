@@ -25,7 +25,7 @@ export function PageFAQ({
       <JsonLd data={faqJsonLd} />
       <h2
         id={headingId}
-        className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-6"
+        className="text-2xl md:text-3xl font-heading font-bold text-iw-ink mb-6"
       >
         {heading}
       </h2>
@@ -33,16 +33,16 @@ export function PageFAQ({
         {items.map((f) => (
           <details
             key={f.q}
-            className="group rounded-2xl border border-slate-100 bg-white p-5 open:border-purple-200 open:shadow-md transition"
+            className="group rounded-iw-card border border-iw-border bg-white p-5 open:border-iw-purple-200 open:shadow-soft-3 transition"
           >
-            <summary className="cursor-pointer font-heading font-bold text-slate-900 flex items-center justify-between gap-4">
+            <summary className="cursor-pointer font-heading font-bold text-iw-ink flex items-center justify-between gap-4">
               <span>{f.q}</span>
               <ArrowRight
-                className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform"
+                className="w-4 h-4 text-iw-ink-muted group-open:rotate-90 transition-transform"
                 aria-hidden="true"
               />
             </summary>
-            <p className="text-slate-600 font-body mt-3 leading-relaxed text-sm">{f.a}</p>
+            <p className="text-iw-ink-muted font-body mt-3 leading-relaxed text-sm">{f.a}</p>
           </details>
         ))}
       </div>

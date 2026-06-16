@@ -106,19 +106,19 @@ export function BrainTimelineClient({
       {/* Regression insights — gentle, paired with a next step. Only when present. */}
       {insights.length > 0 ? (
         <section aria-labelledby="bt-insights-title">
-          <h2 id="bt-insights-title" className="text-sm font-semibold text-aivo-ink">
+          <h2 id="bt-insights-title" className="text-sm font-semibold text-iw-ink">
             {t("insights_title")}
           </h2>
-          <p className="mt-0.5 text-xs text-aivo-ink-soft">{t("insights_hint")}</p>
+          <p className="mt-0.5 text-xs text-iw-ink-muted">{t("insights_hint")}</p>
           <div className="mt-3 space-y-3">
             {insights.map((ins) => (
-              <Card key={ins.id} className="border-aivo-primary/30 bg-aivo-primary/5 p-4">
-                <p className="font-medium text-aivo-ink">{ins.headline}</p>
-                <p className="mt-1 text-sm text-aivo-ink-soft">{ins.body}</p>
-                <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-aivo-ink-soft">
+              <Card key={ins.id} className="border-iw-primary/30 bg-iw-primary/5 p-4">
+                <p className="font-medium text-iw-ink">{ins.headline}</p>
+                <p className="mt-1 text-sm text-iw-ink-muted">{ins.body}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-iw-ink-muted">
                   {t("insight_next_step_label")}
                 </p>
-                <p className="mt-0.5 text-sm text-aivo-ink-soft">{ins.nextStep}</p>
+                <p className="mt-0.5 text-sm text-iw-ink-muted">{ins.nextStep}</p>
               </Card>
             ))}
           </div>
@@ -126,14 +126,14 @@ export function BrainTimelineClient({
       ) : null}
 
       <section aria-labelledby="bt-changes-title">
-        <h2 id="bt-changes-title" className="text-sm font-semibold text-aivo-ink">
+        <h2 id="bt-changes-title" className="text-sm font-semibold text-iw-ink">
           {t("section_changes")}
         </h2>
 
         {entries.length === 0 ? (
           <Card className="mt-3 p-6 text-center">
-            <p className="font-medium text-aivo-ink">{t("empty_title")}</p>
-            <p className="mx-auto mt-1 max-w-md text-sm text-aivo-ink-soft">
+            <p className="font-medium text-iw-ink">{t("empty_title")}</p>
+            <p className="mx-auto mt-1 max-w-md text-sm text-iw-ink-muted">
               {t("empty_body", { name: learnerName })}
             </p>
           </Card>
@@ -199,24 +199,24 @@ function ChangeRow({
       : { tone: "success" as const, label: t("acked_badge") };
 
   return (
-    <Card className={`p-4 ${isPending ? "border-aivo-primary/40" : ""}`} data-testid="bt-change-row">
+    <Card className={`p-4 ${isPending ? "border-iw-primary/40" : ""}`} data-testid="bt-change-row">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone={badge.tone}>{badge.label}</Badge>
-            <span className="text-xs text-aivo-muted">
+            <span className="text-xs text-iw-ink-muted">
               {t("revision_label", { revision: change.revision })}
             </span>
           </div>
-          <p className="mt-1.5 text-sm text-aivo-ink">{change.summary}</p>
-          <p className="mt-1 text-xs text-aivo-muted">{formatWhen(change.createdAt)}</p>
+          <p className="mt-1.5 text-sm text-iw-ink">{change.summary}</p>
+          <p className="mt-1 text-xs text-iw-ink-muted">{formatWhen(change.createdAt)}</p>
           {isPending ? (
-            <p className="mt-1 text-xs text-aivo-ink-soft">
+            <p className="mt-1 text-xs text-iw-ink-muted">
               {t("pending_window_note", { name: learnerName })}
             </p>
           ) : null}
           {errored ? (
-            <p className="mt-1 text-xs text-aivo-danger" role="alert">
+            <p className="mt-1 text-xs text-iw-error" role="alert">
               {t("ack_error")}
             </p>
           ) : null}
@@ -233,15 +233,15 @@ function ChangeRow({
               {t("ack_cta")}
             </Button>
           ) : (
-            <span className="shrink-0 text-xs font-medium text-aivo-success">{t("ack_done")}</span>
+            <span className="shrink-0 text-xs font-medium text-iw-success">{t("ack_done")}</span>
           )
         ) : null}
       </div>
       {isStructural ? (
-        <div className="mt-3 border-t border-aivo-border pt-2">
+        <div className="mt-3 border-t border-iw-border pt-2">
           <Link
             href={`/parent/learners/${learnerId}/brain-review`}
-            className="text-xs font-medium text-aivo-primary underline-offset-2 hover:underline"
+            className="text-xs font-medium text-iw-primary underline-offset-2 hover:underline"
           >
             {t("adjust_cta")}
           </Link>
@@ -281,12 +281,12 @@ function ApprovalRow({
     <Card className="p-4" data-testid="bt-approval-row">
       <div className="flex flex-wrap items-center gap-2">
         <Badge tone={tone}>{label}</Badge>
-        <span className="text-xs text-aivo-muted">
+        <span className="text-xs text-iw-ink-muted">
           {t("revision_label", { revision: approval.profileRevision })}
         </span>
       </div>
-      <p className="mt-1.5 text-sm text-aivo-ink">{summary}</p>
-      <p className="mt-1 text-xs text-aivo-muted">{formatWhen(approval.createdAt)}</p>
+      <p className="mt-1.5 text-sm text-iw-ink">{summary}</p>
+      <p className="mt-1 text-xs text-iw-ink-muted">{formatWhen(approval.createdAt)}</p>
     </Card>
   );
 }

@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: colors.primary },
   chipText: { fontSize: 12, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  chipTextActive: { color: "#FFF" },
+  chipTextActive: { color: colors.white },
   input: {
     height: 40,
     borderWidth: 1.5,

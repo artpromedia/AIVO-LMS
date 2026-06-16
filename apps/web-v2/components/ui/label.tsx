@@ -38,7 +38,7 @@ export const Label = React.forwardRef<React.ElementRef<typeof LabelPrimitive.Roo
         </span>
       )}
       {required === "text" && (
-        <span className="rounded-full bg-aivo-danger/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-aivo-danger">
+        <span className="rounded-full bg-iw-error/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-iw-error">
           Required
         </span>
       )}

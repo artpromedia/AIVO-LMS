@@ -18,26 +18,26 @@ export function LessonStepCard({
   return (
     <div
       className={cn(
-        "flex items-start gap-3 rounded-[var(--radius-card)] border bg-aivo-surface p-4",
-        state === "active" ? "border-aivo-primary" : "border-aivo-border",
+        "flex items-start gap-3 rounded-[var(--radius-card)] border bg-iw-card p-4",
+        state === "active" ? "border-iw-primary" : "border-iw-border",
       )}
       aria-current={state === "active" ? "step" : undefined}
     >
       <Icon
         className={cn(
           "mt-0.5 h-5 w-5",
-          state === "done" && "text-aivo-success",
-          state === "active" && "text-aivo-primary",
-          state === "todo" && "text-aivo-muted",
+          state === "done" && "text-iw-success",
+          state === "active" && "text-iw-primary",
+          state === "todo" && "text-iw-ink-muted",
         )}
         aria-hidden
       />
       <div className="flex-1">
-        <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+        <p className="text-xs font-semibold uppercase tracking-wide text-iw-ink-muted">
           Step {index}
         </p>
         <p className="mt-0.5 font-medium">{title}</p>
-        {description ? <p className="mt-1 text-sm text-aivo-ink-soft">{description}</p> : null}
+        {description ? <p className="mt-1 text-sm text-iw-ink-muted">{description}</p> : null}
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ const STATUS_DOT: Record<SetupStep["status"], string> = {
   active:
     "bg-[var(--aivo-sensory-primary,#7c3aed)] text-white ring-4 ring-[var(--aivo-sensory-primary,#7c3aed)]/20",
   upcoming: "bg-white text-iw-text-muted ring-1 ring-iw-border",
-  blocked: "bg-amber-100 text-amber-800 ring-1 ring-amber-300",
+  blocked: "bg-iw-warning-subtle text-iw-warning-strong ring-1 ring-iw-warning",
 };
 
 const STATUS_LABEL: Record<SetupStep["status"], string> = {

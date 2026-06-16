@@ -398,6 +398,6 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   learnerChipTextSelected: {
-    color: "#FFF",
+    color: colors.white,
   },
 });

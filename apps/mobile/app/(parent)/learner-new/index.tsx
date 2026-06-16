@@ -8,7 +8,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card, Button } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -98,7 +98,7 @@ export default function ParentLearnerNewScreen() {
         )}
         {birthDate.length > 0 && birthDateError ? (
           <Text
-            style={[styles.label, { color: "#b91c1c" }]}
+            style={[styles.label, { color: colors.error }]}
             accessibilityLiveRegion="polite"
           >
             {t(`parentLearnerNew.birthDateError.${birthDateError}`)}

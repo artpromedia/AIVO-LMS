@@ -36,13 +36,13 @@ export function CoreProductLoop() {
           {steps.map((s) => (
             <li
               key={s.n}
-              className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+              className="relative rounded-iw-card border border-iw-border bg-white p-5 shadow-soft-1 transition hover:shadow-soft-3"
             >
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-blue-600 font-heading font-bold text-white">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-iw-chip bg-iw-primary font-heading font-bold text-white">
                 {s.n}
               </span>
-              <h3 className="mt-3 font-heading text-base font-bold text-slate-900">{s.title}</h3>
-              <p className="mt-1 text-sm text-slate-600">{s.body}</p>
+              <h3 className="mt-3 font-heading text-base font-bold text-iw-ink">{s.title}</h3>
+              <p className="mt-1 text-sm text-iw-ink-muted">{s.body}</p>
             </li>
           ))}
         </ol>

@@ -25,7 +25,7 @@ export default async function Page() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/parent/settings/account"
-          className="flex items-start gap-3 rounded-iw-card-lg bg-white border border-iw-border p-5 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] hover:border-[var(--aivo-sensory-primary)] transition-colors"
+          className="flex items-start gap-3 rounded-iw-card-lg bg-white border border-iw-border p-5 shadow-soft-3 hover:border-[var(--aivo-sensory-primary)] transition-colors"
         >
           <span className="inline-flex items-center justify-center h-9 w-9 rounded-iw-control bg-[var(--aivo-aivoPurple-100)] text-[var(--aivo-sensory-primary)] shrink-0">
             <User className="h-5 w-5" />
@@ -39,7 +39,7 @@ export default async function Page() {
         </Link>
         <Link
           href="/parent/settings/billing"
-          className="flex items-start gap-3 rounded-iw-card-lg bg-white border border-iw-border p-5 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] hover:border-[var(--aivo-sensory-primary)] transition-colors"
+          className="flex items-start gap-3 rounded-iw-card-lg bg-white border border-iw-border p-5 shadow-soft-3 hover:border-[var(--aivo-sensory-primary)] transition-colors"
         >
           <span className="inline-flex items-center justify-center h-9 w-9 rounded-iw-control bg-[var(--aivo-aivoPurple-100)] text-[var(--aivo-sensory-primary)] shrink-0">
             <CreditCard className="h-5 w-5" />
@@ -62,7 +62,7 @@ export default async function Page() {
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <Link
           href="/parent/privacy"
-          className="flex items-start gap-3 rounded-iw-card-lg bg-white border border-iw-border p-5 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] hover:border-[var(--aivo-sensory-primary)] transition-colors"
+          className="flex items-start gap-3 rounded-iw-card-lg bg-white border border-iw-border p-5 shadow-soft-3 hover:border-[var(--aivo-sensory-primary)] transition-colors"
         >
           <span className="inline-flex items-center justify-center h-9 w-9 rounded-iw-control bg-[var(--aivo-aivoPurple-100)] text-[var(--aivo-sensory-primary)] shrink-0">
             <ShieldCheck className="h-5 w-5" />

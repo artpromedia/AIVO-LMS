@@ -149,7 +149,7 @@ export default async function Page() {
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-medium truncate">{e.title}</p>
-                        <p className="text-sm text-aivo-ink-soft">
+                        <p className="text-sm text-iw-ink-muted">
                           {e.learnerName}
                           {e.subject ? ` · ${e.subject}` : ""}
                         </p>
@@ -171,7 +171,7 @@ export default async function Page() {
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-medium truncate">{e.title}</p>
-                        <p className="text-sm text-aivo-ink-soft">
+                        <p className="text-sm text-iw-ink-muted">
                           {e.learnerName}
                           {e.subject ? ` · ${e.subject}` : ""}
                         </p>

@@ -25,8 +25,9 @@ import {
   type AdaptedProblem,
   type HomeworkChatMessage,
 } from "@/hooks/useHomework";
-import { AivoCard } from "@aivo/mobile-ui";
+import { Card } from "@/components/ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { HomeworkWorkspace } from "@/src/components/learning/HomeworkWorkspace";
 import { ScratchPad } from "@/src/components/learning/ScratchPad";
@@ -269,7 +270,7 @@ export default function HomeworkSessionScreen() {
           {adaptedProblems.map((p) => {
             const done = completedProblems.has(p.problem_number);
             return (
-              <AivoCard
+              <Card
                 key={p.problem_number}
                 style={[
                   styles.problemCard,
@@ -305,7 +306,7 @@ export default function HomeworkSessionScreen() {
                     {done ? t("learnerHomeworkSession.done") : t("learnerHomeworkSession.markDone")}
                   </Text>
                 </Pressable>
-              </AivoCard>
+              </Card>
             );
           })}
         </ScrollView>
@@ -387,12 +388,12 @@ export default function HomeworkSessionScreen() {
           }}
         >
           {speech.status === "processing" ? (
-            <ActivityIndicator size="small" color="#FFF" />
+            <ActivityIndicator size="small" color={colors.white} />
           ) : (
             <Ionicons
               name={speech.status === "listening" ? "square" : "mic"}
               size={18}
-              color="#FFF"
+              color={colors.white}
             />
           )}
         </Pressable>
@@ -417,7 +418,7 @@ export default function HomeworkSessionScreen() {
           accessibilityRole="button"
           accessibilityLabel={t("learnerHomeworkSession.send")}
         >
-          <Ionicons name="send" size={18} color="#FFF" />
+          <Ionicons name="send" size={18} color={colors.white} />
         </Pressable>
       </View>
 
@@ -434,7 +435,7 @@ export default function HomeworkSessionScreen() {
         accessibilityRole="button"
       >
         {complete.isPending ? (
-          <ActivityIndicator size="small" color="#FFF" />
+          <ActivityIndicator size="small" color={colors.white} />
         ) : (
           <Text style={styles.completeBtnText}>{t("learnerHomeworkSession.finish")}</Text>
         )}
@@ -517,7 +518,7 @@ const styles = StyleSheet.create({
   workArea: { flex: 1 },
   workTitle: {
     fontSize: 14,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -526,7 +527,7 @@ const styles = StyleSheet.create({
   workPad: { flex: 1, minHeight: 240 },
   helperText: {
     fontSize: 13,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     textAlign: "center",
     paddingVertical: spacing.lg,
@@ -539,25 +540,25 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.primary,
   },
   headerTitleRow: { flexDirection: "row", alignItems: "baseline", gap: 8 },
   headerTitle: {
     fontSize: 20,
-    fontFamily: "Nunito-ExtraBold",
+    fontFamily: fontFamilies.bodyExtraBold,
     color: colors.text,
     flex: 1,
   },
   headerMeta: {
     fontSize: 12,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.textSecondary,
   },
   toggleBtn: { alignSelf: "flex-start", paddingVertical: 4 },
   toggleText: {
     fontSize: 12,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.primary,
   },
   problemsWrap: { marginBottom: spacing.sm },
@@ -571,19 +572,19 @@ const styles = StyleSheet.create({
   problemCardDone: { opacity: 0.7 },
   problemNum: {
     fontSize: 11,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.primary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   problemText: {
     fontSize: 13,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.text,
   },
   problemHint: {
     fontSize: 12,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
   },
   problemBtn: {
@@ -595,7 +596,7 @@ const styles = StyleSheet.create({
   problemBtnDone: {},
   problemBtnText: {
     fontSize: 12,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.primary,
   },
   problemBtnTextDone: { color: colors.success },
@@ -610,8 +611,8 @@ const styles = StyleSheet.create({
   },
   bubbleUser: { backgroundColor: colors.primary },
   bubbleAssistant: { backgroundColor: colors.surface },
-  bubbleText: { fontSize: 14, fontFamily: "Nunito-Regular", lineHeight: 20 },
-  bubbleTextUser: { color: "#FFF" },
+  bubbleText: { fontSize: 14, fontFamily: fontFamilies.bodyRegular, lineHeight: 20 },
+  bubbleTextUser: { color: colors.white },
   bubbleTextAssistant: { color: colors.text },
   thinkingRow: {
     flexDirection: "row",
@@ -622,7 +623,7 @@ const styles = StyleSheet.create({
   },
   thinkingText: {
     fontSize: 12,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
   },
   nudgeCard: {
@@ -634,8 +635,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     gap: 6,
   },
-  nudgeTitle: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.text },
-  nudgeBody: { fontSize: 13, fontFamily: "Nunito-Regular", color: colors.textSecondary },
+  nudgeTitle: { fontSize: 15, fontFamily: fontFamilies.bodyBold, color: colors.text },
+  nudgeBody: { fontSize: 13, fontFamily: fontFamilies.bodyRegular, color: colors.textSecondary },
   nudgeActions: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginTop: 4 },
   nudgeAccept: {
     minHeight: 44,
@@ -645,7 +646,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  nudgeAcceptText: { fontSize: 14, fontFamily: "Nunito-Bold", color: "#FFF" },
+  nudgeAcceptText: { fontSize: 14, fontFamily: fontFamilies.bodyBold, color: colors.white },
   nudgeDismiss: {
     minHeight: 44,
     paddingHorizontal: spacing.md,
@@ -655,7 +656,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  nudgeDismissText: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
+  nudgeDismissText: { fontSize: 14, fontFamily: fontFamilies.bodyBold, color: colors.text },
   composerRow: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -671,7 +672,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.text,
   },
   sendBtn: {
@@ -699,7 +700,7 @@ const styles = StyleSheet.create({
   },
   sttError: {
     fontSize: 12,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.error,
     paddingHorizontal: spacing.sm,
     paddingBottom: spacing.xs,
@@ -714,13 +715,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   completeBtnText: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: 14,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
   },
   errorText: {
     fontSize: 14,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.error,
     marginBottom: spacing.md,
   },
@@ -730,5 +731,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: radius.full,
   },
-  backBtnText: { color: "#FFF", fontSize: 14, fontFamily: "Nunito-Bold" },
+  backBtnText: { color: colors.white, fontSize: 14, fontFamily: fontFamilies.bodyBold },
 });

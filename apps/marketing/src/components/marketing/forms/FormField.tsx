@@ -30,10 +30,10 @@ export function FormField({ id, label, required, hint, error, children }: BasePr
 
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-bold text-slate-700">
+      <label htmlFor={id} className="block text-sm font-bold text-iw-ink">
         {label}
         {required ? (
-          <span aria-hidden="true" className="text-rose-600">
+          <span aria-hidden="true" className="text-iw-error">
             {" "}
             *
           </span>
@@ -41,12 +41,12 @@ export function FormField({ id, label, required, hint, error, children }: BasePr
       </label>
       {decoratedChild}
       {hint ? (
-        <p id={hintId} className="text-xs text-slate-500 font-body">
+        <p id={hintId} className="text-xs text-iw-ink-muted font-body">
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p id={errorId} className="text-xs font-semibold text-rose-700" role="alert">
+        <p id={errorId} className="text-xs font-semibold text-iw-error-strong" role="alert">
           {error}
         </p>
       ) : null}
@@ -55,4 +55,4 @@ export function FormField({ id, label, required, hint, error, children }: BasePr
 }
 
 export const fieldInputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-slate-900 font-body shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200 disabled:bg-slate-50 disabled:text-slate-500";
+  "w-full rounded-iw-control border border-iw-border bg-white px-4 py-2.5 text-iw-ink font-body shadow-soft-1 focus:border-iw-primary focus:outline-none focus:ring-2 focus:ring-iw-ring disabled:bg-iw-raised disabled:text-iw-ink-muted";

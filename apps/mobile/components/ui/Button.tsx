@@ -17,6 +17,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { useSensoryPalette, useSensoryMode } from "@/context/SensoryModeProvider";
+import { colors } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 type Variant = "primary" | "ghost" | "outline";
@@ -88,7 +89,7 @@ export function Button({
           // The primary shadow tint is the brand blue at low alpha;
           // shadowStrength comes from the active sensory mode so calm
           // / high-contrast can attenuate or kill it entirely.
-          shadowColor: isPrimary ? palette.primary : "#000",
+          shadowColor: isPrimary ? palette.primary : colors.black,
           shadowOpacity: isPrimary ? shadowStrength * 1.6 : shadowStrength,
           shadowRadius: 12,
           shadowOffset: { width: 0, height: 4 },

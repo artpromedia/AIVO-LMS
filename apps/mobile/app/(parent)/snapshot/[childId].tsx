@@ -11,7 +11,7 @@ import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { Card } from "@/components/ui";
 import { StatCard, MasteryBar, LoadingState } from "@aivo/mobile-ui";
 import { summarizeDomains } from "@/lib/learner-progress";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -85,14 +85,14 @@ export default function ParentSnapshotScreen() {
             <StatCard
               label={t("parentSnapshot.mastered", "Skills mastered")}
               value={summary.masteredCount}
-              icon={<Ionicons name="star" size={18} color="#22c55e" />}
-              color="#22c55e"
+              icon={<Ionicons name="star" size={18} color={colors.success} />}
+              color={colors.success}
             />
             <StatCard
               label={t("parentSnapshot.streak", "Day streak")}
               value={milestones?.streak?.currentStreak ?? 0}
-              icon={<Ionicons name="flame" size={18} color="#f59e0b" />}
-              color="#f59e0b"
+              icon={<Ionicons name="flame" size={18} color={colors.warning} />}
+              color={colors.warning}
             />
             <StatCard
               label={t("parentSnapshot.badges", "Badges")}

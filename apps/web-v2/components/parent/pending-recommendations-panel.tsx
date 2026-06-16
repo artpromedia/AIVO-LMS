@@ -121,18 +121,18 @@ function RecommendationCard({
     const applied = decision.status === "APPLIED";
     const declined = decision.status === "DECLINED";
     return (
-      <div className="rounded-lg border border-aivo-line/60 p-4" data-testid="decided-card">
+      <div className="rounded-lg border border-iw-border/60 p-4" data-testid="decided-card">
         <div className="flex items-center gap-2">
           {applied ? (
-            <CheckCircle2 className="h-5 w-5 text-emerald-500" aria-hidden />
+            <CheckCircle2 className="h-5 w-5 text-iw-success" aria-hidden />
           ) : declined ? (
-            <XCircle className="h-5 w-5 text-aivo-ink-soft" aria-hidden />
+            <XCircle className="h-5 w-5 text-iw-ink-muted" aria-hidden />
           ) : (
-            <ShieldQuestion className="h-5 w-5 text-amber-500" aria-hidden />
+            <ShieldQuestion className="h-5 w-5 text-iw-warning" aria-hidden />
           )}
           <p className="font-medium">{rec.title}</p>
         </div>
-        <p className="mt-1 text-sm text-aivo-ink-soft">
+        <p className="mt-1 text-sm text-iw-ink-muted">
           {applied ? t("status_applied") : declined ? t("status_declined") : t("status_failed")}
         </p>
       </div>
@@ -141,18 +141,18 @@ function RecommendationCard({
 
   const busy = decision?.state === "deciding";
   return (
-    <div className="rounded-lg border border-aivo-line/60 p-4">
+    <div className="rounded-lg border border-iw-border/60 p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <p className="font-medium">{rec.title}</p>
         <Badge tone="primary">{t("pending_badge")}</Badge>
       </div>
-      <p className="mt-1 text-sm text-aivo-ink-soft">{rec.parentSummary}</p>
+      <p className="mt-1 text-sm text-iw-ink-muted">{rec.parentSummary}</p>
       <p className="mt-2 text-sm">
-        <span className="text-aivo-ink-soft">{t("proposed_change")}: </span>
+        <span className="text-iw-ink-muted">{t("proposed_change")}: </span>
         <strong>{valueLabel(rec.proposedValue)}</strong>
       </p>
       {rec.evidence.length > 0 ? (
-        <p className="mt-1 text-xs text-aivo-ink-soft">
+        <p className="mt-1 text-xs text-iw-ink-muted">
           {t("based_on", { summary: evidenceSummary(rec.evidence) })}
         </p>
       ) : null}
@@ -164,7 +164,7 @@ function RecommendationCard({
           </label>
           <input
             id={`amend-${rec.id}`}
-            className="rounded-md border border-aivo-line px-2 py-1 text-sm"
+            className="rounded-md border border-iw-border px-2 py-1 text-sm"
             value={amendValue}
             onChange={(e) => setAmendValue(e.target.value)}
           />
@@ -182,7 +182,7 @@ function RecommendationCard({
           </label>
           <input
             id={`decline-${rec.id}`}
-            className="rounded-md border border-aivo-line px-2 py-1 text-sm"
+            className="rounded-md border border-iw-border px-2 py-1 text-sm"
             value={declineReason}
             onChange={(e) => setDeclineReason(e.target.value)}
           />
@@ -212,7 +212,7 @@ function RecommendationCard({
         </div>
       )}
       {error ? (
-        <p role="alert" className="mt-2 text-sm text-aivo-danger">
+        <p role="alert" className="mt-2 text-sm text-iw-error">
           {error}
         </p>
       ) : null}
@@ -265,20 +265,20 @@ export function PendingRecommendationsPanel({
   return (
     <div className="flex flex-col gap-3" id="recommendations">
       {loading ? (
-        <p className="text-sm text-aivo-ink-soft">{t("loading")}</p>
+        <p className="text-sm text-iw-ink-muted">{t("loading")}</p>
       ) : error ? (
-        <p role="alert" className="text-sm text-aivo-danger">
+        <p role="alert" className="text-sm text-iw-error">
           {error}
         </p>
       ) : pending.length === 0 ? (
-        <p className="text-sm text-aivo-ink-soft">{t("empty")}</p>
+        <p className="text-sm text-iw-ink-muted">{t("empty")}</p>
       ) : (
         pending.map((rec) => (
           <RecommendationCard key={rec.id} apiBase={apiBase} rec={rec} onDecided={onDecided} />
         ))
       )}
       {!loading && decided.length > 0 ? (
-        <details className="text-sm text-aivo-ink-soft">
+        <details className="text-sm text-iw-ink-muted">
           <summary className="cursor-pointer">{t("history", { count: decided.length })}</summary>
           <ul className="mt-2 grid gap-1">
             {decided.map((d) => (

@@ -219,7 +219,7 @@ export function DemoRequestForm() {
       </FormField>
 
       <div className="space-y-1.5">
-        <label htmlFor={id("consent")} className="flex items-start gap-2 text-sm text-slate-700">
+        <label htmlFor={id("consent")} className="flex items-start gap-2 text-sm text-iw-ink">
           <input
             id={id("consent")}
             type="checkbox"
@@ -227,18 +227,18 @@ export function DemoRequestForm() {
             onChange={(e) => setForm({ ...form, consent: e.target.checked })}
             aria-describedby={errors.consent ? id("consent-error") : undefined}
             aria-invalid={errors.consent ? true : undefined}
-            className="mt-1 h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+            className="mt-1 h-4 w-4 rounded border-iw-border text-iw-primary focus:ring-iw-ring"
           />
           <span>
             I agree AIVO can email me about a demo. See our{" "}
-            <a href="/privacy-policy" className="font-semibold text-purple-700 underline">
+            <a href="/privacy-policy" className="font-semibold text-iw-primary underline">
               privacy policy
             </a>
             .
           </span>
         </label>
         {errors.consent ? (
-          <p id={id("consent-error")} className="text-xs font-semibold text-rose-700" role="alert">
+          <p id={id("consent-error")} className="text-xs font-semibold text-iw-error-strong" role="alert">
             {errors.consent}
           </p>
         ) : null}

@@ -42,7 +42,7 @@ export function InvoiceTable({ invoices, districtId, viewAllHref }: InvoiceTable
         <p className="p-6 text-center text-sm text-aivo-ink-soft">No invoices found.</p>
       ) : (
         <table className="w-full text-sm">
-          <thead className="bg-aivo-surface-2 text-left">
+          <thead className="bg-iw-raised text-left">
             <tr>
               <th className="p-3">Number</th>
               <th className="p-3">Period</th>

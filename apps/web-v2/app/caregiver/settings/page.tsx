@@ -34,11 +34,11 @@ export default async function Page() {
       <SectionHeader title={t("section_profile")} />
       <Card className="p-4">
         <dl className="grid grid-cols-[120px_1fr] gap-y-2 text-sm">
-          <dt className="font-medium text-aivo-muted">Name</dt>
+          <dt className="font-medium text-iw-ink-muted">Name</dt>
           <dd>{session.displayName}</dd>
-          <dt className="font-medium text-aivo-muted">Email</dt>
+          <dt className="font-medium text-iw-ink-muted">Email</dt>
           <dd>{session.email}</dd>
-          <dt className="font-medium text-aivo-muted">Role</dt>
+          <dt className="font-medium text-iw-ink-muted">Role</dt>
           <dd>{t("role_label")}</dd>
         </dl>
       </Card>
@@ -49,14 +49,14 @@ export default async function Page() {
           <Badge tone="primary">In-app · {channelCount("in_app")}</Badge>
           <Badge tone="neutral">Email · {channelCount("email")}</Badge>
           <Badge tone="neutral">Push · {channelCount("push")}</Badge>
-          <span className="text-aivo-ink-soft">
+          <span className="text-iw-ink-muted">
             Digest cadence: {prefs.digestCadence}
             {prefs.quietHours ? ` · quiet ${prefs.quietHours}` : ""}
           </span>
         </div>
-        <p className="mt-3 text-xs text-aivo-ink-soft">
+        <p className="mt-3 text-xs text-iw-ink-muted">
           Edit channels and quiet hours from the{" "}
-          <Link href="/notifications" className="text-aivo-accent hover:underline">
+          <Link href="/notifications" className="text-iw-warm hover:underline">
             notifications surface
           </Link>
           .

@@ -238,7 +238,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
         <Card key={g} className="p-5">
           <p className="mb-3 font-semibold">{g === "aac" ? tAac("group_label") : GROUP_LABEL[g]}</p>
           {g === "aac" ? (
-            <p className="-mt-2 mb-3 text-xs text-aivo-ink-soft">{tAac("group_desc")}</p>
+            <p className="-mt-2 mb-3 text-xs text-iw-ink-muted">{tAac("group_desc")}</p>
           ) : null}
           <ul className="grid gap-3 sm:grid-cols-2">
             {TOGGLES.filter((t) => t.group === g).map((t) => {
@@ -249,7 +249,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
               return (
                 <li
                   key={t.key}
-                  className="flex items-start gap-3 rounded-md border border-aivo-line p-3"
+                  className="flex items-start gap-3 rounded-md border border-iw-border p-3"
                 >
                   <Checkbox
                     id={t.key}
@@ -260,7 +260,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
                     <Label htmlFor={t.key} className="font-medium">
                       {label}
                     </Label>
-                    <p className="text-xs text-aivo-ink-soft">{help}</p>
+                    <p className="text-xs text-iw-ink-muted">{help}</p>
                   </div>
                 </li>
               );
@@ -268,9 +268,9 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
           </ul>
 
           {g === "reading" && (
-            <p className="mt-4 rounded-md border border-aivo-line p-3 text-sm">
+            <p className="mt-4 rounded-md border border-iw-border p-3 text-sm">
               <span className="font-medium">{tVoice("title")}</span>{" "}
-              <span className="text-aivo-ink-soft">{tVoice("body")}</span>{" "}
+              <span className="text-iw-ink-muted">{tVoice("body")}</span>{" "}
               <Link
                 href="/learner/settings/audio"
                 className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring rounded"
@@ -281,7 +281,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
           )}
 
           {g === "aac" && prefs.aacEnabled && (
-            <div className="mt-4 grid gap-4 rounded-md border border-aivo-line p-3 sm:grid-cols-2">
+            <div className="mt-4 grid gap-4 rounded-md border border-iw-border p-3 sm:grid-cols-2">
               <div className="flex flex-col gap-1">
                 <Label htmlFor="aacInputMethod" className="font-medium">
                   {tAac("method_label")}
@@ -295,7 +295,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
                       e.target.value as AccessibilityPreferences["aacInputMethod"],
                     )
                   }
-                  className="rounded-md border border-aivo-line bg-transparent px-2 py-2 text-sm"
+                  className="rounded-md border border-iw-border bg-transparent px-2 py-2 text-sm"
                 >
                   {AAC_INPUT_METHODS.map((m) => (
                     <option key={m.value} value={m.value}>
@@ -319,9 +319,9 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
                     const n = Math.min(5000, Math.max(300, Number(e.target.value) || 1200));
                     setAac("aacScanDelayMs", n);
                   }}
-                  className="rounded-md border border-aivo-line bg-transparent px-2 py-2 text-sm"
+                  className="rounded-md border border-iw-border bg-transparent px-2 py-2 text-sm"
                 />
-                <p className="text-xs text-aivo-ink-soft">{tAac("dwell_help")}</p>
+                <p className="text-xs text-iw-ink-muted">{tAac("dwell_help")}</p>
               </div>
             </div>
           )}
@@ -329,7 +329,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
       ))}
 
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-aivo-ink-soft" aria-live="polite">
+        <p className="text-sm text-iw-ink-muted" aria-live="polite">
           {status === "saved" && "Saved."}
           {status === "reset" && "Reset to defaults."}
           {status === "error" && "Could not save — try again."}

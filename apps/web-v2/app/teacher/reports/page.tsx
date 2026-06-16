@@ -92,13 +92,13 @@ export default async function TeacherReportsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("col_learners")}
           </p>
           <p className="mt-1 font-display text-3xl font-semibold">{learners.length}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("class_mastery")}
           </p>
           <p className="mt-1 font-display text-3xl font-semibold">
@@ -106,14 +106,14 @@ export default async function TeacherReportsPage() {
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("on_track")}
           </p>
           <p className="mt-1 font-display text-3xl font-semibold">{learnersOnTrack}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">{t("avg_mastery_threshold")}</p>
+          <p className="mt-1 text-xs text-iw-ink-muted">{t("avg_mastery_threshold")}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("ieps_on_file")}
           </p>
           <p className="mt-1 font-display text-3xl font-semibold">{learnersWithIep}</p>
@@ -123,7 +123,7 @@ export default async function TeacherReportsPage() {
       <SectionHeader title={t("mastery_distribution")} />
       {distTotal === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-sm text-aivo-ink-soft">{t("no_mastery_data")}</p>
+          <p className="text-sm text-iw-ink-muted">{t("no_mastery_data")}</p>
         </Card>
       ) : (
         <Card className="p-[var(--aivo-density-card-pad)]">
@@ -132,14 +132,14 @@ export default async function TeacherReportsPage() {
               const pct = distTotal > 0 ? Math.round((b.count / distTotal) * 100) : 0;
               return (
                 <div key={b.label}>
-                  <div className="flex items-center justify-between text-xs text-aivo-ink-soft">
+                  <div className="flex items-center justify-between text-xs text-iw-ink-muted">
                     <span>{b.label}</span>
                     <span>
                       {b.count} skill{b.count === 1 ? "" : "s"} · {pct}%
                     </span>
                   </div>
-                  <div className="mt-1 h-2 w-full rounded-full bg-aivo-border">
-                    <div className="h-2 rounded-full bg-aivo-accent" style={{ width: `${pct}%` }} />
+                  <div className="mt-1 h-2 w-full rounded-full bg-iw-border">
+                    <div className="h-2 rounded-full bg-iw-warm" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               );
@@ -161,7 +161,7 @@ export default async function TeacherReportsPage() {
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
-            <thead className="bg-aivo-surface-soft text-xs uppercase tracking-wide text-aivo-ink-soft">
+            <thead className="bg-iw-raised text-xs uppercase tracking-wide text-iw-ink-muted">
               <tr>
                 <th className="px-4 py-2 text-left">{t("col_learner")}</th>
                 <th className="px-4 py-2 text-right">{t("col_skills")}</th>
@@ -176,7 +176,7 @@ export default async function TeacherReportsPage() {
               {rows
                 .sort((a, b) => b.avg - a.avg)
                 .map((r) => (
-                  <tr key={r.learner.id} className="border-t border-aivo-border">
+                  <tr key={r.learner.id} className="border-t border-iw-border">
                     <td className="px-4 py-2 font-medium">{r.learner.displayName}</td>
                     <td className="px-4 py-2 text-right font-mono">{r.skillsCount}</td>
                     <td className="px-4 py-2 text-right font-mono">{Math.round(r.avg * 100)}%</td>
@@ -192,7 +192,7 @@ export default async function TeacherReportsPage() {
                     <td className="px-4 py-2 text-right">
                       <Link
                         href={`/teacher/learners/${r.learner.id}`}
-                        className="text-aivo-accent underline underline-offset-4"
+                        className="text-iw-warm underline underline-offset-4"
                       >
                         Open
                       </Link>
@@ -201,7 +201,7 @@ export default async function TeacherReportsPage() {
                           {" · "}
                           <Link
                             href={`/teacher/learners/${r.learner.id}/iep/draft`}
-                            className="text-aivo-accent underline underline-offset-4"
+                            className="text-iw-warm underline underline-offset-4"
                           >
                             {GOALS_LINK_LABEL}
                           </Link>

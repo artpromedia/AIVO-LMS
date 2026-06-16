@@ -6,7 +6,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { OnboardingScaffold } from "@/src/components/onboarding/OnboardingScaffold";
 import { Button } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 async function pickPdf(): Promise<{ name: string } | null> {
@@ -72,7 +72,7 @@ export default function IepUploadScreen() {
           {file ?? t("onboarding.iep.pick", "Choose a PDF")}
         </Text>
         {file ? (
-          <Text style={[styles.dropHint, { color: "#22c55e" }]}>
+          <Text style={[styles.dropHint, { color: colors.success }]}>
             {t("onboarding.iep.ready", "Ready to upload")}
           </Text>
         ) : (

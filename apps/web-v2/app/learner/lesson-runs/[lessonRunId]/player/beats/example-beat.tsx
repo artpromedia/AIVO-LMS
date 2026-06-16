@@ -10,7 +10,7 @@ export function ExampleBeat({ beat }: { beat: Extract<Beat, { kind: "example" }>
       <p className="font-display text-2xl">
         <MathText>{beat.prompt}</MathText>
       </p>
-      <p className="text-aivo-ink-soft">
+      <p className="text-iw-ink-muted">
         <MathText>{beat.explanation}</MathText>
       </p>
     </>

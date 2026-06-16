@@ -48,7 +48,7 @@ export function StickyHeader({
   return (
     <header
       className={`sticky top-0 z-50 w-full bg-[var(--aivo-color-surface-canvas)]/85 backdrop-blur-xl border-b transition-shadow duration-300 ${
-        isScrolled ? "shadow-sm border-slate-200/70" : "border-slate-200/40"
+        isScrolled ? "shadow-soft-1 border-iw-border/70" : "border-iw-border/40"
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 md:px-8 h-20 flex items-center justify-between gap-4">
@@ -67,12 +67,12 @@ export function StickyHeader({
               className="object-contain object-left"
             />
           </Link>
-          <nav className="hidden md:flex items-center gap-5 lg:gap-8 text-sm font-semibold text-slate-500">
+          <nav className="hidden md:flex items-center gap-5 lg:gap-8 text-sm font-semibold text-iw-ink-muted">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="whitespace-nowrap hover:text-slate-900 transition-colors"
+                className="whitespace-nowrap hover:text-iw-ink transition-colors"
               >
                 {link.label}
               </Link>
@@ -87,7 +87,7 @@ export function StickyHeader({
           <LanguageSwitcher compact />
           <a
             href={`${WEB_APP_URL}/login`}
-            className="hidden md:inline-flex items-center px-4 py-2 rounded-full text-slate-700 font-semibold text-sm hover:bg-slate-100 transition min-h-[44px] whitespace-nowrap"
+            className="hidden md:inline-flex items-center px-4 py-2 rounded-iw-control text-iw-ink font-semibold text-sm hover:bg-iw-raised transition min-h-[44px] whitespace-nowrap"
           >
             {t("sign_in")}
           </a>
@@ -97,34 +97,34 @@ export function StickyHeader({
               trackCTAClick("header_get_started", `${WEB_APP_URL}/signup?plan=free`);
               trackSignupInitiation("header");
             }}
-            className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full bg-[var(--aivo-sensory-primary)] text-white font-semibold text-sm hover:opacity-90 transition shadow-md shadow-purple-200 min-h-[44px] whitespace-nowrap"
+            className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold text-sm hover:opacity-90 transition shadow-soft-3 min-h-[44px] whitespace-nowrap"
           >
             {t("get_started")}
           </a>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-slate-100 transition"
+            className="md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-iw-control hover:bg-iw-raised transition"
             aria-label="Toggle navigation menu"
             aria-expanded={menuOpen}
           >
             {menuOpen ? (
-              <X className="w-5 h-5 text-slate-800" aria-hidden="true" />
+              <X className="w-5 h-5 text-iw-ink" aria-hidden="true" />
             ) : (
-              <Menu className="w-5 h-5 text-slate-800" aria-hidden="true" />
+              <Menu className="w-5 h-5 text-iw-ink" aria-hidden="true" />
             )}
           </button>
         </div>
       </div>
 
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 shadow-lg">
+        <div className="md:hidden bg-white border-t border-iw-border shadow-soft-3">
           <nav className="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="px-4 py-3 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition min-h-[44px] flex items-center"
+                className="px-4 py-3 text-iw-ink font-semibold rounded-lg hover:bg-iw-raised transition min-h-[44px] flex items-center"
               >
                 {link.label}
               </Link>
@@ -132,11 +132,11 @@ export function StickyHeader({
             <div className="px-4 py-3 lg:hidden">
               <SensoryModeToggle initialMode={initialSensoryMode ?? "standard"} compact />
             </div>
-            <hr className="my-2 border-slate-100" />
+            <hr className="my-2 border-iw-border" />
             <a
               href={`${WEB_APP_URL}/login`}
               onClick={() => setMenuOpen(false)}
-              className="px-4 py-3 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition min-h-[44px] flex items-center"
+              className="px-4 py-3 text-iw-ink font-semibold rounded-lg hover:bg-iw-raised transition min-h-[44px] flex items-center"
             >
               {t("sign_in")}
             </a>
@@ -147,7 +147,7 @@ export function StickyHeader({
                 trackCTAClick("mobile_menu_get_started", `${WEB_APP_URL}/signup?plan=free`);
                 trackSignupInitiation("mobile_menu");
               }}
-              className="px-4 py-3 bg-[var(--aivo-sensory-primary)] text-white font-semibold rounded-full text-center hover:opacity-90 transition min-h-[44px] flex items-center justify-center mt-2"
+              className="px-4 py-3 bg-[var(--aivo-sensory-primary)] text-white font-semibold rounded-iw-control text-center hover:opacity-90 transition min-h-[44px] flex items-center justify-center mt-2"
             >
               {t("get_started")}
             </a>

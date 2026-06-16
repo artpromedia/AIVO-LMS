@@ -153,7 +153,7 @@ export default function PinSetupPage() {
             <p className="mt-2 text-xs text-iw-ink-muted">{t("no_learner_body")}</p>
             <Link
               href="/onboarding/learner/new"
-              className="mt-5 inline-flex min-h-[52px] w-full items-center justify-center rounded-full bg-iw-primary px-7 text-base font-semibold text-iw-primary-fg shadow-[0_10px_30px_-12px_rgba(124,108,246,0.7)] transition hover:-translate-y-0.5 hover:bg-iw-primary-hover"
+              className="mt-5 inline-flex min-h-[52px] w-full items-center justify-center rounded-iw-control bg-iw-primary px-7 text-base font-semibold text-iw-primary-fg shadow-soft-3 transition hover:-translate-y-0.5 hover:bg-iw-primary-hover"
             >
               {t("no_learner_cta")}
             </Link>
@@ -212,9 +212,9 @@ export default function PinSetupPage() {
                     setStep("confirm");
                   }}
                   className={[
-                    "inline-flex min-h-[52px] w-full items-center justify-center rounded-full px-7 text-base font-semibold text-iw-primary-fg transition",
+                    "inline-flex min-h-[52px] w-full items-center justify-center rounded-iw-control px-7 text-base font-semibold text-iw-primary-fg transition",
                     pin.length === 4 && !needsLearner
-                      ? "bg-iw-primary shadow-[0_10px_30px_-12px_rgba(124,108,246,0.7)] hover:-translate-y-0.5 hover:bg-iw-primary-hover"
+                      ? "bg-iw-primary shadow-soft-3 hover:-translate-y-0.5 hover:bg-iw-primary-hover"
                       : "cursor-not-allowed bg-iw-primary/40",
                   ].join(" ")}
                 >
@@ -226,7 +226,7 @@ export default function PinSetupPage() {
                 <p className="text-center text-sm text-iw-ink-muted">{t("reenter_4")}</p>
                 <PinPad value={confirm} onChange={(v) => setConfirm(v.slice(0, 4))} length={4} />
                 {mismatch ? (
-                  <p role="alert" className="text-center text-xs font-semibold text-red-600">
+                  <p role="alert" className="text-center text-xs font-semibold text-iw-error-strong">
                     {t("mismatch")}
                   </p>
                 ) : null}
@@ -235,9 +235,9 @@ export default function PinSetupPage() {
                   disabled={!canSave}
                   onClick={handleSave}
                   className={[
-                    "inline-flex min-h-[52px] w-full items-center justify-center rounded-full px-7 text-base font-semibold text-iw-primary-fg transition",
+                    "inline-flex min-h-[52px] w-full items-center justify-center rounded-iw-control px-7 text-base font-semibold text-iw-primary-fg transition",
                     canSave
-                      ? "bg-iw-primary shadow-[0_10px_30px_-12px_rgba(124,108,246,0.7)] hover:-translate-y-0.5 hover:bg-iw-primary-hover"
+                      ? "bg-iw-primary shadow-soft-3 hover:-translate-y-0.5 hover:bg-iw-primary-hover"
                       : "cursor-not-allowed bg-iw-primary/40",
                   ].join(" ")}
                 >
@@ -257,7 +257,7 @@ export default function PinSetupPage() {
             )}
 
             {error ? (
-              <p role="alert" className="text-center text-xs font-semibold text-red-600">
+              <p role="alert" className="text-center text-xs font-semibold text-iw-error-strong">
                 {error}
               </p>
             ) : null}

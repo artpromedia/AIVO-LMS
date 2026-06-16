@@ -68,7 +68,7 @@ export function BreakCard({
       )}
     >
       <span
-        className="w-16 h-16 rounded-2xl bg-white shadow-[0_4px_16px_rgb(from_var(--aivo-color-aivoTeal-400)_r_g_b_/_0.18)] inline-flex items-center justify-center text-[var(--aivo-color-aivoTeal-700)]"
+        className="w-16 h-16 rounded-iw-control bg-white shadow-[0_4px_16px_rgb(from_var(--aivo-color-aivoTeal-400)_r_g_b_/_0.18)] inline-flex items-center justify-center text-[var(--aivo-color-aivoTeal-700)]"
         aria-hidden="true"
       >
         {isStruggle ? (

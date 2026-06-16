@@ -70,7 +70,7 @@ export function TotpEnrollForm({ alreadyEnrolled }: { alreadyEnrolled: boolean }
           {pending ? t("starting") : t("start")}
         </Button>
         {error ? (
-          <p role="alert" className="text-sm text-iw-danger">
+          <p role="alert" className="text-sm text-iw-error">
             {error}
           </p>
         ) : null}
@@ -107,7 +107,7 @@ export function TotpEnrollForm({ alreadyEnrolled }: { alreadyEnrolled: boolean }
         autoFocus
       />
       {error ? (
-        <p role="alert" className="text-sm text-iw-danger">
+        <p role="alert" className="text-sm text-iw-error">
           {error}
         </p>
       ) : null}

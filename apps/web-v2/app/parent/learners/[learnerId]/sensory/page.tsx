@@ -124,7 +124,7 @@ export default async function ParentSensoryPage({
           return (
             <Card key={m.key} className="p-[var(--aivo-density-card-pad)]">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-aivo-accent/10 text-aivo-accent">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-iw-warm/10 text-iw-warm">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -132,15 +132,15 @@ export default async function ParentSensoryPage({
                     <p className="font-medium">{m.label}</p>
                     <Badge tone={tone}>{RESPONSE_LABEL[response]}</Badge>
                   </div>
-                  <p className="mt-1 text-sm text-aivo-ink-soft">{m.question}</p>
+                  <p className="mt-1 text-sm text-iw-ink-muted">{m.question}</p>
                   <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-                    <div className="rounded-md bg-aivo-surface-soft p-2">
-                      <dt className="font-medium text-aivo-ink">{t("hyper_sensitive")}</dt>
-                      <dd className="text-aivo-ink-soft">{m.hyper}</dd>
+                    <div className="rounded-md bg-iw-raised p-2">
+                      <dt className="font-medium text-iw-ink">{t("hyper_sensitive")}</dt>
+                      <dd className="text-iw-ink-muted">{m.hyper}</dd>
                     </div>
-                    <div className="rounded-md bg-aivo-surface-soft p-2">
-                      <dt className="font-medium text-aivo-ink">{t("hypo_sensitive")}</dt>
-                      <dd className="text-aivo-ink-soft">{m.hypo}</dd>
+                    <div className="rounded-md bg-iw-raised p-2">
+                      <dt className="font-medium text-iw-ink">{t("hypo_sensitive")}</dt>
+                      <dd className="text-iw-ink-muted">{m.hypo}</dd>
                     </div>
                   </dl>
                 </div>
@@ -155,11 +155,11 @@ export default async function ParentSensoryPage({
         {profile?.notes ? (
           <p className="text-sm">{profile.notes}</p>
         ) : (
-          <p className="text-sm text-aivo-ink-soft">
+          <p className="text-sm text-iw-ink-muted">
             No notes yet. Use{" "}
             <Link
               href={`/parent/learners/${learner.id}/settings`}
-              className="text-aivo-accent underline underline-offset-4"
+              className="text-iw-warm underline underline-offset-4"
             >
               learner settings
             </Link>{" "}
@@ -167,7 +167,7 @@ export default async function ParentSensoryPage({
           </p>
         )}
         {profile ? (
-          <p className="mt-3 text-xs text-aivo-ink-soft">
+          <p className="mt-3 text-xs text-iw-ink-muted">
             Last updated {new Date(profile.updatedAt).toLocaleDateString()}.
           </p>
         ) : null}

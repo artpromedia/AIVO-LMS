@@ -13,7 +13,7 @@ import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { OnboardingStepper } from "@/src/components/onboarding/OnboardingStepper";
 import { Card, Button } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import {
@@ -208,8 +208,8 @@ export default function TeacherAssessmentScreen() {
       <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
         <ScreenHeader title={t("teacherAssessment.doneTitle", "Thank you")} />
         <Card tone="raised" style={{ gap: spacing.sm, alignItems: "center" }}>
-          <View style={[styles.iconWrap, { backgroundColor: "#22c55e1A" }]}>
-            <Ionicons name="checkmark-circle" size={30} color="#22c55e" />
+          <View style={[styles.iconWrap, { backgroundColor: colors.success + "1A" }]}>
+            <Ionicons name="checkmark-circle" size={30} color={colors.success} />
           </View>
           <Text style={[styles.h1, { color: palette.ink, textAlign: "center" }]}>
             {t("teacherAssessment.submitted", "Insight saved")}
@@ -284,7 +284,7 @@ export default function TeacherAssessmentScreen() {
                 </View>
                 <View style={styles.reviewRight}>
                   {complete ? (
-                    <Ionicons name="checkmark-circle" size={20} color="#22c55e" />
+                    <Ionicons name="checkmark-circle" size={20} color={colors.success} />
                   ) : (
                     <View style={[styles.dot, { borderColor: palette.border }]} />
                   )}
@@ -420,11 +420,11 @@ export default function TeacherAssessmentScreen() {
                           <Ionicons
                             name={selected ? "checkbox" : "square-outline"}
                             size={18}
-                            color={selected ? "#FFF" : palette.inkMuted}
+                            color={selected ? colors.white : palette.inkMuted}
                           />
                         ) : null}
                         <Text
-                          style={[styles.optionText, { color: selected ? "#FFF" : palette.ink }]}
+                          style={[styles.optionText, { color: selected ? colors.white : palette.ink }]}
                         >
                           {o.label}
                         </Text>

@@ -95,7 +95,7 @@ export function AIGenerationStatusCard({
     >
       <header className="flex items-start gap-4">
         <span
-          className="shrink-0 w-12 h-12 rounded-2xl bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-sensory-primary)] inline-flex items-center justify-center"
+          className="shrink-0 w-12 h-12 rounded-iw-control bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-sensory-primary)] inline-flex items-center justify-center"
           aria-hidden="true"
         >
           <span className="w-3 h-3 rounded-full bg-[var(--aivo-sensory-primary)] aivo-motion-ai-thinking" />

@@ -36,7 +36,7 @@ export function AuditDetailDrawer({
       role="dialog"
       aria-modal="true"
       aria-label={t("detail_title")}
-      className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-4 overflow-y-auto border-l border-aivo-border bg-aivo-surface p-5 shadow-xl"
+      className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col gap-4 overflow-y-auto border-l border-iw-border bg-iw-card p-5 shadow-soft-5"
     >
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -60,7 +60,7 @@ export function AuditDetailDrawer({
 
       <div>
         <p className="text-sm font-medium">{t("details_payload")}</p>
-        <pre className="mt-1 max-h-48 overflow-auto rounded bg-aivo-surface-2 p-2 text-xs">
+        <pre className="mt-1 max-h-48 overflow-auto rounded bg-iw-raised p-2 text-xs">
           {JSON.stringify(event.details, null, 2)}
         </pre>
       </div>

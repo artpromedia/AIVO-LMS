@@ -48,18 +48,18 @@ export function SensoryModeToggle({
 
   return (
     <div
-      className={`inline-flex items-center gap-1 p-1 rounded-full bg-white/70 border border-slate-200 shadow-sm ${
+      className={`inline-flex items-center gap-1 p-1 rounded-iw-control bg-white/70 border border-iw-border shadow-soft-1 ${
         compact ? "" : "backdrop-blur"
       }`}
       role="group"
       aria-label="Sensory mode"
     >
       {!compact && (
-        <span className="hidden md:inline-flex items-center gap-1.5 px-3 text-xs font-semibold text-slate-500">
+        <span className="hidden md:inline-flex items-center gap-1.5 px-3 text-xs font-semibold text-iw-ink-muted">
           <Eye className="w-3.5 h-3.5" aria-hidden="true" /> Mode
         </span>
       )}
-      <div className="flex items-center bg-slate-100/70 rounded-full p-0.5">
+      <div className="flex items-center bg-iw-raised/70 rounded-iw-control p-0.5">
         {SENSORY_MODES_ORDERED.map((m) => {
           const active = m === mode;
           return (
@@ -68,8 +68,8 @@ export function SensoryModeToggle({
               type="button"
               onClick={() => selectMode(m)}
               aria-pressed={active}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-colors min-h-[28px] whitespace-nowrap ${
-                active ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-800"
+              className={`px-3 py-1.5 text-xs font-semibold rounded-iw-control transition-colors min-h-[28px] whitespace-nowrap ${
+                active ? "bg-white shadow-soft-1 text-iw-ink" : "text-iw-ink-muted hover:text-iw-ink"
               }`}
             >
               {LABELS[m]}

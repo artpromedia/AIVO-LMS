@@ -9,7 +9,7 @@ import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card } from "@/components/ui";
 import { LoadingState, EmptyState } from "@aivo/mobile-ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 type Channel = "visual" | "auditory" | "tactile" | "vestibular";
@@ -22,9 +22,9 @@ const CHANNELS: { key: Channel; icon: keyof typeof Ionicons.glyphMap; label: str
 ];
 
 const SENS_TONE: Record<string, string> = {
-  low: "#22c55e",
-  moderate: "#f59e0b",
-  high: "#ef4444",
+  low: colors.success,
+  moderate: colors.warning,
+  high: colors.error,
 };
 
 /**

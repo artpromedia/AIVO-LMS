@@ -40,17 +40,17 @@ const ROLE_META: Record<TeamRole, { labelKey: string; icon: React.ReactNode; acc
   teacher: {
     labelKey: "role_teacher",
     icon: <GraduationCap className="h-4 w-4" aria-hidden="true" />,
-    accent: "bg-sky-50 text-sky-700 border-sky-200",
+    accent: "bg-iw-accent-soft text-iw-teal-700 border-iw-accent",
   },
   caregiver: {
     labelKey: "role_caregiver",
     icon: <HeartHandshake className="h-4 w-4" aria-hidden="true" />,
-    accent: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    accent: "bg-iw-success-subtle text-iw-success-strong border-iw-success",
   },
   therapist: {
     labelKey: "role_therapist",
     icon: <Brain className="h-4 w-4" aria-hidden="true" />,
-    accent: "bg-violet-50 text-violet-700 border-violet-200",
+    accent: "bg-iw-purple-100 text-iw-primary border-iw-purple-200",
   },
 };
 
@@ -97,7 +97,7 @@ export default async function TeacherTeamPage({
 
       <SectionHeader title={t("team_status_title")} />
       {contributions.members.length > 0 ? (
-        <p className="mb-2 text-sm text-aivo-ink-soft">
+        <p className="mb-2 text-sm text-iw-ink-muted">
           {t("team_status_summary", {
             contributed: contributions.voices.contributed,
             invited: contributions.voices.invited,
@@ -109,7 +109,7 @@ export default async function TeacherTeamPage({
 
       <SectionHeader title={t("how_title")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <ul className="list-disc space-y-1 pl-5 text-sm text-aivo-ink-soft">
+        <ul className="list-disc space-y-1 pl-5 text-sm text-iw-ink-muted">
           <li>{t("how_1")}</li>
           <li>{t("how_2")}</li>
           <li>{t("how_3")}</li>
@@ -189,13 +189,13 @@ async function TeamStatusList({
                 {stageBadge}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-aivo-ink">
+                <p className="truncate text-sm font-medium text-iw-ink">
                   {m.displayName || m.email}
                 </p>
                 {m.displayName ? (
-                  <p className="truncate text-xs text-aivo-ink-soft">{m.email}</p>
+                  <p className="truncate text-xs text-iw-ink-muted">{m.email}</p>
                 ) : null}
-                <p className="mt-1 text-xs text-aivo-ink-soft">{stageLine}</p>
+                <p className="mt-1 text-xs text-iw-ink-muted">{stageLine}</p>
               </div>
             </Card>
           </li>

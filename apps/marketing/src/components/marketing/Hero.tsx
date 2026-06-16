@@ -105,11 +105,11 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
           style={{ transform: parallaxEnabled ? `translateY(${scrollY * -0.05}px)` : undefined }}
         >
           <div className="space-y-7 text-center md:text-left">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-100 text-purple-700 font-bold text-sm">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-iw-chip bg-iw-purple-100 text-iw-primary font-bold text-sm">
               <Sparkles className="w-4 h-4" aria-hidden="true" />
               {t("badge")}
             </span>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-slate-900 leading-[1.05] tracking-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-iw-ink leading-[1.05] tracking-tight">
               {t("headline_line1")}
               <br />
               <span className="relative inline-block">
@@ -117,10 +117,10 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                   aria-hidden="true"
                   className="absolute inset-x-0 bottom-1 -z-10 h-[0.55em] rounded-sm bg-[var(--aivo-aivoOrange-100)]"
                 />
-                <span className="relative text-slate-900">{t("headline_line2")}</span>
+                <span className="relative text-iw-ink">{t("headline_line2")}</span>
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 font-body leading-relaxed max-w-xl mx-auto md:mx-0">
+            <p className="text-lg md:text-xl text-iw-ink-muted font-body leading-relaxed max-w-xl mx-auto md:mx-0">
               {t("subheadline")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
@@ -130,7 +130,7 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                   trackCTAClick("hero_start_trial", `${WEB_APP_URL}/signup?plan=free`);
                   trackSignupInitiation("hero");
                 }}
-                className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-lg hover:opacity-95 transition-all shadow-xl shadow-purple-200 hover:-translate-y-0.5 min-h-[44px]"
+                className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-iw-control bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-lg hover:opacity-95 transition-all shadow-soft-5 hover:-translate-y-0.5 min-h-[44px]"
               >
                 {t("cta_trial")}
                 <ArrowRight
@@ -143,23 +143,23 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                 onClick={() => {
                   trackCTAClick("hero_watch_demo", "#brain");
                 }}
-                className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-slate-200 bg-white text-slate-700 font-bold text-lg hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-y-0.5 min-h-[44px]"
+                className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-iw-control border-2 border-iw-border bg-white text-iw-ink font-bold text-lg hover:bg-iw-raised hover:border-iw-border transition-all hover:-translate-y-0.5 min-h-[44px]"
               >
                 <PlayCircle className="w-5 h-5 text-primary" aria-hidden="true" />
                 {t("cta_demo")}
               </a>
             </div>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-2 justify-center md:justify-start text-sm font-bold text-slate-500">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-2 justify-center md:justify-start text-sm font-bold text-iw-ink-muted">
               <span className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                <CheckCircle2 className="w-4 h-4 text-iw-success" aria-hidden="true" />
                 {t("trust_no_card")}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                <CheckCircle2 className="w-4 h-4 text-iw-success" aria-hidden="true" />
                 {t("trust_coppa")}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                <CheckCircle2 className="w-4 h-4 text-iw-success" aria-hidden="true" />
                 {t("trust_iep")}
               </span>
             </div>
@@ -171,18 +171,18 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
           >
             <div
               aria-hidden="true"
-              className="absolute -top-4 -right-4 z-20 bg-white p-4 rounded-2xl shadow-2xl border border-slate-100 rotate-3 animate-float-slow motion-reduce:animate-none"
+              className="absolute -top-4 -right-4 z-20 bg-white p-4 rounded-iw-card shadow-soft-5 border border-iw-border rotate-3 animate-float-slow motion-reduce:animate-none"
               style={{ animationDelay: "0.5s" }}
             >
               <div className="flex items-center gap-3">
-                <div className="bg-orange-100 text-orange-500 p-2 rounded-xl">
+                <div className="bg-iw-warm-soft text-iw-warm p-2 rounded-iw-control">
                   <Flame className="w-6 h-6 fill-current" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                  <p className="text-xs font-bold text-iw-ink-muted uppercase tracking-wide">
                     {t("badge_streak")}
                   </p>
-                  <p className="text-xl font-heading font-bold text-slate-800">
+                  <p className="text-xl font-heading font-bold text-iw-ink">
                     {t("badge_streak_value")}
                   </p>
                 </div>
@@ -191,27 +191,27 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
             <div
               aria-hidden="true"
               key={current.tutor.name}
-              className="absolute -bottom-4 -left-4 z-20 bg-white p-3 pr-5 rounded-2xl shadow-2xl border border-slate-100 -rotate-3 animate-float-slow motion-reduce:animate-none flex items-center gap-3 transition-all duration-500"
+              className="absolute -bottom-4 -left-4 z-20 bg-white p-3 pr-5 rounded-iw-card shadow-soft-5 border border-iw-border -rotate-3 animate-float-slow motion-reduce:animate-none flex items-center gap-3 transition-all duration-500"
             >
               <Image
                 src={current.tutor.avatar}
                 alt=""
                 width={40}
                 height={40}
-                className="w-10 h-10 rounded-full object-cover bg-violet-100"
+                className="w-10 h-10 rounded-iw-chip object-cover bg-iw-purple-100"
               />
               <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                <p className="text-xs font-bold text-iw-ink-muted uppercase tracking-wide">
                   {t("badge_now_learning")}
                 </p>
-                <p className="text-sm font-heading font-bold text-slate-800">
+                <p className="text-sm font-heading font-bold text-iw-ink">
                   {current.tutor.name} · {current.tutor.subject}
                 </p>
               </div>
             </div>
 
             <div
-              className="rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white aspect-[4/5] md:aspect-[4/5] relative bg-slate-100"
+              className="rounded-iw-card-lg overflow-hidden shadow-soft-5 border-4 border-white aspect-[4/5] md:aspect-[4/5] relative bg-iw-raised"
               role="region"
               aria-roledescription="carousel"
               aria-label="Learners using AIVO"
@@ -268,28 +268,28 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
         </div>
       </div>
 
-      <div className="relative bg-white border-y border-slate-100">
+      <div className="relative bg-white border-y border-iw-border">
         <div className="max-w-5xl mx-auto px-6 md:px-8 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
           {STATS.map((s) => (
             <div key={s.label} className="text-center">
               <div className="text-2xl mb-1">{s.icon}</div>
               <p className="text-3xl md:text-4xl font-heading font-bold text-primary">{s.value}</p>
-              <p className="text-sm text-slate-500 font-bold mt-1">{s.label}</p>
+              <p className="text-sm text-iw-ink-muted font-bold mt-1">{s.label}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="relative bg-slate-50 border-b border-slate-100">
+      <div className="relative bg-iw-raised border-b border-iw-border">
         <div className="max-w-6xl mx-auto px-6 md:px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-slate-500 font-body">{t("trust_line")}</p>
+          <p className="text-sm text-iw-ink-muted font-body">{t("trust_line")}</p>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             {TRUST_CITIES.map((city) => (
               <span
                 key={city}
-                className="flex items-center gap-1.5 text-sm text-slate-500 font-body"
+                className="flex items-center gap-1.5 text-sm text-iw-ink-muted font-body"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="w-1.5 h-1.5 rounded-full bg-iw-success" />
                 {city}
               </span>
             ))}

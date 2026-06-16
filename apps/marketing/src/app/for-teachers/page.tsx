@@ -44,7 +44,7 @@ export default async function Page() {
                 <div
                   key={i}
                   className={`rounded ${
-                    flagged ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
+                    flagged ? "bg-iw-warning-subtle text-iw-warning-strong" : "bg-iw-success-subtle text-iw-success-strong"
                   } p-1.5 text-center`}
                 >
                   <p className="font-heading text-[10px] font-bold">L{i + 1}</p>
@@ -76,10 +76,10 @@ export default async function Page() {
             ].map((r) => (
               <div
                 key={r.l}
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-2.5 text-xs"
+                className="flex items-center justify-between rounded-lg border border-iw-border bg-white p-2.5 text-xs"
               >
-                <span className="font-semibold text-slate-900">{r.l}</span>
-                <span className="text-slate-500">{r.s}</span>
+                <span className="font-semibold text-iw-ink">{r.l}</span>
+                <span className="text-iw-ink-muted">{r.s}</span>
               </div>
             ))}
           </div>
@@ -99,17 +99,17 @@ export default async function Page() {
         mockupTitle="New assignment"
         mockup={
           <div className="space-y-2.5">
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <p className="text-xs font-semibold text-slate-500">Title</p>
-              <p className="font-heading text-sm font-bold text-slate-900">
+            <div className="rounded-lg border border-iw-border bg-white p-3">
+              <p className="text-xs font-semibold text-iw-ink-muted">Title</p>
+              <p className="font-heading text-sm font-bold text-iw-ink">
                 {t("assignment_title")}
               </p>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <p className="text-xs font-semibold text-slate-500">{t("roster_label")}</p>
-              <p className="text-sm text-slate-700">{t("roster_value")}</p>
+            <div className="rounded-lg border border-iw-border bg-white p-3">
+              <p className="text-xs font-semibold text-iw-ink-muted">{t("roster_label")}</p>
+              <p className="text-sm text-iw-ink">{t("roster_value")}</p>
             </div>
-            <div className="rounded-lg bg-purple-600 py-2 text-center text-sm font-semibold text-white">
+            <div className="rounded-lg bg-iw-primary py-2 text-center text-sm font-semibold text-white">
               {t("assign_cta")}
             </div>
           </div>
@@ -138,10 +138,10 @@ export default async function Page() {
             ].map((r) => (
               <div
                 key={r.d + r.t}
-                className="flex gap-3 rounded-lg border border-slate-200 bg-white p-2.5 text-xs"
+                className="flex gap-3 rounded-lg border border-iw-border bg-white p-2.5 text-xs"
               >
-                <span className="font-heading font-bold text-slate-900 w-8">{r.d}</span>
-                <span className="text-slate-700">{r.t}</span>
+                <span className="font-heading font-bold text-iw-ink w-8">{r.d}</span>
+                <span className="text-iw-ink">{r.t}</span>
               </div>
             ))}
           </div>
@@ -167,7 +167,7 @@ export default async function Page() {
               preferences — without raw IEP text, diagnoses, or clinical language exposed in the
               product.
             </p>
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-iw-ink-muted">
               Full IEP documents stay where they belong: in your district's special-services system,
               with the access controls already in place.
             </p>

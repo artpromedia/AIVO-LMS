@@ -90,11 +90,11 @@ export function ScimTokenCard({ idpId, tokens }: { idpId: string; tokens: ScimTo
 
       {issued ? (
         <div
-          className="rounded-md border border-aivo-success bg-aivo-success-soft p-3"
+          className="rounded-md border border-iw-success bg-iw-success-subtle p-3"
           role="status"
         >
           <p className="text-sm font-semibold">{t("token_issued_once")}</p>
-          <code className="mt-2 block break-all rounded bg-aivo-surface px-2 py-1 text-xs">
+          <code className="mt-2 block break-all rounded bg-iw-card px-2 py-1 text-xs">
             {issued}
           </code>
           <Button

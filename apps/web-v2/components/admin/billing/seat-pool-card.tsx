@@ -100,7 +100,7 @@ export function SeatPoolCard({
           <Progress
             value={utilizationPct}
             aria-label={`${utilizationPct}% of seats in use`}
-            className={utilizationPct > 90 ? "[&>div]:bg-aivo-danger" : ""}
+            className={utilizationPct > 90 ? "[&>div]:bg-iw-error" : ""}
           />
         </div>
       </div>

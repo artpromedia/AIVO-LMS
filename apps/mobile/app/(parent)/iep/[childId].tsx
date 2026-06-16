@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   },
   tabActive: { backgroundColor: colors.primary },
   tabText: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  tabTextActive: { color: "#FFF" },
+  tabTextActive: { color: colors.white },
   sectionTitle: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.text },
   goalCard: { marginBottom: spacing.sm },
   goalHeader: {
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
   },
   filterChipActive: { backgroundColor: colors.primary },
   filterChipText: { fontSize: 12, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  filterChipTextActive: { color: "#FFF" },
+  filterChipTextActive: { color: colors.white },
   timelineCard: { marginBottom: spacing.sm },
   timelineHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 },
   timelineType: {

@@ -72,7 +72,7 @@ export function HomeworkSidebar({
             >
               {formatClock(secondsLeft)}
             </div>
-            <p className="text-sm text-aivo-ink-soft" aria-live="polite">
+            <p className="text-sm text-iw-ink-muted" aria-live="polite">
               {t("break_breathe")}
             </p>
             <Button type="button" variant="outline" onClick={() => setBreakOpen(false)}>
@@ -81,7 +81,7 @@ export function HomeworkSidebar({
           </div>
         ) : (
           <>
-            <p className="mt-1 text-sm text-aivo-ink-soft">{t("break_body")}</p>
+            <p className="mt-1 text-sm text-iw-ink-muted">{t("break_body")}</p>
             <Button type="button" className="mt-3 w-full" onClick={() => setBreakOpen(true)}>
               {t("break_start", { minutes: BREAK_MINUTES })}
             </Button>
@@ -93,7 +93,7 @@ export function HomeworkSidebar({
         <h2 className="font-display text-base font-semibold text-iw-text-strong">
           {t("encourage_title")}
         </h2>
-        <p className="mt-1 text-sm text-aivo-ink-soft">{t("encourage_body")}</p>
+        <p className="mt-1 text-sm text-iw-ink-muted">{t("encourage_body")}</p>
         <div className="mt-3 flex gap-2" aria-hidden="true">
           {Array.from({ length: PROGRESS_DOTS }).map((_, i) => (
             <span

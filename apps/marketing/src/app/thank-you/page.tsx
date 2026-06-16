@@ -48,20 +48,20 @@ export default async function ThankYouPage() {
       }}
     >
       <section aria-labelledby="next-steps-heading">
-        <h2 id="next-steps-heading" className="font-heading text-2xl font-bold text-slate-900">
+        <h2 id="next-steps-heading" className="font-heading text-2xl font-bold text-iw-ink">
           {t("while_you_wait")}
         </h2>
         <ul className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
           {NEXT_STEPS.map((s) => (
             <li
               key={s.href}
-              className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+              className="flex flex-col rounded-iw-card border border-iw-border bg-white p-5 shadow-soft-1"
             >
-              <h3 className="font-heading text-lg font-bold text-slate-900">{s.title}</h3>
-              <p className="mt-2 flex-1 font-body text-slate-700">{s.body}</p>
+              <h3 className="font-heading text-lg font-bold text-iw-ink">{s.title}</h3>
+              <p className="mt-2 flex-1 font-body text-iw-ink">{s.body}</p>
               <Link
                 href={s.href}
-                className="mt-4 inline-flex w-fit items-center font-bold text-purple-700 hover:text-purple-800"
+                className="mt-4 inline-flex w-fit items-center font-bold text-iw-primary hover:text-iw-primary-hover"
               >
                 {s.label}{" "}
                 <span aria-hidden="true" className="ml-1">

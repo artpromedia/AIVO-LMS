@@ -73,7 +73,7 @@ export function OptOutMatrix({ models, optOuts, tenantId }: OptOutMatrixProps) {
     <Card className="overflow-hidden p-0">
       {error ? <p className="px-4 py-2 text-sm text-aivo-danger">{error}</p> : null}
       <table className="w-full text-sm">
-        <thead className="bg-aivo-surface-2 text-xs uppercase tracking-wide text-aivo-ink-soft">
+        <thead className="bg-iw-raised text-xs uppercase tracking-wide text-iw-ink-muted">
           <tr>
             <th className="px-4 py-3 text-left">Model</th>
             <th className="px-4 py-3 text-left">Provider</th>
@@ -85,7 +85,7 @@ export function OptOutMatrix({ models, optOuts, tenantId }: OptOutMatrixProps) {
           {models.map((m) => {
             const s = state[m.id];
             return (
-              <tr key={m.id} className="hover:bg-aivo-surface-2/40">
+              <tr key={m.id} className="hover:bg-iw-raised/40">
                 <td className="px-4 py-3 font-medium">{m.name}</td>
                 <td className="px-4 py-3 text-aivo-ink-soft">{m.provider}</td>
                 <td className="px-4 py-3">
@@ -103,7 +103,7 @@ export function OptOutMatrix({ models, optOuts, tenantId }: OptOutMatrixProps) {
                     disabled={busy[m.id]}
                     onClick={() => toggle(m.id)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${
-                      s.optedOut ? "bg-aivo-danger" : "bg-aivo-border"
+                      s.optedOut ? "bg-iw-error" : "bg-iw-border"
                     }`}
                   >
                     <span

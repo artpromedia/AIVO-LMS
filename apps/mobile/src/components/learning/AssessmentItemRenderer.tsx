@@ -465,5 +465,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: "center",
   },
-  submitText: { fontSize: 15, fontFamily: "Nunito-Bold", color: "#FFF" },
+  submitText: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.white },
 });

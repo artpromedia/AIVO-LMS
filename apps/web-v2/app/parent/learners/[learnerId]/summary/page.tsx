@@ -86,13 +86,13 @@ export default async function ParentSummaryPage({
       <SectionHeader className="mt-8" title={t("whats_going_well")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
         {strongest.length === 0 ? (
-          <p className="text-aivo-ink-soft">{t("fill_after_lessons")}</p>
+          <p className="text-iw-ink-muted">{t("fill_after_lessons")}</p>
         ) : (
           <ul className="grid gap-2 text-sm">
             {strongest.map((m) => (
               <li key={m.skillId} className="flex items-center justify-between gap-2">
                 <span>{skillsById.get(m.skillId)?.name ?? m.skillId}</span>
-                <span className="text-aivo-ink-soft">
+                <span className="text-iw-ink-muted">
                   {Math.round(m.score * 100)}% · {m.level}
                 </span>
               </li>
@@ -104,13 +104,13 @@ export default async function ParentSummaryPage({
       <SectionHeader className="mt-8" title={t("keep_practicing")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
         {needsWork.length === 0 ? (
-          <p className="text-aivo-ink-soft">{t("no_skills_flagged")}</p>
+          <p className="text-iw-ink-muted">{t("no_skills_flagged")}</p>
         ) : (
           <ul className="grid gap-2 text-sm">
             {needsWork.map((m) => (
               <li key={m.skillId} className="flex items-center justify-between gap-2">
                 <span>{skillsById.get(m.skillId)?.name ?? m.skillId}</span>
-                <span className="text-aivo-ink-soft">
+                <span className="text-iw-ink-muted">
                   {Math.round(m.score * 100)}% · {m.level}
                 </span>
               </li>
@@ -126,7 +126,7 @@ export default async function ParentSummaryPage({
             {summaries.map((s) => (
               <Card key={s.id} className="p-[var(--aivo-density-card-pad)]">
                 <p className="font-semibold">{s.headline}</p>
-                <p className="mt-1 text-sm text-aivo-ink-soft">
+                <p className="mt-1 text-sm text-iw-ink-muted">
                   Up next: {s.highlights.recommendedNext}
                 </p>
               </Card>

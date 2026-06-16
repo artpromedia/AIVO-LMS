@@ -95,7 +95,7 @@ export default async function TeacherLearnerDetailPage({
       />
 
       <Card
-        className={`p-4 ${taSubmitted ? "border-emerald-200 bg-emerald-50/40" : "border-aivo-accent/40 bg-aivo-accent/5"}`}
+        className={`p-4 ${taSubmitted ? "border-iw-success bg-iw-success-subtle/40" : "border-iw-warm/40 bg-iw-warm/5"}`}
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
@@ -113,7 +113,7 @@ export default async function TeacherLearnerDetailPage({
           </div>
           <Link
             href={taHref}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-aivo-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-iw-warm px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             {taSubmitted ? ta("entry_update") : taInProgress ? ta("cta_resume") : ta("cta_action")}
           </Link>
@@ -127,7 +127,7 @@ export default async function TeacherLearnerDetailPage({
       />
 
       <Link href={`/teacher/learners/${learner.id}/curriculum`}>
-        <Card className="p-4 transition hover:border-aivo-accent">
+        <Card className="p-4 transition hover:border-iw-warm">
           <p className="font-medium">{t("this_week_at_school")}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Add the week&apos;s scope so AIVO&apos;s tutor teaches the same topics, fitted to this
@@ -139,7 +139,7 @@ export default async function TeacherLearnerDetailPage({
       {/* Build the team: invite the child's caregivers and related-service
           therapists so their read shapes the learning profile too. */}
       <Link href={`/teacher/learners/${learner.id}/team`}>
-        <Card className="p-4 transition hover:border-aivo-accent">
+        <Card className="p-4 transition hover:border-iw-warm">
           <p className="font-medium">{tTeam("card_title")}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {tTeam("card_body", { name: learner.displayName })}

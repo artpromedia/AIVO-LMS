@@ -4,7 +4,7 @@ import { API } from "@/constants/api";
 import { apiFetch } from "@/lib/api";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 const AGE_BANDS = [
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     marginTop: spacing.xs,
   },
-  btnText: { color: "#ffffff", fontSize: 15, fontFamily: fontFamilies.bodyBold },
+  btnText: { color: colors.white, fontSize: 15, fontFamily: fontFamilies.bodyBold },
   btnOutline: {
     alignItems: "center",
     justifyContent: "center",
@@ -208,5 +208,5 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
   btnOutlineText: { fontSize: 15, fontFamily: fontFamilies.bodyBold },
-  error: { fontSize: 13, color: "#ef4444", fontFamily: fontFamilies.bodyRegular },
+  error: { fontSize: 13, color: colors.error, fontFamily: fontFamilies.bodyRegular },
 });

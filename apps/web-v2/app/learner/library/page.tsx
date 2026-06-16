@@ -54,7 +54,7 @@ export default async function Page() {
           {runs.map((r) => (
             <Card key={r.id} className="p-4">
               <p className="font-medium">{t("lesson")}</p>
-              <p className="text-sm text-aivo-ink-soft">
+              <p className="text-sm text-iw-ink-muted">
                 {tc("source", { source: r.source })}
                 {r.completedAt
                   ? ` · ${t("completed", { date: new Date(r.completedAt).toLocaleDateString() })}`
@@ -62,7 +62,7 @@ export default async function Page() {
               </p>
               <Link
                 href={`/learner/lesson-runs/${r.id}`}
-                className="mt-2 inline-block text-xs font-medium text-aivo-primary hover:underline"
+                className="mt-2 inline-block text-xs font-medium text-iw-primary hover:underline"
               >
                 {t("replay")}
               </Link>

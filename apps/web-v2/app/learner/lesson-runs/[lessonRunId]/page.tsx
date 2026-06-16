@@ -113,7 +113,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
             {lessonRun.status}
           </Badge>
           {lessonRun.failureReason && (
-            <p className="mt-2 text-sm text-red-700">{lessonRun.failureReason}</p>
+            <p className="mt-2 text-sm text-iw-error-strong">{lessonRun.failureReason}</p>
           )}
           <div className="mt-4 flex gap-2">
             <Button asChild variant="soft">

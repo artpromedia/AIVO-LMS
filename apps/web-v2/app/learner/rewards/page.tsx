@@ -71,7 +71,7 @@ export default async function Page() {
       />
 
       {/* Level journey — Aivo celebrates the learner's progress */}
-      <section className="mb-4 flex items-center gap-4 rounded-3xl border border-iw-border/60 bg-white p-5">
+      <section className="mb-4 flex items-center gap-4 rounded-iw-card-lg border border-iw-border/60 bg-white p-5">
         <AivoMascot expression={badges.length > 0 ? "celebrating" : "greeting"} size={72} />
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div className="flex items-center justify-between gap-3">
@@ -153,10 +153,10 @@ export default async function Page() {
                     {done}/{chapters.length}
                   </Badge>
                 </div>
-                <p className="mt-1 text-sm text-aivo-ink-soft">{w.description}</p>
+                <p className="mt-1 text-sm text-iw-ink-muted">{w.description}</p>
                 <Link
                   href={`/learner/quests/${w.id}`}
-                  className="mt-3 inline-block text-xs font-medium text-aivo-primary hover:underline"
+                  className="mt-3 inline-block text-xs font-medium text-iw-primary hover:underline"
                 >
                   {t("open_world")}
                 </Link>

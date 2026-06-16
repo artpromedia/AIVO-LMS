@@ -20,7 +20,7 @@ function statusTone(s: DsarStatus): "success" | "warning" | "neutral" | "danger"
 
 function slaColor(state: SlaState): string {
   if (state === "overdue") return "text-aivo-danger font-semibold";
-  if (state === "due_soon") return "text-amber-600 font-semibold";
+  if (state === "due_soon") return "text-iw-warning-strong font-semibold";
   if (state === "met") return "text-aivo-success";
   return "text-aivo-ink-soft";
 }
@@ -45,7 +45,7 @@ export function DsarQueueTable({
   return (
     <div className="overflow-x-auto rounded-[var(--radius-card)] border border-aivo-border">
       <table className="w-full text-sm">
-        <thead className="bg-aivo-surface-2 text-left">
+        <thead className="bg-iw-raised text-left">
           <tr>
             <th className="p-3 font-semibold">Type</th>
             <th className="p-3 font-semibold">Subject</th>
@@ -62,7 +62,7 @@ export function DsarQueueTable({
             return (
               <tr
                 key={d.id}
-                className="border-t border-aivo-border hover:bg-aivo-surface-2 transition"
+                className="border-t border-iw-border hover:bg-iw-raised transition"
               >
                 <td className="p-3 capitalize">
                   <Link

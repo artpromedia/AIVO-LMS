@@ -59,17 +59,17 @@ export function ChapterPreviewButton({
             <DialogTitle className="font-display text-base font-semibold">
               {tutor.name}&apos;s {tutor.landmark}
             </DialogTitle>
-            <DialogDescription className="text-xs text-aivo-ink-soft">
+            <DialogDescription className="text-xs text-iw-ink-muted">
               {tutor.subtitle}
             </DialogDescription>
           </div>
         </div>
-        <p className="mt-4 text-sm text-aivo-ink-soft">{tutor.scene}</p>
+        <p className="mt-4 text-sm text-iw-ink-muted">{tutor.scene}</p>
         <figure className="mt-4 rounded-iw-card border border-iw-border bg-iw-raised p-3">
-          <blockquote className="text-sm italic text-aivo-ink">
+          <blockquote className="text-sm italic text-iw-ink">
             &ldquo;{tutor.greeting}&rdquo;
           </blockquote>
-          <figcaption className="mt-1 text-xs text-aivo-ink-soft">— {tutor.name}</figcaption>
+          <figcaption className="mt-1 text-xs text-iw-ink-muted">— {tutor.name}</figcaption>
         </figure>
       </DialogContent>
     </Dialog>

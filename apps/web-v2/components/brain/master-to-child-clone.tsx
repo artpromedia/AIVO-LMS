@@ -161,7 +161,7 @@ export default function MasterToChildClone({
 
   return (
     <div
-      className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-8 rounded-3xl"
+      className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-8 rounded-iw-card-lg"
       style={{
         backgroundImage:
           "radial-gradient(ellipse at top, rgba(63,45,110,0.55), transparent 70%), linear-gradient(to bottom right, #1a0a3e, #0f172a, #0c1222)",

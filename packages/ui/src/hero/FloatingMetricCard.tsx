@@ -23,9 +23,9 @@ export type FloatingMetricCardProps = {
 };
 
 const TONE_ACCENT: Record<NonNullable<FloatingMetricCardProps["tone"]>, string> = {
-  neutral: "from-slate-100 to-white",
+  neutral: "from-iw-raised to-white",
   success: "from-[var(--aivo-domain-completion-completed-strong,#16a34a)]/15 to-white",
-  warning: "from-amber-200/40 to-white",
+  warning: "from-iw-warning-subtle/40 to-white",
   info: "from-[var(--aivo-color-aivoTeal-100,#ccfbf1)]/70 to-white",
 };
 

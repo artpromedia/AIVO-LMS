@@ -25,7 +25,7 @@ export function TabsRail({
 }: TabsRailProps) {
   return (
     <div
-      className={`flex items-center justify-center gap-1 bg-white/80 backdrop-blur rounded-2xl p-1.5 border border-slate-100 shadow-sm ${className}`}
+      className={`flex items-center justify-center gap-1 bg-white/80 backdrop-blur rounded-iw-card p-1.5 border border-iw-border shadow-soft-1 ${className}`}
       role="tablist"
     >
       {tabs.map((tab) => {
@@ -37,12 +37,12 @@ export function TabsRail({
             aria-selected={isActive}
             onClick={() => onTabChange(tab.id)}
             className={`
-              inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-heading font-bold text-sm
-              transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-purple-400 focus-visible:ring-offset-1
+              inline-flex items-center gap-2 px-4 py-2.5 rounded-iw-control font-iw-display font-bold text-sm
+              transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-iw-ring focus-visible:ring-offset-1
               ${
                 isActive
-                  ? "bg-purple-100 text-purple-700 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                  ? "bg-iw-primary text-iw-primary-fg shadow-soft-1"
+                  : "text-iw-ink-muted hover:text-iw-ink hover:bg-iw-raised"
               }
             `}
             style={{

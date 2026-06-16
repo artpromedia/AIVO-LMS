@@ -24,7 +24,7 @@ import { summarizeDomains } from "@/lib/learner-progress";
 import { subjectAccent } from "@/lib/subject-display";
 import { useLessonSessions } from "@/hooks/useGradebook";
 import { lessonsByDay } from "@/lib/gradebook-logic";
-import { spacing } from "@/constants/colors";
+import { colors, spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -108,20 +108,20 @@ export default function LearnerProgressScreen() {
             <StatCard
               label={t("progress.mastered", "Mastered")}
               value={summary.masteredCount}
-              icon={<Ionicons name="star" size={18} color="#22c55e" />}
-              color="#22c55e"
+              icon={<Ionicons name="star" size={18} color={colors.success} />}
+              color={colors.success}
             />
             <StatCard
               label={t("progress.needsSupport", "Needs support")}
               value={summary.needsSupportCount}
-              icon={<Ionicons name="heart" size={18} color="#ef4444" />}
-              color="#ef4444"
+              icon={<Ionicons name="heart" size={18} color={colors.error} />}
+              color={colors.error}
             />
             <StatCard
               label={t("progress.streak", "Day streak")}
               value={engagement?.streakDays ?? 0}
-              icon={<Ionicons name="flame" size={18} color="#f59e0b" />}
-              color="#f59e0b"
+              icon={<Ionicons name="flame" size={18} color={colors.warning} />}
+              color={colors.warning}
             />
           </View>
 

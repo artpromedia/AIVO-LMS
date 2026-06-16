@@ -46,10 +46,10 @@ export function BadgeCollection({
         return (
           <li
             key={key}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-iw-border/60 bg-white p-3 text-center"
+            className="flex flex-col items-center gap-2 rounded-iw-card border border-iw-border/60 bg-white p-3 text-center"
           >
             <span
-              className={`grid h-14 w-14 place-items-center rounded-2xl text-2xl ${
+              className={`grid h-14 w-14 place-items-center rounded-iw-control text-2xl ${
                 earned ? "lx-theme-soft-bg lx-pop-in" : ""
               }`}
               style={

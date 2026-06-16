@@ -71,26 +71,26 @@ export default async function TeacherLessonPlansPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("generated_recent")}
           </p>
           <p className="mt-1 font-display text-3xl font-semibold">{plans.length}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("ai_jobs")}
           </p>
           <p className="mt-1 font-display text-3xl font-semibold">{completeCount}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">
+          <p className="mt-1 text-xs text-iw-ink-muted">
             {runningCount} running · {failedCount} failed
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("fallback_chain")}
           </p>
           <p className="mt-1 text-sm font-medium">{t("fallback_primary_model")}</p>
-          <p className="text-xs text-aivo-ink-soft">→ Gemini 3.0 Pro → GPT-5.5</p>
+          <p className="text-xs text-iw-ink-muted">→ Gemini 3.0 Pro → GPT-5.5</p>
         </Card>
       </div>
 
@@ -133,12 +133,12 @@ export default async function TeacherLessonPlansPage() {
       <SectionHeader title={t("generation_activity")} />
       {jobs.length === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-sm text-aivo-ink-soft">{t("no_ai_jobs")}</p>
+          <p className="text-sm text-iw-ink-muted">{t("no_ai_jobs")}</p>
         </Card>
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
-            <thead className="bg-aivo-surface-soft text-xs uppercase tracking-wide text-aivo-ink-soft">
+            <thead className="bg-iw-raised text-xs uppercase tracking-wide text-iw-ink-muted">
               <tr>
                 <th className="px-4 py-2 text-left">{t("col_started")}</th>
                 <th className="px-4 py-2 text-left">Input</th>
@@ -148,7 +148,7 @@ export default async function TeacherLessonPlansPage() {
             </thead>
             <tbody>
               {jobs.map((job) => (
-                <tr key={job.id} className="border-t border-aivo-border">
+                <tr key={job.id} className="border-t border-iw-border">
                   <td className="px-4 py-2 font-mono text-xs">
                     {new Date(job.startedAt).toLocaleString()}
                   </td>
@@ -166,7 +166,7 @@ export default async function TeacherLessonPlansPage() {
                       {job.status}
                     </Badge>
                   </td>
-                  <td className="px-4 py-2 font-mono text-xs text-aivo-ink-soft">
+                  <td className="px-4 py-2 font-mono text-xs text-iw-ink-muted">
                     {job.completedAt ? new Date(job.completedAt).toLocaleString() : "—"}
                   </td>
                 </tr>

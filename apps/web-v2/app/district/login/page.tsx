@@ -150,7 +150,7 @@ export default async function DistrictLoginPage({
           <div
             role="alert"
             aria-live="polite"
-            className="rounded-iw-card border border-iw-danger/40 bg-iw-danger/10 px-4 py-3 text-sm text-iw-danger"
+            className="rounded-iw-card border border-iw-error/40 bg-iw-error/10 px-4 py-3 text-sm text-iw-error"
           >
             {errorMessage}
           </div>

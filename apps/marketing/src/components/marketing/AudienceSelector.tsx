@@ -10,7 +10,7 @@ const audiences = [
     blurb:
       "See where your child is, what's next, and how learning is being adapted — in plain language, without jargon.",
     cta: "Explore for parents",
-    gradient: "from-purple-500 to-pink-500",
+    gradient: "bg-iw-primary",
   },
   {
     audience: "Schools",
@@ -19,7 +19,7 @@ const audiences = [
     blurb:
       "Teacher dashboards, roster support, and progress views designed for everyday classroom workflow.",
     cta: "Explore for schools",
-    gradient: "from-blue-500 to-cyan-500",
+    gradient: "bg-iw-accent",
   },
   {
     audience: "Districts",
@@ -28,13 +28,13 @@ const audiences = [
     blurb:
       "Designed for FERPA/COPPA-aware workflows with rostering readiness and procurement transparency.",
     cta: "Explore for districts",
-    gradient: "from-emerald-500 to-teal-500",
+    gradient: "bg-iw-accent",
   },
 ];
 
 export function AudienceSelector() {
   return (
-    <section className="py-20 sm:py-24 bg-slate-50/50" aria-labelledby="audience-heading">
+    <section className="py-20 sm:py-24 bg-iw-raised/50" aria-labelledby="audience-heading">
       <Container>
         <SectionHeader
           eyebrow="Built for everyone who supports the learner"
@@ -46,16 +46,16 @@ export function AudienceSelector() {
             <Link
               key={c.audience}
               href={c.href}
-              className="group relative flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:border-purple-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600"
+              className="group relative flex flex-col rounded-iw-card border border-iw-border bg-white p-6 shadow-soft-1 transition hover:-translate-y-1 hover:shadow-soft-5 hover:border-iw-purple-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-iw-ring"
             >
               <span
-                className={`inline-flex w-fit rounded-full bg-gradient-to-r ${c.gradient} px-3 py-1 text-xs font-semibold text-white shadow-sm`}
+                className={`inline-flex w-fit rounded-iw-chip ${c.gradient} px-3 py-1 text-xs font-semibold text-white shadow-soft-1`}
               >
                 {c.audience}
               </span>
-              <h3 className="mt-4 font-heading text-xl font-bold text-slate-900">{c.headline}</h3>
-              <p className="mt-2 flex-1 text-slate-600">{c.blurb}</p>
-              <span className="mt-6 inline-flex items-center gap-1 font-semibold text-purple-700 transition-all group-hover:gap-2">
+              <h3 className="mt-4 font-heading text-xl font-bold text-iw-ink">{c.headline}</h3>
+              <p className="mt-2 flex-1 text-iw-ink-muted">{c.blurb}</p>
+              <span className="mt-6 inline-flex items-center gap-1 font-semibold text-iw-primary transition-all group-hover:gap-2">
                 {c.cta} <span aria-hidden>→</span>
               </span>
             </Link>

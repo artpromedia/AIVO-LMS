@@ -22,7 +22,7 @@ export default async function Page() {
         description="Profile and classroom defaults."
       />
       <Card className="max-w-lg p-6">
-        <p className="mb-4 text-sm text-aivo-ink-soft">
+        <p className="mb-4 text-sm text-iw-ink-muted">
           {t("signed_in_as")} <span className="font-medium">{session.email}</span>.
         </p>
         <AccountForm initial={{ displayName: session.displayName }} />

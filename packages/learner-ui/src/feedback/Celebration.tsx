@@ -73,7 +73,7 @@ export function Celebration({
           🌟
         </div>
         <p
-          className="text-2xl font-heading font-bold text-white drop-shadow-lg"
+          className="text-2xl font-iw-display font-bold text-white drop-shadow-lg"
           style={{ color: tutorColor }}
         >
           {message}

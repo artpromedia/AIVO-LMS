@@ -13,7 +13,7 @@ import { router, useLocalSearchParams, type Href } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import * as Haptics from "expo-haptics";
 import { useAuth } from "@/hooks/useAuth";
-import { spacing } from "@/constants/colors";
+import { colors, spacing } from "@/constants/colors";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette, useSensoryMode } from "@/context/SensoryModeProvider";
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color: "#FFFFFF",
+    color: colors.white,
   },
   subtitle: {
     fontSize: 14,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     fontFamily: "Nunito-Regular",
-    color: "#FFFFFF",
+    color: colors.white,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
   },
@@ -355,6 +355,6 @@ const styles = StyleSheet.create({
   padKeyText: {
     fontSize: 28,
     fontFamily: "Nunito-ExtraBold",
-    color: "#FFFFFF",
+    color: colors.white,
   },
 });

@@ -138,7 +138,7 @@ export function AudioPrefForm({
         <Button type="button" size="sm" onClick={save} disabled={busy}>
           {t("save")}
         </Button>
-        {err && <span className="text-xs text-red-600">{err}</span>}
+        {err && <span className="text-xs text-iw-error-strong">{err}</span>}
       </div>
       {previewSrc && (
         <audio controls src={previewSrc} className="w-full" aria-label={t("preview_aria")}>
@@ -146,13 +146,13 @@ export function AudioPrefForm({
         </audio>
       )}
       {transcript && (
-        <p className="rounded bg-aivo-surface-2 px-3 py-2 text-sm">
-          <span className="text-xs uppercase text-aivo-muted mr-2">{t("transcript")}</span>
+        <p className="rounded bg-iw-raised px-3 py-2 text-sm">
+          <span className="text-xs uppercase text-iw-ink-muted mr-2">{t("transcript")}</span>
           {transcript}
         </p>
       )}
       {previewError && !previewSrc && (
-        <p className="text-xs text-aivo-muted">{t("preview_unavailable")}</p>
+        <p className="text-xs text-iw-ink-muted">{t("preview_unavailable")}</p>
       )}
     </div>
   );

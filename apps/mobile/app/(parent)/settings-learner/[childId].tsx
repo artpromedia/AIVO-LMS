@@ -10,7 +10,7 @@ import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card } from "@/components/ui";
 import { SpeechBuddyConsentCard } from "@/components/parent/SpeechBuddyConsentCard";
 import { LoadingState } from "@aivo/mobile-ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -92,9 +92,9 @@ export default function ParentLearnerSettingsScreen() {
             accessibilityRole="button"
             accessibilityLabel={t("learnerSettings.delete", "Remove learner")}
             onPress={() => router.push("/(parent)/settings")}
-            style={[styles.deleteBtn, { borderColor: "#ef4444" }]}
+            style={[styles.deleteBtn, { borderColor: colors.error }]}
           >
-            <Ionicons name="trash-outline" size={18} color="#ef4444" />
+            <Ionicons name="trash-outline" size={18} color={colors.error} />
             <Text style={styles.deleteText}>{t("learnerSettings.delete", "Remove learner")}</Text>
           </Pressable>
           <Text style={[styles.note, { color: palette.inkMuted }]}>
@@ -123,6 +123,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     borderWidth: 1.5,
   },
-  deleteText: { fontSize: 15, fontFamily: fontFamilies.bodyBold, color: "#ef4444" },
+  deleteText: { fontSize: 15, fontFamily: fontFamilies.bodyBold, color: colors.error },
   note: { fontSize: 12, fontFamily: fontFamilies.bodyRegular, textAlign: "center" },
 });

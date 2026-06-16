@@ -112,7 +112,7 @@ export default async function BaselineIntroPage({
               src={reducedArt ? (firstTutor.avatarReduced ?? firstTutor.avatar) : firstTutor.avatar}
               alt=""
               aria-hidden="true"
-              className="h-16 w-16 rounded-2xl object-contain"
+              className="h-16 w-16 rounded-iw-control object-contain"
             />
           ) : firstTutor ? (
             <TutorFace tutorKey={firstTutor.tutorKey} size={64} />

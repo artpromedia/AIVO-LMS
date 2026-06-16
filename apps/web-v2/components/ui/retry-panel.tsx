@@ -20,7 +20,7 @@ export function RetryPanel({
     <div
       role="alert"
       className={cn(
-        "rounded-[var(--radius-card)] border border-aivo-warning/30 bg-aivo-warning/10 p-4",
+        "rounded-[var(--radius-card)] border border-iw-warning/30 bg-iw-warning/10 p-4",
         className,
       )}
     >

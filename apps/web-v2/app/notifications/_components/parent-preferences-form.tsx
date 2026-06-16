@@ -66,7 +66,7 @@ export function ParentPreferencesForm({ preference }: { preference: Notification
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-aivo-border text-left text-xs uppercase tracking-wide text-aivo-muted">
+            <tr className="border-b border-iw-border text-left text-xs uppercase tracking-wide text-iw-ink-muted">
               <th className="py-2 pr-3">Type</th>
               {CHANNELS.map((c) => (
                 <th key={c} className="py-2 pr-3">
@@ -77,7 +77,7 @@ export function ParentPreferencesForm({ preference }: { preference: Notification
           </thead>
           <tbody>
             {TYPES.map((t) => (
-              <tr key={t.value} className="border-b border-aivo-border/60">
+              <tr key={t.value} className="border-b border-iw-border/60">
                 <td className="py-2 pr-3">{t.label}</td>
                 {CHANNELS.map((c) => {
                   const key = `${t.value}:${c}`;
@@ -100,7 +100,7 @@ export function ParentPreferencesForm({ preference }: { preference: Notification
 
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
-          <span className="block text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+          <span className="block text-xs font-semibold uppercase tracking-wide text-iw-ink-muted">
             {t("prefs_quiet_hours")}
           </span>
           <input
@@ -111,12 +111,12 @@ export function ParentPreferencesForm({ preference }: { preference: Notification
               setQuietHours(e.target.value);
               setSaved(false);
             }}
-            className="mt-1 w-full rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-md border border-iw-border bg-iw-card px-3 py-2 text-sm"
             pattern="\d{2}:\d{2}-\d{2}:\d{2}"
           />
         </label>
         <label className="block text-sm">
-          <span className="block text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+          <span className="block text-xs font-semibold uppercase tracking-wide text-iw-ink-muted">
             {t("prefs_digest_cadence")}
           </span>
           <select
@@ -125,7 +125,7 @@ export function ParentPreferencesForm({ preference }: { preference: Notification
               setCadence(e.target.value as typeof cadence);
               setSaved(false);
             }}
-            className="mt-1 w-full rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-md border border-iw-border bg-iw-card px-3 py-2 text-sm"
           >
             <option value="daily">{t("prefs_cadence_daily")}</option>
             <option value="weekly">{t("prefs_cadence_weekly")}</option>
@@ -138,9 +138,9 @@ export function ParentPreferencesForm({ preference }: { preference: Notification
         <Button onClick={save} disabled={saving}>
           {saving ? t("prefs_saving") : t("prefs_save")}
         </Button>
-        {saved ? <span className="text-sm text-aivo-success">{t("prefs_saved")}</span> : null}
+        {saved ? <span className="text-sm text-iw-success">{t("prefs_saved")}</span> : null}
         {err ? (
-          <span role="alert" className="text-sm text-aivo-danger">
+          <span role="alert" className="text-sm text-iw-error">
             {err}
           </span>
         ) : null}

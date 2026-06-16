@@ -62,7 +62,7 @@ export function SyncStatusCard({
         </div>
       </dl>
       {latestRun?.pauseReason ? (
-        <p className="mt-2 rounded border border-aivo-warning/40 bg-aivo-warning/10 p-2 text-xs">
+        <p className="mt-2 rounded border border-iw-warning/40 bg-iw-warning/10 p-2 text-xs">
           {latestRun.pauseReason}
         </p>
       ) : null}

@@ -100,7 +100,7 @@ export function SpeechBuddyConsentCard({
         <div className="flex flex-col gap-3">
           <div
             role="status"
-            className="rounded-iw-control border border-aivo-success/40 bg-aivo-success/10 px-3.5 py-2.5 text-sm text-iw-text-strong"
+            className="rounded-iw-control border border-iw-success/40 bg-iw-success/10 px-3.5 py-2.5 text-sm text-iw-text-strong"
           >
             {grantedBand
               ? t("enabled_band", { band: grantedBand.replace("-", "–") })
@@ -141,7 +141,7 @@ export function SpeechBuddyConsentCard({
       )}
 
       {error ? (
-        <p role="alert" className="text-sm text-aivo-danger">
+        <p role="alert" className="text-sm text-iw-error">
           {error}
         </p>
       ) : null}

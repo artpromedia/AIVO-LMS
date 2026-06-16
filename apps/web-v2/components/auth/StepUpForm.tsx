@@ -94,7 +94,7 @@ export function StepUpForm({ returnTo }: { returnTo?: string }) {
         autoFocus
       />
       {error ? (
-        <p role="alert" className="text-sm text-iw-danger">
+        <p role="alert" className="text-sm text-iw-error">
           {error}
         </p>
       ) : null}

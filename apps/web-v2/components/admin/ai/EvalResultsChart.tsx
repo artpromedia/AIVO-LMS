@@ -51,9 +51,9 @@ export function EvalResultsChart({ metrics }: EvalResultsChartProps) {
               <span>{row.label}</span>
               <span className="tabular-nums text-aivo-ink-soft">{row.value.toFixed(3)}</span>
             </div>
-            <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-aivo-surface-2">
+            <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-iw-raised">
               <div
-                className={`h-full rounded-full ${row.warn ? "bg-aivo-warning" : "bg-aivo-success"}`}
+                className={`h-full rounded-full ${row.warn ? "bg-iw-warning" : "bg-iw-success"}`}
                 style={{ width: `${pct}%` }}
               />
             </div>

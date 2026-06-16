@@ -70,7 +70,7 @@ export function RequestSeatsModal({ open, onOpenChange, currentSeats }: RequestS
 
         {success ? (
           <div className="mt-4 space-y-4">
-            <div className="rounded-lg bg-aivo-success/10 px-4 py-3 text-sm text-aivo-success">
+            <div className="rounded-lg bg-iw-success/10 px-4 py-3 text-sm text-iw-success">
               Your seat request has been submitted. The district admin will review it shortly.
             </div>
             <div className="flex justify-end">

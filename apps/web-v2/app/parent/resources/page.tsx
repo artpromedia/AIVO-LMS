@@ -52,7 +52,7 @@ export default async function Page() {
             <a
               key={link.href}
               href={link.href}
-              className="flex items-start gap-3 rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] hover:border-[var(--aivo-sensory-primary)] transition-colors"
+              className="flex items-start gap-3 rounded-iw-card-lg bg-white border border-iw-border p-4 shadow-soft-3 hover:border-[var(--aivo-sensory-primary)] transition-colors"
             >
               <span className="inline-flex items-center justify-center h-9 w-9 rounded-iw-control bg-[var(--aivo-aivoPurple-100)] text-[var(--aivo-sensory-primary)] shrink-0">
                 <AivoIcon name={link.icon} size={20} />

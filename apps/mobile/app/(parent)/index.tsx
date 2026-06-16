@@ -12,7 +12,7 @@ import { useParentSummary } from "@/hooks/useParentSummary";
 import { useLearnerMastery } from "@/hooks/useLearnerMastery";
 import { EmptyState, LoadingState, Sparkline, BarMini } from "@aivo/mobile-ui";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
@@ -274,7 +274,7 @@ export default function ParentDashboard() {
                   <ChildAction
                     icon="trending-up-outline"
                     label={t("parent.progress")}
-                    tint={"#16a34a"}
+                    tint={colors.success}
                     onPress={() => router.push(`/(parent)/progress/${learner.id}` as Href)}
                   />
                   <ChildAction
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 6,
     right: 6,
-    backgroundColor: "#dc2626",
+    backgroundColor: colors.error,
     borderRadius: 9,
     minWidth: 16,
     height: 16,
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   unreadBadgeText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 10,
     fontFamily: fontFamilies.bodyBold,
     lineHeight: 12,

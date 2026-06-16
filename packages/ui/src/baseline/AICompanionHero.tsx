@@ -86,7 +86,7 @@ export function AICompanionHero({
           {companion ?? <DefaultOrb />}
           {tutorAvatar ? (
             <span
-              className="absolute -bottom-2 -right-2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white shadow-lg border border-iw-border flex items-center justify-center text-2xl md:text-3xl"
+              className="absolute -bottom-2 -right-2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white shadow-soft-3 border border-iw-border flex items-center justify-center text-2xl md:text-3xl"
               aria-hidden="true"
             >
               {tutorAvatar}

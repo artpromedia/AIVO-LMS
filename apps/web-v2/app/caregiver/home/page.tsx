@@ -109,12 +109,12 @@ export default async function CaregiverHomePage() {
             )}
           />
           <div className="rounded-iw-card bg-iw-card border border-iw-border p-4">
-            <p className="text-xs text-aivo-ink-soft">{t("quick_links")}</p>
+            <p className="text-xs text-iw-ink-muted">{t("quick_links")}</p>
             <div className="mt-1 flex flex-col gap-1 text-sm">
-              <Link href="/caregiver/observations" className="text-aivo-accent hover:underline">
+              <Link href="/caregiver/observations" className="text-iw-warm hover:underline">
                 {t("link_observations")}
               </Link>
-              <Link href="/caregiver/learners" className="text-aivo-accent hover:underline">
+              <Link href="/caregiver/learners" className="text-iw-warm hover:underline">
                 {t("link_roster")}
               </Link>
             </div>
@@ -142,7 +142,7 @@ export default async function CaregiverHomePage() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold">{l.displayName}</p>
-                    <p className="mt-0.5 text-xs text-aivo-ink-soft">
+                    <p className="mt-0.5 text-xs text-iw-ink-muted">
                       {l.gradeBand ? `Grade ${l.gradeBand}` : "Care-team member"}
                     </p>
                   </div>

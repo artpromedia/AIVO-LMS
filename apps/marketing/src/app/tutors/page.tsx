@@ -41,10 +41,10 @@ export default async function TutorsIndex() {
           <Link
             key={tutor.name}
             href={`/tutors/${tutor.name.toLowerCase()}`}
-            className="group rounded-3xl border border-slate-100 bg-white p-6 hover:border-purple-200 hover:shadow-lg transition flex gap-4"
+            className="group rounded-iw-card-lg border border-iw-border bg-white p-6 hover:border-iw-purple-200 hover:shadow-soft-3 transition flex gap-4"
           >
             <div
-              className="w-20 h-20 rounded-2xl shrink-0 overflow-hidden"
+              className="w-20 h-20 rounded-iw-card shrink-0 overflow-hidden"
               style={{ backgroundColor: `${tutor.color}15` }}
             >
               <Image
@@ -56,13 +56,13 @@ export default async function TutorsIndex() {
               />
             </div>
             <div className="min-w-0">
-              <h2 className="font-heading font-bold text-slate-900 text-lg group-hover:text-primary transition">
+              <h2 className="font-heading font-bold text-iw-ink text-lg group-hover:text-primary transition">
                 {tutor.name}
               </h2>
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-400 mt-0.5">
+              <p className="text-xs font-bold uppercase tracking-wide text-iw-ink-muted mt-0.5">
                 {tutor.domain}
               </p>
-              <p className="text-sm text-slate-600 font-body mt-2 leading-relaxed">
+              <p className="text-sm text-iw-ink-muted font-body mt-2 leading-relaxed">
                 {tutor.tagline}
               </p>
             </div>

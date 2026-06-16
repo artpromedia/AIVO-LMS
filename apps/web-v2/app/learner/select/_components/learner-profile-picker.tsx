@@ -132,10 +132,10 @@ export function LearnerProfilePicker({
           disabled={!ready}
           aria-disabled={!ready}
           className={[
-            "inline-flex min-h-[52px] w-full items-center justify-center rounded-full px-7 text-base font-semibold text-iw-primary-fg transition",
+            "inline-flex min-h-[52px] w-full items-center justify-center rounded-iw-control px-7 text-base font-semibold text-iw-primary-fg transition",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg",
             ready
-              ? "bg-iw-primary shadow-[0_10px_30px_-12px_rgba(124,108,246,0.7)] hover:-translate-y-0.5 hover:bg-iw-primary-hover"
+              ? "bg-iw-primary shadow-soft-3 hover:-translate-y-0.5 hover:bg-iw-primary-hover"
               : "cursor-not-allowed bg-iw-primary/40",
           ].join(" ")}
         >

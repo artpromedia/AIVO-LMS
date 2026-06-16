@@ -6,9 +6,11 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEngagement } from "@/hooks/useEngagement";
 import { useShopItems, useInventory } from "@/hooks/useAvatar";
-import { AivoCard, StatCard, AivoButton } from "@aivo/mobile-ui";
+import { StatCard } from "@aivo/mobile-ui";
+import { Card, Button } from "@/components/ui";
 import { AvatarPreview } from "@/src/components/learner/AvatarPreview";
 import { colors, spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 
 export default function GamificationScreen() {
@@ -43,7 +45,7 @@ export default function GamificationScreen() {
         </View>
       </View>
 
-      <AivoCard style={styles.profileCard}>
+      <Card style={styles.profileCard}>
         <AvatarPreview
           items={avatarItems}
           inventory={inventory}
@@ -59,7 +61,7 @@ export default function GamificationScreen() {
           <View style={[styles.xpFill, { width: `${((engagement?.xp || 0) % 1000) / 10}%` }]} />
         </View>
         <Text style={styles.xpText}>{engagement?.xp || 0} XP</Text>
-      </AivoCard>
+      </Card>
 
       <View style={styles.statsRow}>
         <StatCard
@@ -79,7 +81,7 @@ export default function GamificationScreen() {
 
       <Text style={styles.sectionTitle}>{t("learnerGamification.activeChallenges")}</Text>
       {engagement?.activeChallenges?.map((c) => (
-        <AivoCard key={c.id} style={styles.challengeCard}>
+        <Card key={c.id} style={styles.challengeCard}>
           <View style={styles.challengeRow}>
             <Ionicons
               name={c.type === "daily" ? "today" : c.type === "weekly" ? "calendar" : "people"}
@@ -102,35 +104,35 @@ export default function GamificationScreen() {
               <Text style={styles.rewardText}>+{c.reward.xp} XP</Text>
             </View>
           </View>
-        </AivoCard>
+        </Card>
       )) || (
-        <AivoCard>
+        <Card>
           <Text style={styles.noData}>{t("learnerGamification.noChallenges")}</Text>
-        </AivoCard>
+        </Card>
       )}
 
       <View style={styles.quickLinks}>
-        <AivoButton
+        <Button
           title={t("learner.badges")}
           onPress={() => router.push("/(learner)/badges")}
           variant="outline"
-          icon={<Ionicons name="ribbon-outline" size={18} color={colors.primary} />}
+          iconLeft={<Ionicons name="ribbon-outline" size={18} color={colors.primary} />}
           style={{ flex: 1, marginRight: 8 }}
         />
-        <AivoButton
+        <Button
           title={t("learnerGamification.gradebook")}
           onPress={() => router.push("/(learner)/gradebook")}
           variant="outline"
-          icon={<Ionicons name="bar-chart-outline" size={18} color={colors.primary} />}
+          iconLeft={<Ionicons name="bar-chart-outline" size={18} color={colors.primary} />}
           style={{ flex: 1 }}
         />
       </View>
       <View style={[styles.quickLinks, { marginTop: 8 }]}>
-        <AivoButton
+        <Button
           title={t("learnerLeaderboard.title")}
           onPress={() => router.push("/(learner)/leaderboard" as any)}
           variant="outline"
-          icon={<Ionicons name="trophy-outline" size={18} color={colors.primary} />}
+          iconLeft={<Ionicons name="trophy-outline" size={18} color={colors.primary} />}
           style={{ flex: 1 }}
         />
       </View>
@@ -145,16 +147,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: spacing.md,
   },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  title: { fontSize: 24, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   profileCard: {
     alignItems: "center" as const,
     marginBottom: spacing.lg,
     paddingVertical: spacing.lg,
   },
-  userName: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  userName: { fontSize: 22, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   userLevel: {
     fontSize: 14,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.primary,
     marginBottom: 12,
   },
@@ -168,23 +170,23 @@ const styles = StyleSheet.create({
   xpFill: { height: 10, backgroundColor: colors.primary, borderRadius: 5 },
   xpText: {
     fontSize: 12,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.textSecondary,
     marginTop: 4,
   },
   statsRow: { flexDirection: "row", marginBottom: spacing.lg },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.text,
     marginBottom: spacing.md,
   },
   challengeCard: { marginBottom: spacing.sm },
   challengeRow: { flexDirection: "row", alignItems: "flex-start" },
-  challengeName: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.text },
+  challengeName: { fontSize: 15, fontFamily: fontFamilies.bodyBold, color: colors.text },
   challengeDesc: {
     fontSize: 12,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: 2,
   },
@@ -192,7 +194,7 @@ const styles = StyleSheet.create({
   challengeFill: { height: 6, backgroundColor: colors.primary, borderRadius: 3 },
   challengeCount: {
     fontSize: 11,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.textSecondary,
     marginTop: 2,
   },
@@ -202,10 +204,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: radius.full,
   },
-  rewardText: { fontSize: 11, fontFamily: "Nunito-Bold", color: colors.primary },
+  rewardText: { fontSize: 11, fontFamily: fontFamilies.bodyBold, color: colors.primary },
   noData: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     textAlign: "center",
     padding: spacing.md,

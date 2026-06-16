@@ -58,7 +58,7 @@ export default async function Page() {
           <Link
             key={l.href}
             href={l.href}
-            className="flex flex-col gap-2 rounded-iw-card-lg bg-white border border-iw-border p-5 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] hover:border-[var(--aivo-sensory-primary)] transition-colors"
+            className="flex flex-col gap-2 rounded-iw-card-lg bg-white border border-iw-border p-5 shadow-soft-3 hover:border-[var(--aivo-sensory-primary)] transition-colors"
           >
             <div className="flex items-center gap-2 text-iw-text-strong">
               <span className="inline-flex items-center justify-center h-9 w-9 rounded-iw-control bg-[var(--aivo-aivoPurple-100)] text-[var(--aivo-sensory-primary)] shrink-0">
@@ -72,7 +72,7 @@ export default async function Page() {
         ))}
       </div>
 
-      <section className="mt-6 rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+      <section className="mt-6 rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-soft-3">
         <h2 className="text-base sm:text-lg font-semibold text-iw-text-strong flex items-center gap-2">
           <FileText className="h-4 w-4 text-[var(--aivo-sensory-primary)]" /> {t("policies_title")}
         </h2>
@@ -89,7 +89,7 @@ export default async function Page() {
         </ul>
       </section>
 
-      <section className="mt-4 rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+      <section className="mt-4 rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-soft-3">
         <h2 className="text-base sm:text-lg font-semibold text-iw-text-strong">
           {t("subprocessors_title")}
         </h2>
@@ -109,7 +109,7 @@ export default async function Page() {
       </section>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <section className="rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+        <section className="rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-soft-3">
           <h3 className="font-semibold text-iw-text-strong">{t("export_requests_title")}</h3>
           {exportReqs.length === 0 ? (
             <p className="mt-2 text-sm text-iw-text-muted">{t("no_requests")}</p>
@@ -126,7 +126,7 @@ export default async function Page() {
             </ul>
           )}
         </section>
-        <section className="rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]">
+        <section className="rounded-iw-card-lg bg-white border border-iw-border p-5 sm:p-6 shadow-soft-3">
           <h3 className="font-semibold text-iw-text-strong">{t("deletion_requests_title")}</h3>
           {deleteReqs.length === 0 ? (
             <p className="mt-2 text-sm text-iw-text-muted">{t("no_requests")}</p>

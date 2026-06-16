@@ -12,6 +12,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useOffline } from "@/hooks/useOffline";
+import { colors } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 export function OfflineBanner() {
@@ -39,7 +40,7 @@ export function OfflineBanner() {
       <Ionicons
         name={!isOnline ? "cloud-offline" : "sync"}
         size={16}
-        color="#ffffff"
+        color={colors.white}
         accessibilityElementsHidden
       />
       <Text style={styles.text}>{message}</Text>
@@ -56,10 +57,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 16,
   },
-  offline: { backgroundColor: "#475569" },
-  syncing: { backgroundColor: "#2563eb" },
+  offline: { backgroundColor: colors.navy },
+  syncing: { backgroundColor: colors.info },
   text: {
-    color: "#ffffff",
+    color: colors.white,
     fontFamily: fontFamilies.bodyBold,
     fontSize: 13,
   },

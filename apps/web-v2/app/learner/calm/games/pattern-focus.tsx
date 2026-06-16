@@ -14,10 +14,10 @@ import {
 /** Calm, distinct tones per tile — never the only signal: each tile also
  *  carries a number label so it is operable without colour perception. */
 const TILE_TONES = [
-  "bg-aivo-primary/30",
-  "bg-aivo-accent/30",
-  "bg-aivo-success/30",
-  "bg-aivo-warning/30",
+  "bg-iw-primary/30",
+  "bg-iw-warm/30",
+  "bg-iw-success/30",
+  "bg-iw-warning/30",
 ] as const;
 
 /** Milliseconds each tile stays highlighted during the watch phase. */
@@ -122,7 +122,7 @@ export function PatternFocus({
       <h2 className="font-display text-2xl font-bold">{t("pattern_title")}</h2>
 
       {phase === "watch" && reducedMotion ? (
-        <p className="text-aivo-ink-soft">
+        <p className="text-iw-ink-muted">
           {t("pattern_sequence", { sequence: sequence.map((n) => n + 1).join(" · ") })}
         </p>
       ) : null}
@@ -146,11 +146,11 @@ export function PatternFocus({
               aria-label={t("pattern_tile", { number: tile + 1 })}
               className={
                 "h-20 w-20 rounded-iw-card-lg border text-xl font-semibold text-iw-text-strong " +
-                "focus:outline-none focus:ring-2 focus:ring-aivo-primary focus:ring-offset-2 " +
+                "focus:outline-none focus:ring-2 focus:ring-iw-primary focus:ring-offset-2 " +
                 "disabled:opacity-60 " +
                 (reducedMotion ? "" : "transition-transform duration-300 ") +
                 TILE_TONES[tile] +
-                (isLit ? " scale-105 border-aivo-primary" : " border-iw-border")
+                (isLit ? " scale-105 border-iw-primary" : " border-iw-border")
               }
             >
               {tile + 1}

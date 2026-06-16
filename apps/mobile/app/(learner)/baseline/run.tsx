@@ -9,7 +9,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { Card, Button } from "@/components/ui";
 import { LoadingState } from "@aivo/mobile-ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import {
   initBaseline,
@@ -388,8 +388,8 @@ export default function LearnerBaselineRunScreen() {
     return (
       <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
         <Card tone="hero" style={[styles.card, { alignItems: "center", marginTop: spacing.xl }]}>
-          <View style={[styles.iconWrap, { backgroundColor: "#22c55e1A" }]}>
-            <Ionicons name="checkmark-circle" size={34} color="#22c55e" />
+          <View style={[styles.iconWrap, { backgroundColor: colors.success + "1A" }]}>
+            <Ionicons name="checkmark-circle" size={34} color={colors.success} />
           </View>
           <Text style={[styles.h1, { color: palette.ink, textAlign: "center" }]}>
             {t("baselineRun.doneTitle", "Great work!")}

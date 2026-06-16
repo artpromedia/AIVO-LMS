@@ -25,18 +25,18 @@ export default function PressKitPage() {
       accentColor={MARKETING_ACCENTS.amberDeep}
     >
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-6">
           {t("company_overview")}
         </h2>
-        <div className="bg-white rounded-2xl border border-slate-100 p-8">
-          <p className="text-slate-600 font-body leading-relaxed mb-6">
+        <div className="bg-white rounded-iw-card border border-iw-border p-8">
+          <p className="text-iw-ink-muted font-body leading-relaxed mb-6">
             AIVO Learning is an AI-powered adaptive learning platform designed for students of all
             abilities, including those with autism, developmental differences, and diverse learning
             needs. Using proprietary Brain Clone technology, AIVO creates a unique learning profile
             for every student, adapting content, pace, and presentation in real-time across 14
             specialized AI tutors and 5 functioning levels.
           </p>
-          <p className="text-slate-600 font-body leading-relaxed">
+          <p className="text-iw-ink-muted font-body leading-relaxed">
             Founded by a team of healthcare executives, education experts, and technology leaders,
             AIVO is on a mission to ensure no learner is left behind. The platform serves both
             families (B2C) and school districts (B2B), with full COPPA, FERPA, and SOC 2 compliance.
@@ -45,25 +45,25 @@ export default function PressKitPage() {
       </section>
 
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">{t("quick_facts")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-6">{t("quick_facts")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {FACTS.map((f) => (
             <div
               key={f.label}
-              className="bg-amber-50/50 rounded-2xl border border-amber-100 p-5 text-center"
+              className="bg-iw-orange-50/50 rounded-iw-card border border-iw-orange-100 p-5 text-center"
             >
-              <p className="text-2xl font-heading font-bold text-slate-900">{f.value}</p>
-              <p className="text-sm text-slate-500 font-body mt-1">{f.label}</p>
+              <p className="text-2xl font-heading font-bold text-iw-ink">{f.value}</p>
+              <p className="text-sm text-iw-ink-muted font-body mt-1">{f.label}</p>
             </div>
           ))}
         </div>
       </section>
 
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">{t("brand_assets")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-6">{t("brand_assets")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-slate-100 p-8 flex flex-col items-center">
-            <div className="bg-white rounded-xl p-6 mb-4 w-full flex items-center justify-center border border-slate-50">
+          <div className="bg-white rounded-iw-card border border-iw-border p-8 flex flex-col items-center">
+            <div className="bg-white rounded-iw-card p-6 mb-4 w-full flex items-center justify-center border border-iw-border">
               <Image
                 src="/images/aivo-logo-purple.png"
                 alt={t("logo_purple_alt")}
@@ -72,10 +72,10 @@ export default function PressKitPage() {
                 style={{ width: "auto", height: "auto" }}
               />
             </div>
-            <p className="text-sm text-slate-500 font-body">{t("primary_logo_purple")}</p>
+            <p className="text-sm text-iw-ink-muted font-body">{t("primary_logo_purple")}</p>
           </div>
-          <div className="bg-slate-900 rounded-2xl border border-slate-700 p-8 flex flex-col items-center">
-            <div className="rounded-xl p-6 mb-4 w-full flex items-center justify-center">
+          <div className="bg-slate-900 rounded-iw-card border border-slate-700 p-8 flex flex-col items-center">
+            <div className="rounded-iw-card p-6 mb-4 w-full flex items-center justify-center">
               <Image
                 src="/images/aivo-logo-white.png"
                 alt={t("logo_white_alt")}
@@ -87,8 +87,8 @@ export default function PressKitPage() {
             <p className="text-sm text-slate-400 font-body">{t("logo_dark_bg")}</p>
           </div>
         </div>
-        <div className="mt-6 p-6 bg-slate-50 rounded-2xl border border-slate-100">
-          <h3 className="font-heading font-bold text-slate-900 mb-3">{t("brand_colors")}</h3>
+        <div className="mt-6 p-6 bg-iw-raised rounded-iw-card border border-iw-border">
+          <h3 className="font-heading font-bold text-iw-ink mb-3">{t("brand_colors")}</h3>
           <div className="flex flex-wrap gap-4">
             {[
               { name: "AIVO Purple", hex: MARKETING_ACCENTS.purple, textWhite: true },
@@ -100,12 +100,12 @@ export default function PressKitPage() {
             ].map((c) => (
               <div key={c.hex} className="flex items-center gap-3">
                 <div
-                  className="w-10 h-10 rounded-lg shadow-sm border border-white/20"
+                  className="w-10 h-10 rounded-lg shadow-soft-1 border border-white/20"
                   style={{ backgroundColor: c.hex }}
                 />
                 <div>
-                  <p className="text-sm font-bold text-slate-900">{c.name}</p>
-                  <p className="text-xs text-slate-400 font-mono">{c.hex}</p>
+                  <p className="text-sm font-bold text-iw-ink">{c.name}</p>
+                  <p className="text-xs text-iw-ink-muted font-mono">{c.hex}</p>
                 </div>
               </div>
             ))}
@@ -114,17 +114,17 @@ export default function PressKitPage() {
       </section>
 
       <section>
-        <div className="bg-amber-50 rounded-3xl border border-amber-100 p-8 md:p-12">
-          <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+        <div className="bg-iw-orange-50 rounded-iw-card-lg border border-iw-orange-100 p-8 md:p-12">
+          <h2 className="text-2xl font-heading font-bold text-iw-ink mb-4">
             {t("media_contact")}
           </h2>
-          <p className="text-slate-600 font-body mb-6">
+          <p className="text-iw-ink-muted font-body mb-6">
             For press inquiries, interview requests, or media resources, please reach out to our
             communications team.
           </p>
           <a
             href="mailto:press@aivolearning.com"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-amber-600 text-white font-bold hover:bg-amber-700 transition shadow-lg"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-iw-control bg-iw-orange-600 text-white font-bold hover:bg-iw-orange-700 transition shadow-soft-3"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path

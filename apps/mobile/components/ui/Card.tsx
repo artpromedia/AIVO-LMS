@@ -4,6 +4,7 @@
 import React from "react";
 import { View, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { useSensoryPalette, useSensoryMode } from "@/context/SensoryModeProvider";
+import { colors } from "@/constants/colors";
 
 type Tone = "card" | "raised" | "hero";
 
@@ -43,7 +44,7 @@ export function Card({
           borderWidth,
           borderColor: palette.border,
           padding: padded ? 20 : 0,
-          shadowColor: "#000",
+          shadowColor: colors.black,
           shadowOpacity: shadowStrength * (tone === "hero" ? 1.4 : 1),
           shadowRadius: tone === "hero" ? 24 : 8,
           shadowOffset: { width: 0, height: tone === "hero" ? 8 : 2 },

@@ -36,7 +36,7 @@ export function ParentNotificationList({
     <div className="space-y-3">
       {unread.length > 0 ? (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-aivo-muted">{t("unread_count", { count: unread.length })}</p>
+          <p className="text-xs text-iw-ink-muted">{t("unread_count", { count: unread.length })}</p>
           <Button
             size="sm"
             variant="outline"
@@ -52,15 +52,15 @@ export function ParentNotificationList({
         </div>
       ) : null}
       {items.map((n) => (
-        <Card key={n.id} className={`p-4 ${n.readAt ? "opacity-70" : "border-aivo-primary/40"}`}>
+        <Card key={n.id} className={`p-4 ${n.readAt ? "opacity-70" : "border-iw-primary/40"}`}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <p className="font-medium">{n.title}</p>
                 {!n.readAt ? <Badge tone="primary">{t("new_badge")}</Badge> : null}
               </div>
-              <p className="mt-1 text-sm text-aivo-ink-soft">{n.body}</p>
-              <p className="mt-1 text-xs text-aivo-muted">
+              <p className="mt-1 text-sm text-iw-ink-muted">{n.body}</p>
+              <p className="mt-1 text-xs text-iw-ink-muted">
                 {new Date(n.createdAt).toLocaleString()} · {n.type}
               </p>
             </div>

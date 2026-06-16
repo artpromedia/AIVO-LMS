@@ -10,7 +10,7 @@ import { useEngagementTrend } from "@/hooks/useEngagementTrend";
 import { useLearnerEntitlements } from "@/hooks/useLearnerEntitlements";
 import { useLearnerMastery } from "@/hooks/useLearnerMastery";
 import { TUTORS, INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies, typography } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { useScanTarget } from "@/src/components/switch-scan/ScanTargetRegistry";
@@ -278,7 +278,7 @@ export default function LearnerWorldMap() {
                       style={[styles.lockBadge, { backgroundColor: palette.ink }]}
                       accessibilityElementsHidden
                     >
-                      <Ionicons name="lock-closed" size={11} color="#FFF" />
+                      <Ionicons name="lock-closed" size={11} color={colors.white} />
                     </View>
                   )}
                   {getTutorArt(key) ? (

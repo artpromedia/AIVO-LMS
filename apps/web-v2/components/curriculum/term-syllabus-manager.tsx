@@ -304,9 +304,9 @@ export function TermSyllabusManager({
             </Button>
           )}
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-iw-error-strong">{error}</p>}
         {saveNotice && (
-          <p role="status" className="text-sm text-emerald-700" data-testid="syllabus-save-notice">
+          <p role="status" className="text-sm text-iw-success-strong" data-testid="syllabus-save-notice">
             {saveNotice}
           </p>
         )}
@@ -356,7 +356,7 @@ export function TermSyllabusManager({
                   <span className="flex items-center gap-2">
                     {s.title ?? s.subject} · {s.units.length} weeks · {fmtDate(s.createdAt)}
                     {off > 0 && (
-                      <span className="rounded bg-amber-100 text-amber-800 px-2 py-0.5 text-xs">
+                      <span className="rounded bg-iw-warning-subtle text-iw-warning-strong px-2 py-0.5 text-xs">
                         {off} off-curriculum — review
                       </span>
                     )}
@@ -381,7 +381,7 @@ export function TermSyllabusManager({
             })}
           </ul>
           {planError && (
-            <p className="text-sm text-red-600" role="alert">
+            <p className="text-sm text-iw-error-strong" role="alert">
               {planError}
             </p>
           )}

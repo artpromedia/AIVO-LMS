@@ -13,7 +13,7 @@ export function TutorBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full bg-aivo-primary-soft px-3 py-1 text-xs font-medium text-aivo-primary",
+        "inline-flex items-center gap-2 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-primary",
         className,
       )}
     >

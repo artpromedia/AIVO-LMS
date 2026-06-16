@@ -32,17 +32,17 @@ export function FAQ() {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-b from-slate-50/50 to-white" id="faq">
+    <section className="py-24 bg-gradient-to-b from-iw-raised/50 to-white" id="faq">
       <JsonLd data={faqJsonLd} />
       <div className="max-w-3xl mx-auto px-6 md:px-8">
         <div className="text-center mb-16">
           <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-3">
             {t("label")}
           </p>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-heading font-bold text-iw-ink mb-4">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-500 font-body">{t("subtitle")}</p>
+          <p className="text-lg text-iw-ink-muted font-body">{t("subtitle")}</p>
         </div>
 
         <div className="space-y-3" role="list">
@@ -54,7 +54,7 @@ export function FAQ() {
               <div
                 key={faq.q}
                 role="listitem"
-                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? "border-purple-200 shadow-md" : "border-slate-100 hover:border-slate-200"}`}
+                className={`bg-white border rounded-iw-card overflow-hidden transition-all duration-300 ${isOpen ? "border-iw-purple-200 shadow-soft-3" : "border-iw-border hover:border-iw-border"}`}
               >
                 <button
                   id={triggerId}
@@ -63,7 +63,7 @@ export function FAQ() {
                   aria-controls={panelId}
                   className="w-full flex items-center justify-between p-6 text-left"
                 >
-                  <span className="font-heading font-bold text-slate-900 pr-4">{t(faq.q)}</span>
+                  <span className="font-heading font-bold text-iw-ink pr-4">{t(faq.q)}</span>
                   <svg
                     className={`w-5 h-5 text-primary flex-shrink-0 transition-transform duration-300 motion-reduce:transition-none ${isOpen ? "rotate-180" : ""}`}
                     fill="none"
@@ -86,7 +86,7 @@ export function FAQ() {
                   hidden={!isOpen}
                   className={`overflow-hidden transition-all duration-300 motion-reduce:transition-none ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
                 >
-                  <p className="px-6 pb-6 text-slate-500 font-body leading-relaxed">{t(faq.a)}</p>
+                  <p className="px-6 pb-6 text-iw-ink-muted font-body leading-relaxed">{t(faq.a)}</p>
                 </div>
               </div>
             );

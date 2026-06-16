@@ -72,7 +72,7 @@ export default function StudentBrainProfile() {
             </Text>
           </View>
           {contributed ? (
-            <Ionicons name="checkmark-circle" size={22} color="#22c55e" />
+            <Ionicons name="checkmark-circle" size={22} color={colors.success} />
           ) : null}
         </View>
         <AivoButton
@@ -87,7 +87,7 @@ export default function StudentBrainProfile() {
             <Ionicons
               name="clipboard-outline"
               size={18}
-              color={contributed ? colors.primary : "#FFF"}
+              color={contributed ? colors.primary : colors.white}
             />
           }
           style={{ marginTop: spacing.sm }}
@@ -98,7 +98,7 @@ export default function StudentBrainProfile() {
         <AivoButton
           title={t("teacherStudent.submitInsight")}
           onPress={() => router.push(`/(teacher)/student/${id}/insight` as any)}
-          icon={<Ionicons name="chatbubble-outline" size={18} color="#FFF" />}
+          icon={<Ionicons name="chatbubble-outline" size={18} color={colors.white} />}
           style={{ flex: 1, marginRight: 8 }}
         />
         <AivoButton

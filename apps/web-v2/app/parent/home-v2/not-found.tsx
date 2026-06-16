@@ -14,7 +14,7 @@ export default async function ParentHomeV2NotFound() {
   return (
     <StaticRoleShell role="parent">
       <div className="flex min-h-[70vh] items-center justify-center p-6">
-      <div className="max-w-lg w-full rounded-iw-card-lg bg-white border border-iw-border shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] p-8 flex flex-col gap-4 text-center">
+      <div className="max-w-lg w-full rounded-iw-card-lg bg-white border border-iw-border shadow-soft-3 p-8 flex flex-col gap-4 text-center">
         <div className="self-center inline-flex items-center justify-center h-14 w-14 rounded-full bg-[var(--aivo-aivoTeal-100)] text-[var(--aivo-aivoTeal-700)]">
           <AivoIcon name="aiBrain" size={28} />
         </div>

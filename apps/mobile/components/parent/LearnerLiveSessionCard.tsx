@@ -78,8 +78,8 @@ export function LearnerLiveSessionCard({ learnerId }: { learnerId: string }) {
   return (
     <View style={[styles.card, live && styles.cardLive]}>
       <View style={styles.headerRow}>
-        <View style={[styles.dot, { backgroundColor: live ? "#22c55e" : colors.border }]} />
-        <Text style={[styles.status, { color: live ? "#16a34a" : colors.textSecondary }]}>
+        <View style={[styles.dot, { backgroundColor: live ? colors.success : colors.border }]} />
+        <Text style={[styles.status, { color: live ? colors.success : colors.textSecondary }]}>
           {live ? "Active now" : "Last session"}
         </Text>
       </View>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.xs,
   },
-  cardLive: { borderColor: "#22c55e" },
+  cardLive: { borderColor: colors.success },
   headerRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   dot: { width: 10, height: 10, borderRadius: 5 },
   status: {

@@ -8,7 +8,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { OnboardingStepper } from "@/src/components/onboarding/OnboardingStepper";
 import { Card, Button } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { fetchBaselineSubjects, type BaselineSubject } from "@/src/api/baselineClient";
 
@@ -127,7 +127,7 @@ export default function LearnerBaselineScreen() {
             t("baseline.ready4", "Extra time is on"),
           ].map((line, i) => (
             <View key={i} style={[styles.checkRow, { borderColor: palette.border }]}>
-              <Ionicons name="checkmark" size={18} color="#22c55e" />
+              <Ionicons name="checkmark" size={18} color={colors.success} />
               <Text style={[styles.body, { color: palette.ink, flex: 1 }]}>{line}</Text>
             </View>
           ))}

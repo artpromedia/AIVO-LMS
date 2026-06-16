@@ -53,8 +53,8 @@ export function RegenerateConfirm({
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle className="text-lg font-semibold text-aivo-ink">{title}</DialogTitle>
-        <DialogDescription className="mt-2 text-sm text-aivo-ink-soft">{body}</DialogDescription>
+        <DialogTitle className="text-lg font-semibold text-iw-ink">{title}</DialogTitle>
+        <DialogDescription className="mt-2 text-sm text-iw-ink-muted">{body}</DialogDescription>
         <div className="mt-5 flex flex-wrap items-center justify-end gap-2">
           <DialogClose asChild>
             <Button type="button" variant="ghost">

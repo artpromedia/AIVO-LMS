@@ -5,10 +5,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
-import { AivoButton } from "@aivo/mobile-ui";
+import { Button } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 import { colors, spacing } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
 
 interface QuestWorld {
@@ -137,7 +138,7 @@ export default function AdventureScreen() {
         <Text style={styles.subtitle}>{t("learnerAdventure.subtitle")}</Text>
 
         {loadStatus === "loading" && (
-          <ActivityIndicator color="#FFF" style={{ marginTop: spacing.xl }} />
+          <ActivityIndicator color={colors.white} style={{ marginTop: spacing.xl }} />
         )}
 
         {loadStatus === "error" && (
@@ -190,7 +191,7 @@ export default function AdventureScreen() {
             </View>
 
             {current && (
-              <AivoButton
+              <Button
                 title={t("learnerAdventure.beginAdventure")}
                 onPress={() => router.push(`/(learner)/quests/${current.key}` as any)}
                 size="lg"
@@ -207,12 +208,12 @@ export default function AdventureScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#1A1A2E", paddingHorizontal: spacing.md },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.lg },
-  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: "rgba(255,255,255,0.7)" },
+  backText: { fontSize: 16, fontFamily: fontFamilies.bodySemiBold, color: "rgba(255,255,255,0.7)" },
   content: { flex: 1 },
-  title: { fontSize: 28, fontFamily: "Nunito-ExtraBold", color: "#FFF", textAlign: "center" },
+  title: { fontSize: 28, fontFamily: fontFamilies.bodyExtraBold, color: colors.white, textAlign: "center" },
   subtitle: {
     fontSize: 16,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: "rgba(255,255,255,0.7)",
     textAlign: "center",
     marginTop: 4,
@@ -234,15 +235,15 @@ const styles = StyleSheet.create({
   },
   chapterLocked: { opacity: 0.55 },
   chapterIcon: { fontSize: 28 },
-  chapterName: { fontSize: 15, fontFamily: "Nunito-Bold", color: "#FFF" },
-  chapterDomain: { fontSize: 12, fontFamily: "Nunito-Regular", color: "rgba(255,255,255,0.6)" },
+  chapterName: { fontSize: 15, fontFamily: fontFamilies.bodyBold, color: colors.white },
+  chapterDomain: { fontSize: 12, fontFamily: fontFamilies.bodyRegular, color: "rgba(255,255,255,0.6)" },
   currentBadge: {
     backgroundColor: colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
   },
-  currentText: { fontSize: 12, fontFamily: "Nunito-Bold", color: "#FFF" },
+  currentText: { fontSize: 12, fontFamily: fontFamilies.bodyBold, color: colors.white },
   errorBlock: {
     marginTop: spacing.xl,
     padding: spacing.md,
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "rgba(255,255,255,0.85)",
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     fontSize: 14,
     textAlign: "center",
   },

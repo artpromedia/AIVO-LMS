@@ -48,7 +48,7 @@ export function ExportRequestForm({ learners }: { learners: LearnerOpt[] }) {
         </label>
         <select
           id="learner"
-          className="mt-1 w-full rounded border border-aivo-border bg-aivo-surface-1 p-2"
+          className="mt-1 w-full rounded border border-iw-border bg-iw-card p-2"
           value={learnerId}
           onChange={(e) => setLearnerId(e.target.value)}
         >
@@ -66,7 +66,7 @@ export function ExportRequestForm({ learners }: { learners: LearnerOpt[] }) {
         </label>
         <textarea
           id="notes"
-          className="mt-1 w-full rounded border border-aivo-border bg-aivo-surface-1 p-2"
+          className="mt-1 w-full rounded border border-iw-border bg-iw-card p-2"
           rows={3}
           maxLength={2000}
           value={notes}
@@ -74,11 +74,11 @@ export function ExportRequestForm({ learners }: { learners: LearnerOpt[] }) {
           placeholder={t("form_notes_placeholder")}
         />
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-iw-error-strong">{error}</p>}
       <Button type="submit" disabled={busy}>
         {busy ? t("form_submitting") : t("form_submit")}
       </Button>
-      <p className="text-xs text-aivo-muted">{t("form_email_when_ready")}</p>
+      <p className="text-xs text-iw-ink-muted">{t("form_email_when_ready")}</p>
     </form>
   );
 }

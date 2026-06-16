@@ -124,7 +124,7 @@ export default async function ParentMilestonesPage({
           action={
             <Link
               href={`/parent/learners/${learner.id}`}
-              className="text-aivo-accent underline underline-offset-4"
+              className="text-iw-warm underline underline-offset-4"
             >
               {t("back_to_overview")}
             </Link>
@@ -134,54 +134,54 @@ export default async function ParentMilestonesPage({
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+              <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
                 {t("total_xp")}
               </p>
               <p className="mt-1 font-display text-3xl font-semibold">
                 {eng.totalXp.toLocaleString()}
               </p>
-              <div className="mt-3 h-2 w-full rounded-full bg-aivo-border">
-                <div className="h-2 rounded-full bg-aivo-accent" style={{ width: `${xpPct}%` }} />
+              <div className="mt-3 h-2 w-full rounded-full bg-iw-border">
+                <div className="h-2 rounded-full bg-iw-warm" style={{ width: `${xpPct}%` }} />
               </div>
-              <p className="mt-1 text-xs text-aivo-ink-soft">
+              <p className="mt-1 text-xs text-iw-ink-muted">
                 {xpToNext} XP to level {eng.level + 1}
               </p>
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+              <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
                 {LEVEL_LABEL}
               </p>
               <p className="mt-1 font-display text-3xl font-semibold">{eng.level}</p>
-              <p className="mt-3 text-xs text-aivo-ink-soft">{t("levels_desc")}</p>
+              <p className="mt-3 text-xs text-iw-ink-muted">{t("levels_desc")}</p>
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+              <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
                 {t("current_streak")}
               </p>
               <p className="mt-1 flex items-center gap-2 font-display text-3xl font-semibold">
-                <Flame className="h-7 w-7 text-orange-500" />
+                <Flame className="h-7 w-7 text-iw-orange-500" />
                 {eng.currentStreakDays}d
               </p>
-              <p className="mt-3 text-xs text-aivo-ink-soft">
+              <p className="mt-3 text-xs text-iw-ink-muted">
                 Longest streak: {eng.longestStreakDays} days
               </p>
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+              <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
                 {t("wallet")}
               </p>
               <div className="mt-1 flex items-baseline gap-4">
                 <span className="font-display text-2xl font-semibold">{eng.coins} ¢</span>
-                <span className="font-display text-2xl font-semibold text-aivo-accent">
+                <span className="font-display text-2xl font-semibold text-iw-warm">
                   {eng.gems} ◆
                 </span>
               </div>
-              <p className="mt-3 text-xs text-aivo-ink-soft">{t("wallet_desc")}</p>
+              <p className="mt-3 text-xs text-iw-ink-muted">{t("wallet_desc")}</p>
             </Card>
           </div>
 
           <SectionHeader title={t("badge_collection")} />
-          <p className="-mt-3 mb-3 text-sm text-aivo-ink-soft">
+          <p className="-mt-3 mb-3 text-sm text-iw-ink-muted">
             {earned.length} of {ALL_KEYS.length} earned.
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -195,8 +195,8 @@ export default async function ParentMilestonesPage({
                     <div
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
                         isEarned
-                          ? "bg-aivo-accent/20 text-aivo-accent"
-                          : "bg-aivo-border/40 text-aivo-ink-soft"
+                          ? "bg-iw-warm/20 text-iw-warm"
+                          : "bg-iw-border/40 text-iw-ink-muted"
                       }`}
                     >
                       <Icon className="h-5 w-5" />
@@ -210,7 +210,7 @@ export default async function ParentMilestonesPage({
                           <Badge tone="neutral">{t("locked")}</Badge>
                         )}
                       </div>
-                      <p className="mt-1 text-sm text-aivo-ink-soft">{def.description}</p>
+                      <p className="mt-1 text-sm text-iw-ink-muted">{def.description}</p>
                     </div>
                   </div>
                 </Card>
@@ -221,8 +221,8 @@ export default async function ParentMilestonesPage({
           <SectionHeader title={t("how_xp_works")} />
           <Card className="p-[var(--aivo-density-card-pad)]">
             <div className="flex items-start gap-3">
-              <HelpCircle className="mt-0.5 h-5 w-5 shrink-0 text-aivo-ink-soft" />
-              <div className="space-y-1 text-sm text-aivo-ink-soft">
+              <HelpCircle className="mt-0.5 h-5 w-5 shrink-0 text-iw-ink-muted" />
+              <div className="space-y-1 text-sm text-iw-ink-muted">
                 <p>
                   Learners earn 10–40 XP per completed session, plus bonus XP for hitting their
                   daily quest goal and maintaining a streak.

@@ -50,6 +50,174 @@
   --animate-float-slow: float-slow 4s ease-in-out infinite;
 }
 
+/* ------------------------------------------------------------------
+   Inclusive-Warm (iw-*) design tokens for Tailwind v4.
+
+   apps/web-v2 gets these utilities from the v3 brand preset
+   (packages/brand/dist/tailwind/preset.cjs) loaded via @config. This
+   app is pure Tailwind v4 (CSS-first, no preset), so the same iw-*
+   utilities are declared here as @theme entries. Every value is a
+   reference to an --aivo-* var already supplied by
+   @aivo/brand/tokens.css, so this block is a 1:1 mirror of preset.cjs
+   (no literal values) — a token bump in /packages/brand still reflows
+   everything. If you add/rename an iw-* token in preset.cjs, mirror it
+   here so the two public landing pages stay in visual sync.
+   ------------------------------------------------------------------ */
+@theme {
+  /* Sensory-mode-aware semantic colors (repaint on [data-sensory-mode]). */
+  --color-iw-bg: var(--aivo-sensory-bgPage);
+  --color-iw-card: var(--aivo-sensory-bgCard);
+  --color-iw-raised: var(--aivo-sensory-bgRaised);
+  --color-iw-primary: var(--aivo-sensory-primary);
+  --color-iw-primary-hover: var(--aivo-sensory-primaryHover);
+  --color-iw-primary-fg: var(--aivo-sensory-primaryFg);
+  --color-iw-accent: var(--aivo-sensory-accent);
+  --color-iw-accent-soft: var(--aivo-sensory-accentSoft);
+  --color-iw-warm: var(--aivo-sensory-warm);
+  --color-iw-warm-soft: var(--aivo-sensory-warmSoft);
+  --color-iw-ink: var(--aivo-sensory-ink);
+  --color-iw-ink-muted: var(--aivo-sensory-inkMuted);
+  --color-iw-border: var(--aivo-sensory-border);
+  --color-iw-ring: var(--aivo-sensory-ringFocus);
+
+  /* Brand scales (flat, sensory-independent). */
+  --color-iw-purple-50: var(--aivo-color-aivoPurple-50);
+  --color-iw-purple-100: var(--aivo-color-aivoPurple-100);
+  --color-iw-purple-200: var(--aivo-color-aivoPurple-200);
+  --color-iw-purple-300: var(--aivo-color-aivoPurple-300);
+  --color-iw-purple-400: var(--aivo-color-aivoPurple-400);
+  --color-iw-purple-500: var(--aivo-color-aivoPurple-500);
+  --color-iw-purple-600: var(--aivo-color-aivoPurple-600);
+  --color-iw-purple-700: var(--aivo-color-aivoPurple-700);
+  --color-iw-purple-800: var(--aivo-color-aivoPurple-800);
+  --color-iw-purple-900: var(--aivo-color-aivoPurple-900);
+  --color-iw-purple-950: var(--aivo-color-aivoPurple-950);
+  --color-iw-teal-50: var(--aivo-color-aivoTeal-50);
+  --color-iw-teal-100: var(--aivo-color-aivoTeal-100);
+  --color-iw-teal-200: var(--aivo-color-aivoTeal-200);
+  --color-iw-teal-300: var(--aivo-color-aivoTeal-300);
+  --color-iw-teal-400: var(--aivo-color-aivoTeal-400);
+  --color-iw-teal-500: var(--aivo-color-aivoTeal-500);
+  --color-iw-teal-600: var(--aivo-color-aivoTeal-600);
+  --color-iw-teal-700: var(--aivo-color-aivoTeal-700);
+  --color-iw-teal-800: var(--aivo-color-aivoTeal-800);
+  --color-iw-teal-900: var(--aivo-color-aivoTeal-900);
+  --color-iw-teal-950: var(--aivo-color-aivoTeal-950);
+  --color-iw-orange-50: var(--aivo-color-aivoOrange-50);
+  --color-iw-orange-100: var(--aivo-color-aivoOrange-100);
+  --color-iw-orange-200: var(--aivo-color-aivoOrange-200);
+  --color-iw-orange-300: var(--aivo-color-aivoOrange-300);
+  --color-iw-orange-400: var(--aivo-color-aivoOrange-400);
+  --color-iw-orange-500: var(--aivo-color-aivoOrange-500);
+  --color-iw-orange-600: var(--aivo-color-aivoOrange-600);
+  --color-iw-orange-700: var(--aivo-color-aivoOrange-700);
+  --color-iw-orange-800: var(--aivo-color-aivoOrange-800);
+  --color-iw-orange-900: var(--aivo-color-aivoOrange-900);
+  --color-iw-orange-950: var(--aivo-color-aivoOrange-950);
+
+  /* Universal status (canonical iw-error, not iw-danger). */
+  --color-iw-success: var(--aivo-color-status-success);
+  --color-iw-success-subtle: var(--aivo-color-status-success-subtle);
+  --color-iw-success-strong: var(--aivo-color-status-success-strong);
+  --color-iw-warning: var(--aivo-color-status-warning);
+  --color-iw-warning-subtle: var(--aivo-color-status-warning-subtle);
+  --color-iw-warning-strong: var(--aivo-color-status-warning-strong);
+  --color-iw-error: var(--aivo-color-status-error);
+  --color-iw-error-subtle: var(--aivo-color-status-error-subtle);
+  --color-iw-error-strong: var(--aivo-color-status-error-strong);
+  --color-iw-info: var(--aivo-color-status-info);
+  --color-iw-info-subtle: var(--aivo-color-status-info-subtle);
+  --color-iw-info-strong: var(--aivo-color-status-info-strong);
+
+  /* Domain status (subtle / default / strong). */
+  --color-iw-mastery-emerging-subtle: var(--aivo-domain-mastery-emerging-subtle);
+  --color-iw-mastery-emerging: var(--aivo-domain-mastery-emerging-default);
+  --color-iw-mastery-emerging-strong: var(--aivo-domain-mastery-emerging-strong);
+  --color-iw-mastery-developing-subtle: var(--aivo-domain-mastery-developing-subtle);
+  --color-iw-mastery-developing: var(--aivo-domain-mastery-developing-default);
+  --color-iw-mastery-developing-strong: var(--aivo-domain-mastery-developing-strong);
+  --color-iw-mastery-proficient-subtle: var(--aivo-domain-mastery-proficient-subtle);
+  --color-iw-mastery-proficient: var(--aivo-domain-mastery-proficient-default);
+  --color-iw-mastery-proficient-strong: var(--aivo-domain-mastery-proficient-strong);
+  --color-iw-mastery-mastered-subtle: var(--aivo-domain-mastery-mastered-subtle);
+  --color-iw-mastery-mastered: var(--aivo-domain-mastery-mastered-default);
+  --color-iw-mastery-mastered-strong: var(--aivo-domain-mastery-mastered-strong);
+  --color-iw-risk-low-subtle: var(--aivo-domain-risk-low-subtle);
+  --color-iw-risk-low: var(--aivo-domain-risk-low-default);
+  --color-iw-risk-watch-subtle: var(--aivo-domain-risk-watch-subtle);
+  --color-iw-risk-watch: var(--aivo-domain-risk-watch-default);
+  --color-iw-risk-elevated-subtle: var(--aivo-domain-risk-elevated-subtle);
+  --color-iw-risk-elevated: var(--aivo-domain-risk-elevated-default);
+  --color-iw-risk-high-subtle: var(--aivo-domain-risk-high-subtle);
+  --color-iw-risk-high: var(--aivo-domain-risk-high-default);
+  --color-iw-consent-pending-subtle: var(--aivo-domain-consent-pending-subtle);
+  --color-iw-consent-pending: var(--aivo-domain-consent-pending-default);
+  --color-iw-consent-granted-subtle: var(--aivo-domain-consent-granted-subtle);
+  --color-iw-consent-granted: var(--aivo-domain-consent-granted-default);
+  --color-iw-consent-revoked-subtle: var(--aivo-domain-consent-revoked-subtle);
+  --color-iw-consent-revoked: var(--aivo-domain-consent-revoked-default);
+  --color-iw-consent-expired-subtle: var(--aivo-domain-consent-expired-subtle);
+  --color-iw-consent-expired: var(--aivo-domain-consent-expired-default);
+  --color-iw-billing-paid-subtle: var(--aivo-domain-billing-paid-subtle);
+  --color-iw-billing-paid: var(--aivo-domain-billing-paid-default);
+  --color-iw-billing-due-subtle: var(--aivo-domain-billing-due-subtle);
+  --color-iw-billing-due: var(--aivo-domain-billing-due-default);
+  --color-iw-billing-overdue-subtle: var(--aivo-domain-billing-overdue-subtle);
+  --color-iw-billing-overdue: var(--aivo-domain-billing-overdue-default);
+  --color-iw-billing-trial-subtle: var(--aivo-domain-billing-trial-subtle);
+  --color-iw-billing-trial: var(--aivo-domain-billing-trial-default);
+  --color-iw-billing-refunded-subtle: var(--aivo-domain-billing-refunded-subtle);
+  --color-iw-billing-refunded: var(--aivo-domain-billing-refunded-default);
+  --color-iw-safety-safe-subtle: var(--aivo-domain-safety-safe-subtle);
+  --color-iw-safety-safe: var(--aivo-domain-safety-safe-default);
+  --color-iw-safety-review-subtle: var(--aivo-domain-safety-review-subtle);
+  --color-iw-safety-review: var(--aivo-domain-safety-review-default);
+  --color-iw-safety-flag-subtle: var(--aivo-domain-safety-flag-subtle);
+  --color-iw-safety-flag: var(--aivo-domain-safety-flag-default);
+  --color-iw-safety-block-subtle: var(--aivo-domain-safety-block-subtle);
+  --color-iw-safety-block: var(--aivo-domain-safety-block-default);
+  --color-iw-completion-notStarted-subtle: var(--aivo-domain-completion-notStarted-subtle);
+  --color-iw-completion-notStarted: var(--aivo-domain-completion-notStarted-default);
+  --color-iw-completion-inProgress-subtle: var(--aivo-domain-completion-inProgress-subtle);
+  --color-iw-completion-inProgress: var(--aivo-domain-completion-inProgress-default);
+  --color-iw-completion-submitted-subtle: var(--aivo-domain-completion-submitted-subtle);
+  --color-iw-completion-submitted: var(--aivo-domain-completion-submitted-default);
+  --color-iw-completion-complete-subtle: var(--aivo-domain-completion-complete-subtle);
+  --color-iw-completion-complete: var(--aivo-domain-completion-complete-default);
+  --color-iw-completion-overdue-subtle: var(--aivo-domain-completion-overdue-subtle);
+  --color-iw-completion-overdue: var(--aivo-domain-completion-overdue-default);
+
+  /* Radii. */
+  --radius-iw-card: var(--aivo-radius-card);
+  --radius-iw-card-lg: var(--aivo-radius-cardLg);
+  --radius-iw-hero: var(--aivo-radius-hero);
+  --radius-iw-control: var(--aivo-radius-control);
+  --radius-iw-chip: var(--aivo-radius-chip);
+  --radius-iw-sheet-top: var(--aivo-radius-sheetTop);
+
+  /* Soft shadows. */
+  --shadow-soft-1: var(--aivo-shadow-soft-1);
+  --shadow-soft-3: var(--aivo-shadow-soft-3);
+  --shadow-soft-5: var(--aivo-shadow-soft-5);
+
+  /* Type families (marketing keeps font-heading for headings; these exist
+     so any stray font-iw-* still resolves and stays brand-consistent). */
+  --font-iw-display: "Satoshi Variable", var(--font-aivo-display), "Inter Display", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-iw-body: var(--font-aivo-body), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-iw-dyslexia: var(--font-aivo-dyslexia), "Atkinson Hyperlegible", "OpenDyslexic", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Brand gradients (no @theme namespace generates bg-* gradients in v4). */
+@utility bg-iw-brand {
+  background-image: linear-gradient(135deg, var(--color-iw-purple-600) 0%, var(--color-iw-teal-500) 100%);
+}
+@utility bg-iw-sensory-brand {
+  background-image: linear-gradient(135deg, var(--aivo-sensory-primary) 0%, var(--aivo-sensory-accent) 100%);
+}
+@utility bg-iw-hero {
+  background-image: linear-gradient(180deg, var(--aivo-sensory-bgPage) 0%, var(--aivo-sensory-bgRaised) 70%);
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

@@ -19,7 +19,7 @@ export default function ParentHomeV2Loading() {
         <span className="sr-only">{t("loading")}</span>
 
         {/* Hero skeleton */}
-        <div className="rounded-iw-card-lg bg-white border border-iw-border shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] p-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="rounded-iw-card-lg bg-white border border-iw-border shadow-soft-3 p-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="flex flex-col gap-3">
             <div className="h-8 w-3/4 rounded-iw-control bg-iw-card animate-pulse" />
             <div className="h-6 w-2/3 rounded-iw-control bg-iw-card animate-pulse" />
@@ -44,7 +44,7 @@ export default function ParentHomeV2Loading() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="h-40 rounded-iw-card-lg bg-white border border-iw-border shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] animate-pulse"
+              className="h-40 rounded-iw-card-lg bg-white border border-iw-border shadow-soft-3 animate-pulse"
             />
           ))}
         </div>
@@ -54,7 +54,7 @@ export default function ParentHomeV2Loading() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="h-56 rounded-iw-card-lg bg-white border border-iw-border shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] animate-pulse"
+              className="h-56 rounded-iw-card-lg bg-white border border-iw-border shadow-soft-3 animate-pulse"
             />
           ))}
         </div>

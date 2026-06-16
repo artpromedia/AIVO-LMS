@@ -29,11 +29,11 @@ export function LearnerCard({
   };
 
   const variantClasses: Record<string, string> = {
-    default: "bg-white rounded-2xl border border-slate-100 shadow-sm",
-    elevated: "bg-white rounded-2xl shadow-lg",
-    bordered: "bg-white rounded-2xl border-2",
+    default: "bg-white rounded-iw-card border border-iw-border shadow-soft-1",
+    elevated: "bg-white rounded-iw-card shadow-soft-3",
+    bordered: "bg-white rounded-iw-card border-2",
     interactive:
-      "bg-white rounded-2xl border-2 border-transparent hover:shadow-xl cursor-pointer transition-all focus-visible:ring-[3px] focus-visible:ring-offset-2",
+      "bg-white rounded-iw-card border-2 border-transparent hover:shadow-soft-5 cursor-pointer transition-all focus-visible:ring-[3px] focus-visible:ring-offset-2",
   };
 
   const accentStyle =

@@ -39,20 +39,20 @@ export async function CalmSummaryCard({
 
   return (
     <Card className="p-[var(--aivo-density-card-pad)]">
-      <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+      <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
         {t("title")}
       </p>
       {summary.totalMoments === 0 ? (
-        <p className="mt-2 text-sm text-aivo-ink-soft">{t("none", { name: learnerName })}</p>
+        <p className="mt-2 text-sm text-iw-ink-muted">{t("none", { name: learnerName })}</p>
       ) : (
         <div className="mt-2 flex flex-col gap-1 text-sm">
           <p className="text-iw-text-strong">
             {t("moments", { name: learnerName, count: summary.totalMoments })}
           </p>
-          <p className="text-aivo-ink-soft">
+          <p className="text-iw-ink-muted">
             {t("completed", { count: summary.completedMoments })}
           </p>
-          {lastActive ? <p className="text-aivo-ink-soft">{lastActive}</p> : null}
+          {lastActive ? <p className="text-iw-ink-muted">{lastActive}</p> : null}
         </div>
       )}
     </Card>

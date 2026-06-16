@@ -11,7 +11,7 @@ import { Card } from "@/components/ui";
 import { EmptyState, LoadingState } from "@aivo/mobile-ui";
 import { splitLessons } from "@/lib/gradebook-logic";
 import { subjectAccent } from "@/lib/subject-display";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -115,5 +115,5 @@ const styles = StyleSheet.create({
   subject: { fontSize: 16, fontFamily: fontFamilies.bodyBold },
   meta: { fontSize: 13, fontFamily: fontFamilies.bodyRegular, marginTop: 2 },
   continueBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: radius.full },
-  continueText: { color: "#fff", fontSize: 13, fontFamily: fontFamilies.bodyBold },
+  continueText: { color: colors.white, fontSize: 13, fontFamily: fontFamilies.bodyBold },
 });

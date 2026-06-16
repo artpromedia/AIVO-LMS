@@ -2,12 +2,12 @@ import { BookOpen, Calculator, FlaskConical, Globe, Music, Palette, Sparkles } f
 import { cn } from "@/lib/utils";
 
 const MAP: Record<string, { Icon: React.ComponentType<{ className?: string }>; tone: string }> = {
-  reading: { Icon: BookOpen, tone: "bg-aivo-primary-soft text-aivo-primary" },
-  math: { Icon: Calculator, tone: "bg-aivo-warning/30 text-aivo-ink" },
-  science: { Icon: FlaskConical, tone: "bg-aivo-success/20 text-aivo-success" },
-  social: { Icon: Globe, tone: "bg-aivo-danger/15 text-aivo-danger" },
-  music: { Icon: Music, tone: "bg-aivo-primary-soft text-aivo-primary" },
-  art: { Icon: Palette, tone: "bg-aivo-warning/30 text-aivo-ink" },
+  reading: { Icon: BookOpen, tone: "bg-iw-accent-soft text-iw-primary" },
+  math: { Icon: Calculator, tone: "bg-iw-warning/30 text-iw-ink" },
+  science: { Icon: FlaskConical, tone: "bg-iw-success/20 text-iw-success" },
+  social: { Icon: Globe, tone: "bg-iw-error/15 text-iw-error" },
+  music: { Icon: Music, tone: "bg-iw-accent-soft text-iw-primary" },
+  art: { Icon: Palette, tone: "bg-iw-warning/30 text-iw-ink" },
 };
 
 export function SubjectIcon({
@@ -19,7 +19,7 @@ export function SubjectIcon({
   className?: string;
   label?: string;
 }) {
-  const entry = MAP[subject] ?? { Icon: Sparkles, tone: "bg-aivo-surface-2 text-aivo-ink-soft" };
+  const entry = MAP[subject] ?? { Icon: Sparkles, tone: "bg-iw-raised text-iw-ink-muted" };
   const { Icon, tone } = entry;
   return (
     <span

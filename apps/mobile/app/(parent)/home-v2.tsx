@@ -90,7 +90,7 @@ export default function ParentHomeV2() {
             onPress={() => openLearner("session")}
             style={[s.btnPrimary, { backgroundColor: palette.primary }]}
           >
-            <Ionicons name="play" size={16} color="#fff" />
+            <Ionicons name="play" size={16} color={colors.white} />
             <Text style={s.btnPrimaryText}>Start with {learnerFirstName}</Text>
           </Pressable>
           <Pressable accessibilityRole="button"
@@ -178,7 +178,7 @@ const s = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: radius.md,
   },
-  btnPrimaryText: { color: "#fff", fontFamily: fontFamilies.bodyBold, fontSize: 14 },
+  btnPrimaryText: { color: colors.white, fontFamily: fontFamilies.bodyBold, fontSize: 14 },
   btnSecondary: {
     flexDirection: "row",
     alignItems: "center",

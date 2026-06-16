@@ -7,6 +7,7 @@
 import React, { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
+import { colors } from "@/constants/colors";
 import { createSurfaceStyles, readString } from "./shared";
 import type { SurfaceProps } from "./types";
 
@@ -56,7 +57,7 @@ export function VoiceResponseSurface({ theme, disabled, cfg, onSubmit }: Surface
           style={[
             styles.submit,
             { flex: 1 },
-            listening && { backgroundColor: "#dc2626" },
+            listening && { backgroundColor: colors.error },
             (disabled || !speech.isSupported || processing) && styles.submitDisabled,
           ]}
         >

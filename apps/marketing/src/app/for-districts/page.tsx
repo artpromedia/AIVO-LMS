@@ -76,7 +76,7 @@ export default async function Page() {
               providers. For short pilots or single buildings, CSV import and manual rostering are
               first-class paths — no need to wait on a vendor ticket to start a pilot.
             </p>
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-iw-ink-muted">
               We do not overclaim a roster integration we have not built. If your district needs a
               specific SIS path, we'll tell you where it stands before you sign.
             </p>
@@ -89,11 +89,11 @@ export default async function Page() {
       <section className="mb-14" aria-labelledby="licensing-heading">
         <h2
           id="licensing-heading"
-          className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-3"
+          className="text-2xl md:text-3xl font-heading font-bold text-iw-ink mb-3"
         >
           {t("licensing_heading")}
         </h2>
-        <p className="text-slate-600 font-body mb-6 leading-relaxed">
+        <p className="text-iw-ink-muted font-body mb-6 leading-relaxed">
           Per-learner seats with district volume tiers. Multi-year commitments carry lock-in
           pricing. We publish a quote — not a fake list price.
         </p>
@@ -103,9 +103,9 @@ export default async function Page() {
             { t: "Volume tiers", b: "Tiered pricing past 500, 2 500, and 10 000 learners." },
             { t: "Multi-year locks", b: "Two- and three-year price locks available on request." },
           ].map((c) => (
-            <div key={c.t} className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-              <h3 className="font-heading font-bold text-slate-900">{c.t}</h3>
-              <p className="mt-1 text-sm text-slate-600 font-body">{c.b}</p>
+            <div key={c.t} className="rounded-iw-card border border-iw-border bg-white p-5 shadow-soft-1">
+              <h3 className="font-heading font-bold text-iw-ink">{c.t}</h3>
+              <p className="mt-1 text-sm text-iw-ink-muted font-body">{c.b}</p>
             </div>
           ))}
         </div>
@@ -128,7 +128,7 @@ export default async function Page() {
               learner, parent, and teacher surfaces, with built-in read-aloud, reduced-motion,
               high-contrast, and large-text modes.
             </p>
-            <p className="mt-3 text-sm text-slate-600">{t("accessibility_gaps_note")}</p>
+            <p className="mt-3 text-sm text-iw-ink-muted">{t("accessibility_gaps_note")}</p>
           </>
         }
         ctaLabel="Read the accessibility statement"
@@ -156,10 +156,10 @@ export default async function Page() {
             ].map((r) => (
               <div
                 key={r.s}
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-2.5 text-xs"
+                className="flex items-center justify-between rounded-lg border border-iw-border bg-white p-2.5 text-xs"
               >
-                <span className="font-semibold text-slate-900">{r.s}</span>
-                <span className="text-slate-500">{r.v}</span>
+                <span className="font-semibold text-iw-ink">{r.s}</span>
+                <span className="text-iw-ink-muted">{r.v}</span>
               </div>
             ))}
           </div>

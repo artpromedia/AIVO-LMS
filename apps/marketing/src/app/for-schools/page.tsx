@@ -92,15 +92,15 @@ export default async function Page() {
         mockupTitle="Class 3B · Today"
         mockup={
           <div className="space-y-3">
-            <h3 className="font-heading text-base font-bold text-slate-900">
+            <h3 className="font-heading text-base font-bold text-iw-ink">
               22 learners · 18 active today
             </h3>
             <div className="grid grid-cols-4 gap-1.5">
               {Array.from({ length: 16 }).map((_, i) => {
                 const flagged = i === 2 || i === 7 || i === 11;
                 const tone = flagged
-                  ? "bg-amber-100 text-amber-800"
-                  : "bg-emerald-100 text-emerald-800";
+                  ? "bg-iw-warning-subtle text-iw-warning-strong"
+                  : "bg-iw-success-subtle text-iw-success-strong";
                 return (
                   <div key={i} className={`rounded ${tone} p-1.5 text-center`}>
                     <p className="font-heading text-[10px] font-bold">L{i + 1}</p>
@@ -108,7 +108,7 @@ export default async function Page() {
                 );
               })}
             </div>
-            <p className="text-xs text-slate-500">3 learners may benefit from a check-in.</p>
+            <p className="text-xs text-iw-ink-muted">3 learners may benefit from a check-in.</p>
           </div>
         }
       />
@@ -134,7 +134,7 @@ export default async function Page() {
             ].map((row) => (
               <div
                 key={row}
-                className="rounded-lg border border-slate-200 bg-white p-3 text-xs font-body text-slate-700"
+                className="rounded-lg border border-iw-border bg-white p-3 text-xs font-body text-iw-ink"
               >
                 {row}
               </div>
@@ -156,14 +156,14 @@ export default async function Page() {
         mockupTitle="Maya · This quarter"
         mockup={
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-slate-900">{t("progress_summary")}</p>
+            <p className="text-sm font-semibold text-iw-ink">{t("progress_summary")}</p>
             <div className="space-y-1.5">
               {[
                 "Reading · steady progress",
                 "Math · working through 3s",
                 "Writing · early draft skills emerging",
               ].map((r) => (
-                <div key={r} className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">
+                <div key={r} className="rounded-lg bg-iw-raised p-2 text-xs text-iw-ink">
                   {r}
                 </div>
               ))}

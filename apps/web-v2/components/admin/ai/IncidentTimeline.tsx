@@ -22,9 +22,9 @@ export function IncidentTimeline({ timeline }: IncidentTimelineProps) {
       {timeline.map((entry, idx) => (
         <li key={idx} className="relative flex gap-4 pl-2">
           <div className="flex flex-col items-center">
-            <span className="mt-1 h-3 w-3 rounded-full bg-aivo-primary" />
+            <span className="mt-1 h-3 w-3 rounded-full bg-iw-primary" />
             {idx < timeline.length - 1 ? (
-              <span className="mt-1 w-px flex-1 bg-aivo-border" />
+              <span className="mt-1 w-px flex-1 bg-iw-border" />
             ) : null}
           </div>
           <div className="pb-2">

@@ -8,7 +8,7 @@ import { API } from "@/constants/api";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card, Button } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -71,8 +71,8 @@ export default function ParentDeleteDataScreen() {
     <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
       <ScreenHeader title={t("parentPrivacy.delete", "Delete data")} />
       <Card tone="raised" style={{ gap: spacing.sm }}>
-        <View style={[styles.warn, { backgroundColor: "#ef44441A", borderColor: "#ef444466" }]}>
-          <Ionicons name="warning-outline" size={20} color="#ef4444" />
+        <View style={[styles.warn, { backgroundColor: colors.error + "1A", borderColor: colors.error + "66" }]}>
+          <Ionicons name="warning-outline" size={20} color={colors.error} />
           <Text style={[styles.warnText, { color: palette.ink }]}>
             {t("parentPrivacy.deleteWarn", "Deletion is permanent once the review window passes.")}
           </Text>

@@ -57,7 +57,7 @@ export default function LearnerDashboardDesignSystemPage() {
             primaryAction={
               <button
                 type="button"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 shadow-[0_8px_24px_-6px_color-mix(in_oklab,var(--color-aivo-primary)_55%,transparent)] transition"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-iw-card text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 shadow-[0_8px_24px_-6px_color-mix(in_oklab,var(--color-aivo-primary)_55%,transparent)] transition"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                   <path d="M8 5v14l11-7L8 5Z" />
@@ -92,7 +92,7 @@ export default function LearnerDashboardDesignSystemPage() {
           </div>
           <div className="flex flex-col gap-3">
             <h2 className="iw-label-sm text-iw-text-muted">Stat strip</h2>
-            <div className="flex items-center gap-3 p-4 rounded-3xl bg-white border border-iw-border/60 flex-wrap">
+            <div className="flex items-center gap-3 p-4 rounded-iw-card-lg bg-white border border-iw-border/60 flex-wrap">
               <StatChip
                 tone="warm"
                 label="Level 12"
@@ -132,7 +132,7 @@ export default function LearnerDashboardDesignSystemPage() {
 
         <section className="flex flex-col gap-3">
           <h2 className="iw-label-sm text-iw-text-muted">Avatar sizes & tones</h2>
-          <div className="flex items-end gap-6 flex-wrap p-6 bg-white rounded-3xl border border-iw-border/60">
+          <div className="flex items-end gap-6 flex-wrap p-6 bg-white rounded-iw-card-lg border border-iw-border/60">
             <div className="flex flex-col items-center gap-2">
               <TutorAvatar glyph="🤖" tone="lavender" size="sm" />
               <span className="text-xs text-iw-text-muted">sm · lavender</span>

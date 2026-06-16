@@ -6,8 +6,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
-import { AivoCard } from "@aivo/mobile-ui";
+import { SEMANTIC } from "@aivo/brand";
+import { Card } from "@/components/ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 
 interface QuestWorld {
   key: string;
@@ -189,12 +191,12 @@ export default function QuestPlayScreen() {
       </Text>
 
       {phase === "intro" && (
-        <AivoCard style={styles.introCard}>
+        <Card style={styles.introCard}>
           <Text style={styles.introBody}>{quest.narrativeIntro ?? quest.description ?? ""}</Text>
           <Pressable accessibilityRole="button" onPress={() => setPhase("play")} style={styles.primaryButton}>
             <Text style={styles.primaryButtonText}>Begin →</Text>
           </Pressable>
-        </AivoCard>
+        </Card>
       )}
 
       {phase === "play" &&
@@ -202,7 +204,7 @@ export default function QuestPlayScreen() {
           const chosen = answers[q.id];
           const isRevealed = revealed[q.id];
           return (
-            <AivoCard key={q.id} style={styles.questionCard}>
+            <Card key={q.id} style={styles.questionCard}>
               <Text style={styles.questionMeta}>
                 Question {idx + 1} of {questions.length}
               </Text>
@@ -212,16 +214,16 @@ export default function QuestPlayScreen() {
                 const correct = q.answerIndex === choiceIdx;
                 const showState = isRevealed && (selected || correct);
                 let borderColor = colors.border;
-                let bg = "#fff";
+                let bg = colors.surface;
                 if (showState && correct) {
-                  borderColor = "#16a34a";
-                  bg = "#dcfce7";
+                  borderColor = colors.success;
+                  bg = SEMANTIC.color.feedback.successSurface;
                 } else if (showState && !correct && selected) {
-                  borderColor = "#dc2626";
-                  bg = "#fee2e2";
+                  borderColor = colors.error;
+                  bg = SEMANTIC.color.feedback.dangerSurface;
                 } else if (selected) {
                   borderColor = colors.primary;
-                  bg = "#eef2ff";
+                  bg = colors.primaryLight;
                 }
                 return (
                   <Pressable
@@ -241,13 +243,13 @@ export default function QuestPlayScreen() {
               })}
               {isRevealed && (
                 <Text style={styles.explanation}>
-                  <Text style={{ fontFamily: "Nunito-Bold" }}>
+                  <Text style={{ fontFamily: fontFamilies.bodyBold }}>
                     {answers[q.id] === q.answerIndex ? "Correct! " : "Not quite. "}
                   </Text>
                   {q.explanation}
                 </Text>
               )}
-            </AivoCard>
+            </Card>
           );
         })}
 
@@ -268,9 +270,9 @@ export default function QuestPlayScreen() {
       )}
 
       {phase === "outro" && completion && (
-        <AivoCard style={styles.outroCard}>
+        <Card style={styles.outroCard}>
           <View style={styles.celebrateRow}>
-            <Ionicons name="sparkles" size={18} color="#fff" />
+            <Ionicons name="sparkles" size={18} color={colors.white} />
             <Text style={styles.celebrateLabel}>Chapter complete</Text>
           </View>
           <Text style={styles.outroScore}>{completion.score}%</Text>
@@ -298,7 +300,7 @@ export default function QuestPlayScreen() {
           >
             <Text style={styles.outroButtonText}>Back to {world.name}</Text>
           </Pressable>
-        </AivoCard>
+        </Card>
       )}
     </ScrollView>
   );
@@ -307,28 +309,28 @@ export default function QuestPlayScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
-  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
-  title: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  backText: { fontSize: 16, fontFamily: fontFamilies.bodySemiBold, color: colors.primary },
+  title: { fontSize: 22, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   subtitle: {
     fontSize: 12,
-    fontFamily: "Nunito-Bold",
-    color: "#6366f1",
+    fontFamily: fontFamilies.bodyBold,
+    color: colors.primary,
     textTransform: "uppercase",
     marginTop: 4,
     marginBottom: spacing.lg,
   },
   introCard: { padding: spacing.md, gap: spacing.md },
-  introBody: { fontSize: 15, fontFamily: "Nunito-Regular", color: colors.text, lineHeight: 22 },
+  introBody: { fontSize: 15, fontFamily: fontFamilies.bodyRegular, color: colors.text, lineHeight: 22 },
   questionCard: { padding: spacing.md, marginBottom: spacing.sm, gap: spacing.xs },
   questionMeta: {
     fontSize: 11,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.textSecondary,
     textTransform: "uppercase",
   },
   questionPrompt: {
     fontSize: 15,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.text,
     marginBottom: spacing.sm,
   },
@@ -341,10 +343,10 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: "center",
   },
-  choiceText: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.text },
+  choiceText: { fontSize: 14, fontFamily: fontFamilies.bodySemiBold, color: colors.text },
   explanation: {
     fontSize: 13,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
@@ -353,7 +355,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: spacing.md,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 2,
     borderColor: colors.border,
@@ -361,11 +363,11 @@ const styles = StyleSheet.create({
   },
   finishLabel: {
     fontSize: 11,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.textSecondary,
     textTransform: "uppercase",
   },
-  finishValue: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  finishValue: { fontSize: 22, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   primaryButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: 10,
@@ -375,39 +377,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  primaryButtonText: { color: "#fff", fontFamily: "Nunito-Bold", fontSize: 14 },
-  outroCard: { padding: spacing.lg, backgroundColor: "#4f46e5", gap: spacing.sm },
+  primaryButtonText: { color: colors.white, fontFamily: fontFamilies.bodyBold, fontSize: 14 },
+  outroCard: { padding: spacing.lg, backgroundColor: colors.primary, gap: spacing.sm },
   celebrateRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   celebrateLabel: {
-    color: "#fff",
-    fontFamily: "Nunito-Bold",
+    color: colors.white,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: 12,
     textTransform: "uppercase",
   },
-  outroScore: { color: "#fff", fontSize: 32, fontFamily: "Nunito-ExtraBold" },
+  outroScore: { color: colors.white, fontSize: 32, fontFamily: fontFamilies.bodyExtraBold },
   outroBody: {
     color: "rgba(255,255,255,0.9)",
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     lineHeight: 20,
   },
   rewardRow: { flexDirection: "row", gap: spacing.lg, marginTop: spacing.sm },
-  rewardValue: { color: "#fff", fontSize: 20, fontFamily: "Nunito-ExtraBold" },
+  rewardValue: { color: colors.white, fontSize: 20, fontFamily: fontFamilies.bodyExtraBold },
   rewardLabel: {
     color: "rgba(255,255,255,0.7)",
     fontSize: 11,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     textTransform: "uppercase",
   },
   alreadyText: {
     color: "rgba(255,255,255,0.7)",
     fontSize: 12,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     marginTop: spacing.xs,
   },
   outroButton: {
     marginTop: spacing.md,
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     paddingHorizontal: spacing.md,
     paddingVertical: 10,
     borderRadius: radius.lg,
@@ -415,16 +417,16 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: "center",
   },
-  outroButtonText: { color: "#4f46e5", fontFamily: "Nunito-Bold", fontSize: 14 },
+  outroButtonText: { color: colors.primary, fontFamily: fontFamilies.bodyBold, fontSize: 14 },
   notFoundTitle: {
     fontSize: 20,
-    fontFamily: "Nunito-ExtraBold",
+    fontFamily: fontFamilies.bodyExtraBold,
     color: colors.text,
     marginTop: spacing.xl,
   },
   notFoundSlug: {
     fontSize: 13,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
