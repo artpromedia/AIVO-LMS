@@ -106,3 +106,60 @@ describe("registerAction role allowlist (no privilege escalation)", () => {
     expect(identityRegister).toHaveBeenCalledWith(expect.objectContaining({ role: "PARENT" }));
   });
 });
+
+describe("registerAction identity-svc failure mapping (friendly error codes)", () => {
+  // Each identity-svc failure status maps to a specific user-facing `error`
+  // code that the signup page turns into a friendly message. A regression in
+  // this mapping would silently show the wrong (or no) message on failure.
+  const CASES = [
+    { status: 409, code: "email_taken" },
+    { status: 400, code: "weak_password" },
+    { status: 502, code: "service_unavailable" },
+    { status: 500, code: "signup_failed" },
+    { status: undefined, code: "signup_failed" },
+  ] as const;
+
+  for (const { status, code } of CASES) {
+    it(`redirects to the signup page with error=${code} for status ${status ?? "(none)"}`, async () => {
+      identityRegister.mockResolvedValueOnce({ kind: "error", status });
+      await expect(registerAction(signupForm({ ...VALID }))).rejects.toThrow(
+        `NEXT_REDIRECT:/signup?error=${code}`,
+      );
+      expect(setAuthSessionCookies).not.toHaveBeenCalled();
+    });
+  }
+
+  it("bounces back to the supplied errorReturn page on failure", async () => {
+    identityRegister.mockResolvedValueOnce({ kind: "error", status: 409 });
+    await expect(
+      registerAction(signupForm({ ...VALID, errorReturn: "/onboarding/signup" })),
+    ).rejects.toThrow("NEXT_REDIRECT:/onboarding/signup?error=email_taken");
+  });
+
+  it("redirects with error=unsupported_role when the session profile is null", async () => {
+    toSessionProfile.mockReturnValueOnce(null);
+    await expect(registerAction(signupForm({ ...VALID }))).rejects.toThrow(
+      "NEXT_REDIRECT:/signup?error=unsupported_role",
+    );
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+});
+
+describe("registerAction client-side input validation (no identity-svc call)", () => {
+  // Bad input must be rejected with error=invalid_input BEFORE any network
+  // call, so identity-svc never sees a malformed registration.
+  const BAD_INPUTS = [
+    { label: "a too-short name", fields: { ...VALID, name: "A" } },
+    { label: "a malformed email", fields: { ...VALID, email: "not-an-email" } },
+    { label: "a too-short password", fields: { ...VALID, password: "short" } },
+  ];
+
+  for (const { label, fields } of BAD_INPUTS) {
+    it(`rejects ${label} with error=invalid_input before calling identity-svc`, async () => {
+      await expect(registerAction(signupForm(fields))).rejects.toThrow(
+        "NEXT_REDIRECT:/signup?error=invalid_input",
+      );
+      expect(identityRegister).not.toHaveBeenCalled();
+    });
+  }
+});
