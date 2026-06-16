@@ -8,7 +8,13 @@
  *   - teacher assignments: newest-first by createdAt.
  */
 import { getStore } from "@/lib/db/store";
-import type { Classroom, Enrollment, School, TeacherAssignment } from "@/lib/db/types";
+import type {
+  CalendarEvent,
+  Classroom,
+  Enrollment,
+  School,
+  TeacherAssignment,
+} from "@/lib/db/types";
 import type { AdminStore } from "../types";
 
 export const memoryAdmin: AdminStore = {
@@ -83,5 +89,19 @@ export const memoryAdmin: AdminStore = {
     if (!a || a.tenantId !== tenantId || a.teacherId !== teacherId) return false;
     store.teacherAssignments.delete(assignmentId);
     return true;
+  },
+
+  async listCalendarEventsForTeacher(teacherUserId, tenantId, opts): Promise<CalendarEvent[]> {
+    let arr = Array.from(getStore().calendarEvents.values()).filter(
+      (e) => e.tenantId === tenantId && e.teacherUserId === teacherUserId,
+    );
+    if (opts?.fromIso) arr = arr.filter((e) => e.date >= opts.fromIso!);
+    arr = arr.sort((a, b) => a.date.localeCompare(b.date));
+    return opts?.limit ? arr.slice(0, opts.limit) : arr;
+  },
+
+  async upsertCalendarEvent(event: CalendarEvent) {
+    getStore().calendarEvents.set(event.id, event);
+    return event;
   },
 };

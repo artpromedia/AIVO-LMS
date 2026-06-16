@@ -101,6 +101,7 @@ import type {
   AudioCacheEntry,
   School,
   Classroom,
+  CalendarEvent,
   Course,
   Enrollment,
   RosterImportJob,
@@ -264,6 +265,8 @@ export type Store = {
   // Sprint 29: Rostering / SIS / Sync / Notifications
   schools: Map<string, School>;
   classrooms: Map<string, Classroom>;
+  /** Sprint A4: teacher personal-calendar events (teacher-home "Upcoming"). */
+  calendarEvents: Map<string, CalendarEvent>;
   courses: Map<string, Course>;
   enrollments: Map<string, Enrollment>;
   rosterImportJobs: Map<string, RosterImportJob>;
@@ -425,6 +428,7 @@ function createStore(): Store {
     audioCacheEntries: new Map(),
     schools: new Map(),
     classrooms: new Map(),
+    calendarEvents: new Map(),
     courses: new Map(),
     enrollments: new Map(),
     rosterImportJobs: new Map(),

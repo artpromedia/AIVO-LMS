@@ -1540,6 +1540,10 @@ export type TeacherAssignment = {
   learnerIds: ID[];
   status: "active" | "archived";
   dueAt: ISODate | null;
+  /** Sprint A4: learner submissions received (teacher-home grading queue). */
+  submissions?: number;
+  /** Sprint A4: submissions the teacher has graded. */
+  graded?: number;
   createdAt: ISODate;
   updatedAt: ISODate;
 };
@@ -2339,6 +2343,16 @@ export type School = {
   createdAt: ISODate;
 };
 
+/** A class meeting slot (teacher home "Today's classes" schedule line). */
+export type ClassroomSchedule = {
+  /** Display start, e.g. "8:15 AM". */
+  startTime: string;
+  /** Display end, e.g. "9:00 AM". */
+  endTime: string;
+  /** Weekday codes the class meets, e.g. ["Mon","Wed","Fri"]. */
+  days: string[];
+};
+
 export type Classroom = {
   id: ID;
   tenantId: ID;
@@ -2350,6 +2364,43 @@ export type Classroom = {
   teacherUserId: ID;
   /** Optional course id; one course can run across many classrooms. */
   courseId: ID | null;
+  /** Sprint A4: subject this class teaches (drives the class-card glyph). */
+  subjectId?: ID | null;
+  /** Sprint A4: optional meeting time for the teacher-home schedule. */
+  schedule?: ClassroomSchedule | null;
+  /** Sprint A4: current unit focus, e.g. "Story elements". */
+  focusArea?: string | null;
+  /** Sprint A4: today's lesson topic, e.g. "Character analysis". */
+  todayTopic?: string | null;
+  createdAt: ISODate;
+};
+
+/** Teacher personal-calendar event kind (teacher home "Upcoming"). */
+export type CalendarEventType =
+  | "professional_development"
+  | "assessment"
+  | "iep_meeting"
+  | "holiday"
+  | "event";
+
+/**
+ * Sprint A4: a teacher's personal calendar entry — staff PD, unit
+ * assessments, IEP meetings, holidays. Powers the teacher-home "Upcoming"
+ * rail. Web-owned row (no microservice system-of-record yet).
+ */
+export type CalendarEvent = {
+  id: ID;
+  tenantId: ID;
+  /** Owning teacher (user id). */
+  teacherUserId: ID;
+  title: string;
+  /** Secondary line, e.g. "4th Grade – Math", a learner name, or "No school". */
+  subtitle: string | null;
+  type: CalendarEventType;
+  /** Event date (ISO, used for the day chip + ordering). */
+  date: ISODate;
+  /** Display time, e.g. "10:00 AM" or "All day". */
+  timeLabel: string;
   createdAt: ISODate;
 };
 

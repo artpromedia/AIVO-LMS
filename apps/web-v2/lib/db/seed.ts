@@ -11,6 +11,12 @@ import type {
   BaselineAssessment,
   ParentAssessment,
   SkillMastery,
+  MasterySnapshot,
+  AuditLog,
+  CalendarEvent,
+  TeacherAssignment,
+  Classroom,
+  Enrollment,
   LearningPathNode,
   LessonRun,
   ParentLearnerRelationship,
@@ -1813,13 +1819,11 @@ export function ensureSeeded(): void {
     schoolName: string;
     teacherUserId: string;
   };
+  // NOTE: t_demo's school/classrooms are seeded richly by
+  // seedTeacherHomeDemo() below (3 timetabled classes for the teacher-home
+  // redesign), so it is intentionally excluded here to avoid a 4th "Room 4A"
+  // class showing up on the teacher dashboard.
   const SCHOOLS: SeedSchoolSpec[] = [
-    {
-      tenantId: "t_demo",
-      schoolId: "sch_demo_main",
-      schoolName: "AIVO Demo Elementary",
-      teacherUserId: "u_teacher_1",
-    },
     {
       tenantId: "t_school_demo",
       schoolId: "sch_school_demo",
@@ -3104,7 +3108,365 @@ export function ensureSeeded(): void {
 
   if (demoJourneySeedEnabled()) seedSkyDemoJourney(store);
 
+  seedTeacherHomeDemo(store);
+
   store.seeded = true;
+}
+
+/**
+ * Sprint A4 — Teacher-home demo data for the mock demo teacher
+ * (u_teacher_1 / t_demo). Builds three timetabled classes (Reading / ELA /
+ * Math) with a realistic spread of learners, per-skill mastery, mastery
+ * snapshots (so the class-average shows a real delta), an audit trail of
+ * recent lesson completions, a handful of assignments (some awaiting
+ * grading), and upcoming calendar events. Everything the teacher home reads
+ * is sourced from these rows — no values are hard-coded in the UI.
+ */
+function seedTeacherHomeDemo(store: ReturnType<typeof getStore>): void {
+  const tenantId = "t_demo";
+  const teacherUserId = "u_teacher_1";
+  const schoolId = "sch_demo_main";
+
+  const day = 86400_000;
+  const isoDaysAgo = (n: number) => new Date(Date.now() - n * day).toISOString();
+  const isoDaysAhead = (n: number) => new Date(Date.now() + n * day).toISOString();
+  const dateOnlyAhead = (n: number) =>
+    new Date(Date.now() + n * day).toISOString().slice(0, 10);
+
+  const skillBySlug = new Map<string, Skill>();
+  for (const s of store.skills.values()) skillBySlug.set(s.slug, s);
+  const subjects = Array.from(store.subjects.values());
+  const subjectBySlug = new Map(subjects.map((s) => [s.slug, s]));
+
+  const levelFor = (score: number): SkillMastery["level"] =>
+    score >= 0.85
+      ? "stretching"
+      : score >= 0.65
+        ? "on_grade_level"
+        : score >= 0.4
+          ? "approaching"
+          : score > 0
+            ? "emerging"
+            : "not_started";
+
+  store.schools.set(schoolId, {
+    id: schoolId,
+    tenantId,
+    name: "AIVO Demo Elementary",
+    externalId: null,
+    gradeBands: ["K-2", "3-5"],
+    city: "Demo City",
+    state: "DE",
+    createdAt: nowIso(),
+  });
+
+  // Three classes, each pinned to a subject + skill pool so mastery is real.
+  type ClassSpec = {
+    id: string;
+    name: string;
+    subjectSlug: string;
+    skillSlugs: string[];
+    focusArea: string;
+    todayTopic: string;
+    schedule: { startTime: string; endTime: string; days: string[] };
+    /** Number of enrolled learners. */
+    count: number;
+    /** Fraction (0..1) of learners that should land on-track (mean ≥ 0.6). */
+    onTrack: number;
+  };
+  const CLASS_SPECS: ClassSpec[] = [
+    {
+      id: "cls_demo_reading",
+      name: "2nd Grade – Reading",
+      subjectSlug: "reading",
+      skillSlugs: ["phonics-cvc", "sight-words-50", "story-sequence", "main-idea"],
+      focusArea: "Story elements",
+      todayTopic: "Character analysis",
+      schedule: { startTime: "8:15 AM", endTime: "9:00 AM", days: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
+      count: 18,
+      onTrack: 0.7,
+    },
+    {
+      id: "cls_demo_ela",
+      name: "3rd Grade – ELA",
+      subjectSlug: "writing",
+      skillSlugs: ["trace-letters", "simple-sentence"],
+      focusArea: "Sentence building",
+      todayTopic: "Compound sentences",
+      schedule: { startTime: "9:15 AM", endTime: "10:00 AM", days: ["Mon", "Wed", "Fri"] },
+      count: 22,
+      onTrack: 0.64,
+    },
+    {
+      id: "cls_demo_math",
+      name: "2nd Grade – Math",
+      subjectSlug: "math",
+      skillSlugs: ["count-to-20", "add-within-10", "place-value-10s", "subtract-within-20"],
+      focusArea: "Place value",
+      todayTopic: "Regrouping tens",
+      schedule: { startTime: "1:00 PM", endTime: "1:45 PM", days: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
+      count: 20,
+      onTrack: 0.58,
+    },
+  ];
+
+  // Deterministic first-name pool (cycles with a numeric suffix if exhausted).
+  const NAME_POOL = [
+    "Ava", "Mason", "Sofia", "Ethan", "Mia", "Lucas", "Harper", "Noah",
+    "Liam", "Emma", "Oliver", "Isabella", "James", "Charlotte", "Ben", "Amelia",
+    "Jack", "Lily", "Henry", "Grace", "Leo", "Chloe", "Owen", "Zoe",
+    "Aiden", "Nora", "Caleb", "Ruby", "Eli", "Hazel", "Max", "Ivy",
+    "Sam", "Ella", "Theo", "Layla", "Finn", "Aria", "Cole", "Maya",
+    "Jude", "Stella", "Reid", "Eva", "Kai", "Luna", "Asa", "Nina",
+  ];
+  let nameCursor = 0;
+  const nextName = (): string => {
+    const base = NAME_POOL[nameCursor % NAME_POOL.length]!;
+    const wrap = Math.floor(nameCursor / NAME_POOL.length);
+    nameCursor += 1;
+    return wrap === 0 ? base : `${base} ${"BCDEFG"[wrap - 1] ?? wrap}.`;
+  };
+
+  // Build a target-mean per learner that yields the requested on-track ratio:
+  // on-track learners spread across 0.62–0.92, the rest across 0.24–0.58 (so
+  // both "needs support" and "at risk" buckets are populated).
+  const buildTargets = (count: number, onTrack: number): number[] => {
+    const onCount = Math.round(count * onTrack);
+    const targets: number[] = [];
+    for (let i = 0; i < count; i += 1) {
+      if (i < onCount) {
+        const t = onCount > 1 ? i / (onCount - 1) : 0;
+        targets.push(0.62 + t * 0.3);
+      } else {
+        const j = i - onCount;
+        const m = count - onCount;
+        const t = m > 1 ? j / (m - 1) : 0;
+        targets.push(0.58 - t * 0.34);
+      }
+    }
+    return targets;
+  };
+
+  // Teacher self-enrollment + classrooms.
+  for (const spec of CLASS_SPECS) {
+    const subject = subjectBySlug.get(spec.subjectSlug) ?? subjects[0];
+    const classroom: Classroom = {
+      id: spec.id,
+      tenantId,
+      schoolId,
+      name: spec.name,
+      gradeBand: "3-5",
+      teacherUserId,
+      courseId: null,
+      subjectId: subject?.id ?? null,
+      schedule: spec.schedule,
+      focusArea: spec.focusArea,
+      todayTopic: spec.todayTopic,
+      createdAt: nowIso(),
+    };
+    store.classrooms.set(classroom.id, classroom);
+
+    const teacherEnr: Enrollment = {
+      id: `enr_${spec.id}_teacher`,
+      tenantId,
+      classroomId: spec.id,
+      subjectId: teacherUserId,
+      role: "teacher",
+      createdAt: nowIso(),
+    };
+    store.enrollments.set(teacherEnr.id, teacherEnr);
+
+    const skillIds = spec.skillSlugs
+      .map((sl) => skillBySlug.get(sl))
+      .filter((s): s is Skill => Boolean(s));
+
+    const targets = buildTargets(spec.count, spec.onTrack);
+    targets.forEach((target, i) => {
+      const first = nextName();
+      const learnerId = `lrn_${spec.id}_${i}`;
+      const learner: LearnerProfile = {
+        id: learnerId,
+        tenantId,
+        displayName: first,
+        firstName: first,
+        preferredName: null,
+        birthYear: new Date().getFullYear() - 8,
+        pronouns: "they/them",
+        ageRange: "5-7",
+        gradeBand: "3-5",
+        schoolContext: "in_school",
+        primaryLanguage: "English",
+        readingComfort: "growing",
+        mathComfort: "growing",
+        knownStrengths: [],
+        knownChallenges: [],
+        accessibilityDefaults: {
+          reducedMotion: false,
+          highContrast: false,
+          largeText: false,
+          audioFirst: false,
+          captionsAlwaysOn: false,
+        },
+        zipCode: null,
+        districtId: null,
+        districtName: null,
+        functioningLevel: "standard",
+        readinessState: "active_learning",
+        iepDecision: "skipped",
+        createdAt: nowIso(),
+      };
+      store.learnerProfiles.set(learnerId, learner);
+
+      const enr: Enrollment = {
+        id: `enr_${learnerId}`,
+        tenantId,
+        classroomId: spec.id,
+        subjectId: learnerId,
+        role: "learner",
+        createdAt: nowIso(),
+      };
+      store.enrollments.set(enr.id, enr);
+
+      // Per-skill mastery centred on the learner's target mean, with a small
+      // spread so the weakest skill (struggling-with) is deterministic.
+      skillIds.forEach((skill, si) => {
+        const offset = (si - (skillIds.length - 1) / 2) * 0.08;
+        const score = Math.max(0.05, Math.min(0.97, target + offset));
+        store.skillMasteries.push({
+          learnerId,
+          skillId: skill.id,
+          subjectId: skill.subjectId,
+          tenantId,
+          confidence: 0.6,
+          level: levelFor(score),
+          score,
+          needsReview: score < 0.4,
+          lastEvaluatedAt: isoDaysAgo(1 + (i % 5)),
+        });
+      });
+
+      // Two mastery snapshots (prior → current) so the class-average KPI
+      // shows a real positive delta.
+      if (subject) {
+        const cur = target;
+        const prev = Math.max(0.05, target - 0.06);
+        const snapPrev: MasterySnapshot = {
+          id: `ms_${learnerId}_prev`,
+          learnerId,
+          tenantId,
+          subjectId: subject.id,
+          capturedAt: isoDaysAgo(30),
+          averageScore: prev,
+          level: levelFor(prev),
+          skillsOnGradeLevel: prev >= 0.65 ? skillIds.length : 0,
+          skillsTotal: skillIds.length,
+          deliveryLevel: "3-5",
+          gradeBand: "3-5",
+          trigger: "lesson",
+        };
+        const snapCur: MasterySnapshot = {
+          ...snapPrev,
+          id: `ms_${learnerId}_cur`,
+          capturedAt: isoDaysAgo(1),
+          averageScore: cur,
+          level: levelFor(cur),
+          skillsOnGradeLevel: cur >= 0.65 ? skillIds.length : 0,
+        };
+        store.masterySnapshots.push(snapPrev, snapCur);
+      }
+
+      // Recent-activity audit trail: top learners in each class logged a
+      // completion in the last few days.
+      if (i < 2 && skillIds[0]) {
+        const skill = skillIds[Math.min(i, skillIds.length - 1)]!;
+        const log: AuditLog = {
+          id: `aud_${learnerId}_done`,
+          userId: null,
+          tenantId,
+          learnerId,
+          action: "lesson.completed",
+          metadata: { learnerName: first, skillName: skill.name },
+          requestId: `seed-${learnerId}`,
+          occurredAt: isoDaysAgo(i + 1),
+        };
+        store.auditLogs.push(log);
+      }
+    });
+  }
+
+  // Assignments: a spread of active work; two are awaiting grading.
+  const readingSubject = subjectBySlug.get("reading") ?? subjects[0];
+  const mathSubject = subjectBySlug.get("math") ?? subjects[0];
+  const ASSIGNMENTS: Array<{
+    title: string;
+    subjectId: string;
+    dueInDays: number;
+    submissions?: number;
+    graded?: number;
+  }> = [
+    { title: "Story elements worksheet", subjectId: readingSubject?.id ?? "", dueInDays: 2, submissions: 18, graded: 6 },
+    { title: "Sight words quiz", subjectId: readingSubject?.id ?? "", dueInDays: 4 },
+    { title: "Reading log – week 12", subjectId: readingSubject?.id ?? "", dueInDays: 1 },
+    { title: "Place value practice set", subjectId: mathSubject?.id ?? "", dueInDays: 3, submissions: 16, graded: 9 },
+    { title: "Addition fluency check", subjectId: mathSubject?.id ?? "", dueInDays: 5 },
+    { title: "Subtraction word problems", subjectId: mathSubject?.id ?? "", dueInDays: 6 },
+    { title: "Compound sentences exit ticket", subjectId: readingSubject?.id ?? "", dueInDays: 2 },
+  ];
+  ASSIGNMENTS.forEach((a, i) => {
+    const assignment: TeacherAssignment = {
+      id: `ta_demo_${i}`,
+      tenantId,
+      teacherId: teacherUserId,
+      classId: null,
+      title: a.title,
+      instructions: "Seeded demo assignment.",
+      subjectId: a.subjectId,
+      skillIds: [],
+      learnerIds: [],
+      status: "active",
+      dueAt: isoDaysAhead(a.dueInDays),
+      ...(a.submissions != null ? { submissions: a.submissions } : {}),
+      ...(a.graded != null ? { graded: a.graded } : {}),
+      createdAt: isoDaysAgo(7 - (i % 5)),
+      updatedAt: isoDaysAgo(1),
+    };
+    store.teacherAssignments.set(assignment.id, assignment);
+  });
+
+  // Upcoming calendar events.
+  const EVENTS: Array<Omit<CalendarEvent, "id" | "tenantId" | "teacherUserId" | "createdAt">> = [
+    {
+      title: "Staff PD: Sensory supports",
+      subtitle: "Library · All staff",
+      type: "professional_development",
+      date: dateOnlyAhead(2),
+      timeLabel: "3:30 PM",
+    },
+    {
+      title: "Science Unit Test",
+      subtitle: "2nd Grade – Reading",
+      type: "assessment",
+      date: dateOnlyAhead(4),
+      timeLabel: "10:00 AM",
+    },
+    {
+      title: "IEP Meeting",
+      subtitle: "Owen Carter",
+      type: "iep_meeting",
+      date: dateOnlyAhead(7),
+      timeLabel: "1:00 PM",
+    },
+  ];
+  EVENTS.forEach((e, i) => {
+    const ev: CalendarEvent = {
+      id: `cal_demo_${i}`,
+      tenantId,
+      teacherUserId,
+      createdAt: nowIso(),
+      ...e,
+    };
+    store.calendarEvents.set(ev.id, ev);
+  });
 }
 
 /**

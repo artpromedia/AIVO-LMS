@@ -1,5 +1,6 @@
 - [Replit workflow port detection](replit-workflow-ports.md) — supervisor only sees ports declared as `localPort` in `.replit`; bind that exact port and set `waitForPort` to it.
 - [Importing a remote branch when object writes are blocked](remote-branch-import-when-object-writes-blocked.md) — all .git/objects writes are guarded (fetch/merge impossible); pull a public branch via GitHub compare API + raw downloads.
+- [admin-svc overview tenant authz](admin-svc-overview-tenant-authz.md) — overview routes must re-check JWT tenantId against the :id path param (PLATFORM_ADMIN exempt) or it's a cross-tenant IDOR.
 - [web-admin console tokens & palette](admin-console-tokens.md) — web-admin doesn't load brand tokens.css (iw-*/brand-* don't resolve); admin chart palette is its own brand emission; hex ban skips web-admin; ⌘K palette scope = tenants/users/learners.
 - [Stage elevation state](stage-elevation-state.md) — production Stage already robot-themed; legacy emoji host lived only in unused @aivo/stage-ui TutorCharacter; mobile host has no tutor slug.
 - [AIVO robot family — companion + 14 tutors](aivo-stage-companion.md) — one chibi-3D robot family: purple companion + all 14 tutor avatars (recolor + subject motif) at /images/tutors/{key}.png; no more human portraits.

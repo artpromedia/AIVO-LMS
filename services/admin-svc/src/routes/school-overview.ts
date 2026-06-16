@@ -41,20 +41,30 @@ const FUNCTIONING_LEVELS: Array<{ key: string; label: string }> = [
 
 /**
  * RBAC: allowed for SCHOOL_ADMIN, DISTRICT_ADMIN, PLATFORM_ADMIN.
- * Note: finer school-ownership scoping (which `:schoolId` a caller may read) is
- * enforced at the BFF/identity layer — the web-admin BFF only ever calls this
- * with the caller's own `session.tenantId`. Mirrors the classroom routes.
+ *
+ * Tenant ownership: the web-admin BFF only ever calls this with the caller's
+ * own `session.tenantId` as `:schoolId`, so a SCHOOL_ADMIN/DISTRICT_ADMIN is
+ * pinned to their own tenant — requesting any other `:schoolId` is refused
+ * (closes the IDOR). PLATFORM_ADMIN is intentionally allowed cross-tenant.
  */
-async function requireSchoolAdmin(req: any, reply: any) {
+async function requireSchoolAdmin(req: any, reply: any, schoolId: string) {
   const auth = req.headers.authorization as string | undefined;
   if (!auth?.startsWith("Bearer ")) {
     reply.code(401).send({ error: "missing_bearer_token" });
     return null;
   }
   try {
-    const payload = (await verifyJWT(auth.slice(7).trim())) as { sub: string; role: string };
+    const payload = (await verifyJWT(auth.slice(7).trim())) as {
+      sub: string;
+      role: string;
+      tenantId: string;
+    };
     if (!ALLOWED_ROLES.has(payload.role)) {
       reply.code(403).send({ error: "forbidden", required_roles: [...ALLOWED_ROLES] });
+      return null;
+    }
+    if (payload.role !== "PLATFORM_ADMIN" && payload.tenantId !== schoolId) {
+      reply.code(403).send({ error: "forbidden_cross_tenant" });
       return null;
     }
     return payload;
@@ -81,9 +91,9 @@ export function registerSchoolOverviewRoutes(app: FastifyInstance, db: any) {
   app.get<{ Params: { schoolId: string } }>(
     "/admin/schools/:schoolId/overview",
     async (req, reply) => {
-      const actor = await requireSchoolAdmin(req, reply);
-      if (!actor) return;
       const { schoolId } = req.params;
+      const actor = await requireSchoolAdmin(req, reply, schoolId);
+      if (!actor) return;
       const now = new Date();
       const termSince = new Date(now.getTime() - (TERM_WINDOW_DAYS - 1) * DAY_MS);
       termSince.setUTCHours(0, 0, 0, 0);

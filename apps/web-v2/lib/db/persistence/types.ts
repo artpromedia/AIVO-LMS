@@ -57,6 +57,7 @@ import type {
   TTSGenerationJob,
   TutorResponseAudit,
   Classroom,
+  CalendarEvent,
   Course,
   Coupon,
   DailyBillingBatch,
@@ -704,6 +705,15 @@ export interface AdminStore {
     teacherId: string,
     tenantId: string,
   ): Promise<boolean>;
+
+  // Calendar events (teacher personal calendar — teacher home "Upcoming")
+  /** Events owned by a teacher, ascending by date; `fromIso` keeps upcoming. */
+  listCalendarEventsForTeacher(
+    teacherUserId: string,
+    tenantId: string,
+    opts?: { fromIso?: string; limit?: number },
+  ): Promise<CalendarEvent[]>;
+  upsertCalendarEvent(event: CalendarEvent): Promise<CalendarEvent>;
 }
 
 /**

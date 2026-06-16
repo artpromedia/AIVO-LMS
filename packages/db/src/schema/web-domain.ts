@@ -407,6 +407,18 @@ export const webTeacherAssignments = pgTable(
   (t) => ({ idx: index("web_teacher_assignments_idx").on(t.teacherId, t.tenantId) }),
 );
 
+// Sprint A4: teacher personal-calendar events (teacher home "Upcoming").
+export const webCalendarEvents = pgTable(
+  "web_calendar_events",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    teacherUserId: text("teacher_user_id").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({ idx: index("web_calendar_events_teacher_idx").on(t.tenantId, t.teacherUserId) }),
+);
+
 // ===== Collaboration (Sprint 4) =====
 // web-v2's own durable store for collaborator perspectives + accepted
 // members, used by the pre-build invite step and the brain builder. Mirrors
