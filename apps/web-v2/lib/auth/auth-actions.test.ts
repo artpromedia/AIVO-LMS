@@ -29,10 +29,12 @@ vi.mock("@/lib/env", () => ({
 }));
 
 const identityRegister = vi.fn();
+const identityLogin = vi.fn();
 const extractRefreshToken = vi.fn((..._a: unknown[]) => "refresh_tok");
 const toSessionProfile = vi.fn();
 vi.mock("@/lib/auth/identity-client", () => ({
   identityRegister: (...a: unknown[]) => identityRegister(...a),
+  identityLogin: (...a: unknown[]) => identityLogin(...a),
   extractRefreshToken: (...a: unknown[]) => extractRefreshToken(...a),
   toSessionProfile: (...a: unknown[]) => toSessionProfile(...a),
 }));
@@ -42,7 +44,7 @@ vi.mock("@/lib/auth/session-cookies", () => ({
   setAuthSessionCookies: (...a: unknown[]) => setAuthSessionCookies(...a),
 }));
 
-import { registerAction } from "./auth-actions";
+import { registerAction, onboardingSignInAction } from "./auth-actions";
 
 function signupForm(fields: Record<string, string>): FormData {
   const f = new FormData();
@@ -59,6 +61,12 @@ const VALID = {
 beforeEach(() => {
   vi.clearAllMocks();
   identityRegister.mockResolvedValue({
+    kind: "ok",
+    user: { id: "u_1", email: VALID.email, name: VALID.name, role: "PARENT", tenantId: "t_1" },
+    accessToken: "access_tok",
+    setCookies: [],
+  });
+  identityLogin.mockResolvedValue({
     kind: "ok",
     user: { id: "u_1", email: VALID.email, name: VALID.name, role: "PARENT", tenantId: "t_1" },
     accessToken: "access_tok",
@@ -203,4 +211,131 @@ describe("registerAction client-side input validation (no identity-svc call)", (
       expect(identityRegister).not.toHaveBeenCalled();
     });
   }
+});
+
+function signinForm(fields: Record<string, string>): FormData {
+  const f = new FormData();
+  for (const [k, v] of Object.entries(fields)) f.set(k, v);
+  return f;
+}
+
+const SIGNIN = { email: "sam@example.com", password: "S3cure-Signup-Pass!9" };
+
+describe("onboardingSignInAction identity-svc failure mapping (friendly error codes)", () => {
+  // Each identity-svc sign-in failure status maps to a specific user-facing
+  // `error` code that the onboarding sign-in page turns into a friendly
+  // message. A regression here would silently show the wrong (or no) message
+  // to a user who fails to sign in.
+  const CASES = [
+    { status: 401, code: "invalid_credentials" },
+    { status: 403, code: "wrong_surface" },
+    { status: 500, code: "login_failed" },
+    { status: 502, code: "login_failed" },
+  ] as const;
+
+  for (const { status, code } of CASES) {
+    it(`redirects to the sign-in page with error=${code} for status ${status}`, async () => {
+      identityLogin.mockResolvedValueOnce({ kind: "error", status });
+      await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
+        `NEXT_REDIRECT:/onboarding/signin?error=${code}`,
+      );
+      expect(setAuthSessionCookies).not.toHaveBeenCalled();
+    });
+  }
+
+  it("bounces back to the supplied errorReturn page on failure", async () => {
+    identityLogin.mockResolvedValueOnce({ kind: "error", status: 401 });
+    await expect(
+      onboardingSignInAction(signinForm({ ...SIGNIN, errorReturn: "/login" })),
+    ).rejects.toThrow("NEXT_REDIRECT:/login?error=invalid_credentials");
+  });
+
+  it("redirects with error=unsupported_role when the session profile is null", async () => {
+    toSessionProfile.mockReturnValueOnce(null);
+    await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/onboarding/signin?error=unsupported_role",
+    );
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+});
+
+describe("onboardingSignInAction missing-credential validation (no identity-svc call)", () => {
+  // Missing email or password must be rejected with error=missing_credentials
+  // BEFORE any network call, so identity-svc never sees an empty login.
+  const MISSING: { label: string; fields: Record<string, string> }[] = [
+    { label: "a missing email", fields: { password: SIGNIN.password } },
+    { label: "a missing password", fields: { email: SIGNIN.email } },
+    { label: "both credentials missing", fields: {} },
+  ];
+
+  for (const { label, fields } of MISSING) {
+    it(`rejects ${label} with error=missing_credentials before calling identity-svc`, async () => {
+      await expect(onboardingSignInAction(signinForm(fields))).rejects.toThrow(
+        "NEXT_REDIRECT:/onboarding/signin?error=missing_credentials",
+      );
+      expect(identityLogin).not.toHaveBeenCalled();
+    });
+  }
+});
+
+describe("onboardingSignInAction MFA challenge branch", () => {
+  it("stashes the MFA challenge cookie and redirects to /login/mfa", async () => {
+    identityLogin.mockResolvedValueOnce({
+      kind: "mfa",
+      mfaToken: "mfa_tok_123",
+      mfaMethod: "email",
+    });
+    await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/login/mfa",
+    );
+    expect(cookieSet).toHaveBeenCalledTimes(1);
+    const [cookieName, cookieValue] = cookieSet.mock.calls[0];
+    expect(cookieName).toBe("aivo_mfa_challenge");
+    expect(JSON.parse(decodeURIComponent(cookieValue as string))).toEqual({
+      token: "mfa_tok_123",
+      method: "email",
+    });
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+});
+
+describe("onboardingSignInAction safe-surface 403 redirect", () => {
+  it("forwards to a safe same-origin redirectTo instead of error=wrong_surface", async () => {
+    identityLogin.mockResolvedValueOnce({
+      kind: "error",
+      status: 403,
+      redirectTo: "/admin/portal",
+    });
+    await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/admin/portal",
+    );
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+
+  it("falls back to error=wrong_surface when redirectTo is unsafe (off-site)", async () => {
+    identityLogin.mockResolvedValueOnce({
+      kind: "error",
+      status: 403,
+      redirectTo: "https://evil.example.com/phish",
+    });
+    await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/onboarding/signin?error=wrong_surface",
+    );
+  });
+});
+
+describe("onboardingSignInAction successful sign-in", () => {
+  it("redirects to the supplied next destination and sets session cookies", async () => {
+    await expect(
+      onboardingSignInAction(signinForm({ ...SIGNIN, next: "/onboarding/parent-setup" })),
+    ).rejects.toThrow("NEXT_REDIRECT:/onboarding/parent-setup");
+    expect(setAuthSessionCookies).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls back to the role home when no next is supplied", async () => {
+    await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/parent/home",
+    );
+    expect(setAuthSessionCookies).toHaveBeenCalledTimes(1);
+  });
 });
