@@ -53,6 +53,8 @@ export function renderTemplate(
       return renderCollaborationInvite(data);
     case "password_reset":
       return renderPasswordReset(data);
+    case "verify_email":
+      return renderVerifyEmail(data);
     case "progress_report":
       return renderProgressReport(data);
     case "milestone_achieved":
@@ -178,6 +180,21 @@ function renderPasswordReset(data: TemplateData) {
     subject: "Reset your AIVO password",
     html,
     text: `Reset your password by visiting: ${data.resetUrl || "#"}. This link expires in 1 hour.`,
+  };
+}
+
+function renderVerifyEmail(data: TemplateData) {
+  const name = (data.name as string) || "there";
+  const html = baseLayout(`
+    <h1 class="title">Confirm your email</h1>
+    <p class="body-text">Hi ${name}, thanks for joining ${BRAND_NAME}. Please confirm this is your email address so we can keep your account secure and send you important updates about your child's learning.</p>
+    <p style="text-align:center"><a href="${data.verifyUrl || "#"}" class="btn">Confirm Email</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">This link expires in 24 hours. If you didn't create an ${BRAND_NAME} account, you can safely ignore this email.</p>
+  `);
+  return {
+    subject: `Confirm your ${BRAND_NAME} email`,
+    html,
+    text: `Confirm your email for ${BRAND_NAME} by visiting: ${data.verifyUrl || "#"}. This link expires in 24 hours.`,
   };
 }
 
@@ -913,6 +930,7 @@ export const AVAILABLE_TEMPLATES = [
   { id: "welcome", name: "Welcome Email", channels: ["email"] },
   { id: "collaboration_invite", name: "Collaboration Invite", channels: ["email"] },
   { id: "password_reset", name: "Password Reset", channels: ["email"] },
+  { id: "verify_email", name: "Email Verification", channels: ["email"] },
   { id: "progress_report", name: "Weekly Progress Report", channels: ["email"] },
   { id: "milestone_achieved", name: "Milestone Achievement", channels: ["email", "push"] },
   { id: "session_reminder", name: "Session Reminder", channels: ["push", "email"] },

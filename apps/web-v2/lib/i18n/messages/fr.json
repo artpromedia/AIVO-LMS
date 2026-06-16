@@ -1822,7 +1822,8 @@
       },
       "notices": {
         "password_reset": "Votre mot de passe a été réinitialisé. Connectez-vous avec votre nouveau mot de passe.",
-        "logged_out": "Vous avez été déconnecté."
+        "logged_out": "Vous avez été déconnecté.",
+        "email_verified": "Your email is confirmed — you can sign in now."
       },
       "continue_with_sso": "Continuer avec {idp}",
       "sso_required_note": "Votre district se connecte via {idp}. La connexion par mot de passe est désactivée pour ce domaine.",
@@ -1994,6 +1995,31 @@
       "enroll_cta": "Configurer l'authentificateur",
       "error_invalid_code": "Ce code est incorrect ou expiré.",
       "error_network": "Erreur réseau — veuillez réessayer."
+    },
+    "verify": {
+      "heading": "Confirm your email",
+      "errors": {
+        "missing_token": "This confirmation link is missing its security token. Request a new link below.",
+        "missing_email": "Enter the email address you signed up with so we can send a new link.",
+        "invalid_token": "This confirmation link has expired or has already been used. Request a new one to continue.",
+        "verify_failed": "We couldn’t confirm your email just now. Please try again in a moment.",
+        "mock_mode": "Email verification is disabled in mock mode. Run with AUTH_MODE=custom and the identity service to test this flow."
+      },
+      "notices": {
+        "resent": "If that account exists and still needs confirming, a new link is on its way."
+      },
+      "confirm_eyebrow": "Almost there",
+      "confirm_title": "Confirm your email address",
+      "confirm_subtitle": "Tap the button below to verify this email and secure your account.",
+      "confirm_submit": "Confirm my email",
+      "no_token_eyebrow": "Confirm email",
+      "no_token_title": "This confirmation link is incomplete",
+      "no_token_subtitle": "The link in your email is missing its security token. Request a new one below.",
+      "no_token_body": "For your security, confirmation links expire after 24 hours and can only be used once.",
+      "resend_email_label": "Email address",
+      "resend_cta": "Send a new link",
+      "resend_help": "We’ll email a fresh confirmation link if the account still needs verifying.",
+      "back_to_login": "Back to sign in"
     }
   },
   "onboarding": {
