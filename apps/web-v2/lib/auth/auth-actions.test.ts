@@ -107,6 +107,47 @@ describe("registerAction role allowlist (no privilege escalation)", () => {
   });
 });
 
+describe("registerAction open-redirect guard (safePath)", () => {
+  // A crafted `next` must never turn the post-signup redirect into an open
+  // redirect: off-site, protocol-relative, and non-path values are rejected
+  // and the user is sent to the safe in-app fallback instead.
+  const HOSTILE_NEXT = [
+    { label: "an off-site absolute URL", value: "https://evil.example" },
+    { label: "a protocol-relative URL", value: "//evil.example" },
+    { label: "a javascript: scheme", value: "javascript:alert(1)" },
+    { label: "a bare host (no leading slash)", value: "evil.example/path" },
+    { label: "a backslash-prefixed path", value: "\\evil.example" },
+  ];
+
+  for (const { label, value } of HOSTILE_NEXT) {
+    it(`ignores ${label} and redirects to the safe fallback`, async () => {
+      await expect(
+        registerAction(signupForm({ ...VALID, next: value })),
+      ).rejects.toThrow("NEXT_REDIRECT:/onboarding/parent-setup");
+      expect(setAuthSessionCookies).toHaveBeenCalledTimes(1);
+    });
+  }
+
+  // The same guard protects `errorReturn`: a tampered value can't bounce the
+  // failure redirect off-site — it falls back to the in-app /signup page.
+  const HOSTILE_ERROR_RETURN = [
+    { label: "an off-site absolute URL", value: "https://evil.example" },
+    { label: "a protocol-relative URL", value: "//evil.example" },
+    { label: "a javascript: scheme", value: "javascript:alert(1)" },
+    { label: "a bare host (no leading slash)", value: "evil.example/path" },
+  ];
+
+  for (const { label, value } of HOSTILE_ERROR_RETURN) {
+    it(`ignores ${label} in errorReturn and bounces to the safe /signup fallback`, async () => {
+      identityRegister.mockResolvedValueOnce({ kind: "error", status: 409 });
+      await expect(
+        registerAction(signupForm({ ...VALID, errorReturn: value })),
+      ).rejects.toThrow("NEXT_REDIRECT:/signup?error=email_taken");
+      expect(setAuthSessionCookies).not.toHaveBeenCalled();
+    });
+  }
+});
+
 describe("registerAction identity-svc failure mapping (friendly error codes)", () => {
   // Each identity-svc failure status maps to a specific user-facing `error`
   // code that the signup page turns into a friendly message. A regression in
