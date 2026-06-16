@@ -265,6 +265,31 @@ export interface LearnerStore {
     parentUserId: string;
     data: CreateLearnerInput;
   }): Promise<LearnerProfile>;
+  /**
+   * Cross-platform unification (Task #34): link an existing web profile to
+   * its canonical identity-svc learner UUID. Returns the updated learner, or
+   * null if the learner doesn't belong to the tenant.
+   */
+  setIdentityLink(
+    id: string,
+    tenantId: string,
+    identityLearnerId: string,
+  ): Promise<LearnerProfile | null>;
+  /**
+   * Cross-platform unification (Task #34): materialize a web profile for a
+   * learner that already exists in identity-svc (e.g. enrolled from mobile),
+   * pre-linked to the canonical UUID, plus the parent's primary relationship.
+   * Used by the BFF reconcile step to surface mobile-origin learners in web.
+   */
+  createFromIdentity(input: {
+    tenantId: string;
+    parentUserId: string;
+    identityLearnerId: string;
+    name: string;
+    birthYear: number;
+    gradeBand?: LearnerProfile["gradeBand"];
+    primaryLanguage?: string | null;
+  }): Promise<LearnerProfile>;
   /** Patch by id. Returns null if the learner doesn't belong to tenant. */
   update(id: string, tenantId: string, patch: PatchLearnerInput): Promise<LearnerProfile | null>;
   /** Hard delete + cascade (relationships, parent assessments). */

@@ -14,6 +14,8 @@ import {
   getIdentityBearer,
   setLearnerPinViaIdentity,
 } from "@/lib/bff/identity-learners";
+import { provisionAndLink } from "@/lib/bff/learner-unification";
+import { getLearner } from "@/lib/db/repos";
 import { advanceOnboarding } from "@/lib/onboarding-state";
 import {
   isValidPin,
@@ -84,7 +86,26 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     // working without standing up the service stack.
     const bearer = await getIdentityBearer();
     if (isIdentitySvcEnabled() && bearer) {
-      const r = await setLearnerPinViaIdentity(bearer, learnerId, pin);
+      // Cross-platform unification (Task #34): identity-svc keys learners by
+      // its own UUID, not the web `lrn_*` id. Resolve (or backfill) the link
+      // so the PIN lands on the canonical learner instead of 404-ing.
+      const profile = await getLearner(learnerId, auth.session.tenantId);
+      const linked = profile
+        ? await provisionAndLink(bearer, profile, auth.session.tenantId)
+        : null;
+      const identityLearnerId = linked?.identityLearnerId;
+      if (!identityLearnerId) {
+        // Could not resolve a canonical learner — fall back to the in-memory
+        // store so the parent can still set a PIN.
+        const meta = setStoredLearnerPin(auth.session.tenantId, learnerId, pin);
+        await advanceOnboarding(learnerId, auth.session.tenantId, "pin_created", auth.session.userId, { via: "memory-fallback" });
+        audit(auth.session, "learner.pin.set", requestId, {
+          learnerId,
+          metadata: { via: "memory-fallback" },
+        });
+        return ok(meta, requestId, { status: 201 });
+      }
+      const r = await setLearnerPinViaIdentity(bearer, identityLearnerId, pin);
       if (!r.ok) return upstreamFail(requestId, r.status, r.error);
       await advanceOnboarding(learnerId, auth.session.tenantId, "pin_created", auth.session.userId, { via: "identity-svc" });
       audit(auth.session, "learner.pin.set", requestId, {

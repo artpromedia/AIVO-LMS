@@ -20,7 +20,7 @@
  * 0–100) and are normalized to [0, 1] before the EWMA applies.
  */
 import { and, eq, sql } from "drizzle-orm";
-import { webSkills, webSkillMasteries, webMasteryMaps } from "@aivo/db";
+import { webSkills, webSkillMasteries, webMasteryMaps, webLearnerProfiles } from "@aivo/db";
 import {
   masteryLevelFromScore,
   moveMasteryScore,
@@ -51,6 +51,37 @@ export function normalizeMasteryScore(raw: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
+/**
+ * Cross-platform unification (Task #34): translate the canonical identity-svc
+ * learner UUID that session completion carries into the web app's own `lrn_*`
+ * profile id. The web mastery store (and the parent/teacher dashboards that
+ * read it) key off the web id, so without this hop a learner enrolled from
+ * mobile (or any session keyed by the identity UUID) would have their mastery
+ * land under an id the web side never reads.
+ *
+ * Returns the linked web id when a profile links this UUID, otherwise the
+ * input id unchanged (web-origin sessions already pass the `lrn_*` id, and the
+ * fallback keeps legacy behavior intact when no link exists yet).
+ */
+export async function resolveWebLearnerId(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+  tenantId: string,
+  learnerId: string,
+): Promise<string> {
+  const [row] = await db
+    .select({ id: webLearnerProfiles.id })
+    .from(webLearnerProfiles)
+    .where(
+      and(
+        eq(webLearnerProfiles.tenantId, tenantId),
+        eq(sql`${webLearnerProfiles.data}->>'identityLearnerId'`, learnerId),
+      ),
+    )
+    .limit(1);
+  return row?.id ?? learnerId;
+}
+
 export async function writeMasteryToWebStore(
   dbLike: DbLike,
   log: LogLike,
@@ -65,6 +96,10 @@ export async function writeMasteryToWebStore(
   const db = dbLike as any;
   const movements: WebMasteryMovement[] = [];
   const now = new Date().toISOString();
+  // Cross-platform unification (Task #34): the inbound learnerId may be the
+  // canonical identity-svc UUID; resolve it to the web `lrn_*` id the mastery
+  // store + dashboards key off (falls back to the input id when unlinked).
+  const learnerId = await resolveWebLearnerId(db, input.tenantId, input.learnerId);
 
   for (const [key, rawScore] of Object.entries(input.updates)) {
     // Join: web_skills by id, else by slug carried in the jsonb payload.
@@ -84,7 +119,7 @@ export async function writeMasteryToWebStore(
       log.info(
         {
           event: "web_mastery.key_unmatched",
-          learnerId: input.learnerId,
+          learnerId,
           key,
         },
         "masteryUpdates key does not join the web skill space; gradebook only",
@@ -98,7 +133,7 @@ export async function writeMasteryToWebStore(
       .from(webSkillMasteries)
       .where(
         and(
-          eq(webSkillMasteries.learnerId, input.learnerId),
+          eq(webSkillMasteries.learnerId, learnerId),
           eq(webSkillMasteries.tenantId, input.tenantId),
           eq(sql`${webSkillMasteries.data}->>'skillId'`, skillRow.id),
         ),
@@ -111,7 +146,7 @@ export async function writeMasteryToWebStore(
     const after = moveMasteryScore(before, target);
 
     const nextRow = {
-      learnerId: input.learnerId,
+      learnerId,
       tenantId: input.tenantId,
       skillId: skillRow.id,
       subjectId: existing?.subjectId ?? skillRow.subjectId ?? "unknown",
@@ -124,19 +159,19 @@ export async function writeMasteryToWebStore(
     // Delete-then-insert with the web adapter's deterministic surrogate key —
     // identical semantics to web-v2's drizzle CurriculumStore, so both
     // writers heal legacy random-id rows the same way.
-    const rowId = `sm:${input.tenantId}:${input.learnerId}:${skillRow.id}`;
+    const rowId = `sm:${input.tenantId}:${learnerId}:${skillRow.id}`;
     await db
       .delete(webSkillMasteries)
       .where(
         and(
-          eq(webSkillMasteries.learnerId, input.learnerId),
+          eq(webSkillMasteries.learnerId, learnerId),
           eq(webSkillMasteries.tenantId, input.tenantId),
           eq(sql`${webSkillMasteries.data}->>'skillId'`, skillRow.id),
         ),
       );
     await db.insert(webSkillMasteries).values({
       id: rowId,
-      learnerId: input.learnerId,
+      learnerId,
       tenantId: input.tenantId,
       data: nextRow,
     });
@@ -150,7 +185,7 @@ export async function writeMasteryToWebStore(
       .from(webMasteryMaps)
       .where(
         and(
-          eq(webMasteryMaps.learnerId, input.learnerId),
+          eq(webMasteryMaps.learnerId, learnerId),
           eq(webMasteryMaps.tenantId, input.tenantId),
         ),
       )
@@ -161,14 +196,14 @@ export async function writeMasteryToWebStore(
         .set({ data: { ...(mapRow.data as Record<string, unknown>), updatedAt: now } })
         .where(eq(webMasteryMaps.id, mapRow.id));
     } else {
-      const mapId = `mmap:svc:${input.tenantId}:${input.learnerId}`;
+      const mapId = `mmap:svc:${input.tenantId}:${learnerId}`;
       await db.insert(webMasteryMaps).values({
         id: mapId,
-        learnerId: input.learnerId,
+        learnerId,
         tenantId: input.tenantId,
         data: {
           id: mapId,
-          learnerId: input.learnerId,
+          learnerId,
           tenantId: input.tenantId,
           generatedAt: now,
           updatedAt: now,
@@ -178,7 +213,7 @@ export async function writeMasteryToWebStore(
     log.info(
       {
         event: "web_mastery.updated",
-        learnerId: input.learnerId,
+        learnerId,
         skills: movements.map((m) => m.skillId),
       },
       "session completion landed in the web mastery store",

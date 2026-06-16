@@ -124,6 +124,16 @@ export type LearnerProfile = {
    * `team_invite_optional`.
    */
   teamInviteDecision?: "pending" | "done" | "skipped";
+  /**
+   * Cross-platform unification (Task #34): the canonical identity-svc
+   * `learners.id` (a UUID) this web profile is linked to. The backend
+   * microservices (learning-svc sessions, mobile pin-login, mastery
+   * bridge) key everything off this id, while the web app keeps its own
+   * `lrn_*` primary key. Null/undefined for profiles that have not been
+   * provisioned in identity-svc yet (older rows, or dev/mock mode); the
+   * BFF reconciles + backfills the link lazily on read.
+   */
+  identityLearnerId?: string | null;
   createdAt: ISODate;
 };
 

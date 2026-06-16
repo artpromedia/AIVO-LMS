@@ -10,6 +10,8 @@ import {
 } from "@/lib/db/repos";
 import { createLearnerSchema } from "@/lib/validators/learner";
 import { getTenantSeatAvailability } from "@/lib/db/seat-availability";
+import { getIdentityBearer } from "@/lib/bff/identity-learners";
+import { reconcileLearnersForParent, provisionAndLink } from "@/lib/bff/learner-unification";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,20 @@ export async function GET(req: Request) {
     if (response) return response;
     const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
+    // Cross-platform unification (Task #34): backfill web→identity links and
+    // surface mobile-origin learners before listing. Best-effort — never let a
+    // reconcile failure break the parent's learner list.
+    try {
+      const bearer = await getIdentityBearer();
+      await reconcileLearnersForParent({
+        parentUserId: session!.userId,
+        tenantId: session!.tenantId,
+        bearer,
+        log: (event, data) => audit(session, "learner.reconcile", requestId, { metadata: { event, ...data } }),
+      });
+    } catch {
+      // swallowed: unification is opportunistic, the list below is the contract
+    }
     const learners = await listLearnersForParent(session!.userId, session!.tenantId);
     for (const l of learners) {
       await refreshLearnerReadiness(l.id, session!.tenantId);
@@ -62,11 +78,26 @@ export async function POST(req: Request) {
       );
     }
 
-    const learner = await createLearner({
+    let learner = await createLearner({
       tenantId: session!.tenantId,
       parentUserId: session!.userId,
       data: parsed.data,
     });
+    // Cross-platform unification (Task #34): provision the canonical learner
+    // in identity-svc and store the UUID on the web profile, so the learner is
+    // immediately visible on mobile and the PIN step targets the real id.
+    // Best-effort — identity-svc enforces its own seat caps; a failure here
+    // leaves the web learner usable (the link is backfilled on next read).
+    try {
+      const bearer = await getIdentityBearer();
+      if (bearer) {
+        learner = await provisionAndLink(bearer, learner, session!.tenantId, (event, data) =>
+          audit(session, "learner.provision", requestId, { learnerId: learner.id, metadata: { event, ...data } }),
+        );
+      }
+    } catch {
+      // swallowed: provisioning is best-effort, reconcile backfills later
+    }
     // Sprint 24: stamp an age-gate record at the moment of learner creation
     // so COPPA/under-13 status is recorded even if the parent skips IEP.
     const ageGate = await recordAgeGate({

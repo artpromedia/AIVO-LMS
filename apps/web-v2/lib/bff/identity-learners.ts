@@ -75,7 +75,8 @@ async function identityFetch<T>(
 /**
  * Set a learner's PIN via identity-svc
  * (`PUT /api/users/learners/:learnerId`, body `{ pin }`). The parent
- * ownership + role check is enforced by identity-svc.
+ * ownership + role check is enforced by identity-svc. `learnerId` MUST be
+ * the canonical identity-svc UUID (the web `lrn_*` id 404s here).
  */
 export function setLearnerPinViaIdentity(
   bearer: string,
@@ -87,4 +88,58 @@ export function setLearnerPinViaIdentity(
     bearer,
     body: { pin },
   });
+}
+
+/**
+ * Cross-platform unification (Task #34): an identity-svc learner row as
+ * returned by `GET /api/users/learners`. Only the fields the web BFF
+ * reconcile step reads are typed; the row carries more.
+ */
+export type IdentityLearner = {
+  id: string;
+  name?: string | null;
+  dateOfBirth?: string | null;
+  gradeLevel?: string | null;
+  parentId?: string | null;
+  tenantId?: string | null;
+};
+
+/**
+ * Provision the canonical learner in identity-svc
+ * (`POST /api/users/learners`). This is the system of record the backend
+ * microservices + the mobile app key off. Returns the new learner's UUID.
+ *
+ * The web app keeps its own `lrn_*` profile; the caller stores the returned
+ * UUID on that profile via `LearnerStore.setIdentityLink`. identity-svc owns
+ * parent ownership, tenant, and licensing-seat enforcement.
+ */
+export function createLearnerViaIdentity(
+  bearer: string,
+  input: {
+    name: string;
+    dateOfBirth?: string;
+    gradeLevel?: string;
+    diagnoses?: string[];
+    zipCode?: string;
+    country?: string;
+    region?: string;
+    preferredLanguage?: string;
+  },
+): Promise<ServiceResult<{ learner: IdentityLearner }>> {
+  return identityFetch(`/api/users/learners`, {
+    method: "POST",
+    bearer,
+    body: input,
+  });
+}
+
+/**
+ * List the learners identity-svc associates with the bearer's parent account
+ * (`GET /api/users/learners`). Used by the BFF reconcile step to surface
+ * mobile-origin learners in the web app.
+ */
+export function listLearnersViaIdentity(
+  bearer: string,
+): Promise<ServiceResult<IdentityLearner[]>> {
+  return identityFetch(`/api/users/learners`, { method: "GET", bearer });
 }

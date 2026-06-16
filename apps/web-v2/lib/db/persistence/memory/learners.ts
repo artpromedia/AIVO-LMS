@@ -132,6 +132,74 @@ export const memoryLearners: LearnerStore = {
     return learner;
   },
 
+  async setIdentityLink(id, tenantId, identityLearnerId) {
+    const store = getStore();
+    const existing = store.learnerProfiles.get(id);
+    if (!existing || existing.tenantId !== tenantId) return null;
+    if (existing.identityLearnerId === identityLearnerId) return existing;
+    const next: LearnerProfile = { ...existing, identityLearnerId };
+    store.learnerProfiles.set(id, next);
+    return next;
+  },
+
+  async createFromIdentity({
+    tenantId,
+    parentUserId,
+    identityLearnerId,
+    name,
+    birthYear,
+    gradeBand,
+    primaryLanguage,
+  }) {
+    const store = getStore();
+    // Idempotency (Task #34): return the existing profile if this canonical
+    // identity learner is already linked under the tenant (mirrors the drizzle
+    // store's lookup-first + partial unique index).
+    for (const existing of store.learnerProfiles.values()) {
+      if (existing.tenantId === tenantId && existing.identityLearnerId === identityLearnerId) {
+        return existing;
+      }
+    }
+    const id = newId("lrn");
+    const display = name.trim() || "Learner";
+    const learner: LearnerProfile = {
+      id,
+      tenantId,
+      displayName: display,
+      firstName: display,
+      preferredName: null,
+      birthYear,
+      ageRange: null,
+      gradeBand: gradeBand ?? null,
+      schoolContext: null,
+      primaryLanguage: primaryLanguage ?? null,
+      readingComfort: null,
+      mathComfort: null,
+      knownStrengths: [],
+      knownChallenges: [],
+      accessibilityDefaults: { ...DEFAULT_ACCESSIBILITY },
+      zipCode: null,
+      districtId: null,
+      districtName: null,
+      functioningLevel: null,
+      readinessState: "profile_created",
+      iepDecision: null,
+      identityLearnerId,
+      createdAt: nowIso(),
+    };
+    store.learnerProfiles.set(id, learner);
+    const rel: ParentLearnerRelationship = {
+      id: newId("plr"),
+      parentUserId,
+      learnerId: id,
+      tenantId,
+      relation: "parent",
+      isPrimary: store.parentLearnerRelationships.every((r) => r.parentUserId !== parentUserId),
+    };
+    store.parentLearnerRelationships.push(rel);
+    return learner;
+  },
+
   async update(id, tenantId, patch) {
     const store = getStore();
     const existing = store.learnerProfiles.get(id);

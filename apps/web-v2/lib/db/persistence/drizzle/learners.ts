@@ -6,7 +6,7 @@
  * → learner enrollments), and the same cascade on delete (relationships
  * + parent assessments).
  */
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray, sql } from "drizzle-orm";
 import {
   webLearnerProfiles,
   webParentLearnerRelationships,
@@ -185,6 +185,98 @@ export const drizzleLearners: LearnerStore = {
       functioningLevel: null,
       readinessState: "profile_created",
       iepDecision: null,
+      createdAt: nowIso(),
+    };
+    await db.insert(webLearnerProfiles).values({ id, tenantId, data: learner });
+
+    const [existing] = await db
+      .select({ n: count() })
+      .from(webParentLearnerRelationships)
+      .where(eq(webParentLearnerRelationships.parentUserId, parentUserId));
+    const rel: ParentLearnerRelationship = {
+      id: newId("plr"),
+      parentUserId,
+      learnerId: id,
+      tenantId,
+      relation: "parent",
+      isPrimary: Number(existing?.n ?? 0) === 0,
+    };
+    await db.insert(webParentLearnerRelationships).values({
+      id: rel.id,
+      parentUserId,
+      learnerId: id,
+      tenantId,
+      data: rel,
+    });
+    return learner;
+  },
+
+  async setIdentityLink(id, tenantId, identityLearnerId) {
+    const db = getDb();
+    const [row] = await db
+      .select()
+      .from(webLearnerProfiles)
+      .where(and(eq(webLearnerProfiles.id, id), eq(webLearnerProfiles.tenantId, tenantId)))
+      .limit(1);
+    if (!row) return null;
+    const existing = row.data as LearnerProfile;
+    if (existing.identityLearnerId === identityLearnerId) return existing;
+    const next: LearnerProfile = { ...existing, identityLearnerId };
+    await db.update(webLearnerProfiles).set({ data: next }).where(eq(webLearnerProfiles.id, id));
+    return next;
+  },
+
+  async createFromIdentity({
+    tenantId,
+    parentUserId,
+    identityLearnerId,
+    name,
+    birthYear,
+    gradeBand,
+    primaryLanguage,
+  }) {
+    const db = getDb();
+    // Idempotency (Task #34): never materialize a second web profile for the
+    // same canonical identity learner — return the existing link if present.
+    // A partial unique index on (tenant_id, data->>'identityLearnerId') also
+    // guards against truly-concurrent reconciles at the DB layer.
+    const [linked] = await db
+      .select()
+      .from(webLearnerProfiles)
+      .where(
+        and(
+          eq(webLearnerProfiles.tenantId, tenantId),
+          eq(sql`${webLearnerProfiles.data}->>'identityLearnerId'`, identityLearnerId),
+        ),
+      )
+      .limit(1);
+    if (linked) return linked.data as LearnerProfile;
+
+    const id = newId("lrn");
+    const display = name.trim() || "Learner";
+    const learner: LearnerProfile = {
+      id,
+      tenantId,
+      displayName: display,
+      firstName: display,
+      preferredName: null,
+      birthYear,
+      ageRange: null,
+      gradeBand: gradeBand ?? null,
+      schoolContext: null,
+      primaryLanguage: primaryLanguage ?? null,
+      readingComfort: null,
+      mathComfort: null,
+      knownStrengths: [],
+      knownChallenges: [],
+      accessibilityDefaults: { ...DEFAULT_ACCESSIBILITY },
+      zipCode: null,
+      districtId: null,
+      districtName: null,
+      functioningLevel: null,
+      readinessState: "profile_created",
+      iepDecision: null,
+      identityLearnerId,
       createdAt: nowIso(),
     };
     await db.insert(webLearnerProfiles).values({ id, tenantId, data: learner });

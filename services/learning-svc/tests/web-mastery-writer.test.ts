@@ -5,7 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { webSkills, webSkillMasteries, webMasteryMaps } from "@aivo/db";
+import { webSkills, webSkillMasteries, webMasteryMaps, webLearnerProfiles } from "@aivo/db";
 import {
   normalizeMasteryScore,
   writeMasteryToWebStore,
@@ -17,6 +17,8 @@ interface FakeState {
   skills: Array<{ id: string; subjectId: string | null; data: Record<string, unknown> }>;
   masteries: Array<{ id: string; data: Record<string, unknown> }>;
   maps: Array<{ id: string; data: Record<string, unknown> }>;
+  /** Cross-platform unification (Task #34): web profiles linking identity UUIDs. */
+  profiles?: Array<{ id: string }>;
 }
 
 /**
@@ -50,6 +52,9 @@ function fakeDb(state: FakeState) {
               }
               if (table === webMasteryMaps) {
                 return state.maps;
+              }
+              if (table === webLearnerProfiles) {
+                return state.profiles ?? [];
               }
               return [];
             },
@@ -148,6 +153,46 @@ test("a key matching a slug joins; an unmatched key is skipped", async () => {
   });
   assert.equal(m2.length, 0);
   assert.equal(fake2.inserted.length, 0);
+});
+
+test("an identity UUID is translated to the linked web learner id (Task #34)", async () => {
+  const fake = fakeDb({
+    skills: [{ id: "skl-1", subjectId: "sub-1", data: { slug: "s" } }],
+    masteries: [],
+    maps: [],
+    profiles: [{ id: "lrn-web-1" }], // links the identity UUID below
+  });
+  fake.setKey("skl-1");
+  const movements = await writeMasteryToWebStore(fake.db as never, log, {
+    tenantId: "t-1",
+    learnerId: "11111111-2222-3333-4444-555555555555", // identity-svc UUID
+    updates: { "skl-1": 100 },
+  });
+  assert.equal(movements.length, 1);
+  // Mastery must land under the WEB id, not the identity UUID.
+  const masteryInsert = fake.inserted.find((i) => i.table === webSkillMasteries)!;
+  assert.equal(masteryInsert.values.id, "sm:t-1:lrn-web-1:skl-1");
+  assert.equal(masteryInsert.values.learnerId, "lrn-web-1");
+  const mapInsert = fake.inserted.find((i) => i.table === webMasteryMaps)!;
+  assert.equal(mapInsert.values.learnerId, "lrn-web-1");
+});
+
+test("an unlinked learner id is used as-is (legacy fallback)", async () => {
+  const fake = fakeDb({
+    skills: [{ id: "skl-1", subjectId: "sub-1", data: { slug: "s" } }],
+    masteries: [],
+    maps: [],
+    profiles: [], // no link
+  });
+  fake.setKey("skl-1");
+  await writeMasteryToWebStore(fake.db as never, log, {
+    tenantId: "t-1",
+    learnerId: "lrn-direct",
+    updates: { "skl-1": 100 },
+  });
+  const masteryInsert = fake.inserted.find((i) => i.table === webSkillMasteries)!;
+  assert.equal(masteryInsert.values.id, "sm:t-1:lrn-direct:skl-1");
+  assert.equal(masteryInsert.values.learnerId, "lrn-direct");
 });
 
 test("an existing row moves from its prior score and keeps its subject", async () => {
