@@ -385,7 +385,8 @@ export function ApprovalCeremony({
         .bc-ceremony-voices-link {
           font-size: 0.85rem;
           font-weight: 600;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: clamp the palette hue toward near-black for the link text. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           text-decoration: underline;
           text-underline-offset: 2px;
         }
@@ -404,7 +405,9 @@ export function ApprovalCeremony({
           padding: 0.25rem 0;
           font-size: 0.95rem;
           font-weight: 600;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: clamp the learner palette hue toward near-black so the toggle
+             label clears 4.5:1 on the light ceremony canvas. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           cursor: pointer;
         }
         .bc-ceremony-rai-toggle:focus-visible {

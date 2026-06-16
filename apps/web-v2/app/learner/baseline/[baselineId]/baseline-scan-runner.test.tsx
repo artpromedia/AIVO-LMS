@@ -55,7 +55,7 @@ function QuestionHarness({
       config={config}
       speakOnFocus={speakOnFocus}
       scanHelpText="help"
-      announceTemplate={(label) => `Now on: ${label}`}
+      announceLabelTemplate="Now on: {label}"
     >
       <div>
         <a

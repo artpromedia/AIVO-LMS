@@ -351,7 +351,13 @@ export default async function BaselineRunnerPage({
           body={baseline.summary?.learnerSafeSummary ?? undefined}
           learned={[
             ...subjectMastery.map(
-              (s) => `${s.subjectName}: starting at ${s.estimate.replaceAll("_", " ")}`,
+              // Defensive: a malformed summary entry (missing estimate) must
+              // never throw and white-screen the whole runner — fall back to a
+              // neutral phrase so the completion hero still renders.
+              (s) =>
+                `${s.subjectName}: starting at ${
+                  s.estimate ? s.estimate.replaceAll("_", " ") : "their level"
+                }`,
             ),
             ...(chips.includes("iep") ? ["IEP supports stay on"] : []),
             ...(chips.includes("calm_mode") ? ["Calm pacing locked in"] : []),
@@ -394,7 +400,7 @@ export default async function BaselineRunnerPage({
           config={scanConfig}
           speakOnFocus={speakOnScanFocus}
           scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
-          announceTemplate={(label) => tScan("announce", { label })}
+          announceLabelTemplate={tScan.raw("announce")}
         >
           <CompletionHero
             learnerName={learner?.preferredName || learner?.firstName}
@@ -464,7 +470,7 @@ export default async function BaselineRunnerPage({
           config={scanConfig}
           speakOnFocus={speakOnScanFocus}
           scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
-          announceTemplate={(label) => tScan("announce", { label })}
+          announceLabelTemplate={tScan.raw("announce")}
         >
           <BreakCard
             variant={struggleVariant ? "struggle" : "cadence"}
@@ -598,7 +604,7 @@ export default async function BaselineRunnerPage({
         config={scanConfig}
         speakOnFocus={speakOnScanFocus}
         scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
-        announceTemplate={(label) => tScan("announce", { label })}
+        announceLabelTemplate={tScan.raw("announce")}
       >
         <BaselineProgressDots states={dots} ariaLabel="Baseline progress" />
 

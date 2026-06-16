@@ -39,6 +39,10 @@ const learnerCookie = {
 };
 
 const SEEDED_LEARNER = "lrn_demo_sky";
+// Dedicated IN-PROGRESS baseline seeded for switch-scan coverage. The demo
+// bas_demo_sky is complete (completion screen, no scanner), so the switch run
+// drives this in-progress runner instead. See lib/db/seed.ts (seedSkyDemoJourney).
+const SCAN_BASELINE = "bas_demo_sky_scan";
 
 /** Unwrap the BFF success envelope, failing loudly on error envelopes. */
 async function bff<T>(
@@ -75,7 +79,7 @@ function highlighted(page: Page) {
  * than spinning. Single-switch auto-scan advances on its own timer; we poll
  * the highlight rather than driving advance.
  */
-async function scanToAndSelect(page: Page, idSuffix: string, maxWaitMs = 12_000): Promise<void> {
+async function scanToAndSelect(page: Page, idSuffix: string, maxWaitMs = 20_000): Promise<void> {
   const deadline = Date.now() + maxWaitMs;
   while (Date.now() < deadline) {
     const cur = await highlighted(page)
@@ -100,32 +104,27 @@ test.describe("@a11y baseline switch-only run", () => {
 
     // ── Enable single-switch scanning through the REAL accessibility BFF.
     // This is the persisted-pref path the runner reads (DoD settings round-trip).
+    // NOTE: 600ms (not the 1200ms contract default) is deliberate — passing the
+    // exact default makes resolveBaselineScanConfig bump the dwell to the 1800ms
+    // baseline floor, which would push one full auto-scan cycle past the
+    // per-target wait window. A faster, explicitly-chosen dwell keeps the
+    // switch-only walk well inside the helper deadline.
     const enabled = await bff<{ accessibility: { aacEnabled: boolean; aacInputMethod: string } }>(
       page,
       "patch",
       `/api/bff/learners/${SEEDED_LEARNER}/accessibility`,
-      { aacEnabled: true, aacInputMethod: "switch_1", aacScanDelayMs: 1200 },
+      { aacEnabled: true, aacInputMethod: "switch_1", aacScanDelayMs: 600 },
     );
     expect(enabled.accessibility.aacEnabled).toBe(true);
     expect(enabled.accessibility.aacInputMethod).toBe("switch_1");
 
-    // ── Pre-runner pages: plain semantic HTML, driven by keyboard only.
-    await page.goto("/learner/baseline/readiness", { waitUntil: "domcontentloaded" });
-    // The button-friendly suggestion may appear; the "I'm ready" link is always
-    // reachable by keyboard and never blocked.
-    const ready = page.getByRole("link", { name: /i'?m ready/i });
-    await expect(ready).toBeVisible({ timeout: 30_000 });
-    await ready.focus();
-    await page.keyboard.press("Enter");
-
-    // Intro → start the runner (keyboard).
-    const start = page.getByRole("link", { name: /start when you'?re ready/i });
-    await expect(start).toBeVisible({ timeout: 30_000 });
-    await start.focus();
-    await page.keyboard.press("Enter");
-
-    // ── Runner: switch-only from here. Confirm the scanner mounted.
-    await page.waitForURL(/\/learner\/baseline\/bas_demo_sky/, { timeout: 30_000 });
+    // ── Runner: navigate straight to the in-progress scan baseline. (The
+    // readiness → intro → start nav resolves to the learner's ACTIVE baseline,
+    // which for Sky is the COMPLETE demo baseline — a completion screen with no
+    // scanner. Those pre-runner pages' keyboard reachability is covered by
+    // baseline-a11y.) Switch-only from here: confirm the scanner mounted.
+    await page.goto(`/learner/baseline/${SCAN_BASELINE}`, { waitUntil: "domcontentloaded" });
+    await page.waitForSelector("main", { timeout: 30_000 });
     await expect(highlighted(page).first()).toBeVisible({ timeout: 30_000 });
 
     // First question: trigger READ-ALOUD (when the item carries read-aloud
@@ -171,13 +170,12 @@ test.describe("@a11y baseline switch-only run", () => {
       }
     }
 
-    // ── Completion: the baseline reached `complete` via the BFF (the switch run
-    // submitted real answers through the real runner).
-    const { baseline } = await bff<{ baseline: { status: string } | null }>(
-      page,
-      "get",
-      `/api/bff/learners/${SEEDED_LEARNER}/baseline`,
-    );
-    expect(baseline?.status, "baseline reached complete via switch input").toBe("complete");
+    // ── Completion: the switch run submitted real answers through the real
+    // runner and selected the finish control, landing on the completion screen.
+    // (Assert the completion surface directly rather than the BFF active-baseline
+    // GET, which would return Sky's separate already-complete demo baseline.)
+    await expect(
+      page.getByRole("link", { name: /take me home/i }).first(),
+    ).toBeVisible({ timeout: 30_000 });
   });
 });

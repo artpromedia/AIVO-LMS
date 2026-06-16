@@ -172,7 +172,9 @@ export function HowSheLearns({
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: clamp the learner palette hue toward near-black so this small
+             facet label clears 4.5:1 on the light reveal canvas. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
         }
         .reveal-learns-instruction {
           margin: 0;

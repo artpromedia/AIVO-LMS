@@ -201,8 +201,13 @@ export interface BaselineScanProviderProps {
   speakOnFocus: boolean;
   /** Localized hint shown to scan users explaining the two-switch keys. */
   scanHelpText: string;
-  /** Localized live-region template; receives the focused control's label. */
-  announceTemplate: (label: string) => string;
+  /**
+   * Localized live-region template containing a literal `{label}` placeholder,
+   * interpolated client-side with the focused control's label. Passed as a
+   * plain string (not a function) so a Server Component can render this client
+   * provider — Next.js forbids passing functions to client components.
+   */
+  announceLabelTemplate: string;
   children: ReactNode;
 }
 
@@ -215,7 +220,7 @@ export function BaselineScanProvider({
   config,
   speakOnFocus,
   scanHelpText,
-  announceTemplate,
+  announceLabelTemplate,
   children,
 }: BaselineScanProviderProps) {
   const scopeRef = useRef<HTMLDivElement | null>(null);
@@ -254,7 +259,7 @@ export function BaselineScanProvider({
           {scanHelpText}
         </p>
         <p className="sr-only" role="status" aria-live="polite">
-          {announce ? announceTemplate(announce) : ""}
+          {announce ? announceLabelTemplate.replace("{label}", announce) : ""}
         </p>
       </AACScanRoot>
     </AACTargetProvider>
