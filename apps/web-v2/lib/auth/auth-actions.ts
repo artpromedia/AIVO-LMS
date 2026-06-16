@@ -22,6 +22,7 @@ import { ROLE_HOME, type Role } from "@/lib/auth/types";
 import {
   identityRegister,
   identityLogin,
+  identityPinLogin,
   extractRefreshToken,
   toSessionProfile,
 } from "@/lib/auth/identity-client";
@@ -178,6 +179,43 @@ export async function onboardingSignInAction(formData: FormData): Promise<void> 
   });
 
   redirect(next || ROLE_HOME[profile.role]);
+}
+
+/**
+ * PIN sign-in for learners on the `/login?mode=learner` surface. Learners
+ * authenticate with a `parentId` + `learnerId` + a 4–6 digit PIN (no email /
+ * password). Owns its own risky branches: the missing/invalid-input guard,
+ * the identity-svc PIN failure → `invalid_credentials` mapping, the profile
+ * guard that rejects a session whose role isn't "learner" or whose
+ * `learnerId` doesn't match the submitted one (`unsupported_role`), and the
+ * successful redirect to the learner home with session cookies set.
+ *
+ * Form fields: `parentId`, `learnerId`, `pin` (4–6 digits).
+ */
+export async function learnerSignInAction(formData: FormData): Promise<void> {
+  const parentId = String(formData.get("parentId") ?? "").trim();
+  const learnerId = String(formData.get("learnerId") ?? "").trim();
+  const pin = String(formData.get("pin") ?? "").trim();
+  if (!parentId || !learnerId || !/^\d{4,6}$/.test(pin)) {
+    redirect("/login?mode=learner&error=missing_credentials");
+  }
+
+  const result = await identityPinLogin({ parentId, learnerId, pin });
+  if (result.kind === "ok") {
+    const profile = toSessionProfile(result.user);
+    if (!profile || profile.role !== "learner" || profile.learnerId !== learnerId) {
+      redirect("/login?mode=learner&error=unsupported_role");
+    }
+    const learnerProfile = profile;
+    const jar = await cookies();
+    setAuthSessionCookies(jar, {
+      accessToken: result.accessToken,
+      refreshToken: extractRefreshToken(result.setCookies),
+      profile: learnerProfile,
+    });
+    redirect(ROLE_HOME.learner);
+  }
+  redirect("/login?mode=learner&error=invalid_credentials");
 }
 
 /**

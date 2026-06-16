@@ -4,46 +4,9 @@ import { Button } from "@/components/ui/button";
 import { AuthSplitLayout, AuthSidePanel, AuthTrustCard, AuthSecureFooter } from "@/components/auth/auth-split-layout";
 import { AivoBrandMark } from "@/components/auth/auth-brand-mark";
 import { AudienceToggle } from "@/components/auth/audience-toggle";
-import { loginAction } from "@/lib/auth/auth-actions";
+import { loginAction, learnerSignInAction } from "@/lib/auth/auth-actions";
 import { LoginForm } from "./_components/login-form";
 import { LearnerPinForm } from "./_components/learner-pin-form";
-
-async function learnerSignInAction(formData: FormData) {
-  "use server";
-  const { cookies } = await import("next/headers");
-  const { redirect } = await import("next/navigation");
-  const { ROLE_HOME } = await import("@/lib/auth/types");
-  const { identityPinLogin, extractRefreshToken, toSessionProfile } = await import("@/lib/auth/identity-client");
-  const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
-
-  const parentId = String(formData.get("parentId") ?? "").trim();
-  const learnerId = String(formData.get("learnerId") ?? "").trim();
-  const pin = String(formData.get("pin") ?? "").trim();
-  if (!parentId || !learnerId || !/^\d{4,6}$/.test(pin)) {
-    redirect("/login?mode=learner&error=missing_credentials");
-  }
-
-  const result = await identityPinLogin({ parentId, learnerId, pin });
-  if (result.kind === "ok") {
-    const profile = toSessionProfile(result.user);
-    if (!profile || profile.role !== "learner" || profile.learnerId !== learnerId) {
-      redirect("/login?mode=learner&error=unsupported_role");
-      throw new Error("unsupported learner PIN session");
-    }
-    const learnerProfile = profile;
-    const jar = await cookies();
-    setAuthSessionCookies(jar, {
-      accessToken: result.accessToken,
-      refreshToken: extractRefreshToken(result.setCookies),
-      profile: learnerProfile,
-    });
-    redirect(ROLE_HOME.learner);
-  }
-  if (result.kind === "error") {
-    redirect(`/login?mode=learner&error=${"invalid_credentials"}`);
-  }
-  redirect("/login?mode=learner&error=invalid_credentials");
-}
 
 /**
  * Login surface — parent / educator entry into AIVO.

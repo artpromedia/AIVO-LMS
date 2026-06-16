@@ -30,11 +30,13 @@ vi.mock("@/lib/env", () => ({
 
 const identityRegister = vi.fn();
 const identityLogin = vi.fn();
+const identityPinLogin = vi.fn();
 const extractRefreshToken = vi.fn((..._a: unknown[]) => "refresh_tok");
 const toSessionProfile = vi.fn();
 vi.mock("@/lib/auth/identity-client", () => ({
   identityRegister: (...a: unknown[]) => identityRegister(...a),
   identityLogin: (...a: unknown[]) => identityLogin(...a),
+  identityPinLogin: (...a: unknown[]) => identityPinLogin(...a),
   extractRefreshToken: (...a: unknown[]) => extractRefreshToken(...a),
   toSessionProfile: (...a: unknown[]) => toSessionProfile(...a),
 }));
@@ -44,7 +46,12 @@ vi.mock("@/lib/auth/session-cookies", () => ({
   setAuthSessionCookies: (...a: unknown[]) => setAuthSessionCookies(...a),
 }));
 
-import { registerAction, onboardingSignInAction, loginAction } from "./auth-actions";
+import {
+  registerAction,
+  onboardingSignInAction,
+  loginAction,
+  learnerSignInAction,
+} from "./auth-actions";
 
 function signupForm(fields: Record<string, string>): FormData {
   const f = new FormData();
@@ -69,6 +76,19 @@ beforeEach(() => {
   identityLogin.mockResolvedValue({
     kind: "ok",
     user: { id: "u_1", email: VALID.email, name: VALID.name, role: "PARENT", tenantId: "t_1" },
+    accessToken: "access_tok",
+    setCookies: [],
+  });
+  identityPinLogin.mockResolvedValue({
+    kind: "ok",
+    user: {
+      id: "u_learner_1",
+      email: "learner@example.com",
+      name: "Lee Learner",
+      role: "LEARNER",
+      tenantId: "t_1",
+      learnerId: "learner_1",
+    },
     accessToken: "access_tok",
     setCookies: [],
   });
@@ -543,5 +563,128 @@ describe("loginAction unsupported-role and successful sign-in", () => {
       "NEXT_REDIRECT:/parent/home",
     );
     expect(setAuthSessionCookies).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// learnerSignInAction — the 4–6 digit PIN sign-in for learners on
+// `/login?mode=learner`. Owns its own error/success mapping: the
+// missing/invalid-input guard, the identity-svc PIN failure →
+// invalid_credentials mapping, the profile guard (unsupported_role for a
+// null profile / wrong role / learnerId mismatch), and the successful
+// redirect to /learner/home with session cookies set. A regression here
+// could show the wrong (or no) message to a child, or — worse — mint a
+// learner session for a mismatched profile.
+// ---------------------------------------------------------------------------
+
+function pinForm(fields: Record<string, string>): FormData {
+  const f = new FormData();
+  for (const [k, v] of Object.entries(fields)) f.set(k, v);
+  return f;
+}
+
+const PIN = { parentId: "parent_1", learnerId: "learner_1", pin: "1234" };
+
+const LEARNER_PROFILE = {
+  userId: "u_learner_1",
+  tenantId: "t_1",
+  role: "learner",
+  email: "learner@example.com",
+  displayName: "Lee Learner",
+  permissions: [],
+  learnerId: "learner_1",
+};
+
+describe("learnerSignInAction missing/invalid-input validation (no identity-svc call)", () => {
+  // A missing parentId/learnerId or a PIN that isn't 4–6 digits must be
+  // rejected with error=missing_credentials BEFORE any identity-svc call,
+  // so the PIN endpoint never sees a malformed sign-in.
+  const BAD: { label: string; fields: Record<string, string> }[] = [
+    { label: "a missing parentId", fields: { learnerId: PIN.learnerId, pin: PIN.pin } },
+    { label: "a missing learnerId", fields: { parentId: PIN.parentId, pin: PIN.pin } },
+    { label: "a missing pin", fields: { parentId: PIN.parentId, learnerId: PIN.learnerId } },
+    { label: "a too-short (3-digit) pin", fields: { ...PIN, pin: "123" } },
+    { label: "a too-long (7-digit) pin", fields: { ...PIN, pin: "1234567" } },
+    { label: "a non-numeric pin", fields: { ...PIN, pin: "12ab" } },
+    { label: "everything missing", fields: {} },
+  ];
+
+  for (const { label, fields } of BAD) {
+    it(`rejects ${label} with error=missing_credentials before calling identity-svc`, async () => {
+      await expect(learnerSignInAction(pinForm(fields))).rejects.toThrow(
+        "NEXT_REDIRECT:/login?mode=learner&error=missing_credentials",
+      );
+      expect(identityPinLogin).not.toHaveBeenCalled();
+    });
+  }
+
+  it("accepts a 6-digit pin and proceeds to the identity-svc call", async () => {
+    toSessionProfile.mockReturnValueOnce(LEARNER_PROFILE);
+    await expect(learnerSignInAction(pinForm({ ...PIN, pin: "123456" }))).rejects.toThrow(
+      "NEXT_REDIRECT:/learner/home",
+    );
+    expect(identityPinLogin).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("learnerSignInAction identity-svc PIN failure mapping (friendly error code)", () => {
+  // Any identity-svc PIN failure maps to a single user-facing
+  // invalid_credentials code (a child never sees an enumerable
+  // "wrong parent vs wrong pin" distinction).
+  const STATUSES = [401, 403, 404, 500, 502] as const;
+
+  for (const status of STATUSES) {
+    it(`redirects with error=invalid_credentials for status ${status}`, async () => {
+      identityPinLogin.mockResolvedValueOnce({ kind: "error", status });
+      await expect(learnerSignInAction(pinForm({ ...PIN }))).rejects.toThrow(
+        "NEXT_REDIRECT:/login?mode=learner&error=invalid_credentials",
+      );
+      expect(setAuthSessionCookies).not.toHaveBeenCalled();
+    });
+  }
+});
+
+describe("learnerSignInAction profile guard (unsupported_role)", () => {
+  // The success path must reject any session whose profile is missing, whose
+  // role isn't "learner", or whose learnerId doesn't match the submitted one
+  // — otherwise a mismatched profile could be minted as a learner session.
+  it("redirects with error=unsupported_role when the session profile is null", async () => {
+    toSessionProfile.mockReturnValueOnce(null);
+    await expect(learnerSignInAction(pinForm({ ...PIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/login?mode=learner&error=unsupported_role",
+    );
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+
+  it("redirects with error=unsupported_role when the resolved role isn't learner", async () => {
+    toSessionProfile.mockReturnValueOnce({ ...LEARNER_PROFILE, role: "parent" });
+    await expect(learnerSignInAction(pinForm({ ...PIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/login?mode=learner&error=unsupported_role",
+    );
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+
+  it("redirects with error=unsupported_role when the learnerId doesn't match the submitted one", async () => {
+    toSessionProfile.mockReturnValueOnce({ ...LEARNER_PROFILE, learnerId: "someone_else" });
+    await expect(learnerSignInAction(pinForm({ ...PIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/login?mode=learner&error=unsupported_role",
+    );
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+});
+
+describe("learnerSignInAction successful PIN sign-in", () => {
+  it("redirects to /learner/home and sets session cookies on success", async () => {
+    toSessionProfile.mockReturnValueOnce(LEARNER_PROFILE);
+    await expect(learnerSignInAction(pinForm({ ...PIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:/learner/home",
+    );
+    expect(setAuthSessionCookies).toHaveBeenCalledTimes(1);
+    const [, payload] = setAuthSessionCookies.mock.calls[0];
+    expect(payload).toEqual({
+      accessToken: "access_tok",
+      refreshToken: "refresh_tok",
+      profile: LEARNER_PROFILE,
+    });
   });
 });
