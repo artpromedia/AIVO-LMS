@@ -87,10 +87,16 @@ export async function registerAction(formData: FormData): Promise<void> {
   const result = await identityRegister({ name, email, password, role });
 
   if (result.kind === "error") {
-    let code = "signup_failed";
+    // A 409 (email already registered) stays `email_taken` and a 400 (weak /
+    // malformed password) stays `weak_password`. Everything else — 500 / 502 /
+    // unreachable identity-svc / unknown status — is a service/network outage,
+    // so it maps to `service_unavailable` ("we can't reach account creation
+    // right now") instead of the generic `signup_failed`, so an adult creating
+    // an account during a transient outage isn't told they did something wrong.
+    let code: string;
     if (result.status === 409) code = "email_taken";
     else if (result.status === 400) code = "weak_password";
-    else if (result.status === 502) code = "service_unavailable";
+    else code = "service_unavailable";
     redirect(`${errorReturn}?error=${code}`);
   }
 

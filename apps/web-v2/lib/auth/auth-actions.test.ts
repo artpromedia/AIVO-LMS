@@ -184,8 +184,8 @@ describe("registerAction identity-svc failure mapping (friendly error codes)", (
     { status: 409, code: "email_taken" },
     { status: 400, code: "weak_password" },
     { status: 502, code: "service_unavailable" },
-    { status: 500, code: "signup_failed" },
-    { status: undefined, code: "signup_failed" },
+    { status: 500, code: "service_unavailable" },
+    { status: undefined, code: "service_unavailable" },
   ] as const;
 
   for (const { status, code } of CASES) {
