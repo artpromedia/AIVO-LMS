@@ -4,20 +4,60 @@ set -e
 echo "=== Post-merge setup ==="
 
 echo "Installing pnpm dependencies..."
-# --prefer-offline reuses the local pnpm store on warm containers (huge speedup
-# on subsequent merges in the same repl). --reporter=append-only keeps the
-# stdout buffer small for the post-merge log so we don't waste time flushing
-# progress redraws to the captured stream. We deliberately do NOT pass
-# --ignore-scripts because workspace post-install hooks (Drizzle codegen,
-# package builds) are required for downstream services to start.
+# This post-merge runs while every dev workflow is still resident (Marketing,
+# Web App, Brain, Identity, mockup-sandbox), so the container is memory- and
+# thread-constrained. Two transient failure modes show up here, both resource
+# spikes rather than real bugs:
+#   * heap OOM aborts of parallel `tsc` lifecycle builds (exit -11 / "Aborted")
+#   * inability to spawn a process/thread under momentary pressure -- e.g.
+#     "Cannot fork" from a `tsc` prepare script, or a "new Worker" failure
+#     during pnpm's symlinkAllModules link step. (ulimit -u is ~64k here, so
+#     this is memory pressure on fork()/thread-stack alloc, not a PID cap.)
 #
-# --child-concurrency=1 serializes the workspace `prepare`/build lifecycle
-# scripts. With 73 packages, pnpm otherwise spawns up to 5 `tsc` compilers at
-# once, whose combined heap OOM-aborts the build in this container (exit -11 /
-# "Aborted"). Running one tsc at a time trades a little wall-clock for a build
-# that actually finishes; the post-merge timeout has ample headroom.
-pnpm install --frozen-lockfile --prefer-offline --child-concurrency=1 --reporter=append-only 2>/dev/null \
-  || pnpm install --prefer-offline --child-concurrency=1 --reporter=append-only
+# --child-concurrency=1 serializes the workspace `prepare` (tsc) builds so only
+# one compiler heap exists at a time (fixes the OOM-abort mode). --prefer-offline
+# reuses the warm pnpm store; --reporter=append-only keeps the captured log
+# small. We deliberately do NOT pass --ignore-scripts: those prepare hooks
+# (package builds, Drizzle codegen) are required for downstream services to boot.
+#
+# The fork/Worker failures are momentary, so retry the whole install a few times
+# with a growing pause, letting the competing workflow build spike pass before
+# trying again. install_deps is invoked as an `until` condition, so `set -e`
+# does not abort on an individual attempt's failure. The 30-min post-merge
+# timeout leaves ample headroom for the retries.
+#
+# Root cause: this container's cgroup caps total processes at pids.max=1024 and
+# the resident dev workflows already hold ~900 of them, so only ~100 PIDs are
+# free. When several task merges land close together each fires its own
+# post-merge install; their concurrent pnpm link-worker pools + tsc builds blow
+# past the PID ceiling and every fork fails. Two mitigations:
+#   1. flock mutex -- overlapping post-merge runs queue on one lock instead of
+#      colliding. The lock is held on fd 9 and released automatically when the
+#      process exits (no stale locks). Blocking is bounded by the 30-min script
+#      timeout.
+#   2. UV_THREADPOOL_SIZE=2 -- shrink each node process's libuv thread pool
+#      (default 4) so pnpm + every tsc child claim fewer of the scarce PIDs.
+exec 9>/tmp/aivo-post-merge-install.lock
+flock 9
+export UV_THREADPOOL_SIZE=2
+
+install_deps() {
+  pnpm install --frozen-lockfile --prefer-offline --child-concurrency=1 --reporter=append-only 2>/dev/null \
+    || pnpm install --prefer-offline --child-concurrency=1 --reporter=append-only
+}
+
+attempt=1
+max_attempts=4
+until install_deps; do
+  if [ "$attempt" -ge "$max_attempts" ]; then
+    echo "pnpm install still failing after $max_attempts attempts; aborting." >&2
+    exit 1
+  fi
+  backoff=$((attempt * 20))
+  echo "pnpm install attempt $attempt failed (transient resource spike); retrying in ${backoff}s..." >&2
+  sleep "$backoff"
+  attempt=$((attempt + 1))
+done
 
 echo "Installing brain-svc Python dependencies..."
 cd services/brain-svc && pip install -q -r requirements.txt 2>/dev/null; cd ../..
