@@ -669,6 +669,28 @@ export class AgentOrchestrator {
       }
     }
 
+    // Response language: honour the learner's stored instruction language
+    // (brain-svc surfaces it as brain_context.language_profile) so the agentic
+    // tutor speaks the child's enrolled language. ai-svc resolves a name or a
+    // BCP-47 code and falls back to English when this is absent.
+    const languageProfile = (
+      brain as {
+        language_profile?: {
+          preferred_instruction_language?: unknown;
+          primary_language?: unknown;
+          dominant_language?: unknown;
+        };
+      }
+    ).language_profile;
+    const localePref =
+      (typeof languageProfile?.preferred_instruction_language === "string" &&
+        languageProfile.preferred_instruction_language) ||
+      (typeof languageProfile?.primary_language === "string" &&
+        languageProfile.primary_language) ||
+      (typeof languageProfile?.dominant_language === "string" &&
+        languageProfile.dominant_language) ||
+      undefined;
+
     // 4. Model loop with tool roundtrips (caps mirrored on the ai-svc side).
     let aiResult: AiTurnResult | null = null;
     let usedTokens = 0;
@@ -697,6 +719,7 @@ export class AgentOrchestrator {
           },
           delivery_level: state.deliveryLevel,
           functioning_level: state.negotiatedLevel,
+          locale: localePref,
         });
       } catch (err) {
         ladder.recordFailure(err instanceof Error ? err.message : String(err));

@@ -22,6 +22,7 @@ import pytest
 
 from ai_svc.agent.actions import ReplyValidationError, parse_agent_reply
 from ai_svc.agent.loop import AgentTurnRequest, run_turn
+from ai_svc.agent.prompts import build_turn_prompts
 from ai_svc.agent.tiering import MODEL_TIERS, TokenEnvelope, tier_chain
 
 
@@ -228,3 +229,57 @@ def test_garbage_completions_never_escape_run_turn(monkeypatch):
                 "offer_break",
                 "say",
             )
+
+
+# ── language directive in the agentic turn prompt ────────────────────────────
+
+
+def test_turn_prompt_defaults_to_english_directive():
+    system, _user = build_turn_prompts(
+        persona_context="You are Nova.",
+        observation={"beat": "check"},
+        allowed_actions=["advance", "say"],
+        allowed_tools=[],
+    )
+    assert "Respond entirely in English" in system
+
+
+def test_turn_prompt_honours_explicit_locale_code():
+    system, _user = build_turn_prompts(
+        persona_context="You are Nova.",
+        observation={"beat": "check"},
+        allowed_actions=["advance", "say"],
+        allowed_tools=[],
+        locale="es",
+    )
+    assert "Respond entirely in Spanish" in system
+
+
+def test_turn_prompt_honours_language_name():
+    # tutor-svc forwards the learner's stored language, which may be a name.
+    system, _user = build_turn_prompts(
+        persona_context="You are Nova.",
+        observation={"beat": "check"},
+        allowed_actions=["advance", "say"],
+        allowed_tools=[],
+        locale="French",
+    )
+    assert "Respond entirely in French" in system
+
+
+def test_run_turn_threads_locale_into_the_system_prompt(monkeypatch):
+    captured: dict = {}
+
+    async def fake_generate(**kwargs):
+        captured["system_prompt"] = kwargs.get("system_prompt", "")
+        return {
+            "content": json.dumps(
+                {"action": {"kind": "advance"}, "rationale": "ready"}
+            ),
+            "model": "fake",
+        }
+
+    _inject_fake_gateway(monkeypatch, fake_generate)
+    result = _run(run_turn(_req(locale="es")))
+    assert result.kind == "action"
+    assert "Respond entirely in Spanish" in captured["system_prompt"]
