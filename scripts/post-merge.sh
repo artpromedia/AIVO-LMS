@@ -3,6 +3,49 @@ set -e
 
 echo "=== Post-merge setup ==="
 
+# --- Reap orphaned leftovers from previously CANCELLED post-merge runs ---
+# When the platform cancels a post-merge it SIGKILLs our script, but the
+# install's grandchildren (the per-package `prepare` tsc compilers, and the
+# `pnpm install` itself) get reparented to init (ppid=1) and keep
+# running/hung forever. They never exit on their own, so they steadily drain
+# this container's cgroup pids.max=1024 budget (the resident dev workflows
+# already hold ~900). Once the free headroom is gone the NEXT install can no
+# longer fork, runs for many minutes, and is itself cancelled -- leaving even
+# MORE orphans. That feedback loop is what surfaces as repeated
+# "Error in river, code: CANCEL" on post-merge + reconciliation.
+#
+# Breaking the loop here makes the script self-healing regardless of how the
+# previous run died (SIGKILL can't be trapped, so start-of-run cleanup is the
+# only reliable place). We ONLY target processes reparented to init (ppid=1):
+# a healthy prepare-build tsc is a short-lived child of pnpm (ppid!=1) and a
+# legitimate concurrent peer install is a child of its own post-merge script,
+# so neither matches. tsserver / next-dev / the running services are never
+# bare `typescript/bin/tsc` or `pnpm install` under init.
+reap_orphaned_builds() {
+  local p stat after ppid cmd reaped=0
+  for p in $(ls /proc 2>/dev/null | grep -E '^[0-9]+$'); do
+    [ "$p" = "$$" ] && continue
+    stat=$(cat "/proc/$p/stat" 2>/dev/null) || continue
+    after=${stat##*) }          # strip "pid (comm) " -> "state ppid pgrp ..."
+    ppid=$(echo "$after" | awk '{print $2}')
+    [ "$ppid" = "1" ] || continue
+    cmd=$(tr '\0' ' ' < "/proc/$p/cmdline" 2>/dev/null) || continue
+    case "$cmd" in
+      *typescript/bin/tsc*|*"pnpm install"*|*pnpm*\ install\ *)
+        echo "  reaping orphaned post-merge leftover pid=$p" >&2
+        kill -9 "$p" 2>/dev/null && reaped=$((reaped + 1)) || true
+        ;;
+    esac
+  done
+  echo "  reaped $reaped orphaned build process(es) from prior cancelled runs" >&2
+}
+reap_orphaned_builds
+
+# If we are cancelled gracefully (SIGTERM), tear down our own build subtree so
+# we don't add to the orphan pile. SIGKILL still can't be trapped -- the
+# start-of-run reap above is the backstop for that case.
+trap 'pkill -9 -P $$ 2>/dev/null || true' TERM INT
+
 echo "Installing pnpm dependencies..."
 # This post-merge runs while every dev workflow is still resident (Marketing,
 # Web App, Brain, Identity, mockup-sandbox), so the container is memory- and
