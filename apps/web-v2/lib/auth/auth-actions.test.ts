@@ -249,12 +249,13 @@ describe("onboardingSignInAction identity-svc failure mapping (friendly error co
   const CASES = [
     { status: 401, code: "invalid_credentials" },
     { status: 403, code: "wrong_surface" },
-    { status: 500, code: "login_failed" },
-    { status: 502, code: "login_failed" },
+    { status: 500, code: "service_unavailable" },
+    { status: 502, code: "service_unavailable" },
+    { status: undefined, code: "service_unavailable" },
   ] as const;
 
   for (const { status, code } of CASES) {
-    it(`redirects to the sign-in page with error=${code} for status ${status}`, async () => {
+    it(`redirects to the sign-in page with error=${code} for status ${status ?? "(none)"}`, async () => {
       identityLogin.mockResolvedValueOnce({ kind: "error", status });
       await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
         `NEXT_REDIRECT:/onboarding/signin?error=${code}`,
@@ -468,9 +469,9 @@ describe("loginAction identity-svc failure mapping (friendly error codes)", () =
   const CASES = [
     { status: 401, code: "invalid_credentials" },
     { status: 403, code: "wrong_surface" },
-    { status: 500, code: "login_failed" },
-    { status: 502, code: "login_failed" },
-    { status: undefined, code: "login_failed" },
+    { status: 500, code: "service_unavailable" },
+    { status: 502, code: "service_unavailable" },
+    { status: undefined, code: "service_unavailable" },
   ] as const;
 
   for (const { status, code } of CASES) {

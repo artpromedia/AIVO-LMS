@@ -17,6 +17,7 @@ const SIGNIN_ERROR_CODES = new Set([
   "wrong_surface",
   "unsupported_role",
   "login_failed",
+  "service_unavailable",
 ]);
 
 export default function SignInPage() {

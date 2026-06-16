@@ -2266,7 +2266,8 @@
         "invalid_credentials": "Esse e-mail ou senha não confere. Tente novamente.",
         "wrong_surface": "Esta conta entra a partir de outro portal.",
         "unsupported_role": "Este tipo de conta não pode entrar aqui.",
-        "login_failed": "Não foi possível entrar. Tente de novo em instantes."
+        "login_failed": "Não foi possível entrar. Tente de novo em instantes.",
+        "service_unavailable": "Não conseguimos acessar o login agora. Tente de novo em instantes."
       }
     },
     "signup": {

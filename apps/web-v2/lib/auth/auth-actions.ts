@@ -159,10 +159,16 @@ export async function onboardingSignInAction(formData: FormData): Promise<void> 
         redirect(result.redirectTo);
       }
     }
+    // A real 401 (wrong email/password) stays `invalid_credentials` and a 403
+    // (right credentials, wrong portal) stays `wrong_surface`. Everything else
+    // — 500 / 502 / unreachable / unknown status — is a service/network outage,
+    // so it maps to `service_unavailable` ("we can't reach sign-in right now")
+    // instead of the generic `login_failed`, so an adult isn't told they got
+    // their password wrong when sign-in is merely down.
     let code: string;
     if (result.status === 401) code = "invalid_credentials";
     else if (result.status === 403) code = "wrong_surface";
-    else code = "login_failed";
+    else code = "service_unavailable";
     redirect(`${errorReturn}?error=${code}`);
   }
 
@@ -301,10 +307,16 @@ export async function loginAction(formData: FormData): Promise<void> {
         redirect(result.redirectTo);
       }
     }
+    // A real 401 (wrong email/password) stays `invalid_credentials` and a 403
+    // (right credentials, wrong portal) stays `wrong_surface`. Everything else
+    // — 500 / 502 / unreachable / unknown status — is a service/network outage,
+    // so it maps to `service_unavailable` ("we can't reach sign-in right now")
+    // instead of the generic `login_failed`, so an adult isn't told they got
+    // their password wrong when sign-in is merely down.
     let code: string;
     if (result.status === 401) code = "invalid_credentials";
     else if (result.status === 403) code = "wrong_surface";
-    else code = "login_failed";
+    else code = "service_unavailable";
     redirect(`/login?error=${code}`);
   }
 

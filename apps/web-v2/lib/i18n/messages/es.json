@@ -2266,7 +2266,8 @@
         "invalid_credentials": "Ese correo o contraseña no coinciden. Inténtalo de nuevo.",
         "wrong_surface": "Esta cuenta inicia sesión desde otro portal.",
         "unsupported_role": "Este tipo de cuenta no puede iniciar sesión aquí.",
-        "login_failed": "No pudimos iniciar tu sesión. Inténtalo de nuevo en un momento."
+        "login_failed": "No pudimos iniciar tu sesión. Inténtalo de nuevo en un momento.",
+        "service_unavailable": "Ahora mismo no podemos conectar con el inicio de sesión. Inténtalo de nuevo en un momento."
       }
     },
     "signup": {

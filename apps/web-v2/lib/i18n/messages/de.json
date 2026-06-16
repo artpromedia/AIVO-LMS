@@ -2266,7 +2266,8 @@
         "invalid_credentials": "E-Mail oder Passwort stimmen nicht. Bitte erneut versuchen.",
         "wrong_surface": "Dieses Konto meldet sich über ein anderes Portal an.",
         "unsupported_role": "Dieser Kontotyp kann sich hier nicht anmelden.",
-        "login_failed": "Anmeldung fehlgeschlagen. Bitte versuche es gleich noch einmal."
+        "login_failed": "Anmeldung fehlgeschlagen. Bitte versuche es gleich noch einmal.",
+        "service_unavailable": "Wir erreichen die Anmeldung gerade nicht. Bitte versuche es gleich noch einmal."
       }
     },
     "signup": {

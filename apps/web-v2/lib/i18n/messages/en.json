@@ -2266,7 +2266,8 @@
         "invalid_credentials": "That email or password didn't match. Please try again.",
         "wrong_surface": "This account signs in from a different portal.",
         "unsupported_role": "This account type can't sign in here.",
-        "login_failed": "We couldn't sign you in. Please try again in a moment."
+        "login_failed": "We couldn't sign you in. Please try again in a moment.",
+        "service_unavailable": "We can't reach sign-in right now. Please try again in a moment."
       }
     },
     "signup": {

@@ -2266,7 +2266,8 @@
         "invalid_credentials": "邮箱或密码不正确。请重试。",
         "wrong_surface": "此账户从其他门户登录。",
         "unsupported_role": "此账户类型无法在此登录。",
-        "login_failed": "无法为您登录。请稍后再试。"
+        "login_failed": "无法为您登录。请稍后再试。",
+        "service_unavailable": "现在无法连接登录服务。请稍后再试。"
       }
     },
     "signup": {

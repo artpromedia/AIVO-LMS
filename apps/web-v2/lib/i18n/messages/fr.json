@@ -2266,7 +2266,8 @@
         "invalid_credentials": "Cet e-mail ou ce mot de passe ne correspond pas. Réessaie.",
         "wrong_surface": "Ce compte se connecte depuis un autre portail.",
         "unsupported_role": "Ce type de compte ne peut pas se connecter ici.",
-        "login_failed": "Connexion impossible. Réessaie dans un instant."
+        "login_failed": "Connexion impossible. Réessaie dans un instant.",
+        "service_unavailable": "Impossible de joindre la connexion pour le moment. Réessaie dans un instant."
       }
     },
     "signup": {
