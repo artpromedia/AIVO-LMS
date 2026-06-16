@@ -1954,7 +1954,7 @@
     "login": {
       "brand_heading": "Entre para continuar a sua jornada na AIVO.",
       "brand_body": "Seus tutores, missões e informações para a família, tudo em um só lugar, ajustado à forma como seu aluno pensa.",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 verificado",
       "quote": "A AIVO se adapta à forma como minha filha realmente aprende. A primeira plataforma que não nos fez sentir que estávamos lutando contra ela.",
       "quote_attribution": "— Mãe de uma aluna do 3.º ano",
       "welcome_back": "Bem-vindo de volta.",
@@ -1980,7 +1980,8 @@
       },
       "notices": {
         "password_reset": "Sua senha foi redefinida. Entre com sua nova senha.",
-        "logged_out": "Você saiu da conta."
+        "logged_out": "Você saiu da conta.",
+        "email_verified": "Your email is confirmed — you can sign in now."
       },
       "continue_with_sso": "Continuar com {idp}",
       "sso_required_note": "Seu distrito entra com {idp}. O login por senha está desativado para este domínio.",
@@ -2019,14 +2020,14 @@
       "email_label": "E-mail",
       "password_label": "Senha",
       "password_helper": "Pelo menos 8 caracteres com um número e um símbolo.",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "Riley, responsável",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "Informe seu nome, um e-mail válido e uma senha com pelo menos 8 caracteres.",
+        "email_taken": "Esse e-mail já está registrado. Tente entrar em vez disso.",
+        "weak_password": "Essa senha não atende à nossa política de segurança. Use pelo menos 8 caracteres com um número e um símbolo.",
+        "service_unavailable": "Não conseguimos acessar nosso serviço de cadastro. Tente novamente em instantes.",
+        "unsupported_role": "Este tipo de conta não pode ser criado aqui.",
+        "signup_failed": "Não conseguimos criar sua conta. Tente novamente."
       },
       "errors_inline": {
         "name": "Digite pelo menos 2 caracteres.",
@@ -2133,13 +2134,13 @@
       "no_code": "Didn't get a code?"
     },
     "sso_start": {
-      "eyebrow": "Single sign-on",
-      "title": "Continue with {idp}",
-      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
-      "continue": "Continue with {idp}",
-      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
-      "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider",
+      "eyebrow": "Logon único",
+      "title": "Continuar com {idp}",
+      "subtitle": "Vamos encaminhar você ao provedor de identidade da sua organização para concluir o login.",
+      "continue": "Continuar",
+      "redirect_note": "O redirecionamento pode levar alguns segundos.",
+      "back_to_login": "Voltar ao login",
+      "default_idp": "Provedor de identidade",
       "district_badge": "District Access",
       "continue_with_name": "Continue with {name}",
       "district_subtitle": "You'll be redirected to your district's secure sign-in to access AIVO Learning.",
@@ -2208,6 +2209,31 @@
       "wordmark_schools": "Schools",
       "trust_support": "Our support team is here to help you and your family every step of the way.",
       "trust_secure": "Your account is protected with bank-level encryption and multi-factor security."
+    },
+    "verify": {
+      "heading": "Confirm your email",
+      "errors": {
+        "missing_token": "This confirmation link is missing its security token. Request a new link below.",
+        "missing_email": "Enter the email address you signed up with so we can send a new link.",
+        "invalid_token": "This confirmation link has expired or has already been used. Request a new one to continue.",
+        "verify_failed": "We couldn’t confirm your email just now. Please try again in a moment.",
+        "mock_mode": "Email verification is disabled in mock mode. Run with AUTH_MODE=custom and the identity service to test this flow."
+      },
+      "notices": {
+        "resent": "If that account exists and still needs confirming, a new link is on its way."
+      },
+      "confirm_eyebrow": "Almost there",
+      "confirm_title": "Confirm your email address",
+      "confirm_subtitle": "Tap the button below to verify this email and secure your account.",
+      "confirm_submit": "Confirm my email",
+      "no_token_eyebrow": "Confirm email",
+      "no_token_title": "This confirmation link is incomplete",
+      "no_token_subtitle": "The link in your email is missing its security token. Request a new one below.",
+      "no_token_body": "For your security, confirmation links expire after 24 hours and can only be used once.",
+      "resend_email_label": "Email address",
+      "resend_cta": "Send a new link",
+      "resend_help": "We’ll email a fresh confirmation link if the account still needs verifying.",
+      "back_to_login": "Back to sign in"
     }
   },
   "onboarding": {

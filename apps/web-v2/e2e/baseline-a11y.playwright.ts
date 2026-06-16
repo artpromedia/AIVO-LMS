@@ -38,6 +38,10 @@ const AXE_RULES = {
 } as const;
 
 const SEEDED_BASELINE = "bas_demo_sky";
+// Dedicated IN-PROGRESS baseline seeded for switch-scan coverage. bas_demo_sky
+// is complete (completion screen, no scanner), so the scan-ring assertions run
+// against this in-progress runner instead. See lib/db/seed.ts (seedSkyDemoJourney).
+const SCAN_BASELINE = "bas_demo_sky_scan";
 const SEEDED_LEARNER = "lrn_demo_sky";
 
 const learnerCookie = {
@@ -105,7 +109,8 @@ test.describe("@a11y learner baseline flow", () => {
   // mounts the scan controller and paints a high-contrast scan-focus ring on
   // the highlighted control (`data-scan-current`). The ring must hold the axe
   // bar in calm, high-contrast, and reduced-motion — the binding UX rule.
-  test(`@a11y baseline runner scan mode (/learner/baseline/${SEEDED_BASELINE})`, async ({
+  // Runs against the dedicated in-progress baseline (bas_demo_sky is complete).
+  test(`@a11y baseline runner scan mode (/learner/baseline/${SCAN_BASELINE})`, async ({
     page,
   }) => {
     // Enable single-switch scanning via the real accessibility BFF (the
@@ -116,7 +121,7 @@ test.describe("@a11y learner baseline flow", () => {
     expect(res.ok()).toBeTruthy();
 
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto(`/learner/baseline/${SEEDED_BASELINE}`);
+    await page.goto(`/learner/baseline/${SCAN_BASELINE}`);
     await page.waitForSelector("main", { timeout: 30_000 });
     // The scanner highlights the first operable control; wait for the ring.
     await expect(page.locator('[data-scan-current="true"]').first()).toBeVisible({

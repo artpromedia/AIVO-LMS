@@ -179,6 +179,31 @@ export const passwordResetTokens = pgTable(
 );
 
 /**
+ * Email verification tokens. Mirrors `passwordResetTokens`: a single-use,
+ * hashed, time-boxed token minted at registration (and on resend) that flips
+ * `users.emailVerified` to true when redeemed. The raw token only ever lives
+ * in the email link; the row stores its sha256 so a database read cannot
+ * reconstruct a working link.
+ */
+export const emailVerificationTokens = pgTable(
+  "email_verification_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .references(() => users.id)
+      .notNull(),
+    tokenHash: varchar("token_hash", { length: 128 }).notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    usedAt: timestamp("used_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("email_verification_tokens_token_hash_idx").on(table.tokenHash),
+    index("email_verification_tokens_user_id_idx").on(table.userId),
+  ],
+);
+
+/**
  * Sprint 5: Admin session hygiene.
  * Tracks per-internal-user session activity so we can enforce idle timeouts,
  * periodic re-MFA, and device-binding for high-privilege accounts.

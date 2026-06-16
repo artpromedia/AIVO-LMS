@@ -34,6 +34,7 @@ import {
   internalIepNotifySchema,
   internalTeamInviteSchema,
   internalPasswordResetSchema,
+  internalVerifyEmailSchema,
   internalDistrictAdminInviteSchema,
   internalParentInviteSchema,
   internalTrialEndingSchema,
@@ -820,6 +821,45 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
       } catch (err: any) {
         logger.error({ err, to }, "Failed to send password reset email");
         return reply.code(500).send({ error: "Failed to send password reset" });
+      }
+    },
+  );
+
+  app.post(
+    "/api/comms/internal/verify-email",
+    { schema: internalVerifyEmailSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, verifyUrl, name } = request.body as any;
+      if (!to || !verifyUrl) {
+        return reply.code(400).send({ error: "to and verifyUrl required" });
+      }
+      if (!isConfigured()) {
+        logger.warn(
+          { to },
+          "Email verification requested but email not configured, link logged for dev",
+        );
+        return { status: "dev_mode", verifyUrl };
+      }
+      const rendered = renderTemplate("verify_email", { verifyUrl, name: name || "there" });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "verify_email",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send verification email");
+        return reply.code(500).send({ error: "Failed to send verification email" });
       }
     },
   );

@@ -26,7 +26,13 @@ export function buildCompletionLearnedChips(opts: {
   return [
     ...(asParent
       ? subjectMastery.map(
-          (s) => `${s.subjectName}: starting at ${s.estimate.replaceAll("_", " ")}`,
+          // Defensive: a malformed summary entry (missing estimate) must never
+          // throw and white-screen the whole runner — fall back to a neutral
+          // phrase so the completion hero still renders.
+          (s) =>
+            `${s.subjectName}: starting at ${
+              s.estimate ? s.estimate.replaceAll("_", " ") : "their level"
+            }`,
         )
       : []),
     ...(chips.includes("iep") ? ["IEP supports stay on"] : []),

@@ -6,6 +6,12 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+# Workspace package `prepare` scripts (e.g. @aivo/adaptive-baseline,
+# @aivo/accessibility-contract -> tsc) run during `pnpm install` and read the
+# root TS configs via `extends: ../../tsconfig.json` / `../../tsconfig.base.json`.
+# Without them tsc fails with TS5083 (missing base) and TS2802 (target falls
+# back below ES2015). Mirrors apps/web-v2/Dockerfile.
+COPY tsconfig.json tsconfig.base.json ./
 COPY apps/web-admin/package.json apps/web-admin/package.json
 COPY packages packages
 RUN pnpm install --frozen-lockfile

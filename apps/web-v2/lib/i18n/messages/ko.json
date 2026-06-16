@@ -1954,7 +1954,7 @@
     "login": {
       "brand_heading": "로그인하여 AIVO 여정을 계속하세요.",
       "brand_body": "튜터, 미션, 가족 인사이트를 한곳에 모았습니다. 학습자가 생각하는 방식에 맞춰 조정됩니다.",
-      "trust_badge": "COPPA · FERPA · SOC 2",
+      "trust_badge": "COPPA · FERPA · SOC 2 검증됨",
       "quote": "AIVO는 제 딸이 실제로 배우는 방식에 맞춰 줍니다. 우리가 맞서 싸운다는 느낌을 주지 않은 첫 번째 플랫폼입니다.",
       "quote_attribution": "— 3학년 학습자의 학부모",
       "welcome_back": "다시 오신 것을 환영합니다.",
@@ -1980,7 +1980,8 @@
       },
       "notices": {
         "password_reset": "비밀번호가 재설정되었습니다. 새 비밀번호로 로그인하세요.",
-        "logged_out": "로그아웃되었습니다."
+        "logged_out": "로그아웃되었습니다.",
+        "email_verified": "Your email is confirmed — you can sign in now."
       },
       "continue_with_sso": "{idp}(으)로 계속",
       "sso_required_note": "소속 교육구는 {idp}로 로그인합니다. 이 이메일 도메인은 비밀번호 로그인이 비활성화되어 있습니다.",
@@ -2019,14 +2020,14 @@
       "email_label": "이메일",
       "password_label": "비밀번호",
       "password_helper": "숫자와 기호를 포함해 8자 이상.",
-      "name_placeholder": "Riley Parent",
+      "name_placeholder": "보호자 Riley",
       "errors": {
-        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
-        "email_taken": "That email is already registered. Try signing in instead.",
-        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
-        "unsupported_role": "This account type can't be created here.",
-        "signup_failed": "We couldn't create your account. Please try again."
+        "invalid_input": "이름, 올바른 이메일, 8자 이상의 비밀번호를 입력하세요.",
+        "email_taken": "이미 등록된 이메일입니다. 대신 로그인해 보세요.",
+        "weak_password": "이 비밀번호는 보안 정책을 충족하지 않습니다. 숫자와 기호를 포함해 8자 이상을 사용하세요.",
+        "service_unavailable": "가입 서비스에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
+        "unsupported_role": "이 계정 유형은 여기에서 만들 수 없습니다.",
+        "signup_failed": "계정을 만들 수 없습니다. 다시 시도하세요."
       },
       "errors_inline": {
         "name": "2자 이상 입력해 주세요.",
@@ -2133,13 +2134,13 @@
       "no_code": "Didn't get a code?"
     },
     "sso_start": {
-      "eyebrow": "Single sign-on",
-      "title": "Continue with {idp}",
-      "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
-      "continue": "Continue with {idp}",
-      "redirect_note": "You're being redirected automatically. If nothing happens, use the button below.",
-      "back_to_login": "Back to sign-in",
-      "default_idp": "your identity provider",
+      "eyebrow": "싱글 사인온",
+      "title": "{idp}로 계속",
+      "subtitle": "로그인을 완료할 수 있도록 조직의 ID 제공업체로 이동합니다.",
+      "continue": "계속",
+      "redirect_note": "리디렉션에 몇 초가 걸릴 수 있습니다.",
+      "back_to_login": "로그인으로 돌아가기",
+      "default_idp": "ID 제공업체",
       "district_badge": "District Access",
       "continue_with_name": "Continue with {name}",
       "district_subtitle": "You'll be redirected to your district's secure sign-in to access AIVO Learning.",
@@ -2208,6 +2209,31 @@
       "wordmark_schools": "Schools",
       "trust_support": "Our support team is here to help you and your family every step of the way.",
       "trust_secure": "Your account is protected with bank-level encryption and multi-factor security."
+    },
+    "verify": {
+      "heading": "Confirm your email",
+      "errors": {
+        "missing_token": "This confirmation link is missing its security token. Request a new link below.",
+        "missing_email": "Enter the email address you signed up with so we can send a new link.",
+        "invalid_token": "This confirmation link has expired or has already been used. Request a new one to continue.",
+        "verify_failed": "We couldn’t confirm your email just now. Please try again in a moment.",
+        "mock_mode": "Email verification is disabled in mock mode. Run with AUTH_MODE=custom and the identity service to test this flow."
+      },
+      "notices": {
+        "resent": "If that account exists and still needs confirming, a new link is on its way."
+      },
+      "confirm_eyebrow": "Almost there",
+      "confirm_title": "Confirm your email address",
+      "confirm_subtitle": "Tap the button below to verify this email and secure your account.",
+      "confirm_submit": "Confirm my email",
+      "no_token_eyebrow": "Confirm email",
+      "no_token_title": "This confirmation link is incomplete",
+      "no_token_subtitle": "The link in your email is missing its security token. Request a new one below.",
+      "no_token_body": "For your security, confirmation links expire after 24 hours and can only be used once.",
+      "resend_email_label": "Email address",
+      "resend_cta": "Send a new link",
+      "resend_help": "We’ll email a fresh confirmation link if the account still needs verifying.",
+      "back_to_login": "Back to sign in"
     }
   },
   "onboarding": {

@@ -117,7 +117,8 @@ export function StrengthsRecap({
           border-radius: 9999px;
           font-size: 0.92rem;
           font-weight: 600;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: clamp the palette hue toward near-black for the chip label. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           background: color-mix(in oklch, var(--bc-primary, #5b3df5) 10%, transparent);
           border: 1px solid color-mix(in oklch, var(--bc-primary, #5b3df5) 28%, transparent);
         }

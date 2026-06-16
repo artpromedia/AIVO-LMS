@@ -52,6 +52,19 @@ const nextConfig: NextConfig = {
   // mobile screenshots and isn't useful day-to-day. Production builds
   // never render it; this flag silences it in dev too.
   devIndicators: false,
+  // Server Actions handle multipart uploads (parent IEP-document upload in
+  // app/parent/learners/[learnerId]/iep/page.tsx and profile-photo uploads).
+  // Next.js caps Server Action request bodies at 1 MB by default, so any real
+  // IEP PDF — the validator (lib/validators/iep.ts) allows up to 10 MiB — is
+  // rejected with "Body exceeded 1mb limit" before the action ever runs.
+  // Raise the limit to clear the 10 MiB app-level cap plus multipart boundary
+  // overhead. Keep this ≤ the web ingress `proxy-body-size` (currently 20m,
+  // infra/k8s/overlays/hetzner/web-ingress.yaml) so the edge doesn't 413 first.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "12mb",
+    },
+  },
   // NOTE: Set ``NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`` (32+ random bytes,
   // base64) in the deployment env so Server Action IDs are stable
   // across pod replicas and across redeploys of the same build.

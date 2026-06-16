@@ -400,7 +400,7 @@ export default async function BaselineRunnerPage({
           config={scanConfig}
           speakOnFocus={speakOnScanFocus}
           scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
-          announceTemplate={(label) => tScan("announce", { label })}
+          announceLabelTemplate={tScan.raw("announce")}
         >
           <CompletionHero
             learnerName={learner?.preferredName || learner?.firstName}
@@ -470,7 +470,7 @@ export default async function BaselineRunnerPage({
           config={scanConfig}
           speakOnFocus={speakOnScanFocus}
           scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
-          announceTemplate={(label) => tScan("announce", { label })}
+          announceLabelTemplate={tScan.raw("announce")}
         >
           <BreakCard
             variant={struggleVariant ? "struggle" : "cadence"}
@@ -630,7 +630,7 @@ export default async function BaselineRunnerPage({
         config={scanConfig}
         speakOnFocus={speakOnScanFocus}
         scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
-        announceTemplate={(label) => tScan("announce", { label })}
+        announceLabelTemplate={tScan.raw("announce")}
       >
         <BaselineProgressDots states={dots} ariaLabel="Baseline progress" />
 

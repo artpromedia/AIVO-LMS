@@ -1,5 +1,6 @@
 import { getStore, newId, nowIso } from "@/lib/db/store";
 import { buildBrainProfile } from "@/lib/learner/brain-profile";
+import { generateBaselineQuestions } from "@/lib/learner/baseline";
 import { brainProfileStateSchema } from "@/lib/validators/brain-profile";
 import { MOCK_USERS } from "@/lib/auth/mock-session";
 import { MOCK_TENANTS, ROLE_PERMISSIONS } from "@/lib/auth/tenants";
@@ -3678,7 +3679,7 @@ function seedSkyDemoJourney(store: ReturnType<typeof getStore>): void {
         answered: 12,
         correct: s.slug === "reading" ? 8 : 6,
         accuracy: s.slug === "reading" ? 0.67 : 0.5,
-        startLevel: s.slug === "reading" ? "approaching" : "emerging",
+        estimate: s.slug === "reading" ? "approaching" : "emerging",
       })),
       recommendedStartSkillId: skillBySlug.get("add-within-10")?.id ?? null,
       narrative:
@@ -3687,7 +3688,33 @@ function seedSkyDemoJourney(store: ReturnType<typeof getStore>): void {
   } as unknown as BaselineAssessment;
   store.baselineAssessments.set(baseline.id, baseline);
 
-  // ── 3. Approved brain profile ───────────────────────────────────────────
+  // ── 2b. In-progress baseline for the switch/scan @a11y e2e ─────────────
+  // The Sky demo baseline above is COMPLETE (it backs the approved-brain
+  // story), so it renders the completion screen — there is no scan runner to
+  // paint a scan-focus ring on. The switch-scanning a11y specs
+  // (baseline-switch-scan, baseline-a11y scan-mode) need an IN-PROGRESS runner
+  // with real questions. Seed a dedicated in-progress baseline with an OLDER
+  // createdAt so getActiveBaselineForLearner (latest createdAt wins) still
+  // returns bas_demo_sky for every other flow; the scan specs navigate to this
+  // one directly by id.
+  const scanBaseline: BaselineAssessment = {
+    id: "bas_demo_sky_scan",
+    learnerId,
+    tenantId,
+    subjectIds: baselineSubjects.map((s) => s.id),
+    status: "in_progress",
+    startedAt: daysAgo(20),
+    createdAt: daysAgo(20),
+  } as unknown as BaselineAssessment;
+  store.baselineAssessments.set(scanBaseline.id, scanBaseline);
+  const scanQuestions = generateBaselineQuestions({
+    baselineId: scanBaseline.id,
+    learner,
+    brainProfile: null,
+    subjects: baselineSubjects,
+    skills: Array.from(store.skills.values()),
+  });
+  for (const q of scanQuestions) store.baselineQuestions.set(q.id, q);
   const candidate = buildBrainProfile({
     learner,
     assessment,

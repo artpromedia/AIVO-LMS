@@ -1037,10 +1037,19 @@ jobs:
                 # the shared aivo-common-env secret (envFrom), so only the URL +
                 # timeout need an explicit per-service override here.
                 # ai-svc is a Python service listening on 8000 (NOT 3000).
+                #
+                # IEP upload antivirus: stream every PDF to the in-cluster clamd
+                # (infra/k8s/base/clamav.yaml) before parse/persist. In prod this
+                # FAILS CLOSED (scanner unreachable → 503), so clamav must stay
+                # healthy — it is a durable Deployment, enabled via
+                # scripts/setup-iep-clamav.sh. Prod only (staging has no clamav).
                 EXTRA_SETS=(
                   --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:8000"
                   --set "env.BRAIN_SVC_URL=http://brain-svc.aivo.svc.cluster.local:8000"
                   --set "env.AI_IEP_DRAFT_TIMEOUT_MS=20000"
+                  --set "env.CLAMAV_HOST=clamav.aivo.svc.cluster.local"
+                  --set "env.CLAMAV_PORT=3310"
+                  --set "env.CLAMAV_TIMEOUT_MS=15000"
                 )
                 ;;
               ai-svc)
@@ -1065,9 +1074,26 @@ jobs:
               # Explicitly set the colliding var to numeric 3000.
               admin-svc)        EXTRA_SETS=(--set env.ADMIN_SVC_PORT=3000) ;;
               identity-svc)
+                # Avatar (profile-photo) object storage → in-cluster MinIO
+                # (service `minio`, ns aivo, port 9000), bucket `avatars`.
+                # Without these, services/identity-svc/src/lib/avatar-storage.ts
+                # falls back to pod-local disk; with 2 prod replicas a photo
+                # written to pod A 404s when /api/avatars/... load-balances to
+                # pod B (and is lost on restart). AVATAR_S3_BUCKET flips the
+                # backend to S3/MinIO so both replicas share durable state. The
+                # credentials (AVATAR_S3_ACCESS_KEY_ID + _SECRET_ACCESS_KEY) are
+                # a least-privilege MinIO service account scoped to the avatars
+                # bucket, supplied via the aivo-common-env secret (envFrom) —
+                # provisioned by scripts/set-identity-avatar-s3.sh. Staging is
+                # single-replica, so it keeps the local-disk fallback and is
+                # intentionally omitted here.
                 EXTRA_SETS=(
                   --set "env.WEB_ADMIN_LOGIN_URL=https://admin.aivolearning.com/login"
                   --set "env.WEB_DISTRICT_LOGIN_URL=https://district.aivolearning.com/login"
+                  --set "env.AVATAR_S3_BUCKET=avatars"
+                  --set "env.AVATAR_S3_ENDPOINT=http://minio.aivo.svc.cluster.local:9000"
+                  --set "env.AVATAR_S3_REGION=us-east-1"
+                  --set "env.AVATAR_S3_FORCE_PATH_STYLE=true"
                 )
                 ;;
               billing-svc)      EXTRA_SETS=(--set env.BILLING_SVC_PORT=3000) ;;

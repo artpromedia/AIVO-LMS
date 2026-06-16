@@ -27,6 +27,7 @@ describe("parity screens exist", () => {
     ["app", "(learner)", "lesson-runs.tsx"],
     ["src", "api", "observations.ts"],
     ["src", "api", "passwordRecovery.ts"],
+    ["src", "api", "emailVerification.ts"],
     ["components", "SplashGate.tsx"],
   ])("ships %s/%s/%s", (...parts) => {
     expect(isFile(...parts), `missing ${parts.join("/")}`).toBe(true);
@@ -49,6 +50,16 @@ describe("recovery parity is satisfied by the auth group", () => {
   it("keeps the auth forgot-password screen wired to the recovery client", () => {
     expect(isFile("app", "(auth)", "forgot-password.tsx")).toBe(true);
     expect(read("app", "(auth)", "forgot-password.tsx")).toMatch(/requestPasswordReset/);
+  });
+});
+
+describe("email-verification parity is satisfied by the auth group", () => {
+  it("ships the verify-email screen wired to the verification client", () => {
+    expect(isFile("app", "(auth)", "verify-email.tsx")).toBe(true);
+    expect(read("app", "(auth)", "verify-email.tsx")).toMatch(/verifyEmail/);
+  });
+  it("registers verify-email in the auth layout", () => {
+    expect(read("app", "(auth)", "_layout.tsx")).toMatch(/name="verify-email"/);
   });
 });
 

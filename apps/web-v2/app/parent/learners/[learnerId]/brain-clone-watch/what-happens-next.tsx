@@ -165,7 +165,8 @@ export function WhatHappensNext({
           font-size: 0.78rem;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: clamp the learner palette hue toward near-black for the eyebrow. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           margin: 0 0 0.35rem;
           font-weight: 700;
         }
@@ -216,7 +217,8 @@ export function WhatHappensNext({
           font-weight: 600;
           padding: 0.3rem 0.75rem;
           border-radius: 9999px;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: clamp the palette hue toward near-black for the chip label. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           background: color-mix(in oklch, var(--bc-primary, #5b3df5) 10%, transparent);
           border: 1px solid color-mix(in oklch, var(--bc-primary, #5b3df5) 28%, transparent);
         }
@@ -238,7 +240,8 @@ export function WhatHappensNext({
           font-weight: 600;
           border-radius: 9999px;
           text-decoration: none;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: clamp the palette hue toward near-black for the outline CTA label. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           background: transparent;
           border: 1px solid color-mix(in oklch, var(--bc-primary, #5b3df5) 45%, var(--iw-border, #e2e6f0));
           min-height: 44px;
@@ -259,7 +262,9 @@ export function WhatHappensNext({
           font-weight: 600;
           border-radius: 9999px;
           text-decoration: none;
-          background: var(--bc-primary, #5b3df5);
+          /* AA: clamp the palette hue dark enough that the white label clears
+             4.5:1 regardless of the learner's brain colour. */
+          background: color-mix(in oklab, var(--bc-primary, #4338ca) 72%, #14082e);
           color: #fff;
           min-height: 48px;
         }

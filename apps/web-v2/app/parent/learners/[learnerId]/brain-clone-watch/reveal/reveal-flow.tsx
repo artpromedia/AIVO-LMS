@@ -205,7 +205,10 @@ export function RevealFlow({
           font-size: 0.82rem;
           font-weight: 600;
           letter-spacing: 0.04em;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: --bc-primary is the learner's brain-palette hue and can be
+             light; mix toward near-black so this small transition copy always
+             clears 4.5:1 on the light reveal canvas (mirrors the eyebrow). */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
         }
         .reveal-flow-stage {
           animation: revealStageIn 420ms ease;
@@ -218,7 +221,10 @@ export function RevealFlow({
           letter-spacing: 0.16em;
           text-transform: uppercase;
           font-weight: 700;
-          color: var(--bc-primary, #5b3df5);
+          /* AA: --bc-primary is the learner's brain-palette hue and can be
+             light; mix toward near-black so eyebrow text always clears
+             4.5:1 on the light reveal canvas. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
         }
         .reveal-screen-title {
           margin: 0;
@@ -269,8 +275,10 @@ export function RevealFlow({
           border-radius: 9999px;
           cursor: pointer;
           color: #fff;
-          background: var(--bc-primary, #5b3df5);
-          border: 1px solid var(--bc-primary, #5b3df5);
+          /* AA: clamp the learner-palette hue dark enough that white label
+             text clears 4.5:1 regardless of the brain colour. */
+          background: color-mix(in oklab, var(--bc-primary, #4338ca) 72%, #14082e);
+          border: 1px solid color-mix(in oklab, var(--bc-primary, #4338ca) 72%, #14082e);
           transition: transform 180ms ease;
         }
         .reveal-flow-continue:hover { transform: translateY(-1px); }

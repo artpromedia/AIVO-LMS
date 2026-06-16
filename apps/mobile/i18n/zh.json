@@ -136,7 +136,18 @@
     "continueAsLearner": "以 {{name}} 继续",
     "noProfilesYet": "此设备上还没有学习者档案。请输入家长的电子邮箱以继续。",
     "enterParentEmailCta": "使用家长邮箱",
-    "signInAsParent": "改为以家长身份登录"
+    "signInAsParent": "改为以家长身份登录",
+    "verifyEmailTitle": "Confirm your email",
+    "verifyEmailSubtitle": "Tap below to verify this email and secure your account.",
+    "verifyEmailSubmit": "Confirm my email",
+    "verifyEmailSuccess": "Your email is confirmed. You can sign in now.",
+    "verifyEmailMissingToken": "This confirmation link is missing its security token. Request a new one below.",
+    "verifyEmailExpiredLink": "This confirmation link has expired or has already been used. Request a new one to continue.",
+    "verifyEmailResendTitle": "Need a new link?",
+    "verifyEmailResendLabel": "Email address",
+    "verifyEmailResendSubmit": "Send a new link",
+    "verifyEmailResendDone": "If that account exists and still needs confirming, a new link is on its way.",
+    "verifyEmailResendHelp": "We’ll email a fresh confirmation link if the account still needs verifying."
   },
   "parent": {
     "greeting": "你好，{{name}}",

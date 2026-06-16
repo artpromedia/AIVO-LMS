@@ -35,7 +35,7 @@ const ERROR_CODES = new Set([
   "login_failed",
   "service_unavailable",
 ]);
-const NOTICE_CODES = new Set(["password_reset", "logged_out"]);
+const NOTICE_CODES = new Set(["password_reset", "logged_out", "email_verified"]);
 
 export default async function LoginPage({
   searchParams,

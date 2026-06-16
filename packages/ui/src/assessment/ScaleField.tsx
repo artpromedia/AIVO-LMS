@@ -58,8 +58,6 @@ export function ScaleField({
     <fieldset
       className={cn("flex flex-col gap-3", className)}
       aria-describedby={describedBy}
-      aria-required={required || undefined}
-      aria-invalid={error ? true : undefined}
     >
       <legend className="text-sm font-semibold text-iw-text-strong">
         {legend}

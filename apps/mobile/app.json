@@ -195,6 +195,16 @@
             },
             {
               "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/verify-email"
+            },
+            {
+              "scheme": "https",
+              "host": "aivo.app",
+              "pathPrefix": "/reset-password"
+            },
+            {
+              "scheme": "https",
               "host": "staging.aivo.app",
               "pathPrefix": "/learner"
             },
@@ -242,6 +252,16 @@
               "scheme": "https",
               "host": "staging.aivo.app",
               "pathPrefix": "/role-switch"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/verify-email"
+            },
+            {
+              "scheme": "https",
+              "host": "staging.aivo.app",
+              "pathPrefix": "/reset-password"
             }
           ],
           "category": [

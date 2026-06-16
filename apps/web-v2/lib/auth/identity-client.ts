@@ -454,7 +454,11 @@ export async function identityRefresh(refreshToken: string): Promise<IdentityRef
     res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/refresh`, {
       method: "POST",
       headers: {
-        "content-type": "application/json",
+        // No request body — identity-svc reads the refresh token from the
+        // `refreshToken` cookie. Do NOT set `content-type: application/json`:
+        // Fastify's default JSON parser rejects an empty body with a 400
+        // (FST_ERR_CTP_EMPTY_JSON_BODY), which the BFF would forward as a
+        // spurious 400 on every SessionRefresher tick.
         cookie: `refreshToken=${encodeURIComponent(refreshToken)}`,
       },
       cache: "no-store",
@@ -559,6 +563,66 @@ export async function identityResetPassword(
 }
 
 /**
+ * Redeem an email-verification token. Identity-svc validates the token
+ * (24h TTL, single use) and flips the account's `email_verified` flag.
+ * Returns the verified address on success so the page can confirm it.
+ */
+export async function identityVerifyEmail(
+  token: string,
+): Promise<{ ok: true; email: string | null } | { ok: false; status: number; error: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/verify-email`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Verification failed",
+    };
+  }
+  return { ok: true, email: typeof json.email === "string" ? json.email : null };
+}
+
+/**
+ * Request a fresh verification link. Identity-svc always answers with a
+ * generic success (account-enumeration guard), so the caller only learns
+ * whether the request was accepted, never whether the address exists.
+ */
+export async function identitySendVerificationEmail(
+  email: string,
+): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/send-verification-email`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  if (!res.ok) {
+    const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Request failed",
+    };
+  }
+  return { ok: true };
+}
+
+/**
  * POST /api/auth/logout. Best-effort — failures are swallowed because
  * the client-side cookies are cleared regardless.
  */
@@ -568,10 +632,10 @@ export async function identityLogout(refreshToken: string | null): Promise<void>
     await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/logout`, {
       method: "POST",
       headers: {
-        "content-type": "application/json",
-        // identity-svc reads the refresh token from the `refreshToken`
-        // cookie. Send it on the server-to-server call so the row is
-        // invalidated in the sessions table.
+        // No request body. identity-svc reads the refresh token from the
+        // `refreshToken` cookie. Omit `content-type: application/json` so
+        // Fastify's JSON parser doesn't 400 on the empty body (it's
+        // best-effort anyway, but keep it clean).
         cookie: `refreshToken=${encodeURIComponent(refreshToken)}`,
       },
       cache: "no-store",

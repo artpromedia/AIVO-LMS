@@ -423,9 +423,12 @@ export function BrainBuildingClient({
           font-size: 0.78rem;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: var(--bc-primary);
+          /* AA: --bc-primary is the learner's brain-palette hue and can be
+             light; clamp toward near-black so it clears 4.5:1 on the light
+             canvas. Opacity dropped to 1 so it does not re-lighten the text. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           margin: 0 0 0.35rem;
-          opacity: 0.85;
+          opacity: 1;
           font-weight: 600;
         }
         .bc-watch-title {
@@ -445,7 +448,8 @@ export function BrainBuildingClient({
           padding: 0.4rem 0.9rem;
           font-size: 0.82rem;
           font-weight: 600;
-          color: var(--bc-primary);
+          /* AA: clamp the palette hue toward near-black for the button label. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           background: color-mix(in oklch, var(--bc-primary) 10%, transparent);
           border: 1px solid color-mix(in oklch, var(--bc-primary) 35%, transparent);
           border-radius: 9999px;
@@ -467,7 +471,8 @@ export function BrainBuildingClient({
           padding: 0.9rem 0;
           font-size: 0.9rem;
           font-weight: 600;
-          color: var(--bc-primary);
+          /* AA: clamp the palette hue toward near-black for the summary text. */
+          color: color-mix(in oklab, var(--bc-primary, #4338ca) 50%, #14082e);
           list-style: none;
         }
         .bc-watch-details-summary::-webkit-details-marker { display: none; }
