@@ -91,9 +91,14 @@ export async function POST(req: Request) {
     try {
       const bearer = await getIdentityBearer();
       if (bearer) {
-        learner = await provisionAndLink(bearer, learner, session!.tenantId, (event, data) =>
-          audit(session, "learner.provision", requestId, { learnerId: learner.id, metadata: { event, ...data } }),
-        );
+        learner = await provisionAndLink(bearer, learner, session!.tenantId, {
+          parentUserId: session!.userId,
+          log: (event, data) =>
+            audit(session, "learner.provision", requestId, {
+              learnerId: learner.id,
+              metadata: { event, ...data },
+            }),
+        });
       }
     } catch {
       // swallowed: provisioning is best-effort, reconcile backfills later

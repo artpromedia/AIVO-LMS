@@ -91,7 +91,9 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       // so the PIN lands on the canonical learner instead of 404-ing.
       const profile = await getLearner(learnerId, auth.session.tenantId);
       const linked = profile
-        ? await provisionAndLink(bearer, profile, auth.session.tenantId)
+        ? await provisionAndLink(bearer, profile, auth.session.tenantId, {
+            parentUserId: auth.session.userId,
+          })
         : null;
       const identityLearnerId = linked?.identityLearnerId;
       if (!identityLearnerId) {

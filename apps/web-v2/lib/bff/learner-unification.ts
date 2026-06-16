@@ -40,19 +40,120 @@ function birthYearFromDob(dob: string | null | undefined): number {
   return new Date().getFullYear() - 8;
 }
 
+/** Context used to recover from a prior partial failure (identity learner
+ *  created, link-write failed) instead of creating a duplicate. `candidates`
+ *  is the parent's identity-svc learners; `linkedIds` is the set of identity
+ *  UUIDs already linked to a web profile (mutated as matches are consumed). */
+type ReuseContext = { candidates: IdentityLearner[]; linkedIds: Set<string> };
+
+function normName(s: string | null | undefined): string {
+  return (s ?? "").trim().toLowerCase();
+}
+
+/** Build the reuse context for a standalone `provisionAndLink` call (the PIN
+ *  path) by reading the parent's web + identity learners. Returns null when
+ *  the identity list is unavailable (so we skip reuse and fall through). */
+async function buildReuseContext(
+  bearer: string,
+  parentUserId: string,
+  tenantId: string,
+  log?: LogFn,
+): Promise<ReuseContext | null> {
+  try {
+    const learners = getPersistence().learners;
+    const [web, listRes] = await Promise.all([
+      learners.listForParent(parentUserId, tenantId),
+      listLearnersViaIdentity(bearer),
+    ]);
+    if (!listRes.ok) {
+      log?.("learner_unification.identity_list_failed", {
+        status: listRes.status,
+        error: listRes.error,
+      });
+      return null;
+    }
+    const linkedIds = new Set<string>();
+    for (const l of web) if (l.identityLearnerId) linkedIds.add(l.identityLearnerId);
+    return {
+      candidates: Array.isArray(listRes.data) ? listRes.data : [],
+      linkedIds,
+    };
+  } catch (err) {
+    log?.("learner_unification.reuse_context_error", {
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return null;
+  }
+}
+
+/** Find an unlinked identity learner that matches this web learner by name —
+ *  i.e. an orphan left by a prior attempt whose link-write failed, or a
+ *  same-named mobile-origin learner that is in fact the same child. Matching by
+ *  name (within one parent's roster) can in theory mis-pair two different
+ *  same-named children, but that risk is far cheaper than minting a duplicate
+ *  canonical identity on every retry. */
+function findReusableIdentityLearner(
+  learner: LearnerProfile,
+  ctx: ReuseContext,
+): IdentityLearner | undefined {
+  const target = normName(learner.displayName) || normName(learner.firstName);
+  if (!target) return undefined;
+  return ctx.candidates.find(
+    (c) => c?.id && !ctx.linkedIds.has(c.id) && normName(c.name) === target,
+  );
+}
+
 /**
  * Provision a single web learner in identity-svc and persist the link.
- * No-op (returns the learner unchanged) when already linked. Returns the
- * learner with `identityLearnerId` populated on success, or the original on
- * any failure (logged, never thrown).
+ * No-op (returns the learner unchanged) when already linked.
+ *
+ * Idempotent across retries / partial failure: before creating a canonical
+ * learner it looks for an existing unlinked identity learner to reuse (recovers
+ * the case where a prior attempt created the identity learner but failed to
+ * persist the link, which would otherwise mint a duplicate on the next reconcile
+ * or PIN-set). Callers inside a reconcile loop pass a shared `reuse` context so
+ * the list is fetched once and matches are not double-assigned; standalone
+ * callers (PIN) let it build its own.
+ *
+ * Returns the learner with `identityLearnerId` populated on success, or the
+ * original on any failure (logged, never thrown).
  */
 export async function provisionAndLink(
   bearer: string,
   learner: LearnerProfile,
   tenantId: string,
-  log?: LogFn,
+  opts?: { parentUserId?: string; log?: LogFn; reuse?: ReuseContext },
 ): Promise<LearnerProfile> {
+  const log = opts?.log;
   if (learner.identityLearnerId) return learner;
+
+  // Partial-failure recovery: reuse an orphaned identity learner rather than
+  // creating a duplicate canonical learner. The reconcile loop passes a shared
+  // context; a standalone caller (PIN) supplies the parent id so we can build
+  // one (without it we cannot tell orphans from already-linked learners, so we
+  // skip reuse and create — the rarer first-PIN-before-list case).
+  const ctx =
+    opts?.reuse ??
+    (opts?.parentUserId
+      ? await buildReuseContext(bearer, opts.parentUserId, tenantId, log)
+      : null);
+  if (ctx) {
+    const match = findReusableIdentityLearner(learner, ctx);
+    if (match?.id) {
+      ctx.linkedIds.add(match.id); // consume so a later iteration can't reuse it
+      const updated = await getPersistence().learners.setIdentityLink(
+        learner.id,
+        tenantId,
+        match.id,
+      );
+      log?.("learner_unification.reused_identity", {
+        learnerId: learner.id,
+        identityLearnerId: match.id,
+      });
+      return updated ?? { ...learner, identityLearnerId: match.id };
+    }
+  }
+
   const res = await createLearnerViaIdentity(bearer, {
     name: learner.displayName?.trim() || learner.firstName.trim(),
     gradeLevel: learner.gradeBand ?? undefined,
@@ -72,6 +173,9 @@ export async function provisionAndLink(
     log?.("learner_unification.provision_no_id", { learnerId: learner.id });
     return learner;
   }
+  // Track the freshly created id so a shared reuse context (reconcile loop)
+  // won't re-create or re-surface it later in the same pass.
+  ctx?.linkedIds.add(uuid);
   const updated = await getPersistence().learners.setIdentityLink(learner.id, tenantId, uuid);
   return updated ?? { ...learner, identityLearnerId: uuid };
 }
@@ -121,10 +225,15 @@ export async function reconcileLearnersForParent(opts: {
     if (l.identityLearnerId) linkedIds.add(l.identityLearnerId);
   }
 
-  // web → identity: backfill links for web-only learners.
+  // web → identity: backfill links for web-only learners. Share one reuse
+  // context (the identity list we already fetched + the running linkedIds set)
+  // so a single list read serves the whole pass, orphaned identity learners
+  // are reused instead of duplicated, and the surfacing pass below skips
+  // anything we just linked.
+  const reuse: ReuseContext = { candidates: identityList, linkedIds };
   for (const l of webLearners) {
     if (l.identityLearnerId) continue;
-    const linked = await provisionAndLink(bearer, l, tenantId, log);
+    const linked = await provisionAndLink(bearer, l, tenantId, { log, reuse });
     if (linked.identityLearnerId) linkedIds.add(linked.identityLearnerId);
   }
 
