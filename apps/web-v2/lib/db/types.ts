@@ -1477,12 +1477,30 @@ export type QuestProgress = {
 };
 
 // ===== Helper / Teacher =====
+/**
+ * Sprint (Homework Helper work-through): an optional interactive surface the
+ * tutor offers alongside a guided turn — e.g. a number line the learner can
+ * tap to place an answer. Rendered in-chat by `@aivo/learner-surfaces`
+ * `SurfaceRouter`. Derived deterministically from the problem (no fixtures),
+ * so it always matches the numbers in front of the learner.
+ */
+export type HomeworkSurfaceSpec = {
+  surfaceType: "number_line";
+  prompt: string;
+  instructions?: string;
+  numberLine: { min: number; max: number; step: number };
+  /** The value the dot should land on — drives the in-surface correctness hint. */
+  expectedAnswer?: string;
+};
+
 export type HomeworkHelpMessage = {
   id: ID;
   role: "learner" | "tutor";
   text: string;
   /** True for tutor messages that intentionally withhold the final answer. */
   guidedOnly?: boolean;
+  /** Optional interactive surface offered with a tutor turn (e.g. number line). */
+  surface?: HomeworkSurfaceSpec;
   occurredAt: ISODate;
 };
 

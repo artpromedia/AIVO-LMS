@@ -1,4 +1,4 @@
-import type { HomeworkHelpMessage } from "@/lib/db/types";
+import type { HomeworkHelpMessage, HomeworkSurfaceSpec } from "@/lib/db/types";
 import { serverEnv } from "@/lib/env";
 import { callService } from "@/lib/services/client";
 
@@ -15,6 +15,51 @@ export function classifySubject(topic: string): SubjectSlug | null {
   if (/routine|chore|brush|clean|organize/.test(t)) return "life";
   if (/draw|color|paint|art|design/.test(t)) return "art";
   return null;
+}
+
+/**
+ * Deterministically derive an interactive number-line surface from a math
+ * problem so the tutor can offer a "tap to place your answer" model that
+ * always matches the numbers the learner is working with. Returns undefined
+ * for non-math problems or when no `a ± b` pattern can be found — there is no
+ * hardcoded 0–10 fixture, so a surface only mounts when it can carry the
+ * actual answer.
+ */
+export function deriveHomeworkSurface(
+  topic: string,
+  latestLearnerMessage?: string,
+): HomeworkSurfaceSpec | undefined {
+  if (classifySubject(topic) !== "math") return undefined;
+  const haystack = `${topic} ${latestLearnerMessage ?? ""}`;
+  const m = haystack.match(/(\d{1,4})\s*([+-])\s*(\d{1,4})/);
+  if (!m) return undefined;
+  const a = Number.parseInt(m[1], 10);
+  const b = Number.parseInt(m[3], 10);
+  const op = m[2];
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return undefined;
+  const answer = op === "+" ? a + b : a - b;
+  if (answer < 0) return undefined;
+  const peak = Math.max(answer, a, b);
+  const max = peak <= 10 ? 10 : Math.ceil(peak / 5) * 5;
+  const step = max <= 20 ? 1 : max <= 50 ? 5 : 10;
+  return {
+    surfaceType: "number_line",
+    prompt: `Where does ${a} ${op} ${b} land on the number line?`,
+    instructions: "Tap the line to place a dot on your answer.",
+    numberLine: { min: 0, max, step },
+    expectedAnswer: String(answer),
+  };
+}
+
+function withSurface(
+  base: Pick<HomeworkHelpMessage, "text" | "guidedOnly">,
+  input: GuidedReplyInput,
+): Pick<HomeworkHelpMessage, "text" | "guidedOnly" | "surface"> {
+  // Only offer the model once the learner is actually working a step (turn ≥
+  // 1); the opening "what have you tried?" turn stays a plain prompt.
+  const surface =
+    input.turn >= 1 ? deriveHomeworkSurface(input.topic, input.latestLearnerMessage) : undefined;
+  return surface ? { ...base, surface } : base;
 }
 
 type GuidedReplyInput = {
@@ -86,8 +131,8 @@ function useLiveAgent(): boolean {
 
 export async function generateGuidedReply(
   input: GuidedReplyInput,
-): Promise<Pick<HomeworkHelpMessage, "text" | "guidedOnly">> {
-  if (!useLiveAgent()) return deterministicGuidedReply(input);
+): Promise<Pick<HomeworkHelpMessage, "text" | "guidedOnly" | "surface">> {
+  if (!useLiveAgent()) return withSurface(deterministicGuidedReply(input), input);
   if (serverEnv.NODE_ENV === "production" && !serverEnv.INTERNAL_AI_TOKEN) {
     throw new Error("INTERNAL_AI_TOKEN is required for production homework tutor calls");
   }
@@ -135,14 +180,14 @@ export async function generateGuidedReply(
   });
 
   if (result.ok && result.data.response.trim()) {
-    return { text: result.data.response.trim(), guidedOnly: true };
+    return withSurface({ text: result.data.response.trim(), guidedOnly: true }, input);
   }
   if (serverEnv.NODE_ENV === "production") {
     throw new Error(
       `ai-svc homework tutor unavailable: ${result.ok ? "empty response" : result.message}`,
     );
   }
-  return deterministicGuidedReply(input);
+  return withSurface(deterministicGuidedReply(input), input);
 }
 
 export function buildHomeworkInsight(topic: string, messageCount: number): string {

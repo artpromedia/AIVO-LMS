@@ -201,6 +201,9 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       role: "tutor",
       text: finalText,
       guidedOnly: reply.guidedOnly,
+      // Only carry an interactive surface on a clean (non-blocked) tutor turn —
+      // a safety fallback must never ship a "place your answer" model.
+      ...(blockedOutput ? {} : reply.surface ? { surface: reply.surface } : {}),
     });
     audit(session!, "homework.message", requestId, {
       learnerId,
