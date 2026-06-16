@@ -97,15 +97,19 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         : null;
       const identityLearnerId = linked?.identityLearnerId;
       if (!identityLearnerId) {
-        // Could not resolve a canonical learner — fall back to the in-memory
-        // store so the parent can still set a PIN.
-        const meta = setStoredLearnerPin(auth.session.tenantId, learnerId, pin);
-        await advanceOnboarding(learnerId, auth.session.tenantId, "pin_created", auth.session.userId, { via: "memory-fallback" });
-        audit(auth.session, "learner.pin.set", requestId, {
-          learnerId,
-          metadata: { via: "memory-fallback" },
-        });
-        return ok(meta, requestId, { status: 201 });
+        // identity-svc is the canonical PIN store the mobile pin-login flow
+        // verifies. When the service is enabled and we have a bearer but cannot
+        // resolve/provision the canonical learner, we must NOT write to the
+        // in-memory store and report success — that would tell the parent the
+        // PIN is set while mobile login keeps failing (a silent cross-platform
+        // desync). Surface a retriable upstream error instead. The in-memory
+        // path below is reserved for dev/mock mode (identity-svc disabled or no
+        // bearer).
+        return upstreamFail(
+          requestId,
+          502,
+          "could not resolve the learner in identity-svc; please retry",
+        );
       }
       const r = await setLearnerPinViaIdentity(bearer, identityLearnerId, pin);
       if (!r.ok) return upstreamFail(requestId, r.status, r.error);

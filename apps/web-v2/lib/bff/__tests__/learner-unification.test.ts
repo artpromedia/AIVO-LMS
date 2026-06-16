@@ -82,6 +82,27 @@ describe("provisionAndLink idempotency / partial-failure recovery", () => {
     expect((await getLearner(web.id, T))?.identityLearnerId).toBe(NEW_UUID);
   });
 
+  it("does not reuse a same-named identity learner whose birth year differs (sibling guard)", async () => {
+    const web = await createLearner({
+      tenantId: T,
+      parentUserId: PARENT,
+      data: { firstName: "Casey", birthYear: 2016 },
+    });
+
+    // Same name, but a different child (born a different year) — must NOT be
+    // reused; a new canonical learner is created instead.
+    listMock.mockResolvedValue({
+      ok: true,
+      data: [{ id: ORPHAN_UUID, name: "Casey", dateOfBirth: "2012-04-01" }],
+    });
+    createMock.mockResolvedValue({ ok: true, data: { learner: { id: NEW_UUID } } });
+
+    const linked = await provisionAndLink("Bearer x", web, T, { parentUserId: PARENT });
+
+    expect(linked.identityLearnerId).toBe(NEW_UUID);
+    expect(createMock).toHaveBeenCalledTimes(1);
+  });
+
   it("does not re-create when the same orphan name appears across two unlinked learners", async () => {
     // Two same-named unlinked web learners, one orphan identity learner: the
     // orphan is consumed once; the second falls through to a single create.

@@ -50,6 +50,13 @@ function normName(s: string | null | undefined): string {
   return (s ?? "").trim().toLowerCase();
 }
 
+/** A usable birth year from an identity-svc DOB string, else null. */
+function dobYear(dob: string | null | undefined): number | null {
+  if (!dob) return null;
+  const y = new Date(dob).getFullYear();
+  return Number.isFinite(y) ? y : null;
+}
+
 /** Build the reuse context for a standalone `provisionAndLink` call (the PIN
  *  path) by reading the parent's web + identity learners. Returns null when
  *  the identity list is unavailable (so we skip reuse and fall through). */
@@ -98,9 +105,15 @@ function findReusableIdentityLearner(
 ): IdentityLearner | undefined {
   const target = normName(learner.displayName) || normName(learner.firstName);
   if (!target) return undefined;
-  return ctx.candidates.find(
-    (c) => c?.id && !ctx.linkedIds.has(c.id) && normName(c.name) === target,
-  );
+  return ctx.candidates.find((c) => {
+    if (!c?.id || ctx.linkedIds.has(c.id) || normName(c.name) !== target) return false;
+    // Narrow same-name matches with birth year when the candidate carries a
+    // DOB, so two same-named siblings under one parent aren't mis-paired. The
+    // orphans we created via createLearnerViaIdentity carry no DOB, so they
+    // still match on name alone (the partial-failure recovery case).
+    const cy = dobYear(c.dateOfBirth);
+    return cy === null || cy === learner.birthYear;
+  });
 }
 
 /**
