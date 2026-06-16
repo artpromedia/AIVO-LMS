@@ -1,0 +1,426 @@
+1. School Admin Dashboard
+Route family
+/school
+/school/classes
+/school/classes/[classId]
+/school/learners
+/school/rostering
+/school/rostering/import
+/school/reports
+/school/billing
+/school/billing/invoices
+/school/compliance
+/school/audit
+Data contract
+Page	Primary data	Endpoint / source	Empty state	Error state
+/school	school KPIs, learners, classes, completion, term trend	getSchoolOverview via @aivo/admin-api/school and admin-svc/routes/school-overview	“No school activity yet. Import learners or create classes to begin.”	“School overview could not load.” Retry + support link
+/school/classes	class list, teacher, learner count, mastery summary, assignments	admin-svc/routes/classrooms	“No classes yet.” CTA: Import roster / Create class	“Classes could not load.”
+/school/classes/[classId]	class roster, mastery, assignments, learner statuses	classroom detail endpoint	“This class has no learners yet.”	“Class details could not load.”
+/school/learners	learner table, status, mastery, IEP flag, class assignment	school learners endpoint	“No learners found.” CTA: Import learners	“Learner list could not load.”
+/school/rostering	import status, SIS/CSV options, latest import history	learner-import route	“No roster imports yet.”	“Rostering status unavailable.”
+/school/rostering/import	CSV upload, validation, conflicts, import result	admin-svc/routes/learner-import	Upload prompt	Validation errors displayed inline
+/school/reports	school reports, generated files, run report	@aivo/admin-api/reports, runReport	“No reports generated yet.” CTA: Run report	“Reports could not load.”
+/school/billing	plan, seats, usage, pilot state if applicable	@aivo/admin-api/billing	“Billing information unavailable for this tenant.”	“Billing could not load.”
+/school/billing/invoices	invoice table, status, download	billing invoices endpoint	“No invoices yet.”	“Invoices could not load.”
+/school/compliance	compliance posture, privacy/security/accessibility links	@aivo/admin-api/compliance	“No compliance records available yet.”	“Compliance status unavailable.”
+/school/audit	school-scoped audit log	@aivo/admin-api/audit	“No audit events yet.”	“Audit log could not load.”
+RBAC and tenant scope
+
+Every request must be scoped to one school tenant only. The school admin must never see other schools, district-wide data, or cross-tenant learners unless their role explicitly grants that scope.
+
+Required guard:
+
+requirePageRole(...)
+schoolTenantId required
+parent district context optional but non-leaking
+Layout direction
+
+The school admin should use the same design language as the redesigned Platform Admin screenshot:
+
+left admin rail
+top global search
+top-right user/account switcher
+breadcrumb
+page title + role context
+primary actions on the right
+KPI card row
+large analytic cards
+table/report sections
+restrained enterprise polish
+/school overview layout
+Header:
+  Breadcrumb: School Admin > Overview
+  Title: School Overview
+  Subtitle: Signed in as [name] · [school name]
+  Actions: Import roster · Run report
+
+KPI row:
+  Learners
+  Classes
+  Completion
+  Active IEP goals / flagged supports
+
+Main grid:
+  Term trend chart
+  Completion by class
+  Learner status breakdown
+  Recent reports
+
+Lower section:
+  Classes needing attention
+  Recent rostering imports
+  Audit/security activity
+Visual refinements
+
+School admin should not use the playful Family dashboard tone. It should be:
+
+institutional
+clean
+dense but readable
+procurement-friendly
+table-first where appropriate
+visually consistent with Platform Admin
+
+Use admin-style charts with AdminKpiCard, ChartCard, AreaTrend, BarSeries, DonutBreakdown, and the table/report kit.
+
+2. District Admin Dashboard
+Route family
+/district
+/district/sis
+/district/sis/[connectionId]
+/district/sso-config
+/district/branding
+/district/parents
+/district/iep
+/district/reports
+/district/billing
+/district/billing/invoices
+/district/compliance
+/district/audit
+/district/audit/export
+Data contract
+Page	Primary data	Endpoint / source	Empty state	Error state
+/district	district setup, schools, learners, pilot status, setup checklist	getDistrictSetupOverview, getDistrictPilotStatus	“District setup has not started.” CTA: Create first school	“District overview could not load.”
+/district/sis	SIS connections, sync status, provider, last run	district SIS endpoints	“No SIS connection yet.” CTA: Connect SIS	“SIS connections could not load.”
+/district/sis/[connectionId]	connection detail, sync history, errors, mapping	SIS connection detail endpoint	“No sync history yet.”	“SIS connection details unavailable.”
+/district/sso-config	IdP setup, domains, metadata, status	identity SSO endpoints	“SSO not configured.”	“SSO configuration unavailable.”
+/district/branding	tenant logo, colors, district name, portal branding	updateDistrictBranding	“No custom branding configured.”	“Branding could not load.”
+/district/parents	parent/guardian oversight table across child schools	district parent/identity endpoints	“No parent records yet.”	“Parent oversight could not load.”
+/district/iep	IEP oversight, goal status, school/class filters	district IEP/reporting endpoints	“No IEP goal data yet.”	“IEP oversight could not load.”
+/district/reports	cross-school reports, generated files, report runner	reports API	“No district reports yet.”	“Reports could not load.”
+/district/billing	district plan, seats, pilot status, usage	billing API	“Billing not configured.”	“Billing could not load.”
+/district/billing/invoices	invoices, payment status, downloads	billing invoices endpoint	“No invoices yet.”	“Invoices unavailable.”
+/district/compliance	district compliance posture	compliance API	“No compliance records yet.”	“Compliance unavailable.”
+/district/audit	audit events across district + child schools	audit API	“No audit events yet.”	“Audit log unavailable.”
+/district/audit/export	export config, date range, file generation	audit export endpoint	“Choose a date range to export.”	“Audit export failed.”
+RBAC and scope
+
+District admins can see:
+
+district tenant
+child school tenants
+district-level setup and billing
+district-level compliance and audit
+
+They must not see:
+
+other districts
+unrelated schools
+learners outside child-school scope
+cross-district billing or audit events
+/district overview layout
+Header:
+  Breadcrumb: District Admin > Overview
+  Title: District Overview
+  Subtitle: Multi-school setup, pilots, rostering, and compliance
+  Actions: Create school · Invite admin
+
+KPI row:
+  Schools
+  Learners
+  Active pilots
+  Setup completion
+
+Setup track:
+  1. Create schools
+  2. Invite admins
+  3. Grant rostering access
+  4. Configure branding
+  5. Complete setup
+
+Main analytics:
+  Learners by school
+  Completion trend
+  Pilot status
+  Tenant mix / school distribution
+
+Lower section:
+  Schools table
+  SIS/SSO status
+  Recent audit events
+Visual direction
+
+District should feel like Platform Admin but with more enterprise onboarding emphasis.
+
+Use:
+
+setup track cards
+cross-school rollups
+charts with clear labels
+system health and configuration panels
+enterprise action buttons
+
+Avoid:
+
+child-friendly tone
+parent-style encouragement cards
+fake pilot metrics
+unsourced outcomes
+3. Teacher Dashboard
+Route family
+/teacher/home
+/teacher/classes
+/teacher/classes/[classId]
+/teacher/learners
+/teacher/learners/[learnerId]
+/teacher/learners/[learnerId]/assessment
+/teacher/learners/[learnerId]/assessment/intro
+/teacher/learners/[learnerId]/assessment/review
+/teacher/insights
+/teacher/assignments
+/teacher/assignments/new
+/teacher/lesson-plans
+/teacher/curriculum
+/teacher/rostering
+/teacher/reports
+/teacher/settings
+Design inheritance
+
+Teacher does not inherit the admin-console visual system. It should inherit the web-v2 role-app design, closer to the Parent/Family dashboard but denser and classroom-oriented.
+
+It should feel:
+
+calm
+professional
+classroom-ready
+fast to scan
+less playful than Family
+more operational than Parent
+less enterprise than Admin
+Data contract
+Page	Primary data	Endpoint / source	Empty state	Error state
+/teacher/home	classes today, learners needing attention, recent activity, next action	teacher BFF endpoints	“No classes scheduled today.”	“Teacher dashboard could not load.”
+/teacher/classes	class list, learner count, mastery, assignment status	teacher classes endpoint	“No classes assigned.”	“Classes could not load.”
+/teacher/classes/[classId]	roster, mastery, assignments, learner status	class detail endpoint	“No learners in this class yet.”	“Class details could not load.”
+/teacher/learners	roster-scoped learner table	teacher learner endpoint	“No learners assigned.”	“Learners could not load.”
+/teacher/learners/[learnerId]	learner profile, mastery, IEP, what’s working	learner profile + brain insights	“No activity yet for this learner.”	“Learner profile could not load.”
+/teacher/learners/[learnerId]/assessment/intro	learner + invite/token context	teacher assessment token endpoint	“Assessment invite unavailable.”	“Assessment token invalid or expired.”
+/teacher/learners/[learnerId]/assessment	autosaving teacher input flow	teacher_assessments backend	“Start assessment.”	“Assessment could not save.”
+/teacher/learners/[learnerId]/assessment/review	summary of teacher assessment answers	teacher assessment review endpoint	“Nothing to review yet.”	“Review could not load.”
+/teacher/insights	mastery insights, brain insights, recommended actions	teacher_insights → brain_insights	“Insights appear after learner activity.”	“Insights could not load.”
+/teacher/assignments	assignments table/cards	assignments endpoint	“No assignments yet.”	“Assignments could not load.”
+/teacher/assignments/new	assignment creation form	assignments create endpoint	blank form	validation errors
+/teacher/lesson-plans	plans, drafts, recommendations	lesson plan endpoint	“No lesson plans yet.”	“Lesson plans unavailable.”
+/teacher/curriculum	curriculum library	curriculum endpoint	“No curriculum items available.”	“Curriculum could not load.”
+/teacher/rostering	class roster tools	rostering endpoint	“No rostering data.”	“Rostering unavailable.”
+/teacher/reports	class/learner reports	reports endpoint	“No reports yet.”	“Reports could not load.”
+/teacher/settings	teacher profile, notification, accessibility prefs	settings endpoint	settings form	save/load errors
+RBAC
+
+This is the biggest risk area.
+
+Teacher access must be:
+
+teacher belongs to class
+learner belongs to that class
+teacher can access only learners assigned to their roster/classroom
+
+Do not rely only on same tenant.
+
+Required guard:
+
+requireTeacherClassroomScope(teacherId, classId)
+requireTeacherLearnerScope(teacherId, learnerId)
+
+This closes the IDOR risk.
+
+Teacher assessment flow
+
+This is the major missing UI.
+
+Purpose
+
+Allow a teacher to submit structured, school-framed observations that feed:
+
+teacher_assessments
+teacher_insights
+brain_insights
+learner support recommendations
+Flow
+/teacher/learners/[learnerId]/assessment/intro
+
+Content:
+
+learner name
+class
+expected time
+what the assessment is for
+privacy reassurance
+CTA: Start teacher input
+/teacher/learners/[learnerId]/assessment
+
+Use existing @aivo/ui assessment primitives:
+
+AssessmentShell
+AssessmentProgress
+QuestionCard
+PillCardGroup
+ScaleField
+ReassuranceCard
+InsightChip
+
+Sections:
+
+Learning engagement
+Attention and regulation
+Communication style
+Task independence
+Academic strengths
+Support strategies that help
+Classroom context
+Final notes
+
+Must autosave.
+
+/teacher/learners/[learnerId]/assessment/review
+
+Shows:
+
+teacher-entered summary
+strengths observed
+support strategies
+classroom context
+submit button
+disclaimer that this is educational input, not diagnosis
+
+After submit:
+
+feed teacher_assessments
+surface relevant derived insights in /teacher/insights
+update learner profile support context
+Teacher home layout
+Header:
+  Good morning, [Teacher]
+  Here’s what needs your attention today.
+
+Top cards:
+  Today’s classes
+  Learners needing support
+  Assignments due
+  Recent insights
+
+Main area:
+  Class schedule
+  Learners needing attention
+  Recent activity
+  Action queue
+
+Right rail:
+  Insight highlight
+  Quick actions
+  Upcoming assessments
+
+Teacher CTA hierarchy:
+
+Review learner needing attention
+Continue assessment
+Create assignment
+View class insights
+Shared tokens and palette
+School + District Admin
+
+Use admin-console tokens:
+
+@aivo/admin-ui
+ADMIN_CHART_PALETTE
+AdminKpiCard
+ChartCard
+AreaTrend
+BarSeries
+DonutBreakdown
+Gauge
+data-table
+admin-shell
+
+Visual direction:
+
+white cards
+soft slate/lavender background
+violet primary actions
+teal/cyan secondary analytics
+amber only for warning or pipeline
+green only for healthy status
+charts labeled clearly, not color-only
+enterprise density
+Teacher
+
+Use web-v2 role-app tokens:
+
+@aivo/ui
+@aivo/brand
+Family/educator register
+AppShell
+role-shells.tsx
+TEACHER nav
+
+Visual direction:
+
+same calm card system as parent dashboard
+slightly denser layouts
+classroom-first information architecture
+clear action queue
+accessible tables and charts
+no childish gamification
+Global layout alignment
+School Admin and District Admin
+
+Use this visual standard:
+
+Left admin rail
+Top search
+Top-right account menu
+Breadcrumb
+Page title
+Primary page actions
+KPI cards
+Chart grid
+Operational table
+Teacher
+
+Use this visual standard:
+
+Role-app shell
+Teacher nav
+Header greeting
+Main class/action dashboard
+Learner/class cards
+Insight/action rail
+Small trust/accessibility footer where needed
+Gaps to close before implementation
+School
+Confirm all school routes enforce school tenant scope.
+Polish rostering import validation and result summary.
+Ensure all tables have empty/loading/error states.
+Bring reports, billing, compliance, and audit to the same visual standard.
+District
+Build true multi-school rollups.
+Complete SIS and SSO setup flows visually and functionally.
+Add audit export UX.
+Ensure setup actions are audited.
+Ensure district only sees child-school data.
+Teacher
+Build teacher assessment UI.
+Enforce roster/classroom-scoped RBAC.
+Upgrade insights from passive read-only to actionable.
+Ensure mobile parity.
+Keep the visual system aligned with the Parent/Family dashboard, not the admin console.

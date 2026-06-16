@@ -1,0 +1,155 @@
+Admin surfaces it is. Here are the full implementation sprints **A1–A5**, house style, grounded in the real files. They assume the Phase 0 foundations (admin surfaces depend on **F1** palette + **F3** shell/⌘K; teacher also on **F2**). Shared standards from above apply to all (non-destructive/flag-gated rollout, real-control bar, tokens-only, AA, CI green).
+
+````markdown
+# Sprint A1 — Platform Operations overview (compose to the approved design)
+## Goal
+Make `/platform` match the approved design, every widget wired to a real aggregate, panels degrading
+independently.
+## Context
+`apps/web-admin/app/platform/page.tsx` already composes `AdminKpiCard`/`AreaTrend`/`ChartCard`/
+`DonutBreakdown`/`Funnel`/`Gauge` and fetches `getPlatformSystemHealth`, `getPlatformUsageTrends`,
+`listAdminTenants/Users/Learners`, `getTrialConversion`, `listPilots` (helpers `dashboard-data.ts`;
+panels `dashboard-panels.tsx`, `usage-trends-card.tsx`; resilient `settle()`). Aggregates exist in
+`services/admin-svc/src/routes/platform.ts` (tenants-by-type, user/learner counts, lessonRuns
+total/completed, aiUsageLog requests/latency/modelsActive). Shell + ⌘K come from F3.
+## Work orders
+- EDIT: layout/cards/spacing to the design; KPI row (Tenants/Users/Learners/AI cost 24h) with delta +
+  sparkline via `AdminKpiCard` + `growthKpi`/`aiCostDelta`.
+- CREATE: a dual-axis "AI requests (24h)" chart (Requests + Avg latency ms) with a range selector,
+  sourced from `aiRequestsByHour` + latency (extend `AreaTrend`/`ChartCard` for the second axis).
+- EDIT: Tenant mix `DonutBreakdown` (by type, %), Lesson completion `Gauge`, Trial→Pilot→Won `Funnel`,
+  Usage trends 14d — restyle to `ADMIN_CHART_PALETTE`.
+- REFACTOR/CREATE: Active pilots `data-table` (District/Org, Seats x/y bar, Parents, Therapists,
+  Learners, Expires, Status pill, row ⋮, "View all pilots"); ensure `listPilots`/billing-svc returns
+  those counts.
+- DELETE: any placeholder/mocked series.
+## Definition of done
+Matches the design; zero hardcoded numbers; per-panel degrade preserved; AA tables/charts; ⌘K works here.
+## Tests
+Panel render + independent-degrade tests; pilots table; chart visual vs design; a11y.
+## Depends on
+F1 (palette), F3 (shell + ⌘K).
+````
+
+````markdown
+# Sprint A2 — School admin (mirror the platform design)
+## Goal
+Bring every `/school/*` page to the approved admin design, scoped to a single school tenant.
+## Context
+`apps/web-admin/app/school/page.tsx` already uses `getSchoolOverview` (`@aivo/admin-api/school`),
+`runReport`, and the admin-ui kit; shell `app/school/layout.tsx` + `admin-shell.tsx` + nav from
+`lib/admin-nav-model.ts` (school group). Backends: `admin-svc/routes/{school-overview,classrooms,
+learner-import,reports,audit,compliance}`; `requirePageRole` gates.
+## Work orders
+- EDIT: `/school` overview to the design (KPIs learners/classes/completion/term trend via
+  `AdminKpiCard`+`AreaTrend`/`BarSeries`/`DonutBreakdown`; `runReport` term window).
+- EDIT: `/school/classes`(+`[classId]`), `/school/learners` to the `data-table` look (filters, status
+  pills, row actions); class detail = roster + mastery + assignments.
+- EDIT: `/school/rostering`(+`/import`) — CSV/SIS import with validation + result summary.
+- EDIT: `/school/reports`, `/school/billing`(+`/invoices`), `/school/compliance`, `/school/audit`.
+- REFACTOR: enforce single-school-tenant scoping on every read/action; charts → `ADMIN_CHART_PALETTE`.
+## Definition of done
+Identical design to the platform admin; all data from `getSchoolOverview`/admin-svc (no mocks);
+school-scoped RBAC; rostering import end-to-end; AA.
+## Tests
+Overview panels; rostering import e2e; RBAC scoping; a11y.
+## Depends on
+F1, F3.
+````
+
+````markdown
+# Sprint A3 — District admin (mirror the platform design + enterprise flows)
+## Goal
+Bring every `/district/*` page to the approved design, with multi-school rollups and SIS/SSO/setup.
+## Context
+`apps/web-admin/app/district/page.tsx` uses district fns from `@aivo/admin-api/identity`
+(`getDistrictSetupOverview`, `listDistrictLearners`, `createDistrictSchool`, `inviteDistrictAdmin`,
+`get/setDistrictRosteringGrant`, `updateDistrictBranding`, `completeDistrictSetup`) +
+`getDistrictPilotStatus` (billing) + the admin-ui kit; shell `app/district/layout.tsx`. Pages include
+`/district/sis`(+`[connectionId]`), `/district/sso-config`, `/district/branding`, `/district/parents`,
+`/district/iep`, `/district/reports`, `/district/billing`(+`/invoices`), `/district/compliance`,
+`/district/audit`(+`/export`).
+## Work orders
+- EDIT: `/district` overview — rollup KPIs across child schools (`AdminKpiCard`/`ChartCard`/
+  `DonutBreakdown`/`Gauge`), pilot status, and the setup track (create schools, invite admins,
+  rostering grant, branding, complete setup).
+- EDIT: `/district/sis`(+detail) connector flow; `/district/sso-config` IdP + attribute mapping;
+  `/district/branding`.
+- EDIT: `/district/parents`, `/district/iep` oversight tables; reports/billing/compliance/audit(+export).
+- REFACTOR: district + child-school RBAC scoping; charts → `ADMIN_CHART_PALETTE`.
+## Definition of done
+Identical design to the platform admin; real district + child-school data; setup/SIS/SSO actions work +
+audited; district-scoped RBAC; AA; audit export works.
+## Tests
+Rollup + setup flow; SIS/SSO config e2e; RBAC; audit export.
+## Depends on
+F1, F3.
+````
+
+````markdown
+# Sprint A4 — Teacher dashboard (web-v2 role app) + roster RBAC
+## Goal
+Bring every `/teacher/*` page to the approved role-app design (the Family register, professionalized),
+and close the teacher IDOR.
+## Context
+App `apps/web-v2`; shell `components/layout/{app-shell,role-shells}.tsx` (TEACHER nav) + `@aivo/ui` —
+NOT the admin console. Pages: `/teacher/home`, `/teacher/classes`(+`[classId]`), `/teacher/learners`
+(+`[learnerId]` + curriculum + iep/draft), `/teacher/assignments`(+`new`), `/teacher/insights`,
+`/teacher/lesson-plans`, `/teacher/rostering`, `/teacher/reports`, `/teacher/settings`; mobile
+`(teacher)/*`. IDOR: `requireLearnerScope` admits any same-tenant role (`lib/bff/guards.ts:57,87`);
+membership lives in `lib/db/team-invites.ts:23,95,223`.
+## Work orders
+- EDIT: all teacher pages to the role-app design; `/teacher/home` = class-centric hub (today's classes,
+  learners needing attention, recent activity, one primary action).
+- EDIT: `/teacher/classes`(+detail), `/teacher/learners`(+profile: mastery/IEP/what's-working).
+- REFACTOR: `/teacher/insights` from read-only mastery to actionable insights.
+- CREATE/REFACTOR: a roster/classroom-membership guard; replace bare `requireLearnerScope` on teacher
+  learner-scoped reads/actions so a teacher sees only their class's learners.
+- EDIT: `/teacher/assignments`(+`new`), `/teacher/lesson-plans`, `/teacher/rostering`,
+  `/teacher/reports`, `/teacher/settings`; mobile parity.
+## Definition of done
+Mirrors the role-app design (consistent with the parent dashboard); roster-membership RBAC enforced
+(IDOR closed + tested); insights actionable; AA; mobile parity.
+## Tests
+Roster-RBAC (non-member teacher denied); page render; a11y; mobile.
+## Depends on
+F2, F3.
+````
+
+````markdown
+# Sprint A5 — Build the teacher assessment flow (backend exists, no UI)
+## Goal
+Ship the missing teacher assessment experience, wired to the existing `teacher_assessments` /
+`teacher_insights`→`brain_insights` backends.
+## Context
+Assessment-ux report §3.2: "Teacher input does not exist as an experience; two complete backends have
+zero frontend." Routes `/teacher/learners/[learnerId]/assessment`(+`/intro`,`/review`) exist but
+unbuilt. The assessment kit is `@aivo/ui` (`AssessmentShell`, `AssessmentProgress`, `QuestionCard`,
+`PillCardGroup`, `ScaleField`, `SoftTextField`, `ReassuranceCard`, `InsightChip`), proven on the parent
+assessment.
+## Work orders
+- CREATE: the teacher assessment on the `@aivo/ui` kit — a short (~5-screen), school-framed, autosaving
+  wizard ("which IEP accommodations are working?"), ending in a professional summary that doubles as the
+  teacher's record.
+- CREATE: token-pre-authed entry from the invite email (one-click, pre-authenticated).
+- EDIT: wire submit → `teacher_assessments` → `teacher_insights`/`brain_insights`; field-level
+  debounced autosave with a visible "Saved" tick; resume card.
+- REFACTOR: import `@aivo/accessibility-contract` so font/letter-spacing/text-size apply (audit flagged
+  hardcoded `text-2xl md:text-3xl`); apply the roster RBAC from A4 to the assessment endpoints.
+## Definition of done
+A real, autosaving, accessible teacher assessment that persists to `teacher_assessments` and feeds brain
+insights; pre-auth from invite works; AA + accessibility-contract applied; roster-RBAC; no stubs.
+## Tests
+Submit→persistence→insight wiring; autosave/resume; pre-auth token; RBAC; a11y.
+## Depends on
+A4 (role shell + roster RBAC), F2.
+````
+
+**Critical-path note:** A1–A3 can't look right until **F1** (the chart palette into brand) lands — that's the single unblocker for the whole admin look. A4–A5 need **F3** (the web-v2 role shell) and A5 is the only genuinely *new build* in this set (everything else is refine + wire).
+
+Where to next:
+- **Save** F1–F4 + A1–A5 to `sprint-prompts/admin/` (and `/foundations/`) on `claude/trusting-hamilton-0q6uwy`, or
+- **Start executing** — I'd do **F1** first (concrete, unblocks A1–A3), then **A1**. I can implement F1 now and open a PR, or
+- **Expand another phase** (Learner / Parent / Marketing) into sprints like these.
+
+Which would you like?
