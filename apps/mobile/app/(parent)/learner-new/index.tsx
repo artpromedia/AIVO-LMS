@@ -23,6 +23,7 @@ export default function ParentLearnerNewScreen() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gradeLevel, setGradeLevel] = useState("");
+  const [language, setLanguage] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [pin, setPin] = useState("");
 
@@ -41,6 +42,7 @@ export default function ParentLearnerNewScreen() {
         gradeLevel: gradeLevel.trim(),
         pin: pin.trim(),
         dateOfBirth: birthDate.trim(),
+        preferredLanguage: language.trim(),
       });
       const id = created?.id;
       if (id) router.replace(`/(parent)/learners/${id}` as never);
@@ -83,6 +85,11 @@ export default function ParentLearnerNewScreen() {
         {field(t("parentLearnerNew.firstName", "First name"), firstName, setFirstName)}
         {field(t("parentLearnerNew.lastName", "Last name"), lastName, setLastName)}
         {field(t("parentLearnerNew.grade", "Grade level"), gradeLevel, setGradeLevel)}
+        {field(
+          t("parentLearnerNew.language", "Preferred language (optional)"),
+          language,
+          setLanguage,
+        )}
         {field(
           t("parentLearnerNew.birthDate", "Birth date (YYYY-MM-DD)"),
           birthDate,
