@@ -1,22 +1,24 @@
 "use client";
 
 /**
- * Sprint C-07 — Teacher assessment submit island (review screen).
+ * Teacher assessment submit island (review screen).
  *
- * Owns the live elapsed timer and the submit → completion flow. On submit
- * it POSTs to the BFF with the wizard's `startedAtMs` (so elapsed reflects
- * the teacher's real session, not a server clock), then renders the
- * completion screen with the captured time, the honest visibility copy,
- * and a graceful "still syncing" note if the family-svc mirror deferred.
+ * Owns the live elapsed timer and the submit → completion flow. On submit it
+ * POSTs to the BFF with the wizard's `startedAtMs` (so elapsed reflects the
+ * teacher's real session, not a server clock), then renders the completion
+ * screen with the captured time, the honest visibility copy, and a graceful
+ * "still syncing" note if the family-svc mirror deferred. The POST contract is
+ * unchanged — it is what keeps the parent "Contributed" badge and brain-clone
+ * collaborator fold in sync.
  *
- * Every state is designed: submitting (busy), error (retry, answers safe),
- * success (completion hero). Reduced-motion friendly — the only animation
- * is the SubmittedHero's motion-safe halo pulse.
+ * Copy is hardcoded English (matches the rest of the rebuilt teacher flow).
+ * Every state is designed: ready, submitting (busy), error (retry, answers
+ * safe), success (completion hero). Reduced-motion friendly.
  */
 import * as React from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { SubmittedHero } from "@aivo/ui";
+import { SUCCESS_BTN, PRIMARY_BTN, SECONDARY_BTN, ClockIcon, ShieldIcon } from "@/components/teacher/assessment/shared";
 
 type Phase = "ready" | "submitting" | "error" | "done";
 
@@ -40,7 +42,6 @@ export function TeacherAssessmentSubmit({
   backToLearnerHref: string;
   rosterHref: string;
 }) {
-  const t = useTranslations("teacher.learner_assessment");
   const [phase, setPhase] = React.useState<Phase>("ready");
   const [elapsedSeconds, setElapsedSeconds] = React.useState<number>(() =>
     Math.max(0, Math.round((Date.now() - startedAtMs) / 1000)),
@@ -73,7 +74,7 @@ export function TeacherAssessmentSubmit({
         error?: { userMessage?: string };
       };
       if (!res.ok || !json.ok) {
-        setErrorMsg(json.error?.userMessage ?? t("review_submit_error"));
+        setErrorMsg(json.error?.userMessage ?? "Couldn't submit — your answers are safe. Please try again.");
         setPhase("error");
         return;
       }
@@ -83,7 +84,7 @@ export function TeacherAssessmentSubmit({
       setMirror(json.data?.mirror === "deferred" ? "deferred" : "written");
       setPhase("done");
     } catch {
-      setErrorMsg(t("review_submit_error"));
+      setErrorMsg("Couldn't submit — your answers are safe. Please try again.");
       setPhase("error");
     }
   }
@@ -91,29 +92,25 @@ export function TeacherAssessmentSubmit({
   if (phase === "done") {
     return (
       <SubmittedHero
-        eyebrow={t("done_eyebrow", { name: learnerName })}
-        title={t("done_title", { time: fmtClock(elapsedSeconds) })}
-        body={t("done_body", { name: learnerName })}
+        eyebrow={`Thank you for sharing about ${learnerName}`}
+        title={`Submitted in ${fmtClock(elapsedSeconds)}`}
+        body={`Your classroom insights are now part of ${learnerName}'s plan. AIVO will use them to shape a learning experience that fits how ${learnerName} actually learns with you.`}
         next={[
-          { label: t("done_next_clone_label", { name: learnerName }) },
-          { label: t("done_next_visible_label") },
-          { label: t("done_next_update_label") },
-          ...(mirror === "deferred" ? [{ label: t("done_mirror_deferred") }] : []),
+          { label: `Feeds ${learnerName}'s brain-clone alongside the family's input` },
+          { label: "Visible to the family and care team — never shared beyond the plan" },
+          { label: "You can update your responses anytime" },
+          ...(mirror === "deferred"
+            ? [{ label: "Still syncing to the family view — it will appear shortly" }]
+            : []),
         ]}
         primary={
-          <Link
-            href={backToLearnerHref}
-            className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2"
-          >
-            {t("done_back_to_learner", { name: learnerName })}
+          <Link href={backToLearnerHref} className={PRIMARY_BTN}>
+            Back to {learnerName}
           </Link>
         }
         secondary={
-          <Link
-            href={rosterHref}
-            className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2"
-          >
-            {t("done_back_to_roster")}
+          <Link href={rosterHref} className={SECONDARY_BTN}>
+            Back to my learners
           </Link>
         }
       />
@@ -122,30 +119,26 @@ export function TeacherAssessmentSubmit({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-iw-text-muted leading-relaxed">
-        {t("review_what_happens", { name: learnerName })}
-      </p>
-
-      <div
-        className="flex items-center gap-2 text-xs text-iw-text-muted"
-        aria-live="off"
-        role="timer"
-      >
-        <svg
-          className="w-4 h-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <p className="max-w-xl text-sm leading-relaxed text-iw-text-muted">
+          When you submit, {learnerName}&rsquo;s family and care team will see that you
+          contributed, and your insights join the brain-clone. You can come back and update
+          your responses anytime.
+        </p>
+        <span
+          className="inline-flex items-center gap-1.5 text-xs text-iw-text-muted"
+          role="timer"
+          aria-live="off"
         >
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 7v5l3 2" />
-        </svg>
-        <span className="tabular-nums">{fmtClock(elapsedSeconds)}</span>
+          <ClockIcon className="h-4 w-4" />
+          <span className="tabular-nums">{fmtClock(elapsedSeconds)}</span>
+        </span>
       </div>
+
+      <p className="inline-flex items-center gap-1.5 text-xs text-iw-text-muted">
+        <ShieldIcon className="h-4 w-4 text-[var(--aivo-sensory-primary)]" />
+        Private to {learnerName}&rsquo;s family and care team.
+      </p>
 
       {phase === "error" && errorMsg ? (
         <p
@@ -156,19 +149,21 @@ export function TeacherAssessmentSubmit({
         </p>
       ) : null}
 
-      <button
-        type="button"
-        onClick={submit}
-        disabled={phase === "submitting"}
-        aria-busy={phase === "submitting"}
-        className="inline-flex w-fit items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 active:brightness-95 shadow-[0_2px_6px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:pointer-events-none"
-      >
-        {phase === "submitting"
-          ? t("review_submitting")
-          : phase === "error"
-            ? t("review_retry")
-            : t("review_submit")}
-      </button>
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={submit}
+          disabled={phase === "submitting"}
+          aria-busy={phase === "submitting"}
+          className={SUCCESS_BTN}
+        >
+          {phase === "submitting"
+            ? "Submitting…"
+            : phase === "error"
+              ? "Try again"
+              : "Submit assessment"}
+        </button>
+      </div>
     </div>
   );
 }

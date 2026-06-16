@@ -41,8 +41,8 @@ runInBothModes("assessments", () => {
       learnerId: L,
       tenantId: T,
       submittedByUserId: "tch-parity",
-      answers: { context: { teacherRole: "special_ed", gradeLevel: "3-5" } },
-      completedSections: ["context"],
+      answers: { classroom_context: { cc_role: "special_ed", cc_grade: "3-5" } },
+      completedSections: ["classroom_context"],
       startedAtMs: 1_700_000_000_000,
       startedAt: "2026-01-01T00:00:00.000Z",
       updatedAt: "2026-01-01T00:00:00.000Z",
@@ -51,7 +51,7 @@ runInBothModes("assessments", () => {
     await a.upsertTeacherAssessmentDraft(draft);
     const got = await a.findTeacherAssessmentDraft(L, T, "tch-parity");
     expect(got?.id).toBe("tad-parity-1");
-    expect(got?.completedSections).toEqual(["context"]);
+    expect(got?.completedSections).toEqual(["classroom_context"]);
     // A different teacher on the same learner sees no draft.
     expect(await a.findTeacherAssessmentDraft(L, T, "other-tch")).toBeNull();
   });

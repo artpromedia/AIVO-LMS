@@ -1,9 +1,11 @@
 /**
- * Sprint C-07 — teacher assessment validators + projection helpers.
+ * Teacher assessment validators + projection helpers (8-section rebuild).
  *
- * Covers: per-section validation (required context fields, optional rest),
- * the submit-payload projection (flat columns + additionalResponses, the
- * role-label mapping, the first-subject rule), and the summary-insight
+ * Covers: content-driven per-section validation (enum single, array multi,
+ * bounded text, strict unknown-key rejection, every field optional), the
+ * submit-payload projection (flat columns + full structured answers under
+ * additionalResponses.sections, role-label mapping, first-subject rule,
+ * concern → challenge mapping that drops "none"), and the summary-insight
  * builder (strengths-first, supports named, honest fallback).
  */
 import { describe, it, expect } from "vitest";
@@ -12,120 +14,132 @@ import {
   toTeacherSubmitPayload,
   toTeacherInsightSummary,
   TEACHER_ASSESSMENT_SECTION_ORDER,
-  TEACHER_WIZARD_STEPS,
   type TeacherAssessmentAnswers,
 } from "./teacher-assessment";
 
-describe("validateTeacherSection — context", () => {
-  it("requires teacherRole and gradeLevel", () => {
-    expect(validateTeacherSection("context", {}).ok).toBe(false);
-    expect(validateTeacherSection("context", { teacherRole: "general_ed" }).ok).toBe(false);
-    const ok = validateTeacherSection("context", {
-      teacherRole: "general_ed",
-      gradeLevel: "3-5",
-    });
-    expect(ok.ok).toBe(true);
+describe("validateTeacherSection — content-driven", () => {
+  it("accepts an empty section (every question optional)", () => {
+    expect(validateTeacherSection("learning_engagement", {}).ok).toBe(true);
   });
 
-  it("rejects an unknown role / grade enum", () => {
+  it("accepts valid single + multi answers", () => {
+    expect(validateTeacherSection("learning_engagement", { le_motivation: "hands_on" }).ok).toBe(
+      true,
+    );
     expect(
-      validateTeacherSection("context", { teacherRole: "principal", gradeLevel: "3-5" }).ok,
-    ).toBe(false);
-    expect(
-      validateTeacherSection("context", { teacherRole: "general_ed", gradeLevel: "13" }).ok,
-    ).toBe(false);
-  });
-
-  it("accepts optional subjectAreas", () => {
-    const r = validateTeacherSection("context", {
-      teacherRole: "special_ed",
-      gradeLevel: "6-8",
-      subjectAreas: ["math", "reading"],
-    });
-    expect(r.ok).toBe(true);
-  });
-});
-
-describe("validateTeacherSection — optional sections accept partial input", () => {
-  it("strengths: empty object is valid (every field optional)", () => {
-    expect(validateTeacherSection("strengths", {}).ok).toBe(true);
-    expect(validateTeacherSection("strengths", { strengths: ["asks questions"] }).ok).toBe(true);
-  });
-
-  it("supports: validates plan enum, accepts free lists", () => {
-    expect(validateTeacherSection("supports", { planContext: "iep" }).ok).toBe(true);
-    expect(validateTeacherSection("supports", { planContext: "guess" }).ok).toBe(false);
-    expect(
-      validateTeacherSection("supports", { accommodations: ["extended time"] }).ok,
+      validateTeacherSection("learning_engagement", {
+        le_interest_topics: ["reading", "art"],
+      }).ok,
     ).toBe(true);
   });
 
-  it("observations: caps the narrative length", () => {
-    expect(validateTeacherSection("observations", { observations: "fine" }).ok).toBe(true);
+  it("rejects an out-of-enum option value", () => {
+    expect(validateTeacherSection("learning_engagement", { le_motivation: "bogus" }).ok).toBe(false);
     expect(
-      validateTeacherSection("observations", { observations: "x".repeat(8001) }).ok,
+      validateTeacherSection("classroom_context", { cc_role: "principal", cc_grade: "3-5" }).ok,
     ).toBe(false);
+  });
+
+  it("rejects an unknown question id (strict — no JSONB smuggling)", () => {
+    expect(validateTeacherSection("learning_engagement", { not_a_question: "x" }).ok).toBe(false);
+  });
+
+  it("caps text answers", () => {
+    expect(validateTeacherSection("final_notes", { fn_goals: "fine" }).ok).toBe(true);
+    expect(validateTeacherSection("final_notes", { fn_goals: "x".repeat(4001) }).ok).toBe(false);
+  });
+
+  it("rejects an unknown section id", () => {
+    // @ts-expect-error — exercising the runtime guard for a stale client.
+    expect(validateTeacherSection("nope", {}).ok).toBe(false);
   });
 });
 
-describe("section order + wizard steps stay in sync", () => {
-  it("has four input sections and a review step", () => {
+describe("section order", () => {
+  it("is the canonical eight sections in order", () => {
     expect(TEACHER_ASSESSMENT_SECTION_ORDER).toEqual([
-      "context",
-      "strengths",
-      "supports",
-      "observations",
+      "learning_engagement",
+      "attention_regulation",
+      "communication_style",
+      "task_independence",
+      "academic_strengths",
+      "support_strategies",
+      "classroom_context",
+      "final_notes",
     ]);
-    const inputSteps = TEACHER_WIZARD_STEPS.filter((s) => s.section !== "review");
-    expect(inputSteps.map((s) => s.section)).toEqual(TEACHER_ASSESSMENT_SECTION_ORDER);
-    expect(TEACHER_WIZARD_STEPS.at(-1)!.section).toBe("review");
   });
 });
 
 describe("toTeacherSubmitPayload", () => {
   const answers: TeacherAssessmentAnswers = {
-    context: { teacherRole: "general_ed", gradeLevel: "3-5", subjectAreas: ["math", "reading"] },
-    strengths: { strengths: ["number sense"], recommendedFocusAreas: ["fluency"] },
-    supports: { challenges: ["long blocks"], accommodations: ["chunked"], planContext: "iep" },
-    observations: { observations: "Mornings are best.", bestEngagementWindow: "morning" },
+    classroom_context: {
+      cc_role: "general_ed",
+      cc_grade: "3-5",
+      cc_subject: ["reading", "math"],
+    },
+    academic_strengths: {
+      as_strong_subjects: ["reading", "math"],
+      as_strengths_notes: "Retold a story with a drawing.",
+    },
+    support_strategies: {
+      ss_accommodations: ["extended_time"],
+      ss_working_now: ["visual_schedule"],
+      ss_focus_areas: ["reading", "attention"],
+    },
+    final_notes: {
+      fn_concerns: ["attention", "none"],
+      fn_celebrate: "Kind to peers.",
+      fn_goals: "Build reading stamina.",
+    },
   };
 
-  it("maps the role enum to the assessment-svc label and lifts the primary subject", () => {
+  it("maps the role enum to the assessment-svc label and lifts the first subject", () => {
     const p = toTeacherSubmitPayload("lrn-1", answers);
     expect(p.learnerId).toBe("lrn-1");
     expect(p.teacherRole).toBe("General Ed Teacher");
     expect(p.gradeLevel).toBe("3-5");
-    expect(p.subjectArea).toBe("math"); // first subject lifted to the flat column
+    expect(p.subjectArea).toBe("Reading / ELA"); // first cc_subject label
+    expect(p.additionalResponses.subjectAreas).toEqual(["Reading / ELA", "Math"]);
   });
 
-  it("carries the extras the flat columns can't hold in additionalResponses", () => {
+  it("projects labelled strengths, deduped accommodations, focus, and concern→challenge", () => {
     const p = toTeacherSubmitPayload("lrn-1", answers);
-    expect(p.additionalResponses.subjectAreas).toEqual(["math", "reading"]);
-    expect(p.additionalResponses.planContext).toBe("iep");
-    expect(p.additionalResponses.bestEngagementWindow).toBe("morning");
-    expect(p.strengths).toEqual(["number sense"]);
-    expect(p.challenges).toEqual(["long blocks"]);
-    expect(p.accommodations).toEqual(["chunked"]);
-    expect(p.recommendedFocusAreas).toEqual(["fluency"]);
-    expect(p.observations).toBe("Mornings are best.");
+    expect(p.strengths).toEqual(["Reading", "Math"]);
+    expect(p.accommodations).toEqual(["Extended time", "Visual schedule"]);
+    expect(p.recommendedFocusAreas).toEqual(["Reading", "Attention"]);
+    expect(p.challenges).toEqual(["Attention"]); // "none" dropped
+  });
+
+  it("joins the free-text notes into observations", () => {
+    const p = toTeacherSubmitPayload("lrn-1", answers);
+    expect(p.observations).toContain("Kind to peers.");
+    expect(p.observations).toContain("Build reading stamina.");
+    expect(p.observations).toContain("Retold a story with a drawing.");
+  });
+
+  it("stows the full structured answers under additionalResponses.sections", () => {
+    const p = toTeacherSubmitPayload("lrn-1", answers);
+    expect(p.additionalResponses.sections).toEqual(answers);
   });
 
   it("degrades gracefully for a near-empty draft (everything optional)", () => {
-    const p = toTeacherSubmitPayload("lrn-2", { strengths: { strengths: ["kind to peers"] } });
+    const p = toTeacherSubmitPayload("lrn-2", {
+      academic_strengths: { as_strong_subjects: ["reading"] },
+    });
     expect(p.learnerId).toBe("lrn-2");
     expect(p.teacherRole).toBeUndefined();
     expect(p.gradeLevel).toBeUndefined();
     expect(p.subjectArea).toBeUndefined();
-    expect(p.strengths).toEqual(["kind to peers"]);
+    expect(p.strengths).toEqual(["Reading"]);
     expect(p.challenges).toEqual([]);
-    expect(p.additionalResponses).toEqual({});
+    expect(p.accommodations).toEqual([]);
   });
 
   it("does not duplicate a single subject into additionalResponses", () => {
     const p = toTeacherSubmitPayload("lrn-3", {
-      context: { teacherRole: "other", gradeLevel: "K", subjectAreas: ["math"] },
+      classroom_context: { cc_role: "other", cc_grade: "K", cc_subject: ["math"] },
     });
-    expect(p.subjectArea).toBe("math");
+    expect(p.subjectArea).toBe("Math");
     expect(p.additionalResponses.subjectAreas).toBeUndefined();
   });
 });
@@ -133,14 +147,17 @@ describe("toTeacherSubmitPayload", () => {
 describe("toTeacherInsightSummary", () => {
   it("is strengths-first and names the recommended supports", () => {
     const s = toTeacherInsightSummary("Mia", {
-      strengths: { strengths: ["number sense", "persistence"], recommendedFocusAreas: ["fluency"] },
-      supports: { accommodations: ["extended time"] },
+      academic_strengths: { as_strong_subjects: ["reading", "math"] },
+      support_strategies: {
+        ss_working_now: ["visual_schedule"],
+        ss_focus_areas: ["reading"],
+      },
     });
     expect(s.domain).toBe("classroom");
     expect(s.insightText).toContain("Mia");
     expect(s.insightText.indexOf("strengths")).toBeLessThan(s.insightText.indexOf("Supports"));
-    expect(s.insightText).toContain("extended time");
-    expect(s.insightText).toContain("fluency");
+    expect(s.insightText).toContain("Reading");
+    expect(s.insightText).toContain("Visual schedule");
   });
 
   it("falls back to an honest minimal line when nothing concrete was entered", () => {

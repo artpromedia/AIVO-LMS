@@ -10,6 +10,7 @@ import type {
   LearnerBrainProfile,
   BaselineAssessment,
   ParentAssessment,
+  TeacherAssessmentDraft,
   SkillMastery,
   MasterySnapshot,
   AuditLog,
@@ -3467,6 +3468,109 @@ function seedTeacherHomeDemo(store: ReturnType<typeof getStore>): void {
     };
     store.calendarEvents.set(ev.id, ev);
   });
+
+  // A fully-answered teacher "Classroom insights" assessment for the first
+  // reading-class learner, authored by the demo teacher. Lands the review
+  // screen at 100% (all 8 sections / 54 questions answered) so the rebuilt
+  // flow demos end-to-end with zero setup. `submittedAt` is left null so the
+  // green Submit (and the contribution signal it fires) is live in the demo.
+  const insightsLearnerId = "lrn_cls_demo_reading_0";
+  if (store.learnerProfiles.has(insightsLearnerId)) {
+    const startedMs = Date.now() - 12 * 60_000;
+    const teacherInsightsDraft: TeacherAssessmentDraft = {
+      id: "tad_demo_reading_0",
+      learnerId: insightsLearnerId,
+      tenantId,
+      submittedByUserId: teacherUserId,
+      answers: {
+        learning_engagement: {
+          le_motivation: "hands_on",
+          le_interest_topics: ["reading", "building", "art"],
+          le_engagement_level: "familiar",
+          le_group_pref: "small_group",
+          le_new_tasks: "watches",
+          le_persistence: "asks_help",
+          le_signs_engaged: ["attention", "questions", "on_task"],
+          le_engagement_notes: "Lights up during read-aloud and group story time.",
+        },
+        attention_regulation: {
+          ar_focus_duration: "10_20",
+          ar_distractions: ["noise", "peers", "transitions"],
+          ar_regulation: "self_reminders",
+          ar_calming: ["quiet_space", "movement_break", "check_in"],
+          ar_transitions: "warning",
+          ar_triggers: ["change", "loud", "rushed"],
+          ar_regulation_notes: "A two-minute warning before transitions keeps things smooth.",
+        },
+        communication_style: {
+          cs_express: ["sentences", "gestures"],
+          cs_respond: "occasional",
+          cs_receptive: "one_two",
+          cs_social: "invited",
+          cs_preferred_mode: ["visuals", "modeling", "wait_time"],
+          cs_communication_notes: "Responds best with a few seconds of wait time.",
+        },
+        task_independence: {
+          ti_start: "prompt",
+          ti_complete: "check_ins",
+          ti_organization: "systems",
+          ti_help_seeking: "prompting",
+          ti_supports_used: ["checklists", "timers", "chunked"],
+          ti_independence_notes: "Owns a checklist proudly once it's modeled once.",
+        },
+        academic_strengths: {
+          as_strong_subjects: ["reading", "art", "discussion"],
+          as_reading: "on",
+          as_math: "approaching",
+          as_learning_style: ["visual", "hands_on", "repetition"],
+          as_demonstrates: ["speaking", "drawing", "building"],
+          as_strengths_notes: "Retold a whole story with a drawing last week.",
+        },
+        support_strategies: {
+          ss_working_now: ["visual_schedule", "movement_breaks", "check_ins"],
+          ss_accommodations: ["extended_time", "frequent_breaks", "visual_aids"],
+          ss_seating: "near_teacher",
+          ss_breaks: "15_20",
+          ss_motivators: ["praise", "choice", "helper"],
+          ss_redirect: "proximity",
+          ss_instructions: ["one_step", "visuals", "check_understanding"],
+          ss_plan: "informal",
+          ss_focus_areas: ["reading", "attention", "independence"],
+          ss_support_notes: "Keep the visual schedule — it's the anchor of her day.",
+        },
+        classroom_context: {
+          cc_grade: "3-5",
+          cc_setting: "general_ed",
+          cc_subject: ["reading", "math"],
+          cc_relationship: "semester",
+          cc_role: "general_ed",
+        },
+        final_notes: {
+          fn_celebrate: "Her kindness — she always checks on classmates.",
+          fn_concerns: ["attention", "academic_gaps"],
+          fn_family: "occasional",
+          fn_goals: "Build stamina for independent reading.",
+          fn_anything: "Thrives with warmth and clear routines.",
+          fn_confidence: "confident",
+        },
+      } as unknown as TeacherAssessmentDraft["answers"],
+      completedSections: [
+        "learning_engagement",
+        "attention_regulation",
+        "communication_style",
+        "task_independence",
+        "academic_strengths",
+        "support_strategies",
+        "classroom_context",
+        "final_notes",
+      ] as unknown as TeacherAssessmentDraft["completedSections"],
+      startedAtMs: startedMs,
+      startedAt: new Date(startedMs).toISOString(),
+      updatedAt: nowIso(),
+      submittedAt: null,
+    };
+    store.teacherAssessmentDrafts.set(teacherInsightsDraft.id, teacherInsightsDraft);
+  }
 }
 
 /**

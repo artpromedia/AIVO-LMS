@@ -182,7 +182,10 @@ export type ParentAssessment = {
 };
 
 // ===== Teacher assessment draft (Sprint C-07) =====
-export type TeacherAssessmentSectionId = "context" | "strengths" | "supports" | "observations";
+// Section ids live in the content bank (the 8-section "Classroom insights"
+// question set) so the schema, validator, UI, and projection share one source.
+export type { TeacherAssessmentSectionId } from "@/lib/teacher/assessment-content";
+import type { TeacherAssessmentSectionId } from "@/lib/teacher/assessment-content";
 
 /**
  * Web-v2 section-patch DRAFT for the teacher assessment wizard. The

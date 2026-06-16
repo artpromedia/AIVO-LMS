@@ -119,9 +119,9 @@ export function StagePreview() {
   const tutorVars =
     contrast === "high"
       ? {
-          "--tutor-accent": "#000000",
-          "--tutor-accent-soft": "#ffffff",
-          "--tutor-accent-ink": "#000000",
+          "--tutor-accent": "black",
+          "--tutor-accent-soft": "white",
+          "--tutor-accent-ink": "black",
         }
       : tutorThemeCSSVars("nova");
 
@@ -188,7 +188,6 @@ export function StagePreview() {
   ];
   const stepIndex = phase === "listen" ? 0 : phase === "choose" ? 1 : 2;
 
-  const showText = bits.textWeight !== "none" && bits.textWeight !== "icons-only";
   const showSymbolOnly = bits.textWeight === "icons-only" || bits.textWeight === "none";
 
   return (
@@ -331,10 +330,8 @@ export function StagePreview() {
               <div className="lx-host" data-state={tutorState} aria-hidden="true">
                 {motion === 0 ? (
                   // reduced-motion / high-contrast fallback = static reduced SVG
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img src="/images/tutors/nova-reduced.svg" alt="" />
                 ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img src="/images/tutors/nova.png" alt="" />
                 )}
               </div>

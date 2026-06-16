@@ -424,7 +424,6 @@ export function BaselineListenAudio({
     };
     // Auto-start is mount-only; the call site keys this by question id so a new
     // question remounts and re-fires.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const active = status !== "idle";
