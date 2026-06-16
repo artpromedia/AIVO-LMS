@@ -40,6 +40,7 @@ export default async function TeacherLearnerDetailPage({
   const session = await requirePageRole(["teacher"]);
   const t = await getTranslations("teacher.learner_overview");
   const ta = await getTranslations("teacher.learner_assessment");
+  const tTeam = await getTranslations("teacher.learner_team");
   const tContrib = await getTranslations("contributor");
   const { learnerId } = await params;
   const learner = await getLearner(learnerId, session.tenantId);
@@ -131,6 +132,17 @@ export default async function TeacherLearnerDetailPage({
           <p className="mt-0.5 text-xs text-muted-foreground">
             Add the week&apos;s scope so AIVO&apos;s tutor teaches the same topics, fitted to this
             learner&apos;s profile.
+          </p>
+        </Card>
+      </Link>
+
+      {/* Build the team: invite the child's caregivers and related-service
+          therapists so their read shapes the learning profile too. */}
+      <Link href={`/teacher/learners/${learner.id}/team`}>
+        <Card className="p-4 transition hover:border-aivo-accent">
+          <p className="font-medium">{tTeam("card_title")}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {tTeam("card_body", { name: learner.displayName })}
           </p>
         </Card>
       </Link>
