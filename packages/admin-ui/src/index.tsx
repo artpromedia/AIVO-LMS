@@ -28,7 +28,7 @@ export function AdminPageFrame({
   action,
   children,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description?: ReactNode;
   action?: ReactNode;
@@ -42,7 +42,9 @@ export function AdminPageFrame({
       <div className="mx-auto max-w-6xl">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-700">{eyebrow}</p>
+            {eyebrow ? (
+              <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-700">{eyebrow}</p>
+            ) : null}
             <h1 className="admin-h1 mt-3 text-4xl">{title}</h1>
             {description ? <p className="mt-2 text-slate-600">{description}</p> : null}
           </div>

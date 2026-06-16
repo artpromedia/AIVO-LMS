@@ -40,14 +40,15 @@ function hourLabel(ms: number): string {
   return `${String(new Date(ms).getUTCHours()).padStart(2, "0")}:00`;
 }
 
-/** 24 hourly buckets ending now: request count + average latency per hour. */
+/** `hours` hourly buckets ending now: request count + average latency per hour. */
 export function aiRequestsByHour(
   events: RecentAiActivityEntry[],
   now = new Date(),
+  hours = 24,
 ): AreaTrendPoint[] {
   const newest = hourStart(now);
   const buckets = new Map<number, { count: number; latencyTotal: number }>();
-  for (let i = 23; i >= 0; i -= 1) buckets.set(newest - i * HOUR_MS, { count: 0, latencyTotal: 0 });
+  for (let i = hours - 1; i >= 0; i -= 1) buckets.set(newest - i * HOUR_MS, { count: 0, latencyTotal: 0 });
   for (const event of events) {
     const bucket = buckets.get(hourStart(new Date(event.createdAt)));
     if (!bucket) continue;

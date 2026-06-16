@@ -37,3 +37,11 @@ not the global `tokens.css`.
 only `apps/web-v2/**` + `apps/marketing/**`. `apps/web-admin` legacy files are NOT hex-banned
 (frozen by the CI ratchet baseline). Don't flip the global ban onto web-admin in a refine
 pass — many legacy admin files still use raw hex / Tailwind palette colors.
+
+**admin-ui is consumed via its BUILT dist, not its source.** web-admin's `tsc` reads
+`@aivo/admin-ui`'s emitted `.d.ts`, so after adding/changing a component prop in
+`packages/admin-ui/src/**`, you MUST `pnpm --filter @aivo/admin-ui run build` before web-admin
+typecheck will see it — otherwise tsc reports the new prop as "does not exist" and old required
+props (e.g. a prop you just made optional) as still required. **Why:** stale dist types caused
+phantom TS2322/TS2741 errors on a clean source change. Keep all shared-kit prop additions
+optional/opt-in so existing call sites keep compiling.

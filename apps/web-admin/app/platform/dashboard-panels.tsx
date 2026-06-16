@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { ArrowRight, Building2 } from "lucide-react";
 import type { PilotStatus } from "@aivo/admin-api/billing";
 import { AdminCard } from "@aivo/admin-ui";
+import { PilotRowActions } from "./pilot-row-actions";
 
 /**
  * Per-widget degraded state for the /platform dashboard. Every panel owns
@@ -37,10 +39,17 @@ export function PanelError({
   );
 }
 
-const PILOT_STATUS_TONE: Record<PilotStatus["status"], string> = {
-  active: "text-emerald-700",
-  expired: "text-amber-700",
-  none: "text-slate-500",
+/** Soft status pill matching the reference (count never relies on colour alone). */
+const PILOT_STATUS_PILL: Record<PilotStatus["status"], string> = {
+  active: "bg-emerald-100 text-emerald-700",
+  expired: "bg-amber-100 text-amber-800",
+  none: "bg-slate-100 text-slate-600",
+};
+
+const PILOT_STATUS_LABEL: Record<PilotStatus["status"], string> = {
+  active: "Active",
+  expired: "Expired",
+  none: "None",
 };
 
 export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; testId: string }) {
@@ -53,8 +62,12 @@ export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; te
             Live seats, onboarding uptake, and expiry from billing-svc.
           </p>
         </div>
-        <Link className="font-bold text-blue-700" href="/platform/pilots">
-          Pilot operations
+        <Link
+          className="inline-flex items-center gap-1 font-semibold text-violet-700 hover:text-violet-800"
+          href="/platform/pilots"
+        >
+          View all pilots
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </header>
       {pilots.length === 0 ? (
@@ -64,13 +77,16 @@ export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; te
           <table className="admin-table">
             <thead>
               <tr>
-                <th>District</th>
+                <th>District / Organization</th>
                 <th>Seats</th>
                 <th>Parents</th>
                 <th>Therapists</th>
                 <th>Learners</th>
                 <th>Expires</th>
                 <th>Status</th>
+                <th>
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -79,12 +95,28 @@ export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; te
                   pilot.seatLimit && pilot.seatLimit > 0
                     ? Math.min(100, Math.round((pilot.seatsUsed / pilot.seatLimit) * 100))
                     : 0;
+                const districtName = pilot.districtName ?? pilot.tenantId;
                 return (
                   <tr key={pilot.tenantId} data-testid="pilot-row">
                     <td className="font-semibold">
-                      <Link className="text-blue-700" href={`/platform/pilots/${pilot.tenantId}`}>
-                        {pilot.districtName ?? pilot.tenantId}
-                      </Link>
+                      <span className="flex items-center gap-3">
+                        <span
+                          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                          style={{
+                            backgroundColor: "color-mix(in srgb, var(--admin-chart-1) 14%, white)",
+                            color: "var(--admin-chart-1)",
+                          }}
+                          aria-hidden="true"
+                        >
+                          <Building2 className="h-4 w-4" />
+                        </span>
+                        <Link
+                          className="text-violet-700 hover:text-violet-800"
+                          href={`/platform/pilots/${pilot.tenantId}`}
+                        >
+                          {districtName}
+                        </Link>
+                      </span>
                     </td>
                     <td className="admin-tabular">
                       <span>
@@ -121,9 +153,14 @@ export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; te
                         : "—"}
                     </td>
                     <td>
-                      <span className={`font-bold uppercase ${PILOT_STATUS_TONE[pilot.status]}`}>
-                        {pilot.status}
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${PILOT_STATUS_PILL[pilot.status]}`}
+                      >
+                        {PILOT_STATUS_LABEL[pilot.status]}
                       </span>
+                    </td>
+                    <td>
+                      <PilotRowActions tenantId={pilot.tenantId} districtName={districtName} />
                     </td>
                   </tr>
                 );
