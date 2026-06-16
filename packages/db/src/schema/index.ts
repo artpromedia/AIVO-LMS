@@ -63,3 +63,4 @@ export * from "./security.js";
 export * from "./responsible-ai.js";
 export * from "./audio.js";
 export * from "./support.js";
+export * from "./pilots.js";

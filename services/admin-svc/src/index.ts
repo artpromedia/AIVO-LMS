@@ -36,6 +36,7 @@ import { registerGovernanceRoutes } from "./routes/governance.js";
 import { registerLearnerImportRoutes } from "./routes/learner-import.js";
 import { registerClassroomRoutes } from "./routes/classrooms.js";
 import { registerSchoolOverviewRoutes } from "./routes/school-overview.js";
+import { registerDistrictOverviewRoutes } from "./routes/district-overview.js";
 import { registerReportRoutes } from "./routes/reports.js";
 import { registerNotificationRoutes } from "./routes/notifications.js";
 import { registerFeatureFlagRoutes } from "./routes/feature-flags.js";
@@ -111,6 +112,7 @@ export async function buildApp(
   registerLearnerImportRoutes(app, db);
   registerClassroomRoutes(app, db);
   registerSchoolOverviewRoutes(app, db);
+  registerDistrictOverviewRoutes(app, db);
   registerReportRoutes(app, db);
   registerNotificationRoutes(app, db);
   registerFeatureFlagRoutes(app);

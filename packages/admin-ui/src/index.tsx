@@ -4,6 +4,8 @@ export { ChartCard, SrOnlyTable } from "./charts/ChartCard.js";
 export type { SrTableRow } from "./charts/ChartCard.js";
 export { AreaTrend } from "./charts/AreaTrend.js";
 export type { AreaTrendPoint } from "./charts/AreaTrend.js";
+export { MultiLineTrend } from "./charts/MultiLineTrend.js";
+export type { MultiLinePoint, MultiLineSeries } from "./charts/MultiLineTrend.js";
 export { DonutBreakdown } from "./charts/DonutBreakdown.js";
 export type { DonutSlice } from "./charts/DonutBreakdown.js";
 export { BarSeries } from "./charts/BarSeries.js";

@@ -42,6 +42,10 @@
       "types": "./dist/content.d.ts",
       "default": "./dist/content.js"
     },
+    "./district": {
+      "types": "./dist/district.d.ts",
+      "default": "./dist/district.js"
+    },
     "./dsar": {
       "types": "./dist/dsar.d.ts",
       "default": "./dist/dsar.js"
