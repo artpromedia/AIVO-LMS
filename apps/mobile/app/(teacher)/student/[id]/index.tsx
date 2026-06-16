@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useLearner } from "@/hooks/useLearners";
+import { useTeacherAssessmentStatus } from "@/hooks/useTeacherAssessment";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import BrainCloneCard from "@/src/components/brain/BrainCloneCard";
 import { colors, spacing } from "@/constants/colors";
@@ -16,7 +17,9 @@ export default function StudentBrainProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { data: learner } = useLearner(id);
+  const { data: assessmentStatus } = useTeacherAssessmentStatus(id);
   const learnerName = learner ? `${learner.firstName} ${learner.lastName}`.trim() : "Student";
+  const contributed = !!assessmentStatus?.completed;
 
   return (
     <ScrollView
@@ -52,6 +55,44 @@ export default function StudentBrainProfile() {
           variant="full"
         />
       </View>
+
+      <AivoCard style={styles.assessmentCard}>
+        <View style={styles.assessmentHeader}>
+          <View style={styles.assessmentIcon}>
+            <Ionicons name="school" size={22} color={colors.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.assessmentTitle}>
+              {t("teacherAssessment.cardTitle", "Classroom assessment")}
+            </Text>
+            <Text style={styles.assessmentSubtitle}>
+              {contributed
+                ? t("teacherAssessment.cardContributed", "You've contributed — tap to update")
+                : t("teacherAssessment.cardPrompt", "Share how this student learns in your class")}
+            </Text>
+          </View>
+          {contributed ? (
+            <Ionicons name="checkmark-circle" size={22} color="#22c55e" />
+          ) : null}
+        </View>
+        <AivoButton
+          title={
+            contributed
+              ? t("teacherAssessment.updateResponses", "Update responses")
+              : t("teacherAssessment.start", "Start assessment")
+          }
+          onPress={() => router.push(`/(teacher)/student/${id}/assessment` as any)}
+          variant={contributed ? "outline" : "primary"}
+          icon={
+            <Ionicons
+              name="clipboard-outline"
+              size={18}
+              color={contributed ? colors.primary : "#FFF"}
+            />
+          }
+          style={{ marginTop: spacing.sm }}
+        />
+      </AivoCard>
 
       <View style={styles.actions}>
         <AivoButton
@@ -99,5 +140,22 @@ const styles = StyleSheet.create({
   },
   levelText: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text },
   brainWrap: { marginBottom: spacing.lg },
+  assessmentCard: { marginBottom: spacing.lg },
+  assessmentHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  assessmentIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.primary + "15",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  assessmentTitle: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text },
+  assessmentSubtitle: {
+    fontSize: 13,
+    fontFamily: "Nunito-Regular",
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
   actions: { flexDirection: "row", marginTop: spacing.md },
 });

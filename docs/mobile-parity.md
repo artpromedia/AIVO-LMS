@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status | Count |
 | ------ | ----- |
-| Parity | 116 |
+| Parity | 119 |
 | Partial | 4 |
-| Missing | 5 |
+| Missing | 2 |
 | **In-scope total** | **125** |
 
-Full parity: **93%**. 26 web-only routes excluded.
+Full parity: **95%**. 26 web-only routes excluded.
 
 ## Surface-Type Parity
 
@@ -233,9 +233,9 @@ Both learner subject grids consume the canonical `getDiscoverableSubjects()` reg
 | `/teacher/lesson-plans` | `(teacher)/lesson-plan` | Parity | — |
 | `/teacher/reports` | `(teacher)/analytics` | Parity | — |
 | `/teacher/settings` | `(teacher)/settings` | Parity | — |
-| `/teacher/learners/[learnerId]/assessment` | — | **Missing** | Teacher assessment flow (8-section stepper) has no mobile screen yet — next phase. |
-| `/teacher/learners/[learnerId]/assessment/intro` | — | **Missing** | Teacher assessment intro/overview state — next phase. |
-| `/teacher/learners/[learnerId]/assessment/review` | — | **Missing** | Teacher assessment review/summary state — next phase. |
+| `/teacher/learners/[learnerId]/assessment` | `(teacher)/student/[id]/assessment` | Parity | — |
+| `/teacher/learners/[learnerId]/assessment/intro` | `(teacher)/student/[id]/assessment` | Parity | — |
+| `/teacher/learners/[learnerId]/assessment/review` | `(teacher)/student/[id]/assessment` | Parity | — |
 | `/teacher/rostering` | — | **Missing** | Roster sync (Classroom/Clever/ClassLink/Canvas) — no mobile screen yet; next phase. |
 
 ## Therapist

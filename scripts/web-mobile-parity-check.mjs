@@ -419,21 +419,18 @@ const PARITY_MATRIX = {
     { web: "/teacher/settings", mobile: "(teacher)/settings", status: P },
     {
       web: "/teacher/learners/[learnerId]/assessment",
-      mobile: null,
-      status: MISSING,
-      gap: "Teacher assessment flow (8-section stepper) has no mobile screen yet — next phase.",
+      mobile: "(teacher)/student/[id]/assessment",
+      status: P,
     },
     {
       web: "/teacher/learners/[learnerId]/assessment/intro",
-      mobile: null,
-      status: MISSING,
-      gap: "Teacher assessment intro/overview state — next phase.",
+      mobile: "(teacher)/student/[id]/assessment",
+      status: P,
     },
     {
       web: "/teacher/learners/[learnerId]/assessment/review",
-      mobile: null,
-      status: MISSING,
-      gap: "Teacher assessment review/summary state — next phase.",
+      mobile: "(teacher)/student/[id]/assessment",
+      status: P,
     },
     {
       web: "/teacher/rostering",
