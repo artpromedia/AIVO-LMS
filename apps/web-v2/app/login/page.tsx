@@ -204,7 +204,7 @@ export default async function LoginPage({
       }
     >
       <div className="flex flex-col gap-6">
-        <AivoBrandMark sublabel={ts("wordmark_learning")} />
+        <AivoBrandMark />
 
         <AudienceToggle
           active={loginMode}

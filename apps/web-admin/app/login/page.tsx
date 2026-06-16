@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { Lock, ShieldCheck } from "lucide-react";
 import { safeNextPath } from "@/lib/safe-redirect";
 import { SsoHint } from "./sso-hint";
 import { CloudMascot } from "./_components/cloud-mascot";
@@ -90,14 +91,16 @@ export default async function LoginPage({
     <main className="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
       <section className="flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
-          <div className="mb-8 flex flex-col items-center gap-1">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="h-5 w-5 text-blue-600" aria-hidden="true" />
-              <span className="bg-gradient-to-r from-blue-700 to-sky-500 bg-clip-text text-3xl font-extrabold tracking-tight text-transparent">
-                AIVO
-              </span>
-            </div>
-            <span className="pl-6 text-[0.62rem] font-semibold uppercase tracking-[0.42em] text-sky-600">
+          <div className="mb-8 flex flex-col items-center gap-1.5">
+            <Image
+              src="/images/aivo-logo-horizontal-dark.png"
+              alt="AIVO Learning"
+              width={149}
+              height={60}
+              priority
+              className="h-10 w-auto"
+            />
+            <span className="text-[0.62rem] font-semibold uppercase tracking-[0.42em] text-sky-600">
               Admin
             </span>
           </div>

@@ -1,15 +1,13 @@
-import { Sparkles } from "lucide-react";
+import Image from "next/image";
 
 /**
- * AivoBrandMark — the centered "AIVO" wordmark + tracked sublabel that tops
- * every auth card in the design mockups (AIVO · LEARNING / FAMILY / ADMIN).
- *
- * Colors flow through the iw-* sensory tokens so the mark repaints with the
- * rest of the surface; the wordmark uses a purple→teal gradient via
- * bg-clip-text.
+ * AivoBrandMark — the official AIVO Learning logo lockup that tops every auth
+ * card, with an optional tracked contextual sublabel beneath it (Family /
+ * Account / Schools). The logo is the real horizontal brand artwork served
+ * from public/images; the sublabel still flows through the iw-* sensory tokens.
  */
 export function AivoBrandMark({
-  sublabel = "Learning",
+  sublabel,
   align = "center",
   className,
 }: {
@@ -20,20 +18,24 @@ export function AivoBrandMark({
   return (
     <div
       className={[
-        "flex flex-col gap-0.5",
+        "flex flex-col gap-1.5",
         align === "center" ? "items-center" : "items-start",
         className ?? "",
       ].join(" ")}
     >
-      <div className="flex items-center gap-1.5">
-        <Sparkles className="h-5 w-5 text-iw-primary" aria-hidden="true" />
-        <span className="font-iw-display text-3xl font-extrabold tracking-tight bg-gradient-to-r from-iw-primary to-iw-accent bg-clip-text text-transparent">
-          AIVO
+      <Image
+        src="/images/aivo-logo-purple.png"
+        alt="AIVO Learning"
+        width={149}
+        height={60}
+        priority
+        className="h-10 w-auto"
+      />
+      {sublabel ? (
+        <span className="text-[0.62rem] font-semibold uppercase tracking-[0.42em] text-iw-accent">
+          {sublabel}
         </span>
-      </div>
-      <span className="text-[0.62rem] font-semibold uppercase tracking-[0.42em] text-iw-accent pl-6">
-        {sublabel}
-      </span>
+      ) : null}
     </div>
   );
 }
