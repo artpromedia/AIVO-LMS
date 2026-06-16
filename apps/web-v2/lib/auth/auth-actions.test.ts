@@ -219,7 +219,7 @@ function signinForm(fields: Record<string, string>): FormData {
   return f;
 }
 
-const SIGNIN = { email: "sam@example.com", password: "S3cure-Signup-Pass!9" };
+const SIGNIN = { email: "sam@example.com", password: "S3cure-Signin-Pass!9" };
 
 describe("onboardingSignInAction identity-svc failure mapping (friendly error codes)", () => {
   // Each identity-svc sign-in failure status maps to a specific user-facing
@@ -254,6 +254,100 @@ describe("onboardingSignInAction identity-svc failure mapping (friendly error co
     toSessionProfile.mockReturnValueOnce(null);
     await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
       "NEXT_REDIRECT:/onboarding/signin?error=unsupported_role",
+    );
+    expect(setAuthSessionCookies).not.toHaveBeenCalled();
+  });
+});
+
+describe("onboardingSignInAction open-redirect guard (safePath on `next`)", () => {
+  // On a successful sign-in, a crafted `next` must never turn the post-login
+  // redirect into an open redirect: off-site, protocol-relative, and non-path
+  // values are rejected and the user lands on their safe role home instead
+  // (ROLE_HOME["parent"] === "/parent/home").
+  beforeEach(() => {
+    identityLogin.mockResolvedValue({
+      kind: "ok",
+      user: { id: "u_1", email: SIGNIN.email, name: "Sam", role: "PARENT", tenantId: "t_1" },
+      accessToken: "access_tok",
+      setCookies: [],
+    });
+  });
+
+  const HOSTILE_NEXT = [
+    { label: "an off-site absolute URL", value: "https://evil.example" },
+    { label: "a protocol-relative URL", value: "//evil.example" },
+    { label: "a javascript: scheme", value: "javascript:alert(1)" },
+    { label: "a bare host (no leading slash)", value: "evil.example/path" },
+    { label: "a backslash-prefixed path", value: "\\evil.example" },
+  ];
+
+  for (const { label, value } of HOSTILE_NEXT) {
+    it(`ignores ${label} and redirects to the safe role home`, async () => {
+      await expect(
+        onboardingSignInAction(signinForm({ ...SIGNIN, next: value })),
+      ).rejects.toThrow("NEXT_REDIRECT:/parent/home");
+      expect(setAuthSessionCookies).toHaveBeenCalledTimes(1);
+    });
+  }
+});
+
+describe("onboardingSignInAction open-redirect guard (safePath on `errorReturn`)", () => {
+  // On a failed sign-in, a tampered `errorReturn` can't bounce the failure
+  // redirect off-site — it falls back to the in-app /onboarding/signin page.
+  const HOSTILE_ERROR_RETURN = [
+    { label: "an off-site absolute URL", value: "https://evil.example" },
+    { label: "a protocol-relative URL", value: "//evil.example" },
+    { label: "a javascript: scheme", value: "javascript:alert(1)" },
+    { label: "a bare host (no leading slash)", value: "evil.example/path" },
+  ];
+
+  for (const { label, value } of HOSTILE_ERROR_RETURN) {
+    it(`ignores ${label} in errorReturn and bounces to the safe /onboarding/signin fallback`, async () => {
+      identityLogin.mockResolvedValueOnce({ kind: "error", status: 401, error: "bad creds" });
+      await expect(
+        onboardingSignInAction(signinForm({ ...SIGNIN, errorReturn: value })),
+      ).rejects.toThrow("NEXT_REDIRECT:/onboarding/signin?error=invalid_credentials");
+      expect(setAuthSessionCookies).not.toHaveBeenCalled();
+    });
+  }
+});
+
+describe("onboardingSignInAction 403 surface redirect guard (isSafeSurfaceRedirect)", () => {
+  // A 403 `redirectTo` is only honored when it points back into the AIVO
+  // estate. An off-site `redirectTo` must be rejected — the user is NOT sent
+  // there and instead falls back to the safe error page.
+  const HOSTILE_REDIRECT_TO = [
+    { label: "an off-site https URL", value: "https://evil.example/portal" },
+    { label: "a protocol-relative URL", value: "//evil.example" },
+    { label: "a non-https scheme on the apex", value: "http://aivolearning.com/portal" },
+    { label: "a look-alike host", value: "https://aivolearning.com.evil.example" },
+    { label: "a javascript: scheme", value: "javascript:alert(1)" },
+  ];
+
+  for (const { label, value } of HOSTILE_REDIRECT_TO) {
+    it(`rejects ${label} and bounces to the safe error page instead`, async () => {
+      identityLogin.mockResolvedValueOnce({
+        kind: "error",
+        status: 403,
+        error: "wrong surface",
+        redirectTo: value,
+      });
+      await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
+        "NEXT_REDIRECT:/onboarding/signin?error=wrong_surface",
+      );
+      expect(setAuthSessionCookies).not.toHaveBeenCalled();
+    });
+  }
+
+  it("honors a safe in-estate 403 redirectTo (guard allows the legitimate portal)", async () => {
+    identityLogin.mockResolvedValueOnce({
+      kind: "error",
+      status: 403,
+      error: "wrong surface",
+      redirectTo: "https://admin.aivolearning.com/overview",
+    });
+    await expect(onboardingSignInAction(signinForm({ ...SIGNIN }))).rejects.toThrow(
+      "NEXT_REDIRECT:https://admin.aivolearning.com/overview",
     );
     expect(setAuthSessionCookies).not.toHaveBeenCalled();
   });
