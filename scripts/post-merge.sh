@@ -10,8 +10,14 @@ echo "Installing pnpm dependencies..."
 # progress redraws to the captured stream. We deliberately do NOT pass
 # --ignore-scripts because workspace post-install hooks (Drizzle codegen,
 # package builds) are required for downstream services to start.
-pnpm install --frozen-lockfile --prefer-offline --reporter=append-only 2>/dev/null \
-  || pnpm install --prefer-offline --reporter=append-only
+#
+# --child-concurrency=1 serializes the workspace `prepare`/build lifecycle
+# scripts. With 73 packages, pnpm otherwise spawns up to 5 `tsc` compilers at
+# once, whose combined heap OOM-aborts the build in this container (exit -11 /
+# "Aborted"). Running one tsc at a time trades a little wall-clock for a build
+# that actually finishes; the post-merge timeout has ample headroom.
+pnpm install --frozen-lockfile --prefer-offline --child-concurrency=1 --reporter=append-only 2>/dev/null \
+  || pnpm install --prefer-offline --child-concurrency=1 --reporter=append-only
 
 echo "Installing brain-svc Python dependencies..."
 cd services/brain-svc && pip install -q -r requirements.txt 2>/dev/null; cd ../..

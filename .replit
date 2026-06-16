@@ -210,4 +210,4 @@ build = ["bash", "-c", "rm -rf node_modules && pnpm install --frozen-lockfile --
 
 [postMerge]
 path = "scripts/post-merge.sh"
-timeoutMs = 1500000
+timeoutMs = 1800000
