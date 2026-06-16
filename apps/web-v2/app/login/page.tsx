@@ -180,7 +180,7 @@ const ERROR_CODES = new Set([
   "unsupported_role",
   "login_failed",
 ]);
-const NOTICE_CODES = new Set(["password_reset", "logged_out"]);
+const NOTICE_CODES = new Set(["password_reset", "logged_out", "email_verified"]);
 
 export default async function LoginPage({
   searchParams,

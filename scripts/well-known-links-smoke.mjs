@@ -34,6 +34,8 @@ const REQUIRED_AASA_PATHS = [
   "/settings",
   "/billing",
   "/role-switch",
+  "/verify-email",
+  "/reset-password",
 ];
 
 const REQUIRED_BUNDLE_FRAGMENT = ".com.artpromedia.aivo";

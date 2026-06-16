@@ -6,6 +6,7 @@ import {
   learners,
   mfaCodes,
   passwordResetTokens,
+  emailVerificationTokens,
   webauthnCredentials,
   mfaRecoveryCodes,
   auditEvents,
@@ -271,6 +272,60 @@ const COMMS_URL = requireCommsUrl();
 const INTERNAL_KEY =
   process.env.INTERNAL_SERVICE_KEY || (IS_PROD_AUTH ? "" : "aivo-internal-dev-key");
 
+/** Verification links are valid for 24h — long enough to survive a delayed
+ *  inbox without leaving an indefinitely-redeemable credential around. */
+const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Mint a single-use email-verification token and hand the link to comms-svc.
+ *
+ * Mirrors the forgot-password mechanics: only the sha256 of the token is
+ * stored, any earlier unused token for the user is retired first (so a fresh
+ * link always invalidates a stale one), and a comms failure is logged but
+ * never thrown — registration/resend must not fail because email is down.
+ */
+async function issueAndSendEmailVerification(
+  db: any,
+  user: { id: string; email: string | null; name: string | null },
+  request: { headers: { origin?: string } | Record<string, unknown>; log: { error: (...a: any[]) => void } },
+): Promise<void> {
+  if (!user.email) return;
+  try {
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    await db
+      .update(emailVerificationTokens)
+      .set({ usedAt: new Date() })
+      .where(and(eq(emailVerificationTokens.userId, user.id), sql`used_at IS NULL`));
+
+    await db.insert(emailVerificationTokens).values({
+      userId: user.id,
+      tokenHash,
+      expiresAt: new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS),
+    });
+
+    const headerOrigin =
+      typeof (request.headers as Record<string, unknown>).origin === "string"
+        ? ((request.headers as Record<string, unknown>).origin as string)
+        : "";
+    const webOrigin = process.env.WEB_APP_URL || headerOrigin || "";
+    const verifyUrl = `${webOrigin}/verify-email?token=${rawToken}`;
+
+    const commsRes = await fetch(`${COMMS_URL}/api/comms/internal/verify-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-internal-key": INTERNAL_KEY },
+      body: JSON.stringify({ to: user.email, verifyUrl, name: user.name }),
+    }).catch(() => null);
+
+    if (!commsRes || !commsRes.ok) {
+      request.log.error({ email: user.email }, "Failed to send verification email");
+    }
+  } catch (err) {
+    request.log.error({ err, userId: user.id }, "issueAndSendEmailVerification error");
+  }
+}
+
 function generateMfaCode(): string {
   return crypto.randomInt(100000, 999999).toString();
 }
@@ -513,6 +568,12 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         } as any)
         .returning();
       await db.insert(passwordHistory).values({ userId: user.id, passwordHash: newHash });
+
+      // Send a verification link. Best-effort by design: the account is usable
+      // immediately (so onboarding isn't blocked on inbox latency) but stays
+      // `email_verified = false` until the link is redeemed, so downstream
+      // gates can require a verified address where it matters.
+      await issueAndSendEmailVerification(db, user, req);
 
       const accessToken = await mintAccessToken(db, user);
 
@@ -1430,6 +1491,103 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         .where(eq(passwordResetTokens.id, record.id));
       await db.delete(sessions).where(eq(sessions.userId, record.userId));
       return { ok: true };
+    },
+  );
+
+  // --- EMAIL VERIFICATION ------------------------------------------
+  // A registration mints an `email_verification_tokens` row and emails the
+  // link; redeeming it flips `users.email_verified`. The token is single-use,
+  // 24h-lived, and only its sha256 is stored (the raw value lives only in the
+  // emailed link), mirroring the password-reset token handling above.
+  app.post(
+    "/api/auth/verify-email",
+    {
+      schema: {
+        tags: ["Auth"],
+        body: {
+          type: "object",
+          required: ["token"],
+          properties: { token: { type: "string", minLength: 32 } },
+        },
+      },
+    },
+    async (request, reply) => {
+      const { token } = request.body as { token: string };
+      const db = (request.server as any).db;
+
+      const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+      const [record] = await db
+        .select()
+        .from(emailVerificationTokens)
+        .where(eq(emailVerificationTokens.tokenHash, tokenHash))
+        .limit(1);
+
+      if (!record || record.usedAt || record.expiresAt < new Date()) {
+        return reply.status(400).send({ error: "Invalid or expired verification link" });
+      }
+
+      const [user] = await db.select().from(users).where(eq(users.id, record.userId)).limit(1);
+      if (!user) {
+        return reply.status(400).send({ error: "Invalid or expired verification link" });
+      }
+
+      // Idempotent: flip the flag (no-op if already true) and burn the token so
+      // the link can't be replayed. Both updates are safe to repeat.
+      if (!user.emailVerified) {
+        await db
+          .update(users)
+          .set({ emailVerified: true, updatedAt: new Date() } as any)
+          .where(eq(users.id, user.id));
+      }
+      await db
+        .update(emailVerificationTokens)
+        .set({ usedAt: new Date() })
+        .where(eq(emailVerificationTokens.id, record.id));
+
+      return { ok: true, email: user.email };
+    },
+  );
+
+  app.post(
+    "/api/auth/send-verification-email",
+    {
+      schema: {
+        tags: ["Auth"],
+        body: {
+          type: "object",
+          required: ["email"],
+          properties: { email: { type: "string", format: "email" } },
+        },
+      },
+    },
+    async (request, reply) => {
+      const { email } = request.body as { email: string };
+      const db = (request.server as any).db;
+      const normalizedEmail = email.trim().toLowerCase();
+
+      // Generic response regardless of outcome — never reveal whether an
+      // address is registered or already verified (account-enumeration guard,
+      // same posture as forgot-password).
+      const genericResponse = {
+        ok: true,
+        message: "If that account exists and is unverified, a verification link has been sent.",
+      };
+
+      try {
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, normalizedEmail))
+          .limit(1);
+
+        if (user && !user.emailVerified) {
+          await issueAndSendEmailVerification(db, user, request);
+        }
+      } catch (err) {
+        request.log.error({ err, email: normalizedEmail }, "send-verification-email handler error");
+      }
+
+      return genericResponse;
     },
   );
 

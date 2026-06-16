@@ -135,7 +135,18 @@
     "acceptInviteSuccess": "You've been added to {{count}} learner team(s). Welcome!",
     "acceptInviteNoneFound": "No pending invitations were found for your account. If you were expecting one, ask the parent to re-send the invite to {{email}}.",
     "acceptInviteContinue": "Continue to your dashboard",
-    "acceptInviteError": "Something went wrong: {{message}}"
+    "acceptInviteError": "Something went wrong: {{message}}",
+    "verifyEmailTitle": "Confirm your email",
+    "verifyEmailSubtitle": "Tap below to verify this email and secure your account.",
+    "verifyEmailSubmit": "Confirm my email",
+    "verifyEmailSuccess": "Your email is confirmed. You can sign in now.",
+    "verifyEmailMissingToken": "This confirmation link is missing its security token. Request a new one below.",
+    "verifyEmailExpiredLink": "This confirmation link has expired or has already been used. Request a new one to continue.",
+    "verifyEmailResendTitle": "Need a new link?",
+    "verifyEmailResendLabel": "Email address",
+    "verifyEmailResendSubmit": "Send a new link",
+    "verifyEmailResendDone": "If that account exists and still needs confirming, a new link is on its way.",
+    "verifyEmailResendHelp": "We’ll email a fresh confirmation link if the account still needs verifying."
   },
   "parent": {
     "greeting": "Hello, {{name}}",

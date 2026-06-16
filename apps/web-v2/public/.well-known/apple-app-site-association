@@ -1,5 +1,5 @@
 {
-  "_comment": "ADR 0020 Phase 4, slice 4.3. Apple Universal Links manifest for the AIVO mobile app. One bundle id (com.artpromedia.aivo), one app, every role-segmented and cross-cutting path. Update TEAMID before production rollout.",
+  "_comment": "ADR 0020 Phase 4, slice 4.3. Apple Universal Links manifest for the AIVO mobile app. One bundle id (com.artpromedia.aivo), one app, every role-segmented and cross-cutting path (incl. the token-link auth screens /verify-email and /reset-password). Update TEAMID before production rollout.",
   "applinks": {
     "apps": [],
     "details": [
@@ -19,7 +19,9 @@
           { "/": "/settings" },
           { "/": "/billing/*" },
           { "/": "/billing" },
-          { "/": "/role-switch" }
+          { "/": "/role-switch" },
+          { "/": "/verify-email" },
+          { "/": "/reset-password" }
         ]
       }
     ]

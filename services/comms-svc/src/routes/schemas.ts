@@ -280,6 +280,10 @@ export const internalPasswordResetSchema = internalSchema(
   "internalSendPasswordReset",
   "Internal: send a password-reset email",
 );
+export const internalVerifyEmailSchema = internalSchema(
+  "internalSendVerifyEmail",
+  "Internal: send an email-verification link",
+);
 export const internalDistrictAdminInviteSchema = internalSchema(
   "internalSendDistrictAdminInvite",
   "Internal: send a district-admin invite email",
