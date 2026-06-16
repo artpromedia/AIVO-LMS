@@ -32,13 +32,18 @@ echo "Installing pnpm dependencies..."
 # post-merge install; their concurrent pnpm link-worker pools + tsc builds blow
 # past the PID ceiling and every fork fails. Two mitigations:
 #   1. flock mutex -- overlapping post-merge runs queue on one lock instead of
-#      colliding. The lock is held on fd 9 and released automatically when the
-#      process exits (no stale locks). Blocking is bounded by the 30-min script
-#      timeout.
+#      colliding. The wait is BOUNDED (-w): a post-merge that is cancelled
+#      mid-install can leave an orphaned `pnpm install` child (reparented to
+#      pid 1) that inherited this lock fd and never releases it. An unbounded
+#      `flock 9` then blocks the NEXT merge forever until the platform cancels
+#      it -- surfacing as "Error in river, code: CANCEL". With `-w` we wait a
+#      short while for a genuine peer install, then proceed regardless so a
+#      stale holder can never wedge future merges. The lock still releases
+#      automatically when this process exits (no stale locks of our own).
 #   2. UV_THREADPOOL_SIZE=2 -- shrink each node process's libuv thread pool
 #      (default 4) so pnpm + every tsc child claim fewer of the scarce PIDs.
 exec 9>/tmp/aivo-post-merge-install.lock
-flock 9
+flock -w 120 9 || echo "install lock busy after 120s; proceeding without it." >&2
 export UV_THREADPOOL_SIZE=2
 
 install_deps() {

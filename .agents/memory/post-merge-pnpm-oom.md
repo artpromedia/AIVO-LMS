@@ -36,8 +36,17 @@ There are TWO distinct failure modes, both environmental (not code bugs):
   (mode 1).
 - **flock mutex** on fd 9 (`/tmp/aivo-post-merge-install.lock`) around the
   install so overlapping post-merge runs from near-simultaneous merges QUEUE
-  instead of colliding into the PID ceiling (mode 2). Lock auto-releases on
-  process exit — no stale locks.
+  instead of colliding into the PID ceiling (mode 2). **MUST be bounded
+  (`flock -w 120 9 || …`), never unbounded `flock 9`.** A post-merge cancelled
+  mid-install can leave an orphaned `pnpm install` child (reparented to pid 1)
+  that *inherited* fd 9 and never releases the lock — `exec 9>file` is NOT
+  close-on-exec, so children keep it. An unbounded `flock 9` on the next merge
+  then blocks forever until the platform cancels it, surfacing as
+  **`Error in river, code: CANCEL`** (empty message) on both post-merge setup
+  AND workflow reconciliation. Bounded `-w` waits briefly then proceeds, so a
+  stale holder can never wedge future merges. To clear a live wedge: find the
+  pid whose `/proc/<pid>/fd` points at the lock file (`pgrep -f "pnpm install"`,
+  it'll be ppid=1), `kill -9` it, and `rm -f` the lock file.
 - **`export UV_THREADPOOL_SIZE=2`** shrinks each node process's libuv pool
   (default 4) so pnpm + every tsc child claim fewer of the scarce PIDs.
 - **retry-with-backoff** loop (`until install_deps`) for genuinely momentary
