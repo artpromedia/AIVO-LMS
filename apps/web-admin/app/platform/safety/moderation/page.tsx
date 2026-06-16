@@ -9,6 +9,7 @@ import {
 } from "@aivo/admin-api/moderation";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 const STATUSES: AdminModerationStatus[] = [
@@ -60,7 +61,6 @@ export default async function ModerationPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Safety"
       title="Moderation queue"
       description="AI tutor content flagged for human review, with a full decision audit trail."
     >
@@ -107,7 +107,7 @@ export default async function ModerationPage({
             <tbody>
               {events.map((event) => (
                 <tr key={event.id}>
-                  <td className="text-sm">{formatDateTime(event.createdAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(event.createdAt)}</td>
                   <td>
                     <span className="block font-bold">{event.flagReason}</span>
                     {event.flagConfidence !== null ? (
@@ -126,7 +126,7 @@ export default async function ModerationPage({
                     ) : null}
                   </td>
                   <td>
-                    <span className="admin-status">{event.status}</span>
+                    <StatusPill status={event.status} />
                   </td>
                   <td>
                     <form action={reviewAction} className="flex items-center gap-2">

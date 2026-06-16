@@ -76,7 +76,6 @@ export default async function NewPilotPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform onboarding"
       title="Provision a district pilot"
       description="Create the district tenant, provision its pilot entitlement (seat cap + active subscription) automatically, and email a secure invitation to its first administrator — in one step. No coupon to re-key."
       action={

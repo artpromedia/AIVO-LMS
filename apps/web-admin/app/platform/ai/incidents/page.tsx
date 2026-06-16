@@ -12,6 +12,7 @@ import {
 } from "@aivo/admin-api/ai-governance";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
@@ -50,11 +51,11 @@ async function stateAction(formData: FormData) {
   redirect("/platform/ai/incidents?notice=Incident%20updated.");
 }
 
-const SEVERITY_TONE: Record<AiIncidentSeverity, string> = {
-  sev1: "text-red-700",
-  sev2: "text-amber-700",
-  sev3: "text-blue-700",
-  sev4: "text-slate-500",
+const SEVERITY_TONE: Record<AiIncidentSeverity, StatusTone> = {
+  sev1: "danger",
+  sev2: "warning",
+  sev3: "info",
+  sev4: "neutral",
 };
 
 const OPEN_STATES: AiIncidentState[] = ["open", "investigating", "mitigated"];
@@ -75,7 +76,6 @@ export default async function AiIncidentsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Responsible AI"
       title="AI incidents"
       description="Responsible-AI incident register with severity, state transitions and timeline."
       action={
@@ -140,11 +140,15 @@ export default async function AiIncidentsPage({
                       {incident.description}
                     </span>
                   </td>
-                  <td className={`font-bold uppercase ${SEVERITY_TONE[incident.severity]}`}>
-                    {incident.severity}
+                  <td>
+                    <StatusPill
+                      status={incident.severity}
+                      tone={SEVERITY_TONE[incident.severity]}
+                      label={incident.severity.toUpperCase()}
+                    />
                   </td>
                   <td>
-                    <span className="admin-status">{incident.state}</span>
+                    <StatusPill status={incident.state} />
                   </td>
                   <td className="text-sm">
                     {incident.modelId ?? "—"}
@@ -152,7 +156,7 @@ export default async function AiIncidentsPage({
                       <span className="block text-slate-500">{incident.tenantId}</span>
                     ) : null}
                   </td>
-                  <td className="text-sm">{formatDateTime(incident.createdAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(incident.createdAt)}</td>
                   <td>
                     <form action={stateAction} className="flex items-center gap-2">
                       <input name="id" type="hidden" value={incident.id} />

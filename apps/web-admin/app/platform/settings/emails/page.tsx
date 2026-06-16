@@ -9,6 +9,7 @@ import {
 } from "@aivo/admin-api/platform-settings";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function retryAction(formData: FormData) {
@@ -24,10 +25,10 @@ async function retryAction(formData: FormData) {
   redirect("/platform/settings/emails?notice=Email%20requeued.");
 }
 
-const STATUS_TONE: Record<EmailStatus, string> = {
-  pending: "text-amber-700",
-  sent: "text-emerald-700",
-  failed: "text-red-700",
+const STATUS_TONE: Record<EmailStatus, StatusTone> = {
+  pending: "warning",
+  sent: "positive",
+  failed: "danger",
 };
 
 export default async function EmailsPage({
@@ -44,7 +45,6 @@ export default async function EmailsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Settings"
       title="Email delivery"
       description="Transactional email outbox — delivery status, retries, and failures, read from email_outbox (Postgres)."
     >
@@ -96,11 +96,13 @@ export default async function EmailsPage({
                   <td className="font-bold">{email.toEmail}</td>
                   <td className="text-sm">{email.subject ?? email.templateAlias ?? "—"}</td>
                   <td className="text-sm">{email.sendKind}</td>
-                  <td className={`font-bold uppercase ${STATUS_TONE[email.status]}`}>{email.status}</td>
-                  <td className="text-sm">
+                  <td>
+                    <StatusPill status={email.status} tone={STATUS_TONE[email.status]} />
+                  </td>
+                  <td className="text-sm tabular-nums">
                     {email.attempt}/{email.maxAttempts}
                   </td>
-                  <td className="text-sm">{formatDateTime(email.createdAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(email.createdAt)}</td>
                   <td className="max-w-xs truncate text-sm text-red-700" title={email.lastError ?? ""}>
                     {email.lastError ?? "—"}
                   </td>

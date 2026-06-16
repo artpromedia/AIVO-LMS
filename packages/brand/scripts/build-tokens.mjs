@@ -548,6 +548,7 @@ const adminTokens = JSON.parse(
 );
 const adminChart = adminTokens.adminChart;
 const adminSurface = adminTokens.adminSurface;
+const adminStatus = adminTokens.adminStatus;
 
 fs.writeFileSync(
   path.join(generatedDir, "admin-chart.ts"),
@@ -565,6 +566,17 @@ export const ADMIN_CHART_PALETTE = {
 
 export const ADMIN_SURFACE = {
   loginSidebar: ${JSON.stringify(adminSurface.loginSidebar)},
+  primary: ${JSON.stringify(adminSurface.primary)},
+  primaryStrong: ${JSON.stringify(adminSurface.primaryStrong)},
+  primaryFg: ${JSON.stringify(adminSurface.primaryFg)},
+} as const;
+
+export const ADMIN_STATUS = {
+  positive: { bg: ${JSON.stringify(adminStatus.positiveBg)}, fg: ${JSON.stringify(adminStatus.positiveFg)} },
+  warning: { bg: ${JSON.stringify(adminStatus.warningBg)}, fg: ${JSON.stringify(adminStatus.warningFg)} },
+  danger: { bg: ${JSON.stringify(adminStatus.dangerBg)}, fg: ${JSON.stringify(adminStatus.dangerFg)} },
+  neutral: { bg: ${JSON.stringify(adminStatus.neutralBg)}, fg: ${JSON.stringify(adminStatus.neutralFg)} },
+  info: { bg: ${JSON.stringify(adminStatus.infoBg)}, fg: ${JSON.stringify(adminStatus.infoFg)} },
 } as const;
 `,
 );
@@ -579,6 +591,19 @@ const adminCss = `:root {
   --admin-chart-axis: ${adminChart.axis};
   --admin-chart-ink: ${adminChart.ink};
   --admin-login-sidebar: ${adminSurface.loginSidebar};
+  --admin-primary: ${adminSurface.primary};
+  --admin-primary-strong: ${adminSurface.primaryStrong};
+  --admin-primary-fg: ${adminSurface.primaryFg};
+  --admin-status-positive-bg: ${adminStatus.positiveBg};
+  --admin-status-positive-fg: ${adminStatus.positiveFg};
+  --admin-status-warning-bg: ${adminStatus.warningBg};
+  --admin-status-warning-fg: ${adminStatus.warningFg};
+  --admin-status-danger-bg: ${adminStatus.dangerBg};
+  --admin-status-danger-fg: ${adminStatus.dangerFg};
+  --admin-status-neutral-bg: ${adminStatus.neutralBg};
+  --admin-status-neutral-fg: ${adminStatus.neutralFg};
+  --admin-status-info-bg: ${adminStatus.infoBg};
+  --admin-status-info-fg: ${adminStatus.infoFg};
 }
 `;
 fs.writeFileSync(path.join(distDir, "css", "admin-tokens.css"), adminCss);

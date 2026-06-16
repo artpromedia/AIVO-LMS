@@ -12,6 +12,7 @@ import {
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
@@ -51,11 +52,11 @@ async function statusAction(formData: FormData) {
   redirect("/platform/security/incidents?notice=Incident%20updated.");
 }
 
-const SEVERITY_TONE: Record<IncidentSeverity, string> = {
-  sev1: "text-red-700",
-  sev2: "text-amber-700",
-  sev3: "text-blue-700",
-  sev4: "text-slate-500",
+const SEVERITY_TONE: Record<IncidentSeverity, StatusTone> = {
+  sev1: "danger",
+  sev2: "warning",
+  sev3: "info",
+  sev4: "neutral",
 };
 
 const OPEN_STATUSES: IncidentStatus[] = ["open", "investigating", "mitigating"];
@@ -74,7 +75,6 @@ export default async function SecurityIncidentsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Security"
       title="Incidents"
       description="Security incident register and bridge ownership, persisted in admin-svc (Postgres)."
       action={
@@ -132,11 +132,11 @@ export default async function SecurityIncidentsPage({
               {incidents.map((incident) => (
                 <tr key={incident.id}>
                   <td className="font-bold">{incident.title}</td>
-                  <td className={`font-bold uppercase ${SEVERITY_TONE[incident.severity]}`}>
-                    {incident.severity}
+                  <td>
+                    <StatusPill status={incident.severity} tone={SEVERITY_TONE[incident.severity]} />
                   </td>
                   <td>
-                    <span className="admin-status">{incident.status.replace("_", " ")}</span>
+                    <StatusPill status={incident.status} />
                   </td>
                   <td className="text-sm">
                     {incident.customerImpact ? "customer" : "—"}
@@ -144,7 +144,7 @@ export default async function SecurityIncidentsPage({
                       <span className="block text-amber-700">regulator notice</span>
                     ) : null}
                   </td>
-                  <td className="text-sm">{formatDateTime(incident.detectedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(incident.detectedAt)}</td>
                   <td>
                     <form action={statusAction} className="flex items-center gap-2">
                       <input name="id" type="hidden" value={incident.id} />

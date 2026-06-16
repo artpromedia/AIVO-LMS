@@ -25,7 +25,6 @@ export default async function AiModelDetailPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Responsible AI"
       title={model.name}
       description={`${model.provider} · ${model.modality} · status ${model.status}`}
       action={

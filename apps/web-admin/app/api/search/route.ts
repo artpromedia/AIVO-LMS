@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 
   const q = (new URL(request.url).searchParams.get("q") ?? "").trim();
   if (q.length < 2) {
-    return NextResponse.json({ tenants: [], users: [], learners: [] });
+    return NextResponse.json({ tenants: [], users: [], learners: [], pilots: [] });
   }
 
   try {

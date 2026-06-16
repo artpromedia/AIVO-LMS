@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requirePageRole } from "@aivo/admin-auth";
 import { listCoupons } from "@aivo/admin-api/billing";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import { couponStatus, formatCouponDate, grantsSummary } from "./coupon-display";
 import { disableCouponAction } from "./actions";
 
@@ -16,7 +17,6 @@ export default async function CouponsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform billing"
       title="Coupons"
       description="Mint and disable discount, subscription, and provisioning (pilot) coupons. Backed by billing-svc — the single source of truth."
       action={
@@ -49,7 +49,7 @@ export default async function CouponsPage({
                   <tr key={coupon.code}>
                     <td className="font-bold">
                       <Link
-                        className="text-blue-700 hover:underline"
+                        className="text-violet-700 hover:underline"
                         href={`/platform/billing/coupons/${encodeURIComponent(coupon.code)}`}
                       >
                         {coupon.code}
@@ -61,17 +61,17 @@ export default async function CouponsPage({
                       ) : null}
                     </td>
                     <td>
-                      <span className="admin-status">{coupon.couponType}</span>
+                      <StatusPill status={coupon.couponType} />
                     </td>
                     <td>{grantsSummary(coupon)}</td>
-                    <td>
+                    <td className="tabular-nums">
                       {coupon.redemptions}
                       {coupon.maxRedemptions != null ? ` / ${coupon.maxRedemptions}` : ""}
                     </td>
                     <td>
-                      <span className={`admin-status admin-status-${status}`}>{status}</span>
+                      <StatusPill status={status} />
                     </td>
-                    <td>{formatCouponDate(coupon.expiresAt)}</td>
+                    <td className="tabular-nums">{formatCouponDate(coupon.expiresAt)}</td>
                     <td>
                       {coupon.active ? (
                         <form action={disableCouponAction}>

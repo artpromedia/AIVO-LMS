@@ -39,7 +39,6 @@ export default async function PilotDetailPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Pilot operations"
       title={pilot.districtName ?? tenantId}
       description="Live entitlement, seat usage, onboarding, and coupon uptake for this district pilot."
       action={

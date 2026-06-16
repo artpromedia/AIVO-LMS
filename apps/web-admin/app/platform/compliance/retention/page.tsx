@@ -44,7 +44,6 @@ export default async function RetentionPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Compliance"
       title="Data retention"
       description="Per-data-class retention windows and disposition, persisted in data-governance-svc. Blank retention = retain indefinitely (legal hold)."
     >
@@ -91,7 +90,7 @@ export default async function RetentionPage({
                         <input name="legalHold" type="checkbox" defaultChecked={policy.legalHold} />
                         Legal hold
                       </label>
-                      <span className="text-sm text-slate-500">
+                      <span className="text-sm text-slate-500 tabular-nums">
                         {formatDateTime(policy.updatedAt)}
                       </span>
                       <button className="admin-action" type="submit">

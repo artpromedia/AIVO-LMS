@@ -13,7 +13,6 @@ export default async function PlatformBillingPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Billing"
       description="Subscription accounts and trial conversion, backed by billing-svc."
       action={

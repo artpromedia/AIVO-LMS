@@ -10,6 +10,21 @@
     "ink": "#172033"
   },
   "adminSurface": {
-    "loginSidebar": "#2E1065"
+    "loginSidebar": "#2E1065",
+    "primary": "#7C3AED",
+    "primaryStrong": "#6D28D9",
+    "primaryFg": "#FFFFFF"
+  },
+  "adminStatus": {
+    "positiveBg": "#DCFCE7",
+    "positiveFg": "#166534",
+    "warningBg": "#FEF3C7",
+    "warningFg": "#92400E",
+    "dangerBg": "#FEE2E2",
+    "dangerFg": "#991B1B",
+    "neutralBg": "#F1F5F9",
+    "neutralFg": "#475569",
+    "infoBg": "#EDE9FE",
+    "infoFg": "#5B21B6"
   }
 }

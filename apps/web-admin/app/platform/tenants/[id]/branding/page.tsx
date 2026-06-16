@@ -18,12 +18,12 @@ export default async function TenantBrandingPage({
 }) {
   const session = await requirePlatformPage("platform:read");
   const { id } = await params;
-  const tenant = await getAdminTenant(session, id);
+  // Validates the tenant exists and the admin may access it (throws otherwise).
+  await getAdminTenant(session, id);
   const branding = await getTenantBrandingById(id);
 
   return (
     <AdminPageFrame
-      eyebrow={`Platform · ${tenant.name}`}
       title="White-label branding"
       description="Logo, accent palette, and support link shown to this district's signed-in users. Contrast is enforced — branding can never degrade accessibility. Learner sensory palettes are not affected."
       action={

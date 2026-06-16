@@ -19,7 +19,6 @@ export default async function PlatformAuditPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Audit log"
       description="Immutable, hash-chained record of privileged administrative actions across the platform."
     >

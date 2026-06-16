@@ -1,11 +1,12 @@
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { type AdminFeatureFlag, getFeatureFlagInventory } from "@aivo/admin-api/feature-flags";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 
-const RISK_TONE: Record<AdminFeatureFlag["riskBand"], string> = {
-  low: "text-emerald-700",
-  medium: "text-amber-700",
-  high: "text-red-700",
+const RISK_TONE: Record<AdminFeatureFlag["riskBand"], StatusTone> = {
+  low: "positive",
+  medium: "warning",
+  high: "danger",
 };
 
 function FlagTable({ flags }: { flags: AdminFeatureFlag[] }) {
@@ -31,10 +32,12 @@ function FlagTable({ flags }: { flags: AdminFeatureFlag[] }) {
                   <span className="text-sm font-normal text-slate-500">{flag.description}</span>
                 </td>
                 <td className="text-sm">{flag.surface}</td>
-                <td className={`font-bold uppercase ${RISK_TONE[flag.riskBand]}`}>{flag.riskBand}</td>
+                <td>
+                  <StatusPill status={flag.riskBand} tone={RISK_TONE[flag.riskBand]} />
+                </td>
                 <td className="text-sm">{flag.defaultValue ? "on" : "off"}</td>
                 <td>
-                  <span className="admin-status">{flag.active ? "active" : "inactive"}</span>
+                  <StatusPill status={flag.active ? "active" : "inactive"} />
                 </td>
                 <td className="font-mono text-xs text-slate-500">{flag.envVar ?? "—"}</td>
               </tr>
@@ -61,7 +64,6 @@ export default async function FeatureFlagsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Feature flags"
       description="Resolved state of enterprise and sprint-pipeline flags. Environment variables remain the source of truth — this surface is read-only."
     >

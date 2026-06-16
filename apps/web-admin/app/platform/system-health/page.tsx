@@ -9,7 +9,6 @@ export default async function SystemHealthPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="System health"
       description="Live tenant, user, learning, and AI-usage signals across the platform."
     >

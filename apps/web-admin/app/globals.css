@@ -103,11 +103,17 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   border-radius: 12px;
-  background: #174ea6;
+  background: var(--admin-primary);
   padding: 0.78rem 1.1rem;
   font-weight: 700;
-  color: white;
+  color: var(--admin-primary-fg);
+  transition: background-color 120ms ease, transform 120ms ease;
+}
+
+.admin-button:hover {
+  background: var(--admin-primary-strong);
 }
 
 .admin-button:disabled {
@@ -116,9 +122,13 @@ body {
 }
 
 .admin-button-secondary {
-  border: 1px solid rgba(23, 78, 166, 0.25);
+  border: 1px solid color-mix(in srgb, var(--admin-primary) 28%, transparent);
   background: rgba(255, 255, 255, 0.75);
-  color: #174ea6;
+  color: var(--admin-primary);
+}
+
+.admin-button-secondary:hover {
+  background: color-mix(in srgb, var(--admin-primary) 8%, white);
 }
 
 .admin-label {
@@ -133,7 +143,7 @@ body {
   font-weight: 900;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #174ea6;
+  color: var(--admin-primary);
 }
 
 .admin-notice,
@@ -203,27 +213,70 @@ body {
 }
 
 .admin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   border-radius: 999px;
-  padding: 0.35rem 0.65rem;
+  padding: 0.28rem 0.6rem;
   font-size: 0.75rem;
-  font-weight: 900;
-  text-transform: uppercase;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+  /* Default = neutral so any unmapped status still renders a legible pill. */
+  background: var(--admin-status-neutral-bg);
+  color: var(--admin-status-neutral-fg);
 }
 
+/* A leading dot gives a second (non-color) cue per WCAG 1.4.1. */
+.admin-status::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: currentColor;
+  flex: none;
+}
+
+.admin-status-positive {
+  background: var(--admin-status-positive-bg);
+  color: var(--admin-status-positive-fg);
+}
+
+.admin-status-warning {
+  background: var(--admin-status-warning-bg);
+  color: var(--admin-status-warning-fg);
+}
+
+.admin-status-danger {
+  background: var(--admin-status-danger-bg);
+  color: var(--admin-status-danger-fg);
+}
+
+.admin-status-neutral {
+  background: var(--admin-status-neutral-bg);
+  color: var(--admin-status-neutral-fg);
+}
+
+.admin-status-info {
+  background: var(--admin-status-info-bg);
+  color: var(--admin-status-info-fg);
+}
+
+/* Legacy status aliases kept so existing markup keeps working. */
 .admin-status-pending {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--admin-status-warning-bg);
+  color: var(--admin-status-warning-fg);
 }
 
 .admin-status-accepted {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--admin-status-positive-bg);
+  color: var(--admin-status-positive-fg);
 }
 
 .admin-status-expired,
 .admin-status-revoked {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--admin-status-danger-bg);
+  color: var(--admin-status-danger-fg);
 }
 
 

@@ -20,13 +20,15 @@ teal `#0D9488`, orange `#EA580C`, pink `#DB2777`, slate `#64748B`. After changin
 rebuild brand then admin-ui. **Why:** one token source keeps charts on-brand and AA-contrast
 (a brand test locks each series ≥3:1 on white).
 
-**⌘K command palette scope = tenants/users/learners only.** The admin shell's global search
-hits a permission-gated web-admin route that fans to admin-svc `/search`, which currently
-covers tenants/users/learners. **Pilots are deliberately deferred** to the later
-search-endpoint pass — don't add a pilots section to the palette (or "pilots" to its
-placeholder copy) until admin-svc `/search` actually returns them, or it fabricates an empty
-promise. Learners have no detail route, so they deep-link to the learners list with a search
-query.
+**⌘K command palette scope = tenants/users/learners/pilots.** The admin shell's global search
+hits a permission-gated web-admin route. Tenants/users/learners come from admin-svc `/search`;
+**pilots are composed at the admin-api BFF** (`searchAdminEntities` calls billing-svc
+`listPilots` in parallel, filters by district name, caps at 5) because admin-svc has no pilot
+read model — do NOT try to add pilots to admin-svc `/search`. The pilot fetch is guarded
+(`session.role !== "platform_admin"` → `[]`) and wrapped in try/catch so a billing-svc outage
+degrades to empty pilots without breaking the other categories. Learners have no detail route,
+so they deep-link to the learners list with a search query; pilots deep-link to
+`/platform/pilots/[tenantId]`.
 
 **Why:** the admin console is intentionally a separate visual register from the
 Inclusive-Warm consumer apps; pulling in the full brand var set risks repainting admin

@@ -4,6 +4,7 @@ import { requirePageRole, requirePlatformPage } from "@aivo/admin-auth";
 import { listAiPolicies, updateAiPolicy } from "@aivo/admin-api/ai-governance";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function toggleAction(formData: FormData) {
@@ -38,7 +39,6 @@ export default async function AiPoliciesPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Responsible AI"
       title="Safety policies"
       description="Stacked platform → district → tenant safety policies served by responsible-ai-svc."
       action={
@@ -94,9 +94,9 @@ export default async function AiPoliciesPage({
                     ) : null}
                   </td>
                   <td>
-                    <span className="admin-status">{policy.enabled ? "enabled" : "disabled"}</span>
+                    <StatusPill status={policy.enabled ? "enabled" : "disabled"} />
                   </td>
-                  <td className="text-sm">{formatDateTime(policy.updatedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(policy.updatedAt)}</td>
                   <td>
                     <form action={toggleAction}>
                       <input name="id" type="hidden" value={policy.id} />

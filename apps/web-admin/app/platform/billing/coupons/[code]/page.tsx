@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requirePageRole } from "@aivo/admin-auth";
 import { getCoupon } from "@aivo/admin-api/billing";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import {
   couponStatus,
   formatCouponDate,
@@ -34,7 +35,6 @@ export default async function CouponDetailPage({
   if (!coupon) {
     return (
       <AdminPageFrame
-        eyebrow="Platform billing"
         title="Coupon not found"
         description={`No coupon with code ${code}.`}
         action={
@@ -53,7 +53,6 @@ export default async function CouponDetailPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform billing"
       title={coupon.code}
       description={coupon.description ?? "Coupon detail and live redemption uptake."}
       action={
@@ -93,7 +92,7 @@ export default async function CouponDetailPage({
                 : `${remaining} remaining.`}
           </p>
           <p className="mt-4">
-            <span className={`admin-status admin-status-${status}`}>{status}</span>
+            <StatusPill status={status} />
           </p>
         </AdminCard>
 

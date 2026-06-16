@@ -12,6 +12,7 @@ import {
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 import {
   AddControlForm,
@@ -62,11 +63,11 @@ async function statusAction(
   return { notice: "Status updated." };
 }
 
-const STATUS_TONE: Record<SecurityControlStatus, string> = {
-  implemented: "text-emerald-700",
-  partial: "text-amber-700",
-  not_started: "text-red-700",
-  not_applicable: "text-slate-500",
+const STATUS_TONE: Record<SecurityControlStatus, StatusTone> = {
+  implemented: "positive",
+  partial: "warning",
+  not_started: "danger",
+  not_applicable: "neutral",
 };
 
 export default async function SecurityControlsPage() {
@@ -75,7 +76,6 @@ export default async function SecurityControlsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Security"
       title="Control register"
       description="SOC 2 / Trust Services controls, persisted in admin-svc (Postgres)."
       action={
@@ -119,10 +119,10 @@ export default async function SecurityControlsPage() {
                   </td>
                   <td className="text-sm">{control.criterion.replace("_", " ")}</td>
                   <td className="text-sm">{control.owner || "—"}</td>
-                  <td className={`font-bold uppercase ${STATUS_TONE[control.status]}`}>
-                    {control.status.replace("_", " ")}
+                  <td>
+                    <StatusPill status={control.status} tone={STATUS_TONE[control.status]} />
                   </td>
-                  <td className="text-sm">{formatDateTime(control.lastReviewedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(control.lastReviewedAt)}</td>
                   <td>
 <ControlStatusForm
                       action={statusAction}

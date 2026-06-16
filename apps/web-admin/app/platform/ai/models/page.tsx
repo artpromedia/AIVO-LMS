@@ -1,15 +1,9 @@
 import Link from "next/link";
 import { requirePlatformPage } from "@aivo/admin-auth";
-import { type AiModelStatus, listAiModels } from "@aivo/admin-api/ai-governance";
+import { listAiModels } from "@aivo/admin-api/ai-governance";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
-
-const STATUS_TONE: Record<AiModelStatus, string> = {
-  draft: "text-slate-500",
-  active: "text-emerald-700",
-  deprecated: "text-amber-700",
-  retired: "text-red-700",
-};
+import { StatusPill } from "@/components/status-pill";
 
 export default async function AiModelsPage() {
   const session = await requirePlatformPage("platform:read");
@@ -20,7 +14,6 @@ export default async function AiModelsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Responsible AI"
       title="Model registry"
       description="Every model in use with provider, modality and governance status."
       action={
@@ -56,15 +49,15 @@ export default async function AiModelsPage() {
                   <td className="font-bold">{model.name}</td>
                   <td className="text-sm">{model.provider}</td>
                   <td className="text-sm">{model.modality}</td>
-                  <td className={`font-bold uppercase ${STATUS_TONE[model.status]}`}>
-                    {model.status}
+                  <td>
+                    <StatusPill status={model.status} />
                   </td>
                   <td className="text-sm">{model.owner.team}</td>
-                  <td className="text-sm">{model.versions}</td>
-                  <td className="text-sm">{formatDateTime(model.updatedAt)}</td>
+                  <td className="text-sm tabular-nums">{model.versions}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(model.updatedAt)}</td>
                   <td>
                     <Link
-                      className="inline-flex font-bold text-blue-700"
+                      className="inline-flex font-bold text-violet-700 hover:text-violet-800"
                       href={`/platform/ai/models/${model.id}`}
                     >
                       View

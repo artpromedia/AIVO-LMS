@@ -18,7 +18,6 @@ export default async function PlatformLearnersPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Learners"
       description={`${result.total.toLocaleString()} learner profiles across all tenants.`}
     >

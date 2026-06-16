@@ -6,6 +6,7 @@ import {
   Building2,
   GraduationCap,
   Loader2,
+  Rocket,
   Search,
   Users,
   type LucideIcon,
@@ -14,12 +15,13 @@ import {
 /**
  * Global ⌘K command palette. Opens from the shell header trigger or the
  * ⌘K / Ctrl+K shortcut, fans a single query across tenants / users /
- * learners via `/api/search` (RBAC-gated, real DB aggregates), and deep-links
- * the chosen result. Empty query shows recent picks (localStorage). Fully
- * keyboard-driven: ↑/↓ to move, ↵ to open, Esc to dismiss.
+ * learners / pilots via `/api/search` (RBAC-gated, real aggregates — pilots
+ * from billing-svc), and deep-links the chosen result. Empty query shows
+ * recent picks (localStorage). Fully keyboard-driven: ↑/↓ to move, ↵ to open,
+ * Esc to dismiss.
  */
 
-type EntityKind = "tenant" | "user" | "learner";
+type EntityKind = "tenant" | "user" | "learner" | "pilot";
 
 interface SearchHit {
   kind: EntityKind;
@@ -33,18 +35,21 @@ interface ApiResults {
   tenants: { id: string; name: string; type: string; status: string }[];
   users: { id: string; name: string | null; email: string; role: string }[];
   learners: { id: string; name: string; tenantId: string }[];
+  pilots: { tenantId: string; districtName: string; status: string; tier: string | null }[];
 }
 
 const KIND_ICON: Record<EntityKind, LucideIcon> = {
   tenant: Building2,
   user: Users,
   learner: GraduationCap,
+  pilot: Rocket,
 };
 
 const KIND_LABEL: Record<EntityKind, string> = {
   tenant: "Tenants",
   user: "Users",
   learner: "Learners",
+  pilot: "Pilots",
 };
 
 const RECENT_KEY = "aivo-admin-recent-search";
@@ -58,6 +63,9 @@ function userHref(id: string): string {
 }
 function learnerHref(name: string): string {
   return `/platform/learners?search=${encodeURIComponent(name)}`;
+}
+function pilotHref(tenantId: string): string {
+  return `/platform/pilots/${encodeURIComponent(tenantId)}`;
 }
 
 function toHits(results: ApiResults): SearchHit[] {
@@ -82,6 +90,13 @@ function toHits(results: ApiResults): SearchHit[] {
       label: l.name || "Unnamed learner",
       sub: "Learner",
       href: learnerHref(l.name),
+    })),
+    ...results.pilots.map((p) => ({
+      kind: "pilot" as const,
+      id: p.tenantId,
+      label: p.districtName || "District pilot",
+      sub: [p.tier, p.status].filter(Boolean).join(" · ") || "Pilot",
+      href: pilotHref(p.tenantId),
     })),
   ];
 }
@@ -239,7 +254,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   // Group the flat visible list back into sections while preserving the flat
   // index used for keyboard navigation.
   const sections = useMemo(() => {
-    const order: EntityKind[] = ["tenant", "user", "learner"];
+    const order: EntityKind[] = ["tenant", "user", "learner", "pilot"];
     let flat = 0;
     return order
       .map((kind) => {
@@ -274,7 +289,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Search tenants, users, and learners"
+        aria-label="Search tenants, users, learners, and pilots"
         className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-slate-900/10 bg-white shadow-2xl"
         onKeyDown={onKeyDown}
       >
@@ -289,8 +304,8 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             aria-expanded
             aria-controls="command-palette-list"
             aria-autocomplete="list"
-            aria-label="Search tenants, users, and learners"
-            placeholder="Search tenants, users, learners…"
+            aria-label="Search tenants, users, learners, and pilots"
+            placeholder="Search tenants, users, learners, pilots…"
             className="w-full bg-transparent py-3.5 text-base text-slate-900 outline-none placeholder:text-slate-400"
             data-testid="admin-command-input"
           />
@@ -374,13 +389,13 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                   ? "Searching…"
                   : trimmed.length >= 2
                     ? `No matches for “${trimmed}”.`
-                    : "Type at least two characters to search tenants, users, and learners."}
+                    : "Type at least two characters to search tenants, users, learners, and pilots."}
             </li>
           ) : null}
         </ul>
 
         <div className="flex items-center justify-between border-t border-slate-900/10 px-4 py-2 text-[11px] text-slate-400">
-          <span>Search across tenants, users &amp; learners</span>
+          <span>Search across tenants, users, learners &amp; pilots</span>
           <span className="hidden items-center gap-2 sm:flex">
             <kbd className="rounded border border-slate-300 px-1 py-0.5 font-semibold">↑↓</kbd>
             navigate

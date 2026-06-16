@@ -36,7 +36,6 @@ export default async function UserDetailPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · User"
       title={user.name}
       description={`${user.roleLabel} · ${user.email ?? "no email"}`}
       action={

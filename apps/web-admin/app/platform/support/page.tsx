@@ -9,6 +9,7 @@ import {
 } from "@aivo/admin-api/support";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 const SUPPORT_ROLES = ["platform_admin", "support"] as const;
@@ -29,12 +30,6 @@ async function statusAction(formData: FormData) {
   redirect("/platform/support?notice=Ticket%20updated.");
 }
 
-const STATUS_TONE: Record<SupportTicketStatus, string> = {
-  open: "text-red-700",
-  in_progress: "text-amber-700",
-  resolved: "text-emerald-700",
-};
-
 export default async function SupportPage({
   searchParams,
 }: {
@@ -52,7 +47,6 @@ export default async function SupportPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Support tickets"
       description="Customer support queue, persisted in admin-svc (Postgres)."
     >
@@ -107,10 +101,10 @@ export default async function SupportPage({
                     ) : null}
                   </td>
                   <td className="text-sm">{ticket.tenantId ?? "platform"}</td>
-                  <td className={`font-bold uppercase ${STATUS_TONE[ticket.status]}`}>
-                    {ticket.status.replace("_", " ")}
+                  <td>
+                    <StatusPill status={ticket.status} />
                   </td>
-                  <td className="text-sm">{formatDateTime(ticket.createdAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(ticket.createdAt)}</td>
                   <td>
                     <form action={statusAction} className="flex items-center gap-2">
                       <input name="id" type="hidden" value={ticket.id} />

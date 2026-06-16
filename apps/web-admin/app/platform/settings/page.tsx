@@ -25,7 +25,6 @@ export default async function PlatformSettingsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Settings"
       description="Platform-wide configuration and credentials."
     >
@@ -34,7 +33,7 @@ export default async function PlatformSettingsPage() {
           <AdminCard className="p-6" key={link.href}>
             <h2 className="text-xl font-black">{link.title}</h2>
             <p className="mt-2 text-slate-600">{link.description}</p>
-            <Link className="mt-4 inline-flex font-bold text-blue-700" href={link.href}>
+            <Link className="mt-4 inline-flex font-bold text-violet-700" href={link.href}>
               Open
             </Link>
           </AdminCard>

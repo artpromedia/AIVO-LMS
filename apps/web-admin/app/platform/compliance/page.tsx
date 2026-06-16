@@ -26,14 +26,13 @@ export default async function PlatformCompliancePage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Compliance"
       description="Continuous control monitoring and downloadable evidence bundles for audits."
     >
       <section aria-label="Privacy operations" className="mt-8 grid gap-4 md:grid-cols-3">
         {COMPLIANCE_NAV.map((item) => (
           <AdminCard className="p-5" key={item.href}>
-            <Link className="font-bold text-blue-700" href={item.href}>
+            <Link className="font-bold text-violet-700" href={item.href}>
               {item.title}
             </Link>
             <p className="mt-1 text-sm text-slate-600">{item.description}</p>

@@ -15,7 +15,6 @@ export default async function ContentPackDetailPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Content"
       title={pack.title}
       description={`${pack.subject} · grade band ${pack.gradeBand} · v${pack.version}`}
       action={

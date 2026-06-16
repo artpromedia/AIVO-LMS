@@ -1,6 +1,7 @@
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { listAdminTenantsPage } from "@aivo/admin-api/platform";
 import { AdminPageFrame, DataTable } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import { formatDateTime } from "@/components/admin-format";
 
 const PAGE_SIZE = 50;
@@ -24,7 +25,6 @@ export default async function TenantsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Tenants"
       description={`${result.total.toLocaleString()} districts, schools, and family workspaces.`}
     >
@@ -48,7 +48,7 @@ export default async function TenantsPage({
               sortKey: "name",
               render: (row) => (
                 <a
-                  className="font-semibold text-blue-700 hover:underline"
+                  className="font-semibold text-violet-700 hover:underline"
                   href={`/platform/tenants/${row.id}`}
                 >
                   {row.name}
@@ -59,7 +59,7 @@ export default async function TenantsPage({
             {
               key: "status",
               header: "Status",
-              render: (row) => <span className="admin-status">{row.status ?? "active"}</span>,
+              render: (row) => <StatusPill status={row.status ?? "active"} />,
             },
             {
               key: "created",

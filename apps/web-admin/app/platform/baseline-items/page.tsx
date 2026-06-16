@@ -5,15 +5,16 @@ import {
   listBaselineRecalibration,
 } from "@aivo/admin-api/baseline";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 
 function pct(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
 
-const REC_TONE: Record<RecalibrationRecommendation, string> = {
-  harder: "text-red-700",
-  easier: "text-amber-700",
-  ok: "text-slate-500",
+const REC_TONE: Record<RecalibrationRecommendation, StatusTone> = {
+  harder: "danger",
+  easier: "warning",
+  ok: "neutral",
 };
 
 export default async function BaselineItemsPage() {
@@ -26,7 +27,6 @@ export default async function BaselineItemsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Baseline items"
       description="Item calibration analytics over baseline responses (last 30 days), computed from baseline_item_response_logs."
     >
@@ -57,9 +57,9 @@ export default async function BaselineItemsPage() {
               {metrics.byDifficulty.map((row) => (
                 <tr key={row.difficulty}>
                   <td className="font-bold">{row.difficulty.replace("_", " ")}</td>
-                  <td>{row.responses.toLocaleString()}</td>
-                  <td>{pct(row.pCorrect)}</td>
-                  <td className="text-sm">{pct(row.pSkipped)}</td>
+                  <td className="tabular-nums">{row.responses.toLocaleString()}</td>
+                  <td className="tabular-nums">{pct(row.pCorrect)}</td>
+                  <td className="text-sm tabular-nums">{pct(row.pSkipped)}</td>
                 </tr>
               ))}
               {metrics.byDifficulty.length === 0 ? (
@@ -101,12 +101,20 @@ export default async function BaselineItemsPage() {
                   <td className="font-mono text-xs">{item.itemKey}</td>
                   <td className="text-sm">{item.skillId}</td>
                   <td className="text-sm">{item.difficulty.replace("_", " ")}</td>
-                  <td>{item.samples.toLocaleString()}</td>
-                  <td>{pct(item.pCorrect)}</td>
-                  <td className="text-sm">{pct(item.targetPCorrect)}</td>
-                  <td className="text-sm">{item.seedTheta.toFixed(2)}</td>
-                  <td className={`font-bold uppercase ${REC_TONE[item.recommendation]}`}>
-                    {item.recommendation === "ok" ? "—" : `make ${item.recommendation}`}
+                  <td className="tabular-nums">{item.samples.toLocaleString()}</td>
+                  <td className="tabular-nums">{pct(item.pCorrect)}</td>
+                  <td className="text-sm tabular-nums">{pct(item.targetPCorrect)}</td>
+                  <td className="text-sm tabular-nums">{item.seedTheta.toFixed(2)}</td>
+                  <td>
+                    {item.recommendation === "ok" ? (
+                      "—"
+                    ) : (
+                      <StatusPill
+                        status={item.recommendation}
+                        tone={REC_TONE[item.recommendation]}
+                        label={`make ${item.recommendation}`}
+                      />
+                    )}
                   </td>
                 </tr>
               ))}

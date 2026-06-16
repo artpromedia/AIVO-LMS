@@ -79,7 +79,6 @@ export default async function DsarDetailPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Compliance · DSAR"
       title={request.subjectEmail ?? request.subjectId}
       description={`${request.type} · ${request.regulation.toUpperCase()} · status ${request.status}`}
       action={

@@ -13,7 +13,6 @@ export default async function NewCouponPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform billing"
       title="New coupon"
       description="Mint a discount, subscription, or provisioning (pilot) coupon. Use a preset to spin up a district or school pilot in under a minute. Validation mirrors billing-svc."
       action={

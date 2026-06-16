@@ -3,17 +3,12 @@ import { requirePageRole } from "@aivo/admin-auth";
 import { AdminApiError } from "@aivo/admin-api";
 import { listPilots, type PilotStatus } from "@aivo/admin-api/billing";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 
 function seatsLabel(p: PilotStatus): string {
   if (p.seatLimit == null) return `${p.seatsUsed} (uncapped)`;
   return `${p.seatsUsed} / ${p.seatLimit}`;
 }
-
-const STATUS_STYLE: Record<string, string> = {
-  active: "bg-emerald-100 text-emerald-800",
-  expired: "bg-red-100 text-red-700",
-  none: "bg-slate-200 text-slate-600",
-};
 
 export default async function PilotsPage() {
   const session = await requirePageRole(["platform_admin"]);
@@ -28,7 +23,6 @@ export default async function PilotsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform operations"
       title="District pilots"
       description="Live seat usage, parent/learner onboarding, coupon uptake, and expiry for every active district pilot."
       action={
@@ -69,26 +63,22 @@ export default async function PilotsPage() {
                   <tr key={p.tenantId} className="border-b border-slate-100">
                     <td className="py-3 font-semibold">
                       <Link
-                        className="text-blue-700 hover:underline"
+                        className="text-violet-700 hover:underline"
                         href={`/platform/pilots/${p.tenantId}`}
                       >
                         {p.districtName ?? p.tenantId}
                       </Link>
                     </td>
-                    <td className="py-3">{seatsLabel(p)}</td>
-                    <td className="py-3">{p.parentsOnboarded}</td>
-                    <td className="py-3">{p.therapistsOnboarded}</td>
-                    <td className="py-3">{p.learnersCreated}</td>
-                    <td className="py-3">{p.redemptions}</td>
-                    <td className="py-3">
+                    <td className="py-3 tabular-nums">{seatsLabel(p)}</td>
+                    <td className="py-3 tabular-nums">{p.parentsOnboarded}</td>
+                    <td className="py-3 tabular-nums">{p.therapistsOnboarded}</td>
+                    <td className="py-3 tabular-nums">{p.learnersCreated}</td>
+                    <td className="py-3 tabular-nums">{p.redemptions}</td>
+                    <td className="py-3 tabular-nums">
                       {p.expiresAt ? new Date(p.expiresAt).toLocaleDateString() : "—"}
                     </td>
                     <td className="py-3">
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-bold ${STATUS_STYLE[p.status] ?? "bg-slate-100 text-slate-600"}`}
-                      >
-                        {p.status}
-                      </span>
+                      <StatusPill status={p.status} />
                     </td>
                   </tr>
                 ))}

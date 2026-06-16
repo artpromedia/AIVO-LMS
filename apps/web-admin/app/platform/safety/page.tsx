@@ -11,7 +11,6 @@ export default async function SafetyPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Safety"
       description="Trust & safety operations for AI-generated learner content."
     >
@@ -26,7 +25,7 @@ export default async function SafetyPage() {
           Review AI tutor content flagged by automated safety classifiers and record approve, reject,
           or escalate decisions with a full audit trail.
         </p>
-        <Link className="mt-4 inline-flex font-bold text-blue-700" href="/platform/safety/moderation">
+        <Link className="mt-4 inline-flex font-bold text-violet-700 hover:text-violet-800" href="/platform/safety/moderation">
           Open moderation queue
         </Link>
       </AdminCard>
