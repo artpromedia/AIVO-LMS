@@ -157,6 +157,26 @@ export const memoryLearners: LearnerStore = {
     // store's lookup-first + partial unique index).
     for (const existing of store.learnerProfiles.values()) {
       if (existing.tenantId === tenantId && existing.identityLearnerId === identityLearnerId) {
+        // Self-heal: a prior partial failure may have created the profile but
+        // not the parent relationship (or a co-guardian is reconciling a
+        // learner first linked by another parent). Without the relationship the
+        // learner stays invisible in listForParent, so ensure it exists for
+        // this parent before returning.
+        const hasRel = store.parentLearnerRelationships.some(
+          (r) => r.parentUserId === parentUserId && r.learnerId === existing.id,
+        );
+        if (!hasRel) {
+          store.parentLearnerRelationships.push({
+            id: newId("plr"),
+            parentUserId,
+            learnerId: existing.id,
+            tenantId,
+            relation: "parent",
+            isPrimary: store.parentLearnerRelationships.every(
+              (r) => r.parentUserId !== parentUserId,
+            ),
+          });
+        }
         return existing;
       }
     }

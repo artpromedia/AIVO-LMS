@@ -61,6 +61,38 @@ runInBothModes("learner-identity-link", (ctx) => {
     expect(found).toBeDefined();
   });
 
+  it("createFromIdentity self-heals a missing parent relationship (partial-failure recovery)", async () => {
+    // A first guardian links the canonical learner (profile + relationship).
+    const first = await ctx.persistence().learners.createFromIdentity({
+      tenantId: T,
+      parentUserId: PARENT,
+      identityLearnerId: UUID,
+      name: "Mobile Kid",
+      birthYear: 2017,
+    });
+
+    // A second reconcile resolves the same canonical learner under a DIFFERENT
+    // parent who has no relationship yet — the same code path a retry hits after
+    // a prior attempt inserted the profile but failed before the relationship.
+    // The idempotency short-circuit must NOT return early without healing the
+    // gap, or the learner stays invisible in this parent's list.
+    const PARENT2 = "u_demo_parent_2";
+    const again = await ctx.persistence().learners.createFromIdentity({
+      tenantId: T,
+      parentUserId: PARENT2,
+      identityLearnerId: UUID,
+      name: "Mobile Kid",
+      birthYear: 2017,
+    });
+    expect(again.id).toBe(first.id);
+
+    // The learner is now visible in the second parent's web list, and no
+    // duplicate web profile was minted for the one canonical identity learner.
+    const mine = await listLearnersForParent(PARENT2, T);
+    expect(mine.find((l) => l.id === first.id)?.identityLearnerId).toBe(UUID);
+    expect(mine.filter((l) => l.identityLearnerId === UUID).length).toBe(1);
+  });
+
   it("createFromIdentity is idempotent — a repeat returns the same profile", async () => {
     const first = await ctx.persistence().learners.createFromIdentity({
       tenantId: T,

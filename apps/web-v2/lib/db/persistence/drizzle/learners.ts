@@ -13,6 +13,7 @@ import {
   webClassrooms,
   webEnrollments,
   webParentAssessments,
+  type Database,
 } from "@aivo/db";
 import { newId, nowIso } from "@/lib/db/store";
 import type {
@@ -55,6 +56,52 @@ async function teacherClassroomIds(teacherUserId: string, tenantId: string): Pro
     if (e.role === "teacher" && e.subjectId === teacherUserId) ids.add(e.classroomId);
   }
   return ids;
+}
+
+/**
+ * Ensure a parent↔learner relationship row exists (idempotent). A parent's
+ * first-ever relationship is primary. Accepts the shared pool *or* an open
+ * transaction (cast to `Database`) so callers can run it atomically with the
+ * profile insert, and so the identity-surfacing path can self-heal a profile
+ * that was created without its relationship by a prior partial failure.
+ */
+async function ensureParentRelationship(
+  db: Database,
+  parentUserId: string,
+  learnerId: string,
+  tenantId: string,
+): Promise<void> {
+  const [rel] = await db
+    .select({ id: webParentLearnerRelationships.id })
+    .from(webParentLearnerRelationships)
+    .where(
+      and(
+        eq(webParentLearnerRelationships.parentUserId, parentUserId),
+        eq(webParentLearnerRelationships.learnerId, learnerId),
+        eq(webParentLearnerRelationships.tenantId, tenantId),
+      ),
+    )
+    .limit(1);
+  if (rel) return;
+  const [existing] = await db
+    .select({ n: count() })
+    .from(webParentLearnerRelationships)
+    .where(eq(webParentLearnerRelationships.parentUserId, parentUserId));
+  const newRel: ParentLearnerRelationship = {
+    id: newId("plr"),
+    parentUserId,
+    learnerId,
+    tenantId,
+    relation: "parent",
+    isPrimary: Number(existing?.n ?? 0) === 0,
+  };
+  await db.insert(webParentLearnerRelationships).values({
+    id: newRel.id,
+    parentUserId,
+    learnerId,
+    tenantId,
+    data: newRel,
+  });
 }
 
 export const drizzleLearners: LearnerStore = {
@@ -250,7 +297,16 @@ export const drizzleLearners: LearnerStore = {
         ),
       )
       .limit(1);
-    if (linked) return linked.data as LearnerProfile;
+    if (linked) {
+      // Self-heal partial failures: a prior attempt may have inserted the
+      // profile but failed before writing the parent relationship (the two were
+      // not atomic historically). Without this, the idempotency short-circuit
+      // would leave the canonical learner permanently invisible in the parent's
+      // web list. Also covers a co-guardian reconciling a learner first linked
+      // by another parent. Ensure the relationship exists for this parent.
+      await ensureParentRelationship(db, parentUserId, linked.id, tenantId);
+      return linked.data as LearnerProfile;
+    }
 
     const id = newId("lrn");
     const display = name.trim() || "Learner";
@@ -279,26 +335,13 @@ export const drizzleLearners: LearnerStore = {
       identityLearnerId,
       createdAt: nowIso(),
     };
-    await db.insert(webLearnerProfiles).values({ id, tenantId, data: learner });
-
-    const [existing] = await db
-      .select({ n: count() })
-      .from(webParentLearnerRelationships)
-      .where(eq(webParentLearnerRelationships.parentUserId, parentUserId));
-    const rel: ParentLearnerRelationship = {
-      id: newId("plr"),
-      parentUserId,
-      learnerId: id,
-      tenantId,
-      relation: "parent",
-      isPrimary: Number(existing?.n ?? 0) === 0,
-    };
-    await db.insert(webParentLearnerRelationships).values({
-      id: rel.id,
-      parentUserId,
-      learnerId: id,
-      tenantId,
-      data: rel,
+    // Atomic: the profile and its parent relationship must both land, or
+    // neither. A failure between the two inserts would otherwise orphan the
+    // profile (linked but with no relationship → invisible to the parent, and
+    // the idempotency short-circuit would keep returning it on retry).
+    await db.transaction(async (tx) => {
+      await tx.insert(webLearnerProfiles).values({ id, tenantId, data: learner });
+      await ensureParentRelationship(tx as unknown as Database, parentUserId, id, tenantId);
     });
     return learner;
   },
