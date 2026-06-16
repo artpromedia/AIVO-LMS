@@ -51,7 +51,7 @@ const MOBILE_SUBJECTS_PAGE = join(repoRoot, "apps/mobile/app/(learner)/subjects/
 const MOBILE_TUTOR_SCREEN = join(repoRoot, "apps/mobile/app/(learner)/tutor/[tutorSlug].tsx");
 const MOBILE_TUTOR_HOOK = join(repoRoot, "apps/mobile/hooks/useTutor.ts");
 const MOBILE_LEARNER_HOME = join(repoRoot, "apps/mobile/app/(learner)/index.tsx");
-const BRAND_CATALOG = join(repoRoot, "packages/brand/src/index.ts");
+const BRAND_CATALOG = join(repoRoot, "packages/brand/src/tutors.ts");
 
 const argv = new Set(process.argv.slice(2));
 const MARKDOWN = argv.has("--markdown");
