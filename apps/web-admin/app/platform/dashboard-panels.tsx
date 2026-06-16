@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Building2 } from "lucide-react";
 import type { PilotStatus } from "@aivo/admin-api/billing";
 import { AdminCard } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import { PilotRowActions } from "./pilot-row-actions";
 
 /**
@@ -38,19 +39,6 @@ export function PanelError({
     </AdminCard>
   );
 }
-
-/** Soft status pill matching the reference (count never relies on colour alone). */
-const PILOT_STATUS_PILL: Record<PilotStatus["status"], string> = {
-  active: "bg-emerald-100 text-emerald-700",
-  expired: "bg-amber-100 text-amber-800",
-  none: "bg-slate-100 text-slate-600",
-};
-
-const PILOT_STATUS_LABEL: Record<PilotStatus["status"], string> = {
-  active: "Active",
-  expired: "Expired",
-  none: "None",
-};
 
 export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; testId: string }) {
   return (
@@ -153,11 +141,7 @@ export function PilotsTablePanel({ pilots, testId }: { pilots: PilotStatus[]; te
                         : "—"}
                     </td>
                     <td>
-                      <span
-                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${PILOT_STATUS_PILL[pilot.status]}`}
-                      >
-                        {PILOT_STATUS_LABEL[pilot.status]}
-                      </span>
+                      <StatusPill status={pilot.status} />
                     </td>
                     <td>
                       <PilotRowActions tenantId={pilot.tenantId} districtName={districtName} />

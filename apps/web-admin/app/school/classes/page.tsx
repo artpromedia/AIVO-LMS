@@ -30,7 +30,10 @@ export default async function SchoolClassesPage() {
               {classrooms.map((classroom) => (
                 <tr key={classroom.id}>
                   <td className="font-bold">
-                    <Link className="text-blue-700" href={`/school/classes/${classroom.id}`}>
+                    <Link
+                      className="text-violet-700 hover:text-violet-800"
+                      href={`/school/classes/${classroom.id}`}
+                    >
                       {classroom.name}
                     </Link>
                   </td>
