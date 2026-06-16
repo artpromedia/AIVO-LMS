@@ -628,16 +628,25 @@ describe("learnerSignInAction missing/invalid-input validation (no identity-svc 
 });
 
 describe("learnerSignInAction identity-svc PIN failure mapping (friendly error code)", () => {
-  // Any identity-svc PIN failure maps to a single user-facing
-  // invalid_credentials code (a child never sees an enumerable
-  // "wrong parent vs wrong pin" distinction).
-  const STATUSES = [401, 403, 404, 500, 502] as const;
+  // A genuine wrong PIN — the auth provider rejected the credentials (401) or
+  // couldn't find the parent/learner (403/404) — keeps the friendly "that PIN
+  // didn't work" message (invalid_credentials). A service/network failure
+  // (500 / 502 / unreachable) gets its own service_unavailable code so a child
+  // isn't told their PIN is wrong when sign-in is merely down.
+  const CASES = [
+    { status: 401, code: "invalid_credentials" },
+    { status: 403, code: "invalid_credentials" },
+    { status: 404, code: "invalid_credentials" },
+    { status: 500, code: "service_unavailable" },
+    { status: 502, code: "service_unavailable" },
+    { status: undefined, code: "service_unavailable" },
+  ] as const;
 
-  for (const status of STATUSES) {
-    it(`redirects with error=invalid_credentials for status ${status}`, async () => {
+  for (const { status, code } of CASES) {
+    it(`redirects with error=${code} for status ${status ?? "(none)"}`, async () => {
       identityPinLogin.mockResolvedValueOnce({ kind: "error", status });
       await expect(learnerSignInAction(pinForm({ ...PIN }))).rejects.toThrow(
-        "NEXT_REDIRECT:/login?mode=learner&error=invalid_credentials",
+        `NEXT_REDIRECT:/login?mode=learner&error=${code}`,
       );
       expect(setAuthSessionCookies).not.toHaveBeenCalled();
     });

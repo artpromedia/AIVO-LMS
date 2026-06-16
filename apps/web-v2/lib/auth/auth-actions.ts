@@ -185,10 +185,13 @@ export async function onboardingSignInAction(formData: FormData): Promise<void> 
  * PIN sign-in for learners on the `/login?mode=learner` surface. Learners
  * authenticate with a `parentId` + `learnerId` + a 4–6 digit PIN (no email /
  * password). Owns its own risky branches: the missing/invalid-input guard,
- * the identity-svc PIN failure → `invalid_credentials` mapping, the profile
- * guard that rejects a session whose role isn't "learner" or whose
- * `learnerId` doesn't match the submitted one (`unsupported_role`), and the
- * successful redirect to the learner home with session cookies set.
+ * the identity-svc PIN failure mapping (a real wrong PIN — 401/403/404 —
+ * stays `invalid_credentials`, while a service/network failure — 500/502/
+ * unreachable — becomes `service_unavailable` so a child isn't told their PIN
+ * is wrong when sign-in is merely down), the profile guard that rejects a
+ * session whose role isn't "learner" or whose `learnerId` doesn't match the
+ * submitted one (`unsupported_role`), and the successful redirect to the
+ * learner home with session cookies set.
  *
  * Form fields: `parentId`, `learnerId`, `pin` (4–6 digits).
  */
@@ -215,7 +218,17 @@ export async function learnerSignInAction(formData: FormData): Promise<void> {
     });
     redirect(ROLE_HOME.learner);
   }
-  redirect("/login?mode=learner&error=invalid_credentials");
+  // Distinguish a genuine wrong-PIN (the auth provider rejected the
+  // credentials: 401, or the 403/404 "no such parent/learner" cases) from a
+  // service/network failure (500 / 502 / unreachable). A child told "that PIN
+  // didn't work" when sign-in is merely down is confusing and can make a
+  // parent think the PIN changed — so a transient outage gets its own
+  // "we can't reach sign-in right now" message instead.
+  const code =
+    result.status === 401 || result.status === 403 || result.status === 404
+      ? "invalid_credentials"
+      : "service_unavailable";
+  redirect(`/login?mode=learner&error=${code}`);
 }
 
 /**

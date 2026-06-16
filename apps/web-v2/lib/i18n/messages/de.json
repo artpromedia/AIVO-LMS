@@ -1975,7 +1975,8 @@
         "mfa_session_expired": "Deine Bestätigungssitzung ist abgelaufen. Bitte melde dich erneut an.",
         "wrong_surface": "Dieses Konto meldet sich in einem anderen Bereich an (Bezirk oder Verwaltung). Verwende das richtige Portal.",
         "unsupported_role": "Die Rolle deines Kontos wird in diesem Bereich noch nicht unterstützt.",
-        "login_failed": "Wir konnten dich nicht anmelden. Bitte versuche es erneut."
+        "login_failed": "Wir konnten dich nicht anmelden. Bitte versuche es erneut.",
+        "service_unavailable": "Wir erreichen die Anmeldung gerade nicht. Bitte versuche es gleich noch einmal."
       },
       "notices": {
         "password_reset": "Dein Passwort wurde zurückgesetzt. Bitte melde dich mit deinem neuen Passwort an.",

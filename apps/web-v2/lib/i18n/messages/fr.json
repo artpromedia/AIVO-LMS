@@ -1975,7 +1975,8 @@
         "mfa_session_expired": "Votre session de vérification a expiré. Veuillez vous reconnecter.",
         "wrong_surface": "Ce compte se connecte sur un autre espace (district ou administration). Utilisez le bon portail.",
         "unsupported_role": "Le rôle de votre compte n'est pas encore pris en charge sur cet espace.",
-        "login_failed": "Nous n'avons pas pu vous connecter. Veuillez réessayer."
+        "login_failed": "Nous n'avons pas pu vous connecter. Veuillez réessayer.",
+        "service_unavailable": "Impossible de joindre la connexion pour le moment. Réessaie dans un instant."
       },
       "notices": {
         "password_reset": "Votre mot de passe a été réinitialisé. Connectez-vous avec votre nouveau mot de passe.",

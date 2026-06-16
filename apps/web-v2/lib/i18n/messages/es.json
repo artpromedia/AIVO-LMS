@@ -1975,7 +1975,8 @@
         "mfa_session_expired": "Tu sesión de verificación expiró. Inicia sesión de nuevo.",
         "wrong_surface": "Esta cuenta inicia sesión en otro entorno (distrito o administración). Usa el portal correcto.",
         "unsupported_role": "El rol de tu cuenta aún no es compatible con este entorno.",
-        "login_failed": "No pudimos iniciar tu sesión. Inténtalo de nuevo."
+        "login_failed": "No pudimos iniciar tu sesión. Inténtalo de nuevo.",
+        "service_unavailable": "Ahora mismo no podemos conectar con el inicio de sesión. Inténtalo de nuevo en un momento."
       },
       "notices": {
         "password_reset": "Tu contraseña se ha restablecido. Inicia sesión con tu nueva contraseña.",

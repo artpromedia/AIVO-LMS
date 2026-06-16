@@ -1975,7 +1975,8 @@
         "mfa_session_expired": "你的验证会话已过期。请重新登录。",
         "wrong_surface": "此账户在其他端登录（学区或管理端）。请使用正确的门户。",
         "unsupported_role": "你账户的角色尚不支持此端。",
-        "login_failed": "我们无法为你登录。请重试。"
+        "login_failed": "我们无法为你登录。请重试。",
+        "service_unavailable": "现在无法连接登录服务。请稍后再试。"
       },
       "notices": {
         "password_reset": "你的密码已重置。请使用新密码登录。",

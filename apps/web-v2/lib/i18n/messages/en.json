@@ -48,7 +48,8 @@
         "mfa_session_expired": "Your verification session expired. Please sign in again.",
         "wrong_surface": "This account signs in on a different surface (district or admin). Use the correct portal.",
         "unsupported_role": "Your account role isn't supported on this surface yet.",
-        "login_failed": "We couldn't sign you in. Please try again."
+        "login_failed": "We couldn't sign you in. Please try again.",
+        "service_unavailable": "We can't reach sign-in right now. Please try again in a moment."
       },
       "notices": {
         "password_reset": "Your password has been reset. Please sign in with your new password.",

@@ -1975,7 +1975,8 @@
         "mfa_session_expired": "Sua sessão de verificação expirou. Entre novamente.",
         "wrong_surface": "Esta conta entra em outro ambiente (distrito ou administração). Use o portal correto.",
         "unsupported_role": "O perfil da sua conta ainda não é compatível com este ambiente.",
-        "login_failed": "Não conseguimos fazer seu acesso. Tente novamente."
+        "login_failed": "Não conseguimos fazer seu acesso. Tente novamente.",
+        "service_unavailable": "Não conseguimos acessar o login agora. Tente de novo em instantes."
       },
       "notices": {
         "password_reset": "Sua senha foi redefinida. Entre com sua nova senha.",

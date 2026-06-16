@@ -33,6 +33,7 @@ const ERROR_CODES = new Set([
   "wrong_surface",
   "unsupported_role",
   "login_failed",
+  "service_unavailable",
 ]);
 const NOTICE_CODES = new Set(["password_reset", "logged_out"]);
 
