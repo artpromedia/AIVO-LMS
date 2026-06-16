@@ -677,3 +677,9 @@ id = "Z-b20JBK3idBX-UcAzJDY"
 uri = "file://attached_assets/generated_images/tutor-robots/muse.png"
 type = "image"
 title = "Muse — Creative Arts"
+
+[[outputs]]
+id = "1K5PQxBsM39n4-0mYS1NS"
+uri = "file://docs/design-language/inclusive-warm-conversion-plan.md"
+type = "text"
+title = "Inclusive-Warm Design-System Conversion Plan"
